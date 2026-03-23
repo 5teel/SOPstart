@@ -12,7 +12,7 @@ Four phases deliver the complete v1 product. Phase 1 establishes the multi-tenan
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation** - Multi-tenant auth, role-based access, and PWA shell
+- [x] **Phase 1: Foundation** - Multi-tenant auth, role-based access, and PWA shell (completed 2026-03-23)
 - [ ] **Phase 2: Document Intake** - AI parsing pipeline, admin review, and SOP publish workflow
 - [ ] **Phase 3: Worker Experience** - Step-by-step walkthrough, offline access, SOP library, and assignment
 - [ ] **Phase 4: Completion and Sign-off** - Completion tracking, photo evidence, and supervisor sign-off
@@ -35,7 +35,7 @@ Plans:
 - [x] 01-00-PLAN.md — Wave 0: Playwright test framework setup and stub test files for all requirements
 - [x] 01-01-PLAN.md — Next.js 16 scaffold + Supabase multi-tenant schema with RLS, JWT custom claims, and cross-tenant isolation seed test
 - [x] 01-02-PLAN.md — Auth flows (org registration, login, invite code join, email invite acceptance, role assignment)
-- [ ] 01-03-PLAN.md — PWA shell (Serwist service worker, manifest, offline indicator, bottom tab bar)
+- [x] 01-03-PLAN.md — PWA shell (Serwist service worker, manifest, offline indicator, bottom tab bar)
 
 ### Phase 2: Document Intake
 **Goal**: Admins can upload Word and PDF SOP documents, review AI-parsed output, and publish structured SOPs to the library
@@ -96,7 +96,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 2/4 | In Progress|  |
+| 1. Foundation | 4/4 | Complete   | 2026-03-23 |
 | 2. Document Intake | 0/3 | Not started | - |
 | 3. Worker Experience | 0/5 | Not started | - |
 | 4. Completion and Sign-off | 0/3 | Not started | - |

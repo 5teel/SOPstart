@@ -61,8 +61,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Platform
 
-- [ ] **PLAT-01**: App is a Progressive Web App installable to home screen on iOS and Android
-- [ ] **PLAT-02**: App works across modern Android and iOS browsers
+- [x] **PLAT-01**: App is a Progressive Web App installable to home screen on iOS and Android
+- [x] **PLAT-02**: App works across modern Android and iOS browsers
 - [x] **PLAT-03**: App indicates online/offline status to the user
 
 ## v2 Requirements
@@ -145,8 +145,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MGMT-05 | Phase 3 | Pending |
 | MGMT-06 | Phase 3 | Pending |
 | MGMT-07 | Phase 3 | Pending |
-| PLAT-01 | Phase 1 | Pending |
-| PLAT-02 | Phase 1 | Pending |
+| PLAT-01 | Phase 1 | Complete |
+| PLAT-02 | Phase 1 | Complete |
 | PLAT-03 | Phase 1 | Complete |
 
 **Coverage:**
