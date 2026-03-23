@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-brand-yellow: #f59e0b;
+  --color-brand-orange: #ea580c;
+  --color-steel-900: #111827;
+  --color-steel-800: #1f2937;
+  --color-steel-700: #374151;
+  --color-steel-400: #9ca3af;
+  --color-steel-100: #f3f4f6;
+  --min-tap-target: 72px;
+}
