@@ -29,11 +29,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Admin can assign Worker, Supervisor, Admin, and Safety Manager roles to users
   4. One organisation's users cannot see or access any data belonging to another organisation
   5. The app is installable to home screen on iOS and Android and loads in all modern mobile browsers with online/offline status visible
-**Plans**: 3 plans
+**Plans**: 4 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Next.js 16 scaffold + Supabase multi-tenant schema with RLS and JWT custom claims
-- [ ] 01-02-PLAN.md — Auth flows (org registration, login, invite code join, email invite, role assignment)
+- [ ] 01-00-PLAN.md — Wave 0: Playwright test framework setup and stub test files for all requirements
+- [ ] 01-01-PLAN.md — Next.js 16 scaffold + Supabase multi-tenant schema with RLS, JWT custom claims, and cross-tenant isolation seed test
+- [ ] 01-02-PLAN.md — Auth flows (org registration, login, invite code join, email invite acceptance, role assignment)
 - [ ] 01-03-PLAN.md — PWA shell (Serwist service worker, manifest, offline indicator, bottom tab bar)
 
 ### Phase 2: Document Intake
@@ -95,7 +96,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/3 | Not started | - |
+| 1. Foundation | 0/4 | Not started | - |
 | 2. Document Intake | 0/3 | Not started | - |
 | 3. Worker Experience | 0/5 | Not started | - |
 | 4. Completion and Sign-off | 0/3 | Not started | - |
