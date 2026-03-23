@@ -1,0 +1,17 @@
+{
+  "name": "sop-assistant",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:integration": "npx playwright test --project=integration",
+    "test:e2e": "npx playwright test --project=e2e"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2"
+  }
+}
