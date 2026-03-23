@@ -32,7 +32,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 4 plans
 
 Plans:
-- [ ] 01-00-PLAN.md — Wave 0: Playwright test framework setup and stub test files for all requirements
+- [x] 01-00-PLAN.md — Wave 0: Playwright test framework setup and stub test files for all requirements
 - [ ] 01-01-PLAN.md — Next.js 16 scaffold + Supabase multi-tenant schema with RLS, JWT custom claims, and cross-tenant isolation seed test
 - [ ] 01-02-PLAN.md — Auth flows (org registration, login, invite code join, email invite acceptance, role assignment)
 - [ ] 01-03-PLAN.md — PWA shell (Serwist service worker, manifest, offline indicator, bottom tab bar)
@@ -96,7 +96,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/4 | Not started | - |
+| 1. Foundation | 1/4 | In Progress|  |
 | 2. Document Intake | 0/3 | Not started | - |
 | 3. Worker Experience | 0/5 | Not started | - |
 | 4. Completion and Sign-off | 0/3 | Not started | - |

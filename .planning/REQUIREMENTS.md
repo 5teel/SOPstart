@@ -9,12 +9,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Authentication & Multi-Tenancy
 
-- [ ] **AUTH-01**: Organisation can register and create an account with company details
-- [ ] **AUTH-02**: User can sign up with email and password within an organisation
-- [ ] **AUTH-03**: User session persists across browser refresh and app relaunch
-- [ ] **AUTH-04**: Admin can assign roles to users (Worker, Supervisor, Admin, Safety Manager)
-- [ ] **AUTH-05**: Each organisation's data is fully isolated from other organisations
-- [ ] **AUTH-06**: Users only see data belonging to their organisation
+- [x] **AUTH-01**: Organisation can register and create an account with company details
+- [x] **AUTH-02**: User can sign up with email and password within an organisation
+- [x] **AUTH-03**: User session persists across browser refresh and app relaunch
+- [x] **AUTH-04**: Admin can assign roles to users (Worker, Supervisor, Admin, Safety Manager)
+- [x] **AUTH-05**: Each organisation's data is fully isolated from other organisations
+- [x] **AUTH-06**: Users only see data belonging to their organisation
 
 ### Document Intake & Parsing
 
@@ -63,7 +63,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **PLAT-01**: App is a Progressive Web App installable to home screen on iOS and Android
 - [ ] **PLAT-02**: App works across modern Android and iOS browsers
-- [ ] **PLAT-03**: App indicates online/offline status to the user
+- [x] **PLAT-03**: App indicates online/offline status to the user
 
 ## v2 Requirements
 
@@ -108,12 +108,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
-| AUTH-05 | Phase 1 | Pending |
-| AUTH-06 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
+| AUTH-04 | Phase 1 | Complete |
+| AUTH-05 | Phase 1 | Complete |
+| AUTH-06 | Phase 1 | Complete |
 | PARSE-01 | Phase 2 | Pending |
 | PARSE-02 | Phase 2 | Pending |
 | PARSE-03 | Phase 2 | Pending |
@@ -147,7 +147,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MGMT-07 | Phase 3 | Pending |
 | PLAT-01 | Phase 1 | Pending |
 | PLAT-02 | Phase 1 | Pending |
-| PLAT-03 | Phase 1 | Pending |
+| PLAT-03 | Phase 1 | Complete |
 
 **Coverage:**
 - v1 requirements: 30 total
