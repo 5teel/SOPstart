@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Ready to execute
-stopped_at: Completed 01-00-PLAN.md
-last_updated: "2026-03-23T12:46:11.514Z"
+stopped_at: Completed 01-01-PLAN.md
+last_updated: "2026-03-23T13:10:57.468Z"
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 ## Current Position
 
 Phase: 01 (foundation) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 
 ## Performance Metrics
 
@@ -47,6 +47,7 @@ Plan: 2 of 4
 
 *Updated after each plan completion*
 | Phase 01 P00 | 3 | 2 tasks | 6 files |
+| Phase 01-foundation P01 | 21 | 2 tasks | 18 files |
 
 ## Accumulated Context
 
@@ -62,6 +63,9 @@ Recent decisions affecting current work:
 - iOS Background Sync API unreliable — use online event + TanStack Query reconnect instead
 - [Phase 01]: Playwright over Vitest for Phase 1: integration tests require real Supabase instance and browser, not unit mocks
 - [Phase 01]: test.fixme for all stubs: tests are listed and skipped, producing a clear inventory without failing CI
+- [Phase 01-foundation]: Next.js 16 uses proxy.ts (not middleware.ts) with proxy() export — middleware convention deprecated
+- [Phase 01-foundation]: Windows requires explicit install of lightningcss-win32-x64-msvc and @tailwindcss/oxide-win32-x64-msvc for Tailwind v4 builds
+- [Phase 01-foundation]: Supabase gen types: use 2>/dev/null redirect to prevent connection info polluting generated TypeScript file
 
 ### Pending Todos
 
@@ -75,6 +79,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-23T12:46:11.510Z
-Stopped at: Completed 01-00-PLAN.md
+Last session: 2026-03-23T13:10:57.464Z
+Stopped at: Completed 01-01-PLAN.md
 Resume file: None
