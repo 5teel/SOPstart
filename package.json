@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
-    "start": "next start",
+    "start": "next start -p 4200",
     "lint": "eslint",
     "test": "npx playwright test",
     "test:integration": "npx playwright test --project=integration",
