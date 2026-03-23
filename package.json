@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "test": "npx playwright test",
@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@serwist/next": "^9.5.7",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.99.3",
     "@tailwindcss/oxide-win32-x64-msvc": "^4.2.2",
@@ -23,6 +24,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "react-hook-form": "^7.72.0",
+    "serwist": "^9.5.7",
     "zod": "^4.3.6",
     "zustand": "^5.0.12"
   },
