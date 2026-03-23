@@ -14,7 +14,9 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 
 <!-- Shipped and confirmed valuable. -->
 
-(None yet — ship to validate)
+- ✓ Multi-tenant organisation management — Phase 1
+- ✓ Role-based access (Workers, Supervisors, SOP Admins, Safety Managers) — Phase 1
+- ✓ PWA installable on iOS and Android — Phase 1
 
 ### Active
 
@@ -26,8 +28,6 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 - [ ] Photo capture as evidence during SOP completion
 - [ ] Optional completion tracking and sign-off per SOP
 - [ ] Supervisor review of completion records
-- [ ] Multi-tenant organization management
-- [ ] Role-based access (Workers, Supervisors, SOP Admins, Safety Managers)
 - [ ] SOP assignment to workers by role/trade
 - [ ] Search + browse SOP library (assigned SOPs first, full library searchable)
 - [ ] Offline-capable PWA for mixed connectivity sites
@@ -73,4 +73,4 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 | Upload-only for v1 (no in-app authoring) | Orgs already have SOPs in docs — focus on making existing ones usable, not replacing authoring tools | — Pending |
 
 ---
-*Last updated: 2026-03-23 after initialization*
+*Last updated: 2026-03-23 after Phase 1 completion*
