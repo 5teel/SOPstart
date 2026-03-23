@@ -43,6 +43,7 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 
 ## Context
 
+- **New Zealand market** — built for NZ professionals and organizations, NZ-based SaaS
 - Target users are blue-collar tradespeople and inspectors in industrial/manufacturing settings (glass manufacturing, machine shops, etc.)
 - SOPs range widely: from safety-critical chemical handling procedures (PPE-heavy, hazard warnings, emergency procedures) to software configuration guides to equipment maintenance
 - Typical SOP structure includes: hazard warnings, PPE requirements, training/qualification prerequisites, emergency procedures, numbered step-by-step instructions with figures/photos, and competency assessment/sign-off sections
