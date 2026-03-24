@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to execute
-stopped_at: Completed 02-document-intake 02-02-PLAN.md
-last_updated: "2026-03-24T05:24:11.226Z"
+status: Phase complete — ready for verification
+stopped_at: Checkpoint 02-03 Task 3 — awaiting human verification of complete document intake flow
+last_updated: "2026-03-24T05:34:07.449Z"
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 8
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State
@@ -53,6 +53,7 @@ Plan: 4 of 4
 | Phase 02-document-intake P00 | 2 | 1 tasks | 4 files |
 | Phase 02-document-intake P01 | 6 | 2 tasks | 12 files |
 | Phase 02-document-intake P02 | 3 | 2 tasks | 7 files |
+| Phase 02-document-intake P03 | 7 | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,9 @@ Recent decisions affecting current work:
 - [Phase 02-document-intake]: [Phase 02-02]: openai SDK 6.x uses chat.completions.parse (not beta.chat) — beta namespace no longer contains chat in v6
 - [Phase 02-document-intake]: [Phase 02-02]: tesseract.js ImageLike requires Buffer not Uint8Array — use Buffer.from(arrayBuffer)
 - [Phase 02-document-intake]: [Phase 02-02]: PDF image extraction skipped for v1 — @napi-rs/canvas 50MB+ bundle risk on Vercel
+- [Phase 02-document-intake]: Review page split into server component (page.tsx) + client component (ReviewClient.tsx): server fetches SOP/parse job/presigned URL, client manages approval state
+- [Phase 02-document-intake]: Server-enforced publish gate: POST /publish counts unapproved sections server-side, returns 400 if any remain
+- [Phase 02-document-intake]: Realtime + polling hybrid for parse status: subscribe to postgres_changes, start setInterval polling after 5s if no event fires
 
 ### Pending Todos
 
@@ -96,6 +100,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T05:24:11.223Z
-Stopped at: Completed 02-document-intake 02-02-PLAN.md
+Last session: 2026-03-24T05:34:07.445Z
+Stopped at: Checkpoint 02-03 Task 3 — awaiting human verification of complete document intake flow
 Resume file: None
