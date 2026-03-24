@@ -18,7 +18,7 @@ export async function extractDocx(buffer: ArrayBuffer): Promise<DocxExtractionRe
   let imageIndex = 0
 
   const result = await mammoth.convertToHtml(
-    { arrayBuffer: buffer },
+    { buffer: Buffer.from(buffer) },
     {
       convertImage: mammoth.images.imgElement(async (image) => {
         const base64 = await image.read('base64')
