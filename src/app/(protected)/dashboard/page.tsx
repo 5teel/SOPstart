@@ -40,12 +40,18 @@ function AdminDashboard() {
     <div className="space-y-4">
       <p className="text-steel-400 text-sm">Welcome, Admin. Get started:</p>
       <div className="grid gap-4 sm:grid-cols-2">
-        <ActionCard
-          title="Upload SOPs"
-          description="Import your existing SOP documents"
-          disabled
-          badge="Coming soon"
-        />
+        <Link href="/admin/sops/upload">
+          <ActionCard
+            title="Upload SOPs"
+            description="Import your existing SOP documents"
+          />
+        </Link>
+        <Link href="/admin/sops">
+          <ActionCard
+            title="SOP Library"
+            description="View and manage all SOPs"
+          />
+        </Link>
         <Link href="/admin/team">
           <ActionCard
             title="Invite Team"
