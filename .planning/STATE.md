@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Ready to execute
-stopped_at: Completed 02-document-intake 02-01-PLAN.md
-last_updated: "2026-03-24T05:17:16.936Z"
+stopped_at: Completed 02-document-intake 02-02-PLAN.md
+last_updated: "2026-03-24T05:24:11.226Z"
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 8
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 ## Current Position
 
 Phase: 02 (document-intake) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 
 ## Performance Metrics
 
@@ -52,6 +52,7 @@ Plan: 3 of 4
 | Phase 01-foundation P03 | 5 | 2 tasks | 16 files |
 | Phase 02-document-intake P00 | 2 | 1 tasks | 4 files |
 | Phase 02-document-intake P01 | 6 | 2 tasks | 12 files |
+| Phase 02-document-intake P02 | 3 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,9 @@ Recent decisions affecting current work:
 - [Phase 02-01]: Presigned URL upload: server action creates SOP record and signed URL atomically; client uploads directly to Storage bypassing Next.js 4MB body limit
 - [Phase 02-01]: parse_jobs added to supabase_realtime publication at migration time to enable live status updates in admin UI
 - [Phase 02-01]: Storage path structure: {org_id}/{sop_id}/original/{filename} enables org-scoped RLS without custom functions
+- [Phase 02-document-intake]: [Phase 02-02]: openai SDK 6.x uses chat.completions.parse (not beta.chat) — beta namespace no longer contains chat in v6
+- [Phase 02-document-intake]: [Phase 02-02]: tesseract.js ImageLike requires Buffer not Uint8Array — use Buffer.from(arrayBuffer)
+- [Phase 02-document-intake]: [Phase 02-02]: PDF image extraction skipped for v1 — @napi-rs/canvas 50MB+ bundle risk on Vercel
 
 ### Pending Todos
 
@@ -92,6 +96,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T05:17:16.932Z
-Stopped at: Completed 02-document-intake 02-01-PLAN.md
+Last session: 2026-03-24T05:24:11.223Z
+Stopped at: Completed 02-document-intake 02-02-PLAN.md
 Resume file: None
