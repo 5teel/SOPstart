@@ -18,13 +18,13 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Document Intake & Parsing
 
-- [ ] **PARSE-01**: Admin can upload SOP documents in Word (.docx) format
-- [ ] **PARSE-02**: Admin can upload SOP documents in PDF format
-- [ ] **PARSE-03**: AI automatically parses uploaded documents into structured sections (hazards, PPE, steps, emergency procedures, etc.)
-- [ ] **PARSE-04**: AI extracts embedded images and figures from uploaded documents
-- [ ] **PARSE-05**: Admin can review parsed SOP alongside original document before publishing
-- [ ] **PARSE-06**: Admin can edit/correct parsed sections before publishing
-- [ ] **PARSE-07**: Parsed SOPs remain in draft state until admin explicitly publishes them
+- [x] **PARSE-01**: Admin can upload SOP documents in Word (.docx) format
+- [x] **PARSE-02**: Admin can upload SOP documents in PDF format
+- [x] **PARSE-03**: AI automatically parses uploaded documents into structured sections (hazards, PPE, steps, emergency procedures, etc.)
+- [x] **PARSE-04**: AI extracts embedded images and figures from uploaded documents
+- [x] **PARSE-05**: Admin can review parsed SOP alongside original document before publishing
+- [x] **PARSE-06**: Admin can edit/correct parsed sections before publishing
+- [x] **PARSE-07**: Parsed SOPs remain in draft state until admin explicitly publishes them
 
 ### Worker Experience
 
@@ -114,13 +114,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTH-04 | Phase 1 | Complete |
 | AUTH-05 | Phase 1 | Complete |
 | AUTH-06 | Phase 1 | Complete |
-| PARSE-01 | Phase 2 | Pending |
-| PARSE-02 | Phase 2 | Pending |
-| PARSE-03 | Phase 2 | Pending |
-| PARSE-04 | Phase 2 | Pending |
-| PARSE-05 | Phase 2 | Pending |
-| PARSE-06 | Phase 2 | Pending |
-| PARSE-07 | Phase 2 | Pending |
+| PARSE-01 | Phase 2 | Complete |
+| PARSE-02 | Phase 2 | Complete |
+| PARSE-03 | Phase 2 | Complete |
+| PARSE-04 | Phase 2 | Complete |
+| PARSE-05 | Phase 2 | Complete |
+| PARSE-06 | Phase 2 | Complete |
+| PARSE-07 | Phase 2 | Complete |
 | WORK-01 | Phase 3 | Pending |
 | WORK-02 | Phase 3 | Pending |
 | WORK-03 | Phase 3 | Pending |
