@@ -1,14 +1,15 @@
 import { z } from 'zod'
 
 // GPT-4o structured output schemas (used with zodResponseFormat)
+// OpenAI requires .nullable() not .optional() for structured outputs
 export const SopStepSchema = z.object({
   order: z.number().int(),
   text: z.string(),
-  warning: z.string().optional(),
-  caution: z.string().optional(),
-  tip: z.string().optional(),
-  required_tools: z.array(z.string()).optional(),
-  time_estimate_minutes: z.number().optional(),
+  warning: z.string().nullable(),
+  caution: z.string().nullable(),
+  tip: z.string().nullable(),
+  required_tools: z.array(z.string()).nullable(),
+  time_estimate_minutes: z.number().nullable(),
   has_image: z.boolean(),
 })
 
@@ -16,23 +17,23 @@ export const SopSectionSchema = z.object({
   order: z.number().int(),
   type: z.string(),
   title: z.string(),
-  content: z.string().optional(),
-  steps: z.array(SopStepSchema).optional(),
+  content: z.string().nullable(),
+  steps: z.array(SopStepSchema).nullable(),
   confidence: z.number().min(0).max(1),
 })
 
 export const ParsedSopSchema = z.object({
   title: z.string(),
-  sop_number: z.string().optional(),
-  revision_date: z.string().optional(),
-  author: z.string().optional(),
-  category: z.string().optional(),
-  related_sops: z.array(z.string()).optional(),
-  applicable_equipment: z.array(z.string()).optional(),
-  required_certifications: z.array(z.string()).optional(),
+  sop_number: z.string().nullable(),
+  revision_date: z.string().nullable(),
+  author: z.string().nullable(),
+  category: z.string().nullable(),
+  related_sops: z.array(z.string()).nullable(),
+  applicable_equipment: z.array(z.string()).nullable(),
+  required_certifications: z.array(z.string()).nullable(),
   sections: z.array(SopSectionSchema),
   overall_confidence: z.number().min(0).max(1),
-  parse_notes: z.string().optional(),
+  parse_notes: z.string().nullable(),
 })
 
 export type ParsedSop = z.infer<typeof ParsedSopSchema>
