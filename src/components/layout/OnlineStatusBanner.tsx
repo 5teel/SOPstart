@@ -1,12 +1,17 @@
 'use client'
+import { useState, useEffect } from 'react'
 import { useNetworkStore } from '@/stores/network'
 import { useOnlineStatus } from '@/hooks/useOnlineStatus'
 
 export function OnlineStatusBanner() {
   useOnlineStatus()
   const isOnline = useNetworkStore((s) => s.isOnline)
+  const [mounted, setMounted] = useState(false)
 
-  if (isOnline) return null
+  useEffect(() => { setMounted(true) }, [])
+
+  // Don't render during SSR to avoid hydration mismatch
+  if (!mounted || isOnline) return null
 
   return (
     <div
