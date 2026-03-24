@@ -3,7 +3,7 @@
 import { useRef, useState, useCallback } from 'react'
 import { Upload, FileText, Image as ImageIcon, X, CheckCircle, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { createUploadSession, triggerParse } from '@/actions/sops'
+import { createUploadSession } from '@/actions/sops'
 
 const ACCEPTED_MIME_TYPES = [
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -151,8 +151,13 @@ export function UploadDropzone() {
         continue
       }
 
-      // Trigger async parse
-      await triggerParse(session.sopId)
+      // Trigger async parse — call API directly from client
+      // (server action fire-and-forget fetch gets aborted by Next.js)
+      fetch('/api/sops/parse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sopId: session.sopId }),
+      }).catch(console.error)
 
       // Mark as uploaded
       setQueue(prev => prev.map(f =>
