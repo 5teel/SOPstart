@@ -108,15 +108,7 @@ export async function triggerParse(sopId: string): Promise<{ success: boolean } 
     return { error: 'Failed to start parsing' }
   }
 
-  // Fire-and-forget: call the parse API route
-  // The route handler processes asynchronously
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-  fetch(`${baseUrl}/api/sops/parse`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ sopId }),
-  }).catch(console.error) // fire and forget
-
+  // Client triggers /api/sops/parse directly (fire-and-forget doesn't work in Next.js 16 server actions)
   return { success: true }
 }
 
@@ -158,13 +150,7 @@ export async function reparseSop(sopId: string): Promise<{ success: boolean } | 
     status: 'queued',
   })
 
-  // Trigger parse (fire-and-forget)
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
-  fetch(`${baseUrl}/api/sops/parse`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ sopId }),
-  }).catch(console.error)
-
-  return { success: true }
+  // Return sopId — client triggers parse API directly
+  // (server action fire-and-forget fetch gets aborted by Next.js 16)
+  return { success: true, sopId }
 }

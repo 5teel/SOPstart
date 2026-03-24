@@ -42,7 +42,15 @@ export default function ReviewClient({ sop, parseJob, presignedUrl }: ReviewClie
   const executeReparse = async () => {
     setActionPending(true)
     setConfirmAction(null)
-    await reparseSop(sop.id)
+    const result = await reparseSop(sop.id)
+    if ('sopId' in result) {
+      // Trigger parse from client (server action can't fire-and-forget in Next.js 16)
+      fetch('/api/sops/parse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sopId: result.sopId }),
+      }).catch(console.error)
+    }
     router.refresh()
     setActionPending(false)
   }
