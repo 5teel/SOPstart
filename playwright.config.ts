@@ -18,5 +18,9 @@ export default defineConfig({
       testMatch: /offline-indicator/,
       use: { browserName: 'chromium' },
     },
+    {
+      name: 'phase2-stubs',
+      testMatch: /sop-upload|sop-parsing|sop-review/,
+    },
   ],
 })
