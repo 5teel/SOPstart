@@ -119,3 +119,52 @@ export async function triggerParse(sopId: string): Promise<{ success: boolean } 
 
   return { success: true }
 }
+
+export async function reparseSop(sopId: string): Promise<{ success: boolean } | { error: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  // Delete existing sections (cascade deletes steps and images)
+  await supabase.from('sop_sections').delete().eq('sop_id', sopId)
+
+  // Reset SOP status to parsing
+  await supabase
+    .from('sops')
+    .update({
+      status: 'parsing',
+      title: null,
+      overall_confidence: null,
+      parse_notes: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', sopId)
+
+  // Fetch SOP details for the new parse job
+  const { data: sop } = await supabase
+    .from('sops')
+    .select('organisation_id, source_file_path, source_file_type')
+    .eq('id', sopId)
+    .single()
+
+  if (!sop) return { error: 'SOP not found' }
+
+  const admin = createAdminClient()
+  await admin.from('parse_jobs').insert({
+    organisation_id: sop.organisation_id,
+    sop_id: sopId,
+    file_path: sop.source_file_path,
+    file_type: sop.source_file_type,
+    status: 'queued',
+  })
+
+  // Trigger parse (fire-and-forget)
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  fetch(`${baseUrl}/api/sops/parse`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sopId }),
+  }).catch(console.error)
+
+  return { success: true }
+}
