@@ -47,12 +47,13 @@ Plans:
   3. Admin sees the parsed output alongside the original document before publishing
   4. Admin can edit any parsed section to correct errors before publishing
   5. Parsed SOPs stay in draft state until admin explicitly publishes them; published SOPs appear in the library
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 02-01: SOP data model — sops / sop_sections / sop_steps / sop_images normalised schema, Storage bucket, presigned upload URL flow
-- [ ] 02-02: Async parsing pipeline — job queue (parse_jobs table), mammoth + unpdf extraction, GPT-4o structured output parser, confidence scoring per section
-- [ ] 02-03: Admin review UI — diff view (original alongside parsed output), section editing, draft → published publish workflow
+- [ ] 02-00-PLAN.md — Wave 0: Playwright test stubs for all PARSE requirements (sop-upload, sop-parsing, sop-review)
+- [ ] 02-01-PLAN.md — SOP data model (sops/sop_sections/sop_steps/sop_images schema + RLS), Storage buckets, presigned upload URL flow, upload UI, SOP library admin page
+- [ ] 02-02-PLAN.md — Async parsing pipeline: mammoth + unpdf text extraction, tesseract.js OCR fallback, GPT-4o structured output parser, image upload, parse Route Handler
+- [ ] 02-03-PLAN.md — Admin review UI: side-by-side layout, section editor with inline editing + approval, publish workflow, re-parse, delete draft, real-time parse status
 
 ### Phase 3: Worker Experience
 **Goal**: Workers can find, walk through, and browse any assigned SOP on their phone — including offline — with the SOP library, search, and assignment managed by admins
@@ -97,6 +98,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete   | 2026-03-23 |
-| 2. Document Intake | 0/3 | Not started | - |
+| 2. Document Intake | 0/4 | Not started | - |
 | 3. Worker Experience | 0/5 | Not started | - |
 | 4. Completion and Sign-off | 0/3 | Not started | - |
