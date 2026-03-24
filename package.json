@@ -19,6 +19,7 @@
     "@tailwindcss/oxide-win32-x64-msvc": "^4.2.2",
     "lightningcss": "^1.32.0",
     "lightningcss-win32-x64-msvc": "^1.32.0",
+    "lucide-react": "^1.0.1",
     "next": "16.2.1",
     "next-themes": "^0.4.6",
     "react": "19.2.4",

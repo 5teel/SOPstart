@@ -90,6 +90,304 @@ export type Database = {
         }
         Relationships: []
       }
+      parse_jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          file_path: string
+          file_type: string
+          id: string
+          organisation_id: string
+          retry_count: number
+          sop_id: string
+          started_at: string | null
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          file_path: string
+          file_type: string
+          id?: string
+          organisation_id: string
+          retry_count?: number
+          sop_id: string
+          started_at?: string | null
+          status?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          file_path?: string
+          file_type?: string
+          id?: string
+          organisation_id?: string
+          retry_count?: number
+          sop_id?: string
+          started_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parse_jobs_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parse_jobs_sop_id_fkey"
+            columns: ["sop_id"]
+            isOneToOne: false
+            referencedRelation: "sops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sop_images: {
+        Row: {
+          alt_text: string | null
+          content_type: string
+          created_at: string
+          id: string
+          section_id: string | null
+          sop_id: string
+          sort_order: number
+          step_id: string | null
+          storage_path: string
+        }
+        Insert: {
+          alt_text?: string | null
+          content_type: string
+          created_at?: string
+          id?: string
+          section_id?: string | null
+          sop_id: string
+          sort_order?: number
+          step_id?: string | null
+          storage_path: string
+        }
+        Update: {
+          alt_text?: string | null
+          content_type?: string
+          created_at?: string
+          id?: string
+          section_id?: string | null
+          sop_id?: string
+          sort_order?: number
+          step_id?: string | null
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sop_images_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "sop_sections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sop_images_sop_id_fkey"
+            columns: ["sop_id"]
+            isOneToOne: false
+            referencedRelation: "sops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sop_images_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "sop_steps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sop_sections: {
+        Row: {
+          approved: boolean
+          confidence: number | null
+          content: string | null
+          created_at: string
+          id: string
+          section_type: string
+          sop_id: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          approved?: boolean
+          confidence?: number | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          section_type: string
+          sop_id: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          approved?: boolean
+          confidence?: number | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          section_type?: string
+          sop_id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sop_sections_sop_id_fkey"
+            columns: ["sop_id"]
+            isOneToOne: false
+            referencedRelation: "sops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sop_steps: {
+        Row: {
+          caution: string | null
+          created_at: string
+          id: string
+          required_tools: string[] | null
+          section_id: string
+          step_number: number
+          text: string
+          time_estimate_minutes: number | null
+          tip: string | null
+          updated_at: string
+          warning: string | null
+        }
+        Insert: {
+          caution?: string | null
+          created_at?: string
+          id?: string
+          required_tools?: string[] | null
+          section_id: string
+          step_number: number
+          text: string
+          time_estimate_minutes?: number | null
+          tip?: string | null
+          updated_at?: string
+          warning?: string | null
+        }
+        Update: {
+          caution?: string | null
+          created_at?: string
+          id?: string
+          required_tools?: string[] | null
+          section_id?: string
+          step_number?: number
+          text?: string
+          time_estimate_minutes?: number | null
+          tip?: string | null
+          updated_at?: string
+          warning?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sop_steps_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "sop_sections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sops: {
+        Row: {
+          applicable_equipment: string[] | null
+          author: string | null
+          category: string | null
+          created_at: string
+          department: string | null
+          id: string
+          is_ocr: boolean
+          organisation_id: string
+          overall_confidence: number | null
+          parse_notes: string | null
+          published_at: string | null
+          related_sops: string[] | null
+          required_certifications: string[] | null
+          revision_date: string | null
+          sop_number: string | null
+          source_file_name: string
+          source_file_path: string
+          source_file_type: string
+          status: Database["public"]["Enums"]["sop_status"]
+          title: string | null
+          updated_at: string
+          uploaded_by: string
+          version: number
+        }
+        Insert: {
+          applicable_equipment?: string[] | null
+          author?: string | null
+          category?: string | null
+          created_at?: string
+          department?: string | null
+          id?: string
+          is_ocr?: boolean
+          organisation_id: string
+          overall_confidence?: number | null
+          parse_notes?: string | null
+          published_at?: string | null
+          related_sops?: string[] | null
+          required_certifications?: string[] | null
+          revision_date?: string | null
+          sop_number?: string | null
+          source_file_name: string
+          source_file_path: string
+          source_file_type: string
+          status?: Database["public"]["Enums"]["sop_status"]
+          title?: string | null
+          updated_at?: string
+          uploaded_by: string
+          version?: number
+        }
+        Update: {
+          applicable_equipment?: string[] | null
+          author?: string | null
+          category?: string | null
+          created_at?: string
+          department?: string | null
+          id?: string
+          is_ocr?: boolean
+          organisation_id?: string
+          overall_confidence?: number | null
+          parse_notes?: string | null
+          published_at?: string | null
+          related_sops?: string[] | null
+          required_certifications?: string[] | null
+          revision_date?: string | null
+          sop_number?: string | null
+          source_file_name?: string
+          source_file_path?: string
+          source_file_type?: string
+          status?: Database["public"]["Enums"]["sop_status"]
+          title?: string | null
+          updated_at?: string
+          uploaded_by?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sops_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       supervisor_assignments: {
         Row: {
           created_at: string
@@ -136,6 +434,7 @@ export type Database = {
     }
     Enums: {
       app_role: "worker" | "supervisor" | "admin" | "safety_manager"
+      sop_status: "uploading" | "parsing" | "draft" | "published"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -267,6 +566,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["worker", "supervisor", "admin", "safety_manager"],
+      sop_status: ["uploading", "parsing", "draft", "published"],
     },
   },
 } as const
