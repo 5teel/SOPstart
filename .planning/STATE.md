@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Ready to execute
-stopped_at: Completed 02-document-intake 02-00-PLAN.md
-last_updated: "2026-03-24T05:08:48.601Z"
+stopped_at: Completed 02-document-intake 02-01-PLAN.md
+last_updated: "2026-03-24T05:17:16.936Z"
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 8
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 ## Current Position
 
 Phase: 02 (document-intake) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 
 ## Performance Metrics
 
@@ -51,6 +51,7 @@ Plan: 2 of 4
 | Phase 01-foundation P02 | 10m | 2 tasks | 16 files |
 | Phase 01-foundation P03 | 5 | 2 tasks | 16 files |
 | Phase 02-document-intake P00 | 2 | 1 tasks | 4 files |
+| Phase 02-document-intake P01 | 6 | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -75,6 +76,9 @@ Recent decisions affecting current work:
 - [Phase 01-foundation]: next build --webpack required: Next.js 16 Turbopack default conflicts with @serwist/next webpack plugin — build script updated
 - [Phase 01-foundation]: SW disabled in development: disable: process.env.NODE_ENV === 'development' prevents aggressive caching during local dev
 - [Phase 02-document-intake]: Added phase2-stubs Playwright project: new SOP test files not matched by existing integration/e2e project regex — required for test discovery
+- [Phase 02-01]: Presigned URL upload: server action creates SOP record and signed URL atomically; client uploads directly to Storage bypassing Next.js 4MB body limit
+- [Phase 02-01]: parse_jobs added to supabase_realtime publication at migration time to enable live status updates in admin UI
+- [Phase 02-01]: Storage path structure: {org_id}/{sop_id}/original/{filename} enables org-scoped RLS without custom functions
 
 ### Pending Todos
 
@@ -88,6 +92,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T05:08:48.598Z
-Stopped at: Completed 02-document-intake 02-00-PLAN.md
+Last session: 2026-03-24T05:17:16.932Z
+Stopped at: Completed 02-document-intake 02-01-PLAN.md
 Resume file: None
