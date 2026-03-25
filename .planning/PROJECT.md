@@ -18,19 +18,19 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 - ✓ Role-based access (Workers, Supervisors, SOP Admins, Safety Managers) — Phase 1
 - ✓ PWA installable on iOS and Android — Phase 1
 - ✓ AI-powered SOP document parsing (Word/PDF to structured data) — Phase 2
+- ✓ Step-by-step guided walkthrough mode for workers — Phase 3
+- ✓ Quick reference/lookup mode with sectioned navigation — Phase 3
+- ✓ SOP assignment to workers by role/trade — Phase 3
+- ✓ Search + browse SOP library (assigned SOPs first) — Phase 3
+- ✓ Offline-capable PWA for mixed connectivity sites — Phase 3
+- ✓ Image/figure display within SOP steps — Phase 3
 
 ### Active
 
 <!-- Current scope. Building toward these. -->
-- [ ] Step-by-step guided walkthrough mode for workers
-- [ ] Quick reference/lookup mode with sectioned navigation (Hazards, PPE, Steps, Emergency, etc.)
 - [ ] Photo capture as evidence during SOP completion
 - [ ] Optional completion tracking and sign-off per SOP
 - [ ] Supervisor review of completion records
-- [ ] SOP assignment to workers by role/trade
-- [ ] Search + browse SOP library (assigned SOPs first, full library searchable)
-- [ ] Offline-capable PWA for mixed connectivity sites
-- [ ] Image/figure display within SOP steps
 
 ### Out of Scope
 
@@ -72,4 +72,4 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 | Upload-only for v1 (no in-app authoring) | Orgs already have SOPs in docs — focus on making existing ones usable, not replacing authoring tools | — Pending |
 
 ---
-*Last updated: 2026-03-25 after Phase 2 completion*
+*Last updated: 2026-03-25 after Phase 3 completion*
