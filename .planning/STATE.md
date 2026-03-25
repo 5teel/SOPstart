@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Phase complete — ready for verification
-stopped_at: Checkpoint 02-03 Task 3 — awaiting human verification of complete document intake flow
-last_updated: "2026-03-24T05:34:07.449Z"
+stopped_at: Completed 02-03 — Phase 2 Document Intake fully complete and verified
+last_updated: "2026-03-25T00:05:48.497Z"
 progress:
   total_phases: 4
   completed_phases: 2
@@ -54,6 +54,7 @@ Plan: 4 of 4
 | Phase 02-document-intake P01 | 6 | 2 tasks | 12 files |
 | Phase 02-document-intake P02 | 3 | 2 tasks | 7 files |
 | Phase 02-document-intake P03 | 7 | 2 tasks | 11 files |
+| Phase 02-document-intake P02-03 | 120 | 3 tasks | 18 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,9 @@ Recent decisions affecting current work:
 - [Phase 02-document-intake]: Review page split into server component (page.tsx) + client component (ReviewClient.tsx): server fetches SOP/parse job/presigned URL, client manages approval state
 - [Phase 02-document-intake]: Server-enforced publish gate: POST /publish counts unapproved sections server-side, returns 400 if any remain
 - [Phase 02-document-intake]: Realtime + polling hybrid for parse status: subscribe to postgres_changes, start setInterval polling after 5s if no event fires
+- [Phase 02-document-intake]: Parse triggered client-side: Next.js 16 aborts fire-and-forget fetch in server actions — call /api/sops/parse directly from client
+- [Phase 02-document-intake]: mammoth requires Buffer.from() input: arrayBuffer option fails silently with 'Could not find file in options'
+- [Phase 02-document-intake]: OpenAI structured outputs use .nullable() not .optional(): required by OpenAI structured output spec
 
 ### Pending Todos
 
@@ -100,6 +104,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-24T05:34:07.445Z
-Stopped at: Checkpoint 02-03 Task 3 — awaiting human verification of complete document intake flow
+Last session: 2026-03-25T00:05:48.493Z
+Stopped at: Completed 02-03 — Phase 2 Document Intake fully complete and verified
 Resume file: None
