@@ -313,6 +313,7 @@ export type Database = {
           is_ocr: boolean
           organisation_id: string
           overall_confidence: number | null
+          parent_sop_id: string | null
           parse_notes: string | null
           published_at: string | null
           related_sops: string[] | null
@@ -323,6 +324,7 @@ export type Database = {
           source_file_path: string
           source_file_type: string
           status: Database["public"]["Enums"]["sop_status"]
+          superseded_by: string | null
           title: string | null
           updated_at: string
           uploaded_by: string
@@ -338,6 +340,7 @@ export type Database = {
           is_ocr?: boolean
           organisation_id: string
           overall_confidence?: number | null
+          parent_sop_id?: string | null
           parse_notes?: string | null
           published_at?: string | null
           related_sops?: string[] | null
@@ -348,6 +351,7 @@ export type Database = {
           source_file_path: string
           source_file_type: string
           status?: Database["public"]["Enums"]["sop_status"]
+          superseded_by?: string | null
           title?: string | null
           updated_at?: string
           uploaded_by: string
@@ -363,6 +367,7 @@ export type Database = {
           is_ocr?: boolean
           organisation_id?: string
           overall_confidence?: number | null
+          parent_sop_id?: string | null
           parse_notes?: string | null
           published_at?: string | null
           related_sops?: string[] | null
@@ -373,6 +378,7 @@ export type Database = {
           source_file_path?: string
           source_file_type?: string
           status?: Database["public"]["Enums"]["sop_status"]
+          superseded_by?: string | null
           title?: string | null
           updated_at?: string
           uploaded_by?: string
@@ -384,6 +390,51 @@ export type Database = {
             columns: ["organisation_id"]
             isOneToOne: false
             referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      worker_notifications: {
+        Row: {
+          created_at: string
+          id: string
+          organisation_id: string
+          read: boolean
+          sop_id: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          organisation_id: string
+          read?: boolean
+          sop_id: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          organisation_id?: string
+          read?: boolean
+          sop_id?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "worker_notifications_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "worker_notifications_sop_id_fkey"
+            columns: ["sop_id"]
+            isOneToOne: false
+            referencedRelation: "sops"
             referencedColumns: ["id"]
           },
         ]
