@@ -17,12 +17,11 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 - ✓ Multi-tenant organisation management — Phase 1
 - ✓ Role-based access (Workers, Supervisors, SOP Admins, Safety Managers) — Phase 1
 - ✓ PWA installable on iOS and Android — Phase 1
+- ✓ AI-powered SOP document parsing (Word/PDF to structured data) — Phase 2
 
 ### Active
 
 <!-- Current scope. Building toward these. -->
-
-- [ ] AI-powered SOP document parsing (Word/PDF to structured data)
 - [ ] Step-by-step guided walkthrough mode for workers
 - [ ] Quick reference/lookup mode with sectioned navigation (Hazards, PPE, Steps, Emergency, etc.)
 - [ ] Photo capture as evidence during SOP completion
@@ -73,4 +72,4 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 | Upload-only for v1 (no in-app authoring) | Orgs already have SOPs in docs — focus on making existing ones usable, not replacing authoring tools | — Pending |
 
 ---
-*Last updated: 2026-03-23 after Phase 1 completion*
+*Last updated: 2026-03-25 after Phase 2 completion*
