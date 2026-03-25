@@ -1,6 +1,6 @@
 import { defaultCache } from '@serwist/next/worker'
 import type { PrecacheEntry, SerwistGlobalConfig } from 'serwist'
-import { Serwist } from 'serwist'
+import { CacheFirst, ExpirationPlugin, Serwist } from 'serwist'
 
 declare global {
   interface WorkerGlobalScope extends SerwistGlobalConfig {
@@ -15,7 +15,20 @@ const serwist = new Serwist({
   skipWaiting: true,
   clientsClaim: true,
   navigationPreload: true,
-  runtimeCaching: defaultCache,
+  runtimeCaching: [
+    ...defaultCache,
+    {
+      matcher({ url }: { url: URL }) {
+        return url.hostname.includes('supabase.co') && url.pathname.includes('/storage/')
+      },
+      handler: new CacheFirst({
+        cacheName: 'sop-images-v1',
+        plugins: [
+          new ExpirationPlugin({ maxEntries: 500, maxAgeSeconds: 60 * 60 * 24 * 30 }),
+        ],
+      }),
+    },
+  ],
   fallbacks: {
     entries: [
       {

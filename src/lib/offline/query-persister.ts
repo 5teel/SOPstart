@@ -3,7 +3,7 @@ import { createStore, get, set, del } from 'idb-keyval'
 
 const idbStore = createStore('tanstack-query', 'query-cache')
 
-export const queryPersister = experimental_createQueryPersister({
+const _persister = experimental_createQueryPersister({
   storage: {
     getItem: (key: string) => get(key, idbStore),
     setItem: (key: string, value: string) => set(key, value, idbStore),
@@ -11,3 +11,6 @@ export const queryPersister = experimental_createQueryPersister({
   },
   maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
 })
+
+// queryPersister.persisterFn is the QueryPersister function expected by useQuery's persister option
+export const queryPersister = _persister.persisterFn
