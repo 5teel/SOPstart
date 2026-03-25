@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Multi-tenant auth, role-based access, and PWA shell (completed 2026-03-23)
 - [x] **Phase 2: Document Intake** - AI parsing pipeline, admin review, and SOP publish workflow (completed 2026-03-24)
-- [ ] **Phase 3: Worker Experience** - Step-by-step walkthrough, offline access, SOP library, and assignment
+- [x] **Phase 3: Worker Experience** - Step-by-step walkthrough, offline access, SOP library, and assignment (completed 2026-03-25)
 - [ ] **Phase 4: Completion and Sign-off** - Completion tracking, photo evidence, and supervisor sign-off
 
 ## Phase Details
@@ -73,7 +73,7 @@ Plans:
 - [x] 03-02-PLAN.md — Worker SOP walkthrough: safety acknowledgement gate, scrolling step list with tap-to-complete, progress indicator, inline images with zoom, full-screen glove-friendly layout
 - [x] 03-03-PLAN.md — SOP library and quick reference: SOP card list, search overlay, category bottom sheet/sidebar, SOP detail page with tabbed section navigation
 - [x] 03-04-PLAN.md — Admin SOP assignment: assign SOPs to roles and individual workers, assignment row component, server actions with admin role guards
-- [ ] 03-05-PLAN.md — SOP versioning and notifications: version history page, re-upload flow, superseded_by lineage, worker notifications table, notification polling and badge
+- [x] 03-05-PLAN.md — SOP versioning and notifications: version history page, re-upload flow, superseded_by lineage, worker notifications table, notification polling and badge
 
 ### Phase 4: Completion and Sign-off
 **Goal**: Worker completions are durably recorded with photo evidence and SOP version snapshot, and supervisors can review and sign off completions
@@ -100,5 +100,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete   | 2026-03-23 |
 | 2. Document Intake | 4/4 | Complete   | 2026-03-25 |
-| 3. Worker Experience | 5/6 | In Progress|  |
+| 3. Worker Experience | 6/6 | Complete   | 2026-03-25 |
 | 4. Completion and Sign-off | 0/3 | Not started | - |
