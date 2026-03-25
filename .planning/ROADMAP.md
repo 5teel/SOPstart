@@ -84,12 +84,12 @@ Plans:
   2. Worker can capture photos during specific walkthrough steps; photos are tied to the step they were taken on
   3. Completion records cannot be deleted or modified after creation; they form an append-only audit trail
   4. Supervisor can view all completion records for workers they oversee and can approve or reject each completion
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 04-01: Completion FSM and offline-first recording — not_started → in_progress → pending_sign_off state machine, append-only completions table, step completion recording via offline sync queue, SOP version hash snapshot at completion
-- [ ] 04-02: Photo capture and upload queue — camera capture with iOS fallback (input[capture]), Canvas client-side compression (~200KB target), Dexie photo queue, flush to Supabase Storage on reconnect, step-photo foreign key
-- [ ] 04-03: Supervisor sign-off UI — completion record list filtered to supervised workers, approve/reject action (creates second immutable record), completion status visible to supervisor
+- [ ] 04-01-PLAN.md — Completion data foundation: migration 00010 (sop_completions, completion_photos, completion_sign_offs with append-only RLS), Dexie v2 schema, completionStore with Dexie persistence, photo-compress utility, sync engine extensions, server actions (submitCompletion, signOffCompletion, getPhotoUploadUrl), StatusBadge extensions
+- [ ] 04-02-PLAN.md — Photo capture and walkthrough integration: StepPhotoZone with camera input, PhotoThumbnail with upload status, usePhotoQueue hook, walkthrough page extended with completion store (resume support), photo-required gate, Submit Completion flow with content hash
+- [ ] 04-03-PLAN.md — Supervisor sign-off UI: role-aware Activity page (worker history / supervisor feed), filter pills, completion detail page with step rows and photo lightbox, approve/reject sign-off panel with mandatory rejection reason
 
 ## Progress
 
