@@ -112,7 +112,7 @@ export async function triggerParse(sopId: string): Promise<{ success: boolean } 
   return { success: true }
 }
 
-export async function reparseSop(sopId: string): Promise<{ success: boolean } | { error: string }> {
+export async function reparseSop(sopId: string): Promise<{ success: true; sopId: string } | { error: string }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
