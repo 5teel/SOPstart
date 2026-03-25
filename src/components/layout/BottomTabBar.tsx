@@ -1,6 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { NotificationBadge } from '@/components/layout/NotificationBadge'
 
 function DocumentIcon({ className }: { className?: string }) {
   return (
@@ -93,7 +94,14 @@ export function BottomTabBar() {
               ].join(' ')}
               aria-current={isActive ? 'page' : undefined}
             >
-              <Icon className="h-5 w-5" />
+              {label === 'SOPs' ? (
+                <span className="relative">
+                  <Icon className="h-5 w-5" />
+                  <NotificationBadge />
+                </span>
+              ) : (
+                <Icon className="h-5 w-5" />
+              )}
               <span>{label}</span>
             </Link>
           )
