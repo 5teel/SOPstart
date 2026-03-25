@@ -22,5 +22,9 @@ export default defineConfig({
       name: 'phase2-stubs',
       testMatch: /sop-upload|sop-parsing|sop-review/,
     },
+    {
+      name: 'phase3-stubs',
+      testMatch: /offline-sync|walkthrough|quick-ref|sop-library|sop-assignment|sop-versioning/,
+    },
   ],
 })
