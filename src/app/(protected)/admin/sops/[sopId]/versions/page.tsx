@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { getVersionHistory, uploadNewVersion, type VersionRecord } from '@/actions/versioning'
+import { getVersionHistory, uploadNewVersion, notifyAssignedWorkers, type VersionRecord } from '@/actions/versioning'
 
 function ArrowLeftIcon({ className }: { className?: string }) {
   return (
@@ -139,6 +139,9 @@ export default function SopVersionHistoryPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sopId: result.newSopId }),
       })
+
+      // Notify assigned workers about the SOP update (MGMT-07)
+      await notifyAssignedWorkers(sopId as string, result.newSopId)
 
       // Redirect to new version's review page
       router.push(`/admin/sops/${result.newSopId}/review`)
