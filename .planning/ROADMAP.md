@@ -68,7 +68,7 @@ Plans:
 **Plans**: 6 plans
 
 Plans:
-- [ ] 03-00-PLAN.md — Wave 0: Playwright test stubs for all WORK and MGMT requirements (17 stubs across 6 test files)
+- [x] 03-00-PLAN.md — Wave 0: Playwright test stubs for all WORK and MGMT requirements (17 stubs across 6 test files)
 - [ ] 03-01-PLAN.md — Offline-first data layer: Dexie.js IndexedDB schema, TanStack Query persister, SOP sync engine, walkthrough state store, Serwist image caching, FTS and assignment migrations
 - [ ] 03-02-PLAN.md — Worker SOP walkthrough: safety acknowledgement gate, scrolling step list with tap-to-complete, progress indicator, inline images with zoom, full-screen glove-friendly layout
 - [ ] 03-03-PLAN.md — SOP library and quick reference: SOP card list, search overlay, category bottom sheet/sidebar, SOP detail page with tabbed section navigation
@@ -100,5 +100,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete   | 2026-03-23 |
 | 2. Document Intake | 4/4 | Complete   | 2026-03-25 |
-| 3. Worker Experience | 0/6 | Not started | - |
+| 3. Worker Experience | 1/6 | In Progress|  |
 | 4. Completion and Sign-off | 0/3 | Not started | - |

@@ -28,16 +28,16 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Worker Experience
 
-- [ ] **WORK-01**: Worker can walk through an SOP step-by-step with clear progress indication
-- [ ] **WORK-02**: Worker can navigate back to previous steps during a walkthrough
-- [ ] **WORK-03**: Worker can view SOP sections (Hazards, PPE, Steps, Emergency) via tabbed quick-reference mode
-- [ ] **WORK-04**: Worker can jump directly to any section without walking through all steps
-- [ ] **WORK-05**: Hazard and PPE information is prominently displayed before procedure steps begin
-- [ ] **WORK-06**: Images and figures display inline within SOP steps with zoom capability
-- [ ] **WORK-07**: Worker can access cached SOPs without internet connection
-- [ ] **WORK-08**: Data entered offline syncs automatically when connectivity returns
-- [ ] **WORK-09**: All primary actions (Next, Complete, Photo) use large tap targets (72px+) usable with gloves
-- [ ] **WORK-10**: Walkthrough uses full-screen card interface optimised for one-handed use
+- [x] **WORK-01**: Worker can walk through an SOP step-by-step with clear progress indication
+- [x] **WORK-02**: Worker can navigate back to previous steps during a walkthrough
+- [x] **WORK-03**: Worker can view SOP sections (Hazards, PPE, Steps, Emergency) via tabbed quick-reference mode
+- [x] **WORK-04**: Worker can jump directly to any section without walking through all steps
+- [x] **WORK-05**: Hazard and PPE information is prominently displayed before procedure steps begin
+- [x] **WORK-06**: Images and figures display inline within SOP steps with zoom capability
+- [x] **WORK-07**: Worker can access cached SOPs without internet connection
+- [x] **WORK-08**: Data entered offline syncs automatically when connectivity returns
+- [x] **WORK-09**: All primary actions (Next, Complete, Photo) use large tap targets (72px+) usable with gloves
+- [x] **WORK-10**: Walkthrough uses full-screen card interface optimised for one-handed use
 
 ### Completion Tracking & Sign-off
 
@@ -51,13 +51,13 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### SOP Management
 
-- [ ] **MGMT-01**: Admin can assign SOPs to specific roles or individual workers
-- [ ] **MGMT-02**: Worker sees assigned SOPs first when browsing the library
-- [ ] **MGMT-03**: Worker can search the full SOP library by title and content
-- [ ] **MGMT-04**: Worker can browse SOPs by category or department
-- [ ] **MGMT-05**: Admin can update an SOP by uploading a new version of the document
-- [ ] **MGMT-06**: Previous SOP versions are retained and linked to historical completions
-- [ ] **MGMT-07**: Workers are notified when an assigned SOP has been updated
+- [x] **MGMT-01**: Admin can assign SOPs to specific roles or individual workers
+- [x] **MGMT-02**: Worker sees assigned SOPs first when browsing the library
+- [x] **MGMT-03**: Worker can search the full SOP library by title and content
+- [x] **MGMT-04**: Worker can browse SOPs by category or department
+- [x] **MGMT-05**: Admin can update an SOP by uploading a new version of the document
+- [x] **MGMT-06**: Previous SOP versions are retained and linked to historical completions
+- [x] **MGMT-07**: Workers are notified when an assigned SOP has been updated
 
 ### Platform
 
@@ -121,16 +121,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PARSE-05 | Phase 2 | Complete |
 | PARSE-06 | Phase 2 | Complete |
 | PARSE-07 | Phase 2 | Complete |
-| WORK-01 | Phase 3 | Pending |
-| WORK-02 | Phase 3 | Pending |
-| WORK-03 | Phase 3 | Pending |
-| WORK-04 | Phase 3 | Pending |
-| WORK-05 | Phase 3 | Pending |
-| WORK-06 | Phase 3 | Pending |
-| WORK-07 | Phase 3 | Pending |
-| WORK-08 | Phase 3 | Pending |
-| WORK-09 | Phase 3 | Pending |
-| WORK-10 | Phase 3 | Pending |
+| WORK-01 | Phase 3 | Complete |
+| WORK-02 | Phase 3 | Complete |
+| WORK-03 | Phase 3 | Complete |
+| WORK-04 | Phase 3 | Complete |
+| WORK-05 | Phase 3 | Complete |
+| WORK-06 | Phase 3 | Complete |
+| WORK-07 | Phase 3 | Complete |
+| WORK-08 | Phase 3 | Complete |
+| WORK-09 | Phase 3 | Complete |
+| WORK-10 | Phase 3 | Complete |
 | COMP-01 | Phase 4 | Pending |
 | COMP-02 | Phase 4 | Pending |
 | COMP-03 | Phase 4 | Pending |
@@ -138,13 +138,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | COMP-05 | Phase 4 | Pending |
 | COMP-06 | Phase 4 | Pending |
 | COMP-07 | Phase 4 | Pending |
-| MGMT-01 | Phase 3 | Pending |
-| MGMT-02 | Phase 3 | Pending |
-| MGMT-03 | Phase 3 | Pending |
-| MGMT-04 | Phase 3 | Pending |
-| MGMT-05 | Phase 3 | Pending |
-| MGMT-06 | Phase 3 | Pending |
-| MGMT-07 | Phase 3 | Pending |
+| MGMT-01 | Phase 3 | Complete |
+| MGMT-02 | Phase 3 | Complete |
+| MGMT-03 | Phase 3 | Complete |
+| MGMT-04 | Phase 3 | Complete |
+| MGMT-05 | Phase 3 | Complete |
+| MGMT-06 | Phase 3 | Complete |
+| MGMT-07 | Phase 3 | Complete |
 | PLAT-01 | Phase 1 | Complete |
 | PLAT-02 | Phase 1 | Complete |
 | PLAT-03 | Phase 1 | Complete |
