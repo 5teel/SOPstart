@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Ready to execute
-stopped_at: Completed 03-00-PLAN.md
-last_updated: "2026-03-25T12:24:27.065Z"
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-03-25T12:34:50.030Z"
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 14
-  completed_plans: 9
+  completed_plans: 10
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 ## Current Position
 
 Phase: 03 (worker-experience) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 
 ## Performance Metrics
 
@@ -56,6 +56,7 @@ Plan: 2 of 6
 | Phase 02-document-intake P03 | 7 | 2 tasks | 11 files |
 | Phase 02-document-intake P02-03 | 120 | 3 tasks | 18 files |
 | Phase 03-worker-experience P00 | 2 | 2 tasks | 7 files |
+| Phase 03-worker-experience P01 | 7 | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -93,6 +94,9 @@ Recent decisions affecting current work:
 - [Phase 02-document-intake]: mammoth requires Buffer.from() input: arrayBuffer option fails silently with 'Could not find file in options'
 - [Phase 02-document-intake]: OpenAI structured outputs use .nullable() not .optional(): required by OpenAI structured output spec
 - [Phase 03-worker-experience]: phase3-stubs Playwright project uses filename regex to match all 6 new test files, consistent with phase2-stubs approach
+- [Phase 03-worker-experience]: experimental_createQueryPersister returns object; pass .persisterFn to useQuery persister option (not the whole object)
+- [Phase 03-worker-experience]: Walkthrough store in-memory only: safety-critical D-02 requires re-acknowledgement per session, not persistence across restarts
+- [Phase 03-worker-experience]: syncAssignedSops accepts SupabaseClient<any> to avoid Database generic type conflicts at call sites
 
 ### Pending Todos
 
@@ -106,6 +110,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T12:24:27.062Z
-Stopped at: Completed 03-00-PLAN.md
+Last session: 2026-03-25T12:34:50.027Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None
