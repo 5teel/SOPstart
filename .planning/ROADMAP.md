@@ -65,14 +65,15 @@ Plans:
   3. Worker can search and browse the SOP library; assigned SOPs appear first; images within steps display inline with zoom
   4. Worker can access all assigned SOPs without an internet connection; data entered offline syncs when connectivity returns
   5. Admin can assign SOPs to roles or individual workers; uploading a new document version retains previous versions linked to historical completions; workers see an update notification when an assigned SOP changes
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- [ ] 03-01: Offline-first data layer — Dexie.js IndexedDB schema (SOPs, steps, completion states, photo queue), TanStack Query offlineFirst mode, SOP sync engine (version diff → fetch stale → cache images)
-- [ ] 03-02: Worker SOP walkthrough UI — full-screen card interface, 72px+ touch targets, step navigation (forward/back), hazard/PPE prominence, image rendering with zoom, progress indicator
-- [ ] 03-03: Quick reference mode — tabbed interface (Hazards / PPE / Steps / Emergency), direct section jump, per-SOP cache readiness indicator, offline status indicator
-- [ ] 03-04: SOP library, search, and assignment — full-text search (title + content), browse by category/department, assigned SOPs first, admin assignment UI (role and individual)
-- [ ] 03-05: SOP versioning and worker notifications — version integer, previous versions retained, admin re-upload flow, worker in-app notification on SOP update
+- [ ] 03-00-PLAN.md — Wave 0: Playwright test stubs for all WORK and MGMT requirements (17 stubs across 6 test files)
+- [ ] 03-01-PLAN.md — Offline-first data layer: Dexie.js IndexedDB schema, TanStack Query persister, SOP sync engine, walkthrough state store, Serwist image caching, FTS and assignment migrations
+- [ ] 03-02-PLAN.md — Worker SOP walkthrough: safety acknowledgement gate, scrolling step list with tap-to-complete, progress indicator, inline images with zoom, full-screen glove-friendly layout
+- [ ] 03-03-PLAN.md — SOP library and quick reference: SOP card list, search overlay, category bottom sheet/sidebar, SOP detail page with tabbed section navigation
+- [ ] 03-04-PLAN.md — Admin SOP assignment: assign SOPs to roles and individual workers, assignment row component, server actions with admin role guards
+- [ ] 03-05-PLAN.md — SOP versioning and notifications: version history page, re-upload flow, superseded_by lineage, worker notifications table, notification polling and badge
 
 ### Phase 4: Completion and Sign-off
 **Goal**: Worker completions are durably recorded with photo evidence and SOP version snapshot, and supervisors can review and sign off completions
@@ -99,5 +100,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete   | 2026-03-23 |
 | 2. Document Intake | 4/4 | Complete   | 2026-03-25 |
-| 3. Worker Experience | 0/5 | Not started | - |
+| 3. Worker Experience | 0/6 | Not started | - |
 | 4. Completion and Sign-off | 0/3 | Not started | - |
