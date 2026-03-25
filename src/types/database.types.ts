@@ -388,6 +388,39 @@ export type Database = {
           },
         ]
       }
+      sop_assignments: {
+        Row: {
+          id: string
+          organisation_id: string
+          sop_id: string
+          assignment_type: Database["public"]["Enums"]["assignment_type"]
+          role: Database["public"]["Enums"]["app_role"] | null
+          user_id: string | null
+          assigned_by: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          organisation_id: string
+          sop_id: string
+          assignment_type: Database["public"]["Enums"]["assignment_type"]
+          role?: Database["public"]["Enums"]["app_role"] | null
+          user_id?: string | null
+          assigned_by: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          sop_id?: string
+          assignment_type?: Database["public"]["Enums"]["assignment_type"]
+          role?: Database["public"]["Enums"]["app_role"] | null
+          user_id?: string | null
+          assigned_by?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       supervisor_assignments: {
         Row: {
           created_at: string
@@ -434,6 +467,7 @@ export type Database = {
     }
     Enums: {
       app_role: "worker" | "supervisor" | "admin" | "safety_manager"
+      assignment_type: "role" | "individual"
       sop_status: "uploading" | "parsing" | "draft" | "published"
     }
     CompositeTypes: {
