@@ -63,7 +63,7 @@ function UserIcon({ className }: { className?: string }) {
 }
 
 const tabs = [
-  { label: 'SOPs', href: '/dashboard', Icon: DocumentIcon },
+  { label: 'SOPs', href: '/sops', Icon: DocumentIcon },
   { label: 'Activity', href: '/activity', Icon: ClockIcon },
   { label: 'Profile', href: '/profile', Icon: UserIcon },
 ]
@@ -78,7 +78,7 @@ export function BottomTabBar() {
     >
       <div className="flex">
         {tabs.map(({ label, href, Icon }) => {
-          const isActive = pathname === href || (href !== '/dashboard' && pathname.startsWith(href))
+          const isActive = pathname === href || pathname.startsWith(href + '/')
           return (
             <Link
               key={href}
