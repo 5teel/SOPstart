@@ -115,10 +115,10 @@ export default async function SopsLibraryPage({
       ) : (
         <ul className="space-y-3">
           {sops.map(sop => (
-            <li key={sop.id}>
+            <li key={sop.id} className="flex items-stretch gap-2">
               <Link
                 href={`/admin/sops/${sop.id}/review`}
-                className="flex items-center gap-4 px-4 py-3 bg-steel-800 rounded-lg hover:bg-steel-700 transition-colors cursor-pointer min-h-[72px] border border-transparent hover:border-steel-600"
+                className="flex items-center gap-4 px-4 py-3 bg-steel-800 rounded-lg hover:bg-steel-700 transition-colors cursor-pointer min-h-[72px] border border-transparent hover:border-steel-600 flex-1 min-w-0"
               >
                 <div className="flex-1 min-w-0">
                   <p className="text-base font-semibold text-steel-100 truncate">
@@ -138,6 +138,15 @@ export default async function SopsLibraryPage({
                 </div>
                 <StatusBadge status={sop.status as SopStatus} />
               </Link>
+              {sop.status === 'published' && (
+                <Link
+                  href={`/admin/sops/${sop.id}/assign`}
+                  className="flex items-center px-3 bg-steel-800 border border-steel-700 rounded-lg hover:bg-steel-700 hover:border-steel-600 transition-colors text-xs font-medium text-steel-400 hover:text-steel-100 flex-shrink-0 whitespace-nowrap"
+                  title="Assign to roles or workers"
+                >
+                  Assign
+                </Link>
+              )}
             </li>
           ))}
         </ul>
