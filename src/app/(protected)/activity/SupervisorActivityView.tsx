@@ -15,7 +15,6 @@ interface SupervisorActivityViewProps {
 
 interface WorkerProfile {
   user_id: string
-  display_name: string | null
 }
 
 function useWorkerProfiles(workerIds: string[]) {
@@ -26,7 +25,7 @@ function useWorkerProfiles(workerIds: string[]) {
       const supabase = createClient()
       const { data, error } = await supabase
         .from('organisation_members')
-        .select('user_id, display_name')
+        .select('user_id')
         .in('user_id', workerIds)
       if (error) {
         console.error('useWorkerProfiles error:', error)
@@ -52,7 +51,8 @@ export function SupervisorActivityView({ role: _role }: SupervisorActivityViewPr
   const workerMap = useMemo(() => {
     const map = new Map<string, string>()
     for (const p of workerProfiles) {
-      map.set(p.user_id, p.display_name ?? 'Unknown Worker')
+      // No profiles table — use abbreviated user_id as display name
+      map.set(p.user_id, `Worker ${p.user_id.slice(0, 8)}`)
     }
     return map
   }, [workerProfiles])
