@@ -2,6 +2,7 @@
 type AnySupabaseClient = import('@supabase/supabase-js').SupabaseClient<any, any, any>
 import { db } from '@/lib/offline/db'
 import type { SopSection, SopStep, SopImage } from '@/types/sop'
+import { submitCompletion, getPhotoUploadUrl } from '@/actions/completions'
 
 interface SopManifestEntry {
   sop_id: string
@@ -151,4 +152,142 @@ export async function syncAssignedSops(
     const message = err instanceof Error ? err.message : String(err)
     return { synced: 0, errors: [message] }
   }
+}
+
+// ---------------------------------------------------------------
+// flushPhotoQueue
+// Uploads any pending photos (uploaded === false) to Supabase Storage
+// via server-action-generated presigned URLs.
+// ---------------------------------------------------------------
+export async function flushPhotoQueue(
+  _supabase: AnySupabaseClient
+): Promise<{ uploaded: number; errors: string[] }> {
+  const errors: string[] = []
+  let uploaded = 0
+
+  try {
+    // Dexie stores boolean false as 0 — query using numeric 0
+    const pending = await db.photoQueue
+      .where('uploaded')
+      .equals(0)
+      .toArray()
+
+    for (const photo of pending) {
+      try {
+        // Get a presigned upload URL from the server action
+        const urlResult = await getPhotoUploadUrl({
+          localId: photo.localId,
+          contentType: photo.contentType,
+          // orgId is extracted by server action from JWT — pass a placeholder here;
+          // the actual orgId extraction happens server-side
+          orgId: '',
+          completionLocalId: photo.completionLocalId,
+        })
+
+        if ('error' in urlResult) {
+          errors.push(`Photo ${photo.localId}: ${urlResult.error}`)
+          continue
+        }
+
+        // PUT blob to presigned URL
+        const putResponse = await fetch(urlResult.url, {
+          method: 'PUT',
+          body: photo.blob,
+          headers: { 'Content-Type': photo.contentType },
+        })
+
+        if (!putResponse.ok) {
+          errors.push(`Photo ${photo.localId}: upload failed (${putResponse.status})`)
+          continue
+        }
+
+        // Mark as uploaded with storage path
+        await db.photoQueue.update(photo.localId, {
+          uploaded: true,
+          storagePath: urlResult.path,
+        })
+
+        uploaded++
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err)
+        errors.push(`Photo ${photo.localId}: ${message}`)
+      }
+    }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    errors.push(message)
+  }
+
+  return { uploaded, errors }
+}
+
+// ---------------------------------------------------------------
+// flushCompletions
+// Pushes any 'submitted' (not 'in_progress') local completions to
+// Postgres via the submitCompletion server action.
+// On success (or idempotent conflict): removes from Dexie.
+// On failure: leaves in Dexie for retry next time online.
+// ---------------------------------------------------------------
+export async function flushCompletions(
+  _supabase: AnySupabaseClient
+): Promise<{ flushed: number; errors: string[] }> {
+  const errors: string[] = []
+  let flushed = 0
+
+  try {
+    const submitted = await db.completions
+      .where('status')
+      .equals('submitted')
+      .toArray()
+
+    for (const completion of submitted) {
+      try {
+        // Collect uploaded photo records associated with this completion
+        const photos = await db.photoQueue
+          .where('completionLocalId')
+          .equals(completion.localId)
+          .and((p) => p.storagePath !== null)
+          .toArray()
+
+        const photoStoragePaths = photos
+          .filter((p) => p.storagePath !== null)
+          .map((p) => ({
+            localId: p.localId,
+            stepId: p.stepId,
+            storagePath: p.storagePath as string,
+            contentType: p.contentType,
+          }))
+
+        const result = await submitCompletion({
+          localId: completion.localId,
+          sopId: completion.sopId,
+          sopVersion: completion.sopVersion,
+          contentHash: completion.contentHash,
+          stepData: completion.stepCompletions,
+          photoStoragePaths,
+        })
+
+        if ('success' in result && result.success) {
+          // Remove from Dexie on success
+          await db.completions.delete(completion.localId)
+          // Also clean up associated photo queue entries
+          await db.photoQueue
+            .where('completionLocalId')
+            .equals(completion.localId)
+            .delete()
+          flushed++
+        } else if ('error' in result) {
+          errors.push(`Completion ${completion.localId}: ${result.error}`)
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err)
+        errors.push(`Completion ${completion.localId}: ${message}`)
+      }
+    }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    errors.push(message)
+  }
+
+  return { flushed, errors }
 }
