@@ -42,8 +42,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Completion Tracking & Sign-off
 
 - [x] **COMP-01**: Worker's SOP completion is recorded with server-side timestamp
-- [ ] **COMP-02**: Worker can capture photos as evidence during specific SOP steps
-- [ ] **COMP-03**: Photos are tied to the specific step they were captured on
+- [x] **COMP-02**: Worker can capture photos as evidence during specific SOP steps
+- [x] **COMP-03**: Photos are tied to the specific step they were captured on
 - [x] **COMP-04**: Completion records reference the specific SOP version that was followed
 - [ ] **COMP-05**: Supervisor can view completion records for workers they oversee
 - [ ] **COMP-06**: Supervisor can approve or reject a worker's SOP completion
@@ -132,8 +132,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WORK-09 | Phase 3 | Complete |
 | WORK-10 | Phase 3 | Complete |
 | COMP-01 | Phase 4 | Complete |
-| COMP-02 | Phase 4 | Pending |
-| COMP-03 | Phase 4 | Pending |
+| COMP-02 | Phase 4 | Complete |
+| COMP-03 | Phase 4 | Complete |
 | COMP-04 | Phase 4 | Complete |
 | COMP-05 | Phase 4 | Pending |
 | COMP-06 | Phase 4 | Pending |
