@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Ready to plan
-stopped_at: Phase 4 UI-SPEC approved
-last_updated: "2026-03-25T21:24:00.953Z"
+status: Ready to execute
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-03-26T00:51:52.403Z"
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 14
-  completed_plans: 14
+  total_plans: 17
+  completed_plans: 15
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 03 — worker-experience
+**Current focus:** Phase 04 — completion-and-sign-off
 
 ## Current Position
 
-Phase: 4
-Plan: Not started
+Phase: 04 (completion-and-sign-off) — EXECUTING
+Plan: 2 of 3
 
 ## Performance Metrics
 
@@ -61,6 +61,7 @@ Plan: Not started
 | Phase 03-worker-experience P03 | 5 | 2 tasks | 8 files |
 | Phase 03-worker-experience P04 | 6 | 2 tasks | 6 files |
 | Phase 03-worker-experience P05 | 12 | 2 tasks | 9 files |
+| Phase 04-completion-and-sign-off P01 | 5 | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -109,6 +110,10 @@ Recent decisions affecting current work:
 - [Phase 03-worker-experience]: AdminContext typed as discriminated union for TypeScript narrowing of server action auth guard results
 - [Phase 03-worker-experience]: database.types.ts manually extended with superseded_by, parent_sop_id on sops and worker_notifications table for 03-05
 - [Phase 03-worker-experience]: NotificationBadge is self-contained: fetches own data via useNotifications hook, no props needed
+- [Phase 04-completion-and-sign-off]: Append-only RLS on sop_completions: NO UPDATE/DELETE policies for authenticated role (COMP-07, D-15)
+- [Phase 04-completion-and-sign-off]: Client UUID as sop_completions PK: idempotent retry via 23505 conflict handling (COMP-01)
+- [Phase 04-completion-and-sign-off]: Second immutable record pattern: completion_sign_offs separate from sop_completions status update (D-17)
+- [Phase 04-completion-and-sign-off]: completionStore separate from walkthroughStore: walkthrough remains memory-only per D-02 safety re-acknowledgement requirement
 
 ### Pending Todos
 
@@ -122,6 +127,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T21:24:00.949Z
-Stopped at: Phase 4 UI-SPEC approved
-Resume file: .planning/phases/04-completion-and-sign-off/04-UI-SPEC.md
+Last session: 2026-03-26T00:51:52.398Z
+Stopped at: Completed 04-01-PLAN.md
+Resume file: None
