@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { ShieldAlert, ChevronDown, AlertTriangle, ShieldCheck } from 'lucide-react'
 import { useWalkthroughStore } from '@/stores/walkthrough'
 import type { SopSection, SopStep, SopImage } from '@/types/sop'
+import type { QueuedPhoto } from '@/lib/offline/db'
 import { StepItem } from './StepItem'
 
 type SectionWithChildren = SopSection & { sop_steps: SopStep[]; sop_images: SopImage[] }
@@ -13,6 +14,11 @@ interface WalkthroughListProps {
   allImages: SopImage[]
   hazardsSection?: SopSection
   ppeSection?: SopSection
+  // Photo zone props threaded from page
+  completionLocalId: string | null
+  photosByStep: Record<string, QueuedPhoto[]>
+  onAddPhoto: (stepId: string, file: File) => Promise<void>
+  onRemovePhoto: (localId: string) => void
 }
 
 function parseListItems(content: string): string[] {
@@ -28,6 +34,10 @@ export function WalkthroughList({
   allImages,
   hazardsSection,
   ppeSection,
+  completionLocalId,
+  photosByStep,
+  onAddPhoto,
+  onRemovePhoto,
 }: WalkthroughListProps) {
   const [safetyExpanded, setSafetyExpanded] = useState(false)
   const store = useWalkthroughStore()
@@ -124,15 +134,21 @@ export function WalkthroughList({
           const isActive = !isCompleted && step.id === firstActiveId
           const status = isCompleted ? 'completed' : isActive ? 'active' : 'upcoming'
           const stepImages = allImages.filter((img) => img.step_id === step.id)
+          const stepPhotos = photosByStep[step.id] ?? []
 
           return (
-            <StepItem
-              key={step.id}
-              step={step}
-              status={status}
-              images={stepImages}
-              onToggle={() => handleToggle(step.id)}
-            />
+            <div id={`step-${step.id}`} key={step.id}>
+              <StepItem
+                step={step}
+                status={status}
+                images={stepImages}
+                onToggle={() => handleToggle(step.id)}
+                completionLocalId={completionLocalId}
+                stepPhotos={stepPhotos}
+                onAddPhoto={(file) => onAddPhoto(step.id, file)}
+                onRemovePhoto={onRemovePhoto}
+              />
+            </div>
           )
         })}
       </div>

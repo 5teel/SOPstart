@@ -1,7 +1,9 @@
 'use client'
 import { AlertTriangle, CheckCircle2, Circle } from 'lucide-react'
 import type { SopStep, SopImage } from '@/types/sop'
+import type { QueuedPhoto } from '@/lib/offline/db'
 import { SopImageInline } from './SopImageInline'
+import { StepPhotoZone } from './StepPhotoZone'
 
 type StepStatus = 'upcoming' | 'active' | 'completed'
 
@@ -10,6 +12,11 @@ interface StepItemProps {
   status: StepStatus
   images: SopImage[]
   onToggle: () => void
+  // Photo zone props — provided when a completion is active
+  completionLocalId: string | null
+  stepPhotos: QueuedPhoto[]
+  onAddPhoto: (file: File) => Promise<void>
+  onRemovePhoto: (localId: string) => void
 }
 
 const borderByStatus: Record<StepStatus, string> = {
@@ -18,7 +25,16 @@ const borderByStatus: Record<StepStatus, string> = {
   upcoming: 'border-transparent opacity-80',
 }
 
-export function StepItem({ step, status, images, onToggle }: StepItemProps) {
+export function StepItem({
+  step,
+  status,
+  images,
+  onToggle,
+  completionLocalId,
+  stepPhotos,
+  onAddPhoto,
+  onRemovePhoto,
+}: StepItemProps) {
   function handleClick() {
     if ('vibrate' in navigator) navigator.vibrate(30)
     onToggle()
@@ -76,6 +92,17 @@ export function StepItem({ step, status, images, onToggle }: StepItemProps) {
             alt={img.alt_text ?? 'Step image'}
           />
         ))}
+
+        {/* Photo zone — only when a completion is active */}
+        {completionLocalId && (
+          <StepPhotoZone
+            step={step}
+            completionLocalId={completionLocalId}
+            photos={stepPhotos}
+            onAddPhoto={onAddPhoto}
+            onRemovePhoto={onRemovePhoto}
+          />
+        )}
       </div>
 
       {/* Right: tap target */}
