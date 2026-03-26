@@ -1,6 +1,7 @@
 export type SopStatus = 'uploading' | 'parsing' | 'draft' | 'published'
 export type ParseJobStatus = 'queued' | 'processing' | 'completed' | 'failed'
 export type SourceFileType = 'docx' | 'pdf' | 'image'
+export type CompletionStatus = 'pending_sign_off' | 'signed_off' | 'rejected'
 
 export interface Sop {
   id: string
@@ -51,6 +52,7 @@ export interface SopStep {
   tip: string | null
   required_tools: string[] | null
   time_estimate_minutes: number | null
+  photo_required?: boolean
   created_at: string
   updated_at: string
 }

@@ -257,6 +257,7 @@ export type Database = {
           caution: string | null
           created_at: string
           id: string
+          photo_required: boolean
           required_tools: string[] | null
           section_id: string
           step_number: number
@@ -270,6 +271,7 @@ export type Database = {
           caution?: string | null
           created_at?: string
           id?: string
+          photo_required?: boolean
           required_tools?: string[] | null
           section_id: string
           step_number: number
@@ -283,6 +285,7 @@ export type Database = {
           caution?: string | null
           created_at?: string
           id?: string
+          photo_required?: boolean
           required_tools?: string[] | null
           section_id?: string
           step_number?: number
@@ -504,6 +507,150 @@ export type Database = {
           },
         ]
       }
+      sop_completions: {
+        Row: {
+          id: string
+          organisation_id: string
+          sop_id: string
+          worker_id: string
+          sop_version: number
+          content_hash: string
+          status: Database["public"]["Enums"]["completion_status"]
+          step_data: Json
+          submitted_at: string
+          created_at: string
+        }
+        Insert: {
+          id: string
+          organisation_id: string
+          sop_id: string
+          worker_id: string
+          sop_version: number
+          content_hash: string
+          status?: Database["public"]["Enums"]["completion_status"]
+          step_data: Json
+          submitted_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          sop_id?: string
+          worker_id?: string
+          sop_version?: number
+          content_hash?: string
+          status?: Database["public"]["Enums"]["completion_status"]
+          step_data?: Json
+          submitted_at?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sop_completions_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sop_completions_sop_id_fkey"
+            columns: ["sop_id"]
+            isOneToOne: false
+            referencedRelation: "sops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      completion_photos: {
+        Row: {
+          id: string
+          organisation_id: string
+          completion_id: string
+          step_id: string
+          storage_path: string
+          content_type: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          organisation_id: string
+          completion_id: string
+          step_id: string
+          storage_path: string
+          content_type?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          completion_id?: string
+          step_id?: string
+          storage_path?: string
+          content_type?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "completion_photos_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "completion_photos_completion_id_fkey"
+            columns: ["completion_id"]
+            isOneToOne: false
+            referencedRelation: "sop_completions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      completion_sign_offs: {
+        Row: {
+          id: string
+          organisation_id: string
+          completion_id: string
+          supervisor_id: string
+          decision: string
+          reason: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          organisation_id: string
+          completion_id: string
+          supervisor_id: string
+          decision: string
+          reason?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          completion_id?: string
+          supervisor_id?: string
+          decision?: string
+          reason?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "completion_sign_offs_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "completion_sign_offs_completion_id_fkey"
+            columns: ["completion_id"]
+            isOneToOne: false
+            referencedRelation: "sop_completions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -519,6 +666,7 @@ export type Database = {
     Enums: {
       app_role: "worker" | "supervisor" | "admin" | "safety_manager"
       assignment_type: "role" | "individual"
+      completion_status: "pending_sign_off" | "signed_off" | "rejected"
       sop_status: "uploading" | "parsing" | "draft" | "published"
     }
     CompositeTypes: {
@@ -651,6 +799,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["worker", "supervisor", "admin", "safety_manager"],
+      completion_status: ["pending_sign_off", "signed_off", "rejected"],
       sop_status: ["uploading", "parsing", "draft", "published"],
     },
   },
