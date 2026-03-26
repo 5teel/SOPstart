@@ -25,12 +25,15 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 - ✓ Offline-capable PWA for mixed connectivity sites — Phase 3
 - ✓ Image/figure display within SOP steps — Phase 3
 
+- ✓ Photo capture as evidence during SOP completion — Phase 4
+- ✓ Optional completion tracking and sign-off per SOP — Phase 4
+- ✓ Supervisor review of completion records — Phase 4
+
 ### Active
 
 <!-- Current scope. Building toward these. -->
-- [ ] Photo capture as evidence during SOP completion
-- [ ] Optional completion tracking and sign-off per SOP
-- [ ] Supervisor review of completion records
+
+(All v1 requirements validated — milestone complete)
 
 ### Out of Scope
 
@@ -72,4 +75,4 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 | Upload-only for v1 (no in-app authoring) | Orgs already have SOPs in docs — focus on making existing ones usable, not replacing authoring tools | — Pending |
 
 ---
-*Last updated: 2026-03-25 after Phase 3 completion*
+*Last updated: 2026-03-26 after Phase 4 completion — all v1 phases complete*
