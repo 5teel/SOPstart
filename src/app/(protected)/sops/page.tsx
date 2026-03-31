@@ -8,6 +8,7 @@ import { db } from '@/lib/offline/db'
 import { SopLibraryCard } from '@/components/sop/SopLibraryCard'
 import { SopSearchInput } from '@/components/sop/SopSearchInput'
 import { CategoryBottomSheet, CategorySidebar } from '@/components/sop/CategoryBottomSheet'
+import { PRODUCT_NAME } from '@/lib/constants'
 
 function getRelativeTime(isoString: string): string {
   const diff = Date.now() - new Date(isoString).getTime()
@@ -69,7 +70,7 @@ export default function SopsPage() {
     <div className="flex flex-col min-h-screen bg-steel-900">
       {/* Sticky header */}
       <header className="sticky top-0 z-20 bg-steel-900 border-b border-steel-700 px-4 flex items-center justify-between h-[56px]">
-        <span className="text-sm font-semibold text-steel-100">SOP Assistant</span>
+        <span className="text-sm font-semibold text-steel-100">{PRODUCT_NAME}</span>
         <button
           type="button"
           onClick={() => { setSearchTerm(''); setSearchOpen(true) }}

@@ -125,6 +125,10 @@ None — no external service configuration required.
 - Next plans (03-03 through 03-05) can build on the walkthrough route and sop components directory
 - The `/sops/[sopId]` detail page (quick reference view, SOP library) is not yet created — walkthrough page links to `/sops/${sopId}` which will need to exist
 
+## Self-Check: PASSED
+
+All 7 files verified present on disk. Both task commits (50e3257, dd768cd) confirmed in git log. Build passes clean.
+
 ---
 *Phase: 03-worker-experience*
 *Completed: 2026-03-25*
