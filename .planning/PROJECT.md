@@ -1,4 +1,4 @@
-# SOP Assistant
+# SafeStart
 
 ## What This Is
 
@@ -33,7 +33,20 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 
 <!-- Current scope. Building toward these. -->
 
-(All v1 requirements validated — milestone complete)
+#### Pathway 1 — Video → SOP
+- Upload video file (MP4/MOV) and transcribe to structured SOP
+- Paste YouTube/Vimeo URL, fetch and transcribe to SOP
+- Record video in-app from device camera, transcribe to SOP
+
+#### Pathway 2 — File → SOP (expanded)
+- Photo/image upload with OCR → structured SOP
+- Improved AI parsing (accuracy, section detection, formatting)
+- Additional file formats (Excel, PowerPoint, plain text)
+
+#### Pathway 3 — File → Video SOP
+- Narrated slideshow (AI voice over auto-generated slides/cards)
+- Full AI video (generated visuals/animations with narration)
+- Screen recording style (scrolling SOP content with voice overlay)
 
 ### Out of Scope
 
@@ -42,6 +55,15 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 - Real-time collaboration or chat between workers
 - Integration with external HR/ERP systems
 - Video content within SOPs
+
+## Current Milestone: v2.0 SOP Creation Pathways
+
+**Goal:** Three new ways to create and consume SOPs — from video transcription, from expanded file types (photos, Excel, PowerPoint), and as generated video content with AI narration.
+
+**Target features:**
+- Video → SOP: upload, YouTube/Vimeo URL, or in-app recording transcribed into structured SOP
+- File → SOP: photo OCR, improved AI parsing, Excel/PowerPoint/plain text support
+- File → Video SOP: narrated slideshow, full AI video, screen recording style — all three output formats
 
 ## Context
 
@@ -74,5 +96,22 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 | Multi-tenant SaaS from the start | Product is intended for multiple organizations, not a single-company tool | — Pending |
 | Upload-only for v1 (no in-app authoring) | Orgs already have SOPs in docs — focus on making existing ones usable, not replacing authoring tools | — Pending |
 
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `/gsd:transition`):
+1. Requirements invalidated? → Move to Out of Scope with reason
+2. Requirements validated? → Move to Validated with phase reference
+3. New requirements emerged? → Add to Active
+4. Decisions to log? → Add to Key Decisions
+5. "What This Is" still accurate? → Update if drifted
+
+**After each milestone** (via `/gsd:complete-milestone`):
+1. Full review of all sections
+2. Core Value check — still the right priority?
+3. Audit Out of Scope — reasons still valid?
+4. Update Context with current state
+
 ---
-*Last updated: 2026-03-26 after Phase 4 completion — all v1 phases complete*
+*Last updated: 2026-04-01 — Milestone v2.0 started*
