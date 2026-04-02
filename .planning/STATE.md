@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: SOP Creation Pathways
-status: Defining requirements
-stopped_at: Milestone v2.0 started
-last_updated: "2026-04-01T00:00:00.000Z"
+status: Roadmap defined
+stopped_at: Roadmap created — Phase 5 ready for planning
+last_updated: "2026-03-29T00:00:00.000Z"
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -23,31 +23,25 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 5 — Expanded File Intake (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-04-01 — Milestone v2.0 started
+Status: Roadmap defined, ready for Phase 5 planning
+Last activity: 2026-03-29 — v2.0 roadmap created (Phases 5–8)
+
+Progress bar: `[                    ]` 0% (0/4 v2.0 phases)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0
-- Average duration: —
+- Total plans completed (v2.0): 0
+- Average duration: — (v1.0 avg ~7 plans/phase)
 - Total execution time: —
 
-**By Phase:**
+**By Phase (v1.0 historical):**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
-
-**Recent Trend:**
-
-- Last 5 plans: —
-- Trend: —
-
-*Updated after each plan completion*
 | Phase 01 P00 | 3 | 2 tasks | 6 files |
 | Phase 01-foundation P01 | 21 | 2 tasks | 18 files |
 | Phase 01-foundation P02 | 10m | 2 tasks | 16 files |
@@ -66,6 +60,17 @@ Last activity: 2026-04-01 — Milestone v2.0 started
 | Phase 04-completion-and-sign-off P01 | 5 | 2 tasks | 9 files |
 | Phase 04-completion-and-sign-off P02 | 261 | 2 tasks | 6 files |
 | Phase 04-completion-and-sign-off P03 | 7 | 2 tasks | 11 files |
+
+**v2.0 By Phase:**
+
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| Phase 05-expanded-file-intake | - | - | - |
+| Phase 06-video-transcription-upload | - | - | - |
+| Phase 07-video-transcription-recording | - | - | - |
+| Phase 08-video-sop-generation | - | - | - |
+
+*Updated after each plan completion*
 
 ## Accumulated Context
 
@@ -125,18 +130,31 @@ Recent decisions affecting current work:
 - [Phase 04-completion-and-sign-off]: Supabase join select cast as unknown as RawRow[] — generated types don't infer relationship shapes from select strings
 - [Phase 04-completion-and-sign-off]: Admin client used for presigned read URLs in server component — bypasses RLS consistently with upload pattern
 
-### Pending Todos
+### v2.0 Decisions (pending — to be filled during planning)
 
 None yet.
+
+### Pending Todos
+
+- [ ] Confirm Vimeo URL scope for Phase 6 before planning begins (separate API token required; research flags this as product decision)
+- [ ] Phase 6 planning: research TUS integration with current Supabase JS SDK version and confirm tus-js-client vs Uppy choice
+- [ ] Phase 7 planning: verify current iOS Safari MediaRecorder support status (post-iOS 17.2) and design fallback UX
+- [ ] Phase 8 planning: validate Shotstack pricing at expected SOP volume; confirm webhook vs polling pattern
 
 ### Blockers/Concerns
 
 - Phase 2: Job queue implementation choice unresolved (Supabase Edge Function triggered by Storage events vs. BullMQ on Vercel) — decide at start of Phase 2 planning
 - Phase 3: iOS Safari evicts PWA storage after ~7 days inactivity — surface explicit per-SOP download UI with readiness indicator
 - Phase 4: Push notification delivery on iOS requires PWA installed to home screen and iOS 16.4+ — in-app polling fallback may be required
+- Phase 5: Block .xlsm, .xlsb, .xltm, .pptm, .potm, .ppam uploads at validation — macro-enabled formats must be rejected before any parsing library is invoked (validate magic bytes server-side)
+- Phase 6: YouTube/Vimeo URL pathway: never use yt-dlp or ytdl-core (ToS violation / DMCA liability); caption API only; add terms acknowledgement checkbox
+- Phase 6: Factory-floor transcription accuracy 75-85% on NZ-accented audio — pass domain vocabulary prompt to transcription API; flag numerical values, chemical names, PPE specs for admin confirmation
+- Phase 6: ffmpeg-static server-side bundling on Vercel is documented but described as bundle-sensitive — validate with a 20 MB file on Vercel preview before any other video work
+- Phase 8: Generated video storage costs are unbounded without retention policies — source videos deleted 30 days post-transcription; generated videos have 90-day TTL; per-tenant quota visible in settings
+- Phase 8: TTS mispronounces industrial terminology and NZ place names — build per-org pronunciation dictionary with SSML phoneme tags; mandatory admin audio preview before publish
 
 ## Session Continuity
 
-Last session: 2026-03-26T01:10:27.292Z
-Stopped at: Completed 04-03-PLAN.md
+Last session: 2026-03-29T00:00:00.000Z
+Stopped at: v2.0 roadmap created — Phases 5–8 defined
 Resume file: None

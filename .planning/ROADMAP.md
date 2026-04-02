@@ -4,6 +4,8 @@
 
 Four phases deliver the complete v1 product. Phase 1 establishes the multi-tenant foundation that every subsequent feature depends on — this cannot be retrofitted. Phase 2 builds the AI document ingestion pipeline, the core product differentiator. Phase 3 delivers the full worker-facing experience including offline access, SOP library, and SOP management. Phase 4 closes the loop with completion tracking, photo evidence, and supervisor sign-off.
 
+v2.0 adds four phases (5–8) delivering three new SOP creation pathways and a video consumption layer. Phase 5 establishes upload infrastructure and expanded file parsing. Phase 6 delivers video transcription via file upload and URL. Phase 7 adds in-app camera recording (gated on iOS Safari maturity). Phase 8 generates video SOPs from published structured content.
+
 ## Phases
 
 **Phase Numbering:**
@@ -16,6 +18,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Document Intake** - AI parsing pipeline, admin review, and SOP publish workflow (completed 2026-03-24)
 - [x] **Phase 3: Worker Experience** - Step-by-step walkthrough, offline access, SOP library, and assignment (completed 2026-03-25)
 - [x] **Phase 4: Completion and Sign-off** - Completion tracking, photo evidence, and supervisor sign-off (completed 2026-03-26)
+- [ ] **Phase 5: Expanded File Intake** - TUS upload infrastructure, photo OCR, Excel/PowerPoint/text parsing, and shared intake routing
+- [ ] **Phase 6: Video Transcription (Upload and URL)** - MP4/MOV file upload and YouTube/Vimeo URL → structured SOP with transcript review
+- [ ] **Phase 7: Video Transcription (In-App Recording)** - In-browser camera recording → SOP transcription with iOS Safari fallback
+- [ ] **Phase 8: Video SOP Generation** - AI-narrated slideshow, screen-recording-style, and full AI video generated from published SOPs
 
 ## Phase Details
 
@@ -91,10 +97,58 @@ Plans:
 - [x] 04-02-PLAN.md — Photo capture and walkthrough integration: StepPhotoZone with camera input, PhotoThumbnail with upload status, usePhotoQueue hook, walkthrough page extended with completion store (resume support), photo-required gate, Submit Completion flow with content hash
 - [x] 04-03-PLAN.md — Supervisor sign-off UI: role-aware Activity page (worker history / supervisor feed), filter pills, completion detail page with step rows and photo lightbox, approve/reject sign-off panel with mandatory rejection reason
 
+### Phase 5: Expanded File Intake
+**Goal**: Admins can upload photos of printed SOPs, Excel checklists, PowerPoint slide decks, and plain text files — all routed through the existing AI structuring pipeline and review UI — and TUS upload infrastructure is in place for all large file uploads
+**Depends on**: Phase 4
+**Requirements**: FILE-01, FILE-02, FILE-03, FILE-04, FILE-05, FILE-06, FILE-07, FILE-08, INFRA-01, INFRA-02
+**Success Criteria** (what must be TRUE):
+  1. Admin can photograph a printed SOP with their device camera; the system checks image quality (blur, glare, rotation) before submitting, and the extracted text appears in the standard admin review UI alongside the original image
+  2. Admin can upload an Excel (.xlsx), PowerPoint (.pptx), or plain text (.txt) file and receive a structured SOP draft with tables preserved as readable tables in SOP steps
+  3. All new file types use format-specific AI prompts — the admin review confidence scoring and high-risk token flagging applies to every new input type
+  4. Large files (including future video uploads) use TUS resumable upload direct to Supabase Storage, not routed through the Next.js server body
+  5. Every new intake pathway (photo, XLSX, PPTX, TXT) routes through the existing gpt-parser structuring pipeline without changes to the review UI
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 6: Video Transcription (Upload and URL)
+**Goal**: Admins can upload an MP4/MOV video file or paste a YouTube or Vimeo URL and receive a structured SOP draft with the raw transcript visible for manual review — including mandatory warnings when hazard or PPE sections are absent
+**Depends on**: Phase 5
+**Requirements**: VID-01, VID-02, VID-04, VID-05, VID-06, VID-07
+**Success Criteria** (what must be TRUE):
+  1. Admin can upload an MP4 or MOV video file; the upload progresses in named stages (uploading → transcribing → structuring → ready) with visible progress at each stage
+  2. Admin can paste a YouTube or Vimeo URL and the system fetches captions or transcribes audio into a structured SOP without downloading the video
+  3. Admin sees the raw transcript alongside the structured SOP output in the review UI before publishing, with high-risk tokens (chemical names, tolerances, PPE specs) flagged for confirmation
+  4. The system warns the admin when mandatory SOP sections (hazards, PPE) are absent from the video source
+  5. Transcription-sourced SOPs pass through the same confidence scoring and admin approval gate as document-parsed SOPs before they can be published
+**Plans**: TBD
+
+### Phase 7: Video Transcription (In-App Recording)
+**Goal**: Admins can record a procedure video directly in the browser and submit it for transcription into a structured SOP, with an explicit fallback for iOS devices where MediaRecorder support is unreliable
+**Depends on**: Phase 6
+**Requirements**: VID-03
+**Success Criteria** (what must be TRUE):
+  1. Admin can tap "Record video" on Android/Chrome and capture a procedure directly in the browser; on submission the recording is transcribed into a structured SOP via the same pipeline as uploaded videos
+  2. On iOS devices where MediaRecorder is unsupported or unreliable, the admin sees an explicit fallback message directing them to use file upload instead of silently failing
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 8: Video SOP Generation
+**Goal**: Admins can generate narrated slideshow, screen-recording-style, and full AI video versions of any published SOP, workers can watch those videos with chapter navigation from within the SOP view, and video viewing is tracked as a completion event
+**Depends on**: Phase 5
+**Requirements**: VGEN-01, VGEN-02, VGEN-03, VGEN-04, VGEN-05, VGEN-06, VGEN-07, VGEN-08, VGEN-09, INFRA-03
+**Success Criteria** (what must be TRUE):
+  1. Admin can trigger generation of a narrated slideshow (one slide per section, AI voiceover, hazards before steps always) or a scrolling-text screen-recording-style video from any published SOP; generation shows named stages (analyzing → generating → adding narration → finalizing)
+  2. Admin can trigger generation of a full AI avatar or animated-visual video from a published SOP (highest cost format — shown separately from the two standard formats)
+  3. Admin can preview the generated video and re-generate before publishing; a "video is outdated" warning appears when the source SOP is updated after video generation
+  4. Workers see a "Video version" button within the SOP view; the video player supports chapter navigation, timestamp jumps to specific sections, and playback speed control
+  5. Worker video viewing is recorded as a completion event in the same audit trail as text walkthrough completions; generated videos are excluded from service worker caching to prevent device storage bloat
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -102,3 +156,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 2. Document Intake | 4/4 | Complete   | 2026-03-25 |
 | 3. Worker Experience | 6/6 | Complete   | 2026-03-25 |
 | 4. Completion and Sign-off | 3/3 | Complete   | 2026-03-26 |
+| 5. Expanded File Intake | 0/TBD | Not started | - |
+| 6. Video Transcription (Upload and URL) | 0/TBD | Not started | - |
+| 7. Video Transcription (In-App Recording) | 0/TBD | Not started | - |
+| 8. Video SOP Generation | 0/TBD | Not started | - |

@@ -191,6 +191,33 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PLAT-01 | Phase 1 | Complete |
 | PLAT-02 | Phase 1 | Complete |
 | PLAT-03 | Phase 1 | Complete |
+| FILE-01 | Phase 5 | Pending |
+| FILE-02 | Phase 5 | Pending |
+| FILE-03 | Phase 5 | Pending |
+| FILE-04 | Phase 5 | Pending |
+| FILE-05 | Phase 5 | Pending |
+| FILE-06 | Phase 5 | Pending |
+| FILE-07 | Phase 5 | Pending |
+| FILE-08 | Phase 5 | Pending |
+| INFRA-01 | Phase 5 | Pending |
+| INFRA-02 | Phase 5 | Pending |
+| VID-01 | Phase 6 | Pending |
+| VID-02 | Phase 6 | Pending |
+| VID-04 | Phase 6 | Pending |
+| VID-05 | Phase 6 | Pending |
+| VID-06 | Phase 6 | Pending |
+| VID-07 | Phase 6 | Pending |
+| VID-03 | Phase 7 | Pending |
+| VGEN-01 | Phase 8 | Pending |
+| VGEN-02 | Phase 8 | Pending |
+| VGEN-03 | Phase 8 | Pending |
+| VGEN-04 | Phase 8 | Pending |
+| VGEN-05 | Phase 8 | Pending |
+| VGEN-06 | Phase 8 | Pending |
+| VGEN-07 | Phase 8 | Pending |
+| VGEN-08 | Phase 8 | Pending |
+| VGEN-09 | Phase 8 | Pending |
+| INFRA-03 | Phase 8 | Pending |
 
 **v1 Coverage:**
 - v1 requirements: 30 total
@@ -198,10 +225,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 - Unmapped: 0
 
 **v2.0 Coverage:**
-- v2.0 requirements: 28 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 28
+- v2.0 requirements: 27 total (note: original count of 28 in prior traceability header was off-by-one)
+- Mapped to phases: 27
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-04-02 — v2.0 requirements added*
+*Last updated: 2026-03-29 — v2.0 traceability mapped (Phases 5–8)*
