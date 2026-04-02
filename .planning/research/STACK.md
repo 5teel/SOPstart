@@ -1,180 +1,334 @@
-# Stack Research
+# Technology Stack
 
-**Domain:** Multi-tenant SaaS PWA — industrial SOP management with AI document parsing
-**Researched:** 2026-03-23
-**Confidence:** HIGH (core stack verified via npm, official docs, and multiple 2025 sources)
-
----
-
-## Recommended Stack
-
-### Core Technologies
-
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| Next.js | 16.2.1 | Full-stack React framework + PWA host | App Router + React Server Components reduce client payload for slow industrial WiFi. Turbopack (now stable default in v16) gives 2-5x faster builds. Server Actions simplify file upload handling without a separate API layer. Vercel deployment is zero-config. |
-| TypeScript | 5.x (bundled) | Type safety across front and back | Required, not optional. Supabase RLS policies and AI parsing schemas are complex enough that runtime type errors will cause production data bugs. |
-| Tailwind CSS | 4.2.2 | Mobile-first utility CSS | Industrial workers use phones with gloves — Tailwind makes it trivial to enforce large touch targets (min-h-16, p-4) project-wide. No switching contexts to a stylesheet. v4 uses CSS-native cascade layers, faster build. |
-| Supabase | 2.99.3 (JS client) | Postgres DB + Auth + Storage + Realtime | Single BaaS that covers auth, multi-tenant RLS, file storage (for photos and parsed SOP images), and realtime sync. Eliminates the need for a separate auth service, ORM, file server, and websocket server. RLS + custom JWT claims is the standard pattern for multi-tenant RBAC without application-layer filtering. |
-| OpenAI SDK | 6.32.0 | AI document parsing via GPT-4o | GPT-4o with Structured Outputs (JSON Schema response format) achieves 100% schema reliability — critical for turning Word/PDF into structured SOP steps without human cleanup per document. Cheaper and faster than training a custom model for low-volume document ingestion. |
-
-### Supporting Libraries
-
-| Library | Version | Purpose | When to Use |
-|---------|---------|---------|-------------|
-| Dexie.js | 4.3.0 | IndexedDB abstraction for offline data | Primary offline store for cached SOPs on worker devices. Superior to raw IndexedDB for versioned schema migrations, bulk reads, and reactive queries. Used in the service worker and React components. Every SOP assigned to a worker gets synced here on first load. |
-| @serwist/next | 9.5.7 | Service worker / PWA for Next.js App Router | The maintained successor to `next-pwa` (which is abandoned). Serwist is a Workbox fork with active development. Handles precaching of the app shell, runtime caching of SOP assets, and the offline fallback page. Required for installability (home screen PWA) and offline access. |
-| mammoth | 1.12.0 | .docx Word document to HTML extraction | Best-in-class .docx parser for Node.js. Converts Word documents (including embedded images and tables) to clean HTML, which then feeds the AI parsing pipeline. TypeScript types included. Works server-side in Next.js Route Handlers. |
-| unpdf | 1.4.0 | PDF text extraction (Edge Runtime compatible) | Modern replacement for the unmaintained `pdf-parse`. Works in Vercel Edge Functions and Node.js. Extracts text content from PDF files to feed into the AI parsing pipeline. |
-| TanStack Query | 5.95.0 | Server state caching, offline-first fetch | `networkMode: 'offlineFirst'` keeps the last fetched SOPs in memory across navigations. Persisted to IndexedDB via the `createSyncStoragePersister` adapter so cache survives page reloads. Separates server state (SOP data from Supabase) from UI state cleanly. |
-| Zustand | 5.0.12 | UI/local state management | Lightweight global state for things TanStack Query doesn't own: current walkthrough step, pending photo queue, offline sync status indicator. Zero boilerplate vs Redux Toolkit — appropriate complexity for this app's UI state. |
-| React Hook Form | 7.72.0 | Form state + uncontrolled inputs | Minimal re-renders. Combined with Zod resolver for type-safe schema validation. Used on admin upload forms, sign-off forms, and search inputs. |
-| Zod | 4.3.6 | Schema validation and TypeScript inference | Validates AI parser output against the SOP schema before writing to Supabase. Also validates form inputs. Central source of truth for data shape — define once, use in API handlers, client forms, and OpenAI response_format schema simultaneously. |
-| @hookform/resolvers | 5.2.2 | Connects Zod schemas to React Hook Form | Glue package — required for the RHF + Zod pattern. |
-| sharp | 0.34.5 | Server-side image resizing | Resize and compress photos before storing in Supabase Storage. Workers on factory floors take full-resolution photos — unprocessed these can be 5-10 MB each, which will kill offline sync quotas. Resize to max 1200px and compress to <300 KB on upload. |
-
-### Development Tools
-
-| Tool | Purpose | Notes |
-|------|---------|-------|
-| Supabase CLI | Local development DB, migrations, type generation | Run `supabase gen types typescript` after every schema migration to regenerate DB types. Essential for type-safe Supabase queries. |
-| ESLint + `eslint-config-next` | Lint rules aligned with Next.js App Router | Catches common server/client component boundary mistakes (e.g., passing non-serializable props across the boundary). |
-| Prettier | Code formatting | Configure with Tailwind plugin to auto-sort class names. Reduces merge conflicts in JSX-heavy component files. |
-| Playwright | End-to-end testing | Test offline scenarios with `page.context().setOffline(true)`. Critical to verify the service worker cache is serving the right SOPs when offline. |
+**Project:** SafeStart — SOP Creation Pathways (v2.0 Milestone)
+**Researched:** 2026-03-29
+**Scope:** NEW additions only — Video transcription, expanded file parsing, video generation with TTS
+**Note:** Existing validated stack (Next.js 16, Supabase, GPT-4o, Dexie.js, @serwist/next, TanStack Query, mammoth, unpdf, tesseract.js) is documented in STACK.md (2026-03-23) and is not repeated here.
 
 ---
 
-## Installation
+## What Needs to Change (Summary)
+
+The three new pathways each require distinct additions:
+
+| Pathway | New Capability | Primary Addition |
+|---------|---------------|-----------------|
+| Video → SOP | Transcription of uploaded video/audio | OpenAI `gpt-4o-transcribe` (already in `openai` SDK v6) |
+| Video → SOP | Extract existing captions from YouTube/Vimeo URL | `youtube-transcript` (no download required) |
+| Video → SOP | In-browser camera recording | `MediaRecorder` API (native — no library) |
+| Video → SOP | Audio extraction from uploaded video for chunking | `@ffmpeg/ffmpeg` (WASM, client-side) |
+| File → SOP (expanded) | Excel (.xlsx) text/table extraction | `officeparser` v6 |
+| File → SOP (expanded) | PowerPoint (.pptx) text extraction | `officeparser` v6 (same library) |
+| File → SOP (expanded) | Plain text (.txt, .csv) | Native `fs.readFile` / `Request.text()` — no library |
+| File → Video SOP | AI voice narration (TTS) | OpenAI `gpt-4o-mini-tts` (already in `openai` SDK v6) |
+| File → Video SOP | Video composition & rendering | Shotstack API (cloud, no binary) |
+
+The OpenAI SDK (already installed) covers both the transcription models and the TTS models — no new SDK required for those capabilities.
+
+---
+
+## New Libraries Required
+
+### Pathway 1: Video → SOP
+
+#### Audio Transcription
+
+No new package required. The existing `openai` SDK v6 already supports `gpt-4o-transcribe`:
+
+```typescript
+const transcription = await openai.audio.transcriptions.create({
+  file: audioFile,
+  model: 'gpt-4o-transcribe',
+  response_format: 'verbose_json', // returns timestamps + segments
+})
+```
+
+Use `gpt-4o-transcribe` over `whisper-1`. It has lower word error rate and is the current flagship model. Use `gpt-4o-mini-transcribe` at $0.003/min when cost is more important than accuracy (low-quality audio, informal recordings).
+
+**Whisper API constraint:** 25 MB file size limit per request. Most factory floor videos will exceed this. The chunking strategy is: client extracts audio with `@ffmpeg/ffmpeg`, strips video track (MP4 → MP3 reduces file size by ~10×), uploads the audio file. If audio still exceeds 25 MB (roughly 45+ minutes at MP3 128 kbps), split with timestamps and stitch transcription segments server-side. In practice, SOP walkthrough recordings are typically under 15 minutes.
+
+#### YouTube / Vimeo URL Transcription
+
+**Recommended:** `youtube-transcript` for YouTube, Vimeo official API for Vimeo.
+
+Do NOT download the video from YouTube or Vimeo. Terms of service violations, unnecessary bandwidth, and legal risk. Instead:
+
+- **YouTube:** Use the `youtube-transcript` package to fetch auto-generated captions directly from YouTube's caption XML endpoint. This uses YouTube's own API surface (same as the captions button in the player). Call from a Next.js Route Handler (not client-side, to avoid CORS). If a video has no auto-generated captions, fall back to downloading audio and transcribing with Whisper.
+- **Vimeo:** The Vimeo API (`/videos/{id}/texttracks`) returns VTT subtitle files for videos where the owner has enabled captions or where Vimeo has auto-generated them. Authentication is required (Bearer token). For videos with no text tracks, fall back to audio download + Whisper.
+
+The fallback path (download audio for transcription) requires `yt-dlp` as a system binary on the server. This is not viable on Vercel serverless (binary too large, no shell access). If the app is deployed on Vercel, the fallback must go through a separate worker (Supabase Edge Function with a container, or a dedicated small VPS). Flag this as a deployment decision point.
+
+| Package | Version | Why |
+|---------|---------|-----|
+| `youtube-transcript` | `^1.3.0` | Fetches YouTube auto-captions without downloading video. Serverless-compatible. Returns timestamped segments. |
+
+#### Client-Side Audio Extraction (for uploaded video files)
+
+**Recommended:** `@ffmpeg/ffmpeg` (ffmpeg.wasm)
+
+When a user uploads an MP4/MOV file, the server would receive a potentially large binary. Instead, extract audio on the client before upload: strip the video track, produce an MP3. This reduces a 200 MB video upload to a 15 MB audio upload, staying under Whisper's 25 MB limit and dramatically improving upload time on industrial WiFi.
+
+The 30 MB WASM core load is a one-time cost per session, loaded lazily only when the user enters the video upload screen.
+
+| Package | Version | Why |
+|---------|---------|-----|
+| `@ffmpeg/ffmpeg` | `^0.12.x` | Client-side audio extraction from video. Strip video track, produce compressed MP3 before upload. Eliminates server-side FFmpeg binary dependency. |
+| `@ffmpeg/util` | `^0.12.x` | Companion utilities for fetchFile and createFFmpegCore. Required by @ffmpeg/ffmpeg. |
+
+**What NOT to do:** Do not install `fluent-ffmpeg` or `ffmpeg-static` for this purpose. Vercel serverless functions push over the 50 MB limit when FFmpeg binaries are included. `ffmpeg-static` path resolution breaks in serverless environments. Server-side FFmpeg is only needed if you use Remotion for video generation (addressed below in Pathway 3).
+
+#### In-Browser Camera Recording
+
+No library required. The `MediaRecorder` API is native to all modern browsers including Safari (supported since Safari 14, iOS 14+). This is sufficient for the PWA target audience.
+
+```typescript
+const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+const recorder = new MediaRecorder(stream, {
+  // Safari produces MP4/H.264+AAC; Chrome produces WebM/VP8+Opus
+  // Use isTypeSupported() to pick the right format per device
+  mimeType: MediaRecorder.isTypeSupported('video/mp4') ? 'video/mp4' : 'video/webm',
+})
+```
+
+**Safari caveat:** On iOS, MediaRecorder requires enabling under Settings > Safari > Advanced > Experimental Features on older iOS versions (pre-iOS 17.2). iOS 17.2+ has it on by default. Show users a "use file upload instead" fallback if `window.MediaRecorder` is undefined. This will affect some users on factory floors with un-updated iPhones — the fallback matters.
+
+**Format handling:** Safari records MP4; Chrome/Firefox record WebM. Both formats are accepted by the OpenAI Whisper API. No transcoding is needed before sending to the transcription API.
+
+---
+
+### Pathway 2: File → SOP (Expanded)
+
+#### Excel and PowerPoint Parsing
+
+**Recommended:** `officeparser` v6
+
+`officeparser` v6.0.0 (released December 2025) handles `.pptx`, `.xlsx`, `.docx`, `.odt`, `.odp`, `.ods`, `.pdf`, and `.rtf` in a single library. It outputs a structured AST with paragraphs, headings, tables, and extracted images as Base64. This is a superset of what mammoth does for DOCX.
+
+**Why not SheetJS/xlsx for Excel?** The SheetJS npm package (`xlsx`) has not been published to npm since 0.18.5 — that version has known CVEs (prototype pollution, DoS via crafted files). The maintained version requires installing from SheetJS's own CDN (`https://cdn.sheetjs.com/`), which adds supply chain complexity and breaks reproducible installs. `officeparser` wraps a safe internal XLSX parser and is maintained.
+
+**Why not a separate pptx library?** Dedicated PPTX libraries (pptx2json, js-pptx, pptx-parser) are mostly unmaintained or produce incomplete ASTs. `officeparser`'s December 2025 v6 release purpose-built AST output makes it the right choice.
+
+**Important:** The project already uses `mammoth` for DOCX parsing. `officeparser` also handles DOCX. Do not replace mammoth — it has better fidelity for .docx embedded images and styled content (mammoth preserves bold/italic/heading structure better for AI prompting). Use `officeparser` only for XLSX, PPTX, ODT variants, and RTF. Keep mammoth for .docx.
+
+| Package | Version | Purpose | Formats |
+|---------|---------|---------|---------|
+| `officeparser` | `^6.0.0` | Text + table extraction from Office formats | .pptx, .xlsx, .odt, .odp, .ods, .rtf |
+
+#### Plain Text
+
+No new library. In a Next.js Route Handler:
+- `.txt` files: `await req.text()`
+- `.csv` files: read as text, pass raw content to GPT-4o with a prompt that treats columns as procedure steps or configuration items
+
+---
+
+### Pathway 3: File → Video SOP
+
+#### Text-to-Speech (TTS)
+
+No new package required. The existing `openai` SDK v6 supports `gpt-4o-mini-tts`:
+
+```typescript
+const speech = await openai.audio.speech.create({
+  model: 'gpt-4o-mini-tts',
+  voice: 'alloy',          // or nova, shimmer, echo, fable, onyx
+  input: sopStepText,
+  instructions: 'Speak clearly and at a measured pace. This is a safety procedure.',
+})
+const audioBuffer = Buffer.from(await speech.arrayBuffer())
+```
+
+**Why `gpt-4o-mini-tts` over ElevenLabs or Google Cloud TTS?**
+
+- Already in the existing OpenAI SDK — no new dependency, no new API key, no new billing account
+- $0.003/1K characters ($3/million chars) vs ElevenLabs Starter at $5/month for 30K credits
+- Quality is adequate for industrial safety narration — workers need clarity over emotion. ElevenLabs' superior emotional range is not a differentiator here
+- If clients specifically request higher-quality narration voices, ElevenLabs can be swapped in later as an add-on tier
+
+**Extended narration caveat:** For long SOPs (>2 minutes of narration), `gpt-4o-mini-tts` may introduce occasional pauses or stutters. Split TTS requests by SOP section (one API call per section, not the entire SOP as one input). Stitch audio segments in video composition.
+
+#### Video Generation and Composition
+
+**Recommended:** Shotstack API
+
+Use Shotstack over Remotion for the following reasons:
+
+1. **No binary dependencies.** Remotion's `@remotion/renderer` requires an FFmpeg binary in `node_modules`, which exceeds Vercel's 50 MB function limit and is explicitly "not officially supported" by Remotion for Next.js deployments. Shotstack is a pure HTTP API — no binaries, no Lambda setup, no Remotion licensing.
+
+2. **Remotion licensing risk.** Remotion is free for individuals but requires a paid company license for for-profit organizations with 4+ employees. A SaaS product where customers generate videos likely requires a company license even if the Remotion code lives on the server. At ~$100/month baseline this adds meaningful cost. Shotstack at $0.20/min on a subscription only accrues cost when a video is actually rendered.
+
+3. **Simpler integration for this use case.** Shotstack takes a JSON timeline descriptor and returns an MP4 URL. It supports: image sequences (slideshow), audio tracks (TTS narration), text overlays, and transitions. All three video output formats in Pathway 3 can be expressed as Shotstack timelines.
+
+4. **Cost at expected volume.** SafeStart is a B2B SaaS for 50-500-SOP organizations. If admins generate one video per SOP, at roughly 3 minutes per SOP video, 500 SOPs = 1,500 minutes = $300 at PAYG rates (or $156 on the $0.20/min subscription tier). Acceptable at this scale.
+
+**Where Remotion wins and when to reconsider:** Remotion is superior for high-volume rendering (thousands of videos/day), complex React-based animations, and teams comfortable managing AWS Lambda. If SafeStart grows to serve hundreds of organizations all generating videos simultaneously, revisit Remotion + Lambda. At v2.0 launch, Shotstack's simplicity wins.
+
+| Service | Type | SDK |
+|---------|------|-----|
+| Shotstack | Cloud API (no install) | `@shotstack/shotstack-sdk` or plain `fetch` |
+
+Shotstack has an official Node.js SDK but it's optional — the API is simple enough to call with `fetch` and avoids a dependency. Recommend plain `fetch` with typed request/response interfaces (define locally from Shotstack's OpenAPI spec).
+
+**Video output formats — how each maps to Shotstack:**
+
+| Pathway 3 Format | Shotstack Timeline Structure |
+|-----------------|------------------------------|
+| Narrated slideshow | Image clips (one per SOP step) + audio track (TTS per step) + title overlays |
+| Screen recording style | Single long scrolling HTML/image clip + full-SOP TTS audio track |
+| Full AI video | Text-to-image API (DALL-E 3 or similar) per step → image clips → TTS audio |
+
+For "full AI video with animations", generating images per step via `openai.images.generate` (DALL-E 3) is the recommended path. This is already covered by the existing OpenAI SDK.
+
+---
+
+## Revised Installation Block (v2.0 additions only)
 
 ```bash
-# Scaffold
-npx create-next-app@16 sop-assistant --typescript --tailwind --app --src-dir
+# Video transcription — YouTube caption extraction (no video download)
+npm install youtube-transcript
 
-# BaaS & data
-npm install @supabase/supabase-js@2 @supabase/ssr
+# Client-side audio extraction from video uploads
+npm install @ffmpeg/ffmpeg @ffmpeg/util
 
-# Offline / PWA
-npm install @serwist/next serwist dexie
+# Office file parsing — Excel, PowerPoint, ODF formats (v6 = Dec 2025 AST output)
+npm install officeparser
 
-# Server state
-npm install @tanstack/react-query
-
-# UI state
-npm install zustand
-
-# Forms
-npm install react-hook-form zod @hookform/resolvers
-
-# AI + document parsing
-npm install openai mammoth unpdf
-
-# Image processing (server-side only)
-npm install sharp
-
-# Dev dependencies
-npm install -D supabase @types/node eslint-config-next prettier prettier-plugin-tailwindcss @playwright/test
+# Video generation — Shotstack SDK (optional: can also use fetch directly)
+# npm install @shotstack/shotstack-sdk
 ```
+
+The `openai` SDK (already installed at v6.32.0) covers:
+- `gpt-4o-transcribe` and `gpt-4o-mini-transcribe` (transcription)
+- `gpt-4o-mini-tts` (text-to-speech for video narration)
+- `dall-e-3` (image generation for "full AI video" format)
+
+No new API keys are needed for these — they use the existing OpenAI key.
+
+New API keys required:
+- `SHOTSTACK_API_KEY` — for video rendering (Shotstack)
+- `VIMEO_ACCESS_TOKEN` — for Vimeo caption API (optional, only needed if Vimeo URL support is in scope for v2.0)
 
 ---
 
 ## Alternatives Considered
 
-| Recommended | Alternative | When to Use Alternative |
-|-------------|-------------|-------------------------|
-| Supabase (full BaaS) | Firebase / Firestore | If the team already has a Firebase dependency or needs Firestore's document model. Firebase has no RLS equivalent — multi-tenant isolation requires application-layer filtering, which is less safe for SaaS. |
-| Supabase (full BaaS) | PlanetScale + Clerk + S3 | Valid stack but 3 vendors instead of 1. Increases billing complexity and operational overhead. Only warranted if you hit Supabase's connection limits (use Supabase's pgBouncer or Supabase pooler before migrating). |
-| Next.js 16 App Router | Remix | Remix has excellent form handling and offline/streaming story. Choose Remix if the team has strong Remix expertise. Next.js wins here on ecosystem size, Vercel deployment simplicity, and better Supabase SSR integration patterns. |
-| Next.js 16 App Router | Vite + React (SPA) | Only if you want a pure client-side SPA. Loses server-side rendering, Server Actions, and built-in API route support — you'd need a separate API server. Not worth it for this app. |
-| Dexie.js | RxDB | RxDB is more powerful (full reactive ORM with sync adapters). Use if SOP conflicts between multiple devices become a real requirement. Dexie is simpler and sufficient for this app's one-writer-per-device model. |
-| @serwist/next | Custom Workbox config | Use a custom Workbox setup only if you need caching strategies not covered by Serwist's presets. Serwist is the right level of abstraction for Next.js App Router. Avoid the unmaintained `shadowwalker/next-pwa`. |
-| OpenAI GPT-4o | Docling (self-hosted) | Docling (IBM open-source) is excellent for layout-aware PDF parsing at scale. Use it if you process thousands of documents per day and cost is a concern. For v1 at 50-500 SOPs per tenant, GPT-4o's per-request cost is negligible and its semantic understanding is superior for extracting hazard/PPE/step structure. |
-| unpdf | pdf-parse | `pdf-parse` is unmaintained and Node.js only. `unpdf` works across Edge and Node.js runtimes and is actively developed. |
-| TanStack Query | SWR | SWR is simpler but lacks `networkMode: 'offlineFirst'` and mutation persistence — both are required for this app's offline story. |
-| Zustand | Jotai | Jotai is atomic and elegant. Either works. Zustand is slightly more readable for colocated stores (walkthrough state, sync queue state). |
+| Category | Recommended | Alternative | Why Not |
+|----------|-------------|-------------|---------|
+| Transcription | OpenAI `gpt-4o-transcribe` (existing SDK) | AssemblyAI | AssemblyAI has better accuracy benchmarks and speaker diarization. Use it if the app later needs "who said what" in meeting-style recordings. For SOP narration (one speaker, clear audio), GPT-4o-transcribe is accurate enough and eliminates a new dependency. |
+| Transcription | OpenAI `gpt-4o-transcribe` | Deepgram Nova-2 | Deepgram is faster for real-time streaming and has lower latency. Not needed here — transcription is batch, not real-time. |
+| YouTube captions | `youtube-transcript` | `yt-dlp` binary | yt-dlp requires a Python or Deno runtime. Not deployable on Vercel serverless. Even if self-hosted, it's the wrong tool when captions are available via HTTP. |
+| Excel/PPTX | `officeparser` v6 | SheetJS (`xlsx`) + separate PPTX lib | SheetJS npm version has security CVEs and is unmaintained on npm. Separate PPTX libraries are mostly abandoned. `officeparser` covers both formats with a single maintained package. |
+| TTS | OpenAI `gpt-4o-mini-tts` (existing SDK) | ElevenLabs | ElevenLabs has dramatically better voice quality and cloning. Use it if clients request custom brand voices or if users complain about the AI voice quality. ElevenLabs starter ($5/mo) covers 30K credits — fine for low volume, but credit-based pricing becomes unpredictable at scale. |
+| TTS | OpenAI `gpt-4o-mini-tts` | Google Cloud TTS (Chirp 3 HD) | $30/million chars vs OpenAI's $3/million. Google's quality is better but the 10× cost difference is hard to justify for this use case. |
+| Video generation | Shotstack API | Remotion + AWS Lambda | Remotion requires FFmpeg binary (breaks Vercel), needs AWS Lambda setup, and requires a paid company license for commercial SaaS. Shotstack is simpler and more cost-effective at v2.0 scale. |
+| Video generation | Shotstack API | Creatomate | Comparable product. Shotstack is slightly cheaper at scale ($0.20/min subscription vs Creatomate's $41/month Essential tier). Creatomate's template editor is more advanced — revisit if template-based video creation for admins becomes a future feature. |
+| Client audio extraction | `@ffmpeg/ffmpeg` (WASM) | Server-side FFmpeg | Server-side FFmpeg binary breaks Vercel deployments. WASM approach keeps audio extraction client-side, reduces server load, and preserves user privacy (video never uploaded to server). |
 
 ---
 
-## What NOT to Use
+## What NOT to Add
 
-| Avoid | Why | Use Instead |
-|-------|-----|-------------|
-| `shadowwalker/next-pwa` | Abandoned. Last release in 2022. Multiple open issues with App Router compatibility. Will break. | `@serwist/next` |
-| `pdf-parse` | Unmaintained (last published 2019 despite npm activity). Wraps an old internal copy of pdf.js. Will fail on modern Vercel Edge runtime. | `unpdf` |
-| `pdfjs-dist` directly | Huge bundle (~3 MB), complex API. You only need text extraction, not PDF rendering. | `unpdf` (which wraps pdfjs-dist but bundles only the extraction subset) |
-| Prisma | Prisma does not work with Supabase's connection pooler in serverless deployments without extra configuration. Supabase JS client + Supabase-generated types gives full type safety without an ORM. | Supabase JS client + `supabase gen types` |
-| Redux Toolkit | 40+ KB gzipped, boilerplate-heavy. Appropriate for 10+ developer teams on large apps. This app's global UI state is simple enough that Zustand covers it in 3 stores. | Zustand |
-| `next-auth` (Auth.js) | Adds session complexity that conflicts with Supabase's own JWT/session system. Double-session management leads to subtle bugs. | Supabase Auth (built-in, handles JWTs, refresh tokens, custom claims via Access Token Hook) |
-| Web Periodic Background Sync API | Not supported in Safari/Firefox. Workers on iOS (common in industrial settings) would get no sync trigger. | On-connect sync: listen for `online` event + TanStack Query's `refetchOnReconnect`, plus Supabase Realtime re-subscription on reconnect. |
-| Service worker file upload (background fetch) | Background Fetch API has <50% browser support. Uploading photos from the service worker is unreliable on iOS. | Queue photo uploads in Dexie, flush the queue in the React component when `navigator.onLine` is true. |
-| Separate Redis layer (for sessions/caching) | Supabase handles sessions; TanStack Query + Dexie handle client caching. A Redis layer adds infra cost and complexity with no benefit at this scale. | Supabase + Dexie + TanStack Query |
-
----
-
-## Stack Patterns by Variant
-
-**If parsing throughput becomes a bottleneck (>100 documents/day):**
-- Move the AI parsing pipeline to a Supabase Edge Function triggered by Storage object creation
-- Queue documents in a `parse_jobs` table, process asynchronously
-- Because this removes the 10-second Vercel serverless timeout constraint on large PDFs
-
-**If the app needs to run fully on-premise (some industrial clients may require this):**
-- Replace Supabase with a self-hosted Supabase instance (Docker Compose)
-- Replace OpenAI with a self-hosted model via Ollama (e.g., Llama 3.3 70B) or Azure OpenAI with VNet peering
-- Next.js can be self-hosted on any Node.js-capable server
-
-**If photo storage costs become a concern at scale:**
-- Move Supabase Storage (which uses S3 under the hood) to Cloudflare R2 (zero egress fees)
-- Supabase supports custom S3-compatible storage endpoints
-- Keep the same `sharp` preprocessing pipeline on upload
-
-**If RLS performance degrades on large tenants (>100K rows):**
-- Add `organization_id` as the leading column on all composite indexes
-- Consider per-tenant Postgres schemas (separate schema per org) using Supabase's schema support
-- Benchmark with `EXPLAIN ANALYZE` before migrating — properly indexed RLS policies typically add <5 ms overhead
+| Avoid | Why | What to Use Instead |
+|-------|-----|---------------------|
+| `ytdl-core` | Abandoned (last meaningful update 2022). Breaks regularly as YouTube changes its internal API. npm page warns of deprecation. | `youtube-transcript` for captions; no download needed |
+| SheetJS `xlsx` from npm | Security CVEs (prototype pollution, DoS). Unmaintained on npm since 0.18.5 (2023). Installing from SheetJS CDN creates supply chain risk. | `officeparser` v6 |
+| `fluent-ffmpeg` + `ffmpeg-static` on Vercel | Binary pushes serverless function over 50 MB limit. Path resolution breaks in Vercel's sandbox. Verified broken in multiple community reports through 2025. | `@ffmpeg/ffmpeg` (WASM, client-side) |
+| Remotion `@remotion/renderer` in Next.js API routes | Cannot bundle Webpack-inside-Webpack. Requires FFmpeg binary. Explicitly "not officially supported" in Next.js by Remotion's own docs. Company license required for SaaS. | Shotstack API |
+| ElevenLabs at launch | Quality improvement doesn't justify adding a new vendor, API key, and billing account at v2.0. OpenAI TTS is good enough for industrial safety narration. | OpenAI `gpt-4o-mini-tts` |
+| `pptx2json`, `js-pptx`, `node-pptx-parser` | All have low npm downloads, sporadic maintenance, and produce flat or incomplete output. `officeparser` v6 is actively maintained and produces rich AST. | `officeparser` v6 |
+| `ffmpeg.wasm` (the original package from `@ffmpegwasm/ffmpeg`) | Superseded by `@ffmpeg/ffmpeg` (the official package by the same maintainer with multi-thread support). Use the `@ffmpeg` scope. | `@ffmpeg/ffmpeg` |
+| ExcelJS | Hasn't released a new npm version in 12+ months as of 2025. Considered potentially abandoned. | `officeparser` v6 |
 
 ---
 
-## Version Compatibility
+## Integration Points with Existing Stack
 
-| Package | Compatible With | Notes |
-|---------|-----------------|-------|
-| `@serwist/next@9.5.7` | `next@16.x` | Serwist v9 targets Next.js 15+. Do not use with Next.js 14 or earlier. |
-| `@supabase/supabase-js@2.x` | `@supabase/ssr@0.x` | Always use `@supabase/ssr` for cookie-based sessions in Next.js App Router. Do not use the legacy `@supabase/auth-helpers-nextjs`. |
-| `dexie@4.x` | Modern browsers + iOS 14+ | Dexie v4 requires IndexedDB v2 — available on all browsers released after 2018. iOS 14.5+ is required for reliable IndexedDB transactions inside service workers. |
-| `openai@6.x` | Node.js 18+ | Node 18 minimum for the fetch-based HTTP client. Next.js 16 ships with Node 20 in Vercel's runtime. |
-| `react-hook-form@7.x` + `zod@4.x` | `@hookform/resolvers@5.x` | Resolvers v5 added Zod v4 support. Do not use resolvers v4 with Zod v4. |
-| `unpdf@1.x` | Vercel Edge + Node.js 18+ | Uses ES modules exclusively. Ensure `"type": "module"` in any sub-packages, or use dynamic `import()` within Next.js route handlers. |
-| `tailwindcss@4.x` | `next@16.x` | Tailwind v4 replaces `tailwind.config.js` with CSS-based configuration. Follow the Next.js + Tailwind v4 migration guide — the Tailwind PostCSS plugin config has changed. |
+**Transcription pipeline:**
+```
+Client: video file selected
+  → @ffmpeg/ffmpeg extracts audio (MP3, client-side)
+  → audio blob uploaded to Next.js Route Handler
+  → Route Handler calls openai.audio.transcriptions.create (gpt-4o-transcribe)
+  → transcript segments returned to server
+  → GPT-4o structures transcript into SOP JSON (existing pipeline)
+  → SOP written to Supabase (existing pipeline)
+```
+
+**YouTube URL pipeline:**
+```
+Client: pastes YouTube URL
+  → Next.js Route Handler calls youtube-transcript
+  → caption segments returned
+  → if no captions: error with "no auto-captions available" message (no download fallback on Vercel)
+  → GPT-4o structures captions into SOP JSON (existing pipeline)
+```
+
+**Excel/PPTX pipeline:**
+```
+File uploaded to Supabase Storage (existing)
+  → Route Handler fetches file buffer
+  → officeparser.parseOffice(buffer) returns AST
+  → AST text + table content extracted
+  → GPT-4o structures content into SOP JSON (existing pipeline)
+```
+
+**Video SOP generation pipeline:**
+```
+SOP retrieved from Supabase
+  → Route Handler loops SOP steps:
+      - openai.audio.speech.create per step (gpt-4o-mini-tts) → audio buffer
+      - audio stored to Supabase Storage, presigned URL generated
+  → Shotstack API called with timeline JSON:
+      - image clips (SOP step photos or auto-generated DALL-E 3 images)
+      - audio clips (TTS per step from Supabase Storage URLs)
+      - text overlays (step titles, hazard warnings)
+  → Shotstack returns render job ID
+  → polling or webhook callback writes rendered video URL back to Supabase
+  → video URL stored on SOP record, linked from admin UI
+```
+
+**Offline impact:** Video generation is admin-only, runs on reliable connections, and produces a stored output (MP4 URL). The generated video URL can be stored in the SOP record and pre-cached to Dexie for worker offline access using the existing caching pipeline. No new offline architecture needed.
 
 ---
 
-## Key Architecture Decisions Implied by This Stack
+## Deployment Constraint Summary
 
-**Multi-tenancy:** `organization_id` column on every tenant-scoped table, enforced by Supabase RLS policies. Roles stored in `app_metadata` (not `user_metadata`) in Supabase Auth. Custom Access Token Hook injects `organization_id` and `role` into the JWT for use in RLS policies without extra DB round-trips.
+| Feature | Works on Vercel Serverless? | Notes |
+|---------|----------------------------|-------|
+| `gpt-4o-transcribe` via OpenAI SDK | Yes | Pure HTTP, no binary |
+| `youtube-transcript` | Yes | Pure HTTP |
+| `@ffmpeg/ffmpeg` (WASM) | Client-side only | Runs in browser, not on Vercel |
+| `officeparser` v6 | Yes | Pure Node.js, no binary |
+| `gpt-4o-mini-tts` via OpenAI SDK | Yes | Pure HTTP, no binary |
+| Shotstack API | Yes | Pure HTTP |
+| yt-dlp for YouTube/Vimeo fallback | No | Requires binary + shell access |
+| Remotion `@remotion/renderer` | No | Binary + too large |
+| Server-side FFmpeg | No | Binary exceeds 50 MB limit |
 
-**Offline model:** SOPs are synced to Dexie on first load and on every successful network response. Workers read exclusively from Dexie. Writes (step completions, photo captures) go to Dexie immediately and are flushed to Supabase when `navigator.onLine` is true. No conflict resolution needed — each worker's completion record is their own.
-
-**AI parsing pipeline:** File uploads (docx/pdf) go to Supabase Storage via a Next.js Server Action. A Route Handler reads the file, extracts text with mammoth (docx) or unpdf (pdf), sends it to OpenAI with a Zod-derived JSON Schema as `response_format`, validates the structured output with Zod, then writes the SOP to Postgres. Confidence scores below 0.7 on any section flag it for admin review.
-
-**Photo capture:** Browser's `<input type="file" accept="image/*" capture="environment">` — no camera library needed for PWA. Photos are resized server-side with sharp before being stored in Supabase Storage. Offline queue sits in Dexie; uploads flush on reconnect.
+The yt-dlp fallback (for YouTube/Vimeo videos with no captions) is blocked on Vercel. If this fallback matters for product completeness, the transcription step for URL-sourced videos must run in a Supabase Edge Function backed by a Docker container, or be deferred to a future milestone.
 
 ---
 
 ## Sources
 
-- npm registry (live) — `@supabase/supabase-js@2.99.3`, `dexie@4.3.0`, `serwist@9.5.7`, `mammoth@1.12.0`, `unpdf@1.4.0`, `next@16.2.1`, `tailwindcss@4.2.2`, `zustand@5.0.12`, `@tanstack/react-query@5.95.0`, `zod@4.3.6`, `react-hook-form@7.72.0`, `openai@6.32.0` — HIGH confidence, verified 2026-03-23
-- [Next.js 16 release blog](https://nextjs.org/blog/next-16) — Turbopack stable, caching changes, App Router — HIGH confidence
-- [Supabase Row Level Security docs](https://supabase.com/docs/guides/database/postgres/row-level-security) — RLS policy patterns — HIGH confidence
-- [Supabase Custom Claims RBAC docs](https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac) — JWT claims for roles — HIGH confidence
-- [Serwist Next.js docs](https://serwist.pages.dev/docs/next/getting-started) — Service worker integration — HIGH confidence
-- [OpenAI Structured Outputs docs](https://platform.openai.com/docs/guides/structured-outputs) — JSON Schema response format reliability — HIGH confidence
-- [unpdf vs pdf-parse vs pdfjs-dist comparison (PkgPulse 2026)](https://www.pkgpulse.com/blog/unpdf-vs-pdf-parse-vs-pdfjs-dist-pdf-parsing-extraction-nodejs-2026) — PDF library recommendation — MEDIUM confidence (community source, consistent with npm download data)
-- [MDN Background Sync API](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Offline_and_background_operation) — Browser support limitations (Safari no support) — HIGH confidence
-- [TanStack Query network mode docs](https://tanstack.com/query/v4/docs/react/guides/network-mode) — `offlineFirst` mode — HIGH confidence
-- [Supabase multi-tenancy discussion](https://github.com/orgs/supabase/discussions/1615) — RLS performance patterns — MEDIUM confidence (community)
-- [AntStack multi-tenant RLS guide](https://www.antstack.com/blog/multi-tenant-applications-with-rls-on-supabase-postgress/) — organization_id + JWT claims pattern — MEDIUM confidence
+- [OpenAI Speech-to-Text models](https://developers.openai.com/api/docs/models) — gpt-4o-transcribe, gpt-4o-mini-transcribe — HIGH confidence
+- [OpenAI TTS gpt-4o-mini-tts announcement](https://openai.com/index/introducing-our-next-generation-audio-models/) — March 2025 — HIGH confidence
+- [OpenAI Whisper API limits](https://www.transcribetube.com/blog/openai-whisper-api-limits) — 25 MB limit, ~30 min audio — MEDIUM confidence
+- [AssemblyAI transcription benchmarks 2026](https://www.assemblyai.com/benchmarks) — comparison data — MEDIUM confidence
+- [youtube-transcript npm](https://www.npmjs.com/package/youtube-transcript) — v1.3.0, last published ~17 days before research — MEDIUM confidence (npm registry)
+- [officeparser GitHub v6.0.0](https://github.com/harshankur/officeParser) — December 2025 release, AST output — HIGH confidence (official repo)
+- [SheetJS xlsx security issues](https://security.snyk.io/package/npm/xlsx) — CVEs confirmed — HIGH confidence (Snyk)
+- [Remotion Next.js limitations](https://www.remotion.dev/docs/miscellaneous/nextjs) — official docs, binary + bundling constraints — HIGH confidence
+- [Remotion license](https://www.remotion.dev/docs/license) — free for individuals, company license for 4+ employee for-profit orgs — HIGH confidence
+- [Remotion server-side options comparison](https://www.remotion.dev/docs/compare-ssr) — Lambda vs Cloud Run vs self-hosted — HIGH confidence
+- [Shotstack pricing](https://shotstack.io/pricing/) — $0.20/min subscription, $0.30/min PAYG — HIGH confidence
+- [Vercel FFmpeg binary issues](https://github.com/vercel/next.js/issues/53791) — confirmed broken path resolution — HIGH confidence (GitHub issue)
+- [ffmpeg.wasm in Next.js](https://blog.brightcoding.dev/2026/01/09/build-a-viral-video-editor-in-your-browser-next-js-+-ffmpeg-wasm-complete-guide-2026) — WASM client-side pattern — MEDIUM confidence
+- [MediaRecorder browser support](https://caniuse.com/mediarecorder) — Safari 14+, iOS 14+ — HIGH confidence
+- [ElevenLabs vs OpenAI TTS comparison](https://www.speechmatics.com/company/articles-and-news/best-tts-apis-in-2025-top-12-text-to-speech-services-for-developers) — quality and pricing — MEDIUM confidence
+- [Vimeo transcript API](https://help.vimeo.com/hc/en-us/articles/17480150130833-How-to-access-and-download-video-transcripts-via-API) — official Vimeo docs — HIGH confidence
 
 ---
 
-*Stack research for: SOP Assistant — multi-tenant SaaS PWA*
-*Researched: 2026-03-23*
+*Stack additions research for: SafeStart v2.0 — SOP Creation Pathways*
+*Researched: 2026-03-29*

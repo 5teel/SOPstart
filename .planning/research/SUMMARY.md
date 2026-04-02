@@ -1,17 +1,19 @@
-# Project Research Summary
+# Research Summary
 
-**Project:** SOP Assistant
-**Domain:** Multi-tenant SaaS PWA — industrial SOP management with AI document parsing
-**Researched:** 2026-03-23
-**Confidence:** HIGH
+**Project:** SafeStart — SOP Creation Pathways (v2.0 Milestone)
+**Domain:** Industrial safety SOP management — new creation and delivery pathways
+**Researched:** 2026-03-29
+**Confidence:** HIGH (stack and architecture) / MEDIUM-HIGH (features and pitfalls)
+
+---
 
 ## Executive Summary
 
-SOP Assistant is a multi-tenant SaaS progressive web app that ingests existing Word and PDF procedure documents, uses AI to parse them into structured, mobile-native procedures, and delivers them to industrial field workers via an offline-first PWA optimised for gloved-hand use. The market gap is real and uncontested: SafetyCulture, Dozuki, and MaintainX all require manual procedure authoring, whereas every industrial organisation already has 50–500 SOPs as legacy documents. The core value proposition is eliminating the digitisation barrier through AI parsing, not building a better procedure editor. This distinction must drive every prioritisation decision — the product is a document-ingestion and execution tool, not an authoring tool.
+SafeStart v2.0 adds three new SOP creation and delivery pathways on top of a validated v1.0 foundation (Next.js 16, Supabase, GPT-4o, Dexie.js, TanStack Query, @serwist/next). The new pathways are: Video → SOP (transcription of uploaded files, YouTube/Vimeo URLs, and in-app recordings); File → SOP expanded (photo OCR, Excel/PowerPoint/plain text parsing, improved AI accuracy); and File → Video SOP (narrated slideshow, screen recording style, and full AI video output). All three pathways converge on the same `gpt-parser.ts → ParsedSopSchema` core, which is unchanged. The architectural philosophy is additive: new extractor modules feed plain text into the existing structuring pipeline, and new job tracking reuses the existing `parse_jobs` FSM and Supabase Realtime pattern.
 
-The recommended approach is Next.js 16 (App Router) + Supabase (auth, RLS, storage, realtime) + GPT-4o structured outputs for parsing, with Dexie.js + TanStack Query providing the offline-first data layer. This stack was verified against live npm registries on 2026-03-23 and is a high-confidence, coherent set of choices. Supabase's JWT-embedded tenant context + PostgreSQL RLS is the multi-tenancy mechanism — it must be implemented from the first migration, not retrofitted. The service worker layer (@serwist/next) handles PWA caching and must treat the Background Sync API as unreliable on iOS; instead, the app syncs on the online event and TanStack Query reconnect.
+The recommended technology choices minimize new dependencies. The existing OpenAI SDK (v6) already covers `gpt-4o-transcribe` and `gpt-4o-mini-tts` with no additional packages. New additions are `youtube-transcript` for YouTube caption fetching, `@ffmpeg/ffmpeg` (WASM, client-side) for audio extraction from video uploads, and `officeparser` v6 for Excel and PowerPoint parsing. For video rendering (Pathway 3), Shotstack API is recommended over Remotion because it is a pure HTTP service that avoids FFmpeg binary bundling and Vercel function size constraints. The one firm deployment constraint is the Vercel 4.5 MB request body limit: video files must bypass Next.js entirely using TUS resumable upload direct to Supabase Storage.
 
-The two existential risks are: (1) the AI parser silently producing wrong or misordered SOP steps — mitigated only by requiring every parsed document to pass an admin review gate before it can ever be seen by workers; and (2) multi-tenant data leakage — mitigated by RLS as defence-in-depth combined with mandatory application-layer tenant_id filtering and an automated two-tenant cross-access test on every release. Both risks must be addressed in Phase 1, before any worker-facing feature is built.
+The primary risks are operational rather than technical. Transcription on factory-floor audio with NZ accents and industrial terminology achieves 75-85% accuracy on the first pass — significantly lower than clean-audio benchmarks. Safety-critical terms (chemical names, tolerances, PPE specifications) must be explicitly flagged for admin confirmation before publish. Legal exposure from YouTube video downloading is a hard constraint: no `yt-dlp` or equivalent download approach is acceptable in a SaaS product; caption API access is the only compliant path. Video generation and stored source videos have unbounded storage cost if not managed with explicit retention policies. None of these risks block the project, but each must be addressed as a first-class concern within its respective pathway phase.
 
 ---
 
@@ -19,158 +21,203 @@ The two existential risks are: (1) the AI parser silently producing wrong or mis
 
 ### Recommended Stack
 
-The stack forms a coherent, mutually-reinforcing whole. Supabase replaces four separate services (auth, database, file storage, realtime) with a single BaaS, which is the appropriate choice for a v1 SaaS product. Next.js App Router with Server Actions handles file uploads and AI calls server-side without requiring a separate API service. The offline layer (Dexie + @serwist/next + TanStack Query `offlineFirst`) is the most complex part of the stack, and all three libraries must be used together — they are not independently interchangeable.
+The existing stack requires three new libraries and two new API integrations. No new SDK is needed for transcription or TTS — both are covered by the existing `openai` package at v6. The OpenAI SDK covers `gpt-4o-transcribe` (transcription), `gpt-4o-mini-tts` (narration), and `dall-e-3` (image generation for full AI video). `@ffmpeg/ffmpeg` runs entirely client-side as WASM, keeping video bytes off the server until they reach Supabase Storage. Server-side `ffmpeg-static` is used within the transcription route handler to extract audio from uploaded videos, and this binary must be bundled into the Vercel function via `outputFileTracingIncludes`. See STACK.md for full alternatives analysis.
 
-**Core technologies:**
-- **Next.js 16 (App Router):** Full-stack framework + PWA host — Server Components reduce payload on slow industrial WiFi; Turbopack default in v16
-- **Supabase:** Single BaaS covering auth, multi-tenant RLS, Postgres, file storage — eliminates auth, ORM, and file server services
-- **GPT-4o + OpenAI SDK 6.x (Structured Outputs):** AI document parsing with 100% schema reliability via JSON Schema response_format
-- **Dexie.js 4.x:** IndexedDB abstraction for offline SOP and completion storage — required for offline-first worker model
-- **@serwist/next 9.5.7:** Service worker + PWA (maintained Workbox fork) — replaces abandoned next-pwa
-- **TanStack Query 5.x (offlineFirst mode):** Server state with IndexedDB persistence across page reloads
-- **mammoth + unpdf:** .docx and PDF text/image extraction feeding the parsing pipeline
-- **Zod 4.x:** Central schema definition used simultaneously in OpenAI response_format, API validation, and form validation
-- **sharp:** Server-side photo compression before Supabase Storage — prevents 5–10 MB evidence photos breaking offline sync quotas
+**New packages required:**
+- `youtube-transcript ^1.3.0` — fetch YouTube auto-captions without video download; serverless-compatible
+- `@ffmpeg/ffmpeg ^0.12.x` + `@ffmpeg/util ^0.12.x` — client-side audio extraction from video uploads (WASM)
+- `officeparser ^6.0.0` — Excel and PowerPoint text/table extraction; December 2025 AST output release
 
-**Critical version constraints:** @serwist/next@9.x requires Next.js 15+; @hookform/resolvers@5.x required for Zod v4; do not use shadowwalker/next-pwa (abandoned), pdf-parse (unmaintained), next-auth (JWT conflict with Supabase), or Prisma (serverless pooler incompatibility).
+**New API integrations:**
+- Shotstack API — cloud video rendering (HTTP only, no binary); `SHOTSTACK_API_KEY` required
+- Vimeo API (optional) — caption fetch for Vimeo URLs; `VIMEO_ACCESS_TOKEN` required if Vimeo is in v2.0 scope
+
+**Packages to avoid:**
+- `SheetJS/xlsx` from npm — unmaintained on npm since 2023, known CVEs (prototype pollution, DoS)
+- `Remotion @remotion/renderer` — Chromium binary exceeds Vercel limits; SaaS company license required
+- `ytdl-core` / `yt-dlp` — YouTube ToS violation; existential risk for SaaS product
+- `fluent-ffmpeg` / `ffmpeg-static` for client-side use — use `@ffmpeg/ffmpeg` WASM client-side instead
+- `ExcelJS` — effectively abandoned on npm as of 2025
 
 ### Expected Features
 
-AI parsing of legacy Word/PDF documents is the keystone feature — it is both the core differentiator and the highest-risk technical dependency. If parsing quality is low, no other feature has value. Every other feature in the product depends on the parsed SOP content being correct.
+**Must have — Pathway 1 (Video → SOP):**
+- File upload (MP4/MOV) with async processing and named stage feedback (uploading → transcribing → structuring → ready)
+- YouTube URL paste with caption-first fast path; Vimeo URL with caption API
+- Transcript display alongside structured output in admin review (same review UI as v1.0)
+- Confidence scoring that reflects transcript quality, not just parsing quality
+- Mandatory section detection: flag SOPs where hazards or PPE sections are absent from the transcript
 
-**Must have for launch (v1):**
-- Document upload + AI parsing with confidence scoring and admin review queue — blocks all other content
-- Structured SOP display (hazards, PPE, steps, emergency sections as native mobile UI, not PDF display)
-- Step-by-step walkthrough mode — primary worker experience, must work offline
-- Quick reference mode (tabbed: Safety / PPE / Steps / Emergency) — safety-critical, no competitor offers this
-- Offline caching of assigned SOPs — non-negotiable for factory floors
-- SOP library with full-text search — workers need to find SOPs quickly
-- Photo capture tied to specific walkthrough step — standard in the market
-- Completion tracking with server-side timestamp — supervisor visibility + audit foundation
-- Supervisor sign-off (single-role) — digitises existing competency sign-off
-- Role-based access (Worker / Supervisor / Admin)
-- Multi-tenant organisation management — cannot be retrofitted
-- SOP assignment to roles — workers see relevant SOPs first
-- Image/figure rendering within steps — parsed SOPs without figures are incomplete
+**Must have — Pathway 2 (File → SOP expanded):**
+- Photo/image upload with device camera capture (`<input capture="environment">`) and client-side quality check before processing
+- GPT-4o vision for OCR (not Tesseract for primary path — VLMs significantly outperform on phone-photo inputs)
+- PPTX, XLSX, TXT/CSV upload with unified file picker UI
+- Per-word/per-token confidence with mandatory admin confirmation for numerical values and chemical names
 
-**Should have after v1 validation (v1.x):**
-- SOP versioning with worker re-acknowledgement
-- Worker notification on SOP updates (tightly coupled to versioning)
-- Competency assessment multi-role sign-off chain (extends single sign-off)
-- Audit report export (PDF/CSV)
-- Bulk CSV user import
+**Must have — Pathway 3 (File → Video SOP):**
+- Narrated slideshow (Format A) — one card per SOP section, TTS audio, safety-first slide ordering (hazards before steps always)
+- Screen recording style (Format C) — scrolling SOP text synced to TTS narration
+- Chapter markers and timestamp navigation linked to SOP sections
+- Admin preview before publish; "video is outdated" flag when SOP is updated
+- Worker video completion tracking integrated with existing compliance records
 
-**Defer to v2+:**
-- SSO / SCIM integration (enterprise; high cost)
-- Acknowledgement tracking / read receipts (requires versioning + notifications stable first)
-- Analytics dashboard (requires completion data volume)
-- Skills matrix / training assignment
-- IoT / sensor integration
-- Multi-language support
-
-**Do not build:** In-app SOP authoring, real-time chat, video step content, AI-generated SOP creation from scratch, conditional branching logic, public SOP marketplace.
+**Defer to v2.1+:**
+- In-app camera recording (iOS Safari MediaRecorder unreliable for video; Android/Chrome only at this time)
+- Full AI video (Format B) — avatar API with high per-generation cost; validate demand with Formats A and C first
+- Multi-page photo sequence scanning
+- Custom vocabulary correction for transcription (implement after first real-world usage reveals problem terms)
+- Video re-generation triggered automatically on SOP update
 
 ### Architecture Approach
 
-The architecture has four layers: a PWA client with role-specific views, an offline-first data layer (IndexedDB + service worker + sync queue), a server API layer with tenant context middleware, and an async document parsing pipeline decoupled from the HTTP request cycle. The critical constraint is that the offline layer must be designed as write-local-first from day one — retrofitting offline onto a server-write-first model is effectively a full rewrite. The document parsing pipeline must be asynchronous (job queue pattern), because LLM parsing takes 30–120 seconds and HTTP requests time out at 30 seconds.
+The architecture is deliberately additive. All new extractor modules (`extract-audio.ts`, `transcribe-audio.ts`, `fetch-youtube-transcript.ts`, `extract-image.ts`, `extract-xlsx.ts`, `extract-pptx.ts`, `extract-txt.ts`) return a `string` and feed into the existing `gpt-parser.ts → ParsedSopSchema` without any changes to the structuring layer or admin review UI. The `parse_jobs` table gains an `input_type` column to distinguish video, image, xlsx, pptx, txt, and URL sources. The `video_generation_jobs` table is kept separate because its input (SOP ID), status vocabulary (`generating_audio`, `rendering_video`), and output (video URL) are structurally distinct from document parsing. Two new Supabase Storage buckets are required: `sop-videos` (raw video input, up to 2 GB files via TUS) and `sop-generated-videos` (rendered MP4 output with 90-day retention). See ARCHITECTURE.md for full component breakdown, data flow diagrams, and build order.
 
-**Major components:**
-1. **Offline-First Data Layer (Dexie + Service Worker + Sync Queue)** — workers read from IndexedDB always; writes go to IndexedDB first, flush to API on reconnect
-2. **Tenant Context Middleware** — extracts tenant_id from JWT, sets Postgres session variable before every query; RLS policies enforce isolation as last line of defence
-3. **Async Document Parsing Pipeline** — upload → job queue → text/image extraction → GPT-4o structured output → confidence scoring → admin draft → publish
-4. **Completion FSM** — not_started → in_progress → pending_sign_off → signed_off / rejected; completion records are append-only, never mutable
-5. **SOP Normalised Data Model** — sops → sop_sections → sop_steps with explicit type fields; images as foreign-keyed records pointing to object storage; never store content as a blob
+**Major new components:**
+1. `VideoUploader.tsx` + modified `createUploadSession` — TUS resumable upload bypasses Vercel 4.5 MB limit
+2. `/api/sops/transcribe` route — audio extraction (ffmpeg-static) + gpt-4o-transcribe → existing gpt-parser
+3. `/api/sops/youtube` route — youtube-transcript caption fetch → existing gpt-parser
+4. `/api/sops/generate-video` route — creates `video_generation_jobs` record; delegates to TTS + Shotstack
+5. `src/lib/video-gen/tts.ts` — per-section TTS via `gpt-4o-mini-tts`, split by section to avoid pauses
+6. `src/lib/video-gen/render-slides.ts` — Shotstack API call with JSON timeline; polling or webhook for completion
 
-**Build order the architecture dictates:** Data layer + RLS → Auth + tenant context → SOP data model + API → Parsing pipeline → Worker mobile UI + offline layer → Completion tracking → Sign-off workflow → Assignment + RBAC enforcement.
+**Key architectural patterns:**
+- Converging extraction pipelines: all new input types return plain text and feed into unchanged `gpt-parser.ts`
+- TUS resumable upload for video; existing presigned URL flow for documents and images
+- Extend `parse_jobs.input_type` for Pathways 1+2; separate `video_generation_jobs` table for Pathway 3
+- Async-first: all video transcription and video generation must use the existing job/Realtime pattern — no synchronous video processing in the request cycle
 
 ### Critical Pitfalls
 
-1. **AI parser silently produces wrong SOP steps** — Never auto-publish. Every parse is a draft. Build a structured diff view (original alongside parsed output). Confidence scoring per section. Block SOP activation until all low-confidence flags are cleared by an admin. Store original documents permanently — they are the source of truth, not the extraction.
+The following are v2.0-specific pitfalls. The v1.0 pitfalls (stale SOP versions, iOS storage eviction, multi-tenant data leakage, glove-hostile UI, completion record defensibility) remain relevant and are documented in PITFALLS.md (Pitfalls 1-8).
 
-2. **Multi-tenant data leakage** — RLS is defence-in-depth, not the only control. Explicit tenant_id filter in every application query. Cache keys must include tenant_id namespace. Background jobs must carry tenant_id in their payload explicitly. Automated two-tenant cross-access test on every release.
+1. **Vercel 4.5 MB request body limit blocks all video uploads** — Never route video bytes through a Next.js API route or Server Action. Issue a TUS endpoint URL from the server; the client uploads directly to Supabase Storage. Test with a 20 MB file on a Vercel preview deployment before any other video work.
 
-3. **Stale SOP version served after safety update** — SOP version integer on every record. Worker client diffs cached version numbers against server manifest on every sync. Force-update banner for safety-flagged SOPs. Never cache SOP data via HTTP headers (use the app's own sync layer). Implement skipWaiting() with a UI prompt.
+2. **YouTube/Vimeo URL pathway creates DMCA and ToS legal liability** — Do not use yt-dlp, ytdl-core, or any server-side video download tool. Use YouTube Data API v3 `captions.list` for compliant caption access. If no captions exist, prompt the user to download and upload the file themselves. Add a terms acknowledgement checkbox. This constraint must be reviewed before the URL pathway is implemented.
 
-4. **iOS Safari destroys offline data and camera state** — Apple evicts PWA storage after ~7 days inactivity. Surface explicit "Download for offline use" per SOP with a readiness indicator. Always fallback from getUserMedia to `<input type="file" capture="environment">` for camera. Document iOS limitations in admin onboarding.
+3. **Transcription accuracy on factory-floor audio with NZ accents is 75-85%, not 97%+** — Pass a `prompt` parameter to the transcription API with up to 224 tokens of domain vocabulary. Show the admin the transcript with video timestamps for manual verification. Flag numerical values, chemical names, and PPE specs as high-risk tokens requiring explicit admin confirmation. Test on actual NZ-accented factory audio before shipping.
 
-5. **Glove-hostile UI kills worker adoption** — Primary actions (Next, Complete, Photo) must be 72×72px minimum, in the bottom third of the screen, one-handed reachable. Full-screen card interface for walkthrough — no navbar during procedure execution. Validate on real gloved hardware on a mid-range Android before any user testing. No modals or confirmation dialogs in the primary flow.
+4. **Video and generated-video storage costs become unbounded without retention policies** — Source videos deleted 30 days after transcription completes; audio extraction intermediaries deleted after job completes; generated SOP videos have 90-day TTL. Per-tenant storage quota with visible indicator in settings. Generated videos are reproducible derived assets — not permanent.
 
-6. **Completion records not legally defensible** — Completion records are append-only (no UPDATE/DELETE). On completion, snapshot: SOP version number, content hash, worker user ID, server-side timestamp, photo evidence references. Supervisor sign-off creates a second immutable record. Never hard-delete SOP versions.
+5. **Generated videos cached in service worker bloat device storage** — Explicitly exclude `.mp4` and `.webm` URLs from all service worker caching strategies. Never embed generated video URLs in the SOP data structure that syncs to IndexedDB. This exclusion rule must be added in the same activity that first introduces video URLs to the SOP data model.
 
-7. **Photo storage bloats IndexedDB and crashes the app** — Compress client-side before IndexedDB write (Canvas resize to 1200px, ~200KB target). Store Blobs as unindexed fields only. Implement upload queue that flushes on reconnect. Monitor via navigator.storage.estimate().
+6. **Video generation jobs time out or produce duplicates without async-first design** — Always create a `video_generation_jobs` row and return 202 immediately. Implement idempotency: if a job already exists for the current SOP version, return the existing job ID rather than creating a duplicate. Status progression visible via Supabase Realtime subscription.
+
+7. **TTS mispronounces industrial terminology and NZ place names** — Build a per-organisation pronunciation dictionary with SSML `<phoneme>` tags for known problem terms (kPa, RPM, SCBA, PPE, Tergo Alkalox, te reo place names). Require admin audio preview before any generated video is published. This review step is mandatory, not optional.
+
+8. **OCR on phone-photo inputs produces 75-85% accuracy without vision model + preprocessing** — Use GPT-4o vision (not Tesseract) as the primary OCR model. Highlight low-confidence tokens in admin review UI; require explicit confirmation for numerical values and chemical names. Store original image permanently alongside extracted text.
+
+9. **Office file parsing accepts macro-enabled formats by default** — Block `.xlsm`, `.xlsb`, `.xltm`, `.pptm`, `.potm`, `.ppam` at upload validation before any parsing library is invoked. Validate magic bytes server-side, not just file extension. File validation is built first within the expanded parsing activity.
 
 ---
 
 ## Implications for Roadmap
 
-Based on the combined research — particularly the feature dependency graph, the architecture build order, and the pitfall-to-phase mapping — a 6-phase structure is appropriate.
+Based on dependency analysis, risk profile, and feature relationships across all three pathways, five phases are suggested. The ordering de-risks infrastructure and low-complexity parsers first, isolates the iOS-constrained recording feature, then addresses video generation as a distinct async-heavy phase.
 
-### Phase 1: Foundation — Data Model, Auth, Multi-Tenancy
+---
 
-**Rationale:** Everything depends on this. The multi-tenant RLS model cannot be retrofitted; if tenant isolation is built incorrectly in Phase 1, every subsequent phase inherits the flaw. Auth + JWT claims must be working before any data endpoint can be built safely. The FEATURES.md dependency graph shows multi-tenant isolation as "underlies all features."
-**Delivers:** Postgres schema with RLS policies, organisations/users/roles tables, Supabase Auth with JWT custom claims (tenant_id + role), withTenantContext DB wrapper, automated cross-tenant isolation test.
-**Addresses:** Multi-tenant data isolation (table stakes), role-based access control foundation.
-**Avoids:** Pitfall 4 (multi-tenant data leakage) — must be addressed here, not during a later sprint.
+### Phase 1: Infrastructure and Expanded File Parsing
 
-### Phase 2: SOP Data Model and Document Parsing Pipeline
+**Rationale:** The foundation work (`parse_jobs.input_type` migration, new storage buckets, expanded MIME type routing) has no user-visible complexity but blocks all three pathways. Expanded file parsing (image OCR, PPTX, XLSX, plain text) builds on the most familiar pattern in the codebase — same extractor interface, same parse route, same admin review UI — and delivers immediate admin value. Building this first validates the `input_type` routing architecture before the more novel video pipeline is added.
 
-**Rationale:** The SOP data model is the central content model all worker and admin features depend on. The parsing pipeline is the core product differentiator and the highest-risk technical component — risk must be resolved before worker features are built on top of it. Using test fixture SOPs, the mobile UI can begin development in parallel against a stable schema.
-**Delivers:** sops / sop_sections / sop_steps / sop_images normalised schema; document upload flow (presigned URL → object storage); async job queue (parse jobs table); GPT-4o structured output parser with mammoth + unpdf extraction; per-section confidence scoring; admin review UI (diff view: original vs. parsed); SOP publish workflow (draft → admin_review → published).
-**Addresses:** Document upload + AI parsing (P1 table stakes), admin review queue (P1 differentiator), structured section data model.
-**Avoids:** Pitfall 1 (AI parser produces wrong steps) — admin review gate and confidence scoring must ship here; Pitfall AP1 (synchronous parsing) — async pipeline from the start.
+**Delivers:** Admin can upload photos of printed SOPs, PPTX slide decks, XLSX checklists, and plain text files and get structured SOPs through the same review UI as v1.0.
 
-### Phase 3: Worker Mobile UI and Offline-First Layer
+**Features addressed:**
+- Photo/image upload with camera capture and quality check
+- GPT-4o vision OCR with high-risk token flagging
+- PPTX, XLSX, TXT/CSV upload with unified file picker
 
-**Rationale:** The worker experience is the primary value delivery for end users. The offline layer must be designed before completion tracking — if completion records are server-write-first and offline is bolted on later, it is a rewrite. The FEATURES.md dependency graph shows offline caching and the SOP data model as prerequisites to the walkthrough.
-**Delivers:** PWA shell (@serwist/next + Tailwind design system with 72px+ touch targets); IndexedDB schema (Dexie — SOPs, steps, completion states, photo queue); SOP sync engine (version diff → fetch stale → cache images); SOP library with full-text search; step-by-step walkthrough (full-screen card interface, glove-friendly); quick reference mode (tabbed Safety / PPE / Steps / Emergency); offline status indicator; per-SOP cache readiness indicator.
-**Addresses:** Step-by-step walkthrough (P1), quick reference mode (P1 differentiator), offline caching (P1), SOP library + search (P1), structured section rendering (P1 differentiator), glove-friendly UX (P1 differentiator).
-**Avoids:** Pitfall 3 (iOS storage eviction), Pitfall 5 (glove-hostile UI), Pitfall AP3 (online-required writes), Performance trap (pre-caching entire library on install).
-**Research flag:** Needs `/gsd:research-phase` — offline sync engine details, iOS-specific PWA behaviours, and Dexie + TanStack Query integration patterns have enough platform-specific edge cases to warrant targeted research before implementation.
+**Pitfalls to avoid:** OCR quality on phone-photo inputs; macro-enabled file validation
 
-### Phase 4: Completion Tracking, Photo Evidence, and Sign-off
+**Research flag:** Standard patterns — no additional research needed.
 
-**Rationale:** Completion tracking requires the offline layer (Phase 3) and the SOP data model (Phase 2) to be stable. Photo evidence and supervisor sign-off build on completion records. The FSM (not_started → in_progress → pending_sign_off → signed_off) must be designed before the first completion record is written — retrofitting the state machine later requires a data migration.
-**Delivers:** Completion FSM with append-only records; step completion recording (offline-first via sync queue); photo capture tied to specific step (camera fallback for iOS); server-side timestamp on sync; SOP version hash snapshotted at completion time; photo compression + upload queue (Canvas resize, Dexie queue, flush on reconnect); supervisor sign-off UI; push notification to supervisor on pending sign-off; completion status visible to supervisors.
-**Addresses:** Photo capture (P1), completion tracking (P1), supervisor sign-off (P1), image rendering in steps (P1).
-**Avoids:** Pitfall 6 (completion records not legally defensible), Pitfall 7 (photo storage bloats IndexedDB), Pitfall 8 (offline sync conflict blindness — append-only + idempotency keys), Security mistake (completion records deletable by admins).
+---
 
-### Phase 5: SOP Assignment, Versioning, and Notifications
+### Phase 2: Video → SOP (File Upload and YouTube/Vimeo URL)
 
-**Rationale:** SOP assignment to roles can be layered on after the core walkthrough loop is validated. Versioning and worker notifications are tightly coupled — building them together is more efficient than two separate sprints. Versioning is a P2 feature per the prioritisation matrix but is a prerequisite for acknowledgement tracking (v2) and competency chains (v1.x).
-**Delivers:** SOP assignment to roles/workers (admin UI); worker sees only assigned SOPs first; SOP versioning (version integer, history retained, re-acknowledgement required); worker in-app notification on SOP update (force-update banner for safety-flagged SOPs); bulk CSV user import; audit report export (PDF/CSV).
-**Addresses:** SOP assignment (P1), SOP versioning (P2), worker notification on updates (P2), audit report export (P2), bulk CSV user import (P2).
-**Avoids:** Pitfall 2 (stale SOP version served after safety update).
+**Rationale:** Video file upload carries the highest novel risk: TUS upload pattern, ffmpeg-static bundle size on Vercel, OpenAI Whisper 25 MB limit, and real-world transcription accuracy on NZ factory audio. Building this as a focused phase allows early validation of the TUS infrastructure and ffmpeg bundling before the YouTube URL variant is added. YouTube URL is included in this phase (not deferred) because the legal constraints must be designed in from the start — not retrofitted after the fact.
 
-### Phase 6: Competency Assessment and Compliance Enhancements
+**Delivers:** Admin can upload an MP4/MOV video file or paste a YouTube URL and receive a structured SOP with transcript displayed for manual review.
 
-**Rationale:** Multi-role sign-off chain extends the single-role supervisor sign-off built in Phase 4. It is a P2 differentiator that requires single sign-off to be stable first. Acknowledgement tracking (read receipts) requires versioning + notifications (Phase 5) to be stable. These features target the compliance buyer persona and are appropriate once early adopters validate the core parsing + walkthrough loop.
-**Delivers:** Multi-role competency sign-off chain (worker completes → trainer observes → verifier confirms → manager reviews); acknowledgement tracking with exportable audit trail; competency records linked to specific SOP version.
-**Addresses:** Competency assessment multi-role sign-off (P2 differentiator), acknowledgement tracking (P2).
-**Avoids:** Building multi-role sign-off before single sign-off is validated in production.
+**Features addressed:**
+- Video file upload (MP4/MOV) with TUS resumable upload, async processing, named stage feedback
+- YouTube URL paste with caption-first fast path
+- Vimeo URL (if confirmed in scope)
+- Transcript display alongside structured output in admin review
+- Mandatory section detection flag (hazards/PPE absence warning)
+- Industrial terminology confidence scoring and high-risk token flagging
+
+**Pitfalls to avoid:** Vercel 4.5 MB limit (TUS infrastructure built first); YouTube ToS / DMCA liability (legal review before URL pathway ships); factory-floor transcription accuracy (domain vocabulary prompt, NZ accent testing)
+
+**Research flag:** Needs research at planning time — confirm TUS integration with current Supabase JS SDK version before design is finalised.
+
+---
+
+### Phase 3: Video → SOP (In-App Recording)
+
+**Rationale:** Separated from Phase 2 because iOS Safari MediaRecorder support for video is unstable on older devices (pre-iOS 17.2), which is common on NZ factory floors with un-updated iPhones. Shipping in-app recording before iOS support is reliable would produce an Android/Chrome-only feature. This phase should proceed only after Phase 2 is in production and usage data is available.
+
+**Delivers:** Admin can record video directly in the browser (Android/Chrome reliably; iOS 17.2+ with fallback warning) and get a structured SOP without a separate recording tool.
+
+**Features addressed:** In-app camera recording; MediaRecorder with explicit bitrate control (`videoBitsPerSecond: 1_000_000`); iOS fallback warning or file-upload redirect
+
+**Pitfalls to avoid:** MediaRecorder format incompatibility across Chrome/iOS (`isTypeSupported()` priority order; explicit audio extraction before transcription)
+
+**Research flag:** Needs research at planning time — verify current iOS Safari MediaRecorder support status before committing to scope or fallback design.
+
+---
+
+### Phase 4: File → Video SOP (Narrated Slideshow and Screen Recording)
+
+**Rationale:** Pathway 3 generates video from existing structured SOPs — it does not require any document parsing and builds entirely on the published SOP data already in the database. The two simpler formats (narrated slideshow, screen recording style) share the TTS pipeline and differ only in Shotstack timeline structure. Shipping these two formats together validates the async video generation pattern, the Shotstack integration, and the admin preview and worker video player UX before committing to the higher-cost Format B.
+
+**Delivers:** Admin can generate a narrated slideshow or scrolling-text video from any published SOP. Workers see a "Video version" button on the SOP view. Chapter navigation and video completion tracking are live.
+
+**Features addressed:**
+- Narrated slideshow (Format A) with safety-first slide ordering (hazards before steps, always)
+- Screen recording style (Format C) with scroll timing synced to TTS audio
+- Chapter markers and timestamp navigation linked to SOP sections
+- Admin preview before publish
+- "Video is outdated" flag on SOP update
+- Worker video access within existing SOP view
+- Video completion tracking integrated with compliance records
+
+**Pitfalls to avoid:** Video generation timeout / duplicate jobs (async-first, idempotency required); TTS mispronunciation (pronunciation dictionary, mandatory audio preview); video storage costs (retention policies); service worker video caching (exclusion rules added in same activity as video URL introduction)
+
+**Research flag:** Needs research at planning time — Shotstack API webhook vs polling pattern; JSON timeline structure for narrated slideshow; validate pricing model at expected SOP volume before committing.
+
+---
+
+### Phase 5: Full AI Video (Format B) — Conditional
+
+**Rationale:** Full AI video (avatar-based or AI-generated visuals per step) has the highest per-generation cost ($0.10-0.50/minute of output via HeyGen/Synthesia/D-ID), the longest generation time, and the greatest sensitivity to industrial content quality. This phase should only proceed if Phase 4 adoption data confirms demand for richer video output beyond narrated slideshows.
+
+**Delivers:** Admin can generate AI avatar-narrated or AI-visual video SOPs with organisation branding.
+
+**Features addressed:** Format B (AI avatar or animated visuals per step); organisation branding overlay
+
+**Research flag:** Needs research at planning time — evaluate HeyGen vs Synthesia vs D-ID for industrial content quality and per-generation cost. Test DALL-E 3 image generation quality on industrial procedure descriptions before committing.
 
 ---
 
 ### Phase Ordering Rationale
 
-- **Phases 1 → 2 are strictly sequential** because the data model and auth must exist before any feature can be safely built.
-- **Phases 2 → 3 can partially overlap** — worker UI development can begin against fixture SOPs while the parsing pipeline is being refined.
-- **Phase 4 depends on Phase 3** because the offline write queue must exist before completion records can be written.
-- **Phase 5 depends on Phase 2 (versioning requires the SOP model) and Phase 3 (assignment requires the worker view).**
-- **Phase 6 depends on Phase 4 (single sign-off must work first) and Phase 5 (versioning must be stable for acknowledgement tracking).**
+- Expanded file parsing (Phase 1) precedes video (Phase 2) because it validates the `input_type` routing architecture with low-risk additions before the more complex video pipeline is added.
+- TUS upload infrastructure (Phase 2) must be the first thing built within that phase — the 4.5 MB Vercel limit makes the upload pattern the most critical decision, and it fails silently on localhost.
+- In-app recording (Phase 3) is gated on iOS Safari support maturity, placing it after the file upload path gives the product a working video-to-SOP path while the recording UX is refined.
+- Video generation (Phase 4) builds on published SOPs and is independent of the parsing infrastructure, but the async job pattern validated in Phases 1-2 is a prerequisite for its architecture.
+- Format B (Phase 5) is explicitly conditioned on demand validation from Phase 4.
 
 ### Research Flags
 
-Phases likely needing `/gsd:research-phase` during planning:
+Phases needing `/gsd:research-phase` at planning time:
+- **Phase 2:** TUS resumable upload with current Supabase JS SDK; confirm `tus-js-client` vs Uppy for this stack; ffmpeg-static bundling on Vercel confirmed working
+- **Phase 3:** Current iOS Safari MediaRecorder support status (post-iOS 17.2); fallback design for unsupported devices
+- **Phase 4:** Shotstack webhook/polling pattern and timeline JSON structure; pricing validation at expected volume
+- **Phase 5:** AI avatar API comparison for industrial content; DALL-E 3 image quality for procedure visuals
 
-- **Phase 2 (Document Parsing Pipeline):** GPT-4o structured outputs with variable-quality legacy document inputs, confidence scoring strategies, and the Supabase Edge Function vs. Vercel job runner trade-off for async parsing jobs — needs targeted research before implementation planning.
-- **Phase 3 (Offline-First Layer):** iOS-specific PWA storage eviction behaviour, Dexie + TanStack Query + @serwist/next integration patterns, and Background Sync API limitations on iOS — complex enough that dedicated research before sprint planning is warranted.
-- **Phase 4 (Offline Sync Conflict Resolution):** Append-only completion log + idempotency key design and the specific Supabase Realtime reconnect + TanStack Query refetchOnReconnect integration — worth verifying against current library APIs before designing the sync engine.
-
-Phases with well-documented patterns (can skip research-phase):
-
-- **Phase 1 (Foundation):** Supabase RLS + JWT custom claims multi-tenancy is a documented, high-confidence pattern. Standard implementation, no research needed.
-- **Phase 5 (Versioning + Notifications):** SOP versioning and push notification patterns are well-established. No novel integration required.
-- **Phase 6 (Competency Assessment):** Extends the sign-off FSM built in Phase 4 using the same patterns. Standard CRUD + workflow state machine.
+Phases with standard patterns (skip research):
+- **Phase 1:** GPT-4o vision OCR, officeparser v6, plain text parsing — all well-documented; STACK.md alternatives analysis is complete and definitive
 
 ---
 
@@ -178,57 +225,58 @@ Phases with well-documented patterns (can skip research-phase):
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All package versions verified against live npm registry 2026-03-23. Official docs consulted for Supabase RLS, Serwist, OpenAI Structured Outputs, TanStack Query network modes. |
-| Features | HIGH | Competitor analysis across SafetyCulture, Dozuki, MaintainX, Fabrico. Multiple industry sources on field worker mobile app adoption patterns. Market gap clearly identified. |
-| Architecture | HIGH | Core patterns (RLS multi-tenancy, offline-first write queue, async parsing pipeline, completion FSM) drawn from official docs and multiple authoritative architectural sources. |
-| Pitfalls | HIGH | Pitfalls drawn from documented production incidents, official platform limitation docs (Apple WebKit, MDN), peer-reviewed AI hallucination benchmarks, and community incident post-mortems. |
+| Stack | HIGH | Primary choices (OpenAI SDK, officeparser, youtube-transcript, @ffmpeg/ffmpeg) verified via official docs and package repositories. Shotstack chosen over Remotion on verified Vercel constraint documentation. One uncertainty: ffmpeg-static server-side bundling on Vercel is documented but described as "bundle-sensitive" — early validation required in Phase 2. |
+| Features | MEDIUM-HIGH | Competitor landscape (Synthesia, HeyGen, ScreenApp, Trupeer, Docustream.ai) verified via product sites. iOS Safari MediaRecorder constraints verified via official compatibility tables. Feature prioritisation reflects documented industrial mobile adoption patterns. |
+| Architecture | HIGH | Vercel constraints (4.5 MB body limit, 250 MB bundle) verified against official docs. Supabase TUS resumable upload confirmed via official docs. Shotstack API pattern confirmed. Note: ARCHITECTURE.md system diagram references ElevenLabs and Remotion Lambda (from an earlier draft perspective) while STACK.md makes the case for gpt-4o-mini-tts and Shotstack instead. STACK.md recommendations are authoritative; component file structure in ARCHITECTURE.md is accurate. |
+| Pitfalls | HIGH | Critical pitfalls (Vercel body limit, YouTube ToS, transcription accuracy on NZ factory audio, iOS storage eviction) drawn from official documentation, verified CVEs, and published WER benchmarks. |
 
 **Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **Document parsing quality on real customer legacy SOPs:** Research used described patterns and benchmarks, not actual samples from the target customer base. First customer pilot SOPs should be tested against the parser before Phase 2 is declared complete. Identify 10 real-world .docx and .pdf SOPs from a friendly industrial contact early.
-- **Job queue infrastructure for v1:** The architecture recommends async parsing via a job queue, but the specific job queue implementation (Supabase Edge Function triggered by Storage events vs. a separate BullMQ worker process on Vercel) was not resolved in research. This trade-off needs a decision at the start of Phase 2 planning.
-- **Push notification delivery on iOS PWA:** Web Push on iOS requires the PWA to be added to the home screen and iOS 16.4+. Worker adoption rate for home screen installation needs to be considered in the Phase 5 notification design — in-app polling fallback may be necessary for workers who do not install the PWA.
-- **Printing / PDF export of completion records:** Some regulated industries require a signed PDF completion artefact. This was flagged in PITFALLS.md but not sized. Defer to Phase 6 or treat as a v2 feature pending customer demand signal.
+- **ffmpeg-static vs @ffmpeg/ffmpeg WASM dual approach:** The intended architecture uses both — WASM client-side for pre-upload audio extraction (reducing upload size), and `ffmpeg-static` server-side for processing already-uploaded video files. This dual approach should be confirmed and documented in Phase 2 planning to prevent confusion.
+
+- **ARCHITECTURE.md tool divergence:** ARCHITECTURE.md component descriptions reference ElevenLabs, Remotion Lambda, and SheetJS. STACK.md makes a clear case for gpt-4o-mini-tts, Shotstack, and officeparser. STACK.md is authoritative; the component descriptions in ARCHITECTURE.md need to be updated during Phase 2 and Phase 4 planning.
+
+- **Vimeo URL scope for v2.0:** Both STACK.md and FEATURES.md treat Vimeo as "optional, only needed if in scope for v2.0." This is a product decision that needs an explicit answer before Phase 2 planning begins. Vimeo requires a separate API authentication token and has different fallback constraints than YouTube.
+
+- **Pronunciation dictionary implementation:** PITFALLS.md identifies TTS mispronunciation as a critical Pathway 3 concern and recommends SSML `<phoneme>` tags with a per-org dictionary. Neither STACK.md nor ARCHITECTURE.md specifies the implementation. This needs to be designed in Phase 4 planning before the TTS module is built.
+
+- **Inngest for durable jobs:** ARCHITECTURE.md recommends Inngest for long-running transcription and video generation jobs at 500+ SOPs/month. This is not in v2.0 scope, but the async job pattern should be designed to make an Inngest migration non-breaking if growth requires it.
 
 ---
 
 ## Sources
 
 ### Primary (HIGH confidence)
-
-- npm registry (live 2026-03-23) — all package versions verified
-- [Next.js 16 release blog](https://nextjs.org/blog/next-16) — Turbopack stable, App Router
-- [Supabase RLS docs](https://supabase.com/docs/guides/database/postgres/row-level-security) — multi-tenant isolation patterns
-- [Supabase Custom Claims RBAC docs](https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac) — JWT claims for roles
-- [Serwist Next.js docs](https://serwist.pages.dev/docs/next/getting-started) — service worker integration
-- [OpenAI Structured Outputs docs](https://platform.openai.com/docs/guides/structured-outputs) — JSON Schema response format reliability
-- [MDN: Offline and background operation (PWA)](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Offline_and_background_operation) — Background Sync browser support
-- [TanStack Query network mode docs](https://tanstack.com/query/v4/docs/react/guides/network-mode) — offlineFirst mode
-- [From hallucinations to hazards — ScienceDirect](https://www.sciencedirect.com/science/article/pii/S0925753525002814) — LLM hallucination rates on safety-critical content
-- [PWA iOS limitations — MagicBell](https://www.magicbell.com/blog/pwa-ios-limitations-safari-support-complete-guide) — iOS storage eviction behaviour
-- [IndexedDB max storage limit — RxDB](https://rxdb.info/articles/indexeddb-max-storage-limit.html) — photo bloat risk
-- [Building offline-friendly image upload — Smashing Magazine](https://www.smashingmagazine.com/2025/04/building-offline-friendly-image-upload-system/)
-- [Multi-tenant data isolation with PostgreSQL RLS — AWS](https://aws.amazon.com/blogs/database/multi-tenant-data-isolation-with-postgresql-row-level-security/)
+- [OpenAI Speech-to-Text API](https://developers.openai.com/api/docs/models) — gpt-4o-transcribe, gpt-4o-mini-tts, DALL-E 3 in existing SDK
+- [Vercel Functions Limits — official docs](https://vercel.com/docs/functions/limitations) — 4.5 MB body, 300s/800s duration, 250 MB bundle
+- [Supabase Resumable Uploads — TUS protocol](https://supabase.com/docs/guides/storage/uploads/resumable-uploads) — 50 GB max, 6 MB chunks
+- [Remotion on Vercel — official limitations](https://www.remotion.dev/docs/miscellaneous/vercel-functions) — Chromium not viable on Vercel Functions
+- [Remotion license](https://www.remotion.dev/docs/license) — company license required for 4+ employee for-profit SaaS
+- [officeparser GitHub v6.0.0](https://github.com/harshankur/officeParser) — December 2025 AST output release
+- [SheetJS xlsx security](https://security.snyk.io/package/npm/xlsx) — CVEs confirmed in npm version
+- [Shotstack pricing](https://shotstack.io/pricing/) — $0.20/min subscription, $0.30/min PAYG
+- [Vimeo transcript API](https://help.vimeo.com/hc/en-us/articles/17480150130833) — official Vimeo API docs
+- [MediaRecorder browser support](https://caniuse.com/mediarecorder) — Safari 14+, iOS 14+; iOS 17.2+ enabled by default
 
 ### Secondary (MEDIUM confidence)
+- [youtube-transcript npm](https://www.npmjs.com/package/youtube-transcript) — v1.3.0, serverless-compatible caption fetch; ~17 days old at research time
+- [AssemblyAI transcription benchmarks 2026](https://www.assemblyai.com/benchmarks) — WER on noisy audio; NZ/AU accent comparison data
+- [ScreenApp SOP from video guide](https://screenapp.io/blog/how-to-create-sop-from-video-ai) — competitor feature landscape
+- [Synthesia video SOP](https://www.synthesia.io/post/video-sop) — enterprise video SOP patterns and table stakes
+- [Docustream.ai SOP to video](https://docustream.ai/sop-to-video/) — timestamp linking patterns
+- [Scanbot OCR accuracy improvement](https://scanbot.io/blog/improve-ocr-accuracy-with-image-processing/) — preprocessing impact on mobile photo OCR
+- [ffmpeg.wasm in Next.js](https://blog.brightcoding.dev/2026/01/09/build-a-viral-video-editor-in-your-browser-next-js-+-ffmpeg-wasm-complete-guide-2026) — WASM client-side pattern validated
+- [Vercel FFmpeg binary issues](https://github.com/vercel/next.js/issues/53791) — confirmed broken path resolution for some approaches
 
-- [SafetyCulture SOP Software](https://safetyculture.com/apps/sop-software) — competitor feature analysis
-- [Dozuki Platform Features](https://www.dozuki.com/features) — competitor feature analysis
-- [MaintainX blog](https://www.getmaintainx.com/blog/standard-operating-procedure-program) — competitor and pitfall analysis
-- [Fabrico — Best SOP Software for Manufacturing 2026](https://www.fabrico.io/blog/best-sop-software-manufacturing/) — competitor landscape
-- [The CTO Club — Best Connected Worker Platforms 2026](https://thectoclub.com/tools/best-connected-worker-platforms/)
-- [AntStack multi-tenant RLS guide](https://www.antstack.com/blog/multi-tenant-applications-with-rls-on-supabase-postgress/) — organization_id + JWT claims pattern
-- [Supabase multi-tenancy discussion](https://github.com/orgs/supabase/discussions/1615) — RLS performance patterns
-- [OrcaLean — Why operators struggle with SOP compliance](https://www.orcalean.com/article/why-u.s.-operators-struggle-with-sop-complianceand-how-to-fix-it-digitally)
-- [EHS Careers — Mobile safety app features used by field workers](https://ehscareers.com/employer-blog/mobile-safety-apps-which-features-actually-get-used-by-field-workers/)
-
-### Tertiary (LOW confidence)
-
-- [PkgPulse — unpdf vs pdf-parse vs pdfjs-dist comparison 2026](https://www.pkgpulse.com/blog/unpdf-vs-pdf-parse-vs-pdfjs-dist-pdf-parsing-extraction-nodejs-2026) — community source; consistent with npm download data
+### Tertiary (LOW confidence — validate before implementation)
+- [OpenAI gpt-4o vision for OCR comparison](https://intuitionlabs.ai/articles/ai-ocr-models-pdf-structured-text-comparison) — independent comparison; validate against current model versions at implementation time
+- ElevenLabs vs gpt-4o-mini-tts quality — model quality evolves; verify at time of Phase 4 implementation before locking to OpenAI TTS
 
 ---
 
-*Research completed: 2026-03-23*
+*Research completed: 2026-03-29*
+*Scope: v2.0 milestone — Video → SOP, File → SOP (expanded), File → Video SOP*
+*Replaces: v1.0 SUMMARY.md (2026-03-23)*
 *Ready for roadmap: yes*
