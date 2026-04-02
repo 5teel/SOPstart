@@ -1,15 +1,16 @@
 ---
 gsd_state_version: 1.0
 milestone: v2.0
-milestone_name: SOP Creation Pathways
-status: Roadmap defined
-stopped_at: Roadmap created — Phase 5 ready for planning
-last_updated: "2026-03-29T00:00:00.000Z"
+milestone_name: milestone
+status: planning
+stopped_at: Phase 5 context gathered
+last_updated: "2026-04-02T13:08:19.907Z"
+last_activity: 2026-03-29 — v2.0 roadmap created (Phases 5–8)
 progress:
-  total_phases: 4
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_phases: 8
+  completed_phases: 4
+  total_plans: 17
+  completed_plans: 17
 ---
 
 # Project State
@@ -155,6 +156,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-29T00:00:00.000Z
-Stopped at: v2.0 roadmap created — Phases 5–8 defined
-Resume file: None
+Last session: 2026-04-02T13:08:19.903Z
+Stopped at: Phase 5 context gathered
+Resume file: .planning/phases/05-expanded-file-intake/05-CONTEXT.md
