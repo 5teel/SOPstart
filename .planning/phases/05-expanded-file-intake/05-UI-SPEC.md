@@ -52,6 +52,13 @@ Tokens from `src/app/globals.css` — use these, do not redeclare:
 | Scanner strip thumbnail gap | 8px | `gap-2` |
 | Table cell padding | 12px horizontal, 8px vertical | `px-3 py-2` |
 
+**Non-standard values declared as explicit exceptions (both are multiples of 4 — within-scale, but not in the standard set {4, 8, 16, 24, 32, 48, 64}):**
+
+| Value | Tailwind | Rationale |
+|-------|----------|-----------|
+| 12px (`p-3`, `px-3`) | `p-3` / `px-3` | Established prior-phase pattern in `UploadDropzone.tsx` and `SectionEditor.tsx` for tight component padding. Changing would break visual consistency with existing queue rows and table cells. |
+| 20px (`p-5`) | `p-5` | Established prior-phase pattern in `UploadDropzone.tsx` for loose component padding. Retaining for visual continuity. |
+
 **Touch target exception:** All buttons and interactive elements must meet `min-h-[72px]` or `h-[72px]` (established `--min-tap-target`). Exceptions: icon-only remove buttons in file queue use `p-1` with a minimum clickable area of 44px enforced via a wrapping click zone.
 
 ---
@@ -74,9 +81,7 @@ Tokens from `src/app/globals.css` — use these, do not redeclare:
 | Weight | Tailwind | Usage |
 |--------|----------|-------|
 | 400 (regular) | `font-normal` | Body text, step content, table cell values |
-| 600 (semibold) | `font-semibold` | Button labels, card headings, section titles, table header cells |
-
-**Bold (`font-bold`, 700)** is reserved for upload submit button and numeric step indicators — consistent with existing UploadDropzone and WalkthroughList patterns.
+| 600 (semibold) | `font-semibold` | Button labels, card headings, section titles, table header cells, upload submit button, numeric step indicators |
 
 ### Line Height
 
@@ -164,7 +169,7 @@ idle → capture → quality-check → (warn?) → page-strip → [repeat] → o
 [  Page thumbnail strip (scrollable) ]
 [  [p1][p2][p3][+]                   ]
 [────────────────────────────────────]
-[  [Retake]       [Add page / Done]  ]
+[  [Retake photo]   [Add page / Done]]
 ```
 
 **Quality indicator:**
@@ -186,7 +191,7 @@ idle → capture → quality-check → (warn?) → page-strip → [repeat] → o
 - Reordering is drag-to-reorder within the strip only (horizontal drag)
 
 **Action buttons:**
-- "Retake" — `steel-700` bg, `steel-100` text, `h-[72px]`, left half
+- "Retake photo" — `steel-700` bg, `steel-100` text, `h-[72px]`, left half
 - "Add page" (when pages remain to capture) — `brand-yellow` bg, `steel-900` text, `h-[72px]`, right half
 - "Done — submit N pages" (when at least 1 page captured) replaces "Add page" after reviewing strip — `brand-yellow` bg, `steel-900` text, `h-[72px]`
 
@@ -258,7 +263,7 @@ States:
 | Quality check: pass | Green indicator; "Add page" button activates |
 | Quality check: warn | Orange indicator + warning copy; "Add page" button still active (warn-but-allow, D-08) |
 | Tap "Add page" | Append thumbnail to strip; advance to next capture state |
-| Tap "Retake" | Discard current capture, return camera to viewfinder |
+| Tap "Retake photo" | Discard current capture, return camera to viewfinder |
 | Tap thumbnail delete | Remove page from strip; renumber remaining pages |
 | Drag thumbnail | Reorder strip; update page number suggestions |
 | Tap "Done — submit N pages" | Dismiss modal; add virtual "Scanned document (N pages)" item to upload queue; proceed through normal upload flow |
@@ -285,7 +290,7 @@ States:
 | Scanner launch | `Scan document` | Third button in dropzone button row |
 | Scanner add page | `Add page` | During active page capture |
 | Scanner submit | `Done — submit {n} {page/pages}` | After at least 1 page added to strip |
-| Scanner retake | `Retake` | During active page capture |
+| Scanner retake | `Retake photo` | During active page capture |
 
 ### Empty States
 
@@ -353,8 +358,8 @@ Quality bar: `px-4 py-2 border-b border-steel-700`
 Thumbnail strip: `flex gap-2 overflow-x-auto px-4 py-3 border-b border-steel-700 min-h-[88px]`
 
 Action bar: `flex gap-3 px-4 py-4`
-- "Retake": `flex-1 h-[72px] bg-steel-700 text-steel-100 font-semibold rounded-xl`
-- "Add page" / "Done": `flex-1 h-[72px] bg-brand-yellow text-steel-900 font-bold rounded-xl`
+- "Retake photo": `flex-1 h-[72px] bg-steel-700 text-steel-100 font-semibold rounded-xl`
+- "Add page" / "Done": `flex-1 h-[72px] bg-brand-yellow text-steel-900 font-semibold rounded-xl`
 
 ### SopTable (new layout)
 
