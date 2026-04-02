@@ -1,4 +1,4 @@
-# Requirements: SOP Assistant
+# Requirements: SafeStart
 
 **Defined:** 2026-03-23
 **Core Value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
@@ -65,7 +65,50 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **PLAT-02**: App works across modern Android and iOS browsers
 - [x] **PLAT-03**: App indicates online/offline status to the user
 
-## v2 Requirements
+## v2.0 Requirements
+
+Requirements for SOP Creation Pathways milestone. Each maps to roadmap phases.
+
+### Video Transcription & Intake
+
+- [ ] **VID-01**: Admin can upload a video file (MP4/MOV) and the system transcribes it into a structured SOP with standard sections
+- [ ] **VID-02**: Admin can paste a YouTube or Vimeo URL and the system extracts captions or transcribes audio into a structured SOP
+- [ ] **VID-03**: Admin can record video in-app from the device camera and submit it for transcription into a structured SOP
+- [ ] **VID-04**: System shows async processing progress with named stages (uploading → transcribing → structuring → ready)
+- [ ] **VID-05**: Admin can view and edit the raw transcript alongside the structured SOP output before publishing
+- [ ] **VID-06**: Transcription-sourced SOPs go through the same confidence scoring and admin review gate as document-parsed SOPs
+- [ ] **VID-07**: System flags when mandatory SOP sections (hazards, PPE) are absent from the video source
+
+### Expanded File Intake
+
+- [ ] **FILE-01**: Admin can upload a photo/image of a printed SOP and the system OCRs it into a structured SOP
+- [ ] **FILE-02**: System provides image quality feedback before processing (blur, glare, rotation detection)
+- [ ] **FILE-03**: Admin can capture multiple pages sequentially to create a single SOP from a multi-page printed document
+- [ ] **FILE-04**: Admin can upload Excel (.xlsx) files and the system extracts content into a structured SOP
+- [ ] **FILE-05**: Admin can upload PowerPoint (.pptx) files and the system extracts slides into a structured SOP
+- [ ] **FILE-06**: Admin can upload plain text (.txt) files and the system structures them into an SOP
+- [ ] **FILE-07**: Table structures in Excel/PowerPoint are preserved as readable tables within SOP steps
+- [ ] **FILE-08**: AI parsing uses format-specific prompts for improved section detection across all input types
+
+### Video SOP Generation
+
+- [ ] **VGEN-01**: Admin can generate a narrated slideshow video from a published SOP with AI voiceover and one slide per section/step
+- [ ] **VGEN-02**: Admin can generate a screen-recording-style video with scrolling SOP text synced to AI voice narration
+- [ ] **VGEN-03**: Admin can generate a full AI video with avatar or animated visuals synchronized to narration
+- [ ] **VGEN-04**: Generated videos include chapter markers per SOP section and timestamps per step for direct navigation
+- [ ] **VGEN-05**: Admin can preview generated video and re-generate before publishing to workers
+- [ ] **VGEN-06**: Video generation shows async progress with named stages (analyzing → generating → adding narration → finalizing)
+- [ ] **VGEN-07**: Workers can access the video version of an SOP from within the existing SOP view with an in-app video player
+- [ ] **VGEN-08**: Video player supports chapter navigation, timestamp jumps, and playback speed control
+- [ ] **VGEN-09**: Worker video viewing is tracked as a completion event alongside text walkthrough completions
+
+### Shared Infrastructure
+
+- [ ] **INFRA-01**: Video and large file uploads use resumable upload (TUS) direct to storage, bypassing server body limits
+- [ ] **INFRA-02**: All new intake pathways route through the existing SOP structuring pipeline and admin review UI
+- [ ] **INFRA-03**: Generated videos are excluded from service worker caching to prevent device storage bloat
+
+## Future Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
 
@@ -85,7 +128,6 @@ Deferred to future release. Tracked but not in current roadmap.
 
 - **ADV-01**: Skills matrix / training assignment tracking
 - **ADV-02**: Multi-language support for SOP content
-- **ADV-03**: Per-section confidence scoring visible to admins during review
 
 ## Out of Scope
 
@@ -95,12 +137,13 @@ Explicitly excluded. Documented to prevent scope creep.
 |---------|--------|
 | In-app SOP authoring | Orgs already have SOPs in docs — focus on consuming, not creating. Would double scope. |
 | Real-time chat between workers | Scope explosion; Slack/Teams already exist. Add "raise issue" button instead. |
-| Video content in SOP steps | Large files defeat offline caching; storage/CDN cost; difficult to produce for 500 SOPs |
-| AI-generated SOP creation | Hallucinations in safety-critical content are dangerous; orgs have existing verified docs |
+| AI-generated SOP creation from scratch | Hallucinations in safety-critical content are dangerous; orgs have existing verified docs |
 | Conditional branching in SOPs | Increases safety risk; manufacturing SOPs are linear by design |
 | Public SOP marketplace | Liability issues — safety procedures from one org applied in another |
 | Native iOS/Android apps | PWA-first; native later if needed |
 | ERP/HR system integration | High per-client integration cost; manual user management for v1 |
+| Custom voice cloning for video SOPs | Legal, ethical, and quality concerns — use pre-approved AI voices only |
+| Interactive video branching | Different product category (Articulate Storyline); linear video with chapters is sufficient |
 
 ## Traceability
 
@@ -149,11 +192,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PLAT-02 | Phase 1 | Complete |
 | PLAT-03 | Phase 1 | Complete |
 
-**Coverage:**
+**v1 Coverage:**
 - v1 requirements: 30 total
 - Mapped to phases: 30
 - Unmapped: 0
 
+**v2.0 Coverage:**
+- v2.0 requirements: 28 total
+- Mapped to phases: 0 (pending roadmap)
+- Unmapped: 28
+
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-23 — traceability populated after roadmap creation*
+*Last updated: 2026-04-02 — v2.0 requirements added*
