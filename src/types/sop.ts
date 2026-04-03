@@ -1,7 +1,32 @@
 export type SopStatus = 'uploading' | 'parsing' | 'draft' | 'published'
 export type ParseJobStatus = 'queued' | 'processing' | 'completed' | 'failed'
-export type SourceFileType = 'docx' | 'pdf' | 'image'
+export type SourceFileType = 'docx' | 'pdf' | 'image' | 'xlsx' | 'pptx' | 'txt' | 'video'
+export type InputType = 'upload' | 'scan' | 'url' | 'video_file' | 'youtube_url'
 export type CompletionStatus = 'pending_sign_off' | 'signed_off' | 'rejected'
+
+export type VideoProcessingStage =
+  | 'uploading'
+  | 'extracting_audio'
+  | 'transcribing'
+  | 'structuring'
+  | 'verifying'
+  | 'completed'
+  | 'failed'
+
+export interface TranscriptSegment {
+  start: number // seconds
+  end: number // seconds
+  text: string
+}
+
+export interface VerificationFlag {
+  severity: 'critical' | 'warning'
+  section_title: string
+  step_number?: number
+  original_text: string
+  structured_text: string
+  description: string
+}
 
 export interface Sop {
   id: string
@@ -76,11 +101,18 @@ export interface ParseJob {
   status: ParseJobStatus
   file_path: string
   file_type: SourceFileType
+  input_type?: InputType
   error_message: string | null
   retry_count: number
   started_at: string | null
   completed_at: string | null
   created_at: string
+  current_stage?: VideoProcessingStage | null
+  transcript_segments?: TranscriptSegment[] | null
+  transcript_text?: string | null
+  verification_flags?: VerificationFlag[] | null
+  youtube_url?: string | null
+  updated_at?: string
 }
 
 // SOP with nested sections for review page

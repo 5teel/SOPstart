@@ -8,7 +8,7 @@ const withSerwist = withSerwistInit({
 })
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  serverExternalPackages: ['officeparser', 'file-type', 'sharp', '@anthropic-ai/sdk'],
 }
 
 export default withSerwist(nextConfig)
