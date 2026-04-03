@@ -52,6 +52,8 @@ const ACCEPTED_TYPES = [
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // xlsx
   'application/vnd.openxmlformats-officedocument.presentationml.presentation', // pptx
   'text/plain', // txt
+  'video/mp4',
+  'video/quicktime', // MOV
 ] as const
 
 // Macro-enabled Office formats — blocked for security (cannot be safely parsed)
@@ -64,6 +66,7 @@ const BLOCKED_MIME_TYPES = [
 const BLOCKED_EXTENSIONS = ['.xlsm', '.xlsb', '.xltm', '.pptm', '.potm', '.ppam'] as const
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
+const MAX_VIDEO_FILE_SIZE = 2 * 1024 * 1024 * 1024 // 2GB
 
 export const uploadFileSchema = z.object({
   name: z.string().min(1),
@@ -73,6 +76,43 @@ export const uploadFileSchema = z.object({
     'Accepted formats: Word (.docx), PDF, Excel (.xlsx), PowerPoint (.pptx), plain text (.txt), or photos (jpg, png). Macro-enabled files are blocked for security.'
   ),
 })
+
+export const uploadVideoFileSchema = z.object({
+  name: z.string().min(1),
+  size: z.number().max(MAX_VIDEO_FILE_SIZE, 'Video must be under 2GB'),
+  type: z.string().refine(
+    (t) => t === 'video/mp4' || t === 'video/quicktime',
+    'Accepted video formats: MP4 (.mp4) or MOV (.mov)'
+  ),
+})
+
+export const youtubeUrlSchema = z.string().refine(
+  (url) => {
+    try {
+      const u = new URL(url)
+      return (
+        u.hostname === 'www.youtube.com' ||
+        u.hostname === 'youtube.com' ||
+        u.hostname === 'youtu.be' ||
+        u.hostname === 'm.youtube.com'
+      )
+    } catch {
+      return false
+    }
+  },
+  "That doesn't look like a YouTube URL. Check the link and try again."
+)
+
+export function extractYouTubeId(url: string): string | null {
+  try {
+    const u = new URL(url)
+    if (u.hostname === 'youtu.be') return u.pathname.slice(1)
+    if (u.pathname.startsWith('/shorts/')) return u.pathname.split('/')[2]
+    return u.searchParams.get('v')
+  } catch {
+    return null
+  }
+}
 
 export const uploadSessionSchema = z.object({
   files: z.array(uploadFileSchema).min(1, 'Select at least one file').max(20, 'Maximum 20 files per batch'),
@@ -91,7 +131,7 @@ export function isBlockedMacroFile(filename: string): boolean {
 
 /**
  * Maps a MIME type to a SourceFileType.
- * Throws on unknown MIME types to prevent silent wrong routing (Research Pitfall 8).
+ * Throws on unknown MIME types to prevent silent wrong routing.
  */
 export function getSourceFileType(mimeType: string): SourceFileType {
   if (mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') return 'docx'
@@ -100,5 +140,6 @@ export function getSourceFileType(mimeType: string): SourceFileType {
   if (mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') return 'xlsx'
   if (mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') return 'pptx'
   if (mimeType === 'text/plain') return 'txt'
+  if (mimeType === 'video/mp4' || mimeType === 'video/quicktime') return 'video'
   throw new Error('Unsupported file type: ' + mimeType)
 }

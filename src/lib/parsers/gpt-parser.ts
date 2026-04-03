@@ -3,7 +3,14 @@ import { zodResponseFormat } from 'openai/helpers/zod'
 import { ParsedSopSchema, type ParsedSop } from '@/lib/validators/sop'
 import type { SourceFileType } from '@/types/sop'
 
-const openai = new OpenAI() // reads OPENAI_API_KEY from env
+// Lazy-initialized to avoid throwing at module load time during Next.js static analysis
+let openai: OpenAI | null = null
+function getOpenAI(): OpenAI {
+  if (!openai) {
+    openai = new OpenAI() // reads OPENAI_API_KEY from env
+  }
+  return openai
+}
 
 const SYSTEM_PROMPT = `You are an expert at parsing Standard Operating Procedure (SOP) documents used in industrial and manufacturing settings.
 
@@ -30,13 +37,17 @@ const FORMAT_HINTS: Partial<Record<SourceFileType, string>> = {
   pptx: '\n\nNote: This text was extracted from a PowerPoint presentation. Each slide title is a likely section heading. Speaker notes (if present) contain procedural detail. Combine slide text and notes to form a complete SOP.',
   txt: '\n\nNote: This is a plain text file. It may lack consistent formatting. Infer structure from numbering, indentation, blank lines, and keywords like HAZARD, PPE, WARNING, CAUTION, STEP, PROCEDURE, EMERGENCY.',
   image: '\n\nNote: This text was extracted via OCR from a photographed document. It may contain OCR errors, broken words, and missing punctuation. Be lenient with formatting but flag uncertain values (especially numerical tolerances, chemical names, PPE specifications) in parse_notes.',
+  video: '\n\nNote: This text is a transcript from a video recording of someone demonstrating an SOP. ' +
+    'It is spoken language, not written prose. Sentences may be incomplete, informal, or repeated. ' +
+    'Look for action verbs as step indicators. Treat numerical values (measurements, torques, temperatures, voltages) ' +
+    'as safety-critical — preserve exact numbers. If the speaker corrects themselves, use the corrected value.',
 }
 
 export async function parseSopWithGPT(extractedText: string, inputType?: SourceFileType): Promise<ParsedSop> {
   const hint = inputType ? (FORMAT_HINTS[inputType] ?? '') : ''
   const userContent = `Parse this SOP document:\n\n${extractedText}${hint}`
 
-  const completion = await openai.chat.completions.parse({
+  const completion = await getOpenAI().chat.completions.parse({
     model: 'gpt-4o-2024-08-06',
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },

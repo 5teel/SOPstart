@@ -8,9 +8,7 @@ const withSerwist = withSerwistInit({
 })
 
 const nextConfig: NextConfig = {
-  // officeparser depends on file-type (ESM-only) which cannot be bundled by webpack.
-  // Mark it as a server-external package so Next.js requires() it at runtime instead.
-  serverExternalPackages: ['officeparser', 'file-type', 'sharp'],
+  serverExternalPackages: ['officeparser', 'file-type', 'sharp', '@anthropic-ai/sdk'],
 }
 
 export default withSerwist(nextConfig)
