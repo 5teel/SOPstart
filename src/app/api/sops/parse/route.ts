@@ -2,10 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { extractDocx } from '@/lib/parsers/extract-docx'
 import { extractPdf } from '@/lib/parsers/extract-pdf'
+import { extractXlsx } from '@/lib/parsers/extract-xlsx'
+import { extractPptx } from '@/lib/parsers/extract-pptx'
+import { extractTxt } from '@/lib/parsers/extract-txt'
+import { extractImage } from '@/lib/parsers/extract-image'
 import { ocrFallback } from '@/lib/parsers/ocr-fallback'
 import { parseSopWithGPT } from '@/lib/parsers/gpt-parser'
 import { uploadExtractedImages } from '@/lib/parsers/image-uploader'
 import type { ParsedSop } from '@/lib/validators/sop'
+import type { SourceFileType } from '@/types/sop'
 
 // Vercel Pro: 300s max; Hobby: 10s — parsing requires Pro for large docs
 export const maxDuration = 300
@@ -64,25 +69,36 @@ export async function POST(request: NextRequest) {
     let extractedImages: { base64: string; contentType: string; index: number }[] = []
     let isOcr = false
 
-    if (job.file_type === 'docx') {
+    const fileType = job.file_type as SourceFileType
+
+    if (fileType === 'docx') {
       const result = await extractDocx(buffer)
       extractedText = result.text
       extractedImages = result.images
-    } else if (job.file_type === 'pdf') {
+    } else if (fileType === 'pdf') {
       const result = await extractPdf(buffer)
       extractedText = result.text
       // PDF image extraction skipped for v1 (Research Pitfall 5)
-    } else if (job.file_type === 'image') {
-      // Image file — OCR is the only extraction method
-      const ocr = await ocrFallback(buffer, 'image/jpeg')
-      extractedText = ocr.text
+    } else if (fileType === 'image') {
+      // GPT-4o vision is the primary OCR for image files (replaces Tesseract)
+      const result = await extractImage(buffer)
+      extractedText = result.text
       isOcr = true
+    } else if (fileType === 'xlsx') {
+      const result = await extractXlsx(buffer)
+      extractedText = result.text
+    } else if (fileType === 'pptx') {
+      const result = await extractPptx(buffer)
+      extractedText = result.text
+    } else if (fileType === 'txt') {
+      const result = await extractTxt(buffer)
+      extractedText = result.text
     }
 
-    // 3. OCR fallback if text extraction yielded too little content
-    if (extractedText.length < 50 && job.file_type !== 'image') {
+    // 3. OCR fallback if text extraction yielded too little content (scanned PDFs)
+    if (extractedText.length < 50 && fileType !== 'image') {
       // Likely a scanned PDF or image-only document
-      const ocr = await ocrFallback(buffer, job.file_type === 'pdf' ? 'application/pdf' : 'image/jpeg')
+      const ocr = await ocrFallback(buffer, fileType === 'pdf' ? 'application/pdf' : 'image/jpeg')
       if (ocr.text.length > extractedText.length) {
         extractedText = ocr.text
         isOcr = true
@@ -93,8 +109,8 @@ export async function POST(request: NextRequest) {
       throw new Error('Could not extract meaningful text from the document. The file may be empty or corrupted.')
     }
 
-    // 4. Parse with GPT-4o
-    const parsed: ParsedSop = await parseSopWithGPT(extractedText)
+    // 4. Parse with GPT-4o — pass file_type for format-specific prompt hints
+    const parsed: ParsedSop = await parseSopWithGPT(extractedText, fileType)
 
     // 5. Get the SOP's organisation_id for image storage paths
     const { data: sop } = await admin

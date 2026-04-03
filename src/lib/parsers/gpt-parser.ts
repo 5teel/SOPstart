@@ -1,6 +1,7 @@
 import OpenAI from 'openai'
 import { zodResponseFormat } from 'openai/helpers/zod'
 import { ParsedSopSchema, type ParsedSop } from '@/lib/validators/sop'
+import type { SourceFileType } from '@/types/sop'
 
 const openai = new OpenAI() // reads OPENAI_API_KEY from env
 
@@ -20,12 +21,26 @@ Assign confidence scores honestly:
 
 If the source text appears to be OCR output (spelling errors, garbled words, broken formatting), set parse_notes to describe the quality issues you observed.`
 
-export async function parseSopWithGPT(extractedText: string): Promise<ParsedSop> {
+/**
+ * Format-specific hints appended to the user message (not the system prompt)
+ * so the system prompt remains stable for all input types.
+ */
+const FORMAT_HINTS: Partial<Record<SourceFileType, string>> = {
+  xlsx: '\n\nNote: This text was extracted from an Excel spreadsheet. Rows and columns represent tabular data — treat table headers as section titles where appropriate, preserve numerical tolerances exactly. Tables formatted as | col | col | are calibration/parameter data — preserve them in section content or step text using the same pipe-separated format.',
+  pptx: '\n\nNote: This text was extracted from a PowerPoint presentation. Each slide title is a likely section heading. Speaker notes (if present) contain procedural detail. Combine slide text and notes to form a complete SOP.',
+  txt: '\n\nNote: This is a plain text file. It may lack consistent formatting. Infer structure from numbering, indentation, blank lines, and keywords like HAZARD, PPE, WARNING, CAUTION, STEP, PROCEDURE, EMERGENCY.',
+  image: '\n\nNote: This text was extracted via OCR from a photographed document. It may contain OCR errors, broken words, and missing punctuation. Be lenient with formatting but flag uncertain values (especially numerical tolerances, chemical names, PPE specifications) in parse_notes.',
+}
+
+export async function parseSopWithGPT(extractedText: string, inputType?: SourceFileType): Promise<ParsedSop> {
+  const hint = inputType ? (FORMAT_HINTS[inputType] ?? '') : ''
+  const userContent = `Parse this SOP document:\n\n${extractedText}${hint}`
+
   const completion = await openai.chat.completions.parse({
     model: 'gpt-4o-2024-08-06',
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
-      { role: 'user', content: `Parse this SOP document:\n\n${extractedText}` },
+      { role: 'user', content: userContent },
     ],
     response_format: zodResponseFormat(ParsedSopSchema, 'parsed_sop'),
     temperature: 0.1, // low temp for consistent extraction
