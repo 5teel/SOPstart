@@ -48,5 +48,6 @@ export async function extractAudioFromVideo(
   await ffmpeg.deleteFile(inputName)
   await ffmpeg.deleteFile('audio.mp3')
 
-  return new File([data], 'audio.mp3', { type: 'audio/mpeg' })
+  // FFmpeg readFile returns FileData (Uint8Array | string); cast to BlobPart for File constructor
+  return new File([data as BlobPart], 'audio.mp3', { type: 'audio/mpeg' })
 }
