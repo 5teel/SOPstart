@@ -1,6 +1,7 @@
 'use client'
 import { AlertTriangle, ShieldCheck, Siren } from 'lucide-react'
 import { SopImageInline } from '@/components/sop/SopImageInline'
+import { SopTable, containsMarkdownTable } from '@/components/sop/SopTable'
 import type { SopSection, SopStep, SopImage } from '@/types/sop'
 
 type SectionWithChildren = SopSection & {
@@ -94,7 +95,10 @@ function StepsContent({ section }: { section: SectionWithChildren }) {
               {step.step_number}
             </span>
             <div className="flex-1 min-w-0">
-              <p className="text-base text-steel-100 leading-relaxed">{step.text}</p>
+              {containsMarkdownTable(step.text)
+                ? <SopTable markdown={step.text} />
+                : <p className="text-base text-steel-100 leading-relaxed">{step.text}</p>
+              }
               {images.map((img) => (
                 <SopImageInline key={img.id} src={img.storage_path} alt={img.alt_text ?? 'Step image'} />
               ))}
@@ -110,10 +114,14 @@ function StepsContent({ section }: { section: SectionWithChildren }) {
 }
 
 function DefaultContent({ section }: { section: SectionWithChildren }) {
+  const hasTable = containsMarkdownTable(section.content)
+
   return (
     <div className="bg-steel-800 border border-steel-700 rounded-xl p-5 mb-4">
       {section.content && (
-        <p className="text-base text-steel-100 leading-relaxed">{section.content}</p>
+        hasTable
+          ? <SopTable markdown={section.content} />
+          : <p className="text-base text-steel-100 leading-relaxed whitespace-pre-wrap">{section.content}</p>
       )}
     </div>
   )
