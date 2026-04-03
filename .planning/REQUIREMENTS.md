@@ -104,7 +104,7 @@ Requirements for SOP Creation Pathways milestone. Each maps to roadmap phases.
 
 ### Shared Infrastructure
 
-- [ ] **INFRA-01**: Video and large file uploads use resumable upload (TUS) direct to storage, bypassing server body limits
+- [x] **INFRA-01**: Video and large file uploads use resumable upload (TUS) direct to storage, bypassing server body limits
 - [ ] **INFRA-02**: All new intake pathways route through the existing SOP structuring pipeline and admin review UI
 - [ ] **INFRA-03**: Generated videos are excluded from service worker caching to prevent device storage bloat
 
@@ -199,7 +199,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FILE-06 | Phase 5 | Pending |
 | FILE-07 | Phase 5 | Pending |
 | FILE-08 | Phase 5 | Pending |
-| INFRA-01 | Phase 5 | Pending |
+| INFRA-01 | Phase 5 | Complete |
 | INFRA-02 | Phase 5 | Pending |
 | VID-01 | Phase 6 | Pending |
 | VID-02 | Phase 6 | Pending |
