@@ -26,5 +26,9 @@ export default defineConfig({
       name: 'phase3-stubs',
       testMatch: /offline-sync|walkthrough|quick-ref|sop-library|sop-assignment|sop-versioning/,
     },
+    {
+      name: 'phase6-stubs',
+      testMatch: /video-upload|youtube-url|youtube-no-captions|stage-progress|transcript-review|publish-gate|safety-warning/,
+    },
   ],
 })
