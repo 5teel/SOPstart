@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Document Intake** - AI parsing pipeline, admin review, and SOP publish workflow (completed 2026-03-24)
 - [x] **Phase 3: Worker Experience** - Step-by-step walkthrough, offline access, SOP library, and assignment (completed 2026-03-25)
 - [x] **Phase 4: Completion and Sign-off** - Completion tracking, photo evidence, and supervisor sign-off (completed 2026-03-26)
-- [ ] **Phase 5: Expanded File Intake** - TUS upload infrastructure, photo OCR, Excel/PowerPoint/text parsing, and shared intake routing
+- [x] **Phase 5: Expanded File Intake** - TUS upload infrastructure, photo OCR, Excel/PowerPoint/text parsing, and shared intake routing (completed 2026-04-03)
 - [ ] **Phase 6: Video Transcription (Upload and URL)** - MP4/MOV file upload and YouTube/Vimeo URL → structured SOP with transcript review
 - [ ] **Phase 7: Video Transcription (In-App Recording)** - In-browser camera recording → SOP transcription with iOS Safari fallback
 - [ ] **Phase 8: Video SOP Generation** - AI-narrated slideshow, screen-recording-style, and full AI video generated from published SOPs
@@ -113,7 +113,7 @@ Plans:
 Plans:
 - [x] 05-01-PLAN.md — Backend parsing pipeline: DB migration (file_type constraint + input_type), type/validator extensions, extractors (xlsx, pptx, txt, image via GPT-4o vision), format-specific GPT prompts, parse route dispatch
 - [x] 05-02-PLAN.md — Upload UX: TUS resumable upload infrastructure, UploadDropzone extension (new MIME types, Scan button, HEIC conversion, TUS progress bar)
-- [ ] 05-03-PLAN.md — PhotoScanner: multi-page capture flow, client-side image quality checks, page order detection, IndexedDB session persistence, UploadDropzone wiring
+- [x] 05-03-PLAN.md — PhotoScanner: multi-page capture flow, client-side image quality checks, page order detection, IndexedDB session persistence, UploadDropzone wiring
 - [x] 05-04-PLAN.md — SopTable: rich table component with markdown parsing, SectionContent table detection, SectionEditor table editing support
 
 ### Phase 6: Video Transcription (Upload and URL)
@@ -162,7 +162,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 2. Document Intake | 4/4 | Complete   | 2026-03-25 |
 | 3. Worker Experience | 6/6 | Complete   | 2026-03-25 |
 | 4. Completion and Sign-off | 3/3 | Complete   | 2026-03-26 |
-| 5. Expanded File Intake | 3/4 | In Progress|  |
+| 5. Expanded File Intake | 4/4 | Complete   | 2026-04-03 |
 | 6. Video Transcription (Upload and URL) | 0/TBD | Not started | - |
 | 7. Video Transcription (In-App Recording) | 0/TBD | Not started | - |
 | 8. Video SOP Generation | 0/TBD | Not started | - |

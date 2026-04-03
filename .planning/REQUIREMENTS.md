@@ -81,9 +81,9 @@ Requirements for SOP Creation Pathways milestone. Each maps to roadmap phases.
 
 ### Expanded File Intake
 
-- [ ] **FILE-01**: Admin can upload a photo/image of a printed SOP and the system OCRs it into a structured SOP
-- [ ] **FILE-02**: System provides image quality feedback before processing (blur, glare, rotation detection)
-- [ ] **FILE-03**: Admin can capture multiple pages sequentially to create a single SOP from a multi-page printed document
+- [x] **FILE-01**: Admin can upload a photo/image of a printed SOP and the system OCRs it into a structured SOP
+- [x] **FILE-02**: System provides image quality feedback before processing (blur, glare, rotation detection)
+- [x] **FILE-03**: Admin can capture multiple pages sequentially to create a single SOP from a multi-page printed document
 - [x] **FILE-04**: Admin can upload Excel (.xlsx) files and the system extracts content into a structured SOP
 - [x] **FILE-05**: Admin can upload PowerPoint (.pptx) files and the system extracts slides into a structured SOP
 - [x] **FILE-06**: Admin can upload plain text (.txt) files and the system structures them into an SOP
@@ -191,9 +191,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PLAT-01 | Phase 1 | Complete |
 | PLAT-02 | Phase 1 | Complete |
 | PLAT-03 | Phase 1 | Complete |
-| FILE-01 | Phase 5 | Pending |
-| FILE-02 | Phase 5 | Pending |
-| FILE-03 | Phase 5 | Pending |
+| FILE-01 | Phase 5 | Complete |
+| FILE-02 | Phase 5 | Complete |
+| FILE-03 | Phase 5 | Complete |
 | FILE-04 | Phase 5 | Complete |
 | FILE-05 | Phase 5 | Complete |
 | FILE-06 | Phase 5 | Complete |
