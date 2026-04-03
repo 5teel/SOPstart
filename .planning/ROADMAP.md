@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Worker Experience** - Step-by-step walkthrough, offline access, SOP library, and assignment (completed 2026-03-25)
 - [x] **Phase 4: Completion and Sign-off** - Completion tracking, photo evidence, and supervisor sign-off (completed 2026-03-26)
 - [x] **Phase 5: Expanded File Intake** - TUS upload infrastructure, photo OCR, Excel/PowerPoint/text parsing, and shared intake routing (completed 2026-04-03)
-- [ ] **Phase 6: Video Transcription (Upload and URL)** - MP4/MOV file upload and YouTube/Vimeo URL → structured SOP with transcript review
+- [ ] **Phase 6: Video Transcription (Upload and URL)** - MP4/MOV file upload and YouTube URL → structured SOP with transcript review
 - [ ] **Phase 7: Video Transcription (In-App Recording)** - In-browser camera recording → SOP transcription with iOS Safari fallback
 - [ ] **Phase 8: Video SOP Generation** - AI-narrated slideshow, screen-recording-style, and full AI video generated from published SOPs
 
@@ -117,16 +117,23 @@ Plans:
 - [x] 05-04-PLAN.md — SopTable: rich table component with markdown parsing, SectionContent table detection, SectionEditor table editing support
 
 ### Phase 6: Video Transcription (Upload and URL)
-**Goal**: Admins can upload an MP4/MOV video file or paste a YouTube or Vimeo URL and receive a structured SOP draft with the raw transcript visible for manual review — including mandatory warnings when hazard or PPE sections are absent
+**Goal**: Admins can upload an MP4/MOV video file or paste a YouTube URL and receive a structured SOP draft with the raw transcript visible for manual review — including adversarial AI verification and mandatory warnings when hazard or PPE sections are absent
 **Depends on**: Phase 5
 **Requirements**: VID-01, VID-02, VID-04, VID-05, VID-06, VID-07
 **Success Criteria** (what must be TRUE):
   1. Admin can upload an MP4 or MOV video file; the upload progresses in named stages (uploading → transcribing → structuring → ready) with visible progress at each stage
-  2. Admin can paste a YouTube or Vimeo URL and the system fetches captions or transcribes audio into a structured SOP without downloading the video
-  3. Admin sees the raw transcript alongside the structured SOP output in the review UI before publishing, with high-risk tokens (chemical names, tolerances, PPE specs) flagged for confirmation
+  2. Admin can paste a YouTube URL and the system fetches captions into a structured SOP without downloading the video
+  3. Admin sees the raw transcript alongside the structured SOP output in the review UI before publishing, with adversarial AI verification flags for discrepancies
   4. The system warns the admin when mandatory SOP sections (hazards, PPE) are absent from the video source
   5. Transcription-sourced SOPs pass through the same confidence scoring and admin approval gate as document-parsed SOPs before they can be published
-**Plans**: TBD
+**Plans**: 4 plans
+**UI hint**: yes
+
+Plans:
+- [ ] 06-01-PLAN.md — Foundation: DB migration (parse_jobs extensions, sop-videos bucket), type extensions (video SourceFileType, TranscriptSegment, VerificationFlag), validator updates, GPT parser video hint, npm package install
+- [ ] 06-02-PLAN.md — Video transcription pipeline: audio transcription (gpt-4o-transcribe), YouTube caption fetch (youtube-transcript), adversarial verification (Claude SDK), missing section detection, transcribe + youtube route handlers, video upload server action
+- [ ] 06-03-PLAN.md — Upload UX: UploadDropzone video MIME acceptance + YouTube URL tab with terms checkbox, ParseJobStatus 5-step video stage stepper with retry/delete
+- [ ] 06-04-PLAN.md — Review UI: VideoReviewPanel (video player + scrollable transcript with timestamp sync), AdversarialFlagBanner (expandable amber flag list), MissingSectionWarningBanner (warn-but-allow with acknowledge checkbox), ReviewClient + page wiring
 
 ### Phase 7: Video Transcription (In-App Recording)
 **Goal**: Admins can record a procedure video directly in the browser and submit it for transcription into a structured SOP, with an explicit fallback for iOS devices where MediaRecorder support is unreliable
@@ -163,6 +170,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 3. Worker Experience | 6/6 | Complete   | 2026-03-25 |
 | 4. Completion and Sign-off | 3/3 | Complete   | 2026-03-26 |
 | 5. Expanded File Intake | 4/4 | Complete   | 2026-04-03 |
-| 6. Video Transcription (Upload and URL) | 0/TBD | Not started | - |
+| 6. Video Transcription (Upload and URL) | 0/4 | Not started | - |
 | 7. Video Transcription (In-App Recording) | 0/TBD | Not started | - |
 | 8. Video SOP Generation | 0/TBD | Not started | - |
