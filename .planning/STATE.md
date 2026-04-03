@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: Milestone complete
-stopped_at: Completed 04-03-PLAN.md
-last_updated: "2026-03-26T01:15:40.952Z"
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-04-03T06:53:58.862Z"
 progress:
   total_phases: 4
   completed_phases: 4
@@ -64,6 +64,7 @@ Plan: Not started
 | Phase 04-completion-and-sign-off P01 | 5 | 2 tasks | 9 files |
 | Phase 04-completion-and-sign-off P02 | 261 | 2 tasks | 6 files |
 | Phase 04-completion-and-sign-off P03 | 7 | 2 tasks | 11 files |
+| Phase 06-video-transcription-upload-and-url P01 | 557 | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -122,6 +123,7 @@ Recent decisions affecting current work:
 - [Phase 04-completion-and-sign-off]: Worker display names use abbreviated user_id (Worker {first-8-chars}) — no user_profiles table exists in the schema
 - [Phase 04-completion-and-sign-off]: Supabase join select cast as unknown as RawRow[] — generated types don't infer relationship shapes from select strings
 - [Phase 04-completion-and-sign-off]: Admin client used for presigned read URLs in server component — bypasses RLS consistently with upload pattern
+- [Phase 06-video-transcription-upload-and-url]: @ffmpeg/core installed as explicit dependency; lazy OpenAI init prevents build failure when OPENAI_API_KEY unset; migration 00012 is idempotent with/without 00011
 
 ### Pending Todos
 
@@ -135,6 +137,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-26T01:10:27.292Z
-Stopped at: Completed 04-03-PLAN.md
+Last session: 2026-04-03T06:53:58.858Z
+Stopped at: Completed 06-01-PLAN.md
 Resume file: None
