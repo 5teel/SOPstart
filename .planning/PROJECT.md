@@ -29,6 +29,13 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 - ✓ Optional completion tracking and sign-off per SOP — Phase 4
 - ✓ Supervisor review of completion records — Phase 4
 
+- ✓ Photo/image upload with GPT-4o vision OCR → structured SOP — Phase 5
+- ✓ Excel (.xlsx), PowerPoint (.pptx), plain text (.txt) file parsing — Phase 5
+- ✓ Format-specific AI prompts with confidence scoring — Phase 5
+- ✓ TUS resumable upload for large files — Phase 5
+- ✓ Multi-page document scanner with quality checks — Phase 5
+- ✓ Table preservation from Excel/PowerPoint sources — Phase 5
+
 ### Active
 
 <!-- Current scope. Building toward these. -->
@@ -37,11 +44,6 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 - Upload video file (MP4/MOV) and transcribe to structured SOP
 - Paste YouTube/Vimeo URL, fetch and transcribe to SOP
 - Record video in-app from device camera, transcribe to SOP
-
-#### Pathway 2 — File → SOP (expanded)
-- Photo/image upload with OCR → structured SOP
-- Improved AI parsing (accuracy, section detection, formatting)
-- Additional file formats (Excel, PowerPoint, plain text)
 
 #### Pathway 3 — File → Video SOP
 - Narrated slideshow (AI voice over auto-generated slides/cards)
@@ -114,4 +116,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-01 — Milestone v2.0 started*
+*Last updated: 2026-04-03 — Phase 5 (Expanded File Intake) complete*
