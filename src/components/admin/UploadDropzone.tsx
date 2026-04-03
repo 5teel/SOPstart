@@ -16,6 +16,7 @@ import { createClient } from '@/lib/supabase/client'
 import { createUploadSession } from '@/actions/sops'
 import { tusUpload, TUS_THRESHOLD } from '@/lib/upload/tus-upload'
 import { TusUploadProgress } from './TusUploadProgress'
+import { PhotoScanner } from './PhotoScanner'
 
 const ACCEPTED_MIME_TYPES = [
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
@@ -433,15 +434,22 @@ export function UploadDropzone() {
         </div>
       )}
 
-      {/* Scan document placeholder modal (Plan 03 implements the real scanner) */}
-      {scannerOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-          <div className="bg-steel-900 rounded-2xl p-8 max-w-lg text-center">
-            <p className="text-steel-100">Scanner coming soon</p>
-            <button onClick={() => setScannerOpen(false)} className="mt-4 px-4 py-2 bg-steel-700 text-steel-100 rounded-lg">Close</button>
-          </div>
-        </div>
-      )}
+      {/* PhotoScanner modal */}
+      <PhotoScanner
+        open={scannerOpen}
+        onClose={() => setScannerOpen(false)}
+        onSubmit={(files) => {
+          const newItems = files.map((file) => ({
+            id: `scan-${file.name}-${Date.now()}-${Math.random()}`,
+            file,
+            status: 'queued' as FileStatus,
+            useTus: file.size > TUS_THRESHOLD,
+          }))
+          setQueue(prev => [...prev, ...newItems])
+          setSuccess(false)
+          setScannerOpen(false)
+        }}
+      />
     </div>
   )
 }
