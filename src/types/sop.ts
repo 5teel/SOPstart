@@ -1,6 +1,7 @@
 export type SopStatus = 'uploading' | 'parsing' | 'draft' | 'published'
 export type ParseJobStatus = 'queued' | 'processing' | 'completed' | 'failed'
-export type SourceFileType = 'docx' | 'pdf' | 'image'
+export type SourceFileType = 'docx' | 'pdf' | 'image' | 'xlsx' | 'pptx' | 'txt'
+export type InputType = 'upload' | 'scan' | 'url'
 export type CompletionStatus = 'pending_sign_off' | 'signed_off' | 'rejected'
 
 export interface Sop {
@@ -76,6 +77,7 @@ export interface ParseJob {
   status: ParseJobStatus
   file_path: string
   file_type: SourceFileType
+  input_type?: InputType
   error_message: string | null
   retry_count: number
   started_at: string | null

@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { uploadSessionSchema, getSourceFileType } from '@/lib/validators/sop'
+import { uploadSessionSchema, getSourceFileType, isBlockedMacroFile } from '@/lib/validators/sop'
 import type { UploadSession } from '@/types/sop'
 
 export async function createUploadSession(
@@ -35,6 +35,11 @@ export async function createUploadSession(
   const sessions: UploadSession[] = []
 
   for (const file of result.data.files) {
+    // Reject macro-enabled Office files before any parsing library is invoked
+    if (isBlockedMacroFile(file.name)) {
+      return { error: `${file.name} is not supported — macro-enabled Office files are blocked for security. Save as .xlsx or .pptx and try again.` }
+    }
+
     const fileType = getSourceFileType(file.type)
 
     // Create SOP record (status: uploading)
