@@ -1,19 +1,35 @@
 'use client'
 
 import { FileText } from 'lucide-react'
-import type { SourceFileType } from '@/types/sop'
+import type { SourceFileType, TranscriptSegment } from '@/types/sop'
+import VideoReviewPanel from '@/components/admin/VideoReviewPanel'
 
 interface OriginalDocViewerProps {
   sourceFileType: SourceFileType
   presignedUrl: string | null
   sourceFileName: string
+  // New video-specific props (optional — only set for video SOPs)
+  transcriptSegments?: TranscriptSegment[]
+  youtubeVideoId?: string | null
 }
 
 export default function OriginalDocViewer({
   sourceFileType,
   presignedUrl,
   sourceFileName,
+  transcriptSegments,
+  youtubeVideoId,
 }: OriginalDocViewerProps) {
+  if (sourceFileType === 'video') {
+    return (
+      <VideoReviewPanel
+        presignedUrl={presignedUrl}
+        youtubeVideoId={youtubeVideoId ?? null}
+        segments={transcriptSegments ?? []}
+      />
+    )
+  }
+
   return (
     <div className="flex flex-col h-full">
       <p className="text-xs font-semibold text-steel-400 uppercase tracking-wide mb-2">

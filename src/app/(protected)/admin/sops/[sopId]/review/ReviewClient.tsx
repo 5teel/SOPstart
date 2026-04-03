@@ -8,16 +8,29 @@ import { StatusBadge } from '@/components/admin/StatusBadge'
 import ParseJobStatus from '@/components/admin/ParseJobStatus'
 import OriginalDocViewer from '@/components/admin/OriginalDocViewer'
 import SectionEditor from '@/components/admin/SectionEditor'
+import AdversarialFlagBanner from '@/components/admin/AdversarialFlagBanner'
+import MissingSectionWarningBanner from '@/components/admin/MissingSectionWarningBanner'
 import { reparseSop } from '@/actions/sops'
-import type { SopWithSections, SopStatus, ParseJob } from '@/types/sop'
+import type { SopWithSections, SopStatus, ParseJob, TranscriptSegment, VerificationFlag } from '@/types/sop'
 
 interface ReviewClientProps {
   sop: SopWithSections
   parseJob: ParseJob | null
   presignedUrl: string | null
+  // New video-specific props
+  transcriptSegments?: TranscriptSegment[]
+  verificationFlags?: VerificationFlag[]
+  youtubeVideoId?: string | null
 }
 
-export default function ReviewClient({ sop, parseJob, presignedUrl }: ReviewClientProps) {
+export default function ReviewClient({
+  sop,
+  parseJob,
+  presignedUrl,
+  transcriptSegments,
+  verificationFlags,
+  youtubeVideoId,
+}: ReviewClientProps) {
   const router = useRouter()
 
   const initialApprovedCount = sop.sop_sections.filter((s) => s.approved).length
@@ -34,6 +47,28 @@ export default function ReviewClient({ sop, parseJob, presignedUrl }: ReviewClie
   const [confirmAction, setConfirmAction] = useState<'reparse' | 'delete' | 'publish' | null>(null)
   const [actionPending, setActionPending] = useState(false)
   const [publishSuccess, setPublishSuccess] = useState(false)
+
+  // Missing section acknowledgement state
+  const [missingSectionAcknowledged, setMissingSectionAcknowledged] = useState(false)
+
+  // Unresolved critical adversarial flags count
+  const [unresolvedCriticalFlags, setUnresolvedCriticalFlags] = useState(() => {
+    return (verificationFlags ?? []).filter(
+      (f) =>
+        f.severity === 'critical' &&
+        !(
+          (f.section_title === 'Hazards' || f.section_title === 'PPE') &&
+          f.original_text === '(not found in transcript)'
+        )
+    ).length
+  })
+
+  // Derive publish gate conditions
+  const hasMissingSectionFlags = (verificationFlags ?? []).some(
+    (f) =>
+      (f.section_title === 'Hazards' || f.section_title === 'PPE') &&
+      f.original_text === '(not found in transcript)'
+  )
 
   const handleApprovalChange = useCallback(() => {
     router.refresh()
@@ -74,6 +109,22 @@ export default function ReviewClient({ sop, parseJob, presignedUrl }: ReviewClie
   }
 
   const isOcr = sop.is_ocr
+
+  // Publish button disabled conditions
+  const publishDisabled =
+    !allApproved ||
+    actionPending ||
+    sop.status === 'published' ||
+    (hasMissingSectionFlags && !missingSectionAcknowledged) ||
+    unresolvedCriticalFlags > 0
+
+  const publishTitle = !allApproved
+    ? 'Approve all sections before publishing'
+    : unresolvedCriticalFlags > 0
+    ? 'Resolve all critical AI verification flags before publishing (per D-04)'
+    : hasMissingSectionFlags && !missingSectionAcknowledged
+    ? 'Acknowledge missing safety sections before publishing'
+    : undefined
 
   return (
     <div className="min-h-screen bg-steel-900">
@@ -172,8 +223,8 @@ export default function ReviewClient({ sop, parseJob, presignedUrl }: ReviewClie
               </button>
               <button
                 onClick={() => setConfirmAction('publish')}
-                disabled={!allApproved || actionPending || sop.status === 'published'}
-                title={!allApproved ? 'Approve all sections before publishing' : undefined}
+                disabled={publishDisabled}
+                title={publishTitle}
                 className="h-[56px] px-6 bg-brand-yellow text-steel-900 font-bold text-sm rounded-lg hover:bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Publish SOP
@@ -211,11 +262,30 @@ export default function ReviewClient({ sop, parseJob, presignedUrl }: ReviewClie
                 sourceFileType={sop.source_file_type}
                 presignedUrl={presignedUrl}
                 sourceFileName={sop.source_file_name}
+                transcriptSegments={transcriptSegments}
+                youtubeVideoId={youtubeVideoId}
               />
             </div>
 
             {/* Right pane — Parsed output */}
             <div className="w-full lg:w-1/2 overflow-y-auto max-h-[calc(100vh-theme(spacing.32))]">
+              {/* Adversarial verification flags (D-04/D-05) */}
+              {verificationFlags && verificationFlags.length > 0 && (
+                <AdversarialFlagBanner
+                  flags={verificationFlags}
+                  onUnresolvedCountChange={setUnresolvedCriticalFlags}
+                />
+              )}
+
+              {/* Missing section warning (VID-07 / D-13) */}
+              {verificationFlags && (
+                <MissingSectionWarningBanner
+                  flags={verificationFlags}
+                  acknowledged={missingSectionAcknowledged}
+                  onAcknowledgeChange={setMissingSectionAcknowledged}
+                />
+              )}
+
               <p className="text-xs font-semibold text-steel-400 uppercase tracking-wide mb-2">
                 PARSED OUTPUT
               </p>

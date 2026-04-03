@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import ReviewClient from './ReviewClient'
-import type { SopWithSections, ParseJob } from '@/types/sop'
+import type { SopWithSections, ParseJob, TranscriptSegment, VerificationFlag } from '@/types/sop'
 
 export const metadata: Metadata = {
   title: 'Review SOP',
@@ -73,18 +73,42 @@ export default async function ReviewPage({
     .limit(1)
     .maybeSingle()
 
-  // Generate presigned download URL for original document (1 hour)
-  const { data: urlData } = await supabase.storage
-    .from('sop-documents')
-    .createSignedUrl(sop.source_file_path, 3600)
+  // Extract video-specific data from parse job (if video SOP)
+  const isVideoSop = sop.source_file_type === 'video'
+  const transcriptSegments = (parseJob?.transcript_segments as TranscriptSegment[] | null) ?? []
+  const verificationFlags = (parseJob?.verification_flags as VerificationFlag[] | null) ?? []
+  const youtubeUrl = (parseJob as ParseJob | null)?.youtube_url ?? null
 
-  const presignedUrl = urlData?.signedUrl ?? null
+  // Extract YouTube video ID from URL (if YouTube-sourced)
+  let youtubeVideoId: string | null = null
+  if (youtubeUrl) {
+    const { extractYouTubeId } = await import('@/lib/validators/sop')
+    youtubeVideoId = extractYouTubeId(youtubeUrl)
+  }
+
+  // For video SOPs: generate presigned URL from sop-videos bucket
+  // For non-video SOPs: generate presigned URL from sop-documents bucket
+  let presignedUrl: string | null = null
+  if (isVideoSop && !youtubeUrl && sop.source_file_path) {
+    const { data: videoUrlData } = await supabase.storage
+      .from('sop-videos')
+      .createSignedUrl(sop.source_file_path, 3600)
+    presignedUrl = videoUrlData?.signedUrl ?? null
+  } else {
+    const { data: urlData } = await supabase.storage
+      .from('sop-documents')
+      .createSignedUrl(sop.source_file_path, 3600)
+    presignedUrl = urlData?.signedUrl ?? null
+  }
 
   return (
     <ReviewClient
       sop={sop as unknown as SopWithSections}
       parseJob={parseJob as ParseJob | null}
       presignedUrl={presignedUrl}
+      transcriptSegments={transcriptSegments}
+      verificationFlags={verificationFlags}
+      youtubeVideoId={youtubeVideoId}
     />
   )
 }
