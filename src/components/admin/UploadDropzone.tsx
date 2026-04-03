@@ -1,16 +1,35 @@
 'use client'
 
 import { useRef, useState, useCallback } from 'react'
-import { Upload, FileText, Image as ImageIcon, X, CheckCircle, Loader2 } from 'lucide-react'
+import {
+  Upload,
+  FileText,
+  Image as ImageIcon,
+  X,
+  CheckCircle,
+  Loader2,
+  ScanLine,
+  TableProperties,
+  FileType2,
+} from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { createUploadSession } from '@/actions/sops'
+import { tusUpload, TUS_THRESHOLD } from '@/lib/upload/tus-upload'
+import { TusUploadProgress } from './TusUploadProgress'
 
 const ACCEPTED_MIME_TYPES = [
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
   'application/pdf',
   'image/jpeg',
   'image/png',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',       // .xlsx
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
+  'text/plain',                                                               // .txt
+  'image/heic',                                                               // iPhone HEIC
+  'image/heif',                                                               // HEIF variant
 ]
+
+const BLOCKED_EXTENSIONS = ['.xlsm', '.xlsb', '.xltm', '.pptm', '.potm', '.ppam']
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
 
@@ -21,6 +40,8 @@ interface QueuedFile {
   file: File
   status: FileStatus
   error?: string
+  tusProgress?: number   // 0-100, only set for TUS uploads
+  useTus?: boolean       // true if file > TUS_THRESHOLD
 }
 
 function formatFileSize(bytes: number): string {
@@ -36,6 +57,15 @@ function FileIcon({ mimeType }: { mimeType: string }) {
   if (mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
     return <FileText className="w-5 h-5 text-blue-400 shrink-0" />
   }
+  if (mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+    return <TableProperties className="w-5 h-5 text-blue-400 shrink-0" />
+  }
+  if (mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
+    return <ScanLine className="w-5 h-5 text-orange-400 shrink-0" />
+  }
+  if (mimeType === 'text/plain') {
+    return <FileType2 className="w-5 h-5 text-steel-400 shrink-0" />
+  }
   return <ImageIcon className="w-5 h-5 text-green-400 shrink-0" />
 }
 
@@ -45,6 +75,7 @@ export function UploadDropzone() {
   const [uploading, setUploading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
+  const [scannerOpen, setScannerOpen] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
@@ -54,21 +85,51 @@ export function UploadDropzone() {
     setTimeout(() => setToast(null), 4000)
   }, [])
 
-  const validateAndAddFiles = useCallback((files: File[]) => {
+  const validateAndAddFiles = useCallback(async (files: File[]) => {
     const newItems: QueuedFile[] = []
     for (const file of files) {
+      // Check blocked macro-enabled extensions first
+      const lowerName = file.name.toLowerCase()
+      if (BLOCKED_EXTENSIONS.some(ext => lowerName.endsWith(ext))) {
+        showToast(`${file.name} is not supported -- macro-enabled Office files are blocked for security. Save as .xlsx or .pptx and try again.`)
+        continue
+      }
+
       if (file.size > MAX_FILE_SIZE) {
         showToast(`${file.name} is over 50MB and cannot be uploaded.`)
         continue
       }
+
+      // Handle HEIC/HEIF conversion
+      if (file.type === 'image/heic' || file.type === 'image/heif') {
+        try {
+          const heic2any = (await import('heic2any')).default
+          const blob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.92 }) as Blob
+          const jpgName = file.name.replace(/\.(heic|heif)$/i, '.jpg')
+          const convertedFile = new File([blob], jpgName, { type: 'image/jpeg' })
+          newItems.push({
+            id: `${convertedFile.name}-${convertedFile.size}-${Date.now()}-${Math.random()}`,
+            file: convertedFile,
+            status: 'queued',
+            useTus: convertedFile.size > TUS_THRESHOLD,
+          })
+          continue
+        } catch {
+          showToast(`Failed to convert ${file.name}. Please try a different format.`)
+          continue
+        }
+      }
+
       if (!ACCEPTED_MIME_TYPES.includes(file.type)) {
-        showToast(`${file.name} is not a supported format. Use Word (.docx), PDF, or photos (jpg, png).`)
+        showToast(`${file.name} is not a supported format. Use Word, PDF, Excel (.xlsx), PowerPoint (.pptx), plain text (.txt), or a photo.`)
         continue
       }
+
       newItems.push({
         id: `${file.name}-${file.size}-${Date.now()}-${Math.random()}`,
         file,
         status: 'queued',
+        useTus: file.size > TUS_THRESHOLD,
       })
     }
     if (newItems.length > 0) {
@@ -137,32 +198,76 @@ export function UploadDropzone() {
         f.id === item.id ? { ...f, status: 'uploading' as FileStatus } : f
       ))
 
-      // Upload directly to Supabase Storage via presigned URL
-      const { error: uploadError } = await supabase.storage
-        .from('sop-documents')
-        .uploadToSignedUrl(session.path, session.token, item.file, {
-          contentType: item.file.type,
+      if (item.useTus) {
+        // Large file: use TUS resumable upload
+        const { data: { session: authSession } } = await supabase.auth.getSession()
+        if (!authSession) {
+          setQueue(prev => prev.map(f =>
+            f.id === item.id ? { ...f, status: 'error' as FileStatus, error: 'Not authenticated' } : f
+          ))
+          continue
+        }
+
+        await new Promise<void>((resolve) => {
+          const upload = tusUpload({
+            file: item.file,
+            storagePath: session.path,
+            accessToken: authSession.access_token,
+            onProgress: (pct) => {
+              setQueue(prev => prev.map(f =>
+                f.id === item.id ? { ...f, tusProgress: pct } : f
+              ))
+            },
+            onSuccess: () => {
+              // Trigger async parse
+              fetch('/api/sops/parse', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sopId: session.sopId }),
+              }).catch(console.error)
+
+              setQueue(prev => prev.map(f =>
+                f.id === item.id ? { ...f, status: 'uploaded' as FileStatus } : f
+              ))
+              resolve()
+            },
+            onError: (err) => {
+              setQueue(prev => prev.map(f =>
+                f.id === item.id ? { ...f, status: 'error' as FileStatus, error: err.message || 'Upload failed' } : f
+              ))
+              resolve()
+            },
+          })
+          upload.start()
         })
+      } else {
+        // Small file: use existing presigned URL upload
+        const { error: uploadError } = await supabase.storage
+          .from('sop-documents')
+          .uploadToSignedUrl(session.path, session.token, item.file, {
+            contentType: item.file.type,
+          })
 
-      if (uploadError) {
+        if (uploadError) {
+          setQueue(prev => prev.map(f =>
+            f.id === item.id ? { ...f, status: 'error' as FileStatus, error: 'Upload failed' } : f
+          ))
+          continue
+        }
+
+        // Trigger async parse — call API directly from client
+        // (server action fire-and-forget fetch gets aborted by Next.js)
+        fetch('/api/sops/parse', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sopId: session.sopId }),
+        }).catch(console.error)
+
+        // Mark as uploaded
         setQueue(prev => prev.map(f =>
-          f.id === item.id ? { ...f, status: 'error' as FileStatus, error: 'Upload failed' } : f
+          f.id === item.id ? { ...f, status: 'uploaded' as FileStatus } : f
         ))
-        continue
       }
-
-      // Trigger async parse — call API directly from client
-      // (server action fire-and-forget fetch gets aborted by Next.js)
-      fetch('/api/sops/parse', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sopId: session.sopId }),
-      }).catch(console.error)
-
-      // Mark as uploaded
-      setQueue(prev => prev.map(f =>
-        f.id === item.id ? { ...f, status: 'uploaded' as FileStatus } : f
-      ))
     }
 
     setUploading(false)
@@ -201,7 +306,7 @@ export function UploadDropzone() {
             <Upload className="w-10 h-10 text-steel-400" />
             <div>
               <p className="text-base font-semibold text-steel-100">Drop your SOPs here</p>
-              <p className="text-sm text-steel-400 mt-1">Word (.docx), PDF, or photos up to 50MB</p>
+              <p className="text-sm text-steel-400 mt-1">Word (.docx), PDF, Excel (.xlsx), PowerPoint (.pptx), plain text (.txt), or photos up to 50MB</p>
             </div>
           </>
         )}
@@ -224,6 +329,16 @@ export function UploadDropzone() {
           >
             Take a photo
           </button>
+
+          {/* Scan document button */}
+          <button
+            type="button"
+            onClick={() => setScannerOpen(true)}
+            className="bg-steel-700 text-steel-100 font-semibold px-6 h-[72px] rounded-lg hover:bg-steel-600 active:bg-steel-500 transition-colors flex items-center gap-2"
+          >
+            <ScanLine className="w-5 h-5" />
+            Scan document
+          </button>
         </div>
 
         {/* Hidden file inputs */}
@@ -231,7 +346,7 @@ export function UploadDropzone() {
           ref={fileInputRef}
           type="file"
           className="hidden"
-          accept=".docx,.pdf,image/jpeg,image/png"
+          accept=".docx,.pdf,.xlsx,.pptx,.txt,image/jpeg,image/png,image/heic,image/heif"
           multiple
           onChange={handleFileInput}
         />
@@ -274,9 +389,11 @@ export function UploadDropzone() {
                   <X className="w-4 h-4" />
                 </button>
               )}
-              {item.status === 'uploading' && (
+              {item.status === 'uploading' && item.useTus && item.tusProgress !== undefined ? (
+                <TusUploadProgress percentage={item.tusProgress} />
+              ) : item.status === 'uploading' ? (
                 <Loader2 className="w-5 h-5 text-blue-400 animate-spin shrink-0" />
-              )}
+              ) : null}
               {item.status === 'uploaded' && (
                 <CheckCircle className="w-5 h-5 text-green-400 shrink-0" />
               )}
@@ -313,6 +430,16 @@ export function UploadDropzone() {
       {toast && (
         <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 bg-steel-800 border border-steel-700 rounded-lg shadow-xl text-sm text-steel-100 max-w-sm">
           {toast}
+        </div>
+      )}
+
+      {/* Scan document placeholder modal (Plan 03 implements the real scanner) */}
+      {scannerOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <div className="bg-steel-900 rounded-2xl p-8 max-w-lg text-center">
+            <p className="text-steel-100">Scanner coming soon</p>
+            <button onClick={() => setScannerOpen(false)} className="mt-4 px-4 py-2 bg-steel-700 text-steel-100 rounded-lg">Close</button>
+          </div>
         </div>
       )}
     </div>
