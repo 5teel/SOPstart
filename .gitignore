@@ -52,3 +52,10 @@ supabase/.temp/
 
 # FFmpeg WASM binaries (copied from node_modules during setup)
 public/ffmpeg/
+
+# Sample SOP documents (local test data)
+*.pdf
+*.docx
+
+# Cloned repos
+/autoresearch/
