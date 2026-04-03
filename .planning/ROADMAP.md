@@ -130,7 +130,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 06-00-PLAN.md — Wave 0: Playwright test stubs for all VID requirements (7 test files + config)
+- [x] 06-00-PLAN.md — Wave 0: Playwright test stubs for all VID requirements (7 test files + config)
 - [ ] 06-01-PLAN.md — Foundation: DB migration (parse_jobs extensions, sop-videos bucket), type extensions (video SourceFileType, TranscriptSegment, VerificationFlag), validator updates, GPT parser video hint, npm package install
 - [ ] 06-02-PLAN.md — Video transcription pipeline: audio transcription (gpt-4o-transcribe), YouTube caption fetch (youtube-transcript), adversarial verification (Claude SDK), missing section detection, transcribe + youtube route handlers, video upload server action
 - [ ] 06-03-PLAN.md — Upload UX: UploadDropzone video MIME acceptance + YouTube URL tab with terms checkbox, ParseJobStatus 5-step video stage stepper with retry/delete
