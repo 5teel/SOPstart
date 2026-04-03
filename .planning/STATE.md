@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-02-PLAN.md
-last_updated: "2026-04-03T07:07:42.499Z"
+stopped_at: Completed 06-04-PLAN.md
+last_updated: "2026-04-03T07:17:39.917Z"
 last_activity: 2026-04-03
 progress:
   total_phases: 8
-  completed_phases: 4
+  completed_phases: 6
   total_plans: 26
-  completed_plans: 22
+  completed_plans: 26
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 ## Current Position
 
 Phase: 06 (video-transcription-upload-and-url) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-04-03
 
@@ -75,6 +75,7 @@ Progress bar: `[                    ]` 0% (0/4 v2.0 phases)
 | Phase 05-expanded-file-intake P01 | 7m | 2 tasks | 13 files |
 | Phase 05-expanded-file-intake P03 | 2 | 2 tasks | 5 files |
 | Phase 06 P02 | 471 | 2 tasks | 9 files |
+| Phase 06 P04 | 3m | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -143,6 +144,8 @@ Recent decisions affecting current work:
 - [Phase 06]: database.types.ts manually extended with parse_jobs video columns — type regeneration not available in worktree environment (consistent with Phase 3/4 pattern)
 - [Phase 06]: Json cast (as unknown as Json) for storing typed arrays in Supabase JSONB columns — Supabase types require Json, typed arrays lack index signatures
 - [Phase 06]: verifyTranscriptVsSop non-blocking: returns empty array on error per D-04 — verification is additive, not a gate that blocks SOP creation
+- [Phase 06]: YouTube IFrame API loaded lazily via onLoad on iframe element to avoid loading for non-YouTube SOPs
+- [Phase 06]: Publish gate computed as single derived boolean combining allApproved, unresolvedCriticalFlags, hasMissingSectionFlags+acknowledged
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -169,6 +172,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-03T07:07:42.494Z
-Stopped at: Completed 06-02-PLAN.md
+Last session: 2026-04-03T07:17:39.913Z
+Stopped at: Completed 06-04-PLAN.md
 Resume file: None

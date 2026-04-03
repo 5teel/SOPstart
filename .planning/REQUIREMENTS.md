@@ -75,7 +75,7 @@ Requirements for SOP Creation Pathways milestone. Each maps to roadmap phases.
 - [x] **VID-02**: Admin can paste a YouTube or Vimeo URL and the system extracts captions or transcribes audio into a structured SOP
 - [ ] **VID-03**: Admin can record video in-app from the device camera and submit it for transcription into a structured SOP
 - [x] **VID-04**: System shows async processing progress with named stages (uploading → transcribing → structuring → ready)
-- [ ] **VID-05**: Admin can view and edit the raw transcript alongside the structured SOP output before publishing
+- [x] **VID-05**: Admin can view and edit the raw transcript alongside the structured SOP output before publishing
 - [x] **VID-06**: Transcription-sourced SOPs go through the same confidence scoring and admin review gate as document-parsed SOPs
 - [x] **VID-07**: System flags when mandatory SOP sections (hazards, PPE) are absent from the video source
 
@@ -204,7 +204,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VID-01 | Phase 6 | Complete |
 | VID-02 | Phase 6 | Complete |
 | VID-04 | Phase 6 | Complete |
-| VID-05 | Phase 6 | Pending |
+| VID-05 | Phase 6 | Complete |
 | VID-06 | Phase 6 | Complete |
 | VID-07 | Phase 6 | Complete |
 | VID-03 | Phase 7 | Pending |
