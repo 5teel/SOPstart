@@ -2,6 +2,9 @@
   "name": "safestart",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "dev": "next dev --webpack -p 4200",
     "build": "next build --webpack",
@@ -21,14 +24,12 @@
     "@serwist/next": "^9.5.7",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.99.3",
-    "@tailwindcss/oxide-win32-x64-msvc": "^4.2.2",
     "@tanstack/query-persist-client-core": "^5.95.2",
     "@tanstack/react-query": "^5.95.2",
     "dexie": "^4.3.0",
     "heic2any": "^0.0.4",
     "idb-keyval": "^6.2.2",
     "lightningcss": "^1.32.0",
-    "lightningcss-win32-x64-msvc": "^1.32.0",
     "lucide-react": "^1.0.1",
     "mammoth": "^1.12.0",
     "next": "16.2.1",
@@ -61,5 +62,9 @@
     "supabase": "^2.22.6",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "optionalDependencies": {
+    "@tailwindcss/oxide-win32-x64-msvc": "^4.2.2",
+    "lightningcss-win32-x64-msvc": "^1.32.0"
   }
 }
