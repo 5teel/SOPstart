@@ -1,7 +1,14 @@
 import OpenAI from 'openai'
 import sharp from 'sharp'
 
-const openai = new OpenAI() // reads OPENAI_API_KEY from env
+// Lazy-initialized to avoid throwing at module load time during Next.js static analysis
+let openai: OpenAI | null = null
+function getOpenAI(): OpenAI {
+  if (!openai) {
+    openai = new OpenAI() // reads OPENAI_API_KEY from env
+  }
+  return openai
+}
 
 const MAX_BYTES = 4 * 1024 * 1024 // 4MB — GPT-4o vision limit
 
@@ -39,7 +46,7 @@ export async function extractImage(buffer: ArrayBuffer): Promise<ImageExtraction
 
   const base64 = processed.toString('base64')
 
-  const response = await openai.chat.completions.create({
+  const response = await getOpenAI().chat.completions.create({
     model: 'gpt-4o-2024-08-06',
     messages: [
       {

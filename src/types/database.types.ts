@@ -94,41 +94,62 @@ export type Database = {
         Row: {
           completed_at: string | null
           created_at: string
+          current_stage: string | null
           error_message: string | null
           file_path: string
           file_type: string
           id: string
+          input_type: string | null
           organisation_id: string
           retry_count: number
           sop_id: string
           started_at: string | null
           status: string
+          transcript_segments: Json | null
+          transcript_text: string | null
+          updated_at: string | null
+          verification_flags: Json | null
+          youtube_url: string | null
         }
         Insert: {
           completed_at?: string | null
           created_at?: string
+          current_stage?: string | null
           error_message?: string | null
           file_path: string
           file_type: string
           id?: string
+          input_type?: string | null
           organisation_id: string
           retry_count?: number
           sop_id: string
           started_at?: string | null
           status?: string
+          transcript_segments?: Json | null
+          transcript_text?: string | null
+          updated_at?: string | null
+          verification_flags?: Json | null
+          youtube_url?: string | null
         }
         Update: {
           completed_at?: string | null
           created_at?: string
+          current_stage?: string | null
           error_message?: string | null
           file_path?: string
           file_type?: string
           id?: string
+          input_type?: string | null
           organisation_id?: string
           retry_count?: number
           sop_id?: string
           started_at?: string | null
           status?: string
+          transcript_segments?: Json | null
+          transcript_text?: string | null
+          updated_at?: string | null
+          verification_flags?: Json | null
+          youtube_url?: string | null
         }
         Relationships: [
           {
