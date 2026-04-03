@@ -48,5 +48,7 @@ export async function extractAudioFromVideo(
   await ffmpeg.deleteFile(inputName)
   await ffmpeg.deleteFile('audio.mp3')
 
-  return new File([data], 'audio.mp3', { type: 'audio/mpeg' })
+  // Cast to Uint8Array for File constructor (FFmpeg returns Uint8Array | string)
+  const buffer = data as Uint8Array
+  return new File([buffer.buffer as ArrayBuffer], 'audio.mp3', { type: 'audio/mpeg' })
 }

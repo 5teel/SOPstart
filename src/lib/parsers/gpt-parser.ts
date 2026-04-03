@@ -2,7 +2,16 @@ import OpenAI from 'openai'
 import { zodResponseFormat } from 'openai/helpers/zod'
 import { ParsedSopSchema, type ParsedSop } from '@/lib/validators/sop'
 
-const openai = new OpenAI() // reads OPENAI_API_KEY from env
+// Lazy initialization — avoids module-load throw when OPENAI_API_KEY is not set
+// (Next.js static analysis runs route modules at build time)
+let openai: OpenAI | null = null
+
+function getOpenAI(): OpenAI {
+  if (!openai) {
+    openai = new OpenAI() // reads OPENAI_API_KEY from env at call time
+  }
+  return openai
+}
 
 const SYSTEM_PROMPT = `You are an expert at parsing Standard Operating Procedure (SOP) documents used in industrial and manufacturing settings.
 
@@ -21,7 +30,8 @@ Assign confidence scores honestly:
 If the source text appears to be OCR output (spelling errors, garbled words, broken formatting), set parse_notes to describe the quality issues you observed.`
 
 export async function parseSopWithGPT(extractedText: string): Promise<ParsedSop> {
-  const completion = await openai.chat.completions.parse({
+  const client = getOpenAI()
+  const completion = await client.chat.completions.parse({
     model: 'gpt-4o-2024-08-06',
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },

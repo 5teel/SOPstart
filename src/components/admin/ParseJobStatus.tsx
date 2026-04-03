@@ -73,11 +73,12 @@ export default function ParseJobStatus({
       .limit(1)
       .maybeSingle()
       .then(({ data }) => {
-        if (data) {
-          if (data.status) setStatus(data.status as ParseJobStatusType)
-          if (data.error_message) setErrorMessage(data.error_message)
-          if (data.current_stage) setCurrentStage(data.current_stage as string)
-          if (data.file_type === 'video') setIsVideoSop(true)
+        const row = data as { status: string; error_message: string | null; current_stage: string | null; file_type: string } | null
+        if (row) {
+          if (row.status) setStatus(row.status as ParseJobStatusType)
+          if (row.error_message) setErrorMessage(row.error_message)
+          if (row.current_stage) setCurrentStage(row.current_stage as string)
+          if (row.file_type === 'video') setIsVideoSop(true)
         }
       })
 
