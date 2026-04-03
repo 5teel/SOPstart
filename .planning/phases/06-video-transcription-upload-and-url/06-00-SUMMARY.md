@@ -112,6 +112,19 @@ None - no external service configuration required.
 - Test stubs provide implementation checklist for plans 06-01 through 06-04
 - All VID-* requirements have at least one test stub
 
+## Self-Check: PASSED
+
+- FOUND: tests/video-upload.test.ts
+- FOUND: tests/youtube-url.test.ts
+- FOUND: tests/youtube-no-captions.test.ts
+- FOUND: tests/stage-progress.test.ts
+- FOUND: tests/transcript-review.test.ts
+- FOUND: tests/publish-gate.test.ts
+- FOUND: tests/safety-warning.test.ts
+- FOUND: .planning/phases/06-video-transcription-upload-and-url/06-00-SUMMARY.md
+- FOUND commit e8b5292: test(06-00): add Phase 6 Playwright test stubs
+- FOUND commit d8c7664: chore(06-00): add phase6-stubs Playwright project to config
+
 ---
 *Phase: 06-video-transcription-upload-and-url*
 *Completed: 2026-04-03*
