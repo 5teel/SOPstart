@@ -36,14 +36,20 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 - ✓ Multi-page document scanner with quality checks — Phase 5
 - ✓ Table preservation from Excel/PowerPoint sources — Phase 5
 
+- ✓ Video file upload (MP4/MOV) with audio transcription to structured SOP — Phase 6
+- ✓ YouTube URL caption fetch to structured SOP (Vimeo deferred) — Phase 6
+- ✓ Adversarial AI verification (Claude cross-checks GPT output) — Phase 6
+- ✓ Side-by-side transcript + structured SOP review with video player — Phase 6
+- ✓ Missing hazards/PPE section warnings — Phase 6
+- ✓ Named processing stages with progress indicators — Phase 6
+
 ### Active
 
 <!-- Current scope. Building toward these. -->
 
-#### Pathway 1 — Video → SOP
-- Upload video file (MP4/MOV) and transcribe to structured SOP
-- Paste YouTube/Vimeo URL, fetch and transcribe to SOP
+#### Pathway 1 — Video → SOP (remaining)
 - Record video in-app from device camera, transcribe to SOP
+- Vimeo URL support (deferred from Phase 6)
 
 #### Pathway 3 — File → Video SOP
 - Narrated slideshow (AI voice over auto-generated slides/cards)
@@ -116,4 +122,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-03 — Phase 5 (Expanded File Intake) complete*
+*Last updated: 2026-04-03 — Phase 6 (Video Transcription) complete*
