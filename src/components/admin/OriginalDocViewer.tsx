@@ -1,9 +1,10 @@
 'use client'
 
 import { FileText } from 'lucide-react'
+import type { SourceFileType } from '@/types/sop'
 
 interface OriginalDocViewerProps {
-  sourceFileType: 'docx' | 'pdf' | 'image'
+  sourceFileType: SourceFileType
   presignedUrl: string | null
   sourceFileName: string
 }
