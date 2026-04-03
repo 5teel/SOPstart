@@ -11,12 +11,12 @@ import {
   ScanLine,
   TableProperties,
   FileType2,
+  Video,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { createUploadSession } from '@/actions/sops'
+import { createUploadSession, createVideoUploadSession } from '@/actions/sops'
 import { tusUpload, TUS_THRESHOLD } from '@/lib/upload/tus-upload'
 import { TusUploadProgress } from './TusUploadProgress'
-import { PhotoScanner } from './PhotoScanner'
 
 const ACCEPTED_MIME_TYPES = [
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
@@ -28,11 +28,14 @@ const ACCEPTED_MIME_TYPES = [
   'text/plain',                                                               // .txt
   'image/heic',                                                               // iPhone HEIC
   'image/heif',                                                               // HEIF variant
+  'video/mp4',
+  'video/quicktime', // MOV
 ]
 
 const BLOCKED_EXTENSIONS = ['.xlsm', '.xlsb', '.xltm', '.pptm', '.potm', '.ppam']
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
+const MAX_VIDEO_FILE_SIZE = 2 * 1024 * 1024 * 1024 // 2GB
 
 type FileStatus = 'queued' | 'uploading' | 'uploaded' | 'error'
 
@@ -43,15 +46,20 @@ interface QueuedFile {
   error?: string
   tusProgress?: number   // 0-100, only set for TUS uploads
   useTus?: boolean       // true if file > TUS_THRESHOLD
+  isVideo?: boolean      // true for video/mp4, video/quicktime
 }
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`
 }
 
 function FileIcon({ mimeType }: { mimeType: string }) {
+  if (mimeType === 'video/mp4' || mimeType === 'video/quicktime') {
+    return <Video size={20} className="text-purple-400 shrink-0" />
+  }
   if (mimeType === 'application/pdf') {
     return <FileText className="w-5 h-5 text-red-400 shrink-0" />
   }
@@ -77,9 +85,15 @@ export function UploadDropzone() {
   const [success, setSuccess] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
   const [scannerOpen, setScannerOpen] = useState(false)
+  const [mode, setMode] = useState<'upload' | 'youtube'>('upload')
+  const [youtubeUrl, setYoutubeUrl] = useState('')
+  const [termsChecked, setTermsChecked] = useState(false)
+  const [youtubeError, setYoutubeError] = useState<string | null>(null)
+  const [youtubeFetching, setYoutubeFetching] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
+  const videoInputRef = useRef<HTMLInputElement>(null)
 
   const showToast = useCallback((message: string) => {
     setToast(message)
@@ -96,8 +110,15 @@ export function UploadDropzone() {
         continue
       }
 
-      if (file.size > MAX_FILE_SIZE) {
-        showToast(`${file.name} is over 50MB and cannot be uploaded.`)
+      const isVideo = file.type === 'video/mp4' || file.type === 'video/quicktime'
+      const maxSize = isVideo ? MAX_VIDEO_FILE_SIZE : MAX_FILE_SIZE
+
+      if (file.size > maxSize) {
+        if (isVideo) {
+          showToast(`${file.name} is over 2GB. Please compress the video or split into shorter clips.`)
+        } else {
+          showToast(`${file.name} is over 50MB and cannot be uploaded.`)
+        }
         continue
       }
 
@@ -122,7 +143,7 @@ export function UploadDropzone() {
       }
 
       if (!ACCEPTED_MIME_TYPES.includes(file.type)) {
-        showToast(`${file.name} is not a supported format. Use Word, PDF, Excel (.xlsx), PowerPoint (.pptx), plain text (.txt), or a photo.`)
+        showToast(`${file.name} is not a supported format. Use Word, PDF, Excel (.xlsx), PowerPoint (.pptx), plain text (.txt), photo, or MP4/MOV video.`)
         continue
       }
 
@@ -131,6 +152,7 @@ export function UploadDropzone() {
         file,
         status: 'queued',
         useTus: file.size > TUS_THRESHOLD,
+        isVideo,
       })
     }
     if (newItems.length > 0) {
@@ -166,38 +188,167 @@ export function UploadDropzone() {
     setQueue(prev => prev.filter(f => f.id !== id))
   }, [])
 
+  async function handleYoutubeSubmit() {
+    setYoutubeError(null)
+
+    if (!youtubeUrl.trim()) {
+      setYoutubeError('Please enter a YouTube URL')
+      return
+    }
+    if (!termsChecked) {
+      setYoutubeError('Please confirm rights before proceeding.')
+      return
+    }
+
+    // Client-side URL validation
+    try {
+      const u = new URL(youtubeUrl)
+      const validHosts = ['www.youtube.com', 'youtube.com', 'youtu.be', 'm.youtube.com']
+      if (!validHosts.includes(u.hostname)) {
+        setYoutubeError('Only YouTube URLs are supported. Upload the video file directly, or paste a YouTube link.')
+        return
+      }
+    } catch {
+      setYoutubeError("That doesn't look like a YouTube URL. Check the link and try again.")
+      return
+    }
+
+    setYoutubeFetching(true)
+    try {
+      const res = await fetch('/api/sops/youtube', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: youtubeUrl,
+          termsAccepted: termsChecked,
+        }),
+      })
+      const data = await res.json()
+
+      if (data.noCaption) {
+        setYoutubeError(data.message)
+        return
+      }
+
+      if (data.error) {
+        setYoutubeError(data.error)
+        return
+      }
+
+      if (data.sopId) {
+        // Navigate to review page
+        window.location.href = `/admin/sops/${data.sopId}/review`
+      }
+    } catch {
+      setYoutubeError('Network error — please try again.')
+    } finally {
+      setYoutubeFetching(false)
+    }
+  }
+
   const handleUpload = useCallback(async () => {
     const pendingFiles = queue.filter(f => f.status === 'queued')
     if (pendingFiles.length === 0) return
 
     setUploading(true)
 
-    const fileMeta = pendingFiles.map(f => ({
-      name: f.file.name,
-      size: f.file.size,
-      type: f.file.type,
-    }))
-
-    const result = await createUploadSession(fileMeta)
-
-    if ('error' in result) {
-      showToast(result.error)
-      setUploading(false)
-      return
-    }
-
     const supabase = createClient()
 
-    for (let i = 0; i < pendingFiles.length; i++) {
-      const item = pendingFiles[i]
-      const session = result.sessions[i]
-
-      if (!session) continue
-
+    for (const item of pendingFiles) {
       // Mark as uploading
       setQueue(prev => prev.map(f =>
         f.id === item.id ? { ...f, status: 'uploading' as FileStatus } : f
       ))
+
+      if (item.isVideo) {
+        // Video upload: extract audio client-side, then TUS upload to sop-videos bucket
+        try {
+          // Dynamically import to avoid loading FFmpeg WASM unless needed
+          const { extractAudioFromVideo } = await import('@/lib/parsers/extract-video-audio')
+
+          // Update progress to show extraction happening
+          setQueue(prev => prev.map(f =>
+            f.id === item.id ? { ...f, tusProgress: 0 } : f
+          ))
+
+          const audioFile = await extractAudioFromVideo(item.file, (pct) => {
+            // Show extraction progress as first half (0-50%) of total
+            setQueue(prev => prev.map(f =>
+              f.id === item.id ? { ...f, tusProgress: Math.round(pct / 2) } : f
+            ))
+          })
+
+          // Get video upload session (sopId + storage path + token)
+          const sessionResult = await createVideoUploadSession({
+            name: item.file.name,
+            size: String(item.file.size),
+            type: item.file.type,
+          })
+
+          if ('error' in sessionResult) {
+            setQueue(prev => prev.map(f =>
+              f.id === item.id ? { ...f, status: 'error' as FileStatus, error: sessionResult.error } : f
+            ))
+            continue
+          }
+
+          // TUS upload the extracted audio to sop-videos bucket
+          await new Promise<void>((resolve) => {
+            const upload = tusUpload({
+              file: audioFile,
+              storagePath: sessionResult.path,
+              accessToken: sessionResult.token,
+              bucketName: 'sop-videos',
+              onProgress: (pct) => {
+                // Upload progress is second half (50-100%)
+                setQueue(prev => prev.map(f =>
+                  f.id === item.id ? { ...f, tusProgress: 50 + Math.round(pct / 2) } : f
+                ))
+              },
+              onSuccess: () => {
+                // Trigger transcription pipeline
+                fetch('/api/sops/transcribe', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ sopId: sessionResult.sopId }),
+                }).catch(console.error)
+
+                setQueue(prev => prev.map(f =>
+                  f.id === item.id ? { ...f, status: 'uploaded' as FileStatus } : f
+                ))
+                resolve()
+              },
+              onError: (err) => {
+                setQueue(prev => prev.map(f =>
+                  f.id === item.id ? { ...f, status: 'error' as FileStatus, error: err.message || 'Upload failed' } : f
+                ))
+                resolve()
+              },
+            })
+            upload.start()
+          })
+        } catch (err) {
+          const message = err instanceof Error ? err.message : 'Video processing failed'
+          setQueue(prev => prev.map(f =>
+            f.id === item.id ? { ...f, status: 'error' as FileStatus, error: message } : f
+          ))
+        }
+        continue
+      }
+
+      // Non-video: batch via createUploadSession
+      const fileMeta = [{ name: item.file.name, size: item.file.size, type: item.file.type }]
+      const result = await createUploadSession(fileMeta)
+
+      if ('error' in result) {
+        setQueue(prev => prev.map(f =>
+          f.id === item.id ? { ...f, status: 'error' as FileStatus, error: result.error } : f
+        ))
+        continue
+      }
+
+      const session = result.sessions[0]
+      if (!session) continue
 
       if (item.useTus) {
         // Large file: use TUS resumable upload
@@ -242,7 +393,7 @@ export function UploadDropzone() {
           upload.start()
         })
       } else {
-        // Small file: use existing presigned URL upload
+        // Small file: use presigned URL upload
         const { error: uploadError } = await supabase.storage
           .from('sop-documents')
           .uploadToSignedUrl(session.path, session.token, item.file, {
@@ -281,150 +432,244 @@ export function UploadDropzone() {
 
   return (
     <div>
-      {/* Drop zone */}
-      <div
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        className={[
-          'border-2 border-dashed rounded-xl transition-colors',
-          hasFiles ? 'min-h-[120px]' : 'min-h-[200px]',
-          'flex flex-col items-center justify-center gap-4 p-8 text-center',
-          dragOver
-            ? 'border-brand-yellow bg-brand-yellow/10'
-            : 'border-steel-700 bg-steel-800',
-        ].join(' ')}
-      >
-        {dragOver ? (
-          <>
-            <Upload className="w-8 h-8 text-brand-yellow" />
-            <p className="text-lg font-semibold text-brand-yellow">Drop it -- we&apos;ll handle the rest</p>
-          </>
-        ) : hasFiles ? (
-          <p className="text-sm text-steel-400 font-medium">+ Add more files</p>
-        ) : (
-          <>
-            <Upload className="w-10 h-10 text-steel-400" />
-            <div>
-              <p className="text-base font-semibold text-steel-100">Drop your SOPs here</p>
-              <p className="text-sm text-steel-400 mt-1">Word (.docx), PDF, Excel (.xlsx), PowerPoint (.pptx), plain text (.txt), or photos up to 50MB</p>
-            </div>
-          </>
-        )}
-
-        <div className="flex gap-3 flex-wrap justify-center">
-          {/* Browse files button */}
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="bg-brand-yellow text-steel-900 font-semibold px-6 h-[72px] rounded-lg hover:bg-amber-400 active:bg-amber-500 transition-colors"
-          >
-            Browse files
-          </button>
-
-          {/* Take a photo button */}
-          <button
-            type="button"
-            onClick={() => cameraInputRef.current?.click()}
-            className="bg-steel-700 text-steel-100 font-semibold px-6 h-[72px] rounded-lg hover:bg-steel-600 active:bg-steel-500 transition-colors"
-          >
-            Take a photo
-          </button>
-
-          {/* Scan document button */}
-          <button
-            type="button"
-            onClick={() => setScannerOpen(true)}
-            className="bg-steel-700 text-steel-100 font-semibold px-6 h-[72px] rounded-lg hover:bg-steel-600 active:bg-steel-500 transition-colors flex items-center gap-2"
-          >
-            <ScanLine className="w-5 h-5" />
-            Scan document
-          </button>
-        </div>
-
-        {/* Hidden file inputs */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          className="hidden"
-          accept=".docx,.pdf,.xlsx,.pptx,.txt,image/jpeg,image/png,image/heic,image/heif"
-          multiple
-          onChange={handleFileInput}
-        />
-        <input
-          ref={cameraInputRef}
-          type="file"
-          className="hidden"
-          accept="image/*"
-          capture="environment"
-          onChange={handleFileInput}
-        />
+      {/* Mode tab bar */}
+      <div role="tablist" className="flex gap-6 mb-4 border-b border-steel-700">
+        <button
+          role="tab"
+          aria-selected={mode === 'upload'}
+          onClick={() => setMode('upload')}
+          className={`pb-3 text-sm font-semibold cursor-pointer ${
+            mode === 'upload'
+              ? 'text-brand-yellow border-b-2 border-brand-yellow -mb-px'
+              : 'text-steel-400'
+          }`}
+        >
+          Upload file
+        </button>
+        <button
+          role="tab"
+          aria-selected={mode === 'youtube'}
+          onClick={() => setMode('youtube')}
+          className={`pb-3 text-sm font-semibold cursor-pointer ${
+            mode === 'youtube'
+              ? 'text-brand-yellow border-b-2 border-brand-yellow -mb-px'
+              : 'text-steel-400'
+          }`}
+        >
+          YouTube URL
+        </button>
       </div>
 
-      {/* Upload queue */}
-      {queue.length > 0 && (
-        <ul className="mt-4 space-y-2">
-          {queue.map(item => (
-            <li
-              key={item.id}
-              className="flex items-center gap-3 p-3 bg-steel-800 rounded-lg min-h-[72px] border border-steel-700"
-            >
-              <FileIcon mimeType={item.file.type} />
+      {mode === 'youtube' ? (
+        /* YouTube URL tab panel */
+        <div role="tabpanel" className="flex flex-col gap-3 py-4">
+          <input
+            type="url"
+            placeholder="Paste YouTube URL..."
+            value={youtubeUrl}
+            onChange={(e) => { setYoutubeUrl(e.target.value); setYoutubeError(null) }}
+            className="w-full bg-steel-800 border border-steel-700 rounded-lg px-4 h-[52px] text-sm text-steel-100 placeholder:text-steel-400 focus:border-brand-yellow focus:outline-none"
+          />
+          {youtubeError && (
+            <p role="alert" className="text-xs text-red-400">{youtubeError}</p>
+          )}
 
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-steel-100 truncate">{item.file.name}</p>
-                <p className="text-xs text-steel-400">{formatFileSize(item.file.size)}</p>
-                {item.error && (
-                  <p className="text-xs text-red-400 mt-0.5">{item.error}</p>
-                )}
-              </div>
+          <label className="flex items-start gap-3 text-sm text-steel-400 py-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={termsChecked}
+              onChange={(e) => setTermsChecked(e.target.checked)}
+              className="w-5 h-5 accent-brand-yellow mt-0.5"
+              required
+              aria-required="true"
+            />
+            I confirm I have rights to use this content for SOP creation.
+          </label>
 
-              {/* Status indicator */}
-              {item.status === 'queued' && (
-                <button
-                  type="button"
-                  onClick={() => removeFile(item.id)}
-                  className="shrink-0 text-steel-400 hover:text-red-400 transition-colors p-1"
-                  aria-label="Remove file"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-              {item.status === 'uploading' && item.useTus && item.tusProgress !== undefined ? (
-                <TusUploadProgress percentage={item.tusProgress} />
-              ) : item.status === 'uploading' ? (
-                <Loader2 className="w-5 h-5 text-blue-400 animate-spin shrink-0" />
-              ) : null}
-              {item.status === 'uploaded' && (
-                <CheckCircle className="w-5 h-5 text-green-400 shrink-0" />
-              )}
-              {item.status === 'error' && (
-                <X className="w-5 h-5 text-red-400 shrink-0" />
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {/* Upload button */}
-      {queuedCount > 0 && (
-        <button
-          type="button"
-          onClick={handleUpload}
-          disabled={uploading || hasErrors}
-          className="w-full h-[72px] bg-brand-yellow text-steel-900 font-bold text-lg rounded-lg hover:bg-amber-400 active:bg-amber-500 transition-colors mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {uploading
-            ? 'Uploading...'
-            : `Upload ${queuedCount} ${queuedCount === 1 ? 'file' : 'files'}`}
-        </button>
-      )}
-
-      {/* Success banner */}
-      {success && (
-        <div className="mt-4 bg-green-500/20 border border-green-500/40 text-green-400 rounded-lg px-4 py-3 text-sm">
-          Files uploaded successfully. Parsing will begin shortly.
+          <button
+            onClick={handleYoutubeSubmit}
+            disabled={!youtubeUrl || !termsChecked || youtubeFetching}
+            className="h-[72px] w-full rounded-lg bg-brand-yellow text-steel-900 text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-400 transition-colors"
+          >
+            {youtubeFetching ? 'Fetching captions...' : 'Transcribe from YouTube'}
+          </button>
         </div>
+      ) : (
+        /* Upload file tab panel */
+        <>
+          {/* Drop zone */}
+          <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={[
+              'border-2 border-dashed rounded-xl transition-colors',
+              hasFiles ? 'min-h-[120px]' : 'min-h-[200px]',
+              'flex flex-col items-center justify-center gap-4 p-8 text-center',
+              dragOver
+                ? 'border-brand-yellow bg-brand-yellow/10'
+                : 'border-steel-700 bg-steel-800',
+            ].join(' ')}
+          >
+            {dragOver ? (
+              <>
+                <Upload className="w-8 h-8 text-brand-yellow" />
+                <p className="text-lg font-semibold text-brand-yellow">Drop it -- we&apos;ll handle the rest</p>
+              </>
+            ) : hasFiles ? (
+              <p className="text-sm text-steel-400 font-medium">+ Add more files</p>
+            ) : (
+              <>
+                <Upload className="w-10 h-10 text-steel-400" />
+                <div>
+                  <p className="text-base font-semibold text-steel-100">Drop your SOPs here</p>
+                  <p className="text-sm text-steel-400 mt-1">Word (.docx), PDF, Excel (.xlsx), PowerPoint (.pptx), plain text (.txt), photos, or MP4/MOV video up to 2GB</p>
+                </div>
+              </>
+            )}
+
+            <div className="flex gap-3 flex-wrap justify-center">
+              {/* Browse files button */}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="bg-brand-yellow text-steel-900 font-semibold px-6 h-[72px] rounded-lg hover:bg-amber-400 active:bg-amber-500 transition-colors"
+              >
+                Browse files
+              </button>
+
+              {/* Take a photo button */}
+              <button
+                type="button"
+                onClick={() => cameraInputRef.current?.click()}
+                className="bg-steel-700 text-steel-100 font-semibold px-6 h-[72px] rounded-lg hover:bg-steel-600 active:bg-steel-500 transition-colors"
+              >
+                Take a photo
+              </button>
+
+              {/* Scan document button */}
+              <button
+                type="button"
+                onClick={() => setScannerOpen(true)}
+                className="bg-steel-700 text-steel-100 font-semibold px-6 h-[72px] rounded-lg hover:bg-steel-600 active:bg-steel-500 transition-colors flex items-center gap-2"
+              >
+                <ScanLine className="w-5 h-5" />
+                Scan document
+              </button>
+
+              {/* Browse video button */}
+              <button
+                type="button"
+                onClick={() => videoInputRef.current?.click()}
+                className="bg-steel-700 text-steel-100 font-semibold px-6 h-[72px] rounded-lg hover:bg-steel-600 active:bg-steel-500 transition-colors flex items-center gap-2"
+              >
+                <Video size={20} />
+                Browse video
+              </button>
+            </div>
+
+            {/* Hidden file inputs */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              accept=".docx,.pdf,.xlsx,.pptx,.txt,image/jpeg,image/png,image/heic,image/heif"
+              multiple
+              onChange={handleFileInput}
+            />
+            <input
+              ref={cameraInputRef}
+              type="file"
+              className="hidden"
+              accept="image/*"
+              capture="environment"
+              onChange={handleFileInput}
+            />
+            <input
+              ref={videoInputRef}
+              type="file"
+              className="hidden"
+              accept="video/mp4,video/quicktime"
+              onChange={handleFileInput}
+            />
+          </div>
+
+          {/* Upload queue */}
+          {queue.length > 0 && (
+            <ul className="mt-4 space-y-2">
+              {queue.map(item => (
+                <li
+                  key={item.id}
+                  className="flex items-center gap-3 p-3 bg-steel-800 rounded-lg min-h-[72px] border border-steel-700"
+                >
+                  <FileIcon mimeType={item.file.type} />
+
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-steel-100 truncate">{item.file.name}</p>
+                    <p className="text-xs text-steel-400">{formatFileSize(item.file.size)}</p>
+                    {item.error && (
+                      <p className="text-xs text-red-400 mt-0.5">{item.error}</p>
+                    )}
+                  </div>
+
+                  {/* Status indicator */}
+                  {item.status === 'queued' && (
+                    <button
+                      type="button"
+                      onClick={() => removeFile(item.id)}
+                      className="shrink-0 text-steel-400 hover:text-red-400 transition-colors p-1"
+                      aria-label="Remove file"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
+                  {item.status === 'uploading' && (item.useTus || item.isVideo) && item.tusProgress !== undefined ? (
+                    <TusUploadProgress percentage={item.tusProgress} />
+                  ) : item.status === 'uploading' ? (
+                    <Loader2 className="w-5 h-5 text-blue-400 animate-spin shrink-0" />
+                  ) : null}
+                  {item.status === 'uploaded' && (
+                    <CheckCircle className="w-5 h-5 text-green-400 shrink-0" />
+                  )}
+                  {item.status === 'error' && (
+                    <X className="w-5 h-5 text-red-400 shrink-0" />
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Upload button */}
+          {queuedCount > 0 && (
+            <button
+              type="button"
+              onClick={handleUpload}
+              disabled={uploading || hasErrors}
+              className="w-full h-[72px] bg-brand-yellow text-steel-900 font-bold text-lg rounded-lg hover:bg-amber-400 active:bg-amber-500 transition-colors mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {uploading
+                ? 'Uploading...'
+                : `Upload ${queuedCount} ${queuedCount === 1 ? 'file' : 'files'}`}
+            </button>
+          )}
+
+          {/* Success banner */}
+          {success && (
+            <div className="mt-4 bg-green-500/20 border border-green-500/40 text-green-400 rounded-lg px-4 py-3 text-sm">
+              Files uploaded successfully. Parsing will begin shortly.
+            </div>
+          )}
+
+          {/* Scan document placeholder modal */}
+          {scannerOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+              <div className="bg-steel-900 rounded-2xl p-8 max-w-lg text-center">
+                <p className="text-steel-100">Scanner coming soon</p>
+                <button onClick={() => setScannerOpen(false)} className="mt-4 px-4 py-2 bg-steel-700 text-steel-100 rounded-lg">Close</button>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Toast notification */}
@@ -433,23 +678,6 @@ export function UploadDropzone() {
           {toast}
         </div>
       )}
-
-      {/* PhotoScanner modal */}
-      <PhotoScanner
-        open={scannerOpen}
-        onClose={() => setScannerOpen(false)}
-        onSubmit={(files) => {
-          const newItems = files.map((file) => ({
-            id: `scan-${file.name}-${Date.now()}-${Math.random()}`,
-            file,
-            status: 'queued' as FileStatus,
-            useTus: file.size > TUS_THRESHOLD,
-          }))
-          setQueue(prev => [...prev, ...newItems])
-          setSuccess(false)
-          setScannerOpen(false)
-        }}
-      />
     </div>
   )
 }

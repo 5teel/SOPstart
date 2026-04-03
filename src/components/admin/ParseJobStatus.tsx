@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { CheckCircle, AlertTriangle } from 'lucide-react'
+import { CheckCircle, AlertTriangle, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { reparseSop } from '@/actions/sops'
 import type { ParseJobStatus as ParseJobStatusType } from '@/types/sop'
@@ -12,13 +12,29 @@ interface ParseJobStatusProps {
   initialStatus?: ParseJobStatusType | null
   initialErrorMessage?: string | null
   isOcr?: boolean
+  initialStage?: string | null        // current_stage from parse_jobs
+  initialIsVideo?: boolean             // whether this is a video SOP
+  onRetry?: (stage: string) => void    // retry callback
+  onDelete?: () => void                // delete callback
 }
+
+const VIDEO_STAGES = [
+  { key: 'uploading', label: 'Uploading' },
+  { key: 'extracting_audio', label: 'Extracting' },
+  { key: 'transcribing', label: 'Transcribing' },
+  { key: 'structuring', label: 'Structuring' },
+  { key: 'verifying', label: 'Verifying' },
+] as const
 
 export default function ParseJobStatus({
   sopId,
   initialStatus,
   initialErrorMessage,
   isOcr = false,
+  initialStage,
+  initialIsVideo,
+  onRetry,
+  onDelete,
 }: ParseJobStatusProps) {
   const router = useRouter()
   const [status, setStatus] = useState<ParseJobStatusType | null>(
@@ -29,11 +45,42 @@ export default function ParseJobStatus({
   )
   const [deleting, setDeleting] = useState(false)
   const [reParsing, setReParsing] = useState(false)
+  const [currentStage, setCurrentStage] = useState<string | null>(initialStage ?? null)
+  const [isVideoSop, setIsVideoSop] = useState(initialIsVideo ?? false)
+  const [startTime] = useState<number>(Date.now())
+  const [elapsed, setElapsed] = useState(0)
+
+  // Elapsed timer for transcribing stage
+  useEffect(() => {
+    if (currentStage !== 'transcribing') return
+    const interval = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - startTime) / 1000))
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [currentStage, startTime])
 
   useEffect(() => {
     const supabase = createClient()
     let pollingInterval: ReturnType<typeof setInterval> | null = null
     let realtimeConnected = false
+
+    // Fetch initial parse job to detect video type
+    supabase
+      .from('parse_jobs')
+      .select('status, error_message, current_stage, file_type')
+      .eq('sop_id', sopId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        const row = data as { status: string; error_message: string | null; current_stage: string | null; file_type: string } | null
+        if (row) {
+          if (row.status) setStatus(row.status as ParseJobStatusType)
+          if (row.error_message) setErrorMessage(row.error_message)
+          if (row.current_stage) setCurrentStage(row.current_stage as string)
+          if (row.file_type === 'video') setIsVideoSop(true)
+        }
+      })
 
     // Start polling fallback after 5s if Realtime hasn't fired
     const pollingTimeout = setTimeout(() => {
@@ -41,14 +88,16 @@ export default function ParseJobStatus({
         pollingInterval = setInterval(async () => {
           const { data } = await supabase
             .from('parse_jobs')
-            .select('status, error_message')
+            .select('status, error_message, current_stage, file_type')
             .eq('sop_id', sopId)
             .order('created_at', { ascending: false })
             .limit(1)
-            .maybeSingle() as { data: { status: string; error_message: string | null } | null }
+            .maybeSingle() as { data: { status: string; error_message: string | null; current_stage: string | null; file_type: string } | null }
           if (data) {
             setStatus(data.status as ParseJobStatusType)
             if (data.error_message) setErrorMessage(data.error_message)
+            if (data.current_stage) setCurrentStage(data.current_stage as string)
+            if (data.file_type === 'video') setIsVideoSop(true)
             if (data.status === 'completed' || data.status === 'failed') {
               if (pollingInterval) clearInterval(pollingInterval)
             }
@@ -72,6 +121,10 @@ export default function ParseJobStatus({
           if (pollingInterval) clearInterval(pollingInterval)
           setStatus(payload.new.status as ParseJobStatusType)
           if (payload.new.error_message) setErrorMessage(payload.new.error_message)
+          if (payload.new.current_stage) {
+            setCurrentStage(payload.new.current_stage as string)
+          }
+          if (payload.new.file_type === 'video') setIsVideoSop(true)
         }
       )
       .subscribe(() => {
@@ -90,15 +143,27 @@ export default function ParseJobStatus({
     await reparseSop(sopId)
     setStatus('queued')
     setErrorMessage(null)
+    setCurrentStage(null)
     setReParsing(false)
     router.refresh()
   }
 
   const handleDelete = async () => {
+    if (onDelete) {
+      onDelete()
+      return
+    }
     setDeleting(true)
     await fetch(`/api/sops/${sopId}`, { method: 'DELETE' })
     router.push('/admin/sops')
   }
+
+  // Parse failed stage name from error_message format: "Failed at {stage}: {message}"
+  const failedStageMatch = errorMessage?.match(/^Failed at ([^:]+):/)
+  const failedStage = failedStageMatch?.[1]?.trim() ?? null
+  const failedStageName = failedStage
+    ? VIDEO_STAGES.find(s => s.key === failedStage)?.label ?? failedStage
+    : null
 
   // OCR low-confidence banner
   const OcrBanner = () => (
@@ -110,6 +175,46 @@ export default function ParseJobStatus({
     </div>
   )
 
+  // Video stage stepper (shown during active video processing)
+  const VideoStageStepper = () => {
+    if (!isVideoSop || !currentStage || currentStage === 'completed' || currentStage === 'failed') {
+      return null
+    }
+    const stageIndex = VIDEO_STAGES.findIndex(s => s.key === currentStage)
+
+    return (
+      <div className="flex items-center gap-1 mb-4 overflow-x-auto" role="group" aria-label="Processing stages">
+        {VIDEO_STAGES.map((stage, i) => {
+          const isCompleted = i < stageIndex
+          const isActive = i === stageIndex
+          const isPending = i > stageIndex
+
+          return (
+            <React.Fragment key={stage.key}>
+              <span
+                className={`text-xs whitespace-nowrap px-1 ${
+                  isCompleted ? 'text-green-400' :
+                  isActive ? 'text-brand-yellow font-semibold' :
+                  isPending ? 'text-steel-600' :
+                  'text-steel-600'
+                }`}
+                aria-current={isActive ? 'step' : undefined}
+                aria-label={stage.label}
+              >
+                {stage.label}
+              </span>
+              {i < VIDEO_STAGES.length - 1 && (
+                <div className={`h-px flex-1 min-w-[8px] ${
+                  isCompleted ? 'bg-brand-yellow' : 'bg-steel-700'
+                }`} />
+              )}
+            </React.Fragment>
+          )
+        })}
+      </div>
+    )
+  }
+
   if (status === 'completed') {
     return (
       <>
@@ -117,7 +222,9 @@ export default function ParseJobStatus({
         <div className="bg-steel-800 border border-steel-700 rounded-lg p-4 flex items-start gap-3">
           <CheckCircle className="text-green-400 flex-shrink-0 mt-0.5" size={20} />
           <div>
-            <p className="text-sm font-semibold text-steel-100">Parsed and ready to review</p>
+            <p className="text-sm font-semibold text-steel-100">
+              {isVideoSop ? 'Transcript and SOP ready to review' : 'Parsed and ready to review'}
+            </p>
             <button
               onClick={() => router.refresh()}
               className="text-brand-yellow text-sm font-medium hover:text-amber-400 mt-1"
@@ -131,6 +238,38 @@ export default function ParseJobStatus({
   }
 
   if (status === 'failed') {
+    if (isVideoSop) {
+      return (
+        <div className="bg-steel-800 border border-steel-700 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="text-brand-orange flex-shrink-0 mt-0.5" size={20} />
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-steel-100">
+                {errorMessage ?? 'Processing failed'}
+              </p>
+              <div className="flex items-center gap-4 mt-3">
+                {onRetry && failedStage && (
+                  <button
+                    onClick={() => onRetry(failedStage)}
+                    className="text-brand-orange text-sm font-medium hover:text-amber-500"
+                  >
+                    Retry from {failedStageName ?? failedStage}
+                  </button>
+                )}
+                <button
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="text-red-400 text-sm font-medium hover:text-red-300"
+                >
+                  {deleting ? 'Deleting...' : 'Delete'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
     return (
       <div className="bg-steel-800 border border-steel-700 rounded-lg p-4 flex items-start gap-3">
         <AlertTriangle className="text-brand-orange flex-shrink-0 mt-0.5" size={20} />
@@ -160,7 +299,43 @@ export default function ParseJobStatus({
     )
   }
 
-  // Parsing / queued / processing state (default)
+  // Video SOP: show stage-specific processing state
+  if (isVideoSop && currentStage) {
+    return (
+      <div className="bg-steel-800 border border-steel-700 rounded-lg p-4">
+        <VideoStageStepper />
+        <div className="flex items-start gap-3">
+          {currentStage === 'verifying' ? (
+            <Loader2 size={20} className="text-brand-orange animate-spin flex-shrink-0 mt-0.5" />
+          ) : (
+            <Loader2 size={20} className="text-blue-400 animate-spin flex-shrink-0 mt-0.5" />
+          )}
+          <div>
+            {currentStage === 'uploading' && (
+              <p className="text-sm font-semibold text-steel-100">Uploading video...</p>
+            )}
+            {currentStage === 'extracting_audio' && (
+              <p className="text-sm font-semibold text-steel-100">Extracting audio from video...</p>
+            )}
+            {currentStage === 'transcribing' && (
+              <>
+                <p className="text-sm font-semibold text-steel-100">Transcribing audio... ({elapsed}s)</p>
+                <p className="text-xs text-steel-400 mt-1">Grab a hot drink — this can take a few minutes.</p>
+              </>
+            )}
+            {currentStage === 'structuring' && (
+              <p className="text-sm font-semibold text-steel-100">Structuring SOP from transcript...</p>
+            )}
+            {currentStage === 'verifying' && (
+              <p className="text-sm font-semibold text-steel-100">Running AI verification pass...</p>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Non-video parsing / queued / processing state (default)
   return (
     <div className="bg-steel-800 border border-steel-700 rounded-lg p-4 flex items-start gap-3">
       <div
