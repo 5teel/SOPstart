@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { CheckCircle2 } from 'lucide-react'
+import { SopTable, containsMarkdownTable } from '@/components/sop/SopTable'
 import type { SopSection, SopStep, SopImage } from '@/types/sop'
 
 interface SectionEditorProps {
@@ -164,11 +165,13 @@ export default function SectionEditor({
               )}
             </ol>
           ) : (
-            <p className="text-base text-steel-100 leading-relaxed whitespace-pre-wrap">
-              {section.content ?? (
-                <span className="text-steel-400 italic">No content parsed.</span>
-              )}
-            </p>
+            section.content ? (
+              containsMarkdownTable(section.content)
+                ? <SopTable markdown={section.content} />
+                : <p className="text-base text-steel-100 leading-relaxed whitespace-pre-wrap">{section.content}</p>
+            ) : (
+              <p className="text-sm text-steel-400 italic">No content parsed.</p>
+            )
           )}
 
           {/* Inline images */}
@@ -220,12 +223,19 @@ export default function SectionEditor({
               </button>
             </div>
           ) : (
-            <textarea
-              ref={firstTextareaRef}
-              value={editContent}
-              onChange={(e) => setEditContent(e.target.value)}
-              className="w-full bg-steel-900 border border-brand-yellow/50 rounded-lg text-base text-steel-100 leading-relaxed p-3 resize-y focus:outline-none focus:ring-2 focus:ring-brand-yellow/50 min-h-[120px]"
-            />
+            <>
+              <textarea
+                ref={firstTextareaRef}
+                value={editContent}
+                onChange={(e) => setEditContent(e.target.value)}
+                className="w-full bg-steel-900 border border-brand-yellow/50 rounded-lg text-base text-steel-100 leading-relaxed p-3 resize-y focus:outline-none focus:ring-2 focus:ring-brand-yellow/50 min-h-[120px]"
+              />
+              {containsMarkdownTable(editContent) && (
+                <p className="text-xs text-steel-400 mt-1">
+                  Edit as markdown table (| Col1 | Col2 |). The table will render with formatting when you save.
+                </p>
+              )}
+            </>
           )}
         </div>
       )}
