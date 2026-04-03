@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 6 UI-SPEC approved
-last_updated: "2026-04-03T05:35:52.680Z"
+stopped_at: Phase 6 planned (5 plans, 4 waves)
+last_updated: "2026-04-03T06:39:51.642Z"
 last_activity: 2026-04-03
 progress:
   total_phases: 8
   completed_phases: 5
-  total_plans: 21
+  total_plans: 26
   completed_plans: 21
 ---
 
@@ -164,6 +164,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-03T05:35:52.675Z
-Stopped at: Phase 6 UI-SPEC approved
-Resume file: .planning/phases/06-video-transcription-upload-and-url/06-UI-SPEC.md
+Last session: 2026-04-03T06:39:51.638Z
+Stopped at: Phase 6 planned (5 plans, 4 waves)
+Resume file: .planning/phases/06-video-transcription-upload-and-url/06-00-PLAN.md
