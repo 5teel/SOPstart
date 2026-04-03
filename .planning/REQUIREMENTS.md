@@ -71,13 +71,13 @@ Requirements for SOP Creation Pathways milestone. Each maps to roadmap phases.
 
 ### Video Transcription & Intake
 
-- [ ] **VID-01**: Admin can upload a video file (MP4/MOV) and the system transcribes it into a structured SOP with standard sections
-- [ ] **VID-02**: Admin can paste a YouTube or Vimeo URL and the system extracts captions or transcribes audio into a structured SOP
+- [x] **VID-01**: Admin can upload a video file (MP4/MOV) and the system transcribes it into a structured SOP with standard sections
+- [x] **VID-02**: Admin can paste a YouTube or Vimeo URL and the system extracts captions or transcribes audio into a structured SOP
 - [ ] **VID-03**: Admin can record video in-app from the device camera and submit it for transcription into a structured SOP
-- [ ] **VID-04**: System shows async processing progress with named stages (uploading → transcribing → structuring → ready)
+- [x] **VID-04**: System shows async processing progress with named stages (uploading → transcribing → structuring → ready)
 - [ ] **VID-05**: Admin can view and edit the raw transcript alongside the structured SOP output before publishing
-- [ ] **VID-06**: Transcription-sourced SOPs go through the same confidence scoring and admin review gate as document-parsed SOPs
-- [ ] **VID-07**: System flags when mandatory SOP sections (hazards, PPE) are absent from the video source
+- [x] **VID-06**: Transcription-sourced SOPs go through the same confidence scoring and admin review gate as document-parsed SOPs
+- [x] **VID-07**: System flags when mandatory SOP sections (hazards, PPE) are absent from the video source
 
 ### Expanded File Intake
 
@@ -201,12 +201,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FILE-08 | Phase 5 | Complete |
 | INFRA-01 | Phase 5 | Complete |
 | INFRA-02 | Phase 5 | Complete |
-| VID-01 | Phase 6 | Pending |
-| VID-02 | Phase 6 | Pending |
-| VID-04 | Phase 6 | Pending |
+| VID-01 | Phase 6 | Complete |
+| VID-02 | Phase 6 | Complete |
+| VID-04 | Phase 6 | Complete |
 | VID-05 | Phase 6 | Pending |
-| VID-06 | Phase 6 | Pending |
-| VID-07 | Phase 6 | Pending |
+| VID-06 | Phase 6 | Complete |
+| VID-07 | Phase 6 | Complete |
 | VID-03 | Phase 7 | Pending |
 | VGEN-01 | Phase 8 | Pending |
 | VGEN-02 | Phase 8 | Pending |

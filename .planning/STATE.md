@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 6 planned (5 plans, 4 waves)
-last_updated: "2026-04-03T06:40:55.454Z"
-last_activity: 2026-04-03 -- Phase 06 execution started
+stopped_at: Completed 06-02-PLAN.md
+last_updated: "2026-04-03T07:07:42.499Z"
+last_activity: 2026-04-03
 progress:
   total_phases: 8
-  completed_phases: 5
+  completed_phases: 4
   total_plans: 26
-  completed_plans: 21
+  completed_plans: 22
 ---
 
 # Project State
@@ -25,9 +25,9 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 ## Current Position
 
 Phase: 06 (video-transcription-upload-and-url) — EXECUTING
-Plan: 1 of 5
-Status: Executing Phase 06
-Last activity: 2026-04-03 -- Phase 06 execution started
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-04-03
 
 Progress bar: `[                    ]` 0% (0/4 v2.0 phases)
 
@@ -74,6 +74,7 @@ Progress bar: `[                    ]` 0% (0/4 v2.0 phases)
 *Updated after each plan completion*
 | Phase 05-expanded-file-intake P01 | 7m | 2 tasks | 13 files |
 | Phase 05-expanded-file-intake P03 | 2 | 2 tasks | 5 files |
+| Phase 06 P02 | 471 | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -138,6 +139,10 @@ Recent decisions affecting current work:
 - [Phase 05-expanded-file-intake]: idb-keyval for scanner session: already installed as offline dep; lighter than adding new Dexie table
 - [Phase 05-expanded-file-intake]: Laplacian downsample to 512px max: balances accuracy vs sub-300ms quality check target
 - [Phase 05-expanded-file-intake]: thumbnailUrl excluded from IndexedDB: object URLs invalid after tab unload; rebuilt from blob on restore
+- [Phase 06]: Lazy Anthropic client init in verify-sop.ts — same pattern as gpt-parser.ts lazy OpenAI, prevents build failure without ANTHROPIC_API_KEY
+- [Phase 06]: database.types.ts manually extended with parse_jobs video columns — type regeneration not available in worktree environment (consistent with Phase 3/4 pattern)
+- [Phase 06]: Json cast (as unknown as Json) for storing typed arrays in Supabase JSONB columns — Supabase types require Json, typed arrays lack index signatures
+- [Phase 06]: verifyTranscriptVsSop non-blocking: returns empty array on error per D-04 — verification is additive, not a gate that blocks SOP creation
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -164,6 +169,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-03T06:39:51.638Z
-Stopped at: Phase 6 planned (5 plans, 4 waves)
-Resume file: .planning/phases/06-video-transcription-upload-and-url/06-00-PLAN.md
+Last session: 2026-04-03T07:07:42.494Z
+Stopped at: Completed 06-02-PLAN.md
+Resume file: None
