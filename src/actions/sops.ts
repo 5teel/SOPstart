@@ -112,6 +112,82 @@ export async function triggerParse(sopId: string): Promise<{ success: boolean } 
   return { success: true }
 }
 
+export async function createVideoUploadSession(
+  file: { name: string; size: string; type: string }
+): Promise<{ sopId: string; path: string; token: string } | { error: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  // Get org_id and role from JWT claims (same pattern as createUploadSession)
+  const { data: { session } } = await supabase.auth.getSession()
+  const jwtClaims = session?.access_token
+    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    : {}
+  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  if (!organisationId) return { error: 'No organisation found' }
+
+  const role = jwtClaims['user_role']
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
+    return { error: 'You need admin access to upload SOPs.' }
+  }
+
+  // Create SOP record with video type
+  const admin = createAdminClient()
+  const { data: sop, error: sopError } = await admin
+    .from('sops')
+    .insert({
+      organisation_id: organisationId,
+      title: null,
+      status: 'uploading',
+      version: 1,
+      source_file_path: '',
+      source_file_type: 'video' as const,
+      source_file_name: file.name,
+      is_ocr: false,
+      uploaded_by: user.id,
+    })
+    .select('id')
+    .single()
+
+  if (sopError || !sop) {
+    console.error('Video SOP creation error:', sopError)
+    return { error: 'Failed to create upload session. Please try again.' }
+  }
+
+  // Storage path: {org_id}/{sop_id}/audio/audio.mp3
+  // Audio file is uploaded (not the video — client extracts audio before upload)
+  const storagePath = `${organisationId}/${sop.id}/audio/audio.mp3`
+
+  // Update SOP with storage path
+  await admin
+    .from('sops')
+    .update({ source_file_path: storagePath })
+    .eq('id', sop.id)
+
+  // Create parse job for video
+  await admin
+    .from('parse_jobs')
+    .insert({
+      organisation_id: organisationId,
+      sop_id: sop.id,
+      status: 'queued',
+      file_path: storagePath,
+      file_type: 'video',
+      input_type: 'video_file',
+      current_stage: 'uploading',
+    })
+
+  // Use service role key for TUS upload auth
+  const token = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
+
+  return {
+    sopId: sop.id,
+    path: storagePath,
+    token,
+  }
+}
+
 export async function reparseSop(sopId: string): Promise<{ success: true; sopId: string } | { error: string }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
