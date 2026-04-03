@@ -84,11 +84,11 @@ Requirements for SOP Creation Pathways milestone. Each maps to roadmap phases.
 - [ ] **FILE-01**: Admin can upload a photo/image of a printed SOP and the system OCRs it into a structured SOP
 - [ ] **FILE-02**: System provides image quality feedback before processing (blur, glare, rotation detection)
 - [ ] **FILE-03**: Admin can capture multiple pages sequentially to create a single SOP from a multi-page printed document
-- [ ] **FILE-04**: Admin can upload Excel (.xlsx) files and the system extracts content into a structured SOP
-- [ ] **FILE-05**: Admin can upload PowerPoint (.pptx) files and the system extracts slides into a structured SOP
-- [ ] **FILE-06**: Admin can upload plain text (.txt) files and the system structures them into an SOP
+- [x] **FILE-04**: Admin can upload Excel (.xlsx) files and the system extracts content into a structured SOP
+- [x] **FILE-05**: Admin can upload PowerPoint (.pptx) files and the system extracts slides into a structured SOP
+- [x] **FILE-06**: Admin can upload plain text (.txt) files and the system structures them into an SOP
 - [ ] **FILE-07**: Table structures in Excel/PowerPoint are preserved as readable tables within SOP steps
-- [ ] **FILE-08**: AI parsing uses format-specific prompts for improved section detection across all input types
+- [x] **FILE-08**: AI parsing uses format-specific prompts for improved section detection across all input types
 
 ### Video SOP Generation
 
@@ -105,7 +105,7 @@ Requirements for SOP Creation Pathways milestone. Each maps to roadmap phases.
 ### Shared Infrastructure
 
 - [x] **INFRA-01**: Video and large file uploads use resumable upload (TUS) direct to storage, bypassing server body limits
-- [ ] **INFRA-02**: All new intake pathways route through the existing SOP structuring pipeline and admin review UI
+- [x] **INFRA-02**: All new intake pathways route through the existing SOP structuring pipeline and admin review UI
 - [ ] **INFRA-03**: Generated videos are excluded from service worker caching to prevent device storage bloat
 
 ## Future Requirements
@@ -194,13 +194,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FILE-01 | Phase 5 | Pending |
 | FILE-02 | Phase 5 | Pending |
 | FILE-03 | Phase 5 | Pending |
-| FILE-04 | Phase 5 | Pending |
-| FILE-05 | Phase 5 | Pending |
-| FILE-06 | Phase 5 | Pending |
+| FILE-04 | Phase 5 | Complete |
+| FILE-05 | Phase 5 | Complete |
+| FILE-06 | Phase 5 | Complete |
 | FILE-07 | Phase 5 | Pending |
-| FILE-08 | Phase 5 | Pending |
+| FILE-08 | Phase 5 | Complete |
 | INFRA-01 | Phase 5 | Complete |
-| INFRA-02 | Phase 5 | Pending |
+| INFRA-02 | Phase 5 | Complete |
 | VID-01 | Phase 6 | Pending |
 | VID-02 | Phase 6 | Pending |
 | VID-04 | Phase 6 | Pending |

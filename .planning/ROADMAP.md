@@ -111,7 +111,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 05-01-PLAN.md — Backend parsing pipeline: DB migration (file_type constraint + input_type), type/validator extensions, extractors (xlsx, pptx, txt, image via GPT-4o vision), format-specific GPT prompts, parse route dispatch
+- [x] 05-01-PLAN.md — Backend parsing pipeline: DB migration (file_type constraint + input_type), type/validator extensions, extractors (xlsx, pptx, txt, image via GPT-4o vision), format-specific GPT prompts, parse route dispatch
 - [x] 05-02-PLAN.md — Upload UX: TUS resumable upload infrastructure, UploadDropzone extension (new MIME types, Scan button, HEIC conversion, TUS progress bar)
 - [ ] 05-03-PLAN.md — PhotoScanner: multi-page capture flow, client-side image quality checks, page order detection, IndexedDB session persistence, UploadDropzone wiring
 - [x] 05-04-PLAN.md — SopTable: rich table component with markdown parsing, SectionContent table detection, SectionEditor table editing support
@@ -162,7 +162,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 2. Document Intake | 4/4 | Complete   | 2026-03-25 |
 | 3. Worker Experience | 6/6 | Complete   | 2026-03-25 |
 | 4. Completion and Sign-off | 3/3 | Complete   | 2026-03-26 |
-| 5. Expanded File Intake | 0/4 | Not started | - |
+| 5. Expanded File Intake | 3/4 | In Progress|  |
 | 6. Video Transcription (Upload and URL) | 0/TBD | Not started | - |
 | 7. Video Transcription (In-App Recording) | 0/TBD | Not started | - |
 | 8. Video SOP Generation | 0/TBD | Not started | - |

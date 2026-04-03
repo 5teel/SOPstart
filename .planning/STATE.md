@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 5 planned — ready for execution
-last_updated: "2026-04-03T02:36:51.169Z"
-last_activity: 2026-04-03 -- Phase 05 execution started
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-04-03T02:45:50.499Z"
+last_activity: 2026-04-03
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 21
-  completed_plans: 17
+  completed_plans: 20
 ---
 
 # Project State
@@ -25,9 +25,9 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 ## Current Position
 
 Phase: 05 (expanded-file-intake) — EXECUTING
-Plan: 1 of 4
-Status: Executing Phase 05
-Last activity: 2026-04-03 -- Phase 05 execution started
+Plan: 2 of 4
+Status: Ready to execute
+Last activity: 2026-04-03
 
 Progress bar: `[                    ]` 0% (0/4 v2.0 phases)
 
@@ -72,6 +72,7 @@ Progress bar: `[                    ]` 0% (0/4 v2.0 phases)
 | Phase 08-video-sop-generation | - | - | - |
 
 *Updated after each plan completion*
+| Phase 05-expanded-file-intake P01 | 7m | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -130,6 +131,9 @@ Recent decisions affecting current work:
 - [Phase 04-completion-and-sign-off]: Worker display names use abbreviated user_id (Worker {first-8-chars}) — no user_profiles table exists in the schema
 - [Phase 04-completion-and-sign-off]: Supabase join select cast as unknown as RawRow[] — generated types don't infer relationship shapes from select strings
 - [Phase 04-completion-and-sign-off]: Admin client used for presigned read URLs in server component — bypasses RLS consistently with upload pattern
+- [Phase 05-expanded-file-intake]: officeparser + sharp marked as serverExternalPackages — ESM-only file-type dep and native binary require runtime loading, not webpack bundling
+- [Phase 05-expanded-file-intake]: GPT-4o vision replaces Tesseract as primary image OCR — better accuracy for SOP documents with minimal config
+- [Phase 05-expanded-file-intake]: getSourceFileType throws on unknown MIME types instead of catch-all image return — prevents silent wrong routing (Research Pitfall 8)
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -156,6 +160,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-03
-Stopped at: Phase 5 planned — ready for execution
-Resume file: .planning/phases/05-expanded-file-intake/05-01-PLAN.md
+Last session: 2026-04-03T02:45:50.495Z
+Stopped at: Completed 05-01-PLAN.md
+Resume file: None
