@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Worker Experience** - Step-by-step walkthrough, offline access, SOP library, and assignment (completed 2026-03-25)
 - [x] **Phase 4: Completion and Sign-off** - Completion tracking, photo evidence, and supervisor sign-off (completed 2026-03-26)
 - [x] **Phase 5: Expanded File Intake** - TUS upload infrastructure, photo OCR, Excel/PowerPoint/text parsing, and shared intake routing (completed 2026-04-03)
-- [x] **Phase 6: Video Transcription (Upload and URL)** - MP4/MOV file upload and YouTube URL → structured SOP with transcript review (completed 2026-04-03)
+- [x] **Phase 6: Video Transcription (Upload and URL)** - MP4/MOV file upload and YouTube URL → structured SOP with transcript review (completed 2026-04-03)
 - [ ] **Phase 7: Video Transcription (In-App Recording)** - In-browser camera recording → SOP transcription with iOS Safari fallback
 - [ ] **Phase 8: Video SOP Generation** - AI-narrated slideshow, screen-recording-style, and full AI video generated from published SOPs
 
@@ -150,7 +150,7 @@ Plans:
 - [ ] 07-01-PLAN.md — VideoRecorder overlay (full-screen camera recording, 15-min timer, audio extraction, preview) + UploadDropzone Record tab with iOS fallback
 
 ### Phase 8: Video SOP Generation
-**Goal**: Admins can generate narrated slideshow, screen-recording-style, and full AI video versions of any published SOP, workers can watch those videos with chapter navigation from within the SOP view, and video viewing is tracked as a completion event
+**Goal**: Admins can generate narrated slideshow and screen-recording-style video versions of any published SOP, workers can watch those videos with chapter navigation from within the SOP view, and video viewing is tracked as a completion event (full AI video deferred per D-01)
 **Depends on**: Phase 5
 **Requirements**: VGEN-01, VGEN-02, VGEN-03, VGEN-04, VGEN-05, VGEN-06, VGEN-07, VGEN-08, VGEN-09, INFRA-03
 **Success Criteria** (what must be TRUE):
@@ -159,8 +159,15 @@ Plans:
   3. Admin can preview the generated video and re-generate before publishing; a "video is outdated" warning appears when the source SOP is updated after video generation
   4. Workers see a "Video version" button within the SOP view; the video player supports chapter navigation, timestamp jumps to specific sections, and playback speed control
   5. Worker video viewing is recorded as a completion event in the same audit trail as text walkthrough completions; generated videos are excluded from service worker caching to prevent device storage bloat
-**Plans**: TBD
+**Plans**: 5 plans
 **UI hint**: yes
+
+Plans:
+- [ ] 08-00-PLAN.md — Wave 0: Playwright test stubs for all VGEN requirements and INFRA-03 (7 test files, phase8-stubs project)
+- [ ] 08-01-PLAN.md — Foundation: DB migration 00013 (video_generation_jobs table, sop_completions extension, sop-generated-videos bucket), TypeScript types, Zod validators, TTS module (gpt-4o-mini-tts), Shotstack API client
+- [ ] 08-02-PLAN.md — Video generation pipeline: Shotstack timeline builders (narrated slideshow + screen-recording-style), orchestration pipeline (TTS + render + poll), API route /api/sops/generate-video, server actions (video view completion, publish, delete, re-generate)
+- [ ] 08-03-PLAN.md — Admin video generation UI: VideoGeneratePanel (format selector + generation trigger), VideoGenerationStatus (5-step stage stepper), VideoAdminPreview (preview + publish/re-generate), VideoOutdatedBanner, admin SOP library Video button
+- [ ] 08-04-PLAN.md — Worker video experience: VideoTabPanel (player + chapters + speed control), SopSectionTabs Video tab extension, useVideoGeneration hook, video view completion tracking (80% threshold), service worker video URL exclusion (INFRA-03)
 
 ## Progress
 
@@ -176,4 +183,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 5. Expanded File Intake | 4/4 | Complete   | 2026-04-03 |
 | 6. Video Transcription (Upload and URL) | 5/5 | Complete   | 2026-04-03 |
 | 7. Video Transcription (In-App Recording) | 0/1 | In progress | - |
-| 8. Video SOP Generation | 0/TBD | Not started | - |
+| 8. Video SOP Generation | 0/5 | Not started | - |
