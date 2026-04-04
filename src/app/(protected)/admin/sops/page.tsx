@@ -154,6 +154,13 @@ export default async function SopsLibraryPage({
                   >
                     Versions
                   </Link>
+                  <Link
+                    href={`/admin/sops/${sop.id}/video`}
+                    className="flex items-center px-3 bg-steel-800 border border-steel-700 rounded-lg hover:bg-steel-700 hover:border-steel-600 transition-colors text-xs font-medium text-steel-400 hover:text-steel-100 flex-shrink-0 whitespace-nowrap"
+                    title="Generate video"
+                  >
+                    Video
+                  </Link>
                 </>
               )}
             </li>
