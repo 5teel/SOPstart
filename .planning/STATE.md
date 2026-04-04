@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: executing
-stopped_at: "Phase 08 plan 00 complete (08-00-SUMMARY.md)"
-last_updated: "2026-04-04T05:21:48Z"
+stopped_at: Completed 08-video-sop-generation 08-03-PLAN.md
+last_updated: "2026-04-04T05:36:40.239Z"
 last_activity: 2026-04-04
 progress:
   total_phases: 8
-  completed_phases: 7
-  total_plans: 28
-  completed_plans: 28
+  completed_phases: 6
+  total_plans: 32
+  completed_plans: 29
 ---
 
 # Project State
@@ -76,6 +76,7 @@ Progress bar: `[                    ]` 0% (0/4 v2.0 phases)
 | Phase 05-expanded-file-intake P03 | 2 | 2 tasks | 5 files |
 | Phase 06 P02 | 471 | 2 tasks | 9 files |
 | Phase 06 P04 | 3m | 2 tasks | 6 files |
+| Phase 08-video-sop-generation P03 | 7 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -146,6 +147,8 @@ Recent decisions affecting current work:
 - [Phase 06]: verifyTranscriptVsSop non-blocking: returns empty array on error per D-04 — verification is additive, not a gate that blocks SOP creation
 - [Phase 06]: YouTube IFrame API loaded lazily via onLoad on iframe element to avoid loading for non-YouTube SOPs
 - [Phase 06]: Publish gate computed as single derived boolean combining allApproved, unresolvedCriticalFlags, hasMissingSectionFlags+acknowledged
+- [Phase 08-video-sop-generation]: src/actions/video.ts created in Plan 03 (not Plan 02) — parallel wave execution required early creation; Plan 02 may extend regenerateVideo to call pipeline directly
+- [Phase 08-video-sop-generation]: VideoOutdatedBanner rendered inside video page (not as library amber dot) — avoids N+1 query on SOP library listing
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -172,6 +175,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-04T05:21:48Z
-Stopped at: Phase 08 plan 00 complete — resume at 08-01-PLAN.md
-Resume file: .planning/phases/08-video-sop-generation/08-01-PLAN.md
+Last session: 2026-04-04T05:36:40.234Z
+Stopped at: Completed 08-video-sop-generation 08-03-PLAN.md
+Resume file: None
