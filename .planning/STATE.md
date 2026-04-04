@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 08-01-PLAN.md
-last_updated: "2026-04-04T05:25:01.378Z"
+stopped_at: "Phase 08 plan 00 complete (08-00-SUMMARY.md)"
+last_updated: "2026-04-04T05:21:48Z"
 last_activity: 2026-04-04
 progress:
   total_phases: 8
   completed_phases: 7
-  total_plans: 32
+  total_plans: 28
   completed_plans: 28
 ---
 
@@ -24,9 +24,9 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 
 ## Current Position
 
-Phase: 08 (video-sop-generation) — EXECUTING
-Plan: 2 of 5
-Status: Ready to execute
+Phase: 8
+Plan: 00 (complete) — next: 08-01
+Status: Executing Phase 08
 Last activity: 2026-04-04
 
 Progress bar: `[                    ]` 0% (0/4 v2.0 phases)
@@ -69,14 +69,13 @@ Progress bar: `[                    ]` 0% (0/4 v2.0 phases)
 | Phase 05-expanded-file-intake | - | - | - |
 | Phase 06-video-transcription-upload | - | - | - |
 | Phase 07-video-transcription-recording | - | - | - |
-| Phase 08-video-sop-generation | - | - | - |
+| Phase 08-video-sop-generation | 1m | 1 task | 8 files |
 
 *Updated after each plan completion*
 | Phase 05-expanded-file-intake P01 | 7m | 2 tasks | 13 files |
 | Phase 05-expanded-file-intake P03 | 2 | 2 tasks | 5 files |
 | Phase 06 P02 | 471 | 2 tasks | 9 files |
 | Phase 06 P04 | 3m | 2 tasks | 6 files |
-| Phase 08-video-sop-generation P01 | 3 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -147,7 +146,6 @@ Recent decisions affecting current work:
 - [Phase 06]: verifyTranscriptVsSop non-blocking: returns empty array on error per D-04 — verification is additive, not a gate that blocks SOP creation
 - [Phase 06]: YouTube IFrame API loaded lazily via onLoad on iframe element to avoid loading for non-YouTube SOPs
 - [Phase 06]: Publish gate computed as single derived boolean combining allApproved, unresolvedCriticalFlags, hasMissingSectionFlags+acknowledged
-- [Phase 08-video-sop-generation]: gpt-4o-mini-tts with nova voice for TTS; direct fetch for Shotstack API (no SDK); SHOTSTACK_API_URL env var for sandbox switching; video_generation_jobs UNIQUE(sop_id, format, sop_version) for idempotency; sop-generated-videos bucket is private with presigned URL access
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -174,6 +172,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-04T05:25:01.373Z
-Stopped at: Completed 08-01-PLAN.md
-Resume file: None
+Last session: 2026-04-04T05:21:48Z
+Stopped at: Phase 08 plan 00 complete — resume at 08-01-PLAN.md
+Resume file: .planning/phases/08-video-sop-generation/08-01-PLAN.md
