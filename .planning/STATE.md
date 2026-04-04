@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 06-04-PLAN.md
-last_updated: "2026-04-03T07:25:01.397Z"
+stopped_at: Completed 07-01-PLAN.md (VID-03 in-app recording)
+last_updated: "2026-04-04T02:04:59.920Z"
 last_activity: 2026-04-03
 progress:
   total_phases: 8
-  completed_phases: 6
+  completed_phases: 5
   total_plans: 26
-  completed_plans: 26
+  completed_plans: 25
 ---
 
 # Project State
@@ -76,6 +76,7 @@ Progress bar: `[                    ]` 0% (0/4 v2.0 phases)
 | Phase 05-expanded-file-intake P03 | 2 | 2 tasks | 5 files |
 | Phase 06 P02 | 471 | 2 tasks | 9 files |
 | Phase 06 P04 | 3m | 2 tasks | 6 files |
+| Phase 07 P01 | 9m | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -146,6 +147,8 @@ Recent decisions affecting current work:
 - [Phase 06]: verifyTranscriptVsSop non-blocking: returns empty array on error per D-04 — verification is additive, not a gate that blocks SOP creation
 - [Phase 06]: YouTube IFrame API loaded lazily via onLoad on iframe element to avoid loading for non-YouTube SOPs
 - [Phase 06]: Publish gate computed as single derived boolean combining allApproved, unresolvedCriticalFlags, hasMissingSectionFlags+acknowledged
+- [Phase 07]: MediaRecorder codec selection iterates webm(vp9,opus) to webm(vp8,opus) to webm to mp4 — first supported wins (D-07 discretion)
+- [Phase 07]: useMemo for object URL in VideoPreviewPanel avoids setState-in-effect lint rule; cleanup via paired useEffect on the memo value
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -172,6 +175,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-03T07:17:39.913Z
-Stopped at: Completed 06-04-PLAN.md
+Last session: 2026-04-04T02:04:59.916Z
+Stopped at: Completed 07-01-PLAN.md (VID-03 in-app recording)
 Resume file: None
