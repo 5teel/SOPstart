@@ -672,6 +672,78 @@ export type Database = {
           },
         ]
       }
+      video_generation_jobs: {
+        Row: {
+          id: string
+          organisation_id: string
+          sop_id: string
+          sop_version: number
+          format: "narrated_slideshow" | "screen_recording"
+          status: "queued" | "analyzing" | "generating_audio" | "rendering" | "ready" | "failed"
+          current_stage: string | null
+          shotstack_render_id: string | null
+          video_url: string | null
+          chapter_markers: Json | null
+          error_message: string | null
+          published: boolean
+          created_by: string
+          completed_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          organisation_id: string
+          sop_id: string
+          sop_version: number
+          format: "narrated_slideshow" | "screen_recording"
+          status?: "queued" | "analyzing" | "generating_audio" | "rendering" | "ready" | "failed"
+          current_stage?: string | null
+          shotstack_render_id?: string | null
+          video_url?: string | null
+          chapter_markers?: Json | null
+          error_message?: string | null
+          published?: boolean
+          created_by: string
+          completed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          sop_id?: string
+          sop_version?: number
+          format?: "narrated_slideshow" | "screen_recording"
+          status?: "queued" | "analyzing" | "generating_audio" | "rendering" | "ready" | "failed"
+          current_stage?: string | null
+          shotstack_render_id?: string | null
+          video_url?: string | null
+          chapter_markers?: Json | null
+          error_message?: string | null
+          published?: boolean
+          created_by?: string
+          completed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_generation_jobs_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "video_generation_jobs_sop_id_fkey"
+            columns: ["sop_id"]
+            isOneToOne: false
+            referencedRelation: "sops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -115,6 +115,36 @@ export interface ParseJob {
   updated_at?: string
 }
 
+// Video SOP generation types
+export type VideoGenStatus = 'queued' | 'analyzing' | 'generating_audio' | 'rendering' | 'ready' | 'failed'
+export type VideoFormat = 'narrated_slideshow' | 'screen_recording'
+export type CompletionType = 'walkthrough' | 'video_view'
+
+export interface ChapterMarker {
+  sectionId: string
+  title: string
+  timestamp: number // seconds from video start
+}
+
+export interface VideoGenerationJob {
+  id: string
+  organisation_id: string
+  sop_id: string
+  sop_version: number
+  format: VideoFormat
+  status: VideoGenStatus
+  current_stage: string | null
+  shotstack_render_id: string | null
+  video_url: string | null
+  chapter_markers: ChapterMarker[] | null
+  error_message: string | null
+  published: boolean
+  created_by: string
+  completed_at: string | null
+  created_at: string
+  updated_at: string
+}
+
 // SOP with nested sections for review page
 export interface SopWithSections extends Sop {
   sop_sections: (SopSection & {

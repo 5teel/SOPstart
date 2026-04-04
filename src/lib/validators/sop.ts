@@ -120,6 +120,18 @@ export const uploadSessionSchema = z.object({
 
 export type UploadFileInput = z.infer<typeof uploadFileSchema>
 
+// Video generation validators
+export const generateVideoSchema = z.object({
+  sopId: z.string().uuid(),
+  format: z.enum(['narrated_slideshow', 'screen_recording']),
+})
+
+export const recordVideoViewSchema = z.object({
+  sopId: z.string().uuid(),
+  sopVersion: z.number().int().positive(),
+  videoJobId: z.string().uuid(),
+})
+
 /**
  * Returns true if the filename has a macro-enabled Office extension.
  * Must be checked before any parsing library is invoked.
