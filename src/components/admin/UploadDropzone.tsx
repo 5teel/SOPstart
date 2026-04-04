@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useCallback } from 'react'
+import { useRef, useState, useCallback, useEffect } from 'react'
 import {
   Upload,
   FileText,
@@ -12,11 +12,13 @@ import {
   TableProperties,
   FileType2,
   Video,
+  Smartphone,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { createUploadSession, createVideoUploadSession } from '@/actions/sops'
 import { tusUpload, TUS_THRESHOLD } from '@/lib/upload/tus-upload'
 import { TusUploadProgress } from './TusUploadProgress'
+import { VideoRecorder } from './VideoRecorder'
 
 const ACCEPTED_MIME_TYPES = [
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
@@ -85,15 +87,28 @@ export function UploadDropzone() {
   const [success, setSuccess] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
   const [scannerOpen, setScannerOpen] = useState(false)
-  const [mode, setMode] = useState<'upload' | 'youtube'>('upload')
+  const [mode, setMode] = useState<'upload' | 'youtube' | 'record'>('upload')
   const [youtubeUrl, setYoutubeUrl] = useState('')
   const [termsChecked, setTermsChecked] = useState(false)
   const [youtubeError, setYoutubeError] = useState<string | null>(null)
   const [youtubeFetching, setYoutubeFetching] = useState(false)
+  const [recorderOpen, setRecorderOpen] = useState(false)
+  const [mediaRecorderSupported, setMediaRecorderSupported] = useState<boolean | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
   const videoInputRef = useRef<HTMLInputElement>(null)
+
+  // ---------------------------------------------------------------------------
+  // MediaRecorder capability detection (D-05)
+  // ---------------------------------------------------------------------------
+
+  useEffect(() => {
+    const supported = typeof window !== 'undefined'
+      && typeof window.MediaRecorder !== 'undefined'
+      && MediaRecorder.isTypeSupported('video/webm')
+    setMediaRecorderSupported(supported)
+  }, [])
 
   const showToast = useCallback((message: string) => {
     setToast(message)
@@ -179,10 +194,15 @@ export function UploadDropzone() {
 
   const handleFileInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      validateAndAddFiles(Array.from(e.target.files))
+      const files = Array.from(e.target.files)
+      validateAndAddFiles(files)
+      // If picking from the iOS fallback video input, switch to upload tab so queue is visible
+      if (e.target === videoInputRef.current && mode === 'record') {
+        setMode('upload')
+      }
       e.target.value = ''
     }
-  }, [validateAndAddFiles])
+  }, [validateAndAddFiles, mode])
 
   const removeFile = useCallback((id: string) => {
     setQueue(prev => prev.filter(f => f.id !== id))
@@ -424,7 +444,7 @@ export function UploadDropzone() {
 
     setUploading(false)
     setSuccess(true)
-  }, [queue, showToast])
+  }, [queue])
 
   const hasFiles = queue.length > 0
   const queuedCount = queue.filter(f => f.status === 'queued').length
@@ -457,6 +477,18 @@ export function UploadDropzone() {
           }`}
         >
           YouTube URL
+        </button>
+        <button
+          role="tab"
+          aria-selected={mode === 'record'}
+          onClick={() => setMode('record')}
+          className={`pb-3 text-sm font-semibold cursor-pointer ${
+            mode === 'record'
+              ? 'text-brand-yellow border-b-2 border-brand-yellow -mb-px'
+              : 'text-steel-400'
+          }`}
+        >
+          Record video
         </button>
       </div>
 
@@ -493,6 +525,51 @@ export function UploadDropzone() {
           >
             {youtubeFetching ? 'Fetching captions...' : 'Transcribe from YouTube'}
           </button>
+        </div>
+      ) : mode === 'record' ? (
+        /* Record video tab panel */
+        <div role="tabpanel" className="py-4">
+          {mediaRecorderSupported === null ? (
+            /* Detection in progress — effectively instant, show nothing */
+            null
+          ) : mediaRecorderSupported ? (
+            /* Capable device — show Start recording button */
+            <>
+              <button
+                type="button"
+                onClick={() => setRecorderOpen(true)}
+                className="h-[72px] w-full bg-steel-800 border border-steel-700 border-dashed rounded-xl text-steel-100 font-semibold text-base flex items-center justify-center gap-3 hover:bg-steel-700 transition-colors"
+              >
+                <Video className="w-6 h-6" />
+                Start recording
+              </button>
+              <p className="text-xs text-steel-400 text-center mt-2">
+                Records up to 15 minutes. Audio only is uploaded — video stays on your device.
+              </p>
+            </>
+          ) : (
+            /* iOS / unsupported device fallback (D-04, D-05) */
+            <div
+              role="status"
+              className="flex flex-col items-center text-center p-6 bg-brand-orange/20 border border-brand-orange/50 rounded-xl"
+            >
+              <Smartphone className="w-8 h-8 text-brand-orange mx-auto mb-3" />
+              <p className="text-sm font-semibold text-brand-orange text-center">
+                Recording isn&apos;t supported on this device yet.
+              </p>
+              <p className="text-sm text-steel-400 text-center mt-1 leading-relaxed">
+                Use your camera app to record the procedure, then upload the file here.
+              </p>
+              <button
+                type="button"
+                aria-label="Choose a video file from your device"
+                onClick={() => videoInputRef.current?.click()}
+                className="h-[72px] w-full bg-brand-yellow text-steel-900 font-semibold text-lg rounded-lg hover:bg-amber-400 transition-colors mt-4"
+              >
+                Choose video file
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         /* Upload file tab panel */
@@ -677,6 +754,18 @@ export function UploadDropzone() {
         <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 bg-steel-800 border border-steel-700 rounded-lg shadow-xl text-sm text-steel-100 max-w-sm">
           {toast}
         </div>
+      )}
+
+      {/* VideoRecorder overlay */}
+      {recorderOpen && (
+        <VideoRecorder
+          open={recorderOpen}
+          onClose={() => setRecorderOpen(false)}
+          onSubmitComplete={(sopId) => {
+            setRecorderOpen(false)
+            window.location.href = `/admin/sops/${sopId}/review`
+          }}
+        />
       )}
     </div>
   )
