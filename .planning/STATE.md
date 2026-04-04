@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 8 planned (5 plans, 4 waves)
-last_updated: "2026-04-04T04:46:44.570Z"
+stopped_at: Completed 08-01-PLAN.md
+last_updated: "2026-04-04T05:25:01.378Z"
 last_activity: 2026-04-04
 progress:
   total_phases: 8
   completed_phases: 7
   total_plans: 32
-  completed_plans: 27
+  completed_plans: 28
 ---
 
 # Project State
@@ -20,13 +20,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 07 — video-transcription-in-app-recording
+**Current focus:** Phase 08 — video-sop-generation
 
 ## Current Position
 
-Phase: 8
-Plan: Not started
-Status: Executing Phase 07
+Phase: 08 (video-sop-generation) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
 Last activity: 2026-04-04
 
 Progress bar: `[                    ]` 0% (0/4 v2.0 phases)
@@ -76,6 +76,7 @@ Progress bar: `[                    ]` 0% (0/4 v2.0 phases)
 | Phase 05-expanded-file-intake P03 | 2 | 2 tasks | 5 files |
 | Phase 06 P02 | 471 | 2 tasks | 9 files |
 | Phase 06 P04 | 3m | 2 tasks | 6 files |
+| Phase 08-video-sop-generation P01 | 3 | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -146,6 +147,7 @@ Recent decisions affecting current work:
 - [Phase 06]: verifyTranscriptVsSop non-blocking: returns empty array on error per D-04 — verification is additive, not a gate that blocks SOP creation
 - [Phase 06]: YouTube IFrame API loaded lazily via onLoad on iframe element to avoid loading for non-YouTube SOPs
 - [Phase 06]: Publish gate computed as single derived boolean combining allApproved, unresolvedCriticalFlags, hasMissingSectionFlags+acknowledged
+- [Phase 08-video-sop-generation]: gpt-4o-mini-tts with nova voice for TTS; direct fetch for Shotstack API (no SDK); SHOTSTACK_API_URL env var for sandbox switching; video_generation_jobs UNIQUE(sop_id, format, sop_version) for idempotency; sop-generated-videos bucket is private with presigned URL access
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -172,6 +174,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-04T04:46:44.566Z
-Stopped at: Phase 8 planned (5 plans, 4 waves)
-Resume file: .planning/phases/08-video-sop-generation/08-00-PLAN.md
+Last session: 2026-04-04T05:25:01.373Z
+Stopped at: Completed 08-01-PLAN.md
+Resume file: None

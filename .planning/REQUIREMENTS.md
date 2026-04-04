@@ -92,21 +92,21 @@ Requirements for SOP Creation Pathways milestone. Each maps to roadmap phases.
 
 ### Video SOP Generation
 
-- [ ] **VGEN-01**: Admin can generate a narrated slideshow video from a published SOP with AI voiceover and one slide per section/step
-- [ ] **VGEN-02**: Admin can generate a screen-recording-style video with scrolling SOP text synced to AI voice narration
+- [x] **VGEN-01**: Admin can generate a narrated slideshow video from a published SOP with AI voiceover and one slide per section/step
+- [x] **VGEN-02**: Admin can generate a screen-recording-style video with scrolling SOP text synced to AI voice narration
 - [ ] **VGEN-03**: Admin can generate a full AI video with avatar or animated visuals synchronized to narration
-- [ ] **VGEN-04**: Generated videos include chapter markers per SOP section and timestamps per step for direct navigation
+- [x] **VGEN-04**: Generated videos include chapter markers per SOP section and timestamps per step for direct navigation
 - [ ] **VGEN-05**: Admin can preview generated video and re-generate before publishing to workers
-- [ ] **VGEN-06**: Video generation shows async progress with named stages (analyzing → generating → adding narration → finalizing)
+- [x] **VGEN-06**: Video generation shows async progress with named stages (analyzing → generating → adding narration → finalizing)
 - [ ] **VGEN-07**: Workers can access the video version of an SOP from within the existing SOP view with an in-app video player
 - [ ] **VGEN-08**: Video player supports chapter navigation, timestamp jumps, and playback speed control
-- [ ] **VGEN-09**: Worker video viewing is tracked as a completion event alongside text walkthrough completions
+- [x] **VGEN-09**: Worker video viewing is tracked as a completion event alongside text walkthrough completions
 
 ### Shared Infrastructure
 
 - [x] **INFRA-01**: Video and large file uploads use resumable upload (TUS) direct to storage, bypassing server body limits
 - [x] **INFRA-02**: All new intake pathways route through the existing SOP structuring pipeline and admin review UI
-- [ ] **INFRA-03**: Generated videos are excluded from service worker caching to prevent device storage bloat
+- [x] **INFRA-03**: Generated videos are excluded from service worker caching to prevent device storage bloat
 
 ## Future Requirements
 
@@ -208,16 +208,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VID-06 | Phase 6 | Complete |
 | VID-07 | Phase 6 | Complete |
 | VID-03 | Phase 7 | Complete |
-| VGEN-01 | Phase 8 | Pending |
-| VGEN-02 | Phase 8 | Pending |
+| VGEN-01 | Phase 8 | Complete |
+| VGEN-02 | Phase 8 | Complete |
 | VGEN-03 | Phase 8 | Pending |
-| VGEN-04 | Phase 8 | Pending |
+| VGEN-04 | Phase 8 | Complete |
 | VGEN-05 | Phase 8 | Pending |
-| VGEN-06 | Phase 8 | Pending |
+| VGEN-06 | Phase 8 | Complete |
 | VGEN-07 | Phase 8 | Pending |
 | VGEN-08 | Phase 8 | Pending |
-| VGEN-09 | Phase 8 | Pending |
-| INFRA-03 | Phase 8 | Pending |
+| VGEN-09 | Phase 8 | Complete |
+| INFRA-03 | Phase 8 | Complete |
 
 **v1 Coverage:**
 - v1 requirements: 30 total

@@ -164,7 +164,7 @@ Plans:
 
 Plans:
 - [ ] 08-00-PLAN.md — Wave 0: Playwright test stubs for all VGEN requirements and INFRA-03 (7 test files, phase8-stubs project)
-- [ ] 08-01-PLAN.md — Foundation: DB migration 00013 (video_generation_jobs table, sop_completions extension, sop-generated-videos bucket), TypeScript types, Zod validators, TTS module (gpt-4o-mini-tts), Shotstack API client
+- [x] 08-01-PLAN.md — Foundation: DB migration 00013 (video_generation_jobs table, sop_completions extension, sop-generated-videos bucket), TypeScript types, Zod validators, TTS module (gpt-4o-mini-tts), Shotstack API client
 - [ ] 08-02-PLAN.md — Video generation pipeline: Shotstack timeline builders (narrated slideshow + screen-recording-style), orchestration pipeline (TTS + render + poll), API route /api/sops/generate-video, server actions (video view completion, publish, delete, re-generate)
 - [ ] 08-03-PLAN.md — Admin video generation UI: VideoGeneratePanel (format selector + generation trigger), VideoGenerationStatus (5-step stage stepper), VideoAdminPreview (preview + publish/re-generate), VideoOutdatedBanner, admin SOP library Video button
 - [ ] 08-04-PLAN.md — Worker video experience: VideoTabPanel (player + chapters + speed control), SopSectionTabs Video tab extension, useVideoGeneration hook, video view completion tracking (80% threshold), service worker video URL exclusion (INFRA-03)
@@ -183,4 +183,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 5. Expanded File Intake | 4/4 | Complete   | 2026-04-03 |
 | 6. Video Transcription (Upload and URL) | 5/5 | Complete   | 2026-04-03 |
 | 7. Video Transcription (In-App Recording) | 0/1 | In progress | - |
-| 8. Video SOP Generation | 0/5 | Not started | - |
+| 8. Video SOP Generation | 1/5 | In Progress|  |
