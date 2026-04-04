@@ -164,8 +164,8 @@ Plans:
 
 Plans:
 - [x] 08-00-PLAN.md — Wave 0: Playwright test stubs for all VGEN and INFRA-03 requirements (7 test files + config, VGEN-03 marked DEFERRED per D-01)
-- [ ] 08-01-PLAN.md — TBD
-- [ ] 08-02-PLAN.md — TBD
+- [x] 08-01-PLAN.md — Foundation: DB migration (video_generation_jobs), TypeScript types, Zod validators, TTS module (gpt-4o-mini-tts), Shotstack API client
+- [x] 08-02-PLAN.md — Generation pipeline: narrated slideshow builder, screen-recording builder, pipeline orchestrator, API route, server actions
 - [ ] 08-03-PLAN.md — TBD
 - [ ] 08-04-PLAN.md — TBD
 

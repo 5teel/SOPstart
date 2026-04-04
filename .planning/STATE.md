@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: executing
-stopped_at: "Phase 08 plan 00 complete (08-00-SUMMARY.md)"
-last_updated: "2026-04-04T05:21:48Z"
+stopped_at: "Phase 08 plan 02 complete (08-02-SUMMARY.md)"
+last_updated: "2026-04-04T05:35:12Z"
 last_activity: 2026-04-04
 progress:
   total_phases: 8
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-03-23)
 ## Current Position
 
 Phase: 8
-Plan: 00 (complete) — next: 08-01
+Plan: 02 (complete) — next: 08-03
 Status: Executing Phase 08
 Last activity: 2026-04-04
 
@@ -70,6 +70,7 @@ Progress bar: `[                    ]` 0% (0/4 v2.0 phases)
 | Phase 06-video-transcription-upload | - | - | - |
 | Phase 07-video-transcription-recording | - | - | - |
 | Phase 08-video-sop-generation | 1m | 1 task | 8 files |
+| Phase 08-video-sop-generation P02 | 6m | 2 tasks | 5 files |
 
 *Updated after each plan completion*
 | Phase 05-expanded-file-intake P01 | 7m | 2 tasks | 13 files |
@@ -146,6 +147,10 @@ Recent decisions affecting current work:
 - [Phase 06]: verifyTranscriptVsSop non-blocking: returns empty array on error per D-04 — verification is additive, not a gate that blocks SOP creation
 - [Phase 06]: YouTube IFrame API loaded lazily via onLoad on iframe element to avoid loading for non-YouTube SOPs
 - [Phase 06]: Publish gate computed as single derived boolean combining allApproved, unresolvedCriticalFlags, hasMissingSectionFlags+acknowledged
+- [Phase 08-02]: buildScrollEdit uses per-section Shotstack audio clips (not stitched MP3) — naive Buffer.concat of MP3 files produces invalid output
+- [Phase 08-02]: pipeline.ts fetches all SOP steps in one batched query grouped by section_id — avoids N+1 per section
+- [Phase 08-02]: recordVideoView uses submitted_at not completed_at — matches actual sop_completions table schema (completed_at does not exist)
+- [Phase 08-02]: regenerateVideo calls runVideoGenerationPipeline directly (not via fetch) to avoid unnecessary HTTP round-trip
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -172,6 +177,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-04T05:21:48Z
-Stopped at: Phase 08 plan 00 complete — resume at 08-01-PLAN.md
-Resume file: .planning/phases/08-video-sop-generation/08-01-PLAN.md
+Last session: 2026-04-04T05:35:12Z
+Stopped at: Phase 08 plan 02 complete — resume at 08-03-PLAN.md
+Resume file: .planning/phases/08-video-sop-generation/08-03-PLAN.md
