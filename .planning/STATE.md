@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: executing
-stopped_at: "Phase 08 plan 02 complete (08-02-SUMMARY.md)"
-last_updated: "2026-04-04T05:35:12Z"
+stopped_at: Phase 08 plan 04 tasks 1-2 complete, checkpoint at task 3 (human-verify)
+last_updated: "2026-04-04T05:45:45.733Z"
 last_activity: 2026-04-04
 progress:
   total_phases: 8
-  completed_phases: 7
-  total_plans: 28
-  completed_plans: 28
+  completed_phases: 8
+  total_plans: 32
+  completed_plans: 32
 ---
 
 # Project State
@@ -77,6 +77,7 @@ Progress bar: `[                    ]` 0% (0/4 v2.0 phases)
 | Phase 05-expanded-file-intake P03 | 2 | 2 tasks | 5 files |
 | Phase 06 P02 | 471 | 2 tasks | 9 files |
 | Phase 06 P04 | 3m | 2 tasks | 6 files |
+| Phase 08 P04 | 10m | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -151,6 +152,7 @@ Recent decisions affecting current work:
 - [Phase 08-02]: pipeline.ts fetches all SOP steps in one batched query grouped by section_id — avoids N+1 per section
 - [Phase 08-02]: recordVideoView uses submitted_at not completed_at — matches actual sop_completions table schema (completed_at does not exist)
 - [Phase 08-02]: regenerateVideo calls runVideoGenerationPipeline directly (not via fetch) to avoid unnecessary HTTP round-trip
+- [Phase 08]: useNetworkStore used directly in useVideoGeneration — useOnlineStatus hook only registers listeners, returns void; useNetworkStore(s => s.isOnline) is the correct pattern for reading online state
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -177,6 +179,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-04T05:35:12Z
-Stopped at: Phase 08 plan 02 complete — resume at 08-03-PLAN.md
-Resume file: .planning/phases/08-video-sop-generation/08-03-PLAN.md
+Last session: 2026-04-04T05:45:39.073Z
+Stopped at: Phase 08 plan 04 tasks 1-2 complete, checkpoint at task 3 (human-verify)
+Resume file: None

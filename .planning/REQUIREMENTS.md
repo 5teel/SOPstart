@@ -98,8 +98,8 @@ Requirements for SOP Creation Pathways milestone. Each maps to roadmap phases.
 - [x] **VGEN-04**: Generated videos include chapter markers per SOP section and timestamps per step for direct navigation
 - [x] **VGEN-05**: Admin can preview generated video and re-generate before publishing to workers
 - [x] **VGEN-06**: Video generation shows async progress with named stages (analyzing → generating → adding narration → finalizing)
-- [ ] **VGEN-07**: Workers can access the video version of an SOP from within the existing SOP view with an in-app video player
-- [ ] **VGEN-08**: Video player supports chapter navigation, timestamp jumps, and playback speed control
+- [x] **VGEN-07**: Workers can access the video version of an SOP from within the existing SOP view with an in-app video player
+- [x] **VGEN-08**: Video player supports chapter navigation, timestamp jumps, and playback speed control
 - [x] **VGEN-09**: Worker video viewing is tracked as a completion event alongside text walkthrough completions
 
 ### Shared Infrastructure
@@ -214,8 +214,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VGEN-04 | Phase 8 | Complete |
 | VGEN-05 | Phase 8 | Complete |
 | VGEN-06 | Phase 8 | Complete |
-| VGEN-07 | Phase 8 | Pending |
-| VGEN-08 | Phase 8 | Pending |
+| VGEN-07 | Phase 8 | Complete |
+| VGEN-08 | Phase 8 | Complete |
 | VGEN-09 | Phase 8 | Complete |
 | INFRA-03 | Phase 8 | Complete |
 

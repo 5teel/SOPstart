@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Expanded File Intake** - TUS upload infrastructure, photo OCR, Excel/PowerPoint/text parsing, and shared intake routing (completed 2026-04-03)
 - [x] **Phase 6: Video Transcription (Upload and URL)** - MP4/MOV file upload and YouTube URL → structured SOP with transcript review (completed 2026-04-03)
 - [ ] **Phase 7: Video Transcription (In-App Recording)** - In-browser camera recording → SOP transcription with iOS Safari fallback
-- [ ] **Phase 8: Video SOP Generation** - AI-narrated slideshow, screen-recording-style, and full AI video generated from published SOPs
+- [x] **Phase 8: Video SOP Generation** - AI-narrated slideshow, screen-recording-style, and full AI video generated from published SOPs (completed 2026-04-04)
 
 ## Phase Details
 
@@ -166,8 +166,8 @@ Plans:
 - [x] 08-00-PLAN.md — Wave 0: Playwright test stubs for all VGEN and INFRA-03 requirements (7 test files + config, VGEN-03 marked DEFERRED per D-01)
 - [x] 08-01-PLAN.md — Foundation: DB migration (video_generation_jobs), TypeScript types, Zod validators, TTS module (gpt-4o-mini-tts), Shotstack API client
 - [x] 08-02-PLAN.md — Generation pipeline: narrated slideshow builder, screen-recording builder, pipeline orchestrator, API route, server actions
-- [ ] 08-03-PLAN.md — TBD
-- [ ] 08-04-PLAN.md — TBD
+- [x] 08-03-PLAN.md — TBD
+- [x] 08-04-PLAN.md — TBD
 
 ## Progress
 
@@ -183,4 +183,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 5. Expanded File Intake | 4/4 | Complete   | 2026-04-03 |
 | 6. Video Transcription (Upload and URL) | 5/5 | Complete   | 2026-04-03 |
 | 7. Video Transcription (In-App Recording) | 0/1 | In progress | - |
-| 8. Video SOP Generation | 1/TBD | In progress | - |
+| 8. Video SOP Generation | 5/5 | Complete   | 2026-04-04 |
