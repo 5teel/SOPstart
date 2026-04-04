@@ -30,5 +30,9 @@ export default defineConfig({
       name: 'phase6-stubs',
       testMatch: /video-upload|youtube-url|youtube-no-captions|stage-progress|transcript-review|publish-gate|safety-warning/,
     },
+    {
+      name: 'phase8-stubs',
+      testMatch: /video-gen-slideshow|video-gen-scroll|video-chapters|video-admin-preview|video-player|video-completion|sw-video-exclusion/,
+    },
   ],
 })
