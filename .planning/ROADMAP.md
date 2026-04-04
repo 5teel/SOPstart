@@ -162,6 +162,13 @@ Plans:
 **Plans**: TBD
 **UI hint**: yes
 
+Plans:
+- [x] 08-00-PLAN.md — Wave 0: Playwright test stubs for all VGEN and INFRA-03 requirements (7 test files + config, VGEN-03 marked DEFERRED per D-01)
+- [ ] 08-01-PLAN.md — TBD
+- [ ] 08-02-PLAN.md — TBD
+- [ ] 08-03-PLAN.md — TBD
+- [ ] 08-04-PLAN.md — TBD
+
 ## Progress
 
 **Execution Order:**
@@ -176,4 +183,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 5. Expanded File Intake | 4/4 | Complete   | 2026-04-03 |
 | 6. Video Transcription (Upload and URL) | 5/5 | Complete   | 2026-04-03 |
 | 7. Video Transcription (In-App Recording) | 0/1 | In progress | - |
-| 8. Video SOP Generation | 0/TBD | Not started | - |
+| 8. Video SOP Generation | 1/TBD | In progress | - |
