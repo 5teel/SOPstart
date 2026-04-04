@@ -1,11 +1,13 @@
 'use client'
-import { AlertTriangle, ShieldCheck, ListChecks, Siren } from 'lucide-react'
+import { AlertTriangle, ShieldCheck, ListChecks, Siren, Play } from 'lucide-react'
 import type { SopSection } from '@/types/sop'
 
 interface SopSectionTabsProps {
   sections: SopSection[]
   activeType: string
   onTabChange: (type: string) => void
+  hasVideo?: boolean
+  videoOutdated?: boolean
 }
 
 const SECTION_DISPLAY_NAMES: Record<string, string> = {
@@ -45,7 +47,7 @@ function getTabColors(sectionType: string): TabColorConfig {
   return SECTION_COLORS[sectionType] ?? { active: 'text-steel-100', border: 'border-steel-100', icon: null }
 }
 
-export function SopSectionTabs({ sections, activeType, onTabChange }: SopSectionTabsProps) {
+export function SopSectionTabs({ sections, activeType, onTabChange, hasVideo, videoOutdated }: SopSectionTabsProps) {
   // Sort by sort_order
   const sorted = [...sections].sort((a, b) => a.sort_order - b.sort_order)
 
@@ -73,6 +75,30 @@ export function SopSectionTabs({ sections, activeType, onTabChange }: SopSection
           </button>
         )
       })}
+      {hasVideo && (
+        <button
+          type="button"
+          onClick={() => onTabChange('video')}
+          className={[
+            'flex-shrink-0 flex flex-col items-center justify-end px-4 h-[52px] gap-1 relative whitespace-nowrap',
+            'text-[13px] font-semibold transition-colors',
+            activeType === 'video'
+              ? 'text-brand-yellow border-b-2 border-brand-yellow'
+              : 'text-steel-400 hover:text-steel-100',
+          ].join(' ')}
+        >
+          <span className="flex items-center gap-1">
+            <Play size={16} />
+            Video
+            {videoOutdated && (
+              <span
+                className="w-2 h-2 rounded-full bg-brand-orange"
+                aria-label="Video is outdated"
+              />
+            )}
+          </span>
+        </button>
+      )}
     </div>
   )
 }

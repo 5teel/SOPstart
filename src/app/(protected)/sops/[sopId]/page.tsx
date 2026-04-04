@@ -4,14 +4,20 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { ArrowLeft, Download, CheckCircle } from 'lucide-react'
 import { useSopDetail } from '@/hooks/useSopDetail'
+import { useVideoGeneration } from '@/hooks/useVideoGeneration'
+import { useNetworkStore } from '@/stores/network'
 import { SopSectionTabs } from '@/components/sop/SopSectionTabs'
 import { SectionContent } from '@/components/sop/SectionContent'
+import { VideoTabPanel } from '@/components/sop/VideoTabPanel'
+import type { ChapterMarker } from '@/types/sop'
 
 export default function SopDetailPage() {
   const params = useParams()
   const sopId = params.sopId as string
 
   const { data: sop, isLoading, isError } = useSopDetail(sopId)
+  const { data: videoJob } = useVideoGeneration(sopId)
+  const isOnline = useNetworkStore((s) => s.isOnline)
 
   // Default active tab: prefer 'steps', fall back to first section
   const [activeTab, setActiveTab] = useState<string>('')
@@ -28,6 +34,17 @@ export default function SopDetailPage() {
 
   const activeSection = sop?.sop_sections.find((s) => s.section_type === activeTab)
   const isStepsTab = activeTab === 'steps'
+  const isVideoTab = activeTab === 'video'
+
+  // Video tab visibility: only when online and published video exists (D-04, Pitfall 7)
+  const hasVideo = isOnline && !!videoJob?.video_url && videoJob.published
+
+  // Outdated check: compare SOP updated_at vs video completed_at (D-10, Pitfall 5 — use completed_at not created_at)
+  const videoOutdated =
+    hasVideo &&
+    !!sop?.updated_at &&
+    !!videoJob?.completed_at &&
+    new Date(sop.updated_at) > new Date(videoJob.completed_at)
 
   if (isLoading) {
     return (
@@ -117,20 +134,31 @@ export default function SopDetailPage() {
             sections={sop.sop_sections}
             activeType={activeTab}
             onTabChange={setActiveTab}
+            hasVideo={hasVideo}
+            videoOutdated={!!videoOutdated}
           />
         </div>
       )}
 
       {/* Scroll area */}
       <div className="flex-1 overflow-y-auto px-4 py-6 pb-[80px]">
-        {activeSection ? (
+        {isVideoTab && videoJob?.video_url && videoJob.chapter_markers ? (
+          <VideoTabPanel
+            videoUrl={videoJob.video_url}
+            chapters={videoJob.chapter_markers as ChapterMarker[]}
+            videoJobId={videoJob.id}
+            sopId={sopId}
+            sopVersion={videoJob.sop_version}
+            isOutdated={!!videoOutdated}
+          />
+        ) : activeSection ? (
           <SectionContent section={activeSection} />
         ) : (
           <p className="text-sm text-steel-400">No content for this section.</p>
         )}
       </div>
 
-      {/* Bottom action bar — Steps tab only */}
+      {/* Bottom action bar — Steps tab only (hidden for video tab) */}
       {isStepsTab && (
         <div className="sticky bottom-[56px] bg-steel-900 border-t border-steel-700 px-4 py-3">
           <Link
