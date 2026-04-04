@@ -64,7 +64,6 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
   // Recorded data
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null)
   const [audioFile, setAudioFile] = useState<File | null>(null)
-  const [selectedMime, setSelectedMime] = useState('')
 
   // Refs
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -199,6 +198,19 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
   }, [facingMode, recorderState, startCamera])
 
   // ---------------------------------------------------------------------------
+  // Internal toast
+  // ---------------------------------------------------------------------------
+
+  const [internalToast, setInternalToast] = useState<string | null>(null)
+  const showToastInternal = useCallback((msg: string) => {
+    setInternalToast(msg)
+    setTimeout(() => setInternalToast(null), 5000)
+  }, [])
+  // Stable ref so setInterval closure doesn't capture stale version
+  const showToastInternalRef = useRef(showToastInternal)
+  useEffect(() => { showToastInternalRef.current = showToastInternal }, [showToastInternal])
+
+  // ---------------------------------------------------------------------------
   // Start recording
   // ---------------------------------------------------------------------------
 
@@ -206,7 +218,6 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
     if (!streamRef.current || recorderState !== 'ready') return
 
     const mime = selectMimeType()
-    setSelectedMime(mime)
     chunksRef.current = []
 
     const recorder = new MediaRecorder(streamRef.current, {
@@ -257,7 +268,7 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
             mediaRecorderRef.current.stop()
           }
           clearTimer()
-          showToastInternal('Maximum recording length reached (15 minutes).')
+          showToastInternalRef.current('Maximum recording length reached (15 minutes).')
         }
         return next
       })
@@ -276,16 +287,6 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
       mediaRecorderRef.current.stop()
     }
   }, [recorderState, clearTimer])
-
-  // ---------------------------------------------------------------------------
-  // Internal toast (we don't have a showToast prop; use simple mechanism)
-  // ---------------------------------------------------------------------------
-
-  const [internalToast, setInternalToast] = useState<string | null>(null)
-  const showToastInternal = useCallback((msg: string) => {
-    setInternalToast(msg)
-    setTimeout(() => setInternalToast(null), 5000)
-  }, [])
 
   // ---------------------------------------------------------------------------
   // Close handling

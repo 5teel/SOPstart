@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, useEffect, useCallback } from 'react'
+import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { X, Loader2 } from 'lucide-react'
 import { createVideoUploadSession } from '@/actions/sops'
 import { tusUpload } from '@/lib/upload/tus-upload'
@@ -43,7 +43,6 @@ export function VideoPreviewPanel({
   const [panelState, setPanelState] = useState<PreviewState>('reviewing')
   const [uploadProgress, setUploadProgress] = useState(0)
   const [duration, setDuration] = useState<number | null>(null)
-  const [objectUrl, setObjectUrl] = useState<string | null>(null)
   const [toast, setToast] = useState<string | null>(null)
 
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -51,16 +50,16 @@ export function VideoPreviewPanel({
   const closeButtonRef = useRef<HTMLButtonElement>(null)
 
   // ---------------------------------------------------------------------------
-  // Object URL lifecycle
+  // Object URL lifecycle — use useMemo to avoid setState-in-effect lint error
   // ---------------------------------------------------------------------------
 
+  const objectUrl = useMemo(() => URL.createObjectURL(videoBlob), [videoBlob])
+
   useEffect(() => {
-    const url = URL.createObjectURL(videoBlob)
-    setObjectUrl(url)
     return () => {
-      URL.revokeObjectURL(url)
+      URL.revokeObjectURL(objectUrl)
     }
-  }, [videoBlob])
+  }, [objectUrl])
 
   // ---------------------------------------------------------------------------
   // Duration from video metadata
