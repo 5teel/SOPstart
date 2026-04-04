@@ -43,12 +43,14 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 - ✓ Missing hazards/PPE section warnings — Phase 6
 - ✓ Named processing stages with progress indicators — Phase 6
 
+- ✓ In-browser video recording with MediaRecorder (Android/Chrome) — Phase 7
+- ✓ iOS guided fallback to native camera + file upload — Phase 7
+
 ### Active
 
 <!-- Current scope. Building toward these. -->
 
 #### Pathway 1 — Video → SOP (remaining)
-- Record video in-app from device camera, transcribe to SOP
 - Vimeo URL support (deferred from Phase 6)
 
 #### Pathway 3 — File → Video SOP
@@ -122,4 +124,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-03 — Phase 6 (Video Transcription) complete*
+*Last updated: 2026-04-04 — Phase 7 (In-App Recording) complete*
