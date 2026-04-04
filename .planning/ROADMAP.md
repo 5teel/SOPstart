@@ -143,8 +143,11 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Admin can tap "Record video" on Android/Chrome and capture a procedure directly in the browser; on submission the recording is transcribed into a structured SOP via the same pipeline as uploaded videos
   2. On iOS devices where MediaRecorder is unsupported or unreliable, the admin sees an explicit fallback message directing them to use file upload instead of silently failing
-**Plans**: TBD
+**Plans**: 1 plan
 **UI hint**: yes
+
+Plans:
+- [ ] 07-01-PLAN.md — VideoRecorder overlay (full-screen camera recording, 15-min timer, audio extraction, preview) + UploadDropzone Record tab with iOS fallback
 
 ### Phase 8: Video SOP Generation
 **Goal**: Admins can generate narrated slideshow, screen-recording-style, and full AI video versions of any published SOP, workers can watch those videos with chapter navigation from within the SOP view, and video viewing is tracked as a completion event
@@ -172,5 +175,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 4. Completion and Sign-off | 3/3 | Complete   | 2026-03-26 |
 | 5. Expanded File Intake | 4/4 | Complete   | 2026-04-03 |
 | 6. Video Transcription (Upload and URL) | 5/5 | Complete   | 2026-04-03 |
-| 7. Video Transcription (In-App Recording) | 0/TBD | Not started | - |
+| 7. Video Transcription (In-App Recording) | 0/1 | In progress | - |
 | 8. Video SOP Generation | 0/TBD | Not started | - |
