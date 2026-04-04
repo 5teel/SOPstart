@@ -9,6 +9,7 @@ interface VideoAdminPreviewProps {
   videoUrl: string
   jobId: string
   sopId: string
+  format: 'narrated_slideshow' | 'screen_recording'
   isPublished: boolean
   isOutdated: boolean
 }
@@ -19,6 +20,7 @@ export default function VideoAdminPreview({
   videoUrl,
   jobId,
   sopId,
+  format,
   isPublished,
   isOutdated,
 }: VideoAdminPreviewProps) {
@@ -38,7 +40,7 @@ export default function VideoAdminPreview({
         await publishVideo(jobId)
         router.refresh()
       } else if (confirmAction === 'regenerate') {
-        await regenerateVideo(jobId)
+        await regenerateVideo(sopId, format)
         router.refresh()
       } else if (confirmAction === 'delete') {
         await deleteVideoJob(jobId)

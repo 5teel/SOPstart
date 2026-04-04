@@ -229,6 +229,7 @@ export default function VideoGeneratePanel({ sop, existingJob }: VideoGeneratePa
               videoUrl={activeJob.video_url}
               jobId={activeJobId}
               sopId={sop.id}
+              format={activeJob.format}
               isPublished={false}
               isOutdated={outdated}
             />
@@ -246,6 +247,7 @@ export default function VideoGeneratePanel({ sop, existingJob }: VideoGeneratePa
               videoUrl={activeJob.video_url}
               jobId={activeJobId}
               sopId={sop.id}
+              format={activeJob.format}
               isPublished={true}
               isOutdated={outdated}
             />
