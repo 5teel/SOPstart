@@ -129,7 +129,7 @@ Carried forward from Phase 07 — no new tokens added.
 | `green-400` | Generation complete checkmark; publish success state | `text-green-400` |
 | `blue-400` | Generation in-progress spinner (non-verifying stages) | `text-blue-400` |
 | `amber-400` | Hover state for brand-yellow buttons | `hover:bg-amber-400` |
-| `steel-700` | Secondary buttons ("Cancel", "Re-generate" ghost style, "Keep old video" in discard confirm) | `bg-steel-700` |
+| `steel-700` | Secondary buttons ("Keep current video", "Keep video", "Not yet" dismiss labels, "Keep old video" in discard confirm) | `bg-steel-700` |
 
 **Accent reservation rule:** `brand-yellow` must not appear on informational elements, status text, secondary action buttons, chapter timestamps, or the unselected format card. Secondary action buttons use `bg-steel-700 text-steel-100`.
 
@@ -376,9 +376,9 @@ Same amber banner pattern as `AdversarialFlagBanner`:
 | Generation in progress | Stage stepper advances via Supabase Realtime on `video_generation_jobs` table updates (same pattern as `parse_jobs`). Polling fallback after 5s if Realtime silent. |
 | Generation completes | Stage stepper all green; show `VideoAdminPreview` with video player and action bar |
 | Generation fails | Failure card: stage name of failure + brief error + "Re-generate" link + "Delete" link |
-| Admin taps "Re-generate" (after failure or from preview) | Inline confirm: "Re-generate this video? The current video will be replaced." — [Yes, re-generate] (`bg-brand-orange`) + [Cancel] (`bg-steel-700`) |
+| Admin taps "Re-generate" (after failure or from preview) | Inline confirm: "Re-generate this video? The current video will be replaced." — [Yes, re-generate] (`bg-brand-orange`) + [Keep current video] (`bg-steel-700`) |
 | Admin confirms re-generate | Create new generation job (idempotency D-14: server checks for in-progress job first); show stage stepper from step 1 |
-| Admin taps "Publish video" | Inline confirm: "Publish this video? Workers will see it in the SOP video tab." — [Yes, publish] (`bg-brand-yellow text-steel-900`) + [Cancel] (`bg-steel-700`) |
+| Admin taps "Publish video" | Inline confirm: "Publish this video? Workers will see it in the SOP video tab." — [Yes, publish] (`bg-brand-yellow text-steel-900`) + [Not yet] (`bg-steel-700`) |
 | Admin confirms publish | Update `video_generation_jobs.published = true`; navigate back to `/admin/sops` with success toast: "Video published." |
 | Admin arrives at video page — video already generated and published | Show `VideoAdminPreview` with existing video (no format selector); show "Re-generate" and "Unpublish" buttons |
 | Admin arrives at video page — video already generated but not published | Show `VideoAdminPreview` with existing video; show "Re-generate" and "Publish video" buttons |
@@ -400,9 +400,9 @@ Same amber banner pattern as `AdversarialFlagBanner`:
 
 | Action | Approach |
 |--------|----------|
-| Re-generate (replaces existing video) | Inline confirm within `VideoAdminPreview`: "Re-generate this video? The current video will be replaced." — [Yes, re-generate] (`bg-brand-orange`) + [Cancel] (`bg-steel-700`). No modal dialog. |
-| Delete generated video | Inline confirm: "Delete this generated video? Workers will no longer see a video for this SOP." — [Yes, delete] (`bg-red-600 text-steel-100`) + [Cancel] (`bg-steel-700`). Only available from failed state or admin video page (not from review page). |
-| Publish video | Inline confirm: "Publish this video? Workers will see it in the SOP video tab." — [Yes, publish] (`bg-brand-yellow text-steel-900`) + [Cancel] (`bg-steel-700`). |
+| Re-generate (replaces existing video) | Inline confirm within `VideoAdminPreview`: "Re-generate this video? The current video will be replaced." — [Yes, re-generate] (`bg-brand-orange`) + [Keep current video] (`bg-steel-700`). No modal dialog. |
+| Delete generated video | Inline confirm: "Delete this generated video? Workers will no longer see a video for this SOP." — [Yes, delete] (`bg-red-600 text-steel-100`) + [Keep video] (`bg-steel-700`). Only available from failed state or admin video page (not from review page). |
+| Publish video | Inline confirm: "Publish this video? Workers will see it in the SOP video tab." — [Yes, publish] (`bg-brand-yellow text-steel-900`) + [Not yet] (`bg-steel-700`). |
 
 ---
 
@@ -456,9 +456,9 @@ Same amber banner pattern as `AdversarialFlagBanner`:
 
 | Action | Confirm copy | Confirm button |
 |--------|-------------|----------------|
-| Re-generate | "Re-generate this video? The current video will be replaced." — [Yes, re-generate] [Cancel] | `bg-brand-orange text-steel-100` |
-| Delete generated video | "Delete this generated video? Workers will no longer see a video for this SOP." — [Yes, delete] [Cancel] | `bg-red-600 text-steel-100` |
-| Publish video | "Publish this video? Workers will see it in the SOP video tab." — [Yes, publish] [Cancel] | `bg-brand-yellow text-steel-900` |
+| Re-generate | "Re-generate this video? The current video will be replaced." — [Yes, re-generate] [Keep current video] | `bg-brand-orange text-steel-100` |
+| Delete generated video | "Delete this generated video? Workers will no longer see a video for this SOP." — [Yes, delete] [Keep video] | `bg-red-600 text-steel-100` |
+| Publish video | "Publish this video? Workers will see it in the SOP video tab." — [Yes, publish] [Not yet] | `bg-brand-yellow text-steel-900` |
 
 ---
 
@@ -647,37 +647,3 @@ Not applicable. No shadcn initialized. No third-party component registries decla
 | Supabase Realtime polling hybrid | `ParseJobStatus.tsx` — same 5s fallback pattern |
 | "Video" tab in SopSectionTabs | CONTEXT.md D-04 |
 | Inline player + chapter list | CONTEXT.md D-05 |
-| Optional admin preview | CONTEXT.md D-06 |
-| Global NZ vocabulary only | CONTEXT.md D-07 |
-| TTS section split | CONTEXT.md D-08 |
-| No auto-delete TTL | CONTEXT.md D-09 |
-| "Video is outdated" timestamp comparison | CONTEXT.md D-10 |
-| Generated videos excluded from SW cache | CONTEXT.md D-11, INFRA-03 |
-| Shotstack for rendering | CONTEXT.md D-12 |
-| video_generation_jobs FSM | CONTEXT.md D-13 |
-| Idempotency (return existing job) | CONTEXT.md D-14 |
-| Completion tracking (80% threshold) | CONTEXT.md D-15 — Claude's Discretion; VGEN-09 |
-| Format cards UI (2 formats only) | CONTEXT.md D-01 — avatar deferred |
-| Narrated slideshow structure | CONTEXT.md D-02 |
-| Screen-recording style structure | CONTEXT.md D-03 |
-| Admin SOP library "Video" action button | Extending existing pattern in `admin/sops/page.tsx` |
-| NZ-locale tone | Existing `ParseJobStatus.tsx` ("hot drink", "smoko" patterns) |
-
----
-
-## Checker Sign-Off
-
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
-
-**Approval:** pending
-
----
-
-*Phase: 08-video-sop-generation*
-*UI-SPEC created: 2026-04-04*
-*Status: draft — awaiting checker validation*
