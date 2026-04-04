@@ -19,7 +19,11 @@ const serwist = new Serwist({
     ...defaultCache,
     {
       matcher({ url }: { url: URL }) {
-        return url.hostname.includes('supabase.co') && url.pathname.includes('/storage/')
+        return (
+          url.hostname.includes('supabase.co') &&
+          url.pathname.includes('/storage/') &&
+          !url.pathname.includes('/sop-generated-videos/')
+        )
       },
       handler: new CacheFirst({
         cacheName: 'sop-images-v1',
