@@ -34,5 +34,9 @@ export default defineConfig({
       name: 'phase8-stubs',
       testMatch: /video-gen-slideshow|video-gen-scroll|video-chapters|video-admin-preview|video-player|video-completion|sw-video-exclusion/,
     },
+    {
+      name: 'phase9-stubs',
+      testMatch: /pipeline-entry|pipeline-linkage|pipeline-autoqueue|pipeline-progress|pipeline-failure-recovery|pipeline-review-gate/,
+    },
   ],
 })
