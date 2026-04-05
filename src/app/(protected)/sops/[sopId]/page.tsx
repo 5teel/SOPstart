@@ -144,7 +144,7 @@ export default function SopDetailPage() {
       <div className="flex-1 overflow-y-auto px-4 py-6 pb-[80px]">
         {isVideoTab && videoJob?.video_url && videoJob.chapter_markers ? (
           <VideoTabPanel
-            videoUrl={videoJob.video_url}
+            videoUrl={`/api/videos/${videoJob.id}/stream`}
             chapters={videoJob.chapter_markers as ChapterMarker[]}
             videoJobId={videoJob.id}
             sopId={sopId}

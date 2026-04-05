@@ -226,7 +226,7 @@ export default function VideoGeneratePanel({ sop, existingJob }: VideoGeneratePa
               initialStatus="ready"
             />
             <VideoAdminPreview
-              videoUrl={activeJob.video_url}
+              videoUrl={`/api/videos/${activeJobId}/stream`}
               jobId={activeJobId}
               sopId={sop.id}
               format={activeJob.format}
@@ -244,7 +244,7 @@ export default function VideoGeneratePanel({ sop, existingJob }: VideoGeneratePa
               initialStatus="ready"
             />
             <VideoAdminPreview
-              videoUrl={activeJob.video_url}
+              videoUrl={`/api/videos/${activeJobId}/stream`}
               jobId={activeJobId}
               sopId={sop.id}
               format={activeJob.format}

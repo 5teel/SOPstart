@@ -155,8 +155,9 @@ async function downloadAndReuploadVideo(
     throw new Error(`Failed to upload rendered video to Storage: ${error.message}`)
   }
 
-  const { data: urlData } = admin.storage.from('sop-generated-videos').getPublicUrl(path)
-  return urlData.publicUrl
+  // Return the storage path — consumers generate signed URLs at playback time
+  // via /api/videos/[jobId]/stream. The bucket is private so public URLs don't work.
+  return path
 }
 
 /**
