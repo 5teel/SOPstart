@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { generateVideoSchema } from '@/lib/validators/sop'
@@ -103,9 +103,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to create video generation job' }, { status: 500 })
   }
 
-  // 6. Fire-and-forget: run the pipeline without awaiting
-  void runVideoGenerationPipeline(newJob.id).catch((err) => {
-    console.error(`[generate-video] Unhandled pipeline error for job ${newJob.id}:`, err)
+  // 6. Run the pipeline after response is sent — after() keeps the serverless
+  // function alive for the pipeline's duration (up to maxDuration=300s).
+  // A plain void call would be killed by Next.js once the response returns.
+  after(async () => {
+    try {
+      await runVideoGenerationPipeline(newJob.id)
+    } catch (err) {
+      console.error(`[generate-video] Unhandled pipeline error for job ${newJob.id}:`, err)
+    }
   })
 
   // 7. Return 202 Accepted with the new job ID
