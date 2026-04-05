@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { Users, History, Video } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import type { SopStatus } from '@/types/sop'
@@ -139,29 +140,32 @@ export default async function SopsLibraryPage({
                 <StatusBadge status={sop.status as SopStatus} />
               </Link>
               {sop.status === 'published' && (
-                <>
+                <div className="flex flex-col gap-1 flex-shrink-0">
                   <Link
                     href={`/admin/sops/${sop.id}/assign`}
-                    className="flex items-center px-3 bg-steel-800 border border-steel-700 rounded-lg hover:bg-steel-700 hover:border-steel-600 transition-colors text-xs font-medium text-steel-400 hover:text-steel-100 flex-shrink-0 whitespace-nowrap"
-                    title="Assign to roles or workers"
+                    className="flex items-center justify-center w-10 h-10 rounded-lg bg-steel-800 border border-steel-700 hover:bg-steel-700 hover:border-steel-600 transition-colors text-steel-400 hover:text-steel-100"
+                    title="Assign to team"
+                    aria-label="Assign to team"
                   >
-                    Assign
+                    <Users className="h-4 w-4" />
                   </Link>
                   <Link
                     href={`/admin/sops/${sop.id}/versions`}
-                    className="flex items-center px-3 bg-steel-800 border border-steel-700 rounded-lg hover:bg-steel-700 hover:border-steel-600 transition-colors text-xs font-medium text-steel-400 hover:text-steel-100 flex-shrink-0 whitespace-nowrap"
-                    title="View version history"
+                    className="flex items-center justify-center w-10 h-10 rounded-lg bg-steel-800 border border-steel-700 hover:bg-steel-700 hover:border-steel-600 transition-colors text-steel-400 hover:text-steel-100"
+                    title="Version history"
+                    aria-label="Version history"
                   >
-                    Versions
+                    <History className="h-4 w-4" />
                   </Link>
                   <Link
                     href={`/admin/sops/${sop.id}/video`}
-                    className="flex items-center px-3 bg-steel-800 border border-steel-700 rounded-lg hover:bg-steel-700 hover:border-steel-600 transition-colors text-xs font-medium text-steel-400 hover:text-steel-100 flex-shrink-0 whitespace-nowrap"
+                    className="flex items-center justify-center w-10 h-10 rounded-lg bg-steel-800 border border-steel-700 hover:bg-steel-700 hover:border-steel-600 transition-colors text-steel-400 hover:text-steel-100"
                     title="Generate video"
+                    aria-label="Generate video"
                   >
-                    Video
+                    <Video className="h-4 w-4" />
                   </Link>
-                </>
+                </div>
               )}
             </li>
           ))}
