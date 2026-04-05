@@ -234,10 +234,32 @@ export default function ReviewClient({
         </div>
       </header>
 
-      {/* Publish success banner */}
+      {/* Publish success banner with next-step actions */}
       {publishSuccess && (
-        <div className="bg-green-500/20 border border-green-500/40 text-green-400 rounded-lg px-4 py-3 text-sm mx-6 mt-4">
-          SOP published successfully! It is now visible in the library.
+        <div className="bg-green-500/20 border border-green-500/40 rounded-lg px-4 py-4 mx-6 mt-4">
+          <p className="text-green-400 text-sm font-semibold mb-3">
+            SOP published successfully. It&apos;s now in the library. What&apos;s next?
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href={`/admin/sops/${sop.id}/assign`}
+              className="min-h-[44px] px-4 flex items-center bg-brand-yellow text-steel-900 font-semibold rounded-lg hover:bg-amber-400 active:bg-amber-500 transition-colors"
+            >
+              Assign to team
+            </Link>
+            <Link
+              href={`/admin/sops/${sop.id}/video`}
+              className="min-h-[44px] px-4 flex items-center bg-steel-700 text-steel-100 font-semibold rounded-lg hover:bg-steel-600 active:bg-steel-500 transition-colors"
+            >
+              Generate video
+            </Link>
+            <Link
+              href="/admin/sops"
+              className="min-h-[44px] px-4 flex items-center bg-steel-800 text-steel-300 font-semibold rounded-lg hover:bg-steel-700 transition-colors"
+            >
+              Back to library
+            </Link>
+          </div>
         </div>
       )}
 
