@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Worker Experience** - Step-by-step walkthrough, offline access, SOP library, and assignment (completed 2026-03-25)
 - [x] **Phase 4: Completion and Sign-off** - Completion tracking, photo evidence, and supervisor sign-off (completed 2026-03-26)
 - [x] **Phase 5: Expanded File Intake** - TUS upload infrastructure, photo OCR, Excel/PowerPoint/text parsing, and shared intake routing (completed 2026-04-03)
-- [x] **Phase 6: Video Transcription (Upload and URL)** - MP4/MOV file upload and YouTube URL → structured SOP with transcript review (completed 2026-04-03)
+- [x] **Phase 6: Video Transcription (Upload and URL)** - MP4/MOV file upload and YouTube URL → structured SOP with transcript review (completed 2026-04-03)
 - [ ] **Phase 7: Video Transcription (In-App Recording)** - In-browser camera recording → SOP transcription with iOS Safari fallback
 - [x] **Phase 8: Video SOP Generation** - AI-narrated slideshow, screen-recording-style, and full AI video generated from published SOPs (completed 2026-04-04)
 - [ ] **Phase 9: Streamlined File → Video Pipeline** - One-click upload-to-video SOP flow chaining file parsing and video generation
@@ -173,10 +173,22 @@ Plans:
 ### Phase 9: Streamlined File → Video Pipeline
 **Goal**: Admin can upload a source file (docx/pdf/image/xlsx/pptx/video) and reach a generated video SOP in a single guided flow without manually navigating between parse review, publish, and video generation as three separate steps
 **Depends on**: Phase 5, Phase 8
-**Requirements**: TBD (to be derived during discuss-phase)
-**Success Criteria**: TBD
-**Plans**: TBD
+**Requirements**: PATH-01, PATH-02, PATH-03, PATH-04, PATH-05, PATH-06
+**Success Criteria** (what must be TRUE):
+  1. Admin clicks "Generate video SOP" on UploadDropzone, selects a format in a modal, picks a file, and is landed on a unified progress page
+  2. A single pipeline_run_id links upload → parse_job → sop → video_generation_job for stepper rendering and audit
+  3. Publishing a pipeline-linked SOP auto-queues video generation with the format chosen at upload; the existing publish review gate is preserved exactly
+  4. The progress page renders 5 named stages (Uploading, Parsing, Review, Generating video, Ready) with deep-link CTAs to the review page and video panel
+  5. Video generation failure after publish keeps the SOP published and routes the admin to the existing video panel retry path
+**Plans**: 5 plans
 **UI hint**: yes
+
+Plans:
+- [ ] 09-00-PLAN.md — Wave 0: Playwright test stubs for all six PATH requirements (pipeline-entry, pipeline-linkage, pipeline-autoqueue, pipeline-progress, pipeline-failure-recovery, pipeline-review-gate)
+- [ ] 09-01-PLAN.md — Foundation: sop_pipeline_runs migration + pipeline_run_id FKs on parse_jobs/sops/video_generation_jobs, type + validator extensions, createVideoSopPipelineSession server action
+- [ ] 09-02-PLAN.md — Entry UI: "Generate video SOP" button on UploadDropzone + VideoFormatSelectionModal (file + format picker + upload dispatch + navigate to progress page)
+- [ ] 09-03-PLAN.md — Publish auto-queue: enqueueVideoGenerationForPipeline helper + publish route extension (gate preserved, auto-queue runs after successful publish)
+- [ ] 09-04-PLAN.md — Progress page: /admin/sops/pipeline/[pipelineId] route with 5-stage PipelineStepper, realtime+polling hybrid, deep-link CTAs, ReviewClient back-to-pipeline breadcrumb
 
 ## Progress
 
@@ -193,4 +205,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 6. Video Transcription (Upload and URL) | 5/5 | Complete   | 2026-04-03 |
 | 7. Video Transcription (In-App Recording) | 1/1 | Complete   | 2026-04-04 |
 | 8. Video SOP Generation | 5/5 | Complete   | 2026-04-04 |
-| 9. Streamlined File → Video Pipeline | 0/? | Pending | - |
+| 9. Streamlined File → Video Pipeline | 0/5 | Pending | - |
