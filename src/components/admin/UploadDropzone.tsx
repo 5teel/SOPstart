@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, useCallback, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   Upload,
   FileText,
@@ -81,10 +82,12 @@ function FileIcon({ mimeType }: { mimeType: string }) {
 }
 
 export function UploadDropzone() {
+  const router = useRouter()
   const [dragOver, setDragOver] = useState(false)
   const [queue, setQueue] = useState<QueuedFile[]>([])
   const [uploading, setUploading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [uploadedSopIds, setUploadedSopIds] = useState<string[]>([])
   const [toast, setToast] = useState<string | null>(null)
   const [scannerOpen, setScannerOpen] = useState(false)
   const [mode, setMode] = useState<'upload' | 'youtube' | 'record'>('upload')
@@ -401,6 +404,7 @@ export function UploadDropzone() {
               setQueue(prev => prev.map(f =>
                 f.id === item.id ? { ...f, status: 'uploaded' as FileStatus } : f
               ))
+              setUploadedSopIds(prev => [...prev, session.sopId])
               resolve()
             },
             onError: (err) => {
@@ -439,6 +443,7 @@ export function UploadDropzone() {
         setQueue(prev => prev.map(f =>
           f.id === item.id ? { ...f, status: 'uploaded' as FileStatus } : f
         ))
+        setUploadedSopIds(prev => [...prev, session.sopId])
       }
     }
 
@@ -731,9 +736,43 @@ export function UploadDropzone() {
           )}
 
           {/* Success banner */}
-          {success && (
-            <div className="mt-4 bg-green-500/20 border border-green-500/40 text-green-400 rounded-lg px-4 py-3 text-sm">
-              Files uploaded successfully. Parsing will begin shortly.
+          {success && uploadedSopIds.length > 0 && (
+            <div className="mt-4 bg-green-500/20 border border-green-500/40 rounded-lg px-4 py-4">
+              <p className="text-green-400 text-sm mb-3">
+                {uploadedSopIds.length === 1
+                  ? 'File uploaded — AI parsing is running now.'
+                  : `${uploadedSopIds.length} files uploaded — AI parsing is running now.`}
+              </p>
+              <div className="flex gap-2">
+                {uploadedSopIds.length === 1 ? (
+                  <button
+                    type="button"
+                    onClick={() => router.push(`/admin/sops/${uploadedSopIds[0]}/review`)}
+                    className="flex-1 min-h-[44px] px-4 bg-brand-yellow text-steel-900 font-semibold rounded-lg hover:bg-amber-400 active:bg-amber-500 transition-colors"
+                  >
+                    Review parsed SOP
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => router.push('/admin/sops')}
+                    className="flex-1 min-h-[44px] px-4 bg-brand-yellow text-steel-900 font-semibold rounded-lg hover:bg-amber-400 active:bg-amber-500 transition-colors"
+                  >
+                    Go to SOP library
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSuccess(false)
+                    setQueue([])
+                    setUploadedSopIds([])
+                  }}
+                  className="min-h-[44px] px-4 bg-steel-700 text-steel-100 rounded-lg hover:bg-steel-600 transition-colors"
+                >
+                  Upload more
+                </button>
+              </div>
             </div>
           )}
 
