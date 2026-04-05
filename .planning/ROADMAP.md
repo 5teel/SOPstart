@@ -184,7 +184,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 09-00-PLAN.md — Wave 0: Playwright test stubs for all six PATH requirements (pipeline-entry, pipeline-linkage, pipeline-autoqueue, pipeline-progress, pipeline-failure-recovery, pipeline-review-gate)
+- [x] 09-00-PLAN.md — Wave 0: Playwright test stubs for all six PATH requirements (pipeline-entry, pipeline-linkage, pipeline-autoqueue, pipeline-progress, pipeline-failure-recovery, pipeline-review-gate)
 - [ ] 09-01-PLAN.md — Foundation: sop_pipeline_runs migration + pipeline_run_id FKs on parse_jobs/sops/video_generation_jobs, type + validator extensions, createVideoSopPipelineSession server action
 - [ ] 09-02-PLAN.md — Entry UI: "Generate video SOP" button on UploadDropzone + VideoFormatSelectionModal (file + format picker + upload dispatch + navigate to progress page)
 - [ ] 09-03-PLAN.md — Publish auto-queue: enqueueVideoGenerationForPipeline helper + publish route extension (gate preserved, auto-queue runs after successful publish)
@@ -205,4 +205,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 6. Video Transcription (Upload and URL) | 5/5 | Complete   | 2026-04-03 |
 | 7. Video Transcription (In-App Recording) | 1/1 | Complete   | 2026-04-04 |
 | 8. Video SOP Generation | 5/5 | Complete   | 2026-04-04 |
-| 9. Streamlined File → Video Pipeline | 0/5 | Pending | - |
+| 9. Streamlined File → Video Pipeline | 1/5 | In Progress|  |

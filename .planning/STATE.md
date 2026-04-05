@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 9 context gathered (discuss mode) — ready for planning
-last_updated: "2026-04-05T14:25:13.688Z"
-last_activity: 2026-04-04
+stopped_at: Completed 09-00-PLAN.md — phase9-stubs registered, 29 tests across 6 files
+last_updated: "2026-04-05T15:17:42.491Z"
+last_activity: 2026-04-05
 progress:
   total_phases: 9
   completed_phases: 8
-  total_plans: 32
-  completed_plans: 32
-  percent: 100
+  total_plans: 37
+  completed_plans: 33
+  percent: 89
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-23)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 08 — video-sop-generation
+**Current focus:** Phase 9 — streamlined-file-video-pipeline
 
 ## Current Position
 
-Phase: 8
-Plan: 02 (complete) — next: 08-03
-Status: Executing Phase 08
-Last activity: 2026-04-04
+Phase: 9 (streamlined-file-video-pipeline) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-04-05
 
 Progress bar: `[                    ]` 0% (0/4 v2.0 phases)
 
@@ -79,6 +79,7 @@ Progress bar: `[                    ]` 0% (0/4 v2.0 phases)
 | Phase 06 P02 | 471 | 2 tasks | 9 files |
 | Phase 06 P04 | 3m | 2 tasks | 6 files |
 | Phase 08 P04 | 10m | 2 tasks | 5 files |
+| Phase 09-streamlined-file-video-pipeline P00 | 2m | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -154,6 +155,7 @@ Recent decisions affecting current work:
 - [Phase 08-02]: recordVideoView uses submitted_at not completed_at — matches actual sop_completions table schema (completed_at does not exist)
 - [Phase 08-02]: regenerateVideo calls runVideoGenerationPipeline directly (not via fetch) to avoid unnecessary HTTP round-trip
 - [Phase 08]: useNetworkStore used directly in useVideoGeneration — useOnlineStatus hook only registers listeners, returns void; useNetworkStore(s => s.isOnline) is the correct pattern for reading online state
+- [Phase 09-streamlined-file-video-pipeline]: phase9-stubs Playwright project uses filename regex matching all 6 pipeline-*.test.ts files, consistent with phase2/6/8-stubs convention
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -180,6 +182,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T14:25:13.684Z
-Stopped at: Phase 9 context gathered (discuss mode) — ready for planning
-Resume file: .planning/phases/09-streamlined-file-video-pipeline/09-CONTEXT.md
+Last session: 2026-04-05T15:17:42.486Z
+Stopped at: Completed 09-00-PLAN.md — phase9-stubs registered, 29 tests across 6 files
+Resume file: None
