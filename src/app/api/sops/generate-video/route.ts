@@ -70,37 +70,60 @@ export async function POST(request: NextRequest) {
 
   const sopVersion = sop.version
 
-  // 4. Idempotency check (D-14): return existing non-failed job for same SOP + format + version
+  // 4. Idempotency check (D-14): check for existing job for same SOP + format + version.
+  // The UNIQUE constraint covers all statuses, so we must handle failed jobs here too.
   const { data: existingJob } = await admin
     .from('video_generation_jobs')
     .select('id, status')
     .eq('sop_id', sopId)
     .eq('format', format)
     .eq('sop_version', sopVersion)
-    .neq('status', 'failed')
     .maybeSingle()
 
+  let jobId: string
+
   if (existingJob) {
-    return NextResponse.json({ jobId: existingJob.id }, { status: 200 })
-  }
+    if (existingJob.status === 'failed') {
+      // Reset the failed job to queued so the pipeline can retry
+      const { error: resetError } = await admin
+        .from('video_generation_jobs')
+        .update({
+          status: 'queued',
+          current_stage: null,
+          error_message: null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', existingJob.id)
 
-  // 5. Create new job record
-  const { data: newJob, error: insertError } = await admin
-    .from('video_generation_jobs')
-    .insert({
-      organisation_id: organisationId,
-      sop_id: sopId,
-      sop_version: sopVersion,
-      format,
-      status: 'queued',
-      created_by: user.id,
-    })
-    .select('id')
-    .single()
+      if (resetError) {
+        console.error('Video job reset error:', resetError)
+        return NextResponse.json({ error: 'Failed to reset failed job' }, { status: 500 })
+      }
+      jobId = existingJob.id
+    } else {
+      // Job is queued/analyzing/generating_audio/rendering/ready — return it as-is
+      return NextResponse.json({ jobId: existingJob.id }, { status: 200 })
+    }
+  } else {
+    // 5. Create new job record
+    const { data: newJob, error: insertError } = await admin
+      .from('video_generation_jobs')
+      .insert({
+        organisation_id: organisationId,
+        sop_id: sopId,
+        sop_version: sopVersion,
+        format,
+        status: 'queued',
+        created_by: user.id,
+      })
+      .select('id')
+      .single()
 
-  if (insertError || !newJob) {
-    console.error('Video job creation error:', insertError)
-    return NextResponse.json({ error: 'Failed to create video generation job' }, { status: 500 })
+    if (insertError || !newJob) {
+      console.error('Video job creation error:', insertError)
+      return NextResponse.json({ error: 'Failed to create video generation job' }, { status: 500 })
+    }
+    jobId = newJob.id
   }
 
   // 6. Run the pipeline after response is sent — after() keeps the serverless
@@ -108,12 +131,12 @@ export async function POST(request: NextRequest) {
   // A plain void call would be killed by Next.js once the response returns.
   after(async () => {
     try {
-      await runVideoGenerationPipeline(newJob.id)
+      await runVideoGenerationPipeline(jobId)
     } catch (err) {
-      console.error(`[generate-video] Unhandled pipeline error for job ${newJob.id}:`, err)
+      console.error(`[generate-video] Unhandled pipeline error for job ${jobId}:`, err)
     }
   })
 
   // 7. Return 202 Accepted with the new job ID
-  return NextResponse.json({ jobId: newJob.id }, { status: 202 })
+  return NextResponse.json({ jobId }, { status: 202 })
 }
