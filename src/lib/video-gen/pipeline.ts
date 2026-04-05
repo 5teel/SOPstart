@@ -108,9 +108,17 @@ async function uploadAudioBuffer(
     throw new Error(`Failed to upload audio for section ${sectionId}: ${error.message}`)
   }
 
-  // Return the storage URL — the pipeline stores this; presigned URLs are generated at playback time
-  const { data: urlData } = admin.storage.from('sop-generated-videos').getPublicUrl(path)
-  return urlData.publicUrl
+  // Bucket is private — Shotstack needs a signed URL to fetch the audio during rendering.
+  // 1 hour expiry is plenty for a render that takes 30-120 seconds.
+  const { data: signedData, error: signedError } = await admin.storage
+    .from('sop-generated-videos')
+    .createSignedUrl(path, 3600)
+
+  if (signedError || !signedData) {
+    throw new Error(`Failed to create signed URL for section ${sectionId}: ${signedError?.message ?? 'unknown'}`)
+  }
+
+  return signedData.signedUrl
 }
 
 /**
