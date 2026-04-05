@@ -22,6 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Video Transcription (Upload and URL)** - MP4/MOV file upload and YouTube URL → structured SOP with transcript review (completed 2026-04-03)
 - [ ] **Phase 7: Video Transcription (In-App Recording)** - In-browser camera recording → SOP transcription with iOS Safari fallback
 - [x] **Phase 8: Video SOP Generation** - AI-narrated slideshow, screen-recording-style, and full AI video generated from published SOPs (completed 2026-04-04)
+- [ ] **Phase 9: Streamlined File → Video Pipeline** - One-click upload-to-video SOP flow chaining file parsing and video generation
 
 ## Phase Details
 
@@ -169,10 +170,18 @@ Plans:
 - [x] 08-03-PLAN.md — TBD
 - [x] 08-04-PLAN.md — TBD
 
+### Phase 9: Streamlined File → Video Pipeline
+**Goal**: Admin can upload a source file (docx/pdf/image/xlsx/pptx/video) and reach a generated video SOP in a single guided flow without manually navigating between parse review, publish, and video generation as three separate steps
+**Depends on**: Phase 5, Phase 8
+**Requirements**: TBD (to be derived during discuss-phase)
+**Success Criteria**: TBD
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -182,5 +191,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 4. Completion and Sign-off | 3/3 | Complete   | 2026-03-26 |
 | 5. Expanded File Intake | 4/4 | Complete   | 2026-04-03 |
 | 6. Video Transcription (Upload and URL) | 5/5 | Complete   | 2026-04-03 |
-| 7. Video Transcription (In-App Recording) | 0/1 | In progress | - |
+| 7. Video Transcription (In-App Recording) | 1/1 | Complete   | 2026-04-04 |
 | 8. Video SOP Generation | 5/5 | Complete   | 2026-04-04 |
+| 9. Streamlined File → Video Pipeline | 0/? | Pending | - |
