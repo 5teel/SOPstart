@@ -101,6 +101,7 @@ export type Database = {
           id: string
           input_type: string | null
           organisation_id: string
+          pipeline_run_id: string | null
           retry_count: number
           sop_id: string
           started_at: string | null
@@ -121,6 +122,7 @@ export type Database = {
           id?: string
           input_type?: string | null
           organisation_id: string
+          pipeline_run_id?: string | null
           retry_count?: number
           sop_id: string
           started_at?: string | null
@@ -141,6 +143,7 @@ export type Database = {
           id?: string
           input_type?: string | null
           organisation_id?: string
+          pipeline_run_id?: string | null
           retry_count?: number
           sop_id?: string
           started_at?: string | null
@@ -326,6 +329,44 @@ export type Database = {
           },
         ]
       }
+      sop_pipeline_runs: {
+        Row: {
+          id: string
+          organisation_id: string
+          requested_video_format: 'narrated_slideshow' | 'screen_recording'
+          status: 'active' | 'completed' | 'failed' | 'cancelled'
+          created_by: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          organisation_id: string
+          requested_video_format: 'narrated_slideshow' | 'screen_recording'
+          status?: 'active' | 'completed' | 'failed' | 'cancelled'
+          created_by: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          requested_video_format?: 'narrated_slideshow' | 'screen_recording'
+          status?: 'active' | 'completed' | 'failed' | 'cancelled'
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sop_pipeline_runs_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sops: {
         Row: {
           applicable_equipment: string[] | null
@@ -339,6 +380,7 @@ export type Database = {
           overall_confidence: number | null
           parent_sop_id: string | null
           parse_notes: string | null
+          pipeline_run_id: string | null
           published_at: string | null
           related_sops: string[] | null
           required_certifications: string[] | null
@@ -366,6 +408,7 @@ export type Database = {
           overall_confidence?: number | null
           parent_sop_id?: string | null
           parse_notes?: string | null
+          pipeline_run_id?: string | null
           published_at?: string | null
           related_sops?: string[] | null
           required_certifications?: string[] | null
@@ -393,6 +436,7 @@ export type Database = {
           overall_confidence?: number | null
           parent_sop_id?: string | null
           parse_notes?: string | null
+          pipeline_run_id?: string | null
           published_at?: string | null
           related_sops?: string[] | null
           required_certifications?: string[] | null
@@ -686,6 +730,7 @@ export type Database = {
           chapter_markers: Json | null
           error_message: string | null
           published: boolean
+          pipeline_run_id: string | null
           created_by: string
           completed_at: string | null
           created_at: string
@@ -704,6 +749,7 @@ export type Database = {
           chapter_markers?: Json | null
           error_message?: string | null
           published?: boolean
+          pipeline_run_id?: string | null
           created_by: string
           completed_at?: string | null
           created_at?: string
@@ -722,6 +768,7 @@ export type Database = {
           chapter_markers?: Json | null
           error_message?: string | null
           published?: boolean
+          pipeline_run_id?: string | null
           created_by?: string
           completed_at?: string | null
           created_at?: string

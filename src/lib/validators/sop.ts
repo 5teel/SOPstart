@@ -120,6 +120,18 @@ export const uploadSessionSchema = z.object({
 
 export type UploadFileInput = z.infer<typeof uploadFileSchema>
 
+// Pipeline session validators (D-06)
+export const pipelineVideoFormatSchema = z.enum(['narrated_slideshow', 'screen_recording'])
+
+export const createVideoSopPipelineSessionSchema = z.object({
+  file: z.object({
+    name: z.string().min(1).max(255),
+    size: z.number().int().positive(),
+    type: z.string().min(1),
+  }),
+  format: pipelineVideoFormatSchema,
+})
+
 // Video generation validators
 export const generateVideoSchema = z.object({
   sopId: z.string().uuid(),

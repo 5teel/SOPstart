@@ -50,6 +50,7 @@ export interface Sop {
   is_ocr: boolean
   uploaded_by: string
   published_at: string | null
+  pipeline_run_id?: string | null
   created_at: string
   updated_at: string
 }
@@ -113,6 +114,21 @@ export interface ParseJob {
   verification_flags?: VerificationFlag[] | null
   youtube_url?: string | null
   updated_at?: string
+  pipeline_run_id?: string | null
+}
+
+// Pipeline run types (D-06)
+export type PipelineVideoFormat = 'narrated_slideshow' | 'screen_recording'
+export type PipelineRunStatus = 'active' | 'completed' | 'failed' | 'cancelled'
+
+export interface SopPipelineRun {
+  id: string
+  organisation_id: string
+  requested_video_format: PipelineVideoFormat
+  status: PipelineRunStatus
+  created_by: string
+  created_at: string
+  updated_at: string
 }
 
 // Video SOP generation types
