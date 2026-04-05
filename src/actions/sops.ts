@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { uploadSessionSchema, getSourceFileType, isBlockedMacroFile } from '@/lib/validators/sop'
+import { uploadSessionSchema, getSourceFileType, isBlockedMacroFile, createVideoSopPipelineSessionSchema } from '@/lib/validators/sop'
 import type { UploadSession } from '@/types/sop'
 
 export async function createUploadSession(
@@ -234,4 +234,119 @@ export async function reparseSop(sopId: string): Promise<{ success: true; sopId:
   // Return sopId — client triggers parse API directly
   // (server action fire-and-forget fetch gets aborted by Next.js 16)
   return { success: true, sopId }
+}
+
+export async function createVideoSopPipelineSession(input: {
+  file: { name: string; size: number; type: string }
+  format: 'narrated_slideshow' | 'screen_recording'
+}): Promise<
+  | { pipelineId: string; sopId: string; uploadUrl: string; token: string; path: string }
+  | { error: string }
+> {
+  // 1. Validate input
+  const parsed = createVideoSopPipelineSessionSchema.safeParse(input)
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+  }
+  const { file, format } = parsed.data
+
+  // 2. Auth + role check (same JWT pattern as createUploadSession)
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { data: { session } } = await supabase.auth.getSession()
+  const jwtClaims = session?.access_token
+    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    : {}
+  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  if (!organisationId) return { error: 'No organisation found' }
+  const role = jwtClaims['user_role']
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
+    return { error: 'You need admin access to upload SOPs.' }
+  }
+
+  // 3. Block macro-enabled Office files
+  if (isBlockedMacroFile(file.name)) {
+    return { error: `${file.name} is not supported — macro-enabled Office files are blocked for security. Save as .xlsx or .pptx and try again.` }
+  }
+
+  // 4. Determine source file type (throws on unknown — let it surface)
+  let fileType: ReturnType<typeof getSourceFileType>
+  try {
+    fileType = getSourceFileType(file.type)
+  } catch {
+    return { error: `Unsupported file type: ${file.type}` }
+  }
+
+  const admin = createAdminClient()
+
+  // 5. Create pipeline run row
+  const { data: pipelineRun, error: pipelineError } = await admin
+    .from('sop_pipeline_runs')
+    .insert({
+      organisation_id: organisationId,
+      requested_video_format: format,
+      status: 'active',
+      created_by: user.id,
+    })
+    .select('id')
+    .single()
+
+  if (pipelineError || !pipelineRun) {
+    console.error('Pipeline run creation error:', pipelineError)
+    return { error: 'Failed to start pipeline. Please try again.' }
+  }
+
+  // 6. Create SOP row (uploading status), linked to pipeline
+  const { data: sop, error: sopError } = await admin
+    .from('sops')
+    .insert({
+      organisation_id: organisationId,
+      source_file_name: file.name,
+      source_file_type: fileType,
+      source_file_path: '',
+      uploaded_by: user.id,
+      status: 'uploading',
+      pipeline_run_id: pipelineRun.id,
+    })
+    .select('id')
+    .single()
+
+  if (sopError || !sop) {
+    console.error('SOP creation error:', sopError)
+    return { error: 'Failed to create upload session. Please try again.' }
+  }
+
+  // 7. Build storage path + presigned URL
+  const path = `${organisationId}/${sop.id}/original/${file.name}`
+  const { data: signedData, error: signError } = await admin.storage
+    .from('sop-documents')
+    .createSignedUploadUrl(path)
+
+  if (signError || !signedData) {
+    console.error('Presigned URL error:', signError)
+    return { error: 'Failed to create upload URL. Please try again.' }
+  }
+
+  await admin.from('sops').update({ source_file_path: path }).eq('id', sop.id)
+
+  // 8. Create parse_jobs row linked to pipeline
+  await admin.from('parse_jobs').insert({
+    organisation_id: organisationId,
+    sop_id: sop.id,
+    file_path: path,
+    file_type: fileType,
+    status: 'queued',
+    input_type: 'upload',
+    pipeline_run_id: pipelineRun.id,
+  })
+
+  return {
+    pipelineId: pipelineRun.id,
+    sopId: sop.id,
+    uploadUrl: signedData.signedUrl,
+    token: signedData.token,
+    path,
+  }
 }
