@@ -13,3 +13,219 @@
   --color-steel-100: #f3f4f6;
   --min-tap-target: 72px;
 }
+
+/* ============================================================
+   SITE THEMES — Industrial morphism backgrounds
+   Each theme overrides CSS custom properties + adds a bg pattern
+   on [data-theme="..."] via :root scoping.
+   ============================================================ */
+
+/* --- 1. Steel Forge (default) --- */
+[data-theme="steel-forge"] {
+  --color-brand-yellow: #f59e0b;
+  --color-brand-orange: #ea580c;
+  --color-steel-900: #111827;
+  --color-steel-800: #1f2937;
+  --color-steel-700: #374151;
+  --color-steel-600: #4b5563;
+  --color-steel-400: #9ca3af;
+  --color-steel-100: #f3f4f6;
+}
+
+[data-theme="steel-forge"] body {
+  background-color: #111827;
+  background-image:
+    radial-gradient(ellipse 120% 80% at 50% 0%, rgba(245, 158, 11, 0.04) 0%, transparent 60%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 40px,
+      rgba(255, 255, 255, 0.015) 40px,
+      rgba(255, 255, 255, 0.015) 41px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 40px,
+      rgba(255, 255, 255, 0.015) 40px,
+      rgba(255, 255, 255, 0.015) 41px
+    );
+}
+
+/* --- 2. Blueprint --- */
+[data-theme="blueprint"] {
+  --color-brand-yellow: #38bdf8;
+  --color-brand-orange: #0ea5e9;
+  --color-steel-900: #0c1929;
+  --color-steel-800: #132f4c;
+  --color-steel-700: #1e3a5f;
+  --color-steel-600: #2a5580;
+  --color-steel-400: #7db8e0;
+  --color-steel-100: #e0f2fe;
+}
+
+[data-theme="blueprint"] body {
+  background-color: #0c1929;
+  background-image:
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(56, 189, 248, 0.06) 0%, transparent 50%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 24px,
+      rgba(56, 189, 248, 0.07) 24px,
+      rgba(56, 189, 248, 0.07) 25px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 24px,
+      rgba(56, 189, 248, 0.07) 24px,
+      rgba(56, 189, 248, 0.07) 25px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 120px,
+      rgba(56, 189, 248, 0.12) 120px,
+      rgba(56, 189, 248, 0.12) 121px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 120px,
+      rgba(56, 189, 248, 0.12) 120px,
+      rgba(56, 189, 248, 0.12) 121px
+    );
+}
+
+/* --- 3. Riveted Metal --- */
+[data-theme="riveted-metal"] {
+  --color-brand-yellow: #e2a03f;
+  --color-brand-orange: #c27825;
+  --color-steel-900: #1a1a2e;
+  --color-steel-800: #25254a;
+  --color-steel-700: #35355a;
+  --color-steel-600: #50507a;
+  --color-steel-400: #9898b8;
+  --color-steel-100: #e8e8f0;
+}
+
+[data-theme="riveted-metal"] body {
+  background-color: #1a1a2e;
+  background-image:
+    radial-gradient(circle 3px at 20px 20px, rgba(226, 160, 63, 0.12) 2px, transparent 2px),
+    radial-gradient(circle 3px at 60px 20px, rgba(226, 160, 63, 0.12) 2px, transparent 2px),
+    radial-gradient(circle 3px at 20px 60px, rgba(226, 160, 63, 0.12) 2px, transparent 2px),
+    radial-gradient(circle 3px at 60px 60px, rgba(226, 160, 63, 0.12) 2px, transparent 2px),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.02) 25%, transparent 25%),
+    linear-gradient(225deg, rgba(255, 255, 255, 0.02) 25%, transparent 25%),
+    linear-gradient(315deg, rgba(255, 255, 255, 0.02) 25%, transparent 25%),
+    linear-gradient(45deg, rgba(255, 255, 255, 0.02) 25%, transparent 25%);
+  background-size: 80px 80px, 80px 80px, 80px 80px, 80px 80px, 40px 40px, 40px 40px, 40px 40px, 40px 40px;
+}
+
+/* --- 4. Circuit Board --- */
+[data-theme="circuit-board"] {
+  --color-brand-yellow: #4ade80;
+  --color-brand-orange: #22c55e;
+  --color-steel-900: #0a1a0a;
+  --color-steel-800: #132613;
+  --color-steel-700: #1e3a1e;
+  --color-steel-600: #2d5a2d;
+  --color-steel-400: #6daa6d;
+  --color-steel-100: #dcfce7;
+}
+
+[data-theme="circuit-board"] body {
+  background-color: #0a1a0a;
+  background-image:
+    radial-gradient(circle 2px at 30px 30px, rgba(74, 222, 128, 0.15) 1.5px, transparent 1.5px),
+    linear-gradient(0deg, rgba(74, 222, 128, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(74, 222, 128, 0.04) 1px, transparent 1px),
+    linear-gradient(0deg, transparent 14px, rgba(74, 222, 128, 0.08) 14px, rgba(74, 222, 128, 0.08) 16px, transparent 16px),
+    linear-gradient(90deg, transparent 29px, rgba(74, 222, 128, 0.06) 29px, rgba(74, 222, 128, 0.06) 31px, transparent 31px);
+  background-size: 60px 60px, 15px 15px, 15px 15px, 60px 30px, 60px 60px;
+}
+
+/* --- 5. Concrete Plant --- */
+[data-theme="concrete-plant"] {
+  --color-brand-yellow: #fb923c;
+  --color-brand-orange: #f97316;
+  --color-steel-900: #1c1c1e;
+  --color-steel-800: #2c2c2e;
+  --color-steel-700: #3c3c3e;
+  --color-steel-600: #58585a;
+  --color-steel-400: #a0a0a2;
+  --color-steel-100: #f0f0f0;
+}
+
+[data-theme="concrete-plant"] body {
+  background-color: #1c1c1e;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 200px,
+      rgba(251, 146, 60, 0.06) 200px,
+      rgba(251, 146, 60, 0.06) 204px,
+      transparent 204px,
+      transparent 208px,
+      rgba(251, 146, 60, 0.06) 208px,
+      rgba(251, 146, 60, 0.06) 212px
+    ),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  background-size: 212px 212px, 200px 200px;
+}
+
+/* --- 6. Dark Ops --- */
+[data-theme="dark-ops"] {
+  --color-brand-yellow: #ef4444;
+  --color-brand-orange: #dc2626;
+  --color-steel-900: #0a0a0a;
+  --color-steel-800: #161616;
+  --color-steel-700: #222222;
+  --color-steel-600: #3a3a3a;
+  --color-steel-400: #888888;
+  --color-steel-100: #e5e5e5;
+}
+
+[data-theme="dark-ops"] body {
+  background-color: #0a0a0a;
+  background-image:
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(239, 68, 68, 0.02) 10px,
+      rgba(239, 68, 68, 0.02) 11px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 10px,
+      rgba(239, 68, 68, 0.02) 10px,
+      rgba(239, 68, 68, 0.02) 11px
+    ),
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(239, 68, 68, 0.03) 0%, transparent 60%);
+}
+
+/* ============================================================
+   Neumorphic panel utility — works across all themes
+   ============================================================ */
+.neuro-panel {
+  background-color: var(--color-steel-800);
+  box-shadow:
+    8px 8px 16px rgba(0, 0, 0, 0.4),
+    -4px -4px 12px rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-steel-700);
+  border-radius: 12px;
+}
+
+.neuro-panel-inset {
+  background-color: var(--color-steel-900);
+  box-shadow:
+    inset 4px 4px 8px rgba(0, 0, 0, 0.4),
+    inset -2px -2px 6px rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}

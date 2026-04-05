@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { ThemeProvider } from 'next-themes'
 import { PRODUCT_NAME, PRODUCT_DESCRIPTION } from '@/lib/constants'
+import { SiteThemeProvider } from '@/components/providers/SiteThemeProvider'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -23,7 +24,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-          {children}
+          <SiteThemeProvider>
+            {children}
+          </SiteThemeProvider>
         </ThemeProvider>
       </body>
     </html>
