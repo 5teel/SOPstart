@@ -45,7 +45,8 @@ Exceptions:
 - **Tap targets**: minimum 72px height on all primary action buttons (`h-[72px]`) — project-wide `--min-tap-target: 72px` custom property per WORK-09. Applied to: primary CTA buttons, format selection confirm, upload triggers.
 - **Secondary CTAs and nav actions**: minimum 44px height (`min-h-[44px]`) — for actions that are not the primary touch target on a given screen.
 - **Sticky header bar**: fixed 56px height (`h-[56px]`) — matches existing `VideoGeneratePanel` header pattern.
-- **Stepper connector lines**: 1px height (`h-px`) — visual only, not a touch target.
+
+Note: Stepper connector hairlines (`h-px`) are presentational dividers, not layout spacing values. They are documented in the Component Inventory stepper visual rules below and do not appear in this exceptions table.
 
 Source: `UploadDropzone.tsx` buttons all use `h-[72px]`. `ReviewClient.tsx` secondary actions use `min-h-[44px]`. `VideoGeneratePanel.tsx` header uses `h-[56px]`.
 
@@ -55,15 +56,17 @@ Source: `UploadDropzone.tsx` buttons all use `h-[72px]`. `ReviewClient.tsx` seco
 
 | Role | Size | Weight | Line Height | Tailwind Class |
 |------|------|--------|-------------|----------------|
+| Caption / stepper label | 12px | 400 (regular) | 1.5 | `text-xs` |
 | Body | 14px | 400 (regular) | 1.5 | `text-sm` |
 | Label / Button | 16px | 600 (semibold) | 1.25 | `text-base font-semibold` |
-| Heading | 18px | 600 (semibold) | 1.2 | `text-lg font-semibold` (or `text-base font-semibold` for sub-headings) |
-| Display / Page title | 20px | 700 (bold) | 1.2 | `text-xl font-bold` |
+| Heading / Large CTA | 20px | 600 (semibold) | 1.2 | `text-xl font-semibold` |
 
-Additional type uses observed in pattern components:
-- Stepper stage labels: 12px / 400 (`text-xs`) — active stage gains `font-semibold`
-- Caption / metadata: 12px / 400 (`text-xs text-steel-400` or `text-steel-500`)
-- Large CTA button text: 18px / 700 (`text-lg font-bold`) — used on primary upload/generate CTAs
+Scale notes:
+- Active stepper stage label gains `font-semibold` on the 12px caption tier.
+- Metadata and secondary labels (`text-steel-400`, `text-steel-500`) use 12px / 400.
+- Primary CTA buttons (upload, confirm, pipeline entry) use 20px / 600 (`text-xl font-semibold`).
+- Sub-headings (card section headings within panels) use 16px / 600 (`text-base font-semibold`).
+- No `font-bold` (700) is used anywhere in this phase. All emphasis uses `font-semibold` (600).
 
 Source: `UploadDropzone.tsx`, `VideoGeneratePanel.tsx`, `ParseJobStatus.tsx`, `VideoGenerationStatus.tsx`.
 
@@ -113,15 +116,15 @@ Components this phase creates or modifies:
 **Format selection:** A modal (not inline segmented control). Clicking "Generate video SOP" opens a modal overlay (`fixed inset-0 z-50 flex items-center justify-center bg-black/70`). Modal inner container: `bg-steel-900 rounded-2xl p-6 max-w-lg w-full mx-4`. Modal contains:
 - Heading: "Choose video format" (`text-base font-semibold text-steel-100 mb-4`)
 - Format radio cards: reuse exact visual pattern from `VideoGeneratePanel.tsx` — `flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer`, yellow border when selected
-- "Start pipeline" confirm CTA: `h-[72px] w-full bg-brand-yellow text-steel-900 font-bold text-lg rounded-lg`
-- Cancel / close: `X` icon top-right of modal, or a `bg-steel-700` secondary button
+- "Start pipeline" confirm CTA: `h-[72px] w-full bg-brand-yellow text-steel-900 font-semibold text-xl rounded-lg`
+- Close / dismiss: `X` icon top-right of modal (`aria-label="Close"`), and a `bg-steel-700` secondary text button labelled "Discard" (see Copywriting Contract)
 
 **Button position in dropzone:** Added to the button row after "Browse video". The button must have `h-[72px]` height to maintain consistent touch targets.
 
 ### 2. Pipeline Progress Page — New route
 **Route shape:** `/admin/sops/[sopId]/pipeline` (planner may adjust per D-06 state shape, but visual contract applies to either URL pattern).
 
-**Layout:** Single-column, `max-w-2xl mx-auto px-4 py-8`. Sticky header bar: `h-[56px] sticky top-0 z-20 bg-steel-900 border-b border-steel-700 px-4 flex items-center gap-3` — left: back arrow (`ArrowLeft` icon, `text-steel-400 hover:text-steel-100`), centre-left: SOP title (truncated, `text-sm font-medium text-steel-100`).
+**Layout:** Single-column, `max-w-2xl mx-auto px-4 py-8`. Sticky header bar: `h-[56px] sticky top-0 z-20 bg-steel-900 border-b border-steel-700 px-4 flex items-center gap-3` — left: back arrow (`ArrowLeft` icon, `text-steel-400 hover:text-steel-100`, `aria-label="Back to SOP list"`), centre-left: SOP title (truncated, `text-sm font-medium text-steel-100`).
 
 **Unified stepper:** Single horizontal stepper rendering all 5 named stages as one continuous pipeline. Stage list (in order):
 
@@ -137,8 +140,8 @@ Components this phase creates or modifies:
 - Completed stage label: `text-xs text-green-400`
 - Active stage label: `text-xs text-brand-yellow font-semibold` with `aria-current="step"`
 - Pending stage label: `text-xs text-steel-600`
-- Connector line completed: `h-px flex-1 min-w-[8px] bg-brand-yellow`
-- Connector line pending: `h-px flex-1 min-w-[8px] bg-steel-700`
+- Connector line completed: `h-px flex-1 min-w-[8px] bg-brand-yellow` — presentational hairline divider only
+- Connector line pending: `h-px flex-1 min-w-[8px] bg-steel-700` — presentational hairline divider only
 - Container: `flex items-center gap-1 overflow-x-auto` with `role="group" aria-label="Pipeline stages"`
 
 **Stage 3 "Review required" paused state:** This is a human checkpoint, not an error. Render the stage body as:
@@ -148,7 +151,7 @@ bg-brand-orange/20 border border-brand-orange/50 rounded-xl p-5
   ClipboardCheck icon (24×24, text-brand-orange)
   Heading: "Review required before video generates" (text-sm font-semibold text-steel-100)
   Body: "Check the parsed SOP, approve all sections, then publish to continue." (text-sm text-steel-400)
-  CTA button: "Review SOP now →" (h-[72px] w-full bg-brand-yellow text-steel-900 font-bold text-lg rounded-lg)
+  CTA button: "Review SOP now →" (h-[72px] w-full bg-brand-yellow text-steel-900 font-semibold text-xl rounded-lg)
     → deep-links to /admin/sops/[sopId]/review
 ```
 
@@ -163,7 +166,7 @@ bg-green-500/20 border border-green-500/40 rounded-xl px-5 py-5
   CheckCircle icon (24×24, text-green-400)
   Heading: "Video SOP ready" (text-sm font-semibold text-steel-100)
   Body: "Review the video and publish it when you're happy with the audio." (text-sm text-steel-400)
-  CTA button: "Preview and publish video →" (h-[72px] w-full bg-brand-yellow text-steel-900 font-bold text-lg rounded-lg)
+  CTA button: "Preview and publish video →" (h-[72px] w-full bg-brand-yellow text-steel-900 font-semibold text-xl rounded-lg)
     → navigates to /admin/sops/[sopId]/video
 ```
 
@@ -216,7 +219,7 @@ bg-steel-800 border border-steel-700 rounded-xl p-5
   AlertTriangle icon (20×20, text-brand-orange)
   "Video generation failed" (text-sm font-semibold text-steel-100)
   Error message (text-xs text-steel-400, clamped to 2 lines)
-  "Go to video panel" CTA (h-[72px] w-full bg-brand-yellow text-steel-900 font-bold rounded-lg)
+  "Go to video panel" CTA (h-[72px] w-full bg-brand-yellow text-steel-900 font-semibold text-xl rounded-lg)
     → navigates to /admin/sops/[sopId]/video (existing page with retry button per D-05)
 ```
 
@@ -229,7 +232,8 @@ bg-steel-800 border border-steel-700 rounded-xl p-5
 | Primary CTA — dropzone entry button | "Generate video SOP" |
 | Format modal heading | "Choose video format" |
 | Format modal confirm CTA | "Start pipeline" |
-| Format modal cancel | "Cancel" (or X icon with `aria-label="Close"`) |
+| Format modal cancel (text button) | "Discard" |
+| Format modal close icon | `aria-label="Close"` (X icon, no visible label) |
 | Progress page document title | "Generating video SOP — {sopTitle}" |
 | Uploading stage label | "Uploading your file..." |
 | Parsing stage label | "Crunching your SOP…" |
@@ -243,7 +247,7 @@ bg-steel-800 border border-steel-700 rounded-xl p-5
 | Ready CTA | "Preview and publish video →" |
 | Parse failure heading | "Couldn't parse that one" (matches existing `ParseJobStatus` copy) |
 | Parse failure retry action | "Try again" |
-| Parse failure delete action | "Delete" |
+| Parse failure delete action | "Delete" — **locked inherited pattern** from `ParseJobStatus` component (Phase 6); inline action, no confirmation modal, consistent with existing delete behaviour across the admin SOP list |
 | Video gen failure heading | "Video generation failed" |
 | Video gen failure CTA | "Go to video panel" |
 | Back-link from review to pipeline | "← Back to pipeline" |
@@ -254,7 +258,7 @@ bg-steel-800 border border-steel-700 rounded-xl p-5
 | Upload success banner (pipeline mode) | "File uploaded — starting pipeline now." |
 | Validation error — blocked extension | "Macro-enabled Office files are blocked for security. Save as .xlsx or .pptx and try again." |
 
-No destructive actions are introduced in this phase. Deletion of a failed SOP re-uses existing "Delete" action already confirmed inline (no separate modal needed — consistent with existing pattern in `ParseJobStatus`).
+No destructive actions are introduced in this phase. The "Delete" action in the parse failure state re-uses the existing inline pattern from `ParseJobStatus` (no separate confirmation modal) — this is a deliberate locked inherited pattern, not an oversight.
 
 ---
 
@@ -274,7 +278,8 @@ No new npm packages are required for the UI layer. All new components compose ex
 - All stepper groups use `role="group"` with `aria-label` (matches existing pattern).
 - Active stepper stage uses `aria-current="step"`.
 - Format radio cards use `<fieldset>` + `<legend className="sr-only">` (matches existing `VideoGeneratePanel` pattern).
-- Format modal uses a visually hidden label on the close button: `aria-label="Close"`.
+- Format modal X icon close button: `aria-label="Close"`. Text dismiss button is labelled "Discard" (visible label, no additional aria needed).
+- Sticky pipeline header back arrow (`ArrowLeft` icon): `aria-label="Back to SOP list"` — icon-only button requires explicit label.
 - Review gate CTA and Ready CTA both meet 72px touch target minimum.
 - Error messages use `role="alert"` where inline (matches existing `YoutubeError` pattern).
 - Progress page stepper container: `overflow-x-auto` to support small screens without horizontal scroll on the page.
