@@ -1,5 +1,6 @@
 'use server'
 
+import { after } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { recordVideoViewSchema } from '@/lib/validators/sop'
@@ -242,42 +243,69 @@ export async function regenerateVideo(
     return { error: 'Only published SOPs can be used for video generation' }
   }
 
-  // Mark all existing non-failed jobs for this SOP+format as failed
-  // This clears the UNIQUE(sop_id, format, sop_version) constraint for the new job
-  await admin
+  // The UNIQUE constraint is (sop_id, format, sop_version) across ALL statuses.
+  // We can't insert a new row while an old one exists — we must reuse it.
+  const { data: existingJob } = await admin
     .from('video_generation_jobs')
-    .update({
-      status: 'failed',
-      error_message: 'Superseded by regeneration request',
-      updated_at: new Date().toISOString(),
-    })
+    .select('id')
     .eq('sop_id', sopId)
     .eq('format', format)
-    .neq('status', 'failed')
+    .eq('sop_version', sop.version)
+    .maybeSingle()
 
-  // Create new job record
-  const { data: newJob, error: insertError } = await admin
-    .from('video_generation_jobs')
-    .insert({
-      organisation_id: auth.organisationId,
-      sop_id: sopId,
-      sop_version: sop.version,
-      format,
-      status: 'queued',
-      created_by: auth.userId,
-    })
-    .select('id')
-    .single()
+  let jobId: string
 
-  if (insertError || !newJob) {
-    console.error('regenerateVideo job creation error:', insertError)
-    return { error: 'Failed to create regeneration job' }
+  if (existingJob) {
+    // Reset the existing job row to queued and clear previous state
+    const { error: resetError } = await admin
+      .from('video_generation_jobs')
+      .update({
+        status: 'queued',
+        current_stage: null,
+        error_message: null,
+        video_url: null,
+        published: false,
+        shotstack_render_id: null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', existingJob.id)
+
+    if (resetError) {
+      console.error('regenerateVideo reset error:', resetError)
+      return { error: 'Failed to reset existing job' }
+    }
+    jobId = existingJob.id
+  } else {
+    // No prior job for this SOP+format+version — create a new one
+    const { data: newJob, error: insertError } = await admin
+      .from('video_generation_jobs')
+      .insert({
+        organisation_id: auth.organisationId,
+        sop_id: sopId,
+        sop_version: sop.version,
+        format,
+        status: 'queued',
+        created_by: auth.userId,
+      })
+      .select('id')
+      .single()
+
+    if (insertError || !newJob) {
+      console.error('regenerateVideo job creation error:', insertError)
+      return { error: 'Failed to create regeneration job' }
+    }
+    jobId = newJob.id
   }
 
-  // Fire-and-forget pipeline — same pattern as the API route handler
-  void runVideoGenerationPipeline(newJob.id).catch((err) => {
-    console.error(`[regenerateVideo] Unhandled pipeline error for job ${newJob.id}:`, err)
+  // Use after() to run the pipeline after the server action returns — a plain
+  // void call would be killed when the action response is sent.
+  after(async () => {
+    try {
+      await runVideoGenerationPipeline(jobId)
+    } catch (err) {
+      console.error(`[regenerateVideo] Unhandled pipeline error for job ${jobId}:`, err)
+    }
   })
 
-  return { jobId: newJob.id }
+  return { jobId }
 }

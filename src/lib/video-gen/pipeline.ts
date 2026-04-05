@@ -28,7 +28,8 @@ async function updateJobStatus(
   stage: string,
   extra: Record<string, unknown> = {},
 ) {
-  await admin
+  console.log(`[video-pipeline] Job ${jobId} → ${status} (${stage})`)
+  const { error } = await admin
     .from('video_generation_jobs')
     .update({
       status: status as 'queued' | 'analyzing' | 'generating_audio' | 'rendering' | 'ready' | 'failed',
@@ -37,6 +38,10 @@ async function updateJobStatus(
       ...extra,
     })
     .eq('id', jobId)
+
+  if (error) {
+    console.error(`[video-pipeline] updateJobStatus failed for ${jobId}:`, error)
+  }
 }
 
 /**
@@ -194,6 +199,7 @@ async function pollUntilDone(renderId: string): Promise<{ url: string }> {
  * Error handling: any failure marks the job as 'failed' with the error message.
  */
 export async function runVideoGenerationPipeline(jobId: string): Promise<void> {
+  console.log(`[video-pipeline] Starting pipeline for job ${jobId}`)
   const admin = createAdminClient()
 
   try {
