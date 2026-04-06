@@ -24,16 +24,17 @@ export default function SopDetailPage() {
 
   useEffect(() => {
     if (sop && sop.sop_sections.length > 0 && !activeTab) {
-      const stepsSection = sop.sop_sections.find((s) => s.section_type === 'steps' || s.section_type === 'procedure')
-      setActiveTab(stepsSection?.section_type ?? sop.sop_sections[0].section_type)
+      const stepsSection = sop.sop_sections.find((s) =>
+        s.section_type === 'steps' || s.section_type.includes('procedure') || (s as unknown as { sop_steps?: unknown[] }).sop_steps?.length
+      )
+      setActiveTab(stepsSection?.id ?? sop.sop_sections[0].id)
     }
   }, [sop, activeTab])
 
-  // Since SOP is loaded from Dexie, it's cached when data is present
   const isCached = !!sop
 
-  const activeSection = sop?.sop_sections.find((s) => s.section_type === activeTab)
-  const isStepsTab = activeTab === 'steps' || activeTab === 'procedure'
+  const activeSection = sop?.sop_sections.find((s) => s.id === activeTab)
+  const isStepsTab = activeSection ? (activeSection.section_type === 'steps' || activeSection.section_type.includes('procedure')) : false
   const isVideoTab = activeTab === 'video'
 
   // Video tab visibility: only when online and published video exists (D-04, Pitfall 7)
@@ -132,10 +133,11 @@ export default function SopDetailPage() {
         <div className="sticky top-[56px] z-10">
           <SopSectionTabs
             sections={sop.sop_sections}
-            activeType={activeTab}
+            activeId={activeTab}
             onTabChange={setActiveTab}
             hasVideo={hasVideo}
             videoOutdated={!!videoOutdated}
+            isVideoActive={isVideoTab}
           />
         </div>
       )}
