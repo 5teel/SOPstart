@@ -22,7 +22,7 @@ function parseContentLines(content: string | null): string[] {
 }
 
 function HazardContent({ section }: { section: SectionWithChildren }) {
-  const isEmergency = section.section_type === 'emergency'
+  const isEmergency = section.section_type.includes('emergency')
   const Icon = isEmergency ? Siren : AlertTriangle
   const lines = parseContentLines(section.content)
 

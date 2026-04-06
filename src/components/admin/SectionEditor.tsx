@@ -27,7 +27,8 @@ export default function SectionEditor({
   )
   const firstTextareaRef = useRef<HTMLTextAreaElement>(null)
 
-  const isStepsSection = section.section_type === 'steps'
+  // Check if section has steps — don't rely on type name (AI may use 'procedure', 'steps', etc.)
+  const isStepsSection = section.sop_steps.length > 0
 
   const enterEdit = () => {
     setEditContent(section.content ?? '')

@@ -24,7 +24,7 @@ export default function SopDetailPage() {
 
   useEffect(() => {
     if (sop && sop.sop_sections.length > 0 && !activeTab) {
-      const stepsSection = sop.sop_sections.find((s) => s.section_type === 'steps')
+      const stepsSection = sop.sop_sections.find((s) => s.section_type === 'steps' || s.section_type === 'procedure')
       setActiveTab(stepsSection?.section_type ?? sop.sop_sections[0].section_type)
     }
   }, [sop, activeTab])
@@ -33,7 +33,7 @@ export default function SopDetailPage() {
   const isCached = !!sop
 
   const activeSection = sop?.sop_sections.find((s) => s.section_type === activeTab)
-  const isStepsTab = activeTab === 'steps'
+  const isStepsTab = activeTab === 'steps' || activeTab === 'procedure'
   const isVideoTab = activeTab === 'video'
 
   // Video tab visibility: only when online and published video exists (D-04, Pitfall 7)

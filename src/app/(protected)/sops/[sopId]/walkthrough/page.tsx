@@ -147,10 +147,10 @@ export default function WalkthroughPage() {
 
   // Extract sections by type
   const sections = sop.sop_sections as SectionWithChildren[]
-  const hazardsSection = sections.find((s) => s.section_type === 'hazards')
-  const ppeSection = sections.find((s) => s.section_type === 'ppe')
-  const emergencySection = sections.find((s) => s.section_type === 'emergency')
-  const stepsSection = sections.find((s) => s.section_type === 'steps')
+  const hazardsSection = sections.find((s) => s.section_type.includes('hazard'))
+  const ppeSection = sections.find((s) => s.section_type.includes('ppe') || s.section_type.includes('protective'))
+  const emergencySection = sections.find((s) => s.section_type.includes('emergency'))
+  const stepsSection = sections.find((s) => s.section_type === 'steps' || s.section_type.includes('procedure') || s.sop_steps.length > 0)
 
   // Collect all images across all sections
   const allImages: SopImage[] = sections.flatMap((s) => s.sop_images)
