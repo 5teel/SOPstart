@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, RefreshCw, RotateCcw, Trash2, Send, MoreVertical } from 'lucide-react'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import ParseJobStatus from '@/components/admin/ParseJobStatus'
 import OriginalDocViewer from '@/components/admin/OriginalDocViewer'
@@ -151,157 +151,125 @@ export default function ReviewClient({
     ? 'Acknowledge missing safety sections before publishing'
     : undefined
 
+  const [menuOpen, setMenuOpen] = useState(false)
+  const DETAIL_LABELS = ['Min', 'Brief', 'Std', 'Detail', 'Max'] as const
+
   return (
     <div className="min-h-dvh bg-steel-900">
-      {/* Sticky header bar */}
-      <header className="sticky top-0 z-10 bg-steel-900 border-b border-steel-700 px-6 py-4 flex items-center gap-4 flex-wrap">
-        {/* Left cluster */}
-        <div className="flex items-center gap-3 min-w-0">
-          <Link
-            href="/admin/sops"
-            className="text-sm text-steel-400 hover:text-steel-100 flex items-center gap-1 flex-shrink-0"
-          >
-            <ArrowLeft size={16} />
-            All SOPs
-          </Link>
-          <div className="w-px h-5 bg-steel-700 flex-shrink-0" />
-          <span className="text-base font-semibold text-steel-100 truncate max-w-[200px] lg:max-w-xs">
-            {sop.title ?? sop.source_file_name}
-          </span>
-          <StatusBadge status={sop.status as SopStatus} />
-        </div>
+      {/* Sticky header bar — compact */}
+      <header className="sticky top-0 z-10 bg-steel-900 border-b border-steel-700 px-4 flex items-center h-[56px] gap-3">
+        {/* Back + title */}
+        <Link
+          href="/admin/sops"
+          className="text-steel-400 hover:text-steel-100 flex-shrink-0"
+          aria-label="Back to SOP library"
+        >
+          <ArrowLeft size={20} />
+        </Link>
+        <span className="text-sm font-semibold text-steel-100 truncate flex-1 min-w-0">
+          {sop.title ?? sop.source_file_name}
+        </span>
+        <StatusBadge status={sop.status as SopStatus} />
 
-        {/* Right cluster */}
-        <div className="ml-auto flex items-center gap-2 flex-wrap">
-          {confirmAction === 'reparse' ? (
-            <div className="flex items-center gap-2 text-sm flex-wrap">
-              <span className="text-steel-400 text-xs">
-                {isVideoSop ? 'Full re-transcribe + re-structure. Takes ~30s.' : 'Discard edits and re-run AI?'}
-              </span>
+        {/* Confirmation inline bar */}
+        {confirmAction ? (
+          <div className="flex items-center gap-2 ml-2">
+            <span className="text-xs text-steel-400 hidden sm:inline">
+              {confirmAction === 'reparse' && (isVideoSop ? 'Re-transcribe?' : 'Re-parse?')}
+              {confirmAction === 'restructure' && 'Re-structure?'}
+              {confirmAction === 'delete' && 'Delete?'}
+              {confirmAction === 'publish' && 'Publish?'}
+            </span>
+            <button
+              onClick={() => {
+                if (confirmAction === 'reparse') executeReparse()
+                else if (confirmAction === 'restructure') executeRestructure()
+                else if (confirmAction === 'delete') executeDelete()
+                else if (confirmAction === 'publish') executePublish()
+              }}
+              disabled={actionPending}
+              className={[
+                'h-9 px-3 font-semibold text-xs rounded-lg',
+                confirmAction === 'delete' ? 'bg-red-600 text-white' : 'bg-brand-yellow text-steel-900',
+              ].join(' ')}
+            >
+              Yes
+            </button>
+            <button
+              onClick={() => setConfirmAction(null)}
+              className="h-9 px-3 bg-steel-700 text-steel-100 text-xs rounded-lg hover:bg-steel-600"
+            >
+              No
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1.5 ml-2">
+            {/* Detail level slider (video only) */}
+            {isVideoSop && (
+              <div className="hidden sm:flex items-center gap-1 bg-steel-800 border border-steel-700 rounded-lg px-2 h-9">
+                <span className="text-[10px] text-steel-400">−</span>
+                <input
+                  type="range"
+                  min={1}
+                  max={5}
+                  step={1}
+                  value={detailLevel}
+                  onChange={(e) => setDetailLevel(parseInt(e.target.value))}
+                  className="w-12 h-1 rounded-full appearance-none bg-steel-600 accent-brand-yellow cursor-pointer"
+                  aria-label="Detail level"
+                  title={`Detail: ${DETAIL_LABELS[detailLevel - 1]} (${detailLevel}/5)`}
+                />
+                <span className="text-[10px] text-steel-400">+</span>
+              </div>
+            )}
+
+            {/* Re-structure (video only) */}
+            {isVideoSop && (
               <button
-                onClick={executeReparse}
+                onClick={() => setConfirmAction('restructure')}
                 disabled={actionPending}
-                className="h-[40px] px-3 bg-brand-orange text-white font-semibold text-xs rounded-lg hover:opacity-90"
+                className="h-9 w-9 flex items-center justify-center rounded-lg bg-steel-800 border border-steel-700 text-brand-yellow hover:bg-steel-700 disabled:opacity-50"
+                title="Re-structure (keep transcript)"
+                aria-label="Re-structure"
               >
-                Yes, re-{isVideoSop ? 'transcribe' : 'parse'}
+                <RefreshCw size={16} />
               </button>
-              <button
-                onClick={() => setConfirmAction(null)}
-                className="h-[40px] px-3 bg-steel-700 text-steel-100 font-semibold text-xs rounded-lg hover:bg-steel-600"
-              >
-                Cancel
-              </button>
-            </div>
-          ) : confirmAction === 'restructure' ? (
-            <div className="flex items-center gap-2 text-sm flex-wrap">
-              <span className="text-steel-400 text-xs">
-                Re-run AI structuring using existing transcript. Takes ~5s.
-              </span>
-              <button
-                onClick={executeRestructure}
-                disabled={actionPending}
-                className="h-[40px] px-3 bg-brand-yellow text-steel-900 font-semibold text-xs rounded-lg hover:opacity-90"
-              >
-                Yes, re-structure
-              </button>
-              <button
-                onClick={() => setConfirmAction(null)}
-                className="h-[40px] px-3 bg-steel-700 text-steel-100 font-semibold text-xs rounded-lg hover:bg-steel-600"
-              >
-                Cancel
-              </button>
-            </div>
-          ) : confirmAction === 'delete' ? (
-            <div className="flex items-center gap-2 text-sm flex-wrap">
-              <span className="text-steel-400 text-xs">
-                This will permanently delete this draft. Can&apos;t be undone.
-              </span>
-              <button
-                onClick={executeDelete}
-                disabled={actionPending}
-                className="h-[40px] px-3 bg-red-600 text-white font-semibold text-xs rounded-lg hover:opacity-90"
-              >
-                Yes, delete
-              </button>
-              <button
-                onClick={() => setConfirmAction(null)}
-                className="h-[40px] px-3 bg-steel-700 text-steel-100 font-semibold text-xs rounded-lg hover:bg-steel-600"
-              >
-                Cancel
-              </button>
-            </div>
-          ) : confirmAction === 'publish' ? (
-            <div className="flex items-center gap-2 text-sm flex-wrap">
-              <span className="text-steel-400 text-xs">
-                Publish this SOP? It will be visible to all workers.
-              </span>
-              <button
-                onClick={executePublish}
-                disabled={actionPending}
-                className="h-[40px] px-3 bg-brand-yellow text-steel-900 font-bold text-xs rounded-lg hover:bg-amber-400"
-              >
-                Yes, publish
-              </button>
-              <button
-                onClick={() => setConfirmAction(null)}
-                className="h-[40px] px-3 bg-steel-700 text-steel-100 font-semibold text-xs rounded-lg hover:bg-steel-600"
-              >
-                Cancel
-              </button>
-            </div>
-          ) : (
-            <>
-              {isVideoSop && (
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 bg-steel-800 border border-steel-700 rounded-lg px-2 h-[48px]">
-                    <span className="text-xs text-steel-400">−</span>
-                    <input
-                      type="range"
-                      min={1}
-                      max={5}
-                      step={1}
-                      value={detailLevel}
-                      onChange={(e) => setDetailLevel(parseInt(e.target.value))}
-                      className="w-16 h-1.5 rounded-full appearance-none bg-steel-600 accent-brand-yellow cursor-pointer"
-                      aria-label="Detail level"
-                      title={`Detail: ${['Minimal','Brief','Standard','Detailed','Maximum'][detailLevel - 1]} (${detailLevel}/5)`}
-                    />
-                    <span className="text-xs text-steel-400">+</span>
-                  </div>
-                  <button
-                    onClick={() => setConfirmAction('restructure')}
-                    disabled={actionPending}
-                    className="h-[48px] px-4 bg-steel-700 text-brand-yellow border border-brand-yellow/40 font-semibold text-sm rounded-lg hover:bg-steel-600 disabled:opacity-50"
-                  >
-                    Re-structure
-                  </button>
-                </div>
-              )}
-              <button
-                onClick={() => setConfirmAction('reparse')}
-                disabled={actionPending}
-                className="h-[48px] px-4 bg-steel-700 text-brand-orange border border-brand-orange/40 font-semibold text-sm rounded-lg hover:bg-steel-600 disabled:opacity-50"
-              >
-                {isVideoSop ? 'Re-transcribe' : 'Re-parse'}
-              </button>
-              <button
-                onClick={() => setConfirmAction('delete')}
-                disabled={actionPending || sop.status === 'published'}
-                className="h-[48px] px-4 text-red-400 border border-red-500/40 font-semibold text-sm rounded-lg hover:bg-red-500/10 disabled:opacity-50"
-              >
-                Delete draft
-              </button>
-              <button
-                onClick={() => setConfirmAction('publish')}
-                disabled={publishDisabled}
-                title={publishTitle}
-                className="h-[56px] px-6 bg-brand-yellow text-steel-900 font-bold text-sm rounded-lg hover:bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                Publish SOP
-              </button>
-            </>
-          )}
-        </div>
+            )}
+
+            {/* Re-parse / Re-transcribe */}
+            <button
+              onClick={() => setConfirmAction('reparse')}
+              disabled={actionPending}
+              className="h-9 w-9 flex items-center justify-center rounded-lg bg-steel-800 border border-steel-700 text-brand-orange hover:bg-steel-700 disabled:opacity-50"
+              title={isVideoSop ? 'Re-transcribe (full redo)' : 'Re-parse'}
+              aria-label={isVideoSop ? 'Re-transcribe' : 'Re-parse'}
+            >
+              <RotateCcw size={16} />
+            </button>
+
+            {/* Delete */}
+            <button
+              onClick={() => setConfirmAction('delete')}
+              disabled={actionPending || sop.status === 'published'}
+              className="h-9 w-9 flex items-center justify-center rounded-lg bg-steel-800 border border-steel-700 text-red-400 hover:bg-red-900/30 disabled:opacity-50"
+              title="Delete draft"
+              aria-label="Delete draft"
+            >
+              <Trash2 size={16} />
+            </button>
+
+            {/* Publish */}
+            <button
+              onClick={() => setConfirmAction('publish')}
+              disabled={publishDisabled}
+              title={publishTitle ?? 'Publish SOP'}
+              className="h-9 px-3 bg-brand-yellow text-steel-900 font-semibold text-xs rounded-lg hover:bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
+            >
+              <Send size={14} />
+              <span className="hidden sm:inline">Publish</span>
+            </button>
+          </div>
+        )}
       </header>
 
       {/* Publish success banner with next-step actions */}

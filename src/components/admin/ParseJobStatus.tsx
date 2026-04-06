@@ -99,7 +99,11 @@ export default function ParseJobStatus({
             if (data.error_message) setErrorMessage(data.error_message)
             if (data.current_stage) setCurrentStage(data.current_stage as string)
             if (data.file_type === 'video') setIsVideoSop(true)
-            if (data.status === 'completed' || data.status === 'failed') {
+            if (data.status === 'completed') {
+              if (pollingInterval) clearInterval(pollingInterval)
+              router.refresh() // auto-refresh to show review UI
+            }
+            if (data.status === 'failed') {
               if (pollingInterval) clearInterval(pollingInterval)
             }
           }
