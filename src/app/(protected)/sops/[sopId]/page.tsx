@@ -49,7 +49,7 @@ export default function SopDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col h-screen bg-steel-900 overflow-hidden">
+      <div className="flex flex-col flex-1">
         {/* Skeleton header */}
         <div className="sticky top-0 z-20 bg-steel-900 border-b border-steel-700 px-4 flex items-center gap-3 h-[56px]">
           <div className="w-8 h-8 rounded-lg bg-steel-700 animate-pulse" />
@@ -73,7 +73,7 @@ export default function SopDetailPage() {
 
   if (isError || !sop) {
     return (
-      <div className="flex flex-col h-screen bg-steel-900 overflow-hidden">
+      <div className="flex flex-col flex-1">
         <div className="sticky top-0 z-20 bg-steel-900 border-b border-steel-700 px-4 flex items-center gap-3 h-[56px]">
           <Link
             href="/sops"
@@ -102,7 +102,7 @@ export default function SopDetailPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-steel-900 overflow-hidden">
+    <div className="flex flex-col flex-1">
       {/* Sticky header */}
       <header className="sticky top-0 z-20 bg-steel-900 border-b border-steel-700 px-4 flex items-center gap-3 h-[56px]">
         <Link
@@ -142,8 +142,8 @@ export default function SopDetailPage() {
         </div>
       )}
 
-      {/* Scroll area */}
-      <div className="flex-1 overflow-y-auto px-4 py-6">
+      {/* Content */}
+      <div className="px-4 py-6">
         {isVideoTab && videoJob?.video_url && videoJob.chapter_markers ? (
           <VideoTabPanel
             videoUrl={`/api/videos/${videoJob.id}/stream`}
@@ -162,7 +162,7 @@ export default function SopDetailPage() {
 
       {/* Bottom action bar — Steps tab only (hidden for video tab) */}
       {isStepsTab && (
-        <div className="sticky bottom-[56px] bg-steel-900 border-t border-steel-700 px-4 py-3">
+        <div className="sticky bottom-0 bg-steel-900 border-t border-steel-700 px-4 py-3">
           <Link
             href={`/sops/${sopId}/walkthrough`}
             className="flex items-center justify-center w-full h-[72px] bg-brand-yellow text-steel-900 font-bold text-lg rounded-xl hover:bg-amber-400 active:bg-amber-500 transition-colors"

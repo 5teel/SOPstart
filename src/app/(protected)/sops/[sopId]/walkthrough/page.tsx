@@ -108,7 +108,7 @@ export default function WalkthroughPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col flex-1">
         <div className="flex-shrink-0 h-[56px] bg-steel-900 border-b border-steel-700 px-4 flex items-center gap-3 animate-pulse">
           <div className="w-8 h-8 rounded-lg bg-steel-700" />
           <div className="flex-1 h-4 rounded bg-steel-700" />
@@ -322,8 +322,8 @@ export default function WalkthroughPage() {
         />
       )}
 
-      {/* Fixed top bar */}
-      <div className="flex-shrink-0 fixed top-0 left-0 right-0 z-30 bg-steel-900 border-b border-steel-700 px-4 flex items-center gap-3 h-[56px]">
+      {/* Sticky top bar */}
+      <div className="sticky top-0 z-30 bg-steel-900 border-b border-steel-700 px-4 flex items-center gap-3 h-[56px]">
         <button
           type="button"
           onClick={() => router.push(`/sops/${sopId}`)}
@@ -350,13 +350,13 @@ export default function WalkthroughPage() {
         )}
       </div>
 
-      {/* Progress strip — sits below fixed top bar */}
-      <div className="flex-shrink-0 pt-[56px]">
+      {/* Progress strip */}
+      <div className="flex-shrink-0">
         <StepProgress completedCount={completedCount} totalSteps={totalSteps} />
       </div>
 
-      {/* Scrollable step list */}
-      <div className="flex-1 overflow-y-auto px-4 pb-[160px]">
+      {/* Step list */}
+      <div className="px-4 pb-4">
         {stepsSection ? (
           <WalkthroughList
             sopId={sopId}

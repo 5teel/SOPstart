@@ -155,7 +155,7 @@ export default function ReviewClient({
   const DETAIL_LABELS = ['Min', 'Brief', 'Std', 'Detail', 'Max'] as const
 
   return (
-    <div className="min-h-dvh bg-steel-900">
+    <div className="flex flex-col flex-1">
       {/* Sticky header bar — compact */}
       <header className="sticky top-0 z-10 bg-steel-900 border-b border-steel-700 px-4 flex items-center h-[56px] gap-3">
         {/* Back + title */}
@@ -317,7 +317,7 @@ export default function ReviewClient({
           /* Side-by-side layout */
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Left pane — Original document */}
-            <div className="w-full lg:w-1/2 overflow-y-auto max-h-[calc(100vh-theme(spacing.32))]">
+            <div className="w-full lg:w-1/2 overflow-y-visible">
               <OriginalDocViewer
                 sourceFileType={sop.source_file_type}
                 presignedUrl={presignedUrl}
@@ -328,7 +328,7 @@ export default function ReviewClient({
             </div>
 
             {/* Right pane — Parsed output */}
-            <div className="w-full lg:w-1/2 overflow-y-auto max-h-[calc(100vh-theme(spacing.32))]">
+            <div className="w-full lg:w-1/2 overflow-y-visible">
               {/* Adversarial verification flags (D-04/D-05) */}
               {verificationFlags && verificationFlags.length > 0 && (
                 <AdversarialFlagBanner
