@@ -140,7 +140,20 @@ export default function ParseJobStatus({
 
   const handleReparse = async () => {
     setReParsing(true)
-    await reparseSop(sopId)
+    const result = await reparseSop(sopId)
+    if ('error' in result) {
+      setErrorMessage(result.error)
+      setStatus('failed')
+      setReParsing(false)
+      return
+    }
+    // Trigger the correct pipeline based on whether this is a video SOP
+    const endpoint = isVideoSop ? '/api/sops/transcribe' : '/api/sops/parse'
+    fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sopId }),
+    }).catch(console.error)
     setStatus('queued')
     setErrorMessage(null)
     setCurrentStage(null)

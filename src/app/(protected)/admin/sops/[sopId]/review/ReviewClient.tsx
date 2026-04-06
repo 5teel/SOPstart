@@ -79,12 +79,17 @@ export default function ReviewClient({
     setConfirmAction(null)
     const result = await reparseSop(sop.id)
     if ('sopId' in result) {
-      // Trigger parse from client (server action can't fire-and-forget in Next.js 16)
-      fetch('/api/sops/parse', {
+      // Route to correct pipeline based on source file type
+      const endpoint = sop.source_file_type === 'video'
+        ? '/api/sops/transcribe'
+        : '/api/sops/parse'
+      fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sopId: result.sopId }),
       }).catch(console.error)
+    } else if ('error' in result) {
+      alert(result.error)
     }
     router.refresh()
     setActionPending(false)
