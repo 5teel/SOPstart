@@ -5,6 +5,7 @@ import { Users, History, Video } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { DeleteSopButton } from '@/components/admin/DeleteSopButton'
+import { VideoJobIndicator } from '@/components/admin/VideoJobIndicator'
 import type { SopStatus } from '@/types/sop'
 
 export const metadata: Metadata = {
@@ -138,6 +139,7 @@ export default async function SopsLibraryPage({
                     </span>
                   </div>
                 </div>
+                <VideoJobIndicator sopId={sop.id} />
                 <StatusBadge status={sop.status as SopStatus} />
               </Link>
               {sop.status === 'published' ? (
