@@ -235,6 +235,17 @@ export async function reparseSop(sopId: string): Promise<{ success: true; sopId:
   if (!sop) return { error: 'SOP not found' }
 
   const admin = createAdminClient()
+
+  // Verify the source file exists in storage before queuing re-parse
+  const bucket = sop.source_file_type === 'video' ? 'sop-videos' : 'sop-documents'
+  const { data: fileCheck } = await admin.storage
+    .from(bucket)
+    .createSignedUrl(sop.source_file_path, 10)
+
+  if (!fileCheck?.signedUrl) {
+    return { error: 'Source file not found — the original upload may not have completed. Please re-upload the file.' }
+  }
+
   await admin.from('parse_jobs').insert({
     organisation_id: sop.organisation_id,
     sop_id: sopId,

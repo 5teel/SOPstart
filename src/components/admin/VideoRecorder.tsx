@@ -2,7 +2,8 @@
 
 import { useRef, useState, useCallback, useEffect } from 'react'
 import { X, RotateCcw, Circle, Square, Loader2, AlertTriangle } from 'lucide-react'
-import { extractAudioFromVideo } from '@/lib/parsers/extract-video-audio'
+// extractAudioFromVideo skipped for recordings — FFmpeg WASM unreliable on mobile
+// import { extractAudioFromVideo } from '@/lib/parsers/extract-video-audio'
 import { TusUploadProgress } from './TusUploadProgress'
 import { VideoPreviewPanel } from './VideoPreviewPanel'
 
@@ -237,31 +238,12 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
       setElapsedSeconds(prev => prev) // keep value for display
       const blob = new Blob(chunksRef.current, { type: mime || 'video/webm' })
       setRecordedBlob(blob)
-      setRecorderState('extracting-audio')
-
-      // Extract audio — with 15s timeout, falls back to uploading raw video
+      // Skip client-side audio extraction — upload raw video directly.
+      // OpenAI accepts webm/mp4 natively. FFmpeg WASM (32MB) is unreliable
+      // on mobile devices (blocks event loop, OOMs on low-memory phones).
       const videoFile = new File([blob], 'recording.webm', { type: mime || 'video/webm' })
-      try {
-        const extractionPromise = extractAudioFromVideo(videoFile, (pct) => {
-          setExtractionPct(pct)
-        })
-        const timeoutPromise = new Promise<null>((_, reject) =>
-          setTimeout(() => reject(new Error('timeout')), 15_000)
-        )
-        const audio = await Promise.race([extractionPromise, timeoutPromise])
-        if (audio) {
-          setAudioFile(audio)
-        } else {
-          // Fallback: use video file directly (OpenAI accepts webm)
-          setAudioFile(videoFile)
-        }
-        setRecorderState('preview')
-      } catch {
-        // Timeout or extraction failure — upload video directly
-        console.warn('[VideoRecorder] Audio extraction skipped — uploading video directly')
-        setAudioFile(videoFile)
-        setRecorderState('preview')
-      }
+      setAudioFile(videoFile)
+      setRecorderState('preview')
     }
 
     recorder.start(1000) // collect data every second
