@@ -51,7 +51,7 @@ export default function VideoGenerationStatus({
   useEffect(() => {
     const supabase = createClient()
 
-    const handleJobData = (data: VideoGenerationJob) => {
+    const handleJobData = async (data: VideoGenerationJob) => {
       setStatus(data.status)
       setCurrentStage(data.current_stage)
       if (data.error_message) setErrorMessage(data.error_message)
@@ -62,6 +62,27 @@ export default function VideoGenerationStatus({
       } else if (data.status === 'failed') {
         if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current)
         onFailed?.(data.error_message ?? 'Generation failed')
+      } else if (data.current_stage === 'rendering_pending' || (data.status === 'rendering' && data.current_stage === 'rendering_pending')) {
+        // Pipeline timed out but Shotstack may have finished — try to finalize
+        try {
+          const res = await fetch('/api/sops/generate-video/finalize', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ jobId }),
+          })
+          const result = await res.json()
+          if (result.status === 'ready' || result.status === 'failed') {
+            // Re-poll to get updated data
+            const { data: updated } = await supabase
+              .from('video_generation_jobs')
+              .select('*')
+              .eq('id', jobId)
+              .single()
+            if (updated) handleJobData(updated as unknown as VideoGenerationJob)
+          }
+        } catch {
+          // Finalize call failed — keep polling, will retry next cycle
+        }
       }
     }
 

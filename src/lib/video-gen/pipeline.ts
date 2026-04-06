@@ -344,6 +344,7 @@ export async function runVideoGenerationPipeline(jobId: string): Promise<void> {
     await updateJobStatus(admin, jobId, 'rendering', 'rendering')
 
     const renderId = await submitShotstackRender(edit)
+    console.log(`[video-pipeline] Shotstack render submitted: ${renderId}`)
 
     await admin
       .from('video_generation_jobs')
@@ -355,8 +356,41 @@ export async function runVideoGenerationPipeline(jobId: string): Promise<void> {
 
     // -------------------------------------------------------------------
     // Stage 6: Polling until done
+    // Poll within the remaining function time budget, leaving 30s margin
+    // for download + re-upload after render completes.
     // -------------------------------------------------------------------
-    const { url: shotstackUrl } = await pollUntilDone(renderId)
+    const remainingMs = Math.max(POLL_TIMEOUT_MS, 250_000) // at least 4 min
+    const pollDeadline = Date.now() + remainingMs - 30_000 // 30s margin
+
+    let shotstackUrl: string | null = null
+
+    while (Date.now() < pollDeadline) {
+      await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS))
+      const render = await getShotstackRender(renderId)
+      console.log(`[video-pipeline] Poll: ${render.status}`)
+
+      if (render.status === 'done') {
+        if (!render.url) throw new Error('Shotstack render done but no URL returned')
+        shotstackUrl = render.url
+        break
+      }
+      if (render.status === 'failed') {
+        throw new Error(`Shotstack render failed: ${render.error ?? 'unknown error'}`)
+      }
+    }
+
+    if (!shotstackUrl) {
+      // Render still in progress — save state so it can be picked up later
+      console.log(`[video-pipeline] Render ${renderId} still in progress — will be picked up by status check`)
+      await admin
+        .from('video_generation_jobs')
+        .update({
+          current_stage: 'rendering_pending',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', jobId)
+      return // Exit without marking failed — render is still running on Shotstack
+    }
 
     // Download from Shotstack and re-upload to our Storage
     const storageUrl = await downloadAndReuploadVideo(admin, orgId, sopId, jobId, shotstackUrl)
