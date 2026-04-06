@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Users, History, Video } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { StatusBadge } from '@/components/admin/StatusBadge'
+import { DeleteSopButton } from '@/components/admin/DeleteSopButton'
 import type { SopStatus } from '@/types/sop'
 
 export const metadata: Metadata = {
@@ -139,7 +140,7 @@ export default async function SopsLibraryPage({
                 </div>
                 <StatusBadge status={sop.status as SopStatus} />
               </Link>
-              {sop.status === 'published' && (
+              {sop.status === 'published' ? (
                 <div className="flex flex-col gap-1 flex-shrink-0">
                   <Link
                     href={`/admin/sops/${sop.id}/assign`}
@@ -166,6 +167,8 @@ export default async function SopsLibraryPage({
                     <Video className="h-4 w-4" />
                   </Link>
                 </div>
+              ) : (
+                <DeleteSopButton sopId={sop.id} />
               )}
             </li>
           ))}

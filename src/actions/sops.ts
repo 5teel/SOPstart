@@ -259,6 +259,34 @@ export async function reparseSop(sopId: string): Promise<{ success: true; sopId:
   return { success: true, sopId }
 }
 
+export async function deleteSop(sopId: string): Promise<{ success: true } | { error: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  // Verify admin role
+  const { data: { session } } = await supabase.auth.getSession()
+  const jwtClaims = session?.access_token
+    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    : {}
+  const role = jwtClaims['user_role']
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
+    return { error: 'Admin access required' }
+  }
+
+  // Delete sections (cascade deletes steps/images), parse jobs, assignments, then SOP
+  const admin = createAdminClient()
+  await admin.from('sop_sections').delete().eq('sop_id', sopId)
+  await admin.from('parse_jobs').delete().eq('sop_id', sopId)
+  await admin.from('sop_assignments').delete().eq('sop_id', sopId)
+  await admin.from('video_generation_jobs').delete().eq('sop_id', sopId)
+  await admin.from('worker_notifications').delete().eq('sop_id', sopId)
+  const { error } = await admin.from('sops').delete().eq('id', sopId)
+
+  if (error) return { error: error.message }
+  return { success: true }
+}
+
 export async function createVideoSopPipelineSession(input: {
   file: { name: string; size: number; type: string }
   format: 'narrated_slideshow' | 'screen_recording'
