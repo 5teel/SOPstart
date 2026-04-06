@@ -4,6 +4,7 @@ import { useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { X, Loader2 } from 'lucide-react'
 import { createVideoUploadSession } from '@/actions/sops'
 import { tusUpload } from '@/lib/upload/tus-upload'
+import { createClient } from '@/lib/supabase/client'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -163,17 +164,24 @@ export function VideoPreviewPanel({
           return
         }
         setUploadProgress(100)
-        // Trigger transcription pipeline — await to confirm it started
-        const transcribeRes = await fetch('/api/sops/transcribe', {
+        // Fire transcription (don't await — it runs 30-300s server-side)
+        fetch('/api/sops/transcribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ sopId }),
-        })
-        if (!transcribeRes.ok) {
-          console.error('[VideoUpload] Transcription trigger failed:', transcribeRes.status)
-          showToast('Upload succeeded but transcription failed to start. Try re-parsing from the review page.')
-          setPanelState('upload-error')
-          return
+        }).catch((err) => console.error('[VideoUpload] Transcribe trigger error:', err))
+        // Brief delay then verify parse job transitioned from 'queued'
+        await new Promise((r) => setTimeout(r, 2500))
+        const supabase = createClient()
+        const { data: job } = await supabase
+          .from('parse_jobs')
+          .select('status')
+          .eq('sop_id', sopId)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle() as { data: { status: string } | null }
+        if (job?.status === 'queued') {
+          showToast('Transcription may not have started. Check the review page to re-parse.')
         }
         onSubmitComplete(sopId)
       } catch (err) {
@@ -192,19 +200,13 @@ export function VideoPreviewPanel({
           onProgress: (pct) => {
             setUploadProgress(pct)
           },
-          onSuccess: async () => {
-            const transcribeRes = await fetch('/api/sops/transcribe', {
+          onSuccess: () => {
+            // Fire transcription (don't await — runs 30-300s server-side)
+            fetch('/api/sops/transcribe', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ sopId }),
-            }).catch(() => null)
-            if (!transcribeRes || !transcribeRes.ok) {
-              console.error('[VideoUpload] Transcription trigger failed')
-              showToast('Upload succeeded but transcription failed to start. Try re-parsing from the review page.')
-              setPanelState('upload-error')
-              resolve()
-              return
-            }
+            }).catch((err) => console.error('[VideoUpload] Transcribe trigger error:', err))
             resolve()
             onSubmitComplete(sopId)
           },
