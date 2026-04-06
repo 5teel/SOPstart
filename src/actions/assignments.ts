@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { z } from 'zod'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { AppRole } from '@/types/auth'
@@ -188,6 +189,148 @@ export async function getOrgMembers(): Promise<
       email: null,
     })),
   }
+}
+
+// ─── Worker Self-Assignment ─────────────────────────────────────────────────
+
+async function getWorkerContext() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' } as const
+
+  const { data: member } = await supabase
+    .from('organisation_members')
+    .select('organisation_id, role')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (!member) return { error: 'No organisation membership' } as const
+
+  return { supabase, user, organisationId: member.organisation_id, role: member.role }
+}
+
+/**
+ * Self-add a published SOP to "Your SOPs".
+ * Uses admin client because workers can't INSERT via RLS.
+ */
+export async function selfAddSop(sopId: string) {
+  const ctx = await getWorkerContext()
+  if ('error' in ctx) return { success: false, error: ctx.error }
+
+  const admin = createAdminClient()
+  const { error } = await admin.from('sop_assignments').insert({
+    organisation_id: ctx.organisationId,
+    sop_id: sopId,
+    assignment_type: 'individual',
+    user_id: ctx.user.id,
+    assigned_by: ctx.user.id,
+  })
+
+  if (error) {
+    if (error.code === '23505') return { success: true } // already assigned
+    return { success: false, error: error.message }
+  }
+  return { success: true }
+}
+
+/**
+ * Remove a self-added SOP (where assigned_by = current user).
+ */
+export async function selfRemoveSop(sopId: string) {
+  const ctx = await getWorkerContext()
+  if ('error' in ctx) return { success: false, error: ctx.error }
+
+  const admin = createAdminClient()
+  const { error } = await admin
+    .from('sop_assignments')
+    .delete()
+    .eq('sop_id', sopId)
+    .eq('user_id', ctx.user.id)
+    .eq('assigned_by', ctx.user.id)
+    .eq('assignment_type', 'individual')
+
+  if (error) return { success: false, error: error.message }
+  return { success: true }
+}
+
+/**
+ * Request removal of a manager-assigned SOP.
+ * Creates a notification to the assigning manager (or all admins for role-based).
+ */
+export async function requestRemoveAssignment(sopId: string) {
+  const ctx = await getWorkerContext()
+  if ('error' in ctx) return { success: false, error: ctx.error }
+
+  // Check for individual assignment by a manager
+  const { data: assignment } = await ctx.supabase
+    .from('sop_assignments')
+    .select('id, assigned_by')
+    .eq('sop_id', sopId)
+    .eq('user_id', ctx.user.id)
+    .eq('assignment_type', 'individual')
+    .neq('assigned_by', ctx.user.id)
+    .maybeSingle()
+
+  const admin = createAdminClient()
+
+  if (assignment) {
+    // Notify the specific manager who assigned it
+    await admin.from('worker_notifications').insert({
+      organisation_id: ctx.organisationId,
+      user_id: assignment.assigned_by,
+      sop_id: sopId,
+      type: 'removal_request',
+    })
+  } else {
+    // Role-based assignment — notify all admins/safety_managers
+    const { data: managers } = await admin
+      .from('organisation_members')
+      .select('user_id')
+      .eq('organisation_id', ctx.organisationId)
+      .in('role', ['admin', 'safety_manager'])
+
+    if (managers && managers.length > 0) {
+      await admin.from('worker_notifications').insert(
+        managers.map((m) => ({
+          organisation_id: ctx.organisationId,
+          user_id: m.user_id,
+          sop_id: sopId,
+          type: 'removal_request',
+        }))
+      )
+    }
+  }
+
+  return { success: true }
+}
+
+/**
+ * Get all SOP assignments for the current user (self + manager + role-based).
+ */
+export async function getUserSopAssignments() {
+  const ctx = await getWorkerContext()
+  if ('error' in ctx) return []
+
+  const { data: individual } = await ctx.supabase
+    .from('sop_assignments')
+    .select('id, sop_id, assigned_by, assignment_type')
+    .eq('user_id', ctx.user.id)
+    .eq('assignment_type', 'individual')
+
+  let roleAssignments: typeof individual = []
+  if (ctx.role) {
+    const { data } = await ctx.supabase
+      .from('sop_assignments')
+      .select('id, sop_id, assigned_by, assignment_type')
+      .eq('role', ctx.role)
+      .eq('assignment_type', 'role')
+    roleAssignments = data ?? []
+  }
+
+  return [...(individual ?? []), ...(roleAssignments ?? [])].map((a) => ({
+    ...a,
+    isSelfAssigned: a.assignment_type === 'individual' && a.assigned_by === ctx.user.id,
+  }))
 }
 
 // ─── Types ──────────────────────────────────────────────────────────────────
