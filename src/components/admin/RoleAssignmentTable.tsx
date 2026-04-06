@@ -5,6 +5,7 @@ import { RefreshCw, UserMinus, Shield, AlertTriangle } from 'lucide-react'
 import {
   updateMemberRoleSafe,
   inviteWorker,
+  addMemberByEmail,
   regenerateInviteCode,
   removeMember,
   getTeamMembersWithEmails,
@@ -31,6 +32,12 @@ export default function RoleAssignmentTable({ orgId, inviteCode: initialCode }: 
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteLoading, setInviteLoading] = useState(false)
   const [inviteFeedback, setInviteFeedback] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
+
+  // Add existing member state
+  const [addEmail, setAddEmail] = useState('')
+  const [addRole, setAddRole] = useState<AppRole>('worker')
+  const [addLoading, setAddLoading] = useState(false)
+  const [addFeedback, setAddFeedback] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
   // Invite code state
   const [inviteCode, setInviteCode] = useState(initialCode)
@@ -87,6 +94,21 @@ export default function RoleAssignmentTable({ orgId, inviteCode: initialCode }: 
       setInviteEmail('')
     }
     setInviteLoading(false)
+  }
+
+  const handleAddMember = async () => {
+    if (!addEmail.trim()) return
+    setAddLoading(true)
+    setAddFeedback(null)
+    const result = await addMemberByEmail(addEmail.trim(), addRole)
+    if ('error' in result && result.error) {
+      setAddFeedback({ message: result.error, type: 'error' })
+    } else {
+      setAddFeedback({ message: 'Member added!', type: 'success' })
+      setAddEmail('')
+      fetchMembers()
+    }
+    setAddLoading(false)
   }
 
   const handleCopyCode = async () => {
@@ -160,6 +182,42 @@ export default function RoleAssignmentTable({ orgId, inviteCode: initialCode }: 
         {inviteFeedback && (
           <p className={`mt-2 text-sm ${inviteFeedback.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
             {inviteFeedback.message}
+          </p>
+        )}
+      </div>
+
+      {/* Add existing member with role */}
+      <div className="rounded-xl bg-steel-800 border border-steel-700 p-4">
+        <p className="text-sm text-steel-400 mb-2 font-medium">Add Existing Member to Role</p>
+        <p className="text-xs text-steel-600 mb-3">Add someone who already has a SOPstart account to your organisation with a specific role.</p>
+        <div className="flex gap-2 flex-wrap">
+          <input
+            type="email"
+            value={addEmail}
+            onChange={e => setAddEmail(e.target.value)}
+            placeholder="user@example.co.nz"
+            className="flex-1 min-w-[180px] px-4 py-3 rounded-lg bg-steel-900 border border-steel-700 text-steel-100 placeholder-steel-400 focus:outline-none focus:ring-2 focus:ring-brand-yellow text-sm"
+          />
+          <select
+            value={addRole}
+            onChange={e => setAddRole(e.target.value as AppRole)}
+            className="px-3 py-3 rounded-lg bg-steel-900 border border-steel-700 text-steel-100 text-sm focus:outline-none focus:ring-2 focus:ring-brand-yellow cursor-pointer"
+          >
+            {ALL_ROLES.map(r => (
+              <option key={r} value={r}>{ROLE_LABELS[r]}</option>
+            ))}
+          </select>
+          <button
+            onClick={handleAddMember}
+            disabled={addLoading || !addEmail.trim()}
+            className="h-[44px] px-4 bg-brand-yellow hover:bg-brand-orange disabled:opacity-60 text-steel-900 font-bold rounded-lg text-sm transition-colors whitespace-nowrap"
+          >
+            {addLoading ? 'Adding...' : 'Add'}
+          </button>
+        </div>
+        {addFeedback && (
+          <p className={`mt-2 text-sm ${addFeedback.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+            {addFeedback.message}
           </p>
         )}
       </div>

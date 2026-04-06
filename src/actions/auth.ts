@@ -132,21 +132,10 @@ export async function joinWithInviteCode(formData: {
     redirect('/login')
   }
 
-  // Pitfall 3: Check if user already belongs to an organisation
-  const { data: existingMember } = await supabase
-    .from('organisation_members')
-    .select('id')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  if (existingMember) {
-    return { error: 'You are already a member of an organisation.' }
-  }
-
   // Look up org by invite_code
   const { data: org, error: orgError } = await supabase
     .from('organisations')
-    .select('id')
+    .select('id, name')
     .eq('invite_code', code)
     .maybeSingle()
 
@@ -154,20 +143,35 @@ export async function joinWithInviteCode(formData: {
     return { error: 'Invalid invite code' }
   }
 
-  // Join the organisation as a worker
-  const joinInsert: TablesInsert<'organisation_members'> = {
+  // Check if already a member of THIS org
+  const admin = createAdminClient()
+  const { data: existingMember } = await admin
+    .from('organisation_members')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('organisation_id', org.id)
+    .maybeSingle()
+
+  if (existingMember) {
+    return { error: `You are already a member of ${(org as { name?: string }).name ?? 'this organisation'}.` }
+  }
+
+  // Join the organisation as a worker (multi-org allowed)
+  const { error: memberError } = await admin.from('organisation_members').insert({
     organisation_id: org.id,
     user_id: user.id,
     role: 'worker',
-  }
-  const { error: memberError } = await supabase.from('organisation_members').insert(joinInsert)
+  })
 
   if (memberError) {
     console.error('join with code member insert error:', memberError)
     return { error: 'Failed to join organisation. Please try again.' }
   }
 
-  // Refresh JWT to get updated org claims
+  // Set this as the active org and refresh JWT
+  await supabase.auth.updateUser({
+    data: { active_org_id: org.id },
+  })
   await supabase.auth.refreshSession()
 
   redirect('/dashboard')
@@ -525,4 +529,132 @@ export async function updateMemberRoleSafe(formData: {
   }
 
   return { success: 'Role updated successfully' }
+}
+
+// ─────────────────────────────────────────────
+// switchOrganisation — set active org in user_metadata
+// ─────────────────────────────────────────────
+
+export async function switchOrganisation(organisationId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  // Verify user is a member of this org
+  const admin = createAdminClient()
+  const { data: membership } = await admin
+    .from('organisation_members')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('organisation_id', organisationId)
+    .maybeSingle()
+
+  if (!membership) return { error: 'You are not a member of this organisation' }
+
+  await supabase.auth.updateUser({
+    data: { active_org_id: organisationId },
+  })
+  await supabase.auth.refreshSession()
+
+  return { success: true }
+}
+
+// ─────────────────────────────────────────────
+// getUserMemberships — all orgs the user belongs to
+// ─────────────────────────────────────────────
+
+export interface UserMembership {
+  organisationId: string
+  orgName: string
+  role: AppRole
+  joinedAt: string | null
+}
+
+export async function getUserMemberships() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { memberships: [] as UserMembership[], activeOrgId: null as string | null }
+
+  const admin = createAdminClient()
+  const { data: members } = await admin
+    .from('organisation_members')
+    .select('organisation_id, role, created_at')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: true })
+
+  if (!members) return { memberships: [] as UserMembership[], activeOrgId: null as string | null }
+
+  const orgIds = members.map((m) => m.organisation_id)
+  const { data: orgs } = await admin
+    .from('organisations')
+    .select('id, name')
+    .in('id', orgIds)
+
+  const orgMap: Record<string, string> = {}
+  for (const o of orgs ?? []) {
+    orgMap[o.id] = o.name
+  }
+
+  const memberships: UserMembership[] = members.map((m) => ({
+    organisationId: m.organisation_id,
+    orgName: orgMap[m.organisation_id] ?? 'Unknown',
+    role: m.role as AppRole,
+    joinedAt: m.created_at,
+  }))
+
+  const activeOrgId = user.user_metadata?.active_org_id ?? memberships[0]?.organisationId ?? null
+
+  return { memberships, activeOrgId }
+}
+
+// ─────────────────────────────────────────────
+// addMemberByEmail — admin adds existing user to their org with a role
+// ─────────────────────────────────────────────
+
+export async function addMemberByEmail(email: string, role: AppRole) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { data: { session } } = await supabase.auth.getSession()
+  const jwtClaims = session?.access_token
+    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    : {}
+  const currentRole: string = jwtClaims['user_role'] ?? ''
+  if (!['admin', 'safety_manager'].includes(currentRole)) {
+    return { error: 'Admin access required' }
+  }
+  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  if (!organisationId) return { error: 'No organisation' }
+
+  const admin = createAdminClient()
+
+  // Find user by email
+  const { data: { users } } = await admin.auth.admin.listUsers({ perPage: 1000 })
+  const targetUser = users.find((u) => u.email?.toLowerCase() === email.toLowerCase())
+
+  if (!targetUser) {
+    return { error: 'No account found for this email. Send an invite instead.' }
+  }
+
+  // Check if already a member of this org
+  const { data: existing } = await admin
+    .from('organisation_members')
+    .select('id')
+    .eq('user_id', targetUser.id)
+    .eq('organisation_id', organisationId)
+    .maybeSingle()
+
+  if (existing) {
+    return { error: 'This person is already a member of your organisation.' }
+  }
+
+  const { error } = await admin.from('organisation_members').insert({
+    organisation_id: organisationId,
+    user_id: targetUser.id,
+    role,
+  })
+
+  if (error) return { error: 'Failed to add member' }
+  return { success: true }
 }
