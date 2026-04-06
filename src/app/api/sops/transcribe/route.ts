@@ -1,10 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { execFile } from 'node:child_process'
+import { writeFile, readFile, unlink, mkdtemp } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { transcribeAudio } from '@/lib/parsers/transcribe-audio'
 import { parseSopWithGPT } from '@/lib/parsers/gpt-parser'
 import { verifyTranscriptVsSop, detectMissingSections } from '@/lib/parsers/verify-sop'
 import type { ParsedSop } from '@/lib/validators/sop'
 import type { VerificationFlag } from '@/types/sop'
+
+/**
+ * Extract audio from video file server-side using ffmpeg-static.
+ * Returns MP3 buffer. Falls back to original buffer if ffmpeg unavailable.
+ */
+async function extractAudioServerSide(videoBuffer: ArrayBuffer, inputExt: string): Promise<{ buffer: ArrayBuffer; ext: string; mime: string }> {
+  try {
+    const ffmpegPath = require('ffmpeg-static') as string
+    const tmpDir = await mkdtemp(join(tmpdir(), 'sop-audio-'))
+    const inputPath = join(tmpDir, `input.${inputExt}`)
+    const outputPath = join(tmpDir, 'audio.mp3')
+
+    await writeFile(inputPath, Buffer.from(videoBuffer))
+
+    await new Promise<void>((resolve, reject) => {
+      execFile(ffmpegPath, [
+        '-i', inputPath,
+        '-vn',                    // strip video
+        '-acodec', 'libmp3lame',
+        '-q:a', '4',             // VBR ~165kbps
+        '-ac', '1',              // mono
+        '-y',                    // overwrite
+        outputPath,
+      ], { timeout: 120_000 }, (err) => {
+        if (err) reject(err)
+        else resolve()
+      })
+    })
+
+    const audioData = await readFile(outputPath)
+    // Cleanup
+    await unlink(inputPath).catch(() => {})
+    await unlink(outputPath).catch(() => {})
+
+    console.log(`[transcribe] Extracted audio: ${inputExt} ${(videoBuffer.byteLength / 1024 / 1024).toFixed(1)}MB → mp3 ${(audioData.byteLength / 1024 / 1024).toFixed(1)}MB`)
+    return { buffer: audioData.buffer.slice(audioData.byteOffset, audioData.byteOffset + audioData.byteLength), ext: 'mp3', mime: 'audio/mpeg' }
+  } catch (err) {
+    console.warn('[transcribe] Server-side audio extraction failed, using raw file:', err)
+    return { buffer: videoBuffer, ext: inputExt, mime: inputExt === 'webm' ? 'video/webm' : 'video/mp4' }
+  }
+}
 
 export const maxDuration = 300 // Vercel Pro: 300s max
 
@@ -68,15 +113,30 @@ export async function POST(request: NextRequest) {
       throw new Error(`Failed to download audio file: ${downloadError?.message ?? 'unknown error'}`)
     }
 
-    const audioBuffer = await audioData.arrayBuffer()
+    const rawBuffer = await audioData.arrayBuffer()
 
     // Determine file type from path extension
-    const fileExt = job.file_path.split('.').pop()?.toLowerCase() ?? 'mp3'
-    const mimeType = fileExt === 'webm' ? 'video/webm'
-      : fileExt === 'mp4' ? 'video/mp4'
-      : 'audio/mpeg'
+    const rawExt = job.file_path.split('.').pop()?.toLowerCase() ?? 'mp3'
+    const isVideoFile = ['webm', 'mp4', 'mov'].includes(rawExt)
 
-    // Stage 2: Transcribe with gpt-4o-transcribe (accepts mp3, mp4, webm, wav, etc.)
+    // If video file: extract audio server-side to reduce size for OpenAI (25MB limit)
+    // A 2-min webm at 2.5Mbps video = ~37MB; extracted MP3 = ~2MB
+    let audioBuffer: ArrayBuffer
+    let fileExt: string
+    let mimeType: string
+
+    if (isVideoFile) {
+      const extracted = await extractAudioServerSide(rawBuffer, rawExt)
+      audioBuffer = extracted.buffer
+      fileExt = extracted.ext
+      mimeType = extracted.mime
+    } else {
+      audioBuffer = rawBuffer
+      fileExt = rawExt
+      mimeType = 'audio/mpeg'
+    }
+
+    // Stage 2: Transcribe with gpt-4o-transcribe
     await updateStage(admin, job.id, 'transcribing')
     const segments = await transcribeAudio(audioBuffer, fileExt, mimeType)
 

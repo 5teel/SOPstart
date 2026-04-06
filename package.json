@@ -27,6 +27,7 @@
     "@tanstack/query-persist-client-core": "^5.95.2",
     "@tanstack/react-query": "^5.95.2",
     "dexie": "^4.3.0",
+    "ffmpeg-static": "^5.3.0",
     "heic2any": "^0.0.4",
     "idb-keyval": "^6.2.2",
     "lightningcss": "^1.32.0",
