@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { TablesInsert, TablesUpdate } from '@/types/database.types'
+import type { AppRole } from '@/types/auth'
 import {
   orgSignUpSchema,
   loginSchema,
@@ -311,6 +312,216 @@ export async function updateMemberRole(formData: {
   if (error) {
     console.error('update member role error:', error)
     return { error: 'Failed to update role. You may not have permission to do this.' }
+  }
+
+  return { success: 'Role updated successfully' }
+}
+
+// ─────────────────────────────────────────────
+// getTeamMembersWithEmails — fetch members + emails via admin client
+// ─────────────────────────────────────────────
+
+export interface TeamMember {
+  id: string
+  user_id: string
+  role: AppRole
+  email: string | null
+  created_at: string | null
+}
+
+export async function getTeamMembersWithEmails() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { data: { session } } = await supabase.auth.getSession()
+  const jwtClaims = session?.access_token
+    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    : {}
+  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  if (!organisationId) return { error: 'No organisation' }
+
+  const role: string = jwtClaims['user_role'] ?? ''
+  if (!['admin', 'safety_manager'].includes(role)) {
+    return { error: 'Admin access required' }
+  }
+
+  // Fetch members
+  const { data: members } = await supabase
+    .from('organisation_members')
+    .select('id, user_id, role, created_at')
+    .eq('organisation_id', organisationId)
+    .order('created_at', { ascending: true })
+
+  if (!members) return { error: 'Failed to load team' }
+
+  // Fetch emails via admin client (RLS blocks auth.users from regular client)
+  const admin = createAdminClient()
+  const userIds = members.map((m) => m.user_id)
+  const emailMap: Record<string, string> = {}
+
+  // Supabase admin API: list users and filter
+  const { data: { users } } = await admin.auth.admin.listUsers({ perPage: 1000 })
+  for (const u of users) {
+    if (userIds.includes(u.id) && u.email) {
+      emailMap[u.id] = u.email
+    }
+  }
+
+  const result: TeamMember[] = members.map((m) => ({
+    id: m.id,
+    user_id: m.user_id,
+    role: m.role as AppRole,
+    email: emailMap[m.user_id] ?? null,
+    created_at: m.created_at,
+  }))
+
+  return { members: result, currentUserId: user.id }
+}
+
+// ─────────────────────────────────────────────
+// removeMember — remove a user from the organisation
+// ─────────────────────────────────────────────
+
+export async function removeMember(memberId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { data: { session } } = await supabase.auth.getSession()
+  const jwtClaims = session?.access_token
+    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    : {}
+  const role: string = jwtClaims['user_role'] ?? ''
+  if (!['admin', 'safety_manager'].includes(role)) {
+    return { error: 'Admin access required' }
+  }
+
+  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  if (!organisationId) return { error: 'No organisation' }
+
+  // Prevent removing yourself
+  const { data: target } = await supabase
+    .from('organisation_members')
+    .select('user_id, role')
+    .eq('id', memberId)
+    .maybeSingle()
+
+  if (!target) return { error: 'Member not found' }
+  if (target.user_id === user.id) return { error: 'You cannot remove yourself' }
+
+  // Prevent removing the last admin
+  if (target.role === 'admin') {
+    const { count } = await supabase
+      .from('organisation_members')
+      .select('id', { count: 'exact', head: true })
+      .eq('organisation_id', organisationId)
+      .eq('role', 'admin')
+
+    if ((count ?? 0) <= 1) {
+      return { error: 'Cannot remove the last admin. Promote another member first.' }
+    }
+  }
+
+  const { error } = await supabase
+    .from('organisation_members')
+    .delete()
+    .eq('id', memberId)
+
+  if (error) return { error: 'Failed to remove member' }
+  return { success: true }
+}
+
+// ─────────────────────────────────────────────
+// regenerateInviteCode — generate new code, old one stops working
+// ─────────────────────────────────────────────
+
+export async function regenerateInviteCode() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { data: { session } } = await supabase.auth.getSession()
+  const jwtClaims = session?.access_token
+    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    : {}
+  const role: string = jwtClaims['user_role'] ?? ''
+  if (role !== 'admin') return { error: 'Only admins can regenerate invite codes' }
+
+  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  if (!organisationId) return { error: 'No organisation' }
+
+  // Generate new 8-char code
+  const newCode = Array.from(crypto.getRandomValues(new Uint8Array(4)))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+    .toUpperCase()
+    .slice(0, 8)
+
+  const admin = createAdminClient()
+  const { error } = await admin
+    .from('organisations')
+    .update({ invite_code: newCode })
+    .eq('id', organisationId)
+
+  if (error) return { error: 'Failed to regenerate code' }
+  return { code: newCode }
+}
+
+// ─────────────────────────────────────────────
+// updateMemberRole with self-demotion protection
+// ─────────────────────────────────────────────
+
+export async function updateMemberRoleSafe(formData: {
+  memberId: string
+  role: string
+}) {
+  const result = updateRoleSchema.safeParse(formData)
+  if (!result.success) {
+    return { error: result.error.issues[0]?.message ?? 'Invalid input' }
+  }
+
+  const { memberId, role: newRole } = result.data
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { data: { session } } = await supabase.auth.getSession()
+  const jwtClaims = session?.access_token
+    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    : {}
+  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+
+  // Check if this is self-demotion from admin
+  const { data: target } = await supabase
+    .from('organisation_members')
+    .select('user_id, role')
+    .eq('id', memberId)
+    .maybeSingle()
+
+  if (!target) return { error: 'Member not found' }
+
+  if (target.user_id === user.id && target.role === 'admin' && newRole !== 'admin') {
+    // Check if they're the last admin
+    const { count } = await supabase
+      .from('organisation_members')
+      .select('id', { count: 'exact', head: true })
+      .eq('organisation_id', organisationId!)
+      .eq('role', 'admin')
+
+    if ((count ?? 0) <= 1) {
+      return { error: 'You are the last admin. Promote another member before changing your role.' }
+    }
+  }
+
+  const roleUpdate: TablesUpdate<'organisation_members'> = { role: newRole }
+  const { error } = await supabase
+    .from('organisation_members')
+    .update(roleUpdate)
+    .eq('id', memberId)
+
+  if (error) {
+    return { error: 'Failed to update role' }
   }
 
   return { success: 'Role updated successfully' }
