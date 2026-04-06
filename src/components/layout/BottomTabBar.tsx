@@ -75,7 +75,7 @@ export function BottomTabBar() {
   return (
     <nav
       aria-label="Main navigation"
-      className="fixed bottom-0 inset-x-0 z-40 bg-steel-800 border-t border-steel-700 pb-[env(safe-area-inset-bottom)]"
+      className="flex-shrink-0 bg-steel-800 border-t border-steel-700 pb-[env(safe-area-inset-bottom)]"
     >
       <div className="flex">
         {tabs.map(({ label, href, Icon }) => {

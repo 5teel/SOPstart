@@ -264,7 +264,7 @@ export function CompletionDetailClient({
 
       {/* Sign-off action bar (supervisor only, not yet signed) */}
       {showSignOffBar && (
-        <div className="fixed left-0 right-0 z-30 bg-steel-900 border-t border-steel-700 px-4 pt-3 pb-3" style={{ bottom: 'calc(var(--min-tap-target) + env(safe-area-inset-bottom, 0px))' }}>
+        <div className="sticky bottom-0 z-30 bg-steel-900 border-t border-steel-700 px-4 pt-3 pb-3">
           <div className="flex gap-3 max-w-2xl mx-auto">
             {/* Approve button */}
             <button

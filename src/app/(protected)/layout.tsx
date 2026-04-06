@@ -16,10 +16,10 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
 
   return (
     <QueryProvider>
-      <div className="min-h-dvh bg-steel-900">
+      <div className="h-dvh flex flex-col bg-steel-900 overflow-hidden">
         <OnlineStatusBanner />
         <InstallPrompt />
-        <main className="pb-[calc(var(--min-tap-target)+env(safe-area-inset-bottom))]">
+        <main className="flex-1 overflow-y-auto">
           {children}
         </main>
         <BottomTabBar />

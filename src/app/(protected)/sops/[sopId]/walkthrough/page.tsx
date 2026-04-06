@@ -377,7 +377,7 @@ export default function WalkthroughPage() {
       </div>
 
       {/* Fixed bottom action area */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 bg-steel-900 border-t border-steel-700 px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom,0px))]">
+      <div className="sticky bottom-0 z-30 bg-steel-900 border-t border-steel-700 px-4 pt-3 pb-3">
 
         {allDone ? (
           <>
