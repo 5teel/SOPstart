@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CheckCircle, AlertTriangle, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { reparseSop } from '@/actions/sops'
+import { reparseSop, restructureSop } from '@/actions/sops'
 import type { ParseJobStatus as ParseJobStatusType } from '@/types/sop'
 
 interface ParseJobStatusProps {
@@ -147,7 +147,6 @@ export default function ParseJobStatus({
       setReParsing(false)
       return
     }
-    // Trigger the correct pipeline based on whether this is a video SOP
     const endpoint = isVideoSop ? '/api/sops/transcribe' : '/api/sops/parse'
     fetch(endpoint, {
       method: 'POST',
@@ -157,6 +156,27 @@ export default function ParseJobStatus({
     setStatus('queued')
     setErrorMessage(null)
     setCurrentStage(null)
+    setReParsing(false)
+    router.refresh()
+  }
+
+  const handleRestructure = async () => {
+    setReParsing(true)
+    const result = await restructureSop(sopId)
+    if ('error' in result) {
+      setErrorMessage(result.error)
+      setStatus('failed')
+      setReParsing(false)
+      return
+    }
+    fetch('/api/sops/restructure', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sopId }),
+    }).catch(console.error)
+    setStatus('queued')
+    setErrorMessage(null)
+    setCurrentStage('structuring')
     setReParsing(false)
     router.refresh()
   }
@@ -234,16 +254,36 @@ export default function ParseJobStatus({
         {isOcr && <OcrBanner />}
         <div className="bg-steel-800 border border-steel-700 rounded-lg p-4 flex items-start gap-3">
           <CheckCircle className="text-green-400 flex-shrink-0 mt-0.5" size={20} />
-          <div>
+          <div className="flex-1">
             <p className="text-sm font-semibold text-steel-100">
               {isVideoSop ? 'Transcript and SOP ready to review' : 'Parsed and ready to review'}
             </p>
-            <button
-              onClick={() => router.refresh()}
-              className="text-brand-yellow text-sm font-medium hover:text-amber-400 mt-1"
-            >
-              Review now &rarr;
-            </button>
+            <div className="flex items-center gap-4 mt-2 flex-wrap">
+              <button
+                onClick={() => router.refresh()}
+                className="text-brand-yellow text-sm font-medium hover:text-amber-400"
+              >
+                Review now &rarr;
+              </button>
+              {isVideoSop && (
+                <>
+                  <button
+                    onClick={handleRestructure}
+                    disabled={reParsing}
+                    className="text-steel-400 text-sm font-medium hover:text-steel-100"
+                  >
+                    {reParsing ? 'Processing...' : 'Re-structure'}
+                  </button>
+                  <button
+                    onClick={handleReparse}
+                    disabled={reParsing}
+                    className="text-steel-400 text-sm font-medium hover:text-steel-100"
+                  >
+                    {reParsing ? 'Processing...' : 'Re-transcribe'}
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </>
@@ -260,15 +300,21 @@ export default function ParseJobStatus({
               <p className="text-sm font-semibold text-steel-100">
                 {errorMessage ?? 'Processing failed'}
               </p>
-              <div className="flex items-center gap-4 mt-3">
-                {onRetry && failedStage && (
-                  <button
-                    onClick={() => onRetry(failedStage)}
-                    className="text-brand-orange text-sm font-medium hover:text-amber-500"
-                  >
-                    Retry from {failedStageName ?? failedStage}
-                  </button>
-                )}
+              <div className="flex items-center gap-4 mt-3 flex-wrap">
+                <button
+                  onClick={handleRestructure}
+                  disabled={reParsing}
+                  className="text-brand-yellow text-sm font-medium hover:text-amber-400"
+                >
+                  {reParsing ? 'Processing...' : 'Re-structure only'}
+                </button>
+                <button
+                  onClick={handleReparse}
+                  disabled={reParsing}
+                  className="text-brand-orange text-sm font-medium hover:text-amber-500"
+                >
+                  {reParsing ? 'Processing...' : 'Full re-transcribe'}
+                </button>
                 <button
                   onClick={handleDelete}
                   disabled={deleting}

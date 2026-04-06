@@ -270,6 +270,59 @@ export async function reparseSop(sopId: string): Promise<{ success: true; sopId:
   return { success: true, sopId }
 }
 
+/**
+ * Re-structure a video SOP using the existing transcript (skips re-transcription).
+ * Much faster than full re-parse (~3-5s vs ~15-30s).
+ */
+export async function restructureSop(sopId: string): Promise<{ success: true; sopId: string } | { error: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  // Find existing parse job with transcript
+  const { data: existingJob } = await supabase
+    .from('parse_jobs')
+    .select('id, transcript_text, organisation_id, file_path, file_type')
+    .eq('sop_id', sopId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle() as { data: { id: string; transcript_text: string | null; organisation_id: string; file_path: string; file_type: string } | null }
+
+  if (!existingJob?.transcript_text) {
+    return { error: 'No existing transcript found — use full re-transcribe instead.' }
+  }
+
+  // Delete existing sections
+  await supabase.from('sop_sections').delete().eq('sop_id', sopId)
+
+  // Reset SOP status
+  await supabase
+    .from('sops')
+    .update({
+      status: 'parsing',
+      title: null,
+      overall_confidence: null,
+      parse_notes: null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', sopId)
+
+  // Create new parse job that carries forward the transcript
+  const admin = createAdminClient()
+  await admin.from('parse_jobs').insert({
+    organisation_id: existingJob.organisation_id,
+    sop_id: sopId,
+    file_path: existingJob.file_path,
+    file_type: existingJob.file_type,
+    status: 'queued',
+    current_stage: 'structuring',
+    transcript_text: existingJob.transcript_text,
+    transcript_segments: null, // will be re-populated from existing job if needed
+  })
+
+  return { success: true, sopId }
+}
+
 export async function deleteSop(sopId: string): Promise<{ success: true } | { error: string }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

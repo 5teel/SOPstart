@@ -10,7 +10,7 @@ import OriginalDocViewer from '@/components/admin/OriginalDocViewer'
 import SectionEditor from '@/components/admin/SectionEditor'
 import AdversarialFlagBanner from '@/components/admin/AdversarialFlagBanner'
 import MissingSectionWarningBanner from '@/components/admin/MissingSectionWarningBanner'
-import { reparseSop } from '@/actions/sops'
+import { reparseSop, restructureSop } from '@/actions/sops'
 import type { SopWithSections, SopStatus, ParseJob, TranscriptSegment, VerificationFlag } from '@/types/sop'
 
 interface ReviewClientProps {
@@ -43,8 +43,10 @@ export default function ReviewClient({
   const totalCount = sop.sop_sections.length
   const allApproved = totalCount > 0 && approvedCount >= totalCount
 
-  // Confirmation state: 'reparse' | 'delete' | 'publish' | null
-  const [confirmAction, setConfirmAction] = useState<'reparse' | 'delete' | 'publish' | null>(null)
+  const isVideoSop = sop.source_file_type === 'video'
+
+  // Confirmation state
+  const [confirmAction, setConfirmAction] = useState<'reparse' | 'restructure' | 'delete' | 'publish' | null>(null)
   const [actionPending, setActionPending] = useState(false)
   const [publishSuccess, setPublishSuccess] = useState(false)
 
@@ -84,6 +86,23 @@ export default function ReviewClient({
         ? '/api/sops/transcribe'
         : '/api/sops/parse'
       fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sopId: result.sopId }),
+      }).catch(console.error)
+    } else if ('error' in result) {
+      alert(result.error)
+    }
+    router.refresh()
+    setActionPending(false)
+  }
+
+  const executeRestructure = async () => {
+    setActionPending(true)
+    setConfirmAction(null)
+    const result = await restructureSop(sop.id)
+    if ('sopId' in result) {
+      fetch('/api/sops/restructure', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sopId: result.sopId }),
@@ -156,14 +175,33 @@ export default function ReviewClient({
           {confirmAction === 'reparse' ? (
             <div className="flex items-center gap-2 text-sm flex-wrap">
               <span className="text-steel-400 text-xs">
-                This will discard your edits and run the AI again. Sure?
+                {isVideoSop ? 'Full re-transcribe + re-structure. Takes ~30s.' : 'Discard edits and re-run AI?'}
               </span>
               <button
                 onClick={executeReparse}
                 disabled={actionPending}
                 className="h-[40px] px-3 bg-brand-orange text-white font-semibold text-xs rounded-lg hover:opacity-90"
               >
-                Yes, re-parse
+                Yes, re-{isVideoSop ? 'transcribe' : 'parse'}
+              </button>
+              <button
+                onClick={() => setConfirmAction(null)}
+                className="h-[40px] px-3 bg-steel-700 text-steel-100 font-semibold text-xs rounded-lg hover:bg-steel-600"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : confirmAction === 'restructure' ? (
+            <div className="flex items-center gap-2 text-sm flex-wrap">
+              <span className="text-steel-400 text-xs">
+                Re-run AI structuring using existing transcript. Takes ~5s.
+              </span>
+              <button
+                onClick={executeRestructure}
+                disabled={actionPending}
+                className="h-[40px] px-3 bg-brand-yellow text-steel-900 font-semibold text-xs rounded-lg hover:opacity-90"
+              >
+                Yes, re-structure
               </button>
               <button
                 onClick={() => setConfirmAction(null)}
@@ -212,12 +250,21 @@ export default function ReviewClient({
             </div>
           ) : (
             <>
+              {isVideoSop && (
+                <button
+                  onClick={() => setConfirmAction('restructure')}
+                  disabled={actionPending}
+                  className="h-[48px] px-4 bg-steel-700 text-brand-yellow border border-brand-yellow/40 font-semibold text-sm rounded-lg hover:bg-steel-600 disabled:opacity-50"
+                >
+                  Re-structure
+                </button>
+              )}
               <button
                 onClick={() => setConfirmAction('reparse')}
                 disabled={actionPending}
                 className="h-[48px] px-4 bg-steel-700 text-brand-orange border border-brand-orange/40 font-semibold text-sm rounded-lg hover:bg-steel-600 disabled:opacity-50"
               >
-                Re-parse
+                {isVideoSop ? 'Re-transcribe' : 'Re-parse'}
               </button>
               <button
                 onClick={() => setConfirmAction('delete')}
