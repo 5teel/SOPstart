@@ -14,6 +14,16 @@ import {
 } from '@/lib/validators/auth'
 
 // ─────────────────────────────────────────────
+// signOut
+// ─────────────────────────────────────────────
+
+export async function signOut() {
+  const supabase = await createClient()
+  await supabase.auth.signOut()
+  redirect('/login')
+}
+
+// ─────────────────────────────────────────────
 // signUpOrganisation — AUTH-01, D-01, D-02, D-03
 // Creates the org and admin user using service_role
 // ─────────────────────────────────────────────
