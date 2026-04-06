@@ -94,11 +94,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'Already processing' })
   }
 
-  // Mark job as processing
+  // Mark job as processing and SOP as parsing
   await admin
     .from('parse_jobs')
     .update({ status: 'processing', started_at: new Date().toISOString() })
     .eq('id', job.id)
+  await admin
+    .from('sops')
+    .update({ status: 'parsing' })
+    .eq('id', sopId)
 
   try {
     // Stage 1: Download audio/video file from sop-videos bucket

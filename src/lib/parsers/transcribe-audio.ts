@@ -62,6 +62,8 @@ export async function transcribeAudio(
     params.append('keywords', `${kw}:2`)
   }
 
+  console.log(`[Deepgram] Starting transcription: ${(audioBuffer.byteLength / 1024).toFixed(0)}KB ${mimeType}`)
+
   const res = await fetch(`https://api.deepgram.com/v1/listen?${params}`, {
     method: 'POST',
     headers: {
@@ -69,14 +71,18 @@ export async function transcribeAudio(
       'Content-Type': mimeType,
     },
     body: Buffer.from(audioBuffer),
+    signal: AbortSignal.timeout(120_000), // 2-minute timeout
   })
 
   if (!res.ok) {
     const errText = await res.text().catch(() => res.statusText)
+    console.error(`[Deepgram] Failed (${res.status}):`, errText)
     throw new Error(`Deepgram transcription failed (${res.status}): ${errText}`)
   }
 
   const data: DeepgramResponse = await res.json()
+  const utteranceCount = data.results?.utterances?.length ?? 0
+  console.log(`[Deepgram] Complete: ${utteranceCount} utterances`)
 
   // Prefer utterances (natural speech segments with timestamps)
   const utterances = data.results?.utterances ?? []
