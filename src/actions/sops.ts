@@ -119,7 +119,7 @@ export async function triggerParse(sopId: string): Promise<{ success: boolean } 
 
 export async function createVideoUploadSession(
   file: { name: string; size: string; type: string }
-): Promise<{ sopId: string; path: string; token: string } | { error: string }> {
+): Promise<{ sopId: string; path: string; token: string; signedUploadUrl: string | null } | { error: string }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
@@ -186,10 +186,21 @@ export async function createVideoUploadSession(
   // Use service role key for TUS upload auth
   const token = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
 
+  // Generate a presigned upload URL for direct upload (small files < 10MB)
+  let signedUploadUrl: string | null = null
+  const fileSize = parseInt(file.size, 10)
+  if (fileSize < 10 * 1024 * 1024) {
+    const { data: signedData } = await admin.storage
+      .from('sop-videos')
+      .createSignedUploadUrl(storagePath)
+    signedUploadUrl = signedData?.signedUrl ?? null
+  }
+
   return {
     sopId: sop.id,
     path: storagePath,
     token,
+    signedUploadUrl,
   }
 }
 

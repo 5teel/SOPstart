@@ -140,37 +140,67 @@ export function VideoPreviewPanel({
       return
     }
 
-    const { sopId, path, token } = sessionResult
+    const { sopId, path, token, signedUploadUrl } = sessionResult
 
-    // TUS upload the extracted audio
-    await new Promise<void>((resolve) => {
-      const upload = tusUpload({
-        file: audioFile,
-        storagePath: path,
-        accessToken: token,
-        bucketName: 'sop-videos',
-        onProgress: (pct) => {
-          setUploadProgress(pct)
-        },
-        onSuccess: () => {
-          // Trigger transcription pipeline
-          fetch('/api/sops/transcribe', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ sopId }),
-          }).catch(console.error)
-
-          resolve()
-          onSubmitComplete(sopId)
-        },
-        onError: () => {
-          showToast('Upload failed -- please check your connection and try again.')
+    // Direct upload for small files (< 10MB), TUS for large
+    if (signedUploadUrl && audioFile.size < 10 * 1024 * 1024) {
+      try {
+        setUploadProgress(10)
+        const res = await fetch(signedUploadUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': audioFile.type },
+          body: audioFile,
+        })
+        if (!res.ok) {
+          const errText = await res.text().catch(() => res.statusText)
+          console.error('[VideoUpload] Direct upload failed:', res.status, errText)
+          showToast(`Upload failed (${res.status}). Please try again.`)
           setPanelState('upload-error')
-          resolve()
-        },
+          return
+        }
+        setUploadProgress(100)
+        // Trigger transcription pipeline
+        fetch('/api/sops/transcribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sopId }),
+        }).catch(console.error)
+        onSubmitComplete(sopId)
+      } catch (err) {
+        console.error('[VideoUpload] Direct upload error:', err)
+        showToast('Upload failed -- please check your connection and try again.')
+        setPanelState('upload-error')
+      }
+    } else {
+      // TUS upload for large files
+      await new Promise<void>((resolve) => {
+        const upload = tusUpload({
+          file: audioFile,
+          storagePath: path,
+          accessToken: token,
+          bucketName: 'sop-videos',
+          onProgress: (pct) => {
+            setUploadProgress(pct)
+          },
+          onSuccess: () => {
+            fetch('/api/sops/transcribe', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ sopId }),
+            }).catch(console.error)
+            resolve()
+            onSubmitComplete(sopId)
+          },
+          onError: (error) => {
+            console.error('[VideoUpload] TUS upload error:', error?.message ?? error)
+            showToast(`Upload failed: ${error?.message ?? 'connection error'}. Please try again.`)
+            setPanelState('upload-error')
+            resolve()
+          },
+        })
+        upload.start()
       })
-      upload.start()
-    })
+    }
   }, [audioFile, showToast, onSubmitComplete])
 
   // ---------------------------------------------------------------------------
