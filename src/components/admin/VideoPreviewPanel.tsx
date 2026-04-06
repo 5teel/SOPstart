@@ -67,7 +67,7 @@ export function VideoPreviewPanel({
   // ---------------------------------------------------------------------------
 
   const handleLoadedMetadata = useCallback(() => {
-    if (videoRef.current && !isNaN(videoRef.current.duration)) {
+    if (videoRef.current && isFinite(videoRef.current.duration) && videoRef.current.duration > 0) {
       setDuration(videoRef.current.duration)
     }
   }, [])
