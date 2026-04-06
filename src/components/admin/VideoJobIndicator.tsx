@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Loader2, Video } from 'lucide-react'
+import { Loader2, Play } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 const ACTIVE_STATUSES = ['queued', 'analyzing', 'generating_audio', 'rendering']
@@ -15,19 +15,21 @@ const STAGE_LABELS: Record<string, string> = {
   rendering_pending: 'Rendering',
 }
 
-/**
- * Shows a spinning indicator + link on the SOP library row when a video
- * generation job is active for that SOP.
- */
+type JobState =
+  | { type: 'none' }
+  | { type: 'generating'; label: string }
+  | { type: 'ready' }
+
 export function VideoJobIndicator({ sopId }: { sopId: string }) {
-  const [activeJob, setActiveJob] = useState<{ id: string; status: string; current_stage: string | null } | null>(null)
+  const [state, setState] = useState<JobState>({ type: 'none' })
 
   useEffect(() => {
     const supabase = createClient()
     let cancelled = false
 
     async function check() {
-      const { data } = await supabase
+      // Check for active job first
+      const { data: active } = await supabase
         .from('video_generation_jobs')
         .select('id, status, current_stage')
         .eq('sop_id', sopId)
@@ -36,7 +38,28 @@ export function VideoJobIndicator({ sopId }: { sopId: string }) {
         .limit(1)
         .maybeSingle() as { data: { id: string; status: string; current_stage: string | null } | null }
 
-      if (!cancelled && data) setActiveJob(data)
+      if (!cancelled && active) {
+        const label = STAGE_LABELS[active.current_stage ?? active.status] ?? 'Generating'
+        setState({ type: 'generating', label })
+        return
+      }
+
+      // Check for ready + published video
+      const { data: ready } = await supabase
+        .from('video_generation_jobs')
+        .select('id')
+        .eq('sop_id', sopId)
+        .eq('status', 'ready')
+        .eq('published', true)
+        .limit(1)
+        .maybeSingle() as { data: { id: string } | null }
+
+      if (!cancelled && ready) {
+        setState({ type: 'ready' })
+        return
+      }
+
+      if (!cancelled) setState({ type: 'none' })
     }
 
     check()
@@ -44,18 +67,30 @@ export function VideoJobIndicator({ sopId }: { sopId: string }) {
     return () => { cancelled = true; clearInterval(interval) }
   }, [sopId])
 
-  if (!activeJob) return null
+  if (state.type === 'none') return null
 
-  const label = STAGE_LABELS[activeJob.current_stage ?? activeJob.status] ?? 'Generating'
+  if (state.type === 'generating') {
+    return (
+      <Link
+        href={`/admin/sops/${sopId}/video`}
+        className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-semibold hover:bg-blue-500/20 transition-colors flex-shrink-0"
+        title="Video generation in progress — tap to view"
+      >
+        <Loader2 size={12} className="animate-spin" />
+        {state.label}
+      </Link>
+    )
+  }
 
+  // Ready — show play button
   return (
     <Link
       href={`/admin/sops/${sopId}/video`}
-      className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-semibold hover:bg-blue-500/20 transition-colors flex-shrink-0"
-      title="Video generation in progress — tap to view"
+      className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-semibold hover:bg-green-500/20 transition-colors flex-shrink-0"
+      title="Video ready — tap to view"
     >
-      <Loader2 size={12} className="animate-spin" />
-      {label}
+      <Play size={12} />
+      Video
     </Link>
   )
 }

@@ -23,6 +23,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 7: Video Transcription (In-App Recording)** - In-browser camera recording → SOP transcription with iOS Safari fallback
 - [x] **Phase 8: Video SOP Generation** - AI-narrated slideshow, screen-recording-style, and full AI video generated from published SOPs (completed 2026-04-04)
 - [ ] **Phase 9: Streamlined File → Video Pipeline** - One-click upload-to-video SOP flow chaining file parsing and video generation
+- [ ] **Phase 10: Video Version Management** - Multiple video versions per SOP with labels, editing, deletion, and admin management UI
 
 ## Phase Details
 
@@ -190,6 +191,14 @@ Plans:
 - [ ] 09-03-PLAN.md — Publish auto-queue: enqueueVideoGenerationForPipeline helper + publish route extension (gate preserved, auto-queue runs after successful publish)
 - [ ] 09-04-PLAN.md — Progress page: /admin/sops/pipeline/[pipelineId] route with 5-stage PipelineStepper, realtime+polling hybrid, deep-link CTAs, ReviewClient back-to-pipeline breadcrumb
 
+### Phase 10: Video Version Management
+**Goal**: Admins can generate multiple video versions from a single published SOP, label and manage each version, and control which version workers see — with edit, delete, and re-generate controls
+**Depends on**: Phase 8
+**Requirements**: TBD (to be derived during discuss-phase)
+**Success Criteria**: TBD
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
 
 **Execution Order:**
@@ -206,3 +215,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. Video Transcription (In-App Recording) | 1/1 | Complete   | 2026-04-04 |
 | 8. Video SOP Generation | 5/5 | Complete   | 2026-04-04 |
 | 9. Streamlined File → Video Pipeline | 1/5 | In Progress|  |
+| 10. Video Version Management | 0/? | Pending | - |
