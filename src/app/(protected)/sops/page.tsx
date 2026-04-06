@@ -94,7 +94,7 @@ export default function SopsPage() {
   const activeCategoryLabel = activeCategory ?? 'All categories'
 
   return (
-    <div className="flex flex-col min-h-screen bg-steel-900">
+    <div className="flex flex-col flex-1 bg-steel-900">
       {/* Sticky header */}
       <header className="sticky top-0 z-20 bg-steel-900 border-b border-steel-700 px-4 flex items-center justify-between h-[56px]">
         <span className="text-sm font-semibold text-steel-100">{PRODUCT_NAME}</span>
@@ -163,7 +163,7 @@ export default function SopsPage() {
           </div>
         )}
 
-        <div className="flex-1 px-4 py-6 pb-[80px] max-w-2xl mx-auto w-full lg:max-w-none lg:mx-0">
+        <div className="flex-1 px-4 py-6 max-w-2xl mx-auto w-full lg:max-w-none lg:mx-0">
           {activeSection === 'your-sops' && (
             <YourSopsSection
               sops={assignedSops}

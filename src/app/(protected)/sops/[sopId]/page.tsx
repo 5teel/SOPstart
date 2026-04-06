@@ -141,7 +141,7 @@ export default function SopDetailPage() {
       )}
 
       {/* Scroll area */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 pb-[80px]">
+      <div className="flex-1 overflow-y-auto px-4 py-6">
         {isVideoTab && videoJob?.video_url && videoJob.chapter_markers ? (
           <VideoTabPanel
             videoUrl={`/api/videos/${videoJob.id}/stream`}

@@ -73,7 +73,7 @@ export function SupervisorActivityView({ role: _role }: SupervisorActivityViewPr
   }, [workerIds, workerMap])
 
   return (
-    <div className="px-4 py-6 pb-[80px] max-w-4xl mx-auto">
+    <div className="px-4 py-6 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold text-steel-100 mb-1">Activity</h1>
       {!isLoading && (
         <p className="text-sm text-steel-400 mb-6">

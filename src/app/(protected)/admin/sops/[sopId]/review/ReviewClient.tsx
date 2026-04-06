@@ -127,7 +127,7 @@ export default function ReviewClient({
     : undefined
 
   return (
-    <div className="min-h-screen bg-steel-900">
+    <div className="min-h-dvh bg-steel-900">
       {/* Sticky header bar */}
       <header className="sticky top-0 z-10 bg-steel-900 border-b border-steel-700 px-6 py-4 flex items-center gap-4 flex-wrap">
         {/* Left cluster */}
