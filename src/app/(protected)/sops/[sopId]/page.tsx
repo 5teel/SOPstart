@@ -85,9 +85,9 @@ export default function SopDetailPage() {
           <span className="text-base font-semibold text-steel-100 flex-1 truncate">SOP Not Found</span>
         </div>
         <div className="flex flex-col items-center justify-center flex-1 gap-4 px-8 text-center">
-          <p className="text-lg font-semibold text-steel-100">SOP not available</p>
+          <p className="text-lg font-semibold text-steel-100">SOP not found</p>
           <p className="text-sm text-steel-400 max-w-xs">
-            This SOP isn&apos;t available offline. Connect to the internet and try again.
+            This SOP may have been deleted or you may not have access to it.
           </p>
           <Link
             href="/sops"

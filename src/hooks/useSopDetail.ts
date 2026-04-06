@@ -2,13 +2,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { db } from '@/lib/offline/db'
 import { createClient } from '@/lib/supabase/client'
-import { queryPersister } from '@/lib/offline/query-persister'
-import { useNetworkStore } from '@/stores/network'
 import type { SopWithSections } from '@/types/sop'
 
 export function useSopDetail(sopId: string) {
-  const isOnline = useNetworkStore((s) => s.isOnline)
-
   return useQuery({
     queryKey: ['sop-detail', sopId],
     queryFn: async (): Promise<SopWithSections | null> => {
@@ -40,11 +36,9 @@ export function useSopDetail(sopId: string) {
         return { ...sopData, sop_sections: sectionsWithChildren }
       }
 
-      // Fallback: fetch from Supabase if online (non-assigned SOPs from library)
-      if (!isOnline) return null
-
+      // Fallback: fetch from Supabase (non-assigned SOPs from library)
       const supabase = createClient()
-      const { data: sop } = await supabase
+      const { data: sop, error } = await supabase
         .from('sops')
         .select(`
           *,
@@ -57,11 +51,10 @@ export function useSopDetail(sopId: string) {
         .eq('id', sopId)
         .single()
 
-      if (!sop) return null
+      if (error || !sop) return null
 
-      // Sort sections and nested data
-      const sorted = (sop as unknown as SopWithSections)
-      sorted.sop_sections = sorted.sop_sections
+      const sorted = sop as unknown as SopWithSections
+      sorted.sop_sections = (sorted.sop_sections ?? [])
         .sort((a, b) => a.sort_order - b.sort_order)
         .map((s) => ({
           ...s,
@@ -71,8 +64,9 @@ export function useSopDetail(sopId: string) {
 
       return sorted
     },
-    persister: queryPersister,
-    networkMode: 'offlineFirst',
+    // No persister — don't cache null for non-assigned SOPs
+    // No offlineFirst — always try Supabase when Dexie misses
+    staleTime: 1000 * 60 * 5,
     enabled: !!sopId,
   })
 }
