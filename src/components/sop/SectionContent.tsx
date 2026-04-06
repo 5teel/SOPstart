@@ -128,15 +128,33 @@ function DefaultContent({ section }: { section: SectionWithChildren }) {
 }
 
 export function SectionContent({ section }: SectionContentProps) {
-  switch (section.section_type) {
-    case 'hazards':
-    case 'emergency':
-      return <HazardContent section={section} />
-    case 'ppe':
-      return <PpeContent section={section} />
-    case 'steps':
-      return <StepsContent section={section} />
-    default:
-      return <DefaultContent section={section} />
+  const type = section.section_type
+  const hasSteps = section.sop_steps.length > 0
+
+  // Hazard/emergency sections
+  if (type.includes('hazard') || type.includes('emergency')) {
+    return <HazardContent section={section} />
   }
+
+  // PPE sections
+  if (type.includes('ppe') || type.includes('protective')) {
+    return <PpeContent section={section} />
+  }
+
+  // Any section with steps — regardless of type name
+  if (hasSteps) {
+    return (
+      <>
+        {section.content && (
+          <div className="bg-steel-800 border border-steel-700 rounded-xl p-5 mb-4">
+            <p className="text-base text-steel-100 leading-relaxed whitespace-pre-wrap">{section.content}</p>
+          </div>
+        )}
+        <StepsContent section={section} />
+      </>
+    )
+  }
+
+  // Content-only sections (scope, tools, notes, etc.)
+  return <DefaultContent section={section} />
 }
