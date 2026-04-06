@@ -118,6 +118,20 @@ const FORMAT_HINTS: Partial<Record<SourceFileType, string>> = {
 8. Preserve exact numbers (measurements, temperatures, durations, dosages)`,
 }
 
+// Detail level verbosity modifiers (1 = minimal, 5 = maximum)
+const DETAIL_LEVEL_HINTS: Record<number, string> = {
+  1: `\n\nDETAIL LEVEL: MINIMAL (1/5)
+Write the simplest possible SOP. Use short, plain language. One sentence per step maximum. Skip optional details, tips, and time estimates. Only include hazards that are genuinely dangerous. Ideal for: simple everyday tasks, experienced workers who just need a checklist.`,
+  2: `\n\nDETAIL LEVEL: BRIEF (2/5)
+Write a concise SOP. Clear, direct language with just enough detail to follow safely. Include key hazards and PPE but skip minor tips. Brief step descriptions — 1-2 sentences each. Ideal for: routine tasks, experienced teams.`,
+  3: `\n\nDETAIL LEVEL: STANDARD (3/5)
+Write a well-structured SOP with moderate detail. Include all hazards, PPE, and procedural steps with clear descriptions. Add warnings where safety-relevant. Include tools needed. This is the default level. Ideal for: general workplace procedures.`,
+  4: `\n\nDETAIL LEVEL: DETAILED (4/5)
+Write a thorough SOP with comprehensive detail. Every step should include context for WHY it matters. Add cautions, tips, and time estimates. List all tools and equipment. Describe hazard mitigations in full. Include quality checks and verification steps. Ideal for: safety-critical tasks, training new staff, compliance documentation.`,
+  5: `\n\nDETAIL LEVEL: MAXIMUM (5/5)
+Write the most comprehensive SOP possible. Every step must be broken into sub-steps where applicable. Include detailed hazard analysis with severity ratings and specific mitigations. Full PPE justification. Emergency procedures for every identified risk. Quality control checkpoints. Regulatory references where applicable. Training prerequisites. Sign-off requirements. Leave nothing to interpretation. Ideal for: hazardous operations, regulatory audits, legal defensibility, chemical/electrical/confined space work.`,
+}
+
 // Complexity triage prompt for Haiku
 const TRIAGE_PROMPT = `Assess the complexity of structuring this text into a Standard Operating Procedure. Reply with ONLY one word: SIMPLE or COMPLEX.
 
@@ -132,9 +146,11 @@ Text to assess:
  * 1. Haiku triages complexity (fast, cheap)
  * 2. Simple → Haiku parses, Complex → Sonnet parses
  */
-export async function parseSopWithGPT(extractedText: string, inputType?: SourceFileType): Promise<ParsedSop> {
+export async function parseSopWithGPT(extractedText: string, inputType?: SourceFileType, detailLevel: number = 3): Promise<ParsedSop> {
   const client = getAnthropic()
-  const hint = inputType ? (FORMAT_HINTS[inputType] ?? '') : ''
+  const formatHint = inputType ? (FORMAT_HINTS[inputType] ?? '') : ''
+  const detailHint = DETAIL_LEVEL_HINTS[Math.min(5, Math.max(1, Math.round(detailLevel)))] ?? DETAIL_LEVEL_HINTS[3]
+  const hint = formatHint + detailHint
 
   // Stage 1: Haiku complexity triage (~0.5s, ~$0.001)
   const excerpt = extractedText.slice(0, 2000) // first 2000 chars is enough to assess

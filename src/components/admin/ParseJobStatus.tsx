@@ -47,6 +47,7 @@ export default function ParseJobStatus({
   const [reParsing, setReParsing] = useState(false)
   const [currentStage, setCurrentStage] = useState<string | null>(initialStage ?? null)
   const [isVideoSop, setIsVideoSop] = useState(initialIsVideo ?? false)
+  const [detailLevel, setDetailLevel] = useState(3)
   const [startTime] = useState<number>(Date.now())
   const [elapsed, setElapsed] = useState(0)
 
@@ -160,7 +161,7 @@ export default function ParseJobStatus({
     router.refresh()
   }
 
-  const handleRestructure = async () => {
+  const handleRestructure = async (level?: number) => {
     setReParsing(true)
     const result = await restructureSop(sopId)
     if ('error' in result) {
@@ -172,7 +173,7 @@ export default function ParseJobStatus({
     fetch('/api/sops/restructure', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sopId }),
+      body: JSON.stringify({ sopId, detailLevel: level ?? detailLevel }),
     }).catch(console.error)
     setStatus('queued')
     setErrorMessage(null)
@@ -268,7 +269,7 @@ export default function ParseJobStatus({
               {isVideoSop && (
                 <>
                   <button
-                    onClick={handleRestructure}
+                    onClick={() => handleRestructure()}
                     disabled={reParsing}
                     className="text-steel-400 text-sm font-medium hover:text-steel-100"
                   >
@@ -284,6 +285,9 @@ export default function ParseJobStatus({
                 </>
               )}
             </div>
+            {isVideoSop && (
+              <DetailLevelControl value={detailLevel} onChange={setDetailLevel} onApply={() => handleRestructure()} disabled={reParsing} />
+            )}
           </div>
         </div>
       </>
@@ -302,7 +306,7 @@ export default function ParseJobStatus({
               </p>
               <div className="flex items-center gap-4 mt-3 flex-wrap">
                 <button
-                  onClick={handleRestructure}
+                  onClick={() => handleRestructure()}
                   disabled={reParsing}
                   className="text-brand-yellow text-sm font-medium hover:text-amber-400"
                 >
@@ -406,6 +410,56 @@ export default function ParseJobStatus({
         <p className="text-xs text-steel-400 mt-1">
           Grab a hot drink or take a smoko — we&apos;ll let you know when it&apos;s ready.
         </p>
+      </div>
+    </div>
+  )
+}
+
+// ─── Detail Level Control ───────────────────────────────────────────────────
+
+const DETAIL_LABELS = ['Minimal', 'Brief', 'Standard', 'Detailed', 'Maximum'] as const
+
+function DetailLevelControl({
+  value,
+  onChange,
+  onApply,
+  disabled,
+}: {
+  value: number
+  onChange: (v: number) => void
+  onApply: () => void
+  disabled: boolean
+}) {
+  return (
+    <div className="mt-3 pt-3 border-t border-steel-700">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs font-semibold text-steel-400 uppercase tracking-wider">
+          Detail level
+        </span>
+        <span className="text-xs text-steel-400">
+          {DETAIL_LABELS[value - 1]} ({value}/5)
+        </span>
+      </div>
+      <div className="flex items-center gap-3">
+        <span className="text-xs text-steel-400">−</span>
+        <input
+          type="range"
+          min={1}
+          max={5}
+          step={1}
+          value={value}
+          onChange={(e) => onChange(parseInt(e.target.value))}
+          className="flex-1 h-2 rounded-full appearance-none bg-steel-700 accent-brand-yellow cursor-pointer"
+          aria-label="Detail level"
+        />
+        <span className="text-xs text-steel-400">+</span>
+        <button
+          onClick={onApply}
+          disabled={disabled}
+          className="text-xs font-semibold text-brand-yellow hover:text-amber-400 disabled:opacity-50 whitespace-nowrap"
+        >
+          Apply
+        </button>
       </div>
     </div>
   )

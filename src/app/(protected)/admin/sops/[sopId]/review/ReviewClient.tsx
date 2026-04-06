@@ -48,6 +48,7 @@ export default function ReviewClient({
   // Confirmation state
   const [confirmAction, setConfirmAction] = useState<'reparse' | 'restructure' | 'delete' | 'publish' | null>(null)
   const [actionPending, setActionPending] = useState(false)
+  const [detailLevel, setDetailLevel] = useState(3)
   const [publishSuccess, setPublishSuccess] = useState(false)
 
   // Missing section acknowledgement state
@@ -105,7 +106,7 @@ export default function ReviewClient({
       fetch('/api/sops/restructure', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sopId: result.sopId }),
+        body: JSON.stringify({ sopId: result.sopId, detailLevel }),
       }).catch(console.error)
     } else if ('error' in result) {
       alert(result.error)
@@ -251,13 +252,30 @@ export default function ReviewClient({
           ) : (
             <>
               {isVideoSop && (
-                <button
-                  onClick={() => setConfirmAction('restructure')}
-                  disabled={actionPending}
-                  className="h-[48px] px-4 bg-steel-700 text-brand-yellow border border-brand-yellow/40 font-semibold text-sm rounded-lg hover:bg-steel-600 disabled:opacity-50"
-                >
-                  Re-structure
-                </button>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 bg-steel-800 border border-steel-700 rounded-lg px-2 h-[48px]">
+                    <span className="text-xs text-steel-400">−</span>
+                    <input
+                      type="range"
+                      min={1}
+                      max={5}
+                      step={1}
+                      value={detailLevel}
+                      onChange={(e) => setDetailLevel(parseInt(e.target.value))}
+                      className="w-16 h-1.5 rounded-full appearance-none bg-steel-600 accent-brand-yellow cursor-pointer"
+                      aria-label="Detail level"
+                      title={`Detail: ${['Minimal','Brief','Standard','Detailed','Maximum'][detailLevel - 1]} (${detailLevel}/5)`}
+                    />
+                    <span className="text-xs text-steel-400">+</span>
+                  </div>
+                  <button
+                    onClick={() => setConfirmAction('restructure')}
+                    disabled={actionPending}
+                    className="h-[48px] px-4 bg-steel-700 text-brand-yellow border border-brand-yellow/40 font-semibold text-sm rounded-lg hover:bg-steel-600 disabled:opacity-50"
+                  >
+                    Re-structure
+                  </button>
+                </div>
               )}
               <button
                 onClick={() => setConfirmAction('reparse')}
