@@ -7,6 +7,13 @@ import './globals.css'
 export const metadata: Metadata = {
   title: PRODUCT_NAME,
   description: PRODUCT_DESCRIPTION,
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: '32x32' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
 }
 
 export const viewport: Viewport = {
