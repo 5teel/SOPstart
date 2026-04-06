@@ -163,12 +163,18 @@ export function VideoPreviewPanel({
           return
         }
         setUploadProgress(100)
-        // Trigger transcription pipeline
-        fetch('/api/sops/transcribe', {
+        // Trigger transcription pipeline — await to confirm it started
+        const transcribeRes = await fetch('/api/sops/transcribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ sopId }),
-        }).catch(console.error)
+        })
+        if (!transcribeRes.ok) {
+          console.error('[VideoUpload] Transcription trigger failed:', transcribeRes.status)
+          showToast('Upload succeeded but transcription failed to start. Try re-parsing from the review page.')
+          setPanelState('upload-error')
+          return
+        }
         onSubmitComplete(sopId)
       } catch (err) {
         console.error('[VideoUpload] Direct upload error:', err)
@@ -186,12 +192,19 @@ export function VideoPreviewPanel({
           onProgress: (pct) => {
             setUploadProgress(pct)
           },
-          onSuccess: () => {
-            fetch('/api/sops/transcribe', {
+          onSuccess: async () => {
+            const transcribeRes = await fetch('/api/sops/transcribe', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ sopId }),
-            }).catch(console.error)
+            }).catch(() => null)
+            if (!transcribeRes || !transcribeRes.ok) {
+              console.error('[VideoUpload] Transcription trigger failed')
+              showToast('Upload succeeded but transcription failed to start. Try re-parsing from the review page.')
+              setPanelState('upload-error')
+              resolve()
+              return
+            }
             resolve()
             onSubmitComplete(sopId)
           },

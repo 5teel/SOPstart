@@ -165,14 +165,19 @@ export async function createVideoUploadSession(
   const ext = file.name.split('.').pop() || 'mp3'
   const storagePath = `${organisationId}/${sop.id}/audio/audio.${ext}`
 
-  // Update SOP with storage path
-  await admin
+  // Update SOP with storage path + create parse job
+  // If either fails, clean up and return error (pseudo-atomic)
+  const { error: updateError } = await admin
     .from('sops')
     .update({ source_file_path: storagePath })
     .eq('id', sop.id)
 
-  // Create parse job for video
-  await admin
+  if (updateError) {
+    await admin.from('sops').delete().eq('id', sop.id)
+    return { error: 'Failed to create upload session. Please try again.' }
+  }
+
+  const { error: jobError } = await admin
     .from('parse_jobs')
     .insert({
       organisation_id: organisationId,
@@ -183,6 +188,12 @@ export async function createVideoUploadSession(
       input_type: 'video_file',
       current_stage: 'uploading',
     })
+
+  if (jobError) {
+    console.error('Parse job creation error:', jobError)
+    await admin.from('sops').delete().eq('id', sop.id)
+    return { error: 'Failed to create upload session. Please try again.' }
+  }
 
   // Use service role key for TUS upload auth
   const token = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''

@@ -83,6 +83,20 @@ export async function POST(request: NextRequest) {
     // Build full transcript text from segments
     const transcriptText = segments.map((s) => s.text).join(' ')
 
+    // Validate transcript — reject if empty or too short (silence, no speech detected)
+    if (!transcriptText || transcriptText.trim().length < 20) {
+      await admin
+        .from('parse_jobs')
+        .update({
+          status: 'failed',
+          error_message: 'No speech detected in the recording. Please re-record with audible speech.',
+          completed_at: new Date().toISOString(),
+        })
+        .eq('id', job.id)
+      await admin.from('sops').update({ status: 'draft' }).eq('id', sopId)
+      return NextResponse.json({ error: 'No speech detected' }, { status: 422 })
+    }
+
     // Persist transcript on the parse job for review UI (Pitfall 6)
     // Cast to unknown first — Supabase types use Json which doesn't accept typed arrays directly
     await admin

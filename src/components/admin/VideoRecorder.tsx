@@ -233,6 +233,12 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
       }
     }
 
+    recorder.onerror = () => {
+      clearTimer()
+      setErrorMessage('Recording failed. Please close and try again.')
+      setRecorderState('error')
+    }
+
     recorder.onstop = async () => {
       clearTimer()
       setElapsedSeconds(prev => prev) // keep value for display
