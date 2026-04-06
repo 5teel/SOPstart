@@ -1,19 +1,9 @@
-import OpenAI from 'openai'
 import type { TranscriptSegment } from '@/types/sop'
 
-// Lazy-initialized to avoid throwing at module load time during Next.js static analysis
-let openai: OpenAI | null = null
-function getOpenAI(): OpenAI {
-  if (!openai) {
-    openai = new OpenAI() // reads OPENAI_API_KEY from env
-  }
-  return openai
-}
-
-// D-12: Global NZ industrial vocabulary for improved transcription accuracy
-const NZ_INDUSTRY_VOCABULARY = [
+// D-12: NZ industrial vocabulary for keyword boosting
+const NZ_INDUSTRY_KEYWORDS = [
   'PPE', 'MSDS', 'SDS', 'LOTO', 'lockout tagout',
-  'OTG', 'Tergo Alkalox', 'IRI CSV',
+  'OTG', 'Tergo', 'Alkalox',
   'torque wrench', 'Newtons', 'kPa', 'kN', 'psi',
   'alkali', 'caustic soda', 'hydrochloric acid',
   'respirator', 'safety glasses', 'steel cap boots',
@@ -21,37 +11,115 @@ const NZ_INDUSTRY_VOCABULARY = [
   'isolate', 'de-energise', 'earthing',
   'swarf', 'burr', 'deburr', 'chamfer',
   'micrometre', 'vernier', 'dial indicator',
-].join(', ')
+]
 
-// Max audio file size for single API call (20MB — 5MB safety margin below 25MB limit)
-const MAX_SINGLE_CALL_SIZE = 20 * 1024 * 1024
+interface DeepgramUtterance {
+  start: number
+  end: number
+  transcript: string
+}
+
+interface DeepgramWord {
+  word: string
+  punctuated_word?: string
+  start: number
+  end: number
+}
+
+interface DeepgramResponse {
+  results?: {
+    utterances?: DeepgramUtterance[]
+    channels?: Array<{
+      alternatives?: Array<{
+        transcript?: string
+        words?: DeepgramWord[]
+      }>
+    }>
+  }
+}
 
 export async function transcribeAudio(
   audioBuffer: ArrayBuffer,
   fileExt: string = 'mp3',
   mimeType: string = 'audio/mpeg',
 ): Promise<TranscriptSegment[]> {
-  const audioFile = new File([audioBuffer], `audio.${fileExt}`, { type: mimeType })
-
-  if (audioFile.size > MAX_SINGLE_CALL_SIZE) {
-    // For now, throw with a clear message. Chunking can be added in a future iteration.
-    throw new Error(
-      `Audio file is ${Math.round(audioFile.size / 1024 / 1024)}MB — exceeds 20MB limit. ` +
-      'Please use a shorter video (under ~20 minutes) or compress the audio.'
-    )
+  const apiKey = process.env.DEEPGRAM_API_KEY
+  if (!apiKey) {
+    throw new Error('DEEPGRAM_API_KEY is not set')
   }
 
-  const transcription = await getOpenAI().audio.transcriptions.create({
-    file: audioFile,
-    model: 'gpt-4o-transcribe',
-    response_format: 'verbose_json',
-    prompt: `Industrial SOP recording from a New Zealand workplace. Technical vocabulary includes: ${NZ_INDUSTRY_VOCABULARY}`,
+  // Build query params
+  const params = new URLSearchParams({
+    model: 'nova-2',
+    language: 'en-NZ',
+    smart_format: 'true',
+    punctuate: 'true',
+    paragraphs: 'true',
+    utterances: 'true',
+  })
+  // Add keyword boosting (each keyword:weight pair as separate param)
+  for (const kw of NZ_INDUSTRY_KEYWORDS) {
+    params.append('keywords', `${kw}:2`)
+  }
+
+  const res = await fetch(`https://api.deepgram.com/v1/listen?${params}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Token ${apiKey}`,
+      'Content-Type': mimeType,
+    },
+    body: Buffer.from(audioBuffer),
   })
 
-  // Map OpenAI segments to our TranscriptSegment type
-  return (transcription.segments ?? []).map((seg) => ({
-    start: seg.start,
-    end: seg.end,
-    text: seg.text.trim(),
-  }))
+  if (!res.ok) {
+    const errText = await res.text().catch(() => res.statusText)
+    throw new Error(`Deepgram transcription failed (${res.status}): ${errText}`)
+  }
+
+  const data: DeepgramResponse = await res.json()
+
+  // Prefer utterances (natural speech segments with timestamps)
+  const utterances = data.results?.utterances ?? []
+  if (utterances.length > 0) {
+    return utterances.map((u) => ({
+      start: u.start,
+      end: u.end,
+      text: u.transcript.trim(),
+    }))
+  }
+
+  // Fallback: word-level from channel alternatives
+  const channels = data.results?.channels ?? []
+  if (channels.length === 0 || !channels[0].alternatives?.[0]) {
+    return []
+  }
+
+  const alt = channels[0].alternatives[0]
+  const words = alt.words ?? []
+
+  if (words.length === 0) {
+    return alt.transcript
+      ? [{ start: 0, end: 0, text: alt.transcript }]
+      : []
+  }
+
+  // Group words into ~10s segments for review UI timeline
+  const segments: TranscriptSegment[] = []
+  let segStart = words[0].start
+  let segWords: string[] = []
+
+  for (const word of words) {
+    segWords.push(word.punctuated_word ?? word.word)
+    if (word.end - segStart >= 10 || word === words[words.length - 1]) {
+      segments.push({
+        start: segStart,
+        end: word.end,
+        text: segWords.join(' ').trim(),
+      })
+      segStart = word.end
+      segWords = []
+    }
+  }
+
+  return segments
 }
