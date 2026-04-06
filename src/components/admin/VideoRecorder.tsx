@@ -239,17 +239,28 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
       setRecordedBlob(blob)
       setRecorderState('extracting-audio')
 
-      // Extract audio
+      // Extract audio — with 15s timeout, falls back to uploading raw video
+      const videoFile = new File([blob], 'recording.webm', { type: mime || 'video/webm' })
       try {
-        const videoFile = new File([blob], 'recording.webm', { type: mime || 'video/webm' })
-        const audio = await extractAudioFromVideo(videoFile, (pct) => {
+        const extractionPromise = extractAudioFromVideo(videoFile, (pct) => {
           setExtractionPct(pct)
         })
-        setAudioFile(audio)
+        const timeoutPromise = new Promise<null>((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), 15_000)
+        )
+        const audio = await Promise.race([extractionPromise, timeoutPromise])
+        if (audio) {
+          setAudioFile(audio)
+        } else {
+          // Fallback: use video file directly (OpenAI accepts webm)
+          setAudioFile(videoFile)
+        }
         setRecorderState('preview')
       } catch {
-        setErrorMessage('Audio extraction failed. Please try recording again.')
-        setRecorderState('error')
+        // Timeout or extraction failure — upload video directly
+        console.warn('[VideoRecorder] Audio extraction skipped — uploading video directly')
+        setAudioFile(videoFile)
+        setRecorderState('preview')
       }
     }
 

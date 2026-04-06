@@ -160,9 +160,10 @@ export async function createVideoUploadSession(
     return { error: 'Failed to create upload session. Please try again.' }
   }
 
-  // Storage path: {org_id}/{sop_id}/audio/audio.mp3
-  // Audio file is uploaded (not the video — client extracts audio before upload)
-  const storagePath = `${organisationId}/${sop.id}/audio/audio.mp3`
+  // Storage path: {org_id}/{sop_id}/audio/{filename}
+  // May be extracted MP3 audio or raw webm video (mobile fallback)
+  const ext = file.name.split('.').pop() || 'mp3'
+  const storagePath = `${organisationId}/${sop.id}/audio/audio.${ext}`
 
   // Update SOP with storage path
   await admin

@@ -56,10 +56,10 @@ export async function POST(request: NextRequest) {
     .eq('id', job.id)
 
   try {
-    // Stage 1: Extract audio (already done client-side via WASM — audio file is in sop-videos bucket)
+    // Stage 1: Download audio/video file from sop-videos bucket
+    // May be extracted MP3 audio or raw webm video (mobile fallback)
     await updateStage(admin, job.id, 'extracting_audio')
 
-    // Download the audio file from sop-videos bucket
     const { data: audioData, error: downloadError } = await admin.storage
       .from('sop-videos')
       .download(job.file_path)
@@ -70,9 +70,15 @@ export async function POST(request: NextRequest) {
 
     const audioBuffer = await audioData.arrayBuffer()
 
-    // Stage 2: Transcribe audio with gpt-4o-transcribe
+    // Determine file type from path extension
+    const fileExt = job.file_path.split('.').pop()?.toLowerCase() ?? 'mp3'
+    const mimeType = fileExt === 'webm' ? 'video/webm'
+      : fileExt === 'mp4' ? 'video/mp4'
+      : 'audio/mpeg'
+
+    // Stage 2: Transcribe with gpt-4o-transcribe (accepts mp3, mp4, webm, wav, etc.)
     await updateStage(admin, job.id, 'transcribing')
-    const segments = await transcribeAudio(audioBuffer)
+    const segments = await transcribeAudio(audioBuffer, fileExt, mimeType)
 
     // Build full transcript text from segments
     const transcriptText = segments.map((s) => s.text).join(' ')

@@ -26,8 +26,12 @@ const NZ_INDUSTRY_VOCABULARY = [
 // Max audio file size for single API call (20MB — 5MB safety margin below 25MB limit)
 const MAX_SINGLE_CALL_SIZE = 20 * 1024 * 1024
 
-export async function transcribeAudio(audioBuffer: ArrayBuffer): Promise<TranscriptSegment[]> {
-  const audioFile = new File([audioBuffer], 'audio.mp3', { type: 'audio/mpeg' })
+export async function transcribeAudio(
+  audioBuffer: ArrayBuffer,
+  fileExt: string = 'mp3',
+  mimeType: string = 'audio/mpeg',
+): Promise<TranscriptSegment[]> {
+  const audioFile = new File([audioBuffer], `audio.${fileExt}`, { type: mimeType })
 
   if (audioFile.size > MAX_SINGLE_CALL_SIZE) {
     // For now, throw with a clear message. Chunking can be added in a future iteration.

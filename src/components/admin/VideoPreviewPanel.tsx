@@ -127,11 +127,15 @@ export function VideoPreviewPanel({
     setPanelState('uploading')
     setUploadProgress(0)
 
-    // Create upload session using audio file metadata
+    // Create upload session — file may be extracted audio (mp3) or raw video (webm)
+    const isVideo = audioFile.type.startsWith('video/')
+    const fileName = isVideo ? audioFile.name : 'recording.mp3'
+    const fileType = isVideo ? audioFile.type : 'audio/mpeg'
+
     const sessionResult = await createVideoUploadSession({
-      name: 'recording.mp3',
+      name: fileName,
       size: String(audioFile.size),
-      type: 'audio/mpeg',
+      type: fileType,
     })
 
     if ('error' in sessionResult) {
