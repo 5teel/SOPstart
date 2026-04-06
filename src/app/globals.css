@@ -210,6 +210,175 @@
 }
 
 /* ============================================================
+   MORPHISM THEMES — Textured backgrounds + enhanced effects
+   Each morphism theme inherits its base theme's color tokens
+   and layers a generated texture + deeper morphism styling.
+   ============================================================ */
+
+/* --- 7. Steel Forge Morphism --- */
+[data-theme="steel-forge-morphism"] {
+  --color-brand-yellow: #f59e0b;
+  --color-brand-orange: #ea580c;
+  --color-steel-900: #0f1520;
+  --color-steel-800: #1a2332;
+  --color-steel-700: #2a3548;
+  --color-steel-600: #3e5068;
+  --color-steel-400: #8fa0b8;
+  --color-steel-100: #eef1f5;
+}
+
+[data-theme="steel-forge-morphism"] body {
+  background-color: #0f1520;
+  background-image:
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(245, 158, 11, 0.06) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, transparent 30%),
+    url('/themes/steel-forge-morphism.jpg');
+  background-size: 100% 100%, 100% 100%, 512px 512px;
+  background-attachment: fixed, fixed, fixed;
+}
+
+/* --- 8. Blueprint Morphism --- */
+[data-theme="blueprint-morphism"] {
+  --color-brand-yellow: #38bdf8;
+  --color-brand-orange: #0ea5e9;
+  --color-steel-900: #091622;
+  --color-steel-800: #0f2640;
+  --color-steel-700: #183554;
+  --color-steel-600: #245078;
+  --color-steel-400: #6aaad6;
+  --color-steel-100: #dceefb;
+}
+
+[data-theme="blueprint-morphism"] body {
+  background-color: #091622;
+  background-image:
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(56, 189, 248, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, transparent 25%),
+    url('/themes/blueprint-morphism.jpg');
+  background-size: 100% 100%, 100% 100%, 512px 512px;
+  background-attachment: fixed, fixed, fixed;
+}
+
+/* --- 9. Riveted Metal Morphism --- */
+[data-theme="riveted-metal-morphism"] {
+  --color-brand-yellow: #e2a03f;
+  --color-brand-orange: #c27825;
+  --color-steel-900: #151528;
+  --color-steel-800: #1e1e40;
+  --color-steel-700: #2e2e55;
+  --color-steel-600: #484878;
+  --color-steel-400: #9090b5;
+  --color-steel-100: #e5e5ef;
+}
+
+[data-theme="riveted-metal-morphism"] body {
+  background-color: #151528;
+  background-image:
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(226, 160, 63, 0.06) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, transparent 30%),
+    url('/themes/riveted-metal-morphism.jpg');
+  background-size: 100% 100%, 100% 100%, 512px 512px;
+  background-attachment: fixed, fixed, fixed;
+}
+
+/* --- 10. Circuit Board Morphism --- */
+[data-theme="circuit-board-morphism"] {
+  --color-brand-yellow: #4ade80;
+  --color-brand-orange: #22c55e;
+  --color-steel-900: #081508;
+  --color-steel-800: #0f200f;
+  --color-steel-700: #1a351a;
+  --color-steel-600: #285528;
+  --color-steel-400: #60a060;
+  --color-steel-100: #d8f0d8;
+}
+
+[data-theme="circuit-board-morphism"] body {
+  background-color: #081508;
+  background-image:
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(74, 222, 128, 0.06) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, transparent 25%),
+    url('/themes/circuit-board-morphism.jpg');
+  background-size: 100% 100%, 100% 100%, 512px 512px;
+  background-attachment: fixed, fixed, fixed;
+}
+
+/* --- 11. Concrete Plant Morphism --- */
+[data-theme="concrete-plant-morphism"] {
+  --color-brand-yellow: #fb923c;
+  --color-brand-orange: #f97316;
+  --color-steel-900: #181818;
+  --color-steel-800: #242424;
+  --color-steel-700: #343434;
+  --color-steel-600: #505050;
+  --color-steel-400: #989898;
+  --color-steel-100: #ededed;
+}
+
+[data-theme="concrete-plant-morphism"] body {
+  background-color: #181818;
+  background-image:
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(251, 146, 60, 0.05) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, transparent 30%),
+    url('/themes/concrete-plant-morphism.jpg');
+  background-size: 100% 100%, 100% 100%, 512px 512px;
+  background-attachment: fixed, fixed, fixed;
+}
+
+/* --- 12. Dark Ops Morphism --- */
+[data-theme="dark-ops-morphism"] {
+  --color-brand-yellow: #ef4444;
+  --color-brand-orange: #dc2626;
+  --color-steel-900: #080808;
+  --color-steel-800: #121212;
+  --color-steel-700: #1e1e1e;
+  --color-steel-600: #333333;
+  --color-steel-400: #7a7a7a;
+  --color-steel-100: #e0e0e0;
+}
+
+[data-theme="dark-ops-morphism"] body {
+  background-color: #080808;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(239, 68, 68, 0.05) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, transparent 30%),
+    url('/themes/dark-ops-morphism.jpg');
+  background-size: 100% 100%, 100% 100%, 512px 512px;
+  background-attachment: fixed, fixed, fixed;
+}
+
+/* ============================================================
+   Morphism panel overrides — enhanced depth for textured themes
+   ============================================================ */
+[data-theme$="-morphism"] .neuro-panel {
+  background-color: color-mix(in srgb, var(--color-steel-800) 85%, transparent);
+  backdrop-filter: blur(12px) saturate(1.2);
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+  box-shadow:
+    10px 10px 20px rgba(0, 0, 0, 0.5),
+    -4px -4px 14px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+[data-theme$="-morphism"] .neuro-panel-inset {
+  background-color: color-mix(in srgb, var(--color-steel-900) 80%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow:
+    inset 6px 6px 12px rgba(0, 0, 0, 0.5),
+    inset -3px -3px 8px rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+/* Glassmorphic card override for morphism themes */
+[data-theme$="-morphism"] .bg-steel-800 {
+  background-color: color-mix(in srgb, var(--color-steel-800) 80%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* ============================================================
    Neumorphic panel utility — works across all themes
    ============================================================ */
 .neuro-panel {
