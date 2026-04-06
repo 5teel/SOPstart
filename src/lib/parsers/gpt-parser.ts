@@ -145,7 +145,7 @@ export async function parseSopWithGPT(extractedText: string, inputType?: SourceF
   })
   const triageText = triageRes.content[0]?.type === 'text' ? triageRes.content[0].text.trim().toUpperCase() : 'COMPLEX'
   const isSimple = triageText.includes('SIMPLE')
-  const model = isSimple ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-6-20250514'
+  const model = isSimple ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-6'
 
   console.log(`[SOP Parser] Triage: ${triageText} → routing to ${model}`)
 
