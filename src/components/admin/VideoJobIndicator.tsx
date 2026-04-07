@@ -73,11 +73,11 @@ export function VideoJobIndicator({ sopId }: { sopId: string }) {
     return (
       <Link
         href={`/admin/sops/${sopId}/video`}
-        className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-semibold hover:bg-blue-500/20 transition-colors flex-shrink-0"
+        className="flex flex-col items-center justify-center w-[72px] min-h-[72px] rounded-lg bg-blue-500/15 border border-blue-500/30 text-blue-400 hover:bg-blue-500/25 transition-colors flex-shrink-0"
         title="Video generation in progress — tap to view"
       >
-        <Loader2 size={12} className="animate-spin" />
-        {state.label}
+        <Loader2 size={20} className="animate-spin" />
+        <span className="text-[10px] font-semibold mt-1">{state.label}</span>
       </Link>
     )
   }
@@ -86,11 +86,11 @@ export function VideoJobIndicator({ sopId }: { sopId: string }) {
   return (
     <Link
       href={`/admin/sops/${sopId}/video`}
-      className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-semibold hover:bg-green-500/20 transition-colors flex-shrink-0"
+      className="flex flex-col items-center justify-center w-[72px] min-h-[72px] rounded-lg bg-green-500/15 border border-green-500/30 text-green-400 hover:bg-green-500/25 transition-colors flex-shrink-0"
       title="Video ready — tap to view"
     >
-      <Play size={12} />
-      Video
+      <Play size={24} fill="currentColor" />
+      <span className="text-[10px] font-semibold mt-1">Video</span>
     </Link>
   )
 }

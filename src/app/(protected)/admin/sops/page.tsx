@@ -139,9 +139,11 @@ export default async function SopsLibraryPage({
                     </span>
                   </div>
                 </div>
-                <VideoJobIndicator sopId={sop.id} />
                 <StatusBadge status={sop.status as SopStatus} />
               </Link>
+              {sop.status === 'published' && (
+                <VideoJobIndicator sopId={sop.id} />
+              )}
               {sop.status === 'published' ? (
                 <div className="flex flex-col gap-1 flex-shrink-0">
                   <Link
