@@ -38,5 +38,9 @@ export default defineConfig({
       name: 'phase9-stubs',
       testMatch: /pipeline-entry|pipeline-linkage|pipeline-autoqueue|pipeline-progress|pipeline-failure-recovery|pipeline-review-gate/,
     },
+    {
+      name: 'phase10-stubs',
+      testMatch: /video-version-management/,
+    },
   ],
 })
