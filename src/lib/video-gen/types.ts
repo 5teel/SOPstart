@@ -31,7 +31,7 @@ export interface ShotstackEdit {
     tracks: ShotstackTrack[]
     soundtrack?: { src: string; effect?: 'fadeIn' | 'fadeOut'; volume?: number }
   }
-  output: { format: 'mp4'; resolution: 'hd' }
+  output: { format: 'mp4'; resolution: string; quality?: string; fps?: number }
   callback?: string
 }
 
