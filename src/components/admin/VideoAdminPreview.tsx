@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import VideoOutdatedBanner from '@/components/admin/VideoOutdatedBanner'
-import { publishVersionExclusive, unpublishVideo, generateNewVersion, deleteVideoJob } from '@/actions/video'
+import { publishVersionExclusive, unpublishVideo, generateNewVersion, permanentDeleteVersion } from '@/actions/video'
 
 interface VideoAdminPreviewProps {
   videoUrl: string
@@ -43,7 +43,7 @@ export default function VideoAdminPreview({
         await generateNewVersion(sopId, format)
         router.refresh()
       } else if (confirmAction === 'delete') {
-        await deleteVideoJob(jobId)
+        await permanentDeleteVersion(jobId)
         router.push('/admin/sops')
       }
     } finally {
@@ -90,8 +90,8 @@ export default function VideoAdminPreview({
           className="mt-4 bg-steel-800 border border-steel-700 rounded-lg p-4"
         >
           <p className="text-sm text-steel-100 mb-4">
-            {confirmAction === 'regenerate' && 'Re-generate this video? The current video will be replaced.'}
-            {confirmAction === 'publish' && 'Publish this video? Workers will see it in the SOP video tab.'}
+            {confirmAction === 'regenerate' && 'Generate a new version? The current version will be preserved.'}
+            {confirmAction === 'publish' && 'Publish this version? Workers will see it in the SOP video tab. Any currently published version will be unpublished.'}
             {confirmAction === 'unpublish' && 'Unpublish this video? Workers will no longer see it.'}
             {confirmAction === 'delete' && 'Delete this generated video? Workers will no longer see a video for this SOP.'}
           </p>
@@ -102,7 +102,7 @@ export default function VideoAdminPreview({
                 disabled={pending}
                 className="flex-1 h-[44px] bg-brand-orange text-steel-100 font-semibold rounded-lg hover:bg-orange-500 transition-colors disabled:opacity-50"
               >
-                {pending ? 'Re-generating...' : 'Yes, re-generate'}
+                {pending ? 'Generating...' : 'Yes, generate new version'}
               </button>
             )}
             {confirmAction === 'publish' && (
@@ -137,7 +137,7 @@ export default function VideoAdminPreview({
               disabled={pending}
               className="flex-1 h-[44px] bg-steel-700 text-steel-100 font-semibold rounded-lg hover:bg-steel-600 transition-colors disabled:opacity-50"
             >
-              {confirmAction === 'regenerate' ? 'Keep current video' :
+              {confirmAction === 'regenerate' ? 'Not now' :
                confirmAction === 'publish' ? 'Not yet' :
                confirmAction === 'delete' ? 'Keep video' :
                'Cancel'}
@@ -153,7 +153,7 @@ export default function VideoAdminPreview({
             onClick={() => openConfirm('regenerate')}
             className="flex-1 h-[72px] bg-steel-700 text-steel-100 font-semibold text-lg rounded-lg hover:bg-steel-600 transition-colors"
           >
-            Re-generate
+            Generate new version
           </button>
           {isPublished ? (
             <button
