@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Loader2, Play } from 'lucide-react'
+import { Loader2, Play, AlertTriangle, Video } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
 const ACTIVE_STATUSES = ['queued', 'analyzing', 'generating_audio', 'rendering']
@@ -19,6 +19,8 @@ type JobState =
   | { type: 'none' }
   | { type: 'generating'; label: string }
   | { type: 'ready' }
+  | { type: 'failed' }
+  | { type: 'unpublished' }
 
 export function VideoJobIndicator({ sopId }: { sopId: string }) {
   const [state, setState] = useState<JobState>({ type: 'none' })
@@ -59,6 +61,35 @@ export function VideoJobIndicator({ sopId }: { sopId: string }) {
         return
       }
 
+      // Check for any ready but unpublished video
+      const { data: unpublished } = await supabase
+        .from('video_generation_jobs')
+        .select('id')
+        .eq('sop_id', sopId)
+        .eq('status', 'ready')
+        .eq('published', false)
+        .limit(1)
+        .maybeSingle() as { data: { id: string } | null }
+
+      if (!cancelled && unpublished) {
+        setState({ type: 'unpublished' })
+        return
+      }
+
+      // Check for any failed video (so admin can see there's something to manage)
+      const { data: failed } = await supabase
+        .from('video_generation_jobs')
+        .select('id')
+        .eq('sop_id', sopId)
+        .eq('status', 'failed')
+        .limit(1)
+        .maybeSingle() as { data: { id: string } | null }
+
+      if (!cancelled && failed) {
+        setState({ type: 'failed' })
+        return
+      }
+
       if (!cancelled) setState({ type: 'none' })
     }
 
@@ -82,7 +113,33 @@ export function VideoJobIndicator({ sopId }: { sopId: string }) {
     )
   }
 
-  // Ready — show play button
+  if (state.type === 'failed') {
+    return (
+      <Link
+        href={`/admin/sops/${sopId}/video`}
+        className="flex flex-col items-center justify-center w-[72px] min-h-[72px] rounded-lg bg-red-500/15 border border-red-500/30 text-red-400 hover:bg-red-500/25 transition-colors flex-shrink-0"
+        title="Video generation failed — tap to manage"
+      >
+        <AlertTriangle size={20} />
+        <span className="text-[10px] font-semibold mt-1">Failed</span>
+      </Link>
+    )
+  }
+
+  if (state.type === 'unpublished') {
+    return (
+      <Link
+        href={`/admin/sops/${sopId}/video`}
+        className="flex flex-col items-center justify-center w-[72px] min-h-[72px] rounded-lg bg-steel-700/50 border border-steel-600 text-steel-400 hover:bg-steel-700 transition-colors flex-shrink-0"
+        title="Video ready but not published — tap to manage"
+      >
+        <Video size={20} />
+        <span className="text-[10px] font-semibold mt-1">Draft</span>
+      </Link>
+    )
+  }
+
+  // Ready + published — show play button
   return (
     <Link
       href={`/admin/sops/${sopId}/video`}
