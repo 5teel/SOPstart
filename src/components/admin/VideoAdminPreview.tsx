@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import VideoOutdatedBanner from '@/components/admin/VideoOutdatedBanner'
-import { publishVideo, regenerateVideo, deleteVideoJob } from '@/actions/video'
+import { publishVersionExclusive, unpublishVideo, generateNewVersion, deleteVideoJob } from '@/actions/video'
 
 interface VideoAdminPreviewProps {
   videoUrl: string
@@ -34,13 +34,13 @@ export default function VideoAdminPreview({
     setPending(true)
     try {
       if (confirmAction === 'publish') {
-        await publishVideo(jobId)
+        await publishVersionExclusive(jobId, sopId)
         router.push('/admin/sops')
       } else if (confirmAction === 'unpublish') {
-        await publishVideo(jobId)
+        await unpublishVideo(jobId)
         router.refresh()
       } else if (confirmAction === 'regenerate') {
-        await regenerateVideo(sopId, format)
+        await generateNewVersion(sopId, format)
         router.refresh()
       } else if (confirmAction === 'delete') {
         await deleteVideoJob(jobId)

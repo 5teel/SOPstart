@@ -735,6 +735,10 @@ export type Database = {
           completed_at: string | null
           created_at: string
           updated_at: string
+          // Phase 10: multi-version support (migration 00016)
+          version_number: number
+          label: string | null
+          archived: boolean
         }
         Insert: {
           id?: string
@@ -754,6 +758,10 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           updated_at?: string
+          // Phase 10: multi-version support (migration 00016)
+          version_number?: number
+          label?: string | null
+          archived?: boolean
         }
         Update: {
           id?: string
@@ -773,6 +781,10 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           updated_at?: string
+          // Phase 10: multi-version support (migration 00016)
+          version_number?: number
+          label?: string | null
+          archived?: boolean
         }
         Relationships: [
           {
