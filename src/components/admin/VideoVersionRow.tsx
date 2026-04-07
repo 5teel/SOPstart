@@ -179,6 +179,13 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate }
           {statusBadge.text}
         </span>
 
+        {/* Error message for failed versions */}
+        {version.status === 'failed' && version.error_message && (
+          <span className="text-xs text-red-400 truncate max-w-[300px] shrink" title={version.error_message}>
+            {version.error_message}
+          </span>
+        )}
+
         {/* Label */}
         {editing ? (
           <input

@@ -380,16 +380,7 @@ export async function runVideoGenerationPipeline(jobId: string): Promise<void> {
     }
 
     if (!shotstackUrl) {
-      // Render still in progress — save state so it can be picked up later
-      console.log(`[video-pipeline] Render ${renderId} still in progress — will be picked up by status check`)
-      await admin
-        .from('video_generation_jobs')
-        .update({
-          current_stage: 'rendering_pending',
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', jobId)
-      return // Exit without marking failed — render is still running on Shotstack
+      throw new Error(`Shotstack render timed out after ${Math.round(remainingMs / 1000)}s — render ${renderId} may still complete on Shotstack but this job has been marked failed. Re-generate to try again.`)
     }
 
     // Download from Shotstack and re-upload to our Storage
