@@ -192,17 +192,29 @@ Plans:
 - [ ] 09-04-PLAN.md — Progress page: /admin/sops/pipeline/[pipelineId] route with 5-stage PipelineStepper, realtime+polling hybrid, deep-link CTAs, ReviewClient back-to-pipeline breadcrumb
 
 ### Phase 10: Video Version Management
-**Goal**: Admins can generate multiple video versions from a single published SOP, label and manage each version, and control which version workers see — with edit, delete, and re-generate controls
+**Goal**: Admins can generate multiple video versions from a single published SOP, label and manage each version, and control which version workers see — with edit, archive, and re-generate controls
 **Depends on**: Phase 8
-**Requirements**: TBD (to be derived during discuss-phase)
-**Success Criteria**: TBD
-**Plans**: TBD
+**Requirements**: VVM-01, VVM-02, VVM-03, VVM-04, VVM-05, VVM-06, VVM-07, VVM-08
+**Success Criteria** (what must be TRUE):
+  1. Admin can generate multiple video versions per SOP; each generation creates a new version row with auto-incrementing version number
+  2. Version list shows all non-archived versions in descending order with v1/v2/v3 labels, format badges, and status badges
+  3. Publishing a version auto-unpublishes all other versions for that SOP; workers see only the published version
+  4. Admin can archive versions (soft delete to collapsible section) and permanently delete from archive
+  5. Admin can edit an optional label on each version (max 60 chars) via inline editor
+  6. Active/generating versions show live progress stepper inline in the version list
+**Plans**: 4 plans
 **UI hint**: yes
+
+Plans:
+- [ ] 10-01-PLAN.md — Foundation: Playwright test stubs (8 VVM stubs), DB migration 00018 (drop UNIQUE, add version_number/label/archived, partial unique index), TypeScript type extensions
+- [ ] 10-02-PLAN.md — Server actions: generateNewVersion, publishVersionExclusive, archiveVersion, unarchiveVersion, permanentDeleteVersion, updateVersionLabel + generate-video route update
+- [ ] 10-03-PLAN.md — UI components: VideoVersionRow (inline actions, confirm panels, label editor, generation stepper) + VideoVersionList (version rows, collapsible archived section, empty state)
+- [ ] 10-04-PLAN.md — Wiring: Rewrite VideoGeneratePanel + video page for multi-version, update VideoAdminPreview actions, push DB schema, human verification checkpoint
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -215,4 +227,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. Video Transcription (In-App Recording) | 1/1 | Complete   | 2026-04-04 |
 | 8. Video SOP Generation | 5/5 | Complete   | 2026-04-04 |
 | 9. Streamlined File → Video Pipeline | 1/5 | In Progress|  |
-| 10. Video Version Management | 0/? | Pending | - |
+| 10. Video Version Management | 0/4 | Pending | - |
