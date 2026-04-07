@@ -77,13 +77,18 @@ export async function POST() {
             continue
           }
 
+          const contentLength = videoResponse.headers.get('content-length')
+          console.log(`[recover-renders] Downloading ${renderId}: ${contentLength ?? 'unknown'} bytes`)
+
           const arrayBuffer = await videoResponse.arrayBuffer()
           const buffer = Buffer.from(arrayBuffer)
           const path = `${job.organisation_id}/${job.sop_id}/video/${job.id}.mp4`
 
+          console.log(`[recover-renders] Uploading ${buffer.length} bytes to ${path}`)
+
           const { error: uploadError } = await admin.storage
             .from('sop-generated-videos')
-            .upload(path, buffer, { contentType: 'video/mp4', upsert: true })
+            .upload(path, buffer, { contentType: 'video/mp4', upsert: true, duplex: 'half' } as Record<string, unknown>)
 
           if (uploadError) {
             results.push({
