@@ -206,10 +206,10 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 10-01-PLAN.md — Foundation: Playwright test stubs (8 VVM stubs), DB migration 00018 (drop UNIQUE, add version_number/label/archived, partial unique index), TypeScript type extensions
-- [ ] 10-02-PLAN.md — Server actions: generateNewVersion, publishVersionExclusive, archiveVersion, unarchiveVersion, permanentDeleteVersion, updateVersionLabel + generate-video route update
+- [x] 10-01-PLAN.md — Foundation: Playwright test stubs (8 VVM stubs), DB migration 00018 (drop UNIQUE, add version_number/label/archived, partial unique index), TypeScript type extensions
+- [x] 10-02-PLAN.md — Server actions: generateNewVersion, publishVersionExclusive, archiveVersion, unarchiveVersion, permanentDeleteVersion, updateVersionLabel + generate-video route update
 - [ ] 10-03-PLAN.md — UI components: VideoVersionRow (inline actions, confirm panels, label editor, generation stepper) + VideoVersionList (version rows, collapsible archived section, empty state)
-- [ ] 10-04-PLAN.md — Wiring: Rewrite VideoGeneratePanel + video page for multi-version, update VideoAdminPreview actions, push DB schema, human verification checkpoint
+- [x] 10-04-PLAN.md — Wiring: Rewrite VideoGeneratePanel + video page for multi-version, update VideoAdminPreview actions, push DB schema, human verification checkpoint
 
 ## Progress
 
@@ -227,4 +227,15 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. Video Transcription (In-App Recording) | 1/1 | Complete   | 2026-04-04 |
 | 8. Video SOP Generation | 5/5 | Complete   | 2026-04-04 |
 | 9. Streamlined File → Video Pipeline | 1/5 | In Progress|  |
-| 10. Video Version Management | 0/4 | Pending | - |
+| 10. Video Version Management | 3/4 | In Progress|  |
+
+## Backlog
+
+### Phase 999.1: Stale video job cleanup service (BACKLOG)
+
+**Goal:** Scheduled task or cron that marks video_generation_jobs stuck in queued/analyzing/generating_audio/rendering for >30 minutes as 'failed' with a timeout error. Could also notify admin. Triggered by finding a hours-old rendering job during Phase 10 verification.
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+- [ ] TBD (promote with /gsd-review-backlog when ready)
