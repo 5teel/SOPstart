@@ -159,6 +159,9 @@ export interface VideoGenerationJob {
   completed_at: string | null
   created_at: string
   updated_at: string
+  version_number: number
+  label: string | null
+  archived: boolean
 }
 
 // SOP with nested sections for review page
