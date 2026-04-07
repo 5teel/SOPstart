@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { Edit2, Upload, EyeOff, Archive, ArchiveRestore, Trash2 } from 'lucide-react'
+import { Edit2, Upload, EyeOff, Archive, ArchiveRestore, Trash2, Play, ChevronUp } from 'lucide-react'
 import VideoGenerationStatus from '@/components/admin/VideoGenerationStatus'
 import {
   publishVersionExclusive,
@@ -33,6 +33,9 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate }
   const [editing, setEditing] = useState(false)
   const [labelValue, setLabelValue] = useState(version.label ?? '')
   const [pending, setPending] = useState(false)
+  const [showPlayer, setShowPlayer] = useState(false)
+
+  const canPlay = version.status === 'ready' && version.video_url
   const inputRef = useRef<HTMLInputElement>(null)
   const confirmRef = useRef<HTMLDivElement>(null)
 
@@ -164,10 +167,21 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate }
     >
       {/* Main row */}
       <div className="flex items-center gap-2 px-3 py-3 flex-wrap">
-        {/* Version number */}
-        <span className="text-xs font-semibold text-steel-400 shrink-0">
-          v{version.version_number}
-        </span>
+        {/* Play / Version number */}
+        {canPlay ? (
+          <button
+            onClick={() => setShowPlayer(!showPlayer)}
+            className="flex items-center gap-1 text-xs font-semibold shrink-0 text-green-400 hover:text-green-300 transition-colors"
+            title={showPlayer ? 'Hide preview' : 'Play preview'}
+          >
+            {showPlayer ? <ChevronUp size={14} /> : <Play size={14} fill="currentColor" />}
+            v{version.version_number}
+          </button>
+        ) : (
+          <span className="text-xs font-semibold text-steel-400 shrink-0">
+            v{version.version_number}
+          </span>
+        )}
 
         {/* Format badge */}
         <span className="text-xs px-2 py-0.5 rounded bg-steel-700 text-steel-400 shrink-0">
@@ -301,6 +315,20 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate }
           )}
         </div>
       </div>
+
+      {/* Inline video player */}
+      {showPlayer && canPlay && (
+        <div className="px-3 pb-3">
+          <div className="bg-steel-900 rounded-lg border border-steel-700 overflow-hidden">
+            <video
+              src={`/api/videos/${version.id}/stream`}
+              controls
+              preload="metadata"
+              className="w-full rounded-lg"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Inline generation stepper */}
       {isActive && (
