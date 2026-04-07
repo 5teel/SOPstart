@@ -18,6 +18,7 @@ interface VideoVersionRowProps {
   sopId: string
   isArchived?: boolean
   onMutate: () => void
+  autoPlay?: boolean
 }
 
 type ConfirmAction = 'publish' | 'archive' | 'delete' | null
@@ -28,12 +29,12 @@ function isActiveStatus(status: string): boolean {
   return (ACTIVE_STATUSES as readonly string[]).includes(status)
 }
 
-export default function VideoVersionRow({ version, sopId, isArchived, onMutate }: VideoVersionRowProps) {
+export default function VideoVersionRow({ version, sopId, isArchived, onMutate, autoPlay }: VideoVersionRowProps) {
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null)
   const [editing, setEditing] = useState(false)
   const [labelValue, setLabelValue] = useState(version.label ?? '')
   const [pending, setPending] = useState(false)
-  const [showPlayer, setShowPlayer] = useState(false)
+  const [showPlayer, setShowPlayer] = useState(autoPlay === true)
 
   const canPlay = version.status === 'ready' && version.video_url
   const inputRef = useRef<HTMLInputElement>(null)
@@ -323,7 +324,8 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate }
             <video
               src={`/api/videos/${version.id}/stream`}
               controls
-              preload="metadata"
+              autoPlay={autoPlay}
+              preload={autoPlay ? 'auto' : 'metadata'}
               className="w-full rounded-lg"
             />
           </div>

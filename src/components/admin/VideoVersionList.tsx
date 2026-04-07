@@ -10,6 +10,7 @@ interface VideoVersionListProps {
   archivedVersions: VideoGenerationJob[]
   sopId: string
   onMutate: () => void
+  autoPlayJobId?: string
 }
 
 export default function VideoVersionList({
@@ -17,6 +18,7 @@ export default function VideoVersionList({
   archivedVersions,
   sopId,
   onMutate,
+  autoPlayJobId,
 }: VideoVersionListProps) {
   const [showArchived, setShowArchived] = useState(false)
 
@@ -35,7 +37,7 @@ export default function VideoVersionList({
     <div className="space-y-2">
       {/* Active/ready versions */}
       {versions.map((v) => (
-        <VideoVersionRow key={v.id} version={v} sopId={sopId} onMutate={onMutate} />
+        <VideoVersionRow key={v.id} version={v} sopId={sopId} onMutate={onMutate} autoPlay={v.id === autoPlayJobId} />
       ))}
 
       {/* Archived section */}

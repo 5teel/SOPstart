@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { Users, Video } from 'lucide-react'
 import { getVersionHistory, uploadNewVersion, notifyAssignedWorkers, type VersionRecord } from '@/actions/versioning'
 
 function ArrowLeftIcon({ className }: { className?: string }) {
@@ -163,12 +164,26 @@ export default function SopVersionHistoryPage() {
         >
           <ArrowLeftIcon className="h-5 w-5" />
         </Link>
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <h1 className="text-xl font-bold text-steel-100 truncate">Version History</h1>
           {sopTitle && (
             <p className="text-sm text-steel-400 truncate mt-0.5">{sopTitle}</p>
           )}
         </div>
+        <Link
+          href={`/admin/sops/${sopId}/assign`}
+          className="w-8 h-8 rounded-lg bg-steel-800 border border-steel-700 hover:bg-steel-700 hover:border-steel-600 text-steel-400 hover:text-steel-100 transition-colors flex items-center justify-center flex-shrink-0"
+          title="Assign SOP"
+        >
+          <Users size={16} />
+        </Link>
+        <Link
+          href={`/admin/sops/${sopId}/video`}
+          className="w-8 h-8 rounded-lg bg-steel-800 border border-steel-700 hover:bg-steel-700 hover:border-steel-600 text-steel-400 hover:text-steel-100 transition-colors flex items-center justify-center flex-shrink-0"
+          title="Video versions"
+        >
+          <Video size={16} />
+        </Link>
       </div>
 
       {/* Upload new version button */}

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Users, History } from 'lucide-react'
 import VideoVersionList from '@/components/admin/VideoVersionList'
 import { generateNewVersion } from '@/actions/video'
 import type { VideoFormat, VideoGenerationJob } from '@/types/sop'
@@ -19,9 +19,10 @@ interface VideoGeneratePanelProps {
   sop: SopSummary
   versions: VideoGenerationJob[]
   archivedVersions: VideoGenerationJob[]
+  autoPlayJobId?: string
 }
 
-export default function VideoGeneratePanel({ sop, versions, archivedVersions }: VideoGeneratePanelProps) {
+export default function VideoGeneratePanel({ sop, versions, archivedVersions, autoPlayJobId }: VideoGeneratePanelProps) {
   const router = useRouter()
   const [selectedFormat, setSelectedFormat] = useState<VideoFormat | null>(null)
   const [generating, setGenerating] = useState(false)
@@ -71,7 +72,21 @@ export default function VideoGeneratePanel({ sop, versions, archivedVersions }: 
         >
           <ArrowLeft size={20} />
         </Link>
-        <span className="text-sm font-medium text-steel-100 truncate">{sop.title}</span>
+        <span className="text-sm font-medium text-steel-100 truncate flex-1">{sop.title}</span>
+        <Link
+          href={`/admin/sops/${sop.id}/assign`}
+          className="w-8 h-8 rounded-lg bg-steel-800 border border-steel-700 hover:bg-steel-700 hover:border-steel-600 text-steel-400 hover:text-steel-100 transition-colors flex items-center justify-center flex-shrink-0"
+          title="Assign SOP"
+        >
+          <Users size={16} />
+        </Link>
+        <Link
+          href={`/admin/sops/${sop.id}/versions`}
+          className="w-8 h-8 rounded-lg bg-steel-800 border border-steel-700 hover:bg-steel-700 hover:border-steel-600 text-steel-400 hover:text-steel-100 transition-colors flex items-center justify-center flex-shrink-0"
+          title="Version history"
+        >
+          <History size={16} />
+        </Link>
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-8">
@@ -174,6 +189,7 @@ export default function VideoGeneratePanel({ sop, versions, archivedVersions }: 
             archivedVersions={archivedVersions}
             sopId={sop.id}
             onMutate={handleMutate}
+            autoPlayJobId={autoPlayJobId}
           />
         </div>
       </div>

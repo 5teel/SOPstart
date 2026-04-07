@@ -18,7 +18,7 @@ const STAGE_LABELS: Record<string, string> = {
 type JobState =
   | { type: 'none' }
   | { type: 'generating'; label: string }
-  | { type: 'ready' }
+  | { type: 'ready'; jobId: string }
   | { type: 'failed' }
   | { type: 'unpublished' }
 
@@ -57,7 +57,7 @@ export function VideoJobIndicator({ sopId }: { sopId: string }) {
         .maybeSingle() as { data: { id: string } | null }
 
       if (!cancelled && ready) {
-        setState({ type: 'ready' })
+        setState({ type: 'ready', jobId: ready.id })
         return
       }
 
@@ -139,15 +139,16 @@ export function VideoJobIndicator({ sopId }: { sopId: string }) {
     )
   }
 
-  // Ready + published — show play button
+  // Ready + published — show play button (auto-play via query param)
+  const playJobId = state.type === 'ready' ? state.jobId : ''
   return (
     <Link
-      href={`/admin/sops/${sopId}/video`}
+      href={`/admin/sops/${sopId}/video?play=${playJobId}`}
       className="flex flex-col items-center justify-center w-[72px] min-h-[72px] rounded-lg bg-green-500/15 border border-green-500/30 text-green-400 hover:bg-green-500/25 transition-colors flex-shrink-0"
-      title="Video ready — tap to view"
+      title="Video ready — tap to play"
     >
       <Play size={24} fill="currentColor" />
-      <span className="text-[10px] font-semibold mt-1">Video</span>
+      <span className="text-[10px] font-semibold mt-1">Play</span>
     </Link>
   )
 }

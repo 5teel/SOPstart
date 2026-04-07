@@ -11,10 +11,13 @@ export const metadata: Metadata = {
 
 export default async function VideoGeneratePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ sopId: string }>
+  searchParams: Promise<{ play?: string }>
 }) {
   const { sopId } = await params
+  const { play: autoPlayJobId } = await searchParams
   const supabase = await createClient()
 
   // Auth check
@@ -73,6 +76,7 @@ export default async function VideoGeneratePage({
       }}
       versions={(versions ?? []) as VideoGenerationJob[]}
       archivedVersions={(archivedVersions ?? []) as VideoGenerationJob[]}
+      autoPlayJobId={autoPlayJobId}
     />
   )
 }

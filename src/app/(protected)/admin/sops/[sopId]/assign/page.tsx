@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { ArrowLeft, Users } from 'lucide-react'
+import { ArrowLeft, Users, History, Video } from 'lucide-react'
+import Link from 'next/link'
 import { AssignmentRow } from '@/components/admin/AssignmentRow'
 import {
   getAssignments,
@@ -209,15 +210,31 @@ export default function AssignSopPage() {
     <div className="max-w-3xl mx-auto px-4 py-8 lg:px-8 lg:py-10">
       {/* Header */}
       <div className="mb-8">
-        <button
-          type="button"
-          onClick={() => router.push('/admin/sops')}
-          className="flex items-center gap-2 text-steel-400 hover:text-steel-100 transition-colors mb-4"
-          aria-label="Back to SOP Library"
-        >
-          <ArrowLeft size={18} />
-          <span className="text-sm font-medium">Back to SOP Library</span>
-        </button>
+        <div className="flex items-center gap-3 mb-4">
+          <Link
+            href={`/admin/sops/${sopId}/review`}
+            className="flex items-center gap-2 text-steel-400 hover:text-steel-100 transition-colors"
+            aria-label="Back to SOP review"
+          >
+            <ArrowLeft size={18} />
+            <span className="text-sm font-medium">Back to Review</span>
+          </Link>
+          <div className="flex-1" />
+          <Link
+            href={`/admin/sops/${sopId}/versions`}
+            className="w-8 h-8 rounded-lg bg-steel-800 border border-steel-700 hover:bg-steel-700 hover:border-steel-600 text-steel-400 hover:text-steel-100 transition-colors flex items-center justify-center"
+            title="Version history"
+          >
+            <History size={16} />
+          </Link>
+          <Link
+            href={`/admin/sops/${sopId}/video`}
+            className="w-8 h-8 rounded-lg bg-steel-800 border border-steel-700 hover:bg-steel-700 hover:border-steel-600 text-steel-400 hover:text-steel-100 transition-colors flex items-center justify-center"
+            title="Video versions"
+          >
+            <Video size={16} />
+          </Link>
+        </div>
 
         <h1 className="text-2xl font-bold text-steel-100">Assign SOP</h1>
         {sopTitle && (

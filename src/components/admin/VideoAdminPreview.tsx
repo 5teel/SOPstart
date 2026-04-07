@@ -35,7 +35,7 @@ export default function VideoAdminPreview({
     try {
       if (confirmAction === 'publish') {
         await publishVersionExclusive(jobId, sopId)
-        router.push('/admin/sops')
+        router.refresh()
       } else if (confirmAction === 'unpublish') {
         await unpublishVideo(jobId)
         router.refresh()
@@ -44,7 +44,7 @@ export default function VideoAdminPreview({
         router.refresh()
       } else if (confirmAction === 'delete') {
         await permanentDeleteVersion(jobId)
-        router.push('/admin/sops')
+        router.refresh()
       }
     } finally {
       setPending(false)
