@@ -164,7 +164,10 @@ export async function generateNewVersion(
     .select('id')
     .single()
 
-  if (insertError || !newJob) return { error: 'Failed to create version' }
+  if (insertError || !newJob) {
+    console.error('generateNewVersion insert error:', insertError)
+    return { error: insertError?.message || 'Failed to create version' }
+  }
 
   after(async () => {
     await runVideoGenerationPipeline(newJob.id).catch(console.error)
