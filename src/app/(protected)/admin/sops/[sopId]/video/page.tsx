@@ -6,7 +6,7 @@ import VideoGeneratePanel from '@/components/admin/VideoGeneratePanel'
 import type { VideoGenerationJob } from '@/types/sop'
 
 export const metadata: Metadata = {
-  title: 'Generate Video',
+  title: 'Video Versions',
 }
 
 export default async function VideoGeneratePage({
@@ -18,7 +18,9 @@ export default async function VideoGeneratePage({
   const supabase = await createClient()
 
   // Auth check
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
   // Check user is admin or safety_manager
@@ -32,7 +34,6 @@ export default async function VideoGeneratePage({
     redirect('/dashboard')
   }
 
-  // Use admin client for SOP + video job reads to bypass RLS
   const admin = createAdminClient()
 
   // Fetch SOP record
@@ -46,14 +47,21 @@ export default async function VideoGeneratePage({
     redirect('/admin/sops')
   }
 
-  // Fetch the latest video generation job for this SOP (any format)
-  const { data: latestJob } = await admin
+  // Fetch all non-archived versions, newest first
+  const { data: versions } = await admin
     .from('video_generation_jobs')
     .select('*')
     .eq('sop_id', sopId)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
+    .eq('archived', false)
+    .order('version_number', { ascending: false })
+
+  // Fetch archived versions
+  const { data: archivedVersions } = await admin
+    .from('video_generation_jobs')
+    .select('*')
+    .eq('sop_id', sopId)
+    .eq('archived', true)
+    .order('version_number', { ascending: false })
 
   return (
     <VideoGeneratePanel
@@ -63,7 +71,8 @@ export default async function VideoGeneratePage({
         updated_at: sop.updated_at,
         version: sop.version,
       }}
-      existingJob={latestJob as VideoGenerationJob | null}
+      versions={(versions ?? []) as VideoGenerationJob[]}
+      archivedVersions={(archivedVersions ?? []) as VideoGenerationJob[]}
     />
   )
 }
