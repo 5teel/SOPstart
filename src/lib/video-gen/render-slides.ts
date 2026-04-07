@@ -115,6 +115,6 @@ export function buildSlideshowEdit(sections: SectionWithAudio[]): ShotstackEdit 
         { clips: audioClips },
       ],
     },
-    output: { format: 'mp4', resolution: 'hd' },
+    output: { format: 'mp4', resolution: 'sd' },
   }
 }

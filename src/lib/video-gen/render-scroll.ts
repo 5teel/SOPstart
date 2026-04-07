@@ -183,6 +183,6 @@ export function buildScrollEdit(sectionsWithAudio: SectionWithAudio[]): Shotstac
         { clips: audioClips },
       ],
     },
-    output: { format: 'mp4', resolution: 'hd' },
+    output: { format: 'mp4', resolution: 'sd' },
   }
 }
