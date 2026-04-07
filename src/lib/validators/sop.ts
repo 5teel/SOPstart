@@ -144,6 +144,11 @@ export const recordVideoViewSchema = z.object({
   videoJobId: z.string().uuid(),
 })
 
+export const updateVersionLabelSchema = z.object({
+  jobId: z.string().uuid(),
+  label: z.string().max(60).trim().nullable(),
+})
+
 /**
  * Returns true if the filename has a macro-enabled Office extension.
  * Must be checked before any parsing library is invoked.

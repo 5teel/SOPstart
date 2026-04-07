@@ -103,28 +103,109 @@ export async function recordVideoView(input: {
 }
 
 // ---------------------------------------------------------------
-// publishVideo
+// generateNewVersion
 //
-// Sets published=true on a ready video_generation_jobs record.
+// Creates a new video_generation_jobs row with an incremented
+// version_number scoped to the SOP. Replaces regenerateVideo (D-06).
+// Blocks if a generation is already active for this SOP+format.
 // ---------------------------------------------------------------
-export async function publishVideo(
+export async function generateNewVersion(
+  sopId: string,
+  format: VideoFormat,
+): Promise<{ jobId: string; versionNumber: number } | { error: string }> {
+  const auth = await requireAdmin()
+  if (!auth.ok) return { error: auth.error }
+
+  const admin = createAdminClient()
+
+  // Guard: block if a generation is already active for this SOP+format
+  const { data: active } = await admin
+    .from('video_generation_jobs')
+    .select('id, status')
+    .eq('sop_id', sopId)
+    .eq('format', format)
+    .in('status', ['queued', 'analyzing', 'generating_audio', 'rendering'])
+    .limit(1)
+    .maybeSingle()
+
+  if (active) return { error: 'A generation is already in progress for this format' }
+
+  // Get next version number (app-level counter scoped to SOP)
+  const { data: maxRow } = await admin
+    .from('video_generation_jobs')
+    .select('version_number')
+    .eq('sop_id', sopId)
+    .order('version_number', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  const nextVersion = (maxRow?.version_number ?? 0) + 1
+
+  // Fetch SOP for version + status check
+  const { data: sop } = await admin
+    .from('sops')
+    .select('id, version, status, organisation_id')
+    .eq('id', sopId)
+    .single()
+
+  if (!sop || sop.status !== 'published') return { error: 'SOP not found or not published' }
+
+  const { data: newJob, error: insertError } = await admin
+    .from('video_generation_jobs')
+    .insert({
+      organisation_id: auth.organisationId,
+      sop_id: sopId,
+      sop_version: sop.version,
+      format,
+      version_number: nextVersion,
+      status: 'queued',
+      created_by: auth.userId,
+    } as Record<string, unknown>)
+    .select('id')
+    .single()
+
+  if (insertError || !newJob) return { error: 'Failed to create version' }
+
+  after(async () => {
+    await runVideoGenerationPipeline(newJob.id).catch(console.error)
+  })
+
+  return { jobId: newJob.id, versionNumber: nextVersion }
+}
+
+// ---------------------------------------------------------------
+// publishVersionExclusive
+//
+// Unpublishes all other versions for this SOP, then publishes the
+// target version. Enforces single-published-version invariant (D-03).
+// ---------------------------------------------------------------
+export async function publishVersionExclusive(
   jobId: string,
+  sopId: string,
 ): Promise<{ success: true } | { success: false; error: string }> {
   const auth = await requireAdmin()
   if (!auth.ok) return { success: false, error: auth.error }
 
   const admin = createAdminClient()
+  const now = new Date().toISOString()
 
-  const { error } = await admin
+  // Step 1: unpublish all versions for this SOP
+  const { error: unpubError } = await admin
     .from('video_generation_jobs')
-    .update({ published: true, updated_at: new Date().toISOString() })
+    .update({ published: false, updated_at: now })
+    .eq('sop_id', sopId)
+    .eq('published', true)
+
+  if (unpubError) return { success: false, error: 'Failed to unpublish existing versions' }
+
+  // Step 2: publish the target version (must be ready and not archived)
+  const { error: pubError } = await admin
+    .from('video_generation_jobs')
+    .update({ published: true, updated_at: now })
     .eq('id', jobId)
     .eq('status', 'ready')
 
-  if (error) {
-    console.error('publishVideo error:', error)
-    return { success: false, error: 'Failed to publish video' }
-  }
+  if (pubError) return { success: false, error: 'Failed to publish version' }
 
   return { success: true }
 }
@@ -156,11 +237,58 @@ export async function unpublishVideo(
 }
 
 // ---------------------------------------------------------------
-// deleteVideoJob
+// archiveVersion
 //
-// Deletes the job record and its associated Storage files.
+// Sets archived=true and published=false on the target job (D-05).
+// Archiving also unpublishes to prevent published+archived state.
 // ---------------------------------------------------------------
-export async function deleteVideoJob(
+export async function archiveVersion(
+  jobId: string,
+): Promise<{ success: true } | { success: false; error: string }> {
+  const auth = await requireAdmin()
+  if (!auth.ok) return { success: false, error: auth.error }
+
+  const admin = createAdminClient()
+  const now = new Date().toISOString()
+
+  // Archive also unpublishes (D-05 + Pitfall 5: published+archived violates D-03 semantics)
+  const { error } = await admin
+    .from('video_generation_jobs')
+    .update({ archived: true, published: false, updated_at: now })
+    .eq('id', jobId)
+
+  if (error) return { success: false, error: 'Failed to archive version' }
+  return { success: true }
+}
+
+// ---------------------------------------------------------------
+// unarchiveVersion
+//
+// Sets archived=false on the target job (D-05).
+// ---------------------------------------------------------------
+export async function unarchiveVersion(
+  jobId: string,
+): Promise<{ success: true } | { success: false; error: string }> {
+  const auth = await requireAdmin()
+  if (!auth.ok) return { success: false, error: auth.error }
+
+  const admin = createAdminClient()
+  const { error } = await admin
+    .from('video_generation_jobs')
+    .update({ archived: false, updated_at: new Date().toISOString() })
+    .eq('id', jobId)
+
+  if (error) return { success: false, error: 'Failed to unarchive version' }
+  return { success: true }
+}
+
+// ---------------------------------------------------------------
+// permanentDeleteVersion
+//
+// Hard-deletes the job record and its associated Storage files.
+// Renamed from deleteVideoJob (D-05). Alias export for migration safety.
+// ---------------------------------------------------------------
+export async function permanentDeleteVersion(
   jobId: string,
 ): Promise<{ success: true } | { success: false; error: string }> {
   const auth = await requireAdmin()
@@ -182,8 +310,7 @@ export async function deleteVideoJob(
   const { organisation_id: orgId, sop_id: sopId } = job
   const bucket = 'sop-generated-videos'
 
-  // Remove all audio files for this SOP (we stored under {orgId}/{sopId}/audio/)
-  // List and delete audio files
+  // Remove all audio files for this SOP (stored under {orgId}/{sopId}/audio/)
   const { data: audioFiles } = await admin.storage
     .from(bucket)
     .list(`${orgId}/${sopId}/audio`)
@@ -204,108 +331,39 @@ export async function deleteVideoJob(
     .eq('id', jobId)
 
   if (deleteError) {
-    console.error('deleteVideoJob error:', deleteError)
+    console.error('permanentDeleteVersion error:', deleteError)
     return { success: false, error: 'Failed to delete video job' }
   }
 
   return { success: true }
 }
 
+// Backward-compat alias — existing callers using deleteVideoJob continue to work
+// during migration to permanentDeleteVersion.
+export { permanentDeleteVersion as deleteVideoJob }
+
 // ---------------------------------------------------------------
-// regenerateVideo
+// updateVersionLabel
 //
-// Marks the existing job(s) for this SOP+format as failed (clears
-// the UNIQUE constraint), creates a new job, and fires the pipeline.
-// Does NOT call the API route — inline the same logic to avoid the
-// unnecessary HTTP round-trip.
+// Saves a label (max 60 chars) or clears it (null) on the target job (D-04).
 // ---------------------------------------------------------------
-export async function regenerateVideo(
-  sopId: string,
-  format: VideoFormat,
-): Promise<{ jobId: string } | { error: string }> {
+export async function updateVersionLabel(
+  jobId: string,
+  label: string | null,
+): Promise<{ success: true } | { success: false; error: string }> {
   const auth = await requireAdmin()
-  if (!auth.ok) return { error: auth.error }
+  if (!auth.ok) return { success: false, error: auth.error }
+
+  // Validate label
+  const trimmed = label?.trim() || null
+  if (trimmed && trimmed.length > 60) return { success: false, error: 'Label must be 60 characters or fewer' }
 
   const admin = createAdminClient()
-
-  // Fetch current SOP to get version and verify it exists
-  const { data: sop, error: sopError } = await admin
-    .from('sops')
-    .select('id, version, organisation_id, status')
-    .eq('id', sopId)
-    .single()
-
-  if (sopError || !sop) {
-    return { error: 'SOP not found' }
-  }
-
-  if (sop.status !== 'published') {
-    return { error: 'Only published SOPs can be used for video generation' }
-  }
-
-  // The UNIQUE constraint is (sop_id, format, sop_version) across ALL statuses.
-  // We can't insert a new row while an old one exists — we must reuse it.
-  const { data: existingJob } = await admin
+  const { error } = await admin
     .from('video_generation_jobs')
-    .select('id')
-    .eq('sop_id', sopId)
-    .eq('format', format)
-    .eq('sop_version', sop.version)
-    .maybeSingle()
+    .update({ label: trimmed, updated_at: new Date().toISOString() } as Record<string, unknown>)
+    .eq('id', jobId)
 
-  let jobId: string
-
-  if (existingJob) {
-    // Reset the existing job row to queued and clear previous state
-    const { error: resetError } = await admin
-      .from('video_generation_jobs')
-      .update({
-        status: 'queued',
-        current_stage: null,
-        error_message: null,
-        video_url: null,
-        published: false,
-        shotstack_render_id: null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', existingJob.id)
-
-    if (resetError) {
-      console.error('regenerateVideo reset error:', resetError)
-      return { error: 'Failed to reset existing job' }
-    }
-    jobId = existingJob.id
-  } else {
-    // No prior job for this SOP+format+version — create a new one
-    const { data: newJob, error: insertError } = await admin
-      .from('video_generation_jobs')
-      .insert({
-        organisation_id: auth.organisationId,
-        sop_id: sopId,
-        sop_version: sop.version,
-        format,
-        status: 'queued',
-        created_by: auth.userId,
-      })
-      .select('id')
-      .single()
-
-    if (insertError || !newJob) {
-      console.error('regenerateVideo job creation error:', insertError)
-      return { error: 'Failed to create regeneration job' }
-    }
-    jobId = newJob.id
-  }
-
-  // Use after() to run the pipeline after the server action returns — a plain
-  // void call would be killed when the action response is sent.
-  after(async () => {
-    try {
-      await runVideoGenerationPipeline(jobId)
-    } catch (err) {
-      console.error(`[regenerateVideo] Unhandled pipeline error for job ${jobId}:`, err)
-    }
-  })
-
-  return { jobId }
+  if (error) return { success: false, error: 'Failed to update label' }
+  return { success: true }
 }
