@@ -158,9 +158,9 @@ export async function generateNewVersion(
       sop_version: sop.version,
       format,
       version_number: nextVersion,
-      status: 'queued',
+      status: 'queued' as const,
       created_by: auth.userId,
-    } as Record<string, unknown>)
+    })
     .select('id')
     .single()
 
