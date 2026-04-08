@@ -164,33 +164,71 @@ async function fetchDeepgram() {
 
 // --- OpenAI ---
 async function fetchOpenAI() {
-  const key = process.env.OPENAI_API_KEY
-  if (!key) { console.log('  [OpenAI] OPENAI_API_KEY not set — skipping'); return }
+  // Prefer admin key for billing access, fall back to regular key
+  const key = process.env.OPENAI_ADMIN_KEY || process.env.OPENAI_API_KEY
+  if (!key) { console.log('  [OpenAI] OPENAI_API_KEY / OPENAI_ADMIN_KEY not set — skipping'); return }
 
   try {
-    // OpenAI usage API requires org-level admin key — project keys may not work
     const start = Math.floor(startDate.getTime() / 1000)
     const end = Math.floor(endDate.getTime() / 1000)
 
-    const res = await fetch(
-      `https://api.openai.com/v1/organization/usage/completions?start_time=${start}&end_time=${end}&limit=1`,
-      { headers: { 'Authorization': `Bearer ${key}` } }
+    // Fetch completions usage (GPT calls)
+    const completionsRes = await fetch(
+      `https://api.openai.com/v1/organization/usage/completions?start_time=${start}&end_time=${end}&group_by=model`,
+      { headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' } }
     )
 
-    if (res.status === 403 || res.status === 401) {
-      console.log(`  [OpenAI] Usage API requires admin key — check platform.openai.com/usage for costs`)
-      results.push({ service: 'OpenAI', note: 'Check platform.openai.com/usage — API key lacks admin access' })
+    if (completionsRes.status === 403 || completionsRes.status === 401) {
+      console.log(`  [OpenAI] Usage API requires admin key — add OPENAI_ADMIN_KEY to .env.local`)
+      results.push({ service: 'OpenAI', note: 'API key lacks admin access' })
       return
     }
 
-    if (!res.ok) {
-      console.log(`  [OpenAI] API error: ${res.status}`)
-      return
+    let totalCost = 0
+    let totalTokens = 0
+
+    if (completionsRes.ok) {
+      const completions = await completionsRes.json()
+      const buckets = completions?.data || []
+      for (const bucket of buckets) {
+        for (const result of bucket.results || []) {
+          totalTokens += (result.input_tokens || 0) + (result.output_tokens || 0)
+          totalCost += (result.input_cost || 0) + (result.output_cost || 0)
+        }
+      }
+      console.log(`  [OpenAI] Completions: ${totalTokens.toLocaleString()} tokens, $${(totalCost / 100).toFixed(2)} USD`)
     }
 
-    const data = await res.json()
-    console.log(`  [OpenAI] Usage:`, JSON.stringify(data).slice(0, 300))
-    results.push({ service: 'OpenAI', raw: data })
+    // Fetch audio usage (TTS + Whisper)
+    const audioRes = await fetch(
+      `https://api.openai.com/v1/organization/usage/audio_speeches?start_time=${start}&end_time=${end}`,
+      { headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' } }
+    )
+
+    let audioCost = 0
+    if (audioRes.ok) {
+      const audio = await audioRes.json()
+      const buckets = audio?.data || []
+      for (const bucket of buckets) {
+        for (const result of bucket.results || []) {
+          audioCost += (result.cost || result.input_cost || 0)
+        }
+      }
+      if (audioCost > 0) {
+        console.log(`  [OpenAI] Audio/TTS: $${(audioCost / 100).toFixed(2)} USD`)
+      }
+    }
+
+    const grandTotal = (totalCost + audioCost) / 100
+    console.log(`  [OpenAI] Total: $${grandTotal.toFixed(2)} USD`)
+
+    results.push({
+      service: 'OpenAI',
+      completion_tokens: totalTokens,
+      completion_cost_usd: +(totalCost / 100).toFixed(2),
+      audio_cost_usd: +(audioCost / 100).toFixed(2),
+      total_cost_usd: +grandTotal.toFixed(2)
+    })
   } catch (err) {
     console.log(`  [OpenAI] Error: ${err.message}`)
   }
