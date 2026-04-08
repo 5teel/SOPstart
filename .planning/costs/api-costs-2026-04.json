@@ -1,10 +1,172 @@
 {
   "month": "2026-04",
-  "fetched_at": "2026-04-08T13:11:12.987Z",
+  "fetched_at": "2026-04-08T13:50:28.639Z",
   "services": [
     {
+      "service": "Shotstack",
+      "note": "Manual — check dashboard.shotstack.io"
+    },
+    {
       "service": "OpenAI",
-      "note": "Check platform.openai.com/usage — API key lacks admin access"
+      "note": "Key needs api.usage.read scope — check platform.openai.com/usage"
+    },
+    {
+      "service": "Railway",
+      "project": "Docket Rocket",
+      "estimated_monthly_usd": 70.99,
+      "breakdown": {
+        "CPU_USAGE": 0.96,
+        "MEMORY_USAGE_GB": 69.23,
+        "NETWORK_TX_GB": 0.01,
+        "DISK_USAGE_GB": 0.8
+      }
+    },
+    {
+      "service": "Railway",
+      "project": "SOPstart",
+      "estimated_monthly_usd": 43.68,
+      "breakdown": {
+        "CPU_USAGE": 0.76,
+        "MEMORY_USAGE_GB": 42.92,
+        "NETWORK_TX_GB": 0,
+        "DISK_USAGE_GB": 0
+      }
+    },
+    {
+      "service": "Railway",
+      "project": "FightWise",
+      "estimated_monthly_usd": 13.89,
+      "breakdown": {
+        "CPU_USAGE": 0,
+        "MEMORY_USAGE_GB": 13.89,
+        "NETWORK_TX_GB": 0,
+        "DISK_USAGE_GB": 0
+      }
+    },
+    {
+      "service": "Railway",
+      "project": "VI Powerpoint Add-in",
+      "estimated_monthly_usd": 0.14,
+      "breakdown": {
+        "CPU_USAGE": 0,
+        "MEMORY_USAGE_GB": 0.14,
+        "NETWORK_TX_GB": 0,
+        "DISK_USAGE_GB": 0
+      }
+    },
+    {
+      "service": "Railway",
+      "project": "VI News Page",
+      "estimated_monthly_usd": 28.95,
+      "breakdown": {
+        "CPU_USAGE": 0.21,
+        "MEMORY_USAGE_GB": 27.31,
+        "NETWORK_TX_GB": 0,
+        "DISK_USAGE_GB": 1.43
+      }
+    },
+    {
+      "service": "Railway",
+      "project": "Summit Promo Optimiser",
+      "estimated_monthly_usd": 20.66,
+      "breakdown": {
+        "CPU_USAGE": 0.08,
+        "MEMORY_USAGE_GB": 19.2,
+        "NETWORK_TX_GB": 0,
+        "DISK_USAGE_GB": 1.39
+      }
+    },
+    {
+      "service": "Railway",
+      "project": "Strategic Modeller",
+      "estimated_monthly_usd": 1.88,
+      "breakdown": {
+        "CPU_USAGE": 0,
+        "MEMORY_USAGE_GB": 1.88,
+        "NETWORK_TX_GB": 0,
+        "DISK_USAGE_GB": 0
+      }
+    },
+    {
+      "service": "Railway",
+      "project": "BodyAtlas",
+      "estimated_monthly_usd": 7.1,
+      "breakdown": {
+        "CPU_USAGE": 0,
+        "MEMORY_USAGE_GB": 7.1,
+        "NETWORK_TX_GB": 0,
+        "DISK_USAGE_GB": 0
+      }
+    },
+    {
+      "service": "Railway",
+      "project": "Jigsaw Planogram App",
+      "estimated_monthly_usd": 31.04,
+      "breakdown": {
+        "CPU_USAGE": 0.24,
+        "MEMORY_USAGE_GB": 30.6,
+        "NETWORK_TX_GB": 0,
+        "DISK_USAGE_GB": 0.21
+      }
+    },
+    {
+      "service": "Railway",
+      "project": "OBSOLETE - Grocery App",
+      "estimated_monthly_usd": 4.62,
+      "breakdown": {
+        "CPU_USAGE": 0.02,
+        "MEMORY_USAGE_GB": 4.36,
+        "NETWORK_TX_GB": 0,
+        "DISK_USAGE_GB": 0.24
+      }
+    },
+    {
+      "service": "Railway",
+      "project": "Report Builder App",
+      "estimated_monthly_usd": 12.26,
+      "breakdown": {
+        "CPU_USAGE": 0,
+        "MEMORY_USAGE_GB": 12.26,
+        "NETWORK_TX_GB": 0,
+        "DISK_USAGE_GB": 0
+      }
+    },
+    {
+      "service": "Railway",
+      "project": "Deathgame",
+      "estimated_monthly_usd": 4.04,
+      "breakdown": {
+        "CPU_USAGE": 0.02,
+        "MEMORY_USAGE_GB": 3.75,
+        "NETWORK_TX_GB": 0,
+        "DISK_USAGE_GB": 0.27
+      }
+    },
+    {
+      "service": "Railway",
+      "project": "life_pathways",
+      "estimated_monthly_usd": 2.02,
+      "breakdown": {
+        "CPU_USAGE": 0.01,
+        "MEMORY_USAGE_GB": 1.1,
+        "NETWORK_TX_GB": 0,
+        "DISK_USAGE_GB": 0.91
+      }
+    },
+    {
+      "service": "Railway",
+      "project": "sumo-tournament",
+      "estimated_monthly_usd": 0,
+      "breakdown": {
+        "CPU_USAGE": 0,
+        "MEMORY_USAGE_GB": 0,
+        "NETWORK_TX_GB": 0,
+        "DISK_USAGE_GB": 0
+      }
+    },
+    {
+      "service": "Supabase",
+      "note": "Manual — check Supabase dashboard billing page"
     }
   ]
 }
