@@ -187,9 +187,9 @@ Plans:
 Plans:
 - [x] 09-00-PLAN.md — Wave 0: Playwright test stubs for all six PATH requirements (pipeline-entry, pipeline-linkage, pipeline-autoqueue, pipeline-progress, pipeline-failure-recovery, pipeline-review-gate)
 - [x] 09-01-PLAN.md — Foundation: sop_pipeline_runs migration + pipeline_run_id FKs on parse_jobs/sops/video_generation_jobs, type + validator extensions, createVideoSopPipelineSession server action
-- [ ] 09-02-PLAN.md — Entry UI: "Generate video SOP" button on UploadDropzone + VideoFormatSelectionModal (file + format picker + upload dispatch + navigate to progress page)
-- [ ] 09-03-PLAN.md — Publish auto-queue: enqueueVideoGenerationForPipeline helper + publish route extension (gate preserved, auto-queue runs after successful publish)
-- [ ] 09-04-PLAN.md — Progress page: /admin/sops/pipeline/[pipelineId] route with 5-stage PipelineStepper, realtime+polling hybrid, deep-link CTAs, ReviewClient back-to-pipeline breadcrumb
+- [x] 09-02-PLAN.md — Entry UI: "Generate video SOP" button on UploadDropzone + VideoFormatSelectionModal (file + format picker + upload dispatch + navigate to progress page)
+- [x] 09-03-PLAN.md — Publish auto-queue: enqueueVideoGenerationForPipeline helper + publish route extension (gate preserved, auto-queue runs after successful publish)
+- [x] 09-04-PLAN.md — Progress page: /admin/sops/pipeline/[pipelineId] route with 5-stage PipelineStepper, realtime+polling hybrid, deep-link CTAs, ReviewClient back-to-pipeline breadcrumb
 
 ### Phase 10: Video Version Management
 **Goal**: Admins can generate multiple video versions from a single published SOP, label and manage each version, and control which version workers see — with edit, archive, and re-generate controls
