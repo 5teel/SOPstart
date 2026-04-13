@@ -14,12 +14,14 @@ import {
   FileType2,
   Video,
   Smartphone,
+  Film,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { createUploadSession, createVideoUploadSession } from '@/actions/sops'
 import { tusUpload, TUS_THRESHOLD } from '@/lib/upload/tus-upload'
 import { TusUploadProgress } from './TusUploadProgress'
 import { VideoRecorder } from './VideoRecorder'
+import { VideoFormatSelectionModal } from './VideoFormatSelectionModal'
 
 const ACCEPTED_MIME_TYPES = [
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
@@ -97,6 +99,7 @@ export function UploadDropzone() {
   const [youtubeFetching, setYoutubeFetching] = useState(false)
   const [recorderOpen, setRecorderOpen] = useState(false)
   const [mediaRecorderSupported, setMediaRecorderSupported] = useState<boolean | null>(null)
+  const [pipelineModalOpen, setPipelineModalOpen] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
@@ -648,6 +651,16 @@ export function UploadDropzone() {
                 <Video size={20} />
                 Browse video
               </button>
+
+              {/* Generate video SOP button (Phase 9 pipeline entry) */}
+              <button
+                type="button"
+                onClick={() => setPipelineModalOpen(true)}
+                className="bg-steel-700 text-steel-100 font-semibold px-6 h-[72px] rounded-lg hover:bg-steel-600 active:bg-steel-500 transition-colors flex items-center gap-2"
+              >
+                <Film size={20} />
+                Generate video SOP
+              </button>
             </div>
 
             {/* Hidden file inputs */}
@@ -806,6 +819,12 @@ export function UploadDropzone() {
           }}
         />
       )}
+
+      {/* Video SOP pipeline entry modal (Phase 9) */}
+      <VideoFormatSelectionModal
+        open={pipelineModalOpen}
+        onClose={() => setPipelineModalOpen(false)}
+      />
     </div>
   )
 }
