@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
@@ -102,13 +103,15 @@ export default async function ReviewPage({
   }
 
   return (
-    <ReviewClient
-      sop={sop as unknown as SopWithSections}
-      parseJob={parseJob as ParseJob | null}
-      presignedUrl={presignedUrl}
-      transcriptSegments={transcriptSegments}
-      verificationFlags={verificationFlags}
-      youtubeVideoId={youtubeVideoId}
-    />
+    <Suspense fallback={null}>
+      <ReviewClient
+        sop={sop as unknown as SopWithSections}
+        parseJob={parseJob as ParseJob | null}
+        presignedUrl={presignedUrl}
+        transcriptSegments={transcriptSegments}
+        verificationFlags={verificationFlags}
+        youtubeVideoId={youtubeVideoId}
+      />
+    </Suspense>
   )
 }
