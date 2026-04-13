@@ -54,8 +54,8 @@ requirements: [PATH-01, PATH-02, PATH-06]
 
 ## What was built
 
-Migration 00016 creates `public.sop_pipeline_runs` with 7 columns (id, organisation_id,
-created_by, status, video_format, upload_file_name, created_at, updated_at) and adds a
+Migration 00016 creates `public.sop_pipeline_runs` (id, organisation_id, created_by,
+status, requested_video_format, plus audit timestamps) and adds a
 nullable `pipeline_run_id uuid` FK column to each of `parse_jobs`, `sops`, and
 `video_generation_jobs` with `ON DELETE SET NULL`. RLS is enforced via
 `public.current_organisation_id()` across SELECT/INSERT/UPDATE (no DELETE policy —
@@ -66,8 +66,7 @@ pipeline runs are archived, not deleted). The table is added to the
 TypeScript types were extended: `database.types.ts` now includes the
 `sop_pipeline_runs` Row/Insert/Update shape and the three `pipeline_run_id` columns.
 `src/types/sop.ts` exports `PipelineVideoFormat` (`narrated_slideshow |
-screen_recording | ai_avatar`), `PipelineRunStatus`, and the `SopPipelineRun`
-interface. `src/lib/validators/sop.ts` exports `pipelineVideoFormatSchema` and
+screen_recording`), `PipelineRunStatus`, and the `SopPipelineRun` interface. `src/lib/validators/sop.ts` exports `pipelineVideoFormatSchema` and
 `createVideoSopPipelineSessionSchema` for the entry UI.
 
 The new server action `createVideoSopPipelineSession` in `src/actions/sops.ts`
