@@ -71,6 +71,7 @@ export async function GET(
       .from('parse_jobs')
       .select('id, status, current_stage, error_message')
       .eq('sop_id', sop.id)
+      .eq('pipeline_run_id', pipelineId)
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle()
