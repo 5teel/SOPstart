@@ -262,6 +262,13 @@ export function PipelineProgressClient(props: Props) {
             </div>
           )}
 
+          {stage === 'generating' && !snapshot.videoJob && (
+            <div className="bg-steel-800 border border-steel-700 rounded-xl p-5 flex items-center gap-3">
+              <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
+              <p className="text-sm text-steel-100">Queuing video generation…</p>
+            </div>
+          )}
+
           {stage === 'ready' && sopId && (
             <div className="bg-green-500/20 border border-green-500/40 rounded-xl px-5 py-5">
               <div className="flex items-start gap-3 mb-3">
