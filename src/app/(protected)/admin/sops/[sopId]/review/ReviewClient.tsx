@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, RefreshCw, RotateCcw, Trash2, Send, MoreVertical } from 'lucide-react'
 import { StatusBadge } from '@/components/admin/StatusBadge'
@@ -32,6 +32,9 @@ export default function ReviewClient({
   youtubeVideoId,
 }: ReviewClientProps) {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const fromPipeline = searchParams?.get('from') === 'pipeline'
+  const pipelineId = searchParams?.get('pipelineId') ?? null
 
   const initialApprovedCount = sop.sop_sections.filter((s) => s.approved).length
   const [approvedCount, setApprovedCount] = useState(initialApprovedCount)
@@ -156,6 +159,16 @@ export default function ReviewClient({
 
   return (
     <div className="flex flex-col flex-1">
+      {/* Back to pipeline breadcrumb — only when arriving from pipeline flow */}
+      {fromPipeline && pipelineId && (
+        <Link
+          href={`/admin/sops/pipeline/${pipelineId}`}
+          className="inline-block text-brand-yellow text-sm font-medium hover:text-amber-400 px-4 py-2"
+        >
+          ← Back to pipeline
+        </Link>
+      )}
+
       {/* Sticky header bar — compact */}
       <header className="sticky top-0 z-10 bg-steel-900 border-b border-steel-700 px-4 flex items-center h-[56px] gap-3">
         {/* Back + title */}
