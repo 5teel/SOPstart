@@ -9,6 +9,8 @@ import type { PipelineVideoFormat } from '@/types/sop'
 
 const ACCEPT = '.docx,.pdf,.xlsx,.pptx,.txt,image/jpeg,image/png,image/heic,image/heif'
 const BLOCKED_EXTENSIONS = ['.xlsm', '.xlsb', '.xltm', '.pptm', '.potm', '.ppam']
+const HEIC_EXTENSIONS = ['.heic', '.heif']
+const HEIC_MIME_TYPES = ['image/heic', 'image/heif']
 const MAX_FILE_SIZE = 50 * 1024 * 1024
 
 interface Props {
@@ -39,7 +41,7 @@ export function VideoFormatSelectionModal({ open, onClose }: Props) {
 
   if (!open) return null
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     setError(null)
     const picked = e.target.files?.[0]
     if (!picked) {
@@ -58,6 +60,31 @@ export function VideoFormatSelectionModal({ open, onClose }: Props) {
       setError(`${picked.name} is over 50MB and cannot be uploaded.`)
       setFile(null)
       return
+    }
+    // Convert HEIC/HEIF (iPhone photos) to JPEG client-side so the parser can handle them.
+    // Mirrors UploadDropzone.validateAndAddFiles conversion path.
+    const isHeic =
+      HEIC_MIME_TYPES.includes(picked.type) ||
+      HEIC_EXTENSIONS.some((ext) => lower.endsWith(ext))
+    if (isHeic) {
+      try {
+        const heic2any = (await import('heic2any')).default
+        const blob = (await heic2any({
+          blob: picked,
+          toType: 'image/jpeg',
+          quality: 0.92,
+        })) as Blob
+        const jpgName = picked.name.replace(/\.(heic|heif)$/i, '.jpg')
+        const converted = new File([blob], jpgName, { type: 'image/jpeg' })
+        setFile(converted)
+        return
+      } catch {
+        setError(
+          `Failed to convert ${picked.name}. Please try a different format (JPEG or PNG).`,
+        )
+        setFile(null)
+        return
+      }
     }
     setFile(picked)
   }
