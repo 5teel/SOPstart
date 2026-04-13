@@ -85,13 +85,17 @@ function deriveStage(s: Snapshot): {
   return { stage: 'generating', errorStage: null }
 }
 
+const POLL_INTERVAL_MS = 5000
+const REALTIME_GRACE_MS = 5000
+const REALTIME_STALE_MS = 15000
+
 export function PipelineProgressClient(props: Props) {
   const [snapshot, setSnapshot] = useState<Snapshot>({
     sop: props.initialSop,
     parseJob: props.initialParseJob,
     videoJob: props.initialVideoJob,
   })
-  const receivedRealtimeRef = useRef(false)
+  const lastUpdateRef = useRef<number>(Date.now())
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
@@ -103,9 +107,24 @@ export function PipelineProgressClient(props: Props) {
         if (!res.ok) return
         const next = (await res.json()) as Snapshot
         setSnapshot(next)
+        lastUpdateRef.current = Date.now()
       } catch {
         // swallow network errors — polling will retry
       }
+    }
+
+    function startPolling() {
+      if (pollingRef.current) return
+      pollingRef.current = setInterval(() => {
+        // If realtime has gone silent for more than REALTIME_STALE_MS, keep polling.
+        // This also catches the case where realtime connected, delivered events,
+        // then silently dropped — polling resumes automatically on stale data.
+        fetchSnapshot()
+      }, POLL_INTERVAL_MS)
+    }
+
+    function markRealtimeActivity() {
+      lastUpdateRef.current = Date.now()
     }
 
     const channel = supabase
@@ -119,7 +138,7 @@ export function PipelineProgressClient(props: Props) {
           filter: `id=eq.${props.pipelineId}`,
         },
         () => {
-          receivedRealtimeRef.current = true
+          markRealtimeActivity()
           fetchSnapshot()
         }
       )
@@ -132,7 +151,7 @@ export function PipelineProgressClient(props: Props) {
           filter: `pipeline_run_id=eq.${props.pipelineId}`,
         },
         () => {
-          receivedRealtimeRef.current = true
+          markRealtimeActivity()
           fetchSnapshot()
         }
       )
@@ -145,7 +164,7 @@ export function PipelineProgressClient(props: Props) {
           filter: `pipeline_run_id=eq.${props.pipelineId}`,
         },
         () => {
-          receivedRealtimeRef.current = true
+          markRealtimeActivity()
           fetchSnapshot()
         }
       )
@@ -158,21 +177,39 @@ export function PipelineProgressClient(props: Props) {
           filter: `pipeline_run_id=eq.${props.pipelineId}`,
         },
         () => {
-          receivedRealtimeRef.current = true
+          markRealtimeActivity()
           fetchSnapshot()
         }
       )
-      .subscribe()
+      .subscribe((status) => {
+        // Fall back to polling immediately on channel errors or timeouts.
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+          startPolling()
+        }
+      })
 
-    // Polling fallback: if no realtime event fires within 5s, poll every 5s
+    // Polling grace period: if no realtime event fires within REALTIME_GRACE_MS, start polling.
+    // Once polling is running, each tick re-fetches the snapshot unconditionally — which also
+    // serves as the safety net for silently-dropped realtime connections (stale-update recovery).
+    // REALTIME_STALE_MS is retained as the implicit threshold: polling every 5s means any stale
+    // window > 15s is impossible as long as polling is active.
     const startPollingTimeout = setTimeout(() => {
-      if (!receivedRealtimeRef.current) {
-        pollingRef.current = setInterval(fetchSnapshot, 5000)
+      if (Date.now() - lastUpdateRef.current >= REALTIME_GRACE_MS) {
+        startPolling()
       }
-    }, 5000)
+    }, REALTIME_GRACE_MS)
+
+    // Defensive: even if realtime is delivering events, start polling after REALTIME_STALE_MS
+    // to catch silent drops. pollingRef guard makes this a no-op if already polling.
+    const staleWatchdog = setInterval(() => {
+      if (Date.now() - lastUpdateRef.current >= REALTIME_STALE_MS) {
+        startPolling()
+      }
+    }, REALTIME_STALE_MS)
 
     return () => {
       clearTimeout(startPollingTimeout)
+      clearInterval(staleWatchdog)
       if (pollingRef.current) {
         clearInterval(pollingRef.current)
         pollingRef.current = null
