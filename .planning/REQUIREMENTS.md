@@ -294,6 +294,43 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VGEN-08 | Phase 8 | Complete |
 | VGEN-09 | Phase 8 | Complete |
 | INFRA-03 | Phase 8 | Complete |
+| SB-SECT-01 | Phase 11 | Pending |
+| SB-SECT-02 | Phase 11 | Pending |
+| SB-SECT-03 | Phase 11 | Pending |
+| SB-SECT-04 | Phase 11 | Pending |
+| SB-AUTH-01 | Phase 12 | Pending |
+| SB-AUTH-04 | Phase 12 | Pending |
+| SB-AUTH-05 | Phase 12 | Pending |
+| SB-SECT-05 | Phase 12 | Pending |
+| SB-LAYOUT-01 | Phase 12 | Pending |
+| SB-LAYOUT-02 | Phase 12 | Pending |
+| SB-LAYOUT-03 | Phase 12 | Pending |
+| SB-LAYOUT-04 | Phase 12 | Pending |
+| SB-LAYOUT-06 | Phase 12 | Pending |
+| SB-BLOCK-01 | Phase 13 | Pending |
+| SB-BLOCK-02 | Phase 13 | Pending |
+| SB-BLOCK-03 | Phase 13 | Pending |
+| SB-BLOCK-04 | Phase 13 | Pending |
+| SB-BLOCK-05 | Phase 13 | Pending |
+| SB-BLOCK-06 | Phase 13 | Pending |
+| SB-AUTH-02 | Phase 14 | Pending |
+| SB-INFRA-04 | Phase 14 | Pending |
+| SB-AUTH-03 | Phase 15 | Pending |
+| SB-ANNOT-01 | Phase 16 | Pending |
+| SB-ANNOT-02 | Phase 16 | Pending |
+| SB-ANNOT-03 | Phase 16 | Pending |
+| SB-ANNOT-04 | Phase 16 | Pending |
+| SB-ANNOT-05 | Phase 16 | Pending |
+| SB-LAYOUT-05 | Phase 16 | Pending |
+| SB-COLLAB-01 | Phase 17 | Pending |
+| SB-COLLAB-02 | Phase 17 | Pending |
+| SB-COLLAB-03 | Phase 17 | Pending |
+| SB-COLLAB-04 | Phase 17 | Pending |
+| SB-COLLAB-05 | Phase 17 | Pending |
+| SB-COLLAB-06 | Phase 17 | Pending |
+| SB-INFRA-01 | Phase 18 | Pending |
+| SB-INFRA-02 | Phase 18 | Pending |
+| SB-INFRA-03 | Phase 18 | Pending |
 
 **v1 Coverage:**
 - v1 requirements: 30 total
@@ -306,10 +343,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 - Unmapped: 0
 
 **v3.0 Coverage:**
-- v3.0 requirements: 33 total (SB-AUTH ×5, SB-SECT ×5, SB-LAYOUT ×6, SB-ANNOT ×5, SB-COLLAB ×6, SB-BLOCK ×6, SB-INFRA ×4)
-- Mapped to phases: 0 (pending roadmapper)
-- Unmapped: 33
+- v3.0 requirements: 37 total (SB-AUTH ×5, SB-SECT ×5, SB-LAYOUT ×6, SB-ANNOT ×5, SB-COLLAB ×6, SB-BLOCK ×6, SB-INFRA ×4) — header previously stated 33 which was off by four
+- Mapped to phases: 37 (Phases 11–18)
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-04-13 — v3.0 SOP Builder milestone requirements added (SB-XX)*
+*Last updated: 2026-04-13 — v3.0 SOP Builder milestone requirements added (SB-XX); traceability mapped to Phases 11–18*

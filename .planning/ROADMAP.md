@@ -6,6 +6,8 @@ Four phases deliver the complete v1 product. Phase 1 establishes the multi-tenan
 
 v2.0 adds four phases (5–8) delivering three new SOP creation pathways and a video consumption layer. Phase 5 establishes upload infrastructure and expanded file parsing. Phase 6 delivers video transcription via file upload and URL. Phase 7 adds in-app camera recording (gated on iOS Safari maturity). Phase 8 generates video SOPs from published structured content.
 
+v3.0 adds eight phases (11–18) delivering the native SOP Builder milestone. Phase 11 lays down the additive section_kinds catalog + blocks schema that every downstream builder phase depends on. Phase 12 ships the Puck-based builder shell with the blank-page wizard and single unified authoring surface. Phase 13 delivers the reusable org-vs-global block library. Phase 14 adds AI-drafted SOPs gated behind the Phase 6 adversarial verifier. Phase 15 adds the NZ template library. Phase 16 delivers Konva-based image/diagram annotation with dual-store (JSON for editing, baked PNG for workers) and the specialty DiagramHotspotBlock. Phase 17 adds collaborative editing via pessimistic section locks with an optimistic version column for offline handoff. Phase 18 wires the builder into the Phase 9 pipeline runs, enforces bundle isolation via CI, and closes out the milestone.
+
 ## Phases
 
 **Phase Numbering:**
@@ -24,6 +26,14 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 8: Video SOP Generation** - AI-narrated slideshow, screen-recording-style, and full AI video generated from published SOPs (completed 2026-04-04)
 - [ ] **Phase 9: Streamlined File → Video Pipeline** - One-click upload-to-video SOP flow chaining file parsing and video generation
 - [x] **Phase 10: Video Version Management** - Multiple video versions per SOP with labels, editing, deletion, and admin management UI (completed 2026-04-13)
+- [ ] **Phase 11: Section Schema & Block Foundation** - Additive `section_kinds` catalog, `blocks`/`block_versions`/`sop_section_blocks` tables, legacy fallback, and v3.0 wave-0 test stubs
+- [ ] **Phase 12: Builder Shell & Blank-Page Authoring** - Puck-based builder, `layout_data` JSONB, blank-page wizard, unified authoring surface, legacy linear fallback
+- [ ] **Phase 13: Reusable Block Library** - Org-vs-global block CRUD, NZ seed blocks, wizard "Pick from library" step, pin-version vs follow-latest semantics
+- [ ] **Phase 14: AI-Drafted SOPs** - Natural-language prompt → GPT-4o structured draft → Claude adversarial verification gate → editable draft lands in the builder
+- [ ] **Phase 15: NZ Template Library** - Curated WorkSafe / machinery / chemical handling templates surfaced as a third entry point into the builder
+- [ ] **Phase 16: Image & Diagram Annotation** - Konva editor with dual-store (JSON scene + baked PNG), DiagramHotspotBlock for machine-diagram freeform callouts, stylus + palm rejection
+- [ ] **Phase 17: Collaborative Editing** - Section-level pessimistic locks, Supabase Realtime presence, optimistic version column for offline handoff, conflict modal
+- [ ] **Phase 18: Pipeline Integration, Bundle Isolation & v3.0 Closeout** - Builder ↔ Phase 9 pipeline linkage, Dexie draft sync, worker-bundle leakage CI check, v3.0 milestone closeout
 
 ## Phase Details
 
@@ -211,10 +221,158 @@ Plans:
 - [x] 10-03-PLAN.md — UI components: VideoVersionRow (inline actions, confirm panels, label editor, generation stepper) + VideoVersionList (version rows, collapsible archived section, empty state)
 - [x] 10-04-PLAN.md — Wiring: Rewrite VideoGeneratePanel + video page for multi-version, update VideoAdminPreview actions, push DB schema, human verification checkpoint
 
+<!-- ======================================================================= -->
+<!-- v3.0 — SOP Builder milestone (Phases 11–18)                             -->
+<!-- ======================================================================= -->
+
+### Phase 11: Section Schema & Block Foundation
+**Goal**: The additive data model for v3.0 is in place — `section_kinds` catalog, `blocks` / `block_versions` / `sop_section_blocks` junction, legacy fallback, RLS, types, validators — and wave-0 Playwright stubs exist for every SB-XX requirement so downstream phases can execute on a prepared test surface
+**Depends on**: Phase 4 (v1 sop_sections schema)
+**Requirements**: SB-SECT-01, SB-SECT-02, SB-SECT-03, SB-SECT-04
+**Success Criteria** (what must be TRUE):
+  1. Admin can add two "Hazards" sections to the same SOP scoped to different machine states, and both render correctly in the worker walkthrough via the joined `section_kinds` metadata (icon, colour, render priority)
+  2. Admin can define a custom section with an admin-provided title (e.g. "Pre-flight check") and it renders in the worker walkthrough using the `custom` render family fallback
+  3. Every v1/v2 SOP still renders identically — the `section_kinds` catalog is seeded with canonical kinds, and legacy `section_type` substring matching remains the fallback path for rows with no `section_kind_id`
+  4. Wave-0 Playwright stubs exist for all 37 SB-XX requirements and are registered in a new `phase11-stubs` test project
+**Plans**: TBD
+**UI hint**: no
+
+Plans:
+- [ ] 11-00-PLAN.md — Wave 0: Playwright test stubs for every SB-XX requirement (SB-AUTH, SB-SECT, SB-LAYOUT, SB-ANNOT, SB-COLLAB, SB-BLOCK, SB-INFRA) + `phase11-stubs` project config
+- [ ] 11-01-PLAN.md — DB migration: `section_kinds` catalog (with canonical seed rows: hazards, ppe, steps, emergency, signoff, content, custom), `blocks` + `block_versions` tables, `sop_section_blocks` junction with `pin_mode` + snapshot columns, `sop_sections.section_kind_id` advisory FK, RLS policies (org-scoped + null-org global read)
+- [ ] 11-02-PLAN.md — Type layer: `SectionKind`, `Block`, `BlockVersion`, `SopSectionBlock` TypeScript types; Zod validators; walkthrough renderer extension to read `section_kinds` join with legacy substring fallback; verify all v1/v2 SOPs render unchanged
+- [ ] 11-03-PLAN.md — Admin UI plumbing: section-kind picker in the existing admin review UI, add-custom-section control, multi-instance-of-same-kind support, regression pass against Phase 2/5/6 review UIs
+
+### Phase 12: Builder Shell & Blank-Page Authoring
+**Goal**: Admin can start a new SOP from a blank wizard, reach one unified Puck-based builder regardless of entry point, drag blocks onto each section, save drafts auto-debounced to Dexie + Supabase, and workers continue to render every existing SOP via a legacy linear fallback when `layout_data` is absent
+**Depends on**: Phase 11
+**Requirements**: SB-AUTH-01, SB-AUTH-04, SB-AUTH-05, SB-LAYOUT-01, SB-LAYOUT-02, SB-LAYOUT-03, SB-LAYOUT-04, SB-LAYOUT-06, SB-SECT-05
+**Success Criteria** (what must be TRUE):
+  1. Admin can click "New SOP" → blank-page wizard (title → canonical sections → review → draft save) and land in the builder without uploading anything
+  2. Admin can drag text, heading, photo, callout, step, hazard-card, and PPE-card blocks onto a page, rearrange them, and reflow the result on a 5.5" phone preview via Tailwind breakpoints without authoring a separate mobile variant
+  3. Every block component renders identically in the admin editor and the worker walkthrough — there is one component tree, not two
+  4. Layout persists as JSONB on `sop_sections.layout_data` with a `layout_version` pin, and admin can reorder sections via drag-and-drop (persists as `sort_order`)
+  5. Legacy SOPs with no `layout_data` still render correctly in the worker walkthrough via the linear step-list fallback renderer
+  6. A builder-authored draft is visually distinguishable from an uploaded draft in the admin SOP library, but both flow through the same Phase 2 publish gate
+**Plans**: TBD
+**UI hint**: yes
+
+Plans:
+- [ ] 12-01-PLAN.md — Puck infrastructure: install `@measured/puck`, admin `/admin/sops/builder/[sopId]` route, `'use client'` editor wrapper with `next/dynamic` lazy load, `layout_data` + `layout_version` migration on `sop_sections`, worker linear fallback renderer for legacy SOPs
+- [ ] 12-02-PLAN.md — Block components: shared TextBlock, HeadingBlock, PhotoBlock, CalloutBlock, StepBlock, HazardCardBlock, PPECardBlock with Zod-schema props; Puck `config.components` map; worker `<Render>` path; CSS breakpoint reflow verification
+- [ ] 12-03-PLAN.md — Blank-page wizard: multi-step wizard (title → kind selector → section seed → review → save), unified authoring-surface router, admin SOP library "Authored in builder" badge, publish integration with Phase 2 review gate
+- [ ] 12-04-PLAN.md — Draft persistence: Dexie `draftLayouts` table, debounced `onChange` → Dexie → Supabase sync (reuses existing sync-engine pattern), section reorder drag-and-drop with `sort_order` server action
+
+### Phase 13: Reusable Block Library
+**Goal**: Admin can save, browse, and re-use hazard / PPE / step blocks from an org-scoped library alongside a read-only NZ global block set, and the wizard surfaces matching blocks at the right step with explicit pin-version vs follow-latest semantics
+**Depends on**: Phase 11, Phase 12
+**Requirements**: SB-BLOCK-01, SB-BLOCK-02, SB-BLOCK-03, SB-BLOCK-04, SB-BLOCK-05, SB-BLOCK-06
+**Success Criteria** (what must be TRUE):
+  1. Admin can save any hazard / PPE / step as a reusable block to their organisation's library with a name and optional category tags
+  2. The builder wizard shows "Pick from library (N matches)" alongside "Write new" at the appropriate section step, filtered by section kind and SOP category
+  3. Global NZ blocks (WorkSafe standards, common machinery hazards) are visible read-only to every org, while org-created blocks are isolated via RLS
+  4. When a block is added to a SOP, its content is snapshotted into the `sop_section_blocks` junction row so the SOP renders correctly even if the block is later deleted or the worker is offline
+  5. Admin can choose "pin to this version" (default) or "follow latest" per block usage; follow-latest SOPs show an "update available" badge when the source block changes and route through the publish gate before workers see the update
+**Plans**: TBD
+**UI hint**: yes
+
+Plans:
+- [ ] 13-01-PLAN.md — Block CRUD: server actions (`createBlock`, `updateBlock`, `archiveBlock`, `saveFromSection`), `/admin/blocks` library list page, block detail/editor, org-vs-global RLS policies, category tag support
+- [ ] 13-02-PLAN.md — NZ global block seed: migration with WorkSafe hazards, common PPE (hi-vis, hearing, respirator, harness), machinery hazard library (forklift, grinder, press brake), chemical-handling blocks; seed rows with `organisation_id = null`
+- [ ] 13-03-PLAN.md — Wizard integration: `BlockPicker` component filtered by kind + category, "Pick from library" tab alongside "Write new" in the wizard section steps, pin-vs-follow-latest toggle per selection, snapshot-on-add via junction table
+- [ ] 13-04-PLAN.md — Update badging: scheduled diff job (or on-read trigger) that marks SOPs in follow-latest mode as `update_available` when source block version advances, "review update" button in admin library, publish-gate integration
+
+### Phase 14: AI-Drafted SOPs
+**Goal**: Admin can type a natural-language prompt ("PPE check for forklift operators at our Hamilton site") and receive a structured draft pre-filled with hazards, PPE, steps, and emergency sections — which passes the Phase 6 adversarial Claude verification gate before reaching the admin review UI, then opens in the same builder used for blank-page and template flows
+**Depends on**: Phase 6 (adversarial verifier), Phase 12 (builder shell)
+**Requirements**: SB-AUTH-02, SB-INFRA-04
+**Success Criteria** (what must be TRUE):
+  1. Admin can enter a natural-language prompt and receive a structured SOP draft within the named-stages progress UI used by Phase 6
+  2. The AI-drafted output is cross-checked by Claude (adversarial verifier) before it reaches the admin review UI — hallucinated hazards or missing PPE sections are flagged in the same amber-banner UI used for video transcription
+  3. Once reviewed, the AI draft lands in the same unified builder surface as blank-page and template flows — admin cannot tell "draft source: AI" apart from "draft source: blank" once they're editing
+  4. The draft flows through the existing Phase 2 publish gate and Phase 11 section-kind resolver
+**Plans**: TBD
+**UI hint**: yes
+
+Plans:
+- [ ] 14-01-PLAN.md — Prompt entry: `/admin/sops/new/ai` route with prompt textarea, category selector, named-stage progress UI; `parse_jobs` row with `source: 'ai_prompt'` to reuse existing stage stepper
+- [ ] 14-02-PLAN.md — GPT-4o structured draft generator: prompt-engineering pass, structured output schema matching `SopSection[]`, `section_kind_id` assignment, integration with GPT parser module
+- [ ] 14-03-PLAN.md — Adversarial verification reuse: route AI draft through existing Phase 6 Claude verifier, surface flags via existing `AdversarialFlagBanner`, missing-section detection, land draft in the builder with flags visible in the review panel
+
+### Phase 15: NZ Template Library
+**Goal**: Admin can browse a curated NZ template library (WorkSafe categories, common machinery, chemical handling) and pick a template as the starting point for a new SOP — which opens in the same unified builder surface as blank-page and AI flows
+**Depends on**: Phase 12, Phase 13 (template entries reuse block library rows)
+**Requirements**: SB-AUTH-03
+**Success Criteria** (what must be TRUE):
+  1. Admin sees a NZ template library organised by WorkSafe category, common machinery, and chemical-handling families on `/admin/sops/new/template`
+  2. Selecting a template clones its sections, blocks, and `layout_data` into a new draft SOP and opens the unified builder
+  3. The template clone is independent — editing the new SOP does not modify the template, and templates can be updated without affecting existing SOPs
+**Plans**: TBD
+**UI hint**: yes
+
+Plans:
+- [ ] 15-01-PLAN.md — Template catalog: `sop_templates` table (or flag on `sops` with `is_template`), curation list with NZ WorkSafe categories, seed data for forklift ops, grinder use, chemical handling, confined space entry, hot work permit
+- [ ] 15-02-PLAN.md — Template picker UI: `/admin/sops/new/template` route, category sidebar + card grid, template preview drawer, "Use this template" action that clones sections + blocks + layout into a fresh draft SOP
+
+### Phase 16: Image & Diagram Annotation
+**Goal**: Admin can non-destructively annotate any photo or diagram with arrows, rectangles, ellipses, text labels, numbered callouts, and freehand sketches (with Apple Pencil palm rejection), re-edit them later, and place numbered hotspots at freeform x/y on a machine diagram via a specialty `DiagramHotspotBlock` — while workers never download Konva because a baked PNG is served for the read path
+**Depends on**: Phase 11 (section schema), Phase 12 (builder shell — annotation is invoked from photo blocks)
+**Requirements**: SB-ANNOT-01, SB-ANNOT-02, SB-ANNOT-03, SB-ANNOT-04, SB-ANNOT-05, SB-LAYOUT-05
+**Success Criteria** (what must be TRUE):
+  1. Admin can open any photo or diagram block in the annotation editor, draw arrows / rectangles / ellipses / text labels / numbered callouts, and save — and re-open the same image later to edit those exact annotations (non-destructive Konva JSON scene graph)
+  2. On publish, the client bakes a flattened PNG of the annotated image to Supabase Storage at a version-bumped path; workers load the baked PNG via `<img>` and the worker route's First Load JS does not grow by Konva's size
+  3. Admin can add a `DiagramHotspotBlock` to any section, drop a machine diagram into it, and place numbered callouts at freeform x/y on the diagram (the only freeform-positioning exception in the otherwise block-reflow builder)
+  4. Apple Pencil / stylus freehand sketching works with palm rejection when a pen is detected; non-pen input is filtered while pen-mode is active
+  5. If admin replaces the underlying image with a new one of similar dimensions, annotation coordinates are preserved and admin is prompted to review placement before saving
+**Plans**: TBD
+**UI hint**: yes
+
+Plans:
+- [ ] 16-01-PLAN.md — Konva foundation: install `konva` + `react-konva`, `serverExternalPackages: ['canvas']` in `next.config.ts`, `sop_image_annotations` migration (scene jsonb, natural_width, natural_height, baked_storage_path, baked_at, RLS), dynamic-imported `AnnotationEditor` component stub on admin route, Next.js 16 canvas-module spike
+- [ ] 16-02-PLAN.md — Annotation primitives: Arrow / Rect / Ellipse / Text / Label (numbered callout) / Line (freehand) tools, `Konva.Transformer` wiring for resize + rotate, undo/redo via scene JSON snapshots, text-editing `<textarea>` overlay, stylus pointer-type filter + palm-rejection toggle
+- [ ] 16-03-PLAN.md — Bake-on-publish pipeline: client-side `stage.toDataURL()` flatten, upload to `sop-images/baked/{sop_id}/{image_id}.v{N}.png`, update `baked_storage_path` + `baked_at`, worker read path prefers baked PNG, PhotoBlock renderer switches baked-vs-raw without importing Konva
+- [ ] 16-04-PLAN.md — DiagramHotspotBlock: specialty Puck block with image drop zone + freeform x/y numbered-hotspot placement, coordinate preservation on photo replacement with review prompt, integration with the rest of the builder's block set
+
+### Phase 17: Collaborative Editing
+**Goal**: Multi-admin teams can concurrently edit different sections of the same SOP draft without conflict, see presence indicators for who is editing what, and safely reconcile offline edits on reconnect — via section-level pessimistic locks plus an optimistic version column and a plain-English conflict modal
+**Depends on**: Phase 11 (schema), Phase 12 (builder shell — locks live in section edit flow)
+**Requirements**: SB-COLLAB-01, SB-COLLAB-02, SB-COLLAB-03, SB-COLLAB-04, SB-COLLAB-05, SB-COLLAB-06
+**Success Criteria** (what must be TRUE):
+  1. When Alice opens a section for editing, Bob sees "Alice is editing this section" and cannot modify it until the lock releases; Bob can concurrently edit a *different* section on the same SOP without conflict
+  2. Locks auto-release after 5 minutes of inactivity (heartbeat expiry), on explicit release, or on tab close — no admin can permanently block a section
+  3. Admin who held a lock before going offline can continue editing locally; on reconnect, changes push cleanly if the optimistic `version` column has not advanced, otherwise a "keep mine / keep theirs / merge manually" modal appears
+  4. Presence indicators (who-is-editing-what) route through per-organisation Supabase Realtime channels with zero cross-tenant leakage
+  5. All collaborative-editing UI, lock logic, and presence channels are gated behind admin routes — a `next build` bundle analysis shows zero leakage into worker routes
+**Plans**: TBD
+**UI hint**: yes
+
+Plans:
+- [ ] 17-01-PLAN.md — Lock schema: migration adding `locked_by`, `locked_at`, `lock_expires_at`, `version` to `sop_sections`; RLS policy updates; `acquireLock` / `releaseLock` / `heartbeat` server actions; 5-minute expiry sweep
+- [ ] 17-02-PLAN.md — Presence + UI: Supabase Realtime presence channel per SOP (org-scoped via channel name), `SectionLockIndicator` component (avatar + "Alice is editing"), read-only guard when locked by another admin, explicit release on tab close
+- [ ] 17-03-PLAN.md — Offline handoff + conflict modal: optimistic version bump on save, "keep mine / keep theirs / merge manually" modal on reconnect when server version has advanced, Dexie draft sync integration, wave-1 verification that worker routes do not import presence or lock logic
+
+### Phase 18: Pipeline Integration, Bundle Isolation & v3.0 Closeout
+**Goal**: Builder-authored SOPs route through the Phase 9 `sop_pipeline_runs` linkage for one-click video generation, the builder auto-saves through the existing Dexie + sync-engine path without any new "save" step, and a CI check proves that Puck, Konva, Yjs, and y-dexie stay out of worker bundles — closing out the v3.0 milestone
+**Depends on**: Phase 9 (pipeline runs), Phase 12, Phase 16, Phase 17
+**Requirements**: SB-INFRA-01, SB-INFRA-02, SB-INFRA-03
+**Success Criteria** (what must be TRUE):
+  1. Admin can author a SOP in the builder, click "Generate video SOP", and flow through the same Phase 9 unified progress page and publish auto-queue used by uploaded SOPs — via a shared `pipeline_run_id`
+  2. The builder auto-saves to Dexie on change and to Supabase on a debounce with no explicit "save" button visible to the admin; offline authoring continues working uninterrupted across network drops
+  3. A CI script runs `next build` and asserts that the worker walkthrough route's First Load JS does not include `@measured/puck`, `konva`, `react-konva`, `yjs`, or `y-dexie` import paths; build fails if any slip in
+  4. v3.0 milestone closeout: all SB-XX requirements have passing tests, Dexie schema bump is deployed, bundle CI check is green, and human verification checklist is signed off
+**Plans**: TBD
+**UI hint**: yes
+
+Plans:
+- [ ] 18-01-PLAN.md — Pipeline linkage: extend `createVideoSopPipelineSession` to accept a builder-authored SOP id, route "Generate video SOP" button into the existing Phase 9 progress page, verify publish auto-queue works for builder-sourced SOPs
+- [ ] 18-02-PLAN.md — Dexie + sync-engine closeout: final Dexie schema bump (draftLayouts, sopImageAnnotations, sectionLocks mirrors), sync-engine hook-up for each new table, offline authoring end-to-end verification
+- [ ] 18-03-PLAN.md — Bundle isolation CI: `scripts/check-worker-bundle.ts` that parses `.next/app-build-manifest.json` and fails on disallowed imports in worker route chunks, wire into `npm run build`, regression pass
+- [ ] 18-04-PLAN.md — v3.0 human verification + milestone closeout: human UAT checklist covering every SB-XX requirement, verification run, learnings log entries, milestone retrospective hand-off
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12 → 13 → 14 → 15 → 16 → 17 → 18
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -228,6 +386,14 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 8. Video SOP Generation | 5/5 | Complete   | 2026-04-04 |
 | 9. Streamlined File → Video Pipeline | 1/5 | In Progress|  |
 | 10. Video Version Management | 4/4 | Complete    | 2026-04-13 |
+| 11. Section Schema & Block Foundation | 0/4 | Not started |  |
+| 12. Builder Shell & Blank-Page Authoring | 0/4 | Not started |  |
+| 13. Reusable Block Library | 0/4 | Not started |  |
+| 14. AI-Drafted SOPs | 0/3 | Not started |  |
+| 15. NZ Template Library | 0/2 | Not started |  |
+| 16. Image & Diagram Annotation | 0/4 | Not started |  |
+| 17. Collaborative Editing | 0/3 | Not started |  |
+| 18. Pipeline Integration, Bundle Isolation & v3.0 Closeout | 0/4 | Not started |  |
 
 ## Backlog
 
