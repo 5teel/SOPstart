@@ -108,6 +108,79 @@ Requirements for SOP Creation Pathways milestone. Each maps to roadmap phases.
 - [x] **INFRA-02**: All new intake pathways route through the existing SOP structuring pipeline and admin review UI
 - [x] **INFRA-03**: Generated videos are excluded from service worker caching to prevent device storage bloat
 
+## v3.0 Requirements — SOP Builder
+
+Requirements for native SOP authoring in the app. Delivered across the v3.0 milestone
+phases. All SB-XX requirements scope admin-facing functionality; worker walkthrough
+must continue to render all new content correctly without any new worker UI surfaces
+beyond image rendering tweaks for baked annotation layers.
+
+**Design contracts locked in from research (see `.planning/research/v3.0-*.md`):**
+
+1. Block-based layout editor (Puck) is the default editor. A single specialty `DiagramHotspotBlock` handles freeform x/y positioning for machine-diagram annotations.
+2. Image annotation uses Konva + react-konva with a dual-store model: Konva JSON for editing, baked PNG to Supabase Storage for the worker read path (zero Konva bytes in the worker bundle).
+3. Extensible section schema is additive — `section_type` is already free text; v3.0 adds a `section_kinds` catalog plus `blocks` / `block_versions` / `sop_section_blocks` junction. No destructive migration.
+4. Collaborative editing is section-level pessimistic locking in v3.0, with an optimistic version column for offline handoff. Yjs CRDT migration via `y-dexie` is deferred to v3.1+ (additive schema, no rewrite).
+5. All collaborative-editing and authoring UI code lives under admin routes only — workers never download Puck, Konva, presence channels, or lock logic.
+
+### Authoring Entry Points
+
+- [ ] **SB-AUTH-01**: Admin can start a new SOP from a blank page wizard that walks through title → canonical sections → review → draft save, without uploading any source document
+- [ ] **SB-AUTH-02**: Admin can generate a draft SOP by typing a natural-language prompt ("PPE check for forklift operators at our Hamilton site") and receive a structured draft with hazards, PPE, steps, and emergency sections pre-filled for review
+- [ ] **SB-AUTH-03**: Admin can pick a template from the NZ template library (WorkSafe categories, common machinery, chemical handling) as a starting point for a new SOP
+- [ ] **SB-AUTH-04**: Admin reaches the same builder UI whether they start blank, from AI draft, or from a template — there is one authoring surface, not three separate flows
+- [ ] **SB-AUTH-05**: A draft SOP started in the builder is clearly distinguishable in the admin SOP library from an uploaded SOP, but is published through the same admin review + publish workflow used in Phase 2
+
+### Extensible Section Schema
+
+- [ ] **SB-SECT-01**: Admin can add multiple sections of the same canonical kind to a single SOP (e.g. two "Hazards" sections scoped to different machine states)
+- [ ] **SB-SECT-02**: Admin can define a custom section with an admin-provided title (e.g. "Pre-flight check", "Escalation path") and have it render correctly in the worker walkthrough alongside canonical sections
+- [ ] **SB-SECT-03**: The `section_kinds` catalog is seeded with canonical kinds (hazards, ppe, steps, emergency, sign-off) plus rendering metadata (icon, colour family, priority) consumed by the worker UI
+- [ ] **SB-SECT-04**: Existing SOPs from v1/v2 continue to render identically — the extensible schema is additive and legacy `section_type` strings fall through to today's substring-matched renderer
+- [ ] **SB-SECT-05**: Admin can reorder sections via drag-and-drop in the builder; order persists as `sort_order` consistent with the existing schema
+
+### Layout Editor
+
+- [ ] **SB-LAYOUT-01**: Admin can drag blocks (text, photo, heading, callout, step, hazard card, PPE card, diagram hotspot) onto a page and rearrange them in a linear column or 2-column grid on wide screens
+- [ ] **SB-LAYOUT-02**: Each block's React component is shared between the admin editor and the worker walkthrough — there is no separate "author view" and "worker view" component tree
+- [ ] **SB-LAYOUT-03**: Layouts reflow correctly on a 5.5" phone screen without requiring the admin to author a separate mobile variant — Tailwind breakpoints drive the reflow
+- [ ] **SB-LAYOUT-04**: Layout data persists as JSONB on `sop_sections.layout_data` with a `layout_version` pin so future renderer upgrades do not silently break published SOPs
+- [ ] **SB-LAYOUT-05**: Admin can add a DiagramHotspotBlock to any section, drop a machine diagram image into it, and place numbered hotspot callouts at freeform x/y positions on the diagram for specific-component annotation
+- [ ] **SB-LAYOUT-06**: Worker walkthrough falls back to a linear step-list renderer for any SOP that lacks `layout_data` (legacy SOPs) or whose `layout_version` is unsupported, so no SOP is ever unrenderable
+
+### Image & Diagram Annotation
+
+- [ ] **SB-ANNOT-01**: Admin can annotate any uploaded photo or diagram with arrows, rectangles, ellipses, text labels, and numbered callouts (filled circle + number + optional label)
+- [ ] **SB-ANNOT-02**: Annotations are non-destructive — the original image is preserved and admins can re-edit annotations later without re-uploading
+- [ ] **SB-ANNOT-03**: On publish, the client-side editor bakes a flattened PNG of the annotated image and writes it to Supabase Storage at a version-bumped path; workers load the baked PNG via `<img>` with zero Konva bytes in their bundle
+- [ ] **SB-ANNOT-04**: Admin can use Apple Pencil / stylus input for freehand sketching on a diagram, with palm rejection when a pen is detected
+- [ ] **SB-ANNOT-05**: Annotations survive photo replacement in the editing pass — if an admin replaces the underlying image with a new one of similar dimensions, annotation coordinates are preserved and the admin is prompted to review placement
+
+### Collaborative Editing
+
+- [ ] **SB-COLLAB-01**: When an admin opens a section for editing, other admins in the same organisation see a read-only indicator "Alice is editing this section" and cannot modify it until the lock releases
+- [ ] **SB-COLLAB-02**: Locks auto-release after 5 minutes of inactivity (heartbeat expiry), on explicit release, or on tab close, so no admin can permanently block a section
+- [ ] **SB-COLLAB-03**: Different admins can edit different sections of the same SOP concurrently without any locking conflict
+- [ ] **SB-COLLAB-04**: Admin can edit a locked section offline (e.g. on a factory floor with no connectivity) if they were the one holding the lock when they went offline; on reconnect, changes are pushed if the version on server has not advanced, or a plain-English "keep mine / keep theirs / merge manually" modal appears if it has
+- [ ] **SB-COLLAB-05**: Presence indicators (who is currently editing what) are scoped per organisation via Supabase Realtime channels — no cross-tenant leakage
+- [ ] **SB-COLLAB-06**: All collaborative-editing UI, lock logic, and presence channels are gated behind admin routes; worker bundles contain zero code from this feature set
+
+### Reusable Block Library
+
+- [ ] **SB-BLOCK-01**: Admin can save any hazard, PPE item, or step as a reusable block to the organisation's block library with an admin-provided name and optional category tags
+- [ ] **SB-BLOCK-02**: The wizard surfaces "Pick from library (N matches)" alongside "Write new" at the right wizard step (hazards step offers hazard blocks, PPE step offers PPE blocks, etc.)
+- [ ] **SB-BLOCK-03**: Global NZ blocks (WorkSafe standards, common machinery hazards) are available to all orgs read-only, while org-scoped blocks are isolated via RLS to each organisation
+- [ ] **SB-BLOCK-04**: When an admin adds a block to a SOP, the block content is snapshotted into the junction row so the SOP renders correctly even if the block definition is later deleted or the worker is offline
+- [ ] **SB-BLOCK-05**: Admin can choose between "pin to this version" (default — the SOP continues to render the snapshot content forever) and "follow latest" (auto-updates if the block definition changes, with a publish gate)
+- [ ] **SB-BLOCK-06**: When a block definition is updated, all SOPs using it in "follow latest" mode are marked with an "update available" badge; admins review the change before publishing the updated SOP version
+
+### Infrastructure & Safety Gates
+
+- [ ] **SB-INFRA-01**: Draft SOPs authored in the builder integrate with the Phase 9 `sop_pipeline_runs` linkage so a builder-authored SOP can be routed to video generation with the same progress page and publish auto-queue used by uploaded SOPs
+- [ ] **SB-INFRA-02**: All builder-created content persists through Dexie for offline authoring and syncs via the existing sync engine; admins do not need a special "save" step — the builder auto-saves to Dexie on change and to Supabase on a debounce
+- [ ] **SB-INFRA-03**: Builder bundle is code-split so admin-only editor code does not ship to worker routes; a CI check verifies that worker route First-Load-JS does not include Puck, Konva, Yjs, or y-dexie imports
+- [ ] **SB-INFRA-04**: AI-drafted content passes the same adversarial verification gate used in Phase 6 (Claude cross-checks GPT output) before admin review, so hallucinated hazards/PPE are flagged before reaching the reviewer
+
 ## Future Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
@@ -135,9 +208,12 @@ Explicitly excluded. Documented to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| In-app SOP authoring | Orgs already have SOPs in docs — focus on consuming, not creating. Would double scope. |
+| ~~In-app SOP authoring~~ | **Superseded v3.0** — builder milestone adds native authoring (SB-AUTH-01..05). Original rationale (orgs have existing docs) no longer holds because orgs also want to author net-new SOPs and customised variants in-app. |
+| ~~AI-generated SOP creation from scratch~~ | **Superseded v3.0** — SB-AUTH-02 allows AI-drafted starting points, gated behind the same adversarial verification used in Phase 6 and mandatory admin review (SB-INFRA-04). |
+| In-place editing of *published* SOPs | Phase 10 re-upload/version flow remains the publish-edit path. Editing a live SOP would break audit trail and worker cache invariants. |
+| True freeform x/y layout across all blocks | Blocks reflow via Tailwind breakpoints; freeform positioning only exists inside a single specialty `DiagramHotspotBlock` for machine-diagram callouts. Full-freeform layouts would break mobile reflow and accessibility. |
+| Yjs CRDT concurrent editing | Deferred to v3.1+ via `y-dexie`. v3.0 uses section-level pessimistic locking + optimistic version column for offline handoff. |
 | Real-time chat between workers | Scope explosion; Slack/Teams already exist. Add "raise issue" button instead. |
-| AI-generated SOP creation from scratch | Hallucinations in safety-critical content are dangerous; orgs have existing verified docs |
 | Conditional branching in SOPs | Increases safety risk; manufacturing SOPs are linear by design |
 | Public SOP marketplace | Liability issues — safety procedures from one org applied in another |
 | Native iOS/Android apps | PWA-first; native later if needed |
@@ -229,6 +305,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 - Mapped to phases: 27
 - Unmapped: 0
 
+**v3.0 Coverage:**
+- v3.0 requirements: 33 total (SB-AUTH ×5, SB-SECT ×5, SB-LAYOUT ×6, SB-ANNOT ×5, SB-COLLAB ×6, SB-BLOCK ×6, SB-INFRA ×4)
+- Mapped to phases: 0 (pending roadmapper)
+- Unmapped: 33
+
 ---
 *Requirements defined: 2026-03-23*
-*Last updated: 2026-03-29 — v2.0 traceability mapped (Phases 5–8)*
+*Last updated: 2026-04-13 — v3.0 SOP Builder milestone requirements added (SB-XX)*
