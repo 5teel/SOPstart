@@ -50,30 +50,42 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 
 <!-- Current scope. Building toward these. -->
 
-#### Pathway 1 — Video → SOP (remaining)
-- Vimeo URL support (deferred from Phase 6)
+#### v3.0 — SOP Builder (native authoring)
+- Blank-page wizard for authoring SOPs from scratch
+- AI-assisted draft from admin prompts (GPT-4o)
+- NZ-specific template library (WorkSafe categories, machinery, chemical handling)
+- Hybrid AI + builder (AI draft lands in same builder for refinement)
+- Extensible section schema — additional and custom sections beyond the fixed Hazards/PPE/Steps/Emergency set
+- Drag-and-drop layout editor for pages/slides (text, photo, diagram, callout placement)
+- Photo and diagram annotation (arrows, highlight boxes, circles, numbered callouts — non-destructive overlay)
+- Collaborative editing — multi-admin on a draft SOP with conflict resolution
+- Reusable block library — shared hazard/PPE/step blocks surfaced via wizard-prompted selections
 
-#### Pathway 3 — File → Video SOP
-- Narrated slideshow (AI voice over auto-generated slides/cards)
-- Full AI video (generated visuals/animations with narration)
-- Screen recording style (scrolling SOP content with voice overlay)
+#### v2.0 carry-over (not blocking v3.0)
+- Vimeo URL support (Phase 6 deferral)
+- Phase 7 UAT run + Phase 9 live UAT (`human_needed`)
+- Phase 999.1 stale video job cleanup (backlog)
 
 ### Out of Scope
 
 - Native iOS/Android apps — PWA-first, native later if needed
-- In-app SOP authoring — upload-only for v1
-- Real-time collaboration or chat between workers
+- In-place editing of *published* SOPs — the Phase 10 re-upload/version flow remains that path
+- Real-time collaboration or chat between workers (collaborative *admin* authoring IS in scope for v3.0)
 - Integration with external HR/ERP systems
 - Video content within SOPs
 
-## Current Milestone: v2.0 SOP Creation Pathways
+## Current Milestone: v3.0 SOP Builder
 
-**Goal:** Three new ways to create and consume SOPs — from video transcription, from expanded file types (photos, Excel, PowerPoint), and as generated video content with AI narration.
+**Goal:** Enable admins to author SOPs natively in the app — from blank page or AI-drafted start — with an extensible section model, a drag-and-drop layout editor for pages, annotatable photos/diagrams, reusable blocks, NZ-specific templates, and collaborative drafts.
 
 **Target features:**
-- Video → SOP: upload, YouTube/Vimeo URL, or in-app recording transcribed into structured SOP
-- File → SOP: photo OCR, improved AI parsing, Excel/PowerPoint/plain text support
-- File → Video SOP: narrated slideshow, full AI video, screen recording style — all three output formats
+- **Authoring entry points:** blank-page wizard, AI-assisted draft from prompts, NZ template library, hybrid AI+builder single-flow
+- **Structure model:** extensible section schema — additional canonical sections + custom sections with admin-defined titles/behavior
+- **Layout & visuals:** per-page drag-and-drop layout editor; non-destructive photo/diagram annotation (arrows, boxes, circles, callouts)
+- **Collaboration & reuse:** multi-admin collaborative draft editing; reusable hazard/PPE/step block library with wizard-prompted selections
+- **Desktop-authored, mobile-consumed:** layouts authored on desktop must reflow gracefully to worker mobile screens
+
+**Key context:** Inverts v1 decision *"Upload-only for v1 (no in-app authoring)"*. v2.0 infrastructure (pipeline linkage, version management, publish gate) is reusable. Collaborative editing needs CRDT vs. server-lock research before planning. Layout editor + annotation are effectively a mini-Figma-for-SOPs and should be budgeted as multi-phase work.
 
 ## Context
 
@@ -101,10 +113,13 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| PWA over native apps | Faster to ship, works on all devices, no app store friction for enterprise deployment | — Pending |
-| AI auto-parse over manual mapping | Reduces admin burden; hundreds of SOPs make manual entry impractical | — Pending |
-| Multi-tenant SaaS from the start | Product is intended for multiple organizations, not a single-company tool | — Pending |
-| Upload-only for v1 (no in-app authoring) | Orgs already have SOPs in docs — focus on making existing ones usable, not replacing authoring tools | — Pending |
+| PWA over native apps | Faster to ship, works on all devices, no app store friction for enterprise deployment | ✓ Validated v1.0–v2.0 |
+| AI auto-parse over manual mapping | Reduces admin burden; hundreds of SOPs make manual entry impractical | ✓ Validated Phase 2 + 5 |
+| Multi-tenant SaaS from the start | Product is intended for multiple organizations, not a single-company tool | ✓ Validated Phase 1 RLS |
+| Upload-only for v1 (no in-app authoring) | Orgs already have SOPs in docs — focus on making existing ones usable, not replacing authoring tools | ✗ Superseded v3.0 — orgs also want to author net-new SOPs in the builder |
+| v3.0 adds native authoring | Upload flow shipped; orgs now ask for on-app authoring for net-new SOPs and customized variants — not just import | — Pending v3.0 |
+| Collaborative draft editing (v3.0) | Multiple admins share SOP drafting load; avoids email-attachment churn; needs conflict resolution model | — Pending v3.0 research |
+| Non-destructive image annotation (v3.0) | Admins must be able to re-edit annotations after saving; burned-in pixels would require re-upload | — Pending v3.0 research |
 
 ## Evolution
 
@@ -124,4 +139,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-04 — Phase 7 (In-App Recording) complete*
+*Last updated: 2026-04-13 — v2.0 archived, v3.0 SOP Builder milestone started*

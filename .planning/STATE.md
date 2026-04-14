@@ -1,36 +1,42 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.0
-milestone_name: milestone
-status: phase-complete
-stopped_at: Phase 09 complete — 5/5 plans merged, verified (human UAT pending), code review clean
-last_updated: "2026-04-13T13:00:00.000Z"
-last_activity: 2026-04-13 -- Phase 09 streamlined-file-video-pipeline complete
+milestone: v3.0
+milestone_name: sop-builder
+status: requirements
+stopped_at: v3.0 SOP Builder milestone started — gathering requirements
+last_updated: "2026-04-13T13:30:00.000Z"
+last_activity: 2026-04-13 -- v2.0 archived, v3.0 SOP Builder milestone started
 progress:
-  total_phases: 11
-  completed_phases: 10
-  total_plans: 41
-  completed_plans: 41
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-23)
+See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** v2.0 wrap-up — Phase 7 (in-app recording) remains open; Phase 9 + Phase 10 complete
+**Current focus:** v3.0 SOP Builder — native authoring (wizard + AI + layout editor + annotation + collab + reusable blocks)
 
 ## Current Position
 
-Phase: 09 (streamlined-file-video-pipeline) — COMPLETE
-Plan: 5 of 5 (all merged, verified)
-Status: Phase 09 verification human_needed (live UAT pending against remote Supabase)
-Last activity: 2026-04-13 -- Phase 09 complete
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements for v3.0
+Last activity: 2026-04-13 -- v3.0 SOP Builder milestone started
 
-Progress bar: `[██████████████░░░░░░]` 75% (3/4 v2.0 phases — 5, 8/10, 9 done; 7 remaining)
+Progress bar: `[░░░░░░░░░░░░░░░░░░░░]` 0% (requirements phase)
+
+## v2.0 Archive
+
+Archived phases: `.planning/archive/v2.0/` (10 phases + 999.1 backlog)
+Milestone record: `.planning/MILESTONES.md` § v2.0
+Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async error surfacing, Phase 999.1 stale cleanup service.
 
 ## Performance Metrics
 
