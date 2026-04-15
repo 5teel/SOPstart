@@ -139,4 +139,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-13 — v2.0 archived, v3.0 SOP Builder milestone started*
+*Last updated: 2026-04-15 — Phase 11 (Section Schema & Block Foundation) complete — v3.0 schema/types/admin-UI foundation landed; SB-SECT-01..04 pending human walkthrough + Phase 12 test flip*
