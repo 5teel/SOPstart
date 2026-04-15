@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react'
 import { CheckCircle2 } from 'lucide-react'
 import { SopTable, containsMarkdownTable } from '@/components/sop/SopTable'
+import { resolveTabStyling } from '@/lib/sections/resolveRenderFamily'
 import type { SopSection, SopStep, SopImage } from '@/types/sop'
 
 interface SectionEditorProps {
@@ -119,6 +120,11 @@ export default function SectionEditor({
     )
   }
 
+  // Resolve the section_kind metadata (display_name, family) via the shared
+  // Phase 11-02 helper so admins see the canonical kind at a glance even
+  // when the admin-supplied title is something like "Hot surface hazards — melter 2".
+  const styling = resolveTabStyling(section)
+
   return (
     <div
       className={[
@@ -128,10 +134,15 @@ export default function SectionEditor({
     >
       {/* Card header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-steel-700">
-        <span className="text-sm font-semibold text-steel-100 uppercase tracking-wide">
-          {section.title || section.section_type}
-        </span>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-xs uppercase tracking-wide text-steel-400 flex-shrink-0">
+            {styling.displayName ?? styling.family}
+          </span>
+          <span className="text-sm font-semibold text-steel-100 truncate">
+            {section.title || section.section_type}
+          </span>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
           {savedFlash && (
             <span className="text-xs text-green-400 font-medium">Saved ✓</span>
           )}

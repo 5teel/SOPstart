@@ -8,6 +8,7 @@ import { StatusBadge } from '@/components/admin/StatusBadge'
 import ParseJobStatus from '@/components/admin/ParseJobStatus'
 import OriginalDocViewer from '@/components/admin/OriginalDocViewer'
 import SectionEditor from '@/components/admin/SectionEditor'
+import { AddSectionButton } from '@/components/admin/AddSectionButton'
 import AdversarialFlagBanner from '@/components/admin/AdversarialFlagBanner'
 import MissingSectionWarningBanner from '@/components/admin/MissingSectionWarningBanner'
 import { reparseSop, restructureSop } from '@/actions/sops'
@@ -392,6 +393,16 @@ export default function ReviewClient({
                     onApprovalChange={handleApprovalChange}
                   />
                 ))
+              )}
+
+              {/* Add section (draft SOPs only) — lets admin insert a new
+                  canonical or custom section via the 11-01 section_kinds
+                  catalog. Multiple sections of the same kind are allowed. */}
+              {sop.status === 'draft' && (
+                <AddSectionButton
+                  sopId={sop.id}
+                  onCreated={handleApprovalChange}
+                />
               )}
             </div>
           </div>
