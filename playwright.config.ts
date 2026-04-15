@@ -42,5 +42,9 @@ export default defineConfig({
       name: 'phase10-stubs',
       testMatch: /video-version-management/,
     },
+    {
+      name: 'phase11-stubs',
+      testMatch: /sb-auth-builder|sb-section-schema|sb-layout-editor|sb-image-annotation|sb-collaborative-editing|sb-block-library|sb-builder-infrastructure/,
+    },
   ],
 })
