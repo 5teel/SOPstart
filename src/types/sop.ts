@@ -58,7 +58,9 @@ export interface Sop {
 export interface SopSection {
   id: string
   sop_id: string
-  section_type: string
+  section_type: string                // legacy free-text, still populated
+  section_kind_id: string | null      // v3.0 advisory FK (nullable)
+  section_kind?: SectionKind | null   // optional join, populated by useSopDetail
   title: string
   content: string | null
   sort_order: number
@@ -178,4 +180,79 @@ export interface UploadSession {
   uploadUrl: string
   token: string
   path: string
+}
+
+// ---------------------------------------------------------------
+// v3.0: Section Kinds catalog + Reusable Blocks
+// Matches supabase/migrations/00019_section_kinds_and_blocks.sql
+// ---------------------------------------------------------------
+
+export type SectionRenderFamily =
+  | 'hazard'
+  | 'ppe'
+  | 'steps'
+  | 'content'
+  | 'signoff'
+  | 'emergency'
+  | 'custom'
+
+export interface SectionKind {
+  id: string
+  organisation_id: string | null   // null = global/canonical
+  slug: string
+  display_name: string
+  render_family: SectionRenderFamily
+  icon: string | null              // lucide icon name
+  color_family: string | null      // brand palette key
+  render_priority: number
+  description: string | null
+  created_at: string
+  updated_at: string
+}
+
+// Discriminated-union payload for block_versions.content
+export type BlockContent =
+  | { kind: 'hazard';    text: string; severity: 'critical' | 'warning' | 'notice' }
+  | { kind: 'ppe';       items: string[] }
+  | { kind: 'step';      text: string; warning?: string; tip?: string }
+  | { kind: 'emergency'; text: string; contacts?: string[] }
+  | { kind: 'custom';    data: Record<string, unknown> }
+
+export interface Block {
+  id: string
+  organisation_id: string | null
+  kind_slug: string
+  name: string
+  category: string | null
+  current_version_id: string | null
+  archived_at: string | null
+  created_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface BlockVersion {
+  id: string
+  block_id: string
+  version_number: number
+  content: BlockContent
+  change_note: string | null
+  created_by: string | null
+  created_at: string
+}
+
+export type PinMode = 'pinned' | 'follow_latest'
+
+export interface SopSectionBlock {
+  id: string
+  sop_section_id: string
+  block_id: string
+  pinned_version_id: string | null
+  pin_mode: PinMode
+  snapshot_content: BlockContent
+  overridden_at: string | null
+  update_available: boolean
+  sort_order: number
+  created_at: string
+  updated_at: string
 }
