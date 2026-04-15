@@ -26,7 +26,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 8: Video SOP Generation** - AI-narrated slideshow, screen-recording-style, and full AI video generated from published SOPs (completed 2026-04-04)
 - [ ] **Phase 9: Streamlined File → Video Pipeline** - One-click upload-to-video SOP flow chaining file parsing and video generation
 - [x] **Phase 10: Video Version Management** - Multiple video versions per SOP with labels, editing, deletion, and admin management UI (completed 2026-04-13)
-- [ ] **Phase 11: Section Schema & Block Foundation** - Additive `section_kinds` catalog, `blocks`/`block_versions`/`sop_section_blocks` tables, legacy fallback, and v3.0 wave-0 test stubs
+- [x] **Phase 11: Section Schema & Block Foundation** - Additive `section_kinds` catalog, `blocks`/`block_versions`/`sop_section_blocks` tables, legacy fallback, and v3.0 wave-0 test stubs (completed 2026-04-15)
 - [ ] **Phase 12: Builder Shell & Blank-Page Authoring** - Puck-based builder, `layout_data` JSONB, blank-page wizard, unified authoring surface, legacy linear fallback
 - [ ] **Phase 13: Reusable Block Library** - Org-vs-global block CRUD, NZ seed blocks, wizard "Pick from library" step, pin-version vs follow-latest semantics
 - [ ] **Phase 14: AI-Drafted SOPs** - Natural-language prompt → GPT-4o structured draft → Claude adversarial verification gate → editable draft lands in the builder
@@ -238,10 +238,10 @@ Plans:
 **UI hint**: no
 
 Plans:
-- [ ] 11-00-PLAN.md — Wave 0: Playwright test stubs for every SB-XX requirement (SB-AUTH, SB-SECT, SB-LAYOUT, SB-ANNOT, SB-COLLAB, SB-BLOCK, SB-INFRA) + `phase11-stubs` project config
-- [ ] 11-01-PLAN.md — DB migration: `section_kinds` catalog (with canonical seed rows: hazards, ppe, steps, emergency, signoff, content, custom), `blocks` + `block_versions` tables, `sop_section_blocks` junction with `pin_mode` + snapshot columns, `sop_sections.section_kind_id` advisory FK, RLS policies (org-scoped + null-org global read)
-- [ ] 11-02-PLAN.md — Type layer: `SectionKind`, `Block`, `BlockVersion`, `SopSectionBlock` TypeScript types; Zod validators; walkthrough renderer extension to read `section_kinds` join with legacy substring fallback; verify all v1/v2 SOPs render unchanged
-- [ ] 11-03-PLAN.md — Admin UI plumbing: section-kind picker in the existing admin review UI, add-custom-section control, multi-instance-of-same-kind support, regression pass against Phase 2/5/6 review UIs
+- [x] 11-00-PLAN.md — Wave 0: Playwright test stubs for every SB-XX requirement (SB-AUTH, SB-SECT, SB-LAYOUT, SB-ANNOT, SB-COLLAB, SB-BLOCK, SB-INFRA) + `phase11-stubs` project config
+- [x] 11-01-PLAN.md — DB migration: `section_kinds` catalog (with canonical seed rows: hazards, ppe, steps, emergency, signoff, content, custom), `blocks` + `block_versions` tables, `sop_section_blocks` junction with `pin_mode` + snapshot columns, `sop_sections.section_kind_id` advisory FK, RLS policies (org-scoped + null-org global read)
+- [x] 11-02-PLAN.md — Type layer: `SectionKind`, `Block`, `BlockVersion`, `SopSectionBlock` TypeScript types; Zod validators; walkthrough renderer extension to read `section_kinds` join with legacy substring fallback; verify all v1/v2 SOPs render unchanged
+- [x] 11-03-PLAN.md — Admin UI plumbing: section-kind picker in the existing admin review UI, add-custom-section control, multi-instance-of-same-kind support, regression pass against Phase 2/5/6 review UIs
 
 ### Phase 12: Builder Shell & Blank-Page Authoring
 **Goal**: Admin can start a new SOP from a blank wizard, reach one unified Puck-based builder regardless of entry point, drag blocks onto each section, save drafts auto-debounced to Dexie + Supabase, and workers continue to render every existing SOP via a legacy linear fallback when `layout_data` is absent
@@ -386,7 +386,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 8. Video SOP Generation | 5/5 | Complete   | 2026-04-04 |
 | 9. Streamlined File → Video Pipeline | 1/5 | In Progress|  |
 | 10. Video Version Management | 4/4 | Complete    | 2026-04-13 |
-| 11. Section Schema & Block Foundation | 0/4 | Not started |  |
+| 11. Section Schema & Block Foundation | 4/4 | Complete    | 2026-04-15 |
 | 12. Builder Shell & Blank-Page Authoring | 0/4 | Not started |  |
 | 13. Reusable Block Library | 0/4 | Not started |  |
 | 14. AI-Drafted SOPs | 0/3 | Not started |  |
