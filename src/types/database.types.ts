@@ -236,6 +236,7 @@ export type Database = {
           content: string | null
           created_at: string
           id: string
+          section_kind_id: string | null
           section_type: string
           sop_id: string
           sort_order: number
@@ -248,6 +249,7 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          section_kind_id?: string | null
           section_type: string
           sop_id: string
           sort_order?: number
@@ -260,6 +262,7 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          section_kind_id?: string | null
           section_type?: string
           sop_id?: string
           sort_order?: number
@@ -272,6 +275,219 @@ export type Database = {
             columns: ["sop_id"]
             isOneToOne: false
             referencedRelation: "sops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sop_sections_section_kind_id_fkey"
+            columns: ["section_kind_id"]
+            isOneToOne: false
+            referencedRelation: "section_kinds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      section_kinds: {
+        Row: {
+          color_family: string | null
+          created_at: string
+          description: string | null
+          display_name: string
+          icon: string | null
+          id: string
+          organisation_id: string | null
+          render_family: string
+          render_priority: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          color_family?: string | null
+          created_at?: string
+          description?: string | null
+          display_name: string
+          icon?: string | null
+          id?: string
+          organisation_id?: string | null
+          render_family: string
+          render_priority?: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          color_family?: string | null
+          created_at?: string
+          description?: string | null
+          display_name?: string
+          icon?: string | null
+          id?: string
+          organisation_id?: string | null
+          render_family?: string
+          render_priority?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "section_kinds_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blocks: {
+        Row: {
+          archived_at: string | null
+          category: string | null
+          created_at: string
+          created_by: string | null
+          current_version_id: string | null
+          id: string
+          kind_slug: string
+          name: string
+          organisation_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          archived_at?: string | null
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          current_version_id?: string | null
+          id?: string
+          kind_slug: string
+          name: string
+          organisation_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          archived_at?: string | null
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          current_version_id?: string | null
+          id?: string
+          kind_slug?: string
+          name?: string
+          organisation_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blocks_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "blocks_current_version_fk"
+            columns: ["current_version_id"]
+            isOneToOne: false
+            referencedRelation: "block_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      block_versions: {
+        Row: {
+          block_id: string
+          change_note: string | null
+          content: Json
+          created_at: string
+          created_by: string | null
+          id: string
+          version_number: number
+        }
+        Insert: {
+          block_id: string
+          change_note?: string | null
+          content: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          version_number: number
+        }
+        Update: {
+          block_id?: string
+          change_note?: string | null
+          content?: Json
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "block_versions_block_id_fkey"
+            columns: ["block_id"]
+            isOneToOne: false
+            referencedRelation: "blocks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sop_section_blocks: {
+        Row: {
+          block_id: string
+          created_at: string
+          id: string
+          overridden_at: string | null
+          pin_mode: string
+          pinned_version_id: string | null
+          snapshot_content: Json
+          sop_section_id: string
+          sort_order: number
+          update_available: boolean
+          updated_at: string
+        }
+        Insert: {
+          block_id: string
+          created_at?: string
+          id?: string
+          overridden_at?: string | null
+          pin_mode?: string
+          pinned_version_id?: string | null
+          snapshot_content: Json
+          sop_section_id: string
+          sort_order?: number
+          update_available?: boolean
+          updated_at?: string
+        }
+        Update: {
+          block_id?: string
+          created_at?: string
+          id?: string
+          overridden_at?: string | null
+          pin_mode?: string
+          pinned_version_id?: string | null
+          snapshot_content?: Json
+          sop_section_id?: string
+          sort_order?: number
+          update_available?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sop_section_blocks_sop_section_id_fkey"
+            columns: ["sop_section_id"]
+            isOneToOne: false
+            referencedRelation: "sop_sections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sop_section_blocks_block_id_fkey"
+            columns: ["block_id"]
+            isOneToOne: false
+            referencedRelation: "blocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sop_section_blocks_pinned_version_id_fkey"
+            columns: ["pinned_version_id"]
+            isOneToOne: false
+            referencedRelation: "block_versions"
             referencedColumns: ["id"]
           },
         ]
