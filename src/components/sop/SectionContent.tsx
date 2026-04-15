@@ -2,6 +2,7 @@
 import { AlertTriangle, ShieldCheck, Siren } from 'lucide-react'
 import { SopImageInline } from '@/components/sop/SopImageInline'
 import { SopTable, containsMarkdownTable } from '@/components/sop/SopTable'
+import { resolveRenderFamily } from '@/lib/sections/resolveRenderFamily'
 import type { SopSection, SopStep, SopImage } from '@/types/sop'
 
 type SectionWithChildren = SopSection & {
@@ -21,8 +22,7 @@ function parseContentLines(content: string | null): string[] {
     .filter(Boolean)
 }
 
-function HazardContent({ section }: { section: SectionWithChildren }) {
-  const isEmergency = section.section_type.includes('emergency')
+function HazardContent({ section, isEmergency }: { section: SectionWithChildren; isEmergency: boolean }) {
   const Icon = isEmergency ? Siren : AlertTriangle
   const lines = parseContentLines(section.content)
 
@@ -128,33 +128,35 @@ function DefaultContent({ section }: { section: SectionWithChildren }) {
 }
 
 export function SectionContent({ section }: SectionContentProps) {
-  const type = section.section_type
-  const hasSteps = section.sop_steps.length > 0
+  const family = resolveRenderFamily(section)
 
-  // Hazard/emergency sections
-  if (type.includes('hazard') || type.includes('emergency')) {
-    return <HazardContent section={section} />
+  switch (family) {
+    case 'hazard':
+      return <HazardContent section={section} isEmergency={false} />
+    case 'emergency':
+      return <HazardContent section={section} isEmergency={true} />
+    case 'ppe':
+      return <PpeContent section={section} />
+    case 'steps':
+      // Preserve the existing steps preamble wrapper: legacy sections with
+      // both content text AND extracted steps render content + StepsContent
+      // stacked identically to the previous cascade (was at lines 146-155).
+      return (
+        <>
+          {section.content && (
+            <div className="bg-steel-800 border border-steel-700 rounded-xl p-5 mb-4">
+              <p className="text-base text-steel-100 leading-relaxed whitespace-pre-wrap">{section.content}</p>
+            </div>
+          )}
+          <StepsContent section={section} />
+        </>
+      )
+    case 'signoff':
+      // TODO(phase 12): dedicated SignoffContent — until then reuse DefaultContent
+      return <DefaultContent section={section} />
+    case 'content':
+    case 'custom':
+    default:
+      return <DefaultContent section={section} />
   }
-
-  // PPE sections
-  if (type.includes('ppe') || type.includes('protective')) {
-    return <PpeContent section={section} />
-  }
-
-  // Any section with steps — regardless of type name
-  if (hasSteps) {
-    return (
-      <>
-        {section.content && (
-          <div className="bg-steel-800 border border-steel-700 rounded-xl p-5 mb-4">
-            <p className="text-base text-steel-100 leading-relaxed whitespace-pre-wrap">{section.content}</p>
-          </div>
-        )}
-        <StepsContent section={section} />
-      </>
-    )
-  }
-
-  // Content-only sections (scope, tools, notes, etc.)
-  return <DefaultContent section={section} />
 }

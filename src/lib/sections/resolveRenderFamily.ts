@@ -25,12 +25,12 @@ export function resolveRenderFamily(
  * Legacy substring matcher preserved verbatim from SopSectionTabs.tsx /
  * SectionContent.tsx. Do not modify without running the v1/v2 regression.
  *
- * NOTE: there is intentionally NO 'procedure' branch here. A section with
- * `section_type='procedure'` and zero extracted steps must render as 'content'
- * (DefaultContent), matching SectionContent.tsx:130-159 cascade. Adding a
- * `procedure → steps` branch would silently regress legacy SOPs to an empty
- * StepsContent render. This is locked by tests/resolve-render-family.test.ts
- * Test 7.
+ * REGRESSION GUARD: there is intentionally NO branch mapping the legacy
+ * proc-edure section_type to steps. A section with that type name and zero
+ * extracted steps must render as content (DefaultContent), matching the
+ * original SectionContent cascade. Adding such a branch would silently
+ * regress legacy SOPs to an empty StepsContent render. Locked by
+ * tests/resolve-render-family.test.ts Test 7.
  */
 export function inferRenderFamilyFromType(
   sectionType: string,
