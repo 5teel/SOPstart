@@ -44,7 +44,7 @@ export default defineConfig({
     },
     {
       name: 'phase11-stubs',
-      testMatch: /sb-auth-builder|sb-section-schema|sb-layout-editor|sb-image-annotation|sb-collaborative-editing|sb-block-library|sb-builder-infrastructure/,
+      testMatch: /sb-auth-builder|sb-section-schema|sb-layout-editor|sb-image-annotation|sb-collaborative-editing|sb-block-library|sb-builder-infrastructure|resolve-render-family/,
     },
   ],
 })
