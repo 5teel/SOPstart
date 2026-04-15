@@ -37,6 +37,11 @@ export function useSopDetail(sopId: string) {
       }
 
       // Fallback: fetch from Supabase (non-assigned SOPs from library)
+      // v3.0: section_kind join is cached alongside section for offline
+      // walkthrough rendering. The aliased `section_kind:section_kinds!section_kind_id(*)`
+      // syntax returns a single joined row (not an array) and is RLS-respected
+      // by PostgREST — workers receive only global + own-org kinds per
+      // migration 00019 policies.
       const supabase = createClient()
       const { data: sop, error } = await supabase
         .from('sops')
@@ -44,6 +49,7 @@ export function useSopDetail(sopId: string) {
           *,
           sop_sections (
             *,
+            section_kind:section_kinds!section_kind_id ( * ),
             sop_steps ( * ),
             sop_images ( * )
           )

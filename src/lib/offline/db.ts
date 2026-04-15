@@ -64,4 +64,20 @@ db.version(2).stores({
   photoQueue: 'localId, completionLocalId, stepId, uploaded',
 })
 
+// v3: adds section_kind_id index for the v3.0 section kinds catalog join.
+// All v2 tables carried forward unchanged. Dexie tolerates extra row fields
+// on upgrade — only the index string changes, so existing clients upgrade
+// without losing cached SOPs. The joined `section_kind` object is
+// denormalized onto each cached section by the sync layer; there is no
+// separate section_kinds Dexie table.
+db.version(3).stores({
+  sops: 'id, organisation_id, status, version, category, department, _cachedAt',
+  sections: 'id, sop_id, section_type, section_kind_id, sort_order',
+  steps: 'id, section_id, step_number',
+  images: 'id, sop_id, section_id, step_id',
+  syncMeta: 'key',
+  completions: 'localId, sopId, status',
+  photoQueue: 'localId, completionLocalId, stepId, uploaded',
+})
+
 export { db }
