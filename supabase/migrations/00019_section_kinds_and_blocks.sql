@@ -85,3 +85,88 @@ update public.sop_sections s
      or (k.slug = 'signoff'   and (lower(s.section_type) like '%sign%off%' or lower(s.section_type) like '%sign_off%'))
      or (k.slug = 'content'   and lower(s.section_type) in ('overview','notes','scope','content','introduction'))
    );
+
+-- ============================================================
+-- Step 4: blocks definition table
+-- ============================================================
+create table if not exists public.blocks (
+  id                 uuid primary key default gen_random_uuid(),
+  organisation_id    uuid references public.organisations(id) on delete cascade,
+  -- NULL = global block, non-null = org-scoped block
+  kind_slug          text not null,
+  -- Admin-visible name; should be unique within org + kind for findability.
+  name               text not null,
+  category           text,
+  current_version_id uuid,       -- FK added after block_versions exists (circular)
+  archived_at        timestamptz,
+  created_by         uuid references auth.users(id),
+  created_at         timestamptz not null default now(),
+  updated_at         timestamptz not null default now()
+);
+
+create index if not exists idx_blocks_org_kind
+  on public.blocks (organisation_id, kind_slug)
+  where archived_at is null;
+
+-- ============================================================
+-- Step 5: block_versions history + circular FK on blocks.current_version_id
+-- ============================================================
+create table if not exists public.block_versions (
+  id              uuid primary key default gen_random_uuid(),
+  block_id        uuid not null references public.blocks(id) on delete cascade,
+  version_number  int  not null,
+  content         jsonb not null,
+  -- Discriminated-union payload; shape enforced at the application layer
+  -- by a Zod schema (see 11-02). Content must include a 'kind' discriminator.
+  change_note     text,
+  created_by      uuid references auth.users(id),
+  created_at      timestamptz not null default now(),
+  unique (block_id, version_number)
+);
+
+create index if not exists idx_block_versions_block
+  on public.block_versions (block_id, version_number desc);
+
+-- Circular FK: blocks.current_version_id → block_versions.id
+-- Deferrable so insert order within a transaction can go block → version → set current.
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'blocks_current_version_fk'
+  ) then
+    alter table public.blocks
+      add constraint blocks_current_version_fk
+      foreign key (current_version_id)
+      references public.block_versions(id)
+      on delete set null
+      deferrable initially deferred;
+  end if;
+end $$;
+
+-- ============================================================
+-- Step 6: sop_section_blocks junction (pin_mode + snapshot_content)
+-- ============================================================
+create table if not exists public.sop_section_blocks (
+  id                 uuid primary key default gen_random_uuid(),
+  sop_section_id     uuid not null references public.sop_sections(id) on delete cascade,
+  block_id           uuid not null references public.blocks(id) on delete restrict,
+  pinned_version_id  uuid references public.block_versions(id),
+  pin_mode           text not null default 'pinned'
+                       check (pin_mode in ('pinned','follow_latest')),
+  -- Offline-first: cached copy of the block content at insertion time.
+  -- Workers read ONLY this column; never join block_versions at read time.
+  snapshot_content   jsonb not null,
+  overridden_at      timestamptz,
+  update_available   boolean not null default false,
+  sort_order         int not null default 0,
+  created_at         timestamptz not null default now(),
+  updated_at         timestamptz not null default now()
+);
+
+create index if not exists idx_ssb_section_sort
+  on public.sop_section_blocks (sop_section_id, sort_order);
+
+create index if not exists idx_ssb_block
+  on public.sop_section_blocks (block_id);
+-- Note: no UNIQUE on (sop_section_id, block_id) — multiple instances of the
+-- same block within a section are allowed (e.g. warning → instructions → warning).
