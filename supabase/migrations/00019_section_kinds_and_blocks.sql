@@ -170,3 +170,119 @@ create index if not exists idx_ssb_block
   on public.sop_section_blocks (block_id);
 -- Note: no UNIQUE on (sop_section_id, block_id) — multiple instances of the
 -- same block within a section are allowed (e.g. warning → instructions → warning).
+
+-- ============================================================
+-- Step 7: RLS — read globals + own-org; write own-org admin only
+-- ============================================================
+alter table public.section_kinds enable row level security;
+alter table public.blocks enable row level security;
+alter table public.block_versions enable row level security;
+alter table public.sop_section_blocks enable row level security;
+
+-- ---------- section_kinds ----------
+create policy "section_kinds_read_global_plus_org"
+  on public.section_kinds for select to authenticated
+  using (organisation_id is null or organisation_id = public.current_organisation_id());
+
+create policy "section_kinds_admin_insert_own_org"
+  on public.section_kinds for insert to authenticated
+  with check (
+    organisation_id = public.current_organisation_id()
+    and public.current_user_role() in ('admin','safety_manager')
+  );
+
+create policy "section_kinds_admin_update_own_org"
+  on public.section_kinds for update to authenticated
+  using (
+    organisation_id = public.current_organisation_id()
+    and public.current_user_role() in ('admin','safety_manager')
+  )
+  with check (
+    organisation_id = public.current_organisation_id()
+    and public.current_user_role() in ('admin','safety_manager')
+  );
+
+create policy "section_kinds_admin_delete_own_org"
+  on public.section_kinds for delete to authenticated
+  using (
+    organisation_id = public.current_organisation_id()
+    and public.current_user_role() in ('admin','safety_manager')
+  );
+
+-- ---------- blocks ----------
+create policy "blocks_read_global_plus_org"
+  on public.blocks for select to authenticated
+  using (organisation_id is null or organisation_id = public.current_organisation_id());
+
+create policy "blocks_admin_insert_own_org"
+  on public.blocks for insert to authenticated
+  with check (
+    organisation_id = public.current_organisation_id()
+    and public.current_user_role() in ('admin','safety_manager')
+  );
+
+create policy "blocks_admin_update_own_org"
+  on public.blocks for update to authenticated
+  using (
+    organisation_id = public.current_organisation_id()
+    and public.current_user_role() in ('admin','safety_manager')
+  )
+  with check (
+    organisation_id = public.current_organisation_id()
+    and public.current_user_role() in ('admin','safety_manager')
+  );
+
+create policy "blocks_admin_delete_own_org"
+  on public.blocks for delete to authenticated
+  using (
+    organisation_id = public.current_organisation_id()
+    and public.current_user_role() in ('admin','safety_manager')
+  );
+
+-- ---------- block_versions (scoped via join to blocks, immutable history) ----------
+create policy "block_versions_read_via_blocks"
+  on public.block_versions for select to authenticated
+  using (exists (
+    select 1 from public.blocks b
+    where b.id = block_versions.block_id
+      and (b.organisation_id is null or b.organisation_id = public.current_organisation_id())
+  ));
+
+create policy "block_versions_admin_insert_own_org"
+  on public.block_versions for insert to authenticated
+  with check (exists (
+    select 1 from public.blocks b
+    where b.id = block_versions.block_id
+      and b.organisation_id = public.current_organisation_id()
+      and public.current_user_role() in ('admin','safety_manager')
+  ));
+
+-- block_versions are immutable history — no UPDATE/DELETE for authenticated.
+-- (service_role retains bypass for operational needs.)
+
+-- ---------- sop_section_blocks (scoped via join to sop_sections → sops) ----------
+create policy "ssb_read_own_org"
+  on public.sop_section_blocks for select to authenticated
+  using (exists (
+    select 1 from public.sop_sections sec
+    join public.sops sop on sop.id = sec.sop_id
+    where sec.id = sop_section_blocks.sop_section_id
+      and sop.organisation_id = public.current_organisation_id()
+  ));
+
+create policy "ssb_admin_manage_own_org"
+  on public.sop_section_blocks for all to authenticated
+  using (exists (
+    select 1 from public.sop_sections sec
+    join public.sops sop on sop.id = sec.sop_id
+    where sec.id = sop_section_blocks.sop_section_id
+      and sop.organisation_id = public.current_organisation_id()
+      and public.current_user_role() in ('admin','safety_manager')
+  ))
+  with check (exists (
+    select 1 from public.sop_sections sec
+    join public.sops sop on sop.id = sec.sop_id
+    where sec.id = sop_section_blocks.sop_section_id
+      and sop.organisation_id = public.current_organisation_id()
+      and public.current_user_role() in ('admin','safety_manager')
+  ));
