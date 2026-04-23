@@ -80,17 +80,191 @@
     details summary::-webkit-details-marker { display: none; }
     details summary::marker { content: ''; }
     .chip { display:inline-flex; align-items:center; gap:4px; padding:2px 6px; border:1px solid #e4e4e7; font-size:10px; border-radius:2px; background:#fff; }
+
+    /* ============ DEVICE-FRAME TOGGLE ============ */
+    /* Persistent top strip */
+    #preview-bar {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:6px 12px; background:#09090b; border-bottom:1px solid #27272a;
+      font-family:'JetBrains Mono'; font-size:11px; color:#a1a1aa;
+      letter-spacing:0.04em; position:relative; z-index:40;
+    }
+    #preview-bar .seg { display:inline-flex; border:1px solid #3f3f46; border-radius:2px; overflow:hidden; }
+    #preview-bar .seg button { padding:4px 10px; font-size:10px; letter-spacing:0.1em; background:transparent; color:#a1a1aa; cursor:pointer; text-transform:uppercase; display:flex; align-items:center; gap:4px; }
+    #preview-bar .seg button[aria-pressed="true"] { background:#fbbf24; color:#09090b; font-weight:700; }
+
+    /* Desktop view: app fills all available space */
+    body[data-view="desktop"] #device-wrap { height: calc(100dvh - 32px); background:#000; }
+    body[data-view="desktop"] #app { height:100%; width:100%; }
+
+    /* Mobile view: app clamped into a phone frame centered on a textured stage */
+    body[data-view="mobile"] #device-wrap {
+      height: calc(100dvh - 32px);
+      background:
+        radial-gradient(circle at 30% 20%, #1f1f22 0%, #09090b 60%),
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0 8px, transparent 8px 16px);
+      display:grid; place-items:center; padding:20px;
+    }
+    body[data-view="mobile"] #app {
+      width: 430px;
+      height: min(932px, calc(100dvh - 72px));
+      max-width: 95vw;
+      border-radius: 44px;
+      border: 10px solid #0a0a0b;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.55), inset 0 0 0 2px #27272a;
+      overflow: hidden;
+      position: relative;
+      background: #000;
+    }
+    /* Phone notch */
+    body[data-view="mobile"] #app::before {
+      content:""; position:absolute; top:0; left:50%; transform:translateX(-50%);
+      width:128px; height:28px; background:#0a0a0b; z-index:60;
+      border-radius: 0 0 18px 18px;
+    }
+    /* Home indicator */
+    body[data-view="mobile"] #app::after {
+      content:""; position:absolute; bottom:6px; left:50%; transform:translateX(-50%);
+      width:120px; height:4px; background:rgba(255,255,255,0.4); border-radius:2px; z-index:60;
+    }
+
+    /* ------ Mobile layout overrides ------ */
+    body[data-view="mobile"] .hide-on-mobile { display:none !important; }
+    body[data-view="mobile"] .only-on-mobile { display:flex !important; }
+
+    /* Hide desktop chrome parts on mobile */
+    body[data-view="mobile"] #top-chrome-left-extras,
+    body[data-view="mobile"] #top-chrome-right-extras,
+    body[data-view="mobile"] #sub-header-tabs,
+    body[data-view="mobile"] #sub-header-pills,
+    body[data-view="mobile"] aside#left-sidebar,
+    body[data-view="mobile"] aside#ai-rail,
+    body[data-view="mobile"] #footer-strip { display:none !important; }
+
+    /* Compact mobile header */
+    body[data-view="mobile"] header {
+      padding: 32px 12px 8px !important;
+      flex-wrap: wrap;
+    }
+    body[data-view="mobile"] #cmdk-open {
+      width: auto !important; flex:1; min-width:0;
+    }
+    body[data-view="mobile"] #sub-header {
+      padding: 8px 12px !important;
+    }
+    body[data-view="mobile"] #sub-header h1 { font-size: 12px !important; line-height:1.3; }
+
+    /* Mobile: body content area */
+    body[data-view="mobile"] main { padding: 0 !important; }
+    body[data-view="mobile"] main section[data-tab] { padding: 14px 14px 90px !important; }
+
+    /* Mobile: overview grid -> stacked */
+    body[data-view="mobile"] main section[data-tab="overview"] .grid-cols-3 {
+      grid-template-columns: 1fr !important; gap: 18px !important;
+    }
+    /* Mobile: tools table becomes card list */
+    body[data-view="mobile"] main section[data-tab="tools"] table { display:none !important; }
+    body[data-view="mobile"] #tools-mobile { display:block !important; }
+    body[data-view="desktop"] #tools-mobile { display:none !important; }
+
+    /* Mobile: hazards stack to single column */
+    body[data-view="mobile"] main section[data-tab="hazards"] .grid-cols-2 {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Mobile: flow/model keep their own sizing (pan/zoom) */
+    body[data-view="mobile"] main section[data-tab="flow"] .flex.items-center.justify-between {
+      flex-wrap: wrap; gap: 6px;
+    }
+    body[data-view="mobile"] main section[data-tab="model"] { flex-direction: column !important; }
+    body[data-view="mobile"] main section[data-tab="model"] > div:first-child {
+      width: 100% !important; max-height: 180px; border-right: none !important; border-bottom: 1px solid #e4e4e7;
+    }
+
+    /* Mobile: walkthrough — bigger text, bigger tap targets */
+    body[data-view="mobile"] #steps-root summary { padding: 14px !important; }
+    body[data-view="mobile"] #steps-root li { padding: 14px !important; }
+    body[data-view="mobile"] #steps-root input[type="checkbox"] { width: 22px !important; height: 22px !important; }
+    body[data-view="mobile"] #steps-root .font-medium { font-size: 15px !important; line-height: 1.35; }
+
+    /* Mobile: bottom tab bar */
+    #mobile-tabbar {
+      display: none;
+      position: absolute; left:0; right:0; bottom:0;
+      background: #09090b; border-top:1px solid #27272a;
+      padding: 6px 4px 18px; z-index:55;
+      justify-content: space-around;
+    }
+    body[data-view="mobile"] #mobile-tabbar { display: flex; }
+    #mobile-tabbar button {
+      display:flex; flex-direction:column; align-items:center; gap:2px;
+      background:transparent; border:0; color:#71717a; font-family:'JetBrains Mono';
+      font-size:9px; letter-spacing:0.06em; padding:4px 6px; cursor:pointer;
+      min-width:48px;
+    }
+    #mobile-tabbar button[aria-selected="true"] { color:#fbbf24; }
+    #mobile-tabbar button[aria-selected="true"] svg { stroke:#fbbf24; }
+
+    /* Mobile sticky bottom CTA for walkthrough */
+    #mobile-walk-cta {
+      display: none;
+      position: absolute; left:10px; right:10px; bottom:70px;
+      background: #09090b; color:#fff; padding: 14px;
+      font-family: 'JetBrains Mono'; font-size: 13px; letter-spacing:0.08em;
+      border-radius: 8px; text-align:center; z-index:54;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    body[data-view="mobile"][data-active-tab="walkthrough"] #mobile-walk-cta { display: block; }
+
+    /* Mobile overlay drawer for sidebar */
+    #mobile-sheet {
+      display: none;
+      position: absolute; inset:0; z-index:58;
+      background: rgba(0,0,0,0.5);
+    }
+    #mobile-sheet.open { display:block; }
+    #mobile-sheet > div {
+      position:absolute; bottom:0; left:0; right:0;
+      max-height: 75%; overflow-y:auto;
+      background:#fff; color:#09090b;
+      border-top-left-radius: 16px; border-top-right-radius:16px;
+      padding: 14px;
+    }
   </style>
 </head>
-<body class="bg-black text-zinc-200 overflow-hidden">
+<body class="bg-black text-zinc-200 overflow-hidden" data-view="desktop" data-active-tab="overview">
 
-<div class="flex flex-col h-dvh">
+<!-- ============== PREVIEW BAR ============== -->
+<div id="preview-bar">
+  <div class="flex items-center gap-3">
+    <span class="text-yellow-400 font-bold tracking-widest">SOPSTART</span>
+    <span>·</span>
+    <span>SKETCH PREVIEW — E-STOP VERIFICATION SOP</span>
+  </div>
+  <div class="flex items-center gap-3">
+    <span class="text-[10px] text-zinc-500">PREVIEW AS</span>
+    <div class="seg" role="group">
+      <button data-view-btn="desktop" aria-pressed="true">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        DESKTOP
+      </button>
+      <button data-view-btn="mobile" aria-pressed="false">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+        MOBILE
+      </button>
+    </div>
+    <span id="viewport-readout" class="text-[10px] text-zinc-500 mono">—</span>
+  </div>
+</div>
+
+<div id="device-wrap">
+<div id="app" class="flex flex-col h-dvh">
 
   <!-- ============== TOP CHROME ============== -->
   <header class="flex items-center justify-between border-b border-zinc-800 bg-zinc-950 px-4 py-2 text-xs shrink-0">
     <!-- left: brand + crumb -->
-    <div class="flex items-center gap-4">
-      <div class="flex items-center gap-2">
+    <div id="top-chrome-left" class="flex items-center gap-4">
+      <div id="top-chrome-left-extras" class="flex items-center gap-2">
         <div class="w-6 h-6 rounded-sm bg-yellow-400 flex items-center justify-center text-black font-bold">S</div>
         <span class="font-bold tracking-widest">SOPSTART</span>
         <span class="text-zinc-600">/</span>
@@ -98,7 +272,7 @@
         <span class="text-zinc-600">/</span>
       </div>
       <button class="text-zinc-300 hover:text-white flex items-center gap-1">
-        <span>←</span> <span>BACK TO SOPS</span>
+        <span>←</span> <span class="hide-on-mobile">BACK TO SOPS</span>
       </button>
     </div>
     <!-- center: cmd-k -->
@@ -108,7 +282,7 @@
       <kbd class="text-[10px] border border-zinc-600 px-1 rounded">⌘K</kbd>
     </button>
     <!-- right: status + user -->
-    <div class="flex items-center gap-3">
+    <div id="top-chrome-right-extras" class="flex items-center gap-3">
       <span class="pill text-emerald-400"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>ONLINE</span>
       <span class="pill text-zinc-400">REV 2026-04-11</span>
       <div class="w-7 h-7 rounded-full bg-zinc-700 flex items-center justify-center text-[10px] font-bold">SS</div>
@@ -116,13 +290,13 @@
   </header>
 
   <!-- ============== SUB-HEADER : TAB SWITCHER ============== -->
-  <div class="flex items-center justify-between bg-zinc-900 border-b border-zinc-800 px-4 py-2 shrink-0">
-    <div class="flex items-center gap-3">
-      <h1 class="text-sm font-bold tracking-wider">E-STOP VERIFICATION — LINE 4 TEMPERING FURNACE</h1>
-      <span class="pill text-rose-400">SAFETY-CRITICAL</span>
-      <span class="pill text-amber-400">QUARTERLY</span>
+  <div id="sub-header" class="flex items-center justify-between bg-zinc-900 border-b border-zinc-800 px-4 py-2 shrink-0">
+    <div class="flex items-center gap-3 min-w-0">
+      <h1 class="text-sm font-bold tracking-wider truncate">E-STOP VERIFICATION — LINE 4 TEMPERING FURNACE</h1>
+      <span id="sub-header-pills" class="pill text-rose-400 hide-on-mobile">SAFETY-CRITICAL</span>
+      <span class="pill text-amber-400 hide-on-mobile">QUARTERLY</span>
     </div>
-    <nav role="tablist" class="flex items-center gap-1">
+    <nav id="sub-header-tabs" role="tablist" class="flex items-center gap-1">
       <button class="tab" role="tab" aria-selected="true" data-tab-btn="overview">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
         OVERVIEW
@@ -155,7 +329,7 @@
   <div class="flex-1 flex min-h-0 bg-zinc-950">
 
     <!-- ============== LEFT STATIC SIDEBAR ============== -->
-    <aside class="w-[320px] shrink-0 bg-white text-zinc-900 border-r border-zinc-200 flex flex-col">
+    <aside id="left-sidebar" class="w-[320px] shrink-0 bg-white text-zinc-900 border-r border-zinc-200 flex flex-col">
       <div class="p-4 flex items-center gap-2 text-xs text-zinc-500 border-b border-zinc-100">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
         <span>ABOUT</span>
@@ -429,6 +603,51 @@
             </tr>
           </tbody>
         </table>
+
+        <!-- Mobile card list (shown only on mobile via CSS) -->
+        <div id="tools-mobile" class="space-y-2" style="display:none">
+          <div class="flex items-center gap-3 p-3 border border-zinc-200 rounded-sm">
+            <div class="w-12 h-12 bg-yellow-100 border border-yellow-300 rounded-sm flex items-center justify-center text-2xl shrink-0">🦺</div>
+            <div class="flex-1 min-w-0"><div class="font-bold text-sm">Hi-vis vest</div><div class="text-xs text-zinc-500 mono">Stores · Bay 3</div></div>
+            <span class="pill text-amber-600">PPE</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 border border-zinc-200 rounded-sm">
+            <div class="w-12 h-12 bg-yellow-100 border border-yellow-300 rounded-sm flex items-center justify-center text-2xl shrink-0">🥽</div>
+            <div class="flex-1 min-w-0"><div class="font-bold text-sm">Safety glasses</div><div class="text-xs text-zinc-500 mono">Stores · Bay 3</div></div>
+            <span class="pill text-amber-600">PPE</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 border border-zinc-200 rounded-sm">
+            <div class="w-12 h-12 bg-yellow-100 border border-yellow-300 rounded-sm flex items-center justify-center text-2xl shrink-0">🧤</div>
+            <div class="flex-1 min-w-0"><div class="font-bold text-sm">Heat-resistant gloves</div><div class="text-xs text-zinc-500 mono">260°C · Stores Bay 3</div></div>
+            <span class="pill text-amber-600">PPE</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 border border-zinc-200 rounded-sm">
+            <div class="w-12 h-12 bg-yellow-100 border border-yellow-300 rounded-sm flex items-center justify-center text-2xl shrink-0">👢</div>
+            <div class="flex-1 min-w-0"><div class="font-bold text-sm">Steel-cap boots</div><div class="text-xs text-zinc-500 mono">Worn on site</div></div>
+            <span class="pill text-amber-600">PPE</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 border border-zinc-200 rounded-sm">
+            <div class="w-12 h-12 bg-cyan-50 border border-cyan-300 rounded-sm flex items-center justify-center text-2xl shrink-0">⏱</div>
+            <div class="flex-1 min-w-0"><div class="font-bold text-sm">Response timer</div><div class="text-xs text-zinc-500 mono">Cal-lab · Shelf 2B</div></div>
+            <span class="pill text-cyan-600">TOOL</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 border border-zinc-200 rounded-sm">
+            <div class="w-12 h-12 bg-cyan-50 border border-cyan-300 rounded-sm flex items-center justify-center text-2xl shrink-0">📻</div>
+            <div class="flex-1 min-w-0"><div class="font-bold text-sm">2-way radio</div><div class="text-xs text-zinc-500 mono">Channel 4 · Control room</div></div>
+            <span class="pill text-cyan-600">TOOL</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 border border-zinc-200 rounded-sm">
+            <div class="w-12 h-12 bg-cyan-50 border border-cyan-300 rounded-sm flex items-center justify-center text-2xl shrink-0">🔒</div>
+            <div class="flex-1 min-w-0"><div class="font-bold text-sm">Lockout padlock + tag</div><div class="text-xs text-zinc-500 mono">Personal issue</div></div>
+            <span class="pill text-cyan-600">TOOL</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 border border-zinc-200 rounded-sm">
+            <div class="w-12 h-12 bg-cyan-50 border border-cyan-300 rounded-sm flex items-center justify-center text-2xl shrink-0">🌡</div>
+            <div class="flex-1 min-w-0"><div class="font-bold text-sm">IR thermometer</div><div class="text-xs text-zinc-500 mono">Cal-lab · Shelf 1A</div></div>
+            <span class="pill text-cyan-600">TOOL</span>
+          </div>
+          <div class="text-[10px] text-center text-zinc-500 py-2">+ 4 more items · tap to view all</div>
+        </div>
 
         <div class="mt-4 flex items-center justify-between bg-zinc-50 border border-zinc-200 px-4 py-3">
           <div class="text-xs text-zinc-500">ESTIMATED GATHERING TIME</div>
@@ -995,14 +1214,47 @@
     </aside>
   </div>
 
-  <!-- ============== BOTTOM STICKY (mobile hint) ============== -->
-  <div class="shrink-0 bg-zinc-950 border-t border-zinc-800 px-4 py-1.5 text-[10px] text-zinc-500 flex items-center justify-between">
+  <!-- ============== BOTTOM STICKY (desktop footer) ============== -->
+  <div id="footer-strip" class="shrink-0 bg-zinc-950 border-t border-zinc-800 px-4 py-1.5 text-[10px] text-zinc-500 flex items-center justify-between">
     <div>SOP-GL-0134 · rev 2026-04-11 · multi-tenant: SummitGlass NZ</div>
     <div class="flex items-center gap-4">
       <span>⌘K search · ? AI · ← → switch tab</span>
       <button onclick="toggleAiRail()" class="hover:text-white">ASK AI ✦</button>
     </div>
   </div>
+
+  <!-- ============== MOBILE BOTTOM TAB BAR (shown only on mobile) ============== -->
+  <nav id="mobile-tabbar" aria-label="Mobile tab bar">
+    <button data-tab-btn="overview" aria-selected="true">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      INFO
+    </button>
+    <button data-tab-btn="tools" aria-selected="false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.1 2.1-2-2 2.1-2.1z"/></svg>
+      TOOLS
+    </button>
+    <button data-tab-btn="hazards" aria-selected="false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 22h20L12 2zM12 9v5M12 17h.01"/></svg>
+      HAZARD
+    </button>
+    <button data-tab-btn="flow" aria-selected="false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 6h8M18 8v8M16 18H8M6 8v8"/></svg>
+      FLOW
+    </button>
+    <button data-tab-btn="model" aria-selected="false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21 16-9 5-9-5V8l9-5 9 5v8zM12 3v18M3 8l9 5 9-5"/></svg>
+      3D
+    </button>
+    <button data-tab-btn="walkthrough" aria-selected="false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      WALK
+    </button>
+  </nav>
+
+  <!-- Mobile sticky CTA on walkthrough -->
+  <div id="mobile-walk-cta">▶ RESUME · <span id="mobile-walk-progress">0 OF 17</span></div>
+
+</div>
 </div>
 
 <!-- ============== CMD-K OVERLAY ============== -->
@@ -1049,10 +1301,21 @@ function setTab(name) {
   const fullBleed = (name === 'flow' || name === 'model');
   main.classList.toggle('overflow-y-auto', !fullBleed);
   main.classList.toggle('overflow-hidden', fullBleed);
+  document.body.dataset.activeTab = name;
 }
 document.querySelectorAll('[data-tab-btn]').forEach(btn => btn.addEventListener('click', () => setTab(btn.dataset.tabBtn)));
 // init: hide all non-overview tabs explicitly so flex/h-full classes don't override `hidden` attr
 setTab('overview');
+
+// ------- View toggle (desktop / mobile) -------
+function setView(mode) {
+  document.body.dataset.view = mode;
+  document.querySelectorAll('[data-view-btn]').forEach(b => b.setAttribute('aria-pressed', b.dataset.viewBtn === mode ? 'true' : 'false'));
+  const readout = document.getElementById('viewport-readout');
+  if (readout) readout.textContent = mode === 'mobile' ? '430 × 932' : 'FULL';
+}
+document.querySelectorAll('[data-view-btn]').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.viewBtn)));
+setView('desktop');
 
 // ------- Cmd-K -------
 function showCmdk(){ document.getElementById('cmdk').style.display = 'flex'; setTimeout(() => document.getElementById('cmdk-input').focus(), 10); }
@@ -1162,6 +1425,8 @@ function updateGlobalProgress() {
   document.getElementById('wt-progress-text').textContent = `${done}/${total} DONE`;
   document.getElementById('wt-progress-chip').textContent = `${done}/${total}`;
   document.getElementById('submit-btn').disabled = done !== total;
+  const mp = document.getElementById('mobile-walk-progress');
+  if (mp) mp.textContent = `${done} OF ${total}`;
 }
 
 renderSteps();
