@@ -230,6 +230,139 @@
       border-top-left-radius: 16px; border-top-right-radius:16px;
       padding: 14px;
     }
+
+    /* ============ MOBILE IMMERSIVE STEP VIEW ============ */
+    #mobile-step-view { display:none; }
+    body[data-view="mobile"][data-active-tab="walkthrough"] #steps-root,
+    body[data-view="mobile"][data-active-tab="walkthrough"] #signoff-footer,
+    body[data-view="mobile"][data-active-tab="walkthrough"] main section[data-tab="walkthrough"] > .flex.items-center,
+    body[data-view="mobile"][data-active-tab="walkthrough"] main section[data-tab="walkthrough"] > details { display:none !important; }
+    body[data-view="mobile"][data-active-tab="walkthrough"] #mobile-step-view { display:block !important; }
+    body[data-view="mobile"][data-active-tab="walkthrough"] main section[data-tab="walkthrough"] { padding: 0 !important; }
+    /* hide the sticky walk-cta when using the immersive view (it has its own) */
+    body[data-view="mobile"][data-active-tab="walkthrough"] #mobile-walk-cta { display: none !important; }
+
+    /* step card internals */
+    .step-card {
+      display:flex; flex-direction:column; height:100%;
+      background:#fff; color:#09090b;
+    }
+    .step-head {
+      padding: 12px 14px 10px;
+      background:#09090b; color:#fafafa;
+      border-bottom: 1px solid #27272a;
+    }
+    .step-head .crumb { font-size:10px; letter-spacing:0.1em; color:#a1a1aa; display:flex; align-items:center; gap:8px; }
+    .step-head .bar-row { display:flex; gap:3px; margin-top:8px; }
+    .step-head .seg-dot { flex:1; height:4px; background:#27272a; border-radius:2px; }
+    .step-head .seg-dot.done { background:#10b981; }
+    .step-head .seg-dot.current { background:#fbbf24; }
+    .step-body { flex:1; padding: 16px 14px 100px; overflow-y:auto; }
+    .step-body h1 { font-size:18px; line-height:1.25; font-weight:700; letter-spacing:0.02em; }
+    .step-body .num { font-family:'JetBrains Mono'; font-size:12px; color:#71717a; letter-spacing:0.08em; }
+    .step-body .illo {
+      margin-top:12px; border:1px solid #e4e4e7; border-radius:4px;
+      aspect-ratio: 4/3; background: #f4f4f5 center/cover no-repeat;
+      display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;
+    }
+    .step-body .illo .watermark {
+      position:absolute; bottom:6px; right:8px; font-family:'JetBrains Mono';
+      font-size:9px; color:#a1a1aa;
+    }
+    .step-body .body-text { font-family:'Inter', system-ui, sans-serif; font-size:15px; line-height:1.5; color:#27272a; margin-top:14px; }
+    .step-body .warn {
+      margin-top: 12px; padding: 10px 12px;
+      border-left: 4px solid #ef4444; background:#fef2f2;
+      font-size:13px; color:#7f1d1d; font-family:'Inter', system-ui, sans-serif;
+      display:flex; gap:8px; align-items:flex-start;
+    }
+    .step-body .tip {
+      margin-top: 12px; padding: 10px 12px;
+      border-left: 4px solid #0ea5e9; background:#f0f9ff;
+      font-size:13px; color:#0c4a6e; font-family:'Inter', system-ui, sans-serif;
+      display:flex; gap:8px; align-items:flex-start;
+    }
+    .step-body .section-title {
+      font-family:'JetBrains Mono'; font-size:10px; letter-spacing:0.12em;
+      color:#71717a; text-transform:uppercase; margin:22px 0 8px;
+      border-top:1px solid #e4e4e7; padding-top:14px;
+    }
+    .step-body .evidence-row {
+      display:grid; grid-template-columns:1fr 1fr; gap:8px;
+    }
+    .step-body .evidence-btn {
+      border:1px dashed #a1a1aa; background:#fafafa;
+      padding:16px 10px; font-size:11px; color:#52525b;
+      display:flex; flex-direction:column; align-items:center; gap:6px;
+      font-family:'JetBrains Mono'; letter-spacing:0.08em;
+      min-height: 80px;
+    }
+    .step-body .evidence-btn.captured { border-style:solid; border-color:#10b981; background:#ecfdf5; color:#065f46; }
+    .step-body .measurement-box {
+      border:1px solid #fb923c; background:#fff7ed;
+      padding:12px; margin-top:10px; border-radius:4px;
+    }
+    .step-body .measurement-box label { font-size:11px; color:#9a3412; font-family:'JetBrains Mono'; letter-spacing:0.08em; }
+    .step-body .measurement-box input {
+      width:100%; margin-top:6px; padding:10px; font-size:20px;
+      font-family:'JetBrains Mono'; font-weight:700;
+      border:1px solid #fdba74; border-radius:4px; outline:none; background:#fff;
+    }
+    .step-body .measurement-box .target { font-size:10px; color:#9a3412; margin-top:4px; font-family:'JetBrains Mono'; }
+    .step-body .decision-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+    .step-body .decision-btn {
+      padding:14px 10px; font-family:'JetBrains Mono'; font-size:12px; letter-spacing:0.08em;
+      border:1px solid; border-radius:4px; text-align:center;
+    }
+    .step-body .decision-btn.yes { border-color:#10b981; color:#065f46; background:#ecfdf5; }
+    .step-body .decision-btn.no { border-color:#ef4444; color:#7f1d1d; background:#fef2f2; }
+    .step-body .chip-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    .step-body .chip-md {
+      display:inline-flex; align-items:center; gap:6px; padding:6px 10px;
+      border:1px solid #e4e4e7; font-family:'JetBrains Mono'; font-size:11px;
+      background:#fafafa; border-radius:2px;
+    }
+    .step-nav {
+      position:absolute; left:0; right:0; bottom:52px; /* above tabbar */
+      display:flex; gap:8px; padding:10px 12px;
+      background:linear-gradient(to top, rgba(255,255,255,1) 70%, rgba(255,255,255,0));
+      z-index:54;
+    }
+    .step-nav .btn {
+      flex:1; padding:14px; font-family:'JetBrains Mono'; font-size:12px;
+      letter-spacing:0.1em; border-radius:6px; border:1px solid; text-align:center;
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      font-weight:700;
+    }
+    .step-nav .btn.prev { background:#fff; color:#18181b; border-color:#d4d4d8; max-width: 80px; }
+    .step-nav .btn.next {
+      background:#09090b; color:#fff; border-color:#09090b; flex:2;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+    .step-nav .btn.next.done { background:#10b981; border-color:#10b981; }
+    .step-nav .btn:disabled { opacity:0.3; }
+
+    /* Section-jump sheet on step-view */
+    #step-jump-sheet {
+      display:none; position:absolute; inset:0; z-index:58;
+      background:rgba(0,0,0,0.5);
+    }
+    #step-jump-sheet.open { display:block; }
+    #step-jump-sheet > div {
+      position:absolute; left:0; right:0; bottom:0; background:#fff; color:#09090b;
+      border-top-left-radius:16px; border-top-right-radius:16px;
+      padding:16px; max-height:75%; overflow-y:auto;
+    }
+    /* Ask-AI floating button in step view */
+    #mobile-ai-fab {
+      display:none; position:absolute; right:12px; bottom:118px;
+      width:48px; height:48px; border-radius:50%;
+      background:#fbbf24; color:#09090b; z-index:55;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 10px 30px rgba(251,191,36,0.4);
+      font-family:'JetBrains Mono'; font-weight:700; border:2px solid #09090b;
+    }
+    body[data-view="mobile"][data-active-tab="walkthrough"] #mobile-ai-fab { display: flex; }
   </style>
 </head>
 <body class="bg-black text-zinc-200 overflow-hidden" data-view="desktop" data-active-tab="overview">
@@ -1156,11 +1289,14 @@
           </div>
         </details>
 
-        <!-- steps -->
+        <!-- steps (desktop: full list; hidden on mobile) -->
         <div id="steps-root" class="space-y-3"></div>
 
+        <!-- mobile: single-step immersive view (hidden on desktop) -->
+        <div id="mobile-step-view"></div>
+
         <!-- final sign-off footer -->
-        <div class="mt-10 border border-yellow-400 bg-yellow-50 p-4 rounded-sm">
+        <div id="signoff-footer" class="mt-10 border border-yellow-400 bg-yellow-50 p-4 rounded-sm">
           <div class="text-[10px] tracking-widest text-yellow-700 mb-2">WHEN ALL STEPS COMPLETE</div>
           <div class="font-bold text-sm mb-3">Submit for supervisor sign-off</div>
           <button class="w-full bg-black text-white py-3 text-sm tracking-wider hover:bg-zinc-800 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed" disabled id="submit-btn">
@@ -1330,36 +1466,96 @@ document.addEventListener('keydown', (e) => {
 // ------- Walkthrough data + render -------
 const SECTIONS = [
   { id: 1, title: 'Setup', icon: '🏁', steps: [
-    { id: '1.1', title: 'Apply personal lockout to master disconnect', chips: ['1 tag', 'photo'] },
-    { id: '1.2', title: 'Don PPE: hi-vis, glasses, gloves, boots', chips: ['4 items', 'photo'] },
-    { id: '1.3', title: 'Notify control room on Channel 4', chips: ['radio confirm'] },
+    { id: '1.1', title: 'Apply personal lockout to master disconnect',
+      chips: ['photo required'], evidence: ['photo', 'signature'],
+      body: 'Place your personal padlock on the master disconnect switch on panel N4-A. Attach the tag with your name, date, and "DO NOT OPERATE".',
+      warn: 'Do not proceed until the padlock is secured and tested.',
+      tools: ['🔒 Personal padlock', '🏷 Lockout tag'], hazards: ['H-02 Unexpected restart'],
+      illo: 'A hand attaching a red padlock and yellow tag to an industrial disconnect switch on a control panel, close-up studio lighting.' },
+    { id: '1.2', title: 'Don PPE',
+      chips: ['4 items'], evidence: ['photo'],
+      body: 'Put on the full PPE set: hi-vis vest, safety glasses, heat-resistant gloves, steel-cap boots. Inspect each item for damage.',
+      tip: 'Gloves must be rated for 260°C minimum within 1 m of the furnace body.',
+      tools: ['🦺 Hi-vis vest', '🥽 Safety glasses', '🧤 Heat gloves', '👢 Steel-cap boots'], hazards: ['H-01 Residual heat'],
+      illo: 'A worker donning high-visibility industrial PPE: orange vest, clear safety glasses, purple heat-resistant gauntlets, steel-cap boots. Studio lighting.' },
+    { id: '1.3', title: 'Notify control room on Channel 4',
+      chips: ['radio confirm'], evidence: ['confirmation'],
+      body: 'Over Channel 4, state: "Line 4 E-stop test commencing. Clearing exclusion zone." Wait for acknowledgement from shift supervisor before proceeding.',
+      tools: ['📻 2-way radio'],
+      illo: 'A hand holding a yellow industrial 2-way radio with Channel 4 display visible.' },
   ]},
   { id: 2, title: 'Pre-checks', icon: '🔎', steps: [
-    { id: '2.1', title: 'Confirm furnace surface <80°C with IR thermometer', chips: ['measurement', 'target <80°C'] },
-    { id: '2.2', title: 'Inspect E-stop 1 — physical integrity, no cracks', chips: ['photo'] },
-    { id: '2.3', title: 'Inspect E-stop 2 — physical integrity, no cracks', chips: ['photo'] },
-    { id: '2.4', title: 'Ping SCADA — verify comms via control room', chips: ['radio confirm'] },
+    { id: '2.1', title: 'Confirm furnace surface <80°C',
+      chips: ['measurement'], evidence: ['measurement'], measurement: { label: 'FURNACE SURFACE TEMP', unit: '°C', target: '< 80' },
+      body: 'Using the contactless IR thermometer, measure the enclosure face at three points: top, centre, bottom. Record the highest reading.',
+      warn: 'If any reading ≥80°C, STOP and allow 15 min additional cooldown before retrying.',
+      tools: ['🌡 IR thermometer'], hazards: ['H-01 Residual heat'],
+      illo: 'An IR thermometer pointed at a dark industrial furnace enclosure with a temperature readout of 47°C.' },
+    { id: '2.2', title: 'Inspect E-stop 1 — physical integrity',
+      chips: ['photo'], evidence: ['photo'],
+      body: 'Visually inspect E-stop 1 button for cracks, discolouration, or missing safety guard. Button should protrude 18±2 mm.',
+      tip: 'Press very lightly to confirm spring tension is present without actuating.',
+      tools: ['📋 Tablet camera'],
+      illo: 'Close-up of a large red mushroom emergency-stop button with yellow warning collar on an industrial panel.' },
+    { id: '2.3', title: 'Inspect E-stop 2 — physical integrity',
+      chips: ['photo'], evidence: ['photo'],
+      body: 'Repeat the physical inspection on E-stop 2 (far end of line). Same acceptance criteria as 2.2.',
+      tools: ['📋 Tablet camera'] },
+    { id: '2.4', title: 'Ping SCADA — verify comms',
+      chips: ['radio confirm'], evidence: ['confirmation'],
+      body: 'Request the control room to confirm they see Line 4 heartbeat on the SCADA overview (refresh rate < 2 s).',
+      tools: ['📻 2-way radio'] },
   ]},
   { id: 3, title: 'Execute', icon: '⚡', steps: [
-    { id: '3.1', title: 'Activate E-stop 1 (full palm press, hold 2s)', chips: ['1 action'] },
-    { id: '3.2', title: 'Record conveyor halt response time', chips: ['measurement', 'target <500ms', 'auto-capture'] },
-    { id: '3.3', title: 'Decision — if >500ms, stop and escalate (see HAZARD node)', chips: ['decision'] },
-    { id: '3.4', title: 'Activate E-stop 2 (full palm press, hold 2s)', chips: ['1 action'] },
-    { id: '3.5', title: 'Verify all systems off: conveyor, burner, indicators', chips: ['photo', '3 checks'] },
+    { id: '3.1', title: 'Activate E-stop 1',
+      chips: ['1 action'], evidence: ['photo'],
+      body: 'Using a full palm press, activate E-stop 1 and hold for at least 2 seconds. Timer starts automatically on actuation.',
+      warn: 'Remain outside the 2-m exclusion cone during actuation. Falling sheets may dislodge.',
+      tools: ['⏱ Response timer'], hazards: ['H-03 Falling glass', 'H-05 Alarm horn'] },
+    { id: '3.2', title: 'Record conveyor halt response time',
+      chips: ['measurement'], evidence: ['measurement'], measurement: { label: 'E-STOP 1 RESPONSE', unit: 'ms', target: '< 500' },
+      body: 'Read the response time from the high-speed timer. This should auto-capture if paired with SCADA, but enter manually if not.',
+      tip: 'The timer bridges the E-stop circuit — response is measured from button press to conveyor encoder stop.',
+      tools: ['⏱ Response timer'] },
+    { id: '3.3', title: 'Decision — within spec?',
+      chips: ['decision'], decision: { yes: 'Continue to 3.4', no: 'Escalate (H-02) — stop here' },
+      body: 'If E-stop 1 response was within 500 ms: proceed to test E-stop 2. If over 500 ms: stop, lock out line, and page Maintenance Tier 2 immediately.',
+      warn: 'An out-of-spec result means the safety system is not protecting workers. Do not bypass or retry.' },
+    { id: '3.4', title: 'Activate E-stop 2',
+      chips: ['1 action'], evidence: ['photo', 'measurement'], measurement: { label: 'E-STOP 2 RESPONSE', unit: 'ms', target: '< 500' },
+      body: 'Repeat the E-stop 1 actuation procedure on E-stop 2. Record response time in the same manner.',
+      tools: ['⏱ Response timer'] },
+    { id: '3.5', title: 'Verify all systems off',
+      chips: ['3 checks'], evidence: ['photo', 'checklist'],
+      body: 'Confirm: conveyor stationary, burner ignition indicator OFF, SCADA fault panel shows both E-stop events logged.',
+      tools: ['📻 Radio', '📋 Tablet'] },
   ]},
   { id: 4, title: 'Verify', icon: '✓', steps: [
-    { id: '4.1', title: 'Reset system per manufacturer sequence (S1→S2→CONFIRM)', chips: ['3 actions'] },
-    { id: '4.2', title: 'Confirm all indicator lamps return to GREEN', chips: ['photo', 'visual'] },
-    { id: '4.3', title: 'Log both cycle times to SCADA maintenance record', chips: ['2 values'] },
+    { id: '4.1', title: 'Reset system per manufacturer sequence',
+      chips: ['3 actions'], evidence: ['checklist'],
+      body: 'Perform reset in order: [1] rotate E-stop 1 clockwise to release, [2] rotate E-stop 2 clockwise to release, [3] press green CONFIRM on main HMI.',
+      warn: 'Never release E-stops while personnel are inside the exclusion zone.' },
+    { id: '4.2', title: 'Confirm indicator lamps return to GREEN',
+      chips: ['photo'], evidence: ['photo'],
+      body: 'All five status lamps on main HMI must return to solid GREEN within 5 seconds of reset. Take photo for the completion record.' },
+    { id: '4.3', title: 'Log both cycle times to SCADA',
+      chips: ['2 values'], evidence: ['values'],
+      body: 'Enter both recorded response times into the SCADA maintenance log under "Quarterly E-stop verification · Line 4". Include operator name and tablet ID.' },
   ]},
   { id: 5, title: 'Sign-off', icon: '📝', steps: [
-    { id: '5.1', title: 'Operator sign-off — attest results recorded', chips: ['signature'] },
-    { id: '5.2', title: 'Submit to supervisor for counter-sign', chips: ['hand-off'] },
+    { id: '5.1', title: 'Operator sign-off',
+      chips: ['signature'], evidence: ['signature'],
+      body: 'Attest that all measurements are accurate, all evidence captured, and no abnormal conditions were observed during the procedure.' },
+    { id: '5.2', title: 'Submit to supervisor',
+      chips: ['hand-off'],
+      body: 'Hand the completion record to shift supervisor on Channel 4 for counter-sign. Record is auto-synced when device reconnects.' },
   ]},
 ];
 
 const root = document.getElementById('steps-root');
-let flat = SECTIONS.flatMap(s => s.steps.map(st => ({...st, sectionId: s.id})));
+// Hold live references so mobile step-view mutations reflect in the desktop list.
+let flat = [];
+SECTIONS.forEach(sec => sec.steps.forEach(st => { st.sectionId = sec.id; flat.push(st); }));
 
 function renderSteps() {
   root.innerHTML = SECTIONS.map(sec => {
@@ -1429,7 +1625,200 @@ function updateGlobalProgress() {
   if (mp) mp.textContent = `${done} OF ${total}`;
 }
 
+// ------- Mobile immersive step view -------
+let mobileStepIdx = 0;
+
+function getStepMeta(idx) {
+  const s = flat[idx];
+  if (!s) return null;
+  const sec = SECTIONS.find(x => x.id === s.sectionId);
+  const secStepIdx = sec.steps.findIndex(x => x.id === s.id);
+  return { step: s, sec, secStepIdx, secTotal: sec.steps.length };
+}
+
+function renderMobileStep() {
+  const host = document.getElementById('mobile-step-view');
+  if (!host) return;
+  const meta = getStepMeta(mobileStepIdx);
+  if (!meta) return;
+  const { step, sec, secStepIdx, secTotal } = meta;
+
+  const segDots = flat.map((s, i) => {
+    const cls = s.done ? 'done' : (i === mobileStepIdx ? 'current' : '');
+    return `<div class="seg-dot ${cls}"></div>`;
+  }).join('');
+
+  const warnBlock = step.warn ? `
+    <div class="warn">
+      <span>⚠</span>
+      <span>${step.warn}</span>
+    </div>` : '';
+
+  const tipBlock = step.tip ? `
+    <div class="tip">
+      <span>ℹ</span>
+      <span>${step.tip}</span>
+    </div>` : '';
+
+  const illoBlock = step.illo ? `
+    <div class="illo">
+      <svg viewBox="0 0 400 300" class="w-full h-full">
+        <rect width="400" height="300" fill="#e4e4e7"/>
+        <g transform="translate(200,150)" fill="none" stroke="#52525b" stroke-width="1.5">
+          <circle r="60" stroke-dasharray="4 4" opacity="0.4"/>
+          <text text-anchor="middle" y="-75" font-family="JetBrains Mono" font-size="11" fill="#52525b" letter-spacing="1">AI-GENERATED ILLUSTRATION</text>
+          <text text-anchor="middle" y="6" font-family="Inter" font-size="13" fill="#71717a">${step.id}</text>
+        </g>
+      </svg>
+      <div class="watermark">AI · tap to regenerate</div>
+    </div>` : '';
+
+  const measurementBlock = step.measurement ? `
+    <div class="measurement-box">
+      <label>${step.measurement.label}</label>
+      <div style="display:flex; align-items:baseline; gap:6px;">
+        <input type="number" inputmode="decimal" placeholder="0">
+        <span style="font-family:'JetBrains Mono'; font-size:14px; color:#9a3412;">${step.measurement.unit}</span>
+      </div>
+      <div class="target">TARGET ${step.measurement.target} ${step.measurement.unit}</div>
+    </div>` : '';
+
+  const decisionBlock = step.decision ? `
+    <div class="section-title" style="border-top:none; padding-top:0; margin-top:14px;">DECISION</div>
+    <div class="decision-row">
+      <button class="decision-btn yes" onclick="advanceStep(true)">✓ YES<br><span style="font-size:10px; opacity:0.7;">${step.decision.yes}</span></button>
+      <button class="decision-btn no" onclick="alert('Procedure would escalate here (sketch)')">✕ NO<br><span style="font-size:10px; opacity:0.7;">${step.decision.no}</span></button>
+    </div>` : '';
+
+  const evidenceBlock = (step.evidence && step.evidence.length && !step.decision) ? `
+    <div class="section-title">CAPTURE EVIDENCE</div>
+    <div class="evidence-row">
+      ${step.evidence.map(kind => {
+        const labels = {
+          photo: { icon: '📷', label: 'PHOTO' },
+          signature: { icon: '✍', label: 'SIGN' },
+          measurement: { icon: '⏱', label: 'VALUE' },
+          confirmation: { icon: '✓', label: 'CONFIRM' },
+          checklist: { icon: '☑', label: 'CHECKLIST' },
+          values: { icon: '⏱', label: 'VALUES' }
+        };
+        const L = labels[kind] || { icon: '●', label: kind.toUpperCase() };
+        return `<button class="evidence-btn"><span style="font-size:22px">${L.icon}</span><span>${L.label}</span></button>`;
+      }).join('')}
+    </div>` : '';
+
+  const toolsBlock = (step.tools && step.tools.length) ? `
+    <div class="section-title">TOOLS FOR THIS STEP</div>
+    <div class="chip-row">${step.tools.map(t => `<span class="chip-md">${t}</span>`).join('')}</div>` : '';
+
+  const hazardsBlock = (step.hazards && step.hazards.length) ? `
+    <div class="section-title">HAZARDS TO BE AWARE OF</div>
+    <div class="chip-row">${step.hazards.map(h => `<span class="chip-md" style="color:#b91c1c; border-color:#fecaca; background:#fef2f2;">⚠ ${h}</span>`).join('')}</div>` : '';
+
+  const nextLabel = step.done ? '↻ UNDO' : (mobileStepIdx === flat.length - 1 ? 'SUBMIT ✓' : 'DONE · NEXT →');
+  const nextClass = step.done ? 'next done' : 'next';
+
+  host.innerHTML = `
+    <div class="step-card">
+      <div class="step-head">
+        <div class="crumb">
+          <button onclick="openStepJumpSheet()" style="display:flex; align-items:center; gap:6px; background:transparent; border:0; color:#fff; font-family:'JetBrains Mono'; cursor:pointer;">
+            ${sec.icon} <span style="font-weight:700;">${sec.title.toUpperCase()}</span>
+            <span style="opacity:0.5;">· ${secStepIdx + 1} of ${secTotal}</span>
+            <span style="opacity:0.5;">▾</span>
+          </button>
+          <span style="margin-left:auto; color:#fbbf24; font-weight:700;">${mobileStepIdx + 1}/${flat.length}</span>
+        </div>
+        <div class="bar-row">${segDots}</div>
+      </div>
+      <div class="step-body">
+        <div class="num">STEP ${step.id}</div>
+        <h1>${step.title}</h1>
+        ${illoBlock}
+        <div class="body-text">${step.body || ''}</div>
+        ${warnBlock}
+        ${tipBlock}
+        ${measurementBlock}
+        ${decisionBlock}
+        ${evidenceBlock}
+        ${toolsBlock}
+        ${hazardsBlock}
+      </div>
+      <div class="step-nav">
+        <button class="btn prev" onclick="backStep()" ${mobileStepIdx === 0 ? 'disabled' : ''}>← PREV</button>
+        <button class="btn ${nextClass}" onclick="advanceStep()">${nextLabel}</button>
+      </div>
+    </div>
+    <!-- jump-to-section sheet -->
+    <div id="step-jump-sheet" onclick="if(event.target.id==='step-jump-sheet') closeStepJumpSheet()">
+      <div>
+        <div style="font-family:'JetBrains Mono'; font-size:11px; letter-spacing:0.1em; color:#71717a; margin-bottom:8px;">JUMP TO SECTION</div>
+        ${SECTIONS.map(s => {
+          const d = s.steps.filter(st => st.done).length;
+          return `<button onclick="jumpToSection(${s.id})" style="display:flex; align-items:center; gap:12px; width:100%; padding:14px 8px; border-bottom:1px solid #f4f4f5; background:transparent; border-left:0; border-right:0; border-top:0;">
+            <span style="font-family:'JetBrains Mono'; color:#71717a; font-size:12px; width:20px;">${s.id}.</span>
+            <span>${s.icon}</span>
+            <span style="font-weight:700; flex:1; text-align:left;">${s.title}</span>
+            <span style="font-family:'JetBrains Mono'; font-size:11px; color:${d===s.steps.length?'#10b981':'#71717a'};">${d}/${s.steps.length}</span>
+          </button>`;
+        }).join('')}
+        <button onclick="closeStepJumpSheet()" style="width:100%; padding:14px; margin-top:8px; background:#09090b; color:#fff; font-family:'JetBrains Mono'; font-size:12px; letter-spacing:0.1em; border:0;">CLOSE</button>
+      </div>
+    </div>
+  `;
+}
+
+function advanceStep(fromDecision) {
+  const meta = getStepMeta(mobileStepIdx);
+  if (!meta) return;
+  const step = meta.step;
+  if (fromDecision === true || !step.done) {
+    step.done = true;
+    updateGlobalProgress();
+    renderSteps();
+    if (mobileStepIdx < flat.length - 1) mobileStepIdx++;
+    renderMobileStep();
+  } else {
+    step.done = false;
+    updateGlobalProgress();
+    renderSteps();
+    renderMobileStep();
+  }
+}
+
+function backStep() {
+  if (mobileStepIdx > 0) { mobileStepIdx--; renderMobileStep(); }
+}
+
+function jumpToSection(secId) {
+  const sec = SECTIONS.find(s => s.id === secId);
+  const firstUndone = sec.steps.find(s => !s.done) || sec.steps[0];
+  mobileStepIdx = flat.findIndex(f => f.id === firstUndone.id);
+  closeStepJumpSheet();
+  renderMobileStep();
+}
+
+function openStepJumpSheet() { const el = document.getElementById('step-jump-sheet'); if (el) el.classList.add('open'); }
+function closeStepJumpSheet() { const el = document.getElementById('step-jump-sheet'); if (el) el.classList.remove('open'); }
+
+// Swipe gestures on step view
+let touchStartX = null;
+document.addEventListener('touchstart', (e) => {
+  if (document.body.dataset.view === 'mobile' && document.body.dataset.activeTab === 'walkthrough') {
+    touchStartX = e.touches[0].clientX;
+  }
+});
+document.addEventListener('touchend', (e) => {
+  if (touchStartX === null) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 60) {
+    if (dx < 0) advanceStep(); else backStep();
+  }
+  touchStartX = null;
+});
+
 renderSteps();
+renderMobileStep();
 updateGlobalProgress();
 </script>
 </body>
