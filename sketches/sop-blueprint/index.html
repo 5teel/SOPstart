@@ -363,6 +363,58 @@
       font-family:'JetBrains Mono'; font-weight:700; border:2px solid #09090b;
     }
     body[data-view="mobile"][data-active-tab="walkthrough"] #mobile-ai-fab { display: flex; }
+
+    /* ============ VOICE INPUT ============ */
+    .mic-btn {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:44px; height:44px; border-radius:50%;
+      background:#fff; border:1.5px solid #09090b;
+      cursor:pointer; flex-shrink:0;
+      transition: transform 0.1s ease;
+    }
+    .mic-btn:hover { transform: scale(1.05); }
+    .mic-btn:active { transform: scale(0.95); }
+    .mic-btn svg { width:18px; height:18px; stroke:#09090b; }
+    .mic-btn.listening { background:#ef4444; border-color:#ef4444; animation: mic-pulse 1s ease-in-out infinite; }
+    .mic-btn.listening svg { stroke:#fff; }
+    @keyframes mic-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
+      50% { box-shadow: 0 0 0 12px rgba(239,68,68,0); }
+    }
+    .voice-transcript {
+      display:none;
+      margin-top:8px; padding:10px 12px;
+      background:#fef2f2; border:1px solid #fecaca; border-radius:4px;
+      font-family:'Inter', system-ui, sans-serif; font-size:13px; color:#7f1d1d;
+      align-items:center; gap:10px;
+    }
+    .voice-transcript.show { display:flex !important; }
+    .voice-transcript .waves {
+      display:inline-flex; gap:3px; align-items:center; height:16px;
+    }
+    .voice-transcript .waves span {
+      width:3px; background:#ef4444; border-radius:2px;
+      animation: wave-bounce 0.6s ease-in-out infinite;
+    }
+    .voice-transcript .waves span:nth-child(1) { height:8px; animation-delay: 0s; }
+    .voice-transcript .waves span:nth-child(2) { height:14px; animation-delay: 0.1s; }
+    .voice-transcript .waves span:nth-child(3) { height:10px; animation-delay: 0.2s; }
+    .voice-transcript .waves span:nth-child(4) { height:16px; animation-delay: 0.3s; }
+    .voice-transcript .waves span:nth-child(5) { height:7px; animation-delay: 0.4s; }
+    @keyframes wave-bounce {
+      0%, 100% { transform: scaleY(1); }
+      50% { transform: scaleY(0.3); }
+    }
+    .voice-confirm-row {
+      display:none; margin-top:6px; font-size:11px; color:#065f46;
+      font-family:'JetBrains Mono'; letter-spacing:0.06em;
+      align-items:center; gap:8px;
+    }
+    .voice-confirm-row.show { display:flex !important; }
+    .voice-confirm-row button { color:#0c4a6e; text-decoration:underline; background:transparent; border:0; font:inherit; cursor:pointer; }
+
+    /* Evidence VOICE tile in the listening state */
+    .evidence-btn.listening { border-style:solid; border-color:#ef4444; background:#fef2f2; color:#7f1d1d; animation: mic-pulse 1s ease-in-out infinite; }
   </style>
 </head>
 <body class="bg-black text-zinc-200 overflow-hidden" data-view="desktop" data-active-tab="overview">
@@ -1625,6 +1677,134 @@ function updateGlobalProgress() {
   if (mp) mp.textContent = `${done} OF ${total}`;
 }
 
+// ------- Voice input -------
+// Parse spoken text into a number. Handles digits ("480"), word forms ("four hundred eighty"),
+// and decimals ("twelve point four", "seventy two point five").
+function parseSpokenNumber(text) {
+  const clean = (text || '').toLowerCase().trim();
+  const digitMatch = clean.replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
+  if (digitMatch) return parseFloat(digitMatch[0]);
+  const nums = {
+    zero:0, oh:0, one:1, two:2, three:3, four:4, five:5, six:6, seven:7, eight:8, nine:9,
+    ten:10, eleven:11, twelve:12, thirteen:13, fourteen:14, fifteen:15, sixteen:16,
+    seventeen:17, eighteen:18, nineteen:19, twenty:20, thirty:30, forty:40, fifty:50,
+    sixty:60, seventy:70, eighty:80, ninety:90
+  };
+  const scales = { hundred:100, thousand:1000 };
+  const words = clean.split(/[\s-]+/);
+  let intResult = 0, intCurrent = 0;
+  let decimalDigits = [];
+  let mode = 'int';
+  for (const w of words) {
+    if (w === 'point' || w === 'dot') { mode = 'dec'; continue; }
+    if (mode === 'int') {
+      if (w in nums) intCurrent += nums[w];
+      else if (w in scales) {
+        if (scales[w] === 100) intCurrent = (intCurrent || 1) * 100;
+        else { intResult += (intCurrent || 1) * scales[w]; intCurrent = 0; }
+      }
+    } else if (w in nums && nums[w] >= 0 && nums[w] <= 9) {
+      decimalDigits.push(nums[w]);
+    }
+  }
+  const whole = intResult + intCurrent;
+  if (decimalDigits.length) return parseFloat(whole + '.' + decimalDigits.join(''));
+  return whole || null;
+}
+
+// Use real Web Speech API if available AND opted in; otherwise simulate.
+// Sketch default: simulate, so demo is always reproducible without mic permission.
+// Flip window.USE_REAL_VOICE = true in devtools to try the real API.
+function startRecognition(onResult, onEnd, kind) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SR && window.USE_REAL_VOICE) {
+    const r = new SR();
+    r.lang = 'en-US'; r.interimResults = true; r.continuous = false;
+    let finalText = '';
+    r.onresult = (e) => {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) finalText += t; else interim += t;
+      }
+      onResult(finalText || interim, !!finalText);
+    };
+    r.onend = () => onEnd(finalText);
+    r.onerror = () => onEnd('');
+    try { r.start(); } catch(e) { onEnd(''); }
+    return { stop: () => { try { r.stop(); } catch(e){} } };
+  }
+  // Simulate: type out a plausible transcription word-by-word then fire onEnd
+  const numberDemos = ['four hundred eighty', 'four hundred ninety two', 'twelve point four', 'seventy eight'];
+  const proseDemos = ['conveyor fully stopped no sheets dislodged', 'all indicators returned to green within two seconds', 'e stop button protrudes twenty millimetres no cracks visible'];
+  const pool = kind === 'number' ? numberDemos : proseDemos;
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  const words = pick.split(' ');
+  let i = 0;
+  const iv = setInterval(() => {
+    i++;
+    onResult(words.slice(0, i).join(' '), false);
+    if (i >= words.length) {
+      clearInterval(iv);
+      setTimeout(() => onEnd(pick), 500);
+    }
+  }, 300);
+  return { stop: () => { clearInterval(iv); onEnd(''); } };
+}
+
+let activeRec = null;
+function recordVoice(inputId, asNumber, micId) {
+  const input = document.getElementById(inputId);
+  const micBtn = micId ? document.getElementById(micId) : null;
+  const stepId = inputId.replace('measure-input-', '');
+  const transcriptEl = document.getElementById('voice-transcript-' + stepId);
+  const confirmEl = document.getElementById('voice-confirm-' + stepId);
+  if (activeRec) { activeRec.stop(); activeRec = null; micBtn && micBtn.classList.remove('listening'); transcriptEl && transcriptEl.classList.remove('show'); return; }
+  if (confirmEl) confirmEl.classList.remove('show');
+  if (transcriptEl) { transcriptEl.classList.add('show'); transcriptEl.querySelector('.t').textContent = 'Listening…'; }
+  if (micBtn) micBtn.classList.add('listening');
+  activeRec = startRecognition(
+    (text, isFinal) => {
+      if (transcriptEl) transcriptEl.querySelector('.t').textContent = text || 'Listening…';
+    },
+    (finalText) => {
+      activeRec = null;
+      if (micBtn) micBtn.classList.remove('listening');
+      if (transcriptEl) transcriptEl.classList.remove('show');
+      if (!finalText) return;
+      if (asNumber) {
+        const n = parseSpokenNumber(finalText);
+        if (n !== null && input) input.value = n;
+        if (confirmEl) confirmEl.classList.add('show');
+      } else if (input) {
+        input.value = finalText;
+      }
+    },
+    asNumber ? 'number' : 'prose'
+  );
+}
+
+function recordVoiceNote(targetId, btn) {
+  const target = document.getElementById(targetId);
+  if (activeRec) { activeRec.stop(); activeRec = null; btn.classList.remove('listening'); return; }
+  btn.classList.add('listening');
+  if (target) { target.style.display = 'block'; target.textContent = '🎤 Listening…'; }
+  activeRec = startRecognition(
+    (text) => { if (target) target.textContent = '🎤 ' + (text || 'Listening…'); },
+    (finalText) => {
+      activeRec = null;
+      btn.classList.remove('listening');
+      if (finalText) {
+        btn.classList.add('captured');
+        if (target) target.textContent = '✓ ' + finalText;
+      } else if (target) {
+        target.style.display = 'none';
+      }
+    },
+    'prose'
+  );
+}
+
 // ------- Mobile immersive step view -------
 let mobileStepIdx = 0;
 
@@ -1676,10 +1856,15 @@ function renderMobileStep() {
   const measurementBlock = step.measurement ? `
     <div class="measurement-box">
       <label>${step.measurement.label}</label>
-      <div style="display:flex; align-items:baseline; gap:6px;">
-        <input type="number" inputmode="decimal" placeholder="0">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <input type="number" inputmode="decimal" placeholder="0" id="measure-input-${step.id}" style="flex:1;">
         <span style="font-family:'JetBrains Mono'; font-size:14px; color:#9a3412;">${step.measurement.unit}</span>
+        <button class="mic-btn" id="mic-${step.id}" aria-label="Speak value" onclick="recordVoice('measure-input-${step.id}', true, 'mic-${step.id}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zM19 10v1a7 7 0 0 1-14 0v-1M12 18v4M8 22h8"/></svg>
+        </button>
       </div>
+      <div id="voice-transcript-${step.id}" class="voice-transcript"><span class="waves"><span></span><span></span><span></span><span></span><span></span></span><span class="t">Listening…</span></div>
+      <div id="voice-confirm-${step.id}" class="voice-confirm-row">✓ CAPTURED VIA VOICE · <button onclick="document.getElementById('mic-${step.id}').click()">retry</button></div>
       <div class="target">TARGET ${step.measurement.target} ${step.measurement.unit}</div>
     </div>` : '';
 
@@ -1690,20 +1875,25 @@ function renderMobileStep() {
       <button class="decision-btn no" onclick="alert('Procedure would escalate here (sketch)')">✕ NO<br><span style="font-size:10px; opacity:0.7;">${step.decision.no}</span></button>
     </div>` : '';
 
-  const evidenceBlock = (step.evidence && step.evidence.length && !step.decision) ? `
+  // Every step gets a voice-note option; merge with declared evidence
+  const evidenceList = step.decision ? [] : [...(step.evidence || []), 'voice'];
+  const evidenceBlock = evidenceList.length ? `
     <div class="section-title">CAPTURE EVIDENCE</div>
     <div class="evidence-row">
-      ${step.evidence.map(kind => {
+      ${evidenceList.map((kind, i) => {
         const labels = {
           photo: { icon: '📷', label: 'PHOTO' },
           signature: { icon: '✍', label: 'SIGN' },
           measurement: { icon: '⏱', label: 'VALUE' },
           confirmation: { icon: '✓', label: 'CONFIRM' },
           checklist: { icon: '☑', label: 'CHECKLIST' },
-          values: { icon: '⏱', label: 'VALUES' }
+          values: { icon: '⏱', label: 'VALUES' },
+          voice: { icon: '🎤', label: 'VOICE NOTE' }
         };
         const L = labels[kind] || { icon: '●', label: kind.toUpperCase() };
-        return `<button class="evidence-btn"><span style="font-size:22px">${L.icon}</span><span>${L.label}</span></button>`;
+        const onclick = kind === 'voice' ? ` onclick="recordVoiceNote('note-${step.id}-${i}', this)"` : '';
+        const extra = kind === 'voice' ? `<div id="note-${step.id}-${i}" class="voice-note-text" style="display:none; grid-column: 1 / -1; margin-top:8px; padding:10px; background:#ecfdf5; border:1px solid #86efac; border-radius:4px; font-family:'Inter',system-ui,sans-serif; font-size:13px; color:#065f46;"></div>` : '';
+        return `<button class="evidence-btn"${onclick}><span style="font-size:22px">${L.icon}</span><span>${L.label}</span></button>${extra}`;
       }).join('')}
     </div>` : '';
 
