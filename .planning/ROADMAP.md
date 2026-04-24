@@ -254,14 +254,14 @@ Plans:
   4. Layout persists as JSONB on `sop_sections.layout_data` with a `layout_version` pin, and admin can reorder sections via drag-and-drop (persists as `sort_order`)
   5. Legacy SOPs with no `layout_data` still render correctly in the worker walkthrough via the linear step-list fallback renderer
   6. A builder-authored draft is visually distinguishable from an uploaded draft in the admin SOP library, but both flow through the same Phase 2 publish gate
-**Plans**: TBD
+**Plans**: 4 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 12-01-PLAN.md — Puck infrastructure: install `@measured/puck`, admin `/admin/sops/builder/[sopId]` route, `'use client'` editor wrapper with `next/dynamic` lazy load, `layout_data` + `layout_version` migration on `sop_sections`, worker linear fallback renderer for legacy SOPs
-- [ ] 12-02-PLAN.md — Block components: shared TextBlock, HeadingBlock, PhotoBlock, CalloutBlock, StepBlock, HazardCardBlock, PPECardBlock with Zod-schema props; Puck `config.components` map; worker `<Render>` path; CSS breakpoint reflow verification
-- [ ] 12-03-PLAN.md — Blank-page wizard: multi-step wizard (title → kind selector → section seed → review → save), unified authoring-surface router, admin SOP library "Authored in builder" badge, publish integration with Phase 2 review gate
-- [ ] 12-04-PLAN.md — Draft persistence: Dexie `draftLayouts` table, debounced `onChange` → Dexie → Supabase sync (reuses existing sync-engine pattern), section reorder drag-and-drop with `sort_order` server action
+- [ ] 12-01-PLAN.md — Puck infrastructure: install `@puckeditor/core@0.21.2` (renamed from @measured/puck), admin `/admin/sops/builder/[sopId]` route with `'use client'` + `next/dynamic`(ssr:false), migration 00020 (layout_data JSONB + layout_version INT + sops.source_type + reorder_sections RPC), worker LayoutRenderer branch + linear fallback in SectionContent
+- [ ] 12-02-PLAN.md — Block components: 7 shared blocks (Text, Heading, Photo, Callout, Step, HazardCard, PPECard) lifted from SectionContent palette with co-located Zod schemas; puck-config.ts registers all 7 with SafeRender guards; BuilderClient + LayoutRenderer share the same config
+- [ ] 12-03-PLAN.md — Blank-page wizard + library chip: 4-step wizard (title → canonical kinds → review → submit), createSopFromWizard server action (source_type='blank' + compensating cleanup), AUTHORED IN BUILDER chip in /admin/sops. SEND TO REVIEW reuses existing review page + publish route (D-04)
+- [ ] 12-04-PLAN.md — Draft persistence + section reorder: Dexie v4 draftLayouts table, flushDraftLayouts in sync-engine (LWW), useBuilderAutosave (750ms) + useDraftLayoutSync (3s), reorderSections server action via reorder_sections RPC, SectionListSidebar with HTML5 drag handles, updateSectionLayout with 128KB cap
 
 ### Phase 13: Reusable Block Library
 **Goal**: Admin can save, browse, and re-use hazard / PPE / step blocks from an org-scoped library alongside a read-only NZ global block set, and the wizard surfaces matching blocks at the right step with explicit pin-version vs follow-latest semantics

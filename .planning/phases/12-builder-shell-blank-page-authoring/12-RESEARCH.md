@@ -784,22 +784,21 @@ export async function flushDraftLayouts(
 | A3 | Existing RLS policies on `sop_sections` cover writes/reads to the new `layout_data` column without amendment | Pattern 4 | If false, authenticated users get denied writes. Mitigation: add explicit test in `tests/rls-isolation.test.ts`. Historically TRUE for Supabase — RLS is table-level, not column-level. |
 | A4 | Puck 0.21's field types (`text`, `textarea`, `select`, `number`, `array`, `object`, `custom`) are sufficient for all 7 Phase 12 blocks | Standard Stack | If the designer wants e.g. a color picker, a custom field is needed. Per CONTEXT, the standard side-panel is used — no custom fields planned. |
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+*All questions have been resolved during planning. Locked outcomes below are authoritative for executors.*
 
 1. **Does SPEC's `publishSop` grep assertion need reinterpretation?**
+   - RESOLVED: The builder never calls publish directly. CONTEXT D-04 is authoritative — the builder's `SEND TO REVIEW` button navigates to the existing `/admin/sops/[sopId]/review` page, which in turn invokes the existing `POST /api/sops/[sopId]/publish` route. No new `publishSop` server action is created. The SPEC literal grep is reinterpreted as behavioural convergence ("both UI surfaces end at the same review + publish endpoint"), verified by Plan 03's SB-AUTH-05 test asserting both paths converge on the review page and that `/api/sops/[sopId]/publish` is reachable from there.
    - What we know: No `publishSop` export exists today. Publish is `POST /api/sops/[sopId]/publish`.
-   - What's unclear: Whether SPEC literally requires creating a new server action, or whether CONTEXT D-04 (builder redirects to review page) already satisfies the "single publish path" intent.
-   - Recommendation: Planner treats CONTEXT D-04 as authoritative. If SPEC acceptance requires a `publishSop` symbol, create a thin server-action wrapper around a fetch to the existing API route. Update the acceptance-criteria wording in a sub-task.
 
 2. **Should each section get its own `<Puck>` instance, or one builder with multiple sections as root zones?**
-   - What we know: D-02 says section navigation is a left sidebar (click to switch). This strongly implies one-editor-per-section-at-a-time.
-   - What's unclear: Whether the builder keeps multiple Puck instances mounted (hidden by tabs) or unmounts/remounts on section switch.
-   - Recommendation: One `<Puck>` instance, remounted with `key={activeSectionId}`. Dexie holds the per-section state; remount is cheap and avoids state bleed across sections.
+   - RESOLVED: One `<Puck>` instance, remounted per section via `key={activeSectionId}` on the `<Puck>` element. Dexie `draftLayouts` holds the per-section state; remount is cheap and avoids state bleed across sections. Implemented in Plan 01 Task 3 (BuilderClient) and re-confirmed in Plan 04 Task 1 (onChange wiring).
+   - What we know: D-02 says section navigation is a left sidebar (click to switch).
 
 3. **What's the failure mode if `layout_data` size exceeds Postgres jsonb practical limits?**
-   - What we know: Postgres jsonb hard limit is 1 GB. Practical perf starts to suffer above a few MB. Phase 12 layout sizes should be well under 50 KB per section.
-   - What's unclear: Should the server action size-limit the JSONB write (e.g., 128 KB hard cap)?
-   - Recommendation: Add a 128 KB limit check in `updateSectionLayout` server action. Log-and-reject if exceeded. Unlikely to trigger in normal authoring but guards against corrupt client state.
+   - RESOLVED: 128 KB hard cap enforced in the `updateSectionLayout` server action. Payloads exceeding `Buffer.byteLength(JSON.stringify(layoutData), 'utf8') > 128 * 1024` are rejected with `{ error: 'Layout exceeds 128 KB; reduce block count or content' }` before any Supabase UPDATE. Implemented in Plan 04 Task 2 via the `MAX_LAYOUT_BYTES` constant.
+   - What we know: Postgres jsonb hard limit is 1 GB; practical perf suffers above a few MB.
 
 ## Environment Availability
 
