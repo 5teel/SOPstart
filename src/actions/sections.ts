@@ -90,3 +90,118 @@ export async function createSection(
   }
   return inserted as unknown as SopSection
 }
+
+// --- Phase 12 additions: reorderSections + updateSectionLayout ---
+// reorderSections calls the `reorder_sections` RPC (migration 00020) — atomic
+// multi-row UPDATE via a single plpgsql call. The function is NOT SECURITY
+// DEFINER so RLS on sop_sections applies to the caller (defence-in-depth with
+// the explicit admin role check below).
+
+const ReorderSectionsInput = z.object({
+  sopId: z.string().uuid(),
+  orderedSectionIds: z.array(z.string().uuid()).min(1),
+})
+
+export async function reorderSections(
+  input: z.infer<typeof ReorderSectionsInput>
+): Promise<{ success: true } | { error: string }> {
+  const parsed = ReorderSectionsInput.safeParse(input)
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+  }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { data: { session } } = await supabase.auth.getSession()
+  const jwtClaims = session?.access_token
+    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    : {}
+  const role = jwtClaims['user_role']
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
+    return { error: 'Admin access required' }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any).rpc('reorder_sections', {
+    p_sop_id: parsed.data.sopId,
+    p_ordered_section_ids: parsed.data.orderedSectionIds,
+  })
+  if (error) {
+    console.error('[reorderSections] rpc error', error)
+    return { error: `Reorder failed: ${error.message}` }
+  }
+  return { success: true }
+}
+
+const UpdateSectionLayoutInput = z.object({
+  sectionId: z.string().uuid(),
+  layoutData: z.unknown(),
+  layoutVersion: z.number().int().min(1),
+  clientUpdatedAt: z.number().int().min(0),
+})
+
+const MAX_LAYOUT_BYTES = 128 * 1024 // 128 KB hard cap per Research Open Question 3
+
+export async function updateSectionLayout(
+  input: z.infer<typeof UpdateSectionLayoutInput>
+): Promise<{ success: true } | { error: string }> {
+  const parsed = UpdateSectionLayoutInput.safeParse(input)
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+  }
+
+  // 128 KB byte cap (T-12-04-01 mitigation)
+  const serialized = JSON.stringify(parsed.data.layoutData)
+  if (Buffer.byteLength(serialized, 'utf8') > MAX_LAYOUT_BYTES) {
+    return { error: 'Layout exceeds 128 KB; reduce block count or content' }
+  }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { data: { session } } = await supabase.auth.getSession()
+  const jwtClaims = session?.access_token
+    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    : {}
+  const role = jwtClaims['user_role']
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
+    return { error: 'Admin access required' }
+  }
+
+  // LWW check (D-07): if server updated_at is newer than clientUpdatedAt,
+  // signal server_newer so the caller (flushDraftLayouts) drops the local row.
+  const { data: current, error: selErr } = await supabase
+    .from('sop_sections')
+    .select('updated_at')
+    .eq('id', parsed.data.sectionId)
+    .maybeSingle()
+  if (selErr) {
+    console.error('[updateSectionLayout] select error', selErr)
+    return { error: selErr.message }
+  }
+  if (current?.updated_at) {
+    const serverMs = new Date(current.updated_at as string).getTime()
+    if (serverMs > parsed.data.clientUpdatedAt) {
+      return { error: 'server_newer' }
+    }
+  }
+
+  const { error: updErr } = await supabase
+    .from('sop_sections')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .update({
+      layout_data: parsed.data.layoutData as any,
+      layout_version: parsed.data.layoutVersion,
+      updated_at: new Date(parsed.data.clientUpdatedAt).toISOString(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any)
+    .eq('id', parsed.data.sectionId)
+  if (updErr) {
+    console.error('[updateSectionLayout] update error', updErr)
+    return { error: updErr.message }
+  }
+  return { success: true }
+}

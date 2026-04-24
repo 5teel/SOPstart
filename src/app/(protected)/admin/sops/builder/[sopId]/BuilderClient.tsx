@@ -11,6 +11,10 @@ import {
   sanitizeLayoutContent,
 } from '@/lib/builder/puck-config'
 import { LayoutDataSchema } from '@/lib/builder/layout-schema'
+import { useBuilderAutosave } from '@/hooks/useBuilderAutosave'
+import { useDraftLayoutSync } from '@/hooks/useDraftLayoutSync'
+import { useNetworkStore } from '@/stores/network'
+import { db } from '@/lib/offline/db'
 
 const Puck = dynamic(
   () => import('@puckeditor/core').then((m) => m.Puck),
@@ -34,6 +38,63 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
   const [activeSectionId, setActiveSectionId] = useState(sections[0]?.id ?? '')
   const activeSection = sections.find((s) => s.id === activeSectionId)
 
+  // Plan 04: autosave + sync hooks. useDraftLayoutSync registers the
+  // mount/online/visibility triggers that call flushDraftLayouts.
+  const { syncing, lastSyncResult } = useDraftLayoutSync()
+  const isOnline = useNetworkStore((s) => s.isOnline)
+  const handleChange = useBuilderAutosave(activeSectionId, sopId)
+
+  // Track last-synced timestamp for the SAVED pill. Polls Dexie every 2s
+  // while mounted and reads the most recent `updated_at` across this SOP's
+  // draftLayouts rows with `syncState: 'synced'`.
+  const [lastSavedAt, setLastSavedAt] = useState<number | null>(null)
+  const [savedTick, setSavedTick] = useState(0)
+  useEffect(() => {
+    let cancelled = false
+    async function refresh() {
+      try {
+        const rows = await db.draftLayouts
+          .where('sop_id')
+          .equals(sopId)
+          .toArray()
+        const synced = rows.filter((r) => r.syncState === 'synced')
+        const latest = synced.reduce(
+          (acc, r) => (r.updated_at > acc ? r.updated_at : acc),
+          0
+        )
+        if (!cancelled) setLastSavedAt(latest > 0 ? latest : null)
+      } catch {
+        // Dexie not ready / SSR — leave lastSavedAt as-is
+      }
+    }
+    void refresh()
+    const poll = setInterval(refresh, 2_000)
+    // Separate tick interval so the "Ns AGO" label ticks every second without
+    // hitting Dexie.
+    const tick = setInterval(() => setSavedTick((t) => t + 1), 1_000)
+    return () => {
+      cancelled = true
+      clearInterval(poll)
+      clearInterval(tick)
+    }
+  }, [sopId])
+
+  // D-07: when flushDraftLayouts reports a cross-admin overwrite, surface a
+  // quiet toast naming the affected section titles. Auto-clears after ~4s.
+  const [overwriteToast, setOverwriteToast] = useState<string | null>(null)
+  useEffect(() => {
+    if (!lastSyncResult?.overwrittenByServer?.length) return
+    const overwrittenTitles = lastSyncResult.overwrittenByServer.map(
+      (id) => sections.find((s) => s.id === id)?.title ?? id.slice(0, 8)
+    )
+    setOverwriteToast(
+      `Updated by another admin - ${overwrittenTitles.join(', ')}`
+    )
+    const t = setTimeout(() => setOverwriteToast(null), 4000)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastSyncResult])
+
   // D-16: surface a section-level toast when activeSection.layout_data is
   // structurally broken. The sanitized initial data path below falls back to
   // emptyData so the editor still mounts.
@@ -50,6 +111,20 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
         : `Section "${activeSection.title}" has broken layout data - revert to last save?`
     )
   }, [activeSection])
+
+  // Derive the save-state pill label. OFFLINE when network is down (rows stay
+  // in Dexie with syncState: 'dirty'); SAVING while a flush is in-flight;
+  // SAVED {N}s AGO when lastSavedAt is known; plain SAVED otherwise.
+  const savePillLabel = !isOnline
+    ? 'OFFLINE · QUEUED'
+    : syncing
+      ? 'SAVING…'
+      : lastSavedAt
+        ? `SAVED ${Math.max(0, Math.round((Date.now() - lastSavedAt) / 1000))}s AGO`
+        : 'SAVED'
+  // savedTick is consumed by the label computation above — reference it so
+  // React re-runs the render each tick.
+  void savedTick
 
   // D-13: sanitize unknown block types before passing data to <Puck>.
   const sanitizedInitial: Data = useMemo(() => {
@@ -88,8 +163,16 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
               {layoutErrorToast} (click to dismiss)
             </div>
           )}
+          {overwriteToast && (
+            <span
+              role="status"
+              className="px-3 py-1.5 rounded border border-amber-500/30 bg-amber-500/10 text-amber-300 text-xs font-mono uppercase tracking-wider"
+            >
+              {overwriteToast}
+            </span>
+          )}
           <span className="font-mono text-[11px] uppercase tracking-wider text-steel-400 border border-steel-600 rounded px-2 py-0.5">
-            SAVED
+            {savePillLabel}
           </span>
           <Link
             href={`/admin/sops/${sopId}/review`}
@@ -130,10 +213,7 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
               config={puckConfig}
               overrides={puckOverrides}
               data={sanitizedInitial}
-              onChange={(data) => {
-                // Plan 04 wires useBuilderAutosave; log-only for Plan 02.
-                console.log('[builder] onChange', data)
-              }}
+              onChange={handleChange}
             />
           ) : (
             <div className="p-8 text-steel-400">

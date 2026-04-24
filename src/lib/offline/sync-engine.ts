@@ -271,3 +271,63 @@ export async function flushCompletions(
 
   return { flushed, errors }
 }
+
+// ---------------------------------------------------------------
+// flushDraftLayouts (Phase 12 SB-LAYOUT-04)
+// Flushes any draftLayouts rows with syncState === 'dirty' to Supabase
+// via the updateSectionLayout server action. Implements D-07 LWW:
+//   - If server row's updated_at is newer than the local row's, drop local.
+//     BuilderClient surfaces a quiet toast "Updated by another admin"
+//     referencing each affected section title.
+//   - Otherwise push local → server and mark local row 'synced'.
+// ---------------------------------------------------------------
+export async function flushDraftLayouts(
+  _supabase: AnySupabaseClient
+): Promise<{ flushed: number; errors: string[]; overwrittenByServer: string[] }> {
+  const errors: string[] = []
+  const overwrittenByServer: string[] = []
+  let flushed = 0
+
+  try {
+    const dirty = await db.draftLayouts
+      .where('syncState')
+      .equals('dirty')
+      .toArray()
+
+    for (const row of dirty) {
+      try {
+        // Late-import to avoid circular deps between actions/ and sync-engine
+        const { updateSectionLayout } = await import('@/actions/sections')
+        const result = await updateSectionLayout({
+          sectionId: row.section_id,
+          layoutData: row.layout_data,
+          layoutVersion: row.layout_version,
+          clientUpdatedAt: row.updated_at,
+        })
+
+        if ('error' in result) {
+          // LWW: server newer -> drop local, mark synced, record the section_id
+          // so the caller (BuilderClient) can surface a quiet toast per D-07.
+          if (result.error === 'server_newer') {
+            await db.draftLayouts.update(row.section_id, { syncState: 'synced' })
+            overwrittenByServer.push(row.section_id)
+            continue
+          }
+          errors.push(`Draft ${row.section_id}: ${result.error}`)
+          continue
+        }
+
+        await db.draftLayouts.update(row.section_id, { syncState: 'synced' })
+        flushed++
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err)
+        errors.push(`Draft ${row.section_id}: ${message}`)
+      }
+    }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    errors.push(message)
+  }
+
+  return { flushed, errors, overwrittenByServer }
+}
