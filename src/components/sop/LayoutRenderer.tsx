@@ -1,11 +1,9 @@
 'use client'
-import { Render, type Config, type Data } from '@puckeditor/core'
+import { Render, type Data } from '@puckeditor/core'
 import type { ReactNode } from 'react'
 import { SUPPORTED_LAYOUT_VERSIONS } from '@/lib/builder/supported-versions'
 import { LayoutDataSchema } from '@/lib/builder/layout-schema'
-
-// Plan 02 replaces with the real block config (7 shared blocks).
-const placeholderConfig: Config = { components: {} }
+import { puckConfig, sanitizeLayoutContent } from '@/lib/builder/puck-config'
 
 // Module-level warn-once flags (reset per page load — D-13/D-14/D-15 "once per page")
 let warnedUnsupportedVersion = false
@@ -46,5 +44,16 @@ export function LayoutRenderer({
     return <>{fallback}</>
   }
 
-  return <Render config={placeholderConfig} data={parsed.data as Data} />
+  // D-13: rewrite unknown-type block entries to UnsupportedBlockPlaceholder
+  // BEFORE Puck iterates children, so unknown types never crash <Render>.
+  const sanitized = {
+    ...parsed.data,
+    content: sanitizeLayoutContent(
+      (parsed.data.content ?? []) as unknown[]
+    ),
+  }
+  // LayoutDataSchema is permissive; Puck's Data type is narrower. The cast
+  // is confined to the worker render-path entry point.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return <Render config={puckConfig} data={sanitized as any as Data} />
 }
