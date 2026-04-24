@@ -89,6 +89,10 @@ npm run test:integration  # Integration tests only
 npm run test:e2e     # E2E tests only
 ```
 
+## Auto-load routing
+
+- **Sketch findings for SOPstart** (design tokens, layout primitives, screen inventory, new block types, voice/cmdk/immersive walkthrough patterns) → `Skill("sketch-findings-SOPstart")` — load before building any worker-facing UI or adding new SOP block types.
+
 ## Learnings
 
 _Log mistakes, errors, and patterns discovered during development sessions here._

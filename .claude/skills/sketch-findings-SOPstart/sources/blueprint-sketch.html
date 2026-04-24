@@ -1,0 +1,2015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <title>SOPstart — Blueprint Sketch</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --brand-yellow: #fbbf24;
+      --steel-900: #0a0a0b;
+      --steel-800: #141416;
+      --steel-700: #1f1f22;
+      --steel-600: #2a2a2e;
+      --paper: #fafafa;
+      --paper-2: #f4f4f5;
+      --ink-900: #09090b;
+      --ink-700: #3f3f46;
+      --ink-500: #71717a;
+      --ink-300: #d4d4d8;
+      --accent-mcu: #06b6d4;
+      --accent-measure: #f97316;
+      --accent-decision: #ec4899;
+      --accent-hazard: #ef4444;
+      --accent-signoff: #fbbf24;
+      --accent-step: #3b82f6;
+      --accent-ok: #10b981;
+    }
+    html, body { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+    .prose { font-family: 'Inter', system-ui, sans-serif; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    /* Grid paper bg for the 3D & flow canvases */
+    .bg-grid {
+      background-color: #ffffff;
+      background-image:
+        linear-gradient(to right, rgba(0,0,0,0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0,0,0,0.04) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    .bg-grid-dark {
+      background-color: var(--steel-900);
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    /* pill */
+    .pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      border: 1px solid currentColor;
+      padding: 2px 8px; font-size: 10px; letter-spacing: 0.08em;
+      text-transform: uppercase; font-weight: 500;
+      border-radius: 2px;
+    }
+    .pill-filled { background: currentColor; }
+    .pill-filled > * { color: #fff; mix-blend-mode: normal; }
+    /* tab button */
+    .tab { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border:1px solid #e4e4e7; background:#fff; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; border-radius:2px; }
+    .tab[aria-selected="true"] { background:#09090b; color:#fff; border-color:#09090b; }
+    .tab:hover:not([aria-selected="true"]) { border-color:#a1a1aa; }
+    /* progress circle */
+    .prog-ring { transform: rotate(-90deg); }
+    /* scrollbars */
+    .scroll-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+    .scroll-thin::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 3px; }
+    /* animated transparent model */
+    @keyframes spin-slow { from { transform: rotateY(0deg); } to { transform: rotateY(360deg); } }
+    .model-spin { animation: spin-slow 24s linear infinite; transform-style: preserve-3d; }
+    /* cmd-k */
+    .cmdk-bg { background: rgba(9,9,11,0.6); backdrop-filter: blur(4px); }
+    /* flow edge label */
+    .edge-label { font-size: 9px; letter-spacing: 0.04em; fill: #71717a; font-family: 'JetBrains Mono'; }
+    /* step checkbox animations */
+    .step-check:checked ~ .step-title { text-decoration: line-through; color: #a1a1aa; }
+    /* chat bubble */
+    .chat-ai { background: #fef3c7; border-left: 2px solid var(--brand-yellow); }
+    details summary::-webkit-details-marker { display: none; }
+    details summary::marker { content: ''; }
+    .chip { display:inline-flex; align-items:center; gap:4px; padding:2px 6px; border:1px solid #e4e4e7; font-size:10px; border-radius:2px; background:#fff; }
+
+    /* ============ DEVICE-FRAME TOGGLE ============ */
+    /* Persistent top strip */
+    #preview-bar {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:6px 12px; background:#09090b; border-bottom:1px solid #27272a;
+      font-family:'JetBrains Mono'; font-size:11px; color:#a1a1aa;
+      letter-spacing:0.04em; position:relative; z-index:40;
+    }
+    #preview-bar .seg { display:inline-flex; border:1px solid #3f3f46; border-radius:2px; overflow:hidden; }
+    #preview-bar .seg button { padding:4px 10px; font-size:10px; letter-spacing:0.1em; background:transparent; color:#a1a1aa; cursor:pointer; text-transform:uppercase; display:flex; align-items:center; gap:4px; }
+    #preview-bar .seg button[aria-pressed="true"] { background:#fbbf24; color:#09090b; font-weight:700; }
+
+    /* Desktop view: app fills all available space */
+    body[data-view="desktop"] #device-wrap { height: calc(100dvh - 32px); background:#000; }
+    body[data-view="desktop"] #app { height:100%; width:100%; }
+
+    /* Mobile view: app clamped into a phone frame centered on a textured stage */
+    body[data-view="mobile"] #device-wrap {
+      height: calc(100dvh - 32px);
+      background:
+        radial-gradient(circle at 30% 20%, #1f1f22 0%, #09090b 60%),
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0 8px, transparent 8px 16px);
+      display:grid; place-items:center; padding:20px;
+    }
+    body[data-view="mobile"] #app {
+      width: 430px;
+      height: min(932px, calc(100dvh - 72px));
+      max-width: 95vw;
+      border-radius: 44px;
+      border: 10px solid #0a0a0b;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.55), inset 0 0 0 2px #27272a;
+      overflow: hidden;
+      position: relative;
+      background: #000;
+    }
+    /* Phone notch */
+    body[data-view="mobile"] #app::before {
+      content:""; position:absolute; top:0; left:50%; transform:translateX(-50%);
+      width:128px; height:28px; background:#0a0a0b; z-index:60;
+      border-radius: 0 0 18px 18px;
+    }
+    /* Home indicator */
+    body[data-view="mobile"] #app::after {
+      content:""; position:absolute; bottom:6px; left:50%; transform:translateX(-50%);
+      width:120px; height:4px; background:rgba(255,255,255,0.4); border-radius:2px; z-index:60;
+    }
+
+    /* ------ Mobile layout overrides ------ */
+    body[data-view="mobile"] .hide-on-mobile { display:none !important; }
+    body[data-view="mobile"] .only-on-mobile { display:flex !important; }
+
+    /* Hide desktop chrome parts on mobile */
+    body[data-view="mobile"] #top-chrome-left-extras,
+    body[data-view="mobile"] #top-chrome-right-extras,
+    body[data-view="mobile"] #sub-header-tabs,
+    body[data-view="mobile"] #sub-header-pills,
+    body[data-view="mobile"] aside#left-sidebar,
+    body[data-view="mobile"] aside#ai-rail,
+    body[data-view="mobile"] #footer-strip { display:none !important; }
+
+    /* Compact mobile header */
+    body[data-view="mobile"] header {
+      padding: 32px 12px 8px !important;
+      flex-wrap: wrap;
+    }
+    body[data-view="mobile"] #cmdk-open {
+      width: auto !important; flex:1; min-width:0;
+    }
+    body[data-view="mobile"] #sub-header {
+      padding: 8px 12px !important;
+    }
+    body[data-view="mobile"] #sub-header h1 { font-size: 12px !important; line-height:1.3; }
+
+    /* Mobile: body content area */
+    body[data-view="mobile"] main { padding: 0 !important; }
+    body[data-view="mobile"] main section[data-tab] { padding: 14px 14px 90px !important; }
+
+    /* Mobile: overview grid -> stacked */
+    body[data-view="mobile"] main section[data-tab="overview"] .grid-cols-3 {
+      grid-template-columns: 1fr !important; gap: 18px !important;
+    }
+    /* Mobile: tools table becomes card list */
+    body[data-view="mobile"] main section[data-tab="tools"] table { display:none !important; }
+    body[data-view="mobile"] #tools-mobile { display:block !important; }
+    body[data-view="desktop"] #tools-mobile { display:none !important; }
+
+    /* Mobile: hazards stack to single column */
+    body[data-view="mobile"] main section[data-tab="hazards"] .grid-cols-2 {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Mobile: flow/model keep their own sizing (pan/zoom) */
+    body[data-view="mobile"] main section[data-tab="flow"] .flex.items-center.justify-between {
+      flex-wrap: wrap; gap: 6px;
+    }
+    body[data-view="mobile"] main section[data-tab="model"] { flex-direction: column !important; }
+    body[data-view="mobile"] main section[data-tab="model"] > div:first-child {
+      width: 100% !important; max-height: 180px; border-right: none !important; border-bottom: 1px solid #e4e4e7;
+    }
+
+    /* Mobile: walkthrough — bigger text, bigger tap targets */
+    body[data-view="mobile"] #steps-root summary { padding: 14px !important; }
+    body[data-view="mobile"] #steps-root li { padding: 14px !important; }
+    body[data-view="mobile"] #steps-root input[type="checkbox"] { width: 22px !important; height: 22px !important; }
+    body[data-view="mobile"] #steps-root .font-medium { font-size: 15px !important; line-height: 1.35; }
+
+    /* Mobile: bottom tab bar */
+    #mobile-tabbar {
+      display: none;
+      position: absolute; left:0; right:0; bottom:0;
+      background: #09090b; border-top:1px solid #27272a;
+      padding: 6px 4px 18px; z-index:55;
+      justify-content: space-around;
+    }
+    body[data-view="mobile"] #mobile-tabbar { display: flex; }
+    #mobile-tabbar button {
+      display:flex; flex-direction:column; align-items:center; gap:2px;
+      background:transparent; border:0; color:#71717a; font-family:'JetBrains Mono';
+      font-size:9px; letter-spacing:0.06em; padding:4px 6px; cursor:pointer;
+      min-width:48px;
+    }
+    #mobile-tabbar button[aria-selected="true"] { color:#fbbf24; }
+    #mobile-tabbar button[aria-selected="true"] svg { stroke:#fbbf24; }
+
+    /* Mobile sticky bottom CTA for walkthrough */
+    #mobile-walk-cta {
+      display: none;
+      position: absolute; left:10px; right:10px; bottom:70px;
+      background: #09090b; color:#fff; padding: 14px;
+      font-family: 'JetBrains Mono'; font-size: 13px; letter-spacing:0.08em;
+      border-radius: 8px; text-align:center; z-index:54;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    body[data-view="mobile"][data-active-tab="walkthrough"] #mobile-walk-cta { display: block; }
+
+    /* Mobile overlay drawer for sidebar */
+    #mobile-sheet {
+      display: none;
+      position: absolute; inset:0; z-index:58;
+      background: rgba(0,0,0,0.5);
+    }
+    #mobile-sheet.open { display:block; }
+    #mobile-sheet > div {
+      position:absolute; bottom:0; left:0; right:0;
+      max-height: 75%; overflow-y:auto;
+      background:#fff; color:#09090b;
+      border-top-left-radius: 16px; border-top-right-radius:16px;
+      padding: 14px;
+    }
+
+    /* ============ MOBILE IMMERSIVE STEP VIEW ============ */
+    #mobile-step-view { display:none; }
+    body[data-view="mobile"][data-active-tab="walkthrough"] #steps-root,
+    body[data-view="mobile"][data-active-tab="walkthrough"] #signoff-footer,
+    body[data-view="mobile"][data-active-tab="walkthrough"] main section[data-tab="walkthrough"] > .flex.items-center,
+    body[data-view="mobile"][data-active-tab="walkthrough"] main section[data-tab="walkthrough"] > details { display:none !important; }
+    body[data-view="mobile"][data-active-tab="walkthrough"] #mobile-step-view { display:block !important; }
+    body[data-view="mobile"][data-active-tab="walkthrough"] main section[data-tab="walkthrough"] { padding: 0 !important; }
+    /* hide the sticky walk-cta when using the immersive view (it has its own) */
+    body[data-view="mobile"][data-active-tab="walkthrough"] #mobile-walk-cta { display: none !important; }
+
+    /* step card internals */
+    .step-card {
+      display:flex; flex-direction:column; height:100%;
+      background:#fff; color:#09090b;
+    }
+    .step-head {
+      padding: 12px 14px 10px;
+      background:#09090b; color:#fafafa;
+      border-bottom: 1px solid #27272a;
+    }
+    .step-head .crumb { font-size:10px; letter-spacing:0.1em; color:#a1a1aa; display:flex; align-items:center; gap:8px; }
+    .step-head .bar-row { display:flex; gap:3px; margin-top:8px; }
+    .step-head .seg-dot { flex:1; height:4px; background:#27272a; border-radius:2px; }
+    .step-head .seg-dot.done { background:#10b981; }
+    .step-head .seg-dot.current { background:#fbbf24; }
+    .step-body { flex:1; padding: 16px 14px 100px; overflow-y:auto; }
+    .step-body h1 { font-size:18px; line-height:1.25; font-weight:700; letter-spacing:0.02em; }
+    .step-body .num { font-family:'JetBrains Mono'; font-size:12px; color:#71717a; letter-spacing:0.08em; }
+    .step-body .illo {
+      margin-top:12px; border:1px solid #e4e4e7; border-radius:4px;
+      aspect-ratio: 4/3; background: #f4f4f5 center/cover no-repeat;
+      display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;
+    }
+    .step-body .illo .watermark {
+      position:absolute; bottom:6px; right:8px; font-family:'JetBrains Mono';
+      font-size:9px; color:#a1a1aa;
+    }
+    .step-body .body-text { font-family:'Inter', system-ui, sans-serif; font-size:15px; line-height:1.5; color:#27272a; margin-top:14px; }
+    .step-body .warn {
+      margin-top: 12px; padding: 10px 12px;
+      border-left: 4px solid #ef4444; background:#fef2f2;
+      font-size:13px; color:#7f1d1d; font-family:'Inter', system-ui, sans-serif;
+      display:flex; gap:8px; align-items:flex-start;
+    }
+    .step-body .tip {
+      margin-top: 12px; padding: 10px 12px;
+      border-left: 4px solid #0ea5e9; background:#f0f9ff;
+      font-size:13px; color:#0c4a6e; font-family:'Inter', system-ui, sans-serif;
+      display:flex; gap:8px; align-items:flex-start;
+    }
+    .step-body .section-title {
+      font-family:'JetBrains Mono'; font-size:10px; letter-spacing:0.12em;
+      color:#71717a; text-transform:uppercase; margin:22px 0 8px;
+      border-top:1px solid #e4e4e7; padding-top:14px;
+    }
+    .step-body .evidence-row {
+      display:grid; grid-template-columns:1fr 1fr; gap:8px;
+    }
+    .step-body .evidence-btn {
+      border:1px dashed #a1a1aa; background:#fafafa;
+      padding:16px 10px; font-size:11px; color:#52525b;
+      display:flex; flex-direction:column; align-items:center; gap:6px;
+      font-family:'JetBrains Mono'; letter-spacing:0.08em;
+      min-height: 80px;
+    }
+    .step-body .evidence-btn.captured { border-style:solid; border-color:#10b981; background:#ecfdf5; color:#065f46; }
+    .step-body .measurement-box {
+      border:1px solid #fb923c; background:#fff7ed;
+      padding:12px; margin-top:10px; border-radius:4px;
+    }
+    .step-body .measurement-box label { font-size:11px; color:#9a3412; font-family:'JetBrains Mono'; letter-spacing:0.08em; }
+    .step-body .measurement-box input {
+      width:100%; margin-top:6px; padding:10px; font-size:20px;
+      font-family:'JetBrains Mono'; font-weight:700;
+      border:1px solid #fdba74; border-radius:4px; outline:none; background:#fff;
+    }
+    .step-body .measurement-box .target { font-size:10px; color:#9a3412; margin-top:4px; font-family:'JetBrains Mono'; }
+    .step-body .decision-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px; }
+    .step-body .decision-btn {
+      padding:14px 10px; font-family:'JetBrains Mono'; font-size:12px; letter-spacing:0.08em;
+      border:1px solid; border-radius:4px; text-align:center;
+    }
+    .step-body .decision-btn.yes { border-color:#10b981; color:#065f46; background:#ecfdf5; }
+    .step-body .decision-btn.no { border-color:#ef4444; color:#7f1d1d; background:#fef2f2; }
+    .step-body .chip-row { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+    .step-body .chip-md {
+      display:inline-flex; align-items:center; gap:6px; padding:6px 10px;
+      border:1px solid #e4e4e7; font-family:'JetBrains Mono'; font-size:11px;
+      background:#fafafa; border-radius:2px;
+    }
+    .step-nav {
+      position:absolute; left:0; right:0; bottom:52px; /* above tabbar */
+      display:flex; gap:8px; padding:10px 12px;
+      background:linear-gradient(to top, rgba(255,255,255,1) 70%, rgba(255,255,255,0));
+      z-index:54;
+    }
+    .step-nav .btn {
+      flex:1; padding:14px; font-family:'JetBrains Mono'; font-size:12px;
+      letter-spacing:0.1em; border-radius:6px; border:1px solid; text-align:center;
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      font-weight:700;
+    }
+    .step-nav .btn.prev { background:#fff; color:#18181b; border-color:#d4d4d8; max-width: 80px; }
+    .step-nav .btn.next {
+      background:#09090b; color:#fff; border-color:#09090b; flex:2;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+    .step-nav .btn.next.done { background:#10b981; border-color:#10b981; }
+    .step-nav .btn:disabled { opacity:0.3; }
+
+    /* Section-jump sheet on step-view */
+    #step-jump-sheet {
+      display:none; position:absolute; inset:0; z-index:58;
+      background:rgba(0,0,0,0.5);
+    }
+    #step-jump-sheet.open { display:block; }
+    #step-jump-sheet > div {
+      position:absolute; left:0; right:0; bottom:0; background:#fff; color:#09090b;
+      border-top-left-radius:16px; border-top-right-radius:16px;
+      padding:16px; max-height:75%; overflow-y:auto;
+    }
+    /* Ask-AI floating button in step view */
+    #mobile-ai-fab {
+      display:none; position:absolute; right:12px; bottom:118px;
+      width:48px; height:48px; border-radius:50%;
+      background:#fbbf24; color:#09090b; z-index:55;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 10px 30px rgba(251,191,36,0.4);
+      font-family:'JetBrains Mono'; font-weight:700; border:2px solid #09090b;
+    }
+    body[data-view="mobile"][data-active-tab="walkthrough"] #mobile-ai-fab { display: flex; }
+
+    /* ============ VOICE INPUT ============ */
+    .mic-btn {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:44px; height:44px; border-radius:50%;
+      background:#fff; border:1.5px solid #09090b;
+      cursor:pointer; flex-shrink:0;
+      transition: transform 0.1s ease;
+    }
+    .mic-btn:hover { transform: scale(1.05); }
+    .mic-btn:active { transform: scale(0.95); }
+    .mic-btn svg { width:18px; height:18px; stroke:#09090b; }
+    .mic-btn.listening { background:#ef4444; border-color:#ef4444; animation: mic-pulse 1s ease-in-out infinite; }
+    .mic-btn.listening svg { stroke:#fff; }
+    @keyframes mic-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.6); }
+      50% { box-shadow: 0 0 0 12px rgba(239,68,68,0); }
+    }
+    .voice-transcript {
+      display:none;
+      margin-top:8px; padding:10px 12px;
+      background:#fef2f2; border:1px solid #fecaca; border-radius:4px;
+      font-family:'Inter', system-ui, sans-serif; font-size:13px; color:#7f1d1d;
+      align-items:center; gap:10px;
+    }
+    .voice-transcript.show { display:flex !important; }
+    .voice-transcript .waves {
+      display:inline-flex; gap:3px; align-items:center; height:16px;
+    }
+    .voice-transcript .waves span {
+      width:3px; background:#ef4444; border-radius:2px;
+      animation: wave-bounce 0.6s ease-in-out infinite;
+    }
+    .voice-transcript .waves span:nth-child(1) { height:8px; animation-delay: 0s; }
+    .voice-transcript .waves span:nth-child(2) { height:14px; animation-delay: 0.1s; }
+    .voice-transcript .waves span:nth-child(3) { height:10px; animation-delay: 0.2s; }
+    .voice-transcript .waves span:nth-child(4) { height:16px; animation-delay: 0.3s; }
+    .voice-transcript .waves span:nth-child(5) { height:7px; animation-delay: 0.4s; }
+    @keyframes wave-bounce {
+      0%, 100% { transform: scaleY(1); }
+      50% { transform: scaleY(0.3); }
+    }
+    .voice-confirm-row {
+      display:none; margin-top:6px; font-size:11px; color:#065f46;
+      font-family:'JetBrains Mono'; letter-spacing:0.06em;
+      align-items:center; gap:8px;
+    }
+    .voice-confirm-row.show { display:flex !important; }
+    .voice-confirm-row button { color:#0c4a6e; text-decoration:underline; background:transparent; border:0; font:inherit; cursor:pointer; }
+
+    /* Evidence VOICE tile in the listening state */
+    .evidence-btn.listening { border-style:solid; border-color:#ef4444; background:#fef2f2; color:#7f1d1d; animation: mic-pulse 1s ease-in-out infinite; }
+  </style>
+</head>
+<body class="bg-black text-zinc-200 overflow-hidden" data-view="desktop" data-active-tab="overview">
+
+<!-- ============== PREVIEW BAR ============== -->
+<div id="preview-bar">
+  <div class="flex items-center gap-3">
+    <span class="text-yellow-400 font-bold tracking-widest">SOPSTART</span>
+    <span>·</span>
+    <span>SKETCH PREVIEW — E-STOP VERIFICATION SOP</span>
+  </div>
+  <div class="flex items-center gap-3">
+    <span class="text-[10px] text-zinc-500">PREVIEW AS</span>
+    <div class="seg" role="group">
+      <button data-view-btn="desktop" aria-pressed="true">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        DESKTOP
+      </button>
+      <button data-view-btn="mobile" aria-pressed="false">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
+        MOBILE
+      </button>
+    </div>
+    <span id="viewport-readout" class="text-[10px] text-zinc-500 mono">—</span>
+  </div>
+</div>
+
+<div id="device-wrap">
+<div id="app" class="flex flex-col h-dvh">
+
+  <!-- ============== TOP CHROME ============== -->
+  <header class="flex items-center justify-between border-b border-zinc-800 bg-zinc-950 px-4 py-2 text-xs shrink-0">
+    <!-- left: brand + crumb -->
+    <div id="top-chrome-left" class="flex items-center gap-4">
+      <div id="top-chrome-left-extras" class="flex items-center gap-2">
+        <div class="w-6 h-6 rounded-sm bg-yellow-400 flex items-center justify-center text-black font-bold">S</div>
+        <span class="font-bold tracking-widest">SOPSTART</span>
+        <span class="text-zinc-600">/</span>
+        <span class="text-zinc-400">LINE 4 TEMPERING</span>
+        <span class="text-zinc-600">/</span>
+      </div>
+      <button class="text-zinc-300 hover:text-white flex items-center gap-1">
+        <span>←</span> <span class="hide-on-mobile">BACK TO SOPS</span>
+      </button>
+    </div>
+    <!-- center: cmd-k -->
+    <button id="cmdk-open" class="flex items-center gap-2 bg-zinc-800 border border-zinc-700 rounded-sm px-3 py-1 w-[380px] text-left text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200 transition-colors">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <span class="flex-1">Search this SOP or ask AI…</span>
+      <kbd class="text-[10px] border border-zinc-600 px-1 rounded">⌘K</kbd>
+    </button>
+    <!-- right: status + user -->
+    <div id="top-chrome-right-extras" class="flex items-center gap-3">
+      <span class="pill text-emerald-400"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>ONLINE</span>
+      <span class="pill text-zinc-400">REV 2026-04-11</span>
+      <div class="w-7 h-7 rounded-full bg-zinc-700 flex items-center justify-center text-[10px] font-bold">SS</div>
+    </div>
+  </header>
+
+  <!-- ============== SUB-HEADER : TAB SWITCHER ============== -->
+  <div id="sub-header" class="flex items-center justify-between bg-zinc-900 border-b border-zinc-800 px-4 py-2 shrink-0">
+    <div class="flex items-center gap-3 min-w-0">
+      <h1 class="text-sm font-bold tracking-wider truncate">E-STOP VERIFICATION — LINE 4 TEMPERING FURNACE</h1>
+      <span id="sub-header-pills" class="pill text-rose-400 hide-on-mobile">SAFETY-CRITICAL</span>
+      <span class="pill text-amber-400 hide-on-mobile">QUARTERLY</span>
+    </div>
+    <nav id="sub-header-tabs" role="tablist" class="flex items-center gap-1">
+      <button class="tab" role="tab" aria-selected="true" data-tab-btn="overview">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        OVERVIEW
+      </button>
+      <button class="tab" role="tab" aria-selected="false" data-tab-btn="tools">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.1 2.1-2-2 2.1-2.1z"/></svg>
+        TOOLS &amp; PPE
+      </button>
+      <button class="tab" role="tab" aria-selected="false" data-tab-btn="hazards">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 22h20L12 2zM12 9v5M12 17h.01"/></svg>
+        HAZARDS
+      </button>
+      <button class="tab" role="tab" aria-selected="false" data-tab-btn="flow">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 6h8M18 8v8M16 18H8M6 8v8"/></svg>
+        FLOW
+      </button>
+      <button class="tab" role="tab" aria-selected="false" data-tab-btn="model">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21 16-9 5-9-5V8l9-5 9 5v8zM12 3v18M3 8l9 5 9-5"/></svg>
+        MODEL
+      </button>
+      <button class="tab" role="tab" aria-selected="false" data-tab-btn="walkthrough">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        WALKTHROUGH
+        <span class="text-[10px] bg-black text-yellow-400 px-1 py-0.5 rounded ml-1" id="wt-progress-chip">0/17</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ============== TWO-PANE BODY ============== -->
+  <div class="flex-1 flex min-h-0 bg-zinc-950">
+
+    <!-- ============== LEFT STATIC SIDEBAR ============== -->
+    <aside id="left-sidebar" class="w-[320px] shrink-0 bg-white text-zinc-900 border-r border-zinc-200 flex flex-col">
+      <div class="p-4 flex items-center gap-2 text-xs text-zinc-500 border-b border-zinc-100">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+        <span>ABOUT</span>
+      </div>
+      <div class="p-4 space-y-4 overflow-y-auto scroll-thin flex-1">
+        <!-- tags -->
+        <div class="flex flex-wrap gap-1.5">
+          <span class="chip">E-STOP</span>
+          <span class="chip">TEMPERING</span>
+          <span class="chip">LINE 4</span>
+          <span class="chip">QUARTERLY</span>
+        </div>
+        <!-- title + code -->
+        <div>
+          <h2 class="text-base font-bold leading-tight">E-STOP VERIFICATION —<br>LINE 4 TEMPERING FURNACE</h2>
+          <div class="flex items-center gap-1 mt-1 text-xs text-zinc-500">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <span class="mono">SOP-GL-0134 · v3</span>
+          </div>
+        </div>
+        <!-- description -->
+        <p class="text-xs leading-relaxed text-zinc-700 prose">
+          Quarterly verification that both emergency-stop circuits on Line 4 tempering furnace halt the conveyor, kill burner ignition, and trigger the SCADA alarm within spec response time. Required by NZS 4801 and internal safety standard SS-04.
+        </p>
+        <!-- summary table -->
+        <table class="w-full text-xs">
+          <thead>
+            <tr class="border-b border-zinc-200 text-zinc-500">
+              <th class="text-left font-normal py-1">SECTION</th>
+              <th class="text-right font-normal">STEPS</th>
+              <th class="text-right font-normal">TIME</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-zinc-100"><td class="py-1.5">Setup</td><td class="text-right">3</td><td class="text-right">4m</td></tr>
+            <tr class="border-b border-zinc-100"><td class="py-1.5">Pre-checks</td><td class="text-right">4</td><td class="text-right">3m</td></tr>
+            <tr class="border-b border-zinc-100"><td class="py-1.5">Execute</td><td class="text-right">5</td><td class="text-right">8m</td></tr>
+            <tr class="border-b border-zinc-100"><td class="py-1.5">Verify</td><td class="text-right">3</td><td class="text-right">3m</td></tr>
+            <tr class="border-b border-zinc-100"><td class="py-1.5">Sign-off</td><td class="text-right">2</td><td class="text-right">2m</td></tr>
+            <tr class="font-bold"><td class="py-2">Total</td><td class="text-right">17</td><td class="text-right">~20m</td></tr>
+          </tbody>
+        </table>
+        <!-- sign-off chain -->
+        <div>
+          <div class="text-xs text-zinc-500 mb-1.5">SIGN-OFF CHAIN</div>
+          <div class="space-y-1.5 text-xs">
+            <div class="flex items-center gap-2"><div class="w-4 h-4 border border-zinc-400 rounded-full"></div>Operator (you)</div>
+            <div class="flex items-center gap-2"><div class="w-4 h-4 border border-zinc-400 rounded-full"></div>Shift supervisor</div>
+            <div class="flex items-center gap-2"><div class="w-4 h-4 border border-zinc-400 rounded-full"></div>Safety manager</div>
+          </div>
+        </div>
+      </div>
+      <!-- sticky actions -->
+      <div class="border-t border-zinc-100 p-3 space-y-2 bg-zinc-50">
+        <button class="w-full border border-zinc-300 bg-white py-2 text-xs tracking-wider hover:bg-zinc-100 flex items-center justify-center gap-2">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+          DOWNLOAD PDF
+        </button>
+        <button class="w-full bg-black text-white py-2 text-xs tracking-wider hover:bg-zinc-800 flex items-center justify-center gap-2" onclick="setTab('walkthrough')">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+          START WALKTHROUGH
+        </button>
+      </div>
+    </aside>
+
+    <!-- ============== RIGHT ACTIVE PANEL ============== -->
+    <main class="flex-1 bg-white text-zinc-900 overflow-y-auto scroll-thin">
+
+      <!-- ========== OVERVIEW ========== -->
+      <section data-tab="overview" class="p-8 max-w-4xl mx-auto">
+        <!-- hero placeholder "AI-GEN" image -->
+        <div class="bg-zinc-100 border border-zinc-200 rounded-sm aspect-[16/9] flex items-center justify-center relative overflow-hidden">
+          <!-- faux industrial illustration via SVG -->
+          <svg viewBox="0 0 800 450" class="w-full h-full">
+            <defs>
+              <linearGradient id="floor" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0" stop-color="#e5e7eb"/><stop offset="1" stop-color="#9ca3af"/>
+              </linearGradient>
+            </defs>
+            <rect x="0" y="0" width="800" height="450" fill="#f4f4f5"/>
+            <rect x="0" y="320" width="800" height="130" fill="url(#floor)"/>
+            <!-- furnace body -->
+            <rect x="240" y="140" width="320" height="180" fill="#18181b" stroke="#000" stroke-width="2"/>
+            <rect x="250" y="150" width="300" height="20" fill="#27272a"/>
+            <!-- glow window -->
+            <rect x="280" y="200" width="80" height="70" fill="#fbbf24" opacity="0.85"/>
+            <rect x="280" y="200" width="80" height="70" fill="none" stroke="#000" stroke-width="2"/>
+            <!-- e-stop button -->
+            <circle cx="500" cy="230" r="22" fill="#dc2626" stroke="#000" stroke-width="3"/>
+            <circle cx="500" cy="230" r="14" fill="#991b1b"/>
+            <text x="500" y="270" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#000">E-STOP 1</text>
+            <!-- conveyor -->
+            <rect x="100" y="310" width="600" height="14" fill="#52525b"/>
+            <circle cx="110" cy="317" r="10" fill="#a1a1aa"/>
+            <circle cx="690" cy="317" r="10" fill="#a1a1aa"/>
+            <!-- glass sheets -->
+            <rect x="160" y="295" width="60" height="18" fill="#bae6fd" stroke="#0369a1"/>
+            <rect x="260" y="295" width="60" height="18" fill="#bae6fd" stroke="#0369a1"/>
+            <rect x="600" y="295" width="60" height="18" fill="#bae6fd" stroke="#0369a1"/>
+            <!-- warning -->
+            <text x="400" y="80" text-anchor="middle" font-family="JetBrains Mono" font-size="22" font-weight="700" fill="#18181b">LINE 4 — TEMPERING</text>
+            <text x="400" y="105" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#71717a">660°C · 1.2 m/min · 2× E-STOP</text>
+            <!-- AI-gen watermark -->
+            <text x="790" y="440" text-anchor="end" font-family="JetBrains Mono" font-size="9" fill="#a1a1aa">AI-GEN · regenerate</text>
+          </svg>
+        </div>
+
+        <div class="mt-6 grid grid-cols-3 gap-6">
+          <div>
+            <div class="text-[10px] tracking-widest text-zinc-500 mb-2">PURPOSE</div>
+            <p class="text-sm prose leading-relaxed">
+              Confirm both E-stops halt conveyor and burner within <span class="mono font-bold">500 ms</span>, and that the SCADA fault log receives the event within <span class="mono font-bold">2 s</span>.
+            </p>
+          </div>
+          <div>
+            <div class="text-[10px] tracking-widest text-zinc-500 mb-2">WHEN TO RUN</div>
+            <ul class="text-sm prose space-y-1">
+              <li>· Quarterly (every 90 days)</li>
+              <li>· After any E-stop panel repair</li>
+              <li>· Before first shift of monthly maintenance window</li>
+            </ul>
+          </div>
+          <div>
+            <div class="text-[10px] tracking-widest text-zinc-500 mb-2">LAST COMPLETED</div>
+            <div class="text-sm prose">
+              <div class="mono">2026-01-14 · 21m</div>
+              <div class="text-zinc-500">by J. Patel · signed R. Chen</div>
+              <a href="#" class="text-blue-600 hover:underline text-xs">View last 4 runs →</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 border-t border-zinc-200 pt-6">
+          <div class="text-[10px] tracking-widest text-zinc-500 mb-3">COMPLIANCE</div>
+          <div class="flex flex-wrap gap-2">
+            <span class="chip">NZS 4801 §4.3</span>
+            <span class="chip">ISO 13849</span>
+            <span class="chip">INTERNAL SS-04</span>
+            <span class="chip">WORKSAFE NZ</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== TOOLS & PPE ========== -->
+      <section data-tab="tools" hidden class="p-8 max-w-5xl mx-auto">
+        <div class="flex items-center justify-between mb-4">
+          <div class="text-xs text-zinc-500">FILTER</div>
+          <div class="flex items-center gap-2">
+            <button class="tab" aria-selected="true">ALL <span class="mono text-zinc-500">12</span></button>
+            <button class="tab">PPE <span class="mono text-zinc-500">4</span></button>
+            <button class="tab">TOOLS <span class="mono text-zinc-500">5</span></button>
+            <button class="tab">CONSUMABLES <span class="mono text-zinc-500">3</span></button>
+          </div>
+        </div>
+        <div class="flex items-center justify-between mb-4">
+          <div class="text-xs text-zinc-500">VIEW</div>
+          <div class="flex items-center gap-2">
+            <button class="tab" aria-selected="true">TABLE</button>
+            <button class="tab">CARDS</button>
+          </div>
+        </div>
+
+        <table class="w-full text-sm border border-zinc-200">
+          <thead class="bg-zinc-50 text-[10px] tracking-widest text-zinc-500">
+            <tr>
+              <th class="text-left p-3 w-16"></th>
+              <th class="text-left p-3">ITEM</th>
+              <th class="text-left p-3">KIND</th>
+              <th class="text-right p-3">QTY</th>
+              <th class="text-left p-3">SOURCE</th>
+              <th class="text-left p-3">USED IN</th>
+            </tr>
+          </thead>
+          <tbody class="mono text-xs">
+            <!-- rows -->
+            <tr class="border-t border-zinc-100">
+              <td class="p-2"><div class="w-10 h-10 bg-yellow-100 border border-yellow-300 rounded-sm flex items-center justify-center">🦺</div></td>
+              <td class="p-2 font-bold">Hi-vis vest (class D/N)</td>
+              <td class="p-2"><span class="pill text-amber-600">PPE</span></td>
+              <td class="p-2 text-right">1</td>
+              <td class="p-2 text-zinc-500">Stores · Bay 3</td>
+              <td class="p-2 text-zinc-500">1.2</td>
+            </tr>
+            <tr class="border-t border-zinc-100">
+              <td class="p-2"><div class="w-10 h-10 bg-yellow-100 border border-yellow-300 rounded-sm flex items-center justify-center">🥽</div></td>
+              <td class="p-2 font-bold">Safety glasses (polycarbonate)</td>
+              <td class="p-2"><span class="pill text-amber-600">PPE</span></td>
+              <td class="p-2 text-right">1</td>
+              <td class="p-2 text-zinc-500">Stores · Bay 3</td>
+              <td class="p-2 text-zinc-500">1.2</td>
+            </tr>
+            <tr class="border-t border-zinc-100">
+              <td class="p-2"><div class="w-10 h-10 bg-yellow-100 border border-yellow-300 rounded-sm flex items-center justify-center">🧤</div></td>
+              <td class="p-2 font-bold">Heat-resistant gloves (260°C)</td>
+              <td class="p-2"><span class="pill text-amber-600">PPE</span></td>
+              <td class="p-2 text-right">1</td>
+              <td class="p-2 text-zinc-500">Stores · Bay 3</td>
+              <td class="p-2 text-zinc-500">1.2 · 3.2</td>
+            </tr>
+            <tr class="border-t border-zinc-100">
+              <td class="p-2"><div class="w-10 h-10 bg-yellow-100 border border-yellow-300 rounded-sm flex items-center justify-center">👢</div></td>
+              <td class="p-2 font-bold">Steel-cap boots</td>
+              <td class="p-2"><span class="pill text-amber-600">PPE</span></td>
+              <td class="p-2 text-right">1</td>
+              <td class="p-2 text-zinc-500">Worn on site</td>
+              <td class="p-2 text-zinc-500">1.2</td>
+            </tr>
+            <tr class="border-t border-zinc-100">
+              <td class="p-2"><div class="w-10 h-10 bg-cyan-50 border border-cyan-300 rounded-sm flex items-center justify-center">⏱</div></td>
+              <td class="p-2 font-bold">High-speed response timer (1ms res)</td>
+              <td class="p-2"><span class="pill text-cyan-600">TOOL</span></td>
+              <td class="p-2 text-right">1</td>
+              <td class="p-2 text-zinc-500">Cal-lab · Shelf 2B</td>
+              <td class="p-2 text-zinc-500">3.2 · 3.4</td>
+            </tr>
+            <tr class="border-t border-zinc-100">
+              <td class="p-2"><div class="w-10 h-10 bg-cyan-50 border border-cyan-300 rounded-sm flex items-center justify-center">📻</div></td>
+              <td class="p-2 font-bold">2-way radio (Channel 4)</td>
+              <td class="p-2"><span class="pill text-cyan-600">TOOL</span></td>
+              <td class="p-2 text-right">1</td>
+              <td class="p-2 text-zinc-500">Control room</td>
+              <td class="p-2 text-zinc-500">1.3 · 4.3</td>
+            </tr>
+            <tr class="border-t border-zinc-100">
+              <td class="p-2"><div class="w-10 h-10 bg-cyan-50 border border-cyan-300 rounded-sm flex items-center justify-center">🔒</div></td>
+              <td class="p-2 font-bold">Personal lockout padlock + tag</td>
+              <td class="p-2"><span class="pill text-cyan-600">TOOL</span></td>
+              <td class="p-2 text-right">1</td>
+              <td class="p-2 text-zinc-500">Personal issue</td>
+              <td class="p-2 text-zinc-500">1.1</td>
+            </tr>
+            <tr class="border-t border-zinc-100">
+              <td class="p-2"><div class="w-10 h-10 bg-cyan-50 border border-cyan-300 rounded-sm flex items-center justify-center">🌡</div></td>
+              <td class="p-2 font-bold">Contactless IR thermometer</td>
+              <td class="p-2"><span class="pill text-cyan-600">TOOL</span></td>
+              <td class="p-2 text-right">1</td>
+              <td class="p-2 text-zinc-500">Cal-lab · Shelf 1A</td>
+              <td class="p-2 text-zinc-500">2.1</td>
+            </tr>
+            <tr class="border-t border-zinc-100">
+              <td class="p-2"><div class="w-10 h-10 bg-violet-50 border border-violet-300 rounded-sm flex items-center justify-center">📋</div></td>
+              <td class="p-2 font-bold">SOPstart tablet (Samsung Tab Active 4)</td>
+              <td class="p-2"><span class="pill text-violet-600">TOOL</span></td>
+              <td class="p-2 text-right">1</td>
+              <td class="p-2 text-zinc-500">Control room</td>
+              <td class="p-2 text-zinc-500">all</td>
+            </tr>
+            <tr class="border-t border-zinc-100">
+              <td class="p-2"><div class="w-10 h-10 bg-emerald-50 border border-emerald-300 rounded-sm flex items-center justify-center">🧽</div></td>
+              <td class="p-2 font-bold">Lens-cleaning wipes</td>
+              <td class="p-2"><span class="pill text-emerald-600">CONSUMABLE</span></td>
+              <td class="p-2 text-right">2</td>
+              <td class="p-2 text-zinc-500">Stores · Bay 7</td>
+              <td class="p-2 text-zinc-500">2.3</td>
+            </tr>
+            <tr class="border-t border-zinc-100">
+              <td class="p-2"><div class="w-10 h-10 bg-emerald-50 border border-emerald-300 rounded-sm flex items-center justify-center">🏷</div></td>
+              <td class="p-2 font-bold">Cal-check stickers (yellow)</td>
+              <td class="p-2"><span class="pill text-emerald-600">CONSUMABLE</span></td>
+              <td class="p-2 text-right">2</td>
+              <td class="p-2 text-zinc-500">Stores · Bay 7</td>
+              <td class="p-2 text-zinc-500">5.1</td>
+            </tr>
+            <tr class="border-t border-zinc-100">
+              <td class="p-2"><div class="w-10 h-10 bg-emerald-50 border border-emerald-300 rounded-sm flex items-center justify-center">🧯</div></td>
+              <td class="p-2 font-bold">CO₂ extinguisher (standby)</td>
+              <td class="p-2"><span class="pill text-emerald-600">CONSUMABLE</span></td>
+              <td class="p-2 text-right">1</td>
+              <td class="p-2 text-zinc-500">Wall station N4-W2</td>
+              <td class="p-2 text-zinc-500">3.*</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Mobile card list (shown only on mobile via CSS) -->
+        <div id="tools-mobile" class="space-y-2" style="display:none">
+          <div class="flex items-center gap-3 p-3 border border-zinc-200 rounded-sm">
+            <div class="w-12 h-12 bg-yellow-100 border border-yellow-300 rounded-sm flex items-center justify-center text-2xl shrink-0">🦺</div>
+            <div class="flex-1 min-w-0"><div class="font-bold text-sm">Hi-vis vest</div><div class="text-xs text-zinc-500 mono">Stores · Bay 3</div></div>
+            <span class="pill text-amber-600">PPE</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 border border-zinc-200 rounded-sm">
+            <div class="w-12 h-12 bg-yellow-100 border border-yellow-300 rounded-sm flex items-center justify-center text-2xl shrink-0">🥽</div>
+            <div class="flex-1 min-w-0"><div class="font-bold text-sm">Safety glasses</div><div class="text-xs text-zinc-500 mono">Stores · Bay 3</div></div>
+            <span class="pill text-amber-600">PPE</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 border border-zinc-200 rounded-sm">
+            <div class="w-12 h-12 bg-yellow-100 border border-yellow-300 rounded-sm flex items-center justify-center text-2xl shrink-0">🧤</div>
+            <div class="flex-1 min-w-0"><div class="font-bold text-sm">Heat-resistant gloves</div><div class="text-xs text-zinc-500 mono">260°C · Stores Bay 3</div></div>
+            <span class="pill text-amber-600">PPE</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 border border-zinc-200 rounded-sm">
+            <div class="w-12 h-12 bg-yellow-100 border border-yellow-300 rounded-sm flex items-center justify-center text-2xl shrink-0">👢</div>
+            <div class="flex-1 min-w-0"><div class="font-bold text-sm">Steel-cap boots</div><div class="text-xs text-zinc-500 mono">Worn on site</div></div>
+            <span class="pill text-amber-600">PPE</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 border border-zinc-200 rounded-sm">
+            <div class="w-12 h-12 bg-cyan-50 border border-cyan-300 rounded-sm flex items-center justify-center text-2xl shrink-0">⏱</div>
+            <div class="flex-1 min-w-0"><div class="font-bold text-sm">Response timer</div><div class="text-xs text-zinc-500 mono">Cal-lab · Shelf 2B</div></div>
+            <span class="pill text-cyan-600">TOOL</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 border border-zinc-200 rounded-sm">
+            <div class="w-12 h-12 bg-cyan-50 border border-cyan-300 rounded-sm flex items-center justify-center text-2xl shrink-0">📻</div>
+            <div class="flex-1 min-w-0"><div class="font-bold text-sm">2-way radio</div><div class="text-xs text-zinc-500 mono">Channel 4 · Control room</div></div>
+            <span class="pill text-cyan-600">TOOL</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 border border-zinc-200 rounded-sm">
+            <div class="w-12 h-12 bg-cyan-50 border border-cyan-300 rounded-sm flex items-center justify-center text-2xl shrink-0">🔒</div>
+            <div class="flex-1 min-w-0"><div class="font-bold text-sm">Lockout padlock + tag</div><div class="text-xs text-zinc-500 mono">Personal issue</div></div>
+            <span class="pill text-cyan-600">TOOL</span>
+          </div>
+          <div class="flex items-center gap-3 p-3 border border-zinc-200 rounded-sm">
+            <div class="w-12 h-12 bg-cyan-50 border border-cyan-300 rounded-sm flex items-center justify-center text-2xl shrink-0">🌡</div>
+            <div class="flex-1 min-w-0"><div class="font-bold text-sm">IR thermometer</div><div class="text-xs text-zinc-500 mono">Cal-lab · Shelf 1A</div></div>
+            <span class="pill text-cyan-600">TOOL</span>
+          </div>
+          <div class="text-[10px] text-center text-zinc-500 py-2">+ 4 more items · tap to view all</div>
+        </div>
+
+        <div class="mt-4 flex items-center justify-between bg-zinc-50 border border-zinc-200 px-4 py-3">
+          <div class="text-xs text-zinc-500">ESTIMATED GATHERING TIME</div>
+          <div class="mono text-lg font-bold">~8 MIN</div>
+        </div>
+
+        <!-- assumptions -->
+        <div class="mt-8">
+          <div class="text-[10px] tracking-widest text-zinc-500 mb-3">PRE-CONDITIONS &amp; ASSUMPTIONS</div>
+          <ul class="text-sm prose space-y-1.5 text-zinc-700">
+            <li>— Line 4 is scheduled for maintenance (see production schedule)</li>
+            <li>— Furnace temperature is &lt;80°C (post-cooldown cycle complete)</li>
+            <li>— Operator holds a valid Line 4 authorisation and current E-stop competency sign-off</li>
+            <li>— Shift supervisor is available on Channel 4 for the full procedure</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ========== HAZARDS ========== -->
+      <section data-tab="hazards" hidden class="p-8 max-w-5xl mx-auto">
+        <div class="grid grid-cols-2 gap-4">
+          <!-- hazard card -->
+          <div class="border border-rose-300 bg-rose-50 p-4">
+            <div class="flex items-start justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="pill text-rose-600 pill-filled"><span>CRITICAL</span></span>
+                <span class="pill text-rose-600">THERMAL</span>
+              </div>
+              <span class="mono text-[10px] text-zinc-500">H-01</span>
+            </div>
+            <h3 class="font-bold text-sm">Residual furnace heat</h3>
+            <p class="text-xs prose mt-1 text-zinc-700">Lehr exit surface can remain &gt;200°C for 45 min after shutdown. IR burns through thin gloves in &lt;2 s.</p>
+            <div class="mt-3 text-[10px] text-zinc-500">CONTROLS</div>
+            <ul class="text-xs prose space-y-0.5 mt-1">
+              <li>· Verify IR reading &lt;80°C before approach (step 2.1)</li>
+              <li>· Wear 260°C-rated gloves within 1 m of furnace body</li>
+            </ul>
+          </div>
+
+          <div class="border border-rose-300 bg-rose-50 p-4">
+            <div class="flex items-start justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="pill text-rose-600 pill-filled"><span>CRITICAL</span></span>
+                <span class="pill text-rose-600">ELECTRICAL</span>
+              </div>
+              <span class="mono text-[10px] text-zinc-500">H-02</span>
+            </div>
+            <h3 class="font-bold text-sm">Unexpected automatic restart</h3>
+            <p class="text-xs prose mt-1 text-zinc-700">Watchdog timer may re-energise conveyor if E-stop is released without proper reset sequence. Entrapment risk.</p>
+            <div class="mt-3 text-[10px] text-zinc-500">CONTROLS</div>
+            <ul class="text-xs prose space-y-0.5 mt-1">
+              <li>· Lockout-tagout master disconnect before any panel work (step 1.1)</li>
+              <li>· Never release E-stop while personnel are in exclusion zone</li>
+            </ul>
+          </div>
+
+          <div class="border border-amber-300 bg-amber-50 p-4">
+            <div class="flex items-start justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="pill text-amber-600 pill-filled"><span>HIGH</span></span>
+                <span class="pill text-amber-600">MECHANICAL</span>
+              </div>
+              <span class="mono text-[10px] text-zinc-500">H-03</span>
+            </div>
+            <h3 class="font-bold text-sm">Falling glass sheets</h3>
+            <p class="text-xs prose mt-1 text-zinc-700">Partially-tempered sheets on conveyor may dislodge when E-stop engages. Edge lacerations are the primary injury.</p>
+            <div class="mt-3 text-[10px] text-zinc-500">CONTROLS</div>
+            <ul class="text-xs prose space-y-0.5 mt-1">
+              <li>· Ensure conveyor is clear of sheets before test (step 1.3)</li>
+              <li>· Stand outside 2-m exclusion cone during actuation</li>
+            </ul>
+          </div>
+
+          <div class="border border-amber-300 bg-amber-50 p-4">
+            <div class="flex items-start justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="pill text-amber-600 pill-filled"><span>HIGH</span></span>
+                <span class="pill text-amber-600">PNEUMATIC</span>
+              </div>
+              <span class="mono text-[10px] text-zinc-500">H-04</span>
+            </div>
+            <h3 class="font-bold text-sm">Stored pneumatic energy</h3>
+            <p class="text-xs prose mt-1 text-zinc-700">Cooling rollers retain 6 bar air after E-stop. Uncontrolled release during disconnect.</p>
+            <div class="mt-3 text-[10px] text-zinc-500">CONTROLS</div>
+            <ul class="text-xs prose space-y-0.5 mt-1">
+              <li>· Bleed pneumatic system via manifold V-07 before inspection</li>
+            </ul>
+          </div>
+
+          <div class="border border-zinc-300 bg-zinc-50 p-4">
+            <div class="flex items-start justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="pill text-zinc-700 pill-filled"><span>MEDIUM</span></span>
+                <span class="pill text-zinc-700">NOISE</span>
+              </div>
+              <span class="mono text-[10px] text-zinc-500">H-05</span>
+            </div>
+            <h3 class="font-bold text-sm">Alarm horn &gt;95 dB</h3>
+            <p class="text-xs prose mt-1 text-zinc-700">E-stop triggers 95 dB alarm horn at 1 m. Hearing damage on prolonged exposure.</p>
+            <div class="mt-3 text-[10px] text-zinc-500">CONTROLS</div>
+            <ul class="text-xs prose space-y-0.5 mt-1">
+              <li>· Wear Class 5 hearing protection if lingering &gt;30 s</li>
+            </ul>
+          </div>
+
+          <div class="border border-zinc-300 bg-zinc-50 p-4">
+            <div class="flex items-start justify-between mb-2">
+              <div class="flex items-center gap-2">
+                <span class="pill text-zinc-700 pill-filled"><span>LOW</span></span>
+                <span class="pill text-zinc-700">VISIBILITY</span>
+              </div>
+              <span class="mono text-[10px] text-zinc-500">H-06</span>
+            </div>
+            <h3 class="font-bold text-sm">Steam plume at quench</h3>
+            <p class="text-xs prose mt-1 text-zinc-700">Residual quench water creates a ~1 m plume at E-stop event. Visibility reduces for ~10 s.</p>
+          </div>
+        </div>
+
+        <div class="mt-8 border-t border-zinc-200 pt-6 flex items-center justify-between">
+          <div class="text-[10px] tracking-widest text-zinc-500">HAZARD ASSESSMENT</div>
+          <div class="flex items-center gap-3 text-xs mono">
+            <span>CRITICAL <b>2</b></span>
+            <span>HIGH <b>2</b></span>
+            <span>MEDIUM <b>1</b></span>
+            <span>LOW <b>1</b></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== FLOW (node graph) ========== -->
+      <section data-tab="flow" hidden class="h-full flex flex-col">
+        <div class="flex items-center justify-between px-6 py-3 border-b border-zinc-200 bg-zinc-50">
+          <div class="flex items-center gap-3">
+            <span class="text-[10px] tracking-widest text-zinc-500">PROCEDURE FLOW</span>
+            <span class="chip">17 NODES</span>
+            <span class="chip">1 DECISION BRANCH</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="tab" aria-selected="true">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V6M5 12l7-7 7 7"/></svg>
+              EDIT
+            </button>
+            <button class="tab">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              FIT
+            </button>
+            <button class="tab">EXPORT PNG</button>
+          </div>
+        </div>
+
+        <div class="flex-1 bg-grid relative overflow-auto scroll-thin" style="min-height: 600px;">
+          <!-- SVG node graph -->
+          <svg viewBox="0 0 1200 780" class="w-[1200px] h-[780px]">
+            <defs>
+              <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#52525b"/>
+              </marker>
+              <marker id="arrow-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#ef4444"/>
+              </marker>
+            </defs>
+
+            <!-- edges first so nodes are on top -->
+            <!-- setup linear -->
+            <path d="M 180 90 L 180 150" stroke="#52525b" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+            <path d="M 180 210 L 180 270" stroke="#52525b" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+            <path d="M 180 330 L 180 390" stroke="#52525b" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+            <path d="M 240 420 L 440 270" stroke="#52525b" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+            <!-- pre-checks column -->
+            <path d="M 500 300 L 500 360" stroke="#52525b" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+            <path d="M 500 420 L 500 480" stroke="#52525b" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+            <path d="M 500 540 L 500 600" stroke="#52525b" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+            <!-- into decision -->
+            <path d="M 560 630 L 780 630" stroke="#52525b" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+            <!-- measurement branch: measure -> decision -->
+            <path d="M 840 570 L 840 440" stroke="#f97316" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+            <!-- decision -> escalate (no path, red dashed) -->
+            <path d="M 900 400 L 1060 400" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4 4" fill="none" marker-end="url(#arrow-red)"/>
+            <text x="980" y="390" class="edge-label" fill="#ef4444">IF &gt; 500ms</text>
+            <!-- decision -> continue -->
+            <path d="M 840 360 L 840 210" stroke="#10b981" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+            <text x="850" y="290" class="edge-label" fill="#10b981">IF ≤ 500ms</text>
+
+            <!-- continue vertical: execute column -->
+            <path d="M 840 150 L 840 90" stroke="#52525b" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+            <!-- to e-stop 2 test -->
+            <path d="M 900 60 L 1060 60" stroke="#52525b" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+            <!-- e-stop 2 down to reset -->
+            <path d="M 1120 90 L 1120 210" stroke="#52525b" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+            <!-- reset down to log -->
+            <path d="M 1120 270 L 1120 390" stroke="#52525b" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+            <!-- log down to sign -->
+            <path d="M 1120 450 L 1120 570" stroke="#52525b" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+
+            <!-- ============ NODES ============ -->
+            <!-- Zone: Setup -->
+            <g transform="translate(120, 30)">
+              <rect width="120" height="60" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5" rx="2"/>
+              <text x="60" y="22" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#b45309" letter-spacing="1">ZONE</text>
+              <text x="60" y="42" text-anchor="middle" font-family="JetBrains Mono" font-size="12" font-weight="700" fill="#78350f">SETUP AREA</text>
+            </g>
+            <!-- 1.1 LOCKOUT -->
+            <g transform="translate(120, 150)">
+              <rect width="120" height="60" fill="#fff" stroke="#3b82f6" stroke-width="1.5" rx="2"/>
+              <text x="10" y="18" font-family="JetBrains Mono" font-size="9" fill="#2563eb" letter-spacing="1">STEP 1.1</text>
+              <text x="10" y="38" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#0c4a6e">LOCKOUT</text>
+              <text x="10" y="52" font-family="JetBrains Mono" font-size="9" fill="#71717a">master discon.</text>
+            </g>
+            <!-- 1.2 DON PPE -->
+            <g transform="translate(120, 270)">
+              <rect width="120" height="60" fill="#fff" stroke="#3b82f6" stroke-width="1.5" rx="2"/>
+              <text x="10" y="18" font-family="JetBrains Mono" font-size="9" fill="#2563eb" letter-spacing="1">STEP 1.2</text>
+              <text x="10" y="38" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#0c4a6e">DON PPE</text>
+              <text x="10" y="52" font-family="JetBrains Mono" font-size="9" fill="#71717a">hi-vis, gloves…</text>
+            </g>
+            <!-- 1.3 NOTIFY CONTROL -->
+            <g transform="translate(120, 390)">
+              <rect width="120" height="60" fill="#fff" stroke="#3b82f6" stroke-width="1.5" rx="2"/>
+              <text x="10" y="18" font-family="JetBrains Mono" font-size="9" fill="#2563eb" letter-spacing="1">STEP 1.3</text>
+              <text x="10" y="38" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#0c4a6e">NOTIFY</text>
+              <text x="10" y="52" font-family="JetBrains Mono" font-size="9" fill="#71717a">radio ch 4</text>
+            </g>
+
+            <!-- Pre-check column at x=440-560 -->
+            <g transform="translate(440, 240)">
+              <rect width="120" height="60" fill="#ecfeff" stroke="#06b6d4" stroke-width="1.5" rx="2"/>
+              <text x="10" y="18" font-family="JetBrains Mono" font-size="9" fill="#0891b2" letter-spacing="1">INSPECT 2.1</text>
+              <text x="10" y="38" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#0c4a6e">TEMP CHECK</text>
+              <text x="10" y="52" font-family="JetBrains Mono" font-size="9" fill="#71717a">target &lt; 80°C</text>
+            </g>
+            <g transform="translate(440, 360)">
+              <rect width="120" height="60" fill="#ecfeff" stroke="#06b6d4" stroke-width="1.5" rx="2"/>
+              <text x="10" y="18" font-family="JetBrains Mono" font-size="9" fill="#0891b2" letter-spacing="1">INSPECT 2.2</text>
+              <text x="10" y="38" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#0c4a6e">E-STOP 1 VIS</text>
+              <text x="10" y="52" font-family="JetBrains Mono" font-size="9" fill="#71717a">physical integ.</text>
+            </g>
+            <g transform="translate(440, 480)">
+              <rect width="120" height="60" fill="#ecfeff" stroke="#06b6d4" stroke-width="1.5" rx="2"/>
+              <text x="10" y="18" font-family="JetBrains Mono" font-size="9" fill="#0891b2" letter-spacing="1">INSPECT 2.3</text>
+              <text x="10" y="38" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#0c4a6e">E-STOP 2 VIS</text>
+            </g>
+            <g transform="translate(440, 600)">
+              <rect width="120" height="60" fill="#ecfeff" stroke="#06b6d4" stroke-width="1.5" rx="2"/>
+              <text x="10" y="18" font-family="JetBrains Mono" font-size="9" fill="#0891b2" letter-spacing="1">INSPECT 2.4</text>
+              <text x="10" y="38" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#0c4a6e">SCADA COMM</text>
+              <text x="10" y="52" font-family="JetBrains Mono" font-size="9" fill="#71717a">ping control</text>
+            </g>
+
+            <!-- STEP 3.1 ACTIVATE E-STOP 1 (bottom right) -->
+            <g transform="translate(780, 600)">
+              <rect width="120" height="60" fill="#fff" stroke="#3b82f6" stroke-width="1.5" rx="2"/>
+              <text x="10" y="18" font-family="JetBrains Mono" font-size="9" fill="#2563eb" letter-spacing="1">STEP 3.1</text>
+              <text x="10" y="38" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#0c4a6e">PRESS E-STOP 1</text>
+            </g>
+            <!-- MEASUREMENT 3.2 -->
+            <g transform="translate(780, 510)">
+              <rect width="120" height="60" fill="#fff7ed" stroke="#f97316" stroke-width="1.5" rx="2"/>
+              <text x="10" y="18" font-family="JetBrains Mono" font-size="9" fill="#c2410c" letter-spacing="1">MEASURE 3.2</text>
+              <text x="10" y="38" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#7c2d12">RESPONSE TIME</text>
+              <text x="10" y="52" font-family="JetBrains Mono" font-size="9" fill="#c2410c">target &lt; 500ms</text>
+            </g>
+            <!-- DECISION 3.3 -->
+            <g transform="translate(780, 360)">
+              <polygon points="60,0 120,40 60,80 0,40" fill="#fdf2f8" stroke="#ec4899" stroke-width="1.5"/>
+              <text x="60" y="34" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#be185d" letter-spacing="1">DECISION</text>
+              <text x="60" y="52" text-anchor="middle" font-family="JetBrains Mono" font-size="10" font-weight="700" fill="#500724">≤ 500 ms?</text>
+            </g>
+
+            <!-- HAZARD node: ESCALATE -->
+            <g transform="translate(1060, 360)">
+              <rect width="120" height="80" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5" rx="2"/>
+              <text x="10" y="18" font-family="JetBrains Mono" font-size="9" fill="#b91c1c" letter-spacing="1">ESCALATE</text>
+              <text x="10" y="38" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#7f1d1d">OUT-OF-SPEC</text>
+              <text x="10" y="54" font-family="JetBrains Mono" font-size="9" fill="#b91c1c">• lockout line</text>
+              <text x="10" y="68" font-family="JetBrains Mono" font-size="9" fill="#b91c1c">• page maint.</text>
+            </g>
+
+            <!-- STEP 3.4 PRESS E-STOP 2 -->
+            <g transform="translate(780, 150)">
+              <rect width="120" height="60" fill="#fff" stroke="#3b82f6" stroke-width="1.5" rx="2"/>
+              <text x="10" y="18" font-family="JetBrains Mono" font-size="9" fill="#2563eb" letter-spacing="1">STEP 3.4</text>
+              <text x="10" y="38" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#0c4a6e">PRESS E-STOP 2</text>
+            </g>
+            <!-- STEP 3.5 VERIFY SHUTDOWN -->
+            <g transform="translate(780, 30)">
+              <rect width="120" height="60" fill="#fff" stroke="#3b82f6" stroke-width="1.5" rx="2"/>
+              <text x="10" y="18" font-family="JetBrains Mono" font-size="9" fill="#2563eb" letter-spacing="1">STEP 3.5</text>
+              <text x="10" y="38" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#0c4a6e">VERIFY ALL OFF</text>
+            </g>
+
+            <!-- STEP 4.1 RESET -->
+            <g transform="translate(1060, 30)">
+              <rect width="120" height="60" fill="#fff" stroke="#3b82f6" stroke-width="1.5" rx="2"/>
+              <text x="10" y="18" font-family="JetBrains Mono" font-size="9" fill="#2563eb" letter-spacing="1">STEP 4.1</text>
+              <text x="10" y="38" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#0c4a6e">RESET SYSTEM</text>
+            </g>
+            <!-- STEP 4.2 CONFIRM INDICATORS -->
+            <g transform="translate(1060, 210)">
+              <rect width="120" height="60" fill="#fff" stroke="#3b82f6" stroke-width="1.5" rx="2"/>
+              <text x="10" y="18" font-family="JetBrains Mono" font-size="9" fill="#2563eb" letter-spacing="1">STEP 4.2</text>
+              <text x="10" y="38" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#0c4a6e">ALL GREEN?</text>
+            </g>
+            <!-- STEP 4.3 LOG READINGS -->
+            <g transform="translate(1060, 390)">
+              <rect width="120" height="60" fill="#fff" stroke="#3b82f6" stroke-width="1.5" rx="2"/>
+              <text x="10" y="18" font-family="JetBrains Mono" font-size="9" fill="#2563eb" letter-spacing="1">STEP 4.3</text>
+              <text x="10" y="38" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#0c4a6e">LOG CYCLE T</text>
+            </g>
+            <!-- SIGN-OFF 5.1 operator -->
+            <g transform="translate(1060, 570)">
+              <rect width="120" height="60" fill="#fefce8" stroke="#eab308" stroke-width="1.5" rx="2"/>
+              <text x="10" y="18" font-family="JetBrains Mono" font-size="9" fill="#a16207" letter-spacing="1">SIGN-OFF 5.1</text>
+              <text x="10" y="38" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#713f12">OPERATOR</text>
+            </g>
+            <!-- SIGN-OFF 5.2 supervisor -->
+            <g transform="translate(1060, 680)">
+              <rect width="120" height="60" fill="#fefce8" stroke="#eab308" stroke-width="1.5" rx="2"/>
+              <text x="10" y="18" font-family="JetBrains Mono" font-size="9" fill="#a16207" letter-spacing="1">SIGN-OFF 5.2</text>
+              <text x="10" y="38" font-family="JetBrains Mono" font-size="11" font-weight="700" fill="#713f12">SUPERVISOR</text>
+            </g>
+
+            <!-- sign 5.1 -> 5.2 -->
+            <path d="M 1120 630 L 1120 680" stroke="#52525b" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+          </svg>
+
+          <!-- minimap / node palette (bottom left) -->
+          <div class="absolute bottom-4 left-4 bg-white border border-zinc-200 rounded-sm p-3 text-xs shadow-sm" style="width:200px;">
+            <div class="text-[10px] tracking-widest text-zinc-500 mb-2">ADD NODE</div>
+            <div class="grid grid-cols-2 gap-1.5">
+              <button class="border border-blue-400 text-blue-700 px-2 py-1 text-[10px] hover:bg-blue-50">+ STEP</button>
+              <button class="border border-cyan-400 text-cyan-700 px-2 py-1 text-[10px] hover:bg-cyan-50">+ INSPECT</button>
+              <button class="border border-orange-400 text-orange-700 px-2 py-1 text-[10px] hover:bg-orange-50">+ MEASURE</button>
+              <button class="border border-pink-400 text-pink-700 px-2 py-1 text-[10px] hover:bg-pink-50">+ DECISION</button>
+              <button class="border border-red-400 text-red-700 px-2 py-1 text-[10px] hover:bg-red-50">+ HAZARD</button>
+              <button class="border border-amber-400 text-amber-700 px-2 py-1 text-[10px] hover:bg-amber-50">+ ZONE</button>
+              <button class="border border-yellow-400 text-yellow-700 px-2 py-1 text-[10px] hover:bg-yellow-50 col-span-2">+ SIGN-OFF</button>
+            </div>
+          </div>
+
+          <!-- legend (bottom right) -->
+          <div class="absolute bottom-4 right-4 bg-white border border-zinc-200 rounded-sm p-3 text-xs shadow-sm">
+            <div class="text-[10px] tracking-widest text-zinc-500 mb-2">LEGEND</div>
+            <div class="space-y-1 mono text-[10px]">
+              <div class="flex items-center gap-2"><div class="w-3 h-3 border border-blue-500 bg-white"></div> STEP</div>
+              <div class="flex items-center gap-2"><div class="w-3 h-3 border border-cyan-500 bg-cyan-50"></div> INSPECT</div>
+              <div class="flex items-center gap-2"><div class="w-3 h-3 border border-orange-500 bg-orange-50"></div> MEASURE</div>
+              <div class="flex items-center gap-2"><div class="w-3 h-3 border border-pink-500 bg-pink-50 rotate-45"></div> DECISION</div>
+              <div class="flex items-center gap-2"><div class="w-3 h-3 border border-red-500 bg-red-50"></div> HAZARD</div>
+              <div class="flex items-center gap-2"><div class="w-3 h-3 border border-amber-500 bg-amber-50"></div> ZONE</div>
+              <div class="flex items-center gap-2"><div class="w-3 h-3 border border-yellow-500 bg-yellow-50"></div> SIGN-OFF</div>
+              <div class="pt-1 mt-1 border-t border-zinc-200">
+                <div class="flex items-center gap-2">
+                  <svg width="20" height="4"><line x1="0" y1="2" x2="20" y2="2" stroke="#52525b" stroke-width="1.5"/></svg>
+                  SEQUENCE
+                </div>
+                <div class="flex items-center gap-2">
+                  <svg width="20" height="4"><line x1="0" y1="2" x2="20" y2="2" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3 3"/></svg>
+                  CONDITIONAL
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== MODEL (3D) ========== -->
+      <section data-tab="model" hidden class="h-full flex">
+        <!-- left: layers + controls -->
+        <div class="w-[240px] border-r border-zinc-200 bg-zinc-50 p-4 text-xs flex flex-col gap-4 overflow-y-auto scroll-thin">
+          <div>
+            <div class="text-[10px] tracking-widest text-zinc-500 mb-2">3D ASSEMBLY</div>
+            <div class="mono font-bold text-sm text-zinc-900">LINE 4 E-STOP PANEL</div>
+            <div class="text-[10px] text-zinc-500 mt-1">loaded from customer CAD · 2.4 MB GLB</div>
+          </div>
+
+          <div>
+            <div class="text-[10px] tracking-widest text-zinc-500 mb-2">LAYERS</div>
+            <label class="flex items-center gap-2 py-1 cursor-pointer"><input type="checkbox" checked class="accent-blue-600"><span>Enclosure</span><span class="ml-auto mono text-zinc-400">0.8</span></label>
+            <label class="flex items-center gap-2 py-1 cursor-pointer"><input type="checkbox" checked class="accent-blue-600"><span>E-stop buttons</span><span class="ml-auto mono text-zinc-400">1.0</span></label>
+            <label class="flex items-center gap-2 py-1 cursor-pointer"><input type="checkbox" checked class="accent-blue-600"><span>Wiring harness</span><span class="ml-auto mono text-zinc-400">0.6</span></label>
+            <label class="flex items-center gap-2 py-1 cursor-pointer"><input type="checkbox" class="accent-blue-600"><span>Relay board</span><span class="ml-auto mono text-zinc-400">1.0</span></label>
+            <label class="flex items-center gap-2 py-1 cursor-pointer"><input type="checkbox" checked class="accent-blue-600"><span>Annotations</span></label>
+          </div>
+
+          <div>
+            <div class="text-[10px] tracking-widest text-zinc-500 mb-2">EXPLODED VIEW</div>
+            <input type="range" class="w-full accent-yellow-500" min="0" max="100" value="0">
+            <div class="flex justify-between text-[10px] text-zinc-500 mt-1 mono"><span>0%</span><span>100%</span></div>
+          </div>
+
+          <div>
+            <div class="text-[10px] tracking-widest text-zinc-500 mb-2">TRANSPARENCY</div>
+            <input type="range" class="w-full accent-yellow-500" min="0" max="100" value="30">
+          </div>
+
+          <div>
+            <div class="text-[10px] tracking-widest text-zinc-500 mb-2">PINS (4)</div>
+            <button class="w-full text-left py-1.5 hover:bg-white px-2 border-l-2 border-red-500 flex items-center gap-2 text-[11px]"><span class="mono font-bold">P1</span> Residual heat zone → step 2.1</button>
+            <button class="w-full text-left py-1.5 hover:bg-white px-2 border-l-2 border-blue-500 flex items-center gap-2 text-[11px]"><span class="mono font-bold">P2</span> E-stop 1 actuator → step 3.1</button>
+            <button class="w-full text-left py-1.5 hover:bg-white px-2 border-l-2 border-blue-500 flex items-center gap-2 text-[11px]"><span class="mono font-bold">P3</span> E-stop 2 actuator → step 3.4</button>
+            <button class="w-full text-left py-1.5 hover:bg-white px-2 border-l-2 border-orange-500 flex items-center gap-2 text-[11px]"><span class="mono font-bold">P4</span> Cycle timer tap → step 3.2</button>
+          </div>
+
+          <button class="mt-auto border border-dashed border-zinc-400 py-2 text-[11px] text-zinc-600 hover:bg-white">+ REPLACE CAD</button>
+        </div>
+
+        <!-- right: 3D viewport (faux) -->
+        <div class="flex-1 relative bg-grid overflow-hidden">
+          <!-- faux 3D via CSS transforms -->
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div class="model-spin" style="perspective: 800px;">
+              <!-- cube faces showing interior layout -->
+              <div style="position:relative; width:260px; height:180px; transform-style: preserve-3d;">
+                <!-- front face: glass enclosure -->
+                <div style="position:absolute; inset:0; transform: translateZ(90px); background: rgba(255,255,255,0.5); border: 2px solid rgba(0,0,0,0.5); box-shadow: inset 0 0 40px rgba(0,0,0,0.1);"></div>
+                <!-- back -->
+                <div style="position:absolute; inset:0; transform: translateZ(-90px) rotateY(180deg); background: rgba(255,255,255,0.4); border: 2px solid rgba(0,0,0,0.5);"></div>
+                <!-- left -->
+                <div style="position:absolute; top:0; left:-90px; width:180px; height:180px; transform: rotateY(-90deg); background: rgba(255,255,255,0.4); border: 2px solid rgba(0,0,0,0.5);"></div>
+                <!-- right -->
+                <div style="position:absolute; top:0; right:-90px; width:180px; height:180px; transform: rotateY(90deg); background: rgba(255,255,255,0.4); border: 2px solid rgba(0,0,0,0.5);"></div>
+                <!-- top -->
+                <div style="position:absolute; top:-90px; left:0; width:260px; height:180px; transform: rotateX(90deg); background: rgba(255,255,255,0.4); border: 2px solid rgba(0,0,0,0.5);"></div>
+                <!-- floor -->
+                <div style="position:absolute; bottom:-90px; left:0; width:260px; height:180px; transform: rotateX(-90deg); background: rgba(0,0,0,0.2); border: 2px solid rgba(0,0,0,0.5);"></div>
+                <!-- interior: e-stop buttons as red cylinders -->
+                <div style="position:absolute; top:60px; left:60px; width:40px; height:40px; transform: translateZ(0px); background: radial-gradient(circle, #dc2626, #7f1d1d); border-radius: 50%; border: 2px solid #000;"></div>
+                <div style="position:absolute; top:60px; left:160px; width:40px; height:40px; transform: translateZ(0px); background: radial-gradient(circle, #dc2626, #7f1d1d); border-radius: 50%; border: 2px solid #000;"></div>
+                <!-- relay board -->
+                <div style="position:absolute; top:130px; left:30px; width:200px; height:30px; transform: translateZ(-40px); background: #16a34a; border: 1px solid #000;"></div>
+              </div>
+            </div>
+          </div>
+          <!-- pin overlay -->
+          <div class="absolute top-[28%] left-[40%] flex items-start">
+            <div class="w-6 h-6 rounded-full bg-red-600 text-white text-xs font-bold flex items-center justify-center shadow-lg border-2 border-white">1</div>
+            <div class="ml-2 mt-1 bg-white border border-zinc-200 rounded-sm shadow-md text-xs p-2 w-[220px]">
+              <div class="text-[10px] text-red-600 font-bold tracking-wider mb-1">HAZARD · STEP 2.1</div>
+              <div class="mono font-bold">Residual heat zone</div>
+              <div class="prose text-zinc-600 text-[11px] mt-1">Enclosure face can reach 85°C during operation. Confirm &lt;80°C before touching.</div>
+            </div>
+          </div>
+          <div class="absolute top-[55%] left-[32%]">
+            <div class="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center shadow-lg border-2 border-white">2</div>
+          </div>
+          <div class="absolute top-[55%] left-[58%]">
+            <div class="w-6 h-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center shadow-lg border-2 border-white">3</div>
+          </div>
+          <div class="absolute top-[72%] left-[46%]">
+            <div class="w-6 h-6 rounded-full bg-orange-500 text-white text-xs font-bold flex items-center justify-center shadow-lg border-2 border-white">4</div>
+          </div>
+          <!-- viewport hints -->
+          <div class="absolute top-3 left-3 bg-white/90 border border-zinc-200 rounded-sm px-2 py-1 text-[10px] mono text-zinc-600">
+            DRAG · ROTATE &nbsp; SCROLL · ZOOM &nbsp; RIGHT-DRAG · PAN
+          </div>
+          <!-- axis gizmo -->
+          <div class="absolute bottom-4 left-4 bg-white border border-zinc-200 p-2 text-[10px] mono flex gap-2">
+            <span class="text-red-600">X</span><span class="text-emerald-600">Y</span><span class="text-blue-600">Z</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========== WALKTHROUGH ========== -->
+      <section data-tab="walkthrough" hidden class="p-8 max-w-4xl mx-auto">
+        <!-- header -->
+        <div class="flex items-center justify-between border-b border-zinc-200 pb-4 mb-6">
+          <div class="flex items-center gap-3">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            <h2 class="font-bold tracking-wider">INSTRUCTIONS</h2>
+          </div>
+          <div class="mono text-sm" id="wt-progress-text">0/17 DONE</div>
+        </div>
+
+        <!-- Tools & Assumptions (collapsible) -->
+        <details open class="border border-zinc-200 rounded-sm mb-6">
+          <summary class="cursor-pointer flex items-center justify-between bg-zinc-50 p-3 text-xs">
+            <span class="flex items-center gap-2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.1 2.1-2-2 2.1-2.1z"/></svg>
+              <span class="tracking-wider font-bold">TOOLS &amp; PRE-CONDITIONS</span>
+            </span>
+            <span class="mono text-zinc-500">12 items · ~8m to gather</span>
+          </summary>
+          <div class="grid grid-cols-2 gap-6 p-4">
+            <div>
+              <div class="text-[10px] tracking-widest text-zinc-500 mb-2">YOU WILL NEED</div>
+              <ul class="text-xs space-y-1 prose">
+                <li>🦺 Hi-vis vest, safety glasses, heat gloves, boots</li>
+                <li>⏱ High-speed response timer (1ms resolution)</li>
+                <li>📻 2-way radio (Channel 4)</li>
+                <li>🔒 Personal lockout padlock + tag</li>
+                <li>🌡 Contactless IR thermometer</li>
+                <li>📋 SOPstart tablet (this device)</li>
+                <li>🧽 Lens wipes · 🏷 Cal-check stickers · 🧯 CO₂ extinguisher (standby)</li>
+              </ul>
+            </div>
+            <div>
+              <div class="text-[10px] tracking-widest text-zinc-500 mb-2">ASSUMPTIONS</div>
+              <ul class="text-xs space-y-1 prose">
+                <li>— Line 4 is in maintenance window</li>
+                <li>— Furnace temperature below 80°C</li>
+                <li>— Operator holds current E-stop competency</li>
+                <li>— Shift supervisor on Ch 4 standby</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+
+        <!-- steps (desktop: full list; hidden on mobile) -->
+        <div id="steps-root" class="space-y-3"></div>
+
+        <!-- mobile: single-step immersive view (hidden on desktop) -->
+        <div id="mobile-step-view"></div>
+
+        <!-- final sign-off footer -->
+        <div id="signoff-footer" class="mt-10 border border-yellow-400 bg-yellow-50 p-4 rounded-sm">
+          <div class="text-[10px] tracking-widest text-yellow-700 mb-2">WHEN ALL STEPS COMPLETE</div>
+          <div class="font-bold text-sm mb-3">Submit for supervisor sign-off</div>
+          <button class="w-full bg-black text-white py-3 text-sm tracking-wider hover:bg-zinc-800 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed" disabled id="submit-btn">
+            ✓ SUBMIT FOR SIGN-OFF
+          </button>
+          <div class="text-[10px] text-zinc-500 mt-2 text-center">Completes <b>17/17</b> steps to enable · locked until all measurements recorded</div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ============== RIGHT AI CHAT RAIL (conditional / toggleable) ============== -->
+    <aside id="ai-rail" style="display:none" class="w-[320px] shrink-0 bg-zinc-50 border-l border-zinc-200 text-zinc-900 flex-col">
+      <div class="flex items-center justify-between p-3 border-b border-zinc-200 bg-white">
+        <div class="flex items-center gap-2">
+          <div class="w-5 h-5 rounded bg-yellow-400 flex items-center justify-center text-[10px] font-bold text-black">AI</div>
+          <span class="text-xs font-bold tracking-wider">ASK THIS SOP</span>
+        </div>
+        <button onclick="document.getElementById('ai-rail').style.display='none'" class="text-zinc-400 hover:text-zinc-900">✕</button>
+      </div>
+      <div class="flex-1 p-3 overflow-y-auto scroll-thin space-y-3 text-xs">
+        <div class="text-zinc-500 text-[11px]">Scoped to this SOP · answers cite step numbers</div>
+        <div class="flex gap-2">
+          <div class="w-6 h-6 rounded-full bg-zinc-300 shrink-0"></div>
+          <div class="bg-white border border-zinc-200 rounded-sm p-2 flex-1">
+            <div class="font-medium">Where do I check the response time?</div>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <div class="w-6 h-6 rounded bg-yellow-400 flex items-center justify-center text-[10px] font-bold text-black shrink-0">AI</div>
+          <div class="chat-ai rounded-sm p-2 flex-1">
+            <div class="prose">Response time is measured at <a class="text-blue-700 underline font-bold" href="#" onclick="setTab('walkthrough'); return false;">step 3.2</a>. Target is &lt;500 ms from button press to conveyor halt.</div>
+            <div class="mt-2 flex gap-1 flex-wrap">
+              <a class="chip text-blue-700 border-blue-300" href="#" onclick="setTab('walkthrough'); return false;">→ 3.2 RESPONSE TIME</a>
+              <a class="chip text-blue-700 border-blue-300" href="#" onclick="setTab('flow'); return false;">→ DECISION NODE</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="p-3 border-t border-zinc-200 bg-white">
+        <div class="flex items-center gap-2 bg-zinc-100 rounded-sm px-2 py-1.5 border border-zinc-200">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zM19 10v1a7 7 0 0 1-14 0v-1M12 18v4M8 22h8"/></svg>
+          <input placeholder="Ask about this procedure…" class="flex-1 bg-transparent outline-none text-xs">
+          <kbd class="text-[10px] border border-zinc-300 px-1 rounded">↵</kbd>
+        </div>
+        <div class="flex gap-1 mt-2 flex-wrap">
+          <button class="chip hover:bg-zinc-100">What PPE do I need?</button>
+          <button class="chip hover:bg-zinc-100">Skip to sign-off</button>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ============== BOTTOM STICKY (desktop footer) ============== -->
+  <div id="footer-strip" class="shrink-0 bg-zinc-950 border-t border-zinc-800 px-4 py-1.5 text-[10px] text-zinc-500 flex items-center justify-between">
+    <div>SOP-GL-0134 · rev 2026-04-11 · multi-tenant: SummitGlass NZ</div>
+    <div class="flex items-center gap-4">
+      <span>⌘K search · ? AI · ← → switch tab</span>
+      <button onclick="toggleAiRail()" class="hover:text-white">ASK AI ✦</button>
+    </div>
+  </div>
+
+  <!-- ============== MOBILE BOTTOM TAB BAR (shown only on mobile) ============== -->
+  <nav id="mobile-tabbar" aria-label="Mobile tab bar">
+    <button data-tab-btn="overview" aria-selected="true">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      INFO
+    </button>
+    <button data-tab-btn="tools" aria-selected="false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.1 2.1-2-2 2.1-2.1z"/></svg>
+      TOOLS
+    </button>
+    <button data-tab-btn="hazards" aria-selected="false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 22h20L12 2zM12 9v5M12 17h.01"/></svg>
+      HAZARD
+    </button>
+    <button data-tab-btn="flow" aria-selected="false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="18" r="2"/><circle cx="18" cy="6" r="2"/><path d="M8 6h8M18 8v8M16 18H8M6 8v8"/></svg>
+      FLOW
+    </button>
+    <button data-tab-btn="model" aria-selected="false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21 16-9 5-9-5V8l9-5 9 5v8zM12 3v18M3 8l9 5 9-5"/></svg>
+      3D
+    </button>
+    <button data-tab-btn="walkthrough" aria-selected="false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      WALK
+    </button>
+  </nav>
+
+  <!-- Mobile sticky CTA on walkthrough -->
+  <div id="mobile-walk-cta">▶ RESUME · <span id="mobile-walk-progress">0 OF 17</span></div>
+
+</div>
+</div>
+
+<!-- ============== CMD-K OVERLAY ============== -->
+<div id="cmdk" style="display:none" class="fixed inset-0 cmdk-bg z-50 items-start justify-center pt-24">
+  <div class="w-[640px] bg-white rounded-sm shadow-2xl border border-zinc-200 overflow-hidden">
+    <div class="flex items-center gap-2 px-4 py-3 border-b border-zinc-200">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="cmdk-input" placeholder="Search steps, tools, hazards — or ask a question…" class="flex-1 outline-none text-sm" autofocus>
+      <kbd class="text-[10px] border border-zinc-300 px-1 rounded">ESC</kbd>
+    </div>
+    <div class="p-2 max-h-[460px] overflow-y-auto text-sm">
+      <div class="text-[10px] tracking-widest text-zinc-500 px-2 py-1">JUMP TO STEP</div>
+      <button class="w-full text-left px-2 py-1.5 hover:bg-zinc-100 rounded-sm flex items-center gap-3"><span class="mono text-zinc-400 w-10">2.1</span> <span>Check furnace temperature (IR)</span><span class="ml-auto chip text-cyan-600">INSPECT</span></button>
+      <button class="w-full text-left px-2 py-1.5 hover:bg-zinc-100 rounded-sm flex items-center gap-3"><span class="mono text-zinc-400 w-10">3.2</span> <span>Measure E-stop 1 response time</span><span class="ml-auto chip text-orange-600">MEASURE</span></button>
+      <button class="w-full text-left px-2 py-1.5 hover:bg-zinc-100 rounded-sm flex items-center gap-3"><span class="mono text-zinc-400 w-10">3.3</span> <span>Decision: within spec?</span><span class="ml-auto chip text-pink-600">DECISION</span></button>
+
+      <div class="text-[10px] tracking-widest text-zinc-500 px-2 py-1 mt-2">ASK AI</div>
+      <button class="w-full text-left px-2 py-1.5 hover:bg-zinc-100 rounded-sm flex items-start gap-3" onclick="hideCmdk(); document.getElementById('ai-rail').style.display='flex';">
+        <span class="w-5 h-5 rounded bg-yellow-400 flex items-center justify-center text-[10px] font-bold text-black shrink-0">AI</span>
+        <span class="prose">Ask: "What's the pass threshold for response time?"</span>
+      </button>
+
+      <div class="text-[10px] tracking-widest text-zinc-500 px-2 py-1 mt-2">TOOLS &amp; HAZARDS</div>
+      <button class="w-full text-left px-2 py-1.5 hover:bg-zinc-100 rounded-sm flex items-center gap-3"><span>🦺 Hi-vis vest</span><span class="ml-auto chip text-amber-600">PPE</span></button>
+      <button class="w-full text-left px-2 py-1.5 hover:bg-zinc-100 rounded-sm flex items-center gap-3"><span>⚠ Residual furnace heat</span><span class="ml-auto chip text-rose-600">CRITICAL</span></button>
+    </div>
+    <div class="border-t border-zinc-200 px-4 py-2 text-[10px] text-zinc-500 flex items-center justify-between mono">
+      <span>⏎ jump · ⇧⏎ open in new tab · ? for AI</span>
+      <span>semantic search via pgvector</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============== DATA + BEHAVIOUR ============== -->
+<script>
+// ------- Tab switching -------
+function setTab(name) {
+  document.querySelectorAll('[data-tab-btn]').forEach(b => b.setAttribute('aria-selected', b.dataset.tabBtn === name ? 'true' : 'false'));
+  document.querySelectorAll('[data-tab]').forEach(s => {
+    s.removeAttribute('hidden');
+    s.style.display = s.dataset.tab === name ? '' : 'none';
+  });
+  const main = document.querySelector('main');
+  const fullBleed = (name === 'flow' || name === 'model');
+  main.classList.toggle('overflow-y-auto', !fullBleed);
+  main.classList.toggle('overflow-hidden', fullBleed);
+  document.body.dataset.activeTab = name;
+}
+document.querySelectorAll('[data-tab-btn]').forEach(btn => btn.addEventListener('click', () => setTab(btn.dataset.tabBtn)));
+// init: hide all non-overview tabs explicitly so flex/h-full classes don't override `hidden` attr
+setTab('overview');
+
+// ------- View toggle (desktop / mobile) -------
+function setView(mode) {
+  document.body.dataset.view = mode;
+  document.querySelectorAll('[data-view-btn]').forEach(b => b.setAttribute('aria-pressed', b.dataset.viewBtn === mode ? 'true' : 'false'));
+  const readout = document.getElementById('viewport-readout');
+  if (readout) readout.textContent = mode === 'mobile' ? '430 × 932' : 'FULL';
+}
+document.querySelectorAll('[data-view-btn]').forEach(btn => btn.addEventListener('click', () => setView(btn.dataset.viewBtn)));
+setView('desktop');
+
+// ------- Cmd-K -------
+function showCmdk(){ document.getElementById('cmdk').style.display = 'flex'; setTimeout(() => document.getElementById('cmdk-input').focus(), 10); }
+function hideCmdk(){ document.getElementById('cmdk').style.display = 'none'; }
+function toggleAiRail(){ const r = document.getElementById('ai-rail'); r.style.display = (r.style.display === 'flex') ? 'none' : 'flex'; }
+document.getElementById('cmdk-open').addEventListener('click', showCmdk);
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); showCmdk(); }
+  if (e.key === 'Escape') hideCmdk();
+});
+
+// ------- Walkthrough data + render -------
+const SECTIONS = [
+  { id: 1, title: 'Setup', icon: '🏁', steps: [
+    { id: '1.1', title: 'Apply personal lockout to master disconnect',
+      chips: ['photo required'], evidence: ['photo', 'signature'],
+      body: 'Place your personal padlock on the master disconnect switch on panel N4-A. Attach the tag with your name, date, and "DO NOT OPERATE".',
+      warn: 'Do not proceed until the padlock is secured and tested.',
+      tools: ['🔒 Personal padlock', '🏷 Lockout tag'], hazards: ['H-02 Unexpected restart'],
+      illo: 'A hand attaching a red padlock and yellow tag to an industrial disconnect switch on a control panel, close-up studio lighting.' },
+    { id: '1.2', title: 'Don PPE',
+      chips: ['4 items'], evidence: ['photo'],
+      body: 'Put on the full PPE set: hi-vis vest, safety glasses, heat-resistant gloves, steel-cap boots. Inspect each item for damage.',
+      tip: 'Gloves must be rated for 260°C minimum within 1 m of the furnace body.',
+      tools: ['🦺 Hi-vis vest', '🥽 Safety glasses', '🧤 Heat gloves', '👢 Steel-cap boots'], hazards: ['H-01 Residual heat'],
+      illo: 'A worker donning high-visibility industrial PPE: orange vest, clear safety glasses, purple heat-resistant gauntlets, steel-cap boots. Studio lighting.' },
+    { id: '1.3', title: 'Notify control room on Channel 4',
+      chips: ['radio confirm'], evidence: ['confirmation'],
+      body: 'Over Channel 4, state: "Line 4 E-stop test commencing. Clearing exclusion zone." Wait for acknowledgement from shift supervisor before proceeding.',
+      tools: ['📻 2-way radio'],
+      illo: 'A hand holding a yellow industrial 2-way radio with Channel 4 display visible.' },
+  ]},
+  { id: 2, title: 'Pre-checks', icon: '🔎', steps: [
+    { id: '2.1', title: 'Confirm furnace surface <80°C',
+      chips: ['measurement'], evidence: ['measurement'], measurement: { label: 'FURNACE SURFACE TEMP', unit: '°C', target: '< 80' },
+      body: 'Using the contactless IR thermometer, measure the enclosure face at three points: top, centre, bottom. Record the highest reading.',
+      warn: 'If any reading ≥80°C, STOP and allow 15 min additional cooldown before retrying.',
+      tools: ['🌡 IR thermometer'], hazards: ['H-01 Residual heat'],
+      illo: 'An IR thermometer pointed at a dark industrial furnace enclosure with a temperature readout of 47°C.' },
+    { id: '2.2', title: 'Inspect E-stop 1 — physical integrity',
+      chips: ['photo'], evidence: ['photo'],
+      body: 'Visually inspect E-stop 1 button for cracks, discolouration, or missing safety guard. Button should protrude 18±2 mm.',
+      tip: 'Press very lightly to confirm spring tension is present without actuating.',
+      tools: ['📋 Tablet camera'],
+      illo: 'Close-up of a large red mushroom emergency-stop button with yellow warning collar on an industrial panel.' },
+    { id: '2.3', title: 'Inspect E-stop 2 — physical integrity',
+      chips: ['photo'], evidence: ['photo'],
+      body: 'Repeat the physical inspection on E-stop 2 (far end of line). Same acceptance criteria as 2.2.',
+      tools: ['📋 Tablet camera'] },
+    { id: '2.4', title: 'Ping SCADA — verify comms',
+      chips: ['radio confirm'], evidence: ['confirmation'],
+      body: 'Request the control room to confirm they see Line 4 heartbeat on the SCADA overview (refresh rate < 2 s).',
+      tools: ['📻 2-way radio'] },
+  ]},
+  { id: 3, title: 'Execute', icon: '⚡', steps: [
+    { id: '3.1', title: 'Activate E-stop 1',
+      chips: ['1 action'], evidence: ['photo'],
+      body: 'Using a full palm press, activate E-stop 1 and hold for at least 2 seconds. Timer starts automatically on actuation.',
+      warn: 'Remain outside the 2-m exclusion cone during actuation. Falling sheets may dislodge.',
+      tools: ['⏱ Response timer'], hazards: ['H-03 Falling glass', 'H-05 Alarm horn'] },
+    { id: '3.2', title: 'Record conveyor halt response time',
+      chips: ['measurement'], evidence: ['measurement'], measurement: { label: 'E-STOP 1 RESPONSE', unit: 'ms', target: '< 500' },
+      body: 'Read the response time from the high-speed timer. This should auto-capture if paired with SCADA, but enter manually if not.',
+      tip: 'The timer bridges the E-stop circuit — response is measured from button press to conveyor encoder stop.',
+      tools: ['⏱ Response timer'] },
+    { id: '3.3', title: 'Decision — within spec?',
+      chips: ['decision'], decision: { yes: 'Continue to 3.4', no: 'Escalate (H-02) — stop here' },
+      body: 'If E-stop 1 response was within 500 ms: proceed to test E-stop 2. If over 500 ms: stop, lock out line, and page Maintenance Tier 2 immediately.',
+      warn: 'An out-of-spec result means the safety system is not protecting workers. Do not bypass or retry.' },
+    { id: '3.4', title: 'Activate E-stop 2',
+      chips: ['1 action'], evidence: ['photo', 'measurement'], measurement: { label: 'E-STOP 2 RESPONSE', unit: 'ms', target: '< 500' },
+      body: 'Repeat the E-stop 1 actuation procedure on E-stop 2. Record response time in the same manner.',
+      tools: ['⏱ Response timer'] },
+    { id: '3.5', title: 'Verify all systems off',
+      chips: ['3 checks'], evidence: ['photo', 'checklist'],
+      body: 'Confirm: conveyor stationary, burner ignition indicator OFF, SCADA fault panel shows both E-stop events logged.',
+      tools: ['📻 Radio', '📋 Tablet'] },
+  ]},
+  { id: 4, title: 'Verify', icon: '✓', steps: [
+    { id: '4.1', title: 'Reset system per manufacturer sequence',
+      chips: ['3 actions'], evidence: ['checklist'],
+      body: 'Perform reset in order: [1] rotate E-stop 1 clockwise to release, [2] rotate E-stop 2 clockwise to release, [3] press green CONFIRM on main HMI.',
+      warn: 'Never release E-stops while personnel are inside the exclusion zone.' },
+    { id: '4.2', title: 'Confirm indicator lamps return to GREEN',
+      chips: ['photo'], evidence: ['photo'],
+      body: 'All five status lamps on main HMI must return to solid GREEN within 5 seconds of reset. Take photo for the completion record.' },
+    { id: '4.3', title: 'Log both cycle times to SCADA',
+      chips: ['2 values'], evidence: ['values'],
+      body: 'Enter both recorded response times into the SCADA maintenance log under "Quarterly E-stop verification · Line 4". Include operator name and tablet ID.' },
+  ]},
+  { id: 5, title: 'Sign-off', icon: '📝', steps: [
+    { id: '5.1', title: 'Operator sign-off',
+      chips: ['signature'], evidence: ['signature'],
+      body: 'Attest that all measurements are accurate, all evidence captured, and no abnormal conditions were observed during the procedure.' },
+    { id: '5.2', title: 'Submit to supervisor',
+      chips: ['hand-off'],
+      body: 'Hand the completion record to shift supervisor on Channel 4 for counter-sign. Record is auto-synced when device reconnects.' },
+  ]},
+];
+
+const root = document.getElementById('steps-root');
+// Hold live references so mobile step-view mutations reflect in the desktop list.
+let flat = [];
+SECTIONS.forEach(sec => sec.steps.forEach(st => { st.sectionId = sec.id; flat.push(st); }));
+
+function renderSteps() {
+  root.innerHTML = SECTIONS.map(sec => {
+    const total = sec.steps.length;
+    const done = sec.steps.filter(s => s.done).length;
+    const pct = total ? (done/total)*100 : 0;
+    return `
+      <details ${done < total ? 'open' : ''} class="border border-zinc-200 rounded-sm overflow-hidden">
+        <summary class="cursor-pointer flex items-center justify-between bg-zinc-50 p-3 hover:bg-zinc-100">
+          <div class="flex items-center gap-3">
+            <span class="mono text-xs text-zinc-500 w-6">${sec.id}.</span>
+            <span>${sec.icon}</span>
+            <span class="font-bold text-sm">${sec.title}</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="mono text-xs text-zinc-500">${done}/${total}</span>
+            <svg class="prog-ring" width="20" height="20" viewBox="0 0 36 36">
+              <circle cx="18" cy="18" r="14" fill="none" stroke="#e4e4e7" stroke-width="3"/>
+              <circle cx="18" cy="18" r="14" fill="none" stroke="${done===total ? '#10b981' : '#fbbf24'}" stroke-width="3"
+                stroke-dasharray="${(pct/100)*87.96} 87.96" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </summary>
+        <ul>
+          ${sec.steps.map(s => `
+            <li class="flex items-start gap-3 p-3 border-t border-zinc-100 hover:bg-zinc-50">
+              <input type="checkbox" data-step="${s.id}" ${s.done?'checked':''} class="mt-1 w-4 h-4 accent-yellow-500 shrink-0"/>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-0.5">
+                  <span class="mono text-[11px] text-zinc-500 w-10">${s.id}</span>
+                  <span class="font-medium text-sm ${s.done?'line-through text-zinc-400':''}">${s.title}</span>
+                </div>
+                <div class="pl-12 flex flex-wrap gap-1 mt-1">
+                  ${s.chips.map(c => `<span class="chip text-zinc-600">${c}</span>`).join('')}
+                  <button class="chip text-blue-700 border-blue-300 hover:bg-blue-50">→ on flow</button>
+                  <button class="chip text-violet-700 border-violet-300 hover:bg-violet-50">→ on 3D</button>
+                </div>
+              </div>
+            </li>
+          `).join('')}
+        </ul>
+      </details>
+    `;
+  }).join('');
+
+  // attach check handlers
+  root.querySelectorAll('input[data-step]').forEach(cb => {
+    cb.addEventListener('change', (e) => {
+      const id = e.target.dataset.step;
+      const step = flat.find(f => f.id === id);
+      step.done = e.target.checked;
+      // mirror into SECTIONS
+      SECTIONS.forEach(sec => sec.steps.forEach(st => { if (st.id === id) st.done = e.target.checked; }));
+      renderSteps();
+      updateGlobalProgress();
+    });
+  });
+}
+
+function updateGlobalProgress() {
+  const total = flat.length;
+  const done = flat.filter(f => f.done).length;
+  document.getElementById('wt-progress-text').textContent = `${done}/${total} DONE`;
+  document.getElementById('wt-progress-chip').textContent = `${done}/${total}`;
+  document.getElementById('submit-btn').disabled = done !== total;
+  const mp = document.getElementById('mobile-walk-progress');
+  if (mp) mp.textContent = `${done} OF ${total}`;
+}
+
+// ------- Voice input -------
+// Parse spoken text into a number. Handles digits ("480"), word forms ("four hundred eighty"),
+// and decimals ("twelve point four", "seventy two point five").
+function parseSpokenNumber(text) {
+  const clean = (text || '').toLowerCase().trim();
+  const digitMatch = clean.replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
+  if (digitMatch) return parseFloat(digitMatch[0]);
+  const nums = {
+    zero:0, oh:0, one:1, two:2, three:3, four:4, five:5, six:6, seven:7, eight:8, nine:9,
+    ten:10, eleven:11, twelve:12, thirteen:13, fourteen:14, fifteen:15, sixteen:16,
+    seventeen:17, eighteen:18, nineteen:19, twenty:20, thirty:30, forty:40, fifty:50,
+    sixty:60, seventy:70, eighty:80, ninety:90
+  };
+  const scales = { hundred:100, thousand:1000 };
+  const words = clean.split(/[\s-]+/);
+  let intResult = 0, intCurrent = 0;
+  let decimalDigits = [];
+  let mode = 'int';
+  for (const w of words) {
+    if (w === 'point' || w === 'dot') { mode = 'dec'; continue; }
+    if (mode === 'int') {
+      if (w in nums) intCurrent += nums[w];
+      else if (w in scales) {
+        if (scales[w] === 100) intCurrent = (intCurrent || 1) * 100;
+        else { intResult += (intCurrent || 1) * scales[w]; intCurrent = 0; }
+      }
+    } else if (w in nums && nums[w] >= 0 && nums[w] <= 9) {
+      decimalDigits.push(nums[w]);
+    }
+  }
+  const whole = intResult + intCurrent;
+  if (decimalDigits.length) return parseFloat(whole + '.' + decimalDigits.join(''));
+  return whole || null;
+}
+
+// Use real Web Speech API if available AND opted in; otherwise simulate.
+// Sketch default: simulate, so demo is always reproducible without mic permission.
+// Flip window.USE_REAL_VOICE = true in devtools to try the real API.
+function startRecognition(onResult, onEnd, kind) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SR && window.USE_REAL_VOICE) {
+    const r = new SR();
+    r.lang = 'en-US'; r.interimResults = true; r.continuous = false;
+    let finalText = '';
+    r.onresult = (e) => {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) finalText += t; else interim += t;
+      }
+      onResult(finalText || interim, !!finalText);
+    };
+    r.onend = () => onEnd(finalText);
+    r.onerror = () => onEnd('');
+    try { r.start(); } catch(e) { onEnd(''); }
+    return { stop: () => { try { r.stop(); } catch(e){} } };
+  }
+  // Simulate: type out a plausible transcription word-by-word then fire onEnd
+  const numberDemos = ['four hundred eighty', 'four hundred ninety two', 'twelve point four', 'seventy eight'];
+  const proseDemos = ['conveyor fully stopped no sheets dislodged', 'all indicators returned to green within two seconds', 'e stop button protrudes twenty millimetres no cracks visible'];
+  const pool = kind === 'number' ? numberDemos : proseDemos;
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  const words = pick.split(' ');
+  let i = 0;
+  const iv = setInterval(() => {
+    i++;
+    onResult(words.slice(0, i).join(' '), false);
+    if (i >= words.length) {
+      clearInterval(iv);
+      setTimeout(() => onEnd(pick), 500);
+    }
+  }, 300);
+  return { stop: () => { clearInterval(iv); onEnd(''); } };
+}
+
+let activeRec = null;
+function recordVoice(inputId, asNumber, micId) {
+  const input = document.getElementById(inputId);
+  const micBtn = micId ? document.getElementById(micId) : null;
+  const stepId = inputId.replace('measure-input-', '');
+  const transcriptEl = document.getElementById('voice-transcript-' + stepId);
+  const confirmEl = document.getElementById('voice-confirm-' + stepId);
+  if (activeRec) { activeRec.stop(); activeRec = null; micBtn && micBtn.classList.remove('listening'); transcriptEl && transcriptEl.classList.remove('show'); return; }
+  if (confirmEl) confirmEl.classList.remove('show');
+  if (transcriptEl) { transcriptEl.classList.add('show'); transcriptEl.querySelector('.t').textContent = 'Listening…'; }
+  if (micBtn) micBtn.classList.add('listening');
+  activeRec = startRecognition(
+    (text, isFinal) => {
+      if (transcriptEl) transcriptEl.querySelector('.t').textContent = text || 'Listening…';
+    },
+    (finalText) => {
+      activeRec = null;
+      if (micBtn) micBtn.classList.remove('listening');
+      if (transcriptEl) transcriptEl.classList.remove('show');
+      if (!finalText) return;
+      if (asNumber) {
+        const n = parseSpokenNumber(finalText);
+        if (n !== null && input) input.value = n;
+        if (confirmEl) confirmEl.classList.add('show');
+      } else if (input) {
+        input.value = finalText;
+      }
+    },
+    asNumber ? 'number' : 'prose'
+  );
+}
+
+function recordVoiceNote(targetId, btn) {
+  const target = document.getElementById(targetId);
+  if (activeRec) { activeRec.stop(); activeRec = null; btn.classList.remove('listening'); return; }
+  btn.classList.add('listening');
+  if (target) { target.style.display = 'block'; target.textContent = '🎤 Listening…'; }
+  activeRec = startRecognition(
+    (text) => { if (target) target.textContent = '🎤 ' + (text || 'Listening…'); },
+    (finalText) => {
+      activeRec = null;
+      btn.classList.remove('listening');
+      if (finalText) {
+        btn.classList.add('captured');
+        if (target) target.textContent = '✓ ' + finalText;
+      } else if (target) {
+        target.style.display = 'none';
+      }
+    },
+    'prose'
+  );
+}
+
+// ------- Mobile immersive step view -------
+let mobileStepIdx = 0;
+
+function getStepMeta(idx) {
+  const s = flat[idx];
+  if (!s) return null;
+  const sec = SECTIONS.find(x => x.id === s.sectionId);
+  const secStepIdx = sec.steps.findIndex(x => x.id === s.id);
+  return { step: s, sec, secStepIdx, secTotal: sec.steps.length };
+}
+
+function renderMobileStep() {
+  const host = document.getElementById('mobile-step-view');
+  if (!host) return;
+  const meta = getStepMeta(mobileStepIdx);
+  if (!meta) return;
+  const { step, sec, secStepIdx, secTotal } = meta;
+
+  const segDots = flat.map((s, i) => {
+    const cls = s.done ? 'done' : (i === mobileStepIdx ? 'current' : '');
+    return `<div class="seg-dot ${cls}"></div>`;
+  }).join('');
+
+  const warnBlock = step.warn ? `
+    <div class="warn">
+      <span>⚠</span>
+      <span>${step.warn}</span>
+    </div>` : '';
+
+  const tipBlock = step.tip ? `
+    <div class="tip">
+      <span>ℹ</span>
+      <span>${step.tip}</span>
+    </div>` : '';
+
+  const illoBlock = step.illo ? `
+    <div class="illo">
+      <svg viewBox="0 0 400 300" class="w-full h-full">
+        <rect width="400" height="300" fill="#e4e4e7"/>
+        <g transform="translate(200,150)" fill="none" stroke="#52525b" stroke-width="1.5">
+          <circle r="60" stroke-dasharray="4 4" opacity="0.4"/>
+          <text text-anchor="middle" y="-75" font-family="JetBrains Mono" font-size="11" fill="#52525b" letter-spacing="1">AI-GENERATED ILLUSTRATION</text>
+          <text text-anchor="middle" y="6" font-family="Inter" font-size="13" fill="#71717a">${step.id}</text>
+        </g>
+      </svg>
+      <div class="watermark">AI · tap to regenerate</div>
+    </div>` : '';
+
+  const measurementBlock = step.measurement ? `
+    <div class="measurement-box">
+      <label>${step.measurement.label}</label>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <input type="number" inputmode="decimal" placeholder="0" id="measure-input-${step.id}" style="flex:1;">
+        <span style="font-family:'JetBrains Mono'; font-size:14px; color:#9a3412;">${step.measurement.unit}</span>
+        <button class="mic-btn" id="mic-${step.id}" aria-label="Speak value" onclick="recordVoice('measure-input-${step.id}', true, 'mic-${step.id}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zM19 10v1a7 7 0 0 1-14 0v-1M12 18v4M8 22h8"/></svg>
+        </button>
+      </div>
+      <div id="voice-transcript-${step.id}" class="voice-transcript"><span class="waves"><span></span><span></span><span></span><span></span><span></span></span><span class="t">Listening…</span></div>
+      <div id="voice-confirm-${step.id}" class="voice-confirm-row">✓ CAPTURED VIA VOICE · <button onclick="document.getElementById('mic-${step.id}').click()">retry</button></div>
+      <div class="target">TARGET ${step.measurement.target} ${step.measurement.unit}</div>
+    </div>` : '';
+
+  const decisionBlock = step.decision ? `
+    <div class="section-title" style="border-top:none; padding-top:0; margin-top:14px;">DECISION</div>
+    <div class="decision-row">
+      <button class="decision-btn yes" onclick="advanceStep(true)">✓ YES<br><span style="font-size:10px; opacity:0.7;">${step.decision.yes}</span></button>
+      <button class="decision-btn no" onclick="alert('Procedure would escalate here (sketch)')">✕ NO<br><span style="font-size:10px; opacity:0.7;">${step.decision.no}</span></button>
+    </div>` : '';
+
+  // Every step gets a voice-note option; merge with declared evidence
+  const evidenceList = step.decision ? [] : [...(step.evidence || []), 'voice'];
+  const evidenceBlock = evidenceList.length ? `
+    <div class="section-title">CAPTURE EVIDENCE</div>
+    <div class="evidence-row">
+      ${evidenceList.map((kind, i) => {
+        const labels = {
+          photo: { icon: '📷', label: 'PHOTO' },
+          signature: { icon: '✍', label: 'SIGN' },
+          measurement: { icon: '⏱', label: 'VALUE' },
+          confirmation: { icon: '✓', label: 'CONFIRM' },
+          checklist: { icon: '☑', label: 'CHECKLIST' },
+          values: { icon: '⏱', label: 'VALUES' },
+          voice: { icon: '🎤', label: 'VOICE NOTE' }
+        };
+        const L = labels[kind] || { icon: '●', label: kind.toUpperCase() };
+        const onclick = kind === 'voice' ? ` onclick="recordVoiceNote('note-${step.id}-${i}', this)"` : '';
+        const extra = kind === 'voice' ? `<div id="note-${step.id}-${i}" class="voice-note-text" style="display:none; grid-column: 1 / -1; margin-top:8px; padding:10px; background:#ecfdf5; border:1px solid #86efac; border-radius:4px; font-family:'Inter',system-ui,sans-serif; font-size:13px; color:#065f46;"></div>` : '';
+        return `<button class="evidence-btn"${onclick}><span style="font-size:22px">${L.icon}</span><span>${L.label}</span></button>${extra}`;
+      }).join('')}
+    </div>` : '';
+
+  const toolsBlock = (step.tools && step.tools.length) ? `
+    <div class="section-title">TOOLS FOR THIS STEP</div>
+    <div class="chip-row">${step.tools.map(t => `<span class="chip-md">${t}</span>`).join('')}</div>` : '';
+
+  const hazardsBlock = (step.hazards && step.hazards.length) ? `
+    <div class="section-title">HAZARDS TO BE AWARE OF</div>
+    <div class="chip-row">${step.hazards.map(h => `<span class="chip-md" style="color:#b91c1c; border-color:#fecaca; background:#fef2f2;">⚠ ${h}</span>`).join('')}</div>` : '';
+
+  const nextLabel = step.done ? '↻ UNDO' : (mobileStepIdx === flat.length - 1 ? 'SUBMIT ✓' : 'DONE · NEXT →');
+  const nextClass = step.done ? 'next done' : 'next';
+
+  host.innerHTML = `
+    <div class="step-card">
+      <div class="step-head">
+        <div class="crumb">
+          <button onclick="openStepJumpSheet()" style="display:flex; align-items:center; gap:6px; background:transparent; border:0; color:#fff; font-family:'JetBrains Mono'; cursor:pointer;">
+            ${sec.icon} <span style="font-weight:700;">${sec.title.toUpperCase()}</span>
+            <span style="opacity:0.5;">· ${secStepIdx + 1} of ${secTotal}</span>
+            <span style="opacity:0.5;">▾</span>
+          </button>
+          <span style="margin-left:auto; color:#fbbf24; font-weight:700;">${mobileStepIdx + 1}/${flat.length}</span>
+        </div>
+        <div class="bar-row">${segDots}</div>
+      </div>
+      <div class="step-body">
+        <div class="num">STEP ${step.id}</div>
+        <h1>${step.title}</h1>
+        ${illoBlock}
+        <div class="body-text">${step.body || ''}</div>
+        ${warnBlock}
+        ${tipBlock}
+        ${measurementBlock}
+        ${decisionBlock}
+        ${evidenceBlock}
+        ${toolsBlock}
+        ${hazardsBlock}
+      </div>
+      <div class="step-nav">
+        <button class="btn prev" onclick="backStep()" ${mobileStepIdx === 0 ? 'disabled' : ''}>← PREV</button>
+        <button class="btn ${nextClass}" onclick="advanceStep()">${nextLabel}</button>
+      </div>
+    </div>
+    <!-- jump-to-section sheet -->
+    <div id="step-jump-sheet" onclick="if(event.target.id==='step-jump-sheet') closeStepJumpSheet()">
+      <div>
+        <div style="font-family:'JetBrains Mono'; font-size:11px; letter-spacing:0.1em; color:#71717a; margin-bottom:8px;">JUMP TO SECTION</div>
+        ${SECTIONS.map(s => {
+          const d = s.steps.filter(st => st.done).length;
+          return `<button onclick="jumpToSection(${s.id})" style="display:flex; align-items:center; gap:12px; width:100%; padding:14px 8px; border-bottom:1px solid #f4f4f5; background:transparent; border-left:0; border-right:0; border-top:0;">
+            <span style="font-family:'JetBrains Mono'; color:#71717a; font-size:12px; width:20px;">${s.id}.</span>
+            <span>${s.icon}</span>
+            <span style="font-weight:700; flex:1; text-align:left;">${s.title}</span>
+            <span style="font-family:'JetBrains Mono'; font-size:11px; color:${d===s.steps.length?'#10b981':'#71717a'};">${d}/${s.steps.length}</span>
+          </button>`;
+        }).join('')}
+        <button onclick="closeStepJumpSheet()" style="width:100%; padding:14px; margin-top:8px; background:#09090b; color:#fff; font-family:'JetBrains Mono'; font-size:12px; letter-spacing:0.1em; border:0;">CLOSE</button>
+      </div>
+    </div>
+  `;
+}
+
+function advanceStep(fromDecision) {
+  const meta = getStepMeta(mobileStepIdx);
+  if (!meta) return;
+  const step = meta.step;
+  if (fromDecision === true || !step.done) {
+    step.done = true;
+    updateGlobalProgress();
+    renderSteps();
+    if (mobileStepIdx < flat.length - 1) mobileStepIdx++;
+    renderMobileStep();
+  } else {
+    step.done = false;
+    updateGlobalProgress();
+    renderSteps();
+    renderMobileStep();
+  }
+}
+
+function backStep() {
+  if (mobileStepIdx > 0) { mobileStepIdx--; renderMobileStep(); }
+}
+
+function jumpToSection(secId) {
+  const sec = SECTIONS.find(s => s.id === secId);
+  const firstUndone = sec.steps.find(s => !s.done) || sec.steps[0];
+  mobileStepIdx = flat.findIndex(f => f.id === firstUndone.id);
+  closeStepJumpSheet();
+  renderMobileStep();
+}
+
+function openStepJumpSheet() { const el = document.getElementById('step-jump-sheet'); if (el) el.classList.add('open'); }
+function closeStepJumpSheet() { const el = document.getElementById('step-jump-sheet'); if (el) el.classList.remove('open'); }
+
+// Swipe gestures on step view
+let touchStartX = null;
+document.addEventListener('touchstart', (e) => {
+  if (document.body.dataset.view === 'mobile' && document.body.dataset.activeTab === 'walkthrough') {
+    touchStartX = e.touches[0].clientX;
+  }
+});
+document.addEventListener('touchend', (e) => {
+  if (touchStartX === null) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 60) {
+    if (dx < 0) advanceStep(); else backStep();
+  }
+  touchStartX = null;
+});
+
+renderSteps();
+renderMobileStep();
+updateGlobalProgress();
+</script>
+</body>
+</html>
