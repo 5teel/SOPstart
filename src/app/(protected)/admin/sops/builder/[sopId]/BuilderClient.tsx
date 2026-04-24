@@ -15,6 +15,7 @@ import { useBuilderAutosave } from '@/hooks/useBuilderAutosave'
 import { useDraftLayoutSync } from '@/hooks/useDraftLayoutSync'
 import { useNetworkStore } from '@/stores/network'
 import { db } from '@/lib/offline/db'
+import { SectionListSidebar } from './SectionListSidebar'
 
 const Puck = dynamic(
   () => import('@puckeditor/core').then((m) => m.Puck),
@@ -183,28 +184,13 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
         </div>
       </header>
       <div className="flex flex-1 min-h-0">
-        {/* Left sidebar — section list (Plan 04 wires drag handles) */}
-        <nav
-          aria-label="Sections"
-          className="w-64 shrink-0 border-r border-steel-700 overflow-y-auto"
-        >
-          <ul>
-            {sections.map((s) => (
-              <li key={s.id}>
-                <button
-                  onClick={() => setActiveSectionId(s.id)}
-                  className={`w-full text-left px-4 py-3 text-sm ${
-                    s.id === activeSectionId
-                      ? 'bg-steel-800 text-brand-yellow'
-                      : 'text-steel-300 hover:bg-steel-800'
-                  }`}
-                >
-                  {s.title}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        {/* Left sidebar — section list with drag-reorder (Plan 04) */}
+        <SectionListSidebar
+          sections={sections}
+          activeSectionId={activeSectionId}
+          onSelect={setActiveSectionId}
+          sopId={sopId}
+        />
         {/* Canvas — remount Puck per active section (Research Open Question 2) */}
         <main className="flex-1 min-w-0 overflow-auto">
           {activeSection ? (

@@ -132,12 +132,90 @@ test.describe('Layout editor (SB-LAYOUT)', () => {
     expect(grepOutput.trim()).toBe('')
   })
 
-  test.fixme(
-    'SB-LAYOUT-04 layout persists as JSONB on sop_sections.layout_data with layout_version pin',
-    async ({ page: _page }) => {
-      void _page
-    }
-  )
+  test('SB-LAYOUT-04 layout persists as JSONB on sop_sections.layout_data with layout_version pin', async () => {
+    // Plan 04 delivers the autosave + flush pipeline that writes Puck's Data
+    // payload into sop_sections.layout_data with layout_version === 1. Live
+    // DOM autosave tests require a running dev server + DB fixture harness
+    // (not present in this worktree). Following Plan 01/02 precedent, this
+    // stub asserts the structural pieces:
+    //   - Dexie v4 schema declares the draftLayouts table
+    //   - DraftLayout interface exports the contract fields
+    //   - useBuilderAutosave writes through to db.draftLayouts.put with the
+    //     dirty sentinel + layout_version pinned to CURRENT_LAYOUT_VERSION
+    //   - sync-engine.flushDraftLayouts + actions.updateSectionLayout close the loop
+    //   - BuilderClient wires both hooks into <Puck onChange> + SAVED pill
+    const fs = await import('node:fs/promises')
+
+    // 1. Dexie v4 + draftLayouts shape.
+    const db = await fs.readFile('src/lib/offline/db.ts', 'utf8')
+    expect(db).toContain('db.version(4).stores')
+    expect(db).toContain(
+      "draftLayouts: 'section_id, sop_id, syncState, _cachedAt'"
+    )
+    expect(db).toContain('export interface DraftLayout')
+    expect(db).toMatch(/layout_data:\s*unknown/)
+    expect(db).toMatch(/layout_version:\s*number/)
+    expect(db).toMatch(/syncState:\s*'dirty'\s*\|\s*'synced'/)
+
+    // 2. useBuilderAutosave writes through to Dexie with the dirty sentinel
+    //    and the current layout_version pin.
+    const autosave = await fs.readFile(
+      'src/hooks/useBuilderAutosave.ts',
+      'utf8'
+    )
+    expect(autosave).toContain('db.draftLayouts.put')
+    expect(autosave).toContain("syncState: 'dirty'")
+    expect(autosave).toContain('CURRENT_LAYOUT_VERSION')
+    expect(autosave).toContain('setTimeout')
+    expect(autosave).toContain('DEBOUNCE_MS')
+    expect(autosave).toMatch(/DEBOUNCE_MS\s*=\s*750/)
+
+    // 3. useDraftLayoutSync debounces at 3s and drives flushDraftLayouts.
+    const sync = await fs.readFile('src/hooks/useDraftLayoutSync.ts', 'utf8')
+    expect(sync).toContain('flushDraftLayouts')
+    expect(sync).toMatch(/SYNC_DEBOUNCE_MS\s*=\s*3_000/)
+    expect(sync).toContain('visibilitychange')
+
+    // 4. sync-engine batch-flush with LWW sentinel + per-row errors.
+    const syncEngine = await fs.readFile(
+      'src/lib/offline/sync-engine.ts',
+      'utf8'
+    )
+    expect(syncEngine).toContain('export async function flushDraftLayouts')
+    expect(syncEngine).toContain("equals('dirty')")
+    expect(syncEngine).toContain('updateSectionLayout')
+    expect(syncEngine).toContain("'server_newer'")
+    expect(syncEngine).toContain('overwrittenByServer')
+
+    // 5. updateSectionLayout server action enforces 128KB cap + LWW check +
+    //    admin-role guard, and targets the Phase 12 columns.
+    const actions = await fs.readFile('src/actions/sections.ts', 'utf8')
+    expect(actions).toContain('export async function updateSectionLayout')
+    expect(actions).toContain('MAX_LAYOUT_BYTES')
+    expect(actions).toMatch(/128\s*\*\s*1024/)
+    expect(actions).toContain('Buffer.byteLength')
+    expect(actions).toContain("'server_newer'")
+    expect(actions).toContain('layout_data')
+    expect(actions).toContain('layout_version')
+    expect(actions).toContain("['admin', 'safety_manager']")
+
+    // 6. BuilderClient wires useBuilderAutosave into <Puck onChange> and
+    //    useDraftLayoutSync at the top of the component.
+    const builder = await fs.readFile(
+      'src/app/(protected)/admin/sops/builder/[sopId]/BuilderClient.tsx',
+      'utf8'
+    )
+    expect(builder).toContain('useBuilderAutosave')
+    expect(builder).toContain('useDraftLayoutSync')
+    expect(builder).toContain('onChange={handleChange}')
+    // SAVED pill reads from sync state + online flag + lastSavedAt.
+    expect(builder).toContain('OFFLINE · QUEUED')
+    expect(builder).toContain('SAVING')
+    expect(builder).toMatch(/SAVED.*s AGO/)
+    // D-07 cross-admin overwrite toast is wired from lastSyncResult.
+    expect(builder).toContain('overwrittenByServer')
+    expect(builder).toContain('Updated by another admin')
+  })
 
   test.fixme(
     'SB-LAYOUT-05 admin can add a DiagramHotspotBlock, drop a machine diagram image, and place numbered hotspot callouts at freeform x/y positions',
