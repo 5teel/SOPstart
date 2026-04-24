@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNetworkStore } from '@/stores/network'
 import { syncAssignedSops } from '@/lib/offline/sync-engine'
 import { createClient } from '@/lib/supabase/client'
+import { purgeDraftLayoutsOnPublish } from '@/lib/offline/draftLayouts-purge'
 
 const SYNC_DEBOUNCE_MS = 30_000 // 30 seconds
 
@@ -13,6 +14,7 @@ export function useSopSync() {
   const [lastSyncResult, setLastSyncResult] = useState<{
     synced: number
     errors: string[]
+    publishedTransitions?: string[]
   } | null>(null)
 
   async function triggerSync() {
@@ -25,6 +27,15 @@ export function useSopSync() {
       const supabase = createClient()
       const result = await syncAssignedSops(supabase)
       setLastSyncResult(result)
+
+      // D-08 purge-on-publish: when a cached SOP moves non-published -> published
+      // during this sync pass, delete any leftover draftLayouts rows for that SOP.
+      // The authoritative layout now lives in sopCache via the sync just performed.
+      if (result.publishedTransitions && result.publishedTransitions.length > 0) {
+        for (const sopId of result.publishedTransitions) {
+          await purgeDraftLayoutsOnPublish(sopId)
+        }
+      }
     } finally {
       setSyncing(false)
     }

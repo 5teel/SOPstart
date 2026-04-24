@@ -25,7 +25,7 @@ type SopWithNested = Sop & {
 
 export async function syncAssignedSops(
   supabase: AnySupabaseClient
-): Promise<{ synced: number; errors: string[] }> {
+): Promise<{ synced: number; errors: string[]; publishedTransitions: string[] }> {
   try {
     // 1. Fetch manifest of assigned SOPs for the current user
     const { data: assignments, error: assignError } = await supabase
@@ -33,15 +33,18 @@ export async function syncAssignedSops(
       .select('sop_id, sops(id, version, updated_at)')
 
     if (assignError) {
-      return { synced: 0, errors: [assignError.message] }
+      return { synced: 0, errors: [assignError.message], publishedTransitions: [] }
     }
 
     const manifest = (assignments as unknown as SopManifestEntry[] | null) ?? []
     const manifestSopIds = new Set(manifest.map((a) => a.sop_id))
 
-    // 2. Get cached versions from Dexie
+    // 2. Get cached versions from Dexie (also snapshot statuses for D-08
+    //    draft->published transition detection — used by useSopSync to fire
+    //    purgeDraftLayoutsOnPublish).
     const cached = await db.sops.toArray()
     const cachedVersionMap = new Map(cached.map((s) => [s.id, s.version]))
+    const cachedStatusMap = new Map(cached.map((s) => [s.id, s.status]))
 
     // 3. Compute stale IDs
     const staleIds = manifest
@@ -71,7 +74,7 @@ export async function syncAssignedSops(
           await db.images.where('sop_id').anyOf(orphanIds).delete()
         })
       }
-      return { synced: 0, errors: [] }
+      return { synced: 0, errors: [], publishedTransitions: [] }
     }
 
     // 5. Fetch full SOP content for stale IDs
@@ -81,10 +84,20 @@ export async function syncAssignedSops(
       .in('id', staleIds)
 
     if (sopError) {
-      return { synced: 0, errors: [sopError.message] }
+      return { synced: 0, errors: [sopError.message], publishedTransitions: [] }
     }
 
     const sops = (sopsData as SopWithNested[] | null) ?? []
+
+    // D-08 transition detection: which incoming SOPs moved
+    // non-published -> published during this sync pass?
+    const publishedTransitions: string[] = []
+    for (const incoming of sops) {
+      const prevStatus = cachedStatusMap.get(incoming.id)
+      if (prevStatus !== 'published' && incoming.status === 'published') {
+        publishedTransitions.push(incoming.id)
+      }
+    }
 
     // 6. Write to Dexie in a single transaction
     await db.transaction('rw', [db.sops, db.sections, db.steps, db.images], async () => {
@@ -127,10 +140,14 @@ export async function syncAssignedSops(
     // 8. Update syncMeta
     await db.syncMeta.put({ key: 'lastSync', value: new Date().toISOString() })
 
-    return { synced: staleIds.length, errors: [] }
+    return {
+      synced: staleIds.length,
+      errors: [],
+      publishedTransitions,
+    }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
-    return { synced: 0, errors: [message] }
+    return { synced: 0, errors: [message], publishedTransitions: [] }
   }
 }
 
