@@ -224,52 +224,43 @@ test.describe('Layout editor (SB-LAYOUT)', () => {
     }
   )
 
-  test('SB-LAYOUT-D01-preview persistent DESKTOP | MOBILE toggle clamps canvas to 430px phone frame', async () => {
-    // Plan 04 D-01: the admin builder top bar renders a persistent DESKTOP |
-    // MOBILE pill toggle. Clicking MOBILE sets body[data-view="mobile"] and
-    // the ported phone-frame CSS clamps the canvas to 430px. Live width-
-    // measurement tests require a running dev server + fixture harness (not
-    // present in this worktree). Structural assertion (Plan 01/02 precedent):
-    //   - PreviewToggle.tsx exists with both pills + data-view-btn attrs
-    //   - Toggle writes document.body.dataset.view on click
-    //   - builder-preview.css clamps .builder-canvas to 430px in mobile view
-    //   - BuilderClient mounts <PreviewToggle> + wraps canvas in #builder-device-wrap
+  test('SB-LAYOUT-D01-preview Puck native viewports clamp only the canvas, palette + fields stay full width', async () => {
+    // D-01 (revised 2026-04-24): Superseded the Plan-04 body[data-view] + CSS
+    // clamp approach — it squashed the whole Puck layout (including palette)
+    // to 430px, making block selection unusable. Replaced with Puck 0.21.2's
+    // native `viewports` prop which clamps only the preview canvas.
+    // Structural assertions:
+    //   - BuilderClient exports a BUILDER_VIEWPORTS constant with Desktop + Mobile
+    //   - BuilderClient passes `viewports={BUILDER_VIEWPORTS}` to <Puck>
+    //   - Obsolete PreviewToggle.tsx and builder-preview.css are removed
+    //   - BuilderClient no longer references #builder-device-wrap or body[data-view]
     //   - SB-LAYOUT-03 invariant preserved: zero JS-based viewport branching
-    //     in src/components/sop/blocks/ (no isMobile / useMediaQuery / UA-sniffing).
+    //     in src/components/sop/blocks/
     const fs = await import('node:fs/promises')
-
-    const previewToggle = await fs.readFile(
-      'src/app/(protected)/admin/sops/builder/[sopId]/PreviewToggle.tsx',
-      'utf8'
-    )
-    expect(previewToggle).toContain('data-view-btn="desktop"')
-    expect(previewToggle).toContain('data-view-btn="mobile"')
-    expect(previewToggle).toContain('aria-pressed')
-    expect(previewToggle).toContain("document.body.dataset.view = view")
-
-    const css = await fs.readFile(
-      'src/app/(protected)/admin/sops/builder/[sopId]/builder-preview.css',
-      'utf8'
-    )
-    expect(css).toContain('#builder-device-wrap')
-    expect(css).toContain('body[data-view="mobile"]')
-    expect(css).toContain('430px')
-    // Phone notch + home indicator (port from sketch commit 64f1bec)
-    expect(css).toContain('::before')
-    expect(css).toContain('::after')
 
     const builder = await fs.readFile(
       'src/app/(protected)/admin/sops/builder/[sopId]/BuilderClient.tsx',
       'utf8'
     )
-    expect(builder).toContain('PreviewToggle')
-    expect(builder).toContain("import './builder-preview.css'")
-    expect(builder).toContain('id="builder-device-wrap"')
-    expect(builder).toContain('builder-canvas')
+    expect(builder).toContain('BUILDER_VIEWPORTS')
+    expect(builder).toContain("label: 'Desktop'")
+    expect(builder).toContain("label: 'Mobile'")
+    expect(builder).toMatch(/width:\s*430/)
+    expect(builder).toContain('viewports={BUILDER_VIEWPORTS}')
+    // Regression guard: old approach must stay gone
+    expect(builder).not.toContain('PreviewToggle')
+    expect(builder).not.toContain('builder-device-wrap')
+    expect(builder).not.toContain('builder-preview.css')
+
+    // Obsolete files must not reappear
+    await expect(
+      fs.access('src/app/(protected)/admin/sops/builder/[sopId]/PreviewToggle.tsx')
+    ).rejects.toThrow()
+    await expect(
+      fs.access('src/app/(protected)/admin/sops/builder/[sopId]/builder-preview.css')
+    ).rejects.toThrow()
 
     // SB-LAYOUT-03 invariant: zero JS-based viewport branching in blocks/.
-    // Cross-check with the shell grep the SPEC references so CI fails loud
-    // if the preview toggle regresses this rule.
     let grepOutput = ''
     try {
       grepOutput = execSync(

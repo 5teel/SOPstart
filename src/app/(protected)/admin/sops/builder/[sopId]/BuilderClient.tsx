@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import type { Data } from '@puckeditor/core'
+import type { Data, Viewports } from '@puckeditor/core'
 import type { SopWithSections } from '@/types/sop'
 import {
   puckConfig,
@@ -16,8 +16,16 @@ import { useDraftLayoutSync } from '@/hooks/useDraftLayoutSync'
 import { useNetworkStore } from '@/stores/network'
 import { db } from '@/lib/offline/db'
 import { SectionListSidebar } from './SectionListSidebar'
-import { PreviewToggle } from './PreviewToggle'
-import './builder-preview.css'
+
+// D-01 (revised 2026-04-24): Use Puck's native viewports prop. It clamps
+// only the preview canvas, leaving the palette + fields sidebars at full
+// width so the admin can still drag blocks while inspecting the mobile
+// layout. The previous body-attr CSS clamp squashed the entire Puck layout.
+const BUILDER_VIEWPORTS: Viewports = [
+  { width: '100%', height: 'auto', label: 'Desktop', icon: 'Monitor' },
+  // 430px ≈ iPhone 14/15 Pro Max; matches the worker walkthrough target.
+  { width: 430, height: 'auto', label: 'Mobile', icon: 'Smartphone' },
+]
 
 const Puck = dynamic(
   () => import('@puckeditor/core').then((m) => m.Puck),
@@ -157,7 +165,6 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
           </h1>
         </div>
         <div className="flex items-center gap-3">
-          <PreviewToggle />
           {layoutErrorToast && (
             <div
               role="alert"
@@ -194,26 +201,23 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
           onSelect={setActiveSectionId}
           sopId={sopId}
         />
-        {/* Canvas — wrapped in #builder-device-wrap for D-01 phone-frame preview.
+        {/* Canvas — Puck owns the viewport clamp via BUILDER_VIEWPORTS.
             Puck remounts per active section (Research Open Question 2). */}
         <main className="flex-1 min-w-0 overflow-auto">
-          <div id="builder-device-wrap">
-            <div className="builder-canvas overflow-auto">
-              {activeSection ? (
-                <Puck
-                  key={activeSection.id}
-                  config={puckConfig}
-                  overrides={puckOverrides}
-                  data={sanitizedInitial}
-                  onChange={handleChange}
-                />
-              ) : (
-                <div className="p-8 text-steel-400">
-                  No sections yet — add one from the sidebar.
-                </div>
-              )}
+          {activeSection ? (
+            <Puck
+              key={activeSection.id}
+              config={puckConfig}
+              overrides={puckOverrides}
+              data={sanitizedInitial}
+              onChange={handleChange}
+              viewports={BUILDER_VIEWPORTS}
+            />
+          ) : (
+            <div className="p-8 text-steel-400">
+              No sections yet — add one from the sidebar.
             </div>
-          </div>
+          )}
         </main>
       </div>
     </div>
