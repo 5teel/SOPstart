@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnySupabaseClient = import('@supabase/supabase-js').SupabaseClient<any, any, any>
 import { db } from '@/lib/offline/db'
-import type { SopSection, SopStep, SopImage } from '@/types/sop'
+import type { Sop, SopSection, SopStep, SopImage } from '@/types/sop'
 import { submitCompletion, getPhotoUploadUrl } from '@/actions/completions'
 
 interface SopManifestEntry {
@@ -13,30 +13,10 @@ interface SopManifestEntry {
   } | null
 }
 
-interface SopWithNested {
-  id: string
-  organisation_id: string
-  title: string | null
-  sop_number: string | null
-  revision_date: string | null
-  author: string | null
-  category: string | null
-  department: string | null
-  related_sops: string[] | null
-  applicable_equipment: string[] | null
-  required_certifications: string[] | null
-  status: 'uploading' | 'parsing' | 'draft' | 'published'
-  version: number
-  source_file_path: string
-  source_file_type: 'docx' | 'pdf' | 'image'
-  source_file_name: string
-  overall_confidence: number | null
-  parse_notes: string | null
-  is_ocr: boolean
-  uploaded_by: string
-  published_at: string | null
-  created_at: string
-  updated_at: string
+// Nested shape returned by supabase select('*, sop_sections(*, ...)'). Inherits
+// every Sop field (including Phase 12's required source_type) so Dexie writes
+// stay in sync with the Sop interface without hand-maintained mirrors.
+type SopWithNested = Sop & {
   sop_sections: (SopSection & {
     sop_steps: SopStep[]
     sop_images: SopImage[]

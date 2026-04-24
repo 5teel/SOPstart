@@ -3,6 +3,7 @@ import { AlertTriangle, ShieldCheck, Siren } from 'lucide-react'
 import { SopImageInline } from '@/components/sop/SopImageInline'
 import { SopTable, containsMarkdownTable } from '@/components/sop/SopTable'
 import { resolveRenderFamily } from '@/lib/sections/resolveRenderFamily'
+import { LayoutRenderer } from '@/components/sop/LayoutRenderer'
 import type { SopSection, SopStep, SopImage } from '@/types/sop'
 
 type SectionWithChildren = SopSection & {
@@ -128,6 +129,20 @@ function DefaultContent({ section }: { section: SectionWithChildren }) {
 }
 
 export function SectionContent({ section }: SectionContentProps) {
+  if (section.layout_data != null && section.layout_version != null) {
+    return (
+      <LayoutRenderer
+        layoutData={section.layout_data}
+        layoutVersion={section.layout_version}
+        sectionId={section.id}
+        fallback={<LegacyRenderer section={section} />}
+      />
+    )
+  }
+  return <LegacyRenderer section={section} />
+}
+
+function LegacyRenderer({ section }: SectionContentProps) {
   const family = resolveRenderFamily(section)
 
   switch (family) {
