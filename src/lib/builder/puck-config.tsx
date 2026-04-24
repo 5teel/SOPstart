@@ -396,7 +396,23 @@ export const puckConfig: Config = {
   },
 }
 
-// Populate the forward-declared registry mirror used by sanitizeLayoutContent.
+/**
+ * Canonical runtime registry of all builder block types.
+ *
+ * AI agents and external tooling should introspect block types via the
+ * `/api/schema` endpoint (src/actions/introspection.ts), which exposes
+ * a block's props schema + description + example in JSON-Schema form.
+ * This object is the internal mirror consumed by sanitizeLayoutContent()
+ * to detect unknown block types before <Render> iterates children (D-13).
+ *
+ * Adding a block type requires three edits to keep the AI surface in
+ * sync — the contract is: if it's not in all three, it cannot be written
+ * by an AI agent.
+ *   1. puckConfig.components above (palette + render)
+ *   2. BLOCK_REGISTRY in src/actions/introspection.ts
+ *   3. (if the block is stored in sop_section_blocks) BlockContentSchema
+ *      in src/lib/validators/blocks.ts
+ */
 for (const key of Object.keys(puckConfig.components)) {
   puckConfigComponentsRegistry[key] =
     puckConfig.components[key as keyof typeof puckConfig.components]

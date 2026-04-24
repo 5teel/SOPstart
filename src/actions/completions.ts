@@ -1,35 +1,12 @@
 'use server'
 
-import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-
-// ---------------------------------------------------------------
-// Zod schemas
-// ---------------------------------------------------------------
-
-const photoStoragePathSchema = z.object({
-  localId: z.string().uuid(),
-  stepId: z.string().uuid(),
-  storagePath: z.string().min(1),
-  contentType: z.string().min(1),
-})
-
-const submitCompletionSchema = z.object({
-  localId: z.string().uuid(),
-  sopId: z.string().uuid(),
-  sopVersion: z.number().int().positive(),
-  contentHash: z.string().min(1).max(64),
-  stepData: z.record(z.string(), z.number()),
-  photoStoragePaths: z.array(photoStoragePathSchema),
-})
-
-const signOffSchema = z.object({
-  completionId: z.string().uuid(),
-  decision: z.enum(['approved', 'rejected']),
-  reason: z.string().optional(),
-})
+import {
+  SubmitCompletionSchema as submitCompletionSchema,
+  SignOffSchema as signOffSchema,
+} from '@/lib/validators/completions'
 
 // ---------------------------------------------------------------
 // submitCompletion

@@ -21,7 +21,11 @@ export async function updateSession(request: NextRequest) {
 
   const path = request.nextUrl.pathname
   const isAuthRoute = path.startsWith('/login') || path.startsWith('/sign-up') || path.startsWith('/join') || path.startsWith('/invite')
-  const isPublicRoute = path === '/' || isAuthRoute
+  // /api/schema returns SOP data-model metadata (block types, enums,
+  // JSON-Schema for layout_data) for AI agents and external integrations.
+  // No tenant data, no RLS concerns - deliberately public.
+  const isSchemaIntrospection = path === '/api/schema'
+  const isPublicRoute = path === '/' || isAuthRoute || isSchemaIntrospection
 
   if (!isPublicRoute && !user) {
     return NextResponse.redirect(new URL('/login', request.url))
