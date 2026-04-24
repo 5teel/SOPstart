@@ -27,7 +27,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 9: Streamlined File → Video Pipeline** - One-click upload-to-video SOP flow chaining file parsing and video generation
 - [x] **Phase 10: Video Version Management** - Multiple video versions per SOP with labels, editing, deletion, and admin management UI (completed 2026-04-13)
 - [x] **Phase 11: Section Schema & Block Foundation** - Additive `section_kinds` catalog, `blocks`/`block_versions`/`sop_section_blocks` tables, legacy fallback, and v3.0 wave-0 test stubs (completed 2026-04-15)
-- [~] **Phase 12: Builder Shell & Blank-Page Authoring** - Puck-based builder, `layout_data` JSONB, blank-page wizard, unified authoring surface, legacy linear fallback (structurally complete 2026-04-24; awaiting 11-item UAT)
+- [x] **Phase 12: Builder Shell & Blank-Page Authoring** - Puck-based builder, `layout_data` JSONB, blank-page wizard, unified authoring surface, legacy linear fallback (completed 2026-04-24; UAT 9/11 automated PASS, UAT #3 airplane-mode + UAT #6 cross-admin LWW carried as human-verification items)
 - [ ] **Phase 13: Reusable Block Library** - Org-vs-global block CRUD, NZ seed blocks, wizard "Pick from library" step, pin-version vs follow-latest semantics
 - [ ] **Phase 14: AI-Drafted SOPs** - Natural-language prompt → GPT-4o structured draft → Claude adversarial verification gate → editable draft lands in the builder
 - [ ] **Phase 15: NZ Template Library** - Curated WorkSafe / machinery / chemical handling templates surfaced as a third entry point into the builder

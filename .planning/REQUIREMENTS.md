@@ -125,11 +125,11 @@ beyond image rendering tweaks for baked annotation layers.
 
 ### Authoring Entry Points
 
-- [ ] **SB-AUTH-01**: Admin can start a new SOP from a blank page wizard that walks through title → canonical sections → review → draft save, without uploading any source document
+- [x] **SB-AUTH-01**: Admin can start a new SOP from a blank page wizard that walks through title → canonical sections → review → draft save, without uploading any source document
 - [ ] **SB-AUTH-02**: Admin can generate a draft SOP by typing a natural-language prompt ("PPE check for forklift operators at our Hamilton site") and receive a structured draft with hazards, PPE, steps, and emergency sections pre-filled for review
 - [ ] **SB-AUTH-03**: Admin can pick a template from the NZ template library (WorkSafe categories, common machinery, chemical handling) as a starting point for a new SOP
-- [ ] **SB-AUTH-04**: Admin reaches the same builder UI whether they start blank, from AI draft, or from a template — there is one authoring surface, not three separate flows
-- [ ] **SB-AUTH-05**: A draft SOP started in the builder is clearly distinguishable in the admin SOP library from an uploaded SOP, but is published through the same admin review + publish workflow used in Phase 2
+- [x] **SB-AUTH-04**: Admin reaches the same builder UI whether they start blank, from AI draft, or from a template — there is one authoring surface, not three separate flows
+- [x] **SB-AUTH-05**: A draft SOP started in the builder is clearly distinguishable in the admin SOP library from an uploaded SOP, but is published through the same admin review + publish workflow used in Phase 2
 
 ### Extensible Section Schema
 
@@ -137,16 +137,16 @@ beyond image rendering tweaks for baked annotation layers.
 - [ ] **SB-SECT-02**: Admin can define a custom section with an admin-provided title (e.g. "Pre-flight check", "Escalation path") and have it render correctly in the worker walkthrough alongside canonical sections
 - [ ] **SB-SECT-03**: The `section_kinds` catalog is seeded with canonical kinds (hazards, ppe, steps, emergency, sign-off) plus rendering metadata (icon, colour family, priority) consumed by the worker UI
 - [ ] **SB-SECT-04**: Existing SOPs from v1/v2 continue to render identically — the extensible schema is additive and legacy `section_type` strings fall through to today's substring-matched renderer
-- [ ] **SB-SECT-05**: Admin can reorder sections via drag-and-drop in the builder; order persists as `sort_order` consistent with the existing schema
+- [x] **SB-SECT-05**: Admin can reorder sections via drag-and-drop in the builder; order persists as `sort_order` consistent with the existing schema
 
 ### Layout Editor
 
-- [ ] **SB-LAYOUT-01**: Admin can drag blocks (text, photo, heading, callout, step, hazard card, PPE card, diagram hotspot) onto a page and rearrange them in a linear column or 2-column grid on wide screens
-- [ ] **SB-LAYOUT-02**: Each block's React component is shared between the admin editor and the worker walkthrough — there is no separate "author view" and "worker view" component tree
-- [ ] **SB-LAYOUT-03**: Layouts reflow correctly on a 5.5" phone screen without requiring the admin to author a separate mobile variant — Tailwind breakpoints drive the reflow
-- [ ] **SB-LAYOUT-04**: Layout data persists as JSONB on `sop_sections.layout_data` with a `layout_version` pin so future renderer upgrades do not silently break published SOPs
+- [x] **SB-LAYOUT-01**: Admin can drag blocks (text, photo, heading, callout, step, hazard card, PPE card, diagram hotspot) onto a page and rearrange them in a linear column or 2-column grid on wide screens
+- [x] **SB-LAYOUT-02**: Each block's React component is shared between the admin editor and the worker walkthrough — there is no separate "author view" and "worker view" component tree
+- [x] **SB-LAYOUT-03**: Layouts reflow correctly on a 5.5" phone screen without requiring the admin to author a separate mobile variant — Tailwind breakpoints drive the reflow
+- [x] **SB-LAYOUT-04**: Layout data persists as JSONB on `sop_sections.layout_data` with a `layout_version` pin so future renderer upgrades do not silently break published SOPs
 - [ ] **SB-LAYOUT-05**: Admin can add a DiagramHotspotBlock to any section, drop a machine diagram image into it, and place numbered hotspot callouts at freeform x/y positions on the diagram for specific-component annotation
-- [ ] **SB-LAYOUT-06**: Worker walkthrough falls back to a linear step-list renderer for any SOP that lacks `layout_data` (legacy SOPs) or whose `layout_version` is unsupported, so no SOP is ever unrenderable
+- [x] **SB-LAYOUT-06**: Worker walkthrough falls back to a linear step-list renderer for any SOP that lacks `layout_data` (legacy SOPs) or whose `layout_version` is unsupported, so no SOP is ever unrenderable
 
 ### Image & Diagram Annotation
 
@@ -298,15 +298,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SB-SECT-02 | Phase 11 | Pending |
 | SB-SECT-03 | Phase 11 | Pending |
 | SB-SECT-04 | Phase 11 | Pending |
-| SB-AUTH-01 | Phase 12 | Pending |
-| SB-AUTH-04 | Phase 12 | Pending |
-| SB-AUTH-05 | Phase 12 | Pending |
-| SB-SECT-05 | Phase 12 | Pending |
-| SB-LAYOUT-01 | Phase 12 | Pending |
-| SB-LAYOUT-02 | Phase 12 | Pending |
-| SB-LAYOUT-03 | Phase 12 | Pending |
-| SB-LAYOUT-04 | Phase 12 | Pending |
-| SB-LAYOUT-06 | Phase 12 | Pending |
+| SB-AUTH-01 | Phase 12 | Complete |
+| SB-AUTH-04 | Phase 12 | Complete |
+| SB-AUTH-05 | Phase 12 | Complete |
+| SB-SECT-05 | Phase 12 | Complete |
+| SB-LAYOUT-01 | Phase 12 | Complete |
+| SB-LAYOUT-02 | Phase 12 | Complete |
+| SB-LAYOUT-03 | Phase 12 | Complete |
+| SB-LAYOUT-04 | Phase 12 | Complete |
+| SB-LAYOUT-06 | Phase 12 | Complete |
 | SB-BLOCK-01 | Phase 13 | Pending |
 | SB-BLOCK-02 | Phase 13 | Pending |
 | SB-BLOCK-03 | Phase 13 | Pending |

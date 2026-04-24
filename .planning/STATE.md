@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Closeout
-status: ready_for_uat
-stopped_at: "Completed Phase 12 — all 4 plans merged; VERIFICATION verdict FLAG (human_needed) pending 11-item UAT"
-last_updated: "2026-04-24T08:30:00.000Z"
-last_activity: 2026-04-24 -- Phase 12 execution complete (4 plans merged, verifier FLAG awaiting UAT)
+status: complete
+stopped_at: "Completed Phase 12 — all 4 plans merged, UAT 9/11 automated PASS, 2 items carried as human-verification (airplane-mode, cross-admin LWW)"
+last_updated: "2026-04-24T17:20:00.000Z"
+last_activity: 2026-04-24 -- Phase 12 UAT complete; 9 requirements promoted to Complete in REQUIREMENTS.md
 progress:
   total_phases: 19
   completed_phases: 2
@@ -21,26 +21,28 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 12 — builder-shell-blank-page-authoring (execution complete, UAT pending)
+**Current focus:** Phase 12 complete — ready to start Phase 13 (Reusable Block Library)
 
 ## Current Position
 
-Phase: 12 (builder-shell-blank-page-authoring) — EXECUTION COMPLETE, AWAITING UAT
+Phase: 12 (builder-shell-blank-page-authoring) — COMPLETE
 Plan: 4 of 4 (all merged to master)
-Status: Verifier returned FLAG (human_needed) — 9/9 requirements structurally verified, 11 UAT scenarios outstanding
-Last activity: 2026-04-24 -- Phase 12 execution complete (4 plans merged, verifier FLAG)
+Status: UAT complete — 9/11 items automated PASS, 2 items carried as human-verification (airplane-mode offline, cross-admin LWW)
+Last activity: 2026-04-24 -- Phase 12 UAT complete; 9 requirements promoted to Complete
 
-Progress bar: `[██████████░░░░░░░░░░]` 50% (phases 11 and 12 structurally complete, 12 UAT pending)
+Progress bar: `[███████████░░░░░░░░░]` 55% (phases 11 + 12 both complete)
 
 Phase 12 commits on master:
 - 1eeca15 merge(12-01) builder shell foundation
 - 895ecc7 merge(12-02) 7 SOP blocks + Puck config
 - 53303e9 merge(12-04) Dexie autosave + reorder + preview toggle
 - 944de00 merge(12-03) blank-page wizard + AUTHORED IN BUILDER + D-08 purge
+- 1612925 docs(phase-12) verification FLAG → later promoted after UAT
 
-Outstanding before closeout:
-- Run 11-item UAT against live dev server + Supabase (logged in `12-VERIFICATION.md` human-verification block)
-- On UAT pass: mark SB-AUTH-01/04/05, SB-LAYOUT-01/02/03/04/06, SB-SECT-05 Complete in REQUIREMENTS.md and advance ROADMAP.md
+Carried human-verification items (non-blocking for Phase 13):
+- UAT #3: airplane-mode edit → OFFLINE · QUEUED → reconnect → SAVED
+- UAT #6: cross-admin LWW "Updated by another admin" toast
+Both wired structurally; need live two-session / offline-toggle scenario to exercise.
 
 ## v2.0 Archive
 
