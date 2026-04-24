@@ -3,6 +3,7 @@ export type ParseJobStatus = 'queued' | 'processing' | 'completed' | 'failed'
 export type SourceFileType = 'docx' | 'pdf' | 'image' | 'xlsx' | 'pptx' | 'txt' | 'video'
 export type InputType = 'upload' | 'scan' | 'url' | 'video_file' | 'youtube_url'
 export type CompletionStatus = 'pending_sign_off' | 'signed_off' | 'rejected'
+export type SourceType = 'uploaded' | 'blank' | 'ai' | 'template'
 
 export type VideoProcessingStage =
   | 'uploading'
@@ -51,6 +52,7 @@ export interface Sop {
   uploaded_by: string
   published_at: string | null
   pipeline_run_id?: string | null
+  source_type: SourceType
   created_at: string
   updated_at: string
 }
@@ -66,6 +68,8 @@ export interface SopSection {
   sort_order: number
   confidence: number | null
   approved: boolean
+  layout_data: unknown | null
+  layout_version: number | null
   created_at: string
   updated_at: string
 }
