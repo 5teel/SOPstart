@@ -380,4 +380,51 @@ test.describe('Layout editor (SB-LAYOUT)', () => {
     expect(builder).toContain('LayoutDataSchema.safeParse')
     expect(builder).toContain('has broken layout data')
   })
+
+  test('SB-LAYOUT-D08-purge draftLayouts Dexie rows are purged when the SOP transitions to published', async () => {
+    // Plan 12-03 Task 3 delivers D-08 purge-on-publish:
+    //   - src/lib/offline/draftLayouts-purge.ts — idempotent helper
+    //   - Wired into useSopSync on draft->published status transition
+    //   - Explicit call from ReviewClient.executePublish on 2xx response
+    //
+    // Structural-assertion test matching the Phase 12 precedent — live DOM +
+    // Dexie round-trip tests require a fixture harness that does not exist.
+    const fs = await import('node:fs/promises')
+
+    // 1. Helper module exists and exports the idempotent purge function.
+    const purge = await fs.readFile(
+      'src/lib/offline/draftLayouts-purge.ts',
+      'utf8'
+    )
+    expect(purge).toMatch(/export async function purgeDraftLayoutsOnPublish/)
+    // Scoped delete on the correct Dexie index.
+    expect(purge).toContain("db.draftLayouts.where('sop_id').equals(sopId).delete()")
+    // Idempotent — empty sopId is a no-op, errors are swallowed.
+    expect(purge).toMatch(/if\s*\(!sopId\)\s*return\s+0/)
+    expect(purge).toContain('catch')
+
+    // 2. useSopSync imports the helper and invokes it on draft->published
+    //    transitions reported by syncAssignedSops.
+    const hook = await fs.readFile('src/hooks/useSopSync.ts', 'utf8')
+    expect(hook).toContain('purgeDraftLayoutsOnPublish')
+    expect(hook).toContain('publishedTransitions')
+    expect(hook).toMatch(/from\s+'@\/lib\/offline\/draftLayouts-purge'/)
+
+    // 3. sync-engine detects and returns the draft->published transition set.
+    const syncEngine = await fs.readFile('src/lib/offline/sync-engine.ts', 'utf8')
+    expect(syncEngine).toContain('publishedTransitions')
+    expect(syncEngine).toContain('cachedStatusMap')
+    expect(syncEngine).toMatch(/prevStatus\s*!==\s*'published'/)
+    expect(syncEngine).toMatch(/incoming\.status\s*===\s*'published'/)
+
+    // 4. ReviewClient explicitly invokes the helper after a successful publish
+    //    response, before any redirect or router.refresh.
+    const reviewClient = await fs.readFile(
+      'src/app/(protected)/admin/sops/[sopId]/review/ReviewClient.tsx',
+      'utf8'
+    )
+    expect(reviewClient).toContain('purgeDraftLayoutsOnPublish')
+    // The explicit call lives inside the executePublish handler's 2xx branch.
+    expect(reviewClient).toMatch(/if\s*\(res\.ok\)\s*\{[\s\S]*?purgeDraftLayoutsOnPublish\(sop\.id\)/)
+  })
 })

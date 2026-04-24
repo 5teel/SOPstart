@@ -1,5 +1,6 @@
 'use server'
 
+import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { uploadSessionSchema, getSourceFileType, isBlockedMacroFile, createVideoSopPipelineSessionSchema } from '@/lib/validators/sop'
@@ -464,4 +465,119 @@ export async function createVideoSopPipelineSession(input: {
     token: signedData.token,
     path,
   }
+}
+
+// ---------------------------------------------------------------
+// createSopFromWizard (Phase 12 SB-AUTH-01)
+// Atomic SOP + sections create for the blank-page authoring wizard.
+// - Zod-validates input (title required, kindIds min 1 max 10)
+// - JWT admin/safety_manager role guard
+// - Inserts sops row with source_type='blank', status='draft'
+// - Fetches section_kinds via the user's RLS-scoped client (prevents
+//   cross-org kind forgery — T-12-03-02)
+// - Batched insert of sop_sections mirroring kind.slug → section_type
+//   (matches createSection precedent in src/actions/sections.ts)
+// - Compensating cleanup (admin.from('sops').delete) on any section
+//   insert failure so no orphan sops rows are left behind
+// ---------------------------------------------------------------
+const CreateSopFromWizardInput = z.object({
+  title: z.string().min(1).max(200),
+  sopNumber: z.string().max(60).nullable().optional(),
+  kindIds: z.array(z.string().uuid()).min(1).max(10),
+})
+
+export async function createSopFromWizard(
+  input: z.infer<typeof CreateSopFromWizardInput>
+): Promise<{ sopId: string } | { error: string }> {
+  const parsed = CreateSopFromWizardInput.safeParse(input)
+  if (!parsed.success) {
+    return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+  }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { data: { session } } = await supabase.auth.getSession()
+  const jwtClaims = session?.access_token
+    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    : {}
+  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  if (!organisationId) return { error: 'No organisation found' }
+
+  const role = jwtClaims['user_role']
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
+    return { error: 'Admin access required' }
+  }
+
+  const admin = createAdminClient()
+
+  // 1. Insert the SOP row (source_type='blank', status='draft').
+  //    source_file_type='docx' is a placeholder — source_type='blank' is the
+  //    authoritative signal that this SOP was built from scratch.
+  const { data: sop, error: sopError } = await admin
+    .from('sops')
+    .insert({
+      organisation_id: organisationId,
+      source_file_name: parsed.data.title,
+      source_file_type: 'docx',
+      source_file_path: '',
+      uploaded_by: user.id,
+      status: 'draft',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      source_type: 'blank' as any,
+      title: parsed.data.title,
+      sop_number: parsed.data.sopNumber ?? null,
+    })
+    .select('id')
+    .single()
+
+  if (sopError || !sop) {
+    console.error('[createSopFromWizard] sop insert error', sopError)
+    return { error: 'Failed to create SOP. Please try again.' }
+  }
+
+  // 2. Fetch the selected kinds via the caller's RLS-scoped supabase client
+  //    (prevents an attacker from forging another org's custom kind —
+  //    T-12-03-02). If the count is off, RLS filtered something out.
+  const { data: kinds, error: kindsErr } = await supabase
+    .from('section_kinds')
+    .select('id, slug, display_name')
+    .in('id', parsed.data.kindIds)
+
+  if (kindsErr || !kinds || kinds.length !== parsed.data.kindIds.length) {
+    // Compensating cleanup: delete the orphan SOP row
+    await admin.from('sops').delete().eq('id', sop.id)
+    return { error: 'One or more section kinds not found or not accessible' }
+  }
+
+  // 3. Batched insert of sop_sections — mirror kind.slug → section_type
+  //    (sections.ts:71-80 precedent). gap-of-10 sort_order for future manual
+  //    reordering (reorderSections RPC in Plan 04 relies on this).
+  const sectionsPayload = parsed.data.kindIds.map((kindId, i) => {
+    const kind = kinds.find((k) => k.id === kindId)!
+    return {
+      sop_id: sop.id,
+      section_type: kind.slug,
+      section_kind_id: kind.id,
+      title: kind.display_name,
+      content: null,
+      sort_order: (i + 1) * 10,
+      approved: false,
+    }
+  })
+
+  const { error: sectionsErr } = await admin
+    .from('sop_sections')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    .insert(sectionsPayload as any)
+
+  if (sectionsErr) {
+    console.error('[createSopFromWizard] sections insert error', sectionsErr)
+    // Compensating cleanup
+    await admin.from('sops').delete().eq('id', sop.id)
+    return { error: 'Failed to create SOP sections. Please try again.' }
+  }
+
+  return { sopId: sop.id }
 }

@@ -12,6 +12,7 @@ import { AddSectionButton } from '@/components/admin/AddSectionButton'
 import AdversarialFlagBanner from '@/components/admin/AdversarialFlagBanner'
 import MissingSectionWarningBanner from '@/components/admin/MissingSectionWarningBanner'
 import { reparseSop, restructureSop } from '@/actions/sops'
+import { purgeDraftLayoutsOnPublish } from '@/lib/offline/draftLayouts-purge'
 import type { SopWithSections, SopStatus, ParseJob, TranscriptSegment, VerificationFlag } from '@/types/sop'
 
 interface ReviewClientProps {
@@ -131,6 +132,12 @@ export default function ReviewClient({
     setConfirmAction(null)
     const res = await fetch(`/api/sops/${sop.id}/publish`, { method: 'POST' })
     if (res.ok) {
+      // D-08 purge-on-publish: drop any leftover Dexie draftLayouts rows for
+      // this SOP so future builder sessions read from the authoritative
+      // sopCache. Belt-and-braces alongside the useSopSync transition path
+      // (see src/hooks/useSopSync.ts) — purges immediately on the publishing
+      // admin's own tab without waiting for a sync pass.
+      await purgeDraftLayoutsOnPublish(sop.id)
       setPublishSuccess(true)
       router.refresh()
     }
