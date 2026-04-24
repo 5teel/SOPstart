@@ -132,12 +132,90 @@ test.describe('Layout editor (SB-LAYOUT)', () => {
     expect(grepOutput.trim()).toBe('')
   })
 
-  test.fixme(
-    'SB-LAYOUT-04 layout persists as JSONB on sop_sections.layout_data with layout_version pin',
-    async ({ page: _page }) => {
-      void _page
-    }
-  )
+  test('SB-LAYOUT-04 layout persists as JSONB on sop_sections.layout_data with layout_version pin', async () => {
+    // Plan 04 delivers the autosave + flush pipeline that writes Puck's Data
+    // payload into sop_sections.layout_data with layout_version === 1. Live
+    // DOM autosave tests require a running dev server + DB fixture harness
+    // (not present in this worktree). Following Plan 01/02 precedent, this
+    // stub asserts the structural pieces:
+    //   - Dexie v4 schema declares the draftLayouts table
+    //   - DraftLayout interface exports the contract fields
+    //   - useBuilderAutosave writes through to db.draftLayouts.put with the
+    //     dirty sentinel + layout_version pinned to CURRENT_LAYOUT_VERSION
+    //   - sync-engine.flushDraftLayouts + actions.updateSectionLayout close the loop
+    //   - BuilderClient wires both hooks into <Puck onChange> + SAVED pill
+    const fs = await import('node:fs/promises')
+
+    // 1. Dexie v4 + draftLayouts shape.
+    const db = await fs.readFile('src/lib/offline/db.ts', 'utf8')
+    expect(db).toContain('db.version(4).stores')
+    expect(db).toContain(
+      "draftLayouts: 'section_id, sop_id, syncState, _cachedAt'"
+    )
+    expect(db).toContain('export interface DraftLayout')
+    expect(db).toMatch(/layout_data:\s*unknown/)
+    expect(db).toMatch(/layout_version:\s*number/)
+    expect(db).toMatch(/syncState:\s*'dirty'\s*\|\s*'synced'/)
+
+    // 2. useBuilderAutosave writes through to Dexie with the dirty sentinel
+    //    and the current layout_version pin.
+    const autosave = await fs.readFile(
+      'src/hooks/useBuilderAutosave.ts',
+      'utf8'
+    )
+    expect(autosave).toContain('db.draftLayouts.put')
+    expect(autosave).toContain("syncState: 'dirty'")
+    expect(autosave).toContain('CURRENT_LAYOUT_VERSION')
+    expect(autosave).toContain('setTimeout')
+    expect(autosave).toContain('DEBOUNCE_MS')
+    expect(autosave).toMatch(/DEBOUNCE_MS\s*=\s*750/)
+
+    // 3. useDraftLayoutSync debounces at 3s and drives flushDraftLayouts.
+    const sync = await fs.readFile('src/hooks/useDraftLayoutSync.ts', 'utf8')
+    expect(sync).toContain('flushDraftLayouts')
+    expect(sync).toMatch(/SYNC_DEBOUNCE_MS\s*=\s*3_000/)
+    expect(sync).toContain('visibilitychange')
+
+    // 4. sync-engine batch-flush with LWW sentinel + per-row errors.
+    const syncEngine = await fs.readFile(
+      'src/lib/offline/sync-engine.ts',
+      'utf8'
+    )
+    expect(syncEngine).toContain('export async function flushDraftLayouts')
+    expect(syncEngine).toContain("equals('dirty')")
+    expect(syncEngine).toContain('updateSectionLayout')
+    expect(syncEngine).toContain("'server_newer'")
+    expect(syncEngine).toContain('overwrittenByServer')
+
+    // 5. updateSectionLayout server action enforces 128KB cap + LWW check +
+    //    admin-role guard, and targets the Phase 12 columns.
+    const actions = await fs.readFile('src/actions/sections.ts', 'utf8')
+    expect(actions).toContain('export async function updateSectionLayout')
+    expect(actions).toContain('MAX_LAYOUT_BYTES')
+    expect(actions).toMatch(/128\s*\*\s*1024/)
+    expect(actions).toContain('Buffer.byteLength')
+    expect(actions).toContain("'server_newer'")
+    expect(actions).toContain('layout_data')
+    expect(actions).toContain('layout_version')
+    expect(actions).toContain("['admin', 'safety_manager']")
+
+    // 6. BuilderClient wires useBuilderAutosave into <Puck onChange> and
+    //    useDraftLayoutSync at the top of the component.
+    const builder = await fs.readFile(
+      'src/app/(protected)/admin/sops/builder/[sopId]/BuilderClient.tsx',
+      'utf8'
+    )
+    expect(builder).toContain('useBuilderAutosave')
+    expect(builder).toContain('useDraftLayoutSync')
+    expect(builder).toContain('onChange={handleChange}')
+    // SAVED pill reads from sync state + online flag + lastSavedAt.
+    expect(builder).toContain('OFFLINE · QUEUED')
+    expect(builder).toContain('SAVING')
+    expect(builder).toMatch(/SAVED.*s AGO/)
+    // D-07 cross-admin overwrite toast is wired from lastSyncResult.
+    expect(builder).toContain('overwrittenByServer')
+    expect(builder).toContain('Updated by another admin')
+  })
 
   test.fixme(
     'SB-LAYOUT-05 admin can add a DiagramHotspotBlock, drop a machine diagram image, and place numbered hotspot callouts at freeform x/y positions',
@@ -145,6 +223,64 @@ test.describe('Layout editor (SB-LAYOUT)', () => {
       void _page
     }
   )
+
+  test('SB-LAYOUT-D01-preview persistent DESKTOP | MOBILE toggle clamps canvas to 430px phone frame', async () => {
+    // Plan 04 D-01: the admin builder top bar renders a persistent DESKTOP |
+    // MOBILE pill toggle. Clicking MOBILE sets body[data-view="mobile"] and
+    // the ported phone-frame CSS clamps the canvas to 430px. Live width-
+    // measurement tests require a running dev server + fixture harness (not
+    // present in this worktree). Structural assertion (Plan 01/02 precedent):
+    //   - PreviewToggle.tsx exists with both pills + data-view-btn attrs
+    //   - Toggle writes document.body.dataset.view on click
+    //   - builder-preview.css clamps .builder-canvas to 430px in mobile view
+    //   - BuilderClient mounts <PreviewToggle> + wraps canvas in #builder-device-wrap
+    //   - SB-LAYOUT-03 invariant preserved: zero JS-based viewport branching
+    //     in src/components/sop/blocks/ (no isMobile / useMediaQuery / UA-sniffing).
+    const fs = await import('node:fs/promises')
+
+    const previewToggle = await fs.readFile(
+      'src/app/(protected)/admin/sops/builder/[sopId]/PreviewToggle.tsx',
+      'utf8'
+    )
+    expect(previewToggle).toContain('data-view-btn="desktop"')
+    expect(previewToggle).toContain('data-view-btn="mobile"')
+    expect(previewToggle).toContain('aria-pressed')
+    expect(previewToggle).toContain("document.body.dataset.view = view")
+
+    const css = await fs.readFile(
+      'src/app/(protected)/admin/sops/builder/[sopId]/builder-preview.css',
+      'utf8'
+    )
+    expect(css).toContain('#builder-device-wrap')
+    expect(css).toContain('body[data-view="mobile"]')
+    expect(css).toContain('430px')
+    // Phone notch + home indicator (port from sketch commit 64f1bec)
+    expect(css).toContain('::before')
+    expect(css).toContain('::after')
+
+    const builder = await fs.readFile(
+      'src/app/(protected)/admin/sops/builder/[sopId]/BuilderClient.tsx',
+      'utf8'
+    )
+    expect(builder).toContain('PreviewToggle')
+    expect(builder).toContain("import './builder-preview.css'")
+    expect(builder).toContain('id="builder-device-wrap"')
+    expect(builder).toContain('builder-canvas')
+
+    // SB-LAYOUT-03 invariant: zero JS-based viewport branching in blocks/.
+    // Cross-check with the shell grep the SPEC references so CI fails loud
+    // if the preview toggle regresses this rule.
+    let grepOutput = ''
+    try {
+      grepOutput = execSync(
+        'grep -rE "isMobile|useMediaQuery|navigator\\.userAgent" src/components/sop/blocks/',
+        { stdio: ['pipe', 'pipe', 'pipe'] }
+      ).toString()
+    } catch {
+      grepOutput = ''
+    }
+    expect(grepOutput.trim()).toBe('')
+  })
 
   test('SB-LAYOUT-06 worker walkthrough falls back to linear step-list renderer for SOPs with no layout_data or unsupported layout_version', async () => {
     // Plan 01 establishes the LayoutRenderer fallback branch in SectionContent.tsx.

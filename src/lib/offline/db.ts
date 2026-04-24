@@ -31,6 +31,20 @@ export interface QueuedPhoto {
   storagePath: string | null             // filled after upload
 }
 
+// ---------------------------------------------------------------
+// v4 types: builder draft layout cache (Phase 12 SB-LAYOUT-04)
+// ---------------------------------------------------------------
+
+export interface DraftLayout {
+  section_id: string                     // primary key — matches Supabase row
+  sop_id: string                         // indexed for per-SOP bulk queries
+  layout_data: unknown                   // opaque Puck Data JSON — validated by LayoutDataSchema at read time
+  layout_version: number                 // monotonic integer version pin; Phase 12 writes 1
+  updated_at: number                     // epoch ms (client-side LWW source of truth)
+  syncState: 'dirty' | 'synced'          // 'dirty' → needs flush; 'synced' → matches server
+  _cachedAt: number                      // when the row was last read/written locally
+}
+
 type SopAssistantDB = Dexie & {
   sops: EntityTable<CachedSop, 'id'>
   sections: EntityTable<SopSection, 'id'>
@@ -39,6 +53,7 @@ type SopAssistantDB = Dexie & {
   syncMeta: EntityTable<{ key: string; value: string }, 'key'>
   completions: EntityTable<LocalCompletion, 'localId'>
   photoQueue: EntityTable<QueuedPhoto, 'localId'>
+  draftLayouts: EntityTable<DraftLayout, 'section_id'>
 }
 
 const db = new Dexie('SopAssistantDB') as SopAssistantDB
@@ -78,6 +93,21 @@ db.version(3).stores({
   syncMeta: 'key',
   completions: 'localId, sopId, status',
   photoQueue: 'localId, completionLocalId, stepId, uploaded',
+})
+
+// v4: adds draftLayouts table for builder auto-save (Phase 12 SB-LAYOUT-04).
+// Repeats all v3 stores verbatim (Dexie declarative-cumulative requirement).
+// draftLayouts is keyed by section_id (1:1 with Supabase sop_sections row),
+// indexes sop_id (bulk queries per SOP), syncState (dirty-row sweep), _cachedAt.
+db.version(4).stores({
+  sops: 'id, organisation_id, status, version, category, department, _cachedAt',
+  sections: 'id, sop_id, section_type, section_kind_id, sort_order',
+  steps: 'id, section_id, step_number',
+  images: 'id, sop_id, section_id, step_id',
+  syncMeta: 'key',
+  completions: 'localId, sopId, status',
+  photoQueue: 'localId, completionLocalId, stepId, uploaded',
+  draftLayouts: 'section_id, sop_id, syncState, _cachedAt',
 })
 
 export { db }
