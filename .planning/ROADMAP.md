@@ -407,3 +407,12 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 Plans:
 - [ ] TBD (promote with /gsd-review-backlog when ready)
+
+### Phase 999.2: Graphify full LLM build (BACKLOG)
+
+**Goal:** Run the full `/graphify` pipeline (not AST-only) across src/, .planning/, supabase/migrations/, scripts/ so the knowledge graph also captures doc→code rationale edges, cross-phase concept clustering, and plan→commit traceability. AST-only graph already exists (961 nodes / 155 communities) — this upgrades it with semantic-subagent extraction + community labelling.
+**Requirements:** N/A (internal developer tooling)
+**Plans:** 1 plan stubbed
+
+Plans:
+- [ ] Full-corpus graphify run: dispatch ~40+ semantic subagents on src/ + .planning/ + supabase/migrations/; build `graphify-out/graph.json` with EXTRACTED/INFERRED/AMBIGUOUS edges; label communities; produce HTML viz. Estimated cost: ~40 subagents × ~45s = ~10-15 min wall, ~$1-3 token spend. Triggered when Phase 13 planning needs cross-document concept surfacing (e.g. "which phase-12 blocks relate to phase-13 reusable library requirements").
