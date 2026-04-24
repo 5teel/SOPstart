@@ -28,6 +28,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 10: Video Version Management** - Multiple video versions per SOP with labels, editing, deletion, and admin management UI (completed 2026-04-13)
 - [x] **Phase 11: Section Schema & Block Foundation** - Additive `section_kinds` catalog, `blocks`/`block_versions`/`sop_section_blocks` tables, legacy fallback, and v3.0 wave-0 test stubs (completed 2026-04-15)
 - [x] **Phase 12: Builder Shell & Blank-Page Authoring** - Puck-based builder, `layout_data` JSONB, blank-page wizard, unified authoring surface, legacy linear fallback (completed 2026-04-24; UAT 9/11 automated PASS, UAT #3 airplane-mode + UAT #6 cross-admin LWW carried as human-verification items)
+- [ ] **Phase 12.5: Blueprint Redesign** - Worker-first UX overhaul with paper/ink engineering-drawing aesthetic; unified tabbed interface (overview/tools/hazards/flow/model/walkthrough); mobile immersive walkthrough; voice input (server-side transcription); cmdk; 7 new AI-accessible block types (Measurement, Decision, Escalate, SignOff, Zone, Inspect, VoiceNote) — ModelBlock deferred
 - [ ] **Phase 13: Reusable Block Library** - Org-vs-global block CRUD, NZ seed blocks, wizard "Pick from library" step, pin-version vs follow-latest semantics
 - [ ] **Phase 14: AI-Drafted SOPs** - Natural-language prompt → GPT-4o structured draft → Claude adversarial verification gate → editable draft lands in the builder
 - [ ] **Phase 15: NZ Template Library** - Curated WorkSafe / machinery / chemical handling templates surfaced as a third entry point into the builder
@@ -264,6 +265,41 @@ Plans:
 - [x] 12-04-PLAN.md — Draft persistence + section reorder: Dexie v4 draftLayouts table, flushDraftLayouts in sync-engine (LWW via server_newer sentinel + overwrittenByServer toast), useBuilderAutosave (750ms) + useDraftLayoutSync (3s), reorderSections server action via reorder_sections RPC, SectionListSidebar with HTML5 drag handles, updateSectionLayout with 128KB cap, DESKTOP/MOBILE preview toggle (430px phone-frame)
 
 Verifier verdict: FLAG (human_needed) — 9/9 requirements structurally verified, no duplicate publish flow, no stub-dressed tests. 11-item UAT required before REQUIREMENTS.md flip. See `12-VERIFICATION.md`.
+
+### Phase 12.5: Blueprint Redesign
+**Goal**: Ship the worker-first engineering-drawing UI. Workers, supervisors, and admins all use a single unified tabbed interface (overview / tools / hazards / flow / model / walkthrough) on paper/ink palette with JetBrains Mono + Inter typography and 20px grid-paper backgrounds on canvas screens. Mobile walkthrough is immersive (full-screen step card). Voice capture (server-side transcription) populates measurements and free-form notes. Command palette (Cmd/Ctrl+K) enables jump-to-step + ask-AI (SOP-scoped) + tool/hazard lookup. 7 new AI-accessible block types ship with the redesign and are exposed via `/api/schema` through the three-place contract.
+**Depends on**: Phase 11, Phase 12
+**Requirements**: SB-UX-01..SB-UX-10 (to be assigned in SPEC.md)
+**Success Criteria** (what must be TRUE):
+  1. Worker `/sops/[sopId]` renders the 6-tab interface with paper/ink palette — no more steel-900/brand-yellow dark theme on worker-facing routes
+  2. Mobile walkthrough is immersive-only on phones (≤430px); list-style walkthrough still available on desktop
+  3. 7 new block types registered in puckConfig + `/api/schema` + BlockContentSchema (three-place contract): Measurement, Decision, Escalate, SignOff, Zone, Inspect, VoiceNote
+  4. EscalateBlock accepts `escalationMode: 'alert' | 'lock' | 'form'` prop; default is `form` (supervisor form with audit trail)
+  5. Voice capture works end-to-end with server-side transcription: idle → listening → transcribing → captured → persisted to cloud
+  6. Command palette responds to Cmd/Ctrl+K globally; returns results from JUMP TO STEP + ASK AI (scoped to current SOP only) + TOOLS & HAZARDS
+  7. Preview toggle (desktop ↔ 430px mobile frame) is available on worker-facing tabs (not just admin builder); preference persists in localStorage
+  8. Flow tab renders an SVG node graph built via BOTH derivation (Option A: from sections/steps + block types) AND an explicit `sops.flow_graph` JSONB column (Option B) — derived is the default, explicit overrides when present
+  9. Flow graph is editable inside the Puck editor (extend Puck for flow-graph authoring — NOT a separate tool)
+  10. ModelBlock is registered in the three-place contract (palette entry + schema) but the 3D viewer implementation is stubbed behind a feature flag; file formats and upload flow deferred to a future phase
+**Plans**: TBD (created by /gsd-plan-phase after spec+discuss)
+**UI hint**: yes (heavy)
+
+Resolved open questions (from sketch wrap-up):
+- Scope: all tabs at once
+- Voice: server-side transcription
+- 3D: exclude format support for now; stub ModelBlock
+- Escalation: hybrid — EscalateBlock carries per-instance `escalationMode`; default = supervisor form
+- Flow editing: inside Puck
+- New blocks: all 7 (excl. ModelBlock) ship in 12.5
+- Mobile walkthrough: both modes (immersive + list) — immersive default on phones
+- cmdk Ask AI: SOP-scoped only
+- Voice notes: cloud-first persistence
+- Flow data shape: build BOTH derivation (A) and explicit JSONB (B); derived is default, explicit overrides when present
+
+Canonical refs:
+- Design skill: `.claude/skills/sketch-findings-SOPstart/` (auto-loaded via CLAUDE.md)
+- Sketch source: `sketches/sop-blueprint/index.html`
+- Wrap-up: `.planning/sketches/WRAP-UP-SUMMARY.md`
 
 ### Phase 13: Reusable Block Library
 **Goal**: Admin can save, browse, and re-use hazard / PPE / step blocks from an org-scoped library alongside a read-only NZ global block set, and the wizard surfaces matching blocks at the right step with explicit pin-version vs follow-latest semantics
