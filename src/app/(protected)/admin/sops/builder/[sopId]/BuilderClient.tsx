@@ -1,10 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import type { Config, Data } from '@puckeditor/core'
+import type { Data } from '@puckeditor/core'
 import type { SopWithSections } from '@/types/sop'
+import {
+  puckConfig,
+  puckOverrides,
+  sanitizeLayoutContent,
+} from '@/lib/builder/puck-config'
+import { LayoutDataSchema } from '@/lib/builder/layout-schema'
 
 const Puck = dynamic(
   () => import('@puckeditor/core').then((m) => m.Puck),
@@ -14,8 +20,6 @@ const Puck = dynamic(
   }
 )
 
-// Plan 02 replaces this with the real 7-block config.
-const placeholderConfig: Config = { components: {} }
 const emptyData: Data = { content: [], root: { props: {} } }
 
 interface BuilderClientProps {
@@ -29,7 +33,35 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
   )
   const [activeSectionId, setActiveSectionId] = useState(sections[0]?.id ?? '')
   const activeSection = sections.find((s) => s.id === activeSectionId)
-  const initialData = (activeSection?.layout_data as Data | null) ?? emptyData
+
+  // D-16: surface a section-level toast when activeSection.layout_data is
+  // structurally broken. The sanitized initial data path below falls back to
+  // emptyData so the editor still mounts.
+  const [layoutErrorToast, setLayoutErrorToast] = useState<string | null>(null)
+  useEffect(() => {
+    if (!activeSection || activeSection.layout_data == null) {
+      setLayoutErrorToast(null)
+      return
+    }
+    const parsed = LayoutDataSchema.safeParse(activeSection.layout_data)
+    setLayoutErrorToast(
+      parsed.success
+        ? null
+        : `Section "${activeSection.title}" has broken layout data - revert to last save?`
+    )
+  }, [activeSection])
+
+  // D-13: sanitize unknown block types before passing data to <Puck>.
+  const sanitizedInitial: Data = useMemo(() => {
+    if (!activeSection || activeSection.layout_data == null) return emptyData
+    const parsed = LayoutDataSchema.safeParse(activeSection.layout_data)
+    if (!parsed.success) return emptyData
+    const sanitizedContent = sanitizeLayoutContent(
+      (parsed.data.content ?? []) as unknown[]
+    )
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return { ...parsed.data, content: sanitizedContent } as any as Data
+  }, [activeSection])
 
   return (
     <div className="flex flex-col h-screen bg-steel-900 text-steel-100">
@@ -47,6 +79,15 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
           </h1>
         </div>
         <div className="flex items-center gap-3">
+          {layoutErrorToast && (
+            <div
+              role="alert"
+              className="px-3 py-1.5 rounded border border-red-500/30 bg-red-500/10 text-red-300 text-xs font-mono uppercase tracking-wider cursor-pointer"
+              onClick={() => setLayoutErrorToast(null)}
+            >
+              {layoutErrorToast} (click to dismiss)
+            </div>
+          )}
           <span className="font-mono text-[11px] uppercase tracking-wider text-steel-400 border border-steel-600 rounded px-2 py-0.5">
             SAVED
           </span>
@@ -86,10 +127,12 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
           {activeSection ? (
             <Puck
               key={activeSection.id}
-              config={placeholderConfig}
-              data={initialData}
-              onChange={() => {
-                /* Plan 04 wires autosave */
+              config={puckConfig}
+              overrides={puckOverrides}
+              data={sanitizedInitial}
+              onChange={(data) => {
+                // Plan 04 wires useBuilderAutosave; log-only for Plan 02.
+                console.log('[builder] onChange', data)
               }}
             />
           ) : (
