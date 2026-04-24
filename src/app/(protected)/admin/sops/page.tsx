@@ -51,10 +51,13 @@ export default async function SopsLibraryPage({
   const params = await searchParams
   const activeStatus = params.status ?? 'all'
 
-  // Build query
-  let query = supabase
+  // Build query — cast .select() to any because supabase-generated types have
+  // not been regenerated since migration 00020 added sops.source_type. Same
+  // pattern as src/actions/sections.ts reorderSections/updateSectionLayout.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let query: any = supabase
     .from('sops')
-    .select('id, title, sop_number, category, status, source_file_name, created_at, updated_at, published_at')
+    .select('id, title, sop_number, category, status, source_file_name, source_type, created_at, updated_at, published_at')
     .order('created_at', { ascending: false })
 
   // Filter by status tab (except "all")
@@ -72,12 +75,20 @@ export default async function SopsLibraryPage({
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-steel-100">SOP Library</h1>
-        <Link
-          href="/admin/sops/upload"
-          className="bg-brand-yellow text-steel-900 font-semibold px-4 h-[44px] rounded-lg hover:bg-amber-400 transition-colors text-sm inline-flex items-center"
-        >
-          Upload SOP
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/admin/sops/new/blank"
+            className="bg-steel-800 border border-steel-700 text-steel-100 font-semibold px-4 h-[44px] rounded-lg hover:bg-steel-700 hover:border-steel-600 transition-colors text-sm inline-flex items-center"
+          >
+            New SOP (blank)
+          </Link>
+          <Link
+            href="/admin/sops/upload"
+            className="bg-brand-yellow text-steel-900 font-semibold px-4 h-[44px] rounded-lg hover:bg-amber-400 transition-colors text-sm inline-flex items-center"
+          >
+            Upload SOP
+          </Link>
+        </div>
       </div>
 
       {/* Filter tabs */}
@@ -117,7 +128,8 @@ export default async function SopsLibraryPage({
         </div>
       ) : (
         <ul className="space-y-3">
-          {sops.map(sop => (
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          {sops.map((sop: any) => (
             <li key={sop.id} className="flex items-stretch gap-2">
               <Link
                 href={`/admin/sops/${sop.id}/review`}
@@ -137,6 +149,11 @@ export default async function SopsLibraryPage({
                     <span className="text-xs text-steel-400">
                       {formatDate(sop.updated_at ?? sop.created_at)}
                     </span>
+                    {sop.source_type && sop.source_type !== 'uploaded' && (
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-steel-400 border border-steel-600 rounded px-1.5 py-0.5">
+                        AUTHORED IN BUILDER
+                      </span>
+                    )}
                   </div>
                 </div>
                 <StatusBadge status={sop.status as SopStatus} />
