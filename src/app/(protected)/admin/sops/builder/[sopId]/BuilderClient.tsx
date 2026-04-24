@@ -16,6 +16,8 @@ import { useDraftLayoutSync } from '@/hooks/useDraftLayoutSync'
 import { useNetworkStore } from '@/stores/network'
 import { db } from '@/lib/offline/db'
 import { SectionListSidebar } from './SectionListSidebar'
+import { PreviewToggle } from './PreviewToggle'
+import './builder-preview.css'
 
 const Puck = dynamic(
   () => import('@puckeditor/core').then((m) => m.Puck),
@@ -155,6 +157,7 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
           </h1>
         </div>
         <div className="flex items-center gap-3">
+          <PreviewToggle />
           {layoutErrorToast && (
             <div
               role="alert"
@@ -191,21 +194,26 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
           onSelect={setActiveSectionId}
           sopId={sopId}
         />
-        {/* Canvas — remount Puck per active section (Research Open Question 2) */}
+        {/* Canvas — wrapped in #builder-device-wrap for D-01 phone-frame preview.
+            Puck remounts per active section (Research Open Question 2). */}
         <main className="flex-1 min-w-0 overflow-auto">
-          {activeSection ? (
-            <Puck
-              key={activeSection.id}
-              config={puckConfig}
-              overrides={puckOverrides}
-              data={sanitizedInitial}
-              onChange={handleChange}
-            />
-          ) : (
-            <div className="p-8 text-steel-400">
-              No sections yet — add one from the sidebar.
+          <div id="builder-device-wrap">
+            <div className="builder-canvas overflow-auto">
+              {activeSection ? (
+                <Puck
+                  key={activeSection.id}
+                  config={puckConfig}
+                  overrides={puckOverrides}
+                  data={sanitizedInitial}
+                  onChange={handleChange}
+                />
+              ) : (
+                <div className="p-8 text-steel-400">
+                  No sections yet — add one from the sidebar.
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </main>
       </div>
     </div>
