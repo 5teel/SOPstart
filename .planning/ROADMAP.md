@@ -27,7 +27,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 9: Streamlined File → Video Pipeline** - One-click upload-to-video SOP flow chaining file parsing and video generation
 - [x] **Phase 10: Video Version Management** - Multiple video versions per SOP with labels, editing, deletion, and admin management UI (completed 2026-04-13)
 - [x] **Phase 11: Section Schema & Block Foundation** - Additive `section_kinds` catalog, `blocks`/`block_versions`/`sop_section_blocks` tables, legacy fallback, and v3.0 wave-0 test stubs (completed 2026-04-15)
-- [ ] **Phase 12: Builder Shell & Blank-Page Authoring** - Puck-based builder, `layout_data` JSONB, blank-page wizard, unified authoring surface, legacy linear fallback
+- [~] **Phase 12: Builder Shell & Blank-Page Authoring** - Puck-based builder, `layout_data` JSONB, blank-page wizard, unified authoring surface, legacy linear fallback (structurally complete 2026-04-24; awaiting 11-item UAT)
 - [ ] **Phase 13: Reusable Block Library** - Org-vs-global block CRUD, NZ seed blocks, wizard "Pick from library" step, pin-version vs follow-latest semantics
 - [ ] **Phase 14: AI-Drafted SOPs** - Natural-language prompt → GPT-4o structured draft → Claude adversarial verification gate → editable draft lands in the builder
 - [ ] **Phase 15: NZ Template Library** - Curated WorkSafe / machinery / chemical handling templates surfaced as a third entry point into the builder
@@ -258,10 +258,12 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 12-01-PLAN.md — Puck infrastructure: install `@puckeditor/core@0.21.2` (renamed from @measured/puck), admin `/admin/sops/builder/[sopId]` route with `'use client'` + `next/dynamic`(ssr:false), migration 00020 (layout_data JSONB + layout_version INT + sops.source_type + reorder_sections RPC), worker LayoutRenderer branch + linear fallback in SectionContent
-- [ ] 12-02-PLAN.md — Block components: 7 shared blocks (Text, Heading, Photo, Callout, Step, HazardCard, PPECard) lifted from SectionContent palette with co-located Zod schemas; puck-config.ts registers all 7 with SafeRender guards; BuilderClient + LayoutRenderer share the same config
-- [ ] 12-03-PLAN.md — Blank-page wizard + library chip: 4-step wizard (title → canonical kinds → review → submit), createSopFromWizard server action (source_type='blank' + compensating cleanup), AUTHORED IN BUILDER chip in /admin/sops. SEND TO REVIEW reuses existing review page + publish route (D-04)
-- [ ] 12-04-PLAN.md — Draft persistence + section reorder: Dexie v4 draftLayouts table, flushDraftLayouts in sync-engine (LWW), useBuilderAutosave (750ms) + useDraftLayoutSync (3s), reorderSections server action via reorder_sections RPC, SectionListSidebar with HTML5 drag handles, updateSectionLayout with 128KB cap
+- [x] 12-01-PLAN.md — Puck infrastructure: install `@puckeditor/core@0.21.2` (renamed from @measured/puck), admin `/admin/sops/builder/[sopId]` route with `'use client'` + `next/dynamic`(ssr:false), migration 00020 (layout_data JSONB + layout_version INT + sops.source_type + reorder_sections RPC), worker LayoutRenderer branch + linear fallback in SectionContent
+- [x] 12-02-PLAN.md — Block components: 7 shared blocks (Text, Heading, Photo, Callout, Step, HazardCard, PPECard) lifted from SectionContent palette with co-located Zod schemas; puck-config.tsx registers all 7 with SafeRender guards; BuilderClient + LayoutRenderer share the same config
+- [x] 12-03-PLAN.md — Blank-page wizard + library chip: 4-step wizard (title → canonical kinds → review → submit), createSopFromWizard server action (source_type='blank' + compensating cleanup), AUTHORED IN BUILDER chip in /admin/sops. SEND TO REVIEW reuses existing review page + publish route (D-04). D-08 purge wired into sync engine + ReviewClient.
+- [x] 12-04-PLAN.md — Draft persistence + section reorder: Dexie v4 draftLayouts table, flushDraftLayouts in sync-engine (LWW via server_newer sentinel + overwrittenByServer toast), useBuilderAutosave (750ms) + useDraftLayoutSync (3s), reorderSections server action via reorder_sections RPC, SectionListSidebar with HTML5 drag handles, updateSectionLayout with 128KB cap, DESKTOP/MOBILE preview toggle (430px phone-frame)
+
+Verifier verdict: FLAG (human_needed) — 9/9 requirements structurally verified, no duplicate publish flow, no stub-dressed tests. 11-item UAT required before REQUIREMENTS.md flip. See `12-VERIFICATION.md`.
 
 ### Phase 13: Reusable Block Library
 **Goal**: Admin can save, browse, and re-use hazard / PPE / step blocks from an org-scoped library alongside a read-only NZ global block set, and the wizard surfaces matching blocks at the right step with explicit pin-version vs follow-latest semantics

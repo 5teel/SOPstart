@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Closeout
-status: executing
-stopped_at: Completed 09-00-PLAN.md — phase9-stubs registered, 29 tests across 6 files
-last_updated: "2026-04-24T05:21:40.299Z"
-last_activity: 2026-04-24 -- Phase 12 planning complete
+status: ready_for_uat
+stopped_at: "Completed Phase 12 — all 4 plans merged; VERIFICATION verdict FLAG (human_needed) pending 11-item UAT"
+last_updated: "2026-04-24T08:30:00.000Z"
+last_activity: 2026-04-24 -- Phase 12 execution complete (4 plans merged, verifier FLAG awaiting UAT)
 progress:
   total_phases: 19
-  completed_phases: 1
-  total_plans: 8
-  completed_plans: 4
-  percent: 50
+  completed_phases: 2
+  total_plans: 12
+  completed_plans: 8
+  percent: 66
 ---
 
 # Project State
@@ -21,16 +21,26 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 11 — section-schema-block-foundation
+**Current focus:** Phase 12 — builder-shell-blank-page-authoring (execution complete, UAT pending)
 
 ## Current Position
 
-Phase: 12
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-04-24 -- Phase 12 planning complete
+Phase: 12 (builder-shell-blank-page-authoring) — EXECUTION COMPLETE, AWAITING UAT
+Plan: 4 of 4 (all merged to master)
+Status: Verifier returned FLAG (human_needed) — 9/9 requirements structurally verified, 11 UAT scenarios outstanding
+Last activity: 2026-04-24 -- Phase 12 execution complete (4 plans merged, verifier FLAG)
 
-Progress bar: `[░░░░░░░░░░░░░░░░░░░░]` 0% (requirements phase)
+Progress bar: `[██████████░░░░░░░░░░]` 50% (phases 11 and 12 structurally complete, 12 UAT pending)
+
+Phase 12 commits on master:
+- 1eeca15 merge(12-01) builder shell foundation
+- 895ecc7 merge(12-02) 7 SOP blocks + Puck config
+- 53303e9 merge(12-04) Dexie autosave + reorder + preview toggle
+- 944de00 merge(12-03) blank-page wizard + AUTHORED IN BUILDER + D-08 purge
+
+Outstanding before closeout:
+- Run 11-item UAT against live dev server + Supabase (logged in `12-VERIFICATION.md` human-verification block)
+- On UAT pass: mark SB-AUTH-01/04/05, SB-LAYOUT-01/02/03/04/06, SB-SECT-05 Complete in REQUIREMENTS.md and advance ROADMAP.md
 
 ## v2.0 Archive
 
