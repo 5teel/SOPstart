@@ -1,5 +1,5 @@
 'use client'
-import { Suspense, useState, useEffect, useCallback } from 'react'
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useSopDetail } from '@/hooks/useSopDetail'
@@ -8,30 +8,12 @@ import { WorkerPreviewToggle, WorkerPreviewClamp } from '@/components/sop/Worker
 import {
   OverviewTab, ToolsTab, HazardsTab, FlowTab, ModelTab, WalkthroughTab,
 } from '@/components/sop/tabs'
-import { CommandPalette } from '@/components/sop/CommandPalette'
 
 function SopDetailInner() {
   const params = useParams<{ sopId: string }>()
   const sopId = params?.sopId ?? ''
   const { data: sop, isLoading, isError } = useSopDetail(sopId)
   const active = useActiveTab()
-
-  const [cmdOpen, setCmdOpen] = useState(false)
-
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-      e.preventDefault()
-      // Don't open over the escalation modal
-      if (document.querySelector('[data-escalation-modal]')) return
-      setCmdOpen((prev) => !prev)
-    }
-    if (e.key === 'Escape') setCmdOpen(false)
-  }, [])
-
-  useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [handleKeyDown])
 
   if (isLoading) {
     return (
@@ -102,11 +84,6 @@ function SopDetailInner() {
         </WorkerPreviewClamp>
       </main>
 
-      <CommandPalette
-        sop={sop}
-        open={cmdOpen}
-        onClose={() => setCmdOpen(false)}
-      />
     </div>
   )
 }

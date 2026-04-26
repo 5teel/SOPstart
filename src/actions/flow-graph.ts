@@ -23,6 +23,15 @@ export async function updateSopFlowGraph(input: z.infer<typeof Input>) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
 
+  // Role gate — only admin and safety_manager may write flow graphs
+  const rawRole = (user.user_metadata?.['user_role'] as string | undefined)
+    ?? (user as unknown as { app_metadata?: { user_role?: string } }).app_metadata?.user_role
+    ?? ''
+  const role = (user as unknown as { user_role?: string }).user_role ?? rawRole
+  if (!['admin', 'safety_manager'].includes(role)) {
+    return { error: 'Admin access required' }
+  }
+
   const { error } = await supabase
     .from('sops')
     .update({ flow_graph: parsed.data.graph as unknown as import('@/types/database.types').Json })

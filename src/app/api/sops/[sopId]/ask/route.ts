@@ -20,9 +20,14 @@ export async function POST(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return new Response('Unauthorized', { status: 401 })
 
-  const body = await req.json() as { query?: string }
+  const body = await req.json() as { query?: string; sopId?: string }
   const query = typeof body.query === 'string' ? body.query.slice(0, 500) : ''
   if (!query) return new Response('Missing query', { status: 400 })
+
+  // Cross-SOP guard — reject if body.sopId is present and doesn't match path sopId
+  if (body.sopId && body.sopId !== sopId) {
+    return new Response(JSON.stringify({ error: 'SOP mismatch' }), { status: 400 })
+  }
 
   // Fetch SOP sections + steps to build AI context (org-scoped via RLS)
   const { data: sop } = await supabase

@@ -1,5 +1,5 @@
 'use client'
-import { useRef } from 'react'
+import { useRef, useMemo } from 'react'
 import { BlueprintCanvas } from '@/components/ui/BlueprintCanvas'
 import { BlueprintFrame } from '@/components/ui/BlueprintFrame'
 import { FlowGraphSchema, type FlowGraph } from '@/lib/validators/flow-graph'
@@ -133,6 +133,9 @@ function FlowCanvas({ graph }: { graph: FlowGraph }) {
 export function FlowTab({ sop }: { sop: SopWithSections }) {
   const warnedRef = useRef(false)
 
+  // D-15: memoize derivation keyed on stable fields — avoids recompute on unrelated renders
+  const derivedGraph = useMemo(() => deriveFlowGraph(sop), [sop.id, sop.updated_at])
+
   let graph: FlowGraph
   if (sop.flow_graph != null) {
     const parsed = FlowGraphSchema.safeParse(sop.flow_graph)
@@ -143,10 +146,10 @@ export function FlowTab({ sop }: { sop: SopWithSections }) {
         console.warn('[flow] explicit graph invalid, using derived', parsed.error)
         warnedRef.current = true
       }
-      graph = deriveFlowGraph(sop)
+      graph = derivedGraph
     }
   } else {
-    graph = deriveFlowGraph(sop)
+    graph = derivedGraph
   }
 
   return (

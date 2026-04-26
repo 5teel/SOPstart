@@ -29,7 +29,7 @@ export function CommandPalette({ sop, open, onClose }: CommandPaletteProps) {
       const res = await fetch(`/api/sops/${sop.id}/ask`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: aiQuery }),
+        body: JSON.stringify({ query: aiQuery, sopId: sop.id }),
         signal: abortRef.current.signal,
       })
       if (!res.ok || !res.body) { setAiError('Request failed'); setAiLoading(false); return }
