@@ -17,7 +17,7 @@ async function authOrg() {
   } = await supabase.auth.getSession()
   const claims = session?.access_token
     ? (JSON.parse(
-        Buffer.from(session.access_token.split('.')[1], 'base64').toString()
+        Buffer.from(session.access_token.split('.')[1], 'base64url').toString()
       ) as { organisation_id?: string })
     : {}
   if (!claims.organisation_id) return { error: 'Missing organisation_id claim' as const }

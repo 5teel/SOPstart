@@ -30,7 +30,7 @@ export async function saveVoiceNote(input: z.infer<typeof Input>) {
   } = await supabase.auth.getSession()
   const claims = session?.access_token
     ? (JSON.parse(
-        Buffer.from(session.access_token.split('.')[1], 'base64').toString()
+        Buffer.from(session.access_token.split('.')[1], 'base64url').toString()
       ) as { organisation_id?: string })
     : {}
   const orgId = claims.organisation_id

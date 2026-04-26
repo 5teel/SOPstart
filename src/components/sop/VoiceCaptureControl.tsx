@@ -47,34 +47,34 @@ export interface VoiceCaptureControlProps {
   onTranscript: (transcript: string, confidence: number) => void
 }
 
-export function VoiceCaptureControl(props: VoiceCaptureControlProps) {
+export function VoiceCaptureControl({
+  target,
+  sopId,
+  sectionId,
+  stepId,
+  completionId,
+  language,
+  onTranscript,
+}: VoiceCaptureControlProps) {
+  // All hooks must be called unconditionally before any conditional return
   const [state, dispatch] = useReducer(reducer, { kind: 'idle' })
   const { start, stop } = useDeepgramWebSocket()
   const isOnline = useNetworkStore((s) => s.isOnline)
 
-  const supported = typeof window !== 'undefined' ? isVoiceCaptureSupported() : true
-  if (!supported) {
-    return (
-      <span className="text-xs text-[var(--ink-500)]">
-        Voice capture requires iOS 14.3+ or desktop Chrome/Firefox/Safari
-      </span>
-    )
-  }
-
   const handleStart = useCallback(async () => {
     try {
-      const h = await start({ language: props.language, numerals: props.target === 'measurement' })
+      const h = await start({ language, numerals: target === 'measurement' })
       h.onPartial((text) => dispatch({ type: 'PARTIAL', text }))
       h.onFinal((text, confidence) => {
         dispatch({ type: 'CAPTURED', transcript: text, confidence })
-        props.onTranscript(text, confidence)
+        onTranscript(text, confidence)
       })
       h.onError((err) => dispatch({ type: 'ERROR', message: err.message }))
       dispatch({ type: 'START' })
     } catch (err) {
       dispatch({ type: 'ERROR', message: err instanceof Error ? err.message : 'start_failed' })
     }
-  }, [start, props])
+  }, [start, language, target, onTranscript])
 
   const handleStop = useCallback(async () => {
     dispatch({ type: 'STOP' })
@@ -87,16 +87,16 @@ export function VoiceCaptureControl(props: VoiceCaptureControlProps) {
         if (!format) return
         await db.voiceNotesQueue.add({
           id: crypto.randomUUID(),
-          sop_id: props.sopId,
-          section_id: props.sectionId,
-          step_id: props.stepId,
-          completion_id: props.completionId,
-          block_type: props.target,
+          sop_id: sopId,
+          section_id: sectionId,
+          step_id: stepId,
+          completion_id: completionId,
+          block_type: target,
           transcript: result.transcript || undefined,
           audio_blob: result.blob,
           audio_mime: format.mimeType,
           audio_ext: result.ext,
-          language: props.language,
+          language,
           confidence: result.confidence || undefined,
           syncState: 'dirty',
           _createdAt: Date.now(),
@@ -105,7 +105,17 @@ export function VoiceCaptureControl(props: VoiceCaptureControlProps) {
     } catch (err) {
       dispatch({ type: 'ERROR', message: err instanceof Error ? err.message : 'stop_failed' })
     }
-  }, [stop, isOnline, props])
+  }, [stop, isOnline, sopId, sectionId, stepId, completionId, target, language])
+
+  // Check support AFTER all hooks (Rules of Hooks — no early return before hooks)
+  const supported = typeof window !== 'undefined' ? isVoiceCaptureSupported() : true
+  if (!supported) {
+    return (
+      <span className="text-xs text-[var(--ink-500)]">
+        Voice capture requires iOS 14.3+ or desktop Chrome/Firefox/Safari
+      </span>
+    )
+  }
 
   return (
     <div className="inline-flex items-center gap-2" data-voice-state={state.kind}>

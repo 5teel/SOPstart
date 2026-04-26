@@ -56,9 +56,12 @@ export async function flushVoiceNoteQueue(supabase: SupabaseClient): Promise<Flu
         data: { session },
       } = await supabase.auth.getSession()
       const claims = session?.access_token
-        ? (JSON.parse(atob(session.access_token.split('.')[1])) as {
-            organisation_id?: string
-          })
+        ? (() => {
+            // JWTs use base64url (no padding, URL-safe chars) — atob() requires standard base64
+            const raw = session.access_token.split('.')[1]
+            const padded = raw.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((raw.length + 3) % 4)
+            return JSON.parse(atob(padded)) as { organisation_id?: string }
+          })()
         : {}
       const orgId = claims.organisation_id
       if (!orgId) throw new Error('no_org_claim')
