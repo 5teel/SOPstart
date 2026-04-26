@@ -138,16 +138,32 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
   void savedTick
 
   // D-13: sanitize unknown block types before passing data to <Puck>.
+  // Also carries through flow_graph from the SOP-level record (D-16) so
+  // FlowGraphField pre-loads the existing graph when the builder opens.
   const sanitizedInitial: Data = useMemo(() => {
-    if (!activeSection || activeSection.layout_data == null) return emptyData
+    if (!activeSection || activeSection.layout_data == null) {
+      return {
+        content: [],
+        root: { props: { flowGraph: initialSop.flow_graph ?? null } },
+      } as unknown as Data
+    }
     const parsed = LayoutDataSchema.safeParse(activeSection.layout_data)
-    if (!parsed.success) return emptyData
+    if (!parsed.success) {
+      return {
+        content: [],
+        root: { props: { flowGraph: initialSop.flow_graph ?? null } },
+      } as unknown as Data
+    }
     const sanitizedContent = sanitizeLayoutContent(
       (parsed.data.content ?? []) as unknown[]
     )
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return { ...parsed.data, content: sanitizedContent } as any as Data
-  }, [activeSection])
+    return {
+      ...parsed.data,
+      content: sanitizedContent,
+      root: { props: { flowGraph: initialSop.flow_graph ?? null } },
+    } as any as Data
+  }, [activeSection, initialSop.flow_graph])
 
   return (
     <div className="flex flex-col h-screen bg-steel-900 text-steel-100">
