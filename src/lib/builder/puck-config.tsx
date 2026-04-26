@@ -22,6 +22,18 @@ import {
   PPECardBlock,
   PPECardBlockPropsSchema,
   type PPECardBlockProps,
+  MeasurementBlock,
+  MeasurementBlockPropsSchema,
+  type MeasurementBlockProps,
+  DecisionBlock,
+  DecisionBlockPropsSchema,
+  type DecisionBlockProps,
+  EscalateBlock,
+  EscalateBlockPropsSchema,
+  type EscalateBlockProps,
+  SignOffBlock,
+  SignOffBlockPropsSchema,
+  type SignOffBlockProps,
 } from '@/components/sop/blocks'
 
 // Module-level warn-once flags (D-13/D-14: "once per page load")
@@ -375,6 +387,148 @@ export const puckConfig: Config = {
               coerced,
               'PPECardBlock',
               'PPE card - fix required props',
+              puck
+            )}
+          </>
+        )
+      },
+    },
+    MeasurementBlock: {
+      fields: {
+        label: { type: 'text', label: 'Label' },
+        unit: { type: 'text', label: 'Unit' },
+        voiceEnabled: {
+          type: 'select',
+          options: [
+            { label: 'On', value: true },
+            { label: 'Off', value: false },
+          ],
+        },
+        hint: { type: 'text', label: 'Hint (optional)' },
+      },
+      defaultProps: {
+        label: 'Gap',
+        unit: 'mm',
+        voiceEnabled: true,
+      } satisfies MeasurementBlockProps,
+      render: (rawProps) => {
+        const { puck, ...props } = rawProps as RawRenderProps
+        return (
+          <>
+            {SafeRender(
+              MeasurementBlockPropsSchema,
+              MeasurementBlock,
+              props,
+              'MeasurementBlock',
+              'Measurement - fix required props',
+              puck
+            )}
+          </>
+        )
+      },
+    },
+    DecisionBlock: {
+      fields: {
+        question: { type: 'text', label: 'Question' },
+        options: {
+          type: 'array',
+          arrayFields: {
+            label: { type: 'text', label: 'Option label' },
+            isEscalation: {
+              type: 'select',
+              label: 'Is escalation?',
+              options: [
+                { label: 'No', value: false },
+                { label: 'Yes', value: true },
+              ],
+            },
+          },
+          getItemSummary: (item: unknown) =>
+            (item as { label?: string }).label ?? 'Option',
+        },
+      },
+      defaultProps: {
+        question: 'Is the guard in place?',
+        options: [{ label: 'Yes — continue' }, { label: 'No — escalate', isEscalation: true }],
+      } satisfies DecisionBlockProps,
+      render: (rawProps) => {
+        const { puck, ...props } = rawProps as RawRenderProps
+        return (
+          <>
+            {SafeRender(
+              DecisionBlockPropsSchema,
+              DecisionBlock,
+              props,
+              'DecisionBlock',
+              'Decision - fix required props',
+              puck
+            )}
+          </>
+        )
+      },
+    },
+    EscalateBlock: {
+      fields: {
+        title: { type: 'text', label: 'Title' },
+        reason: { type: 'textarea', label: 'Reason (optional)' },
+        escalationMode: {
+          type: 'select',
+          label: 'Escalation mode',
+          options: [
+            { label: 'Form (default)', value: 'form' },
+            { label: 'Alert', value: 'alert' },
+            { label: 'Lock', value: 'lock' },
+          ],
+        },
+      },
+      defaultProps: {
+        title: 'Escalate',
+        escalationMode: 'form',
+      } satisfies EscalateBlockProps,
+      render: (rawProps) => {
+        const { puck, ...props } = rawProps as RawRenderProps
+        return (
+          <>
+            {SafeRender(
+              EscalateBlockPropsSchema,
+              EscalateBlock,
+              props,
+              'EscalateBlock',
+              'Escalate - fix required props',
+              puck
+            )}
+          </>
+        )
+      },
+    },
+    SignOffBlock: {
+      fields: {
+        title: { type: 'text', label: 'Title' },
+        requiredRole: {
+          type: 'select',
+          label: 'Required role',
+          options: [
+            { label: 'Supervisor', value: 'supervisor' },
+            { label: 'Safety manager', value: 'safety_manager' },
+            { label: 'Admin', value: 'admin' },
+          ],
+        },
+        acknowledgementText: { type: 'textarea', label: 'Acknowledgement text (optional)' },
+      },
+      defaultProps: {
+        title: 'Supervisor sign-off',
+        requiredRole: 'supervisor',
+      } satisfies SignOffBlockProps,
+      render: (rawProps) => {
+        const { puck, ...props } = rawProps as RawRenderProps
+        return (
+          <>
+            {SafeRender(
+              SignOffBlockPropsSchema,
+              SignOffBlock,
+              props,
+              'SignOffBlock',
+              'Sign-off - fix required props',
               puck
             )}
           </>

@@ -29,6 +29,10 @@ import {
   StepBlockPropsSchema,
   HazardCardBlockPropsSchema,
   PPECardBlockPropsSchema,
+  MeasurementBlockPropsSchema,
+  DecisionBlockPropsSchema,
+  EscalateBlockPropsSchema,
+  SignOffBlockPropsSchema,
 } from '@/components/sop/blocks'
 import { BlockContentSchema } from '@/lib/validators/blocks'
 import {
@@ -97,6 +101,26 @@ const BLOCK_REGISTRY: Record<string, {
     schema: PPECardBlockPropsSchema,
     description: 'Blue PPE card - required equipment chips.',
     example: { title: 'Required PPE', items: ['Cut-resistant gloves', 'Safety glasses'] },
+  },
+  MeasurementBlock: {
+    schema: MeasurementBlockPropsSchema,
+    description: 'Numeric measurement capture with unit, tolerance, and optional voice affordance.',
+    example: { label: 'Blade gap', unit: 'mm', tolerance: { min: 0.5, max: 1.5, target: 1.0 }, voiceEnabled: true },
+  },
+  DecisionBlock: {
+    schema: DecisionBlockPropsSchema,
+    description: 'Branching decision with 2-6 options; each option may jump to a step or trigger escalation.',
+    example: { question: 'Is the guard in place?', options: [{ label: 'Yes — continue' }, { label: 'No — escalate', isEscalation: true }] },
+  },
+  EscalateBlock: {
+    schema: EscalateBlockPropsSchema,
+    description: 'Hybrid escalation. Mode "alert" notifies supervisor, "lock" blocks NEXT until sign-off, "form" (default) opens a structured report.',
+    example: { title: 'Lockout required', escalationMode: 'form', recipients: ['supervisor'] },
+  },
+  SignOffBlock: {
+    schema: SignOffBlockPropsSchema,
+    description: 'Supervisor sign-off capable block. Can unlock a previously locked EscalateBlock.',
+    example: { title: 'Supervisor sign-off', requiredRole: 'supervisor' },
   },
 }
 
