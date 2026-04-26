@@ -1,3 +1,9 @@
+// Phase 12.5 — new union types for blocks + voice + escalation
+export type VoiceNoteBlockType = 'measurement' | 'note'
+export type EscalationMode = 'alert' | 'lock' | 'form'
+export type VoiceLanguage = 'en-NZ' | 'en-AU' | 'en-US'
+export type EscalationStatus = 'open' | 'acknowledged' | 'resolved'
+
 export type SopStatus = 'uploading' | 'parsing' | 'draft' | 'published'
 export type ParseJobStatus = 'queued' | 'processing' | 'completed' | 'failed'
 export type SourceFileType = 'docx' | 'pdf' | 'image' | 'xlsx' | 'pptx' | 'txt' | 'video'
