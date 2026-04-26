@@ -46,5 +46,10 @@ export default defineConfig({
       name: 'phase11-stubs',
       testMatch: /sb-auth-builder|sb-section-schema|sb-layout-editor|sb-image-annotation|sb-collaborative-editing|sb-block-library|sb-builder-infrastructure|resolve-render-family/,
     },
+    {
+      name: 'phase12.5-stubs',
+      testMatch: /sb-ux-(blueprint|voice|flow|cmdk|contract|walkthrough|escalate|blocks)\.test\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
