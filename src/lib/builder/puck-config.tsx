@@ -34,6 +34,18 @@ import {
   SignOffBlock,
   SignOffBlockPropsSchema,
   type SignOffBlockProps,
+  ZoneBlock,
+  ZoneBlockPropsSchema,
+  type ZoneBlockProps,
+  InspectBlock,
+  InspectBlockPropsSchema,
+  type InspectBlockProps,
+  VoiceNoteBlock,
+  VoiceNoteBlockPropsSchema,
+  type VoiceNoteBlockProps,
+  ModelBlock,
+  ModelBlockPropsSchema,
+  type ModelBlockProps,
 } from '@/components/sop/blocks'
 
 // Module-level warn-once flags (D-13/D-14: "once per page load")
@@ -529,6 +541,141 @@ export const puckConfig: Config = {
               props,
               'SignOffBlock',
               'Sign-off - fix required props',
+              puck
+            )}
+          </>
+        )
+      },
+    },
+    ZoneBlock: {
+      fields: {
+        label: { type: 'text', label: 'Zone name' },
+        zoneType: {
+          type: 'select',
+          label: 'Zone type',
+          options: [
+            { label: 'Danger', value: 'danger' },
+            { label: 'Warning', value: 'warning' },
+            { label: 'Safe', value: 'safe' },
+            { label: 'Pedestrian', value: 'pedestrian' },
+          ],
+        },
+        notes: { type: 'textarea', label: 'Notes (optional)' },
+      },
+      defaultProps: {
+        label: 'Forklift corridor',
+        zoneType: 'danger',
+      } satisfies ZoneBlockProps,
+      render: (rawProps) => {
+        const { puck, ...props } = rawProps as RawRenderProps
+        return (
+          <>
+            {SafeRender(
+              ZoneBlockPropsSchema,
+              ZoneBlock,
+              props,
+              'ZoneBlock',
+              'Zone - fix required props',
+              puck
+            )}
+          </>
+        )
+      },
+    },
+    InspectBlock: {
+      fields: {
+        title: { type: 'text', label: 'Title' },
+        items: {
+          type: 'array',
+          arrayFields: {
+            label: { type: 'text', label: 'Item label' },
+            requirePhoto: {
+              type: 'select',
+              label: 'Require photo?',
+              options: [
+                { label: 'No', value: false },
+                { label: 'Yes', value: true },
+              ],
+            },
+          },
+          getItemSummary: (item: unknown) =>
+            (item as { label?: string }).label ?? 'Item',
+        },
+      },
+      defaultProps: {
+        title: 'Pre-start inspection',
+        items: [{ label: 'Guards in place', requirePhoto: true }],
+      } satisfies InspectBlockProps,
+      render: (rawProps) => {
+        const { puck, ...props } = rawProps as RawRenderProps
+        return (
+          <>
+            {SafeRender(
+              InspectBlockPropsSchema,
+              InspectBlock,
+              props,
+              'InspectBlock',
+              'Inspection - fix required props',
+              puck
+            )}
+          </>
+        )
+      },
+    },
+    VoiceNoteBlock: {
+      fields: {
+        prompt: { type: 'text', label: 'Prompt' },
+        language: {
+          type: 'select',
+          label: 'Language',
+          options: [
+            { label: 'English (NZ)', value: 'en-NZ' },
+            { label: 'English (AU)', value: 'en-AU' },
+            { label: 'English (US)', value: 'en-US' },
+          ],
+        },
+        maxDurationSec: { type: 'number', label: 'Max duration (seconds)' },
+      },
+      defaultProps: {
+        prompt: 'Describe any unusual noise.',
+        language: 'en-NZ',
+        maxDurationSec: 60,
+      } satisfies VoiceNoteBlockProps,
+      render: (rawProps) => {
+        const { puck, ...props } = rawProps as RawRenderProps
+        return (
+          <>
+            {SafeRender(
+              VoiceNoteBlockPropsSchema,
+              VoiceNoteBlock,
+              props,
+              'VoiceNoteBlock',
+              'Voice note - fix required props',
+              puck
+            )}
+          </>
+        )
+      },
+    },
+    ModelBlock: {
+      fields: {
+        assetUrl: { type: 'text', label: 'Asset URL (.glb / .usdz)' },
+      },
+      defaultProps: {
+        assetUrl: 'https://storage.example.com/models/pump.glb',
+        hotspots: [],
+        defaultLayers: [],
+      } satisfies ModelBlockProps,
+      render: (rawProps) => {
+        const { puck, ...props } = rawProps as RawRenderProps
+        return (
+          <>
+            {SafeRender(
+              ModelBlockPropsSchema,
+              ModelBlock,
+              props,
+              'ModelBlock',
+              '3D model - fix required props',
               puck
             )}
           </>

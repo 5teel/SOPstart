@@ -33,6 +33,10 @@ import {
   DecisionBlockPropsSchema,
   EscalateBlockPropsSchema,
   SignOffBlockPropsSchema,
+  ZoneBlockPropsSchema,
+  InspectBlockPropsSchema,
+  VoiceNoteBlockPropsSchema,
+  ModelBlockPropsSchema,
 } from '@/components/sop/blocks'
 import { BlockContentSchema } from '@/lib/validators/blocks'
 import {
@@ -121,6 +125,26 @@ const BLOCK_REGISTRY: Record<string, {
     schema: SignOffBlockPropsSchema,
     description: 'Supervisor sign-off capable block. Can unlock a previously locked EscalateBlock.',
     example: { title: 'Supervisor sign-off', requiredRole: 'supervisor' },
+  },
+  ZoneBlock: {
+    schema: ZoneBlockPropsSchema,
+    description: 'Color-coded zone label (danger/warning/safe/pedestrian).',
+    example: { label: 'Forklift corridor', zoneType: 'danger' },
+  },
+  InspectBlock: {
+    schema: InspectBlockPropsSchema,
+    description: 'Inspection checklist. Each item may require a photo.',
+    example: { title: 'Pre-start inspection', items: [{ label: 'Guards in place', requirePhoto: true }] },
+  },
+  VoiceNoteBlock: {
+    schema: VoiceNoteBlockPropsSchema,
+    description: 'Voice-note capture (Deepgram Nova-3). Transcript persisted to sop_voice_notes.',
+    example: { prompt: 'Describe any unusual noise.', language: 'en-NZ', maxDurationSec: 60 },
+  },
+  ModelBlock: {
+    schema: ModelBlockPropsSchema,
+    description: '3D model viewer (feature-flagged via NEXT_PUBLIC_MODEL_BLOCK_ENABLED). Renders placeholder when disabled.',
+    example: { assetUrl: 'https://storage.example.com/models/pump.glb', hotspots: [], defaultLayers: [] },
   },
 }
 

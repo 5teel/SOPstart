@@ -84,6 +84,37 @@ export const SignOffBlockContentSchema = z.object({
   acknowledgementText: z.string().optional(),
 })
 
+export const ZoneBlockContentSchema = z.object({
+  kind: z.literal('zone'),
+  label: z.string().min(1),
+  zoneType: z.enum(['danger', 'warning', 'safe', 'pedestrian']),
+  notes: z.string().optional(),
+})
+
+export const InspectBlockContentSchema = z.object({
+  kind: z.literal('inspect'),
+  title: z.string().min(1),
+  items: z
+    .array(
+      z.object({
+        label: z.string().min(1),
+        requirePhoto: z.boolean().default(false),
+      })
+    )
+    .min(1),
+})
+
+export const VoiceNoteBlockContentSchema = z.object({
+  kind: z.literal('voice-note'),
+  prompt: z.string().min(1),
+  language: z.enum(['en-NZ', 'en-AU', 'en-US']).default('en-NZ'),
+  maxDurationSec: z.number().int().min(5).max(300).default(60),
+})
+
+// ModelBlock is intentionally excluded from BlockContentSchema —
+// it lives only in layout_data (Puck JSON), never in sop_section_blocks.
+// It IS registered in puckConfig.components + BLOCK_REGISTRY.
+
 export const BlockContentSchema = z.discriminatedUnion('kind', [
   HazardBlockContentSchema,
   PpeBlockContentSchema,
@@ -94,6 +125,9 @@ export const BlockContentSchema = z.discriminatedUnion('kind', [
   DecisionBlockContentSchema,
   EscalateBlockContentSchema,
   SignOffBlockContentSchema,
+  ZoneBlockContentSchema,
+  InspectBlockContentSchema,
+  VoiceNoteBlockContentSchema,
 ])
 
 export type HazardBlockContent = z.infer<typeof HazardBlockContentSchema>
@@ -105,4 +139,7 @@ export type MeasurementBlockContent = z.infer<typeof MeasurementBlockContentSche
 export type DecisionBlockContent = z.infer<typeof DecisionBlockContentSchema>
 export type EscalateBlockContent = z.infer<typeof EscalateBlockContentSchema>
 export type SignOffBlockContent = z.infer<typeof SignOffBlockContentSchema>
+export type ZoneBlockContent = z.infer<typeof ZoneBlockContentSchema>
+export type InspectBlockContent = z.infer<typeof InspectBlockContentSchema>
+export type VoiceNoteBlockContent = z.infer<typeof VoiceNoteBlockContentSchema>
 export type BlockContent = z.infer<typeof BlockContentSchema>
