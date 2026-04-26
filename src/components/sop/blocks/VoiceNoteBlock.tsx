@@ -3,6 +3,8 @@ import { useContext, useState } from 'react'
 import { z } from 'zod'
 import { VoiceCaptureControl } from '@/components/sop/VoiceCaptureControl'
 import { SopBlockContext } from '@/components/sop/SopBlockContext'
+import { createClient } from '@/lib/supabase/client'
+import { saveVoiceNote } from '@/actions/voice-notes'
 
 export const VoiceNoteBlockPropsSchema = z.object({
   prompt: z.string().min(1).max(200),
@@ -18,6 +20,39 @@ export function VoiceNoteBlock({
 }: VoiceNoteBlockProps) {
   const ctx = useContext(SopBlockContext)
   const [saved, setSaved] = useState<string | null>(null)
+
+  const handleCaptured = async (payload: { blob: Blob; transcript: string; confidence: number; ext: string }) => {
+    if (!ctx) return
+    try {
+      const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+      const raw = session?.access_token?.split('.')[1]
+      const claims = raw
+        ? (JSON.parse(atob(raw.replace(/-/g, '+').replace(/_/g, '/') + '==='.slice((raw.length + 3) % 4))) as { organisation_id?: string })
+        : {}
+      const orgId = claims.organisation_id
+      if (!orgId) return
+      const fileId = crypto.randomUUID()
+      const storagePath = `${orgId}/voice/${ctx.sopId}/${fileId}.${payload.ext}`
+      const { error: uploadErr } = await supabase.storage
+        .from('sop-voice-notes')
+        .upload(storagePath, payload.blob, { contentType: payload.blob.type })
+      if (uploadErr) { console.error('[voice] storage upload failed', uploadErr); return }
+      await saveVoiceNote({
+        sopId: ctx.sopId,
+        sectionId: ctx.sectionId,
+        stepId: ctx.stepId,
+        completionId: ctx.completionId,
+        blockType: 'note',
+        transcript: payload.transcript,
+        confidence: payload.confidence,
+        language,
+        audioStoragePath: storagePath,
+      })
+    } catch (err) {
+      console.error('[voice] online persist failed', err)
+    }
+  }
 
   return (
     <section
@@ -51,6 +86,7 @@ export function VoiceNoteBlock({
             onTranscript={(transcript) => {
               setSaved(transcript)
             }}
+            onCaptured={handleCaptured}
           />
         ) : (
           // Fallback when no SopBlockContext available (e.g. admin preview)
