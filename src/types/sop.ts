@@ -59,6 +59,7 @@ export interface Sop {
   published_at: string | null
   pipeline_run_id?: string | null
   source_type: SourceType
+  flow_graph?: unknown | null
   created_at: string
   updated_at: string
 }
