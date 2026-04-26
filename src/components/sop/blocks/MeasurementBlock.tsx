@@ -1,4 +1,8 @@
+'use client'
+import { useContext, useState } from 'react'
 import { z } from 'zod'
+import { VoiceCaptureControl } from '@/components/sop/VoiceCaptureControl'
+import { SopBlockContext } from '@/components/sop/SopBlockContext'
 
 export const MeasurementBlockPropsSchema = z.object({
   label: z.string().min(1).max(120),
@@ -22,6 +26,9 @@ export function MeasurementBlock({
   voiceEnabled = true,
   hint,
 }: MeasurementBlockProps) {
+  const ctx = useContext(SopBlockContext)
+  const [value, setValue] = useState('')
+
   const range = tolerance
     ? [
         tolerance.min != null ? `≥${tolerance.min}` : null,
@@ -31,6 +38,7 @@ export function MeasurementBlock({
         .filter(Boolean)
         .join(' · ')
     : null
+
   return (
     <section
       className="mb-4 border rounded-xl p-5"
@@ -50,46 +58,52 @@ export function MeasurementBlock({
           </span>
           <strong className="text-base font-semibold">{label}</strong>
           {range && (
-            <span
-              className="text-xs mt-1"
-              style={{ color: 'var(--ink-500, #6b7280)' }}
-            >
+            <span className="text-xs mt-1" style={{ color: 'var(--ink-500, #6b7280)' }}>
               {range}
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
           <input
             type="text"
             inputMode="decimal"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
             aria-label={`${label} value`}
             className="w-24 px-2 py-1 border border-[var(--ink-300,#d1d5db)] rounded text-right font-mono bg-white"
           />
-          <span
-            className="text-sm"
-            style={{ color: 'var(--ink-700, #374151)' }}
-          >
+          <span className="text-sm" style={{ color: 'var(--ink-700, #374151)' }}>
             {unit}
           </span>
-          {voiceEnabled && (
-            <button
-              type="button"
-              aria-label={`Capture ${label} by voice`}
-              className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-[var(--accent-measure)] text-base"
+          {voiceEnabled && ctx && (
+            <VoiceCaptureControl
+              target="measurement"
+              sopId={ctx.sopId}
+              sectionId={ctx.sectionId}
+              stepId={ctx.stepId}
+              completionId={ctx.completionId}
+              language="en-NZ"
+              onTranscript={(text) => {
+                // Deepgram numerals=true biases spoken numbers → digits
+                const numeric = text.replace(/[^\d.-]/g, '')
+                if (numeric) setValue(numeric)
+              }}
+            />
+          )}
+          {voiceEnabled && !ctx && (
+            // Fallback when no SopBlockContext — render static mic indicator
+            <span
+              className="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-[var(--accent-measure)] text-base opacity-40"
               style={{ color: 'var(--accent-measure)' }}
-              data-voice-target="measurement"
-              data-wave4-wiring="VoiceCaptureControl"
+              title="Voice capture requires SopBlockContext"
             >
               🎤
-            </button>
+            </span>
           )}
         </div>
       </div>
       {hint && (
-        <p
-          className="text-xs mt-2"
-          style={{ color: 'var(--ink-500, #6b7280)' }}
-        >
+        <p className="text-xs mt-2" style={{ color: 'var(--ink-500, #6b7280)' }}>
           {hint}
         </p>
       )}

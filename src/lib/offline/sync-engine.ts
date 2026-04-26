@@ -3,6 +3,7 @@ type AnySupabaseClient = import('@supabase/supabase-js').SupabaseClient<any, any
 import { db } from '@/lib/offline/db'
 import type { Sop, SopSection, SopStep, SopImage } from '@/types/sop'
 import { submitCompletion, getPhotoUploadUrl } from '@/actions/completions'
+import { flushVoiceNoteQueue } from '@/lib/offline/voice-queue'
 
 interface SopManifestEntry {
   sop_id: string
@@ -288,6 +289,14 @@ export async function flushCompletions(
 
   return { flushed, errors }
 }
+
+// ---------------------------------------------------------------
+// flushVoiceQueue (Phase 12.5 SB-UX-06)
+// Flushes offline-queued voice blobs: transcribes via Deepgram REST,
+// uploads to Supabase Storage, inserts sop_voice_notes row.
+// Called by reconnect handlers alongside flushPhotoQueue + flushCompletions.
+// ---------------------------------------------------------------
+export { flushVoiceNoteQueue }
 
 // ---------------------------------------------------------------
 // flushDraftLayouts (Phase 12 SB-LAYOUT-04)
