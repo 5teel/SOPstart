@@ -29,6 +29,14 @@ import {
   StepBlockPropsSchema,
   HazardCardBlockPropsSchema,
   PPECardBlockPropsSchema,
+  MeasurementBlockPropsSchema,
+  DecisionBlockPropsSchema,
+  EscalateBlockPropsSchema,
+  SignOffBlockPropsSchema,
+  ZoneBlockPropsSchema,
+  InspectBlockPropsSchema,
+  VoiceNoteBlockPropsSchema,
+  ModelBlockPropsSchema,
 } from '@/components/sop/blocks'
 import { BlockContentSchema } from '@/lib/validators/blocks'
 import {
@@ -97,6 +105,46 @@ const BLOCK_REGISTRY: Record<string, {
     schema: PPECardBlockPropsSchema,
     description: 'Blue PPE card - required equipment chips.',
     example: { title: 'Required PPE', items: ['Cut-resistant gloves', 'Safety glasses'] },
+  },
+  MeasurementBlock: {
+    schema: MeasurementBlockPropsSchema,
+    description: 'Numeric measurement capture with unit, tolerance, and optional voice affordance.',
+    example: { label: 'Blade gap', unit: 'mm', tolerance: { min: 0.5, max: 1.5, target: 1.0 }, voiceEnabled: true },
+  },
+  DecisionBlock: {
+    schema: DecisionBlockPropsSchema,
+    description: 'Branching decision with 2-6 options; each option may jump to a step or trigger escalation.',
+    example: { question: 'Is the guard in place?', options: [{ label: 'Yes — continue' }, { label: 'No — escalate', isEscalation: true }] },
+  },
+  EscalateBlock: {
+    schema: EscalateBlockPropsSchema,
+    description: 'Hybrid escalation. Mode "alert" notifies supervisor, "lock" blocks NEXT until sign-off, "form" (default) opens a structured report.',
+    example: { title: 'Lockout required', escalationMode: 'form', recipients: ['supervisor'] },
+  },
+  SignOffBlock: {
+    schema: SignOffBlockPropsSchema,
+    description: 'Supervisor sign-off capable block. Can unlock a previously locked EscalateBlock.',
+    example: { title: 'Supervisor sign-off', requiredRole: 'supervisor' },
+  },
+  ZoneBlock: {
+    schema: ZoneBlockPropsSchema,
+    description: 'Color-coded zone label (danger/warning/safe/pedestrian).',
+    example: { label: 'Forklift corridor', zoneType: 'danger' },
+  },
+  InspectBlock: {
+    schema: InspectBlockPropsSchema,
+    description: 'Inspection checklist. Each item may require a photo.',
+    example: { title: 'Pre-start inspection', items: [{ label: 'Guards in place', requirePhoto: true }] },
+  },
+  VoiceNoteBlock: {
+    schema: VoiceNoteBlockPropsSchema,
+    description: 'Voice-note capture (Deepgram Nova-3). Transcript persisted to sop_voice_notes.',
+    example: { prompt: 'Describe any unusual noise.', language: 'en-NZ', maxDurationSec: 60 },
+  },
+  ModelBlock: {
+    schema: ModelBlockPropsSchema,
+    description: '3D model viewer (feature-flagged via NEXT_PUBLIC_MODEL_BLOCK_ENABLED). Renders placeholder when disabled.',
+    example: { assetUrl: 'https://storage.example.com/models/pump.glb', hotspots: [], defaultLayers: [] },
   },
 }
 

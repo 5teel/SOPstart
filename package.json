@@ -7,9 +7,11 @@
   },
   "scripts": {
     "dev": "next dev --webpack -p 4200",
+    "prebuild": "tsx scripts/contract-check.ts",
     "build": "next build --webpack",
     "start": "next start -p 4200",
     "lint": "eslint",
+    "contract:check": "tsx scripts/contract-check.ts",
     "test": "npx playwright test",
     "test:integration": "npx playwright test --project=integration",
     "test:e2e": "npx playwright test --project=e2e",
@@ -63,6 +65,7 @@
     "prettier-plugin-tailwindcss": "^0.6.12",
     "supabase": "^2.22.6",
     "tailwindcss": "^4",
+    "tsx": "4.19.2",
     "typescript": "^5"
   },
   "optionalDependencies": {
