@@ -45,6 +45,35 @@ export interface DraftLayout {
   _cachedAt: number                      // when the row was last read/written locally
 }
 
+// ---------------------------------------------------------------
+// v5 types: voice notes queue + walkthrough progress (Phase 12.5)
+// ---------------------------------------------------------------
+
+export interface QueuedVoiceNote {
+  id: string                    // client-generated UUID
+  sop_id: string
+  section_id?: string
+  step_id?: string
+  completion_id?: string
+  block_type: 'measurement' | 'note'
+  transcript?: string           // optional: may be transcribed offline or on flush
+  audio_blob: Blob
+  audio_mime: string            // e.g. 'audio/webm;codecs=opus' — from pickRecorderFormat()
+  audio_ext: 'webm' | 'mp4' | 'ogg'
+  language: 'en-NZ' | 'en-AU' | 'en-US'
+  confidence?: number
+  syncState: 'dirty' | 'synced'
+  _createdAt: number            // epoch ms
+}
+
+export interface WalkthroughProgressRow {
+  sop_id: string
+  user_id: string               // stored for sync reconciliation; Dexie keys on sop_id only (single-worker-per-device)
+  step_id: string | null
+  completed_at: number | null   // epoch ms
+  updated_at: number            // epoch ms
+}
+
 type SopAssistantDB = Dexie & {
   sops: EntityTable<CachedSop, 'id'>
   sections: EntityTable<SopSection, 'id'>
@@ -54,6 +83,8 @@ type SopAssistantDB = Dexie & {
   completions: EntityTable<LocalCompletion, 'localId'>
   photoQueue: EntityTable<QueuedPhoto, 'localId'>
   draftLayouts: EntityTable<DraftLayout, 'section_id'>
+  voiceNotesQueue: EntityTable<QueuedVoiceNote, 'id'>
+  walkthroughProgress: EntityTable<WalkthroughProgressRow, 'sop_id'>
 }
 
 const db = new Dexie('SopAssistantDB') as SopAssistantDB
@@ -108,6 +139,27 @@ db.version(4).stores({
   completions: 'localId, sopId, status',
   photoQueue: 'localId, completionLocalId, stepId, uploaded',
   draftLayouts: 'section_id, sop_id, syncState, _cachedAt',
+})
+
+// v5: adds voiceNotesQueue + walkthroughProgress for Phase 12.5 blueprint redesign.
+// All v4 stores re-declared verbatim (Dexie cumulative-additive requirement).
+// voiceNotesQueue: keyed by id (client UUID); indexes sop_id, syncState, _createdAt.
+// walkthroughProgress: keyed by sop_id (single-worker-per-device assumption);
+//   indexes step_id + updated_at for flush sweep.
+db.version(5).stores({
+  // v4 stores — re-declared verbatim per cumulative-bump pattern
+  sops: 'id, organisation_id, status, version, category, department, _cachedAt',
+  sections: 'id, sop_id, section_type, section_kind_id, sort_order',
+  steps: 'id, section_id, step_number',
+  images: 'id, sop_id, section_id, step_id',
+  syncMeta: 'key',
+  completions: 'localId, sopId, status',
+  photoQueue: 'localId, completionLocalId, stepId, uploaded',
+  draftLayouts: 'section_id, sop_id, syncState, _cachedAt',
+
+  // v5 additions — Phase 12.5
+  voiceNotesQueue:     'id, sop_id, syncState, _createdAt',
+  walkthroughProgress: 'sop_id, step_id, updated_at',
 })
 
 export { db }

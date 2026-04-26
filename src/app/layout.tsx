@@ -3,6 +3,7 @@ import { ThemeProvider } from 'next-themes'
 import { PRODUCT_NAME, PRODUCT_DESCRIPTION } from '@/lib/constants'
 import { SiteThemeProvider } from '@/components/providers/SiteThemeProvider'
 import './globals.css'
+import '../styles/blueprint-theme.css'
 
 export const metadata: Metadata = {
   title: PRODUCT_NAME,

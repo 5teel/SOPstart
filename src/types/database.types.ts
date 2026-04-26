@@ -590,6 +590,7 @@ export type Database = {
           category: string | null
           created_at: string
           department: string | null
+          flow_graph: Json | null
           id: string
           is_ocr: boolean
           organisation_id: string
@@ -618,6 +619,7 @@ export type Database = {
           category?: string | null
           created_at?: string
           department?: string | null
+          flow_graph?: Json | null
           id?: string
           is_ocr?: boolean
           organisation_id: string
@@ -646,6 +648,7 @@ export type Database = {
           category?: string | null
           created_at?: string
           department?: string | null
+          flow_graph?: Json | null
           id?: string
           is_ocr?: boolean
           organisation_id?: string
@@ -787,6 +790,132 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      sop_voice_notes: {
+        Row: {
+          id: string
+          organisation_id: string
+          sop_id: string
+          section_id: string | null
+          step_id: string | null
+          completion_id: string | null
+          block_type: 'measurement' | 'note'
+          transcript: string
+          audio_storage_path: string
+          confidence: number | null
+          language: 'en-NZ' | 'en-AU' | 'en-US'
+          created_by: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          organisation_id: string
+          sop_id: string
+          section_id?: string | null
+          step_id?: string | null
+          completion_id?: string | null
+          block_type: 'measurement' | 'note'
+          transcript: string
+          audio_storage_path: string
+          confidence?: number | null
+          language?: 'en-NZ' | 'en-AU' | 'en-US'
+          created_by: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          sop_id?: string
+          section_id?: string | null
+          step_id?: string | null
+          completion_id?: string | null
+          block_type?: 'measurement' | 'note'
+          transcript?: string
+          audio_storage_path?: string
+          confidence?: number | null
+          language?: 'en-NZ' | 'en-AU' | 'en-US'
+          created_by?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      escalation_reports: {
+        Row: {
+          id: string
+          organisation_id: string
+          sop_id: string
+          section_id: string | null
+          step_id: string | null
+          completion_id: string | null
+          escalation_mode: 'alert' | 'lock' | 'form'
+          reason: string | null
+          photos: string[] | null
+          measurements: Json | null
+          status: 'open' | 'acknowledged' | 'resolved'
+          submitted_by: string
+          submitted_at: string
+          acknowledged_by: string | null
+          acknowledged_at: string | null
+        }
+        Insert: {
+          id?: string
+          organisation_id: string
+          sop_id: string
+          section_id?: string | null
+          step_id?: string | null
+          completion_id?: string | null
+          escalation_mode: 'alert' | 'lock' | 'form'
+          reason?: string | null
+          photos?: string[] | null
+          measurements?: Json | null
+          status?: 'open' | 'acknowledged' | 'resolved'
+          submitted_by: string
+          submitted_at?: string
+          acknowledged_by?: string | null
+          acknowledged_at?: string | null
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          sop_id?: string
+          section_id?: string | null
+          step_id?: string | null
+          completion_id?: string | null
+          escalation_mode?: 'alert' | 'lock' | 'form'
+          reason?: string | null
+          photos?: string[] | null
+          measurements?: Json | null
+          status?: 'open' | 'acknowledged' | 'resolved'
+          submitted_by?: string
+          submitted_at?: string
+          acknowledged_by?: string | null
+          acknowledged_at?: string | null
+        }
+        Relationships: []
+      }
+      walkthrough_progress: {
+        Row: {
+          sop_id: string
+          user_id: string
+          step_id: string | null
+          completed_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          sop_id: string
+          user_id: string
+          step_id?: string | null
+          completed_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          sop_id?: string
+          user_id?: string
+          step_id?: string | null
+          completed_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       sop_completions: {
         Row: {
