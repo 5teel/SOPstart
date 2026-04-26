@@ -1,70 +1,38 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { ArrowLeft, Download, CheckCircle } from 'lucide-react'
 import { useSopDetail } from '@/hooks/useSopDetail'
-import { useVideoGeneration } from '@/hooks/useVideoGeneration'
-import { useNetworkStore } from '@/stores/network'
-import { SopSectionTabs } from '@/components/sop/SopSectionTabs'
-import { SectionContent } from '@/components/sop/SectionContent'
-import { VideoTabPanel } from '@/components/sop/VideoTabPanel'
-import type { ChapterMarker } from '@/types/sop'
+import { SopTabNav, useActiveTab } from '@/components/sop/SopTabNav'
+import { WorkerPreviewToggle, WorkerPreviewClamp } from '@/components/sop/WorkerPreviewToggle'
+import {
+  OverviewTab, ToolsTab, HazardsTab, FlowTab, ModelTab, WalkthroughTab,
+} from '@/components/sop/tabs'
 
-export default function SopDetailPage() {
-  const params = useParams()
-  const sopId = params.sopId as string
-
+function SopDetailInner() {
+  const params = useParams<{ sopId: string }>()
+  const sopId = params?.sopId ?? ''
   const { data: sop, isLoading, isError } = useSopDetail(sopId)
-  const { data: videoJob } = useVideoGeneration(sopId)
-  const isOnline = useNetworkStore((s) => s.isOnline)
-
-  // Default active tab: prefer 'steps', fall back to first section
-  const [activeTab, setActiveTab] = useState<string>('')
-
-  useEffect(() => {
-    if (sop && sop.sop_sections.length > 0 && !activeTab) {
-      const stepsSection = sop.sop_sections.find((s) =>
-        s.section_type === 'steps' || s.section_type.includes('procedure') || (s as unknown as { sop_steps?: unknown[] }).sop_steps?.length
-      )
-      setActiveTab(stepsSection?.id ?? sop.sop_sections[0].id)
-    }
-  }, [sop, activeTab])
-
-  const isCached = !!sop
-
-  const activeSection = sop?.sop_sections.find((s) => s.id === activeTab)
-  const isStepsTab = activeSection ? (activeSection.section_type === 'steps' || activeSection.section_type.includes('procedure')) : false
-  const isVideoTab = activeTab === 'video'
-
-  // Video tab visibility: only when online and published video exists (D-04, Pitfall 7)
-  const hasVideo = isOnline && !!videoJob?.video_url && videoJob.published
-
-  // Outdated check: compare SOP updated_at vs video completed_at (D-10, Pitfall 5 — use completed_at not created_at)
-  const videoOutdated =
-    hasVideo &&
-    !!sop?.updated_at &&
-    !!videoJob?.completed_at &&
-    new Date(sop.updated_at) > new Date(videoJob.completed_at)
+  const active = useActiveTab()
 
   if (isLoading) {
     return (
-      <div className="flex flex-col flex-1">
+      <div className="min-h-screen bg-[var(--paper)]">
         {/* Skeleton header */}
-        <div className="sticky top-0 z-20 bg-steel-900 border-b border-steel-700 px-4 flex items-center gap-3 h-[56px]">
-          <div className="w-8 h-8 rounded-lg bg-steel-700 animate-pulse" />
-          <div className="flex-1 h-4 rounded bg-steel-700 animate-pulse max-w-[200px]" />
+        <div className="sticky top-0 z-10 bg-[var(--paper)]/95 border-b border-[var(--ink-100)] px-4 flex items-center gap-3 h-[56px]">
+          <div className="w-16 h-4 rounded bg-[var(--ink-100)] animate-pulse" />
+          <div className="flex-1 h-4 rounded bg-[var(--ink-100)] animate-pulse max-w-[200px]" />
         </div>
         {/* Skeleton tab bar */}
-        <div className="h-[52px] bg-steel-900 border-b border-steel-700 flex items-center px-4 gap-4">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="w-16 h-4 rounded bg-steel-700 animate-pulse" />
+        <div className="h-[48px] bg-[var(--paper)] border-b border-[var(--ink-100)] flex items-center px-4 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="w-16 h-3 rounded bg-[var(--ink-100)] animate-pulse" />
           ))}
         </div>
         {/* Skeleton content */}
-        <div className="flex-1 px-4 py-6 flex flex-col gap-4">
+        <div className="p-8 flex flex-col gap-4">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-20 rounded-xl bg-steel-800 animate-pulse" />
+            <div key={i} className="h-20 rounded-lg bg-[var(--ink-50)] animate-pulse" />
           ))}
         </div>
       </div>
@@ -73,104 +41,56 @@ export default function SopDetailPage() {
 
   if (isError || !sop) {
     return (
-      <div className="flex flex-col flex-1">
-        <div className="sticky top-0 z-20 bg-steel-900 border-b border-steel-700 px-4 flex items-center gap-3 h-[56px]">
-          <Link
-            href="/sops"
-            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-steel-800 transition-colors"
-            aria-label="Back to SOPs"
-          >
-            <ArrowLeft size={20} className="text-steel-400 hover:text-steel-100" />
-          </Link>
-          <span className="text-base font-semibold text-steel-100 flex-1 truncate">SOP Not Found</span>
-        </div>
-        <div className="flex flex-col items-center justify-center flex-1 gap-4 px-8 text-center">
-          <p className="text-lg font-semibold text-steel-100">SOP not found</p>
-          <p className="text-sm text-steel-400 max-w-xs">
-            This SOP may have been deleted or you may not have access to it.
-          </p>
-          <Link
-            href="/sops"
-            className="mt-2 inline-flex items-center gap-2 px-4 h-[44px] bg-steel-800 rounded-xl text-sm font-medium text-steel-100 hover:bg-steel-700 border border-steel-700 transition-colors"
-          >
-            <ArrowLeft size={16} />
-            Back to SOPs
-          </Link>
-        </div>
+      <div className="min-h-screen bg-[var(--paper)] flex flex-col items-center justify-center p-8 gap-4 text-center">
+        <p className="text-lg font-semibold text-[var(--ink-900)]">SOP not found</p>
+        <p className="text-sm text-[var(--ink-500)] max-w-xs">
+          This SOP may have been deleted or you may not have access to it.
+        </p>
+        <Link
+          href="/sops"
+          className="mt-2 inline-flex items-center gap-2 px-4 h-[44px] border border-[var(--ink-300)] rounded-lg text-sm font-medium text-[var(--ink-700)] hover:border-[var(--ink-900)] transition-colors"
+        >
+          ← Library
+        </Link>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col flex-1">
-      {/* Sticky header */}
-      <header className="sticky top-0 z-20 bg-steel-900 border-b border-steel-700 px-4 flex items-center gap-3 h-[56px]">
-        <Link
-          href="/sops"
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-steel-800 transition-colors flex-shrink-0"
-          aria-label="Back to SOPs"
-        >
-          <ArrowLeft size={20} className="text-steel-400 hover:text-steel-100" />
-        </Link>
-        <span className="text-base font-semibold text-steel-100 flex-1 truncate">
-          {sop.title ?? 'Untitled SOP'}
-        </span>
-        <button
-          type="button"
-          aria-label={isCached ? 'Downloaded — available offline' : 'Download for offline use'}
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-steel-800 transition-colors flex-shrink-0"
-        >
-          {isCached ? (
-            <CheckCircle size={20} className="text-green-400" />
-          ) : (
-            <Download size={20} className="text-steel-400" />
-          )}
-        </button>
+    <div className="min-h-screen bg-[var(--paper)] text-[var(--ink-900)]">
+      <header className="sticky top-0 z-10 bg-[var(--paper)]/95 backdrop-blur border-b border-[var(--ink-100)]">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <Link href="/sops" className="text-sm text-[var(--ink-500)] hover:text-[var(--ink-900)] flex-shrink-0">
+              ← Library
+            </Link>
+            <h1 className="text-base font-semibold truncate">{sop.title ?? 'Untitled SOP'}</h1>
+          </div>
+          <WorkerPreviewToggle />
+        </div>
+        <div className="max-w-5xl mx-auto px-4">
+          <SopTabNav />
+        </div>
       </header>
 
-      {/* Sticky tab bar */}
-      {sop.sop_sections.length > 0 && (
-        <div className="sticky top-[56px] z-10">
-          <SopSectionTabs
-            sections={sop.sop_sections}
-            activeId={activeTab}
-            onTabChange={setActiveTab}
-            hasVideo={hasVideo}
-            videoOutdated={!!videoOutdated}
-            isVideoActive={isVideoTab}
-          />
-        </div>
-      )}
-
-      {/* Content */}
-      <div className="px-4 py-6">
-        {isVideoTab && videoJob?.video_url && videoJob.chapter_markers ? (
-          <VideoTabPanel
-            videoUrl={`/api/videos/${videoJob.id}/stream`}
-            chapters={videoJob.chapter_markers as ChapterMarker[]}
-            videoJobId={videoJob.id}
-            sopId={sopId}
-            sopVersion={videoJob.sop_version}
-            isOutdated={!!videoOutdated}
-          />
-        ) : activeSection ? (
-          <SectionContent section={activeSection} />
-        ) : (
-          <p className="text-sm text-steel-400">No content for this section.</p>
-        )}
-      </div>
-
-      {/* Bottom action bar — Steps tab only (hidden for video tab) */}
-      {isStepsTab && (
-        <div className="sticky bottom-0 bg-steel-900 border-t border-steel-700 px-4 py-3">
-          <Link
-            href={`/sops/${sopId}/walkthrough`}
-            className="flex items-center justify-center w-full h-[72px] bg-brand-yellow text-steel-900 font-bold text-lg rounded-xl hover:bg-amber-400 active:bg-amber-500 transition-colors"
-          >
-            Start Walkthrough
-          </Link>
-        </div>
-      )}
+      <main>
+        <WorkerPreviewClamp>
+          {active === 'overview'    && <OverviewTab sop={sop} />}
+          {active === 'tools'       && <ToolsTab sop={sop} />}
+          {active === 'hazards'     && <HazardsTab sop={sop} />}
+          {active === 'flow'        && <FlowTab sop={sop} />}
+          {active === 'model'       && <ModelTab sop={sop} />}
+          {active === 'walkthrough' && <WalkthroughTab sop={sop} />}
+        </WorkerPreviewClamp>
+      </main>
     </div>
+  )
+}
+
+export default function SopDetailPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-sm text-[var(--ink-500)]">Loading SOP…</div>}>
+      <SopDetailInner />
+    </Suspense>
   )
 }
