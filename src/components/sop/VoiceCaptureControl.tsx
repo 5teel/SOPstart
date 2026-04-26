@@ -45,6 +45,7 @@ export interface VoiceCaptureControlProps {
   completionId?: string
   language: 'en-NZ' | 'en-AU' | 'en-US'
   onTranscript: (transcript: string, confidence: number) => void
+  onCaptured?: (payload: { blob: Blob; transcript: string; confidence: number; ext: string }) => void
 }
 
 export function VoiceCaptureControl({
@@ -55,6 +56,7 @@ export function VoiceCaptureControl({
   completionId,
   language,
   onTranscript,
+  onCaptured,
 }: VoiceCaptureControlProps) {
   // All hooks must be called unconditionally before any conditional return
   const [state, dispatch] = useReducer(reducer, { kind: 'idle' })
@@ -101,6 +103,8 @@ export function VoiceCaptureControl({
           syncState: 'dirty',
           _createdAt: Date.now(),
         })
+      } else if (result.transcript && onCaptured) {
+        onCaptured({ blob: result.blob, transcript: result.transcript, confidence: result.confidence, ext: result.ext })
       }
     } catch (err) {
       dispatch({ type: 'ERROR', message: err instanceof Error ? err.message : 'stop_failed' })
