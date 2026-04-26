@@ -1,5 +1,6 @@
 import type { Config, Overrides } from '@puckeditor/core'
 import type { ReactElement, ReactNode } from 'react'
+import { FlowGraphField } from '@/lib/builder/flow-graph-field'
 import {
   TextBlock,
   TextBlockPropsSchema,
@@ -194,6 +195,18 @@ type RawRenderProps = Record<string, unknown> & {
 }
 
 export const puckConfig: Config = {
+  root: {
+    fields: {
+      flowGraph: {
+        type: 'custom' as const,
+        render: ({ value, onChange }: { value: unknown; onChange: (v: unknown) => void }) => (
+          <FlowGraphField value={value} onChange={onChange} />
+        ),
+      },
+    },
+    defaultProps: { flowGraph: null },
+    render: ({ children }: { children: ReactNode }) => <>{children}</>,
+  },
   components: {
     TextBlock: {
       fields: {
