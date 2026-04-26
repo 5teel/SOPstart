@@ -199,3 +199,23 @@ body[data-theme="paper"] .block-signoff   { border-left: 3px solid var(--accent-
 body[data-theme="paper"] .block-inspect   { border-left: 3px solid var(--accent-inspect); }
 body[data-theme="paper"] .block-zone      { border-left: 3px solid var(--accent-zone); }
 body[data-theme="paper"] .block-voice     { border-left: 3px solid var(--accent-voice); }
+
+/* ---------------------------------------------------------------
+ * Responsive walkthrough viewport helpers (Wave 4)
+ * CSS-only show/hide — NO JS viewport branching allowed.
+ * hide-below-430: hidden on phones ≤430px (ViewModeToggle, desktop list controls)
+ * walkthrough-list-only-above-430: visible on desktop only
+ * immersive-only-below-430: visible on phones only
+ * --------------------------------------------------------------- */
+body[data-theme="paper"] .hide-below-430 { display: inline-flex; }
+@media (max-width: 430px) {
+  body[data-theme="paper"] .hide-below-430 { display: none; }
+}
+body[data-theme="paper"] .walkthrough-list-only-above-430 { display: block; }
+@media (max-width: 430px) {
+  body[data-theme="paper"] .walkthrough-list-only-above-430 { display: none; }
+}
+body[data-theme="paper"] .immersive-only-below-430 { display: none; }
+@media (max-width: 430px) {
+  body[data-theme="paper"] .immersive-only-below-430 { display: block; }
+}

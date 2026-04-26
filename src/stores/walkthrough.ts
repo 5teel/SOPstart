@@ -5,17 +5,22 @@ interface WalkthroughState {
   completedSteps: Record<string, string[]>
   // sopId -> timestamp when acknowledged
   acknowledgedSops: Record<string, number>
+  // stepId -> true when locked by EscalateBlock (lock mode)
+  lockedSteps: Record<string, true>
   markStepComplete: (sopId: string, stepId: string) => void
   markStepIncomplete: (sopId: string, stepId: string) => void
   acknowledgeSafety: (sopId: string) => void
   isAcknowledged: (sopId: string) => boolean
   getCompletedSteps: (sopId: string) => Set<string>
   resetWalkthrough: (sopId: string) => void
+  lockStep: (stepId: string) => void
+  unlockStep: (stepId: string) => void
 }
 
 export const useWalkthroughStore = create<WalkthroughState>((set, get) => ({
   completedSteps: {},
   acknowledgedSops: {},
+  lockedSteps: {},
 
   markStepComplete: (sopId, stepId) =>
     set((state) => {
@@ -66,5 +71,15 @@ export const useWalkthroughStore = create<WalkthroughState>((set, get) => ({
         completedSteps: remainingSteps,
         acknowledgedSops: remainingAcks,
       }
+    }),
+
+  lockStep: (stepId) =>
+    set((state) => ({ lockedSteps: { ...state.lockedSteps, [stepId]: true } })),
+
+  unlockStep: (stepId) =>
+    set((state) => {
+      const next = { ...state.lockedSteps }
+      delete next[stepId]
+      return { lockedSteps: next }
     }),
 }))
