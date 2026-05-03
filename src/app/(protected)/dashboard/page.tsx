@@ -13,7 +13,6 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  // Fetch membership to determine role
   const { data: member } = await supabase
     .from('organisation_members')
     .select('role')
@@ -22,14 +21,16 @@ export default async function DashboardPage() {
 
   const role = member?.role ?? null
 
+  // Non-admin roles go straight to their primary page
+  if (role === 'worker') redirect('/sops')
+  if (role === 'supervisor') redirect('/activity')
+  if (role === 'safety_manager') redirect('/activity')
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold text-steel-100 mb-6">Dashboard</h1>
 
       {role === 'admin' && <AdminDashboard />}
-      {role === 'worker' && <WorkerDashboard />}
-      {role === 'supervisor' && <SupervisorDashboard />}
-      {role === 'safety_manager' && <SafetyManagerDashboard />}
       {!role && <PendingDashboard />}
     </div>
   )
@@ -65,30 +66,6 @@ function AdminDashboard() {
           />
         </Link>
       </div>
-    </div>
-  )
-}
-
-function WorkerDashboard() {
-  return (
-    <div className="rounded-xl bg-steel-800 border border-steel-700 p-6 text-center">
-      <p className="text-steel-400">Your assigned SOPs will appear here once your admin uploads them.</p>
-    </div>
-  )
-}
-
-function SupervisorDashboard() {
-  return (
-    <div className="rounded-xl bg-steel-800 border border-steel-700 p-6 text-center">
-      <p className="text-steel-400">Completions awaiting your review will appear here.</p>
-    </div>
-  )
-}
-
-function SafetyManagerDashboard() {
-  return (
-    <div className="rounded-xl bg-steel-800 border border-steel-700 p-6 text-center">
-      <p className="text-steel-400">Organisation-wide SOP compliance will appear here.</p>
     </div>
   )
 }
