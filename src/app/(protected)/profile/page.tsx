@@ -14,16 +14,16 @@ export default async function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-6 space-y-4">
-      <h1 className="text-xl font-semibold text-brand-yellow mb-2">Profile</h1>
+      <h1 className="text-xl font-semibold text-[var(--ink-900)] mb-2">Profile</h1>
 
       {/* Account info */}
-      <section className="neuro-panel p-5">
-        <h2 className="text-sm font-semibold text-steel-400 uppercase tracking-wider mb-3">
+      <section className="blueprint-frame p-5">
+        <h2 className="mono text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wider mb-3">
           Account
         </h2>
         <div className="flex items-center justify-between">
-          <span className="text-sm text-steel-400">Email</span>
-          <span className="text-sm text-steel-100">{user.email}</span>
+          <span className="text-sm text-[var(--ink-500)]">Email</span>
+          <span className="text-sm text-[var(--ink-900)]">{user.email}</span>
         </div>
       </section>
 
@@ -34,11 +34,11 @@ export default async function ProfilePage() {
       <LogoutButton />
 
       {/* Theme picker */}
-      <section className="neuro-panel p-5">
-        <h2 className="text-sm font-semibold text-steel-400 uppercase tracking-wider mb-1">
+      <section className="blueprint-frame p-5">
+        <h2 className="mono text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wider mb-1">
           Site Theme
         </h2>
-        <p className="text-xs text-steel-600 mb-4">
+        <p className="text-xs text-[var(--ink-500)] mb-4">
           Choose an industrial aesthetic. Applies instantly across all pages.
         </p>
         <ThemePicker />

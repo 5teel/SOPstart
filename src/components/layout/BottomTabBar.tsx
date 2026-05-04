@@ -75,7 +75,7 @@ export function BottomTabBar() {
   return (
     <nav
       aria-label="Main navigation"
-      className="flex-shrink-0 bg-steel-800 border-t border-steel-700 pb-[env(safe-area-inset-bottom)]"
+      className="bottom-tab-bar flex-shrink-0 bg-steel-800 border-t border-steel-700 pb-[env(safe-area-inset-bottom)]"
     >
       <div className="flex">
         {tabs.map(({ label, href, Icon }) => {
@@ -85,7 +85,7 @@ export function BottomTabBar() {
               key={href}
               href={href}
               className={[
-                'flex flex-1 flex-col items-center justify-center gap-1',
+                'tab-link flex flex-1 flex-col items-center justify-center gap-1',
                 'min-h-[var(--min-tap-target)] text-xs font-medium',
                 'transition-colors duration-150',
                 isActive

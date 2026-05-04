@@ -47,12 +47,10 @@ export default function SopsPage() {
 
   const { syncing } = useSopSync()
 
-  // Your SOPs (offline-first from Dexie)
   const { data: assignedSops = [], isLoading: assignedLoading } = useAssignedSops({ category: activeCategory ?? undefined })
   const { data: searchResults = [] } = useAssignedSops({ search: searchTerm || undefined })
   const { data: allAssigned = [] } = useAssignedSops()
 
-  // User role check
   const { data: userRole } = useQuery({
     queryKey: ['user-role'],
     queryFn: async () => {
@@ -70,7 +68,6 @@ export default function SopsPage() {
   })
   const isAdmin = userRole === 'admin' || userRole === 'safety_manager'
 
-  // Categories from assigned SOPs
   const categories = useMemo(() => {
     const counts: Record<string, number> = {}
     for (const sop of allAssigned) {
@@ -81,7 +78,6 @@ export default function SopsPage() {
       .sort((a, b) => a.name.localeCompare(b.name))
   }, [allAssigned])
 
-  // Last sync time
   const { data: lastSyncMeta } = useQuery({
     queryKey: ['sync-meta-last-sync'],
     queryFn: async () => db.syncMeta.get('lastSync'),
@@ -94,30 +90,30 @@ export default function SopsPage() {
   const activeCategoryLabel = activeCategory ?? 'All categories'
 
   return (
-    <div className="flex flex-col flex-1 bg-steel-900">
+    <div className="flex flex-col flex-1 bg-[var(--paper)]">
       {/* Sticky header */}
-      <header className="sticky top-0 z-20 bg-steel-900 border-b border-steel-700 px-4 flex items-center justify-between h-[56px]">
-        <span className="text-sm font-semibold text-steel-100">{PRODUCT_NAME}</span>
+      <header className="sticky top-0 z-20 bg-[var(--paper)] border-b border-[var(--ink-100)] px-4 flex items-center justify-between h-[56px]">
+        <span className="mono text-sm font-semibold text-[var(--ink-900)] tracking-tight">{PRODUCT_NAME}</span>
         <button
           type="button"
           onClick={() => { setSearchTerm(''); setSearchOpen(true) }}
           aria-label="Search SOPs"
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-steel-800 transition-colors"
+          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-[var(--paper-2)] transition-colors"
         >
           {syncing ? (
-            <RefreshCw size={22} className="text-brand-yellow animate-spin" />
+            <RefreshCw size={22} className="text-[var(--accent-measure)] animate-spin" />
           ) : (
-            <Search size={22} className="text-steel-400 hover:text-steel-100" />
+            <Search size={22} className="text-[var(--ink-500)] hover:text-[var(--ink-900)]" />
           )}
         </button>
       </header>
 
       {/* Section tabs */}
-      <nav className="flex border-b border-steel-700 px-4 gap-1">
+      <nav className="flex border-b border-[var(--ink-100)] px-4 gap-1">
         {isAdmin && (
           <Link
             href="/admin/sops/upload"
-            className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-steel-400 hover:text-brand-yellow transition-colors whitespace-nowrap"
+            className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors whitespace-nowrap"
           >
             <Upload size={16} />
             <span>Create SOP</span>
@@ -129,8 +125,8 @@ export default function SopsPage() {
           className={[
             'flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors',
             activeSection === 'your-sops'
-              ? 'border-b-2 border-brand-yellow text-brand-yellow'
-              : 'text-steel-400 hover:text-steel-100',
+              ? 'border-b-2 border-[var(--ink-900)] text-[var(--ink-900)]'
+              : 'text-[var(--ink-500)] hover:text-[var(--ink-900)]',
           ].join(' ')}
         >
           <FileText size={16} />
@@ -142,8 +138,8 @@ export default function SopsPage() {
           className={[
             'flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors',
             activeSection === 'library'
-              ? 'border-b-2 border-brand-yellow text-brand-yellow'
-              : 'text-steel-400 hover:text-steel-100',
+              ? 'border-b-2 border-[var(--ink-900)] text-[var(--ink-900)]'
+              : 'text-[var(--ink-500)] hover:text-[var(--ink-900)]',
           ].join(' ')}
         >
           <BookOpen size={16} />
@@ -218,7 +214,6 @@ function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeCategory, 
   const [pending, startTransition] = useTransition()
   const [requestedIds, setRequestedIds] = useState<Set<string>>(new Set())
 
-  // User assignments (to know self vs manager)
   const { data: assignments = [] } = useQuery({
     queryKey: ['user-sop-assignments'],
     queryFn: getUserSopAssignments,
@@ -245,8 +240,8 @@ function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeCategory, 
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-steel-100 mb-1">Your SOPs</h1>
-      <p className="text-sm text-steel-400 mb-4">
+      <h1 className="text-2xl font-bold text-[var(--ink-900)] mb-1">Your SOPs</h1>
+      <p className="text-sm text-[var(--ink-500)] mb-4">
         {isLoading ? 'Loading...' : `${sops.length} procedure${sops.length !== 1 ? 's' : ''}`}
         {' · '}{lastSyncLabel}
       </p>
@@ -256,25 +251,25 @@ function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeCategory, 
         <button
           type="button"
           onClick={onOpenCategorySheet}
-          className="inline-flex items-center gap-2 px-4 h-[44px] bg-steel-800 rounded-xl text-sm font-medium text-steel-100 hover:bg-steel-700 transition-colors border border-steel-700"
+          className="inline-flex items-center gap-2 px-4 h-[44px] bg-white border border-[var(--ink-100)] rounded-xl text-sm font-medium text-[var(--ink-900)] hover:bg-[var(--paper-2)] transition-colors"
         >
           <span>{activeCategoryLabel}</span>
-          <ChevronDown size={16} className="text-steel-400" />
+          <ChevronDown size={16} className="text-[var(--ink-500)]" />
         </button>
       </div>
 
       {isLoading ? (
         <div className="flex flex-col gap-3">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-[88px] bg-steel-800 rounded-xl animate-pulse" />
+            <div key={i} className="h-[88px] bg-[var(--paper-2)] rounded-xl animate-pulse" />
           ))}
         </div>
       ) : sops.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-4 py-24 px-8 text-center">
-          <ClipboardList size={48} className="text-steel-600" />
+          <ClipboardList size={48} className="text-[var(--ink-300)]" />
           <div>
-            <p className="text-xl font-semibold text-steel-100">No SOPs yet</p>
-            <p className="text-sm text-steel-400 max-w-xs mx-auto mt-2">
+            <p className="text-xl font-semibold text-[var(--ink-900)]">No SOPs yet</p>
+            <p className="text-sm text-[var(--ink-500)] max-w-xs mx-auto mt-2">
               Browse the SOP Library to add procedures, or ask your admin to assign some.
             </p>
           </div>
@@ -299,10 +294,10 @@ function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeCategory, 
                   className={[
                     'flex items-center justify-center w-10 rounded-xl transition-colors flex-shrink-0 border',
                     alreadyRequested
-                      ? 'bg-steel-800 border-steel-700 text-steel-600 cursor-default'
+                      ? 'bg-[var(--paper-2)] border-[var(--ink-100)] text-[var(--ink-300)] cursor-default'
                       : isSelf
-                        ? 'bg-steel-800 border-steel-700 hover:bg-red-900/30 hover:border-red-500/40 text-steel-400 hover:text-red-400'
-                        : 'bg-steel-800 border-steel-700 hover:bg-brand-orange/10 hover:border-brand-orange/40 text-steel-400 hover:text-brand-orange',
+                        ? 'bg-white border-[var(--ink-100)] hover:bg-red-50 hover:border-red-300 text-[var(--ink-500)] hover:text-red-500'
+                        : 'bg-white border-[var(--ink-100)] hover:bg-orange-50 hover:border-orange-300 text-[var(--ink-500)] hover:text-orange-500',
                   ].join(' ')}
                 >
                   {pending ? <Loader2 size={16} className="animate-spin" /> : <Minus size={16} />}
@@ -331,7 +326,6 @@ function LibrarySection() {
     status: string
   }
 
-  // All published SOPs in the org (online query via Supabase client)
   const { data: librarySops = [], isLoading } = useQuery<LibrarySop[]>({
     queryKey: ['library-sops'],
     queryFn: async () => {
@@ -346,7 +340,6 @@ function LibrarySection() {
     staleTime: 1000 * 60 * 2,
   })
 
-  // User's current assignments
   const { data: assignments = [] } = useQuery({
     queryKey: ['user-sop-assignments'],
     queryFn: getUserSopAssignments,
@@ -375,22 +368,22 @@ function LibrarySection() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-steel-100 mb-1">SOP Library</h1>
-      <p className="text-sm text-steel-400 mb-4">
+      <h1 className="text-2xl font-bold text-[var(--ink-900)] mb-1">SOP Library</h1>
+      <p className="text-sm text-[var(--ink-500)] mb-4">
         {isLoading ? 'Loading...' : `${librarySops.length} published procedure${librarySops.length !== 1 ? 's' : ''}`}
       </p>
 
       {isLoading ? (
         <div className="flex flex-col gap-3">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-[72px] bg-steel-800 rounded-xl animate-pulse" />
+            <div key={i} className="h-[72px] bg-[var(--paper-2)] rounded-xl animate-pulse" />
           ))}
         </div>
       ) : librarySops.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-4 py-24 px-8 text-center">
-          <BookOpen size={48} className="text-steel-600" />
-          <p className="text-xl font-semibold text-steel-100">No SOPs published yet</p>
-          <p className="text-sm text-steel-400">Your admin hasn&apos;t published any SOPs yet.</p>
+          <BookOpen size={48} className="text-[var(--ink-300)]" />
+          <p className="text-xl font-semibold text-[var(--ink-900)]">No SOPs published yet</p>
+          <p className="text-sm text-[var(--ink-500)]">Your admin hasn&apos;t published any SOPs yet.</p>
         </div>
       ) : (
         <div className="flex flex-col gap-2">
@@ -403,22 +396,22 @@ function LibrarySection() {
               <div key={sop.id} className="flex items-stretch gap-2">
                 <Link
                   href={`/sops/${sop.id}`}
-                  className="flex items-center gap-4 px-4 py-3 bg-steel-800 rounded-xl hover:bg-steel-700 transition-colors flex-1 min-w-0 min-h-[72px] border border-transparent hover:border-steel-600"
+                  className="flex items-center gap-4 px-4 py-3 bg-white border border-[var(--ink-100)] rounded-xl hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] transition-colors flex-1 min-w-0 min-h-[72px]"
                 >
-                  <FileText size={24} className="text-steel-400 flex-shrink-0" />
+                  <FileText size={24} className="text-[var(--ink-500)] flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-steel-100 truncate">
+                    <p className="text-sm font-semibold text-[var(--ink-900)] truncate">
                       {sop.title ?? 'Untitled SOP'}
                     </p>
-                    {meta && <p className="text-xs text-steel-400 mt-0.5">{meta}</p>}
-                    {sop.sop_number && <p className="text-xs text-steel-400 font-mono">{sop.sop_number}</p>}
+                    {meta && <p className="text-xs text-[var(--ink-500)] mt-0.5">{meta}</p>}
+                    {sop.sop_number && <p className="mono text-xs text-[var(--ink-500)]">{sop.sop_number}</p>}
                   </div>
                   {assigned && (
-                    <span className="inline-flex items-center px-2 py-0.5 bg-brand-yellow/20 text-brand-yellow text-xs font-semibold rounded flex-shrink-0">
+                    <span className="inline-flex items-center px-2 py-0.5 bg-[var(--accent-signoff)]/10 text-[var(--accent-signoff)] text-xs font-semibold rounded flex-shrink-0">
                       {selfAdded ? 'Added' : 'Assigned'}
                     </span>
                   )}
-                  <ChevronRight size={18} className="text-steel-400 flex-shrink-0" />
+                  <ChevronRight size={18} className="text-[var(--ink-300)] flex-shrink-0" />
                 </Link>
 
                 <button
@@ -434,10 +427,10 @@ function LibrarySection() {
                   className={[
                     'flex items-center justify-center w-10 rounded-xl transition-colors flex-shrink-0 border',
                     assigned && !selfAdded
-                      ? 'bg-steel-800 border-steel-700 text-steel-600 cursor-default'
+                      ? 'bg-[var(--paper-2)] border-[var(--ink-100)] text-[var(--ink-300)] cursor-default'
                       : assigned && selfAdded
-                        ? 'bg-steel-800 border-steel-700 hover:bg-red-900/30 hover:border-red-500/40 text-brand-yellow hover:text-red-400'
-                        : 'bg-steel-800 border-steel-700 hover:bg-brand-yellow/10 hover:border-brand-yellow/40 text-steel-400 hover:text-brand-yellow',
+                        ? 'bg-white border-[var(--ink-100)] hover:bg-red-50 hover:border-red-300 text-[var(--accent-signoff)] hover:text-red-500'
+                        : 'bg-white border-[var(--ink-100)] hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] text-[var(--ink-500)] hover:text-[var(--ink-900)]',
                   ].join(' ')}
                 >
                   {pending ? (

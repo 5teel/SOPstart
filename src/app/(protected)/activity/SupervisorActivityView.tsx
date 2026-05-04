@@ -41,7 +41,6 @@ export function SupervisorActivityView({ role: _role }: SupervisorActivityViewPr
   const [filter, setFilter] = useState<FilterState>({ type: 'all' })
   const { data: completions = [], isLoading } = useSupervisorCompletions(filter)
 
-  // Collect unique worker IDs to resolve names
   const workerIds = useMemo(
     () => [...new Set(completions.map((c) => c.worker_id))],
     [completions]
@@ -51,7 +50,6 @@ export function SupervisorActivityView({ role: _role }: SupervisorActivityViewPr
   const workerMap = useMemo(() => {
     const map = new Map<string, string>()
     for (const p of workerProfiles) {
-      // No profiles table — use abbreviated user_id as display name
       map.set(p.user_id, `Worker ${p.user_id.slice(0, 8)}`)
     }
     return map
@@ -59,7 +57,6 @@ export function SupervisorActivityView({ role: _role }: SupervisorActivityViewPr
 
   const pendingCount = completions.filter((c) => c.status === 'pending_sign_off').length
 
-  // Derive filter options
   const sopOptions = useMemo(() => {
     const seen = new Map<string, string>()
     for (const c of completions) {
@@ -74,19 +71,18 @@ export function SupervisorActivityView({ role: _role }: SupervisorActivityViewPr
 
   return (
     <div className="px-4 py-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold text-steel-100 mb-1">Activity</h1>
+      <h1 className="text-2xl font-bold text-[var(--ink-900)] mb-1">Activity</h1>
       {!isLoading && (
-        <p className="text-sm text-steel-400 mb-6">
+        <p className="text-sm text-[var(--ink-500)] mb-6">
           {pendingCount} completion{pendingCount !== 1 ? 's' : ''} awaiting review
         </p>
       )}
-      {isLoading && <p className="text-sm text-steel-400 mb-6">Loading...</p>}
+      {isLoading && <p className="text-sm text-[var(--ink-500)] mb-6">Loading...</p>}
 
-      {/* Desktop: sidebar + feed. Mobile: stacked */}
       <div className="lg:flex lg:gap-8">
         {/* Sidebar filter (desktop) */}
         <div className="hidden lg:block w-[220px] flex-shrink-0">
-          <p className="text-xs font-semibold text-steel-500 uppercase tracking-wide mb-3">
+          <p className="mono text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wide mb-3">
             Filter
           </p>
           <ActivityFilter
@@ -109,17 +105,16 @@ export function SupervisorActivityView({ role: _role }: SupervisorActivityViewPr
             />
           </div>
 
-          {/* Completion feed */}
           {!isLoading && completions.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
-              <div className="w-16 h-16 rounded-full bg-steel-800 flex items-center justify-center">
-                <ClipboardList size={28} className="text-steel-500" />
+              <div className="w-16 h-16 rounded-full bg-[var(--paper-2)] border border-[var(--ink-100)] flex items-center justify-center">
+                <ClipboardList size={28} className="text-[var(--ink-500)]" />
               </div>
               <div>
-                <p className="text-base font-semibold text-steel-300">
+                <p className="text-base font-semibold text-[var(--ink-700)]">
                   {filter.type === 'all' ? 'No completions yet' : 'No results for this filter'}
                 </p>
-                <p className="text-sm text-steel-500 mt-1">
+                <p className="text-sm text-[var(--ink-500)] mt-1">
                   {filter.type === 'all'
                     ? 'Completions submitted by your workers will appear here.'
                     : 'Try a different filter to see completions.'}
