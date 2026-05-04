@@ -1,0 +1,115 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-05-05T22:37:38Z",
+  "phase": "12.5",
+  "phase_name": "blueprint-redesign",
+  "phase_dir": ".planning/phases/12.5-blueprint-redesign",
+  "plan": null,
+  "task": null,
+  "total_tasks": null,
+  "status": "paused",
+  "completed_tasks": [
+    {
+      "id": 1,
+      "name": "Fix Railway build (npm-9_x lockfile mismatch)",
+      "status": "done",
+      "commit": "6d4018a"
+    },
+    {
+      "id": 2,
+      "name": "Wire clickable flow + deprecate old walkthrough page",
+      "status": "done",
+      "commit": "a940185"
+    },
+    {
+      "id": 3,
+      "name": "Wire full walkthrough completion flow into WalkthroughTab",
+      "status": "done",
+      "commit": "fecd2ae"
+    },
+    {
+      "id": 4,
+      "name": "Reskin all worker pages in paper/ink (sops, activity, profile, BottomTabBar)",
+      "status": "done",
+      "commit": "d101b81"
+    },
+    {
+      "id": 5,
+      "name": "Full paper/ink reskin of all remaining components + real tab implementations",
+      "status": "done",
+      "commit": "c7be343"
+    }
+  ],
+  "remaining_tasks": [
+    {
+      "id": 6,
+      "name": "Walkthrough Wave 3 — step completion marking, evidence capture grid, gate bars",
+      "status": "not_started",
+      "notes": "DEPRECATED-WALKTHROUGH.md has full spec. Infrastructure exists: useCompletionStore, usePhotoQueue, SafetyAcknowledgement, submitCompletion. WalkthroughTab already has safety gate + submit wired; missing inline evidence capture per step and gate bar blocking NEXT on ack-required steps."
+    },
+    {
+      "id": 7,
+      "name": "ThemePicker minor cleanup",
+      "status": "not_started",
+      "notes": "src/components/profile/ThemePicker.tsx has some text-steel-* label classes remaining. Low priority."
+    },
+    {
+      "id": 8,
+      "name": "Voice capture state machine",
+      "status": "not_started",
+      "notes": "Future phase. Idle→Listening→Transcribing→Captured. webkitSpeechRecognition. MeasurementBlock trigger surface."
+    },
+    {
+      "id": 9,
+      "name": "cmdk command palette",
+      "status": "not_started",
+      "notes": "Future phase. Cmd+K global. Jump-to-step / ask-AI / tool+hazard search. fuse.js fuzzy match."
+    },
+    {
+      "id": 10,
+      "name": "Slide transitions between immersive step cards",
+      "status": "not_started",
+      "notes": "300ms slide-left/right. Currently instant re-render."
+    },
+    {
+      "id": 11,
+      "name": "Preview toggle on worker views",
+      "status": "not_started",
+      "notes": "Supervisor can preview mobile walkthrough from desktop. localStorage persisted."
+    }
+  ],
+  "blockers": [],
+  "human_actions_pending": [
+    {
+      "action": "Verify Railway deploy looks correct in browser",
+      "context": "Two large commits pushed (d101b81, c7be343). Railway auto-deploys from master. Worker pages should now show paper/ink theme.",
+      "blocking": false
+    }
+  ],
+  "decisions": [
+    {
+      "decision": "layout-shell CSS class approach for outer protected layout background",
+      "rationale": "Admin routes (no PaperThemeMount) keep bg-steel-900 default. Worker routes get body[data-theme=paper] .layout-shell override in blueprint-theme.css. Avoids creating admin layout wrappers.",
+      "phase": "12.5"
+    },
+    {
+      "decision": "HazardsTab/ToolsTab pull from sections by render_family + title keywords, not Puck layout_data JSON parsing",
+      "rationale": "layout_data is raw Puck JSON — complex to parse reliably. section.content plain text + sop.applicable_equipment + sop_steps.required_tools/warning/caution cover real data for now.",
+      "phase": "12.5"
+    },
+    {
+      "decision": "WalkthroughTab already has safety gate + submit wired (from fecd2ae). Wave 3 is about inline evidence capture per step.",
+      "rationale": "Submit flow uses SHA-256 content hash, useCompletionStore Dexie restore, flushPhotoQueue on reconnect. All wired. Missing: photo/voice/measure capture buttons inside ImmersiveStepCard body.",
+      "phase": "12.5"
+    }
+  ],
+  "uncommitted_files": [
+    ".planning/STATE.md",
+    ".planning/costs/api-costs-2026-04.json",
+    ".planning/costs/report-2026-04.txt",
+    ".planning/phases/12.5-blueprint-redesign/12.5-05-PLAN.md",
+    ".planning/phases/12.5-blueprint-redesign/12.5-06-PLAN.md"
+  ],
+  "next_action": "Start walkthrough Wave 3: add evidence capture grid (photo/voice/measure buttons) inside ImmersiveStepCard body, gate bar above footer when step has ack-required blocks, and ensure NEXT is disabled until gate satisfied. Read DEPRECATED-WALKTHROUGH.md first.",
+  "context_notes": "Phase 12.5 blueprint redesign is substantially complete visually. All worker-facing pages (sops, activity, profile, completion detail) are in paper/ink. All components that rendered inside paper pages have been reskinned. Overview/Hazards/Tools tabs have real implementations. Flow tab already had a real SVG graph implementation. The remaining work is interactivity inside the walkthrough — the core worker completion UX."
+}
