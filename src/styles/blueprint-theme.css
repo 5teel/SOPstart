@@ -219,3 +219,26 @@ body[data-theme="paper"] .immersive-only-below-430 { display: none; }
 @media (max-width: 430px) {
   body[data-theme="paper"] .immersive-only-below-430 { display: block; }
 }
+
+/* ---------------------------------------------------------------
+ * BottomTabBar — paper theme override
+ * Without data-theme="paper" the bar keeps its dark steel classes.
+ * --------------------------------------------------------------- */
+body[data-theme="paper"] .bottom-tab-bar {
+  background-color: var(--paper);
+  border-top-color: var(--ink-100);
+}
+body[data-theme="paper"] .bottom-tab-bar .tab-link {
+  color: var(--ink-400, #a1a1aa);
+}
+body[data-theme="paper"] .bottom-tab-bar .tab-link[aria-current="page"] {
+  color: var(--ink-900);
+}
+
+/* ---------------------------------------------------------------
+ * layout-shell — override outer protected layout bg for paper theme
+ * Admin routes keep bg-steel-900; worker routes flip to paper.
+ * --------------------------------------------------------------- */
+body[data-theme="paper"] .layout-shell {
+  background-color: var(--paper);
+}

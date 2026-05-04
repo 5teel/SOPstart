@@ -18,7 +18,7 @@ export function LogoutButton() {
         }
       }}
       disabled={pending}
-      className="w-full h-[44px] flex items-center justify-center gap-2 rounded-xl bg-steel-800 border border-steel-700 text-red-400 hover:bg-red-900/20 hover:border-red-500/30 transition-colors text-sm font-semibold disabled:opacity-50"
+      className="w-full h-[44px] flex items-center justify-center gap-2 rounded-xl bg-white border border-[var(--ink-100)] text-[var(--accent-escalate)] hover:bg-[var(--accent-escalate)]/5 hover:border-[var(--accent-escalate)]/30 transition-colors text-sm font-semibold disabled:opacity-50"
     >
       <LogOut size={16} />
       {pending ? 'Signing out...' : 'Sign out'}

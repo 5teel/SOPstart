@@ -51,26 +51,23 @@ export function CompletionStepRow({
   }
 
   return (
-    <div className="flex flex-col gap-3 py-5 border-b border-steel-700 last:border-b-0">
-      {/* Header row */}
+    <div className="flex flex-col gap-3 py-5 border-b border-[var(--ink-100)] last:border-b-0">
       <div className="flex items-center gap-3">
-        <div className="w-6 h-6 rounded-full bg-steel-700 flex items-center justify-center text-xs font-bold text-steel-300 flex-shrink-0">
+        <div className="w-6 h-6 rounded-full bg-[var(--paper-2)] border border-[var(--ink-100)] flex items-center justify-center text-xs font-bold text-[var(--ink-700)] flex-shrink-0">
           {stepNumber}
         </div>
-        <CheckCircle2 size={18} className="text-green-400 flex-shrink-0" />
+        <CheckCircle2 size={18} className="text-[var(--accent-signoff)] flex-shrink-0" />
         {completedAt !== null && (
-          <span className="text-xs text-steel-400 ml-auto tabular-nums">
+          <span className="mono text-xs text-[var(--ink-500)] ml-auto tabular-nums">
             {formatTime(completedAt)}
           </span>
         )}
       </div>
 
-      {/* Step text */}
-      <p className="text-base text-steel-100 leading-relaxed ml-9">
+      <p className="text-base text-[var(--ink-900)] leading-relaxed ml-9">
         {stepText}
       </p>
 
-      {/* Photo thumbnails */}
       {photos.length > 0 && (
         <div className="flex items-center gap-2 flex-wrap ml-9 mt-1">
           {photos.map((photo, index) => (
@@ -78,7 +75,7 @@ export function CompletionStepRow({
               key={photo.id}
               type="button"
               onClick={() => openPhoto(index)}
-              className="w-[80px] h-[80px] rounded-lg overflow-hidden border border-steel-700 hover:border-steel-500 cursor-pointer flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-brand-yellow/50"
+              className="w-[80px] h-[80px] rounded-lg overflow-hidden border border-[var(--ink-100)] hover:border-[var(--ink-300)] cursor-pointer flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)]/20"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img

@@ -29,21 +29,21 @@ function formatNZDateTime(isoString: string): string {
 function StatusIcon({ status }: { status: CompletionStatus }) {
   if (status === 'pending_sign_off') {
     return (
-      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-yellow/15 flex items-center justify-center">
-        <Clock size={20} className="text-brand-yellow" />
+      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[var(--accent-decision)]/10 flex items-center justify-center">
+        <Clock size={20} className="text-[var(--accent-decision)]" />
       </div>
     )
   }
   if (status === 'signed_off') {
     return (
-      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-500/15 flex items-center justify-center">
-        <CheckCircle2 size={20} className="text-green-400" />
+      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[var(--accent-signoff)]/10 flex items-center justify-center">
+        <CheckCircle2 size={20} className="text-[var(--accent-signoff)]" />
       </div>
     )
   }
   return (
-    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-red-500/15 flex items-center justify-center">
-      <XCircle size={20} className="text-red-400" />
+    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[var(--accent-escalate)]/10 flex items-center justify-center">
+      <XCircle size={20} className="text-[var(--accent-escalate)]" />
     </div>
   )
 }
@@ -58,33 +58,33 @@ export function CompletionHistoryCard({
 }: CompletionHistoryCardProps) {
   return (
     <Link href={`/activity/${id}`}>
-      <div className="flex items-start gap-4 p-4 bg-steel-800 rounded-xl hover:bg-steel-700 transition-colors cursor-pointer min-h-[88px]">
+      <div className="flex items-start gap-4 p-4 bg-white border border-[var(--ink-100)] rounded-xl hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] transition-colors cursor-pointer min-h-[88px]">
         <StatusIcon status={status} />
 
         <div className="flex-1 min-w-0">
-          <p className="text-base font-semibold text-steel-100 truncate">
+          <p className="text-base font-semibold text-[var(--ink-900)] truncate">
             {sopTitle ?? 'Untitled SOP'}
           </p>
-          <p className="text-xs text-steel-400 mt-0.5">
+          <p className="text-xs text-[var(--ink-500)] mt-0.5">
             {formatNZDateTime(submittedAt)}
           </p>
           <div className="flex items-center gap-2 mt-1.5 flex-wrap">
             <StatusBadge status={status} />
             {photoCount > 0 && (
-              <span className="inline-flex items-center gap-1 text-xs font-bold tabular-nums text-steel-400 bg-steel-700 px-2 py-0.5 rounded">
+              <span className="inline-flex items-center gap-1 text-xs font-bold tabular-nums text-[var(--ink-500)] bg-[var(--paper-2)] border border-[var(--ink-100)] px-2 py-0.5 rounded">
                 <Camera size={10} />
                 {photoCount}
               </span>
             )}
           </div>
           {status === 'rejected' && rejectionReason && (
-            <p className="text-xs text-red-400 mt-2 line-clamp-2">
+            <p className="text-xs text-[var(--accent-escalate)] mt-2 line-clamp-2">
               {rejectionReason}
             </p>
           )}
         </div>
 
-        <ChevronRight size={18} className="text-steel-500 flex-shrink-0 mt-2.5" />
+        <ChevronRight size={18} className="text-[var(--ink-300)] flex-shrink-0 mt-2.5" />
       </div>
     </Link>
   )

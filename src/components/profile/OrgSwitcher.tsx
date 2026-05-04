@@ -42,26 +42,26 @@ export function OrgSwitcher() {
 
   if (loading) {
     return (
-      <div className="neuro-panel p-5">
-        <div className="h-16 bg-steel-700 rounded-lg animate-pulse" />
+      <div className="blueprint-frame p-5">
+        <div className="h-16 bg-[var(--paper-2)] rounded-lg animate-pulse" />
       </div>
     )
   }
 
   if (memberships.length === 0) {
     return (
-      <div className="neuro-panel p-5">
-        <h2 className="text-sm font-semibold text-steel-400 uppercase tracking-wider mb-2">
+      <div className="blueprint-frame p-5">
+        <h2 className="mono text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wider mb-2">
           Organisations
         </h2>
-        <p className="text-sm text-steel-400">You are not a member of any organisation yet.</p>
+        <p className="text-sm text-[var(--ink-500)]">You are not a member of any organisation yet.</p>
       </div>
     )
   }
 
   return (
-    <div className="neuro-panel p-5">
-      <h2 className="text-sm font-semibold text-steel-400 uppercase tracking-wider mb-3">
+    <div className="blueprint-frame p-5">
+      <h2 className="mono text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wider mb-3">
         Organisations
       </h2>
       <div className="space-y-2">
@@ -75,31 +75,31 @@ export function OrgSwitcher() {
               className={[
                 'w-full flex items-center gap-3 rounded-xl px-4 py-3 text-left transition-all border',
                 isActive
-                  ? 'bg-brand-yellow/10 border-brand-yellow/30'
-                  : 'bg-steel-800 border-steel-700 hover:border-steel-600 hover:bg-steel-700',
+                  ? 'bg-[var(--ink-900)]/5 border-[var(--ink-900)]/20'
+                  : 'bg-white border-[var(--ink-100)] hover:border-[var(--ink-300)] hover:bg-[var(--paper-2)]',
               ].join(' ')}
             >
-              <Building2 size={18} className={isActive ? 'text-brand-yellow' : 'text-steel-400'} />
+              <Building2 size={18} className={isActive ? 'text-[var(--ink-900)]' : 'text-[var(--ink-500)]'} />
               <div className="flex-1 min-w-0">
-                <p className={`text-sm font-semibold truncate ${isActive ? 'text-brand-yellow' : 'text-steel-100'}`}>
+                <p className={`text-sm font-semibold truncate ${isActive ? 'text-[var(--ink-900)]' : 'text-[var(--ink-700)]'}`}>
                   {m.orgName}
                 </p>
-                <p className="text-xs text-steel-400">
+                <p className="text-xs text-[var(--ink-500)]">
                   {ROLE_LABELS[m.role] ?? m.role}
                 </p>
               </div>
               {isActive && !switching && (
-                <Check size={16} className="text-brand-yellow flex-shrink-0" />
+                <Check size={16} className="text-[var(--ink-900)] flex-shrink-0" />
               )}
               {switching && !isActive && (
-                <Loader2 size={16} className="text-steel-400 animate-spin flex-shrink-0" />
+                <Loader2 size={16} className="text-[var(--ink-500)] animate-spin flex-shrink-0" />
               )}
             </button>
           )
         })}
       </div>
       {memberships.length > 1 && (
-        <p className="text-xs text-steel-600 mt-2">
+        <p className="text-xs text-[var(--ink-300)] mt-2">
           Tap an organisation to switch your active workspace.
         </p>
       )}
