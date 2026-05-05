@@ -1,6 +1,6 @@
 {
   "month": "2026-04",
-  "fetched_at": "2026-04-08T13:50:28.639Z",
+  "fetched_at": "2026-04-08T14:03:37.744Z",
   "services": [
     {
       "service": "Shotstack",
@@ -13,21 +13,21 @@
     {
       "service": "Railway",
       "project": "Docket Rocket",
-      "estimated_monthly_usd": 70.99,
+      "estimated_monthly_usd": 72.7,
       "breakdown": {
-        "CPU_USAGE": 0.96,
-        "MEMORY_USAGE_GB": 69.23,
+        "CPU_USAGE": 0.97,
+        "MEMORY_USAGE_GB": 70.84,
         "NETWORK_TX_GB": 0.01,
-        "DISK_USAGE_GB": 0.8
+        "DISK_USAGE_GB": 0.87
       }
     },
     {
       "service": "Railway",
       "project": "SOPstart",
-      "estimated_monthly_usd": 43.68,
+      "estimated_monthly_usd": 32.65,
       "breakdown": {
-        "CPU_USAGE": 0.76,
-        "MEMORY_USAGE_GB": 42.92,
+        "CPU_USAGE": 1.08,
+        "MEMORY_USAGE_GB": 31.57,
         "NETWORK_TX_GB": 0,
         "DISK_USAGE_GB": 0
       }
@@ -35,10 +35,10 @@
     {
       "service": "Railway",
       "project": "FightWise",
-      "estimated_monthly_usd": 13.89,
+      "estimated_monthly_usd": 15.16,
       "breakdown": {
         "CPU_USAGE": 0,
-        "MEMORY_USAGE_GB": 13.89,
+        "MEMORY_USAGE_GB": 15.16,
         "NETWORK_TX_GB": 0,
         "DISK_USAGE_GB": 0
       }
@@ -46,10 +46,10 @@
     {
       "service": "Railway",
       "project": "VI Powerpoint Add-in",
-      "estimated_monthly_usd": 0.14,
+      "estimated_monthly_usd": 0.15,
       "breakdown": {
         "CPU_USAGE": 0,
-        "MEMORY_USAGE_GB": 0.14,
+        "MEMORY_USAGE_GB": 0.15,
         "NETWORK_TX_GB": 0,
         "DISK_USAGE_GB": 0
       }
@@ -57,32 +57,32 @@
     {
       "service": "Railway",
       "project": "VI News Page",
-      "estimated_monthly_usd": 28.95,
+      "estimated_monthly_usd": 31.06,
       "breakdown": {
-        "CPU_USAGE": 0.21,
-        "MEMORY_USAGE_GB": 27.31,
+        "CPU_USAGE": 0.23,
+        "MEMORY_USAGE_GB": 29.25,
         "NETWORK_TX_GB": 0,
-        "DISK_USAGE_GB": 1.43
+        "DISK_USAGE_GB": 1.57
       }
     },
     {
       "service": "Railway",
       "project": "Summit Promo Optimiser",
-      "estimated_monthly_usd": 20.66,
+      "estimated_monthly_usd": 22.59,
       "breakdown": {
-        "CPU_USAGE": 0.08,
-        "MEMORY_USAGE_GB": 19.2,
+        "CPU_USAGE": 0.09,
+        "MEMORY_USAGE_GB": 20.97,
         "NETWORK_TX_GB": 0,
-        "DISK_USAGE_GB": 1.39
+        "DISK_USAGE_GB": 1.53
       }
     },
     {
       "service": "Railway",
       "project": "Strategic Modeller",
-      "estimated_monthly_usd": 1.88,
+      "estimated_monthly_usd": 2.04,
       "breakdown": {
         "CPU_USAGE": 0,
-        "MEMORY_USAGE_GB": 1.88,
+        "MEMORY_USAGE_GB": 2.04,
         "NETWORK_TX_GB": 0,
         "DISK_USAGE_GB": 0
       }
@@ -90,10 +90,10 @@
     {
       "service": "Railway",
       "project": "BodyAtlas",
-      "estimated_monthly_usd": 7.1,
+      "estimated_monthly_usd": 7.81,
       "breakdown": {
         "CPU_USAGE": 0,
-        "MEMORY_USAGE_GB": 7.1,
+        "MEMORY_USAGE_GB": 7.81,
         "NETWORK_TX_GB": 0,
         "DISK_USAGE_GB": 0
       }
@@ -101,32 +101,32 @@
     {
       "service": "Railway",
       "project": "Jigsaw Planogram App",
-      "estimated_monthly_usd": 31.04,
+      "estimated_monthly_usd": 33.75,
       "breakdown": {
-        "CPU_USAGE": 0.24,
-        "MEMORY_USAGE_GB": 30.6,
+        "CPU_USAGE": 0.26,
+        "MEMORY_USAGE_GB": 33.26,
         "NETWORK_TX_GB": 0,
-        "DISK_USAGE_GB": 0.21
+        "DISK_USAGE_GB": 0.23
       }
     },
     {
       "service": "Railway",
       "project": "OBSOLETE - Grocery App",
-      "estimated_monthly_usd": 4.62,
+      "estimated_monthly_usd": 5.05,
       "breakdown": {
         "CPU_USAGE": 0.02,
-        "MEMORY_USAGE_GB": 4.36,
+        "MEMORY_USAGE_GB": 4.76,
         "NETWORK_TX_GB": 0,
-        "DISK_USAGE_GB": 0.24
+        "DISK_USAGE_GB": 0.27
       }
     },
     {
       "service": "Railway",
       "project": "Report Builder App",
-      "estimated_monthly_usd": 12.26,
+      "estimated_monthly_usd": 13.08,
       "breakdown": {
         "CPU_USAGE": 0,
-        "MEMORY_USAGE_GB": 12.26,
+        "MEMORY_USAGE_GB": 13.08,
         "NETWORK_TX_GB": 0,
         "DISK_USAGE_GB": 0
       }
@@ -134,23 +134,23 @@
     {
       "service": "Railway",
       "project": "Deathgame",
-      "estimated_monthly_usd": 4.04,
+      "estimated_monthly_usd": 4.4,
       "breakdown": {
         "CPU_USAGE": 0.02,
-        "MEMORY_USAGE_GB": 3.75,
+        "MEMORY_USAGE_GB": 4.08,
         "NETWORK_TX_GB": 0,
-        "DISK_USAGE_GB": 0.27
+        "DISK_USAGE_GB": 0.3
       }
     },
     {
       "service": "Railway",
       "project": "life_pathways",
-      "estimated_monthly_usd": 2.02,
+      "estimated_monthly_usd": 2.2,
       "breakdown": {
         "CPU_USAGE": 0.01,
-        "MEMORY_USAGE_GB": 1.1,
+        "MEMORY_USAGE_GB": 1.19,
         "NETWORK_TX_GB": 0,
-        "DISK_USAGE_GB": 0.91
+        "DISK_USAGE_GB": 1
       }
     },
     {

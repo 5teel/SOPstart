@@ -6,8 +6,8 @@
   EXECUTIVE SUMMARY
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-  Dev Time:        21.9h across 31 sessions (197 commits)
-  Dev Cost:        $2,190 NZD (@ $100/hr)
+  Dev Time:        22.3h across 31 sessions (198 commits)
+  Dev Cost:        $2,230 NZD (@ $100/hr)
   Infrastructure:  $33.87 USD
     Railway:       $33.87 USD
 
@@ -18,9 +18,9 @@
 
 Week	Active Days	Commits	Person	Rate (NZD/hr)
 2026-03-30 — 2026-04-05	4	110	Simon (Potenco)	100
-2026-04-06 — 2026-04-12	4	87	Simon (Potenco)	100
+2026-04-06 — 2026-04-12	5	88	Simon (Potenco)	100
 
-Total	8 days	197 commits	21.9h	$2190 NZD
+Total	9 days	198 commits	22.3h	$2230 NZD
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   INFRASTRUCTURE — April 2026
@@ -63,13 +63,13 @@ Total Railway: $251.33 USD/mo (SOPstart: $33.87)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Stakeholder	Entity	Role	Hours	Rate	Amount (NZD)	Status
-Simon	Potenco Pty Ltd	Tech Lead / Developer	21.9	$100/hr	$2,190	Active
+Simon	Potenco Pty Ltd	Tech Lead / Developer	22.3	$100/hr	$2,230	Active
 Bobby	TBD	TBD	—	—	—	TBD
 Joe Rolleston	—	Project Leader	—	—	—	TBD
 Bryce	—	TBD	—	—	—	TBD
 
 Category	Amount	Currency	Paid By
-Dev Time (Simon)	$2,190	NZD	Potenco — pending agreement
+Dev Time (Simon)	$2,230	NZD	Potenco — pending agreement
 Railway Hosting	$33.87	USD	Potenco
 API Costs (OpenAI/Deepgram/Shotstack)	—	USD	Potenco — see dashboards
 Supabase	—	USD	Potenco — see dashboard
