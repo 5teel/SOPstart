@@ -10,6 +10,7 @@ import { useWalkthroughStore } from '@/stores/walkthrough'
 import { useCompletionStore } from '@/stores/completionStore'
 import { SafetyAcknowledgement } from '@/components/sop/SafetyAcknowledgement'
 import { submitCompletion } from '@/actions/completions'
+import { usePhotoQueue, addPhotoToQueue } from '@/hooks/usePhotoQueue'
 import { flushPhotoQueue } from '@/lib/offline/sync-engine'
 import { createClient } from '@/lib/supabase/client'
 import { db } from '@/lib/offline/db'
@@ -60,6 +61,11 @@ export function WalkthroughTab({ sop }: { sop: SopWithSections }) {
   const nextStep = allSteps[currentIdx + 1]
   const currentDone = !!(currentStep && completedSteps.has(currentStep.id))
 
+  // Photo queue for the active completion
+  const { photosForStep } = usePhotoQueue(activeCompletion?.localId ?? null)
+  const currentStepPhotos = currentStep ? photosForStep(currentStep.id) : []
+  const photoGateMet = !currentStep?.photo_required || currentStepPhotos.length > 0
+
   const sections = sop.sop_sections
   const hazardsSection = sections.find((s) => s.section_type.includes('hazard')) as SopSection | undefined
   const ppeSection = sections.find((s) =>
@@ -75,6 +81,20 @@ export function WalkthroughTab({ sop }: { sop: SopWithSections }) {
       void upsertWalkthroughProgress({ sopId: sop.id, stepId })
     },
     [router, search, sop.id]
+  )
+
+  // Auto-starts a completion if none is active, then queues the photo
+  const handleCapturePhoto = useCallback(
+    async (stepId: string, file: File) => {
+      let localId = activeCompletion?.localId
+      if (!localId) {
+        await completionStore.startCompletion(sopId, sop.version)
+        localId = useCompletionStore.getState().getActiveCompletion(sopId)?.localId
+      }
+      if (!localId) return
+      await addPhotoToQueue({ completionLocalId: localId, stepId, file })
+    },
+    [activeCompletion?.localId, completionStore, sopId, sop.version]
   )
 
   const handleMarkComplete = useCallback(
@@ -211,6 +231,8 @@ export function WalkthroughTab({ sop }: { sop: SopWithSections }) {
             sop={sop}
             onStepChange={handleStepChange}
             completedSteps={completedSteps}
+            stepPhotos={currentStepPhotos}
+            onCapturePhoto={handleCapturePhoto}
           />
         </div>
       ) : (
@@ -265,6 +287,8 @@ export function WalkthroughTab({ sop }: { sop: SopWithSections }) {
           sop={sop}
           onStepChange={handleStepChange}
           completedSteps={completedSteps}
+          stepPhotos={currentStepPhotos}
+          onCapturePhoto={handleCapturePhoto}
         />
       </div>
 
@@ -301,15 +325,23 @@ export function WalkthroughTab({ sop }: { sop: SopWithSections }) {
             </div>
           ) : (
             <>
-              {currentStep?.photo_required && (
-                <p className="flex items-center justify-center gap-1 text-xs text-[var(--accent-decision)] mb-2">
-                  <Camera size={12} /> Photo capture coming soon — you may still mark complete
-                </p>
+              {/* Photo gate bar */}
+              {currentStep?.photo_required && !photoGateMet && (
+                <div className="flex items-center gap-2 px-3 py-2 mb-2 rounded-lg bg-[var(--accent-decision)]/10 border border-[var(--accent-decision)]/30 text-sm text-[var(--accent-decision)]">
+                  <Camera size={14} className="flex-shrink-0" />
+                  Capture a photo in the step above to mark complete
+                </div>
               )}
               <button
                 type="button"
-                onClick={() => currentStep && handleMarkComplete(currentStep.id)}
-                className="w-full h-[64px] rounded-xl font-bold text-base bg-[var(--ink-900)] text-[var(--paper)] hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                onClick={() => currentStep && void handleMarkComplete(currentStep.id)}
+                disabled={!photoGateMet}
+                className={[
+                  'w-full h-[64px] rounded-xl font-bold text-base transition-all flex items-center justify-center gap-2',
+                  !photoGateMet
+                    ? 'bg-[var(--ink-200)] text-[var(--ink-400)] cursor-not-allowed'
+                    : 'bg-[var(--ink-900)] text-[var(--paper)] hover:opacity-90',
+                ].join(' ')}
               >
                 Mark step {currentIdx + 1} complete
               </button>
