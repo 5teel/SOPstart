@@ -83,11 +83,11 @@ export function ThemePicker() {
       {/* Minimal */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <Layers size={14} className="text-steel-400" />
-          <h3 className="text-xs font-semibold text-steel-400 uppercase tracking-wider">
+          <Layers size={14} className="text-[var(--ink-400)]" />
+          <h3 className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wider">
             Minimal
           </h3>
-          <span className="text-xs text-steel-600">CSS patterns</span>
+          <span className="text-xs text-[var(--ink-400)]">CSS patterns</span>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {minimalThemes.map((t) => (
@@ -105,10 +105,10 @@ export function ThemePicker() {
       <div>
         <div className="flex items-center gap-2 mb-3">
           <Sparkles size={14} className="text-brand-yellow" />
-          <h3 className="text-xs font-semibold text-steel-400 uppercase tracking-wider">
+          <h3 className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wider">
             Morphism
           </h3>
-          <span className="text-xs text-steel-600">Textured + glassmorphic panels</span>
+          <span className="text-xs text-[var(--ink-400)]">Textured + glassmorphic panels</span>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {morphismThemes.map((t) => (
