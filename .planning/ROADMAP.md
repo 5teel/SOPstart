@@ -311,14 +311,15 @@ Canonical refs:
   3. Global NZ blocks (WorkSafe standards, common machinery hazards) are visible read-only to every org, while org-created blocks are isolated via RLS
   4. When a block is added to a SOP, its content is snapshotted into the `sop_section_blocks` junction row so the SOP renders correctly even if the block is later deleted or the worker is offline
   5. Admin can choose "pin to this version" (default) or "follow latest" per block usage; follow-latest SOPs show an "update available" badge when the source block changes and route through the publish gate before workers see the update
-**Plans**: TBD
+**Plans**: 5 plans
 **UI hint**: yes
 
 Plans:
-- [ ] 13-01-PLAN.md — Block CRUD: server actions (`createBlock`, `updateBlock`, `archiveBlock`, `saveFromSection`), `/admin/blocks` library list page, block detail/editor, org-vs-global RLS policies, category tag support
+- [x] 13-01-PLAN.md — Block CRUD foundation: server actions (`createBlock` with scope option, `updateBlock`, `archiveBlock`, `saveFromSection`, `listBlocks` with globalOnly + includeContent options, `promoteSuggestion`, `rejectSuggestion`), `/admin/blocks` library list page, block detail/editor, org-vs-global RLS policies, category tag support, `sops.category_tag` column (D-Tax-03) (completed 2026-05-07)
 - [ ] 13-02-PLAN.md — NZ global block seed: migration with WorkSafe hazards, common PPE (hi-vis, hearing, respirator, harness), machinery hazard library (forklift, grinder, press brake), chemical-handling blocks; seed rows with `organisation_id = null`
-- [ ] 13-03-PLAN.md — Wizard integration: `BlockPicker` component filtered by kind + category, "Pick from library" tab alongside "Write new" in the wizard section steps, pin-vs-follow-latest toggle per selection, snapshot-on-add via junction table
-- [ ] 13-04-PLAN.md — Update badging: scheduled diff job (or on-read trigger) that marks SOPs in follow-latest mode as `update_available` when source block version advances, "review update" button in admin library, publish-gate integration
+- [ ] 13-03-PLAN.md — Wizard integration: SOP-level category select (D-Tax-03), `BlockPicker` component filtered by kind + SOP category, "Pick from library" tab alongside "Write new" in the wizard, pin-vs-follow-latest toggle per selection, snapshot-on-add via junction table, atomic `reorder_sop_section_blocks` RPC, three-dot menu via Puck componentItem override
+- [ ] 13-04-PLAN.md — Follow-latest tracking + update badging: AFTER-INSERT trigger on `block_versions` flips `update_available`, accept/decline RPCs, `sop_block_update_decisions` audit table, `UpdateAvailableBadge` + `BlockUpdateReviewModal`, publish-gate integration (status flip published->draft on accept), diff function
+- [ ] 13-05-PLAN.md — Summit super-admin curation UI: `summit-admin-guard.ts` route guard, `/admin/global-blocks` landing (lists globals via `listBlocks({ globalOnly: true })`), `/admin/global-blocks/suggestions` queue with promote/reject, `SuggestionReviewRow` component (no schema changes)
 
 ### Phase 14: AI-Drafted SOPs
 **Goal**: Admin can type a natural-language prompt ("PPE check for forklift operators at our Hamilton site") and receive a structured draft pre-filled with hazards, PPE, steps, and emergency sections — which passes the Phase 6 adversarial Claude verification gate before reaching the admin review UI, then opens in the same builder used for blank-page and template flows

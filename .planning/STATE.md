@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Closeout
-status: verifying
-stopped_at: context exhaustion at 99% (2026-05-04)
-last_updated: "2026-05-04T12:23:49.238Z"
-last_activity: 2026-04-24 -- Phase 12 UAT complete; 9 requirements promoted to Complete
+status: in-progress
+stopped_at: Phase 13 plan 01 complete (schema + actions + admin/blocks UI shipped + supabase db push verified live); next plan 13-02 (NZ global seed migration)
+last_updated: "2026-05-07T04:08:00.000Z"
+last_activity: 2026-05-07 -- Phase 13 plan 01 executed: migration 00022 (summit_admins, block_categories x34, block_suggestions, blocks.category_tags+free_text_tags, sops.category_tag), src/actions/blocks.ts with FINAL option surface (10 exports), /admin/blocks UI + SaveToLibraryModal; supabase db push verified live (34 categories, all tables reachable)
 progress:
   total_phases: 21
-  completed_phases: 3
-  total_plans: 14
-  completed_plans: 14
+  completed_phases: 12
+  total_plans: 21
+  completed_plans: 21
   percent: 100
 ---
 
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 12 (builder-shell-blank-page-authoring) — COMPLETE
-Plan: 4 of 4 (all merged to master)
-Status: UAT complete — 9/11 items automated PASS, 2 items carried as human-verification (airplane-mode offline, cross-admin LWW)
-Last activity: 2026-04-24 -- Phase 12 UAT complete; 9 requirements promoted to Complete
+Phase: 13 (reusable-block-library) — IN PROGRESS
+Plan: 1 of 5 complete (13-01 schema + CRUD foundation shipped)
+Status: schema pushed to live Supabase (34 block_categories rows, all new tables/columns reachable); ready for plan 13-02 (NZ global block seed)
+Last activity: 2026-05-07 -- Phase 13 plan 01 executed atomically across T1-T4 commits + DB push gate
 
-Progress bar: `[███████████░░░░░░░░░]` 55% (phases 11 + 12 both complete)
+Progress bar: `[████████████░░░░░░░░]` 60% (phases 11+12 complete; phase 13 plan 1/5)
 
 Phase 12 commits on master:
 
@@ -184,6 +184,16 @@ Recent decisions affecting current work:
 
 None yet.
 
+### Phase 13 Plan 01 Decisions
+
+- [Phase 13-01]: Encoded Summit super-admin role as separate `summit_admins` table (D-Global-01) — mirrors organisation_members role pattern; avoids modifying auth.users or JWT claims
+- [Phase 13-01]: Seeded `block_categories` with full 34-tag controlled vocab (24 hazard + 10 area) from 13-CORPUS-ANALYSIS § 6 (D-Tax-02)
+- [Phase 13-01]: Single `sops.category_tag` column (not array) per D-Tax-03 — admin picks one primary category at SOP creation
+- [Phase 13-01]: ListBlocksOptions surface declared FINAL in 13-01 (`includeContent`, `globalOnly`, `includeGlobal`, `kindSlug`, `categoryTag`, `includeArchived`) — downstream plans MUST consume as-is, no late additions
+- [Phase 13-01]: Postgres CHECK on `category_tags` array entries deferred to application-layer Zod (CHECK cannot subquery against block_categories)
+- [Phase 13-01]: Defence-in-depth super-admin guard: `is_summit_admin()` SECURITY DEFINER helper used in RLS policies AND server-action `requireSummitAdmin()` (T-13-01-01)
+- [Phase 13-01]: `BlockContentSchema.parse()` invoked at all 3 content-write sites including `promoteSuggestion` snapshot path (T-13-01-03)
+
 ### Pending Todos
 
 - [ ] Confirm Vimeo URL scope for Phase 6 before planning begins (separate API token required; research flags this as product decision)
@@ -205,6 +215,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-04T12:23:49.230Z
-Stopped at: context exhaustion at 99% (2026-05-04)
+Last session: 2026-05-07T04:08:00Z
+Stopped at: Completed Phase 13 plan 01 (`13-01-PLAN.md`). Migration 00022 pushed to live Supabase; 4 commits on master (8a50c54, 22c57d0, f53c9c8, 8ccb767). Next: plan 13-02 (NZ global block seed migration — consumes block_categories vocab + corpus-analysis § 7 seed list).
 Resume file: None
