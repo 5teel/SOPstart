@@ -171,8 +171,8 @@ beyond image rendering tweaks for baked annotation layers.
 - [x] **SB-BLOCK-02**: The wizard surfaces "Pick from library (N matches)" alongside "Write new" at the right wizard step (hazards step offers hazard blocks, PPE step offers PPE blocks, etc.) [Phase 13-03]
 - [ ] **SB-BLOCK-03**: Global NZ blocks (WorkSafe standards, common machinery hazards) are available to all orgs read-only, while org-scoped blocks are isolated via RLS to each organisation
 - [x] **SB-BLOCK-04**: When an admin adds a block to a SOP, the block content is snapshotted into the junction row so the SOP renders correctly even if the block definition is later deleted or the worker is offline [Phase 13-03]
-- [x] **SB-BLOCK-05**: Admin can choose between "pin to this version" (default — the SOP continues to render the snapshot content forever) and "follow latest" (auto-updates if the block definition changes, with a publish gate) [Phase 13-03 — UI half; follow-latest detection in 13-04]
-- [ ] **SB-BLOCK-06**: When a block definition is updated, all SOPs using it in "follow latest" mode are marked with an "update available" badge; admins review the change before publishing the updated SOP version
+- [x] **SB-BLOCK-05**: Admin can choose between "pin to this version" (default — the SOP continues to render the snapshot content forever) and "follow latest" (auto-updates if the block definition changes, with a publish gate) [Phase 13-03 UI half + Phase 13-04 follow-latest detection]
+- [x] **SB-BLOCK-06**: When a block definition is updated, all SOPs using it in "follow latest" mode are marked with an "update available" badge; admins review the change before publishing the updated SOP version [Phase 13-04]
 
 ### Infrastructure & Safety Gates
 
@@ -311,8 +311,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SB-BLOCK-02 | Phase 13-03 | Complete |
 | SB-BLOCK-03 | Phase 13 | Pending |
 | SB-BLOCK-04 | Phase 13-03 | Complete |
-| SB-BLOCK-05 | Phase 13-03 | Complete (UI half — follow-latest detection in 13-04) |
-| SB-BLOCK-06 | Phase 13 | Pending |
+| SB-BLOCK-05 | Phase 13-03 + 13-04 | Complete |
+| SB-BLOCK-06 | Phase 13-04 | Complete |
 | SB-AUTH-02 | Phase 14 | Pending |
 | SB-INFRA-04 | Phase 14 | Pending |
 | SB-AUTH-03 | Phase 15 | Pending |
