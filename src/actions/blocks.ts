@@ -726,6 +726,31 @@ export async function rejectSuggestion(
 // 10. listBlockCategories
 // ---------------------------------------------------------------------------
 
+/**
+ * Phase 13 plan 13-04: count downstream SOP usages of a block in follow_latest
+ * mode. Surfaced in BlockEditorClient post-save toast so admins know how many
+ * SOPs will see an update-available badge.
+ *
+ * Counts ALL follow-latest junction rows referencing this block — across the
+ * entire org (RLS-scoped: only own-org SOPs are returned by the count).
+ * Globals show the count of follow-latest junction rows the calling org owns.
+ */
+export async function countFollowLatestUsages(blockId: string): Promise<number> {
+  if (!blockId) return 0
+  const supabase = await createClient()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { count, error } = await (supabase as any)
+    .from('sop_section_blocks')
+    .select('id', { count: 'exact', head: true })
+    .eq('block_id', blockId)
+    .eq('pin_mode', 'follow_latest')
+  if (error) {
+    console.error('[countFollowLatestUsages] error', error)
+    return 0
+  }
+  return count ?? 0
+}
+
 export async function listBlockCategories(): Promise<BlockCategory[]> {
   const supabase = await createClient()
   const { data, error } = await supabase

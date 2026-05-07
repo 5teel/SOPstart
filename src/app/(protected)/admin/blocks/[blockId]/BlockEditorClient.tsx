@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save, History as HistoryIcon } from 'lucide-react'
-import { updateBlock, archiveBlock } from '@/actions/blocks'
+import { updateBlock, archiveBlock, countFollowLatestUsages } from '@/actions/blocks'
 import type { Block, BlockVersion, BlockCategory, BlockContent } from '@/types/sop'
 
 interface Props {
@@ -61,7 +61,26 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
         setError(res.error)
         return
       }
-      setSavedMsg(res.version ? `Saved as version ${res.version.version_number}` : 'Saved')
+
+      // Phase 13 plan 13-04: when a new block_versions row was inserted
+      // (res.version present), surface the downstream impact — how many
+      // follow-latest SOPs will see an update-available badge.
+      const baseMsg = res.version
+        ? `Saved as version ${res.version.version_number}`
+        : 'Saved'
+      let finalMsg = baseMsg
+      if (res.version) {
+        try {
+          const followCount = await countFollowLatestUsages(block.id)
+          if (followCount > 0) {
+            finalMsg = `${baseMsg}. ${followCount} follow-latest SOP${followCount === 1 ? '' : 's'} will see an update-available badge.`
+          }
+        } catch (e) {
+          console.warn('[BlockEditorClient] follow-latest usage count failed', e)
+        }
+      }
+
+      setSavedMsg(finalMsg)
       setChangeNote('')
       router.refresh()
     })

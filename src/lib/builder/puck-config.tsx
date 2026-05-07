@@ -752,24 +752,42 @@ for (const key of Object.keys(puckConfig.components)) {
 // once 13-04 ships UpdateAvailableBadge).
 
 import { BlockOverflowMenu } from '@/components/sop/blocks/BlockOverflowMenu'
+import { PuckItemBadgeOverlay } from '@/components/sop/blocks/PuckItemBadgeOverlay'
 import {
   PUCK_TYPE_TO_BLOCK_KIND,
   puckPropsToBlockContent,
 } from '@/lib/builder/puck-to-block-content'
-import type { BlockCategory } from '@/types/sop'
+import type { BlockCategory, SopSectionBlockWithUpdate } from '@/types/sop'
 import type { BlockContent } from '@/lib/validators/blocks'
+// Re-export for adjacent code that imports UpdateAvailableBadge through the
+// builder module surface.
+export { UpdateAvailableBadge } from '@/components/admin/blocks/UpdateAvailableBadge'
 
 /**
- * Factory that returns a Puck Overrides object configured with a category
- * loader (lazy — only invoked when a menu is opened).
+ * Factory that returns a Puck Overrides object configured with:
+ *  - category loader (lazy; only invoked when the three-dot menu opens)
+ *  - optional junctionMap (Phase 13 plan 13-04) keyed by sop_section_blocks.id
+ *  - optional componentIdToJunction (Phase 13 plan 13-04) keyed by Puck's
+ *    canvas item id (props.id) → derived in BuilderClient by walking
+ *    layout_data and matching props.junctionId entries against junctionMap
  *
  * Use `puckOverrides` (default export below) for the standard wiring;
- * test code or alternate routes can call `createPuckOverrides({...})` directly
- * to inject a different category loader.
+ * test code or alternate routes can call `createPuckOverrides({...})` directly.
  */
 export function createPuckOverrides(opts: {
   loadCategories: () => Promise<BlockCategory[]>
+  /** Phase 13 plan 13-04: keyed by sop_section_blocks.id; consumed by componentOverlay */
+  junctionMap?: Map<string, SopSectionBlockWithUpdate>
+  /** Phase 13 plan 13-04: keyed by Puck componentId (= layout_data props.id) */
+  componentIdToJunction?: Map<string, SopSectionBlockWithUpdate>
+  /** Phase 13 plan 13-04: callback fired after Accept / Decline to refresh junctions */
+  onReviewed?: () => void
 }): Partial<Overrides> {
+  // Reference junctionMap for lint cleanliness — the canonical lookup the
+  // overlay uses is componentIdToJunction (built from junctionMap + layout_data
+  // in BuilderClient). Both maps are kept in the factory surface so callers
+  // can pass either / both as their needs evolve.
+  void opts.junctionMap
   return {
     componentItem: ({
       children,
@@ -807,6 +825,35 @@ export function createPuckOverrides(opts: {
             />
           </div>
         </div>
+      )
+    },
+    // Phase 13 plan 13-04: render UpdateAvailableBadge over canvas items whose
+    // junction has update_available=true. componentOverlay receives Puck's
+    // canvas componentId (matches layout_data entry's props.id). Inline-authored
+    // items (no junctionId stamped) have no entry in componentIdToJunction and
+    // the overlay renders a graceful no-op (children only, no badge).
+    componentOverlay: ({
+      children,
+      componentId,
+    }: {
+      children: ReactNode
+      hover: boolean
+      isSelected: boolean
+      componentId: string
+      componentType: string
+    }): ReactElement => {
+      const map = opts.componentIdToJunction
+      if (!map || map.size === 0) {
+        return <>{children}</>
+      }
+      return (
+        <PuckItemBadgeOverlay
+          componentId={componentId}
+          componentIdToJunction={map}
+          onReviewed={opts.onReviewed}
+        >
+          {children}
+        </PuckItemBadgeOverlay>
       )
     },
   }

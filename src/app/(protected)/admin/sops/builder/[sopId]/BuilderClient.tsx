@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import type { Data, Viewports } from '@puckeditor/core'
-import type { SopWithSections } from '@/types/sop'
+import type { SopWithSections, SopSectionBlockWithUpdate } from '@/types/sop'
 import {
   puckConfig,
-  puckOverrides,
+  createPuckOverrides,
   sanitizeLayoutContent,
 } from '@/lib/builder/puck-config'
 import { LayoutDataSchema } from '@/lib/builder/layout-schema'
@@ -15,6 +15,8 @@ import { useBuilderAutosave } from '@/hooks/useBuilderAutosave'
 import { useDraftLayoutSync } from '@/hooks/useDraftLayoutSync'
 import { useNetworkStore } from '@/stores/network'
 import { db } from '@/lib/offline/db'
+import { listSectionBlocksWithUpdates } from '@/actions/sop-section-blocks'
+import { listBlockCategories } from '@/actions/blocks'
 import { SectionListSidebar } from './SectionListSidebar'
 
 // D-01 (revised 2026-04-24): Use Puck's native viewports prop. It clamps
@@ -137,6 +139,83 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
   // React re-runs the render each tick.
   void savedTick
 
+  // Phase 13 plan 13-04: fetch junction rows + hydrated latestVersion for
+  // the active section. Used to render UpdateAvailableBadge on canvas items
+  // whose source block has advanced.
+  const [junctionMap, setJunctionMap] = useState<
+    Map<string, SopSectionBlockWithUpdate>
+  >(new Map())
+
+  const refreshJunctions = useCallback(async () => {
+    if (!activeSection) {
+      setJunctionMap(new Map())
+      return
+    }
+    try {
+      const rows = await listSectionBlocksWithUpdates(activeSection.id)
+      setJunctionMap(new Map(rows.map((r) => [r.id, r])))
+    } catch (e) {
+      console.warn('[BuilderClient] junction refresh failed', e)
+    }
+  }, [activeSection])
+
+  useEffect(() => {
+    let cancelled = false
+    void (async () => {
+      if (!activeSection) {
+        if (!cancelled) setJunctionMap(new Map())
+        return
+      }
+      try {
+        const rows = await listSectionBlocksWithUpdates(activeSection.id)
+        if (!cancelled) setJunctionMap(new Map(rows.map((r) => [r.id, r])))
+      } catch (e) {
+        console.warn('[BuilderClient] junction fetch failed', e)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [activeSection])
+
+  // Walk the active section's layout_data and build a lookup from
+  // Puck componentId (= layout entry props.id) → junction row, by matching
+  // each item's `props.junctionId` against the junctionMap key.
+  const componentIdToJunction = useMemo<
+    Map<string, SopSectionBlockWithUpdate>
+  >(() => {
+    const out = new Map<string, SopSectionBlockWithUpdate>()
+    if (!activeSection?.layout_data || junctionMap.size === 0) return out
+    const parsed = LayoutDataSchema.safeParse(activeSection.layout_data)
+    if (!parsed.success) return out
+    const items = (parsed.data.content ?? []) as Array<{
+      props?: { id?: string; junctionId?: string }
+    }>
+    for (const item of items) {
+      const componentId = item?.props?.id
+      const junctionId = item?.props?.junctionId
+      if (!componentId || !junctionId) continue
+      const junction = junctionMap.get(junctionId)
+      if (junction) out.set(componentId, junction)
+    }
+    return out
+  }, [activeSection, junctionMap])
+
+  // Memoized overrides factory — rebuilt when junctions or the section change
+  // so the componentOverlay closure captures the latest map / refresh callback.
+  const overrides = useMemo(
+    () =>
+      createPuckOverrides({
+        loadCategories: listBlockCategories,
+        junctionMap,
+        componentIdToJunction,
+        onReviewed: () => {
+          void refreshJunctions()
+        },
+      }),
+    [junctionMap, componentIdToJunction, refreshJunctions]
+  )
+
   // D-13: sanitize unknown block types before passing data to <Puck>.
   // Also carries through flow_graph from the SOP-level record (D-16) so
   // FlowGraphField pre-loads the existing graph when the builder opens.
@@ -224,7 +303,7 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
             <Puck
               key={activeSection.id}
               config={puckConfig}
-              overrides={puckOverrides}
+              overrides={overrides}
               data={sanitizedInitial}
               onChange={handleChange}
               viewports={BUILDER_VIEWPORTS}
