@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Closeout
 status: in-progress
-stopped_at: Phase 13 implementation complete — all 5 plans landed (13-01 schema/CRUD, 13-02 NZ global seed, 13-03 wizard picker + builder save-to-library, 13-04 follow-latest tracking, 13-05 Summit super-admin curation UI); awaiting batched browser UAT (13-03 + 13-04 + 13-05 scenarios) before phase verification
-last_updated: "2026-05-07T06:30:00.000Z"
-last_activity: 2026-05-07 -- Phase 13 plan 05 executed: summit-admin-guard.ts (requireSummitAdmin via is_summit_admin RPC), /admin/global-blocks landing page (reuses BlockListTable from 13-01 with globalOnly: true), /admin/global-blocks/suggestions queue page, SuggestionReviewRow with snapshot preview + Promote/Reject decision form; consumes pre-declared listBlocks/listBlockSuggestions/promoteSuggestion/rejectSuggestion server-action surface from 13-01 verbatim; no schema changes; 3 task commits (5ea8575 / 5a57687 / 1d2bef7); tsc clean, 0 lint errors
+stopped_at: Phase 13 verifier PASSED (5/5 success criteria plumbing-complete, 6/6 SB-BLOCK requirements have backing code, summit→platform rename consistent across schema + code); awaiting batched browser UAT (13-03 + 13-04 + 13-05) as carried human-verification items
+last_updated: "2026-05-07T08:00:00.000Z"
+last_activity: 2026-05-07 -- Phase 13 cleanup + verification: (1) commit e093d45 renamed summit_admins→platform_admins (migration 00026, RPC, 5 RLS policies, summit-admin-guard.ts→platform-admin-guard.ts, requireSummitAdmin→requirePlatformAdmin, /admin/global-blocks UI strings) — Potenco-owned, unrelated to Summit Insights; (2) commit 9d723a4 added migration 00027 idempotent seed of initial platform admin (simonscott86@gmail.com); (3) gsd-verifier produced 13-VERIFICATION.md — status human_needed (plumbing complete, browser UAT batchable)
 progress:
   total_phases: 21
   completed_phases: 12
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 13 implementation complete (5/5 plans) — awaiting batched browser UAT (13-03 + 13-04 + 13-05 scenarios)
+**Current focus:** Phase 13 verifier PASSED — awaiting batched browser UAT (13-03 + 13-04 + 13-05) before transitioning to next phase
 
 ## Current Position
 
-Phase: 13 (reusable-block-library) — IMPLEMENTATION COMPLETE (UAT pending)
-Plan: 5 of 5 implementation complete (13-01 schema + CRUD; 13-02 NZ global seed; 13-03 wizard picker + builder save-to-library + 00024 atomic junction reorder RPC; 13-04 follow-latest tracking with 00025 trigger + RPCs + UpdateAvailableBadge + diff modal; 13-05 Summit super-admin curation UI — /admin/global-blocks gated route + suggestions queue with Promote/Reject); 13-03 + 13-04 + 13-05 browser UAT pending Simon's manual verification (batchable); next: phase verification + transition
-Status: SB-BLOCK-05 (runtime half) + SB-BLOCK-06 closed via 13-04; SB-BLOCK-06 super-admin half delivered via 13-05 (gated /admin/global-blocks landing + Suggestions Queue)
-Last activity: 2026-05-07 -- Phase 13 plan 05 executed atomically across 3 task commits (5ea8575 / 5a57687 / 1d2bef7); no schema changes; tsc + lint clean
+Phase: 13 (reusable-block-library) — VERIFIED COMPLETE (UAT pending as carried human-verification)
+Plan: 5 of 5 implementation complete (13-01 schema + CRUD; 13-02 NZ global seed; 13-03 wizard picker + builder save-to-library + 00024 atomic junction reorder RPC; 13-04 follow-latest tracking with 00025 trigger + RPCs + UpdateAvailableBadge + diff modal; 13-05 platform super-admin curation UI — /admin/global-blocks gated route + suggestions queue with Promote/Reject); summit→platform rename applied via 00026 + code; 00027 seeds initial platform admin; 13-VERIFICATION.md written; 13-03 + 13-04 + 13-05 browser UAT pending Simon's manual verification (batchable)
+Status: SB-BLOCK-01..06 all closed; verifier PASSED — 5/5 plumbing-complete, 6/6 requirements backed by code, no anti-patterns or stubs detected
+Last activity: 2026-05-07 -- Phase 13 verified + summit→platform rename + initial platform admin seed migration; 2 cleanup commits (e093d45, 9d723a4) on top of the 5 plan-execution waves
 
 Progress bar: `[████████████████████]` 100% (phases 11+12 complete; phase 13 implementation 5/5 done — UAT remaining)
 
