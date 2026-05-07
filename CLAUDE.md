@@ -1,5 +1,9 @@
 # SafeStart — SOP Assistant PWA
 
+## Ownership
+
+SafeStart (SOPstart / sopstart.com) is a subsidiary project of **Potenco Pty Ltd**. It is **not** related to Summit Insights — Summit is Simon's day-job consultancy and has no involvement in this codebase, its data, or its commercial direction. Do not conflate the two: any "super-admin" / curator concepts in this project belong to Potenco, not Summit.
+
 ## Project Description
 
 SafeStart is a multi-tenant SaaS progressive web app that helps blue-collar tradespeople and inspectors follow Standard Operating Procedures (SOPs) on-site. Organizations upload existing SOP documents (Word/PDF), AI parses them into structured mobile-friendly procedures, and workers walk through them step-by-step on their phones — with photo capture, completion tracking, and supervisor sign-off.

@@ -498,7 +498,7 @@ export type Database = {
           },
         ]
       }
-      summit_admins: {
+      platform_admins: {
         Row: {
           user_id: string
           granted_at: string
@@ -1300,7 +1300,7 @@ export type Database = {
         Returns: Database["public"]["Enums"]["app_role"]
       }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
-      is_summit_admin: { Args: Record<string, never>; Returns: boolean }
+      is_platform_admin: { Args: Record<string, never>; Returns: boolean }
       accept_block_update: {
         Args: {
           p_sop_section_block_id: string

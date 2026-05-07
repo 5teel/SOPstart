@@ -1,15 +1,15 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { requireSummitAdmin } from '@/lib/auth/summit-admin-guard'
+import { requirePlatformAdmin } from '@/lib/auth/platform-admin-guard'
 import { listBlockSuggestions } from '@/actions/blocks'
 import { SuggestionReviewRow } from '@/components/admin/blocks/SuggestionReviewRow'
 
 export const metadata: Metadata = {
-  title: 'Pending Suggestions — Summit super-admin',
+  title: 'Pending Suggestions — Platform admin',
 }
 
 /**
- * Phase 13 plan 13-05: Suggestions queue page for the Summit super-admin.
+ * Phase 13 plan 13-05: Suggestions queue page for the platform super-admin.
  *
  * Lists all `block_suggestions` rows with status='pending'. Each row exposes
  * a Promote / Reject decision form via SuggestionReviewRow.
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
  * Reject → marks the suggestion rejected with optional decision note.
  */
 export default async function SuggestionsQueuePage() {
-  await requireSummitAdmin()
+  await requirePlatformAdmin()
   const pending = await listBlockSuggestions({ status: 'pending' })
 
   return (

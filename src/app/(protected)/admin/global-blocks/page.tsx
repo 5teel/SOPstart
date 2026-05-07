@@ -1,26 +1,26 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
-import { requireSummitAdmin } from '@/lib/auth/summit-admin-guard'
+import { requirePlatformAdmin } from '@/lib/auth/platform-admin-guard'
 import { listBlocks, listBlockCategories } from '@/actions/blocks'
 import { BlockListTable } from '@/components/admin/blocks/BlockListTable'
 
 export const metadata: Metadata = {
-  title: 'Global Block Library — Summit super-admin',
+  title: 'Global Block Library — Platform admin',
 }
 
 /**
- * Phase 13 plan 13-05: Summit super-admin landing page for global block curation.
+ * Phase 13 plan 13-05: Platform super-admin landing page for global block curation.
  *
  * Consumes the FINAL listBlocks option surface from 13-01 (`globalOnly: true`).
  * Reuses BlockListTable from 13-01 — no UI duplication.
  *
  * Existing /admin/blocks/[blockId] editor + RLS policy
- * `blocks_summit_admin_global_update` permit super-admin updates to
+ * `blocks_platform_admin_global_update` permit super-admin updates to
  * `organisation_id = null` rows, so row links work transparently.
  */
 export default async function GlobalBlocksPage() {
-  await requireSummitAdmin()
+  await requirePlatformAdmin()
 
   // Consume the pre-declared `globalOnly` option from 13-01's listBlocks signature.
   // Include archived globals so super-admin can un-archive / inspect history.
@@ -34,7 +34,7 @@ export default async function GlobalBlocksPage() {
       <header className="flex items-start justify-between mb-2 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-steel-100">
-            Global Block Library — Summit super-admin
+            Global Block Library — Platform admin
           </h1>
           <p className="text-sm text-steel-400 mt-1 max-w-2xl">
             Curated NZ-industry blocks visible read-only to every org.
@@ -51,7 +51,7 @@ export default async function GlobalBlocksPage() {
         </Link>
       </header>
 
-      {/* Summit super-admin sub-nav */}
+      {/* Platform super-admin sub-nav */}
       <nav className="flex gap-4 border-b border-steel-700 mt-6 mb-6 text-sm">
         <Link
           href="/admin/global-blocks"

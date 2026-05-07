@@ -83,7 +83,7 @@ export function SaveToLibraryModal({
       // src/components/providers (deferred to integration plan 13-03).
       const msg =
         scope === 'suggest_global'
-          ? 'Saved to your library and submitted to Summit for global review.'
+          ? 'Saved to your library and submitted for global review.'
           : 'Saved to library.'
       // eslint-disable-next-line no-alert
       alert(msg)
@@ -205,7 +205,7 @@ export function SaveToLibraryModal({
             <span className="text-sm text-steel-100">
               Suggest for global
               <span className="block text-xs text-steel-400">
-                Submit to Summit Insights for review and possible promotion to the global library.
+                Submit for review and possible promotion to the global library.
               </span>
             </span>
           </label>

@@ -11,7 +11,7 @@
  * All content writes call BlockContentSchema.parse() before the insert.
  * RLS handles cross-org isolation; createAdminClient() is used ONLY where the
  * insert/update target is organisation_id = null (global blocks) and the
- * caller has been verified as a Summit super-admin via is_summit_admin().
+ * caller has been verified as a platform super-admin via is_platform_admin().
  */
 
 import { z } from 'zod'
@@ -55,17 +55,17 @@ async function requireAdmin(): Promise<AdminCtx | { error: string }> {
 }
 
 /**
- * Defence-in-depth: verify caller is a Summit super-admin via the
- * is_summit_admin() RPC. Used by createBlock when scope='global' is
+ * Defence-in-depth: verify caller is a platform super-admin via the
+ * is_platform_admin() RPC. Used by createBlock when scope='global' is
  * requested AND by promoteSuggestion / rejectSuggestion. The full route
  * guard for /admin/global-blocks ships in plan 13-05.
  */
-async function requireSummitAdmin(): Promise<{ ok: true } | { error: string }> {
+async function requirePlatformAdmin(): Promise<{ ok: true } | { error: string }> {
   const supabase = await createClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase as any).rpc('is_summit_admin')
+  const { data, error } = await (supabase as any).rpc('is_platform_admin')
   if (error || data !== true) {
-    return { error: 'Summit super-admin required' }
+    return { error: 'Platform super-admin required' }
   }
   return { ok: true }
 }
@@ -81,7 +81,7 @@ const CreateBlockInput = z.object({
   freeTextTags: z.array(z.string()).max(20).default([]),
   content: z.unknown(), // validated below via BlockContentSchema
   changeNote: z.string().max(500).optional(),
-  // 'global' requires Summit super-admin (D-Global-01)
+  // 'global' requires platform super-admin (D-Global-01)
   scope: z.enum(['org', 'global']).default('org'),
 })
 
@@ -150,9 +150,9 @@ export async function createBlock(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let writer: any
   if (isGlobal) {
-    const summit = await requireSummitAdmin()
-    if ('error' in summit) {
-      return { error: 'Summit super-admin required to create global blocks' }
+    const guard = await requirePlatformAdmin()
+    if ('error' in guard) {
+      return { error: 'Platform super-admin required to create global blocks' }
     }
     // For global writes (organisation_id = null) use the service-role client
     // since the authenticated RLS path would also work (per 00022 policy) but
@@ -243,7 +243,7 @@ export async function updateBlock(
 
   // Fetch current block — RLS-scoped (returns null if not visible / cross-org).
   // For global blocks, RLS update policy from 00022 will gate the actual write
-  // on is_summit_admin(); we do not pre-check here to avoid duplicating logic.
+  // on is_platform_admin(); we do not pre-check here to avoid duplicating logic.
   const { data: existing, error: selErr } = await supabase
     .from('blocks')
     .select('*')
@@ -579,8 +579,8 @@ export async function promoteSuggestion(
 ): Promise<{ promotedBlockId: string } | { error: string }> {
   if (!suggestionId) return { error: 'suggestionId required' }
 
-  const summit = await requireSummitAdmin()
-  if ('error' in summit) return { error: summit.error }
+  const guard = await requirePlatformAdmin()
+  if ('error' in guard) return { error: guard.error }
 
   // Capture caller user id via regular client (admin client has no auth context).
   const supabase = await createClient()
@@ -589,7 +589,7 @@ export async function promoteSuggestion(
 
   const admin = createAdminClient()
 
-  // Fetch suggestion (admin client bypasses RLS — fine since requireSummitAdmin gated).
+  // Fetch suggestion (admin client bypasses RLS — fine since requirePlatformAdmin gated).
   const { data: sug, error: sugErr } = await admin
     .from('block_suggestions')
     .select('*')
@@ -695,15 +695,15 @@ export async function rejectSuggestion(
 ): Promise<{ success: true } | { error: string }> {
   if (!suggestionId) return { error: 'suggestionId required' }
 
-  const summit = await requireSummitAdmin()
-  if ('error' in summit) return { error: summit.error }
+  const guard = await requirePlatformAdmin()
+  if ('error' in guard) return { error: guard.error }
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
 
-  // RLS update policy block_suggestions_update_summit_only allows this via
-  // the regular client because requireSummitAdmin already passed.
+  // RLS update policy block_suggestions_update_platform_only allows this via
+  // the regular client because requirePlatformAdmin already passed.
   const { error } = await supabase
     .from('block_suggestions')
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
