@@ -313,3 +313,33 @@ export interface BlockCategory {
   sort_order: number
   created_at: string
 }
+
+// ---------------------------------------------------------------
+// Phase 13 plan 13-04: follow-latest update tracking
+// Matches supabase/migrations/00025_phase13_follow_latest_tracking.sql
+// ---------------------------------------------------------------
+
+export type BlockUpdateDecisionType = 'accept' | 'decline'
+
+export interface BlockUpdateDecision {
+  id: string
+  sop_section_block_id: string
+  block_version_id: string
+  decision: BlockUpdateDecisionType
+  decided_by: string | null
+  decided_at: string
+  note: string | null
+}
+
+/**
+ * Convenience type for the builder UI: a junction row hydrated with the
+ * latest version of its source block. Used by listSectionBlocksWithUpdates
+ * (server action) and consumed by UpdateAvailableBadge / BlockUpdateReviewModal.
+ *
+ * `latestVersion` is null/undefined when:
+ *   - the source block has only one version (nothing to update to), OR
+ *   - update_available is false (we don't bother hydrating)
+ */
+export interface SopSectionBlockWithUpdate extends SopSectionBlock {
+  latestVersion?: BlockVersion | null
+}

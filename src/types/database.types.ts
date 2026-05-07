@@ -585,6 +585,51 @@ export type Database = {
         }
         Relationships: []
       }
+      sop_block_update_decisions: {
+        Row: {
+          id: string
+          sop_section_block_id: string
+          block_version_id: string
+          decision: 'accept' | 'decline'
+          decided_by: string | null
+          decided_at: string
+          note: string | null
+        }
+        Insert: {
+          id?: string
+          sop_section_block_id: string
+          block_version_id: string
+          decision: 'accept' | 'decline'
+          decided_by?: string | null
+          decided_at?: string
+          note?: string | null
+        }
+        Update: {
+          id?: string
+          sop_section_block_id?: string
+          block_version_id?: string
+          decision?: 'accept' | 'decline'
+          decided_by?: string | null
+          decided_at?: string
+          note?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sop_block_update_decisions_sop_section_block_id_fkey"
+            columns: ["sop_section_block_id"]
+            isOneToOne: false
+            referencedRelation: "sop_section_blocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sop_block_update_decisions_block_version_id_fkey"
+            columns: ["block_version_id"]
+            isOneToOne: false
+            referencedRelation: "block_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sop_steps: {
         Row: {
           caution: string | null
@@ -1256,6 +1301,25 @@ export type Database = {
       }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       is_summit_admin: { Args: Record<string, never>; Returns: boolean }
+      accept_block_update: {
+        Args: {
+          p_sop_section_block_id: string
+          p_new_version_id: string
+          p_note?: string | null
+        }
+        Returns: void
+      }
+      decline_block_update: {
+        Args: {
+          p_sop_section_block_id: string
+          p_new_version_id: string
+          p_note?: string | null
+        }
+        Returns: void
+      }
+      // Trigger function — never directly callable from client; declared so
+      // schema-aware tooling does not consider it missing.
+      propagate_block_update: { Args: Record<string, never>; Returns: unknown }
     }
     Enums: {
       app_role: "worker" | "supervisor" | "admin" | "safety_manager"
