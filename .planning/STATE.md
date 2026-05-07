@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Closeout
 status: in-progress
-stopped_at: Phase 13 plan 04 implementation complete (00025 follow-latest tracking trigger + accept/decline RPCs live; UpdateAvailableBadge + BlockUpdateReviewModal wired through Puck componentOverlay; BlockEditorClient downstream-impact toast); awaiting browser UAT (batch with 13-03 UAT) before plan 13-05
-last_updated: "2026-05-07T05:30:00.000Z"
-last_activity: 2026-05-07 -- Phase 13 plan 04 executed: migration 00025 (propagate_block_update trigger + sop_block_update_decisions audit table + accept_block_update / decline_block_update SECURITY DEFINER RPCs) pushed to gknxhqinzjvuupccyojv; diff-block-content pure helper + 5 unit tests; UpdateAvailableBadge + BlockUpdateReviewModal components; PuckItemBadgeOverlay wired through createPuckOverrides componentOverlay; BuilderClient junction fetch + componentId->junction lookup; BlockEditorClient countFollowLatestUsages downstream-impact toast; tsc clean, 0 lint errors
+stopped_at: Phase 13 implementation complete — all 5 plans landed (13-01 schema/CRUD, 13-02 NZ global seed, 13-03 wizard picker + builder save-to-library, 13-04 follow-latest tracking, 13-05 Summit super-admin curation UI); awaiting batched browser UAT (13-03 + 13-04 + 13-05 scenarios) before phase verification
+last_updated: "2026-05-07T06:30:00.000Z"
+last_activity: 2026-05-07 -- Phase 13 plan 05 executed: summit-admin-guard.ts (requireSummitAdmin via is_summit_admin RPC), /admin/global-blocks landing page (reuses BlockListTable from 13-01 with globalOnly: true), /admin/global-blocks/suggestions queue page, SuggestionReviewRow with snapshot preview + Promote/Reject decision form; consumes pre-declared listBlocks/listBlockSuggestions/promoteSuggestion/rejectSuggestion server-action surface from 13-01 verbatim; no schema changes; 3 task commits (5ea8575 / 5a57687 / 1d2bef7); tsc clean, 0 lint errors
 progress:
   total_phases: 21
   completed_phases: 12
   total_plans: 26
-  completed_plans: 25
-  percent: 96
+  completed_plans: 26
+  percent: 100
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 13 plan 02 complete — ready for plan 13-03 (wizard picker integration)
+**Current focus:** Phase 13 implementation complete (5/5 plans) — awaiting batched browser UAT (13-03 + 13-04 + 13-05 scenarios)
 
 ## Current Position
 
-Phase: 13 (reusable-block-library) — IN PROGRESS
-Plan: 4 of 5 implementation complete (13-01 schema + CRUD; 13-02 NZ global seed; 13-03 wizard picker + builder save-to-library + 00024 atomic junction reorder RPC; 13-04 follow-latest tracking — 00025 trigger + RPCs live, UpdateAvailableBadge + diff modal wired into Puck builder); 13-03 + 13-04 browser UAT pending Simon's manual verification (batchable); plan 13-05 (super-admin curation UI) is next
-Status: SB-BLOCK-05 (runtime half) + SB-BLOCK-06 closed; admin block edits now flip update_available on follow-latest junctions, builder canvas shows amber-dot badge, review modal accept/decline routes through publish gate (status flip published->draft); BlockEditorClient toast surfaces N follow-latest SOP usages
-Last activity: 2026-05-07 -- Phase 13 plan 04 executed atomically across 5 task commits (6f03cea / 056a495 / 99a3360 / 995b3c3 / 5d9188a) + 00025 migration push to live Supabase
+Phase: 13 (reusable-block-library) — IMPLEMENTATION COMPLETE (UAT pending)
+Plan: 5 of 5 implementation complete (13-01 schema + CRUD; 13-02 NZ global seed; 13-03 wizard picker + builder save-to-library + 00024 atomic junction reorder RPC; 13-04 follow-latest tracking with 00025 trigger + RPCs + UpdateAvailableBadge + diff modal; 13-05 Summit super-admin curation UI — /admin/global-blocks gated route + suggestions queue with Promote/Reject); 13-03 + 13-04 + 13-05 browser UAT pending Simon's manual verification (batchable); next: phase verification + transition
+Status: SB-BLOCK-05 (runtime half) + SB-BLOCK-06 closed via 13-04; SB-BLOCK-06 super-admin half delivered via 13-05 (gated /admin/global-blocks landing + Suggestions Queue)
+Last activity: 2026-05-07 -- Phase 13 plan 05 executed atomically across 3 task commits (5ea8575 / 5a57687 / 1d2bef7); no schema changes; tsc + lint clean
 
-Progress bar: `[████████████████░░░░]` 80% (phases 11+12 complete; phase 13 plan 4/5 implementation done, plan 13-05 + UAT remaining)
+Progress bar: `[████████████████████]` 100% (phases 11+12 complete; phase 13 implementation 5/5 done — UAT remaining)
 
 Phase 12 commits on master:
 
@@ -220,6 +220,13 @@ None yet.
 - [Phase 13-04]: Decline records sop_block_update_decisions row with the SPECIFIC declined version_id — trigger filter makes that exact version idempotent for the badge, but a SUBSEQUENT version (v+2) will re-fire the badge by design (each new version deserves a fresh review opportunity)
 - [Phase 13-04]: Task 6 schema push auto-completed — SUPABASE_ACCESS_TOKEN already in .env.local from 13-01..13-03 means automating the push was correct (executor prompt: complete every automatable task; only stop for genuine eyes-on gates)
 
+### Phase 13 Plan 05 Decisions
+
+- [Phase 13-05]: Create-new-global path implemented as a Link to /admin/blocks/new?scope=global (deferred entry point) — Phase 13 v1 also supports editing existing globals as the create path; SaveToLibraryModal forcedScope extension explicitly skipped per plan's "only add this if cheap" guidance
+- [Phase 13-05]: requireSummitAdmin server-side guard uses (supabase as any).rpc('is_summit_admin') cast — matches existing src/actions/blocks.ts requireSummitAdmin pattern, single source-of-truth for the "who is a Summit super-admin" policy via the SECURITY DEFINER RPC from 00022
+- [Phase 13-05]: BlockListTable from 13-01 reused verbatim for /admin/global-blocks landing — single rendering surface for org-scope (/admin/blocks) and global-scope (/admin/global-blocks) lists
+- [Phase 13-05]: SuggestionReviewRow snapshot preview reuses BlockPickerPreview's switch shape (HazardCardBlock / PPECardBlock / StepBlock / curated emergency + measurement); non-curated kinds fall through to compact JSON dump labelled with kind — kept self-contained for now; promote to shared <BlockContentPreview> if a third surface needs it
+
 ### Pending Todos
 
 - [ ] Confirm Vimeo URL scope for Phase 6 before planning begins (separate API token required; research flags this as product decision)
@@ -241,6 +248,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-07T05:30:00Z
-Stopped at: Completed Phase 13 plan 04 (`13-04-PLAN.md`). Migration 00025 pushed to live Supabase (gknxhqinzjvuupccyojv); follow-latest tracking trigger + accept/decline RPCs + sop_block_update_decisions audit table live. 5 commits on master (6f03cea, 056a495, 99a3360, 995b3c3, 5d9188a). 13-03 + 13-04 browser UAT batch pending Simon's manual verification. Next: plan 13-05 (super-admin global-block curation UI — no schema changes; Wave 3 parallel-eligible with 13-04 originally, now sequential since 13-04 just landed).
+Last session: 2026-05-07T06:30:00Z
+Stopped at: Completed Phase 13 plan 05 (`13-05-PLAN.md`). Summit super-admin curation UI shipped — `/admin/global-blocks` (gated by requireSummitAdmin) lists globals via BlockListTable + nav to suggestions queue; `/admin/global-blocks/suggestions` exposes pending block_suggestions rows with Promote/Reject decision form. No schema changes (consumes 13-01's pre-declared server-action surface verbatim). 3 task commits on master (5ea8575, 5a57687, 1d2bef7). Phase 13 implementation 5/5 complete; batched browser UAT (13-03 + 13-04 + 13-05) remains pending Simon's verification. Pre-existing 13-01 manual SQL seed (insert into summit_admins ...) still required before super-admin routes are accessible. Next: phase verification + Phase 13 transition.
 Resume file: None

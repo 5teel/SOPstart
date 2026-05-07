@@ -319,7 +319,7 @@ Plans:
 - [x] 13-02-PLAN.md — NZ global block seed: migration 00023 inserts 65 globals (57 hazard + 5 PPE + 3 step) with `organisation_id = null` from corpus-analysis § 7; auditable JSON source-of-truth committed at `seed-source/global-blocks.json`; idempotency guard prevents double-seed (completed 2026-05-07)
 - [x] 13-03-PLAN.md — Wizard integration: SOP-level category select (D-Tax-03), `BlockPicker` component filtered by kind + SOP category, "Pick from library" tab alongside "Write new" in the wizard, pin-vs-follow-latest toggle per selection, snapshot-on-add via junction table, atomic `reorder_sop_section_blocks` RPC (00024), three-dot menu via Puck componentItem override (implementation complete 2026-05-07; Task 7 UAT pending Simon's manual browser verification)
 - [x] 13-04-PLAN.md — Follow-latest tracking + update badging: AFTER-INSERT trigger on `block_versions` flips `update_available`, accept/decline RPCs, `sop_block_update_decisions` audit table, `UpdateAvailableBadge` + `BlockUpdateReviewModal`, publish-gate integration (status flip published->draft on accept), diff function (implementation complete 2026-05-07; migration 00025 live on gknxhqinzjvuupccyojv; browser UAT pending Simon's verification, batchable with 13-03 UAT)
-- [ ] 13-05-PLAN.md — Summit super-admin curation UI: `summit-admin-guard.ts` route guard, `/admin/global-blocks` landing (lists globals via `listBlocks({ globalOnly: true })`), `/admin/global-blocks/suggestions` queue with promote/reject, `SuggestionReviewRow` component (no schema changes)
+- [x] 13-05-PLAN.md — Summit super-admin curation UI: `summit-admin-guard.ts` route guard (calls `is_summit_admin()` RPC, redirects non-summit to `/dashboard`), `/admin/global-blocks` landing reusing `BlockListTable` from 13-01 with `listBlocks({ globalOnly: true })`, `/admin/global-blocks/suggestions` queue, `SuggestionReviewRow` with snapshot preview + Promote/Reject decision form; consumes 13-01's pre-declared server-action surface verbatim — no schema changes (implementation complete 2026-05-07; browser UAT pending Simon's verification, batchable with 13-03 + 13-04 UAT scenarios)
 
 ### Phase 14: AI-Drafted SOPs
 **Goal**: Admin can type a natural-language prompt ("PPE check for forklift operators at our Hamilton site") and receive a structured draft pre-filled with hazards, PPE, steps, and emergency sections — which passes the Phase 6 adversarial Claude verification gate before reaching the admin review UI, then opens in the same builder used for blank-page and template flows
@@ -427,7 +427,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 10. Video Version Management | 4/4 | Complete    | 2026-04-13 |
 | 11. Section Schema & Block Foundation | 4/4 | Complete    | 2026-04-15 |
 | 12. Builder Shell & Blank-Page Authoring | 0/4 | Not started |  |
-| 13. Reusable Block Library | 0/4 | Not started |  |
+| 13. Reusable Block Library | 5/5 | Implementation Complete (UAT pending) | 2026-05-07 |
 | 14. AI-Drafted SOPs | 0/3 | Not started |  |
 | 15. NZ Template Library | 0/2 | Not started |  |
 | 16. Image & Diagram Annotation | 0/4 | Not started |  |
