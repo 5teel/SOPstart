@@ -1,0 +1,465 @@
+{
+  "generated_from": "13-CORPUS-ANALYSIS.md § 7 (D-Global-03 auto-seed) + § 2 exemplar phrasings",
+  "generated_at": "2026-05-07T00:00:00Z",
+  "blocks": [
+    {
+      "name": "Caught in section",
+      "kind_slug": "hazard",
+      "category_tags": ["crush-entrapment", "area-job-change"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Caught in section.", "severity": "critical" }
+    },
+    {
+      "name": "Entrapment",
+      "kind_slug": "hazard",
+      "category_tags": ["crush-entrapment", "area-mould-repair"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Entrapment.", "severity": "critical" }
+    },
+    {
+      "name": "Prevent entrapment",
+      "kind_slug": "hazard",
+      "category_tags": ["crush-entrapment", "area-forming"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Prevent entrapment in moving section.", "severity": "critical" }
+    },
+    {
+      "name": "Entrapment in section",
+      "kind_slug": "hazard",
+      "category_tags": ["crush-entrapment", "area-job-change"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Entrapment in section.", "severity": "critical" }
+    },
+    {
+      "name": "Crushed hand",
+      "kind_slug": "hazard",
+      "category_tags": ["crush-entrapment", "area-mould-repair"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Crushed hand.", "severity": "critical" }
+    },
+
+    {
+      "name": "Manual handling strain",
+      "kind_slug": "hazard",
+      "category_tags": ["manual-handling-strain", "area-machine-repair"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Manual handling.", "severity": "warning" }
+    },
+    {
+      "name": "Back strain from lifting",
+      "kind_slug": "hazard",
+      "category_tags": ["manual-handling-strain", "area-finished-products"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Back strain from lifting.", "severity": "warning" }
+    },
+    {
+      "name": "Sprain or strain",
+      "kind_slug": "hazard",
+      "category_tags": ["manual-handling-strain", "area-plant-services"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Sprain or strain.", "severity": "warning" }
+    },
+    {
+      "name": "Burnt or back strain handling hot ware",
+      "kind_slug": "hazard",
+      "category_tags": ["manual-handling-strain", "burns-hot", "area-forming"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Burnt or back strain when handling hot ware.", "severity": "warning" }
+    },
+    {
+      "name": "Repetitive strain injury",
+      "kind_slug": "hazard",
+      "category_tags": ["manual-handling-strain", "area-quality-control"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Repetitive strain injury from sustained handling.", "severity": "warning" }
+    },
+
+    {
+      "name": "Laceration",
+      "kind_slug": "hazard",
+      "category_tags": ["cuts-lacerations", "area-quality-control"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Laceration.", "severity": "warning" }
+    },
+    {
+      "name": "Laceration from broken glass",
+      "kind_slug": "hazard",
+      "category_tags": ["cuts-lacerations", "glass-breakage", "area-quality-control"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Laceration from broken glass.", "severity": "warning" }
+    },
+    {
+      "name": "Cuts to hands",
+      "kind_slug": "hazard",
+      "category_tags": ["cuts-lacerations", "area-finished-products"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Cuts to hands.", "severity": "warning" }
+    },
+    {
+      "name": "Lacerations from sharp edges",
+      "kind_slug": "hazard",
+      "category_tags": ["cuts-lacerations", "area-machine-repair"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Lacerations from sharp edges.", "severity": "warning" }
+    },
+    {
+      "name": "Cuts from broken bottles",
+      "kind_slug": "hazard",
+      "category_tags": ["cuts-lacerations", "glass-breakage", "area-finished-products"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Cuts from broken bottles.", "severity": "warning" }
+    },
+
+    {
+      "name": "Burns from hot surfaces",
+      "kind_slug": "hazard",
+      "category_tags": ["burns-hot", "area-forming"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Burns from hot surfaces.", "severity": "warning" }
+    },
+    {
+      "name": "Burns from hot ware",
+      "kind_slug": "hazard",
+      "category_tags": ["burns-hot", "area-forming"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Burns from hot ware.", "severity": "warning" }
+    },
+    {
+      "name": "Burning from heat reflected off ware",
+      "kind_slug": "hazard",
+      "category_tags": ["burns-hot", "area-forming"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Burning from heat reflected off ware.", "severity": "warning" }
+    },
+    {
+      "name": "Burnt with hot gob",
+      "kind_slug": "hazard",
+      "category_tags": ["burns-hot", "area-forming"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Burnt with hot gob.", "severity": "warning" }
+    },
+    {
+      "name": "Burns from hot oil or fluid",
+      "kind_slug": "hazard",
+      "category_tags": ["burns-hot", "pressurised-fluid", "area-batch-furnace"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Burns from hot oil or fluid splash.", "severity": "warning" }
+    },
+
+    {
+      "name": "Environmental contamination",
+      "kind_slug": "hazard",
+      "category_tags": ["spill-environmental", "area-factory-maintenance"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Contamination.", "severity": "notice" }
+    },
+    {
+      "name": "Oil or fluid leak",
+      "kind_slug": "hazard",
+      "category_tags": ["spill-environmental", "area-machine-repair"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Leak in hose or fitting.", "severity": "notice" }
+    },
+    {
+      "name": "Spill on floor",
+      "kind_slug": "hazard",
+      "category_tags": ["spill-environmental", "slips-trips", "area-plant-services"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Spill on floor.", "severity": "notice" }
+    },
+    {
+      "name": "Leak from valve",
+      "kind_slug": "hazard",
+      "category_tags": ["spill-environmental", "area-factory-maintenance"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Leak from valve.", "severity": "notice" }
+    },
+    {
+      "name": "Hose leak",
+      "kind_slug": "hazard",
+      "category_tags": ["spill-environmental", "area-batch-furnace"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Leak in hose.", "severity": "notice" }
+    },
+
+    {
+      "name": "Slip hazard",
+      "kind_slug": "hazard",
+      "category_tags": ["slips-trips", "area-factory-maintenance"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Slip on wet or oily floor.", "severity": "notice" }
+    },
+    {
+      "name": "Trip hazard",
+      "kind_slug": "hazard",
+      "category_tags": ["slips-trips", "area-mould-repair"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Trip hazard.", "severity": "notice" }
+    },
+    {
+      "name": "Tripping over cables or hoses",
+      "kind_slug": "hazard",
+      "category_tags": ["slips-trips", "area-electrical"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Tripping over cables or hoses.", "severity": "notice" }
+    },
+    {
+      "name": "Slip hazard in confined work area",
+      "kind_slug": "hazard",
+      "category_tags": ["slips-trips", "area-plant-services"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Limited work area causing slips and strains from spanner slipping.", "severity": "notice" }
+    },
+    {
+      "name": "Trip on uneven walkway",
+      "kind_slug": "hazard",
+      "category_tags": ["slips-trips", "area-finished-products"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Trip on uneven walkway.", "severity": "notice" }
+    },
+
+    {
+      "name": "Electrocution",
+      "kind_slug": "hazard",
+      "category_tags": ["electrocution", "area-electrical"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Electrocution.", "severity": "critical" }
+    },
+    {
+      "name": "Electric shock",
+      "kind_slug": "hazard",
+      "category_tags": ["electrocution", "area-electrical"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Electric shock.", "severity": "critical" }
+    },
+    {
+      "name": "Shocks and electrocution from live circuits",
+      "kind_slug": "hazard",
+      "category_tags": ["electrocution", "isolation-energy", "area-electrical"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Shocks and electrocution from live circuits.", "severity": "critical" }
+    },
+
+    {
+      "name": "Moving machinery",
+      "kind_slug": "hazard",
+      "category_tags": ["moving-machinery", "area-forming"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Moving machinery.", "severity": "warning" }
+    },
+    {
+      "name": "Moving parts",
+      "kind_slug": "hazard",
+      "category_tags": ["moving-machinery", "area-machine-repair"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Moving parts.", "severity": "warning" }
+    },
+    {
+      "name": "Moving machinery noise and heat",
+      "kind_slug": "hazard",
+      "category_tags": ["moving-machinery", "noise", "burns-hot", "area-forming"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Moving machinery, noise and heat.", "severity": "warning" }
+    },
+
+    {
+      "name": "Broken bottle",
+      "kind_slug": "hazard",
+      "category_tags": ["glass-breakage", "cuts-lacerations", "area-quality-control"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Broken bottle causing cuts.", "severity": "warning" }
+    },
+    {
+      "name": "Broken glass",
+      "kind_slug": "hazard",
+      "category_tags": ["glass-breakage", "cuts-lacerations", "area-finished-products"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Broken glass.", "severity": "warning" }
+    },
+    {
+      "name": "Glass run out",
+      "kind_slug": "hazard",
+      "category_tags": ["glass-breakage", "burns-hot", "area-forming"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Glass run out from forming machine.", "severity": "warning" }
+    },
+
+    {
+      "name": "Falling objects",
+      "kind_slug": "hazard",
+      "category_tags": ["falling-objects", "area-finished-products"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Falling objects.", "severity": "warning" }
+    },
+    {
+      "name": "Dropped loads from overhead hoist",
+      "kind_slug": "hazard",
+      "category_tags": ["falling-objects", "forklift-vehicle", "area-mould-repair"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Dropped loads from overhead hoist.", "severity": "warning" }
+    },
+    {
+      "name": "Hopper or container could drop",
+      "kind_slug": "hazard",
+      "category_tags": ["falling-objects", "area-batch-furnace"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Hopper could drop from carry position.", "severity": "warning" }
+    },
+
+    {
+      "name": "Pinch points",
+      "kind_slug": "hazard",
+      "category_tags": ["pinch-points", "area-machine-repair"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Pinch points.", "severity": "notice" }
+    },
+    {
+      "name": "Pinch points and moving parts",
+      "kind_slug": "hazard",
+      "category_tags": ["pinch-points", "moving-machinery", "area-electrical"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Moving parts and pinch points.", "severity": "notice" }
+    },
+    {
+      "name": "Pinch points, slips and cuts",
+      "kind_slug": "hazard",
+      "category_tags": ["pinch-points", "slips-trips", "cuts-lacerations", "area-machine-repair"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Pinch points, slips and cuts.", "severity": "notice" }
+    },
+
+    {
+      "name": "Vehicle collision",
+      "kind_slug": "hazard",
+      "category_tags": ["forklift-vehicle", "area-finished-products"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Vehicle collision.", "severity": "warning" }
+    },
+    {
+      "name": "Crane or hoist operation",
+      "kind_slug": "hazard",
+      "category_tags": ["forklift-vehicle", "falling-objects", "area-finished-products"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Crane and hoist operations.", "severity": "warning" }
+    },
+
+    {
+      "name": "Fire risk",
+      "kind_slug": "hazard",
+      "category_tags": ["fire-explosion", "hot-work", "area-batch-furnace"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Fire risk.", "severity": "critical" }
+    },
+    {
+      "name": "Sparks ignition risk",
+      "kind_slug": "hazard",
+      "category_tags": ["fire-explosion", "hot-work", "area-electrical"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Sparks creating ignition risk.", "severity": "critical" }
+    },
+
+    {
+      "name": "Airborne contaminants",
+      "kind_slug": "hazard",
+      "category_tags": ["dust-airborne", "area-batch-furnace"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Airborne contaminants.", "severity": "notice" }
+    },
+    {
+      "name": "Dust inhalation",
+      "kind_slug": "hazard",
+      "category_tags": ["dust-airborne", "eye-injury", "area-batch-furnace"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Dust inhalation and dust in the eyes.", "severity": "notice" }
+    },
+
+    {
+      "name": "High noise levels",
+      "kind_slug": "hazard",
+      "category_tags": ["noise", "area-forming"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Noise.", "severity": "notice" }
+    },
+    {
+      "name": "Noise and heat exposure",
+      "kind_slug": "hazard",
+      "category_tags": ["noise", "burns-hot", "area-forming"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Noise and heat exposure.", "severity": "notice" }
+    },
+
+    {
+      "name": "Gas leak",
+      "kind_slug": "hazard",
+      "category_tags": ["chemical-exposure", "fire-explosion", "area-batch-furnace"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Gas leak creating fire hazard.", "severity": "critical" }
+    },
+    {
+      "name": "Exposure to chemicals",
+      "kind_slug": "hazard",
+      "category_tags": ["chemical-exposure", "area-plant-services"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Exposure to chemicals.", "severity": "critical" }
+    },
+
+    {
+      "name": "Eyesight risk from flying debris",
+      "kind_slug": "hazard",
+      "category_tags": ["flying-debris", "eye-injury", "area-machine-repair"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Eyesight risk from small flying objects, dust inhalation, and skin damage.", "severity": "warning" }
+    },
+
+    {
+      "name": "Pressurised fluid release",
+      "kind_slug": "hazard",
+      "category_tags": ["pressurised-fluid", "area-machine-repair"],
+      "free_text_tags": [],
+      "content": { "kind": "hazard", "text": "Pressurised fluid release on disconnect.", "severity": "critical" }
+    },
+
+    { "name": "Safety Glasses", "kind_slug": "ppe", "category_tags": ["eye-injury"], "free_text_tags": [], "content": { "kind": "ppe", "items": ["Safety glasses (Z87.1 or AS/NZS 1337 rated)"] } },
+    { "name": "Hearing Protection", "kind_slug": "ppe", "category_tags": ["noise"], "free_text_tags": [], "content": { "kind": "ppe", "items": ["Class 4 ear muffs or Class 5 ear plugs (NRR >= 25 dB)"] } },
+    { "name": "Hi-Viz Vest", "kind_slug": "ppe", "category_tags": ["forklift-vehicle"], "free_text_tags": [], "content": { "kind": "ppe", "items": ["AS/NZS 4602 Class D/N hi-viz vest or jacket"] } },
+    { "name": "Hard Hat", "kind_slug": "ppe", "category_tags": ["falling-objects"], "free_text_tags": [], "content": { "kind": "ppe", "items": ["AS/NZS 1801 Type 1 hard hat"] } },
+    { "name": "Steel-Toe Safety Boots", "kind_slug": "ppe", "category_tags": ["crush-entrapment", "falling-objects"], "free_text_tags": [], "content": { "kind": "ppe", "items": ["AS/NZS 2210.3 safety footwear with steel toe cap and oil-resistant sole"] } },
+
+    {
+      "name": "Lock-out / Tag-out (LOTO)",
+      "kind_slug": "step",
+      "category_tags": ["isolation-energy", "electrocution"],
+      "free_text_tags": [],
+      "content": {
+        "kind": "step",
+        "text": "Isolate the energy source, apply personal lock and tag, verify zero energy state before commencing work.",
+        "warning": "Never remove another worker's lock or tag.",
+        "tip": "Photograph the isolation point as evidence."
+      }
+    },
+    {
+      "name": "Manual Handling — Lift Technique",
+      "kind_slug": "step",
+      "category_tags": ["manual-handling-strain"],
+      "free_text_tags": [],
+      "content": {
+        "kind": "step",
+        "text": "Assess the load, plan the route, bend at the knees not the back, keep the load close to your body, lift smoothly.",
+        "warning": "If the load exceeds 25 kg single-person, request mechanical aid or two-person lift.",
+        "tip": "Use trolleys for any distance > 5 metres."
+      }
+    },
+    {
+      "name": "Hot Work Permit Check",
+      "kind_slug": "step",
+      "category_tags": ["hot-work", "fire-explosion"],
+      "free_text_tags": [],
+      "content": {
+        "kind": "step",
+        "text": "Confirm a current hot work permit is in place, fire watch is assigned, fire extinguisher is within 3 metres, and combustibles within 11 metres are removed or shielded.",
+        "warning": "No hot work proceeds without a permit.",
+        "tip": "Permit expires daily — re-issue each shift."
+      }
+    }
+  ]
+}
