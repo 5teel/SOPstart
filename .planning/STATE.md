@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Closeout
 status: in-progress
-stopped_at: Phase 13 verifier PASSED (5/5 success criteria plumbing-complete, 6/6 SB-BLOCK requirements have backing code, summit→platform rename consistent across schema + code); awaiting batched browser UAT (13-03 + 13-04 + 13-05) as carried human-verification items
-last_updated: "2026-05-07T08:00:00.000Z"
-last_activity: 2026-05-07 -- Phase 13 cleanup + verification: (1) commit e093d45 renamed summit_admins→platform_admins (migration 00026, RPC, 5 RLS policies, summit-admin-guard.ts→platform-admin-guard.ts, requireSummitAdmin→requirePlatformAdmin, /admin/global-blocks UI strings) — Potenco-owned, unrelated to Summit Insights; (2) commit 9d723a4 added migration 00027 idempotent seed of initial platform admin (simonscott86@gmail.com); (3) gsd-verifier produced 13-VERIFICATION.md — status human_needed (plumbing complete, browser UAT batchable)
+stopped_at: Phase 12.5 + Phase 13 both marked complete (verifiers PASSED on both; combined 8 carried human-UAT items batchable in one session); v3.0 closeout milestone progressing
+last_updated: "2026-05-07T09:00:00.000Z"
+last_activity: 2026-05-07 -- Phase 12.5 closed out: walkthrough photo-queue badge + submit-while-uploading guard committed (5989852); ROADMAP marks 12.5 [x] (verifier had already PASSED 10/10 on 2026-04-26 with 6 carried human-UAT items). Phase 13 also marked [x] following same pattern (verifier PASSED 5/5; 4 carried human-UAT items). v3.0 milestone now: 13/14 integer/decimal phases complete in this milestone (7 still open: 7, 9, 14, 15, 16, 17, 18)
 progress:
   total_phases: 21
-  completed_phases: 12
+  completed_phases: 14
   total_plans: 26
   completed_plans: 26
   percent: 100
