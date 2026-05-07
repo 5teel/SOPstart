@@ -62,7 +62,7 @@ export function WalkthroughTab({ sop }: { sop: SopWithSections }) {
   const currentDone = !!(currentStep && completedSteps.has(currentStep.id))
 
   // Photo queue for the active completion
-  const { photosForStep } = usePhotoQueue(activeCompletion?.localId ?? null)
+  const { photosForStep, queueCount } = usePhotoQueue(activeCompletion?.localId ?? null)
   const currentStepPhotos = currentStep ? photosForStep(currentStep.id) : []
   const photoGateMet = !currentStep?.photo_required || currentStepPhotos.length > 0
 
@@ -115,6 +115,13 @@ export function WalkthroughTab({ sop }: { sop: SopWithSections }) {
 
   async function handleSubmit() {
     if (!activeCompletion) return
+    if (queueCount > 0) {
+      const proceed = window.confirm(
+        `${queueCount} photo${queueCount === 1 ? '' : 's'} still uploading. ` +
+          'These will not be attached to your completion if you submit now. Submit anyway?'
+      )
+      if (!proceed) return
+    }
     setSubmitLoading(true)
     setSubmitError(null)
     try {
@@ -214,7 +221,18 @@ export function WalkthroughTab({ sop }: { sop: SopWithSections }) {
             <span className="mono text-[11px] uppercase tracking-wider text-[var(--ink-500)]">
               {allDone ? `All ${totalSteps} steps done` : `Step ${completedCount + 1} of ${totalSteps}`}
             </span>
-            <span className="mono text-[11px] text-[var(--ink-400)]">{pct}%</span>
+            <div className="flex items-center gap-2">
+              {queueCount > 0 && (
+                <span
+                  className="mono text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-[var(--accent-decision)]/15 text-[var(--accent-decision)] flex items-center gap-1"
+                  title={`${queueCount} photo${queueCount === 1 ? '' : 's'} waiting to upload`}
+                >
+                  <Camera size={10} />
+                  {queueCount} queued
+                </span>
+              )}
+              <span className="mono text-[11px] text-[var(--ink-400)]">{pct}%</span>
+            </div>
           </div>
         </div>
       )}
