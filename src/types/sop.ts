@@ -1,3 +1,9 @@
+// Phase 13: Re-export the canonical BlockContent discriminated union from
+// the validators (the handwritten union below was a stale subset). Callers
+// importing from '@/types/sop' continue to work transparently.
+import type { BlockContent } from '@/lib/validators/blocks'
+export type { BlockContent } from '@/lib/validators/blocks'
+
 // Phase 12.5 — new union types for blocks + voice + escalation
 export type VoiceNoteBlockType = 'measurement' | 'note'
 export type EscalationMode = 'alert' | 'lock' | 'form'
@@ -60,6 +66,8 @@ export interface Sop {
   pipeline_run_id?: string | null
   source_type: SourceType
   flow_graph?: unknown | null
+  // Phase 13: SOP-level primary category tag (D-Tax-03). Drives picker pre-filter input.
+  category_tag: string | null
   created_at: string
   updated_at: string
 }
@@ -221,13 +229,10 @@ export interface SectionKind {
   updated_at: string
 }
 
-// Discriminated-union payload for block_versions.content
-export type BlockContent =
-  | { kind: 'hazard';    text: string; severity: 'critical' | 'warning' | 'notice' }
-  | { kind: 'ppe';       items: string[] }
-  | { kind: 'step';      text: string; warning?: string; tip?: string }
-  | { kind: 'emergency'; text: string; contacts?: string[] }
-  | { kind: 'custom';    data: Record<string, unknown> }
+// Phase 13: BlockContent is re-exported at the top of this file from
+// '@/lib/validators/blocks' (the canonical full discriminated-union source).
+// The stale inline union previously declared here was a subset and has been
+// removed.
 
 export interface Block {
   id: string
@@ -235,6 +240,10 @@ export interface Block {
   kind_slug: string
   name: string
   category: string | null
+  // Phase 13: controlled-vocab tag slugs (D-Tax-01)
+  category_tags: string[]
+  // Phase 13: free-text overlay tags (D-Tax-01)
+  free_text_tags: string[]
   current_version_id: string | null
   archived_at: string | null
   created_by: string | null
@@ -266,4 +275,41 @@ export interface SopSectionBlock {
   sort_order: number
   created_at: string
   updated_at: string
+}
+
+// ---------------------------------------------------------------
+// Phase 13: Block library — suggestions queue + category vocab
+// Matches supabase/migrations/00022_block_library_phase13.sql.
+// ---------------------------------------------------------------
+
+export type BlockSuggestionStatus = 'pending' | 'promoted' | 'rejected'
+
+export interface BlockSuggestion {
+  id: string
+  source_block_id: string
+  suggested_by_org_id: string
+  suggested_by_user: string | null
+  snapshot: {
+    kind_slug: string
+    name: string
+    category_tags: string[]
+    free_text_tags: string[]
+    content: BlockContent
+  }
+  status: BlockSuggestionStatus
+  decided_by: string | null
+  decided_at: string | null
+  decision_note: string | null
+  promoted_block_id: string | null
+  created_at: string
+}
+
+export type BlockCategoryGroup = 'hazard' | 'area' | 'ppe' | 'procedure'
+
+export interface BlockCategory {
+  slug: string
+  display_name: string
+  category_group: BlockCategoryGroup
+  sort_order: number
+  created_at: string
 }

@@ -340,9 +340,11 @@ export type Database = {
         Row: {
           archived_at: string | null
           category: string | null
+          category_tags: string[]
           created_at: string
           created_by: string | null
           current_version_id: string | null
+          free_text_tags: string[]
           id: string
           kind_slug: string
           name: string
@@ -352,9 +354,11 @@ export type Database = {
         Insert: {
           archived_at?: string | null
           category?: string | null
+          category_tags?: string[]
           created_at?: string
           created_by?: string | null
           current_version_id?: string | null
+          free_text_tags?: string[]
           id?: string
           kind_slug: string
           name: string
@@ -364,9 +368,11 @@ export type Database = {
         Update: {
           archived_at?: string | null
           category?: string | null
+          category_tags?: string[]
           created_at?: string
           created_by?: string | null
           current_version_id?: string | null
+          free_text_tags?: string[]
           id?: string
           kind_slug?: string
           name?: string
@@ -492,6 +498,93 @@ export type Database = {
           },
         ]
       }
+      summit_admins: {
+        Row: {
+          user_id: string
+          granted_at: string
+          granted_by: string | null
+          notes: string | null
+        }
+        Insert: {
+          user_id: string
+          granted_at?: string
+          granted_by?: string | null
+          notes?: string | null
+        }
+        Update: {
+          user_id?: string
+          granted_at?: string
+          granted_by?: string | null
+          notes?: string | null
+        }
+        Relationships: []
+      }
+      block_categories: {
+        Row: {
+          slug: string
+          display_name: string
+          category_group: 'hazard' | 'area' | 'ppe' | 'procedure'
+          sort_order: number
+          created_at: string
+        }
+        Insert: {
+          slug: string
+          display_name: string
+          category_group: 'hazard' | 'area' | 'ppe' | 'procedure'
+          sort_order?: number
+          created_at?: string
+        }
+        Update: {
+          slug?: string
+          display_name?: string
+          category_group?: 'hazard' | 'area' | 'ppe' | 'procedure'
+          sort_order?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
+      block_suggestions: {
+        Row: {
+          id: string
+          source_block_id: string
+          suggested_by_org_id: string
+          suggested_by_user: string | null
+          snapshot: Json
+          status: 'pending' | 'promoted' | 'rejected'
+          decided_by: string | null
+          decided_at: string | null
+          decision_note: string | null
+          promoted_block_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          source_block_id: string
+          suggested_by_org_id: string
+          suggested_by_user?: string | null
+          snapshot: Json
+          status?: 'pending' | 'promoted' | 'rejected'
+          decided_by?: string | null
+          decided_at?: string | null
+          decision_note?: string | null
+          promoted_block_id?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          source_block_id?: string
+          suggested_by_org_id?: string
+          suggested_by_user?: string | null
+          snapshot?: Json
+          status?: 'pending' | 'promoted' | 'rejected'
+          decided_by?: string | null
+          decided_at?: string | null
+          decision_note?: string | null
+          promoted_block_id?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       sop_steps: {
         Row: {
           caution: string | null
@@ -588,6 +681,7 @@ export type Database = {
           applicable_equipment: string[] | null
           author: string | null
           category: string | null
+          category_tag: string | null
           created_at: string
           department: string | null
           flow_graph: Json | null
@@ -617,6 +711,7 @@ export type Database = {
           applicable_equipment?: string[] | null
           author?: string | null
           category?: string | null
+          category_tag?: string | null
           created_at?: string
           department?: string | null
           flow_graph?: Json | null
@@ -646,6 +741,7 @@ export type Database = {
           applicable_equipment?: string[] | null
           author?: string | null
           category?: string | null
+          category_tag?: string | null
           created_at?: string
           department?: string | null
           flow_graph?: Json | null
@@ -1159,6 +1255,7 @@ export type Database = {
         Returns: Database["public"]["Enums"]["app_role"]
       }
       custom_access_token_hook: { Args: { event: Json }; Returns: Json }
+      is_summit_admin: { Args: Record<string, never>; Returns: boolean }
     }
     Enums: {
       app_role: "worker" | "supervisor" | "admin" | "safety_manager"
