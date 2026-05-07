@@ -91,6 +91,22 @@ export default async function SopsLibraryPage({
         </div>
       </div>
 
+      {/* Admin sub-nav (Phase 13: SOPs ↔ Blocks) */}
+      <nav className="flex gap-4 border-b border-steel-700 mb-6 text-sm">
+        <Link
+          href="/admin/sops"
+          className="pb-3 px-1 font-medium border-b-2 border-brand-yellow text-brand-yellow"
+        >
+          SOPs
+        </Link>
+        <Link
+          href="/admin/blocks"
+          className="pb-3 px-1 font-medium text-steel-400 hover:text-steel-100"
+        >
+          Blocks
+        </Link>
+      </nav>
+
       {/* Filter tabs */}
       <div className="flex gap-2 border-b border-steel-700 mb-6 overflow-x-auto">
         {STATUS_TABS.map(tab => {
