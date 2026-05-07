@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { listBlockCategories } from '@/actions/blocks'
 import { WizardClient } from './WizardClient'
 
 export const metadata: Metadata = {
@@ -25,6 +26,11 @@ export default async function NewBlankSopPage() {
     redirect('/dashboard')
   }
 
+  // Phase 13 D-Tax-03: SOP-level category vocab + block library categories
+  // for the wizard's "Pick from library" picker (passed as a prop to keep
+  // env-vars / service-role keys out of the client bundle).
+  const categories = await listBlockCategories()
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 lg:px-8 lg:py-12">
       <div className="flex items-center justify-between mb-2">
@@ -39,7 +45,7 @@ export default async function NewBlankSopPage() {
       <p className="text-sm text-steel-400 mb-8">
         Start a SOP from scratch — pick the sections you want, then build them in the editor.
       </p>
-      <WizardClient />
+      <WizardClient categories={categories} />
     </div>
   )
 }

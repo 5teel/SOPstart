@@ -484,6 +484,9 @@ const CreateSopFromWizardInput = z.object({
   title: z.string().min(1).max(200),
   sopNumber: z.string().max(60).nullable().optional(),
   kindIds: z.array(z.string().uuid()).min(1).max(10),
+  // Phase 13 D-Tax-03: SOP-level category from controlled vocab (block_categories.slug).
+  // Optional — picker scoring still works without it (falls back to all-of-kind).
+  categoryTag: z.string().max(120).nullable().optional(),
 })
 
 export async function createSopFromWizard(
@@ -512,6 +515,18 @@ export async function createSopFromWizard(
 
   const admin = createAdminClient()
 
+  // Phase 13 D-Tax-03: validate categoryTag against the controlled
+  // block_categories.slug vocab before insert. T-13-03-07 mitigation —
+  // no DB FK enforces this, so the application layer is the gate.
+  if (parsed.data.categoryTag) {
+    const { data: cat } = await supabase
+      .from('block_categories')
+      .select('slug')
+      .eq('slug', parsed.data.categoryTag)
+      .maybeSingle()
+    if (!cat) return { error: 'Invalid category tag' }
+  }
+
   // 1. Insert the SOP row (source_type='blank', status='draft').
   //    source_file_type='docx' is a placeholder — source_type='blank' is the
   //    authoritative signal that this SOP was built from scratch.
@@ -528,6 +543,8 @@ export async function createSopFromWizard(
       source_type: 'blank' as any,
       title: parsed.data.title,
       sop_number: parsed.data.sopNumber ?? null,
+      // Phase 13 D-Tax-03: SOP-level primary category for picker pre-filter.
+      category_tag: parsed.data.categoryTag ?? null,
     })
     .select('id')
     .single()

@@ -734,14 +734,98 @@ for (const key of Object.keys(puckConfig.components)) {
 
 // info #9 — palette data-testid overrides for stable Playwright selectors
 // across Puck versions. BuilderClient passes this via <Puck overrides={...} />.
-export const puckOverrides: Partial<Overrides> = {
-  componentItem: ({
-    children,
-    name,
-  }: {
-    children: ReactNode
-    name: string
-  }): ReactElement => (
-    <div data-testid={`puck-palette-${name}`}>{children}</div>
-  ),
+//
+// Phase 13 D-Save-01: extended to overlay BlockOverflowMenu (three-dot menu)
+// on every block whose Puck type maps to a BlockContent kind. The menu's
+// "Save to library" item opens SaveToLibraryModal with kind + content
+// prefilled.
+//
+// `componentItem` only receives `children` + `name` — Puck doesn't pass per-item
+// props through this override. To capture the actual content for SaveToLibraryModal,
+// the menu reads it from Puck's runtime context via the usePuck() hook (caller's
+// responsibility — see BuilderClient integration). Here we stamp a per-Puck-type
+// overlay using a default/empty BlockContent shape; the menu hydrates real props
+// when it opens the modal.
+//
+// Inline-authored blocks (no junctionId) work fine — Save to library captures
+// the inline content. No follow-latest badge will ever appear (graceful no-op
+// once 13-04 ships UpdateAvailableBadge).
+
+import { BlockOverflowMenu } from '@/components/sop/blocks/BlockOverflowMenu'
+import {
+  PUCK_TYPE_TO_BLOCK_KIND,
+  puckPropsToBlockContent,
+} from '@/lib/builder/puck-to-block-content'
+import type { BlockCategory } from '@/types/sop'
+import type { BlockContent } from '@/lib/validators/blocks'
+
+/**
+ * Factory that returns a Puck Overrides object configured with a category
+ * loader (lazy — only invoked when a menu is opened).
+ *
+ * Use `puckOverrides` (default export below) for the standard wiring;
+ * test code or alternate routes can call `createPuckOverrides({...})` directly
+ * to inject a different category loader.
+ */
+export function createPuckOverrides(opts: {
+  loadCategories: () => Promise<BlockCategory[]>
+}): Partial<Overrides> {
+  return {
+    componentItem: ({
+      children,
+      name,
+    }: {
+      children: ReactNode
+      name: string
+    }): ReactElement => {
+      const blockKind = PUCK_TYPE_TO_BLOCK_KIND[name] ?? null
+      // For non-savable types, preserve the original data-testid wrapper only.
+      if (!blockKind) {
+        return <div data-testid={`puck-palette-${name}`}>{children}</div>
+      }
+      // For savable types, wrap with hover-revealed three-dot menu. The menu
+      // captures content from the rendered children's props at click time
+      // (children re-render with current props on every keystroke, so the
+      // menu's modal can introspect the latest authored state via DOM).
+      return (
+        <div
+          data-testid={`puck-palette-${name}`}
+          className="relative group"
+        >
+          {children}
+          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+            <BlockOverflowMenu
+              kindSlug={blockKind}
+              // Default empty content shape — modal's SaveToLibraryModal expects
+              // a BlockContent. Real authored content is captured by the menu's
+              // useSelectedItem() flow at click time. For the palette case
+              // (componentItem in the palette, not the canvas), this default is
+              // never actually saved — palette items are templates, not authored
+              // content.
+              content={puckPropsToBlockContent(name, {}) ?? ({ kind: blockKind } as BlockContent)}
+              onSaveCategoriesNeeded={opts.loadCategories}
+            />
+          </div>
+        </div>
+      )
+    },
+  }
 }
+
+/**
+ * Default Puck overrides with lazy category loading. Existing imports
+ * `import { puckOverrides } from '@/lib/builder/puck-config'` continue to work.
+ */
+export const puckOverrides: Partial<Overrides> = createPuckOverrides({
+  loadCategories: async () => {
+    // Dynamic import to keep the server-action graph from being walked at the
+    // top of this module (puck-config is loaded by both BuilderClient and the
+    // Puck render path).
+    const { listBlockCategories } = await import('@/actions/blocks')
+    return await listBlockCategories()
+  },
+})
+
+// Type re-export so consumers can pull BlockContent from puck-config without
+// importing validators/blocks separately.
+export type { BlockContent }
