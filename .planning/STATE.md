@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Closeout
 status: in-progress
-stopped_at: Phase 13 plan 01 complete (schema + actions + admin/blocks UI shipped + supabase db push verified live); next plan 13-02 (NZ global seed migration)
-last_updated: "2026-05-07T04:08:00.000Z"
-last_activity: 2026-05-07 -- Phase 13 plan 01 executed: migration 00022 (summit_admins, block_categories x34, block_suggestions, blocks.category_tags+free_text_tags, sops.category_tag), src/actions/blocks.ts with FINAL option surface (10 exports), /admin/blocks UI + SaveToLibraryModal; supabase db push verified live (34 categories, all tables reachable)
+stopped_at: Phase 13 plan 02 complete (00023 NZ global block seed migration applied live — 65 globals: 57 hazard + 5 PPE + 3 step); next plan 13-03 (wizard picker integration)
+last_updated: "2026-05-07T04:30:00.000Z"
+last_activity: 2026-05-07 -- Phase 13 plan 02 executed: seed-source/global-blocks.json (65 entries, all zod-valid), 00023 plpgsql migration with idempotency guard, supabase db push to gknxhqinzjvuupccyojv verified (57+5+3 rows reachable via PostgREST, current_version_id wired on every row)
 progress:
   total_phases: 21
   completed_phases: 12
-  total_plans: 21
-  completed_plans: 21
-  percent: 100
+  total_plans: 26
+  completed_plans: 23
+  percent: 88
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 12 complete — ready to start Phase 13 (Reusable Block Library)
+**Current focus:** Phase 13 plan 02 complete — ready for plan 13-03 (wizard picker integration)
 
 ## Current Position
 
 Phase: 13 (reusable-block-library) — IN PROGRESS
-Plan: 1 of 5 complete (13-01 schema + CRUD foundation shipped)
-Status: schema pushed to live Supabase (34 block_categories rows, all new tables/columns reachable); ready for plan 13-02 (NZ global block seed)
-Last activity: 2026-05-07 -- Phase 13 plan 01 executed atomically across T1-T4 commits + DB push gate
+Plan: 2 of 5 complete (13-01 schema + CRUD foundation; 13-02 NZ global seed live)
+Status: 65 global blocks live in Supabase (57 hazard + 5 PPE + 3 step); ready for plan 13-03 (wizard picker / BlockPicker component)
+Last activity: 2026-05-07 -- Phase 13 plan 02 executed atomically across T1-T3 commits + DB push gate
 
-Progress bar: `[████████████░░░░░░░░]` 60% (phases 11+12 complete; phase 13 plan 1/5)
+Progress bar: `[█████████████░░░░░░░]` 65% (phases 11+12 complete; phase 13 plan 2/5)
 
 Phase 12 commits on master:
 
@@ -194,6 +194,13 @@ None yet.
 - [Phase 13-01]: Defence-in-depth super-admin guard: `is_summit_admin()` SECURITY DEFINER helper used in RLS policies AND server-action `requireSummitAdmin()` (T-13-01-01)
 - [Phase 13-01]: `BlockContentSchema.parse()` invoked at all 3 content-write sites including `promoteSuggestion` snapshot path (T-13-01-03)
 
+### Phase 13 Plan 02 Decisions
+
+- [Phase 13-02]: JSON source-of-truth at `seed-source/global-blocks.json` — generator script (`generate-migration.mjs`) emits 00023 SQL deterministically; Summit re-seeds edit JSON and regenerate
+- [Phase 13-02]: Severity heuristic per cluster: `critical` (crush-entrapment, electrocution, fire-explosion, chemical-exposure, pressurised-fluid), `warning` (burns-hot, cuts-lacerations, manual-handling-strain, moving-machinery, glass-breakage, falling-objects, forklift-vehicle, flying-debris), `notice` (slips-trips, pinch-points, spill-environmental, dust-airborne, noise)
+- [Phase 13-02]: Idempotency guard (`if exists … return`) inside DO block backs up Supabase migration-tracking layer for direct SQL editor re-execution
+- [Phase 13-02]: Encoding-corrupted corpus phrasings (e.g. `personγçös eyesight…`) substituted with canonical NZ-industry language per plan instruction; remaining 56 hazard phrasings taken verbatim from CORPUS-ANALYSIS § 2
+
 ### Pending Todos
 
 - [ ] Confirm Vimeo URL scope for Phase 6 before planning begins (separate API token required; research flags this as product decision)
@@ -215,6 +222,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-07T04:08:00Z
-Stopped at: Completed Phase 13 plan 01 (`13-01-PLAN.md`). Migration 00022 pushed to live Supabase; 4 commits on master (8a50c54, 22c57d0, f53c9c8, 8ccb767). Next: plan 13-02 (NZ global block seed migration — consumes block_categories vocab + corpus-analysis § 7 seed list).
+Last session: 2026-05-07T04:30:00Z
+Stopped at: Completed Phase 13 plan 02 (`13-02-PLAN.md`). Migration 00023 pushed to live Supabase (gknxhqinzjvuupccyojv); 65 global blocks seeded (57 hazard + 5 PPE + 3 step). 3 commits on master (15d3621, 688af52, e1aa497). Next: plan 13-03 (wizard picker integration — BlockPicker component + sop-level category select + pin-vs-follow-latest snapshot via sop_section_blocks junction).
 Resume file: None
