@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Closeout
 status: in-progress
-stopped_at: Phase 13 plan 02 complete (00023 NZ global block seed migration applied live — 65 globals: 57 hazard + 5 PPE + 3 step); next plan 13-03 (wizard picker integration)
-last_updated: "2026-05-07T04:30:00.000Z"
-last_activity: 2026-05-07 -- Phase 13 plan 02 executed: seed-source/global-blocks.json (65 entries, all zod-valid), 00023 plpgsql migration with idempotency guard, supabase db push to gknxhqinzjvuupccyojv verified (57+5+3 rows reachable via PostgREST, current_version_id wired on every row)
+stopped_at: Phase 13 plan 03 implementation complete (BlockPicker + wizard category + builder three-dot menu + 00024 junction reorder RPC live); awaiting human-verify UAT (Task 7) before plan 13-04
+last_updated: "2026-05-07T05:00:00.000Z"
+last_activity: 2026-05-07 -- Phase 13 plan 03 executed: match-blocks pure matcher + 00024 atomic junction reorder RPC pushed to gknxhqinzjvuupccyojv + 5 sop-section-blocks server actions + BlockPicker/Row/Preview UI + BlockOverflowMenu + puck-to-block-content helpers + WizardClient SOP category + post-create junction attachment with junctionId stamping; tsc clean, 0 lint errors; UAT pending
 progress:
   total_phases: 21
   completed_phases: 12
   total_plans: 26
-  completed_plans: 23
-  percent: 88
+  completed_plans: 24
+  percent: 92
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 13 (reusable-block-library) — IN PROGRESS
-Plan: 2 of 5 complete (13-01 schema + CRUD foundation; 13-02 NZ global seed live)
-Status: 65 global blocks live in Supabase (57 hazard + 5 PPE + 3 step); ready for plan 13-03 (wizard picker / BlockPicker component)
-Last activity: 2026-05-07 -- Phase 13 plan 02 executed atomically across T1-T3 commits + DB push gate
+Plan: 3 of 5 implementation complete (13-01 schema + CRUD; 13-02 NZ global seed; 13-03 wizard picker + builder save-to-library + 00024 atomic junction reorder RPC live); 13-03 UAT (Task 7) pending Simon's manual browser verification
+Status: BlockPicker UI + wizard 'Pick from library' + builder three-dot ⋯ menu wired end-to-end; addBlockToSection snapshot-on-add (SB-BLOCK-04) + setPinMode (SB-BLOCK-05) + reorderSectionBlocks RPC ready; awaiting human-verify of round-trip flow
+Last activity: 2026-05-07 -- Phase 13 plan 03 executed atomically across 4 task commits + 00024 migration push to live Supabase
 
-Progress bar: `[█████████████░░░░░░░]` 65% (phases 11+12 complete; phase 13 plan 2/5)
+Progress bar: `[██████████████░░░░░░]` 70% (phases 11+12 complete; phase 13 plan 3/5 implementation done, awaiting UAT)
 
 Phase 12 commits on master:
 
@@ -200,6 +200,15 @@ None yet.
 - [Phase 13-02]: Severity heuristic per cluster: `critical` (crush-entrapment, electrocution, fire-explosion, chemical-exposure, pressurised-fluid), `warning` (burns-hot, cuts-lacerations, manual-handling-strain, moving-machinery, glass-breakage, falling-objects, forklift-vehicle, flying-debris), `notice` (slips-trips, pinch-points, spill-environmental, dust-airborne, noise)
 - [Phase 13-02]: Idempotency guard (`if exists … return`) inside DO block backs up Supabase migration-tracking layer for direct SQL editor re-execution
 - [Phase 13-02]: Encoding-corrupted corpus phrasings (e.g. `personγçös eyesight…`) substituted with canonical NZ-industry language per plan instruction; remaining 56 hazard phrasings taken verbatim from CORPUS-ANALYSIS § 2
+
+### Phase 13 Plan 03 Decisions
+
+- [Phase 13-03]: Migration renamed 00023.5 → 00024 — Supabase CLI v2.83 rejects fractional integer migration filenames; clean integer-prefix consistent with 00019..00023 history
+- [Phase 13-03]: addBlockToSection does NOT mutate layout_data — it returns the junction id; caller (wizard / picker) stamps props.junctionId onto matching Puck items via existing updateSectionLayout flow (per 13-04 prereq)
+- [Phase 13-03]: Soft prefix scoring formula: +50 base + (10 × prefix-token-length) bonus rewards longer matched prefixes, then plus +20 hazard cluster + +10 global-bias + +1 per usage hint
+- [Phase 13-03]: Library 'Pick from library' affordance only on hazards/ppe/steps/emergency kinds (LIBRARY_SUPPORTED_SLUG_TO_KIND map) — signoff intentionally inline-only per Phase 12 D-Save scope
+- [Phase 13-03]: Wizard post-create junction attachment is best-effort non-blocking (T-13-03-04 acceptance) — partial picker failures route admin to builder with console.warn; admin can manually pick missing blocks via builder ⋯ menu
+- [Phase 13-03]: createPuckOverrides factory + retained backward-compat puckOverrides export — original simple data-testid wrapper preserved for non-savable types (TextBlock/HeadingBlock/PhotoBlock/CalloutBlock/ModelBlock/UnsupportedBlockPlaceholder) keeping Phase 12 Playwright selectors stable
 
 ### Pending Todos
 
