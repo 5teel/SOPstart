@@ -165,9 +165,19 @@ export default async function SopsLibraryPage({
                     <span className="text-xs text-steel-400">
                       {formatDate(sop.updated_at ?? sop.created_at)}
                     </span>
-                    {sop.source_type && sop.source_type !== 'uploaded' && (
+                    {sop.source_type === 'blank' && (
                       <span className="text-[10px] font-bold uppercase tracking-wider text-steel-400 border border-steel-600 rounded px-1.5 py-0.5">
                         AUTHORED IN BUILDER
+                      </span>
+                    )}
+                    {sop.source_type === 'ai' && (
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-steel-400 border border-steel-600 rounded px-1.5 py-0.5">
+                        AI DRAFT
+                      </span>
+                    )}
+                    {sop.source_type === 'template' && (
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-steel-400 border border-steel-600 rounded px-1.5 py-0.5">
+                        NZ TEMPLATE
                       </span>
                     )}
                   </div>

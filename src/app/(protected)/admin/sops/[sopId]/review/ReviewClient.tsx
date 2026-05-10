@@ -367,6 +367,18 @@ export default function ReviewClient({
                 />
               )}
 
+              {/* Phase 14 D-03: hand-off from review -> builder for non-uploaded sources
+                  (blank, ai, template). Uploaded SOPs are excluded — they may not yet have
+                  layout_data and shouldn't be pushed into the builder from the review surface. */}
+              {sop.source_type && sop.source_type !== 'uploaded' && (
+                <Link
+                  href={`/admin/sops/builder/${sop.id}`}
+                  className="inline-flex items-center gap-2 px-4 py-2 mb-4 rounded-lg bg-steel-700 hover:bg-steel-600 text-steel-100 font-semibold text-sm transition-colors"
+                >
+                  Open in builder
+                </Link>
+              )}
+
               <p className="text-xs font-semibold text-steel-400 uppercase tracking-wide mb-2">
                 PARSED OUTPUT
               </p>
