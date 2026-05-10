@@ -150,6 +150,24 @@ export const updateVersionLabelSchema = z.object({
 })
 
 /**
+ * Phase 14: AI-prompt entry validator.
+ * - D-06: min(20) blocks wasted-call prompts ("make me an SOP")
+ * - Pitfall #6: max(2000) bounds LLM cost from pasted policy documents
+ * - detailLevel mirrors the existing parseSopWithGPT(detailLevel: 1-5) parameter
+ * - categoryTag optional, references the controlled vocab from 13's block_categories table
+ */
+export const aiPromptSchema = z.object({
+  promptText: z
+    .string()
+    .min(20, 'Prompt must be at least 20 characters — describe the procedure, site, or worker role')
+    .max(2000, 'Prompt cannot exceed 2000 characters — paste a shorter brief'),
+  categoryTag: z.string().nullable().optional(),
+  detailLevel: z.number().int().min(1).max(5).default(3),
+})
+
+export type AiPromptInput = z.infer<typeof aiPromptSchema>
+
+/**
  * Returns true if the filename has a macro-enabled Office extension.
  * Must be checked before any parsing library is invoked.
  */
