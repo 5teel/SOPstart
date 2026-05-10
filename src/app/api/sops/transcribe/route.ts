@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
 
     // Stage 3: Structure SOP with GPT-4o using video format hint
     await updateStage(admin, job.id, 'structuring')
-    const parsed: ParsedSop = await parseSopWithGPT(transcriptText, 'video')
+    const parsed: ParsedSop = await parseSopWithGPT(transcriptText, { sourceMode: 'video' })
 
     // Stage 4: Adversarial verification (D-04) + missing section detection (VID-07)
     await updateStage(admin, job.id, 'verifying')

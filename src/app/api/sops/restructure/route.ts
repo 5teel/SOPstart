@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
   try {
     // Structure with Claude (skips download + transcription)
     console.log(`[Restructure] Parsing ${transcriptText.length} chars of transcript for SOP ${sopId}`)
-    const parsed: ParsedSop = await parseSopWithGPT(transcriptText, 'video', detailLevel ?? 3)
+    const parsed: ParsedSop = await parseSopWithGPT(transcriptText, { sourceMode: 'video', detailLevel: detailLevel ?? 3 })
 
     // Adversarial verification + missing sections
     await admin.from('parse_jobs')

@@ -29,9 +29,17 @@ If no discrepancies found, respond with exactly: []`
 // Override with ANTHROPIC_VERIFY_MODEL env var if needed.
 const VERIFY_MODEL = process.env.ANTHROPIC_VERIFY_MODEL || 'claude-3-5-haiku-20241022'
 
+/**
+ * Phase 14 D-02: opts.mode accepted as a forward-compat stub.
+ * 14-03 will swap the system prompt when mode === 'prompt' to switch from
+ * fidelity-to-source semantics to plausibility/hallucination semantics.
+ * Until then, mode is ignored and the verifier runs in transcript mode.
+ */
 export async function verifyTranscriptVsSop(
   transcriptText: string,
   parsedSop: ParsedSop,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  opts?: { mode?: 'transcript' | 'prompt' },
 ): Promise<VerificationFlag[]> {
   try {
     const response = await getAnthropic().messages.create({
