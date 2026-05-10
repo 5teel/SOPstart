@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Closeout
-status: in-progress
-stopped_at: Phase 14 planned (3 plans across 3 waves); plan-checker NEEDS_REVISION resolved (5 warnings + 2 info — all FIXED inline); ready for /gsd-execute-phase 14
-last_updated: "2026-05-10T00:00:00.000Z"
-last_activity: 2026-05-10 -- Phase 14 (AI-Drafted SOPs) planning complete: 14-RESEARCH.md (12 pitfalls, 6 [DECISION-NEEDED] items resolved), 14-CONTEXT.md (D-01..D-06 locked: Claude not GPT-4o, mode='prompt' verifier param, review-page landing, prompt_text persistence, AI DRAFT chip, zod min(20)), 14-01-PLAN.md (route + migration 00029 input_type CHECK + prompt_text + STAGE_SETS), 14-02-PLAN.md (Claude generator + section_kind resolver + 4-caller signature migration including restructure/route.ts), 14-03-PLAN.md (verifier mode + Open-in-builder CTA ADD + AI DRAFT library chip + 7-step UAT). Revision pass corrected false claim about builder CTA pre-existing on review page. ParseJobStatus SELECT projection input_type addition baked in.
+status: executing
+stopped_at: "Completed Phase 13 plan 05 (`13-05-PLAN.md`). Summit super-admin curation UI shipped — `/admin/global-blocks` (gated by requireSummitAdmin) lists globals via BlockListTable + nav to suggestions queue; `/admin/global-blocks/suggestions` exposes pending block_suggestions rows with Promote/Reject decision form. No schema changes (consumes 13-01's pre-declared server-action surface verbatim). 3 task commits on master (5ea8575, 5a57687, 1d2bef7). Phase 13 implementation 5/5 complete; batched browser UAT (13-03 + 13-04 + 13-05) remains pending Simon's verification. Pre-existing 13-01 manual SQL seed (insert into summit_admins ...) still required before super-admin routes are accessible. Next: phase verification + Phase 13 transition."
+last_updated: "2026-05-10T10:57:22.829Z"
+last_activity: 2026-05-10 -- Phase 14 execution started
 progress:
   total_phases: 21
-  completed_phases: 14
-  total_plans: 26
-  completed_plans: 26
-  percent: 100
+  completed_phases: 4
+  total_plans: 22
+  completed_plans: 19
+  percent: 86
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 13 verifier PASSED — awaiting batched browser UAT (13-03 + 13-04 + 13-05) before transitioning to next phase
+**Current focus:** Phase 14 — ai-drafted-sops
 
 ## Current Position
 
-Phase: 13 (reusable-block-library) — VERIFIED COMPLETE (UAT pending as carried human-verification)
-Plan: 5 of 5 implementation complete (13-01 schema + CRUD; 13-02 NZ global seed; 13-03 wizard picker + builder save-to-library + 00024 atomic junction reorder RPC; 13-04 follow-latest tracking with 00025 trigger + RPCs + UpdateAvailableBadge + diff modal; 13-05 platform super-admin curation UI — /admin/global-blocks gated route + suggestions queue with Promote/Reject); summit→platform rename applied via 00026 + code; 00027 seeds initial platform admin; 13-VERIFICATION.md written; 13-03 + 13-04 + 13-05 browser UAT pending Simon's manual verification (batchable)
-Status: SB-BLOCK-01..06 all closed; verifier PASSED — 5/5 plumbing-complete, 6/6 requirements backed by code, no anti-patterns or stubs detected
-Last activity: 2026-05-07 -- Phase 13 verified + summit→platform rename + initial platform admin seed migration; 2 cleanup commits (e093d45, 9d723a4) on top of the 5 plan-execution waves
+Phase: 14 (ai-drafted-sops) — EXECUTING
+Plan: 1 of 3
+Status: Executing Phase 14
+Last activity: 2026-05-10 -- Phase 14 execution started
 
 Progress bar: `[████████████████████]` 100% (phases 11+12 complete; phase 13 implementation 5/5 done — UAT remaining)
 
