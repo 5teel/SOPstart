@@ -101,7 +101,7 @@ Also include any other relevant sections: Training Requirements, Tools/Equipment
 
 Set parse_notes to describe what you inferred vs what was explicitly stated.`
 
-const FORMAT_HINTS: Partial<Record<SourceFileType, string>> = {
+const FORMAT_HINTS: Partial<Record<SourceFileType | 'prompt', string>> = {
   xlsx: '\n\nNote: This text was extracted from an Excel spreadsheet. Treat table headers as section titles, preserve numerical tolerances exactly.',
   pptx: '\n\nNote: This text was extracted from a PowerPoint presentation. Each slide title is a likely section heading.',
   txt: '\n\nNote: Plain text file. Infer structure from numbering, indentation, and keywords.',
@@ -116,6 +116,17 @@ const FORMAT_HINTS: Partial<Record<SourceFileType, string>> = {
 6. Create Emergency Procedures based on what could go wrong
 7. If speaker mentions tools/products/equipment → "Tools & Equipment" section
 8. Preserve exact numbers (measurements, temperatures, durations, dosages)`,
+  // Phase 14 D-01: 'prompt' is the AI-prompt source mode — short NL brief from an admin requesting a brand-new SOP.
+  prompt: `\n\nIMPORTANT: This input is a short natural-language prompt from an admin requesting a brand-new SOP draft. It is NOT a source document — there is no transcript, no manual, no policy text behind it. Apply MAXIMUM inference:
+
+1. Treat the prompt as a brief — your job is to author a complete, professional SOP from a one-line request.
+2. Infer the work context: location, equipment, hazards, regulatory frame (NZ WorkSafe / HSNO Act for chemical, AS/NZS standards for machinery), worker role.
+3. The prompt may name a NZ region (Hamilton, Auckland, Tauranga) or industry (forklift, glass, chemical, manufacturing). Use this to scope hazards and PPE realistically.
+4. ALWAYS produce all four core sections — hazards, PPE, steps, emergency procedures — even if the prompt only mentions one of them.
+5. Steps should be procedurally complete (don't stop at "do the task" — break into preparation, execution, verification, cleanup).
+6. Be CONSERVATIVE on specifics: if the prompt does not name a model number, do not invent one. Use generic language ("the forklift", "the operator manual") instead of fake specifics. Never invent NZ addresses, business names, regulatory citations, or staff roles that weren't asked for.
+7. Set parse_notes to list what you INFERRED vs what was STATED. Reviewers use this to know where to refine.
+8. If the prompt is vague (< 10 meaningful words like "chemical SOP"), produce a generic SOP for the named domain and lower overall_confidence to <= 0.6.`,
 }
 
 // Detail level verbosity modifiers (1 = minimal, 5 = maximum)
@@ -145,10 +156,34 @@ Text to assess:
  * Two-stage Claude parsing:
  * 1. Haiku triages complexity (fast, cheap)
  * 2. Simple → Haiku parses, Complex → Sonnet parses
+ *
+ * Phase 14 D-01: signature evolved to accept either:
+ *  - legacy positional: parseSopWithGPT(text, 'video', 3)
+ *  - new opts shape:    parseSopWithGPT(text, { sourceMode: 'prompt', detailLevel: 3 })
+ *
+ * `sourceMode` admits `'prompt'` for the AI-prompt path; that value is NOT added to
+ * SourceFileType (which gates the parse_jobs DB CHECK constraint) — kept isolated to
+ * the FORMAT_HINTS keyspace and parser-call layer.
  */
-export async function parseSopWithGPT(extractedText: string, inputType?: SourceFileType, detailLevel: number = 3): Promise<ParsedSop> {
+export async function parseSopWithGPT(
+  extractedText: string,
+  optsOrInputType?:
+    | SourceFileType
+    | 'prompt'
+    | { sourceMode?: SourceFileType | 'prompt'; detailLevel?: number },
+  detailLevelLegacy: number = 3,
+): Promise<ParsedSop> {
+  // Normalise legacy positional and new opts shape into a single opts object.
+  const opts: { sourceMode?: SourceFileType | 'prompt'; detailLevel?: number } =
+    typeof optsOrInputType === 'object' && optsOrInputType !== null
+      ? optsOrInputType
+      : { sourceMode: optsOrInputType ?? undefined, detailLevel: detailLevelLegacy }
+
+  const sourceMode = opts.sourceMode
+  const detailLevel = opts.detailLevel ?? 3
+
   const client = getAnthropic()
-  const formatHint = inputType ? (FORMAT_HINTS[inputType] ?? '') : ''
+  const formatHint = sourceMode ? (FORMAT_HINTS[sourceMode] ?? '') : ''
   const detailHint = DETAIL_LEVEL_HINTS[Math.min(5, Math.max(1, Math.round(detailLevel)))] ?? DETAIL_LEVEL_HINTS[3]
   const hint = formatHint + detailHint
 

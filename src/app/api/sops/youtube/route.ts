@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
 
   try {
     // 4. Structure SOP with GPT-4o using video format hint
-    const parsed: ParsedSop = await parseSopWithGPT(transcriptText, 'video')
+    const parsed: ParsedSop = await parseSopWithGPT(transcriptText, { sourceMode: 'video' })
 
     // 5. Adversarial verification + missing section detection
     await admin.from('parse_jobs')

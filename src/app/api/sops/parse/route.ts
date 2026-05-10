@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Parse with GPT-4o — pass file_type for format-specific prompt hints
-    const parsed: ParsedSop = await parseSopWithGPT(extractedText, fileType)
+    const parsed: ParsedSop = await parseSopWithGPT(extractedText, { sourceMode: fileType })
 
     // 5. Get the SOP's organisation_id for image storage paths
     const { data: sop } = await admin
