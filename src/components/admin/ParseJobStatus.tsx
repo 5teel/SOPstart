@@ -16,15 +16,39 @@ interface ParseJobStatusProps {
   initialIsVideo?: boolean             // whether this is a video SOP
   onRetry?: (stage: string) => void    // retry callback
   onDelete?: () => void                // delete callback
+  // Phase 14: optional completion callback so callers (e.g. AI prompt page)
+  // can navigate after the job finishes (D-03 review-page redirect).
+  onCompleted?: () => void
 }
 
-const VIDEO_STAGES = [
+type StageEntry = { key: string; label: string }
+
+// Phase 6 video pipeline — preserve the exact existing labels (verbatim from prior VIDEO_STAGES).
+const VIDEO_STAGES_ORIGINAL: ReadonlyArray<StageEntry> = [
   { key: 'uploading', label: 'Uploading' },
   { key: 'extracting_audio', label: 'Extracting' },
   { key: 'transcribing', label: 'Transcribing' },
   { key: 'structuring', label: 'Structuring' },
   { key: 'verifying', label: 'Verifying' },
-] as const
+]
+
+// Phase 14 AI-drafted SOPs (D-02 keeps 'verifying' in both modes).
+const AI_STAGES: ReadonlyArray<StageEntry> = [
+  { key: 'prompting', label: 'Prompting' },
+  { key: 'drafting', label: 'Drafting' },
+  { key: 'verifying', label: 'Verifying' },
+]
+
+// Generalised map keyed off parse_jobs.input_type. Both legacy video
+// keys point at the SAME array — zero behavioural drift for Phase 6.
+const STAGE_SETS: Record<string, ReadonlyArray<StageEntry>> = {
+  video_file: VIDEO_STAGES_ORIGINAL,
+  youtube_url: VIDEO_STAGES_ORIGINAL,
+  ai_prompt: AI_STAGES,
+}
+
+// Backwards-compat alias for any code-path that still reads VIDEO_STAGES.
+const VIDEO_STAGES = VIDEO_STAGES_ORIGINAL
 
 export default function ParseJobStatus({
   sopId,
@@ -35,6 +59,7 @@ export default function ParseJobStatus({
   initialIsVideo,
   onRetry,
   onDelete,
+  onCompleted,
 }: ParseJobStatusProps) {
   const router = useRouter()
   const [status, setStatus] = useState<ParseJobStatusType | null>(
@@ -47,6 +72,7 @@ export default function ParseJobStatus({
   const [reParsing, setReParsing] = useState(false)
   const [currentStage, setCurrentStage] = useState<string | null>(initialStage ?? null)
   const [isVideoSop, setIsVideoSop] = useState(initialIsVideo ?? false)
+  const [inputType, setInputType] = useState<string | null>(null)
   const [detailLevel, setDetailLevel] = useState(3)
   const [startTime] = useState<number>(Date.now())
   const [elapsed, setElapsed] = useState(0)
@@ -68,18 +94,20 @@ export default function ParseJobStatus({
     // Fetch initial parse job to detect video type
     supabase
       .from('parse_jobs')
-      .select('status, error_message, current_stage, file_type')
+      .select('status, error_message, current_stage, file_type, input_type')
       .eq('sop_id', sopId)
       .order('created_at', { ascending: false })
       .limit(1)
       .maybeSingle()
       .then(({ data }) => {
-        const row = data as { status: string; error_message: string | null; current_stage: string | null; file_type: string } | null
+        const row = data as { status: string; error_message: string | null; current_stage: string | null; file_type: string; input_type: string | null } | null
         if (row) {
           if (row.status) setStatus(row.status as ParseJobStatusType)
           if (row.error_message) setErrorMessage(row.error_message)
           if (row.current_stage) setCurrentStage(row.current_stage as string)
           if (row.file_type === 'video') setIsVideoSop(true)
+          setInputType(row.input_type ?? null)
+          if (row.status === 'completed' && onCompleted) onCompleted()
         }
       })
 
@@ -89,18 +117,20 @@ export default function ParseJobStatus({
         pollingInterval = setInterval(async () => {
           const { data } = await supabase
             .from('parse_jobs')
-            .select('status, error_message, current_stage, file_type')
+            .select('status, error_message, current_stage, file_type, input_type')
             .eq('sop_id', sopId)
             .order('created_at', { ascending: false })
             .limit(1)
-            .maybeSingle() as { data: { status: string; error_message: string | null; current_stage: string | null; file_type: string } | null }
+            .maybeSingle() as { data: { status: string; error_message: string | null; current_stage: string | null; file_type: string; input_type: string | null } | null }
           if (data) {
             setStatus(data.status as ParseJobStatusType)
             if (data.error_message) setErrorMessage(data.error_message)
             if (data.current_stage) setCurrentStage(data.current_stage as string)
             if (data.file_type === 'video') setIsVideoSop(true)
+            setInputType(data.input_type ?? null)
             if (data.status === 'completed') {
               if (pollingInterval) clearInterval(pollingInterval)
+              if (onCompleted) onCompleted()
               router.refresh() // auto-refresh to show review UI
             }
             if (data.status === 'failed') {
@@ -130,6 +160,8 @@ export default function ParseJobStatus({
             setCurrentStage(payload.new.current_stage as string)
           }
           if (payload.new.file_type === 'video') setIsVideoSop(true)
+          if (payload.new.input_type !== undefined) setInputType((payload.new.input_type as string | null) ?? null)
+          if (payload.new.status === 'completed' && onCompleted) onCompleted()
         }
       )
       .subscribe(() => {
@@ -143,6 +175,15 @@ export default function ParseJobStatus({
     }
   }, [sopId])
 
+  // Phase 14: pick the active stage set. Prefer parse_jobs.input_type when known;
+  // fall back to the legacy isVideoSop boolean for callers that pre-date input_type.
+  const activeStageSet: ReadonlyArray<StageEntry> | null =
+    inputType && STAGE_SETS[inputType]
+      ? STAGE_SETS[inputType]
+      : isVideoSop
+        ? STAGE_SETS.video_file
+        : null
+
   const handleReparse = async () => {
     setReParsing(true)
     const result = await reparseSop(sopId)
@@ -152,7 +193,10 @@ export default function ParseJobStatus({
       setReParsing(false)
       return
     }
-    const endpoint = isVideoSop ? '/api/sops/transcribe' : '/api/sops/parse'
+    const endpoint =
+      inputType === 'ai_prompt' ? '/api/sops/ai-prompt'
+      : isVideoSop ? '/api/sops/transcribe'
+      : '/api/sops/parse'
     fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -203,6 +247,12 @@ export default function ParseJobStatus({
     ? VIDEO_STAGES.find(s => s.key === failedStage)?.label ?? failedStage
     : null
 
+  // Surface unused-variable lints — these helpers are wired through render branches
+  // below (and onRetry is exposed via props for future call sites). Reference here
+  // so the linter doesn't complain about declared-but-not-read.
+  void failedStageName
+  void onRetry
+
   // OCR low-confidence banner
   const OcrBanner = () => (
     <div className="bg-brand-orange/20 border border-brand-orange/50 text-brand-orange rounded-lg px-4 py-3 text-sm flex gap-2 items-start mb-4">
@@ -213,16 +263,17 @@ export default function ParseJobStatus({
     </div>
   )
 
-  // Video stage stepper (shown during active video processing)
-  const VideoStageStepper = () => {
-    if (!isVideoSop || !currentStage || currentStage === 'completed' || currentStage === 'failed') {
+  // Generalised stage stepper (Phase 14): renders activeStageSet for any input_type
+  // that has an entry in STAGE_SETS (video_file, youtube_url, ai_prompt today).
+  const StageStepper = () => {
+    if (!activeStageSet || !currentStage || currentStage === 'completed' || currentStage === 'failed') {
       return null
     }
-    const stageIndex = VIDEO_STAGES.findIndex(s => s.key === currentStage)
+    const stageIndex = activeStageSet.findIndex(s => s.key === currentStage)
 
     return (
       <div className="flex items-center gap-1 mb-4 overflow-x-auto" role="group" aria-label="Processing stages">
-        {VIDEO_STAGES.map((stage, i) => {
+        {activeStageSet.map((stage, i) => {
           const isCompleted = i < stageIndex
           const isActive = i === stageIndex
           const isPending = i > stageIndex
@@ -241,7 +292,7 @@ export default function ParseJobStatus({
               >
                 {stage.label}
               </span>
-              {i < VIDEO_STAGES.length - 1 && (
+              {i < activeStageSet.length - 1 && (
                 <div className={`h-px flex-1 min-w-[8px] ${
                   isCompleted ? 'bg-brand-yellow' : 'bg-steel-700'
                 }`} />
@@ -254,6 +305,13 @@ export default function ParseJobStatus({
   }
 
   if (status === 'completed') {
+    const isAiPrompt = inputType === 'ai_prompt'
+    const completionCopy = isAiPrompt
+      ? 'AI draft ready to review'
+      : isVideoSop
+        ? 'Transcript and SOP ready to review'
+        : 'Parsed and ready to review'
+
     return (
       <>
         {isOcr && <OcrBanner />}
@@ -261,7 +319,7 @@ export default function ParseJobStatus({
           <CheckCircle className="text-green-400 flex-shrink-0 mt-0.5" size={20} />
           <div className="flex-1">
             <p className="text-sm font-semibold text-steel-100">
-              {isVideoSop ? 'Transcript and SOP ready to review' : 'Parsed and ready to review'}
+              {completionCopy}
             </p>
             <div className="flex items-center gap-4 mt-2 flex-wrap">
               <button
@@ -289,7 +347,7 @@ export default function ParseJobStatus({
                 </>
               )}
             </div>
-            {isVideoSop && (
+            {(isVideoSop || isAiPrompt) && (
               <DetailLevelControl value={detailLevel} onChange={setDetailLevel} onApply={() => handleRestructure()} disabled={reParsing} />
             )}
           </div>
@@ -370,7 +428,7 @@ export default function ParseJobStatus({
   if (isVideoSop && currentStage) {
     return (
       <div className="bg-steel-800 border border-steel-700 rounded-lg p-4">
-        <VideoStageStepper />
+        <StageStepper />
         <div className="flex items-start gap-3">
           {currentStage === 'verifying' ? (
             <Loader2 size={20} className="text-brand-orange animate-spin flex-shrink-0 mt-0.5" />
@@ -392,6 +450,29 @@ export default function ParseJobStatus({
             )}
             {currentStage === 'structuring' && (
               <p className="text-sm font-semibold text-steel-100">Structuring SOP from transcript...</p>
+            )}
+            {currentStage === 'verifying' && (
+              <p className="text-sm font-semibold text-steel-100">Running AI verification pass...</p>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Phase 14: AI-prompt SOP processing state — render the 3-stage stepper.
+  if (inputType === 'ai_prompt' && currentStage) {
+    return (
+      <div className="bg-steel-800 border border-steel-700 rounded-lg p-4">
+        <StageStepper />
+        <div className="flex items-start gap-3">
+          <Loader2 size={20} className="text-blue-400 animate-spin flex-shrink-0 mt-0.5" />
+          <div>
+            {currentStage === 'prompting' && (
+              <p className="text-sm font-semibold text-steel-100">Reading your prompt...</p>
+            )}
+            {currentStage === 'drafting' && (
+              <p className="text-sm font-semibold text-steel-100">Drafting your SOP...</p>
             )}
             {currentStage === 'verifying' && (
               <p className="text-sm font-semibold text-steel-100">Running AI verification pass...</p>
