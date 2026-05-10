@@ -102,6 +102,7 @@ export type Database = {
           input_type: string | null
           organisation_id: string
           pipeline_run_id: string | null
+          prompt_text: string | null
           retry_count: number
           sop_id: string
           started_at: string | null
@@ -123,6 +124,7 @@ export type Database = {
           input_type?: string | null
           organisation_id: string
           pipeline_run_id?: string | null
+          prompt_text?: string | null
           retry_count?: number
           sop_id: string
           started_at?: string | null
@@ -144,6 +146,7 @@ export type Database = {
           input_type?: string | null
           organisation_id?: string
           pipeline_run_id?: string | null
+          prompt_text?: string | null
           retry_count?: number
           sop_id?: string
           started_at?: string | null

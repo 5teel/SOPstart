@@ -13,7 +13,7 @@ export type EscalationStatus = 'open' | 'acknowledged' | 'resolved'
 export type SopStatus = 'uploading' | 'parsing' | 'draft' | 'published'
 export type ParseJobStatus = 'queued' | 'processing' | 'completed' | 'failed'
 export type SourceFileType = 'docx' | 'pdf' | 'image' | 'xlsx' | 'pptx' | 'txt' | 'video'
-export type InputType = 'upload' | 'scan' | 'url' | 'video_file' | 'youtube_url'
+export type InputType = 'upload' | 'scan' | 'url' | 'video_file' | 'youtube_url' | 'ai_prompt'
 export type CompletionStatus = 'pending_sign_off' | 'signed_off' | 'rejected'
 export type SourceType = 'uploaded' | 'blank' | 'ai' | 'template'
 
@@ -135,6 +135,7 @@ export interface ParseJob {
   verification_flags?: VerificationFlag[] | null
   youtube_url?: string | null
   updated_at?: string
+  prompt_text?: string | null  // Phase 14: persisted NL prompt for input_type = 'ai_prompt' (D-04)
   pipeline_run_id?: string | null
 }
 
