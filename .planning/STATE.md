@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Closeout
 status: in-progress
-stopped_at: Phase 12.5 + Phase 13 both marked complete (verifiers PASSED on both; combined 8 carried human-UAT items batchable in one session); v3.0 closeout milestone progressing
-last_updated: "2026-05-07T09:00:00.000Z"
-last_activity: 2026-05-07 -- Phase 12.5 closed out: walkthrough photo-queue badge + submit-while-uploading guard committed (5989852); ROADMAP marks 12.5 [x] (verifier had already PASSED 10/10 on 2026-04-26 with 6 carried human-UAT items). Phase 13 also marked [x] following same pattern (verifier PASSED 5/5; 4 carried human-UAT items). v3.0 milestone now: 13/14 integer/decimal phases complete in this milestone (7 still open: 7, 9, 14, 15, 16, 17, 18)
+stopped_at: Phase 14 planned (3 plans across 3 waves); plan-checker NEEDS_REVISION resolved (5 warnings + 2 info — all FIXED inline); ready for /gsd-execute-phase 14
+last_updated: "2026-05-10T00:00:00.000Z"
+last_activity: 2026-05-10 -- Phase 14 (AI-Drafted SOPs) planning complete: 14-RESEARCH.md (12 pitfalls, 6 [DECISION-NEEDED] items resolved), 14-CONTEXT.md (D-01..D-06 locked: Claude not GPT-4o, mode='prompt' verifier param, review-page landing, prompt_text persistence, AI DRAFT chip, zod min(20)), 14-01-PLAN.md (route + migration 00029 input_type CHECK + prompt_text + STAGE_SETS), 14-02-PLAN.md (Claude generator + section_kind resolver + 4-caller signature migration including restructure/route.ts), 14-03-PLAN.md (verifier mode + Open-in-builder CTA ADD + AI DRAFT library chip + 7-step UAT). Revision pass corrected false claim about builder CTA pre-existing on review page. ParseJobStatus SELECT projection input_type addition baked in.
 progress:
   total_phases: 21
   completed_phases: 14
