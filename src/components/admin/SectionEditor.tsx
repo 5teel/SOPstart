@@ -128,17 +128,17 @@ export default function SectionEditor({
   return (
     <div
       className={[
-        'bg-steel-800 rounded-lg border-l-4 mb-4 overflow-hidden transition-colors',
-        approved ? 'border-green-500' : 'border-steel-700',
+        'bg-white rounded-lg border-l-4 mb-4 overflow-hidden transition-colors',
+        approved ? 'border-green-500' : 'border-[var(--ink-100)]',
       ].join(' ')}
     >
       {/* Card header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-steel-700">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--ink-100)]">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="text-xs uppercase tracking-wide text-steel-400 flex-shrink-0">
+          <span className="text-xs uppercase tracking-wide text-[var(--ink-500)] flex-shrink-0">
             {styling.displayName ?? styling.family}
           </span>
-          <span className="text-sm font-semibold text-steel-100 truncate">
+          <span className="text-sm font-semibold text-[var(--ink-900)] truncate">
             {section.title || section.section_type}
           </span>
         </div>
@@ -154,35 +154,35 @@ export default function SectionEditor({
 
       {/* Card body */}
       {mode === 'read' ? (
-        <div className="px-4 py-4 hover:bg-steel-700/20 cursor-text transition-colors">
+        <div className="px-4 py-4 hover:bg-[var(--paper-2)]/20 cursor-text transition-colors">
           {isStepsSection ? (
             <ol className="list-decimal list-inside space-y-3">
               {section.sop_steps.map((step) => (
-                <li key={step.id} className="text-base text-steel-100">
+                <li key={step.id} className="text-base text-[var(--ink-900)]">
                   {step.text}
                   {step.warning && (
-                    <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-brand-orange/20 text-brand-orange text-xs font-semibold rounded uppercase">
+                    <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--accent-voice)]/20 text-[var(--accent-voice)] text-xs font-semibold rounded uppercase">
                       WARNING: {step.warning}
                     </span>
                   )}
                   {step.caution && (
-                    <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-brand-orange/20 text-brand-orange text-xs font-semibold rounded uppercase">
+                    <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--accent-voice)]/20 text-[var(--accent-voice)] text-xs font-semibold rounded uppercase">
                       CAUTION: {step.caution}
                     </span>
                   )}
                 </li>
               ))}
               {section.sop_steps.length === 0 && (
-                <p className="text-sm text-steel-400 italic">No steps parsed yet.</p>
+                <p className="text-sm text-[var(--ink-500)] italic">No steps parsed yet.</p>
               )}
             </ol>
           ) : (
             section.content ? (
               containsMarkdownTable(section.content)
                 ? <SopTable markdown={section.content} />
-                : <p className="text-base text-steel-100 leading-relaxed whitespace-pre-wrap">{section.content}</p>
+                : <p className="text-base text-[var(--ink-900)] leading-relaxed whitespace-pre-wrap">{section.content}</p>
             ) : (
-              <p className="text-sm text-steel-400 italic">No content parsed.</p>
+              <p className="text-sm text-[var(--ink-500)] italic">No content parsed.</p>
             )
           )}
 
@@ -194,7 +194,7 @@ export default function SectionEditor({
                   key={img.id}
                   src={img.storage_path}
                   alt={img.alt_text ?? 'SOP figure'}
-                  className="rounded-md max-w-full object-contain max-h-48 my-2 border border-steel-700"
+                  className="rounded-md max-w-full object-contain max-h-48 my-2 border border-[var(--ink-100)]"
                 />
               ))}
             </div>
@@ -207,19 +207,19 @@ export default function SectionEditor({
             <div className="space-y-3">
               {editSteps.map((step, idx) => (
                 <div key={step.id} className="flex items-start gap-2">
-                  <span className="text-sm font-mono text-steel-400 w-6 flex-shrink-0 mt-3">
+                  <span className="text-sm font-mono text-[var(--ink-500)] w-6 flex-shrink-0 mt-3">
                     {idx + 1}.
                   </span>
                   <textarea
                     ref={idx === 0 ? firstTextareaRef : undefined}
                     value={step.text}
                     onChange={(e) => updateStepText(idx, e.target.value)}
-                    className="flex-1 bg-steel-900 border border-brand-yellow/50 rounded-lg text-base text-steel-100 leading-relaxed p-3 resize-y focus:outline-none focus:ring-2 focus:ring-brand-yellow/50 min-h-[72px]"
+                    className="flex-1 bg-[var(--paper)] border border-[var(--ink-900)]/50 rounded-lg text-base text-[var(--ink-900)] leading-relaxed p-3 resize-y focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)]/50 min-h-[72px]"
                   />
                   <button
                     type="button"
                     onClick={() => removeStep(idx)}
-                    className="text-steel-400 hover:text-red-400 mt-3 text-lg leading-none"
+                    className="text-[var(--ink-500)] hover:text-red-400 mt-3 text-lg leading-none"
                     aria-label="Remove step"
                   >
                     ✕
@@ -229,7 +229,7 @@ export default function SectionEditor({
               <button
                 type="button"
                 onClick={addStep}
-                className="text-brand-yellow text-sm hover:text-amber-400 mt-2"
+                className="text-[var(--ink-900)] text-sm hover:text-[var(--ink-700)] mt-2"
               >
                 + Add step
               </button>
@@ -240,10 +240,10 @@ export default function SectionEditor({
                 ref={firstTextareaRef}
                 value={editContent}
                 onChange={(e) => setEditContent(e.target.value)}
-                className="w-full bg-steel-900 border border-brand-yellow/50 rounded-lg text-base text-steel-100 leading-relaxed p-3 resize-y focus:outline-none focus:ring-2 focus:ring-brand-yellow/50 min-h-[120px]"
+                className="w-full bg-[var(--paper)] border border-[var(--ink-900)]/50 rounded-lg text-base text-[var(--ink-900)] leading-relaxed p-3 resize-y focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)]/50 min-h-[120px]"
               />
               {containsMarkdownTable(editContent) && (
-                <p className="text-xs text-steel-400 mt-1">
+                <p className="text-xs text-[var(--ink-500)] mt-1">
                   Edit as markdown table (| Col1 | Col2 |). The table will render with formatting when you save.
                 </p>
               )}
@@ -253,7 +253,7 @@ export default function SectionEditor({
       )}
 
       {/* Card footer */}
-      <div className="flex items-center gap-3 px-4 py-3 border-t border-steel-700 bg-steel-900/50">
+      <div className="flex items-center gap-3 px-4 py-3 border-t border-[var(--ink-100)] bg-[var(--paper)]/50">
         {mode === 'read' ? (
           approved ? (
             <>
@@ -263,7 +263,7 @@ export default function SectionEditor({
               <button
                 type="button"
                 onClick={undoApproval}
-                className="text-xs text-steel-400 hover:text-steel-100 underline ml-auto"
+                className="text-xs text-[var(--ink-500)] hover:text-[var(--ink-900)] underline ml-auto"
               >
                 Undo approval
               </button>
@@ -273,7 +273,7 @@ export default function SectionEditor({
               <button
                 type="button"
                 onClick={enterEdit}
-                className="h-[72px] px-5 bg-steel-700 text-steel-100 font-semibold rounded-lg hover:bg-steel-600 text-sm"
+                className="h-[72px] px-5 bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--paper-2)] text-sm"
               >
                 Edit section
               </button>
@@ -281,7 +281,7 @@ export default function SectionEditor({
                 type="button"
                 onClick={approveSection}
                 disabled={approving}
-                className="h-[72px] px-5 bg-brand-yellow text-steel-900 font-bold rounded-lg hover:bg-amber-400 text-sm disabled:opacity-60"
+                className="h-[72px] px-5 bg-[var(--ink-900)] text-white font-bold rounded-lg hover:bg-[var(--ink-700)] text-sm disabled:opacity-60"
               >
                 {approving ? 'Approving…' : 'Approve section'}
               </button>
@@ -293,14 +293,14 @@ export default function SectionEditor({
               type="button"
               onClick={saveChanges}
               disabled={saving}
-              className="h-[72px] px-5 bg-brand-yellow text-steel-900 font-bold rounded-lg hover:bg-amber-400 text-sm disabled:opacity-60"
+              className="h-[72px] px-5 bg-[var(--ink-900)] text-white font-bold rounded-lg hover:bg-[var(--ink-700)] text-sm disabled:opacity-60"
             >
               {saving ? 'Saving…' : 'Save changes'}
             </button>
             <button
               type="button"
               onClick={cancelEdit}
-              className="h-[72px] px-5 bg-steel-700 text-steel-100 font-semibold rounded-lg hover:bg-steel-600 text-sm"
+              className="h-[72px] px-5 bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--paper-2)] text-sm"
             >
               Cancel
             </button>

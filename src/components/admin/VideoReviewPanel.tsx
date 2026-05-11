@@ -97,12 +97,12 @@ export default function VideoReviewPanel({
   return (
     <div className="flex flex-col h-full gap-3">
       {/* Header */}
-      <p className="text-xs font-semibold text-steel-400 uppercase tracking-wide">
+      <p className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wide">
         VIDEO SOURCE
       </p>
 
       {/* Video player */}
-      <div className="bg-steel-900 rounded-lg overflow-hidden border border-steel-700 max-h-[280px]">
+      <div className="bg-[var(--paper)] rounded-lg overflow-hidden border border-[var(--ink-100)] max-h-[280px]">
         {youtubeVideoId ? (
           <iframe
             id="youtube-player"
@@ -123,19 +123,19 @@ export default function VideoReviewPanel({
             onTimeUpdate={handleTimeUpdate}
           />
         ) : (
-          <div className="flex items-center justify-center h-[180px] text-steel-400 text-sm">
+          <div className="flex items-center justify-center h-[180px] text-[var(--ink-500)] text-sm">
             No video available.
           </div>
         )}
       </div>
 
       {/* Transcript header */}
-      <p className="text-xs font-semibold text-steel-400 uppercase tracking-wide">
+      <p className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wide">
         TRANSCRIPT
       </p>
 
       {/* Read-only note */}
-      <p className="text-xs text-steel-600 italic px-3 py-2">
+      <p className="text-xs text-[var(--ink-300)] italic px-3 py-2">
         Read only — edit the structured SOP on the right.
       </p>
 
@@ -148,7 +148,7 @@ export default function VideoReviewPanel({
         onScroll={handleManualScroll}
       >
         {segments.length === 0 ? (
-          <p className="text-sm text-steel-400 px-3 py-4">No transcript available for this video.</p>
+          <p className="text-sm text-[var(--ink-500)] px-3 py-4">No transcript available for this video.</p>
         ) : (
           segments.map((seg, i) => (
             <div
@@ -158,14 +158,14 @@ export default function VideoReviewPanel({
               onClick={() => handleSegmentClick(i)}
               className={`flex items-start gap-3 px-3 py-2 rounded-lg cursor-pointer min-h-[44px] ${
                 activeSegmentIndex === i
-                  ? 'bg-steel-800 border-l-2 border-brand-yellow'
-                  : 'hover:bg-steel-800'
+                  ? 'bg-white border-l-2 border-[var(--ink-900)]'
+                  : 'hover:bg-white'
               }`}
             >
-              <span className="text-xs text-steel-400 font-semibold tabular-nums w-[48px] shrink-0 pt-1">
+              <span className="text-xs text-[var(--ink-500)] font-semibold tabular-nums w-[48px] shrink-0 pt-1">
                 {formatTimestamp(seg.start)}
               </span>
-              <span className="text-sm text-steel-100 leading-relaxed flex-1">
+              <span className="text-sm text-[var(--ink-900)] leading-relaxed flex-1">
                 {seg.text}
               </span>
             </div>

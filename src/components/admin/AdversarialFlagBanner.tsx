@@ -43,11 +43,11 @@ export default function AdversarialFlagBanner({ flags, onUnresolvedCountChange }
   }
 
   return (
-    <div className="bg-brand-orange/20 border border-brand-orange/50 rounded-lg px-4 py-3 mb-4">
+    <div className="bg-[var(--accent-voice)]/20 border border-[var(--accent-voice)]/50 rounded-lg px-4 py-3 mb-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <AlertTriangle size={16} className="text-brand-orange shrink-0" />
-          <span className="text-sm font-semibold text-brand-orange">
+          <AlertTriangle size={16} className="text-[var(--accent-voice)] shrink-0" />
+          <span className="text-sm font-semibold text-[var(--accent-voice)]">
             AI verification found {adversarialFlags.length} potential issue{adversarialFlags.length !== 1 ? 's' : ''} — review before publishing.
           </span>
         </div>
@@ -55,7 +55,7 @@ export default function AdversarialFlagBanner({ flags, onUnresolvedCountChange }
           onClick={() => setExpanded(!expanded)}
           aria-expanded={expanded}
           aria-label={expanded ? 'Collapse verification flags' : 'Expand verification flags'}
-          className="text-steel-400 hover:text-steel-100 p-1"
+          className="text-[var(--ink-500)] hover:text-[var(--ink-900)] p-1"
         >
           {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </button>
@@ -64,7 +64,7 @@ export default function AdversarialFlagBanner({ flags, onUnresolvedCountChange }
       {expanded && (
         <div className="mt-3 space-y-1">
           {adversarialFlags.map((flag, i) => (
-            <div key={i} className="text-xs text-steel-100 py-1">
+            <div key={i} className="text-xs text-[var(--ink-900)] py-1">
               <span className="font-semibold">
                 {flag.section_title}{flag.step_number ? ` (step ${flag.step_number})` : ''}
                 {flag.severity === 'critical' && (
@@ -86,7 +86,7 @@ export default function AdversarialFlagBanner({ flags, onUnresolvedCountChange }
               className={`text-xs px-2 py-1 rounded ${
                 resolvedFlags.has(i)
                   ? 'bg-green-500/20 text-green-400'
-                  : 'bg-steel-700 text-steel-400 hover:text-steel-100'
+                  : 'bg-[var(--paper-2)] text-[var(--ink-500)] hover:text-[var(--ink-900)]'
               }`}
             >
               {resolvedFlags.has(i) ? 'Resolved' : `Confirm #${i + 1}`}
@@ -94,7 +94,7 @@ export default function AdversarialFlagBanner({ flags, onUnresolvedCountChange }
           ))}
           <button
             onClick={() => setDismissed(true)}
-            className="text-xs px-2 py-1 rounded bg-steel-700 text-steel-400 hover:text-steel-100 ml-auto"
+            className="text-xs px-2 py-1 rounded bg-[var(--paper-2)] text-[var(--ink-500)] hover:text-[var(--ink-900)] ml-auto"
           >
             Dismiss all
           </button>

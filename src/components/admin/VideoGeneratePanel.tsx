@@ -64,25 +64,25 @@ export default function VideoGeneratePanel({ sop, versions, archivedVersions, au
   return (
     <div>
       {/* Sticky header */}
-      <div className="sticky top-0 z-20 bg-steel-900 border-b border-steel-700 px-4 flex items-center gap-3 h-[56px]">
+      <div className="sticky top-0 z-20 bg-[var(--paper)] border-b border-[var(--ink-100)] px-4 flex items-center gap-3 h-[56px]">
         <Link
           href={`/admin/sops/${sop.id}/review`}
-          className="text-steel-400 hover:text-steel-100 transition-colors"
+          className="text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors"
           aria-label="Back to review"
         >
           <ArrowLeft size={20} />
         </Link>
-        <span className="text-sm font-medium text-steel-100 truncate flex-1">{sop.title}</span>
+        <span className="text-sm font-medium text-[var(--ink-900)] truncate flex-1">{sop.title}</span>
         <Link
           href={`/admin/sops/${sop.id}/assign`}
-          className="w-8 h-8 rounded-lg bg-steel-800 border border-steel-700 hover:bg-steel-700 hover:border-steel-600 text-steel-400 hover:text-steel-100 transition-colors flex items-center justify-center flex-shrink-0"
+          className="w-8 h-8 rounded-lg bg-white border border-[var(--ink-100)] hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors flex items-center justify-center flex-shrink-0"
           title="Assign SOP"
         >
           <Users size={16} />
         </Link>
         <Link
           href={`/admin/sops/${sop.id}/versions`}
-          className="w-8 h-8 rounded-lg bg-steel-800 border border-steel-700 hover:bg-steel-700 hover:border-steel-600 text-steel-400 hover:text-steel-100 transition-colors flex items-center justify-center flex-shrink-0"
+          className="w-8 h-8 rounded-lg bg-white border border-[var(--ink-100)] hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors flex items-center justify-center flex-shrink-0"
           title="Version history"
         >
           <History size={16} />
@@ -91,7 +91,7 @@ export default function VideoGeneratePanel({ sop, versions, archivedVersions, au
 
       <div className="max-w-2xl mx-auto px-4 py-8">
         {/* Generate new version section */}
-        <h1 className="text-base font-semibold text-steel-100 mb-4">Generate new version</h1>
+        <h1 className="text-base font-semibold text-[var(--ink-900)] mb-4">Generate new version</h1>
 
         {/* Format selector */}
         <fieldset className="flex flex-col gap-3">
@@ -101,8 +101,8 @@ export default function VideoGeneratePanel({ sop, versions, archivedVersions, au
           <label
             className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
               selectedFormat === 'narrated_slideshow'
-                ? 'border-brand-yellow bg-steel-800'
-                : 'border-steel-700 bg-steel-800 hover:border-steel-600'
+                ? 'border-[var(--ink-900)] bg-white'
+                : 'border-[var(--ink-100)] bg-white hover:border-[var(--ink-300)]'
             }`}
           >
             <input
@@ -116,20 +116,20 @@ export default function VideoGeneratePanel({ sop, versions, archivedVersions, au
             <div
               className={`w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center ${
                 selectedFormat === 'narrated_slideshow'
-                  ? 'border-brand-yellow'
-                  : 'border-steel-600'
+                  ? 'border-[var(--ink-900)]'
+                  : 'border-[var(--ink-300)]'
               }`}
             >
               {selectedFormat === 'narrated_slideshow' && (
-                <div className="w-2.5 h-2.5 rounded-full bg-brand-yellow" />
+                <div className="w-2.5 h-2.5 rounded-full bg-[var(--ink-900)]" />
               )}
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-steel-100">Narrated slideshow</p>
-              <p className="text-sm text-steel-400 mt-1">
+              <p className="text-sm font-semibold text-[var(--ink-900)]">Narrated slideshow</p>
+              <p className="text-sm text-[var(--ink-500)] mt-1">
                 One slide per SOP section with AI voiceover. Hazards and PPE appear first.
               </p>
-              <p className="text-xs text-steel-500 mt-1">~5-15 slides - best for training and induction</p>
+              <p className="text-xs text-[var(--ink-500)] mt-1">~5-15 slides - best for training and induction</p>
             </div>
           </label>
 
@@ -137,8 +137,8 @@ export default function VideoGeneratePanel({ sop, versions, archivedVersions, au
           <label
             className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
               selectedFormat === 'screen_recording'
-                ? 'border-brand-yellow bg-steel-800'
-                : 'border-steel-700 bg-steel-800 hover:border-steel-600'
+                ? 'border-[var(--ink-900)] bg-white'
+                : 'border-[var(--ink-100)] bg-white hover:border-[var(--ink-300)]'
             }`}
           >
             <input
@@ -152,20 +152,20 @@ export default function VideoGeneratePanel({ sop, versions, archivedVersions, au
             <div
               className={`w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 flex items-center justify-center ${
                 selectedFormat === 'screen_recording'
-                  ? 'border-brand-yellow'
-                  : 'border-steel-600'
+                  ? 'border-[var(--ink-900)]'
+                  : 'border-[var(--ink-300)]'
               }`}
             >
               {selectedFormat === 'screen_recording' && (
-                <div className="w-2.5 h-2.5 rounded-full bg-brand-yellow" />
+                <div className="w-2.5 h-2.5 rounded-full bg-[var(--ink-900)]" />
               )}
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-steel-100">Screen-recording style</p>
-              <p className="text-sm text-steel-400 mt-1">
+              <p className="text-sm font-semibold text-[var(--ink-900)]">Screen-recording style</p>
+              <p className="text-sm text-[var(--ink-500)] mt-1">
                 Scrolling SOP text synced to AI narration, like a screen recording.
               </p>
-              <p className="text-xs text-steel-500 mt-1">Continuous scroll - best for quick reference</p>
+              <p className="text-xs text-[var(--ink-500)] mt-1">Continuous scroll - best for quick reference</p>
             </div>
           </label>
         </fieldset>
@@ -174,7 +174,7 @@ export default function VideoGeneratePanel({ sop, versions, archivedVersions, au
         <button
           onClick={handleGenerate}
           disabled={!selectedFormat || generating || hasActiveGeneration(selectedFormat)}
-          className="mt-6 h-[72px] w-full bg-brand-orange text-steel-900 font-semibold text-lg rounded-xl hover:bg-orange-500 active:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-6 h-[72px] w-full bg-[var(--accent-voice)] text-white font-semibold text-lg rounded-xl hover:bg-orange-500 active:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {generating ? 'Starting...' : 'Generate new version'}
         </button>
@@ -182,8 +182,8 @@ export default function VideoGeneratePanel({ sop, versions, archivedVersions, au
         {error && <p className="text-sm text-red-400 mt-2">{error}</p>}
 
         {/* Version list */}
-        <div className="mt-8 border-t border-steel-700 pt-6">
-          <h2 className="text-sm font-semibold text-steel-100 mb-4">Video versions</h2>
+        <div className="mt-8 border-t border-[var(--ink-100)] pt-6">
+          <h2 className="text-sm font-semibold text-[var(--ink-900)] mb-4">Video versions</h2>
           <VideoVersionList
             versions={versions}
             archivedVersions={archivedVersions}

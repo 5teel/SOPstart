@@ -107,7 +107,7 @@ export function VideoTabPanel({
       {isOutdated && <VideoOutdatedBanner variant="worker" />}
 
       {/* Video player area */}
-      <div className="relative bg-steel-900 rounded-lg border border-steel-700 mb-4 overflow-hidden">
+      <div className="relative bg-[var(--paper)] rounded-lg border border-[var(--ink-100)] mb-4 overflow-hidden">
         <video
           ref={videoRef}
           src={videoUrl}
@@ -121,7 +121,7 @@ export function VideoTabPanel({
 
       {/* Playback speed selector */}
       <div className="flex items-center gap-2 mb-4">
-        <span className="text-sm text-steel-400">Speed:</span>
+        <span className="text-sm text-[var(--ink-500)]">Speed:</span>
         <div className="flex gap-2 flex-wrap">
           {SPEED_OPTIONS.map((rate) => {
             const isActive = playbackRate === rate
@@ -135,8 +135,8 @@ export function VideoTabPanel({
                 className={[
                   'px-3 h-[36px] rounded-lg text-sm font-semibold transition-colors',
                   isActive
-                    ? 'bg-brand-yellow text-steel-900'
-                    : 'bg-steel-700 text-steel-100 hover:bg-steel-600',
+                    ? 'bg-[var(--ink-900)] text-white'
+                    : 'bg-[var(--paper-2)] text-[var(--ink-900)] hover:bg-[var(--paper-2)]',
                 ].join(' ')}
               >
                 {rate}x
@@ -149,11 +149,11 @@ export function VideoTabPanel({
       {/* Chapter list */}
       {chapters.length > 0 && (
         <div>
-          <p className="text-xs font-semibold text-steel-400 uppercase tracking-wide mb-2">
+          <p className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wide mb-2">
             Chapters
           </p>
           <div
-            className="bg-steel-800 rounded-xl overflow-hidden divide-y divide-steel-700"
+            className="bg-white rounded-xl overflow-hidden divide-y divide-[var(--ink-100)]"
             role="list"
           >
             {chapters.map((chapter) => {
@@ -167,17 +167,17 @@ export function VideoTabPanel({
                     aria-label={`${chapter.title} - jump to ${timeLabel}`}
                     aria-current={isActive ? 'true' : undefined}
                     className={[
-                      'flex items-center gap-3 px-4 py-3 w-full min-h-[44px] hover:bg-steel-700 transition-colors text-left',
-                      isActive ? 'border-l-2 border-brand-yellow bg-steel-800' : '',
+                      'flex items-center gap-3 px-4 py-3 w-full min-h-[44px] hover:bg-[var(--paper-2)] transition-colors text-left',
+                      isActive ? 'border-l-2 border-[var(--ink-900)] bg-white' : '',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-steel-400 font-semibold tabular-nums w-[40px] shrink-0">
+                    <span className="text-xs text-[var(--ink-500)] font-semibold tabular-nums w-[40px] shrink-0">
                       {timeLabel}
                     </span>
-                    <span className="text-sm text-steel-100 font-semibold flex-1 leading-snug">
+                    <span className="text-sm text-[var(--ink-900)] font-semibold flex-1 leading-snug">
                       {chapter.title}
                     </span>
-                    <ChevronRight size={16} className="text-steel-400 shrink-0" />
+                    <ChevronRight size={16} className="text-[var(--ink-500)] shrink-0" />
                   </button>
                 </div>
               )

@@ -124,7 +124,7 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
   } else if (version.status === 'ready' && version.published) {
     statusBadge = { cls: 'bg-green-500/20 text-green-400', text: 'Published' }
   } else if (version.status === 'ready') {
-    statusBadge = { cls: 'bg-steel-700 text-steel-400', text: 'Ready' }
+    statusBadge = { cls: 'bg-[var(--paper-2)] text-[var(--ink-500)]', text: 'Ready' }
   } else {
     statusBadge = { cls: 'bg-red-500/20 text-red-400', text: 'Failed' }
   }
@@ -145,9 +145,9 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
       'Permanently delete this version? The video file and all data will be removed and cannot be recovered.',
   }
   const confirmButtonCls: Record<NonNullable<ConfirmAction>, string> = {
-    publish: 'bg-brand-yellow text-steel-900',
-    archive: 'bg-steel-600 text-steel-100',
-    delete: 'bg-red-600 text-steel-100',
+    publish: 'bg-[var(--ink-900)] text-white',
+    archive: 'bg-[var(--ink-300)] text-[var(--ink-900)]',
+    delete: 'bg-red-600 text-[var(--ink-900)]',
   }
   const confirmLabel: Record<NonNullable<ConfirmAction>, string> = {
     publish: 'Yes, publish',
@@ -162,8 +162,8 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
 
   return (
     <div
-      className={`rounded-lg bg-steel-800 border border-steel-700 overflow-hidden ${
-        version.published ? 'border-l-2 border-l-brand-yellow' : ''
+      className={`rounded-lg bg-white border border-[var(--ink-100)] overflow-hidden ${
+        version.published ? 'border-l-2 border-l-[var(--ink-900)]' : ''
       }`}
     >
       {/* Main row */}
@@ -179,13 +179,13 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
             v{version.version_number}
           </button>
         ) : (
-          <span className="text-xs font-semibold text-steel-400 shrink-0">
+          <span className="text-xs font-semibold text-[var(--ink-500)] shrink-0">
             v{version.version_number}
           </span>
         )}
 
         {/* Format badge */}
-        <span className="text-xs px-2 py-0.5 rounded bg-steel-700 text-steel-400 shrink-0">
+        <span className="text-xs px-2 py-0.5 rounded bg-[var(--paper-2)] text-[var(--ink-500)] shrink-0">
           {formatLabel}
         </span>
 
@@ -212,7 +212,7 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
             onKeyDown={handleLabelKeyDown}
             maxLength={60}
             placeholder="E.g. Final cut, Training version..."
-            className="bg-steel-900 border border-steel-600 rounded px-2 py-1 text-sm text-steel-100 w-full max-w-[240px]"
+            className="bg-[var(--paper)] border border-[var(--ink-300)] rounded px-2 py-1 text-sm text-[var(--ink-900)] w-full max-w-[240px]"
           />
         ) : (
           <button
@@ -220,9 +220,9 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
             className="text-sm shrink-0 min-w-0 truncate"
           >
             {version.label ? (
-              <span className="text-steel-100">{version.label}</span>
+              <span className="text-[var(--ink-900)]">{version.label}</span>
             ) : (
-              <span className="text-steel-600 italic">Add label...</span>
+              <span className="text-[var(--ink-300)] italic">Add label...</span>
             )}
           </button>
         )}
@@ -231,7 +231,7 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
         <div className="flex-1" />
 
         {/* Date */}
-        <span className="text-xs text-steel-400 shrink-0">{createdDate}</span>
+        <span className="text-xs text-[var(--ink-500)] shrink-0">{createdDate}</span>
 
         {/* Action icons */}
         <div className="flex items-center gap-1 shrink-0">
@@ -240,7 +240,7 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
               {/* Edit label icon */}
               <button
                 onClick={() => setEditing(true)}
-                className="w-8 h-8 flex items-center justify-center text-steel-400 hover:text-steel-100 transition-colors"
+                className="w-8 h-8 flex items-center justify-center text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors"
                 title="Edit label"
                 disabled={pending}
               >
@@ -251,7 +251,7 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
               {version.status === 'ready' && !version.published && (
                 <button
                   onClick={() => handleOpenConfirm('publish')}
-                  className="w-8 h-8 flex items-center justify-center text-steel-400 hover:text-steel-100 transition-colors"
+                  className="w-8 h-8 flex items-center justify-center text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors"
                   title="Publish this version"
                   disabled={pending}
                 >
@@ -263,7 +263,7 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
               {version.published && (
                 <button
                   onClick={handleUnpublish}
-                  className="w-8 h-8 flex items-center justify-center text-steel-400 hover:text-steel-100 transition-colors"
+                  className="w-8 h-8 flex items-center justify-center text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors"
                   title="Unpublish"
                   disabled={pending}
                 >
@@ -277,8 +277,8 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
                   onClick={() => !isActive && handleOpenConfirm('archive')}
                   className={`w-8 h-8 flex items-center justify-center transition-colors ${
                     isActive
-                      ? 'text-steel-600 opacity-50 cursor-not-allowed'
-                      : 'text-steel-400 hover:text-steel-100'
+                      ? 'text-[var(--ink-300)] opacity-50 cursor-not-allowed'
+                      : 'text-[var(--ink-500)] hover:text-[var(--ink-900)]'
                   }`}
                   title={
                     isActive
@@ -296,7 +296,7 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
               {/* Unarchive (restore) icon */}
               <button
                 onClick={handleUnarchive}
-                className="w-8 h-8 flex items-center justify-center text-steel-400 hover:text-steel-100 transition-colors"
+                className="w-8 h-8 flex items-center justify-center text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors"
                 title="Restore from archive"
                 disabled={pending}
               >
@@ -306,7 +306,7 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
               {/* Permanent delete icon */}
               <button
                 onClick={() => handleOpenConfirm('delete')}
-                className="w-8 h-8 flex items-center justify-center text-steel-400 hover:text-red-400 transition-colors"
+                className="w-8 h-8 flex items-center justify-center text-[var(--ink-500)] hover:text-red-400 transition-colors"
                 title="Permanently delete"
                 disabled={pending}
               >
@@ -320,7 +320,7 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
       {/* Inline video player */}
       {showPlayer && canPlay && (
         <div className="px-3 pb-3">
-          <div className="bg-steel-900 rounded-lg border border-steel-700 overflow-hidden">
+          <div className="bg-[var(--paper)] rounded-lg border border-[var(--ink-100)] overflow-hidden">
             <video
               src={`/api/videos/${version.id}/stream`}
               controls
@@ -342,7 +342,7 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
             onComplete={() => onMutate()}
             onFailed={() => onMutate()}
           />
-          <p className="text-xs text-steel-400 mt-1">
+          <p className="text-xs text-[var(--ink-500)] mt-1">
             Generating your video — this usually takes 2-5 minutes.
           </p>
         </div>
@@ -354,9 +354,9 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
           ref={confirmRef}
           role="alertdialog"
           aria-modal="true"
-          className="mx-3 mb-3 bg-steel-800 border border-steel-700 rounded-lg p-4"
+          className="mx-3 mb-3 bg-white border border-[var(--ink-100)] rounded-lg p-4"
         >
-          <p className="text-sm text-steel-100 mb-4">{confirmCopy[confirmAction]}</p>
+          <p className="text-sm text-[var(--ink-900)] mb-4">{confirmCopy[confirmAction]}</p>
           <div className="flex gap-3">
             <button
               onClick={handleConfirm}
@@ -368,7 +368,7 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
             <button
               onClick={() => setConfirmAction(null)}
               disabled={pending}
-              className="flex-1 h-[44px] bg-steel-700 text-steel-100 font-semibold rounded-lg hover:bg-steel-600 transition-colors disabled:opacity-50"
+              className="flex-1 h-[44px] bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--paper-2)] transition-colors disabled:opacity-50"
             >
               {cancelLabel[confirmAction]}
             </button>
