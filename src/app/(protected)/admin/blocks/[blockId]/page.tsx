@@ -36,11 +36,11 @@ export default async function BlockEditorPage({
   const categories = await listBlockCategories()
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10 bg-steel-900 min-h-screen">
+    <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10 bg-[var(--paper)] min-h-screen">
       <div className="mb-4">
         <Link
           href="/admin/blocks"
-          className="inline-flex items-center gap-1 text-sm text-steel-400 hover:text-steel-100"
+          className="inline-flex items-center gap-1 text-sm text-[var(--ink-500)] hover:text-[var(--ink-900)]"
         >
           <ChevronLeft className="h-4 w-4" />
           Back to library
@@ -48,12 +48,12 @@ export default async function BlockEditorPage({
       </div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-steel-100">{result.block.name}</h1>
+          <h1 className="text-2xl font-bold text-[var(--ink-900)]">{result.block.name}</h1>
           <div className="flex items-center gap-2 mt-1">
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-steel-800 border border-steel-700 text-steel-300">
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-white border border-[var(--ink-100)] text-[var(--ink-500)]">
               {result.block.kind_slug}
             </span>
-            <span className="text-xs text-steel-400">
+            <span className="text-xs text-[var(--ink-500)]">
               v{result.currentVersion.version_number}
             </span>
           </div>

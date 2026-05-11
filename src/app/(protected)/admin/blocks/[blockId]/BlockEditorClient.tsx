@@ -103,7 +103,7 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
       {/* LEFT: edit form */}
       <div className="space-y-5">
         <div>
-          <label htmlFor="name" className="block text-xs uppercase tracking-wider text-steel-400 mb-1">
+          <label htmlFor="name" className="block text-xs uppercase tracking-wider text-[var(--ink-500)] mb-1">
             Name
           </label>
           <input
@@ -111,12 +111,12 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full bg-steel-800 border border-steel-700 rounded-md px-3 py-2 text-steel-100 focus:border-brand-yellow focus:outline-none"
+            className="w-full bg-white border border-[var(--ink-100)] rounded-md px-3 py-2 text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
           />
         </div>
 
         <div>
-          <label className="block text-xs uppercase tracking-wider text-steel-400 mb-2">
+          <label className="block text-xs uppercase tracking-wider text-[var(--ink-500)] mb-2">
             Categories
           </label>
           <div className="flex flex-wrap gap-1.5">
@@ -130,8 +130,8 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
                   className={[
                     'text-xs px-2 py-1 rounded border transition-colors',
                     active
-                      ? 'bg-brand-yellow/20 text-brand-yellow border-brand-yellow/40'
-                      : 'bg-steel-800 text-steel-300 border-steel-700 hover:text-steel-100',
+                      ? 'bg-[var(--ink-900)]/20 text-[var(--ink-900)] border-[var(--ink-900)]/40'
+                      : 'bg-white text-[var(--ink-500)] border-[var(--ink-100)] hover:text-[var(--ink-900)]',
                   ].join(' ')}
                 >
                   {c.display_name}
@@ -142,7 +142,7 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
         </div>
 
         <div>
-          <label htmlFor="freetags" className="block text-xs uppercase tracking-wider text-steel-400 mb-1">
+          <label htmlFor="freetags" className="block text-xs uppercase tracking-wider text-[var(--ink-500)] mb-1">
             Free-text tags (comma-separated)
           </label>
           <input
@@ -157,12 +157,12 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
                   .filter((s) => s.length > 0)
               )
             }
-            className="w-full bg-steel-800 border border-steel-700 rounded-md px-3 py-2 text-steel-100 focus:border-brand-yellow focus:outline-none"
+            className="w-full bg-white border border-[var(--ink-100)] rounded-md px-3 py-2 text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
           />
         </div>
 
         <div>
-          <label htmlFor="content" className="block text-xs uppercase tracking-wider text-steel-400 mb-1">
+          <label htmlFor="content" className="block text-xs uppercase tracking-wider text-[var(--ink-500)] mb-1">
             Content (JSON; matches BlockContentSchema)
           </label>
           <textarea
@@ -170,12 +170,12 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
             rows={12}
             value={contentJson}
             onChange={(e) => setContentJson(e.target.value)}
-            className="w-full bg-steel-950 border border-steel-700 rounded-md px-3 py-2 font-mono text-xs text-steel-100 focus:border-brand-yellow focus:outline-none"
+            className="w-full bg-steel-950 border border-[var(--ink-100)] rounded-md px-3 py-2 font-mono text-xs text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
           />
         </div>
 
         <div>
-          <label htmlFor="changeNote" className="block text-xs uppercase tracking-wider text-steel-400 mb-1">
+          <label htmlFor="changeNote" className="block text-xs uppercase tracking-wider text-[var(--ink-500)] mb-1">
             Change note (optional)
           </label>
           <input
@@ -183,7 +183,7 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
             type="text"
             value={changeNote}
             onChange={(e) => setChangeNote(e.target.value)}
-            className="w-full bg-steel-800 border border-steel-700 rounded-md px-3 py-2 text-steel-100 focus:border-brand-yellow focus:outline-none"
+            className="w-full bg-white border border-[var(--ink-100)] rounded-md px-3 py-2 text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
             placeholder="Why are you saving this version?"
           />
         </div>
@@ -204,7 +204,7 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
             type="button"
             onClick={handleSave}
             disabled={isPending}
-            className="bg-brand-yellow text-steel-900 font-semibold px-4 h-[44px] rounded-lg hover:bg-amber-400 transition-colors text-sm inline-flex items-center gap-2 disabled:opacity-50"
+            className="bg-[var(--ink-900)] text-white font-semibold px-4 h-[44px] rounded-lg hover:bg-[var(--ink-700)] transition-colors text-sm inline-flex items-center gap-2 disabled:opacity-50"
           >
             <Save className="h-4 w-4" />
             Save changes
@@ -213,7 +213,7 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
             type="button"
             onClick={handleArchive}
             disabled={isPending}
-            className="bg-steel-800 border border-steel-700 text-steel-300 hover:text-red-300 hover:bg-red-950/30 font-semibold px-4 h-[44px] rounded-lg transition-colors text-sm disabled:opacity-50"
+            className="bg-white border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-red-300 hover:bg-red-950/30 font-semibold px-4 h-[44px] rounded-lg transition-colors text-sm disabled:opacity-50"
           >
             Archive block
           </button>
@@ -223,7 +223,7 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
           <button
             type="button"
             onClick={() => setShowHistory((s) => !s)}
-            className="inline-flex items-center gap-1 text-xs text-steel-400 hover:text-steel-100"
+            className="inline-flex items-center gap-1 text-xs text-[var(--ink-500)] hover:text-[var(--ink-900)]"
           >
             <HistoryIcon className="h-3.5 w-3.5" />
             {showHistory ? 'Hide' : 'Show'} version history ({allVersions.length})
@@ -233,11 +233,11 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
               {allVersions.map((v) => (
                 <li
                   key={v.id}
-                  className="text-xs bg-steel-800 border border-steel-700 rounded-md p-2 text-steel-300"
+                  className="text-xs bg-white border border-[var(--ink-100)] rounded-md p-2 text-[var(--ink-500)]"
                 >
-                  <span className="font-semibold text-steel-100">v{v.version_number}</span>
+                  <span className="font-semibold text-[var(--ink-900)]">v{v.version_number}</span>
                   {v.change_note && <span className="ml-2">— {v.change_note}</span>}
-                  <span className="ml-2 text-steel-500">
+                  <span className="ml-2 text-[var(--ink-500)]">
                     {new Date(v.created_at).toLocaleString('en-NZ')}
                   </span>
                 </li>
@@ -249,8 +249,8 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
 
       {/* RIGHT: live preview */}
       <div>
-        <div className="text-xs uppercase tracking-wider text-steel-400 mb-2">Preview</div>
-        <div className="bg-steel-800 border border-steel-700 rounded-lg p-4">
+        <div className="text-xs uppercase tracking-wider text-[var(--ink-500)] mb-2">Preview</div>
+        <div className="bg-white border border-[var(--ink-100)] rounded-lg p-4">
           <BlockPreview content={tryParse(contentJson)} />
         </div>
       </div>
@@ -268,7 +268,7 @@ function tryParse(json: string): BlockContent | null {
 
 function BlockPreview({ content }: { content: BlockContent | null }) {
   if (!content) {
-    return <div className="text-sm text-steel-500">Invalid JSON — preview unavailable.</div>
+    return <div className="text-sm text-[var(--ink-500)]">Invalid JSON — preview unavailable.</div>
   }
   // Render a minimal preview keyed off discriminator. The full builder uses the
   // BLOCK_REGISTRY components but those expect Puck-shaped props; for the editor
@@ -278,12 +278,12 @@ function BlockPreview({ content }: { content: BlockContent | null }) {
       return (
         <div>
           <div className="text-[10px] uppercase tracking-wider text-red-300 mb-1">{content.severity}</div>
-          <div className="text-steel-100">{content.text}</div>
+          <div className="text-[var(--ink-900)]">{content.text}</div>
         </div>
       )
     case 'ppe':
       return (
-        <ul className="list-disc list-inside text-steel-100 space-y-1">
+        <ul className="list-disc list-inside text-[var(--ink-900)] space-y-1">
           {content.items.map((it: string, i: number) => (
             <li key={i}>{it}</li>
           ))}
@@ -292,7 +292,7 @@ function BlockPreview({ content }: { content: BlockContent | null }) {
     case 'step':
       return (
         <div>
-          <div className="text-steel-100">{content.text}</div>
+          <div className="text-[var(--ink-900)]">{content.text}</div>
           {content.warning && (
             <div className="mt-2 text-xs text-red-300 italic">Warning: {content.warning}</div>
           )}
@@ -304,9 +304,9 @@ function BlockPreview({ content }: { content: BlockContent | null }) {
     case 'emergency':
       return (
         <div>
-          <div className="text-steel-100">{content.text}</div>
+          <div className="text-[var(--ink-900)]">{content.text}</div>
           {content.contacts && content.contacts.length > 0 && (
-            <ul className="mt-2 text-xs text-steel-300">
+            <ul className="mt-2 text-xs text-[var(--ink-500)]">
               {content.contacts.map((c: string, i: number) => (
                 <li key={i}>{c}</li>
               ))}
@@ -316,7 +316,7 @@ function BlockPreview({ content }: { content: BlockContent | null }) {
       )
     default:
       return (
-        <pre className="text-xs text-steel-300 overflow-auto">
+        <pre className="text-xs text-[var(--ink-500)] overflow-auto">
           {JSON.stringify(content, null, 2)}
         </pre>
       )

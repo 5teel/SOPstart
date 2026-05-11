@@ -58,33 +58,33 @@ export default async function BlocksLibraryPage({
   ])
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10 bg-steel-900 min-h-screen">
+    <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10 bg-[var(--paper)] min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
-        <h1 className="text-2xl font-bold text-steel-100">Block Library</h1>
+        <h1 className="text-2xl font-bold text-[var(--ink-900)]">Block Library</h1>
         <Link
           href="/admin/blocks/new"
-          className="bg-brand-yellow text-steel-900 font-semibold px-4 h-[44px] rounded-lg hover:bg-amber-400 transition-colors text-sm inline-flex items-center gap-2"
+          className="bg-[var(--ink-900)] text-white font-semibold px-4 h-[44px] rounded-lg hover:bg-[var(--ink-700)] transition-colors text-sm inline-flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
           New block
         </Link>
       </div>
-      <p className="text-sm text-steel-400 mb-6">
+      <p className="text-sm text-[var(--ink-500)] mb-6">
         Reusable hazards, PPE, and step blocks across your SOPs.
       </p>
 
       {/* Admin sub-nav */}
-      <nav className="flex gap-4 border-b border-steel-700 mb-6 text-sm">
+      <nav className="flex gap-4 border-b border-[var(--ink-100)] mb-6 text-sm">
         <Link
           href="/admin/sops"
-          className="pb-3 px-1 font-medium text-steel-400 hover:text-steel-100"
+          className="pb-3 px-1 font-medium text-[var(--ink-500)] hover:text-[var(--ink-900)]"
         >
           SOPs
         </Link>
         <Link
           href="/admin/blocks"
-          className="pb-3 px-1 font-medium border-b-2 border-brand-yellow text-brand-yellow"
+          className="pb-3 px-1 font-medium border-b-2 border-[var(--ink-900)] text-[var(--ink-900)]"
         >
           Blocks
         </Link>
@@ -102,8 +102,8 @@ export default async function BlocksLibraryPage({
               className={[
                 'px-3 h-9 rounded-md text-sm font-medium inline-flex items-center transition-colors',
                 isActive
-                  ? 'bg-steel-700 text-steel-100 border border-steel-600'
-                  : 'bg-steel-800 text-steel-400 border border-steel-700 hover:text-steel-100',
+                  ? 'bg-[var(--paper-2)] text-[var(--ink-900)] border border-[var(--ink-300)]'
+                  : 'bg-white text-[var(--ink-500)] border border-[var(--ink-100)] hover:text-[var(--ink-900)]',
               ].join(' ')}
             >
               {tab.label}
@@ -114,7 +114,7 @@ export default async function BlocksLibraryPage({
 
       {/* Kind filter */}
       <div className="mb-6 flex items-center gap-3">
-        <label htmlFor="kind-filter" className="text-xs uppercase tracking-wider text-steel-400">
+        <label htmlFor="kind-filter" className="text-xs uppercase tracking-wider text-[var(--ink-500)]">
           Kind
         </label>
         <div className="flex flex-wrap gap-2">
@@ -128,8 +128,8 @@ export default async function BlocksLibraryPage({
                 className={[
                   'px-2.5 h-7 text-xs rounded-md inline-flex items-center transition-colors',
                   isActive
-                    ? 'bg-brand-yellow/20 text-brand-yellow border border-brand-yellow/40'
-                    : 'bg-steel-800 text-steel-400 border border-steel-700 hover:text-steel-100',
+                    ? 'bg-[var(--ink-900)]/20 text-[var(--ink-900)] border border-[var(--ink-900)]/40'
+                    : 'bg-white text-[var(--ink-500)] border border-[var(--ink-100)] hover:text-[var(--ink-900)]',
                 ].join(' ')}
               >
                 {k.label}

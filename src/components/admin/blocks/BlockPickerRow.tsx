@@ -47,12 +47,12 @@ export function BlockPickerRow({
       className={[
         'w-full text-left px-3 py-2 border rounded-md transition-colors',
         selected
-          ? 'bg-steel-700 border-l-4 border-l-brand-yellow border-steel-600'
-          : 'bg-steel-900 border-steel-700 hover:bg-steel-800',
+          ? 'bg-[var(--paper-2)] border-l-4 border-l-[var(--ink-900)] border-[var(--ink-300)]'
+          : 'bg-[var(--paper)] border-[var(--ink-100)] hover:bg-white',
       ].join(' ')}
     >
       <div className="flex items-center justify-between gap-2 mb-1">
-        <span className="font-semibold text-sm text-steel-100 truncate">
+        <span className="font-semibold text-sm text-[var(--ink-900)] truncate">
           {block.name}
         </span>
         {isGlobal && (
@@ -65,16 +65,16 @@ export function BlockPickerRow({
         {tags.slice(0, 3).map((slug) => (
           <span
             key={slug}
-            className="text-[10px] px-1.5 py-0.5 rounded bg-steel-800 text-steel-300 border border-steel-700"
+            className="text-[10px] px-1.5 py-0.5 rounded bg-white text-[var(--ink-500)] border border-[var(--ink-100)]"
           >
             {categoryDisplayMap?.[slug] ?? slug}
           </span>
         ))}
         {tags.length > 3 && (
-          <span className="text-[10px] text-steel-500">+{tags.length - 3}</span>
+          <span className="text-[10px] text-[var(--ink-500)]">+{tags.length - 3}</span>
         )}
       </div>
-      <div className="flex items-center gap-3 text-[11px] text-steel-500">
+      <div className="flex items-center gap-3 text-[11px] text-[var(--ink-500)]">
         {updatedLabel && <span>Updated {updatedLabel}</span>}
         {usageCount > 0 && <span>used in {usageCount} SOPs</span>}
       </div>

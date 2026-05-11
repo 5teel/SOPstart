@@ -59,7 +59,7 @@ export function SectionListSidebar({
   return (
     <nav
       aria-label="Sections"
-      className="w-64 shrink-0 border-r border-steel-700 overflow-y-auto"
+      className="w-64 shrink-0 border-r border-[var(--ink-100)] overflow-y-auto"
     >
       {error && (
         <div className="px-4 py-2 text-xs text-red-400 border-b border-red-500/30 bg-red-500/10">
@@ -76,11 +76,11 @@ export function SectionListSidebar({
             onDrop={() => handleDrop(idx)}
             data-section-row={s.id}
             className={`flex items-center gap-2 ${
-              s.id === activeSectionId ? 'bg-steel-800' : 'hover:bg-steel-800'
+              s.id === activeSectionId ? 'bg-white' : 'hover:bg-white'
             }`}
           >
             <span
-              className="pl-2 text-steel-500 cursor-grab"
+              className="pl-2 text-[var(--ink-500)] cursor-grab"
               aria-hidden
               data-drag-handle
             >
@@ -91,8 +91,8 @@ export function SectionListSidebar({
               onClick={() => onSelect(s.id)}
               className={`flex-1 text-left py-3 pr-4 text-sm ${
                 s.id === activeSectionId
-                  ? 'text-brand-yellow'
-                  : 'text-steel-300'
+                  ? 'text-[var(--ink-900)]'
+                  : 'text-[var(--ink-500)]'
               }`}
             >
               {s.title}
