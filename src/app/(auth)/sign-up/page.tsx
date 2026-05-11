@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 export default function SignUpPage() {
   return (
     <div>
-      <h2 className="text-xl font-semibold text-steel-100 mb-6 text-center">
+      <h2 className="text-xl font-semibold text-[var(--ink-900)] mb-6 text-center">
         Register your organisation
       </h2>
       <OrgSignUpForm />

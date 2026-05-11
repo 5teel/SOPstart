@@ -37,7 +37,7 @@ export default function JoinByCodeForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
-        <label htmlFor="code" className="block text-sm font-medium text-steel-100 mb-1">
+        <label htmlFor="code" className="block text-sm font-medium text-[var(--ink-900)] mb-1">
           Invite Code
         </label>
         <input
@@ -47,7 +47,7 @@ export default function JoinByCodeForm() {
           autoCapitalize="characters"
           placeholder="e.g. ACME-1234"
           {...register('code')}
-          className="w-full px-4 py-3 rounded-lg bg-steel-800 border border-steel-700 text-steel-100 placeholder-steel-400 focus:outline-none focus:ring-2 focus:ring-brand-yellow focus:border-transparent text-base uppercase tracking-widest"
+          className="w-full px-4 py-3 rounded-lg bg-white border border-[var(--ink-100)] text-[var(--ink-900)] placeholder-[var(--ink-500)] focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)] focus:border-transparent text-base uppercase tracking-widest"
         />
         {errors.code && (
           <p className="mt-1 text-sm text-red-400">{errors.code.message}</p>
@@ -65,21 +65,21 @@ export default function JoinByCodeForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full min-h-[var(--min-tap-target)] bg-brand-yellow hover:bg-brand-orange disabled:opacity-60 disabled:cursor-not-allowed text-steel-900 font-bold rounded-lg text-base transition-colors"
+        className="w-full min-h-[var(--min-tap-target)] bg-[var(--ink-900)] hover:bg-[var(--accent-voice)] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-lg text-base transition-colors"
       >
         {isSubmitting ? 'Joining...' : 'Join Organisation'}
       </button>
 
       <div className="text-center space-y-2 pt-2">
-        <p className="text-steel-400 text-sm">
+        <p className="text-[var(--ink-500)] text-sm">
           Registering a new org instead?{' '}
-          <Link href="/sign-up" className="text-brand-yellow hover:text-brand-orange font-medium">
+          <Link href="/sign-up" className="text-[var(--ink-900)] hover:text-[var(--accent-voice)] font-medium">
             Sign up
           </Link>
         </p>
-        <p className="text-steel-400 text-sm">
+        <p className="text-[var(--ink-500)] text-sm">
           Already have an account?{' '}
-          <Link href="/login" className="text-brand-yellow hover:text-brand-orange font-medium">
+          <Link href="/login" className="text-[var(--ink-900)] hover:text-[var(--accent-voice)] font-medium">
             Log in
           </Link>
         </p>

@@ -9,13 +9,13 @@ export const metadata: Metadata = {
 export default function InviteAcceptPage() {
   return (
     <div>
-      <h2 className="text-xl font-semibold text-steel-100 mb-2 text-center">
+      <h2 className="text-xl font-semibold text-[var(--ink-900)] mb-2 text-center">
         Accept your invitation
       </h2>
-      <p className="text-steel-400 text-sm text-center mb-6">
+      <p className="text-[var(--ink-500)] text-sm text-center mb-6">
         Set a password to complete your account setup
       </p>
-      <Suspense fallback={<div className="text-steel-400 text-center py-4">Loading...</div>}>
+      <Suspense fallback={<div className="text-[var(--ink-500)] text-center py-4">Loading...</div>}>
         <InviteAcceptForm />
       </Suspense>
     </div>

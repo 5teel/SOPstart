@@ -11,10 +11,10 @@ function ThemeCard({ t, active, onSelect }: { t: ThemeConfig; active: boolean; o
       onClick={onSelect}
       className={[
         'relative flex flex-col rounded-xl p-3 text-left transition-all min-h-[140px]',
-        'border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-yellow',
+        'border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ink-900)]',
         active
-          ? 'border-brand-yellow ring-1 ring-brand-yellow/30'
-          : 'border-steel-700 hover:border-steel-600',
+          ? 'border-[var(--ink-900)] ring-1 ring-[var(--ink-900)]/30'
+          : 'border-[var(--ink-100)] hover:border-[var(--ink-300)]',
       ].join(' ')}
       style={{ backgroundColor: t.preview.bg }}
       aria-pressed={active}
@@ -104,7 +104,7 @@ export function ThemePicker() {
       {/* Morphism */}
       <div>
         <div className="flex items-center gap-2 mb-3">
-          <Sparkles size={14} className="text-brand-yellow" />
+          <Sparkles size={14} className="text-[var(--ink-900)]" />
           <h3 className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wider">
             Morphism
           </h3>
