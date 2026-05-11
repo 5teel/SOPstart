@@ -96,19 +96,19 @@ export function SaveToLibraryModal({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 bg-steel-900/80 backdrop-blur-sm flex items-center justify-center px-4"
+      className="fixed inset-0 z-50 bg-[var(--paper)]/80 backdrop-blur-sm flex items-center justify-center px-4"
       onClick={onClose}
     >
       <div
-        className="bg-steel-800 border border-steel-700 rounded-xl w-full max-w-md p-6 shadow-2xl"
+        className="bg-white border border-[var(--ink-100)] rounded-xl w-full max-w-md p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-steel-100">Save to library</h2>
+          <h2 className="text-lg font-bold text-[var(--ink-900)]">Save to library</h2>
           <button
             type="button"
             onClick={onClose}
-            className="text-steel-400 hover:text-steel-100"
+            className="text-[var(--ink-500)] hover:text-[var(--ink-900)]"
             aria-label="Close"
           >
             <X className="h-5 w-5" />
@@ -117,7 +117,7 @@ export function SaveToLibraryModal({
 
         {/* 1. Name */}
         <div className="mb-4">
-          <label htmlFor="save-name" className="block text-xs uppercase tracking-wider text-steel-400 mb-1">
+          <label htmlFor="save-name" className="block text-xs uppercase tracking-wider text-[var(--ink-500)] mb-1">
             Name *
           </label>
           <input
@@ -126,13 +126,13 @@ export function SaveToLibraryModal({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Crush hazard — section forming"
-            className="w-full bg-steel-900 border border-steel-700 rounded-md px-3 py-2 text-steel-100 focus:border-brand-yellow focus:outline-none"
+            className="w-full bg-[var(--paper)] border border-[var(--ink-100)] rounded-md px-3 py-2 text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
           />
         </div>
 
         {/* 2. Categories */}
         <div className="mb-4">
-          <label className="block text-xs uppercase tracking-wider text-steel-400 mb-2">
+          <label className="block text-xs uppercase tracking-wider text-[var(--ink-500)] mb-2">
             Categories
           </label>
           <div className="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto">
@@ -146,8 +146,8 @@ export function SaveToLibraryModal({
                   className={[
                     'text-xs px-2 py-1 rounded border transition-colors',
                     active
-                      ? 'bg-brand-yellow/20 text-brand-yellow border-brand-yellow/40'
-                      : 'bg-steel-900 text-steel-300 border-steel-700 hover:text-steel-100',
+                      ? 'bg-[var(--ink-900)]/20 text-[var(--ink-900)] border-[var(--ink-900)]/40'
+                      : 'bg-[var(--paper)] text-[var(--ink-500)] border-[var(--ink-100)] hover:text-[var(--ink-900)]',
                   ].join(' ')}
                 >
                   {c.display_name}
@@ -159,7 +159,7 @@ export function SaveToLibraryModal({
 
         {/* 3. Free-text tags */}
         <div className="mb-4">
-          <label htmlFor="save-tags" className="block text-xs uppercase tracking-wider text-steel-400 mb-1">
+          <label htmlFor="save-tags" className="block text-xs uppercase tracking-wider text-[var(--ink-500)] mb-1">
             Free-text tags (comma-separated)
           </label>
           <input
@@ -168,13 +168,13 @@ export function SaveToLibraryModal({
             value={freeTextTagsRaw}
             onChange={(e) => setFreeTextTagsRaw(e.target.value)}
             placeholder="e.g. forming, swab, gob"
-            className="w-full bg-steel-900 border border-steel-700 rounded-md px-3 py-2 text-steel-100 focus:border-brand-yellow focus:outline-none"
+            className="w-full bg-[var(--paper)] border border-[var(--ink-100)] rounded-md px-3 py-2 text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
           />
         </div>
 
         {/* 4. Scope */}
         <fieldset className="mb-5">
-          <legend className="block text-xs uppercase tracking-wider text-steel-400 mb-2">
+          <legend className="block text-xs uppercase tracking-wider text-[var(--ink-500)] mb-2">
             Scope
           </legend>
           <label className="flex items-start gap-2 mb-2 cursor-pointer">
@@ -186,9 +186,9 @@ export function SaveToLibraryModal({
               onChange={() => setScope('org')}
               className="mt-0.5 accent-brand-yellow"
             />
-            <span className="text-sm text-steel-100">
+            <span className="text-sm text-[var(--ink-900)]">
               My org only
-              <span className="block text-xs text-steel-400">
+              <span className="block text-xs text-[var(--ink-500)]">
                 Save just to your organisation&apos;s library.
               </span>
             </span>
@@ -202,9 +202,9 @@ export function SaveToLibraryModal({
               onChange={() => setScope('suggest_global')}
               className="mt-0.5 accent-brand-yellow"
             />
-            <span className="text-sm text-steel-100">
+            <span className="text-sm text-[var(--ink-900)]">
               Suggest for global
-              <span className="block text-xs text-steel-400">
+              <span className="block text-xs text-[var(--ink-500)]">
                 Submit for review and possible promotion to the global library.
               </span>
             </span>
@@ -222,7 +222,7 @@ export function SaveToLibraryModal({
             type="button"
             onClick={onClose}
             disabled={isPending}
-            className="bg-steel-900 border border-steel-700 text-steel-300 hover:text-steel-100 font-semibold px-4 h-[40px] rounded-lg transition-colors text-sm disabled:opacity-50"
+            className="bg-[var(--paper)] border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] font-semibold px-4 h-[40px] rounded-lg transition-colors text-sm disabled:opacity-50"
           >
             Cancel
           </button>
@@ -230,7 +230,7 @@ export function SaveToLibraryModal({
             type="button"
             onClick={handleSave}
             disabled={isPending}
-            className="bg-brand-yellow text-steel-900 font-semibold px-4 h-[40px] rounded-lg hover:bg-amber-400 transition-colors text-sm disabled:opacity-50"
+            className="bg-[var(--ink-900)] text-white font-semibold px-4 h-[40px] rounded-lg hover:bg-[var(--ink-700)] transition-colors text-sm disabled:opacity-50"
           >
             Save to library
           </button>

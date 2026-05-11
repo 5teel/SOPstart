@@ -77,41 +77,41 @@ export function SuggestionReviewRow({ suggestion, onDecision }: SuggestionReview
   const submittedRel = relativeDate(suggestion.created_at)
 
   return (
-    <div className="bg-steel-800 border border-steel-700 rounded-lg p-4 lg:p-6">
+    <div className="bg-white border border-[var(--ink-100)] rounded-lg p-4 lg:p-6">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* LEFT — snapshot preview (5/12) */}
         <div className="lg:col-span-5">
-          <div className="text-[11px] uppercase tracking-wider text-steel-400 mb-2">
+          <div className="text-[11px] uppercase tracking-wider text-[var(--ink-500)] mb-2">
             Snapshot preview
           </div>
-          <div className="bg-steel-900 border border-steel-700 rounded-md p-3">
+          <div className="bg-[var(--paper)] border border-[var(--ink-100)] rounded-md p-3">
             {renderSnapshot(suggestion.snapshot.kind_slug, suggestion.snapshot.content)}
           </div>
         </div>
 
         {/* MIDDLE — metadata (3/12) */}
         <div className="lg:col-span-3 text-sm">
-          <div className="text-[11px] uppercase tracking-wider text-steel-400 mb-2">
+          <div className="text-[11px] uppercase tracking-wider text-[var(--ink-500)] mb-2">
             Submission
           </div>
           <dl className="space-y-2">
             <div>
-              <dt className="text-[11px] text-steel-500">Block name</dt>
-              <dd className="text-steel-100 font-medium break-words">
+              <dt className="text-[11px] text-[var(--ink-500)]">Block name</dt>
+              <dd className="text-[var(--ink-900)] font-medium break-words">
                 {suggestion.snapshot.name}
               </dd>
             </div>
             <div>
-              <dt className="text-[11px] text-steel-500">Kind</dt>
-              <dd className="text-steel-200">
-                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-steel-900 border border-steel-700 text-steel-300">
+              <dt className="text-[11px] text-[var(--ink-500)]">Kind</dt>
+              <dd className="text-[var(--ink-700)]">
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-[var(--paper)] border border-[var(--ink-100)] text-[var(--ink-500)]">
                   {suggestion.snapshot.kind_slug}
                 </span>
               </dd>
             </div>
             <div>
-              <dt className="text-[11px] text-steel-500">Categories</dt>
-              <dd className="text-steel-300 text-xs">
+              <dt className="text-[11px] text-[var(--ink-500)]">Categories</dt>
+              <dd className="text-[var(--ink-500)] text-xs">
                 {suggestion.snapshot.category_tags?.length
                   ? suggestion.snapshot.category_tags.join(', ')
                   : '—'}
@@ -119,39 +119,39 @@ export function SuggestionReviewRow({ suggestion, onDecision }: SuggestionReview
             </div>
             {suggestion.snapshot.free_text_tags?.length ? (
               <div>
-                <dt className="text-[11px] text-steel-500">Free-text tags</dt>
-                <dd className="text-steel-300 text-xs">
+                <dt className="text-[11px] text-[var(--ink-500)]">Free-text tags</dt>
+                <dd className="text-[var(--ink-500)] text-xs">
                   {suggestion.snapshot.free_text_tags.join(', ')}
                 </dd>
               </div>
             ) : null}
             <div>
-              <dt className="text-[11px] text-steel-500">Suggesting org</dt>
-              <dd className="text-steel-300 font-mono text-[11px]">
+              <dt className="text-[11px] text-[var(--ink-500)]">Suggesting org</dt>
+              <dd className="text-[var(--ink-500)] font-mono text-[11px]">
                 {truncId(suggestion.suggested_by_org_id)}
               </dd>
             </div>
             <div>
-              <dt className="text-[11px] text-steel-500">Suggested by</dt>
-              <dd className="text-steel-300 font-mono text-[11px]">
+              <dt className="text-[11px] text-[var(--ink-500)]">Suggested by</dt>
+              <dd className="text-[var(--ink-500)] font-mono text-[11px]">
                 {truncId(suggestion.suggested_by_user)}
               </dd>
             </div>
             <div>
-              <dt className="text-[11px] text-steel-500">Submitted</dt>
-              <dd className="text-steel-300 text-xs">{submittedRel}</dd>
+              <dt className="text-[11px] text-[var(--ink-500)]">Submitted</dt>
+              <dd className="text-[var(--ink-500)] text-xs">{submittedRel}</dd>
             </div>
           </dl>
         </div>
 
         {/* RIGHT — decision form (4/12) */}
         <div className="lg:col-span-4">
-          <div className="text-[11px] uppercase tracking-wider text-steel-400 mb-2">
+          <div className="text-[11px] uppercase tracking-wider text-[var(--ink-500)] mb-2">
             Decision
           </div>
           <label
             htmlFor={`note-${suggestion.id}`}
-            className="block text-[11px] text-steel-500 mb-1"
+            className="block text-[11px] text-[var(--ink-500)] mb-1"
           >
             Decision note (optional)
           </label>
@@ -162,7 +162,7 @@ export function SuggestionReviewRow({ suggestion, onDecision }: SuggestionReview
             placeholder="e.g. 'Cleaned up phrasing — promoted as canonical hazard.'"
             rows={3}
             disabled={isPending}
-            className="w-full bg-steel-900 border border-steel-700 rounded-md px-3 py-2 text-sm text-steel-100 placeholder:text-steel-500 focus:outline-none focus:border-brand-yellow disabled:opacity-60"
+            className="w-full bg-[var(--paper)] border border-[var(--ink-100)] rounded-md px-3 py-2 text-sm text-[var(--ink-900)] placeholder-[var(--ink-500)] focus:outline-none focus:border-[var(--ink-900)] disabled:opacity-60"
           />
 
           {error && (
@@ -187,7 +187,7 @@ export function SuggestionReviewRow({ suggestion, onDecision }: SuggestionReview
               type="button"
               onClick={handlePromote}
               disabled={isPending}
-              className="inline-flex items-center gap-1.5 px-3 h-9 rounded-md bg-brand-yellow text-steel-900 font-semibold text-sm hover:bg-amber-400 transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3 h-9 rounded-md bg-[var(--ink-900)] text-white font-semibold text-sm hover:bg-[var(--ink-700)] transition-colors disabled:opacity-50"
             >
               <Check className="h-4 w-4" />
               Promote to global
@@ -196,7 +196,7 @@ export function SuggestionReviewRow({ suggestion, onDecision }: SuggestionReview
               type="button"
               onClick={handleReject}
               disabled={isPending}
-              className="inline-flex items-center gap-1.5 px-3 h-9 rounded-md bg-steel-900 border border-steel-600 text-steel-200 text-sm hover:bg-red-950/40 hover:border-red-700/40 hover:text-red-300 transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3 h-9 rounded-md bg-[var(--paper)] border border-[var(--ink-300)] text-[var(--ink-700)] text-sm hover:bg-red-950/40 hover:border-red-700/40 hover:text-red-300 transition-colors disabled:opacity-50"
             >
               <X className="h-4 w-4" />
               Reject
@@ -275,9 +275,9 @@ function renderSnapshot(kindSlug: string, content: BlockContent) {
           <div className="text-sm font-bold uppercase tracking-widest text-red-400 mb-2">
             Emergency
           </div>
-          <p className="text-base text-steel-100 leading-relaxed">{content.text}</p>
+          <p className="text-base text-[var(--ink-900)] leading-relaxed">{content.text}</p>
           {content.contacts && content.contacts.length > 0 && (
-            <ul className="mt-2 text-sm text-steel-300 list-disc pl-5">
+            <ul className="mt-2 text-sm text-[var(--ink-500)] list-disc pl-5">
               {content.contacts.map((c, i) => (
                 <li key={i}>{c}</li>
               ))}
@@ -287,26 +287,26 @@ function renderSnapshot(kindSlug: string, content: BlockContent) {
       )
     case 'measurement':
       return (
-        <div className="bg-steel-900 border border-steel-700 rounded-xl p-4">
-          <div className="text-xs uppercase tracking-wider text-steel-400 mb-1">
+        <div className="bg-[var(--paper)] border border-[var(--ink-100)] rounded-xl p-4">
+          <div className="text-xs uppercase tracking-wider text-[var(--ink-500)] mb-1">
             Measurement
           </div>
-          <div className="text-base text-steel-100">
+          <div className="text-base text-[var(--ink-900)]">
             {content.label}{' '}
-            <span className="text-steel-400">({content.unit})</span>
+            <span className="text-[var(--ink-500)]">({content.unit})</span>
           </div>
           {content.hint && (
-            <div className="mt-2 text-xs text-steel-400">{content.hint}</div>
+            <div className="mt-2 text-xs text-[var(--ink-500)]">{content.hint}</div>
           )}
         </div>
       )
     default:
       return (
-        <div className="text-xs text-steel-400">
-          <div className="text-[11px] uppercase tracking-wider text-steel-500 mb-1">
+        <div className="text-xs text-[var(--ink-500)]">
+          <div className="text-[11px] uppercase tracking-wider text-[var(--ink-500)] mb-1">
             Content (kind: {content.kind})
           </div>
-          <pre className="bg-steel-900 border border-steel-700 rounded p-2 overflow-x-auto whitespace-pre-wrap break-words text-[11px] text-steel-300">
+          <pre className="bg-[var(--paper)] border border-[var(--ink-100)] rounded p-2 overflow-x-auto whitespace-pre-wrap break-words text-[11px] text-[var(--ink-500)]">
             {JSON.stringify(content, null, 2)}
           </pre>
         </div>

@@ -33,7 +33,7 @@ const Puck = dynamic(
   () => import('@puckeditor/core').then((m) => m.Puck),
   {
     ssr: false,
-    loading: () => <div className="p-8 text-steel-400">Loading editor…</div>,
+    loading: () => <div className="p-8 text-[var(--ink-500)]">Loading editor…</div>,
   }
 )
 
@@ -245,13 +245,13 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
   }, [activeSection, initialSop.flow_graph])
 
   return (
-    <div className="flex flex-col h-screen bg-steel-900 text-steel-100">
+    <div className="flex flex-col h-screen bg-[var(--paper)] text-[var(--ink-900)]">
       {/* Top chrome — SAVED pill + SEND TO REVIEW (Plan 04 wires real save state) */}
-      <header className="flex items-center justify-between px-4 py-3 border-b border-steel-700">
+      <header className="flex items-center justify-between px-4 py-3 border-b border-[var(--ink-100)]">
         <div className="flex items-center gap-3">
           <Link
             href="/admin/sops"
-            className="text-sm text-steel-400 hover:text-brand-yellow transition-colors"
+            className="text-sm text-[var(--ink-500)] hover:text-[var(--ink-700)] transition-colors"
           >
             ← Library
           </Link>
@@ -277,12 +277,12 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
               {overwriteToast}
             </span>
           )}
-          <span className="font-mono text-[11px] uppercase tracking-wider text-steel-400 border border-steel-600 rounded px-2 py-0.5">
+          <span className="font-mono text-[11px] uppercase tracking-wider text-[var(--ink-500)] border border-[var(--ink-300)] rounded px-2 py-0.5">
             {savePillLabel}
           </span>
           <Link
             href={`/admin/sops/${sopId}/review`}
-            className="px-3 py-1.5 bg-brand-yellow text-steel-900 text-sm font-bold rounded"
+            className="px-3 py-1.5 bg-[var(--ink-900)] text-white text-sm font-bold rounded"
           >
             SEND TO REVIEW
           </Link>
@@ -309,7 +309,7 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
               viewports={BUILDER_VIEWPORTS}
             />
           ) : (
-            <div className="p-8 text-steel-400">
+            <div className="p-8 text-[var(--ink-500)]">
               No sections yet — add one from the sidebar.
             </div>
           )}
