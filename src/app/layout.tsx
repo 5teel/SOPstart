@@ -30,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
+      <body data-theme="paper">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
           <SiteThemeProvider>
             {children}

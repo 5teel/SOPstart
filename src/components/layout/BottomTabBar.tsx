@@ -75,7 +75,7 @@ export function BottomTabBar() {
   return (
     <nav
       aria-label="Main navigation"
-      className="bottom-tab-bar flex-shrink-0 bg-steel-800 border-t border-steel-700 pb-[env(safe-area-inset-bottom)]"
+      className="bottom-tab-bar flex-shrink-0 bg-[var(--paper)] border-t border-[var(--ink-100)] pb-[env(safe-area-inset-bottom)]"
     >
       <div className="flex">
         {tabs.map(({ label, href, Icon }) => {
@@ -89,8 +89,8 @@ export function BottomTabBar() {
                 'min-h-[var(--min-tap-target)] text-xs font-medium',
                 'transition-colors duration-150',
                 isActive
-                  ? 'text-brand-yellow'
-                  : 'text-steel-400 hover:text-steel-100',
+                  ? 'text-[var(--ink-900)]'
+                  : 'text-[var(--ink-500)] hover:text-[var(--ink-900)]',
               ].join(' ')}
               aria-current={isActive ? 'page' : undefined}
             >
