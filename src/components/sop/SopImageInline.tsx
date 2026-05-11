@@ -37,7 +37,7 @@ export function SopImageInline({ src, alt }: SopImageInlineProps) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="relative mt-3 rounded-xl overflow-hidden bg-steel-700 cursor-zoom-in max-h-[240px] border border-steel-600 w-full text-left"
+        className="relative mt-3 rounded-xl overflow-hidden bg-[var(--paper-2)] cursor-zoom-in max-h-[240px] border border-[var(--ink-300)] w-full text-left"
         aria-label={`Tap to zoom: ${alt}`}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -46,7 +46,7 @@ export function SopImageInline({ src, alt }: SopImageInlineProps) {
           alt={alt}
           className="w-full object-contain max-h-[240px]"
         />
-        <div className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-1 bg-steel-900/80 rounded-lg text-xs font-medium text-steel-100">
+        <div className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-1 bg-[var(--paper)]/80 rounded-lg text-xs font-medium text-[var(--ink-900)]">
           <ZoomIn size={12} />
           Tap to zoom
         </div>

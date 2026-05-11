@@ -11,7 +11,7 @@ export type PhotoBlockProps = z.infer<typeof PhotoBlockPropsSchema>
 export function PhotoBlock({ src, alt, caption }: PhotoBlockProps) {
   if (!src) {
     return (
-      <div className="bg-steel-800 border border-dashed border-steel-600 rounded-xl p-8 text-center text-steel-400 text-sm mb-4">
+      <div className="bg-white border border-dashed border-[var(--ink-300)] rounded-xl p-8 text-center text-[var(--ink-500)] text-sm mb-4">
         Photo missing
       </div>
     )
@@ -20,7 +20,7 @@ export function PhotoBlock({ src, alt, caption }: PhotoBlockProps) {
     <figure className="mb-4">
       <SopImageInline src={src} alt={alt || 'SOP photo'} />
       {caption && (
-        <figcaption className="text-xs text-steel-400 mt-2 text-center">
+        <figcaption className="text-xs text-[var(--ink-500)] mt-2 text-center">
           {caption}
         </figcaption>
       )}

@@ -63,16 +63,16 @@ export function WalkthroughList({
         <button
           type="button"
           onClick={() => setSafetyExpanded((v) => !v)}
-          className="flex items-center gap-3 px-4 py-3 bg-brand-orange/10 border border-brand-orange/30 rounded-xl w-full text-left cursor-pointer"
+          className="flex items-center gap-3 px-4 py-3 bg-[var(--accent-voice)]/10 border border-[var(--accent-voice)]/30 rounded-xl w-full text-left cursor-pointer"
         >
-          <ShieldAlert size={18} className="text-brand-orange flex-shrink-0" />
+          <ShieldAlert size={18} className="text-[var(--accent-voice)] flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <span className="text-sm font-semibold text-brand-orange">Safety summary</span>
-            <span className="text-xs text-steel-400 ml-1">Tap to review</span>
+            <span className="text-sm font-semibold text-[var(--accent-voice)]">Safety summary</span>
+            <span className="text-xs text-[var(--ink-500)] ml-1">Tap to review</span>
           </div>
           <ChevronDown
             size={16}
-            className={`text-steel-400 flex-shrink-0 transition-transform duration-200 ${safetyExpanded ? 'rotate-180' : ''}`}
+            className={`text-[var(--ink-500)] flex-shrink-0 transition-transform duration-200 ${safetyExpanded ? 'rotate-180' : ''}`}
           />
         </button>
 
@@ -88,7 +88,7 @@ export function WalkthroughList({
                 </div>
                 <ul className="list-none space-y-2">
                   {parseListItems(hazardsSection.content).map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-steel-100">
+                    <li key={i} className="flex items-start gap-2 text-sm text-[var(--ink-900)]">
                       <span className="text-red-400">•</span>
                       <span>{item}</span>
                     </li>
@@ -119,7 +119,7 @@ export function WalkthroughList({
             <button
               type="button"
               onClick={() => setSafetyExpanded(false)}
-              className="text-sm text-steel-400 hover:text-steel-100 py-2 text-center"
+              className="text-sm text-[var(--ink-500)] hover:text-[var(--ink-900)] py-2 text-center"
             >
               Close
             </button>

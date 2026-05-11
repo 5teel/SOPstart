@@ -38,14 +38,14 @@ function HazardContent({ section, isEmergency }: { section: SectionWithChildren;
       {lines.length > 0 ? (
         <ul className="flex flex-col gap-2">
           {lines.map((line, i) => (
-            <li key={i} className="flex items-start gap-3 text-base text-steel-100 leading-relaxed">
+            <li key={i} className="flex items-start gap-3 text-base text-[var(--ink-900)] leading-relaxed">
               <span className="text-red-400 mt-1.5 flex-shrink-0">•</span>
               <span>{line}</span>
             </li>
           ))}
         </ul>
       ) : section.content ? (
-        <p className="text-base text-steel-100 leading-relaxed mt-3">{section.content}</p>
+        <p className="text-base text-[var(--ink-900)] leading-relaxed mt-3">{section.content}</p>
       ) : null}
     </div>
   )
@@ -74,7 +74,7 @@ function PpeContent({ section }: { section: SectionWithChildren }) {
           ))}
         </div>
       ) : section.content ? (
-        <p className="text-base text-steel-100 leading-relaxed mt-3">{section.content}</p>
+        <p className="text-base text-[var(--ink-900)] leading-relaxed mt-3">{section.content}</p>
       ) : null}
     </div>
   )
@@ -90,15 +90,15 @@ function StepsContent({ section }: { section: SectionWithChildren }) {
         return (
           <div
             key={step.id}
-            className="flex items-start gap-4 p-4 bg-steel-800 rounded-xl border border-steel-700"
+            className="flex items-start gap-4 p-4 bg-white rounded-xl border border-[var(--ink-100)]"
           >
-            <span className="text-[13px] font-bold text-steel-400 w-6 flex-shrink-0 pt-0.5 tabular-nums">
+            <span className="text-[13px] font-bold text-[var(--ink-500)] w-6 flex-shrink-0 pt-0.5 tabular-nums">
               {step.step_number}
             </span>
             <div className="flex-1 min-w-0">
               {containsMarkdownTable(step.text)
                 ? <SopTable markdown={step.text} />
-                : <p className="text-base text-steel-100 leading-relaxed">{step.text}</p>
+                : <p className="text-base text-[var(--ink-900)] leading-relaxed">{step.text}</p>
               }
               {images.map((img) => (
                 <SopImageInline key={img.id} src={img.storage_path} alt={img.alt_text ?? 'Step image'} />
@@ -118,11 +118,11 @@ function DefaultContent({ section }: { section: SectionWithChildren }) {
   const hasTable = containsMarkdownTable(section.content)
 
   return (
-    <div className="bg-steel-800 border border-steel-700 rounded-xl p-5 mb-4">
+    <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5 mb-4">
       {section.content && (
         hasTable
           ? <SopTable markdown={section.content} />
-          : <p className="text-base text-steel-100 leading-relaxed whitespace-pre-wrap">{section.content}</p>
+          : <p className="text-base text-[var(--ink-900)] leading-relaxed whitespace-pre-wrap">{section.content}</p>
       )}
     </div>
   )
@@ -159,8 +159,8 @@ function LegacyRenderer({ section }: SectionContentProps) {
       return (
         <>
           {section.content && (
-            <div className="bg-steel-800 border border-steel-700 rounded-xl p-5 mb-4">
-              <p className="text-base text-steel-100 leading-relaxed whitespace-pre-wrap">{section.content}</p>
+            <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5 mb-4">
+              <p className="text-base text-[var(--ink-900)] leading-relaxed whitespace-pre-wrap">{section.content}</p>
             </div>
           )}
           <StepsContent section={section} />
