@@ -42,11 +42,11 @@ const ICON_MAP: Record<string, React.ElementType> = {
 // Tailwind color classes keyed by section_kinds.color_family. Static strings
 // so Tailwind's JIT picks them up at build time.
 const COLOR_CLASSES: Record<string, { active: string; border: string }> = {
-  'red-400':      { active: 'text-red-400',      border: 'border-red-400' },
-  'blue-400':     { active: 'text-blue-400',     border: 'border-blue-400' },
-  'brand-yellow': { active: 'text-brand-yellow', border: 'border-brand-yellow' },
-  'green-400':    { active: 'text-green-400',    border: 'border-green-400' },
-  'steel-100':    { active: 'text-steel-100',    border: 'border-steel-100' },
+  'red-400':      { active: 'text-red-400',              border: 'border-red-400' },
+  'blue-400':     { active: 'text-blue-400',             border: 'border-blue-400' },
+  'brand-yellow': { active: 'text-[var(--ink-900)]',     border: 'border-[var(--ink-900)]' },
+  'green-400':    { active: 'text-green-400',            border: 'border-green-400' },
+  'steel-100':    { active: 'text-[var(--ink-900)]',     border: 'border-[var(--ink-900)]' },
 }
 
 function getTabLabel(section: SopSection, displayName: string | null): string {
@@ -73,7 +73,7 @@ export function SopSectionTabs({ sections, activeId, onTabChange, hasVideo, vide
   })
 
   return (
-    <div className="flex overflow-x-auto scrollbar-hide bg-steel-900 border-b border-steel-700 px-4 gap-0">
+    <div className="flex overflow-x-auto scrollbar-hide bg-[var(--paper)] border-b border-[var(--ink-100)] px-4 gap-0">
       {sorted.map((section) => {
         const isActive = section.id === activeId
         const styling = resolveTabStyling(section)
@@ -88,7 +88,7 @@ export function SopSectionTabs({ sections, activeId, onTabChange, hasVideo, vide
             className={[
               'flex-shrink-0 flex flex-col items-center justify-end px-4 h-[52px] gap-1 relative whitespace-nowrap',
               'text-[13px] font-semibold transition-colors',
-              isActive ? `${colors.active} border-b-2 ${colors.border}` : 'text-steel-400 hover:text-steel-100',
+              isActive ? `${colors.active} border-b-2 ${colors.border}` : 'text-[var(--ink-500)] hover:text-[var(--ink-900)]',
             ].join(' ')}
           >
             <span className="flex items-center gap-1">
@@ -106,8 +106,8 @@ export function SopSectionTabs({ sections, activeId, onTabChange, hasVideo, vide
             'flex-shrink-0 flex flex-col items-center justify-end px-4 h-[52px] gap-1 relative whitespace-nowrap',
             'text-[13px] font-semibold transition-colors',
             isVideoActive
-              ? 'text-brand-yellow border-b-2 border-brand-yellow'
-              : 'text-steel-400 hover:text-steel-100',
+              ? 'text-[var(--ink-900)] border-b-2 border-[var(--ink-900)]'
+              : 'text-[var(--ink-500)] hover:text-[var(--ink-900)]',
           ].join(' ')}
         >
           <span className="flex items-center gap-1">
@@ -115,7 +115,7 @@ export function SopSectionTabs({ sections, activeId, onTabChange, hasVideo, vide
             Video
             {videoOutdated && (
               <span
-                className="w-2 h-2 rounded-full bg-brand-orange"
+                className="w-2 h-2 rounded-full bg-[var(--accent-voice)]"
                 aria-label="Video is outdated"
               />
             )}

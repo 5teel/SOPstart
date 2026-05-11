@@ -95,7 +95,7 @@ export function BlockOverflowMenu({
         }}
         aria-label="Block actions"
         data-testid="block-overflow-trigger"
-        className="p-1.5 rounded-md bg-steel-900/80 border border-steel-700 text-steel-300 hover:text-steel-100 hover:bg-steel-800 backdrop-blur-sm shadow"
+        className="p-1.5 rounded-md bg-[var(--paper)]/80 border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] hover:bg-white backdrop-blur-sm shadow"
       >
         <MoreVertical className="h-4 w-4" />
       </button>
@@ -104,14 +104,14 @@ export function BlockOverflowMenu({
         <div
           role="menu"
           data-testid="block-overflow-menu"
-          className="absolute top-full right-0 mt-1 w-44 bg-steel-800 border border-steel-700 rounded-md shadow-xl z-30 py-1"
+          className="absolute top-full right-0 mt-1 w-44 bg-white border border-[var(--ink-100)] rounded-md shadow-xl z-30 py-1"
         >
           <button
             type="button"
             role="menuitem"
             onClick={handleSaveClick}
             disabled={loadingCategories}
-            className="w-full text-left px-3 py-1.5 text-sm text-steel-100 hover:bg-steel-700 disabled:opacity-60"
+            className="w-full text-left px-3 py-1.5 text-sm text-[var(--ink-900)] hover:bg-[var(--paper-2)] disabled:opacity-60"
           >
             {loadingCategories ? 'Loading…' : 'Save to library'}
           </button>
@@ -120,7 +120,7 @@ export function BlockOverflowMenu({
               type="button"
               role="menuitem"
               onClick={handleDuplicateClick}
-              className="w-full text-left px-3 py-1.5 text-sm text-steel-100 hover:bg-steel-700"
+              className="w-full text-left px-3 py-1.5 text-sm text-[var(--ink-900)] hover:bg-[var(--paper-2)]"
             >
               Duplicate
             </button>

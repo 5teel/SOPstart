@@ -37,24 +37,24 @@ export default function MissingSectionWarningBanner({
   warningText += ' detected in this SOP.'
 
   return (
-    <div className="bg-brand-orange/20 border border-brand-orange/50 rounded-lg px-4 py-3 mb-4">
+    <div className="bg-[var(--accent-voice)]/20 border border-[var(--accent-voice)]/50 rounded-lg px-4 py-3 mb-4">
       <div className="flex items-center gap-2">
-        <AlertTriangle size={16} className="text-brand-orange shrink-0" />
-        <span className="text-sm font-semibold text-brand-orange">
+        <AlertTriangle size={16} className="text-[var(--accent-voice)] shrink-0" />
+        <span className="text-sm font-semibold text-[var(--accent-voice)]">
           {warningText}
         </span>
       </div>
 
       <label
         htmlFor="missing-section-ack"
-        className="flex items-center gap-2 mt-2 text-xs text-steel-400 cursor-pointer"
+        className="flex items-center gap-2 mt-2 text-xs text-[var(--ink-500)] cursor-pointer"
       >
         <input
           id="missing-section-ack"
           type="checkbox"
           checked={acknowledged}
           onChange={(e) => onAcknowledgeChange(e.target.checked)}
-          className="w-4 h-4 accent-brand-yellow"
+          className="w-4 h-4 accent-[var(--ink-900)]"
           aria-required="true"
         />
         I understand — publish anyway

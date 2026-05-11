@@ -163,19 +163,19 @@ export function BlockPicker({
       role="dialog"
       aria-modal="true"
       data-testid="block-picker"
-      className="fixed inset-0 z-50 bg-steel-900/80 backdrop-blur-sm flex items-center justify-center px-4"
+      className="fixed inset-0 z-50 bg-[var(--paper)]/80 backdrop-blur-sm flex items-center justify-center px-4"
       onClick={onClose}
     >
       <div
-        className="bg-steel-800 border border-steel-700 rounded-xl w-full max-w-5xl max-h-[85vh] flex flex-col shadow-2xl"
+        className="bg-white border border-[var(--ink-100)] rounded-xl w-full max-w-5xl max-h-[85vh] flex flex-col shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-steel-700">
-          <h2 className="text-lg font-bold text-steel-100">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--ink-100)]">
+          <h2 className="text-lg font-bold text-[var(--ink-900)]">
             Pick a {kindSlug} from your library
             {grouped.totalCount > 0 && (
-              <span className="text-steel-400 font-normal text-sm ml-2">
+              <span className="text-[var(--ink-500)] font-normal text-sm ml-2">
                 ({grouped.totalCount} match{grouped.totalCount === 1 ? '' : 'es'})
               </span>
             )}
@@ -183,7 +183,7 @@ export function BlockPicker({
           <button
             type="button"
             onClick={onClose}
-            className="text-steel-400 hover:text-steel-100"
+            className="text-[var(--ink-500)] hover:text-[var(--ink-900)]"
             aria-label="Close picker"
           >
             <X className="h-5 w-5" />
@@ -192,15 +192,15 @@ export function BlockPicker({
 
         {/* Filter chips */}
         {presentCategories.length > 0 && (
-          <div className="px-6 py-3 border-b border-steel-700 flex flex-wrap gap-1.5">
+          <div className="px-6 py-3 border-b border-[var(--ink-100)] flex flex-wrap gap-1.5">
             <button
               type="button"
               onClick={() => setCategoryFilter(null)}
               className={[
                 'text-xs px-2 py-1 rounded border',
                 categoryFilter === null
-                  ? 'bg-brand-yellow/20 text-brand-yellow border-brand-yellow/40'
-                  : 'bg-steel-900 text-steel-300 border-steel-700 hover:text-steel-100',
+                  ? 'bg-[var(--ink-900)]/20 text-[var(--ink-900)] border-[var(--ink-900)]/40'
+                  : 'bg-[var(--paper)] text-[var(--ink-500)] border-[var(--ink-100)] hover:text-[var(--ink-900)]',
               ].join(' ')}
             >
               All ({blocks.length})
@@ -215,8 +215,8 @@ export function BlockPicker({
                 className={[
                   'text-xs px-2 py-1 rounded border',
                   categoryFilter === c.slug
-                    ? 'bg-brand-yellow/20 text-brand-yellow border-brand-yellow/40'
-                    : 'bg-steel-900 text-steel-300 border-steel-700 hover:text-steel-100',
+                    ? 'bg-[var(--ink-900)]/20 text-[var(--ink-900)] border-[var(--ink-900)]/40'
+                    : 'bg-[var(--paper)] text-[var(--ink-500)] border-[var(--ink-100)] hover:text-[var(--ink-900)]',
                 ].join(' ')}
               >
                 {c.display} ({c.count})
@@ -228,9 +228,9 @@ export function BlockPicker({
         {/* Two-pane content */}
         <div className="flex-1 flex min-h-0">
           {/* LEFT — list */}
-          <div className="w-3/5 overflow-y-auto p-4 border-r border-steel-700 flex flex-col gap-4">
+          <div className="w-3/5 overflow-y-auto p-4 border-r border-[var(--ink-100)] flex flex-col gap-4">
             {loading && (
-              <div className="text-sm text-steel-400">Loading library…</div>
+              <div className="text-sm text-[var(--ink-500)]">Loading library…</div>
             )}
             {error && (
               <div className="text-sm text-red-400 bg-red-950/30 border border-red-700/40 rounded p-3">
@@ -242,7 +242,7 @@ export function BlockPicker({
               <>
                 {grouped.exact.length > 0 && (
                   <section className="flex flex-col gap-2">
-                    <h3 className="text-xs uppercase tracking-wider text-steel-400">
+                    <h3 className="text-xs uppercase tracking-wider text-[var(--ink-500)]">
                       Best matches
                       {sopCategoryLabel ? ` for ${sopCategoryLabel}` : ''}
                     </h3>
@@ -261,7 +261,7 @@ export function BlockPicker({
 
                 {grouped.related.length > 0 && (
                   <section className="flex flex-col gap-2">
-                    <h3 className="text-xs uppercase tracking-wider text-steel-400">
+                    <h3 className="text-xs uppercase tracking-wider text-[var(--ink-500)]">
                       Related
                     </h3>
                     {grouped.related.map((s) => (
@@ -289,7 +289,7 @@ export function BlockPicker({
                 {grouped.allOfKind.length > 0 && (
                   <section className="flex flex-col gap-2">
                     {(grouped.exact.length > 0 || grouped.related.length > 0) && (
-                      <h3 className="text-xs uppercase tracking-wider text-steel-400 mt-2">
+                      <h3 className="text-xs uppercase tracking-wider text-[var(--ink-500)] mt-2">
                         Other {kindSlug} blocks
                       </h3>
                     )}
@@ -313,7 +313,7 @@ export function BlockPicker({
                 )}
 
                 {grouped.totalCount === 0 && (
-                  <div className="text-sm text-steel-400 p-4 border border-dashed border-steel-700 rounded">
+                  <div className="text-sm text-[var(--ink-500)] p-4 border border-dashed border-[var(--ink-100)] rounded">
                     No {kindSlug} blocks in your library yet. Save one from the builder using the ⋯ menu.
                   </div>
                 )}
@@ -331,9 +331,9 @@ export function BlockPicker({
         </div>
 
         {/* Footer — pin/follow toggle + actions */}
-        <div className="px-6 py-4 border-t border-steel-700 flex items-center justify-between gap-4">
+        <div className="px-6 py-4 border-t border-[var(--ink-100)] flex items-center justify-between gap-4">
           <fieldset className="flex flex-col gap-1">
-            <legend className="text-[11px] uppercase tracking-wider text-steel-400 mb-1">
+            <legend className="text-[11px] uppercase tracking-wider text-[var(--ink-500)] mb-1">
               When the source block changes
             </legend>
             <div className="flex items-center gap-4">
@@ -346,9 +346,9 @@ export function BlockPicker({
                   onChange={() => setPinMode('pinned')}
                   className="mt-0.5 accent-brand-yellow"
                 />
-                <span className="text-sm text-steel-200">
+                <span className="text-sm text-[var(--ink-700)]">
                   Pinned
-                  <span className="block text-[11px] text-steel-500">
+                  <span className="block text-[11px] text-[var(--ink-500)]">
                     Lock to the current version forever.
                   </span>
                 </span>
@@ -362,9 +362,9 @@ export function BlockPicker({
                   onChange={() => setPinMode('follow_latest')}
                   className="mt-0.5 accent-brand-yellow"
                 />
-                <span className="text-sm text-steel-200">
+                <span className="text-sm text-[var(--ink-700)]">
                   Follow latest
-                  <span className="block text-[11px] text-steel-500">
+                  <span className="block text-[11px] text-[var(--ink-500)]">
                     Show an &lsquo;update available&rsquo; badge when source changes.
                   </span>
                 </span>
@@ -377,7 +377,7 @@ export function BlockPicker({
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="bg-steel-900 border border-steel-700 text-steel-300 hover:text-steel-100 font-semibold px-4 h-[40px] rounded-lg text-sm disabled:opacity-50"
+              className="bg-[var(--paper)] border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] font-semibold px-4 h-[40px] rounded-lg text-sm disabled:opacity-50"
             >
               Cancel
             </button>
@@ -385,7 +385,7 @@ export function BlockPicker({
               type="button"
               onClick={handleAdd}
               disabled={!selectedBlockEntry || !selectedContent || submitting}
-              className="bg-brand-yellow text-steel-900 font-semibold px-4 h-[40px] rounded-lg hover:bg-amber-400 text-sm disabled:opacity-50"
+              className="bg-[var(--ink-900)] text-white font-semibold px-4 h-[40px] rounded-lg hover:bg-[var(--ink-700)] text-sm disabled:opacity-50"
               data-testid="block-picker-add"
             >
               {submitting ? 'Adding…' : 'Add to section'}

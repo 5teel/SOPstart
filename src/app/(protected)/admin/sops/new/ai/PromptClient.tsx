@@ -61,7 +61,7 @@ export function PromptClient({ categories }: Props) {
   if (sopId) {
     return (
       <div>
-        <h2 className="text-lg font-semibold text-steel-100 mb-4">Drafting your SOP</h2>
+        <h2 className="text-lg font-semibold text-[var(--ink-900)] mb-4">Drafting your SOP</h2>
         <ParseJobStatus
           sopId={sopId}
           initialIsVideo={false}
@@ -74,7 +74,7 @@ export function PromptClient({ categories }: Props) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div>
-        <label htmlFor="promptText" className="block text-sm font-medium text-steel-200 mb-1">
+        <label htmlFor="promptText" className="block text-sm font-medium text-[var(--ink-700)] mb-1">
           Your prompt
         </label>
         <textarea
@@ -82,7 +82,7 @@ export function PromptClient({ categories }: Props) {
           {...register('promptText')}
           rows={5}
           placeholder="e.g. PPE check for forklift operators at our Hamilton site"
-          className="w-full bg-steel-800 border border-steel-700 rounded-lg p-3 text-steel-100 placeholder-steel-500 focus:border-brand-yellow focus:outline-none"
+          className="w-full bg-white border border-[var(--ink-100)] rounded-lg p-3 text-[var(--ink-900)] placeholder-[var(--ink-500)] focus:border-[var(--ink-900)] focus:outline-none"
         />
         {errors.promptText && (
           <p className="mt-1 text-sm text-red-400">{errors.promptText.message}</p>
@@ -90,13 +90,13 @@ export function PromptClient({ categories }: Props) {
       </div>
 
       <div>
-        <label htmlFor="categoryTag" className="block text-sm font-medium text-steel-200 mb-1">
+        <label htmlFor="categoryTag" className="block text-sm font-medium text-[var(--ink-700)] mb-1">
           Category (optional)
         </label>
         <select
           id="categoryTag"
           {...register('categoryTag')}
-          className="w-full bg-steel-800 border border-steel-700 rounded-lg p-2 text-steel-100"
+          className="w-full bg-white border border-[var(--ink-100)] rounded-lg p-2 text-[var(--ink-900)]"
         >
           <option value="">— None —</option>
           {categories.map((c) => (
@@ -108,8 +108,8 @@ export function PromptClient({ categories }: Props) {
       </div>
 
       <div>
-        <label htmlFor="detailLevel" className="block text-sm font-medium text-steel-200 mb-1">
-          Detail level <span className="text-steel-400">(1 = minimal, 5 = maximum) — currently {detailLevel}</span>
+        <label htmlFor="detailLevel" className="block text-sm font-medium text-[var(--ink-700)] mb-1">
+          Detail level <span className="text-[var(--ink-500)]">(1 = minimal, 5 = maximum) — currently {detailLevel}</span>
         </label>
         <input
           id="detailLevel"
@@ -118,7 +118,7 @@ export function PromptClient({ categories }: Props) {
           max={5}
           step={1}
           {...register('detailLevel', { valueAsNumber: true })}
-          className="w-full accent-brand-yellow"
+          className="w-full accent-[var(--ink-900)]"
         />
       </div>
 
@@ -131,7 +131,7 @@ export function PromptClient({ categories }: Props) {
       <button
         type="submit"
         disabled={submitting}
-        className="w-full bg-brand-yellow text-steel-900 font-semibold rounded-lg py-3 hover:bg-yellow-300 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+        className="w-full bg-[var(--ink-900)] text-white font-semibold rounded-lg py-3 hover:bg-[var(--ink-700)] disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
       >
         {submitting ? 'Generating…' : 'Generate draft'}
       </button>

@@ -78,10 +78,10 @@ export function StepPhotoZone({
       <button
         type="button"
         onClick={handleCameraClick}
-        className="w-[72px] h-[72px] rounded-lg border-2 border-dashed border-steel-600 flex items-center justify-center hover:border-steel-400 transition-colors"
+        className="w-[72px] h-[72px] rounded-lg border-2 border-dashed border-[var(--ink-300)] flex items-center justify-center hover:border-[var(--ink-500)] transition-colors"
         aria-label="Add another photo"
       >
-        <Plus size={22} className="text-steel-400" />
+        <Plus size={22} className="text-[var(--ink-500)]" />
       </button>
     </div>
   )
@@ -90,19 +90,19 @@ export function StepPhotoZone({
   if (isRequired && !hasPhotos) {
     return (
       <div
-        className="mt-3 rounded-xl bg-brand-orange/10 border border-brand-orange/40 p-3"
+        className="mt-3 rounded-xl bg-[var(--accent-voice)]/10 border border-[var(--accent-voice)]/40 p-3"
         onClick={(e) => e.stopPropagation()}
       >
         {cameraInput}
         <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Camera size={18} className="text-brand-orange flex-shrink-0" />
-            <span className="text-sm font-semibold text-brand-orange">Photo required</span>
+            <Camera size={18} className="text-[var(--accent-voice)] flex-shrink-0" />
+            <span className="text-sm font-semibold text-[var(--accent-voice)]">Photo required</span>
           </div>
           <button
             type="button"
             onClick={handleCameraClick}
-            className="flex items-center gap-1.5 h-[72px] px-4 bg-brand-orange text-white text-sm font-bold rounded-lg hover:bg-orange-600 transition-colors flex-shrink-0"
+            className="flex items-center gap-1.5 h-[72px] px-4 bg-[var(--accent-voice)] text-white text-sm font-bold rounded-lg hover:bg-orange-600 transition-colors flex-shrink-0"
           >
             <Camera size={16} />
             Take photo
@@ -118,8 +118,8 @@ export function StepPhotoZone({
       <div className="mt-3" onClick={(e) => e.stopPropagation()}>
         {cameraInput}
         <div className="flex items-center gap-1.5">
-          <Camera size={14} className="text-brand-orange" />
-          <span className="text-[13px] font-bold tabular-nums text-brand-orange">
+          <Camera size={14} className="text-[var(--accent-voice)]" />
+          <span className="text-[13px] font-bold tabular-nums text-[var(--accent-voice)]">
             Photo required · {photos.length} attached
           </span>
         </div>
@@ -136,7 +136,7 @@ export function StepPhotoZone({
         <button
           type="button"
           onClick={handleCameraClick}
-          className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-dashed border-steel-600 text-steel-400 text-sm hover:border-steel-400 hover:text-steel-300 transition-colors"
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-dashed border-[var(--ink-300)] text-[var(--ink-500)] text-sm hover:border-[var(--ink-500)] hover:text-[var(--ink-500)] transition-colors"
         >
           <Camera size={14} />
           Add photo (optional)
@@ -150,8 +150,8 @@ export function StepPhotoZone({
     <div className="mt-3" onClick={(e) => e.stopPropagation()}>
       {cameraInput}
       <div className="flex items-center gap-1.5">
-        <Camera size={14} className="text-steel-400" />
-        <span className="text-[13px] font-bold tabular-nums text-steel-300">
+        <Camera size={14} className="text-[var(--ink-500)]" />
+        <span className="text-[13px] font-bold tabular-nums text-[var(--ink-500)]">
           Photos · {photos.length} attached
         </span>
       </div>

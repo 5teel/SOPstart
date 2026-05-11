@@ -20,18 +20,18 @@ export type BlockPickerPreviewProps = {
 export function BlockPickerPreview({ block, content }: BlockPickerPreviewProps) {
   if (!block || !content) {
     return (
-      <div className="bg-steel-800 border border-steel-700 rounded-md p-6 h-full flex items-center justify-center">
-        <p className="text-sm text-steel-500">Select a block to preview</p>
+      <div className="bg-white border border-[var(--ink-100)] rounded-md p-6 h-full flex items-center justify-center">
+        <p className="text-sm text-[var(--ink-500)]">Select a block to preview</p>
       </div>
     )
   }
 
   return (
-    <div className="bg-steel-800 border border-steel-700 rounded-md p-4 h-full overflow-y-auto">
-      <div className="text-xs uppercase tracking-wider text-steel-400 mb-2">
+    <div className="bg-white border border-[var(--ink-100)] rounded-md p-4 h-full overflow-y-auto">
+      <div className="text-xs uppercase tracking-wider text-[var(--ink-500)] mb-2">
         Preview
       </div>
-      <div className="text-[11px] text-steel-500 mb-3">
+      <div className="text-[11px] text-[var(--ink-500)] mb-3">
         Workers see this exact content.
       </div>
       <div>
@@ -75,9 +75,9 @@ function renderForKind(kindSlug: string, content: BlockContent) {
           <div className="text-sm font-bold uppercase tracking-widest text-red-400 mb-2">
             Emergency
           </div>
-          <p className="text-base text-steel-100 leading-relaxed">{content.text}</p>
+          <p className="text-base text-[var(--ink-900)] leading-relaxed">{content.text}</p>
           {content.contacts && content.contacts.length > 0 && (
-            <ul className="mt-2 text-sm text-steel-300 list-disc pl-5">
+            <ul className="mt-2 text-sm text-[var(--ink-500)] list-disc pl-5">
               {content.contacts.map((c, i) => (
                 <li key={i}>{c}</li>
               ))}
@@ -87,21 +87,21 @@ function renderForKind(kindSlug: string, content: BlockContent) {
       )
     case 'measurement':
       return (
-        <div className="bg-steel-900 border border-steel-700 rounded-xl p-4">
-          <div className="text-xs uppercase tracking-wider text-steel-400 mb-1">
+        <div className="bg-[var(--paper)] border border-[var(--ink-100)] rounded-xl p-4">
+          <div className="text-xs uppercase tracking-wider text-[var(--ink-500)] mb-1">
             Measurement
           </div>
-          <div className="text-base text-steel-100">
-            {content.label} <span className="text-steel-400">({content.unit})</span>
+          <div className="text-base text-[var(--ink-900)]">
+            {content.label} <span className="text-[var(--ink-500)]">({content.unit})</span>
           </div>
           {content.hint && (
-            <div className="mt-2 text-xs text-steel-400">{content.hint}</div>
+            <div className="mt-2 text-xs text-[var(--ink-500)]">{content.hint}</div>
           )}
         </div>
       )
     default:
       return (
-        <div className="text-sm text-steel-400">
+        <div className="text-sm text-[var(--ink-500)]">
           Preview not available for kind &lsquo;{content.kind}&rsquo;.
         </div>
       )

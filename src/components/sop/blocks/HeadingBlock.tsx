@@ -8,7 +8,7 @@ export type HeadingBlockProps = z.infer<typeof HeadingBlockPropsSchema>
 
 export function HeadingBlock({ text, level }: HeadingBlockProps) {
   if (level === 'h3') {
-    return <h3 className="text-xl font-semibold text-steel-100 mb-3">{text}</h3>
+    return <h3 className="text-xl font-semibold text-[var(--ink-900)] mb-3">{text}</h3>
   }
-  return <h2 className="text-2xl font-bold text-steel-100 mb-4">{text}</h2>
+  return <h2 className="text-2xl font-bold text-[var(--ink-900)] mb-4">{text}</h2>
 }

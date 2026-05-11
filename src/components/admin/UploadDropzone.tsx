@@ -78,7 +78,7 @@ function FileIcon({ mimeType }: { mimeType: string }) {
     return <ScanLine className="w-5 h-5 text-orange-400 shrink-0" />
   }
   if (mimeType === 'text/plain') {
-    return <FileType2 className="w-5 h-5 text-steel-400 shrink-0" />
+    return <FileType2 className="w-5 h-5 text-[var(--ink-500)] shrink-0" />
   }
   return <ImageIcon className="w-5 h-5 text-green-400 shrink-0" />
 }
@@ -461,15 +461,15 @@ export function UploadDropzone() {
   return (
     <div>
       {/* Mode tab bar */}
-      <div role="tablist" className="flex gap-6 mb-4 border-b border-steel-700">
+      <div role="tablist" className="flex gap-6 mb-4 border-b border-[var(--ink-100)]">
         <button
           role="tab"
           aria-selected={mode === 'upload'}
           onClick={() => setMode('upload')}
           className={`pb-3 text-sm font-semibold cursor-pointer ${
             mode === 'upload'
-              ? 'text-brand-yellow border-b-2 border-brand-yellow -mb-px'
-              : 'text-steel-400'
+              ? 'text-[var(--ink-900)] border-b-2 border-[var(--ink-900)] -mb-px'
+              : 'text-[var(--ink-500)]'
           }`}
         >
           Upload file
@@ -480,8 +480,8 @@ export function UploadDropzone() {
           onClick={() => setMode('youtube')}
           className={`pb-3 text-sm font-semibold cursor-pointer ${
             mode === 'youtube'
-              ? 'text-brand-yellow border-b-2 border-brand-yellow -mb-px'
-              : 'text-steel-400'
+              ? 'text-[var(--ink-900)] border-b-2 border-[var(--ink-900)] -mb-px'
+              : 'text-[var(--ink-500)]'
           }`}
         >
           YouTube URL
@@ -492,8 +492,8 @@ export function UploadDropzone() {
           onClick={() => setMode('record')}
           className={`pb-3 text-sm font-semibold cursor-pointer ${
             mode === 'record'
-              ? 'text-brand-yellow border-b-2 border-brand-yellow -mb-px'
-              : 'text-steel-400'
+              ? 'text-[var(--ink-900)] border-b-2 border-[var(--ink-900)] -mb-px'
+              : 'text-[var(--ink-500)]'
           }`}
         >
           Record video
@@ -508,18 +508,18 @@ export function UploadDropzone() {
             placeholder="Paste YouTube URL..."
             value={youtubeUrl}
             onChange={(e) => { setYoutubeUrl(e.target.value); setYoutubeError(null) }}
-            className="w-full bg-steel-800 border border-steel-700 rounded-lg px-4 h-[52px] text-sm text-steel-100 placeholder:text-steel-400 focus:border-brand-yellow focus:outline-none"
+            className="w-full bg-white border border-[var(--ink-100)] rounded-lg px-4 h-[52px] text-sm text-[var(--ink-900)] placeholder:text-[var(--ink-500)] focus:border-[var(--ink-900)] focus:outline-none"
           />
           {youtubeError && (
             <p role="alert" className="text-xs text-red-400">{youtubeError}</p>
           )}
 
-          <label className="flex items-start gap-3 text-sm text-steel-400 py-3 cursor-pointer">
+          <label className="flex items-start gap-3 text-sm text-[var(--ink-500)] py-3 cursor-pointer">
             <input
               type="checkbox"
               checked={termsChecked}
               onChange={(e) => setTermsChecked(e.target.checked)}
-              className="w-5 h-5 accent-brand-yellow mt-0.5"
+              className="w-5 h-5 accent-[var(--ink-900)] mt-0.5"
               required
               aria-required="true"
             />
@@ -529,7 +529,7 @@ export function UploadDropzone() {
           <button
             onClick={handleYoutubeSubmit}
             disabled={!youtubeUrl || !termsChecked || youtubeFetching}
-            className="h-[72px] w-full rounded-lg bg-brand-yellow text-steel-900 text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-400 transition-colors"
+            className="h-[72px] w-full rounded-lg bg-[var(--ink-900)] text-white text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[var(--ink-700)] transition-colors"
           >
             {youtubeFetching ? 'Fetching captions...' : 'Transcribe from YouTube'}
           </button>
@@ -546,12 +546,12 @@ export function UploadDropzone() {
               <button
                 type="button"
                 onClick={() => setRecorderOpen(true)}
-                className="h-[72px] w-full bg-steel-800 border border-steel-700 border-dashed rounded-xl text-steel-100 font-semibold text-base flex items-center justify-center gap-3 hover:bg-steel-700 transition-colors"
+                className="h-[72px] w-full bg-white border border-[var(--ink-100)] border-dashed rounded-xl text-[var(--ink-900)] font-semibold text-base flex items-center justify-center gap-3 hover:bg-[var(--paper-2)] transition-colors"
               >
                 <Video className="w-6 h-6" />
                 Start recording
               </button>
-              <p className="text-xs text-steel-400 text-center mt-2">
+              <p className="text-xs text-[var(--ink-500)] text-center mt-2">
                 Records up to 15 minutes. Audio only is uploaded — video stays on your device.
               </p>
             </>
@@ -559,20 +559,20 @@ export function UploadDropzone() {
             /* iOS / unsupported device fallback (D-04, D-05) */
             <div
               role="status"
-              className="flex flex-col items-center text-center p-6 bg-brand-orange/20 border border-brand-orange/50 rounded-xl"
+              className="flex flex-col items-center text-center p-6 bg-[var(--accent-voice)]/20 border border-[var(--accent-voice)]/50 rounded-xl"
             >
-              <Smartphone className="w-8 h-8 text-brand-orange mx-auto mb-3" />
-              <p className="text-sm font-semibold text-brand-orange text-center">
+              <Smartphone className="w-8 h-8 text-[var(--accent-voice)] mx-auto mb-3" />
+              <p className="text-sm font-semibold text-[var(--accent-voice)] text-center">
                 Recording isn&apos;t supported on this device yet.
               </p>
-              <p className="text-sm text-steel-400 text-center mt-1 leading-relaxed">
+              <p className="text-sm text-[var(--ink-500)] text-center mt-1 leading-relaxed">
                 Use your camera app to record the procedure, then upload the file here.
               </p>
               <button
                 type="button"
                 aria-label="Choose a video file from your device"
                 onClick={() => videoInputRef.current?.click()}
-                className="h-[72px] w-full bg-brand-yellow text-steel-900 font-semibold text-lg rounded-lg hover:bg-amber-400 transition-colors mt-4"
+                className="h-[72px] w-full bg-[var(--ink-900)] text-white font-semibold text-lg rounded-lg hover:bg-[var(--ink-700)] transition-colors mt-4"
               >
                 Choose video file
               </button>
@@ -592,23 +592,23 @@ export function UploadDropzone() {
               hasFiles ? 'min-h-[120px]' : 'min-h-[200px]',
               'flex flex-col items-center justify-center gap-4 p-8 text-center',
               dragOver
-                ? 'border-brand-yellow bg-brand-yellow/10'
-                : 'border-steel-700 bg-steel-800',
+                ? 'border-[var(--ink-900)] bg-[var(--ink-900)]/10'
+                : 'border-[var(--ink-100)] bg-white',
             ].join(' ')}
           >
             {dragOver ? (
               <>
-                <Upload className="w-8 h-8 text-brand-yellow" />
-                <p className="text-lg font-semibold text-brand-yellow">Drop it -- we&apos;ll handle the rest</p>
+                <Upload className="w-8 h-8 text-[var(--ink-900)]" />
+                <p className="text-lg font-semibold text-[var(--ink-900)]">Drop it -- we&apos;ll handle the rest</p>
               </>
             ) : hasFiles ? (
-              <p className="text-sm text-steel-400 font-medium">+ Add more files</p>
+              <p className="text-sm text-[var(--ink-500)] font-medium">+ Add more files</p>
             ) : (
               <>
-                <Upload className="w-10 h-10 text-steel-400" />
+                <Upload className="w-10 h-10 text-[var(--ink-500)]" />
                 <div>
-                  <p className="text-base font-semibold text-steel-100">Drop your SOPs here</p>
-                  <p className="text-sm text-steel-400 mt-1">Word (.docx), PDF, Excel (.xlsx), PowerPoint (.pptx), plain text (.txt), photos, or MP4/MOV video up to 2GB</p>
+                  <p className="text-base font-semibold text-[var(--ink-900)]">Drop your SOPs here</p>
+                  <p className="text-sm text-[var(--ink-500)] mt-1">Word (.docx), PDF, Excel (.xlsx), PowerPoint (.pptx), plain text (.txt), photos, or MP4/MOV video up to 2GB</p>
                 </div>
               </>
             )}
@@ -618,7 +618,7 @@ export function UploadDropzone() {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="bg-brand-yellow text-steel-900 font-semibold px-6 h-[72px] rounded-lg hover:bg-amber-400 active:bg-amber-500 transition-colors"
+                className="bg-[var(--ink-900)] text-white font-semibold px-6 h-[72px] rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
               >
                 Browse files
               </button>
@@ -627,7 +627,7 @@ export function UploadDropzone() {
               <button
                 type="button"
                 onClick={() => cameraInputRef.current?.click()}
-                className="bg-steel-700 text-steel-100 font-semibold px-6 h-[72px] rounded-lg hover:bg-steel-600 active:bg-steel-500 transition-colors"
+                className="bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold px-6 h-[72px] rounded-lg hover:bg-[var(--ink-300)] active:bg-[var(--ink-500)] transition-colors"
               >
                 Take a photo
               </button>
@@ -636,7 +636,7 @@ export function UploadDropzone() {
               <button
                 type="button"
                 onClick={() => setScannerOpen(true)}
-                className="bg-steel-700 text-steel-100 font-semibold px-6 h-[72px] rounded-lg hover:bg-steel-600 active:bg-steel-500 transition-colors flex items-center gap-2"
+                className="bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold px-6 h-[72px] rounded-lg hover:bg-[var(--ink-300)] active:bg-[var(--ink-500)] transition-colors flex items-center gap-2"
               >
                 <ScanLine className="w-5 h-5" />
                 Scan document
@@ -646,7 +646,7 @@ export function UploadDropzone() {
               <button
                 type="button"
                 onClick={() => videoInputRef.current?.click()}
-                className="bg-steel-700 text-steel-100 font-semibold px-6 h-[72px] rounded-lg hover:bg-steel-600 active:bg-steel-500 transition-colors flex items-center gap-2"
+                className="bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold px-6 h-[72px] rounded-lg hover:bg-[var(--ink-300)] active:bg-[var(--ink-500)] transition-colors flex items-center gap-2"
               >
                 <Video size={20} />
                 Browse video
@@ -656,7 +656,7 @@ export function UploadDropzone() {
               <button
                 type="button"
                 onClick={() => setPipelineModalOpen(true)}
-                className="bg-steel-700 text-steel-100 font-semibold px-6 h-[72px] rounded-lg hover:bg-steel-600 active:bg-steel-500 transition-colors flex items-center gap-2"
+                className="bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold px-6 h-[72px] rounded-lg hover:bg-[var(--ink-300)] active:bg-[var(--ink-500)] transition-colors flex items-center gap-2"
               >
                 <Film size={20} />
                 Generate video SOP
@@ -695,13 +695,13 @@ export function UploadDropzone() {
               {queue.map(item => (
                 <li
                   key={item.id}
-                  className="flex items-center gap-3 p-3 bg-steel-800 rounded-lg min-h-[72px] border border-steel-700"
+                  className="flex items-center gap-3 p-3 bg-white rounded-lg min-h-[72px] border border-[var(--ink-100)]"
                 >
                   <FileIcon mimeType={item.file.type} />
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-steel-100 truncate">{item.file.name}</p>
-                    <p className="text-xs text-steel-400">{formatFileSize(item.file.size)}</p>
+                    <p className="text-sm font-medium text-[var(--ink-900)] truncate">{item.file.name}</p>
+                    <p className="text-xs text-[var(--ink-500)]">{formatFileSize(item.file.size)}</p>
                     {item.error && (
                       <p className="text-xs text-red-400 mt-0.5">{item.error}</p>
                     )}
@@ -712,7 +712,7 @@ export function UploadDropzone() {
                     <button
                       type="button"
                       onClick={() => removeFile(item.id)}
-                      className="shrink-0 text-steel-400 hover:text-red-400 transition-colors p-1"
+                      className="shrink-0 text-[var(--ink-500)] hover:text-red-400 transition-colors p-1"
                       aria-label="Remove file"
                     >
                       <X className="w-4 h-4" />
@@ -740,7 +740,7 @@ export function UploadDropzone() {
               type="button"
               onClick={handleUpload}
               disabled={uploading || hasErrors}
-              className="w-full h-[72px] bg-brand-yellow text-steel-900 font-bold text-lg rounded-lg hover:bg-amber-400 active:bg-amber-500 transition-colors mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-[72px] bg-[var(--ink-900)] text-white font-bold text-lg rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {uploading
                 ? 'Uploading...'
@@ -761,7 +761,7 @@ export function UploadDropzone() {
                   <button
                     type="button"
                     onClick={() => router.push(`/admin/sops/${uploadedSopIds[0]}/review`)}
-                    className="flex-1 min-h-[44px] px-4 bg-brand-yellow text-steel-900 font-semibold rounded-lg hover:bg-amber-400 active:bg-amber-500 transition-colors"
+                    className="flex-1 min-h-[44px] px-4 bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
                   >
                     Review parsed SOP
                   </button>
@@ -769,7 +769,7 @@ export function UploadDropzone() {
                   <button
                     type="button"
                     onClick={() => router.push('/admin/sops')}
-                    className="flex-1 min-h-[44px] px-4 bg-brand-yellow text-steel-900 font-semibold rounded-lg hover:bg-amber-400 active:bg-amber-500 transition-colors"
+                    className="flex-1 min-h-[44px] px-4 bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
                   >
                     Go to SOP library
                   </button>
@@ -781,7 +781,7 @@ export function UploadDropzone() {
                     setQueue([])
                     setUploadedSopIds([])
                   }}
-                  className="min-h-[44px] px-4 bg-steel-700 text-steel-100 rounded-lg hover:bg-steel-600 transition-colors"
+                  className="min-h-[44px] px-4 bg-[var(--paper-2)] text-[var(--ink-900)] rounded-lg hover:bg-[var(--ink-300)] transition-colors"
                 >
                   Upload more
                 </button>
@@ -792,9 +792,9 @@ export function UploadDropzone() {
           {/* Scan document placeholder modal */}
           {scannerOpen && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-              <div className="bg-steel-900 rounded-2xl p-8 max-w-lg text-center">
-                <p className="text-steel-100">Scanner coming soon</p>
-                <button onClick={() => setScannerOpen(false)} className="mt-4 px-4 py-2 bg-steel-700 text-steel-100 rounded-lg">Close</button>
+              <div className="bg-[var(--paper)] rounded-2xl p-8 max-w-lg text-center">
+                <p className="text-[var(--ink-900)]">Scanner coming soon</p>
+                <button onClick={() => setScannerOpen(false)} className="mt-4 px-4 py-2 bg-[var(--paper-2)] text-[var(--ink-900)] rounded-lg">Close</button>
               </div>
             </div>
           )}
@@ -803,7 +803,7 @@ export function UploadDropzone() {
 
       {/* Toast notification */}
       {toast && (
-        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 bg-steel-800 border border-steel-700 rounded-lg shadow-xl text-sm text-steel-100 max-w-sm">
+        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 bg-white border border-[var(--ink-100)] rounded-lg shadow-xl text-sm text-[var(--ink-900)] max-w-sm">
           {toast}
         </div>
       )}

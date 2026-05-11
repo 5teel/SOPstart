@@ -25,8 +25,8 @@ export default function VideoVersionList({
   if (versions.length === 0 && archivedVersions.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-sm font-semibold text-steel-100">No videos generated yet</p>
-        <p className="text-sm text-steel-400 mt-2">
+        <p className="text-sm font-semibold text-[var(--ink-900)]">No videos generated yet</p>
+        <p className="text-sm text-[var(--ink-500)] mt-2">
           Choose a format above and generate your first video version.
         </p>
       </div>
@@ -45,7 +45,7 @@ export default function VideoVersionList({
         <div className="pt-4">
           <button
             onClick={() => setShowArchived(!showArchived)}
-            className="flex items-center gap-1 text-sm text-steel-400 hover:text-steel-100 transition-colors"
+            className="flex items-center gap-1 text-sm text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors"
           >
             <ChevronDown
               size={16}

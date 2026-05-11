@@ -171,23 +171,23 @@ export default function ReviewClient({
       {fromPipeline && pipelineId && (
         <Link
           href={`/admin/sops/pipeline/${pipelineId}`}
-          className="inline-block text-brand-yellow text-sm font-medium hover:text-amber-400 px-4 py-2"
+          className="inline-block text-[var(--ink-900)] text-sm font-medium hover:text-[var(--ink-700)] px-4 py-2"
         >
           ← Back to pipeline
         </Link>
       )}
 
       {/* Sticky header bar — compact */}
-      <header className="sticky top-0 z-10 bg-steel-900 border-b border-steel-700 px-4 flex items-center h-[56px] gap-3">
+      <header className="sticky top-0 z-10 bg-[var(--paper)] border-b border-[var(--ink-100)] px-4 flex items-center h-[56px] gap-3">
         {/* Back + title */}
         <Link
           href="/admin/sops"
-          className="text-steel-400 hover:text-steel-100 flex-shrink-0"
+          className="text-[var(--ink-500)] hover:text-[var(--ink-900)] flex-shrink-0"
           aria-label="Back to SOP library"
         >
           <ArrowLeft size={20} />
         </Link>
-        <span className="text-sm font-semibold text-steel-100 truncate flex-1 min-w-0">
+        <span className="text-sm font-semibold text-[var(--ink-900)] truncate flex-1 min-w-0">
           {sop.title ?? sop.source_file_name}
         </span>
         <StatusBadge status={sop.status as SopStatus} />
@@ -195,7 +195,7 @@ export default function ReviewClient({
         {/* Confirmation inline bar */}
         {confirmAction ? (
           <div className="flex items-center gap-2 ml-2">
-            <span className="text-xs text-steel-400 hidden sm:inline">
+            <span className="text-xs text-[var(--ink-500)] hidden sm:inline">
               {confirmAction === 'reparse' && (isVideoSop ? 'Re-transcribe?' : 'Re-parse?')}
               {confirmAction === 'restructure' && 'Re-structure?'}
               {confirmAction === 'delete' && 'Delete?'}
@@ -211,14 +211,14 @@ export default function ReviewClient({
               disabled={actionPending}
               className={[
                 'h-9 px-3 font-semibold text-xs rounded-lg',
-                confirmAction === 'delete' ? 'bg-red-600 text-white' : 'bg-brand-yellow text-steel-900',
+                confirmAction === 'delete' ? 'bg-red-600 text-white' : 'bg-[var(--ink-900)] text-white',
               ].join(' ')}
             >
               Yes
             </button>
             <button
               onClick={() => setConfirmAction(null)}
-              className="h-9 px-3 bg-steel-700 text-steel-100 text-xs rounded-lg hover:bg-steel-600"
+              className="h-9 px-3 bg-[var(--paper-2)] text-[var(--ink-900)] text-xs rounded-lg hover:bg-[var(--ink-300)]"
             >
               No
             </button>
@@ -227,8 +227,8 @@ export default function ReviewClient({
           <div className="flex items-center gap-1.5 ml-2">
             {/* Detail level slider (video only) */}
             {isVideoSop && (
-              <div className="hidden sm:flex items-center gap-1 bg-steel-800 border border-steel-700 rounded-lg px-2 h-9">
-                <span className="text-[10px] text-steel-400">−</span>
+              <div className="hidden sm:flex items-center gap-1 bg-white border border-[var(--ink-100)] rounded-lg px-2 h-9">
+                <span className="text-[10px] text-[var(--ink-500)]">−</span>
                 <input
                   type="range"
                   min={1}
@@ -236,11 +236,11 @@ export default function ReviewClient({
                   step={1}
                   value={detailLevel}
                   onChange={(e) => setDetailLevel(parseInt(e.target.value))}
-                  className="w-12 h-1 rounded-full appearance-none bg-steel-600 accent-brand-yellow cursor-pointer"
+                  className="w-12 h-1 rounded-full appearance-none bg-[var(--ink-300)] accent-[var(--ink-900)] cursor-pointer"
                   aria-label="Detail level"
                   title={`Detail: ${DETAIL_LABELS[detailLevel - 1]} (${detailLevel}/5)`}
                 />
-                <span className="text-[10px] text-steel-400">+</span>
+                <span className="text-[10px] text-[var(--ink-500)]">+</span>
               </div>
             )}
 
@@ -249,7 +249,7 @@ export default function ReviewClient({
               <button
                 onClick={() => setConfirmAction('restructure')}
                 disabled={actionPending}
-                className="h-9 w-9 flex items-center justify-center rounded-lg bg-steel-800 border border-steel-700 text-brand-yellow hover:bg-steel-700 disabled:opacity-50"
+                className="h-9 w-9 flex items-center justify-center rounded-lg bg-white border border-[var(--ink-100)] text-[var(--ink-900)] hover:bg-[var(--paper-2)] disabled:opacity-50"
                 title="Re-structure (keep transcript)"
                 aria-label="Re-structure"
               >
@@ -261,7 +261,7 @@ export default function ReviewClient({
             <button
               onClick={() => setConfirmAction('reparse')}
               disabled={actionPending}
-              className="h-9 w-9 flex items-center justify-center rounded-lg bg-steel-800 border border-steel-700 text-brand-orange hover:bg-steel-700 disabled:opacity-50"
+              className="h-9 w-9 flex items-center justify-center rounded-lg bg-white border border-[var(--ink-100)] text-[var(--accent-voice)] hover:bg-[var(--paper-2)] disabled:opacity-50"
               title={isVideoSop ? 'Re-transcribe (full redo)' : 'Re-parse'}
               aria-label={isVideoSop ? 'Re-transcribe' : 'Re-parse'}
             >
@@ -272,7 +272,7 @@ export default function ReviewClient({
             <button
               onClick={() => setConfirmAction('delete')}
               disabled={actionPending || sop.status === 'published'}
-              className="h-9 w-9 flex items-center justify-center rounded-lg bg-steel-800 border border-steel-700 text-red-400 hover:bg-red-900/30 disabled:opacity-50"
+              className="h-9 w-9 flex items-center justify-center rounded-lg bg-white border border-[var(--ink-100)] text-red-400 hover:bg-red-900/30 disabled:opacity-50"
               title="Delete draft"
               aria-label="Delete draft"
             >
@@ -284,7 +284,7 @@ export default function ReviewClient({
               onClick={() => setConfirmAction('publish')}
               disabled={publishDisabled}
               title={publishTitle ?? 'Publish SOP'}
-              className="h-9 px-3 bg-brand-yellow text-steel-900 font-semibold text-xs rounded-lg hover:bg-amber-400 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
+              className="h-9 px-3 bg-[var(--ink-900)] text-white font-semibold text-xs rounded-lg hover:bg-[var(--ink-700)] disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5"
             >
               <Send size={14} />
               <span className="hidden sm:inline">Publish</span>
@@ -302,19 +302,19 @@ export default function ReviewClient({
           <div className="flex flex-wrap gap-2">
             <Link
               href={`/admin/sops/${sop.id}/assign`}
-              className="min-h-[44px] px-4 flex items-center bg-brand-yellow text-steel-900 font-semibold rounded-lg hover:bg-amber-400 active:bg-amber-500 transition-colors"
+              className="min-h-[44px] px-4 flex items-center bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
             >
               Assign to team
             </Link>
             <Link
               href={`/admin/sops/${sop.id}/video`}
-              className="min-h-[44px] px-4 flex items-center bg-steel-700 text-steel-100 font-semibold rounded-lg hover:bg-steel-600 active:bg-steel-500 transition-colors"
+              className="min-h-[44px] px-4 flex items-center bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--paper-2)] active:bg-[var(--ink-500)] transition-colors"
             >
               Generate video
             </Link>
             <Link
               href="/admin/sops"
-              className="min-h-[44px] px-4 flex items-center bg-steel-800 text-steel-300 font-semibold rounded-lg hover:bg-steel-700 transition-colors"
+              className="min-h-[44px] px-4 flex items-center bg-white text-[var(--ink-500)] font-semibold rounded-lg hover:bg-[var(--paper-2)] transition-colors"
             >
               Back to library
             </Link>
@@ -373,24 +373,24 @@ export default function ReviewClient({
               {sop.source_type && sop.source_type !== 'uploaded' && (
                 <Link
                   href={`/admin/sops/builder/${sop.id}`}
-                  className="inline-flex items-center gap-2 px-4 py-2 mb-4 rounded-lg bg-steel-700 hover:bg-steel-600 text-steel-100 font-semibold text-sm transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 mb-4 rounded-lg bg-[var(--paper-2)] hover:bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold text-sm transition-colors"
                 >
                   Open in builder
                 </Link>
               )}
 
-              <p className="text-xs font-semibold text-steel-400 uppercase tracking-wide mb-2">
+              <p className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wide mb-2">
                 PARSED OUTPUT
               </p>
 
               {/* Progress counter */}
-              <p className="text-sm text-steel-400 mb-4">
+              <p className="text-sm text-[var(--ink-500)] mb-4">
                 {approvedCount} of {totalCount} sections approved
               </p>
 
               {/* OCR warning banner */}
               {isOcr && (
-                <div className="bg-brand-orange/20 border border-brand-orange/50 text-brand-orange rounded-lg px-4 py-3 text-sm flex gap-2 items-start mb-4">
+                <div className="bg-[var(--accent-voice)]/20 border border-[var(--accent-voice)]/50 text-[var(--accent-voice)] rounded-lg px-4 py-3 text-sm flex gap-2 items-start mb-4">
                   <span className="flex-shrink-0">&#9888;</span>
                   <span>
                     Heads up — this document was scanned or photographed, so some text might be off. Check it carefully before publishing.
@@ -400,7 +400,7 @@ export default function ReviewClient({
 
               {/* Section editors */}
               {sop.sop_sections.length === 0 ? (
-                <p className="text-sm text-steel-400 italic">
+                <p className="text-sm text-[var(--ink-500)] italic">
                   No sections found. Try re-parsing the document.
                 </p>
               ) : (

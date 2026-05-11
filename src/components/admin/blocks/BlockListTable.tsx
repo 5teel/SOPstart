@@ -42,9 +42,9 @@ export function BlockListTable({ blocks, categories }: Props) {
 
   if (blocks.length === 0) {
     return (
-      <div className="bg-steel-800 border border-steel-700 rounded-lg p-8 text-center">
-        <p className="text-base font-semibold text-steel-100 mb-1">No blocks yet</p>
-        <p className="text-sm text-steel-400">
+      <div className="bg-white border border-[var(--ink-100)] rounded-lg p-8 text-center">
+        <p className="text-base font-semibold text-[var(--ink-900)] mb-1">No blocks yet</p>
+        <p className="text-sm text-[var(--ink-500)]">
           Save your first block from the builder via the three-dot menu on any hazard / PPE / step.
         </p>
       </div>
@@ -52,9 +52,9 @@ export function BlockListTable({ blocks, categories }: Props) {
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-steel-700">
-      <table className="w-full text-sm bg-steel-800 text-steel-100">
-        <thead className="bg-steel-900 text-xs uppercase tracking-wider text-steel-400">
+    <div className="overflow-x-auto rounded-lg border border-[var(--ink-100)]">
+      <table className="w-full text-sm bg-white text-[var(--ink-900)]">
+        <thead className="bg-[var(--paper)] text-xs uppercase tracking-wider text-[var(--ink-500)]">
           <tr>
             <th className="px-4 py-3 text-left">Name</th>
             <th className="px-4 py-3 text-left">Kind</th>
@@ -69,22 +69,22 @@ export function BlockListTable({ blocks, categories }: Props) {
             const isGlobal = b.organisation_id === null
             const isArchived = b.archived_at !== null
             return (
-              <tr key={b.id} className="border-t border-steel-700 hover:bg-steel-700/50">
+              <tr key={b.id} className="border-t border-[var(--ink-100)] hover:bg-[var(--paper-2)]/50">
                 <td className="px-4 py-3">
                   <Link
                     href={`/admin/blocks/${b.id}`}
-                    className="font-medium text-steel-100 hover:text-brand-yellow"
+                    className="font-medium text-[var(--ink-900)] hover:text-[var(--ink-700)]"
                   >
                     {b.name}
                   </Link>
                   {isGlobal && (
-                    <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-steel-400 border border-steel-600 rounded px-1.5 py-0.5">
+                    <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-[var(--ink-500)] border border-[var(--ink-300)] rounded px-1.5 py-0.5">
                       GLOBAL
                     </span>
                   )}
                 </td>
                 <td className="px-4 py-3">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-steel-900 border border-steel-700 text-steel-300">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-[var(--paper)] border border-[var(--ink-100)] text-[var(--ink-500)]">
                     {b.kind_slug}
                   </span>
                 </td>
@@ -95,18 +95,18 @@ export function BlockListTable({ blocks, categories }: Props) {
                       return (
                         <span
                           key={slug}
-                          className="text-[11px] px-1.5 py-0.5 rounded bg-steel-700 text-steel-200 border border-steel-600"
+                          className="text-[11px] px-1.5 py-0.5 rounded bg-[var(--paper-2)] text-[var(--ink-700)] border border-[var(--ink-300)]"
                         >
                           {cat?.display_name ?? slug}
                         </span>
                       )
                     })}
                     {(b.category_tags ?? []).length === 0 && (
-                      <span className="text-xs text-steel-500">—</span>
+                      <span className="text-xs text-[var(--ink-500)]">—</span>
                     )}
                   </div>
                 </td>
-                <td className="px-4 py-3 text-steel-400">{formatDate(b.updated_at)}</td>
+                <td className="px-4 py-3 text-[var(--ink-500)]">{formatDate(b.updated_at)}</td>
                 <td className="px-4 py-3">
                   {isArchived ? (
                     <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-red-950/40 border border-red-700/40 text-red-300">
@@ -124,7 +124,7 @@ export function BlockListTable({ blocks, categories }: Props) {
                       type="button"
                       onClick={() => handleArchive(b.id)}
                       disabled={isPending}
-                      className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs text-steel-300 hover:text-red-300 hover:bg-red-950/30 transition-colors disabled:opacity-50"
+                      className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs text-[var(--ink-500)] hover:text-red-300 hover:bg-red-950/30 transition-colors disabled:opacity-50"
                       aria-label={`Archive ${b.name}`}
                     >
                       <Archive className="h-3.5 w-3.5" />

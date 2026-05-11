@@ -150,11 +150,11 @@ export function VideoFormatSelectionModal({ open, onClose }: Props) {
       aria-labelledby="video-format-modal-title"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
     >
-      <div className="bg-steel-900 rounded-2xl p-6 max-w-lg w-full mx-4">
+      <div className="bg-[var(--paper)] rounded-2xl p-6 max-w-lg w-full mx-4">
         <div className="flex items-start justify-between mb-4">
           <h2
             id="video-format-modal-title"
-            className="text-base font-semibold text-steel-100"
+            className="text-base font-semibold text-[var(--ink-900)]"
           >
             Choose video format
           </h2>
@@ -162,7 +162,7 @@ export function VideoFormatSelectionModal({ open, onClose }: Props) {
             type="button"
             onClick={handleDismiss}
             aria-label="Close"
-            className="text-steel-400 hover:text-steel-100 p-1"
+            className="text-[var(--ink-500)] hover:text-[var(--ink-900)] p-1"
           >
             <X className="w-5 h-5" />
           </button>
@@ -172,21 +172,21 @@ export function VideoFormatSelectionModal({ open, onClose }: Props) {
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="w-full min-h-[72px] border-2 border-dashed border-steel-700 rounded-xl p-4 flex items-center gap-3 text-left hover:bg-steel-800 transition-colors mb-4"
+          className="w-full min-h-[72px] border-2 border-dashed border-[var(--ink-100)] rounded-xl p-4 flex items-center gap-3 text-left hover:bg-white transition-colors mb-4"
         >
-          <Upload className="w-5 h-5 text-steel-400 shrink-0" />
+          <Upload className="w-5 h-5 text-[var(--ink-500)] shrink-0" />
           <div className="min-w-0 flex-1">
             {file ? (
               <>
-                <p className="text-sm font-medium text-steel-100 truncate">
+                <p className="text-sm font-medium text-[var(--ink-900)] truncate">
                   {file.name}
                 </p>
-                <p className="text-xs text-steel-400">
+                <p className="text-xs text-[var(--ink-500)]">
                   {(file.size / (1024 * 1024)).toFixed(1)} MB
                 </p>
               </>
             ) : (
-              <p className="text-sm text-steel-400">
+              <p className="text-sm text-[var(--ink-500)]">
                 Choose a Word, PDF, Excel, PowerPoint, text or photo file
               </p>
             )}
@@ -209,7 +209,7 @@ export function VideoFormatSelectionModal({ open, onClose }: Props) {
               <label
                 key={f.id}
                 className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer ${
-                  selected ? 'border-brand-yellow' : 'border-steel-700'
+                  selected ? 'border-[var(--ink-900)]' : 'border-[var(--ink-100)]'
                 }`}
               >
                 <input
@@ -223,18 +223,18 @@ export function VideoFormatSelectionModal({ open, onClose }: Props) {
                 <span
                   aria-hidden="true"
                   className={`mt-1 w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center ${
-                    selected ? 'border-brand-yellow' : 'border-steel-500'
+                    selected ? 'border-[var(--ink-900)]' : 'border-[var(--ink-500)]'
                   }`}
                 >
                   {selected && (
-                    <span className="w-2 h-2 rounded-full bg-brand-yellow" />
+                    <span className="w-2 h-2 rounded-full bg-[var(--ink-900)]" />
                   )}
                 </span>
                 <span className="flex-1">
-                  <span className="block text-sm font-semibold text-steel-100">
+                  <span className="block text-sm font-semibold text-[var(--ink-900)]">
                     {f.name}
                   </span>
-                  <span className="block text-xs text-steel-400 mt-1">
+                  <span className="block text-xs text-[var(--ink-500)] mt-1">
                     {f.description}
                   </span>
                 </span>
@@ -253,7 +253,7 @@ export function VideoFormatSelectionModal({ open, onClose }: Props) {
           type="button"
           onClick={handleConfirm}
           disabled={!canSubmit}
-          className="h-[72px] w-full bg-brand-yellow text-steel-900 font-semibold text-xl rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-amber-400 transition-colors flex items-center justify-center gap-2"
+          className="h-[72px] w-full bg-[var(--ink-900)] text-white font-semibold text-xl rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[var(--ink-700)] transition-colors flex items-center justify-center gap-2"
         >
           {submitting ? (
             <>
@@ -269,7 +269,7 @@ export function VideoFormatSelectionModal({ open, onClose }: Props) {
           type="button"
           onClick={handleDismiss}
           disabled={submitting}
-          className="w-full min-h-[44px] mt-3 bg-steel-700 text-steel-100 rounded-lg hover:bg-steel-600 transition-colors disabled:opacity-50"
+          className="w-full min-h-[44px] mt-3 bg-[var(--paper-2)] text-[var(--ink-900)] rounded-lg hover:bg-[var(--paper-2)] transition-colors disabled:opacity-50"
         >
           Discard
         </button>

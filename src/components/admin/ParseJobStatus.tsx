@@ -255,7 +255,7 @@ export default function ParseJobStatus({
 
   // OCR low-confidence banner
   const OcrBanner = () => (
-    <div className="bg-brand-orange/20 border border-brand-orange/50 text-brand-orange rounded-lg px-4 py-3 text-sm flex gap-2 items-start mb-4">
+    <div className="bg-[var(--accent-voice)]/20 border border-[var(--accent-voice)]/50 text-[var(--accent-voice)] rounded-lg px-4 py-3 text-sm flex gap-2 items-start mb-4">
       <AlertTriangle className="flex-shrink-0 mt-0.5" size={16} />
       <span>
         Heads up — this document was scanned or photographed, so some text might be off. Check it carefully before publishing.
@@ -283,9 +283,9 @@ export default function ParseJobStatus({
               <span
                 className={`text-xs whitespace-nowrap px-1 ${
                   isCompleted ? 'text-green-400' :
-                  isActive ? 'text-brand-yellow font-semibold' :
-                  isPending ? 'text-steel-600' :
-                  'text-steel-600'
+                  isActive ? 'text-[var(--ink-900)] font-semibold' :
+                  isPending ? 'text-[var(--ink-300)]' :
+                  'text-[var(--ink-300)]'
                 }`}
                 aria-current={isActive ? 'step' : undefined}
                 aria-label={stage.label}
@@ -294,7 +294,7 @@ export default function ParseJobStatus({
               </span>
               {i < activeStageSet.length - 1 && (
                 <div className={`h-px flex-1 min-w-[8px] ${
-                  isCompleted ? 'bg-brand-yellow' : 'bg-steel-700'
+                  isCompleted ? 'bg-[var(--ink-900)]' : 'bg-[var(--ink-100)]'
                 }`} />
               )}
             </React.Fragment>
@@ -315,16 +315,16 @@ export default function ParseJobStatus({
     return (
       <>
         {isOcr && <OcrBanner />}
-        <div className="bg-steel-800 border border-steel-700 rounded-lg p-4 flex items-start gap-3">
+        <div className="bg-white border border-[var(--ink-100)] rounded-lg p-4 flex items-start gap-3">
           <CheckCircle className="text-green-400 flex-shrink-0 mt-0.5" size={20} />
           <div className="flex-1">
-            <p className="text-sm font-semibold text-steel-100">
+            <p className="text-sm font-semibold text-[var(--ink-900)]">
               {completionCopy}
             </p>
             <div className="flex items-center gap-4 mt-2 flex-wrap">
               <button
                 onClick={() => router.refresh()}
-                className="text-brand-yellow text-sm font-medium hover:text-amber-400"
+                className="text-[var(--ink-900)] text-sm font-medium hover:text-[var(--ink-700)]"
               >
                 Review now &rarr;
               </button>
@@ -333,14 +333,14 @@ export default function ParseJobStatus({
                   <button
                     onClick={() => handleRestructure()}
                     disabled={reParsing}
-                    className="text-steel-400 text-sm font-medium hover:text-steel-100"
+                    className="text-[var(--ink-500)] text-sm font-medium hover:text-[var(--ink-900)]"
                   >
                     {reParsing ? 'Processing...' : 'Re-structure'}
                   </button>
                   <button
                     onClick={handleReparse}
                     disabled={reParsing}
-                    className="text-steel-400 text-sm font-medium hover:text-steel-100"
+                    className="text-[var(--ink-500)] text-sm font-medium hover:text-[var(--ink-900)]"
                   >
                     {reParsing ? 'Processing...' : 'Re-transcribe'}
                   </button>
@@ -359,25 +359,25 @@ export default function ParseJobStatus({
   if (status === 'failed') {
     if (isVideoSop) {
       return (
-        <div className="bg-steel-800 border border-steel-700 rounded-lg p-4">
+        <div className="bg-white border border-[var(--ink-100)] rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="text-brand-orange flex-shrink-0 mt-0.5" size={20} />
+            <AlertTriangle className="text-[var(--accent-voice)] flex-shrink-0 mt-0.5" size={20} />
             <div className="flex-1">
-              <p className="text-sm font-semibold text-steel-100">
+              <p className="text-sm font-semibold text-[var(--ink-900)]">
                 {errorMessage ?? 'Processing failed'}
               </p>
               <div className="flex items-center gap-4 mt-3 flex-wrap">
                 <button
                   onClick={() => handleRestructure()}
                   disabled={reParsing}
-                  className="text-brand-yellow text-sm font-medium hover:text-amber-400"
+                  className="text-[var(--ink-900)] text-sm font-medium hover:text-[var(--ink-700)]"
                 >
                   {reParsing ? 'Processing...' : 'Re-structure only'}
                 </button>
                 <button
                   onClick={handleReparse}
                   disabled={reParsing}
-                  className="text-brand-orange text-sm font-medium hover:text-amber-500"
+                  className="text-[var(--accent-voice)] text-sm font-medium hover:text-[var(--ink-700)]"
                 >
                   {reParsing ? 'Processing...' : 'Full re-transcribe'}
                 </button>
@@ -396,18 +396,18 @@ export default function ParseJobStatus({
     }
 
     return (
-      <div className="bg-steel-800 border border-steel-700 rounded-lg p-4 flex items-start gap-3">
-        <AlertTriangle className="text-brand-orange flex-shrink-0 mt-0.5" size={20} />
+      <div className="bg-white border border-[var(--ink-100)] rounded-lg p-4 flex items-start gap-3">
+        <AlertTriangle className="text-[var(--accent-voice)] flex-shrink-0 mt-0.5" size={20} />
         <div className="flex-1">
-          <p className="text-sm font-semibold text-steel-100">Couldn&apos;t parse that one</p>
+          <p className="text-sm font-semibold text-[var(--ink-900)]">Couldn&apos;t parse that one</p>
           {errorMessage && (
-            <p className="text-xs text-steel-400 mt-1 line-clamp-2">{errorMessage}</p>
+            <p className="text-xs text-[var(--ink-500)] mt-1 line-clamp-2">{errorMessage}</p>
           )}
           <div className="flex items-center gap-4 mt-3">
             <button
               onClick={handleReparse}
               disabled={reParsing}
-              className="text-brand-orange text-sm hover:text-amber-500 font-medium"
+              className="text-[var(--accent-voice)] text-sm hover:text-[var(--ink-700)] font-medium"
             >
               {reParsing ? 'Trying again…' : 'Try again'}
             </button>
@@ -427,32 +427,32 @@ export default function ParseJobStatus({
   // Video SOP: show stage-specific processing state
   if (isVideoSop && currentStage) {
     return (
-      <div className="bg-steel-800 border border-steel-700 rounded-lg p-4">
+      <div className="bg-white border border-[var(--ink-100)] rounded-lg p-4">
         <StageStepper />
         <div className="flex items-start gap-3">
           {currentStage === 'verifying' ? (
-            <Loader2 size={20} className="text-brand-orange animate-spin flex-shrink-0 mt-0.5" />
+            <Loader2 size={20} className="text-[var(--accent-voice)] animate-spin flex-shrink-0 mt-0.5" />
           ) : (
             <Loader2 size={20} className="text-blue-400 animate-spin flex-shrink-0 mt-0.5" />
           )}
           <div>
             {currentStage === 'uploading' && (
-              <p className="text-sm font-semibold text-steel-100">Uploading video...</p>
+              <p className="text-sm font-semibold text-[var(--ink-900)]">Uploading video...</p>
             )}
             {currentStage === 'extracting_audio' && (
-              <p className="text-sm font-semibold text-steel-100">Extracting audio from video...</p>
+              <p className="text-sm font-semibold text-[var(--ink-900)]">Extracting audio from video...</p>
             )}
             {currentStage === 'transcribing' && (
               <>
-                <p className="text-sm font-semibold text-steel-100">Transcribing audio... ({elapsed}s)</p>
-                <p className="text-xs text-steel-400 mt-1">Grab a hot drink — this can take a few minutes.</p>
+                <p className="text-sm font-semibold text-[var(--ink-900)]">Transcribing audio... ({elapsed}s)</p>
+                <p className="text-xs text-[var(--ink-500)] mt-1">Grab a hot drink — this can take a few minutes.</p>
               </>
             )}
             {currentStage === 'structuring' && (
-              <p className="text-sm font-semibold text-steel-100">Structuring SOP from transcript...</p>
+              <p className="text-sm font-semibold text-[var(--ink-900)]">Structuring SOP from transcript...</p>
             )}
             {currentStage === 'verifying' && (
-              <p className="text-sm font-semibold text-steel-100">Running AI verification pass...</p>
+              <p className="text-sm font-semibold text-[var(--ink-900)]">Running AI verification pass...</p>
             )}
           </div>
         </div>
@@ -463,19 +463,19 @@ export default function ParseJobStatus({
   // Phase 14: AI-prompt SOP processing state — render the 3-stage stepper.
   if (inputType === 'ai_prompt' && currentStage) {
     return (
-      <div className="bg-steel-800 border border-steel-700 rounded-lg p-4">
+      <div className="bg-white border border-[var(--ink-100)] rounded-lg p-4">
         <StageStepper />
         <div className="flex items-start gap-3">
           <Loader2 size={20} className="text-blue-400 animate-spin flex-shrink-0 mt-0.5" />
           <div>
             {currentStage === 'prompting' && (
-              <p className="text-sm font-semibold text-steel-100">Reading your prompt...</p>
+              <p className="text-sm font-semibold text-[var(--ink-900)]">Reading your prompt...</p>
             )}
             {currentStage === 'drafting' && (
-              <p className="text-sm font-semibold text-steel-100">Drafting your SOP...</p>
+              <p className="text-sm font-semibold text-[var(--ink-900)]">Drafting your SOP...</p>
             )}
             {currentStage === 'verifying' && (
-              <p className="text-sm font-semibold text-steel-100">Running AI verification pass...</p>
+              <p className="text-sm font-semibold text-[var(--ink-900)]">Running AI verification pass...</p>
             )}
           </div>
         </div>
@@ -485,14 +485,14 @@ export default function ParseJobStatus({
 
   // Non-video parsing / queued / processing state (default)
   return (
-    <div className="bg-steel-800 border border-steel-700 rounded-lg p-4 flex items-start gap-3">
+    <div className="bg-white border border-[var(--ink-100)] rounded-lg p-4 flex items-start gap-3">
       <div
         className="flex-shrink-0 mt-0.5 animate-spin border-2 border-blue-500/30 border-t-blue-400 rounded-full w-5 h-5"
         aria-hidden="true"
       />
       <div>
-        <p className="text-sm font-semibold text-steel-100">Crunching your SOP&hellip;</p>
-        <p className="text-xs text-steel-400 mt-1">
+        <p className="text-sm font-semibold text-[var(--ink-900)]">Crunching your SOP&hellip;</p>
+        <p className="text-xs text-[var(--ink-500)] mt-1">
           Grab a hot drink or take a smoko — we&apos;ll let you know when it&apos;s ready.
         </p>
       </div>
@@ -516,17 +516,17 @@ function DetailLevelControl({
   disabled: boolean
 }) {
   return (
-    <div className="mt-3 pt-3 border-t border-steel-700">
+    <div className="mt-3 pt-3 border-t border-[var(--ink-100)]">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-semibold text-steel-400 uppercase tracking-wider">
+        <span className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wider">
           Detail level
         </span>
-        <span className="text-xs text-steel-400">
+        <span className="text-xs text-[var(--ink-500)]">
           {DETAIL_LABELS[value - 1]} ({value}/5)
         </span>
       </div>
       <div className="flex items-center gap-3">
-        <span className="text-xs text-steel-400">−</span>
+        <span className="text-xs text-[var(--ink-500)]">−</span>
         <input
           type="range"
           min={1}
@@ -534,14 +534,14 @@ function DetailLevelControl({
           step={1}
           value={value}
           onChange={(e) => onChange(parseInt(e.target.value))}
-          className="flex-1 h-2 rounded-full appearance-none bg-steel-700 accent-brand-yellow cursor-pointer"
+          className="flex-1 h-2 rounded-full appearance-none bg-[var(--paper-2)] accent-[var(--ink-900)] cursor-pointer"
           aria-label="Detail level"
         />
-        <span className="text-xs text-steel-400">+</span>
+        <span className="text-xs text-[var(--ink-500)]">+</span>
         <button
           onClick={onApply}
           disabled={disabled}
-          className="text-xs font-semibold text-brand-yellow hover:text-amber-400 disabled:opacity-50 whitespace-nowrap"
+          className="text-xs font-semibold text-[var(--ink-900)] hover:text-[var(--ink-700)] disabled:opacity-50 whitespace-nowrap"
         >
           Apply
         </button>

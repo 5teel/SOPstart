@@ -152,7 +152,7 @@ export default function VideoGenerationStatus({
   }
 
   return (
-    <div className="bg-steel-800 border border-steel-700 rounded-lg p-4">
+    <div className="bg-white border border-[var(--ink-100)] rounded-lg p-4">
       {/* Stage stepper */}
       <div
         className="flex items-center gap-1 mb-4 overflow-x-auto"
@@ -171,9 +171,9 @@ export default function VideoGenerationStatus({
                   status === 'ready' ? 'text-green-400' :
                   status === 'failed' ? 'text-red-400' :
                   isCompleted ? 'text-green-400' :
-                  isActive ? 'text-brand-yellow font-semibold' :
-                  isPending ? 'text-steel-600' :
-                  'text-steel-600'
+                  isActive ? 'text-[var(--ink-900)] font-semibold' :
+                  isPending ? 'text-[var(--ink-300)]' :
+                  'text-[var(--ink-300)]'
                 }`}
                 aria-current={isActive ? 'step' : undefined}
               >
@@ -182,9 +182,9 @@ export default function VideoGenerationStatus({
               {i < VIDEO_GEN_STAGES.length - 1 && (
                 <div
                   className={`h-px flex-1 min-w-[8px] ${
-                    status === 'ready' ? 'bg-brand-yellow' :
-                    isCompleted ? 'bg-brand-yellow' :
-                    'bg-steel-700'
+                    status === 'ready' ? 'bg-[var(--ink-900)]' :
+                    isCompleted ? 'bg-[var(--ink-900)]' :
+                    'bg-[var(--ink-100)]'
                   }`}
                 />
               )}
@@ -197,17 +197,17 @@ export default function VideoGenerationStatus({
       {status === 'ready' ? (
         <div className="flex items-center gap-3">
           <CheckCircle className="text-green-400 flex-shrink-0" size={20} />
-          <p className="text-sm font-semibold text-steel-100">Video ready to preview and publish</p>
+          <p className="text-sm font-semibold text-[var(--ink-900)]">Video ready to preview and publish</p>
         </div>
       ) : status === 'failed' ? (
         <div className="flex items-center gap-3">
-          <AlertTriangle className="text-brand-orange flex-shrink-0" size={20} />
-          <p className="text-sm font-semibold text-steel-100">Generation failed — {errorMessage ?? 'unknown error'}</p>
+          <AlertTriangle className="text-[var(--accent-voice)] flex-shrink-0" size={20} />
+          <p className="text-sm font-semibold text-[var(--ink-900)]">Generation failed — {errorMessage ?? 'unknown error'}</p>
         </div>
       ) : (
         <div className="flex items-center gap-3">
           <Loader2 className="text-blue-400 animate-spin flex-shrink-0" size={20} />
-          <p className="text-sm font-semibold text-steel-100">
+          <p className="text-sm font-semibold text-[var(--ink-900)]">
             {stageCopy[currentStage ?? status] ?? 'Generating video...'}
           </p>
         </div>

@@ -27,8 +27,8 @@ export function PhotoThumbnail({ photo, onRemove }: PhotoThumbnailProps) {
     }
   }, [photo.blob])
 
-  const borderColor = photo.uploaded ? 'border-green-500/40' : 'border-brand-orange'
-  const dotColor = photo.uploaded ? 'bg-green-500' : 'bg-brand-orange'
+  const borderColor = photo.uploaded ? 'border-green-500/40' : 'border-[var(--accent-voice)]'
+  const dotColor = photo.uploaded ? 'bg-green-500' : 'bg-[var(--accent-voice)]'
 
   return (
     <div className="relative w-[72px] h-[72px] flex-shrink-0">
@@ -39,12 +39,12 @@ export function PhotoThumbnail({ photo, onRemove }: PhotoThumbnailProps) {
           className={`w-full h-full rounded-lg object-cover border-2 ${borderColor}`}
         />
       ) : (
-        <div className={`w-full h-full rounded-lg bg-steel-700 border-2 ${borderColor}`} />
+        <div className={`w-full h-full rounded-lg bg-[var(--paper-2)] border-2 ${borderColor}`} />
       )}
 
       {/* Upload status dot — top-right corner */}
       <span
-        className={`absolute top-1 right-1 w-3 h-3 rounded-full border border-steel-900 ${dotColor}`}
+        className={`absolute top-1 right-1 w-3 h-3 rounded-full border border-[var(--paper)] ${dotColor}`}
         aria-label={photo.uploaded ? 'Uploaded' : 'Queued for upload'}
       />
 
@@ -56,10 +56,10 @@ export function PhotoThumbnail({ photo, onRemove }: PhotoThumbnailProps) {
             e.stopPropagation()
             onRemove()
           }}
-          className="absolute top-1 left-1 w-5 h-5 rounded-full bg-steel-900/80 flex items-center justify-center hover:bg-steel-900 transition-colors"
+          className="absolute top-1 left-1 w-5 h-5 rounded-full bg-[var(--paper)]/80 flex items-center justify-center hover:bg-[var(--paper)] transition-colors"
           aria-label="Remove photo"
         >
-          <X size={10} className="text-steel-100" />
+          <X size={10} className="text-[var(--ink-900)]" />
         </button>
       )}
     </div>

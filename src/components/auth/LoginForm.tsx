@@ -37,7 +37,7 @@ export default function LoginForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-steel-100 mb-1">
+        <label htmlFor="email" className="block text-sm font-medium text-[var(--ink-900)] mb-1">
           Email Address
         </label>
         <input
@@ -46,7 +46,7 @@ export default function LoginForm() {
           autoComplete="email"
           placeholder="you@yourcompany.co.nz"
           {...register('email')}
-          className="w-full px-4 py-3 rounded-lg bg-steel-800 border border-steel-700 text-steel-100 placeholder-steel-400 focus:outline-none focus:ring-2 focus:ring-brand-yellow focus:border-transparent text-base"
+          className="w-full px-4 py-3 rounded-lg bg-white border border-[var(--ink-100)] text-[var(--ink-900)] placeholder-[var(--ink-500)] focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)] focus:border-transparent text-base"
         />
         {errors.email && (
           <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
@@ -54,7 +54,7 @@ export default function LoginForm() {
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-steel-100 mb-1">
+        <label htmlFor="password" className="block text-sm font-medium text-[var(--ink-900)] mb-1">
           Password
         </label>
         <input
@@ -63,7 +63,7 @@ export default function LoginForm() {
           autoComplete="current-password"
           placeholder="Your password"
           {...register('password')}
-          className="w-full px-4 py-3 rounded-lg bg-steel-800 border border-steel-700 text-steel-100 placeholder-steel-400 focus:outline-none focus:ring-2 focus:ring-brand-yellow focus:border-transparent text-base"
+          className="w-full px-4 py-3 rounded-lg bg-white border border-[var(--ink-100)] text-[var(--ink-900)] placeholder-[var(--ink-500)] focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)] focus:border-transparent text-base"
         />
         {errors.password && (
           <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
@@ -79,21 +79,21 @@ export default function LoginForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full min-h-[var(--min-tap-target)] bg-brand-yellow hover:bg-brand-orange disabled:opacity-60 disabled:cursor-not-allowed text-steel-900 font-bold rounded-lg text-base transition-colors"
+        className="w-full min-h-[var(--min-tap-target)] bg-[var(--ink-900)] hover:bg-[var(--accent-voice)] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-lg text-base transition-colors"
       >
         {isSubmitting ? 'Logging in...' : 'Log In'}
       </button>
 
       <div className="text-center space-y-2 pt-2">
-        <p className="text-steel-400 text-sm">
+        <p className="text-[var(--ink-500)] text-sm">
           Need an account?{' '}
-          <Link href="/sign-up" className="text-brand-yellow hover:text-brand-orange font-medium">
+          <Link href="/sign-up" className="text-[var(--ink-900)] hover:text-[var(--accent-voice)] font-medium">
             Register a new organisation
           </Link>
         </p>
-        <p className="text-steel-400 text-sm">
+        <p className="text-[var(--ink-500)] text-sm">
           Have an invite code?{' '}
-          <Link href="/join" className="text-brand-yellow hover:text-brand-orange font-medium">
+          <Link href="/join" className="text-[var(--ink-900)] hover:text-[var(--accent-voice)] font-medium">
             Join an organisation
           </Link>
         </p>

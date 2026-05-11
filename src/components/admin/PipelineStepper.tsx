@@ -36,15 +36,15 @@ export function PipelineStepper({ currentStage, errorAtStage = null }: PipelineS
         const labelClass = isError
           ? 'text-xs text-red-400 font-semibold whitespace-nowrap px-1'
           : isActive
-            ? 'text-xs text-brand-yellow font-semibold whitespace-nowrap px-1'
+            ? 'text-xs text-[var(--ink-900)] font-semibold whitespace-nowrap px-1'
             : isComplete
               ? 'text-xs text-green-400 whitespace-nowrap px-1'
-              : 'text-xs text-steel-600 whitespace-nowrap px-1'
+              : 'text-xs text-[var(--ink-300)] whitespace-nowrap px-1'
 
         const connectorClass =
           isComplete || (isActive && !isError)
-            ? 'h-px flex-1 min-w-[8px] bg-brand-yellow'
-            : 'h-px flex-1 min-w-[8px] bg-steel-700'
+            ? 'h-px flex-1 min-w-[8px] bg-[var(--ink-900)]'
+            : 'h-px flex-1 min-w-[8px] bg-[var(--ink-100)]'
 
         return (
           <div key={stage.key} className="flex items-center gap-1 shrink-0">

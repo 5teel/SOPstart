@@ -27,32 +27,32 @@ export default async function SuggestionsQueuePage() {
   const pending = await listBlockSuggestions({ status: 'pending' })
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10 bg-steel-900 min-h-screen">
+    <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10 bg-[var(--paper)] min-h-screen">
       <header className="mb-2">
-        <h1 className="text-2xl font-bold text-steel-100">
+        <h1 className="text-2xl font-bold text-[var(--ink-900)]">
           Pending Suggestions for Global Library
         </h1>
-        <p className="text-sm text-steel-400 mt-1 max-w-2xl">
+        <p className="text-sm text-[var(--ink-500)] mt-1 max-w-2xl">
           Review, promote, or reject blocks submitted by orgs for the shared
           NZ-industry library. Promoted blocks become read-only globals visible
           to every org.
         </p>
       </header>
 
-      <nav className="flex gap-4 border-b border-steel-700 mt-6 mb-6 text-sm">
+      <nav className="flex gap-4 border-b border-[var(--ink-100)] mt-6 mb-6 text-sm">
         <Link
           href="/admin/global-blocks"
-          className="pb-3 px-1 font-medium text-steel-400 hover:text-steel-100"
+          className="pb-3 px-1 font-medium text-[var(--ink-500)] hover:text-[var(--ink-900)]"
         >
           Global Blocks
         </Link>
         <Link
           href="/admin/global-blocks/suggestions"
-          className="pb-3 px-1 font-medium border-b-2 border-brand-yellow text-brand-yellow"
+          className="pb-3 px-1 font-medium border-b-2 border-[var(--ink-900)] text-[var(--ink-900)]"
         >
           Suggestions Queue
           {pending.length > 0 && (
-            <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[11px] bg-brand-yellow text-steel-900 font-bold">
+            <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[11px] bg-[var(--ink-900)] text-white font-bold">
               {pending.length}
             </span>
           )}
@@ -60,11 +60,11 @@ export default async function SuggestionsQueuePage() {
       </nav>
 
       {pending.length === 0 ? (
-        <div className="bg-steel-800 border border-steel-700 rounded-lg p-8 text-center">
-          <p className="text-base font-semibold text-steel-100 mb-1">
+        <div className="bg-white border border-[var(--ink-100)] rounded-lg p-8 text-center">
+          <p className="text-base font-semibold text-[var(--ink-900)] mb-1">
             No pending suggestions
           </p>
-          <p className="text-sm text-steel-400">
+          <p className="text-sm text-[var(--ink-500)]">
             Org admins can submit blocks via &ldquo;Suggest for global&rdquo; in
             the Save to library modal (built in 13-01). Promoted suggestions
             land in the Global Blocks tab.

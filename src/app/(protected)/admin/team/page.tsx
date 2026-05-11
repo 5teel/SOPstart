@@ -37,10 +37,10 @@ export default async function AdminTeamPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-steel-100">Manage Team</h1>
+        <h1 className="text-2xl font-bold text-[var(--ink-900)]">Manage Team</h1>
         <Link
           href="/dashboard"
-          className="text-sm text-steel-400 hover:text-brand-yellow transition-colors"
+          className="text-sm text-[var(--ink-500)] hover:text-[var(--ink-700)] transition-colors"
         >
           Back to Dashboard
         </Link>

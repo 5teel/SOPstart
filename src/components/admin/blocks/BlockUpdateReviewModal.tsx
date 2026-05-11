@@ -106,22 +106,22 @@ export function BlockUpdateReviewModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="block-update-review-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-steel-900/80 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--paper)]/80 backdrop-blur-sm p-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="w-full max-w-3xl max-h-[85vh] overflow-y-auto bg-steel-800 border border-steel-700 rounded-xl shadow-xl">
+      <div className="w-full max-w-3xl max-h-[85vh] overflow-y-auto bg-white border border-[var(--ink-100)] rounded-xl shadow-xl">
         {/* Header */}
-        <div className="flex items-start justify-between px-5 py-4 border-b border-steel-700">
+        <div className="flex items-start justify-between px-5 py-4 border-b border-[var(--ink-100)]">
           <div>
             <h2
               id="block-update-review-title"
-              className="text-base font-semibold text-steel-100"
+              className="text-base font-semibold text-[var(--ink-900)]"
             >
               Block update available — review changes
             </h2>
-            <p className="mt-1 text-xs text-steel-400">
+            <p className="mt-1 text-xs text-[var(--ink-500)]">
               This block&apos;s source has been updated. Review the changes and
               decide whether to apply them to this SOP.
             </p>
@@ -130,7 +130,7 @@ export function BlockUpdateReviewModal({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="text-steel-400 hover:text-steel-100"
+            className="text-[var(--ink-500)] hover:text-[var(--ink-900)]"
           >
             <X className="h-4 w-4" />
           </button>
@@ -158,10 +158,10 @@ export function BlockUpdateReviewModal({
 
           {diff && (
             <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="text-[10px] uppercase tracking-wider text-steel-400 px-2">
+              <div className="text-[10px] uppercase tracking-wider text-[var(--ink-500)] px-2">
                 Current (in this SOP)
               </div>
-              <div className="text-[10px] uppercase tracking-wider text-steel-400 px-2">
+              <div className="text-[10px] uppercase tracking-wider text-[var(--ink-500)] px-2">
                 New (latest version)
               </div>
 
@@ -169,23 +169,23 @@ export function BlockUpdateReviewModal({
                 const fieldChanged = f.oldValue !== f.newValue
                 const cellClass = fieldChanged
                   ? 'bg-amber-900/30 border border-amber-600/50'
-                  : 'bg-steel-900 border border-steel-700'
+                  : 'bg-[var(--paper)] border border-[var(--ink-100)]'
                 return (
                   <div key={f.key} className="contents">
                     <div className={`${cellClass} rounded-md p-2`}>
-                      <div className="text-[10px] uppercase tracking-wider text-steel-500 mb-1">
+                      <div className="text-[10px] uppercase tracking-wider text-[var(--ink-500)] mb-1">
                         {f.key}
                       </div>
-                      <pre className="whitespace-pre-wrap break-words font-mono text-xs text-steel-100">
-                        {f.oldValue || <span className="text-steel-500">(empty)</span>}
+                      <pre className="whitespace-pre-wrap break-words font-mono text-xs text-[var(--ink-900)]">
+                        {f.oldValue || <span className="text-[var(--ink-500)]">(empty)</span>}
                       </pre>
                     </div>
                     <div className={`${cellClass} rounded-md p-2`}>
-                      <div className="text-[10px] uppercase tracking-wider text-steel-500 mb-1">
+                      <div className="text-[10px] uppercase tracking-wider text-[var(--ink-500)] mb-1">
                         {f.key}
                       </div>
-                      <pre className="whitespace-pre-wrap break-words font-mono text-xs text-steel-100">
-                        {f.newValue || <span className="text-steel-500">(empty)</span>}
+                      <pre className="whitespace-pre-wrap break-words font-mono text-xs text-[var(--ink-900)]">
+                        {f.newValue || <span className="text-[var(--ink-500)]">(empty)</span>}
                       </pre>
                     </div>
                   </div>
@@ -197,7 +197,7 @@ export function BlockUpdateReviewModal({
           <div>
             <label
               htmlFor="decision-note"
-              className="block text-xs uppercase tracking-wider text-steel-400 mb-1"
+              className="block text-xs uppercase tracking-wider text-[var(--ink-500)] mb-1"
             >
               Decision note (optional)
             </label>
@@ -206,7 +206,7 @@ export function BlockUpdateReviewModal({
               rows={2}
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="w-full bg-steel-900 border border-steel-700 rounded-md px-3 py-2 text-sm text-steel-100 focus:border-brand-yellow focus:outline-none"
+              className="w-full bg-[var(--paper)] border border-[var(--ink-100)] rounded-md px-3 py-2 text-sm text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
               placeholder="Why are you accepting / declining?"
             />
           </div>
@@ -224,12 +224,12 @@ export function BlockUpdateReviewModal({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-5 py-3 border-t border-steel-700 bg-steel-900/40">
+        <div className="flex items-center justify-between px-5 py-3 border-t border-[var(--ink-100)] bg-[var(--paper)]/40">
           <button
             type="button"
             onClick={handleDecline}
             disabled={isPending || !latest}
-            className="bg-steel-800 border border-steel-700 text-steel-300 hover:text-steel-100 hover:bg-steel-700 font-semibold px-4 h-[40px] rounded-lg transition-colors text-sm disabled:opacity-50"
+            className="bg-white border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] hover:bg-[var(--paper-2)] font-semibold px-4 h-[40px] rounded-lg transition-colors text-sm disabled:opacity-50"
           >
             Decline (keep current)
           </button>
@@ -237,7 +237,7 @@ export function BlockUpdateReviewModal({
             type="button"
             onClick={handleAccept}
             disabled={isPending || !latest}
-            className="bg-brand-yellow text-steel-900 font-semibold px-4 h-[40px] rounded-lg hover:bg-amber-400 transition-colors text-sm disabled:opacity-50"
+            className="bg-[var(--ink-900)] text-white font-semibold px-4 h-[40px] rounded-lg hover:bg-[var(--ink-700)] transition-colors text-sm disabled:opacity-50"
           >
             Accept update
           </button>

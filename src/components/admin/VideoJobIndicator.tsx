@@ -130,7 +130,7 @@ export function VideoJobIndicator({ sopId }: { sopId: string }) {
     return (
       <Link
         href={`/admin/sops/${sopId}/video`}
-        className="flex flex-col items-center justify-center w-[72px] min-h-[72px] rounded-lg bg-steel-700/50 border border-steel-600 text-steel-400 hover:bg-steel-700 transition-colors flex-shrink-0"
+        className="flex flex-col items-center justify-center w-[72px] min-h-[72px] rounded-lg bg-[var(--paper-2)]/50 border border-[var(--ink-300)] text-[var(--ink-500)] hover:bg-[var(--paper-2)] transition-colors flex-shrink-0"
         title="Video ready but not published — tap to manage"
       >
         <Video size={20} />

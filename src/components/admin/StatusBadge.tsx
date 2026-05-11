@@ -7,17 +7,17 @@ interface StatusBadgeProps {
 
 const variantMap: Record<string, string> = {
   // SOP statuses
-  uploading: 'bg-steel-700 text-steel-400',
+  uploading: 'bg-[var(--paper-2)] text-[var(--ink-500)]',
   parsing: 'bg-blue-500/20 text-blue-400 animate-pulse',
-  draft: 'bg-brand-yellow/20 text-brand-yellow',
+  draft: 'bg-[var(--ink-900)]/20 text-[var(--ink-900)]',
   published: 'bg-green-500/20 text-green-400',
   // ParseJob statuses
-  queued: 'bg-steel-700 text-steel-400',
+  queued: 'bg-[var(--paper-2)] text-[var(--ink-500)]',
   processing: 'bg-blue-500/20 text-blue-400 animate-pulse',
   completed: 'bg-green-500/20 text-green-400',
   failed: 'bg-red-500/20 text-red-400',
   // Completion statuses
-  pending_sign_off: 'bg-brand-yellow/20 text-brand-yellow',
+  pending_sign_off: 'bg-[var(--ink-900)]/20 text-[var(--ink-900)]',
   signed_off: 'bg-green-500/20 text-green-400',
   rejected: 'bg-red-500/20 text-red-400',
 }
@@ -46,7 +46,7 @@ function CompletionIcon({ status }: { status: string }) {
 }
 
 export function StatusBadge({ status }: StatusBadgeProps) {
-  const variantClass = variantMap[status] ?? 'bg-steel-700 text-steel-400'
+  const variantClass = variantMap[status] ?? 'bg-[var(--paper-2)] text-[var(--ink-500)]'
   const label = labelMap[status] ?? status
   const isCompletion = completionStatuses.has(status)
 

@@ -27,14 +27,14 @@ export function SafetyAcknowledgement({
   const [emergencyExpanded, setEmergencyExpanded] = useState(false)
 
   return (
-    <div className="fixed inset-0 z-40 bg-steel-900 flex flex-col overflow-y-auto">
+    <div className="fixed inset-0 z-40 bg-[var(--paper)] flex flex-col overflow-y-auto">
       <div className="flex flex-col gap-6 px-4 py-8 pb-[120px] max-w-2xl mx-auto w-full">
 
         {/* Header */}
         <div className="flex flex-col gap-2">
-          <ShieldAlert size={40} className="text-brand-orange" />
-          <h1 className="text-2xl font-bold text-steel-100">Before you start</h1>
-          <p className="text-base text-steel-400">
+          <ShieldAlert size={40} className="text-[var(--accent-voice)]" />
+          <h1 className="text-2xl font-bold text-[var(--ink-900)]">Before you start</h1>
+          <p className="text-base text-[var(--ink-500)]">
             Review the hazards and required PPE for this procedure.
           </p>
         </div>
@@ -52,14 +52,14 @@ export function SafetyAcknowledgement({
             {hazardsSection.content ? (
               <ul className="list-none space-y-2">
                 {parseListItems(hazardsSection.content).map((item, i) => (
-                  <li key={i} className="flex items-start gap-2 text-base text-steel-100 leading-relaxed">
+                  <li key={i} className="flex items-start gap-2 text-base text-[var(--ink-900)] leading-relaxed">
                     <span className="text-red-400 mt-0.5">•</span>
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="text-base text-steel-100 leading-relaxed">{hazardsSection.title}</p>
+              <p className="text-base text-[var(--ink-900)] leading-relaxed">{hazardsSection.title}</p>
             )}
           </div>
         )}
@@ -86,7 +86,7 @@ export function SafetyAcknowledgement({
                 ))}
               </div>
             ) : (
-              <p className="text-base text-steel-100 leading-relaxed">{ppeSection.title}</p>
+              <p className="text-base text-[var(--ink-900)] leading-relaxed">{ppeSection.title}</p>
             )}
           </div>
         )}
@@ -107,11 +107,11 @@ export function SafetyAcknowledgement({
               </div>
               <ChevronDown
                 size={16}
-                className={`text-steel-400 transition-transform duration-200 ${emergencyExpanded ? 'rotate-180' : ''}`}
+                className={`text-[var(--ink-500)] transition-transform duration-200 ${emergencyExpanded ? 'rotate-180' : ''}`}
               />
             </button>
             {emergencyExpanded && emergencySection.content && (
-              <div className="px-5 pb-5 text-base text-steel-100 leading-relaxed">
+              <div className="px-5 pb-5 text-base text-[var(--ink-900)] leading-relaxed">
                 {emergencySection.content}
               </div>
             )}
@@ -120,11 +120,11 @@ export function SafetyAcknowledgement({
       </div>
 
       {/* Fixed bottom acknowledgement bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-steel-900 border-t border-steel-700 px-4 pt-4 pb-[calc(16px+env(safe-area-inset-bottom,0px))]">
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-[var(--paper)] border-t border-[var(--ink-100)] px-4 pt-4 pb-[calc(16px+env(safe-area-inset-bottom,0px))]">
         <button
           type="button"
           onClick={onAcknowledge}
-          className="w-full h-[80px] bg-brand-orange text-white font-bold text-lg rounded-xl hover:bg-orange-500 active:bg-orange-700 transition-colors flex items-center justify-center gap-2"
+          className="w-full h-[80px] bg-[var(--accent-voice)] text-white font-bold text-lg rounded-xl hover:bg-orange-500 active:bg-orange-700 transition-colors flex items-center justify-center gap-2"
         >
           <ShieldCheck size={22} />
           Understood — Start Procedure

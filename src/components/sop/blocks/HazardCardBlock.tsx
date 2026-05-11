@@ -27,7 +27,7 @@ export function HazardCardBlock({ title, body, severity }: HazardCardBlockProps)
           {lines.map((line, i) => (
             <li
               key={i}
-              className="flex items-start gap-3 text-base text-steel-100 leading-relaxed"
+              className="flex items-start gap-3 text-base text-[var(--ink-900)] leading-relaxed"
             >
               <span className="text-red-400 mt-1.5 flex-shrink-0">•</span>
               <span>{line}</span>
@@ -35,7 +35,7 @@ export function HazardCardBlock({ title, body, severity }: HazardCardBlockProps)
           ))}
         </ul>
       ) : (
-        <p className="text-base text-steel-100 leading-relaxed">{body}</p>
+        <p className="text-base text-[var(--ink-900)] leading-relaxed">{body}</p>
       )}
     </div>
   )

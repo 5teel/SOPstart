@@ -29,7 +29,7 @@ export function AddSectionButton({ sopId, onCreated }: AddSectionButtonProps) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="w-full flex items-center justify-center gap-2 h-[72px] mt-4 border-2 border-dashed border-steel-700 rounded-lg text-steel-400 hover:text-steel-100 hover:border-steel-500 transition-colors"
+        className="w-full flex items-center justify-center gap-2 h-[72px] mt-4 border-2 border-dashed border-[var(--ink-100)] rounded-lg text-[var(--ink-500)] hover:text-[var(--ink-900)] hover:border-[var(--ink-500)] transition-colors"
       >
         <Plus size={20} />
         <span className="text-sm font-semibold">Add section</span>
@@ -45,8 +45,8 @@ export function AddSectionButton({ sopId, onCreated }: AddSectionButtonProps) {
             if (e.target === e.currentTarget) setOpen(false)
           }}
         >
-          <div className="w-full max-w-lg bg-steel-900 border border-steel-700 rounded-xl p-5">
-            <h2 className="text-lg font-bold text-steel-100 mb-3">Add section</h2>
+          <div className="w-full max-w-lg bg-[var(--paper)] border border-[var(--ink-100)] rounded-xl p-5">
+            <h2 className="text-lg font-bold text-[var(--ink-900)] mb-3">Add section</h2>
             <SectionKindPicker
               onSubmit={handleSubmit}
               onCancel={() => setOpen(false)}

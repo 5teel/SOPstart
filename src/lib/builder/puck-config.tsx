@@ -77,7 +77,7 @@ export function UnsupportedBlockPlaceholder({ type }: { type?: string }): ReactE
   return (
     <div
       data-layout-placeholder="unsupported-block"
-      className="bg-steel-800 border border-dashed border-steel-500 rounded-xl p-4 text-steel-400 text-sm mb-4"
+      className="bg-white border border-dashed border-[var(--ink-500)] rounded-xl p-4 text-[var(--ink-500)] text-sm mb-4"
     >
       This block isn&apos;t supported in your app version - update required
       {type ? ` (${type})` : ''}.
@@ -173,14 +173,14 @@ function SafeRender<P>(
           <div className="bg-red-500/15 text-red-300 text-xs font-mono uppercase tracking-wider px-3 py-1 rounded-t-xl">
             {blockName} - {hint}
           </div>
-          <div className="bg-steel-800 border-t-0 rounded-b-xl p-4 text-amber-400 text-sm">
+          <div className="bg-white border-t-0 rounded-b-xl p-4 text-amber-400 text-sm">
             {emptyState}
           </div>
         </div>
       )
     }
     return (
-      <div className="bg-steel-800 border border-dashed border-amber-500/40 rounded-xl p-4 text-amber-400 text-sm mb-4">
+      <div className="bg-white border border-dashed border-amber-500/40 rounded-xl p-4 text-amber-400 text-sm mb-4">
         {emptyState}
       </div>
     )

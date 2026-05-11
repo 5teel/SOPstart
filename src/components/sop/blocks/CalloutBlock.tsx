@@ -16,7 +16,7 @@ export function CalloutBlock({ title, body }: CalloutBlockProps) {
           {title}
         </span>
       </div>
-      <p className="text-base text-steel-100 leading-relaxed">{body}</p>
+      <p className="text-base text-[var(--ink-900)] leading-relaxed">{body}</p>
     </div>
   )
 }

@@ -12,21 +12,21 @@ export function StepProgress({ completedCount, totalSteps }: StepProgressProps) 
   const allDone = completedCount >= totalSteps && totalSteps > 0
 
   return (
-    <div className="px-4 pt-3 pb-4 bg-steel-900">
+    <div className="px-4 pt-3 pb-4 bg-[var(--paper)]">
       {/* Progress bar */}
-      <div className="h-2 bg-steel-700 rounded-full overflow-hidden mb-2">
+      <div className="h-2 bg-[var(--paper-2)] rounded-full overflow-hidden mb-2">
         <div
-          className="h-full bg-brand-yellow rounded-full transition-all duration-300"
+          className="h-full bg-[var(--ink-900)] rounded-full transition-all duration-300"
           style={{ width: `${pct}%` }}
         />
       </div>
 
       {/* Counter row */}
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-steel-100 tabular-nums">
+        <span className="text-sm font-semibold text-[var(--ink-900)] tabular-nums">
           {allDone ? `All ${totalSteps} steps done` : `Step ${nextStep} of ${totalSteps}`}
         </span>
-        <span className="text-sm text-steel-400 tabular-nums">{pct}% done</span>
+        <span className="text-sm text-[var(--ink-500)] tabular-nums">{pct}% done</span>
       </div>
     </div>
   )

@@ -94,12 +94,12 @@ export function SectionKindPicker({ onSubmit, onCancel }: SectionKindPickerProps
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-sm text-steel-300">
+      <p className="text-sm text-[var(--ink-500)]">
         Pick a kind for this section. You can add multiple sections of the same kind —
         e.g. two &ldquo;Hazards&rdquo; sections scoped to different machine states.
       </p>
 
-      {loading && <p className="text-sm text-steel-400">Loading kinds…</p>}
+      {loading && <p className="text-sm text-[var(--ink-500)]">Loading kinds…</p>}
       {error && <p className="text-sm text-red-400">{error}</p>}
 
       {!loading && (
@@ -117,15 +117,15 @@ export function SectionKindPicker({ onSubmit, onCancel }: SectionKindPickerProps
                     'flex items-center gap-2 px-3 py-2 rounded-lg border text-left',
                     'min-h-[72px] transition-colors',
                     isSelected
-                      ? 'border-brand-yellow bg-brand-yellow/10 text-brand-yellow'
-                      : 'border-steel-700 bg-steel-800 text-steel-100 hover:bg-steel-700',
+                      ? 'border-[var(--ink-900)] bg-[var(--ink-900)]/10 text-[var(--ink-900)]'
+                      : 'border-[var(--ink-100)] bg-white text-[var(--ink-900)] hover:bg-[var(--paper-2)]',
                   ].join(' ')}
                 >
                   <Icon size={18} />
                   <div className="flex flex-col">
                     <span className="text-sm font-semibold">{k.display_name}</span>
                     {k.description && (
-                      <span className="text-xs text-steel-400 line-clamp-2">
+                      <span className="text-xs text-[var(--ink-500)] line-clamp-2">
                         {k.description}
                       </span>
                     )}
@@ -137,7 +137,7 @@ export function SectionKindPicker({ onSubmit, onCancel }: SectionKindPickerProps
 
           {orgCustom.length > 0 && (
             <>
-              <div className="text-xs uppercase tracking-wide text-steel-400 mt-2">
+              <div className="text-xs uppercase tracking-wide text-[var(--ink-500)] mt-2">
                 Your organisation
               </div>
               <div className="grid grid-cols-2 gap-2">
@@ -151,8 +151,8 @@ export function SectionKindPicker({ onSubmit, onCancel }: SectionKindPickerProps
                       className={[
                         'flex items-center gap-2 px-3 py-2 rounded-lg border text-left min-h-[72px]',
                         isSelected
-                          ? 'border-brand-yellow bg-brand-yellow/10 text-brand-yellow'
-                          : 'border-steel-700 bg-steel-800 text-steel-100 hover:bg-steel-700',
+                          ? 'border-[var(--ink-900)] bg-[var(--ink-900)]/10 text-[var(--ink-900)]'
+                          : 'border-[var(--ink-100)] bg-white text-[var(--ink-900)] hover:bg-[var(--paper-2)]',
                       ].join(' ')}
                     >
                       <span className="text-sm font-semibold">{k.display_name}</span>
@@ -165,7 +165,7 @@ export function SectionKindPicker({ onSubmit, onCancel }: SectionKindPickerProps
 
           {selectedKind && (
             <label className="flex flex-col gap-1">
-              <span className="text-sm font-semibold text-steel-100">Section title</span>
+              <span className="text-sm font-semibold text-[var(--ink-900)]">Section title</span>
               <input
                 type="text"
                 value={title}
@@ -176,7 +176,7 @@ export function SectionKindPicker({ onSubmit, onCancel }: SectionKindPickerProps
                     ? 'e.g. Pre-flight check'
                     : selectedKind.display_name
                 }
-                className="bg-steel-900 border border-steel-700 rounded-lg px-3 py-2 text-base text-steel-100 focus:outline-none focus:ring-2 focus:ring-brand-yellow/50"
+                className="bg-[var(--paper)] border border-[var(--ink-100)] rounded-lg px-3 py-2 text-base text-[var(--ink-900)] focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)]/50"
               />
             </label>
           )}
@@ -188,14 +188,14 @@ export function SectionKindPicker({ onSubmit, onCancel }: SectionKindPickerProps
           type="button"
           onClick={handleSubmit}
           disabled={!selectedKindId || !title.trim() || submitting || loading}
-          className="h-[72px] px-5 bg-brand-yellow text-steel-900 font-bold rounded-lg hover:bg-amber-400 text-sm disabled:opacity-60"
+          className="h-[72px] px-5 bg-[var(--ink-900)] text-white font-bold rounded-lg hover:bg-[var(--ink-700)] text-sm disabled:opacity-60"
         >
           {submitting ? 'Adding…' : 'Add section'}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="h-[72px] px-5 bg-steel-700 text-steel-100 font-semibold rounded-lg hover:bg-steel-600 text-sm"
+          className="h-[72px] px-5 bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--paper-2)] text-sm"
         >
           Cancel
         </button>

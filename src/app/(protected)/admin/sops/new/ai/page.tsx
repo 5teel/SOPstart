@@ -41,15 +41,15 @@ export default async function NewAiSopPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 lg:px-8 lg:py-12">
       <div className="flex items-center justify-between mb-2">
-        <h1 className="text-2xl font-bold text-steel-100">Draft a SOP from a prompt</h1>
+        <h1 className="text-2xl font-bold text-[var(--ink-900)]">Draft a SOP from a prompt</h1>
         <Link
           href="/admin/sops"
-          className="text-sm text-steel-400 hover:text-brand-yellow transition-colors"
+          className="text-sm text-[var(--ink-500)] hover:text-[var(--ink-700)] transition-colors"
         >
           Back to library
         </Link>
       </div>
-      <p className="text-sm text-steel-400 mb-8">
+      <p className="text-sm text-[var(--ink-500)] mb-8">
         Describe the procedure, site, or worker role in plain English. Claude drafts a structured
         SOP with hazards, PPE, steps and emergency procedures. You&apos;ll review and refine before publish.
       </p>
