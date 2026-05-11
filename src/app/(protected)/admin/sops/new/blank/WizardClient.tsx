@@ -264,16 +264,16 @@ export function WizardClient({ categories }: WizardClientProps) {
   }
 
   return (
-    <div className="rounded-xl border border-steel-700 bg-steel-800 p-6" data-testid="wizard-client">
+    <div className="rounded-xl border border-[var(--ink-100)] bg-white p-6" data-testid="wizard-client">
       {/* Step indicator */}
-      <div className="mb-6 flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-steel-400">
-        <span className={step === 1 ? 'text-brand-yellow' : ''}>1 Title</span>
+      <div className="mb-6 flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[var(--ink-500)]">
+        <span className={step === 1 ? 'text-[var(--ink-900)]' : ''}>1 Title</span>
         <span>→</span>
-        <span className={step === 2 ? 'text-brand-yellow' : ''}>2 Sections</span>
+        <span className={step === 2 ? 'text-[var(--ink-900)]' : ''}>2 Sections</span>
         <span>→</span>
-        <span className={step === 3 ? 'text-brand-yellow' : ''}>3 Review</span>
+        <span className={step === 3 ? 'text-[var(--ink-900)]' : ''}>3 Review</span>
         <span>→</span>
-        <span className={step === 4 ? 'text-brand-yellow' : ''}>4 Create</span>
+        <span className={step === 4 ? 'text-[var(--ink-900)]' : ''}>4 Create</span>
       </div>
 
       {error && (
@@ -294,10 +294,10 @@ export function WizardClient({ categories }: WizardClientProps) {
           className="flex flex-col gap-4"
         >
           <label className="flex flex-col gap-1">
-            <span className="text-sm text-steel-300">Title *</span>
+            <span className="text-sm text-[var(--ink-500)]">Title *</span>
             <input
               {...titleForm.register('title')}
-              className="rounded border border-steel-600 bg-steel-900 px-3 py-2 text-steel-100"
+              className="rounded border border-[var(--ink-300)] bg-[var(--paper)] px-3 py-2 text-[var(--ink-900)]"
               placeholder="e.g. Forklift pre-start checklist"
               data-testid="wizard-title-input"
             />
@@ -308,10 +308,10 @@ export function WizardClient({ categories }: WizardClientProps) {
             )}
           </label>
           <label className="flex flex-col gap-1">
-            <span className="text-sm text-steel-300">SOP number (optional)</span>
+            <span className="text-sm text-[var(--ink-500)]">SOP number (optional)</span>
             <input
               {...titleForm.register('sopNumber')}
-              className="rounded border border-steel-600 bg-steel-900 px-3 py-2 text-steel-100"
+              className="rounded border border-[var(--ink-300)] bg-[var(--paper)] px-3 py-2 text-[var(--ink-900)]"
               placeholder="e.g. SOP-042"
               data-testid="wizard-sop-number-input"
             />
@@ -319,11 +319,11 @@ export function WizardClient({ categories }: WizardClientProps) {
 
           {/* Phase 13 D-Tax-03 — SOP category select */}
           <label className="flex flex-col gap-1">
-            <span className="text-sm text-steel-300">SOP category (optional)</span>
+            <span className="text-sm text-[var(--ink-500)]">SOP category (optional)</span>
             <select
               value={categoryTag ?? ''}
               onChange={(e) => setCategoryTag(e.target.value || null)}
-              className="rounded border border-steel-600 bg-steel-900 px-3 py-2 text-steel-100"
+              className="rounded border border-[var(--ink-300)] bg-[var(--paper)] px-3 py-2 text-[var(--ink-900)]"
               data-testid="wizard-category-tag"
             >
               <option value="">— None —</option>
@@ -333,7 +333,7 @@ export function WizardClient({ categories }: WizardClientProps) {
                 </option>
               ))}
             </select>
-            <span className="text-xs text-steel-500">
+            <span className="text-xs text-[var(--ink-500)]">
               Used to surface the most relevant blocks when you pick from the library.
             </span>
           </label>
@@ -341,7 +341,7 @@ export function WizardClient({ categories }: WizardClientProps) {
           <div className="flex justify-end">
             <button
               type="submit"
-              className="rounded bg-brand-yellow px-4 py-2 text-sm font-bold text-steel-900"
+              className="rounded bg-[var(--ink-900)] px-4 py-2 text-sm font-bold text-white"
               data-testid="wizard-next-1"
             >
               Next
@@ -352,13 +352,13 @@ export function WizardClient({ categories }: WizardClientProps) {
 
       {step === 2 && (
         <div className="flex flex-col gap-4">
-          <p className="text-sm text-steel-300">
+          <p className="text-sm text-[var(--ink-500)]">
             Pick the sections you want to include. You can add more later. For
             hazards, PPE, and step sections you can also pick reusable blocks
             from the library.
           </p>
           {kindsLoading ? (
-            <div className="text-steel-400 text-sm">Loading sections…</div>
+            <div className="text-[var(--ink-500)] text-sm">Loading sections…</div>
           ) : (
             <ul className="flex flex-col gap-2">
               {kinds.map((k) => {
@@ -368,7 +368,7 @@ export function WizardClient({ categories }: WizardClientProps) {
                 return (
                   <li key={k.id}>
                     <div
-                      className="flex flex-col gap-2 rounded border border-steel-700 p-3 hover:bg-steel-900"
+                      className="flex flex-col gap-2 rounded border border-[var(--ink-100)] p-3 hover:bg-[var(--paper)]"
                       data-kind-slug={k.slug}
                     >
                       <label className="flex items-start gap-3 cursor-pointer">
@@ -392,7 +392,7 @@ export function WizardClient({ categories }: WizardClientProps) {
                           }}
                         />
                         <div className="flex-1">
-                          <div className="text-sm font-semibold text-steel-100">
+                          <div className="text-sm font-semibold text-[var(--ink-900)]">
                             {k.display_name}
                           </div>
                         </div>
@@ -406,7 +406,7 @@ export function WizardClient({ categories }: WizardClientProps) {
                                 libraryKindSlug: libraryKind,
                               })
                             }}
-                            className="text-xs px-2 py-1 rounded bg-steel-900 border border-steel-700 text-steel-300 hover:text-brand-yellow"
+                            className="text-xs px-2 py-1 rounded bg-[var(--paper)] border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)]"
                             data-testid={`wizard-pick-from-library-${k.slug}`}
                           >
                             + Pick from library
@@ -423,11 +423,11 @@ export function WizardClient({ categories }: WizardClientProps) {
                               <span className="uppercase tracking-wider">
                                 {p.pinMode === 'pinned' ? 'Pinned' : 'Follow'}
                               </span>
-                              <span className="text-steel-200">{p.preview.name}</span>
+                              <span className="text-[var(--ink-700)]">{p.preview.name}</span>
                               <button
                                 type="button"
                                 onClick={() => handleRemovePicked(k.slug, p.blockId)}
-                                className="text-steel-400 hover:text-red-400 ml-1"
+                                className="text-[var(--ink-500)] hover:text-red-400 ml-1"
                                 aria-label={`Remove ${p.preview.name}`}
                               >
                                 ×
@@ -446,7 +446,7 @@ export function WizardClient({ categories }: WizardClientProps) {
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="rounded border border-steel-600 px-4 py-2 text-sm text-steel-300"
+              className="rounded border border-[var(--ink-300)] px-4 py-2 text-sm text-[var(--ink-500)]"
               data-testid="wizard-back-2"
             >
               Back
@@ -455,7 +455,7 @@ export function WizardClient({ categories }: WizardClientProps) {
               type="button"
               disabled={selectedKindIds.length === 0}
               onClick={() => setStep(3)}
-              className="rounded bg-brand-yellow px-4 py-2 text-sm font-bold text-steel-900 disabled:opacity-40"
+              className="rounded bg-[var(--ink-900)] px-4 py-2 text-sm font-bold text-white disabled:opacity-40"
               data-testid="wizard-next-2"
             >
               Next
@@ -466,29 +466,29 @@ export function WizardClient({ categories }: WizardClientProps) {
 
       {step === 3 && titleValues && (
         <div className="flex flex-col gap-4">
-          <h2 className="text-lg font-bold text-steel-100">Review</h2>
+          <h2 className="text-lg font-bold text-[var(--ink-900)]">Review</h2>
           <dl className="flex flex-col gap-2 text-sm">
             <div>
-              <dt className="text-steel-400">Title</dt>
-              <dd className="text-steel-100">{titleValues.title}</dd>
+              <dt className="text-[var(--ink-500)]">Title</dt>
+              <dd className="text-[var(--ink-900)]">{titleValues.title}</dd>
             </div>
             {titleValues.sopNumber && (
               <div>
-                <dt className="text-steel-400">SOP number</dt>
-                <dd className="text-steel-100">{titleValues.sopNumber}</dd>
+                <dt className="text-[var(--ink-500)]">SOP number</dt>
+                <dd className="text-[var(--ink-900)]">{titleValues.sopNumber}</dd>
               </div>
             )}
             {categoryTag && (
               <div>
-                <dt className="text-steel-400">Category</dt>
-                <dd className="text-steel-100">
+                <dt className="text-[var(--ink-500)]">Category</dt>
+                <dd className="text-[var(--ink-900)]">
                   {sopCategoryOptions.find((c) => c.slug === categoryTag)?.display_name ?? categoryTag}
                 </dd>
               </div>
             )}
             <div>
-              <dt className="text-steel-400">Sections</dt>
-              <dd className="text-steel-100">
+              <dt className="text-[var(--ink-500)]">Sections</dt>
+              <dd className="text-[var(--ink-900)]">
                 <ul className="list-disc pl-5">
                   {selectedKindIds.map((id) => {
                     const k = kinds.find((x) => x.id === id)
@@ -498,7 +498,7 @@ export function WizardClient({ categories }: WizardClientProps) {
                       <li key={id}>
                         {k.display_name}
                         {picks.length > 0 && (
-                          <span className="text-xs text-steel-400 ml-1">
+                          <span className="text-xs text-[var(--ink-500)] ml-1">
                             ({picks.length} from library)
                           </span>
                         )}
@@ -513,7 +513,7 @@ export function WizardClient({ categories }: WizardClientProps) {
             <button
               type="button"
               onClick={() => setStep(2)}
-              className="rounded border border-steel-600 px-4 py-2 text-sm text-steel-300"
+              className="rounded border border-[var(--ink-300)] px-4 py-2 text-sm text-[var(--ink-500)]"
               data-testid="wizard-back-3"
             >
               Back
@@ -522,7 +522,7 @@ export function WizardClient({ categories }: WizardClientProps) {
               type="button"
               disabled={submitting}
               onClick={handleSubmitFinal}
-              className="rounded bg-brand-yellow px-4 py-2 text-sm font-bold text-steel-900 disabled:opacity-40"
+              className="rounded bg-[var(--ink-900)] px-4 py-2 text-sm font-bold text-white disabled:opacity-40"
               data-testid="wizard-create-draft"
             >
               Create draft
@@ -532,7 +532,7 @@ export function WizardClient({ categories }: WizardClientProps) {
       )}
 
       {step === 4 && (
-        <div className="text-steel-300 text-sm" data-testid="wizard-submitting">
+        <div className="text-[var(--ink-500)] text-sm" data-testid="wizard-submitting">
           Creating your SOP…
         </div>
       )}
