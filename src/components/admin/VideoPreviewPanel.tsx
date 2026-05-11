@@ -231,29 +231,29 @@ export function VideoPreviewPanel({
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 bg-steel-900 flex flex-col"
+      className="fixed inset-0 z-50 bg-[var(--paper)] flex flex-col"
       role="dialog"
       aria-modal="true"
       aria-label="Review your recording"
     >
       {/* Header */}
-      <div className="h-14 px-4 flex items-center justify-between bg-steel-900">
+      <div className="h-14 px-4 flex items-center justify-between bg-[var(--paper)]">
         <button
           ref={closeButtonRef}
           type="button"
           onClick={onClose}
           aria-label="Close preview"
           disabled={isUploading}
-          className="w-12 h-12 flex items-center justify-center rounded-full bg-steel-800 hover:bg-steel-700 text-steel-100 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-12 h-12 flex items-center justify-center rounded-full bg-white hover:bg-[var(--paper-2)] text-[var(--ink-900)] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <X className="w-5 h-5" />
         </button>
-        <span className="text-base font-semibold text-steel-100">Preview</span>
+        <span className="text-base font-semibold text-[var(--ink-900)]">Preview</span>
         <div className="w-12" aria-hidden="true" />
       </div>
 
       {/* Playback area */}
-      <div className="flex-1 relative bg-steel-900">
+      <div className="flex-1 relative bg-[var(--paper)]">
         {objectUrl && (
           <video
             ref={videoRef}
@@ -268,19 +268,19 @@ export function VideoPreviewPanel({
 
         {/* Duration badge */}
         {duration !== null && (
-          <div className="absolute bottom-4 right-4 bg-steel-900/80 rounded px-2 py-1 text-xs font-semibold text-steel-100 tabular-nums pointer-events-none">
+          <div className="absolute bottom-4 right-4 bg-[var(--paper)]/80 rounded px-2 py-1 text-xs font-semibold text-[var(--ink-900)] tabular-nums pointer-events-none">
             {formatDuration(duration)}
           </div>
         )}
       </div>
 
       {/* Action bar */}
-      <div className="bg-steel-800 py-6 px-6 flex gap-4">
+      <div className="bg-white py-6 px-6 flex gap-4">
         <button
           type="button"
           onClick={onRetake}
           disabled={isUploading}
-          className="flex-1 h-[72px] bg-steel-700 text-steel-100 font-semibold text-lg rounded-lg hover:bg-steel-600 active:bg-steel-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 h-[72px] bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold text-lg rounded-lg hover:bg-[var(--paper-2)] active:bg-[var(--ink-500)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Retake
         </button>
@@ -289,7 +289,7 @@ export function VideoPreviewPanel({
           onClick={handleSubmit}
           disabled={isUploading}
           aria-busy={isUploading}
-          className="flex-[2] h-[72px] bg-brand-yellow text-steel-900 font-semibold text-lg rounded-lg hover:bg-amber-400 active:bg-amber-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="flex-[2] h-[72px] bg-[var(--ink-900)] text-white font-semibold text-lg rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {isUploading ? (
             <>
@@ -304,7 +304,7 @@ export function VideoPreviewPanel({
 
       {/* Toast */}
       {toast && (
-        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 bg-steel-800 border border-steel-700 rounded-lg shadow-xl text-sm text-steel-100 max-w-sm">
+        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 bg-white border border-[var(--ink-100)] rounded-lg shadow-xl text-sm text-[var(--ink-900)] max-w-sm">
           {toast}
         </div>
       )}

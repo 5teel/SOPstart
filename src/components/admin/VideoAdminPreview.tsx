@@ -69,10 +69,10 @@ export default function VideoAdminPreview({
       {isOutdated && <VideoOutdatedBanner variant="admin" sopId={sopId} />}
 
       {/* Preview heading */}
-      <p className="text-xs font-semibold text-steel-400 uppercase tracking-wide mb-2">Preview</p>
+      <p className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wide mb-2">Preview</p>
 
       {/* Video player */}
-      <div className="bg-steel-900 rounded-lg border border-steel-700 overflow-hidden">
+      <div className="bg-[var(--paper)] rounded-lg border border-[var(--ink-100)] overflow-hidden">
         <video
           src={videoUrl}
           controls
@@ -87,9 +87,9 @@ export default function VideoAdminPreview({
           ref={confirmRef}
           role="alertdialog"
           aria-modal="true"
-          className="mt-4 bg-steel-800 border border-steel-700 rounded-lg p-4"
+          className="mt-4 bg-white border border-[var(--ink-100)] rounded-lg p-4"
         >
-          <p className="text-sm text-steel-100 mb-4">
+          <p className="text-sm text-[var(--ink-900)] mb-4">
             {confirmAction === 'regenerate' && 'Generate a new version? The current version will be preserved.'}
             {confirmAction === 'publish' && 'Publish this version? Workers will see it in the SOP video tab. Any currently published version will be unpublished.'}
             {confirmAction === 'unpublish' && 'Unpublish this video? Workers will no longer see it.'}
@@ -100,7 +100,7 @@ export default function VideoAdminPreview({
               <button
                 onClick={handleConfirm}
                 disabled={pending}
-                className="flex-1 h-[44px] bg-brand-orange text-steel-100 font-semibold rounded-lg hover:bg-orange-500 transition-colors disabled:opacity-50"
+                className="flex-1 h-[44px] bg-[var(--accent-voice)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-orange-500 transition-colors disabled:opacity-50"
               >
                 {pending ? 'Generating...' : 'Yes, generate new version'}
               </button>
@@ -109,7 +109,7 @@ export default function VideoAdminPreview({
               <button
                 onClick={handleConfirm}
                 disabled={pending}
-                className="flex-1 h-[44px] bg-brand-yellow text-steel-900 font-semibold rounded-lg hover:bg-amber-400 transition-colors disabled:opacity-50"
+                className="flex-1 h-[44px] bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] transition-colors disabled:opacity-50"
               >
                 {pending ? 'Publishing...' : 'Yes, publish'}
               </button>
@@ -118,7 +118,7 @@ export default function VideoAdminPreview({
               <button
                 onClick={handleConfirm}
                 disabled={pending}
-                className="flex-1 h-[44px] bg-steel-600 text-steel-100 font-semibold rounded-lg hover:bg-steel-500 transition-colors disabled:opacity-50"
+                className="flex-1 h-[44px] bg-[var(--ink-300)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--ink-500)] transition-colors disabled:opacity-50"
               >
                 {pending ? 'Unpublishing...' : 'Yes, unpublish'}
               </button>
@@ -127,7 +127,7 @@ export default function VideoAdminPreview({
               <button
                 onClick={handleConfirm}
                 disabled={pending}
-                className="flex-1 h-[44px] bg-red-600 text-steel-100 font-semibold rounded-lg hover:bg-red-500 transition-colors disabled:opacity-50"
+                className="flex-1 h-[44px] bg-red-600 text-[var(--ink-900)] font-semibold rounded-lg hover:bg-red-500 transition-colors disabled:opacity-50"
               >
                 {pending ? 'Deleting...' : 'Yes, delete'}
               </button>
@@ -135,7 +135,7 @@ export default function VideoAdminPreview({
             <button
               onClick={handleCancel}
               disabled={pending}
-              className="flex-1 h-[44px] bg-steel-700 text-steel-100 font-semibold rounded-lg hover:bg-steel-600 transition-colors disabled:opacity-50"
+              className="flex-1 h-[44px] bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--paper-2)] transition-colors disabled:opacity-50"
             >
               {confirmAction === 'regenerate' ? 'Not now' :
                confirmAction === 'publish' ? 'Not yet' :
@@ -151,21 +151,21 @@ export default function VideoAdminPreview({
         <div className="flex gap-3 mt-4">
           <button
             onClick={() => openConfirm('regenerate')}
-            className="flex-1 h-[72px] bg-steel-700 text-steel-100 font-semibold text-lg rounded-lg hover:bg-steel-600 transition-colors"
+            className="flex-1 h-[72px] bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold text-lg rounded-lg hover:bg-[var(--paper-2)] transition-colors"
           >
             Generate new version
           </button>
           {isPublished ? (
             <button
               onClick={() => openConfirm('unpublish')}
-              className="flex-[2] h-[72px] bg-steel-700 text-steel-100 font-semibold text-lg rounded-lg hover:bg-steel-600 transition-colors"
+              className="flex-[2] h-[72px] bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold text-lg rounded-lg hover:bg-[var(--paper-2)] transition-colors"
             >
               Unpublish
             </button>
           ) : (
             <button
               onClick={() => openConfirm('publish')}
-              className="flex-[2] h-[72px] bg-brand-yellow text-steel-900 font-semibold text-lg rounded-lg hover:bg-amber-400 transition-colors"
+              className="flex-[2] h-[72px] bg-[var(--ink-900)] text-white font-semibold text-lg rounded-lg hover:bg-[var(--ink-700)] transition-colors"
             >
               Publish video
             </button>

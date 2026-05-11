@@ -159,27 +159,27 @@ export default function SopVersionHistoryPage() {
       <div className="flex items-center gap-3 mb-6">
         <Link
           href={`/admin/sops/${sopId}/review`}
-          className="flex items-center justify-center w-10 h-10 rounded-lg bg-steel-800 hover:bg-steel-700 transition-colors text-steel-400 hover:text-steel-100 flex-shrink-0"
+          className="flex items-center justify-center w-10 h-10 rounded-lg bg-white hover:bg-[var(--paper-2)] transition-colors text-[var(--ink-500)] hover:text-[var(--ink-900)] flex-shrink-0"
           aria-label="Back to SOP review"
         >
           <ArrowLeftIcon className="h-5 w-5" />
         </Link>
         <div className="min-w-0 flex-1">
-          <h1 className="text-xl font-bold text-steel-100 truncate">Version History</h1>
+          <h1 className="text-xl font-bold text-[var(--ink-900)] truncate">Version History</h1>
           {sopTitle && (
-            <p className="text-sm text-steel-400 truncate mt-0.5">{sopTitle}</p>
+            <p className="text-sm text-[var(--ink-500)] truncate mt-0.5">{sopTitle}</p>
           )}
         </div>
         <Link
           href={`/admin/sops/${sopId}/assign`}
-          className="w-8 h-8 rounded-lg bg-steel-800 border border-steel-700 hover:bg-steel-700 hover:border-steel-600 text-steel-400 hover:text-steel-100 transition-colors flex items-center justify-center flex-shrink-0"
+          className="w-8 h-8 rounded-lg bg-white border border-[var(--ink-100)] hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors flex items-center justify-center flex-shrink-0"
           title="Assign SOP"
         >
           <Users size={16} />
         </Link>
         <Link
           href={`/admin/sops/${sopId}/video`}
-          className="w-8 h-8 rounded-lg bg-steel-800 border border-steel-700 hover:bg-steel-700 hover:border-steel-600 text-steel-400 hover:text-steel-100 transition-colors flex items-center justify-center flex-shrink-0"
+          className="w-8 h-8 rounded-lg bg-white border border-[var(--ink-100)] hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors flex items-center justify-center flex-shrink-0"
           title="Video versions"
         >
           <Video size={16} />
@@ -192,7 +192,7 @@ export default function SopVersionHistoryPage() {
           type="button"
           onClick={() => setShowUploadConfirm(true)}
           disabled={uploading}
-          className="flex items-center gap-2 h-[56px] px-5 bg-brand-yellow text-steel-900 font-semibold rounded-xl hover:bg-amber-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+          className="flex items-center gap-2 h-[56px] px-5 bg-[var(--ink-900)] text-white font-semibold rounded-xl hover:bg-[var(--ink-700)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
         >
           <UploadIcon className="h-4 w-4" />
           {uploading ? 'Uploading...' : 'Upload New Version'}
@@ -200,11 +200,11 @@ export default function SopVersionHistoryPage() {
 
         {/* Inline confirmation card */}
         {showUploadConfirm && (
-          <div className="mt-3 bg-brand-orange/10 border border-brand-orange/30 rounded-xl px-4 py-4">
+          <div className="mt-3 bg-[var(--accent-voice)]/10 border border-[var(--accent-voice)]/30 rounded-xl px-4 py-4">
             <div className="flex items-start gap-3">
-              <AlertTriangleIcon className="h-5 w-5 text-brand-orange flex-shrink-0 mt-0.5" />
+              <AlertTriangleIcon className="h-5 w-5 text-[var(--accent-voice)] flex-shrink-0 mt-0.5" />
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-steel-100 leading-relaxed">
+                <p className="text-sm text-[var(--ink-900)] leading-relaxed">
                   Uploading a new version will replace what workers see -- the old version stays linked to any historical completions.
                 </p>
                 <div className="flex items-center gap-4 mt-3">
@@ -215,14 +215,14 @@ export default function SopVersionHistoryPage() {
                       className="sr-only"
                       onChange={handleFileSelected}
                     />
-                    <span className="text-brand-orange font-semibold text-sm hover:text-amber-400 transition-colors">
+                    <span className="text-[var(--accent-voice)] font-semibold text-sm hover:text-[var(--ink-700)] transition-colors">
                       Got it, proceed
                     </span>
                   </label>
                   <button
                     type="button"
                     onClick={() => setShowUploadConfirm(false)}
-                    className="text-steel-400 hover:text-steel-100 text-sm transition-colors"
+                    className="text-[var(--ink-500)] hover:text-[var(--ink-900)] text-sm transition-colors"
                   >
                     Cancel
                   </button>
@@ -240,20 +240,20 @@ export default function SopVersionHistoryPage() {
       {/* Version history table */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <p className="text-sm text-steel-400">Loading version history...</p>
+          <p className="text-sm text-[var(--ink-500)]">Loading version history...</p>
         </div>
       ) : versions.length === 0 ? (
         <div className="flex items-center justify-center py-12">
-          <p className="text-sm text-steel-400">No versions found.</p>
+          <p className="text-sm text-[var(--ink-500)]">No versions found.</p>
         </div>
       ) : (
-        <div className="w-full bg-steel-800 rounded-lg overflow-hidden border border-steel-700">
+        <div className="w-full bg-white rounded-lg overflow-hidden border border-[var(--ink-100)]">
           {/* Table header */}
-          <div className="grid grid-cols-[80px_1fr_1fr_120px] gap-4 px-4 py-3 bg-steel-900/60">
-            <span className="text-xs font-semibold text-steel-400 uppercase tracking-wide">Version</span>
-            <span className="text-xs font-semibold text-steel-400 uppercase tracking-wide">Uploaded</span>
-            <span className="text-xs font-semibold text-steel-400 uppercase tracking-wide">Status</span>
-            <span className="text-xs font-semibold text-steel-400 uppercase tracking-wide text-right">Actions</span>
+          <div className="grid grid-cols-[80px_1fr_1fr_120px] gap-4 px-4 py-3 bg-[var(--paper)]/60">
+            <span className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wide">Version</span>
+            <span className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wide">Uploaded</span>
+            <span className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wide">Status</span>
+            <span className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wide text-right">Actions</span>
           </div>
 
           {/* Data rows */}
@@ -262,22 +262,22 @@ export default function SopVersionHistoryPage() {
             return (
               <div
                 key={ver.id}
-                className="grid grid-cols-[80px_1fr_1fr_120px] gap-4 px-4 items-center border-t border-steel-700 min-h-[56px] text-sm text-steel-100"
+                className="grid grid-cols-[80px_1fr_1fr_120px] gap-4 px-4 items-center border-t border-[var(--ink-100)] min-h-[56px] text-sm text-[var(--ink-900)]"
               >
                 {/* Version number */}
                 <span className="text-sm font-mono font-semibold">v{ver.version}</span>
 
                 {/* Upload date */}
-                <span className="text-sm text-steel-300">{formatDate(ver.created_at)}</span>
+                <span className="text-sm text-[var(--ink-500)]">{formatDate(ver.created_at)}</span>
 
                 {/* Status badge */}
                 <span>
                   {isCurrent ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-brand-yellow/20 text-brand-yellow text-xs font-semibold rounded">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--ink-900)]/20 text-[var(--ink-900)] text-xs font-semibold rounded">
                       Current
                     </span>
                   ) : (
-                    <span className="inline-flex items-center px-2 py-0.5 bg-steel-700 text-steel-400 text-xs font-medium rounded">
+                    <span className="inline-flex items-center px-2 py-0.5 bg-[var(--paper-2)] text-[var(--ink-500)] text-xs font-medium rounded">
                       Superseded
                     </span>
                   )}
@@ -288,7 +288,7 @@ export default function SopVersionHistoryPage() {
                   {isCurrent && (
                     <Link
                       href={`/admin/sops/${ver.id}/review`}
-                      className="text-brand-yellow hover:text-amber-400 text-sm font-medium transition-colors"
+                      className="text-[var(--ink-900)] hover:text-[var(--ink-700)] text-sm font-medium transition-colors"
                     >
                       Review
                     </Link>

@@ -54,21 +54,21 @@ export function AssignmentRow({
   }
 
   return (
-    <div className="flex items-center gap-4 px-4 py-3 bg-steel-800 rounded-xl border border-steel-700 min-h-[56px]">
+    <div className="flex items-center gap-4 px-4 py-3 bg-white rounded-xl border border-[var(--ink-100)] min-h-[56px]">
       {/* Left icon */}
       {type === 'role' ? (
-        <Users size={20} className="text-steel-400 flex-shrink-0" />
+        <Users size={20} className="text-[var(--ink-500)] flex-shrink-0" />
       ) : (
-        <div className="w-9 h-9 rounded-full bg-steel-700 flex items-center justify-center text-sm font-bold text-steel-100 flex-shrink-0 select-none">
+        <div className="w-9 h-9 rounded-full bg-[var(--paper-2)] flex items-center justify-center text-sm font-bold text-[var(--ink-900)] flex-shrink-0 select-none">
           {getInitials(name)}
         </div>
       )}
 
       {/* Middle — name + subtitle */}
       <div className="flex flex-col flex-1 min-w-0">
-        <span className="text-base font-medium text-steel-100 truncate">{name}</span>
+        <span className="text-base font-medium text-[var(--ink-900)] truncate">{name}</span>
         {subtitle && (
-          <span className="text-xs text-steel-400 truncate">{subtitle}</span>
+          <span className="text-xs text-[var(--ink-500)] truncate">{subtitle}</span>
         )}
       </div>
 
@@ -77,7 +77,7 @@ export function AssignmentRow({
         {confirmingRemove ? (
           /* Inline removal confirmation — no modal */
           <div className="flex items-center gap-2">
-            <span className="text-sm text-steel-300 hidden sm:inline">Remove assignment?</span>
+            <span className="text-sm text-[var(--ink-500)] hidden sm:inline">Remove assignment?</span>
             <button
               type="button"
               onClick={handleConfirmRemove}
@@ -88,7 +88,7 @@ export function AssignmentRow({
             <button
               type="button"
               onClick={handleCancelRemove}
-              className="h-[36px] px-3 text-steel-400 font-semibold text-sm rounded-lg border border-steel-600 hover:bg-steel-700 transition-colors"
+              className="h-[36px] px-3 text-[var(--ink-500)] font-semibold text-sm rounded-lg border border-[var(--ink-300)] hover:bg-[var(--paper-2)] transition-colors"
             >
               Cancel
             </button>
@@ -96,7 +96,7 @@ export function AssignmentRow({
         ) : isLoading ? (
           /* Loading state */
           <div className="h-[44px] px-4 flex items-center justify-center opacity-70 pointer-events-none">
-            <Loader2 size={18} className="animate-spin text-steel-400" />
+            <Loader2 size={18} className="animate-spin text-[var(--ink-500)]" />
           </div>
         ) : isAssigned ? (
           /* Assigned state — show "Assigned" with hover → "Remove" */
@@ -127,7 +127,7 @@ export function AssignmentRow({
           <button
             type="button"
             onClick={onAssign}
-            className="h-[44px] px-4 bg-brand-yellow text-steel-900 font-semibold text-sm rounded-lg hover:bg-amber-400 transition-colors"
+            className="h-[44px] px-4 bg-[var(--ink-900)] text-white font-semibold text-sm rounded-lg hover:bg-[var(--ink-700)] transition-colors"
           >
             + Assign
           </button>

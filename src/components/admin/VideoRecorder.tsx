@@ -384,8 +384,8 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
     if (recorderState === 'permission-denied') {
       return (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-8 text-center">
-          <AlertTriangle className="w-10 h-10 text-brand-orange" />
-          <p className="text-sm text-brand-orange leading-relaxed">
+          <AlertTriangle className="w-10 h-10 text-[var(--accent-voice)]" />
+          <p className="text-sm text-[var(--accent-voice)] leading-relaxed">
             Camera access required — please allow camera access in your browser settings and reload.
           </p>
         </div>
@@ -395,7 +395,7 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
       return (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-8 text-center">
           <AlertTriangle className="w-10 h-10 text-red-400" />
-          <p className="text-sm text-brand-orange leading-relaxed">{errorMessage}</p>
+          <p className="text-sm text-[var(--accent-voice)] leading-relaxed">{errorMessage}</p>
         </div>
       )
     }
@@ -410,14 +410,14 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
     if (recorderState === 'discard-confirm') {
       return (
         <div className="flex flex-col items-center gap-4 text-center w-full px-6 py-6">
-          <p className="text-base font-semibold text-steel-100">Stop recording and discard?</p>
-          <p className="text-sm text-steel-400">Your recording will be lost.</p>
+          <p className="text-base font-semibold text-[var(--ink-900)]">Stop recording and discard?</p>
+          <p className="text-sm text-[var(--ink-500)]">Your recording will be lost.</p>
           <div className="flex gap-3 w-full">
             <button
               type="button"
               onClick={handleDiscardConfirm}
               aria-label="Discard recording and close"
-              className="flex-1 h-[72px] bg-steel-800 border border-red-500/50 text-red-400 rounded-lg font-semibold text-sm hover:bg-steel-700 transition-colors"
+              className="flex-1 h-[72px] bg-white border border-red-500/50 text-red-400 rounded-lg font-semibold text-sm hover:bg-[var(--paper-2)] transition-colors"
             >
               Discard recording
             </button>
@@ -425,7 +425,7 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
               type="button"
               onClick={handleKeepRecording}
               aria-label="Keep recording and continue"
-              className="flex-1 h-[72px] bg-steel-700 text-steel-100 rounded-lg font-semibold text-sm hover:bg-steel-600 transition-colors"
+              className="flex-1 h-[72px] bg-[var(--paper-2)] text-[var(--ink-900)] rounded-lg font-semibold text-sm hover:bg-[var(--paper-2)] transition-colors"
             >
               Keep recording
             </button>
@@ -440,12 +440,12 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
           {recorderState === 'extracting-audio' ? (
             <>
               <TusUploadProgress percentage={extractionPct} />
-              <p className="text-sm text-steel-100">Extracting audio... {extractionPct}%</p>
+              <p className="text-sm text-[var(--ink-900)]">Extracting audio... {extractionPct}%</p>
             </>
           ) : (
             <div className="flex items-center gap-2">
               <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
-              <p className="text-sm text-steel-100">Stopping...</p>
+              <p className="text-sm text-[var(--ink-900)]">Stopping...</p>
             </div>
           )}
         </div>
@@ -460,11 +460,11 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Open browser camera settings"
-            className="text-brand-yellow text-sm font-semibold hover:underline"
+            className="text-[var(--ink-900)] text-sm font-semibold hover:underline"
           >
             Open Settings
           </a>
-          <p className="text-xs text-steel-400 leading-relaxed mt-2">
+          <p className="text-xs text-[var(--ink-500)] leading-relaxed mt-2">
             In your browser&apos;s address bar, tap the camera icon or go to Settings &gt; Privacy &gt; Camera and allow access for this site.
           </p>
         </div>
@@ -481,7 +481,7 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
               setRecorderState('requesting-permission')
               startCamera(facingMode)
             }}
-            className="h-[72px] px-8 bg-steel-700 text-steel-100 font-semibold rounded-lg hover:bg-steel-600 transition-colors"
+            className="h-[72px] px-8 bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--paper-2)] transition-colors"
           >
             Try again
           </button>
@@ -497,7 +497,7 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
           onClick={handleSwitchCamera}
           disabled={isRecording}
           aria-label={switchCameraLabel}
-          className={`md:hidden w-[72px] h-[72px] rounded-full bg-steel-700 flex items-center justify-center text-steel-100 hover:bg-steel-600 active:bg-steel-500 transition-colors ${
+          className={`md:hidden w-[72px] h-[72px] rounded-full bg-[var(--paper-2)] flex items-center justify-center text-[var(--ink-900)] hover:bg-[var(--paper-2)] active:bg-[var(--ink-500)] transition-colors ${
             isRecording ? 'opacity-50 cursor-not-allowed' : ''
           }`}
         >
@@ -511,7 +511,7 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
             onClick={handleStartRecording}
             aria-label="Start recording"
             aria-pressed={false}
-            className="w-20 h-20 rounded-full border-4 border-brand-yellow bg-steel-800 flex items-center justify-center hover:bg-steel-700 transition-colors"
+            className="w-20 h-20 rounded-full border-4 border-[var(--ink-900)] bg-white flex items-center justify-center hover:bg-[var(--paper-2)] transition-colors"
           >
             <Circle className="w-8 h-8 fill-white text-white" />
           </button>
@@ -542,27 +542,27 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 bg-steel-900 flex flex-col"
+      className="fixed inset-0 z-50 bg-[var(--paper)] flex flex-col"
       role="dialog"
       aria-modal="true"
       aria-label="Record video"
     >
       {/* Header */}
-      <div className="h-14 px-4 flex items-center justify-between bg-steel-900">
+      <div className="h-14 px-4 flex items-center justify-between bg-[var(--paper)]">
         <button
           ref={closeButtonRef}
           type="button"
           onClick={handleClose}
           aria-label="Close recording overlay"
-          className="w-12 h-12 flex items-center justify-center rounded-full bg-steel-800 hover:bg-steel-700 text-steel-100"
+          className="w-12 h-12 flex items-center justify-center rounded-full bg-white hover:bg-[var(--paper-2)] text-[var(--ink-900)]"
         >
           <X className="w-5 h-5" />
         </button>
-        <span className="text-xs text-steel-400 font-semibold">{cameraLabel}</span>
+        <span className="text-xs text-[var(--ink-500)] font-semibold">{cameraLabel}</span>
       </div>
 
       {/* Viewfinder */}
-      <div className="flex-1 relative bg-steel-900 overflow-hidden">
+      <div className="flex-1 relative bg-[var(--paper)] overflow-hidden">
         <video
           ref={videoRef}
           autoPlay
@@ -583,9 +583,9 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
             aria-live="polite"
           >
             <span className="w-3 h-3 rounded-full bg-red-500 animate-pulse" aria-hidden="true" />
-            <span className="text-xs font-semibold text-steel-100 tabular-nums">REC</span>
+            <span className="text-xs font-semibold text-[var(--ink-900)] tabular-nums">REC</span>
             <span
-              className={`text-xs font-semibold tabular-nums ${isWarning ? 'text-red-400' : 'text-steel-400'}`}
+              className={`text-xs font-semibold tabular-nums ${isWarning ? 'text-red-400' : 'text-[var(--ink-500)]'}`}
               aria-label={`Recording duration: ${formatTime(elapsedSeconds)}`}
             >
               {formatTime(elapsedSeconds)}
@@ -600,7 +600,7 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
       </div>
 
       {/* Controls bar */}
-      <div className={`bg-steel-800 ${
+      <div className={`bg-white ${
         recorderState === 'discard-confirm' ? '' : 'py-6 px-8 flex items-center justify-between'
       }`}>
         {renderControlsContent()}
@@ -613,7 +613,7 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
 
       {/* Internal toast */}
       {internalToast && (
-        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 bg-steel-800 border border-steel-700 rounded-lg shadow-xl text-sm text-steel-100 max-w-sm">
+        <div className="fixed bottom-4 right-4 z-50 flex items-center gap-3 px-4 py-3 bg-white border border-[var(--ink-100)] rounded-lg shadow-xl text-sm text-[var(--ink-900)] max-w-sm">
           {internalToast}
         </div>
       )}

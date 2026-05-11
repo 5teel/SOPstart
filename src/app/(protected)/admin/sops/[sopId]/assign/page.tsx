@@ -201,7 +201,7 @@ export default function AssignSopPage() {
   if (isPageLoading) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-8 lg:px-8 lg:py-10 flex items-center justify-center min-h-[200px]">
-        <p className="text-steel-400 text-sm">Loading...</p>
+        <p className="text-[var(--ink-500)] text-sm">Loading...</p>
       </div>
     )
   }
@@ -213,7 +213,7 @@ export default function AssignSopPage() {
         <div className="flex items-center gap-3 mb-4">
           <Link
             href={`/admin/sops/${sopId}/review`}
-            className="flex items-center gap-2 text-steel-400 hover:text-steel-100 transition-colors"
+            className="flex items-center gap-2 text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors"
             aria-label="Back to SOP review"
           >
             <ArrowLeft size={18} />
@@ -222,29 +222,29 @@ export default function AssignSopPage() {
           <div className="flex-1" />
           <Link
             href={`/admin/sops/${sopId}/versions`}
-            className="w-8 h-8 rounded-lg bg-steel-800 border border-steel-700 hover:bg-steel-700 hover:border-steel-600 text-steel-400 hover:text-steel-100 transition-colors flex items-center justify-center"
+            className="w-8 h-8 rounded-lg bg-white border border-[var(--ink-100)] hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors flex items-center justify-center"
             title="Version history"
           >
             <History size={16} />
           </Link>
           <Link
             href={`/admin/sops/${sopId}/video`}
-            className="w-8 h-8 rounded-lg bg-steel-800 border border-steel-700 hover:bg-steel-700 hover:border-steel-600 text-steel-400 hover:text-steel-100 transition-colors flex items-center justify-center"
+            className="w-8 h-8 rounded-lg bg-white border border-[var(--ink-100)] hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors flex items-center justify-center"
             title="Video versions"
           >
             <Video size={16} />
           </Link>
         </div>
 
-        <h1 className="text-2xl font-bold text-steel-100">Assign SOP</h1>
+        <h1 className="text-2xl font-bold text-[var(--ink-900)]">Assign SOP</h1>
         {sopTitle && (
-          <p className="text-sm text-steel-400 mt-1 truncate">{sopTitle}</p>
+          <p className="text-sm text-[var(--ink-500)] mt-1 truncate">{sopTitle}</p>
         )}
       </div>
 
       {/* Section 1: Assign by role */}
       <section className="mb-8">
-        <h2 className="text-xs font-semibold text-steel-400 uppercase tracking-widest mb-3">
+        <h2 className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-widest mb-3">
           Assign by role
         </h2>
         <ul className="space-y-2">
@@ -272,16 +272,16 @@ export default function AssignSopPage() {
 
       {/* Section 2: Assign to individual workers */}
       <section>
-        <h2 className="text-xs font-semibold text-steel-400 uppercase tracking-widest mb-3">
+        <h2 className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-widest mb-3">
           Assign to individual workers
         </h2>
 
         {members.length === 0 ? (
           /* Empty state */
-          <div className="flex flex-col items-center justify-center py-12 text-center bg-steel-800 rounded-xl border border-steel-700">
-            <Users size={32} className="text-steel-500 mb-3" />
-            <p className="text-base font-semibold text-steel-100 mb-1">No workers yet</p>
-            <p className="text-sm text-steel-400">
+          <div className="flex flex-col items-center justify-center py-12 text-center bg-white rounded-xl border border-[var(--ink-100)]">
+            <Users size={32} className="text-[var(--ink-500)] mb-3" />
+            <p className="text-base font-semibold text-[var(--ink-900)] mb-1">No workers yet</p>
+            <p className="text-sm text-[var(--ink-500)]">
               Invite workers to your organisation first.
             </p>
           </div>
@@ -293,11 +293,11 @@ export default function AssignSopPage() {
               placeholder="Search workers..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full h-[56px] px-4 bg-steel-800 border border-steel-700 rounded-xl text-steel-100 placeholder:text-steel-500 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-brand-yellow/50 focus:border-brand-yellow/50"
+              className="w-full h-[56px] px-4 bg-white border border-[var(--ink-100)] rounded-xl text-[var(--ink-900)] placeholder:text-[var(--ink-500)] text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)]/50 focus:border-[var(--ink-900)]/50"
             />
 
             {filteredMembers.length === 0 ? (
-              <p className="text-sm text-steel-400 text-center py-6">
+              <p className="text-sm text-[var(--ink-500)] text-center py-6">
                 No workers match &ldquo;{search}&rdquo;
               </p>
             ) : (

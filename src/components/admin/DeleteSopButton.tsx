@@ -33,7 +33,7 @@ export function DeleteSopButton({ sopId }: { sopId: string }) {
           type="button"
           onClick={() => setConfirming(false)}
           disabled={pending}
-          className="flex items-center justify-center w-10 h-10 rounded-lg bg-steel-800 border border-steel-700 text-steel-400 hover:text-steel-100 transition-colors text-xs font-medium"
+          className="flex items-center justify-center w-10 h-10 rounded-lg bg-white border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors text-xs font-medium"
           title="Cancel"
           aria-label="Cancel delete"
         >
@@ -47,7 +47,7 @@ export function DeleteSopButton({ sopId }: { sopId: string }) {
     <button
       type="button"
       onClick={() => setConfirming(true)}
-      className="flex items-center justify-center w-10 h-10 rounded-lg bg-steel-800 border border-steel-700 hover:bg-red-900/30 hover:border-red-500/40 transition-colors text-steel-400 hover:text-red-400 flex-shrink-0"
+      className="flex items-center justify-center w-10 h-10 rounded-lg bg-white border border-[var(--ink-100)] hover:bg-red-900/30 hover:border-red-500/40 transition-colors text-[var(--ink-500)] hover:text-red-400 flex-shrink-0"
       title="Delete SOP"
       aria-label="Delete SOP"
     >
