@@ -224,16 +224,16 @@ export function PipelineProgressClient(props: Props) {
     snapshot.sop?.title ?? snapshot.sop?.source_file_name ?? 'New SOP'
 
   return (
-    <div className="min-h-screen bg-steel-900">
-      <header className="h-[56px] sticky top-0 z-20 bg-steel-900 border-b border-steel-700 px-4 flex items-center gap-3">
+    <div className="min-h-screen bg-[var(--paper)]">
+      <header className="h-[56px] sticky top-0 z-20 bg-[var(--paper)] border-b border-[var(--ink-100)] px-4 flex items-center gap-3">
         <Link
           href="/admin/sops"
           aria-label="Back to SOP list"
-          className="text-steel-400 hover:text-steel-100"
+          className="text-[var(--ink-500)] hover:text-[var(--ink-900)]"
         >
           <ArrowLeft className="w-5 h-5" />
         </Link>
-        <h1 className="text-sm font-medium text-steel-100 truncate">{sopTitle}</h1>
+        <h1 className="text-sm font-medium text-[var(--ink-900)] truncate">{sopTitle}</h1>
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-8">
@@ -241,35 +241,35 @@ export function PipelineProgressClient(props: Props) {
 
         <div className="mt-6 space-y-4">
           {stage === 'uploading' && (
-            <div className="bg-steel-800 border border-steel-700 rounded-xl p-5 flex items-center gap-3">
+            <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5 flex items-center gap-3">
               <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
-              <p className="text-sm text-steel-100">Uploading your file...</p>
+              <p className="text-sm text-[var(--ink-900)]">Uploading your file...</p>
             </div>
           )}
 
           {stage === 'parsing' && (
-            <div className="bg-steel-800 border border-steel-700 rounded-xl p-5">
+            <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5">
               <div className="flex items-center gap-3">
                 <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
-                <p className="text-sm font-semibold text-steel-100">
+                <p className="text-sm font-semibold text-[var(--ink-900)]">
                   Crunching your SOP…
                 </p>
               </div>
-              <p className="text-xs text-steel-400 mt-2">
+              <p className="text-xs text-[var(--ink-500)] mt-2">
                 Grab a coffee — this can take a few minutes.
               </p>
             </div>
           )}
 
           {stage === 'review' && sopId && (
-            <div className="bg-brand-orange/20 border border-brand-orange/50 rounded-xl p-5">
+            <div className="bg-[var(--accent-voice)]/20 border border-[var(--accent-voice)]/50 rounded-xl p-5">
               <div className="flex items-start gap-3 mb-3">
-                <ClipboardCheck className="w-6 h-6 text-brand-orange shrink-0" />
+                <ClipboardCheck className="w-6 h-6 text-[var(--accent-voice)] shrink-0" />
                 <div>
-                  <p className="text-sm font-semibold text-steel-100">
+                  <p className="text-sm font-semibold text-[var(--ink-900)]">
                     Review required before video generates
                   </p>
-                  <p className="text-sm text-steel-400 mt-1">
+                  <p className="text-sm text-[var(--ink-500)] mt-1">
                     Check the parsed SOP, approve all sections, then publish to
                     continue.
                   </p>
@@ -277,7 +277,7 @@ export function PipelineProgressClient(props: Props) {
               </div>
               <Link
                 href={`/admin/sops/${sopId}/review?from=pipeline&pipelineId=${props.pipelineId}`}
-                className="h-[72px] w-full bg-brand-yellow text-steel-900 font-semibold text-xl rounded-lg flex items-center justify-center hover:bg-amber-400 transition-colors"
+                className="h-[72px] w-full bg-[var(--ink-900)] text-white font-semibold text-xl rounded-lg flex items-center justify-center hover:bg-[var(--ink-700)] transition-colors"
               >
                 Review SOP now →
               </Link>
@@ -285,14 +285,14 @@ export function PipelineProgressClient(props: Props) {
           )}
 
           {stage === 'generating' && snapshot.videoJob && (
-            <div className="bg-steel-800 border border-steel-700 rounded-xl p-5">
+            <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5">
               <div className="flex items-center gap-3 mb-2">
                 <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
-                <p className="text-sm font-semibold text-steel-100">
+                <p className="text-sm font-semibold text-[var(--ink-900)]">
                   Generating video
                 </p>
               </div>
-              <p className="text-xs text-steel-400">
+              <p className="text-xs text-[var(--ink-500)]">
                 Stage:{' '}
                 {snapshot.videoJob.current_stage ?? snapshot.videoJob.status}
               </p>
@@ -300,9 +300,9 @@ export function PipelineProgressClient(props: Props) {
           )}
 
           {stage === 'generating' && !snapshot.videoJob && (
-            <div className="bg-steel-800 border border-steel-700 rounded-xl p-5 flex items-center gap-3">
+            <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5 flex items-center gap-3">
               <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
-              <p className="text-sm text-steel-100">Queuing video generation…</p>
+              <p className="text-sm text-[var(--ink-900)]">Queuing video generation…</p>
             </div>
           )}
 
@@ -311,10 +311,10 @@ export function PipelineProgressClient(props: Props) {
               <div className="flex items-start gap-3 mb-3">
                 <CheckCircle className="w-6 h-6 text-green-400 shrink-0" />
                 <div>
-                  <p className="text-sm font-semibold text-steel-100">
+                  <p className="text-sm font-semibold text-[var(--ink-900)]">
                     Video SOP ready
                   </p>
-                  <p className="text-sm text-steel-400 mt-1">
+                  <p className="text-sm text-[var(--ink-500)] mt-1">
                     Review the video and publish it when you&apos;re happy with
                     the audio.
                   </p>
@@ -322,7 +322,7 @@ export function PipelineProgressClient(props: Props) {
               </div>
               <Link
                 href={`/admin/sops/${sopId}/video`}
-                className="h-[72px] w-full bg-brand-yellow text-steel-900 font-semibold text-xl rounded-lg flex items-center justify-center hover:bg-amber-400 transition-colors"
+                className="h-[72px] w-full bg-[var(--ink-900)] text-white font-semibold text-xl rounded-lg flex items-center justify-center hover:bg-[var(--ink-700)] transition-colors"
               >
                 Preview and publish video →
               </Link>
@@ -331,16 +331,16 @@ export function PipelineProgressClient(props: Props) {
 
           {stage === 'error' && errorStage === 'generating' && sopId && (
             <div
-              className="bg-steel-800 border border-steel-700 rounded-xl p-5"
+              className="bg-white border border-[var(--ink-100)] rounded-xl p-5"
               role="alert"
             >
               <div className="flex items-start gap-3 mb-3">
-                <AlertTriangle className="w-5 h-5 text-brand-orange shrink-0" />
+                <AlertTriangle className="w-5 h-5 text-[var(--accent-voice)] shrink-0" />
                 <div>
-                  <p className="text-sm font-semibold text-steel-100">
+                  <p className="text-sm font-semibold text-[var(--ink-900)]">
                     Video generation failed
                   </p>
-                  <p className="text-xs text-steel-400 mt-1 line-clamp-2">
+                  <p className="text-xs text-[var(--ink-500)] mt-1 line-clamp-2">
                     {snapshot.videoJob?.error_message ??
                       'Check the video panel for details.'}
                   </p>
@@ -348,7 +348,7 @@ export function PipelineProgressClient(props: Props) {
               </div>
               <Link
                 href={`/admin/sops/${sopId}/video`}
-                className="h-[72px] w-full bg-brand-yellow text-steel-900 font-semibold text-xl rounded-lg flex items-center justify-center hover:bg-amber-400 transition-colors"
+                className="h-[72px] w-full bg-[var(--ink-900)] text-white font-semibold text-xl rounded-lg flex items-center justify-center hover:bg-[var(--ink-700)] transition-colors"
               >
                 Go to video panel
               </Link>
@@ -357,21 +357,21 @@ export function PipelineProgressClient(props: Props) {
 
           {stage === 'error' && errorStage === 'parsing' && sopId && (
             <div
-              className="bg-steel-800 border border-steel-700 rounded-xl p-5"
+              className="bg-white border border-[var(--ink-100)] rounded-xl p-5"
               role="alert"
             >
               <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-brand-orange shrink-0" />
+                <AlertTriangle className="w-5 h-5 text-[var(--accent-voice)] shrink-0" />
                 <div>
-                  <p className="text-sm font-semibold text-steel-100">
+                  <p className="text-sm font-semibold text-[var(--ink-900)]">
                     Couldn&apos;t parse that one
                   </p>
-                  <p className="text-xs text-steel-400 mt-1">
+                  <p className="text-xs text-[var(--ink-500)] mt-1">
                     {snapshot.parseJob?.error_message ?? 'Parsing failed.'}
                   </p>
                   <Link
                     href={`/admin/sops/${sopId}/review`}
-                    className="text-xs text-brand-yellow hover:text-amber-400 mt-2 inline-block"
+                    className="text-xs text-[var(--ink-900)] hover:text-[var(--ink-700)] mt-2 inline-block"
                   >
                     Open review page to retry →
                   </Link>

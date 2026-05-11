@@ -16,7 +16,7 @@ export function ImageQualityOverlay({ state, message }: ImageQualityOverlayProps
     checking: {
       icon: <Loader2 className="w-4 h-4 animate-spin" />,
       text: 'Checking image...',
-      color: 'text-steel-400',
+      color: 'text-[var(--ink-500)]',
     },
     pass: {
       icon: <CheckCircle className="w-4 h-4" />,
@@ -26,13 +26,13 @@ export function ImageQualityOverlay({ state, message }: ImageQualityOverlayProps
     warn: {
       icon: <AlertTriangle className="w-4 h-4" />,
       text: message || 'Image may be hard to read -- retake recommended',
-      color: 'text-brand-orange',
+      color: 'text-[var(--accent-voice)]',
     },
   }[state]
 
   return (
     <div
-      className={`flex items-center gap-2 px-4 py-2 border-b border-steel-700 ${config.color}`}
+      className={`flex items-center gap-2 px-4 py-2 border-b border-[var(--ink-100)] ${config.color}`}
       role="status"
       aria-live="polite"
     >
