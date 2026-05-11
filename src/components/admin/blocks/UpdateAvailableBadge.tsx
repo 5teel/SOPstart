@@ -41,10 +41,10 @@ export function UpdateAvailableBadge({
         title="Update available — click to review"
         aria-label="Update available — click to review"
         data-testid="update-available-badge"
-        className="relative inline-flex h-2.5 w-2.5 items-center justify-center rounded-full bg-amber-400 ring-2 ring-amber-300/30 hover:ring-amber-300/60 transition-shadow cursor-pointer"
+        className="relative inline-flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[var(--accent-decision)] ring-2 ring-[var(--accent-decision)]/30 hover:ring-[var(--accent-decision)]/60 transition-shadow cursor-pointer"
       >
         <span className="sr-only">Update available — click to review</span>
-        <span className="absolute inset-0 rounded-full bg-amber-400 animate-ping opacity-50" />
+        <span className="absolute inset-0 rounded-full bg-[var(--accent-decision)] animate-ping opacity-50" />
       </button>
       {modalOpen && (
         <BlockUpdateReviewModal

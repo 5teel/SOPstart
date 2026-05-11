@@ -170,7 +170,7 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
             rows={12}
             value={contentJson}
             onChange={(e) => setContentJson(e.target.value)}
-            className="w-full bg-steel-950 border border-[var(--ink-100)] rounded-md px-3 py-2 font-mono text-xs text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
+            className="w-full bg-[var(--paper-2)] border border-[var(--ink-100)] rounded-md px-3 py-2 font-mono text-xs text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
           />
         </div>
 

@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useMemo, useState } from 'react'
 import { X } from 'lucide-react'
@@ -18,9 +18,9 @@ export type BlockPickerOnAddInput = {
 export type BlockPickerProps = {
   open: boolean
   onClose: () => void
-  /** Hard-filter — picker shows only this kind (e.g. 'hazard'). */
+  /** Hard-filter â€” picker shows only this kind (e.g. 'hazard'). */
   kindSlug: string
-  /** Soft filter — drives matching/boosting (e.g. 'area-forming'). */
+  /** Soft filter â€” drives matching/boosting (e.g. 'area-forming'). */
   sopCategory?: string | null
   onAdd: (input: BlockPickerOnAddInput) => Promise<void> | void
 }
@@ -227,10 +227,10 @@ export function BlockPicker({
 
         {/* Two-pane content */}
         <div className="flex-1 flex min-h-0">
-          {/* LEFT — list */}
+          {/* LEFT â€” list */}
           <div className="w-3/5 overflow-y-auto p-4 border-r border-[var(--ink-100)] flex flex-col gap-4">
             {loading && (
-              <div className="text-sm text-[var(--ink-500)]">Loading library…</div>
+              <div className="text-sm text-[var(--ink-500)]">Loading libraryâ€¦</div>
             )}
             {error && (
               <div className="text-sm text-red-400 bg-red-950/30 border border-red-700/40 rounded p-3">
@@ -283,7 +283,7 @@ export function BlockPicker({
                   </div>
                 )}
 
-                {/* Always render allOfKind — it is the master list, used as
+                {/* Always render allOfKind â€” it is the master list, used as
                     fallback section when exact+related are empty, or as the
                     "Other [kind] blocks" tail when they're populated. */}
                 {grouped.allOfKind.length > 0 && (
@@ -314,14 +314,14 @@ export function BlockPicker({
 
                 {grouped.totalCount === 0 && (
                   <div className="text-sm text-[var(--ink-500)] p-4 border border-dashed border-[var(--ink-100)] rounded">
-                    No {kindSlug} blocks in your library yet. Save one from the builder using the ⋯ menu.
+                    No {kindSlug} blocks in your library yet. Save one from the builder using the â‹¯ menu.
                   </div>
                 )}
               </>
             )}
           </div>
 
-          {/* RIGHT — preview pane */}
+          {/* RIGHT â€” preview pane */}
           <div className="w-2/5 p-4 overflow-y-auto">
             <BlockPickerPreview
               block={selectedBlockEntry?.block ?? null}
@@ -330,7 +330,7 @@ export function BlockPicker({
           </div>
         </div>
 
-        {/* Footer — pin/follow toggle + actions */}
+        {/* Footer â€” pin/follow toggle + actions */}
         <div className="px-6 py-4 border-t border-[var(--ink-100)] flex items-center justify-between gap-4">
           <fieldset className="flex flex-col gap-1">
             <legend className="text-[11px] uppercase tracking-wider text-[var(--ink-500)] mb-1">
@@ -344,7 +344,7 @@ export function BlockPicker({
                   value="pinned"
                   checked={pinMode === 'pinned'}
                   onChange={() => setPinMode('pinned')}
-                  className="mt-0.5 accent-brand-yellow"
+                  className="mt-0.5 accent-[var(--ink-900)]"
                 />
                 <span className="text-sm text-[var(--ink-700)]">
                   Pinned
@@ -360,7 +360,7 @@ export function BlockPicker({
                   value="follow_latest"
                   checked={pinMode === 'follow_latest'}
                   onChange={() => setPinMode('follow_latest')}
-                  className="mt-0.5 accent-brand-yellow"
+                  className="mt-0.5 accent-[var(--ink-900)]"
                 />
                 <span className="text-sm text-[var(--ink-700)]">
                   Follow latest
@@ -388,7 +388,7 @@ export function BlockPicker({
               className="bg-[var(--ink-900)] text-white font-semibold px-4 h-[40px] rounded-lg hover:bg-[var(--ink-700)] text-sm disabled:opacity-50"
               data-testid="block-picker-add"
             >
-              {submitting ? 'Adding…' : 'Add to section'}
+              {submitting ? 'Addingâ€¦' : 'Add to section'}
             </button>
           </div>
         </div>

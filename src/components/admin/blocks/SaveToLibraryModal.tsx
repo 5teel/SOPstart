@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useTransition } from 'react'
 import { X } from 'lucide-react'
@@ -17,7 +17,7 @@ interface Props {
 }
 
 /**
- * D-Save-02 modal — field order:
+ * D-Save-02 modal â€” field order:
  *   1. Name (required)
  *   2. Categories (multi-select chips)
  *   3. Free-text tags (comma-separated)
@@ -125,7 +125,7 @@ export function SaveToLibraryModal({
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Crush hazard — section forming"
+            placeholder="e.g. Crush hazard â€” section forming"
             className="w-full bg-[var(--paper)] border border-[var(--ink-100)] rounded-md px-3 py-2 text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
           />
         </div>
@@ -184,7 +184,7 @@ export function SaveToLibraryModal({
               value="org"
               checked={scope === 'org'}
               onChange={() => setScope('org')}
-              className="mt-0.5 accent-brand-yellow"
+              className="mt-0.5 accent-[var(--ink-900)]"
             />
             <span className="text-sm text-[var(--ink-900)]">
               My org only
@@ -200,7 +200,7 @@ export function SaveToLibraryModal({
               value="suggest_global"
               checked={scope === 'suggest_global'}
               onChange={() => setScope('suggest_global')}
-              className="mt-0.5 accent-brand-yellow"
+              className="mt-0.5 accent-[var(--ink-900)]"
             />
             <span className="text-sm text-[var(--ink-900)]">
               Suggest for global

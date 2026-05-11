@@ -173,14 +173,14 @@ function SafeRender<P>(
           <div className="bg-red-500/15 text-red-300 text-xs font-mono uppercase tracking-wider px-3 py-1 rounded-t-xl">
             {blockName} - {hint}
           </div>
-          <div className="bg-white border-t-0 rounded-b-xl p-4 text-amber-400 text-sm">
+          <div className="bg-white border-t-0 rounded-b-xl p-4 text-[var(--accent-decision)] text-sm">
             {emptyState}
           </div>
         </div>
       )
     }
     return (
-      <div className="bg-white border border-dashed border-amber-500/40 rounded-xl p-4 text-amber-400 text-sm mb-4">
+      <div className="bg-white border border-dashed border-[var(--accent-decision)]/40 rounded-xl p-4 text-[var(--accent-decision)] text-sm mb-4">
         {emptyState}
       </div>
     )
