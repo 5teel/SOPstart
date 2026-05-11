@@ -31,17 +31,17 @@ export function SopSearchInput({ searchTerm, onSearch, onClose, results }: SopSe
   const showNoResults = searchTerm.length > 0 && results.length === 0
 
   return (
-    <div className="fixed inset-0 z-40 bg-steel-900 flex flex-col transition-transform duration-200 ease-out translate-y-0">
+    <div className="fixed inset-0 z-40 bg-[var(--paper)] flex flex-col transition-transform duration-200 ease-out translate-y-0">
       {/* Search input bar */}
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-steel-700 flex-shrink-0">
-        <Search size={20} className="text-steel-400 flex-shrink-0" />
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--ink-100)] flex-shrink-0">
+        <Search size={20} className="text-[var(--ink-500)] flex-shrink-0" />
         <input
           ref={inputRef}
           type="search"
           value={searchTerm}
           onChange={(e) => onSearch(e.target.value)}
           placeholder="Search SOPs..."
-          className="flex-1 bg-transparent text-base text-steel-100 placeholder:text-steel-400 outline-none h-[40px]"
+          className="flex-1 bg-transparent text-base text-[var(--ink-900)] placeholder:text-[var(--ink-500)] outline-none h-[40px]"
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
@@ -50,7 +50,7 @@ export function SopSearchInput({ searchTerm, onSearch, onClose, results }: SopSe
         <button
           type="button"
           onClick={onClose}
-          className="text-sm font-medium text-brand-yellow hover:text-amber-400 flex-shrink-0 px-2"
+          className="text-sm font-medium text-[var(--ink-900)] hover:text-[var(--ink-700)] flex-shrink-0 px-2"
         >
           Cancel
         </button>
@@ -60,10 +60,10 @@ export function SopSearchInput({ searchTerm, onSearch, onClose, results }: SopSe
       <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-2">
         {showNoResults ? (
           <div className="flex flex-col items-center justify-center gap-4 py-16 text-center">
-            <SearchX size={40} className="text-steel-600" />
+            <SearchX size={40} className="text-[var(--ink-300)]" />
             <div>
-              <p className="text-lg font-semibold text-steel-100">Nothing matched</p>
-              <p className="text-sm text-steel-400 mt-1">
+              <p className="text-lg font-semibold text-[var(--ink-900)]">Nothing matched</p>
+              <p className="text-sm text-[var(--ink-500)] mt-1">
                 Try a different search term or check your spelling.
               </p>
             </div>

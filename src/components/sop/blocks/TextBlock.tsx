@@ -9,11 +9,11 @@ export type TextBlockProps = z.infer<typeof TextBlockPropsSchema>
 export function TextBlock({ content }: TextBlockProps) {
   const hasTable = containsMarkdownTable(content)
   return (
-    <div className="bg-steel-800 border border-steel-700 rounded-xl p-5 mb-4">
+    <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5 mb-4">
       {hasTable ? (
         <SopTable markdown={content} />
       ) : (
-        <p className="text-base text-steel-100 leading-relaxed whitespace-pre-wrap">
+        <p className="text-base text-[var(--ink-900)] leading-relaxed whitespace-pre-wrap">
           {content}
         </p>
       )}

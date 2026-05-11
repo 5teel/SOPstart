@@ -20,7 +20,7 @@ interface StepItemProps {
 }
 
 const borderByStatus: Record<StepStatus, string> = {
-  active: 'border-brand-yellow bg-steel-800/60',
+  active: 'border-[var(--ink-900)] bg-white/60',
   completed: 'border-green-500/40 bg-green-500/5',
   upcoming: 'border-transparent opacity-80',
 }
@@ -58,7 +58,7 @@ export function StepItem({
         {status === 'completed' ? (
           <CheckCircle2 size={20} className="text-green-400" />
         ) : (
-          <span className="text-[13px] font-bold tabular-nums text-steel-400">
+          <span className="text-[13px] font-bold tabular-nums text-[var(--ink-500)]">
             {step.step_number}
           </span>
         )}
@@ -66,11 +66,11 @@ export function StepItem({
 
       {/* Centre: step content */}
       <div className="flex-1 min-w-0">
-        <p className="text-lg font-normal text-steel-100 leading-relaxed">{step.text}</p>
+        <p className="text-lg font-normal text-[var(--ink-900)] leading-relaxed">{step.text}</p>
 
         {/* Warning annotation */}
         {step.warning && (
-          <div className="inline-flex items-center gap-1 px-2 py-1 bg-brand-orange/20 text-brand-orange text-xs font-bold uppercase tracking-wide rounded border border-brand-orange/30 mt-2">
+          <div className="inline-flex items-center gap-1 px-2 py-1 bg-[var(--accent-voice)]/20 text-[var(--accent-voice)] text-xs font-bold uppercase tracking-wide rounded border border-[var(--accent-voice)]/30 mt-2">
             <AlertTriangle size={12} />
             {step.warning}
           </div>
@@ -78,7 +78,7 @@ export function StepItem({
 
         {/* Caution annotation */}
         {step.caution && (
-          <div className="inline-flex items-center gap-1 px-2 py-1 bg-brand-orange/20 text-brand-orange text-xs font-bold uppercase tracking-wide rounded border border-brand-orange/30 mt-2 ml-1">
+          <div className="inline-flex items-center gap-1 px-2 py-1 bg-[var(--accent-voice)]/20 text-[var(--accent-voice)] text-xs font-bold uppercase tracking-wide rounded border border-[var(--accent-voice)]/30 mt-2 ml-1">
             <AlertTriangle size={12} />
             {step.caution}
           </div>
@@ -110,7 +110,7 @@ export function StepItem({
         {status === 'completed' ? (
           <CheckCircle2 size={28} className="text-green-400" />
         ) : (
-          <Circle size={28} className="text-steel-600 hover:text-brand-yellow" />
+          <Circle size={28} className="text-[var(--ink-300)] hover:text-[var(--ink-900)]" />
         )}
       </div>
     </div>

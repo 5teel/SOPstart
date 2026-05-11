@@ -57,21 +57,21 @@ export function SopTable({ markdown }: SopTableProps) {
   // Malformed table: fall through to plain text (per UI-SPEC)
   if (!table) {
     return (
-      <p className="text-base text-steel-100 leading-relaxed whitespace-pre-wrap">
+      <p className="text-base text-[var(--ink-900)] leading-relaxed whitespace-pre-wrap">
         {markdown}
       </p>
     )
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-steel-700 my-3">
+    <div className="overflow-x-auto rounded-xl border border-[var(--ink-100)] my-3">
       <table className="w-full text-sm border-collapse" role="table">
-        <thead className="bg-steel-700 sticky top-0 z-10">
+        <thead className="bg-[var(--paper-2)] sticky top-0 z-10">
           <tr>
             {table.headers.map((header, i) => (
               <th
                 key={i}
-                className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-steel-400"
+                className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-[var(--ink-500)]"
                 style={{ textAlign: table.alignments[i] ?? 'left' }}
               >
                 {header}
@@ -83,12 +83,12 @@ export function SopTable({ markdown }: SopTableProps) {
           {table.rows.map((row, rowIdx) => (
             <tr
               key={rowIdx}
-              className={rowIdx % 2 === 0 ? 'bg-steel-800' : 'bg-steel-900'}
+              className={rowIdx % 2 === 0 ? 'bg-white' : 'bg-[var(--paper)]'}
             >
               {row.map((cell, cellIdx) => (
                 <td
                   key={cellIdx}
-                  className="px-3 py-2 text-base text-steel-100 leading-snug min-h-[44px]"
+                  className="px-3 py-2 text-base text-[var(--ink-900)] leading-snug min-h-[44px]"
                   style={{ textAlign: table.alignments[cellIdx] ?? 'left' }}
                 >
                   {cell}

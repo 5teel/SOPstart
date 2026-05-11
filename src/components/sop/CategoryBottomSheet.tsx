@@ -35,17 +35,17 @@ function CategoryRow({
         'flex items-center justify-between px-4 rounded-xl transition-colors cursor-pointer w-full text-left',
         height,
         isActive
-          ? 'bg-brand-yellow/15 border border-brand-yellow/30'
-          : 'hover:bg-steel-700',
+          ? 'bg-[var(--ink-900)]/15 border border-[var(--ink-900)]/30'
+          : 'hover:bg-[var(--paper-2)]',
       ].join(' ')}
     >
       <span className="flex items-center gap-2">
-        {isActive && <Check size={16} className="text-brand-yellow flex-shrink-0" />}
-        <span className={`text-base font-medium ${isActive ? 'text-brand-yellow' : 'text-steel-100'}`}>
+        {isActive && <Check size={16} className="text-[var(--ink-900)] flex-shrink-0" />}
+        <span className={`text-base font-medium ${isActive ? 'text-[var(--ink-900)]' : 'text-[var(--ink-900)]'}`}>
           {name}
         </span>
       </span>
-      <span className="text-xs text-steel-400 tabular-nums">{count} SOPs</span>
+      <span className="text-xs text-[var(--ink-500)] tabular-nums">{count} SOPs</span>
     </button>
   )
 }
@@ -71,18 +71,18 @@ export function CategoryBottomSheet({
         />
 
         {/* Sheet panel */}
-        <div className="fixed bottom-0 left-0 right-0 z-40 bg-steel-800 rounded-t-2xl shadow-2xl max-h-[70vh] overflow-hidden flex flex-col">
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-white rounded-t-2xl shadow-2xl max-h-[70vh] overflow-hidden flex flex-col">
           {/* Handle */}
-          <div className="mx-auto mt-3 mb-0 w-10 h-1 bg-steel-600 rounded-full flex-shrink-0" />
+          <div className="mx-auto mt-3 mb-0 w-10 h-1 bg-[var(--ink-300)] rounded-full flex-shrink-0" />
 
           {/* Header */}
-          <div className="px-4 py-4 border-b border-steel-700 flex items-center justify-between flex-shrink-0">
-            <h2 className="text-base font-semibold text-steel-100">Filter by category</h2>
+          <div className="px-4 py-4 border-b border-[var(--ink-100)] flex items-center justify-between flex-shrink-0">
+            <h2 className="text-base font-semibold text-[var(--ink-900)]">Filter by category</h2>
             {activeCategory && (
               <button
                 type="button"
                 onClick={() => { onSelect(null); onClose() }}
-                className="text-sm text-brand-yellow hover:text-amber-400"
+                className="text-sm text-[var(--ink-900)] hover:text-[var(--ink-700)]"
               >
                 Clear
               </button>
@@ -123,8 +123,8 @@ export function CategorySidebar({
   onSelect,
 }: Pick<CategoryBottomSheetProps, 'categories' | 'activeCategory' | 'onSelect'>) {
   return (
-    <aside className="w-[240px] flex-shrink-0 sticky top-0 h-screen overflow-y-auto py-6 px-3 border-r border-steel-700 bg-steel-900">
-      <p className="text-xs font-semibold text-steel-400 uppercase tracking-widest px-3 mb-3">
+    <aside className="w-[240px] flex-shrink-0 sticky top-0 h-screen overflow-y-auto py-6 px-3 border-r border-[var(--ink-100)] bg-[var(--paper)]">
+      <p className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-widest px-3 mb-3">
         Categories
       </p>
       <div className="flex flex-col gap-1">
