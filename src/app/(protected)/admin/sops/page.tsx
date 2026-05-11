@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Users, History, Video } from 'lucide-react'
+import { Users, History, Video, Pencil } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { DeleteSopButton } from '@/components/admin/DeleteSopButton'
 import { VideoJobIndicator } from '@/components/admin/VideoJobIndicator'
+import { PaperThemeMount } from '@/app/_theme-mount'
 import type { SopStatus } from '@/types/sop'
 
 export const metadata: Metadata = {
@@ -37,7 +38,6 @@ export default async function SopsLibraryPage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  // Check user is admin or safety_manager
   const { data: member } = await supabase
     .from('organisation_members')
     .select('role')
@@ -48,179 +48,222 @@ export default async function SopsLibraryPage({
     redirect('/dashboard')
   }
 
+  // Detect platform-admin (per src/lib/auth/platform-admin-guard.ts) so we can
+  // surface the otherwise-orphaned /admin/global-blocks curation surface.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: platformAdminFlag } = await (supabase as any).rpc('is_platform_admin')
+  const isPlatformAdmin = platformAdminFlag === true
+
   const params = await searchParams
   const activeStatus = params.status ?? 'all'
 
-  // Build query — cast .select() to any because supabase-generated types have
-  // not been regenerated since migration 00020 added sops.source_type. Same
-  // pattern as src/actions/sections.ts reorderSections/updateSectionLayout.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let query: any = supabase
     .from('sops')
     .select('id, title, sop_number, category, status, source_file_name, source_type, created_at, updated_at, published_at')
     .order('created_at', { ascending: false })
 
-  // Filter by status tab (except "all")
   if (activeStatus !== 'all' && activeStatus !== 'failed') {
     query = query.eq('status', activeStatus as SopStatus)
   } else if (activeStatus === 'failed') {
-    // "Needs attention" = parsing status without progress, or uploading old records
     query = query.in('status', ['uploading', 'parsing'])
   }
 
   const { data: sops } = await query
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 lg:px-8 lg:py-10">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-steel-100">SOP Library</h1>
-        <div className="flex items-center gap-2">
-          <Link
-            href="/admin/sops/new/blank"
-            className="bg-steel-800 border border-steel-700 text-steel-100 font-semibold px-4 h-[44px] rounded-lg hover:bg-steel-700 hover:border-steel-600 transition-colors text-sm inline-flex items-center"
-          >
-            New SOP (blank)
-          </Link>
-          <Link
-            href="/admin/sops/upload"
-            className="bg-brand-yellow text-steel-900 font-semibold px-4 h-[44px] rounded-lg hover:bg-amber-400 transition-colors text-sm inline-flex items-center"
-          >
-            Upload SOP
-          </Link>
-        </div>
-      </div>
-
-      {/* Admin sub-nav (Phase 13: SOPs ↔ Blocks) */}
-      <nav className="flex gap-4 border-b border-steel-700 mb-6 text-sm">
-        <Link
-          href="/admin/sops"
-          className="pb-3 px-1 font-medium border-b-2 border-brand-yellow text-brand-yellow"
-        >
-          SOPs
-        </Link>
-        <Link
-          href="/admin/blocks"
-          className="pb-3 px-1 font-medium text-steel-400 hover:text-steel-100"
-        >
-          Blocks
-        </Link>
-      </nav>
-
-      {/* Filter tabs */}
-      <div className="flex gap-2 border-b border-steel-700 mb-6 overflow-x-auto">
-        {STATUS_TABS.map(tab => {
-          const isActive = activeStatus === tab.value
-          return (
+    <>
+      <PaperThemeMount />
+      <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-6 gap-4 flex-wrap">
+          <div>
+            <div className="flex items-center gap-3 mb-1">
+              <span className="pill">LIBRARY</span>
+            </div>
+            <h1 className="mono text-2xl font-semibold text-[var(--ink-900)]">SOPs</h1>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
             <Link
-              key={tab.value}
-              href={tab.value === 'all' ? '/admin/sops' : `/admin/sops?status=${tab.value}`}
-              className={[
-                'pb-3 px-1 text-sm font-medium whitespace-nowrap transition-colors',
-                isActive
-                  ? 'border-b-2 border-brand-yellow text-brand-yellow'
-                  : 'text-steel-400 hover:text-steel-100',
-              ].join(' ')}
+              href="/admin/sops/upload"
+              className="evidence-btn !min-h-[40px] text-sm"
             >
-              {tab.label}
+              Upload
             </Link>
-          )
-        })}
-      </div>
-
-      {/* SOP list */}
-      {!sops || sops.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <p className="text-lg font-semibold text-steel-100 mb-2">No SOPs yet</p>
-          <p className="text-sm text-steel-400 mb-6">
-            Upload your first SOP document to get started.
-          </p>
-          <Link
-            href="/admin/sops/upload"
-            className="bg-brand-yellow text-steel-900 font-semibold px-6 h-[72px] rounded-lg hover:bg-amber-400 transition-colors inline-flex items-center"
-          >
-            Upload your first SOP
-          </Link>
+            <Link
+              href="/admin/sops/new/blank"
+              className="evidence-btn !min-h-[40px] text-sm"
+            >
+              Blank
+            </Link>
+            <Link
+              href="/admin/sops/new/ai"
+              className="evidence-btn !min-h-[40px] text-sm !bg-[var(--ink-900)] !text-white !border-[var(--ink-900)] hover:!bg-[var(--ink-700)]"
+            >
+              AI Draft
+            </Link>
+          </div>
         </div>
-      ) : (
-        <ul className="space-y-3">
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-          {sops.map((sop: any) => (
-            <li key={sop.id} className="flex items-stretch gap-2">
+
+        {/* Admin sub-nav */}
+        <nav
+          aria-label="Admin sections"
+          className="flex gap-1 border-b border-[var(--ink-100)] mb-6"
+        >
+          <Link href="/admin/sops" className="tab" data-active="true">
+            SOPs
+          </Link>
+          <Link href="/admin/blocks" className="tab">
+            Blocks
+          </Link>
+          {isPlatformAdmin && (
+            <Link
+              href="/admin/global-blocks"
+              className="tab"
+              title="Platform-admin curated globals"
+            >
+              Curate Globals
+            </Link>
+          )}
+        </nav>
+
+        {/* Filter tabs */}
+        <div className="flex gap-1 border-b border-[var(--ink-100)] mb-6 overflow-x-auto">
+          {STATUS_TABS.map(tab => {
+            const isActive = activeStatus === tab.value
+            return (
               <Link
-                href={`/admin/sops/${sop.id}/review`}
-                className="flex items-center gap-4 px-4 py-3 bg-steel-800 rounded-lg hover:bg-steel-700 transition-colors cursor-pointer min-h-[72px] border border-transparent hover:border-steel-600 flex-1 min-w-0"
+                key={tab.value}
+                href={tab.value === 'all' ? '/admin/sops' : `/admin/sops?status=${tab.value}`}
+                className="tab"
+                data-active={isActive ? 'true' : undefined}
               >
-                <div className="flex-1 min-w-0">
-                  <p className="text-base font-semibold text-steel-100 truncate">
-                    {sop.title ?? sop.source_file_name}
-                  </p>
-                  <div className="flex items-center gap-3 mt-1 flex-wrap">
-                    {sop.sop_number && (
-                      <span className="text-xs text-steel-400">{sop.sop_number}</span>
-                    )}
-                    {sop.category && (
-                      <span className="text-xs text-steel-400">{sop.category}</span>
-                    )}
-                    <span className="text-xs text-steel-400">
-                      {formatDate(sop.updated_at ?? sop.created_at)}
-                    </span>
-                    {sop.source_type === 'blank' && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-steel-400 border border-steel-600 rounded px-1.5 py-0.5">
-                        AUTHORED IN BUILDER
-                      </span>
-                    )}
-                    {sop.source_type === 'ai' && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-steel-400 border border-steel-600 rounded px-1.5 py-0.5">
-                        AI DRAFT
-                      </span>
-                    )}
-                    {sop.source_type === 'template' && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-steel-400 border border-steel-600 rounded px-1.5 py-0.5">
-                        NZ TEMPLATE
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <StatusBadge status={sop.status as SopStatus} />
+                {tab.label}
               </Link>
-              {sop.status === 'published' && (
-                <VideoJobIndicator sopId={sop.id} />
-              )}
-              {sop.status === 'published' ? (
-                <div className="flex flex-col gap-1 flex-shrink-0">
+            )
+          })}
+        </div>
+
+        {/* SOP list */}
+        {!sops || sops.length === 0 ? (
+          <div className="blueprint-frame text-center py-12">
+            <p className="mono text-[11px] text-[var(--ink-500)] uppercase tracking-wider mb-2">
+              EMPTY
+            </p>
+            <p className="text-lg font-semibold text-[var(--ink-900)] mb-1">No SOPs yet</p>
+            <p className="text-sm text-[var(--ink-500)] mb-6">
+              Pick a starting point above — upload a doc, start blank, or draft with AI.
+            </p>
+            <div className="flex justify-center gap-2 flex-wrap">
+              <Link href="/admin/sops/upload" className="evidence-btn text-sm">Upload</Link>
+              <Link href="/admin/sops/new/blank" className="evidence-btn text-sm">Blank</Link>
+              <Link
+                href="/admin/sops/new/ai"
+                className="evidence-btn text-sm !bg-[var(--ink-900)] !text-white !border-[var(--ink-900)]"
+              >
+                AI Draft
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <ul className="space-y-2">
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {sops.map((sop: any) => {
+              const canEditInBuilder = sop.source_type && sop.source_type !== 'uploaded'
+              return (
+                <li key={sop.id} className="flex items-stretch gap-2">
                   <Link
-                    href={`/admin/sops/${sop.id}/assign`}
-                    className="flex items-center justify-center w-10 h-10 rounded-lg bg-steel-800 border border-steel-700 hover:bg-steel-700 hover:border-steel-600 transition-colors text-steel-400 hover:text-steel-100"
-                    title="Assign to team"
-                    aria-label="Assign to team"
+                    href={`/admin/sops/${sop.id}/review`}
+                    className="blueprint-frame flex-1 min-w-0 flex items-center gap-4 hover:shadow-[0_0_0_1px_var(--ink-900)] transition-shadow"
                   >
-                    <Users className="h-4 w-4" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-base font-semibold text-[var(--ink-900)] truncate">
+                        {sop.title ?? sop.source_file_name}
+                      </p>
+                      <div className="flex items-center gap-3 mt-1 flex-wrap">
+                        {sop.sop_number && (
+                          <span className="mono text-[11px] text-[var(--ink-500)]">{sop.sop_number}</span>
+                        )}
+                        {sop.category && (
+                          <span className="text-xs text-[var(--ink-500)]">{sop.category}</span>
+                        )}
+                        <span className="mono text-[11px] text-[var(--ink-500)]">
+                          {formatDate(sop.updated_at ?? sop.created_at)}
+                        </span>
+                        {sop.source_type === 'blank' && (
+                          <span className="pill">AUTHORED IN BUILDER</span>
+                        )}
+                        {sop.source_type === 'ai' && (
+                          <span className="pill">AI DRAFT</span>
+                        )}
+                        {sop.source_type === 'template' && (
+                          <span className="pill">NZ TEMPLATE</span>
+                        )}
+                      </div>
+                    </div>
+                    <StatusBadge status={sop.status as SopStatus} />
                   </Link>
-                  <Link
-                    href={`/admin/sops/${sop.id}/versions`}
-                    className="flex items-center justify-center w-10 h-10 rounded-lg bg-steel-800 border border-steel-700 hover:bg-steel-700 hover:border-steel-600 transition-colors text-steel-400 hover:text-steel-100"
-                    title="Version history"
-                    aria-label="Version history"
-                  >
-                    <History className="h-4 w-4" />
-                  </Link>
-                  <Link
-                    href={`/admin/sops/${sop.id}/video`}
-                    className="flex items-center justify-center w-10 h-10 rounded-lg bg-steel-800 border border-steel-700 hover:bg-steel-700 hover:border-steel-600 transition-colors text-steel-400 hover:text-steel-100"
-                    title="Generate video"
-                    aria-label="Generate video"
-                  >
-                    <Video className="h-4 w-4" />
-                  </Link>
-                </div>
-              ) : (
-                <DeleteSopButton sopId={sop.id} />
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+                  {sop.status === 'published' && (
+                    <VideoJobIndicator sopId={sop.id} />
+                  )}
+                  {sop.status === 'published' ? (
+                    <div className="flex flex-col gap-1 flex-shrink-0">
+                      {canEditInBuilder && (
+                        <Link
+                          href={`/admin/sops/builder/${sop.id}`}
+                          className="evidence-btn !min-w-[40px] !min-h-[40px] !p-0"
+                          title="Edit in builder"
+                          aria-label="Edit in builder"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Link>
+                      )}
+                      <Link
+                        href={`/admin/sops/${sop.id}/assign`}
+                        className="evidence-btn !min-w-[40px] !min-h-[40px] !p-0"
+                        title="Assign to team"
+                        aria-label="Assign to team"
+                      >
+                        <Users className="h-4 w-4" />
+                      </Link>
+                      <Link
+                        href={`/admin/sops/${sop.id}/versions`}
+                        className="evidence-btn !min-w-[40px] !min-h-[40px] !p-0"
+                        title="Version history"
+                        aria-label="Version history"
+                      >
+                        <History className="h-4 w-4" />
+                      </Link>
+                      <Link
+                        href={`/admin/sops/${sop.id}/video`}
+                        className="evidence-btn !min-w-[40px] !min-h-[40px] !p-0"
+                        title="Generate video"
+                        aria-label="Generate video"
+                      >
+                        <Video className="h-4 w-4" />
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-1 flex-shrink-0">
+                      {canEditInBuilder && (
+                        <Link
+                          href={`/admin/sops/builder/${sop.id}`}
+                          className="evidence-btn !min-w-[40px] !min-h-[40px] !p-0"
+                          title="Edit in builder"
+                          aria-label="Edit in builder"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Link>
+                      )}
+                      <DeleteSopButton sopId={sop.id} />
+                    </div>
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </div>
+    </>
   )
 }

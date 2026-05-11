@@ -31,6 +31,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 12.5: Blueprint Redesign** - Worker-first UX overhaul with paper/ink engineering-drawing aesthetic; unified tabbed interface (overview/tools/hazards/flow/model/walkthrough); mobile immersive walkthrough; voice input (server-side transcription); cmdk; 7 new AI-accessible block types (Measurement, Decision, Escalate, SignOff, Zone, Inspect, VoiceNote) — ModelBlock deferred (completed 2026-05-07; verifier PASSED 10/10 truths; 6 carried human-UAT items: paper/ink theme scoping, mobile immersive viewport routing, Deepgram voice state machine, online voice persistence, Cmd+K palette, Puck FlowGraphField round-trip; walkthrough completion flow + photo-queue guard finalised in 5989852)
 - [x] **Phase 13: Reusable Block Library** - Org-vs-global block CRUD, NZ seed blocks (65 globals), wizard "Pick from library" step, pin-version vs follow-latest semantics, platform-admin curation UI (implementation complete 2026-05-07; verifier PASSED — 5/5 plumbing-complete, browser UAT for 13-03/13-04/13-05 batchable as carried human-verification items)
 - [ ] **Phase 14: AI-Drafted SOPs** - Natural-language prompt → GPT-4o structured draft → Claude adversarial verification gate → editable draft lands in the builder
+- [ ] **Phase 14.5: Blueprint Shell Rollout** - Extend Phase 12.5's paper/ink design language from `/sops/*` to the admin/auth/dashboard surfaces. Engineering-drawing role-aware home, global app-wide Cmd+K, blueprint-styled admin sub-pages (review/assign/versions/video/upload/new-blank/new-ai/pipeline/blocks/team) and auth pages.
 - [ ] **Phase 15: NZ Template Library** - Curated WorkSafe / machinery / chemical handling templates surfaced as a third entry point into the builder
 - [ ] **Phase 16: Image & Diagram Annotation** - Konva editor with dual-store (JSON scene + baked PNG), DiagramHotspotBlock for machine-diagram freeform callouts, stylus + palm rejection
 - [ ] **Phase 17: Collaborative Editing** - Section-level pessimistic locks, Supabase Realtime presence, optimistic version column for offline handoff, conflict modal
@@ -337,6 +338,31 @@ Plans:
 - [ ] 14-01-PLAN.md — Prompt entry: `/admin/sops/new/ai` route with prompt textarea, category selector, named-stage progress UI; `parse_jobs` row with `source: 'ai_prompt'` to reuse existing stage stepper
 - [ ] 14-02-PLAN.md — GPT-4o structured draft generator: prompt-engineering pass, structured output schema matching `SopSection[]`, `section_kind_id` assignment, integration with GPT parser module
 - [ ] 14-03-PLAN.md — Adversarial verification reuse: route AI draft through existing Phase 6 Claude verifier, surface flags via existing `AdversarialFlagBanner`, missing-section detection, land draft in the builder with flags visible in the review panel
+
+### Phase 14.5: Blueprint Shell Rollout
+**Goal**: Finish the Phase 12.5 blueprint redesign by rolling it out everywhere the worker-first design hasn't yet landed — the protected layout shell, dashboard, auth pages, and every admin sub-page. After this phase: a worker, supervisor, admin, or platform-admin sees consistent paper/ink engineering-drawing UI across every authenticated surface. No more steel-900/brand-yellow legacy theme on any production page.
+**Depends on**: Phase 12.5 (paper/ink tokens, blueprint primitives), Phase 14 (AI draft entry route to integrate into shell nav)
+**Requirements**: SB-UX-11..SB-UX-15 (to be assigned in SPEC.md)
+**Success Criteria** (what must be TRUE):
+  1. Engineering-drawing role-aware home replaces `/dashboard` for admins — a single hub surface that adapts to role (admin sees library + creation paths + team; supervisor sees activity + review queue; worker redirects to /sops as today). Built on `blueprint-frame` + `pill` + `mono` primitives.
+  2. Cmd+K command palette is mounted globally (not just `/sops/*`) and surfaces app-wide navigation actions (Library, Blocks, Team, Create SOP via Upload/Blank/AI, Settings) alongside the existing SOP-scoped jump-to-step + ask-AI when on a SOP page.
+  3. All `/admin/*` sub-pages migrate from `bg-steel-*` / `text-brand-yellow` to paper/ink tokens — specifically: `/admin/sops/upload`, `/admin/sops/new/blank`, `/admin/sops/new/ai`, `/admin/sops/[sopId]/review`, `/admin/sops/[sopId]/assign`, `/admin/sops/[sopId]/versions`, `/admin/sops/[sopId]/video`, `/admin/sops/pipeline/[pipelineId]`, `/admin/sops/builder/[sopId]` shell, `/admin/blocks`, `/admin/blocks/[blockId]`, `/admin/global-blocks`, `/admin/global-blocks/suggestions`, `/admin/team`.
+  4. Auth pages (`/login`, `/sign-up`, `/invite/accept`, `/join`) migrate to paper theme — first impression of the app aligns with the rest.
+  5. Zero references to `bg-steel-` or `text-brand-yellow` in `src/app/**` `src/components/**` page/component code (legacy tokens remain in `globals.css` only for backwards-compat during transition, removed at phase close).
+  6. `/activity/[completionId]` (the one remaining `/activity/*` sub-page not yet on paper) is migrated.
+**Plans**: TBD (created by /gsd-plan-phase after spec+discuss)
+**UI hint**: yes (heavy)
+
+Pre-existing wave-0 deliverables already shipped outside the formal phase (audit done 2026-05-11):
+- `/dashboard` rebuilt on paper tokens with AI Draft tile (commit pending in this session)
+- `/admin/sops` library rebuilt on paper tokens with Upload|Blank|AI Draft button group, platform-admin "Curate Globals" sub-nav link, and "Edit in builder" row CTA for non-uploaded sources (commit pending in this session)
+- Note: layout shell + BottomTabBar already adapt via existing `body[data-theme="paper"]` CSS scoping — no shell-level change required, only per-page `PaperThemeMount` opt-ins.
+
+Open scope decisions to resolve in spec/discuss:
+- Role-aware home: single shared surface vs role-specific landing routes?
+- Global Cmd+K: extend existing `CmdKProvider` to all `(protected)` routes, or build a separate app-shell-level palette?
+- Auth-page treatment: full blueprint frame, or minimal centered card on paper canvas?
+- Legacy-token removal: hard removal at phase close, or grace period with lint warning first?
 
 ### Phase 15: NZ Template Library
 **Goal**: Admin can browse a curated NZ template library (WorkSafe categories, common machinery, chemical handling) and pick a template as the starting point for a new SOP — which opens in the same unified builder surface as blank-page and AI flows

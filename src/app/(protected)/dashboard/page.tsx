@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { PaperThemeMount } from '@/app/_theme-mount'
 
 export const metadata: Metadata = {
   title: 'Dashboard',
@@ -21,93 +22,109 @@ export default async function DashboardPage() {
 
   const role = member?.role ?? null
 
-  // Non-admin roles go straight to their primary page
   if (role === 'worker') redirect('/sops')
   if (role === 'supervisor') redirect('/activity')
   if (role === 'safety_manager') redirect('/activity')
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-steel-100 mb-6">Dashboard</h1>
+    <>
+      <PaperThemeMount />
+      <div className="max-w-3xl mx-auto px-4 py-8 lg:py-10">
+        <div className="flex items-center gap-3 mb-6">
+          <span className="pill">DASHBOARD</span>
+          <span className="mono text-[11px] text-[var(--ink-500)] uppercase tracking-wider">
+            v3.0 / Closeout
+          </span>
+        </div>
+        <h1 className="mono text-2xl font-semibold text-[var(--ink-900)] mb-1">Home</h1>
+        <p className="text-sm text-[var(--ink-500)] mb-8">
+          Pick a path. Build, review, and publish your SOPs.
+        </p>
 
-      {role === 'admin' && <AdminDashboard />}
-      {!role && <PendingDashboard />}
-    </div>
+        {role === 'admin' && <AdminDashboard />}
+        {!role && <PendingDashboard />}
+      </div>
+    </>
   )
 }
 
 function AdminDashboard() {
   return (
-    <div className="space-y-4">
-      <p className="text-steel-400 text-sm">Welcome, Admin. Get started:</p>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Link href="/admin/sops/upload">
-          <ActionCard
-            title="Upload SOPs"
-            description="Import your existing SOP documents"
-          />
-        </Link>
-        <Link href="/admin/sops">
-          <ActionCard
-            title="SOP Library"
-            description="View and manage all SOPs"
-          />
-        </Link>
-        <Link href="/admin/team">
-          <ActionCard
-            title="Invite Team"
-            description="Add workers and assign roles"
-          />
-        </Link>
-        <Link href="/admin/team">
-          <ActionCard
-            title="Manage Roles"
-            description="View and update team member roles"
-          />
-        </Link>
-      </div>
+    <div className="grid gap-4 sm:grid-cols-2">
+      <DashTile
+        href="/admin/sops/new/ai"
+        eyebrow="AI"
+        title="Draft from a prompt"
+        description="Describe the procedure in plain English. Claude drafts a structured SOP for review."
+      />
+      <DashTile
+        href="/admin/sops/new/blank"
+        eyebrow="BUILDER"
+        title="Start blank"
+        description="Open the builder with an empty canvas and pick block types as you go."
+      />
+      <DashTile
+        href="/admin/sops/upload"
+        eyebrow="INTAKE"
+        title="Upload existing SOP"
+        description="Word, PDF, image, video, or YouTube link. We parse and you review."
+      />
+      <DashTile
+        href="/admin/sops"
+        eyebrow="LIBRARY"
+        title="SOP library"
+        description="Search, filter, assign, and version published SOPs."
+      />
+      <DashTile
+        href="/admin/blocks"
+        eyebrow="REUSE"
+        title="Block library"
+        description="Reusable hazards, PPE, callouts and steps shared across SOPs."
+      />
+      <DashTile
+        href="/admin/team"
+        eyebrow="TEAM"
+        title="Team & invites"
+        description="Add workers, set roles, share invite codes."
+      />
     </div>
   )
 }
 
 function PendingDashboard() {
   return (
-    <div className="rounded-xl bg-steel-800 border border-steel-700 p-6 text-center">
-      <p className="text-steel-400">Your account is being set up. Ask your admin if you have access issues.</p>
+    <div className="blueprint-frame max-w-md">
+      <p className="mono text-[11px] text-[var(--ink-500)] uppercase tracking-wider mb-1">
+        ACCOUNT PENDING
+      </p>
+      <p className="text-sm text-[var(--ink-700)]">
+        Your account is being set up. Ask your admin if you have access issues.
+      </p>
     </div>
   )
 }
 
-function ActionCard({
+function DashTile({
+  href,
+  eyebrow,
   title,
   description,
-  disabled = false,
-  badge,
 }: {
+  href: string
+  eyebrow: string
   title: string
   description: string
-  disabled?: boolean
-  badge?: string
 }) {
   return (
-    <div
-      className={`rounded-xl border p-5 min-h-[var(--min-tap-target)] flex flex-col justify-center ${
-        disabled
-          ? 'bg-steel-800/50 border-steel-700 opacity-60 cursor-not-allowed'
-          : 'bg-steel-800 border-steel-700 hover:border-brand-yellow cursor-pointer transition-colors'
-      }`}
+    <Link
+      href={href}
+      className="blueprint-frame block transition-shadow hover:shadow-[0_0_0_1px_var(--ink-900)] focus-visible:outline-2 focus-visible:outline-[var(--ink-900)] focus-visible:outline-offset-2"
     >
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <h3 className="font-semibold text-steel-100">{title}</h3>
-          <p className="text-steel-400 text-sm mt-0.5">{description}</p>
-        </div>
-        {badge && (
-          <span className="shrink-0 text-xs bg-steel-700 text-steel-400 px-2 py-0.5 rounded-full">
-            {badge}
-          </span>
-        )}
-      </div>
-    </div>
+      <p className="mono text-[10px] text-[var(--ink-500)] uppercase tracking-[0.08em] mb-2">
+        {eyebrow}
+      </p>
+      <h3 className="text-base font-semibold text-[var(--ink-900)] mb-1">{title}</h3>
+      <p className="text-sm text-[var(--ink-500)]">{description}</p>
+    </Link>
   )
 }
