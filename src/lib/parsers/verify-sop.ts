@@ -49,22 +49,94 @@ Respond with a JSON array only. No prose, no markdown, no explanation.
 Each element: { "severity": "critical"|"warning", "section_title": "string", "step_number": number|null, "original_text": "exact quote from transcript", "structured_text": "what the SOP says", "description": "what is wrong" }
 If no discrepancies found, respond with exactly: []`
 
+// Phase 15 D-07: voice_qa-mode verifier — audits an answer string against a packed-SOP source.
+// Source text is the byte-identical packSopForPrompt(sop) output (Pitfall 3 — same cache key as
+// the answer call → cache HIT, 90% input-token savings).
+//
+// Prompt-tuning guidance (Pitfall 6): paraphrase from the SOP is OK; INVENTION is not. The verifier
+// should not flag "wear heat-resistant gloves" when the SOP says "heat-resistant gloves required",
+// but SHOULD flag "use leather gloves as a substitute" when the SOP says "heat-resistant gloves only".
+const VOICE_QA_VERIFY_SYSTEM = `You are a safety auditor reviewing an answer that was generated in response to a worker's voice question about a Standard Operating Procedure.
+
+Your job: confirm every claim in the answer is GROUNDED in the cited section of the SOP. The SOP content is provided in full below; the answer claims to cite specific sections.
+
+GROUND TRUTH RULES:
+- If a claim refers to PPE, hazards, tools, or steps NOT present in the cited section's text → flag it as ungrounded.
+- If a claim adds detail (a brand name, a specific torque value, a temperature) that doesn't appear in the SOP → flag it.
+- If the answer says "I don't know" or "this is not specified in the procedure" or "I'm not certain" → that is GROUNDED. Do not flag.
+- If the answer cites a section that does not exist in the SOP → flag the entire answer as ungrounded.
+- Reasonable paraphrase is OK. The answer may use different wording for the same fact: "wear gloves" / "use heat-resistant gloves" are equivalent if the SOP says "heat-resistant gloves are required". Be strict on safety specifics (PPE type, hazard class, lockout step) — those must match exactly or be paraphrased without adding new detail.
+- If the answer suggests a substitution NOT in the SOP (e.g. "leather gloves as a substitute" when the SOP only lists "heat-resistant gloves"), flag it.
+
+Respond with a JSON array only. No prose, no markdown.
+Each element: { "severity": "critical"|"warning", "section_title": "string", "step_number": null, "original_text": "the unverified phrase from the answer", "structured_text": "what the cited section actually says", "description": "why this claim is not grounded in the cited section" }
+If every claim is grounded, respond with exactly: []`
+
 // Model selection: claude-3-5-haiku for cost (~$0.01/SOP).
 // Override with ANTHROPIC_VERIFY_MODEL env var if needed.
 const VERIFY_MODEL = process.env.ANTHROPIC_VERIFY_MODEL || 'claude-3-5-haiku-20241022'
+
+// Phase 15 D-08: voice_qa uses claude-haiku-4-5 (same model as the answer call) so the
+// answer-call cache write at this exact model is reused by the verifier-call cache read.
+const VOICE_QA_VERIFY_MODEL = 'claude-haiku-4-5-20251001'
 
 /**
  * Phase 14 D-02: opts.mode selects the verifier framing.
  * - 'transcript' (default): adversarial fidelity check against a source transcript (Phase 6 behaviour, byte-identical).
  * - 'prompt': plausibility / hallucination check against a short NL prompt (D-02). Used by /api/sops/ai-prompt.
- * Backwards-compat: existing call sites `verifyTranscriptVsSop(text, parsed)` continue to work unchanged.
+ * - 'voice_qa' (Phase 15 D-07): grounding check on a voice answer. parsedOutput is `{ answer, citations }`
+ *   (NOT a ParsedSop). sourceText is the packed-SOP string (byte-identical with the answer call's cache
+ *   block → cache HIT). On Anthropic exception, returns a synthetic "Verification temporarily unavailable"
+ *   warning flag (Pitfall 10 fail-safe to uncertainty), NEVER `[]`.
+ *
+ * Backwards-compat: existing call sites `verifyTranscriptVsSop(text, parsed)` and
+ * `verifyTranscriptVsSop(text, parsed, { mode: 'prompt' })` continue to work unchanged.
  */
 export async function verifyTranscriptVsSop(
   sourceText: string,
-  parsedSop: ParsedSop,
-  opts?: { mode?: 'transcript' | 'prompt' },
+  parsedOutput: ParsedSop | { answer: string; citations: string[] },
+  opts?: { mode?: 'transcript' | 'prompt' | 'voice_qa' },
 ): Promise<VerificationFlag[]> {
   const mode = opts?.mode ?? 'transcript'
+
+  // [D-07 — voice_qa mode extension]
+  if (mode === 'voice_qa') {
+    const voiceOutput = parsedOutput as { answer: string; citations: string[] }
+    try {
+      const response = await getAnthropic().messages.create({
+        model: VOICE_QA_VERIFY_MODEL,
+        max_tokens: 2048,
+        // System-array form with cache_control on the packed-SOP block — same content as the
+        // answer call's cache block → cache HIT on the 2nd call within 5 minutes.
+        system: [
+          { type: 'text', text: VOICE_QA_VERIFY_SYSTEM },
+          { type: 'text', text: sourceText, cache_control: { type: 'ephemeral' } },
+        ],
+        messages: [{
+          role: 'user',
+          content: `PROPOSED ANSWER:\n${voiceOutput.answer}\n\nCLAIMED CITATIONS: ${JSON.stringify(voiceOutput.citations)}`,
+        }],
+      })
+      const text = response.content[0]?.type === 'text' ? response.content[0].text : '[]'
+      const cleaned = text.replace(/^```json?\n?/i, '').replace(/\n?```$/i, '').trim()
+      return JSON.parse(cleaned) as VerificationFlag[]
+    } catch (err) {
+      // [Pitfall 10 — fail-safe to uncertainty]
+      // NEVER return [] here — that masks a verifier failure as "no flags" which is a safety regression.
+      // Surface a synthetic warning so the modal renders the yellow Verification badge.
+      console.error('voice_qa verifier exception:', err)
+      return [{
+        severity: 'warning',
+        section_title: '(verification unavailable)',
+        original_text: voiceOutput.answer ?? '',
+        structured_text: '(verifier exception)',
+        description: 'Verification temporarily unavailable — please re-check the SOP directly.',
+      }]
+    }
+  }
+
+  // Existing transcript / prompt modes — unchanged behaviour, plain `system: string` form.
+  const parsedSop = parsedOutput as ParsedSop
   const systemPrompt = mode === 'prompt' ? PROMPT_VERIFY_SYSTEM : ADVERSARIAL_SYSTEM
   const sourceLabel = mode === 'prompt' ? 'SOURCE PROMPT' : 'SOURCE TRANSCRIPT'
 
@@ -127,3 +199,7 @@ export function detectMissingSections(parsedSop: ParsedSop): VerificationFlag[] 
 
   return flags
 }
+
+// Re-export the voice_qa verifier system prompt for tests that want to assert wording invariants
+// without invoking Anthropic.
+export { VOICE_QA_VERIFY_SYSTEM }
