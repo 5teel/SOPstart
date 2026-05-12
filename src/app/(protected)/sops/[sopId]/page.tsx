@@ -6,8 +6,9 @@ import { useSopDetail } from '@/hooks/useSopDetail'
 import { SopTabNav, useActiveTab } from '@/components/sop/SopTabNav'
 import { WorkerPreviewToggle, WorkerPreviewClamp } from '@/components/sop/WorkerPreviewToggle'
 import {
-  OverviewTab, ToolsTab, HazardsTab, FlowTab, ModelTab, WalkthroughTab,
+  OverviewTab, ToolsTab, HazardsTab, FlowTab, ModelTab,
 } from '@/components/sop/tabs'
+import { WalkthroughSwitcher } from '@/components/sop/walkthrough/WalkthroughSwitcher'
 
 function SopDetailInner() {
   const params = useParams<{ sopId: string }>()
@@ -80,7 +81,7 @@ function SopDetailInner() {
           {active === 'hazards'     && <HazardsTab sop={sop} />}
           {active === 'flow'        && <FlowTab sop={sop} />}
           {active === 'model'       && <ModelTab sop={sop} />}
-          {active === 'walkthrough' && <WalkthroughTab sop={sop} />}
+          {active === 'walkthrough' && <WalkthroughSwitcher sop={sop} />}
         </WorkerPreviewClamp>
       </main>
 
