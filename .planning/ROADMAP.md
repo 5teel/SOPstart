@@ -382,7 +382,7 @@ These two items belong with kiosk mode + site-tier work in Phase 15 because they
 **Plans:** 5 plans (Phase 15a — demo wedge for Bryce at Visy; Phase 15b governance/auth/HRIS scoped separately after POC sign-off)
 
 Plans:
-- [ ] 15-00-PLAN.md — Wave 0: capture pre-Phase-15 bundle baseline + scaffold all Playwright/test fixture files referenced in 15-VALIDATION.md
+- [x] 15-00-PLAN.md — Wave 0: capture pre-Phase-15 bundle baseline + scaffold all Playwright/test fixture files referenced in 15-VALIDATION.md (completed 2026-05-13; baseline = 1088 KB for /sops/[sopId]/page; 13 spec scaffolds + live lint guard; commits 847dca0, b40d3ae, 77d3481)
 - [ ] 15-01-PLAN.md — Wave 1: foundation — migration 00030 (sub_trades + junctions + RLS helper + completions.step_ack_trace) + database.types.ts manual extension + voice/sub-trades validators + useViewport hook + walkthrough store ack-trace extension
 - [ ] 15-02-PLAN.md — Wave 2: UI — extract MobileWalkthrough, build DesktopWalkthrough (big-text ≥24px, 60px Next button), WalkthroughSwitcher (next/dynamic ssr:false), floating mic-pill + WalkthroughVoiceModal, sequential ack gate on both layouts
 - [ ] 15-03-PLAN.md — Wave 3: voice backend — packSopForPrompt utility + voice-qa.ts two-call pipeline with Anthropic prompt caching + verify-sop.ts mode voice_qa extension (fail-safe to uncertainty) + /api/voice/query route with full Zod + RLS-scoped SOP fetch + 7-threat coverage

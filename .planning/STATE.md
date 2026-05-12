@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Closeout
 status: executing
-stopped_at: "Completed Phase 13 plan 05 (`13-05-PLAN.md`). Summit super-admin curation UI shipped — `/admin/global-blocks` (gated by requireSummitAdmin) lists globals via BlockListTable + nav to suggestions queue; `/admin/global-blocks/suggestions` exposes pending block_suggestions rows with Promote/Reject decision form. No schema changes (consumes 13-01's pre-declared server-action surface verbatim). 3 task commits on master (5ea8575, 5a57687, 1d2bef7). Phase 13 implementation 5/5 complete; batched browser UAT (13-03 + 13-04 + 13-05) remains pending Simon's verification. Pre-existing 13-01 manual SQL seed (insert into summit_admins ...) still required before super-admin routes are accessible. Next: phase verification + Phase 13 transition."
-last_updated: "2026-05-10T10:57:22.829Z"
-last_activity: 2026-05-10 -- Phase 14 execution started
+stopped_at: "Completed Phase 15 plan 00 (`15-00-PLAN.md`). Wave 0 scaffolding shipped: pre-Phase-15 First Load JS baseline locked at 1088 KB for /sops/[sopId]/page, postbuild bundle-isolation CI gate wired with 2KB tolerance, 13 spec scaffolds across 6 integration/e2e files for SB-LINE-01..05, live import-leak lint guard (2 passing) for SB-LINE-06, anthropic-voice-mock fixture + Visy ENF4-03-031 seed SQL. 3 task commits on master (847dca0, b40d3ae, 77d3481). All 15 phase15-stubs tests discoverable via playwright --list. Next: Wave 1 (sub-trades schema + RLS) — plan 15-01."
+last_updated: "2026-05-13T00:30:00.000Z"
+last_activity: 2026-05-13 -- Phase 15 plan 00 (Wave 0 scaffolding) complete
 progress:
-  total_phases: 21
-  completed_phases: 4
-  total_plans: 22
-  completed_plans: 19
-  percent: 86
+  total_phases: 23
+  completed_phases: 5
+  total_plans: 28
+  completed_plans: 23
+  percent: 82
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 14 — ai-drafted-sops
+**Current focus:** Phase 15 — manufacturing-line-mode
 
 ## Current Position
 
-Phase: 14 (ai-drafted-sops) — EXECUTING
-Plan: 1 of 3
-Status: Executing Phase 14
-Last activity: 2026-05-10 -- Phase 14 execution started
+Phase: 15 (manufacturing-line-mode) — EXECUTING
+Plan: 2 of 5 (plan 00 / Wave 0 complete)
+Status: Executing Phase 15 — Wave 0 scaffolding shipped; Wave 1 next
+Last activity: 2026-05-13 -- Phase 15 plan 00 (Wave 0 scaffolding) complete
 
 Progress bar: `[████████████████████]` 100% (phases 11+12 complete; phase 13 implementation 5/5 done — UAT remaining)
 
@@ -227,6 +227,14 @@ None yet.
 - [Phase 13-05]: BlockListTable from 13-01 reused verbatim for /admin/global-blocks landing — single rendering surface for org-scope (/admin/blocks) and global-scope (/admin/global-blocks) lists
 - [Phase 13-05]: SuggestionReviewRow snapshot preview reuses BlockPickerPreview's switch shape (HazardCardBlock / PPECardBlock / StepBlock / curated emergency + measurement); non-curated kinds fall through to compact JSON dump labelled with kind — kept self-contained for now; promote to shared <BlockContentPreview> if a third surface needs it
 
+### Phase 15 Plan 00 Decisions
+
+- [Phase 15-00]: Pre-Phase-15 First Load JS baseline = 1088 KB for /sops/[sopId]/page (18 chunks) — locked in .bundle-baseline.json; Wave 4 enforces ≤ +2KB delta via postbuild CI gate
+- [Phase 15-00]: Next.js 16 webpack does NOT emit app-build-manifest.json (Turbopack-only artifact) — derived per-route client chunk list from RSC client-reference-manifest at .next/server/app/(protected)/sops/[sopId]/page_client-reference-manifest.js; both capture + check scripts handle webpack and Turbopack manifest layouts
+- [Phase 15-00]: playwright.config.ts testMatch extended to accept both *.test.ts and *.spec.ts; new phase15-stubs project regex matches 6 SB-LINE spec files + lint guard (15 tests total discoverable via --list)
+- [Phase 15-00]: Lint guard (tests/lint/no-static-desktop-import.spec.ts) runs LIVE not test.fixme — regex matches import-shape lines only, passes vacuously at Phase-14-head, auto-traps any future static import of DesktopWalkthrough/WalkthroughVoiceModal outside WalkthroughSwitcher.tsx
+- [Phase 15-00]: Wave-0 carve-out in check-bundle-size.ts: chunk-existence assertions silently no-op when neither chunk name appears in any manifest AND delta ≤ 0; auto-activates the moment Wave 2 ships next/dynamic imports
+
 ### Pending Todos
 
 - [ ] Confirm Vimeo URL scope for Phase 6 before planning begins (separate API token required; research flags this as product decision)
@@ -248,6 +256,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-07T06:30:00Z
-Stopped at: Completed Phase 13 plan 05 (`13-05-PLAN.md`). Summit super-admin curation UI shipped — `/admin/global-blocks` (gated by requireSummitAdmin) lists globals via BlockListTable + nav to suggestions queue; `/admin/global-blocks/suggestions` exposes pending block_suggestions rows with Promote/Reject decision form. No schema changes (consumes 13-01's pre-declared server-action surface verbatim). 3 task commits on master (5ea8575, 5a57687, 1d2bef7). Phase 13 implementation 5/5 complete; batched browser UAT (13-03 + 13-04 + 13-05) remains pending Simon's verification. Pre-existing 13-01 manual SQL seed (insert into summit_admins ...) still required before super-admin routes are accessible. Next: phase verification + Phase 13 transition.
+Last session: 2026-05-13T00:30:00Z
+Stopped at: Completed Phase 15 plan 00 (`15-00-PLAN.md`). Wave 0 scaffolding shipped: pre-Phase-15 First Load JS baseline locked at 1088 KB for /sops/[sopId]/page, postbuild bundle-isolation CI gate wired with 2KB tolerance, 13 spec scaffolds across 6 integration/e2e files for SB-LINE-01..05, live import-leak lint guard (2 passing) for SB-LINE-06, anthropic-voice-mock fixture + Visy ENF4-03-031 seed SQL. 3 task commits on master (847dca0, b40d3ae, 77d3481). All 15 phase15-stubs tests discoverable via playwright --list. Next: Wave 1 (sub-trades schema + RLS) — plan 15-01.
 Resume file: None
