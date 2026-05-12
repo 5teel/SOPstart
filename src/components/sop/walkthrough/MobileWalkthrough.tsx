@@ -207,7 +207,12 @@ export function MobileWalkthrough({ sop }: { sop: SopWithSections }) {
 
       if (result.success) {
         await completionStore.clearCompletion(sopId)
-        walkthroughStore.resetWalkthrough(sopId)
+        // Phase 15 polish: do NOT reset walkthrough state on submit. We mark
+        // the SOP as submitted so the worker can re-enter and re-read any
+        // step freely (highest-acked is now the last step, so the forward
+        // jump guard is permissive). resetWalkthrough is reserved for the
+        // explicit "Start another walkthrough" action.
+        walkthroughStore.markWalkthroughSubmitted(sopId)
         setSubmitted(true)
       } else {
         await db.completions.update(activeCompletion.localId, { status: 'in_progress' })
@@ -225,6 +230,7 @@ export function MobileWalkthrough({ sop }: { sop: SopWithSections }) {
 
   // ── Success state ──────────────────────────────────────────────
   if (submitted) {
+    const firstStepId = allSteps[0]?.id
     return (
       <div
         className="flex flex-col items-center justify-center min-h-[60vh] px-6 gap-6 text-center"
@@ -235,16 +241,35 @@ export function MobileWalkthrough({ sop }: { sop: SopWithSections }) {
           <p className="text-2xl font-bold text-[var(--ink-900)] mb-2">Completion submitted</p>
           <p className="text-sm text-[var(--ink-500)]">Your supervisor has been notified.</p>
         </div>
-        <button
-          type="button"
-          onClick={() => { setSubmitted(false); walkthroughStore.resetWalkthrough(sopId) }}
-          className="px-6 py-3 rounded-xl border border-[var(--ink-300)] text-sm font-medium text-[var(--ink-700)] hover:border-[var(--ink-900)] transition-colors"
-        >
-          Start another walkthrough
-        </button>
+        <div className="flex flex-col gap-3 w-full max-w-xs">
+          <button
+            type="button"
+            data-testid="reread-steps"
+            onClick={() => {
+              setSubmitted(false)
+              if (firstStepId) {
+                const params = new URLSearchParams(search.toString())
+                params.set('step', firstStepId)
+                router.push(`?${params.toString()}`, { scroll: false })
+              }
+            }}
+            className="px-6 py-3 rounded-xl bg-[var(--ink-900)] text-[var(--paper)] font-semibold hover:opacity-90 transition-opacity"
+          >
+            Re-read steps
+          </button>
+          <button
+            type="button"
+            onClick={() => { setSubmitted(false); walkthroughStore.resetWalkthrough(sopId) }}
+            className="px-6 py-3 rounded-xl border border-[var(--ink-300)] text-sm font-medium text-[var(--ink-700)] hover:border-[var(--ink-900)] transition-colors"
+          >
+            Start another walkthrough
+          </button>
+        </div>
       </div>
     )
   }
+
+  const isSubmittedSop = walkthroughStore.isSubmitted(sopId)
 
   // ── Main layout ────────────────────────────────────────────────
   return (
@@ -370,7 +395,18 @@ export function MobileWalkthrough({ sop }: { sop: SopWithSections }) {
           )}
 
           {/* Primary action */}
-          {allDone ? (
+          {isSubmittedSop ? (
+            <div
+              data-testid="walkthrough-already-submitted"
+              className="w-full min-h-[60px] h-[64px] rounded-xl border border-[var(--ink-200)] bg-[var(--ink-50)] flex flex-col items-center justify-center gap-0.5 text-[var(--ink-700)]"
+            >
+              <div className="flex items-center gap-2 font-semibold">
+                <CheckCircle2 size={20} className="text-green-500" />
+                Already submitted — re-reading
+              </div>
+              <span className="text-xs font-normal opacity-75">Use Prev / Next to browse any step</span>
+            </div>
+          ) : allDone ? (
             <button
               type="button"
               onClick={handleSubmit}

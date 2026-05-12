@@ -10,6 +10,8 @@ interface WalkthroughState {
   lockedSteps: Record<string, true>
   // Phase 15 D-21: sopId -> ordered list of step ack-button clicks (evidence of sequential reading)
   ackTrace: Record<string, AckTraceEntry[]>
+  // sopId -> timestamp when walkthrough was submitted (enables free-read review mode)
+  submittedSops: Record<string, number>
   markStepComplete: (sopId: string, stepId: string) => void
   markStepIncomplete: (sopId: string, stepId: string) => void
   acknowledgeSafety: (sopId: string) => void
@@ -22,6 +24,8 @@ interface WalkthroughState {
   markStepAcknowledged: (sopId: string, stepId: string) => void
   getHighestAckIndex: (sopId: string, allStepIds: string[]) => number
   getAckTrace: (sopId: string) => AckTraceEntry[]
+  markWalkthroughSubmitted: (sopId: string) => void
+  isSubmitted: (sopId: string) => boolean
 }
 
 export const useWalkthroughStore = create<WalkthroughState>((set, get) => ({
@@ -29,6 +33,7 @@ export const useWalkthroughStore = create<WalkthroughState>((set, get) => ({
   acknowledgedSops: {},
   lockedSteps: {},
   ackTrace: {},
+  submittedSops: {},
 
   markStepComplete: (sopId, stepId) =>
     set((state) => {
@@ -76,10 +81,12 @@ export const useWalkthroughStore = create<WalkthroughState>((set, get) => ({
       const { [sopId]: _steps, ...remainingSteps } = state.completedSteps
       const { [sopId]: _ack, ...remainingAcks } = state.acknowledgedSops
       const { [sopId]: _trace, ...remainingTrace } = state.ackTrace
+      const { [sopId]: _submitted, ...remainingSubmitted } = state.submittedSops
       return {
         completedSteps: remainingSteps,
         acknowledgedSops: remainingAcks,
         ackTrace: remainingTrace,
+        submittedSops: remainingSubmitted,
       }
     }),
 
@@ -118,4 +125,11 @@ export const useWalkthroughStore = create<WalkthroughState>((set, get) => ({
   },
 
   getAckTrace: (sopId) => get().ackTrace[sopId] ?? [],
+
+  markWalkthroughSubmitted: (sopId) =>
+    set((state) => ({
+      submittedSops: { ...state.submittedSops, [sopId]: Date.now() },
+    })),
+
+  isSubmitted: (sopId) => !!get().submittedSops[sopId],
 }))

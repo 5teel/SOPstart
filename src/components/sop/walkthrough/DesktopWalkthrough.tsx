@@ -53,6 +53,7 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
   const currentIdx = Math.max(0, allSteps.findIndex((s) => s.id === currentId))
   const currentStep = allSteps[currentIdx]
   const prevStep = allSteps[currentIdx - 1]
+  const nextStep = allSteps[currentIdx + 1]
   const currentSection =
     sop.sop_sections.find((s) => (s.sop_steps ?? []).some((st) => st.id === currentStep?.id)) ?? null
 
@@ -135,7 +136,10 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
 
       if (result.success) {
         await completionStore.clearCompletion(sopId)
-        walkthroughStore.resetWalkthrough(sopId)
+        // Phase 15 polish: preserve walkthrough state so the worker can
+        // re-enter and re-read any step freely. resetWalkthrough is only
+        // called from the explicit "Start another walkthrough" action.
+        walkthroughStore.markWalkthroughSubmitted(sopId)
         setSubmitted(true)
       } else {
         await db.completions.update(activeCompletion.localId, { status: 'in_progress' })
@@ -150,9 +154,10 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
 
   // ── Success state ──────────────────────────────────────────────
   if (submitted) {
+    const firstStepId = allSteps[0]?.id
     return (
       <div
-        className="flex flex-col items-center justify-center min-h-[60vh] px-6 gap-6 text-center"
+        className="flex flex-col items-center justify-center min-h-[60vh] px-6 gap-8 text-center"
         data-walkthrough="desktop"
       >
         <CheckCircle2 size={96} className="text-green-500" />
@@ -160,9 +165,35 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
           <p className="text-4xl font-bold text-[var(--ink-900)] mb-3">Completion submitted</p>
           <p className="text-xl text-[var(--ink-500)]">Your supervisor has been notified.</p>
         </div>
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            data-testid="reread-steps"
+            onClick={() => {
+              setSubmitted(false)
+              if (firstStepId) {
+                const params = new URLSearchParams(search.toString())
+                params.set('step', firstStepId)
+                router.push(`?${params.toString()}`, { scroll: false })
+              }
+            }}
+            className="min-h-[60px] px-10 rounded-xl bg-[var(--ink-900)] text-[var(--paper)] text-xl font-bold hover:opacity-90 transition-opacity"
+          >
+            Re-read steps
+          </button>
+          <button
+            type="button"
+            onClick={() => { setSubmitted(false); walkthroughStore.resetWalkthrough(sopId) }}
+            className="min-h-[60px] px-10 rounded-xl border border-[var(--ink-300)] text-lg font-medium text-[var(--ink-700)] hover:border-[var(--ink-900)] transition-colors"
+          >
+            Start another walkthrough
+          </button>
+        </div>
       </div>
     )
   }
+
+  const isSubmittedSop = walkthroughStore.isSubmitted(sopId)
 
   if (!currentStep) {
     return (
@@ -288,7 +319,27 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
               <p className="text-base text-[var(--accent-escalate)]">{submitError}</p>
             )}
 
-            {allDone ? (
+            {isSubmittedSop ? (
+              <div className="flex items-center gap-4">
+                <div
+                  data-testid="walkthrough-already-submitted"
+                  className="min-h-[60px] px-6 rounded-xl border border-[var(--ink-200)] bg-[var(--ink-50)] flex items-center gap-3 text-lg font-semibold text-[var(--ink-700)]"
+                >
+                  <CheckCircle2 className="h-6 w-6 text-green-500" />
+                  Already submitted — re-reading
+                </div>
+                <button
+                  type="button"
+                  disabled={!nextStep}
+                  onClick={() => nextStep && void handleStepChange(nextStep.id)}
+                  className="min-h-[60px] px-8 rounded-xl bg-[var(--ink-900)] text-[var(--paper)] text-xl font-bold flex items-center gap-3 hover:opacity-90 transition-opacity disabled:opacity-30 disabled:pointer-events-none"
+                  data-testid="review-next"
+                >
+                  Next
+                  <span aria-hidden>→</span>
+                </button>
+              </div>
+            ) : allDone ? (
               <button
                 type="button"
                 onClick={handleSubmit}
