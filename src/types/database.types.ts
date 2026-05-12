@@ -825,6 +825,92 @@ export type Database = {
           },
         ]
       }
+      // ------------------------------------------------------------
+      // Phase 15: sub-trade controlled vocab + junctions (migration 00030)
+      // ------------------------------------------------------------
+      sub_trades: {
+        Row: {
+          id: string
+          slug: string
+          label: string
+          sort_order: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          slug: string
+          label: string
+          sort_order?: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          slug?: string
+          label?: string
+          sort_order?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
+      users_sub_trades: {
+        Row: {
+          user_id: string
+          sub_trade_id: string
+          assigned_at: string
+          assigned_by: string | null
+        }
+        Insert: {
+          user_id: string
+          sub_trade_id: string
+          assigned_at?: string
+          assigned_by?: string | null
+        }
+        Update: {
+          user_id?: string
+          sub_trade_id?: string
+          assigned_at?: string
+          assigned_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "users_sub_trades_sub_trade_id_fkey"
+            columns: ["sub_trade_id"]
+            isOneToOne: false
+            referencedRelation: "sub_trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sops_sub_trades: {
+        Row: {
+          sop_id: string
+          sub_trade_id: string
+        }
+        Insert: {
+          sop_id: string
+          sub_trade_id: string
+        }
+        Update: {
+          sop_id?: string
+          sub_trade_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sops_sub_trades_sop_id_fkey"
+            columns: ["sop_id"]
+            isOneToOne: false
+            referencedRelation: "sops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sops_sub_trades_sub_trade_id_fkey"
+            columns: ["sub_trade_id"]
+            isOneToOne: false
+            referencedRelation: "sub_trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       worker_notifications: {
         Row: {
           created_at: string
@@ -1073,6 +1159,8 @@ export type Database = {
           step_data: Json
           submitted_at: string
           created_at: string
+          // Phase 15 D-21: ordered ack-button click trace
+          step_ack_trace: Json
         }
         Insert: {
           id: string
@@ -1085,6 +1173,7 @@ export type Database = {
           step_data: Json
           submitted_at?: string
           created_at?: string
+          step_ack_trace?: Json | null
         }
         Update: {
           id?: string
@@ -1097,6 +1186,7 @@ export type Database = {
           step_data?: Json
           submitted_at?: string
           created_at?: string
+          step_ack_trace?: Json | null
         }
         Relationships: [
           {
@@ -1323,6 +1413,9 @@ export type Database = {
       // Trigger function — never directly callable from client; declared so
       // schema-aware tooling does not consider it missing.
       propagate_block_update: { Args: Record<string, never>; Returns: unknown }
+      // Phase 15: sub-trade RLS helpers (migration 00030)
+      current_user_sub_trades: { Args: Record<string, never>; Returns: string[] }
+      sub_trade_id_intersects: { Args: { p_sop_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "worker" | "supervisor" | "admin" | "safety_manager"

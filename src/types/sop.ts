@@ -344,3 +344,57 @@ export interface BlockUpdateDecision {
 export interface SopSectionBlockWithUpdate extends SopSectionBlock {
   latestVersion?: BlockVersion | null
 }
+
+// ---------------------------------------------------------------
+// Phase 15: sub-trade vocab + voice Q&A + acknowledgement trace
+// Matches supabase/migrations/00030_sub_trades.sql.
+// ---------------------------------------------------------------
+
+export type SubTradeSlug = 'operator' | 'fitter' | 'sparky' | 'maintainer' | 'other'
+
+export interface SubTrade {
+  id: string
+  // Slug is intentionally widened to string to allow future admin-editable vocab (15b);
+  // current 15a seed is exactly the SubTradeSlug union above.
+  slug: SubTradeSlug | string
+  label: string
+  sort_order: number
+}
+
+/**
+ * Junction row: a worker holds zero or more sub-trade tags.
+ * Matches public.users_sub_trades from migration 00030.
+ */
+export interface UsersSubTrade {
+  user_id: string
+  sub_trade_id: string
+  assigned_at: string
+  assigned_by: string | null
+}
+
+/**
+ * Junction row: an SOP targets zero or more sub-trades.
+ * Empty for a SOP = visible to all workers (backward compat).
+ * Matches public.sops_sub_trades from migration 00030.
+ */
+export interface SopsSubTrade {
+  sop_id: string
+  sub_trade_id: string
+}
+
+/**
+ * Phase 15 D-21: append-only evidence of sequential reading.
+ * One entry per "I've done this — Next" click on a step.
+ */
+export type AckTraceEntry = { stepId: string; timestamp: number }
+
+/**
+ * Phase 15 voice Q&A response shape. Returned by POST /api/voice/query.
+ * `citations` are section/step IDs the answer cites.
+ * `verifier_flags` are adversarial-verifier ungrounded-claim flags (D-06, D-18).
+ */
+export interface VoiceQueryResponse {
+  answer: string
+  citations: string[]
+  verifier_flags: VerificationFlag[]
+}
