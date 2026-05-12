@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Closeout
 status: executing
-stopped_at: "Completed Phase 15 plan 01 (`15-01-PLAN.md`) Tasks 1, 3, 4. Wave 1 foundation: migration 00030_sub_trades.sql written (3 junction tables, 2 SECURITY DEFINER helpers, additive sops_visible_by_sub_trade policy, 5-row seed, sop_completions.step_ack_trace JSONB column); database.types.ts manually extended; src/types/sop.ts exports SubTrade/AckTraceEntry/VoiceQueryResponse; new validators voiceQuerySchema + subTradeAssignmentSchema; useViewport SSR-safe hook; useWalkthroughStore extended with ackTrace/markStepAcknowledged/getHighestAckIndex/getAckTrace; 11 new live tests pass under phase15-stubs project. 3 task commits on master (454b442, 989c0ba, 9498e88). Auto-fixed Rule 1 bug (plan said 'completions', actual table is 'sop_completions'). BLOCKED on Task 2 (human-action): Simon must run `npx supabase db push --include-all` to apply migration 00030 before Wave 3 voice route + Wave 4 admin server actions can ship. See 15-01-SUMMARY.md § Awaiting Action."
-last_updated: "2026-05-13T01:00:00.000Z"
-last_activity: 2026-05-13 -- Phase 15 plan 01 (Wave 1 foundation) code complete; awaiting migration push
+stopped_at: "Completed Phase 15 Plan 02 (Wave 2 Walkthrough UI). 5 new files + 4 modified. MobileWalkthrough extracted + ack gate wired (D-19); DesktopWalkthrough big-text variant; WalkthroughSwitcher with next/dynamic({ssr:false}) for Desktop+Modal; floating mic-pill; voice modal shell with /api/voice/query stub pending Wave 3. 49 of 55 phase15-stubs tests pass. Bundle delta +7 KB documented for Wave 4. Task 5 human visual verification deferred to phase UAT per orchestrator brief. See 15-02-SUMMARY.md UAT checklist."
+last_updated: "2026-05-12T14:33:03.724Z"
+last_activity: 2026-05-12
 progress:
   total_phases: 23
   completed_phases: 5
-  total_plans: 28
-  completed_plans: 24
-  percent: 86
+  total_plans: 27
+  completed_plans: 25
+  percent: 93
 ---
 
 # Project State
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 15 (manufacturing-line-mode) — EXECUTING
-Plan: 2 of 5 (plan 00 / Wave 0 complete)
-Status: Executing Phase 15 — Wave 0 scaffolding shipped; Wave 1 next
-Last activity: 2026-05-13 -- Phase 15 plan 00 (Wave 0 scaffolding) complete
+Plan: 3 of 5 (plan 00 / Wave 0 complete)
+Status: Ready to execute
+Last activity: 2026-05-12
 
 Progress bar: `[████████████████████]` 100% (phases 11+12 complete; phase 13 implementation 5/5 done — UAT remaining)
 
@@ -103,6 +103,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 06 P04 | 3m | 2 tasks | 6 files |
 | Phase 08 P04 | 10m | 2 tasks | 5 files |
 | Phase 09-streamlined-file-video-pipeline P00 | 2m | 2 tasks | 7 files |
+| Phase 15 P02 | 10m | 4 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -179,6 +180,12 @@ Recent decisions affecting current work:
 - [Phase 08-02]: regenerateVideo calls runVideoGenerationPipeline directly (not via fetch) to avoid unnecessary HTTP round-trip
 - [Phase 08]: useNetworkStore used directly in useVideoGeneration — useOnlineStatus hook only registers listeners, returns void; useNetworkStore(s => s.isOnline) is the correct pattern for reading online state
 - [Phase 09-streamlined-file-video-pipeline]: phase9-stubs Playwright project uses filename regex matching all 6 pipeline-*.test.ts files, consistent with phase2/6/8-stubs convention
+- [Phase ?]: [Phase 15-02]: WalkthroughTab.tsx kept as a 4-line re-export shim; deletion deferred to Wave 4 Task 5
+- [Phase ?]: [Phase 15-02]: WalkthroughVoiceModal ships full shell in Wave 2 (not placeholder) — switcher next/dynamic requires the export to exist; only /api/voice/query fetch is stubbed for Wave 3
+- [Phase ?]: [Phase 15-02]: Voice button + modal mounted at WalkthroughSwitcher level (single instance serves Mobile + Desktop variants, RESEARCH A10)
+- [Phase ?]: [Phase 15-02]: stepAckTrace persisted as informational evidence on sop_completions.step_ack_trace (jsonb) via Json cast; server does NOT gate on it (T-15-02-01 accept disposition)
+- [Phase ?]: [Phase 15-02]: Wave-2 runtime tests downgraded to live source-contract assertions (chromium binary not installed; same Rule-3 trade-off as Plan 15-01); runtime checks deferred to Task 5 phase UAT
+- [Phase ?]: [Phase 15-02]: First Load JS delta /sops/[sopId]/page = +7 KB (1088→1095); DesktopWalkthrough+WalkthroughVoiceModal correctly out-of-band as dynamic chunks; Wave 4 owns formal CI gate
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -266,6 +273,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-13T01:00:00Z
-Stopped at: Completed Phase 15 plan 01 (`15-01-PLAN.md`) Tasks 1, 3, 4 — Wave 1 foundation code complete. Migration 00030 written (3 junction tables + 2 SECURITY DEFINER helpers + additive RLS policy + 5-row seed + sop_completions.step_ack_trace); database.types.ts + sop.ts manually extended for sub-trade schema; voice-query + sub-trades Zod validators; SSR-safe useViewport hook; useWalkthroughStore extended with ackTrace API. 11 new live Playwright tests pass under phase15-stubs project. 3 task commits on master (454b442, 989c0ba, 9498e88). Auto-fixed Rule-1 bug: plan/RESEARCH said `completions` but actual table is `sop_completions` (per 00010). Awaiting Simon's `npx supabase db push --include-all` (Task 2 blocking checkpoint) before Wave 3 voice route + Wave 4 admin server actions can ship. See .planning/phases/15-manufacturing-line-mode/15-01-SUMMARY.md § Awaiting Action for exact PowerShell commands.
-Resume file: .planning/phases/15-manufacturing-line-mode/15-01-SUMMARY.md
+Last session: 2026-05-12T14:33:03.718Z
+Stopped at: Completed Phase 15 Plan 02 (Wave 2 Walkthrough UI). 5 new files + 4 modified. MobileWalkthrough extracted + ack gate wired (D-19); DesktopWalkthrough big-text variant; WalkthroughSwitcher with next/dynamic({ssr:false}) for Desktop+Modal; floating mic-pill; voice modal shell with /api/voice/query stub pending Wave 3. 49 of 55 phase15-stubs tests pass. Bundle delta +7 KB documented for Wave 4. Task 5 human visual verification deferred to phase UAT per orchestrator brief. See 15-02-SUMMARY.md UAT checklist.
+Resume file: .planning/phases/15-manufacturing-line-mode/15-02-SUMMARY.md
