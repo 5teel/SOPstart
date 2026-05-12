@@ -2,7 +2,7 @@ import { defineConfig } from '@playwright/test'
 
 export default defineConfig({
   testDir: './tests',
-  testMatch: '**/*.test.ts',
+  testMatch: ['**/*.test.ts', '**/*.spec.ts'],
   timeout: 30_000,
   retries: 0,
   use: {
@@ -49,6 +49,12 @@ export default defineConfig({
     {
       name: 'phase12.5-stubs',
       testMatch: /sb-ux-(blueprint|voice|flow|cmdk|contract|walkthrough|escalate|blocks)\.test\.ts$/,
+      use: { browserName: 'chromium' },
+    },
+    {
+      name: 'phase15-stubs',
+      testMatch:
+        /(desktop-walkthrough-layout|sequential-ack|voice-qa-happy-path|voice-grounding-scope|sub-trade-rls-backward-compat|sub-trade-assignment|no-static-desktop-import)\.spec\.ts$/,
       use: { browserName: 'chromium' },
     },
   ],
