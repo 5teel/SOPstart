@@ -365,7 +365,7 @@ These two items belong with kiosk mode + site-tier work in Phase 15 because they
 
 **Depends on**: Phase 11 (section schema), Phase 12 (builder), Phase 13 (block library — extended for site-tier), Phase 14 (AI prompts — feeds the RAG), Phase 14.5 (paper/ink shell)
 
-**Requirements**: SB-LINE-01..SB-LINE-10 (to be assigned in SPEC.md — see open decisions below)
+**Requirements**: SB-LINE-01, SB-LINE-02, SB-LINE-03, SB-LINE-04, SB-LINE-05, SB-LINE-06
 
 **Success Criteria** (what must be TRUE):
   1. A Visy admin can model their org structure as: corporate organisation → ~100 sites → site-specific SOP overlays on top of org/global SOPs. Existing single-org tenants migrate transparently with a synthetic single "default site" so no Phase 1–14 RLS or UI breaks.
