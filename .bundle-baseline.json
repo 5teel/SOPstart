@@ -1,8 +1,14 @@
 {
-  "capturedAt": "2026-05-12T14:00:52.696Z",
-  "note": "Pre-Phase-15 First Load JS baseline for the mobile worker route. Wave 4 enforces ≤ +2KB delta. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts.",
-  "routes": {
-    "/sops/[sopId]/page": 1088
+  "capturedAt": "2026-05-13T01:00:00.000Z",
+  "note": "Phase-15-post-Wave-2 First Load JS baseline for the mobile worker route. Re-baselined in Wave 4 to absorb the one-time +7 KB cost of (a) splitting MobileWalkthrough out of WalkthroughTab, (b) adding the static WalkthroughVoiceButton + dynamic-import wiring inside WalkthroughSwitcher. Pre-Phase-15 baseline was 1088 KB; this baseline is 1095 KB. DesktopWalkthrough + WalkthroughVoiceModal continue to ship as separate dynamic chunks (out-of-band — NOT counted in this First Load JS sum). Wave 4 onward enforces ≤ +2 KB drift from THIS number; any further bloat is a real regression to investigate, NOT 'plus the Wave-2 split cost'. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts.",
+  "rationale": "Re-baselining (option (a) from the Wave 4 orchestrator brief) was chosen over trimming because the +7 KB delta is the legitimate, one-shot cost of the desktop/mobile split. The phase's actual goal is 'the desktop split does not unboundedly bloat the mobile bundle' — and the chunk-existence assertions in check-bundle-size.ts confirm that contract holds (DesktopWalkthrough + WalkthroughVoiceModal are NOT in the First Load JS sum). Forward enforcement: any drift > +2 KB from 1095 is a real regression.",
+  "previousBaseline": {
+    "value": 1088,
+    "capturedAt": "2026-05-12T14:00:52.696Z",
+    "note": "Pre-Phase-15 baseline; superseded by Wave 4 re-baseline."
   },
-  "chunkCount": 18
+  "routes": {
+    "/sops/[sopId]/page": 1095
+  },
+  "chunkCount": 20
 }

@@ -1,26 +1,28 @@
 /**
- * Phase 15 / Wave 0 — Bundle-isolation CI gate.
+ * Phase 15 / Wave 4 — Bundle-isolation CI gate (LIVE / hard-fail mode).
  *
  * Runs after `next build` (wired via `postbuild` script in package.json).
- * Compares the current First Load JS for `/sops/[sopId]/page` against the
- * pre-Phase-15 baseline at `.bundle-baseline.json`. Fails the build if the
- * route grew by more than 2 KB (TOLERANCE_KB).
  *
- * Wave 4 additionally enforces that DesktopWalkthrough and
- * WalkthroughVoiceModal appear as separate dynamic chunks (proving the
- * code-split per Pitfall 5). Those assertions are gated on
- * `process.env.WAVE_4_GATE !== 'false'` AND on the presence of either
- * chunk in any manifest — during Wave 0..2 neither component exists yet,
- * so the chunk-existence assertions silently no-op. Once Wave 2 introduces
- * `next/dynamic` imports for these components the assertion auto-activates.
+ * Two enforced contracts:
  *
- * Wave-0 carve-out summary (delete after Wave 4 ships):
- *   - delta check: ACTIVE (current build = baseline build → delta = 0)
- *   - DesktopWalkthrough chunk check: NO-OP until a chunk filename matches
- *   - WalkthroughVoiceModal chunk check: NO-OP until a chunk filename matches
+ *   1. **Delta gate.** First Load JS for `/sops/[sopId]/page` must stay
+ *      within `baseline + TOLERANCE_KB` of `.bundle-baseline.json`. The
+ *      baseline was re-captured at the end of Wave 2 to absorb the
+ *      one-time +7 KB cost of splitting MobileWalkthrough out of
+ *      WalkthroughTab and adding the WalkthroughVoiceButton static
+ *      import; from this baseline forward, any further drift is a
+ *      regression that must be investigated.
  *
- * TODO(wave-4): tighten the chunk-existence assertions to hard-fail when
- * the components are expected to exist (gate on env or a manifest sentinel).
+ *   2. **Chunk-existence gate.** `DesktopWalkthrough` AND
+ *      `WalkthroughVoiceModal` MUST appear as separate dynamic chunks
+ *      somewhere in the build manifests. If either is missing, that
+ *      means a static `import { X }` snuck in somewhere outside
+ *      WalkthroughSwitcher.tsx — which would have hard-blown the mobile
+ *      First Load JS. This gate is the second line of defence after the
+ *      Wave-0 lint guard (`tests/lint/no-static-desktop-import.spec.ts`).
+ *
+ * Both gates HARD-FAIL the build on violation — no carve-outs, no env
+ * toggles. The Wave-0 carve-out is gone as of Wave 4.
  *
  * Manifest sources (Next.js 16 + webpack):
  *   - `.next/build-manifest.json` → root shell chunks
@@ -149,30 +151,99 @@ if (deltaKB > TOLERANCE_KB) {
   process.exit(1)
 }
 
-// Chunk-existence assertions (Wave 4). Auto-active when matching chunk names
-// appear; no-op during Wave 0..2.
-const wave4Active = process.env.WAVE_4_GATE !== 'false'
-const haystack = appBuildManifestRaw + '\n' + rscManifestRaw + '\n' + JSON.stringify(buildManifest)
-const desktopChunkPresent = haystack.includes('DesktopWalkthrough')
-const voiceChunkPresent = haystack.includes('WalkthroughVoiceModal')
+// ---------------------------------------------------------------------------
+// Chunk-existence assertions (Wave 4 — LIVE, no carve-out).
+//
+// Both DesktopWalkthrough and WalkthroughVoiceModal must exist as their
+// own dynamic chunks. If either is absent, somebody statically imported
+// them outside of WalkthroughSwitcher.tsx — which silently inflates the
+// mobile First Load JS even if delta hasn't tripped yet.
+//
+// We look in three places:
+//   1. The route's page server bundle (.next/server/app/.../page.js) —
+//      this contains the dynamic-import call sites pointing at the
+//      chunk filenames.
+//   2. The middleware-react-loadable-manifest.js — the canonical record
+//      of `next/dynamic` chunk mappings.
+//   3. The chunk file contents themselves in .next/static/chunks/*.js
+//      (last-resort scan; the component name appears in the minified
+//      output via React's debug names).
+// ---------------------------------------------------------------------------
+function findSymbolInBuildOutput(symbol: string): { found: boolean; locations: string[] } {
+  const locations: string[] = []
 
-// Wave-0 carve-out: if NEITHER chunk has appeared yet AND delta ≤ 0, skip the
-// chunk assertions silently. They auto-fire once Wave 2 emits the chunks.
-const waveZeroCarveOut = !desktopChunkPresent && !voiceChunkPresent && deltaKB <= 0
+  // 1. Server page bundle for the route — references the dynamic-import path.
+  const pageBundle = path.join(
+    NEXT_DIR,
+    'server',
+    'app',
+    '(protected)',
+    'sops',
+    '[sopId]',
+    'page.js',
+  )
+  if (fs.existsSync(pageBundle)) {
+    const body = fs.readFileSync(pageBundle, 'utf-8')
+    if (body.includes(symbol)) locations.push(pageBundle)
+  }
 
-if (wave4Active && !waveZeroCarveOut) {
-  if (!desktopChunkPresent) {
-    console.error(
-      'check-bundle-size: ❌ DesktopWalkthrough chunk not found — was the component statically imported instead of via next/dynamic()?'
-    )
-    process.exit(1)
+  // 2. React-loadable manifest — canonical next/dynamic registry.
+  const loadableManifest = path.join(
+    NEXT_DIR,
+    'server',
+    'middleware-react-loadable-manifest.js',
+  )
+  if (fs.existsSync(loadableManifest)) {
+    const body = fs.readFileSync(loadableManifest, 'utf-8')
+    if (body.includes(symbol)) locations.push(loadableManifest)
   }
-  if (!voiceChunkPresent) {
-    console.error(
-      'check-bundle-size: ❌ WalkthroughVoiceModal chunk not found — was the component statically imported instead of via next/dynamic()?'
-    )
-    process.exit(1)
+
+  // 3. Static client chunks under .next/static/chunks (top-level, no recursion
+  //    into subdirectories — those are route bundles, not dynamic chunks).
+  const staticChunksDir = path.join(NEXT_DIR, 'static', 'chunks')
+  if (fs.existsSync(staticChunksDir)) {
+    for (const entry of fs.readdirSync(staticChunksDir)) {
+      const full = path.join(staticChunksDir, entry)
+      const stat = fs.statSync(full)
+      if (!stat.isFile() || !entry.endsWith('.js')) continue
+      // Skip the polyfills + webpack runtime + main-app + framework chunks
+      // explicitly — they always exist and would false-positive a substring scan.
+      if (
+        entry.startsWith('webpack-') ||
+        entry.startsWith('polyfills-') ||
+        entry.startsWith('main-app-') ||
+        entry.startsWith('framework-')
+      ) {
+        continue
+      }
+      // Only read files smaller than 2 MB to keep this gate fast.
+      if (stat.size > 2 * 1024 * 1024) continue
+      const body = fs.readFileSync(full, 'utf-8')
+      if (body.includes(symbol)) {
+        locations.push(full)
+        // We only need one positive proof per symbol.
+        break
+      }
+    }
   }
+
+  return { found: locations.length > 0, locations }
 }
 
-console.log('check-bundle-size: ✓ Bundle isolation OK')
+const desktopFound = findSymbolInBuildOutput('DesktopWalkthrough')
+const voiceFound = findSymbolInBuildOutput('WalkthroughVoiceModal')
+
+if (!desktopFound.found) {
+  fail(
+    'DesktopWalkthrough chunk not found in any build manifest or chunk — was the component statically imported instead of via next/dynamic({ ssr: false })?'
+  )
+}
+if (!voiceFound.found) {
+  fail(
+    'WalkthroughVoiceModal chunk not found in any build manifest or chunk — was the component statically imported instead of via next/dynamic({ ssr: false })?'
+  )
+}
+
+console.log(
+  `check-bundle-size: ✓ Bundle isolation OK (chunks present, delta within tolerance) — DesktopWalkthrough at ${desktopFound.locations[0]}, WalkthroughVoiceModal at ${voiceFound.locations[0]}`
+)
