@@ -379,17 +379,14 @@ These two items belong with kiosk mode + site-tier work in Phase 15 because they
   9. Global app-wide Cmd+K mounted across all `(protected)` routes — surfaces app-wide navigation (Library, Blocks, Team, Create via Upload/Blank/AI, Settings, kiosk site selector for multi-site admins) alongside the existing SOP-scoped jump-to-step + ask-AI on SOP pages.
   10. Bundle isolation: kiosk mode chunks + voice Q&A RAG client do not leak into the existing mobile worker bundle; mobile worker walkthrough First Load JS does not grow as a result of Phase 15.
 
-**Plans**: TBD (6–8 plans, created by /gsd-plan-phase after spec+discuss)
+**Plans:** 5 plans (Phase 15a — demo wedge for Bryce at Visy; Phase 15b governance/auth/HRIS scoped separately after POC sign-off)
 
-Anticipated plan breakdown:
-- 15-01: Site tier in multi-tenancy — `sites` table, `sops.site_id` (nullable for org-level), RLS extension, backfill migration creating synthetic default site for existing orgs, site selector UI
-- 15-02: Terminal/kiosk shell — `/kiosk/[siteSlug]/...` route group, big-text reading UI, sequence-enforced walkthrough, no-auth read path with PIN/badge sign-off on completion
-- 15-03: Voice Q&A over a single SOP — RAG indexer over structured SOP content (sections + blocks + hazards + PPE), Deepgram ASR (already in stack), Anthropic answer synthesis with explicit citations
-- 15-04: SOP governance & lifecycle — `sops.review_cadence_months` + `sops.next_review_due_at`, stale-grey-out UI, configurable n-step approval chain (`sop_approval_steps` table), Discipline Leader cross-site approver flow
-- 15-05: Extended roles + sub-trade tags — role catalog extension, `users.sub_trade_tags` array, SOP-to-role-and-trade assignment filtering
-- 15-06: Training-record export + Success Factors integration spec — completion → competency mapping, CSV export endpoint, Success Factors API connector (deferred to sub-plan if no API access during trial)
-- 15-07: Role-aware home + global Cmd+K (residual from Phase 14.5) — `/dashboard` rebuild as engineering-drawing role-adaptive home, CmdKProvider promoted from `/sops/*` to root layout
-- 15-08: Integration + verification — end-to-end kiosk + voice + governance smoke test, bundle isolation CI check (worker bundle excludes kiosk chunks)
+Plans:
+- [ ] 15-00-PLAN.md — Wave 0: capture pre-Phase-15 bundle baseline + scaffold all Playwright/test fixture files referenced in 15-VALIDATION.md
+- [ ] 15-01-PLAN.md — Wave 1: foundation — migration 00030 (sub_trades + junctions + RLS helper + completions.step_ack_trace) + database.types.ts manual extension + voice/sub-trades validators + useViewport hook + walkthrough store ack-trace extension
+- [ ] 15-02-PLAN.md — Wave 2: UI — extract MobileWalkthrough, build DesktopWalkthrough (big-text ≥24px, 60px Next button), WalkthroughSwitcher (next/dynamic ssr:false), floating mic-pill + WalkthroughVoiceModal, sequential ack gate on both layouts
+- [ ] 15-03-PLAN.md — Wave 3: voice backend — packSopForPrompt utility + voice-qa.ts two-call pipeline with Anthropic prompt caching + verify-sop.ts mode voice_qa extension (fail-safe to uncertainty) + /api/voice/query route with full Zod + RLS-scoped SOP fetch + 7-threat coverage
+- [ ] 15-04-PLAN.md — Wave 4: admin UI + completion + CI gate + demo prep — SubTradePicker + admin/team + admin/sops/[id]/assign + completions.step_ack_trace persistence + activate bundle-isolation CI gate + Visy ENF4-03-031 demo prep doc
 
 **UI hint**: yes (heavy)
 
