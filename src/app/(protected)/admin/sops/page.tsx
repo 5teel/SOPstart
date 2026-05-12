@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase/server'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { DeleteSopButton } from '@/components/admin/DeleteSopButton'
 import { VideoJobIndicator } from '@/components/admin/VideoJobIndicator'
-import { PaperThemeMount } from '@/app/_theme-mount'
 import type { SopStatus } from '@/types/sop'
 
 export const metadata: Metadata = {
@@ -72,9 +71,7 @@ export default async function SopsLibraryPage({
   const { data: sops } = await query
 
   return (
-    <>
-      <PaperThemeMount />
-      <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10">
+    <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10">
         {/* Header */}
         <div className="flex items-start justify-between mb-6 gap-4 flex-wrap">
           <div>
@@ -262,8 +259,7 @@ export default async function SopsLibraryPage({
               )
             })}
           </ul>
-        )}
-      </div>
-    </>
+      )}
+    </div>
   )
 }

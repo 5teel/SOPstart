@@ -1,7 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { ThemeProvider } from 'next-themes'
 import { PRODUCT_NAME, PRODUCT_DESCRIPTION } from '@/lib/constants'
-import { SiteThemeProvider } from '@/components/providers/SiteThemeProvider'
 import './globals.css'
 import '../styles/blueprint-theme.css'
 
@@ -29,14 +27,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body data-theme="paper">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-          <SiteThemeProvider>
-            {children}
-          </SiteThemeProvider>
-        </ThemeProvider>
-      </body>
+    <html lang="en">
+      <body data-theme="paper">{children}</body>
     </html>
   )
 }

@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { ThemePicker } from '@/components/profile/ThemePicker'
 import { LogoutButton } from '@/components/profile/LogoutButton'
 import { OrgSwitcher } from '@/components/profile/OrgSwitcher'
 
@@ -32,17 +31,6 @@ export default async function ProfilePage() {
 
       {/* Sign out */}
       <LogoutButton />
-
-      {/* Theme picker */}
-      <section className="blueprint-frame p-5">
-        <h2 className="mono text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wider mb-1">
-          Site Theme
-        </h2>
-        <p className="text-xs text-[var(--ink-500)] mb-4">
-          Choose an industrial aesthetic. Applies instantly across all pages.
-        </p>
-        <ThemePicker />
-      </section>
     </div>
   )
 }

@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { PaperThemeMount } from '@/app/_theme-mount'
 
 export const metadata: Metadata = {
   title: 'Dashboard',
@@ -27,9 +26,7 @@ export default async function DashboardPage() {
   if (role === 'safety_manager') redirect('/activity')
 
   return (
-    <>
-      <PaperThemeMount />
-      <div className="max-w-3xl mx-auto px-4 py-8 lg:py-10">
+    <div className="max-w-3xl mx-auto px-4 py-8 lg:py-10">
         <div className="flex items-center gap-3 mb-6">
           <span className="pill">DASHBOARD</span>
           <span className="mono text-[11px] text-[var(--ink-500)] uppercase tracking-wider">
@@ -41,10 +38,9 @@ export default async function DashboardPage() {
           Pick a path. Build, review, and publish your SOPs.
         </p>
 
-        {role === 'admin' && <AdminDashboard />}
-        {!role && <PendingDashboard />}
-      </div>
-    </>
+      {role === 'admin' && <AdminDashboard />}
+      {!role && <PendingDashboard />}
+    </div>
   )
 }
 
