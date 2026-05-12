@@ -57,5 +57,10 @@ export default defineConfig({
         /(desktop-walkthrough-layout|sequential-ack|voice-qa-happy-path|voice-grounding-scope|sub-trade-rls-backward-compat|sub-trade-assignment|no-static-desktop-import|use-viewport|walkthrough-store-ack)\.spec\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      name: 'phase15-unit',
+      testDir: './src/lib/voice/__tests__',
+      testMatch: /.*\.test\.ts$/,
+    },
   ],
 })
