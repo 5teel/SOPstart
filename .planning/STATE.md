@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Closeout
 status: executing
-stopped_at: "Completed Phase 15 plan 00 (`15-00-PLAN.md`). Wave 0 scaffolding shipped: pre-Phase-15 First Load JS baseline locked at 1088 KB for /sops/[sopId]/page, postbuild bundle-isolation CI gate wired with 2KB tolerance, 13 spec scaffolds across 6 integration/e2e files for SB-LINE-01..05, live import-leak lint guard (2 passing) for SB-LINE-06, anthropic-voice-mock fixture + Visy ENF4-03-031 seed SQL. 3 task commits on master (847dca0, b40d3ae, 77d3481). All 15 phase15-stubs tests discoverable via playwright --list. Next: Wave 1 (sub-trades schema + RLS) — plan 15-01."
-last_updated: "2026-05-13T00:30:00.000Z"
-last_activity: 2026-05-13 -- Phase 15 plan 00 (Wave 0 scaffolding) complete
+stopped_at: "Completed Phase 15 plan 01 (`15-01-PLAN.md`) Tasks 1, 3, 4. Wave 1 foundation: migration 00030_sub_trades.sql written (3 junction tables, 2 SECURITY DEFINER helpers, additive sops_visible_by_sub_trade policy, 5-row seed, sop_completions.step_ack_trace JSONB column); database.types.ts manually extended; src/types/sop.ts exports SubTrade/AckTraceEntry/VoiceQueryResponse; new validators voiceQuerySchema + subTradeAssignmentSchema; useViewport SSR-safe hook; useWalkthroughStore extended with ackTrace/markStepAcknowledged/getHighestAckIndex/getAckTrace; 11 new live tests pass under phase15-stubs project. 3 task commits on master (454b442, 989c0ba, 9498e88). Auto-fixed Rule 1 bug (plan said 'completions', actual table is 'sop_completions'). BLOCKED on Task 2 (human-action): Simon must run `npx supabase db push --include-all` to apply migration 00030 before Wave 3 voice route + Wave 4 admin server actions can ship. See 15-01-SUMMARY.md § Awaiting Action."
+last_updated: "2026-05-13T01:00:00.000Z"
+last_activity: 2026-05-13 -- Phase 15 plan 01 (Wave 1 foundation) code complete; awaiting migration push
 progress:
   total_phases: 23
   completed_phases: 5
   total_plans: 28
-  completed_plans: 23
-  percent: 82
+  completed_plans: 24
+  percent: 86
 ---
 
 # Project State
@@ -235,6 +235,16 @@ None yet.
 - [Phase 15-00]: Lint guard (tests/lint/no-static-desktop-import.spec.ts) runs LIVE not test.fixme — regex matches import-shape lines only, passes vacuously at Phase-14-head, auto-traps any future static import of DesktopWalkthrough/WalkthroughVoiceModal outside WalkthroughSwitcher.tsx
 - [Phase 15-00]: Wave-0 carve-out in check-bundle-size.ts: chunk-existence assertions silently no-op when neither chunk name appears in any manifest AND delta ≤ 0; auto-activates the moment Wave 2 ships next/dynamic imports
 
+### Phase 15 Plan 01 Decisions
+
+- [Phase 15-01]: Migration 00030 uses sop_completions (not 'completions' as plan/RESEARCH stated) — actual completion table from migration 00010 is public.sop_completions; Rule-1 bug auto-fix corrected in migration + database.types.ts extension
+- [Phase 15-01]: Two SECURITY DEFINER helpers — current_user_sub_trades() returns setof uuid; sub_trade_id_intersects(p_sop_id uuid) returns boolean — kept separate from the additive sops_visible_by_sub_trade policy for testability and reuse
+- [Phase 15-01]: Backward-compat short-circuit via `not exists (select 1 from sops_sub_trades sst where sst.sop_id = sops.id)` clause — Phase 1-14 SOPs with zero sub-trade rows remain visible to all workers without modifying the existing role-based RLS
+- [Phase 15-01]: useViewport runtime browser tests downgraded to source-contract tests (Rule-3 blocking adapt) — Playwright chromium binary not installed locally; the D-04 SSR-safety invariant is the initial-state literal, which source-contract assertions catch directly. Runtime variant swap covered end-to-end by Wave 2 desktop-walkthrough-layout.spec.ts against the real route.
+- [Phase 15-01]: AckTraceEntry imported from @/types/sop into the walkthrough store — single source of truth for {stepId, timestamp} shape across types, validators, store, and Wave 2/3 consumers
+- [Phase 15-01]: subTradeAssignmentSchema caps subTradeIds.length at 10 per T-15-01-05 DoS mitigation — leaves 5× headroom over the 15a seed vocab (5 rows), forward-compat with 15b admin-editable vocab
+- [Phase 15-01]: Migration tripwire comment convention established — every SQL function that references a renamable table by NAME must include the CLAUDE.md learning 2026-05-08 reference in its `comment on function` body (current_user_sub_trades + sub_trade_id_intersects both carry it)
+
 ### Pending Todos
 
 - [ ] Confirm Vimeo URL scope for Phase 6 before planning begins (separate API token required; research flags this as product decision)
@@ -256,6 +266,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-13T00:30:00Z
-Stopped at: Completed Phase 15 plan 00 (`15-00-PLAN.md`). Wave 0 scaffolding shipped: pre-Phase-15 First Load JS baseline locked at 1088 KB for /sops/[sopId]/page, postbuild bundle-isolation CI gate wired with 2KB tolerance, 13 spec scaffolds across 6 integration/e2e files for SB-LINE-01..05, live import-leak lint guard (2 passing) for SB-LINE-06, anthropic-voice-mock fixture + Visy ENF4-03-031 seed SQL. 3 task commits on master (847dca0, b40d3ae, 77d3481). All 15 phase15-stubs tests discoverable via playwright --list. Next: Wave 1 (sub-trades schema + RLS) — plan 15-01.
-Resume file: None
+Last session: 2026-05-13T01:00:00Z
+Stopped at: Completed Phase 15 plan 01 (`15-01-PLAN.md`) Tasks 1, 3, 4 — Wave 1 foundation code complete. Migration 00030 written (3 junction tables + 2 SECURITY DEFINER helpers + additive RLS policy + 5-row seed + sop_completions.step_ack_trace); database.types.ts + sop.ts manually extended for sub-trade schema; voice-query + sub-trades Zod validators; SSR-safe useViewport hook; useWalkthroughStore extended with ackTrace API. 11 new live Playwright tests pass under phase15-stubs project. 3 task commits on master (454b442, 989c0ba, 9498e88). Auto-fixed Rule-1 bug: plan/RESEARCH said `completions` but actual table is `sop_completions` (per 00010). Awaiting Simon's `npx supabase db push --include-all` (Task 2 blocking checkpoint) before Wave 3 voice route + Wave 4 admin server actions can ship. See .planning/phases/15-manufacturing-line-mode/15-01-SUMMARY.md § Awaiting Action for exact PowerShell commands.
+Resume file: .planning/phases/15-manufacturing-line-mode/15-01-SUMMARY.md
