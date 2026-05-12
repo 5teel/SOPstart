@@ -2,11 +2,17 @@ import Anthropic from '@anthropic-ai/sdk'
 import type { ParsedSop } from '@/lib/validators/sop'
 import type { VerificationFlag } from '@/types/sop'
 
-// Lazy-initialized to avoid throwing at module load time during Next.js static analysis
+// Lazy-initialized to avoid throwing at module load time during Next.js static analysis.
+//
+// Phase 15 — pass a fetch indirection so the SDK re-reads `globalThis.fetch` on every
+// call (tests can swap the global; the cached singleton would otherwise hold the
+// fetch reference captured at construction).
 let anthropic: Anthropic | null = null
 function getAnthropic(): Anthropic {
   if (!anthropic) {
-    anthropic = new Anthropic() // reads ANTHROPIC_API_KEY from env
+    anthropic = new Anthropic({
+      fetch: (input, init) => globalThis.fetch(input as RequestInfo, init),
+    }) // reads ANTHROPIC_API_KEY from env
   }
   return anthropic
 }
