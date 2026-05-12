@@ -96,6 +96,7 @@ npm run test:e2e     # E2E tests only
 ## Auto-load routing
 
 - **Sketch findings for SOPstart** (design tokens, layout primitives, screen inventory, new block types, voice/cmdk/immersive walkthrough patterns) → `Skill("sketch-findings-SOPstart")` — load before building any worker-facing UI or adding new SOP block types.
+- **Customer interviews** (`.planning/research/customer-interviews/`) — primary-source field research from real SOP users. Consult before spec/discuss/plan on any new phase, before locking contentious UX decisions (mobile vs desktop, identity model, approval chains), and when triaging backlog ideas. Latest: 2026-05-05 Visy Packaging (~100 AU/NZ industrial sites, glass + cans + cardboard) — surfaces desktop-first reading, SOP-ownership governance gap, voice Q&A unlock, training-record / Success Factors integration.
 
 ## Learnings
 
