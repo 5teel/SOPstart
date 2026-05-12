@@ -1,49 +1,96 @@
 /**
- * SB-LINE-05 — Sub-trade RLS backward compatibility.
+ * SB-LINE-05 — Sub-trade RLS backward compatibility (source-contract + runtime).
  *
- * Verifies that:
- *   1. A worker with no sub_trade rows can still read SOPs where
- *      `sops_sub_trades` is empty (backward-compat per D-11: empty
- *      means "all workers regardless of sub-trade").
- *   2. A worker with a [fitter] tag can read an SOP tagged [fitter];
- *      a worker without [fitter] cannot.
+ * Verifies that the migration-00030 RLS extension preserves Phase 1-14
+ * worker access patterns:
+ *   1. SOPs with NO `sops_sub_trades` rows remain visible to all workers
+ *      (`not exists` short-circuit in the policy).
+ *   2. SOPs WITH `sops_sub_trades` rows are filtered by the SECURITY
+ *      DEFINER `sub_trade_id_intersects()` helper.
  *
- * Tests run against the live Supabase project via authenticated clients
- * (cookie-auth pattern from CLAUDE.md learning 2026-04-24). Wave 1 plan
- * adds migrations + RLS policies; this scaffold ensures the RLS
- * expression survives the schema extension without breaking Phase 12.5
- * worker access.
- *
- * Status: Wave-0 scaffold — Wave 1 (schema + RLS) flips to `test`.
+ * Wave 4 status: code-complete (migration 00030 + helper functions exist
+ * in supabase/migrations/, types extended in database.types.ts). Runtime
+ * assertions require Simon's `npx supabase db push --include-all` to
+ * activate the policy in the live DB. Until then we run live
+ * source-contract assertions against the migration SQL + types.
  */
-import { test } from '@playwright/test'
+import { test, expect } from '@playwright/test'
+import fs from 'node:fs'
+import path from 'node:path'
 
-test.describe('SB-LINE-05 — Sub-trade RLS backward compat', () => {
+const ROOT = process.cwd()
+const MIGRATION = path.join(ROOT, 'supabase', 'migrations', '00030_sub_trades.sql')
+const DB_TYPES = path.join(ROOT, 'src', 'types', 'database.types.ts')
+
+function read(p: string): string {
+  return fs.readFileSync(p, 'utf-8')
+}
+
+test.describe('SB-LINE-05 — RLS source-contract', () => {
+  test('migration 00030 exists with the backward-compat short-circuit', () => {
+    const sql = read(MIGRATION)
+    // Short-circuit clause: empty sops_sub_trades → visible to everyone
+    expect(sql).toMatch(/not exists/i)
+    expect(sql).toMatch(/sops_sub_trades/i)
+    // The additive policy
+    expect(sql).toMatch(/sops_visible_by_sub_trade/i)
+  })
+
+  test('migration 00030 defines both SECURITY DEFINER helpers', () => {
+    const sql = read(MIGRATION)
+    expect(sql).toMatch(/current_user_sub_trades/i)
+    expect(sql).toMatch(/sub_trade_id_intersects/i)
+    expect(sql.toLowerCase()).toContain('security definer')
+  })
+
+  test('migration 00030 seeds the 5-row controlled vocab', () => {
+    const sql = read(MIGRATION)
+    expect(sql).toMatch(/operator/i)
+    expect(sql).toMatch(/fitter/i)
+    expect(sql).toMatch(/sparky/i)
+    expect(sql).toMatch(/maintainer/i)
+    expect(sql).toMatch(/other/i)
+    expect(sql.toLowerCase()).toContain('on conflict (slug) do nothing')
+  })
+
+  test('database.types.ts exposes the 3 new tables + 2 helper functions', () => {
+    const types = read(DB_TYPES)
+    expect(types).toContain('sub_trades:')
+    expect(types).toContain('users_sub_trades:')
+    expect(types).toContain('sops_sub_trades:')
+    expect(types).toContain('current_user_sub_trades')
+    expect(types).toContain('sub_trade_id_intersects')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Runtime UAT — flipped after `npx supabase db push --include-all`.
+// ---------------------------------------------------------------------------
+
+test.describe('SB-LINE-05 — runtime RLS UAT', () => {
   test.fixme(
     'worker with no sub_trade rows can read SOP with empty sops_sub_trades (backward compat)',
     async ({ page }) => {
-      // TODO(wave-1):
-      // 1. Seed: 1 org, 1 SOP (published, role=worker, NO sops_sub_trades rows),
+      // unblocks after `npx supabase db push --include-all`:
+      // 1. Seed: 1 org, 1 SOP (published, NO sops_sub_trades rows),
       //    1 worker user with NO users_sub_trades rows
       // 2. Authenticate as the worker via cookie
       // 3. await page.goto('/sops/<sop-id>')
       // 4. await expect(page.locator('h1')).toContainText('<sop title>')
-      // 5. (Negative parallel: also query supabase directly with worker JWT
-      //    and assert .from('sops').select('id').eq('id', sopId).single() returns the row)
+      // 5. Direct supabase query with worker JWT returns the row
       void page
-    }
+    },
   )
 
   test.fixme(
     'worker with fitter tag can read SOP tagged [fitter]; worker without cannot',
     async ({ page }) => {
-      // TODO(wave-1):
+      // unblocks after `npx supabase db push --include-all`:
       // 1. Seed: 1 org, 1 SOP tagged [fitter] via sops_sub_trades,
-      //    workerA with [fitter] in users_sub_trades, workerB with no tags
-      // 2. Authenticate as workerA → can read SOP
-      // 3. Authenticate as workerB → cannot read SOP (RLS hides it from /sops)
-      // 4. await expect(page.locator('[data-testid="sop-card-<sop-id>"]')).not.toBeVisible()
+      //    workerA with [fitter] in users_sub_trades, workerB no tags
+      // 2. workerA → can read SOP
+      // 3. workerB → /sops list does NOT show SOP; direct .single() returns null
       void page
-    }
+    },
   )
 })

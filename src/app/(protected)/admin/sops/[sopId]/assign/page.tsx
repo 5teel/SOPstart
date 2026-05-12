@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { ArrowLeft, Users, History, Video } from 'lucide-react'
 import Link from 'next/link'
 import { AssignmentRow } from '@/components/admin/AssignmentRow'
+import { SubTradePicker } from '@/components/admin/SubTradePicker'
 import {
   getAssignments,
   getOrgMembers,
@@ -270,7 +271,24 @@ export default function AssignSopPage() {
         </ul>
       </section>
 
-      {/* Section 2: Assign to individual workers */}
+      {/* Phase 15 / D-12 — Sub-trade tagging.
+          Orthogonal to role assignment: both gates filter worker visibility
+          via the RLS policy in migration 00030. Empty selection = visible
+          to all workers regardless of sub-trade (backward compat). */}
+      <section className="mb-8" data-testid="sop-sub-trade-section">
+        <h2 className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-widest mb-3">
+          Assign by sub-trade
+        </h2>
+        <p className="text-xs text-[var(--ink-500)] mb-3">
+          Tag this SOP with one or more sub-trades. Workers carrying the
+          matching tag will see this SOP in their library; others will not.
+          Leave empty to make this SOP visible to all workers regardless of
+          sub-trade.
+        </p>
+        <SubTradePicker mode="sop" sopId={sopId} />
+      </section>
+
+      {/* Section 3: Assign to individual workers */}
       <section>
         <h2 className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-widest mb-3">
           Assign to individual workers
