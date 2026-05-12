@@ -1,0 +1,8 @@
+{
+  "capturedAt": "2026-05-12T14:00:52.696Z",
+  "note": "Pre-Phase-15 First Load JS baseline for the mobile worker route. Wave 4 enforces ≤ +2KB delta. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts.",
+  "routes": {
+    "/sops/[sopId]/page": 1088
+  },
+  "chunkCount": 18
+}
