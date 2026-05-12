@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import type { Json } from '@/types/database.types'
 import {
   SubmitCompletionSchema as submitCompletionSchema,
   SignOffSchema as signOffSchema,
@@ -37,10 +38,14 @@ export async function submitCompletion(
   if (!organisationId) return { success: false, error: 'No organisation found' }
 
   const admin = createAdminClient()
-  const { localId, sopId, sopVersion, contentHash, stepData, photoStoragePaths } = parsed.data
+  const { localId, sopId, sopVersion, contentHash, stepData, photoStoragePaths, stepAckTrace } =
+    parsed.data
 
   // Insert into sop_completions — client UUID as PK for idempotent retry
   // submitted_at intentionally omitted: DB DEFAULT now() is the authoritative server timestamp
+  // step_ack_trace (Phase 15 D-21): append-only evidence of sequential reading.
+  // Server treats client-supplied trace as informational — D-20 / threat model
+  // T-15-02-01: it's evidence, not a gate.
   const { error: insertError } = await admin
     .from('sop_completions')
     .insert({
@@ -51,6 +56,10 @@ export async function submitCompletion(
       sop_version: sopVersion,
       content_hash: contentHash,
       step_data: stepData as Record<string, number>,
+      // Cast through unknown: ack-trace is jsonb on the DB side; the
+      // generated Json type union doesn't admit typed object arrays
+      // directly.
+      step_ack_trace: (stepAckTrace ?? []) as unknown as Json,
     })
 
   if (insertError) {

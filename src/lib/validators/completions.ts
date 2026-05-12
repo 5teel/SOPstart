@@ -32,6 +32,18 @@ export type PhotoStoragePath = z.infer<typeof PhotoStoragePathSchema>
 export const StepDataSchema = z.record(z.string(), z.number())
 export type StepData = z.infer<typeof StepDataSchema>
 
+/**
+ * Phase 15 D-21: append-only evidence of sequential reading.
+ * One entry per "I've done this — Next" click on a step. Mirrors the
+ * AckTraceEntry shape from `@/types/sop`. Persisted to
+ * `sop_completions.step_ack_trace` (jsonb) on submission.
+ */
+export const StepAckEntrySchema = z.object({
+  stepId: z.string().uuid(),
+  timestamp: z.number().int().positive(),
+})
+export type StepAckEntry = z.infer<typeof StepAckEntrySchema>
+
 export const SubmitCompletionSchema = z.object({
   localId: z.string().uuid(),
   sopId: z.string().uuid(),
@@ -39,6 +51,10 @@ export const SubmitCompletionSchema = z.object({
   contentHash: z.string().min(1).max(64),
   stepData: StepDataSchema,
   photoStoragePaths: z.array(PhotoStoragePathSchema),
+  // Phase 15 D-21: optional for back-compat with Phase 12.5 completions
+  // (older mobile clients won't send this). When present, server persists
+  // to sop_completions.step_ack_trace.
+  stepAckTrace: z.array(StepAckEntrySchema).optional(),
 })
 export type SubmitCompletionInput = z.infer<typeof SubmitCompletionSchema>
 
