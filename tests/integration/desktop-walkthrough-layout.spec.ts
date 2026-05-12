@@ -1,49 +1,112 @@
 /**
- * SB-LINE-01 — Desktop walkthrough layout variant.
+ * SB-LINE-01 — Desktop walkthrough layout variant (Wave 2 live).
  *
- * Verifies that:
- *   1. At ≥1024px viewport width, the route renders DesktopWalkthrough
- *      with computed body font-size ≥ 24px (far-readable from a seated
- *      Visy operator desk at a 22"+ HD monitor).
- *   2. At < 1024px (390×844 iPhone 14), the route renders
- *      MobileWalkthrough byte-identical to the Phase 12.5 baseline
- *      (no regression on the touch-device flow).
+ * Source-contract assertions confirming the DesktopWalkthrough + the
+ * dynamic-import switcher meet the plan's truth list. Full end-to-end
+ * Playwright with `setViewportSize` + `getComputedStyle` is deferred
+ * to phase verification UAT (Task 5 blocking checkpoint) because the
+ * chromium binary isn't installed in the executor environment (per
+ * Plan 15-01 Rule-3 finding).
  *
- * Status: Wave-0 scaffold — both tests use `test.fixme` so they appear
- * in `--list` but do not run until Wave 2 ships the DesktopWalkthrough
- * variant.
- *
- * Auth pattern: cookie-based session via @supabase/ssr token (see
- * CLAUDE.md learning 2026-04-24, "magic-link session install via
- * hash-fragment cookies"). Wave 2 executor will add a beforeEach helper
- * that calls Supabase admin client to mint a worker session and set
- * `sb-{projectRef}-auth-token`.
+ * The Wave-0 lint guard `tests/lint/no-static-desktop-import.spec.ts`
+ * runs alongside this file and PROVES the runtime bundle isolation
+ * contract via the import graph (the real source-of-truth for
+ * SB-LINE-06).
  */
-import { test } from '@playwright/test'
+import { test, expect } from '@playwright/test'
+import fs from 'node:fs'
+import path from 'node:path'
 
-test.describe('SB-LINE-01 — Desktop walkthrough layout', () => {
-  test.fixme(
-    'renders DesktopWalkthrough with computed font-size >= 24px at 1920×1080',
-    async ({ page }) => {
-      // TODO(wave-2):
-      // 1. Mint worker session cookie for org with seeded Visy SOP fixture
-      // 2. await page.setViewportSize({ width: 1920, height: 1080 })
-      // 3. await page.goto('/sops/<visy-sop-id>')
-      // 4. const fontSize = await page.locator('[data-walkthrough="desktop"] p').evaluate(el => parseFloat(getComputedStyle(el).fontSize))
-      // 5. expect(fontSize).toBeGreaterThanOrEqual(24)
-      void page
-    }
-  )
+const ROOT = path.resolve(__dirname, '..', '..')
+const DESKTOP = path.join(ROOT, 'src', 'components', 'sop', 'walkthrough', 'DesktopWalkthrough.tsx')
+const SWITCHER = path.join(ROOT, 'src', 'components', 'sop', 'walkthrough', 'WalkthroughSwitcher.tsx')
+const MOBILE = path.join(ROOT, 'src', 'components', 'sop', 'walkthrough', 'MobileWalkthrough.tsx')
 
-  test.fixme(
-    'renders MobileWalkthrough byte-identical to Phase 12.5 at 390×844',
-    async ({ page }) => {
-      // TODO(wave-2):
-      // 1. Mint worker session cookie
-      // 2. await page.setViewportSize({ width: 390, height: 844 })
-      // 3. await page.goto('/sops/<visy-sop-id>')
-      // 4. await expect(page.locator('[data-walkthrough="mobile"]')).toHaveScreenshot('mobile-walkthrough-baseline.png', { maxDiffPixelRatio: 0.01 })
-      void page
-    }
-  )
+function read(p: string): string {
+  return fs.readFileSync(p, 'utf-8')
+}
+
+test.describe('SB-LINE-01 — Desktop walkthrough layout (Wave 2 contract)', () => {
+  test('DesktopWalkthrough.tsx exists', () => {
+    expect(fs.existsSync(DESKTOP)).toBe(true)
+  })
+
+  test('WalkthroughSwitcher.tsx exists', () => {
+    expect(fs.existsSync(SWITCHER)).toBe(true)
+  })
+
+  test('DesktopWalkthrough body text uses Tailwind ≥24px class or 1.5rem inline (D-01)', () => {
+    const src = read(DESKTOP)
+    // text-2xl ≈ 24px; or explicit fontSize 1.5rem (24px)
+    expect(src).toMatch(/text-2xl|fontSize:\s*['"]1\.5rem['"]/)
+  })
+
+  test('DesktopWalkthrough primary Next button is min-h-[60px] (D-19)', () => {
+    const src = read(DESKTOP)
+    expect(src).toContain('min-h-[60px]')
+  })
+
+  test('DesktopWalkthrough secondary text (warnings/cautions/tips/tools) uses ≥18px (text-lg)', () => {
+    const src = read(DESKTOP)
+    expect(src).toMatch(/text-lg/)
+  })
+
+  test('DesktopWalkthrough wires markStepAcknowledged + "I\'ve done this — Next" copy', () => {
+    const src = read(DESKTOP)
+    expect(src).toMatch(/markStepAcknowledged\(/)
+    expect(src).toMatch(/I&apos;ve done this\s*—\s*Next/)
+  })
+
+  test('DesktopWalkthrough has forward-jump guard (router.replace + strict > check)', () => {
+    const src = read(DESKTOP)
+    expect(src).toMatch(/router\.replace\(/)
+    expect(src).toMatch(/requestedIdx\s*>\s*highestAckIdx\s*\+\s*1/)
+  })
+
+  test('WalkthroughSwitcher uses next/dynamic for DesktopWalkthrough with ssr:false', () => {
+    const src = read(SWITCHER)
+    expect(src).toMatch(/import\s+dynamic\s+from\s+['"]next\/dynamic['"]/)
+    // dynamic import of DesktopWalkthrough with ssr: false
+    expect(src).toMatch(/dynamic\([\s\S]*?DesktopWalkthrough[\s\S]*?ssr:\s*false/)
+  })
+
+  test('WalkthroughSwitcher uses next/dynamic for WalkthroughVoiceModal with ssr:false', () => {
+    const src = read(SWITCHER)
+    expect(src).toMatch(/dynamic\([\s\S]*?WalkthroughVoiceModal[\s\S]*?ssr:\s*false/)
+  })
+
+  test('WalkthroughSwitcher statically imports MobileWalkthrough (SSR path)', () => {
+    const src = read(SWITCHER)
+    expect(src).toMatch(
+      /import\s+\{\s*MobileWalkthrough\s*\}\s+from\s+['"]@\/components\/sop\/walkthrough\/MobileWalkthrough['"]/
+    )
+  })
+
+  test('WalkthroughSwitcher calls useViewport() to choose variant (D-04)', () => {
+    const src = read(SWITCHER)
+    expect(src).toMatch(/import\s+\{\s*useViewport\s*\}\s+from\s+['"]@\/hooks\/useViewport['"]/)
+    expect(src).toMatch(/useViewport\(\)/)
+  })
+
+  test('Mobile variant rendered when viewport === mobile, Desktop when === desktop', () => {
+    const src = read(SWITCHER)
+    expect(src).toMatch(/variant\s*===\s*['"]desktop['"]/)
+    expect(src).toMatch(/<MobileWalkthrough/)
+    expect(src).toMatch(/<DesktopWalkthrough/)
+  })
+
+  test('WalkthroughSwitcher mounts WalkthroughVoiceButton (D-14)', () => {
+    const src = read(SWITCHER)
+    expect(src).toMatch(/<WalkthroughVoiceButton/)
+  })
+
+  test('MobileWalkthrough has data-walkthrough="mobile" marker for UAT', () => {
+    const src = read(MOBILE)
+    expect(src).toContain('data-walkthrough="mobile"')
+  })
+
+  test('DesktopWalkthrough has data-walkthrough="desktop" marker for UAT', () => {
+    const src = read(DESKTOP)
+    expect(src).toContain('data-walkthrough="desktop"')
+  })
 })
