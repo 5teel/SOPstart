@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: Closeout
 status: executing
-stopped_at: "Completed Phase 15 Plan 02 (Wave 2 Walkthrough UI). 5 new files + 4 modified. MobileWalkthrough extracted + ack gate wired (D-19); DesktopWalkthrough big-text variant; WalkthroughSwitcher with next/dynamic({ssr:false}) for Desktop+Modal; floating mic-pill; voice modal shell with /api/voice/query stub pending Wave 3. 49 of 55 phase15-stubs tests pass. Bundle delta +7 KB documented for Wave 4. Task 5 human visual verification deferred to phase UAT per orchestrator brief. See 15-02-SUMMARY.md UAT checklist."
-last_updated: "2026-05-12T14:33:03.724Z"
-last_activity: 2026-05-12
+stopped_at: "Completed Phase 15 Plan 03 (Wave 3 Voice Q&A Backend). 6 new files + 3 modified. packSopForPrompt single-source serializer; answerSopQuestion two-call pipeline with cache_control:ephemeral on full SOP block; verify-sop.ts mode 'voice_qa' extension with Pitfall 10 fail-safe synthetic warning; POST /api/voice/query with Zod + auth + RLS single-SOP fetch + concurrency cap + full error envelope. 25 new automated tests (6 sop-pack + 11 verify-sop voice_qa + 8 voice-qa cache + 14 voice-grounding-scope source-contract). All 88 phase15 stub+unit tests pass. SB-LINE-03 + SB-LINE-04 marked complete. Live cache-token UAT + Visy SOP UAT deferred to phase verification. See 15-03-SUMMARY.md."
+last_updated: "2026-05-13T00:00:00.000Z"
+last_activity: 2026-05-13
 progress:
   total_phases: 23
   completed_phases: 5
   total_plans: 27
-  completed_plans: 25
-  percent: 93
+  completed_plans: 26
+  percent: 96
 ---
 
 # Project State
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 15 (manufacturing-line-mode) — EXECUTING
-Plan: 3 of 5 (plan 00 / Wave 0 complete)
-Status: Ready to execute
-Last activity: 2026-05-12
+Plan: 4 of 5 (plans 00, 01, 02, 03 complete; Wave 3 = Voice Q&A backend shipped)
+Status: Ready to execute Wave 4 (sub-trade admin UI + bundle CI + Visy UAT)
+Last activity: 2026-05-13
 
 Progress bar: `[████████████████████]` 100% (phases 11+12 complete; phase 13 implementation 5/5 done — UAT remaining)
 
@@ -104,6 +104,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 08 P04 | 10m | 2 tasks | 5 files |
 | Phase 09-streamlined-file-video-pipeline P00 | 2m | 2 tasks | 7 files |
 | Phase 15 P02 | 10m | 4 tasks | 11 files |
+| Phase 15 P03 | 75m | 4 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -242,6 +243,17 @@ None yet.
 - [Phase 15-00]: Lint guard (tests/lint/no-static-desktop-import.spec.ts) runs LIVE not test.fixme — regex matches import-shape lines only, passes vacuously at Phase-14-head, auto-traps any future static import of DesktopWalkthrough/WalkthroughVoiceModal outside WalkthroughSwitcher.tsx
 - [Phase 15-00]: Wave-0 carve-out in check-bundle-size.ts: chunk-existence assertions silently no-op when neither chunk name appears in any manifest AND delta ≤ 0; auto-activates the moment Wave 2 ships next/dynamic imports
 
+### Phase 15 Plan 03 Decisions
+
+- [Phase 15-03]: packSopForPrompt is the SINGLE source of truth for cache-keyed SOP payload — both answer call (voice-qa.ts) and verifier call (verify-sop.ts mode 'voice_qa' branch) import from `@/lib/voice/sop-pack` to guarantee byte-identical input above the cache_control:ephemeral breakpoint (Pitfall 3 closed)
+- [Phase 15-03]: verify-sop.ts mode 'voice_qa' branch returns synthetic `{severity:'warning', description:'Verification temporarily unavailable…'}` flag on Anthropic exception (Pitfall 10 fail-safe to uncertainty); existing 'transcript' and 'prompt' modes retain `return []` semantics (Phase 6 / 14 callers unaffected)
+- [Phase 15-03]: Anthropic SDK captures `globalThis.fetch` at construct time — wrap with passthrough lambda `fetch: (input, init) => globalThis.fetch(input, init)` so tests can swap `global.fetch` after the lazy singleton is built; applied to both voice-qa.ts and verify-sop.ts lazy-init helpers
+- [Phase 15-03]: __resetAnthropicForTests export added to voice-qa.ts (test-only) so unit-test suites can null the lazy singleton between cases without touching production paths
+- [Phase 15-03]: Concurrency cap = per-process in-memory `Set<userId>` keyed by `auth.uid` — Railway-single-process compatible only; comment cites CLAUDE.md PM2 cluster learning. Move to Redis-backed bucket if deploy ever fans out to multiple processes
+- [Phase 15-03]: /api/voice/query route uses regular `createClient()` (RLS-respecting), NOT `createAdminClient()` — RLS enforces single-org + sub-trade gate from migration 00030. No admin-role check on the route (D-15 — workers must be allowed)
+- [Phase 15-03]: voice-qa-cache test uses local `rawAnswerResp`/`rawVerifierResp` helpers — Wave-0 anthropic-voice-mock fixture's `content[0].text = JSON.stringify({answer, citations})` is wire-incorrect (real Anthropic returns raw text); fixture left alone (Wave 0 contract) but flagged for future correction
+- [Phase 15-03]: voice-grounding-scope tests implemented as source-contract assertions (matching Plan 15-01 / 15-02 Rule-3 trade-off) — runtime live-route SB-LINE-04 cross-SOP scenario gated on chromium binary, but route's structural single-SOP fetch (`.eq('id', sopId)` exactly once) makes cross-SOP leak impossible to introduce silently
+
 ### Phase 15 Plan 01 Decisions
 
 - [Phase 15-01]: Migration 00030 uses sop_completions (not 'completions' as plan/RESEARCH stated) — actual completion table from migration 00010 is public.sop_completions; Rule-1 bug auto-fix corrected in migration + database.types.ts extension
@@ -273,6 +285,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-12T14:33:03.718Z
-Stopped at: Completed Phase 15 Plan 02 (Wave 2 Walkthrough UI). 5 new files + 4 modified. MobileWalkthrough extracted + ack gate wired (D-19); DesktopWalkthrough big-text variant; WalkthroughSwitcher with next/dynamic({ssr:false}) for Desktop+Modal; floating mic-pill; voice modal shell with /api/voice/query stub pending Wave 3. 49 of 55 phase15-stubs tests pass. Bundle delta +7 KB documented for Wave 4. Task 5 human visual verification deferred to phase UAT per orchestrator brief. See 15-02-SUMMARY.md UAT checklist.
-Resume file: .planning/phases/15-manufacturing-line-mode/15-02-SUMMARY.md
+Last session: 2026-05-13T00:00:00.000Z
+Stopped at: Completed Phase 15 Plan 03 (Wave 3 Voice Q&A Backend). 6 new files + 3 modified. packSopForPrompt single-source serializer; answerSopQuestion two-call pipeline with cache_control:ephemeral; verify-sop.ts mode 'voice_qa' with Pitfall 10 fail-safe; POST /api/voice/query with full envelope. 25 new automated tests pass; 88 of 92 phase15 stub+unit tests green. SB-LINE-03 + SB-LINE-04 marked complete. Wave 4 = sub-trade admin UI + bundle CI + Visy SOP UAT.
+Resume file: .planning/phases/15-manufacturing-line-mode/15-03-SUMMARY.md

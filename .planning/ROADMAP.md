@@ -379,13 +379,13 @@ These two items belong with kiosk mode + site-tier work in Phase 15 because they
   9. Global app-wide Cmd+K mounted across all `(protected)` routes — surfaces app-wide navigation (Library, Blocks, Team, Create via Upload/Blank/AI, Settings, kiosk site selector for multi-site admins) alongside the existing SOP-scoped jump-to-step + ask-AI on SOP pages.
   10. Bundle isolation: kiosk mode chunks + voice Q&A RAG client do not leak into the existing mobile worker bundle; mobile worker walkthrough First Load JS does not grow as a result of Phase 15.
 
-**Plans:** 3/5 plans executed
+**Plans:** 4/5 plans executed
 
 Plans:
 - [x] 15-00-PLAN.md — Wave 0: capture pre-Phase-15 bundle baseline + scaffold all Playwright/test fixture files referenced in 15-VALIDATION.md (completed 2026-05-13; baseline = 1088 KB for /sops/[sopId]/page; 13 spec scaffolds + live lint guard; commits 847dca0, b40d3ae, 77d3481)
 - [x] 15-01-PLAN.md — Wave 1: foundation — migration 00030 (sub_trades + junctions + RLS helper + sop_completions.step_ack_trace) + database.types.ts manual extension + voice/sub-trades validators + useViewport hook + walkthrough store ack-trace extension (code-complete 2026-05-13; commits 454b442, 989c0ba, 9498e88; 11 new tests pass; awaiting Simon's `npx supabase db push` to apply 00030 — Task 2 blocking checkpoint, see 15-01-SUMMARY.md § Awaiting Action)
 - [x] 15-02-PLAN.md — Wave 2: UI — extract MobileWalkthrough, build DesktopWalkthrough (big-text ≥24px, 60px Next button), WalkthroughSwitcher (next/dynamic ssr:false), floating mic-pill + WalkthroughVoiceModal, sequential ack gate on both layouts
-- [ ] 15-03-PLAN.md — Wave 3: voice backend — packSopForPrompt utility + voice-qa.ts two-call pipeline with Anthropic prompt caching + verify-sop.ts mode voice_qa extension (fail-safe to uncertainty) + /api/voice/query route with full Zod + RLS-scoped SOP fetch + 7-threat coverage
+- [x] 15-03-PLAN.md — Wave 3: voice backend — packSopForPrompt utility + voice-qa.ts two-call pipeline with Anthropic prompt caching + verify-sop.ts mode voice_qa extension (fail-safe to uncertainty) + /api/voice/query route with full Zod + RLS-scoped SOP fetch + 7-threat coverage (completed 2026-05-13; commits 6218b41, 019ef51, fd792bd, 538b9be; 25 new tests pass; SB-LINE-03 + SB-LINE-04 marked complete)
 - [ ] 15-04-PLAN.md — Wave 4: admin UI + completion + CI gate + demo prep — SubTradePicker + admin/team + admin/sops/[id]/assign + completions.step_ack_trace persistence + activate bundle-isolation CI gate + Visy ENF4-03-031 demo prep doc
 
 **UI hint**: yes (heavy)
