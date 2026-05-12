@@ -107,4 +107,55 @@ test.describe('SB-LINE-02 — Sequential acknowledgement gate (Wave 2 contract t
     expect(src).toMatch(/StepAckEntrySchema/)
     expect(src).toMatch(/stepAckTrace:.*optional\(\)/)
   })
+
+  // Wave 4 additions — verify end-to-end ack-trace flow through both
+  // walkthrough variants and the server action.
+
+  test('DesktopWalkthrough also passes stepAckTrace to submitCompletion (D-21)', () => {
+    const desktopPath = path.resolve(
+      __dirname,
+      '..',
+      '..',
+      'src',
+      'components',
+      'sop',
+      'walkthrough',
+      'DesktopWalkthrough.tsx',
+    )
+    const src = fs.readFileSync(desktopPath, 'utf-8')
+    expect(src).toMatch(/getAckTrace\(sopId\)/)
+    expect(src).toMatch(/stepAckTrace,?\s*\}\)/m)
+  })
+
+  test('submitCompletion server action persists step_ack_trace to sop_completions (D-21)', () => {
+    const actionPath = path.resolve(
+      __dirname,
+      '..',
+      '..',
+      'src',
+      'actions',
+      'completions.ts',
+    )
+    const src = fs.readFileSync(actionPath, 'utf-8')
+    // Server action destructures stepAckTrace from validated input
+    expect(src).toMatch(/stepAckTrace/)
+    // And writes the snake_case jsonb column on the insert payload
+    expect(src).toMatch(/step_ack_trace:\s*\(stepAckTrace/)
+  })
+
+  test('AckTraceEntry schema requires {stepId: uuid, timestamp: int} (D-21)', () => {
+    const validatorPath = path.resolve(
+      __dirname,
+      '..',
+      '..',
+      'src',
+      'lib',
+      'validators',
+      'completions.ts',
+    )
+    const src = fs.readFileSync(validatorPath, 'utf-8')
+    expect(src).toMatch(/StepAckEntrySchema\s*=\s*z\.object/)
+    expect(src).toMatch(/stepId:\s*z\.string\(\)\.uuid\(\)/)
+    expect(src).toMatch(/timestamp:\s*z\.number\(\)\.int\(\)/)
+  })
 })
