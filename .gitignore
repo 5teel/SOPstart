@@ -39,6 +39,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# raw transcript artifacts (mp3/json/scripts) — markdown lives in .planning/research/customer-interviews/
+/transcripts/*.mp3
+/transcripts/*.json
+/transcripts/*.cjs
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
