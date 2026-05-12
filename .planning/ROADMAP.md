@@ -6,7 +6,7 @@ Four phases deliver the complete v1 product. Phase 1 establishes the multi-tenan
 
 v2.0 adds four phases (5–8) delivering three new SOP creation pathways and a video consumption layer. Phase 5 establishes upload infrastructure and expanded file parsing. Phase 6 delivers video transcription via file upload and URL. Phase 7 adds in-app camera recording (gated on iOS Safari maturity). Phase 8 generates video SOPs from published structured content.
 
-v3.0 adds eight phases (11–18) delivering the native SOP Builder milestone. Phase 11 lays down the additive section_kinds catalog + blocks schema that every downstream builder phase depends on. Phase 12 ships the Puck-based builder shell with the blank-page wizard and single unified authoring surface. Phase 13 delivers the reusable org-vs-global block library. Phase 14 adds AI-drafted SOPs gated behind the Phase 6 adversarial verifier. Phase 15 adds the NZ template library. Phase 16 delivers Konva-based image/diagram annotation with dual-store (JSON for editing, baked PNG for workers) and the specialty DiagramHotspotBlock. Phase 17 adds collaborative editing via pessimistic section locks with an optimistic version column for offline handoff. Phase 18 wires the builder into the Phase 9 pipeline runs, enforces bundle isolation via CI, and closes out the milestone.
+v3.0 adds nine phases (11–19) delivering the native SOP Builder milestone. Phase 11 lays down the additive section_kinds catalog + blocks schema that every downstream builder phase depends on. Phase 12 ships the Puck-based builder shell with the blank-page wizard and single unified authoring surface. Phase 12.5 delivered the worker-first blueprint redesign. Phase 13 delivers the reusable org-vs-global block library. Phase 14 adds AI-drafted SOPs gated behind the Phase 6 adversarial verifier. Phase 14.5 rolled the blueprint redesign across the full admin/auth surface. **Phase 15 adds Manufacturing-Line Mode — kiosk/terminal UI, voice Q&A over a single SOP, site-tier multi-tenancy, SOP-lifecycle governance, extended roles, and training-record export — derived from the 2026-05-05 Visy customer interview.** Phase 16 adds the NZ template library. Phase 17 delivers Konva-based image/diagram annotation with dual-store (JSON for editing, baked PNG for workers) and the specialty DiagramHotspotBlock. Phase 18 adds collaborative editing via pessimistic section locks with an optimistic version column for offline handoff. Phase 19 wires the builder into the Phase 9 pipeline runs, enforces bundle isolation via CI, and closes out the milestone.
 
 ## Phases
 
@@ -30,12 +30,13 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 12: Builder Shell & Blank-Page Authoring** - Puck-based builder, `layout_data` JSONB, blank-page wizard, unified authoring surface, legacy linear fallback (completed 2026-04-24; UAT 9/11 automated PASS, UAT #3 airplane-mode + UAT #6 cross-admin LWW carried as human-verification items)
 - [x] **Phase 12.5: Blueprint Redesign** - Worker-first UX overhaul with paper/ink engineering-drawing aesthetic; unified tabbed interface (overview/tools/hazards/flow/model/walkthrough); mobile immersive walkthrough; voice input (server-side transcription); cmdk; 7 new AI-accessible block types (Measurement, Decision, Escalate, SignOff, Zone, Inspect, VoiceNote) — ModelBlock deferred (completed 2026-05-07; verifier PASSED 10/10 truths; 6 carried human-UAT items: paper/ink theme scoping, mobile immersive viewport routing, Deepgram voice state machine, online voice persistence, Cmd+K palette, Puck FlowGraphField round-trip; walkthrough completion flow + photo-queue guard finalised in 5989852)
 - [x] **Phase 13: Reusable Block Library** - Org-vs-global block CRUD, NZ seed blocks (65 globals), wizard "Pick from library" step, pin-version vs follow-latest semantics, platform-admin curation UI (implementation complete 2026-05-07; verifier PASSED — 5/5 plumbing-complete, browser UAT for 13-03/13-04/13-05 batchable as carried human-verification items)
-- [ ] **Phase 14: AI-Drafted SOPs** - Natural-language prompt → GPT-4o structured draft → Claude adversarial verification gate → editable draft lands in the builder
-- [ ] **Phase 14.5: Blueprint Shell Rollout** - Extend Phase 12.5's paper/ink design language from `/sops/*` to the admin/auth/dashboard surfaces. Engineering-drawing role-aware home, global app-wide Cmd+K, blueprint-styled admin sub-pages (review/assign/versions/video/upload/new-blank/new-ai/pipeline/blocks/team) and auth pages.
-- [ ] **Phase 15: NZ Template Library** - Curated WorkSafe / machinery / chemical handling templates surfaced as a third entry point into the builder
-- [ ] **Phase 16: Image & Diagram Annotation** - Konva editor with dual-store (JSON scene + baked PNG), DiagramHotspotBlock for machine-diagram freeform callouts, stylus + palm rejection
-- [ ] **Phase 17: Collaborative Editing** - Section-level pessimistic locks, Supabase Realtime presence, optimistic version column for offline handoff, conflict modal
-- [ ] **Phase 18: Pipeline Integration, Bundle Isolation & v3.0 Closeout** - Builder ↔ Phase 9 pipeline linkage, Dexie draft sync, worker-bundle leakage CI check, v3.0 milestone closeout
+- [ ] **Phase 14: AI-Drafted SOPs** - Natural-language prompt → GPT-4o structured draft → Claude adversarial verification gate → editable draft lands in the builder (implementation complete 2026-05-10; verifier PASSED 9/9; awaiting human UAT 1/2/4 against live Anthropic API)
+- [x] **Phase 14.5: Blueprint Shell Rollout** - Paper/ink design language rolled across admin, auth, dashboard, library, and worker SOP surfaces (~90 files migrated 2026-05-11/12; legacy steel/yellow theme + SiteThemeProvider + ThemePicker removed). Residual scope (role-aware home + global Cmd+K) rolled into Phase 15.
+- [ ] **Phase 15: Manufacturing-Line Mode** - Derived from Visy customer interview (2026-05-05). Six sub-scopes: site tier in multi-tenancy (org → site → SOP), terminal/kiosk shell with big-text + sequence-enforced walkthrough + PIN/badge sign-off, voice Q&A over a single SOP (RAG-grounded), SOP governance & lifecycle (review-due cadence + multi-step approval + Discipline Leader role), sub-trade tags + extended roles, training-record export with Success Factors integration target.
+- [ ] **Phase 16: NZ Template Library** - Curated WorkSafe / machinery / chemical handling templates surfaced as a third entry point into the builder
+- [ ] **Phase 17: Image & Diagram Annotation** - Konva editor with dual-store (JSON scene + baked PNG), DiagramHotspotBlock for machine-diagram freeform callouts, stylus + palm rejection
+- [ ] **Phase 18: Collaborative Editing** - Section-level pessimistic locks, Supabase Realtime presence, optimistic version column for offline handoff, conflict modal
+- [ ] **Phase 19: Pipeline Integration, Bundle Isolation & v3.0 Closeout** - Builder ↔ Phase 9 pipeline linkage, Dexie draft sync, worker-bundle leakage CI check, v3.0 milestone closeout
 
 ## Phase Details
 
@@ -339,32 +340,67 @@ Plans:
 - [ ] 14-02-PLAN.md — GPT-4o structured draft generator: prompt-engineering pass, structured output schema matching `SopSection[]`, `section_kind_id` assignment, integration with GPT parser module
 - [ ] 14-03-PLAN.md — Adversarial verification reuse: route AI draft through existing Phase 6 Claude verifier, surface flags via existing `AdversarialFlagBanner`, missing-section detection, land draft in the builder with flags visible in the review panel
 
-### Phase 14.5: Blueprint Shell Rollout
-**Goal**: Finish the Phase 12.5 blueprint redesign by rolling it out everywhere the worker-first design hasn't yet landed — the protected layout shell, dashboard, auth pages, and every admin sub-page. After this phase: a worker, supervisor, admin, or platform-admin sees consistent paper/ink engineering-drawing UI across every authenticated surface. No more steel-900/brand-yellow legacy theme on any production page.
-**Depends on**: Phase 12.5 (paper/ink tokens, blueprint primitives), Phase 14 (AI draft entry route to integrate into shell nav)
-**Requirements**: SB-UX-11..SB-UX-15 (to be assigned in SPEC.md)
+### Phase 14.5: Blueprint Shell Rollout (Complete 2026-05-12)
+**Outcome**: Paper/ink design language rolled across the full admin/auth/dashboard/library/worker surfaces in ~90 files migrated across 5 parallel worktree clusters. Legacy steel/yellow Tailwind tokens, marketing-themes system (12 themes via SiteThemeProvider + Zustand store + ThemePicker), `next-themes` ThemeProvider, and PaperThemeMount opt-in pattern all removed — body now ships `data-theme="paper"` at SSR root.
+
+**What shipped:**
+- `/dashboard` rebuilt on paper tokens with role-adaptive tiles (AI Draft tile added)
+- `/admin/sops` library rebuilt with Upload|Blank|AI Draft button group, platform-admin "Curate Globals" sub-nav link, and "Edit in builder" row CTA for non-uploaded sources
+- Every `/admin/*` sub-page migrated (review, assign, versions, video, upload, new-blank, new-ai, pipeline, builder shell, blocks, global-blocks, team)
+- Auth pages (`/login`, `/sign-up`, `/invite/accept`, `/join`) migrated
+- Worker SOP components (`/components/sop/*`, blocks, walkthrough, etc.) migrated
+- `globals.css` trimmed from 400 → 5 lines; `next-themes` uninstalled
+
+**Residual scope rolled into Phase 15:**
+- Role-aware home (engineering-drawing home that adapts per role beyond admin tile grid)
+- Global app-wide Cmd+K (currently scoped to `/sops/*` only — needs to surface kiosk navigation actions, library access, ask-AI globally)
+
+These two items belong with kiosk mode + site-tier work in Phase 15 because they all touch the same shell-level surfaces.
+
+### Phase 15: Manufacturing-Line Mode
+
+> **Source**: Derived from Visy customer interview 2026-05-05 — see `.planning/research/customer-interviews/2026-05-05-visy-findings.md`. Visy = Pratt-family packaging, ~100 AU/NZ industrial sites, glass + cans + cardboard. Bryce (Engineering Manager) is the named trial sign-off contact.
+
+**Goal**: Ship the full shop-floor industrial-manufacturing experience as one coordinated release. After this phase: a 50–500-SOP industrial manufacturer with shared shop-floor terminals can run SafeStart end-to-end. Operators read at the line terminal in kiosk mode with big-text and voice Q&A, supervisors sign off on a tablet/phone, admins manage SOPs through a governance loop with site-specific overlays and multi-step approval, and completion records flow into the org's HRIS as training evidence.
+
+**Depends on**: Phase 11 (section schema), Phase 12 (builder), Phase 13 (block library — extended for site-tier), Phase 14 (AI prompts — feeds the RAG), Phase 14.5 (paper/ink shell)
+
+**Requirements**: SB-LINE-01..SB-LINE-10 (to be assigned in SPEC.md — see open decisions below)
+
 **Success Criteria** (what must be TRUE):
-  1. Engineering-drawing role-aware home replaces `/dashboard` for admins — a single hub surface that adapts to role (admin sees library + creation paths + team; supervisor sees activity + review queue; worker redirects to /sops as today). Built on `blueprint-frame` + `pill` + `mono` primitives.
-  2. Cmd+K command palette is mounted globally (not just `/sops/*`) and surfaces app-wide navigation actions (Library, Blocks, Team, Create SOP via Upload/Blank/AI, Settings) alongside the existing SOP-scoped jump-to-step + ask-AI when on a SOP page.
-  3. All `/admin/*` sub-pages migrate from `bg-steel-*` / `text-brand-yellow` to paper/ink tokens — specifically: `/admin/sops/upload`, `/admin/sops/new/blank`, `/admin/sops/new/ai`, `/admin/sops/[sopId]/review`, `/admin/sops/[sopId]/assign`, `/admin/sops/[sopId]/versions`, `/admin/sops/[sopId]/video`, `/admin/sops/pipeline/[pipelineId]`, `/admin/sops/builder/[sopId]` shell, `/admin/blocks`, `/admin/blocks/[blockId]`, `/admin/global-blocks`, `/admin/global-blocks/suggestions`, `/admin/team`.
-  4. Auth pages (`/login`, `/sign-up`, `/invite/accept`, `/join`) migrate to paper theme — first impression of the app aligns with the rest.
-  5. Zero references to `bg-steel-` or `text-brand-yellow` in `src/app/**` `src/components/**` page/component code (legacy tokens remain in `globals.css` only for backwards-compat during transition, removed at phase close).
-  6. `/activity/[completionId]` (the one remaining `/activity/*` sub-page not yet on paper) is migrated.
-**Plans**: TBD (created by /gsd-plan-phase after spec+discuss)
+  1. A Visy admin can model their org structure as: corporate organisation → ~100 sites → site-specific SOP overlays on top of org/global SOPs. Existing single-org tenants migrate transparently with a synthetic single "default site" so no Phase 1–14 RLS or UI breaks.
+  2. An operator at the Auckland glass plant walks up to the line terminal, picks an SOP from the kiosk list, reads it without logging in, taps a PIN (or badge) on completion sign-off, and the completion is attributed to that operator. Camera coverage at the terminal + attribution timestamp form the accountability layer rather than per-read auth.
+  3. The same operator presses the mic and asks "how do I change the blank side hanger" — the system returns an answer grounded in this specific SOP's structured content (sections, blocks, hazards, PPE), with explicit citations to the section it drew from. Available on both mobile AND kiosk modes.
+  4. An admin marks an SOP as needing 24-month review; when the review date passes, the SOP appears greyed-out in the library and the configured approver chain is notified. Stale SOPs are still readable by workers but visibly flagged as "Pending review".
+  5. A multi-step approval chain (e.g. Site Manager → Discipline Leader → Safety Manager) can be configured per-SOP at the org or site level; publish gates on all required sign-offs in order, with the existing publish gate remaining the single point of "this is now live to workers".
+  6. New roles surfaced from Visy interview are modelled: **Discipline Leader** (cross-site SOP approver, e.g. "Global Forming Discipline Leader"), **Engineering Manager**, **Plant Manager**. Worker role gains optional sub-trade tags (Operator / Fitter / Sparky / etc.) used in SOP-to-role assignment filtering.
+  7. A site safety manager exports the last 90 days of completion records as a CSV including operator name, SOP ID + version, timestamp, sign-off chain, and competency tag. Success Factors API connector is spec'd; built only if Visy provides API access during trial.
+  8. Engineering-drawing role-aware home replaces `/dashboard` — adapts by role (admin sees library + creation paths + governance queue; supervisor sees activity + review queue; worker → /sops; operator-at-terminal → kiosk SOP list).
+  9. Global app-wide Cmd+K mounted across all `(protected)` routes — surfaces app-wide navigation (Library, Blocks, Team, Create via Upload/Blank/AI, Settings, kiosk site selector for multi-site admins) alongside the existing SOP-scoped jump-to-step + ask-AI on SOP pages.
+  10. Bundle isolation: kiosk mode chunks + voice Q&A RAG client do not leak into the existing mobile worker bundle; mobile worker walkthrough First Load JS does not grow as a result of Phase 15.
+
+**Plans**: TBD (6–8 plans, created by /gsd-plan-phase after spec+discuss)
+
+Anticipated plan breakdown:
+- 15-01: Site tier in multi-tenancy — `sites` table, `sops.site_id` (nullable for org-level), RLS extension, backfill migration creating synthetic default site for existing orgs, site selector UI
+- 15-02: Terminal/kiosk shell — `/kiosk/[siteSlug]/...` route group, big-text reading UI, sequence-enforced walkthrough, no-auth read path with PIN/badge sign-off on completion
+- 15-03: Voice Q&A over a single SOP — RAG indexer over structured SOP content (sections + blocks + hazards + PPE), Deepgram ASR (already in stack), Anthropic answer synthesis with explicit citations
+- 15-04: SOP governance & lifecycle — `sops.review_cadence_months` + `sops.next_review_due_at`, stale-grey-out UI, configurable n-step approval chain (`sop_approval_steps` table), Discipline Leader cross-site approver flow
+- 15-05: Extended roles + sub-trade tags — role catalog extension, `users.sub_trade_tags` array, SOP-to-role-and-trade assignment filtering
+- 15-06: Training-record export + Success Factors integration spec — completion → competency mapping, CSV export endpoint, Success Factors API connector (deferred to sub-plan if no API access during trial)
+- 15-07: Role-aware home + global Cmd+K (residual from Phase 14.5) — `/dashboard` rebuild as engineering-drawing role-adaptive home, CmdKProvider promoted from `/sops/*` to root layout
+- 15-08: Integration + verification — end-to-end kiosk + voice + governance smoke test, bundle isolation CI check (worker bundle excludes kiosk chunks)
+
 **UI hint**: yes (heavy)
 
-Pre-existing wave-0 deliverables already shipped outside the formal phase (audit done 2026-05-11):
-- `/dashboard` rebuilt on paper tokens with AI Draft tile (commit pending in this session)
-- `/admin/sops` library rebuilt on paper tokens with Upload|Blank|AI Draft button group, platform-admin "Curate Globals" sub-nav link, and "Edit in builder" row CTA for non-uploaded sources (commit pending in this session)
-- Note: layout shell + BottomTabBar already adapt via existing `body[data-theme="paper"]` CSS scoping — no shell-level change required, only per-page `PaperThemeMount` opt-ins.
-
 Open scope decisions to resolve in spec/discuss:
-- Role-aware home: single shared surface vs role-specific landing routes?
-- Global Cmd+K: extend existing `CmdKProvider` to all `(protected)` routes, or build a separate app-shell-level palette?
-- Auth-page treatment: full blueprint frame, or minimal centered card on paper canvas?
-- Legacy-token removal: hard removal at phase close, or grace period with lint warning first?
+1. Kiosk shell: separate Next.js route group, or runtime mode-switch (env var or query param)?
+2. Voice Q&A grounding: ground only to this SOP, or also to org's block library + global blocks?
+3. PIN-on-completion: 4-digit PIN per operator (admin-issued), or NFC badge tap (hardware dependency)?
+4. Discipline Leader role: cross-site within an org, or also cross-org for platform-admin curated globals?
+5. Success Factors: spec-only this phase, or build the connector if Visy provides API access during trial?
 
-### Phase 15: NZ Template Library
+### Phase 16: NZ Template Library
 **Goal**: Admin can browse a curated NZ template library (WorkSafe categories, common machinery, chemical handling) and pick a template as the starting point for a new SOP — which opens in the same unified builder surface as blank-page and AI flows
 **Depends on**: Phase 12, Phase 13 (template entries reuse block library rows)
 **Requirements**: SB-AUTH-03
@@ -376,10 +412,10 @@ Open scope decisions to resolve in spec/discuss:
 **UI hint**: yes
 
 Plans:
-- [ ] 15-01-PLAN.md — Template catalog: `sop_templates` table (or flag on `sops` with `is_template`), curation list with NZ WorkSafe categories, seed data for forklift ops, grinder use, chemical handling, confined space entry, hot work permit
-- [ ] 15-02-PLAN.md — Template picker UI: `/admin/sops/new/template` route, category sidebar + card grid, template preview drawer, "Use this template" action that clones sections + blocks + layout into a fresh draft SOP
+- [ ] 16-01-PLAN.md — Template catalog: `sop_templates` table (or flag on `sops` with `is_template`), curation list with NZ WorkSafe categories, seed data for forklift ops, grinder use, chemical handling, confined space entry, hot work permit
+- [ ] 16-02-PLAN.md — Template picker UI: `/admin/sops/new/template` route, category sidebar + card grid, template preview drawer, "Use this template" action that clones sections + blocks + layout into a fresh draft SOP
 
-### Phase 16: Image & Diagram Annotation
+### Phase 17: Image & Diagram Annotation
 **Goal**: Admin can non-destructively annotate any photo or diagram with arrows, rectangles, ellipses, text labels, numbered callouts, and freehand sketches (with Apple Pencil palm rejection), re-edit them later, and place numbered hotspots at freeform x/y on a machine diagram via a specialty `DiagramHotspotBlock` — while workers never download Konva because a baked PNG is served for the read path
 **Depends on**: Phase 11 (section schema), Phase 12 (builder shell — annotation is invoked from photo blocks)
 **Requirements**: SB-ANNOT-01, SB-ANNOT-02, SB-ANNOT-03, SB-ANNOT-04, SB-ANNOT-05, SB-LAYOUT-05
@@ -393,12 +429,12 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 16-01-PLAN.md — Konva foundation: install `konva` + `react-konva`, `serverExternalPackages: ['canvas']` in `next.config.ts`, `sop_image_annotations` migration (scene jsonb, natural_width, natural_height, baked_storage_path, baked_at, RLS), dynamic-imported `AnnotationEditor` component stub on admin route, Next.js 16 canvas-module spike
-- [ ] 16-02-PLAN.md — Annotation primitives: Arrow / Rect / Ellipse / Text / Label (numbered callout) / Line (freehand) tools, `Konva.Transformer` wiring for resize + rotate, undo/redo via scene JSON snapshots, text-editing `<textarea>` overlay, stylus pointer-type filter + palm-rejection toggle
-- [ ] 16-03-PLAN.md — Bake-on-publish pipeline: client-side `stage.toDataURL()` flatten, upload to `sop-images/baked/{sop_id}/{image_id}.v{N}.png`, update `baked_storage_path` + `baked_at`, worker read path prefers baked PNG, PhotoBlock renderer switches baked-vs-raw without importing Konva
-- [ ] 16-04-PLAN.md — DiagramHotspotBlock: specialty Puck block with image drop zone + freeform x/y numbered-hotspot placement, coordinate preservation on photo replacement with review prompt, integration with the rest of the builder's block set
+- [ ] 17-01-PLAN.md — Konva foundation: install `konva` + `react-konva`, `serverExternalPackages: ['canvas']` in `next.config.ts`, `sop_image_annotations` migration (scene jsonb, natural_width, natural_height, baked_storage_path, baked_at, RLS), dynamic-imported `AnnotationEditor` component stub on admin route, Next.js 16 canvas-module spike
+- [ ] 17-02-PLAN.md — Annotation primitives: Arrow / Rect / Ellipse / Text / Label (numbered callout) / Line (freehand) tools, `Konva.Transformer` wiring for resize + rotate, undo/redo via scene JSON snapshots, text-editing `<textarea>` overlay, stylus pointer-type filter + palm-rejection toggle
+- [ ] 17-03-PLAN.md — Bake-on-publish pipeline: client-side `stage.toDataURL()` flatten, upload to `sop-images/baked/{sop_id}/{image_id}.v{N}.png`, update `baked_storage_path` + `baked_at`, worker read path prefers baked PNG, PhotoBlock renderer switches baked-vs-raw without importing Konva
+- [ ] 17-04-PLAN.md — DiagramHotspotBlock: specialty Puck block with image drop zone + freeform x/y numbered-hotspot placement, coordinate preservation on photo replacement with review prompt, integration with the rest of the builder's block set
 
-### Phase 17: Collaborative Editing
+### Phase 18: Collaborative Editing
 **Goal**: Multi-admin teams can concurrently edit different sections of the same SOP draft without conflict, see presence indicators for who is editing what, and safely reconcile offline edits on reconnect — via section-level pessimistic locks plus an optimistic version column and a plain-English conflict modal
 **Depends on**: Phase 11 (schema), Phase 12 (builder shell — locks live in section edit flow)
 **Requirements**: SB-COLLAB-01, SB-COLLAB-02, SB-COLLAB-03, SB-COLLAB-04, SB-COLLAB-05, SB-COLLAB-06
@@ -412,11 +448,11 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 17-01-PLAN.md — Lock schema: migration adding `locked_by`, `locked_at`, `lock_expires_at`, `version` to `sop_sections`; RLS policy updates; `acquireLock` / `releaseLock` / `heartbeat` server actions; 5-minute expiry sweep
-- [ ] 17-02-PLAN.md — Presence + UI: Supabase Realtime presence channel per SOP (org-scoped via channel name), `SectionLockIndicator` component (avatar + "Alice is editing"), read-only guard when locked by another admin, explicit release on tab close
-- [ ] 17-03-PLAN.md — Offline handoff + conflict modal: optimistic version bump on save, "keep mine / keep theirs / merge manually" modal on reconnect when server version has advanced, Dexie draft sync integration, wave-1 verification that worker routes do not import presence or lock logic
+- [ ] 18-01-PLAN.md — Lock schema: migration adding `locked_by`, `locked_at`, `lock_expires_at`, `version` to `sop_sections`; RLS policy updates; `acquireLock` / `releaseLock` / `heartbeat` server actions; 5-minute expiry sweep
+- [ ] 18-02-PLAN.md — Presence + UI: Supabase Realtime presence channel per SOP (org-scoped via channel name), `SectionLockIndicator` component (avatar + "Alice is editing"), read-only guard when locked by another admin, explicit release on tab close
+- [ ] 18-03-PLAN.md — Offline handoff + conflict modal: optimistic version bump on save, "keep mine / keep theirs / merge manually" modal on reconnect when server version has advanced, Dexie draft sync integration, wave-1 verification that worker routes do not import presence or lock logic
 
-### Phase 18: Pipeline Integration, Bundle Isolation & v3.0 Closeout
+### Phase 19: Pipeline Integration, Bundle Isolation & v3.0 Closeout
 **Goal**: Builder-authored SOPs route through the Phase 9 `sop_pipeline_runs` linkage for one-click video generation, the builder auto-saves through the existing Dexie + sync-engine path without any new "save" step, and a CI check proves that Puck, Konva, Yjs, and y-dexie stay out of worker bundles — closing out the v3.0 milestone
 **Depends on**: Phase 9 (pipeline runs), Phase 12, Phase 16, Phase 17
 **Requirements**: SB-INFRA-01, SB-INFRA-02, SB-INFRA-03
@@ -429,15 +465,15 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 18-01-PLAN.md — Pipeline linkage: extend `createVideoSopPipelineSession` to accept a builder-authored SOP id, route "Generate video SOP" button into the existing Phase 9 progress page, verify publish auto-queue works for builder-sourced SOPs
-- [ ] 18-02-PLAN.md — Dexie + sync-engine closeout: final Dexie schema bump (draftLayouts, sopImageAnnotations, sectionLocks mirrors), sync-engine hook-up for each new table, offline authoring end-to-end verification
-- [ ] 18-03-PLAN.md — Bundle isolation CI: `scripts/check-worker-bundle.ts` that parses `.next/app-build-manifest.json` and fails on disallowed imports in worker route chunks, wire into `npm run build`, regression pass
-- [ ] 18-04-PLAN.md — v3.0 human verification + milestone closeout: human UAT checklist covering every SB-XX requirement, verification run, learnings log entries, milestone retrospective hand-off
+- [ ] 19-01-PLAN.md — Pipeline linkage: extend `createVideoSopPipelineSession` to accept a builder-authored SOP id, route "Generate video SOP" button into the existing Phase 9 progress page, verify publish auto-queue works for builder-sourced SOPs
+- [ ] 19-02-PLAN.md — Dexie + sync-engine closeout: final Dexie schema bump (draftLayouts, sopImageAnnotations, sectionLocks mirrors), sync-engine hook-up for each new table, offline authoring end-to-end verification
+- [ ] 19-03-PLAN.md — Bundle isolation CI: `scripts/check-worker-bundle.ts` that parses `.next/app-build-manifest.json` and fails on disallowed imports in worker route chunks, wire into `npm run build`, regression pass
+- [ ] 19-04-PLAN.md — v3.0 human verification + milestone closeout: human UAT checklist covering every SB-XX requirement, verification run, learnings log entries, milestone retrospective hand-off
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12 → 13 → 14 → 15 → 16 → 17 → 18
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12 → 12.5 → 13 → 14 → 14.5 → 15 → 16 → 17 → 18 → 19
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -454,11 +490,13 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 11. Section Schema & Block Foundation | 4/4 | Complete    | 2026-04-15 |
 | 12. Builder Shell & Blank-Page Authoring | 0/4 | Not started |  |
 | 13. Reusable Block Library | 5/5 | Implementation Complete (UAT pending) | 2026-05-07 |
-| 14. AI-Drafted SOPs | 0/3 | Not started |  |
-| 15. NZ Template Library | 0/2 | Not started |  |
-| 16. Image & Diagram Annotation | 0/4 | Not started |  |
-| 17. Collaborative Editing | 0/3 | Not started |  |
-| 18. Pipeline Integration, Bundle Isolation & v3.0 Closeout | 0/4 | Not started |  |
+| 14. AI-Drafted SOPs | 3/3 | Implementation Complete (UAT pending) | 2026-05-10 |
+| 14.5. Blueprint Shell Rollout | n/a | Complete (no formal plans — shipped ad-hoc) | 2026-05-12 |
+| 15. Manufacturing-Line Mode | 0/8 | Not started |  |
+| 16. NZ Template Library | 0/2 | Not started |  |
+| 17. Image & Diagram Annotation | 0/4 | Not started |  |
+| 18. Collaborative Editing | 0/3 | Not started |  |
+| 19. Pipeline Integration, Bundle Isolation & v3.0 Closeout | 0/4 | Not started |  |
 
 ## Backlog
 
