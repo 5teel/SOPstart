@@ -189,7 +189,7 @@ Derived from 2026-05-05 Visy Packaging customer interview (`.planning/research/c
 - [x] **SB-LINE-02**: Sequential walkthrough enforcement on both layouts — workers cannot skip ahead. Forward advance gated on explicit acknowledgement of current step; backward navigation allowed; deep-links past highest acknowledged step redirect back to it.
 - [x] **SB-LINE-03**: Voice Q&A over the current SOP — operator presses microphone button on walkthrough, speaks question, receives a text answer grounded in this SOP's structured content with explicit section/step citations.
 - [x] **SB-LINE-04**: Voice answer accuracy via adversarial verifier — second Claude call verifies every claim in the answer is grounded in the cited SOP section; ungrounded claims trigger a "I'm not certain — please re-check" response with the flagged claim highlighted.
-- [ ] **SB-LINE-05**: Sub-trade tags on workers — workers can hold multiple sub-trade tags (Operator, Fitter, Sparky/Electrician, Maintainer, Other) via a controlled vocabulary. SOPs can target specific sub-trades; workers see only their applicable SOPs.
+- [x] **SB-LINE-05**: Sub-trade tags on workers — workers can hold multiple sub-trade tags (Operator, Fitter, Sparky/Electrician, Maintainer, Other) via a controlled vocabulary. SOPs can target specific sub-trades; workers see only their applicable SOPs.
 - [x] **SB-LINE-06**: Mobile worker route bundle isolation — desktop-walkthrough code and voice-query client are code-split. First Load JS for `/sops/[sopId]` on mobile within 2 KB of pre-Phase-15 baseline. Verified by CI bundle check.
 
 ## Future Requirements
