@@ -18,3 +18,26 @@ export const subTradeAssignmentSchema = z.object({
 })
 
 export type SubTradeAssignmentInput = z.infer<typeof subTradeAssignmentSchema>
+
+/**
+ * Wave 4 — server-action validators consumed by src/actions/sub-trades.ts.
+ *
+ * Each validates the target id (userId or sopId) AND the sub-trade id array
+ * (max 10, per T-15-01-05 DoS mitigation; reuses subTradeAssignmentSchema's
+ * cap rationale).
+ */
+export const assignUserSubTradesSchema = z.object({
+  userId: z.string().uuid(),
+  subTradeIds: z
+    .array(z.string().uuid())
+    .max(10, 'Maximum 10 sub-trades per assignment'),
+})
+export type AssignUserSubTradesInput = z.infer<typeof assignUserSubTradesSchema>
+
+export const assignSopSubTradesSchema = z.object({
+  sopId: z.string().uuid(),
+  subTradeIds: z
+    .array(z.string().uuid())
+    .max(10, 'Maximum 10 sub-trades per assignment'),
+})
+export type AssignSopSubTradesInput = z.infer<typeof assignSopSubTradesSchema>
