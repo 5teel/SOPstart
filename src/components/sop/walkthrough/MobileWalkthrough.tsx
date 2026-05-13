@@ -73,7 +73,27 @@ export function MobileWalkthrough({ sop }: { sop: SopWithSections }) {
   const allDone = totalSteps > 0 && completedCount >= totalSteps
   const pct = totalSteps > 0 ? Math.round((completedCount / totalSteps) * 100) : 0
 
-  const currentId = search.get('step') ?? allSteps[0]?.id
+  // PERF: drive currentStep from local state, not the URL. router.push on
+  // a search-param change triggers an RSC payload fetch for the route
+  // segment, which (with the service worker layered on top) was the visible
+  // unresponsiveness on "I've done this — Next". Local state gives an
+  // instant React re-render; the URL is synced as a side effect via
+  // window.history.replaceState (no fetch, no Next.js routing).
+  const [localStepId, setLocalStepId] = useState<string | null>(
+    () => search.get('step') ?? allSteps[0]?.id ?? null
+  )
+
+  // Keep local state in sync with browser navigation (back/forward) and
+  // with router-driven URL changes that originate outside the walkthrough.
+  useEffect(() => {
+    const urlStep = search.get('step')
+    if (urlStep && urlStep !== localStepId) {
+      setLocalStepId(urlStep)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.toString()])
+
+  const currentId = localStepId ?? allSteps[0]?.id
   const currentIdx = Math.max(0, allSteps.findIndex((s) => s.id === currentId))
   const currentStep = allSteps[currentIdx]
   const prevStep = allSteps[currentIdx - 1]
@@ -94,9 +114,17 @@ export function MobileWalkthrough({ sop }: { sop: SopWithSections }) {
     if (requestedIdx > highestAckIdx + 1) {
       const targetId = allSteps[highestAckIdx + 1]?.id ?? allSteps[0]?.id
       if (targetId && targetId !== currentStep.id) {
-        const params = new URLSearchParams(search.toString())
-        params.set('step', targetId)
-        router.replace(`?${params.toString()}`, { scroll: false })
+        // Use the same local-state path as handleStepChange so the guard
+        // is just as instant as a normal next-click. Pitfall 4 (infinite
+        // loop) is still mitigated because setLocalStepId is a state set
+        // and the effect dep on currentStep.id changes only once.
+        setLocalStepId(targetId)
+        if (typeof window !== 'undefined') {
+          const params = new URLSearchParams(window.location.search)
+          params.set('step', targetId)
+          const newUrl = `${window.location.pathname}?${params.toString()}${window.location.hash}`
+          window.history.replaceState(window.history.state, '', newUrl)
+        }
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -115,13 +143,21 @@ export function MobileWalkthrough({ sop }: { sop: SopWithSections }) {
   const emergencySection = sections.find((s) => s.section_type.includes('emergency')) as SopSection | undefined
 
   const handleStepChange = useCallback(
-    async (stepId: string) => {
-      const params = new URLSearchParams(search.toString())
-      params.set('step', stepId)
-      router.push(`?${params.toString()}`, { scroll: false })
+    (stepId: string) => {
+      // PERF: local state first (instant re-render of this subtree only).
+      setLocalStepId(stepId)
+      // URL sync — replaceState bypasses Next.js client routing and the
+      // RSC fetch entirely, so it doesn't compete with the React render.
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search)
+        params.set('step', stepId)
+        const newUrl = `${window.location.pathname}?${params.toString()}${window.location.hash}`
+        window.history.replaceState(window.history.state, '', newUrl)
+      }
+      // Fire-and-forget server-side progress upsert (does not block UI).
       void upsertWalkthroughProgress({ sopId: sop.id, stepId })
     },
-    [router, search, sop.id]
+    [sop.id]
   )
 
   // Auto-starts a completion if none is active, then queues the photo

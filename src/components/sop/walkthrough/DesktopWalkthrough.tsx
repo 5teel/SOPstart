@@ -49,7 +49,20 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
   const completedCount = completedSteps.size
   const allDone = totalSteps > 0 && completedCount >= totalSteps
 
-  const currentId = search.get('step') ?? allSteps[0]?.id
+  // PERF: drive currentStep from local state, not the URL — see the same
+  // comment in MobileWalkthrough.tsx for full rationale.
+  const [localStepId, setLocalStepId] = useState<string | null>(
+    () => search.get('step') ?? allSteps[0]?.id ?? null
+  )
+  useEffect(() => {
+    const urlStep = search.get('step')
+    if (urlStep && urlStep !== localStepId) {
+      setLocalStepId(urlStep)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.toString()])
+
+  const currentId = localStepId ?? allSteps[0]?.id
   const currentIdx = Math.max(0, allSteps.findIndex((s) => s.id === currentId))
   const currentStep = allSteps[currentIdx]
   const prevStep = allSteps[currentIdx - 1]
@@ -68,9 +81,13 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
     if (requestedIdx > highestAckIdx + 1) {
       const targetId = allSteps[highestAckIdx + 1]?.id ?? allSteps[0]?.id
       if (targetId && targetId !== currentStep.id) {
-        const params = new URLSearchParams(search.toString())
-        params.set('step', targetId)
-        router.replace(`?${params.toString()}`, { scroll: false })
+        setLocalStepId(targetId)
+        if (typeof window !== 'undefined') {
+          const params = new URLSearchParams(window.location.search)
+          params.set('step', targetId)
+          const newUrl = `${window.location.pathname}?${params.toString()}${window.location.hash}`
+          window.history.replaceState(window.history.state, '', newUrl)
+        }
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -84,13 +101,17 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
   const emergencySection = sections.find((s) => s.section_type.includes('emergency')) as SopSection | undefined
 
   const handleStepChange = useCallback(
-    async (stepId: string) => {
-      const params = new URLSearchParams(search.toString())
-      params.set('step', stepId)
-      router.push(`?${params.toString()}`, { scroll: false })
+    (stepId: string) => {
+      setLocalStepId(stepId)
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search)
+        params.set('step', stepId)
+        const newUrl = `${window.location.pathname}?${params.toString()}${window.location.hash}`
+        window.history.replaceState(window.history.state, '', newUrl)
+      }
       void upsertWalkthroughProgress({ sopId: sop.id, stepId })
     },
-    [router, search, sop.id]
+    [sop.id]
   )
 
   const handleAcknowledgeNext = useCallback(() => {
