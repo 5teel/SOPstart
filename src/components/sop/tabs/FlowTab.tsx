@@ -1,280 +1,171 @@
 'use client'
-import { useRef, useMemo, useState, useEffect } from 'react'
-import { AlertTriangle, Zap, Lightbulb, Wrench, Clock, X } from 'lucide-react'
+import { useRef, useMemo, useState } from 'react'
+import { AlertTriangle, Zap, Lightbulb, Wrench, Clock, ChevronDown, Camera } from 'lucide-react'
 import { BlueprintCanvas } from '@/components/ui/BlueprintCanvas'
 import { BlueprintFrame } from '@/components/ui/BlueprintFrame'
 import { FlowGraphSchema, type FlowGraph } from '@/lib/validators/flow-graph'
 import { deriveFlowGraph } from '@/lib/sop/flow-graph'
 import type { SopStep, SopWithSections } from '@/types/sop'
 
-const NODE_COLORS: Record<FlowGraph['nodes'][number]['type'], string> = {
-  step:        'var(--accent-step, #1e40af)',
-  measurement: 'var(--accent-measure, #0d9488)',
-  decision:    'var(--accent-decision, #d97706)',
-  escalate:    'var(--accent-escalate, #dc2626)',
-  signoff:     'var(--accent-signoff, #7c3aed)',
-  inspect:     'var(--accent-inspect, #0284c7)',
-  zone:        'var(--accent-zone, #16a34a)',
+const TYPE_COLORS: Record<FlowGraph['nodes'][number]['type'], { accent: string; bg: string; label: string }> = {
+  step:        { accent: 'var(--accent-step, #1e40af)',     bg: 'var(--accent-step, #1e40af)',     label: 'Step' },
+  measurement: { accent: 'var(--accent-measure, #0d9488)',  bg: 'var(--accent-measure, #0d9488)',  label: 'Measurement' },
+  decision:    { accent: 'var(--accent-decision, #d97706)', bg: 'var(--accent-decision, #d97706)', label: 'Decision' },
+  escalate:    { accent: 'var(--accent-escalate, #dc2626)', bg: 'var(--accent-escalate, #dc2626)', label: 'Escalate' },
+  signoff:     { accent: 'var(--accent-signoff, #7c3aed)',  bg: 'var(--accent-signoff, #7c3aed)',  label: 'Sign-off' },
+  inspect:     { accent: 'var(--accent-inspect, #0284c7)',  bg: 'var(--accent-inspect, #0284c7)',  label: 'Inspect' },
+  zone:        { accent: 'var(--accent-zone, #16a34a)',     bg: 'var(--accent-zone, #16a34a)',     label: 'Zone' },
 }
 
-const EDGE_COLORS: Record<FlowGraph['edges'][number]['kind'], string> = {
-  sequential: 'var(--ink-300, #d1d5db)',
-  yes:        'var(--accent-zone, #16a34a)',
-  no:         'var(--accent-escalate, #dc2626)',
-  escalate:   'var(--accent-escalate, #dc2626)',
-}
-
-const NODE_W = 160
-const NODE_H = 48
-
-function truncate(text: string, max: number): string {
-  return text.length > max ? text.slice(0, max - 1) + '…' : text
-}
-
-function FlowCanvas({
-  graph,
-  onNodeClick,
-}: {
-  graph: FlowGraph
-  onNodeClick: (stepId: string) => void
-}) {
-  if (graph.nodes.length === 0) {
-    return (
-      <p className="text-sm" style={{ color: 'var(--ink-500)' }}>
-        No steps found — add steps to sections to generate a flow graph.
-      </p>
-    )
-  }
-
-  const xs = graph.nodes.map((n) => n.position.x)
-  const ys = graph.nodes.map((n) => n.position.y)
-  const minX = Math.min(...xs) - 20
-  const minY = -20
-  const svgWidth = Math.max(...xs.map((x) => x + NODE_W)) - minX + 40
-  const svgHeight = Math.max(...ys.map((y) => y + NODE_H)) - minY + 40
-  const cappedHeight = Math.min(svgHeight, 800)
-
-  const posMap = new Map<string, { x: number; y: number }>()
-  for (const node of graph.nodes) {
-    posMap.set(node.id, node.position)
-  }
-
-  return (
-    <div style={{ overflowY: svgHeight > 800 ? 'scroll' : 'visible', maxHeight: 800 }}>
-      <svg
-        width="100%"
-        height={cappedHeight}
-        viewBox={`${minX} ${minY} ${svgWidth} ${svgHeight}`}
-        aria-label="SOP flow graph"
-      >
-        {graph.edges.map((edge, i) => {
-          const fromPos = posMap.get(edge.from)
-          const toPos = posMap.get(edge.to)
-          if (!fromPos || !toPos) return null
-          const x1 = fromPos.x + NODE_W / 2
-          const y1 = fromPos.y + NODE_H
-          const x2 = toPos.x + NODE_W / 2
-          const y2 = toPos.y
-          const mx = (x1 + x2) / 2
-          const my = (y1 + y2) / 2
-          const color = EDGE_COLORS[edge.kind]
-          return (
-            <g key={`edge-${i}`}>
-              <line
-                x1={x1} y1={y1} x2={x2} y2={y2}
-                stroke={color}
-                strokeWidth={1.5}
-              />
-              {edge.label && (
-                <text
-                  x={mx} y={my}
-                  fontSize={10}
-                  fill="var(--ink-500, #6b7280)"
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                >
-                  {edge.label}
-                </text>
-              )}
-            </g>
-          )
-        })}
-
-        {graph.nodes.map((node) => {
-          const color = NODE_COLORS[node.type]
-          return (
-            <g
-              key={node.id}
-              transform={`translate(${node.position.x},${node.position.y})`}
-              role="button"
-              tabIndex={0}
-              aria-label={`Open step: ${node.label}`}
-              style={{ cursor: 'pointer' }}
-              onClick={() => onNodeClick(node.id)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault()
-                  onNodeClick(node.id)
-                }
-              }}
-            >
-              <title>{node.label}</title>
-              <rect
-                width={NODE_W}
-                height={NODE_H}
-                rx={6}
-                ry={6}
-                fill={color}
-                opacity={0.15}
-                stroke={color}
-                strokeWidth={1.5}
-              />
-              <text
-                x={NODE_W / 2}
-                y={NODE_H / 2}
-                fontSize={11}
-                fill={color}
-                textAnchor="middle"
-                dominantBaseline="middle"
-                fontWeight={600}
-                style={{ pointerEvents: 'none' }}
-              >
-                {truncate(node.label, 28)}
-              </text>
-            </g>
-          )
-        })}
-      </svg>
-    </div>
-  )
-}
-
-function StepDetailModal({
-  step,
-  stepNumber,
-  totalSteps,
-  sectionTitle,
-  onClose,
-}: {
-  step: SopStep
+type NodeWithStep = {
+  node: FlowGraph['nodes'][number]
+  step: SopStep | null
   stepNumber: number
   totalSteps: number
   sectionTitle: string | null
-  onClose: () => void
+}
+
+function StepCard({
+  entry,
+  isOpen,
+  onToggle,
+}: {
+  entry: NodeWithStep
+  isOpen: boolean
+  onToggle: () => void
 }) {
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', onKey)
-    // Lock body scroll while modal open
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      window.removeEventListener('keydown', onKey)
-      document.body.style.overflow = prev
-    }
-  }, [onClose])
+  const colors = TYPE_COLORS[entry.node.type]
+  const { step } = entry
+  const hasExtras = !!(
+    step &&
+    (step.warning || step.caution || step.tip || step.photo_required ||
+      (step.required_tools && step.required_tools.length > 0) ||
+      step.time_estimate_minutes != null)
+  )
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="flow-step-title"
-    >
-      {/* Backdrop */}
+    <li className="flow-card-li">
       <button
         type="button"
-        aria-label="Close step details"
-        onClick={onClose}
-        className="absolute inset-0 bg-black/60"
-      />
-
-      {/* Card — mirrors DesktopWalkthrough big-text treatment */}
-      <article
-        className="relative max-w-3xl w-full max-h-[85vh] overflow-y-auto bg-[var(--paper)] border border-[var(--ink-100)] rounded-xl shadow-2xl p-8 md:p-10"
-        onClick={(e) => e.stopPropagation()}
+        onClick={onToggle}
+        aria-expanded={isOpen}
+        aria-controls={`flow-step-detail-${entry.node.id}`}
+        className="w-full text-left bg-[var(--paper)] border rounded-xl px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[var(--ink-50)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--ink-900)]"
+        style={{
+          borderColor: isOpen ? colors.accent : 'var(--ink-100)',
+          borderLeftWidth: 4,
+          borderLeftColor: colors.accent,
+        }}
+        data-flow-card
+        data-flow-open={isOpen ? 'true' : 'false'}
       >
-        <div className="flex items-start justify-between gap-4 mb-6">
-          <span className="mono text-base uppercase tracking-wider text-[var(--ink-500)]">
-            Step {stepNumber} of {totalSteps}
-            {sectionTitle ? ` · ${sectionTitle}` : ''}
-          </span>
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex-shrink-0 p-2 rounded-lg hover:bg-[var(--ink-50)] text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors"
-            aria-label="Close"
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </div>
-
-        <h2
-          id="flow-step-title"
-          className="text-3xl md:text-4xl font-semibold text-[var(--ink-900)] leading-tight mb-6"
+        <span
+          className="mono text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded flex-shrink-0"
+          style={{ color: colors.accent, backgroundColor: `color-mix(in srgb, ${colors.bg} 12%, transparent)` }}
         >
-          {step.text}
-        </h2>
+          {colors.label}
+        </span>
+        <span className="mono text-[11px] text-[var(--ink-500)] flex-shrink-0">
+          {entry.stepNumber}/{entry.totalSteps}
+        </span>
+        <span className="text-base font-medium text-[var(--ink-900)] flex-1 truncate">
+          {entry.node.label}
+        </span>
+        <ChevronDown
+          className="h-5 w-5 text-[var(--ink-500)] flex-shrink-0 transition-transform duration-300"
+          style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
+          aria-hidden
+        />
+      </button>
 
-        {step.warning && (
-          <div className="mt-4 flex items-start gap-3 p-4 rounded-lg bg-[var(--accent-escalate)]/10 border border-[var(--accent-escalate)]/30">
-            <AlertTriangle className="h-6 w-6 text-[var(--accent-escalate)] flex-shrink-0 mt-0.5" />
-            <p className="text-lg text-[var(--accent-escalate)]">{step.warning}</p>
-          </div>
-        )}
-        {step.caution && (
-          <div className="mt-4 flex items-start gap-3 p-4 rounded-lg bg-[var(--accent-decision)]/10 border border-[var(--accent-decision)]/30">
-            <Zap className="h-6 w-6 text-[var(--accent-decision)] flex-shrink-0 mt-0.5" />
-            <p className="text-lg text-[var(--accent-decision)]">{step.caution}</p>
-          </div>
-        )}
-        {step.tip && (
-          <div className="mt-4 flex items-start gap-3 p-4 rounded-lg bg-[var(--ink-50)] border border-[var(--ink-100)]">
-            <Lightbulb className="h-6 w-6 text-[var(--ink-500)] flex-shrink-0 mt-0.5" />
-            <p className="text-lg text-[var(--ink-500)]">{step.tip}</p>
-          </div>
-        )}
+      {/* Inline expandable region — grid-rows trick for smooth content-driven height animation */}
+      <div
+        id={`flow-step-detail-${entry.node.id}`}
+        className="flow-card-expand"
+        data-open={isOpen ? 'true' : 'false'}
+        aria-hidden={!isOpen}
+      >
+        <div className="flow-card-expand-inner">
+          {step ? (
+            <article className="px-5 pt-4 pb-5 border-l-4 ml-0 mt-1 rounded-b-xl bg-[var(--paper)] border border-[var(--ink-100)]"
+              style={{ borderLeftColor: colors.accent }}
+            >
+              <h3 className="text-2xl md:text-3xl font-semibold text-[var(--ink-900)] leading-tight mb-4">
+                {step.text}
+              </h3>
 
-        {step.required_tools && step.required_tools.length > 0 && (
-          <div className="mt-6">
-            <div className="flex items-center gap-2 mb-2">
-              <Wrench className="h-5 w-5 text-[var(--ink-500)]" />
-              <span className="mono text-sm uppercase tracking-wider text-[var(--ink-500)]">
-                Tools required
-              </span>
-            </div>
-            <ul className="space-y-1 ml-7">
-              {step.required_tools.map((tool, i) => (
-                <li key={i} className="text-lg text-[var(--ink-700)]">
-                  • {tool}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+              {step.warning && (
+                <div className="mt-3 flex items-start gap-3 p-3 rounded-lg bg-[var(--accent-escalate)]/10 border border-[var(--accent-escalate)]/30">
+                  <AlertTriangle className="h-5 w-5 text-[var(--accent-escalate)] flex-shrink-0 mt-0.5" />
+                  <p className="text-base text-[var(--accent-escalate)]">{step.warning}</p>
+                </div>
+              )}
+              {step.caution && (
+                <div className="mt-3 flex items-start gap-3 p-3 rounded-lg bg-[var(--accent-decision)]/10 border border-[var(--accent-decision)]/30">
+                  <Zap className="h-5 w-5 text-[var(--accent-decision)] flex-shrink-0 mt-0.5" />
+                  <p className="text-base text-[var(--accent-decision)]">{step.caution}</p>
+                </div>
+              )}
+              {step.tip && (
+                <div className="mt-3 flex items-start gap-3 p-3 rounded-lg bg-[var(--ink-50)] border border-[var(--ink-100)]">
+                  <Lightbulb className="h-5 w-5 text-[var(--ink-500)] flex-shrink-0 mt-0.5" />
+                  <p className="text-base text-[var(--ink-700)]">{step.tip}</p>
+                </div>
+              )}
 
-        {step.time_estimate_minutes != null && (
-          <div className="mt-6 flex items-center gap-2 text-lg text-[var(--ink-500)]">
-            <Clock className="h-5 w-5" />
-            Estimated: {step.time_estimate_minutes} min
-          </div>
-        )}
+              {step.required_tools && step.required_tools.length > 0 && (
+                <div className="mt-4">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <Wrench className="h-4 w-4 text-[var(--ink-500)]" />
+                    <span className="mono text-xs uppercase tracking-wider text-[var(--ink-500)]">
+                      Tools required
+                    </span>
+                  </div>
+                  <ul className="space-y-0.5 ml-6">
+                    {step.required_tools.map((tool, i) => (
+                      <li key={i} className="text-base text-[var(--ink-700)]">
+                        • {tool}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
-        {step.photo_required && (
-          <div className="mt-6 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs uppercase tracking-wider font-medium bg-[var(--accent-decision)]/10 text-[var(--accent-decision)] border border-[var(--accent-decision)]/30">
-            Photo required during walkthrough
-          </div>
-        )}
-      </article>
-    </div>
+              <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-[var(--ink-500)]">
+                {step.time_estimate_minutes != null && (
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="h-4 w-4" />
+                    {step.time_estimate_minutes} min
+                  </span>
+                )}
+                {step.photo_required && (
+                  <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[var(--accent-decision)]/10 text-[var(--accent-decision)] border border-[var(--accent-decision)]/30 text-xs uppercase tracking-wider font-medium">
+                    <Camera className="h-3.5 w-3.5" />
+                    Photo required
+                  </span>
+                )}
+                {entry.sectionTitle && (
+                  <span className="mono text-xs uppercase tracking-wider">{entry.sectionTitle}</span>
+                )}
+                {!hasExtras && (
+                  <span className="text-[var(--ink-400)] italic">No additional details on this step.</span>
+                )}
+              </div>
+            </article>
+          ) : (
+            <p className="px-5 py-3 text-sm text-[var(--ink-500)] italic">
+              No step detail available for this node.
+            </p>
+          )}
+        </div>
+      </div>
+    </li>
   )
 }
 
 export function FlowTab({ sop }: { sop: SopWithSections }) {
   const warnedRef = useRef(false)
-  const [selectedStepId, setSelectedStepId] = useState<string | null>(null)
+  const [openId, setOpenId] = useState<string | null>(null)
 
   const derivedGraph = useMemo(() => deriveFlowGraph(sop), [sop.id, sop.updated_at])
 
@@ -294,48 +185,84 @@ export function FlowTab({ sop }: { sop: SopWithSections }) {
     graph = derivedGraph
   }
 
-  // Build step lookup + section + step-number indices for the modal
-  const { stepMap, stepIndex } = useMemo(() => {
-    const map = new Map<string, { step: SopStep; sectionTitle: string | null; index: number; total: number }>()
+  // Step lookup keyed by node id (which deriveFlowGraph sets to step.id).
+  const entries: NodeWithStep[] = useMemo(() => {
+    const stepMap = new Map<string, { step: SopStep; sectionTitle: string | null; index: number }>()
     const allSteps = sop.sop_sections.flatMap((s) => s.sop_steps ?? [])
     const total = allSteps.length
-    let globalIdx = 0
+    let i = 0
     for (const section of sop.sop_sections) {
       for (const step of section.sop_steps ?? []) {
-        map.set(step.id, {
-          step,
-          sectionTitle: section.title ?? null,
-          index: globalIdx + 1,
-          total,
-        })
-        globalIdx += 1
+        stepMap.set(step.id, { step, sectionTitle: section.title ?? null, index: ++i })
       }
     }
-    return { stepMap: map, stepIndex: total }
-  }, [sop])
+    return graph.nodes.map((node) => {
+      const matched = stepMap.get(node.id)
+      return {
+        node,
+        step: matched?.step ?? null,
+        stepNumber: matched?.index ?? 0,
+        totalSteps: total,
+        sectionTitle: matched?.sectionTitle ?? null,
+      }
+    })
+  }, [graph, sop])
 
-  void stepIndex // satisfy lint when only used as memo dep witness
-
-  const selected = selectedStepId ? stepMap.get(selectedStepId) ?? null : null
+  if (entries.length === 0) {
+    return (
+      <BlueprintCanvas fullBleed>
+        <BlueprintFrame>
+          <h2 className="text-lg font-semibold mb-2">Flow</h2>
+          <p className="text-sm text-[var(--ink-500)]">
+            No steps found — add steps to sections to generate a flow graph.
+          </p>
+        </BlueprintFrame>
+      </BlueprintCanvas>
+    )
+  }
 
   return (
     <BlueprintCanvas fullBleed>
       <BlueprintFrame>
         <h2 className="text-lg font-semibold mb-2">Flow</h2>
         <p className="text-xs text-[var(--ink-500)] mb-4">
-          Tap any step to see the full detail.
+          Tap any step to expand it. Tap again to collapse.
         </p>
-        <FlowCanvas graph={graph} onNodeClick={setSelectedStepId} />
+
+        {/* Inline expand-in-place animation:
+            We use the grid-template-rows 0fr → 1fr trick so the panel
+            animates to its natural content height without measuring the DOM. */}
+        <style>{`
+          .flow-card-expand {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 280ms cubic-bezier(0.16, 1, 0.3, 1),
+                        margin-top 280ms cubic-bezier(0.16, 1, 0.3, 1);
+            margin-top: 0;
+          }
+          .flow-card-expand[data-open="true"] {
+            grid-template-rows: 1fr;
+            margin-top: 6px;
+          }
+          .flow-card-expand-inner {
+            overflow: hidden;
+          }
+          .flow-card-li + .flow-card-li { margin-top: 8px; }
+        `}</style>
+
+        <ol role="list">
+          {entries.map((entry) => (
+            <StepCard
+              key={entry.node.id}
+              entry={entry}
+              isOpen={openId === entry.node.id}
+              onToggle={() =>
+                setOpenId((prev) => (prev === entry.node.id ? null : entry.node.id))
+              }
+            />
+          ))}
+        </ol>
       </BlueprintFrame>
-      {selected && (
-        <StepDetailModal
-          step={selected.step}
-          stepNumber={selected.index}
-          totalSteps={selected.total}
-          sectionTitle={selected.sectionTitle}
-          onClose={() => setSelectedStepId(null)}
-        />
-      )}
     </BlueprintCanvas>
   )
 }
