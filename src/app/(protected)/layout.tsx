@@ -5,6 +5,7 @@ import { QueryProvider } from '@/components/providers/QueryProvider'
 import { OnlineStatusBanner } from '@/components/layout/OnlineStatusBanner'
 import { BottomTabBar } from '@/components/layout/BottomTabBar'
 import { InstallPrompt } from '@/components/layout/InstallPrompt'
+import { RouteTransition } from '@/components/layout/RouteTransition'
 
 export default async function ProtectedLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient()
@@ -20,7 +21,7 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
         <OnlineStatusBanner />
         <InstallPrompt />
         <main className="flex-1 overflow-y-auto">
-          {children}
+          <RouteTransition>{children}</RouteTransition>
         </main>
         <BottomTabBar />
       </div>

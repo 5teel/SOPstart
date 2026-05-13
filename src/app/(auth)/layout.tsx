@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { PRODUCT_NAME } from '@/lib/constants'
+import { RouteTransition } from '@/components/layout/RouteTransition'
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
@@ -11,7 +12,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           </h1>
           <p className="mt-1 text-ink-500 text-sm">Step-by-step SOP guidance for your team</p>
         </div>
-        {children}
+        <RouteTransition>{children}</RouteTransition>
       </div>
     </div>
   )
