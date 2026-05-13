@@ -514,3 +514,21 @@ Plans:
 
 Plans:
 - [ ] Full-corpus graphify run: dispatch ~40+ semantic subagents on src/ + .planning/ + supabase/migrations/; build `graphify-out/graph.json` with EXTRACTED/INFERRED/AMBIGUOUS edges; label communities; produce HTML viz. Estimated cost: ~40 subagents × ~45s = ~10-15 min wall, ~$1-3 token spend. Triggered when Phase 13 planning needs cross-document concept surfacing (e.g. "which phase-12 blocks relate to phase-13 reusable library requirements").
+
+### Phase 999.3: Security hardening pass — CSP, HSTS, frame-ancestors (BACKLOG)
+
+**Goal:** Add proper response-header security to sopstart.com:
+- **Content-Security-Policy** with allowlists for `'self'`, Supabase (REST + Realtime + Storage), Anthropic API, Railway, and `'wasm-unsafe-eval'` for the tesseract.js client OCR path (used by `src/components/admin/PhotoScanner.tsx`).
+- **Strict-Transport-Security** (HSTS) with `max-age=31536000; includeSubDomains; preload`.
+- **frame-ancestors 'none'** (or `'self'`) to prevent clickjacking embeds.
+- **X-Content-Type-Options: nosniff**, **Referrer-Policy: strict-origin-when-cross-origin**, **Permissions-Policy** stub locking down sensors / payment / serial.
+
+Also consider whether OCR should move server-side to drop tesseract.js from the client bundle entirely (smaller bundle, loses offline OCR, adds server round-trip per scan).
+
+**Requirements:** TBD
+**Plans:** 0 plans
+
+**Trigger:** Surfaced during Phase 15 UAT (2026-05-13) — Chrome DevTools flagged `wasm-unsafe-eval` advisory from tesseract.js. No functional impact today (no CSP currently set). Worth a dedicated security pass after the Visy demo lands.
+
+Plans:
+- [ ] TBD (promote with /gsd-review-backlog when ready)
