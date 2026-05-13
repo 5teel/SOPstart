@@ -278,21 +278,6 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
                 </h2>
               </div>
 
-              <article
-                data-region="body"
-                className="blueprint-frame bg-[var(--paper)] border border-[var(--ink-100)] rounded-xl p-10"
-              >
-                <div
-                  className="text-[var(--ink-700)] leading-relaxed"
-                  data-testid="step-body"
-                  style={{ fontSize: '1.5rem' /* 24px — D-01 floor */ }}
-                >
-                  {currentStep.warning || currentStep.caution || currentStep.tip ? null : (
-                    <span className="text-[var(--ink-500)]">Follow the step as written above.</span>
-                  )}
-                </div>
-              </article>
-
               <div data-region="callouts" className="flex flex-col gap-3">
                 {currentStep.warning && (
                   <div className="flex items-start gap-3 p-4 rounded-lg bg-[var(--accent-escalate)]/10 border border-[var(--accent-escalate)]/30">
@@ -344,6 +329,19 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
                   </div>
                 )}
               </div>
+
+              {/* Subtle hint pinned just above the action bar — only shown
+                  when the step has no warnings, cautions or tips. Keeps
+                  short steps from looking empty without dominating the
+                  layout the way the old big-text "body" card did. */}
+              {!currentStep.warning && !currentStep.caution && !currentStep.tip && (
+                <p
+                  data-region="hint"
+                  className="text-sm text-[var(--ink-400)] italic text-center"
+                >
+                  Follow the step as written above.
+                </p>
+              )}
             </div>
 
             {/* Action bar — outside the keyed wrapper so it doesn't re-animate */}

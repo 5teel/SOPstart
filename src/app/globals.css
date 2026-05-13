@@ -51,18 +51,19 @@
   grid-template-areas:
     "meta"
     "title"
-    "body"
     "callouts"
     "context"
+    "spacer"
+    "hint"
     "action";
-  grid-template-rows: auto auto minmax(0, 1fr) auto auto auto;
+  grid-template-rows: auto auto auto auto 1fr auto auto;
   row-gap: 1rem;
   min-height: 60vh;
 }
 
 .walkthrough-step-grid > [data-region="meta"]     { grid-area: meta; }
 .walkthrough-step-grid > [data-region="title"]    { grid-area: title; }
-.walkthrough-step-grid > [data-region="body"]     { grid-area: body; }
 .walkthrough-step-grid > [data-region="callouts"] { grid-area: callouts; }
 .walkthrough-step-grid > [data-region="context"]  { grid-area: context; }
+.walkthrough-step-grid > [data-region="hint"]     { grid-area: hint; }
 .walkthrough-step-grid > [data-region="action"]   { grid-area: action; }
