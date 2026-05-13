@@ -13,15 +13,22 @@ interface Props {
   completedSteps?: Set<string>
   stepPhotos: QueuedPhoto[]
   onCapturePhoto: (stepId: string, file: File) => Promise<void>
+  /**
+   * Optional override for the current step id. When the parent walkthrough
+   * drives step state locally (perf fix — see MobileWalkthrough.tsx), it
+   * passes the active id here. Falls back to ?step= URL param so external
+   * deep-links / refresh still work for any caller that doesn't supply it.
+   */
+  currentStepId?: string | null
 }
 
-export function ImmersiveStepCard({ sop, onStepChange, completedSteps, stepPhotos, onCapturePhoto }: Props) {
+export function ImmersiveStepCard({ sop, onStepChange, completedSteps, stepPhotos, onCapturePhoto, currentStepId }: Props) {
   const search = useSearchParams()
   const lockedSteps = useWalkthroughStore((s) => s.lockedSteps)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const steps = sop.sop_sections.flatMap((s) => s.sop_steps ?? [])
-  const currentId = search.get('step') ?? steps[0]?.id
+  const currentId = currentStepId ?? search.get('step') ?? steps[0]?.id
   const currentIdx = Math.max(0, steps.findIndex((s) => s.id === currentId))
   const current = steps[currentIdx]
   if (!current) return null
@@ -42,7 +49,11 @@ export function ImmersiveStepCard({ sop, onStepChange, completedSteps, stepPhoto
   }
 
   return (
-    <article className="immersive-step-card bg-grid flex flex-col" data-immersive="true">
+    <article
+      key={current.id}
+      className="immersive-step-card bg-grid flex flex-col step-fade-in"
+      data-immersive="true"
+    >
       <header className="px-4 py-3 border-b border-[var(--ink-100)] flex items-center justify-between">
         <div className="mono text-[11px] uppercase tracking-wider text-[var(--ink-500)] truncate">
           {sectionTitle} · Step {currentIdx + 1}/{steps.length}

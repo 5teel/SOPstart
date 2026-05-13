@@ -363,6 +363,7 @@ export function MobileWalkthrough({ sop }: { sop: SopWithSections }) {
         <div className="walkthrough-list-only-above-430">
           <ImmersiveStepCard
             sop={sop}
+            currentStepId={localStepId}
             onStepChange={handleStepChange}
             completedSteps={completedSteps}
             stepPhotos={currentStepPhotos}

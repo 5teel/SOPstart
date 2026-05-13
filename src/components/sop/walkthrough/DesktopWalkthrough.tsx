@@ -5,6 +5,7 @@ import { CheckCircle2, ClipboardCheck, AlertTriangle, Zap, Lightbulb, Wrench, Cl
 import type { SopWithSections, SopSection } from '@/types/sop'
 import { useWalkthroughStore } from '@/stores/walkthrough'
 import { useCompletionStore } from '@/stores/completionStore'
+import { PageShell } from '@/components/layout/PageShell'
 import { SafetyAcknowledgement } from '@/components/sop/SafetyAcknowledgement'
 import { submitCompletion } from '@/actions/completions'
 import { upsertWalkthroughProgress } from '@/actions/walkthrough-progress'
@@ -244,92 +245,109 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
       )}
 
       {acknowledged && (
-        <div className="max-w-4xl mx-auto px-8 py-12">
-          {/* Step counter — blueprint mono */}
-          <div className="mb-6">
-            <span
-              className="mono text-base uppercase tracking-wider text-[var(--ink-500)]"
-              data-testid="step-counter"
-            >
-              Step {currentIdx + 1} of {totalSteps}
-              {currentSection?.title ? ` · ${currentSection.title}` : ''}
-            </span>
-          </div>
+        <PageShell width="lg" paddingX="px-8" paddingY="py-12" animateKey={`wt-${sopId}`}>
+          {/*
+            Phase 15 polish: walkthrough laid out with a CSS grid of named
+            regions (see globals.css `.walkthrough-step-grid`). Empty regions
+            (no warning / no tools / no time estimate) collapse to zero, but
+            the action bar's grid position is locked at the bottom — no more
+            "jumpy" step-to-step layout shifts.
 
-          {/* Step body — big-text variant per D-01 */}
-          <article className="blueprint-frame bg-[var(--paper)] border border-[var(--ink-100)] rounded-xl p-10">
-            <h2
-              className="text-4xl font-semibold text-[var(--ink-900)] leading-tight mb-6"
-              data-testid="step-title"
-            >
-              {currentStep.text}
-            </h2>
+            The keyed wrapper around the swappable regions cross-fades each
+            step in (~140ms). Action bar is OUTSIDE the keyed region so it
+            doesn't restart its animation on every click.
+          */}
+          <div className="walkthrough-step-grid">
+            <div key={currentStep.id} className="step-fade-in contents">
+              <div data-region="meta">
+                <span
+                  className="mono text-base uppercase tracking-wider text-[var(--ink-500)]"
+                  data-testid="step-counter"
+                >
+                  Step {currentIdx + 1} of {totalSteps}
+                  {currentSection?.title ? ` · ${currentSection.title}` : ''}
+                </span>
+              </div>
 
-            <div
-              className="text-2xl text-[var(--ink-700)] leading-relaxed"
-              data-testid="step-body"
-              style={{ fontSize: '1.5rem' /* 24px — D-01 floor */ }}
-            >
-              {/* Reserved slot for sub-text / instructions; the SopStep
-                  model doesn't currently carry a long-form body, so we
-                  surface tools/warnings/cautions/tips below at ≥18px. */}
-              {currentStep.warning || currentStep.caution || currentStep.tip ? null : (
-                <span className="text-[var(--ink-500)]">Follow the step as written above.</span>
-              )}
+              <div data-region="title">
+                <h2
+                  className="text-4xl font-semibold text-[var(--ink-900)] leading-tight"
+                  data-testid="step-title"
+                >
+                  {currentStep.text}
+                </h2>
+              </div>
+
+              <article
+                data-region="body"
+                className="blueprint-frame bg-[var(--paper)] border border-[var(--ink-100)] rounded-xl p-10"
+              >
+                <div
+                  className="text-[var(--ink-700)] leading-relaxed"
+                  data-testid="step-body"
+                  style={{ fontSize: '1.5rem' /* 24px — D-01 floor */ }}
+                >
+                  {currentStep.warning || currentStep.caution || currentStep.tip ? null : (
+                    <span className="text-[var(--ink-500)]">Follow the step as written above.</span>
+                  )}
+                </div>
+              </article>
+
+              <div data-region="callouts" className="flex flex-col gap-3">
+                {currentStep.warning && (
+                  <div className="flex items-start gap-3 p-4 rounded-lg bg-[var(--accent-escalate)]/10 border border-[var(--accent-escalate)]/30">
+                    <AlertTriangle
+                      className="h-6 w-6 text-[var(--accent-escalate)] flex-shrink-0 mt-0.5"
+                    />
+                    <p className="text-lg text-[var(--accent-escalate)]" data-testid="step-warning">
+                      {currentStep.warning}
+                    </p>
+                  </div>
+                )}
+                {currentStep.caution && (
+                  <div className="flex items-start gap-3 p-4 rounded-lg bg-[var(--accent-decision)]/10 border border-[var(--accent-decision)]/30">
+                    <Zap className="h-6 w-6 text-[var(--accent-decision)] flex-shrink-0 mt-0.5" />
+                    <p className="text-lg text-[var(--accent-decision)]">{currentStep.caution}</p>
+                  </div>
+                )}
+                {currentStep.tip && (
+                  <div className="flex items-start gap-3 p-4 rounded-lg bg-[var(--ink-50)] border border-[var(--ink-100)]">
+                    <Lightbulb className="h-6 w-6 text-[var(--ink-500)] flex-shrink-0 mt-0.5" />
+                    <p className="text-lg text-[var(--ink-500)]">{currentStep.tip}</p>
+                  </div>
+                )}
+              </div>
+
+              <div data-region="context" className="flex flex-col gap-3">
+                {currentStep.required_tools && currentStep.required_tools.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Wrench className="h-5 w-5 text-[var(--ink-500)]" />
+                      <span className="mono text-sm uppercase tracking-wider text-[var(--ink-500)]">
+                        Tools required
+                      </span>
+                    </div>
+                    <ul className="space-y-1 ml-7">
+                      {currentStep.required_tools.map((tool, i) => (
+                        <li key={i} className="text-lg text-[var(--ink-700)]">
+                          • {tool}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {currentStep.time_estimate_minutes != null && (
+                  <div className="flex items-center gap-2 text-lg text-[var(--ink-500)]">
+                    <Clock className="h-5 w-5" />
+                    Estimated: {currentStep.time_estimate_minutes} min
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Secondary text — warnings/cautions/tips at ≥18px (text-lg = 18px) */}
-            {currentStep.warning && (
-              <div className="mt-6 flex items-start gap-3 p-4 rounded-lg bg-[var(--accent-escalate)]/10 border border-[var(--accent-escalate)]/30">
-                <AlertTriangle
-                  className="h-6 w-6 text-[var(--accent-escalate)] flex-shrink-0 mt-0.5"
-                />
-                <p className="text-lg text-[var(--accent-escalate)]" data-testid="step-warning">
-                  {currentStep.warning}
-                </p>
-              </div>
-            )}
-            {currentStep.caution && (
-              <div className="mt-4 flex items-start gap-3 p-4 rounded-lg bg-[var(--accent-decision)]/10 border border-[var(--accent-decision)]/30">
-                <Zap className="h-6 w-6 text-[var(--accent-decision)] flex-shrink-0 mt-0.5" />
-                <p className="text-lg text-[var(--accent-decision)]">{currentStep.caution}</p>
-              </div>
-            )}
-            {currentStep.tip && (
-              <div className="mt-4 flex items-start gap-3 p-4 rounded-lg bg-[var(--ink-50)] border border-[var(--ink-100)]">
-                <Lightbulb className="h-6 w-6 text-[var(--ink-500)] flex-shrink-0 mt-0.5" />
-                <p className="text-lg text-[var(--ink-500)]">{currentStep.tip}</p>
-              </div>
-            )}
-
-            {currentStep.required_tools && currentStep.required_tools.length > 0 && (
-              <div className="mt-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <Wrench className="h-5 w-5 text-[var(--ink-500)]" />
-                  <span className="mono text-sm uppercase tracking-wider text-[var(--ink-500)]">
-                    Tools required
-                  </span>
-                </div>
-                <ul className="space-y-1 ml-7">
-                  {currentStep.required_tools.map((tool, i) => (
-                    <li key={i} className="text-lg text-[var(--ink-700)]">
-                      • {tool}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {currentStep.time_estimate_minutes != null && (
-              <div className="mt-6 flex items-center gap-2 text-lg text-[var(--ink-500)]">
-                <Clock className="h-5 w-5" />
-                Estimated: {currentStep.time_estimate_minutes} min
-              </div>
-            )}
-          </article>
-
-          {/* Action bar */}
-          <div className="mt-8 flex items-center justify-between gap-6">
+            {/* Action bar — outside the keyed wrapper so it doesn't re-animate */}
+            <div data-region="action" className="flex items-center justify-between gap-6 pt-2">
             <button
               type="button"
               disabled={!prevStep}
@@ -385,8 +403,9 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
                 <span aria-hidden>→</span>
               </button>
             )}
+            </div>
           </div>
-        </div>
+        </PageShell>
       )}
     </div>
   )

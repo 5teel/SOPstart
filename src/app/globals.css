@@ -3,3 +3,66 @@
 @theme {
   --min-tap-target: 72px;
 }
+
+/* ─────────────────────────────────────────────────────────────
+   Page + step transition animations
+   Used by <PageShell> for cross-route page entry and by the
+   walkthrough step swap. Keep durations short — these are
+   continuity cues, not effects in their own right.
+   Respects prefers-reduced-motion.
+   ───────────────────────────────────────────────────────────── */
+
+@keyframes page-shell-enter {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.page-shell-enter {
+  animation: page-shell-enter 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: both;
+}
+
+@keyframes step-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.step-fade-in {
+  animation: step-fade-in 140ms ease-out;
+  animation-fill-mode: both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-shell-enter,
+  .step-fade-in {
+    animation: none !important;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Walkthrough step grid
+   Stable layout regions so the action bar's position doesn't
+   shift between steps with different content. Empty regions
+   collapse to zero (auto rows) but the order is locked.
+   ───────────────────────────────────────────────────────────── */
+
+.walkthrough-step-grid {
+  display: grid;
+  grid-template-areas:
+    "meta"
+    "title"
+    "body"
+    "callouts"
+    "context"
+    "action";
+  grid-template-rows: auto auto minmax(0, 1fr) auto auto auto;
+  row-gap: 1rem;
+  min-height: 60vh;
+}
+
+.walkthrough-step-grid > [data-region="meta"]     { grid-area: meta; }
+.walkthrough-step-grid > [data-region="title"]    { grid-area: title; }
+.walkthrough-step-grid > [data-region="body"]     { grid-area: body; }
+.walkthrough-step-grid > [data-region="callouts"] { grid-area: callouts; }
+.walkthrough-step-grid > [data-region="context"]  { grid-area: context; }
+.walkthrough-step-grid > [data-region="action"]   { grid-area: action; }
