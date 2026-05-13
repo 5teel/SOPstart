@@ -24,8 +24,11 @@ export const useCompletionStore = create<CompletionStoreState>((set, get) => ({
   activeCompletions: {},
 
   /**
-   * Start a new completion for a SOP. Creates a new LocalCompletion with a
-   * client-generated UUID (idempotency key) and writes it to Dexie immediately.
+   * Start a new completion for a SOP. Updates in-memory state synchronously
+   * so callers don't need to await before the next interaction; Dexie write
+   * runs in the background for durability. Safe to await (idempotent) for
+   * callers that need to ensure Dexie has flushed before a critical op
+   * (e.g. just before submitCompletion).
    */
   startCompletion: async (sopId: string, sopVersion: number) => {
     const existing = get().activeCompletions[sopId]
@@ -45,20 +48,22 @@ export const useCompletionStore = create<CompletionStoreState>((set, get) => ({
       startedAt: Date.now(),
     }
 
-    // Write to Dexie for durability
-    await db.completions.put(newCompletion)
-
+    // Optimistic: set in-memory state first so subsequent reads are instant
     set((state) => ({
       activeCompletions: {
         ...state.activeCompletions,
         [sopId]: newCompletion,
       },
     }))
+
+    // Durability write in the background. Awaited so callers CAN await if
+    // they need to, but the UI path should call this without awaiting.
+    await db.completions.put(newCompletion)
   },
 
   /**
-   * Mark a step as completed. Records the current timestamp and writes the
-   * updated completion record to Dexie.
+   * Mark a step as completed. In-memory state is set synchronously so the
+   * UI reacts immediately; Dexie write happens in the background.
    */
   markStepCompleted: async (sopId: string, stepId: string) => {
     const completion = get().activeCompletions[sopId]
@@ -72,15 +77,16 @@ export const useCompletionStore = create<CompletionStoreState>((set, get) => ({
       },
     }
 
-    // Write to Dexie for durability on every step
-    await db.completions.put(updated)
-
+    // Optimistic in-memory update first
     set((state) => ({
       activeCompletions: {
         ...state.activeCompletions,
         [sopId]: updated,
       },
     }))
+
+    // Durability write in the background
+    await db.completions.put(updated)
   },
 
   /**

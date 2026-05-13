@@ -93,17 +93,20 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
     [router, search, sop.id]
   )
 
-  const handleAcknowledgeNext = useCallback(async () => {
+  const handleAcknowledgeNext = useCallback(() => {
     if (!currentStep) return
-    if (!activeCompletion) {
-      await completionStore.startCompletion(sopId, sop.version)
-    }
-    // D-19: explicit sequential ack — record before advancing.
+    // PERF: sync in-memory updates + navigation first; Dexie writes
+    // happen in the background via fire-and-forget. The completionStore
+    // sets state synchronously so the order here is safe even on first
+    // click (no need to await startCompletion).
     walkthroughStore.markStepAcknowledged(sopId, currentStep.id)
     walkthroughStore.markStepComplete(sopId, currentStep.id)
-    await completionStore.markStepCompleted(sopId, currentStep.id)
     const next = allSteps.slice(currentIdx + 1).find((s) => !completedSteps.has(s.id))
     if (next) void handleStepChange(next.id)
+    if (!activeCompletion) {
+      void completionStore.startCompletion(sopId, sop.version)
+    }
+    void completionStore.markStepCompleted(sopId, currentStep.id)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep, activeCompletion, allSteps, currentIdx, completedSteps])
 
@@ -354,7 +357,7 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
               <button
                 type="button"
                 onClick={handleAcknowledgeNext}
-                className="min-h-[60px] px-10 rounded-xl bg-[var(--ink-900)] text-[var(--paper)] text-xl font-bold flex items-center gap-3 hover:opacity-90 transition-opacity"
+                className="min-h-[60px] px-10 rounded-xl bg-[var(--ink-900)] text-[var(--paper)] text-xl font-bold flex items-center gap-3 hover:opacity-90 transition-transform duration-100 active:scale-[0.97]"
                 data-testid="ack-next"
               >
                 I&apos;ve done this — Next

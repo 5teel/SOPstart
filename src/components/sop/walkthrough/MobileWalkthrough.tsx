@@ -139,20 +139,23 @@ export function MobileWalkthrough({ sop }: { sop: SopWithSections }) {
   )
 
   const handleMarkComplete = useCallback(
-    async (stepId: string) => {
-      if (!activeCompletion) {
-        await completionStore.startCompletion(sopId, sop.version)
-      }
-      // Phase 15 D-19: explicit sequential ack-trace, in addition to the
-      // existing completion bookkeeping. markStepAcknowledged dedupes on
-      // stepId so repeated clicks are no-ops.
+    (stepId: string) => {
+      // PERF: do all in-memory updates + navigation synchronously so the
+      // UI reacts on the next frame. Persistence (Dexie writes via
+      // completionStore + walkthrough-progress server action) is fired in
+      // the background — the user does not block on IndexedDB.
       walkthroughStore.markStepAcknowledged(sopId, stepId)
       walkthroughStore.markStepComplete(sopId, stepId)
-      await completionStore.markStepCompleted(sopId, stepId)
-      // Auto-advance to next uncompleted step
       const idx = allSteps.findIndex((s) => s.id === stepId)
       const next = allSteps.slice(idx + 1).find((s) => !completedSteps.has(s.id))
       if (next) void handleStepChange(next.id)
+      // Fire-and-forget persistence. startCompletion is idempotent and the
+      // completionStore sets in-memory state synchronously, so the order
+      // here is safe even on the first click.
+      if (!activeCompletion) {
+        void completionStore.startCompletion(sopId, sop.version)
+      }
+      void completionStore.markStepCompleted(sopId, stepId)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [activeCompletion, completionStore, walkthroughStore, sopId, sop.version, allSteps, completedSteps]
@@ -439,16 +442,20 @@ export function MobileWalkthrough({ sop }: { sop: SopWithSections }) {
                 </div>
               )}
               {/* Phase 15 D-19: explicit "I've done this — Next" gate.
-                  min-h-[60px] for glove-friendly tap target. */}
+                  min-h-[60px] for glove-friendly tap target.
+                  active:scale-[0.97] gives instant tap feedback while the
+                  optimistic store updates + navigation kick in (no awaits
+                  block the click handler — see handleMarkComplete). */}
               <button
                 type="button"
                 data-testid="ack-next"
-                onClick={() => currentStep && void handleMarkComplete(currentStep.id)}
+                onClick={() => currentStep && handleMarkComplete(currentStep.id)}
                 disabled={!photoGateMet}
                 className={[
-                  'w-full min-h-[60px] h-[64px] rounded-xl font-bold text-base transition-all flex items-center justify-center gap-2',
+                  'w-full min-h-[60px] h-[64px] rounded-xl font-bold text-base flex items-center justify-center gap-2',
+                  'transition-transform duration-100 active:scale-[0.97]',
                   !photoGateMet
-                    ? 'bg-[var(--ink-200)] text-[var(--ink-400)] cursor-not-allowed'
+                    ? 'bg-[var(--ink-200)] text-[var(--ink-400)] cursor-not-allowed active:scale-100'
                     : 'bg-[var(--ink-900)] text-[var(--paper)] hover:opacity-90',
                 ].join(' ')}
               >
