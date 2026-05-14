@@ -37,6 +37,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 17: Image & Diagram Annotation** - Konva editor with dual-store (JSON scene + baked PNG), DiagramHotspotBlock for machine-diagram freeform callouts, stylus + palm rejection
 - [ ] **Phase 18: Collaborative Editing** - Section-level pessimistic locks, Supabase Realtime presence, optimistic version column for offline handoff, conflict modal
 - [ ] **Phase 19: Pipeline Integration, Bundle Isolation & v3.0 Closeout** - Builder ↔ Phase 9 pipeline linkage, Dexie draft sync, worker-bundle leakage CI check, v3.0 milestone closeout
+- [ ] **Phase 20: Conversion Pipeline V2** - Safety-critical overhaul of the document → SOP conversion path. Semantic extraction of photos / diagrams / charts / tables with step-level provenance anchoring; parsed drafts land as Puck `layout_data` directly in the Phase 12 builder (review surface retires); three-layer verification (persistent side-by-side source viewer + AI reviewer running 5 jobs auto/manual + mandatory per-block verify checklist at publish gate).
 
 ## Phase Details
 
@@ -467,10 +468,47 @@ Plans:
 - [ ] 19-03-PLAN.md — Bundle isolation CI: `scripts/check-worker-bundle.ts` that parses `.next/app-build-manifest.json` and fails on disallowed imports in worker route chunks, wire into `npm run build`, regression pass
 - [ ] 19-04-PLAN.md — v3.0 human verification + milestone closeout: human UAT checklist covering every SB-XX requirement, verification run, learnings log entries, milestone retrospective hand-off
 
+### Phase 20: Conversion Pipeline V2
+
+> **Source**: Surfaced during /gsd-explore session 2026-05-14 after Phase 15 wrap. Decisions captured in `.planning/notes/conversion-pipeline-v2-decisions.md`.
+
+**Goal**: An admin uploading a Word / PDF / scan / video SOP that contains photos, diagrams, charts, and tables receives a structured draft where every visual element is preserved AND anchored to the correct step/section, and the review surface IS the Phase 12 builder — with persistent side-by-side source viewing, an AI reviewer that runs five verification jobs (auto on first parse + manual re-run), and a mandatory per-block verify checklist at the publish gate. Safety-critical: no extraction is trusted without three independent layers of verification.
+
+**Depends on**: Phase 2 (existing parser), Phase 5 (expanded intake), Phase 6 (adversarial verifier), Phase 11 (block schema), Phase 12 (builder shell), Phase 13 (block library matching), Phase 14.5 (paper/ink shell)
+
+**Requirements**: TBD (assigned during /gsd-spec-phase)
+
+**Success Criteria** (what must be TRUE):
+  1. A DOCX or PDF containing embedded photos, diagrams, hazards tables, and process-flow charts produces a draft where every visual is retained as a SafeStart-native block (PhotoBlock anchored to its step, HazardCard per table row, DiagramHotspotBlock for machine diagrams) — none are dropped, none flattened to prose
+  2. Each block carries source-provenance metadata (page + bbox for PDFs, paragraph/run id for DOCX, image crop coords for scans, video timestamp for Phase 6 sources) sufficient for the source viewer to highlight on click
+  3. The legacy `/admin/sops/[sopId]/review` ReviewClient retires — parsed drafts open in the Phase 12 builder with `layout_data` pre-populated by the parser, edit at block granularity in the paper/ink blueprint style, publish gate sits on top of the builder
+  4. Source viewer renders persistently alongside the builder canvas on desktop; clicking any block scrolls/highlights the source region it came from; works for DOCX, PDF, scan image, and video sources
+  5. AI reviewer runs all five jobs on first parse: (A) hallucination — every claim traces to source; (B) omission — flag source content missing from the draft; (C) anchoring — verify each photo/diagram is on the correct step; (D) safety completeness — pattern-match against NZ-industry minimums (hazards + PPE + emergency); (E) clarity — flag line-worker-hostile jargon/sentence length. Admin can manually re-run the reviewer after edits.
+  6. Publish gate forces admin through a per-block verify checklist — every block has a checkbox tied to its source provenance; publish is blocked until all blocks signed off. The checklist UI doesn't allow bulk-tick.
+  7. Phase 13 block-library matching runs during extraction — if an extracted hazard semantically matches a global/org block, the parser proposes "link to existing block X" alongside "write new block"; admin chooses.
+  8. PDF embedded image extraction is bundle-safe (resolves the Phase 2-02 D `@napi-rs/canvas` deferral) — production build cost and runtime memory profile validated before Plan 20-01 commits to an extraction library.
+
+**Plans**: 5 plans (sketch — finalised by /gsd-plan-phase)
+**UI hint**: yes (heavy — review surface convergence + new source viewer pane + verify checklist UI)
+
+Plans:
+- [ ] 20-00-PLAN.md — Wave 0: Playwright test stubs for all conversion-V2 acceptance criteria; provenance schema fixture files (DOCX/PDF/scan/video sample sources with hand-labelled expected anchoring); test project registration
+- [ ] 20-01-PLAN.md — Provenance schema + PDF image extraction: unified `block_provenance` JSONB shape (source_type + source_ref + region_coords/timestamp/paragraph_id) on `sop_section_blocks` and/or `block_versions`; PDF embedded-image extraction spike outcome implementation (resolves Phase 2-02 D); DOCX paragraph/run id capture; scan crop-region capture
+- [ ] 20-02-PLAN.md — Parser refactor: gpt-parser emits Puck `layout_data` directly with provenance per block (not just `sop_sections` + `sop_steps` rows); semantic extraction of tables → HazardCard[] / SopTable, diagrams → PhotoBlock or DiagramHotspotBlock with hotspot pre-placement, charts → image + extracted-data block; block-library matching during extraction (propose link-to-existing alongside write-new)
+- [ ] 20-03-PLAN.md — Review surface convergence: `/admin/sops/[sopId]/review` retired; parsed drafts route into `/admin/sops/builder/[sopId]` with parse-status banner; SourceViewerPane component (persistent right-pane on desktop, drawer on tablet) with click-to-highlight via provenance metadata; builder ↔ source bidirectional selection sync
+- [ ] 20-04-PLAN.md — AI reviewer (5 jobs) + verify-checklist publish gate: extend `verify-sop.ts` to run jobs A–E with structured output schema; ReviewerFlagsPanel surfaces flags per-block in the builder canvas; manual re-run trigger; VerifyChecklistGate component blocks publish until every block ticked; rejection-flow back to builder; audit row in `sop_publish_verifications`
+
+**Open scope decisions to resolve in spec/discuss:**
+1. AI prompt SOPs (Phase 14) — no source to verify against; do jobs A/B/C N/A, leaving only D + E? Or skip the verify-checklist gate entirely for AI-prompt source?
+2. Video-source provenance — timestamp anchoring vs. frame-grab thumbnails as the "source region" the source viewer highlights?
+3. Block-library matching threshold — at what semantic similarity does the parser propose link-to-existing vs. always write-new?
+4. Per-block verify checklist — single sign-off pass, or split by section (hazards verified by safety_manager, steps verified by supervisor)?
+5. Where does AI-reviewer cost get capped — re-run limit per SOP per day? Token budget per parse?
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12 → 12.5 → 13 → 14 → 14.5 → 15 → 16 → 17 → 18 → 19
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12 → 12.5 → 13 → 14 → 14.5 → 15 → 16 → 17 → 18 → 19 → 20
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -494,6 +532,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 17. Image & Diagram Annotation | 0/4 | Not started |  |
 | 18. Collaborative Editing | 0/3 | Not started |  |
 | 19. Pipeline Integration, Bundle Isolation & v3.0 Closeout | 0/4 | Not started |  |
+| 20. Conversion Pipeline V2 | 0/5 | Not started |  |
 
 ## Backlog
 
