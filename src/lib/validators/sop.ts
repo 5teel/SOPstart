@@ -12,6 +12,10 @@ export const SopStepSchema = z.object({
   required_tools: z.array(z.string()).nullable(),
   time_estimate_minutes: z.number().nullable(),
   has_image: z.boolean(),
+  // Phase 20 interim — image positions extracted from DOCX as [IMAGE N] tokens
+  // in the source text. GPT must list every [IMAGE N] index that appears in or
+  // immediately around this step. Empty array if no image tokens were near the step.
+  image_indexes: z.array(z.number().int()).nullable(),
 })
 
 export const SopSectionSchema = z.object({

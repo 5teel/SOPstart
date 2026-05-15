@@ -43,7 +43,7 @@ const SOP_TOOL: Anthropic.Tool = {
               description: 'For procedural sections with numbered steps',
               items: {
                 type: 'object',
-                required: ['order', 'text', 'has_image'],
+                required: ['order', 'text', 'has_image', 'image_indexes'],
                 properties: {
                   order: { type: 'integer' },
                   text: { type: 'string' },
@@ -53,6 +53,13 @@ const SOP_TOOL: Anthropic.Tool = {
                   required_tools: { type: 'array', items: { type: 'string' }, nullable: true },
                   time_estimate_minutes: { type: 'number', nullable: true },
                   has_image: { type: 'boolean' },
+                  image_indexes: {
+                    type: 'array',
+                    items: { type: 'integer' },
+                    nullable: true,
+                    description:
+                      'Indexes of every [IMAGE N] token from the source text that belongs to this step. Empty array if no images. Each token can be attributed to AT MOST one step.',
+                  },
                 },
               },
             },
@@ -99,7 +106,21 @@ Also include any other relevant sections: Training Requirements, Tools/Equipment
 - 0.5-0.7 = significant inference required
 - Below 0.5 = source quality too poor
 
-Set parse_notes to describe what you inferred vs what was explicitly stated.`
+Set parse_notes to describe what you inferred vs what was explicitly stated.
+
+### 5. IMAGES — Attribute every [IMAGE N] token
+The source text may contain tokens like \`[IMAGE 0]\`, \`[IMAGE 1]\`, etc. — each one is a real image embedded in the original document at that position. You MUST attribute every image token to the step (or section) where it visually belongs.
+
+For each step, populate \`image_indexes\` with the numeric indexes of every image that appears in or immediately surrounds that step. Example: if the source contains "1. Open the valve [IMAGE 3]. Wait for pressure to stabilise.", then that step's \`image_indexes\` is \`[3]\`.
+
+Rules:
+- Each image index may appear in AT MOST one step's image_indexes.
+- If an image appears between two steps, attribute it to the more relevant one based on caption / surrounding context.
+- If you cannot tell which step an image belongs to (cover image, appendix figure), leave its index OUT of every step — the server will surface unattributed images at section level for admin review.
+- If a step has no nearby images, return \`image_indexes: []\` (or null).
+- Do NOT preserve the \`[IMAGE N]\` token in the step's \`text\` field — the token is metadata only. Write the step text naturally without the bracket.
+
+Also continue setting \`has_image: true\` for backward compatibility whenever \`image_indexes\` is non-empty.`
 
 const FORMAT_HINTS: Partial<Record<SourceFileType | 'prompt', string>> = {
   xlsx: '\n\nNote: This text was extracted from an Excel spreadsheet. Treat table headers as section titles, preserve numerical tolerances exactly.',
@@ -247,6 +268,7 @@ export async function parseSopWithGPT(
             required_tools: (st.required_tools as string[]) ?? null,
             time_estimate_minutes: (st.time_estimate_minutes as number) ?? null,
             has_image: (st.has_image as boolean) ?? false,
+            image_indexes: (st.image_indexes as number[] | null) ?? null,
           }))
         : null,
       confidence: (s.confidence as number) ?? 0.7,

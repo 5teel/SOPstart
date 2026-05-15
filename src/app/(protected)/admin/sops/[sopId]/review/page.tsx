@@ -65,6 +65,24 @@ export default async function ReviewPage({
     )
   }
 
+  // Sign storage paths on sop_images so <img src={...}> actually loads. The
+  // sop-images bucket is private (00005), so the raw storage_path returns 404
+  // when used as a src directly. We rewrite each sop_image.storage_path to a
+  // presigned URL valid for the review session (1 hour).
+  for (const section of sop.sop_sections ?? []) {
+    for (const img of section.sop_images ?? []) {
+      if (!img.storage_path || img.storage_path.startsWith('http')) continue
+      const { data } = await supabase.storage
+        .from('sop-images')
+        .createSignedUrl(img.storage_path, 3600)
+      if (data?.signedUrl) {
+        // Mutate the row in-place — the type still has `storage_path: string`,
+        // we're just swapping the bucket path for a usable URL on this render.
+        img.storage_path = data.signedUrl
+      }
+    }
+  }
+
   // Fetch latest parse job
   const { data: parseJob } = await supabase
     .from('parse_jobs')

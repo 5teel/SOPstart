@@ -145,6 +145,12 @@ export async function POST(request: NextRequest) {
       })
       .eq('id', sopId)
 
+    // Track which image indexes have been attached to a step so we can surface
+    // unattributed images (cover photos, appendix figures) at SOP-level rather
+    // than dropping them on the floor (legacy bug — Phase 20 fixes this properly).
+    const attachedImageIndexes = new Set<number>()
+    let firstSectionId: string | null = null
+
     // Insert sections
     for (const section of parsed.sections) {
       const { data: sectionRow, error: sectionError } = await admin
@@ -165,6 +171,7 @@ export async function POST(request: NextRequest) {
         console.error('Section insert error:', sectionError)
         continue
       }
+      if (firstSectionId === null) firstSectionId = sectionRow.id
 
       // Insert steps if present
       if (section.steps && section.steps.length > 0) {
@@ -184,20 +191,64 @@ export async function POST(request: NextRequest) {
             .select('id')
             .single()
 
-          // Link images to steps if the step flagged has_image
-          if (step.has_image && stepRow) {
-            const matchingImage = uploadedImages.find((img) => img.index === step.order - 1)
-            if (matchingImage) {
+          if (!stepRow) continue
+
+          // Primary path: use GPT's image_indexes (Phase 20 interim — sourced from
+          // [IMAGE N] tokens preserved through HTML-strip). Each index can only
+          // be attached once.
+          const requestedIndexes = (step.image_indexes ?? []).filter(
+            (n) => !attachedImageIndexes.has(n)
+          )
+          for (const idx of requestedIndexes) {
+            const img = uploadedImages.find((u) => u.index === idx)
+            if (img) {
               await admin.from('sop_images').insert({
                 sop_id: sopId,
                 section_id: sectionRow.id,
                 step_id: stepRow.id,
-                storage_path: matchingImage.storagePath,
-                content_type: matchingImage.contentType,
+                storage_path: img.storagePath,
+                content_type: img.contentType,
               })
+              attachedImageIndexes.add(idx)
+            }
+          }
+
+          // Legacy fallback: positional `step.order - 1` (still kept for SOPs
+          // that round-trip through this code BEFORE GPT-image-token support
+          // lands). Skips indexes already attached above.
+          if (requestedIndexes.length === 0 && step.has_image) {
+            const fallback = uploadedImages.find(
+              (img) => img.index === step.order - 1 && !attachedImageIndexes.has(img.index)
+            )
+            if (fallback) {
+              await admin.from('sop_images').insert({
+                sop_id: sopId,
+                section_id: sectionRow.id,
+                step_id: stepRow.id,
+                storage_path: fallback.storagePath,
+                content_type: fallback.contentType,
+              })
+              attachedImageIndexes.add(fallback.index)
             }
           }
         }
+      }
+    }
+
+    // Surface any unattributed images at SOP-level so the admin can re-anchor
+    // them from the review surface instead of losing them. Attached to the
+    // first section with step_id = null so SectionEditor renders them in its
+    // inline-images gallery.
+    if (firstSectionId !== null) {
+      const orphans = uploadedImages.filter((img) => !attachedImageIndexes.has(img.index))
+      for (const img of orphans) {
+        await admin.from('sop_images').insert({
+          sop_id: sopId,
+          section_id: firstSectionId,
+          step_id: null,
+          storage_path: img.storagePath,
+          content_type: img.contentType,
+        })
       }
     }
 

@@ -32,8 +32,15 @@ export async function extractDocx(buffer: ArrayBuffer): Promise<DocxExtractionRe
     }
   )
 
-  // Strip HTML tags for plain text (fed to GPT-4o)
-  const text = result.value
+  // Strip HTML tags for plain text (fed to GPT-4o), BUT first replace each
+  // <img src="__IMAGE_N__" .../> with a visible `[IMAGE N]` token so the
+  // image positions survive HTML stripping. GPT can then attribute each token
+  // to the step it appears in via the `image_indexes` field.
+  const htmlWithImageTokens = result.value.replace(
+    /<img\b[^>]*src=["']__IMAGE_(\d+)__["'][^>]*\/?>/gi,
+    '[IMAGE $1]'
+  )
+  const text = htmlWithImageTokens
     .replace(/<[^>]*>/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()

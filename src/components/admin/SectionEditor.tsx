@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { CheckCircle2 } from 'lucide-react'
+import { CheckCircle2, ChevronDown, ChevronRight } from 'lucide-react'
 import { SopTable, containsMarkdownTable } from '@/components/sop/SopTable'
 import { resolveTabStyling } from '@/lib/sections/resolveRenderFamily'
 import type { SopSection, SopStep, SopImage } from '@/types/sop'
@@ -19,6 +19,9 @@ export default function SectionEditor({
 }: SectionEditorProps) {
   const [mode, setMode] = useState<'read' | 'edit'>('read')
   const [approved, setApproved] = useState(section.approved)
+  // Auto-collapse on approve: approved sections collapse to header-only so unreviewed
+  // sections are easier to scan. Click the header (or "Show details") to re-expand.
+  const [collapsed, setCollapsed] = useState(section.approved)
   const [saving, setSaving] = useState(false)
   const [savedFlash, setSavedFlash] = useState(false)
   const [approving, setApproving] = useState(false)
@@ -35,6 +38,7 @@ export default function SectionEditor({
     setEditContent(section.content ?? '')
     setEditSteps(section.sop_steps.map((s) => ({ id: s.id, text: s.text })))
     setMode('edit')
+    setCollapsed(false) // editing requires the body
     // autoFocus is handled by the ref on mount below
     setTimeout(() => firstTextareaRef.current?.focus(), 0)
   }
@@ -84,6 +88,7 @@ export default function SectionEditor({
       })
       if (res.ok) {
         setApproved(true)
+        setCollapsed(true)
         onApprovalChange()
       }
     } finally {
@@ -99,6 +104,7 @@ export default function SectionEditor({
     })
     if (res.ok) {
       setApproved(false)
+      setCollapsed(false)
       onApprovalChange()
     }
   }
@@ -132,9 +138,30 @@ export default function SectionEditor({
         approved ? 'border-green-500' : 'border-[var(--ink-100)]',
       ].join(' ')}
     >
-      {/* Card header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--ink-100)]">
+      {/* Card header — clickable when approved to toggle collapse */}
+      <button
+        type="button"
+        onClick={() => {
+          if (approved && mode === 'read') setCollapsed((c) => !c)
+        }}
+        aria-expanded={!collapsed}
+        disabled={!approved || mode === 'edit'}
+        className={[
+          'w-full flex items-center justify-between px-4 py-3 text-left',
+          collapsed ? '' : 'border-b border-[var(--ink-100)]',
+          approved && mode === 'read'
+            ? 'cursor-pointer hover:bg-[var(--paper-2)]/40'
+            : 'cursor-default',
+        ].join(' ')}
+      >
         <div className="flex items-center gap-2 min-w-0">
+          {approved && (
+            collapsed ? (
+              <ChevronRight className="text-[var(--ink-500)] flex-shrink-0" size={16} />
+            ) : (
+              <ChevronDown className="text-[var(--ink-500)] flex-shrink-0" size={16} />
+            )
+          )}
           <span className="text-xs uppercase tracking-wide text-[var(--ink-500)] flex-shrink-0">
             {styling.displayName ?? styling.family}
           </span>
@@ -150,9 +177,11 @@ export default function SectionEditor({
             <CheckCircle2 className="text-green-400" size={18} />
           )}
         </div>
-      </div>
+      </button>
 
-      {/* Card body */}
+      {/* Card body + footer — hidden when approved + collapsed */}
+      {!collapsed && (
+      <>
       {mode === 'read' ? (
         <div className="px-4 py-4 hover:bg-[var(--paper-2)]/20 cursor-text transition-colors">
           {isStepsSection ? (
@@ -307,6 +336,8 @@ export default function SectionEditor({
           </>
         )}
       </div>
+      </>
+      )}
     </div>
   )
 }
