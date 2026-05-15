@@ -334,7 +334,7 @@ export function WizardClient({ categories }: WizardClientProps) {
               ))}
             </select>
             <span className="text-xs text-[var(--ink-500)]">
-              Used to surface the most relevant blocks when you pick from the library.
+              Used to surface the most relevant items when you pick from the library.
             </span>
           </label>
 

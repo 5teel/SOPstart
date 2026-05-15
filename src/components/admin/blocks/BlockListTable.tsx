@@ -27,7 +27,7 @@ export function BlockListTable({ blocks, categories }: Props) {
   const categoryMap = new Map(categories.map((c) => [c.slug, c]))
 
   function handleArchive(blockId: string) {
-    if (!confirm('Archive this block? It will no longer appear in the picker, but existing SOPs keep their snapshot.')) {
+    if (!confirm('Archive this item? It will no longer appear in the picker, but existing SOPs keep their snapshot.')) {
       return
     }
     startTransition(async () => {
@@ -43,9 +43,9 @@ export function BlockListTable({ blocks, categories }: Props) {
   if (blocks.length === 0) {
     return (
       <div className="bg-white border border-[var(--ink-100)] rounded-lg p-8 text-center">
-        <p className="text-base font-semibold text-[var(--ink-900)] mb-1">No blocks yet</p>
+        <p className="text-base font-semibold text-[var(--ink-900)] mb-1">Nothing in your library yet</p>
         <p className="text-sm text-[var(--ink-500)]">
-          Save your first block from the builder via the three-dot menu on any hazard / PPE / step.
+          Save your first item from the builder via the three-dot menu on any hazard, PPE, or step.
         </p>
       </div>
     )

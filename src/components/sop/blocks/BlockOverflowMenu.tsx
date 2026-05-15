@@ -75,7 +75,7 @@ export function BlockOverflowMenu({
     setOpen(false)
     if (onDelete) {
       // eslint-disable-next-line no-alert
-      if (window.confirm('Delete this block?')) onDelete()
+      if (window.confirm('Delete this item?')) onDelete()
     }
   }
 
@@ -93,7 +93,7 @@ export function BlockOverflowMenu({
           e.stopPropagation()
           setOpen((prev) => !prev)
         }}
-        aria-label="Block actions"
+        aria-label="Item actions"
         data-testid="block-overflow-trigger"
         className="p-1.5 rounded-md bg-[var(--paper)]/80 border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] hover:bg-white backdrop-blur-sm shadow"
       >

@@ -74,7 +74,7 @@ function AdminDashboard() {
       <DashTile
         href="/admin/blocks"
         eyebrow="REUSE"
-        title="Block library"
+        title="Library"
         description="Reusable hazards, PPE, callouts and steps shared across SOPs."
       />
       <DashTile

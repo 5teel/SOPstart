@@ -7,7 +7,7 @@ import { listBlocks, listBlockCategories } from '@/actions/blocks'
 import { BlockListTable } from '@/components/admin/blocks/BlockListTable'
 
 export const metadata: Metadata = {
-  title: 'Block Library',
+  title: 'Library',
 }
 
 const KIND_FILTERS = [
@@ -20,8 +20,8 @@ const KIND_FILTERS = [
 ]
 
 const SCOPE_TABS: { label: string; value: 'org' | 'global' }[] = [
-  { label: 'Org blocks', value: 'org' },
-  { label: 'Global blocks', value: 'global' },
+  { label: 'My library', value: 'org' },
+  { label: 'Global library', value: 'global' },
 ]
 
 export default async function BlocksLibraryPage({
@@ -61,17 +61,17 @@ export default async function BlocksLibraryPage({
     <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10 bg-[var(--paper)] min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
-        <h1 className="text-2xl font-bold text-[var(--ink-900)]">Block Library</h1>
+        <h1 className="text-2xl font-bold text-[var(--ink-900)]">Library</h1>
         <Link
           href="/admin/blocks/new"
           className="bg-[var(--ink-900)] text-white font-semibold px-4 h-[44px] rounded-lg hover:bg-[var(--ink-700)] transition-colors text-sm inline-flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
-          New block
+          New item
         </Link>
       </div>
       <p className="text-sm text-[var(--ink-500)] mb-6">
-        Reusable hazards, PPE, and step blocks across your SOPs.
+        Reusable hazards, PPE, and steps across your SOPs.
       </p>
 
       {/* Admin sub-nav */}
@@ -86,7 +86,7 @@ export default async function BlocksLibraryPage({
           href="/admin/blocks"
           className="pb-3 px-1 font-medium border-b-2 border-[var(--ink-900)] text-[var(--ink-900)]"
         >
-          Blocks
+          Library
         </Link>
       </nav>
 

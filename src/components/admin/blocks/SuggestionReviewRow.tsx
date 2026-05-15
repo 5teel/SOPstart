@@ -96,7 +96,7 @@ export function SuggestionReviewRow({ suggestion, onDecision }: SuggestionReview
           </div>
           <dl className="space-y-2">
             <div>
-              <dt className="text-[11px] text-[var(--ink-500)]">Block name</dt>
+              <dt className="text-[11px] text-[var(--ink-500)]">Item name</dt>
               <dd className="text-[var(--ink-900)] font-medium break-words">
                 {suggestion.snapshot.name}
               </dd>

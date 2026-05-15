@@ -21,7 +21,7 @@ export function BlockPickerPreview({ block, content }: BlockPickerPreviewProps) 
   if (!block || !content) {
     return (
       <div className="bg-white border border-[var(--ink-100)] rounded-md p-6 h-full flex items-center justify-center">
-        <p className="text-sm text-[var(--ink-500)]">Select a block to preview</p>
+        <p className="text-sm text-[var(--ink-500)]">Select an item to preview</p>
       </div>
     )
   }

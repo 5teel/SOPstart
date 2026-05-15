@@ -61,7 +61,7 @@ export function BlockPicker({
       })
       .catch((e: unknown) => {
         if (cancelled) return
-        setError(e instanceof Error ? e.message : 'Failed to load blocks')
+        setError(e instanceof Error ? e.message : 'Failed to load library')
         setLoading(false)
       })
     return () => {
@@ -279,7 +279,7 @@ export function BlockPicker({
 
                 {noCategoryMatches && (
                   <div className="bg-amber-900/30 text-amber-200 p-3 rounded border border-amber-500/40 text-xs">
-                    No blocks tagged for {sopCategoryLabel ?? sopCategory}. Showing all {kindSlug} blocks.
+                    Nothing tagged for {sopCategoryLabel ?? sopCategory}. Showing all {kindSlug} items.
                   </div>
                 )}
 
@@ -290,7 +290,7 @@ export function BlockPicker({
                   <section className="flex flex-col gap-2">
                     {(grouped.exact.length > 0 || grouped.related.length > 0) && (
                       <h3 className="text-xs uppercase tracking-wider text-[var(--ink-500)] mt-2">
-                        Other {kindSlug} blocks
+                        Other {kindSlug} items
                       </h3>
                     )}
                     {grouped.allOfKind
@@ -314,7 +314,7 @@ export function BlockPicker({
 
                 {grouped.totalCount === 0 && (
                   <div className="text-sm text-[var(--ink-500)] p-4 border border-dashed border-[var(--ink-100)] rounded">
-                    No {kindSlug} blocks in your library yet. Save one from the builder using the â‹¯ menu.
+                    No {kindSlug} items in your library yet. Save one from the builder using the â‹¯ menu.
                   </div>
                 )}
               </>
@@ -334,7 +334,7 @@ export function BlockPicker({
         <div className="px-6 py-4 border-t border-[var(--ink-100)] flex items-center justify-between gap-4">
           <fieldset className="flex flex-col gap-1">
             <legend className="text-[11px] uppercase tracking-wider text-[var(--ink-500)] mb-1">
-              When the source block changes
+              When the library source changes
             </legend>
             <div className="flex items-center gap-4">
               <label className="flex items-start gap-2 cursor-pointer">

@@ -6,7 +6,7 @@ import { listBlocks, listBlockCategories } from '@/actions/blocks'
 import { BlockListTable } from '@/components/admin/blocks/BlockListTable'
 
 export const metadata: Metadata = {
-  title: 'Global Block Library — Platform admin',
+  title: 'Global Library — Platform admin',
 }
 
 /**
@@ -34,10 +34,10 @@ export default async function GlobalBlocksPage() {
       <header className="flex items-start justify-between mb-2 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[var(--ink-900)]">
-            Global Block Library — Platform admin
+            Global Library — Platform admin
           </h1>
           <p className="text-sm text-[var(--ink-500)] mt-1 max-w-2xl">
-            Curated NZ-industry blocks visible read-only to every org.
+            Curated NZ-industry items visible read-only to every org.
             Edits propagate via follow-latest tracking (admins of follow-latest
             SOPs see an update-available badge in the builder).
           </p>
@@ -47,7 +47,7 @@ export default async function GlobalBlocksPage() {
           className="bg-[var(--ink-900)] text-white font-semibold px-4 h-[44px] rounded-lg hover:bg-[var(--ink-700)] transition-colors text-sm inline-flex items-center gap-2 whitespace-nowrap"
         >
           <Plus className="h-4 w-4" />
-          Create new global block
+          Create new global item
         </Link>
       </header>
 
@@ -57,7 +57,7 @@ export default async function GlobalBlocksPage() {
           href="/admin/global-blocks"
           className="pb-3 px-1 font-medium border-b-2 border-[var(--ink-900)] text-[var(--ink-900)]"
         >
-          Global Blocks
+          Global Library
         </Link>
         <Link
           href="/admin/global-blocks/suggestions"

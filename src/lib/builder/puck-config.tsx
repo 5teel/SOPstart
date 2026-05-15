@@ -79,7 +79,7 @@ export function UnsupportedBlockPlaceholder({ type }: { type?: string }): ReactE
       data-layout-placeholder="unsupported-block"
       className="bg-white border border-dashed border-[var(--ink-500)] rounded-xl p-4 text-[var(--ink-500)] text-sm mb-4"
     >
-      This block isn&apos;t supported in your app version - update required
+      This item isn&apos;t supported in your app version - update required
       {type ? ` (${type})` : ''}.
     </div>
   )
@@ -222,7 +222,7 @@ export const puckConfig: Config = {
               TextBlock,
               props,
               'TextBlock',
-              'Text block - fix required props',
+              'Text - fix required props',
               puck
             )}
           </>

@@ -87,7 +87,7 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
   }
 
   function handleArchive() {
-    if (!confirm('Archive this block? Existing SOPs keep their snapshot.')) return
+    if (!confirm('Archive this item? Existing SOPs keep their snapshot.')) return
     startTransition(async () => {
       const res = await archiveBlock(block.id)
       if ('error' in res) {

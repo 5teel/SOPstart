@@ -71,8 +71,8 @@ export function BlockUpdateReviewModal({
       }
       setToast(
         res.sopReturnedToDraft
-          ? 'Block updated. SOP returned to draft for re-publish.'
-          : 'Block updated.'
+          ? 'Item updated. SOP returned to draft for re-publish.'
+          : 'Item updated.'
       )
       onReviewed?.()
     })
@@ -119,10 +119,10 @@ export function BlockUpdateReviewModal({
               id="block-update-review-title"
               className="text-base font-semibold text-[var(--ink-900)]"
             >
-              Block update available — review changes
+              Library update available — review changes
             </h2>
             <p className="mt-1 text-xs text-[var(--ink-500)]">
-              This block&apos;s source has been updated. Review the changes and
+              This item&apos;s source has been updated. Review the changes and
               decide whether to apply them to this SOP.
             </p>
           </div>
@@ -149,8 +149,8 @@ export function BlockUpdateReviewModal({
             <div className="flex items-start gap-2 text-sm text-amber-200 bg-amber-950/30 border border-amber-700/40 rounded-md p-3">
               <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
               <div>
-                <strong>Block kind changed.</strong> Accepting will replace the
-                block entirely (
+                <strong>Item kind changed.</strong> Accepting will replace it
+                entirely (
                 {diff.fields[0]?.oldValue} → {diff.fields[0]?.newValue}).
               </div>
             </div>

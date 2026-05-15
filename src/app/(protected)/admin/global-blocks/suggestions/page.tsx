@@ -33,8 +33,8 @@ export default async function SuggestionsQueuePage() {
           Pending Suggestions for Global Library
         </h1>
         <p className="text-sm text-[var(--ink-500)] mt-1 max-w-2xl">
-          Review, promote, or reject blocks submitted by orgs for the shared
-          NZ-industry library. Promoted blocks become read-only globals visible
+          Review, promote, or reject items submitted by orgs for the shared
+          NZ-industry library. Promoted items become read-only globals visible
           to every org.
         </p>
       </header>
@@ -44,7 +44,7 @@ export default async function SuggestionsQueuePage() {
           href="/admin/global-blocks"
           className="pb-3 px-1 font-medium text-[var(--ink-500)] hover:text-[var(--ink-900)]"
         >
-          Global Blocks
+          Global Library
         </Link>
         <Link
           href="/admin/global-blocks/suggestions"
@@ -65,9 +65,9 @@ export default async function SuggestionsQueuePage() {
             No pending suggestions
           </p>
           <p className="text-sm text-[var(--ink-500)]">
-            Org admins can submit blocks via &ldquo;Suggest for global&rdquo; in
-            the Save to library modal (built in 13-01). Promoted suggestions
-            land in the Global Blocks tab.
+            Org admins can submit items via &ldquo;Suggest for global&rdquo; in
+            the Save to library modal. Promoted suggestions land in the Global
+            Library tab.
           </p>
         </div>
       ) : (
