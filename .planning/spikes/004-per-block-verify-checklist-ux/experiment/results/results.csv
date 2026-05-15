@@ -1,0 +1,4 @@
+pass,pausePerBlockMs,totalBlocks,approved,publishedAtMs,wallMs,keys,perBlockApproxMs,errors
+machine-speed,0,50,50,105,188,50,2.1,1
+skim-speed,500,50,50,24969,25557,50,499.4,0
+careful-speed,3000,50,50,148016,151127,50,2960.3,0

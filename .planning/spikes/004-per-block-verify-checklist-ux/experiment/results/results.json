@@ -1,0 +1,49 @@
+[
+  {
+    "pass": "machine-speed",
+    "pausePerBlockMs": 0,
+    "totalBlocks": 50,
+    "approved": 50,
+    "declined": 0,
+    "flaggedAcked": 10,
+    "publishedAtMs": 105.40000000596046,
+    "wallMs": 188,
+    "keystrokes": 50,
+    "pointerEvents": 0,
+    "perBlockApproxMs": 2.108000000119209,
+    "screenshot": "screenshots/machine-speed.png",
+    "errors": [
+      "console: Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ]
+  },
+  {
+    "pass": "skim-speed",
+    "pausePerBlockMs": 500,
+    "totalBlocks": 50,
+    "approved": 50,
+    "declined": 0,
+    "flaggedAcked": 10,
+    "publishedAtMs": 24968.80000001192,
+    "wallMs": 25557,
+    "keystrokes": 50,
+    "pointerEvents": 0,
+    "perBlockApproxMs": 499.37600000023843,
+    "screenshot": "screenshots/skim-speed.png",
+    "errors": []
+  },
+  {
+    "pass": "careful-speed",
+    "pausePerBlockMs": 3000,
+    "totalBlocks": 50,
+    "approved": 50,
+    "declined": 0,
+    "flaggedAcked": 10,
+    "publishedAtMs": 148015.5,
+    "wallMs": 151127,
+    "keystrokes": 50,
+    "pointerEvents": 0,
+    "perBlockApproxMs": 2960.31,
+    "screenshot": "screenshots/careful-speed.png",
+    "errors": []
+  }
+]

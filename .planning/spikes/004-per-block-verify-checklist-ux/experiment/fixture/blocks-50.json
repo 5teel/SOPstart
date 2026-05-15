@@ -1,0 +1,768 @@
+{
+  "title": "Manual Swabbing of a Forming Machine",
+  "sourcePdf": "medium-forming-swabbing.pdf",
+  "blockCount": 50,
+  "blocks": [
+    {
+      "blockId": "b-001",
+      "kind": "heading",
+      "sectionId": "sec-safety",
+      "text": "Safety Requirements",
+      "page": null,
+      "bbox": null,
+      "flags": [
+        {
+          "severity": "warning",
+          "kind": "omission",
+          "source_quote": "Do not begin these tasks without confirmation that personnel directly involved have completed the required training associated with the work instruction activity",
+          "source_location_hint": "Page 2, step 1",
+          "missing_from": "Safety Requirements or Preparing Swab Brushes",
+          "description": "Mandatory training confirmation before starting work missing"
+        }
+      ]
+    },
+    {
+      "blockId": "b-002",
+      "kind": "hazard",
+      "sectionId": "sec-safety",
+      "stepId": "step-safety-1",
+      "text": "Observe O-I standard safety requirements and procedures defined by the Global Environmental Health & Safety (EH&S) organization, as well as all applicable local, regional, and national requirements.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-003",
+      "kind": "hazard",
+      "sectionId": "sec-safety",
+      "stepId": "step-safety-2",
+      "text": "Identified hazards: Slip, Crush, Hand injury, Hot Surface, Bump, Inhalation, Steam.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-004",
+      "kind": "heading",
+      "sectionId": "sec-prep",
+      "text": "Preparing Swab Brushes",
+      "page": null,
+      "bbox": null,
+      "flags": [
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "Only use the approved commercial swabbing compound specified in the swabbing instructions. Do not add other materials to the approved compounds, or mix commercial compounds",
+          "source_location_hint": "Page 3, step 7",
+          "missing_from": "Preparing Swab Brushes",
+          "description": "Approved compound restriction and prohibition on mixing compounds missing"
+        },
+        {
+          "severity": "warning",
+          "kind": "omission",
+          "source_quote": "Do not begin these tasks without confirmation that personnel directly involved have completed the required training associated with the work instruction activity",
+          "source_location_hint": "Page 2, step 1",
+          "missing_from": "Safety Requirements or Preparing Swab Brushes",
+          "description": "Mandatory training confirmation before starting work missing"
+        }
+      ]
+    },
+    {
+      "blockId": "b-005",
+      "kind": "step",
+      "sectionId": "sec-prep",
+      "stepId": "step-prep-1",
+      "text": "Begin each shift with new, clean swab brushes of the appropriate diameter and length per the job history.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-006",
+      "kind": "step",
+      "sectionId": "sec-prep",
+      "stepId": "step-prep-1",
+      "text": "Replace them during the shift as needed.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-007",
+      "kind": "step",
+      "sectionId": "sec-prep",
+      "stepId": "step-prep-2",
+      "text": "Use one swab brush for the neckrings.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-008",
+      "kind": "step",
+      "sectionId": "sec-prep",
+      "stepId": "step-prep-3",
+      "text": "Use two swab brushes for the blanks, swabbing half of the sections with each brush.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-009",
+      "kind": "step",
+      "sectionId": "sec-prep",
+      "stepId": "step-prep-4",
+      "text": "Prepare a new swab brush by saturating it with a light oil so that the swab lubricant compound will penetrate into the swab fibers.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-010",
+      "kind": "step",
+      "sectionId": "sec-prep",
+      "stepId": "step-prep-5",
+      "text": "Inspect the swab brushes before each swab cycle.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-011",
+      "kind": "step",
+      "sectionId": "sec-prep",
+      "stepId": "step-prep-5",
+      "text": "Replace a swab brush if it becomes hard or scorched, is losing fibers, forms a tail, or is no longer soft, fluffy and able to apply the proper coat of swabbing compound.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-012",
+      "kind": "photo",
+      "sectionId": "sec-prep",
+      "stepId": "step-prep-5",
+      "photoId": "photo-bad-brush",
+      "caption": "Bad Swab Brush — example of a brush that should be replaced.",
+      "page": null,
+      "bbox": null,
+      "flags": [
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "Do not put your thumb or finger through the ring on the swab brush handle...Serious injuries to your thumb or fingers may result if the swab gets caught in the section.",
+          "source_location_hint": "Pages 5, 7, 11, 15",
+          "missing_from": "All swabbing sections (neckrings, blanks, mould-side)",
+          "description": "Critical hand injury warning repeated 4 times in source is completely absent from draft"
+        },
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "When swabbing, hold the swab along the metal handle with an overhand grip. Stand comfortably and balanced, and keep your free hand away from moving parts while swabbing.",
+          "source_location_hint": "Page 5, steps 8-9",
+          "missing_from": "Properly Swab a Section",
+          "description": "Safe hand position and stance requirements missing"
+        },
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "Only use the approved commercial swabbing compound specified in the swabbing instructions. Do not add other materials to the approved compounds, or mix commercial compounds",
+          "source_location_hint": "Page 3, step 7",
+          "missing_from": "Preparing Swab Brushes",
+          "description": "Approved compound restriction and prohibition on mixing compounds missing"
+        },
+        {
+          "severity": "warning",
+          "kind": "omission",
+          "source_quote": "Do not begin these tasks without confirmation that personnel directly involved have completed the required training associated with the work instruction activity",
+          "source_location_hint": "Page 2, step 1",
+          "missing_from": "Safety Requirements or Preparing Swab Brushes",
+          "description": "Mandatory training confirmation before starting work missing"
+        },
+        {
+          "severity": "warning",
+          "kind": "omission",
+          "source_quote": "Do not allow swab compound to run or drip down the blanks because this can cause carbon buildup, affect gob loading, and cause a jam-up.",
+          "source_location_hint": "Page 10, step 5.3",
+          "missing_from": "Swab the Blanks",
+          "description": "Warning about dripping compound causing jam-up hazard missing"
+        }
+      ]
+    },
+    {
+      "blockId": "b-013",
+      "kind": "step",
+      "sectionId": "sec-prep",
+      "stepId": "step-prep-6",
+      "text": "When a swab is no longer useable, remove the head and place it into a designated container per regional or country specific environmental regulations.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-014",
+      "kind": "heading",
+      "sectionId": "sec-swab-section",
+      "text": "Properly Swab a Section",
+      "page": null,
+      "bbox": null,
+      "flags": [
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "When swabbing, hold the swab along the metal handle with an overhand grip. Stand comfortably and balanced, and keep your free hand away from moving parts while swabbing.",
+          "source_location_hint": "Page 5, steps 8-9",
+          "missing_from": "Properly Swab a Section",
+          "description": "Safe hand position and stance requirements missing"
+        }
+      ]
+    },
+    {
+      "blockId": "b-015",
+      "kind": "step",
+      "sectionId": "sec-swab-section",
+      "stepId": "step-swab-1",
+      "text": "Review the established swabbing instructions for the job being produced.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-016",
+      "kind": "step",
+      "sectionId": "sec-swab-section",
+      "stepId": "step-swab-2",
+      "text": "Determine the minimum number of cycles to reject ware after swabbing based on the control document or a checklist.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-017",
+      "kind": "step",
+      "sectionId": "sec-swab-section",
+      "stepId": "step-swab-3",
+      "text": "Before swabbing a section, activate the “Swab Cycle” switch on the section control panel.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-018",
+      "kind": "step",
+      "sectionId": "sec-swab-section",
+      "stepId": "step-swab-3",
+      "text": "The Manual swab light will begin to blink, gob loading will stop, and the section will clear glass from the blank side.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-019",
+      "kind": "photo",
+      "sectionId": "sec-swab-section",
+      "stepId": "step-swab-3",
+      "photoId": "photo-swab-cycle-switch",
+      "caption": "Swab Cycle Switch on the section control panel.",
+      "page": null,
+      "bbox": null,
+      "flags": [
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "Do not put your thumb or finger through the ring on the swab brush handle...Serious injuries to your thumb or fingers may result if the swab gets caught in the section.",
+          "source_location_hint": "Pages 5, 7, 11, 15",
+          "missing_from": "All swabbing sections (neckrings, blanks, mould-side)",
+          "description": "Critical hand injury warning repeated 4 times in source is completely absent from draft"
+        },
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "When swabbing, hold the swab along the metal handle with an overhand grip. Stand comfortably and balanced, and keep your free hand away from moving parts while swabbing.",
+          "source_location_hint": "Page 5, steps 8-9",
+          "missing_from": "Properly Swab a Section",
+          "description": "Safe hand position and stance requirements missing"
+        },
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "Only use the approved commercial swabbing compound specified in the swabbing instructions. Do not add other materials to the approved compounds, or mix commercial compounds",
+          "source_location_hint": "Page 3, step 7",
+          "missing_from": "Preparing Swab Brushes",
+          "description": "Approved compound restriction and prohibition on mixing compounds missing"
+        },
+        {
+          "severity": "warning",
+          "kind": "omission",
+          "source_quote": "Do not begin these tasks without confirmation that personnel directly involved have completed the required training associated with the work instruction activity",
+          "source_location_hint": "Page 2, step 1",
+          "missing_from": "Safety Requirements or Preparing Swab Brushes",
+          "description": "Mandatory training confirmation before starting work missing"
+        },
+        {
+          "severity": "warning",
+          "kind": "omission",
+          "source_quote": "Do not allow swab compound to run or drip down the blanks because this can cause carbon buildup, affect gob loading, and cause a jam-up.",
+          "source_location_hint": "Page 10, step 5.3",
+          "missing_from": "Swab the Blanks",
+          "description": "Warning about dripping compound causing jam-up hazard missing"
+        },
+        {
+          "severity": "critical",
+          "kind": "anchoring",
+          "photo_id": "photo-swab-cycle-switch",
+          "current_step_id": "step-mould-5",
+          "current_step_text_snippet": "Swab bottom plates with a semi-dry swab. Place the swab on the inside bottom plate, and lightly drag it outward using a sl",
+          "photo_caption": "Swab Cycle Switch on the section control panel.",
+          "description": "Photo shows the Swab Cycle Switch on a control panel, but step describes swabbing bottom plates with a specific sliding technique. The photo's subject (control panel switch) is completely unrelated to the step's instruction (bottom plate swabbing technique).",
+          "suggested_step_id": "step-swab-3"
+        }
+      ]
+    },
+    {
+      "blockId": "b-020",
+      "kind": "step",
+      "sectionId": "sec-swab-section",
+      "stepId": "step-swab-4",
+      "text": "Begin swabbing when the “RUN” indicator light starts blinking, the blank side is clear of glass, and the neckring arms are in the revert position.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-021",
+      "kind": "photo",
+      "sectionId": "sec-swab-section",
+      "stepId": "step-swab-4",
+      "photoId": "photo-run-light",
+      "caption": "Run Indicator Light blinking — safe to begin swabbing.",
+      "page": null,
+      "bbox": null,
+      "flags": [
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "Do not put your thumb or finger through the ring on the swab brush handle...Serious injuries to your thumb or fingers may result if the swab gets caught in the section.",
+          "source_location_hint": "Pages 5, 7, 11, 15",
+          "missing_from": "All swabbing sections (neckrings, blanks, mould-side)",
+          "description": "Critical hand injury warning repeated 4 times in source is completely absent from draft"
+        },
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "When swabbing, hold the swab along the metal handle with an overhand grip. Stand comfortably and balanced, and keep your free hand away from moving parts while swabbing.",
+          "source_location_hint": "Page 5, steps 8-9",
+          "missing_from": "Properly Swab a Section",
+          "description": "Safe hand position and stance requirements missing"
+        },
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "Only use the approved commercial swabbing compound specified in the swabbing instructions. Do not add other materials to the approved compounds, or mix commercial compounds",
+          "source_location_hint": "Page 3, step 7",
+          "missing_from": "Preparing Swab Brushes",
+          "description": "Approved compound restriction and prohibition on mixing compounds missing"
+        },
+        {
+          "severity": "warning",
+          "kind": "omission",
+          "source_quote": "Do not begin these tasks without confirmation that personnel directly involved have completed the required training associated with the work instruction activity",
+          "source_location_hint": "Page 2, step 1",
+          "missing_from": "Safety Requirements or Preparing Swab Brushes",
+          "description": "Mandatory training confirmation before starting work missing"
+        },
+        {
+          "severity": "warning",
+          "kind": "omission",
+          "source_quote": "Do not allow swab compound to run or drip down the blanks because this can cause carbon buildup, affect gob loading, and cause a jam-up.",
+          "source_location_hint": "Page 10, step 5.3",
+          "missing_from": "Swab the Blanks",
+          "description": "Warning about dripping compound causing jam-up hazard missing"
+        }
+      ]
+    },
+    {
+      "blockId": "b-022",
+      "kind": "step",
+      "sectionId": "sec-swab-section",
+      "stepId": "step-swab-5-safety",
+      "text": "Do not put your thumb or finger through the ring on the swab brush handle, if your plant uses swabs with a ring.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-023",
+      "kind": "step",
+      "sectionId": "sec-swab-section",
+      "stepId": "step-swab-5-safety",
+      "text": "Serious injuries to your thumb or fingers may result if the swab gets caught in the section.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-024",
+      "kind": "photo",
+      "sectionId": "sec-swab-section",
+      "stepId": "step-swab-5-safety",
+      "photoId": "photo-thumb-warning",
+      "caption": "Do not place thumb or fingers in the ring!",
+      "page": null,
+      "bbox": null,
+      "flags": [
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "Do not put your thumb or finger through the ring on the swab brush handle...Serious injuries to your thumb or fingers may result if the swab gets caught in the section.",
+          "source_location_hint": "Pages 5, 7, 11, 15",
+          "missing_from": "All swabbing sections (neckrings, blanks, mould-side)",
+          "description": "Critical hand injury warning repeated 4 times in source is completely absent from draft"
+        },
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "When swabbing, hold the swab along the metal handle with an overhand grip. Stand comfortably and balanced, and keep your free hand away from moving parts while swabbing.",
+          "source_location_hint": "Page 5, steps 8-9",
+          "missing_from": "Properly Swab a Section",
+          "description": "Safe hand position and stance requirements missing"
+        },
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "Only use the approved commercial swabbing compound specified in the swabbing instructions. Do not add other materials to the approved compounds, or mix commercial compounds",
+          "source_location_hint": "Page 3, step 7",
+          "missing_from": "Preparing Swab Brushes",
+          "description": "Approved compound restriction and prohibition on mixing compounds missing"
+        },
+        {
+          "severity": "warning",
+          "kind": "omission",
+          "source_quote": "Do not begin these tasks without confirmation that personnel directly involved have completed the required training associated with the work instruction activity",
+          "source_location_hint": "Page 2, step 1",
+          "missing_from": "Safety Requirements or Preparing Swab Brushes",
+          "description": "Mandatory training confirmation before starting work missing"
+        },
+        {
+          "severity": "warning",
+          "kind": "omission",
+          "source_quote": "Do not allow swab compound to run or drip down the blanks because this can cause carbon buildup, affect gob loading, and cause a jam-up.",
+          "source_location_hint": "Page 10, step 5.3",
+          "missing_from": "Swab the Blanks",
+          "description": "Warning about dripping compound causing jam-up hazard missing"
+        }
+      ]
+    },
+    {
+      "blockId": "b-025",
+      "kind": "step",
+      "sectionId": "sec-swab-section",
+      "stepId": "step-swab-6",
+      "text": "If a swab gets caught in equipment, let go immediately and push the E-STOP button for the section.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-026",
+      "kind": "step",
+      "sectionId": "sec-swab-section",
+      "stepId": "step-swab-7",
+      "text": "After swabbing a section and your hand is clear of the section, deactivate the swab cycle by cycling the button.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-027",
+      "kind": "step",
+      "sectionId": "sec-swab-section",
+      "stepId": "step-swab-7",
+      "text": "The RUN light continues to blink until normal operations resume, then stays on continuously.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-028",
+      "kind": "heading",
+      "sectionId": "sec-swab-neckrings",
+      "text": "Swab the Neckrings",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-029",
+      "kind": "step",
+      "sectionId": "sec-swab-neckrings",
+      "stepId": "step-neck-1",
+      "text": "Recommended: swab neckrings before swabbing the blanks.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-030",
+      "kind": "step",
+      "sectionId": "sec-swab-neckrings",
+      "stepId": "step-neck-2",
+      "text": "Apply a small amount of neckring swab compound on the swab and work it into the fibers of the swab.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-031",
+      "kind": "step",
+      "sectionId": "sec-swab-neckrings",
+      "stepId": "step-neck-2",
+      "text": "Wring out excess lubricant with a twisting motion, and shake the swab so that it loosens back out.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-032",
+      "kind": "step",
+      "sectionId": "sec-swab-neckrings",
+      "stepId": "step-neck-3",
+      "text": "Bend the head of the swab at a 45-90 degree angle to prevent damage to the neckring from the metal tip.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-033",
+      "kind": "step",
+      "sectionId": "sec-swab-neckrings",
+      "stepId": "step-neck-3",
+      "text": "Do not bend the swab if it has a protective tip (such as those used in the Asia-Pacific region).",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-034",
+      "kind": "step",
+      "sectionId": "sec-swab-neckrings",
+      "stepId": "step-neck-4",
+      "text": "Swab each neckring once with a downward dabbing or patting motion.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-035",
+      "kind": "step",
+      "sectionId": "sec-swab-neckrings",
+      "stepId": "step-neck-4",
+      "text": "A proper swab will leave an imprint of the neckring on the swab.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-036",
+      "kind": "step",
+      "sectionId": "sec-swab-neckrings",
+      "stepId": "step-neck-4",
+      "text": "Do not use a sliding or back-and-forth motion, or drag the swab across the rings.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-037",
+      "kind": "heading",
+      "sectionId": "sec-swab-blanks",
+      "text": "Swab the Blanks",
+      "page": null,
+      "bbox": null,
+      "flags": [
+        {
+          "severity": "warning",
+          "kind": "omission",
+          "source_quote": "Do not allow swab compound to run or drip down the blanks because this can cause carbon buildup, affect gob loading, and cause a jam-up.",
+          "source_location_hint": "Page 10, step 5.3",
+          "missing_from": "Swab the Blanks",
+          "description": "Warning about dripping compound causing jam-up hazard missing"
+        }
+      ]
+    },
+    {
+      "blockId": "b-038",
+      "kind": "step",
+      "sectionId": "sec-swab-blanks",
+      "stepId": "step-blank-1",
+      "text": "Swab all blanks according to established swabbing instructions.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-039",
+      "kind": "step",
+      "sectionId": "sec-swab-blanks",
+      "stepId": "step-blank-1",
+      "text": "When uncoated blanks are changed, increase the swabbing frequency to every 10 minutes for an hour.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-040",
+      "kind": "step",
+      "sectionId": "sec-swab-blanks",
+      "stepId": "step-blank-1",
+      "text": "Pre-coated blanks do not require extra swabbing.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-041",
+      "kind": "photo",
+      "sectionId": "sec-swab-blanks",
+      "stepId": "step-blank-1",
+      "photoId": "photo-coated-uncoated",
+      "caption": "Pre-Coated vs Uncoated blanks.",
+      "page": null,
+      "bbox": null,
+      "flags": [
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "Do not put your thumb or finger through the ring on the swab brush handle...Serious injuries to your thumb or fingers may result if the swab gets caught in the section.",
+          "source_location_hint": "Pages 5, 7, 11, 15",
+          "missing_from": "All swabbing sections (neckrings, blanks, mould-side)",
+          "description": "Critical hand injury warning repeated 4 times in source is completely absent from draft"
+        },
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "When swabbing, hold the swab along the metal handle with an overhand grip. Stand comfortably and balanced, and keep your free hand away from moving parts while swabbing.",
+          "source_location_hint": "Page 5, steps 8-9",
+          "missing_from": "Properly Swab a Section",
+          "description": "Safe hand position and stance requirements missing"
+        },
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "Only use the approved commercial swabbing compound specified in the swabbing instructions. Do not add other materials to the approved compounds, or mix commercial compounds",
+          "source_location_hint": "Page 3, step 7",
+          "missing_from": "Preparing Swab Brushes",
+          "description": "Approved compound restriction and prohibition on mixing compounds missing"
+        },
+        {
+          "severity": "warning",
+          "kind": "omission",
+          "source_quote": "Do not begin these tasks without confirmation that personnel directly involved have completed the required training associated with the work instruction activity",
+          "source_location_hint": "Page 2, step 1",
+          "missing_from": "Safety Requirements or Preparing Swab Brushes",
+          "description": "Mandatory training confirmation before starting work missing"
+        },
+        {
+          "severity": "warning",
+          "kind": "omission",
+          "source_quote": "Do not allow swab compound to run or drip down the blanks because this can cause carbon buildup, affect gob loading, and cause a jam-up.",
+          "source_location_hint": "Page 10, step 5.3",
+          "missing_from": "Swab the Blanks",
+          "description": "Warning about dripping compound causing jam-up hazard missing"
+        }
+      ]
+    },
+    {
+      "blockId": "b-042",
+      "kind": "step",
+      "sectionId": "sec-swab-blanks",
+      "stepId": "step-blank-2",
+      "text": "Use the proper size swab for the blank cavity.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-043",
+      "kind": "step",
+      "sectionId": "sec-swab-blanks",
+      "stepId": "step-blank-2",
+      "text": "The swab should not be more than 1.5 times the diameter of the blank at the load line.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-044",
+      "kind": "step",
+      "sectionId": "sec-swab-blanks",
+      "stepId": "step-blank-3",
+      "text": "Apply a small amount of blank swab compound to the swab and work it into the fibers.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-045",
+      "kind": "step",
+      "sectionId": "sec-swab-blanks",
+      "stepId": "step-blank-3",
+      "text": "Squeeze out excess swab compound, and shake the swab to loosen the fibers.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-046",
+      "kind": "photo",
+      "sectionId": "sec-swab-blanks",
+      "stepId": "step-blank-3",
+      "photoId": "photo-shaken-not-shaken",
+      "caption": "Shaken vs Not Shaken brush comparison.",
+      "page": null,
+      "bbox": null,
+      "flags": [
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "Do not put your thumb or finger through the ring on the swab brush handle...Serious injuries to your thumb or fingers may result if the swab gets caught in the section.",
+          "source_location_hint": "Pages 5, 7, 11, 15",
+          "missing_from": "All swabbing sections (neckrings, blanks, mould-side)",
+          "description": "Critical hand injury warning repeated 4 times in source is completely absent from draft"
+        },
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "When swabbing, hold the swab along the metal handle with an overhand grip. Stand comfortably and balanced, and keep your free hand away from moving parts while swabbing.",
+          "source_location_hint": "Page 5, steps 8-9",
+          "missing_from": "Properly Swab a Section",
+          "description": "Safe hand position and stance requirements missing"
+        },
+        {
+          "severity": "critical",
+          "kind": "omission",
+          "source_quote": "Only use the approved commercial swabbing compound specified in the swabbing instructions. Do not add other materials to the approved compounds, or mix commercial compounds",
+          "source_location_hint": "Page 3, step 7",
+          "missing_from": "Preparing Swab Brushes",
+          "description": "Approved compound restriction and prohibition on mixing compounds missing"
+        },
+        {
+          "severity": "warning",
+          "kind": "omission",
+          "source_quote": "Do not begin these tasks without confirmation that personnel directly involved have completed the required training associated with the work instruction activity",
+          "source_location_hint": "Page 2, step 1",
+          "missing_from": "Safety Requirements or Preparing Swab Brushes",
+          "description": "Mandatory training confirmation before starting work missing"
+        },
+        {
+          "severity": "warning",
+          "kind": "omission",
+          "source_quote": "Do not allow swab compound to run or drip down the blanks because this can cause carbon buildup, affect gob loading, and cause a jam-up.",
+          "source_location_hint": "Page 10, step 5.3",
+          "missing_from": "Swab the Blanks",
+          "description": "Warning about dripping compound causing jam-up hazard missing"
+        }
+      ]
+    },
+    {
+      "blockId": "b-047",
+      "kind": "step",
+      "sectionId": "sec-swab-blanks",
+      "stepId": "step-blank-4",
+      "text": "Always apply light pressure to the blanks, and hold the swab parallel to the blank.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-048",
+      "kind": "step",
+      "sectionId": "sec-swab-blanks",
+      "stepId": "step-blank-4",
+      "text": "Rotate the swab brush after swabbing each blank.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-049",
+      "kind": "step",
+      "sectionId": "sec-swab-blanks",
+      "stepId": "step-blank-5",
+      "text": "Swab NNPB blanks only from the baffle parting line down to the load line, using a patting motion or one downward sweeping motion.",
+      "page": null,
+      "bbox": null
+    },
+    {
+      "blockId": "b-050",
+      "kind": "step",
+      "sectionId": "sec-swab-blanks",
+      "stepId": "step-blank-5",
+      "text": "Do not swab blanks with an upward motion.",
+      "page": null,
+      "bbox": null
+    }
+  ]
+}
