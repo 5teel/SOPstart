@@ -108,17 +108,36 @@ Also include any other relevant sections: Training Requirements, Tools/Equipment
 
 Set parse_notes to describe what you inferred vs what was explicitly stated.
 
-### 5. IMAGES — Attribute every [IMAGE N] token
-The source text may contain tokens like \`[IMAGE 0]\`, \`[IMAGE 1]\`, etc. — each one is a real image embedded in the original document at that position. You MUST attribute every image token to the step (or section) where it visually belongs.
+### 5. STRUCTURED INPUT FORMAT — Read structural anchors strictly
+The source may be provided as a STRUCTURED document with explicit block markers. When you see lines starting with:
 
-For each step, populate \`image_indexes\` with the numeric indexes of every image that appears in or immediately surrounds that step. Example: if the source contains "1. Open the valve [IMAGE 3]. Wait for pressure to stabilise.", then that step's \`image_indexes\` is \`[3]\`.
+- \`HEADING L<n>: <text>\` — a section heading at level n.
+- \`PARA: <text> [IMG N] [IMG M]\` — a paragraph. Any \`[IMG N]\` tokens are images attached to THIS paragraph.
+- \`LIST (depth=<n>): <text> [IMG …]\` — a list item.
+- \`CAPTION (for IMG N): <text>\` — a caption describing image N.
+- \`TABLE #<n> (<R> rows)\` … \`END TABLE #<n>\` — a table. Each row is one line.
+- Inside a table: \`HEADER: c0=«…» | c1=«…» | …\` or \`ROW <i>: c0=«…» | c1=«…» [IMG N]\` — cells delimited by \`|\`. Images inside \`c<col>=…\` belong to THAT cell only.
+- After a procedural table opens, you may see hints like \`-- PROCEDURAL: stepCol=0 imagesCol=1 commentsCol=2\`. When that hint is present, the step instruction is in cell c0 of each row and the images for that step are in cell c1 of the SAME row.
 
-Rules:
-- Each image index may appear in AT MOST one step's image_indexes.
-- If an image appears between two steps, attribute it to the more relevant one based on caption / surrounding context.
-- If you cannot tell which step an image belongs to (cover image, appendix figure), leave its index OUT of every step — the server will surface unattributed images at section level for admin review.
-- If a step has no nearby images, return \`image_indexes: []\` (or null).
-- Do NOT preserve the \`[IMAGE N]\` token in the step's \`text\` field — the token is metadata only. Write the step text naturally without the bracket.
+### IMAGES — Attribute every [IMG N] token using structural containment
+You MUST populate \`image_indexes\` on each step using the structural location of \`[IMG N]\` tokens — NOT by stream proximity.
+
+The non-negotiable rules:
+- If an image appears inside a cell of a procedural table (stepCol/imagesCol/commentsCol hint present), it belongs to the STEP extracted from THAT ROW. Do not assign it to a step from a different row even if the token would be "close" in the linearised text.
+- If an image appears in a non-procedural cell, list item, or paragraph, it belongs to that block's step / hazard / note.
+- Each image index appears in AT MOST one step's \`image_indexes\`.
+- If you cannot confidently anchor an image (cover image, appendix figure, header decoration), leave its index OUT of every step. The server will surface those at section level for admin review.
+- If a step has no images, return \`image_indexes: []\` (or null).
+- Do NOT keep \`[IMG N]\` tokens inside the step's \`text\` field — the brackets are metadata only.
+
+Worked example. Given:
+  TABLE #3 (3 rows)
+    -- PROCEDURAL: stepCol=0 imagesCol=1 commentsCol=2
+    HEADER: c0=«Step Instruction» | c1=«Images» | c2=«Comments»
+    ROW 1: c0=«Position the deflector flush against the bracket.» | c1=«» [IMG 11] | c2=«»
+    ROW 2: c0=«Tighten with torque wrench to 25 Nm.» | c1=«» [IMG 12] [IMG 13] | c2=«»
+  END TABLE #3
+→ step 1 has image_indexes=[11]; step 2 has image_indexes=[12, 13]. Image 13 is in row 2, NOT row 3 — even though linearly it appears "between" them.
 
 Also continue setting \`has_image: true\` for backward compatibility whenever \`image_indexes\` is non-empty.`
 

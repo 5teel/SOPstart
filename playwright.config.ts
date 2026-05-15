@@ -62,5 +62,10 @@ export default defineConfig({
       testDir: './src/lib/voice/__tests__',
       testMatch: /.*\.test\.ts$/,
     },
+    {
+      name: 'phase20-parsers',
+      testDir: './src/lib/parsers/__tests__',
+      testMatch: /.*\.test\.ts$/,
+    },
   ],
 })

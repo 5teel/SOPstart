@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { extractDocx } from '@/lib/parsers/extract-docx'
+import { extractDocxStructural } from '@/lib/parsers/extract-docx-structural'
+import { structuredDocToPrompt } from '@/lib/parsers/structured-doc-to-prompt'
 import { extractPdf } from '@/lib/parsers/extract-pdf'
 import { extractXlsx } from '@/lib/parsers/extract-xlsx'
 import { extractPptx } from '@/lib/parsers/extract-pptx'
@@ -72,9 +74,25 @@ export async function POST(request: NextRequest) {
     const fileType = job.file_type as SourceFileType
 
     if (fileType === 'docx') {
-      const result = await extractDocx(buffer)
-      extractedText = result.text
-      extractedImages = result.images
+      // Phase 20 forward-compat: structural extractor preserves table-row
+      // containment so image_indexes alignment is exact (not stream-proximity
+      // guessing). The legacy flat extractor is kept exported for tests + as a
+      // fallback if the structural walk throws.
+      try {
+        const structural = await extractDocxStructural(buffer)
+        extractedText = structuredDocToPrompt(structural.doc)
+        extractedImages = structural.images
+        console.log(
+          `[parse] docx structural: ${structural.doc.stats.blockCount} blocks, ` +
+            `${structural.doc.stats.proceduralTableCount}/${structural.doc.stats.tableCount} procedural tables, ` +
+            `${structural.doc.stats.imageCount} images (${structural.doc.stats.imagesInTables} in tables)`
+        )
+      } catch (err) {
+        console.error('[parse] structural docx extract failed, falling back to flat:', err)
+        const result = await extractDocx(buffer)
+        extractedText = result.text
+        extractedImages = result.images
+      }
     } else if (fileType === 'pdf') {
       const result = await extractPdf(buffer)
       extractedText = result.text
