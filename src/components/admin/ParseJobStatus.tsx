@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { CheckCircle, AlertTriangle, Loader2 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -76,6 +76,9 @@ export default function ParseJobStatus({
   const [detailLevel, setDetailLevel] = useState(3)
   const [startTime] = useState<number>(Date.now())
   const [elapsed, setElapsed] = useState(0)
+  // Loading state for "Review now →" click — router.refresh() runs in a
+  // transition so we can show a spinner while the slow RSC fetch lands.
+  const [reviewLoading, startReviewTransition] = useTransition()
 
   // Elapsed timer for transcribing stage
   useEffect(() => {
@@ -323,10 +326,19 @@ export default function ParseJobStatus({
             </p>
             <div className="flex items-center gap-4 mt-2 flex-wrap">
               <button
-                onClick={() => router.refresh()}
-                className="text-[var(--ink-900)] text-sm font-medium hover:text-[var(--ink-700)]"
+                onClick={() => startReviewTransition(() => router.refresh())}
+                disabled={reviewLoading}
+                className="inline-flex items-center gap-1.5 text-[var(--ink-900)] text-sm font-medium hover:text-[var(--ink-700)] disabled:opacity-60 disabled:cursor-wait"
+                aria-busy={reviewLoading}
               >
-                Review now &rarr;
+                {reviewLoading ? (
+                  <>
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    Loading review&hellip;
+                  </>
+                ) : (
+                  <>Review now &rarr;</>
+                )}
               </button>
               {isVideoSop && (
                 <>

@@ -69,16 +69,30 @@ export default async function ReviewPage({
   // sop-images bucket is private (00005), so the raw storage_path returns 404
   // when used as a src directly. We rewrite each sop_image.storage_path to a
   // presigned URL valid for the review session (1 hour).
-  for (const section of sop.sop_sections ?? []) {
-    for (const img of section.sop_images ?? []) {
-      if (!img.storage_path || img.storage_path.startsWith('http')) continue
-      const { data } = await supabase.storage
+  //
+  // SOPs like EN-FOR-03-042 have 50+ extracted images. Signing sequentially
+  // (~50-100ms per call) blocks the review-page render for several seconds and
+  // makes the Serwist SW emit `no-response` (CLAUDE.md learning 2026-05-13).
+  // createSignedUrls accepts an array and signs in one round-trip.
+  {
+    const pathsToSign: string[] = []
+    const imageRefs: Array<{ row: { storage_path: string }; idx: number }> = []
+    for (const section of sop.sop_sections ?? []) {
+      for (const img of section.sop_images ?? []) {
+        if (!img.storage_path || img.storage_path.startsWith('http')) continue
+        imageRefs.push({ row: img, idx: pathsToSign.length })
+        pathsToSign.push(img.storage_path)
+      }
+    }
+    if (pathsToSign.length > 0) {
+      const { data: signed } = await supabase.storage
         .from('sop-images')
-        .createSignedUrl(img.storage_path, 3600)
-      if (data?.signedUrl) {
-        // Mutate the row in-place — the type still has `storage_path: string`,
-        // we're just swapping the bucket path for a usable URL on this render.
-        img.storage_path = data.signedUrl
+        .createSignedUrls(pathsToSign, 3600)
+      if (signed) {
+        for (const ref of imageRefs) {
+          const url = signed[ref.idx]?.signedUrl
+          if (url) ref.row.storage_path = url
+        }
       }
     }
   }
