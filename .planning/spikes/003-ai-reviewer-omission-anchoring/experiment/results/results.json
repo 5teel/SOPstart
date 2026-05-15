@@ -1,0 +1,232 @@
+{
+  "results": {
+    "clean": {
+      "B": {
+        "job": "B",
+        "flags": [
+          {
+            "severity": "critical",
+            "kind": "omission",
+            "source_quote": "Do not begin these tasks without confirmation that personnel directly involved have completed the required training",
+            "source_location_hint": "Page 2, Step 1",
+            "missing_from": "Safety Requirements or Preparing Swab Brushes",
+            "description": "Mandatory training confirmation requirement before starting work"
+          },
+          {
+            "severity": "critical",
+            "kind": "omission",
+            "source_quote": "Only use the approved commercial swabbing compound specified in the swabbing instructions. Do not add other materials",
+            "source_location_hint": "Page 3, Step 7",
+            "missing_from": "Preparing Swab Brushes",
+            "description": "Prohibition on unapproved compounds or mixing materials"
+          },
+          {
+            "severity": "critical",
+            "kind": "omission",
+            "source_quote": "When swabbing, hold the swab along the metal handle with an overhand grip",
+            "source_location_hint": "Page 5, Step 8",
+            "missing_from": "Properly Swab a Section",
+            "description": "Required grip technique to prevent injury"
+          },
+          {
+            "severity": "critical",
+            "kind": "omission",
+            "source_quote": "Stand comfortably and balanced, and keep your free hand away from moving parts while swabbing",
+            "source_location_hint": "Page 5, Step 9",
+            "missing_from": "Properly Swab a Section",
+            "description": "Body positioning and free hand safety requirement"
+          },
+          {
+            "severity": "warning",
+            "kind": "omission",
+            "source_quote": "Do not allow swab compound to run or drip down the blanks because this can cause carbon buildup, affect gob loading, and cause a jam-up",
+            "source_location_hint": "Page 10, Step 4.3",
+            "missing_from": "Swab the Blanks",
+            "description": "Prevention of dripping compound that causes jam-up hazard"
+          }
+        ],
+        "usage": {
+          "input_tokens": 2901,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 5199,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "output_tokens": 537,
+          "service_tier": "standard",
+          "inference_geo": "not_available"
+        },
+        "wallMs": 11206,
+        "rawText": "```json\n[\n  {\n    \"severity\": \"critical\",\n    \"kind\": \"omission\",\n    \"source_quote\": \"Do not begin these tasks without confirmation that personnel directly involved have completed the required training\",\n    \"source_location_hint\": \"Page 2, Step 1\",\n    \"missing_from\": \"Safety Requirements or Preparing Swab Brushes\",\n    \"description\": \"Mandatory training confirmation requirement before starting work\"\n  },\n  {\n    \"severity\": \"critical\",\n    \"kind\": \"omission\",\n    \"source_quote\": \"Only use the"
+      },
+      "C": {
+        "job": "C",
+        "flags": [],
+        "usage": {
+          "input_tokens": 2899,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 5202,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "output_tokens": 9,
+          "service_tier": "standard",
+          "inference_geo": "not_available"
+        },
+        "wallMs": 3043,
+        "rawText": "```json\n[]\n```"
+      }
+    },
+    "corrupted": {
+      "B": {
+        "job": "B",
+        "flags": [
+          {
+            "severity": "critical",
+            "kind": "omission",
+            "source_quote": "Do not put your thumb or finger through the ring on the swab brush handle...Serious injuries to your thumb or fingers may result if the swab gets caught in the section.",
+            "source_location_hint": "Pages 5, 7, 11, 15",
+            "missing_from": "All swabbing sections (neckrings, blanks, mould-side)",
+            "description": "Critical hand injury warning repeated 4 times in source is completely absent from draft"
+          },
+          {
+            "severity": "critical",
+            "kind": "omission",
+            "source_quote": "When swabbing, hold the swab along the metal handle with an overhand grip. Stand comfortably and balanced, and keep your free hand away from moving parts while swabbing.",
+            "source_location_hint": "Page 5, steps 8-9",
+            "missing_from": "Properly Swab a Section",
+            "description": "Safe hand position and stance requirements missing"
+          },
+          {
+            "severity": "critical",
+            "kind": "omission",
+            "source_quote": "Only use the approved commercial swabbing compound specified in the swabbing instructions. Do not add other materials to the approved compounds, or mix commercial compounds",
+            "source_location_hint": "Page 3, step 7",
+            "missing_from": "Preparing Swab Brushes",
+            "description": "Approved compound restriction and prohibition on mixing compounds missing"
+          },
+          {
+            "severity": "warning",
+            "kind": "omission",
+            "source_quote": "Do not begin these tasks without confirmation that personnel directly involved have completed the required training associated with the work instruction activity",
+            "source_location_hint": "Page 2, step 1",
+            "missing_from": "Safety Requirements or Preparing Swab Brushes",
+            "description": "Mandatory training confirmation before starting work missing"
+          },
+          {
+            "severity": "warning",
+            "kind": "omission",
+            "source_quote": "Do not allow swab compound to run or drip down the blanks because this can cause carbon buildup, affect gob loading, and cause a jam-up.",
+            "source_location_hint": "Page 10, step 5.3",
+            "missing_from": "Swab the Blanks",
+            "description": "Warning about dripping compound causing jam-up hazard missing"
+          }
+        ],
+        "usage": {
+          "input_tokens": 2790,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 5199,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "output_tokens": 616,
+          "service_tier": "standard",
+          "inference_geo": "not_available"
+        },
+        "wallMs": 13341,
+        "rawText": "```json\n[\n  {\n    \"severity\": \"critical\",\n    \"kind\": \"omission\",\n    \"source_quote\": \"Do not put your thumb or finger through the ring on the swab brush handle...Serious injuries to your thumb or fingers may result if the swab gets caught in the section.\",\n    \"source_location_hint\": \"Pages 5, 7, 11, 15\",\n    \"missing_from\": \"All swabbing sections (neckrings, blanks, mould-side)\",\n    \"description\": \"Critical hand injury warning repeated 4 times in source is completely absent from draft\"\n  },\n "
+      },
+      "C": {
+        "job": "C",
+        "flags": [
+          {
+            "severity": "critical",
+            "kind": "anchoring",
+            "photo_id": "photo-swab-cycle-switch",
+            "current_step_id": "step-mould-5",
+            "current_step_text_snippet": "Swab bottom plates with a semi-dry swab. Place the swab on the inside bottom plate, and lightly drag it outward using a sl",
+            "photo_caption": "Swab Cycle Switch on the section control panel.",
+            "description": "Photo shows the Swab Cycle Switch on a control panel, but step describes swabbing bottom plates with a specific sliding technique. The photo's subject (control panel switch) is completely unrelated to the step's instruction (bottom plate swabbing technique).",
+            "suggested_step_id": "step-swab-3"
+          }
+        ],
+        "usage": {
+          "input_tokens": 2788,
+          "cache_creation_input_tokens": 0,
+          "cache_read_input_tokens": 5202,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "output_tokens": 212,
+          "service_tier": "standard",
+          "inference_geo": "not_available"
+        },
+        "wallMs": 5398,
+        "rawText": "```json\n[\n  {\n    \"severity\": \"critical\",\n    \"kind\": \"anchoring\",\n    \"photo_id\": \"photo-swab-cycle-switch\",\n    \"current_step_id\": \"step-mould-5\",\n    \"current_step_text_snippet\": \"Swab bottom plates with a semi-dry swab. Place the swab on the inside bottom plate, and lightly drag it outward using a sl\",\n    \"photo_caption\": \"Swab Cycle Switch on the section control panel.\",\n    \"description\": \"Photo shows the Swab Cycle Switch on a control panel, but step describes swabbing bottom plates with"
+      }
+    }
+  },
+  "verdict": {
+    "jobB": {
+      "pass": true,
+      "evidence": {
+        "cleanHasRingFlag": false,
+        "corruptedHasRingFlag": true
+      }
+    },
+    "jobC": {
+      "pass": true,
+      "evidence": {
+        "cleanHasSwapFlag": false,
+        "corruptedHasSwapFlag": true,
+        "corruptedCFlagCount": 1
+      }
+    },
+    "overall": "VALIDATED",
+    "cleanFlagCounts": {
+      "B": 5,
+      "C": 0
+    },
+    "corruptedFlagCounts": {
+      "B": 5,
+      "C": 1
+    },
+    "injected": {
+      "B": {
+        "expectedFlag": "draft is missing the critical safety warning 'do not put your thumb/finger through the ring on the swab brush handle' which appears in the source on pages 5, 7, 11, 15",
+        "sourceLocation": "appears verbatim on pages 5, 7, 11, 15 of source",
+        "droppedFrom": "sec-swab-section",
+        "droppedStepId": "step-swab-5-safety"
+      },
+      "C": {
+        "expectedFlag": "photo 'Swab Cycle Switch' is anchored to step-mould-5 ('Swab bottom plates with a semi-dry swab…') but its caption clearly describes the section control panel switch from sec-swab-section step 3",
+        "photoId": "photo-swab-cycle-switch",
+        "truthfulAnchor": {
+          "sectionId": "sec-swab-section",
+          "stepId": "step-swab-3"
+        },
+        "wrongAnchor": {
+          "sectionId": "sec-swab-mould",
+          "stepId": "step-mould-5"
+        }
+      }
+    },
+    "costs": {
+      "clean": {
+        "B": 0.0183177,
+        "C": 0.0103926,
+        "total": 0.0287103
+      },
+      "corrupted": {
+        "B": 0.0191697,
+        "C": 0.013104600000000001,
+        "total": 0.032274300000000006
+      }
+    },
+    "totalCostUsd": 0.06098460000000001
+  }
+}

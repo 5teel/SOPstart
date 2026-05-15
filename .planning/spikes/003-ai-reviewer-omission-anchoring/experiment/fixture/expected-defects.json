@@ -1,0 +1,20 @@
+{
+  "omission": {
+    "expectedFlag": "draft is missing the critical safety warning 'do not put your thumb/finger through the ring on the swab brush handle' which appears in the source on pages 5, 7, 11, 15",
+    "sourceLocation": "appears verbatim on pages 5, 7, 11, 15 of source",
+    "droppedFrom": "sec-swab-section",
+    "droppedStepId": "step-swab-5-safety"
+  },
+  "anchoring": {
+    "expectedFlag": "photo 'Swab Cycle Switch' is anchored to step-mould-5 ('Swab bottom plates with a semi-dry swab…') but its caption clearly describes the section control panel switch from sec-swab-section step 3",
+    "photoId": "photo-swab-cycle-switch",
+    "truthfulAnchor": {
+      "sectionId": "sec-swab-section",
+      "stepId": "step-swab-3"
+    },
+    "wrongAnchor": {
+      "sectionId": "sec-swab-mould",
+      "stepId": "step-mould-5"
+    }
+  }
+}
