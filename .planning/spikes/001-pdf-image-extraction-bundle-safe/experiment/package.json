@@ -1,0 +1,12 @@
+{
+  "name": "spike-001-pdf-image-extraction",
+  "private": true,
+  "type": "module",
+  "description": "Self-contained spike scratch space — install candidates here, NOT in main project.",
+  "scripts": {
+    "run": "node run.mjs"
+  },
+  "dependencies": {
+    "mupdf": "^1.27.0"
+  }
+}

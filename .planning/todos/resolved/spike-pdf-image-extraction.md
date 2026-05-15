@@ -4,6 +4,8 @@ date: 2026-05-14
 priority: high
 gates: Phase 20 Plan 20-01
 trigger: /gsd-explore session 2026-05-14 — Conversion Pipeline V2
+status: RESOLVED 2026-05-15 → see .planning/spikes/001-pdf-image-extraction-bundle-safe/README.md
+verdict: VALIDATED — unpdf.extractImages (bytes) + pdfjs-direct op-list+CTM (bbox); 0 MB bundle Δ
 ---
 
 # Spike: PDF Image Extraction with Provenance, Bundle-Safe
