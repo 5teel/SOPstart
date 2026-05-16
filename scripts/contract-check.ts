@@ -44,6 +44,9 @@ const EXCLUDED_FROM_VALIDATORS = new Set([
   'HeadingBlock',
   'PhotoBlock',
   'CalloutBlock',
+  // Phase 20 CONV-03 layout-only blocks (parser-emitted into layout_data only):
+  'StepWithPhotosBlock',
+  'PhotoGridBlock',
 ])
 
 /**

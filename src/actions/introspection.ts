@@ -37,6 +37,8 @@ import {
   InspectBlockPropsSchema,
   VoiceNoteBlockPropsSchema,
   ModelBlockPropsSchema,
+  StepWithPhotosBlockPropsSchema,
+  PhotoGridBlockPropsSchema,
 } from '@/components/sop/blocks'
 import { BlockContentSchema } from '@/lib/validators/blocks'
 import {
@@ -145,6 +147,21 @@ const BLOCK_REGISTRY: Record<string, {
     schema: ModelBlockPropsSchema,
     description: '3D model viewer (feature-flagged via NEXT_PUBLIC_MODEL_BLOCK_ENABLED). Renders placeholder when disabled.',
     example: { assetUrl: 'https://storage.example.com/models/pump.glb', hotspots: [], defaultLayers: [] },
+  },
+  StepWithPhotosBlock: {
+    schema: StepWithPhotosBlockPropsSchema,
+    description: 'Phase 20 CONV-03 — procedural step with one or more anchored photos. Emitted by the DOCX parser when a step has 1+ image_indexes; layout switches between right-of-text (single photo) and 2/3/4-col grid (multi).',
+    example: {
+      number: 1,
+      text: 'Position the deflector flush against the bracket.',
+      photos: [{ src: 'org/sop/images/img_11.png', alt: 'Deflector aligned to bracket', caption: null }],
+      layout: 'right',
+    },
+  },
+  PhotoGridBlock: {
+    schema: PhotoGridBlockPropsSchema,
+    description: 'Phase 20 CONV-03 — standalone N-image grid. Used for orphan/unanchored images surfaced by the parser, or admin-authored figure groups.',
+    example: { items: [{ src: 'org/sop/images/img_0.png', alt: 'Hazard icon', caption: null }], columns: '2' },
   },
 }
 
