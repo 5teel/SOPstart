@@ -57,6 +57,18 @@ export default async function ReviewPage({
     redirect('/admin/sops')
   }
 
+  // Phase 20 CONV-03 — parsed DOCX SOPs with layout_data populated land in
+  // the Phase 12 builder (Rung C). Admin gets side-by-side step+photo via
+  // StepWithPhotosBlock, full block-swap power, library picker. The legacy
+  // ReviewClient remains for non-DOCX sources until each gets its own
+  // structural extractor.
+  // layout_data column type isn't surfaced in the generated db types (matches
+  // the cast pattern other builder code uses — see /admin/sops/builder/[sopId]).
+  const hasLayoutData = (sop as unknown as { layout_data?: unknown }).layout_data != null
+  if (sop.source_file_type === 'docx' && hasLayoutData) {
+    redirect(`/admin/sops/builder/${sopId}`)
+  }
+
   // Sort steps within each section
   for (const section of sop.sop_sections ?? []) {
     section.sop_steps?.sort(

@@ -47,6 +47,12 @@ import {
   ModelBlock,
   ModelBlockPropsSchema,
   type ModelBlockProps,
+  StepWithPhotosBlock,
+  StepWithPhotosBlockPropsSchema,
+  type StepWithPhotosBlockProps,
+  PhotoGridBlock,
+  PhotoGridBlockPropsSchema,
+  type PhotoGridBlockProps,
 } from '@/components/sop/blocks'
 
 // Module-level warn-once flags (D-13/D-14: "once per page load")
@@ -689,6 +695,97 @@ export const puckConfig: Config = {
               props,
               'ModelBlock',
               '3D model - fix required props',
+              puck
+            )}
+          </>
+        )
+      },
+    },
+    StepWithPhotosBlock: {
+      fields: {
+        number: { type: 'number', min: 1 },
+        text: { type: 'textarea' },
+        photos: {
+          type: 'array',
+          arrayFields: {
+            src: { type: 'text', label: 'Image URL' },
+            alt: { type: 'text', label: 'Alt text' },
+            caption: { type: 'text', label: 'Caption (optional)' },
+          },
+          getItemSummary: (item: unknown) =>
+            (item as { caption?: string; alt?: string }).caption ??
+            (item as { caption?: string; alt?: string }).alt ??
+            'Photo',
+        },
+        layout: {
+          type: 'select',
+          options: [
+            { label: 'Photo right of step', value: 'right' },
+            { label: '2-col grid below', value: 'grid-2' },
+            { label: '3-col grid below', value: 'grid-3' },
+            { label: '4-col grid below', value: 'grid-4' },
+          ],
+        },
+      },
+      defaultProps: {
+        number: 1,
+        text: 'Describe this step…',
+        photos: [{ src: null, alt: '', caption: null }],
+        layout: 'right',
+      } satisfies StepWithPhotosBlockProps,
+      render: (rawProps) => {
+        const { puck, ...props } = rawProps as RawRenderProps
+        return (
+          <>
+            {SafeRender(
+              StepWithPhotosBlockPropsSchema,
+              StepWithPhotosBlock,
+              props,
+              'StepWithPhotosBlock',
+              'Step + photos - fix required props',
+              puck
+            )}
+          </>
+        )
+      },
+    },
+    PhotoGridBlock: {
+      fields: {
+        items: {
+          type: 'array',
+          arrayFields: {
+            src: { type: 'text', label: 'Image URL' },
+            alt: { type: 'text', label: 'Alt text' },
+            caption: { type: 'text', label: 'Caption (optional)' },
+          },
+          getItemSummary: (item: unknown) =>
+            (item as { caption?: string; alt?: string }).caption ??
+            (item as { caption?: string; alt?: string }).alt ??
+            'Photo',
+        },
+        columns: {
+          type: 'select',
+          options: [
+            { label: '2 columns', value: '2' },
+            { label: '3 columns', value: '3' },
+            { label: '4 columns', value: '4' },
+          ],
+        },
+      },
+      defaultProps: {
+        items: [{ src: null, alt: '', caption: null }],
+        columns: '2',
+      } satisfies PhotoGridBlockProps,
+      render: (rawProps) => {
+        const { puck, ...props } = rawProps as RawRenderProps
+        return (
+          <>
+            {SafeRender(
+              PhotoGridBlockPropsSchema,
+              PhotoGridBlock,
+              props,
+              'PhotoGridBlock',
+              'Photo grid - fix required props',
               puck
             )}
           </>
