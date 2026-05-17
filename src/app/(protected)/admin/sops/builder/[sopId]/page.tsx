@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { signLayoutDataImages } from '@/lib/builder/sign-layout-data-images'
 import { BuilderClient } from './BuilderClient'
 import type { SopWithSections } from '@/types/sop'
 
@@ -54,6 +55,8 @@ export default async function BuilderPage({
   if (sopError || !sop) {
     redirect('/admin/sops')
   }
+
+  await signLayoutDataImages(supabase, sop as unknown as { sop_sections?: Array<{ layout_data?: unknown }> })
 
   return (
     <Suspense fallback={null}>
