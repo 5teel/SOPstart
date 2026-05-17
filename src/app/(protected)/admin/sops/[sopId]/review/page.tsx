@@ -62,10 +62,13 @@ export default async function ReviewPage({
   // StepWithPhotosBlock, full block-swap power, library picker. The legacy
   // ReviewClient remains for non-DOCX sources until each gets its own
   // structural extractor.
-  // layout_data column type isn't surfaced in the generated db types (matches
-  // the cast pattern other builder code uses — see /admin/sops/builder/[sopId]).
-  const hasLayoutData = (sop as unknown as { layout_data?: unknown }).layout_data != null
-  if (sop.source_file_type === 'docx' && hasLayoutData) {
+  // layout_data lives on sop_sections (per migration 00020), not on sops.
+  // Phase 20 CONV-03: redirect DOCX parses to the builder once any section
+  // has layout_data populated (i.e. the per-section converter has written).
+  const anySectionHasLayoutData = (
+    (sop.sop_sections ?? []) as unknown as Array<{ layout_data?: unknown }>
+  ).some((s) => s.layout_data != null)
+  if (sop.source_file_type === 'docx' && anySectionHasLayoutData) {
     redirect(`/admin/sops/builder/${sopId}`)
   }
 

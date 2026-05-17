@@ -1,21 +1,26 @@
 /**
- * Phase 20 CONV-03 — ParsedSop + uploaded image refs → Puck `layout_data` tree.
+ * Phase 20 CONV-03 — ParsedSop + uploaded image refs → Puck `layout_data` PER SECTION.
  *
- * Deterministic converter (code owns layout v1 per Simon 2026-05-16). Each
- * AI-emitted step becomes one of:
+ * Deterministic converter (code owns layout v1 per Simon 2026-05-16). The
+ * Phase 12 builder reads layout_data PER sop_sections row (not on the sops
+ * row itself — see `BuilderClient.tsx`). This converter produces one
+ * LayoutData per parsed section so the parse route can write each into the
+ * corresponding sop_sections row's layout_data column.
+ *
+ * Per-step mapping:
  *   - `StepBlock`            when image_indexes.length === 0
  *   - `StepWithPhotosBlock`  otherwise (layout chosen by image count)
  *
  * Non-step content maps to:
- *   - section.steps?.length === 0 + section.content  → TextBlock under heading
- *   - hazard-flavoured sections (type === 'hazards')  → HazardCardBlock per step
- *   - ppe-flavoured sections                         → PPECardBlock
+ *   - section.content + no steps → TextBlock under heading
+ *   - hazard-flavoured sections (type === 'hazards')  → HazardCardBlock per line
+ *   - ppe-flavoured sections                          → PPECardBlock
  *
  * Orphan images (uploaded but not referenced by any step) accumulate in a
- * PhotoGridBlock appended to the first section so the admin can re-anchor
- * them in the builder rather than losing them silently.
+ * PhotoGridBlock appended to the FIRST section's content so the admin can
+ * re-anchor them in the builder rather than losing them silently.
  */
-import type { ParsedSop } from '@/lib/validators/sop'
+import type { ParsedSop, ParsedSopSection } from '@/lib/validators/sop'
 import type { UploadedImage } from './image-uploader'
 
 // Minimal subset of Puck's layout_data shape. We avoid importing Puck's
@@ -30,14 +35,19 @@ export type LayoutData = {
   zones?: Record<string, PuckItem[]>
 }
 
-interface ConvertOptions {
+export interface ConvertOptions {
   /**
-   * Maps image index (from ParsedSop.step.image_indexes / sectionImages) to
-   * its public URL (presigned by callers or the API later). When omitted,
-   * `src` is set to the storage_path which the renderer signs at request
-   * time (existing review-page pattern from commit 8f227f8).
+   * Maps image index to its public URL. When omitted, `src` is set to the
+   * storage_path which the renderer signs at request time.
    */
   imageSrcResolver?: (index: number) => string | null
+}
+
+export interface PerSectionLayoutResult {
+  /** sectionOrder → LayoutData ready to write to sop_sections.layout_data */
+  layouts: Map<number, LayoutData>
+  /** Indexes claimed by some step (so caller can compute orphans). */
+  attachedImageIndexes: Set<number>
 }
 
 let idSeed = 0
@@ -75,135 +85,152 @@ function makeImagesProp(
   }))
 }
 
-export function parsedSopToLayoutData(
+/**
+ * Build a per-section content array for ONE parsed section.
+ * The `claimedIndexes` set is mutated — caller owns it to coordinate
+ * cross-section orphan detection.
+ */
+function buildSectionContent(
+  section: ParsedSopSection,
+  uploadedImages: UploadedImage[],
+  resolver: ConvertOptions['imageSrcResolver'],
+  claimedIndexes: Set<number>
+): PuckItem[] {
+  const content: PuckItem[] = []
+  const sectionType = (section.type ?? '').toLowerCase()
+
+  // Narrative content (non-step sections)
+  if (section.content && (!section.steps || section.steps.length === 0)) {
+    const lines = section.content
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter(Boolean)
+    if (sectionType === 'hazards' && lines.length >= 1) {
+      for (const line of lines) {
+        content.push({
+          type: 'HazardCardBlock',
+          props: { id: nextId('hz'), title: 'Hazard', body: line, severity: 'warning' },
+        })
+      }
+      return content
+    }
+    if (
+      (sectionType === 'ppe' || sectionType === 'personal protective equipment') &&
+      lines.length >= 1
+    ) {
+      content.push({
+        type: 'PPECardBlock',
+        props: { id: nextId('ppe'), title: 'PPE Required', items: lines },
+      })
+      return content
+    }
+    content.push({
+      type: 'TextBlock',
+      props: { id: nextId('t'), content: section.content },
+    })
+    return content
+  }
+
+  // Step-bearing section
+  const steps = section.steps ?? []
+  for (const step of steps) {
+    const indexes = (step.image_indexes ?? []).filter((n) => !claimedIndexes.has(n))
+    for (const n of indexes) claimedIndexes.add(n)
+
+    if (indexes.length === 0) {
+      content.push({
+        type: 'StepBlock',
+        props: { id: nextId('s'), number: step.order ?? 1, text: step.text ?? '' },
+      })
+    } else {
+      const photos = makeImagesProp(indexes, uploadedImages, resolver)
+      content.push({
+        type: 'StepWithPhotosBlock',
+        props: {
+          id: nextId('sp'),
+          number: step.order ?? 1,
+          text: step.text ?? '',
+          photos,
+          layout: chooseStepLayout(indexes.length),
+        },
+      })
+    }
+
+    if (step.warning) {
+      content.push({
+        type: 'CalloutBlock',
+        props: { id: nextId('cw'), title: 'Warning', body: step.warning },
+      })
+    }
+    if (step.caution) {
+      content.push({
+        type: 'CalloutBlock',
+        props: { id: nextId('cc'), title: 'Caution', body: step.caution },
+      })
+    }
+    if (step.tip) {
+      content.push({
+        type: 'CalloutBlock',
+        props: { id: nextId('ct'), title: 'Tip', body: step.tip },
+      })
+    }
+  }
+  return content
+}
+
+/**
+ * Per-section converter. Returns one LayoutData per section keyed by
+ * section.order. Orphan images (any index NOT in attachedImageIndexes after
+ * all sections are processed) are appended to the FIRST section's layout
+ * as a labelled PhotoGridBlock so the admin can re-anchor in the builder.
+ */
+export function parsedSopToPerSectionLayoutData(
   parsed: ParsedSop,
   uploadedImages: UploadedImage[],
   opts: ConvertOptions = {}
-): LayoutData {
+): PerSectionLayoutResult {
   idSeed = 0
-  const content: PuckItem[] = []
   const attachedIndexes = new Set<number>()
-  const resolver = opts.imageSrcResolver
+  const layouts = new Map<number, LayoutData>()
 
   for (const section of parsed.sections) {
-    const sectionType = (section.type ?? '').toLowerCase()
-
-    // Section heading
-    content.push({
-      type: 'HeadingBlock',
-      props: { id: nextId('h'), text: section.title || 'Untitled section', level: 'h2' },
-    })
-
-    // Narrative content (non-step sections)
-    if (section.content && (!section.steps || section.steps.length === 0)) {
-      // Hazards / PPE special-case: try to split content into card-shaped items
-      // by line. Falls back to TextBlock on a single-line content blob.
-      const lines = section.content
-        .split(/\r?\n/)
-        .map((l) => l.trim())
-        .filter(Boolean)
-      if (sectionType === 'hazards' && lines.length >= 1) {
-        for (const line of lines) {
-          content.push({
-            type: 'HazardCardBlock',
-            props: {
-              id: nextId('hz'),
-              title: 'Hazard',
-              body: line,
-              severity: 'warning',
-            },
-          })
-        }
-        continue
-      }
-      if ((sectionType === 'ppe' || sectionType === 'personal protective equipment') && lines.length >= 1) {
-        content.push({
-          type: 'PPECardBlock',
-          props: {
-            id: nextId('ppe'),
-            title: 'PPE Required',
-            items: lines,
-          },
-        })
-        continue
-      }
-      content.push({
-        type: 'TextBlock',
-        props: { id: nextId('t'), content: section.content },
-      })
-      continue
-    }
-
-    // Step-bearing section
-    const steps = section.steps ?? []
-    for (const step of steps) {
-      const indexes = (step.image_indexes ?? []).filter((n) => !attachedIndexes.has(n))
-      for (const n of indexes) attachedIndexes.add(n)
-
-      if (indexes.length === 0) {
-        content.push({
-          type: 'StepBlock',
-          props: { id: nextId('s'), number: step.order ?? 1, text: step.text ?? '' },
-        })
-      } else {
-        const photos = makeImagesProp(indexes, uploadedImages, resolver)
-        content.push({
-          type: 'StepWithPhotosBlock',
-          props: {
-            id: nextId('sp'),
-            number: step.order ?? 1,
-            text: step.text ?? '',
-            photos,
-            layout: chooseStepLayout(indexes.length),
-          },
-        })
-      }
-
-      // Step-level warning/caution/tip → adjacent CalloutBlocks for visibility.
-      if (step.warning) {
-        content.push({
-          type: 'CalloutBlock',
-          props: { id: nextId('cw'), title: 'Warning', body: step.warning },
-        })
-      }
-      if (step.caution) {
-        content.push({
-          type: 'CalloutBlock',
-          props: { id: nextId('cc'), title: 'Caution', body: step.caution },
-        })
-      }
-      if (step.tip) {
-        content.push({
-          type: 'CalloutBlock',
-          props: { id: nextId('ct'), title: 'Tip', body: step.tip },
-        })
-      }
-    }
+    const content = buildSectionContent(
+      section,
+      uploadedImages,
+      opts.imageSrcResolver,
+      attachedIndexes
+    )
+    layouts.set(section.order, { root: { props: {} }, content })
   }
 
-  // Orphan images — every image that no step claimed
+  // Append orphan-images PhotoGrid to the first section.
   const orphans = uploadedImages.filter((u) => !attachedIndexes.has(u.index))
-  if (orphans.length > 0) {
-    content.push({
-      type: 'HeadingBlock',
-      props: { id: nextId('h'), text: 'Unanchored figures (review)', level: 'h3' },
-    })
-    content.push({
-      type: 'PhotoGridBlock',
-      props: {
-        id: nextId('og'),
-        items: orphans.map((u) => ({
-          src: resolver ? resolver(u.index) : u.storagePath,
-          alt: `Unanchored image ${u.index}`,
-          caption: null,
-        })),
-        columns: orphans.length >= 4 ? '4' : orphans.length === 3 ? '3' : '2',
-      },
-    })
+  if (orphans.length > 0 && parsed.sections.length > 0) {
+    const firstOrder = parsed.sections[0].order
+    const firstLayout = layouts.get(firstOrder)
+    if (firstLayout) {
+      firstLayout.content.push({
+        type: 'HeadingBlock',
+        props: {
+          id: nextId('h'),
+          text: 'Unanchored figures (review)',
+          level: 'h3',
+        },
+      })
+      firstLayout.content.push({
+        type: 'PhotoGridBlock',
+        props: {
+          id: nextId('og'),
+          items: orphans.map((u) => ({
+            src: opts.imageSrcResolver ? opts.imageSrcResolver(u.index) : u.storagePath,
+            alt: `Unanchored image ${u.index}`,
+            caption: null,
+          })),
+          columns: orphans.length >= 4 ? '4' : orphans.length === 3 ? '3' : '2',
+        },
+      })
+    }
   }
 
-  return {
-    root: { props: {} },
-    content,
-  }
+  return { layouts, attachedImageIndexes: attachedIndexes }
 }

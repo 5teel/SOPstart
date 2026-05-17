@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { extractDocx } from '@/lib/parsers/extract-docx'
 import { extractDocxStructural } from '@/lib/parsers/extract-docx-structural'
 import { structuredDocToPrompt } from '@/lib/parsers/structured-doc-to-prompt'
-import { parsedSopToLayoutData } from '@/lib/parsers/parsed-sop-to-layout-data'
+import { parsedSopToPerSectionLayoutData } from '@/lib/parsers/parsed-sop-to-layout-data'
 import { extractPdf } from '@/lib/parsers/extract-pdf'
 import { extractXlsx } from '@/lib/parsers/extract-xlsx'
 import { extractPptx } from '@/lib/parsers/extract-pptx'
@@ -144,13 +144,15 @@ export async function POST(request: NextRequest) {
     const uploadedImages = await uploadExtractedImages(organisationId, sopId, extractedImages)
 
     // 7. Write parsed data to database
-    // Phase 20 CONV-03 (interim) — for DOCX parses, also emit Puck layout_data
-    // so the Phase 12 builder can render the parsed SOP with side-by-side step
-    // + photo layouts (StepWithPhotosBlock / PhotoGridBlock). Worker walkthrough
-    // continues reading sop_steps until that codepath migrates separately.
-    const layoutData =
+    // Phase 20 CONV-03 — for DOCX parses, also emit Puck layout_data PER
+    // SECTION (layout_data lives on sop_sections per migration 00020, NOT
+    // on sops). Each procedural section's row gets its own StepWithPhotos
+    // / PhotoGrid tree so the Phase 12 builder renders side-by-side step+
+    // photo. Worker walkthrough continues reading sop_steps until that
+    // codepath migrates separately.
+    const perSectionLayouts =
       fileType === 'docx'
-        ? parsedSopToLayoutData(parsed, uploadedImages)
+        ? parsedSopToPerSectionLayoutData(parsed, uploadedImages)
         : null
 
     // Update SOP metadata
@@ -169,9 +171,6 @@ export async function POST(request: NextRequest) {
         parse_notes: parsed.parse_notes ?? null,
         is_ocr: isOcr,
         status: 'draft',
-        ...(layoutData
-          ? { layout_data: layoutData, layout_version: 1 }
-          : {}),
         updated_at: new Date().toISOString(),
       })
       .eq('id', sopId)
@@ -184,6 +183,7 @@ export async function POST(request: NextRequest) {
 
     // Insert sections
     for (const section of parsed.sections) {
+      const sectionLayout = perSectionLayouts?.layouts.get(section.order) ?? null
       const { data: sectionRow, error: sectionError } = await admin
         .from('sop_sections')
         .insert({
@@ -194,6 +194,9 @@ export async function POST(request: NextRequest) {
           sort_order: section.order,
           confidence: section.confidence,
           approved: false,
+          ...(sectionLayout
+            ? { layout_data: sectionLayout, layout_version: 1 }
+            : {}),
         })
         .select('id')
         .single()
