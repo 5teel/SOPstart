@@ -5,6 +5,37 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from '@/actions/auth'
 import { NotificationBadge } from '@/components/layout/NotificationBadge'
+import { PRODUCT_NAME } from '@/lib/constants'
+
+function BrandMark({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 32 32"
+      className={className}
+      aria-hidden="true"
+    >
+      <path
+        d="M16 2 L28 6 L28 15 C28 22 22 28 16 30 C10 28 4 22 4 15 L4 6 Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+        strokeLinejoin="round"
+      />
+      <text
+        x="16"
+        y="21"
+        textAnchor="middle"
+        fontFamily="ui-monospace, monospace"
+        fontSize="13"
+        fontWeight="700"
+        fill="currentColor"
+      >
+        S
+      </text>
+    </svg>
+  )
+}
 
 function MenuIcon({ className }: { className?: string }) {
   return (
@@ -165,11 +196,12 @@ export function TopHeader({ role, userEmail }: TopHeaderProps) {
 
         <Link
           href="/dashboard"
-          className="flex items-center gap-2 focus-visible:outline-2 focus-visible:outline-[var(--ink-900)] focus-visible:outline-offset-2 rounded-sm"
-          aria-label="SafeStart — home"
+          className="flex items-center gap-2 text-[var(--ink-900)] focus-visible:outline-2 focus-visible:outline-[var(--ink-900)] focus-visible:outline-offset-2 rounded-sm"
+          aria-label={`${PRODUCT_NAME} — home`}
         >
-          <span className="mono text-base font-semibold tracking-tight text-[var(--ink-900)]">
-            SafeStart
+          <BrandMark className="h-7 w-7" />
+          <span className="mono text-base font-semibold tracking-tight">
+            {PRODUCT_NAME}
           </span>
         </Link>
 
@@ -284,9 +316,12 @@ export function TopHeader({ role, userEmail }: TopHeaderProps) {
           />
           <div className="absolute inset-y-0 left-0 w-72 max-w-[80vw] bg-[var(--paper)] border-r border-[var(--ink-200)] flex flex-col">
             <div className="flex h-14 items-center justify-between px-4 border-b border-[var(--ink-100)]">
-              <span className="mono text-base font-semibold text-[var(--ink-900)]">
-                SafeStart
-              </span>
+              <div className="flex items-center gap-2 text-[var(--ink-900)]">
+                <BrandMark className="h-6 w-6" />
+                <span className="mono text-base font-semibold">
+                  {PRODUCT_NAME}
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={() => setDrawerOpen(false)}

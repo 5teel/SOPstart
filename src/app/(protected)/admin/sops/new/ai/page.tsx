@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 import { PromptClient } from './PromptClient'
 
 export const metadata: Metadata = {
-  title: 'Draft a SOP from a prompt — SafeStart',
+  title: 'Draft a SOP from a prompt — SOPstart',
   description: 'Type a short brief and Claude drafts a structured SOP for review.',
 }
 
