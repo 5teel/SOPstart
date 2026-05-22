@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
 milestone: v3.0
-milestone_name: Closeout
-status: executing
-stopped_at: "Completed Phase 15 Plan 04 (Wave 4 closeout — phase 15a code-complete). 4 new files + 8 modified. src/actions/sub-trades.ts (5 RLS-respecting server actions, requireAdmin gate); SubTradePicker component (multi-select pills, aria-pressed, optimistic+revert); /admin/team + /admin/sops/[sopId]/assign extended with SubTradePicker sections; check-bundle-size.ts hard-fail mode (Wave-0 carve-out removed); .bundle-baseline.json re-baselined to 1095 KB (post-Wave-2 starting point with inline rationale); 15-DEMO-PREP.md (5-min Bryce demo script). 23 new live source-contract tests; step_ack_trace contract tests added (Wave 2 wiring verified, no code changes). 85 passed / 4 skipped on phase15-stubs. SB-LINE-05 + SB-LINE-06 marked complete. Awaiting Simon's phase UAT: npx supabase db push --include-all + Visy demo dry-run via 15-DEMO-PREP.md. See 15-04-SUMMARY.md."
-last_updated: "2026-05-13T01:05:00.000Z"
-last_activity: 2026-05-13
+milestone_name: SOP Builder
+status: in-progress
+stopped_at: Phase 20 CONV-03 v1 paused 2026-05-17 (commit 233fc2e) — final image-src signing pass pending; resumed in 064e819
+last_updated: "2026-05-22T00:00:00.000Z"
+last_activity: 2026-05-17
 progress:
-  total_phases: 23
-  completed_phases: 5
-  total_plans: 28
-  completed_plans: 27
-  percent: 96
+  total_phases: 22
+  completed_phases: 13
+  in_flight_phases: 2
+  open_phases: 7
+  percent: 59
 ---
 
 # Project State
@@ -25,27 +25,36 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 15 (manufacturing-line-mode) — CODE-COMPLETE; AWAITING PHASE UAT
-Plan: 5 of 5 (plans 00, 01, 02, 03, 04 complete; Wave 4 = admin UI + CI gate + Visy demo prep shipped)
-Status: Phase 15a code-complete. Awaiting Simon's UAT: npx supabase db push --include-all + Visy demo dry-run.
-Last activity: 2026-05-13
+Active phase: 20 — Conversion Pipeline V2 (in flight; SPEC + 4 spikes validated; CONV-03 v1 build paused)
+Awaiting UAT (blocks closure): Phase 14, Phase 15
+Open / not started: Phase 7, Phase 9, Phase 16, Phase 17, Phase 18, Phase 19
 
-Progress bar: `[████████████████████]` 100% (phases 11+12 complete; phase 13 implementation 5/5 done — UAT remaining)
+Progress: `[███████████░░░░░░░░░]` 13 / 22 phases complete (59%)
 
-Phase 12 commits on master:
+### Phase 20 — Conversion Pipeline V2 (active)
 
-- 1eeca15 merge(12-01) builder shell foundation
-- 895ecc7 merge(12-02) 7 SOP blocks + Puck config
-- 53303e9 merge(12-04) Dexie autosave + reorder + preview toggle
-- 944de00 merge(12-03) blank-page wizard + AUTHORED IN BUILDER + D-08 purge
-- 1612925 docs(phase-12) verification FLAG → later promoted after UAT
+- SPEC.md locked 2026-05-15 (ambiguity 0.129, 12 requirements)
+- Spikes 001–004 all VALIDATED on master
+- Build plan captured 2026-05-16 (commit 312ac96) — executing directly, no numbered PLAN files yet
+- CONV-03 v1 (DOCX → Puck layout_data with side-by-side step+photo blocks) paused 2026-05-17 at 233fc2e
+- Last commit 064e819 (2026-05-17): sign layout_data photo URLs from private sop-images bucket
+- Next: finish CONV-03 v1 image-src signing pass, then move to AI-reviewer + per-block verify-checklist requirements
 
-Carried human-verification items (non-blocking for Phase 13):
+### Phase 14 — AI-Drafted SOPs (code complete, UAT debt)
 
-- UAT #3: airplane-mode edit → OFFLINE · QUEUED → reconnect → SAVED
-- UAT #6: cross-admin LWW "Updated by another admin" toast
+- Implementation complete 2026-05-10; verifier PASSED 9/9
+- Awaiting human UAT 1, 2, 4 against live Anthropic API
 
-Both wired structurally; need live two-session / offline-toggle scenario to exercise.
+### Phase 15 — Manufacturing-Line Mode (code complete, UAT debt)
+
+- 5/5 plans complete; Wave 4 (admin UI + CI gate + Visy demo prep) shipped
+- Awaiting: `npx supabase db push --include-all` (migration 00030) + Visy demo dry-run per `15-DEMO-PREP.md`
+
+### Carried human-verification items (non-blocking)
+
+- Phase 12 UAT #3: airplane-mode edit → OFFLINE · QUEUED → reconnect → SAVED
+- Phase 12 UAT #6: cross-admin LWW "Updated by another admin" toast
+- Phase 13: browser UAT for 13-03 / 13-04 / 13-05 (batchable)
 
 ## v2.0 Archive
 
@@ -296,7 +305,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-13T01:05:00.000Z
-Stopped at: Completed Phase 15 Plan 04 (Wave 4 closeout — Phase 15a code-complete). 4 new files + 8 modified. sub-trades server actions (5 RLS-respecting exports); SubTradePicker (multi-select pill, aria-pressed, optimistic+revert); /admin/team + /admin/sops/[sopId]/assign extended; check-bundle-size.ts hard-fail mode + chunk-detection extended to route bundle + react-loadable-manifest + static chunks; .bundle-baseline.json re-baselined to 1095 KB with inline rationale; 15-DEMO-PREP.md (5-min Bryce demo script, 154 lines, 21 keyword hits). 23 new live source-contract tests pass; 85 of 89 phase15-stubs tests green (4 skipped = runtime UAT fixme pending db push + chromium install). SB-LINE-05 + SB-LINE-06 marked complete. Phase 15a ready for Bryce demo dry-run.
-Resume file: .planning/phases/15-manufacturing-line-mode/15-04-SUMMARY.md
+Last session: 2026-05-17T05:45:30.393Z
+Stopped at: context exhaustion at 98% (2026-05-17)
+Resume file: None
 Awaiting: Simon's phase UAT — npx supabase db push --include-all (Wave 1 migration 00030) + Visy demo dry-run per 15-DEMO-PREP.md
