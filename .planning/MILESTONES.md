@@ -109,7 +109,7 @@ Move SOP authoring from "upload-and-parse only" to first-class native authoring 
 
 ### Known debt carried into v4.0
 
-- **Migration 00030 push pending** — Simon owns `npx supabase db push --include-all` before any worker hits the manufacturing-line UI on prod.
+- ~~Migration 00030 push pending~~ — **cleared 2026-05-23**: `npx supabase db push --include-all` reported "Remote database is up to date". Phase 15 sub-trade RLS live on prod.
 - **Phase 14.5 residual** — role-aware home + global Cmd+K were rolled forward into Phase 15 scope; verify these still land before they get forgotten.
 - **Browser-tab/PWA icon caches** — paper/ink rebrand of `favicon.svg` + `apple-touch-icon.png` + PWA icons (commit `ff00006`) shipped 2026-05-22; OS-level icon caches are sticky on installed PWAs and may need home-screen reinstall to refresh.
 - **Bundle baseline** — `/sops/[sopId]/page` re-baselined 1095 → 1104 KB on 2026-05-22 (global `TopHeader` added). ±2 KB tolerance preserved; further drift is real regression.

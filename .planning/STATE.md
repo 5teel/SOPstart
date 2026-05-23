@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Next action (operator):**
 
-- Run `npx supabase db push --include-all` from the repo to land migration 00030 (manufacturing-line sub-trade tags + RLS). Pending this push, the Phase 15 worker UI is broken on prod against unmigrated state.
+- ✅ Cleared 2026-05-23 — `npx supabase db push --include-all` reported "Remote database is up to date". Migration 00030 (Phase 15 sub-trade RLS) is live on prod.
 
 **Next action (development):**
 
