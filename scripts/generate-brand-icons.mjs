@@ -25,7 +25,6 @@ function shieldSvg({ size, contentScale }) {
   // Canvas is `size`px square. Content area is centered, sized to contentScale.
   // contentScale 0.7 means content occupies ~70% of canvas (safe for maskable).
   const inset = (1 - contentScale) / 2
-  const cx = size / 2
   // Stroke and font scale with content size, not canvas size.
   const strokeW = Math.max(2, size * contentScale * 0.04)
   const fontSize = size * contentScale * 0.5
