@@ -341,10 +341,6 @@ export async function permanentDeleteVersion(
   return { success: true }
 }
 
-// Backward-compat alias — existing callers using deleteVideoJob continue to work
-// during migration to permanentDeleteVersion.
-export { permanentDeleteVersion as deleteVideoJob }
-
 // ---------------------------------------------------------------
 // updateVersionLabel
 //
