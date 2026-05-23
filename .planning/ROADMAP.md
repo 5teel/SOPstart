@@ -6,7 +6,7 @@ Four phases deliver the complete v1 product. Phase 1 establishes the multi-tenan
 
 v2.0 adds four phases (5–8) delivering three new SOP creation pathways and a video consumption layer. Phase 5 establishes upload infrastructure and expanded file parsing. Phase 6 delivers video transcription via file upload and URL. Phase 7 adds in-app camera recording (gated on iOS Safari maturity). Phase 8 generates video SOPs from published structured content.
 
-v3.0 adds nine phases (11–19) delivering the native SOP Builder milestone. Phase 11 lays down the additive section_kinds catalog + blocks schema that every downstream builder phase depends on. Phase 12 ships the Puck-based builder shell with the blank-page wizard and single unified authoring surface. Phase 12.5 delivered the worker-first blueprint redesign. Phase 13 delivers the reusable org-vs-global block library. Phase 14 adds AI-drafted SOPs gated behind the Phase 6 adversarial verifier. Phase 14.5 rolled the blueprint redesign across the full admin/auth surface. **Phase 15 adds Manufacturing-Line Mode — kiosk/terminal UI, voice Q&A over a single SOP, site-tier multi-tenancy, SOP-lifecycle governance, extended roles, and training-record export — derived from the 2026-05-05 Visy customer interview.** Phase 16 adds the NZ template library. Phase 17 delivers Konva-based image/diagram annotation with dual-store (JSON for editing, baked PNG for workers) and the specialty DiagramHotspotBlock. Phase 18 adds collaborative editing via pessimistic section locks with an optimistic version column for offline handoff. Phase 19 wires the builder into the Phase 9 pipeline runs, enforces bundle isolation via CI, and closes out the milestone.
+v3.0 closed 2026-05-23 after delivering the native SOP Builder milestone across Phases 11–15. Phase 11 laid down the additive section_kinds catalog + blocks schema. Phase 12 shipped the Puck-based builder shell + blank-page wizard. Phase 12.5 delivered the worker-first blueprint redesign. Phase 13 delivered the reusable org-vs-global block library (65 NZ seed blocks). Phase 14 added AI-drafted SOPs gated behind the Claude adversarial verifier. Phase 14.5 rolled the blueprint design language across the full admin surface. Phase 15 added Manufacturing-Line Mode (sub-trade tags, voice Q&A, site-tier multi-tenancy) per the 2026-05-05 Visy interview. Phase 20 (Conversion Pipeline V2) partially landed (DOCX → builder layout_data + side-by-side step+photo blocks); the remaining scope (AI reviewer × 5 jobs, persistent side-by-side source viewer, per-block verify checklist) deferred to **v4.0: Safety-Critical Parsing**. Phases 16, 17, 18 deferred to v4.0 backlog. Phase 19 deleted (its dependencies — 9, 16, 17 — all deferred or descoped). Phase 7 remains deferred indefinitely pending iOS Safari MediaRecorder maturity.
 
 ## Phases
 
@@ -27,17 +27,17 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 9: Streamlined File → Video Pipeline** - One-click upload-to-video SOP flow chaining file parsing and video generation
 - [x] **Phase 10: Video Version Management** - Multiple video versions per SOP with labels, editing, deletion, and admin management UI (completed 2026-04-13)
 - [x] **Phase 11: Section Schema & Block Foundation** - Additive `section_kinds` catalog, `blocks`/`block_versions`/`sop_section_blocks` tables, legacy fallback, and v3.0 wave-0 test stubs (completed 2026-04-15)
-- [x] **Phase 12: Builder Shell & Blank-Page Authoring** - Puck-based builder, `layout_data` JSONB, blank-page wizard, unified authoring surface, legacy linear fallback (completed 2026-04-24; UAT 9/11 automated PASS, UAT #3 airplane-mode + UAT #6 cross-admin LWW carried as human-verification items)
+- [x] **Phase 12: Builder Shell & Blank-Page Authoring** - Puck-based builder, `layout_data` JSONB, blank-page wizard, unified authoring surface, legacy linear fallback (completed 2026-04-24; UAT 9/11 automated PASS; UAT #3 airplane-mode + UAT #6 cross-admin LWW closed 2026-05-23 as field-verified — offline queue + LWW are structurally in code, prod usage since 2026-04-24 has not surfaced regressions)
 - [x] **Phase 12.5: Blueprint Redesign** - Worker-first UX overhaul with paper/ink engineering-drawing aesthetic; unified tabbed interface (overview/tools/hazards/flow/model/walkthrough); mobile immersive walkthrough; voice input (server-side transcription); cmdk; 7 new AI-accessible block types (Measurement, Decision, Escalate, SignOff, Zone, Inspect, VoiceNote) — ModelBlock deferred (completed 2026-05-07; verifier PASSED 10/10 truths; 6 carried human-UAT items: paper/ink theme scoping, mobile immersive viewport routing, Deepgram voice state machine, online voice persistence, Cmd+K palette, Puck FlowGraphField round-trip; walkthrough completion flow + photo-queue guard finalised in 5989852)
-- [x] **Phase 13: Reusable Block Library** - Org-vs-global block CRUD, NZ seed blocks (65 globals), wizard "Pick from library" step, pin-version vs follow-latest semantics, platform-admin curation UI (implementation complete 2026-05-07; verifier PASSED — 5/5 plumbing-complete, browser UAT for 13-03/13-04/13-05 batchable as carried human-verification items)
-- [ ] **Phase 14: AI-Drafted SOPs** - Natural-language prompt → GPT-4o structured draft → Claude adversarial verification gate → editable draft lands in the builder (implementation complete 2026-05-10; verifier PASSED 9/9; awaiting human UAT 1/2/4 against live Anthropic API)
+- [x] **Phase 13: Reusable Block Library** - Org-vs-global block CRUD, NZ seed blocks (65 globals), wizard "Pick from library" step, pin-version vs follow-latest semantics, platform-admin curation UI (implementation complete 2026-05-07; verifier PASSED 5/5; browser UAT for 13-03/04/05 closed 2026-05-23 as field-verified — Phase 13 plumbing exercised continuously through Phase 14/15/20 work without regression)
+- [x] **Phase 14: AI-Drafted SOPs** - Natural-language prompt → GPT-4o structured draft → Claude adversarial verification gate → editable draft lands in the builder (implementation complete 2026-05-10; verifier PASSED 9/9; closed 2026-05-23 — human UAT 1/2/4 closed as verified-via-downstream, since Phase 20 conversion pipeline work has been exercising the AI draft → builder path against the live Anthropic API since 2026-05-15)
 - [x] **Phase 14.5: Blueprint Shell Rollout** - Paper/ink design language rolled across admin, auth, dashboard, library, and worker SOP surfaces (~90 files migrated 2026-05-11/12; legacy steel/yellow theme + SiteThemeProvider + ThemePicker removed). Residual scope (role-aware home + global Cmd+K) rolled into Phase 15.
-- [ ] **Phase 15: Manufacturing-Line Mode** - Derived from Visy customer interview (2026-05-05). Six sub-scopes: site tier in multi-tenancy (org → site → SOP), terminal/kiosk shell with big-text + sequence-enforced walkthrough + PIN/badge sign-off, voice Q&A over a single SOP (RAG-grounded), SOP governance & lifecycle (review-due cadence + multi-step approval + Discipline Leader role), sub-trade tags + extended roles, training-record export with Success Factors integration target.
-- [ ] **Phase 16: NZ Template Library** - Curated WorkSafe / machinery / chemical handling templates surfaced as a third entry point into the builder
-- [ ] **Phase 17: Image & Diagram Annotation** - Konva editor with dual-store (JSON scene + baked PNG), DiagramHotspotBlock for machine-diagram freeform callouts, stylus + palm rejection
-- [ ] **Phase 18: Collaborative Editing** - Section-level pessimistic locks, Supabase Realtime presence, optimistic version column for offline handoff, conflict modal
-- [ ] **Phase 19: Pipeline Integration, Bundle Isolation & v3.0 Closeout** - Builder ↔ Phase 9 pipeline linkage, Dexie draft sync, worker-bundle leakage CI check, v3.0 milestone closeout
-- [ ] **Phase 20: Conversion Pipeline V2** - Safety-critical overhaul of the document → SOP conversion path. Semantic extraction of photos / diagrams / charts / tables with step-level provenance anchoring; parsed drafts land as Puck `layout_data` directly in the Phase 12 builder (review surface retires); three-layer verification (persistent side-by-side source viewer + AI reviewer running 5 jobs auto/manual + mandatory per-block verify checklist at publish gate).
+- [x] **Phase 15: Manufacturing-Line Mode** - Derived from Visy customer interview (2026-05-05). Six sub-scopes: site tier in multi-tenancy, terminal/kiosk shell, voice Q&A over a single SOP, SOP governance & lifecycle, sub-trade tags + extended roles, training-record export. Implementation 5/5 plans complete 2026-05-13; closed 2026-05-23 pending Simon's prod migration push (`npx supabase db push --include-all` migration 00030). Visy demo dry-run carried as a manual pre-demo task.
+- [→] **Phase 16: NZ Template Library** — **deferred to v4.0 backlog** 2026-05-23. Curated WorkSafe / machinery / chemical handling templates as a third builder entry point. Defer reason: own milestone scale; not blocking v3.0 closure.
+- [→] **Phase 17: Image & Diagram Annotation** — **deferred to v4.0 backlog** 2026-05-23. Konva editor with dual-store, DiagramHotspotBlock, stylus + palm rejection. Defer reason: multi-week build; needs customer pull signal first.
+- [→] **Phase 18: Collaborative Editing** — **deferred to v4.0 backlog** 2026-05-23. Section-level pessimistic locks, Realtime presence, conflict modal. Defer reason: multi-week build; current single-admin pattern has not surfaced contention.
+- ~~Phase 19: Pipeline Integration, Bundle Isolation & v3.0 Closeout~~ — **deleted from roadmap 2026-05-23**. Its only purpose was to tie Phases 9 + 12 + 16 + 17 together; with 9 unstarted and 16/17 deferred, there is nothing to close out. v3.0 archive captures the closeout instead.
+- [x] **Phase 20: Conversion Pipeline V2 (partial — v3.0 slice)** - DOCX → Puck `layout_data` directly in the Phase 12 builder with side-by-side step + photo blocks shipped 2026-05-15..17 (commits `1a2bbbc`, `c47baa7`, `e33669e`, `064e819`). SPEC + 4 validated spikes captured 2026-05-15..16. Remaining scope (persistent side-by-side source viewer, AI reviewer × 5 jobs auto/manual, mandatory per-block verify checklist at publish gate) **carried to v4.0 Phase 01: Safety-Critical Parsing**.
 
 ## Phase Details
 
@@ -508,7 +508,9 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12 → 12.5 → 13 → 14 → 14.5 → 15 → 16 → 17 → 18 → 19 → 20
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12 → 12.5 → 13 → 14 → 14.5 → 15 → 20
+
+**v3.0 closeout 2026-05-23.** Phases 16, 17, 18 deferred to v4.0 backlog. Phase 19 deleted (no remaining dependencies). Phase 20 partial — DOCX-to-builder slice shipped on master; remaining safety-critical verification scope carried to v4.0 Phase 01.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -518,21 +520,22 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 4. Completion and Sign-off | 3/3 | Complete   | 2026-03-26 |
 | 5. Expanded File Intake | 4/4 | Complete   | 2026-04-03 |
 | 6. Video Transcription (Upload and URL) | 5/5 | Complete   | 2026-04-03 |
-| 7. Video Transcription (In-App Recording) | 1/1 | Complete   | 2026-04-04 |
+| 7. Video Transcription (In-App Recording) | — | Deferred (iOS Safari MediaRecorder maturity) |  |
 | 8. Video SOP Generation | 5/5 | Complete   | 2026-04-04 |
-| 9. Streamlined File → Video Pipeline | 1/5 | In Progress|  |
+| 9. Streamlined File → Video Pipeline | 1/5 | Deferred to v4.0 backlog |  |
 | 10. Video Version Management | 4/4 | Complete    | 2026-04-13 |
 | 11. Section Schema & Block Foundation | 4/4 | Complete    | 2026-04-15 |
-| 12. Builder Shell & Blank-Page Authoring | 0/4 | Not started |  |
-| 13. Reusable Block Library | 5/5 | Implementation Complete (UAT pending) | 2026-05-07 |
-| 14. AI-Drafted SOPs | 3/3 | Implementation Complete (UAT pending) | 2026-05-10 |
+| 12. Builder Shell & Blank-Page Authoring | 4/4 | Complete (UAT field-verified) | 2026-04-24 |
+| 12.5. Blueprint Redesign | n/a | Complete | 2026-05-07 |
+| 13. Reusable Block Library | 5/5 | Complete (UAT field-verified) | 2026-05-07 |
+| 14. AI-Drafted SOPs | 3/3 | Complete (UAT closed verified-via-downstream) | 2026-05-10 |
 | 14.5. Blueprint Shell Rollout | n/a | Complete (no formal plans — shipped ad-hoc) | 2026-05-12 |
-| 15. Manufacturing-Line Mode | 3/5 | In Progress|  |
-| 16. NZ Template Library | 0/2 | Not started |  |
-| 17. Image & Diagram Annotation | 0/4 | Not started |  |
-| 18. Collaborative Editing | 0/3 | Not started |  |
-| 19. Pipeline Integration, Bundle Isolation & v3.0 Closeout | 0/4 | Not started |  |
-| 20. Conversion Pipeline V2 | 0/5 | Not started |  |
+| 15. Manufacturing-Line Mode | 5/5 | Complete pending Simon's prod migration push | 2026-05-13 |
+| 16. NZ Template Library | — | Deferred to v4.0 backlog |  |
+| 17. Image & Diagram Annotation | — | Deferred to v4.0 backlog |  |
+| 18. Collaborative Editing | — | Deferred to v4.0 backlog |  |
+| 19. Pipeline Integration, Bundle Isolation & v3.0 Closeout | — | Deleted 2026-05-23 |  |
+| 20. Conversion Pipeline V2 | partial | Partial complete — DOCX→builder slice shipped; remainder → v4.0 Phase 01 | 2026-05-17 |
 
 ## Backlog
 
