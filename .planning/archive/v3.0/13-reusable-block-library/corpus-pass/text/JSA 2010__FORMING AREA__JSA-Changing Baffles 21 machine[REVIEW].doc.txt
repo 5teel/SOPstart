@@ -1,0 +1,38 @@
+
+Change Baffles 2/1
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |                                        |
+|All standard PPE required    |Yes                                        |JSA Reviewed by and date                |
+|when working within          |                                           |                                        |
+|production area.             |Overall Category of task                   |                                        |
+|                             |                                           |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |                                           |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|                             |                              |            |                                        |
+|Stop the Glass               |Minor Burn                    |5           |All PPE                                 |
+|                             |                              |            |                                        |
+|Clear section of glass       |                              |            |                                        |
+|                             |                              |            |                                        |
+|Stop Section                 |                              |            |                                        |
+|                             |                              |            |                                        |
+|Change Baffle                |                              |            |                                        |
+|                             |                              |            |                                        |
+|Swab section                 |                              |            |                                        |
+|                             |                              |            |                                        |
+|Restart                      |                              |            |                                        |
+|                             |                              |            |                                        |
+|Load section                 |                              |            |                                        |
+|                             |                              |            |                                        |
+|Check ware ΓÇÿAΓÇÖ OK. back in   |                              |            |                                        |
+|lehr                         |                              |            |                                        |
+
+

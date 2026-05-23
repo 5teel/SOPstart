@@ -1,0 +1,42 @@
+
+Tipping Pallets preparation of equipment
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety Glasses/ gloves / boots /|Yes                                    |Gary OΓÇÖNeill  31/05/07                  |
+|hi viz / ear protection / hard  |                                       |Mate Pocrnich  31/05/07                 |
+|hat                             |Risk Score                             |Glenn Stempher 31/05/07                 |
+|                                |100                                    |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Medium                                 |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps           |Potential /                  |Level of |Controls to reduce the Risk of Hazard   |
+|                                |Actual Hazard                |Risk     |                                        |
+|Turn on water valve  x1 bottom  |No water causes jam ups &    |Low      |Lever horizontal = on / vertical =  off |
+|( Deoiler )                     |damage                       |         |                                        |
+|On left hand side panel of      |Falling bottles may cause    |Low      |Ensure no one is under belt before      |
+|tipping machine turn on  (      |injury to persons under      |         |starting up                             |
+|clockwise ) conveyor start knob |conveyor belt                |         |                                        |
+|Walk up to the top platform     |Trip / slip                  |Medium   |Use hand rail                           |
+|towards crusher                 |                             |         |                                        |
+|Turn on water valves x2 top ( by|No water causes jam ups &    |Low      |Valves 2 & 4 on = anti clockwise/ off = |
+|crusher )                       |damage                       |         |clockwise                               |
+|Visually check that conveyor is |No water or conveyor  will   |Low      |Check                                   |
+|running & water supply is on    |result jam up &may cause     |         |                                        |
+|                                |damage                       |         |                                        |
+|If bottles are jamming in the   |Entrapment / Laceration      |Medium   |Use all PPE & equipment provided        |
+|crusher Than an iron bar may be |                             |         |                                        |
+|used to help clear the blockage |                             |         |                                        |
+|by pushing up & down on the     |                             |         |                                        |
+|glass                           |                             |         |                                        |
+|When the pallet being tipped is |Sprain / strain              |Low      |Use fork hoist / pedestrian hoist or ask|
+|removed from the enclosure. The |                             |         |for assistance                          |
+|pallets & layer boards should be|                             |         |                                        |
+|neatly stacked for disposition  |                             |         |                                        |

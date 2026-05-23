@@ -1,0 +1,52 @@
+
+Lathe Turning
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                             |Safety Induction [Contractor]           |                                            |
+|PPE Required:                 |Significant Hazard                      |JSEA Reviewed by and date                   |
+|All standard PPE required     |Yes                                     |                                            |
+|                              |                                        |                                            |
+|                              |Risk Score                              |                                            |
+|                              |45                                      |                                            |
+|                              |                                        |                                            |
+|                              |Category                                |                                            |
+|                              |Low                                     |                                            |
+|                              |                                        |                                            |
+|                              |Control taken                           |                                            |
+|                              |Minimisation                            |                                            |
+|                              |                                        |                                            |
+|Sequence of Job Steps         |Potential /                   |Level of |Controls to reduce the Risk of Hazard       |
+|                              |Actual Hazard                 |Risk     |                                            |
+|Safety checks and work to be  |Equipment used by non trained |High     |Ensure person trained and qualified to use  |
+|undertaken to be completed by |personnel may cause serious   |         |equipment. If trained but new to this Lathe |
+|a Trained person only         |injury to the employee.       |         |then must be covered within Induction.      |
+|Turn on lights to unlock ΓÇ£Lock|Equipment starting            |Medium   |Safety checks in place to prevent accidental|
+|outΓÇ¥                          |automatically is prevented    |         |start up                                    |
+|Set up job. Using correct     |Manual handling causing back  |Medium   |Use lifting gear to organise gear onto the  |
+|chuck holder on jig           |strain                        |         |Lathe                                       |
+|Centralise cutting tool       |Gear set too high or low the  |Medium   |Set tool at correct height                  |
+|                              |tool may break or vibrate     |         |                                            |
+|Turn on Lathe selecting       |Incorrect speed may cause     |Low      |Set at correct speed                        |
+|correct speed                 |injury and damage to gear     |         |                                            |
+|On job completion ΓÇ£Turn OffΓÇ¥  |Prevent accidental start up   |Low      |Isolate using Lock Out pad                  |
+|lathe using the ΓÇ£lock Out pad |causing entrapment            |         |                                            |
+|Clean Lathe                   |Laceration to hand & fingers  |Low      |Use PPE                                     |
+|Environmental:                |                              |         |                                            |
+|Removal of used rags / gloves/|Contamination.                |High     |Place in correct contamination or waste bins|
+|waste/ glass / cullet         |Waste removal and tidy up.    |         |provided.                                   |
+|                              |                              |         |Ensure area is cleaned and product / tools  |
+|                              |                              |         |cleared away.                               |
+|Protection & Security         |                              |         |                                            |
+|Demarcation                   |Damage to people, property and|High     |Demarcation where applicable.               |
+|                              |environment.                  |         |Install barricaded/danger tape as required. |
+|                              |                              |         |Ensure correct fire fighting equipment is   |
+|                              |                              |         |available.                                  |
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+

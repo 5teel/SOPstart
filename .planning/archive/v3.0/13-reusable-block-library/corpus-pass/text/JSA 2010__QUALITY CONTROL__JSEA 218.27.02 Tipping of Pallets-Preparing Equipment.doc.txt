@@ -1,0 +1,56 @@
+
+Tipping Pallets preparation of equipment
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                     |Safety Induction [Contractor]        |                                    |
+|PPE Required:                         |Significant Hazard                   |JSEA Reviewed by and date           |
+|Safety Glasses/ gloves / boots / hi   |Yes                                  |Gary OΓÇÖNeill  31/05/07              |
+|viz / ear protection / hard hat       |                                     |Mate Pocrnich  31/05/07             |
+|                                      |Risk Score                           |Glenn Stempher 31/05/07             |
+|                                      |100                                  |                                    |
+|                                      |                                     |                                    |
+|                                      |Category                             |                                    |
+|                                      |Medium                               |                                    |
+|                                      |                                     |                                    |
+|                                      |Control taken                        |                                    |
+|                                      |Minimisation                         |                                    |
+|                                      |                                     |                                    |
+|Sequence of Job Steps                 |Potential /               |Level of  |Controls to reduce the Risk of      |
+|                                      |Actual Hazard             |Risk      |Hazard                              |
+|Turn on water valve  x1 bottom  (     |No water causes jam ups & |Low       |Lever horizontal = on / vertical =  |
+|Deoiler )                             |damage                    |          |off                                 |
+|On left hand side panel of tipping    |Falling bottles may cause |Low       |Ensure no one is under belt before  |
+|machine turn on  ( clockwise )        |injury to persons under   |          |starting up                         |
+|conveyor start knob                   |conveyor belt             |          |                                    |
+|Walk up to the top platform towards   |Trip / slip               |Medium    |Use hand rail                       |
+|crusher                               |                          |          |                                    |
+|Turn on water valves x2 top ( by      |No water causes jam ups & |Low       |Valves 2 & 4 on = anti clockwise/   |
+|crusher )                             |damage                    |          |off = clockwise                     |
+|Visually check that conveyor is       |No water or conveyor  will|Low       |Check                               |
+|running & water supply is on          |result jam up &may cause  |          |                                    |
+|                                      |damage                    |          |                                    |
+|If bottles are jamming in the crusher |Entrapment / Laceration   |Medium    |Use all PPE & equipment provided    |
+|Than an iron bar may be used to help  |                          |          |                                    |
+|clear the blockage by pushing up &    |                          |          |                                    |
+|down on the glass                     |                          |          |                                    |
+|When the pallet being tipped is       |Sprain / strain           |Low       |Use fork hoist / pedestrian hoist or|
+|removed from the enclosure. The       |                          |          |ask for assistance                  |
+|pallets & layer boards should be      |                          |          |                                    |
+|neatly stacked for disposition        |                          |          |                                    |
+|Environmental:                        |                          |          |                                    |
+|Removal of used rags / gloves/  waste/|Contamination.            |High      |Place in correct contamination or   |
+|glass / cullet                        |Waste removal and tidy up.|          |waste bins provided.                |
+|                                      |                          |          |Ensure area is cleaned and product /|
+|                                      |                          |          |tools cleared away.                 |
+|Protection & Security                 |                          |          |                                    |
+|Demarcation                           |Damage to people, property|High      |Demarcation where applicable.       |
+|                                      |and environment.          |          |Install barricaded/danger tape as   |
+|                                      |                          |          |required.                           |
+|                                      |                          |          |Ensure correct fire fighting        |
+|                                      |                          |          |equipment is available.             |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

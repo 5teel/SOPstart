@@ -1,0 +1,56 @@
+
+Operating Steam Cleaner.
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                                      |Safety Induction [Contractor]                                 |
+|Hazard            |Practicable to Eliminate                                                                    |
+|Identification    |                                                                                            |
+|                                     |Insignificant ΓÇô first aid injury, up to  |
+|                                     |$1,000 damage, spill confined to         |
+|LIKELIHOOD                           |immediate work area, rapid clean up, no  |
+|                                     |damage to environment                    |
+|How likely is it to happen?          |                                         |
+|4                                    |ACT NOW ΓÇô Urgent ΓÇô do something about the|
+|ACUTE                                |risks immediately. Requires immediate    |
+|                                     |attention.                               |
+|3                                    |Highest management decision is required  |
+|HIGH                                 |urgently                                 |
+|2                                    |Follow management instruction            |
+|MODERATE                             |                                         |
+|1                                    |OK for now. Record and review if any     |
+|LOW                                  |equipment / people / materials / work    |
+|                                     |processes or procedures change           |
+
+
+
+                                                    Operating Steam Cleaner.
+|Area / Department             |Forming Services                     |Task or Job Description                       |
+|PPE Required:                 |Significant Hazard                   |JSA Reviewed by and date                      |
+|All standard PPE required     |Yes                                  |Dave Walmsley ΓÇô 10.07.08                      |
+|                              |                                     |                                              |
+|                              |Category                             |                                              |
+|                              |Medium                               |                                              |
+|                              |                                     |                                              |
+|                              |Control taken                        |                                              |
+|                              |Minimisation.                        |                                              |
+|                              |                                     |                                              |
+|Sequence of Job Steps          |Potential /                   |Level of  |Controls to reduce the Risk of Hazard    |
+|                               |Actual Hazard                 |Risk      |                                         |
+|Start Steam Cleaning machine.  |Tripping.                     |          |Ensure hoses are coiled & hung onto the  |
+|                               |Electric Shock.               |Med       |wall mounted clips.                      |
+|                               |Sprayed with hot water.       |          |Check switch for any signs of damage.    |
+|                               |                              |          |Check hoses for any leaking hoses or     |
+|                               |                              |          |connections.                             |
+|Steam Clean the dirty items.   |Hot water/Dirt.               |          |Wear Safety Glasses as well as Face      |
+|                               |Handpiece flying up in the    |Med       |Shield.                                  |
+|                               |air.                          |          |Hold Handpiece with 2 hands whilst Steam |
+|                               |Burns.                        |          |Cleaning.                                |
+|                               |                              |          |Wear Gloves.                             |
+|Shut down Steam Cleaning       |Tripping.                     |Med       |Move hoses out of the way.               |
+|machine.                       |Electric Shock.               |          |Check switch for signs of damage.        |
+|Store hoses back on the wall   |Handpiece flying up in the    |          |Hold Handpiece with 2 hands whilst       |
+|mounted clips.                 |air.                          |          |releasing the pressure from the hose.    |
+|                               |Tripping.                     |          |Ensure hoses are coiled up onto the wall |
+|                               |                              |          |mounted clips                            |

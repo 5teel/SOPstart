@@ -1,0 +1,45 @@
+
+FoodMac Operation
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                           |Safety Induction [Contractor]          |                                           |
+|PPE Required:               |Significant Hazard                     |JSA Reviewed by and date                   |
+|All standard PPE required   |Yes                                    |                                           |
+|                            |                                       |                                           |
+|                            |Risk Score                             |                                           |
+|                            |60                                     |                                           |
+|                            |                                       |                                           |
+|                            |Category                               |                                           |
+|                            |Medium                                 |                                           |
+|                            |                                       |                                           |
+|                            |Control taken                          |                                           |
+|                            |Minimisation                           |                                           |
+|                            |                                       |                                           |
+|Sequence of Job Steps           |Potential /                  |Level of|Controls to reduce the Risk of Hazard    |
+|                                |Actual Hazard                |Risk    |                                         |
+|New pallet enters the  lift well|Manual Handling from pallet  |Medium  |Lift frame collapse due to drive chains  |
+|and ascends to top, applicator  |lift collapse                |        |breaking. empty Pallet collapse          |
+|applies board, dead plate and   |                             |        |Preventative maintenance and early       |
+|divider squares extend          |                             |        |reporting of any faults                  |
+|Bottles come onto accumulation  |Entrapment of fingers        |Low     |Clamp may come down on fingers / hands   |
+|table and into the sweep        |                             |        |but only if light curtain fails Keep     |
+|carriage, clamp down to clamp   |                             |        |hands / fingers clear of clamp           |
+|bottles                         |                             |        |                                         |
+|The layer breaks and the        |Entrapment due to failure of |Low     |Sweep tynes may cause injury when        |
+|conveyor breaks, the sweep tynes|Light curtain                |        |lowered, entrapment during sweep, if     |
+|lower, sweep carriage then moves|                             |        |light curtain fails Stay clear during    |
+|forward onto pallet             |                             |        |sweep cycle                              |
+|The layer break closes, and the |Entrapment due to failure of |Low     |Stay clear during cycle                  |
+|dead plate, divider squares and |Light curtain                |        |                                         |
+|the layer squares then retract  |                             |        |                                         |
+|Pallet index moves down, divider|Entrapment due to failure of |Low     |Layer break close, sweep carriage reverse|
+|and layer squares extend, sweep |Light curtain on reverse     |        |may cause entrapment Stay clear during   |
+|tynes up, Sweep carriage        |                             |        |cycle                                    |
+|reverses back to start.         |                             |        |                                         |
+|Full pallet descends and exits  |Manual Handling from pallet  |Medium  |Lift frame collapse on descent due to    |
+|lift as new pallet enters lift  |lift collapse                |        |drive chains breaking. Pallet collapses  |
+|and ascends to top position.    |                             |        |also, bottles falling off pallet         |
+|                                |                             |        |Preventative maintenance and early       |
+|                                |                             |        |reporting of any faults.                 |

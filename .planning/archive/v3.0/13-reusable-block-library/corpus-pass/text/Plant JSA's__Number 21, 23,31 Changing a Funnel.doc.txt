@@ -1,0 +1,121 @@
+
+|HAZARD IDENTIFICATION   Number 21, 23,31 Changing a Funnel   SAFETY REQUIRED                                  |
+
+|Risk of Entrapment          |X   |Ventilation                |     |
+|Pinch Points                |X   |Fire Hazard                |     |
+|Moving Parts                |X   |Fragile roof support       |     |
+|Rotating Parts              |    |Lighting                   |     |
+|Cutting                     |    |Isolated workplace location|     |
+|Moving Machinery            |X   |Work above 3 metres        |     |
+|Automatic equipment         |X   |Pressurised Fluid          |     |
+|Manual Handling             |X   |Spill to site drainage     |     |
+|Risk of falling objects     |    |Spill to Stormwater        |     |
+|Excessively hot environment |X   |Odour or Emissions         |     |
+|Noise                       |X   |Soil Contamination         |     |
+|Slippery surface            |X   |Airborne Contaminants      |     |
+|Tripping hazard             |    |Electricity [Power Tools]  |     |
+|Confined Space              |    |Stored energy              |     |
+|Broken or smashed glass     |X   |Electrocution              |     |
+|Limited working area        |    |Risk of person falling     |     |
+
+|Hard Hat                    |     |
+|Gloves                      |X    |
+|Breathing Apparatus         |     |
+|Goggles                     |     |
+|Hearing protection          |X    |
+|Fire Extinguisher           |     |
+|Safety Glasses              |X    |
+|Back Support belt           |     |
+|Face Shield                 |     |
+|Disposable Clothing         |     |
+|Harness                     |     |
+|MSDS                        |     |
+|Spill Kit                   |     |
+|Bunding                     |     |
+|Council / OSH Notification  |     |
+|Warning signs to be         |     |
+|displayed                   |     |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+|NOTES              PERMITS COMPLETD                                                                           |
+
+|Work at Heights              |    |
+|High Voltage                 |    |
+|Hot work                     |    |
+|Confined Space               |    |
+|Excavation                   |    |
+|Permit to work completed     |    |
+
+|                                                                  |
+|                                                                  |
+|                                                                  |
+
+
+|CONTRACTOR                                            |
+|                                                      |Is the Contractor Inducted ΓÇô do they have a current   |
+|                                                      |safety Agreement                                      |
+|                                                      |
+
+|HAZARD MATRIX                                                                                                 |
+|                  |CONSEQUENCES                            The severity of potential consequences             |
+|                                    |Insignificant                                |
+|LIKELIHOOD                          |First aid injury, up to $1,000 damage, spill |
+|                                    |confined to immediate work area, rapid clean |
+|How likely is it to happen?         |up, no damage to environment                 |
+|4                                   |ACT NOW ΓÇô Urgent ΓÇô do something about the    |
+|ACUTE                               |risks immediately. Requires immediate        |
+|                                    |attention.                                   |
+|3                                   |Highest management decision is required      |
+|HIGH                                |urgently                                     |
+|2                                   |Follow management instruction                |
+|MODERATE                            |                                             |
+|1                                   |OK for now. Record and review if any         |
+|LOW                                 |equipment / people / materials / work        |
+|                                    |processes or procedures change               |
+
+|Hazard Management Worksheet                           |Number 21, 23,31 Changing a Funnel                             |
+|Hazard Identification              |Practicable to Eliminate                                                   |
+|Area /         |Job Change         |JSA Conducted by:                          |Date completed   26.6.2010     |
+|Department     |                   |                                           |                               |
+|Controls to be taken Delete all other controls not taken |Overview of the Hazard                               |
+|Elimination                                              |Significant Hazard                                   |
+|Isolation                                                |Yes                                                  |
+|Administration                                           |                                                     |
+|                                                         |Control taken                                        |
+|Engineering                                              |Minimisation                                         |
+|Minimisation                                             |                                                     |
+|Substitution                                             |                                                     |
+|                                                         |                                                     |
+|                                                         |                                                     |
+|PPE Required:  All standard PPE required when working    |JSA Reviewed by and date                             |
+|within production area                                   |GRANT JUPP 18-12-2019                                |
+|Sequence of Job Steps       |Potential / Actual Hazard   |Level of   |Controls to reduce the Risk of Hazard    |
+|                            |                            |Risk       |                                         |
+|                            |                            |H M L      |                                         |
+|Stop Section:- Take 5       |Making section safe to      |H          |Stop Neck ring arms in the inverted      |
+|Follow Stopping Section     |prevent entrapment          |           |position using the E Stop button         |
+|Ensure section is safe.     |Trapped in the section /    |H          |Ensure E Stop button is activated and    |
+|                            |crush injury.               |           |light is on before entering section.     |
+|                            |                            |           |Apply safety T Bar to invert rack.       |
+|Ensure working safely.      |Crush injury.               |H          |Be aware of baffle arm coming            |
+|Remove funnel.              |Burns                       |H          |Using thick gloves provided remove the   |
+|                            |                            |           |funnel.                                  |
+|Replace funnel.             |Burns                       |L          |Using thick gloves provided fit the clean|
+|                            |                            |           |funnel to the machine.                   |
+|Follow starting a section   |Caught in section / back    |H          |Ensure all personnel are clear of the    |
+|procedure                   |strain.                     |           |section.  Start the section up.          |
+

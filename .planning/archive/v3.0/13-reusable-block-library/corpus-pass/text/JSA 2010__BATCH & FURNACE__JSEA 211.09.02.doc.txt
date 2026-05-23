@@ -1,0 +1,83 @@
+
+
+
+Job Safety Environmental Analysis Form:
+                                                                     Controll
+                                                                     ed Run
+                                                                     Out
+
+|Area / Department                   |Batch & Furnace                      |Task  or Job Description                  |
+|PPE Required:                       |Significant Hazard                   |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs,  |                                     |                                          |
+|Safety Boots, High Vis/heat Garment,|                                     |                                          |
+|Respiratory Protection (when working|Risk Score                           |                                          |
+|with asbestos)                      |                                     |                                          |
+|                                    |                                     |                                          |
+|                                    |Category                             |                                          |
+|                                    |                                     |                                          |
+|                                    |                                     |                                          |
+|                                    |Control taken                        |                                          |
+|                                    |                                     |                                          |
+|                                    |                                     |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Bubblers inserted and    |Heat, water hydraulic   |High     |Familiar users completing task.                         |
+|stabilised.              |system.                 |         |Ascertain the requirement for the hole prior to         |
+|                         |Drill inserted to far or|         |insertion.                                              |
+|                         |the hole not correct    |         |                                                        |
+|                         |size.                   |         |                                                        |
+|Fill up raw materials for|Stop production to Tank |High     |Preparation of requirements for batching.               |
+|Tank 2.                  |2.                      |         |                                                        |
+|Batch House roadway      |Contamination into      |High     |Sand barriers and plating.                              |
+|prepared.                |stormwater drains.      |         |(Check tank 2 area and water into Great South Road).    |
+|                         |Flooding to basement    |         |                                                        |
+|                         |areas.                  |         |                                                        |
+|Installation of run-out  |Glass to close to the   |High     |Extension to pipe.                                      |
+|pipe                     |furnace.                |         |                                                        |
+|Process Engineer to check|Glass run-out via the   |High     |Wind cooling on bubbler pocket.                         |
+|bubbler site hourly until|bubblers inserted prior.|         |                                                        |
+|the Monday.              |                        |         |                                                        |
+|Open run-out gates.      |Loader driver unable to |High     |Control the flow from the furnace for the first 4 hours,|
+|                         |keep up with flow of the|         |then open gates fully as the furnace pressure has       |
+|                         |glass.                  |         |reduced.                                                |
+|Stop glass production at |Nil                     |Low      |Nil                                                     |
+|5am once established     |                        |         |                                                        |
+|run-out.                 |                        |         |                                                        |
+|Barricade off area.      |Employees observing the |High     |Use Safety Officers during time plus back-up employees  |
+|                         |run-out or trying to get|         |from Forming Shift to stop employees entering in the    |
+|                         |access through the area.|         |area.                                                   |
+|Notify Services ΓÇô        |Complaints from nearby  |Low      |Notification to all services and nearby residents.      |
+|Council, Fire, Seamount. |residents.              |         |                                                        |
+|Disconnmect electroboost |Electrocution.          |High     |Lock out supply.                                        |
+|once advised.            |                        |         |                                                        |
+|Remove glass via Loader  |Loader failure.         |High     |Have second Loader on standby on site.                  |
+|from roadway into bay.   |Heat and steam exposure.|         |Break from driving using the 3 drivers.                 |
+|                         |                        |         |Electrolyte replacement drinks.                         |
+|Loader visibility.       |Steam obscuring         |High     |Lighting in area to guide driver.                       |
+|                         |visibility.             |         |                                                        |
+|Clean up roadway.        |Assess hazards.         |High     | Remove sand and plates.                                |
+|Hand over furnace area to|All employees working in|High     |Notification by O-I project team.                       |
+|Project Team.            |area not aware.         |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

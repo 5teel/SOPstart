@@ -1,0 +1,42 @@
+
+Changing Plunger, Thimble & Striker Plate
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                           |Safety Induction [Contractor]           |                                           |
+|PPE Required:               |Significant Hazard                      |JSA Reviewed by and date                   |
+|All standard PPE required   |Yes                                     |                                           |
+|                            |                                        |                                           |
+|                            |Risk Score                              |                                           |
+|                            |250                                     |                                           |
+|                            |                                        |                                           |
+|                            |Category                                |                                           |
+|                            |High                                    |                                           |
+|                            |                                        |                                           |
+|                            |Control taken                           |                                           |
+|                            |Minimisation                            |                                           |
+|                            |                                        |                                           |
+|Sequence of Job Steps       |Potential /                   |Level of |Controls to reduce the Risk of Hazard      |
+|                            |Actual Hazard                 |Risk     |                                           |
+|Stop Loading                |Gob may still be loading      |Low      |Wait until complete forming cycle          |
+|Stop Section at invert      |Neck ring arm reverts and or  |High     |Install revert safety lock and close blank |
+|position                    |blank close                   |         |open/close airline                         |
+|Pull out striker plate with |Burns, moving parts. Difficult|High     |Use PPE  Use special tools to remove       |
+|special tools               |to remove plate               |         |striker plate                              |
+|Press thimble at twist 90┬░  |FB to eyes and manual handling|High     |Use PPE  Use special tools to remove       |
+|to remove                   |from twisting & removing gear |         |thimble                                    |
+|Turn on thimble and Plunger |Hot plunger causing burns.    |High     |Use compressed air to clean then remove by |
+|up air ride to remove       |Build up of carbon may be     |         |hands                                      |
+|plunger                     |difficult to remove           |         |                                           |
+|Change Plunger then turn off|Plunger stays on              |Medium   |Turn off correct plunger/thimble override  |
+|thimble and plunger         |                              |         |                                           |
+|Install thimble press and   |Thimble moving                |Low      |Ensure secure by locking after and press   |
+|twist 90┬░ to lock           |                              |         |and twist 90┬░                              |
+|Insert Striker Plate        |Burns                         |Low      |Insert striker plate making sure it sits   |
+|                            |                              |         |correctly                                  |
+|Remove revert safety lock   |Entrapment                    |Low      |Pull Neck Ring arm to revert               |
+|Open Blank close air line   |Entrapment                    |Low      |Use over ride                              |
+|Start Section               |Glass causing burns and crush |Low      |Reset maintenance button                   |
+|Load Section                |Jam up of glass               |Low      |Be aware as to what is taking place with   |
+|                            |                              |         |the loading                                |

@@ -1,0 +1,60 @@
+
+
+
+Job Safety Environmental Analysis Form:
+                                                                     Job
+                                                                     Change
+                                                                     Foodmach
+
+
+
+                                                                     |Area / Department                  |Factory Maintenance                   |Task  or Job Description                  |
+|                                   |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Recommended Personal Protective    |                                      |                                          |
+|Equipment                          |                                      |                                          |
+|Gloves, Safety Glasses, Ear Muffs, |Risk Score                            |                                          |
+|Safety Boots, High Vis Garment,    |                                      |                                          |
+|Respiratory Protection (when       |                                      |                                          |
+|working with asbestos).            |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Prepare work site.       |Manual handling.        |Medium   |Use correct manual handling techniques.                 |
+|Lower lift and raise     |Falls / cuts /          |Medium   |Check all clear before lowering and raising clamp.      |
+|layer clamp.             |pedestrians             |         |Wear appropriate PPE equipment.                         |
+|Isolate ΓÇô Foodmach.      |Hand tools / jammed     |Low      |Remove key.                                             |
+|                         |fingers.                |         |Place boards over lift well, clear old bottles.         |
+|                         |                        |         |Set layer squares.                                      |
+|                         |                        |         |Remove boards from lift well.                           |
+|                         |                        |         |Set layer screws and clamp screws.                      |
+|Set rest of Foodmach.    |                        |Low      |Run bottles in and set up packs.                        |
+|                         |                        |         |Start Foodmach in Auto, then set squarer to layer board.|
+|                         |                        |         |Set grippers, set labeller.                             |
+|                         |                        |         |Be vigilant.                                            |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

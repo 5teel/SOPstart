@@ -1,0 +1,27 @@
+
+Inspection of data Accumulator
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]           |                                         |
+|PPE Required:                |Significant Hazard                      |JSA Reviewed by and date                 |
+|All standard PPE required    |Yes                                     |J Booth 14/01/08                         |
+|                             |                                        |                                         |
+|                             |Risk Score                              |                                         |
+|                             |                                        |                                         |
+|                             |                                        |                                         |
+|                             |Category                                |                                         |
+|                             |Medium                                  |                                         |
+|                             |                                        |                                         |
+|                             |Control taken                           |                                         |
+|                             |Minimisation                            |                                         |
+|                             |                                        |                                         |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Clean cabinet                |Lighting, Dust to eyes        |Low      |PPE required. Improve lighting in cabinet|
+|Check connections and glands |Slips & cuts                  |Low      |Safe working practice. Safe ladder       |
+|Check voltages from power    |Electrocution                 |High     |Approved meters plus training and        |
+|supply                       |                              |         |instruction                              |
+|Check fans                   |Moving parts. Pinch points    |Medium   |Safe working practice. PPE required      |
+|Check for damage to cables   |Cuts                          |Medium   |Safe working practice. PPE required      |

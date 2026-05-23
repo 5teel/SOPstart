@@ -1,0 +1,36 @@
+
+Changing Transfer Wiper fingers
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes or No                                  |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |Low                                        |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Reject bottles off main      |Heat, lacerations from glass  |Low         |Wear all PPE to ensure that no exposure |
+|conveyor                     |                              |            |to glass                                |
+|Person 1 to engage transfer  |Heat & lacerations from glass |Low         |Wear all PPE to ensure that no exposure |
+|clutch                       |                              |            |to glass                                |
+|Person 2 to remove and       |Heat & lacerations from glass |Low         |Wear all PPE to ensure that no exposure |
+|replace transfer fingers     |Pinch pointΓÇÖs Manual handling.|            |to glass. Care with lifting             |
+|Person 1 to disengage        |Heat & lacerations from glass |Low         |Wear all PPE to ensure that no exposure |
+|Transfer clutch              |                              |            |to glass                                |
+|Turn air off to conveyor     |Heat & lacerations from glass |Low         |Wear all PPE to ensure that no exposure |
+|reject                       |                              |            |to glass                                |
+|Ensure system is functioning |Heat & lacerations from glass |Low         |Wear all PPE to ensure that no exposure |
+|before leaving area          |                              |            |to glass                                |
+
+
+
+
+
+                   Is lock out required with this task????

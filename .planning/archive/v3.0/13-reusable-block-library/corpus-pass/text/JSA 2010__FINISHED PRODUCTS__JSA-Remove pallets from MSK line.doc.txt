@@ -1,0 +1,36 @@
+
+Removing pallets from MSK during MSK breakdown
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date:               |
+|Standard safety PPE equipment   |Yes                                    |                                        |
+|                                |                                       |Bronwyn Bell                            |
+|                                |Risk Score                             |                                        |
+|                                |45                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps           |Potential /               |Level of    |Controls to reduce the Risk of Hazard   |
+|                                |Actual Hazard             |Risk        |                                        |
+|Section of MSK in feed line must|Getting on/off hoist to   |Low         |Care taken when getting on/off hoist,   |
+|be turned off before hoist is   |turn line on/off, up and  |            |                                        |
+|able to lift pallet off line    |down, trip hazard         |            |                                        |
+|Move forward with hoist, lift   |Pallet collapse, mobile   |Low         |All PPE gear to be worn - ensure way is |
+|pallet and slowly reverse until |hoist movement and bottles|            |clear when reversing, slowly place      |
+|clear of line, lower pallet when|falling off pallet,       |            |pallet on floor                         |
+|clear.                          |lacerations, cuts         |            |                                        |
+|Getting off hoist to turn line  |Getting on/off hoist to   |Low         |Care taken when getting on/off hoist,   |
+|back on for next pallet         |turn line on/off, up and  |            |                                        |
+|                                |down, trip hazard         |            |                                        |
+|Now move pallet away from line  |Unstable pallet, falling  |Low         |When placing pallet/s, speed must be    |
+|to suitable floor area          |bottles, lacerations, cuts|            |reduced, ensure area is clear of all    |
+|                                |                          |            |potential obstructions                  |
+|Repeat process until MSK is up  |                          |            |                                        |
+|and running                     |                          |            |                                        |

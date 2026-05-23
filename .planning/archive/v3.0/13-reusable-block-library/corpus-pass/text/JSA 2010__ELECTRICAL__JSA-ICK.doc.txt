@@ -1,0 +1,30 @@
+
+I.C.K
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |High                                       |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Isolate power and air supply |Shock, moving parts & cuts    |Low         |Lock out procedure. Wear all PPE        |
+|Remove broken glass. Check   |Pinch points, slips & cuts    |Low         |Use safe working procedures. Wear all   |
+|belts and pulleys            |                              |            |PPE                                     |
+|Check swing arm and pressure |Slips, cuts, lifting & pinch  |Low         |Use safe working procedures. Wear all   |
+|pad                          |points                        |            |PPE. Approved meters                    |
+|Check guide rails            |Cuts                          |Medium      |Use safe working procedures. Wear all   |
+|                             |                              |            |PPE                                     |
+|Power up and check air       |Shocks & moving parts         |Low         |Use safe working procedures. Wear all   |
+|supply. Check all safetyΓÇÖs   |                              |            |PPE                                     |
+|Test run                     |Moving parts and pinch points |Low         |Use safe working procedures. Wear all   |
+|                             |slips                         |            |PPE                                     |
+

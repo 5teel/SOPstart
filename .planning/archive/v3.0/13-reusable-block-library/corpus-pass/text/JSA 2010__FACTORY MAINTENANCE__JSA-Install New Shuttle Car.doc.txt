@@ -1,0 +1,26 @@
+
+Install New Shuttle Car
+                            HAZARD IDENTIFICATION
+
+|                                                                        |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSA Reviewed by and date                    |
+|All standard PPE required     |Yes                                  |Chris Sheppard                              |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |200                                  |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |High                                 |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps   |Potential /            |Level of |Controls to reduce the Risk of Hazard                 |
+|                        |Actual Hazard          |Risk     |                                                      |
+|Install rails on floor  |Shuttle car working    |High     |Lock out automatic car  plus Use manual car with      |
+|                        |within area            |         |safety watch                                          |
+|Install rails on floor  |Broken glass           |Medium   |Keep floor clean and use gloves                       |
+|Drilling concrete       |Dust & Electrocution   |High     |Goggles & RCD, dust masks                             |
+|Lifting Rails           |Strain                 |Medium   |Use Samson and correct lifting technique              |

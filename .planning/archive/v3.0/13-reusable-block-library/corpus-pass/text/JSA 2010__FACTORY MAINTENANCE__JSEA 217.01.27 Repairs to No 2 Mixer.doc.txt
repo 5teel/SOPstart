@@ -1,0 +1,66 @@
+
+Repairs to Number 2 Mixer in Batch House
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                            |Safety Induction [Contractor]        |X                                           |
+|PPE Required:                |Significant Hazard                   |JSEA Reviewed by and date                   |
+|All standard PPE required    |Yes                                  |                                            |
+|                             |                                     |                                            |
+|                             |Risk Score                           |                                            |
+|                             |400                                  |                                            |
+|                             |                                     |                                            |
+|                             |Category                             |                                            |
+|                             |High                                 |                                            |
+|                             |                                     |                                            |
+|                             |Control taken                        |                                            |
+|                             |Minimisation                         |                                            |
+|                             |                                     |                                            |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Stop Mixer                   |Crush & Entrapment            |Medium   |Isolate and permit time for mixer to slow|
+|                             |                              |         |down and stop rotating.                  |
+|Set up for the work          |Manual Handling               |High     |Complete documentation for Hot Work      |
+|                             |                              |         |Permit Extra lighting to be set up.      |
+|                             |                              |         |Ensure doors open for the ventilation.   |
+|                             |                              |         |All electrical equipment connected to    |
+|                             |                              |         |RCD.                                     |
+|Set up for Confined Space    |Entrapment                    |High     |Commence documentation for working in    |
+|work                         |                              |         |Confined space.                          |
+|Monitor oxygen levels in side|Asphyxiation                  |High     |Monitor and record levels and decision   |
+|mixer                        |                              |         |then made as to the entry requirements.  |
+|                             |                              |         |Discuss entry and rescue emergency       |
+|                             |                              |         |methods                                  |
+|Strip out old paddles        |Sharp edges on equipment      |Medium   |Use correct lifting when removing        |
+|                             |causing laceration Manual     |         |paddles.                                 |
+|                             |Handling                      |         |                                         |
+|Strip out old liners         |Sharp edges on equipment      |Medium   |Use correct lifting when removing old    |
+|                             |causing laceration Manual     |         |liners                                   |
+|                             |Handling                      |         |                                         |
+|Install new lines            |Sharp edges on equipment      |Medium   |Use correct lifting when installing new  |
+|                             |causing laceration Manual     |         |lines                                    |
+|                             |Handling                      |         |                                         |
+|Install new paddles          |Sharp edges on equipment      |Medium   |Use correct lifting when installing new  |
+|                             |causing laceration. Manual    |         |paddles                                  |
+|                             |Handling                      |         |                                         |
+|Reset Mixer                  |Electrocution                 |Medium   |Ensure equipment operational before      |
+|                             |                              |         |leaving                                  |
+|Environmental:               |                              |         |                                         |
+|Removal of used rags /       |Contamination.                |High     |Place in correct contamination or waste  |
+|gloves/  waste/ glass /      |Waste removal and tidy up.    |         |bins provided.                           |
+|cullet                       |                              |         |Ensure area is cleaned and product /     |
+|                             |                              |         |tools cleared away.                      |
+|Protection & Security        |                              |         |                                         |
+|Demarcation                  |Damage to people, property and|High     |Demarcation where applicable.            |
+|                             |environment.                  |         |Install barricaded/danger tape as        |
+|                             |                              |         |required.                                |
+|                             |                              |         |Ensure correct fire fighting equipment is|
+|                             |                              |         |available.                               |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+
+

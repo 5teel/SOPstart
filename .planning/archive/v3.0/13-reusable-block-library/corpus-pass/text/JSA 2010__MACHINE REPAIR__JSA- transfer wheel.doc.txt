@@ -1,0 +1,52 @@
+
+ Transfer Wheel Unit Replacement on 34 machine
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                 |Safety Induction [Contractor]                                                               |
+|                              |Insignificant ΓÇô first aid injury, up  |
+|                              |to $1,000 damage, spill confined to   |
+|LIKELIHOOD                    |immediate work area, rapid clean up,  |
+|                              |no damage to environment              |
+|How likely is it to happen?   |                                      |
+|4                             |ACT NOW ΓÇô Urgent ΓÇô do something about |
+|ACUTE                         |the risks immediately. Requires       |
+|                              |immediate attention.                  |
+|3                             |Highest management decision is        |
+|HIGH                          |required urgently                     |
+|2                             |Follow management instruction         |
+|MODERATE                      |                                      |
+|1                             |OK for now. Record and review if any  |
+|LOW                           |equipment / people / materials / work |
+|                              |processes or procedures change        |
+                               Transfer Wheel Unit Replacement on 34 machine
+|Area / Department            |Production Maint.                          |Task  or Job Description                |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required eg.|Yes o                                      |John Holmes Libbis                      |
+|Ear muffs, gloves, safety    |                                           |Colin Hayes                             |
+|glasses                      |Overall Category of task                   |                                        |
+|                             |MEDIUM                                     |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Turn off power by pressing   |Electrocution                 |4           |Isolation= Use safety lockout provided  |
+|the ΓÇÿEΓÇÖ stop button.         |                              |            |by John Matahiki to be used on the main |
+|                             |                              |            |control panel                           |
+|Turn off lube line tap then, |Slippery surface              |3           |Elimination= if lube is spilt, spill kit|
+|remove lube lines from       |                              |            |is available for use.                   |
+|injectors.                   |                              |            |                                        |
+|Loosen grub screw on drive   |Broken glass                  |1           |Minimisation= clean broken glass.       |
+|shaft, this will allow       |Limited working area          |            |                                        |
+|transfer wheel to separate   |                              |            |                                        |
+|from gearbox.                |                              |            |                                        |
+|Secure chain block to        |Manual handling               |3           |Isolation= place transfer on transfer   |
+|transfer wheel, then remove  |Risk of entrapment            |            |wheel trolley, clamp it down with lock  |
+|lock down clamps.            |                              |            |down clamps.                            |
+|Hoist transfer wheel off     |Manual handling               |3           |Isolation= place transfer on transfer   |
+|manifold bracket and secure  |Risk of entrapment            |            |wheel trolley, clamp it down with lock  |
+|to transfer wheel trolley.   |                              |            |down clamps.                            |
+|Assemble new transfer wheel  |Risk of entrapment            |3           |Isolation= use chain block to lift      |
+|to manifold bracket, and     |                              |            |transfer wheel of the trolley, place it |
+|repeat steps in reverse      |                              |            |on the manifold bracket and clamp down  |
+|order.                       |                              |            |with lock down clamps.                  |

@@ -1,0 +1,27 @@
+
+In-feed Slat band Drive Shaft and Bearings Replacement
+                            HAZARD IDENTIFICATION
+
+                     REPLACE FP INFEED DRIVE SHAFT/BRGS
+|1                                                                       |
+|1                                                                       |
+|1                              |Safety Induction [Contractor]       |                                            |
+|PPE Required:                  |Significant Hazard                  |JSA Reviewed by and date                    |
+|All standard PPE required      |Yes                                 |                                            |
+|                               |                                    |                                            |
+|                               |Risk Score                          |                                            |
+|                               |45                                  |                                            |
+|                               |                                    |                                            |
+|                               |Category                            |                                            |
+|                               |Low                                 |                                            |
+|                               |                                    |                                            |
+|                               |Control taken                       |                                            |
+|                               |Minimisation                        |                                            |
+|                               |                                    |                                            |
+|Sequence of Job Steps   |Potential /                       |Level of  |Controls to reduce the Risk of Hazard    |
+|                        |Actual Hazard                     |Risk      |                                         |
+|Switch off line         |Trapping hand                     |L         |Lock out procedure                       |
+|Remove chute            |Lifting/twisting                  |L         |Lightweight chute                        |
+|Remove chain            |Trapping fingers/light            |L         |Lock out procedure, torch                |
+|Remove shaft            |Pinching fingers                  |L         |Light, be careful                        |
+|Refit new shaft bearings|Reverse order                     |          |                                         |

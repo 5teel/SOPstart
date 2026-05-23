@@ -1,0 +1,42 @@
+
+CHANGING RINGS 23MC
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                                 |Safety Induction [Contractor]                                                  |
+
+|Area / Department            |HOT END FORMING                            |Task  or Job Description                |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |YES                                        |DON WESTERLUND   09/03/2010             |
+|when working within          |                                           |                                        |
+|production area              |Overall Category of Risk                   |                                        |
+|                             |                                           |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |MINIMISATION                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|GET CORRECT RINGS FROM SPARES|TRIP                          |LOW         |WATCH WHERE YOUR WALKING                |
+|BENCH                        |                              |            |                                        |
+|REFER TO JSA ON HOW TO STOP  |NIL                           |LOW         |NIL                                     |
+|SECTION WITH RING ARM ON     |                              |            |                                        |
+|MOULD SIDE                   |                              |            |                                        |
+|CLOSE MOULD  ΓÇÿEΓÇÖSTOP PUSHED  |ENTRAPMENT                    |LOW         |ENSURE NO ONE WORKING ON MLD SIDE       |
+|IN                           |                              |            |                                        |
+|TURN MLD SIDE SWITCH TO CLOSE|                              |            |                                        |
+|(TO THE LEFT)                |                              |            |                                        |
+|TAKE OFF RINGS               |BURNS WHILE REMOVING RING     |MED         |ALL PPE GEAR TO BE WORN CORRECTLY       |
+|OPEN MOULDS ΓÇô TURN SWITCH TO |ENTRAPMENT                    |MED         |PUSH DOWN MOULD OPEN/CLOSE SAFETY SNAP  |
+|MOULD OPEN (TO THE RIGHT)    |                              |            |VLVS TO STOP MLDS FROM CLOSING          |
+|NEW NECK RINGS ON            |BURNS WHILE PUTTING ON NEW    |MED         |ALL PPE GEAR TO BE WORN CORRECTLY       |
+|                             |RINGS                         |            |                                        |
+|PUSH RING ARMS TO BLANK SIDE |BURNS WHILE PUSHING ARM BACK  |MED         |ALL PPE GEAR TO BE WORN CORRECTLY       |
+|& RELEASE MLD SIDE ΓÇ£EΓÇ¥ STOP  |                              |            |                                        |
+|MOP RINGS                    |NIL                           |LOW         |NIL                                     |
+|REFER TO JSA ON STARTING     |ENTRAPMENT                    |LOW         |ALL PPE GEAR TO BE WORN CORRECTLY       |
+|SECTION                      |                              |            |                                        |
+|REJECT CAVITIES & CHECK      |BURNS/CUTS                    |LOW         |ALL PPE GEAR TO BE WORN CORRECTLY       |
+|QULAITY OF RINGS BEFORE      |                              |            |                                        |
+|ALLOWING BACK INTO LEHR      |                              |            |                                        |

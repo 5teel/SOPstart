@@ -1,0 +1,37 @@
+
+Changing Moulds on 21 machine
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|when working within          |                                           |                                        |
+|production area              |Overall Category of task                   |                                        |
+|                             |Medium                                     |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Ensure all PPE is worn. Stop |                              |Nil         |Follow JSA instruction for stopping     |
+|glass into section then Stop |                              |            |section Keep machine clean to reduce    |
+|section once all glass is    |                              |            |slip trip hazard. Use all PPE use       |
+|empty                        |                              |            |correct lifting technique.              |
+|Use the safety device        |Noise Heat. Burns from hot    |High        |Keep machine clean to reduce slip trip  |
+|provided by inserting T bar  |bottles                       |            |hazard. Use all PPE use correct lifting |
+|into mould to be removed     |                              |            |technique.                              |
+|Replace old mould with new   |Sprain /Strain from awkward   |Medium      |Use all PPE use correct lifting         |
+|moulds                       |movement from working in      |            |technique.                              |
+|                             |limited space. Burns          |            |                                        |
+|Pull out E stop intercept    |Nil                           |Low         |Nil                                     |
+|button activating reject     |                              |            |                                        |
+|button                       |                              |            |                                        |
+|Section loaded check samples |Burns                         |Medium      |Nil                                     |
+|before it goes into the Lehr |                              |            |                                        |
+|Load into PIC to inform Cold |Nil                           |Nil         |Nil                                     |
+|End of the gear change       |                              |            |                                        |
+
+

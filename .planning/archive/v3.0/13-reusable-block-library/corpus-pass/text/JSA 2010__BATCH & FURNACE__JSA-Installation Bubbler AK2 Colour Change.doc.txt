@@ -1,0 +1,35 @@
+
+Installation of bubbler tubes on AK2 colour change
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSA Reviewed by and date                    |
+|All standard PPE required     |Yes                                  |                                            |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |                                     |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |High                                 |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps               |Potential /                  |Level of |Controls to reduce the Risk of      |
+|                                    |Actual Hazard                |Risk     |Hazard                              |
+|SWITCH OFF BOOST SYSTEM IF REQUIRED |GLASS QUALITY ISSUES         |H        |                                    |
+|BE ADVISED FROM PROCESS AND MANAGERS|                             |         |                                    |
+|SET UP DRILLING RIG IN DESIGNATED   |WELDING FLASH, TRIP HAZARDS. |H        |SUPERVISION AT ALL TIMES, WEAR      |
+|BUBBLER POSITIONS PRIOR TO DRILLING |HITTING HEAD, COVER          |         |WELDING SCREEN, WEAR SAFETY HELMET, |
+|                                    |ELECTRICAL EQUIPMENT         |         |AND COVER ELECTRICAL EQUIPMENT WITH |
+|                                    |                             |         |PLASTIC SHEET.                      |
+|DRILL 16MM HOLE INTO GLASS AND      |HOT WATER INGRESS, LEAD RUN  |H        |SUPERVISION AT ALL TIMES ,          |
+|INSERT BUBBLER                      |OUTS. GLASS RUN OUTS.        |         |GLASS LEAK EQUIPMENT AT HAND,       |
+|                                    |                             |         |RESTRICT ACCESS TO UNDER FURNACE,   |
+|ONCE BUBBLER IS INSERTED  SECURELY  |AS ABOVE                     |H        |AS ABOVE                            |
+|FASTEN  WITH INSULATED CLAMP        |                             |         |                                    |
+|CHECK AS TO WEATHER BUBBLERS ARE    |AS ABOVE                     |H        |AS ABOVE                            |
+|BUBBLING RECOMMEND 1-2 BUBBLES PER  |                             |         |                                    |
+|SECOND.                             |                             |         |                                    |

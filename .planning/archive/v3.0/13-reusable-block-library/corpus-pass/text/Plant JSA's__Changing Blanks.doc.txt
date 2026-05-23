@@ -1,0 +1,125 @@
+
+| HAZARD IDENTIFICATION  Changing Blanks                                               SAFETY REQUIRED         |
+
+|Risk of Entrapment          |X   |Ventilation                |     |
+|Pinch Points                |X   |Fire Hazard                |     |
+|Moving Parts                |X   |Fragile roof support       |     |
+|Rotating Parts              |    |Lighting                   |     |
+|Cutting                     |    |Isolated workplace location|     |
+|Moving Machinery            |X   |Work above 3 metres        |     |
+|Automatic equipment         |X   |Pressurised Fluid          |     |
+|Manual Handling             |X   |Spill to site drainage     |     |
+|Risk of falling objects     |    |Spill to Stormwater        |     |
+|Excessively hot environment |X   |Odour or Emissions         |     |
+|Noise                       |X   |Soil Contamination         |     |
+|Slippery surface            |X   |Airborne Contaminants      |     |
+|Tripping hazard             |X   |Electricity [Power Tools]  |     |
+|Confined Space              |    |Stored energy              |X    |
+|Broken or smashed glass     |    |Electrocution              |     |
+|Limited working area        |X   |Risk of person falling     |     |
+
+|Hard Hat                    |     |
+|Gloves                      |X    |
+|Breathing Apparatus         |     |
+|Goggles                     |     |
+|Hearing protection          |X    |
+|Fire Extinguisher           |     |
+|Safety Glasses              |X    |
+|Back Support belt           |X    |
+|Face Shield                 |     |
+|Disposable Clothing         |     |
+|Harness                     |     |
+|MSDS                        |     |
+|Spill Kit                   |     |
+|Bunding                     |     |
+|Council / OSH Notification  |     |
+|Warning signs to be         |     |
+|displayed                   |     |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+|NOTES              PERMITS COMPLETD                                                                           |
+
+|Work at Heights              |    |
+|High Voltage                 |    |
+|Hot work                     |    |
+|Confined Space               |    |
+|Excavation                   |    |
+|Permit to work completed     |    |
+
+|                                                                  |
+|                                                                  |
+|                                                                  |
+
+
+|CONTRACTOR                                            |
+|                                                      |Is the Contractor Inducted ΓÇô do they have a current   |
+|                                                      |safety Agreement                                      |
+|                                                      |
+
+|HAZARD MATRIX                                                                                                 |
+|                  |CONSEQUENCES                            The severity of potential consequences             |
+|                                    |Insignificant                                |
+|LIKELIHOOD                          |First aid injury, up to $1,000 damage, spill |
+|                                    |confined to immediate work area, rapid clean |
+|How likely is it to happen?         |up, no damage to environment                 |
+|4                                   |ACT NOW ΓÇô Urgent ΓÇô do something about the    |
+|ACUTE                               |risks immediately. Requires immediate        |
+|                                    |attention.                                   |
+|3                                   |Highest management decision is required      |
+|HIGH                                |urgently                                     |
+|2                                   |Follow management instruction                |
+|MODERATE                            |                                             |
+|1                                   |OK for now. Record and review if any         |
+|LOW                                 |equipment / people / materials / work        |
+|                                    |processes or procedures change               |
+
+|Hazard Management Worksheet                            |Changing Blanks                                               |
+|Hazard Identification              |Practicable to Eliminate                                                   |
+|Area /         |Forming            |JSA Conducted by:                          |Date completed   25.6.2010     |
+|Department     |                   |                                           |                               |
+|Controls to be taken Delete all other controls not taken |Overview of the Hazard                               |
+|Elimination                                              |Significant Hazard                                   |
+|Isolation                                                |Yes                                                  |
+|Administration                                           |                                                     |
+|                                                         |Control taken                                        |
+|Engineering                                              |Minimisation                                         |
+|Minimisation                                             |                                                     |
+|Substitution                                             |                                                     |
+|                                                         |                                                     |
+|                                                         |                                                     |
+|PPE Required:  All standard PPE required when working    |JSA Reviewed by and date                             |
+|within production area                                   |GRANT JUPP 17/12/2019                                |
+|Sequence of Job Steps       |Potential / Actual Hazard   |Level of   |Controls to reduce the Risk of Hazard    |
+|                            |                            |Risk       |                                         |
+|                            |                            |H M L      |                                         |
+|Get Blank from oven         |Manual Handling, Heat &     |M          |Correct lifting technique. Use correct   |
+|                            |Burns                       |           |PPE                                      |
+|Take Blank to machine       |Slippery Surfaces           |M          |Correct lifting technique. Use correct   |
+|                            |                            |           |PPE                                      |
+|Stop Section to make safe   |Moving machinery            |H          |Follow shut down procedure. Correct      |
+|                            |                            |           |lifting technique. Use correct PPE       |
+|Remove old blank            |Manual Handling, Moving     |H          |Follow procedure of removal of equipment |
+|                            |equipment, Heat & Burns     |           |from machine. Correct lifting technique. |
+|                            |                            |           |Use correct PPE                          |
+|Replace new Blank           |Manual Handling, Moving     |H          |Follow procedure of replacing equipment  |
+|                            |equipment, Heat & Burns     |           |on machine. Correct lifting technique.   |
+|                            |                            |           |Use correct PPE                          |
+|Restart section             |Moving machinery            |M          |Correct lifting technique. Use correct   |
+|                            |                            |           |PPE                                      |
+|Place used blank back on    |Manual Handling,            |L          |Correct lifting technique. Use correct   |
+|parts table                 |                            |           |PPE                                      |
+

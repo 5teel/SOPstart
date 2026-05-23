@@ -1,0 +1,38 @@
+
+Use of manual thermal printer pallet label
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|None                            |Yes                                    |Gary OΓÇÖNeill  12/06/07                  |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |40                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                     |Potential /               |Level of    |Controls to reduce the Risk of|
+|                                          |Actual Hazard             |Risk        |Hazard                        |
+|Check unlabelled pallets for tracking     |Fall from height          |Low         |Use secure ladder with hand   |
+|label application NB Must not climb on top|                          |            |rail for access               |
+|of pallets to gain access                 |                          |            |                              |
+|Ensure the thermal printer ribbon & pallet|Pinch points              |Low         |Training on equipment         |
+|labels are loaded correctly into the      |                          |            |                              |
+|printer                                   |                          |            |                              |
+|Turn printer on                           |none                      |Low         |                              |
+|Turn computer on & go to audit screen &   |none                      |Low         |Training                      |
+|then label pallets sub screen             |                          |            |                              |
+|Enter the required data                   |none                      |Low         |Training                      |
+|NB if no tracking number has been applied |                          |            |                              |
+|to the pallet then a new one should be    |                          |            |                              |
+|input to create a label                   |                          |            |                              |
+|Tear off label & apply to pallet          |none                      |Low         |                              |
+|Remove labelled pallet to warehouse       |Collision with something /|Low         |Care when using fork hoist    |
+|                                          |someone                   |            |                              |

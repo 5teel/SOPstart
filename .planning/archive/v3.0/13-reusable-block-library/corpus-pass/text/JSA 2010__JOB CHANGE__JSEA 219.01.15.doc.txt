@@ -1,0 +1,77 @@
+
+#23, 31, 34 Bottom Plate Change
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                  |Safety Induction [Contractor]         |                                          |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Boots, gloves, uniform, safety     |Yes                                   |                                          |
+|glasses, ear muffs, (protection    |                                      |July 2007                                 |
+|sleeves, back support ΓÇô optional)  |Risk Score                            |                                          |
+|                                   |100                                   |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |Medium                                |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |Minimisation                          |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Stop Section:-           |Making section safe to  |High     |Stop Neck ring arms in the reverted position using the E|
+|Follow Stopping Section  |prevent entrapment      |         |Stop button                                             |
+|refer JSEA 219.01.02     |                        |         |                                                        |
+|Mould side safety        |Reduce the risk of being|High     |Ensure E Stop button on the mould side is pushed in and |
+|                         |caught in the section.  |         |both snap valves are depressed.                         |
+|Mould side safety        |Reduce the risk of a    |High     |Depress both safety snap valves down.                   |
+|                         |crush injury.           |         |Note:  During job change fit safety snap valve cover    |
+|                         |                        |         |over mould side snap valves.                            |
+|Mould Side safety Plate  |Burning from heat       |High     |Where possible, place safety plate in the up position to|
+|                         |reflected off ware      |         |reflect heat back towards the machine.                  |
+|                         |                        |         |                                                        |
+|On job changes remove    |                        |         |Note:-  On Job Change there is no Hot glass and this    |
+|moulds before removing   |                        |         |Safety plate can be left in the down position..         |
+|bottom plates.  Mould    |                        |         |                                                        |
+|inhibit button to be     |                        |         |                                                        |
+|pressed in.              |                        |         |                                                        |
+|                         |                        |         |                                                        |
+|Put bottom plates in     |                        |         |                                                        |
+|before moulds on job     |                        |         |                                                        |
+|change.                  |                        |         |                                                        |
+|Where applicable, remove |                        |         |                                                        |
+|moulds first.            |                        |         |                                                        |
+|                         |                        |         |                                                        |
+|JSEA  219.01.10 Mould    |                        |         |                                                        |
+|Change 330ml             |                        |         |                                                        |
+|JSEA  219.01.12 Mould    |                        |         |                                                        |
+|Change 750ml             |                        |         |                                                        |
+|Remove Bottom Plate.     |Crushed hand.           |High     |Using Bottom Plate lifting tool remove bottom plate from|
+|                         |                        |         |section.                                                |
+|                         |                        |         |Note:  On job changes bottom plate lifting tool not     |
+|                         |                        |         |required.                                               |
+|Fit clean Bottom Plate.  |Crushed Hand            |High     |Using Bottom Plate lifting tool replace bottom plate    |
+|                         |                        |         |into the section.                                       |
+|                         |                        |         |Note:  On job changes bottom plate lifting tool not     |
+|                         |                        |         |required.                                               |
+|Prepare Section to start.|Caught in Section.      |High     |Pull out all mould side buttons and pull up snap valves.|
+|Follow starting a section|Caught in Section.      |High     |Ensure all personnel are clear of the section.  Start   |
+|refer JSEA 219.01.01     |                        |         |the section up.                                         |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+
+                                                     -----------------------
+[pic]
+
+O-I New Zealand
+

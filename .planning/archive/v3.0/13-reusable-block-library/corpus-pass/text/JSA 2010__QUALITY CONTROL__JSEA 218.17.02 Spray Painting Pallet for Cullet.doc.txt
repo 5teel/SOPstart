@@ -1,0 +1,53 @@
+
+Spray Paint Pallets for Culleting
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses / gloves / dust  |Yes                                    |Gary OΓÇÖNeill  12/06/07                  |
+|mask  if required               |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |15                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps               |Potential /             |Level of Risk    |Controls to reduce the Risk of |
+|                                    |Actual Hazard           |                 |Hazard                         |
+|Identify pallet to be sprayed       |Broken bottles causing  |Low              |PPE                            |
+|                                    |Laceration              |                 |                               |
+|Shake can of spray paint            |None.  Avoid excessive  |Low              |Nil                            |
+|                                    |heat                    |                 |                               |
+|Aim nozzle at plastic shroud -      |none                    |Low              |Nil                            |
+|approx 6-8 inches away              |                        |                 |                               |
+|Depress trigger                     |None                    |Low              |Nil                            |
+|Spray required text onto plastic    |Ensure adequate         |Low              |PPE if required to prevent     |
+|shroud                              |ventilation due to the  |                 |paint going onto skin.         |
+|                                    |fumes from the spray can|                 |                               |
+|Move pallet to designated area using|Collision with someone /|Low              |Ensure plant and fork hoist    |
+|Fork hoist                          |something               |                 |rules are implemented.         |
+|Return spray paint to Chemical      |None                    |Low              |Nil                            |
+|cupboard after use and dispose of as|                        |                 |                               |
+|per manufacturers instructions when |                        |                 |                               |
+|empty                               |                        |                 |                               |
+|Environmental:                      |                        |                 |                               |
+|Removal of used rags / gloves/      |Contamination.          |High             |Place in correct contamination |
+|waste/ glass / cullet               |Waste removal and tidy  |                 |or waste bins provided.        |
+|                                    |up.                     |                 |Ensure area is cleaned and     |
+|                                    |                        |                 |product / tools cleared away.  |
+|Protection & Security               |                        |                 |                               |
+|Demarcation                         |Damage to people,       |High             |Demarcation where applicable.  |
+|                                    |property and            |                 |Install barricaded/danger tape |
+|                                    |environment.            |                 |as required.                   |
+|                                    |                        |                 |Ensure correct fire fighting   |
+|                                    |                        |                 |equipment is available.        |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

@@ -1,0 +1,95 @@
+
+
+
+Job Safety Environmental Analysis Form:          Forehearth Shutdown & Heat
+                                                                     Up
+
+|Area / Department                  |Forming                               |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots/Clothing.             |                                      |                                          |
+|                                   |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Isolate gas, combustion  |Nil                     |Low      |Isolate and tag out as required.                        |
+|air to spout and         |                        |         |                                                        |
+|conditioning zones.      |                        |         |                                                        |
+|Monitor conditioning     |Glass run.              |Low      |Air and water to be applied as directed.                |
+|zones for the first 24   |                        |         |                                                        |
+|hours.                   |                        |         |                                                        |
+|Maintain other zones     |Nil                     |Low      |Follow work instruction as per QW1-IT-410-F/05.         |
+|firing as per work       |                        |         |                                                        |
+|instruction              |                        |         |                                                        |
+|QW1-IT-410-F/05.         |                        |         |                                                        |
+|Forehearth heat up.      |                        |         |                                                        |
+|Increase firing on front |Nil                     |Low      |Follow heat up check list.                              |
+|zone.                    |                        |         |                                                        |
+|Ignite gas on spout and  |Flash burns.            |Medium   |Safety heat protection, PPE, gloves, clothing, boots and|
+|conditioning zone.       |                        |         |glasses.                                                |
+|Recommission gas rig.    |                        |         |                                                        |
+|Once ignition, set at    |Re-ignition if flame    |Medium   |Safety heat protection, PPE, gloves, clothing, boots and|
+|minimum as per check     |goes out.               |         |glasses.                                                |
+|list.                    |                        |         |                                                        |
+|Monitor fire in spout and|Burns.                  |Low      |Safety heat protection, PPE, gloves, clothing, boots and|
+|conditioning zone, as per|                        |         |glasses.                                                |
+|checklist.               |                        |         |                                                        |
+|Follow spout heat up as  |Burns.                  |Low      |Safety heat protection, PPE, gloves, clothing, boots and|
+|per attachment check     |                        |         |glasses.                                                |
+|list.                    |                        |         |                                                        |
+|After temperature reaches|Burns                   |Low      |Safety heat protection, PPE, gloves, clothing, boots and|
+|900 degrees, observation |                        |         |glasses.                                                |
+|is required hourly.      |                        |         |                                                        |
+|Once normal operating    |Burns.                  |High     |Safety heat protection, PPE, gloves, clothing, boots and|
+|temperatures are reached,|Manual handling.        |         |glasses.                                                |
+|remove inconel plate.    |                        |         |Use lifting equipment as required and supplied.         |
+|Check drag line operating|Oily grating.           |Low      |Safety heat protection, PPE, gloves, clothing, boots and|
+|and water on cullet      |                        |         |glasses.                                                |
+|chute.                   |                        |         |                                                        |
+|Unplug drainage hole for |Burns.                  |Medium   |Safety heat protection, PPE, gloves, clothing, boots and|
+|glass to granulate.      |Contact with powder     |         |glasses.                                                |
+|                         |(eyes).                 |         |                                                        |
+|Install sleeve and       |Burns.                  |Low      |Safety heat protection, PPE, gloves, clothing, boots and|
+|control granulation.     |Manual handling.        |         |glasses.                                                |
+|                         |                        |         |Use lifting equipment as required and supplied.         |
+|Return forehearth to     |Nil                     |Low      |Control room operation.                                 |
+|normal operation.        |                        |         |                                                        |
+|Change orifice ring as   |Burns.                  |High     |Safety heat protection, PPE, gloves, clothing, boots and|
+|per procedure W532-04.   |Manual handling.        |         |glasses.                                                |
+|                         |                        |         |Use lifting equipment as required and supplied.         |
+|Install needles.         |Burns.                  |Low      |Safety heat protection, PPE, gloves, clothing, boots and|
+|                         |Manual handling.        |         |glasses.                                                |
+|                         |                        |         |Use lifting equipment as required and supplied.         |
+|Return to normal         |Burns.                  |Medium   |Safety heat protection, PPE, gloves, clothing, boots and|
+|operations as directed.  |Manual handling.        |         |glasses.                                                |
+|                         |                        |         |Use lifting equipment as required and supplied.         |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

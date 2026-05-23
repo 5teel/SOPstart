@@ -1,0 +1,30 @@
+
+Wiper Mechanism Maintenance
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]           |                                         |
+|PPE Required:                |Significant Hazard                      |JSA Reviewed by and date                 |
+|All standard PPE required    |Yes / No                                |                                         |
+|                             |                                        |                                         |
+|                             |Risk Score                              |                                         |
+|                             |                                        |                                         |
+|                             |                                        |                                         |
+|                             |Category                                |                                         |
+|                             |                                        |                                         |
+|                             |                                        |                                         |
+|                             |Control taken                           |                                         |
+|                             |                                        |                                         |
+|                             |                                        |                                         |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Dismantle wiper              |Damage to mechanism           |Low      |PPE                                      |
+|Clean and check all parts    |Nil                           |Medium   |                                         |
+|Replace or fit new parts     |Nil                           |Low      |Read up service manual                   |
+|Assemble and fit to Jig      |Nil                           |Low      |Use correct Jig                          |
+|Test for leaks and align     |Entrapment                    |Low      |Use correct procedure                    |
+|Using correct air pressure ΓÇô |Compressed air                |Medium   |Regulator gauge                          |
+|30 psi minimum               |                              |         |                                         |
+|Remove from Jig              |Nil                           |Low      |Correct ergonomics                       |
+|Label mechanism              |Nil                           |Low      |Correct info                             |

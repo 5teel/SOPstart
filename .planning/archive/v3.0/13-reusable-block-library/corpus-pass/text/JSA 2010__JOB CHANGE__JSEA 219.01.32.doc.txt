@@ -1,0 +1,41 @@
+
+#21, 23, 31, 34 Hot Glass Activation
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                  |Safety Induction [Contractor]         |                                          |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Boots, gloves, uniform, safety     |Yes                                   |                                          |
+|glasses, ear muffs, (protection    |                                      |July 2007                                 |
+|sleeves, back support ΓÇô optional)  |Risk Score                            |                                          |
+|                                   |60                                    |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |Low                                   |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |Minimisation                          |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Hot glass alarm activated|Burnt with hot gob.     |High     |Immediately stand back from the machine in a safe       |
+|(siren).                 |                        |         |position.                                               |
+|While Hot Glass alarm    |Burnt with a hot gob.   |High     |Do not return to machine until hot glass alarm          |
+|activated.               |                        |         |deactivated.                                            |
+|Hot Glass alarm          |Safe.                   |Low      |Return to the section, recommence work.                 |
+|deactivated.             |                        |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+
+                                                     -----------------------
+[pic]
+
+O-I New Zealand
+

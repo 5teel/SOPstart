@@ -1,0 +1,38 @@
+
+SPC Leaner Gauge
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety Glasses                  |Yes                                    |Rey Basabas  11/06/07                   |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |20                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                    |Potential /            |Level of Risk      |Controls to reduce the Risk|
+|                                         |Actual Hazard          |                   |of Hazard                  |
+|Ensure appropriate PPE is worn           |None                   |Low                |Nil                        |
+|Collect containers to be tested          |None                   |Low                |Nil                        |
+|Position a container on the metal plate  |None                   |Low                |Nil                        |
+|so that it sits against the lip of the   |                       |                   |                           |
+|plate                                    |                       |                   |                           |
+|Adjust the height of the assembly ( by   |None                   |Low                |Nil                        |
+|loosening the handle & moving the head   |                       |                   |                           |
+|assembly , then tightening it in position|                       |                   |                           |
+|)                                        |                       |                   |                           |
+|Ensure that the spring plunger sits      |None                   |Low                |Nil                        |
+|inside the bore entrance                 |                       |                   |                           |
+|Turn on the digital dial  gauge & zero   |None                   |Low                |Nil                        |
+|Slowly rotate the container 360*         |None                   |Low                |Nil                        |
+|Record the results                       |None                   |Low                |Nil                        |
+|Discard containers after testing         |Laceration             |Low                |Ensure all PPE is worn to  |
+|                                         |                       |                   |prevent injury to self     |

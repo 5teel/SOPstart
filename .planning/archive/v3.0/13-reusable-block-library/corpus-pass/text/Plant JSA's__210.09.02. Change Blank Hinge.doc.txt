@@ -1,0 +1,150 @@
+
+|HAZARD IDENTIFICATION                                                                                         |
+
+|Risk of Entrapment          |X   |Ventilation                |     |
+|Pinch Points                |X   |Fire Hazard                |     |
+|Moving Parts                |X   |Fragile roof support       |     |
+|Rotating Parts              |    |Lighting                   |     |
+|Cutting                     |    |Isolated workplace location|     |
+|Moving Machinery            |X   |Work above 3 metres        |     |
+|Automatic equipment         |    |Pressurised Fluid          |     |
+|Manual Handling             |X   |Spill to site drainage     |     |
+|Risk of falling objects     |    |Spill to Stormwater        |     |
+|Excessively hot environment |X   |Odour or Emissions         |     |
+|Noise                       |X   |Soil Contamination         |     |
+|Slippery surface            |X   |Airborne Contaminants      |     |
+|Tripping hazard             |    |Electricity [Power Tools]  |     |
+|Confined Space              |X   |Stored energy              |X    |
+|Broken or smashed glass     |    |Electrocution              |     |
+|Limited working area        |X   |Risk of person falling     |     |
+
+|Hard Hat                    |     |
+|Gloves                      |X    |
+|Breathing Apparatus         |     |
+|Goggles                     |     |
+|Hearing protection          |X    |
+|Fire Extinguisher           |     |
+|Safety Glasses              |X    |
+|Back Support belt           |X    |
+|Face Shield                 |     |
+|Disposable Clothing         |     |
+|Harness                     |     |
+|MSDS                        |     |
+|Spill Kit                   |     |
+|Bunding                     |     |
+|Council / OSH Notification  |     |
+|Warning signs to be         |     |
+|displayed                   |     |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+|NOTES              PERMITS COMPLETD                                                                           |
+
+|Work at Heights              |    |
+|High Voltage                 |    |
+|Hot work                     |    |
+|Confined Space               |    |
+|Excavation                   |    |
+|Permit to work completed     |    |
+
+|                                                                  |
+|                                                                  |
+|                                                                  |
+
+
+
+|HAZARD MATRIX                                                                                                 |
+|                  |CONSEQUENCES                            The severity of potential consequences             |
+|                                    |Insignificant                                |
+|LIKELIHOOD                          |First aid injury, up to $1,000 damage, spill |
+|                                    |confined to immediate work area, rapid clean |
+|How likely is it to happen?         |up, no damage to environment                 |
+|4                                   |ACT NOW ΓÇô Urgent ΓÇô do something about the    |
+|ACUTE                               |risks immediately. Requires immediate        |
+|                                    |attention.                                   |
+|3                                   |Highest management decision is required      |
+|HIGH                                |urgently                                     |
+|2                                   |Follow management instruction                |
+|MODERATE                            |                                             |
+|1                                   |OK for now. Record and review if any         |
+|LOW                                 |equipment / people / materials / work        |
+|                                    |processes or procedures change               |
+
+|Hazard Management Worksheet                                                                                           |
+|Hazard Identification                                                                                          |
+|Department     |Forming            |JSA Conducted by: D Westerlund             |Date completed   01.05.2010    |
+|Overview of the Hazard                                                                                         |
+|Significant Hazard                                                                                             |
+|Yes                                                                                                            |
+|                                                                                                               |
+|Risk                                                                                                           |
+|HIGH                                                                                                           |
+|                                                                                                               |
+|Control taken                                                                                                  |
+|Minimisation                                                                                                   |
+|                                                                                                               |
+|                                                                                                               |
+|PPE Required:  All standard PPE required when working    |JSA Reviewed by and date                             |
+|within production area                                   |Joe Rolleston 04.09.2019                             |
+|Sequence of Job Steps          |Potential / Actual Hazard     |Level  |Controls to reduce the Risk of Hazard   |
+|                               |                              |of Risk|                                        |
+|                               |                              |H M L  |                                        |
+|Get hinge & tools ready        |Back strain                   |M      |PPE/Back brace/Trolley                  |
+|Stop section as per JSA        |As per JSA                    |L      |PPE                                     |
+|Apply machine safety           |Pinch points/heat/noise/moving|L      |PPE/Awareness of surroundings           |
+|                               |machinery                     |       |                                        |
+|Remove blanks and put baffle   |Heat/noise/moving             |H      |PPE/T Bars                              |
+|arm and funnel arm down if     |machinery/back strain         |       |                                        |
+|required or remove funnel arm  |                              |       |                                        |
+|and baffle arm if necessary    |                              |       |                                        |
+|Remove barrier if required     |-                             |-      |PPE                                     |
+|Remove anti-deflection bracket |Shoulder strain/moving        |L      |PPE, Correct tools                      |
+|Remove links and pins, be aware|Entrapment, crushing          |M      |Stop sections either side of the one you|
+|of the sections either side of |                              |       |are working on                          |
+|you, you may stop sections     |                              |       |                                        |
+|either side to eliminate the   |                              |       |                                        |
+|pinch points                   |                              |       |                                        |
+|Fit lifting jig and check that |Slip/strain/noise/heat/moving |H      |PPE/Back brace/correct lifting          |
+|lifting jig has locked into    |parts                         |       |techniques                              |
+|place                          |                              |       |                                        |
+|Fit gantry/crane hook through  |                              |       |                                        |
+|the eye of the lifting jig     |                              |       |                                        |
+|Use the gantry/crane to lift   |Slip/strain/noise/heat/moving |H      |PPE/Back brace/correct lifting          |
+|blank hinge out of section,    |parts                         |       |techniques                              |
+|never put your hand on the     |                              |       |                                        |
+|underneath side of the hinge   |                              |       |                                        |
+|Place old hinge onto trolley   |                              |       |                                        |
+|Remove lifting jig from old    |Crushing                      |M      |PPE, lifting jig, gantry crane          |
+|hinge and fit to new hinge     |                              |       |                                        |
+|going onto the machine check   |                              |       |                                        |
+|that lifting jig has locked    |                              |       |                                        |
+|into place                     |                              |       |                                        |
+|New blank hinge on, guide the  |Strains, burns, cuts          |M      |PPE, lifting jig, gantry crane          |
+|hinge onto the shaft holding on|                              |       |                                        |
+|to the top of the hinge never  |                              |       |                                        |
+|put your hand on the underneath|                              |       |                                        |
+|side of the hinge              |                              |       |                                        |
+|New Links/Pins on, you may stop|Crushing                      |M      |Stop sections either side               |
+|sections either side to        |                              |       |                                        |
+|eliminate the pinch points     |                              |       |                                        |
+|Anti-deflection bracket on     |Strains, burns, cuts          |L      |PPE                                     |
+|Refit safety barrier           |-                             |-      |PPE                                     |
+|Refit blanks, baffle arm,      |Heat/noise/back strain/moving |H      |PPE (awareness of surroundings)         |
+|funnel arm                     |parts                         |       |                                        |
+|Remove machine safety          |Pinch points/heat/noise/moving|L      |PPE (awareness of surroundings)         |
+|                               |machinery                     |       |                                        |
+|Restart section as per JSA     |As per JSA                    |-      |PPE                                     |
+|Take old hinge to spares tray  |Back strain/heat              |M      |PPE/Brace/Trolley                       |

@@ -1,0 +1,38 @@
+
+Loading Layerboard Pallets onto Foodmac
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSA Reviewed by and date                    |
+|All standard PPE required     |Yes                                  |                                            |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |60                                   |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |Medium                               |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Using pedestrian hoist, pick |Layer boards may fall off     |Low      |Ensure load is stable and forks are      |
+|up a new pallet of layer     |pallet if not lifted correctly|         |tilted backwards prior to lifting. Use   |
+|boards and drive toward      |                              |         |brakes when stopping pedestrian  hoist   |
+|f/mach in feed conveyors     |                              |         |                                         |
+|Line pallet up with f/mach in|Layer boards may fall off     |Medium   |Ensure load is straight and forks are    |
+|feed conveyor prior to       |pallet if not lifted correctly|         |tilted backwards prior to lifting.       |
+|lifting.                     |or load is unstable           |         |                                         |
+|Move forward with load until |As above                      |Low      |Ensure that pallet does not hit the back |
+|it touches back guard        |                              |         |guard too hard as this may make load     |
+|                             |                              |         |unstable and uneven                      |
+|Lower pallet ensuring that   |Broken bearers can sometimes  |Low      |Check that bearers are intact and not    |
+|bearers are on the chain     |cause unsteadiness of load    |         |broken prior to loading                  |
+|conveyors before reversing   |when entering magazine        |         |                                         |
+|Reverse hoist until clear of |Crushed  by pedestrian hoist  |Low      |Checking that there are no obstacles or  |
+|pallet, lower forks to ground|                              |         |persons behind prior to reversing. Use   |
+|tilting forks forward.       |                              |         |brakes when stopping pedestrian hoist.   |

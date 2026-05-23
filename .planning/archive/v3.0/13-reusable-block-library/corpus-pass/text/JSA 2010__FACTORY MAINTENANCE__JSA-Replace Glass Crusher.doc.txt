@@ -1,0 +1,27 @@
+
+Replacing Glass Crusher
+                            HAZARD IDENTIFICATION
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|all standard PPE Required       |Yes                                    |                                        |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |75                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Medium                                 |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard              |
+|                         |Actual Hazard           |Risk     |                                                   |
+|Shut Down the Crusher and|Electrocution/moving    |High     |Lock out procedure will prevent injury             |
+|lock out                 |parts                   |         |                                                   |
+|Remove hopper            |Falling objects         |High     |Overhead hoist, PPE, personnel clear of lift       |
+|Remove crusher           |Falling objects from    |High     |Suitable lifting chains.  PPE. Personnel clear of  |
+|                         |moving Hopper Plus      |         |area below Trained Fork Hoist  operator, load      |
+|                         |Forkhoist               |         |secured                                            |
+|Replace crusher          |As above in reverse     |         |                                                   |

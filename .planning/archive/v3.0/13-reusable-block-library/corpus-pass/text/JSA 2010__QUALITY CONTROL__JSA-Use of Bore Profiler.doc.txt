@@ -1,0 +1,32 @@
+
+Using the Bore Profiler
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety specs / gloves           |Yes                                    |Richard Smith   11/06/07                |
+|                                |                                       |Fran OΓÇÖKeefe  15/06/07                  |
+|                                |Risk Score                             |                                        |
+|                                |40                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard              |
+|                         |Actual Hazard           |Risk     |                                                   |
+|Switch on Bore Profiler  |none                    |Low      |                                                   |
+|Have sample containers   |none                    |Low      |Samples should be transported in an enclose plastic|
+|available                |                        |         |crate                                              |
+|Wearing appropriate PPE  |Breaking bottles causing|Low      |Plastic bag stops glass fragments from being       |
+|place container in a     |lacerations             |         |sprayed                                            |
+|plastic bag              |                        |         |                                                   |
+|Conduct test             |Breaking bottles causing|Low      |Plastic bag stops glass fragments from being       |
+|                         |lacerations             |         |sprayed                                            |
+|Record results           |None                    |Low      |                                                   |
+|Discard containers after |Lacerations             |Low      |PPE                                                |
+|testing                  |                        |         |                                                   |

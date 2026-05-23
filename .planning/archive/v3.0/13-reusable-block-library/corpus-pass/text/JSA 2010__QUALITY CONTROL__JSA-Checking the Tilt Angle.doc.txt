@@ -1,0 +1,34 @@
+
+Checking the tilt Angle
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety Glasses and  gloves if   |Yes                                    |Rey Basabas 12/06/07                    |
+|required                        |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |10                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                        |Potential /        |Level of Risk|Controls to reduce the Risk of   |
+|                                             |Actual Hazard      |             |Hazard                           |
+|Switch on & reset Tilt table to zero degrees |Nil                |Low          |                                 |
+|Position one bottle vertically on the tilt   |Laceration if glass|Low          |PPE if required                  |
+|table (with the base sitting on the grip mat |broke              |             |                                 |
+|) approx 5mm away from the left hand stop    |                   |             |                                 |
+|sensor                                       |                   |             |                                 |
+|Ensure that the top contact point on the     |Nil                |Low          |                                 |
+|container is in line with the stop sensor    |                   |             |                                 |
+|Press the start button & the assembly will   |Nil                |Low          |                                 |
+|tilt & stop when the bottle tilts & the stop |                   |             |                                 |
+|sensor is activated                          |                   |             |                                 |
+|Record the tilt angle                        |Nil                |Low          |                                 |
+|Discard the containers after testing         |Laceration from    |Low          |Wear required PPE                |
+|                                             |broken glass       |             |                                 |

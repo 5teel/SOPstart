@@ -1,0 +1,47 @@
+
+Road Sweeper Operation
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSA Reviewed by and date                    |
+|All standard PPE required     |Yes                                  |                                            |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |250                                  |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |High                                 |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps              |Potential /                   |Level  |Controls to reduce the Risk of Hazard|
+|                                   |Actual Hazard                 |of Risk|                                     |
+|Prior to any operation talk to     |In all cases ensure onlooker  |High   |Tell any persons observing to move to|
+|anyone in the area and tell them of|are at least 15 metres away   |       |a safe area. Be alert at all times   |
+|your intentions to use the machine |                              |       |while operating the sweeper and      |
+|                                   |                              |       |always ensure you are in full        |
+|                                   |                              |       |control.                             |
+|Inspect machine daily for signs of |Damage to eyes hands feet and |       |Ensure hands feet and clothing are   |
+|wear and damage. Ensure fuel and   |clothing from moving parts.   |       |clear of all moving part. Do not wear|
+|any other reservoirs are full.     |Pinch points as indicated on  |       |loose fitting clothing. Always wear  |
+|                                   |the machine and the sweeper.  |       |seatbelt                             |
+|Sweeping the roadway and           |Injury to pedestrians,        |       |Be aware of your surroundings,       |
+|surrounding areas                  |personΓÇÖs eyesight in vicinity |       |observe persons in your area, those  |
+|                                   |from small flying objects.    |       |not wearing eye protection, tell them|
+|                                   |Dust inhalation. Damage to    |       |to. Wear dusk masks. Use the roadway |
+|                                   |property.                     |       |water deluge. Use mirrors and        |
+|                                   |                              |       |flashing beacon at all time. Be aware|
+|                                   |                              |       |of any height restrictions. When     |
+|                                   |                              |       |reversing ensure your path is clear  |
+|Emptying rubbish from bucket       |Tipping over loader when      |       |Ensure loader is not driven with the |
+|                                   |preparing to empty. Injury to |       |sweeper in the up position. Wear all |
+|                                   |pedestrians, personΓÇÖs eyesight|       |PPE. Be aware of person around you.  |
+|                                   |in vicinity from small flying |       |Do not walk under the sweeper when in|
+|                                   |objects. Dust inhalation.     |       |up position                          |
+|                                   |Damage to property.           |       |                                     |
+|Inspect machine at the end of the  |Damage to eyes hands feet and |       |Ensure hands feet and clothing are   |
+|day and report any observations or |clothing from moving parts.   |       |clear of all moving part. Do not wear|
+|damage noted                       |                              |       |loose fitting clothing.              |

@@ -1,0 +1,58 @@
+
+Capacity Measurement
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]                 |                                 |
+|PPE Required:                   |Significant Hazard                            |JSEA Reviewed by and date        |
+|Safety Glasses                  |No                                            |Richard Smith  11/06/07          |
+|                                |                                              |Fran OΓÇÖKeefe   15/06/07          |
+|                                |Risk Score                                    |                                 |
+|                                |40                                            |                                 |
+|                                |                                              |                                 |
+|                                |Category                                      |                                 |
+|                                |Low                                           |                                 |
+|                                |                                              |                                 |
+|                                |Control taken                                 |                                 |
+|                                |Minimisation                                  |                                 |
+|                                |                                              |                                 |
+|Sequence of Job Steps                        |Potential /         |Level of    |Controls to reduce the Risk of   |
+|                                             |Actual Hazard       |Risk        |Hazard                           |
+|Ensure PPE is worn                           |none                |            |                                 |
+|Collect samples to be tested using a plastic |Laceration          |Low         |                                 |
+|crate                                        |                    |            |                                 |
+|Arrange containers by gob & section ( as per |none                |Low         |                                 |
+|cavity map ) on the table by the capacity    |                    |            |                                 |
+|scales                                       |                    |            |                                 |
+|Check the fill height is correct for each    |none                |Low         |                                 |
+|pipette using a steel ruler                  |                    |            |                                 |
+|Check & record water temperature using       |none                |Low         |                                 |
+|thermometer                                  |                    |            |                                 |
+|Enter  set details into computer program     |none                |Low         |                                 |
+|Weigh each empty bottle on the scales &      |none                |Low         |                                 |
+|record result                                |                    |            |                                 |
+|Fill each container with water & insert      |Slip                |Low         |Keep area dry                    |
+|correct pipette to draw out excess water from|                    |            |                                 |
+|container (ensure metal plate on pipette is  |                    |            |                                 |
+|flat against finish) To achieve correct fill |                    |            |                                 |
+|height. Record result                        |                    |            |                                 |
+|Corrected capacity will be shown on the      |none                |Low         |                                 |
+|computer program                             |                    |            |                                 |
+|Invert & drain bottle after testing          |none                |Low         |                                 |
+|Discard containers after testing             |Laceration          |Low         |Wearing safety Gloves            |
+|Environmental:                               |                    |            |                                 |
+|Removal of used rags / gloves/  waste/ glass |Contamination.      |High        |Place in correct contamination or|
+|/ cullet                                     |Waste removal and   |            |waste bins provided.             |
+|                                             |tidy up.            |            |Ensure area is cleaned and       |
+|                                             |                    |            |product / tools cleared away.    |
+|Protection & Security                        |                    |            |                                 |
+|Demarcation                                  |Damage to people,   |High        |Demarcation where applicable.    |
+|                                             |property and        |            |Install barricaded/danger tape as|
+|                                             |environment.        |            |required.                        |
+|                                             |                    |            |Ensure correct fire fighting     |
+|                                             |                    |            |equipment is available.          |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

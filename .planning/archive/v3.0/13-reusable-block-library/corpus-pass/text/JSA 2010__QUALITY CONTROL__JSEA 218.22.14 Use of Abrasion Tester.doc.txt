@@ -1,0 +1,62 @@
+
+Use of the Abrasion Tester
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                     |Safety Induction [Contractor]    |                                        |
+|PPE Required:                         |Significant Hazard               |JSEA Reviewed by and date               |
+|Safety Specs / gloves                 |Yes                              |Richard Smith  11/06/07                 |
+|                                      |                                 |F OΓÇÖKeefe  15/06/07                     |
+|                                      |Risk Score                       |                                        |
+|                                      |40                               |                                        |
+|                                      |                                 |                                        |
+|                                      |Category                         |                                        |
+|                                      |Low                              |                                        |
+|                                      |                                 |                                        |
+|                                      |Control taken                    |                                        |
+|                                      |Minimisation                     |                                        |
+|                                      |                                 |                                        |
+|Sequence of Job Steps                             |Potential /         |Level of Risk|Controls to reduce the    |
+|                                                  |Actual Hazard       |             |Risk of Hazard            |
+|Ensure required PPE is worn                       |None                |Low          |                          |
+|Check that the main bar between he two wheels is  |None                |Low          |                          |
+|kept as horizontal as possible ( spirit level )   |                    |             |                          |
+|Turn the large left hand wheel anti clockwise so  |None                |Low          |                          |
+|as to raise the bar enough to position the two    |                    |             |                          |
+|bottles to be tested on the V stands at 90* to    |                    |             |                          |
+|each other                                        |                    |             |                          |
+|Turn the large left hand wheel clockwise so as to |Broken bottles      |Low          |PPE                       |
+|lower the bar & exert pressure on the containers  |causing laceration  |             |                          |
+|                                                  |NB This is NOT a    |             |                          |
+|                                                  |destructive test    |             |                          |
+|Commencing at around 80 Kg (and avoiding the      |Broken bottles      |Low          |PPE                       |
+|seams) move the bar so that the containers glide  |causing laceration  |             |                          |
+|over each other. Increase the pressure by turning |NB This is NOT a    |             |                          |
+|the left hand wheel clockwise until there is a    |destructive test    |             |                          |
+|reading of around 110Kg  Record the results of any|                    |             |                          |
+|break through in coating                          |                    |             |                          |
+|Release that bar by turning the large left hand   |Broken bottles      |Low          |PPE                       |
+|wheel anti clockwise & repeat the test on two     |causing laceration  |             |                          |
+|further positions on the bottles Record the       |NB This is NOT a    |             |                          |
+|results as above                                  |destructive test    |             |                          |
+|Discard containers after testing                  |Laceration          |Low 40       |PPE                       |
+|Environmental:                                    |                    |             |                          |
+|Removal of used rags / gloves/  waste/ glass /    |Contamination.      |High         |Place in correct          |
+|cullet                                            |Waste removal and   |             |contamination or waste    |
+|                                                  |tidy up.            |             |bins provided.            |
+|                                                  |                    |             |Ensure area is cleaned and|
+|                                                  |                    |             |product / tools cleared   |
+|                                                  |                    |             |away.                     |
+|Protection & Security                             |                    |             |                          |
+|Demarcation                                       |Damage to people,   |High         |Demarcation where         |
+|                                                  |property and        |             |applicable.               |
+|                                                  |environment.        |             |Install barricaded/danger |
+|                                                  |                    |             |tape as required.         |
+|                                                  |                    |             |Ensure correct fire       |
+|                                                  |                    |             |fighting equipment is     |
+|                                                  |                    |             |available.                |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

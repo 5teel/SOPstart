@@ -1,0 +1,50 @@
+
+
+
+Job Safety Environmental Analysis Form:                  Steam Clean M/c
+Fan in Basement
+
+|Area / Department                  |Factory Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots, High Vis Garment,    |                                      |                                          |
+|Respiratory Protection (when       |Risk Score                            |                                          |
+|working with asbestos).            |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Drill holes into concrete|Electrical leads for    |High     |Hang off ground level.                                  |
+|drain.                   |drill.                  |         |Place ΓÇÿDanger TagΓÇÖ to main board.                       |
+|                         |Electrocution.          |         |                                                        |
+|Steam cleaning.          |Eye injury.             |High     |Use ELCB unit.                                          |
+|                         |Grease on floor, slips. |         |PPE = gumboots / face shield / safety glasses / ear     |
+|                         |                        |         |plugs.                                                  |
+|Set up steam cleaner.    |Lifting into basement   |Medium   |Overhead monorail south side of #34 to be used.         |
+|                         |areas.                  |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

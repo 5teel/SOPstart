@@ -1,0 +1,42 @@
+
+219.01.04        #21 Blank Change 330ml
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes or No                                  |June 2009                               |
+|when working within          |                                           |                                        |
+|production area              |Overall Category of task                   |                                        |
+|                             |Medium                                     |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Stop Section:-               |Making section safe to prevent|High        |Stop Neck ring arms in the inverted     |
+|                             |entrapment                    |            |position, using the (Red) Maintenance / |
+|                             |                              |            |E Stop Button.                          |
+|Manual Operation             |Caught in Section.            |High        |Switch to manual operation              |
+|Safety lock outs for blanks  |Reduce the risk of being      |High        |Blank close safety lock activated       |
+|                             |caught in the section         |            |                                        |
+|Invert safety bar procedure  |Reduce the risk of being      |High        |Place Invert safety lock over Invert    |
+|                             |caught in the section         |            |rack so that lock sits down on the top  |
+|                             |                              |            |of the invert mechanism                 |
+|Prepare Blanks for Lifting.  |Back Strain                   |High        |Fit tee screw lifters to the blanks or  |
+|                             |                              |            |use thick gloves to lift the Blank from |
+|                             |                              |            |the hinge.                              |
+|Remove Blanks procedure      |Caught in Section. / Back     |High        |Get into a comfortable lifting position |
+|                             |strain                        |            |that suits. Reducing lowering and       |
+|                             |                              |            |twisting. And remove Blanks. Back       |
+|                             |                              |            |support belt optional.                  |
+|Fit clean blanks             |Caught in Section. / Back     |High        |Get into a comfortable lifting position |
+|                             |strain                        |            |that suits. Reducing lowering and       |
+|                             |                              |            |twisting. And refit Blanks              |
+|Prepare Section to start.    |Caught in Section.            |High        |Disengage Blank close safety lock and   |
+|                             |                              |            |remove Invert safety block. Pull out    |
+|                             |                              |            |(Red) Maintenance / E Stop Button.      |
+|Starting the section         |Caught in Section.            |High        |Ensure all personnel are clear of the   |
+|                             |                              |            |section.  Start the section up          |

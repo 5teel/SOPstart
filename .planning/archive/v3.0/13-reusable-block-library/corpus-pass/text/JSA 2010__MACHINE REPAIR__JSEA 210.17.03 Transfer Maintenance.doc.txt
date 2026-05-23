@@ -1,0 +1,55 @@
+
+Transfer Maintenance
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]           |                                             |
+|PPE Required:                 |Significant Hazard                      |JSEA Reviewed by and date                    |
+|All standard PPE required     |Yes                                     |                                             |
+|                              |                                        |                                             |
+|                              |Risk Score                              |                                             |
+|                              |10                                      |                                             |
+|                              |                                        |                                             |
+|                              |Category                                |                                             |
+|                              |Low                                     |                                             |
+|                              |                                        |                                             |
+|                              |Control taken                           |                                             |
+|                              |Minimisation                            |                                             |
+|                              |                                        |                                             |
+|Sequence of Job Steps         |Potential /                   |Level of |Controls to reduce the Risk of Hazard        |
+|                              |Actual Hazard                 |Risk     |                                             |
+|Clean Transfer                |Cuts from glass fragments     |Low      |Wear PPE to prevent injury to skin           |
+|                              |attached to gear              |         |                                             |
+|Lift onto bench               |Crush and manual handling     |Low      |Secure gear on the bench to prevent falling. |
+|                              |causing back strain           |         |Work at a suitable height for the employee in|
+|                              |                              |         |order that back strain is prevented from gear|
+|                              |                              |         |being too low while working.                 |
+|Dismantle parts and inspect  ΓÇô|Manual Handling from handling |Low      |Place damaged gear on a safe part of the     |
+|may have damaged or worn parts|heavy gear                    |         |bench for further checking plus in a area    |
+|or guide rails                |                              |         |that does not restrict working on Transfer   |
+|                              |                              |         |gear.                                        |
+|Replace and repair parts      |Manual Handling from handling |Low      |Inspect each part replacing damaged with new |
+|                              |heavy gear                    |         |                                             |
+|Assemble                      |Manual Handling from handling |Low      |Care when moving new gear into place to      |
+|                              |heavy gear                    |         |ensure they are not damaged                  |
+|Test Transfer in the Test Room|Entrapment from moving parts  |Low      |Isolate Test area guards                     |
+|Label and Store Transfer in   |Manual Handling causing back  |Low      |Correct lifting required when moving Transfer|
+|Workshop Transfer station     |strain                        |         |gear into storage                            |
+|Environmental:                |                              |         |                                             |
+|Removal of used rags / gloves/|Contamination.                |High     |Place in correct contamination or waste bins |
+|waste/ glass / cullet         |Waste removal and tidy up.    |         |provided.                                    |
+|                              |                              |         |Ensure area is cleaned and product / tools   |
+|                              |                              |         |cleared away.                                |
+|Protection & Security         |                              |         |                                             |
+|Demarcation                   |Damage to people, property and|High     |Demarcation where applicable.                |
+|                              |environment.                  |         |Install barricaded/danger tape as required.  |
+|                              |                              |         |Ensure correct fire fighting equipment is    |
+|                              |                              |         |available.                                   |
+
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

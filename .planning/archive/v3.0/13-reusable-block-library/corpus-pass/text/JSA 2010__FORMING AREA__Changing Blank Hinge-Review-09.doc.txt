@@ -1,0 +1,48 @@
+
+Changing Blank Hinge
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                                                      |Safety Induction [Contractor]                                 |
+|Hazard            |Practicable to Eliminate                                                                    |
+|Identification    |                                                                                            |
+|                                     |Insignificant ΓÇô first aid injury, up to  |
+|                                     |$1,000 damage, spill confined to         |
+|LIKELIHOOD                           |immediate work area, rapid clean up, no  |
+|                                     |damage to environment                    |
+|How likely is it to happen?          |                                         |
+|4                                    |ACT NOW ΓÇô Urgent ΓÇô do something about the|
+|ACUTE                                |risks immediately. Requires immediate    |
+|                                     |attention.                               |
+|3                                    |Highest management decision is required  |
+|HIGH                                 |urgently                                 |
+|2                                    |Follow management instruction            |
+|MODERATE                             |                                         |
+|1                                    |OK for now. Record and review if any     |
+|LOW                                  |equipment / people / materials / work    |
+|                                     |processes or procedures change           |
+
+
+|JOB SAFETY ANALYSIS               |Changing Blank Hinge                                                           |
+
+|Area / Department            |Forming                                    |Task  or Job Description                |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|when working within          |                                           |                                        |
+|production area              |Overall Category of Risk                   |                                        |
+|                             |High                                       |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Take blank hinge to section  |Possibly greasy/wet floor slip|High        |Be aware of surroundings                |
+|                             |hazard Heavy                  |            |                                        |
+|Stop section                 |Moving machinery              |High        |Stay until section stops.               |
+|Change blank hinge           |Moving machinery  limited     |            |Be aware adjacent sections operating.   |
+|                             |working space                 |High        |Use right tools and PPE required.       |
+|Check nobody working on the  |Moving machinery.             |High        |Be aware of other workers around you and|
+|mould side.                  |Risk entrapment.              |            |where they are.                         |
+|Re start section             |Moving machinery              |High        |Keep clear of section.                  |

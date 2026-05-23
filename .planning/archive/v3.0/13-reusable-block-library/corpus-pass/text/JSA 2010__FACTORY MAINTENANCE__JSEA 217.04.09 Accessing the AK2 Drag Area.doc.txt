@@ -1,0 +1,70 @@
+
+
+
+Job Safety Environmental Analysis Form:               Accessing the AK2
+                                                                     Drag
+                                                                     Area
+
+|JSEA Number:   |217.04.09        |Area/Department |Tank 2 Cullet Drag         |Date:        |9/5/07                   |
+|JSEA Conducted |Neil Sheppard    |Department:     |Factory Maintenance        |JSEA Reviewed|F OΓÇÖKeefe 11/05/07       |
+|by:            |                 |                |                           |by and Date: |                         |
+|PPE Equipment Required                                      |Additional Equipment /      |Tick the Control Taken      |
+|High Visibility Jacket, PPE clothing, Hard Hat (when working|Requirements                |                            |
+|in drag area), gumboots, safety boots, hearing protection,  |Torches, notification to Hot|Minimisation (              |
+|safety glasses, advisable that both employees have a BATT   |End                         |                            |
+|phone.                                                      |Refer to ISO Procedure      |                            |
+|                                                            |214.04.02 ΓÇô Confined Spaces.|                            |
+|                                                            |                            |                            |
+|Significant Hazard        |Yes                             |Risk Score   |8,000                                      |
+|Sequence Of Basic Job     |Potential Hazards               |Level of Risk|Controls to Reduce the Risk of Hazard      |
+|Steps                     |                                |             |                                           |
+|Before entering drag area.|Being trapped or hurt in the    |High         |Take a BATT phone with you. If working or  |
+|                          |area and other people not aware |             |observing ΓÇôtake another person with you or |
+|                          |                                |             |notify another person in close proximity to|
+|                          |                                |             |that area.                                 |
+|                          |Noise                           |High         |Wear hearing protection.                   |
+|Accessing the area of the |Slip / trip hazard.             |High         |Use handrail. Ensure area has adequate     |
+|drag                      |Lighting.                       |             |lighting, or take a torch.                 |
+|                          |                                |             |If required, the area may need cleaning by |
+|                          |                                |             |spraying with a high pressure hose.        |
+|                          |Confined space & Low head room, |High         |Be aware of any obstructions               |
+|                          |narrow access.                  |             |                                           |
+|In the drag area.         |Hot water, steam, heat.         |High         |Stay within the path area. Ensure splash   |
+|                          |                                |             |guards are in place.                       |
+|                          |                                |             |Keep away from the chute areas. Ensure that|
+|                          |                                |             |the extraction fan is operating.           |
+|                          |Electrocution                   |High         |Check to ensure all electrical equipment is|
+|                          |                                |             |well maintained.  No exposed wires or      |
+|                          |                                |             |damaged parts.  The electrical equipment is|
+|                          |                                |             |suitably protected for damp/wet areas.     |
+|                          |Slipping.                       |Medium       |Use the handrail.  Take care where walking.|
+|                          |                                |             |Use of gumboots will help.                 |
+|Working in the drag.      |Falling objects.                |High         |Ensure correct PPE equipment is worn.      |
+|                          |                                |             |Notify Hot End of personnel in area so ware|
+|                          |                                |             |is not dropped down into the area          |
+|Leaving the drag.         |Entrapment                      |High         |Notify others that you have left and       |
+|                          |                                |             |finished in the drag area.                 |
+|                          |Electrical.                     |High         |Switch off the cooling make up drag water, |
+|                          |                                |             |and the extraction fan if no longer        |
+|                          |                                |             |required. Remove any lock out tags.        |
+|Environmental:            |                                |High         |Place in correct contamination or waste    |
+|Removal of used rags,     |Contamination.                  |             |bins provided.                             |
+|gloves                    |                                |             |                                           |
+|Protection & Security:    |                                |             |                                           |
+|Demarcation               |Damage to people, property and  |High         |Demarcation where applicable.              |
+|                          |environment.                    |             |Install barricaded/danger tape as required.|
+|                          |                                |             |Ensure correct fire fighting equipment is  |
+|                          |                                |             |available.                                 |
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

@@ -1,0 +1,27 @@
+
+Mopping Baffles on job # 30053
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|when working within          |                                           |                                        |
+|production area              |Overall Category of task                   |                                        |
+|                             |Medium                                     |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Load mop with mould aid.     |Spill Hazard                  |Low         |Use dope tray to remove excess mould aid|
+|Wait for Baffle to be in     |Mop getting knocked out of    |Medium      |Observe timing of Baffle retracting     |
+|retract position.            |hand                          |            |                                        |
+| Mop Baffles.                |Mop getting knocked out of    |Medium      |Use extended mop ΓÇô coat ΓÇ£BΓÇ¥ cavity      |
+|                             |hand                          |            |Baffle first.                           |
+|Remove mop before Baffle     |Mop getting caught under      |Medium      |Observe timing of Baffle coming down.   |
+|comes down.                  |Baffle                        |            |                                        |
+
+

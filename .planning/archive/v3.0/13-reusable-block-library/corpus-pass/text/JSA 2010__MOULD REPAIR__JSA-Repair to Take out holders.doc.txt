@@ -1,0 +1,31 @@
+
+Repairs or Maintenance of Take out holders
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety Glasses, Gloves          |No                                     |Gary Russell 7/9/07                     |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |20                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard              |
+|                         |Actual Hazard           |Risk     |                                                   |
+|Inspect Take out and     |Cuts / Abrasions to skin|Low      |Wear gloves                                        |
+|remove checks / burrs    |                        |         |Correct procedure for using file if required to    |
+|                         |                        |         |remove burrs                                       |
+|Inspect take out cavity  |Cuts / Abrasions to skin|Low      |Wear gloves                                        |
+|Inspect spring and       |Cuts / Abrasions to skin|Low      |Wear gloves                                        |
+|replace if required      |Slipping screwdriver    |         |Ensure screwdriver used is correct for job         |
+|Inspect ball bearing and |Cuts / Abrasions to skin|Low      |Wear gloves                                        |
+|replace if required      |Pinching fingers        |         |                                                   |
+|Replace Inserts          |Pinch fingers           |Low      |Be aware of pinch points when pressing in insert   |

@@ -1,0 +1,51 @@
+
+Checking  2 hourly sample sets re: Verifier
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]           |                                            |
+|PPE Required:                |Significant Hazard                      |JSEA Reviewed by and date                   |
+|All standard PPE required    |Low                                     |Bronwyn Bell                                |
+|                             |                                        |                                            |
+|                             |Risk Score                              |                                            |
+|                             |40                                      |                                            |
+|                             |                                        |                                            |
+|                             |Category                                |                                            |
+|                             |Low                                     |                                            |
+|                             |                                        |                                            |
+|                             |Control taken                           |                                            |
+|                             |Minimisation                            |                                            |
+|                             |                                        |                                            |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard       |
+|                             |Actual Hazard                 |Risk     |                                            |
+|Verifier takes sample set off|Reaching, stretching and      |Low      |Gloves to be used when taking sample sets   |
+|the lehr every hour and      |lifting [bottles]. Cuts to    |         |off lehr                                    |
+|places the bottles on the    |hands from broken finishes    |         |                                            |
+|verifiers work bench         |                              |         |                                            |
+|Verifier checks each bottle  |Broken finishes from gauging  |Low      |Gloves worn when gauging finishes, care     |
+|with gauges provided for the |re: ring gauges               |         |taken when gauging bottles                  |
+|job                          |                              |         |                                            |
+|Verifier then checks set for |Possible cuts to finger when  |Low      |Do not put finger into top of ring          |
+|visual / cosmetic defects    |inserted into top of ring     |         |                                            |
+|                             |checking for internal fused   |         |                                            |
+|                             |glass                         |         |                                            |
+|If any cavity found to be    |None                          |Low      |                                            |
+|defective ΓÇô must be CID      |                              |         |                                            |
+|rejected by FPΓÇÖs             |                              |         |                                            |
+|Frequent monitoring of cavity|Reaching , stretching and     |Low      |Gloves to be used when checking defective   |
+|and remove from CID reject if|lifting                       |         |cavity on the lehr and Fps , care taken when|
+|commercial                   |                              |         |reaching / stretching                       |
+|Environmental:               |                              |         |                                            |
+|Removal of used rags /       |Contamination.                |High     |Place in correct contamination or waste bins|
+|gloves/  waste/ glass /      |Waste removal and tidy up.    |         |provided.                                   |
+|cullet                       |                              |         |Ensure area is cleaned and product / tools  |
+|                             |                              |         |cleared away.                               |
+|Protection & Security        |                              |         |                                            |
+|Demarcation                  |Damage to people, property and|High     |Demarcation where applicable.               |
+|                             |environment.                  |         |Install barricaded/danger tape as required. |
+|                             |                              |         |Ensure correct fire fighting equipment is   |
+|                             |                              |         |available.                                  |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

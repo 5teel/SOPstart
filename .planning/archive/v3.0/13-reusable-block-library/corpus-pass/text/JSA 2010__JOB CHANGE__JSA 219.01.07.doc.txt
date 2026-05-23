@@ -1,0 +1,77 @@
+
+#21 Blank Change 750ml
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                                      |Safety Induction [Contractor]                                 |
+|Hazard            |Practicable to Eliminate                                                                    |
+|Identification    |                                                                                            |
+|                                     |Insignificant ΓÇô first aid injury, up to  |
+|                                     |$1,000 damage, spill confined to         |
+|LIKELIHOOD                           |immediate work area, rapid clean up, no  |
+|                                     |damage to environment                    |
+|How likely is it to happen?          |                                         |
+|4                                    |ACT NOW ΓÇô Urgent ΓÇô do something about the|
+|ACUTE                                |risks immediately. Requires immediate    |
+|                                     |attention.                               |
+|3                                    |Highest management decision is required  |
+|HIGH                                 |urgently                                 |
+|2                                    |Follow management instruction            |
+|MODERATE                             |                                         |
+|1                                    |OK for now. Record and review if any     |
+|LOW                                  |equipment / people / materials / work    |
+|                                     |processes or procedures change           |
+
+
+Job Safety Analysis Form:               #21 Blank Change 750ml
+
+
+
+|Area / Department                  |Job Change                            |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSA Reviewed by and Date:                 |
+|Boots, gloves, uniform, safety     |Yes                                   |                                          |
+|glasses, ear muffs, (protection    |                                      |August  2009                              |
+|sleeves, back support ΓÇô optional)  |Risk Score                            |                                          |
+|                                   |100                                   |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |Medium                                |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |Minimisation                          |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Stop Section:-           |Making section safe to  |High     |Stop Neck ring arms in the inverted position, using the |
+|Follow Stopping Section  |prevent entrapment      |         |E Stop Button[Red button]                               |
+|refer JSA 210.01.02      |                        |         |                                                        |
+|Manual Operation         |Caught in Section.      |High     |Switch to manual operation                              |
+|Safety lock outs for     |Reduce the risk of being|High     |Blank close safety lock activated                       |
+|blanks                   |caught in the section   |         |                                                        |
+|Invert safety bar        |Reduce the risk of being|High     |Place Invert safety lock over Invert rack so that lock  |
+|                         |caught in the section   |         |sits down on the top of the invert mechanism            |
+|Access to remove Blanks  |Jamming hands, burns.   |High     |Trip Funnel and then baffle into the down position      |
+|Prepare Blanks for       |Back Strain, burns.     |High     |Fit tee screw lifters to the blanks and lift the Blank  |
+|Lifting.                 |                        |         |from the hinge.                                         |
+|Remove Blanks            |Caught in Section,      |High     |Get into a comfortable lifting position that suits.     |
+|                         |burns. / Back strain    |         |Reducing lowering and twisting while lifting. Remove    |
+|                         |                        |         |Blanks                                                  |
+|Fit clean blanks         |Caught in Section,      |High     |Get into a comfortable lifting position that suits.     |
+|                         |burns. / Back strain    |         |Reducing lowering and twisting while lifting. Refit     |
+|                         |                        |         |Blanks. Remove Tee Lifters                              |
+|Prepare Section to start.|Caught in Section.      |High     |Disengage blank, close safety lock and remove invert    |
+|                         |                        |         |safety lock over invert rack.                           |
+|Follow starting a section|Caught in Section.      |High     |Ensure all personnel are clear of the section.  Start   |
+|refer JSA 210.01.01      |                        |         |the section up                                          |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+
+                                                     -----------------------
+[pic]
+
+O-I New Zealand
+

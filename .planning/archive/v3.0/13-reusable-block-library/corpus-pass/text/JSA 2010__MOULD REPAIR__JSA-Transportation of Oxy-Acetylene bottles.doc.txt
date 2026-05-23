@@ -1,0 +1,40 @@
+
+Transportation of Oxy-Acetylene bottles
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                |Safety Induction [Contractor]         |                                       |
+|PPE Required:                    |Significant Hazard                    |JSA Reviewed by and date               |
+|Standard Safety Uniform plus     |Yes                                   |Gary Russell 16/7/07                   |
+|Safety glasses                   |                                      |                                       |
+|                                 |Risk Score                            |                                       |
+|                                 |36                                    |                                       |
+|                                 |                                      |                                       |
+|                                 |Category                              |                                       |
+|                                 |Low                                   |                                       |
+|                                 |                                      |                                       |
+|                                 |Control taken                         |                                       |
+|                                 |Minimisation                          |                                       |
+|                                 |                                      |                                       |
+|Sequence of Job Steps         |Potential /                    |Level of |Controls to reduce the Risk of Hazard   |
+|                              |Actual Hazard                  |Risk     |                                        |
+|Turn off Bottles              |Leaking gas , Fire hazard      |Low      |Ensure no naked flames                  |
+|                              |                               |         |Bottles are turned off correctly        |
+|Remove bottles from storage   |Crushing , entrapment          |Low      |Position trolley correctly so as to     |
+|area                          |Straining of back              |         |slide under bottle.                     |
+|                              |                               |         |Ensure area is clear of obstructions and|
+|                              |                               |         |clear pathway to exit area              |
+|                              |                               |         |Plan route to store as to not be stoping|
+|                              |                               |         |and having to move items out of way     |
+|                              |                               |         |Ensure bottle is secured by chain in    |
+|                              |                               |         |cradle trolley                          |
+|                              |                               |         |Wear back support if required           |
+|Unloading bottles at main     |Crushing , entrapment          |Low      |Position trolley correctly so as to     |
+|store                         |Straining of back              |         |slide under bottle.                     |
+|                              |                               |         |Ensure area is clear of obstructions and|
+|                              |                               |         |clear pathway to storage area is clear  |
+|                              |                               |         |Ensure bottle is secured by chain in    |
+|                              |                               |         |storage area                            |
+|                              |                               |         |Wear back support if required           |

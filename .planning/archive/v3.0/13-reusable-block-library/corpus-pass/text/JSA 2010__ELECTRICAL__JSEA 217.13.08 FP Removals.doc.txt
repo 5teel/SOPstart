@@ -1,0 +1,63 @@
+
+
+
+Job Safety Environmental Analysis Form:
+
+
+                                                                       FP
+                                                                     Removals
+
+
+
+                                                                     |Area / Department                  |Electrical                            |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Boots, gloves, uniform, safety     |                                      |                                          |
+|glasses, ear muffs.                |                                      |                                          |
+|                                   |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Remove FP platforms.     |Grinding sparks, oxy    |High     |Fire fighting equipment on hand.                        |
+|Cut off bolts and lift   |cutting.                |         |Hot Work Permit.                                        |
+|out.                     |Forklift for lifting.   |         |Check lifting jib SWL and reach, rigging load / use     |
+|                         |Rigging load.           |         |rigger.                                                 |
+|                         |Transporting to holding |         |Forklift driver to complete risk assessment for task.   |
+|                         |area.                   |         |Spotter for forklift during removal.                    |
+|                         |Burns, sharp edges,     |         |Clean up work aera after removal.                       |
+|                         |crushing.               |         |Barricade off driveway to building entry point.         |
+|                         |                        |         |Gloves.                                                 |
+|Removalof FPΓÇÖs.          |Grinding sparks, oxy    |         |Fire fighting equipment on hand.                        |
+|                         |cutting.                |         |Hot Work Permit.                                        |
+|                         |Forklift for lifting.   |         |Check lifting jib SWL and reach, rigging load / use     |
+|                         |                        |         |rigger.                                                 |
+|                         |                        |         |Forklift driver to complete risk assessment for task.   |
+|                         |                        |         |Spotter for forklift during removal.                    |
+|                         |                        |         |Clean up work aera after removal.                       |
+|                         |                        |         |Barricade off driveway to building entry point.         |
+|                         |                        |         |Gloves.                                                 |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

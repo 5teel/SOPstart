@@ -1,0 +1,33 @@
+
+Replace 23 Conveyor Cooling Motor Starter
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]           |                                         |
+|PPE Required:                |Significant Hazard                      |JSA Reviewed by and date                 |
+|All standard PPE required    |Yes                                     |                                         |
+|                             |                                        |                                         |
+|                             |Risk Score                              |                                         |
+|                             |10                                      |                                         |
+|                             |                                        |                                         |
+|                             |Category                                |                                         |
+|                             |Low                                     |                                         |
+|                             |                                        |                                         |
+|                             |Control taken                           |                                         |
+|                             |Isolation                               |                                         |
+|                             |                                        |                                         |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Isolate supply               |Electrocution                 |Low      |Lock out mains isolator                  |
+|Disconnect old starter       |If separate supplies connected|Low      |Testing using the ΓÇ£Test / Check / Test   |
+|                             |ΓÇô possible electrocution      |         |ruleΓÇ¥                                    |
+|Remove old starter off wall  |Strain or sprain              |Low      |Correct lifting techniques required      |
+|Place new drive on wall      |Manual Handling               |Low      |Correct lifting techniques required      |
+|Connect up new drive         |Nil                           |Low      |Nil                                      |
+|Reinstate supply             |Electrocution                 |Low      |Testing using the ΓÇ£Test / Check / Test   |
+|                             |                              |         |ruleΓÇ¥                                    |
+|Commission drive             |Fan may start and people      |Low      |Ensure all aware and clear as fan may    |
+|                             |working in area               |         |start                                    |
+|Start fan                    |Nil                           |Low      |Inform all personal in area prior to     |
+|                             |                              |         |starting fan                             |

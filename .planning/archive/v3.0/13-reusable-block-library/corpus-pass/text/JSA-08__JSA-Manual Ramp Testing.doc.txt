@@ -1,0 +1,39 @@
+
+Using the Ramp Manual Pressure Tester
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety Specs / gloves if        |Yes                                    |Rey Basabas   12/06/07                  |
+|required / ear protect          |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |10                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                                  |Potential /   |Level of Risk|Controls to reduce the Risk|
+|                                                       |Actual Hazard |             |of Hazard                  |
+|When using the Ramp Manual Pressure Tester [RMPT]      |Nil           |Low          |Nil                        |
+|Connect hose from VLT to Pressure Tester by fitting to |              |             |                           |
+|the head assembly on the selected chamber              |              |             |                           |
+|The fitting should be set face down between the plastic|Nil           |Low          |Nil                        |
+|holder & the head                                      |              |             |                           |
+|Pull down handle to create a good seal                 |Nil           |Low          |Nil                        |
+|Turn on power & water                                  |Slip          |Low          |Keep area dry and ensure   |
+|                                                       |              |             |all PPE is worn            |
+|Turn dial to Vertical Load                             |Nil           |Low          |Nil                        |
+|Close door on selected chamber                         |Nil           |Low          |Nil                        |
+|When all of the above has been completed turn the power|Slip          |Low          |Keep area dry and ensure   |
+|on the VLT & then press START                          |              |             |all PPE is worn            |
+|The results will be displayed on the RMPT LED The test |Laceration    |Low          |PPE                        |
+|is complete when the container breaks in the canister  |              |             |                           |
+|Turn off water & power at the RMPT & release hose from |Slip          |Low          |Keep area dry and ensure   |
+|head assembly                                          |              |             |all PPE is worn            |
+|Turn power off at the VLT & open chamber door,         |Laceration    |Low          |PPE                        |
+|carefully lift out canister & discard tested bottle    |              |             |                           |

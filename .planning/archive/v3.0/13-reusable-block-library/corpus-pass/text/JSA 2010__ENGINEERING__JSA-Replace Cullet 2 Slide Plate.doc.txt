@@ -1,0 +1,33 @@
+
+Replace Cullet 2 slide gate
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                           |Safety Induction [Contractor]           |                                           |
+|PPE Required:               |Significant Hazard                      |JSA Reviewed by and date                   |
+|All standard PPE required   |Yes                                     |                                           |
+|                            |                                        |                                           |
+|                            |Risk Score                              |                                           |
+|                            |20                                      |                                           |
+|                            |                                        |                                           |
+|                            |Category                                |                                           |
+|                            |Low                                     |                                           |
+|                            |                                        |                                           |
+|                            |Control taken                           |                                           |
+|                            |Minimisation                            |                                           |
+|                            |                                        |                                           |
+|Sequence of Job Steps       |Potential /                   |Level of |Controls to reduce the Risk of Hazard      |
+|                            |Actual Hazard                 |Risk     |                                           |
+|Remove lower fixing bolts   |Strain and slippage. FB in    |Low      |Use correct equipment Use PPE to prevent FB|
+|and welds                   |eyes from grinding metal      |         |to eyes                                    |
+|Remove top fixing bolts     |Limited work area causing     |Low      |Tie off with rope to take the weight. Use  |
+|                            |Strains from spanner slipping.|         |correct spanner size                       |
+|                            |Manual handling.              |         |                                           |
+|Lift top half away          |Limited work area causing     |Low      |Use correct lifting techniques. Clear area |
+|                            |Strains from spanner slipping.|         |where possible and remove equipment to     |
+|                            |Manual handling.              |         |prevent tripping                           |
+|Lift lower half away        |Limited work area causing     |Low      |Tie off with rope to take the weight. Use  |
+|                            |Strains from spanner slipping.|         |correct spanner size                       |
+|                            |Manual handling.              |         |                                           |
+|Replace Slide Gate          |Manual Handling               |Low      |Use correct lifting techniques.            |

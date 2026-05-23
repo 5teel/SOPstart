@@ -1,0 +1,26 @@
+
+Replate Sides of Elevator
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                              |Safety Induction [Contractor]        |                                          |
+|PPE Required:                  |Significant Hazard                   |JSA Reviewed by and date                  |
+|All standard PPE required      |Yes                                  |C Sheppard                                |
+|                               |                                     |                                          |
+|                               |Risk Score                           |                                          |
+|                               |500                                  |                                          |
+|                               |                                     |                                          |
+|                               |Category                             |                                          |
+|                               |High                                 |                                          |
+|                               |                                     |                                          |
+|                               |Control taken                        |                                          |
+|                               |Minimisation                         |                                          |
+|                               |                                     |                                          |
+|Sequence of Job Steps    |Potential /                         |Level of    |Controls to reduce the Risk of Hazard|
+|                         |Actual Hazard                       |Risk        |                                     |
+|Work area                |Stairs, glass on floor, falling     |Low         |Hard hats, RCD, clean work area      |
+|                         |glass, water                        |            |Walk carefully                       |
+|Lift up plates           |Scaffolding, lifting                |Low         |Hoist or extra manpower, certified   |
+|                         |                                    |            |scaffolding                          |
+|Weld up plates           |Sparks, fire risk, weld flash       |Low         |Fire watch, welding screens, PPE     |

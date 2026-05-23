@@ -1,0 +1,52 @@
+
+Loading Layerboard Pallets onto Foodmac
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSEA Reviewed by and date                   |
+|All standard PPE required     |Yes                                  |                                            |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |60                                   |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |Medium                               |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps          |Potential /                  |Level of |Controls to reduce the Risk of Hazard    |
+|                               |Actual Hazard                |Risk     |                                         |
+|Using pedestrian hoist, pick up|Layer boards may fall off    |Low      |Ensure load is stable and forks are      |
+|a new pallet of layer boards   |pallet if not lifted         |         |tilted backwards prior to lifting. Use   |
+|and drive toward f/mach in feed|correctly                    |         |brakes when stopping pedestrian  hoist   |
+|conveyors                      |                             |         |                                         |
+|Line pallet up with f/mach in  |Layer boards may fall off    |Medium   |Ensure load is straight and forks are    |
+|feed conveyor prior to lifting.|pallet if not lifted         |         |tilted backwards prior to lifting.       |
+|                               |correctly or load is unstable|         |                                         |
+|Move forward with load until it|As above                     |Low      |Ensure that pallet does not hit the back |
+|touches back guard             |                             |         |guard too hard as this may make load     |
+|                               |                             |         |unstable and uneven                      |
+|Lower pallet ensuring that     |Broken bearers can sometimes |Low      |Check that bearers are intact and not    |
+|bearers are on the chain       |cause unsteadiness of load   |         |broken prior to loading                  |
+|conveyors before reversing     |when entering magazine       |         |                                         |
+|Reverse hoist until clear of   |Crushed  by pedestrian hoist |Low      |Checking that there are no obstacles or  |
+|pallet, lower forks to ground  |                             |         |persons behind prior to reversing. Use   |
+|tilting forks forward.         |                             |         |brakes when stopping pedestrian hoist.   |
+|Environmental:                 |                             |         |                                         |
+|Removal of used rags / gloves/ |Contamination.               |High     |Place in correct contamination or waste  |
+|waste/ glass / cullet          |Waste removal and tidy up.   |         |bins provided.                           |
+|                               |                             |         |Ensure area is cleaned and product /     |
+|                               |                             |         |tools cleared away.                      |
+|Protection & Security          |                             |          |                                        |
+|Demarcation                    |Damage to people, property   |High      |Demarcation where applicable.           |
+|                               |and environment.             |          |Install barricaded/danger tape as       |
+|                               |                             |          |required.                               |
+|                               |                             |          |Ensure correct fire fighting equipment  |
+|                               |                             |          |is available.                           |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

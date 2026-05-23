@@ -1,0 +1,32 @@
+
+Replacing Tank 2 Drag Bucket
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                           |Safety Induction [Contractor]           |                                           |
+|PPE Required:               |Significant Hazard                      |JSA Reviewed by and date                   |
+|All standard PPE required   |Yes                                     |                                           |
+|                            |                                        |                                           |
+|                            |Risk Score                              |                                           |
+|                            |40                                      |                                           |
+|                            |                                        |                                           |
+|                            |Category                                |                                           |
+|                            |Low                                     |                                           |
+|                            |                                        |                                           |
+|                            |Control taken                           |                                           |
+|                            |Minimisation                            |                                           |
+|                            |                                        |                                           |
+|Sequence of Job Steps       |Potential /                   |Level of |Controls to reduce the Risk of Hazard      |
+|                            |Actual Hazard                 |Risk     |                                           |
+|Shut down and isolate       |Moving machinery              |High     |Follow Isolation Procedure plus Drag       |
+|                            |                              |         |Procedures                                 |
+|Disconnect bucket           |Entrapment, crushing falling, |High     |Attach lifting equipment. Ensure area is   |
+|                            |slipping                      |         |clear so not chance of tripping over       |
+|                            |                              |         |rubbish                                    |
+|Remove bucket               |Entrapment, crushing falling, |High     |Use certified lifting equipment. Employees |
+|                            |slipping                      |         |to stand clear                             |
+|Install new bucket          |Entrapment, crushing falling, |High     |Use certified lifting equipment. Employees |
+|                            |slipping                      |         |to stand clear Attach lifting equipment.   |
+|                            |                              |         |Ensure area is clear so not chance of      |
+|                            |                              |         |tripping over rubbish                      |

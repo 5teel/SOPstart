@@ -1,0 +1,34 @@
+
+Dynes Testing
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety Glasses / disposable     |Yes                                    |                                        |
+|gloves                          |                                       |Ellis Levy  11/06/07                    |
+|                                |Risk Score                             |                                        |
+|                                |20                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                    |Potential /           |Level of Risk|Controls to reduce the Risk of    |
+|                                         |Actual Hazard         |             |Hazard                            |
+|Select containers to test & allow to cool|Nil                   |Nil          |Nil                               |
+|to ambient temperature                   |                      |             |                                  |
+|Ensure appropriate PPE is worn           |Chemical composition  |Low          |PPE / MSDS                        |
+|                                         |in ink die            |             |                                  |
+|Select a Dynes Pen ( mid point in the    |Nil                   |Low          |Nil                               |
+|testing range ) & draw one continuous    |                      |             |                                  |
+|line from shoulder to heel               |                      |             |                                  |
+|Note results as per specification        |Nil                   |Low          |Nil                               |
+|If the test needs to be done again (     |Nil                   |Low          |Nil                               |
+|either with the same Dynes Pen or another|                      |             |                                  |
+|in the range ) then the procedure is as  |                      |             |                                  |
+|above                                    |                      |             |                                  |
+|Discard containers after testing         |Laceration            |Low          |PPE                               |

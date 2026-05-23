@@ -1,0 +1,28 @@
+
+                                                         Mopping the Baffles
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |GRANT JUPP 18-12-2019                   |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |Medium                                     |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Press the swab cycle button  |Nil                           |Nil         |Nil                                     |
+|Wait for barrier to drop and |Nil                           |Nil         |Nil                                     |
+|moving parts to stop         |                              |            |                                        |
+|Mop the baffles              |Manual handling               |Low         |Training in swabbing. Technique in doing|
+|                             |                              |            |the task                                |
+|Press the swab cycle button  |Nil                           |Nil         |Nil                                     |
+|for the barrier to return to |                              |            |                                        |
+|position                     |                              |            |                                        |
+
+

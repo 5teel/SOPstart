@@ -1,0 +1,66 @@
+
+Task Title here
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                 |Safety Induction [Contractor]                                                               |
+|                              |Insignificant ΓÇô first aid injury, up  |
+|                              |to $1,000 damage, spill confined to   |
+|LIKELIHOOD                    |immediate work area, rapid clean up,  |
+|                              |no damage to environment              |
+|How likely is it to happen?   |                                      |
+|4                             |ACT NOW ΓÇô Urgent ΓÇô do something about |
+|ACUTE                         |the risks immediately. Requires       |
+|                              |immediate attention.                  |
+|3                             |Highest management decision is        |
+|HIGH                          |required urgently                     |
+|2                             |Follow management instruction         |
+|MODERATE                      |                                      |
+|1                             |OK for now. Record and review if any  |
+|LOW                           |equipment / people / materials / work |
+|                              |processes or procedures change        |
+                                                             Task Title here
+|Area / Department            |Production Mtce                            |Task  or Job Description                |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes or No                                  |John Holmes-Libbis                      |
+|                             |                                           |Colin Hayes                             |
+|                             |Overall Category of task                   |                                        |
+|                             |                                           |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |                                           |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|1.Stop the stacker by pushing|Electrocution                 |4           |Isolation ΓÇô push E-stop ,lock it out and|
+|the E-stop, put lock-out on  |                              |            |tag it with the name of the person      |
+|the switch                   |                              |            |working on the stacker.                 |
+|2.Manually push the stacker  |Pinch points                  |2           |Minimization-use required PPE           |
+|bar on top of the cross      |Risk of entrapment            |            |                                        |
+|conveyor mat.                |                              |            |- ensure correct  body ergonomics       |
+|Undo 8pcs x 6mm cap screw    |Excessively hot environment   |            |                                        |
+|which hold the stacker onto  |Slippery surface              |            |                                        |
+|the bracket                  |Broken glass                  |            |                                        |
+|                             |Burnt                         |            |                                        |
+|3.Install new stacker bar    |Pinch points                  |2           |Minimization-use correct PPE            |
+|                             |Risk of entrapment            |            |-donΓÇÖt twist body when lifting          |
+|                             |Manual handling               |            |- carry bar closer to your body         |
+|                             |Broken glass                  |            |- ask some assistance when lifting and  |
+|                             |Burnt                         |            |installing the bar                      |
+|                             |Slippery surface              |            |                                        |
+|                             |                              |            |                                        |
+|4.Level the bar by ensuring a|Broken glass                  |2           |Minimization-use correct PPE            |
+|clearance of ┬╜  above the    |Limited working area          |            |- correct body ergonomics               |
+|cross conveyor mat.          |Slippery surface              |            |                                        |
+|                             |Risk of entrapment            |            |                                        |
+|                             |Pinch points                  |            |                                        |
+|                             |Excessive hot environment     |            |                                        |
+|5.Remove lock-out and start  |Risk of entrapment            |3           |Minimization- ensure no one is around   |
+|stacker                      |                              |            |the stacker area when in starting.      |
+|                             |                              |            |                                        |
+|                             |                              |            |                                        |
+|                             |                              |            |                                        |
+|                             |                              |            |                                        |
+
+

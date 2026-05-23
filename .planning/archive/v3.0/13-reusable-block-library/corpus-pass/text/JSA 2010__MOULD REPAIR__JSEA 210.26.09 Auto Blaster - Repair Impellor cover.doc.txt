@@ -1,0 +1,50 @@
+
+Auto Sandblaster ΓÇô Repair Impellor cover
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                            |Safety Induction [Contractor]               |                                        |
+|PPE Required:                |Significant Hazard                          |JSEA Reviewed by and date               |
+|Safety Glasses, Gloves,      |Yes                                         |Gary Russell 20/9/07                    |
+|Welding Mask, Welding screen |                                            |                                        |
+|                             |Risk Score                                  |                                        |
+|                             |30                                          |                                        |
+|                             |                                            |                                        |
+|                             |Category                                    |                                        |
+|                             |Low                                         |                                        |
+|                             |                                            |                                        |
+|                             |Control taken                               |                                        |
+|                             |Minimisation                                |                                        |
+|                             |                                            |                                        |
+|Sequence of Job Steps        |Potential /                      |Level of  |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                    |Risk      |                                        |
+|Isolate Machine              |Automatic equipment              |Low       |Ensure machine locked out using correct |
+|                             |                                 |          |procedure                               |
+|Grind area free of paint     |Foreign objects                  |Low       |Correct PPE                             |
+|                             |Sparks                           |          |Ensure no flammable materials in area   |
+|                             |Hot surface                      |          |Do not touch area with bare skin        |
+|Blow area down with air hose |Dust                             |Low       |Correct PPE                             |
+|                             |Foreign objects in eyes          |          |When using air hose ensure pointing in  |
+|                             |                                 |          |safe direction away from body           |
+|Weld Patch                   |Electrical shock                 |Low       |Check cables and supply in good working |
+|                             |Hot surface                      |          |order                                   |
+|                             |Damage to eyes                   |          |Correct PPE                             |
+|                             |Sparks                           |          |Correct PPE (Welding mask) and screen to|
+|                             |                                 |          |protect pedestrians                     |
+|                             |                                 |          |Ensure no flammable materials in area   |
+|Re paint area                |Flammable                        |Low       |Ensure no naked flames                  |
+|Environmental:               |                                 |          |                                        |
+|Removal of used rags /       |Contamination.                   |High      |Place in correct contamination or waste |
+|gloves/  waste/ glass /      |Waste removal and tidy up.       |          |bins provided.                          |
+|cullet                       |                                 |          |Ensure area is cleaned and product /    |
+|                             |                                 |          |tools cleared away.                     |
+|Protection & Security        |                                 |          |                                        |
+|Demarcation                  |Damage to people, property and   |High      |Demarcation where applicable.           |
+|                             |environment.                     |          |Install barricaded/danger tape as       |
+|                             |                                 |          |required.                               |
+|                             |                                 |          |Ensure correct fire fighting equipment  |
+|                             |                                 |          |is available.                           |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

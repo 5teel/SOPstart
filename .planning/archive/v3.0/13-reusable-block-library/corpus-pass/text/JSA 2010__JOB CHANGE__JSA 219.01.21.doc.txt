@@ -1,0 +1,71 @@
+
+#21, 23, 31 Changing a Blow-head
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                                      |Safety Induction [Contractor]                                 |
+|Hazard            |Practicable to Eliminate                                                                    |
+|Identification    |                                                                                            |
+|                                     |Insignificant ΓÇô first aid injury, up to  |
+|                                     |$1,000 damage, spill confined to         |
+|LIKELIHOOD                           |immediate work area, rapid clean up, no  |
+|                                     |damage to environment                    |
+|How likely is it to happen?          |                                         |
+|4                                    |ACT NOW ΓÇô Urgent ΓÇô do something about the|
+|ACUTE                                |risks immediately. Requires immediate    |
+|                                     |attention.                               |
+|3                                    |Highest management decision is required  |
+|HIGH                                 |urgently                                 |
+|2                                    |Follow management instruction            |
+|MODERATE                             |                                         |
+|1                                    |OK for now. Record and review if any     |
+|LOW                                  |equipment / people / materials / work    |
+|                                     |processes or procedures change           |
+
+
+Job Safety Analysis Form:               #21, 23, 31 Changing a Blow-head
+
+
+
+|Area / Department                  |Job Change                            |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSA Reviewed by and Date:                 |
+|Boots, gloves, uniform, safety     |Yes                                   |August 2009                               |
+|glasses, ear muffs, (protection    |                                      |                                          |
+|sleeves, back support ΓÇô optional)  |Risk Score                            |                                          |
+|                                   |100                                   |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |Medium                                |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |Minimisation                          |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Stop Section:-           |Making section safe to  |High     |Stop Neck ring arms in the inverted position using the E|
+|Follow Stopping Section  |prevent entrapment      |         |Stop button                                             |
+|refer JSA 219.01.02      |                        |         |                                                        |
+|Ensure section is safe.  |Trapped in the machine /|High     |Ensure E Stop button is activated and light is on before|
+|                         |crush injury.           |         |entering section.                                       |
+|Ensure section is safe.  |Trapped in the machine /|High     |Ensure snap valves are pressed down.                    |
+|                         |crush injury            |         |Note:  On job changes, ensure yellow cover is on over   |
+|                         |                        |         |snap valves.                                            |
+|                         |                        |         |Note:  On O-I machine, push in mould inhibit button.    |
+|Remove blow head.        |Burns                   |High     |Using thick gloves provided remove the blow head.       |
+|Replace blow head.       |Burns                   |Low      |Using thick gloves provided fit the clean blow head to  |
+|                         |                        |         |the machine.                                            |
+|Follow starting a section|Trapped in the machine /|Low      |Snap valves to the run position.  Remove snap valve     |
+|procedure refer JSA      |crush injury.           |         |guard and pullout mould inhibit button if applicable.   |
+|219.01.01                |                        |         |Ensure all personnel are clear of the section.  Start   |
+|                         |                        |         |the section up.                                         |
+
+ If the operation does not follow this JSA re-assess procedure and report to
+                            Supervisor / Manager.
+
+
+                                                     -----------------------
+[pic]
+
+O-I New Zealand
+

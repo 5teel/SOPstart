@@ -1,0 +1,34 @@
+
+Use of Vertical Load Tester
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSA Reviewed by and date                    |
+|Safety Glasses & Gloves       |Yes                                  |Rey Basabas  12/06/07                       |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |10                                   |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |Low                                  |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps                     |Potential /            |Level of Risk|Controls to reduce the Risk of |
+|                                          |Actual Hazard          |             |Hazard                         |
+|When using the Vertical Load Tester ( VLT |Nil                    |Low          |Nil                            |
+|)ensure required PPE is being worn        |                       |             |                               |
+|Select container to be checked            |Nil                    |Low          |Nil                            |
+|Place in steel canister ensuring that the |Nil                    |Low          |Nil                            |
+|lid overhangs the base portion            |                       |             |                               |
+|Place canister on Vertical Load stand (   |Nil                    |low          |Nil                            |
+|inside chamber ) taking care to align the |                       |             |                               |
+|top stop of the canister , to the stop on |                       |             |                               |
+|the assembly                              |                       |             |                               |
+|Close the door & turn the handle to lock  |Nil                    |Low          |Nil                            |
+|on the Vertical Load Tester               |                       |             |                               |
+|Place the overflow water hose from the VLT|Nil                    |Low          |Nil                            |
+|to the drain tray on the RMPT             |                       |             |                               |

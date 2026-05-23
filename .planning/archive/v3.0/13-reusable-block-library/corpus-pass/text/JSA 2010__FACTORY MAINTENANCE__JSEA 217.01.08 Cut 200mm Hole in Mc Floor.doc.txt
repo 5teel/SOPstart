@@ -1,0 +1,49 @@
+
+
+
+Job Safety Environmental Analysis Form:                           Cut 200mm
+Hole in M/c Floor
+
+|Area / Department                  |Factory Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots, High Vis Garment,    |                                      |                                          |
+|Respiratory Protection (when       |Risk Score                            |                                          |
+|working with asbestos).            |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Prepare work area.       |Manual handling.        |Medium   |Use correct manual handling techniques.                 |
+|Cut hole in floor at QG  |Water on floor.         |High     |Control water spillage.                                 |
+|15 machine.              |Electric shock.         |         |Electrical leads to use RCD.                            |
+|                         |Falling objects (core   |         |Barricade off basement.                                 |
+|                         |fall into basement)     |         |Wear appropriate PPE.                                   |
+|                         |Slip / trip.            |         |Barricade off work area.                                |
+|                         |                        |         |Keep electric leads up off floor and water.             |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

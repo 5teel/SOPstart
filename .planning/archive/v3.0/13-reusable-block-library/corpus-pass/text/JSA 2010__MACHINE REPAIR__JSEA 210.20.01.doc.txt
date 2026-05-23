@@ -1,0 +1,80 @@
+
+
+
+Job Safety Environmental Analysis Form:                        Removal &
+                                                                      Install
+                                                                      ation
+                                                                      of
+                                                                      Spout
+                                                                      Casing
+                                                                      /
+                                                                      Shear
+                                                                      & Tube
+                                                                      Mechani
+                                                                      sm
+
+|Area / Department                  |Machine Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |R. Hogan                                  |
+|and Safety Boots, welding PPE      |                                      |                                          |
+|required                           |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Prepare work area        |Manual Handling.        |         |Use correct manual handling techniques.                 |
+|- Set up barricades      |Jammed fingers.         |         |Ensure no person under work area when cleaning.         |
+|- Deck out floor         |                        |         |Cover floor openings with ply/masonite.                 |
+|(masonite/ply)           |                        |         |Barricade off work area & place signage.                |
+|- Clean down mechanism.  |                        |         |                                                        |
+|Disconnect & prepare     |Heat area.              |         |Use correct manual handling techniques.                 |
+|feeder spout casing and  |Crane & rigging.        |         |Barricade off work area & place signage.                |
+|shear mechanism & Tube   |Manual Handling.        |         |Crane crew to control rigging & lift, use appropriate   |
+|Mechanism for removal    |Falling objects.        |         |lifting equipment.                                      |
+|- Use crane  / Chain     |Burns & Heat stress.    |         |Barricade & Stop through pedestrian access during lift. |
+|Blocks.                  |                        |         |Drink fluids & monitor personal conditions.             |
+|                         |                        |         |Wear appropriate PPE.                                   |
+|Remove feeder spout      |Crane movement.         |         |Crane to use spotter when moving to clean down area.    |
+|casing & shear mechanism |Falling objects.        |         |Lift to be controlled by Dogger.                        |
+|to clean down area.      |Lacerations.            |         |Deck out floor.                                         |
+|                         |                        |         |Barricade off area under work area before lifting.      |
+|                         |                        |         |Wear appropriate PPE.                                   |
+|Reinstall the feeder     |Crane & rigging.        |         |Use correct manual handling techniques.                 |
+|spout casing.            |Manual Handling.        |         |Crane crew to control lift.                             |
+|                         |Heat area.              |         |Barricade off work area & place signs & stop pedestrian |
+|                         |Pedestrian traffic      |         |traffic.                                                |
+|                         |below.                  |         |Wear appropriate PPE.                                   |
+|                         |Falling objects.        |         |                                                        |
+|                         |Burns & heat stress.    |         |                                                        |
+|Reinstall Feeder         |As above.               |         |As Above.                                               |
+|mechanism.               |                        |         |                                                        |
+|Reinstall Tube Mechanism.|As Above.               |         |As Above.                                               |
+|Reinstall shear          |As Above.               |         |As Above.                                               |
+|mechanism.               |                        |         |                                                        |
+|Clean up work area.      |Manual Handling.        |         |Use correct manual handling.                            |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

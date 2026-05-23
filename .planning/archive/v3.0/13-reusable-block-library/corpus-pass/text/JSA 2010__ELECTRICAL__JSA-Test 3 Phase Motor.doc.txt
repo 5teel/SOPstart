@@ -1,0 +1,38 @@
+
+Test 3 Phase Motor - general
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|when working in production   |                                           |                                        |
+|area                         |Overall Category of task                   |                                        |
+|                             |Low                                        |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Isolation                                  |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Isolate, lockout & tag motor |Electrocution                 |High        |Qualified Electrician to complete       |
+|supply                       |                              |            |isolation and lockout procedure         |
+|Remove motor terminal cover &|Electrocution                 |High        |Duopol or suitable multimeter. Use ,    |
+|test for isolation           |                              |            |check, test, check procedures           |
+|Test resistance of motor     |None if properly isolated and |Low         |None                                    |
+|windings                     |tested                        |            |                                        |
+|Megar windings to earth-     |Nil                           |Low         |Training on use of megar caution high DC|
+|check connections            |                              |            |voltages present                        |
+|If motor fault found         |Nil                           |Low         |Note polarity of connections &          |
+|disconnect and remove        |                              |            |configuration of windings               |
+|If motor OK replace terminal |Nil                           |Low         |Isolation & lockout procedures          |
+|cover and discontinue        |                              |            |                                        |
+|isolation                    |                              |            |                                        |
+|Put motor back in service    |Electrocution                 |Low         |Proper use of clamp meter               |
+|clamp test supply            |                              |            |                                        |
+|Check for bearing noise while|Rotating parts                |Low         |There are a number of ways to do this   |
+|running                      |                              |            |task, caution for moving parts while    |
+|                             |                              |            |checking                                |
+
+

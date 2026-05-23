@@ -1,0 +1,46 @@
+
+Running Cables for I.T
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |X                                             |
+|PPE Required:                 |Significant Hazard                   |JSEA Reviewed by and date                     |
+|All standard PPE required     |Yes / No                             |                                              |
+|                              |                                     |                                              |
+|                              |Risk Score                           |                                              |
+|                              |                                     |                                              |
+|                              |                                     |                                              |
+|                              |Category                             |                                              |
+|                              |                                     |                                              |
+|                              |                                     |                                              |
+|                              |Control taken                        |                                              |
+|                              |                                     |                                              |
+|                              |                                     |                                              |
+|Sequence of Job Steps       |Potential /                   |Level of  |Controls to reduce the Risk of Hazard       |
+|                            |Actual Hazard                 |Risk      |                                            |
+|Watch person to prevent     |Fall and entrapment           |High      |Look out to ensure that all area aware that |
+|injury from Trucks, Hoist   |                              |          |persons working in area. Advise the         |
+|that are working in the area|                              |          |employees working the area.                 |
+|Getting gear and tools ready|Manual Handling from heavy    |Medium    |Trolley used to move gear into place        |
+|                            |lifting                       |          |                                            |
+|Place ladder into correct   |Slip                          |Medium    |Care while placing ladder into secure firm  |
+|position to access the roof |                              |          |position                                    |
+|Using the ladder to get to  |Slipping and falling off the  |High      |Have extra person to ensure the ladder is   |
+|top of roof                 |ladder causing crush injuries |          |secure                                      |
+|Access area to complete     |Fall from height              |High      |Not to walk on the roof but if required to  |
+|cabling                     |                              |          |access roof to complete task safety harness |
+|                            |                              |          |to be used and secured into position        |
+|Environmental:              |                              |          |                                            |
+|Removal of used rags /      |Contamination.                |High      |Place in correct contamination or waste bins|
+|gloves/  waste/ glass /     |Waste removal and tidy up.    |          |provided.                                   |
+|cullet                      |                              |          |Ensure area is cleaned and product / tools  |
+|                            |                              |          |cleared away.                               |
+|Protection & Security       |                              |          |                                            |
+|Demarcation                 |Damage to people, property and|High      |Demarcation where applicable.               |
+|                            |environment.                  |          |Install barricaded/danger tape as required. |
+|                            |                              |          |Ensure correct fire fighting equipment is   |
+|                            |                              |          |available.                                  |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

@@ -1,0 +1,34 @@
+
+Installing new High Speed Door
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                            |Safety Induction [Contractor]              |(                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                 |
+|All standard PPE required    |Yes                                        |Dave Walmsley 14.07.08                   |
+|                             |                                           |                                         |
+|                             |Category                                   |                                         |
+|                             |Low                                        |                                         |
+|                             |                                           |                                         |
+|                             |Control taken                              |                                         |
+|                             |Minimise                                   |                                         |
+|                             |                                           |                                         |
+|Sequence of Job Steps        |Potential /                    |Level of  |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                  |Risk      |                                         |
+|Assemble Door                |Traffic  Fork Hoist            |Low       |Traffic Cones or Danger Tape around work |
+|                             |                               |          |area.                                    |
+|                             |                               |          |Comply with Fork Hoist Procedures        |
+|                             |                               |          |217.01.26                                |
+|Remove existing Doors        |Traffic Manual Handling        |          |Traffic Cones or Danger Tape around work |
+|                             |Scissor Lift                   |Med       |area.                                    |
+|                             |                               |          |Use correct Manual Handling procedures.  |
+|                             |                               |          |Comply with Scissor Lift Procedures      |
+|                             |                               |          |217.02.02                                |
+|Install Door using Scissor   |Traffic Manual Handling        |          |Traffic Cones or Danger Tape around work |
+|Lift                         |Scissor Lift                   |Med       |area.                                    |
+|                             |                               |          |Use correct Manual Handling procedures.  |
+|                             |                               |          |Comply with Scissor Lift Procedures      |
+|                             |                               |          |217.02.02                                |
+|Test Door                    |Traffic                        |Low       |Traffic Cones or Danger Tape around work |
+|                             |                               |          |area.                                    |

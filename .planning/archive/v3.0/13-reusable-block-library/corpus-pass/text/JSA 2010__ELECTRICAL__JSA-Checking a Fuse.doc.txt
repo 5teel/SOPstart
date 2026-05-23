@@ -1,0 +1,33 @@
+
+Checking a Fuse
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|when working in production   |                                           |                                        |
+|area                         |Overall Category of task                   |                                        |
+|                             |Low                                        |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Isolation                                  |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Identify circuit fuse        |Removal of supply to wrong    |Low         |All switchboards should be correctly    |
+|                             |circuit ΓÇô computers           |            |labelled as to the circuits they protect|
+|Turn off all equipment on    |Arching of contacts as fuse is|Low         |Isolation and proper identification of  |
+|circuit                      |withdrawn                     |            |circuit                                 |
+|Remove fuse carrier          |If an old switchboard carrier |Low         |Care when removing carrier ΓÇô visual     |
+|                             |maybe faulty                  |            |checks                                  |
+|Test fuse for continuity     |Nil                           |Low         |Correct use of multimeter               |
+|Replace fuse if faulty       |Nil                           |Low         |Use correct size fuse replacement for   |
+|                             |                              |            |circuit being protected                 |
+|Replace fuse carrier         |Nil                           |Low         |Isolation                               |
+|Turn on all equipment one    |Care should be taken as any   |Low         |Turning on one at a time may indicate   |
+|item at a time               |piece of equipment may have   |            |which piece of equipment caused the fuse|
+|                             |fault & electrocution         |            |to blow                                 |
+
+

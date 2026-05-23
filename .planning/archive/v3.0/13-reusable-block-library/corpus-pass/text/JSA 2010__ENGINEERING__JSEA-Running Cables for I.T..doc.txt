@@ -1,0 +1,34 @@
+
+Running Cables for I.T
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |X                                           |
+|PPE Required:                 |Significant Hazard                   |JSA Reviewed by and date                    |
+|All standard PPE required     |Yes / No                             |                                            |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |                                     |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |                                     |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |                                     |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps          |Potential /                  |Level of |Controls to reduce the Risk of Hazard    |
+|                               |Actual Hazard                |Risk     |                                         |
+|Watch person to prevent injury |Fall and entrapment          |High     |Look out to ensure that all area aware   |
+|from Trucks, Hoist that are    |                             |         |that persons working in area. Advise the |
+|working in the area            |                             |         |employees working the area.              |
+|Getting gear and tools ready   |Manual Handling from heavy   |Medium   |Trolley used to move gear into place     |
+|                               |lifting                      |         |                                         |
+|Place ladder into correct      |Slip                         |Medium   |Care while placing ladder into secure    |
+|position to access the roof    |                             |         |firm position                            |
+|Using the ladder to get to top |Slipping and falling off the |High     |Have extra person to ensure the ladder is|
+|of roof                        |ladder causing crush injuries|         |secure                                   |
+|Access area to complete cabling|Fall from height             |High     |Not to walk on the roof but if required  |
+|                               |                             |         |to access roof to complete task safety   |
+|                               |                             |         |harness to be used and secured into      |
+|                               |                             |         |position                                 |

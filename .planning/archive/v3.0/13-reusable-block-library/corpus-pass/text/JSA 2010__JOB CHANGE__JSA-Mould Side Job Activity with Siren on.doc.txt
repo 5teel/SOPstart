@@ -1,0 +1,34 @@
+
+Mould Side Activity while siren is on
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]           |                                         |
+|PPE Required:                |Significant Hazard                      |JSA Reviewed by and date                 |
+|All standard PPE required    |Yes                                     |                                         |
+|                             |                                        |                                         |
+|                             |Risk Score                              |                                         |
+|                             |?                                       |                                         |
+|                             |                                        |                                         |
+|                             |Category                                |                                         |
+|                             |?                                       |                                         |
+|                             |                                        |                                         |
+|                             |Control taken                           |                                         |
+|                             |Minimisation                            |                                         |
+|                             |                                        |                                         |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Ensure stop button is        |Burns crushing                |Medium   |Ensure machine is stopped before working |
+|activated                    |                              |         |                                         |
+|Take out head wiper fingers  |Burns                         |Low      |While standing on platform, remove take  |
+|                             |                              |         |out head wiper fingers. Do not stand on  |
+|                             |                              |         |the conveyor or go past line off take out|
+|                             |                              |         |mechanism                                |
+|Mould side action for blank  |Foreign bodies                |High     |Stay out of sections being blown down    |
+|side blow down               |                              |         |from blank side until completed          |
+|                             |                              |         |                                         |
+|                             |                              |         |                                         |
+|                             |                              |         |                                         |
+|                             |                              |         |                                         |
+|                             |                              |         |                                         |

@@ -1,0 +1,129 @@
+
+| HAZARD IDENTIFICATION Changing Plunger, Thimble & Striker Plate   SAFETY REQUIRED                            |
+
+|Risk of Entrapment          |X   |Ventilation                |     |
+|Pinch Points                |X   |Fire Hazard                |     |
+|Moving Parts                |X   |Fragile roof support       |     |
+|Rotating Parts              |X   |Lighting                   |     |
+|Cutting                     |    |Isolated workplace location|     |
+|Moving Machinery            |    |Work above 3 metres        |     |
+|Automatic equipment         |    |Pressurised Fluid          |     |
+|Manual Handling             |X   |Spill to site drainage     |     |
+|Risk of falling objects     |    |Spill to Stormwater        |     |
+|Excessively hot environment |X   |Odour or Emissions         |     |
+|Noise                       |X   |Soil Contamination         |     |
+|Slippery surface            |X   |Airborne Contaminants      |X    |
+|Tripping hazard             |X   |Electricity [Power Tools]  |     |
+|Confined Space              |    |Stored energy              |     |
+|Broken or smashed glass     |X   |Electrocution              |     |
+|Limited working area        |X   |Risk of person falling     |     |
+
+|Hard Hat                    |     |
+|Gloves                      |X    |
+|Breathing Apparatus         |     |
+|Goggles                     |     |
+|Hearing protection          |X    |
+|Fire Extinguisher           |     |
+|Safety Glasses              |X    |
+|Back Support belt           |     |
+|Face Shield                 |     |
+|Disposable Clothing         |     |
+|Harness                     |     |
+|MSDS                        |     |
+|Spill Kit                   |     |
+|Bunding                     |     |
+|Council / OSH Notification  |     |
+|Warning signs to be         |     |
+|displayed                   |     |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+|NOTES              PERMITS COMPLETD                                                                           |
+
+|Work at Heights              |    |
+|High Voltage                 |    |
+|Hot work                     |    |
+|Confined Space               |    |
+|Excavation                   |    |
+|Permit to work completed     |    |
+
+|                                                                  |
+|                                                                  |
+|                                                                  |
+
+
+|CONTRACTOR                                            |
+|                                                      |Is the Contractor Inducted ΓÇô do they have a current   |
+|                                                      |safety Agreement                                      |
+|                                                      |
+
+|HAZARD MATRIX                                                                                                 |
+|                  |CONSEQUENCES                            The severity of potential consequences             |
+|                                    |Insignificant                                |
+|LIKELIHOOD                          |First aid injury, up to $1,000 damage, spill |
+|                                    |confined to immediate work area, rapid clean |
+|How likely is it to happen?         |up, no damage to environment                 |
+|4                                   |ACT NOW ΓÇô Urgent ΓÇô do something about the    |
+|ACUTE                               |risks immediately. Requires immediate        |
+|                                    |attention.                                   |
+|3                                   |Highest management decision is required      |
+|HIGH                                |urgently                                     |
+|2                                   |Follow management instruction                |
+|MODERATE                            |                                             |
+|1                                   |OK for now. Record and review if any         |
+|LOW                                 |equipment / people / materials / work        |
+|                                    |processes or procedures change               |
+
+|Hazard Management Worksheet                           |Changing Plunger, Thimble & Striker Plate                      |
+|Hazard Identification              |Practicable to Eliminate                                                     |
+|Area /         |Forming            |JSA Conducted by: Ian Clyde                |Date completed 25.6.2010         |
+|Department     |                   |                                           |                                 |
+|Controls to be taken Delete all other controls not taken   |Overview of the Hazard                               |
+|Elimination                                                |Significant Hazard                                   |
+|Isolation                                                  |Yes                                                  |
+|Administration                                             |                                                     |
+|                                                           |Control taken                                        |
+|Engineering                                                |Minimisation                                         |
+|Minimisation                                               |                                                     |
+|Substitution                                               |                                                     |
+|                                                           |                                                     |
+|                                                           |                                                     |
+|PPE Required:  All standard PPE required when working      |JSA Reviewed by and date                             |
+|within production area                                     |Joe Rolleston 04.09.2019                             |
+|Sequence of Job Steps       |Potential / Actual Hazard     |Level of |Controls to reduce the Risk of Hazard      |
+|                            |                              |Risk     |                                           |
+|                            |                              |H M L    |                                           |
+|Stop Loading                |Gob may still be loading      |L        |Wait until complete forming cycle          |
+|Stop Section at invert      |Neck ring arm reverts & or    |H        |Install revert safety lock close blank     |
+|position                    |blank close                   |         |open/close airline                         |
+|Pull out striker plate with |Burns, moving parts. Difficult|H        |Use PPE  Use special tools to remove       |
+|special tools               |to remove plate               |         |striker plate                              |
+|Press thimble at twist 90┬░  |FB to eyes and manual handling|H        |Use PPE  Use special tools to remove       |
+|to remove                   |from twisting & removing gear |         |thimble                                    |
+|Turn on thimble and Plunger |Hot plunger causing burns.    |H        |Use compressed air to clean then remove by |
+|up air ride to remove       |Build up of carbon may be     |         |hands                                      |
+|plunger                     |difficult to remove           |         |                                           |
+|Change Plunger then turn off|Plunger stays on              |M        |Turn off correct plunger/thimble override  |
+|thimble and plunger         |                              |         |                                           |
+|Install thimble press and   |Thimble moving                |         |Ensure secure by locking after and press   |
+|twist 90┬░ to lock           |                              |         |and twist 90┬░                              |
+|Insert Striker Plate        |Burns                         |L        |Insert striker plate making sure it sits   |
+|                            |                              |         |correctly                                  |
+|Remove revert safety lock   |Entrapment                    |L        |Pull Neck Ring arm to revert               |
+|Open Blank close air line   |Entrapment                    |L        |Use over ride                              |
+|Start Section               |Glass causing burns and crush |L        |Reset maintenance button                   |
+|Load Section                |Jam up of glass               |L        |Be aware as to what is taking place with   |
+|                            |                              |         |the loading                                |

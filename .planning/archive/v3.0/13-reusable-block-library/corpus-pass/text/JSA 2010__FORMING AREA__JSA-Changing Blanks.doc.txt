@@ -1,0 +1,43 @@
+
+Changing Blanks
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                          |Safety Induction [Contractor]                |                                      |
+|PPE Required:              |Significant Hazard                           |JSA Reviewed by and date              |
+|All standard PPE required  |Yes                                          |                                      |
+|                           |                                             |                                      |
+|                           |Risk Score                                   |                                      |
+|                           |250                                          |                                      |
+|                           |                                             |                                      |
+|                           |Category                                     |                                      |
+|                           |High                                         |                                      |
+|                           |                                             |                                      |
+|                           |Control taken                                |                                      |
+|                           |Minimisation                                 |                                      |
+|                           |                                             |                                      |
+|Sequence of Job Steps              |Potential /               |Level of  |Controls to reduce the Risk of Hazard |
+|                                   |Actual Hazard             |Risk      |                                      |
+|Get Blank from oven Take Blank to  |Manual Handling, Heat &   |Medium    |Correct lifting technique. Use correct|
+|machine                            |Burns Slippery Surfaces   |          |PPE                                   |
+|Stop Section to make safe          |Moving machinery on both  |High      |Correct lifting technique. Use correct|
+|                                   |sides of the machine      |          |PPE                                   |
+|Put in safety blocks               |Moving machinery on both  |High      |Stay aware and alert as to what is    |
+|Ring arm if inverted               |sides of the machine      |          |happening with the machine.           |
+|34 Machine use T bar blank block if|                          |          |                                      |
+|guard is not there due to          |                          |          |                                      |
+|maintenance                        |                          |          |                                      |
+|31/23 Machine blank air off        |                          |          |                                      |
+|21 Machine blank lock out pin in   |                          |          |                                      |
+|Remove old blank                   |Manual Handling, Moving   |High      |Follow procedure of removal of        |
+|                                   |equipment, Heat & Burns   |          |equipment from machine. Correct       |
+|                                   |                          |          |lifting technique. Use correct PPE    |
+|Replace new Blank                  |Manual Handling, Moving   |High      |Follow procedure of replacing         |
+|                                   |equipment, Heat & Burns   |          |equipment on machine. Correct lifting |
+|                                   |                          |          |technique. Use correct PPE            |
+|Remove all Safety blocks and       |Moving machinery on both  |Medium    |Stay aware and alert as to what is    |
+|Restart section                    |sides of the machine      |          |happening with the machine. Correct   |
+|                                   |                          |          |lifting technique. Use correct PPE    |
+|Place used blank back on parts     |Manual Handling,          |Low       |Correct lifting technique. Use correct|
+|table                              |                          |          |PPE                                   |

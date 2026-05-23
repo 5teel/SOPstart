@@ -1,0 +1,36 @@
+
+Removal and installation of Vacuum pumps ΓÇôTop Floor
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                            |Safety Induction [Contractor]        |                                            |
+|PPE Required:                |Significant Hazard                   |JSA Reviewed by and date                    |
+|All standard PPE required    |Yes                                  |                                            |
+|                             |                                     |                                            |
+|                             |Risk Score                           |                                            |
+|                             |30                                   |                                            |
+|                             |                                     |                                            |
+|                             |Category                             |                                            |
+|                             |Low                                  |                                            |
+|                             |                                     |                                            |
+|                             |Control taken                        |                                            |
+|                             |Minimisation                         |                                            |
+|                             |                                     |                                            |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Isolate Elevator and rotary  |Electrocution                 |High     |Contact Electrician to ensure that       |
+|distributor                  |                              |         |equipment is safely disconnected. Check  |
+|                             |                              |         |all equipment locked out safely prior to |
+|                             |                              |         |start working                            |
+|Cut out old pipe             |Burns or FB from hot work     |Medium   |Follow Hot work Procedure. Ensure safe   |
+|                             |cutting                       |         |working area to prevent risk of injury to|
+|                             |                              |         |self                                     |
+|Grind up area                |Risk of electrocution and fire|Medium   |Ensure safe working area to prevent risk |
+|                             |                              |         |of injury to self.                       |
+|Install pipe                 |Strain from manual handling   |Medium   |Obtain assistance with moving pipe into  |
+|                             |                              |         |position                                 |
+|Weld into place              |Welding flash                 |Medium   |Use welding screens to prevent injury to |
+|                             |                              |         |people nearby                            |
+|Remove isolation             |Entrapment                    |Medium   |Check all equipment is safe prior to     |
+|                             |                              |         |leaving area                             |

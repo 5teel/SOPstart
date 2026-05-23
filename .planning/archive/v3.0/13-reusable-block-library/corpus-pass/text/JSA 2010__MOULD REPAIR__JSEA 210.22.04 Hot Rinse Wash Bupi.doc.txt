@@ -1,0 +1,64 @@
+
+Hot Rinse Washer ΓÇô Bupi wash
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                |Safety Induction [Contractor]         |                                          |
+|PPE Required:                    |Significant Hazard                    |JSEA Reviewed by and date                 |
+|Standard Safety Uniform plus     |Yes                                   |Gary Russell 16/7/07                      |
+|Safety glasses, Face shield, Hat |                                      |                                          |
+|or Cap, gloves, Hearing          |Risk Score                            |                                          |
+|protection                       |125                                   |                                          |
+|                                 |                                      |                                          |
+|                                 |Category                              |                                          |
+|                                 |Medium                                |                                          |
+|                                 |                                      |                                          |
+|                                 |Control taken                         |                                          |
+|                                 |Minimisation                          |                                          |
+|                                 |                                      |                                          |
+|Sequence of Job Steps           |Potential /                      |Level of  |Controls to reduce the Risk of Hazard|
+|                                |Actual Hazard                    |Risk      |                                     |
+|Load Basket                     |Overloading of basket            |Medium    |Load single layer only in basket     |
+|                                |Back strain                      |          |Wear Back support if required        |
+|                                |Trapping or crushing of fingers /|          |Correct manual handling procedures   |
+|                                |hands                            |          |                                     |
+|Pushing of basket into Bupi wash|Back strain                      |Low       |Back support if required             |
+|                                |Slipping / Tripping              |          |Check floor for obstacles and wet    |
+|                                |Crushing / entrapment of hands   |          |area                                 |
+|                                |                                 |          |Ensure basket is located on trolley  |
+|                                |                                 |          |and track                            |
+|Close door                      |Hot water spray ΓÇô scalding       |Low       |Close door securely                  |
+|                                |                                 |          |Check door seal is not leaking       |
+|Open door                       |Hot steam                        |Medium    |Face shield                          |
+|                                |Burns / Scalding                 |          |Gloves                               |
+|                                |Door dropping                    |          |Hold door securely when opening      |
+|                                |                                 |          |Ensure unit is switched off before   |
+|                                |                                 |          |opening                              |
+|Pulling out of basket           |Back strain                      |Low       |Wear back support if required        |
+|                                |Slipping                         |          |Ensure area is dry and clear of      |
+|                                |Burn                             |          |obstacles                            |
+|Drying of equipment             |Noise                            |Low       |Required PPE                         |
+|                                |Hot equipment                    |          |Refer to Blowdown air nozzles / guns |
+|                                |Hot water splashes               |          |JSEA                                 |
+|Unloading of tray onto trolley  |Back strain                      |Medium    |Wear back support if required        |
+|                                |Hot equipment                    |          |Correct manual handling procedure    |
+|Environmental:                  |                                 |          |                                     |
+|Removal of used rags / gloves/  |Contamination.                   |High      |Place in correct contamination or    |
+|waste/ glass / cullet           |Waste removal and tidy up.       |          |waste bins provided.                 |
+|                                |                                 |          |Ensure area is cleaned and product / |
+|                                |                                 |          |tools cleared away.                  |
+|Protection & Security           |                                 |          |                                     |
+|Demarcation                     |Damage to people, property and   |High      |Demarcation where applicable.        |
+|                                |environment.                     |          |Install barricaded/danger tape as    |
+|                                |                                 |          |required.                            |
+|                                |                                 |          |Ensure correct fire fighting         |
+|                                |                                 |          |equipment is available.              |
+
+
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

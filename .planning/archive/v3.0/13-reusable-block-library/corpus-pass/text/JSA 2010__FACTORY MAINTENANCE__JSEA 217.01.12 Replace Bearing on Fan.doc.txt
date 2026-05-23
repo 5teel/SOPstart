@@ -1,0 +1,51 @@
+
+
+
+Job Safety Environmental Analysis Form:
+Replace Bearing on Fan
+
+|Area / Department                  |Factory Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots, High Vis Garment,    |                                      |                                          |
+|Respiratory Protection (when       |Risk Score                            |                                          |
+|working with asbestos).            |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Isolation of fan.        |Moving parts.           |High     |Isolate electrical supply (group isolation) procedure.  |
+|Portable light.          |Electrocution.          |High     |Use RCD earth leakage leads and lights.                 |
+|Remove guards and undo   |Sharp edges / cuts.     |Medium   |Wear appropriate PPE equipment ie gloves, glasses, hard |
+|motor.                   |                        |         |hat.                                                    |
+|Lift motor.              |Crushing / falling.     |Medium   |Use rigger and appropriate lifting equipment.           |
+|Remove coupling /        |Manual lifting.         |Medium   |Manual lifting technique.  Use PPE equipment.           |
+|bearing.                 |                        |         |                                                        |
+|Re-assembly.             |Manual lifting.         |Medium   |Manual lifting technique.  Use PPE equipment.           |
+|Line up motor.           |Pinching.               |Medium   |Use lifting gear as above.  Use PPE Equipment.          |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

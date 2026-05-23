@@ -1,0 +1,44 @@
+
+Replace Section of Elevator Chute
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]       |                                                |
+|PPE Required:                 |Significant Hazard                  |JSEA Reviewed by and date                       |
+|All standard PPE required     |Yes                                 |C Sheppard                                      |
+|                              |                                    |                                                |
+|                              |Risk Score                          |                                                |
+|                              |100                                 |                                                |
+|                              |                                    |                                                |
+|                              |Category                            |                                                |
+|                              |Medium                              |                                                |
+|                              |                                    |                                                |
+|                              |Control taken                       |                                                |
+|                              |Minimisation                        |                                                |
+|                              |                                    |                                                |
+|Sequence of Job Steps    |Potential /                       |Level of |Controls to reduce the Risk of Hazard        |
+|                         |Actual Hazard                     |Risk     |                                             |
+|Cut out old section      |Elevator, glass, sparks, falling  |High     |Isolate, clean area down, PPE, hot work and  |
+|                         |objects                           |         |screens, tape off area.                      |
+|Remove old section       |Falling objects and back strain   |High     |Use chain or suitable lifting equip0ment.    |
+|                         |                                  |         |Tape off area                                |
+|Install new section      |As above                          |High     |As above                                     |
+|Weld up section          |Sparks, welding flash             |High     |Tape off area, welding screens.              |
+|                         |                                  |         |Hot work permit                              |
+|Job finish               |Clean up area                     |Low      |Remove all off cuts and scrap and clean area |
+|Environmental:           |                                  |         |                                             |
+|Removal of used rags /   |Contamination.                    |High     |Place in correct contamination or waste bins |
+|gloves/  waste/ glass /  |Waste removal and tidy up.        |         |provided.                                    |
+|cullet                   |                                  |         |Ensure area is cleaned and product / tools   |
+|                         |                                  |         |cleared away.                                |
+|Protection & Security    |                                  |         |                                             |
+|Demarcation              |Damage to people, property and    |High     |Demarcation where applicable.                |
+|                         |environment.                      |         |Install barricaded/danger tape as required.  |
+|                         |                                  |         |Ensure correct fire fighting equipment is    |
+|                         |                                  |         |available.                                   |
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.

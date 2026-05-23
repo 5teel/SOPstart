@@ -1,0 +1,59 @@
+
+
+
+    Job Safety Environmental Analysis Form:          Removal of Redundant
+                                                                    Hydraulic
+                                                                     Pipe &
+                                                                    Cooling
+                                                                    Water
+                                                                    from Oil
+                                                                    Servery
+                                                                    to
+                                                                    Machine
+
+|Area / Department                  |Machine Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|and Safety Boots, welding PPE      |                                      |                                          |
+|required.                          |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Remove cooling water.    |Water on floor.         |High     |Drain into bucket.                                      |
+|                         |Manual handling.        |         |Use correct manual handling techniques.                 |
+|Remove hydraulic lines.  |Oil on floor.           |High     |Use absorbent material to soak up.                      |
+|                         |Manual handling.        |         |Clean up as your go.                                    |
+|                         |Falling objects.        |         |Use correct manual handling techniques.                 |
+|                         |                        |         |Barricade immediate work area.                          |
+|                         |                        |         |Co-ordinate with MB33 Operators.                        |
+|Removal of hydraulic and |Collision of scissor    |High     |Use competent / trained operators.                      |
+|cooling water lines.     |lift.                   |         |                                                        |
+|Blocking up area for #34 |Lack of access for      |High     |Communciate with machine operators as totheir access    |
+|Operators.               |machine operators.      |         |requirements at time to suit them.                      |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

@@ -1,0 +1,80 @@
+
+#23, 31, 34 First Load of a Section with Gob Catcher
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                  |Safety Induction [Contractor]         |                                          |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Boots, gloves, uniform, safety     |Yes                                   |                                          |
+|glasses, ear muffs, (protection    |                                      |July 2007                                 |
+|sleeves, back support ΓÇô optional)  |Risk Score                            |                                          |
+|                                   |100                                   |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |Medium                                |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |Minimisation                          |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Note:  On Job Change     |                        |         |                                                        |
+|start-upΓÇÖs the only time |                        |         |                                                        |
+|the Swab Barrier is to be|                        |         |                                                        |
+|removed is for bad       |                        |         |                                                        |
+|loading and gob          |                        |         |                                                        |
+|collection by shovel.    |                        |         |                                                        |
+|Job Change ΓÇô Barrier.    |Caught in Section.      |High     |All barriers must be in place on start-up.  If the      |
+|                         |                        |         |section is not loading consistently into the blank,     |
+|                         |                        |         |remove barrier and start other sections (coming back to |
+|                         |                        |         |the stopped section/s when the other sections are       |
+|                         |                        |         |running).                                               |
+|                         |                        |         |The person WHO REMOVES THE BARRIER IS RESPONSIBLE for   |
+|                         |                        |         |putting the Barrier back on when the section is ready to|
+|                         |                        |         |run again.                                              |
+|Following Machine        |Caught in Section       |High     |Ensure all personnel are clear of the section.   Start  |
+|starting procedure:  JSEA|                        |         |the section up.                                         |
+|219.01.01  /             |                        |         |                                                        |
+|JSEA 219.01.03 Emhart    |                        |         |                                                        |
+|Before loading glass.    |Burnt with hot gob.     |High     |Inform all personnel of planned loading of gob to the   |
+|                         |                        |         |section and make all stand clear.                       |
+|Activate siren.          |Burnt with hot gob.     |High     |Activate siren to confirm loading.  Turn off siren when |
+|                         |                        |         |loading is confirmed.  Swab barrier must be in place    |
+|                         |                        |         |before gob is loaded.                                   |
+|Once all clear position  |Machine hitting gob     |High     |Ensuring the gob catcher is held up as high as possible |
+|Gob Catcher.             |catcher, which could    |         |under the deflector to prevent revert strike.           |
+|                         |cause a contusion.      |         |                                                        |
+|Load gob.                |Burns / back strain.    |High     |Press the gob load button and prepare for the weight of |
+|                         |                        |         |the gob in the catcher.  Note:  Ensure barrier is in    |
+|                         |                        |         |place.                                                  |
+|Once gob load confirmed. |Burns / back strain.    |High     |Remove gob catcher from section.  Do  not overload gob  |
+|                         |                        |         |catcher with too many gobs.                             |
+|If gob load is not in the|Jam up causing possible |High     |Turn off glass.  Make necessary adjustments to get gob  |
+|correct position.        |burns.                  |         |load position correct and repeat process from ΓÇ£before   |
+|                         |                        |         |loading glassΓÇ¥.                                         |
+|If gob loading is in the |Burns.                  |High     |Allow gob to load into the section.                     |
+|correct position.        |                        |         |                                                        |
+|Confirm section          |Jam up causing possible |High     |Once gob loaded into blank, turn off gob load until ware|
+|operation.               |burns.                  |         |is removed from the section.                            |
+|Section operation        |Jam up causing possible |High     |Activate gob load button allowing the section to produce|
+|confirmed.               |burns.                  |         |ware.                                                   |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+
+                                                     -----------------------
+[pic]
+
+O-I New Zealand
+

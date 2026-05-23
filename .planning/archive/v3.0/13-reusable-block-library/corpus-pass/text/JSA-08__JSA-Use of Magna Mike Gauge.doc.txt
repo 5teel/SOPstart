@@ -1,0 +1,38 @@
+
+Use of Magna Mike Thickness Gauge
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety Glasses                  |Yes                                    |Rey Basabas  11/06/07                   |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |20                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                 |Potential /               |Level of Risk   |Controls to reduce the Risk of|
+|                                      |Actual Hazard             |                |Hazard                        |
+|Switch on Magna Mike                  |None                      |Low             |Nil                           |
+|Check that target ball is sitting     |None                      |Low             |Nil                           |
+|straight on tip of probe & that the   |                          |                |                              |
+|LED is reading zero                   |                          |                |                              |
+|Carefully place the ball inside the   |None                      |Low             |Nil                           |
+|container& position the probe on the  |                          |                |                              |
+|outside surface of the bottle so that |                          |                |                              |
+|the ball is picked up by the magnet on|                          |                |                              |
+|the probe tip                         |                          |                |                              |
+|Move the probe to the required area   |None                      |Low             |Nil                           |
+|for measuring glass thickness         |                          |                |                              |
+|Record the results                    |None                      |Low             |Nil                           |
+|Extract the target ball carefully from|None                      |Low             |Nil                           |
+|the bottle & replace onto probe tip   |                          |                |                              |
+|Discard any containers after testing  |Broken glass causing      |Low             |Ensure all PPE on to prevent  |
+|                                      |laceration                |                |injury to self                |

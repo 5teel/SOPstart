@@ -1,0 +1,45 @@
+
+Using the Automatic Sandblaster
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSA Reviewed by and date                    |
+|All standard PPE required     |Yes                                  |Gary Russell  07/09/07                      |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |120                                  |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |Medium                               |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps          |Potential /                   |Level of  |Controls to reduce the Risk of Hazard |
+|                               |Actual Hazard                 |Risk      |                                      |
+|Turn machine on                |Electric shock                |Low       |Check electrical switches for obvious |
+|                               |                              |          |damage                                |
+|Place equipment onto table     |Entrapment of fingers         |Medium    |Position surface equipment is to      |
+|                               |Back strain                   |          |lifted from or to as close as possible|
+|                               |Trip or falling               |          |Optional back support if required Use |
+|                               |                              |          |correct manual handling procedures    |
+|                               |                              |          |Ensure area clear of trip hazards     |
+|Close door on blaster          |Entrapment of hands or fingers|Low       |Ensure area of door swing clear of    |
+|                               |                              |          |obstructions                          |
+|                               |                              |          |Be aware of position of fingers and   |
+|                               |                              |          |hands when closing door so as not to  |
+|                               |                              |          |get trapped                           |
+|Start cycle                    |Electric shock                |Low       |Check electrical switches for obvious |
+|                               |                              |          |damage                                |
+|Open door                      |Entrapment of hands or fingers|Low       |Ensure area of door swing clear of    |
+|                               |                              |          |obstructions                          |
+|                               |                              |          |Be aware of position of fingers and   |
+|                               |                              |          |hands when opening door so as not to  |
+|                               |                              |          |get trapped                           |
+|Unload table of equipment      |Entrapment of fingers         |Medium    |Position surface equipment is to      |
+|                               |Back strain                   |          |lifted from or to as close as possible|
+|                               |Trip or falling               |          |Optional back support if required Use |
+|                               |                              |          |correct manual handling procedures    |
+|                               |                              |          |Ensure area clear of trip hazards     |

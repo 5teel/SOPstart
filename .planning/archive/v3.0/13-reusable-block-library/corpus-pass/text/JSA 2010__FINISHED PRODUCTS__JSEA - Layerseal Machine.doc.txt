@@ -1,0 +1,41 @@
+
+Loading Pallets on and off Layer Seal
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|All standard safety equipment   |Yes                                    |Wayne Smith 16/08/07                    |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |30                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps           |Potential /                  |Level of |Controls to reduce the Risk of Hazard   |
+|                                |Actual Hazard                |Risk     |                                        |
+|Driver loads pallets onto chain |Pallets not loaded straight  |Low      |Drivers to ensure pallets are straight  |
+|conveyor                        |and entering magazine hits   |         |when loading                            |
+|                                |corner  collapsing pallets,  |         |                                        |
+|                                |removing pallets manually    |         |                                        |
+|Pulls cord for pallets to move  |Strain from stretching when  |Low      |Awareness of position of body when      |
+|into magazine                   |seated on fork hoist         |         |pulling cord                            |
+|PalletΓÇÖs enter magazine, then   |Pallet fails to exit, jammed |Low      |Drivers to check pallets for broken or  |
+|after entry are lifted, the     |ΓÇô strain back / shoulder to  |         |worn bearers prior to loading.          |
+|bottom pallet discharged to next|pull out. can only pull out  |         |                                        |
+|station                         |manually if pallet jams      |         |                                        |
+|                                |inside magazine              |         |                                        |
+|Pallet then moves into position |Pallet stayed up too long ΓÇô  |Low      |Failsafe installed so burners switch off|
+|for layer seal application it is|burners cause fire on plastic|         |if pallet is in the up position too long|
+|lifted and the burners go on    |                             |         |                                        |
+|Pallet lowers ΓÇô moves to exit   |Pallet fail to exit, jammed ΓÇô|Low      |Training / Awareness                    |
+|stack then lifted               |back strain / shoulder strain|         |                                        |
+|Pallet stack height completed   |Pallet stack collapses on    |Low      |Check frequently that pallets are being |
+|and  stack exits chamber        |exit                         |         |stacked straight, stay clear when stack |
+|                                |Note: this has happened      |         |exits.  Check lift for smooth operation |
+|                                |                             |         |[sometimes jerking]                     |

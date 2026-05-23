@@ -1,0 +1,29 @@
+
+Lehr Sprays & Back up Unit
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |High                                       |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Isolate from power and air   |Shocks & electrocution        |Low         |Training & instruction. Wear all PPE    |
+|check filter                 |Pressurised systems           |            |                                        |
+|Check motor flex & belt and  |Cuts slips & pinch points     |Low         |Use all safe working procedures Wear all|
+|sensor for damage            |                              |            |PPE                                     |
+|Clean motor air ducts and    |Flying objects cuts           |Medium      |Correct lifting position. All PPE to be |
+|control cabinets             |                              |            |worn                                    |
+|Power up check sensor        |Shocks , hot ware moving parts|Low         |Use all safe working procedures Wear all|
+|alignment and air rpm        |chemicals                     |            |PPE                                     |
+|Check all safety circuits in |Moving machinery chemicals    |Low         |Use all safe working procedures Wear all|
+|working order                |                              |            |PPE                                     |
+

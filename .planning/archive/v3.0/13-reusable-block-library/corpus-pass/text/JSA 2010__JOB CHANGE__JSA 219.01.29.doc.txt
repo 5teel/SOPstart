@@ -1,0 +1,61 @@
+
+#23, 31, 34 Valve Switch Operation
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                                      |Safety Induction [Contractor]                                 |
+|Hazard            |Practicable to Eliminate                                                                    |
+|Identification    |                                                                                            |
+|                                     |Insignificant ΓÇô first aid injury, up to  |
+|                                     |$1,000 damage, spill confined to         |
+|LIKELIHOOD                           |immediate work area, rapid clean up, no  |
+|                                     |damage to environment                    |
+|How likely is it to happen?          |                                         |
+|4                                    |ACT NOW ΓÇô Urgent ΓÇô do something about the|
+|ACUTE                                |risks immediately. Requires immediate    |
+|                                     |attention.                               |
+|3                                    |Highest management decision is required  |
+|HIGH                                 |urgently                                 |
+|2                                    |Follow management instruction            |
+|MODERATE                             |                                         |
+|1                                    |OK for now. Record and review if any     |
+|LOW                                  |equipment / people / materials / work    |
+|                                     |processes or procedures change           |
+
+
+Job Safety Analysis Form:               #23, 31, 34 Valve Switch Operations
+
+|Area / Department                  |Job Change                            |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSA Reviewed by and Date:                 |
+|Boots, gloves, uniform, safety     |Yes                                   |                                          |
+|glasses, ear muffs, (protection    |                                      |September 2009                            |
+|sleeves, back support ΓÇô optional)  |Risk Score                            |                                          |
+|                                   |40                                    |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |Low                                   |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |Minimisation                          |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Stop Section:-           |Making section safe to  |High     |Stop neck ring arms in the inverted positions using the |
+|Refer  JSA  219.01.02    |prevent entrapment.     |         |E Stop button.                                          |
+|Operate valve.           |Burns, crushing.        |High     |Ensure that coloured gloves are removed prior to        |
+|                         |                        |         |operating valve.                                        |
+|                         |                        |         |Operate valve after checking section is clear and you   |
+|                         |                        |         |are operating the correct valve.                        |
+|                         |                        |         |Ensure all personnel are away and clear of section.     |
+|Following starting a     |Caught in section.      |High     |Ensure all personnel are clear of the section, barrier  |
+|section refer JSA        |                        |         |is in place and start the section up.                   |
+|219.01.01                |                        |         |                                                        |
+
+
+
+                                                     -----------------------
+[pic]
+
+O-I New Zealand
+

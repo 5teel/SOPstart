@@ -1,0 +1,49 @@
+
+Removal and installation of Vacuum pumps ΓÇôTop Floor
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                            |Safety Induction [Contractor]        |                                              |
+|PPE Required:                |Significant Hazard                   |JSEA Reviewed by and date                     |
+|All standard PPE required    |Yes                                  |                                              |
+|                             |                                     |                                              |
+|                             |Risk Score                           |                                              |
+|                             |30                                   |                                              |
+|                             |                                     |                                              |
+|                             |Category                             |                                              |
+|                             |Low                                  |                                              |
+|                             |                                     |                                              |
+|                             |Control taken                        |                                              |
+|                             |Minimisation                         |                                              |
+|                             |                                     |                                              |
+|Sequence of Job Steps        |Potential /                   |Level of  |Controls to reduce the Risk of Hazard      |
+|                             |Actual Hazard                 |Risk      |                                           |
+|Isolate Elevator and rotary  |Electrocution                 |High      |Contact Electrician to ensure that         |
+|distributor                  |                              |          |equipment is safely disconnected. Check all|
+|                             |                              |          |equipment locked out safely prior to start |
+|                             |                              |          |working                                    |
+|Cut out old pipe             |Burns or FB from hot work     |Medium    |Follow Hot work Procedure. Ensure safe     |
+|                             |cutting                       |          |working area to prevent risk of injury to  |
+|                             |                              |          |self                                       |
+|Grind up area                |Risk of electrocution and fire|Medium    |Ensure safe working area to prevent risk of|
+|                             |                              |          |injury to self.                            |
+|Install pipe                 |Strain from manual handling   |Medium    |Obtain assistance with moving pipe into    |
+|                             |                              |          |position                                   |
+|Weld into place              |Welding flash                 |Medium    |Use welding screens to prevent injury to   |
+|                             |                              |          |people nearby                              |
+|Remove isolation             |Entrapment                    |Medium    |Check all equipment is safe prior to       |
+|                             |                              |          |leaving area                               |
+|Environmental:               |                              |          |                                           |
+|Removal of used rags /       |Contamination.                |High      |Place in correct contamination or waste    |
+|gloves/  waste/ glass /      |Waste removal and tidy up.    |          |bins provided.                             |
+|cullet                       |                              |          |Ensure area is cleaned and product / tools |
+|                             |                              |          |cleared away.                              |
+|Protection & Security        |                              |          |                                           |
+|Demarcation                  |Damage to people, property and|High      |Demarcation where applicable.              |
+|                             |environment.                  |          |Install barricaded/danger tape as required.|
+|                             |                              |          |Ensure correct fire fighting equipment is  |
+|                             |                              |          |available.                                 |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

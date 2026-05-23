@@ -1,0 +1,42 @@
+
+Changing Neck Rings on 21 Machines during Job Change
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Boots, Uniform, Safety Glasses, |Yes                                    |Fran OΓÇÖKeefe 24th May 2007              |
+|Ear Muffs, Protection Sleeves,  |                                       |                                        |
+|Back Support                    |Risk Score                             |                                        |
+|                                |2500                                   |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard              |
+|                         |Actual Hazard           |Risk     |                                                   |
+|Stop Section:-           |Entrapment              |High     |Stop Neck ring arms in the inverted position.      |
+|Manual Operation         |Entrapment in Section   |High     |Switch to manual operation                         |
+|                         |and Moulds              |         |                                                   |
+|Neck ring change with    |Entrapment in Section   |High     |Activate manual switches on the Blank side to      |
+|Moulds Closed plus Mould |and Moulds              |         |position the Moulds in the closed position Press in|
+|side safety              |                        |         |Mould inhibit button and the E stop button so the  |
+|                         |                        |         |section cannot be operated manually from the Blank |
+|                         |                        |         |side.                                              |
+|Neck ring change with    |Entrapment in Section   |Extreme  |Press in Mould inhibit button and the E stop button|
+|Moulds open              |                        |         |so the section cannot be operated manually from the|
+|                         |                        |         |Blank side.                                        |
+|Mould Side safety Plate  |Entrapment in Section   |Extreme  |Where possible, place safety plate in the up       |
+|                         |                        |         |position to reflect heat back towards the machine. |
+|                         |                        |         |Note: - On Job Change there is no Hot glass and    |
+|                         |                        |         |this Safety plate can be left in the down position.|
+|Remove Neck ring         |Burning from heat       |High     |Wear gloves provided to remove Neck ring from neck |
+|                         |reflected off ware      |         |ring arms Neck ring is hot.                        |
+|Fit clean Neck ring      |Burns                   |Extreme  |Wear gloves provided to fit clean Neck ring.       |
+|Prepare Section to start.|Burns                   |Extreme  |Pull out Mould inhibit button and the E stop       |
+|Mould close              |                        |         |button. Switch to run on the Blank Side.           |
+|Prepare Section to start.|Entrapment in Section   |High     |Pull out Mould inhibit button and the E stop       |
+|Mould Open               |                        |         |button. Switch to run on the Blank Side.           |
+|Starting a section       |Entrapment in Section   |High     |Ensure all personnel are clear of the section.     |
+|                         |                        |         |Start the section up                               |

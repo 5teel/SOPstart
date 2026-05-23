@@ -1,0 +1,43 @@
+
+Use of LPG Gas Guns
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]             |                                     |
+|PPE Required:                   |Significant Hazard                        |JSA Reviewed by and date             |
+|Safety Glasses / gloves if      |Yes                                       |Gary OΓÇÖNeill 12/06/07                |
+|required                        |                                          |                                     |
+|                                |Risk Score                                |                                     |
+|                                |27                                        |                                     |
+|                                |                                          |                                     |
+|                                |Category                                  |                                     |
+|                                |Low                                       |                                     |
+|                                |                                          |                                     |
+|                                |Control taken                             |                                     |
+|                                |Minimisation                              |                                     |
+|                                |                                          |                                     |
+|Sequence of Job Steps                      |Potential /            |Level of    |Controls to reduce the Risk of |
+|                                           |Actual Hazard          |Risk        |Hazard                         |
+|Ensure gas cylinder is safely secured onto |Tip over causing       |Low         |Do not move unless secured     |
+|the mobile trolley with the chain ( any    |explosion and damage to|            |position on the trolley        |
+|backup cylinders should be chained to the  |gun / hoses / cylinder |            |                               |
+|wall in the Audit area )                   |                       |            |                               |
+|Move trolley to desired location           |Sprain / strain        |Low         |The preference is to move the  |
+|                                           |                       |            |pallet to trolley location     |
+|Check that there is a valid Hot Work Permit|Must be available to   |Low         |Completed each month by QA     |
+|                                           |view                   |            |Manager to cover Gas Gun use   |
+|                                           |                       |            |specifically                   |
+|Unhook Gas Gun                             |Leak in hose           |Low         |Check condition of hose        |
+|Turn valve on at cylinder                  |Leak from valve        |Low         |Report any obvious gas smells  |
+|                                           |                       |            |not usually apparent           |
+|Set the gun approx  12 inches from plastic |Burn                   |Low         |Care when operating            |
+|shroud to be repaired                      |Fire risk              |            |                               |
+|Ensuring that no other persons are in the  |none                   |Low         |                               |
+|immediate vicinity, depress the Gas Gun    |                       |            |                               |
+|trigger                                    |                       |            |                               |
+|Ensuring that the flame is not left on for |Burn                   |Low         |Care when operating            |
+|an extended period of time, seal the patch |Fire risk              |            |                               |
+|When finished turn valve off at the        |Sprain / strain        |Low         |Trolley                        |
+|cylinder & return mobile trolley to its    |                       |            |                               |
+|location                                   |                       |            |                               |

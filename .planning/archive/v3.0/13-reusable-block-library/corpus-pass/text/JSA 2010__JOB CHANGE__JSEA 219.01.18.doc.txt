@@ -1,0 +1,67 @@
+
+#21, 23, 31 Blank Hinge Change
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                  |Safety Induction [Contractor]         |                                          |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Boots, gloves, uniform, safety     |Yes                                   |                                          |
+|glasses, ear muffs, (protection    |                                      |July 2007                                 |
+|sleeves, back support ΓÇô optional)  |Risk Score                            |                                          |
+|                                   |60                                    |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |Medium                                |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |Minimisation                          |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Stop Section:-           |Making section safe to  |High     |Stop Neck ring arms in the inverted position using the E|
+|Follow Stopping Section  |prevent entrapment      |         |Stop button                                             |
+|refer JSEA 219.01.02     |                        |         |                                                        |
+|Manual operation.        |Caught in section.      |High     |Switch to manual operation and remove barriers.         |
+|Safety lock-outs for     |Reduce the risk of being|High     |Blank close safety lock activated, remove barriers.     |
+|blanks.                  |caught in the section.  |         |Note:  On Emhart machines, turn off air for blank close.|
+|Invert safety bar.       |Reduce the risk of being|High     |Place invert safety lock over invert rack so that lock  |
+|                         |caught in the section.  |         |sits down on the top of the invert mechanism.           |
+|Lifting blanks.          |Back strain.            |High     |Fit tee screw lifters to the blanks or use thick gloves |
+|                         |                        |         |to lift the blank from the hinge.                       |
+|Remove blanks.           |Caught in section / back|Med      |Get into a comfortable lifting position that suits.     |
+|                         |strain.                 |         |Reducing lowering and twisting, remove blanks.          |
+|Prepare to remove hinge. |Burnt / back strain.    |Low      |Remove safety bars and blank post supports.  Remove link|
+|                         |                        |         |pin from hinge and move link out of the slot in the     |
+|                         |                        |         |blank hinge.                                            |
+|Remove hinge.            |Burnt / back strain.    |High     |Get into a comfortable lifting position that suits.     |
+|                         |                        |         |Reducing lowering and twisting, remove hinge.           |
+|Replace with clean hinge.|Burnt / back strain.    |High     |Get into a comfortable lifting position that suits.     |
+|                         |                        |         |Reducing lowering and twisting, remove hinge.           |
+|Replace safety and       |Burnt / back strain.    |Low      |Move link into the slot in the blank hinge.  Refit link |
+|support tooling.         |                        |         |pin to hinge.  Refit blank post support and safety bars.|
+|Clean blanks.            |Caught in section.      |Medium   |Get into a comfortable lifting position that suits.     |
+|                         |                        |         |Reducing lowering and twisting, refit blanks.           |
+|Prepare machine to start |Caught in section.      |High     |Disengage blank close safety lock, remove invert safety |
+|                         |                        |         |block and turn on air valve for blank close on Emhart   |
+|                         |                        |         |machines.  Replace barrier log BEFORE starting.         |
+|Follow machine starting  |Caught in section.      |High     |Ensure all personnel are clear of the section.  Start   |
+|JSEA 219.01.01           |                        |         |the section up.                                         |
+|Environmental            |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+
+                                                     -----------------------
+[pic]
+
+O-I New Zealand
+

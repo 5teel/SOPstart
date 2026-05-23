@@ -1,0 +1,49 @@
+
+Use of manual Thickness Gauges (Base & Sidewall
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses & Gloves if      |Yes                                    |Rey Basabas   11/06/07                  |
+|required                        |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |20                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                     |Potential /             |Level of  |Controls to reduce the Risk of   |
+|                                          |Actual Hazard           |Risk      |Hazard                           |
+|Turn on digital thickness gauge           |None                    |Low       |Nil                              |
+|Zero gauge                                |None                    |Low       |Nil                              |
+|Select container to be measured           |None                    |Low       |Nil                              |
+|Position bottle so that the tip of the    |Broken bottle           |Low       |Ensure all PPE is worn to prevent|
+|probe is on the outer surface of the      |                        |          |injury to self                   |
+|container & the tip of the gauge assembly |Laceration              |          |                                 |
+|is on the inner surface of the container  |                        |          |                                 |
+|Measure & record                          |None                    |Low       |Nil                              |
+|Discard container after testing           |Broken bottles causing  |Low       |Ensure all PPE is worn to prevent|
+|                                          |Laceration              |          |injury to self                   |
+|Cold End have additional hazards to       |Noise                   |Low       |Ensure all PPE is worn to prevent|
+|consider                                  |                        |          |injury to self                   |
+|Environmental:                            |                        |          |                                 |
+|Removal of used rags / gloves/  waste/    |Contamination.          |High      |Place in correct contamination or|
+|glass / cullet                            |Waste removal and tidy  |          |waste bins provided.             |
+|                                          |up.                     |          |Ensure area is cleaned and       |
+|                                          |                        |          |product / tools cleared away.    |
+|Protection & Security                     |                        |          |                                 |
+|Demarcation                               |Damage to people,       |High      |Demarcation where applicable.    |
+|                                          |property and            |          |Install barricaded/danger tape as|
+|                                          |environment.            |          |required.                        |
+|                                          |                        |          |Ensure correct fire fighting     |
+|                                          |                        |          |equipment is available.          |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

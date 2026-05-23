@@ -1,0 +1,45 @@
+
+RESORT - Line & FP Handling & Sighting
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date13/06/07        |
+|Safety Glasses / Gloves / cap / |Yes/                                   |Gary OΓÇÖNeill  Mate Pocrinich            |
+|Hi Viz Clothing / ear protection|                                       |Numela Ropati Hiliate Kilifi            |
+|                                |Risk Score                             |                                        |
+|                                |150                                    |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |High                                   |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                               |Potential /        |Level of Risk  |Controls to reduce the  |
+|                                                    |Actual Hazard      |               |Risk of Hazard          |
+|This procedure assumes that the line has been job   |None               |Nil            |Nil                     |
+|changed to suit the job to be run.                  |                   |               |                        |
+|With the line running at the desired speed for      |Damage to equipment|Low            |Training                |
+|optimum efficiency , the FPs ( up to 2 ) may be set |                   |               |                        |
+|to reject defects by mould numbers automatically The|                   |               |                        |
+|speed of the FP should be set to compliment the     |                   |               |                        |
+|line speed & not cause additional handling issues   |                   |               |                        |
+|Periodically the resort operator is required to     |Broken Glass       |Low            |Wearing the required PPE|
+|check the integrity of the FPs by either  Ensuring  |causing Laceration |               |Glasses ΓÇô long sleeved  |
+|that the correct mould number is physically being   |                   |               |clothing to prevent any |
+|rejected or Checking if a known defect is being     |                   |               |lacerations             |
+|rejected  ( if the FP has specifically been set up )|                   |               |                        |
+|Occasionally the resort requirement may be for      |Eye strain causing |Low            |Regular breaks          |
+|sighting for defects at light screens               |tiredness          |               |                        |
+|Any intervention required on the FPs MUST have the  |Entrapment / pinch |Low            |Use emergency stop      |
+|FP STOPPED                                          |points             |               |buttons. Correct PPE    |
+|                                                    |                   |               |worn to prevent         |
+|                                                    |                   |               |entrapment ΓÇô No sleeves |
+|                                                    |                   |               |worn loose.             |
+|Rejected ware will be on a conveyor into a large    |Broken Glass       |Low            |PPE to be worn          |
+|skip.                                               |causing Laceration |               |                        |
+|The skip is uplifted & tipped into an appropriate   |Vehicle Collision  |High           |Care and attention as   |
+|cullet bay when full                                |                   |               |per FH & site           |
+|                                                    |                   |               |requirements            |

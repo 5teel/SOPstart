@@ -1,0 +1,48 @@
+
+01
+
+Job Safety Environmental Analysis Form:                         New Mixer
+                                                                     Batch
+                                                                     House
+
+|Area / Department                  |Batch & Furnace                       |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots, High Vis/heat        |                                      |                                          |
+|Garment, Respiratory Protection    |Risk Score                            |                                          |
+|(when working with asbestos)       |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Drive belts.             |Entrapment/caught in    |High     |Barricade off area and gate access.                     |
+|                         |belt.                   |         |                                                        |
+|Moving conveyors.        |Entrapment/caught in    |High     |Guards fitted to conveyors.                             |
+|                         |moving parts.           |         |                                                        |
+|Access.                  |                        |High     |Opening of gate stops mixer and conveyors.              |
+|Area is completely       |Entrapment / caught by  |         |Fice emergency stops available.                         |
+|enclosed by safety fence.|moving machine.         |         |Safety stop on all gates, stops all machinery on        |
+|                         |                        |         |opening.  Cannot be reset from inside.                  |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |Damage to people,       |High     |Demarcation where applicable.                           |
+|Demarcation              |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

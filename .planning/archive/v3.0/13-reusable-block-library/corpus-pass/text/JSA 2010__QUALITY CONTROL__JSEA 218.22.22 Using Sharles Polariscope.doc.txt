@@ -1,0 +1,47 @@
+
+Use of Sharples Polariscope
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses and gloves       |Yes                                    |Matthew Teleiai  12/06/07               |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |40                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                    |Potential /            |Level of Risk|Controls to reduce the Risk of   |
+|                                         |Actual Hazard          |             |Hazard                           |
+|Switch on Polariscope [CE leave it on all|Laceration from broken |Low          |Nil                              |
+|the time / QC does not]                  |glass                  |             |                                 |
+|Ensure only white light ( W ) source is  |Nil                    |Low          |Nil                              |
+|switched on                              |                       |             |                                 |
+|Remove top plastic protective cover      |Nil                    |Low          |Nil                              |
+|Move 1st filter out of position          |Nil                    |Low          |Nil                              |
+|Select bottle to be tested & cool to     |Nil                    |Low          |Nil                              |
+|ambient temperature                      |                       |             |                                 |
+|Hold under dial analyser & 2nd filter    |Nil                    |Low          |Nil                              |
+|Measure & record annealing grade         |Nil                    |low          |Nil                              |
+|Discard container after testing          |Laceration             |Low          |PPE                              |
+|Environmental:                           |                       |             |                                 |
+|Removal of used rags / gloves/  waste/   |Contamination.         |High         |Place in correct contamination or|
+|glass / cullet                           |Waste removal and tidy |             |waste bins provided.             |
+|                                         |up.                    |             |Ensure area is cleaned and       |
+|                                         |                       |             |product / tools cleared away.    |
+|Protection & Security                    |                       |             |                                 |
+|Demarcation                              |Damage to people,      |High         |Demarcation where applicable.    |
+|                                         |property and           |             |Install barricaded/danger tape as|
+|                                         |environment.           |             |required.                        |
+|                                         |                       |             |Ensure correct fire fighting     |
+|                                         |                       |             |equipment is available.          |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

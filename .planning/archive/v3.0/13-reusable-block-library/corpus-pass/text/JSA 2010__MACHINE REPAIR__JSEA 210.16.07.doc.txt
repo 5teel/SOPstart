@@ -1,0 +1,50 @@
+
+
+
+Job Safety Environmental Analysis Form:          Changing Stacker Bar ΓÇô
+                                                               Production
+                                                               Maintenance
+
+|Area / Department                  |Machine Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|and Safety Boots, welding PPE      |                                      |A. Poole / B. Knight                      |
+|required                           |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Lock stacker and cross   |Getting caught in       |High     |Lock out electrically.                                  |
+|conveyor out.            |stacker.                |         |                                                        |
+|Lower Lehr door.         |Burnt, heat exhaustion. |High     |Wear appropriate PPE ie gloves.                         |
+|                         |                        |         |Drink water to keep hydrated.                           |
+|Undo bolts holding bar.  |Heat, burns.            |High     |Wear appropriate PPE ie gloves.                         |
+|Pick bar up with gloves. |Burns.                  |High     |Wear appropriate PPE ie gloves.                         |
+|Place bar on rack.       |Fingers jammed, burns.  |High     |Wear appropriate PPE ie gloves.                         |
+|                         |                        |         |Be mindful of others, placement of bar on rack etc.     |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

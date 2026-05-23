@@ -1,0 +1,46 @@
+
+Frit Hopper Lifting.
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSEA Reviewed by and date                   |
+|All standard PPE required     |Yes                                  |                                            |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |200                                  |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |High                                 |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps              |Potential /                   |Level of |Controls to reduce the Risk of      |
+|                                   |Actual Hazard                 |Risk     |Hazard                              |
+|Fill frit hopper with frit         |Back strain. Spillage on to   |Low      |Correct lifting procedure using fork|
+|                                   |floor                         |         |hoist and platforms                 |
+|Transfer from filling station to   |None                          |Low      |None                                |
+|adjacent machine                   |                              |         |                                    |
+|Set up all safety barriers and     |None                          |Low      |Supervision at all times. No person |
+|isolate machine floor              |                              |         |to be in this area during the       |
+|                                   |                              |         |lifting of the hopper               |
+|Transfer hopper to machine floor   |Hopper could drop from hoist  |High     |Supervision at all times. No person |
+|and lift into place on top of frit |and damage machine. Material  |         |to be in this area during the       |
+|silo                               |spillage into sections causing|         |lifting of the hopper               |
+|                                   |machine damage and down time  |         |                                    |
+|Environmental:                     |                              |         |                                    |
+|Removal of used rags / gloves/     |Contamination.                |High     |Place in correct contamination or   |
+|waste/ glass / cullet              |Waste removal and tidy up.    |         |waste bins provided.                |
+|                                   |                              |         |Ensure area is cleaned and product /|
+|                                   |                              |         |tools cleared away.                 |
+|Protection & Security              |                              |         |                                    |
+|Demarcation                        |Damage to people, property and|High     |Demarcation where applicable.       |
+|                                   |environment.                  |         |Install barricaded/danger tape as   |
+|                                   |                              |         |required.                           |
+|                                   |                              |         |Ensure correct fire fighting        |
+|                                   |                              |         |equipment is available.             |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

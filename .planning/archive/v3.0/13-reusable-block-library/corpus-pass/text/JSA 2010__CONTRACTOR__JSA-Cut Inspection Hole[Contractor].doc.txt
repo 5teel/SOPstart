@@ -1,0 +1,37 @@
+
+Cut Inspection Hole
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |                                        |
+|All standard PPE required    |Yes                                        |JSA Reviewed by and date                |
+|when working within          |                                           |                                        |
+|production area.             |Overall Category of task                   |                                        |
+|Cutting                      |Medium                                     |                                        |
+|Goggles/Overall/Boots/Gloves |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|                             |                              |            |                                        |
+|Remove loose items and Tape  |Tripping Hazard               |            |                                        |
+|off Working area             |                              |            |                                        |
+|                             |                              |            |                                        |
+|Cut piece, weld sections into|Tripping Hazard               |            |                                        |
+|place                        |                              |            |                                        |
+|                             |                              |            |                                        |
+|Cut with cutting torch in    |Fire Hazard / flying sparks / |            |Keep fire extinguisher ready            |
+|Turbine Housing              |cutting vapour                |            |Wear required protective clothing       |
+|                             |                              |            |Use vapour mask                         |
+|                             |                              |            |                                        |
+|Inspect machine through      |Warm cutting areas            |            |Wear protective clothing supplied       |
+|inspection hole              |                              |            |                                        |
+|                             |                              |            |                                        |
+|Close inspection hole        |Pinch points                  |            |Keep fingers clear when tightening      |
+|                             |                              |            |inspection plate                        |
+
+

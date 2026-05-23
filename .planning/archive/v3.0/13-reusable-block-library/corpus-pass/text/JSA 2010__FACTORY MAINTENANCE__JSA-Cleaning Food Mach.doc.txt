@@ -1,0 +1,28 @@
+
+Cleaning Food Mach
+                            HAZARD IDENTIFICATION
+|1                                                                       |
+|1                                                                       |
+|1                            |Safety Induction [Contractor]       |                                             |
+|PPE Required:                |Significant Hazard                  |JSA Reviewed by and date                     |
+|                             |Yes                                 |                                             |
+|                             |                                    |                                             |
+|                             |Risk Score                          |                                             |
+|                             |12.5                                |                                             |
+|                             |                                    |                                             |
+|                             |Category                            |                                             |
+|                             |Low                                 |                                             |
+|                             |                                    |                                             |
+|                             |Control taken                       |                                             |
+|                             |Minimisation                        |                                             |
+|                             |                                    |                                             |
+|Sequence of Job Steps    |Potential /                       |Level of  |Controls to reduce the Risk of Hazard   |
+|                         |Actual Hazard                     |Risk      |                                        |
+|Place Safety boards on   |Falling from working on a open    |High      |Safety boards are placed to work from   |
+|the well to prevent      |well                              |          |                                        |
+|falling                  |                                  |          |                                        |
+|Cleaning Food Mach       |Noise and Broken Bottles in the   |Low       |Wear ear muffs to prevent damage to     |
+|                         |area                              |          |hearing. Wear gloves to prevent broken  |
+|                         |                                  |          |glass from cutting                      |
+|Using Vacuum cleaner     |Airborne contaminants             |Medium    |Wear dust mask                          |
+|noise                    |                                  |          |                                        |

@@ -1,0 +1,68 @@
+
+Driving a Fork Hoist.
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1            |Hot work          |                  |4                   |Confined Space         |                   |
+|JSEA Conducted by:              |Additional Procedures/ Equipment       |Controls to be taken                       |
+|F OΓÇÖKeefe                       |Approved certificated Training required|Elimination                                |
+|                                |prior to using a Fork Hoist            |Minimisation                               |
+|                                |                                       |                                           |
+|                                |                                       |Isolation                                  |
+|                                |                                       |Engineering                                |
+|                                |                                       |                                           |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date                  |
+|Hearing, Glasses, Footwear      |Yes                                    |                                           |
+|                                |                                       |                                           |
+|                                |Risk Score                             |                                           |
+|                                |500                                    |                                           |
+|                                |                                       |                                           |
+|                                |Category                               |                                           |
+|                                |High                                   |                                           |
+|                                |                                       |                                           |
+|                                |Control taken                          |                                           |
+|                                |Minimisation                           |                                           |
+|                                |                                       |                                           |
+|Sequence of Job Steps    |Potential or Actual Hazard          |Level of  |Controls to reduce the Risk of Hazard    |
+|                         |                                    |Risk      |                                         |
+|Mounting or dismounting a|Slipping or tripping on the floor   |High      |Clean up of floors particularly in high  |
+|fork hoist               |                                    |          |traffic areas                            |
+|                         |Back or Shoulder strain from        |High      |Exercise caution when mounting or        |
+|                         |repeated incorrect entry and exit   |          |dismounting using the three point method |
+|                         |and bumping head on protective      |          |to get in and out of the fork cab.       |
+|                         |structure                           |          |Careful not to bump head on overhead     |
+|                         |                                    |          |protective structure. Hold the support   |
+|                         |                                    |          |beams for the overhead structure with    |
+|                         |                                    |          |both hands, placing the left foot into   |
+|                         |                                    |          |the foothold and then pushing off with   |
+|                         |                                    |          |the right foot and levering self into the|
+|                         |                                    |          |cab                                      |
+|Applying Seat Belt       |To keep Driver safe in the event of |High      |Each time the Fork Hoist is about to be  |
+|                         |a fork hoist roll over              |          |operated on the Seat belt must be secured|
+|                         |                                    |          |into position                            |
+|Driving with or without  |Pedestrian traffic and other        |High      |Slowing down in high traffic areas,      |
+|loads                    |vehicles might cross path suddenly  |          |waiting and sounding horn at all         |
+|                         |                                    |          |crossings exercising caution around      |
+|                         |                                    |          |pedestrians. Observing speed limits      |
+|Raising or lowering forks|Leaning and twisting of the neck in |High      |Twisting or leaning from the waist not   |
+|with or without loads    |order to see the load clearly       |          |from the neck                            |
+|Changing LPG cylinders or|this may require excessive and      |High      |Using two employees or a mechanical      |
+|batteries                |awkward lifting                     |          |hoist.                                   |
+|Environmental:           |                                    |          |                                         |
+|Removal of used rags /   |Contamination.                      |High      |Place in correct contamination or waste  |
+|gloves/  waste/ glass /  |Waste removal and tidy up.          |          |bins provided.                           |
+|cullet                   |                                    |          |Ensure area is cleaned and product /     |
+|                         |                                    |          |tools cleared away.                      |
+|Protection & Security    |                                    |          |                                         |
+|Demarcation              |Damage to people, property and      |High      |Demarcation where applicable.            |
+|                         |environment.                        |          |Install barricaded/danger tape as        |
+|                         |                                    |          |required.                                |
+|                         |                                    |          |Ensure correct fire fighting equipment is|
+|                         |                                    |          |available.                               |
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

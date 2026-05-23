@@ -1,0 +1,56 @@
+
+Using the Line Simulator
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses and gloves       |Yes                                    |Rey Basabas  12/6/7                     |
+|protection                      |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |8                                      |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                    |Potential /               |Level of Risk |Controls to reduce the Risk  |
+|                                         |Actual Hazard             |              |of Hazard                    |
+|Select correct size ring assembly & clamp|Nil                       |Low           |Nil                          |
+|mechanisms for the size of container to  |                          |              |                             |
+|be tested                                |                          |              |                             |
+|Fit to drum assembly in Line Simulator & |Nil                       |Low           |Nil                          |
+|secure by winding centre handle          |                          |              |                             |
+|Place samples into drum assembly         |Laceration from broken    |Low           |Ensure all PPE is worn       |
+|                                         |glass                     |              |                             |
+|Set timer for required testing time      |Nil                       |Low           |Nil                          |
+|Turn on water supply at tap Press START  |Slip from the water       |Low           |Keep area dry                |
+|Be aware that the containers will revolve|Entrapment and Pinch point|Low           |Do not place hand in drum    |
+|around the drum for the required time &  |                          |              |assembly until drum has      |
+|then stop on timer                       |                          |              |stopped operating            |
+|If testing is required with full bottles |Entrapment and Pinch point|Low           |Do not place hand in drum    |
+|follow the same procedure noting that    |                          |              |assembly until drum has      |
+|containers are heavier & could cause more|                          |              |stopped operating            |
+|serious injury if hand caught between    |                          |              |                             |
+|bottles                                  |                          |              |                             |
+|Retrieve containers & examine for        |Laceration from broken    |Low           |PPE                          |
+|breakage before discarding to cullet bin |glass                     |              |                             |
+|Environmental:                           |                          |              |                             |
+|Removal of used rags / gloves/  waste/   |Contamination.            |High          |Place in correct             |
+|glass / cullet                           |Waste removal and tidy up.|              |contamination or waste bins  |
+|                                         |                          |              |provided.                    |
+|                                         |                          |              |Ensure area is cleaned and   |
+|                                         |                          |              |product / tools cleared away.|
+|Protection & Security                    |                          |              |                             |
+|Demarcation                              |Damage to people, property|High          |Demarcation where applicable.|
+|                                         |and environment.          |              |Install barricaded/danger    |
+|                                         |                          |              |tape as required.            |
+|                                         |                          |              |Ensure correct fire fighting |
+|                                         |                          |              |equipment is available.      |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

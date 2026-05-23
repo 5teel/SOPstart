@@ -1,0 +1,27 @@
+
+Jig Saw
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |High                                       |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Check lead                   |Electrical shock              |Low         |Use all safe working procedures Wear all|
+|                             |                              |            |PPE                                     |
+|Check guards and blade secure|Cuts                          |Low         |Use all safe working procedures Wear all|
+|                             |                              |            |PPE                                     |
+|Work to be cut held secure   |Moving parts & pinch points   |Medium      |Use all safe working procedures Wear all|
+|                             |                              |            |PPE                                     |
+|Eye Protection on            |Flying objects & moving parts |Medium      |Use all safe working procedures Wear all|
+|                             |                              |            |PPE                                     |
+

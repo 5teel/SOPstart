@@ -1,0 +1,62 @@
+
+Pedestrian Hoist operation
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses & Hearing        |Yes                                    |Gary OΓÇÖNeill                            |
+|Protection                      |                                       |Matthew Teleiai  12/06/07               |
+|                                |Risk Score                             |                                        |
+|                                |90                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Medium                                 |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                    |Potential / Actual Hazard      |Level of  |Controls to reduce the Risk|
+|                                         |                               |Risk      |of Hazard                  |
+|Visual inspection of pedestrian hoist    |Loss of fluid may cause        |Low       |Check equipment            |
+|                                         |malfunction                    |          |                           |
+|Ensure that battery is adequately charged|May stall in compromising      |Low       |PPE                        |
+|& terminals properly connected           |situation Pinch point          |          |Training                   |
+|Check for slip / trip hazard on & around |Laceration / abrasion          |Low       |Visual check of area       |
+|hoist before moving off                  |                               |          |                           |
+|Check vicinity for pedestrians & other   |Collision with something /     |Low       |Check prior to moving load |
+|obstructions before moving off           |someone                        |          |                           |
+|Address the load with forks at           |Incorrect height will cause    |Low       |Follow required safety     |
+|appropriate height to lift load          |damage                         |          |Hoist procedures           |
+|Pick up load ensuring that the load is   |May cause damage to load       |Low       |Follow required safety     |
+|not pushed up hard against the frame &   |                               |          |Hoist procedures           |
+|tilt mast as required                    |                               |          |                           |
+|Move loaded hoist to required location   |Collision with someone /       |Medium    |Follow required safety     |
+|                                         |something Sprain/strain        |          |Hoist procedures           |
+|Put down load & reverse hoist            |Collision with someone /       |Medium    |Observe area clear as you  |
+|                                         |something                      |          |reverse                    |
+|Ensure that hoist is parked safely in    |Obstruction may cause harm to  |Low       |Follow required safety     |
+|appropriate location                     |other personnel                |          |Hoist procedures           |
+|Ensure that battery is disconnected from |Nil                            |Low       |Follow required safety     |
+|pedestrian hoist & made ready for re     |                               |          |Hoist procedures           |
+|charging                                 |                               |          |                           |
+|Environmental:                           |                               |          |                           |
+|Removal of used rags / gloves/  waste/   |Contamination.                 |High      |Place in correct           |
+|glass / cullet                           |Waste removal and tidy up.     |          |contamination or waste bins|
+|                                         |                               |          |provided.                  |
+|                                         |                               |          |Ensure area is cleaned and |
+|                                         |                               |          |product / tools cleared    |
+|                                         |                               |          |away.                      |
+|Protection & Security                    |                               |          |                           |
+|Demarcation                              |Damage to people, property and |High      |Demarcation where          |
+|                                         |environment.                   |          |applicable.                |
+|                                         |                               |          |Install barricaded/danger  |
+|                                         |                               |          |tape as required.          |
+|                                         |                               |          |Ensure correct fire        |
+|                                         |                               |          |fighting equipment is      |
+|                                         |                               |          |available.                 |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

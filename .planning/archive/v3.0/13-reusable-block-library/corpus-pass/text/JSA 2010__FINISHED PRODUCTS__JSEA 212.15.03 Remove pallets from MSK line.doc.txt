@@ -1,0 +1,50 @@
+
+Removing pallets from MSK during MSK breakdown
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date:              |
+|Standard safety PPE equipment   |Yes                                    |                                        |
+|                                |                                       |Bronwyn Bell                            |
+|                                |Risk Score                             |                                        |
+|                                |45                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps           |Potential /                  |Level of |Controls to reduce the Risk of Hazard   |
+|                                |Actual Hazard                |Risk     |                                        |
+|Section of MSK in feed line must|Getting on/off hoist to turn |Low      |Care taken when getting on/off hoist,   |
+|be turned off before hoist is   |line on/off, up and down,    |         |                                        |
+|able to lift pallet off line    |trip hazard                  |         |                                        |
+|Move forward with hoist, lift   |Pallet collapse, mobile hoist|Low      |All PPE gear to be worn - ensure way is |
+|pallet and slowly reverse until |movement and bottles falling |         |clear when reversing, slowly place      |
+|clear of line, lower pallet when|off pallet, lacerations, cuts|         |pallet on floor                         |
+|clear.                          |                             |         |                                        |
+|Getting off hoist to turn line  |Getting on/off hoist to turn |Low      |Care taken when getting on/off hoist,   |
+|back on for next pallet         |line on/off, up and down,    |         |                                        |
+|                                |trip hazard                  |         |                                        |
+|Now move pallet away from line  |Unstable pallet, falling     |Low      |When placing pallet/s, speed must be    |
+|to suitable floor area          |bottles, lacerations, cuts   |         |reduced, ensure area is clear of all    |
+|                                |                             |         |potential obstructions                  |
+|Repeat process until MSK is up  |                             |         |                                        |
+|and running                     |                             |         |                                        |
+|Environmental:                  |                             |         |                                        |
+|Removal of used rags / gloves/  |Contamination.               |High     |Place in correct contamination or waste |
+|waste/ glass / cullet           |Waste removal and tidy up.   |         |bins provided.                          |
+|                                |                             |         |Ensure area is cleaned and product /    |
+|                                |                             |         |tools cleared away.                     |
+|Protection & Security           |                             |         |                                        |
+|Demarcation                     |Damage to people, property   |High     |Demarcation where applicable.           |
+|                                |and environment.             |         |Install barricaded/danger tape as       |
+|                                |                             |         |required.                               |
+|                                |                             |         |Ensure correct fire fighting equipment  |
+|                                |                             |         |is available.                           |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

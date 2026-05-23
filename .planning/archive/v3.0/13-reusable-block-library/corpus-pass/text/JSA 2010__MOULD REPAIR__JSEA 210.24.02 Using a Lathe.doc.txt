@@ -1,0 +1,62 @@
+
+Using a Lathe
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                              |Safety Induction [Contractor]            |                                         |
+|PPE Required:                  |Significant Hazard                       |JSEA Reviewed by and date                |
+|Standard Safety Uniform plus   |Yes                                      |Gary Russell 16/7/07                     |
+|Safety glasses                 |                                         |                                         |
+|                               |Risk Score                               |                                         |
+|                               |250                                      |                                         |
+|                               |                                         |                                         |
+|                               |Category                                 |                                         |
+|                               |High                                     |                                         |
+|                               |                                         |                                         |
+|                               |Control taken                            |                                         |
+|                               |Minimisation                             |                                         |
+|                               |                                         |                                         |
+|Sequence of Job Steps          |Potential /                |Level of Risk|Controls to reduce the Risk of Hazard    |
+|                               |Actual Hazard              |             |                                         |
+|Inspect Lathe                  |Falling objects            |Medium       |Check and remove any loose objects from  |
+|                               |                           |             |lathe                                    |
+|Switch on Lathe                |Electrical shock           |Medium       |Check electrical switches are in good    |
+|                               |                           |             |operating condition                      |
+|Put job in lathe               |Crushing / entrapment of   |Medium       |Open chuck jaws to required diameter     |
+|                               |fingers and hands          |             |Support job with one hand or hoist whilst|
+|                               |Dropping / falling         |             |tightening chuck key                     |
+|                               |equipment                  |             |                                         |
+|Turning the job                |Crushing                   |High         |Ensure chuck safety guard is working     |
+|                               |Entrapment                 |             |correctly                                |
+|                               |Falling objects            |             |Ensure job is secure in chuck before     |
+|                               |Swarf                      |             |operating lathe                          |
+|                               |Heat                       |             |Check area for loose objects within      |
+|                               |Noise                      |             |operating field                          |
+|                               |                           |             |Required PPE                             |
+|                               |                           |             |Hearing protection if required           |
+|                               |                           |             |Correct operation of lathe as per        |
+|                               |                           |             |instructions                             |
+|Remove job from lathe          |Crushing / entrapment of   |Medium       |Open chuck jaws to required diameter     |
+|                               |fingers and hands          |             |Support job with one hand or hoist whilst|
+|                               |Dropping / falling         |             |undoing chuck key                        |
+|                               |equipment                  |             |                                         |
+|Environmental:                 |                           |             |                                         |
+|Removal of used rags / gloves/ |Contamination.             |High         |Place in correct contamination or waste  |
+|waste/ glass / cullet          |Waste removal and tidy up. |             |bins provided.                           |
+|                               |                           |             |Ensure area is cleaned and product /     |
+|                               |                           |             |tools cleared away.                      |
+|Protection & Security          |                           |             |                                         |
+|Demarcation                    |Damage to people, property |High         |Demarcation where applicable.            |
+|                               |and environment.           |             |Install barricaded/danger tape as        |
+|                               |                           |             |required.                                |
+|                               |                           |             |Ensure correct fire fighting equipment is|
+|                               |                           |             |available.                               |
+
+
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

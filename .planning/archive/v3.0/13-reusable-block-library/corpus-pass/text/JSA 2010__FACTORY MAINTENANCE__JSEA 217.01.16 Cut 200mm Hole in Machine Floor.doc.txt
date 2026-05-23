@@ -1,0 +1,53 @@
+
+
+
+Job Safety Environmental Analysis Form:                  Cut 200mm Hole in
+                                                                 Machine
+                                                                 Floor
+
+|Area / Department                  |Factory Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots, High Vis Garment,    |                                      |                                          |
+|Respiratory Protection (when       |Risk Score                            |                                          |
+|working with asbestos).            |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Fire Permit required.    |                        |         |                                                        |
+|Prepare work area.       |Manual handling.        |Medium   |Use correct manual handling technique.                  |
+|Check under floor for    |Electrical shock.       |High     |Electrical leads tagged.                                |
+|hazards.                 |                        |         |Use RCD.                                                |
+|Cut hole in floor.       |Water on floor.         |High     |Control water spillage.                                 |
+|                         |Falling objects (sparks,|         |Barricade off area.                                     |
+|                         |steel plate falling into|         |Keep electrical leads up of the wet floor.              |
+|                         |basement).              |         |                                                        |
+|                         |Slips, trips.           |         |                                                        |
+|                         |Foreign matter in eyes. |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

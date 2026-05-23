@@ -1,0 +1,34 @@
+
+Erect Platform
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |X                                       |
+|PPE Required:                |Significant Hazard                         |                                        |
+|All standard PPE required    |NO                                         |JSA Reviewed by and date                |
+|when working within          |                                           |                                        |
+|production area.             |Risk Score                                 |                                        |
+|                             |                                           |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |                                           |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |                                           |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|                             |                              |            |                                        |
+|Cut Metal                    |Lifting                       |LOW         |Use Block & Tackle                      |
+|                             |                              |            |                                        |
+|Assemble Frame               |Lifting                       |LOW         |Secure Ladder                           |
+|                             |                              |            |                                        |
+|Weld                         |Burn                          |LOW         |Gloves & Face Mask                      |
+|                             |                              |            |                                        |
+|Bolt into place              |Drilling debris               |LOW         |Face Mask                               |
+|                             |                              |            |                                        |
+|Paint                        |Fumes                         |LOW         |Ventilation & Mask                      |
+
+

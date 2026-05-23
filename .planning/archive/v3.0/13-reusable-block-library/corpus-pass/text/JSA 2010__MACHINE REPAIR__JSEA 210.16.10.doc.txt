@@ -1,0 +1,64 @@
+
+
+
+    Job Safety Environmental Analysis Form:                        #31 Box
+                                                                    Section
+                                                                    Exchange
+
+|Area / Department                  |Machine Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|and Safety Boots, welding PPE      |                                      |                                          |
+|required.                          |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Strip gazebo.            |Fall at heights.        |High     |Wear safety harness.                                    |
+|                         |                        |         |Plank top roof.                                         |
+|Remove AC units from     |Manual handling.        |High     |Use correct manual handling techniques.                 |
+|roof.                    |Water spill.            |         |Isolate water supplies.                                 |
+|Skate gazebo out of      |Restricted access.      |High     |Flat area of travel by using spotter.                   |
+|building.                |Slipping off skates.    |         |Secure skates and move slowly.                          |
+|Strip stannic flow line. |Chemical burns.         |High     |Chemical gloves and appropriate stannic protective      |
+|                         |Chemical inhalation.    |         |equipment.                                              |
+|                         |Manual handling.        |         |Correct lifting techniques.                             |
+|Strip air to hot bottle  |Manual handling.        |Medium   |Use correct lifting techniques.                         |
+|reject.                  |                        |         |Wear hand protection.                                   |
+|Strip cullet water.      |Water spill.            |Medium   |Isolate water.                                          |
+|                         |Manual handling.        |         |Wear hand protection.                                   |
+|Wind cooling conveyor    |Hand injury.            |High     |Wear hand protection.                                   |
+|belt burner.             |                        |         |                                                        |
+|Strip and plug spout.    |Gas leak.               |High     |Isolate gas line.                                       |
+|                         |                        |         |No Hot Work.                                            |
+|Equalising section.      |Gas leak.               |High     |Isolate gas and spade.                                  |
+|Install tarp.            |Fall at heights.        |High     |Use scissor lift.                                       |
+|                         |Falling objects.        |         |Correct lifting techniques.                             |
+|                         |Manual handling.        |         |Restricted access.                                      |
+|                         |Congested work area.    |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

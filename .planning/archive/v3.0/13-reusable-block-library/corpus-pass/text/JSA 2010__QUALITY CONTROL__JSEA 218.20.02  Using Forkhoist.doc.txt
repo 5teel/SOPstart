@@ -1,0 +1,77 @@
+
+Fork Hoist Operation
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses & Hearing        |Yes                                    |Gary OΓÇÖNeill  12/06/07                  |
+|Protection                      |                                       |Matthew Teleiai                         |
+|                                |Risk Score                             |                                        |
+|                                |150                                    |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |High                                   |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                     |Potential /         |Level of  |Controls to reduce the Risk of Hazard|
+|                                          |Actual Hazard       |Risk      |                                     |
+|Complete fork hoist check sheet           |Malfunction will    |High      |Do not use if machine is suspect Lock|
+|                                          |cause injury /      |          |out as required Report to supervision|
+|                                          |damage              |          |so that 3rd party contractor may     |
+|                                          |                    |          |remedy                               |
+|Ensure that LPG gas supply is turned on at|Gas burn ( freeze   |Low       |PPE Visual checks for condition      |
+|cylinder valve                            |burn )              |          |Ensure integrity of hose / valve.    |
+|                                          |Gas leak            |          |                                     |
+|Check for slip / trip hazard on & around  |Laceration /        |Low       |Visual check of area  Caution should |
+|hoist before mounting                     |abrasion            |          |be  exercised when mounting /        |
+|                                          |Sprain / strain     |          |dismounting cab                      |
+|Put seatbelt on NB If hoist is not fitted |Nil                 |Low       |PPE                                  |
+|with seat belt , report to supervision    |                    |          |                                     |
+|Check vicinity for pedestrians & other    |Collision with      |High      |Observe area before driving away     |
+|obstructions before moving off            |something / someone |          |                                     |
+|Best practice to reverse with a load      |Nil                 |-         |Nil                                  |
+|unless there is a clear & unobstructed    |                    |          |                                     |
+|view going forward ( Forks should be in   |                    |          |                                     |
+|the down position ΓÇô no higher than 6      |                    |          |                                     |
+|inches off the ground -  when hoist is    |                    |          |                                     |
+|moving with no load )                     |                    |          |                                     |
+|Address the load with forks at appropriate|Incorrect height    |Medium    |Nil                                  |
+|height to lift load                       |will cause damage   |          |                                     |
+
+|Pick up load ensuring that the load is |May cause damage to    |Medium   |Nil                                   |
+|not pushed up hard against the frame & |load                   |         |                                      |
+|tilt mast as required                  |                       |         |                                      |
+|Manoeuvre  loaded hoist to required    |Collision with someone |High     |Care should be taken when driving so  |
+|location                               |/ something            |         |as to turn from the waist & not the   |
+|                                       |Sprain/strain          |         |neck                                  |
+|                                       |leaning/twisting       |         |                                      |
+|Put down load & reverse hoist          |Collision with someone |High     |Nil                                   |
+|                                       |/ something            |         |                                      |
+|Dismount from fork hoist, ensuring     |Laceration / abrasion  |Low      |Visual check of area                  |
+|there are no slip trip hazards  in the |                       |         |                                      |
+|immediate vicinity                     |                       |         |                                      |
+|Ensure that hoist is parked safely in  |Obstruction may cause  |Medium   |Nil                                   |
+|appropriate location                   |harm to other personnel|         |                                      |
+|Turn off ignition to hoist & turn off  |Gas leak               |Low      |PPE Ensure integrity of hose / valve  |
+|gas supply at cylinder valve ( if hoist|                       |         |                                      |
+|will not be used for an extended period|                       |         |                                      |
+|)                                      |                       |         |                                      |
+|Environmental:                         |                       |         |                                      |
+|Removal of used rags / gloves/  waste/ |Contamination.         |High     |Place in correct contamination or     |
+|glass / cullet                         |Waste removal and tidy |         |waste bins provided.                  |
+|                                       |up.                    |         |Ensure area is cleaned and product /  |
+|                                       |                       |         |tools cleared away.                   |
+|Protection & Security                  |                       |         |                                      |
+|Demarcation                            |Damage to people,      |High     |Demarcation where applicable.         |
+|                                       |property and           |         |Install barricaded/danger tape as     |
+|                                       |environment.           |         |required.                             |
+|                                       |                       |         |Ensure correct fire fighting equipment|
+|                                       |                       |         |is available.                         |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

@@ -1,0 +1,27 @@
+
+Surry Starrett Cleaner
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety Glasses / gloves         |Ye s                                   |Ellis Levy  11/06/07                    |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |8                                      |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps           |Potential /                 |Level of  |Controls to reduce the Risk of Hazard   |
+|                                |Actual Hazard               |Risk      |                                        |
+|Ensure appropriate PPE is worn  |none                        |Low       |                                        |
+|Pour a liberal amount of cleaner|Spill                       |Low       |PPE                                     |
+|onto a clean rag                |Irritation to eye / skin    |          |                                        |
+|Vigorously scrub granite block  |none                        |Low       |                                        |
+|to clean                        |                            |          |                                        |
+|Wipe dry with rag               |none                        |Low       |                                        |

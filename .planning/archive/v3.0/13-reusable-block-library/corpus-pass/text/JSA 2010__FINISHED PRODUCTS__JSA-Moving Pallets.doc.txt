@@ -1,0 +1,34 @@
+
+Fork Hoists moving pallets to Warehouses
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |Medium                                     |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Remove pallet from MSK line  |Dropped pallet, hitting person|Medium      |Training prior to moving pallets,       |
+|                             |or object,                    |            |experience in lifting pallets. Restrict |
+|                             |                              |            |access to people walking in areas       |
+|Secure load in a safe manner |Collapsed pallet, flying glass|Low         |Training prior to moving pallets,       |
+|at correct height            |                              |            |experience in lifting pallets.          |
+|Drive with load in reverse   |Back sprain due to twisted    |Medium      |Care with positioning while driving, use|
+|due to limited vision        |position, hitting objects or  |            |mirrors, other people to wear Hiviz     |
+|                             |people, Dropped pallets, Speed|            |clothing when in warehouse areas        |
+|                             |control for conditions        |            |                                        |
+|Place pallet in bay          |Nil                           |Nil         |Nil                                     |
+|                             |                              |            |                                        |
+|                             |                              |            |                                        |
+|                             |                              |            |                                        |
+|                             |                              |            |                                        |
+
+

@@ -1,0 +1,74 @@
+
+
+
+Job Safety Environmental Analysis Form:
+
+                                                                     Install
+                                                                     Spade
+
+|Area / Department                  |Forming                               |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots/Clothing.             |                                      |                                          |
+|                                   |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Remove all overhead      |Heat                    |High     |Drink water and monitor personal conditions.            |
+|interference             |Slippery floor grates.  |         |Deck out floor and handrails with ply/masonite.         |
+|piping                   |                        |         |Wear appropriate PPE.                                   |
+|thermocouples            |                        |         |                                                        |
+|Lift spade to work area. |Rigging.                |High     |Use appropriate lifting equipment.                      |
+|                         |Lift floor mesh.        |         |Use coverhead crane to lift floor mesh.                 |
+|                         |Opening in forehearth   |         |Barricade opening in floor.                             |
+|                         |floor.                  |         |Restrict access.                                        |
+|                         |Long lift with overhead |         |Lift to be controlled by responsible person.            |
+|                         |crane (gantry)          |         |Replace floor mesh on completion of lift.               |
+|                         |Falling objects.        |         |Barricade off area under forehearth floor.              |
+|                         |                        |         |Wear appropriate PPE.                                   |
+|Rig spade.               |Rigging.                |Medium   |Use correct tools / equipment.                          |
+|Connect spade            |Loose hoses             |Medium   |Secure hoses.                                           |
+|compressed air           |Equipment damaged by    |         |Protect hoses from heat.                                |
+|water                    |heat.                   |         |Secure couplings (safety pins).                         |
+|                         |Coupling parting under  |         |                                                        |
+|                         |pressure                |         |                                                        |
+|                         |Leaking couplings.      |         |                                                        |
+|Lift spade to Arbour     |Working overhead.       |High     |Check barricades and clear area under working area.     |
+|position.                |Falling objects.        |         |                                                        |
+|Turn on and confirm water|Exhausting air.         |Medium.  |Warn crew prior to turning on.                          |
+|/ air flow.              |Dust or foreign matter  |         |Wear appropriate PPE.                                   |
+|                         |blown out.              |         |                                                        |
+|Connect LP air.          |Loose connections.      |Low      |Check connections.                                      |
+|Turn off combustion      |                        |Medium   |Isolate combustion controls.                            |
+|equalising               |                        |         |On-going monitoring of spade (every 8 hours).           |
+|adjacent cooling         |                        |         |Procedure to be written for monitoring.                 |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

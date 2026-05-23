@@ -1,0 +1,44 @@
+
+Changing Blanks 2/1 MC
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |                                        |
+|All standard PPE required    |Yes or No                                  |JSA Reviewed by and date                |
+|when working within          |                                           |                                        |
+|production area.             |Overall Category of task                   |                                        |
+|                             |HIGH                                       |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |                                           |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|                             |                              |            |                                        |
+|Get Blank from oven          |Heavy Lifting                 |HIGH        |Take time when lifting blanks from oven.|
+|                             |                              |            |                                        |
+|Stop Glass ΓÇô invert position |Nil                           |LOW         |                                        |
+|                             |                              |            |                                        |
+|Safety Gear on (Lock out     |Nil                           |LOW         |                                        |
+|T-Bar)                       |                              |            |                                        |
+|                             |                              |            |                                        |
+|Take Blank off               |Burns ΓÇô hot blank             |HIGH        |Wear PPE ΓÇô Gloves & Sleeves             |
+|                             |                              |            |                                        |
+|New Blank on                 |Lifting`                      |HIGH        |Take time when putting new blank on.    |
+|                             |                              |            |                                        |
+|Safety gear off              |Nil                           |LOW         |                                        |
+|                             |                              |            |                                        |
+|Start Section                |Nil                           |LOW         |                                        |
+|                             |                              |            |                                        |
+|Load Glass                   |Nil                           |LOW         |                                        |
+|                             |                              |            |                                        |
+|Blank cooling on             |Nil                           |LOW         |                                        |
+|                             |                              |            |                                        |
+|Check ware                   |Nil                           |LOW         |                                        |
+|                             |                              |            |                                        |
+|Ok ΓÇô let in lehr             |Nil                           |LOW         |                                        |
+
+

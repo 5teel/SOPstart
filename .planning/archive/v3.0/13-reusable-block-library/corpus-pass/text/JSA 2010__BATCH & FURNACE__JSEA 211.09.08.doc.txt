@@ -1,0 +1,88 @@
+
+
+
+Job Safety Environmental Analysis Form:
+                                                                  Removal
+                                                                  of Flu
+                                                                  Dust
+
+|Area / Department                  |Batch & Furnace                       |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots, High Vis/heat        |                                      |                                          |
+|Garment, Respiratory Protection    |Risk Score                            |                                          |
+|(when working with asbestos), Fire |                                      |                                          |
+|Visor, Balaclava, Hotwork Gloves   |                                      |                                          |
+|(if required), Face Mask, Hot Work |Category                              |                                          |
+|permit (if required).  Safety      |                                      |                                          |
+|Harnesses.                         |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Pre-meeting with all     |                        |Low      |Supervisor.                                             |
+|relevant people to be    |                        |         |                                                        |
+|held.                    |                        |         |                                                        |
+|Preparation work for flu |                        |High     |Supervisor.                                             |
+|dust removal to be       |                        |         |                                                        |
+|completed (safety gear   |                        |         |                                                        |
+|worn, dust collection bin|                        |         |                                                        |
+|or supersucker ready,    |                        |         |                                                        |
+|logistics of flu dust    |                        |         |                                                        |
+|removal thought of, area |                        |         |                                                        |
+|safety taped, access to  |                        |         |                                                        |
+|regenerator door free, no|                        |         |                                                        |
+|flooding in basement     |                        |         |                                                        |
+|area).  As the           |                        |         |                                                        |
+|regenerator is a confined|                        |         |                                                        |
+|space, extra precaution  |                        |         |                                                        |
+|has to be undertaken to  |                        |         |                                                        |
+|meet the requirements of |                        |         |                                                        |
+|work in confined spaces, |                        |         |                                                        |
+|eg lack of / excess      |                        |         |                                                        |
+|oxygen.  Furnace reversal|                        |         |                                                        |
+|needs to be locked out by|                        |         |                                                        |
+|all the relevant people. |                        |         |                                                        |
+|Open regenerator door of |Heat                    |High     |Supervisor.                                             |
+|the firing side (never of|Flooding to basement    |         |Regenerator door to be freed, water to be pumped out    |
+|the exhausting side,     |area.                   |         |before job starts.                                      |
+|Process Engineer to      |Restricted access.      |         |Process Engineer to advise.                             |
+|advise).                 |                        |         |                                                        |
+|Two people maximum       |Falling debris from     |High     |Supervisor to be there all the time whilst regenerator  |
+|wearing safety harnesses |upper parts of          |         |door is open.                                           |
+|are to enter the         |regenerator.            |         |                                                        |
+|regenerator basement.    |Heat.                   |         |                                                        |
+|Flu dust to be raked out |Ashes.                  |         |                                                        |
+|and transported through  |Loss of body fluids.    |         |                                                        |
+|access door into pre     |Combustion air.         |         |                                                        |
+|basement room of         |                        |         |                                                        |
+|regenerator.             |                        |         |                                                        |
+|Close regenerator        |Heat.                   |High     |Supervisor                                              |
+|basement door.           |Restricted access.      |         |Process Engineer.                                       |
+|Furnace reversal to be   |Heat.                   |High     |Supervisor.                                             |
+|reinstated.              |Restricted access.      |         |Process Engineer.                                       |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

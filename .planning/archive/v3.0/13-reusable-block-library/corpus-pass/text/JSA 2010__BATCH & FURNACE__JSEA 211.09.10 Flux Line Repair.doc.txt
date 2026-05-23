@@ -1,0 +1,86 @@
+
+
+
+Job Safety Environmental Analysis Form:
+                                                                      Flux
+                                                                     Line
+                                                                     Repair
+
+|Area / Department                  |Batch & Furnace                       |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots, High Vis/heat        |                                      |                                          |
+|Garment, Respiratory Protection    |Risk Score                            |                                          |
+|(when working with asbestos)       |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Meeting to discuss       |None.                   |Low      |All staff involved in the work.  Get a Hot Work permit  |
+|safety, the job          |                        |         |from Factory Maintenance.                               |
+|requirements, any        |                        |         |                                                        |
+|concerns and reservations|                        |         |                                                        |
+|that those concerned may |                        |         |                                                        |
+|have.                    |                        |         |                                                        |
+|Ensure all run out       |Working down burner     |High     |Furnace management.  Supervision at all times.          |
+|equipment is out and     |ally.  Be aware of      |         |                                                        |
+|working.  Hotwork gear   |apparent hazards,       |         |                                                        |
+|and all PPE.             |particularly heat.      |         |                                                        |
+|Set up equipment for i.e.|Working down burner     |High     |Supervision at all times.  Ensure no hazard exists to   |
+|welder, water, air       |ally.  Be aware of      |         |those below.  Danger tape the area if necessary.        |
+|supply, cutting gear and |apparent hazards,       |         |                                                        |
+|lighting.                |particularly heat.      |         |                                                        |
+|Remove any wind cooling  |Working down burner     |High     |Drink plenty of liquids and restrict amount of time down|
+|ducking and furnace      |ally.  Be aware of      |         |the burner ally.  Fans will be positioned at entrance to|
+|steelwork that may       |apparent hazards,       |         |ally to try and move some air.                          |
+|obstruct your work area. |particularly heat.  Heat|         |                                                        |
+|                         |and dehydration.        |         |                                                        |
+|Remove insulation to     |Burns from glass leak,  |High     |SUPERVISION AT ALL TIMES.  TRAINED PERSONNEL CARRYING   |
+|expose brickwork, insert |water ingress, steam,   |         |OUT THE WORK.                                           |
+|lance to prevent glass   |fire RUN OUT.  Heat and |         |                                                        |
+|leakage should there be  |dehydration.            |         |                                                        |
+|any sign of glass behind |                        |         |                                                        |
+|the insulation.          |                        |         |                                                        |
+|Be prepared for the      |Burns from glass leak,  |H        |SUPERVISION AT ALL TIMES.  TRAINED PERSONNEL CARRYING   |
+|unexpected, have all run |water ingress, steam,   |         |OUT THE WORK.                                           |
+|out equipment at hand.   |fire RUN OUT.  Heat and |         |                                                        |
+|                         |dehydration.            |         |                                                        |
+|Lay overcoat tiles to the|Burns from glass leak,  |H        |SUPERVISION AT ALL TIMES.  TRAINED PERSONNEL CARRYING   |
+|exposed area and refit   |water ingress, steam,   |         |OUT THE WORK.                                           |
+|insulating.  Fit bracing.|fire, falling           |         |                                                        |
+|                         |refractory.  RUN OUT.   |         |                                                        |
+|                         |Heat and dehydration.   |         |                                                        |
+|Refit any steel or       |Burns from glass leak,  |H        |SUPERVISION AT ALL TIMES.  TRAINED PERSONNEL CARRYING   |
+|ductwork that has been   |water ingress, steam,   |         |OUT THE WORK.                                           |
+|removed.  Ensure the work|fire RUN OUT.  Heat and |         |                                                        |
+|area has been cleaned up |dehydration.            |         |                                                        |
+|and left in a safe       |                        |         |                                                        |
+|manner.  Monitor the job.|                        |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

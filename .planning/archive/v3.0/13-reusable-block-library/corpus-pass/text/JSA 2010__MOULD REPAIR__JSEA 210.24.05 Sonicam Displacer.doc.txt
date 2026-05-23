@@ -1,0 +1,52 @@
+
+Sonicam Displacer
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                |Safety Induction [Contractor]         |                                          |
+|PPE Required:                    |Significant Hazard                    |JSEA Reviewed by and date                 |
+|Standard Safety Uniform plus     |Yes                                   |Gary Russell 16/7/07                      |
+|Safety glasses                   |                                      |                                          |
+|                                 |Risk Score                            |                                          |
+|                                 |50                                    |                                          |
+|                                 |                                      |                                          |
+|                                 |Category                              |                                          |
+|                                 |Medium                                |                                          |
+|                                 |                                      |                                          |
+|                                 |Control taken                         |                                          |
+|                                 |Minimisation                          |                                          |
+|                                 |                                      |                                          |
+|Sequence of Job Steps     |Potential /                      |Level of    |Controls to reduce the Risk of Hazard      |
+|                          |Actual Hazard                    |Risk        |                                           |
+|Turn on and set up machine|Electric shock                   |Medium      |Check cables / switch for damage           |
+|as per operating          |                                 |            |                                           |
+|instructions              |                                 |            |                                           |
+|Lift mld or blk onto table|Back strain                      |Low         |Wear back support if required              |
+|                          |Trapping of fingers and hands    |            |Correct manual handling procedures         |
+|                          |                                 |            |Ensure area clear of obstructions          |
+|Displacement of component |Trapping of fingers and hands    |Low         |Correct manual handling procedures         |
+|                          |Crushing                         |            |Ensure floor is dry                        |
+|                          |Falling objects                  |            |                                           |
+|                          |Slipping                         |            |                                           |
+|Remove mld or blk from    |Back strain                      |Low         |Wear back support if required              |
+|table                     |Trapping of fingers and hands    |            |Correct manual handling procedures         |
+|                          |                                 |            |Ensure area clear of obstructions          |
+|Environmental:           |                                 |            |                                           |
+|Removal of used rags /   |Contamination.                   |High        |Place in correct contamination or waste    |
+|gloves/  waste/ glass /  |Waste removal and tidy up.       |            |bins provided.                             |
+|cullet                   |                                 |            |Ensure area is cleaned and product / tools |
+|                         |                                 |            |cleared away.                              |
+|Protection & Security    |                                 |            |                                           |
+|Demarcation              |Damage to people, property and   |High        |Demarcation where applicable.              |
+|                         |environment.                     |            |Install barricaded/danger tape as required.|
+|                         |                                 |            |Ensure correct fire fighting equipment is  |
+|                         |                                 |            |available.                                 |
+
+
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

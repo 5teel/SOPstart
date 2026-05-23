@@ -1,0 +1,34 @@
+
+                                              Mopping Baffles on job # 30053
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |Joe Rolleston 08/22/19                  |
+|when working within          |                                           |                                        |
+|production area              |Overall Category of task                   |                                        |
+|                             |Medium                                     |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Load mop with mould aid.     |Spill Hazard                  |Low         |Use dope tray to remove excess mould aid|
+|Watch each section           |Mop getting knocked out of    |Medium      |Observe timing of Baffle retracting     |
+|individually to confirm there|hand                          |            |                                        |
+|is a double baffle on each   |                              |            |                                        |
+|section                      |                              |            |                                        |
+| Wait for gob to load, wait  |Mop getting knocked out of    |Medium      |Use extended mop ΓÇô coat ΓÇ£BΓÇ¥ cavity      |
+|for first baffle to lift from|hand                          |            |Baffle first.                           |
+|the blanks and then go back  |                              |            |                                        |
+|down                         |                              |            |                                        |
+|Wait for the second baffle to|
+|lift off and watch the blanks|
+|starting to open             |
+|Mop baffles now              |Mop getting caught under      |Medium      |Observe timing of Baffle coming down.   |
+|                             |Baffle                        |            |                                        |
+
+

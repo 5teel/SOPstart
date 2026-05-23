@@ -1,0 +1,34 @@
+
+Install Covers around 31 Forehearth
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]       |                                            |
+|PPE Required:                 |Significant Hazard                  |JSA Reviewed by and date                    |
+|All standard PPE equipment    |Yes                                 |                                            |
+|                              |                                    |                                            |
+|                              |Risk Score                          |                                            |
+|                              |                                    |                                            |
+|                              |                                    |                                            |
+|                              |Category                            |                                            |
+|                              |                                    |                                            |
+|                              |                                    |                                            |
+|                              |Control taken                       |                                            |
+|                              |Minimisation                        |                                            |
+|                              |                                    |                                            |
+|Sequence of Job Steps   |Potential /                     |Level of  |Controls to reduce the Risk of Hazard      |
+|                        |Actual Hazard                   |Risk      |                                           |
+|Weld on brackets        |Noise, heat                     |High      |Wear hearing protection.  Brake every 20   |
+|                        |                                |          |minutes and drink plenty of water          |
+|Cutting brackets        |Sparks, power                   |High      |Cover with fire blanket, use RCD.          |
+|                        |                                |          |Hot work permit, fire fighting equipment   |
+|Cutting brackets        |Welding flash                   |High      |Use welding screens                        |
+|Leaving work area       |Old steel etc                   |Medium    |Remove all scrap etc., and place in bin    |
+|Cutting & folding sheet |Guillotine and folder           |High      |Keep body away from guillotine when in use.|
+|metal                   |                                |          |Wear PPE                                   |
+|                        |                                |          |Ensure blade on safely and latch when not  |
+|                        |                                |          |in use                                     |
+|Cutting & folding sheet |Guillotine and folder           |High      |Wear gloves; keep hands away from folder   |
+|metal                   |                                |          |when closing. Two employees to lift sheets.|
+|                        |                                |          |Wear PPE                                   |

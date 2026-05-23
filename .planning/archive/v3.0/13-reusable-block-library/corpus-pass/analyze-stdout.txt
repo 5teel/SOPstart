@@ -1,0 +1,205 @@
+Reading 666 text files...
+
+=== STATS ===
+Total docs: 666
+Total step rows: 10146
+Total hazard mentions: 5141
+
+Top folders:
+   602  JSA 2010
+    48  JSA-08
+    15  Plant JSA's
+     1  JSA-2011
+
+Top departments (subfolder):
+    93  JOB CHANGE
+    92  QUALITY CONTROL
+    77  FACTORY MAINTENANCE
+    65  MOULD REPAIR
+    59  BATCH & FURNACE
+    50  ELECTRICAL
+    48  JSA-08
+    46  FORMING AREA
+    43  FINISHED PRODUCTS
+    41  MACHINE REPAIR
+    20  PLANT SERVICES
+    15  Plant JSA's
+     5  JSA 2010
+     5  ENGINEERING
+     4  CONTRACTOR
+     1  IT
+     1  Line
+     1  JSA-2011
+
+Risk Categories: {
+  Low: 238,
+  Medium: 163,
+  Moderate: 5,
+  High: 87,
+  M: 2,
+  MINIMISATION: 2,
+  '12.5': 2,
+  Minimisation: 6,
+  LOW: 9,
+  Med: 1,
+  HIGH: 1,
+  Extreme: 1,
+  '?': 1,
+  MEDIUM: 4,
+  low: 3,
+  medium: 1
+}
+Control Taken: {
+  MINIMISATION: 4,
+  Minimisation: 510,
+  'Cuts to Skin, Abrasion to': 1,
+  'Risk of falling': 1,
+  minimisation: 1,
+  'Manual handling.': 24,
+  'Heat, water hydraulic': 1,
+  'Heat exposure, hot': 1,
+  'Loss of production.': 1,
+  'Glass quality issues.': 1,
+  'Electrocutions.': 1,
+  'Back strain.  Spillage': 1,
+  'Heat / scolds / burns /': 1,
+  'None.': 1,
+  'In all cases ensure': 4,
+  'Entrapment/caught in': 1,
+  'Bottles are normally': 1,
+  'Manual handling': 3,
+  'Manual Handling': 10,
+  Minimise: 1,
+  Isolation: 13,
+  Engineering: 2,
+  'Electrocution.': 4,
+  'Trip hazards.': 1,
+  'Grinding sparks, oxy': 1,
+  'Fall and entrapment': 2,
+  'Fall.': 1,
+  Fall: 1,
+  'Electrical leads for': 1,
+  'Moving parts.': 1,
+  'Bad lighting.': 1,
+  'Fire hazard.': 1,
+  'Damaged tools.': 2,
+  'Fall at height.': 1,
+  'Unsafe operating': 1,
+  'Forklift in area.': 1,
+  'Manual Handling.': 9,
+  'No less than 2 people': 1,
+  'No less than 2 people in': 3,
+  'Being caught in paddles': 1,
+  'Elimination/ Minimisation': 1,
+  'As below': 1,
+  'Bottles are hot out of': 1,
+  Nil: 4,
+  Heat: 1,
+  'Water on floor.': 2,
+  'Minimisation.': 1,
+  Slipping: 1,
+  Electrocution: 2,
+  'Damage to mechanism': 1,
+  'Weld flash.': 1,
+  'Synthetic mineral fibre.': 1,
+  'Electric Shock': 1,
+  'Live compressed air.': 1,
+  'Hot temperatures in area': 1,
+  'Getting caught in': 1,
+  'Hot  temperatures.': 1,
+  'Fall at heights.': 1,
+  'Falling bolts.': 1,
+  'Restricted access.': 1,
+  'Electric shock': 2,
+  'Escaping air under': 1
+}
+Significant Hazard: {
+  Yes: 468,
+  No: 36,
+  YES: 6,
+  NO: 3,
+  'Yes or No': 14,
+  'Yes / No': 9,
+  'Sequence Of Basic Job': 1,
+  Low: 2,
+  LOW: 1,
+  'Yes o': 2,
+  'Yes / Laceration': 3,
+  'Yes/': 3,
+  'Ye s': 3
+}
+
+=== HAZARD CLUSTERS (Top 30) ===
+   1511  other
+    729  crush-entrapment
+    572  manual-handling-strain
+    422  cuts-lacerations
+    334  burns-hot
+    319  spill-environmental
+    258  slips-trips
+    170  electrocution
+    140  moving-machinery
+    112  glass-breakage
+     87  falling-objects
+     85  pinch-points
+     76  forklift-vehicle
+     64  fire-explosion
+     58  dust-airborne
+     51  noise
+     49  chemical-exposure
+     33  flying-debris
+     24  pressurised-fluid
+     20  falls-from-height
+     18  hot-work
+      6  isolation-energy
+      2  fatigue-shift
+      1  confined-space
+
+=== TOP RAW HAZARD PHRASINGS (Top 30) ===
+    269  contamination
+    148  caught in section
+    132  laceration
+    126  manual handling
+    109  burns
+     79  electrocution
+     53  entrapment
+     48  burnt / back strain
+     47  prevent entrapment
+     45  making section safe to
+     40  back strain
+     39  moving machinery
+     36  reduce the risk of being caught in the section
+     32  entrapment in section
+     32  crushed hand
+     28  broken glass
+     27  reduce the risk of being
+     26  caught in the section
+     26  caught in section / back strain
+     26  laceration from broken glass
+     24  falling objects
+     24  electric shock
+     23  burn
+     23  sprain / strain
+     23  crush injury
+     22  strain
+     22  lacerations
+     21  points
+     21  cuts
+     20  burning from heat reflected off ware
+
+=== TOP PPE REQUIRED FREE-TEXT (Top 15) ===
+    221  All standard PPE required
+     87  Gloves, Safety Glasses, Ear Muffs,
+     75  Boots, gloves, uniform, safety
+     26  Standard Safety Uniform plus
+     22  Safety Glasses
+     11  Safety Glasses / gloves if
+      9  within production area
+      8  Safety Glasses & Gloves
+      8  All standard safety equipment
+      6  Safety Glasses, Gloves
+      6  Safety Glasses / disposable
+      6  Safety Glasses and gloves
+      5  Safety Glasses & Hearing
+      5  Boots, Uniform, Safety Glasses,
+      4  Hi Viz Clothing  / Gloves /

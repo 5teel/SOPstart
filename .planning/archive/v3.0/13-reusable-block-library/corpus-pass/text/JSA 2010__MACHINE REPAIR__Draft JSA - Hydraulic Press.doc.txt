@@ -1,0 +1,33 @@
+
+Hydraulic Press
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]           |                                         |
+|PPE Required:                |Significant Hazard                      |JSA Reviewed by and date                 |
+|All standard PPE required    |Yes / No                                |                                         |
+|                             |                                        |                                         |
+|                             |Risk Score                              |                                         |
+|                             |                                        |                                         |
+|                             |                                        |                                         |
+|                             |Category                                |                                         |
+|                             |                                        |                                         |
+|                             |                                        |                                         |
+|                             |Control taken                           |                                         |
+|                             |                                        |                                         |
+|                             |                                        |                                         |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Check Hydraulic Press        |Nil                           |Low      |Check for and remove any loose objects   |
+|Set up work bench to correct |Back Strain                   |Medium   |Use correct ergonomics                   |
+|height                       |                              |         |                                         |
+|Use correct tools            |Nil                           |Low      |Training                                 |
+|Check alignment  for pressing|Nil                           |Low      |Visual check                             |
+|job                          |                              |         |                                         |
+|Lower hydraulic ram slowly   |Nil                           |Low      |Training                                 |
+|manual or auto               |                              |         |                                         |
+|Check ram operation          |Back Strain                   |Medium   |Visual check                             |
+|Release Hydraulic pressure to|Nil                           |Low      |Training                                 |
+|remove job                   |                              |         |                                         |
+|Check job after completed    |Nil                           |Low      |Visual check                             |

@@ -1,0 +1,42 @@
+
+Removal and installation of Vacuum pumps ΓÇôTop Floor
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                            |Safety Induction [Contractor]        |                                            |
+|PPE Required:                |Significant Hazard                   |JSA Reviewed by and date                    |
+|All standard PPE required    |Yes                                  |                                            |
+|                             |                                     |                                            |
+|                             |Risk Score                           |                                            |
+|                             |40                                   |                                            |
+|                             |                                     |                                            |
+|                             |Category                             |                                            |
+|                             |High                                 |                                            |
+|                             |                                     |                                            |
+|                             |Control taken                        |                                            |
+|                             |Minimisation                         |                                            |
+|                             |                                     |                                            |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Disconnect power supply      |Electrocution                 |High     |Contact Electrician so equipment is      |
+|                             |                              |         |safely disconnected                      |
+|Isolate air and water supply |Air & Water under pressure may|High     |Isolate valves on air and water, check   |
+|                             |cause FB to body              |         |all equipment locked out safely prior to |
+|                             |                              |         |start working                            |
+|Unbolt pump and frames       |Abrasion to hands/ fingers    |Medium   |Use correct spanner to prevent sprain or |
+|                             |from hitting metal. Sprain or |         |strain                                   |
+|                             |strain from trying to release |         |                                         |
+|                             |gear.                         |         |                                         |
+|Lift out pumps and frames    |Entrapment or crush from      |High     |Use hoist with beam. Keep clear at hoist |
+|                             |moving vehicles and overhead  |         |and machinery when in the air            |
+|                             |loads                         |         |                                         |
+|Cutting pipes                |Burns or FB from hot work     |Medium   |Follow Hot work Procedure                |
+|                             |cutting                       |         |                                         |
+|Install pump                 |Entrapment or crush from      |High     |Use hoist with beam. Keep clear at hoist |
+|                             |moving vehicles and overhead  |         |and machinery when in the air            |
+|                             |loads                         |         |                                         |
+|Connect pipe and bolt dows   |Abrasion to hands/ fingers    |Medium   |Use correct spanner to prevent sprain or |
+|                             |from hitting metal. Sprain or |         |strain                                   |
+|                             |strain from trying to release |         |                                         |
+|                             |gear.                         |         |                                         |

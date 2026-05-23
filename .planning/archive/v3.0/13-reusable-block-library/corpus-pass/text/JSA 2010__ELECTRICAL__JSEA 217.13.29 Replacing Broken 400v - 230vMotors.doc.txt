@@ -1,0 +1,29 @@
+
+Replacing broken 400v & 230v Outlets
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |High                                       |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Trace source of supply and   |Shocks                        |High        |Training & instruction. Wear all PPE    |
+|isolate and lock out         |                              |            |                                        |
+|Remove and replace broken or |Cuts & lighting               |Medium      |Use all safe working procedures Wear all|
+|damaged item                 |                              |            |PPE                                     |
+|Test connection to correct   |Pinch points, lighting        |Medium      |Use all safe working procedures Wear all|
+|terminals                    |                              |            |PPE                                     |
+|Prove earth connection within|Shocks                        |Medium      |Use all safe working procedures Wear all|
+|safety limits                |                              |            |PPE                                     |
+|Turn on power test with      |Shocks                        |High        |Training & instruction. Wear all PPE    |
+|approved meter               |                              |            |                                        |
+

@@ -1,0 +1,31 @@
+
+Replacing motors
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |High                                       |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Trace source of supply and   |Shocks & electrocution        |High        |Training & instruction. Wear all PPE    |
+|isolate and lock out         |                              |            |                                        |
+|Clean site                   |Cuts slips & flying objects   |High        |Use all safe working procedures Wear all|
+|                             |                              |            |PPE                                     |
+|Disconnect motor wiring and  |Lifting & slips               |High        |Correct lifting position. All PPE to be |
+|remove part                  |                              |            |worn                                    |
+|Replace with new motor fix to|Lifting & slips               |High        |Use all safe working procedures Wear all|
+|mounts                       |                              |            |PPE                                     |
+|Reconnect wiring and remove  |Shocks                        |High        |Use all safe working procedures Wear all|
+|lockouts                     |                              |            |PPE                                     |
+|Power up and test run        |Flash overs & jam ups         |High        |Use all safe working procedures Wear all|
+|                             |                              |            |PPE                                     |
+

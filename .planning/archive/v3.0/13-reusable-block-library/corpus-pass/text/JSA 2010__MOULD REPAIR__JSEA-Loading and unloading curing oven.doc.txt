@@ -1,0 +1,38 @@
+
+Loading & Unloading or Curing Oven
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|All standard safety equipment   |Yes                                    |17/8/07 Gary Russell                    |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |30                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps           |Potential /               |Level of    |Controls to reduce the Risk of Hazard   |
+|                                |Actual Hazard             |Risk        |                                        |
+|Open oven door                  |Electric shock            |Low         |Insure control box looks in good        |
+|                                |Moving parts causing      |            |condition with no obvious damage. Ensure|
+|                                |entrapment                |            |door opening arc is clear of            |
+|                                |                          |            |obstructions                            |
+|Load Equipment into oven        |Entrapment of hands/      |Low         |Be aware of finger position when lifting|
+|                                |fingers                   |            |and setting equipment on oven surface   |
+|                                |Falling objects           |            |Ensure items are securely placed on oven|
+|                                |                          |            |table surface. Do not double stack items|
+|                                |                          |            |in oven                                 |
+|Close oven door                 |Electric shock            |Low         |Insure control box looks in good        |
+|                                |Moving parts              |            |condition with no obvious damage. Ensure|
+|                                |                          |            |door opening arc is clear of            |
+|                                |                          |            |obstructions                            |
+|Unloading over is reversed of   |Electric shock            |Medium      |Insure control box looks in good        |
+|above                           |Moving parts              |            |condition with no obvious damage. Ensure|
+|                                |                          |            |door opening arc is clear of            |
+|                                |                          |            |obstructions                            |

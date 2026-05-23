@@ -1,0 +1,61 @@
+
+Use of Impact Tester
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses & Gloves / Face  |Yes                                    |Rey Basabas  11/06/07                   |
+|mask if required                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |12                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                        |Potential /            |Level of    |Controls to reduce the Risk of|
+|                                             |Actual Hazard          |Risk        |Hazard                        |
+|Select containers to be tested               |None                   |Low         |Nil                           |
+|Operator to be positioned 90* to the Impact  |None                   |Low         |Nil                           |
+|Tester  facing dial                          |                       |            |                              |
+|Decide on which portion of the container is  |None                   |Low         |Nil                           |
+|to be tested ie  shoulder, panel, heel       |                       |            |                              |
+|Loosen wing nut on shaft & turn handle       |None                   |Low         |Nil                           |
+|(middle) so that the V stand is adjustable   |                       |            |                              |
+|for container height                         |                       |            |                              |
+|Turn handle (bottom) so that the whole V     |None                   |Low         |Nil                           |
+|stand is adjustable for container diameter.  |                       |            |                              |
+|Tighten wing nut                             |                       |            |                              |
+|Turn handle ( top ) to select desired        |None                   |Low         |Nil                           |
+|distance inches per second                   |                       |            |                              |
+|Place bottle on V stand                      |None                   |Low         |Nil                           |
+|Pull pendulum & hammer back to spring & latch|None                   |Low         |Nil                           |
+|Lift latch so that pendulum is released ( do |Broken bottles /       |Low         |Ensure all PPE is worn to     |
+|not exert any additional force ) NB This is a|laceration             |            |prevent injury to self        |
+|destructive test                             |                       |            |                              |
+|Rotate bottle for further testing & adjust   |Broken bottles /       |Low         |Ensure all PPE is worn to     |
+|height for position of testing as per Best   |laceration             |            |prevent injury to self E      |
+|Practice & record results NB This is a       |                       |            |                              |
+|destructive test                             |                       |            |                              |
+|Discard containers after testing             |Laceration             |Low         |Ensure all PPE is worn to     |
+|                                             |                       |            |prevent injury to self        |
+|Environmental:                               |                       |            |                              |
+|Removal of used rags / gloves/  waste/ glass |Contamination.         |High        |Place in correct contamination|
+|/ cullet                                     |Waste removal and tidy |            |or waste bins provided.       |
+|                                             |up.                    |            |Ensure area is cleaned and    |
+|                                             |                       |            |product / tools cleared away. |
+|Protection & Security                        |                       |            |                              |
+|Demarcation                                  |Damage to people,      |High        |Demarcation where applicable. |
+|                                             |property and           |            |Install barricaded/danger tape|
+|                                             |environment.           |            |as required.                  |
+|                                             |                       |            |Ensure correct fire fighting  |
+|                                             |                       |            |equipment is available.       |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

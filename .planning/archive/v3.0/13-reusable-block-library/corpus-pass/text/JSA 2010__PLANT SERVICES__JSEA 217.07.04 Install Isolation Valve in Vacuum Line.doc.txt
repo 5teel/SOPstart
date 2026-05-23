@@ -1,0 +1,64 @@
+
+
+
+Job Safety Environmental Analysis Form:            Install Isolation Valve
+                                                                       in
+                                                                       Vacuum
+                                                                        Line
+
+|Area / Department                  |Plant Services                        |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|and Safety Boots, welding PPE      |                                      |                                          |
+|required.                          |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Prepare work area.       |Manual Handling.        |Medium   |Use Correct manual handling techniques.                 |
+|Access To Vacuum Line.   |Slips, Trips, Falls.    |High     |Ensure adequate Lighting.                               |
+|                         |Live Machinery.         |         |Advise workers that machinery can start at any time.    |
+|                         |                        |         |Isolate vacuum line.                                    |
+|Cut into vacuum Line     |Fire  sparks.           |High     |Fire equipment readily available.  Fire watch.          |
+|- use oxy.               |Falling pipe work.      |         |Wear appropriate PPE.                                   |
+|                         |Strains & sprains.      |         |Support pipe to be cut.                                 |
+|                         |                        |         |Use correct manual handling techniques.                 |
+|Remove Pipe Work.        |Burns.                  |High     |Wear appropriate PPE.                                   |
+|                         |Manual Handling.        |         |Use correct manual handling techniques.                 |
+|                         |Congested work area.    |         |Plan route for pipe removal from area.                  |
+|Dress pipe ends using    |Sparks.                 |High     |Fire equipment readily available.                       |
+|grinder.                 |Noise.                  |         |Wear appropriate PPE.                                   |
+|                         |Electric Shock.         |         |Electric leads to have RCDΓÇÖs.                           |
+|                         |                        |         |Hold pipe in an appropriate vice / stand.               |
+|Weld on Rolled Pipe End  |Sparks.                 |High     |Fire equipment readily available.                       |
+|Stubs.                   |Welding Flash.          |         |Screen off welding area.                                |
+|                         |Burns.                  |         |Wear appropriate PPE.                                   |
+|Position Pipe and Fit    |Manual Handling.        |High     |Use correct manual handling techniques.                 |
+|Valve                    |Jammed fingers.         |         |Use correct tools for job.                              |
+|- using Victaulic        |Abrasions.              |         |                                                        |
+|coupling                 |Hand tools.             |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+                           -----------------------
+
+
+[pic]
+
+O-I New Zealand
+

@@ -1,0 +1,42 @@
+
+Install New Shut ΓÇô Tank 3
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |X                                       |
+|PPE Required:                |Significant Hazard                         |                                        |
+|All standard PPE required    |Yes or No                                  |JSA Reviewed by and date                |
+|when working within          |                                           |                                        |
+|production area.             |Risk Score                                 |                                        |
+|                             |48                                         |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |LOW                                        |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |As below                                   |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|                             |                              |            |                                        |
+|Measure angle of shut (from  |Air contamination, batch slip,|12          |Isolate top flap gate. (Test with Air   |
+|inside)                      |falling glass                 |            |Meter)                                  |
+|                             |                              |            |Use safety harness & safety Line, Dust  |
+|                             |                              |            |masks                                   |
+|                             |                              |            |                                        |
+|Cut angle on shut            |Fire - Burns                  |6           |Hot work permit                         |
+|                             |                              |            |Gloves & Goggles                        |
+|                             |                              |            |                                        |
+|Lift shut into Hopper Welding|Strains, Electrocution, cuts &|12          |Chain block up to platform, extra men to|
+|                             |bruises                       |            |lift into silo with all safety gear on. |
+|                             |                              |            |Use RCD inside Hopper                   |
+|                             |                              |            |                                        |
+|Install shut in place        |Strains                       |6           |Extra men inside with you, all safety   |
+|                             |                              |            |gear.                                   |
+|                             |                              |            |Test with Air Meter                     |
+|                             |                              |            |                                        |
+|Weld up shut                 |Burns & Fumes                 |12          |Use gloves & extractor Fan              |
+
+

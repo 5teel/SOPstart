@@ -1,0 +1,52 @@
+
+
+
+Job Safety Environmental Analysis Form:
+                                                                         Changing
+                                                                          De
+                                                                         lte
+                                                                         c
+                                                                         Fil
+                                                                         ter
+                                                                         s
+
+|Area / Department                  |Plant Services                        |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|and Safety Boots, welding PPE      |                                      |                                          |
+|required.                          |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Isolation of air.        |Escaping air under      |High     |Isolate in root valves with personal isolation tag.     |
+|                         |pressure.               |         |Release air pressure from tank.                         |
+|Removing of bolt         |Height to work on       |Low      |Use plastic safe step or scaffolding to obtain height to|
+|retaining lid.           |safety.                 |         |undo bolts.                                             |
+|Re-install filters and   |                        |Low      |Use plastic safe step or scaffolding to obtain height to|
+|lid.                     |                        |         |undo bolts.                                             |
+|Remove isolation to tank.|                        |Low      |Remove personal isolation tag.                          |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+                           -----------------------
+
+
+[pic]
+
+O-I New Zealand
+

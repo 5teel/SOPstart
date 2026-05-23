@@ -1,0 +1,61 @@
+
+Sink and Bulge Gauge
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses                  |Yes                                    |Ellis Levy                              |
+|                                |                                       |11/06/07                                |
+|                                |Risk Score                             |                                        |
+|                                |10                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                            |Potential /            |Level of  |Controls to reduce the Risk|
+|                                                 |Actual Hazard          |Risk      |of Hazard                  |
+|Set up the sink & bulge template on the computer |Nil                    |Low       |                           |
+|linked to the SPC assembly in QC                 |                       |          |                           |
+|Check results against calibrated block for       |Nil                    |Low       |                           |
+|accuracy of equipment                            |                       |          |                           |
+|Loosen the two screw clamps ( on the main upright|Nil                    |Low       |                           |
+|of the assembly )                                |                       |          |                           |
+|Set the area of testing as per the label panel   |Nil                    |Low       |                           |
+|length on the ware spec                          |                       |          |                           |
+|Tighten the two screw clamps at set position     |Nil                    |Low       |                           |
+|Zero the dial gauge                              |Nil                    |Low       |                           |
+|Position bottle in V on the stand & ensure that  |Broken bottle /        |Low       |PPE                        |
+|spring plunger is making contact with the bottle |laceration             |          |                           |
+|Depress the footswitch once                      |Nil                    |Low       |                           |
+|Gently apply forward pressure on the spring      |Broken bottle /        |Low       |PPE                        |
+|plunger & at the same time carefully raise  &    |laceration             |          |                           |
+|lower the dial gauge ( to the full extent of the |                       |          |                           |
+|panel length )                                   |                       |          |                           |
+|Depress the footswitch once                      |Nil                    |Low       |                           |
+|Rotate bottle & repeat steps for further tests   |Nil                    |Low       |                           |
+|Discard containers after testing                 |Laceration from broken |Low       |PPE                        |
+|                                                 |glass                  |          |                           |
+|Environmental:                                   |                       |          |                           |
+|Removal of used rags / gloves/  waste/ glass /   |Contamination.         |High      |Place in correct           |
+|cullet                                           |Waste removal and tidy |          |contamination or waste bins|
+|                                                 |up.                    |          |provided.                  |
+|                                                 |                       |          |Ensure area is cleaned and |
+|                                                 |                       |          |product / tools cleared    |
+|                                                 |                       |          |away.                      |
+|Protection & Security                            |                       |          |                           |
+|Demarcation                                      |Damage to people,      |High      |Demarcation where          |
+|                                                 |property and           |          |applicable.                |
+|                                                 |environment.           |          |Install barricaded/danger  |
+|                                                 |                       |          |tape as required.          |
+|                                                 |                       |          |Ensure correct fire        |
+|                                                 |                       |          |fighting equipment is      |
+|                                                 |                       |          |available.                 |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

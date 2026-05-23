@@ -1,0 +1,75 @@
+
+Using Water Fire Canon & Hose
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |No                                         |                                        |
+|when working in production   |                                           |                                        |
+|areas                        |Overall Category of task                   |                                        |
+|                             |Low                                        |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Unwind the fire hose ensuring|Tripping                      |Low         |Ensure all personnel are aware of what  |
+|no tangles                   |                              |            |is happening if possible appoint someone|
+|                             |                              |            |[Apprentice] to watch out for new people|
+|                             |                              |            |entering area                           |
+|Connect the Fire hose onto   |Tripping & back strain        |Low         |Bend knees or kneel down ΓÇô do not stoop |
+|the fire hydrant and water   |                              |            |                                        |
+|canon                        |                              |            |                                        |
+|Ensure tight connection and  |Tripping & back strain        |Low         |Use correct posture                     |
+|gate valve is in the off     |                              |            |                                        |
+|position                     |                              |            |                                        |
+|Open hydrant slowly and      |Tripping & back strain        |Low         |Use correct posture                     |
+|observe hoses are filling up |                              |            |                                        |
+|evenly and no tangle in the  |                              |            |                                        |
+|hose                         |                              |            |                                        |
+|Proceed to use the water     |Tripping & back strain        |Low         |Start using water canon make sure that a|
+|cannon opening valve         |                              |            |buddy is behind you to move the hose    |
+|                             |                              |            |where you want it to                    |
+|When finished reverse the    |Tripping & back strain        |            |                                        |
+|procedure                    |                              |            |                                        |
+
+
+            To get a Risk Score [Consequence by the Probability.]
+|Consequence. Most probably result of the potential accident /event        |
+|Probability                       |INJURY                              |PLANT PROPERTY OR PROCESS DAMAGE    |
+|Likelihood that accident sequence |                                    |                                    |
+|will follow to.                   |                                    |                                    |
+|Common or frequent occurrence     |Fatality or permanent disability    |More than 1 million, Major          |
+|                                  |                                    |disruption of activities            |
+|Is known to have happened         |Multiple lost time injury with      |$500,000 to $1 million              |
+|                                  |hospital admissions                 |                                    |
+|Could occur                       |Single Lost time injury             |$100,000 to $500,000                |
+|Not likely to occur               |Medical Treatment Injury or         |$1000 to $100,000                   |
+|                                  |restricted work                     |                                    |
+|Practically impossible            |First Aid injury                    |Up to $1000                         |
+|                                  |                                    |                                    |
+|                                  |QUALITY                             |ENVIRONMENTAL                       |
+|                                  |Major product recall with adverse   |Confined to immediate work area,    |
+|                                  |publicity and major customer claim  |rapid clean up no damage to         |
+|                                  |                                    |environment                         |
+|                                  |Minor product recall with adverse   |Confined to specific area, rapid    |
+|                                  |publicity resulting in minor claim  |clean up little damage to           |
+|                                  |                                    |environment                         |
+|                                  |Minor product recall with major     |Confined to local environment,      |
+|                                  |resort of product                   |naturally recoverable, moderate     |
+|                                  |                                    |clean up                            |
+|                                  |Minor product recall with minor     |Considerable clean up on site as    |
+|                                  |resort of product                   |well as external resources involved |
+|                                  |                                    |& extends past boundaries           |
+|                                  |Customer compliant and no resort of |Regional scale, extensive clean up  |
+|                                  |product required                    |and long recovery                   |
+
+
+|CONSEQUENCES                                                                                 |
+|PROBABILITY    |INSIGNIFICANT    |MINOR            |MODERATE         |MAJOR            |EXTREME             |
+|               |1                |2                |3                |4                |5                   |
+|almost certain            |H                        |H                          |E                            |
+

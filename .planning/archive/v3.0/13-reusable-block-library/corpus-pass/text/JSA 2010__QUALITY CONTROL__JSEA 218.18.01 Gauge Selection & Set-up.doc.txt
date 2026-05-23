@@ -1,0 +1,53 @@
+
+Gauge selection & set up
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses / Ear protection |Yes                                    |Richard Smith  11/06/07                 |
+|/ gloves if required            |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |20                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                 |Potential /             |Level of Risk|Controls to reduce the Risk of    |
+|                                      |Actual Hazard           |             |Hazard                            |
+|SELECTION                             |                        |-            |                                  |
+|Check ware spec & finish spec for any |None                    |Low          |Nil                               |
+|changes since last run                |                        |             |                                  |
+|Consult manufacturing records ( paper |None                    |Low          |Nil                               |
+|& electronic ) for previous job       |                        |             |                                  |
+|history re gauges issued              |                        |             |                                  |
+|Select gauges from racking in QC (use |Fall from height        |Low          |Care when using ladder ensure that|
+|ladder as necessary)                  |                        |             |the ladder is compliant by        |
+|                                      |                        |             |checking the date on the ladder is|
+|                                      |                        |             |still current.                    |
+|Complete documentation re issue of    |None                    |Low          |Nil                               |
+|gauges                                |                        |             |                                  |
+|SETUP                                 |                        |             |                                  |
+|Take appropriate gauges to CE / HE &  |Noise / lacerations /   |Low          |Ensure that PPE is worn in order  |
+|set up using appropriate tools        |slip / trip             |             |to prevent injury to self         |
+|Discard any containers used for set up|Laceration from the     |Low          |Ensure that PPE is worn in order  |
+|to the cullet conveyor                |broken glass            |             |to prevent injury to self         |
+|Environmental:                        |                        |             |                                  |
+|Removal of used rags / gloves/  waste/|Contamination.          |High         |Place in correct contamination or |
+|glass / cullet                        |Waste removal and tidy  |             |waste bins provided.              |
+|                                      |up.                     |             |Ensure area is cleaned and product|
+|                                      |                        |             |/ tools cleared away.             |
+|Protection & Security                 |                        |             |                                  |
+|Demarcation                           |Damage to people,       |High         |Demarcation where applicable.     |
+|                                      |property and            |             |Install barricaded/danger tape as |
+|                                      |environment.            |             |required.                         |
+|                                      |                        |             |Ensure correct fire fighting      |
+|                                      |                        |             |equipment is available.           |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

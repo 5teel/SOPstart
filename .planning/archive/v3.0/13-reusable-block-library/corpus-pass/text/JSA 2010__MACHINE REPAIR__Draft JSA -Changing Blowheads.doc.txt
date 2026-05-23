@@ -1,0 +1,33 @@
+
+Changing Blowheads
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]           |                                         |
+|PPE Required:                |Significant Hazard                      |JSA Reviewed by and date                 |
+|All standard PPE required    |Yes / No                                |                                         |
+|                             |                                        |                                         |
+|                             |Risk Score                              |                                         |
+|                             |                                        |                                         |
+|                             |                                        |                                         |
+|                             |Category                                |                                         |
+|                             |                                        |                                         |
+|                             |                                        |                                         |
+|                             |Control taken                           |                                         |
+|                             |                                        |                                         |
+|                             |                                        |                                         |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Isolate section              |Nil                           |Low      |Press stop button one mould side,        |
+|                             |                              |         |blowhead in off position                 |
+|Use lock out or hold card    |Nil                           |Medium   |Isolate section                          |
+|Shut air off                 |Nil                           |Low      |                                         |
+|Remove mechanism and         |Lifting Glass                 |Low      |Use proper lifting gear                  |
+|ancillaries                  |                              |         |                                         |
+|Clear glass from section     |Glass                         |Low      |PPE                                      |
+|Fit new blowhead in reverse  |Nil                           |Medium   |Use proper lifting gear                  |
+|order                        |                              |         |                                         |
+|Retighten mechanism after    |Nil                           |Low      |Minimisation                             |
+|being jigged                 |                              |         |                                         |
+|Test run                     |Nil                           |Low      |Minimisation                             |

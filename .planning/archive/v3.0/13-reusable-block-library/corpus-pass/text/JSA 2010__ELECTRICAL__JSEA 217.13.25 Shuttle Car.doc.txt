@@ -1,0 +1,34 @@
+
+Shuttle car
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |Medium                                     |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Position the shuttle car in  |Moving machinery & pinch      |Low         |Training & instruction. Wear all PPE    |
+|the home position            |points                        |            |                                        |
+|Isolate the power and air    |Shocks, slips & stored energy |Medium      |Use all safe working procedures Wear all|
+|supplies                     |                              |            |PPE                                     |
+|Check all connections,       |Stored energy, shocks & pinch |Medium      |Use all safe working procedures Wear all|
+|sensors and damp for damage  |points                        |            |PPE                                     |
+|Blow out all drives & lube   |Flying objects, cuts          |Medium      |Use all safe working procedures Wear all|
+|all moving parts             |chemicals, slips              |            |PPE                                     |
+|Reconnect power and air      |Shocks, moving parts Pinch    |Medium      |Use all safe working procedures Wear all|
+|supplies and check all safety|points                        |            |PPE                                     |
+|circuits                     |                              |            |                                        |
+|Test all operations in the   |Moving machinery, pinch points|Low         |Training & Instruction Wear all PPE     |
+|manual mode                  |                              |            |                                        |
+|Return to operation in the   |Moving machinery & pinch      |Medium      |Use all safe working procedures Wear all|
+|auto mode                    |points                        |            |PPE                                     |
+

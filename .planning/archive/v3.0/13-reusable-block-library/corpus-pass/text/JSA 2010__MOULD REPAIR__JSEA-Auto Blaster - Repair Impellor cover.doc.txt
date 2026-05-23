@@ -1,0 +1,36 @@
+
+Auto Sandblaster ΓÇô Repair Impellor cover
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                              |Safety Induction [Contractor]             |                                        |
+|PPE Required:                  |Significant Hazard                        |JSA Reviewed by and date                |
+|Safety Glasses, Gloves, Welding|Yes                                       |Gary Russell 20/9/07                    |
+|Mask, Welding screen           |                                          |                                        |
+|                               |Risk Score                                |                                        |
+|                               |30                                        |                                        |
+|                               |                                          |                                        |
+|                               |Category                                  |                                        |
+|                               |Low                                       |                                        |
+|                               |                                          |                                        |
+|                               |Control taken                             |                                        |
+|                               |Minimisation                              |                                        |
+|                               |                                          |                                        |
+|Sequence of Job Steps          |Potential /                    |Level of |Controls to reduce the Risk of Hazard   |
+|                               |Actual Hazard                  |Risk     |                                        |
+|Isolate Machine                |Automatic equipment            |Low      |Ensure machine locked out using correct |
+|                               |                               |         |procedure                               |
+|Grind area free of paint       |Foreign objects                |Low      |Correct PPE                             |
+|                               |Sparks                         |         |Ensure no flammable materials in area   |
+|                               |Hot surface                    |         |Do not touch area with bare skin        |
+|Blow area down with air hose   |Dust                           |Low      |Correct PPE                             |
+|                               |Foreign objects in eyes        |         |When using air hose ensure pointing in  |
+|                               |                               |         |safe direction away from body           |
+|Weld Patch                     |Electrical shock               |Low      |Check cables and supply in good working |
+|                               |Hot surface                    |         |order                                   |
+|                               |Damage to eyes                 |         |Correct PPE                             |
+|                               |Sparks                         |         |Correct PPE (Welding mask) and screen to|
+|                               |                               |         |protect pedestrians                     |
+|                               |                               |         |Ensure no flammable materials in area   |
+|Re paint area                  |Flammable                      |Low      |Ensure no naked flames                  |

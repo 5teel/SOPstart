@@ -1,0 +1,30 @@
+
+Testing of Furnace gas emergency stops
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                          |Safety Induction [Contractor]                  |                                         |
+|PPE Required:              |Significant Hazard                             |JSA Reviewed by and date                 |
+|All standard PPE required  |Yes                                            |                                         |
+|                           |                                               |                                         |
+|                           |Overall Category of task                       |                                         |
+|                           |M                                              |                                         |
+|                           |                                               |                                         |
+|                           |Control taken                                  |                                         |
+|                           |minimisation                                   |                                         |
+|                           |                                               |                                         |
+|Sequence of Job Steps      |Potential /                    |Level of Risk |Controls to reduce the Risk of Hazard    |
+|                           |Actual Hazard                  |              |                                         |
+| Identify location of all  |Noise, Heat                    |L             |Wear PPE                                 |
+|emergency stops.           |                               |              |                                         |
+| Inform the Process        |Nil.                           |nil           |Nil.                                     |
+|Engineer on shift.         |                               |              |                                         |
+|Put gas into manual and set|Production of black smoke      |M             |Manually set gas PV to minimum.          |
+|to min PV.                 |                               |              |                                         |
+|Operate each Emergency stop|Noise, Heat, Production of     |M             |Wear PPE. Manually set gas PV to minimum.|
+|in turn and check          |black smoke.                   |              |                                         |
+|operation.                 |                               |              |                                         |
+|Return gas to computer     |Production of black smoke.     |M             |Manually bring gas PV back up to normal  |
+|control from manual.       |                               |              |value slowly before switching to         |
+|                           |                               |              |automatic/cascade.                       |

@@ -1,0 +1,99 @@
+
+
+
+Job Safety Environmental Analysis Form:
+                                                                     Crane
+                                                                     Operatio
+                                                                     ns
+
+|Area / Department                  |Factory Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots, High Vis/heat        |                                      |                                          |
+|Garment, Respiratory Protection    |Risk Score                            |                                          |
+|(when working with asbestos)       |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Operating a crane.       |Unsafe operating        |High     |Only the correct licensed and competent operators are to|
+|                         |practices.              |         |operate the crane.                                      |
+|Assess job requirements. |Injury, damage to crane |High     |Crane Driver and Rigger to determine crane capacity to  |
+|                         |or property if incorrect|         |lift load within SWL of crane.                          |
+|                         |assessments are not     |         |Assessment of lift to be carried out by Dogger.         |
+|                         |carried out.            |         |Check suitability of crane for the job.                 |
+|                         |Wrong size / type of    |         |Crane is able to work inside SWL at all times.          |
+|                         |crane leads to major    |         |                                                        |
+|                         |injuries and / or       |         |                                                        |
+|                         |damage.                 |         |                                                        |
+|Check assess to location.|Personnel in path of    |High     |Dogger to determine if traffic / people control is      |
+|                         |lift being injured.     |         |required for safety.                                    |
+|                         |                        |         |Notify other personnel in the vicinity of crane         |
+|                         |                        |         |operations.                                             |
+|Working near overhead    |Hazard does not exist on|High     |Rigger to inspect all lifting gear prior to use.        |
+|power lines.             |this project.           |         |Check is to include any rigging gear used in the lift.  |
+|                         |                        |         |All lifting gear must be within the SWL of the load.    |
+|                         |                        |         |All lifting gear is to be marked with the SWL.          |
+|Check communications.    |Misunderstood signal or |High     |Dogger and Operator to agree on communication method,   |
+|                         |bad communication could |         |which may be by hand signals.  If Dogger is in full view|
+|                         |lead to major injury.   |         |of the Operator, or by whistle / radio if line of vision|
+|                         |                        |         |is or can be broken.                                    |
+|                         |                        |         |Where conditions warrant it, a second Dogger may be used|
+|                         |                        |         |to communicate between Crane, Operator and Dogger.      |
+|                         |                        |         |Only one Dogger is to be in charge of the lift, but     |
+|                         |                        |         |anybody can stop the lift if they see danger.           |
+|                         |                        |         |Parties are to understand the communication method to be|
+|                         |                        |         |used.                                                   |
+|Slinging and hooking up  |Pinch or crushing       |High     |Crane Operator not to operate until instructed to by the|
+|the load.                |injuries to fingers or  |         |Dogger.                                                 |
+|                         |hands.                  |         |Keep hands and fingers well clear of all pinch and      |
+|                         |Strains and sprains.    |         |crushing points.                                        |
+|                         |Load slipping or        |         |Get help to lift heavy components.                      |
+|                         |dropping.               |         |Use correct manual handling procedure when lifting.     |
+|                         |                        |         |Ensure all hooks, slings, shackles and other lifting    |
+|                         |                        |         |gear is tight and securely fastened.                    |
+|                         |                        |         |Signal Crane Operator to take weight and check all      |
+|                         |                        |         |attachments.                                            |
+|Travelling, lifting and  |Load could cause injury |High     |Pre-check rout to be taken for obstructions or danger.  |
+|slewing load.            |to other personnel or   |         |Dogger to walk with load until clear of personnel, plant|
+|                         |damage to load or plant.|         |or obstructions.                                        |
+|                         |Items falling from      |         |If traversing with load in the air, ensure ground is    |
+|                         |height.                 |         |level and in good condition, and warn personnel in the  |
+|                         |Loosing control of load.|         |area.                                                   |
+|Lower load into position.|Hand and finger         |High     |Dogger to ensure that all personnel are clear of landing|
+|                         |injuries.               |         |area before starting to lower load.                     |
+|                         |Injuries to personnel in|         |Bring load into place in a controlled and safe manner.  |
+|                         |path of the load.       |         |If Dogger or Operator has any doubt about landing load, |
+|                         |                        |         |hold or retract load until safe to continue.            |
+|                         |                        |         |Never release load until it is secure or safe to be left|
+|                         |                        |         |unattached.                                             |
+|Housekeeping.            |Slip, trip, gall.       |Medium   |Return all rigging and lifting gear to the crane box as |
+|                         |Lost or damaged gear.   |         |soon as the job is done.                                |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

@@ -1,0 +1,47 @@
+
+Loading Mould Equipment onto Tray & Trolley
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                              |Safety Induction [Contractor]           |                                           |
+|PPE Required:                  |Significant Hazard                      |JSEA Reviewed by and date                  |
+|Safety Glasses, Gloves         |Yes                                     |17/8/08 Gary Russell                       |
+|                               |                                        |                                           |
+|                               |Risk Score                              |                                           |
+|                               |120                                     |                                           |
+|                               |                                        |                                           |
+|                               |Category                                |                                           |
+|                               |Medium                                  |                                           |
+|                               |                                        |                                           |
+|                               |Control taken                           |                                           |
+|                               |Minimisation                            |                                           |
+|                               |                                        |                                           |
+|Sequence of Job Steps          |Potential /                   |Level of |Controls to reduce the Risk of Hazard      |
+|                               |Actual Hazard                 |Risk     |                                           |
+|Lift mould equipment from box, |Entrapment of fingers         |Medium   |Position surface equipment is to lifted    |
+|trolley or tray                |Back strain                   |         |from or to as close as possible Optional   |
+|                               |Trip or falling               |         |back support if required Use correct manual|
+|                               |                              |         |handling procedures                        |
+|                               |                              |         |Ensure area clear of trip hazards          |
+|Lower mould equipment onto tray|Entrapment of fingers         |Medium   |Position surface equipment is to lifted    |
+|/ trolley                      |Back strain                   |         |from or to as close as possible Optional   |
+|                               |Trip or falling               |         |back support if required Use correct manual|
+|                               |                              |         |handling procedures                        |
+|                               |                              |         |Be aware of position of hands and fingers  |
+|                               |                              |         |when lowering equipment onto tray Ensure   |
+|                               |                              |         |area clear of trip hazards                 |
+|Environmental:                 |                              |         |                                           |
+|Removal of used rags / gloves/ |Contamination.                |High     |Place in correct contamination or waste    |
+|waste/ glass / cullet          |Waste removal and tidy up.    |         |bins provided.                             |
+|                               |                              |         |Ensure area is cleaned and product / tools |
+|                               |                              |         |cleared away.                              |
+|Protection & Security          |                              |         |                                           |
+|Demarcation                    |Damage to people, property and|High     |Demarcation where applicable.              |
+|                               |environment.                  |         |Install barricaded/danger tape as required.|
+|                               |                              |         |Ensure correct fire fighting equipment is  |
+|                               |                              |         |available.                                 |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

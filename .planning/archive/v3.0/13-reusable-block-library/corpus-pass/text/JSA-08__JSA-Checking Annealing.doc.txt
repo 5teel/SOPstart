@@ -1,0 +1,36 @@
+
+Checking Annealing
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSA Reviewed by and date                    |
+|All standard PPE required     |Yes                                  |                                            |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |10                                   |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |Low                                  |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps                 |Potential /           |Level of |Controls to reduce the Risk of Hazard    |
+|                                      |Actual Hazard         |Risk     |                                         |
+|Off the lehr - Take one bottle from   |Strain from over      |Low      |Bottles must be annealed prior to testing|
+|outside left row, one from middle row |reaching              |         |as they could shatter                    |
+|and one bottle from outside right row.|                      |         |                                         |
+|Bottles need to be cooled down prior  |Nil                   |Low      |Nil                                      |
+|to testing                            |                      |         |                                         |
+|Take bottles over to polariscope,     |Tripping              |Low      |When testing only use top and bottom     |
+|ensure bottom disc is in line with eye|                      |         |discs                                    |
+|piece and set to zero.                |                      |         |                                         |
+|Place one bottle directly under the   |Nil                   |Low      |Nil                                      |
+|eye piece looking for bright colouring|                      |         |                                         |
+|on the edges of the base              |                      |         |                                         |
+|Determine grading from colouring in   |Nil                   |Low      |Nil                                      |
+|the base, do likewise with other two  |                      |         |                                         |
+|bottles and discard into cullet belt, |                      |         |                                         |
+|place cover back on polariscope       |                      |         |                                         |

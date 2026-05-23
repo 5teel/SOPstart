@@ -1,0 +1,109 @@
+
+
+
+Job Safety Environmental Analysis Form:                          Working on
+                                                                     the
+                                                                     Roof
+
+|Area / Department                  |Factory Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots, High Vis/heat        |                                      |                                          |
+|Garment, Respiratory Protection    |Risk Score                            |                                          |
+|(when working with asbestos)       |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Go for a site safety     |                        |High     |                                                        |
+|induction. All           |                        |         |                                                        |
+|contractors and employess|                        |         |                                                        |
+|must be inducted. This   |                        |         |                                                        |
+|must take place prior to |                        |         |                                                        |
+|the commencement of work.|                        |         |                                                        |
+|Complete a permit to Work|                        |High     |Lay planks to make walkway.                             |
+|at Heights (ISO 214      |                        |         |                                                        |
+|06.05) and Hot Work      |                        |         |                                                        |
+|permit (if cutting or    |                        |         |                                                        |
+|welding is to take place)|                        |         |                                                        |
+|(ISO 214 06.04).         |                        |         |                                                        |
+|Develop an emergency plan|Being rescued and being |High     |Complete and follow the emergency plan ΓÇô refer to ISO   |
+|                         |able to be released and |         |214 06.05 ΓÇô Working at heights.                         |
+|                         |lowered safely and      |         |                                                        |
+|                         |promptly to ground in   |         |                                                        |
+|                         |the event of a fall.    |         |                                                        |
+|Protect area below from  |Injury to people below. |High     |Demarcate the area below by installing danger tape or by|
+|falling debris and       |                        |         |erecting barriers.                                      |
+|roofing material         |                        |         |                                                        |
+|Access on top of the roof|Falling through the roof|High     |Make use of catwalks and cat/roof ladders and roof      |
+|                         |sheets.                 |         |planks.                                                 |
+|                         |Note: The Fibrelite     |         |                                                        |
+|                         |roofing is very brittle,|         |The translucent plastic light roof sheets must NOT be   |
+|                         |and can easily crack and|         |walked on ΓÇô they are not designed for the weight of a   |
+|                         |break.                  |         |person.                                                 |
+|Secure safety ropes to   |Falling off the roof    |High     |Must have some secure anchorage for safety harness rope.|
+|anchor points            |                        |         |Wear full harness system and be roped to the anchor     |
+|                         |                        |         |point.                                                  |
+|Securing safety ropes to |Falling off the roof    |High     |Must have some secure anchorage for safety harness rope.|
+|purlins (an alternative  |                        |         |Must wear full harness system.  Connect ropes to purlins|
+|to anchor points)        |                        |         |and set up fall static line along ridge.                |
+|Crane up (and removing)  |Falling materials       |High     |Demarcate or protect the area below . See the JSAs on   |
+|roofing materials and    |injuring people below.  |         |lifting equipment.                                      |
+|planks.                  |                        |         |                                                        |
+|Must wear full harness   |Falling through the roof|High     |Walk on planks when moving iron.  Harness not considered|
+|when loosening and       |sheets.                 |         |practical when moving sheets to re-roof area.           |
+|removing roofing         |                        |         |                                                        |
+|Creating a catwalk       |Falling through the roof|High     |Lay planks two by tow.  Walk sheets across the main roof|
+|                         |sheets.                 |         |area. Screw plates to purlin.                           |
+|                         |                        |         |Wear harness if practical.                              |
+|Cutting and welding on   |Fire                    |High     |Obtain a Hot Work Permit and comply with the specified  |
+|the roof                 |                        |         |conditions.                                             |
+|                         |                        |         |No smoking is allowed on the roof ΓÇô cigarette butts     |
+|                         |                        |         |falling and the risk of fire                            |
+|Roof openings, skylights |Falling through the roof|High     |Securely cover the openings with planks.                |
+|and translucent/coloured |opening, skylight of    |         |                                                        |
+|plastic roof sheets.     |plastic roof sheet. .   |         |                                                        |
+|Working with asbestos    |Inhalation of asbestos  |High     |Must wear full respiratory protection, disposable       |
+|fibrelite sheeting       |particles. Risk of      |         |overalls.                                               |
+|                         |exposure to fibres      |         |                                                        |
+|                         |                        |         |Wrap asbestos in black polythene.                       |
+|                         |                        |         |                                                        |
+|                         |                        |         |Wet fibre with sprinkler.                               |
+|                         |                        |         |Crane off roof direct to bin.                           |
+|Super Six and corrugated |Falling through the roof|High     |These roofing materials are brittle.                    |
+|roofing ΓÇô no netting or  |sheets.                 |         |In most of the roofing on site there is no safety       |
+|underlay                 |                        |         |netting or underlay installed under the roof sheets.    |
+|                         |                        |         |Care must be taken as this may not be installed.        |
+|Smoking.                 |Fire                    |High     |No smoking is allowed on the roof ΓÇô cigarette butts     |
+|                         |                        |         |falling and the risk of fire.                           |
+|Clean up                 |Environmental. Debris   |High     |Remove all tools, waste, scrap and lose material. No    |
+|                         |can blow around or fall |         |debris is to be left on the roof.                       |
+|                         |off the roof.           |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

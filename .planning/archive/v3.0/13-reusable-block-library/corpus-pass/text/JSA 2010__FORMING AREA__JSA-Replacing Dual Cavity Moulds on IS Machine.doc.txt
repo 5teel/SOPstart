@@ -1,0 +1,75 @@
+
+Replacing Dual cavity moulds on IS Machine
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                                                                         |
+|Probability                       |INJURY                              |PLANT PROPERTY OR PROCESS DAMAGE    |
+|Likelihood that accident sequence |                                    |                                    |
+|will follow to.                   |                                    |                                    |
+|Common or frequent occurrence     |Fatality or permanent disability    |More than 1 million, Major          |
+|                                  |                                    |disruption of activities            |
+|Is known to have happened         |Multiple lost time injury with      |$500,000 to $1 million              |
+|                                  |hospital admissions                 |                                    |
+|Could occur                       |Single Lost time injury             |$100,000 to $500,000                |
+|Not likely to occur               |Medical Treatment Injury or         |$1000 to $100,000                   |
+|                                  |restricted work                     |                                    |
+|Practically impossible            |First Aid injury                    |Up to $1000                         |
+|                                  |                                    |                                    |
+|                                  |QUALITY                             |ENVIRONMENTAL                       |
+|                                  |Major product recall with adverse   |Confined to immediate work area,    |
+|                                  |publicity and major customer claim  |rapid clean up no damage to         |
+|                                  |                                    |environment                         |
+|                                  |Minor product recall with adverse   |Confined to specific area, rapid    |
+|                                  |publicity resulting in minor claim  |clean up little damage to           |
+|                                  |                                    |environment                         |
+|                                  |Minor product recall with major     |Confined to local environment,      |
+|                                  |resort of product                   |naturally recoverable, moderate     |
+|                                  |                                    |clean up                            |
+|                                  |Minor product recall with minor     |Considerable clean up on site as    |
+|                                  |resort of product                   |well as external resources involved |
+|                                  |                                    |& extends past boundaries           |
+|                                  |Customer compliant and no resort of |Regional scale, extensive clean up  |
+|                                  |product required                    |and long recovery                   |
+
+
+|CONSEQUENCES                                                                                 |
+|PROBABILITY    |INSIGNIFICANT    |MINOR            |MODERATE         |MAJOR            |EXTREME             |
+|               |1                |2                |3                |4                |5                   |
+|almost certain            |H                        |H                          |E                            |
+
+                                  Replacing Dual cavity moulds on IS Machine
+|Area / Department            |Forming                                    |Task  or Job Description                |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |Moderate                                   |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Stop and isolate the section.|Nil                           |Nil         |Read JSA for stopping section           |
+|Activate the kick valves for |                              |            |                                        |
+|mould open/close             |                              |            |                                        |
+|Get into position on the     |Fall from machine, Manual     |Extreme     |Training skills required before doing   |
+|machine in order to work     |handling. Sprains, Heat ΓÇô     |            |task, warming up before lifting gear.   |
+|safely, Close Moulds and     |Burns.                        |            |Use lifting gear if necessary           |
+|attach lifters.              |                              |            |                                        |
+|Open mould and disconnect the|Fall from machine, Manual     |Extreme     |Reposition the hoses closer towards you |
+|hoses.                       |handling. Sprains, Heat ΓÇô     |            |to reduce heat exposure.                |
+|                             |Burns.                        |            |                                        |
+|Remove moulds                |Sprains & Strains. Burns,     |Extreme     |Use correct lifting techniques when     |
+|                             |Falls/Trips                   |            |replacing moulds. Awareness of the      |
+|                             |                              |            |length of time that the task takes      |
+|Replace with new mould       |Sprains & Strains. Burns,     |Extreme     |Use correct lifting techniques when     |
+|                             |Falls/Trips                   |            |replacing moulds. Awareness of the      |
+|                             |                              |            |length of time that the task takes      |
+|Reconnect hoses, close moulds|Fall from machine, Manual     |Extreme     |Reposition the hoses closer towards you |
+|and remove lifters           |handling. Sprains, Heat ΓÇô     |            |to reduce heat exposure.                |
+|                             |Burns.                        |            |                                        |
+
+

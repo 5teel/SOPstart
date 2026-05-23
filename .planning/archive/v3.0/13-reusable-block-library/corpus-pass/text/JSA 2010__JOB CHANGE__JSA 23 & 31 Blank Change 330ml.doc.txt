@@ -1,0 +1,41 @@
+
+ISO 219.01.05       #23, 31 Blank Change 330ml
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes or No                                  |June 2009                               |
+|when working within          |                                           |                                        |
+|production area              |Overall Category of task                   |                                        |
+|                             |Medium                                     |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Make section Safe. Safety    |Caught in Section. Reduce the |High        |Ensure Maintenance stop button is       |
+|lock outs for blanks         |risk of being caught in the   |            |activated and light is on before        |
+|                             |section                       |            |entering section. Turn Blank Close      |
+|                             |                              |            |operating air off under valve chest.    |
+|Invert safety bar  and ensure|Reduce the risk of being      |High        |Place Invert safety lock over Invert    |
+|working safely.              |caught in the section Baffle  |            |rack so that lock sits down on the top  |
+|                             |Arm                           |            |of the invert mechanism Be aware of     |
+|                             |                              |            |baffle arm coming off on the adjacent   |
+|                             |                              |            |section.                                |
+|Prepare Blanks for Lifting.  |Back Strain                   |High        |Fit tee screw lifters to the blanks or  |
+|                             |                              |            |use thick gloves to lift the Blank from |
+|                             |                              |            |the hinge.                              |
+|Remove Blanks                |Caught in Section. / Back     |High        |Get into a comfortable lifting position |
+|                             |strain                        |            |that suits. Reducing lowering and       |
+|                             |                              |            |twisting while lifting.  Remove Blanks, |
+|                             |                              |            |wearing a back support belt optional.   |
+|Fit clean blanks             |Caught in Section. / Back     |High        |Get into a comfortable lifting position |
+|                             |strain                        |            |that suits. Reducing lowering and       |
+|                             |                              |            |twisting while lifting.  Refit Blanks   |
+|Prepare Section to start.    |Caught in Section.            |High        |Turn on Blank close air and remove      |
+|                             |                              |            |Invert safety lock.                     |
+|Starting the section         |Caught in Section.            |High        |Ensure all personnel are clear of the   |
+|                             |                              |            |section.  Start the section up          |

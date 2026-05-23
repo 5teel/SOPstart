@@ -1,0 +1,28 @@
+
+Cleaning /Scraping Carbon from Mould Tops
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                |Safety Induction [Contractor]         |                                       |
+|PPE Required:                    |Significant Hazard                    |JSA Reviewed by and date               |
+|Standard Safety Uniform plus     |NO                                    |Ian Johnston 30/07/12                  |
+|Safety goggles(full face).       |                                      |                                       |
+|Gloves, Hearing Protection.      |Risk Score                            |                                       |
+|                                 |4                                     |                                       |
+|                                 |                                      |                                       |
+|                                 |Category                              |                                       |
+|                                 |low                                   |                                       |
+|                                 |                                      |                                       |
+|                                 |Control taken                         |                                       |
+|                                 |Minimisation                          |                                       |
+|                                 |                                      |                                       |
+|Sequence of Job Steps      |Potential /                     |Level of    |Controls to reduce the Risk of Hazard   |
+|                           |Actual Hazard                   |Risk        |                                        |
+|Isolate Mould/Blank on     |Manual Handling/Heavy           |Low         |Follow correct Handling procedures.     |
+|Bench.                     |                                |            |                                        |
+|Scrape Carbon with Tool    |Loose flying debris in eyes     |Low         |Point Scraper is safe direction away    |
+|/Scraper provided          |Ingression of particles trough  |            |from body and people.                   |
+|                           |skin                            |            |                                        |
+|                           |Noise                           |            |                                        |

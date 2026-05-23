@@ -1,0 +1,38 @@
+
+Change Blank 3/4MC
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |                                        |
+|All standard PPE required    |Yes                                        |JSA Reviewed by and date                |
+|when working within          |                                           |                                        |
+|production area.             |Overall Category of task                   |                                        |
+|                             |LOW                                        |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|                             |                              |            |                                        |
+|Stop the Gob & unload section|NIL                           |NIL         |NIL                                     |
+|                             |                              |            |                                        |
+|Stop Section                 |NIL                           |NIL         |NIL                                     |
+|                             |                              |            |                                        |
+|Remove old Blanks            |Arms caught if burns from hot |LOW         |Use T-Bar                               |
+|                             |blank                         |            |Use Blue Gloves & Tube Sock             |
+|                             |                              |            |                                        |
+|Place new Blanks             |Arms caught if burns from hot |LOW         |Use T-Bar                               |
+|                             |blank                         |            |Use Blue Gloves & Tube Sock             |
+|                             |                              |            |                                        |
+|Start-up section             |NIL                           |NIL         |NIL                                     |
+|                             |                              |            |                                        |
+|Load Gob                     |NIL                           |NIL         |NIL                                     |
+|                             |                              |            |                                        |
+|Check cavity & load into lehr|NIL                           |NIL         |NIL                                     |
+|if OK                        |                              |            |                                        |
+
+

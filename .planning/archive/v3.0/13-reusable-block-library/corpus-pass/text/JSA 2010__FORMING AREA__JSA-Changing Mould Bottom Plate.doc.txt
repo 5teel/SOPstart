@@ -1,0 +1,39 @@
+
+Changing Mould Bottom Plate.
+                            AZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                            |Safety Induction [Contractor]         |                                           |
+|PPE Required:                |Significant Hazard                    |JSA Reviewed by and date                   |
+|All standard PPE required    |Yes                                   |                                           |
+|                             |                                      |                                           |
+|                             |Risk Score                            |                                           |
+|                             |50                                    |                                           |
+|                             |                                      |                                           |
+|                             |Category                              |                                           |
+|                             |Medium                                |                                           |
+|                             |                                      |                                           |
+|                             |Control taken                         |                                           |
+|                             |Minimisation                          |                                           |
+|                             |                                      |                                           |
+|Sequence of Job Steps        |Potential /                   |Level  |Controls to reduce the Risk of Hazard      |
+|                             |Actual Hazard                 |of Risk|                                           |
+|Take new plate to machine    |Back Strain                   |Low    |Proper lifting technique and use the       |
+|                             |                              |       |correct lifting tools                      |
+|Stop Section                 |Nil                           |Low    |Follow set procedure for shutting section  |
+|Remove Mould to be replaced  |Back Strain, bruising & burns |Medium |Proper lifting technique and use the       |
+|from machine                 |                              |       |correct lifting tools. Be aware of moving  |
+|                             |                              |       |parts on adjacent sections and the hot     |
+|                             |                              |       |bottles on machine conveyor                |
+|Place new moulds on machine  |Back Strain, bruising & burns |Low    |Proper lifting technique and use the       |
+|                             |                              |       |correct lifting tools. Be aware of moving  |
+|                             |                              |       |parts on adjacent sections and the hot     |
+|                             |                              |       |bottles on machine conveyor                |
+|Restart section              |Nil                           |Low    |Follow set procedure for starting section  |
+|Check bottles for quality    |Glass exploding due to        |Medium |Ensure that safety glasses on securely     |
+|before putting into Lehr     |unannealed ware               |       |fitted                                     |
+|Place old mould from machine |Back & Shoulder Strain        |Low    |Use correct lifting technique and tools    |
+|onto tray                    |                              |       |                                           |
+|Update mould number on the   |Nil                           |Low    |Nil                                        |
+|MOA,PIC and Worksheet        |                              |       |                                           |

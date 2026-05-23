@@ -1,0 +1,60 @@
+
+
+
+Job Safety Environmental Analysis Form:
+                                                                     Changing
+                                                                      Blanks
+
+|Area / Department                  |Forming                               |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots/Clothing.             |                                      |                                          |
+|                                   |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Identify the blank to be |Bottles are hot out of  |High     |Use tongs and gloves.                                   |
+|changed.                 |the machine.            |         |                                                        |
+|Obtain a clean set of    |Blanks are hot, strains.|High     |Use blank lifting equipment provided and gloves.  Lift  |
+|blanks from the mould    |                        |         |with caution, blank might be heavy.                     |
+|oven.                    |                        |         |                                                        |
+|Check if the blank is the|Blanks are hot.         |High     |Gloves are to be worn at all times when handling the    |
+|right one for the job.   |                        |         |blanks.                                                 |
+|Put section into         |Entrapment, burns.      |High     |Wear gloves, use all safety devices provided.           |
+|maintenance stop.        |                        |         |                                                        |
+|Remove damaged blanks off|Entrapment, burns,      |High     |Make sure all safety devices are in place, wear gloves, |
+|the hinges.              |strains.                |         |correct lifting device should be used.                  |
+|Install clean blanks to  |Entrapment, burns,      |High     |Make sure all safety devices are in place, wear gloves, |
+|the section.             |strains.                |         |correct lifting device should be used.                  |
+|Return section back to   |Entrapment, burns.      |High     |Make sure all safety devices are taken out before       |
+|normal operation.        |                        |         |starting the section, keep clear of moving parts.       |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

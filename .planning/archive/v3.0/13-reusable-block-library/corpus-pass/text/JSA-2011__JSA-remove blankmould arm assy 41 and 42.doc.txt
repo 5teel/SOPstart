@@ -1,0 +1,57 @@
+
+Removing Blank Mould Arm Assembly 41 -42
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                 |Safety Induction [Contractor]                                                               |
+|                              |Insignificant ΓÇô first aid injury, up  |
+|                              |to $1,000 damage, spill confined to   |
+|LIKELIHOOD                    |immediate work area, rapid clean up,  |
+|                              |no damage to environment              |
+|How likely is it to happen?   |                                      |
+|4                             |ACT NOW ΓÇô Urgent ΓÇô do something about |
+|ACUTE                         |the risks immediately. Requires       |
+|                              |immediate attention.                  |
+|3                             |Highest management decision is        |
+|HIGH                          |required urgently                     |
+|2                             |Follow management instruction         |
+|MODERATE                      |                                      |
+|1                             |OK for now. Record and review if any  |
+|LOW                           |equipment / people / materials / work |
+|                              |processes or procedures change        |
+                                    Removing Blank Mould Arm Assembly 41 -42
+|Area / Department             |Production Maintenance                      |Task  or Job Description                 |
+|PPE Required:                 |Significant Hazard                          |JSA Reviewed by and date                 |
+|All standard PPE required     |Yes or No                                   |Colin Hayes                              |
+|                              |                                            |John Holmes Libbis                       |
+|                              |Overall Category of task                    |                                         |
+|                              |                                            |                                         |
+|                              |                                            |                                         |
+|                              |Control taken                               |                                         |
+|                              |                                            |                                         |
+|                              |                                            |                                         |
+|Sequence of Job Steps         |Potential /                      |Level of |Controls to reduce the Risk of Hazard    |
+|                              |Actual Hazard                    |Risk     |                                         |
+|ALWAYS follow all plant safety|                                 |         |                                         |
+|procedures                    |                                 |         |                                         |
+|Remove the Deflectors         |Pinch point, noise, broken glass,|1        |Correct P.P.E                            |
+|                              |slippery surface, risk of person |         |                                         |
+|                              |falling.                         |         |                                         |
+|Remove the Baffles/Arm, Baffle|Pinch point, noise, broken glass,|1        |Correct P.P.E                            |
+|Air Manifold Assembly and     |slippery surface, risk of person |         |                                         |
+|Pantograph Arm.               |falling.                         |         |                                         |
+|Remove the Blanks             |Pinch point, risk of entrapment, |1        |Correct P.P.E                            |
+|                              |hot surface, noise               |         |                                         |
+|Remove the Links and Link Pin | Pinch point, risk of entrapment,|1        |Correct P.P.E                            |
+|Assemblies                    |hot surface, noise               |         |                                         |
+|Remove the Spring Dampers     |noise                            |1        |Correct P.P.E                            |
+|Remove the Anti-Deflection    |noise                            |1        |Correct P.P.E                            |
+|Bracket                       |                                 |         |                                         |
+|Close the Blank-mould Arm by  | Noise, pinch point, risk of     |1        |Correct P.P.E                            |
+|hand.                         |entrapment, broken glass, manual |         |                                         |
+|                              |handling                         |         |                                         |
+|Attach the lifting fixture    |noise                            |1        |Correct P.P.E                            |
+|(OIS-42-1731-0)               |                                 |         |                                         |
+|Remove the Blank-mould Arm    |Risk of entrapment, pinch point, |2        |ELIMINATION- consider new hoist system   |
+|using an overhead hoist       |moving parts, manual handling    |         |                                         |

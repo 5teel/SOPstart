@@ -1,0 +1,46 @@
+
+Alkaline Tank - Workshop
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                |Safety Induction [Contractor]         |                                          |
+|PPE Required:                    |Significant Hazard                    |JSEA Reviewed by and date                 |
+|Standard Safety Uniform plus     |Yes                                   |Gary Russell 16/7/07                      |
+|Safety glasses, Face shield, Hat |                                      |                                          |
+|or Cap, Rubber gauntlet gloves   |Risk Score                            |                                          |
+|                                 |120                                   |                                          |
+|                                 |                                      |                                          |
+|                                 |Category                              |                                          |
+|                                 |Low                                   |                                          |
+|                                 |                                      |                                          |
+|                                 |Control taken                         |                                          |
+|                                 |Minimisation                          |                                          |
+|                                 |                                      |                                          |
+|Sequence of Job Steps            |Potential /               |Level of    |Controls to reduce the Risk of Hazard      |
+|                                 |Actual Hazard             |Risk        |                                           |
+|Load Basket                      |Overloading of basket     |Medium      |Load single layer only in basket           |
+|                                 |Back strain               |            |Wear Back support                          |
+|                                 |Trapping or crushing of   |            |Correct manual handling procedures         |
+|                                 |fingers / hands           |            |                                           |
+|Place basket in cleaning tank    |Swinging basket           |Low         |Follow correct procedure for operating     |
+|                                 |Splashes to face body     |            |hoist                                      |
+|                                 |                          |            |Required PPE                               |
+|Remove to hot water rinse        |Swinging basket           |Low         |Follow correct procedure for operating     |
+|                                 |Splashes to face body     |            |hoist                                      |
+|                                 |                          |            |Required PPE                               |
+|Environmental:                  |                          |            |                                           |
+|Removal of used rags / gloves/  |Contamination.            |High        |Place in correct contamination or waste    |
+|waste/ glass / cullet           |Waste removal and tidy up.|            |bins provided.                             |
+|                                |                          |            |Ensure area is cleaned and product / tools |
+|                                |                          |            |cleared away.                              |
+|Protection & Security           |                          |            |                                           |
+|Demarcation                     |Damage to people, property|High        |Demarcation where applicable.              |
+|                                |and environment.          |            |Install barricaded/danger tape as required.|
+|                                |                          |            |Ensure correct fire fighting equipment is  |
+|                                |                          |            |available.                                 |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

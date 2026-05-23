@@ -1,0 +1,33 @@
+
+Installing wind cooling on the furnace crown.
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                          |Safety Induction [Contractor]                  |x                                        |
+|PPE Required:              |Significant Hazard                             |JSA Reviewed by and date                 |
+|All standard PPE required  |Yes                                            |                                         |
+|                           |                                               |                                         |
+|                           |Overall Category of task                       |                                         |
+|                           |M                                              |                                         |
+|                           |                                               |                                         |
+|                           |Control taken                                  |                                         |
+|                           |Minimisation                                   |                                         |
+|                           |                                               |                                         |
+|Sequence of Job Steps      |Potential /                    |Level of Risk |Controls to reduce the Risk of Hazard    |
+|                           |Actual Hazard                  |              |                                         |
+|Cut hole in wind cooling   |Heat, noise, power tools,      |M             |Wear PPE. Limit continuous working time, |
+|duct.                      |manual handling.               |              |take regular breaks and drink plenty of  |
+|                           |                               |              |water/electrolytes.                      |
+|Attach take-off.           |Heat, noise, manual handling.  |M             |Wear PPE. Limit continuous working time, |
+|                           |                               |              |take regular breaks and drink plenty of  |
+|                           |                               |              |water/electrolytes.                      |
+|Weld support brackets.     |Heat, noise, manual handling,  |M             |Wear PPE. Limit continuous working time, |
+|                           |welder.                        |              |take regular breaks and drink plenty of  |
+|                           |                               |              |water/electrolytes.                      |
+|Connect ducts.             |Heat, noise, manual handling.  |M             |Wear PPE. Limit continuous working time, |
+|                           |                               |              |take regular breaks and drink plenty of  |
+|                           |                               |              |water/electrolytes.                      |
+|Connect box.               |Heat, noise, manual handling.  |M             |Wear PPE. Limit continuous working time, |
+|                           |                               |              |take regular breaks and drink plenty of  |
+|                           |                               |              |water/electrolytes.                      |

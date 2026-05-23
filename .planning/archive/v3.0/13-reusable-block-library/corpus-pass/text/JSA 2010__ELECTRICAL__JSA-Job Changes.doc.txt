@@ -1,0 +1,33 @@
+
+Job Changes
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |High                                       |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Engineering                                |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Stop ware. Clear FP and      |Cuts, moving parts & pinch    |High        |Use all safe working procedures Wear all|
+|remove broken glass          |points                        |            |PPE                                     |
+|Strip machine cage, replace  |Lifting Manual handling &     |High        |Use all safe working procedures Wear all|
+|segments                     |slips                         |            |PPE Care with lifting                   |
+|Set height and guide rails & |Moving parts, pinch points and|High        |Use all safe working procedures Wear all|
+|adjust plug gauger           |falling objects               |            |PPE                                     |
+|Set up auxiliary gauges      |Cuts                          |High        |Use all safe working procedures Wear all|
+|                             |                              |            |PPE                                     |
+|Test run samples and set the |Moving parts & cuts           |High        |Use all safe working procedures Wear all|
+|reject levels                |                              |            |PPE                                     |
+|Run ware through the line    |Rotating parts, pinch points &|High        |Use all safe working procedures Wear all|
+|                             |cuts                          |            |PPE                                     |
+|Check all safetyΓÇÖs are       |Shock & moving parts          |High        |Use all safe working procedures Wear all|
+|operating                    |                              |            |PPE                                     |
+

@@ -1,0 +1,34 @@
+
+Replace Wheels on Tank 2 Cullet Drag
+                            HAZARD IDENTIFICATION
+|1                                                                       |
+|1                                                                       |
+|1                              |Safety Induction [Contractor]        |                                          |
+|PPE Required:                  |Significant Hazard                   |JSA Reviewed by and date                  |
+|Standard PPE plus high vis,    |Yes / No                             |F OΓÇÖKeefe 11/05/07                        |
+|gumboots, hard hat, batt phone |                                     |                                          |
+|                               |Risk Score                           |                                          |
+|                               |125                                  |                                          |
+|                               |                                     |                                          |
+|                               |Category                             |                                          |
+|                               |Medium                               |                                          |
+|                               |                                     |                                          |
+|                               |Control taken                        |                                          |
+|                               |Minimisation                         |                                          |
+|                               |                                     |                                          |
+|Sequence of Job Steps    |Potential /                         |Level of  |Controls to reduce the Risk of Hazard |
+|                         |Actual Hazard                       |Risk      |                                      |
+|Phone Hot End Supervisor |Glass coming down from top causing  |H         |Inform Operator                       |
+|                         |burns                               |          |Communication                         |
+|Drain water              |Slipping or hitting head.  Due to   |H         |Ensure area had adequate lighting, or |
+|                         |inadequate lighting and water in the|          |use torches.                          |
+|                         |area                                |          |                                      |
+|Bring bucket to middle   |Machine starting up causing         |H         |Isolate machine                       |
+|                         |entrapment                          |          |                                      |
+|Lift counter weight      |Strains                             |M         |Keep clear of cullet chute            |
+|                         |Burns                               |          |                                      |
+|Unbolt side plate and    |Slipping on greasy surface causing  |M         |Clean work area                       |
+|change wheels            |injury to hands                     |          |Use correct sized spanner             |
+|Fire Protection          |Fire Hazard                         |H         |Ensure correct fire fighting equipment|
+|                         |                                    |          |is available ΓÇô Hot Work Permit        |
+|                         |                                    |          |required ISI 214.06.04                |

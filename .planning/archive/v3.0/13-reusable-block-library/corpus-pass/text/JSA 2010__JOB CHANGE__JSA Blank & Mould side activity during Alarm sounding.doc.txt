@@ -1,0 +1,30 @@
+
+Blank and Mould side activity while Hot Gob Alarm (Siren) is on
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |June 2009                               |
+|when working within          |                                           |                                        |
+|production area              |Overall Category of task                   |                                        |
+|                             |Medium                                     |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps      |Potential /                |Level of Risk |Controls to reduce the Risk of Hazard      |
+|                           |Actual Hazard              |              |                                           |
+|Mould side procedure       |burns                      |High          |Stay out of the sections. The safety line  |
+|                           |                           |              |is governed by the Takeout mechanism. No   |
+|                           |                           |              |body parts past the centre line of the     |
+|                           |                           |              |takeout mechanism whilst the Hot Gob Alarm |
+|                           |                           |              |is activated.                              |
+|                           |                           |              |You can work on the machine conveyor and   |
+|                           |                           |              |takeout arms.                              |
+|                           |burns                      |High          |Stay out of the section. The safety line is|
+|Blank side procedure       |                           |              |governed by the over head platform, No body|
+|                           |                           |              |parts past the platform edge closest to the|
+|                           |                           |              |machine whilst the Hot Gob Alarm is        |
+|                           |                           |              |activated.                                 |

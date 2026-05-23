@@ -1,0 +1,32 @@
+
+Filter Element Replacement on Fans
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required: All PPE           |Significant Hazard                     |JSA Reviewed by and date                |
+|                                |No                                     |C Sheppard   11/06/07                   |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |12.5                                   |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard              |
+|                         |Actual Hazard           |Risk     |                                                   |
+|Undo frame               |Hot environment         |Low      |Ensure that all PPE is worn to prevent injury to   |
+|                         |                        |         |self                                               |
+|Remove element           |Noise, Pinch points     |High     |Care while undoing element                         |
+|Filters                  |Air bore contaminants   |Low      |Dust mask                                          |
+|Replace element          |Risk of falling         |Low      |Tie rope on top of ladder.  Make sure rubber grips |
+|                         |                        |         |on bottom of feet of the step ladder are in good   |
+|                         |                        |         |condition. The Ladder must be compliant to use ΓÇô   |
+|                         |                        |         |check the date on the ladder                       |
+|Replace frame            |Hot environment         |Low      |Gloves PPE                                         |
+|Use scissor or step      |Trip hazard             |Low      |                                                   |
+|ladder ΓÇô due to access   |                        |         |                                                   |

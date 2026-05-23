@@ -1,0 +1,44 @@
+
+Topping up pallets of missing Bottles
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety Glasses. Gloves.         |Yes                                    |Gary OΓÇÖNeill  12/06/07                  |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |40                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                     |Potential /             |Level of Risk |Controls to reduce the Risk  |
+|                                          |Actual Hazard           |              |of Hazard                    |
+|Identify pallet to be topped up with      |Nil                     |Low           |Nil                          |
+|containers                                |                        |              |                             |
+|Inform Supervision if a trend becomes     |Nil                     |Low           |Nil                          |
+|apparent ie missing bottle always from the|                        |              |                             |
+|same line                                 |                        |              |                             |
+|Collect an appropriate number of bottles  |Nil                     |Low           |Nil                          |
+|from the affected line AFTER INSPECTION.  |                        |              |                             |
+|This will ensure the integrity of the     |                        |              |                             |
+|containers used for top up regarding      |                        |              |                             |
+|colour & defect                           |                        |              |                             |
+|Carefully cut the plastic shroud around   |Broken glass causing    |Low           |Ensure PPE worn when handling|
+|the area of missing ware on the pallet    |laceration              |              |glass containers             |
+|Carefully insert the containers into the  |Laceration / damage to  |Low           |Ensure PPE worn when handling|
+|pack to fill in the voids on the pallet   |ware                    |              |glass containers. Ensure that|
+|                                          |                        |              |the customers product is not |
+|                                          |                        |              |damaged                      |
+|Cut a piece of plastic to cover the hole  |Broken glass causing    |Low           |Ensure PPE worn when handling|
+|previously cut                            |laceration              |              |glass containers             |
+|Using an LPG Gas Gun , seal the patch onto|Burns from using the gas|Low           |Check that the Gas Gun has a |
+|the pallet                                |gun plus poor control   |              |current Hot Work Permit and  |
+|NB in some cases a completely new shroud  |may cause a Fire Hazard |              |Fire extinguisher is to hand.|
+|will have to be put over the pallet       |                        |              |                             |

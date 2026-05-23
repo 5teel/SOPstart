@@ -1,0 +1,58 @@
+
+Drive Unit Reamer
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                           |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date                  |
+|Standard PPE only               |Yes                                    |Gary Russell  12/06/07                     |
+|                                |                                       |Fran OΓÇÖKeefe  12/06/07                     |
+|                                |Risk Score                             |                                           |
+|                                |100                                    |                                           |
+|                                |                                       |                                           |
+|                                |Category                               |                                           |
+|                                |Medium                                 |                                           |
+|                                |                                       |                                           |
+|                                |Control taken                          |                                           |
+|                                |Minimisation                           |                                           |
+|                                |                                       |                                           |
+|Sequence of Job Steps      |Potential /               |Level of  |Controls to reduce the Risk of Hazard             |
+|                           |Actual Hazard             |Risk      |                                                  |
+|Lift Moulds onto unit      |Dropping the mould        |Med       |Check for slippery surfaces on the Mould          |
+|                           |equipment causing crush   |          |equipment. Ensure using the correct lifting       |
+|                           |injury to body. Lifting   |          |procedures and safety footwear to be worn         |
+|                           |and twisting movement     |          |                                                  |
+|                           |causing back strain       |          |                                                  |
+|Load job into Reamer Cutter|Crushing and or entrapment|Med       |Keep Hand clear from pinch points on mould        |
+|                           |of the hand               |          |equipment                                         |
+|                           |                          |          |Emergency stop fitted                             |
+|Close Reamer Arms          |Crushing and or entrapment|Low       |Keep Hand clear from pinch points on Reamer Arms  |
+|                           |of the hand               |          |Emergency stop fitted                             |
+|Start Reamer Cycle         |Crushing of the hand      |Low       |Keep Hand clear and away from the Reamer while in |
+|                           |                          |          |the working cycle  Emergency stop fitted          |
+|Open Reamer after cycle    |Crushing  of the hand     |Low       |Keep Hand clear from pinch points on Reamer Arms. |
+|                           |                          |          |Emergency stop fitted                             |
+|Lift Mould onto Trolley    |Dropping the mould        |Med       |Check for slippery surfaces on the Mould          |
+|                           |equipment causing crush   |          |equipment. Ensure using the correct lifting       |
+|                           |injury to body. Lifting   |          |procedures and safety footwear to be worn         |
+|                           |and twisting movement     |          |                                                  |
+|                           |causing back strain       |          |                                                  |
+|Environmental:            |                          |          |                                                  |
+|Removal of used rags /    |Contamination.            |High      |Place in correct contamination or waste bins      |
+|gloves/  waste/ glass /   |Waste removal and tidy up.|          |provided.                                         |
+|cullet                    |                          |          |Ensure area is cleaned and product / tools cleared|
+|                          |                          |          |away.                                             |
+|Protection & Security     |                          |          |                                                  |
+|Demarcation               |Damage to people, property|High      |Demarcation where applicable.                     |
+|                          |and environment.          |          |Install barricaded/danger tape as required.       |
+|                          |                          |          |Ensure correct fire fighting equipment is         |
+|                          |                          |          |available.                                        |
+
+
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

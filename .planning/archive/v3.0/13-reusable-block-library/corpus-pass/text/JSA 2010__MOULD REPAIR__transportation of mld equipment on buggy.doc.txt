@@ -1,0 +1,188 @@
+
+Instructions for the process
+   1. Tick the Hazards involved with the task or area
+   2. Use the hazard template scoring sheet to work out the Risk score
+   3. Complete a Job Safety Analysis sheet
+
+                            HAZARD IDENTIFICATION
+
+|1  |Risk of Entrapment           |(  |22 |Electricity [Power Tools]  |   |
+|2  |Pinch Points                 |(  |23 |Stored energy              |   |
+|3  |Moving Parts                 |(  |24 |Working on/near live       |   |
+|   |                             |   |   |Equipment                  |   |
+|4  |Rotating Parts               |   |25 |Electrocution              |   |
+|5  |Cutting                      |   |26 |Work with Cherry Picker    |   |
+|   |                             |   |   |/Forklift Cage             |   |
+|6  |Moving Machinery             |(  |27 |Confined Space             |   |
+|7  |Automatic equipment          |   |28 |Isolated workplace location|   |
+|8  |Manual Handling              |(  |29 |Work above 3 metres        |   |
+|9  |Risk of falling objects      |(  |30 |Pressurised Fluid          |   |
+|10 |Excessively hot environment  |   |31 |Abrasion to Skin / Eye     |   |
+|11 |Excessively cold environment |   |32 |Spill to site drainage     |   |
+|12 |Noise                        |   |33 |Spill to Stormwater        |   |
+|13 |Slippery surface             |   |34 |Odour or Emissions         |   |
+|14 |Tripping hazard              |   |35 |Soil Contamination         |   |
+|15 |Risk of person falling       |   |36 |Airborne Contaminants      |   |
+|16 |Lighting                     |   |37 |Hazardous explosive        |   |
+|   |                             |   |   |Substances                 |   |
+|17 |Broken or smashed glass      |   |38 |Hazardous corrosive        |   |
+|   |                             |   |   |Substances                 |   |
+|18 |Ventilation                  |   |39 |Hazardous toxic Substances |   |
+|19 |Fire Hazard                  |   |40 |Flammable liquids          |   |
+|20 |Fragile roof support         |   |41 |High Gas Reading           |   |
+|21 |Limited working area         |   |42 |Other hazards              |   |
+|SAFETY /  ENVIRONMENTAL / PPE REQUIREMENTS                              |
+|1  |Hard Hat                     |   |8  |Face Shield                |   |
+|2  |Gloves                       |(  |10 |Disposable Clothing        |   |
+|3  |Breathing Apparatus          |   |11 |Harness                    |   |
+|4  |Goggles                      |   |12 |MSDS                       |   |
+|5  |Hearing protection           |   |13 |Spill Kit                  |   |
+|6  |Fire Extinguisher            |   |14 |Bunding                    |   |
+|7  |Safety Glasses               |(  |15 |Council Notification       |   |
+|PERMIT REQUIREMENTS                                                     |
+|1  |Safety Induction [Contractor]|   |5  |Hot work                   |   |
+|2  |Safety Agreement Completed   |   |6  |Confined Space             |   |
+|3  |Work at Heights              |   |7  |Excavation                 |   |
+|4  |High Voltage                 |   |8  |Group Isolation            |   |
+
+
+|FACTOR          |INJURY                           |DAMAGE                |ENVIRONMENTAL      |QUALITY            |RATES |
+|Consequence.    |Numerous fatalities              |More than 1 million,  |Major off site     |Major product      |100   |
+|Most probably   |                                 |Major disruption of   |impact and clean up|recall with adverse|      |
+|result of the   |                                 |activities            |with adverse       |publicity and major|      |
+|potential       |                                 |                      |publicity          |customer claim     |      |
+|accident /event |                                 |                      |                   |                   |      |
+|                |Multiple fatalities              |$500,000 to $1 million|Major on site      |Minor product      |50    |
+|                |                                 |                      |impact and major   |recall with adverse|      |
+|                |                                 |                      |clean up           |publicity resulting|      |
+|                |                                 |                      |                   |in minor claim     |      |
+|                |Fatality                         |$100,000 to $500,000  |Minor on site      |Minor product      |10    |
+|                |                                 |                      |impact and major   |recall with major  |      |
+|                |                                 |                      |clean up           |resort of product  |      |
+|                |Extremely serous injury [        |$1000 to $100,000     |Minor off site     |Minor product      |5     |
+|                |amputation, permanent disability |                      |impact and minor   |recall with minor  |      |
+|                |                                 |                      |clean up           |resort of product  |      |
+|                |Disabling injury [ ACC claim, one|Up to $1000           |Minor local area   |Customer compliant |3     |
+|                |week off work or more]           |                      |impact with area   |and no resort of   |      |
+|                |                                 |                      |clean up required  |product required   |      |
+|                |Minor  injury or minor damage    |$500- nil             |Minimal impact     |                   |2     |
+|                |                                 |                      |                   |                   |      |
+|Exposure How    |Continuously ΓÇô many times daily  |                      |                   |                   |10    |
+|often the task  |                                 |                      |                   |                   |      |
+|occurs          |                                 |                      |                   |                   |      |
+|                |Frequently ΓÇô approximately once a|                      |                   |                   |5     |
+|                |day                              |                      |                   |                   |      |
+|                |Usually from once a week to once |                      |                   |                   |3     |
+|                |a month                          |                      |                   |                   |      |
+|                |Occasionally once a month to once|                      |                   |                   |2     |
+|                |in six months                    |                      |                   |                   |      |
+|                |Rarely ΓÇô once a year             |                      |                   |                   |1     |
+|                |Very rarely ΓÇô once every few     |                      |                   |                   |0.5   |
+|                |years                            |                      |                   |                   |      |
+|                |                                 |                      |                   |                   |      |
+|Probability     |Is the most likely and expected  |                      |                   |                   |5     |
+|Likelihood that |result if the hazardous event    |                      |                   |                   |      |
+|accident        |takes place                      |                      |                   |                   |      |
+|sequence will   |                                 |                      |                   |                   |      |
+|follow to       |                                 |                      |                   |                   |      |
+|completion      |                                 |                      |                   |                   |      |
+|                |Is quite possible, not unusual,  |                      |                   |                   |4     |
+|                |but has an even 50/50 chance     |                      |                   |                   |      |
+|                |Would be an unusual sequence or  |                      |                   |                   |3     |
+|                |coincidence                      |                      |                   |                   |      |
+|                |Would be a remotely possible     |                      |                   |                   |2     |
+|                |coincidence                      |                      |                   |                   |      |
+|                |Has never happened after many    |                      |                   |                   |1     |
+|                |years of exposure but it is      |                      |                   |                   |      |
+|                |conceivably possible             |                      |                   |                   |      |
+|                |Practically impossible sequence  |                      |                   |                   |0.5   |
+|                |has never happened               |                      |                   |                   |      |
+
+|EXTREME               |HIGH                |MEDIUM                |LOW                                         |
+|The risk score is     |The Risk Score is   |The Risk Score is  120|The Risk Score is  45                       |
+|5000                  |1000                |                      |                                            |
+|Serious harm Action   |Moderate Hazard     |Minor Hazard          |Hazard                                      |
+|required              |Action required     |Action required       |Action required                             |
+|Conduct a immediate   |Conduct planned JSA |Conduct planned JSA   |Take 5 Plan                                 |
+|JSA. Involving        |involving at least 3|involving at least 2  |Think through the task                      |
+|Management, Depart    |team members.       |team members.         |Spot the hazard                             |
+|employees Health &    |                    |                      |                                            |
+|Safety Manager        |                    |                      |Assess the Risks                            |
+|                      |                    |                      |Make the Changes Control & Communication    |
+|                      |                    |                      |                                            |
+|                      |                    |                      |Do the Job safely                           |
+|                      |                    |                      |                                            |
+|                      |                    |                      |                                            |
+|Health Risk:          |Health Risk:        |Health Risk:          |Health Risk:                                |
+|May require immediate |May require         |Consider the          |Nil                                         |
+|mandatory medical     |Low-level medical   |requirement for       |                                            |
+|surveillance.         |surveillance.       |medical surveillance. |                                            |
+|Environmental Risk    |Environmental Risk  |Environmental Risk    |Environmental Risk                          |
+|Major off site impact |Major on site impact|Minor on site impact  |Minor local area impact with area clean up  |
+|and clean up with     |and major clean up  |and major clean up    |required                                    |
+|adverse publicity     |                    |                      |                                            |
+|QUALITY               |QUALITY             |QUALITY               |QUALITY                                     |
+|Major product recall  |Minor product recall|Minor product recall  |Customer compliant and no resort of product |
+|with adverse publicity|with adverse        |with minor resort of  |required                                    |
+|and major customer    |publicity resulting |product               |                                            |
+|claim                 |in minor claim      |                      |                                            |
+|General Risk:         |General Risk:       |General Risk:         |General Risk:                               |
+|Requires the immediate|Review controls and |Review controls yearly|Nil                                         |
+|change to control risk|implement the       |                      |                                            |
+|                      |changes from the    |                      |                                            |
+|                      |short into long term|                      |                                            |
+|Monitoring:           |Monitoring:         |Monitoring:           |Monitoring:                                 |
+|Quarterly medical or  |Yearly medical or   |If required           |Nil                                         |
+|environmental         |environmental       |                      |                                            |
+|monitoring            |monitoring          |                      |                                            |
+
+
+                              RESULTS AREA PLAN
+
+     To get a Risk Score multiply the Consequence by the Exposure by the
+                              Probability rate.
+
+                        JOB SAFETY ANALYSIS WORKSHEET
+
+|Area /       |                  |Task  or Job      |Transportation of   |Date JSA completed     |7/9/07          |
+|Department   |                  |Description       |Mld equipment on    |                       |                |
+|             |                  |                  |buggy               |                       |                |
+|JSA Conducted by:  Peter Hassle |Additional Procedures/ Equipment       |Controls to be taken                    |
+|                                |                                       |                                        |
+|                                |                                       |Minimisation                            |
+|                                |                                       |                                        |
+|                                |                                       |I                                       |
+|                                |                                       |                                        |
+|                                |                                       |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety glasses, Hearing         |                                       |Gary Russell 7/9/07                     |
+|protection, Gloves,             |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |                                       |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |                                       |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |                                       |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard              |
+|                         |Actual Hazard           |Risk     |                                                   |
+|Load equipment onto tray |As per 210:27:05 JSEA   |         |                                                   |
+|Inspect buggy for faults |Leaking fluid           |40       |Check buggy before use for obvious damage and      |
+|                         |Entrapment              |150      |report immediately                                 |
+|Lift tray to be          |Entrapment              |150      |Ensure buggy correctly located for lifting tray.   |
+|transported              |                        |         |Ensure tray sides to be used and fitted            |
+|                         |                        |         |Ensure nobody in area of operation that can come to|
+|                         |                        |         |any harm.                                          |
+|Transport equipment      |Entrapment of personnel |50       |Drive carefully at all times                       |
+|                         |Falling equipment       |60       |Ensure equipment is well balanced on tray and not  |
+|                         |Damage to property and  |60       |free to move about                                 |
+|                         |equipment               |         |Drive carefully at all times in full control of    |
+|                         |                        |         |buggy.                                             |
+|Moving tray to required  |Entrapment              |50       |Ensure area equipment to be left is clear of       |
+|position                 |Damage to property and  |60       |personnel and equipment                            |
+|                         |equipment               |         |                                                   |
+|                         |                        |         |                                                   |
+|                         |                        |         |                                                   |
+|                         |                        |         |                                                   |

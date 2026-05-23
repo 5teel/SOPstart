@@ -1,0 +1,63 @@
+
+Storage of pallets to the Warehouse
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Hi Viz Clothing Gloves if       |Yes                                    |Gary OΓÇÖNeill   14/06/07                 |
+|required                        |                                       |                                        |
+|NB Dispensation not to wear     |Risk Score                             |                                        |
+|safety specs on audit station as|40                                     |                                        |
+|it inhibits task                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                           |Potential /         |Level of    |Controls to reduce the Risk of|
+|                                                |Actual Hazard       |Risk        |Hazard                        |
+|Using the steps the 2  auditors work on either  |Trip                |Low         |Hand rails                    |
+|side  audit platform from each side, so  all    |                    |            |                              |
+|sides of the pallet are  accessible             |                    |            |                              |
+|Auditor #1 has conveyor control & is responsible|Entrapment  & Pinch |Low         |Guarded by hand rail          |
+|for recording audit results                     |points              |            |                              |
+|Auditor #2 removes the layerboard               |Sprain / strain from|Low         |Ensure Gloves are worn        |
+|                                                |Twisting / leaning  |            |                              |
+|The audit samples are retained  & delivered to  |Laceration from     |Low         |Bottles are carried in plastic|
+|QC after audits are completed                   |tripping            |            |crate                         |
+|Audit pallets are deposited in the Audit area by|Collision           |High        |Follow all FH and plant Safety|
+|shift drivers & are manoeuvred into position by |                    |            |Rules                         |
+|Audit driver                                    |                    |            |                              |
+|Up to 3 pallets may be loaded on to the audit in|Entrapment          |Low         |                              |
+|feed conveyor this is controlled by Auditor #1  |                    |            |                              |
+|Once the pallet to be audited is in correct     |Laceration from     |Low         |PPE Ensure Gloves are worn    |
+|position , both auditors cut the plastic shroud |broken glass        |            |                              |
+|against the top layerboard ( AVOIDING ALL GLASS |                    |            |                              |
+|CONTACT ) leaving one side attached to act as a |                    |            |                              |
+|hinge                                           |                    |            |                              |
+|The layerboard is removed & the required number |Laceration          |Low         |                              |
+|of samples are inspected for defects from the   |                    |            |                              |
+|top layer                                       |                    |            |                              |
+|Any containers containing defects are removed & |Laceration          |Low         |Training                      |
+|layer is topped up as appropriate The layerboard|                    |            |JSEA TOPUP refers             |
+|is replaced & the hinged plastic shroud is drawn|Sprain / strain     |            |PPE if required               |
+|over the layerboard.                            |                    |            |                              |
+|An additional plastic shroud approximately      |Sprain / strain     |Low         |PPE if required               |
+|1500mm long is placed over the pallet           |                    |            |JSEA CAPS refers              |
+|Auditor #1operates the conveyor controls to move|Entrapment          |Low         |Warning sign prohibiting      |
+|the audited pallet through the out feed & onto  |                    |            |walking on conveyor           |
+|the cross conveyor leading to the audit oven (  |                    |            |                              |
+|for heat sealing plastic caps )                 |                    |            |                              |
+|Once the pallet reaches its desired position in |Burn                |Low         |PPE                           |
+|the audit oven, the hood automatically comes    |Entrapment          |            |DO NOT ENTER THE AUDIT OVEN   |
+|down over the pallet for approximately two      |                    |            |area                          |
+|minutes                                         |                    |            |                              |
+|Once the plastic has been heat sealed the hood  |Nil                 |Low         |Nil                           |
+|will raise up & the pallet will continue on the |                    |            |                              |
+|out feed conveyor until it reached the pallet   |                    |            |                              |
+|stop                                            |                    |            |                              |
+|The pallet may then be picked up by fork hoist &|collision           |High        |Follow all FH and plant Safety|
+|taken to its location in the warehouse          |                    |            |Rules                         |

@@ -1,0 +1,68 @@
+
+#21, 23, 31, 34 Starting a Section
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                                      |Safety Induction [Contractor]                                 |
+|Hazard            |Practicable to Eliminate                                                                    |
+|Identification    |                                                                                            |
+|                                     |Insignificant ΓÇô first aid injury, up to  |
+|                                     |$1,000 damage, spill confined to         |
+|LIKELIHOOD                           |immediate work area, rapid clean up, no  |
+|                                     |damage to environment                    |
+|How likely is it to happen?          |                                         |
+|4                                    |ACT NOW ΓÇô Urgent ΓÇô do something about the|
+|ACUTE                                |risks immediately. Requires immediate    |
+|                                     |attention.                               |
+|3                                    |Highest management decision is required  |
+|HIGH                                 |urgently                                 |
+|2                                    |Follow management instruction            |
+|MODERATE                             |                                         |
+|1                                    |OK for now. Record and review if any     |
+|LOW                                  |equipment / people / materials / work    |
+|                                     |processes or procedures change           |
+
+
+Job Safety Analysis Form:               #21, 23, 31, 34  Start a Section
+
+
+
+|Area / Department                  |Job Change                            |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSA Reviewed by and Date:                 |
+|Boots, gloves, uniform, safety     |Yes                                   |                                          |
+|glasses, ear muffs, (protection    |                                      |August 2009                               |
+|sleeves, back support ΓÇô optional)  |Risk Score                            |                                          |
+|                                   |40                                    |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |Low                                   |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |Minimisation                          |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Upon starting a section  |Crushing                |High     |Ensure all personnel are clear of the section and are   |
+|the Swab Barrier must be |                        |         |aware of machine starting.                              |
+|on and you must remain   |                        |         |                                                        |
+|with that section with   |                        |         |                                                        |
+|your hand on E Stop until|                        |         |                                                        |
+|running.                 |                        |         |                                                        |
+|Refer JSA  210.01.02     |                        |         |                                                        |
+|If in Manual             |Caught in section       |High     |Return all overrides to the run position and confirm all|
+|                         |                        |         |safety equipment is removed from the section            |
+|Start section            |Caught in section       |High     |Press the two start buttons at the same time and hold in|
+|                         |                        |         |until the section starts.                               |
+|Load Gob                 |Burns                   |High     |Once section running press the glass load button to load|
+|                         |                        |         |glass. If first gob to be loaded follow first load of a |
+|                         |                        |         |section  procedure refer JSA                            |
+|Mould cooling            |Burns                   |High     |Once moulds are hot activate mould cooling.             |
+
+ If the operation does not follow this JSA re-assess procedure and report to
+                            Supervisor / Manager.
+                           -----------------------
+[pic]
+
+O-I New Zealand
+

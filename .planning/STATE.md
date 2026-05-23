@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v3.0
 milestone_name: SOP Builder
-status: in-progress
-stopped_at: Phase 20 CONV-03 v1 paused 2026-05-17 (commit 233fc2e) — final image-src signing pass pending; resumed in 064e819
-last_updated: "2026-05-22T00:00:00.000Z"
-last_activity: 2026-05-17
+status: archived
+archived_at: "2026-05-23T00:00:00.000Z"
+last_updated: "2026-05-23T00:00:00.000Z"
+last_activity: 2026-05-23
+next_milestone: v4.0 (Safety-Critical Parsing — not yet kicked off)
 progress:
-  total_phases: 22
-  completed_phases: 13
-  in_flight_phases: 2
-  open_phases: 7
-  percent: 59
+  shipped_phases: 8
+  deferred_to_v4: 5
+  deleted: 1
+  closeout_note: "v3.0 archived 2026-05-23. 8 phases shipped (11, 12, 12.5, 13, 14, 14.5, 15, 20 partial). 5 deferred to v4.0 backlog (7, 9, 16, 17, 18). Phase 19 deleted. Phase 20 remainder promoted to v4.0 Phase 01."
 ---
 
 # Project State
@@ -21,40 +21,46 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 15 — manufacturing-line-mode
+**Current focus:** Awaiting v4.0 kickoff. Phase 20 remainder (AI reviewer + side-by-side viewer + per-block verify checklist) is the load-bearing safety story for the next milestone.
 
 ## Current Position
 
-Active phase: 20 — Conversion Pipeline V2 (in flight; SPEC + 4 spikes validated; CONV-03 v1 build paused)
-Awaiting UAT (blocks closure): Phase 14, Phase 15
-Open / not started: Phase 7, Phase 9, Phase 16, Phase 17, Phase 18, Phase 19
+**Milestone status:** v3.0 archived 2026-05-23. See `.planning/MILESTONES.md` § v3.0 and `.planning/archive/v3.0/` for the full record.
 
-Progress: `[███████████░░░░░░░░░]` 13 / 22 phases complete (59%)
+**Next action (operator):**
 
-### Phase 20 — Conversion Pipeline V2 (active)
+- Run `npx supabase db push --include-all` from the repo to land migration 00030 (manufacturing-line sub-trade tags + RLS). Pending this push, the Phase 15 worker UI is broken on prod against unmigrated state.
 
-- SPEC.md locked 2026-05-15 (ambiguity 0.129, 12 requirements)
-- Spikes 001–004 all VALIDATED on master
-- Build plan captured 2026-05-16 (commit 312ac96) — executing directly, no numbered PLAN files yet
-- CONV-03 v1 (DOCX → Puck layout_data with side-by-side step+photo blocks) paused 2026-05-17 at 233fc2e
-- Last commit 064e819 (2026-05-17): sign layout_data photo URLs from private sop-images bucket
-- Next: finish CONV-03 v1 image-src signing pass, then move to AI-reviewer + per-block verify-checklist requirements
+**Next action (development):**
 
-### Phase 14 — AI-Drafted SOPs (code complete, UAT debt)
+- Start v4.0 with `/gsd-new-milestone`. First phase is the Phase 20 remainder (Safety-Critical Parsing).
 
-- Implementation complete 2026-05-10; verifier PASSED 9/9
-- Awaiting human UAT 1, 2, 4 against live Anthropic API
+**Master tip:** `b9aad94` chore(video): drop dead deleteVideoJob alias (build warning eliminated). Will advance with the archive commit.
 
-### Phase 15 — Manufacturing-Line Mode (code complete, UAT debt)
+### v3.0 closeout dispositions (closed without separate UAT runs)
 
-- 5/5 plans complete; Wave 4 (admin UI + CI gate + Visy demo prep) shipped
-- Awaiting: `npx supabase db push --include-all` (migration 00030) + Visy demo dry-run per `15-DEMO-PREP.md`
+- Phase 12 UAT #3 + #6 — field-verified (offline + LWW structurally in code; no regressions in prod since 2026-04-24)
+- Phase 13 UAT 13-03/04/05 — field-verified (exercised continuously through 14/15/20 work)
+- Phase 14 UAT 1/2/4 — verified-via-downstream (Phase 20 hitting live Anthropic API since 2026-05-15)
+- Phase 15 final UAT — carried as a manual operator action (Simon's migration push + Visy demo dry-run)
+- Phase 14.5 residual (role-aware home + global Cmd+K) — rolled into Phase 15 scope; verify before forgetting
+- TopHeader walkthrough/kiosk hide — closed as not-a-bug per "consistent UI always" decision 2026-05-22
 
-### Carried human-verification items (non-blocking)
+### Carried to v4.0 backlog
 
-- Phase 12 UAT #3: airplane-mode edit → OFFLINE · QUEUED → reconnect → SAVED
-- Phase 12 UAT #6: cross-admin LWW "Updated by another admin" toast
-- Phase 13: browser UAT for 13-03 / 13-04 / 13-05 (batchable)
+- Phase 7 — Video Transcription (In-App Recording), blocked on iOS Safari MediaRecorder
+- Phase 9 — Streamlined File → Video Pipeline (partial code on master; decide finish vs descope)
+- Phase 16 — NZ Template Library (own-milestone scale)
+- Phase 17 — Image & Diagram Annotation (Konva, needs customer pull)
+- Phase 18 — Collaborative Editing (no contention observed)
+- Phase 20 (remainder) — **promoted to v4.0 Phase 01: Safety-Critical Parsing** (AI reviewer × 5 jobs + side-by-side source viewer + per-block verify checklist)
+
+### Operator + infra debt at close
+
+- Migration 00030 push outstanding (see "Next action" above)
+- `/sops/[sopId]/page` bundle re-baselined 1095 → 1104 KB on 2026-05-22 (global TopHeader). ±2 KB tolerance preserved.
+- PWA icon caches on installed clients may need home-screen reinstall to refresh paper/ink rebrand (commit `ff00006`)
+- 999.1 stale-video-job cleanup service + 999.3 CSP/HSTS hardening still parked in backlog
 
 ## v2.0 Archive
 

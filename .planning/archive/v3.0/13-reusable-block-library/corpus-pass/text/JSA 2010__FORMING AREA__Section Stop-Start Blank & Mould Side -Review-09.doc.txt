@@ -1,0 +1,51 @@
+
+Stop/start blank & mould side
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                                                      |Safety Induction [Contractor]                                 |
+|Hazard            |Practicable to Eliminate                                                                    |
+|Identification    |                                                                                            |
+|                                     |Insignificant ΓÇô first aid injury, up to  |
+|                                     |$1,000 damage, spill confined to         |
+|LIKELIHOOD                           |immediate work area, rapid clean up, no  |
+|                                     |damage to environment                    |
+|How likely is it to happen?          |                                         |
+|4                                    |ACT NOW ΓÇô Urgent ΓÇô do something about the|
+|ACUTE                                |risks immediately. Requires immediate    |
+|                                     |attention.                               |
+|3                                    |Highest management decision is required  |
+|HIGH                                 |urgently                                 |
+|2                                    |Follow management instruction            |
+|MODERATE                             |                                         |
+|1                                    |OK for now. Record and review if any     |
+|LOW                                  |equipment / people / materials / work    |
+|                                     |processes or procedures change           |
+
+
+|JOB SAFETY ANALYSIS               |Stop/start blank & mould side                                                  |
+
+|Area / Department            |                                           |Task  or Job Description                |
+|                             |Forming                                    |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|when working within          |                                           |                                        |
+|production area              |Overall Category of Risk                   |                                        |
+|                             |High                                       |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Stop gob loading             |Possibly greasy/wet floor [   |High        |Be aware of surroundings.               |
+|                             |slip hazard ] Moving          |            |                                        |
+|                             |machinery.                    |            |                                        |
+|Stop section                 |Greasy / wet floor. Moving    |High        |Be aware of surroundings.               |
+|                             |machinery.                    |            |                                        |
+|Check nobody on either blank |Moving machinery.             |High        |B e aware of other workers around you   |
+|/ mould side.                |Risk entrapment.              |            |and where they are.                     |
+|Re start section             |Moving machinery              |High        |Keep clear of section.                  |
+|Start gob loading.           |Moving machinery.             |High        |Keep a close watch on section re        |
+|                             |                              |            |starting and gob loading.               |

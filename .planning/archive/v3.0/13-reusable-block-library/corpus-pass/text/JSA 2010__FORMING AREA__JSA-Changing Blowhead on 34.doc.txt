@@ -1,0 +1,37 @@
+
+Changing Blowhead on 34 machine
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|when working within          |                                           |                                        |
+|production area              |Overall Category of task                   |                                        |
+|                             |Medium                                     |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Stop glass into section then |                              |Nil         |Follow JSA instruction for stopping     |
+|Stop section                 |                              |            |section                                 |
+|Climb onto machine carefully |Slip & trip hazard. Noise     |High        |Keep machine clean to reduce slip trip  |
+|and manoeuvre body to bend   |Heat. Burns from hot bottles  |            |hazard. Use all PPE use correct lifting |
+|over and remove blowhead     |                              |            |technique. Use the non-slip treads      |
+|Get into safe working        |Heat. Noise and hot moulds    |Medium      |Keep machine clean to reduce slip trip  |
+|position and remove blowhead |Sprain /Strain from awkward   |            |hazard. Use all PPE use correct lifting |
+|                             |movement from working in      |            |technique. Use the non-slip treads      |
+|                             |limited space                 |            |                                        |
+|Get off machine safely       |Heat. Noise and hot moulds    |Medium      |Keep machine clean to reduce slip trip  |
+|                             |Sprain /Strain from awkward   |            |hazard. Use all PPE use correct lifting |
+|                             |movement from working in      |            |technique. Use the non                  |
+|                             |limited space                 |            |                                        |
+|Start section                |Heat. Noise and hot moulds    |Medium      |Keep machine clean to reduce slip trip  |
+|                             |Sprain /Strain from awkward   |            |hazard. Use all PPE use correct lifting |
+|                             |movement from working in      |            |technique. Use the non                  |
+|                             |limited space                 |            |                                        |
+
+

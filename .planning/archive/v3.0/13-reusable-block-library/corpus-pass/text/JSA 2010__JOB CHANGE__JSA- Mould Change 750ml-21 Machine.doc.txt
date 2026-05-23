@@ -1,0 +1,82 @@
+
+ISO 219.01.12              #21 Mould Change 750ml
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                                                                         |
+|Probability                       |INJURY                              |PLANT PROPERTY OR PROCESS DAMAGE    |
+|Likelihood that accident sequence |                                    |                                    |
+|will follow to.                   |                                    |                                    |
+|Common or frequent occurrence     |Fatality or permanent disability    |More than 1 million, Major          |
+|                                  |                                    |disruption of activities            |
+|Is known to have happened         |Multiple lost time injury with      |$500,000 to $1 million              |
+|                                  |hospital admissions                 |                                    |
+|Could occur                       |Single Lost time injury             |$100,000 to $500,000                |
+|Not likely to occur               |Medical Treatment Injury or         |$1000 to $100,000                   |
+|                                  |restricted work                     |                                    |
+|Practically impossible            |First Aid injury                    |Up to $1000                         |
+|                                  |                                    |                                    |
+|                                  |QUALITY                             |ENVIRONMENTAL                       |
+|                                  |Major product recall with adverse   |Confined to immediate work area,    |
+|                                  |publicity and major customer claim  |rapid clean up no damage to         |
+|                                  |                                    |environment                         |
+|                                  |Minor product recall with adverse   |Confined to specific area, rapid    |
+|                                  |publicity resulting in minor claim  |clean up little damage to           |
+|                                  |                                    |environment                         |
+|                                  |Minor product recall with major     |Confined to local environment,      |
+|                                  |resort of product                   |naturally recoverable, moderate     |
+|                                  |                                    |clean up                            |
+|                                  |Minor product recall with minor     |Considerable clean up on site as    |
+|                                  |resort of product                   |well as external resources involved |
+|                                  |                                    |& extends past boundaries           |
+|                                  |Customer compliant and no resort of |Regional scale, extensive clean up  |
+|                                  |product required                    |and long recovery                   |
+
+
+|CONSEQUENCES                                                                                 |
+|PROBABILITY    |INSIGNIFICANT    |MINOR            |MODERATE         |MAJOR            |EXTREME             |
+|               |1                |2                |3                |4                |5                   |
+|almost certain            |H                        |H                          |E                            |
+
+                                                      #21 Mould Change 750ml
+|Area / Department            |Job Change                                 |Task  or Job Description                |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |June 2009                               |
+|when working within          |                                           |                                        |
+|production area              |Overall Category of task                   |                                        |
+|                             |Medium                                     |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job     |Potential /                  |Level of Risk |Controls to reduce the Risk of Hazard           |
+|Steps               |Actual Hazard                |              |                                                |
+|Stop Section:-      |Making section safe to       |High          |Stop Neck ring arms in the reverted position    |
+|                    |prevent entrapment           |              |using the (Red) Maintenance / E Stop button.    |
+|                    |                             |              |Push in the Mould side inhibit button.          |
+|Mould Side safety   |Burning from heat reflected  |High          |Where possible, place safety plate in the up    |
+|Plate               |off ware                     |              |position to reflect heat back towards the       |
+|                    |                             |              |machine.                                        |
+|                    |                             |              |Note:- On Job Change there is no Hot glass and  |
+|                    |                             |              |this Safety plate can be left in the down       |
+|                    |                             |              |position.                                       |
+|Prepare moulds for  |Burns                        |High          |Ensure tee screw lifters to the Moulds are in   |
+|Lifting             |                             |              |securely and prepare to lift the Mould from the |
+|                    |                             |              |hinge.                                          |
+|Removing Moulds     |Burns / Back Strain          |High          |Get into a comfortable lifting position that    |
+|                    |                             |              |suits. Reducing lowering and twisting while     |
+|                    |                             |              |lifting. Remove Moulds.                         |
+|Remove Bottom Plate.|Crushed hand.                |High          |Using Bottom Plate lifting tool remove bottom   |
+|                    |                             |              |plate from section                              |
+|Fit clean Bottom    |Crushed Hand                 |High          |Using Bottom Plate lifting tool replace bottom  |
+|Plate               |                             |              |plate into the section                          |
+|Fit clean Moulds    |Back Strain                  |High          |Get into a comfortable lifting position that    |
+|                    |                             |              |suits. Reducing lowering and twisting while     |
+|                    |                             |              |lifting. Refit Moulds. Remove Tee Lifters.      |
+|Prepare Section to  |Caught in Section.           |High          |Pull out Mould Side (Red) Maintenance / E Stop  |
+|start.              |                             |              |button. Pull out the Mould Side inhibit button. |
+|Start up the section|Caught in Section.           |High          |Ensure all personnel are clear of the section.  |
+|                    |                             |              |Start the section up.                           |
+
+

@@ -1,0 +1,47 @@
+
+
+                                           Preparation for Lancing a Furnace
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                  |Safety Induction [Contractor]      |                                        |
+|PPE Required:                      |Significant Hazard                 |JSEA Reviewed by and date               |
+|Hats , hot work  Jackets ,gloves,  |Yes                                |Neil Missen                             |
+|safety glasses, earmuffs.          |                                   |                                        |
+|                                   |Risk Score                         |                                        |
+|                                   |50                                 |                                        |
+|                                   |                                   |                                        |
+|                                   |Category                           |                                        |
+|                                   |Medium                             |                                        |
+|                                   |                                   |                                        |
+|                                   |Control taken                      |                                        |
+|                                   |Minimisation                       |                                        |
+|                                   |                                   |                                        |
+|Sequence of Job Steps              |Potential /                  |Level |Controls to reduce the Risk of Hazard   |
+|                                   |Actual Hazard                |of    |                                        |
+|                                   |                             |Risk  |                                        |
+|Meeting to discuss the job         |None                         |0     |Involvement from everyone assigned to   |
+|requirements, any concerns, and    |                             |      |the job.                                |
+|safety.                            |                             |      |                                        |
+|Set up equipment i.e lances, run   |Heat , lifting - strains     |16    |Wearing of all PPE , lifting technique. |
+|out hoses.                         |                             |      |                                        |
+|Lance                              |Heat , fire , strains , burns|20    |Wearing of PPE, hot work jackets, proper|
+|                                   |                             |      |lifting technique. Taking adequate      |
+|                                   |                             |      |breaks and lots of fluids.              |
+|Environmental:                     |                             |      |                                        |
+|Removal of used rags / gloves/     |Contamination.               |High  |Place in correct contamination or waste |
+|waste/ glass / cullet              |Waste removal and tidy up.   |      |bins provided.                          |
+|                                   |                             |      |Ensure area is cleaned and product /    |
+|                                   |                             |      |tools cleared away.                     |
+|Protection & Security              |                             |      |                                        |
+|Demarcation                        |Damage to people, property   |High  |Demarcation where applicable.           |
+|                                   |and environment.             |      |Install barricaded/danger tape as       |
+|                                   |                             |      |required.                               |
+|                                   |                             |      |Ensure correct fire fighting equipment  |
+|                                   |                             |      |is available.                           |
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

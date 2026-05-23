@@ -1,0 +1,35 @@
+
+Repair and Maintenance to Take Out Tong Heads
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]           |                                         |
+|PPE Required:                |Significant Hazard                      |JSA Reviewed by and date                 |
+|All standard PPE required    |Yes                                     |                                         |
+|                             |                                        |                                         |
+|                             |Risk Score                              |                                         |
+|                             |45                                      |                                         |
+|                             |                                        |                                         |
+|                             |Category                                |                                         |
+|                             |Low                                     |                                         |
+|                             |                                        |                                         |
+|                             |Control taken                           |                                         |
+|                             |Minimisation                            |                                         |
+|                             |                                        |                                         |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Clean Parts and Inspect      |                              |Low      |Wear PPE to prevent injury               |
+|Set up on the Jig and test   |Manual handling risk from     |Low      |Correct lifting technique required       |
+|                             |moving & setting up gear      |         |                                         |
+|Replace worn or damaged parts|Ergonomic risk from position  |Low      |Correct lifting technique required       |
+|                             |of person while inspected     |         |Use lubricant for O rings and seals      |
+|                             |gear. Dermatitis from         |         |ensure correct PPE is worn               |
+|                             |lubricant                     |         |                                         |
+|Align grips with bottle also |Entrapment from Moving parts  |Medium   |Correct lifting technique required       |
+|set to correct height on the |                              |         |                                         |
+|Jig                          |                              |         |                                         |
+|Remove and label             |Manual handling risk from     |Low      |Correct lifting technique required       |
+|                             |moving gear                   |         |                                         |
+|Store in allocated cabinet by|Manual handling risk from     |Low      |Correct lifting technique required       |
+|IS Machine                   |moving gear                   |         |                                         |

@@ -1,0 +1,55 @@
+
+Swabbing on a IS Machine
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                                      |Safety Induction [Contractor]                                 |
+|Hazard            |Practicable to Eliminate                                                                    |
+|Identification    |                                                                                            |
+|                                     |Insignificant ΓÇô first aid injury, up to  |
+|                                     |$1,000 damage, spill confined to         |
+|LIKELIHOOD                           |immediate work area, rapid clean up, no  |
+|                                     |damage to environment                    |
+|How likely is it to happen?          |                                         |
+|4                                    |ACT NOW ΓÇô Urgent ΓÇô do something about the|
+|ACUTE                                |risks immediately. Requires immediate    |
+|                                     |attention.                               |
+|3                                    |Highest management decision is required  |
+|HIGH                                 |urgently                                 |
+|2                                    |Follow management instruction            |
+|MODERATE                             |                                         |
+|1                                    |OK for now. Record and review if any     |
+|LOW                                  |equipment / people / materials / work    |
+|                                     |processes or procedures change           |
+
+                                                    Swabbing on a IS Machine
+
+|Area Department                |Forming                                |Task  or Job Description                |
+|PPE Required:                  |Significant Hazard                     |JSA Reviewed by and date                |
+|All PPE required plus          |                                       |                                        |
+|protective sleeves             |                                       |                                        |
+|                               |Category                               |                                        |
+|                               |                                       |                                        |
+|                               |                                       |                                        |
+|                               |Control taken                          |                                        |
+|                               |                                       |                                        |
+|                               |                                       |                                        |
+|Sequence of Job Steps                |Potential /            |Level of |Controls to reduce the Risk of Hazard   |
+|                                     |Actual Hazard          |Risk     |                                        |
+|Take hold of the swab using an       |Slipping               |High     |Maintain .a good grip and balance.      |
+|over-hand grip. Adopt a balanced     |                       |         |                                        |
+|stance.                              |                       |         |                                        |
+|Press the swab cycle button on  the  |Moving parts           |High     |Wait until the swab barrier have drop   |
+|blank side overhead control panel the|                       |         |and blanks are open and accessible and  |
+|manual swab light will begin to blink|                       |         |is then ready to start swabbing.        |
+|and delivery will stop               |                       |         |                                        |
+|Swabbing                             |Risk of entrapment     |High     |If a swab gets caught the procedure for |
+|                                     |                       |         |the blank side of the machine, LET IT   |
+|                                     |                       |         |GO, step back and use the emergency stop|
+|Restart swab cycle                   |Moving parts.          |High     |Press the swab cycle button to restart  |
+|                                     |                       |         |the section. The swab barrier will raise|
+|                                     |                       |         |and swab cycle light will blink until   |
+|                                     |                       |         |the gob load light comes on to show     |
+|                                     |                       |         |glass is once again entering the        |
+|                                     |                       |         |section.                                |

@@ -1,0 +1,43 @@
+
+Installation of Extractor Units
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |(                                       |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety Glasses, Safety Boots,   |Yes                                    |Gary Russell 6/9/-7                     |
+|Hearing Protection, Harness     |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |150                                    |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |High                                   |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard              |
+|                         |Actual Hazard           |Risk     |                                                   |
+|Position machine stand in|Entrapment with forklift|High     |Ensure forklift driver has had correct training and|
+|correct place            |Falling objects         |         |fully briefed on procedure                         |
+|                         |Obstructions overhead   |         |Ensure area clear of pedestrians                   |
+|                         |i.e. lights, beams      |         |Keep hands and limbs clear of area when setting    |
+|                         |                        |         |down equipment                                     |
+|                         |                        |         |Ensure area clear of all obstructions              |
+|Dyna bolt stand to floor |Electric shock          |High     |Ensure cables are and electrical connections are in|
+|                         |Catching of fingers or  |         |good working order Keep fingers and hands clear of |
+|                         |hand                    |         |moving parts when operating                        |
+|Lift and position hopper |Entrapment with forklift|High     |Ensure forklift driver has had correct training and|
+|                         |Falling objects         |         |fully briefed on procedure Ensure area clear of    |
+|                         |                        |         |pedestrians                                        |
+|                         |                        |         |Keep hands and limbs clear of area when setting    |
+|                         |                        |         |down equipment                                     |
+|Dismantle existing       |Working at height       |High     |Correct procedures and precautions taken for       |
+|ducting                  |Falling objects Dust    |         |working at height                                  |
+|                         |from inside ducting when|         |Ensure area below is tapped off and correct signage|
+|                         |cut                     |         |Face mask                                          |
+|Assemble new ducting     |Working at height       |High     |Correct procedures and precautions taken for       |
+|                         |Falling objects Dust    |         |working at height                                  |
+|                         |from inside ducting when|         |Ensure area below is tapped off and correct signage|
+|                         |cut                     |         |Face mask                                          |

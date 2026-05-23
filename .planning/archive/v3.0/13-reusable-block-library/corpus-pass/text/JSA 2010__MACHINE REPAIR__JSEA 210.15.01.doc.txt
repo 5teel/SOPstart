@@ -1,0 +1,99 @@
+
+
+
+    Job Safety Environmental Analysis Form:        #31 Machine changing Hot
+                                                                          En
+                                                                          d
+                                                                          Ro
+                                                                          ll
+                                                                          er
+                                                                           B
+                                                                          ea
+                                                                          ri
+                                                                          ng
+                                                                          s
+                                                                          fo
+                                                                          r
+                                                                          Le
+                                                                          hr
+                                                                           M
+                                                                          at
+
+
+
+                                                                          |Area / Department                  |Machine Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots.                      |                                      |                                          |
+|                                   |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Notify Shift Supervisor  |                        |         |Communication.                                          |
+|and appropriate Operaters|                        |         |                                                        |
+|and Maintenance staff.   |                        |         |                                                        |
+|Clear the lehr of bottles|Glass wear handling     |Low      |Gloves, safety boots, coveralls, glasses to be worn.    |
+|and shut down lehr.      |                        |         |                                                        |
+|Gas to be turned down    |Gas leak                |Low      |Tagged out and/or spaded as directed.                   |
+|and/or tagged and locked |                        |         |                                                        |
+|out as required.         |                        |         |                                                        |
+|Electricians to reverse  |Electricity             |High     |Qualified electrician to follow correct isolation and/or|
+|polarity of drive motor  |                        |         |reversal procedure as directed.                         |
+|(cold/end).              |                        |         |                                                        |
+|Take off counter weights |Manual handling         |Medium   |Use lifting devices as required, protective clothing,   |
+|to release the tension   |                        |         |gloves, glasses, boots and coveralls.                   |
+|off the roller.          |                        |         |                                                        |
+|Isolate lehr lock and tag|Nil                     |Nil      |As per isolation procedures                             |
+|out as required.         |                        |         |                                                        |
+|Remove hot/end dead      |Glass (broken) wire on  |Medium   |Gloves, safety boots, coveralls, glasses to be worn.    |
+|plates                   |mat                     |         |                                                        |
+|Split the mat and tie off|Broken glass and wire   |Medium   |Gloves, safety boots, coveralls, glasses to be worn.    |
+|each end / both sides    |from mat                |         |                                                        |
+|Riggers to support       |Broken glass and wire,  |Medium   |Appropriate lifting devices to be used, protective      |
+|rollers as directed.     |manual handling         |         |clothing, gloves, glasses, boots, coveralls, manual     |
+|                         |                        |         |handling training.                                      |
+|Remove bearings and      |Manual handling, glass, |Medium   |Appropriate lifting devices to be used, protective      |
+|replace                  |wire.                   |         |clothing, gloves, glasses, boots, coverall, manual      |
+|remove roller if required|                        |         |handling training.                                      |
+|Once in place remove all |Manual handling         |Medium   |Gloves, safety boots, coveralls, glasses to be worn.    |
+|rigging supports, lower  |                        |         |All safety precautions to be adhered to.                |
+|roller into place.       |                        |         |                                                        |
+|Rejoin mat and replace   |Glass (broken) wire on  |Medium   |Gloves, safety boots, coveralls, glasses to be worn.    |
+|hot / end dead plates    |mat                     |         |                                                        |
+|Electricians to reverse  |Electricity             |High     |Qualified electrician to follow correct isolation and/or|
+|polarity of drive motor. |                        |         |reversal procedure as directed.                         |
+|Remove all tags and      |                        |         |                                                        |
+|locks.                   |                        |         |                                                        |
+|Replace all counter      |Manual handling.        |Medium   |Gloves, safety boots, coveralls, glasses to be worn.    |
+|weights as directed.     |                        |         |All safety precautions for manual handling adhered to.  |
+|Take tension up on mat   |Entanglement            |Low      |Personal to keep visual on task (communication a must)  |
+|and track.               |                        |         |appropriate PPE to be worn.                             |
+|Re-ignite lehr gas and   |Entanglement, gas.      |Low      |Personal to keep visual on task (communication a must)  |
+|continue tracking mat.   |                        |         |appropriate PPE to be worn. Check for gas leaks         |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

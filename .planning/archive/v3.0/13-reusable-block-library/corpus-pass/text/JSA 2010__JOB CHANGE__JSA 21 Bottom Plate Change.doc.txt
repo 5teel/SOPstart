@@ -1,0 +1,39 @@
+
+ISO 219.01.14       #21 Bottom Plate Change
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes or No                                  |June 2009                               |
+|when working within          |                                           |                                        |
+|production area              |Overall Category of task                   |                                        |
+|                             |Medium                                     |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Stop Section:- and implement |Making section safe to prevent|High        |Stop Neck ring arms in the reverted     |
+|the  Mould side safety       |entrapment Reduce the risk of |            |position using the (Red) maintenance / E|
+|procedure.                   |being caught in the section   |            |Stop button                             |
+|Mould Side safety Plate      |Burning from heat reflected   |High        |Where possible, place safety plate in   |
+|                             |off ware                      |            |the up position to reflect heat back    |
+|Where applicable, remove     |                              |            |towards the machine.                    |
+|moulds first.                |Back Strain                   |            |Note:-  On Job Change there is no Hot   |
+|                             |                              |            |glass and this Safety plate can be left |
+|                             |                              |            |in the down position..                  |
+|                             |                              |            |Note:- On job changes remove moulds     |
+|                             |                              |            |before removing bottom plates. Back     |
+|                             |                              |            |support belt optional.                  |
+|                             |                              |            |Put bottom plates in before moulds on   |
+|                             |                              |            |job change.                             |
+|Remove Bottom Plate non job  |Crushed hand.                 |High        |Using Bottom Plate lifting tool remove  |
+|change.                      |                              |            |bottom plate from section               |
+|Prepare Section to start.    |Caught in Section.            |High        |Pull out (Red) maintenance / E Stop     |
+|                             |                              |            |button on the mould side                |
+|                             |                              |            |Pull out Mould inhibit button.          |
+|Starting the section         |Caught in Section.            |High        |Ensure all personnel are clear of the   |
+|                             |                              |            |section.  Start the section up          |

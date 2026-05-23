@@ -1,0 +1,28 @@
+
+DEPARTMENT |QUALITY CONTROL |TASK |CAPPING MACHINE USE | |
+|PURPOSE             |To test bottle breaking point     |SAFETY     |Glasses, gloves & hearing protection       |
+
+|1      |Wearing PPE put the cap on bottle, then the bottle in canister.                                       |
+|2      |Place canister in vee of centring jig.                                                                |
+|3      |Be aware of Ram moving down. Press and hold start buttons, located either side of the control panel.  |
+|4      |Depress start buttons after one Ram cycle.                                                            |
+|5      |Remove cap and bottle from canister. If bottle has fractured empty the canister directly into a bin.  |
+|6      |Repeat the process for each bottle                                                                    |
+|7      |Turn off power when leaving the machine.                                                              |
+|8      |In the event of bottle breakage, remove the canister from the capping machine and dispose broken glass|
+|       |into the bin provided. Ensure safety glasses are worn when handling broken glass.                     |
+|9      |Do not make any adjustment on the machine. In the case of machine failure, notify QC for appropriate  |
+|       |action.                                                                                               |
+
+
+|STEP #1                             |STEP #2                             |STEP #3                             |
+|                                    |                                    |                                    |
+|                                    |                                    |                                    |
+|                                    |                                    |                                    |
+|                                    |                                    |                                    |
+|                                    |                                    |                                    |
+|                                    |                                    |                                    |
+|                                    |                                    |                                    |
+|                                    |                                    |                                    |
+|                                    |                                    |                                    |
+|                                    |                                    |                                    |

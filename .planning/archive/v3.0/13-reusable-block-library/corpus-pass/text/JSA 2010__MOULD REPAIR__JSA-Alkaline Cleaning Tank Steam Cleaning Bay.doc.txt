@@ -1,0 +1,46 @@
+
+Alkaline cleaning tank steam cleaning bay
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                |Safety Induction [Contractor]         |                                       |
+|PPE Required:                    |Significant Hazard                    |JSA Reviewed by and date               |
+|Standard Safety Uniform plus     |Yes                                   |Gary Russell 16/7/07                   |
+|Safety glasses Face shield , Hat |                                      |                                       |
+|or Cap, Rubber gauntlet gloves   |Risk Score                            |                                       |
+|                                 |250                                   |                                       |
+|                                 |                                      |                                       |
+|                                 |Category                              |                                       |
+|                                 |Medium                                |                                       |
+|                                 |                                      |                                       |
+|                                 |Control taken                         |                                       |
+|                                 |Minimisation                          |                                       |
+|                                 |                                      |                                       |
+|Sequence of Job Steps          |Potential /                   |Level of |Controls to reduce the Risk of Hazard   |
+|                               |Actual Hazard                 |Risk     |                                        |
+|Load Basket                    |Overloading of basket causing |Medium   |Load single layer only in basket        |
+|                               |Back strain                   |         |Wear Back support if required           |
+|                               |Trapping or crushing of       |         |Correct manual handling procedures      |
+|                               |fingers / hands               |         |                                        |
+|Check Steam cleaning unit      |Scalds from leaking hot water |Medium   |Ensure all fittings are tight           |
+|                               |Electric shock                |         |Ensure steam cleaner is plugged into RCD|
+|                               |                              |         |unit                                    |
+|                               |                              |         |Check cable for damage                  |
+|Hold gun                       |Gun can swing erratically when|Low      |Hold gun securely with both hands       |
+|                               |operated                      |         |                                        |
+|Steam clean equipment          |Debris flying around          |Medium   |Wear Required PPE at all times          |
+|                               |Wet floor                     |         |                                        |
+|Place basket in cleaning tank  |Swinging basket               |Low      |Follow correct procedure for operating  |
+|                               |Splashes to face body         |         |hoist                                   |
+|                               |                              |         |Wear Required PPE                       |
+|Remove to steam cleaning tank  |Swinging basket               |Low      |Follow correct procedure for operating  |
+|                               |Splashes to face body         |         |hoist                                   |
+|                               |                              |         |Required PPE                            |
+|Steam clean equipment          |Refer to steps 2,3,4,5,       |Medium   |Refer to steps 2,3,4,5,                 |
+|Blow Dry equipment             |Refer to blowdown air nozzles |Low      |Refer to blowdown air nozzles / guns    |
+|                               |/ guns JSEA                   |         |JSEA                                    |
+|Unload Basket                  |Back strain                   |Medium   |Wear Back support if required           |
+|                               |Trapping or crushing of       |         |Correct manual handling procedures      |
+|                               |fingers / hands               |         |                                        |

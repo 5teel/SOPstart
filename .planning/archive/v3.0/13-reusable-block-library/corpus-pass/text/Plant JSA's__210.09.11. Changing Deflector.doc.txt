@@ -1,0 +1,114 @@
+
+|HAZARD IDENTIFICATION                                                                                         |
+
+|Risk of Entrapment          |X   |Ventilation                |     |
+|Pinch Points                |    |Fire Hazard                |X    |
+|Moving Parts                |X   |Fragile roof support       |     |
+|Rotating Parts              |    |Lighting                   |X    |
+|Cutting                     |X   |Isolated workplace location|     |
+|Moving Machinery            |    |Work above 3 metres        |     |
+|Automatic equipment         |    |Pressurised Fluid          |     |
+|Manual Handling             |X   |Spill to site drainage     |     |
+|Risk of falling objects     |X   |Spill to Stormwater        |     |
+|Excessively hot environment |X   |Odour or Emissions         |     |
+|Noise                       |X   |Soil Contamination         |     |
+|Slippery surface            |X   |Airborne Contaminants      |     |
+|Tripping hazard             |    |Electricity [Power Tools]  |     |
+|Confined Space              |    |Stored energy              |     |
+|Broken or smashed glass     |X   |Electrocution              |     |
+|Limited working area        |X   |Risk of person falling     |X    |
+
+|Hard Hat                    |     |
+|Gloves                      |X    |
+|Breathing Apparatus         |     |
+|Goggles                     |     |
+|Hearing protection          |X    |
+|Fire Extinguisher           |     |
+|Safety Glasses              |X    |
+|Back Support belt           |     |
+|Face Shield                 |     |
+|Disposable Clothing         |     |
+|Harness                     |     |
+|MSDS                        |     |
+|Spill Kit                   |     |
+|Bunding                     |     |
+|Council / OSH Notification  |     |
+|Warning signs to be         |     |
+|displayed                   |     |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+|NOTES              PERMITS COMPLETD                                                                           |
+
+|Work at Heights              |    |
+|High Voltage                 |    |
+|Hot work                     |    |
+|Confined Space               |    |
+|Excavation                   |    |
+|Permit to work completed     |    |
+
+|                                                                  |
+|                                                                  |
+|                                                                  |
+
+
+
+|HAZARD MATRIX                                                                                                 |
+|                  |CONSEQUENCES                            The severity of potential consequences             |
+|                                    |Insignificant                                |
+|LIKELIHOOD                          |First aid injury, up to $1,000 damage, spill |
+|                                    |confined to immediate work area, rapid clean |
+|How likely is it to happen?         |up, no damage to environment                 |
+|4                                   |ACT NOW ΓÇô Urgent ΓÇô do something about the    |
+|ACUTE                               |risks immediately. Requires immediate        |
+|                                    |attention.                                   |
+|3                                   |Highest management decision is required      |
+|HIGH                                |urgently                                     |
+|2                                   |Follow management instruction                |
+|MODERATE                            |                                             |
+|1                                   |OK for now. Record and review if any         |
+|LOW                                 |equipment / people / materials / work        |
+|                                    |processes or procedures change               |
+
+|Hazard Management Worksheet                                                                                           |
+|Hazard Identification                                                                                          |
+|Department     |Forming            |JSA Conducted by: D Westerlund             |Date completed   01.05.2010    |
+|Overview of the Hazard                                                                                         |
+|Significant Hazard                                                                                             |
+|Yes                                                                                                            |
+|                                                                                                               |
+|Risk                                                                                                           |
+|MEDIUM                                                                                                         |
+|                                                                                                               |
+|Control taken                                                                                                  |
+|Minimisation                                                                                                   |
+|                                                                                                               |
+|                                                                                                               |
+|PPE Required:  All standard PPE required when working    |JSA Reviewed by and date                             |
+|within production area                                   |GRANT JUPP 18-12-2019                                |
+|Sequence of Job Steps       |Potential / Actual Hazard   |Level of   |Controls to reduce the Risk of Hazard    |
+|                            |                            |Risk       |                                         |
+|                            |                            |H M L      |                                         |
+|Stop section ΓÇô TAKE 5       |-                           |L          |                                         |
+|Close Blanks/Baffle Down    |                            |L          |                                         |
+|Toggles /Safety on          |                            |           |                                         |
+|Change Deflector            |Heat/Slippery Surface       |M          |PPE, Clean and clear surfaces            |
+|Toggles/Safety Off          |                            |           |                                         |
+|Restart Section             |                            |L          |                                         |
+|                            |                            |           |                                         |
+|                            |                            |           |                                         |
+|                            |                            |           |                                         |
+

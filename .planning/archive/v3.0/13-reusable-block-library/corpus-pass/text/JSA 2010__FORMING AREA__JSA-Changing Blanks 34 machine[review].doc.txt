@@ -1,0 +1,43 @@
+
+Changing Blanks 3/4MC
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |                                        |
+|All standard PPE required    |Yes                                        |JSA Reviewed by and date                |
+|when working within          |                                           |                                        |
+|production area.             |Overall Category of task                   |                                        |
+|                             |LOW                                        |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|                             |                              |            |                                        |
+|Prepare/get blank in the oven|Burn arm ΓÇô pain               |LOW         |Use T-Bars, Cart                        |
+|                             |                              |            |                                        |
+|Unload gob of the specific   |Gob ΓÇô still loading           |LOW         |Make sure to press the unload button    |
+|section                      |                              |            |                                        |
+|                             |                              |            |                                        |
+|STOP the section             |Still running                 |LOW         |Press Emergency button & wait to confirm|
+|                             |Jam up                        |LOW         |stop                                    |
+|                             |                              |            |Stop Section at revert position & make  |
+|                             |                              |            |sure no bottles inside the section      |
+|                             |                              |            |                                        |
+|Remove the cover             |Hard to unlock                |LOW         |Use wrench to twist/unlock              |
+|                             |                              |            |                                        |
+|Change Blank                 |Burn                          |LOW         |Use T-Bar                               |
+|                             |                              |            |Use Rags/Gloves if space are limited    |
+|                             |                              |            |                                        |
+|Place the cover              |Jam up                        |LOW         |Be sure to place properly and lock it   |
+|                             |                              |            |                                        |
+|Start section                |Risk of entrapment            |LOW         |Be sure no person working on that       |
+|                             |                              |            |section before start the section        |
+|                             |                              |            |                                        |
+|Load gob                     |Fallen gob                    |LOW         |Be alert                                |
+
+

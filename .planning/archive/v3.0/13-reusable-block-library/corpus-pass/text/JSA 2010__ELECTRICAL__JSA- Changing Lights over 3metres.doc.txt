@@ -1,0 +1,37 @@
+
+Charging light bulbs over 3 metres
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]           |                                         |
+|PPE Required:                |Significant Hazard                      |JSA Reviewed by and date                 |
+|All standard PPE required    |Yes                                     |J Booth 14/01/08                         |
+|                             |                                        |                                         |
+|                             |Risk Score                              |                                         |
+|                             |90                                      |                                         |
+|                             |                                        |                                         |
+|                             |Category                                |                                         |
+|                             |Medium                                  |                                         |
+|                             |                                        |                                         |
+|                             |Control taken                           |                                         |
+|                             |Minimisation                            |                                         |
+|                             |                                        |                                         |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Isolate power from supply    |Electrocution                 |High     |Approved trained person to replace some  |
+|where possible               |                              |         |bulbs Safe working practice. PPE required|
+|Position lift under lamp to  |Moving machinery ΓÇô pinch      |Low      |Safe working practice. PPE required      |
+|be changed                   |points                        |         |                                         |
+|Set out cones to protect area|Moving machinery              |Low      |Safe working practice. PPE required      |
+|around lift                  |                              |         |                                         |
+|Fit safety harness and secure|Falls & Moving machinery      |Low      |Safe working practice. PPE required      |
+|to lift. Position safety     |                              |         |                                         |
+|ΓÇ£spotterΓÇ¥ person             |                              |         |                                         |
+|Raise the lift to lamp       |Falls Electrocution cuts burns|High     |Safe working practice. PPE required      |
+|replace the lamp and lower   |                              |         |                                         |
+|the lift                     |                              |         |                                         |
+|Re-power the lamp if         |Electrocution                 |High     |Safe working practice. PPE required      |
+|disconnected                 |                              |         |                                         |
+|Remove the barriers and lift |Moving machinery              |High     |Safe working practice. PPE required      |
+|from the area                |                              |         |                                         |

@@ -1,0 +1,61 @@
+
+Working above the lehrs
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSEA Reviewed by and date                   |
+|Normal safety personal        |Yes                                  |Miles Gardiner 06/05/05                     |
+|protective equipment (thick   |                                     |                                            |
+|soled safety boots, overalls, |Risk Score                           |                                            |
+|ear protection). In addition, |150                                  |                                            |
+|gloves and hard hat.          |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |High                                 |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps                     |Potential /            |Level of|Controls to reduce the Risk of Hazard|
+|                                          |Actual Hazard          |Risk    |                                     |
+|Ensure all safety equipment worn. Gloves  |Hot surfaces           |Medium  |Wear gloves                          |
+|required as the access handrail will be   |                       |        |                                     |
+|hot, especially at the top of the lehr.   |                       |        |                                     |
+|Due to the manual handling nature of this |Manual Handling        |High    |Work in in two teams of pairs        |
+|task it requires employees to be working  |                       |        |depending to the nature of the task  |
+|in team of pairs                          |                       |        |undertaken.                          |
+|To access the top of the lehr, use of     |Height                 |Low     |Use the access ladders provided      |
+|correct access ladder on the side of the  |                       |        |                                     |
+|lehr.                                     |                       |        |                                     |
+|This area is about 2m off the ground. Be  |Falls                  |High    |Be cautious. Keep away from the sides|
+|careful not to drop objects from this     |                       |        |of the lehr.                         |
+|height.                                   |                       |        |                                     |
+|When moving around the top of the lehr, be|Headroom               |Medium  |Wear a hard hat and be aware of the  |
+|aware of the restricted head room.        |                       |        |height restriction                   |
+|The top of the lehr has ducts, pipes, fans|Obstructions           |Low     |Take caution                         |
+|and electrical conduits. Be careful when  |                       |        |                                     |
+|moving around the area.                   |                       |        |                                     |
+|The area above the lehr entraps hot air.  |Hot environment        |High    |Take continuous breaks by getting off|
+|Do not spend extended time in this hot    |                       |        |the top of the lehr and resting in a |
+|environment.                              |                       |        |cooling environment.                 |
+|                                          |                       |        |Drink plenty of liquids.             |
+|Environmental:                            |                       |        |                                     |
+|Removal of used rags / gloves/  waste/    |Contamination.         |High    |Place in correct contamination or    |
+|glass / cullet                            |Waste removal and tidy |        |waste bins provided.                 |
+|                                          |up.                    |        |Ensure area is cleaned and product / |
+|                                          |                       |        |tools cleared away.                  |
+|Protection & Security                     |                       |        |                                     |
+|Demarcation                               |Damage to people,      |High    |Demarcation where applicable.        |
+|                                          |property and           |        |Install barricaded/danger tape as    |
+|                                          |environment.           |        |required.                            |
+|                                          |                       |        |Ensure correct fire fighting         |
+|                                          |                       |        |equipment is available.              |
+
+
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

@@ -1,0 +1,70 @@
+
+
+
+Job Safety Environmental Analysis Form:            Drilling & Installation
+                                                                  of
+                                                                  Bubblers
+
+|Area / Department                  |Batch & Furnace                       |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots, High Vis/heat        |                                      |                                          |
+|Garment, Respiratory Protection    |Risk Score                            |                                          |
+|(when working with asbestos), Fire |                                      |                                          |
+|Visor, Balaclava, Hotwork Gloves   |                                      |                                          |
+|(if required), Face Mask, Hot Work |Category                              |                                          |
+|permit (if required).              |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Refer to colour change   |Glass quality issues.   |Low      |Process Engineers.                                      |
+|manual for ΓÇÿoff colourΓÇÖ  |                        |         |                                                        |
+|time etc.                |                        |         |                                                        |
+|Set up equipment for     |Work under furnace.     |High     |Supervision at all times.                               |
+|drilling ie welder,      |Watch out for any       |         |Restrict access.                                        |
+|water, air supply,       |apparent hazards i.e.   |         |                                                        |
+|lighting, bubblers.      |heat.                   |         |                                                        |
+|Boost off when breaking  |Electric shock hazards. |High     |Observe furnace conditions ie batch line floor          |
+|through.                 |                        |         |temperature.                                            |
+|Refractory into glass.   |                        |         |                                                        |
+|Drill bubbler holes and  |Hot glass dropping.     |High     |Supervision at all times.                               |
+|insert bubblers.  Secure |Hot water ingress.      |         |Trained personnel carrying out the work.                |
+|bubblers in position.    |Steam / explosions / hot|         |                                                        |
+|                         |lead.                   |         |                                                        |
+|Ensure bubblers are      |Hot glass dropping.     |High     |Supervision at all times.                               |
+|bubbling at correct      |Hot water ingress.      |         |Trained personnel carrying out the work.                |
+|pressure.                |Steam / explosions / hot|         |                                                        |
+|Recommend 1 bubble per   |lead.                   |         |                                                        |
+|second.                  |                        |         |                                                        |
+|Ensure bubblers are      |Hot glass dropping.     |High     |Supervision at all times.                               |
+|checked by management.   |Hot water ingress.      |         |Trained personnel carrying out the work.                |
+|Turn off bubblers when   |Steam / explosions / hot|         |                                                        |
+|required.                |lead.                   |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

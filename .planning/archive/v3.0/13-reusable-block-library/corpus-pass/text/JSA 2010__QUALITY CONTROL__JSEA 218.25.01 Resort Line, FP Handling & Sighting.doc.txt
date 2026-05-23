@@ -1,0 +1,64 @@
+
+RESORT - Line & FP Handling & Sighting
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date13/06/07       |
+|Safety Glasses / Gloves / cap / |Yes/                                   |Gary OΓÇÖNeill  Mate Pocrinich            |
+|Hi Viz Clothing / ear protection|                                       |Numela Ropati Hiliate Kilifi            |
+|                                |Risk Score                             |                                        |
+|                                |150                                    |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |High                                   |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                    |Potential /                   |Level of |Controls to reduce the Risk of|
+|                                         |Actual Hazard                 |Risk     |Hazard                        |
+|This procedure assumes that the line has |None                          |Nil      |Nil                           |
+|been job changed to suit the job to be   |                              |         |                              |
+|run.                                     |                              |         |                              |
+|With the line running at the desired     |Damage to equipment           |Low      |Training                      |
+|speed for optimum efficiency , the FPs ( |                              |         |                              |
+|up to 2 ) may be set to reject defects by|                              |         |                              |
+|mould numbers automatically The speed of |                              |         |                              |
+|the FP should be set to compliment the   |                              |         |                              |
+|line speed & not cause additional        |                              |         |                              |
+|handling issues                          |                              |         |                              |
+|Periodically the resort operator is      |Broken Glass causing          |Low      |Wearing the required PPE      |
+|required to check the integrity of the   |Laceration                    |         |Glasses ΓÇô long sleeved        |
+|FPs by either  Ensuring that the correct |                              |         |clothing to prevent any       |
+|mould number is physically being rejected|                              |         |lacerations                   |
+|or Checking if a known defect is being   |                              |         |                              |
+|rejected  ( if the FP has specifically   |                              |         |                              |
+|been set up )                            |                              |         |                              |
+|Occasionally the resort requirement may  |Eye strain causing tiredness  |Low      |Regular breaks                |
+|be for sighting for defects at light     |                              |         |                              |
+|screens                                  |                              |         |                              |
+|Any intervention required on the FPs MUST|Entrapment / pinch points     |Low      |Use emergency stop buttons.   |
+|have the FP STOPPED                      |                              |         |Correct PPE worn to prevent   |
+|                                         |                              |         |entrapment ΓÇô No sleeves worn  |
+|                                         |                              |         |loose.                        |
+|Rejected ware will be on a conveyor into |Broken Glass causing          |Low      |PPE to be worn                |
+|a large skip.                            |Laceration                    |         |                              |
+|The skip is uplifted & tipped into an    |Vehicle Collision             |High     |Care and attention as per FH &|
+|appropriate cullet bay when full         |                              |         |site requirements             |
+|Environmental:                           |                              |         |                              |
+|Removal of used rags / gloves/  waste/   |Contamination.                |High     |Place in correct contamination|
+|glass / cullet                           |Waste removal and tidy up.    |         |or waste bins provided.       |
+|                                         |                              |         |Ensure area is cleaned and    |
+|                                         |                              |         |product / tools cleared away. |
+|Protection & Security                    |                              |         |                              |
+|Demarcation                              |Damage to people, property and|High     |Demarcation where applicable. |
+|                                         |environment.                  |         |Install barricaded/danger tape|
+|                                         |                              |         |as required.                  |
+|                                         |                              |         |Ensure correct fire fighting  |
+|                                         |                              |         |equipment is available.       |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

@@ -1,0 +1,66 @@
+
+
+
+Job Safety Environmental Analysis Form:                         Remove &
+                                                              Install
+                                                              Cullet Drag
+
+|Area / Department                  |Factory Maintenance                   |Task  or Job Description                  |
+|Recommended Personal Protective    |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Equipment                          |                                      |                                          |
+|High Visibility Jacket, PPE, Hard  |                                      |                                          |
+|hat (when working in Drag area),   |Risk Score                            |                                          |
+|gumboots, safety boots, hearing    |                                      |                                          |
+|protection, safety glasses,        |                                      |                                          |
+|advisable that both emplyees have a|Category                              |                                          |
+|BATT phone.                        |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Prepare work site.       |Manual Handling.        |Medium   |Use correct manual handling techniques.                 |
+|                         |Low head room.          |         |Helmets to be worn.                                     |
+|                         |                        |         |Barricade off area.                                     |
+|Isolate electrics to     |Electric shock, burns.  |Medium   |Ensure isolation has been done to the Group Isolation   |
+|drag.                    |                        |         |Board.                                                  |
+|Remove old pulley and    |Gas cutting.            |High     |Wear appropriate PPE.                                   |
+|install new one.         |Low head room.          |         |Ensure electrical leads have RCDΓÇÖs.                     |
+|Remove old drag chain and|Congested work area.    |         |All electrical leads to be kept up off floor.           |
+|install new one.         |Water and oil on all    |         |Clear broken glass from work area.                      |
+|                         |surfaces, slip hazard.  |         |                                                        |
+|                         |Slips / trips / falls.  |         |                                                        |
+|                         |Electricution.          |         |                                                        |
+|                         |Lacerations.            |         |                                                        |
+|Install top platforms    |Manual handling         |Medium   |Use correct manual handling techniques.                 |
+|over drag.               |Jammed fingers / pinch  |         |Use appropriate PPE.                                    |
+|                         |points.                 |         |Fire equipment readily available.                       |
+|                         |Welding / grinding.     |         |Barricade off and restrict access.                      |
+|                         |Congested work area.    |         |                                                        |
+|Install new limit        |Drilling.               |High     |Electrical leads to use RCD.                            |
+|switches                 |Electrocution.          |         |                                                        |
+|Commission drag.         |                        |         |Follow commissiong procedure.                           |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

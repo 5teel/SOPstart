@@ -1,0 +1,29 @@
+
+Servicing Spray Gun
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]           |                                         |
+|PPE Required:                |Significant Hazard                      |JSA Reviewed by and date                 |
+|All standard PPE required    |Yes / No                                |                                         |
+|                             |                                        |                                         |
+|                             |Risk Score                              |                                         |
+|                             |                                        |                                         |
+|                             |                                        |                                         |
+|                             |Category                                |                                         |
+|                             |                                        |                                         |
+|                             |                                        |                                         |
+|                             |Control taken                           |                                         |
+|                             |                                        |                                         |
+|                             |                                        |                                         |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Clean Spray Gun              |Nil                           |Low      |Use correct PPE Gloves and face mask     |
+|Dismantle                    |Nil                           |Low      |Follow correct procedure                 |
+|Inspect Parts                |Nil                           |Low      |Read manual info ΓÇô services manual       |
+|Purchase parts               |Nil                           |Low      |Use Main Store                           |
+|Assemble in reverse order    |Nil                           |Low      |Correct assemble procedure               |
+|Test Spray Gun               |Compressed Air                |Medium   |Adjust Air pressure                      |
+|Label Spray Gun              |Nil                           |Low      |Write info correctly and clearly         |
+|Store in Rack                |Nil                           |Low      |Correct parts Rack shelf                 |

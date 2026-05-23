@@ -1,0 +1,54 @@
+
+Manual Pressure Testing
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]         |                                        |
+|PPE Required:                   |Significant Hazard                    |JSEA Reviewed by and date:              |
+|All standard PPE required       |Yes                                   |                                        |
+|                                |                                      |Bronwyn Bell                            |
+|                                |Risk Score                            |                                        |
+|                                |24                                    |                                        |
+|                                |                                      |                                        |
+|                                |Category                              |                                        |
+|                                |Low                                   |                                        |
+|                                |                                      |                                        |
+|                                |Control taken                         |                                        |
+|                                |Minimisation                          |                                        |
+|                                |                                      |                                        |
+|Sequence of Job Steps           |Potential /                  |Level of |Controls to reduce the Risk of Hazard   |
+|                                |Actual Hazard                |Risk     |                                        |
+|A set of samples taken off the  |Manually picking bottles off |Low      |Gloves [optional] to be worn when       |
+|lehr ΓÇô do not drag bottles off  |lehr, broken finishes,       |         |picking bottles off lehr                |
+|lehr, may causes damage to      |stretching, reaching for set |         |                                        |
+|stipple                         |                             |         |                                        |
+|Sort bottles out to ensure set  |Possible broken finishes     |Low      |As above                                |
+|is complete and record cavity   |                             |         |                                        |
+|numbers prior to testing        |                             |         |                                        |
+|Complete sample set to be filled|As above                     |Low      |As above                                |
+|with water                      |                             |         |                                        |
+|All filled with water, turn on  |Bottles become slippery with |Low      |Care taken when handling bottles after  |
+|pressure tester, open door, lift|water, may slip out and break|         |filling with water, Gloves worn must be |
+|handle and insert bottle into   |on impact, broken glass      |         |worn                                    |
+|jaws                            |fragments                    |         |                                        |
+|Bring handle down to clamp      |Finish sometimes breaks when |Low      |As above ΓÇô water is normally used to    |
+|bottle and jaws, close door to  |jaws are clamped creating    |         |wash away broken glass fragments in the |
+|start testing                   |glass fragments after bottle |         |jaws. Gloves must be worn               |
+|                                |falls and hits tray ΓÇô broken |         |                                        |
+|                                |glass in jaws                |         |                                        |
+|Repeat process ΓÇÿtil set complete|As above                     |Low      |As above                                |
+|Environmental:                  |                             |         |                                        |
+|Removal of used rags / gloves/  |Contamination.               |High     |Place in correct contamination or waste |
+|waste/ glass / cullet           |Waste removal and tidy up.   |         |bins provided.                          |
+|                                |                             |         |Ensure area is cleaned and product /    |
+|                                |                             |         |tools cleared away.                     |
+|Protection & Security           |                             |         |                                        |
+|Demarcation                     |Damage to people, property   |High     |Demarcation where applicable.           |
+|                                |and environment.             |         |Install barricaded/danger tape as       |
+|                                |                             |         |required.                               |
+|                                |                             |         |Ensure correct fire fighting equipment  |
+|                                |                             |         |is available.                           |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

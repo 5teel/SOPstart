@@ -1,0 +1,39 @@
+
+CHANGING NECK RINGS 21MC
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                                 |Safety Induction [Contractor]                                                  |
+
+|Area / Department            |HOT END FORMING                            |Task  or Job Description                |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |YES                                        |DON WESTERLUND 09/03/2010               |
+|when working within          |                                           |                                        |
+|production area              |Overall Category of Risk                   |                                        |
+|                             |                                           |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |MINIMISATION                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|GET CORRECT RING FROM SPARES |TRIP                          |MEDIUM      |WATCH WHERE YOUR WALKING                |
+|BENCH                        |                              |            |                                        |
+|REFER TO JSA ON HOW TO STOP  |NIL                           |LOW         |NIL                                     |
+|SECTION WITH RING ARM ON     |                              |            |                                        |
+|MOULD SIDE                   |                              |            |                                        |
+|CLOSE MOULDS                 |ENTRAPMENT                    |MED         |INFORM PERSON IN FRONT TO STAY CLEAR    |
+|                             |                              |            |TILL MOULDS ARE CLOSED                  |
+|TAKE OFF RINGS               |BURNS WHILE REMOVING RINGS    |MED         |ALL PPE GEAR TO BE WORN CORRECTLY       |
+|OPEN MLDS                    |ENTRAPMENT                    |MED         |DE-PRESS MOULD SIDE INHIBIT BUTTON TO   |
+|                             |                              |            |STOP MLDS FROM CLOSING                  |
+|NEW RINGS ON                 |BURNS WHILE  PUTTING ON RINGS |MED         |ALL PPE GEAR TO BE WORN CORRECTLY       |
+|PUSH RING ARM BACK TO BLK    |BURNS WHILE PUSHING ARM BACK  |MED         |ALL PPE GEAR TO BE WORN CORRECTLY       |
+|SIDE                         |                              |            |                                        |
+|MOP RINGS                    |NIL                           |LOW         |NIL                                     |
+|REFER TO JSA ON RESTARTING A |ENTRAPMENT                    |MED         |MAKE SURE ALL PERSONS ARE CLEAR OF      |
+|SECTION                      |                              |            |SECTION                                 |
+|REJECT CAVITIES & CHECK      |BURNS/CUTS                    |MED         |ALL PPE GEAR TO BE WORN CORRECTLY       |
+|QUALITY OF RINGS BEFORE      |                              |            |                                        |
+|ALLOWING BACK INTO LEHR      |                              |            |                                        |

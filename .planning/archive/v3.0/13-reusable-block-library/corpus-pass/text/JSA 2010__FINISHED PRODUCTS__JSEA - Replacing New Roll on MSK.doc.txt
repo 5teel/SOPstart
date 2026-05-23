@@ -1,0 +1,37 @@
+
+APPLYING NEW ROLL TO MSK
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date:               |
+|All standard safety equipment   |Yes                                    |Wayne Smith 16/08/07                    |
+|                                |                                       |Simote Tuitupou 16/08/07                |
+|                                |Risk Score                             |                                        |
+|                                |30                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps           |Potential /                  |Level of |Controls to reduce the Risk of Hazard   |
+|                                |Actual Hazard                |Risk     |                                        |
+|Using the block & tackle lift   |Heavy bar ΓÇô possible back    |Medium   |2 people (when possible) to lift bar /  |
+|bar off bracket and remove      |strain                       |         |or if in training  to ensure that       |
+|locking nut and core            |                             |         |employee not exposed to manual handling |
+|                                |                             |         |risk                                    |
+|Feed bar into new roll and      |Heavy bar ΓÇô possible back    |Medium   |2 people (when possible) to lift bar /  |
+|secure                          |strain                       |         |or if in training  to ensure that       |
+|                                |                             |         |employee not exposed to manual handling |
+|                                |                             |         |risk                                    |
+|Use block & tackle to lift roll |Block & tackle may fail ΓÇô    |Medium   |2 people [when possible] to push roll   |
+|to correct height - push roll   |back strain, shoulder strain |         |into place                              |
+|into position and lower onto    |                             |         |                                        |
+|bracket                         |                             |         |                                        |
+|Plastic then fed through correct|Back strain ΓÇô possible trip  |Low      |Normally 2 people can do this, but the  |
+|sequence                        |hazards                      |         |task can be done by the Fork Hoist only.|
+|Close doors, reset MSK and press|Crush hazard from closing the|Low      |Training / awareness                    |
+|Auto                            |door                         |         |                                        |

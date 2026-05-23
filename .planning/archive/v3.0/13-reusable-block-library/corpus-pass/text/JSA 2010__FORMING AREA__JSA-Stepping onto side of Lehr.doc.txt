@@ -1,0 +1,28 @@
+
+Stepping onto side of the Lehr
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required for|Yes                                        |                                        |
+|working in the production    |                                           |                                        |
+|areas                        |Overall Category of task                   |                                        |
+|                             |Low                                        |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Stop back up Spray           |Moving machinery              |Low         |Use the E ΓÇôStop to stop spray           |
+|Step onto side of Lehr       |Risk of falling and tripping  |Medium      |Use step and hand rails to get up onto  |
+|                             |                              |            |Lehr                                    |
+|Stand up fallen ware         |Broken glass                  |Medium      |Use purpose made stick for standing ware|
+|                             |                              |            |up                                      |
+|Step off side of Lehr        |Risk of falling & tripping    |Medium      |Use the step and handrail to get off the|
+|                             |                              |            |Lehr                                    |
+|Restart back up spray        |Moving machinery              |Low         |Release the E-Stop and restart          |
+
+

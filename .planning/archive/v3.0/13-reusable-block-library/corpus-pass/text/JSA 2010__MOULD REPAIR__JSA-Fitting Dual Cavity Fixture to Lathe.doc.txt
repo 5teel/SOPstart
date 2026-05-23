@@ -1,0 +1,30 @@
+
+Fitting Dual Cavity Fixture to Lathe.
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                              |
+|PPE Required:                 |Significant Hazard                   |JSA Reviewed by and date                      |
+|All standard PPE required     |Yes                                  |Dave Walmsley ΓÇô 10.07.08                      |
+|                              |                                     |                                              |
+|                              |Category                             |                                              |
+|                              |Medium                               |                                              |
+|                              |                                     |                                              |
+|                              |Control taken                        |                                              |
+|                              |Minimisation                         |                                              |
+|                              |                                     |                                              |
+|Sequence of Job Steps          |Potential /                   |Level of  |Controls to reduce the Risk of Hazard    |
+|                               |Actual Hazard                 |Risk      |                                         |
+|Attach 500kg Chain Block to    |Tripping.                     |          |Remove all obstacles in the way.         |
+|Gantry.                        |Back Strain.                  |Med       |Ask for assistance in attaching the Cain |
+|                               |Entrapment of Fingers.        |          |Block if reqd.                           |
+|                               |                              |          |Use correct Manual Handling Procedures.  |
+|                               |                              |          |Use Back Support if reqd.                |
+|Lift Dual Cavity Fixture with  |Falling object.               |          |Keep clear of load.                      |
+|500kg Chain Block & Gantry.    |                              |Med       |Ensure no obstacles in the way.          |
+|                               |                              |          |Move load slowly.                        |
+|Locate Dual Cavity Fixture onto|Entrapment of Fingers.        |          |Keep Fingers clear when sliding Fixture  |
+|ΓÇÿSnoutΓÇÖ of Lathe.              |Slipping.                     |Med       |Dowels into Locking holes.               |
+|                               |                              |          |Ensure firm footing whilst tightening    |
+|                               |                              |          |Locking Cams.                            |

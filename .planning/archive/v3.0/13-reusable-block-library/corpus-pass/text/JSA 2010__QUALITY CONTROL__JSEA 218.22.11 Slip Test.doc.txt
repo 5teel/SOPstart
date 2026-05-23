@@ -1,0 +1,51 @@
+
+Slip Test
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses                  |Yes                                    |Richard Smith  11/06/07                 |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |10                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                  |Potential /            |Level of    |Controls to reduce the Risk of      |
+|                                       |Actual Hazard          |Risk        |Hazard                              |
+|Switch on & reset Tilt table to zero   |None                   |Low         |Nil                                 |
+|degrees                                |                       |            |                                    |
+|Position two bottles side by side on   |None                   |Low         |Nil                                 |
+|the tilt table with the bases touching |                       |            |                                    |
+|the stop on the left of the assembly   |                       |            |                                    |
+|Place a third bottle on top of the     |None                   |Low         |Nil                                 |
+|other two ( facing the same way )      |                       |            |                                    |
+|Press the start button & the assembly  |None                   |Low         |Nil                                 |
+|will tilt & stop when the third bottle |                       |            |                                    |
+|has been dislodged & has activated a   |                       |            |                                    |
+|back stop sensor                       |                       |            |                                    |
+|Record the slip angle                  |None                   |Low         |Nil                                 |
+|Discard the containers after testing   |Laceration from broken |Low         |Ensure PPE is worn to prevent injury|
+|                                       |glass                  |            |to self                             |
+|Environmental:                         |                       |            |                                    |
+|Removal of used rags / gloves/  waste/ |Contamination.         |High        |Place in correct contamination or   |
+|glass / cullet                         |Waste removal and tidy |            |waste bins provided.                |
+|                                       |up.                    |            |Ensure area is cleaned and product /|
+|                                       |                       |            |tools cleared away.                 |
+|Protection & Security                  |                       |            |                                    |
+|Demarcation                            |Damage to people,      |High        |Demarcation where applicable.       |
+|                                       |property and           |            |Install barricaded/danger tape as   |
+|                                       |environment.           |            |required.                           |
+|                                       |                       |            |Ensure correct fire fighting        |
+|                                       |                       |            |equipment is available.             |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

@@ -1,0 +1,57 @@
+
+MSK Manual Operation
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date:              |
+|All standard safety equipment   |Yes                                    |Wayne Smith 16/08/07                    |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |120                                    |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Medium                                 |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps          |Potential /                   |Level of |Controls to reduce the Risk of Hazard   |
+|                               |Actual Hazard                 |Risk     |                                        |
+|Pallets moves into the squarer,|Bottles falling off pallet,   |Low      |Awareness when pallets entering MSK     |
+|Squarer walls closes, then     |pallet twists on entering due |         |Stay clear                              |
+|opens                          |to broken board or bottles on |         |                                        |
+|                               |rollers                       |         |                                        |
+|Pallet moves into position to  |Bottles falling off pallet    |Low      |Clear area before turning to auto       |
+|measure bag size               |                              |         |                                        |
+|Lift arms raise plastic to     |Sealing frame closes [possible|High     |Ensure that all employees are out of the|
+|measure bag, bag cut & sealed, |entrapment], cutting blade    |         |area when                               |
+|gripper arms open              |                              |         |                                        |
+|Pallet moves into lift and     |Bottles falling off pallet,   |Low      |Clear area before turning to auto       |
+|bagging position               |                              |         |                                        |
+|Gas ring lowers, pallet is     |Bottles falling off pallet,   |Low      |Clear area before turning to auto       |
+|lifted, bag is applied, gripper|pallet collapse when lifted   |         |                                        |
+|arms back in position.         |due to broken pallet maybe    |         |                                        |
+|                               |twisted                       |         |                                        |
+|Shrink process starts, pallet  |Bottles under pallet may cause|Low      |Awareness when pallet exits MSK Stay    |
+|lift lowers pallet, gas ring   |collapse when lowered, pallet |         |clear                                   |
+|raises, pallet exits shrink    |may twist / collapses whilst  |         |                                        |
+|area and MSK                   |exiting MSK                   |         |                                        |
+|Environmental:                 |                              |         |                                        |
+|Removal of used rags / gloves/ |Contamination.                |High     |Place in correct contamination or waste |
+|waste/ glass / cullet          |Waste removal and tidy up.    |         |bins provided.                          |
+|                               |                              |         |Ensure area is cleaned and product /    |
+|                               |                              |         |tools cleared away.                     |
+|Protection & Security          |                              |         |                                        |
+|Demarcation                    |Damage to people, property and|High     |Demarcation where applicable.           |
+|                               |environment.                  |         |Install barricaded/danger tape as       |
+|                               |                              |         |required.                               |
+|                               |                              |         |Ensure correct fire fighting equipment  |
+|                               |                              |         |is available.                           |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+

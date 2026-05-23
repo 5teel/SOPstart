@@ -1,0 +1,66 @@
+
+Thermal Bath
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]    |                                             |
+|PPE Required:                   |Significant Hazard               |JSEA Reviewed by and date                    |
+|Safety Glasses / gloves , back  |Yes                              |Richard Smith  11/06/07                      |
+|support brace if required       |                                 |                                             |
+|                                |Risk Score                       |                                             |
+|                                |50                               |                                             |
+|                                |                                 |                                             |
+|                                |Category                         |                                             |
+|                                |Medium                           |                                             |
+|                                |                                 |                                             |
+|                                |Control taken                    |                                             |
+|                                |Minimisation                     |                                             |
+|                                |                                 |                                             |
+|Sequence of Job Steps                      |Potential /           |Level of Risk |Controls to reduce the Risk of|
+|                                           |Actual Hazard         |              |Hazard                        |
+|This test is semi automated                |None                  |Low           |                              |
+|The bath is on a timer & will switch itself|Timer malfunctions    |Medium        |Weekly electrical checks      |
+|on for approx 6 hours every day            |causing fire / damage |              |conducted                     |
+|                                           |injury                |              |                              |
+|Water temperature is set to achieve a 55*c |Temperature do not    |Medium        |Weekly electrical checks      |
+|differential with the hot bath at 76*c &   |match set points      |              |conducted                     |
+|cold bath at 21*c                          |causing  incorrect    |              |                              |
+|                                           |results to be recorded|              |                              |
+|Standing facing the cage remove the wire   |Sprain / strain       |Low           |PPE                           |
+|mesh lid & drop it back                    |                      |              |                              |
+|Position the bottles to be tested (evenly  |None                  |Low           |Nil                           |
+|distributed ) in the crate & replace wire  |                      |              |                              |
+|mesh lid so that it is seated firmly over  |                      |              |                              |
+|the finishes                               |                      |              |                              |
+|At the control panel depress the start     |None                  |Low           |Nil                           |
+|button                                     |                      |              |                              |
+|The cage will lift & immerse itself in the |Scalding from hot     |Low           |Nil                           |
+|hot bath for 5 minutes The operation will  |splashed water        |              |                              |
+|not cause splash, employee not remain in   |                      |              |                              |
+|area                                       |                      |              |                              |
+|The cage will then lift & immerse itself in|None                  |Low           |Nil                           |
+|the cold bath for 30 seconds               |                      |              |                              |
+|When the test is complete, the cage will be|None                  |Low           |Nil                           |
+|lifted up a stop above the cold bath       |                      |              |                              |
+|The wire mesh lid can now be removed &     |Sprain / strain       |Low           |Ensure that PPE is worn to    |
+|dropped back                               |                      |              |prevent injury to self        |
+|Each bottle should be drained of water &   |Laceration            |Low           |Ensure that PPE is worn to    |
+|checked for breakage                       |                      |              |prevent injury to self        |
+|Discard containers after testing           |Laceration            |Low           |Ensure that PPE is worn to    |
+|                                           |                      |              |prevent injury to self        |
+|Environmental:                             |                      |              |                              |
+|Removal of used rags / gloves/  waste/     |Contamination.        |High          |Place in correct contamination|
+|glass / cullet                             |Waste removal and tidy|              |or waste bins provided.       |
+|                                           |up.                   |              |Ensure area is cleaned and    |
+|                                           |                      |              |product / tools cleared away. |
+|Protection & Security                      |                      |              |                              |
+|Demarcation                                |Damage to people,     |High          |Demarcation where applicable. |
+|                                           |property and          |              |Install barricaded/danger tape|
+|                                           |environment.          |              |as required.                  |
+|                                           |                      |              |Ensure correct fire fighting  |
+|                                           |                      |              |equipment is available.       |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

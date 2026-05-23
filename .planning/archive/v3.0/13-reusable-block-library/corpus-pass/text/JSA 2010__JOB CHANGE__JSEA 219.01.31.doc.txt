@@ -1,0 +1,49 @@
+
+#34 Blowing out glass from section prior to Job Change
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                  |Safety Induction [Contractor]         |                                          |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Boots, gloves, uniform, safety     |Yes                                   |                                          |
+|glasses, ear muffs, (protection    |                                      |July 2007                                 |
+|sleeves, back support ΓÇô optional)  |Risk Score                            |                                          |
+|                                   |40                                    |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |Low                                   |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |Minimisation                          |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Stop Section:-           |Burns, crushing, caught |High     |                                                        |
+|Follow Stopping Section  |in machine.             |         |                                                        |
+|refer JSEA 219.01.02     |                        |         |                                                        |
+|Close moulds.            |Crushing.               |High     |Make sure all personnel are clear of the section.       |
+|Blow out sections from   |Glass fragments being   |High     |Do not blow glass back towards the blank side.          |
+|the mould side when siren|blown through the air.  |         |                                                        |
+|has been deactivated.    |                        |         |                                                        |
+|Carry on with Job Change |Burns, crushing, caught |High     |As per existing job change JSEA.                        |
+|after blowing out        |in machine.             |         |                                                        |
+|section.                 |                        |         |                                                        |
+|Environmental            |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+
+                                                     -----------------------
+[pic]
+
+O-I New Zealand
+

@@ -1,0 +1,52 @@
+
+
+
+Job Safety Environmental Analysis Form:      Remove Gas Line Feeder
+                                                                     Platform
+
+|Area / Department                  |Forming                               |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots/Clothing.             |                                      |                                          |
+|                                   |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Prepare work area.       |Manual handling.        |High     |Use correct manual handling techniques.                 |
+|Purge gas line with      |Fumes.                  |High     |Ensure gas line isolated on Group Isolation Board.      |
+|compressed air.          |Uncontrolled escape of  |         |Fire equipment readily available.                       |
+|                         |gas.                    |         |Use appropriate PPE.                                    |
+|                         |                        |         |Good ventilation.                                       |
+|Cut gas line.            |Hand tools.             |Medium   |Use correct tools for job.                              |
+|                         |Fumes.                  |         |Good ventilation.                                       |
+|Remove pipe.             |Manual handling.        |Medium   |Use correct manual handling techniques.                 |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

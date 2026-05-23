@@ -1,0 +1,60 @@
+
+Loading mould equipment via Tank 3 platform when lift out of order
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Hard hat for forklift driver    |Yes                                    |Gary Russell  1/6/07                    |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |300                                    |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |High                                   |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps    |Potential /        |Level of |Controls to reduce the Risk of Hazard                    |
+|                         |Actual Hazard      |Risk     |                                                         |
+|Engage tray with fork    |Entrapment         |High     |Authorized personnel only to operate hoist               |
+|hoist and position for   |Crushing           |         |Ensure area clear of pedestrians                         |
+|lifting                  |Uneven load        |         |Ensure tray has correct metal sides in place             |
+|                         |Tray sliding       |         |Lay equipment down on tray                               |
+|                         |                   |         |10 trays to be modified with wood under tray to ensure no|
+|                         |                   |         |metal on metal contact with forks.                       |
+|Second person to open top|Falling from height|High     |Ensure area clear of obstructions                        |
+|platform gate            |                   |         |Only open biggest of the two gates                       |
+|                         |                   |         |When gate is unlatched back away with gate to open       |
+|                         |                   |         |Gate should be between person and edge of platform until |
+|                         |                   |         |fully open.                                              |
+|Raise tray onto deck of  |Entrapment         |High     |Correct operation of hoist as per training               |
+|platform                 |Crushing           |         |Ensure area clear of pedestrians                         |
+|                         |Falling objects    |         |Ensure tray has correct metal sides in place             |
+|                         |                   |         |Lay equipment down on tray                               |
+|                         |                   |         |10 trays to be modified with wood under tray to ensure no|
+|                         |                   |         |metal on metal contact with forks.                       |
+
+|Unloading tray with      |Entrapment         |High     |Correct operation of hoist as per training               |
+|pedestrian hoist         |Crushing           |         |Ensure area clear of pedestrians                         |
+|                         |Uneven load        |         |Ensure tray has correct metal sides in place             |
+|                         |Tray sliding       |         |Lay equipment down on tray                               |
+|                         |Falling of edge of |         |10 trays to be modified with wood under tray to ensure no|
+|                         |platform           |         |metal on metal contact with forks.                       |
+|                         |                   |         |Pedestrian hoist forks to be set at correct width for    |
+|                         |                   |         |lifting tray with counterbalance fork hoist in place.    |
+|                         |                   |         |Counter balance fork hoist to be left in place in raised |
+|                         |                   |         |position                                                 |
+|Transfer tray to buggy   |Entrapment         |high     |Correct operation of hoist as per training               |
+|within tank 3 building   |Crushing           |         |Ensure area clear of pedestrians                         |
+|                         |Uneven load        |         |Ensure tray has correct metal sides in place             |
+|                         |Tray sliding       |         |Lay equipment down on tray                               |
+|                         |Falling of edge of |         |10 trays to be modified with wood under tray to ensure no|
+|                         |platform           |         |metal on metal contact with forks.                       |
+|                         |                   |         |Reverse pedestrian hoist into main tank 3 building       |
+|                         |                   |         |Remove pedestrian hoist from tray into a safe clear area |
+|Lowering trays from      |                   |High     |                                                         |
+|platform is a reversal of|                   |         |                                                         |
+|the above                |                   |         |                                                         |

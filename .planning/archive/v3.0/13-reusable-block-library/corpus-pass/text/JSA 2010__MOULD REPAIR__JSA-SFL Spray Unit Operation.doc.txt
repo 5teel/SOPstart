@@ -1,0 +1,39 @@
+
+SFL Spray Unit Operation
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                           |Safety Induction [Contractor]      |                                               |
+|PPE Required:               |Significant Hazard                 |JSA Reviewed by and date                       |
+|                            |Yes                                |G Russell                                      |
+|                            |                                   |                                               |
+|                            |Risk Score                         |                                               |
+|                            |250                                |                                               |
+|                            |                                   |                                               |
+|                            |Category                           |                                               |
+|                            |High                               |                                               |
+|                            |                                   |                                               |
+|                            |Control taken                      |                                               |
+|                            |Minimisation                       |                                               |
+|                            |                                   |                                               |
+|Sequence of Job Steps       |Potential /            |Level of    |Controls to reduce the Risk of Hazard          |
+|                            |Actual Hazard          |Risk        |                                               |
+|Switch unit on              |Crushing / Entrapment /|High        |Ensure area is clear of people & equipment Wear|
+|                            |Noise                  |            |hearing protection                             |
+|Remove airline from solution|Splash of solution     |Low         |Ensure supply valve is closed  Safety glasses  |
+|tank                        |                       |            |                                               |
+|Attach airline to paint tank|Splashing of paint     |Low         |Ensure supply valve is closed Safety glasses   |
+|Prime paint line            |Spraying of paint      |Low         |Apply paint nozzle to tin or bucket Correct PPE|
+|                            |Inhalation of fumes    |            |(Mask, Face shield or Glasses                  |
+|                            |Contamination in eyes  |            |                                               |
+|Place equipment on stand    |Back strain            |High        |Correct manual handling procedure              |
+|                            |Crushing of fingers    |            |Optional back support                          |
+|                            |                       |            |Keep fingers and hands clear of surface when   |
+|                            |                       |            |placing  equipment down                        |
+|Spraying of equipment       |Spraying of paint      |Low         |Glasses / face shield / hat                    |
+|                            |Inhalation of fumes    |            |Correct PPE (Optional type of Respirator Mask ,|
+|                            |Contamination in eyes  |            |Face shield or Glasses                         |
+|Remove equipment to table   |Back strain            |High        |Correct manual handling procedure. Back support|
+|                            |Crushing of fingers    |            |Keep fingers and hands clear of surface when   |
+|                            |                       |            |placing  equipment down                        |

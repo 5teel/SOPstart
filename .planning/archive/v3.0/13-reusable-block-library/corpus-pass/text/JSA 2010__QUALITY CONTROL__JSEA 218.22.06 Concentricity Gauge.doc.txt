@@ -1,0 +1,50 @@
+
+Concentricity Gauge
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses , Gloves         |No                                     |Richard Smith  11/06/07                 |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |10                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                 |Potential /             |Level of Risk|Controls to reduce the Risk of    |
+|                                      |Actual Hazard           |             |Hazard                            |
+|First stage is the Set up             |Noise                   |Low          |PPE to worn                       |
+|Select concentricity assembly, post , |None                    |Low          |Nil                               |
+|cone, hammer , Allen keys             |                        |             |                                  |
+|Release assembly with allen key & set |None                    |Low          |Nil                               |
+|pointer to correct height & distance  |                        |             |                                  |
+|using post & cone                     |                        |             |                                  |
+|Tighten assembly using allen key      |None                    |Low          |Nil                               |
+|Select & set correct jaws ( for the   |None                    |Low          |Nil                               |
+|chuck )                               |                        |             |                                  |
+|Place container on chuck & tighten    |Laceration              |Low          |Ensure PPE worn to prevent injury |
+|jaws. Spin chuck slowly               |                        |             |to self                           |
+|Observe & record result               |None                    |Low          |Nil                               |
+|Environmental:                        |                        |             |                                  |
+|Removal of used rags / gloves/  waste/|Contamination.          |High         |Place in correct contamination or |
+|glass / cullet                        |Waste removal and tidy  |             |waste bins provided.              |
+|                                      |up.                     |             |Ensure area is cleaned and product|
+|                                      |                        |             |/ tools cleared away.             |
+|Protection & Security                 |                             |          |                                 |
+|Demarcation                           |Damage to people, property   |High      |Demarcation where applicable.    |
+|                                      |and environment.             |          |Install barricaded/danger tape as|
+|                                      |                             |          |required.                        |
+|                                      |                             |          |Ensure correct fire fighting     |
+|                                      |                             |          |equipment is available.          |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

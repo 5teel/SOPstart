@@ -1,0 +1,45 @@
+
+Mould Side Activity while Siren is on
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]           |                                             |
+|PPE Required:                |Significant Hazard                      |JSEA Reviewed by and date                    |
+|All standard PPE required    |Yes                                     |                                             |
+|                             |                                        |                                             |
+|                             |Risk Score                              |                                             |
+|                             |50                                      |                                             |
+|                             |                                        |                                             |
+|                             |Category                                |                                             |
+|                             |Medium                                  |                                             |
+|                             |                                        |                                             |
+|                             |Control taken                           |                                             |
+|                             |Minimisation                            |                                             |
+|                             |                                        |                                             |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard        |
+|                             |Actual Hazard                 |Risk     |                                             |
+|Ensure stop button is        |Burns crushing                |Medium   |Ensure machine is stopped before working     |
+|activated                    |                              |         |                                             |
+|Wiper fingers                |Burns                         |Low      |Whilst standing on platform, remove wiper    |
+|                             |                              |         |fingers. Do not stand on the conveyor or go  |
+|                             |                              |         |past line of take out mechanism              |
+|Mould side action for blank  |Foreign bodies                |High     |Stay out of sections being blown down from   |
+|side blow down               |                              |         |blank side until completed                   |
+|Take out head                |Foreign bodies/burns          |High     |Whilst standing on platform, remove take out |
+|                             |                              |         |head.                                        |
+|                             |                              |         |Do not go past line of take out mechanism.   |
+|Environmental:               |                              |         |                                             |
+|Removal of used rags /       |Contamination.                |High     |Place in correct contamination or waste bins |
+|gloves/  waste/ glass /      |Waste removal and tidy up.    |         |provided.                                    |
+|cullet                       |                              |         |Ensure area is cleaned and product / tools   |
+|                             |                              |         |cleared away.                                |
+|Protection & Security        |                              |         |                                             |
+|Demarcation                  |Damage to people, property and|High     |Demarcation where applicable.                |
+|                             |environment.                  |         |Install barricaded/danger tape as required.  |
+|                             |                              |         |Ensure correct fire fighting equipment is    |
+|                             |                              |         |available.                                   |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

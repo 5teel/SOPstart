@@ -1,0 +1,52 @@
+
+Loading empty pallets in Foodmach pallet magazine
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]         |                                        |
+|PPE Required:                   |Significant Hazard                    |JSEA Reviewed by and date:              |
+|All Standard safety equipment   |Yes                                   |                                        |
+|                                |                                      |Wayne Smith                             |
+|                                |Risk Score                            |                                        |
+|                                |30                                    |                                        |
+|                                |                                      |                                        |
+|                                |Category                              |                                        |
+|                                |Low                                   |                                        |
+|                                |                                      |                                        |
+|                                |Control taken                         |                                        |
+|                                |Minimisation                          |                                        |
+|                                |                                      |                                        |
+|Sequence of Job Steps           |Potential /                  |Level of |Controls to reduce the Risk of Hazard   |
+|                                |Actual Hazard                |Risk     |                                        |
+|Move fork hoist forward to pick |Fork hoist movement, pallet  |Low      |Current fork hoist license, ensure stack|
+|up a stack of empty pallets     |stack may be unstable        |         |is straight and stable                  |
+|Move hoist forward to front of  |As above                     |Low      |As above                                |
+|magazine with stack             |                             |         |                                        |
+|Lift stack until level with     |Pallet stack collapse and    |Low      |As above ΓÇô Check stack height prior to  |
+|magazine entry and clear of any |going into magazine on wrong |         |moving pallets into magazine            |
+|pallets that may still be in    |angle and to avoid top limit |         |                                        |
+|magazine                        |bar                          |         |                                        |
+|Before moving forward ensure top|If stack too high, top pallet|Low      |Check stack height prior to moving      |
+|of pallet stack is clear of bar |may hit bar for height       |         |pallets into magazine                   |
+|for height restriction on top of|restriction and fall         |         |                                        |
+|magazine                        |                             |         |                                        |
+|Slowly move hoist forward to    |Fork hoist movement, stack   |Low      |Ensure stack is placed properly and     |
+|place stack into magazine, lower|collapse                     |         |safely into magazine. When reversing    |
+|forks and carefully reverse     |                             |         |ensure rear is clear and lower forks    |
+|hoist ensuring forks are clear  |                             |         |when clear of magazine.                 |
+|of stack and rear is clear also |                             |         |                                        |
+|Environmental:                  |                             |         |                                        |
+|Removal of used rags / gloves/  |Contamination.               |High     |Place in correct contamination or waste |
+|waste/ glass / cullet           |Waste removal and tidy up.   |         |bins provided.                          |
+|                                |                             |         |Ensure area is cleaned and product /    |
+|                                |                             |         |tools cleared away.                     |
+|Protection & Security           |                             |         |                                        |
+|Demarcation                     |Damage to people, property   |High     |Demarcation where applicable.           |
+|                                |and environment.             |         |Install barricaded/danger tape as       |
+|                                |                             |         |required.                               |
+|                                |                             |         |Ensure correct fire fighting equipment  |
+|                                |                             |         |is available.                           |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

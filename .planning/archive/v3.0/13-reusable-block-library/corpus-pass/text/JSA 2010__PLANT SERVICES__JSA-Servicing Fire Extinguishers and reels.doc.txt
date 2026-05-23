@@ -1,0 +1,38 @@
+
+Overview of Servicing fire extinguishers & fire reels
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |X                                          |
+|PPE Required:                 |Significant Hazard                   |JSA Reviewed by and date                   |
+|All standard PPE required     |Yes                                  |James Hayes                                |
+|                              |                                     |                                           |
+|                              |Risk Score                           |                                           |
+|                              |75                                   |                                           |
+|                              |                                     |                                           |
+|                              |Category                             |                                           |
+|                              |Medium                               |                                           |
+|                              |                                     |                                           |
+|                              |Control taken                        |                                           |
+|                              |Minimisation                         |                                           |
+|                              |                                     |                                           |
+|Sequence of Job Steps   |Potential /                     |Level of Risk |Controls to reduce the Risk of Hazard   |
+|                        |Actual Hazard                   |              |                                        |
+|Servicing Fire          |Noise                           |Medium        |Wear ear muffs                          |
+|Extinguishers And fire  |                                |              |                                        |
+|reels                   |                                |              |                                        |
+|                        |Heat                            |Medium        |Keep away, limit time in area. Drink    |
+|                        |                                |              |fluids                                  |
+|                        |Fork hoists/trucks/moving       |Medium        |Be aware, give them row Wear high viz   |
+|                        |machines                        |              |clothing                                |
+|                        |Wet floor                       |Medium        |Watch your footing, wear safety shoes   |
+|                        |                                |              |with good tread                         |
+|                        |Rails and steps                 |Medium        |Watch your footing, donΓÇÖt overload      |
+|                        |                                |              |Ensure rails are secure                 |
+|                        |Glass                           |Medium        |Be aware of glass on floor Wear safety  |
+|                        |                                |              |glasses and hat                         |
+|                        |Limited work area               |Medium        |Ensure exit pathways clear              |
+|                        |Lighting                        |Medium        |Ensure adequate lighting (use torch)    |
+|                        |Electrical shocks               |Medium        |Stay away from live wires Notice the    |
+|                        |                                |              |signage                                 |

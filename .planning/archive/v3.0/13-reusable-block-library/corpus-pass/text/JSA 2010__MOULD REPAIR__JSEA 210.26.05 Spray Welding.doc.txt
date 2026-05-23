@@ -1,0 +1,54 @@
+
+Spray welding
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses, Gloves          |Yes                                    |Gary Russell 7/9/07                     |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |100                                    |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Medium                                 |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps           |Potential /                 |Level of  |Controls to reduce the Risk of Hazard   |
+|                                |Actual Hazard               |Risk      |                                        |
+|Check area to be welded         |Cuts / Abrasions            |Medium    |Remove sharp edges with file            |
+|                                |                            |          |Gloves                                  |
+|Heat area to be welded          |Burns                       |Medium    |Wear gloves and do not touch hot area   |
+|                                |Fire                        |          |with bare skin                          |
+|                                |                            |          |Ensure all flammable materials and      |
+|                                |                            |          |objects are a safe distance away Keep   |
+|                                |                            |          |gun pointed in safe area when ignited   |
+|Spray weld                      |Burns                       |Medium    |Wear gloves and do not touch hot area   |
+|                                |Fire                        |          |with bare skin                          |
+|                                |Dust                        |          |Ensure all flammable materials and      |
+|                                |                            |          |objects are a safe distance away        |
+|                                |                            |          |Keep gun pointed in safe area when      |
+|                                |                            |          |ignited                                 |
+|                                |                            |          |Do not directly inhale powder           |
+|Switch off welding gun          |Leaks                       |Medium    |If gun does not switch off report       |
+|                                |                            |          |immediately.                            |
+|Environmental:                  |                            |          |                                        |
+|Removal of used rags / gloves/  |Contamination.              |High      |Place in correct contamination or waste |
+|waste/ glass / cullet           |Waste removal and tidy up.  |          |bins provided.                          |
+|                                |                            |          |Ensure area is cleaned and product /    |
+|                                |                            |          |tools cleared away.                     |
+|Protection & Security           |                            |          |                                        |
+|Demarcation                     |Damage to people, property  |High      |Demarcation where applicable.           |
+|                                |and environment.            |          |Install barricaded/danger tape as       |
+|                                |                            |          |required.                               |
+|                                |                            |          |Ensure correct fire fighting equipment  |
+|                                |                            |          |is available.                           |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

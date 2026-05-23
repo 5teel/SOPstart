@@ -1,0 +1,34 @@
+
+Port Neck Sealing
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSA Reviewed by and date                    |
+|All standard PPE required     |Yes                                  |                                            |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |750                                  |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |High                                 |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps           |Potential /                        |Level of|Controls to reduce the Risk of    |
+|                                |Actual Hazard                      |Risk    |Hazard                            |
+|REMOVE STEEL ON PORT WALL TO    |HEAT EXPOSURE, HOT FLAMES, FALLING |H       |SUPERVISION, OBSERVE ANY FIRE     |
+|EXPOSE JOINT                    |HAZARDS, HOT STEEL, LOSS OF BODY   |        |HAZARDS, FIRE EQUIPMENT AT HAND   |
+|                                |FLUIDS.                            |        |                                  |
+|PREPARE MATERIAL TO CARRY OUT   |INHALATION OF TOXIC DUST FROM      |H       |FACE MASK, SUPERVISION AT ALL     |
+|SEALING,                        |MORTAR, AND AS ABOVE.              |        |TIMES                             |
+|IE WATER TOOLS AND REFRACTORIES |                                   |        |                                  |
+|EXPOSE JOINT AND CLEAN AREA     |HEAT EXPOSURE, FALLING HAZARDS,    |H       |COVER WALKWAY UNDER PORTS TO STOP |
+|PRIOR TO SEALING                |FLAME STINGS                       |        |FALLING DEBRIS, SUPERVISION       |
+|SEAL JOINT WITH REFRACTORIES    |AS ABOVE                           |H       |AS ABOVE                          |
+|REPLACE STEELWORK AND TIGHTEN   |AS ABOVE                           |H       |AS ABOVE                          |
+|JACK BOLTS                      |                                   |        |                                  |
+|CHECK FOR GAS AND FLAME         |AS ABOVE                           |H       |CONTACT B&F MANAGEMENT TO CHECK   |
+|EXHAUSTING THROUGH JOINT        |                                   |        |WORK CARRIED OUT                  |

@@ -1,0 +1,65 @@
+
+Filling Mobile Hopper with Iron Chromite
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                                                      |Safety Induction [Contractor]                                 |
+|Hazard            |Practicable to Eliminate                                                                    |
+|Identification    |                                                                                            |
+|                                     |Insignificant ΓÇô first aid injury, up to  |
+|                                     |$1,000 damage, spill confined to         |
+|LIKELIHOOD                           |immediate work area, rapid clean up, no  |
+|                                     |damage to environment                    |
+|How likely is it to happen?          |                                         |
+|4                                    |ACT NOW ΓÇô Urgent ΓÇô do something about the|
+|ACUTE                                |risks immediately. Requires immediate    |
+|                                     |attention.                               |
+|3                                    |Highest management decision is required  |
+|HIGH                                 |urgently                                 |
+|2                                    |Follow management instruction            |
+|MODERATE                             |                                         |
+|1                                    |OK for now. Record and review if any     |
+|LOW                                  |equipment / people / materials / work    |
+|                                     |processes or procedures change           |
+
+
+|JOB SAFETY ANALYSIS               |Filling Mobile Hopper with Iron Chromite.                                      |
+
+|Area / Department            |Batch & Furnace                                   |Task  or Job Description         |
+|PPE Required:                |Significant Hazard                                |JSA Reviewed by and date         |
+|All standard PPE. Disposable |Yes                                               |                                 |
+|overall, face-mark.          |                                                  |                                 |
+|                             |Overall Category of task                          |                                 |
+|                             |High                                              |                                 |
+|                             |                                                  |                                 |
+|                             |Control taken                                     |                                 |
+|                             |Minimisation                                      |                                 |
+|                             |                                                  |                                 |
+|Sequence of Job Steps                     |Potential /               |Level of  |Controls to reduce the Risk of   |
+|                                          |Actual Hazard             |Risk      |Hazard                           |
+|Unplug power connection & air hose.       |Electricity, Trip Hazard  |Low       |Switch power off. Secure power   |
+|Disconnect hopper outlet bag from shaker. |                          |          |cord & air hose Secure outlet    |
+|                                          |                          |          |bag.                             |
+|Position crane over mobile hopper, lower  |Hopper could drop from    |Low       | No person to be in this area    |
+|hook, connect hook & chain. Raise hopper. |crane hoist               |          |during the lifting of the hopper.|
+|Lower to ground level.                    |                          |          |Ensure load is secure            |
+|Position movable loading platform under   |Hopper could drop from    |Low       | No person to be in this area    |
+|hopper, lower onto MLP, release hook &    |crane hoist               |          |during the lifting of the hopper.|
+|chain. Move MLP away from loading bay.    |                          |          |Ensure load is secure            |
+|Position bulk bay under crane, connect    |Bulk bag could drop from  |Low       | No person to be in this area    |
+|hook, chain & tie rope around inner bag   |crane hoist               |          |during the lifting of the Bulk   |
+|then raise bulk bag, move hopper under    |                          |          |bag. Ensure load is secure       |
+|bulk bag.                                 |                          |          |                                 |
+|Cut under bag with a knife. Allow bag to  |Iron Chromite in the air  |High      |Facemask & disposable overall.   |
+|empty into hopper.                        |                          |          |                                 |
+|Unhook empty bulk bag & dispose into      |Iron Chromite in the air  |High      |Facemask & disposable overall.   |
+|rubbish bin.                              |                          |          |                                 |
+| Connect hook & chain then raise mobile   |Hopper could drop from    |Low       | No person to be in this area    |
+|hopper to platform level.                 |crane hoist               |          |during the lifting of the hopper.|
+|                                          |                          |          |Ensure load is secure            |
+|Position & resit in designated hopper     |Hopper could drop from    |Low       |No person to be in this area     |
+|stand, disconnect hook & chain            |crane hoist               |          |during the lifting of the hopper.|
+|                                          |                          |          |Ensure load is secure            |
+|Reconnect hopper outlet bag to shaker.    |none                      |Low       |                                 |
+| Reconnect power sources & air hose.      |Electricity, Trip Hazard  |Medium    |Secure power cord.               |

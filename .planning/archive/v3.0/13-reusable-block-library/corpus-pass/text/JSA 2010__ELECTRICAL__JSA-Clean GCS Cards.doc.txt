@@ -1,0 +1,29 @@
+
+Clean GCS 1/0 Cards
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]           |                                         |
+|PPE Required:                |Significant Hazard                      |JSA Reviewed by and date                 |
+|All standard PPE required    |Yes                                     |                                         |
+|                             |                                        |                                         |
+|                             |Risk Score                              |                                         |
+|                             |                                        |                                         |
+|                             |                                        |                                         |
+|                             |Category                                |                                         |
+|                             |Low                                     |                                         |
+|                             |                                        |                                         |
+|                             |Control taken                           |                                         |
+|                             |Isolation                               |                                         |
+|                             |                                        |                                         |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Put both FH in manual        |Nil                           |Low      |None                                     |
+|Turn off CPI chassis power   |Nil                           |Low      |None                                     |
+|Remove one card at a time    |Nil                           |Low      |None                                     |
+|Clean with contact cleaner   |Nil                           |Low      |Read card for precautions                |
+|Let card dry before replacing|Nil                           |Low      |None                                     |
+|Once all cards are in, power |Nil                           |Low      |None                                     |
+|up the CPI                   |                              |         |                                         |
+|Put FH back into Auto        |Nil                           |Low      |None                                     |

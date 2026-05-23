@@ -1,0 +1,76 @@
+
+
+
+Job Safety Environmental Analysis Form:                             Fork
+                                                                     Hoist
+                                                                     Operatio
+                                                                     n
+
+|Area / Department                  |Batch & Furnace                       |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Hearing Protection, PPE gear.      |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Prior to any operation   |In all cases ensure     |High     |Tell any persons observing to move to a safe area. Be   |
+|talk to anyone in the    |onlooker are aware of   |         |alert at all times while operating the hoist and always |
+|area and tell them of    |you                     |         |ensure you are in full control. Ensure mirrors are clean|
+|your intentions to use   |                        |         |                                                        |
+|the machine              |                        |         |                                                        |
+|Inspect hoist daily for  |Damage to eyes hands    |High     |Ensure hands feet and clothing are clear of all moving  |
+|signs of wear and damage.|feet and clothing from  |         |part. Do not wear loose fitting clothing.               |
+|Ensure fuel and any other|moving parts. Pince     |         |                                                        |
+|reservious are full.     |points as indicated on  |         |                                                        |
+|                         |the hoist               |         |                                                        |
+|Driving on the roadway   |Injury or death to      |High     |Be aware of your surroundings, observe persons in your  |
+|and surrounding areas    |pedestrians. PersonΓÇÖs   |         |area. Use mirrors at all time. Be aware of any height   |
+|                         |eyesight in vasinity    |         |restrictions particularly when the mast is up. Always   |
+|                         |from small flying       |         |wear seatbelt. When reversing ensure your path is clear |
+|                         |objects. Dust           |         |                                                        |
+|                         |inhalation. Damage to   |         |                                                        |
+|                         |property.               |         |                                                        |
+|Moving pallets           |Injury or death to      |High     |Wear all PPE. Be aware of person around you. Do not walk|
+|                         |pedestrians. PersonΓÇÖs   |         |under the mast at any time. Always wear seatbelt. Be    |
+|                         |eyesight in vasinity    |         |aware of property                                       |
+|                         |from small flying       |         |                                                        |
+|                         |objects. Dust           |         |                                                        |
+|                         |inhalation. Damage to   |         |                                                        |
+|                         |property. Objects       |         |                                                        |
+|                         |falling from pallet when|         |                                                        |
+|                         |mast is elevated        |         |                                                        |
+|Inspect machine at the   |Injury or death. Damage |High     |Ensure hands feet and clothing are clear of all moving  |
+|end of the day and report|to eyes hands feet and  |         |part and pinch points. Do not wear loose fitting        |
+|any observations or      |clothing from moving    |         |                                                        |
+|damage noted             |parts. Pince points     |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

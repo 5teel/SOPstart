@@ -1,0 +1,86 @@
+
+
+
+Job Safety Environmental Analysis Form:
+                                                              Tank 2
+                                                              Crusher
+                                                              Pedestal
+
+|Area / Department                  |Factory Maintenance                   |Task  or Job Description                  |
+|Recommended Personal Protective    |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Equipment                          |                                      |                                          |
+|High Visibility Jacket, PPE, Hard  |                                      |                                          |
+|hat (when working in Drag area),   |Risk Score                            |                                          |
+|gumboots, safety boots, hearing    |                                      |                                          |
+|protection, safety glasses,        |                                      |                                          |
+|advisable that both emplyees have a|Category                              |                                          |
+|BATT phone.                        |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Phone HE / CE Supervisor.|No less than 2 people   |High     |Isolate crusher and vibrating conveyor.                 |
+|Arrange bins and labour  |crusher starting.       |         |                                                        |
+|for CE.                  |                        |         |                                                        |
+|Bring drag bucket to     |Starting and dumping    |Low      |Isolate drag and #23 cullet belt.                       |
+|front.                   |glass.                  |         |                                                        |
+|Remove hopper.           |Falling and weight.     |Medium   |Overhead crane ΓÇô 3rd person.                            |
+|Remove top of crusher.   |Weight, lifting, back   |Medium   |2 men to lift.                                          |
+|                         |injury.                 |         |Manual lifting technique.                               |
+|                         |                        |         |Use PPE equipment.                                      |
+|Remove pedestal.         |Dropping.               |High     |Electrical leads to use RCD.                            |
+|Remove inlet duct to fan |Dropped loads.          |High     |All lifting gear must be within the SWL of the load.    |
+|and seal duct opening    |                        |         |All lifting gear must be marked with the SWL.           |
+|with plastic.            |                        |         |Lifting points to be suitable checked.                  |
+|                         |                        |         |Use correct inspected lifting gear.                     |
+|Cut fan apart with oxy   |Cuts, eyes, burns.      |High     |All employees to be competent with each tool prior to   |
+|acetylene torch.         |                        |         |use.                                                    |
+|                         |                        |         |Gloves to be worn as required.                          |
+|                         |                        |         |Welding glasses to be worn.                             |
+|                         |                        |         |Fire equipment to be readily available.                 |
+|Fan motor removal ΓÇô check|Dropped loads.          |High     |All lifting gear must be within the SWL of the load.    |
+|lifting gear.            |                        |         |All lifting gear must be marked with the SWL.           |
+|                         |                        |         |Lifting points to be suitably checked.                  |
+|                         |                        |         |Use correct inspected lifting gear.                     |
+|Lifting fan parts ΓÇô      |Trip.                   |High     |Remove obstacles from work area where possible.         |
+|remove to outside.       |Duct/equipment falling  |         |Determine if weight of parts requires mechanical        |
+|                         |off lifting device.     |         |lifting.                                                |
+|                         |Hand/finger injuries.   |         |Ensure equipment is balanced when lifting.              |
+|                         |Strains.                |         |Gloves to be worn as required.                          |
+|                         |                        |         |Ensure manual lifting employees good lifting practices. |
+|                         |                        |         |DO NOT twist while lifting and maintain a straight back |
+|                         |                        |         |when lifting.                                           |
+|Use of hand tools.       |Cuts.                   |Medium   |All employees to be competent in the use of each hand   |
+|                         |                        |         |tool prior to use.                                      |
+|Use of electrical tools  |Electrocution.          |High     |All employees to be competent in the use of each hand   |
+|and cutting, grinding,   |Cuts/eyes/noise/trip/bur|         |tool prior to use.                                      |
+|drilling.                |ns.                     |         |Gloves to be worn as required.                          |
+|                         |                        |         |Welding glasses to be worn.                             |
+|                         |                        |         |Fan equipment to be readily available.                  |
+|                         |                        |         |Welding helmets to be worn when welding.                |
+|                         |                        |         |Electrical leads to be run above floor level where      |
+|                         |                        |         |possible.                                               |
+|                         |                        |         |Tagged and use RCD.                                     |
+|                         |                        |         |Obtain Hot Work Permit.                                 |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security:   |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

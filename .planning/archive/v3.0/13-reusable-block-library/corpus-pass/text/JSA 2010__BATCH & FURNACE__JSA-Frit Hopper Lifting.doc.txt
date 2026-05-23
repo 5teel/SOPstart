@@ -1,0 +1,33 @@
+
+Frit Hopper Lifting.
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSA Reviewed by and date                    |
+|All standard PPE required     |Yes                                  |                                            |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |200                                  |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |High                                 |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps   |Potential /                        |Level of |Controls to reduce the Risk of Hazard    |
+|                        |Actual Hazard                      |Risk     |                                         |
+|Fill frit hopper with   |Back strain. Spillage on to floor  |Low      |Correct lifting procedure using fork     |
+|frit                    |                                   |         |hoist and platforms                      |
+|Transfer from filling   |None                               |Low      |None                                     |
+|station to adjacent     |                                   |         |                                         |
+|machine                 |                                   |         |                                         |
+|Set up all safety       |None                               |Low      |Supervision at all times. No person to be|
+|barriers and isolate    |                                   |         |in this area during the lifting of the   |
+|machine floor           |                                   |         |hopper                                   |
+|Transfer hopper to      |Hopper could drop from hoist and   |High     |Supervision at all times. No person to be|
+|machine floor and lift  |damage machine. Material spillage  |         |in this area during the lifting of the   |
+|into place on top of    |into sections causing machine      |         |hopper                                   |
+|frit silo               |damage and down time               |         |                                         |

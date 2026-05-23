@@ -1,0 +1,46 @@
+
+Use of Vernier / Calliper
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses / gloves if      |Yes                                    |Rey Basabas  11/06/07                   |
+|required                        |                                       |                                        |
+|* Not always practicable doing  |Risk Score                             |                                        |
+|this task, common sense should  |40                                     |                                        |
+|prevail                         |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps              |Potential /               |Level of    |Controls to reduce the Risk of Hazard|
+|                                   |Actual Hazard             |Risk        |                                     |
+|Pick up & switch on vernier        |None                      |Low         |Nil                                  |
+|Pick up container & hold firmly    |None                      |Low         |Nil                                  |
+|Position vernier on the area to    |None                      |Low         |Nil                                  |
+|measure                            |                          |            |                                     |
+|Measure & record                   |None                      |Low         |Nil                                  |
+|Discard container after testing    |Laceration                |Low         |Ensure all PPE is worn to prevent    |
+|                                   |                          |            |injury to self                       |
+|Comfort & support are essential in |Repetition will result in |Low         |Regular breaks as required           |
+|conducting this task               |muscle strain             |            |                                     |
+|Environmental:                     |                          |            |                                     |
+|Removal of used rags / gloves/     |Contamination.            |High        |Place in correct contamination or    |
+|waste/ glass / cullet              |Waste removal and tidy up.|            |waste bins provided.                 |
+|                                   |                          |            |Ensure area is cleaned and product / |
+|                                   |                          |            |tools cleared away.                  |
+|Protection & Security              |                          |            |                                     |
+|Demarcation                        |Damage to people, property|High        |Demarcation where applicable.        |
+|                                   |and environment.          |            |Install barricaded/danger tape as    |
+|                                   |                          |            |required.                            |
+|                                   |                          |            |Ensure correct fire fighting         |
+|                                   |                          |            |equipment is available.              |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

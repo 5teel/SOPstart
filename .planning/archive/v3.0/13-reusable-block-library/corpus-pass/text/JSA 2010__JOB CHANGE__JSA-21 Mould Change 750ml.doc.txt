@@ -1,0 +1,43 @@
+
+ISO 219.01.12              #21 Mould Change 750ml
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                        |Safety Induction [Contractor]           |                                               |
+|PPE Required:            |Significant Hazard                      |JSA Reviewed by and date                       |
+|All standard PPE required|Yes or No                               |June 2009                                      |
+|when working within      |                                        |                                               |
+|production area          |Overall Category of task                |                                               |
+|                         |Medium                                  |                                               |
+|                         |                                        |                                               |
+|                         |Control taken                           |                                               |
+|                         |Minimisation                            |                                               |
+|                         |                                        |                                               |
+|Sequence of Job Steps    |Potential /               |Level of Risk|Controls to reduce the Risk of Hazard          |
+|                         |Actual Hazard             |             |                                               |
+|Stop Section:-           |Making section safe to    |High         |Stop Neck ring arms in the reverted position   |
+|                         |prevent entrapment        |             |using the (Red) Maintenance / E Stop button.   |
+|                         |                          |             |Push in the Mould side inhibit button.         |
+|Mould Side safety Plate  |Burning from heat         |High         |Where possible, place safety plate in the up   |
+|                         |reflected off ware        |             |position to reflect heat back towards the      |
+|                         |                          |             |machine.                                       |
+|                         |                          |             |Note:- On Job Change there is no Hot glass and |
+|                         |                          |             |this Safety plate can be left in the down      |
+|                         |                          |             |position.                                      |
+|Prepare moulds for       |Burns                     |High         |Ensure tee screw lifters to the Moulds are in  |
+|Lifting                  |                          |             |securely and prepare to lift the Mould from the|
+|                         |                          |             |hinge.                                         |
+|Removing Moulds          |Burns / Back Strain       |High         |Get into a comfortable lifting position that   |
+|                         |                          |             |suits. Reducing lowering and twisting while    |
+|                         |                          |             |lifting. Remove Moulds. Back support belt      |
+|                         |                          |             |optional                                       |
+|Remove Bottom Plate and  |Crushed hand.             |High         |Using Bottom Plate lifting tool remove then    |
+|fit clean Bottom Plate   |                          |             |replace bottom plate in section                |
+|Fit clean Moulds         |Back Strain               |High         |Get into a comfortable lifting position that   |
+|                         |                          |             |suits. Reducing lowering and twisting while    |
+|                         |                          |             |lifting. Refit Moulds. Remove Tee Lifters.     |
+|Prepare Section to start.|Caught in Section.        |High         |Pull out Mould Side (Red) Maintenance / E Stop |
+|                         |                          |             |button. Pull out the Mould Side inhibit button.|
+|                         |                          |             |Ensure all personnel are clear of the section. |
+|                         |                          |             |Start the section up.                          |

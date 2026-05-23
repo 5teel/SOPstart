@@ -1,0 +1,53 @@
+
+#21, 23, 31 Changing a Baffle
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                  |Safety Induction [Contractor]         |                                          |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Boots, gloves, uniform, safety     |Yes                                   |                                          |
+|glasses, ear muffs, (protection    |                                      |July 2007                                 |
+|sleeves, back support ΓÇô optional)  |Risk Score                            |                                          |
+|                                   |100                                   |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |Medium                                |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |Minimisation                          |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Stop Section:-           |Making section safe to  |High     |Stop Neck ring arms in the inverted position using the E|
+|Follow Stopping Section  |prevent entrapment      |         |Stop button                                             |
+|refer JSEA 219.01.02     |                        |         |                                                        |
+|Ensure section is safe.  |Trapped in the section /|High     |Ensure E Stop button is activated and light is on before|
+|                         |crush injury.           |         |entering section.                                       |
+|                         |                        |         |Apply safety T bar to invert rack.                      |
+|Ensure section is safe.  |Crush injury            |High     |Be aware of funnel arms coming off on the adjacent      |
+|                         |                        |         |section.                                                |
+|Remove baffle.           |Burns                   |High     |Using thick gloves provided remove the baffle.          |
+|Replace baffle.          |Burns                   |High     |Using thick gloves provided fit the clean baffle to the |
+|                         |                        |         |machine.                                                |
+|Follow starting a section|Trapped in the machine /|High     |Ensure all personnel are clear of the section.  Start   |
+|procedure refer JSEA     |crush injury.           |         |the section up.                                         |
+|219.01.01                |                        |         |                                                        |
+|Environmental            |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+
+                                                     -----------------------
+[pic]
+
+O-I New Zealand
+

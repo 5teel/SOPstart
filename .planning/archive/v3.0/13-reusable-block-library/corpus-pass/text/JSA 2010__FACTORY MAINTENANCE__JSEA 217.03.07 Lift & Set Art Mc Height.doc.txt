@@ -1,0 +1,54 @@
+
+
+
+Job Safety Environmental Analysis Form:
+                                                              Lift & Set
+                                                              Art M/c
+                                                              Height
+
+|Area / Department                  |Factory Maintenance                   |Task  or Job Description                  |
+|                                   |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Recommended Personal Protective    |                                      |                                          |
+|Equipment                          |                                      |                                          |
+|Gloves, Safety Glasses, Ear Muffs, |Risk Score                            |                                          |
+|Safety Boots, High Vis Garment,    |                                      |                                          |
+|Respiratory Protection (when       |                                      |                                          |
+|working with asbestos).            |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Prepare work site.       |Manual Handling         |Medium   |Use correct manual handling techniques.                 |
+|Lift unloader into place.|Pedestrians / rigging / |Low      |Rigger to rig load.                                     |
+|                         |load size and shape /   |         |Rigger to control load movement.                        |
+|                         |jammed fingers.         |         |Barricade off work area.                                |
+|                         |                        |         |Wear appropriate PPE.                                   |
+|                         |                        |         |Workers to keep away from pinch points.                 |
+|Set machine and unhook   |Hand tools / jammed     |Low      |Rigger to unhook load.                                  |
+|load.                    |fingers.                |         |Workers to keep away from pinch points.                 |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

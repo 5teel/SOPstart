@@ -1,0 +1,33 @@
+
+Hot End Coating Meter
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |High                                       |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Unplug plug meter to isolate |Shock                         |Medium      |Turn off before unplugging              |
+|and check leads              |                              |            |                                        |
+|Check all clamps head        |Chemicals on hands            |High        |Wear all PPE                            |
+|movement                     |                              |            |                                        |
+|Check drive motor and gear   |Pinch points & heat           |Medium      |Training & instruction required prior to|
+|drive                        |                              |            |doing task Wear all PPE                 |
+|Check hoses for leaks and    |Chemicals present             |High        |Use safe working procedures. Wear all   |
+|fluid level in reservoir     |                              |            |PPE                                     |
+|Reconnect power, run fluid   |Shock, chemicals present.     |Medium      |Use safe working procedures. Wear all   |
+|pump and set the height      |Watch for pinch points        |            |PPE                                     |
+|Calibrate head. Spot test    |Moving parts & chemicals      |Medium      |Use safe working procedures. Wear all   |
+|then test the motor          |                              |            |PPE                                     |
+
+
+                Notes -------------what is the chemical ????

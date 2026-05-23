@@ -1,0 +1,49 @@
+
+Thermal Profile of Furnace
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                              |Safety Induction [Contractor]           |                                           |
+|PPE Required:                  |Significant Hazard                      |JSEA Reviewed by and date                  |
+|Gloves, Ear muffs, Safety      |Yes                                     |Sanjay Adhar  09-08-07                     |
+|glasses                        |                                        |                                           |
+|                               |Risk Score                              |                                           |
+|                               |30                                      |                                           |
+|                               |                                        |                                           |
+|                               |Category                                |                                           |
+|                               |Low                                     |                                           |
+|                               |                                        |                                           |
+|                               |Control taken                           |                                           |
+|                               |Minimisation                            |                                           |
+|                               |                                        |                                           |
+|Sequence of Job Steps          |Potential /                |Level of    |Controls to reduce the Risk of Hazard      |
+|                               |Actual Hazard              |Risk        |                                           |
+|Put gas into manual.           |None.                      |Low         |none                                       |
+|Turn off gas to port.          |Burn, heat                 |Low         |Wear heat resistant gloves                 |
+|Open inspection port.          |Burn, heat.                |Low         |Wear heat resistant gloves. Take regular   |
+|                               |                           |            |breaks and stand as far away from the      |
+|                               |                           |            |regenerators as possible.                  |
+|Take temperature shot.         |Burn, heat, eye damage.    |Low         |Wear heat resistant gloves. Look through   |
+|                               |                           |            |shaded pyrometer. Stand as far away from   |
+|                               |                           |            |the regenerators as possible.              |
+|Close inspection port.         |Burn, heat.                |Low         |Wear heat resistant gloves. Take regular   |
+|                               |                           |            |breaks and stand as far away from the      |
+|                               |                           |            |regenerators as possible.                  |
+|Turn on gas to port            |Burn, heat                 |Low         |Wear heat resistant gloves                 |
+|Repeat steps 2-6 on all the    |As above                   |Low         |As above                                   |
+|ports.                         |                           |            |                                           |
+|Environmental:                 |                           |            |                                           |
+|Removal of used rags / gloves/ |Contamination.             |High        |Place in correct contamination or waste    |
+|waste/ glass / cullet          |Waste removal and tidy up. |            |bins provided.                             |
+|                               |                           |            |Ensure area is cleaned and product / tools |
+|                               |                           |            |cleared away.                              |
+|Protection & Security          |                           |            |                                           |
+|Demarcation                    |Damage to people, property |High        |Demarcation where applicable.              |
+|                               |and environment.           |            |Install barricaded/danger tape as required.|
+|                               |                           |            |Ensure correct fire fighting equipment is  |
+|                               |                           |            |available.                                 |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

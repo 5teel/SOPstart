@@ -1,0 +1,66 @@
+
+Empty Bin using Kerrick Hoist.
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                                                      |Safety Induction [Contractor]                                 |
+|Hazard Identification                                                     |
+|PROBABILITY                        |INJURY                              |PLANT PROPERTY OR PROCESS DAMAGE     |
+|Likelihood that accident sequence  |                                    |                                     |
+|will follow to.                    |                                    |                                     |
+|Common or frequent occurrence      |Fatality or permanent disability    |More than 1 million, Major disruption|
+|                                   |                                    |of activities                        |
+|Is known to have happened          |Multiple lost time injury with      |$500,000 to $1 million               |
+|                                   |hospital admissions                 |                                     |
+|Could occur                        |Single Lost time injury             |$100,000 to $500,000                 |
+|Not likely to occur                |Medical Treatment Injury or         |$1000 to $100,000                    |
+|                                   |restricted work                     |                                     |
+|Practically impossible             |First Aid injury                    |Up to $1000                          |
+|                                   |QUALITY                             |ENVIRONMENTAL                        |
+|                                   |Major product recall with adverse   |Confined to immediate work area,     |
+|                                   |publicity and major customer claim  |rapid clean up no damage to          |
+|                                   |                                    |environment                          |
+|                                   |Minor product recall with adverse   |Confined to specific area, rapid     |
+|                                   |publicity resulting in minor claim  |clean up little damage to environment|
+|                                   |Minor product recall with major     |Confined to local environment,       |
+|                                   |resort of product                   |naturally recoverable, moderate clean|
+|                                   |                                    |up                                   |
+|                                   |Minor product recall with minor     |Considerable clean up on site as well|
+|                                   |resort of product                   |as external resources involved &     |
+|                                   |                                    |extends past boundaries              |
+|                                   |Customer compliant and no resort of |Regional scale, extensive clean up   |
+|                                   |product required                    |and long recovery                    |
+|CONSEQUENCES                                                                                 |
+|PROBABILITY    |INSIGNIFICANT    |MINOR            |MODERATE         |MAJOR            |EXTREME             |
+|               |1                |2                |3                |4                |5                   |
+|almost certain            |H                        |H                          |E                            |
+
+
+|JOB SAFETY ANALYSIS               |Empty Bin using Kerrick Hoist..                                                |
+
+|Area / Department            |Batch & Furnace                            |Task  or Job Description                |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|when working within          |                                           |                                        |
+|production area              |Overall Category of task                   |                                        |
+|                             |Low                                        |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Position Kerrick hoist & bin |Manual handling.              |Low         |Use correct manual handling techniques. |
+|together.                    |                              |            |                                        |
+|Secure bin to hoist, strapped|Manual handling.              |Low         |Use correct manual handling techniques. |
+|tight.                       |                              |            |                                        |
+|Hydraulic pump, hoist to     |Manual handling.              |Low         |Use correct manual handling techniques. |
+|tipping level.               |                              |            |                                        |
+|Adjusted winder to tilt & tip|Manual handling.              |Low         |Use correct manual handling techniques. |
+|bin into Loader bucket.      |                              |            |                                        |
+|Re tilt bin, release         |Manual handling.              |Low         |Use correct manual handling techniques. |
+|hydraulic lever to lower     |                              |            |                                        |
+|hoist.                       |                              |            |                                        |
+|Release straps from bin.     |Manual handling.              |Low         |Use correct manual handling techniques. |
+|Return bin to vacuum         |Manual handling.              |Low         |Use correct manual handling techniques. |

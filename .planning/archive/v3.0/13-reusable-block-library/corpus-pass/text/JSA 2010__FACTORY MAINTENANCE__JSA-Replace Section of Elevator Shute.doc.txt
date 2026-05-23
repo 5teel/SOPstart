@@ -1,0 +1,30 @@
+
+Replace Section of Elevator Chute
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]       |                                            |
+|PPE Required:                 |Significant Hazard                  |JSA Reviewed by and date                    |
+|All standard PPE required     |Yes                                 |C Sheppard                                  |
+|                              |                                    |                                            |
+|                              |Risk Score                          |                                            |
+|                              |100                                 |                                            |
+|                              |                                    |                                            |
+|                              |Category                            |                                            |
+|                              |Medium                              |                                            |
+|                              |                                    |                                            |
+|                              |Control taken                       |                                            |
+|                              |Minimisation                        |                                            |
+|                              |                                    |                                            |
+|Sequence of Job Steps   |Potential /                     |Level of    |Controls to reduce the Risk of Hazard    |
+|                        |Actual Hazard                   |Risk        |                                         |
+|Cut out old section     |Elevator, glass, sparks, falling|H           |Isolate, clean area down, PPE, hot work  |
+|                        |objects                         |            |and screens, tape off area.              |
+|Remove old section      |Falling objects and back strain |H           |Use chain or suitable lifting equip0ment.|
+|                        |                                |            |Tape off area                            |
+|Install new section     |As above                        |H           |As above                                 |
+|Weld up section         |Sparks, welding flash           |H           |Tape off area, welding screens.          |
+|                        |                                |            |Hot work permit                          |
+|Job finish              |Clean up area                   |L           |Remove all off cuts and scrap and clean  |
+|                        |                                |            |area                                     |

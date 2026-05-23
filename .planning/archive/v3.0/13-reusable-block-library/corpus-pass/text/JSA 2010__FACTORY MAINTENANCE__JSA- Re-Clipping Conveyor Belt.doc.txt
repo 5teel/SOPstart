@@ -1,0 +1,33 @@
+
+Re-clipping Conveyor Belt
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSA Reviewed by and date                    |
+|Safety Glasses & Gloves       |Yes                                  |                                            |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |120                                  |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |Medium                               |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps           |Potential /                |Level of |Controls to reduce the Risk of Hazard    |
+|                                |Actual Hazard              |Risk     |                                         |
+|Stop belt in correct position   |Moving belt                |Low      |Use the Lock Out procedure               |
+|Remove clip. Cutting out of the |Cuts to hands due to glass |Low      |Ensure all PPE is in place to prevent    |
+|belt                            |                           |         |injury to self                           |
+|Fit new clip by punching holes  |Hitting hands when punching|Low      |Need Gloves on and take care when doing  |
+|                                |Belt Slipping off timber   |         |task                                     |
+|                                |support                    |         |Nail the belt to the board               |
+|Join Belt manually              |Cut to the hands from glass|Low      |Ensure all PPE is in place to prevent    |
+|                                |in the belt                |         |injury to self                           |
+|Tension Belt                    |Broken Glass               |Low      |Ensure all PPE is in place to prevent    |
+|                                |                           |         |injury to self                           |
+|Remove Lock out and run the belt|Trapping hands             |Low      |Confirm that all people are clear of the |
+|                                |                           |         |area                                     |

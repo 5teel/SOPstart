@@ -1,0 +1,38 @@
+
+SFL -Changing Paint
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required: Safety Glasses ,  |Significant Hazard                     |JSA Reviewed by and date                |
+|Face mask, Gloves               |No                                     |Gary Russell 30/8/07                    |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |10                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard              |
+|                         |Actual Hazard           |Risk     |                                                   |
+|Shake paint              |Flying objects          |Low      |Ensure paint is secure in shaker                   |
+|                         |Jamming fingers         |         |Ensure fingers and hands are clear of moving parts |
+|                         |Splashing of solution   |         |before start up                                    |
+|                         |Spill hazard            |         |Ensure lid is secure on paint pot                  |
+|                         |                        |         |Ensure paint pot is not damaged or leaking         |
+|Turn on shaker for set   |Electric shock          |Low      |Check switch for obvious damage                    |
+|time                     |                        |         |                                                   |
+|Remove paint holder lid  |Contamination by paint  |Low      |Turn off air supply to paint pot  / Release        |
+|                         |spraying                |         |pressure in pot using pressure release.            |
+|                         |Spilling paint on floor |         |Ensure pot is supported when removing mixer        |
+|Refill mixer pot with    |Splash/ spill paint     |Low      |Correctly support paint pot and do not overfill pot|
+|paint                    |                        |         |                                                   |
+|Replace mixer on pot     |Spilling paint          |Low      |Ensure pot sitting secure                          |
+|                         |Trapping fingers        |         |Ensure fingers clear of sealing surface when       |
+|                         |                        |         |replacing pot lid                                  |
+|Turn on air              |Splashing of solution   |Low      |Ensure wing nuts are tight and pot sealed before   |
+|                         |                        |         |turning on air                                     |

@@ -1,0 +1,42 @@
+
+Replacing Glass Crusher
+                            HAZARD IDENTIFICATION
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                            |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date                   |
+|all standard PPE Required       |Yes                                    |                                            |
+|                                |                                       |                                            |
+|                                |Risk Score                             |                                            |
+|                                |75                                     |                                            |
+|                                |                                       |                                            |
+|                                |Category                               |                                            |
+|                                |Medium                                 |                                            |
+|                                |                                       |                                            |
+|                                |Control taken                          |                                            |
+|                                |Minimisation                           |                                            |
+|                                |                                       |                                            |
+|Sequence of Job Steps    |Potential /                      |Level of  |Controls to reduce the Risk of Hazard        |
+|                         |Actual Hazard                    |Risk      |                                             |
+|Shut Down the Crusher and|Electrocution/moving parts       |High      |Lock out procedure will prevent injury       |
+|lock out                 |                                 |          |                                             |
+|Remove hopper            |Falling objects                  |High      |Overhead hoist, PPE, personnel clear of lift |
+|Remove crusher           |Falling objects from moving      |High      |Suitable lifting chains.  PPE. Personnel     |
+|                         |Hopper Plus Forkhoist            |          |clear of  area below Trained Fork Hoist      |
+|                         |                                 |          |operator, load secured                       |
+|Replace crusher          |As above in reverse              |          |                                             |
+|Environmental:           |                                 |          |                                             |
+|Removal of used rags /   |Contamination.                   |High      |Place in correct contamination or waste bins |
+|gloves/  waste/ glass /  |Waste removal and tidy up.       |          |provided.                                    |
+|cullet                   |                                 |          |Ensure area is cleaned and product / tools   |
+|                         |                                 |          |cleared away.                                |
+|Protection & Security    |                                 |          |                                             |
+|Demarcation              |Damage to people, property and   |High      |Demarcation where applicable.                |
+|                         |environment.                     |          |Install barricaded/danger tape as required.  |
+|                         |                                 |          |Ensure correct fire fighting equipment is    |
+|                         |                                 |          |available.                                   |
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

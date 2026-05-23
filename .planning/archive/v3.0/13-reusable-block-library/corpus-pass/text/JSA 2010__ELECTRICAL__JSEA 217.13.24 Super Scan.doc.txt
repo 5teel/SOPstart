@@ -1,0 +1,30 @@
+
+Super ScanΓÇÖs
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |High                                       |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Isolate power and air supply |Shock Slips & cuts            |Low         |Lock out procedure. Wear all PPE        |
+|Check unit, Check drive belts|Pinch points & cuts           |Low         |Use safe working procedures. Wear all   |
+|                             |                              |            |PPE                                     |
+|Inspect all safety circuits  |Slips                         |Low         |Use safe working procedures. Wear all   |
+|are working                  |                              |            |PPE. Approved meters                    |
+|Check lamps and cam motors   |Burns                         |Medium      |Use safe working procedures. Wear all   |
+|                             |                              |            |PPE                                     |
+|Check all PC boards and clean|Slips from ladder. Airborne   |Low         |Use safe working procedures. Wear all   |
+|connections                  |contaminates                  |            |PPE                                     |
+|Re- power and test run       |Moving parts and pinch points |Low         |Use safe working procedures. Wear all   |
+|                             |                              |            |PPE                                     |
+

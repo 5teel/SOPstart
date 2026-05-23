@@ -1,0 +1,42 @@
+
+Surry Starrett Cleaner
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses / gloves         |Ye s                                   |Ellis Levy  11/06/07                    |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |8                                      |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps           |Potential /                 |Level of  |Controls to reduce the Risk of Hazard   |
+|                                |Actual Hazard               |Risk      |                                        |
+|Ensure appropriate PPE is worn  |none                        |Low       |                                        |
+|Pour a liberal amount of cleaner|Spill                       |Low       |PPE                                     |
+|onto a clean rag                |Irritation to eye / skin    |          |                                        |
+|Vigorously scrub granite block  |none                        |Low       |                                        |
+|to clean                        |                            |          |                                        |
+|Wipe dry with rag               |none                        |Low       |                                        |
+|Environmental:                  |                            |          |                                        |
+|Removal of used rags / gloves/  |Contamination.              |High      |Place in correct contamination or waste |
+|waste/ glass / cullet           |Waste removal and tidy up.  |          |bins provided.                          |
+|                                |                            |          |Ensure area is cleaned and product /    |
+|                                |                            |          |tools cleared away.                     |
+|Protection & Security           |                            |          |                                        |
+|Demarcation                     |Damage to people, property  |High      |Demarcation where applicable.           |
+|                                |and environment.            |          |Install barricaded/danger tape as       |
+|                                |                            |          |required.                               |
+|                                |                            |          |Ensure correct fire fighting equipment  |
+|                                |                            |          |is available.                           |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

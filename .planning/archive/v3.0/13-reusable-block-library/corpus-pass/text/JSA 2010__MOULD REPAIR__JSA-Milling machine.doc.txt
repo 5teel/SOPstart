@@ -1,0 +1,38 @@
+
+Milling Machines
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                |Safety Induction [Contractor]         |                                       |
+|PPE Required:                    |Significant Hazard                    |JSA Reviewed by and date               |
+|Standard Safety Uniform plus     |Yes                                   |Gary Russell 16/7/07                   |
+|Safety glasses                   |                                      |                                       |
+|                                 |Risk Score                            |                                       |
+|                                 |100                                   |                                       |
+|                                 |                                      |                                       |
+|                                 |Category                              |                                       |
+|                                 |Medium                                |                                       |
+|                                 |                                      |                                       |
+|                                 |Control taken                         |                                       |
+|                                 |Minimisation                          |                                       |
+|                                 |                                      |                                       |
+|Sequence of Job Steps            |Potential /                  |Level of |Controls to reduce the Risk of Hazard  |
+|                                 |Actual Hazard                |Risk     |                                       |
+|Inspect Mill                     |Falling objects              |Medium   |Check and remove any loose objects from|
+|                                 |Unexpected movement of tables|         |lathe                                  |
+|                                 |slides etc                   |         |Ensure all feed controls are disengaged|
+|                                 |Crushing                     |         |before turning on power                |
+|                                 |Entrapment                   |         |                                       |
+|Switch on machine                |Electric shock               |Low      |Check switch is operating correctly    |
+|Insert cutter in correct collet  |Loose cutter                 |Low      |Select correct collet for shank size   |
+|                                 |Flying objects               |         |Ensure cutter is tightened correctly in|
+|                                 |                             |         |collet and machine                     |
+|Secure job in vice or jig        |Falling objects              |Low      |Ensure job is correctly and securely   |
+|                                 |                             |         |clamped                                |
+|Milling of job                   |Swarf                        |Low      |Required PPE                           |
+|                                 |Shattered cutters            |         |Correct operating procedures for       |
+|                                 |Flying debris                |         |speeds, feeds, direction of cutting    |
+|Remove job from mill             |Falling objects              |Low      |Take care when unclamping and secure   |
+|                                 |                             |         |with free hand                         |

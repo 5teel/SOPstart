@@ -1,0 +1,39 @@
+
+Re-Coating Delivery Equipment
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                              |
+|PPE Required:                 |Significant Hazard                   |JSA Reviewed by and date                      |
+|All standard PPE required     |                                     |Dave Walmsley 09.07.08                        |
+|                              |                                     |                                              |
+|                              |Category                             |                                              |
+|                              |                                     |                                              |
+|                              |                                     |                                              |
+|                              |Control taken                        |                                              |
+|                              |Minimisation                         |                                              |
+|                              |                                     |                                              |
+|Sequence of Job Steps          |Potential /                   |Level of  |Controls to reduce the Risk of Hazard    |
+|                               |Actual Hazard                 |Risk      |                                         |
+|Place Delivery Equip in Vice   |Entrapment of Fingers         |          |Ensure work area is clear of             |
+|                               |Back Strain                   |Med       |obstructions.                            |
+|                               |Trip or Falling               |          |Use Back Support if reqd.                |
+|                               |                              |          |Use correct Manual Handling procedures.  |
+|Sand & Clean Delivery Equip    |Abrasion to Skin.             |          |Ensure gloves are worn.                  |
+|                               |Airborne contaminants.        |Med       |Ensure Extraction system is turned on.   |
+|Mix 2 Pot Epoxy Paint.         |Fumes.                        |          |Extraction system.                       |
+|                               |Flammable Liquid              |Med       |Ensure that no ignition sources are      |
+|                               |Toxic Liquid.                 |          |nearby.                                  |
+|                               |                              |          |If required use Respiratory Equip.       |
+|                               |                              |          |Wear Latex Gloves.                       |
+|Paint Delivery Equipment       |Fumes.                        |          |Extraction system.                       |
+|                               |Flammable Liquid.             |Med       |Ensure that no ignition sources are      |
+|                               |Toxic Liquid.                 |          |nearby.                                  |
+|                               |                              |          |If required use Respiratory Equip.       |
+|                               |                              |          |Wear Latex Gloves.                       |
+|Store Painted Delivery Equip on|Entrapment of Fingers.        |          |Ensure area is clear of obstructions.    |
+|Drying Rack.                   |Back Strain.                  |          |Use Back Support if reqd.                |
+|                               |Trip or Falling.              |Med       |Use correct Manual Handling procedures.  |
+|                               |Noise.                        |          |Ensure Painted Delivery Equip is located |
+|                               |                              |          |correctly on the Drying Rack.            |

@@ -1,0 +1,62 @@
+
+Use of AGR Ramp Pressure Tester
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses & Gloves         |Yes                                    |                                        |
+|                                |                                       |Rey Basabas  11/06/07                   |
+|                                |Risk Score                             |                                        |
+|                                |12                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                        |Potential /               |Level of  |Controls to reduce the Risk  |
+|                                             |Actual Hazard             |Risk      |of Hazard                    |
+|Switch on power & water supply to pressure   |None                      |Low       |Nil                          |
+|tester                                       |                          |          |                             |
+|Select one of two chambers to conduct the    |None                      |Low       |Nil                          |
+|tests                                        |                          |          |                             |
+|Open the door & push the container neck      |Broken bottle causing     |Low       |Ensure all PPE is worn to    |
+|through the plastic holder ( so that the     |laceration                |          |prevent injury to self       |
+|bottle will stay in place with some downward |                          |          |                             |
+|pressure being exerted )                     |                          |          |                             |
+|Bring down handle so that head comes into    |Broken bottle causing     |Low       |Ensure all PPE is worn to    |
+|contact with finish                          |laceration                |          |prevent injury to self       |
+|Adjust head turning thumb screw up or down as|Broken bottle causing     |Low       |Ensure all PPE is worn to    |
+|required                                     |laceration                |          |prevent injury to self       |
+|Ensure a good seal is achieved               |None                      |Low       |Nil                          |
+|Close chamber door                           |None                      |Low       |Nil                          |
+|The pressure tester will commence            |Broken bottle causing     |Low       |Ensure all PPE is worn to    |
+|automatically Record results as required NB  |laceration                |          |prevent injury to self       |
+|This test is to destruction                  |                          |          |                             |
+|If origins of breakage are required then each|Broken bottle causing     |Low       |Ensure all PPE is worn to    |
+|sample must be taped up with Sellotape so    |laceration                |          |prevent injury to self       |
+|that fragments are retained in position for  |                          |          |                             |
+|analysis                                     |                          |          |                             |
+|Discard containers after testing             |Broken bottle causing     |Low       |Ensure all PPE is worn to    |
+|                                             |laceration                |          |prevent injury to self       |
+|Environmental:                               |                          |          |                             |
+|Removal of used rags / gloves/  waste/ glass |Contamination.            |High      |Place in correct             |
+|/ cullet                                     |Waste removal and tidy up.|          |contamination or waste bins  |
+|                                             |                          |          |provided.                    |
+|                                             |                          |          |Ensure area is cleaned and   |
+|                                             |                          |          |product / tools cleared away.|
+|Protection & Security                        |                          |          |                             |
+|Demarcation                                  |Damage to people, property|High      |Demarcation where applicable.|
+|                                             |and environment.          |          |Install barricaded/danger    |
+|                                             |                          |          |tape as required.            |
+|                                             |                          |          |Ensure correct fire fighting |
+|                                             |                          |          |equipment is available.      |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

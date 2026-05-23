@@ -1,0 +1,39 @@
+
+Replacing Dual cavity moulds on IS Machine
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |Moderate                                   |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Stop and isolate the section.|Nil                           |Nil         |Read JSA for stopping section           |
+|Activate the kick valves for |                              |            |                                        |
+|mould open/close             |                              |            |                                        |
+|Get into position on the     |Fall from machine, Manual     |Extreme     |Training skills required before doing   |
+|machine in order to work     |handling. Sprains, Heat ΓÇô     |            |task, warming up before lifting gear.   |
+|safely, Close Moulds and     |Burns.                        |            |Use lifting gear if necessary           |
+|attach lifters.              |                              |            |                                        |
+|Open mould and disconnect the|Fall from machine, Manual     |Extreme     |Reposition the hoses closer towards you |
+|hoses.                       |handling. Sprains, Heat ΓÇô     |            |to reduce heat exposure.                |
+|                             |Burns.                        |            |                                        |
+|Remove moulds                |Sprains & Strains. Burns,     |Extreme     |Use correct lifting techniques when     |
+|                             |Falls/Trips                   |            |replacing moulds. Awareness of the      |
+|                             |                              |            |length of time that the task takes      |
+|Replace with new mould       |Sprains & Strains. Burns,     |Extreme     |Use correct lifting techniques when     |
+|                             |Falls/Trips                   |            |replacing moulds. Awareness of the      |
+|                             |                              |            |length of time that the task takes      |
+|Reconnect hoses, close moulds|Fall from machine, Manual     |Extreme     |Reposition the hoses closer towards you |
+|and remove lifters           |handling. Sprains, Heat ΓÇô     |            |to reduce heat exposure.                |
+|                             |Burns.                        |            |                                        |
+
+

@@ -1,0 +1,33 @@
+
+Removal of Take out, Bottom plate covers on Machine Platform
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]           |                                         |
+|PPE Required:                |Significant Hazard                      |JSA Reviewed by and date                 |
+|All standard PPE required    |Yes                                     |                                         |
+|                             |                                        |                                         |
+|                             |Risk Score                              |                                         |
+|                             |50                                      |                                         |
+|                             |                                        |                                         |
+|                             |Category                                |                                         |
+|                             |Medium                                  |                                         |
+|                             |                                        |                                         |
+|                             |Control taken                           |                                         |
+|                             |Minimisation                            |                                         |
+|                             |                                        |                                         |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Remove cover to adjust bottom|Hole to fall into             |Medium   |Ensure on one steps in to hole           |
+|plate and takeout            |                              |         |                                         |
+|After adjustment put cover   |                              |Low      |No hole to fall into                     |
+|back over hole               |                              |         |                                         |
+|Winder in hole               |Bruising tripping             |Medium   |Remove winder when no in using and put   |
+|                             |                              |         |back into trolley to prevent mishaps or  |
+|                             |                              |         |accidents                                |
+|                             |                              |         |                                         |
+|                             |                              |         |                                         |
+|                             |                              |         |                                         |
+|                             |                              |         |                                         |
+|                             |                              |         |                                         |

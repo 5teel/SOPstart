@@ -1,0 +1,30 @@
+
+Overview Repair Main Gob Chute at the Machine Floor
+                            AZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]         |X                                        |
+|PPE Required:                   |Significant Hazard                    |JSA Reviewed by and date                 |
+|All required PPE                |Yes                                   |                                         |
+|                                |                                      |                                         |
+|                                |Risk Score                            |                                         |
+|                                |750                                   |                                         |
+|                                |                                      |                                         |
+|                                |Category                              |                                         |
+|                                |High                                  |                                         |
+|                                |                                      |                                         |
+|                                |Control taken                         |                                         |
+|                                |Minimisation                          |                                         |
+|                                |                                      |                                         |
+|Sequence of Job Steps    |Potential /                           |Level of |Controls to reduce the Risk of Hazard|
+|                         |Actual Hazard                         |Risk     |                                     |
+|Install gob chute, sling |Forklift in area.                     |High     |Barricade area to prevent access by  |
+|up and put in position   |Falling pipe                          |         |others to the area                   |
+|                         |                                      |         |Riggers ΓÇô slings/chain blocks        |
+|Weld in position         |Electrocution caused by working in wet|High     |Use RCD for all electrical equipment.|
+|                         |area with electrical equipment        |         |Ensure screens are in place to       |
+|                         |Welding flash                         |         |prevent welding flash. Ensure that   |
+|                         |                                      |         |appropriate PPE equipment is worn    |
+|Oxy cutting              |Fire                                  |High     |Fire catch                           |
+|                         |                                      |         |Fire extinguisher readily available  |

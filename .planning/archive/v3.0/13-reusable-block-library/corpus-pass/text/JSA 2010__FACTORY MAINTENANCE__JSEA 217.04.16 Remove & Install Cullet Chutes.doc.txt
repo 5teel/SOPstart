@@ -1,0 +1,60 @@
+
+
+
+Job Safety Environmental Analysis Form:                       Remove &
+                                                              Install
+                                                              Cullet Chutes
+
+|Area / Department                  |Factory Maintenance                   |Task  or Job Description                  |
+|                                   |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Recommended Personal Protective    |                                      |                                          |
+|Equipment                          |                                      |                                          |
+|Gloves, Safety Glasses, Ear Muffs, |Risk Score                            |                                          |
+|Safety Boots, High Vis Garment,    |                                      |                                          |
+|Respiratory Protection (when       |                                      |                                          |
+|working with asbestos).            |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Prepare work site.       |Manual Handling         |Medium   |Use correct manual handling techniques.                 |
+|Isolate water.           |Uncontrolled escape of  |Low      |Ensure water is isolated on the Group Isolation Board.  |
+|                         |water.                  |         |                                                        |
+|Remove cullet chutes ΓÇô   |Rigging / twisting /    |Medium   |Use correct manual handling techniques.                 |
+|use chain blocks.        |manual handling /       |         |Use appropriate lifting equipment.                      |
+|                         |grinding / oxy cutting. |         |Rigger to control lifting operations.                   |
+|                         |                        |         |Ensure basement workers advised when removing chutes.   |
+|Repair cullet chutes.    |Welding / flash /       |Medium   |Use welding screens.                                    |
+|                         |grinding.               |         |Wear appropriate PPE equipment.                         |
+|                         |                        |         |Fire equipment readily available.                       |
+|Install cullet chutes.   |Rigging / twisting /    |Medium   |Use correct manual handling techniques.                 |
+|                         |manual handling /       |         |Use appropriate lifting equipment.                      |
+|                         |grinding.               |         |Rigger to control lifting operations.                   |
+|De-isolate water.        |Uncontrolled escape of  |Medium   |Follow commissiong procedures.                          |
+|                         |water.                  |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

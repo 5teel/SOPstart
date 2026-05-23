@@ -1,0 +1,54 @@
+
+APPLYING NEW ROLL TO MSK
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                              |Safety Induction [Contractor]           |                                        |
+|PPE Required:                  |Significant Hazard                      |JSEA Reviewed by and date:              |
+|All standard safety equipment  |Yes                                     |Wayne Smith 16/08/07                    |
+|                               |                                        |Simote Tuitupou 16/08/07                |
+|                               |Risk Score                              |                                        |
+|                               |30                                      |                                        |
+|                               |                                        |                                        |
+|                               |Category                                |                                        |
+|                               |Low                                     |                                        |
+|                               |                                        |                                        |
+|                               |Control taken                           |                                        |
+|                               |Minimisation                            |                                        |
+|                               |                                        |                                        |
+|Sequence of Job Steps          |Potential /                |Level of    |Controls to reduce the Risk of Hazard   |
+|                               |Actual Hazard              |Risk        |                                        |
+|Using the block & tackle lift  |Heavy bar ΓÇô possible back  |Medium      |2 people (when possible) to lift bar /  |
+|bar off bracket and remove     |strain                     |            |or if in training  to ensure that       |
+|locking nut and core           |                           |            |employee not exposed to manual handling |
+|                               |                           |            |risk                                    |
+|Feed bar into new roll and     |Heavy bar ΓÇô possible back  |Medium      |2 people (when possible) to lift bar /  |
+|secure                         |strain                     |            |or if in training  to ensure that       |
+|                               |                           |            |employee not exposed to manual handling |
+|                               |                           |            |risk                                    |
+|Use block & tackle to lift roll|Block & tackle may fail ΓÇô  |Medium      |2 people [when possible] to push roll   |
+|to correct height - push roll  |back strain, shoulder      |            |into place                              |
+|into position and lower onto   |strain                     |            |                                        |
+|bracket                        |                           |            |                                        |
+|Plastic then fed through       |Back strain ΓÇô possible trip|Low         |Normally 2 people can do this, but the  |
+|correct sequence               |hazards                    |            |task can be done by the Fork Hoist only.|
+|Close doors, reset MSK and     |Crush hazard from closing  |Low         |Training / awareness                    |
+|press Auto                     |the door                   |            |                                        |
+|Environmental:                 |                           |            |                                        |
+|Removal of used rags / gloves/ |Contamination.             |High        |Place in correct contamination or waste |
+|waste/ glass / cullet          |Waste removal and tidy up. |            |bins provided.                          |
+|                               |                           |            |Ensure area is cleaned and product /    |
+|                               |                           |            |tools cleared away.                     |
+|Protection & Security          |                           |            |                                        |
+|Demarcation                    |Damage to people, property |High        |Demarcation where applicable.           |
+|                               |and environment.           |            |Install barricaded/danger tape as       |
+|                               |                           |            |required.                               |
+|                               |                           |            |Ensure correct fire fighting equipment  |
+|                               |                           |            |is available.                           |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+

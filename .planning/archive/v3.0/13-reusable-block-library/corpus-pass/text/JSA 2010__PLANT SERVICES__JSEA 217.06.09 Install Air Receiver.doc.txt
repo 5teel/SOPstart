@@ -1,0 +1,61 @@
+
+
+
+Job Safety Environmental Analysis Form:
+
+                                                                         Ins
+                                                                         tal
+                                                                         l
+                                                                         Air
+                                                                          Re
+                                                                         cei
+                                                                         ver
+
+
+
+                                                                         |Area / Department                  |Plant Services                        |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|and Safety Boots, welding PPE      |                                      |                                          |
+|required.                          |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Prepare work area.       |Manual Handling.        |Medium   |Use correct manual handling techniques.                 |
+|Access area.             |Slip, Trip, Fall.       |Medium   |Clean work area.                                        |
+|Remove floor grids.      |Manual handling.        |High     |Barricade off hole in floor.                            |
+|                         |Falls.                  |         |Use correct manual handling techniques.                 |
+|                         |Other personΓÇÖs access.  |         |                                                        |
+|Lift receiver to Platform|Lifting.                |High     |Barricade off under work area.                          |
+|using overhead chain     |Falls.                  |         |Rigger to rig load.                                     |
+|block.                   |Drop Load.              |         |Rigger to control lift.                                 |
+|                         |Pedestrian traffic.     |         |                                                        |
+|Position receiver.       |Manual Handling.        |High     |Use correct manual handling techniques.                 |
+|                         |                        |         |Crew to be harnessed.                                   |
+|Replace floor grid.      |Manual Handling.        |High     |Use correct manual handling techniques.                 |
+|                         |Falls.                  |         |Secure floor grid in position.                          |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+                           -----------------------
+
+
+[pic]
+
+O-I New Zealand
+

@@ -1,0 +1,42 @@
+
+Plant Greasing Overview
+                            HAZARD IDENTIFICATION
+|1                                                                       |
+|1                                                                       |
+|1                              |Safety Induction [Contractor]       |                                                |
+|PPE Required:                  |Significant Hazard                  |JSEA Reviewed by and date                       |
+|                               |Yes                                 |                                                |
+|                               |                                    |                                                |
+|                               |Risk Score                          |                                                |
+|                               |40                                  |                                                |
+|                               |                                    |                                                |
+|                               |Category                            |                                                |
+|                               |Low                                 |                                                |
+|                               |                                    |                                                |
+|                               |Control taken                       |                                                |
+|                               |Minimisation                        |                                                |
+|                               |                                    |                                                |
+|Sequence of Job Steps    |Potential /                      |Level of  |Controls to reduce the Risk of Hazard        |
+|                         |Actual Hazard                    |Risk      |                                             |
+|Greasing equipment       |Airborne contaminants            |Low       |Wear dust mask                               |
+|throughout the plant     |                                 |          |                                             |
+|                         |Noise                            |High      |Ear muffs, gloves                            |
+|                         |Excessively hot environment      |High      |Gloves, dust mask                            |
+|                         |Slippery surface                 |Low       |Walk carefully                               |
+|                         |Risk of falling                  |Low       |Be sure the top ladder is stable             |
+|                         |Broken glass                     |Low       |Clean the area if practicable                |
+|Environmental:           |                                 |          |                                             |
+|Removal of used rags /   |Contamination.                   |High      |Place in correct contamination or waste bins |
+|gloves/  waste/ glass /  |Waste removal and tidy up.       |          |provided.                                    |
+|cullet                   |                                 |          |Ensure area is cleaned and product / tools   |
+|                         |                                 |          |cleared away.                                |
+|Protection & Security    |                                 |          |                                             |
+|Demarcation              |Damage to people, property and   |High      |Demarcation where applicable.                |
+|                         |environment.                     |          |Install barricaded/danger tape as required.  |
+|                         |                                 |          |Ensure correct fire fighting equipment is    |
+|                         |                                 |          |available.                                   |
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

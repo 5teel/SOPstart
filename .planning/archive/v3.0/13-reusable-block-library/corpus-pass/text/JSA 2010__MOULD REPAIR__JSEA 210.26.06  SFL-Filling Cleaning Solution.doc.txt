@@ -1,0 +1,47 @@
+
+SFL- Filling Cleaning solution
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required: Safety Glasses ,  |Significant Hazard                     |JSEA Reviewed by and date               |
+|Face mask, Gloves               |No                                     |Gary Russell 30/8/07                    |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |6                                      |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps       |Potential /                      |Level of |Controls to reduce the Risk of Hazard   |
+|                            |Actual Hazard                    |Risk     |                                        |
+|Remove holder lid           |Contamination by solution        |Low      |Turn off air supply to pot / Release    |
+|                            |spraying                         |         |pressure in pot using pressure release. |
+|                            |Spilling solution on floor       |         |Ensure pot is supported when removed    |
+|Refill pot with cleaning    |Splash/ spill solution           |Low      |Correctly support pot and do not        |
+|solution                    |                                 |         |overfill pot                            |
+|Replace pot                 |Spilling solution                |Low      |Ensure pot sitting secure               |
+|                            |Trapping fingers                 |         |Ensure fingers clear of sealing surface |
+|                            |                                 |         |when replacing pot lid                  |
+|Turn on air                 |Splashing of solution            |Low      |Ensure wing nuts are tight and pot      |
+|                            |                                 |         |sealed before turning on air            |
+|Environmental:              |                                 |         |                                        |
+|Removal of used rags /      |Contamination.                   |High     |Place in correct contamination or waste |
+|gloves/  waste/ glass /     |Waste removal and tidy up.       |         |bins provided.                          |
+|cullet                      |                                 |         |Ensure area is cleaned and product /    |
+|                            |                                 |         |tools cleared away.                     |
+|Protection & Security       |                                 |         |                                        |
+|Demarcation                 |Damage to people, property and   |High     |Demarcation where applicable.           |
+|                            |environment.                     |         |Install barricaded/danger tape as       |
+|                            |                                 |         |required.                               |
+|                            |                                 |         |Ensure correct fire fighting equipment  |
+|                            |                                 |         |is available.                           |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

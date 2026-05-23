@@ -1,0 +1,63 @@
+
+Electrode Holder Drilling
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSEA Reviewed by and date                   |
+|Safety Glasses & Gloves plus  |Yes                                  |                                            |
+|heat protection clothing      |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |500                                  |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |High                                 |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps                    |Potential /             |Level of |Controls to reduce the Risk of      |
+|                                         |Actual Hazard           |Risk     |Hazard                              |
+|Meeting to discuss safety, the job       |None                    |Low      |All staff involve in the work       |
+|requirements, any concerns and           |                        |         |Supervision at all times, trained   |
+|reservations that those concerned may    |                        |         |personnel carrying out the task     |
+|have                                     |                        |         |                                    |
+|Ensure all run out equipment is out and  |Heat & dehydration      |Low      |Working down burner ally. Be aware  |
+|working. Hotwork gear and all PPE        |                        |         |of apparent hazards particularly    |
+|                                         |                        |         |heat                                |
+|Set up equipment for drilling i.e.       |Heat & dehydration      |High     |Supervision at all times.           |
+|welder, water, air supply, cutting gear  |                        |         |                                    |
+|and lighting.                            |                        |         |                                    |
+|Fix drill frame to furnace steelwork.    |Heat & dehydration      |High     |Drink plenty of liquids and restrict|
+|                                         |                        |         |amount of time down the burner ally.|
+|                                         |                        |         |Fans will be positioned at entrance |
+|                                         |                        |         |to ally to try and move some air    |
+|Drill hole and remove core, insert lance |Burns from glass leak,  |High     |Maintain supervision at all times   |
+|to prevent glass leakage                 |water ingress, steam,   |         |                                    |
+|                                         |fire RUN OUT            |         |                                    |
+|Freeze glass off by leaving drill slowly |Glass Run out           |High     |Maintain supervision at all times   |
+|rotating with water on ΓÇô minimum of 1    |                        |         |                                    |
+|hour                                     |                        |         |                                    |
+|Insert electrode holder in hole and      |Glass Run out           |High     |Maintain supervision at all times   |
+|secure in place                          |                        |         |                                    |
+|Break out core and advance electrode into|Glass Run out           |High     |Maintain supervision at all times   |
+|glass                                    |                        |         |                                    |
+|Environmental:                           |                        |         |                                    |
+|Removal of used rags / gloves/  waste/   |Contamination.          |High     |Place in correct contamination or   |
+|glass / cullet                           |Waste removal and tidy  |         |waste bins provided.                |
+|                                         |up.                     |         |Ensure area is cleaned and product /|
+|                                         |                        |         |tools cleared away.                 |
+|Protection & Security                    |                        |         |                                    |
+|Demarcation                              |Damage to people,       |High     |Demarcation where applicable.       |
+|                                         |property and            |         |Install barricaded/danger tape as   |
+|                                         |environment.            |         |required.                           |
+|                                         |                        |         |Ensure correct fire fighting        |
+|                                         |                        |         |equipment is available.             |
+
+
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

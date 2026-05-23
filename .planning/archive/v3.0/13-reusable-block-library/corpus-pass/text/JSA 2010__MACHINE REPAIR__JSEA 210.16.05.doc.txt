@@ -1,0 +1,79 @@
+
+
+
+Job Safety Environmental Analysis Form:          Remove & Install Blank
+                                                                          Side
+                                                                          Ma
+                                                                          ni
+                                                                          fo
+                                                                          ld
+                                                                          s
+
+|Area / Department                  |Machine Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|and Safety Boots, welding PPE      |                                      |                                          |
+|required                           |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Prepare work site.       |Manual Handling.        |High     |Barricade work area.                                    |
+|                         |Access.                 |         |Use correct manual handling techniques.                 |
+|                         |                        |         |Conduct Tool Box meeting prior to starting work.        |
+|Isolate air.             |Uncontrolled escape of  |High     |Ensure air line is isolated prior to starting work.     |
+|                         |compressed air.         |         |Follow Group Isolation Procedure.                       |
+|Disconnect supply piping.|Uncontrolled escape of  |High     |Check prior to disconnecting.                           |
+|                         |compressed air.         |         |                                                        |
+|Disconnect piping to     |Hot machine parts.      |High     |Wear appropriate PPE.                                   |
+|valve blocks and section |Congested work area.    |         |                                                        |
+|frame.                   |Burns.                  |         |                                                        |
+|                         |Abrasions.              |         |                                                        |
+|Lift out manifolds       |Manual Handling.        |High     |Use appropriate lifting equipment.                      |
+|-   using Abbey Hoist.   |Pushing / Pulling.      |         |Use correct manual handling techniques.                 |
+|-   place manifolds on   |Oily work area.         |         |Control load swing.                                     |
+|pallet.                  |Rigging.                |         |Position pallet in accessible position.                 |
+|                         |Jammed fingers / feet   |         |                                                        |
+|Forklift to transport    |Moving vehicle          |High     |Spotter to be used when moving vehicle in project area  |
+|pallet to clean down area|                        |         |Place pallet in position for cleaning crew              |
+|Clean down manifolds     |Splash with detergents  |High     |Wear appropriate PPE                                    |
+|                         |Splash with foreign     |         |                                                        |
+|                         |matter                  |         |                                                        |
+|Install manifolds        |Manual Handling         |High     |Use appropriate lifting equipment                       |
+|- Collect form stored    |Pushing / Pulling       |         |Use correct manual handling techniques                  |
+|area with forklift       |Rigging                 |         |Control load swing                                      |
+|- Transport to work area |Jammed fingers / feet   |         |Position pallet in accessible position                  |
+|by forklift              |                        |         |                                                        |
+|- Use Abbey Hoist to     |                        |         |                                                        |
+|install manifolds        |                        |         |                                                        |
+|Connect piping to section|Congested work area     |High     |Wear appropriate PPE                                    |
+|boxes                    |Abrasions               |         |Use correct tools                                       |
+|Connect supply piping    |Congested work area     |High     |Wear appropriate PPE                                    |
+|                         |                        |         |Use correct tools                                       |
+|Commissioning            |Incomplete work         |Medium   |Follow Commissioning Procedure                          |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

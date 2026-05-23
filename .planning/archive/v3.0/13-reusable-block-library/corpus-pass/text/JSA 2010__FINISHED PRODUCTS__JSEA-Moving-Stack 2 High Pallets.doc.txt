@@ -1,0 +1,45 @@
+
+MOVING AND STACKING PALLETS TWO HIGH
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date:               |
+|All standard PPE required. Plus |Yes                                    |Wayne Smith                             |
+|Hiviz clothing                  |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |90                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Medium                                 |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps              |Potential /               |Level of |Controls to reduce the Risk of Hazard   |
+|                                   |Actual Hazard             |Risk     |                                        |
+|Mobile hoist picks up a pallet and |Mobile hoist              |Low      |Reduce speed, ensure pallet is stable   |
+|places it on the floor             |movement/speed, unstable  |         |                                        |
+|                                   |pallet may collapse       |         |                                        |
+|Hoist driver then picks up second  |Entrapment from pallet    |Medium   |Reduce speed, ensure pallet is stable   |
+|pallet and places it carefully and |collapse. Lacerations from|         |when placing pallet on top of each      |
+|straight on top of the first pallet|glass                     |         |other.                                  |
+|Hoist is driven in reverse with    |Strain from driving in    |Medium   |Driver must ensure that reverse alarm is|
+|load and driver must ensure that   |reverse                   |         |sounding, reverse lights are on, and    |
+|speed is reduced for safe transport|                          |         |speed is reduced. Driving in reverse due|
+|of pallets                         |                          |         |to height of pallet and limited         |
+|                                   |                          |         |visibility                              |
+|At  the bay entrance, move forward |Vehicle collision causing |Medium   |Speed is reduced while about to place   |
+|into the bay sounding horn and     |damage to self and hoist  |         |pallets                                 |
+|place load safely in position,     |                          |         |                                        |
+|Driver must ensure there is        |Entrapment from pallet    |Medium   |Ensure that sufficient clearance is     |
+|sufficient clearance between the   |collapse and overhead     |         |maintained with top pallet and roof     |
+|roof structures and the top pallet |structures.               |         |structures before moving pallet into    |
+|                                   |                          |         |storage position.  If unsure of height  |
+|                                   |                          |         |of roof structures and clearance - place|
+|                                   |                          |         |one pallet at a time                    |
+|Slowly reverse out of bay sounding |Vehicle collision causing |Medium   |Be very aware of other fork hoist       |
+|horn. return  now driving forward  |damage to self and hoist  |         |drivers and other activity within the   |
+|to pick up another pallet for      |                          |         |area                                    |
+|storage                            |                          |         |                                        |

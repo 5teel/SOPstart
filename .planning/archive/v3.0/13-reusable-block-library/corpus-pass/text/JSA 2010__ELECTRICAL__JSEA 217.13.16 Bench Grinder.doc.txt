@@ -1,0 +1,26 @@
+
+Bench Grinder
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |High                                       |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Isolate power                |Electrocution & rotating parts|High        |Wear all PPE Turn off                   |
+|Check grinding wheel for     |Flying objects & pinch points |Low         |Wear all PPE                            |
+|damage and guard is fitted   |                              |            |                                        |
+|Reconnect power              |Sudden start ups              |Low         |Stand clear when reconnecting power     |
+|Start grinder and commence   |Rotating parts, flying        |High        |Wear all PPE ΓÇô face shield & gloves     |
+|work                         |objects, sparks & hot metal   |            |                                        |
+|Stop grinder                 |Hot metal & rotating parts    |Low         |Wear all PPE - gloves                   |
+

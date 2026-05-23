@@ -1,0 +1,36 @@
+
+Cutting glass containers
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety Specs / Ear protection   |Yes                                    |Richard Smith  12/06/07                 |
+|gloves , face mask if required  |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |30                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                  |Potential /                         |Level  |Controls to reduce the Risk|
+|                                       |Actual Hazard                       |of Risk|of Hazard                  |
+|Conduct visual check of saw            |Check for any obvious broken parts  |Low    |Nil                        |
+|Turn on water to saw                   |Slippery floor surface              |Low    |Steel mat ( non slip ) /   |
+|                                       |                                    |       |keep area dry              |
+|Switch on saw                          |Electrocution                       |Low    |Ensure all equipment is    |
+|                                       |                                    |       |safe to use prior          |
+|Position container in V block          |None                                |Low    |None                       |
+|Hold container to be cut firmly in V   |Laceration from equipment           |Low    |Ensure all PPE is worn to  |
+|block, slowly moving the carriage so   |                                    |       |prevent any injury to self |
+|that the container passes through the  |                                    |       |                           |
+|saw blade                              |                                    |       |                           |
+|Retain required glass  samples &       |Laceration                          |Low    |Ensure all PPE is worn to  |
+|discard broken fragments               |                                    |       |prevent any injury to self |
+|Switch off power to saw & turn off     |None                                |Low    |Nil                        |
+|water                                  |                                    |       |                           |

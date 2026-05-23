@@ -1,0 +1,58 @@
+
+REPAIR LIGHTS
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                            |Safety Induction [Contractor]          |                                               |
+|PPE Required:                |Significant Hazard                     |JSEA Reviewed by and date                      |
+|All standard PPE required    |Yes                                    |                                               |
+|                             |                                       |                                               |
+|                             |Risk Score                             |                                               |
+|                             |47                                     |                                               |
+|                             |                                       |                                               |
+|                             |Category                               |                                               |
+|                             |Medium                                 |                                               |
+|                             |                                       |                                               |
+|                             |Control taken                          |                                               |
+|                             |Minimisation                           |                                               |
+|                             |                                       |                                               |
+|Sequence of Job Steps       |Potential /                        |Level|Controls to reduce the Risk of Hazard        |
+|                            |Actual Hazard                      |of   |                                             |
+|                            |                                   |Risk |                                             |
+|Check operation of Scissor  |Injury to operator and other       |Low  |Check operation before use                   |
+|Lift and drive to position  |persons if equipment fails         |     |                                             |
+|Notify people in restricted |Injury from working vehicles ΓÇô fork|Low  |Notify Seamount that Scissor Lift about to be|
+|areas                       |hoist and trucks                   |     |in operation repairing lights                |
+|Place hazard warning cones  |Prevents operator being hit by     |Low  |Place the cones in a area that warns people  |
+|around the area             |passing traffic                    |     |approaching the area that driving restriction|
+|                            |                                   |     |ahead. Prevent other people entering the work|
+|                            |                                   |     |area                                         |
+|Put on Safety Harness       |Prevents falling from the platform |Low  |Attach the harness to the Scissor lift       |
+|                            |                                   |     |platform                                     |
+|Use another employee as a   |Risk of falling equipment from the |Med  |Spotter to stand in a area away from risk of |
+|ΓÇ£Spotter ΓÇ£when moving       |lift and or the lights             |     |falling or being hit by any traffic but still|
+|                            |                                   |     |able to see whole operation                  |
+|Test light for electrical   |Electrocution                      |Med  |Electrical Testing of fault and or isolation |
+|isolation                   |                                   |     |that may be required prior to replacing      |
+|Replace or repair faulty    |Electrocution                      |High |Isolate if required                          |
+|light fitting               |                                   |     |                                             |
+|Complete task and remove    |Risk of hitting people or          |Low  |Driving with care and caution                |
+|Scissor Lift to a safe area |structures                         |     |                                             |
+|Remove the hazard warning   |Back injury from bending or        |Low  |Store with the Scissor Lift                  |
+|cones                       |tripping on uneven ground          |     |                                             |
+|Environmental:              |                                   |    |                                              |
+|Removal of used rags /      |Contamination.                     |High|Place in correct contamination or waste bins  |
+|gloves/  waste/ glass /     |Waste removal and tidy up.         |    |provided.                                     |
+|cullet                      |                                   |    |Ensure area is cleaned and product / tools    |
+|                            |                                   |    |cleared away.                                 |
+|Protection & Security       |                                   |    |                                              |
+|Demarcation                 |Damage to people, property and     |High|Demarcation where applicable.                 |
+|                            |environment.                       |    |Install barricaded/danger tape as required.   |
+|                            |                                   |    |Ensure correct fire fighting equipment is     |
+|                            |                                   |    |available.                                    |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

@@ -1,0 +1,32 @@
+
+SFL- Filling Cleaning solution
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required: Safety Glasses ,  |Significant Hazard                     |JSA Reviewed by and date                |
+|Face mask, Gloves               |No                                     |Gary Russell 30/8/07                    |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |6                                      |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard              |
+|                         |Actual Hazard           |Risk     |                                                   |
+|Remove holder lid        |Contamination by        |Low      |Turn off air supply to pot / Release pressure in   |
+|                         |solution spraying       |         |pot using pressure release. Ensure pot is supported|
+|                         |Spilling solution on    |         |when removed                                       |
+|                         |floor                   |         |                                                   |
+|Refill pot with cleaning |Splash/ spill solution  |Low      |Correctly support pot and do not overfill pot      |
+|solution                 |                        |         |                                                   |
+|Replace pot              |Spilling solution       |Low      |Ensure pot sitting secure                          |
+|                         |Trapping fingers        |         |Ensure fingers clear of sealing surface when       |
+|                         |                        |         |replacing pot lid                                  |
+|Turn on air              |Splashing of solution   |Low      |Ensure wing nuts are tight and pot sealed before   |
+|                         |                        |         |turning on air                                     |

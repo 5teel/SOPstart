@@ -1,0 +1,28 @@
+
+Drill Press
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |High                                       |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Isolate power and clean site |Cuts, flying objects &        |High        |Wear all PPE Turn off                   |
+|                             |rotating parts                |            |                                        |
+|Fit new drill to chuck       |Flying objects, slipping when |Low         |Wear all PPE                            |
+|                             |tightening chuck              |            |                                        |
+|Secure work to be drilled    |Flying objects, cuts and      |Low         |Wear all PPE                            |
+|                             |crushing                      |            |                                        |
+|Drill hole                   |Rotating parts, flying        |High        |Wear all PPE No loose clothing          |
+|                             |objects, Noise                |            |                                        |
+|Remove drill and work        |Cuts                          |Low         |Wear all PPE                            |
+

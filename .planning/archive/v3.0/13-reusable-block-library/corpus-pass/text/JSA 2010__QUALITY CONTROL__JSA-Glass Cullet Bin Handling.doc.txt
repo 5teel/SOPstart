@@ -1,0 +1,41 @@
+
+Glass cullet bin handling
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety Glasses / Gloves and back|Yes                                    |Gary OΓÇÖNeill  12/06/07                  |
+|support brace if required       |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |30                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                    |Potential /               |Level of  |Controls to reduce the Risk of   |
+|                                         |Actual Hazard             |Risk      |Hazard                           |
+|Identify glass bin to be moved           |Nil                       |Low       |Nil                              |
+|Ensure Fork hoist is safety checked ok   |Malfunction will lead to  |Low       |Complete FH check sheets         |
+|                                         |injury / damage           |          |                                 |
+|Manoeuvre empty pallet to bin location   |Nil                       |Low       |Nil                              |
+|Place glass bin onto empty pallet ( ask  |Strain / sprain           |Low       |PPE                              |
+|for assistance if needed )               |                          |          |                                 |
+|Place further bins onto pallet until full|Strain / sprain           |Low       |PPE                              |
+|( but not unbalanced )                   |                          |          |                                 |
+|Pick up pallet using fork hoist & move to|Pallet tips over in       |Low       |PPE / Ensure bins are balanced on|
+|cullet bay                               |transit causing           |          |pallet                           |
+|                                         |laceration                |          |                                 |
+|Empty glass cullet from bins to          |Laceration from broken    |Low       |PPE                              |
+|appropriate cullet bay. NB Applies only  |glass                     |          |                                 |
+|if bins contain GLASS ONLY-  any rubbish |                          |          |                                 |
+|then bin to be emptied into rubbish skip |                          |          |                                 |
+|Replace bins back to original location   |Nil                       |Low       |Nil                              |
+|In some cases it is appropriate to tip   |Strain / sprain           |Low       |PPE                              |
+|cullet from the glass bins into one big  |                          |          |                                 |
+|skip & then it is this which is tipped at|                          |          |                                 |
+|the cullet bay                           |                          |          |                                 |

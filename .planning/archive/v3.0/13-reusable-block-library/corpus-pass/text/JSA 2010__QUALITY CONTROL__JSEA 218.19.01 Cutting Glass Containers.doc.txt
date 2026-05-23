@@ -1,0 +1,56 @@
+
+Cutting glass containers
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Specs / Ear protection   |Yes                                    |Richard Smith  12/06/07                 |
+|gloves , face mask if required  |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |30                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                  |Potential /                      |Level of  |Controls to reduce the Risk|
+|                                       |Actual Hazard                    |Risk      |of Hazard                  |
+|Conduct visual check of saw            |Check for any obvious broken     |Low       |Nil                        |
+|                                       |parts                            |          |                           |
+|Turn on water to saw                   |Slippery floor surface           |Low       |Steel mat ( non slip ) /   |
+|                                       |                                 |          |keep area dry              |
+|Switch on saw                          |Electrocution                    |Low       |Ensure all equipment is    |
+|                                       |                                 |          |safe to use prior          |
+|Position container in V block          |None                             |Low       |None                       |
+|Hold container to be cut firmly in V   |Laceration from equipment        |Low       |Ensure all PPE is worn to  |
+|block, slowly moving the carriage so   |                                 |          |prevent any injury to self |
+|that the container passes through the  |                                 |          |                           |
+|saw blade                              |                                 |          |                           |
+|Retain required glass  samples &       |Laceration                       |Low       |Ensure all PPE is worn to  |
+|discard broken fragments               |                                 |          |prevent any injury to self |
+|Switch off power to saw & turn off     |None                             |Low       |Nil                        |
+|water                                  |                                 |          |                           |
+|Environmental:                         |                                 |          |                           |
+|Removal of used rags / gloves/  waste/ |Contamination.                   |High      |Place in correct           |
+|glass / cullet                         |Waste removal and tidy up.       |          |contamination or waste bins|
+|                                       |                                 |          |provided.                  |
+|                                       |                                 |          |Ensure area is cleaned and |
+|                                       |                                 |          |product / tools cleared    |
+|                                       |                                 |          |away.                      |
+|Protection & Security                  |                                 |          |                           |
+|Demarcation                            |Damage to people, property and   |High      |Demarcation where          |
+|                                       |environment.                     |          |applicable.                |
+|                                       |                                 |          |Install barricaded/danger  |
+|                                       |                                 |          |tape as required.          |
+|                                       |                                 |          |Ensure correct fire        |
+|                                       |                                 |          |fighting equipment is      |
+|                                       |                                 |          |available.                 |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

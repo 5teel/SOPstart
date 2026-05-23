@@ -1,0 +1,101 @@
+
+
+
+Job Safety Environmental Analysis Form:            Removal of Gob
+                                                                          Distributor
+                                                                           &
+                                                                           A
+                                                                          ss
+                                                                          oc
+                                                                          ia
+                                                                          te
+                                                                          d
+                                                                          Eq
+                                                                          ui
+                                                                          pm
+                                                                          en
+                                                                          t
+
+|Area / Department                  |Machine Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|and Safety Boots, welding PPE      |                                      |                                          |
+|required.                          |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Stop Production and Plug |Hot temperatures in area|         |Drink water & monitor personal conditions               |
+|Glass                    |Pedestrian traffic      |         |Barricade off area                                      |
+|- Working feeder & spout |Hot molten glass        |         |Wear appropriate PPE                                    |
+|casing                   |falling objects         |         |No traffic to sub floor                                 |
+|above the machine        |Burns                   |         |                                                        |
+|                         |Heat stress             |         |                                                        |
+|Isolate Drive System     |Entrapment              |         |Ensure Isolation completed Group Isolation Board        |
+|                         |Lacerations             |         |                                                        |
+|                         |Abrasions Burns         |         |                                                        |
+|Remove Gob distributor   |Lacerations             |         |Use correct manual handling techniques                  |
+|                         |Awkward working postures|         |Cover all floor gaps where possible                     |
+|                         |Congested working area  |         |Wear appropriate PPE                                    |
+|                         |Falling objects         |         |Barricade off area under work area                      |
+|Remove delivery troughs  |Falling objects         |         |Wear appropriate PPE                                    |
+|and deflectors           |Lacerations             |         |Clean work area before starting                         |
+|Removal of blank & mould |Manual Handling         |         |Use correct manual handling techniques                  |
+|side auxiliary equipment |Lacerations             |         |Wear appropriate PPE                                    |
+|                         |Jammed fingers          |         |Clean machine prior to starting work                    |
+|                         |Burns                   |         |                                                        |
+|Isolate the following    |Lacerations             |         |Ensure all isolations at Group Isolation Board          |
+|- Low & High Pressure air|Striking                |         |Wear appropriate PPE                                    |
+|- Pilot Air              |Entrapment              |         |                                                        |
+|- Oil Lubrication        |                        |         |                                                        |
+|- Constant Cushioning    |                        |         |                                                        |
+|- Hydraulics             |                        |         |                                                        |
+|- Machine Cooling        |                        |         |                                                        |
+|- Conveyor               |                        |         |                                                        |
+|- Stannic Lines          |                        |         |                                                        |
+|- Shear Water            |                        |         |                                                        |
+|Remove Mould Side Cullet |Slips, Trips, Falls     |         |Cover all floor openings                                |
+|Chute                    |Manual Handling         |         |Use correct manual handling techniques                  |
+|                         |Floor openings          |         |Clean floor                                             |
+|Remove Auxiliary Mould   |Crushing                |         |Use appropriate lifting equipment                       |
+|Side Equipment           |Entanglement            |         |Use correct manual handling techniques                  |
+|                         |Lacerations             |         |Barricade area off                                      |
+|                         |Abrasions               |         |                                                        |
+|                         |Manual Handling         |         |                                                        |
+|Remove all of the        |Slips, Trips, Falls     |         |Use appropriate lifting equipment                       |
+|following                |Lacerations             |         |Use correct Manual Handling techniques                  |
+|- Long Conveyor Auxiliary|Manual Handling         |         |Wear Appropriate PPE                                    |
+|                         |Abrasions               |         |Machine to be cleaned of excess cullet                  |
+|Equipment                |                        |         |Floor openings to be covered                            |
+|- Air Lines to Section   |                        |         |Restrict access                                         |
+|Boxes                    |                        |         |Restrict access to below the machine                    |
+|- Blank Side Floor Plates|                        |         |                                                        |
+|- Oil Lines to Section   |                        |         |                                                        |
+|Boxes                    |                        |         |                                                        |
+|- Air Lines              |                        |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

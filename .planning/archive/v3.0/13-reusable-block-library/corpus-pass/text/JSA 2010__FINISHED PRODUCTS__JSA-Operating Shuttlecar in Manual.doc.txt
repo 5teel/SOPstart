@@ -1,0 +1,38 @@
+
+Operating Automatic Shuttle Car in Manual
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSA Reviewed by and date                    |
+|All standard PPE required     |Yes                                  |Wayne Smith 07/09/07                        |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |18                                   |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |Low                                  |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps          |Potential /                  |Level of |Controls to reduce the Risk of Hazard    |
+|                               |Actual Hazard                |Risk     |                                         |
+|Step onto shuttle car ΓÇô turn to|Trip hazard                  |Low      |Care as stepping onto the Shuttle car    |
+|manual operation               |                             |         |                                         |
+|Drive shuttle car to f/mach out|Moving machinery - entrapment|Low      |Stand on the Shuttle car in a safe area  |
+|feed line to collect pallet/s  |                             |         |to ensure that no entrapment occurs with |
+|                               |                             |         |moving machinery                         |
+|Stop at line ΓÇô move pallet onto|Chain conveyors, bottles     |Low      |Ensure that position is such that they   |
+|shuttle car                    |falling off pallets,         |         |are away from the area of risk. Ensure   |
+|                               |lacerations / cuts           |         |that all PPE is worn                     |
+|Clamps lowered to stabilise top|Bottles falling off pallet,  |Low      |Ensure that position is such that they   |
+|layer during transit           |lacerations / cuts           |         |are away from the area of risk. Ensure   |
+|                               |                             |         |that all PPE is worn                     |
+|Drive shuttle car forward to   |Moving machinery, bottles    |Low      |Stand on the Shuttle car in a safe area  |
+|MSK line                       |falling off pallets,         |         |to ensure that no entrapment occurs with |
+|                               |lacerations / cuts           |         |moving machinery                         |
+|Stop at MSK in feed, move      |Chain conveyors, bottles     |Low      |Ensure that all PPE is worn              |
+|pallet/s onto MSK line         |falling off pallets,         |         |                                         |
+|                               |lacerations / cuts           |         |                                         |

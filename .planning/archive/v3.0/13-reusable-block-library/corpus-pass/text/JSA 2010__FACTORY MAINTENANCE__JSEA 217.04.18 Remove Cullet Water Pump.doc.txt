@@ -1,0 +1,46 @@
+
+Remove Cullet Water Pump
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                           |Safety Induction [Contractor]           |                                            |
+|PPE Required:               |Significant Hazard                      |JSEA Reviewed by and date                   |
+|All standard PPE required   |Yes                                     |                                            |
+|                            |                                        |                                            |
+|                            |Risk Score                              |                                            |
+|                            |120                                     |                                            |
+|                            |                                        |                                            |
+|                            |Category                                |                                            |
+|                            |Medium                                  |                                            |
+|                            |                                        |                                            |
+|                            |Control taken                           |                                            |
+|                            |Minimisation                            |                                            |
+|                            |                                        |                                            |
+|Sequence of Job Steps       |Potential /                   |Level of |Controls to reduce the Risk of Hazard       |
+|                            |Actual Hazard                 |Risk     |                                            |
+|Have the Electrician isolate|Electrocution                 |Low      |Isolate equipment correctly                 |
+|and disconnect              |                              |         |                                            |
+|Hook up pump to chain block |Manual Handling, Falling      |Medium   |Tie rope to pump to pull and stand clear    |
+|Unblock pump                |Manual Handling, Falling      |Low      |Use right chain and chain block             |
+|Raise Chain block           |Manual Handling, Falling      |Medium   |Use right sling, chain and block            |
+|Swap 1 chain block to       |Manual Handling, Falling      |Medium   |Use right sling, chain and block            |
+|another and lift over wall  |                              |         |                                            |
+|to fork lift                |                              |         |                                            |
+|Environmental:              |                              |         |                                            |
+|Removal of used rags /      |Contamination.                |High     |Place in correct contamination or waste bins|
+|gloves/  waste/ glass /     |Waste removal and tidy up.    |         |provided.                                   |
+|cullet                      |                              |         |Ensure area is cleaned and product / tools  |
+|                            |                              |         |cleared away.                               |
+|Protection & Security       |                              |         |                                            |
+|Demarcation                 |Damage to people, property and|High     |Demarcation where applicable.               |
+|                            |environment.                  |         |Install barricaded/danger tape as required. |
+|                            |                              |         |Ensure correct fire fighting equipment is   |
+|                            |                              |         |available.                                  |
+
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

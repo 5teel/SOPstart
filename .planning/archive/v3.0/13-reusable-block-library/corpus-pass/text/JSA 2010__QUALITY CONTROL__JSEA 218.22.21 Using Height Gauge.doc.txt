@@ -1,0 +1,43 @@
+
+Using the Height Gauge
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses / gloves if      |No                                     |Richard Smith  11/06/07                 |
+|required                        |                                       |Fran OΓÇÖKeefe  15/06/07                  |
+|                                |Risk Score                             |                                        |
+|                                |40                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                  |Potential /             |Level of    |Controls to reduce the Risk of    |
+|                                       |Actual Hazard           |Risk        |Hazard                            |
+|Switch on the Height Gauge             |None                    |Low         |                                  |
+|Position the container in the height   |None                    |Low         |                                  |
+|gauge                                  |                        |            |                                  |
+|Measure & record result                |None                    |Low         |                                  |
+|Discard containers  after testing      |Laceration from glass   |Low         |Wearing gloves to prevent         |
+|                                       |                        |            |laceration to hands               |
+|Turn Off Height gauge                  |None                    |Low         |                                  |
+|Environmental:                         |                        |            |                                  |
+|Removal of used rags / gloves/  waste/ |Contamination.          |High        |Place in correct contamination or |
+|glass / cullet                         |Waste removal and tidy  |            |waste bins provided.              |
+|                                       |up.                     |            |Ensure area is cleaned and product|
+|                                       |                        |            |/ tools cleared away.             |
+|Protection & Security                  |                        |            |                                  |
+|Demarcation                            |Damage to people,       |High        |Demarcation where applicable.     |
+|                                       |property and            |            |Install barricaded/danger tape as |
+|                                       |environment.            |            |required.                         |
+|                                       |                        |            |Ensure correct fire fighting      |
+|                                       |                        |            |equipment is available.           |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

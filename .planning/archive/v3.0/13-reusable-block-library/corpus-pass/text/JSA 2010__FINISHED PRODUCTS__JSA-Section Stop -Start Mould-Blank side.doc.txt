@@ -1,0 +1,26 @@
+
+Stopping Section at Blank & Mould Side
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                            |Safety Induction [Contractor]           |                                         |
+|PPE Required:                |Significant Hazard                      |JSA Reviewed by and date                 |
+|All standard PPE required    |Yes                                     |                                         |
+|                             |                                        |                                         |
+|                             |Risk Score                              |                                         |
+|                             |40                                      |                                         |
+|                             |                                        |                                         |
+|                             |Category                                |                                         |
+|                             |Medium                                  |                                         |
+|                             |                                        |                                         |
+|                             |Control taken                           |                                         |
+|                             |Minimisation                            |                                         |
+|                             |                                        |                                         |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Divert Gob Loading           |Heat Exposure                 |Medium   |                                         |
+|Stop Section by pushing      |Heat & vibration exposure     |Medium   |                                         |
+|emergency stop button        |                              |         |                                         |
+|Wait for swab barrier to come|Heat, vibration & moving parts|Medium   |                                         |
+|down                         |                              |         |                                         |

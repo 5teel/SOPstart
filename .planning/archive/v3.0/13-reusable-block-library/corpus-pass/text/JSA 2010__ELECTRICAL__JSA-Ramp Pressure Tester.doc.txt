@@ -1,0 +1,30 @@
+
+Ramp Pressure Tester
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |High                                       |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Isolate power and remove     |Electrical shock, moving      |Medium      |Lock out procedure. Wear all PPE        |
+|broken glass                 |parts, air & water supply, &  |            |                                        |
+|                             |cuts                          |            |                                        |
+|Check all safety circuits are|Pinch points, slips & cuts    |Low         |Test with approved meters.              |
+|working                      |                              |            |                                        |
+|Check for water and air leaks|Eye ΓÇô foreign bodies          |Low         |Use safe working procedures. Wear all   |
+|                             |                              |            |PPE. Approved meters                    |
+|Check clamps, conveyors &    |Cuts, pinch points & moving   |Medium      |Use safe working procedures. Wear all   |
+|bottle handling              |machinery                     |            |PPE                                     |
+|Power up and test run        |Moving machinery, broken      |Low         |Use safe working procedures. Wear all   |
+|                             |glass, air pressure           |            |PPE                                     |
+

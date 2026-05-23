@@ -1,0 +1,36 @@
+
+Change Operator Panel
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|when working in production   |                                           |                                        |
+|area                         |Overall Category of task                   |                                        |
+|                             |Low                                        |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Isolation                                  |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Perform a controlled stop of |Nil                           |Low         |Operator to stop section                |
+|section by Operator          |                              |            |                                        |
+|Isolate section controller at|Entanglement if isolation     |Low         |Isolation procedure commenced           |
+|T600 VLan panel              |procedure not commenced       |            |                                        |
+|Lift covers above blow side  |Burns due to hot glass        |Low         |Use gloved hands to lift covers on the  |
+|panels                       |                              |            |section plus either side                |
+|Unscrew panel holding screws |Falling glass & burns         |Low         |Have operator observe the machine in    |
+|and unplug                   |                              |            |case of jam up                          |
+|Plug in new panel and screw  |Falling glass & burns         |Low         |Have operator observe the machine in    |
+|back into place              |                              |            |case of jam up                          |
+|Lower covers with care as    |Manual handling               |Low         |Use heavy duty gloves to prevent burns  |
+|they are hot                 |                              |            |to self                                 |
+|Reinstate section power at   |Glass and electrocution       |Low         |Ensure all personnel all clear of       |
+|T600 VLan                    |                              |            |section                                 |
+|Restart section and check    |Nil                           |Low         |Operator to start section               |
+|operation of panel           |                              |            |                                        |
+
+

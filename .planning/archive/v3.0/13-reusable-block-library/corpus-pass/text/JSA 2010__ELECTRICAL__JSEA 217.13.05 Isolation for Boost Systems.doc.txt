@@ -1,0 +1,72 @@
+
+
+
+Job Safety Environmental Analysis Form:                  Isolation for
+                                                                     Boost
+                                                                     Systems
+
+|Area / Department                  |Electrical                            |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Boots, gloves, uniform, safety     |                                      |                                          |
+|glasses, ear muffs.                |                                      |                                          |
+|                                   |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|NOTE:                    |Electrocution.          |High     |                                                        |
+|ALL STEPS TO BE CARRIED  |                        |         |                                                        |
+|OUT BY ELECTRICIAN.      |                        |         |                                                        |
+|Request Process Engineer |Electrocution.          |High     |Personal control of Castell Interlock key.              |
+|to switch off boost.     |                        |         |                                                        |
+|Rack out intermediate    |Electrocution.          |High     |Place LOCK OUT tag on switch / control of key.          |
+|11KV switch.             |                        |         |                                                        |
+|Trip 11KV switch in      |Electrocution.          |High     |Place LOCK OUT tag and padlock on switch.               |
+|McNabb Street sub and    |                        |         |                                                        |
+|rack out.                |                        |         |                                                        |
+|To reactivate ΓÇô check    |Electrocution.          |Medium   |Control of Castell Interlock key.                       |
+|work area is safe and    |                        |         |                                                        |
+|clear of personnel.  Lock|                        |         |                                                        |
+|boost cage and remove    |                        |         |                                                        |
+|key.                     |                        |         |                                                        |
+|Reinstate both H/V switch|Electrocution.          |Medium   |Control of Castell Interlock key.                       |
+|mechanisms.  First the   |                        |         |                                                        |
+|intermediate switch then |                        |         |                                                        |
+|the OCB.  Remove lock out|                        |         |                                                        |
+|tags.                    |                        |         |                                                        |
+|Close McNabb Street OCB. |Electrocution.          |Medium   |Control of Castell Interlock key.                       |
+|Place Castell Interlock  |                        |         |                                                        |
+|key in remote switch     |                        |         |                                                        |
+|controls and close       |                        |         |                                                        |
+|switch.                  |                        |         |                                                        |
+|Once safe ΓÇô remove the   |Electrocution.          |Medium   |Remove LOCK OUT tag.  Control of Castell Interlock key. |
+|LOCK OUT tags.           |                        |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

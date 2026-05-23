@@ -1,0 +1,49 @@
+
+Use of Punt depth Gauges
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses  / gloves if     |Yes / Laceration                       |                                        |
+|required                        |                                       |Rey Basabas                             |
+|                                |Risk Score                             |11/6/7                                  |
+|                                |20                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                 |Potential /             |Level of  |Controls to reduce the Risk of Hazard|
+|                                      |Actual Hazard           |Risk      |                                     |
+|Select appropriate depth gauge        |None                    |Low       |Nil                                  |
+|Fit reference block to gauge          |None                    |Low       |Nil                                  |
+|Check gauge against pre machined slots|None                    |Low       |Nil                                  |
+|for integrity                         |                        |          |                                     |
+|Fit gauge to gauge stand              |None                    |Low       |Nil                                  |
+|Select container to measure           |None                    |Low       |Nil                                  |
+|Invert container & push punt into     |Broken bottle causing   |Low       |Examine base of container prior to   |
+|probe                                 |Laceration              |          |gauging for any obviously thin bases |
+|Measure & record                      |none                    |Low       |Nil                                  |
+|Discard container after testing       |Laceration              |Low       |Ensure all PPE worn to prevent injury|
+|                                      |                        |          |to self                              |
+|Environmental:                        |                        |          |                                     |
+|Removal of used rags / gloves/  waste/|Contamination.          |High      |Place in correct contamination or    |
+|glass / cullet                        |Waste removal and tidy  |          |waste bins provided.                 |
+|                                      |up.                     |          |Ensure area is cleaned and product / |
+|                                      |                        |          |tools cleared away.                  |
+|Protection & Security                 |                        |          |                                     |
+|Demarcation                           |Damage to people,       |High      |Demarcation where applicable.        |
+|                                      |property and            |          |Install barricaded/danger tape as    |
+|                                      |environment.            |          |required.                            |
+|                                      |                        |          |Ensure correct fire fighting         |
+|                                      |                        |          |equipment is available.              |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

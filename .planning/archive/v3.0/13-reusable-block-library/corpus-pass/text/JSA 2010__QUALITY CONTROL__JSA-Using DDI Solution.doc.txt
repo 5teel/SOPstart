@@ -1,0 +1,33 @@
+
+Using DDI Solution
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety Glasses / disposable     |Yes                                    |Ellis Levy   11/06/07                   |
+|gloves                          |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |20                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                  |Potential /           |Level of |Controls to reduce the Risk of Hazard   |
+|                                       |Actual Hazard         |Risk     |                                        |
+|Select containers to test & allow to   |none                  |Low      |                                        |
+|cool to ambient temperature            |                      |         |                                        |
+|Stir the ready mixed solution & allow  |none                  |Low      |                                        |
+|to settle for a few minutes            |                      |         |                                        |
+|Dip the container to be tested into the|none                  |Low      |PPE                                     |
+|solution ensuring it is immersed up to |                      |         |                                        |
+|its neck                               |                      |         |                                        |
+|Lift out & allow to drain on the crate |none                  |Low      |                                        |
+|available                              |                      |         |                                        |
+|Record the results                     |-                     |Low      |                                        |
+|Discard the containers after testing   |Laceration from broken|Low      |Ensure PPE on                           |
+|                                       |glass                 |         |                                        |

@@ -1,0 +1,62 @@
+
+
+
+Job Safety Environmental Analysis Form:
+                                                                  Lifting
+                                                                  of Frit
+                                                                  Hopper
+
+|Area / Department                  |Batch & Furnace                       |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots, High Vis/heat        |                                      |                                          |
+|Garment, Respiratory Protection    |Risk Score                            |                                          |
+|(when working with asbestos), Fire |                                      |                                          |
+|Visor, Balaclava, Hotwork Gloves   |                                      |                                          |
+|(if required), Face Mask, Hot Work |Category                              |                                          |
+|permit (if required).              |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Fill Frit Hopper with    |Back strain.  Spillage  |Low      |Correct lifting procedure using forkhoist and platforms.|
+|frit.                    |onto floor.             |         |                                                        |
+|Transfer from filling    |None                    |Low      |None.                                                   |
+|station to adjacent      |                        |         |                                                        |
+|machine.                 |                        |         |                                                        |
+|Set up all safety        |None                    |Low      |Supervision at all times.  No person to be in this area |
+|barriers and isolate     |                        |         |during the lifting of the hopper.                       |
+|machine floor.           |                        |         |                                                        |
+|Transfer hopper to       |Hopper could drop from  |High     |Supervision at all times.                               |
+|machine floor and lift   |hoist and damage        |         |No person to be in this area during the lifting of the  |
+|into place on top of frit|machine.                |         |hopper.                                                 |
+|silo.                    |Material spillage into  |         |                                                        |
+|                         |sections causing machine|         |                                                        |
+|                         |damage and downtime.    |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

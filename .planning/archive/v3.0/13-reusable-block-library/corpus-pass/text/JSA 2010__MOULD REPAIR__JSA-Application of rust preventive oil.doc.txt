@@ -1,0 +1,29 @@
+
+Application of rust preventive oil
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                |Safety Induction [Contractor]         |                                       |
+|PPE Required:                    |Significant Hazard                    |JSA Reviewed by and date               |
+|Standard Safety Uniform plus     |No                                    |Gary Russell 16/7/07                   |
+|Safety glasses or goggles        |                                      |                                       |
+|                                 |Risk Score                            |                                       |
+|                                 |4                                     |                                       |
+|                                 |                                      |                                       |
+|                                 |Category                              |                                       |
+|                                 |Low                                   |                                       |
+|                                 |                                      |                                       |
+|                                 |Control taken                         |                                       |
+|                                 |Minimisation                          |                                       |
+|                                 |                                      |                                       |
+|Sequence of Job Steps            |Potential /                      |Level of |Controls to reduce the Risk of     |
+|                                 |Actual Hazard                    |Risk     |Hazard                             |
+|Select correct oil container for |Leaking oil                      |Low      |Select correct container           |
+|application                      |Slipping                         |         |Ensure container is not leaking    |
+|                                 |Fire hazard                      |         |Wipe up any spillage on floor      |
+|Apply rust preventive oil to     |Spray in eyes                    |Low      |Required PPE                       |
+|mould or blank                   |Spill oil                        |         |Clean up any spillage              |
+|                                 |Fire hazard                      |         |Dispose of any rags used in correct|
+|                                 |                                 |         |bin                                |

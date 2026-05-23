@@ -1,0 +1,74 @@
+
+
+
+Job Safety Environmental Analysis Form:                   Road Sweeper
+                                                                     Operatio
+                                                                     n
+
+|Area / Department                  |Batch & Furnace                       |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots, High Vis/heat        |                                      |                                          |
+|Garment,                           |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Prior to any operation   |In all cases ensure     |High     |Tell any persons observing to move to a safe area. Be   |
+|talk to anyone in the    |onlookers are at least  |         |alert at all times while operating the sweeper and      |
+|area and tell them of    |15 metres away          |         |always ensure you are in full control.                  |
+|your intentions to use   |                        |         |                                                        |
+|the machine              |                        |         |                                                        |
+|Inspect machine daily for|Damage to eyes hands    |High     |Ensure hands feet and clothing are clear of all moving  |
+|signs of wear and damage.|feet and clothing from  |         |part. Do not wear loose fitting clothing. Always wear   |
+|Ensure fuel and any other|moving parts. Pince     |         |seatbelt                                                |
+|reservious are full.     |points as indicated on  |         |                                                        |
+|                         |the machine and the     |         |                                                        |
+|                         |sweeper.                |         |                                                        |
+|Sweeping the roadway and |Injury to pedestrians,  |High     |Be aware of your surroundings, observe persons in your  |
+|surrounding areas        |personΓÇÖs eyesight in    |         |area, those not wearing eye protection, tell them to.   |
+|                         |vasinity from small     |         |Wear dusk masks. Use the roadway water deludge. Use     |
+|                         |flying objects. Dust    |         |mirrors and flashing beacon at all time. Be aware of any|
+|                         |inhalation. Damage to   |         |height restrictions. Always wear seatbelt When reversing|
+|                         |property.               |         |ensure your path is clear                               |
+|Emptying rubbish from    |Tipping over loader when|High     |Ensure loader is not driven with the sweeper in the up  |
+|bucket                   |preparing to empty.     |         |position. Wear all PPE.                                 |
+|                         |Injury to pedestrians,  |         |Be aware of person around you. Do not walk under the    |
+|                         |personΓÇÖs eyesight in    |         |sweeper when in up position Always wear seatbelt.       |
+|                         |vasinity from small     |         |                                                        |
+|                         |flying objects. Dust    |         |                                                        |
+|                         |inhalation. Damage to   |         |                                                        |
+|                         |property.               |         |                                                        |
+|Inspect machine at the   |Damage to eyes hands    |High     |Ensure hands feet and clothing are clear of all moving  |
+|end of the day and report|feet and clothing from  |         |part. Do not wear loose fitting clothing. Always wear   |
+|any observations or      |moving parts. Pince     |         |seatbelt                                                |
+|damage noted             |points                  |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

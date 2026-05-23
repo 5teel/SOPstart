@@ -1,0 +1,55 @@
+
+
+
+Job Safety Environmental Analysis Form:               Relocate Control
+                                                                     Panel
+                                                                     Machine
+                                                                     Fan
+
+|Area / Department                  |Electrical                            |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Boots, gloves, uniform, safety     |                                      |                                          |
+|glasses, ear muffs.                |                                      |                                          |
+|                                   |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Prepare work area.       |Manual handling.        |Medium   |Use correct manual handling techniques.                 |
+|Remove machine fan       |Manual handling.        |High     |Rigger to control lift.                                 |
+|control room panel from  |Rigging.                |         |Forklift to use spotter.                                |
+|fan room.                |Lifting.                |         |Wear appropriate PPE.                                   |
+|                         |Jammed fingers.         |         |Secure control panel to forklift.                       |
+|                         |Pedestrian traffic.     |         |Use correct manual handling techniques.                 |
+|                         |Crushing.               |         |Use correct lifting techniques.                         |
+|Replace machine fan      |Manual handling.        |High     |Rigger to control lift.                                 |
+|control panel in fan     |Rigging.                |         |Forklift to use spotter.                                |
+|room.                    |Lifting.                |         |Wear appropriate PPE.                                   |
+|                         |Jammed fingers.         |         |Secure control panel to forklift.                       |
+|                         |Pedestrian traffic.     |         |Use correct manual handling techniques.                 |
+|                         |Crushing.               |         |Use correct lifting techniques.                         |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

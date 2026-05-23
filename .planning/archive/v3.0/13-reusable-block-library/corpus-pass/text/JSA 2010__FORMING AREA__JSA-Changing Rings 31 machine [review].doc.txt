@@ -1,0 +1,42 @@
+
+Changing Rings 3/1
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |                                        |
+|All standard PPE required    |NO                                         |JSA Reviewed by and date                |
+|when working within          |                                           |                                        |
+|production area.             |Overall Category of task                   |                                        |
+|                             |LOW                                        |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |                                           |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|                             |                              |            |                                        |
+|Divert Glass/Gob             |NIL                           |NIL         |NIL                                     |
+|                             |                              |            |                                        |
+|Shut section down (Moulds    |NIL                           |NIL         |NIL                                     |
+|closed)                      |                              |            |                                        |
+|                             |                              |            |                                        |
+|Raise Heat plate/shield      |NIL                           |NIL         |NIL                                     |
+|                             |                              |            |                                        |
+|Remove old Ring              |Burn from hot bottles on      |MEDIUM      |Using heat Plate/Shield                 |
+|                             |conveyor                      |            |Using Tube socks for arms               |
+|                             |                              |            |                                        |
+|Place new Ring               |Burn from hot bottles on      |MEDIUM      |Using heat Plate/Shield                 |
+|                             |conveyor                      |            |Using Tube socks for arms               |
+|                             |                              |            |                                        |
+|Start up section (open       |NIL                           |NIL         |NIL                                     |
+|Moulds)                      |                              |            |                                        |
+|                             |                              |            |                                        |
+|Load Gob                     |NIL                           |NIL         |NIL                                     |
+|                             |                              |            |                                        |
+|Check cavity and load in lehr|Burn from hot bottles         |LOW         |Use Tongs & ΓÇÿBig BlueΓÇÖ Gloves           |
+|if OK                        |                              |            |                                        |
+
+

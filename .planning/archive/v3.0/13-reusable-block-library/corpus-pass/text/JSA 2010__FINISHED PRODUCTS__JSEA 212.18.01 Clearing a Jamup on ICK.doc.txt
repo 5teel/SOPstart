@@ -1,0 +1,49 @@
+
+Clearing ICK Jam up
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSEA Reviewed by and date                   |
+|All standard PPE required     |Yes                                  |                                            |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |80                                   |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |Medium                               |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps          |Potential /                  |Level of |Controls to reduce the Risk of Hazard    |
+|                               |Actual Hazard                |Risk     |                                         |
+|ICK jam-up occurs - depress    |None                         |Low      |Correct  Safety gloves must be worn when |
+|emergency stop, lift cover to  |                             |         |clearing ICK in order to reduce the risk |
+|inspect jam-up                 |                             |         |of lacerations                           |
+|Remove the broken glass or     |Lacerations                  |Low      |Correct  Safety gloves must be worn when |
+|unbroken bottle that has jammed|                             |         |clearing ICK in order to reduce the risk |
+|                               |                             |         |of lacerations                           |
+|If unbroken bottle you must use|Lacerations                  |Medium   |Correct  Safety gloves must be worn when |
+|the small hammer provided to   |                             |         |clearing ICK in order to reduce the risk |
+|break bottle and glass         |                             |         |of lacerations                           |
+|Once all glass is cleared,     |None                         |Low      |Correct  Safety gloves must be worn when |
+|lower the covers and release   |                             |         |clearing ICK in order to reduce the risk |
+|emergency stop to start ICK    |                             |         |of lacerations                           |
+|again                          |                             |         |                                         |
+|Environmental:                 |                             |         |                                         |
+|Removal of used rags / gloves/ |Contamination.               |High     |Place in correct contamination or waste  |
+|waste/ glass / cullet          |Waste removal and tidy up.   |         |bins provided.                           |
+|                               |                             |         |Ensure area is cleaned and product /     |
+|                               |                             |         |tools cleared away.                      |
+|Protection & Security          |                             |         |                                         |
+|Demarcation                    |Damage to people, property   |High     |Demarcation where applicable.            |
+|                               |and environment.             |         |Install barricaded/danger tape as        |
+|                               |                             |         |required.                                |
+|                               |                             |         |Ensure correct fire fighting equipment is|
+|                               |                             |         |available.                               |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

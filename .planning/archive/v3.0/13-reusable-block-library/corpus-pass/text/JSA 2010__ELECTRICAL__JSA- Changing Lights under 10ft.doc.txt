@@ -1,0 +1,29 @@
+
+Charging light bulbs under 10ft
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]           |                                         |
+|PPE Required:                |Significant Hazard                      |JSA Reviewed by and date                 |
+|All standard PPE required    |Yes                                     |J Booth 14/01/08                         |
+|                             |                                        |                                         |
+|                             |Risk Score                              |                                         |
+|                             |90                                      |                                         |
+|                             |                                        |                                         |
+|                             |Category                                |                                         |
+|                             |Medium                                  |                                         |
+|                             |                                        |                                         |
+|                             |Control taken                           |                                         |
+|                             |Minimisation                            |                                         |
+|                             |                                        |                                         |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Isolate power from supply    |Electrocution                 |High     |Approved trained person to replace some  |
+|where possible               |                              |         |bulbs Safe working practice. PPE required|
+|Remove blown bulb using the  |Hot causing burns, cuts. Fall |High     |Safe working practice. PPE required      |
+|approved ladder              |from height                   |         |                                         |
+|Check connection             |Fall                          |High     |Safe working practice. PPE required      |
+|Replace bulb                 |Fall                          |High     |Safe working practice. PPE required      |
+|Turn power back on if        |Electrocution                 |High     |Safe working practice. PPE required      |
+|disconnected                 |                              |         |                                         |

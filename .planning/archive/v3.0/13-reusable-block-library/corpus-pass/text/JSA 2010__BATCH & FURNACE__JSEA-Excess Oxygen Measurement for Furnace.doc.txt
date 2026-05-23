@@ -1,0 +1,38 @@
+
+Excess Oxygen Measurement on the Furnace
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses, Ear Muffs, Heat |No                                     |Sanjay Adhar   09/08/07                 |
+|resistant gloves.               |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |45                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps           |Potential /                 |Level of  |Controls to reduce the Risk of Hazard   |
+|                                |Actual Hazard               |Risk      |                                        |
+|Turn on combustion analyser and |None                        |Low       |None                                    |
+|connect to probe.               |                            |          |                                        |
+|Open inspection port            |Burns, heat, eye damage     |Low       |Wear heat resistant gloves, Stand away  |
+|                                |                            |          |from furnace when possible, take breaks.|
+|                                |                            |          |Wear shaded glasses, look away from     |
+|                                |                            |          |ports.                                  |
+|Insert probe into inspection    |Burns, heat                 |Low       |Wear heat resistant gloves. Insulate the|
+|port and hold in place.         |                            |          |probe. Stand away from the furnace when |
+|                                |                            |          |possible, take breaks.                  |
+|Withdraw hot probe and close    |Burns, heat, eye damage     |Medium    |Wear heat resistant gloves. Stand away  |
+|inspection port.                |                            |          |from the furnace. Point probe away from |
+|                                |                            |          |bystanders and oneself. Wear shaded     |
+|                                |                            |          |glasses and look away from the ports.   |
+|Repeat Steps 2-4 for the        |Burns, heat, eye damage     |Low       |As above                                |
+|remaining ports.                |                            |          |                                        |
+|Turn off analyser and disconnect|Burns.                      |Low       |Wear heat resistant gloves.             |
+|from probe.                     |                            |          |                                        |

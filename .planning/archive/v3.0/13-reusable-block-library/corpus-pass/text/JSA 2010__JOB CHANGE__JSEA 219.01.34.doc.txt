@@ -1,0 +1,51 @@
+
+#23, 31, 34 Manual Override Activation
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                  |Safety Induction [Contractor]         |                                          |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Boots, gloves, uniform, safety     |Yes                                   |                                          |
+|glasses, ear muffs, (protection    |                                      |July 2007                                 |
+|sleeves, back support ΓÇô optional)  |Risk Score                            |                                          |
+|                                   |100                                   |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |Medium                                |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |Minimisation                          |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Stop machine.            |Making machine safe to  |High     |Stop Neck ring arms in the inverted position using the  |
+|Refer JSEA 219.01.02     |prevent entrapment      |         |Maintenance Stop button                                 |
+|Manual Operation         |Caught in Section.      |High     |Ensure Maintenance Stop button is fully in and the red  |
+|                         |                        |         |light is on, on the side of the machine you are working.|
+|Manual Over ride safety  |Crush injury            |High     |When using Manual overrides make sure at all times that |
+|                         |                        |         |the Manual override you are activating is for the       |
+|                         |                        |         |mechanism to be moved and people are clear off the      |
+|                         |                        |         |section.                                                |
+|Manual Override safety.  |                        |         |                                                        |
+|Start a machine, refer   |                        |         |                                                        |
+|JSEA  219.01.01          |                        |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+
+                                                     -----------------------
+[pic]
+
+O-I New Zealand
+

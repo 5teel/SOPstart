@@ -1,0 +1,88 @@
+
+
+
+  Job Safety Environmental Analysis Form:
+
+
+                                                                        Remov
+                                                                        al
+                                                                        of
+                                                                        Lehr
+
+|Area / Department                  |Machine Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|and Safety Boots, welding PPE      |                                      |                                          |
+|required.                          |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Isolate and Disconnect   |Electric Shock          |High     |Only licensed personnel to perform.                     |
+|Electric components.     |                        |         |Isolation and disconnection as per group isolation      |
+|                         |                        |         |procedure.                                              |
+|                         |                        |         |Tag Out system to be utilised.                          |
+|Isolate and Purge Gas    |Asphyxiation            |High     |Ensure area is well ventilated.                         |
+|                         |Uncontrolled release of |         |Shut off gas feed to machine.                           |
+|                         |gas                     |         |Purge gas lines with air.                               |
+|                         |Flash Over              |         |Fire Equipment on hand during disconnection.            |
+|                         |                        |         |Tag out gas supply valves.                              |
+|Remove LEHR Belt         |Pinch points            |High     |Worker to identify possible pinch points.               |
+|Release Belt Tension     |Manual Handling         |         |Use correct Manual Handling Techniques.                 |
+|Split Belt               |Sharp Edges             |         |Use Crow Bars to manipulate section.                    |
+|Fold belt onto pallet    |Grinding                |         |Follow ACI Grinding Procedure and JSA for power tools.  |
+|Remove pallet with       |Hand Tools              |         |Use PPE ΓÇô glasses/goggles, leather gloves, dust mask,   |
+|forklift                 |Power Tools             |         |hearing protection, helmet, face shield, safety boots.  |
+|                         |Dust                    |         |Forklift driver to complete risk assessment.            |
+|                         |                        |         |Forklift to utilise spotter.                            |
+|Dismantle and Remove Cold|Build up of over spray. |High     |Fire Equipment to be on hand.                           |
+|end sections and remove  |Build up of dust.       |         |Clean up as removal progresses.                         |
+|sections to holding area.|Grinding.               |         |Follow ACI procedure for Rigging/ Dogging, Oxywelding   |
+|                         |Oxy cutting.            |         |and Grinding and JSA for same.                          |
+|                         |Rigging/Crane work.     |         |Crane crew to submit risk assessment for lifts.         |
+|Remove Spray Unit        |Pressurised Air lines.  |High     |Isolate Electricity as per group isolation procedure.   |
+|Disconnect Air           |Pressurised Fluid lines.|         |Tag out Electrical components.                          |
+|Disconnect Electricity   |Electrocution.          |         |Check to ensure Air Lines Depressurised and tagged out. |
+|Disconnect Fluids        |Rigging/Crane           |         |Check to ensure Fluid Lines Depressurised and tagged    |
+|Unbolt Unit              |Operations.             |         |out.                                                    |
+|Remove to Holding Area.  |Grinding.               |         |Refer to JSA for Cranes and Rigging.                    |
+|                         |                        |         |Refer to JSA for Grinding.                              |
+|                         |                        |         |Ensure compliance with PPE requirements.                |
+|Remove Firing Sections   |Possible Asbestos       |High     |See JSA or Grinding.                                    |
+|Remove side plates       |issues.                 |         |See JSA for Oxy Cutting.                                |
+|Unbolt sections          |Synthetic Mineral Fibre.|         |Ensure fire fighting equipment is on hand.              |
+|Remove Belt Sections.    |Dust and Rust.          |         |Observe PPE requirements including dust masks.          |
+|Remove sections to       |Grinding.               |         |To address asbestos issues SIMTARS will be on call and  |
+|holding area with crane. |Oxy Cutting.            |         |all work will be stopped and relocated if possible      |
+|                         |Rigging/ Crane          |         |asbestos is located.                                    |
+|                         |Operations.             |         |See JSA for cranes and rigging.                         |
+|                         |                        |         |-See procure for SMF                                    |
+|On Going Clean Up        |Dust                    |Medium   |Wear PPE as required eg dust masks.                     |
+|Section by section.      |                        |         |                                                        |
+|Clean up before starting |                        |         |                                                        |
+|next section removal.    |                        |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

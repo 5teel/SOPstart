@@ -1,0 +1,37 @@
+
+FP Sampling
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date:               |
+|ALL                             |Yes                                    |Bronwyn Bell                            |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |60                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps           |Potential /                 |Level of  |Controls to reduce the Risk of Hazard   |
+|                                |Actual Hazard               |Risk      |                                        |
+|Auto sampler bypass turned on   |Broken sample ΓÇô laceration  |Low       |Auto challenge must be switched on.     |
+|and wait for green light.       |hand/s                      |          |Safety gloves must also be worn during  |
+|S/leader puts all FP defect     |                            |          |this task                               |
+|samples through the FP to       |                            |          |                                        |
+|confirm samples are rejected at |                            |          |                                        |
+|their respective setup stations |                            |          |                                        |
+|Samples are collected at the out|As above                    |Low       |As above                                |
+|feed, once collected auto       |                            |          |                                        |
+|sampler bypass turned off       |                            |          |                                        |
+|FP samples are placed back onto |None                        |Low       |None                                    |
+|the sample tray                 |                            |          |                                        |
+|Tech called if samples are not  |None                        |Low       |None                                    |
+|being rejected at their         |                            |          |                                        |
+|respective stations and set up  |                            |          |                                        |
+|Follow up required after tech   |Broken samples, laceration /|Low       |Auto challenge must be switched on ΓÇô    |
+|has checked the Fps to samples  |cuts                        |          |safety gloves used for this task        |

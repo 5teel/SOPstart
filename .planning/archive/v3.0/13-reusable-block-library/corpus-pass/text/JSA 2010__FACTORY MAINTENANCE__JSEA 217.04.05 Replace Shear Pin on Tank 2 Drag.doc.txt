@@ -1,0 +1,52 @@
+
+
+
+Job Safety Environmental Analysis Form:                Replace Shear Pin on
+                                                                  Tank 2
+                                                                  Drag
+
+|Area / Department                  |Factory Maintenance                   |Task  or Job Description                  |
+|Recommended Personal Protective    |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Equipment                          |                                      |                                          |
+|High Visibility Jacket, PPE, Hard  |                                      |                                          |
+|hat (when working in Drag area),   |Risk Score                            |                                          |
+|gumboots, safety boots, hearing    |                                      |                                          |
+|protection, safety glasses,        |                                      |                                          |
+|advisable that both emplyees have a|Category                              |                                          |
+|BATT phone.                        |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Phone Hot End Supervisor.|No less than 2 people in|Medium   |Communication.                                          |
+|                         |drag.                   |         |                                                        |
+|Isolate motor.           |Starting up.            |Medium   |Isolation.                                              |
+|Remove guard.            |Slip / trip.            |Medium   |Clean area.                                             |
+|Unbolt shear pin.        |Electrocution           |High     |Use RCD board.                                          |
+|                         |                        |         |Provide extra lighting if required.                     |
+|Undo bracket.            |Cuts/ bruises.          |Low      |                                                        |
+|Bolt on brackets and line|Cuts                    |Low      |Clean work area.                                        |
+|up for pin.              |                        |         |Use correct sized spanner.                              |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security:   |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

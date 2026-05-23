@@ -1,0 +1,29 @@
+
+Using the Height Gauge
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety Glasses / gloves if      |No                                     |Richard Smith  11/06/07                 |
+|required                        |                                       |Fran OΓÇÖKeefe  15/06/07                  |
+|                                |Risk Score                             |                                        |
+|                                |40                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard              |
+|                         |Actual Hazard           |Risk     |                                                   |
+|Switch on the Height     |None                    |Low      |                                                   |
+|Gauge                    |                        |         |                                                   |
+|Position the container in|None                    |Low      |                                                   |
+|the height gauge         |                        |         |                                                   |
+|Measure & record result  |None                    |Low      |                                                   |
+|Discard containers  after|Laceration from glass   |Low      |Wearing gloves to prevent laceration to hands      |
+|testing                  |                        |         |                                                   |
+|Turn Off Height gauge    |None                    |Low      |                                                   |

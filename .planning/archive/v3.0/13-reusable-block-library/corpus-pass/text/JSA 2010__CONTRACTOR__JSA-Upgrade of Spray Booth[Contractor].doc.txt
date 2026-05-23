@@ -1,0 +1,35 @@
+
+Upgrade of Spray Booth
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |X                                       |
+|PPE Required:                |Significant Hazard                         |                                        |
+|All standard PPE required    |Yes or No                                  |JSA Reviewed by and date                |
+|when working within          |                                           |                                        |
+|production area.             |Overall Category of task                   |                                        |
+|                             |Low                                        |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|                             |                              |            |                                        |
+|Isolate mains air inlet and  |Noise                         |HIGH        |Wear hearing protection                 |
+|exhaust system               |                              |            |                                        |
+|                             |                              |            |                                        |
+|Remove old equipment         |Dropping Hazard               |LOW         |Wear steel toe capped shoes / boots     |
+|                             |                              |            |                                        |
+|Drill new mounting holes     |Noise / shrapnel              |LOW         |Wear hearing protection & safety glasses|
+|                             |                              |            |                                        |
+|Mount new equipment          |Dropping Hazard               |LOW         |Wear steel toe capped shoes / boots     |
+|                             |                              |            |                                        |
+|Re-kit repairable equipment  |Dropping Hazard               |LOW         |                                        |
+|                             |                              |            |                                        |
+|Test installed equipment     |Bursting Pipes / ??? ???      |LOW         |Stand back and observe while test in    |
+|                             |                              |            |progress                                |
+
+

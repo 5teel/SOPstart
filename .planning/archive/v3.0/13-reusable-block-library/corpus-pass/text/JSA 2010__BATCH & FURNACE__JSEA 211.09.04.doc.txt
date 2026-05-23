@@ -1,0 +1,107 @@
+
+
+
+Job Safety Environmental Analysis Form:                             Burner
+                                                                     Block
+                                                                     Change
+
+|Area / Department                     |Batch & Furnace                     |Task  or Job Description                  |
+|PPE Required:                         |Significant Hazard                  |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs,    |                                    |                                          |
+|Safety Boots, High Vis/heat Garment,  |                                    |                                          |
+|Respiratory Protection (when working  |Risk Score                          |                                          |
+|with asbestos), Fire Visor, Balaclava,|                                    |                                          |
+|Hotwork Gloves (if required), Face    |                                    |                                          |
+|Mask, Hot Work permit (if required).  |Category                            |                                          |
+|                                      |                                    |                                          |
+|                                      |                                    |                                          |
+|                                      |Control taken                       |                                          |
+|                                      |                                    |                                          |
+|                                      |                                    |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Set value of throat and  |Loss of production.     |Low      |Process Engineer to monitor during shift.               |
+|crown temperature to be  |                        |         |                                                        |
+|increased 5 ΓÇô 10 degrees |                        |         |                                                        |
+|overnight to ensure      |                        |         |                                                        |
+|melting conditions are   |                        |         |                                                        |
+|maintained.              |                        |         |                                                        |
+|All persons involved to  |Bodily injury invarious |High     |Process Engineers and Supervision to monitor process    |
+|liaise at all times to   |forms.                  |         |constantly.                                             |
+|ensure safety.           |                        |         |                                                        |
+|Isolate reversal.        |Heat exposure, hot      |High     |Supervision, observe for fires.                         |
+|Shut off gas on required |flames, trip hazards,   |         |Fire equipment at hand.                                 |
+|port.                    |loss of bodily fluids.  |         |                                                        |
+|Close timing valve ( this|                        |         |                                                        |
+|oeration should be done  |                        |         |                                                        |
+|by the individual that   |                        |         |                                                        |
+|carries out the work, so |                        |         |                                                        |
+|he and he only has the   |                        |         |                                                        |
+|key to start reversal ). |                        |         |                                                        |
+|Set up suitable platform.|Falling hazards.        |High     |Supervision, observe for fires.                         |
+|Ensure platform belowis  |Hot brickwork.          |         |Fire equipment at hand.                                 |
+|free of fire hazards.    |Falling.                |         |Barriers under furnace to stop access under furnace.    |
+|Ensure personnel donΓÇÖt   |Heat exposure, hot      |         |                                                        |
+|walk under furnace       |flames, trip hazards,   |         |                                                        |
+|platform at this time.   |loss of bodily fluids.  |         |                                                        |
+|Remove burner and bracket|Falling hazards.        |High     |Supervision, observe for fires.                         |
+|and clean ready for      |Hot brickwork.          |         |Fire equipment at hand.                                 |
+|re-installation.         |Falling.                |         |                                                        |
+|                         |Heat exposure, hot      |         |                                                        |
+|                         |flames, trip hazards,   |         |                                                        |
+|                         |loss of bodily fluids.  |         |                                                        |
+|Remove worn burner block,|Burns.                  |High     |Supervision, observe for fires.                         |
+|clean burner hole and    |Falling hazards.        |         |Watch for falling debris.                               |
+|port floor of debris and |Hot brickwork.          |         |Fire equipment at hand.                                 |
+|batch build-up.          |Falling.                |         |                                                        |
+|                         |Heat exposure, hot      |         |                                                        |
+|                         |flames, trip hazards,   |         |                                                        |
+|                         |loss of bodily fluids.  |         |                                                        |
+|Re-install new burner    |Burns.                  |High     |Supervision, observe for fires.                         |
+|block, seal around joint |Falling hazards.        |         |Watch for falling debris.                               |
+|with wool and            |Hot brickwork.          |         |Fire equipment at hand.                                 |
+|refractories.            |Falling.                |         |                                                        |
+|                         |Heat exposure, hot      |         |                                                        |
+|                         |flames, trip hazards,   |         |                                                        |
+|                         |loss of bodily fluids.  |         |                                                        |
+|Re-install burner and    |Burns.                  |High     |Supervision, observe for fires.                         |
+|brackets, seal burner.   |Falling hazards.        |         |Watch for falling debris.                               |
+|                         |Hot brickwork.          |         |Fire equipment at hand.                                 |
+|                         |Falling.                |         |                                                        |
+|                         |Heat exposure, hot      |         |                                                        |
+|                         |flames, trip hazards,   |         |                                                        |
+|                         |loss of bodily fluids.  |         |                                                        |
+|Open trimming valves,    |Burns.                  |High     |Supervision.                                            |
+|unlock reversal lock out.|Falling hazards.        |         |                                                        |
+|                         |Hot brickwork.          |         |                                                        |
+|                         |Falling.                |         |                                                        |
+|                         |Heat exposure, hot      |         |                                                        |
+|                         |flames, trip hazards,   |         |                                                        |
+|                         |loss of bodily fluids.  |         |                                                        |
+|Check for any gas leaks  |Burns.                  |High     |Supervision.                                            |
+|on burner and burner     |Falling hazards.        |         |                                                        |
+|block.                   |Hot brickwork.          |         |                                                        |
+|Check flame through IP   |Falling.                |         |                                                        |
+|block.                   |Heat exposure, hot      |         |                                                        |
+|                         |flames, trip hazards,   |         |                                                        |
+|                         |loss of bodily fluids.  |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

@@ -1,0 +1,54 @@
+
+Check 21 Chute up/down proximity switches
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]           |                                            |
+|PPE Required:                |Significant Hazard                      |JSEA Reviewed by and date                   |
+|All standard PPE required    |Yes                                     |                                            |
+|                             |                                        |                                            |
+|                             |Risk Score                              |                                            |
+|                             |200                                     |                                            |
+|                             |                                        |                                            |
+|                             |Category                                |                                            |
+|                             |High                                    |                                            |
+|                             |                                        |                                            |
+|                             |Control taken                           |                                            |
+|                             |Isolation                               |                                            |
+|                             |                                        |                                            |
+|Sequence of Job Steps        |Potential /                    |Level  |Controls to reduce the Risk of Hazard       |
+|                             |Actual Hazard                  |of Risk|                                            |
+|Isolate air supply to chute  |If not isolated will retract   |High   |Place steel bar to mechanically lock chute  |
+|                             |spraying machine with glass    |       |up in case of accidental retraction. Sound  |
+|                             |                               |       |machine alarm to clear machine of people.   |
+|Clean chute up proximity     |Streaming glass, heat noise,   |High   |Training and awareness of hazards in working|
+|switch                       |slippery and limited working   |       |area ensure have planned escape route. All  |
+|                             |area                           |       |PPE to be worn                              |
+|Remove proximity switch and  |No hazard if all controls are  |Low    |Training and awareness of hazards in working|
+|check condition              |in place                       |       |area ensure have planned escape route. All  |
+|                             |                               |       |PPE to be worn                              |
+|Replace proximity switch     |No hazard if all controls are  |Low    |Training and awareness of hazards in working|
+|                             |in place                       |       |area ensure have planned escape route. All  |
+|                             |                               |       |PPE to be worn                              |
+|Remove isolation to chute    |If not isolated will retract   |High   |Sound machine alarm to clear machine of     |
+|                             |spraying machine with glass.   |       |people. Remove all isolation to chute       |
+|                             |Ensure all personal are clear  |       |                                            |
+|                             |of machine                     |       |                                            |
+|Environmental:               |                               |       |                                            |
+|Removal of used rags /       |Contamination.                 |High   |Place in correct contamination or waste bins|
+|gloves/  waste/ glass /      |Waste removal and tidy up.     |       |provided.                                   |
+|cullet                       |                               |       |Ensure area is cleaned and product / tools  |
+|                             |                               |       |cleared away.                               |
+|Protection & Security        |                               |          |                                         |
+|Demarcation                  |Damage to people, property and |High      |Demarcation where applicable.            |
+|                             |environment.                   |          |Install barricaded/danger tape as        |
+|                             |                               |          |required.                                |
+|                             |                               |          |Ensure correct fire fighting equipment is|
+|                             |                               |          |available.                               |
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

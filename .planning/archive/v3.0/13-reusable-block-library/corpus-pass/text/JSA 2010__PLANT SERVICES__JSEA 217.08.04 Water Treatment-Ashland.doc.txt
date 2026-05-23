@@ -1,0 +1,45 @@
+
+             Water Treatment
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                        |Safety Induction [Contractor]        |x                                                    |
+|PPE Required:            |Significant Hazard                   |JSA Reviewed by and date                             |
+|All standard PPE required|Yes                                  |                                                     |
+|                         |                                     |                                                     |
+|                         |Risk Score                           |                                                     |
+|                         |47                                   |                                                     |
+|                         |                                     |                                                     |
+|                         |Category                             |                                                     |
+|                         |Medium                               |                                                     |
+|                         |                                     |                                                     |
+|                         |Control taken                        |                                                     |
+|                         |Minimisation                         |                                                     |
+|                         |                                     |                                                     |
+|Sequence of Job Steps    |Potential /               |Level of    |Controls to reduce the Risk of Hazard              |
+|                         |Actual Hazard             |Risk        |                                                   |
+|Carry and de-cant        |Chemical exposure, lifting|Med         |PPE, training by Ashland,                          |
+|chemicals                |injury                    |            |                                                   |
+|Walking around site      |Forklifts                 |Med         |Hi Viz jacket, improved forklift driver training   |
+|                         |                          |            |and discipline                                     |
+|Access to cooling towers |Falling from ladder       |High        |Improved ladder access required to Compressor CTΓÇÖs.|
+|                         |                          |            |Caged ladder required.                             |
+|Working on water         |Electrocution             |High        |Ensuring pumps are isolated prior to starting work.|
+|treatment dosing         |                          |            |                                                   |
+|equipment                |                          |            |                                                   |
+|Clean up area following  |Slipping or Tripping      |Med         |Make area safe                                     |
+|task                     |                          |            |                                                   |
+|Environmental:           |                          |            |                                                   |
+|Removal of used rags /   |Contamination.            |High        |Place in correct contamination or waste bins       |
+|gloves/  waste/ glass /  |Waste removal and tidy up.|            |provided.                                          |
+|cullet                   |                          |            |Ensure area is cleaned and product / tools cleared |
+|                         |                          |            |away.                                              |
+|Protection & Security    |                          |            |                                                   |
+|Demarcation              |Damage to people, property|High        |Demarcation where applicable.                      |
+|                         |and environment.          |            |Install barricaded/danger tape as required.        |
+|                         |                          |            |Ensure correct fire fighting equipment is          |
+|                         |                          |            |available.                                         |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

@@ -1,0 +1,47 @@
+
+Loading Layerboard pallets at Layerboard lift
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                              |Safety Induction [Contractor]           |                                            |
+|PPE Required:                  |Significant Hazard                      |JSEA Reviewed by and date:                  |
+|All standard PPE required      |Yes                                     |Bronwyn Bell                                |
+|                               |                                        |                                            |
+|                               |Risk Score                              |                                            |
+|                               |60                                      |                                            |
+|                               |                                        |                                            |
+|                               |Category                                |                                            |
+|                               |Low                                     |                                            |
+|                               |                                        |                                            |
+|                               |Control taken                           |                                            |
+|                               |Minimisation                            |                                            |
+|                               |                                        |                                            |
+|Sequence of Job Steps          |Potential /                   |Level of |Controls to reduce the Risk of Hazard       |
+|                               |Actual Hazard                 |Risk     |                                            |
+|Using mobile hoist, drive      |Mobile hoist                  |Low      |Must be a licensed driver                   |
+|forward with forks lowered     |                              |         |                                            |
+|Carefully move forward with    |As above                      |Low      |Licensed hoist driver, care taken when      |
+|hoist and forks into pallet and|Layerboard pallets are        |         |moving or shifting layerboard pallets as    |
+|lift pallet into position      |unstable and may slide off if |         |boards may shift or slide off.              |
+|                               |moving too fast               |         |                                            |
+|Slowly move hoist forward until|As above                      |Low      |As above                                    |
+|in position, carefully lower   |                              |         |                                            |
+|pallet onto rollers            |                              |         |                                            |
+|Carefully reverse hoist until  |As above                      |Low      |As above                                    |
+|forks are clear of pallet and  |                              |         |                                            |
+|conveyor and lower forks       |                              |         |                                            |
+|Repeat process with care       |As above                      |Low      |As above                                    |
+|Environmental:                 |                              |         |                                            |
+|Removal of used rags / gloves/ |Contamination.                |High     |Place in correct contamination or waste bins|
+|waste/ glass / cullet          |Waste removal and tidy up.    |         |provided.                                   |
+|                               |                              |         |Ensure area is cleaned and product / tools  |
+|                               |                              |         |cleared away.                               |
+|Protection & Security          |                              |         |                                            |
+|Demarcation                    |Damage to people, property and|High     |Demarcation where applicable.               |
+|                               |environment.                  |         |Install barricaded/danger tape as required. |
+|                               |                              |         |Ensure correct fire fighting equipment is   |
+|                               |                              |         |available.                                  |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

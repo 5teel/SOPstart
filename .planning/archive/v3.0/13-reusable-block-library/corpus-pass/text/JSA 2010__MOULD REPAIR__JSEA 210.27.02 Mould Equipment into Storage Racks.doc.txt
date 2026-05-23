@@ -1,0 +1,57 @@
+
+Mould Equipment into & out of Storage Racks
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                            |Safety Induction [Contractor]      |                                               |
+|PPE Required:                |Significant Hazard                 |JSEA Reviewed by and date                      |
+|All standard PPE required    |Yes                                |G Russell                                      |
+|                             |                                   |                                               |
+|                             |Risk Score                         |                                               |
+|                             |200                                |                                               |
+|                             |                                   |                                               |
+|                             |Category                           |                                               |
+|                             |High                               |                                               |
+|                             |                                   |                                               |
+|                             |Control taken                      |                                               |
+|                             |Minimisation                       |                                               |
+|                             |                                   |                                               |
+|Sequence of Job Steps             |Potential /                  |Level of |Controls to reduce the Risk of Hazard |
+|                                  |Actual Hazard                |Risk     |                                      |
+|Position hoist for lifting          |Tripping hazard            |High     |Ensure area clear                     |
+|                                    |Crushing / Entrapment      |         |Watch and warn any pedestrians        |
+|Raise forks to correct height /     |Crushing                   |High     |Beware of obstacles in area           |
+|level                               |Entrapment                 |         |Use slow speed on hoist               |
+|                                    |Falling objects            |         |Check equipment in box is secure &    |
+|                                    |                           |         |packed evenly                         |
+|                                    |                           |         |Keep body and hands clear of moving   |
+|                                    |                           |         |parts                                 |
+|Lifting box of equipment from rack  |Entrapment                 |High     |Beware of obstacles in area           |
+|                                    |Falling objects            |         |Use slow speed on hoist               |
+|                                    |Crushing                   |         |Check equipment in box is secure &    |
+|                                    |                           |         |packed evenly                         |
+|Loading box onto trolley            |Falling objects            |Medium   |Check box aligns with trolley and     |
+|                                    |Falling box                |         |between bars on trolley               |
+|Moving hoist                        |Entrapment                 |High     |Beware of area you are moving into    |
+|                                    |Crushing                   |         |Sound horn when approaching a corner  |
+|                                    |                           |         |Travel with hoist in trailing position|
+|Environmental:                      |                           |         |                                      |
+|Removal of used rags / gloves/      |Contamination.             |High     |Place in correct contamination or     |
+|waste/ glass / cullet               |Waste removal and tidy up. |         |waste bins provided.                  |
+|                                    |                           |         |Ensure area is cleaned and product /  |
+|                                    |                           |         |tools cleared away.                   |
+|Protection & Security               |                           |         |                                      |
+|Demarcation                         |Damage to people, property |High     |Demarcation where applicable.         |
+|                                    |and environment.           |         |Install barricaded/danger tape as     |
+|                                    |                           |         |required.                             |
+|                                    |                           |         |Ensure correct fire fighting equipment|
+|                                    |                           |         |is available.                         |
+
+
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

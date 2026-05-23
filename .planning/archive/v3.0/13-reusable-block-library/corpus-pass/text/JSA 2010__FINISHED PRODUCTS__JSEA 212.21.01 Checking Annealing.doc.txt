@@ -1,0 +1,53 @@
+
+Checking Annealing
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSEA Reviewed by and date                   |
+|All standard PPE required     |Yes                                  |                                            |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |10                                   |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |Low                                  |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps               |Potential /            |Level of |Controls to reduce the Risk of Hazard    |
+|                                    |Actual Hazard          |Risk     |                                         |
+|Off the lehr - Take one bottle from |Strain from over       |Low      |Bottles must be annealed prior to testing|
+|outside left row, one from middle   |reaching               |         |as they could shatter                    |
+|row and one bottle from outside     |                       |         |                                         |
+|right row.                          |                       |         |                                         |
+|Bottles need to be cooled down prior|Nil                    |Low      |Nil                                      |
+|to testing                          |                       |         |                                         |
+|Take bottles over to polariscope,   |Tripping               |Low      |When testing only use top and bottom     |
+|ensure bottom disc is in line with  |                       |         |discs                                    |
+|eye piece and set to zero.          |                       |         |                                         |
+|Place one bottle directly under the |Nil                    |Low      |Nil                                      |
+|eye piece looking for bright        |                       |         |                                         |
+|colouring on the edges of the base  |                       |         |                                         |
+|Determine grading from colouring in |Nil                    |Low      |Nil                                      |
+|the base, do likewise with other two|                       |         |                                         |
+|bottles and discard into cullet     |                       |         |                                         |
+|belt, place cover back on           |                       |         |                                         |
+|polariscope                         |                       |         |                                         |
+|Environmental:                      |                       |         |                                         |
+|Removal of used rags / gloves/      |Contamination.         |High     |Place in correct contamination or waste  |
+|waste/ glass / cullet               |Waste removal and tidy |         |bins provided.                           |
+|                                    |up.                    |         |Ensure area is cleaned and product /     |
+|                                    |                       |         |tools cleared away.                      |
+|Protection & Security               |                       |         |                                         |
+|Demarcation                         |Damage to people,      |High     |Demarcation where applicable.            |
+|                                    |property and           |         |Install barricaded/danger tape as        |
+|                                    |environment.           |         |required.                                |
+|                                    |                       |         |Ensure correct fire fighting equipment is|
+|                                    |                       |         |available.                               |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

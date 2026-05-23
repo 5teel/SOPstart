@@ -1,0 +1,43 @@
+
+Use of CAMSENSOR Metrology unit
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                           |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                   |
+|Safety Glasses                  |Yes                                    |Rey Basabas  11/06/07                      |
+|                                |                                       |                                           |
+|                                |Risk Score                             |                                           |
+|                                |40                                     |                                           |
+|                                |                                       |                                           |
+|                                |Category                               |                                           |
+|                                |Low                                    |                                           |
+|                                |                                       |                                           |
+|                                |Control taken                          |                                           |
+|                                |Minimisation                           |                                           |
+|                                |                                       |                                           |
+|Sequence of Job Steps                                     |Potential /         |Level  |Controls to reduce the Risk|
+|                                                          |Actual Hazard       |of Risk|of Hazard                  |
+|Note THIS EQUIPMENT EMITS RAPID PULSATING LIGHT. ANYONE   |Rapid light pulses  |Low    |Anyone prone to reaction eg|
+|PRONE TO REACTION TO THIS TYPE OF LIGHT SOURCE SHOULD     |                    |       |epilepsy should check with |
+|CONSULT WITH QA  / HEALTH & SAFETY MANAGER BEFORE USE     |                    |       |health professional  /     |
+|                                                          |                    |       |management first           |
+|Collect containers to be tested                           |Laceration from     |Low    |Ensure all PPE is worn to  |
+|                                                          |broken glass        |       |prevent injury to self     |
+|Place calibration container in universal holder & start   |None                |Low    |Nil                        |
+|measurement sequence NB Results should be checked for     |                    |       |                           |
+|accuracy before continuing with sample set                |                    |       |                           |
+|Following keypad menu Enter job details as prescribed     |None                |Low    |Nil                        |
+|Enter set details as prescribed                           |None                |Low    |Nil                        |
+|Select first container to test & place in holder          |None                |Low    |Nil                        |
+|Set camera height so that finish is in the camera range   |None                |Low    |Nil                        |
+|Start Finish measurement - reset                          |None                |Low    |Nil                        |
+|Start S measurement - reset                               |None                |Low    |Nil                        |
+|Zero digital height gauge & wind down to required distance|None                |Low    |Nil                        |
+|as per ware specifications & start Y measurement          |                    |       |                           |
+|Repeat steps for further testing ( ensuring that the      |None                |Low    |Nil                        |
+|height assembly is raised back to the correct height      |                    |       |                           |
+|before starting Finish measurements again ) Record results|                    |       |                           |
+|Discard containers after testing                          |Laceration          |Low    |Ensure all PPE is worn     |

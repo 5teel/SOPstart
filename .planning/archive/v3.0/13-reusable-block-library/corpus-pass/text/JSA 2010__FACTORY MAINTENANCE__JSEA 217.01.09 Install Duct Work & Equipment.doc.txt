@@ -1,0 +1,123 @@
+
+
+
+Job Safety Environmental Analysis Form:                       Install Duct
+Work & Equipment
+
+|Area / Department                  |Factory Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots, High Vis Garment,    |                                      |                                          |
+|Respiratory Protection (when       |Risk Score                            |                                          |
+|working with asbestos).            |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Access to work area.     |Fall                    |Medium   |All operators of EWP to be licensed.                    |
+|                         |Damage to EWP.          |         |Ladders to be roped off at top at a suitable angle.     |
+|                         |Damage to machinery /   |         |No working on the top two treads of side ladders.       |
+|                         |equipment.              |         |Check suitability of EWP for job.                       |
+|                         |                        |         |Ensure EWP is inside SWL at al times.                   |
+|Check access to location.|Personnel in path of    |Medium   |Operator to determine if traffic / people control is    |
+|                         |EWP.                    |         |required for safety.                                    |
+|                         |                        |         |Notify other personnel in the vicinity of operation.    |
+|                         |                        |         |Ensure EWP is fitted with beeper.                       |
+|Lift fan into place.     |Refer ISO Engineering   |         |                                                        |
+|                         |(217) Section 2 JSEA    |         |                                                        |
+|                         |Crane & Lifting         |         |                                                        |
+|                         |Equipment               |         |                                                        |
+|Drill chemsets holes.    |Electrocution / cuts /  |High     |All employees to be competent with eachof the electrical|
+|                         |eyes.                   |         |tools prior tou se.                                     |
+|                         |                        |         |All tools to be connected through ane arth leakage      |
+|                         |                        |         |device at all times.                                    |
+|                         |                        |         |Gloves to be worn as required.                          |
+|                         |                        |         |Safety glasses to be worn at all times.                 |
+|                         |                        |         |Electrical leads to be run above floor level where      |
+|                         |                        |         |possible and practical.                                 |
+|Lift fan clear to install|Refer ISO Engineering   |         |                                                        |
+|Chemsets.                |(217) Section 2 JSEA    |         |                                                        |
+|                         |Crane & Lifting         |         |                                                        |
+|                         |Equipment               |         |                                                        |
+|Install Chemsets.        |Electrocution / eyes.   |High     |All tools to be connected through an earthleakage device|
+|                         |                        |         |at all times.                                           |
+|                         |                        |         |Safety glasses to be worn at all times.                 |
+|                         |                        |         |Electrical leads to be run above floor level where      |
+|                         |                        |         |possible and practical.                                 |
+|Lift fan back onto       |Refer ISO Engineering   |         |                                                        |
+|Chemsets and bolt down.  |(217) Section 2 JSEA    |         |                                                        |
+|                         |Crane & Lifting         |         |                                                        |
+|                         |Equipment               |         |                                                        |
+|Install duct hangers:    |Fall                    |High     |All operators of EWP to be licensed.                    |
+|-  beam clamps and       |Damage to EWP / damage  |         |Ladders to be roped off at top at a suitable angle.     |
+|threaded rod.            |to machinery, equipment |         |No working on the top two treads of side ladders.       |
+|                         |Electrocution / cuts /  |         |Check suitability of EWP for job.                       |
+|                         |eyes.                   |         |Ensure EWP is inside SWL at all times.                  |
+|                         |                        |         |Safety glasses to be worn at all times.                 |
+|                         |                        |         |Electrical leads to be run above floor level where      |
+|                         |                        |         |possible and practical.                                 |
+|Install duct work:       |Fall                    |High     |All operators of EWP to be licenses.                    |
+|lift ductwork into       |Damage to EWP / Damage  |         |Ladders to be roped off at top at a suitable angle.     |
+|hangers and secure.      |to machinery, equipment |         |No working on the top two treads of side ladders.       |
+|Use threaded rod as      |Electrocution / cuts    |         |Check suitability of EWP for job.                       |
+|spacers in the vertical. |/eyes.                  |         |Ensure EWP is inside SWL at all times.                  |
+|See process below for    |                        |         |Safety Glasses to be worn at all times.                 |
+|lifting ductwork.        |                        |         |Electrical leads to be run above floor level where      |
+|                         |                        |         |possible and practical.                                 |
+|Use of hand tools.       |Cuts                    |Medium   |All employees to be competent with each of the hand     |
+|                         |                        |         |tools prior to use.                                     |
+|Use of electrical tools. |Electrocution / cuts /  |High     |All employees to be competent with each of the          |
+|                         |eyes / noise / trip     |         |electrical tools prior to use.                          |
+|                         |hazard.                 |         |All tools to be connected through an earth leakage      |
+|                         |                        |         |device at all times.                                    |
+|                         |                        |         |Safety glasses to be worn at all times.                 |
+|                         |                        |         |Electrical leads to be run above floor level where      |
+|                         |                        |         |possible and practical.                                 |
+|                         |                        |         |Welding helmets to be worn when welding.                |
+|                         |                        |         |Ear protection to be worn when knocking up ducting,     |
+|                         |                        |         |grinding, cutting etc.                                  |
+|Cutting, grinding,       |Electrocution / cuts /  |High     |All employees to be competent with each of the          |
+|drilling.                |eyes / noise / burns    |         |electrical tools prior to use.                          |
+|                         |                        |         |All tools to be connected through an earth leakage      |
+|                         |                        |         |device at all times.                                    |
+|                         |                        |         |Safety glasses to be worn at all times.                 |
+|                         |                        |         |Electrical leads to be run above floor level where      |
+|                         |                        |         |possible and practical.                                 |
+|                         |                        |         |Gloves, long sleeve shirts and trousers to be worn when |
+|                         |                        |         |welding and oxy cutting.                                |
+|Lifting ductwork.        |Trip.                   |High     |Remove obstacles from works area where possible.        |
+|                         |Duct / equipment falling|         |Determineif weight of duct requires mechanical lifting. |
+|                         |off lifting device.     |         |Ensure duct / equipment is balanced when lifted.        |
+|                         |                        |         |Gloves to be worn as required.                          |
+|                         |                        |         |Ensure manual lifting employs good lifting practices.   |
+|                         |                        |         |DO NOT twist while lifting and maintain a straight back |
+|                         |                        |         |when lifting.                                           |
+|Housekeeping.            |Slip / trip / fall.     |Medium   |Ensure all rubbish is removed from work area.           |
+|                         |Lost or damaged gear.   |         |Clean and tidy work area at end of each day.            |
+|                         |                        |         |Lock tools etc in site box at end of each day.          |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

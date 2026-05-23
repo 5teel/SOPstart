@@ -1,0 +1,77 @@
+
+
+
+  Job Safety Environmental Analysis Form:            Cleaning of Lehr Blast
+                                                                        Cooli
+                                                                        ng
+                                                                        Fans
+
+|Area / Department                  |Machine Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|and Safety Boots, welding PPE      |                                      |                                          |
+|required                           |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Preparation & Safety.    |                        |High     |Ensure safety consumables like dust masks are never     |
+|                         |                        |         |re-used.                                                |
+|Check equipment if       |Faulty equipment.       |High     |Ensure all PPE is worn.                                 |
+|functioning correctly.   |Cuts / burns.           |         |                                                        |
+|Check area is clear and  |                        |Medium   |Communication.                                          |
+|inform personnel.        |                        |         |                                                        |
+|Isolate power source and |Electrocution.          |         |Ensure isolation of power source.                       |
+|tag.                     |                        |         |Tag process completed.                                  |
+|Isolate Cold End sprays  |                        |Medium   |Isolate sprays.                                         |
+|and tag.                 |                        |         |                                                        |
+|Be aware of Lehr loaded  |Lehr belt running.      |Medium   |Watch for oncoming glass.                               |
+|with glass and Lehr time.|                        |         |                                                        |
+|Cleaning:                |                        |         |                                                        |
+|Remove guarding.         |Back strains.           |Medium   |Use correct manual handling techniques.                 |
+|Blow excess dust from    |Dust inhalation.        |High     |Wear dust masks / goggles.                              |
+|impellors using          |Dust in the eyes.       |         |                                                        |
+|compressed air.          |                        |         |                                                        |
+|Scrape hardened dust     |Dust inhalation.        |High     |Wear dust masks / goggles.                              |
+|particles from impellors |Dust in the eyes.       |         |                                                        |
+|with wire brush and      |                        |         |                                                        |
+|scraper.                 |                        |         |                                                        |
+|Scrape hardened dust     |Dust inhalation.        |High     |Wear dust masks / goggles.                              |
+|particals from louvres.  |Dust in the eyes.       |         |                                                        |
+|Blow impellors once again|Dust inhalation.        |High     |Wear dust masks / goggles.                              |
+|to clear away any        |Dust in the eyes.       |         |                                                        |
+|remaining dust.          |                        |         |                                                        |
+|Re-assembly:             |                        |         |                                                        |
+|Check fan area is clear  |Manual handling.        |Medium   |Use correct manual handling techniques.                 |
+|of all equipment.        |                        |         |                                                        |
+|Replace guarding.        |Manual handling.        |Medium   |Use correct manual handling techniques.                 |
+|                         |Cuts / bruising.        |         |                                                        |
+|Ensure fasteners are     |Manual handling.        |Medium   |Use correct manual handling techniques.                 |
+|tight.                   |Cuts / bruising.        |         |                                                        |
+|Check area is free from  |Trips / cuts / bruising.|Medium   |Ensure area is tidy and free from debris left lying     |
+|hazards.                 |                        |         |around.                                                 |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

@@ -1,0 +1,56 @@
+
+#21, 23, 31, 34 Stop a Section
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                  |Safety Induction [Contractor]         |                                          |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Boots, gloves, uniform, safety     |Yes                                   |                                          |
+|glasses, ear muffs, (protection    |                                      |July 2007                                 |
+|sleeves, back support ΓÇô optional)  |Risk Score                            |                                          |
+|                                   |40                                    |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |Low                                   |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |Minimisation                          |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Stopping a machine.      |Burns                   |High     |Turn off the glass by pressing the gob load button in,  |
+|Wait for section to clear|Caught in section       |High     |Leave the section running until the last container      |
+|                         |                        |         |produced is swept on to the conveyor.                   |
+|Stopping the section     |Caught in section       |High     |Once container is clear of the conveyor dead plate press|
+|                         |                        |         |the E stop button in to stop the section in the position|
+|                         |                        |         |required to do the work.                                |
+|Stopping the section ΓÇô   |Crushing, burns.        |High     |Stop the section by using the E stop button.            |
+|swab barrier.            |                        |         |Swab Barrier MUST NOT be removed until the section has  |
+|                         |                        |         |been stopped and made safe.                             |
+|                         |                        |         |Ensure all personnel are clear of the section.          |
+|                         |                        |High     |Make sure the E Stop red light is on. Fit all required  |
+|                         |                        |         |safety devices, and activate safety locks.              |
+|Section Safety           |Burns / Caught in the   |High     |Make sure the E Stop red light is on. Fit all required  |
+|                         |section                 |         |safety devices, and activate safety locks.              |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+
+
+
+                                                     -----------------------
+[pic]
+
+O-I New Zealand
+

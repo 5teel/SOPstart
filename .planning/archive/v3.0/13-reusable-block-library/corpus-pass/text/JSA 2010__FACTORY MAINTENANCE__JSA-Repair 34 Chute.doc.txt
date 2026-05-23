@@ -1,0 +1,30 @@
+
+Repair 34 Down Ware Chute
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                              |Safety Induction [Contractor]         |                                         |
+|PPE Required:                  |Significant Hazard                    |JSA Reviewed by and date                 |
+|All standard PPE required      |Yes                                   |C Sheppard                               |
+|                               |                                      |                                         |
+|                               |Risk Score                            |                                         |
+|                               |100                                   |                                         |
+|                               |                                      |                                         |
+|                               |Category                              |                                         |
+|                               |Low                                   |                                         |
+|                               |                                      |                                         |
+|                               |Control taken                         |                                         |
+|                               |Minimisation                          |                                         |
+|                               |                                      |                                         |
+|Sequence of Job Steps    |Potential /                          |Level of  |Controls to reduce the Risk of Hazard|
+|                         |Actual Hazard                        |Risk      |                                     |
+|Broken or smashed glass  |                                     |Medium    |Clean up area, use RCD               |
+|shock                    |                                     |          |                                     |
+|Install plate            |Slips, falling glass                 |Medium    |Clean area down where possible. Wear |
+|                         |                                     |          |hard hat                             |
+|Install plate            |Ensure no bottle access from required|Medium    |Install plate across shute           |
+|                         |shute                                |          |                                     |
+|Install plate            |Ensure no water coming down shute    |Medium    |Turn off all valves                  |
+|Weld up plate            |Hot Sparks and  Welding flash, burns |Medium    |Fire equipment available, screens,   |
+|                         |                                     |          |wear appropriate PPE                 |

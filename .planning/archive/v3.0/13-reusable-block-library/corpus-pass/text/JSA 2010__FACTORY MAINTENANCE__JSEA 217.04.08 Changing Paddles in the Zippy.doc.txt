@@ -1,0 +1,58 @@
+
+
+
+Job Safety Environmental Analysis Form:                        Changing
+                                                                  Paddles
+                                                                  in the
+                                                                  Zippy
+
+|Area / Department                  |Factory Maintenance                   |Task  or Job Description                  |
+|Recommended Personal Protective    |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Equipment                          |                                      |                                          |
+|High Visibility Jacket, PPE, Hard  |                                      |                                          |
+|hat (when working in Drag area),   |Risk Score                            |                                          |
+|gumboots, safety boots, hearing    |                                      |                                          |
+|protection, safety glasses,        |                                      |                                          |
+|advisable that both emplyees have a|Category                              |                                          |
+|BATT phone.                        |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Bring paddle to position |Being caught in paddles |High     |Isolate power.                                          |
+|at rise.                 |or chain.               |         |                                                        |
+|Pull lanyard to stop     |                        |         |                                                        |
+|zippy.                   |                        |         |                                                        |
+|Turnoff power in         |Electrocution.          |High     |Lock box with lock-out one for each person.             |
+|isolation box and lock   |                        |         |                                                        |
+|box.                     |                        |         |                                                        |
+|Unbolt paddle and bolt on|Jamming fingers.        |Medium   |Be vigilant.                                            |
+|new one.                 |                        |         |                                                        |
+|Reset lanyard, turn on   |Being caught in paddles |High     |Check all clear before resetting each switch.           |
+|main switch, then reset  |or chain.               |         |                                                        |
+|rotation switch.         |                        |         |                                                        |
+|Restart process for next |                        |Low      |                                                        |
+|paddle.                  |                        |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security:   |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

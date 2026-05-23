@@ -1,0 +1,47 @@
+
+Replace 23 Conveyor Cooling Motor Starter
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]           |                                            |
+|PPE Required:                |Significant Hazard                      |JSEA Reviewed by and date                   |
+|All standard PPE required    |Yes                                     |                                            |
+|                             |                                        |                                            |
+|                             |Risk Score                              |                                            |
+|                             |10                                      |                                            |
+|                             |                                        |                                            |
+|                             |Category                                |                                            |
+|                             |Low                                     |                                            |
+|                             |                                        |                                            |
+|                             |Control taken                           |                                            |
+|                             |Isolation                               |                                            |
+|                             |                                        |                                            |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard       |
+|                             |Actual Hazard                 |Risk     |                                            |
+|Isolate supply               |Electrocution                 |Low      |Lock out mains isolator                     |
+|Disconnect old starter       |If separate supplies connected|Low      |Testing using the ΓÇ£Test / Check / Test ruleΓÇ¥|
+|                             |ΓÇô possible electrocution      |         |                                            |
+|Remove old starter off wall  |Strain or sprain              |Low      |Correct lifting techniques required         |
+|Place new drive on wall      |Manual Handling               |Low      |Correct lifting techniques required         |
+|Connect up new drive         |Nil                           |Low      |Nil                                         |
+|Reinstate supply             |Electrocution                 |Low      |Testing using the ΓÇ£Test / Check / Test ruleΓÇ¥|
+|Commission drive             |Fan may start and people      |Low      |Ensure all aware and clear as fan may start |
+|                             |working in area               |         |                                            |
+|Start fan                    |Nil                           |Low      |Inform all personal in area prior to        |
+|                             |                              |         |starting fan                                |
+|Environmental:               |                              |         |                                            |
+|Removal of used rags /       |Contamination.                |High     |Place in correct contamination or waste bins|
+|gloves/  waste/ glass /      |Waste removal and tidy up.    |         |provided.                                   |
+|cullet                       |                              |         |Ensure area is cleaned and product / tools  |
+|                             |                              |         |cleared away.                               |
+|Protection & Security        |                              |         |                                            |
+|Demarcation                  |Damage to people, property and|High     |Demarcation where applicable.               |
+|                             |environment.                  |         |Install barricaded/danger tape as required. |
+|                             |                              |         |Ensure correct fire fighting equipment is   |
+|                             |                              |         |available.                                  |
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

@@ -1,0 +1,28 @@
+
+Plant Greasing Overview
+                            HAZARD IDENTIFICATION
+|1                                                                       |
+|1                                                                       |
+|1                              |Safety Induction [Contractor]       |                                            |
+|PPE Required:                  |Significant Hazard                  |JSA Reviewed by and date                    |
+|                               |Yes                                 |                                            |
+|                               |                                    |                                            |
+|                               |Risk Score                          |                                            |
+|                               |40                                  |                                            |
+|                               |                                    |                                            |
+|                               |Category                            |                                            |
+|                               |Low                                 |                                            |
+|                               |                                    |                                            |
+|                               |Control taken                       |                                            |
+|                               |Minimisation                        |                                            |
+|                               |                                    |                                            |
+|Sequence of Job Steps   |Potential /            |Level of|Controls to reduce the Risk of Hazard                |
+|                        |Actual Hazard          |Risk    |                                                     |
+|Greasing equipment      |Airborne contaminants  |Low     |Wear dust mask                                       |
+|throughout the plant    |                       |        |                                                     |
+|                        |Noise                  |High    |Ear muffs, gloves                                    |
+|                        |Excessively hot        |High    |Gloves, dust mask                                    |
+|                        |environment            |        |                                                     |
+|                        |Slippery surface       |Low     |Walk carefully                                       |
+|                        |Risk of falling        |Low     |Be sure the top ladder is stable                     |
+|                        |Broken glass           |Low     |Clean the area if practicable                        |

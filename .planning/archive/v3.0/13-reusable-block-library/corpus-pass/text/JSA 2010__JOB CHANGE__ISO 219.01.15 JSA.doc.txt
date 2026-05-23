@@ -1,0 +1,42 @@
+
+ISO 219.01.15        #23, 31, 34 Bottom Plate Change
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                         |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                 |
+|All standard PPE required    |Yes                                        |June 2009                                |
+|when working within          |                                           |                                         |
+|production area              |Overall Category of task                   |                                         |
+|                             |Medium                                     |                                         |
+|                             |                                           |                                         |
+|                             |Control taken                              |                                         |
+|                             |Minimisation                               |                                         |
+|                             |                                           |                                         |
+|Sequence of Job Steps   |Potential /                   |Level of  |Controls to reduce the Risk of Hazard           |
+|                        |Actual Hazard                 |Risk      |                                                |
+|Stop Section:-          |Making section safe to prevent|High      |Stop Neck ring arms in the reverted position    |
+|                        |entrapment                    |          |using the (Red) Maintenance / E Stop button     |
+|Mould side safety       |Reduce the risk of being      |High      |Ensure (Red) Maintenance / E Stop button on the |
+|procedure               |caught in the section.        |          |mould side is pushed in and both snap valves are|
+|                        |                              |          |depressed.                                      |
+|Mould side safety       |Reduce the risk of a crush    |High      |Depress both safety snap valves down. Note:     |
+|procedure               |injury.                       |          |During job change fit safety snap valve cover   |
+|                        |                              |          |over mould side snap valves.                    |
+|Mould Side safety Plate |Burning from heat reflected   |High      |Where possible, place safety plate in the up    |
+|                        |off ware                      |          |position to reflect heat back towards the       |
+|                        |                              |          |machine. Note: - On Job Change there is no Hot  |
+|                        |                              |          |glass and this Safety plate can be left in the  |
+|                        |                              |          |down position...                                |
+|Mould Side safety       |Crush injury.                 |          |On job changes remove moulds before removing    |
+|procedures              |                              |          |bottom plates.  Back support belt optional. Put |
+|                        |                              |          |bottom plates in before moulds on job change.   |
+|                        |                              |          |Where applicable, remove moulds first. Back     |
+|                        |                              |          |support belt optional.                          |
+|Prepare Section to      |Caught in Section.            |High      |Remove  snap valve safety covers (where         |
+|start.                  |                              |          |applicable) Pull out (Red) Maintenance / E Stop |
+|                        |                              |          |button                                          |
+|Starting section        |Caught in Section.            |High      |Ensure all personnel are clear of the section.  |
+|                        |                              |          |Start the section up                            |
+

@@ -1,0 +1,37 @@
+
+Use of Baty Projector
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety Glasses                  |Yes                                    |Rey Basabas  11/06/07                   |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |40                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps               |Potential /               |Level of Risk|Controls to reduce the Risk of    |
+|                                    |Actual Hazard             |             |Hazard                            |
+|If projector is located in the Cold |Noise and Broken bottles  |Low          |Ensure that all PPE is worn to    |
+|End then there are additional       |causing Laceration        |             |prevent injury to self            |
+|hazards                             |                          |             |                                  |
+|Switch on Baty Projector            |None                      |Low          |Nil                               |
+|Place container to be checked on the|None                      |Low          |Nil                               |
+|V block as appropriate              |                          |             |                                  |
+|Move the carriage to the required X |None                      |Low          |Nil                               |
+|/ Y position using the controls on  |                          |             |                                  |
+|the machine                         |                          |             |                                  |
+|Measure & record results            |None                      |Low          |Nil                               |
+|Discard containers after testing    |Broken bottles causing    |Low          |Ensure that all PPE is worn to    |
+|                                    |Laceration                |             |prevent injury to self            |
+|NB Because of the detailed  nature  |Eye strain                |Low          |Regular breaks as required        |
+|of this task,  eye strain is a      |                          |             |                                  |
+|concern                             |                          |             |                                  |

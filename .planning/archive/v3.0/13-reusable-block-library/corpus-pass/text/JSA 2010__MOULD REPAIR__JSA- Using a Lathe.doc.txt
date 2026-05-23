@@ -1,0 +1,44 @@
+
+Using a Lathe
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                |Safety Induction [Contractor]         |                                       |
+|PPE Required:                    |Significant Hazard                    |JSA Reviewed by and date               |
+|Standard Safety Uniform plus     |Yes                                   |Gary Russell 16/7/07                   |
+|Safety glasses                   |                                      |                                       |
+|                                 |Risk Score                            |                                       |
+|                                 |250                                   |                                       |
+|                                 |                                      |                                       |
+|                                 |Category                              |                                       |
+|                                 |High                                  |                                       |
+|                                 |                                      |                                       |
+|                                 |Control taken                         |                                       |
+|                                 |Minimisation                          |                                       |
+|                                 |                                      |                                       |
+|Sequence of Job Steps            |Potential /                |Level of  |Controls to reduce the Risk of Hazard  |
+|                                 |Actual Hazard              |Risk      |                                       |
+|Inspect Lathe                    |Falling objects            |Medium    |Check and remove any loose objects from|
+|                                 |                           |          |lathe                                  |
+|Switch on Lathe                  |Electrical shock           |Medium    |Check electrical switches are in good  |
+|                                 |                           |          |operating condition                    |
+|Put job in lathe                 |Crushing / entrapment of   |Medium    |Open chuck jaws to required diameter   |
+|                                 |fingers and hands          |          |Support job with one hand or hoist     |
+|                                 |Dropping / falling         |          |whilst tightening chuck key            |
+|                                 |equipment                  |          |                                       |
+|Turning the job                  |Crushing                   |High      |Ensure chuck safety guard is working   |
+|                                 |Entrapment                 |          |correctly                              |
+|                                 |Falling objects            |          |Ensure job is secure in chuck before   |
+|                                 |Swarf                      |          |operating lathe                        |
+|                                 |Heat                       |          |Check area for loose objects within    |
+|                                 |Noise                      |          |operating field                        |
+|                                 |                           |          |Required PPE                           |
+|                                 |                           |          |Hearing protection if required         |
+|                                 |                           |          |Correct operation of lathe as per      |
+|                                 |                           |          |instructions                           |
+|Remove job from lathe            |Crushing / entrapment of   |Medium    |Open chuck jaws to required diameter   |
+|                                 |fingers and hands          |          |Support job with one hand or hoist     |
+|                                 |Dropping / falling         |          |whilst undoing chuck key               |
+|                                 |equipment                  |          |                                       |

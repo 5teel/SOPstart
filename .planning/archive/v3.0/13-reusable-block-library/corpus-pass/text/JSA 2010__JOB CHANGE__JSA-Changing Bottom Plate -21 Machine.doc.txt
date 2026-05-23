@@ -1,0 +1,73 @@
+
+#21 Bottom Plate Change
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                                                                         |
+|Probability                       |INJURY                              |PLANT PROPERTY OR PROCESS DAMAGE    |
+|Likelihood that accident sequence |                                    |                                    |
+|will follow to.                   |                                    |                                    |
+|Common or frequent occurrence     |Fatality or permanent disability    |More than 1 million, Major          |
+|                                  |                                    |disruption of activities            |
+|Is known to have happened         |Multiple lost time injury with      |$500,000 to $1 million              |
+|                                  |hospital admissions                 |                                    |
+|Could occur                       |Single Lost time injury             |$100,000 to $500,000                |
+|Not likely to occur               |Medical Treatment Injury or         |$1000 to $100,000                   |
+|                                  |restricted work                     |                                    |
+|Practically impossible            |First Aid injury                    |Up to $1000                         |
+|                                  |                                    |                                    |
+|                                  |QUALITY                             |ENVIRONMENTAL                       |
+|                                  |Major product recall with adverse   |Confined to immediate work area,    |
+|                                  |publicity and major customer claim  |rapid clean up no damage to         |
+|                                  |                                    |environment                         |
+|                                  |Minor product recall with adverse   |Confined to specific area, rapid    |
+|                                  |publicity resulting in minor claim  |clean up little damage to           |
+|                                  |                                    |environment                         |
+|                                  |Minor product recall with major     |Confined to local environment,      |
+|                                  |resort of product                   |naturally recoverable, moderate     |
+|                                  |                                    |clean up                            |
+|                                  |Minor product recall with minor     |Considerable clean up on site as    |
+|                                  |resort of product                   |well as external resources involved |
+|                                  |                                    |& extends past boundaries           |
+|                                  |Customer compliant and no resort of |Regional scale, extensive clean up  |
+|                                  |product required                    |and long recovery                   |
+
+
+|CONSEQUENCES                                                                                 |
+|PROBABILITY    |INSIGNIFICANT    |MINOR            |MODERATE         |MAJOR            |EXTREME             |
+|               |1                |2                |3                |4                |5                   |
+|almost certain            |H                        |H                          |E                            |
+
+                                                     #21 Bottom Plate Change
+|Area / Department            |Job Change                                 |Task  or Job Description                |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |June 2009                               |
+|when working within          |                                           |                                        |
+|production area              |Overall Category of task                   |                                        |
+|                             |Medium                                     |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps      |Potential /                  |Level of    |Controls to reduce the Risk of Hazard       |
+|                           |Actual Hazard                |Risk        |                                            |
+|Stop Section:-             |Making section safe to       |High        |Stop Neck ring arms in the reverted position|
+|                           |prevent entrapment           |            |using the (Red) maintenance / E Stop button |
+|Mould side safety procedure|Reduce the risk of being     |High        |                                            |
+|commenced                  |caught in the section        |            |                                            |
+|Mould Side safety Plate put|Burning from heat reflected  |High        |Place safety plate in the up position to    |
+|into up position           |off ware                     |            |reflect heat back towards the machine.  On  |
+|                           |                             |            |Job Change there is no Hot glass and this   |
+|                           |                             |            |Safety plate can be left in the down        |
+|                           |                             |            |position.                                   |
+|Remove moulds first.       |                             |            |On job changes remove moulds before removing|
+|                           |                             |            |bottom plates.  Put bottom plates in before |
+|                           |                             |            |moulds on job change.                       |
+|Remove Bottom Plate non job|Crushed hand.                |High        |Using Bottom Plate lifting tool remove      |
+|change.                    |                             |            |bottom plate from section                   |
+|Prepare Section to start.  |Caught in Section.           |High        |Pull out (Red) maintenance / E Stop button  |
+|                           |                             |            |on the mould side                           |
+|                           |                             |            |Pull out Mould inhibit button.              |
+|Start the section          |Caught in Section.           |High        |Ensure all personnel are clear of the       |
+|                           |                             |            |section.  Start the section up              |

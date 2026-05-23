@@ -1,0 +1,34 @@
+
+Changing Unit
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]           |                                         |
+|PPE Required:                |Significant Hazard                      |JSA Reviewed by and date                 |
+|All standard PPE required    |Yes / No                                |                                         |
+|                             |                                        |                                         |
+|                             |Risk Score                              |                                         |
+|                             |                                        |                                         |
+|                             |                                        |                                         |
+|                             |Category                                |                                         |
+|                             |                                        |                                         |
+|                             |                                        |                                         |
+|                             |Control taken                           |                                         |
+|                             |                                        |                                         |
+|                             |                                        |                                         |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Turn off power               |Electrocution                 |Low      |Check area and isolate                   |
+|use Lock Out                 |Nil                           |Medium   |Isolate                                  |
+|Hook up lifting Gear         |Weight of chain block         |Low      |Correct ergonomics                       |
+|Remove safety guards. Turn   |Broken glass sharp edges      |Low      |PPE                                      |
+|off lube line                |                              |         |                                         |
+|Remove mounting bolts, drive,|Confined space & lighting     |Low      |Correct ergonomics and torch             |
+|shaft & lube lines           |                              |         |                                         |
+|Lift transfer onto trolley   |Lifting brackets not secure   |Medium   |Minimise weight balance                  |
+|stand                        |                              |         |                                         |
+|Mount Transfer onto trolley  |Weight of transfer off centre |Low      |Secure trolley stand                     |
+|stand                        |                              |         |                                         |
+|Reverse order for new        |Complancey                    |Low      |Carry out correct procedures             |
+|Transfer                     |                              |         |                                         |

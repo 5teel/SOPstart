@@ -1,0 +1,85 @@
+
+#21 Changing a Mould Hinge
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                                      |Safety Induction [Contractor]                                 |
+|Hazard            |Practicable to Eliminate                                                                    |
+|Identification    |                                                                                            |
+|                                     |Insignificant ΓÇô first aid injury, up to  |
+|                                     |$1,000 damage, spill confined to         |
+|LIKELIHOOD                           |immediate work area, rapid clean up, no  |
+|                                     |damage to environment                    |
+|How likely is it to happen?          |                                         |
+|4                                    |ACT NOW ΓÇô Urgent ΓÇô do something about the|
+|ACUTE                                |risks immediately. Requires immediate    |
+|                                     |attention.                               |
+|3                                    |Highest management decision is required  |
+|HIGH                                 |urgently                                 |
+|2                                    |Follow management instruction            |
+|MODERATE                             |                                         |
+|1                                    |OK for now. Record and review if any     |
+|LOW                                  |equipment / people / materials / work    |
+|                                     |processes or procedures change           |
+
+
+Job Safety  Analysis Form:              #21 Changing a Mould Hinge
+
+
+
+|Area / Department                  |Job Change                            |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSA Reviewed by and Date:                 |
+|Boots, gloves, uniform, safety     |Yes                                   |                                          |
+|glasses, ear muffs, (protection    |                                      |August  2009                              |
+|sleeves, back support ΓÇô optional)  |Risk Score                            |                                          |
+|                                   |100                                   |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |Medium                                |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |Minimisation                          |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Stop machine.            |Making machine safe to  |High     |Stop neck ring arms in the reverted position using the E|
+|                         |prevent entrapment.     |         |stop button.                                            |
+|Mould side safety.       |Reduce the risk of being|High     |Ensure E stop button on the mould side is pushed in.    |
+|                         |caught in the section.  |         |Push in mould inhibit button.                           |
+|Mould side safety plate. |Burning from heat       |High     |Where possible place safety plate in the up position to |
+|                         |reflected off ware.     |         |reflect heat back towards the machine.                  |
+|Prepare moulds for       |Burns.                  |High     |Fit tee screw lifters to the moulds and prepare to lift |
+|lifting.                 |                        |         |the mould from the hinge.                               |
+|Removing moulds.         |Burns / back strain.    |High     |Get into a comfortable lifting position that suits.     |
+|                         |                        |         |Reducing lowering and twisting while lifting.  Remove   |
+|                         |                        |         |moulds.                                                 |
+|Remove bottom plate.     |Crushed hand.           |High     |Using bottom plate lifting tool, remove bottom plate    |
+|                         |                        |         |from section.                                           |
+|Prepare to remove hinge. |Burnt / back strain.    |Low      |Remove mould post supports.  Remove link pin from hinge |
+|                         |                        |         |and move link out of the slot in the mould hinge.       |
+|Remove hinge.            |Burnt / back strain.    |High     |Get into a comfortable lifting position that suits.     |
+|                         |                        |         |Reducing lowering and twisting and remove hinge.        |
+|Replace with clean hinge.|Burnt / back strain.    |High     |Get into a comfortable lifting position that suits.     |
+|                         |                        |         |Reducing lowering and twisting and fit clean hinge.     |
+|Replace safety and       |Burnt / back strain.    |Low      |Move link into the slot in the mould hinge.  Refit link |
+|support tooling.         |                        |         |pin to hinge. Refit mould post support.                 |
+|Fit clean bottom plate.  |Crushed hand.           |High     |Using bottom plate lifting tool, replace bottom plate   |
+|                         |                        |         |into the section.                                       |
+|Fit clean moulds.        |Back strain.            |High     |Get into a comfortable lifting position that suits.     |
+|                         |                        |         |Reducing lowering and twisting while lifting.  Refit    |
+|                         |                        |         |moulds.                                                 |
+|Prepare machine to start.|Caught in section.      |High     |Pull out mould side E stop and pull out mould inhibit   |
+|                         |                        |         |button.                                                 |
+|Follow machine start     |Caught in section.      |High     |Ensure all personnel are clear of the section.  Start   |
+|refer 210.01.01          |                        |         |the section up.                                         |
+
+ If the operation does not follow this JSA re-assess procedure and report to
+                            Supervisor / Manager.
+
+
+                                                     -----------------------
+[pic]
+
+O-I New Zealand
+

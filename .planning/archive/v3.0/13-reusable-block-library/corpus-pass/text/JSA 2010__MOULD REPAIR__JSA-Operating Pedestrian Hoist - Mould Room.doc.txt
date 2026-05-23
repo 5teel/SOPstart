@@ -1,0 +1,39 @@
+
+Operating Pedestrian Hoist
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                              |
+|PPE Required:                 |Significant Hazard                   |JSEA Reviewed by and date                     |
+|All standard PPE required     |Yes                                  |Dave Walmsley ΓÇô 10.07.08                      |
+|                              |                                     |                                              |
+|                              |Category                             |                                              |
+|                              |medium                               |                                              |
+|                              |                                     |                                              |
+|                              |Control taken                        |                                              |
+|                              |Minimisation                         |                                              |
+|                              |                                     |                                              |
+|Sequence of Job Steps          |Potential /                   |Level of  |Controls to reduce the Risk of Hazard    |
+|                               |Actual Hazard                 |Risk      |                                         |
+|Switch Hoist on with Key.      |Electric shock from batteries.|Low       |Check Hoist for any signs of damage      |
+|Manoeuvre Hoist into position  |Tripping.                     |Med       |Check & remove all obstacles out of the  |
+|to lift object.                |Entrapment of Body.           |          |way.                                     |
+|                               |                              |          |Do not reverse Hoist with something      |
+|                               |                              |          |immediately behind you.                  |
+|Position Forks ready for lift. |Entrapment of Fingers/Hand.   |Med       |Keep Fingers/Hands clear of Pinch Points.|
+|                               |                              |          |Wear Gloves.                             |
+|Lift object with Hoist.        |Insecure/Unstable load.       |Med       |Ensure Forks are spaced as wide as       |
+|                               |                              |          |possible.                                |
+|                               |                              |          |Ensure object being lifted is secure &   |
+|                               |                              |          |stable on the Forks whilst still low to  |
+|                               |                              |          |the ground.                              |
+|Manoeuvre object to final      |Tripping.                     |          |Check & remove all obstacles out of the  |
+|destination.                   |Falling objects.              |Med       |way.                                     |
+|                               |Entrapment of Body.           |          |Do not stop the Hoist suddenly or bump   |
+|                               |                              |          |into things.                             |
+|                               |                              |          |Do not reverse Hoist with something      |
+|                               |                              |          |immediately behind you.                  |
+|Return Hoist to Storage area.  |Tripping.                     |Low       |Ensure no obstacles in your way.         |
+|                               |                              |          |Ensure Forks are lowered as low as       |
+|                               |                              |          |possible when Hoist is stored away.      |

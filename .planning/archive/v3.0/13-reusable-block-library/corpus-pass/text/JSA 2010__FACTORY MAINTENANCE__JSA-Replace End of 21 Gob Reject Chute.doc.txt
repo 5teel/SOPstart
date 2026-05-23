@@ -1,0 +1,31 @@
+
+Replace End of 2/1 Gob Reject Chute
+                            HAZARD IDENTIFICATION
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]       |                                             |
+|PPE Required:                 |Significant Hazard                  |JSA Reviewed by and date                     |
+|Hat, gloves, glasses, Hiviz,  |Yes                                 |C Sheppard 8/05/07                           |
+|phone                         |                                    |                                             |
+|                              |Risk Score                          |                                             |
+|                              |50                                  |                                             |
+|                              |                                    |                                             |
+|                              |Category                            |                                             |
+|                              |                                    |                                             |
+|                              |                                    |                                             |
+|                              |Control taken                       |                                             |
+|                              |Minimisation                        |                                             |
+|                              |                                    |                                             |
+|Sequence of Job Steps   |Potential /                       |Level of  |Controls to reduce the Risk of Hazard    |
+|                        |Actual Hazard                     |Risk      |                                         |
+|Communication to        |Falling objects                   |High      |Notify Manager in order all areas and    |
+|employees working within|                                  |          |employees are aware                      |
+|affected area           |                                  |          |                                         |
+|Clean Floor             |Tripping from the stairs and glass|Low       |Clean area prior to starting. Ensure that|
+|                        |on floor plus excess water        |          |extra lighting is in place.              |
+|Connect equipment to RCD|Electrocution                     |High      |Use RCD for all electrical equipment     |
+|Isolate Drag            |Moving drag                       |High      |Place planks over drag                   |
+|Block off Drag          |Falling gobs, objects and sparks  |High      |Shut.  Hard hats.                        |
+|Chain Block             |Lifting                           |Medium    |Chain block and strops                   |
+|Change end section to   |Welding                           |Low       |Fire watch.  Welding shield where needed |
+|chute                   |                                  |          |                                         |

@@ -1,0 +1,42 @@
+
+In-feed Slat band Drive Shaft and Bearings Replacement
+                            HAZARD IDENTIFICATION
+
+                     REPLACE FP INFEED DRIVE SHAFT/BRGS
+|1                                                                       |
+|1                                                                       |
+|1                              |Safety Induction [Contractor]       |                                              |
+|PPE Required:                  |Significant Hazard                  |JSEA Reviewed by and date                     |
+|All standard PPE required      |Yes                                 |                                              |
+|                               |                                    |                                              |
+|                               |Risk Score                          |                                              |
+|                               |45                                  |                                              |
+|                               |                                    |                                              |
+|                               |Category                            |                                              |
+|                               |Low                                 |                                              |
+|                               |                                    |                                              |
+|                               |Control taken                       |                                              |
+|                               |Minimisation                        |                                              |
+|                               |                                    |                                              |
+|Sequence of Job Steps    |Potential /                      |Level of  |Controls to reduce the Risk of Hazard       |
+|                         |Actual Hazard                    |Risk      |                                            |
+|Switch off line          |Trapping hand                    |Low       |Lock out procedure                          |
+|Remove chute             |Lifting/twisting                 |Low       |Lightweight chute                           |
+|Remove chain             |Trapping fingers/light           |Low       |Lock out procedure, torch                   |
+|Remove shaft             |Pinching fingers                 |Low       |Light, be careful                           |
+|Refit new shaft bearings |Reverse order                    |          |                                            |
+|Environmental:           |                                 |          |                                            |
+|Removal of used rags /   |Contamination.                   |High      |Place in correct contamination or waste bins|
+|gloves/  waste/ glass /  |Waste removal and tidy up.       |          |provided.                                   |
+|cullet                   |                                 |          |Ensure area is cleaned and product / tools  |
+|                         |                                 |          |cleared away.                               |
+|Protection & Security    |                                 |          |                                            |
+|Demarcation              |Damage to people, property and   |High      |Demarcation where applicable.               |
+|                         |environment.                     |          |Install barricaded/danger tape as required. |
+|                         |                                 |          |Ensure correct fire fighting equipment is   |
+|                         |                                 |          |available.                                  |
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

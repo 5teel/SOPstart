@@ -1,0 +1,29 @@
+
+Applying Crocell Wax
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                |Safety Induction [Contractor]         |                                       |
+|PPE Required:                    |Significant Hazard                    |JSA Reviewed by and date               |
+|Standard Safety Uniform plus     |Yes                                   |Gary Russell 16/7/07                   |
+|Safety glasses Gloves            |                                      |                                       |
+|                                 |Risk Score                            |                                       |
+|                                 |80                                    |                                       |
+|                                 |                                      |                                       |
+|                                 |Category                              |                                       |
+|                                 |Medium                                |                                       |
+|                                 |                                      |                                       |
+|                                 |Control taken                         |                                       |
+|                                 |Minimisation                          |                                       |
+|                                 |                                      |                                       |
+|Sequence of Job Steps            |Potential /                  |Level of |Controls to reduce the Risk of Hazard   |
+|                                 |Actual Hazard                |Risk     |                                        |
+|Turn on wax to heat up           |Electric shock               |Low      |Check electrical equipment for current  |
+|                                 |                             |         |tag                                     |
+|                                 |                             |         |Check electrical cables for damage      |
+|Clean equipment to be waxed      |Dropping equipment           |Medium   |Wear required PPE                       |
+|Dip equipment into wax           |Burn                         |Medium   |Wear required PPE                       |
+|Let excessive wax run off        |Burn                         |Medium   |Wear required PPE                       |
+|Allow wax to harden on equipment |Burn                         |Medium   |Wear required PPE                       |

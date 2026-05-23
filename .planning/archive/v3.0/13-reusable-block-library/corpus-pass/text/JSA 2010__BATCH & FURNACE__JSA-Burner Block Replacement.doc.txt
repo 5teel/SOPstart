@@ -1,0 +1,48 @@
+
+Burner Block Replacement
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSA Reviewed by and date                    |
+|All standard PPE required     |Yes                                  |                                            |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |750                                  |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |High                                 |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps                     |Potential /              |Level of  |Controls to reduce the Risk of   |
+|                                          |Actual Hazard            |Risk      |Hazard                           |
+|SET VALUE OF FLOOR AND CROWN TEMPERATURE  |GLASS QUALITY ISSUES     |Low       |PROCESS ENGINEER TO MONITOR      |
+|TO BE INCREASED 5 ΓÇô 10 DEG C OVERNIGHT TO |                         |          |DURING SHIFT                     |
+|ENSURE MELTING CONDITIONS ARE MAINTAINED  |                         |          |                                 |
+|ALL PERSONS INVOLVED TO LIASE AT ALL TIMES|BODILY INJURY IN VARIOUS |High      |PROCESS ENGINEERS AND SUPERVISION|
+|TO ENSURE SAFETY                          |FORMS                    |          |TO MONITOR PROCESS CONSTANTLY    |
+|ISOLATE REVERSAL, SHUT OFF GAS ON REQUIRED|HEAT EXPOSURE, HOT       |High      |SUPERVISION, OBSERVE FOR FIRES.  |
+|PORT, CLOSE TRIMMING VALVE, THIS OPERATION|FLAMES, TRIP HAZARDS,    |          |FIRE EQUIPMENT AT HAND.          |
+|SHOULD BE DONE BY THE INDIVIDUAL THAT     |LOSS OF BODY FLUIDS.     |          |                                 |
+|CARRIES OUT THE WORK SO HE AND HE ONLY HAS|                         |          |                                 |
+|THE KEY TO START REVERSAL.                |                         |          |                                 |
+|SET UP SUITABLE PLATFORM, ENSURE PLATFORM |FALL HAZARDS, HOT        |High      |AS ABOVE AND PUT BARRIERS UNDER  |
+|BELOW IS FREE OF FIRE HAZARDS. ENSURE     |BRICKWORK FALLING - ALL  |          |FURNACE TO STOP ACSESS UNDER     |
+|PERSONNEL DO NOT WALK UNDER FURNACE       |THE ABOVE                |          |FURNACE.                         |
+|PLATFORM AT THIS TIME.                    |                         |          |                                 |
+|REMOVE BURNER AND BRACKET AND CLEAN  READY|ALL THE ABOVE            |High      |SUPERVISION, OBSERVE FOR FIRES   |
+|FOR RE-INSTALLATION                       |                         |          |FIRE EQUIPMENT AT HAND.          |
+|REMOVE WORN BURNER BLOCK, CLEAN BURNER    |BURN INJURY AND ALL THE  |High      |SUPERVISION, OBSERVE FOR FIRES,  |
+|HOLE AND PORT FLOOR OF DEBRIS AND BATCH   |ABOVE                    |          |WATCH FOR FALLING DEBRIS.        |
+|BUILD UP                                  |                         |          |                                 |
+|REINSTALL NEW BURNER BLOCK, SEAL AROUND   |BURN INJURY AND ALL THE  |High      |SUPERVISION OBSERVES FOR FIRES,  |
+|JOINT WITH WOOL AND REFRACTORIES.         |ABOVE                    |          |WATCH FOR FALLING DEBRIS.        |
+|REINSTALL BURNER AND BRACKET, SEAL BURNER |AS ABOVE                 |High      |AS ABOVE                         |
+|OPEN TRIMMING VALVES, UNLOCK REVERSAL LOCK|AS ABOVE                 |High      |SUPERVISION                      |
+|OUT.                                      |                         |          |                                 |
+|CHECK FOR ANY GAS LEAKS ON BURNER AND     |AS ABOVE                 |High      |SUPERVISION                      |
+|BURNER BLOCK, CHECK FLAME THROUGH IP      |                         |          |                                 |
+|BLOCK.                                    |                         |          |                                 |

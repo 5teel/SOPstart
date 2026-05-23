@@ -1,0 +1,62 @@
+
+Using Fork Hoist for Pallet Tipping
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses / gloves / boots |Yes                                    |Gary OΓÇÖNeill  30/05/07                  |
+|/ hi viz / ear protection / hard|                                       |Mate Pocrnich  30/05/07                 |
+|hat with mesh face              |Risk Score                             |Glenn Stempher 30/05/07                 |
+|                                |100                                    |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |MEDIUM                                 |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                      |Potential /            |Level of  |Controls to reduce the Risk of   |
+|                                           |Actual Hazard          |Risk      |Hazard                           |
+|Complete fork hoist safety check sheet     |Malfunction will cause |Medium    |Standard fork hoist operating    |
+|                                           |injury                 |          |procedure                        |
+|Visually inspect tipping cage for any      |Malfunction will cause |Medium    |Visual inspection                |
+|damage / wear / tear                       |injury                 |          |                                 |
+|Raise Fork hoist mast approx one metre for |Unstable tipping cage  |Medium    |Check that the cage is seated    |
+|easy access Fit the tipping cage to the    |may cause the pallet to|          |fully & correctly against the    |
+|fork hoist ensuring that the two chains are|collapse               |          |mast & on the tynes              |
+|secured onto the mast & that the clips are |                       |          |                                 |
+|closed off                                 |                       |          |                                 |
+|Lower the fork hoist mast Check the        |Rotten pallets will    |Medium    |Check pallet                     |
+|condition of the pallet to be tipped       |collapse & cause injury|          |                                 |
+|Position fork hoist in front of unshrouded |Falling bottles may    |Medium    |PPE should be worn               |
+|pallet, move forward & lift ( tilt mast as |cause lacerations      |          |                                 |
+|required )                                 |                       |          |                                 |
+|Load pallet into tipping machine, lower    |Collision with someone |Medium    |Care & attention should be taken |
+|pallet into position & reverse hoist out of|/ something. Collapse  |          |Previous checks apply            |
+|enclosure                                  |pallet                 |          |                                 |
+|Fork hoist driver to get off hoist & push  |Jam up                 |Medium    |Check that water supply &        |
+|green start button on left hand panel of   |                       |          |conveyor are working             |
+|tipper, to commence tipping process        |                       |          |                                 |
+|Tipping is a two part process lasting      |Strain / sprain        |Medium    |Care should be taken when using  |
+|approx 3-4 minutes per pallet Any bottles  |Laceration             |          |the iron bar that back strain    |
+|left on the tipped pallet may be dislodged |                       |          |does not occur, nor that bottles |
+|by using a long iron bar against the base  |                       |          |fall on the person using the bar |
+|of the pallet                              |                       |          |PPE must be along with long      |
+|                                           |                       |          |sleeved shirts                   |
+|Environmental:                             |                       |          |                                 |
+|Removal of used rags / gloves/  waste/     |Contamination.         |High      |Place in correct contamination or|
+|glass / cullet                             |Waste removal and tidy |          |waste bins provided.             |
+|                                           |up.                    |          |Ensure area is cleaned and       |
+|                                           |                       |          |product / tools cleared away.    |
+|Protection & Security                      |                       |          |                                 |
+|Demarcation                                |Damage to people,      |High      |Demarcation where applicable.    |
+|                                           |property and           |          |Install barricaded/danger tape as|
+|                                           |environment.           |          |required.                        |
+|                                           |                       |          |Ensure correct fire fighting     |
+|                                           |                       |          |equipment is available.          |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

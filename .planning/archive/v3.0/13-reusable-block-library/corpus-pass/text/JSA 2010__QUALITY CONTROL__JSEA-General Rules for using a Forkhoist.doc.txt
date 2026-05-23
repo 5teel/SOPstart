@@ -1,0 +1,50 @@
+
+Driving a Fork Hoist.
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1            |Hot work          |                  |4                   |Confined Space         |                |
+|JSA Conducted by:               |Additional Procedures/ Equipment       |Controls to be taken                    |
+|F OΓÇÖKeefe                       |Approved certificated Training required|Elimination                             |
+|                                |prior to using a Fork Hoist            |Minimisation                            |
+|                                |                                       |                                        |
+|                                |                                       |Isolation                               |
+|                                |                                       |Engineering                             |
+|                                |                                       |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Hearing, Glasses, Footwear      |Yes                                    |                                        |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |500                                    |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |High                                   |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps |Potential or Actual     |Level of  |Controls to reduce the Risk of Hazard               |
+|                      |Hazard                  |Risk      |                                                    |
+|Mounting or           |Slipping or tripping on |High      |Clean up of floors particularly in high traffic     |
+|dismounting a fork    |the floor               |          |areas                                               |
+|hoist                 |                        |          |                                                    |
+|                      |Back or Shoulder strain |High      |Exercise caution when mounting or dismounting using |
+|                      |from repeated incorrect |          |the three point method to get in and out of the fork|
+|                      |entry and exit and      |          |cab. Careful not to bump head on overhead protective|
+|                      |bumping head on         |          |structure. Hold the support beams for the overhead  |
+|                      |protective structure    |          |structure with both hands, placing the left foot    |
+|                      |                        |          |into the foothold and then pushing off with the     |
+|                      |                        |          |right foot and levering self into the cab           |
+|Applying Seat Belt    |To keep Driver safe in  |High      |Each time the Fork Hoist is about to be operated on |
+|                      |the event of a fork     |          |the Seat belt must be secured into position         |
+|                      |hoist roll over         |          |                                                    |
+|Driving with or       |Pedestrian traffic and  |High      |Slowing down in high traffic areas, waiting and     |
+|without loads         |other vehicles might    |          |sounding horn at all crossings exercising caution   |
+|                      |cross path suddenly     |          |around pedestrians. Observing speed limits          |
+|Raising or lowering   |Leaning and twisting of |High      |Twisting or leaning from the waist not from the neck|
+|forks with or without |the neck in order to see|          |                                                    |
+|loads                 |the load clearly        |          |                                                    |
+|Changing LPG cylinders|this may require        |High      |Using two employees or a mechanical hoist.          |
+|or batteries          |excessive and awkward   |          |                                                    |
+|                      |lifting                 |          |                                                    |

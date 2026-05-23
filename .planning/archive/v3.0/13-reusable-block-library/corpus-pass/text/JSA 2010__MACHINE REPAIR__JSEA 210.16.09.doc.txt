@@ -1,0 +1,110 @@
+
+
+
+    Job Safety Environmental Analysis Form:          Section Box Isolations
+                                                                    &
+                                                                    Removal
+                                                                    of
+                                                                    Associate
+                                                                    d
+                                                                    Component
+                                                                    s
+
+|Area / Department                  |Machine Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|and Safety Boots, welding PPE      |                                      |R. Hogan                                  |
+|required                           |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Stop production and plug |Hot  temperatures.      |High     |Drink water, monitor your personal condition.           |
+|glass.                   |Pedestrian traffic      |         |Barricade area below to stop all traffic.               |
+|-   Working feeder and   |below.                  |         |Wear appropriate PPE ie gloves, hearing protection,     |
+|spout casing             |Hot moulting glass      |         |safety glasses etc.                                     |
+|above the machine.       |Falling objects.        |         |No traffic to sub floor.                                |
+|                         |Burns.                  |         |                                                        |
+|                         |Heat stress.            |         |                                                        |
+|Drive system isolation.  |Entrapment.             |High     |Locked and tagged out.                                  |
+|                         |Lacerations.            |         |                                                        |
+|                         |Abrasions.              |         |                                                        |
+|Removal of feeder        |Falling objects         |         |Drink water, monitor your personal condition            |
+|mechanism.               |Heat stress             |         |Barricade area below to stop all traffic                |
+|Removal of shear         |Entrapment              |         |Electrical isolations lock out and tag                  |
+|mechanism.               |Lacerations             |         |Barricade area below to stop all traffic                |
+|Removal of gob           |Striking                |         |As ahove                                                |
+|distributor.             |Entrapment              |         |                                                        |
+|                         |Lacerations             |         |                                                        |
+|Removal of delivery      |Striking                |         |Clean area before starting work                         |
+|troughs and              |Sprains                 |         |Wear protective footwear in good condition              |
+|Deflectors.              |Strains                 |         |Wear appropriate gloves to protect your hands           |
+|                         |Lacerations             |         |Work as a team, ie to pass items to                     |
+|Removal of blank and     |Manual handling         |         |Lock out and tag as required                            |
+|mould                    |Cuts and burns          |         |Machine to be cleaned prior to starting                 |
+|side auxiliary equipment.|                        |         |Appropriate lifting devices to be used                  |
+|Removal of cylinder both |As above                |         |As above                                                |
+|sides.                   |                        |         |                                                        |
+|Isolation of low and high|Lacerations             |         |Air to be isolated and tagged as required               |
+|pressure                 |Abrasions               |         |                                                        |
+|air supply.              |                        |         |                                                        |
+|Isolated the following   |Lacerations             |         |Isolated and de-energise all air and hydraulic supplies,|
+|Pilot air supply         |Striking                |         |lock out and tag                                        |
+|Oil lubrication          |Entrapment              |         |                                                        |
+|Constant cushioning      |                        |         |                                                        |
+|Hydraulics               |                        |         |                                                        |
+|Isolate the following    |As above                |         |Electrical lock out and tag                             |
+|Machine cooling          |                        |         |                                                        |
+|Conveyor                 |                        |         |                                                        |
+|Stannic lines            |                        |         |                                                        |
+|Shear water              |                        |         |                                                        |
+|Removal of mould side    |Falls                   |         |Covers to be placed over holes and secured              |
+|cullet chute             |Trips                   |         |                                                        |
+|                         |Sprains                 |         |                                                        |
+|Removal of auxiliary     |Crushing                |         |Electrically isolate, lock out and tag the long conveyor|
+|equipment                |Entanglement            |         |at the main motor control panel.                        |
+|mould side               |Lacerations             |         |Use appropriate lifting devices                         |
+|                         |Abrasions               |         |Area to be cordoned off and barricaded                  |
+|Removal of long conveyor |As above                |         |As above                                                |
+|auxiliary equipment      |                        |         |                                                        |
+|Removal of airlines to   |Lacerations             |         |Machine to be cleaned of excess cullet                  |
+|section                  |Abrasions               |         |Planks to be in place                                   |
+|boxes                    |Tripping                |         |Appropriate gloves to be worn                           |
+|                         |Slipping                |         |Cordon off and restrict access below                    |
+|Blank side removal of    |Manual handling         |         |Use correct manual handling techniques                  |
+|floor plates             |Lacerations             |         |Use appropriate lifting devise                          |
+|                         |Slippage                |         |Use planks to cover up holes                            |
+|                         |Trips and falls         |         |Keep area clean                                         |
+|                         |                        |         |Area to be cordoned off and barricaded                  |
+|Removal of oil lines to  |As above                |         |As above                                                |
+|section                  |                        |         |                                                        |
+|boxes                    |                        |         |                                                        |
+|Removal of airlines      |As above                |         |As above                                                |
+|Make sure the work area  |As above                |         |As above                                                |
+|is clean and made safe   |                        |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

@@ -1,0 +1,38 @@
+
+Using the Plunger Polisher
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|All standard safety equipment   |Yes                                    |Gary Russell 18/7/07                    |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |30                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps           |Potential /               |Level of    |Controls to reduce the Risk of Hazard   |
+|                                |Actual Hazard             |Risk        |                                        |
+|Turn on power and air supply    |Electric shock Bust air   |Low         |Check electrical switches look in good  |
+|                                |lines                     |            |condition Check air lines for leaks and |
+|                                |                          |            |correctly fitted                        |
+|Insert plunger in chuck         |Entrapment of fingers     |Low         |Hold fingers clear of moving parts when |
+|                                |Crushing                  |            |offering plunger into chuck             |
+|Turn on Chuck                   |Entrapment of fingers     |Low         |Air supply will automatically engage    |
+|                                |Crushing                  |            |chuck before rotation starts ΓÇô If not,  |
+|                                |                          |            |this is a machine fault and needs to be |
+|                                |                          |            |reported                                |
+|Polish plunger                  |Entrapment of fingers     |Low         |Do not wrap emery around plunger Do not |
+|                                |                          |            |apply to much pressure to plunger when  |
+|                                |                          |            |rotating                                |
+|Remove plunger                  |Entrapment of fingers     |Low         |Rotation will stop before plunger is    |
+|                                |Crushing Falling parts    |            |released by chuck ΓÇô If not, this is a   |
+|                                |                          |            |machine fault and needs to be reported  |
+|                                |                          |            |Hold fingers clear of moving parts when |
+|                                |                          |            |removing plunger form chuck             |

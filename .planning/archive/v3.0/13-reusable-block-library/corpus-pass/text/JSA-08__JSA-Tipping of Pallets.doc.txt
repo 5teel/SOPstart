@@ -1,0 +1,42 @@
+
+Preparation for Tipping of Pallets
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                   |Safety Induction [Contractor]     |                                        |
+|PPE Required:                       |Significant Hazard                |JSA Reviewed by and date                |
+|Safety Glasses / gloves / boots / hi|Yes                               |Gary OΓÇÖNeill                            |
+|viz / ear protection / hard hat or  |                                  |Mate Pochnich                           |
+|cap                                 |Risk Score                        |Glenn Stempher                          |
+|                                    |80                                |                                        |
+|                                    |                                  |                                        |
+|                                    |Category                          |                                        |
+|                                    |Medium                            |                                        |
+|                                    |                                  |                                        |
+|                                    |Control taken                     |                                        |
+|                                    |Minimisation                      |                                        |
+|                                    |                                  |                                        |
+|Sequence of Job Steps               |Potential /              |Level of |Controls to reduce the Risk of Hazard   |
+|                                    |Actual Hazard            |Risk     |                                        |
+|Check condition of pallet           |If it is rotten it will  |Medium   |Visual inspection. If rotten do not     |
+|                                    |collapse                 |         |strip shroud or tip pallet              |
+|Visual inspection of pedestrian     |Loss of fluid may cause  |Low      |Check equipment                         |
+|hoist                               |malfunction              |         |                                        |
+|Move pallet with pedestrian hoist so|Collision with someone or|Low      |Move pallet with care & attention. Only |
+|that you have access to all 4 sides |something                |         |ONE pallet should be moved using the    |
+|                                    |                         |         |pedestrian hoist-  (more than one , then|
+|                                    |                         |         |use Fork hoist)                         |
+|Raise pallet approx one metre from  |Collapse                 |Medium   |Previous checks should suffice          |
+|ground                              |                         |         |                                        |
+|Using a sharp knife cut around the  |Laceration               |Medium   |PPE to be worn                          |
+|1st layerboard on the pallet to     |                         |         |                                        |
+|remove plastic shroud               |                         |         |                                        |
+|Lower pallet back down to ground    |                         |Low      |Use normal care when using Fork or      |
+|using a hoist                       |                         |         |pedestrian  Hoist                       |
+|Cut & remove rest of plastic shroud |Laceration               |Low      |PPE to be worn                          |
+|Discard plastic in bin provided     |Slipping on waste if left|Low      |Environmental reuse of the plastic      |
+|                                    |on ground                |         |                                        |
+|Move de shrouded pallet to holding  |Bottles falling from     |Medium   |Move pallet with care & attention.      |
+|area, awaiting processing           |pallet & breaking causing|         |                                        |
+|                                    |injury                   |         |                                        |

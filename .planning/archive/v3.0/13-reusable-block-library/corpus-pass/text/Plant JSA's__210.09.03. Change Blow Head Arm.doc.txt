@@ -1,0 +1,121 @@
+
+|HAZARD IDENTIFICATION                                                                                         |
+
+|Risk of Entrapment          |X   |Ventilation                |     |
+|Pinch Points                |X   |Fire Hazard                |     |
+|Moving Parts                |X   |Fragile roof support       |     |
+|Rotating Parts              |    |Lighting                   |     |
+|Cutting                     |    |Isolated workplace location|     |
+|Moving Machinery            |X   |Work above 3 metres        |     |
+|Automatic equipment         |    |Pressurised Fluid          |     |
+|Manual Handling             |X   |Spill to site drainage     |     |
+|Risk of falling objects     |    |Spill to Stormwater        |     |
+|Excessively hot environment |X   |Odour or Emissions         |     |
+|Noise                       |X   |Soil Contamination         |     |
+|Slippery surface            |X   |Airborne Contaminants      |     |
+|Tripping hazard             |X   |Electricity [Power Tools]  |     |
+|Confined Space              |    |Stored energy              |X    |
+|Broken or smashed glass     |X   |Electrocution              |     |
+|Limited working area        |    |Risk of person falling     |X    |
+
+|Hard Hat                    |     |
+|Gloves                      |X    |
+|Breathing Apparatus         |     |
+|Goggles                     |     |
+|Hearing protection          |X    |
+|Fire Extinguisher           |     |
+|Safety Glasses              |X    |
+|Back Support belt           |X    |
+|Face Shield                 |     |
+|Disposable Clothing         |     |
+|Harness                     |     |
+|MSDS                        |     |
+|Spill Kit                   |     |
+|Bunding                     |     |
+|Council / OSH Notification  |     |
+|Warning signs to be         |     |
+|displayed                   |     |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+|NOTES              PERMITS COMPLETD                                                                           |
+
+|Work at Heights              |    |
+|High Voltage                 |    |
+|Hot work                     |    |
+|Confined Space               |    |
+|Excavation                   |    |
+|Permit to work completed     |    |
+
+|                                                                  |
+|                                                                  |
+|                                                                  |
+
+
+
+
+|HAZARD MATRIX                                                                                                 |
+|                  |CONSEQUENCES                            The severity of potential consequences             |
+|                                    |Insignificant                                |
+|LIKELIHOOD                          |First aid injury, up to $1,000 damage, spill |
+|                                    |confined to immediate work area, rapid clean |
+|How likely is it to happen?         |up, no damage to environment                 |
+|4                                   |ACT NOW ΓÇô Urgent ΓÇô do something about the    |
+|ACUTE                               |risks immediately. Requires immediate        |
+|                                    |attention.                                   |
+|3                                   |Highest management decision is required      |
+|HIGH                                |urgently                                     |
+|2                                   |Follow management instruction                |
+|MODERATE                            |                                             |
+|1                                   |OK for now. Record and review if any         |
+|LOW                                 |equipment / people / materials / work        |
+|                                    |processes or procedures change               |
+
+|Hazard Management Worksheet                                                                                           |
+|Hazard Identification                                                                                          |
+|Department     |Forming            |JSA Conducted by: D Westerlund             |Date completed   01.05.2010    |
+|Overview of the Hazard                                                                                         |
+|Significant Hazard                                                                                             |
+|Yes                                                                                                            |
+|                                                                                                               |
+|Risk                                                                                                           |
+|MEDIUM                                                                                                         |
+|                                                                                                               |
+|Control taken                                                                                                  |
+|Minimisation                                                                                                   |
+|                                                                                                               |
+|                                                                                                               |
+|PPE Required:  All standard PPE required when working    |JSA Reviewed by and date                             |
+|within production area                                   |Joe Rolleston 04.09.2019                             |
+|Sequence of Job Steps         |Potential / Actual Hazard   |Level of   |Controls to reduce the Risk of Hazard  |
+|                              |                            |Risk       |                                       |
+|                              |                            |H M L      |                                       |
+|Get spare blowhead arm from   |Strains                     |L          |PPE                                    |
+|cabinet and dummy set up      |                            |           |                                       |
+|b/heads                       |                            |           |                                       |
+|Stop section per JSA          |                            |L          |PPE                                    |
+|Close moulds/blowhead down    |                            |L          |PPE                                    |
+|Be aware of hot bottles       |Burn                        |M          |Use tunnel or mould side platform      |
+|passing beneath you on the    |                            |           |                                       |
+|conveyor                      |                            |           |                                       |
+|Take hose off at blowhead arm |Strains, burns, cuts, moving|M          |Tools                                  |
+|                              |machinery                   |           |                                       |
+|Remove blowhead arm           |ΓÇ£                           |M          |Tools                                  |
+|Put on blowhead arm with set  |ΓÇ£                           |M          |Tools                                  |
+|up dummies/tighten            |                            |           |                                       |
+|Re-start section per JSA      |                            |M          |                                       |
+|Old blowhead arm on used gear |                            |L          |                                       |
+|trolley                       |                            |           |                                       |

@@ -1,0 +1,46 @@
+
+Repair 34 Down Ware Chute
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                              |Safety Induction [Contractor]         |                                            |
+|PPE Required:                  |Significant Hazard                    |JSEA Reviewed by and date                   |
+|All standard PPE required      |Yes                                   |C Sheppard                                  |
+|                               |                                      |                                            |
+|                               |Risk Score                            |                                            |
+|                               |100                                   |                                            |
+|                               |                                      |                                            |
+|                               |Category                              |                                            |
+|                               |Low                                   |                                            |
+|                               |                                      |                                            |
+|                               |Control taken                         |                                            |
+|                               |Minimisation                          |                                            |
+|                               |                                      |                                            |
+|Sequence of Job Steps    |Potential /                          |Level of  |Controls to reduce the Risk of Hazard   |
+|                         |Actual Hazard                        |Risk      |                                        |
+|Broken or smashed glass  |                                     |Medium    |Clean up area, use RCD                  |
+|shock                    |                                     |          |                                        |
+|Install plate            |Slips, falling glass                 |Medium    |Clean area down where possible. Wear    |
+|                         |                                     |          |hard hat                                |
+|Install plate            |Ensure no bottle access from required|Medium    |Install plate across chute              |
+|                         |shute                                |          |                                        |
+|Install plate            |Ensure no water coming down shute    |Medium    |Turn off all valves                     |
+|Weld up plate            |Hot Sparks and  Welding flash, burns |Medium    |Fire equipment available, screens, wear |
+|                         |                                     |          |appropriate PPE                         |
+|Environmental:           |                                     |          |                                        |
+|Removal of used rags /   |Contamination.                       |High      |Place in correct contamination or waste |
+|gloves/  waste/ glass /  |Waste removal and tidy up.           |          |bins provided.                          |
+|cullet                   |                                     |          |Ensure area is cleaned and product /    |
+|                         |                                     |          |tools cleared away.                     |
+|Protection & Security    |                                     |          |                                        |
+|Demarcation              |Damage to people, property and       |High      |Demarcation where applicable.           |
+|                         |environment.                         |          |Install barricaded/danger tape as       |
+|                         |                                     |          |required.                               |
+|                         |                                     |          |Ensure correct fire fighting equipment  |
+|                         |                                     |          |is available.                           |
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

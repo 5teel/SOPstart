@@ -1,0 +1,58 @@
+
+#21 Blank Change 330ml
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                  |Safety Induction [Contractor]         |                                          |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Boots, gloves, uniform, safety     |Yes                                   |                                          |
+|glasses, ear muffs, (protection    |                                      |July 2007                                 |
+|sleeves, back support ΓÇô optional)  |Risk Score                            |                                          |
+|                                   |100                                   |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |Medium                                |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |Minimisation                          |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Stop Section:-           |Making section safe to  |High     |Stop Neck ring arms in the inverted position, using the |
+|Follow Stopping Section  |prevent entrapment      |         |E Stop Button.                                          |
+|refer  JSEA 219.01.02    |                        |         |                                                        |
+|Manual Operation         |Caught in Section.      |High     |Switch to manual operation                              |
+|Safety lock outs for     |Reduce the risk of being|High     |Blank close safety lock activated                       |
+|blanks                   |caught in the section   |         |                                                        |
+|Invert safety bar        |Reduce the risk of being|High     |Place Invert safety lock over Invert rack so that lock  |
+|                         |caught in the section   |         |sits down on the top of the invert mechanism            |
+|Prepare Blanks for       |Back Strain             |High     |Fit tee screw lifters to the blanks or use thick gloves |
+|Lifting.                 |                        |         |to lift the Blank from the hinge.                       |
+|Remove Blanks            |Caught in Section. /    |High     |Get into a comfortable lifting position that suits.     |
+|                         |Back strain             |         |Reducing lowering and twisting. And remove Blanks       |
+|Fit clean blanks         |Caught in Section. /    |High     |Get into a comfortable lifting position that suits.     |
+|                         |Back strain             |         |Reducing lowering and twisting. And refit Blanks        |
+|Prepare Section to start.|Caught in Section.      |High     |Disengage Blank close safety lock and remove Invert     |
+|                         |                        |         |safety block.                                           |
+|Follow starting a section|Caught in Section.      |High     |Ensure all personnel are clear of the section.  Start   |
+|procedure JSEA  219.01.01|                        |         |the section up                                          |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+
+                                                     -----------------------
+[pic]
+
+O-I New Zealand
+

@@ -1,0 +1,80 @@
+
+
+
+  Job Safety Environmental Analysis Form:
+                                                                        Installati
+                                                                        on
+                                                                        of
+                                                                        Lehr
+
+|Area / Department                  |Machine Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots, welding PPE required.|                                      |                                          |
+|                                   |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Align and position first |Synthetic mineral fibre.|High     |Ensure fire fighting equipment is on hand.              |
+|firing section.          |Dust and rust.          |         |Observe PPE requirements, including dust masks.         |
+|insert bottom belt       |Grinding / oxy cutting. |         |Refer to JSEAΓÇÖs for Grinding / Oxy Cutting / Cranes &   |
+|place tow rope for top   |Rigging / crane         |         |Rigging.                                                |
+|belt                     |operations.             |         |See procure for SMF.                                    |
+|drilling concrete        |Using power tools.      |         |                                                        |
+|level section.           |Pinch points.           |         |                                                        |
+|Align and position all   |As per above.           |High     |As per above.                                           |
+|other firing sections.   |                        |         |                                                        |
+|insert and join bottom   |                        |         |                                                        |
+|belt                     |                        |         |                                                        |
+|place tow rope for top   |                        |         |                                                        |
+|belt                     |                        |         |                                                        |
+|drilling concrete        |                        |         |                                                        |
+|level each section.      |                        |         |                                                        |
+|Check internal level of  |                        |         |Follow Confined Space procedure.                        |
+|all firing sections.     |                        |         |                                                        |
+|adjust sections as       |                        |         |                                                        |
+|required.                |                        |         |                                                        |
+|Install top belt in      |Weight of belt.         |         |Use mechanical device to draw belt through top section. |
+|firing sections only.    |Pinch points and sharp  |         |                                                        |
+|                         |edges.                  |         |                                                        |
+|Align and install Cold   |Grinding / oxy cutting. |High     |Ensure fire fighting equipment is on hand.              |
+|End sections.            |Rigging / crane         |         |Observe PPE requirements, including dust masks.         |
+|-  align tri level quad. |operations.             |         |Refer to JSEAΓÇÖs for Grinding / Oxy Cutting / Cranes &   |
+|                         |Using power tools.      |         |Rigging.                                                |
+|                         |Pinch points.           |         |                                                        |
+|Install belt drive       |Restricted working area.|High     |Ensure fire fighting equipment is on hand.              |
+|mechanism.               |Using power tools.      |         |Observe PPE requirements, including dust masks.         |
+|                         |Pinch points.           |         |Refer to JSEAΓÇÖs for Grinding / Oxy Cutting / Cranes &   |
+|                         |Rigging / crane         |         |Rigging.                                                |
+|                         |operations.             |         |                                                        |
+|Install electrics.       |Electric shock.         |High     |Follow commissioning procedure.                         |
+|Install gas lines.       |Asphyxiation.           |High     |Follow commissioning procedure.                         |
+|                         |Uncontrolled release of |         |                                                        |
+|                         |gas.                    |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

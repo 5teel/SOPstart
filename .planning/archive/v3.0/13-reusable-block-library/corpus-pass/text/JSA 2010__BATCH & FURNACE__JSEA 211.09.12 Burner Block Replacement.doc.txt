@@ -1,0 +1,72 @@
+
+Burner Block Replacement
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSEA Reviewed by and date                   |
+|All standard PPE required     |Yes                                  |                                            |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |750                                  |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |High                                 |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps               |Potential /                   |Level of  |Controls to reduce the Risk of   |
+|                                    |Actual Hazard                 |Risk      |Hazard                           |
+|Set value of floor and crown        |Glass quality issues          |Low       |Process engineer to monitor      |
+|temperature to be increased 5 ΓÇô 10  |                              |          |during shift                     |
+|deg c overnight to ensure melting   |                              |          |                                 |
+|conditions are maintained           |                              |          |                                 |
+|All persons involved to liaise at   |Bodily injury in various forms|High      |Process engineers and supervision|
+|all times to ensure safety          |                              |          |to monitor process constantly    |
+|Isolate reversal, shut off gas on   |Heat exposure, hot flames,    |High      |Supervision, observe for fires.  |
+|required port, close trimming valve,|trip hazards, loss of body    |          |Fire equipment at hand.          |
+|this operation should be done by the|fluids.                       |          |                                 |
+|individual that carries out the work|                              |          |                                 |
+|so he and he only has the key to    |                              |          |                                 |
+|start reversal.                     |                              |          |                                 |
+|Set up suitable platform, ensure    |Fall hazards, hot brickwork   |High      |As above and put barriers under  |
+|platform below is free of fire      |falling - all the above       |          |furnace to stop acsess under     |
+|hazards. Ensure personnel do not    |                              |          |furnace.                         |
+|walk under furnace platform at this |                              |          |                                 |
+|time.                               |                              |          |                                 |
+|Remove burner and bracket and clean |All the above                 |High      |Supervision, observe for fires   |
+|ready for re-installation           |                              |          |fire equipment at hand.          |
+|Remove worn burner block, clean     |Burn injury and all the above |High      |Supervision, observe for fires,  |
+|burner hole and port floor of debris|                              |          |watch for falling debris.        |
+|and batch build up                  |                              |          |                                 |
+|Reinstall new burner block, seal    |Burn injury and all the above |High      |Supervision observes for fires,  |
+|around joint with wool and          |                              |          |watch for falling debris.        |
+|refractories.                       |                              |          |                                 |
+|Reinstall burner and bracket, seal  |As above                      |High      |As above                         |
+|burner                              |                              |          |                                 |
+|Open trimming valves, unlock        |As above                      |High      |Supervision                      |
+|reversal lock out.                  |                              |          |                                 |
+|Check for any gas leaks on burner   |As above                      |High      |Supervision                      |
+|and burner block, check flame       |                              |          |                                 |
+|through ip block.                   |                              |          |                                 |
+|Environmental:                      |                              |          |                                 |
+|Removal of used rags / gloves/      |Contamination.                |High      |Place in correct contamination or|
+|waste/ glass / cullet               |Waste removal and tidy up.    |          |waste bins provided.             |
+|                                    |                              |          |Ensure area is cleaned and       |
+|                                    |                              |          |product / tools cleared away.    |
+|Protection & Security               |                              |          |                                 |
+|Demarcation                         |Damage to people, property and|High      |Demarcation where applicable.    |
+|                                    |environment.                  |          |Install barricaded/danger tape as|
+|                                    |                              |          |required.                        |
+|                                    |                              |          |Ensure correct fire fighting     |
+|                                    |                              |          |equipment is available.          |
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+

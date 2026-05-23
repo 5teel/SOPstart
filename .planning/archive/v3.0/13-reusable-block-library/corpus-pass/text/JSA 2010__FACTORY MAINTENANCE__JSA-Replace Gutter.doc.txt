@@ -1,0 +1,39 @@
+
+Replacing Roof Guttering
+                            HAZARD IDENTIFICATION
+
+|1                                                                         |
+|1                                                                         |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Standard PPE. / Fall Arrest     |Yes                                    |F OΓÇÖKeefe  11/06/07                     |
+|Equipment = Harness/ Ropes      |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |1000                                   |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |High                                   |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard              |
+|                         |Actual Hazard           |Risk     |                                                   |
+|Check all safety gear    |Out of date damage      |Low      |Check each time to ensure that all harnesses and   |
+|                         |                        |         |other equipment is compliant and safe to use.      |
+|Scissor lift  for access |Faulty, risk of         |High     |Ensure that prior to using the Scissor Lift that   |
+|                         |personnel falling       |         |the checks are completed. Follow procedures top    |
+|                         |                        |         |ensure that the work area does not create any      |
+|                         |                        |         |hazards for other employees                        |
+|Place safety barrier     |Risk of falling         |High     |Secure the area from others                        |
+|around area if risk of   |                        |         |                                                   |
+|others entering the area |                        |         |                                                   |
+|Put on safety harness    |Falling                 |High     |Connect tie to purlin/anchor point to prevent      |
+|                         |                        |         |falling                                            |
+|Remove gutter            |Falling objects slipping|High     |Remain with all safety equipment attached and no   |
+|                         |                        |         |waste is dropped causing hazard to others          |
+|Fit new gutter           |Falling objects slipping|High     |Remain with all safety equipment attached and no   |
+|                         |                        |         |waste is dropped causing hazard to others          |
+|Reverse of the above     |                        |         |                                                   |
+|Discard waste to correct |None                    |Low      |Nil                                                |
+|waste bin                |                        |         |                                                   |

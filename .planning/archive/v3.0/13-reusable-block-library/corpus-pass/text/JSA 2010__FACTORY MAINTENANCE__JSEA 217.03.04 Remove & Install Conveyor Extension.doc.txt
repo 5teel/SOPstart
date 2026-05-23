@@ -1,0 +1,61 @@
+
+
+
+Job Safety Environmental Analysis Form:          Remove & Install Conveyor
+                                                              Extension
+
+|Area / Department                  |Factory Maintenance                   |Task  or Job Description                  |
+|                                   |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Recommended Personal Protective    |                                      |                                          |
+|Equipment                          |                                      |                                          |
+|Gloves, Safety Glasses, Ear Muffs, |Risk Score                            |                                          |
+|Safety Boots, High Vis Garment,    |                                      |                                          |
+|Respiratory Protection (when       |                                      |                                          |
+|working with asbestos).            |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Prepare work site.       |Manual Handling         |Medium   |Use correct manual handling techniques.                 |
+|Isolate electrics.       |Electrocution.          |High     |Ensure isolation has been done on the Group Isolation   |
+|                         |                        |         |Board.                                                  |
+|Disconnect lube piping.  |Uncontrolled escape of  |High     |Check and shut off oil line at machine end.             |
+|                         |oil.                    |         |Be aware of nearest spill kit location in case of spill.|
+|Remove conveyor ΓÇô use    |Load size.              |Medium   |Forklift to use spotter when removing conveyor.  Good   |
+|forklift.                |                        |         |communications when removing.                           |
+|Clean down conveyor area.|Splash with detergent.  |Low      |Wear appropriate PPE.                                   |
+|                         |Broken glass / sharp    |         |Sweep area for broken glass.                            |
+|                         |edges.                  |         |                                                        |
+|Install conveyor ΓÇô use   |Load size / pinch points|Low      |Forklift to use Spotter when removing conveyor. Good    |
+|forklift.                |/ jammed fingers.       |         |communications when positioning.                        |
+|Set up conveyor and bolt |Pinch points / jammed   |Medium   |Good communications when moving conveyor.               |
+|down.                    |fingers.                |         |Use correct tools.                                      |
+|                         |Drilling concrete /     |         |Ensure RCD is used on electrical leads.                 |
+|                         |foreign body in eyes.   |         |                                                        |
+|                         |Using hand tools.       |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

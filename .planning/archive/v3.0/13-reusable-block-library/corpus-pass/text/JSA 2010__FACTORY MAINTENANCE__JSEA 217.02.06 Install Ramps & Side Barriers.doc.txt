@@ -1,0 +1,47 @@
+
+Install ramps & side barriers to lift entry way
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                            |Safety Induction [Contractor]        |X                                           |
+|PPE Required:                |Significant Hazard                   |JSEA Reviewed by and date                   |
+|All standard PPE required    |Yes                                  |                                            |
+|                             |                                     |                                            |
+|                             |Risk Score                           |                                            |
+|                             |30                                   |                                            |
+|                             |                                     |                                            |
+|                             |Category                             |                                            |
+|                             |Low                                  |                                            |
+|                             |                                     |                                            |
+|                             |Control taken                        |                                            |
+|                             |Minimisation                         |                                            |
+|                             |                                     |                                            |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Preparation                  |Nil                           |Low      |Ensure Hot Work Permit documentation     |
+|                             |                              |         |completed                                |
+|Weld Ramps down angle        |Fire from welding. Arc eye    |Low      |Follow equipments of Hot Work Permit.    |
+|                             |from welding                  |         |Place Welding screens into position      |
+|Drill and tap angles         |Broken tap or drills          |Low      |Ensure PPE in use to prevent lacerations |
+|Install plate                |Entrapment. Back injury       |Low      |Use PPE and back brace if required. Using|
+|                             |                              |         |correct lifting gear plus 2 man task     |
+|Side barriers weld on        |Entrapment. Back injury       |Low      |Use PPE and back brace if required. Using|
+|channels                     |                              |         |correct lifting gear plus 2 man task     |
+|Dina bolt down posts         |Electrocution                 |Low      |Use RCD on all electrical equipment      |
+|Ramp and barrier all         |Electrocution                 |Low      |Use RCD on all electrical equipment      |
+|electrical work              |                              |         |                                         |
+|Environmental:               |                              |         |                                         |
+|Removal of used rags /       |Contamination.                |High     |Place in correct contamination or waste  |
+|gloves/  waste/ glass /      |Waste removal and tidy up.    |         |bins provided.                           |
+|cullet                       |                              |         |Ensure area is cleaned and product /     |
+|                             |                              |         |tools cleared away.                      |
+|Protection & Security        |                              |         |                                         |
+|Demarcation                  |Damage to people, property and|High     |Demarcation where applicable.            |
+|                             |environment.                  |         |Install barricaded/danger tape as        |
+|                             |                              |         |required.                                |
+|                             |                              |         |Ensure correct fire fighting equipment is|
+|                             |                              |         |available.                               |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

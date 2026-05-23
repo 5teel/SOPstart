@@ -1,0 +1,65 @@
+
+Use of CAMSENSOR Metrology unit
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                          |Safety Induction [Contractor]             |                                             |
+|PPE Required:              |Significant Hazard                        |JSEA Reviewed by and date                    |
+|Safety Glasses             |Yes                                       |Rey Basabas  11/06/07                        |
+|                           |                                          |                                             |
+|                           |Risk Score                                |                                             |
+|                           |40                                        |                                             |
+|                           |                                          |                                             |
+|                           |Category                                  |                                             |
+|                           |Low                                       |                                             |
+|                           |                                          |                                             |
+|                           |Control taken                             |                                             |
+|                           |Minimisation                              |                                             |
+|                           |                                          |                                             |
+|Sequence of Job Steps                               |Potential /        |Level of Risk      |Controls to reduce the  |
+|                                                    |Actual Hazard      |                   |Risk of Hazard          |
+|Note THIS EQUIPMENT EMITS RAPID PULSATING LIGHT.    |Rapid light pulses |Low                |Anyone prone to reaction|
+|ANYONE PRONE TO REACTION TO THIS TYPE OF LIGHT      |                   |                   |eg epilepsy should check|
+|SOURCE SHOULD CONSULT WITH QA  / HEALTH & SAFETY    |                   |                   |with health professional|
+|MANAGER BEFORE USE                                  |                   |                   |/ management first      |
+|Collect containers to be tested                     |Laceration from    |Low                |Ensure all PPE is worn  |
+|                                                    |broken glass       |                   |to prevent injury to    |
+|                                                    |                   |                   |self                    |
+|Place calibration container in universal holder &   |None               |Low                |Nil                     |
+|start measurement sequence NB Results should be     |                   |                   |                        |
+|checked for accuracy before continuing with sample  |                   |                   |                        |
+|set                                                 |                   |                   |                        |
+|Following keypad menu Enter job details as          |None               |Low                |Nil                     |
+|prescribed                                          |                   |                   |                        |
+|Enter set details as prescribed                     |None               |Low                |Nil                     |
+|Select first container to test & place in holder    |None               |Low                |Nil                     |
+|Set camera height so that finish is in the camera   |None               |Low                |Nil                     |
+|range                                               |                   |                   |                        |
+|Start Finish measurement - reset                    |None               |Low                |Nil                     |
+|Start S measurement - reset                         |None               |Low                |Nil                     |
+|Zero digital height gauge & wind down to required   |None               |Low                |Nil                     |
+|distance as per ware specifications & start Y       |                   |                   |                        |
+|measurement                                         |                   |                   |                        |
+|Repeat steps for further testing ( ensuring that the|None               |Low                |Nil                     |
+|height assembly is raised back to the correct height|                   |                   |                        |
+|before starting Finish measurements again ) Record  |                   |                   |                        |
+|results                                             |                   |                   |                        |
+|Discard containers after testing                    |Laceration         |Low                |Ensure all PPE is worn  |
+|Environmental:                                      |                    |         |                                 |
+|Removal of used rags / gloves/  waste/ glass /      |Contamination.      |High     |Place in correct contamination or|
+|cullet                                              |Waste removal and   |         |waste bins provided.             |
+|                                                    |tidy up.            |         |Ensure area is cleaned and       |
+|                                                    |                    |         |product / tools cleared away.    |
+|Protection & Security                               |                    |         |                                 |
+|Demarcation                                         |Damage to people,   |High     |Demarcation where applicable.    |
+|                                                    |property and        |         |Install barricaded/danger tape as|
+|                                                    |environment.        |         |required.                        |
+|                                                    |                    |         |Ensure correct fire fighting     |
+|                                                    |                    |         |equipment is available.          |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

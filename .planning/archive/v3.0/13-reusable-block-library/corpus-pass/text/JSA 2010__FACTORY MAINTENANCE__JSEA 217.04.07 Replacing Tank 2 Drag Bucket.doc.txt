@@ -1,0 +1,46 @@
+
+Replacing Tank 2 Drag Bucket
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                           |Safety Induction [Contractor]           |                                             |
+|PPE Required:               |Significant Hazard                      |JSEA Reviewed by and date                    |
+|All standard PPE required   |Yes                                     |                                             |
+|                            |                                        |                                             |
+|                            |Risk Score                              |                                             |
+|                            |40                                      |                                             |
+|                            |                                        |                                             |
+|                            |Category                                |                                             |
+|                            |Low                                     |                                             |
+|                            |                                        |                                             |
+|                            |Control taken                           |                                             |
+|                            |Minimisation                            |                                             |
+|                            |                                        |                                             |
+|Sequence of Job Steps       |Potential /                   |Level of |Controls to reduce the Risk of Hazard        |
+|                            |Actual Hazard                 |Risk     |                                             |
+|Shut down and isolate       |Moving machinery              |High     |Follow Isolation Procedure plus Drag         |
+|                            |                              |         |Procedures                                   |
+|Disconnect bucket           |Entrapment, crushing falling, |High     |Attach lifting equipment. Ensure area is     |
+|                            |slipping                      |         |clear so not chance of tripping over rubbish |
+|Remove bucket               |Entrapment, crushing falling, |High     |Use certified lifting equipment. Employees to|
+|                            |slipping                      |         |stand clear                                  |
+|Install new bucket          |Entrapment, crushing falling, |High     |Use certified lifting equipment. Employees to|
+|                            |slipping                      |         |stand clear Attach lifting equipment. Ensure |
+|                            |                              |         |area is clear so not chance of tripping over |
+|                            |                              |         |rubbish                                      |
+|Environmental:              |                              |         |                                             |
+|Removal of used rags /      |Contamination.                |High     |Place in correct contamination or waste bins |
+|gloves/  waste/ glass /     |Waste removal and tidy up.    |         |provided.                                    |
+|cullet                      |                              |         |Ensure area is cleaned and product / tools   |
+|                            |                              |         |cleared away.                                |
+|Protection & Security       |                              |         |                                             |
+|Demarcation                 |Damage to people, property and|High     |Demarcation where applicable.                |
+|                            |environment.                  |         |Install barricaded/danger tape as required.  |
+|                            |                              |         |Ensure correct fire fighting equipment is    |
+|                            |                              |         |available.                                   |
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

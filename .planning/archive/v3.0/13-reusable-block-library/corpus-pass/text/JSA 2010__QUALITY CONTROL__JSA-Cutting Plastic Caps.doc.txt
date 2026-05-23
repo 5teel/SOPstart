@@ -1,0 +1,42 @@
+
+Cutting Plastic Caps
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Hi Viz Clothing  / Gloves /     |Yes                                    |Gary OΓÇÖNeill   14/06/07                 |
+|Safety Glasses                  |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |50                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |LOW                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                 |Potential /                  |Level of  |Controls to reduce the Risk of   |
+|                                      |Actual Hazard                |Risk      |Hazard                           |
+|Lift & position plastic roll onto     |Sprain / strain from lifting |Low       |Ask for assistance when required |
+|guillotine table                      |                             |          |                                 |
+|Feed plastic roll through guillotine  |Entrapment of part of body   |Low       |Training                         |
+|assembly ensuring that both ends of   |Falling from the need to     |          |                                 |
+|the shaft  secure the roll in position|climb onto guillotine table  |          |                                 |
+|                                      |to feed plastic through ΓÇô 1  |          |                                 |
+|                                      |metre high                   |          |                                 |
+|Turn on power to hot wire, lift & hold|Burn                         |Low       |PPE                              |
+|bar to unwind plastic film.           |                             |          |                                 |
+|Releasing the bar will stop the       |Nil                          |Low       |Nil                              |
+|plastic  unwinding ( cut to approx    |                             |          |                                 |
+|1500mm  length )                      |                             |          |                                 |
+|On control panel at the guillotine    |Nil                          |Low       |Ensure hands are free from any   |
+|press the button to engage the hot    |                             |          |entrapment                       |
+|wire & blade in order to both cut &   |                             |          |                                 |
+|seal bag                              |                             |          |                                 |
+|Continue process to desired quantity  |Nil                          |Low       |Nil                              |
+|The bags are deposited into meshed    |Sprain / strain from manual  |Low       |PPE                              |
+|cage &                                |handling.                    |          |                                 |
+|Transported to the audit station when |Vehicle collision            |Medium    |Follow all required FH & site    |
+|required                              |                             |          |procedures                       |

@@ -1,0 +1,52 @@
+
+FP Sampling
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                           |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date:                 |
+|ALL                             |Yes                                    |Bronwyn Bell                               |
+|                                |                                       |                                           |
+|                                |Risk Score                             |                                           |
+|                                |60                                     |                                           |
+|                                |                                       |                                           |
+|                                |Category                               |                                           |
+|                                |Low                                    |                                           |
+|                                |                                       |                                           |
+|                                |Control taken                          |                                           |
+|                                |Minimisation                           |                                           |
+|                                |                                       |                                           |
+|Sequence of Job Steps           |Potential /                 |Level of  |Controls to reduce the Risk of Hazard      |
+|                                |Actual Hazard               |Risk      |                                           |
+|Auto sampler bypass turned on   |Broken sample ΓÇô laceration  |Low       |Auto challenge must be switched on. Safety |
+|and wait for green light.       |hand/s                      |          |gloves must also be worn during this task  |
+|S/leader puts all FP defect     |                            |          |                                           |
+|samples through the FP to       |                            |          |                                           |
+|confirm samples are rejected at |                            |          |                                           |
+|their respective setup stations |                            |          |                                           |
+|Samples are collected at the out|As above                    |Low       |As above                                   |
+|feed, once collected auto       |                            |          |                                           |
+|sampler bypass turned off       |                            |          |                                           |
+|FP samples are placed back onto |None                        |Low       |None                                       |
+|the sample tray                 |                            |          |                                           |
+|Tech called if samples are not  |None                        |Low       |None                                       |
+|being rejected at their         |                            |          |                                           |
+|respective stations and set up  |                            |          |                                           |
+|Follow up required after tech   |Broken samples, laceration /|Low       |Auto challenge must be switched on ΓÇô safety|
+|has checked the Fps to samples  |cuts                        |          |gloves used for this task                  |
+|Environmental:                  |                            |          |                                           |
+|Removal of used rags / gloves/  |Contamination.              |High      |Place in correct contamination or waste    |
+|waste/ glass / cullet           |Waste removal and tidy up.  |          |bins provided.                             |
+|                                |                            |          |Ensure area is cleaned and product / tools |
+|                                |                            |          |cleared away.                              |
+|Protection & Security           |                            |          |                                           |
+|Demarcation                     |Damage to people, property  |High      |Demarcation where applicable.              |
+|                                |and environment.            |          |Install barricaded/danger tape as required.|
+|                                |                            |          |Ensure correct fire fighting equipment is  |
+|                                |                            |          |available.                                 |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+

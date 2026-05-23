@@ -1,0 +1,61 @@
+
+#21 Plunger & Thimble Change
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                  |Safety Induction [Contractor]         |                                          |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Boots, gloves, uniform, safety     |Yes                                   |                                          |
+|glasses, ear muffs, (protection    |                                      |July 2007                                 |
+|sleeves, back support ΓÇô optional)  |Risk Score                            |                                          |
+|                                   |150                                   |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |Medium                                |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |Minimisation                          |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Stop Section:-           |Making section safe to  |High     |Stop neck ring arms in the inverted positions using the |
+|Follow Stopping Section  |prevent entrapment.     |         |E Stop button.                                          |
+|refer JSEA 219.01.02     |                        |         |                                                        |
+|Manual operation.        |Caught in section.      |High     |Switch to manual operation.                             |
+|Safety lock-outs for     |Reduce the risk of being|High     |Blank close safety lock activated.                      |
+|blanks.                  |caught in the section.  |         |                                                        |
+|Invert safety bar.       |Reduce the risk of being|High     |Place invert safety lock over invert rack, so that lock |
+|                         |caught in the section.  |         |sits down on the top of the invert mechanism.           |
+|Access to remove plungers|Burns, jamming hands.   |High     |Remove barrier and remove cover plate.                  |
+|& thimbles.              |                        |         |                                                        |
+|Remove thimbles whilst   |                        |         |                                                        |
+|plunger  is down (using  |                        |         |                                                        |
+|tool)                    |                        |         |                                                        |
+|Trip up plunger, replace |                        |         |                                                        |
+|plunger.                 |                        |         |                                                        |
+|Reverse procedure for    |                        |         |                                                        |
+|installation.            |                        |         |                                                        |
+|Prepare screen to start. |Caught in section.      |High     |Disengage blank close safety lock and remove invert     |
+|                         |                        |         |safety lock over invert rack.                           |
+|Following starting a     |Caught in section.      |High     |Ensure all personnel are clear of the section, barrier  |
+|section refer JSEA       |                        |         |is in place and start the section up.                   |
+|219.01.01                |                        |         |                                                        |
+|Environmental            |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+
+                                                     -----------------------
+[pic]
+
+O-I New Zealand
+

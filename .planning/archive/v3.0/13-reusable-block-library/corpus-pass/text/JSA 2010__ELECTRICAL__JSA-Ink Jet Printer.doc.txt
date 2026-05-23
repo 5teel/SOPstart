@@ -1,0 +1,27 @@
+
+Ink Jet Printer
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |Medium                                     |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Stop position head on        |Chemicals, compressed air,    |Low         |Training & instruction. Wear all PPE    |
+|maintenance stand            |ventilation lighting          |            |                                        |
+|Close recuperation gutter.   |Chemicals & pressurised fluids|Medium      |Use all safe working procedures Wear all|
+|Clean electrodes             |                              |            |PPE                                     |
+|Open shutter. Check Ink      |Spills & ventilation          |Medium      |Use all safe working procedures Wear all|
+|levels and flush system      |                              |            |PPE                                     |
+|Check air supply start up and|Pressurised systems           |Medium      |Use all safe working procedures Wear all|
+|refresh                      |                              |            |PPE                                     |
+

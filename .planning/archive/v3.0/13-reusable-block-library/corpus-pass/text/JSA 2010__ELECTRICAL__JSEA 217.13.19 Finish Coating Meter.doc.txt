@@ -1,0 +1,30 @@
+
+Finish Coating Meter
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |High                                       |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Unplug and check leads       |Shock                         |Medium      |Turn off before unplugging              |
+|Check all clamps and head    |Chemicals                     |High        |Wear all PPE                            |
+|movement                     |                              |            |                                        |
+|Check hoses for leaks. Check |Chemicals                     |Medium      |Wear all PPE                            |
+|the fluid level in bottle    |                              |            |                                        |
+|Reconnect power. Test pump   |Chemicals & Electrical shock  |High        |Use safe working procedures. Wear all   |
+|and set the height           |                              |            |PPE                                     |
+|Calibrate using sample set   |Chemicals present.            |Medium      |Use safe working procedures. Wear all   |
+|zero                         |                              |            |PPE                                     |
+
+
+                Notes -------------what is the chemical ????

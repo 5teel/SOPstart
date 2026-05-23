@@ -1,0 +1,43 @@
+
+Komatsu Loader operation
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSA Reviewed by and date                    |
+|All standard PPE required     |Yes                                  |                                            |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |500                                  |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |High                                 |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps       |Potential /                      |Level  |Controls to reduce the Risk of Hazard    |
+|                            |Actual Hazard                    |of Risk|                                         |
+|Prior to any operation talk |In all cases ensure onlooker are |High   |Tell any persons observing to move to a  |
+|to anyone in the area and   |aware of you                     |       |safe area. Be alert at all times while   |
+|tell them of your intentions|                                 |       |operating the loader and always ensure   |
+|to use the machine          |                                 |       |you are in full control. Ensure mirrors  |
+|                            |                                 |       |are clean                                |
+|Inspect machine daily for   |Damage to eyes hands feet and    |High   |Ensure hands feet and clothing are clear |
+|signs of wear and damage.   |clothing from moving parts. Pinch|       |of all moving part. Do not wear loose    |
+|Ensure fuel and any other   |points as indicated on the loader|       |fitting clothing.                        |
+|reservoirs are full.        |                                 |       |                                         |
+|Driving on the roadway and  |Injury or death to pedestrians.  |High   |Be aware of your surroundings, observe   |
+|surrounding areas           |PersonΓÇÖs eyesight in vicinity    |       |persons in your area. Use mirrors at all |
+|                            |from small flying objects. Dust  |       |time. Be aware of any height restrictions|
+|                            |inhalation. Damage to property.  |       |particularly when the bucket is up.      |
+|                            |                                 |       |Always wear seatbelt. When reversing     |
+|                            |                                 |       |ensure your path is clear                |
+|Moving sand and cullet in   |Injury or death to pedestrians.  |High   |Wear all PPE.                            |
+|bucket                      |PersonΓÇÖs eyesight in vicinity    |       |Be aware of person around you. Do not    |
+|                            |from small flying objects. Dust  |       |walk under the bucket when in up position|
+|                            |inhalation. Damage to property.  |       |Always wear seatbelt.                    |
+|Inspect machine at the end  |Injury or death. Damage to eyes  |High   |Ensure hands feet and clothing are clear |
+|of the day and report any   |hands feet and clothing from     |       |of all moving part and pinch points. Do  |
+|observations or damage noted|moving parts.                    |       |not wear loose fitting                   |

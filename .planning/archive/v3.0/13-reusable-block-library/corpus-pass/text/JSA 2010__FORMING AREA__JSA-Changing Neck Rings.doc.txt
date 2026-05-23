@@ -1,0 +1,33 @@
+
+Neck Ring Change
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                           |Safety Induction [Contractor]           |                                           |
+|PPE Required:               |Significant Hazard                      |JSA Reviewed by and date                   |
+|All standard PPE required   |Yes                                     |                                           |
+|                            |                                        |                                           |
+|                            |Risk Score                              |                                           |
+|                            |250                                     |                                           |
+|                            |                                        |                                           |
+|                            |Category                                |                                           |
+|                            |High                                    |                                           |
+|                            |                                        |                                           |
+|                            |Control taken                           |                                           |
+|                            |Minimisation                            |                                           |
+|                            |                                        |                                           |
+|Sequence of Job Steps       |Potential /                   |Level of |Controls to reduce the Risk of Hazard      |
+|                            |Actual Hazard                 |Risk     |                                           |
+|Stop Glass                  |Glass still could load        |Medium   |Wait for glass loading to stop             |
+|Stop Section in invert      |Stop section to late and      |High     |Wait until stop loading                    |
+|position                    |section still moving          |         |                                           |
+|Safety gear on              |Moving parts                  |High     |Turn off air  and wait                     |
+|Close Moulds                |Burns while changing Neck Ring|High     |Wear PPE to prevent burns                  |
+|Take off Neck Rings         |Burns while changing Neck Ring|High     |Wear PPE to prevent burns                  |
+|Safety Gear off             |Hot gear when removing gear   |Medium   |Wear PPE to prevent burns                  |
+|Open Moulds                 |Burns                         |Medium   |Wear PPE to prevent burns                  |
+|Start Section               |Entrapment                    |Medium   |Assistance may be required to restart the  |
+|                            |                              |         |section                                    |
+|Load glass                  |Late load & jam up causing    |Medium   |Be aware as to what is happening with      |
+|                            |Burns                         |         |section as loading and start up commence   |

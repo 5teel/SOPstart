@@ -1,0 +1,41 @@
+
+#21, 23, 31 Changing a Funnel
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                  |Safety Induction [Contractor]         |                                          |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Boots, gloves, uniform, safety     |Yes                                   |                                          |
+|glasses, ear muffs, (protection    |                                      |July 2007                                 |
+|sleeves, back support ΓÇô optional)  |Risk Score                            |                                          |
+|                                   |60                                    |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |Low                                   |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |Minimisation                          |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Stop Section:-           |Making section safe to  |High     |Stop Neck ring arms in the inverted position using the E|
+|Follow Stopping Section  |prevent entrapment      |         |Stop button                                             |
+|refer JSEA 219.01.02     |                        |         |                                                        |
+|Ensure section is safe.  |Trapped in the section /|High     |Ensure E Stop button is activated and light is on before|
+|                         |crush injury.           |         |entering section.  Apply safety T Bar to invert rack.   |
+|Ensure working safely.   |Crush injury.           |High     |Be aware of baffle arm coming                           |
+|Remove funnel.           |Burns                   |High     |Using thick gloves provided remove the funnel.          |
+|Replace funnel.          |Burns                   |Low      |Using thick gloves provided fit the clean funnel to the |
+|                         |                        |         |machine.                                                |
+|Follow starting a section|Caught in section / back|High     |Ensure all personnel are clear of the section.  Start   |
+|procedure refer JSEA     |strain.                 |         |the section up.                                         |
+|219.01.01                |                        |         |                                                        |
+
+
+
+                                                     -----------------------
+[pic]
+
+O-I New Zealand
+

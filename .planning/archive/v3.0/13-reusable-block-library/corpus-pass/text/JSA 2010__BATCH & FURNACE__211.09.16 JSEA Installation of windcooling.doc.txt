@@ -1,0 +1,48 @@
+
+
+                                      Installation of extra Wind Cooling AK2
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |X                                       |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Earmuffs.                       |Yes                                    |                                        |
+|Safety Glasses.                 |                                       |                                        |
+|Gloves.                         |Risk Score                             |                                        |
+|                                |40                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |MINIMISATION                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps           |Potential /               |Level of  |Controls to reduce the Risk of Hazard    |
+|                                |Actual Hazard             |Risk      |                                         |
+|Place flex tube in correct      |Heat, noise, dust, back   |Medium    |Have regular breaks and drink lots of    |
+|position.                       |strain.                   |          |fluid. Wear appropriate PPE.             |
+|Join Flex Tube                  |Heat, noise, cuts.        |High      |Have regular breaks and drink lots of    |
+|                                |                          |          |fluid. Wear gloves.                      |
+|Cut hole in manifold and rivet  |Noise, sparks, dust.      |High      |Wear all PPE.                            |
+|takeoff.                        |                          |          |                                         |
+|Fit flex tube to takeoff and    |Noise, dust and cuts.     |Medium    |Wear all PPE.                            |
+|rivet.                          |                          |          |                                         |
+|Environmental:                  |                          |          |                                         |
+|Removal of used rags / gloves/  |Contamination.            |High      |Place in correct contamination or waste  |
+|waste/ glass / cullet           |Waste removal and tidy up.|          |bins provided.                           |
+|                                |                          |          |Ensure area is cleaned and product /     |
+|                                |                          |          |tools cleared away.                      |
+|Protection & Security           |                          |          |                                         |
+|Demarcation                     |Damage to people, property|High      |Demarcation where applicable.            |
+|                                |and environment.          |          |Install barricaded/danger tape as        |
+|                                |                          |          |required.                                |
+|                                |                          |          |Ensure correct fire fighting equipment is|
+|                                |                          |          |available.                               |
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+

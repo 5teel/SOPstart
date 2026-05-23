@@ -1,0 +1,70 @@
+
+
+
+    Job Safety Environmental Analysis Form:  FP Set-up during Tank 2 Colour
+                                                                       Change
+
+
+
+                                                                       |Area / Department                  |Machine Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|and Safety Boots, welding PPE      |                                      |                                          |
+|required.                          |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|To prevent Cullet System |                        |         |                                                        |
+|failure during a Colour  |                        |         |                                                        |
+|Change:                  |                        |         |                                                        |
+|Only 1x machine at any   |                        |High     |Any compromise on safety, then the granulating machine  |
+|time shall granulate into|                        |         |shall be reduced in tonnage.                            |
+|the DRAG at full tonnage.|                        |         |                                                        |
+|Should 2x machines need  |                        |         |                                                        |
+|to use the DRAG:         |                        |         |                                                        |
+|1x machine must be making|                        |High     |This may continue for a short period of time.           |
+|bottles for a short      |                        |         |                                                        |
+|period of time.          |                        |         |                                                        |
+|When in a Colour Change  |                        |High     |The shears shall be latched out and the glass punched   |
+|or a long job change, and|                        |         |through.                                                |
+|the weight has been      |                        |         |Shear cutting will only start ┬╜ hour before loading.    |
+|achieved.                |                        |         |                                                        |
+|Both machines may go into|                        |High     |This must be monitored and at any stage there are safety|
+|DRAG when making bottles |                        |         |concerns, a machine must send ware into the Lehr or be  |
+|and rejected off the     |                        |         |reduced tonnage.                                        |
+|primary conveyor.        |                        |         |                                                        |
+|During the Colour Change |                        |High     |Bottles are removed from the unloader (not the FPΓÇÖs) but|
+|the Cold End must be in a|                        |         |with the Lehr full, we palletise because of the shear   |
+|position to handle any   |                        |         |number of bottles.                                      |
+|failure in the cullet    |                        |         |                                                        |
+|systems.                 |                        |         |In cases where this cannot be achieved regarding        |
+|                         |                        |         |maintenance requirements, discussion shall occur with   |
+|                         |                        |         |Manufacturing management and consensus shall be achieved|
+|                         |                        |         |on how it is handled should a failure occur on the back |
+|                         |                        |         |shift.                                                  |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

@@ -1,0 +1,30 @@
+
+Water Treatment
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                           |Safety Induction [Contractor]     |x                                               |
+|PPE Required:               |Significant Hazard                |JSA Reviewed by and date                        |
+|All standard PPE required   |Yes                               |                                                |
+|                            |                                  |                                                |
+|                            |Risk Score                        |                                                |
+|                            |47                                |                                                |
+|                            |                                  |                                                |
+|                            |Category                          |                                                |
+|                            |Medium                            |                                                |
+|                            |                                  |                                                |
+|                            |Control taken                     |                                                |
+|                            |Minimisation                      |                                                |
+|                            |                                  |                                                |
+|Sequence of Job Steps       |Potential /                |Level of |Controls to reduce the Risk of Hazard         |
+|                            |Actual Hazard              |Risk     |                                              |
+|Carry and de-cant chemicals |Chemical exposure, lifting |Med      |PPE, training by Ashland,                     |
+|                            |injury                     |         |                                              |
+|Walking around site         |Forklifts                  |Med      |Hi Viz jacket, improved forklift driver       |
+|                            |                           |         |training and discipline                       |
+|Access to cooling towers    |Falling from ladder        |High     |Improved ladder access required to Compressor |
+|                            |                           |         |CTΓÇÖs. Caged ladder required.                  |
+|Working on water treatment  |Electrocution              |High     |Ensuring pumps are isolated prior to starting |
+|dosing equipment            |                           |         |work.                                         |
+|Clean up area following task|Slipping or Tripping       |Med      |Make area safe                                |

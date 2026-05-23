@@ -1,0 +1,50 @@
+
+Re-clipping Conveyor Belt
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                            |Safety Induction [Contractor]      |                                                 |
+|PPE Required:                |Significant Hazard                 |JSEA Reviewed by and date                        |
+|Safety Glasses & Gloves      |Yes                                |                                                 |
+|                             |                                   |                                                 |
+|                             |Risk Score                         |                                                 |
+|                             |120                                |                                                 |
+|                             |                                   |                                                 |
+|                             |Category                           |                                                 |
+|                             |Medium                             |                                                 |
+|                             |                                   |                                                 |
+|                             |Control taken                      |                                                 |
+|                             |Minimisation                       |                                                 |
+|                             |                                   |                                                 |
+|Sequence of Job Steps       |Potential /                   |Level of Risk|Controls to reduce the Risk of Hazard     |
+|                            |Actual Hazard                 |             |                                          |
+|Stop belt in correct        |Moving belt                   |Low          |Use the Lock Out procedure                |
+|position                    |                              |             |                                          |
+|Remove clip. Cutting out of |Cuts to hands due to glass    |Low          |Ensure all PPE is in place to prevent     |
+|the belt                    |                              |             |injury to self                            |
+|Fit new clip by punching    |Hitting hands when punching   |Low          |Need Gloves on and take care when doing   |
+|holes                       |Belt Slipping off timber      |             |task                                      |
+|                            |support                       |             |Nail the belt to the board                |
+|Join Belt manually          |Cut to the hands from glass in|Low          |Ensure all PPE is in place to prevent     |
+|                            |the belt                      |             |injury to self                            |
+|Tension Belt                |Broken Glass                  |Low          |Ensure all PPE is in place to prevent     |
+|                            |                              |             |injury to self                            |
+|Remove Lock out and run the |Trapping hands                |Low          |Confirm that all people are clear of the  |
+|belt                        |                              |             |area                                      |
+|Environmental:              |                              |             |                                          |
+|Removal of used rags /      |Contamination.                |High         |Place in correct contamination or waste   |
+|gloves/  waste/ glass /     |Waste removal and tidy up.    |             |bins provided.                            |
+|cullet                      |                              |             |Ensure area is cleaned and product / tools|
+|                            |                              |             |cleared away.                             |
+|Protection & Security       |                              |             |                                          |
+|Demarcation                 |Damage to people, property and|High         |Demarcation where applicable.             |
+|                            |environment.                  |             |Install barricaded/danger tape as         |
+|                            |                              |             |required.                                 |
+|                            |                              |             |Ensure correct fire fighting equipment is |
+|                            |                              |             |available.                                |
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.

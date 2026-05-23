@@ -1,0 +1,50 @@
+
+Operating  Kerrick  Vacuum
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                                                      |Safety Induction [Contractor]                                 |
+|Hazard            |Practicable to Eliminate                                                                    |
+|Identification    |                                                                                            |
+|                                     |Insignificant ΓÇô first aid injury, up to  |
+|                                     |$1,000 damage, spill confined to         |
+|LIKELIHOOD                           |immediate work area, rapid clean up, no  |
+|                                     |damage to environment                    |
+|How likely is it to happen?          |                                         |
+|4                                    |ACT NOW ΓÇô Urgent ΓÇô do something about the|
+|ACUTE                                |risks immediately. Requires immediate    |
+|                                     |attention.                               |
+|3                                    |Highest management decision is required  |
+|HIGH                                 |urgently                                 |
+|2                                    |Follow management instruction            |
+|MODERATE                             |                                         |
+|1                                    |OK for now. Record and review if any     |
+|LOW                                  |equipment / people / materials / work    |
+|                                     |processes or procedures change           |
+
+                                      n
+|JOB SAFETY ANALYSIS               |Operating  Kerrick  Vacuum.                                                    |
+
+|Area / Department            |Batch & Furnace                            |Task  or Job Description                |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |No                                         |                                        |
+|when working within Batch    |                                           |                                        |
+|area                         |Overall Category of task                   |                                        |
+|                             |Low                                        |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Connect Vacuum hose.         |Manual handling.              |Low         |Use correct manual handling techniques. |
+|Install  Bin                 |Manual handling.              |Low         |Use correct manual handling techniques. |
+|Switch power ON              | None                         |Low         |                                        |
+|Use for the purpose of       |Manual handling.              |Low         |Use correct manual handling techniques. |
+|cleaning.                    |                              |            |                                        |
+|When finish, switch power    | None                         |Low         |                                        |
+|OFF.                         |                              |            |                                        |
+|Remove hose.                 |Manual handling.              |Low         |Use correct manual handling techniques, |
+|                             |                              |            |secure hose.                            |
+| Remove bin for emptying..   |Manual handling.              |Low         |Use correct manual handling techniques. |

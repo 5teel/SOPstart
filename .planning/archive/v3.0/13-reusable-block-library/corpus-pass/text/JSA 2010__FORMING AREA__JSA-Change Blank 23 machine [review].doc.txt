@@ -1,0 +1,39 @@
+
+Change Blank 2 3
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |                                        |
+|All standard PPE required    |Yes                                        |JSA Reviewed by and date                |
+|when working within          |                                           |                                        |
+|production area.             |Overall Category of task                   |                                        |
+|                             |High                                       |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|                             |                              |            |                                        |
+|Ensure all PPE worn          |Burns ΓÇô Hot objects           |LOW         |Wear correct PPE provided               |
+|                             |                              |            |                                        |
+|Stop Gob to section          |Strains ΓÇô Lifting objects     |LOW         |Use all tools provided for task         |
+|                             |                              |            |                                        |
+|ΓÇÿEΓÇÖ Stopping section         |Excessive noise               |LOW         |Stop section as per ΓÇÿBEST PracticeΓÇÖ     |
+|                             |                              |            |Minimisation ΓÇô by wearing ear muffs     |
+|                             |                              |            |                                        |
+|Put in place revert stop     |                              |            |Elimination  -  by use of tools provided|
+|                             |                              |            |(revert barrier) & stopping section     |
+|                             |                              |            |                                        |
+|Use tools provided           |                              |            |                                        |
+|                             |                              |            |                                        |
+|Remove Blank                 |                              |            |#1  -  DonΓÇÖt rush, think safety -  Risk |
+|                             |                              |            |of burns                                |
+|                             |                              |            |                                        |
+|Replace Blank                |                              |            |                                        |
+|                             |                              |            |                                        |
+|Start section as per ΓÇÿBest   |                              |            |                                        |
+|PracticeΓÇÖ                    |                              |            |                                        |

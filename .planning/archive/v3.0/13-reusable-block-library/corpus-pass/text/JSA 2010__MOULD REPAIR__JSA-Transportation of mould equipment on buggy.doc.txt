@@ -1,0 +1,36 @@
+
+Transportation of Mould equipment on buggy
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety glasses, Hearing         |Yes                                    |Gary Russell 7/9/07                     |
+|protection, Gloves,             |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |150                                    |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |High                                   |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps          |Potential /               |Level of    |Controls to reduce the Risk of Hazard   |
+|                               |Actual Hazard             |Risk        |                                        |
+|Inspect buggy for faults       |Leaking fluid             |Low         |Check buggy before use for obvious      |
+|                               |                          |            |damage and report immediately           |
+|Lift tray to be transported    |Entrapment                |High        |Ensure buggy correctly located for      |
+|                               |                          |            |lifting tray.                           |
+|                               |                          |            |Ensure tray sides to be used and fitted |
+|                               |                          |            |Ensure no one in area of operation that |
+|                               |                          |            |can come to any harm.                   |
+|Transport equipment            |Entrapment of personnel   |Medium      |Drive carefully at all times  Ensure    |
+|                               |Falling equipment         |            |equipment is well balanced on tray and  |
+|                               |Damage to property and    |            |not free to move about                  |
+|                               |equipment                 |            |Drive carefully at all times in full    |
+|                               |                          |            |control of buggy.                       |
+|Moving tray to required        |Entrapment                |Medium      |Ensure area equipment to be left is     |
+|position                       |Damage to property and    |            |clear of personnel and equipment        |
+|                               |equipment                 |            |                                        |

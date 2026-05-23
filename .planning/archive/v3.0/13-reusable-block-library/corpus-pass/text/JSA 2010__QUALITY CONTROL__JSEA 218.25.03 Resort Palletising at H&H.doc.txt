@@ -1,0 +1,82 @@
+
+RESORT Including Palletising at H & H and scanning tracking labels
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date 13/06/07      |
+|Safety Glasses / Gloves / Hi Viz|Yes                                    |Gary OΓÇÖNeill  Mate Pocrinich            |
+|Clothing/ Back Support brace if |                                       |Numela Ropati Hiliate Kilifi            |
+|required                        |Risk Score                             |                                        |
+|                                |40                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                    |Potential /                   |Level of|Controls to reduce the Risk of |
+|                                         |Actual Hazard                 |Risk    |Hazard                         |
+|Turn on vacuum supply at compressor      |Nil                           |Low     |Nil                            |
+|Ware will come from two different        |Falling bottles causing       |Low     |Ensure all PPE Gloves & Long   |
+|directions after inspection by FPs &     |laceration                    |        |sleeves in place Adjust line   |
+|merge onto the accumulation table at H & |                              |        |speeds if needed               |
+|H                                        |                              |        |                               |
+|Fill any voids in the pack               |Sprain / strain from Leaning /|Low     |Use wooden hook                |
+|                                         |twisting                      |        |                               |
+|Using the controls on the  H & H         |If in the wrong position      |Low     |Training                       |
+|Palletiser lower the air bag assembly so |bottles will fall or get      |        |                               |
+|that the bags settle in between the necks|damaged                       |        |                               |
+|of the bottles ( if job change done      |                              |        |                               |
+|correctly then this will not be an issue |                              |        |                               |
+|)                                        |                              |        |                               |
+|Using the controls, inflate the air bags |Incorrect inflation may cause |Low     |Training                       |
+|                                         |damage                        |        |                               |
+|Load a stack of pallets - no more than 10|Sprain / strain Injury from   |Low     |Pallets stacked to a practical |
+|high onto the in feed conveyor of the H &|collapsed pallets             |        |but safe height PPE            |
+|H. the pallets will automatically be     |                              |        |                               |
+|dispensed when completed pallet moves to |                              |        |                               |
+|out feed                                 |                              |        |                               |
+|The pallet travels along the conveyor to |Sprain / strain Injury from   |Low     |Correct manual Handling        |
+|a position where it may be loaded with   |collapsed pallets             |        |procedures to be implemented.  |
+|bottles - Manual intervention may be     |                              |        |                               |
+|needed to move pallets if jam up occurs  |                              |        |                               |
+|Using the controls lift the layer of     |Falling bottles causing       |Low     |PPE                            |
+|bottles & move to pallet being built     |Laceration                    |        |                               |
+
+|Using the controls lower the layer &     |Falling bottles causing       |Low     |Correct PPE                    |
+|release onto pallet                      |Laceration                    |        |                               |
+|Manually place a layerboard onto the     |Sprain / strain from manual   |Low     |Correct PPE. Layerboard pallets|
+|finishes of the bottles                  |handling                      |        |are not to be stacked more than|
+|                                         |Crushing injury from unstable |        |ONE PALLET high as instability |
+|                                         |load of pallet                |        |will cause injury              |
+|Using the controls reposition the air bag|If in the wrong position      |Low     |Training                       |
+|assembly over the accumulation table     |bottles will fall or get      |        |                               |
+|ready for the next layer                 |damaged                       |        |                               |
+|Once the pallet has been built to the    |No read Re labelling          |Low     |Manual Handling procedures     |
+|required tier height ,a tracking label   |Strain/ Sprain from stretching|        |                               |
+|should be peeled off the roll & placed on|                              |        |                               |
+|the top layerboard in the location       |                              |        |                               |
+|specified ( The operator should also scan|                              |        |                               |
+|the barcode to record the completed      |                              |        |                               |
+|pallet ),  so as to allow the MSK scanner|                              |        |                               |
+|to read & apply a pallet ticket          |                              |        |                               |
+|The H & H outfeed conveyor can only hold |Nil                           |Low     |Nil                            |
+|two pallets before the line stops        |                              |        |                               |
+|Environmental:                           |                              |        |                               |
+|Removal of used rags / gloves/  waste/   |Contamination.                |High    |Place in correct contamination |
+|glass / cullet                           |Waste removal and tidy up.    |        |or waste bins provided.        |
+|                                         |                              |        |Ensure area is cleaned and     |
+|                                         |                              |        |product / tools cleared away.  |
+|Protection & Security                    |                              |        |                               |
+|Demarcation                              |Damage to people, property and|High    |Demarcation where applicable.  |
+|                                         |environment.                  |        |Install barricaded/danger tape |
+|                                         |                              |        |as required.                   |
+|                                         |                              |        |Ensure correct fire fighting   |
+|                                         |                              |        |equipment is available.        |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

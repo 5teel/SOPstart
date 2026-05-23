@@ -1,0 +1,54 @@
+
+Clearing FP Jam ups and broken glass
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                           |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date:                 |
+|                                |Yes                                    |Bronwyn Bell                               |
+|                                |                                       |                                           |
+|                                |Risk Score                             |                                           |
+|                                |40                                     |                                           |
+|                                |                                       |                                           |
+|                                |Category                               |                                           |
+|                                |Low                                    |                                           |
+|                                |                                       |                                           |
+|                                |Control taken                          |                                           |
+|                                |Minimisation                           |                                           |
+|                                |                                       |                                           |
+|Sequence of Job Steps           |Potential /               |Level of    |Controls to reduce the Risk of Hazard      |
+|                                |Actual Hazard             |Risk        |                                           |
+|If a bottle/s has fallen over   |None                      |Low         |None                                       |
+|and jammed inside the FP, ensure|                          |            |                                           |
+|E stop on FP has been depressed |                          |            |                                           |
+|Stop ICK to stop flow of bottles|Broken glass              |Low         |Gloves and safety glasses must be worn     |
+|and clear all bottles on  in    |                          |            |                                           |
+|feed line to FP                 |                          |            |                                           |
+|Check where bottle has jammed,  |Broken glass, splinters   |Low         |As above                                   |
+|use a bottle breaker hammer     |when bottle breaks        |            |                                           |
+|provided to break the bottle    |                          |            |                                           |
+|Manually remove larger pieces of|As above                  |Low         |As above                                   |
+|glass                           |                          |            |                                           |
+|Once FP in feed line is clear,  |As above                  |Low         |As above Note: using compressed air must be|
+|use compressed air to carefully |                          |            |done in a safe controlled manner           |
+|blow all broken glass from FP   |                          |            |                                           |
+|Turn compressed air off, return |None                      |Low         |None                                       |
+|air hose to station             |                          |            |                                           |
+|When FP is clear of all broken  |None                      |Low         |None                                       |
+|glass, start FP, then ICK       |                          |            |                                           |
+|Environmental:                  |                          |            |                                           |
+|Removal of used rags / gloves/  |Contamination.            |High        |Place in correct contamination or waste    |
+|waste/ glass / cullet           |Waste removal and tidy up.|            |bins provided.                             |
+|                                |                          |            |Ensure area is cleaned and product / tools |
+|                                |                          |            |cleared away.                              |
+|Protection & Security           |                          |            |                                           |
+|Demarcation                     |Damage to people, property|High        |Demarcation where applicable.              |
+|                                |and environment.          |            |Install barricaded/danger tape as required.|
+|                                |                          |            |Ensure correct fire fighting equipment is  |
+|                                |                          |            |available.                                 |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+

@@ -1,0 +1,31 @@
+
+Changing a LPG cylinder for Gas Gun
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]              |                                    |
+|PPE Required:                             |Significant Hazard               |JSA Reviewed by and date            |
+|Safety Glasses / gloves if required       |Yes                              |Gary OΓÇÖNeill 12/06/07               |
+|                                          |                                 |                                    |
+|                                          |Risk Score                       |                                    |
+|                                          |27                               |                                    |
+|                                          |                                 |                                    |
+|                                          |Category                         |                                    |
+|                                          |Low                              |                                    |
+|                                          |                                 |                                    |
+|                                          |Control taken                    |                                    |
+|                                          |Minimisation                     |                                    |
+|                                          |                                 |                                    |
+|Sequence of Job Steps                      |Potential /            |Level of    |Controls to reduce the Risk of |
+|                                           |Actual Hazard          |Risk        |Hazard                         |
+|Seek qualified assistance prior to         |                       |-           |                               |
+|commencing with changing LPG Cylinder      |                       |            |                               |
+|Ensure valve on LPG cylinder is turned off |Gas leak               |Low         |Check                          |
+|loosen the hose connector to the cylinder  |                       |            |                               |
+|with appropriate tools                     |                       |            |                               |
+|Refit hose connector to new LPG Gas        |Gas leak               |Low         |Qualified personnel only       |
+|Cylinder & tighten                         |                       |            |                               |
+|Ensure that all checks as previously       |none                   |Low         |Care in operation              |
+|prescribed are carried out in normal       |                       |            |                               |
+|operation                                  |                       |            |                               |

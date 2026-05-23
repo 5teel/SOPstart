@@ -1,0 +1,90 @@
+
+
+
+Job Safety Environmental Analysis Form:
+
+                                                                     Density
+                                                                     Test
+
+|Area / Department                  |Batch & Furnace                       |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots, High Vis/heat        |                                      |                                          |
+|Garment, Respiratory Protection    |Risk Score                            |                                          |
+|(when working with asbestos)       |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Haza  rd                 |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Obtain samples from the  |Bottles are normally    |Low      |Wear cotton gloves to avoid getting burns.              |
+|centre position of each  |warm to hot coming off  |         |                                                        |
+|machine.                 |the Lehr, depending on  |         |                                                        |
+|                         |the size of the bottles.|         |                                                        |
+|Cut samples from the     |Laceration and damage to|High     |Wear gloves to reduce laceration.  Wear eye protection  |
+|sidewall of the bottles  |eyes.                   |         |to avoid damage to eyes.                                |
+|into different shapes so |                        |         |                                                        |
+|it is easier to identify.|                        |         |                                                        |
+|Check if the fume cabinet|Fumes                   |High     |Test report must be noted and if not current supervisor |
+|has a current test report|                        |         |must be notified.                                       |
+|and is safe to use.      |                        |         |                                                        |
+|Drain water out of the   |Water and spill on the  |High     |Use funnel on top of the bowl to avoid spillage.  Wipe  |
+|bowl and add cold water  |floor and can be a slip |         |up any water on the floor.                              |
+|out of the fridge.  Wait |hazard.                 |         |                                                        |
+|for the old samples to   |                        |         |                                                        |
+|rise.                    |                        |         |                                                        |
+|Remove old samples from  |Exposure to chemicals.  |High     |Wear vinyl gloves to avoid contact with skin.  Wear eye |
+|the test tube in the bowl|(Tetrabromoethane &     |         |protection.  Keep MSD for the chemicals being used close|
+|using a spatula.         |Bromonaphtalene)        |         |to the density tester.                                  |
+|Place new samples in the |Exposure to chemicals.  |High     |Wear vinyl gloves to avoid contact with skin.  Wear eye |
+|test tubes and mix up the|(Tetrabromoethane &     |         |protection.  Keep MSD for the chemicals being used close|
+|solution.                |Bromonaphtalene)        |         |to the density tester.                                  |
+|Wait for the temperature |Electrocution           |High     |Avoid placing hands in the bowl, as there is a fan in   |
+|to drop off to about 16  |                        |         |motion.  Make sure density tester is plugged into a RCD |
+|degrees and then turn the|                        |         |and not straight into the mains.                        |
+|fan and the heat on.     |                        |         |                                                        |
+|Wait for samples to drop |None                    |Low      |Keep an eye on the samples as they might drop without   |
+|to the bottom of the test|                        |         |warning.                                                |
+|tube.                    |                        |         |                                                        |
+|Remove samples from the  |Exposure to chemicals.  |High     |Wear vinyl gloves to avoid contact with skin.  Wear eye |
+|test tubes using a       |(Tetrabromoethane &     |         |protection.  Keep MSD for the chemicals being used close|
+|spatula and dispose of   |Bromonaphtalene)        |         |to the density tester.                                  |
+|them in the bin          |                        |         |                                                        |
+|appropriate for the      |                        |         |                                                        |
+|chemical.                |                        |         |                                                        |
+|Turn machine off from the|None                    |Low      |Use dry hands.                                          |
+|main switch.             |                        |         |                                                        |
+|Clean up the area of work|Exposure to chemicals.  |High     |Wear vinyl gloves to avoid contact with skin.  Wear eye |
+|after use of the density |(Tetrabromoethane &     |         |protection.  Keep MSD for the chemicals being used close|
+|tester.                  |Bromonaphtalene).       |         |to the density tester.                                  |
+|                         |Laceration and damage to|         |                                                        |
+|                         |eyes.                   |         |                                                        |
+|Record results in        |None                    |Low      |Compare results and inform the Supervisor of any        |
+|appropriate documents.   |                        |         |problems.                                               |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

@@ -1,0 +1,59 @@
+
+Certincoat Hood Cleaning
+                            HAZARD IDENTIFICATION
+
+|1                                                                           |
+|1                                                                           |
+|1                 |Safety Induction [Contractor]                                                               |
+|                              |Insignificant ΓÇô first aid injury, up  |
+|                              |to $1,000 damage, spill confined to   |
+|LIKELIHOOD                    |immediate work area, rapid clean up,  |
+|                              |no damage to environment              |
+|How likely is it to happen?   |                                      |
+|4                             |ACT NOW ΓÇô Urgent ΓÇô do something about |
+|ACUTE                         |the risks immediately. Requires       |
+|                              |immediate attention.                  |
+|3                             |Highest management decision is        |
+|HIGH                          |required urgently                     |
+|2                             |Follow management instruction         |
+|MODERATE                      |                                      |
+|1                             |OK for now. Record and review if any  |
+|LOW                           |equipment / people / materials / work |
+|                              |processes or procedures change        |
+                                                    Certincoat Hood Cleaning
+|Area / Department            |Production Mtce                            |Task  or Job Description                |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |Moderate                                   |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps             |Potential /                  |Level of |Controls to reduce the Risk of Hazard   |
+|                                  |Actual Hazard                |Risk     |                                        |
+|Turn off power to hood and pump   |Electrocution                |4        |Use safety lockout on the main control  |
+|                                  |                             |         |panel.                                  |
+|Lock out all switches m/c         |Manual handling              |Low      |Use safety lockouts on main control     |
+|conveyors, pumps and fan motors   |                             |         |panel and disconnect fan motors.        |
+|Disconnect electrical cables to   |Risk of entrapment           |Low      |Ensure all electrical cables are folded |
+|all motors                        |                             |         |away tidily.                            |
+|Open up side covers and baffle    |Broken glass                 |Low      |Clean broken glass, hazardous substances|
+|plates and clean inside hood      |Limited working area         |         |by using industrial vacuum cleaner.     |
+|including mixing chambers by using|Hazardous corrosive          |         |                                        |
+|scrapers bars and vacuum cleaner  |substances                   |         |                                        |
+|Brush off excessive tin residue   |Hazardous corrosive          |Moderate |Dispose all hazardous materials into a  |
+|and put in spill trays            |substances                   |         |waste drum ,located in dangerous goods  |
+|                                  |Odour or emission            |         |shed                                    |
+|Set up side shield and mid section|Manual handling              |Low      |Use correct /appropriate tools for job  |
+|for new job                       |                             |         |change set-ups using the machine maint  |
+|                                  |                             |         |data base.                              |
+|Check all rubber seals on side    |Cutting                      |Low      |Use correct /appropriate tools, ensure  |
+|covers and assemble               |Manual handling              |         |flat even surface when cutting rubber to|
+|                                  |                             |         |required length.                        |
+|Reconnect all cables then turn on |Risk of entrapment           |Moderate |Keep cables tidy and ensure personnel is|
+|motors and check for rotation and |Odour or emission            |         |not at risk when turning on hood.       |
+|switch on certincoat pump if hood |Electrocution                |         |                                        |
+|reaches right operating           |                             |         |                                        |
+|temperature                       |                             |         |                                        |

@@ -1,0 +1,60 @@
+
+Shift Audit
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                                                      |Safety Induction [Contractor]                                 |
+|Hazard            |Practicable to Eliminate                                                                    |
+|Identification    |                                                                                            |
+|                                     |Insignificant ΓÇô first aid injury, up to  |
+|                                     |$1,000 damage, spill confined to         |
+|LIKELIHOOD                           |immediate work area, rapid clean up, no  |
+|                                     |damage to environment                    |
+|How likely is it to happen?          |                                         |
+|4                                    |ACT NOW ΓÇô Urgent ΓÇô do something about the|
+|ACUTE                                |risks immediately. Requires immediate    |
+|                                     |attention.                               |
+|3                                    |Highest management decision is required  |
+|HIGH                                 |urgently                                 |
+|2                                    |Follow management instruction            |
+|MODERATE                             |                                         |
+|1                                    |OK for now. Record and review if any     |
+|LOW                                  |equipment / people / materials / work    |
+|                                     |processes or procedures change           |
+
+
+|Area / Department               |QC                                     |Task  or Job Description                |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date:               |
+|Hi Viz Clothing Gloves if       |Yes                                    |J. Baker   20/08/09                     |
+|required                        |                                       |                                        |
+|NB Dispensation not to wear     |Overall Category of Risk               |                                        |
+|safety specs on audit station as|Med                                    |                                        |
+|it inhibits task                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                           |Potential /         |Level of    |Controls to reduce the Risk of|
+|                                                |Actual Hazard       |Risk        |Hazard                        |
+|Using the steps the  auditor work on either side|Tripping            |Low         |Hand rails and barriers.      |
+|of the audit platform from each side, so  all   |                    |            |                              |
+|sides of the pallet are  accessible             |                    |            |                              |
+|Pallets automatically dropped off by the shuttle|Collision with      |Low         |Sensor in place for automatic |
+|car to audit conveyor and stop in stand by      |pallet              |            |stop when pallet reached      |
+|conveyor.                                       |                    |            |position.                     |
+|Up to 3 pallets may be loaded on to the audit in|Entrapment          |Low         |Push button control with      |
+|feed conveyor this is controlled by Auditor     |                    |            |emergency stop.               |
+|The layer board is removed & the required number|Laceration          |Med         |Observed safety when handling |
+|of samples are inspected for defects from the   |Sprain/ Strain      |            |sample                        |
+|top layer                                       |                    |            |                              |
+|Any containers containing defects are removed & |Laceration          |Med         |PPE if required               |
+|layer is topped up as appropriate. The layer    |Sprain/ Strain      |            |                              |
+|board is replaced.                              |                    |            |                              |
+|The audit samples are retained  & delivered to  |Laceration from     |Low         |Bottles are carried in plastic|
+|QC after audits are completed                   |tripping            |            |crate.                        |
+|Auditor operates the conveyor controls to move  |NA                  | Low        |                              |
+|the audited pallet through the out feed & onto  |                    |            |                              |
+|the cross conveyor leading to the MSK.          |                    |            |                              |
+|The pallet will then be shrouded automatically  |NA                  |Low         |                              |
+|by the MSK and fed to the out feed conveyor for |                    |            |                              |
+|pick up and warehousing.                        |                    |            |                              |

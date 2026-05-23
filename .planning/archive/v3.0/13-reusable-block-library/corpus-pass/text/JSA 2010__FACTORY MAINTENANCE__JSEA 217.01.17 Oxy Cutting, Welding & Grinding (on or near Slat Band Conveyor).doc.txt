@@ -1,0 +1,60 @@
+
+
+
+Job Safety Environmental Analysis Form:            Oxy Cutting, Welding &
+                                                                 Grinding
+                                                                 (on or
+                                                                 near Slat
+                                                                 Band
+                                                                 Conveyor)
+
+|Area / Department                  |Factory Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots, High Vis Garment,    |                                      |                                          |
+|Respiratory Protection (when       |Risk Score                            |                                          |
+|working with asbestos).            |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Fire Permit required.    |                        |         |                                                        |
+|Fire extinguisher        |Fire and burning of     |Medium   |Isolate and tag.                                        |
+|required.                |electrical wiring.      |         |                                                        |
+|Fire watch required.     |Fire and burning of     |High     |Wet down area if required.                              |
+|                         |electrical wiring.      |         |                                                        |
+|Report to Area           |                        |High     |Communication.                                          |
+|Supervisor.              |                        |         |                                                        |
+|Clean surrounding area.  |Falling objects.        |High     |Wear appropriate PPE equipment.                         |
+|                         |Foreign matter in eyes. |         |                                                        |
+|Check hazard where sparks|Sparks in eye, weld     |Medium   |Place suitable shield to contain sparks.                |
+|may land and put up      |flash to other          |         |                                                        |
+|screen / coverage.       |personnel.              |         |                                                        |
+|Remove slat band top and |Jamming, crushing.      |High     |                                                        |
+|bottom.                  |                        |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+
+If the operation does not follow this JSEA re-assess procedure and report
+to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

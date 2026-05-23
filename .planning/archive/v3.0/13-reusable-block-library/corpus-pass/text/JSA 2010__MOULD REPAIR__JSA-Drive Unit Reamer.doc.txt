@@ -1,0 +1,40 @@
+
+Drive Unit Reamer
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Standard PPE only               |Yes                                    |Gary Russell  12/06/07                  |
+|                                |                                       |Fran OΓÇÖKeefe  12/06/07                  |
+|                                |Risk Score                             |                                        |
+|                                |100                                    |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Medium                                 |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard              |
+|                         |Actual Hazard           |Risk     |                                                   |
+|Lift Moulds onto unit    |Dropping the mould      |Med      |Check for slippery surfaces on the Mould equipment.|
+|                         |equipment causing crush |         |Ensure using the correct lifting procedures and    |
+|                         |injury to body. Lifting |         |safety footwear to be worn                         |
+|                         |and twisting movement   |         |                                                   |
+|                         |causing back strain     |         |                                                   |
+|Load job into Reamer     |Crushing and or         |Med      |Keep Hand clear from pinch points on mould         |
+|Cutter                   |entrapment of the hand  |         |equipment                                          |
+|                         |                        |         |Emergency stop fitted                              |
+|Close Reamer Arms        |Crushing and or         |Low      |Keep Hand clear from pinch points on Reamer Arms   |
+|                         |entrapment of the hand  |         |Emergency stop fitted                              |
+|Start Reamer Cycle       |Crushing of the hand    |Low      |Keep Hand clear and away from the Reamer while in  |
+|                         |                        |         |the working cycle  Emergency stop fitted           |
+|Open Reamer after cycle  |Crushing  of the hand   |Low      |Keep Hand clear from pinch points on Reamer Arms.  |
+|                         |                        |         |Emergency stop fitted                              |
+|Lift Mould onto Trolley  |Dropping the mould      |Med      |Check for slippery surfaces on the Mould equipment.|
+|                         |equipment causing crush |         |Ensure using the correct lifting procedures and    |
+|                         |injury to body. Lifting |         |safety footwear to be worn                         |
+|                         |and twisting movement   |         |                                                   |
+|                         |causing back strain     |         |                                                   |

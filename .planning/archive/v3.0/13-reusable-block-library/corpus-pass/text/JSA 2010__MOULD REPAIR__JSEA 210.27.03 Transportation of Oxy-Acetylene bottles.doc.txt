@@ -1,0 +1,57 @@
+
+Transportation of Oxy-Acetylene bottles
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                |Safety Induction [Contractor]         |                                          |
+|PPE Required:                    |Significant Hazard                    |JSEA Reviewed by and date                 |
+|Standard Safety Uniform plus     |Yes                                   |Gary Russell 16/7/07                      |
+|Safety glasses                   |                                      |                                          |
+|                                 |Risk Score                            |                                          |
+|                                 |36                                    |                                          |
+|                                 |                                      |                                          |
+|                                 |Category                              |                                          |
+|                                 |Low                                   |                                          |
+|                                 |                                      |                                          |
+|                                 |Control taken                         |                                          |
+|                                 |Minimisation                          |                                          |
+|                                 |                                      |                                          |
+|Sequence of Job Steps         |Potential /                    |Level of |Controls to reduce the Risk of Hazard      |
+|                              |Actual Hazard                  |Risk     |                                           |
+|Turn off Bottles              |Leaking gas , Fire hazard      |Low      |Ensure no naked flames                     |
+|                              |                               |         |Bottles are turned off correctly           |
+|Remove bottles from storage   |Crushing , entrapment          |Low      |Position trolley correctly so as to slide  |
+|area                          |Straining of back              |         |under bottle.                              |
+|                              |                               |         |Ensure area is clear of obstructions and   |
+|                              |                               |         |clear pathway to exit area                 |
+|                              |                               |         |Plan route to store as to not be stoping   |
+|                              |                               |         |and having to move items out of way        |
+|                              |                               |         |Ensure bottle is secured by chain in cradle|
+|                              |                               |         |trolley                                    |
+|                              |                               |         |Wear back support if required              |
+|Unloading bottles at main     |Crushing , entrapment          |Low      |Position trolley correctly so as to slide  |
+|store                         |Straining of back              |         |under bottle.                              |
+|                              |                               |         |Ensure area is clear of obstructions and   |
+|                              |                               |         |clear pathway to storage area is clear     |
+|                              |                               |         |Ensure bottle is secured by chain in       |
+|                              |                               |         |storage area                               |
+|                              |                               |         |Wear back support if required              |
+|Environmental:               |                               |         |                                           |
+|Removal of used rags /       |Contamination.                 |High     |Place in correct contamination or waste    |
+|gloves/  waste/ glass /      |Waste removal and tidy up.     |         |bins provided.                             |
+|cullet                       |                               |         |Ensure area is cleaned and product / tools |
+|                             |                               |         |cleared away.                              |
+|Protection & Security        |                               |         |                                           |
+|Demarcation                  |Damage to people, property and |High     |Demarcation where applicable.              |
+|                             |environment.                   |         |Install barricaded/danger tape as required.|
+|                             |                               |         |Ensure correct fire fighting equipment is  |
+|                             |                               |         |available.                                 |
+
+
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.

@@ -1,0 +1,38 @@
+
+Using the Pedestal Drill
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Standard Safety Uniform plus    |Yes                                    |Gary Russell 29/6/07                    |
+|Safety glasses                  |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |31                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps    |Potential /                      |Level of    |Controls to reduce the Risk of Hazard   |
+|                         |Actual Hazard                    |Risk        |                                        |
+|Inspect drill before     |Loose object lying on the drill  |Low         |Remove all loose objects and make safe  |
+|start up                 |or bed that might fall off during|            |                                        |
+|                         |operation                        |            |                                        |
+|                         |Wall function of feeds, speed and|Low         |Check all feeds, speeds, drill direction|
+|Switch on drill unit     |drilling direction               |            |before operation                        |
+|                         |Job might come loose from the    |Low         |Ensure and double check that job is     |
+|Secure job in vice or jig|vice or jig causing serious      |            |secure and tight in vice or jig         |
+|                         |harm/damage                      |            |                                        |
+|Secure vice or jig to    |The drill might grab onto the job|Low         |Secure vice or jig to drill bed         |
+|drill bed                |spinning vice or jig             |            |                                        |
+|Secure drill to drill    |Drill might come loose causing   |Low         |Secure and double check that drill is   |
+|chuck                    |flying object                    |            |tight in chuck                          |
+|Drill the job            |Entrapment and cutting of the    |Low         |Keep hands clear and away from rotating |
+|                         |hands                            |            |drill                                   |
+|                         |Grabbing long drill shavings     |Low         |Ensure no loose clothing or loose       |
+|                         |                                 |            |objects near job                        |

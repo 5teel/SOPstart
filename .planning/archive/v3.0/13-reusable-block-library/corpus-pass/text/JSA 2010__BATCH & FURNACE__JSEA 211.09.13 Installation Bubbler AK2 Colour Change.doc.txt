@@ -1,0 +1,54 @@
+
+Installation of bubbler tubes on AK2 Colour Change
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                             |Safety Induction [Contractor]        |                                            |
+|PPE Required:                 |Significant Hazard                   |JSEA Reviewed by and date                   |
+|All standard PPE required     |Yes                                  |                                            |
+|                              |                                     |                                            |
+|                              |Risk Score                           |                                            |
+|                              |                                     |                                            |
+|                              |                                     |                                            |
+|                              |Category                             |                                            |
+|                              |High                                 |                                            |
+|                              |                                     |                                            |
+|                              |Control taken                        |                                            |
+|                              |Minimisation                         |                                            |
+|                              |                                     |                                            |
+|Sequence of Job Steps               |Potential /                  |Level of |Controls to reduce the Risk of      |
+|                                    |Actual Hazard                |Risk     |Hazard                              |
+|Switch Off Boost System If Required |Glass Quality Issues         |High     |                                    |
+|Be Advised From Process And Managers|                             |         |                                    |
+|Set Up Drilling Rig In Designated   |Welding Flash, Trip Hazards. |High     |Supervision At All Times, Wear      |
+|Bubbler Positions Prior To Drilling |Hitting Head, Cover          |         |Welding Screen, Wear Safety Helmet, |
+|                                    |Electrical Equipment         |         |And Cover Electrical Equipment With |
+|                                    |                             |         |Plastic Sheet.                      |
+|Drill 16mm Hole Into Glass And      |Hot Water Ingress, Lead Run  |High     |Supervision At All Times ,          |
+|Insert Bubbler                      |Outs. Glass Run Outs.        |         |Glass Leak Equipment At Hand,       |
+|                                    |                             |         |Restrict Access To Under Furnace,   |
+|Once Bubbler Is Inserted  Securely  |As Above                     |High     |As Above                            |
+|Fasten  With Insulated Clamp        |                             |         |                                    |
+|Check As To Weather Bubblers Are    |As Above                     |High     |As Above                            |
+|Bubbling Recommend 1-2 Bubbles Per  |                             |         |                                    |
+|Second.                             |                             |         |                                    |
+|Environmental:                      |                             |         |                                    |
+|Removal of used rags / gloves/      |Contamination.               |High     |Place in correct contamination or   |
+|waste/ glass / cullet               |Waste removal and tidy up.   |         |waste bins provided.                |
+|                                    |                             |         |Ensure area is cleaned and product /|
+|                                    |                             |         |tools cleared away.                 |
+|Protection & Security               |                             |         |                                    |
+|Demarcation                         |Damage to people, property   |High     |Demarcation where applicable.       |
+|                                    |and environment.             |         |Install barricaded/danger tape as   |
+|                                    |                             |         |required.                           |
+|                                    |                             |         |Ensure correct fire fighting        |
+|                                    |                             |         |equipment is available.             |
+
+
+
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

@@ -1,0 +1,35 @@
+
+Replacing Wheels on Turntable of MSK
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                            |Safety Induction [Contractor]        |                                            |
+|PPE Required:                |Significant Hazard                   |JSA Reviewed by and date                    |
+|All standard PPE required    |No                                   |                                            |
+|                             |                                     |                                            |
+|                             |Risk Score                           |                                            |
+|                             |16                                   |                                            |
+|                             |                                     |                                            |
+|                             |Category                             |                                            |
+|                             |Low                                  |                                            |
+|                             |                                     |                                            |
+|                             |Control taken                        |                                            |
+|                             |Isolation                            |                                            |
+|                             |                                     |                                            |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Turn off and isolate         |Electrocution                 |         |Ensure correct isolation procedures are  |
+|                             |                              |         |carried out                              |
+|Remove all 4 bolts that hold |Pinch points and glass in area|         |Wear correct protective gloves to prevent|
+|the wheels on                |may cause laceration to  hands|         |laceration from pinch points and from    |
+|                             |                              |         |broken glass                             |
+|Clean area of broken glass   |Laceration                    |         |Prevents lacerations and makes it easier |
+|                             |                              |         |to work in clean area                    |
+|Fit new wheels to MSK        |Pinch points present          |         |Wearing PPE                              |
+|turntable                    |                              |         |                                         |
+|Remove Lock out equipment and|Electrocution                 |         |Equipment now safe for production        |
+|tags                         |                              |         |functioning                              |
+|Reset alarms                 |Machine failure               |         |Check that equipment is functioning      |
+|                             |                              |         |before cleaning area and removing all    |
+|                             |                              |         |tools and equipment.                     |

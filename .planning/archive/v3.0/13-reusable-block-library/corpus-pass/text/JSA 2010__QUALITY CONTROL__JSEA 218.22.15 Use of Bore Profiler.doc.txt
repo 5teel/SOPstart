@@ -1,0 +1,46 @@
+
+Using the Bore Profiler
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety specs / gloves           |Yes                                    |Richard Smith   11/06/07                |
+|                                |                                       |Fran OΓÇÖKeefe  15/06/07                  |
+|                                |Risk Score                             |                                        |
+|                                |40                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps      |Potential /                  |Level of    |Controls to reduce the Risk of Hazard      |
+|                           |Actual Hazard                |Risk        |                                           |
+|Switch on Bore Profiler    |none                         |Low         |                                           |
+|Have sample containers     |none                         |Low         |Samples should be transported in an enclose|
+|available                  |                             |            |plastic crate                              |
+|Wearing appropriate PPE    |Breaking bottles causing     |Low         |Plastic bag stops glass fragments from     |
+|place container in a       |lacerations                  |            |being sprayed                              |
+|plastic bag                |                             |            |                                           |
+|Conduct test               |Breaking bottles causing     |Low         |Plastic bag stops glass fragments from     |
+|                           |lacerations                  |            |being sprayed                              |
+|Record results             |None                         |Low         |                                           |
+|Discard containers after   |Lacerations                  |Low         |PPE                                        |
+|testing                    |                             |            |                                           |
+|Environmental:             |                             |            |                                           |
+|Removal of used rags /     |Contamination.               |High        |Place in correct contamination or waste    |
+|gloves/  waste/ glass /    |Waste removal and tidy up.   |            |bins provided.                             |
+|cullet                     |                             |            |Ensure area is cleaned and product / tools |
+|                           |                             |            |cleared away.                              |
+|Protection & Security      |                             |            |                                           |
+|Demarcation                |Damage to people, property   |High        |Demarcation where applicable.              |
+|                           |and environment.             |            |Install barricaded/danger tape as required.|
+|                           |                             |            |Ensure correct fire fighting equipment is  |
+|                           |                             |            |available.                                 |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

@@ -1,0 +1,59 @@
+
+                                                      Changing Neckring Arms
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                                                      |Safety Induction [Contractor]                                 |
+|Hazard Management Worksheet                                                                                           |
+|Hazard            |Practicable to Eliminate                                                                    |
+|Identification    |                                                                                            |
+|                                     |Insignificant ΓÇô first aid injury, up to  |
+|                                     |$1,000 damage, spill confined to         |
+|LIKELIHOOD                           |immediate work area, rapid clean up, no  |
+|                                     |damage to environment                    |
+|How likely is it to happen?          |                                         |
+|4                                    |ACT NOW ΓÇô Urgent ΓÇô do something about the|
+|ACUTE                                |risks immediately. Requires immediate    |
+|                                     |attention.                               |
+|3                                    |Highest management decision is required  |
+|HIGH                                 |urgently                                 |
+|2                                    |Follow management instruction            |
+|MODERATE                             |                                         |
+|1                                    |OK for now. Record and review if any     |
+|LOW                                  |equipment / people / materials / work    |
+|                                     |processes or procedures change           |
+
+
+|JOB SAFETY ANALYSIS               |Changing Neckring Arms                                                         |
+
+|Area / Department            |Forming                                    |Task  or Job Description                |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |- Grant Jupp 17-12-2019                 |
+|when working within          |                                           |                                        |
+|production area              |Overall Category of Risk                   |                                        |
+|                             |High                                       |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps           |Potential /                    |Level  |Controls to reduce the Risk of Hazard   |
+|                                |Actual Hazard                  |of Risk|                                        |
+|Take new neckring arm to section|Moving   machinery. Greasy/wet |High   |Take 5 - Be aware of surroundings       |
+|check if correct and undamaged. |floor. Slip hazard             |       |                                        |
+|Stop gob loading                |Moving machinery. Noise/heat   |High   |Stay clear of section until last gob is |
+|                                |                               |       |loaded and section is clear.            |
+|Stop section with neck ring arm |Moving machinery. Noise/heat   |High   |Stay clear until the section stops.     |
+|on the mould side.              |                               |       |                                        |
+|[Put safety barriers in place]  |                               |       |                                        |
+|Manually close mould/ remove    |Moving machinery. Noise/heat   |High   |Be aware of surroundings and notify     |
+|neckrings.                      |                               |       |other workers on what you are going to  |
+|                                |                               |       |do                                      |
+|Undo neckring arm from blank    |Moving machinery. [Hot/ noise  |High   |PPE   is  required when changing        |
+|side remove them                |limited space]                 |       |neckring arm                            |
+|Put new neckring arm on use     | Moving machinery.             |High   |Communicate as to what is to happen next|
+|blocks to reset and align them. |Noise/heat/limited space       |       |as it is a two men job                  |
+|Put new neck rings on. [Take    |                               |       |                                        |
+|mould close of manual and put it|                               |       |                                        |
+|into auto                       |                               |       |                                        |
+|Re start section                |Moving machinery               |High   |Stay clear of section                   |

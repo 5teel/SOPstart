@@ -1,0 +1,41 @@
+
+219.01.13      #23, 31, 34 Mould Change 750ml
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                       |Safety Induction [Contractor]               |                                             |
+|PPE Required:           |Significant Hazard                          |JSA Reviewed by and date                     |
+|All standard PPE        |Yes o                                       |June 2009                                    |
+|required when working   |                                            |                                             |
+|within production area  |Overall Category of task                    |                                             |
+|                        |Medium                                      |                                             |
+|                        |                                            |                                             |
+|                        |Control taken                               |                                             |
+|                        |Minimisation                                |                                             |
+|                        |                                            |                                             |
+|Sequence of Job Steps   |Potential /                |Level of |Controls to reduce the Risk of Hazard               |
+|                        |Actual Hazard              |Risk     |                                                    |
+|Mould side safety       |Reduce the risk of being   |High     |Ensure (Red) maintenance / E Stop button on the     |
+|procedure               |caught in the section      |         |mould side is pushed in.                            |
+|Mould Side safety Plate |Burning from heat reflected|High     |Where possible, place safety plate in the up        |
+|                        |off ware                   |         |position to reflect heat back towards the machine.  |
+|                        |                           |         |Depress both safety snap valves down. Note:  During |
+|                        |Caught in moulds           |High     |job changes fit safety snap valve cover over mould  |
+|                        |                           |         |side snap valves.                                   |
+|Prepare moulds for      |Burns                      |High     |Ensure tee lifters to the Moulds are in securely and|
+|Lifting                 |                           |         |prepare to lift the Mould from the hinge.           |
+|Removing Moulds         |Burns / Back Strain        |High     |Get into a comfortable lifting position that suits. |
+|                        |                           |         |Reducing lowering and twisting while lifting. Remove|
+|                        |                           |         |Moulds. Back support belt optional.                 |
+|Remove Bottom Plate.    |Crushed hand.              |High     |Using Bottom Plate lifting tool remove bottom plate |
+|                        |                           |         |from section                                        |
+|Fit clean Bottom Plate  |Crushed Hand               |High     |Using Bottom Plate lifting tool replace bottom plate|
+|                        |                           |         |into the section                                    |
+|Fit clean Moulds        |Back Strain                |High     |Get into a comfortable lifting position that suits. |
+|                        |                           |         |Reducing lowering and twisting while lifting. Refit |
+|                        |                           |         |Moulds. Remove Tee Lifters.                         |
+|Prepare Section to      |Caught in Section.         |High     |Pull out Mould Side (Red) maintenance / E Stop      |
+|start.                  |                           |         |button Remove snap valve safety plate. Reset snap   |
+|                        |                           |         |valve to run position. Ensure all personnel are     |
+|                        |                           |         |clear of the section.  Start the section up.        |

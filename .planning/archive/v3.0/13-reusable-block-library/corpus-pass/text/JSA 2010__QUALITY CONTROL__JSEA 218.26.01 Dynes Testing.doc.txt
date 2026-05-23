@@ -1,0 +1,49 @@
+
+Dynes Testing
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Glasses / disposable     |Yes                                    |                                        |
+|gloves                          |                                       |Ellis Levy  11/06/07                    |
+|                                |Risk Score                             |                                        |
+|                                |20                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                    |Potential /            |Level of    |Controls to reduce the Risk of    |
+|                                         |Actual Hazard          |Risk        |Hazard                            |
+|Select containers to test & allow to cool|Nil                    |Nil         |Nil                               |
+|to ambient temperature                   |                       |            |                                  |
+|Ensure appropriate PPE is worn           |Chemical composition in|Low         |PPE / MSDS                        |
+|                                         |ink die                |            |                                  |
+|Select a Dynes Pen ( mid point in the    |Nil                    |Low         |Nil                               |
+|testing range ) & draw one continuous    |                       |            |                                  |
+|line from shoulder to heel               |                       |            |                                  |
+|Note results as per specification        |Nil                    |Low         |Nil                               |
+|If the test needs to be done again (     |Nil                    |Low         |Nil                               |
+|either with the same Dynes Pen or another|                       |            |                                  |
+|in the range ) then the procedure is as  |                       |            |                                  |
+|above                                    |                       |            |                                  |
+|Discard containers after testing         |Laceration             |Low         |PPE                               |
+|Environmental:                           |                       |            |                                  |
+|Removal of used rags / gloves/  waste/   |Contamination.         |High        |Place in correct contamination or |
+|glass / cullet                           |Waste removal and tidy |            |waste bins provided.              |
+|                                         |up.                    |            |Ensure area is cleaned and product|
+|                                         |                       |            |/ tools cleared away.             |
+|Protection & Security                    |                       |            |                                  |
+|Demarcation                              |Damage to people,      |High        |Demarcation where applicable.     |
+|                                         |property and           |            |Install barricaded/danger tape as |
+|                                         |environment.           |            |required.                         |
+|                                         |                       |            |Ensure correct fire fighting      |
+|                                         |                       |            |equipment is available.           |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

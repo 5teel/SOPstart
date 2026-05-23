@@ -1,0 +1,31 @@
+
+Fitting Motor to Cullet Water Pump
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                            |Safety Induction [Contractor]        |                                            |
+|PPE Required:                |Significant Hazard                   |JSA Reviewed by and date                    |
+|All standard PPE required    |No                                   |                                            |
+|                             |                                     |                                            |
+|                             |Risk Score                           |                                            |
+|                             |16                                   |                                            |
+|                             |                                     |                                            |
+|                             |Category                             |                                            |
+|                             |Low                                  |                                            |
+|                             |                                     |                                            |
+|                             |Control taken                        |                                            |
+|                             |Isolation                            |                                            |
+|                             |                                     |                                            |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Turn off motor and isolate   |Electrocution                 |Medium   |Ensure correct isolation procedures are  |
+|                             |                              |         |carried out                              |
+|Remove guard                 |Pinch points                  |Low      |Use PPE to prevent lacerations           |
+|Remove motor                 |Manual Handling & Straining   |Medium   |Requires two people using the correct    |
+|                             |injury                        |         |lifting technique                        |
+|Fit new motor                |Manual Handling & Straining   |Medium   |Requires two people using the correct    |
+|                             |injury                        |         |lifting technique                        |
+|Fit coupling                 |Entrapment as fitting on motor|Low      |Use correct size spanner and tighten     |
+|                             |                              |         |motor                                    |
+|Replace guard                |Entrapment                    |Low      |Prevent access to motor                  |

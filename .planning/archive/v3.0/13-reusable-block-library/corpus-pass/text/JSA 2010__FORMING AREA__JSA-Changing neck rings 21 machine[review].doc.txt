@@ -1,0 +1,41 @@
+
+Changing N/Rings 2/1MC
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |                                        |
+|All standard PPE required    |YES                                        |JSA Reviewed by and date                |
+|when working within          |                                           |                                        |
+|production area.             |Overall Category of task                   |                                        |
+|                             |                                           |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|                             |                              |            |                                        |
+|Get ring from spare bench    |                              |LOW         |                                        |
+|                             |                              |            |                                        |
+|Turn Glass off               |                              |LOW         |                                        |
+|                             |                              |            |                                        |
+|Stop section to or on mould  |                              |LOW         |                                        |
+|side                         |                              |            |                                        |
+|                             |                              |            |                                        |
+|Change the Ring              |Watch you donΓÇÖt burn yourself |HIGH +      |Make sure PPE is worn                   |
+|                             |                              |            |                                        |
+|After changing the Ring, push|Be careful you donΓÇÖt go by the|HIGH        |Make sure PPE is worn                   |
+|arms to the blank side.      |section next to you.          |            |                                        |
+|                             |                              |            |                                        |
+|Mop the Rings and start the  |Watch out for sections running|HIGH        |Make sure PPE is worn                   |
+|section                      |                              |            |                                        |
+|                             |                              |            |                                        |
+|Load the Glass               |                              |LOW         |                                        |
+|                             |                              |            |                                        |
+|Check the Ring, if it is OK, |                              |HIGH        |Make sure PPE is worn                   |
+|let go in the lehr           |                              |            |                                        |
+
+

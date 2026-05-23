@@ -1,0 +1,43 @@
+
+#34 Blank Change 330ml
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                                  |Safety Induction [Contractor]         |                                          |
+|PPE Required:                      |Significant Hazard                    |JSA Reviewed by and Date:                 |
+|Boots, gloves, uniform, safety     |Yes                                   |                                          |
+|glasses, ear muffs, (protection    |                                      |July 2007                                 |
+|sleeves, back support ΓÇô optional)  |Category                              |                                          |
+|                                   |Medium                                |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |Minimisation                          |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Make section Safe.       |Caught in Section.      |High     |Ensure Maintenance stop button is activated and light is|
+|                         |                        |         |on before entering section.                             |
+|Safety lock outs for     |Reduce the risk of being|High     |Turn Blank Close operating air off under valve chest.   |
+|blanks                   |caught in the section   |         |                                                        |
+|Invert safety bar        |Reduce the risk of being|High     |Place Invert safety lock over Invert rack so that lock  |
+|                         |caught in the section   |         |sits down on the top of the invert mechanism            |
+|Ensure working safely.   |Baffle Arm              |High     |Be aware of baffle arm coming off on the adjacent       |
+|                         |                        |         |section.                                                |
+|Access to remove blanks. |Jamming hands.          |High     |Remove plenum chambers.                                 |
+|Prepare Blanks for       |Back Strain             |High     |Fit tee screw lifters to the blanks or use thick gloves |
+|Lifting.                 |                        |         |to lift the Blank from the hinge.                       |
+|Remove Blanks            |Caught in Section. /    |High     |Get into a comfortable lifting position that suits.     |
+|                         |Back strain             |         |Reducing lowering and twisting while lifting.  Remove   |
+|                         |                        |         |Blanks                                                  |
+|Fit clean blanks         |Caught in Section. /    |High     |Get into a comfortable lifting position that suits.     |
+|                         |Back strain             |         |Reducing lowering and twisting while lifting.  Refit    |
+|                         |                        |         |Blanks and plenum chambers.                             |
+|Prepare Section to start.|Caught in Section.      |High     |Turn on Blank close air and remove Invert safety lock.  |
+
+
+-----------------------
+[pic]
+
+O-I New Zealand
+

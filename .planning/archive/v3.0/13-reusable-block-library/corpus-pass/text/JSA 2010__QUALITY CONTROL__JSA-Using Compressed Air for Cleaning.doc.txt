@@ -1,0 +1,46 @@
+
+Use of Compressed Air for cleaning
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety Glasses / gloves / Dust  |Yes                                    |Gary OΓÇÖNeill   12/06/07                 |
+|mask if required                |                                       |Steve Bell                              |
+|                                |Risk Score                             |                                        |
+|                                |100                                    |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Medium                                 |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                      |Potential /                  |Level of |Controls to reduce the Risk  |
+|                                           |Actual Hazard                |Risk     |of Hazard                    |
+|Once the area that requires cleaning has   |Nil                          |Low      |Understanding that Compressed|
+|been identified as a limited space that    |                             |         |Air is a hazard to people    |
+|cleaning with the use of a shovel and brush|                             |         |working within the area      |
+|is not possible then Compressed Air to be  |                             |         |                             |
+|used.                                      |                             |         |                             |
+|Ensure the immediate vicinity is clear of  |Excessive dust & glass       |Medium   |Ensure all employees have    |
+|other persons &/or palletised ware         |fragments will be hazardous  |         |been advised prior to        |
+|                                           |to both other personnel &    |         |starting the Compressed Air  |
+|                                           |palletised glass             |         |cleaning                     |
+|Take firm hold of the hose/ nozzle & point |Nil                          |Low      |Nil                          |
+|away from body                             |                             |         |                             |
+|Turn on Compressed Air valve               |Nil                          |Low      |Nil                          |
+|Direct the nozzle so that the area is blown|Nil                          |Low      |Never point nozzle at any    |
+|clean as effectively as possible           |                             |         |person as Compressed Air may |
+|                                           |                             |         |enter blood stream           |
+|When completed, turn off valve & clear     |Manual handling risk causing |Low      |Ask for assistance if needed.|
+|remaining debris with broom & shovel       |Sprain / strain              |         |PPE to worn as broken glass  |
+|                                           |                             |         |fragments are present        |
+|DO NOT use compressed air for any other    |May cause injury to self     |High     |Never use Compressed Air to  |
+|purpose other than that for which it is    |                             |         |blow down clothing as        |
+|provided NEVER indulge in so called        |                             |         |Compressed Air may enter     |
+|practical jokes  with compressed air       |                             |         |blood stream                 |
+|THERE IS BOTH HIGH & LOW PRESSURE          |May cause injury to self and |High     |                             |
+|COMPRESSED AIR IN THE FACTORY, BOTH CAN BE |others                       |         |                             |
+|FATAL IF USED INCORRECTLY                  |                             |         |                             |

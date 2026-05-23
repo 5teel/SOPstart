@@ -1,0 +1,128 @@
+
+Instructions for the process
+   1. Tick the Hazards involved with the task or area
+   2. Use the hazard template scoring sheet to work out the Risk score
+   3. Complete a Job Safety Analysis sheet
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1               |Safety Induction [Contractor]    |                      |5                  |Hot work           |      |
+|                |Multiple fatalities              |$500,000 to $1 million|Major on site      |Minor product      |50    |
+|                |                                 |                      |impact and major   |recall with adverse|      |
+|                |                                 |                      |clean up           |publicity resulting|      |
+|                |                                 |                      |                   |in minor claim     |      |
+|                |Fatality                         |$100,000 to $500,000  |Minor on site      |Minor product      |10    |
+|                |                                 |                      |impact and major   |recall with major  |      |
+|                |                                 |                      |clean up           |resort of product  |      |
+|                |Extremely serous injury [        |$1000 to $100,000     |Minor off site     |Minor product      |5     |
+|                |amputation, permanent disability |                      |impact and minor   |recall with minor  |      |
+|                |                                 |                      |clean up           |resort of product  |      |
+|                |Disabling injury [ ACC claim, one|Up to $1000           |Minor local area   |Customer compliant |3     |
+|                |week off work or more]           |                      |impact with area   |and no resort of   |      |
+|                |                                 |                      |clean up required  |product required   |      |
+|                |Minor  injury or minor damage    |$500- nil             |Minimal impact     |                   |2     |
+|                |                                 |                      |                   |                   |      |
+|                |Frequently ΓÇô approximately once a|                      |                   |                   |5     |
+|                |day                              |                      |                   |                   |      |
+|                |Usually from once a week to once |                      |                   |                   |3     |
+|                |a month                          |                      |                   |                   |      |
+|                |Occasionally once a month to once|                      |                   |                   |2     |
+|                |in six months                    |                      |                   |                   |      |
+|                |Rarely ΓÇô once a year             |                      |                   |                   |1     |
+|                |Very rarely ΓÇô once every few     |                      |                   |                   |0.5   |
+|                |years                            |                      |                   |                   |      |
+|                |                                 |                      |                   |                   |      |
+|                |Is quite possible, not unusual,  |                      |                   |                   |4     |
+|                |but has an even 50/50 chance     |                      |                   |                   |      |
+|                |Would be an unusual sequence or  |                      |                   |                   |3     |
+|                |coincidence                      |                      |                   |                   |      |
+|                |Would be a remotely possible     |                      |                   |                   |2     |
+|                |coincidence                      |                      |                   |                   |      |
+|                |Has never happened after many    |                      |                   |                   |1     |
+|                |years of exposure but it is      |                      |                   |                   |      |
+|                |conceivably possible             |                      |                   |                   |      |
+|                |Practically impossible sequence  |                      |                   |                   |0.5   |
+|                |has never happened               |                      |                   |                   |      |
+
+|EXTREME               |HIGH                |MEDIUM                |LOW                                         |
+|The risk score is     |The Risk Score is   |The Risk Score is  120|The Risk Score is  45                       |
+|5000                  |1000                |                      |                                            |
+|Serious harm Action   |Moderate Hazard     |Minor Hazard          |Hazard                                      |
+|required              |Action required     |Action required       |Action required                             |
+|Conduct a immediate   |Conduct planned JSA |Conduct planned JSA   |Take 5 Plan                                 |
+|JSA. Involving        |involving at least 3|involving at least 2  |Think through the task                      |
+|Management, Depart    |team members.       |team members.         |Spot the hazard                             |
+|employees Health &    |                    |                      |                                            |
+|Safety Manager        |                    |                      |Assess the Risks                            |
+|                      |                    |                      |Make the Changes Control & Communication    |
+|                      |                    |                      |                                            |
+|                      |                    |                      |Do the Job safely                           |
+|                      |                    |                      |                                            |
+|                      |                    |                      |                                            |
+|Health Risk:          |Health Risk:        |Health Risk:          |Health Risk:                                |
+|May require immediate |May require         |Consider the          |Nil                                         |
+|mandatory medical     |Low-level medical   |requirement for       |                                            |
+|surveillance.         |surveillance.       |medical surveillance. |                                            |
+|Environmental Risk    |Environmental Risk  |Environmental Risk    |Environmental Risk                          |
+|Major off site impact |Major on site impact|Minor on site impact  |Minor local area impact with area clean up  |
+|and clean up with     |and major clean up  |and major clean up    |required                                    |
+|adverse publicity     |                    |                      |                                            |
+|QUALITY               |QUALITY             |QUALITY               |QUALITY                                     |
+|Major product recall  |Minor product recall|Minor product recall  |Customer compliant and no resort of product |
+|with adverse publicity|with adverse        |with minor resort of  |required                                    |
+|and major customer    |publicity resulting |product               |                                            |
+|claim                 |in minor claim      |                      |                                            |
+|General Risk:         |General Risk:       |General Risk:         |General Risk:                               |
+|Requires the immediate|Review controls and |Review controls yearly|Nil                                         |
+|change to control risk|implement the       |                      |                                            |
+|                      |changes from the    |                      |                                            |
+|                      |short into long term|                      |                                            |
+|Monitoring:           |Monitoring:         |Monitoring:           |Monitoring:                                 |
+|Quarterly medical or  |Yearly medical or   |If required           |Nil                                         |
+|environmental         |environmental       |                      |                                            |
+|monitoring            |monitoring          |                      |                                            |
+
+
+                              RESULTS AREA PLAN
+
+     To get a Risk Score multiply the Consequence by the Exposure by the
+                              Probability rate.
+
+                        Changing Neck Rings on 21 Machines during Job Change
+|Area / Department               |21 Forming Machine                     |Task  or Job Description                |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Boots, Uniform, Safety Glasses, |Yes                                    |Fran OΓÇÖKeefe 24th May 2007              |
+|Ear Muffs, Protection Sleeves,  |                                       |                                        |
+|Back Support                    |Risk Score                             |                                        |
+|                                |2500                                   |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard              |
+|                         |Actual Hazard           |Risk     |                                                   |
+|Stop Section:-           |Entrapment              |High     |Stop Neck ring arms in the inverted position.      |
+|Manual Operation         |Entrapment in Section   |High     |Switch to manual operation                         |
+|                         |and Moulds              |         |                                                   |
+|Neck ring change with    |Entrapment in Section   |High     |Activate manual switches on the Blank side to      |
+|Moulds Closed plus Mould |and Moulds              |         |position the Moulds in the closed position Press in|
+|side safety              |                        |         |Mould inhibit button and the E stop button so the  |
+|                         |                        |         |section cannot be operated manually from the Blank |
+|                         |                        |         |side.                                              |
+|Neck ring change with    |Entrapment in Section   |Extreme  |Press in Mould inhibit button and the E stop button|
+|Moulds open              |                        |         |so the section cannot be operated manually from the|
+|                         |                        |         |Blank side.                                        |
+|Mould Side safety Plate  |Entrapment in Section   |Extreme  |Where possible, place safety plate in the up       |
+|                         |                        |         |position to reflect heat back towards the machine. |
+|                         |                        |         |Note: - On Job Change there is no Hot glass and    |
+|                         |                        |         |this Safety plate can be left in the down position.|
+|Remove Neck ring         |Burning from heat       |High     |Wear gloves provided to remove Neck ring from neck |
+|                         |reflected off ware      |         |ring arms Neck ring is hot.                        |
+|Fit clean Neck ring      |Burns                   |Extreme  |Wear gloves provided to fit clean Neck ring.       |
+|Prepare Section to start.|Burns                   |Extreme  |Pull out Mould inhibit button and the E stop       |
+|Mould close              |                        |         |button. Switch to run on the Blank Side.           |
+|Prepare Section to start.|Entrapment in Section   |High     |Pull out Mould inhibit button and the E stop       |
+|Mould Open               |                        |         |button. Switch to run on the Blank Side.           |
+|Starting a section       |Entrapment in Section   |High     |Ensure all personnel are clear of the section.     |
+|                         |                        |         |Start the section up                               |

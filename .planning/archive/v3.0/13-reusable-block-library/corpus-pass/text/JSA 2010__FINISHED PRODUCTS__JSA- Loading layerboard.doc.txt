@@ -1,0 +1,34 @@
+
+Loading Layerboard pallets at Layerboard lift
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date:               |
+|All standard PPE required       |Yes                                    |Bronwyn Bell                            |
+|                                |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |60                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps           |Potential /                 |Level of |Controls to reduce the Risk of Hazard   |
+|                                |Actual Hazard               |Risk     |                                        |
+|Using mobile hoist, drive       |Mobile hoist                |Low      |Must be a licensed driver               |
+|forward with forks lowered      |                            |         |                                        |
+|Carefully move forward with     |As above                    |Low      |Licensed hoist driver, care taken when  |
+|hoist and forks into pallet and |Layerboard pallets are      |         |moving or shifting layerboard pallets as|
+|lift pallet into position       |unstable and may slide off  |         |boards may shift or slide off.          |
+|                                |if moving too fast          |         |                                        |
+|Slowly move hoist forward until |As above                    |Low      |As above                                |
+|in position, carefully lower    |                            |         |                                        |
+|pallet onto rollers             |                            |         |                                        |
+|Carefully reverse hoist until   |As above                    |Low      |As above                                |
+|forks are clear of pallet and   |                            |         |                                        |
+|conveyor and lower forks        |                            |         |                                        |
+|Repeat process with care        |As above                    |Low      |As above                                |

@@ -1,0 +1,56 @@
+
+Stacker bar Replacement on 21 machine
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                 |Safety Induction [Contractor]                                                               |
+|                              |Insignificant ΓÇô first aid injury, up  |
+|                              |to $1,000 damage, spill confined to   |
+|LIKELIHOOD                    |immediate work area, rapid clean up,  |
+|                              |no damage to environment              |
+|How likely is it to happen?   |                                      |
+|4                             |ACT NOW ΓÇô Urgent ΓÇô do something about |
+|ACUTE                         |the risks immediately. Requires       |
+|                              |immediate attention.                  |
+|3                             |Highest management decision is        |
+|HIGH                          |required urgently                     |
+|2                             |Follow management instruction         |
+|MODERATE                      |                                      |
+|1                             |OK for now. Record and review if any  |
+|LOW                           |equipment / people / materials / work |
+|                              |processes or procedures change        |
+                                       Stacker bar Replacement on 21 machine
+|Area / Department            |Production Mtce                            |Task  or Job Description                |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date  16/02/10      |
+|All standard PPE required    |Yes                                        |John Holmes-Libbis  Colin Hayes         |
+|                             |                                           |                                        |
+|                             |Overall Category of task                   |                                        |
+|                             |Medium                                     |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Stop the stacker by pushing  |Electrocution                 |4           |Isolation ΓÇô push E-stop, lock it out and|
+|the E-stop, put lock-out on  |                              |            |tag it with the name of the person      |
+|the switch                   |                              |            |working on the stacker.                 |
+|Manually push the stacker bar|Pinch points                  |2           |Minimization-use required PPE           |
+|on top of the cross conveyor |Risk of entrapment            |            |Ensure correct  body ergonomics         |
+|mat.                         |Excessively hot environment   |            |                                        |
+|Undo 8pcs x 6mm cap screw    |Slippery surface              |            |                                        |
+|which hold the stacker onto  |Broken glass                  |            |                                        |
+|the bracket                  |Burnt                         |            |                                        |
+|Install new stacker bar      |Pinch points                  |2           |Minimization-use correct PPE            |
+|                             |Risk of entrapment            |            |-donΓÇÖt twist body when lifting          |
+|                             |Manual handling               |            |- carry bar closer to your body         |
+|                             |Broken glass                  |            |- ask some assistance when lifting and  |
+|                             |Burnt                         |            |installing the bar                      |
+|                             |Slippery surface              |            |                                        |
+|Level the bar by ensuring a  |Broken glass                  |2           |Minimization-use correct PPE            |
+|clearance of ┬╜ above the     |Limited working area          |            |Correct body ergonomics                 |
+|cross conveyor mat.          |Slippery surface              |            |                                        |
+|                             |Risk of entrapment            |            |                                        |
+|                             |Pinch points                  |            |                                        |
+|                             |Excessive hot environment     |            |                                        |
+|Remove lock-out and start    |Risk of entrapment            |3           |Minimization- ensure that no one is     |
+|stacker                      |                              |            |around the stacker area when in         |
+|                             |                              |            |starting.                               |

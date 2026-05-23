@@ -1,0 +1,52 @@
+
+Scales Set up / Calibration / Weighing Bottles
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Safety Specs / Ear protection / |Yes                                    |Richard Smith                           |
+|cap / boots                     |                                       |11/6/7                                  |
+|                                |Risk Score                             |                                        |
+|                                |20                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                 |Potential /             |Level of    |Controls to reduce the Risk of      |
+|                                      |Actual Hazard           |Risk        |Hazard                              |
+|SET UP / CALIBRATION                  |Noise                   |Low         |Ensure that all PPE is worn to      |
+|                                      |                        |            |prevent injury to self              |
+|Switch on scales                      |None                    |Low         |Nil                                 |
+|Zero scales ( tare )                  |None                    |Low         |Nil                                 |
+|Place certified weights onto scale    |None                    |Low         |Nil                                 |
+|tray                                  |                        |            |                                    |
+|Measure & record                      |None                    |Low         |Nil                                 |
+|Apply calibration sticker if passed ok|None                    |Low         |Nil                                 |
+|WEIGHING BOTTLES                      |Noise / Heat            |Low         |Drink fluids whilst working for     |
+|                                      |                        |            |prolonged periods in the Hot End.   |
+|                                      |                        |            |Ensure that all PPE is worn to      |
+|                                      |                        |            |prevent injury to self              |
+|Switch on scales                      |None                    |Low         |Nil                                 |
+|Zero scales ( tare )                  |None                    |Low         |Nil                                 |
+|Place container onto scale tray       |None                    |Low         |Nil                                 |
+|Record results                        |None                    |Low         |Nil                                 |
+|Environmental:                        |                        |            |                                    |
+|Removal of used rags / gloves/  waste/|Contamination.          |High        |Place in correct contamination or   |
+|glass / cullet                        |Waste removal and tidy  |            |waste bins provided.                |
+|                                      |up.                     |            |Ensure area is cleaned and product /|
+|                                      |                        |            |tools cleared away.                 |
+|Protection & Security                 |                        |            |                                    |
+|Demarcation                           |Damage to people,       |High        |Demarcation where applicable.       |
+|                                      |property and            |            |Install barricaded/danger tape as   |
+|                                      |environment.            |            |required.                           |
+|                                      |                        |            |Ensure correct fire fighting        |
+|                                      |                        |            |equipment is available.             |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+

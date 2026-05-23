@@ -1,0 +1,59 @@
+
+
+
+  Job Safety Environmental Analysis Form:                      Installation
+                                                                        Lehr
+                                                                        Belt
+
+|Area / Department                  |Machine Maintenance                   |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|Safety Boots, welding PPE required.|                                      |                                          |
+|                                   |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Prepare work area.       |Manual handling.        |Medium   |Use correct manual handling techniques.                 |
+|Temporary power to drive.|Electric shock.         |High     |Temporary power to be provided by Electrician.          |
+|                         |Other persons in area.  |         |Barricade off work area.                                |
+|                         |Exposed moving parts.   |         |Drive to be strictly controlled.                        |
+|                         |Sharp edges.            |         |Wear appropriate PPE.                                   |
+|Lift belt rolls to Hot   |Forklift movements.     |High     |Rigger to rig load.                                     |
+|End ΓÇô forklift.          |Rigging load.           |         |Forklift to use spotter.                                |
+|Tow belt through Lehr    |Jammed fingers.         |High     |Towing speed to be slow and controlled.                 |
+|with rope.               |Pinch points.           |         |Rope around drive end.                                  |
+|                         |Moving rollers and      |         |                                                        |
+|                         |rolls.                  |         |                                                        |
+|                         |Sharp edges.            |         |                                                        |
+|Start and stop to join   |Jammed fingers.         |High     |Towing speed to be slow and controlled.                 |
+|rolls as required.       |Pinch points.           |         |Rope around drive end.                                  |
+|                         |Moving rolls / sharp    |         |Turn power off when joining rolls.                      |
+|                         |edges.                  |         |Use correct manual handling techniques.                 |
+|                         |Manual handling.        |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+
+-----------------------
+
+
+[pic]
+
+O-I New Zealand
+

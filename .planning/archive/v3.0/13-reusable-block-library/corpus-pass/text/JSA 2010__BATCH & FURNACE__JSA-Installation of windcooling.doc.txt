@@ -1,0 +1,30 @@
+
+
+                                      Installation of extra Wind Cooling AK2
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |X                                       |
+|PPE Required:                   |Significant Hazard                     |JSEA Reviewed by and date               |
+|Earmuffs.                       |Yes                                    |                                        |
+|Safety Glasses.                 |                                       |                                        |
+|Gloves.                         |Risk Score                             |                                        |
+|                                |40                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |MINIMISATION                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard              |
+|                         |Actual Hazard           |Risk     |                                                   |
+|Place flex tube in       |Heat, noise, dust, back |Medium   |Have regular breaks and drink lots of fluid. Wear  |
+|correct position.        |strain.                 |         |appropriate PPE.                                   |
+|Join Flex Tube           |Heat, noise, cuts.      |High     |Have regular breaks and drink lots of fluid. Wear  |
+|                         |                        |         |gloves.                                            |
+|Cut hole in manifold and |Noise, sparks, dust.    |High     |Wear all PPE.                                      |
+|rivet takeoff.           |                        |         |                                                   |
+|Fit flex tube to takeoff |Noise, dust and cuts.   |Medium   |Wear all PPE.                                      |
+|and rivet.               |                        |         |                                                   |

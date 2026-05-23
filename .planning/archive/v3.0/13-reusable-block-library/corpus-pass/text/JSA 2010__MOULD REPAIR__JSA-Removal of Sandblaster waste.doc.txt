@@ -1,0 +1,39 @@
+
+Removal of Sandblaster waste
+
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date                |
+|Safety Glasses, Face mask,      |Yes                                    |Gary Russell 7/9/07                     |
+|Gloves                          |                                       |                                        |
+|                                |Risk Score                             |                                        |
+|                                |30                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Low                                    |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard              |
+|                         |Actual Hazard           |Risk     |                                                   |
+|Turn machine off         |Electric shock          |25       |Check electrical switches for obvious damage       |
+|Undo clamp on waste drum |Dust                    |25       |Wear Face mask and PPE Gloves                      |
+|                         |Cuts / Abrasions        |         |Use correct size screwdriver for slot              |
+|                         |Slipping screwdriver    |         |                                                   |
+|Undo Hose from hopper    |Dust                    |25       |Wear Face mask and PPE Gloves                      |
+|                         |Cuts / Abrasions        |         |Use correct size screwdriver for slot              |
+|                         |Slipping screwdriver    |         |                                                   |
+|Fit lid to waste drum    |Dust                    |25       |Wear Face mask and PPE Gloves                      |
+|                         |Cuts / Abrasions        |         |Use correct size screwdriver for slot              |
+|                         |Slipping screwdriver    |         |                                                   |
+|Remove waste drum        |Tripping / falling      |10       |Ensure area clear of obstacles                     |
+|                         |                        |         |Ensure drum is secure on wheel stand               |
+|Transport full drum to   |Falling objects         |30       |Ensure drum lifting clamp is secure and correctly  |
+|pick up area             |Tripping                |         |fitted                                             |
+|                         |                        |         |Ensure area moving into is clear of obstructions   |
+|                         |                        |         |Correct operation of pedestrian hoist or forklift  |
+|                         |                        |         |if used                                            |

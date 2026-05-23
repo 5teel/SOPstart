@@ -1,0 +1,27 @@
+
+Changing section of Vacuum line
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                            |Safety Induction [Contractor]        |                                            |
+|PPE Required:                |Significant Hazard                   |JSA Reviewed by and date                    |
+|All standard PPE required    |Yes                                  |                                            |
+|                             |                                     |                                            |
+|                             |Risk Score                           |                                            |
+|                             |                                     |                                            |
+|                             |                                     |                                            |
+|                             |Category                             |                                            |
+|                             |Low                                  |                                            |
+|                             |                                     |                                            |
+|                             |Control taken                        |                                            |
+|                             |Minimisation                         |                                            |
+|                             |                                     |                                            |
+|Sequence of Job Steps        |Potential /                   |Level of |Controls to reduce the Risk of Hazard    |
+|                             |Actual Hazard                 |Risk     |                                         |
+|Notify Control Room of task  |bad planning                  |Low      |Communicate to right people              |
+|about to be undertaken       |                              |         |                                         |
+|Isolate pipe work            |                              |         |                                         |
+|Prop existing pipe work      |Hit head                      |Low      |                                         |
+|Disconnect pipe              |Manual Handling               |         |Use correct manual handling techniques   |
+|Re install new bits          |Manual Handling               |         |Use correct manual handling techniques   |

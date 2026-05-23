@@ -1,0 +1,28 @@
+
+Changing Plunger on 31 Machine
+                            HAZARD IDENTIFICATION
+
+|1                                                                          |
+|1                                                                          |
+|1                            |Safety Induction [Contractor]              |                                        |
+|PPE Required:                |Significant Hazard                         |JSA Reviewed by and date                |
+|All standard PPE required    |Yes                                        |                                        |
+|when working within          |                                           |                                        |
+|production area              |Overall Category of task                   |                                        |
+|                             |Medium                                     |                                        |
+|                             |                                           |                                        |
+|                             |Control taken                              |                                        |
+|                             |Minimisation                               |                                        |
+|                             |                                           |                                        |
+|Sequence of Job Steps        |Potential /                   |Level of    |Controls to reduce the Risk of Hazard   |
+|                             |Actual Hazard                 |Risk        |                                        |
+|Remove striker plate         |Burns from hot blanks         |Medium      |Use all PPE to prevent burns. Ring arm T|
+|                             |                              |            |bar lock                                |
+|Remove thimble               |Burns Entrapment, Back or     |Medium      |Use all PPE to prevent burns Turn blank |
+|                             |shoulder strain from manual   |            |close air off and lock blank hinge      |
+|                             |handling                      |            |                                        |
+|Remove Plunger               |Burns Entrapment Back or      |Medium      |Use all PPE to prevent burns Turn blank |
+|                             |shoulder strain from manual   |            |close air off and lock blank hinge      |
+|                             |handling                      |            |                                        |
+
+

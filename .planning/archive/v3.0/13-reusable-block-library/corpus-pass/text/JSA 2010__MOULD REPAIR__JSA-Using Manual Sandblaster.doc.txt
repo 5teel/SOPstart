@@ -1,0 +1,36 @@
+
+Manual Sandblaster
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                           |Safety Induction [Contractor]      |                                               |
+|PPE Required:               |Significant Hazard                 |JSA Reviewed by and date                       |
+|Glasses, Hearing, Safety    |Yes                                |                                               |
+|Footwear                    |                                   |                                               |
+|                            |Risk Score                         |                                               |
+|                            |200                                |                                               |
+|                            |                                   |                                               |
+|                            |Category                           |                                               |
+|                            |High                               |                                               |
+|                            |                                   |                                               |
+|                            |Control taken                      |                                               |
+|                            |Minimisation                       |                                               |
+|                            |                                   |                                               |
+|Sequence of Job Steps       |Potential /            |Level of    |Controls to reduce the Risk of Hazard          |
+|                            |Actual Hazard          |Risk        |                                               |
+|Lift Mould onto the Table   |Crushing               |High        |Keep fingers and hands clear of surface when   |
+|                            |                       |            |placing  equipment down                        |
+|                            |Back Strain            |High        |Correct Manual Handling when lifting the moulds|
+|                            |                       |            |Ensure no lifting and twisting movement of the |
+|                            |                       |            |body at the same time                          |
+|Open doors                  |Entrapment             |Low         |Keep hands and fingers clear at all times      |
+|Cleaning                    |Crushing the fingers   |Medium      |Take care of fingers and hands when moving any |
+|                            |                       |            |mould that they are not caught between         |
+|                            |                       |            |equipment.                                     |
+|                            |Noise                  |Med         |Wear PPE                                       |
+|Open Doors                  |Crushing               |Low         |Keep fingers and hands clear of surface when   |
+|                            |                       |            |placing  equipment down                        |
+|Lift Mould off the Table    |Back Strain            |High        |Correct Manual Handling when lifting the       |
+|                            |                       |            |moulds. Ensure no lifting and twisting movement|
+|                            |                       |            |of the body at the same time                   |

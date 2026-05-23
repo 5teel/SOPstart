@@ -1,0 +1,68 @@
+
+
+
+Job Safety Environmental Analysis Form:                   Compressor #6
+                                                                         Comms
+                                                                         sio
+                                                                         nin
+                                                                         g
+
+|Area / Department                  |Plant Services                        |Task  or Job Description                  |
+|PPE Required:                      |Significant Hazard                    |JSEA Reviewed by and Date:                |
+|Gloves, Safety Glasses, Ear Muffs, |                                      |                                          |
+|and Safety Boots, welding PPE      |                                      |                                          |
+|required.                          |Risk Score                            |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Category                              |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|                                   |Control taken                         |                                          |
+|                                   |                                      |                                          |
+|                                   |                                      |                                          |
+|Sequence of Job Steps    |Potential /             |Level of |Controls to reduce the Risk of Hazard                   |
+|                         |Actual Hazard           |Risk     |                                                        |
+|Prepare work area        |Manual Handling         |Medium   |Use correct manual handling techniques                  |
+|Check compressor has oil |Oil spillage            |High     |Have absorbent materials on hand                        |
+|- fill if necessary      |Manual Handling         |         |Use correct manual handling techniques                  |
+|Commissioning            |                        |Low      |Follow Commissioning Procedure                          |
+|Open Receiver Water      |Leakage                 |High     |Repair any leakage before proceeding                    |
+|System                   |                        |         |                                                        |
+|Connect temporary Power  |Electric Shock          |High     |Advise all persons of temporary electrical installation |
+|supply                   |                        |         |& isolate supply as required                            |
+|Dry Run Main Panel       |Electric Shock          |High     |Isoalte supply board.                                   |
+|Check Safety Circuits    |Electric Shock          |High     |Isoalte supply board.                                   |
+|Connect Motor & Direction|Electric Shock          |High     |Ensure machine Guards are in place before starting motor|
+|Test Motor               |Rotating equipment      |         |                                                        |
+|Connect Main Coupling    |Hand Tools              |Medium   |Use correct tools                                       |
+|                         |Bruises                 |         |Check Cleanliness                                       |
+|                         |Abrasions               |         |                                                        |
+|Start Compressor         |Flying objects          |High     |Ensure personnel stand away from machinery when starting|
+|                         |                        |         |Ensure all safety guards are in place                   |
+|Purge Air Piping         |Escaping air under      |High     |Wear appropriate PPE                                    |
+|                         |pressure                |         |                                                        |
+|                         |Potential for foreign   |         |                                                        |
+|                         |matter                  |         |                                                        |
+|Natural Surge test       |                        |         |                                                        |
+|On Completion Finalise   |                        |         |Follow Commissioning Procedure                          |
+|-  Commissioning         |                        |         |Follow Isolation Procedure                              |
+|Procedure                |                        |         |                                                        |
+|-  Isolation Procedure   |                        |         |                                                        |
+|Environmental:           |                        |         |                                                        |
+|Removal of used rags /   |Contamination.          |High     |Place in correct contamination or waste bins provided.  |
+|gloves/  waste/ glass /  |Waste removal and tidy  |         |Ensure area is cleaned and product / tools cleared away.|
+|cullet                   |up.                     |         |                                                        |
+|Protection & Security    |                        |         |                                                        |
+|Demarcation              |Damage to people,       |High     |Demarcation where applicable.                           |
+|                         |property and            |         |Install barricaded/danger tape as required.             |
+|                         |environment.            |         |Ensure correct fire fighting equipment is available.    |
+
+  If the operation does not follow this JSEA re-assess procedure and report
+                          to Supervisor / Manager.
+                           -----------------------
+
+
+[pic]
+
+O-I New Zealand
+

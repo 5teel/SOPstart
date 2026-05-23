@@ -1,0 +1,50 @@
+
+RESORT - Pallet preparation including Depalletising
+                            HAZARD IDENTIFICATION
+
+|1                                                                       |
+|1                                                                       |
+|1                               |Safety Induction [Contractor]          |                                        |
+|PPE Required:                   |Significant Hazard                     |JSA Reviewed by and date 13/06/07       |
+|Safety Glasses / Gloves / Cap / |Yes                                    |Gary OΓÇÖNeill  Mate Pocrinich            |
+|Hi Viz Clothing  /Hearing       |                                       |Numela Ropati  Hiliate Kilifi           |
+|protection                      |Risk Score                             |                                        |
+|                                |60                                     |                                        |
+|                                |                                       |                                        |
+|                                |Category                               |                                        |
+|                                |Medium                                 |                                        |
+|                                |                                       |                                        |
+|                                |Control taken                          |                                        |
+|                                |Minimisation                           |                                        |
+|                                |                                       |                                        |
+|Sequence of Job Steps                      |Potential /           |Level of  |Controls to reduce the Risk of    |
+|                                           |Actual Hazard         |Risk      |Hazard                            |
+|Select the pallet to be resorted Ensure    |Collapse may cause    |Medium    |Check pallet prior                |
+|that the pallet is in good condition ie NOT|injury / damage       |          |                                  |
+|rotten                                     |                      |          |                                  |
+|Remove the pallet ticket & hold card &     |None                  |Low       |Nil                               |
+|retain                                     |                      |          |                                  |
+|Using a knife carefully cut away the       |Laceration from the   |Low       |Care while cutting plastic,       |
+|plastic shroud avoiding all contact with   |Falling bottles       |          |ensuring that long sleeved        |
+|glass containers                           |                      |          |clothing is in place.             |
+|Place waste plastic into recycle bin &     |Fall / trip hazard    |Low       |Use ladder / step as required     |
+|attach pallet ticket & hold card to top    |                      |          |                                  |
+|layerboard                                 |                      |          |                                  |
+|Using the Hoist, lift & position pallet    |Collision with        |Medium    |Ensure pallet is as straight as   |
+|onto Depalletiser  infeed conveyor ( max 4 |something / some one  |          |possible when entering magazine   |
+|pallets )                                  |                      |          |and the layer boards are not      |
+|                                           |                      |          |skewed                            |
+|At the control panel,  move pallet into    |Collapse causing      |Low       |Control panel located on the top  |
+|magazine, then lift to depalletising       |Falling or tripping   |          |platform ΓÇô non slip mats & self   |
+|position                                   |                      |          |closing safety gates are  fitted  |
+|Manually remove top layerboard and place in|Sprain / strain from  |Low       |Care while moving the Layerboard  |
+|layerboard  magazine for reprocessing later|moving the layerboard |          |                                  |
+|Record pallet & defect details from the    |Nil                   |Low       |Nil                               |
+|pallet ticket & hold card. ΓÇô discard when  |                      |          |                                  |
+|done                                       |                      |          |                                  |
+|At the control panel, sweep layers of glass|Jam up - Broken glass |Low       | PPE                              |
+|so as to load up the serpentine conveyor   |Damage may cause harm |          |                                  |
+|with glass containers Ensure that conveyor |to consumer / resort  |          |                                  |
+|speed & handling are such that bottles do  |operator Laceration   |          |                                  |
+|not fall over ( introducing additional     |                      |          |                                  |
+|defects )                                  |                      |          |                                  |
