@@ -270,7 +270,7 @@ export function PipelineProgressClient(props: Props) {
                     Review required before video generates
                   </p>
                   <p className="text-sm text-[var(--ink-500)] mt-1">
-                    Check the parsed SOP, approve all sections, then publish to
+                    Check the parsed SOP, approve every section, then publish to
                     continue.
                   </p>
                 </div>
