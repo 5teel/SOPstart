@@ -1,5 +1,5 @@
 import type { Config, Overrides } from '@puckeditor/core'
-import type { ReactElement, ReactNode } from 'react'
+import { useEffect, useRef, type ReactElement, type ReactNode } from 'react'
 import { FlowGraphField } from '@/lib/builder/flow-graph-field'
 import {
   TextBlock,
@@ -879,6 +879,16 @@ export function createPuckOverrides(opts: {
   componentIdToJunction?: Map<string, SopSectionBlockWithUpdate>
   /** Phase 13 plan 13-04: callback fired after Accept / Decline to refresh junctions */
   onReviewed?: () => void
+  /**
+   * Phase 21 Plan 21-02 — fires when Puck selection flips to a canvas item.
+   * Receives both the Puck componentId (= layout_data props.id) and the
+   * stamped junctionId so the source viewer can resolve provenance without
+   * walking layout_data again. Either may be absent for inline-authored
+   * blocks (no junction) — caller is responsible for the lookup contract.
+   */
+  onItemSelected?: (
+    info: { componentId: string; junctionId: string | null }
+  ) => void
 }): Partial<Overrides> {
   // Reference junctionMap for lint cleanliness — the canonical lookup the
   // overlay uses is componentIdToJunction (built from junctionMap + layout_data
@@ -932,6 +942,7 @@ export function createPuckOverrides(opts: {
     componentOverlay: ({
       children,
       componentId,
+      isSelected,
     }: {
       children: ReactNode
       hover: boolean
@@ -940,20 +951,69 @@ export function createPuckOverrides(opts: {
       componentType: string
     }): ReactElement => {
       const map = opts.componentIdToJunction
+      const onItemSelected = opts.onItemSelected
+      // Phase 21: fan selection events out to the source viewer. Wrap in
+      // a tiny child component so the hook can use effects safely (Puck
+      // re-renders componentOverlay on every selection change, so an
+      // effect on isSelected is the correct edge-detector).
+      const selectionTap = onItemSelected ? (
+        <SelectionSyncTap
+          componentId={componentId}
+          isSelected={isSelected}
+          junctionId={map?.get(componentId)?.id ?? null}
+          onItemSelected={onItemSelected}
+        />
+      ) : null
       if (!map || map.size === 0) {
-        return <>{children}</>
+        return (
+          <>
+            {selectionTap}
+            {children}
+          </>
+        )
       }
       return (
-        <PuckItemBadgeOverlay
-          componentId={componentId}
-          componentIdToJunction={map}
-          onReviewed={opts.onReviewed}
-        >
-          {children}
-        </PuckItemBadgeOverlay>
+        <>
+          {selectionTap}
+          <PuckItemBadgeOverlay
+            componentId={componentId}
+            componentIdToJunction={map}
+            onReviewed={opts.onReviewed}
+          >
+            {children}
+          </PuckItemBadgeOverlay>
+        </>
       )
     },
   }
+}
+
+/**
+ * Phase 21 Plan 21-02 — tap rendered inside componentOverlay that fires
+ * `onItemSelected` exactly on the rising edge of `isSelected`. Puck re-renders
+ * the overlay on every selection change, so this effect runs only when the
+ * selection actually flips on this item. Pure side-effect tap — renders null.
+ */
+function SelectionSyncTap(props: {
+  componentId: string
+  junctionId: string | null
+  isSelected: boolean
+  onItemSelected: (info: { componentId: string; junctionId: string | null }) => void
+}): null {
+  const wasSelectedRef = useRef(false)
+  useEffect(() => {
+    if (props.isSelected && !wasSelectedRef.current) {
+      props.onItemSelected({
+        componentId: props.componentId,
+        junctionId: props.junctionId,
+      })
+    }
+    wasSelectedRef.current = props.isSelected
+    // We intentionally do not depend on onItemSelected — caller passes a stable
+    // ref-backed callback. Including it would re-fire on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.isSelected, props.componentId, props.junctionId])
+  return null
 }
 
 /**

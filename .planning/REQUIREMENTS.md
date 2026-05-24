@@ -374,11 +374,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 **Side-by-Side Source Viewer (S-02):**
 
-- [ ] **SCP-VIEWER-01**: Source PDF / DOCX / image rendered alongside parsed blocks during admin review
-- [ ] **SCP-VIEWER-02**: Clicking a parsed block scrolls the source viewer to the exact passage that produced it
-- [ ] **SCP-VIEWER-03**: Clicking a region in the source highlights the corresponding parsed block
-- [ ] **SCP-VIEWER-04**: Source viewer remains persistent throughout review (not modal, not dismissible)
-- [ ] **SCP-VIEWER-05**: Source viewer works uniformly for DOCX, PDF, image, and video-transcript intake formats
+- [x] **SCP-VIEWER-01**: Source PDF / DOCX / image rendered alongside parsed blocks during admin review (Phase 21 Plan 21-02 — 2026-05-25)
+- [x] **SCP-VIEWER-02**: Clicking a parsed block scrolls the source viewer to the exact passage that produced it (Phase 21 Plan 21-02 — 2026-05-25)
+- [x] **SCP-VIEWER-03**: Clicking a region in the source highlights the corresponding parsed block (Phase 21 Plan 21-02 — 2026-05-25)
+- [x] **SCP-VIEWER-04**: Source viewer remains persistent throughout review (not modal, not dismissible) (Phase 21 Plan 21-02 — 2026-05-25)
+- [x] **SCP-VIEWER-05**: Source viewer works uniformly for DOCX, PDF, image, and video-transcript intake formats (Phase 21 Plan 21-02 — 2026-05-25)
 
 **AI Reviewer × 5 Verification Jobs (S-03):**
 
@@ -404,7 +404,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 - [ ] **SCP-PARSE-01**: Photos, diagrams, charts, and tables extracted from source with step-level provenance metadata (which step, which section)
 - [ ] **SCP-PARSE-02**: Parsed drafts land directly as Puck layout_data in the builder (review surface retires — admin reviews IN the builder)
-- [ ] **SCP-PARSE-03**: Side-by-side source viewer (SCP-VIEWER-*) integrated into the builder review surface
+- [x] **SCP-PARSE-03**: Side-by-side source viewer (SCP-VIEWER-*) integrated into the builder review surface (Phase 21 Plan 21-02 — 2026-05-25)
 - [ ] **SCP-PARSE-04**: AI reviewer (SCP-AI-*) auto-runs as part of the parse pipeline
 
 ### Voice-Driven Walkthrough (Phase 22)
@@ -444,7 +444,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCP-VIEWER-01..05 (5) | Phase 21 | Pending |
+| SCP-VIEWER-01..05 (5) | Phase 21 | ✅ Complete (Plan 21-02 — 2026-05-25) |
 | SCP-AI-01..08 (8) | Phase 21 | Pending |
 | SCP-VERIFY-01..06 (6) | Phase 21 | Pending |
 | SCP-PARSE-01..04 (4) | Phase 21 | Pending |
