@@ -45,7 +45,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Three phases bundle the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` v0.3. Execution order 21 → 22 → 23.
 
-- [ ] **Phase 21: Safety-Critical Parsing** — Finishes the Phase 20 contract. Side-by-side source viewer (S-02) + AI reviewer × 5 verification jobs (S-03) + per-block verify checklist at publish gate (S-04) + Word/PDF parsing with step-level provenance (I-01). All four features touch the same builder review surface and AI pipeline; bundle delivers the safety story end-to-end.
+- [x] **Phase 21: Safety-Critical Parsing** ✅ 2026-05-25 (PASS-WITH-NOTES) — Finishes the Phase 20 contract. Side-by-side source viewer (S-02) + AI reviewer × 5 verification jobs (S-03) + per-block verify checklist at publish gate (S-04) + Word/PDF parsing with step-level provenance (I-01). 5 plans / 5 waves merged; 23/23 SCP-* requirements covered; defence-in-depth publish gate (UI disabled + server 400); D-21-07 no-bulk-verify lint guard live in CI. See `.planning/phases/21-safety-critical-parsing/VERIFICATION.md`.
 - [ ] **Phase 22: Voice-Driven Walkthrough** — Worker walkthrough literacy gaps closed (W-01) + AI Voice Q&A that drives the walkthrough end-to-end (X-02). Bundle: voice infrastructure (transcription, TTS, multi-language) serves both the literacy story and the Q&A story.
 - [ ] **Phase 23: AI Field Layer + Version Supersede** — Universal AI read/write access to every editable field + Cmd+K extended across admin surfaces (X-03) + version history formal supersede + diff + restore + worker-instance sign-off chain (G-01). X-03 is the architectural backbone v5.0 conversational app builds on; G-01 fits naturally alongside as a small standalone bundle.
 
@@ -548,7 +548,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 18. Collaborative Editing | — | Deferred to v4.0 backlog |  |
 | 19. Pipeline Integration, Bundle Isolation & v3.0 Closeout | — | Deleted 2026-05-23 |  |
 | 20. Conversion Pipeline V2 | partial | Partial complete — DOCX→builder slice shipped; remainder → v4.0 Phase 21 | 2026-05-17 |
-| **21. Safety-Critical Parsing (v4.0)** | 0/? | Not started — next |  |
+| **21. Safety-Critical Parsing (v4.0)** | 5/5 | ✅ Complete — PASS-WITH-NOTES (see VERIFICATION.md) | 2026-05-25 |
 | **22. Voice-Driven Walkthrough (v4.0)** | 0/? | Not started |  |
 | **23. AI Field Layer + Version Supersede (v4.0)** | 0/? | Not started |  |
 

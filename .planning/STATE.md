@@ -4,17 +4,17 @@ milestone: v4.0
 milestone_name: Safety-Critical Parsing + Voice + AI Foundation
 status: in-progress
 started_at: "2026-05-24T00:00:00.000Z"
-last_updated: "2026-05-25T15:03:38.000Z"
+last_updated: "2026-05-25T18:00:00.000Z"
 last_activity: 2026-05-25
 previous_milestone: v3.0 (archived 2026-05-23 — see .planning/MILESTONES.md § v3.0)
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   in_flight_phases: 0
-  percent: 0
+  percent: 33
   phases:
-    - "21. Safety-Critical Parsing (S-02 + S-03 + S-04 + I-01) — not started, next"
-    - "22. Voice-Driven Walkthrough (W-01 + X-02) — not started"
+    - "21. Safety-Critical Parsing (S-02 + S-03 + S-04 + I-01) — complete (PASS-WITH-NOTES, see VERIFICATION.md)"
+    - "22. Voice-Driven Walkthrough (W-01 + X-02) — not started, next"
     - "23. AI Field Layer + Version Supersede (X-03 + G-01) — not started"
 ---
 
@@ -25,21 +25,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** v4.0 Phase 21 — Safety-Critical Parsing. Finish the Phase 20 contract (S-02 + S-03 + S-04 + I-01) so no parsed SOP can be published without verified anchoring.
+**Current focus:** v4.0 Phase 22 — Voice-Driven Walkthrough. Phase 21 complete (verdict PASS-WITH-NOTES — see `.planning/phases/21-safety-critical-parsing/VERIFICATION.md`).
 
 ## Current Position
 
-**Milestone status:** v4.0 started 2026-05-24. 3 phases / 40 requirements. See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
+**Milestone status:** v4.0 started 2026-05-24. 3 phases / 40 requirements (1 of 3 phases complete). See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
-**Active phase:** 21 (Safety-Critical Parsing) — in progress. Wave 0 (test stubs), Wave 1 (DB + parser infra + Job A), Wave 2 (source viewer pane), and Wave 3 (AI reviewer Jobs B/C/D/E + auto-trigger + flag panel) complete. Next: Wave 4 (per-block verify checklist + publish gate) — `/gsd-execute-phase 21` wave 4.
+**Active phase:** 22 (Voice-Driven Walkthrough) — not started, next. Phase 21 closed 2026-05-25: all 5 waves merged, 23/23 SCP-* requirements covered, defence-in-depth publish gate live, D-21-07 no-bulk-verify lint guard wired into CI (commit f0d2792). Human UAT items captured in VERIFICATION.md `human_verification` frontmatter (pane behaviour + live Anthropic key + chromium UAT before pilot).
 
 **v4.0 phase sequence:**
 
-1. **Phase 21 — Safety-Critical Parsing** (next): S-02 side-by-side viewer + S-03 AI reviewer × 5 + S-04 per-block verify checklist + I-01 Phase 20 contract complete. 23 requirements (SCP-VIEWER ×5, SCP-AI ×8, SCP-VERIFY ×6, SCP-PARSE ×4).
-2. **Phase 22 — Voice-Driven Walkthrough**: W-01 literacy/visual/voice gaps + X-02 voice-driven walkthrough. 8 requirements (VDW-LIT ×4, VDW-VOICE ×4).
+1. **Phase 21 — Safety-Critical Parsing** ✅ COMPLETE 2026-05-25: S-02 side-by-side viewer + S-03 AI reviewer × 5 + S-04 per-block verify checklist + I-01 Phase 20 contract complete. 23 requirements (SCP-VIEWER ×5, SCP-AI ×8, SCP-VERIFY ×6, SCP-PARSE ×4). VERIFICATION.md verdict: PASS-WITH-NOTES.
+2. **Phase 22 — Voice-Driven Walkthrough** (next): W-01 literacy/visual/voice gaps + X-02 voice-driven walkthrough. 8 requirements (VDW-LIT ×4, VDW-VOICE ×4).
 3. **Phase 23 — AI Field Layer + Version Supersede**: X-03 universal AI read/write + G-01 version supersede + worker-instance sign-off. 9 requirements (AFL-AI ×4, AFL-VER ×5).
 
-**Next action:** Phase 21 Wave 4 — `/gsd-execute-phase 21 --wave 4` (per-block verify checklist + publish gate at the builder).
+**Next action:** `/gsd-spec-phase 22` (or `/gsd-discuss-phase 22` if spec already drafted) to scope Voice-Driven Walkthrough. Migration 00032 still needs a `npx supabase db push --include-all` from Simon before any Phase 21 admin UAT can hit live DB.
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
