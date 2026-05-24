@@ -81,5 +81,10 @@ export default defineConfig({
       testDir: './src/lib/parsers/ai-reviewer/__tests__',
       testMatch: /.*\.test\.ts$/,
     },
+    {
+      name: 'phase21-ai-reviewer-jobs',
+      testDir: './src/lib/parsers/ai-reviewer/jobs/__tests__',
+      testMatch: /.*\.test\.ts$/,
+    },
   ],
 })
