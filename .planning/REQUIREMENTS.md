@@ -382,14 +382,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 **AI Reviewer × 5 Verification Jobs (S-03):**
 
-- [ ] **SCP-AI-01**: Omission check — AI compares source to parsed output and flags safety-critical content that was dropped
-- [ ] **SCP-AI-02**: Anchoring check — AI confirms photos and diagrams are attached to the step they describe
-- [ ] **SCP-AI-03**: Step-image alignment check — AI confirms each photo actually depicts the action of its anchored step
-- [ ] **SCP-AI-04**: Table fidelity check — AI confirms dosages, torque values, temperatures, and other tabular data preserved exactly
-- [ ] **SCP-AI-05**: Terminology consistency check — AI confirms parsed language matches the org's existing SOP vocabulary
-- [ ] **SCP-AI-06**: All five jobs auto-run on first parse without admin invocation
-- [ ] **SCP-AI-07**: Admin can manually re-run any job after editing the parsed draft
-- [ ] **SCP-AI-08**: Per-parse AI cost bounded with prompt-caching + per-org spend cap (no runaway billing)
+- [x] **SCP-AI-01**: Omission check — AI compares source to parsed output and flags safety-critical content that was dropped (Phase 21 Plan 21-03 — 2026-05-25)
+- [x] **SCP-AI-02**: Anchoring check — AI confirms photos and diagrams are attached to the step they describe (Phase 21 Plan 21-03 — 2026-05-25; D-21-11 single-call shape with SCP-AI-03)
+- [x] **SCP-AI-03**: Step-image alignment check — AI confirms each photo actually depicts the action of its anchored step (Phase 21 Plan 21-03 — 2026-05-25; D-21-11 single-call shape with SCP-AI-02)
+- [x] **SCP-AI-04**: Table fidelity check — AI confirms dosages, torque values, temperatures, and other tabular data preserved exactly (Phase 21 Plan 21-03 — 2026-05-25)
+- [x] **SCP-AI-05**: Terminology consistency check — AI confirms parsed language matches the org's existing SOP vocabulary (Phase 21 Plan 21-03 — 2026-05-25)
+- [x] **SCP-AI-06**: All five jobs auto-run on first parse without admin invocation (Phase 21 Plan 21-03 — 2026-05-25; fire-and-forget across 4 parse-completion sites)
+- [x] **SCP-AI-07**: Admin can manually re-run any job after editing the parsed draft (Phase 21 Plan 21-03 — 2026-05-25; toolbar button + POST endpoint)
+- [x] **SCP-AI-08**: Per-parse AI cost bounded with prompt-caching + per-org spend cap (no runaway billing) (Phase 21 Plan 21-03 — 2026-05-25; CONV-09 5/day + Wave-1 org cap both gated)
 
 **Per-Block Verify Checklist at Publish Gate (S-04):**
 
@@ -405,7 +405,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 - [ ] **SCP-PARSE-01**: Photos, diagrams, charts, and tables extracted from source with step-level provenance metadata (which step, which section)
 - [ ] **SCP-PARSE-02**: Parsed drafts land directly as Puck layout_data in the builder (review surface retires — admin reviews IN the builder)
 - [x] **SCP-PARSE-03**: Side-by-side source viewer (SCP-VIEWER-*) integrated into the builder review surface (Phase 21 Plan 21-02 — 2026-05-25)
-- [ ] **SCP-PARSE-04**: AI reviewer (SCP-AI-*) auto-runs as part of the parse pipeline
+- [x] **SCP-PARSE-04**: AI reviewer (SCP-AI-*) auto-runs as part of the parse pipeline (Phase 21 Plan 21-03 — 2026-05-25)
 
 ### Voice-Driven Walkthrough (Phase 22)
 
@@ -445,9 +445,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | SCP-VIEWER-01..05 (5) | Phase 21 | ✅ Complete (Plan 21-02 — 2026-05-25) |
-| SCP-AI-01..08 (8) | Phase 21 | Pending |
+| SCP-AI-01..08 (8) | Phase 21 | ✅ Complete (Plan 21-03 — 2026-05-25; 02+03 served by D-21-11 single Job C call) |
 | SCP-VERIFY-01..06 (6) | Phase 21 | Pending |
-| SCP-PARSE-01..04 (4) | Phase 21 | Pending |
+| SCP-PARSE-01..04 (4) | Phase 21 | Partial — SCP-PARSE-03 (21-02), SCP-PARSE-04 (21-03); 01+02 pending |
 | VDW-LIT-01..04 (4) | Phase 22 | Pending |
 | VDW-VOICE-01..04 (4) | Phase 22 | Pending |
 | AFL-AI-01..04 (4) | Phase 23 | Pending |
