@@ -244,6 +244,52 @@ if (!voiceFound.found) {
   )
 }
 
+// ---------------------------------------------------------------------------
+// Phase 21 Plan 21-02 — pdfjs / mammoth must NOT ship in the worker
+// `/sops/[sopId]/page` bundle. Both are heavy (pdfjs ~ 300 KB minified)
+// and only the admin source viewer (BuilderWithSourceViewer) needs them.
+// `BuilderWithSourceViewer` dynamic-imports `SourceViewerPane` which in
+// turn dynamic-imports pdfjs / mammoth — verify that boundary by scanning
+// the worker route's chunk set.
+//
+// The negative assertion checks the SAME chunkSet that drove the size
+// gate above, so if pdfjs ever leaks in, both the delta gate AND this
+// gate should trip — but this one gives a clearer error message.
+// ---------------------------------------------------------------------------
+function workerChunkBodies(): string {
+  const bodies: string[] = []
+  for (const chunkPath of chunkSet) {
+    const fullPath = path.join(NEXT_DIR, chunkPath)
+    if (!fs.existsSync(fullPath)) continue
+    const stat = fs.statSync(fullPath)
+    if (!stat.isFile() || stat.size > 4 * 1024 * 1024) continue
+    bodies.push(fs.readFileSync(fullPath, 'utf-8'))
+  }
+  return bodies.join('\n')
+}
+
+const workerJoined = workerChunkBodies()
+const PDFJS_MARKERS = ['pdfjs-dist', 'PDFWorker', 'getDocument']
+const pdfjsLeaks = PDFJS_MARKERS.filter((m) => workerJoined.includes(m))
+if (pdfjsLeaks.length > 0) {
+  fail(
+    `pdfjs-dist leaked into worker bundle ${ROUTE} (markers: ${pdfjsLeaks.join(', ')}). ` +
+      'SourceViewerPane MUST be dynamic-imported with ssr: false from BuilderWithSourceViewer.tsx ' +
+      '(D-21-09). Check for accidental static `import { SourceViewerPane }` calls.'
+  )
+}
+const MAMMOTH_MARKERS = ['mammoth', 'convertToHtml']
+const mammothLeaks = MAMMOTH_MARKERS.filter((m) => workerJoined.includes(m))
+if (mammothLeaks.length > 0) {
+  fail(
+    `mammoth leaked into worker bundle ${ROUTE} (markers: ${mammothLeaks.join(', ')}). ` +
+      'DocxPreview MUST be reached only through the dynamic-imported SourceViewerPane.'
+  )
+}
+
 console.log(
   `check-bundle-size: ✓ Bundle isolation OK (chunks present, delta within tolerance) — DesktopWalkthrough at ${desktopFound.locations[0]}, WalkthroughVoiceModal at ${voiceFound.locations[0]}`
+)
+console.log(
+  `check-bundle-size: ✓ Source-viewer isolation OK — pdfjs + mammoth not in ${ROUTE} bundle (D-21-09).`
 )

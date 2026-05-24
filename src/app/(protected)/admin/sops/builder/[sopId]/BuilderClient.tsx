@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import type { Data, Viewports } from '@puckeditor/core'
@@ -18,6 +18,7 @@ import { db } from '@/lib/offline/db'
 import { listSectionBlocksWithUpdates } from '@/actions/sop-section-blocks'
 import { listBlockCategories } from '@/actions/blocks'
 import { SectionListSidebar } from './SectionListSidebar'
+import { useSelectionSync } from '@/components/admin/source-viewer/useSelectionSync'
 
 // D-01 (revised 2026-04-24): Use Puck's native viewports prop. It clamps
 // only the preview canvas, leaving the palette + fields sidebars at full
@@ -201,6 +202,72 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
     return out
   }, [activeSection, junctionMap])
 
+  // Phase 21 Plan 21-02 — selection-sync wiring (source viewer ↔ canvas).
+  // The provider lives one level up in BuilderWithSourceViewer; when the
+  // pane is absent (no source attached / wrapper disabled), useSelectionSync
+  // returns the no-op default value and these handlers are inert.
+  const {
+    setActiveProvenance,
+    registerBlockClickHandler,
+    activeBlockId: highlightedFromSourceClickBlockId,
+  } = useSelectionSync()
+
+  // Stable ref so SelectionSyncTap can fire onItemSelected without
+  // re-rendering on every parent re-render (the tap's effect deps stay
+  // shallow).
+  const onItemSelectedRef = useRef<
+    (info: { componentId: string; junctionId: string | null }) => void
+  >(() => {})
+  useEffect(() => {
+    onItemSelectedRef.current = ({ junctionId }) => {
+      if (!junctionId) {
+        // Inline-authored block — no provenance possible. Clear any prior
+        // highlight so the source pane returns to its idle state.
+        setActiveProvenance(null, null)
+        return
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const junction: any = junctionMap.get(junctionId)
+      const region = (junction?.block_provenance ?? null) as
+        | import('@/lib/parsers/source-viewer').SourceProvenanceRegion
+        | null
+      // Even when region is null we propagate the activeBlockId so the
+      // source pane can keep showing "no source for this block" cues.
+      setActiveProvenance(region, junctionId)
+    }
+  }, [junctionMap, setActiveProvenance])
+
+  // Reverse channel — clicks inside the source pane should scroll the
+  // matching Puck canvas item into view + paint a yellow outline.
+  // BlockClickHandler receives a junctionId or paragraph/segment id; we
+  // resolve it back to a DOM node via componentId mapping.
+  useEffect(() => {
+    const unregister = registerBlockClickHandler((idFromSource: string) => {
+      // The source pane forwards either a junction id (PDF bbox click) or a
+      // paragraph / transcript line id. For junction ids, look up the
+      // matching componentId via the existing layout walk.
+      let matchingComponentId: string | null = null
+      for (const [componentId, junction] of componentIdToJunction.entries()) {
+        if (junction.id === idFromSource) {
+          matchingComponentId = componentId
+          break
+        }
+      }
+      if (!matchingComponentId) return
+      const escaped =
+        typeof window !== 'undefined' && typeof window.CSS?.escape === 'function'
+          ? window.CSS.escape(matchingComponentId)
+          : matchingComponentId.replace(/[^a-zA-Z0-9_-]/g, (c) => `\\${c}`)
+      const el = document.querySelector<HTMLElement>(`[data-puck-item-id="${escaped}"]`)
+      if (el) {
+        requestAnimationFrame(() => {
+          el.scrollIntoView({ behavior: 'auto', block: 'center' })
+        })
+      }
+    })
+    return unregister
+  }, [registerBlockClickHandler, componentIdToJunction])
+
   // Memoized overrides factory — rebuilt when junctions or the section change
   // so the componentOverlay closure captures the latest map / refresh callback.
   const overrides = useMemo(
@@ -212,9 +279,16 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
         onReviewed: () => {
           void refreshJunctions()
         },
+        onItemSelected: (info) => {
+          onItemSelectedRef.current(info)
+        },
       }),
     [junctionMap, componentIdToJunction, refreshJunctions]
   )
+
+  // Reference highlighted state so React keeps the subscription effect alive
+  // when source-pane clicks fire. Cleared via the source-pane state machine.
+  void highlightedFromSourceClickBlockId
 
   // D-13: sanitize unknown block types before passing data to <Puck>.
   // Also carries through flow_graph from the SOP-level record (D-16) so
@@ -280,12 +354,19 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
           <span className="font-mono text-[11px] uppercase tracking-wider text-[var(--ink-500)] border border-[var(--ink-300)] rounded px-2 py-0.5">
             {savePillLabel}
           </span>
-          <Link
-            href={`/admin/sops/${sopId}/review`}
-            className="px-3 py-1.5 bg-[var(--ink-900)] text-white text-sm font-bold rounded"
+          {/*
+            Phase 21 D-21-12 — legacy /admin/sops/[sopId]/review is gone and
+            308-redirects back to this builder route. Publish gate lands in
+            Wave 4 (per-block verify checklist). For now, the chrome shows
+            a disabled placeholder so admins don't see a self-looping link.
+          */}
+          <span
+            data-testid="publish-button-placeholder"
+            className="px-3 py-1.5 bg-[var(--ink-300)] text-[var(--ink-700)] text-sm font-bold rounded cursor-not-allowed"
+            title="Publish gate ships in Phase 21 Wave 4"
           >
-            SEND TO REVIEW
-          </Link>
+            VERIFY &amp; PUBLISH
+          </span>
         </div>
       </header>
       <div className="flex flex-1 min-h-0">

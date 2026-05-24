@@ -276,6 +276,17 @@ export interface SopSectionBlock {
   sort_order: number
   created_at: string
   updated_at: string
+  /**
+   * Phase 21 D-CV2-06 — JSONB region pointer back to the original source.
+   * Discriminated by `kind`: 'pdf' | 'docx' | 'scan' | 'video' | 'ai_prompt'.
+   * Nullable so pre-Phase-21 rows survive. Source viewer (Plan 21-02)
+   * consumes this to highlight the matching region on block selection.
+   */
+  block_provenance?: import('@/lib/parsers/source-viewer').SourceProvenanceRegion | null
+  /** Phase 21 SCP-VERIFY-01 — admin user_id who marked this block verified. */
+  verified_by_admin_id?: string | null
+  /** Phase 21 SCP-VERIFY-01 — timestamp of verify action. */
+  verified_at?: string | null
 }
 
 // ---------------------------------------------------------------
