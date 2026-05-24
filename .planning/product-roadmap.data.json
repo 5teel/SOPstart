@@ -1,6 +1,6 @@
 {
   "version": "0.2",
-  "updated": "2026-05-23",
+  "updated": "2026-05-24",
   "categories": [
     {
       "id": "authoring",
@@ -28,20 +28,25 @@
       "description": "Findability + assistive access — search, AI, voice, Cmd+K"
     },
     {
+      "id": "compliance",
+      "name": "Compliance & Legislation",
+      "description": "Legislation library, per-SOP legislation links, AI compliance scans, audit trail"
+    },
+    {
       "id": "platform",
       "name": "Platform",
-      "description": "Multi-tenancy, PWA shell, security, bundle hygiene"
+      "description": "Multi-tenancy, PWA shell, security, bundle hygiene, telemetry"
     },
     {
       "id": "intake",
       "name": "Intake",
-      "description": "Bringing existing knowledge in — parse, OCR, transcribe"
+      "description": "Bringing existing knowledge in — parse, OCR, transcribe, AI-narrated capture"
     }
   ],
   "features": [
     {
       "id": "A-01",
-      "name": "Native Block Builder (Puck)",
+      "name": "SOP Builder (Puck)",
       "category": "authoring",
       "phase": "v3.0",
       "plainEnglish": "An admin opens a blank canvas in the browser and drags blocks (Step, Hazard, Tool, Decision, etc.) into the page to compose an SOP. No upload required.",
@@ -75,11 +80,11 @@
           "passes": false
         },
         {
-          "text": "Inline block builder AI assistant ",
+          "text": "Inline AI assistant inside the builder",
           "passes": false
         },
         {
-          "text": "Rename block builder to SOP Builder",
+          "text": "Renamed from 'Block Builder' to 'SOP Builder' across all UI copy",
           "passes": false
         }
       ],
@@ -237,20 +242,12 @@
         {
           "text": "Industry-specific bundles (forestry, food processing, mining)",
           "passes": false
-        },
-        {
-          "text": "AI review process which examines SOP contents and searches for relevant legislation and boundaries",
-          "passes": false
-        },
-        {
-          "text": "Legislation library - All SOPs with links to relevant legislation are kept active and legislation is periodically reviewed for compliance",
-          "passes": false
         }
       ],
       "currentGrade": "F",
       "targetGrade": "A",
       "priority": "Next",
-      "notes": "Customer-acquisition lift. Was deferred Phase 16.",
+      "notes": "Customer-acquisition lift. Was deferred Phase 16. (Legislation-review criteria moved to new Compliance category C-01..C-04.)",
       "reviewed": false,
       "disputed": false
     },
@@ -775,10 +772,10 @@
     },
     {
       "id": "G-01",
-      "name": "Version History",
+      "name": "Version History + Worker-Instance Sign-off",
       "category": "admin",
       "phase": "v3.0",
-      "plainEnglish": "Every SOP keeps a record of every published version. Admins can compare versions, view who changed what when, and recover an old version if a change was wrong.",
+      "plainEnglish": "Every SOP keeps a record of every published version. Admins can compare versions and recover an old version. Every individual worker instance also logs the worker's name, the version they used, and per-step approval as a personal sign-off chain — the act of completing the SOP is the legal signature.",
       "criteria": [
         {
           "text": "Every publish creates a new version row",
@@ -809,23 +806,23 @@
           "passes": false
         },
         {
-          "text": "Every SOP instance used by a worker is recorded with a worker's signoff - user's initiate each SOP instance by entering their name - every approval the worker makes of each step is effectively the worker signing off that they have followed the steps",
+          "text": "Every SOP instance used by a worker is recorded with a worker's signoff - users initiate each SOP instance by entering their name - every approval the worker makes of each step is effectively the worker signing off that they have followed the steps",
           "passes": false
         }
       ],
       "currentGrade": "F",
       "targetGrade": "A",
       "priority": "Now",
-      "notes": "Formal supersede + diff are partner-requested.",
+      "notes": "Formal supersede + diff + instance sign-off are partner-requested.",
       "reviewed": false,
       "disputed": false
     },
     {
       "id": "G-02",
-      "name": "Multi-Step Approval Chain",
+      "name": "Multi-Step Approval Chain (Optional, Versioned)",
       "category": "admin",
       "phase": "v4.5",
-      "plainEnglish": "Before an SOP is published to workers, it routes through a configurable approval chain — e.g. Safety Manager reviews first, then Operations Manager, then Discipline Leader.",
+      "plainEnglish": "Before an SOP is published to workers, it routes through a configurable approval chain — e.g. Safety Manager reviews first, then Operations Manager, then Discipline Leader. The chain is optional per SOP (not all need one) and editable per version so org-structure changes don't break old SOPs.",
       "criteria": [
         {
           "text": "Org admin can configure approval chain per SOP category",
@@ -848,7 +845,11 @@
           "passes": false
         },
         {
-          "text": "Not all SOPs have an approval chain - this is a capability that is important but optional - the chain of approval needs to be editable by SOP version to account for changes in organisational structure and method of operation",
+          "text": "Approval chain is optional per SOP — not every SOP requires one",
+          "passes": false
+        },
+        {
+          "text": "Approval chain editable per SOP version — accommodates org-structure changes between versions",
           "passes": false
         }
       ],
@@ -861,10 +862,10 @@
     },
     {
       "id": "G-03",
-      "name": "Review-Due Cadence",
+      "name": "Review-Due Cadence + AI Maintenance Schedule",
       "category": "admin",
       "phase": "v4.5",
-      "plainEnglish": "Every SOP has a periodic review date (annual, or category-specific). The system prompts the SOP owner to review before the date lapses and flags SOPs that are overdue.",
+      "plainEnglish": "Every SOP has a periodic review date (annual, or category-specific). The system prompts the SOP owner to review before lapse and flags overdue. A connected AI-assisted maintenance schedule designs and maintains the plan for which new SOPs to create and which old SOPs to update.",
       "criteria": [
         {
           "text": "Per-SOP review_due_at field",
@@ -887,7 +888,7 @@
           "passes": false
         },
         {
-          "text": "Review cadence is linked to a SOP development and maintenance schedule which designs and maintains (with AI assitance) the schedule for the creation of new SOPs, updating old SOPs",
+          "text": "AI-assisted SOP development + maintenance schedule — designs the plan for creating new SOPs and updating old ones, evolves with the org's portfolio",
           "passes": false
         }
       ],
@@ -900,10 +901,10 @@
     },
     {
       "id": "G-04",
-      "name": "Role-Based Access",
+      "name": "Role-Based Access + Stale-Role Surfacing",
       "category": "admin",
       "phase": "v3.0",
-      "plainEnglish": "Each user has a role (Worker, Supervisor, Admin, Safety Manager, Discipline Leader) that determines what they can see and do.",
+      "plainEnglish": "Each user has a role (Worker, Supervisor, Admin, Safety Manager, Discipline Leader) that determines what they can see and do. Roles are editable at will, and any SOP whose access list references an outdated role surfaces in the governance review queue.",
       "criteria": [
         {
           "text": "Worker, Supervisor, Admin, Safety Manager roles defined",
@@ -926,7 +927,7 @@
           "passes": false
         },
         {
-          "text": "Roles can be defined, re-defined at will - SOPs with role based access that is out of date need to be surfaced in the admin and governance review process to be identified and have the access updated",
+          "text": "Roles can be defined and re-defined at will — SOPs with out-of-date role access surface in governance review queue for update",
           "passes": false
         }
       ],
@@ -1048,10 +1049,10 @@
     },
     {
       "id": "X-01",
-      "name": "SOP Search",
+      "name": "SOP Search + AI-Managed Categorisation",
       "category": "accessibility",
       "phase": "v3.0",
-      "plainEnglish": "Worker types a few words ('scaffold,' 'manual handling,' 'electrical isolation') and finds the relevant SOP instantly.",
+      "plainEnglish": "Worker types a few words ('scaffold,' 'manual handling,' 'electrical isolation') and finds the relevant SOP instantly. Categorisation and structure managed by AI — manufacturing sites aren't database experts, and the taxonomy evolves as new SOP attributes emerge.",
       "criteria": [
         {
           "text": "Worker-facing search input on SOPs tab",
@@ -1142,10 +1143,10 @@
     },
     {
       "id": "X-03",
-      "name": "Cmd+K Command Palette",
+      "name": "Cmd+K Command Palette + Universal AI Access",
       "category": "accessibility",
       "phase": "v3.0",
-      "plainEnglish": "Power users (mostly admins) press Cmd+K and jump to anything — an SOP by name, a team member, a setting, an admin action — without navigating menus.",
+      "plainEnglish": "Power users press Cmd+K and jump to anything. Underlying this: every editable field has AI read access, most have AI write access. End goal is an app 99% controlled by AI agents via a unified interface.",
       "criteria": [
         {
           "text": "Cmd+K opens global command palette",
@@ -1173,9 +1174,9 @@
         }
       ],
       "currentGrade": "F",
-      "targetGrade": "B",
-      "priority": "Later",
-      "notes": "",
+      "targetGrade": "A",
+      "priority": "Now",
+      "notes": "Promoted from Later — universal AI read/write is the architectural backbone for v4.0.",
       "reviewed": false,
       "disputed": false
     },
@@ -1220,10 +1221,10 @@
     },
     {
       "id": "X-05",
-      "name": "AI Assistant as Primary Interface",
+      "name": "AI Assistant as Primary Interface + Layered Architecture",
       "category": "accessibility",
       "phase": "v5.0",
-      "plainEnglish": "A worker doesn't navigate — they ask the AI to do things. 'Show me the lockout SOP.' 'Mark step 4 as done.' 'Take a photo of the panel.' The whole app is steerable by voice + conversation.",
+      "plainEnglish": "A worker doesn't navigate — they ask the AI to do things. 'Show me the lockout SOP.' 'Mark step 4 as done.' 'Take a photo of the panel.' The whole app is steerable by voice + conversation. Beneath this, AI is built into every surface with a unified interface — designed in layers so models, agents, and token budgets are upgradeable without rebuilding features.",
       "criteria": [
         {
           "text": "AI accepts natural-language commands across all primary actions",
@@ -1289,6 +1290,146 @@
       "targetGrade": "A",
       "priority": "Now",
       "notes": "Load-bearing for blue-collar TAM.",
+      "reviewed": false,
+      "disputed": false
+    },
+    {
+      "id": "C-01",
+      "name": "Legislation Library",
+      "category": "compliance",
+      "phase": "v4.5",
+      "plainEnglish": "A curated, machine-readable library of NZ workplace-safety legislation — WorkSafe regulations, AS/NZS standards, industry-specific codes — kept up to date and queryable by SOP authors.",
+      "criteria": [
+        {
+          "text": "Catalog of NZ WorkSafe regulations + AS/NZS standards relevant to industrial SOPs",
+          "passes": false
+        },
+        {
+          "text": "Org tier (org's own internal regulations) + Potenco-curated global tier",
+          "passes": false
+        },
+        {
+          "text": "Each entry carries: citation, effective date, summary, source link, category tags",
+          "passes": false
+        },
+        {
+          "text": "Library refreshed on a periodic cadence (and surfaces changes to subscribers)",
+          "passes": false
+        },
+        {
+          "text": "Searchable from the builder + browsable as a standalone admin surface",
+          "passes": false
+        },
+        {
+          "text": "AI read/write access (agents can query legislation, propose new entries)",
+          "passes": false
+        }
+      ],
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Next",
+      "notes": "New in v0.2 — customer-acquisition lever for NZ industrial.",
+      "reviewed": false,
+      "disputed": false
+    },
+    {
+      "id": "C-02",
+      "name": "Per-SOP Legislation Links",
+      "category": "compliance",
+      "phase": "v4.5",
+      "plainEnglish": "Each SOP carries explicit links to the specific clauses / regulations it satisfies. Workers see 'this SOP satisfies WorkSafe regulation X clause Y'; auditors see provenance.",
+      "criteria": [
+        {
+          "text": "SOP can link to one or more legislation entries (from C-01)",
+          "passes": false
+        },
+        {
+          "text": "Links are per-section or per-step, not just per-SOP (granular provenance)",
+          "passes": false
+        },
+        {
+          "text": "Workers see 'this satisfies regulation X' as inline reference",
+          "passes": false
+        },
+        {
+          "text": "Auditors export 'all SOPs satisfying regulation X' as a one-shot report",
+          "passes": false
+        },
+        {
+          "text": "Links survive SOP versioning (audit trail)",
+          "passes": false
+        }
+      ],
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Next",
+      "notes": "New in v0.2.",
+      "reviewed": false,
+      "disputed": false
+    },
+    {
+      "id": "C-03",
+      "name": "AI Legislation Scanner",
+      "category": "compliance",
+      "phase": "v4.5",
+      "plainEnglish": "When an SOP is drafted or edited, an AI scans its content and surfaces relevant legislation matches — and gaps. 'This SOP describes confined-space entry but doesn't reference Regulation X — should it?'",
+      "criteria": [
+        {
+          "text": "AI scan runs on every draft + on demand",
+          "passes": false
+        },
+        {
+          "text": "Surfaces matches (legislation X clause Y is referenced) and gaps (regulation Z should be referenced but isn't)",
+          "passes": false
+        },
+        {
+          "text": "Confidence-graded — fail-safe to 'uncertain' rather than guessing",
+          "passes": false
+        },
+        {
+          "text": "Auto-suggests legislation links the admin can accept one-click",
+          "passes": false
+        },
+        {
+          "text": "Cost bounded (prompt-caching + per-org spend cap)",
+          "passes": false
+        }
+      ],
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Next",
+      "notes": "New in v0.2 — extracted from Simon's A-05 criterion 'AI review process which examines SOP contents and searches for relevant legislation'.",
+      "reviewed": false,
+      "disputed": false
+    },
+    {
+      "id": "C-04",
+      "name": "Compliance Audit Trail",
+      "category": "compliance",
+      "phase": "v5.0",
+      "plainEnglish": "Every legislation link, scan, and acceptance is logged immutably. An auditor can reconstruct exactly which regulations an SOP claimed compliance with at any historical point, and which AI scans were run.",
+      "criteria": [
+        {
+          "text": "Append-only log of every legislation link (added, removed, updated)",
+          "passes": false
+        },
+        {
+          "text": "Log of every AI scan run + the suggestions surfaced + admin response",
+          "passes": false
+        },
+        {
+          "text": "Audit-exportable as CSV/PDF for regulatory review",
+          "passes": false
+        },
+        {
+          "text": "Survives SOP versioning (links to the version that was active at the time)",
+          "passes": false
+        }
+      ],
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Later",
+      "notes": "New in v0.2.",
       "reviewed": false,
       "disputed": false
     },
@@ -1450,10 +1591,10 @@
     },
     {
       "id": "P-05",
-      "name": "Performance Monitoring",
+      "name": "Performance Monitoring + Full Usage Telemetry",
       "category": "platform",
       "phase": "v5.0",
-      "plainEnglish": "When something is slow or broken on a customer's site, we see it in dashboards immediately — without waiting for a support ticket.",
+      "plainEnglish": "When something is slow or broken on a customer's site, we see it in dashboards immediately. Beyond errors and Web Vitals, the platform captures full usage telemetry — what SOPs were used, user interaction stats, action sequences — structured into databases for AI review and analysis.",
       "criteria": [
         {
           "text": "Frontend error tracking (Sentry or equivalent)",
@@ -1626,10 +1767,10 @@
     },
     {
       "id": "I-04",
-      "name": "Video Transcription (Upload + YouTube)",
+      "name": "Video Transcription + AI-Narrated Capture",
       "category": "intake",
       "phase": "v3.0",
-      "plainEnglish": "Admin uploads an MP4 / MOV or pastes a YouTube URL of a training video. The app transcribes it and structures the transcript into an SOP draft.",
+      "plainEnglish": "Admin uploads an MP4 / MOV or pastes a YouTube URL of a training video. The app transcribes it and structures the transcript into an SOP draft. New scope: admin or worker records video of themselves performing the procedure (first or third person), and AI watches, describes physical events, and breaks them into SOP steps.",
       "criteria": [
         {
           "text": "MP4 / MOV upload (TUS for large files)",
@@ -1675,7 +1816,7 @@
       "currentGrade": "F",
       "targetGrade": "A",
       "priority": "Later",
-      "notes": "Transcription quality is the gap.",
+      "notes": "Transcription quality is the gap; 1st/3rd person capture is a new intake pathway.",
       "reviewed": false,
       "disputed": false
     },
