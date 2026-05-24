@@ -46,23 +46,42 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 - ✓ In-browser video recording with MediaRecorder (Android/Chrome) — Phase 7
 - ✓ iOS guided fallback to native camera + file upload — Phase 7
 
+- ✓ Native SOP builder (Puck-based drag-and-drop) — Phase 12
+- ✓ Blank-page wizard for authoring SOPs from scratch — Phase 12
+- ✓ AI-assisted draft from admin prompts (GPT-4o + Claude adversarial verifier) — Phase 14
+- ✓ Reusable block library — org + Potenco-curated global tiers, 65 NZ seed blocks — Phase 13
+- ✓ Extensible section schema — additional and custom sections beyond fixed Hazards/PPE/Steps/Emergency — Phase 11
+- ✓ Paper/ink design language rolled across admin + auth + dashboard + library + worker surfaces — Phase 12.5 + 14.5
+- ✓ Sub-trade tags + site-tier multi-tenancy (Visy customer interview-driven) — Phase 15
+- ✓ AI Voice Q&A grounded to single SOP with citations + uncertainty fail-safe — Phase 15
+- ✓ DOCX → Puck layout_data with side-by-side step+photo blocks — Phase 20 partial
+
 ### Active
 
 <!-- Current scope. Building toward these. -->
 
-#### v3.0 — SOP Builder (native authoring)
-- Blank-page wizard for authoring SOPs from scratch
-- AI-assisted draft from admin prompts (GPT-4o)
-- NZ-specific template library (WorkSafe categories, machinery, chemical handling)
-- Hybrid AI + builder (AI draft lands in same builder for refinement)
-- Extensible section schema — additional and custom sections beyond the fixed Hazards/PPE/Steps/Emergency set
-- Drag-and-drop layout editor for pages/slides (text, photo, diagram, callout placement)
-- Photo and diagram annotation (arrows, highlight boxes, circles, numbered callouts — non-destructive overlay)
-- Collaborative editing — multi-admin on a draft SOP with conflict resolution
-- Reusable block library — shared hazard/PPE/step blocks surfaced via wizard-prompted selections
+#### v4.0 — Safety-Critical Parsing + Voice + AI Foundation
+- Side-by-side source viewer (admin sees original document beside parsed blocks, click-to-sync scroll)
+- AI reviewer running five verification jobs (omission, anchoring, photo-step alignment, table fidelity, terminology) on every parsed SOP
+- Per-block verify checklist at publish gate (publish hard-disabled until 100% verified, no bulk-bypass)
+- Word/PDF parsing — Phase 20 contract complete (full step-level provenance for photos/diagrams/charts/tables)
+- Worker walkthrough literacy gaps closed — visual-only flow + voice-driven completion + multi-language UI
+- AI Voice Q&A drives walkthrough (full audio loop, advances on "I've done step 4," multi-language)
+- Universal AI read/write field access — every editable field AI-callable via unified agent interface (architectural backbone for v5.0 conversational app)
+- Version history formal supersede + diff + restore + worker-instance sign-off chain (completing the SOP IS the legal signature)
 
-#### v2.0 carry-over (not blocking v3.0)
-- Vimeo URL support (Phase 6 deferral)
+#### v3.0 carry-over (deferred to v4.5 backlog)
+- A-05 NZ Template Library (Visy glass-mfg-focused)
+- W-04 Kiosk mode + sequence-enforced walkthrough
+- W-05 PIN/badge sign-off at shared workstations
+- S-05 Pinned PPE icon strip
+- G-02 Multi-step approval chain (optional, versioned)
+- G-03 Review-due cadence + AI maintenance schedule
+- G-04 Roles + stale-role surfacing
+- X-01 Full-text search + AI-managed taxonomy
+- P-04 CSP/HSTS security hardening
+
+#### v2.0 carry-over (not blocking v4.0)
 - Phase 7 UAT run + Phase 9 live UAT (`human_needed`)
 - Phase 999.1 stale video job cleanup (backlog)
 
@@ -74,18 +93,30 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 - Integration with external HR/ERP systems
 - Video content within SOPs
 
-## Current Milestone: v3.0 SOP Builder
+## Current Milestone: v4.0 Safety-Critical Parsing + Voice + AI Foundation
 
-**Goal:** Enable admins to author SOPs natively in the app — from blank page or AI-drafted start — with an extensible section model, a drag-and-drop layout editor for pages, annotatable photos/diagrams, reusable blocks, NZ-specific templates, and collaborative drafts.
+**Started:** 2026-05-24
+**Goal:** No parsed SOP can be published without verified anchoring (Phase 20 contract complete). A worker who can't read English can still complete an SOP by voice. Every editable field in the app is AI-callable — laying the architectural backbone for the v5.0 conversational app.
 
-**Target features:**
-- **Authoring entry points:** blank-page wizard, AI-assisted draft from prompts, NZ template library, hybrid AI+builder single-flow
-- **Structure model:** extensible section schema — additional canonical sections + custom sections with admin-defined titles/behavior
-- **Layout & visuals:** per-page drag-and-drop layout editor; non-destructive photo/diagram annotation (arrows, boxes, circles, callouts)
-- **Collaboration & reuse:** multi-admin collaborative draft editing; reusable hazard/PPE/step block library with wizard-prompted selections
-- **Desktop-authored, mobile-consumed:** layouts authored on desktop must reflow gracefully to worker mobile screens
+**Target features (8, grouped into 3 phases):**
 
-**Key context:** Inverts v1 decision *"Upload-only for v1 (no in-app authoring)"*. v2.0 infrastructure (pipeline linkage, version management, publish gate) is reusable. Collaborative editing needs CRDT vs. server-lock research before planning. Layout editor + annotation are effectively a mini-Figma-for-SOPs and should be budgeted as multi-phase work.
+- **Phase 21 — Safety-Critical Parsing** (S-02 + S-03 + S-04 + I-01):
+  - Side-by-side source viewer (admin sees original document beside parsed blocks)
+  - AI reviewer × 5 verification jobs (omission, anchoring, photo-step, table fidelity, terminology)
+  - Per-block verify checklist at publish gate (no bulk-bypass)
+  - Word/PDF parsing — full step-level provenance for photos/diagrams/charts/tables
+- **Phase 22 — Voice-Driven Walkthrough** (W-01 + X-02):
+  - Walkthrough literacy gaps closed — low-literacy / visual-only / voice-only completion + multi-language UI
+  - Voice Q&A drives walkthrough (reads aloud, advances on "done," multi-language)
+- **Phase 23 — AI Field Layer + Version Supersede** (X-03 + G-01):
+  - Universal AI read/write access to every editable field (unified agent interface)
+  - Cmd+K palette extended across admin pages + team + settings
+  - Version supersede + diff + one-click restore + worker-update indicator
+  - Worker-instance sign-off chain — completing the SOP IS the legal signature
+
+**Key context:** Source of truth is `.planning/PRODUCT-ROADMAP.md` v0.3 (Simon's 2026-05-24 review pass). v3.0's deferrals (NZ templates, kiosk mode, approval chains, search, security hardening, the compliance category) carry to v4.5. The Visy customer interview (2026-05-05) remains the primary domain anchor; v4.0 finishes the safety story before v4.5 broadens to multi-customer acquisition.
+
+**Execution order:** 21 → 22 → 23. Phase 21 unblocks the most safety risk. Phase 23 lays the AI-field foundation that v5.0's conversational interface (X-05) builds on.
 
 ## Context
 
@@ -139,4 +170,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-15 — Phase 11 (Section Schema & Block Foundation) complete — v3.0 schema/types/admin-UI foundation landed; SB-SECT-01..04 pending human walkthrough + Phase 12 test flip*
+*Last updated: 2026-05-24 — v4.0 milestone kicked off. v3.0 archived (8 phases shipped: 11, 12, 12.5, 13, 14, 14.5, 15, 20 partial). v4.0 = Phases 21/22/23, source of truth `.planning/PRODUCT-ROADMAP.md` v0.3.*

@@ -361,3 +361,103 @@ Which phases cover which requirements. Updated during roadmap creation.
 ---
 *Requirements defined: 2026-03-23*
 *Last updated: 2026-04-13 — v3.0 SOP Builder milestone requirements added (SB-XX); traceability mapped to Phases 11–18*
+
+---
+
+## v4.0 Requirements — Safety-Critical Parsing + Voice + AI Foundation
+
+**Defined:** 2026-05-24
+**Milestone goal:** No parsed SOP can be published without verified anchoring. Every editable field is AI-callable. A worker who can't read English can still complete an SOP by voice.
+**Source:** Derived from `.planning/PRODUCT-ROADMAP.md` v0.3 § v4.0 NOW (Simon's 2026-05-24 review pass).
+
+### Safety-Critical Parsing (Phase 21)
+
+**Side-by-Side Source Viewer (S-02):**
+
+- [ ] **SCP-VIEWER-01**: Source PDF / DOCX / image rendered alongside parsed blocks during admin review
+- [ ] **SCP-VIEWER-02**: Clicking a parsed block scrolls the source viewer to the exact passage that produced it
+- [ ] **SCP-VIEWER-03**: Clicking a region in the source highlights the corresponding parsed block
+- [ ] **SCP-VIEWER-04**: Source viewer remains persistent throughout review (not modal, not dismissible)
+- [ ] **SCP-VIEWER-05**: Source viewer works uniformly for DOCX, PDF, image, and video-transcript intake formats
+
+**AI Reviewer × 5 Verification Jobs (S-03):**
+
+- [ ] **SCP-AI-01**: Omission check — AI compares source to parsed output and flags safety-critical content that was dropped
+- [ ] **SCP-AI-02**: Anchoring check — AI confirms photos and diagrams are attached to the step they describe
+- [ ] **SCP-AI-03**: Step-image alignment check — AI confirms each photo actually depicts the action of its anchored step
+- [ ] **SCP-AI-04**: Table fidelity check — AI confirms dosages, torque values, temperatures, and other tabular data preserved exactly
+- [ ] **SCP-AI-05**: Terminology consistency check — AI confirms parsed language matches the org's existing SOP vocabulary
+- [ ] **SCP-AI-06**: All five jobs auto-run on first parse without admin invocation
+- [ ] **SCP-AI-07**: Admin can manually re-run any job after editing the parsed draft
+- [ ] **SCP-AI-08**: Per-parse AI cost bounded with prompt-caching + per-org spend cap (no runaway billing)
+
+**Per-Block Verify Checklist at Publish Gate (S-04):**
+
+- [ ] **SCP-VERIFY-01**: Every block in a draft SOP carries a `verified_by` boolean
+- [ ] **SCP-VERIFY-02**: Publish button is hard-disabled until 100% of blocks are verified
+- [ ] **SCP-VERIFY-03**: Verification timestamps + admin user_id stored immutably for audit
+- [ ] **SCP-VERIFY-04**: Re-editing a block requires re-verification of that specific block, not the whole SOP
+- [ ] **SCP-VERIFY-05**: No bulk-verify or skip-all option offered (the speed-bump is the safety feature)
+- [ ] **SCP-VERIFY-06**: Verify UI guides admin's eye-flow such that they actually read each block, not just click through
+
+**Word/PDF Document Parsing — Phase 20 contract complete (I-01):**
+
+- [ ] **SCP-PARSE-01**: Photos, diagrams, charts, and tables extracted from source with step-level provenance metadata (which step, which section)
+- [ ] **SCP-PARSE-02**: Parsed drafts land directly as Puck layout_data in the builder (review surface retires — admin reviews IN the builder)
+- [ ] **SCP-PARSE-03**: Side-by-side source viewer (SCP-VIEWER-*) integrated into the builder review surface
+- [ ] **SCP-PARSE-04**: AI reviewer (SCP-AI-*) auto-runs as part of the parse pipeline
+
+### Voice-Driven Walkthrough (Phase 22)
+
+**Walkthrough Literacy (W-01):**
+
+- [ ] **VDW-LIT-01**: A worker with low literacy can complete an SOP without requiring fluent reading
+- [ ] **VDW-LIT-02**: A worker can complete an SOP entirely visually — diagrams, photos, icons — no required reading
+- [ ] **VDW-LIT-03**: A worker can complete an SOP entirely by voice — AI reads steps aloud, listens for "done," asks questions back
+- [ ] **VDW-LIT-04**: Walkthrough UI supports multi-language rendering (Te Reo, Tagalog, Hindi, Mandarin priority languages for NZ industrial sites)
+
+**Voice Q&A — Voice-Driven Mode (X-02):**
+
+- [ ] **VDW-VOICE-01**: Voice input transcribed reliably in industrial-floor noise (factory ambient, machinery) — accuracy target ≥ 90% for common SOP vocabulary
+- [ ] **VDW-VOICE-02**: AI answer is read back aloud — full audio loop, no required screen reading
+- [ ] **VDW-VOICE-03**: Voice Q&A drives step progression — "I've done step 4, what's next" advances the walkthrough state
+- [ ] **VDW-VOICE-04**: Multi-language voice input + output (matches VDW-LIT-04 language set)
+
+### AI Field Layer + Version Supersede (Phase 23)
+
+**Universal AI Read/Write Field Access (X-03):**
+
+- [ ] **AFL-AI-01**: Every editable field in the app exposes an AI read API (agent can fetch the current value)
+- [ ] **AFL-AI-02**: Most editable fields expose an AI write API (agent can propose / apply a value, with admin approval for high-stakes fields)
+- [ ] **AFL-AI-03**: Unified agent interface — every feature surface registers fields via a single shared mechanism, no per-feature bespoke API
+- [ ] **AFL-AI-04**: Cmd+K command palette extended to cover admin pages, team members, and settings (not just SOPs)
+
+**Version History + Worker-Instance Sign-off (G-01):**
+
+- [ ] **AFL-VER-01**: Admin can edit an SOP into a new version with the previous version explicitly deprecated and saved in version history (formal supersede flow)
+- [ ] **AFL-VER-02**: Side-by-side diff between any two SOP versions
+- [ ] **AFL-VER-03**: Admin can restore an old version as the active one with one click
+- [ ] **AFL-VER-04**: Workers see an indicator on the SOP if it has been updated since their last completion
+- [ ] **AFL-VER-05**: Every SOP instance run by a worker is recorded with the worker's name (captured at instance start) + per-step approval, forming a personal sign-off chain — completing the SOP IS the legal signature
+
+### v4.0 Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| SCP-VIEWER-01..05 (5) | Phase 21 | Pending |
+| SCP-AI-01..08 (8) | Phase 21 | Pending |
+| SCP-VERIFY-01..06 (6) | Phase 21 | Pending |
+| SCP-PARSE-01..04 (4) | Phase 21 | Pending |
+| VDW-LIT-01..04 (4) | Phase 22 | Pending |
+| VDW-VOICE-01..04 (4) | Phase 22 | Pending |
+| AFL-AI-01..04 (4) | Phase 23 | Pending |
+| AFL-VER-01..05 (5) | Phase 23 | Pending |
+
+**v4.0 Coverage:**
+
+- v4.0 requirements: 40 total (SCP ×23, VDW ×8, AFL ×9)
+- Mapped to phases: 40 (Phases 21–23)
+- Unmapped: 0
+
+---
+*v4.0 requirements added: 2026-05-24*

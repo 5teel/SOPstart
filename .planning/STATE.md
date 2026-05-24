@@ -1,17 +1,21 @@
 ---
 gsd_state_version: 1.0
-milestone: v3.0
-milestone_name: SOP Builder
-status: archived
-archived_at: "2026-05-23T00:00:00.000Z"
-last_updated: "2026-05-23T00:00:00.000Z"
-last_activity: 2026-05-23
-next_milestone: v4.0 (Safety-Critical Parsing — not yet kicked off)
+milestone: v4.0
+milestone_name: Safety-Critical Parsing + Voice + AI Foundation
+status: in-progress
+started_at: "2026-05-24T00:00:00.000Z"
+last_updated: "2026-05-24T00:00:00.000Z"
+last_activity: 2026-05-24
+previous_milestone: v3.0 (archived 2026-05-23 — see .planning/MILESTONES.md § v3.0)
 progress:
-  shipped_phases: 8
-  deferred_to_v4: 5
-  deleted: 1
-  closeout_note: "v3.0 archived 2026-05-23. 8 phases shipped (11, 12, 12.5, 13, 14, 14.5, 15, 20 partial). 5 deferred to v4.0 backlog (7, 9, 16, 17, 18). Phase 19 deleted. Phase 20 remainder promoted to v4.0 Phase 01."
+  total_phases: 3
+  completed_phases: 0
+  in_flight_phases: 0
+  percent: 0
+  phases:
+    - "21. Safety-Critical Parsing (S-02 + S-03 + S-04 + I-01) — not started, next"
+    - "22. Voice-Driven Walkthrough (W-01 + X-02) — not started"
+    - "23. AI Field Layer + Version Supersede (X-03 + G-01) — not started"
 ---
 
 # Project State
@@ -21,21 +25,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Awaiting v4.0 kickoff. Phase 20 remainder (AI reviewer + side-by-side viewer + per-block verify checklist) is the load-bearing safety story for the next milestone.
+**Current focus:** v4.0 Phase 21 — Safety-Critical Parsing. Finish the Phase 20 contract (S-02 + S-03 + S-04 + I-01) so no parsed SOP can be published without verified anchoring.
 
 ## Current Position
 
-**Milestone status:** v3.0 archived 2026-05-23. See `.planning/MILESTONES.md` § v3.0 and `.planning/archive/v3.0/` for the full record.
+**Milestone status:** v4.0 started 2026-05-24. 3 phases / 40 requirements. See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
-**Next action (operator):**
+**Active phase:** 21 (Safety-Critical Parsing) — not started, ready for `/gsd-plan-phase 21`.
 
-- ✅ Cleared 2026-05-23 — `npx supabase db push --include-all` reported "Remote database is up to date". Migration 00030 (Phase 15 sub-trade RLS) is live on prod.
+**v4.0 phase sequence:**
 
-**Next action (development):**
+1. **Phase 21 — Safety-Critical Parsing** (next): S-02 side-by-side viewer + S-03 AI reviewer × 5 + S-04 per-block verify checklist + I-01 Phase 20 contract complete. 23 requirements (SCP-VIEWER ×5, SCP-AI ×8, SCP-VERIFY ×6, SCP-PARSE ×4).
+2. **Phase 22 — Voice-Driven Walkthrough**: W-01 literacy/visual/voice gaps + X-02 voice-driven walkthrough. 8 requirements (VDW-LIT ×4, VDW-VOICE ×4).
+3. **Phase 23 — AI Field Layer + Version Supersede**: X-03 universal AI read/write + G-01 version supersede + worker-instance sign-off. 9 requirements (AFL-AI ×4, AFL-VER ×5).
 
-- Start v4.0 with `/gsd-new-milestone`. First phase is the Phase 20 remainder (Safety-Critical Parsing).
-
-**Master tip:** `b9aad94` chore(video): drop dead deleteVideoJob alias (build warning eliminated). Will advance with the archive commit.
+**Next action:** `/gsd-plan-phase 21` to produce PLAN.md for Safety-Critical Parsing.
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 

@@ -37,7 +37,17 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [→] **Phase 17: Image & Diagram Annotation** — **deferred to v4.0 backlog** 2026-05-23. Konva editor with dual-store, DiagramHotspotBlock, stylus + palm rejection. Defer reason: multi-week build; needs customer pull signal first.
 - [→] **Phase 18: Collaborative Editing** — **deferred to v4.0 backlog** 2026-05-23. Section-level pessimistic locks, Realtime presence, conflict modal. Defer reason: multi-week build; current single-admin pattern has not surfaced contention.
 - ~~Phase 19: Pipeline Integration, Bundle Isolation & v3.0 Closeout~~ — **deleted from roadmap 2026-05-23**. Its only purpose was to tie Phases 9 + 12 + 16 + 17 together; with 9 unstarted and 16/17 deferred, there is nothing to close out. v3.0 archive captures the closeout instead.
-- [x] **Phase 20: Conversion Pipeline V2 (partial — v3.0 slice)** - DOCX → Puck `layout_data` directly in the Phase 12 builder with side-by-side step + photo blocks shipped 2026-05-15..17 (commits `1a2bbbc`, `c47baa7`, `e33669e`, `064e819`). SPEC + 4 validated spikes captured 2026-05-15..16. Remaining scope (persistent side-by-side source viewer, AI reviewer × 5 jobs auto/manual, mandatory per-block verify checklist at publish gate) **carried to v4.0 Phase 01: Safety-Critical Parsing**.
+- [x] **Phase 20: Conversion Pipeline V2 (partial — v3.0 slice)** - DOCX → Puck `layout_data` directly in the Phase 12 builder with side-by-side step + photo blocks shipped 2026-05-15..17 (commits `1a2bbbc`, `c47baa7`, `e33669e`, `064e819`). SPEC + 4 validated spikes captured 2026-05-15..16. Remaining scope (persistent side-by-side source viewer, AI reviewer × 5 jobs auto/manual, mandatory per-block verify checklist at publish gate) **carried to v4.0 Phase 21: Safety-Critical Parsing**.
+
+---
+
+## v4.0 — Safety-Critical Parsing + Voice + AI Foundation (started 2026-05-24)
+
+Three phases bundle the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` v0.3. Execution order 21 → 22 → 23.
+
+- [ ] **Phase 21: Safety-Critical Parsing** — Finishes the Phase 20 contract. Side-by-side source viewer (S-02) + AI reviewer × 5 verification jobs (S-03) + per-block verify checklist at publish gate (S-04) + Word/PDF parsing with step-level provenance (I-01). All four features touch the same builder review surface and AI pipeline; bundle delivers the safety story end-to-end.
+- [ ] **Phase 22: Voice-Driven Walkthrough** — Worker walkthrough literacy gaps closed (W-01) + AI Voice Q&A that drives the walkthrough end-to-end (X-02). Bundle: voice infrastructure (transcription, TTS, multi-language) serves both the literacy story and the Q&A story.
+- [ ] **Phase 23: AI Field Layer + Version Supersede** — Universal AI read/write access to every editable field + Cmd+K extended across admin surfaces (X-03) + version history formal supersede + diff + restore + worker-instance sign-off chain (G-01). X-03 is the architectural backbone v5.0 conversational app builds on; G-01 fits naturally alongside as a small standalone bundle.
 
 ## Phase Details
 
@@ -508,9 +518,11 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12 → 12.5 → 13 → 14 → 14.5 → 15 → 20
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12 → 12.5 → 13 → 14 → 14.5 → 15 → 20 → **21 → 22 → 23**
 
-**v3.0 closeout 2026-05-23.** Phases 16, 17, 18 deferred to v4.0 backlog. Phase 19 deleted (no remaining dependencies). Phase 20 partial — DOCX-to-builder slice shipped on master; remaining safety-critical verification scope carried to v4.0 Phase 01.
+**v3.0 closeout 2026-05-23.** Phases 16, 17, 18 deferred to v4.0 backlog. Phase 19 deleted (no remaining dependencies). Phase 20 partial — DOCX-to-builder slice shipped on master; remaining safety-critical verification scope carried to v4.0 Phase 21.
+
+**v4.0 kicked off 2026-05-24.** Three phases (21, 22, 23) cover the 8 v0.3 NOW features. Execution sequential.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -535,7 +547,10 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 17. Image & Diagram Annotation | — | Deferred to v4.0 backlog |  |
 | 18. Collaborative Editing | — | Deferred to v4.0 backlog |  |
 | 19. Pipeline Integration, Bundle Isolation & v3.0 Closeout | — | Deleted 2026-05-23 |  |
-| 20. Conversion Pipeline V2 | partial | Partial complete — DOCX→builder slice shipped; remainder → v4.0 Phase 01 | 2026-05-17 |
+| 20. Conversion Pipeline V2 | partial | Partial complete — DOCX→builder slice shipped; remainder → v4.0 Phase 21 | 2026-05-17 |
+| **21. Safety-Critical Parsing (v4.0)** | 0/? | Not started — next |  |
+| **22. Voice-Driven Walkthrough (v4.0)** | 0/? | Not started |  |
+| **23. AI Field Layer + Version Supersede (v4.0)** | 0/? | Not started |  |
 
 ## Backlog
 
