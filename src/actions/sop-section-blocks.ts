@@ -466,7 +466,84 @@ export async function unverifyBlock(
 }
 
 // ---------------------------------------------------------------------------
-// 10. listSectionBlocksWithUpdates — Phase 13 plan 13-04
+// 10. getPublishGateStatus — Phase 21 plan 21-04 (SCP-VERIFY-02)
+//
+// Reads the verify gate state for a SOP — used by the builder UI to render
+// "X / N verified" + enable/disable the Publish button before the user
+// even attempts to POST /publish (defence-in-depth — server still enforces).
+//
+// Returns { ready: true } when source_type === 'ai_prompt' OR there is no
+// source_file_path (pre-Phase-20 SOPs bypass the gate entirely).
+// ---------------------------------------------------------------------------
+
+export type PublishGateStatus = {
+  ready: boolean
+  unverified_count: number
+  total: number
+  /** True when this SOP is excluded from the verify gate (CONV-12 / legacy). */
+  bypassed: boolean
+}
+
+export async function getPublishGateStatus(
+  sopId: string
+): Promise<PublishGateStatus | { error: string }> {
+  if (!sopId) return { error: 'sopId required' }
+
+  const supabase = await createClient()
+
+  // SOP-level bypass check
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: sopRow, error: sopErr } = await (supabase as any)
+    .from('sops')
+    .select('source_type, source_file_path')
+    .eq('id', sopId)
+    .maybeSingle()
+  if (sopErr) {
+    return { error: sopErr.message }
+  }
+
+  const sourceType = (sopRow?.source_type as string | null) ?? null
+  const sourceFilePath = (sopRow?.source_file_path as string | null) ?? null
+  if (sourceType === 'ai_prompt' || !sourceFilePath) {
+    return { ready: true, unverified_count: 0, total: 0, bypassed: true }
+  }
+
+  // Collect this SOP's section ids
+  const { data: sectionRows, error: sErr } = await supabase
+    .from('sop_sections')
+    .select('id')
+    .eq('sop_id', sopId)
+  if (sErr) return { error: sErr.message }
+  const sectionIds = (sectionRows ?? []).map((r: { id: string }) => r.id)
+  if (sectionIds.length === 0) {
+    return { ready: true, unverified_count: 0, total: 0, bypassed: false }
+  }
+
+  const { count: total, error: tErr } = await supabase
+    .from('sop_section_blocks')
+    .select('*', { count: 'exact', head: true })
+    .in('sop_section_id', sectionIds)
+  if (tErr) return { error: tErr.message }
+
+  const { count: unverified, error: uErr } = await supabase
+    .from('sop_section_blocks')
+    .select('*', { count: 'exact', head: true })
+    .in('sop_section_id', sectionIds)
+    .is('verified_by_admin_id', null)
+  if (uErr) return { error: uErr.message }
+
+  const totalNum = total ?? 0
+  const unverifiedNum = unverified ?? 0
+  return {
+    ready: totalNum > 0 && unverifiedNum === 0,
+    unverified_count: unverifiedNum,
+    total: totalNum,
+    bypassed: false,
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 11. listSectionBlocksWithUpdates — Phase 13 plan 13-04
 // ---------------------------------------------------------------------------
 
 export async function listSectionBlocksWithUpdates(
