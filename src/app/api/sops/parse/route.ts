@@ -13,8 +13,17 @@ import { ocrFallback } from '@/lib/parsers/ocr-fallback'
 import { parseSopWithGPT } from '@/lib/parsers/gpt-parser'
 import { uploadExtractedImages } from '@/lib/parsers/image-uploader'
 import { triggerReviewerOnParseCompletion } from '@/lib/parsers/parse-pipeline'
+import {
+  extractDocxParagraphAnchors,
+  extractPdfBlockBboxes,
+} from '@/lib/parsers/source-viewer'
+import type { ProvenanceContext } from '@/lib/parsers/parsed-sop-to-layout-data'
 import type { ParsedSop } from '@/lib/validators/sop'
 import type { SourceFileType } from '@/types/sop'
+
+// Phase 21 (Plan 21-04 Task 3) — bump when the parsed-sop-to-layout-data
+// shape changes in a way that downstream consumers must distinguish.
+const PARSER_VERSION = '21.4.0'
 
 // Vercel Pro: 300s max; Hobby: 10s — parsing requires Pro for large docs
 export const maxDuration = 300
@@ -151,9 +160,89 @@ export async function POST(request: NextRequest) {
     // / PhotoGrid tree so the Phase 12 builder renders side-by-side step+
     // photo. Worker walkthrough continues reading sop_steps until that
     // codepath migrates separately.
+    //
+    // Phase 21 (Plan 21-04 Task 3) — build a ProvenanceContext so every
+    // emitted Puck item carries `block_provenance`. Image-bearing blocks
+    // get a precise region (PDF: page+bbox; DOCX: paragraph anchor).
+    // Non-image blocks fall through to fallbackRegion so the verify gate
+    // still has SOMETHING to point at.
+    let provenanceContext: ProvenanceContext | undefined
+    if (fileType === 'docx' || fileType === 'pdf' || fileType === 'image') {
+      const sourceKind: ProvenanceContext['sourceKind'] =
+        fileType === 'pdf' ? 'pdf' : fileType === 'docx' ? 'docx' : 'scan'
+      const ctx: ProvenanceContext = {
+        sourceKind,
+        parser_run_id: job.id,
+        parser_version: PARSER_VERSION,
+        fallbackRegion:
+          sourceKind === 'pdf'
+            ? { kind: 'pdf', page: 1, bbox: [0, 0, 0, 0], pageWidth: 1, pageHeight: 1 }
+            : sourceKind === 'docx'
+              ? { kind: 'docx', paragraph_id: 'unknown', run_start: 0, run_end: 0 }
+              : { kind: 'scan', image_crop: [0, 0, 0, 0] },
+      }
+
+      // DOCX: build the index → paragraph anchor map from
+      // extractDocxParagraphAnchors. Wraps the structural extractor, so we
+      // can co-run it with the parse path without re-parsing the file.
+      if (sourceKind === 'docx') {
+        try {
+          const anchors = await extractDocxParagraphAnchors(Buffer.from(buffer))
+          const m = new Map<number, { paragraph_id: string; run_start: number; run_end: number }>()
+          for (let i = 0; i < anchors.length; i++) {
+            const a = anchors[i]
+            if (a.region.kind === 'docx') {
+              m.set(i, {
+                paragraph_id: a.region.paragraph_id,
+                run_start: a.region.run_start,
+                run_end: a.region.run_end,
+              })
+            }
+          }
+          ctx.paragraphOfImageIndex = m
+        } catch (err) {
+          console.warn('[parse] extractDocxParagraphAnchors failed — using fallback region only', err)
+        }
+      }
+
+      // PDF: per-page bbox extraction. CLAUDE.md learning: pdfjs needs a
+      // FRESH Uint8Array per call — extractPdfBlockBboxes already does that
+      // internally; we just pass the same Node Buffer each iteration.
+      if (sourceKind === 'pdf') {
+        try {
+          const m = new Map<number, { page: number; bbox: [number, number, number, number]; pageWidth: number; pageHeight: number }>()
+          // We don't know the page count up-front without a separate doc-open;
+          // walk extracted images by their `index` and probe pages 1..N where
+          // N is bounded by uploadedImages.length (one page per image upper bound).
+          // Most SOPs are <50 pages, so this is cheap.
+          const maxPages = Math.max(1, Math.min(50, uploadedImages.length + 5))
+          let imgIdx = 0
+          for (let p = 1; p <= maxPages && imgIdx < uploadedImages.length; p++) {
+            const blocks = await extractPdfBlockBboxes(Buffer.from(buffer), p)
+            for (const b of blocks) {
+              if (b.region.kind === 'pdf') {
+                m.set(imgIdx, {
+                  page: b.region.page,
+                  bbox: b.region.bbox,
+                  pageWidth: b.region.pageWidth,
+                  pageHeight: b.region.pageHeight,
+                })
+                imgIdx++
+              }
+            }
+          }
+          ctx.pageOfImageIndex = m
+        } catch (err) {
+          console.warn('[parse] extractPdfBlockBboxes failed — using fallback region only', err)
+        }
+      }
+
+      provenanceContext = ctx
+    }
+
     const perSectionLayouts =
       fileType === 'docx'
-        ? parsedSopToPerSectionLayoutData(parsed, uploadedImages)
+        ? parsedSopToPerSectionLayoutData(parsed, uploadedImages, { provenanceContext })
         : null
 
     // Update SOP metadata
