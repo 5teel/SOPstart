@@ -889,6 +889,23 @@ export function createPuckOverrides(opts: {
   onItemSelected?: (
     info: { componentId: string; junctionId: string | null }
   ) => void
+  /**
+   * Phase 21 Plan 21-03 — optional renderer for the AI-reviewer flag panel.
+   * Mounted INLINE beneath each canvas block (after children) so flags
+   * appear under the affected block per the plan UI spec. The renderer
+   * receives the Puck componentId and the resolved junctionId (= block_id);
+   * an empty render is fine when there are no flags for the block (the
+   * `<ReviewerFlagsPanel>` itself returns null on empty state).
+   *
+   * D-21-09 isolation: callers MUST pass a renderer that is admin-only
+   * (worker routes pass undefined). The puck-config has no static import
+   * of any admin-only surface — the renderer crosses that boundary
+   * dynamically at render time.
+   */
+  renderReviewerFlagsPanel?: (params: {
+    componentId: string
+    junctionId: string | null
+  }) => ReactNode
 }): Partial<Overrides> {
   // Reference junctionMap for lint cleanliness — the canonical lookup the
   // overlay uses is componentIdToJunction (built from junctionMap + layout_data
@@ -964,11 +981,19 @@ export function createPuckOverrides(opts: {
           onItemSelected={onItemSelected}
         />
       ) : null
+      const junctionId = map?.get(componentId)?.id ?? null
+      // Phase 21 Plan 21-03 — inline flag panel renderer (admin-only).
+      // The renderer returns null when there are no flags for this block,
+      // so this surface is invisible on verified blocks.
+      const flagPanel = opts.renderReviewerFlagsPanel
+        ? opts.renderReviewerFlagsPanel({ componentId, junctionId })
+        : null
       if (!map || map.size === 0) {
         return (
           <>
             {selectionTap}
             {children}
+            {flagPanel}
           </>
         )
       }
@@ -982,6 +1007,7 @@ export function createPuckOverrides(opts: {
           >
             {children}
           </PuckItemBadgeOverlay>
+          {flagPanel}
         </>
       )
     },

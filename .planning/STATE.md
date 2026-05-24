@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Milestone status:** v4.0 started 2026-05-24. 3 phases / 40 requirements. See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
-**Active phase:** 21 (Safety-Critical Parsing) — in progress. Wave 0 (test stubs), Wave 1 (DB + parser infra + Job A), and Wave 2 (source viewer pane) complete. Next: Wave 3 (AI reviewer Jobs B/C/D/E) — `/gsd-execute-phase 21` wave 3.
+**Active phase:** 21 (Safety-Critical Parsing) — in progress. Wave 0 (test stubs), Wave 1 (DB + parser infra + Job A), Wave 2 (source viewer pane), and Wave 3 (AI reviewer Jobs B/C/D/E + auto-trigger + flag panel) complete. Next: Wave 4 (per-block verify checklist + publish gate) — `/gsd-execute-phase 21` wave 4.
 
 **v4.0 phase sequence:**
 
@@ -39,7 +39,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 2. **Phase 22 — Voice-Driven Walkthrough**: W-01 literacy/visual/voice gaps + X-02 voice-driven walkthrough. 8 requirements (VDW-LIT ×4, VDW-VOICE ×4).
 3. **Phase 23 — AI Field Layer + Version Supersede**: X-03 universal AI read/write + G-01 version supersede + worker-instance sign-off. 9 requirements (AFL-AI ×4, AFL-VER ×5).
 
-**Next action:** Phase 21 Wave 3 — `/gsd-execute-phase 21 --wave 3` (AI reviewer Jobs B omission, C anchoring, D table fidelity, E terminology).
+**Next action:** Phase 21 Wave 4 — `/gsd-execute-phase 21 --wave 4` (per-block verify checklist + publish gate at the builder).
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
@@ -126,6 +126,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 15 P03 | 75m | 4 tasks | 9 files |
 | Phase 15 P04 | 10m | 5 tasks | 12 files |
 | Phase 21 P02 | 18m | 3 tasks | 17 files |
+| Phase 21 P03 | 25m | 3 tasks | 22 files |
 
 ## Accumulated Context
 
@@ -317,6 +318,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-05-25T15:03:38.000Z
-Stopped at: Completed Phase 21 Plan 21-02 (Wave 2 — Source Viewer Pane)
+Stopped at: Completed Phase 21 Plan 21-03 (Wave 3 — AI Reviewer Jobs B/C/D/E + auto-trigger + flag panel)
 Resume file: None
-Awaiting: Phase 21 Wave 3 — AI reviewer Jobs B/C/D/E. Migration 00030 push still outstanding per close-out note above.
+Awaiting: Phase 21 Wave 4 — per-block verify checklist + publish gate. Migration 00032 push outstanding (creates verified_by_admin_id, ai_review_results, org_anthropic_spend, ai_review_rate_limits).

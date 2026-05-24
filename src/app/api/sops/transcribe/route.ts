@@ -7,6 +7,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { transcribeAudio } from '@/lib/parsers/transcribe-audio'
 import { parseSopWithGPT } from '@/lib/parsers/gpt-parser'
 import { verifyTranscriptVsSop, detectMissingSections } from '@/lib/parsers/verify-sop'
+import { triggerReviewerOnParseCompletion } from '@/lib/parsers/parse-pipeline'
 import type { ParsedSop } from '@/lib/validators/sop'
 import type { VerificationFlag } from '@/types/sop'
 
@@ -265,6 +266,9 @@ export async function POST(request: NextRequest) {
         completed_at: new Date().toISOString(),
       })
       .eq('id', job.id)
+
+    // Phase 21 (Plan 21-03 Task 2) — auto-trigger AI reviewer.
+    void triggerReviewerOnParseCompletion(job.id)
 
     // Suppress unused variable warning — organisationId reserved for future image storage
     void organisationId

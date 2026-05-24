@@ -214,15 +214,55 @@ test.describe('runReviewerJobs orchestrator', () => {
     }
   })
 
-  test('Stub jobs B/C/D/E surface as not_implemented; partial envelope returned', async () => {
+  test('All five jobs A/B/C/D/E run live in one session (Wave 3 — Plan 21-03)', async () => {
+    // Wave 1 originally asserted these surfaced as `not_implemented`. Wave 3
+    // (Plan 21-03) wired the live jobs, so we now assert the full A→B→C→D→E
+    // dispatch produces ok statuses for each — proving D-21-03 single-session
+    // ordering and confirming the stubs are gone.
     const anthropicStub = makeAnthropicStub([
       {
         content: [{ type: 'text', text: '[]' }],
         usage: {
-          input_tokens: 10,
+          input_tokens: 1000,
+          output_tokens: 100,
+          cache_creation_input_tokens: 500,
+          cache_read_input_tokens: 0,
+        },
+      },
+      {
+        content: [{ type: 'text', text: '[]' }],
+        usage: {
+          input_tokens: 50,
           output_tokens: 5,
           cache_creation_input_tokens: 0,
-          cache_read_input_tokens: 0,
+          cache_read_input_tokens: 500,
+        },
+      },
+      {
+        content: [{ type: 'text', text: '[]' }],
+        usage: {
+          input_tokens: 50,
+          output_tokens: 5,
+          cache_creation_input_tokens: 0,
+          cache_read_input_tokens: 500,
+        },
+      },
+      {
+        content: [{ type: 'text', text: '[]' }],
+        usage: {
+          input_tokens: 50,
+          output_tokens: 5,
+          cache_creation_input_tokens: 0,
+          cache_read_input_tokens: 500,
+        },
+      },
+      {
+        content: [{ type: 'text', text: '[]' }],
+        usage: {
+          input_tokens: 50,
+          output_tokens: 5,
+          cache_creation_input_tokens: 0,
+          cache_read_input_tokens: 500,
         },
       },
     ])
@@ -257,13 +297,17 @@ test.describe('runReviewerJobs orchestrator', () => {
         'E',
       ])
 
-      expect(envelope.jobs_run).toEqual(['A'])
+      expect(envelope.jobs_run).toEqual(['A', 'B', 'C', 'D', 'E'])
       expect(envelope.job_status?.A).toBe('ok')
-      expect(envelope.job_status?.B).toBe('not_implemented')
-      expect(envelope.job_status?.C).toBe('not_implemented')
-      expect(envelope.job_status?.D).toBe('not_implemented')
-      expect(envelope.job_status?.E).toBe('not_implemented')
-      expect(envelope.job_errors?.B).toContain('not implemented')
+      expect(envelope.job_status?.B).toBe('ok')
+      expect(envelope.job_status?.C).toBe('ok')
+      expect(envelope.job_status?.D).toBe('ok')
+      expect(envelope.job_status?.E).toBe('ok')
+      // 5 HTTP calls — one per job — proving single-session dispatch.
+      expect(anthropicStub.calls.length).toBe(5)
+      // cache_read_tokens should be non-zero — calls 2-5 hit the cached
+      // source block per D-21-03 / Spike 003 finding #1.
+      expect(envelope.usage.cache_read_tokens).toBeGreaterThan(0)
     } finally {
       restoreAnthropic()
       restoreSupabase()

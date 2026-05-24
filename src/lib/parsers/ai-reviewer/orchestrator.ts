@@ -1,5 +1,5 @@
 /**
- * Phase 21 (Plan 21-01 Task 3) — AI reviewer orchestrator.
+ * Phase 21 (Plan 21-01 Task 3 + Plan 21-03 Task 1) — AI reviewer orchestrator.
  *
  * Runs the requested reviewer jobs (A/B/C/D/E) in ONE HTTP session per parse
  * so the shared source-content prompt cache is reused (D-21-03 /
@@ -12,9 +12,9 @@
  * Cost guard (D-21-06): assertOrgCapNotExceeded(orgId) is called BEFORE any
  * dispatch. recordOrgSpend(orgId, totalCostUsd) is called AFTER persistence.
  *
- * Job A is wired through Phase 6's ADVERSARIAL_SYSTEM (no regression). Jobs
- * B/C/D/E throw NotImplementedError until Wave 3 fills them in — the
- * orchestrator catches and reports a partial envelope.
+ * Wave 3 (plan 21-03): Jobs B/C/D/E now live; the source content block is
+ * built once per session via `buildSourceContentBlock` and Job E's system
+ * prompt is rebuilt per run with the calling org's vocabulary.
  */
 
 import type Anthropic from '@anthropic-ai/sdk'
@@ -34,33 +34,30 @@ import {
 } from './types'
 import type { ReviewerJob } from './jobs/types'
 import { JOB_A } from './jobs/job-a-hallucination'
+import { JOB_B } from './jobs/job-b-omission'
+import { JOB_C } from './jobs/job-c-anchoring'
+import { JOB_D } from './jobs/job-d-table-fidelity'
+import {
+  JOB_E,
+  buildJobESystemPrompt,
+  fetchOrgVocabulary,
+} from './jobs/job-e-terminology'
+import { buildSourceContentBlock } from './source-content'
 
 // Fixed canonical execution order (Spike 003 finding #1): A → B → C → D → E.
 const JOB_ORDER: ReviewerJobId[] = ['A', 'B', 'C', 'D', 'E']
 
-// Wave-3 stubs — replaced by real jobs in plan 21-03.
-function makeStubJob(id: ReviewerJobId): ReviewerJob {
-  return {
-    id,
-    systemPrompt: '',
-    maxTokens: 0,
-    parseResponse: () => [],
-  }
-}
-
 const JOB_REGISTRY: Record<ReviewerJobId, ReviewerJob> = {
   A: JOB_A,
-  B: makeStubJob('B'),
-  C: makeStubJob('C'),
-  D: makeStubJob('D'),
-  E: makeStubJob('E'),
+  B: JOB_B,
+  C: JOB_C,
+  D: JOB_D,
+  E: JOB_E,
 }
 
-const STUB_JOBS = new Set<ReviewerJobId>(['B', 'C', 'D', 'E'])
-
 // Spike 003 cost numbers — input $3/MTok, output $15/MTok at Sonnet 4.5;
-// cache writes 1.25x input, cache reads 0.1x input. Numbers updated in
-// plan 21-03 once the model lock is final.
+// cache writes 1.25x input, cache reads 0.1x input. Numbers locked at
+// Sonnet pricing per D-21-03; Haiku A/B is deferred to a follow-up.
 const COST_PER_MTOK_INPUT_USD = 3
 const COST_PER_MTOK_OUTPUT_USD = 15
 const CACHE_WRITE_MULTIPLIER = 1.25
@@ -160,6 +157,36 @@ function readUsage(u: AnthropicUsageLike | undefined | null): {
 }
 
 /**
+ * Fail-safe synthetic flag — per threat T-21-03-06 / CLAUDE.md voice-qa
+ * precedent. When a job throws (verifier-unavailable, JSON parse failure,
+ * timeout, etc.) we MUST NOT return [] silently — that masks a verifier
+ * failure as "no flags found" which is a safety regression. Instead we add
+ * a synthetic warning flag so admins see the yellow "verification
+ * unavailable" banner inline.
+ */
+function syntheticErrorFlag(jobId: ReviewerJobId, errMsg: string): ReviewerFlag {
+  return {
+    job: jobId,
+    severity: 'warning',
+    kind:
+      jobId === 'B'
+        ? 'omission'
+        : jobId === 'C'
+          ? 'anchoring'
+          : jobId === 'D'
+            ? 'table_fidelity'
+            : jobId === 'E'
+              ? 'terminology'
+              : 'hallucination',
+    description: `Reviewer job ${jobId} unavailable — re-run from the builder to verify.`,
+    extras: {
+      synthetic: true,
+      error: errMsg.slice(0, 200),
+    },
+  }
+}
+
+/**
  * Run the requested reviewer jobs in a single HTTP session, persist the
  * envelope to `parse_jobs.ai_review_results`, and record the spend.
  *
@@ -190,6 +217,39 @@ export async function runReviewerJobs(
   // path (correct: nothing was dispatched).
   await assertOrgCapNotExceeded(load.organisation_id)
 
+  // Build the shared source-content block via the canonical helper. This
+  // also reads parse_jobs (a second time) to pick up file_type / page
+  // markers; the orchestrator could fold these into loadParseJob() later
+  // but the separation keeps the source-content concern testable in isolation.
+  let sourceText = load.source_text
+  try {
+    const sourceBlock = await buildSourceContentBlock(parseJobId)
+    if (sourceBlock.text) sourceText = sourceBlock.text
+  } catch (err) {
+    console.error('[orchestrator] buildSourceContentBlock failed', err)
+  }
+
+  // Job E needs the org's vocabulary injected into its system prompt. Build
+  // the per-run JOB_E shape once, BEFORE the loop. fetchOrgVocabulary is
+  // best-effort — on failure we use the empty-vocabulary baseline.
+  let jobERuntime = JOB_E
+  if (requested.has('E')) {
+    try {
+      const vocab = await fetchOrgVocabulary(load.organisation_id)
+      jobERuntime = {
+        ...JOB_E,
+        systemPrompt: buildJobESystemPrompt(vocab),
+      }
+    } catch (err) {
+      console.error('[orchestrator] fetchOrgVocabulary failed', err)
+    }
+  }
+
+  const runRegistry: Record<ReviewerJobId, ReviewerJob> = {
+    ...JOB_REGISTRY,
+    E: jobERuntime,
+  }
+
   const anthropic = getAnthropic()
   const flags: ReviewerFlag[] = []
   const aggUsage: ReviewerUsage = {
@@ -205,23 +265,14 @@ export async function runReviewerJobs(
 
   const cachedSourceBlock = {
     type: 'text' as const,
-    text: `SOURCE CONTENT:\n${load.source_text}`,
+    text: `SOURCE CONTENT:\n${sourceText}`,
     cache_control: { type: 'ephemeral' as const },
   }
 
   for (const jobId of JOB_ORDER) {
     if (!requested.has(jobId)) continue
 
-    const job = JOB_REGISTRY[jobId]
-
-    // Wave-3 stubs — surface NotImplementedError as a per-job status entry
-    // and continue to the next job (partial envelope per Test 2).
-    if (STUB_JOBS.has(jobId)) {
-      const err = new NotImplementedError(jobId)
-      jobStatus[jobId] = 'not_implemented'
-      jobErrors[jobId] = err.message
-      continue
-    }
+    const job = runRegistry[jobId]
 
     try {
       // Cast: the SDK doesn't expose cache_control in the public Message type
@@ -263,6 +314,12 @@ export async function runReviewerJobs(
       console.error(`[orchestrator] job ${jobId} failed`, err)
       jobStatus[jobId] = 'error'
       jobErrors[jobId] = err instanceof Error ? err.message : String(err)
+      // T-21-03-06 mitigation: NEVER let a job error silently surface as
+      // "no flags" — push a synthetic warning flag so the admin sees the
+      // verification-unavailable signal.
+      flags.push(
+        syntheticErrorFlag(jobId, err instanceof Error ? err.message : String(err)),
+      )
       // Continue to next job — partial envelope is more useful than total
       // failure when one job errors transiently.
     }

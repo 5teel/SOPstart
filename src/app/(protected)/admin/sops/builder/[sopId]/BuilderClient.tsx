@@ -19,6 +19,8 @@ import { listSectionBlocksWithUpdates } from '@/actions/sop-section-blocks'
 import { listBlockCategories } from '@/actions/blocks'
 import { SectionListSidebar } from './SectionListSidebar'
 import { useSelectionSync } from '@/components/admin/source-viewer/useSelectionSync'
+import { ReviewerFlagsPanel } from '@/components/admin/ai-reviewer/ReviewerFlagsPanel'
+import { RerunReviewerButton } from '@/components/admin/ai-reviewer/RerunReviewerButton'
 
 // D-01 (revised 2026-04-24): Use Puck's native viewports prop. It clamps
 // only the preview canvas, leaving the palette + fields sidebars at full
@@ -282,8 +284,14 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
         onItemSelected: (info) => {
           onItemSelectedRef.current(info)
         },
+        // Phase 21 Plan 21-03 — inline ReviewerFlagsPanel under each block.
+        // Empty state renders nothing (no chrome) so verified blocks stay quiet.
+        renderReviewerFlagsPanel: ({ junctionId }) =>
+          junctionId ? (
+            <ReviewerFlagsPanel sopId={sopId} blockId={junctionId} />
+          ) : null,
       }),
-    [junctionMap, componentIdToJunction, refreshJunctions]
+    [junctionMap, componentIdToJunction, refreshJunctions, sopId]
   )
 
   // Reference highlighted state so React keeps the subscription effect alive
@@ -354,6 +362,8 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
           <span className="font-mono text-[11px] uppercase tracking-wider text-[var(--ink-500)] border border-[var(--ink-300)] rounded px-2 py-0.5">
             {savePillLabel}
           </span>
+          {/* Phase 21 Plan 21-03 — Re-run AI Reviewer toolbar button. */}
+          <RerunReviewerButton sopId={sopId} />
           {/*
             Phase 21 D-21-12 — legacy /admin/sops/[sopId]/review is gone and
             308-redirects back to this builder route. Publish gate lands in

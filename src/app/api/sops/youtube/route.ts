@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { fetchYouTubeTranscript } from '@/lib/parsers/fetch-youtube-transcript'
 import { parseSopWithGPT } from '@/lib/parsers/gpt-parser'
 import { verifyTranscriptVsSop, detectMissingSections } from '@/lib/parsers/verify-sop'
+import { triggerReviewerOnParseCompletion } from '@/lib/parsers/parse-pipeline'
 import { youtubeUrlSchema, extractYouTubeId } from '@/lib/validators/sop'
 import type { ParsedSop } from '@/lib/validators/sop'
 import type { VerificationFlag } from '@/types/sop'
@@ -194,6 +195,9 @@ export async function POST(request: NextRequest) {
         completed_at: new Date().toISOString(),
       })
       .eq('id', job.id)
+
+    // Phase 21 (Plan 21-03 Task 2) — auto-trigger AI reviewer.
+    void triggerReviewerOnParseCompletion(job.id)
 
     return NextResponse.json({ success: true, sopId: sop.id })
   } catch (error) {
