@@ -19,9 +19,18 @@
  * Orphan images (uploaded but not referenced by any step) accumulate in a
  * PhotoGridBlock appended to the FIRST section's content so the admin can
  * re-anchor them in the builder rather than losing them silently.
+ *
+ * Phase 21 (Plan 21-04 Task 3) — every produced Puck item carries
+ * `props.block_provenance = { region, parser_run_id, parser_version }` when
+ * a `provenanceContext` is supplied. The region kind matches the source
+ * file (`pdf` / `docx` / `scan` / `video` / `ai_prompt`). When no context
+ * is supplied OR the source kind is unknown, props.block_provenance is
+ * omitted — pre-Phase-21 callers see the previous behaviour exactly.
  */
 import type { ParsedSop, ParsedSopSection } from '@/lib/validators/sop'
 import type { UploadedImage } from './image-uploader'
+import type { SourceProvenanceRegion } from './source-viewer'
+import { BlockProvenanceSchema } from '@/lib/validators/sop'
 
 // Minimal subset of Puck's layout_data shape. We avoid importing Puck's
 // internal types so this module stays usable from server contexts.
@@ -35,12 +44,106 @@ export type LayoutData = {
   zones?: Record<string, PuckItem[]>
 }
 
+/**
+ * Phase 21 (Plan 21-04 Task 3) — provenance context for `block_provenance`.
+ *
+ * Provides:
+ *   - `sourceKind` — drives the discriminated union of region kinds
+ *   - `parser_run_id` — soft FK to parse_jobs.id
+ *   - `parser_version` — semver-ish tag set by the parser at write time
+ *   - `pageOfImageIndex` (PDF only) — index → page number lookup; built by
+ *     the parse route from `extractPdfBlockBboxes` results
+ *   - `paragraphOfImageIndex` (DOCX only) — index → paragraph anchor;
+ *     built by the parse route from `extractDocxParagraphAnchors`
+ *   - `fallbackRegion` — used when a block has no specific anchor (e.g. a
+ *     hazards line that came from generic body text); guarantees every
+ *     block produced has SOMETHING in block_provenance so the verify gate
+ *     can render a row for it
+ */
+export interface ProvenanceContext {
+  sourceKind: 'pdf' | 'docx' | 'scan' | 'video' | 'ai_prompt'
+  parser_run_id: string
+  parser_version: string
+  /** PDF only — map image index → 1-based page number. */
+  pageOfImageIndex?: Map<number, { page: number; bbox: [number, number, number, number]; pageWidth: number; pageHeight: number }>
+  /** DOCX only — map image index → paragraph anchor pair. */
+  paragraphOfImageIndex?: Map<number, { paragraph_id: string; run_start: number; run_end: number }>
+  /** Used when a block has no specific image-index → region mapping. */
+  fallbackRegion?: SourceProvenanceRegion
+}
+
 export interface ConvertOptions {
   /**
    * Maps image index to its public URL. When omitted, `src` is set to the
    * storage_path which the renderer signs at request time.
    */
   imageSrcResolver?: (index: number) => string | null
+  /** Phase 21 — write block_provenance into every emitted Puck item. */
+  provenanceContext?: ProvenanceContext
+}
+
+/**
+ * Build a SourceProvenanceRegion for a single block. Returns null when no
+ * region can be derived (so the caller can decide whether to omit the
+ * block_provenance prop entirely vs use the fallback).
+ */
+function regionForBlock(
+  ctx: ProvenanceContext,
+  imageIndexes: number[],
+): SourceProvenanceRegion | null {
+  // PDF: prefer the first image's bbox/page.
+  if (ctx.sourceKind === 'pdf' && ctx.pageOfImageIndex) {
+    for (const idx of imageIndexes) {
+      const hit = ctx.pageOfImageIndex.get(idx)
+      if (hit) {
+        return {
+          kind: 'pdf',
+          page: hit.page,
+          bbox: hit.bbox,
+          pageWidth: hit.pageWidth,
+          pageHeight: hit.pageHeight,
+        }
+      }
+    }
+  }
+  // DOCX: prefer the first image's paragraph anchor.
+  if (ctx.sourceKind === 'docx' && ctx.paragraphOfImageIndex) {
+    for (const idx of imageIndexes) {
+      const hit = ctx.paragraphOfImageIndex.get(idx)
+      if (hit) {
+        return {
+          kind: 'docx',
+          paragraph_id: hit.paragraph_id,
+          run_start: hit.run_start,
+          run_end: hit.run_end,
+        }
+      }
+    }
+  }
+  return ctx.fallbackRegion ?? null
+}
+
+function buildBlockProvenance(
+  ctx: ProvenanceContext,
+  imageIndexes: number[],
+): Record<string, unknown> | null {
+  const region = regionForBlock(ctx, imageIndexes)
+  if (!region) return null
+  const record = {
+    region,
+    parser_run_id: ctx.parser_run_id,
+    parser_version: ctx.parser_version,
+  }
+  // Validate before stamping — guarantees we never write a malformed shape.
+  const parsed = BlockProvenanceSchema.safeParse(record)
+  if (!parsed.success) {
+    console.warn(
+      '[parsed-sop-to-layout-data] dropping invalid block_provenance',
+      parsed.error.issues[0]?.message,
+    )
+    return null
+  }
+  return record as Record<string, unknown>
 }
 
 export interface PerSectionLayoutResult {
@@ -86,6 +189,23 @@ function makeImagesProp(
 }
 
 /**
+ * Stamp `block_provenance` on a Puck item's props. Mutates in place. Safe
+ * when ctx is undefined (no-op).
+ */
+function stampProvenance(
+  item: PuckItem,
+  ctx: ProvenanceContext | undefined,
+  imageIndexes: number[],
+): PuckItem {
+  if (!ctx) return item
+  const prov = buildBlockProvenance(ctx, imageIndexes)
+  if (prov) {
+    item.props.block_provenance = prov
+  }
+  return item
+}
+
+/**
  * Build a per-section content array for ONE parsed section.
  * The `claimedIndexes` set is mutated — caller owns it to coordinate
  * cross-section orphan detection.
@@ -94,7 +214,8 @@ function buildSectionContent(
   section: ParsedSopSection,
   uploadedImages: UploadedImage[],
   resolver: ConvertOptions['imageSrcResolver'],
-  claimedIndexes: Set<number>
+  claimedIndexes: Set<number>,
+  provenanceContext?: ProvenanceContext,
 ): PuckItem[] {
   const content: PuckItem[] = []
   const sectionType = (section.type ?? '').toLowerCase()
@@ -107,10 +228,10 @@ function buildSectionContent(
       .filter(Boolean)
     if (sectionType === 'hazards' && lines.length >= 1) {
       for (const line of lines) {
-        content.push({
+        content.push(stampProvenance({
           type: 'HazardCardBlock',
           props: { id: nextId('hz'), title: 'Hazard', body: line, severity: 'warning' },
-        })
+        }, provenanceContext, []))
       }
       return content
     }
@@ -118,16 +239,16 @@ function buildSectionContent(
       (sectionType === 'ppe' || sectionType === 'personal protective equipment') &&
       lines.length >= 1
     ) {
-      content.push({
+      content.push(stampProvenance({
         type: 'PPECardBlock',
         props: { id: nextId('ppe'), title: 'PPE Required', items: lines },
-      })
+      }, provenanceContext, []))
       return content
     }
-    content.push({
+    content.push(stampProvenance({
       type: 'TextBlock',
       props: { id: nextId('t'), content: section.content },
-    })
+    }, provenanceContext, []))
     return content
   }
 
@@ -138,13 +259,13 @@ function buildSectionContent(
     for (const n of indexes) claimedIndexes.add(n)
 
     if (indexes.length === 0) {
-      content.push({
+      content.push(stampProvenance({
         type: 'StepBlock',
         props: { id: nextId('s'), number: step.order ?? 1, text: step.text ?? '' },
-      })
+      }, provenanceContext, []))
     } else {
       const photos = makeImagesProp(indexes, uploadedImages, resolver)
-      content.push({
+      content.push(stampProvenance({
         type: 'StepWithPhotosBlock',
         props: {
           id: nextId('sp'),
@@ -153,26 +274,26 @@ function buildSectionContent(
           photos,
           layout: chooseStepLayout(indexes.length),
         },
-      })
+      }, provenanceContext, indexes))
     }
 
     if (step.warning) {
-      content.push({
+      content.push(stampProvenance({
         type: 'CalloutBlock',
         props: { id: nextId('cw'), title: 'Warning', body: step.warning },
-      })
+      }, provenanceContext, indexes))
     }
     if (step.caution) {
-      content.push({
+      content.push(stampProvenance({
         type: 'CalloutBlock',
         props: { id: nextId('cc'), title: 'Caution', body: step.caution },
-      })
+      }, provenanceContext, indexes))
     }
     if (step.tip) {
-      content.push({
+      content.push(stampProvenance({
         type: 'CalloutBlock',
         props: { id: nextId('ct'), title: 'Tip', body: step.tip },
-      })
+      }, provenanceContext, indexes))
     }
   }
   return content
@@ -198,7 +319,8 @@ export function parsedSopToPerSectionLayoutData(
       section,
       uploadedImages,
       opts.imageSrcResolver,
-      attachedIndexes
+      attachedIndexes,
+      opts.provenanceContext,
     )
     layouts.set(section.order, { root: { props: {} }, content })
   }
@@ -209,15 +331,15 @@ export function parsedSopToPerSectionLayoutData(
     const firstOrder = parsed.sections[0].order
     const firstLayout = layouts.get(firstOrder)
     if (firstLayout) {
-      firstLayout.content.push({
+      firstLayout.content.push(stampProvenance({
         type: 'HeadingBlock',
         props: {
           id: nextId('h'),
           text: 'Unanchored figures (review)',
           level: 'h3',
         },
-      })
-      firstLayout.content.push({
+      }, opts.provenanceContext, []))
+      firstLayout.content.push(stampProvenance({
         type: 'PhotoGridBlock',
         props: {
           id: nextId('og'),
@@ -228,7 +350,7 @@ export function parsedSopToPerSectionLayoutData(
           })),
           columns: orphans.length >= 4 ? '4' : orphans.length === 3 ? '3' : '2',
         },
-      })
+      }, opts.provenanceContext, orphans.map((u) => u.index)))
     }
   }
 

@@ -3,6 +3,15 @@ import { createClient } from '@/lib/supabase/server'
 import { enqueueVideoGenerationForPipeline } from '@/lib/video-gen/auto-queue'
 
 // POST /api/sops/[sopId]/publish — transition draft -> published
+//
+// Phase 21 (Plan 21-04 Task 2) — per-block verify gate.
+//   - Rejects with 400 { error: 'unverified_blocks', count: N } if any
+//     sop_section_blocks row for this SOP has verified_by_admin_id IS NULL.
+//   - Skipped for AI-prompt SOPs (CONV-12 carve-out).
+//   - Skipped for pre-Phase-20 SOPs that have no source_file_path (no
+//     parser produced provenance, so there's nothing to verify).
+//   - Defence-in-depth — the builder UI also disables the publish button
+//     (VerifyProgressIndicator), but a client could still POST directly.
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ sopId: string }> }
@@ -42,6 +51,56 @@ export async function POST(
       { error: 'All sections must be approved before publishing' },
       { status: 400 }
     )
+  }
+
+  // 2b. Phase 21 verify-checklist gate — defence in depth (D-CV2-04 Layer 3).
+  //     Bypass for AI-prompt sources (CONV-12) and pre-Phase-20 SOPs
+  //     (no source_file_path means there's no parser-provenance to verify).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: sopRow, error: sopErr } = await (supabase as any)
+    .from('sops')
+    .select('source_type, source_file_path')
+    .eq('id', sopId)
+    .maybeSingle()
+
+  if (sopErr) {
+    return NextResponse.json({ error: 'Failed to load SOP for verify gate' }, { status: 500 })
+  }
+
+  const sourceType: string | null = (sopRow?.source_type as string | null) ?? null
+  const sourceFilePath: string | null = (sopRow?.source_file_path as string | null) ?? null
+  const verifyGateApplies = sourceType !== 'ai_prompt' && !!sourceFilePath
+
+  if (verifyGateApplies) {
+    // Collect this SOP's section ids, then count unverified junction rows.
+    const { data: sectionRows, error: sectErr } = await supabase
+      .from('sop_sections')
+      .select('id')
+      .eq('sop_id', sopId)
+
+    if (sectErr) {
+      return NextResponse.json({ error: 'Failed to load sections for verify gate' }, { status: 500 })
+    }
+
+    const sectionIds = (sectionRows ?? []).map((r: { id: string }) => r.id)
+    if (sectionIds.length > 0) {
+      const { count: unverifiedCount, error: blkErr } = await supabase
+        .from('sop_section_blocks')
+        .select('*', { count: 'exact', head: true })
+        .in('sop_section_id', sectionIds)
+        .is('verified_by_admin_id', null)
+
+      if (blkErr) {
+        return NextResponse.json({ error: 'Failed to check verified_by_admin_id' }, { status: 500 })
+      }
+
+      if (unverifiedCount && unverifiedCount > 0) {
+        return NextResponse.json(
+          { error: 'unverified_blocks', count: unverifiedCount },
+          { status: 400 }
+        )
+      }
+    }
   }
 
   // 3. Publish

@@ -365,18 +365,11 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
           {/* Phase 21 Plan 21-03 — Re-run AI Reviewer toolbar button. */}
           <RerunReviewerButton sopId={sopId} />
           {/*
-            Phase 21 D-21-12 — legacy /admin/sops/[sopId]/review is gone and
-            308-redirects back to this builder route. Publish gate lands in
-            Wave 4 (per-block verify checklist). For now, the chrome shows
-            a disabled placeholder so admins don't see a self-looping link.
+            Phase 21 Plan 21-04 — Publish surface moved to <VerifyChecklistGate>
+            in the right-pane sidebar (BuilderWithSourceViewer mounts it).
+            The placeholder span here is gone — the gate's publish button is
+            the sole entry point and it's gated on per-block verification.
           */}
-          <span
-            data-testid="publish-button-placeholder"
-            className="px-3 py-1.5 bg-[var(--ink-300)] text-[var(--ink-700)] text-sm font-bold rounded cursor-not-allowed"
-            title="Publish gate ships in Phase 21 Wave 4"
-          >
-            VERIFY &amp; PUBLISH
-          </span>
         </div>
       </header>
       <div className="flex flex-1 min-h-0">
