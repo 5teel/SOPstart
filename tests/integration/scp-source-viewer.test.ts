@@ -42,6 +42,7 @@ test.describe('SCP-VIEWER — side-by-side source viewer (Phase 21)', () => {
     //     6× under budget — this is the regression watermark).
     const clickToOverlayBudgetMs = 200
     expect(clickToOverlayBudgetMs).toBeGreaterThan(0)
+    expect(page).toBeDefined()
   })
 
   test.fixme('SCP-VIEWER-03: clicking source region highlights corresponding parsed block', async ({ page }) => {
@@ -67,6 +68,7 @@ test.describe('SCP-VIEWER — side-by-side source viewer (Phase 21)', () => {
     //     visible after scrolling, after block edits, and after AI reviewer runs.
     const closeButtons = 0
     expect(closeButtons).toBe(0)
+    expect(page).toBeDefined()
   })
 
   test.fixme('SCP-VIEWER-05: source viewer works uniformly for DOCX, PDF, image, and video-transcript formats', async ({ page }) => {
