@@ -12,6 +12,7 @@ import { extractImage } from '@/lib/parsers/extract-image'
 import { ocrFallback } from '@/lib/parsers/ocr-fallback'
 import { parseSopWithGPT } from '@/lib/parsers/gpt-parser'
 import { uploadExtractedImages } from '@/lib/parsers/image-uploader'
+import { triggerReviewerOnParseCompletion } from '@/lib/parsers/parse-pipeline'
 import type { ParsedSop } from '@/lib/validators/sop'
 import type { SourceFileType } from '@/types/sop'
 
@@ -294,6 +295,11 @@ export async function POST(request: NextRequest) {
         completed_at: new Date().toISOString(),
       })
       .eq('id', job.id)
+
+    // Phase 21 (Plan 21-03 Task 2) — auto-trigger AI reviewer. Fire-and-forget;
+    // MUST NOT await — parse-completion response should not block on
+    // Anthropic latency. Failures are logged inside the helper.
+    void triggerReviewerOnParseCompletion(job.id)
 
     return NextResponse.json({ success: true, sopId })
   } catch (error) {
