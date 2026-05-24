@@ -4,8 +4,8 @@ milestone: v4.0
 milestone_name: Safety-Critical Parsing + Voice + AI Foundation
 status: in-progress
 started_at: "2026-05-24T00:00:00.000Z"
-last_updated: "2026-05-24T00:00:00.000Z"
-last_activity: 2026-05-24
+last_updated: "2026-05-25T15:03:38.000Z"
+last_activity: 2026-05-25
 previous_milestone: v3.0 (archived 2026-05-23 — see .planning/MILESTONES.md § v3.0)
 progress:
   total_phases: 3
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Milestone status:** v4.0 started 2026-05-24. 3 phases / 40 requirements. See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
-**Active phase:** 21 (Safety-Critical Parsing) — not started, ready for `/gsd-plan-phase 21`.
+**Active phase:** 21 (Safety-Critical Parsing) — in progress. Wave 0 (test stubs), Wave 1 (DB + parser infra + Job A), and Wave 2 (source viewer pane) complete. Next: Wave 3 (AI reviewer Jobs B/C/D/E) — `/gsd-execute-phase 21` wave 3.
 
 **v4.0 phase sequence:**
 
@@ -39,7 +39,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 2. **Phase 22 — Voice-Driven Walkthrough**: W-01 literacy/visual/voice gaps + X-02 voice-driven walkthrough. 8 requirements (VDW-LIT ×4, VDW-VOICE ×4).
 3. **Phase 23 — AI Field Layer + Version Supersede**: X-03 universal AI read/write + G-01 version supersede + worker-instance sign-off. 9 requirements (AFL-AI ×4, AFL-VER ×5).
 
-**Next action:** `/gsd-plan-phase 21` to produce PLAN.md for Safety-Critical Parsing.
+**Next action:** Phase 21 Wave 3 — `/gsd-execute-phase 21 --wave 3` (AI reviewer Jobs B omission, C anchoring, D table fidelity, E terminology).
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
@@ -125,6 +125,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 15 P02 | 10m | 4 tasks | 11 files |
 | Phase 15 P03 | 75m | 4 tasks | 9 files |
 | Phase 15 P04 | 10m | 5 tasks | 12 files |
+| Phase 21 P02 | 18m | 3 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -315,7 +316,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-17T05:45:30.393Z
-Stopped at: context exhaustion at 98% (2026-05-17)
+Last session: 2026-05-25T15:03:38.000Z
+Stopped at: Completed Phase 21 Plan 21-02 (Wave 2 — Source Viewer Pane)
 Resume file: None
-Awaiting: Simon's phase UAT — npx supabase db push --include-all (Wave 1 migration 00030) + Visy demo dry-run per 15-DEMO-PREP.md
+Awaiting: Phase 21 Wave 3 — AI reviewer Jobs B/C/D/E. Migration 00030 push still outstanding per close-out note above.
