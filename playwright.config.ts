@@ -63,6 +63,10 @@ export default defineConfig({
       testMatch: /.*\.test\.ts$/,
     },
     {
+      name: 'phase21-stubs',
+      testMatch: /scp-(source-viewer|ai-reviewer|verify-checklist|parse-pipeline)\.test\.ts$/,
+    },
+    {
       name: 'phase20-parsers',
       testDir: './src/lib/parsers/__tests__',
       testMatch: /.*\.test\.ts$/,
