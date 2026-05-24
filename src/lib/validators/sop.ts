@@ -172,6 +172,72 @@ export const aiPromptSchema = z.object({
 export type AiPromptInput = z.infer<typeof aiPromptSchema>
 
 /**
+ * Phase 21 (Plan 21-01) / D-CV2-06 — block_provenance JSONB shape.
+ *
+ * The wrapping record `{ region, parser_run_id, parser_version }` is what
+ * sits on each `sop_section_blocks.block_provenance` row. The inner `region`
+ * is a discriminated union over the 5 source kinds:
+ *   - pdf   : page + bbox + page dims (Spike 001 / 002)
+ *   - docx  : paragraph_id + run offsets (commit 7b9151e structural anchor)
+ *   - scan  : OCR image crop bbox
+ *   - video : timestamp range (CONV-11 — frame-grab deferred)
+ *   - ai_prompt : the prompt text itself (CONV-12 — Jobs D+E only)
+ *
+ * NULL is also a valid value at the DB column level (pre-Phase-21 rows survive
+ * without provenance). The Zod schemas below only validate present payloads.
+ */
+export const SourceProvenanceRegionSchema = z.discriminatedUnion('kind', [
+  z.object({
+    kind: z.literal('pdf'),
+    page: z.number().int().positive(),
+    bbox: z.tuple([z.number(), z.number(), z.number(), z.number()]),
+    pageWidth: z.number().positive(),
+    pageHeight: z.number().positive(),
+  }),
+  z.object({
+    kind: z.literal('docx'),
+    paragraph_id: z.string().min(1),
+    run_start: z.number().int().nonnegative(),
+    run_end: z.number().int().nonnegative(),
+  }),
+  z.object({
+    kind: z.literal('scan'),
+    image_crop: z.tuple([z.number(), z.number(), z.number(), z.number()]),
+  }),
+  z.object({
+    kind: z.literal('video'),
+    timestamp_start: z.number().nonnegative(),
+    timestamp_end: z.number().nonnegative(),
+  }),
+  z.object({
+    kind: z.literal('ai_prompt'),
+    prompt_text: z.string().min(1),
+  }),
+])
+
+export type SourceProvenanceRegion = z.infer<typeof SourceProvenanceRegionSchema>
+
+/**
+ * The full record stored on sop_section_blocks.block_provenance.
+ * `parser_run_id` is a soft reference to `parse_jobs.id` (string, not FK).
+ * `parser_version` is a semver-ish tag set by the parser at write time.
+ */
+export const BlockProvenanceRecordSchema = z.object({
+  region: SourceProvenanceRegionSchema,
+  parser_run_id: z.string().min(1),
+  parser_version: z.string().min(1),
+})
+
+export type BlockProvenanceRecord = z.infer<typeof BlockProvenanceRecordSchema>
+
+/**
+ * Alias kept for plan-checker artifact contract ("BlockProvenanceSchema" was
+ * the name requested in the plan). Identical to BlockProvenanceRecordSchema.
+ */
+export const BlockProvenanceSchema = BlockProvenanceRecordSchema
+export type BlockProvenance = BlockProvenanceRecord
+
+/**
  * Returns true if the filename has a macro-enabled Office extension.
  * Must be checked before any parsing library is invoked.
  */

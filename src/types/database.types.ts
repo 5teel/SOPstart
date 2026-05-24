@@ -92,6 +92,7 @@ export type Database = {
       }
       parse_jobs: {
         Row: {
+          ai_review_results: Json
           completed_at: string | null
           created_at: string
           current_stage: string | null
@@ -114,6 +115,7 @@ export type Database = {
           youtube_url: string | null
         }
         Insert: {
+          ai_review_results?: Json
           completed_at?: string | null
           created_at?: string
           current_stage?: string | null
@@ -136,6 +138,7 @@ export type Database = {
           youtube_url?: string | null
         }
         Update: {
+          ai_review_results?: Json
           completed_at?: string | null
           created_at?: string
           current_stage?: string | null
@@ -440,6 +443,7 @@ export type Database = {
       sop_section_blocks: {
         Row: {
           block_id: string
+          block_provenance: Json | null
           created_at: string
           id: string
           overridden_at: string | null
@@ -450,9 +454,12 @@ export type Database = {
           sort_order: number
           update_available: boolean
           updated_at: string
+          verified_at: string | null
+          verified_by_admin_id: string | null
         }
         Insert: {
           block_id: string
+          block_provenance?: Json | null
           created_at?: string
           id?: string
           overridden_at?: string | null
@@ -463,9 +470,12 @@ export type Database = {
           sort_order?: number
           update_available?: boolean
           updated_at?: string
+          verified_at?: string | null
+          verified_by_admin_id?: string | null
         }
         Update: {
           block_id?: string
+          block_provenance?: Json | null
           created_at?: string
           id?: string
           overridden_at?: string | null
@@ -476,6 +486,8 @@ export type Database = {
           sort_order?: number
           update_available?: boolean
           updated_at?: string
+          verified_at?: string | null
+          verified_by_admin_id?: string | null
         }
         Relationships: [
           {
@@ -497,6 +509,71 @@ export type Database = {
             columns: ["pinned_version_id"]
             isOneToOne: false
             referencedRelation: "block_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sop_section_blocks_verified_by_admin_id_fkey"
+            columns: ["verified_by_admin_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_anthropic_spend: {
+        Row: {
+          cap_cents: number | null
+          month_start: string
+          organisation_id: string
+          spend_cents: number
+          updated_at: string
+        }
+        Insert: {
+          cap_cents?: number | null
+          month_start: string
+          organisation_id: string
+          spend_cents?: number
+          updated_at?: string
+        }
+        Update: {
+          cap_cents?: number | null
+          month_start?: string
+          organisation_id?: string
+          spend_cents?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_anthropic_spend_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ai_review_rate_limits: {
+        Row: {
+          sop_id: string
+          runs_today: number
+          runs_today_reset_at: string
+        }
+        Insert: {
+          sop_id: string
+          runs_today?: number
+          runs_today_reset_at?: string
+        }
+        Update: {
+          sop_id?: string
+          runs_today?: number
+          runs_today_reset_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_review_rate_limits_sop_id_fkey"
+            columns: ["sop_id"]
+            isOneToOne: true
+            referencedRelation: "sops"
             referencedColumns: ["id"]
           },
         ]
