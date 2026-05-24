@@ -8,7 +8,14 @@ import type { VerificationFlag } from '@/types/sop'
 // call (tests can swap the global; the cached singleton would otherwise hold the
 // fetch reference captured at construction).
 let anthropic: Anthropic | null = null
-function getAnthropic(): Anthropic {
+/**
+ * Phase 21 (Plan 21-01): exported for the AI reviewer orchestrator
+ * (src/lib/parsers/ai-reviewer/orchestrator.ts). DO NOT create a second
+ * Anthropic instance there — share this lazy singleton so the fetch
+ * indirection (Phase 15) is preserved and the SDK re-reads
+ * globalThis.fetch on every call.
+ */
+export function getAnthropic(): Anthropic {
   if (!anthropic) {
     anthropic = new Anthropic({
       fetch: (input, init) => globalThis.fetch(input as RequestInfo, init),
@@ -20,7 +27,8 @@ function getAnthropic(): Anthropic {
 // Phase 14 D-02: prompt-mode verifier — the source is a short NL prompt, not a transcript.
 // Framing shifts from "fidelity to source" (transcript mode) to "plausibility / hallucination check"
 // (prompt mode). Same JSON-array output contract — both modes feed the same VerificationFlag[] consumer.
-const PROMPT_VERIFY_SYSTEM = `You are a safety auditor reviewing a Standard Operating Procedure draft generated from a user's short natural-language prompt.
+// Phase 21 (Plan 21-01): exported for Job A of the AI reviewer (job-a-hallucination.ts).
+export const PROMPT_VERIFY_SYSTEM = `You are a safety auditor reviewing a Standard Operating Procedure draft generated from a user's short natural-language prompt.
 
 The user's prompt is BRIEF — a one-sentence brief like "PPE check for forklift operators at our Hamilton site". The draft AI was instructed to apply MAXIMUM inference to flesh out hazards, PPE, steps, and emergency procedures. Reasonable inference is EXPECTED and CORRECT.
 
@@ -41,7 +49,11 @@ Respond with a JSON array only. No prose, no markdown, no explanation.
 Each element: { "severity": "critical"|"warning", "section_title": "string", "step_number": number|null, "original_text": "(prompt mode — reproduce the relevant phrase from the structured SOP being audited)", "structured_text": "what the SOP says", "description": "what is hallucinated and why" }
 If no hallucinations found, respond with exactly: []`
 
-const ADVERSARIAL_SYSTEM = `You are a safety auditor reviewing an AI-generated Standard Operating Procedure (SOP).
+// Phase 21 (Plan 21-01): exported for Job A of the AI reviewer
+// (job-a-hallucination.ts). DO NOT duplicate this prompt text in the new
+// reviewer — import it from here so the Phase 6 transcript-mode verifier
+// and the new orchestrator share the source of truth.
+export const ADVERSARIAL_SYSTEM = `You are a safety auditor reviewing an AI-generated Standard Operating Procedure (SOP).
 Your job is to find discrepancies between the source transcript and the AI-structured SOP output.
 Be adversarial — look for:
 - Omitted safety information (hazard warnings, PPE requirements, emergency procedures)
@@ -80,7 +92,10 @@ If every claim is grounded, respond with exactly: []`
 
 // Model selection: claude-3-5-haiku for cost (~$0.01/SOP).
 // Override with ANTHROPIC_VERIFY_MODEL env var if needed.
-const VERIFY_MODEL = process.env.ANTHROPIC_VERIFY_MODEL || 'claude-3-5-haiku-20241022'
+// Phase 21 (Plan 21-01): exported for Job A of the AI reviewer. Plan 21-03
+// will A/B Sonnet 4.5 vs Haiku 4.5 for the full reviewer suite; this constant
+// remains the Phase 6 transcript-mode default.
+export const VERIFY_MODEL = process.env.ANTHROPIC_VERIFY_MODEL || 'claude-3-5-haiku-20241022'
 
 // Phase 15 D-08: voice_qa uses claude-haiku-4-5 (same model as the answer call) so the
 // answer-call cache write at this exact model is reused by the verifier-call cache read.

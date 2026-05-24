@@ -403,6 +403,72 @@ export async function declineBlockUpdate(
 // + BlockUpdateReviewModal without an extra round-trip per row.
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// 9. verifyBlock / unverifyBlock — Phase 21 plan 21-01 (SCP-VERIFY-01/03)
+//
+// Pre-publish per-block verify checklist (Spike 004). Each block in a draft
+// SOP must carry a verified_by_admin_id before the publish button unlocks
+// (gate enforced in Wave 4). Re-editing a block content row clears its own
+// verified_by_admin_id automatically via DB trigger
+// clear_block_verification_on_content_change (migration 00032).
+//
+// RLS owns the org-scope check — the row will simply not be visible / not be
+// updatable from another org. The action layer adds a defence-in-depth role
+// check so workers can't poke the verify column even within their own org.
+// ---------------------------------------------------------------------------
+
+export async function verifyBlock(
+  blockId: string
+): Promise<{ ok: boolean; error?: string }> {
+  if (!blockId) return { ok: false, error: 'blockId required' }
+
+  const ctx = await requireAdmin()
+  if ('error' in ctx) return { ok: false, error: ctx.error }
+  const { supabase, user } = ctx
+
+  const { error } = await supabase
+    .from('sop_section_blocks')
+    .update({
+      verified_by_admin_id: user.id,
+      verified_at: new Date().toISOString(),
+    })
+    .eq('id', blockId)
+
+  if (error) {
+    console.error('[verifyBlock] update error', error)
+    return { ok: false, error: error.message }
+  }
+  return { ok: true }
+}
+
+export async function unverifyBlock(
+  blockId: string
+): Promise<{ ok: boolean; error?: string }> {
+  if (!blockId) return { ok: false, error: 'blockId required' }
+
+  const ctx = await requireAdmin()
+  if ('error' in ctx) return { ok: false, error: ctx.error }
+  const { supabase } = ctx
+
+  const { error } = await supabase
+    .from('sop_section_blocks')
+    .update({
+      verified_by_admin_id: null,
+      verified_at: null,
+    })
+    .eq('id', blockId)
+
+  if (error) {
+    console.error('[unverifyBlock] update error', error)
+    return { ok: false, error: error.message }
+  }
+  return { ok: true }
+}
+
+// ---------------------------------------------------------------------------
+// 10. listSectionBlocksWithUpdates — Phase 13 plan 13-04
+// ---------------------------------------------------------------------------
+
 export async function listSectionBlocksWithUpdates(
   sopSectionId: string
 ): Promise<SopSectionBlockWithUpdate[]> {

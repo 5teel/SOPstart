@@ -71,5 +71,15 @@ export default defineConfig({
       testDir: './src/lib/parsers/__tests__',
       testMatch: /.*\.test\.ts$/,
     },
+    {
+      name: 'phase21-source-viewer',
+      testDir: './src/lib/parsers/source-viewer/__tests__',
+      testMatch: /.*\.test\.ts$/,
+    },
+    {
+      name: 'phase21-ai-reviewer',
+      testDir: './src/lib/parsers/ai-reviewer/__tests__',
+      testMatch: /.*\.test\.ts$/,
+    },
   ],
 })
