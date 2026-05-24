@@ -1,5 +1,5 @@
 /**
- * SOPstart Product Roadmap — v0.2 baseline data
+ * SOPstart Product Roadmap — v0.3 baseline data
  *
  * Loaded by product-roadmap.html via <script src> (works file:// — no fetch needed).
  * Mirror of .planning/product-roadmap.data.json, kept in JS form so the HTML
@@ -8,632 +8,1908 @@
  * To update: regenerate from the canonical JSON.
  */
 window.BASELINE = {
-  version: "0.2",
-  updated: "2026-05-24",
-  categories: [
-    { id: "authoring", name: "Authoring", description: "Anything an admin does to create/edit/manage SOPs" },
-    { id: "worker", name: "Worker Experience", description: "What a worker sees on the floor" },
-    { id: "safety", name: "Safety", description: "Guardrails — adversarial AI, verify checklists, sign-off" },
-    { id: "admin", name: "Admin & Governance", description: "Versioning, approvals, roles, audit trails" },
-    { id: "accessibility", name: "Accessibility", description: "Findability + assistive access — search, AI, voice, Cmd+K" },
-    { id: "compliance", name: "Compliance & Legislation", description: "Legislation library, per-SOP legislation links, AI compliance scans, audit trail" },
-    { id: "platform", name: "Platform", description: "Multi-tenancy, PWA shell, security, bundle hygiene, telemetry" },
-    { id: "intake", name: "Intake", description: "Bringing existing knowledge in — parse, OCR, transcribe, AI-narrated capture" }
+  "version": "0.3",
+  "updated": "2026-05-24",
+  "categories": [
+    {
+      "id": "authoring",
+      "name": "Authoring",
+      "description": "Anything an admin does to create/edit/manage SOPs"
+    },
+    {
+      "id": "worker",
+      "name": "Worker Experience",
+      "description": "What a worker sees on the floor"
+    },
+    {
+      "id": "safety",
+      "name": "Safety",
+      "description": "Guardrails — adversarial AI, verify checklists, sign-off"
+    },
+    {
+      "id": "admin",
+      "name": "Admin & Governance",
+      "description": "Versioning, approvals, roles, audit trails"
+    },
+    {
+      "id": "accessibility",
+      "name": "Accessibility",
+      "description": "Findability + assistive access — search, AI, voice, Cmd+K"
+    },
+    {
+      "id": "compliance",
+      "name": "Compliance & Legislation",
+      "description": "Legislation library, per-SOP legislation links, AI compliance scans, audit trail"
+    },
+    {
+      "id": "platform",
+      "name": "Platform",
+      "description": "Multi-tenancy, PWA shell, security, bundle hygiene, telemetry"
+    },
+    {
+      "id": "intake",
+      "name": "Intake",
+      "description": "Bringing existing knowledge in — parse, OCR, transcribe, AI-narrated capture"
+    }
   ],
-  features: [
+  "features": [
     {
-      id: "A-01", name: "SOP Builder (Puck)", category: "authoring", phase: "v3.0",
-      plainEnglish: "An admin opens a blank canvas in the browser and drags blocks (Step, Hazard, Tool, Decision, etc.) into the page to compose an SOP. No upload required.",
-      criteria: [
-        { text: "Admin can create an SOP from scratch with no source document", passes: true },
-        { text: "Block palette covers common SOP shapes (steps, hazards, PPE, tools, sign-off, photos, callouts, decision, measurement, escalate, voice note, inspect, zone)", passes: true },
-        { text: "Drag-to-reorder works at the section level", passes: true },
-        { text: "Dexie autosave keeps work safe if the tab closes", passes: true },
-        { text: "Preview toggle shows worker-view without leaving the builder", passes: true },
-        { text: "Two admins can edit the same SOP concurrently without overwriting", passes: false },
-        { text: "Builder works on tablets and phones, not just desktops", passes: false },
-        { text: "Inline AI assistant inside the builder", passes: false },
-        { text: "Renamed from 'Block Builder' to 'SOP Builder' across all UI copy", passes: false }
+      "id": "A-01",
+      "name": "SOP Builder (Puck)",
+      "category": "authoring",
+      "phase": "v3.0",
+      "plainEnglish": "An admin opens a blank canvas in the browser and drags blocks (Step, Hazard, Tool, Decision, etc.) into the page to compose an SOP. No upload required.",
+      "criteria": [
+        {
+          "text": "Admin can create an SOP from scratch with no source document",
+          "passes": true
+        },
+        {
+          "text": "Block palette covers common SOP shapes (steps, hazards, PPE, tools, sign-off, photos, callouts, decision, measurement, escalate, voice note, inspect, zone)",
+          "passes": true
+        },
+        {
+          "text": "Drag-to-reorder works at the section level",
+          "passes": true
+        },
+        {
+          "text": "Dexie autosave keeps work safe if the tab closes",
+          "passes": true
+        },
+        {
+          "text": "Preview toggle shows worker-view without leaving the builder",
+          "passes": true
+        },
+        {
+          "text": "Two admins can edit the same SOP concurrently without overwriting",
+          "passes": false
+        },
+        {
+          "text": "Builder works on tablets and phones, not just desktops",
+          "passes": false
+        },
+        {
+          "text": "Inline AI assistant inside the builder",
+          "passes": false
+        },
+        {
+          "text": "Renamed from 'Block Builder' to 'SOP Builder' across all UI copy",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Later", notes: "", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Later",
+      "notes": "The block selection editor is difficult to navigate, we shouldn't expect users to have to learn what each block means - we need an intuitive helper to make it clear. We shouldn't expect users to know the best way to structure a SOP, the user should be guided to use blocks in sequences which are easy for future users to understand. ",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "A-02", name: "Blank-Page Wizard", category: "authoring", phase: "v3.0",
-      plainEnglish: "When an admin clicks 'Start blank', a short wizard prompts them for the SOP's name, category, and a few key fields before opening the builder. Less daunting than an empty canvas.",
-      criteria: [
-        { text: "Wizard appears for first-time admins on the new-SOP flow", passes: false },
-        { text: "Admin can pick the SOP's primary category tag (hazard cluster + area)", passes: false },
-        { text: "Admin can pick blocks from the library during the wizard", passes: false },
-        { text: "Wizard creates SOP record + initial layout_data atomically", passes: false }
+      "id": "A-02",
+      "name": "Blank-Page Wizard",
+      "category": "authoring",
+      "phase": "v3.0",
+      "plainEnglish": "When an admin clicks 'Start blank', a short wizard prompts them for the SOP's name, category, and a few key fields before opening the builder. Less daunting than an empty canvas.",
+      "criteria": [
+        {
+          "text": "Wizard appears for first-time admins on the new-SOP flow",
+          "passes": false
+        },
+        {
+          "text": "Admin can pick the SOP's primary category tag (hazard cluster + area)",
+          "passes": false
+        },
+        {
+          "text": "Admin can pick blocks from the library during the wizard",
+          "passes": false
+        },
+        {
+          "text": "Wizard creates SOP record + initial layout_data atomically",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Shipped", notes: "", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Shipped",
+      "notes": "",
+      "reviewed": false,
+      "disputed": false
     },
     {
-      id: "A-03", name: "AI-Drafted SOP from Prompt", category: "authoring", phase: "v3.0",
-      plainEnglish: "An admin types a short description ('scaffold inspection for warehouse mezzanine') and Claude drafts a structured SOP for them to review and edit.",
-      criteria: [
-        { text: "Admin enters a freeform prompt (20–2000 chars) and gets a structured draft", passes: true },
-        { text: "Draft is verified by Claude adversarially before reaching the admin", passes: true },
-        { text: "Adversarial flags surface inline in the builder, not hidden", passes: true },
-        { text: "Admin can edit and republish; verifier re-runs on changes", passes: true },
-        { text: "AI can draft based on customer's existing SOPs to match house style", passes: false },
-        { text: "AI accepts photos/diagrams alongside the prompt to anchor to real equipment", passes: false },
-        { text: "New SOP needs relational context from existing library - AI suggested new number and SOP title to be consistent", passes: false }
+      "id": "A-03",
+      "name": "AI-Drafted SOP from Prompt",
+      "category": "authoring",
+      "phase": "v3.0",
+      "plainEnglish": "An admin types a short description ('scaffold inspection for warehouse mezzanine') and Claude drafts a structured SOP for them to review and edit.",
+      "criteria": [
+        {
+          "text": "Admin enters a freeform prompt (20–2000 chars) and gets a structured draft",
+          "passes": true
+        },
+        {
+          "text": "Draft is verified by Claude adversarially before reaching the admin",
+          "passes": true
+        },
+        {
+          "text": "Adversarial flags surface inline in the builder, not hidden",
+          "passes": true
+        },
+        {
+          "text": "Admin can edit and republish; verifier re-runs on changes",
+          "passes": true
+        },
+        {
+          "text": "AI can draft based on customer's existing SOPs to match house style",
+          "passes": false
+        },
+        {
+          "text": "AI accepts photos/diagrams alongside the prompt to anchor to real equipment",
+          "passes": false
+        },
+        {
+          "text": "New SOP needs relational context from existing library - AI suggested new number and SOP title to be consistent",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Later", notes: "", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Later",
+      "notes": "",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "A-04", name: "Reusable Block Library", category: "authoring", phase: "v3.0",
-      plainEnglish: "Common SOP pieces (e.g. 'Lockout-Tagout PPE list,' 'Crush-entrapment hazard card') are stored as reusable blocks. When the global library updates a block, every SOP that uses it gets a 'review and accept' prompt — they don't break silently.",
-      criteria: [
-        { text: "Orgs can save their own blocks + use Potenco-curated global blocks", passes: true },
-        { text: "65 NZ-industry seed blocks ship with the product", passes: true },
-        { text: "An SOP using a global block can pin to specific version or follow latest", passes: true },
-        { text: "Global-block updates surface as a per-SOP review modal with diff", passes: true },
-        { text: "Org admins can suggest new global blocks to Potenco for curation", passes: true },
-        { text: "Block usage analytics — 'which blocks are most reused'", passes: false },
-        { text: "Admin can clone an org block into the global-library proposal queue one-click", passes: false },
-        { text: "AI suggested blocks", passes: false }
+      "id": "A-04",
+      "name": "Reusable Block Library",
+      "category": "authoring",
+      "phase": "v3.0",
+      "plainEnglish": "Common SOP pieces (e.g. 'Lockout-Tagout PPE list,' 'Crush-entrapment hazard card') are stored as reusable blocks. When the global library updates a block, every SOP that uses it gets a 'review and accept' prompt — they don't break silently.",
+      "criteria": [
+        {
+          "text": "Orgs can save their own blocks + use Potenco-curated global blocks",
+          "passes": true
+        },
+        {
+          "text": "65 NZ-industry seed blocks ship with the product",
+          "passes": true
+        },
+        {
+          "text": "An SOP using a global block can pin to specific version or follow latest",
+          "passes": true
+        },
+        {
+          "text": "Global-block updates surface as a per-SOP review modal with diff",
+          "passes": true
+        },
+        {
+          "text": "Org admins can suggest new global blocks to Potenco for curation",
+          "passes": true
+        },
+        {
+          "text": "Block usage analytics — 'which blocks are most reused'",
+          "passes": false
+        },
+        {
+          "text": "Admin can clone an org block into the global-library proposal queue one-click",
+          "passes": false
+        },
+        {
+          "text": "AI suggested blocks",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Maybe", notes: "", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Maybe",
+      "notes": "The block selection editor is difficult to navigate, we shouldn't expect users to have to learn what each block means - we need an intuitive helper to make it clear. We shouldn't expect users to know the best way to structure a SOP, the user should be guided to use blocks in sequences which are easy for future users to understand. ",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "A-05", name: "NZ Template Library", category: "authoring", phase: "v4.5",
-      plainEnglish: "Pre-built complete SOPs for common NZ industrial scenarios (WorkSafe-aligned). An admin can clone a template and customise it, rather than starting blank.",
-      criteria: [
-        { text: "Browseable catalog of complete SOP templates (not just blocks)", passes: false },
-        { text: "Templates aligned to WorkSafe categories (machinery, chemical, manual handling, electrical)", passes: false },
-        { text: "Templates available as third entry point in new-SOP flow (after AI/Blank/Upload)", passes: false },
-        { text: "Clone-and-edit preserves attribution + lets curator push updates", passes: false },
-        { text: "Industry-specific bundles (forestry, food processing, mining)", passes: false }
+      "id": "A-05",
+      "name": "NZ Template Library",
+      "category": "authoring",
+      "phase": "v4.5",
+      "plainEnglish": "Pre-built complete SOPs for common NZ industrial scenarios (WorkSafe-aligned). An admin can clone a template and customise it, rather than starting blank.",
+      "criteria": [
+        {
+          "text": "Browseable catalog of complete SOP templates (not just blocks)",
+          "passes": false
+        },
+        {
+          "text": "Templates aligned to WorkSafe categories (machinery, chemical, manual handling, electrical)",
+          "passes": false
+        },
+        {
+          "text": "Templates available as third entry point in new-SOP flow (after AI/Blank/Upload)",
+          "passes": false
+        },
+        {
+          "text": "Clone-and-edit preserves attribution + lets curator push updates",
+          "passes": false
+        },
+        {
+          "text": "Industry-specific bundles (forestry, food processing, mining)",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Next", notes: "Customer-acquisition lift. Was deferred Phase 16. (Legislation-review criteria moved to new Compliance category C-01..C-04.)", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Next",
+      "notes": "Customer-acquisition lift. Was deferred Phase 16. (Legislation-review criteria moved to new Compliance category C-01..C-04.) Visy is our primary first client so we should build templates that are likely to be used by Visy, do research on the types of equipment Visy operates in New Zealand glass manufacture.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "A-06", name: "Image & Diagram Annotation (Konva)", category: "authoring", phase: "v5.0",
-      plainEnglish: "Admin can upload a machine diagram or photo and add labelled hotspots ('This is the e-stop'), arrows, and freeform callouts that workers tap to see context.",
-      criteria: [
-        { text: "Stylus + finger annotation editor (Konva-based)", passes: false },
-        { text: "Dual storage: editable JSON scene + baked PNG for worker view", passes: false },
-        { text: "Hotspots on diagrams that link to specific steps in the SOP", passes: false },
-        { text: "Palm rejection on iPad / large Android tablets", passes: false },
-        { text: "Workers see baked image without needing editor bundle", passes: false }
+      "id": "A-06",
+      "name": "Image & Diagram Annotation (Konva)",
+      "category": "authoring",
+      "phase": "v5.0",
+      "plainEnglish": "Admin can upload a machine diagram or photo and add labelled hotspots ('This is the e-stop'), arrows, and freeform callouts that workers tap to see context. ",
+      "criteria": [
+        {
+          "text": "Stylus + finger annotation editor (Konva-based)",
+          "passes": false
+        },
+        {
+          "text": "Dual storage: editable JSON scene + baked PNG for worker view",
+          "passes": false
+        },
+        {
+          "text": "Hotspots on diagrams that link to specific steps in the SOP",
+          "passes": false
+        },
+        {
+          "text": "Palm rejection on iPad / large Android tablets",
+          "passes": false
+        },
+        {
+          "text": "Workers see baked image without needing editor bundle",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Later", notes: "Was deferred Phase 17.", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Later",
+      "notes": "Was deferred Phase 17. Requires AI assistant control and integration",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "A-07", name: "Collaborative Editing", category: "authoring", phase: "Maybe",
-      plainEnglish: "Two admins can work on the same SOP at the same time. The app shows who's editing what, prevents simultaneous edits to the same section, and handles offline reconciliation.",
-      criteria: [
-        { text: "Section-level pessimistic locks (one editor per section)", passes: false },
-        { text: "Realtime presence indicators (who is in this SOP)", passes: false },
-        { text: "Optimistic version column for offline-then-reconnect conflict detection", passes: false },
-        { text: "Clear conflict modal when two admins fight over the same block", passes: false },
-        { text: "'Updated by another admin' toast — soft warning before write", passes: false }
+      "id": "A-07",
+      "name": "Collaborative Editing",
+      "category": "authoring",
+      "phase": "Maybe",
+      "plainEnglish": "Two admins can work on the same SOP at the same time. The app shows who's editing what, prevents simultaneous edits to the same section, and handles offline reconciliation.",
+      "criteria": [
+        {
+          "text": "Section-level pessimistic locks (one editor per section)",
+          "passes": false
+        },
+        {
+          "text": "Realtime presence indicators (who is in this SOP)",
+          "passes": false
+        },
+        {
+          "text": "Optimistic version column for offline-then-reconnect conflict detection",
+          "passes": false
+        },
+        {
+          "text": "Clear conflict modal when two admins fight over the same block",
+          "passes": false
+        },
+        {
+          "text": "'Updated by another admin' toast — soft warning before write",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "B", priority: "Maybe", notes: "No contention observed in single-admin pattern. Wait for first complaint.", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "B",
+      "priority": "Maybe",
+      "notes": "No contention observed in single-admin pattern. Wait for first complaint.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "W-01", name: "Step-by-Step Walkthrough", category: "worker", phase: "v3.0",
-      plainEnglish: "A worker opens an SOP and the app guides them through one step at a time on their phone. They tap to confirm each step is done.",
-      criteria: [
-        { text: "Works on any modern phone browser, no install required", passes: true },
-        { text: "Works offline once the SOP is downloaded", passes: true },
-        { text: "Readable in bright outdoor light (paper/ink high-contrast)", passes: true },
-        { text: "Tap targets ≥44px (glove-friendly)", passes: true },
-        { text: "Photo capture per step", passes: true },
-        { text: "Step acknowledgement trace captured for audit", passes: true },
-        { text: "A worker with low literacy can complete the SOP (currently text-heavy)", passes: false },
-        { text: "A worker can complete the SOP visually — diagrams, photos, no required reading", passes: false },
-        { text: "A worker can complete the SOP entirely by voice — AI reads + listens + asks back", passes: false },
-        { text: "Multi-language UI (Te Reo, Tagalog, Hindi, Mandarin)", passes: false }
+      "id": "W-01",
+      "name": "Step-by-Step Walkthrough",
+      "category": "worker",
+      "phase": "v3.0",
+      "plainEnglish": "A worker opens an SOP and the app guides them through one step at a time on their phone. They tap to confirm each step is done.",
+      "criteria": [
+        {
+          "text": "Works on any modern phone browser, no install required",
+          "passes": true
+        },
+        {
+          "text": "Works offline once the SOP is downloaded",
+          "passes": true
+        },
+        {
+          "text": "Readable in bright outdoor light (paper/ink high-contrast)",
+          "passes": true
+        },
+        {
+          "text": "Tap targets ≥44px (glove-friendly)",
+          "passes": true
+        },
+        {
+          "text": "Photo capture per step",
+          "passes": true
+        },
+        {
+          "text": "Step acknowledgement trace captured for audit",
+          "passes": true
+        },
+        {
+          "text": "A worker with low literacy can complete the SOP (currently text-heavy)",
+          "passes": false
+        },
+        {
+          "text": "A worker can complete the SOP visually — diagrams, photos, no required reading",
+          "passes": false
+        },
+        {
+          "text": "A worker can complete the SOP entirely by voice — AI reads + listens + asks back",
+          "passes": false
+        },
+        {
+          "text": "Multi-language UI (Te Reo, Tagalog, Hindi, Mandarin)",
+          "passes": false
+        }
       ],
-      currentGrade: "B", targetGrade: "A", priority: "Now", notes: "Literacy / visual / voice gaps are the blue-collar TAM blocker the Visy interview surfaced.", reviewed: false, disputed: false
+      "currentGrade": "B",
+      "targetGrade": "A",
+      "priority": "Now",
+      "notes": "Literacy / visual / voice gaps are the blue-collar TAM blocker the Visy interview surfaced.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "W-02", name: "Photo Evidence Capture", category: "worker", phase: "v3.0",
-      plainEnglish: "Worker takes a photo with their phone camera at any step. Photo is queued for upload, even offline, and arrives with the completion record.",
-      criteria: [
-        { text: "Camera fires from the step view (one tap to capture)", passes: true },
-        { text: "Photos compress client-side before queueing", passes: true },
-        { text: "Offline queue persists across tab close + device restart", passes: true },
-        { text: "Auto-upload resumes when connectivity returns", passes: true },
-        { text: "Per-step photo_required flag enforces capture before mark-complete", passes: true },
-        { text: "Worker can add voice annotation to photo (5-sec clip + auto-transcription)", passes: false },
-        { text: "Photo auto-tagged with GPS + timestamp on capture", passes: false }
+      "id": "W-02",
+      "name": "Photo Evidence Capture",
+      "category": "worker",
+      "phase": "v3.0",
+      "plainEnglish": "Worker takes a photo with their phone camera at any step. Photo is queued for upload, even offline, and arrives with the completion record.",
+      "criteria": [
+        {
+          "text": "Camera fires from the step view (one tap to capture)",
+          "passes": true
+        },
+        {
+          "text": "Photos compress client-side before queueing",
+          "passes": true
+        },
+        {
+          "text": "Offline queue persists across tab close + device restart",
+          "passes": true
+        },
+        {
+          "text": "Auto-upload resumes when connectivity returns",
+          "passes": true
+        },
+        {
+          "text": "Per-step photo_required flag enforces capture before mark-complete",
+          "passes": true
+        },
+        {
+          "text": "Worker can add voice annotation to photo (5-sec clip + auto-transcription)",
+          "passes": false
+        },
+        {
+          "text": "Photo auto-tagged with GPS + timestamp on capture",
+          "passes": false
+        }
       ],
-      currentGrade: "B", targetGrade: "A", priority: "Next", notes: "", reviewed: false, disputed: false
+      "currentGrade": "B",
+      "targetGrade": "A",
+      "priority": "Cut",
+      "notes": " [v0.3: Cut means no further roadmap investment — feature complete as shipped on master, not removed.]",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "W-03", name: "Offline-First Reliability", category: "worker", phase: "v3.0",
-      plainEnglish: "A worker on a construction site with no signal can still download SOPs in advance and use the app fully — read, photograph, complete sign-off — and everything syncs when they're back online.",
-      criteria: [
-        { text: "Service worker (Serwist) caches assets aggressively", passes: true },
-        { text: "Dexie/IndexedDB stores all assigned SOPs locally", passes: true },
-        { text: "Photo upload queue survives crash + restart", passes: true },
-        { text: "Sync engine reconciles on reconnect without manual intervention", passes: true },
-        { text: "Online/offline indicator visible at all times", passes: true },
-        { text: "Explicit per-SOP 'download for offline' UI with progress + storage usage", passes: false },
-        { text: "iOS Safari storage eviction warning (PWA storage purges after ~7 days)", passes: false },
-        { text: "Worker can see WHEN an SOP was last synced (don't act on stale revisions)", passes: false }
+      "id": "W-03",
+      "name": "Offline-First Reliability",
+      "category": "worker",
+      "phase": "v3.0",
+      "plainEnglish": "A worker on a construction site with no signal can still download SOPs in advance and use the app fully — read, photograph, complete sign-off — and everything syncs when they're back online.",
+      "criteria": [
+        {
+          "text": "Service worker (Serwist) caches assets aggressively",
+          "passes": true
+        },
+        {
+          "text": "Dexie/IndexedDB stores all assigned SOPs locally",
+          "passes": true
+        },
+        {
+          "text": "Photo upload queue survives crash + restart",
+          "passes": true
+        },
+        {
+          "text": "Sync engine reconciles on reconnect without manual intervention",
+          "passes": true
+        },
+        {
+          "text": "Online/offline indicator visible at all times",
+          "passes": true
+        },
+        {
+          "text": "Explicit per-SOP 'download for offline' UI with progress + storage usage",
+          "passes": false
+        },
+        {
+          "text": "iOS Safari storage eviction warning (PWA storage purges after ~7 days)",
+          "passes": false
+        },
+        {
+          "text": "Worker can see WHEN an SOP was last synced (don't act on stale revisions)",
+          "passes": false
+        }
       ],
-      currentGrade: "B", targetGrade: "A", priority: "Now", notes: "iOS eviction issue is a known incident risk.", reviewed: false, disputed: false
+      "currentGrade": "B",
+      "targetGrade": "A",
+      "priority": "Later",
+      "notes": "iOS eviction issue is a known incident risk.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "W-04", name: "Immersive Walkthrough (Mobile)", category: "worker", phase: "v3.0",
-      plainEnglish: "Optional full-screen mode for mobile workers. One step at a time, big text, swipe between steps, minimal chrome.",
-      criteria: [
-        { text: "Full-bleed step rendering on mobile viewports", passes: true },
-        { text: "Bottom action bar with primary action (Next / I've done this)", passes: true },
-        { text: "Routes through walkthrough/layout.tsx nested layout", passes: true },
-        { text: "Kiosk mode lockdown — tablet can't navigate away from active SOP", passes: false },
-        { text: "Sequence-enforced walkthrough — worker cannot skip a critical step", passes: false }
+      "id": "W-04",
+      "name": "Immersive Walkthrough (Mobile)",
+      "category": "worker",
+      "phase": "v3.0",
+      "plainEnglish": "Optional full-screen mode for mobile workers. One step at a time, big text, swipe between steps, minimal chrome.",
+      "criteria": [
+        {
+          "text": "Full-bleed step rendering on mobile viewports",
+          "passes": true
+        },
+        {
+          "text": "Bottom action bar with primary action (Next / I've done this)",
+          "passes": true
+        },
+        {
+          "text": "Routes through walkthrough/layout.tsx nested layout",
+          "passes": true
+        },
+        {
+          "text": "Kiosk mode lockdown — tablet can't navigate away from active SOP",
+          "passes": false
+        },
+        {
+          "text": "Sequence-enforced walkthrough — worker cannot skip a critical step",
+          "passes": false
+        }
       ],
-      currentGrade: "B", targetGrade: "A", priority: "Next", notes: "Kiosk mode came from Visy interview.", reviewed: false, disputed: false
+      "currentGrade": "B",
+      "targetGrade": "A",
+      "priority": "Next",
+      "notes": "",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "W-05", name: "Completion & Sign-off", category: "worker", phase: "v3.0",
-      plainEnglish: "When a worker finishes an SOP, the app captures a completion record (immutable, legally defensible) and routes it to a supervisor for sign-off.",
-      criteria: [
-        { text: "Completion records are append-only (no UPDATE/DELETE)", passes: true },
-        { text: "Photo evidence attached to record", passes: true },
-        { text: "Supervisor reviews and signs off (separate immutable record)", passes: true },
-        { text: "Supervisor can reject with reason", passes: true },
-        { text: "PIN / badge sign-off at shared workstation (Visy pattern)", passes: false },
-        { text: "Email / push notification to supervisor when worker submits", passes: false },
-        { text: "Bulk supervisor sign-off for multiple SOPs at once", passes: false }
+      "id": "W-05",
+      "name": "Completion & Sign-off",
+      "category": "worker",
+      "phase": "v3.0",
+      "plainEnglish": "When a worker finishes an SOP, the app captures a completion record (immutable, legally defensible) and routes it to a supervisor for sign-off.",
+      "criteria": [
+        {
+          "text": "Completion records are append-only (no UPDATE/DELETE)",
+          "passes": true
+        },
+        {
+          "text": "Photo evidence attached to record",
+          "passes": true
+        },
+        {
+          "text": "Supervisor reviews and signs off (separate immutable record)",
+          "passes": true
+        },
+        {
+          "text": "Supervisor can reject with reason",
+          "passes": true
+        },
+        {
+          "text": "PIN / badge sign-off at shared workstation (Visy pattern)",
+          "passes": false
+        },
+        {
+          "text": "Email / push notification to supervisor when worker submits",
+          "passes": false
+        },
+        {
+          "text": "Bulk supervisor sign-off for multiple SOPs at once",
+          "passes": false
+        }
       ],
-      currentGrade: "B", targetGrade: "A", priority: "Next", notes: "", reviewed: false, disputed: false
+      "currentGrade": "B",
+      "targetGrade": "A",
+      "priority": "Next",
+      "notes": "",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "W-06", name: "Worker Notifications", category: "worker", phase: "v3.0",
-      plainEnglish: "Worker receives a notification when a new SOP is assigned to them, when an SOP is updated, or when a supervisor responds to their submission.",
-      criteria: [
-        { text: "In-app notification badge on SOPs tab", passes: true },
-        { text: "New-assignment notification record created on assign", passes: true },
-        { text: "Push notifications to mobile (PWA install + iOS 16.4+)", passes: false },
-        { text: "Email digest of pending SOPs", passes: false },
-        { text: "Worker can configure notification quiet hours (no pings during night shift)", passes: false }
+      "id": "W-06",
+      "name": "Worker Notifications",
+      "category": "worker",
+      "phase": "v3.0",
+      "plainEnglish": "Worker receives a notification when a new SOP is assigned to them, when an SOP is updated, or when a supervisor responds to their submission.",
+      "criteria": [
+        {
+          "text": "In-app notification badge on SOPs tab",
+          "passes": true
+        },
+        {
+          "text": "New-assignment notification record created on assign",
+          "passes": true
+        },
+        {
+          "text": "Push notifications to mobile (PWA install + iOS 16.4+)",
+          "passes": false
+        },
+        {
+          "text": "Email digest of pending SOPs",
+          "passes": false
+        },
+        {
+          "text": "Worker can configure notification quiet hours (no pings during night shift)",
+          "passes": false
+        }
       ],
-      currentGrade: "C", targetGrade: "B", priority: "Later", notes: "", reviewed: false, disputed: false
+      "currentGrade": "C",
+      "targetGrade": "B",
+      "priority": "Later",
+      "notes": "",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "S-01", name: "Adversarial AI Verifier", category: "safety", phase: "v3.0",
-      plainEnglish: "When AI generates an SOP from a prompt or transcript, a second AI (Claude) reads the result with a critical eye and flags missing safety info, unrealistic times, vague PPE, or dangerous omissions before the admin sees the draft.",
-      criteria: [
-        { text: "Verifier runs automatically on every AI-generated draft", passes: true },
-        { text: "Flags surface inline in the builder (not in a hidden log)", passes: true },
-        { text: "Each flag has severity (critical / warning / notice)", passes: true },
-        { text: "Critical flags must be resolved or acknowledged before publish", passes: true },
-        { text: "Verifier learns from admin accept/reject decisions over time", passes: false },
-        { text: "Verifier accepts org's prior SOPs as ground-truth context for house-style", passes: false }
+      "id": "S-01",
+      "name": "Adversarial AI Verifier",
+      "category": "safety",
+      "phase": "v3.0",
+      "plainEnglish": "When AI generates an SOP from a prompt or transcript, a second AI (Claude) reads the result with a critical eye and flags missing safety info, unrealistic times, vague PPE, or dangerous omissions before the admin sees the draft.",
+      "criteria": [
+        {
+          "text": "Verifier runs automatically on every AI-generated draft",
+          "passes": true
+        },
+        {
+          "text": "Flags surface inline in the builder (not in a hidden log)",
+          "passes": true
+        },
+        {
+          "text": "Each flag has severity (critical / warning / notice)",
+          "passes": true
+        },
+        {
+          "text": "Critical flags must be resolved or acknowledged before publish",
+          "passes": true
+        },
+        {
+          "text": "Verifier learns from admin accept/reject decisions over time",
+          "passes": false
+        },
+        {
+          "text": "Verifier accepts org's prior SOPs as ground-truth context for house-style",
+          "passes": false
+        }
       ],
-      currentGrade: "B", targetGrade: "A", priority: "Later", notes: "", reviewed: false, disputed: false
+      "currentGrade": "B",
+      "targetGrade": "A",
+      "priority": "Later",
+      "notes": "",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "S-02", name: "Side-by-Side Source Viewer", category: "safety", phase: "v4.0",
-      plainEnglish: "When an admin reviews an SOP parsed from a Word/PDF, the original document is pinned beside the parsed structure. They can scroll the source and the parsed blocks light up in sync — so the admin can verify nothing was misread.",
-      criteria: [
-        { text: "Source PDF / DOCX / image rendered alongside parsed blocks", passes: false },
-        { text: "Click a parsed block → source viewer scrolls to exact passage", passes: false },
-        { text: "Click a source region → parsed block highlights", passes: false },
-        { text: "Source viewer persistent throughout review, not modal", passes: false },
-        { text: "Source viewer works for all supported intake formats", passes: false }
+      "id": "S-02",
+      "name": "Side-by-Side Source Viewer",
+      "category": "safety",
+      "phase": "v4.0",
+      "plainEnglish": "When an admin reviews an SOP parsed from a Word/PDF, the original document is pinned beside the parsed structure. They can scroll the source and the parsed blocks light up in sync — so the admin can verify nothing was misread.",
+      "criteria": [
+        {
+          "text": "Source PDF / DOCX / image rendered alongside parsed blocks",
+          "passes": false
+        },
+        {
+          "text": "Click a parsed block → source viewer scrolls to exact passage",
+          "passes": false
+        },
+        {
+          "text": "Click a source region → parsed block highlights",
+          "passes": false
+        },
+        {
+          "text": "Source viewer persistent throughout review, not modal",
+          "passes": false
+        },
+        {
+          "text": "Source viewer works for all supported intake formats",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Now", notes: "Phase 20 remainder — load-bearing safety story for v4.0.", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Now",
+      "notes": "Phase 20 remainder — load-bearing safety story for v4.0. [v0.3: priority restored to Now after Simon confirmed demotion was a mistake — side-by-side viewer remains load-bearing for v4.0 safety story alongside S-03 + S-04.]",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "S-03", name: "AI Reviewer (Five Verification Jobs)", category: "safety", phase: "v4.0",
-      plainEnglish: "Beyond the single adversarial verifier, the conversion pipeline runs five specialised AI jobs (omission, anchoring, photo-step alignment, table fidelity, terminology consistency) on every parsed SOP, both automatically and on admin demand.",
-      criteria: [
-        { text: "Job A: Omission check — did we drop safety-critical content?", passes: false },
-        { text: "Job B: Anchoring check — are photos/diagrams attached to correct step?", passes: false },
-        { text: "Job C: Step-image alignment — does each photo actually depict its step?", passes: false },
-        { text: "Job D: Table fidelity — were dosages/torque/temperatures preserved exactly?", passes: false },
-        { text: "Job E: Terminology consistency — does language match org's vocabulary?", passes: false },
-        { text: "All five jobs auto-run on first parse", passes: false },
-        { text: "Admin can re-run any job manually after editing", passes: false },
-        { text: "Cost per parse bounded with prompt-caching + per-org spend cap", passes: false }
+      "id": "S-03",
+      "name": "AI Reviewer (Five Verification Jobs)",
+      "category": "safety",
+      "phase": "v4.0",
+      "plainEnglish": "Beyond the single adversarial verifier, the conversion pipeline runs five specialised AI jobs (omission, anchoring, photo-step alignment, table fidelity, terminology consistency) on every parsed SOP, both automatically and on admin demand.",
+      "criteria": [
+        {
+          "text": "Job A: Omission check — did we drop safety-critical content?",
+          "passes": false
+        },
+        {
+          "text": "Job B: Anchoring check — are photos/diagrams attached to correct step?",
+          "passes": false
+        },
+        {
+          "text": "Job C: Step-image alignment — does each photo actually depict its step?",
+          "passes": false
+        },
+        {
+          "text": "Job D: Table fidelity — were dosages/torque/temperatures preserved exactly?",
+          "passes": false
+        },
+        {
+          "text": "Job E: Terminology consistency — does language match org's vocabulary?",
+          "passes": false
+        },
+        {
+          "text": "All five jobs auto-run on first parse",
+          "passes": false
+        },
+        {
+          "text": "Admin can re-run any job manually after editing",
+          "passes": false
+        },
+        {
+          "text": "Cost per parse bounded with prompt-caching + per-org spend cap",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Now", notes: "Phase 20 remainder.", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Now",
+      "notes": "Phase 20 remainder.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "S-04", name: "Per-Block Verify Checklist at Publish Gate", category: "safety", phase: "v4.0",
-      plainEnglish: "Before an admin can publish an SOP, they must walk through every block and tick 'I have verified this matches the source.' The publish button is hard-disabled until every block is signed off.",
-      criteria: [
-        { text: "Every block in a draft carries a 'verified by' boolean", passes: false },
-        { text: "Publish button hard-disabled until 100% block verification", passes: false },
-        { text: "Verification timestamps + admin user_id stored for audit", passes: false },
-        { text: "Re-edits to a block require re-verification of THAT block, not whole SOP", passes: false },
-        { text: "Bulk-verify is NOT offered — speed-bump is the feature", passes: false },
-        { text: "UI guides eye-flow so admin actually reads each block (not just clicks through)", passes: false }
+      "id": "S-04",
+      "name": "Per-Block Verify Checklist at Publish Gate",
+      "category": "safety",
+      "phase": "v4.0",
+      "plainEnglish": "Before an admin can publish an SOP, they must walk through every block and tick 'I have verified this matches the source.' The publish button is hard-disabled until every block is signed off.",
+      "criteria": [
+        {
+          "text": "Every block in a draft carries a 'verified by' boolean",
+          "passes": false
+        },
+        {
+          "text": "Publish button hard-disabled until 100% block verification",
+          "passes": false
+        },
+        {
+          "text": "Verification timestamps + admin user_id stored for audit",
+          "passes": false
+        },
+        {
+          "text": "Re-edits to a block require re-verification of THAT block, not whole SOP",
+          "passes": false
+        },
+        {
+          "text": "Bulk-verify is NOT offered — speed-bump is the feature",
+          "passes": false
+        },
+        {
+          "text": "UI guides eye-flow so admin actually reads each block (not just clicks through)",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Now", notes: "Phase 20 remainder.", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Now",
+      "notes": "Phase 20 remainder.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "S-05", name: "Safety Reminders Always Visible", category: "safety", phase: "v3.0",
-      plainEnglish: "Hazards, PPE, and emergency information for the current step never scroll off the worker's screen — they're persistent regardless of where the worker is in the walkthrough.",
-      criteria: [
-        { text: "Hazards/PPE rendered as persistent callout blocks", passes: true },
-        { text: "Block severity colour-coded (critical / warning / notice)", passes: true },
-        { text: "Critical PPE icons pinned to fixed strip visible across all steps", passes: false },
-        { text: "Worker can re-acknowledge hazards at any time without restarting walkthrough", passes: false }
+      "id": "S-05",
+      "name": "Safety Reminders Always Visible",
+      "category": "safety",
+      "phase": "v3.0",
+      "plainEnglish": "Hazards, PPE, and emergency information for the current step never scroll off the worker's screen — they're persistent regardless of where the worker is in the walkthrough.",
+      "criteria": [
+        {
+          "text": "Hazards/PPE rendered as persistent callout blocks",
+          "passes": true
+        },
+        {
+          "text": "Block severity colour-coded (critical / warning / notice)",
+          "passes": true
+        },
+        {
+          "text": "Critical PPE icons pinned to fixed strip visible across all steps",
+          "passes": false
+        },
+        {
+          "text": "Worker can re-acknowledge hazards at any time without restarting walkthrough",
+          "passes": false
+        }
       ],
-      currentGrade: "B", targetGrade: "A", priority: "Next", notes: "", reviewed: false, disputed: false
+      "currentGrade": "B",
+      "targetGrade": "A",
+      "priority": "Next",
+      "notes": "",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "G-01", name: "Version History + Worker-Instance Sign-off", category: "admin", phase: "v3.0",
-      plainEnglish: "Every SOP keeps a record of every published version. Admins can compare versions and recover an old version. Every individual worker instance also logs the worker's name, the version they used, and per-step approval as a personal sign-off chain — the act of completing the SOP is the legal signature.",
-      criteria: [
-        { text: "Every publish creates a new version row", passes: true },
-        { text: "Old versions preserved, not overwritten", passes: true },
-        { text: "Admin can view version history list for any SOP", passes: true },
-        { text: "SOP can be edited to a new version with the old version explicitly deprecated + saved in history (formal supersede flow)", passes: false },
-        { text: "Side-by-side diff between any two versions", passes: false },
-        { text: "Restore an old version as the active one with one click", passes: false },
-        { text: "Workers see 'SOP updated since you last completed it' indicator", passes: false },
-        { text: "Every SOP instance used by a worker is recorded with a worker's signoff - users initiate each SOP instance by entering their name - every approval the worker makes of each step is effectively the worker signing off that they have followed the steps", passes: false }
+      "id": "G-01",
+      "name": "Version History + Worker-Instance Sign-off",
+      "category": "admin",
+      "phase": "v3.0",
+      "plainEnglish": "Every SOP keeps a record of every published version. Admins can compare versions and recover an old version. Every individual worker instance also logs the worker's name, the version they used, and per-step approval as a personal sign-off chain — the act of completing the SOP is the legal signature.",
+      "criteria": [
+        {
+          "text": "Every publish creates a new version row",
+          "passes": true
+        },
+        {
+          "text": "Old versions preserved, not overwritten",
+          "passes": true
+        },
+        {
+          "text": "Admin can view version history list for any SOP",
+          "passes": true
+        },
+        {
+          "text": "SOP can be edited to a new version with the old version explicitly deprecated + saved in history (formal supersede flow)",
+          "passes": false
+        },
+        {
+          "text": "Side-by-side diff between any two versions",
+          "passes": false
+        },
+        {
+          "text": "Restore an old version as the active one with one click",
+          "passes": false
+        },
+        {
+          "text": "Workers see 'SOP updated since you last completed it' indicator",
+          "passes": false
+        },
+        {
+          "text": "Every SOP instance used by a worker is recorded with a worker's signoff - users initiate each SOP instance by entering their name - every approval the worker makes of each step is effectively the worker signing off that they have followed the steps",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Now", notes: "Formal supersede + diff + instance sign-off are partner-requested.", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Now",
+      "notes": "Formal supersede + diff + instance sign-off are partner-requested.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "G-02", name: "Multi-Step Approval Chain (Optional, Versioned)", category: "admin", phase: "v4.5",
-      plainEnglish: "Before an SOP is published to workers, it routes through a configurable approval chain — e.g. Safety Manager reviews first, then Operations Manager, then Discipline Leader. The chain is optional per SOP (not all need one) and editable per version so org-structure changes don't break old SOPs.",
-      criteria: [
-        { text: "Org admin can configure approval chain per SOP category", passes: false },
-        { text: "SOPs sit in 'awaiting approval' state with role-based visibility for next approver", passes: false },
-        { text: "Approval / rejection at each step logged immutably", passes: false },
-        { text: "Rejection routes back to author with reason field", passes: false },
-        { text: "Bypass-on-emergency option for safety managers (logged)", passes: false },
-        { text: "Approval chain is optional per SOP — not every SOP requires one", passes: false },
-        { text: "Approval chain editable per SOP version — accommodates org-structure changes between versions", passes: false }
+      "id": "G-02",
+      "name": "Multi-Step Approval Chain (Optional, Versioned)",
+      "category": "admin",
+      "phase": "v4.5",
+      "plainEnglish": "Before an SOP is published to workers, it routes through a configurable approval chain — e.g. Safety Manager reviews first, then Operations Manager, then Discipline Leader. The chain is optional per SOP (not all need one) and editable per version so org-structure changes don't break old SOPs.",
+      "criteria": [
+        {
+          "text": "Org admin can configure approval chain per SOP category",
+          "passes": false
+        },
+        {
+          "text": "SOPs sit in 'awaiting approval' state with role-based visibility for next approver",
+          "passes": false
+        },
+        {
+          "text": "Approval / rejection at each step logged immutably",
+          "passes": false
+        },
+        {
+          "text": "Rejection routes back to author with reason field",
+          "passes": false
+        },
+        {
+          "text": "Bypass-on-emergency option for safety managers (logged)",
+          "passes": false
+        },
+        {
+          "text": "Approval chain is optional per SOP — not every SOP requires one",
+          "passes": false
+        },
+        {
+          "text": "Approval chain editable per SOP version — accommodates org-structure changes between versions",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Next", notes: "Visy governance gap.", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Next",
+      "notes": "Visy governance gap.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "G-03", name: "Review-Due Cadence + AI Maintenance Schedule", category: "admin", phase: "v4.5",
-      plainEnglish: "Every SOP has a periodic review date (annual, or category-specific). The system prompts the SOP owner to review before lapse and flags overdue. A connected AI-assisted maintenance schedule designs and maintains the plan for which new SOPs to create and which old SOPs to update.",
-      criteria: [
-        { text: "Per-SOP review_due_at field", passes: false },
-        { text: "Default cadence per category (chemical 6mo, machinery 12mo, etc.)", passes: false },
-        { text: "Dashboard widget for admins shows SOPs due / overdue", passes: false },
-        { text: "Email digest to SOP owners at T-30, T-7, and overdue", passes: false },
-        { text: "Overdue SOPs flagged in worker view ('overdue for review')", passes: false },
-        { text: "AI-assisted SOP development + maintenance schedule — designs the plan for creating new SOPs and updating old ones, evolves with the org's portfolio", passes: false }
+      "id": "G-03",
+      "name": "Review-Due Cadence + AI Maintenance Schedule",
+      "category": "admin",
+      "phase": "v4.5",
+      "plainEnglish": "Every SOP has a periodic review date (annual, or category-specific). The system prompts the SOP owner to review before lapse and flags overdue. A connected AI-assisted maintenance schedule designs and maintains the plan for which new SOPs to create and which old SOPs to update.",
+      "criteria": [
+        {
+          "text": "Per-SOP review_due_at field",
+          "passes": false
+        },
+        {
+          "text": "Default cadence per category (chemical 6mo, machinery 12mo, etc.)",
+          "passes": false
+        },
+        {
+          "text": "Dashboard widget for admins shows SOPs due / overdue",
+          "passes": false
+        },
+        {
+          "text": "Email digest to SOP owners at T-30, T-7, and overdue",
+          "passes": false
+        },
+        {
+          "text": "Overdue SOPs flagged in worker view ('overdue for review')",
+          "passes": false
+        },
+        {
+          "text": "AI-assisted SOP development + maintenance schedule — designs the plan for creating new SOPs and updating old ones, evolves with the org's portfolio",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Next", notes: "", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Next",
+      "notes": "",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "G-04", name: "Role-Based Access + Stale-Role Surfacing", category: "admin", phase: "v3.0",
-      plainEnglish: "Each user has a role (Worker, Supervisor, Admin, Safety Manager, Discipline Leader) that determines what they can see and do. Roles are editable at will, and any SOP whose access list references an outdated role surfaces in the governance review queue.",
-      criteria: [
-        { text: "Worker, Supervisor, Admin, Safety Manager roles defined", passes: true },
-        { text: "Role-based RLS enforced server-side, not just UI", passes: true },
-        { text: "Role can be assigned per organisation member", passes: true },
-        { text: "Discipline Leader role (Phase 15 scope, partial) — owns SOPs for a discipline", passes: false },
-        { text: "Trade-level granularity within roles (electrical-supervisor vs mechanical)", passes: false },
-        { text: "Roles can be defined and re-defined at will — SOPs with out-of-date role access surface in governance review queue for update", passes: false }
+      "id": "G-04",
+      "name": "Role-Based Access + Stale-Role Surfacing",
+      "category": "admin",
+      "phase": "v3.0",
+      "plainEnglish": "Each user has a role (Worker, Supervisor, Admin, Safety Manager, Discipline Leader) that determines what they can see and do. Roles are editable at will, and any SOP whose access list references an outdated role surfaces in the governance review queue.",
+      "criteria": [
+        {
+          "text": "Worker, Supervisor, Admin, Safety Manager roles defined",
+          "passes": true
+        },
+        {
+          "text": "Role-based RLS enforced server-side, not just UI",
+          "passes": true
+        },
+        {
+          "text": "Role can be assigned per organisation member",
+          "passes": true
+        },
+        {
+          "text": "Discipline Leader role (Phase 15 scope, partial) — owns SOPs for a discipline",
+          "passes": false
+        },
+        {
+          "text": "Trade-level granularity within roles (electrical-supervisor vs mechanical)",
+          "passes": false
+        },
+        {
+          "text": "Roles can be defined and re-defined at will — SOPs with out-of-date role access surface in governance review queue for update",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Next", notes: "", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Next",
+      "notes": "",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "G-05", name: "Site-Tier Multi-Tenancy", category: "admin", phase: "v3.0",
-      plainEnglish: "A multi-site customer (e.g. Visy with ~100 sites) can scope SOPs to one or more sites within their org, and route assignments / approvals to site-local staff.",
-      criteria: [
-        { text: "Site entity exists in data model (Phase 15)", passes: true },
-        { text: "Sub-trade tags routed via RLS (Phase 15 migration 00030)", passes: true },
-        { text: "Per-site dashboards for site managers", passes: false },
-        { text: "Per-site SOP rollout (publish to site A but not site B)", passes: false },
-        { text: "Per-site sign-off chains", passes: false }
+      "id": "G-05",
+      "name": "Site-Tier Multi-Tenancy",
+      "category": "admin",
+      "phase": "v3.0",
+      "plainEnglish": "A multi-site customer (e.g. Visy with ~100 sites) can scope SOPs to one or more sites within their org, and route assignments / approvals to site-local staff.",
+      "criteria": [
+        {
+          "text": "Site entity exists in data model (Phase 15)",
+          "passes": true
+        },
+        {
+          "text": "Sub-trade tags routed via RLS (Phase 15 migration 00030)",
+          "passes": true
+        },
+        {
+          "text": "Per-site dashboards for site managers",
+          "passes": false
+        },
+        {
+          "text": "Per-site SOP rollout (publish to site A but not site B)",
+          "passes": false
+        },
+        {
+          "text": "Per-site sign-off chains",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Next", notes: "Visy is the named customer here.", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Cut",
+      "notes": "Visy is the named customer here. [v0.3: Cut means no further roadmap investment — site-tier multi-tenancy stays live (migration 00030, used by Phase 15). Per-site dashboards + rollouts not pursued unless customer signal arrives.]",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "G-06", name: "Training-Record Export", category: "admin", phase: "v4.5",
-      plainEnglish: "Completed SOPs become evidence in a worker's training record. The org can export these records — for audits, for migration into HR systems (SAP SuccessFactors is the target integration).",
-      criteria: [
-        { text: "Completion records carry timestamp + worker_id + photo_evidence_url", passes: true },
-        { text: "CSV / Excel export of all completion records for a date range", passes: false },
-        { text: "Per-worker training record view (every SOP completed, dated, signed off)", passes: false },
-        { text: "SAP SuccessFactors integration target — push completion events", passes: false },
-        { text: "Export filterable by site, role, SOP category, date range", passes: false }
+      "id": "G-06",
+      "name": "Training-Record Export",
+      "category": "admin",
+      "phase": "v4.5",
+      "plainEnglish": "Completed SOPs become evidence in a worker's training record. The org can export these records — for audits, for migration into HR systems (SAP SuccessFactors is the target integration).",
+      "criteria": [
+        {
+          "text": "Completion records carry timestamp + worker_id + photo_evidence_url",
+          "passes": true
+        },
+        {
+          "text": "CSV / Excel export of all completion records for a date range",
+          "passes": false
+        },
+        {
+          "text": "Per-worker training record view (every SOP completed, dated, signed off)",
+          "passes": false
+        },
+        {
+          "text": "SAP SuccessFactors integration target — push completion events",
+          "passes": false
+        },
+        {
+          "text": "Export filterable by site, role, SOP category, date range",
+          "passes": false
+        }
       ],
-      currentGrade: "D", targetGrade: "A", priority: "Next", notes: "Visy interview surfaced SuccessFactors.", reviewed: false, disputed: false
+      "currentGrade": "D",
+      "targetGrade": "A",
+      "priority": "Later",
+      "notes": "Visy interview surfaced SuccessFactors.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "G-07", name: "Team & Invite Management", category: "admin", phase: "v3.0",
-      plainEnglish: "Org admin can invite workers via email or shareable invite code, assign roles, view active members, and revoke access.",
-      criteria: [
-        { text: "Email invite flow with role pre-assigned", passes: true },
-        { text: "Shareable invite code with role pre-assigned", passes: true },
-        { text: "Active members list with role", passes: true },
-        { text: "Bulk CSV import of team members", passes: false },
-        { text: "SSO / SAML for enterprise customers", passes: false },
-        { text: "Deactivate (without delete) for departed workers — preserves history", passes: false }
+      "id": "G-07",
+      "name": "Team & Invite Management",
+      "category": "admin",
+      "phase": "v3.0",
+      "plainEnglish": "Org admin can invite workers via email or shareable invite code, assign roles, view active members, and revoke access.",
+      "criteria": [
+        {
+          "text": "Email invite flow with role pre-assigned",
+          "passes": true
+        },
+        {
+          "text": "Shareable invite code with role pre-assigned",
+          "passes": true
+        },
+        {
+          "text": "Active members list with role",
+          "passes": true
+        },
+        {
+          "text": "Bulk CSV import of team members",
+          "passes": false
+        },
+        {
+          "text": "SSO / SAML for enterprise customers",
+          "passes": false
+        },
+        {
+          "text": "Deactivate (without delete) for departed workers — preserves history",
+          "passes": false
+        }
       ],
-      currentGrade: "B", targetGrade: "A", priority: "Later", notes: "", reviewed: false, disputed: false
+      "currentGrade": "B",
+      "targetGrade": "A",
+      "priority": "Later",
+      "notes": "Team structures are necessary",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "X-01", name: "SOP Search + AI-Managed Categorisation", category: "accessibility", phase: "v3.0",
-      plainEnglish: "Worker types a few words ('scaffold,' 'manual handling,' 'electrical isolation') and finds the relevant SOP instantly. Categorisation and structure managed by AI — manufacturing sites aren't database experts, and the taxonomy evolves as new SOP attributes emerge.",
-      criteria: [
-        { text: "Worker-facing search input on SOPs tab", passes: true },
-        { text: "Search matches title + category tag", passes: true },
-        { text: "Search matches step / hazard content (full-text)", passes: false },
-        { text: "Search matches synonyms / common misspellings ('forklift' finds 'FLT')", passes: false },
-        { text: "Search works offline against locally-cached SOPs", passes: false },
-        { text: "Recently-used SOPs surface first on empty search", passes: false },
-        { text: "Manufacturing sites are not database experts - the categorisation and structure of SOPs needs to be handled by AI with the capability to evolve over time as new SOP attributes are created", passes: false }
+      "id": "X-01",
+      "name": "SOP Search + AI-Managed Categorisation",
+      "category": "accessibility",
+      "phase": "v3.0",
+      "plainEnglish": "Worker types a few words ('scaffold,' 'manual handling,' 'electrical isolation') and finds the relevant SOP instantly. Categorisation and structure managed by AI — manufacturing sites aren't database experts, and the taxonomy evolves as new SOP attributes emerge.",
+      "criteria": [
+        {
+          "text": "Worker-facing search input on SOPs tab",
+          "passes": true
+        },
+        {
+          "text": "Search matches title + category tag",
+          "passes": true
+        },
+        {
+          "text": "Search matches step / hazard content (full-text)",
+          "passes": false
+        },
+        {
+          "text": "Search matches synonyms / common misspellings ('forklift' finds 'FLT')",
+          "passes": false
+        },
+        {
+          "text": "Search works offline against locally-cached SOPs",
+          "passes": false
+        },
+        {
+          "text": "Recently-used SOPs surface first on empty search",
+          "passes": false
+        },
+        {
+          "text": "Manufacturing sites are not database experts - the categorisation and structure of SOPs needs to be handled by AI with the capability to evolve over time as new SOP attributes are created",
+          "passes": false
+        }
       ],
-      currentGrade: "C", targetGrade: "A", priority: "Next", notes: "", reviewed: false, disputed: false
+      "currentGrade": "C",
+      "targetGrade": "A",
+      "priority": "Next",
+      "notes": "",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "X-02", name: "AI Voice Q&A on an SOP", category: "accessibility", phase: "v3.0",
-      plainEnglish: "A worker has a hands-free question about the current SOP ('how tight should this bolt be?' 'what PPE for the next step?'). They tap a button, ask in plain English, and the AI answers grounded only to that SOP's content.",
-      criteria: [
-        { text: "Voice button on the walkthrough view", passes: true },
-        { text: "Answers strictly grounded to active SOP (no hallucination from other SOPs)", passes: true },
-        { text: "Answer includes citations to specific steps / blocks", passes: true },
-        { text: "Verifier flags uncertainty rather than guessing", passes: true },
-        { text: "Per-user concurrency cap to bound cost", passes: true },
-        { text: "Voice input transcribed reliably with industrial-floor noise", passes: false },
-        { text: "Answer is read back aloud (full-audio loop)", passes: false },
-        { text: "Voice Q&A drives step progression — 'I've done step 4, what's next' advances", passes: false },
-        { text: "Multi-language voice support", passes: false }
+      "id": "X-02",
+      "name": "AI Voice Q&A on an SOP",
+      "category": "accessibility",
+      "phase": "v3.0",
+      "plainEnglish": "A worker has a hands-free question about the current SOP ('how tight should this bolt be?' 'what PPE for the next step?'). They tap a button, ask in plain English, and the AI answers grounded only to that SOP's content.",
+      "criteria": [
+        {
+          "text": "Voice button on the walkthrough view",
+          "passes": true
+        },
+        {
+          "text": "Answers strictly grounded to active SOP (no hallucination from other SOPs)",
+          "passes": true
+        },
+        {
+          "text": "Answer includes citations to specific steps / blocks",
+          "passes": true
+        },
+        {
+          "text": "Verifier flags uncertainty rather than guessing",
+          "passes": true
+        },
+        {
+          "text": "Per-user concurrency cap to bound cost",
+          "passes": true
+        },
+        {
+          "text": "Voice input transcribed reliably with industrial-floor noise",
+          "passes": false
+        },
+        {
+          "text": "Answer is read back aloud (full-audio loop)",
+          "passes": false
+        },
+        {
+          "text": "Voice Q&A drives step progression — 'I've done step 4, what's next' advances",
+          "passes": false
+        },
+        {
+          "text": "Multi-language voice support",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Now", notes: "Voice-driven flow is part of W-01's literacy story.", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Now",
+      "notes": "Voice-driven flow is part of W-01's literacy story.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "X-03", name: "Cmd+K Command Palette + Universal AI Access", category: "accessibility", phase: "v3.0",
-      plainEnglish: "Power users press Cmd+K and jump to anything. Underlying this: every editable field has AI read access, most have AI write access. End goal is an app 99% controlled by AI agents via a unified interface.",
-      criteria: [
-        { text: "Cmd+K opens global command palette", passes: true },
-        { text: "Search across SOPs", passes: true },
-        { text: "Search across admin pages, team members, settings", passes: false },
-        { text: "Recently-used actions surface first", passes: false },
-        { text: "Mobile alternative (swipe / long-press primary nav)", passes: false },
-        { text: "All editable fields in the app need AI read access, most editable fields should give AI write access - end goal is an app which is 99% controlled and managed by AI agents", passes: false }
+      "id": "X-03",
+      "name": "Cmd+K Command Palette + Universal AI Access",
+      "category": "accessibility",
+      "phase": "v3.0",
+      "plainEnglish": "Power users press Cmd+K and jump to anything. Underlying this: every editable field has AI read access, most have AI write access. End goal is an app 99% controlled by AI agents via a unified interface.",
+      "criteria": [
+        {
+          "text": "Cmd+K opens global command palette",
+          "passes": true
+        },
+        {
+          "text": "Search across SOPs",
+          "passes": true
+        },
+        {
+          "text": "Search across admin pages, team members, settings",
+          "passes": false
+        },
+        {
+          "text": "Recently-used actions surface first",
+          "passes": false
+        },
+        {
+          "text": "Mobile alternative (swipe / long-press primary nav)",
+          "passes": false
+        },
+        {
+          "text": "All editable fields in the app need AI read access, most editable fields should give AI write access - end goal is an app which is 99% controlled and managed by AI agents",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Now", notes: "Promoted from Later — universal AI read/write is the architectural backbone for v4.0.", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Now",
+      "notes": "Promoted from Later — universal AI read/write is the architectural backbone for v4.0.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "X-04", name: "Global Header Navigation", category: "accessibility", phase: "v3.0",
-      plainEnglish: "Every page in the app has a header with the SOPstart logo, the user's primary navigation links, and a profile menu — so workers and admins always know where they are and can jump to anywhere.",
-      criteria: [
-        { text: "Persistent top header on every protected route", passes: true },
-        { text: "Role-aware navigation (worker sees worker links, admin sees admin links)", passes: true },
-        { text: "SOPstart brand mark + wordmark on the left", passes: true },
-        { text: "Profile menu with sign-out", passes: true },
-        { text: "Mobile collapses center nav into hamburger drawer", passes: true },
-        { text: "Bundle cost bounded by CI gate (≤ +2 KB drift)", passes: true }
+      "id": "X-04",
+      "name": "Global Header Navigation",
+      "category": "accessibility",
+      "phase": "v3.0",
+      "plainEnglish": "Every page in the app has a header with the SOPstart logo, the user's primary navigation links, and a profile menu — so workers and admins always know where they are and can jump to anywhere.",
+      "criteria": [
+        {
+          "text": "Persistent top header on every protected route",
+          "passes": true
+        },
+        {
+          "text": "Role-aware navigation (worker sees worker links, admin sees admin links)",
+          "passes": true
+        },
+        {
+          "text": "SOPstart brand mark + wordmark on the left",
+          "passes": true
+        },
+        {
+          "text": "Profile menu with sign-out",
+          "passes": true
+        },
+        {
+          "text": "Mobile collapses center nav into hamburger drawer",
+          "passes": true
+        },
+        {
+          "text": "Bundle cost bounded by CI gate (≤ +2 KB drift)",
+          "passes": true
+        }
       ],
-      currentGrade: "A", targetGrade: "A", priority: "Shipped", notes: "Shipped 2026-05-22.", reviewed: false, disputed: false
+      "currentGrade": "A",
+      "targetGrade": "A",
+      "priority": "Shipped",
+      "notes": "Shipped 2026-05-22.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "X-05", name: "AI Assistant as Primary Interface + Layered Architecture", category: "accessibility", phase: "v5.0",
-      plainEnglish: "A worker doesn't navigate — they ask the AI to do things. 'Show me the lockout SOP.' 'Mark step 4 as done.' 'Take a photo of the panel.' The whole app is steerable by voice + conversation. Beneath this, AI is built into every surface with a unified interface — designed in layers so models, agents, and token budgets are upgradeable without rebuilding features.",
-      criteria: [
-        { text: "AI accepts natural-language commands across all primary actions", passes: false },
-        { text: "Wake-word or single-tap activation", passes: false },
-        { text: "Conversation is multi-turn (AI asks clarifying questions back)", passes: false },
-        { text: "AI works fully offline for cached SOPs (no roundtrip to LLM)", passes: false },
-        { text: "AI surfaces its own confidence — refuses to act if certainty is low", passes: false },
-        { text: "AI is built into every app surface, with a unified interface. The design and structure of the AI inclusion is crucial as it needs to be upgradeable over time with new agents, models, token limits. The structure we will start with requires these layers: database layers (multiple structured, unstructured, relational), agent routing layer, agents, memory layer, agents, UI layer", passes: false }
+      "id": "X-05",
+      "name": "AI Assistant as Primary Interface + Layered Architecture",
+      "category": "accessibility",
+      "phase": "v5.0",
+      "plainEnglish": "A worker doesn't navigate — they ask the AI to do things. 'Show me the lockout SOP.' 'Mark step 4 as done.' 'Take a photo of the panel.' The whole app is steerable by voice + conversation. Beneath this, AI is built into every surface with a unified interface — designed in layers so models, agents, and token budgets are upgradeable without rebuilding features.",
+      "criteria": [
+        {
+          "text": "AI accepts natural-language commands across all primary actions",
+          "passes": false
+        },
+        {
+          "text": "Wake-word or single-tap activation",
+          "passes": false
+        },
+        {
+          "text": "Conversation is multi-turn (AI asks clarifying questions back)",
+          "passes": false
+        },
+        {
+          "text": "AI works fully offline for cached SOPs (no roundtrip to LLM)",
+          "passes": false
+        },
+        {
+          "text": "AI surfaces its own confidence — refuses to act if certainty is low",
+          "passes": false
+        },
+        {
+          "text": "AI is built into every app surface, with a unified interface. The design and structure of the AI inclusion is crucial as it needs to be upgradeable over time with new agents, models, token limits. The structure we will start with requires these layers: database layers (multiple structured, unstructured, relational), agent routing layer, agents, memory layer, agents, UI layer",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Later", notes: "Vision target. Depends on X-02 maturing first.", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Later",
+      "notes": "Vision target. Depends on X-02 maturing first.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "X-06", name: "Visual-Only Flow", category: "accessibility", phase: "v4.0",
-      plainEnglish: "A worker with low literacy can complete an SOP relying entirely on photos, diagrams, and icons — no required reading.",
-      criteria: [
-        { text: "Every step can carry a primary photo / diagram that anchors the action", passes: false },
-        { text: "Standardised icons for hazards, PPE, tools (workers learn the icon set)", passes: false },
-        { text: "Visual progress indicator (5 of 12 steps done, no English text)", passes: false },
-        { text: "'Show me' affordance on every step (opens photo/diagram full-screen)", passes: false },
-        { text: "Visual-only audit trail — supervisor can review completion via photos", passes: false }
+      "id": "X-06",
+      "name": "Visual-Only Flow",
+      "category": "accessibility",
+      "phase": "v4.0",
+      "plainEnglish": "A worker with low literacy can complete an SOP relying entirely on photos, diagrams, and icons — no required reading.",
+      "criteria": [
+        {
+          "text": "Every step can carry a primary photo / diagram that anchors the action",
+          "passes": false
+        },
+        {
+          "text": "Standardised icons for hazards, PPE, tools (workers learn the icon set)",
+          "passes": false
+        },
+        {
+          "text": "Visual progress indicator (5 of 12 steps done, no English text)",
+          "passes": false
+        },
+        {
+          "text": "'Show me' affordance on every step (opens photo/diagram full-screen)",
+          "passes": false
+        },
+        {
+          "text": "Visual-only audit trail — supervisor can review completion via photos",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Now", notes: "Load-bearing for blue-collar TAM.", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Maybe",
+      "notes": "Load-bearing for blue-collar TAM.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "C-01", name: "Legislation Library", category: "compliance", phase: "v4.5",
-      plainEnglish: "A curated, machine-readable library of NZ workplace-safety legislation — WorkSafe regulations, AS/NZS standards, industry-specific codes — kept up to date and queryable by SOP authors.",
-      criteria: [
-        { text: "Catalog of NZ WorkSafe regulations + AS/NZS standards relevant to industrial SOPs", passes: false },
-        { text: "Org tier (org's own internal regulations) + Potenco-curated global tier", passes: false },
-        { text: "Each entry carries: citation, effective date, summary, source link, category tags", passes: false },
-        { text: "Library refreshed on a periodic cadence (and surfaces changes to subscribers)", passes: false },
-        { text: "Searchable from the builder + browsable as a standalone admin surface", passes: false },
-        { text: "AI read/write access (agents can query legislation, propose new entries)", passes: false }
+      "id": "C-01",
+      "name": "Legislation Library",
+      "category": "compliance",
+      "phase": "v4.5",
+      "plainEnglish": "A curated, machine-readable library of NZ workplace-safety legislation — WorkSafe regulations, AS/NZS standards, industry-specific codes — kept up to date and queryable by SOP authors.",
+      "criteria": [
+        {
+          "text": "Catalog of NZ WorkSafe regulations + AS/NZS standards relevant to industrial SOPs",
+          "passes": false
+        },
+        {
+          "text": "Org tier (org's own internal regulations) + Potenco-curated global tier",
+          "passes": false
+        },
+        {
+          "text": "Each entry carries: citation, effective date, summary, source link, category tags",
+          "passes": false
+        },
+        {
+          "text": "Library refreshed on a periodic cadence (and surfaces changes to subscribers)",
+          "passes": false
+        },
+        {
+          "text": "Searchable from the builder + browsable as a standalone admin surface",
+          "passes": false
+        },
+        {
+          "text": "AI read/write access (agents can query legislation, propose new entries)",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Next", notes: "New in v0.2 — customer-acquisition lever for NZ industrial.", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Maybe",
+      "notes": "New in v0.2 — customer-acquisition lever for NZ industrial.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "C-02", name: "Per-SOP Legislation Links", category: "compliance", phase: "v4.5",
-      plainEnglish: "Each SOP carries explicit links to the specific clauses / regulations it satisfies. Workers see 'this SOP satisfies WorkSafe regulation X clause Y'; auditors see provenance.",
-      criteria: [
-        { text: "SOP can link to one or more legislation entries (from C-01)", passes: false },
-        { text: "Links are per-section or per-step, not just per-SOP (granular provenance)", passes: false },
-        { text: "Workers see 'this satisfies regulation X' as inline reference", passes: false },
-        { text: "Auditors export 'all SOPs satisfying regulation X' as a one-shot report", passes: false },
-        { text: "Links survive SOP versioning (audit trail)", passes: false }
+      "id": "C-02",
+      "name": "Per-SOP Legislation Links",
+      "category": "compliance",
+      "phase": "v4.5",
+      "plainEnglish": "Each SOP carries explicit links to the specific clauses / regulations it satisfies. Workers see 'this SOP satisfies WorkSafe regulation X clause Y'; auditors see provenance.",
+      "criteria": [
+        {
+          "text": "SOP can link to one or more legislation entries (from C-01)",
+          "passes": false
+        },
+        {
+          "text": "Links are per-section or per-step, not just per-SOP (granular provenance)",
+          "passes": false
+        },
+        {
+          "text": "Workers see 'this satisfies regulation X' as inline reference",
+          "passes": false
+        },
+        {
+          "text": "Auditors export 'all SOPs satisfying regulation X' as a one-shot report",
+          "passes": false
+        },
+        {
+          "text": "Links survive SOP versioning (audit trail)",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Next", notes: "New in v0.2.", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Later",
+      "notes": "New in v0.2.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "C-03", name: "AI Legislation Scanner", category: "compliance", phase: "v4.5",
-      plainEnglish: "When an SOP is drafted or edited, an AI scans its content and surfaces relevant legislation matches — and gaps. 'This SOP describes confined-space entry but doesn't reference Regulation X — should it?'",
-      criteria: [
-        { text: "AI scan runs on every draft + on demand", passes: false },
-        { text: "Surfaces matches (legislation X clause Y is referenced) and gaps (regulation Z should be referenced but isn't)", passes: false },
-        { text: "Confidence-graded — fail-safe to 'uncertain' rather than guessing", passes: false },
-        { text: "Auto-suggests legislation links the admin can accept one-click", passes: false },
-        { text: "Cost bounded (prompt-caching + per-org spend cap)", passes: false }
+      "id": "C-03",
+      "name": "AI Legislation Scanner",
+      "category": "compliance",
+      "phase": "v4.5",
+      "plainEnglish": "When an SOP is drafted or edited, an AI scans its content and surfaces relevant legislation matches — and gaps. 'This SOP describes confined-space entry but doesn't reference Regulation X — should it?'",
+      "criteria": [
+        {
+          "text": "AI scan runs on every draft + on demand",
+          "passes": false
+        },
+        {
+          "text": "Surfaces matches (legislation X clause Y is referenced) and gaps (regulation Z should be referenced but isn't)",
+          "passes": false
+        },
+        {
+          "text": "Confidence-graded — fail-safe to 'uncertain' rather than guessing",
+          "passes": false
+        },
+        {
+          "text": "Auto-suggests legislation links the admin can accept one-click",
+          "passes": false
+        },
+        {
+          "text": "Cost bounded (prompt-caching + per-org spend cap)",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Next", notes: "New in v0.2 — extracted from Simon's A-05 criterion 'AI review process which examines SOP contents and searches for relevant legislation'.", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Later",
+      "notes": "New in v0.2 — extracted from Simon's A-05 criterion 'AI review process which examines SOP contents and searches for relevant legislation'.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "C-04", name: "Compliance Audit Trail", category: "compliance", phase: "v5.0",
-      plainEnglish: "Every legislation link, scan, and acceptance is logged immutably. An auditor can reconstruct exactly which regulations an SOP claimed compliance with at any historical point, and which AI scans were run.",
-      criteria: [
-        { text: "Append-only log of every legislation link (added, removed, updated)", passes: false },
-        { text: "Log of every AI scan run + the suggestions surfaced + admin response", passes: false },
-        { text: "Audit-exportable as CSV/PDF for regulatory review", passes: false },
-        { text: "Survives SOP versioning (links to the version that was active at the time)", passes: false }
+      "id": "C-04",
+      "name": "Compliance Audit Trail",
+      "category": "compliance",
+      "phase": "v5.0",
+      "plainEnglish": "Every legislation link, scan, and acceptance is logged immutably. An auditor can reconstruct exactly which regulations an SOP claimed compliance with at any historical point, and which AI scans were run.",
+      "criteria": [
+        {
+          "text": "Append-only log of every legislation link (added, removed, updated)",
+          "passes": false
+        },
+        {
+          "text": "Log of every AI scan run + the suggestions surfaced + admin response",
+          "passes": false
+        },
+        {
+          "text": "Audit-exportable as CSV/PDF for regulatory review",
+          "passes": false
+        },
+        {
+          "text": "Survives SOP versioning (links to the version that was active at the time)",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Later", notes: "New in v0.2.", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Later",
+      "notes": "New in v0.2.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "P-01", name: "Multi-Tenant RLS", category: "platform", phase: "v3.0",
-      plainEnglish: "Every customer's data is fully isolated from every other customer's data. No cross-tenant leakage is possible even with a code bug — the database itself refuses to return another org's rows.",
-      criteria: [
-        { text: "Supabase RLS policies on every customer-data table", passes: true },
-        { text: "JWT custom claims carry org_id; RLS reads from JWT", passes: true },
-        { text: "Cross-tenant isolation seed test in Playwright suite", passes: true },
-        { text: "SECURITY DEFINER helpers for legitimate cross-policy checks", passes: true },
-        { text: "Per-customer encryption-at-rest with org-scoped keys", passes: false },
-        { text: "Audit log of every cross-tenant boundary the admin client crosses", passes: false }
+      "id": "P-01",
+      "name": "Multi-Tenant RLS",
+      "category": "platform",
+      "phase": "v3.0",
+      "plainEnglish": "Every customer's data is fully isolated from every other customer's data. No cross-tenant leakage is possible even with a code bug — the database itself refuses to return another org's rows.",
+      "criteria": [
+        {
+          "text": "Supabase RLS policies on every customer-data table",
+          "passes": true
+        },
+        {
+          "text": "JWT custom claims carry org_id; RLS reads from JWT",
+          "passes": true
+        },
+        {
+          "text": "Cross-tenant isolation seed test in Playwright suite",
+          "passes": true
+        },
+        {
+          "text": "SECURITY DEFINER helpers for legitimate cross-policy checks",
+          "passes": true
+        },
+        {
+          "text": "Per-customer encryption-at-rest with org-scoped keys",
+          "passes": false
+        },
+        {
+          "text": "Audit log of every cross-tenant boundary the admin client crosses",
+          "passes": false
+        }
       ],
-      currentGrade: "A", targetGrade: "A", priority: "Shipped", notes: "Phase 1.", reviewed: false, disputed: false
+      "currentGrade": "A",
+      "targetGrade": "A",
+      "priority": "Shipped",
+      "notes": "Phase 1.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "P-02", name: "PWA Shell", category: "platform", phase: "v3.0",
-      plainEnglish: "The app installs to the worker's phone like a native app (add-to-home-screen), works offline, and looks like a normal app icon rather than a browser tab.",
-      criteria: [
-        { text: "Web App Manifest with name, icons (192/512), maskable + any purposes", passes: true },
-        { text: "Service worker (Serwist) registered and caching", passes: true },
-        { text: "Installable on iOS Safari + Android Chrome", passes: true },
-        { text: "Online/offline status banner", passes: true },
-        { text: "Brand-consistent icons across favicon + apple-touch + PWA", passes: true },
-        { text: "'Open in Safari' / 'Open in Chrome' prompts to ensure install path", passes: false },
-        { text: "Splash-screen + tab-color customisation per organisation (white-label)", passes: false }
+      "id": "P-02",
+      "name": "PWA Shell",
+      "category": "platform",
+      "phase": "v3.0",
+      "plainEnglish": "The app installs to the worker's phone like a native app (add-to-home-screen), works offline, and looks like a normal app icon rather than a browser tab.",
+      "criteria": [
+        {
+          "text": "Web App Manifest with name, icons (192/512), maskable + any purposes",
+          "passes": true
+        },
+        {
+          "text": "Service worker (Serwist) registered and caching",
+          "passes": true
+        },
+        {
+          "text": "Installable on iOS Safari + Android Chrome",
+          "passes": true
+        },
+        {
+          "text": "Online/offline status banner",
+          "passes": true
+        },
+        {
+          "text": "Brand-consistent icons across favicon + apple-touch + PWA",
+          "passes": true
+        },
+        {
+          "text": "'Open in Safari' / 'Open in Chrome' prompts to ensure install path",
+          "passes": false
+        },
+        {
+          "text": "Splash-screen + tab-color customisation per organisation (white-label)",
+          "passes": false
+        }
       ],
-      currentGrade: "B", targetGrade: "A", priority: "Later", notes: "", reviewed: false, disputed: false
+      "currentGrade": "B",
+      "targetGrade": "A",
+      "priority": "Later",
+      "notes": "",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "P-03", name: "Bundle Isolation CI Gate", category: "platform", phase: "v3.0",
-      plainEnglish: "Every code change is checked against the worker's bundle size. New admin features cannot bloat what workers download.",
-      criteria: [
-        { text: "check-bundle-size.ts runs in postbuild on every build", passes: true },
-        { text: "Baseline locked in .bundle-baseline.json with documented drift rationale", passes: true },
-        { text: "±2 KB tolerance per route", passes: true },
-        { text: "Chunk-existence assertions prove dynamic imports stay out-of-band", passes: true },
-        { text: "CI workflow blocks merge on bundle-gate failure (currently warning only)", passes: false },
-        { text: "Per-PR bundle delta report posted to PR conversation", passes: false }
+      "id": "P-03",
+      "name": "Bundle Isolation CI Gate",
+      "category": "platform",
+      "phase": "v3.0",
+      "plainEnglish": "Every code change is checked against the worker's bundle size. New admin features cannot bloat what workers download.",
+      "criteria": [
+        {
+          "text": "check-bundle-size.ts runs in postbuild on every build",
+          "passes": true
+        },
+        {
+          "text": "Baseline locked in .bundle-baseline.json with documented drift rationale",
+          "passes": true
+        },
+        {
+          "text": "±2 KB tolerance per route",
+          "passes": true
+        },
+        {
+          "text": "Chunk-existence assertions prove dynamic imports stay out-of-band",
+          "passes": true
+        },
+        {
+          "text": "CI workflow blocks merge on bundle-gate failure (currently warning only)",
+          "passes": false
+        },
+        {
+          "text": "Per-PR bundle delta report posted to PR conversation",
+          "passes": false
+        }
       ],
-      currentGrade: "B", targetGrade: "A", priority: "Later", notes: "", reviewed: false, disputed: false
+      "currentGrade": "B",
+      "targetGrade": "A",
+      "priority": "Later",
+      "notes": "",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "P-04", name: "Security Hardening (CSP, HSTS)", category: "platform", phase: "v4.5",
-      plainEnglish: "The app sends modern HTTP security headers (Content-Security-Policy, HSTS, frame-ancestors) so it can't be embedded in a malicious iframe or hijacked via injected scripts.",
-      criteria: [
-        { text: "CSP with explicit allowlists for Supabase, Anthropic, Railway", passes: false },
-        { text: "HSTS with max-age=31536000, includeSubDomains, preload", passes: false },
-        { text: "frame-ancestors 'self' (or 'none')", passes: false },
-        { text: "X-Content-Type-Options nosniff + Referrer-Policy strict-origin-when-cross-origin", passes: false },
-        { text: "Permissions-Policy locking down sensors/payment/serial", passes: false }
+      "id": "P-04",
+      "name": "Security Hardening (CSP, HSTS)",
+      "category": "platform",
+      "phase": "v4.5",
+      "plainEnglish": "The app sends modern HTTP security headers (Content-Security-Policy, HSTS, frame-ancestors) so it can't be embedded in a malicious iframe or hijacked via injected scripts.",
+      "criteria": [
+        {
+          "text": "CSP with explicit allowlists for Supabase, Anthropic, Railway",
+          "passes": false
+        },
+        {
+          "text": "HSTS with max-age=31536000, includeSubDomains, preload",
+          "passes": false
+        },
+        {
+          "text": "frame-ancestors 'self' (or 'none')",
+          "passes": false
+        },
+        {
+          "text": "X-Content-Type-Options nosniff + Referrer-Policy strict-origin-when-cross-origin",
+          "passes": false
+        },
+        {
+          "text": "Permissions-Policy locking down sensors/payment/serial",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Next", notes: "Carried from backlog 999.3.", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Next",
+      "notes": "Carried from backlog 999.3.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "P-05", name: "Performance Monitoring + Full Usage Telemetry", category: "platform", phase: "v5.0",
-      plainEnglish: "When something is slow or broken on a customer's site, we see it in dashboards immediately. Beyond errors and Web Vitals, the platform captures full usage telemetry — what SOPs were used, user interaction stats, action sequences — structured into databases for AI review and analysis.",
-      criteria: [
-        { text: "Frontend error tracking (Sentry or equivalent)", passes: false },
-        { text: "Web Vitals capture (LCP, FID, CLS) per route, per org", passes: false },
-        { text: "Backend trace capture for parse pipeline runs (timing per step)", passes: false },
-        { text: "Async error surfacing — after() errors not silently swallowed (LR-03 debt)", passes: false },
-        { text: "Per-org rate-limit dashboards (AI spend, photo upload volume)", passes: false },
-        { text: "Full usage tracking - what SOPs were used, user interaction stats, sequence of user actions stats - captured and structured into databases for AI review and analysis", passes: false }
+      "id": "P-05",
+      "name": "Performance Monitoring + Full Usage Telemetry",
+      "category": "platform",
+      "phase": "v5.0",
+      "plainEnglish": "When something is slow or broken on a customer's site, we see it in dashboards immediately. Beyond errors and Web Vitals, the platform captures full usage telemetry — what SOPs were used, user interaction stats, action sequences — structured into databases for AI review and analysis.",
+      "criteria": [
+        {
+          "text": "Frontend error tracking (Sentry or equivalent)",
+          "passes": false
+        },
+        {
+          "text": "Web Vitals capture (LCP, FID, CLS) per route, per org",
+          "passes": false
+        },
+        {
+          "text": "Backend trace capture for parse pipeline runs (timing per step)",
+          "passes": false
+        },
+        {
+          "text": "Async error surfacing — after() errors not silently swallowed (LR-03 debt)",
+          "passes": false
+        },
+        {
+          "text": "Per-org rate-limit dashboards (AI spend, photo upload volume)",
+          "passes": false
+        },
+        {
+          "text": "Full usage tracking - what SOPs were used, user interaction stats, sequence of user actions stats - captured and structured into databases for AI review and analysis",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "B", priority: "Later", notes: "", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "B",
+      "priority": "Later",
+      "notes": "",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "I-01", name: "Word / PDF Document Parsing", category: "intake", phase: "v3.0",
-      plainEnglish: "Admin uploads an existing Word doc or PDF SOP; the app parses it into structured sections (hazards, PPE, steps, emergency), runs OCR for scans, and presents the result for review.",
-      criteria: [
-        { text: "DOCX text + image extraction (mammoth)", passes: true },
-        { text: "PDF text + image extraction (unpdf)", passes: true },
-        { text: "OCR fallback for scanned PDFs (tesseract.js)", passes: true },
-        { text: "GPT-4o structured parsing with section labels", passes: true },
-        { text: "Async pipeline (parse_jobs table; >30s LLM tasks supported)", passes: true },
-        { text: "Realtime + polling hybrid for parse status", passes: true },
-        { text: "DOCX images anchored to steps by table-row containment", passes: true },
-        { text: "Parsed drafts land as Puck layout_data in the builder (Phase 20 partial)", passes: true },
-        { text: "Photos / diagrams / charts / tables extracted with step-level provenance (Phase 20 full)", passes: false },
-        { text: "Per-block verify checklist at publish gate (Phase 20)", passes: false },
-        { text: "Side-by-side source viewer (Phase 20)", passes: false },
-        { text: "AI reviewer × 5 jobs (Phase 20)", passes: false }
+      "id": "I-01",
+      "name": "Word / PDF Document Parsing",
+      "category": "intake",
+      "phase": "v3.0",
+      "plainEnglish": "Admin uploads an existing Word doc or PDF SOP; the app parses it into structured sections (hazards, PPE, steps, emergency), runs OCR for scans, and presents the result for review.",
+      "criteria": [
+        {
+          "text": "DOCX text + image extraction (mammoth)",
+          "passes": true
+        },
+        {
+          "text": "PDF text + image extraction (unpdf)",
+          "passes": true
+        },
+        {
+          "text": "OCR fallback for scanned PDFs (tesseract.js)",
+          "passes": true
+        },
+        {
+          "text": "GPT-4o structured parsing with section labels",
+          "passes": true
+        },
+        {
+          "text": "Async pipeline (parse_jobs table; >30s LLM tasks supported)",
+          "passes": true
+        },
+        {
+          "text": "Realtime + polling hybrid for parse status",
+          "passes": true
+        },
+        {
+          "text": "DOCX images anchored to steps by table-row containment",
+          "passes": true
+        },
+        {
+          "text": "Parsed drafts land as Puck layout_data in the builder (Phase 20 partial)",
+          "passes": true
+        },
+        {
+          "text": "Photos / diagrams / charts / tables extracted with step-level provenance (Phase 20 full)",
+          "passes": false
+        },
+        {
+          "text": "Per-block verify checklist at publish gate (Phase 20)",
+          "passes": false
+        },
+        {
+          "text": "Side-by-side source viewer (Phase 20)",
+          "passes": false
+        },
+        {
+          "text": "AI reviewer × 5 jobs (Phase 20)",
+          "passes": false
+        }
       ],
-      currentGrade: "D", targetGrade: "A", priority: "Now", notes: "Phase 20 remainder is the highest-value safety story.", reviewed: false, disputed: false
+      "currentGrade": "D",
+      "targetGrade": "A",
+      "priority": "Now",
+      "notes": "Phase 20 remainder is the highest-value safety story.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "I-02", name: "Image / Photo OCR", category: "intake", phase: "v3.0",
-      plainEnglish: "Admin uploads a phone photo of a paper SOP. The app extracts the text via OCR and routes it through the parsing pipeline.",
-      criteria: [
-        { text: "JPG / PNG accepted as upload", passes: true },
-        { text: "GPT-4o vision used as primary OCR (better accuracy than tesseract)", passes: true },
-        { text: "Pre-flight Laplacian-blur check warns admin on bad scans", passes: true },
-        { text: "Multi-page photo scan with per-page review", passes: false },
-        { text: "'Hold camera steady' guidance during capture (real-time blur feedback)", passes: false },
-        { text: "Auto-stitching of photographed multi-page documents", passes: false }
+      "id": "I-02",
+      "name": "Image / Photo OCR",
+      "category": "intake",
+      "phase": "v3.0",
+      "plainEnglish": "Admin uploads a phone photo of a paper SOP. The app extracts the text via OCR and routes it through the parsing pipeline.",
+      "criteria": [
+        {
+          "text": "JPG / PNG accepted as upload",
+          "passes": true
+        },
+        {
+          "text": "GPT-4o vision used as primary OCR (better accuracy than tesseract)",
+          "passes": true
+        },
+        {
+          "text": "Pre-flight Laplacian-blur check warns admin on bad scans",
+          "passes": true
+        },
+        {
+          "text": "Multi-page photo scan with per-page review",
+          "passes": false
+        },
+        {
+          "text": "'Hold camera steady' guidance during capture (real-time blur feedback)",
+          "passes": false
+        },
+        {
+          "text": "Auto-stitching of photographed multi-page documents",
+          "passes": false
+        }
       ],
-      currentGrade: "B", targetGrade: "A", priority: "Later", notes: "", reviewed: false, disputed: false
+      "currentGrade": "B",
+      "targetGrade": "A",
+      "priority": "Later",
+      "notes": "",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "I-03", name: "Excel / PowerPoint / Text Parsing", category: "intake", phase: "v3.0",
-      plainEnglish: "Admin uploads xlsx, pptx, or plain text — these are routed through the same parse pipeline as DOCX and PDF.",
-      criteria: [
-        { text: "xlsx, pptx, txt accepted as upload", passes: true },
-        { text: "officeparser handles xlsx + pptx", passes: true },
-        { text: "Macro-enabled formats (.xlsm, .pptm) rejected at validation", passes: true },
-        { text: "Excel tables with merged cells / multi-row headers parsed correctly", passes: false },
-        { text: "PowerPoint speaker notes incorporated into parsed step text", passes: false }
+      "id": "I-03",
+      "name": "Excel / PowerPoint / Text Parsing",
+      "category": "intake",
+      "phase": "v3.0",
+      "plainEnglish": "Admin uploads xlsx, pptx, or plain text — these are routed through the same parse pipeline as DOCX and PDF.",
+      "criteria": [
+        {
+          "text": "xlsx, pptx, txt accepted as upload",
+          "passes": true
+        },
+        {
+          "text": "officeparser handles xlsx + pptx",
+          "passes": true
+        },
+        {
+          "text": "Macro-enabled formats (.xlsm, .pptm) rejected at validation",
+          "passes": true
+        },
+        {
+          "text": "Excel tables with merged cells / multi-row headers parsed correctly",
+          "passes": false
+        },
+        {
+          "text": "PowerPoint speaker notes incorporated into parsed step text",
+          "passes": false
+        }
       ],
-      currentGrade: "B", targetGrade: "B", priority: "Later", notes: "Uncommon SOP source formats.", reviewed: false, disputed: false
+      "currentGrade": "B",
+      "targetGrade": "B",
+      "priority": "Later",
+      "notes": "Uncommon SOP source formats.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "I-04", name: "Video Transcription + AI-Narrated Capture", category: "intake", phase: "v3.0",
-      plainEnglish: "Admin uploads an MP4 / MOV or pastes a YouTube URL of a training video. The app transcribes it and structures the transcript into an SOP draft. New scope: admin or worker records video of themselves performing the procedure (first or third person), and AI watches, describes physical events, and breaks them into SOP steps.",
-      criteria: [
-        { text: "MP4 / MOV upload (TUS for large files)", passes: true },
-        { text: "YouTube URL via caption API (no scraping / DMCA risk)", passes: true },
-        { text: "Transcript review surface with admin edits", passes: true },
-        { text: "Transcript-to-SOP structuring through GPT-4o", passes: true },
-        { text: "Adversarial verifier on the result", passes: true },
-        { text: "Factory-floor transcription accuracy on NZ-accented speakers (currently 75-85%)", passes: false },
-        { text: "Vimeo URL pathway", passes: false },
-        { text: "Mid-video diagram / whiteboard frames extracted as step photos", passes: false },
-        { text: "First person view narration of captured video - full video of all physical actions taken with AI describing events and breaking events into steps of SOP format", passes: false },
-        { text: "Third person view narration of captured video - full video of all physical actions taken with AI describing events and breaking events into steps of SOP format", passes: false }
+      "id": "I-04",
+      "name": "Video Transcription + AI-Narrated Capture",
+      "category": "intake",
+      "phase": "v3.0",
+      "plainEnglish": "Admin uploads an MP4 / MOV or pastes a YouTube URL of a training video. The app transcribes it and structures the transcript into an SOP draft. New scope: admin or worker records video of themselves performing the procedure (first or third person), and AI watches, describes physical events, and breaks them into SOP steps.",
+      "criteria": [
+        {
+          "text": "MP4 / MOV upload (TUS for large files)",
+          "passes": true
+        },
+        {
+          "text": "YouTube URL via caption API (no scraping / DMCA risk)",
+          "passes": true
+        },
+        {
+          "text": "Transcript review surface with admin edits",
+          "passes": true
+        },
+        {
+          "text": "Transcript-to-SOP structuring through GPT-4o",
+          "passes": true
+        },
+        {
+          "text": "Adversarial verifier on the result",
+          "passes": true
+        },
+        {
+          "text": "Factory-floor transcription accuracy on NZ-accented speakers (currently 75-85%)",
+          "passes": false
+        },
+        {
+          "text": "Vimeo URL pathway",
+          "passes": false
+        },
+        {
+          "text": "Mid-video diagram / whiteboard frames extracted as step photos",
+          "passes": false
+        },
+        {
+          "text": "First person view narration of captured video - full video of all physical actions taken with AI describing events and breaking events into steps of SOP format",
+          "passes": false
+        },
+        {
+          "text": "Third person view narration of captured video - full video of all physical actions taken with AI describing events and breaking events into steps of SOP format",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "A", priority: "Later", notes: "Transcription quality is the gap; 1st/3rd person capture is a new intake pathway.", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "A",
+      "priority": "Later",
+      "notes": "Transcription quality is the gap; 1st/3rd person capture is a new intake pathway.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "I-05", name: "In-App Video Recording", category: "intake", phase: "Maybe",
-      plainEnglish: "Admin presses record in the browser, films a procedure on their phone or laptop, and the app transcribes the recording into an SOP draft on the spot.",
-      criteria: [
-        { text: "In-browser camera recording (MediaRecorder API)", passes: false },
-        { text: "iOS Safari fallback (file-upload picker)", passes: false },
-        { text: "Live transcription preview while recording", passes: false },
-        { text: "Auto-detection of step boundaries from pauses / 'next' cues", passes: false }
+      "id": "I-05",
+      "name": "In-App Video Recording",
+      "category": "intake",
+      "phase": "Maybe",
+      "plainEnglish": "Admin presses record in the browser, films a procedure on their phone or laptop, and the app transcribes the recording into an SOP draft on the spot.",
+      "criteria": [
+        {
+          "text": "In-browser camera recording (MediaRecorder API)",
+          "passes": false
+        },
+        {
+          "text": "iOS Safari fallback (file-upload picker)",
+          "passes": false
+        },
+        {
+          "text": "Live transcription preview while recording",
+          "passes": false
+        },
+        {
+          "text": "Auto-detection of step boundaries from pauses / 'next' cues",
+          "passes": false
+        }
       ],
-      currentGrade: "F", targetGrade: "B", priority: "Maybe", notes: "Blocked on iOS Safari MediaRecorder maturity.", reviewed: false, disputed: false
+      "currentGrade": "F",
+      "targetGrade": "B",
+      "priority": "Maybe",
+      "notes": "Blocked on iOS Safari MediaRecorder maturity.",
+      "reviewed": true,
+      "disputed": false
     },
     {
-      id: "I-06", name: "Video SOP Generation", category: "intake", phase: "v3.0",
-      plainEnglish: "Admin clicks 'Generate video SOP' on a published SOP and the app produces a narrated video version — for orgs that prefer to train via video.",
-      criteria: [
-        { text: "Narrated slideshow format", passes: true },
-        { text: "Screen-recording-style format (for software SOPs)", passes: true },
-        { text: "AI-generated video format (Shotstack)", passes: true },
-        { text: "Multiple video versions per SOP with labels", passes: true },
-        { text: "TTS pronunciation dictionary per org (NZ place names, industrial terms)", passes: false },
-        { text: "Mandatory audio preview before publish", passes: false },
-        { text: "Streamlined File→Video pipeline (Phase 9 — partial)", passes: false },
-        { text: "Retention policy (90-day TTL) actually enforced", passes: false },
-        { text: "Per-tenant storage quota visible in settings", passes: false }
+      "id": "I-06",
+      "name": "Video SOP Generation",
+      "category": "intake",
+      "phase": "v3.0",
+      "plainEnglish": "Admin clicks 'Generate video SOP' on a published SOP and the app produces a narrated video version — for orgs that prefer to train via video.",
+      "criteria": [
+        {
+          "text": "Narrated slideshow format",
+          "passes": true
+        },
+        {
+          "text": "Screen-recording-style format (for software SOPs)",
+          "passes": true
+        },
+        {
+          "text": "AI-generated video format (Shotstack)",
+          "passes": true
+        },
+        {
+          "text": "Multiple video versions per SOP with labels",
+          "passes": true
+        },
+        {
+          "text": "TTS pronunciation dictionary per org (NZ place names, industrial terms)",
+          "passes": false
+        },
+        {
+          "text": "Mandatory audio preview before publish",
+          "passes": false
+        },
+        {
+          "text": "Streamlined File→Video pipeline (Phase 9 — partial)",
+          "passes": false
+        },
+        {
+          "text": "Retention policy (90-day TTL) actually enforced",
+          "passes": false
+        },
+        {
+          "text": "Per-tenant storage quota visible in settings",
+          "passes": false
+        }
       ],
-      currentGrade: "B", targetGrade: "A", priority: "Later", notes: "Current implementation functional; polish + cost-control later.", reviewed: false, disputed: false
+      "currentGrade": "B",
+      "targetGrade": "A",
+      "priority": "Later",
+      "notes": "Current implementation functional; polish + cost-control later.",
+      "reviewed": true,
+      "disputed": false
     }
   ]
 };

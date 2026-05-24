@@ -1,5 +1,5 @@
 {
-  "version": "0.2",
+  "version": "0.3",
   "updated": "2026-05-24",
   "categories": [
     {
@@ -91,8 +91,8 @@
       "currentGrade": "F",
       "targetGrade": "A",
       "priority": "Later",
-      "notes": "",
-      "reviewed": false,
+      "notes": "The block selection editor is difficult to navigate, we shouldn't expect users to have to learn what each block means - we need an intuitive helper to make it clear. We shouldn't expect users to know the best way to structure a SOP, the user should be guided to use blocks in sequences which are easy for future users to understand. ",
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -166,7 +166,7 @@
       "targetGrade": "A",
       "priority": "Later",
       "notes": "",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -212,8 +212,8 @@
       "currentGrade": "F",
       "targetGrade": "A",
       "priority": "Maybe",
-      "notes": "",
-      "reviewed": false,
+      "notes": "The block selection editor is difficult to navigate, we shouldn't expect users to have to learn what each block means - we need an intuitive helper to make it clear. We shouldn't expect users to know the best way to structure a SOP, the user should be guided to use blocks in sequences which are easy for future users to understand. ",
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -247,8 +247,8 @@
       "currentGrade": "F",
       "targetGrade": "A",
       "priority": "Next",
-      "notes": "Customer-acquisition lift. Was deferred Phase 16. (Legislation-review criteria moved to new Compliance category C-01..C-04.)",
-      "reviewed": false,
+      "notes": "Customer-acquisition lift. Was deferred Phase 16. (Legislation-review criteria moved to new Compliance category C-01..C-04.) Visy is our primary first client so we should build templates that are likely to be used by Visy, do research on the types of equipment Visy operates in New Zealand glass manufacture.",
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -256,7 +256,7 @@
       "name": "Image & Diagram Annotation (Konva)",
       "category": "authoring",
       "phase": "v5.0",
-      "plainEnglish": "Admin can upload a machine diagram or photo and add labelled hotspots ('This is the e-stop'), arrows, and freeform callouts that workers tap to see context.",
+      "plainEnglish": "Admin can upload a machine diagram or photo and add labelled hotspots ('This is the e-stop'), arrows, and freeform callouts that workers tap to see context. ",
       "criteria": [
         {
           "text": "Stylus + finger annotation editor (Konva-based)",
@@ -282,8 +282,8 @@
       "currentGrade": "F",
       "targetGrade": "A",
       "priority": "Later",
-      "notes": "Was deferred Phase 17.",
-      "reviewed": false,
+      "notes": "Was deferred Phase 17. Requires AI assistant control and integration",
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -318,7 +318,7 @@
       "targetGrade": "B",
       "priority": "Maybe",
       "notes": "No contention observed in single-admin pattern. Wait for first complaint.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -373,7 +373,7 @@
       "targetGrade": "A",
       "priority": "Now",
       "notes": "Literacy / visual / voice gaps are the blue-collar TAM blocker the Visy interview surfaced.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -414,9 +414,9 @@
       ],
       "currentGrade": "B",
       "targetGrade": "A",
-      "priority": "Next",
-      "notes": "",
-      "reviewed": false,
+      "priority": "Cut",
+      "notes": " [v0.3: Cut means no further roadmap investment — feature complete as shipped on master, not removed.]",
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -461,9 +461,9 @@
       ],
       "currentGrade": "B",
       "targetGrade": "A",
-      "priority": "Now",
+      "priority": "Later",
       "notes": "iOS eviction issue is a known incident risk.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -497,8 +497,8 @@
       "currentGrade": "B",
       "targetGrade": "A",
       "priority": "Next",
-      "notes": "Kiosk mode came from Visy interview.",
-      "reviewed": false,
+      "notes": "",
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -541,7 +541,7 @@
       "targetGrade": "A",
       "priority": "Next",
       "notes": "",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -576,7 +576,7 @@
       "targetGrade": "B",
       "priority": "Later",
       "notes": "",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -615,7 +615,7 @@
       "targetGrade": "A",
       "priority": "Later",
       "notes": "",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -649,8 +649,8 @@
       "currentGrade": "F",
       "targetGrade": "A",
       "priority": "Now",
-      "notes": "Phase 20 remainder — load-bearing safety story for v4.0.",
-      "reviewed": false,
+      "notes": "Phase 20 remainder — load-bearing safety story for v4.0. [v0.3: priority restored to Now after Simon confirmed demotion was a mistake — side-by-side viewer remains load-bearing for v4.0 safety story alongside S-03 + S-04.]",
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -697,7 +697,7 @@
       "targetGrade": "A",
       "priority": "Now",
       "notes": "Phase 20 remainder.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -736,7 +736,7 @@
       "targetGrade": "A",
       "priority": "Now",
       "notes": "Phase 20 remainder.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -767,7 +767,7 @@
       "targetGrade": "A",
       "priority": "Next",
       "notes": "",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -814,7 +814,7 @@
       "targetGrade": "A",
       "priority": "Now",
       "notes": "Formal supersede + diff + instance sign-off are partner-requested.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -857,7 +857,7 @@
       "targetGrade": "A",
       "priority": "Next",
       "notes": "Visy governance gap.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -896,7 +896,7 @@
       "targetGrade": "A",
       "priority": "Next",
       "notes": "",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -935,7 +935,7 @@
       "targetGrade": "A",
       "priority": "Next",
       "notes": "",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -968,9 +968,9 @@
       ],
       "currentGrade": "F",
       "targetGrade": "A",
-      "priority": "Next",
-      "notes": "Visy is the named customer here.",
-      "reviewed": false,
+      "priority": "Cut",
+      "notes": "Visy is the named customer here. [v0.3: Cut means no further roadmap investment — site-tier multi-tenancy stays live (migration 00030, used by Phase 15). Per-site dashboards + rollouts not pursued unless customer signal arrives.]",
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1003,9 +1003,9 @@
       ],
       "currentGrade": "D",
       "targetGrade": "A",
-      "priority": "Next",
+      "priority": "Later",
       "notes": "Visy interview surfaced SuccessFactors.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1043,8 +1043,8 @@
       "currentGrade": "B",
       "targetGrade": "A",
       "priority": "Later",
-      "notes": "",
-      "reviewed": false,
+      "notes": "Team structures are necessary",
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1087,7 +1087,7 @@
       "targetGrade": "A",
       "priority": "Next",
       "notes": "",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1138,7 +1138,7 @@
       "targetGrade": "A",
       "priority": "Now",
       "notes": "Voice-driven flow is part of W-01's literacy story.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1177,7 +1177,7 @@
       "targetGrade": "A",
       "priority": "Now",
       "notes": "Promoted from Later — universal AI read/write is the architectural backbone for v4.0.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1216,7 +1216,7 @@
       "targetGrade": "A",
       "priority": "Shipped",
       "notes": "Shipped 2026-05-22.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1255,7 +1255,7 @@
       "targetGrade": "A",
       "priority": "Later",
       "notes": "Vision target. Depends on X-02 maturing first.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1288,9 +1288,9 @@
       ],
       "currentGrade": "F",
       "targetGrade": "A",
-      "priority": "Now",
+      "priority": "Maybe",
       "notes": "Load-bearing for blue-collar TAM.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1327,9 +1327,9 @@
       ],
       "currentGrade": "F",
       "targetGrade": "A",
-      "priority": "Next",
+      "priority": "Maybe",
       "notes": "New in v0.2 — customer-acquisition lever for NZ industrial.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1362,9 +1362,9 @@
       ],
       "currentGrade": "F",
       "targetGrade": "A",
-      "priority": "Next",
+      "priority": "Later",
       "notes": "New in v0.2.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1397,9 +1397,9 @@
       ],
       "currentGrade": "F",
       "targetGrade": "A",
-      "priority": "Next",
+      "priority": "Later",
       "notes": "New in v0.2 — extracted from Simon's A-05 criterion 'AI review process which examines SOP contents and searches for relevant legislation'.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1430,7 +1430,7 @@
       "targetGrade": "A",
       "priority": "Later",
       "notes": "New in v0.2.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1469,7 +1469,7 @@
       "targetGrade": "A",
       "priority": "Shipped",
       "notes": "Phase 1.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1512,7 +1512,7 @@
       "targetGrade": "A",
       "priority": "Later",
       "notes": "",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1551,7 +1551,7 @@
       "targetGrade": "A",
       "priority": "Later",
       "notes": "",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1586,7 +1586,7 @@
       "targetGrade": "A",
       "priority": "Next",
       "notes": "Carried from backlog 999.3.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1625,7 +1625,7 @@
       "targetGrade": "B",
       "priority": "Later",
       "notes": "",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1688,7 +1688,7 @@
       "targetGrade": "A",
       "priority": "Now",
       "notes": "Phase 20 remainder is the highest-value safety story.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1727,7 +1727,7 @@
       "targetGrade": "A",
       "priority": "Later",
       "notes": "",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1762,7 +1762,7 @@
       "targetGrade": "B",
       "priority": "Later",
       "notes": "Uncommon SOP source formats.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1817,7 +1817,7 @@
       "targetGrade": "A",
       "priority": "Later",
       "notes": "Transcription quality is the gap; 1st/3rd person capture is a new intake pathway.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1848,7 +1848,7 @@
       "targetGrade": "B",
       "priority": "Maybe",
       "notes": "Blocked on iOS Safari MediaRecorder maturity.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     },
     {
@@ -1899,7 +1899,7 @@
       "targetGrade": "A",
       "priority": "Later",
       "notes": "Current implementation functional; polish + cost-control later.",
-      "reviewed": false,
+      "reviewed": true,
       "disputed": false
     }
   ]

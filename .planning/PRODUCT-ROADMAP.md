@@ -1,10 +1,19 @@
 # SOPstart — Product Roadmap
 
 **Owner:** Potenco Pty Ltd
-**Status:** v0.2 — 2026-05-24 (regenerated from Simon's 2026-05-24 review pass)
+**Status:** v0.3 — 2026-05-24 (regenerated after Simon's 21:12 review pass)
 **Source of truth:** `.planning/product-roadmap.data.json` (machine-readable)
 **Editor:** `.planning/product-roadmap.html` (open in browser to edit and re-export)
-**Purpose:** A single, partner-readable record of every feature SOPstart aspires to ship — both what's already on master and what we want to one day add. Each feature has bespoke acceptance criteria, a current grade, a target grade, and a priority tag. Grades are **forward-looking** — a feature is F until every criterion passes; A means industry-leading and complete.
+**Purpose:** A single, partner-readable record of every feature SOPstart aspires to ship. Each feature has bespoke acceptance criteria, a current grade, a target grade, and a priority tag. Grades are **forward-looking** — a feature is F until every criterion passes; A means industry-leading and complete.
+
+**v0.3 changes from v0.2:**
+- 9 priority shifts (notably W-03 + X-06 demoted out of v4.0, several compliance features pushed to Later/Maybe)
+- 2 features moved to "Cut (shipped — no further investment)": W-02 photo evidence + G-05 site-tier multi-tenancy
+- S-02 side-by-side viewer kept at Now (Simon confirmed earlier demotion was a misclick)
+- v4.0 NOW surface narrowed from 10 to 8 features
+- Simon's review notes pulled into feature entries
+
+45 of 46 features marked reviewed by Simon. The one outstanding: A-02 Blank-Page Wizard (already shipped, low priority to re-review).
 
 ---
 
@@ -12,29 +21,24 @@
 
 SOPstart is a mobile-first workplace-safety app for blue-collar industrial customers. Workers open an SOP on their phone, walk through it step-by-step, capture photo evidence, and complete a legally defensible sign-off — even offline at remote job sites. Admins author SOPs in a builder, draft them from a prompt, or upload existing documents for AI parsing.
 
-We are post-v3.0 (Native SOP Builder) and entering v4.0+. The next eighteen months are defined by four product pulls:
+We are post-v3.0 (Native SOP Builder) and entering v4.0+. v0.3's review pass has sharpened the next milestone. **v4.0 is now defined by two intertwined pulls:**
 
-1. **Safety-critical content fidelity.** Every photo, diagram, table, and step in a parsed SOP must be anchored, verified by AI, and verifiable by a human admin before publish.
-2. **Worker accessibility for the actual blue-collar TAM.** Low-literacy workflows, visual-only flow, voice-driven walkthrough, multi-language UI. The Visy interview made clear: today's app excludes most workers on a typical NZ industrial site.
-3. **Compliance & Legislation as a product surface.** Customers buy SOP tooling to satisfy regulators. A live legislation library, per-SOP legislation links, and AI compliance scans are a customer-acquisition lever, not an afterthought.
-4. **AI as the operating layer, not just a feature.** The end state is an app 99% steerable by AI agents — every editable field has read access, most have write access, and a unified agent-routing + memory architecture sits underneath the UI.
+1. **Safety-critical parsing fidelity** — finish the Phase 20 contract. Word/PDF documents parse into the builder with side-by-side source verification, an AI reviewer running five quality jobs on every parse, and a mandatory per-block verify checklist at the publish gate. Workers must never act on misaligned content.
+2. **AI as the operating layer** — every editable field gets AI read access, most get AI write access. Workers with low literacy can complete SOPs by voice; admins can drive authoring conversationally. The end state is an app 99% steerable by AI agents.
+
+The Visy-pilot themes (kiosk mode, approval chains, NZ templates) are now v4.5. Konva annotation, telemetry, and the conversational primary interface push to v5.0.
 
 ---
 
 ## 2. Architectural Principles
 
-These are horizontal — they cut across every feature, not stored in any single category.
+Horizontal — they cut across every feature.
 
 ### 2.1 AI Everywhere
 
-The product's long-term shape is an app driven primarily by AI agents on behalf of users. Concretely:
+The product's long-term shape is an app driven primarily by AI agents on behalf of users. Every editable field offers an AI **read** API. Most editable fields offer an AI **write** API (with the user as final approver for high-stakes actions). A **unified agent interface** sits underneath every surface.
 
-- Every editable field offers an AI **read** API.
-- Most editable fields offer an AI **write** API (with the user as final approver where stakes are high — sign-off, publish, role assignment).
-- The app exposes a **unified agent interface** that any feature surface can call into.
-- The agent layer is **upgradeable** without rebuilding features — new models, new agents, new token limits should drop in.
-
-The intended layered architecture:
+Intended layered architecture:
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -50,19 +54,13 @@ The intended layered architecture:
 └─────────────────────────────────────────────┘
 ```
 
-Every feature in the catalog below carries explicit AI read/write criteria so the principle is enforced one feature at a time, not aspirationally.
-
 ### 2.2 Safety-Critical Defaults
 
-The product's failure mode is a worker acting on misinformation. Defaults must err on the side of refusing rather than guessing:
-
-- AI verifier output is fail-safe to uncertainty, not fail-open to plausible-but-wrong.
-- Publish gates are hard-disabled until verification is complete — no bulk-bypass.
-- Voice answers cite specific steps; refuse rather than hallucinate.
+The product's failure mode is a worker acting on misinformation. Defaults err toward refusing over guessing. AI verifier output is fail-safe to uncertainty, not fail-open to plausible-but-wrong. Publish gates are hard-disabled until verification is complete — no bulk-bypass.
 
 ### 2.3 Offline-First Worker
 
-A worker on a remote NZ site has unreliable signal. The app must work fully offline for any SOP previously downloaded, and signal clearly when an SOP is stale or unsynced.
+A worker on a remote NZ site has unreliable signal. The app must work fully offline for any SOP previously downloaded.
 
 ### 2.4 Multi-Tenancy Hard from Day 1
 
@@ -91,434 +89,322 @@ RLS at the database layer, JWT custom claims, SECURITY DEFINER helpers for cross
 |---|---|
 | **A** | All criteria pass. Industry-leading and complete. |
 | **B** | Almost all criteria pass; small known gaps. Competitive today. |
-| **C** | Half of criteria pass; functional but rough; loses side-by-side demo. |
+| **C** | Half of criteria pass; functional but rough. |
 | **D** | Few criteria pass; present but failing. Active overhaul candidate. |
 | **F** | Most criteria fail OR feature missing entirely. |
-
-> ⚠ A feature can have demonstrably working parts and still grade F if it doesn't meet the full target vision. The grade tracks the gap to target, not the implementation reality on master.
 
 ### Priority
 
 | Tag | Meaning |
 |---|---|
-| **Now** | Next milestone (v4.0). We're building this. |
-| **Next** | Milestone-after-next (v4.5). Tentatively scheduled. |
-| **Later** | Year-out horizon (v5.0). On the radar. |
+| **Now** | v4.0 milestone. We're building this. |
+| **Next** | v4.5 milestone. Tentatively scheduled. |
+| **Later** | v5.0+ horizon. On the radar. |
 | **Maybe** | Speculative — needs customer signal before committing. |
-| **Cut** | Considered and rejected. Logged so we don't re-debate. |
-| **Shipped** | On master, complete against target. |
+| **Cut** | No further roadmap investment. **For shipped features (W-02, G-05): code remains in product; we won't extend them.** For unbuilt features (ModelBlock, Vimeo, in-house OCR): rejected, never built. |
+| **Shipped** | On master, target spec met. |
 
 ---
 
-## 4. Feature Catalog
+## 4. Feature Catalog by Category
 
-Counts: **47 features total** (40 from v0.1, plus 3 new compliance features, plus 4 expanded scope on existing entries). All grades reflect Simon's 2026-05-24 forward-looking pass.
+Counts: **46 features** across 8 categories. **8 Now, 9 Next, 19 Later, 5 Maybe, 2 Cut, 3 Shipped.**
 
 ### 4.1 Authoring (7 features)
 
-#### A-01 — SOP Builder (Puck) *(renamed from Block Builder)*
+#### A-01 — SOP Builder (Puck) · Later
 
-**Plain English:** An admin opens a blank canvas in the browser and drags blocks (Step, Hazard, Tool, Decision, etc.) into the page to compose an SOP. No upload required.
+Admin opens a blank canvas in the browser and drags blocks into the page to compose an SOP.
 
-**Criteria:** Admin can create from scratch ✅ · Block palette covers common shapes ✅ · Drag-to-reorder at section level ✅ · Dexie autosave ✅ · Preview toggle ✅ · Two admins concurrent without overwriting ❌ · Builder works on tablets and phones ❌ · **Inline AI assistant inside the builder** ❌ · **Renamed from "Block Builder" to "SOP Builder" across all UI copy** ❌
+> **Simon's note:** *The block selection editor is difficult to navigate, we shouldn't expect users to have to learn what each block means — we need an intuitive helper to make it clear. We shouldn't expect users to know the best way to structure a SOP, the user should be guided to use blocks in sequences which are easy for future users to understand.*
 
-**Current:** F · **Target:** A · **Priority:** Later
+**Open criteria:** concurrent multi-admin editing · tablet/phone support · inline AI assistant · rename "Block Builder" → "SOP Builder" in UI copy.
+**Current:** F · **Target:** A
 
-#### A-02 — Blank-Page Wizard
+#### A-02 — Blank-Page Wizard · Shipped
 
-**Plain English:** When an admin clicks "Start blank," a short wizard prompts them for the SOP's name, category, and key fields before opening the builder.
+Short wizard prompts for SOP name, category, key fields before opening the builder.
+**Current:** F (forward-looking — wizard works on master) · **Target:** A
 
-**Criteria:** Wizard appears on new-SOP flow ✅ · Admin picks primary category tag ✅ · Admin picks blocks from the library ✅ · Atomic SOP record creation ✅
+#### A-03 — AI-Drafted SOP from Prompt · Later
 
-**Current:** F (forward-looking — wizard works on master but Simon's standard requires expanded scope) · **Target:** A · **Priority:** Shipped
+Admin types a short description and Claude drafts a structured SOP for review.
+**Open criteria:** house-style learning · multimodal input (photos/diagrams) · relational naming/numbering vs library.
+**Current:** F · **Target:** A
 
-#### A-03 — AI-Drafted SOP from Prompt
+#### A-04 — Reusable Block Library · Maybe
 
-**Plain English:** An admin types a short description ("scaffold inspection for warehouse mezzanine") and Claude drafts a structured SOP for review and edit.
+Common SOP pieces stored as reusable blocks with version pinning + diff review on updates.
 
-**Criteria:** Freeform prompt → structured draft ✅ · Adversarial verifier on every draft ✅ · Flags surface inline ✅ · Edit-and-republish re-runs verifier ✅ · AI drafts in customer's house style ❌ · AI accepts photos/diagrams alongside prompt ❌ · **New SOP gets relational context from existing library — AI suggests number + title consistent with house naming** ❌
+> **Simon's note:** *(same as A-01)* — block-selection navigation needs the same intuitive helper treatment.
 
-**Current:** F · **Target:** A · **Priority:** Later
+**Open criteria:** block usage analytics · one-click clone org→global proposal · AI-suggested blocks.
+**Current:** F · **Target:** A
 
-#### A-04 — Reusable Block Library
+#### A-05 — NZ Template Library · Next
 
-**Plain English:** Common SOP pieces (Lockout-Tagout PPE, Crush-entrapment hazard card, etc.) are stored as reusable blocks. Global-library updates surface as per-SOP "review and accept" prompts.
+Pre-built complete SOPs for common NZ industrial scenarios. Admin clones + customises rather than starting blank.
 
-**Criteria:** Org + Potenco-curated tiers ✅ · 65 NZ-industry seed blocks ✅ · Pin-version or follow-latest ✅ · Per-SOP review modal with diff ✅ · Org admins suggest globals to Potenco ✅ · Block usage analytics ❌ · One-click clone org→global proposal ❌ · **AI-suggested blocks based on draft content** ❌
+> **Simon's note:** *Customer-acquisition lift. Visy is our primary first client so we should build templates that are likely to be used by Visy — research the types of equipment Visy operates in New Zealand glass manufacture.*
 
-**Current:** F · **Target:** A · **Priority:** Maybe
+**Current:** F · **Target:** A
 
-#### A-05 — NZ Template Library
+#### A-06 — Image & Diagram Annotation (Konva) · Later
 
-**Plain English:** Pre-built complete SOPs for common NZ industrial scenarios (WorkSafe-aligned). An admin clones a template and customises rather than starting blank.
+Konva-based annotation editor with hotspots, stylus support, dual storage (JSON edit + baked PNG worker view).
 
-**Criteria:** Browseable catalog of complete SOP templates ❌ · Aligned to WorkSafe categories ❌ · Third entry point in new-SOP flow ❌ · Clone-and-edit with attribution + curator updates ❌ · Industry bundles (forestry, food processing, mining) ❌
+> **Simon's note:** *Requires AI assistant control and integration.*
 
-> See also Compliance category (C-01..C-04) — Simon's "AI legislation review" and "Legislation library kept active" criteria moved there as their own feature surface.
+**Current:** F · **Target:** A
 
-**Current:** F · **Target:** A · **Priority:** Next
+#### A-07 — Collaborative Editing · Maybe
 
-#### A-06 — Image & Diagram Annotation (Konva)
-
-**Plain English:** Admin uploads a machine diagram or photo and adds labelled hotspots, arrows, freeform callouts. Workers tap hotspots to see context.
-
-**Criteria:** Stylus + finger annotation editor ❌ · Dual storage (JSON edit + baked PNG worker view) ❌ · Hotspots link to specific steps ❌ · Palm rejection ❌ · Workers see baked image without editor bundle ❌
-
-**Current:** F · **Target:** A · **Priority:** Later
-
-#### A-07 — Collaborative Editing
-
-**Plain English:** Two admins can work on the same SOP at the same time. The app shows who's editing what, prevents simultaneous edits to the same section, and handles offline reconciliation.
-
-**Criteria:** Section-level pessimistic locks ❌ · Realtime presence indicators ❌ · Optimistic version column for offline-then-reconnect ❌ · Clear conflict modal ❌ · "Updated by another admin" toast ❌
-
-**Current:** F · **Target:** B · **Priority:** Maybe
+Section-level locks, realtime presence, conflict modal.
+**Current:** F · **Target:** B · No contention observed in single-admin pattern — wait for first complaint.
 
 ---
 
 ### 4.2 Worker Experience (6 features)
 
-#### W-01 — Step-by-Step Walkthrough
+#### W-01 — Step-by-Step Walkthrough · Now
 
-**Plain English:** A worker opens an SOP and the app guides them through one step at a time on their phone. They tap to confirm each step is done.
+Worker opens an SOP, taps through one step at a time, confirms each done.
+**Open criteria (v4.0 scope):** low-literacy completion · visual-only completion · voice-only completion (W-01 ↔ X-02 are the same story) · multi-language UI.
+**Current:** B · **Target:** A
 
-**Criteria:** Modern phone browser, no install ✅ · Offline once downloaded ✅ · Readable in bright outdoor light ✅ · Tap targets ≥44px ✅ · Photo capture per step ✅ · Step ack trace for audit ✅ · Low-literacy worker can complete ❌ · Visual-only completion (diagrams/photos, no required reading) ❌ · Voice-only completion (AI reads + listens + asks back) ❌ · Multi-language UI (Te Reo, Tagalog, Hindi, Mandarin) ❌
+#### W-02 — Photo Evidence Capture · **Cut (shipped, no further work)**
 
-**Current:** B · **Target:** A · **Priority:** Now — literacy / visual / voice gaps are the blue-collar TAM blocker.
+Worker takes a photo at any step. Photo queued + uploaded.
+> Code remains in product. No additional roadmap investment planned for voice-annotated photos or GPS-tagging unless customer signal emerges.
 
-#### W-02 — Photo Evidence Capture
+**Current:** B · **Target:** A
 
-**Plain English:** Worker takes a photo with their phone camera at any step. Photo is queued for upload (even offline) and arrives with the completion record.
+#### W-03 — Offline-First Reliability · Later
 
-**Criteria:** Camera fires from step view ✅ · Client-side compression ✅ · Offline queue persists ✅ · Auto-upload on reconnect ✅ · photo_required enforces capture ✅ · Voice-annotated photo (5-sec clip + auto-transcribe) ❌ · GPS + timestamp auto-tag ❌
+A worker on a no-signal job site can use the app fully. Sync on reconnect.
 
-**Current:** B · **Target:** A · **Priority:** Next
+> Demoted from Now in v0.3. iOS Safari storage eviction warning + last-sync timestamp + per-SOP download UI still on the radar — not v4.0 priority.
 
-#### W-03 — Offline-First Reliability
+**Current:** B · **Target:** A
 
-**Plain English:** A worker on a construction site with no signal can use the app fully — read, photograph, complete sign-off — and everything syncs when they're back online.
+#### W-04 — Immersive Walkthrough (Mobile) · Next
 
-**Criteria:** Serwist asset cache ✅ · Dexie SOP store ✅ · Photo queue survives crash + restart ✅ · Sync engine reconciles on reconnect ✅ · Online/offline indicator ✅ · Per-SOP "download for offline" UI ❌ · iOS Safari eviction warning (7-day purge) ❌ · Last-synced timestamp visible to worker ❌
+Full-screen mobile mode. Kiosk lockdown + sequence-enforced walkthrough (Visy pattern).
+**Current:** B · **Target:** A
 
-**Current:** B · **Target:** A · **Priority:** Now — iOS eviction is a known incident risk.
+#### W-05 — Completion & Sign-off · Next
 
-#### W-04 — Immersive Walkthrough (Mobile)
+Immutable completion record + supervisor sign-off. Adds PIN/badge sign-off at shared workstations + supervisor notifications + bulk sign-off.
+**Current:** B · **Target:** A
 
-**Plain English:** Full-screen mode for mobile workers. One step at a time, big text, swipe between steps, minimal chrome.
+#### W-06 — Worker Notifications · Later
 
-**Criteria:** Full-bleed step render ✅ · Bottom action bar ✅ · Nested layout routing ✅ · Kiosk mode lockdown (tablet can't navigate away) ❌ · Sequence-enforced (can't skip critical step) ❌
-
-**Current:** B · **Target:** A · **Priority:** Next — kiosk mode from Visy interview.
-
-#### W-05 — Completion & Sign-off
-
-**Plain English:** When a worker finishes an SOP, the app captures an immutable completion record and routes it to a supervisor for sign-off.
-
-**Criteria:** Append-only completion records ✅ · Photo evidence attached ✅ · Supervisor signs off (immutable record) ✅ · Supervisor reject-with-reason ✅ · PIN / badge sign-off at shared workstation ❌ · Email/push notification to supervisor ❌ · Bulk supervisor sign-off ❌
-
-**Current:** B · **Target:** A · **Priority:** Next
-
-#### W-06 — Worker Notifications
-
-**Plain English:** Worker receives a notification when a new SOP is assigned, an SOP is updated, or a supervisor responds.
-
-**Criteria:** In-app notification badge ✅ · New-assignment notification record ✅ · Push notifications to mobile ❌ · Email digest of pending SOPs ❌ · Configurable quiet hours ❌
-
-**Current:** C · **Target:** B · **Priority:** Later
+In-app + push + email digest + quiet hours.
+**Current:** C · **Target:** B
 
 ---
 
 ### 4.3 Safety (5 features)
 
-#### S-01 — Adversarial AI Verifier
+#### S-01 — Adversarial AI Verifier · Later
 
-**Plain English:** When AI generates an SOP from a prompt or transcript, a second AI (Claude) reads the result critically and flags missing safety info, unrealistic times, vague PPE, or dangerous omissions before the admin sees the draft.
+Second AI scrutinises every AI-generated draft for safety omissions before admin sees it.
+**Open criteria:** verifier learns from admin accept/reject over time · accepts org's prior SOPs as house-style context.
+**Current:** B · **Target:** A
 
-**Criteria:** Verifier auto-runs on every AI draft ✅ · Flags surface inline ✅ · Severity (critical/warning/notice) ✅ · Critical flags must be resolved before publish ✅ · Verifier learns from admin accept/reject over time ❌ · Verifier accepts org's prior SOPs as house-style context ❌
+#### S-02 — Side-by-Side Source Viewer · Now
 
-**Current:** B · **Target:** A · **Priority:** Later
+Source document pinned beside parsed structure. Click parsed block → source scrolls; click source → block highlights.
 
-#### S-02 — Side-by-Side Source Viewer
+> **v0.3 note:** Priority restored to Now after Simon confirmed the v0.2-pass demotion was a misclick. This is the load-bearing v4.0 safety story alongside S-03 + S-04.
 
-**Plain English:** When an admin reviews a parsed SOP, the original document is pinned beside the parsed structure. Click a parsed block → source viewer scrolls to the exact passage; click a source region → parsed block highlights.
+**Current:** F · **Target:** A
 
-**Criteria:** Source rendered alongside parsed blocks ❌ · Click parsed block → source scrolls ❌ · Click source region → block highlights ❌ · Persistent throughout review, not modal ❌ · Works for all intake formats ❌
+#### S-03 — AI Reviewer (Five Verification Jobs) · Now
 
-**Current:** F · **Target:** A · **Priority:** Now — Phase 20 remainder, load-bearing safety story for v4.0.
+Five specialised AI jobs run on every parsed SOP — omission, anchoring, photo-step alignment, table fidelity, terminology consistency. Auto on parse + manual re-run.
+**Current:** F · **Target:** A
 
-#### S-03 — AI Reviewer (Five Verification Jobs)
+#### S-04 — Per-Block Verify Checklist at Publish Gate · Now
 
-**Plain English:** The conversion pipeline runs five specialised AI jobs on every parsed SOP — omission, anchoring, photo-step alignment, table fidelity, terminology consistency — automatically on first parse and on admin demand.
+Admin walks through every block ticking "verified." Publish hard-disabled until 100% verification. No bulk-bypass.
+**Current:** F · **Target:** A
 
-**Criteria:** Job A: Omission check ❌ · Job B: Anchoring check ❌ · Job C: Step-image alignment ❌ · Job D: Table fidelity ❌ · Job E: Terminology consistency ❌ · All five auto-run on first parse ❌ · Admin can re-run any job manually ❌ · Cost bounded with prompt-caching + per-org cap ❌
+#### S-05 — Safety Reminders Always Visible · Next
 
-**Current:** F · **Target:** A · **Priority:** Now — Phase 20 remainder.
-
-#### S-04 — Per-Block Verify Checklist at Publish Gate
-
-**Plain English:** Before publish, the admin walks through every block and ticks "I have verified this matches the source." Publish is hard-disabled until 100% verification.
-
-**Criteria:** Every block carries verified_by boolean ❌ · Publish hard-disabled until 100% ❌ · Timestamp + admin user_id stored for audit ❌ · Re-edit requires re-verify of THAT block ❌ · No bulk-verify (speed-bump is the feature) ❌ · UI guides eye-flow so admin actually reads each block ❌
-
-**Current:** F · **Target:** A · **Priority:** Now — Phase 20 remainder.
-
-#### S-05 — Safety Reminders Always Visible
-
-**Plain English:** Hazards, PPE, and emergency info for the current step never scroll off the worker's screen — persistent regardless of walkthrough position.
-
-**Criteria:** Hazards/PPE as persistent callout blocks ✅ · Severity colour-coded ✅ · Critical PPE icon strip pinned across all steps ❌ · Worker can re-acknowledge hazards without restarting walkthrough ❌
-
-**Current:** B · **Target:** A · **Priority:** Next
+PPE icon strip pinned across all steps. Worker can re-acknowledge hazards anytime.
+**Current:** B · **Target:** A
 
 ---
 
 ### 4.4 Admin & Governance (7 features)
 
-#### G-01 — Version History + Worker-Instance Sign-off
+#### G-01 — Version History + Worker-Instance Sign-off · Now
 
-**Plain English:** Every SOP keeps a record of every published version. Admins can compare versions and recover an old version. Every individual worker instance also logs the worker's name, the version they used, and per-step approval as a personal sign-off chain — the act of completing the SOP is the legal signature.
+Formal supersede flow + side-by-side diff + one-click restore. **Every SOP instance run by a worker logs the worker's name + per-step approval as a personal sign-off chain — completing the SOP IS the legal signature.**
+**Current:** F · **Target:** A
 
-**Criteria:** Every publish creates a new version row ✅ · Old versions preserved ✅ · Version history list per SOP ✅ · Formal supersede flow (deprecate old explicitly) ❌ · Side-by-side diff between any two versions ❌ · One-click restore old version as active ❌ · Workers see "SOP updated since you last completed it" indicator ❌ · **Every SOP instance records a worker's name + per-step approval as immutable sign-off chain — completing the SOP IS the worker signing every step** ❌
+#### G-02 — Multi-Step Approval Chain (Optional, Versioned) · Next
 
-**Current:** F · **Target:** A · **Priority:** Now — formal supersede + diff + instance sign-off are partner-requested.
+Configurable approval chain per SOP category. **Optional** per SOP — not all need one. **Editable per version** — accommodates org-structure changes between versions.
+**Current:** F · **Target:** A
 
-#### G-02 — Multi-Step Approval Chain (Optional, Versioned)
+#### G-03 — Review-Due Cadence + AI Maintenance Schedule · Next
 
-**Plain English:** Before an SOP is published to workers, it routes through a configurable approval chain — e.g. Safety Manager → Operations Manager → Discipline Leader. The chain is optional per SOP (not all SOPs need one) and editable per version (so org-structure changes don't break old SOPs).
+Per-SOP review_due_at + category cadence + dashboard widget + email digest. **AI-assisted maintenance schedule** designs and maintains the plan for creating new SOPs and updating old ones — proactive lifecycle, not just reminders.
+**Current:** F · **Target:** A
 
-**Criteria:** Org admin configures approval chain per SOP category ❌ · "Awaiting approval" state with role-visible queue for next approver ❌ · Approval/rejection logged immutably ❌ · Rejection routes back to author with reason ❌ · Emergency bypass for safety managers (logged) ❌ · **Approval chain is optional per SOP — not every SOP requires one** ❌ · **Approval chain editable per SOP version — accommodates org-structure changes between versions** ❌
+#### G-04 — Role-Based Access + Stale-Role Surfacing · Next
 
-**Current:** F · **Target:** A · **Priority:** Next — Visy governance gap.
+Roles editable at will. **SOPs whose access lists reference outdated roles surface in the governance review queue for update.**
+**Current:** F · **Target:** A
 
-#### G-03 — Review-Due Cadence + AI Maintenance Schedule
+#### G-05 — Site-Tier Multi-Tenancy · **Cut (shipped, no further work)**
 
-**Plain English:** Every SOP has a review date (annual or category-specific). The system prompts the SOP owner before lapse and flags overdue. A connected AI-assisted **maintenance schedule** designs and maintains the plan for which new SOPs to create and which old SOPs to update — proactive lifecycle management, not just reminders.
+> Migration 00030 lives on prod. Phase 15 manufacturing-line mode uses this. Per-site dashboards + per-site SOP rollout + per-site sign-off chains not pursued unless customer signal arrives.
 
-**Criteria:** Per-SOP review_due_at field ❌ · Default cadence per category (chemical 6mo, machinery 12mo) ❌ · Dashboard widget for due/overdue ❌ · Email digest T-30 / T-7 / overdue ❌ · Overdue SOPs flagged in worker view ❌ · **AI-assisted SOP development + maintenance schedule — designs the plan for creating new SOPs and updating old ones, evolves with the org's portfolio** ❌
+**Current:** F · **Target:** A
 
-**Current:** F · **Target:** A · **Priority:** Next
+#### G-06 — Training-Record Export · Later
 
-#### G-04 — Role-Based Access + Stale-Role Surfacing
+CSV/Excel export + per-worker view + SAP SuccessFactors integration target. Demoted from Next in v0.3.
+**Current:** D · **Target:** A
 
-**Plain English:** Each user has a role (Worker, Supervisor, Admin, Safety Manager, Discipline Leader) determining what they can see and do. Roles are editable at will, and any SOP whose access list references an outdated role surfaces in the governance review queue.
+#### G-07 — Team & Invite Management · Later
 
-**Criteria:** Worker, Supervisor, Admin, Safety Manager roles defined ✅ · Role-based RLS server-side ✅ · Role assigned per organisation member ✅ · Discipline Leader role (full) ❌ · Trade-level granularity (electrical-supervisor vs mechanical) ❌ · **Roles can be defined and re-defined at will — SOPs with out-of-date role access surface in governance review queue for update** ❌
+> **Simon's note:** *Team structures are necessary.*
 
-**Current:** F · **Target:** A · **Priority:** Next
-
-#### G-05 — Site-Tier Multi-Tenancy
-
-**Plain English:** A multi-site customer (e.g. Visy with ~100 sites) can scope SOPs to specific sites within their org, route assignments / approvals to site-local staff, and view per-site dashboards.
-
-**Criteria:** Site entity in data model ✅ · Sub-trade tags routed via RLS ✅ · Per-site dashboards for site managers ❌ · Per-site SOP rollout ❌ · Per-site sign-off chains ❌
-
-**Current:** F · **Target:** A · **Priority:** Next — Visy is the named customer.
-
-#### G-06 — Training-Record Export (SuccessFactors target)
-
-**Plain English:** Completed SOPs become evidence in a worker's training record. The org can export these records — for audits, for migration into HR systems (SAP SuccessFactors is the target integration).
-
-**Criteria:** Completion records carry timestamp + worker_id + photo ✅ · CSV/Excel export for date range ❌ · Per-worker training-record view ❌ · SAP SuccessFactors integration target ❌ · Export filterable by site, role, category, date ❌
-
-**Current:** D · **Target:** A · **Priority:** Next — Visy interview surfaced SuccessFactors.
-
-#### G-07 — Team & Invite Management
-
-**Plain English:** Org admin invites workers via email or shareable invite code, assigns roles, views active members, revokes access.
-
-**Criteria:** Email invite with role pre-assigned ✅ · Shareable invite code with role pre-assigned ✅ · Active members list with role ✅ · Bulk CSV import ❌ · SSO/SAML for enterprise ❌ · Deactivate-without-delete preserves history ❌
-
-**Current:** B · **Target:** A · **Priority:** Later
+Bulk CSV import + SSO/SAML + deactivate-preserving-history.
+**Current:** B · **Target:** A
 
 ---
 
 ### 4.5 Accessibility (6 features)
 
-#### X-01 — SOP Search + AI-Managed Categorisation
+#### X-01 — SOP Search + AI-Managed Categorisation · Next
 
-**Plain English:** Worker types a few words ("scaffold," "manual handling," "electrical isolation") and finds the SOP. Categorisation and structure of SOPs is managed by AI — manufacturing sites aren't database experts, and the taxonomy evolves as new SOP attributes emerge.
+Full-text + synonym/misspelling tolerance + offline search + recently-used first. **Categorisation managed by AI, evolves as new SOP attributes emerge — manufacturing sites aren't database experts.**
+**Current:** C · **Target:** A
 
-**Criteria:** Worker-facing search input on SOPs tab ✅ · Matches title + category tag ✅ · Full-text content search ❌ · Synonym / misspelling tolerance ❌ · Offline search against locally-cached SOPs ❌ · Recently-used SOPs first on empty search ❌ · **Categorisation and structure handled by AI, evolves over time as new SOP attributes are created (orgs aren't database experts)** ❌
+#### X-02 — AI Voice Q&A on an SOP · Now
 
-**Current:** C · **Target:** A · **Priority:** Next
+Worker has hands-free question about current SOP. AI grounded only to that SOP's content.
+**Open criteria (v4.0 scope):** reliable transcription in industrial-floor noise · answer read back aloud · voice drives step progression · multi-language voice.
+**Current:** F · **Target:** A
 
-#### X-02 — AI Voice Q&A on an SOP
+#### X-03 — Cmd+K Command Palette + Universal AI Access · Now
 
-**Plain English:** Worker has a hands-free question about the current SOP ("how tight should this bolt be?" "what PPE for the next step?"). Taps a button, asks in plain English, AI answers grounded only to that SOP's content.
+Power-user Cmd+K palette. Underlying this: **every editable field offers AI read access, most offer AI write access. End goal: app is 99% controllable by AI agents via a unified interface.**
+**Current:** F · **Target:** A
 
-**Criteria:** Voice button on walkthrough ✅ · Answers strictly grounded to active SOP ✅ · Citations to specific steps/blocks ✅ · Verifier flags uncertainty rather than guessing ✅ · Per-user concurrency cap ✅ · Reliable transcription in industrial-floor noise ❌ · Answer read back aloud (full-audio loop) ❌ · Voice drives step progression ("I've done step 4, what's next") ❌ · Multi-language voice support ❌
+#### X-04 — Global Header Navigation · Shipped
 
-**Current:** F · **Target:** A · **Priority:** Now — voice-driven flow is part of W-01's literacy story.
+Persistent top header on every protected route. Role-aware nav, brand mark, profile menu, mobile hamburger drawer.
+**Current:** A · **Target:** A · Shipped 2026-05-22
 
-#### X-03 — Cmd+K Command Palette + Universal AI Access
+#### X-05 — AI Assistant as Primary Interface + Layered Architecture · Later
 
-**Plain English:** Power users press Cmd+K and jump to anything. Underlying this: every editable field in the app has AI read access, most have AI write access. End goal is an app 99% controlled and managed by AI agents.
+Worker doesn't navigate — they talk to the AI. Underlying layered architecture (database → routing → agents → memory → UI) is upgradeable without rebuilding features.
+**Current:** F · **Target:** A · Depends on X-02 and X-03 maturing first.
 
-**Criteria:** Cmd+K global palette ✅ · Cross-SOP search ✅ · Cross admin pages, team, settings ❌ · Recently-used actions first ❌ · Mobile alternative (swipe / long-press) ❌ · **Every editable field offers AI read access** ❌ · **Most editable fields offer AI write access** ❌ · **End goal: app is 99% controllable by AI agents via a unified interface** ❌
+#### X-06 — Visual-Only Flow · Maybe
 
-**Current:** F · **Target:** A · **Priority:** Now (promoted from Later — this is the architectural backbone)
+Worker with low literacy completes SOPs entirely through photos, diagrams, icons. No required reading.
 
-#### X-04 — Global Header Navigation
+> Demoted from Now in v0.3. Voice-driven completion (W-01 + X-02) carries the literacy story for v4.0; visual-only flow returns to the roadmap if voice doesn't close the TAM gap.
 
-**Plain English:** Every page has a header with the SOPstart logo, role-aware nav, profile menu — so users always know where they are and can jump anywhere.
-
-**Criteria:** Persistent top header on every protected route ✅ · Role-aware navigation ✅ · SOPstart brand mark + wordmark ✅ · Profile menu with sign-out ✅ · Mobile hamburger drawer ✅ · Bundle cost bounded by CI gate ✅
-
-**Current:** A · **Target:** A · **Priority:** Shipped 2026-05-22
-
-#### X-05 — AI Assistant as Primary Interface + Layered AI Architecture
-
-**Plain English:** A worker doesn't navigate — they ask the AI. "Show me the lockout SOP." "Mark step 4 as done." "Take a photo of the panel." The whole app is steerable by voice + conversation. Beneath this, AI is built into every surface with a unified interface — designed in layers (database / agent routing / agents / memory / UI) so models, agents, and token budgets are upgradeable without rebuilding features.
-
-**Criteria:** Natural-language commands across all primary actions ❌ · Wake-word or single-tap activation ❌ · Multi-turn conversation (AI asks clarifying questions back) ❌ · Works offline for cached SOPs (no LLM roundtrip) ❌ · AI surfaces own confidence — refuses to act if uncertain ❌ · **Unified AI interface across every app surface, designed in layers (database → agent routing → agents → memory → UI) for upgradeability** ❌
-
-**Current:** F · **Target:** A · **Priority:** Later — vision target. Depends on X-02 and X-03 maturing first.
-
-#### X-06 — Visual-Only Flow
-
-**Plain English:** A worker with low literacy can complete an SOP relying entirely on photos, diagrams, and icons — no required reading.
-
-**Criteria:** Every step carries a primary photo/diagram anchoring the action ❌ · Standardised icons for hazards, PPE, tools ❌ · Visual progress indicator (5 of 12 steps, no English) ❌ · "Show me" affordance opens photo/diagram full-screen ❌ · Visual-only audit trail (supervisor reviews via photos) ❌
-
-**Current:** F · **Target:** A · **Priority:** Now — load-bearing for blue-collar TAM.
+**Current:** F · **Target:** A
 
 ---
 
-### 4.6 Compliance & Legislation (4 features — NEW)
+### 4.6 Compliance & Legislation (4 features)
 
-This category is new in v0.2. Compliance with WorkSafe NZ / AS-NZS / industry-specific legislation is a customer-acquisition lever for industrial customers, not an afterthought.
+#### C-01 — Legislation Library · Maybe
 
-#### C-01 — Legislation Library
+Curated machine-readable library of NZ workplace-safety legislation. Demoted in v0.3 — needs explicit customer signal before commitment.
+**Current:** F · **Target:** A
 
-**Plain English:** A curated, machine-readable library of NZ workplace-safety legislation — WorkSafe regulations, AS/NZS standards, industry-specific codes — kept up to date and queryable by SOP authors.
+#### C-02 — Per-SOP Legislation Links · Later
 
-**Criteria:** Catalog of NZ WorkSafe regulations + AS/NZS standards relevant to industrial SOPs ❌ · Org tier (org's own internal regulations) + Potenco-curated global tier ❌ · Each entry carries: citation, effective date, summary, source link, category tags ❌ · Library refreshed on a periodic cadence (and surfaces changes to subscribers) ❌ · Searchable from the builder + browsable as a standalone admin surface ❌ · AI read/write access (agents can query legislation, propose new entries) ❌
+Each SOP cites specific clauses it satisfies. Auditors export by regulation.
+**Current:** F · **Target:** A
 
-**Current:** F · **Target:** A · **Priority:** Next
+#### C-03 — AI Legislation Scanner · Later
 
-#### C-02 — Per-SOP Legislation Links
+AI scans every SOP, surfaces relevant legislation matches and gaps.
+**Current:** F · **Target:** A
 
-**Plain English:** Each SOP carries explicit links to the specific clauses / regulations it satisfies. Workers see "this SOP satisfies WorkSafe regulation X clause Y"; auditors see provenance.
+#### C-04 — Compliance Audit Trail · Later
 
-**Criteria:** SOP can link to one or more legislation entries (from C-01) ❌ · Links are per-section or per-step, not just per-SOP (granular provenance) ❌ · Workers see "this satisfies regulation X" as inline reference ❌ · Auditors export "all SOPs satisfying regulation X" as a one-shot report ❌ · Links survive SOP versioning (audit trail) ❌
-
-**Current:** F · **Target:** A · **Priority:** Next
-
-#### C-03 — AI Legislation Scanner
-
-**Plain English:** When an SOP is drafted or edited, an AI scans its content and surfaces relevant legislation matches — and gaps. "This SOP describes confined-space entry but doesn't reference Regulation X — should it?"
-
-**Criteria:** AI scan runs on every draft + on demand ❌ · Surfaces matches (legislation X clause Y is referenced) and gaps (regulation Z should be referenced but isn't) ❌ · Confidence-graded — fail-safe to "uncertain" rather than guessing ❌ · Auto-suggests legislation links the admin can accept one-click ❌ · Cost bounded (prompt-caching + per-org spend cap) ❌
-
-**Current:** F · **Target:** A · **Priority:** Next
-
-#### C-04 — Compliance Audit Trail
-
-**Plain English:** Every legislation link, scan, and acceptance is logged immutably. An auditor can reconstruct exactly which regulations an SOP claimed compliance with at any historical point, and which AI scans were run.
-
-**Criteria:** Append-only log of every legislation link (added, removed, updated) ❌ · Log of every AI scan run + the suggestions surfaced + admin response ❌ · Audit-exportable as CSV/PDF for regulatory review ❌ · Survives SOP versioning (links to the version that was active at the time) ❌
-
-**Current:** F · **Target:** A · **Priority:** Later
+Append-only log of every legislation link + scan + acceptance.
+**Current:** F · **Target:** A
 
 ---
 
 ### 4.7 Platform (5 features)
 
-#### P-01 — Multi-Tenant RLS
+#### P-01 — Multi-Tenant RLS · Shipped
 
-**Plain English:** Every customer's data is fully isolated. No cross-tenant leakage possible even with a code bug — the database refuses to return another org's rows.
+Supabase RLS + JWT custom claims + cross-tenant seed test + SECURITY DEFINER helpers.
+**Current:** A · **Target:** A · Phase 1.
 
-**Criteria:** Supabase RLS on every table ✅ · JWT custom claims carry org_id ✅ · Cross-tenant isolation seed test ✅ · SECURITY DEFINER helpers ✅ · Per-customer encryption-at-rest with org-scoped keys ❌ · Audit log of admin-client cross-tenant boundaries ❌
+#### P-02 — PWA Shell · Later
 
-**Current:** A · **Target:** A · **Priority:** Shipped
+Web App Manifest, service worker, install-prompts, white-label splash + tab colour per org.
+**Current:** B · **Target:** A
 
-#### P-02 — PWA Shell
+#### P-03 — Bundle Isolation CI Gate · Later
 
-**Plain English:** The app installs to the worker's phone like a native app, works offline, looks like a normal app icon rather than a browser tab.
+check-bundle-size in postbuild, ±2 KB tolerance, CI merge-blocking on failure, per-PR delta report.
+**Current:** B · **Target:** A
 
-**Criteria:** Web App Manifest with maskable + any icons ✅ · Serwist service worker registered + caching ✅ · Installable on iOS Safari + Android Chrome ✅ · Online/offline status banner ✅ · Brand-consistent icons across favicon + apple-touch + PWA ✅ · "Open in Safari/Chrome" install prompts ❌ · Splash-screen + tab-colour customisation per org (white-label) ❌
+#### P-04 — Security Hardening (CSP, HSTS) · Next
 
-**Current:** B · **Target:** A · **Priority:** Later
+Modern HTTP security headers (CSP, HSTS, frame-ancestors, X-Content-Type-Options, Permissions-Policy).
+**Current:** F · **Target:** A
 
-#### P-03 — Bundle Isolation CI Gate
+#### P-05 — Performance Monitoring + Full Usage Telemetry · Later
 
-**Plain English:** Every code change is checked against the worker's bundle size. New admin features cannot bloat what workers download.
-
-**Criteria:** check-bundle-size.ts runs in postbuild ✅ · Baseline locked with documented drift rationale ✅ · ±2 KB tolerance per route ✅ · Chunk-existence assertions ✅ · CI workflow blocks merge on gate failure ❌ · Per-PR bundle delta posted to PR conversation ❌
-
-**Current:** B · **Target:** A · **Priority:** Later
-
-#### P-04 — Security Hardening (CSP, HSTS, frame-ancestors)
-
-**Plain English:** Modern HTTP security headers (CSP, HSTS, frame-ancestors) prevent malicious iframe embedding and script injection.
-
-**Criteria:** CSP allowlists for Supabase, Anthropic, Railway ❌ · HSTS max-age=31536000, includeSubDomains, preload ❌ · frame-ancestors 'self' or 'none' ❌ · X-Content-Type-Options nosniff + Referrer-Policy strict-origin ❌ · Permissions-Policy lockdown ❌
-
-**Current:** F · **Target:** A · **Priority:** Next
-
-#### P-05 — Performance Monitoring + Full Usage Telemetry
-
-**Plain English:** When something is slow or broken on a customer's site, we see it immediately. Beyond errors and Web Vitals, the platform captures full usage telemetry — what SOPs were used, user interaction stats, action sequences — structured into databases for AI review and analysis (which feeds X-05 and other AI agents).
-
-**Criteria:** Frontend error tracking (Sentry-equivalent) ❌ · Web Vitals (LCP, FID, CLS) per route per org ❌ · Backend trace capture for parse pipeline ❌ · Async error surfacing — after() errors not silently swallowed (LR-03 debt) ❌ · Per-org rate-limit dashboards (AI spend, photo upload) ❌ · **Full usage telemetry — SOPs used, interaction stats, action sequences — captured + structured for AI review and analysis** ❌
-
-**Current:** F · **Target:** B · **Priority:** Later (telemetry is foundational for AI-everywhere — may promote to Next once X-05 architecture lands)
+Error tracking + Web Vitals + backend traces + async error surfacing (LR-03) + per-org rate-limit dashboards. **Full usage telemetry (SOPs used, interaction stats, action sequences) structured for AI review and analysis.**
+**Current:** F · **Target:** B
 
 ---
 
 ### 4.8 Intake (6 features)
 
-#### I-01 — Word / PDF Document Parsing
+#### I-01 — Word / PDF Document Parsing · Now
 
-**Plain English:** Admin uploads an existing Word doc or PDF SOP; the app parses it into structured sections, runs OCR for scans, and presents the result for review.
+Admin uploads Word/PDF; app parses to structured sections + OCR fallback + GPT-4o structured parsing. **v4.0 target:** Phase 20 contract complete — extracted photos/diagrams/charts/tables with step-level provenance + side-by-side source viewer (S-02) + AI reviewer × 5 jobs (S-03) + per-block verify checklist (S-04).
+**Current:** D · **Target:** A
 
-**Criteria:** DOCX text + image extraction ✅ · PDF text + image extraction ✅ · OCR fallback for scanned PDFs ✅ · GPT-4o structured parsing ✅ · Async pipeline ✅ · Realtime + polling status ✅ · DOCX images anchored to steps ✅ · Parsed drafts → builder layout_data ✅ · Photos/diagrams/charts/tables extracted with step-level provenance ❌ · Per-block verify checklist at publish gate (Phase 20 — see S-04) ❌ · Side-by-side source viewer (Phase 20 — see S-02) ❌ · AI reviewer × 5 jobs (Phase 20 — see S-03) ❌
+#### I-02 — Image / Photo OCR · Later
 
-**Current:** D · **Target:** A · **Priority:** Now — Phase 20 remainder is the highest-value safety story.
+JPG/PNG upload + GPT-4o vision OCR + blur check + multi-page scan + auto-stitching.
+**Current:** B · **Target:** A
 
-#### I-02 — Image / Photo OCR
+#### I-03 — Excel / PowerPoint / Text Parsing · Later
 
-**Plain English:** Admin uploads a phone photo of a paper SOP; the app extracts text via OCR and routes through the parse pipeline.
+xlsx/pptx/txt accepted + officeparser + merged cells + speaker notes.
+**Current:** B · **Target:** B
 
-**Criteria:** JPG / PNG upload ✅ · GPT-4o vision as primary OCR ✅ · Pre-flight Laplacian-blur check ✅ · Multi-page photo scan with per-page review ❌ · "Hold camera steady" real-time blur feedback ❌ · Auto-stitching of multi-page photographed documents ❌
+#### I-04 — Video Transcription + AI-Narrated Capture · Later
 
-**Current:** B · **Target:** A · **Priority:** Later
+MP4/MOV upload + YouTube + GPT-4o structuring. **Substantial new scope:** record video of yourself doing the procedure (first OR third person view); AI watches, describes physical actions, breaks into SOP steps.
+**Current:** F · **Target:** A
 
-#### I-03 — Excel / PowerPoint / Text Parsing
+#### I-05 — In-App Video Recording · Maybe
 
-**Plain English:** Admin uploads xlsx, pptx, or plain text; routed through the same parse pipeline.
+In-browser MediaRecorder + iOS Safari fallback + live transcription preview + step-boundary auto-detection. Blocked on iOS Safari MediaRecorder maturity.
+**Current:** F · **Target:** B
 
-**Criteria:** xlsx / pptx / txt accepted ✅ · officeparser handles xlsx + pptx ✅ · Macro-enabled formats rejected at validation ✅ · Excel tables with merged cells / multi-row headers parsed correctly ❌ · PowerPoint speaker notes incorporated into step text ❌
+#### I-06 — Video SOP Generation · Later
 
-**Current:** B · **Target:** B · **Priority:** Later — uncommon SOP source formats.
-
-#### I-04 — Video Transcription + AI-Narrated Capture (1st + 3rd Person)
-
-**Plain English:** Admin uploads an MP4/MOV or pastes a YouTube URL; the app transcribes and structures into an SOP draft. **New scope:** Admin (or worker) records video of themselves performing the procedure — either first-person (head-cam style) or third-person — and AI watches the video, describes the physical events, and breaks them into SOP steps. The video itself replaces voice transcription as the input format.
-
-**Criteria:** MP4 / MOV upload (TUS) ✅ · YouTube URL via caption API ✅ · Transcript review surface ✅ · GPT-4o transcript structuring ✅ · Adversarial verifier ✅ · Industrial-floor transcription accuracy on NZ-accented speakers ❌ · Vimeo URL pathway ❌ · Mid-video diagram/whiteboard frame extraction ❌ · **First-person view narration — AI watches procedure video, describes physical actions, breaks into SOP steps** ❌ · **Third-person view narration — AI watches procedure video, describes physical actions, breaks into SOP steps** ❌
-
-**Current:** F · **Target:** A · **Priority:** Later — promoted in scope; the AI-narrated capture is a substantially new intake pathway.
-
-#### I-05 — In-App Video Recording
-
-**Plain English:** Admin presses record in the browser, films a procedure on their phone or laptop, and the app transcribes it into an SOP draft on the spot.
-
-**Criteria:** In-browser camera recording (MediaRecorder) ❌ · iOS Safari fallback (file-upload picker) ❌ · Live transcription preview while recording ❌ · Auto-detection of step boundaries from pauses / "next" cues ❌
-
-**Current:** F · **Target:** B · **Priority:** Maybe — blocked on iOS Safari MediaRecorder maturity.
-
-#### I-06 — Video SOP Generation
-
-**Plain English:** Admin clicks "Generate video SOP" on a published SOP; the app produces a narrated video version for orgs that train via video.
-
-**Criteria:** Narrated slideshow format ✅ · Screen-recording-style format ✅ · AI-generated video format (Shotstack) ✅ · Multiple video versions per SOP with labels ✅ · TTS pronunciation dictionary per org ❌ · Mandatory audio preview before publish ❌ · Streamlined File→Video pipeline ❌ · 90-day TTL retention enforced ❌ · Per-tenant storage quota in settings ❌
-
-**Current:** B · **Target:** A · **Priority:** Later — current implementation functional; polish + cost-control later.
+Narrated slideshow + screen-recording + Shotstack AI video + per-org TTS pronunciation + retention TTL + per-tenant quota.
+**Current:** B · **Target:** A
 
 ---
 
-## 5. Phased Roadmap (Visual)
+## 5. Phased Roadmap
 
 ### 🟢 v3.0 — Native SOP Builder (SHIPPED 2026-05-23)
 
@@ -526,71 +412,70 @@ Phases 11 / 12 / 12.5 / 13 / 14 / 14.5 / 15 + Phase 20 partial. See `.planning/M
 
 ---
 
-### 🟡 v4.0 — Safety-Critical Parsing + Worker Accessibility + AI Foundation (NOW)
+### 🟡 v4.0 — Safety-Critical Parsing + AI Foundation + Voice-Driven Workers (NOW)
 
-**Theme:** Three intertwined pulls. (1) Finish the safety-critical conversion pipeline that v3.0 left partial. (2) Make the worker experience usable for the blue-collar TAM (literacy, visual, voice). (3) Lay the AI-everywhere foundation (X-03 architectural backbone) so subsequent milestones build on it instead of retrofitting.
+**Theme:** Two intertwined pulls. (1) Finish Phase 20 — every parsed SOP has source-anchored fidelity, AI-verified content, and a publish gate that forces per-block verification. (2) Lay the AI-everywhere foundation that the conversational app vision (v5.0) builds on. Voice-driven walkthrough (W-01 + X-02) carries the literacy story.
 
-**Goal:** No worker on a NZ industrial site is excluded by literacy. No parsed SOP can be published without verified anchoring. AI read/write is plumbed through the underlying data model for every feature.
+**Goal:** No parsed SOP can be published without verified anchoring. Every editable field is AI-callable. A worker who can't read English can still complete an SOP by voice.
 
-| Priority | Feature | Forward grade gap |
+| # | Feature | Forward grade gap |
 |---|---|---|
-| Now | S-02 Side-by-side source viewer | F → A |
-| Now | S-03 AI reviewer × 5 jobs | F → A |
-| Now | S-04 Per-block verify checklist | F → A |
-| Now | I-01 Word/PDF parsing (Phase 20 remainder) | D → A |
-| Now | W-01 Walkthrough literacy/visual/voice | B → A |
-| Now | X-02 Voice Q&A drives walkthrough + reads aloud | F → A |
-| Now | X-03 Cmd+K + universal AI read/write field access | F → A |
-| Now | X-06 Visual-only flow | F → A |
-| Now | G-01 Version supersede + diff + worker-instance sign-off | F → A |
-| Now | W-03 iOS storage eviction warning + last-sync timestamp | B → A |
+| 1 | **S-02** Side-by-side source viewer | F → A |
+| 2 | **S-03** AI reviewer × 5 jobs | F → A |
+| 3 | **S-04** Per-block verify checklist | F → A |
+| 4 | **I-01** Word/PDF parsing (Phase 20 contract complete) | D → A |
+| 5 | **W-01** Walkthrough literacy/voice gaps closed | B → A |
+| 6 | **X-02** Voice Q&A drives walkthrough + reads aloud | F → A |
+| 7 | **X-03** Cmd+K + universal AI read/write field access | F → A |
+| 8 | **G-01** Version supersede + diff + worker-instance sign-off | F → A |
+
+**Out of v4.0 scope (carried to v4.5 or later):** offline polish (W-03), visual-only flow (X-06), legislation library (C-01..C-03), kiosk mode (W-04), approval chains (G-02), templates (A-05).
 
 ---
 
-### 🟠 v4.5 — Customer-Acquisition + Compliance + Visy Pilot Closeout (NEXT)
+### 🟠 v4.5 — Customer-Acquisition + Visy Pilot Closeout (NEXT)
 
-**Theme:** Turn the platform into something Visy can move 100 sites onto, and something prospective NZ industrial customers can self-serve into a paid tier. Compliance/legislation moves from afterthought to first-class product surface.
+**Theme:** Make the platform Visy-deployable across 100 sites. Templates, governance chains, search, security hardening.
 
-| Priority | Feature | Forward grade gap |
+| # | Feature | Forward grade gap |
 |---|---|---|
-| Next | A-05 NZ Template Library | F → A |
-| Next | **C-01 Legislation Library** | F → A |
-| Next | **C-02 Per-SOP Legislation Links** | F → A |
-| Next | **C-03 AI Legislation Scanner** | F → A |
-| Next | G-02 Multi-step approval chain (optional, versioned) | F → A |
-| Next | G-03 Review-due cadence + AI maintenance schedule | F → A |
-| Next | G-04 Roles + stale-role surfacing | F → A |
-| Next | G-05 Site-tier multi-tenancy (per-site dashboards + rollout) | F → A |
-| Next | G-06 Training-record export + SuccessFactors target | D → A |
-| Next | W-04 Kiosk mode + sequence-enforced walkthrough | B → A |
-| Next | W-05 PIN/badge sign-off at shared workstations | B → A |
-| Next | X-01 Full-text + synonym search + AI-managed taxonomy | C → A |
-| Next | S-05 Pinned PPE icon strip | B → A |
-| Next | P-04 CSP/HSTS hardening | F → A |
-| Next | W-02 Voice-annotated photos + GPS-tagged capture | B → A |
+| 1 | A-05 NZ Template Library (Visy glass-mfg-focused research) | F → A |
+| 2 | W-04 Kiosk mode + sequence-enforced walkthrough | B → A |
+| 3 | W-05 PIN/badge sign-off at shared workstations | B → A |
+| 4 | S-05 Pinned PPE icon strip | B → A |
+| 5 | G-02 Multi-step approval chain (optional, versioned) | F → A |
+| 6 | G-03 Review-due cadence + AI maintenance schedule | F → A |
+| 7 | G-04 Roles + stale-role surfacing | F → A |
+| 8 | X-01 Full-text search + AI-managed taxonomy | C → A |
+| 9 | P-04 CSP/HSTS security hardening | F → A |
 
 ---
 
-### 🔵 v5.0 — Conversational App + Annotation + Telemetry (LATER)
+### 🔵 v5.0 — Conversational App + Telemetry + Diagram Annotation (LATER)
 
-**Theme:** App becomes primarily AI-steerable. Diagram annotation lands. Telemetry feeds the AI layer.
+**Theme:** App becomes primarily AI-steerable. Annotation lands. Telemetry feeds the AI layer.
 
-| Priority | Feature | Forward grade gap |
-|---|---|---|
-| Later | X-05 AI assistant as primary interface + layered architecture | F → A |
-| Later | A-06 Konva image/diagram annotation | F → A |
-| Later | A-03 AI draft learns house style + multimodal input + relational naming | F → A |
-| Later | A-04 AI-suggested blocks | F → A |
-| Later | A-01 Inline AI assistant in SOP Builder + collab + tablet | F → A |
-| Later | S-01 Adversarial verifier learns from history | B → A |
-| Later | C-04 Compliance audit trail | F → A |
-| Later | W-06 Push notifications + email digest + quiet hours | C → B |
-| Later | X-02 Multi-language voice support | (continued) |
-| Later | X-03 (continued — recently-used actions, mobile alternative) | (continued) |
-| Later | P-02 White-label splash/tab-colour per org | B → A |
-| Later | P-05 Performance monitoring + LR-03 + full usage telemetry | F → B |
-| Later | I-04 Industrial transcription accuracy + 1st/3rd person AI-narrated capture | F → A |
-| Later | I-06 Streamlined File→Video + TTS pronunciation dictionaries | B → A |
+| Feature |
+|---|
+| A-01 SOP Builder polish — inline AI assistant + collab + tablet/phone |
+| A-03 AI draft — house style + multimodal + relational naming |
+| A-06 Konva image/diagram annotation (requires AI integration) |
+| W-03 Offline polish — iOS eviction warning, last-sync UI |
+| W-06 Push notifications + email digest + quiet hours |
+| S-01 Adversarial verifier learns from history |
+| G-06 Training-record export + SuccessFactors |
+| G-07 Team management — bulk CSV, SSO, deactivate-preserving-history |
+| X-05 AI assistant as primary interface + layered architecture |
+| C-02 Per-SOP legislation links |
+| C-03 AI legislation scanner |
+| C-04 Compliance audit trail |
+| P-02 White-label PWA splash/tab-colour per org |
+| P-03 CI workflow blocks merge on bundle-gate failure |
+| P-05 Performance monitoring + full usage telemetry |
+| I-02 Multi-page photo OCR + auto-stitching |
+| I-03 Excel merged cells + PowerPoint speaker notes |
+| I-04 Industrial transcription accuracy + 1st/3rd-person AI-narrated capture |
+| I-06 Streamlined File→Video + TTS pronunciation dictionaries |
 
 ---
 
@@ -598,66 +483,67 @@ Phases 11 / 12 / 12.5 / 13 / 14 / 14.5 / 15 + Phase 20 partial. See `.planning/M
 
 | Feature | Why "Maybe" |
 |---|---|
-| A-07 Collaborative editing | No contention observed in single-admin pattern. |
-| I-05 In-app video recording | iOS Safari MediaRecorder still unreliable. |
-| I-02 advanced — multi-page stitching | Photo OCR usage low; revisit if frequency grows. |
-| A-04 — Block usage analytics | Internal product instrumentation. |
-| G-07 — Bulk CSV team import + SSO | Premium-tier; tie to pricing milestone. |
-| P-01 — Per-customer encryption-at-rest | Enterprise sales requirement. |
+| A-04 Block library — usage analytics + AI-suggested blocks | Existing library functional; analytics is internal instrumentation |
+| A-07 Collaborative editing | No contention observed; wait for first complaint |
+| X-06 Visual-only flow | Voice-driven completion (W-01 + X-02) carries literacy story for now |
+| C-01 Legislation Library | Demoted in v0.3 — needs explicit customer signal first |
+| I-05 In-app video recording | iOS Safari MediaRecorder still unreliable |
 
 ---
 
 ### 🔴 Cut
 
+**Cut (shipped — no further roadmap investment):**
+
+| Feature | Why "Cut but shipped" |
+|---|---|
+| W-02 Photo Evidence Capture | Code remains in product. No voice-annotated-photo or GPS-tagging extension unless customer signal arrives. |
+| G-05 Site-Tier Multi-Tenancy | Migration 00030 lives on prod; Phase 15 manufacturing-line uses it. Per-site dashboards + rollouts not pursued unless customer signal arrives. |
+
+**Cut (rejected, never built):**
+
 | Feature | Why cut |
 |---|---|
 | ModelBlock (3D model embed) | Considered in Phase 12.5, dropped. Bundle weight + niche use. |
 | Vimeo URL pathway | API scope never confirmed; YouTube + upload cover use case. |
-| In-house OCR engine | tesseract.js + GPT-4o vision are sufficient. |
+| In-house OCR engine | tesseract.js + GPT-4o vision sufficient. |
 
 ---
 
 ## 6. Partner Communication Index
 
-One-line plain-English explanations for verbal use:
-
-- **A-01 SOP Builder** — "Admins build SOPs in the browser by dragging blocks. AI assists inline."
+- **A-01 SOP Builder** — "Admins build SOPs in the browser. Block selection needs better guidance for first-timers."
 - **A-03 AI draft** — "Admin types a sentence; AI writes the SOP."
-- **A-05 Templates** — "Library of ready-to-clone NZ industry SOPs."
-- **C-01 Legislation Library** — "Curated library of WorkSafe NZ + AS/NZS standards, kept current."
-- **C-02 Per-SOP Legislation Links** — "Each SOP cites the regulations it satisfies; auditors export by regulation."
-- **C-03 AI Legislation Scanner** — "AI scans every SOP and surfaces missing legislation references."
-- **W-01 Walkthrough** — "Worker taps through one step at a time on their phone."
-- **W-03 Offline** — "Works on a job site with no signal."
+- **A-05 Templates** — "Library of ready-to-clone NZ industry SOPs, Visy-glass-mfg-focused first."
+- **W-01 Walkthrough** — "Worker taps through one step at a time on their phone — soon they'll be able to do it entirely by voice."
 - **S-02 Source viewer** — "When reviewing a parsed SOP, admin sees the original side-by-side."
 - **S-03 AI reviewer** — "Five AI quality checks run automatically on every parsed SOP."
 - **S-04 Verify checklist** — "Admin must tick 'verified' on every block before publish."
 - **G-01 Version history + sign-off** — "Every version is saved; every worker run is signed step-by-step."
 - **G-02 Approval chain** — "SOPs route through configurable approvers; the chain is optional and per-version."
 - **G-03 Maintenance schedule** — "AI helps plan which SOPs to create and which to update."
-- **G-06 Training-record export** — "Completed SOPs become evidence; exports to SuccessFactors."
+- **G-04 Stale-role surfacing** — "When roles change at the org, affected SOPs surface in the governance queue."
 - **X-02 Voice Q&A** — "Worker asks the AI a hands-free question about the current SOP."
 - **X-03 AI everywhere** — "Every field is AI-readable; most are AI-writable; goal is 99% AI-controllable."
 - **X-05 AI assistant** — "Long-term: workers and admins talk to the AI; navigation becomes optional."
-- **X-06 Visual flow** — "Workers with low literacy complete SOPs through pictures and icons only."
+- **I-01 Document parsing** — "Word, PDF, photo of a paper SOP — all parse into the builder with verified anchoring."
 - **I-04 AI-narrated capture** — "Record yourself doing the job; AI watches and writes the SOP."
 - **P-04 Security hardening** — "Modern security headers; no iframe embedding."
-- **P-05 Telemetry** — "Full usage data feeds the AI layer for analysis and improvement."
 
 ---
 
 ## 7. Open Questions for Partners
 
-- **TAM positioning:** Australian / NZ industrial (Visy-shape) only, or also trades-services SMB? SMB has different pricing and feature acceptance criteria.
-- **Pricing tier definitions:** Enterprise (SuccessFactors, SSO, compliance audit), Pro (templates, approval chains, legislation library), Free (basic walkthrough)?
-- **Customer-acquisition channel:** direct sales, partner-channel via NZ trade associations, or self-serve?
-- **Compliance scope:** WorkSafe NZ general, AS/NZS 4801, ISO 45001? Cert-driven feature gaps differ from competitive-driven gaps.
+- **TAM positioning:** Australian / NZ industrial (Visy-shape) primary, or also trades-services SMB?
+- **Pricing tier definitions:** Enterprise (SuccessFactors, SSO), Pro (templates, approval chains), Free (basic walkthrough)?
+- **Customer-acquisition channel:** direct sales, partner-channel, or self-serve?
+- **Compliance scope:** WorkSafe NZ general, AS/NZS 4801, ISO 45001? (Demoting the Legislation features in v0.3 means we're not committing to this yet — flag if you want it back.)
 
 ---
 
 ## 8. Maintenance
 
-This document is **generated** from `.planning/product-roadmap.data.json` (the canonical machine-readable source). Edit via `.planning/product-roadmap.html` in your browser, export JSON, and the next regeneration uses the JSON as the new base.
+This document is generated from `.planning/product-roadmap.data.json` (the canonical machine-readable source). Edit via `.planning/product-roadmap.html` in your browser, export JSON, and the next regeneration uses the JSON as the new base.
 
 **Regeneration flow:**
 
@@ -665,14 +551,14 @@ This document is **generated** from `.planning/product-roadmap.data.json` (the c
 2. Review / edit / add features / mark reviewed / mark disputed
 3. Click **Export JSON** — save the file
 4. Hand the JSON back to Claude (or replace `.planning/product-roadmap.data.json` directly)
-5. Claude regenerates this Markdown doc (and updates the HTML baseline if structural changes — new categories, criteria patterns)
+5. Claude regenerates this Markdown doc and updates `product-roadmap-data.js` (the editor baseline)
 
 **Evolution triggers:**
 
 - Milestone completion → feature grades update, completed phases move to "shipped"
 - Customer interview → new acceptance criteria added to relevant features
-- Quarterly review → priorities re-shuffled based on actual customer signal
+- Quarterly review → priorities re-shuffled
 
 ---
 
-*Last updated 2026-05-24 — v0.2 (forward-looking grades, AI-everywhere distributed, Compliance & Legislation added, Simon's review pass merged).*
+*Last updated 2026-05-24 — v0.3 (Simon's 21:12 review pass — 9 priority shifts, "Cut-but-shipped" semantics introduced, S-02 restored to Now).*
