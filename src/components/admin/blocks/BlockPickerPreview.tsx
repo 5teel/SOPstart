@@ -99,10 +99,107 @@ function renderForKind(kindSlug: string, content: BlockContent) {
           )}
         </div>
       )
+    // Plan 21-05 — parser-emitted kinds added to the picker preview so
+    // admins can pick them from the library after parsing (or after
+    // promoting a parsed_inline block manually).
+    case 'text':
+      return (
+        <div className="bg-white border border-[var(--ink-100)] rounded-xl p-4">
+          <div className="text-xs uppercase tracking-wider text-[var(--ink-500)] mb-1">
+            Text
+          </div>
+          <p className="text-sm text-[var(--ink-900)] leading-relaxed whitespace-pre-wrap line-clamp-6">
+            {content.content.slice(0, 200)}
+            {content.content.length > 200 ? '…' : ''}
+          </p>
+        </div>
+      )
+    case 'heading':
+      return (
+        <div className="bg-white border border-[var(--ink-100)] rounded-xl p-4">
+          <div className="text-xs uppercase tracking-wider text-[var(--ink-500)] mb-1">
+            Heading ({content.level})
+          </div>
+          {content.level === 'h3' ? (
+            <h3 className="text-lg font-semibold text-[var(--ink-900)]">{content.text}</h3>
+          ) : (
+            <h2 className="text-xl font-bold text-[var(--ink-900)]">{content.text}</h2>
+          )}
+        </div>
+      )
+    case 'photo':
+      return (
+        <div className="bg-white border border-[var(--ink-100)] rounded-xl p-3">
+          <div className="text-xs uppercase tracking-wider text-[var(--ink-500)] mb-2">
+            Photo
+          </div>
+          {content.src ? (
+            <div className="text-xs font-mono text-[var(--ink-500)] break-all">
+              {content.src}
+            </div>
+          ) : (
+            <div className="text-xs italic text-[var(--ink-500)]">No image source set</div>
+          )}
+          {content.alt && (
+            <div className="text-xs text-[var(--ink-500)] mt-1">alt: {content.alt}</div>
+          )}
+          {content.caption && (
+            <div className="text-xs text-[var(--ink-700)] mt-1">{content.caption}</div>
+          )}
+        </div>
+      )
+    case 'callout':
+      return (
+        <div className="bg-[var(--accent-decision)]/10 border border-[var(--accent-decision)]/30 rounded-xl p-4">
+          <div className="text-xs uppercase tracking-widest text-[var(--accent-decision)] mb-1">
+            {content.title}
+          </div>
+          <p className="text-base text-[var(--ink-900)] leading-relaxed">{content.body}</p>
+        </div>
+      )
+    case 'model':
+      return (
+        <div className="bg-white border border-dashed border-[var(--ink-300)] rounded-xl p-4">
+          <div className="text-xs uppercase tracking-wider text-[var(--ink-500)] mb-2">
+            3D Model
+          </div>
+          <div className="text-xs font-mono text-[var(--ink-700)] break-all">
+            {content.assetUrl}
+          </div>
+          {content.hotspots && content.hotspots.length > 0 && (
+            <div className="text-xs text-[var(--ink-500)] mt-1">
+              {content.hotspots.length} hotspot(s)
+            </div>
+          )}
+        </div>
+      )
+    case 'step_with_photos':
+      return (
+        <div className="bg-white border border-[var(--ink-100)] rounded-xl p-4">
+          <div className="text-xs uppercase tracking-wider text-[var(--ink-500)] mb-1">
+            Step {content.number} with photos ({content.photos.length})
+          </div>
+          <p className="text-sm text-[var(--ink-900)] leading-relaxed line-clamp-3">
+            {content.text}
+          </p>
+          <div className="text-xs text-[var(--ink-500)] mt-2">Layout: {content.layout}</div>
+        </div>
+      )
+    case 'photo_grid':
+      return (
+        <div className="bg-white border border-[var(--ink-100)] rounded-xl p-4">
+          <div className="text-xs uppercase tracking-wider text-[var(--ink-500)] mb-1">
+            Photo Grid ({content.columns} cols)
+          </div>
+          <div className="text-sm text-[var(--ink-700)]">
+            {content.items.length} photo{content.items.length === 1 ? '' : 's'}
+          </div>
+        </div>
+      )
     default:
       return (
         <div className="text-sm text-[var(--ink-500)]">
-          Preview not available for kind &lsquo;{content.kind}&rsquo;.
+          Preview not available for kind &lsquo;{(content as { kind: string }).kind}&rsquo;.
         </div>
       )
   }

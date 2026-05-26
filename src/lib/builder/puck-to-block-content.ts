@@ -31,12 +31,18 @@ export const PUCK_TYPE_TO_BLOCK_KIND: Record<string, BlockContent['kind'] | null
   ZoneBlock: 'zone',
   InspectBlock: 'inspect',
   VoiceNoteBlock: 'voice-note',
+  // Plan 21-05 — the parser now creates library blocks for these kinds too,
+  // so they need a non-null mapping if any Save-from-Canvas flow targets
+  // them. The picker hides them by default (category='parsed_inline' filter)
+  // but they are otherwise savable.
+  TextBlock: 'text',
+  HeadingBlock: 'heading',
+  PhotoBlock: 'photo',
+  CalloutBlock: 'callout',
+  ModelBlock: 'model',
+  StepWithPhotosBlock: 'step_with_photos',
+  PhotoGridBlock: 'photo_grid',
   // Non-savable types:
-  TextBlock: null,
-  HeadingBlock: null,
-  PhotoBlock: null,
-  CalloutBlock: null,
-  ModelBlock: null,
   UnsupportedBlockPlaceholder: null,
 }
 
@@ -180,6 +186,78 @@ export function puckPropsToBlockContent(
           : 60
       return { kind: 'voice-note', prompt, language, maxDurationSec }
     }
+    // Plan 21-05 — parser-emitted kinds. Strip presentation-only fields
+    // (id, block_provenance, junctionId) — they live on the Puck item, not
+    // the BlockContent shape.
+    case 'text': {
+      const content = typeof p.content === 'string' ? p.content : ''
+      if (!content) return null
+      return { kind: 'text', content }
+    }
+    case 'heading': {
+      const text = typeof p.text === 'string' ? p.text : ''
+      if (!text) return null
+      const level = p.level === 'h3' ? 'h3' : 'h2'
+      return { kind: 'heading', text, level }
+    }
+    case 'photo': {
+      const src = typeof p.src === 'string' ? p.src : null
+      const alt = typeof p.alt === 'string' ? p.alt : ''
+      const caption = typeof p.caption === 'string' ? p.caption : null
+      return { kind: 'photo', src, alt, caption }
+    }
+    case 'callout': {
+      const body = typeof p.body === 'string' ? p.body : ''
+      if (!body) return null
+      const title = typeof p.title === 'string' ? p.title : 'Note'
+      return { kind: 'callout', title, body }
+    }
+    case 'model': {
+      const assetUrl = typeof p.assetUrl === 'string' ? p.assetUrl : ''
+      if (!assetUrl) return null
+      const hotspots = Array.isArray(p.hotspots)
+        ? (p.hotspots as Array<{ id: string; label: string; position: { x: number; y: number; z: number } }>)
+        : []
+      const defaultLayers = Array.isArray(p.defaultLayers)
+        ? (p.defaultLayers as string[])
+        : []
+      return { kind: 'model', assetUrl, hotspots, defaultLayers }
+    }
+    case 'step_with_photos': {
+      const text = typeof p.text === 'string' ? p.text : ''
+      if (!text) return null
+      const number = typeof p.number === 'number' ? p.number : 1
+      const rawPhotos = (p.photos ?? []) as Array<{
+        src?: string | null
+        alt?: string
+        caption?: string | null
+      }>
+      const photos = rawPhotos.map((ph) => ({
+        src: (ph?.src ?? null) as string | null,
+        alt: typeof ph?.alt === 'string' ? ph.alt : '',
+        caption: (ph?.caption ?? null) as string | null,
+      }))
+      if (photos.length === 0) return null
+      const layout =
+        p.layout === 'grid-2' || p.layout === 'grid-3' || p.layout === 'grid-4'
+          ? p.layout
+          : 'right'
+      return { kind: 'step_with_photos', number, text, photos, layout }
+    }
+    case 'photo_grid': {
+      const rawItems = (p.items ?? []) as Array<{
+        src?: string | null
+        alt?: string
+        caption?: string | null
+      }>
+      const items = rawItems.map((ph) => ({
+        src: (ph?.src ?? null) as string | null,
+        alt: typeof ph?.alt === 'string' ? ph.alt : '',
+        caption: (ph?.caption ?? null) as string | null,
+      }))
+      const columns = p.columns === '3' || p.columns === '4' ? p.columns : '2'
+      return { kind: 'photo_grid', items, columns }
+    }
     default:
       return null
   }
@@ -256,6 +334,34 @@ export function blockContentToPuckProps(content: BlockContent): Record<string, u
       }
     case 'custom':
       return content.data
+    // Plan 21-05 — round-trip for parser-emitted kinds.
+    case 'text':
+      return { content: content.content }
+    case 'heading':
+      return { text: content.text, level: content.level }
+    case 'photo':
+      return {
+        src: content.src,
+        alt: content.alt,
+        caption: content.caption ?? '',
+      }
+    case 'callout':
+      return { title: content.title, body: content.body }
+    case 'model':
+      return {
+        assetUrl: content.assetUrl,
+        hotspots: content.hotspots,
+        defaultLayers: content.defaultLayers,
+      }
+    case 'step_with_photos':
+      return {
+        number: content.number,
+        text: content.text,
+        photos: content.photos,
+        layout: content.layout,
+      }
+    case 'photo_grid':
+      return { items: content.items, columns: content.columns }
     default:
       return {}
   }

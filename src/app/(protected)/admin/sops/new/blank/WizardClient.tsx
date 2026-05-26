@@ -26,6 +26,14 @@ const LIBRARY_SUPPORTED_SLUG_TO_KIND: Record<string, BlockContent['kind'] | null
   steps: 'step',
   emergency: 'emergency',
   signoff: null, // signoff blocks live inline; no library picker yet
+  // Plan 21-05 — parser-emitted slugs (seeded in migration 00033).
+  text: 'text',
+  heading: 'heading',
+  photo: 'photo',
+  callout: 'callout',
+  model: 'model',
+  step_with_photos: 'step_with_photos',
+  photo_grid: 'photo_grid',
 }
 
 const TitleStepSchema = z.object({

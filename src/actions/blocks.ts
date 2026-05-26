@@ -139,6 +139,14 @@ export type ListBlocksOptions = {
   globalOnly?: boolean
   /** default false: when true, hydrate currentContent on each block from block_versions (consumed by 13-03 to avoid N+1) */
   includeContent?: boolean
+  /**
+   * Plan 21-05 / T-21-05-01 — default false:
+   *   excludes blocks whose category = 'parsed_inline' so the library picker
+   *   isn't bloated with single-use parser-created blocks.
+   * Set true ONLY in surfaces that genuinely need to surface parsed-inline
+   * blocks (e.g. an admin "promote inline to reusable" UI — deferred).
+   */
+  includeParsedInline?: boolean
 }
 
 // ---------------------------------------------------------------------------
@@ -413,6 +421,7 @@ export async function listBlocks(
     includeArchived: false,
     globalOnly: false,
     includeContent: false,
+    includeParsedInline: false,
     ...(options ?? {}),
   }
 
@@ -445,6 +454,17 @@ export async function listBlocks(
     // RLS already restricts to org + globals; if caller does not want globals,
     // exclude null org rows explicitly.
     query = query.not('organisation_id', 'is', null)
+  }
+
+  // Plan 21-05 / T-21-05-01 — by default hide parser-created blocks from
+  // the picker so 50-block parsed SOPs don't bloat the library. `category`
+  // is NULL for hand-authored library blocks (Phase 13) and 'parsed_inline'
+  // for parser-created junctions. NULL passes `neq` checks.
+  if (!opts.includeParsedInline) {
+    // PostgREST: `category=neq.parsed_inline` excludes the equal rows but
+    // also drops NULL rows because NULL comparisons are unknown. Use
+    // .or() to keep NULL rows.
+    query = query.or('category.is.null,category.neq.parsed_inline')
   }
 
   // Order: org blocks first (organisation_id is not null), then by name.
