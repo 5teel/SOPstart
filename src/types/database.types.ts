@@ -242,6 +242,10 @@ export type Database = {
           content: string | null
           created_at: string
           id: string
+          // Plan 21-05: manually extended per CLAUDE.md learning (type regen unavailable).
+          // Source: migration 00020_section_layout_data.sql.
+          layout_data: Json | null
+          layout_version: number | null
           section_kind_id: string | null
           section_type: string
           sop_id: string
@@ -255,6 +259,8 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          layout_data?: Json | null
+          layout_version?: number | null
           section_kind_id?: string | null
           section_type: string
           sop_id: string
@@ -268,6 +274,8 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          layout_data?: Json | null
+          layout_version?: number | null
           section_kind_id?: string | null
           section_type?: string
           sop_id?: string

@@ -3,7 +3,10 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { extractDocx } from '@/lib/parsers/extract-docx'
 import { extractDocxStructural } from '@/lib/parsers/extract-docx-structural'
 import { structuredDocToPrompt } from '@/lib/parsers/structured-doc-to-prompt'
-import { parsedSopToPerSectionLayoutData } from '@/lib/parsers/parsed-sop-to-layout-data'
+import {
+  parsedSopToPerSectionLayoutData,
+  materializeJunctionsForLayout,
+} from '@/lib/parsers/parsed-sop-to-layout-data'
 import { extractPdf } from '@/lib/parsers/extract-pdf'
 import { extractXlsx } from '@/lib/parsers/extract-xlsx'
 import { extractPptx } from '@/lib/parsers/extract-pptx'
@@ -274,6 +277,9 @@ export async function POST(request: NextRequest) {
     // Insert sections
     for (const section of parsed.sections) {
       const sectionLayout = perSectionLayouts?.layouts.get(section.order) ?? null
+      // Step 1: insert section WITHOUT layout_data first — Plan 21-05 needs
+      // the section.id to materialize junctions, and the junction ids get
+      // stamped onto the Puck items before layout_data is written.
       const { data: sectionRow, error: sectionError } = await admin
         .from('sop_sections')
         .insert({
@@ -284,9 +290,6 @@ export async function POST(request: NextRequest) {
           sort_order: section.order,
           confidence: section.confidence,
           approved: false,
-          ...(sectionLayout
-            ? { layout_data: sectionLayout, layout_version: 1 }
-            : {}),
         })
         .select('id')
         .single()
@@ -296,6 +299,36 @@ export async function POST(request: NextRequest) {
         continue
       }
       if (firstSectionId === null) firstSectionId = sectionRow.id
+
+      // Plan 21-05 — materialize library blocks + junctions per Puck item,
+      // stamping props.junctionId onto each item, then write the now-stamped
+      // layout_data onto the section row. ANY failure throws and is caught
+      // by the outer try/catch (parse_job marked failed; no partial junctions
+      // because the section row is the only artifact and gets cleaned up
+      // alongside the SOP rollback path).
+      if (sectionLayout && sectionLayout.content.length > 0) {
+        await materializeJunctionsForLayout({
+          organisationId,
+          sectionId: sectionRow.id,
+          puckItems: sectionLayout.content,
+          createdByUserId: null,
+        })
+        // Now write layout_data WITH the junctionId-stamped items.
+        const { error: updErr } = await admin
+          .from('sop_sections')
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .update({
+            layout_data: sectionLayout as unknown as object,
+            layout_version: 1,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } as any)
+          .eq('id', sectionRow.id)
+        if (updErr) {
+          throw new Error(
+            `Section ${sectionRow.id} layout_data write failed: ${updErr.message}`,
+          )
+        }
+      }
 
       // Insert steps if present
       if (section.steps && section.steps.length > 0) {
