@@ -548,7 +548,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 18. Collaborative Editing | — | Deferred to v4.0 backlog |  |
 | 19. Pipeline Integration, Bundle Isolation & v3.0 Closeout | — | Deleted 2026-05-23 |  |
 | 20. Conversion Pipeline V2 | partial | Partial complete — DOCX→builder slice shipped; remainder → v4.0 Phase 21 | 2026-05-17 |
-| **21. Safety-Critical Parsing (v4.0)** | 5/5 | ✅ Complete — PASS-WITH-NOTES (see VERIFICATION.md) | 2026-05-25 |
+| **21. Safety-Critical Parsing (v4.0)** | 6/6 | ✅ Complete — PASS-WITH-NOTES (includes 21-05 gap closure — parser→library junction integration) | 2026-05-26 |
 | **22. Voice-Driven Walkthrough (v4.0)** | 0/? | Not started |  |
 | **23. AI Field Layer + Version Supersede (v4.0)** | 0/? | Not started |  |
 
