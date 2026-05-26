@@ -140,6 +140,56 @@ function emitFields(content: BlockContent): BlockContentDiffField[] {
     case 'custom':
       out.push({ key: 'data', oldValue: asJson(content.data), newValue: '' })
       break
+    // Phase 21 Plan 21-05 — parser-emitted kinds (text/heading/photo/callout/
+    // model/step_with_photos/photo_grid). These are content-only emit cases for
+    // the side-by-side diff modal — same shape as the existing branches.
+    case 'text':
+      out.push({ key: 'content', oldValue: content.content, newValue: '' })
+      break
+    case 'heading':
+      out.push({ key: 'text', oldValue: content.text, newValue: '' })
+      out.push({ key: 'level', oldValue: content.level ?? 'h2', newValue: '' })
+      break
+    case 'photo':
+      out.push({ key: 'src', oldValue: content.src ?? '', newValue: '' })
+      out.push({ key: 'alt', oldValue: content.alt ?? '', newValue: '' })
+      out.push({ key: 'caption', oldValue: content.caption ?? '', newValue: '' })
+      break
+    case 'callout':
+      out.push({ key: 'title', oldValue: content.title ?? 'Note', newValue: '' })
+      out.push({ key: 'body', oldValue: content.body, newValue: '' })
+      break
+    case 'model':
+      out.push({ key: 'assetUrl', oldValue: content.assetUrl, newValue: '' })
+      out.push({ key: 'hotspots', oldValue: asJson(content.hotspots), newValue: '' })
+      out.push({
+        key: 'defaultLayers',
+        oldValue: (content.defaultLayers ?? []).join(', '),
+        newValue: '',
+      })
+      break
+    case 'step_with_photos':
+      out.push({ key: 'number', oldValue: String(content.number ?? 1), newValue: '' })
+      out.push({ key: 'text', oldValue: content.text, newValue: '' })
+      out.push({
+        key: 'photos',
+        oldValue: (content.photos ?? [])
+          .map((p) => (p.src ?? '') + (p.caption ? ` — ${p.caption}` : ''))
+          .join('\n'),
+        newValue: '',
+      })
+      out.push({ key: 'layout', oldValue: content.layout ?? 'right', newValue: '' })
+      break
+    case 'photo_grid':
+      out.push({
+        key: 'items',
+        oldValue: (content.items ?? [])
+          .map((p) => (p.src ?? '') + (p.caption ? ` — ${p.caption}` : ''))
+          .join('\n'),
+        newValue: '',
+      })
+      out.push({ key: 'columns', oldValue: content.columns ?? '2', newValue: '' })
+      break
     default: {
       // Exhaustiveness guard — if a new BlockContent variant is added without
       // updating this switch, TypeScript will surface it here.

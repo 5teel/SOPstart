@@ -86,5 +86,12 @@ export default defineConfig({
       testDir: './src/lib/parsers/ai-reviewer/jobs/__tests__',
       testMatch: /.*\.test\.ts$/,
     },
+    {
+      // Plan 21-05 — Zod schema unit tests + parser junction-creation tests.
+      name: 'phase21-unit',
+      testDir: './src',
+      testMatch:
+        /(validators\/__tests__\/block-content-extended|parsers\/__tests__\/parser-creates-junctions)\.test\.ts$/,
+    },
   ],
 })

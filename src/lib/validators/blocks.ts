@@ -111,9 +111,84 @@ export const VoiceNoteBlockContentSchema = z.object({
   maxDurationSec: z.number().int().min(5).max(300).default(60),
 })
 
-// ModelBlock is intentionally excluded from BlockContentSchema —
-// it lives only in layout_data (Puck JSON), never in sop_section_blocks.
-// It IS registered in puckConfig.components + BLOCK_REGISTRY.
+// ---------------------------------------------------------------
+// Phase 21 Plan 21-05 — Parser-emitted Puck kinds added to the
+// discriminated union. Until 21-05 the parser only wrote Puck items
+// into sop_sections.layout_data; the publish-gate verify checklist
+// (Wave 4) walks sop_section_blocks junction rows, so every parsed
+// SOP had 0/0 → no-op gate. 21-05 wires the parser to also create
+// library blocks + junctions for each Puck item, requiring these
+// 7 kinds to be valid BlockContent shapes.
+//
+// .nullable() (not .optional()) per Phase 02 OpenAI structured-output
+// pattern — keeps the schema GPT-compatible if these are ever used
+// as response_format targets.
+// ---------------------------------------------------------------
+
+export const TextBlockContentSchema = z.object({
+  kind: z.literal('text'),
+  content: z.string().min(1).max(10_000),
+})
+
+export const HeadingBlockContentSchema = z.object({
+  kind: z.literal('heading'),
+  text: z.string().min(1).max(200),
+  level: z.enum(['h2', 'h3']).default('h2'),
+})
+
+export const PhotoBlockContentSchema = z.object({
+  kind: z.literal('photo'),
+  src: z.string().min(1).nullable(),
+  alt: z.string().max(200).default(''),
+  caption: z.string().max(500).nullable(),
+})
+
+export const CalloutBlockContentSchema = z.object({
+  kind: z.literal('callout'),
+  title: z.string().max(120).default('Note'),
+  body: z.string().min(1).max(2000),
+})
+
+export const ModelBlockContentSchema = z.object({
+  kind: z.literal('model'),
+  assetUrl: z.string().url(),
+  hotspots: z
+    .array(
+      z.object({
+        id: z.string(),
+        label: z.string().min(1).max(120),
+        position: z.object({ x: z.number(), y: z.number(), z: z.number() }),
+      })
+    )
+    .default([]),
+  defaultLayers: z.array(z.string()).default([]),
+})
+
+export const StepPhotoItemContentSchema = z.object({
+  src: z.string().nullable(),
+  alt: z.string().max(200).default(''),
+  caption: z.string().max(500).nullable(),
+})
+
+export const StepWithPhotosBlockContentSchema = z.object({
+  kind: z.literal('step_with_photos'),
+  number: z.number().int().min(1).default(1),
+  text: z.string().min(1).max(5000),
+  photos: z.array(StepPhotoItemContentSchema).min(1).max(12),
+  layout: z.enum(['right', 'grid-2', 'grid-3', 'grid-4']).default('right'),
+})
+
+export const PhotoGridItemContentSchema = z.object({
+  src: z.string().nullable(),
+  alt: z.string().max(200).default(''),
+  caption: z.string().max(500).nullable(),
+})
+
+export const PhotoGridBlockContentSchema = z.object({
+  kind: z.literal('photo_grid'),
+  items: z.array(PhotoGridItemContentSchema).default([]),
+  columns: z.enum(['2', '3', '4']).default('2'),
+})
 
 export const BlockContentSchema = z.discriminatedUnion('kind', [
   HazardBlockContentSchema,
@@ -128,6 +203,14 @@ export const BlockContentSchema = z.discriminatedUnion('kind', [
   ZoneBlockContentSchema,
   InspectBlockContentSchema,
   VoiceNoteBlockContentSchema,
+  // Plan 21-05 — parser-emitted kinds (mirror Puck registry shapes):
+  TextBlockContentSchema,
+  HeadingBlockContentSchema,
+  PhotoBlockContentSchema,
+  CalloutBlockContentSchema,
+  ModelBlockContentSchema,
+  StepWithPhotosBlockContentSchema,
+  PhotoGridBlockContentSchema,
 ])
 
 export type HazardBlockContent = z.infer<typeof HazardBlockContentSchema>
@@ -142,4 +225,12 @@ export type SignOffBlockContent = z.infer<typeof SignOffBlockContentSchema>
 export type ZoneBlockContent = z.infer<typeof ZoneBlockContentSchema>
 export type InspectBlockContent = z.infer<typeof InspectBlockContentSchema>
 export type VoiceNoteBlockContent = z.infer<typeof VoiceNoteBlockContentSchema>
+// Plan 21-05 — parser-emitted content types
+export type TextBlockContent = z.infer<typeof TextBlockContentSchema>
+export type HeadingBlockContent = z.infer<typeof HeadingBlockContentSchema>
+export type PhotoBlockContent = z.infer<typeof PhotoBlockContentSchema>
+export type CalloutBlockContent = z.infer<typeof CalloutBlockContentSchema>
+export type ModelBlockContent = z.infer<typeof ModelBlockContentSchema>
+export type StepWithPhotosBlockContent = z.infer<typeof StepWithPhotosBlockContentSchema>
+export type PhotoGridBlockContent = z.infer<typeof PhotoGridBlockContentSchema>
 export type BlockContent = z.infer<typeof BlockContentSchema>
