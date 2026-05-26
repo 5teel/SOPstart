@@ -83,6 +83,26 @@ const CreateBlockInput = z.object({
   changeNote: z.string().max(500).optional(),
   // 'global' requires platform super-admin (D-Global-01)
   scope: z.enum(['org', 'global']).default('org'),
+  /**
+   * Phase 21 Plan 21-05 — written to blocks.category. The picker filters
+   * `category != 'parsed_inline'` by default so per-item library blocks
+   * created during parsing don't bloat the picker UX (T-21-05-01).
+   * Other callers (Phase 13 wizard, picker promotion) leave this null.
+   */
+  category: z.string().max(60).nullable().optional(),
+  /**
+   * Phase 21 Plan 21-05 — service-role / parser invocation override.
+   * When set, the action skips the auth-session-based requireAdmin() path
+   * and uses the admin (service-role) supabase client with the explicit
+   * organisationId. NEVER call from a user-facing context — parser is the
+   * sole consumer because parse-jobs run server-side with no auth session.
+   */
+  serviceRole: z
+    .object({
+      organisationId: z.string().uuid(),
+      createdByUserId: z.string().uuid().nullable(),
+    })
+    .optional(),
 })
 
 const UpdateBlockInput = z.object({
@@ -149,7 +169,17 @@ export async function createBlock(
   let createdByUserId: string | null = null
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let writer: any
-  if (isGlobal) {
+  if (data.serviceRole) {
+    // Plan 21-05 — parser invocation. Bypass requireAdmin (no session in the
+    // parse-job worker context). Always scoped to the caller-supplied org;
+    // never global. Defence-in-depth: refuse if 'global' was also requested.
+    if (isGlobal) {
+      return { error: 'serviceRole cannot be combined with scope=global' }
+    }
+    writer = createAdminClient()
+    organisationId = data.serviceRole.organisationId
+    createdByUserId = data.serviceRole.createdByUserId
+  } else if (isGlobal) {
     const guard = await requirePlatformAdmin()
     if ('error' in guard) {
       return { error: 'Platform super-admin required to create global blocks' }
@@ -181,6 +211,8 @@ export async function createBlock(
       category_tags: data.categoryTags,
       free_text_tags: data.freeTextTags,
       created_by: createdByUserId,
+      // Plan 21-05 — only set when supplied (Phase 13 callers leave null).
+      ...(data.category ? { category: data.category } : {}),
     })
     .select('*')
     .single()
