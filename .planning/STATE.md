@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
 status: Executing Phase 21.5
-stopped_at: Phase 21.5 UI-SPEC approved (6/6 dimensions)
-last_updated: "2026-06-02T13:04:02.986Z"
+stopped_at: Phase 21.5 Plan 05 complete — BuilderStageShell live on builder route
+last_updated: "2026-06-02T13:33:00Z"
 progress:
   total_phases: 26
   completed_phases: 0
   total_plans: 5
-  completed_plans: 0
-  percent: 0
+  completed_plans: 5
+  percent: 100
 ---
 
 # Project State
@@ -24,8 +24,8 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 21.5 (builder-review-ux) — EXECUTING
-Plan: 1 of 5
+Phase: 21.5 (builder-review-ux) — COMPLETE
+Plan: 5 of 5 (all plans complete)
 **Milestone status:** v4.0 started 2026-05-24. 3 phases / 40 requirements (1 of 3 phases complete). See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
 **Active phase:** 21.5
@@ -314,7 +314,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-02T12:36:34.211Z
-Stopped at: Phase 21.5 UI-SPEC approved (6/6 dimensions)
-Resume file: .planning/phases/21.5-builder-review-ux/21.5-UI-SPEC.md
-Awaiting: Phase 21 Wave 4 — per-block verify checklist + publish gate. Migration 00032 push outstanding (creates verified_by_admin_id, ai_review_results, org_anthropic_spend, ai_review_rate_limits).
+Last session: 2026-06-02T13:33:00Z
+Stopped at: Phase 21.5 Plan 05 complete — BuilderStageShell (shell integration) committed baf5ee6 + 132335f, pushed to Railway
+Resume file: .planning/phases/21.5-builder-review-ux/21.5-05-SUMMARY.md
+Awaiting: Phase 21.5 UAT on sopstart.com — verify Build→Review→Publish flow on live builder route; then plan Phase 22 (Voice-Driven Walkthrough).
