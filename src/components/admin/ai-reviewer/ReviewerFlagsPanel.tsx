@@ -22,6 +22,7 @@
 
 import { useCallback } from 'react'
 import type { ReviewerFlag } from '@/lib/parsers/ai-reviewer'
+import type { SourceProvenanceRegion } from '@/lib/parsers/source-viewer/types'
 import { useSelectionSync } from '@/components/admin/source-viewer/useSelectionSync'
 import { useReviewerFlags } from './useReviewerFlags'
 import { FlagBadge } from './FlagBadge'
@@ -33,9 +34,10 @@ export type ReviewerFlagsPanelProps = {
    * Optional override: when the parent already has the block's provenance,
    * pass it in so we skip the lookup. The selection-sync provider's
    * `setActiveProvenance` accepts `null` so omitting this is fine.
+   * This is a bare region (the shape `setActiveProvenance` expects), NOT a
+   * wrapper — callers pass `block.provenance` directly.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  blockProvenance?: any
+  blockProvenance?: SourceProvenanceRegion | null
 }
 
 export function ReviewerFlagsPanel({
@@ -53,7 +55,7 @@ export function ReviewerFlagsPanel({
       // Best-effort jump to provenance. The selection-sync provider also
       // fans out the blockId to any builder-canvas registered handler, so
       // the canvas scrolls into view independent of pane availability.
-      const region = blockProvenance?.region ?? null
+      const region = blockProvenance ?? null
       setActiveProvenance(region, blockId)
       // Reserved: future ergonomics could surface flag.description in a
       // tooltip pinned to the source pane. For now, the badge title attr

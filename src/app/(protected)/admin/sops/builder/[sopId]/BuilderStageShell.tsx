@@ -32,7 +32,7 @@
  *   - No VerifyProgressIndicator or bulk-verify affordance mounted here.
  */
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { BuilderClient } from './BuilderClient'
 import { BuilderStageStepper } from './BuilderStageStepper'
@@ -177,6 +177,16 @@ export function BuilderStageShell({
   // Stage state
   // ------------------------------------------------------------------
   const [activeStage, setActiveStage] = useState<BuilderStage>('build')
+
+  // Demote off the Publish stage if verification is revoked while parked there
+  // (e.g. a decline elsewhere / query invalidation flips isReady back to false).
+  // Prevents a dead-end stage where the stepper shows Publish active but the
+  // button is disabled with a "N steps left to verify" reason. (WR-01)
+  useEffect(() => {
+    if (activeStage === 'publish' && !effectiveIsReady) {
+      setActiveStage(hasSourceDoc ? 'review' : 'build')
+    }
+  }, [activeStage, effectiveIsReady, hasSourceDoc])
 
   const handleStageSelect = useCallback(
     (stage: BuilderStage) => {

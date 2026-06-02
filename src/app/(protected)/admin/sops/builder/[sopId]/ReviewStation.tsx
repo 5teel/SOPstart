@@ -140,8 +140,11 @@ export function ReviewStation({
   }, [activeBlock, checklist])
 
   const handlePrev = useCallback(() => {
-    checklist.setActiveIdx(Math.max(0, checklist.activeIdx - 1))
-  }, [checklist])
+    const idx = Math.max(0, checklist.activeIdx - 1)
+    checklist.setActiveIdx(idx)
+    const b = checklist.blocks[idx]
+    if (b) selection.setActiveProvenance(b.provenance ?? null, b.id)
+  }, [checklist, selection])
 
   // ─── Loading state ───────────────────────────────────────────────────────────
   if (checklist.isLoading) {
