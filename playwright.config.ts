@@ -99,5 +99,14 @@ export default defineConfig({
       testDir: './src/lib/builder/__tests__',
       testMatch: /.*\.test\.ts$/,
     },
+    {
+      // Phase 21.5 — source-contract stubs: block-type-labels unit test
+      // (Plan 01) + builder-review-flow integration spec (Plan 05).
+      // testDir covers both tests/ and src/ so both files are discoverable.
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      name: 'phase21.5-stubs',
+      testDir: '.',
+      testMatch: /(block-type-labels|builder-review-flow)\.(test|spec)\.ts$/,
+    },
   ],
 })

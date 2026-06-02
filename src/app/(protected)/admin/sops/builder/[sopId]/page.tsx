@@ -4,7 +4,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { signLayoutDataImages } from '@/lib/builder/sign-layout-data-images'
-import { BuilderWithSourceViewer } from './BuilderWithSourceViewer'
+import { BuilderStageShell } from './BuilderStageShell'
 import type { SopWithSections, ParseJob } from '@/types/sop'
 
 export const metadata: Metadata = {
@@ -72,7 +72,7 @@ export default async function BuilderPage({
 
   return (
     <Suspense fallback={null}>
-      <BuilderWithSourceViewer
+      <BuilderStageShell
         sopId={sopId}
         initialSop={sop as unknown as SopWithSections}
         parseJob={(parseJob ?? null) as ParseJob | null}
