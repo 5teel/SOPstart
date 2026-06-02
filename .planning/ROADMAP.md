@@ -52,6 +52,19 @@ Three phases bundle the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` 
 
 ## Phase Details
 
+### Phase 21.5: Builder Review UX
+**Goal**: A first-time admin can, without guidance, understand each builder pane's purpose and complete review and publish — via a sequenced Build → Review → Publish flow that replaces the 5–6 always-on jargon-labelled panels.
+**Depends on**: Phase 21 (reuses the shipped source viewer, AI reviewer, verify checklist, and publish gate)
+**Requirements**: R1 stepper, R2 review-station, R3 inline-AI, R4 humanized-labels, R5 plain-actions, R6 inline-publish-reason, R7 publish-stage, R8 adaptive-stepper, R9 tablet-responsive, R10 safety-invariants (SPEC.md is the ID source)
+**Plans**: 5 plans / 3 waves
+
+Plans:
+- [ ] 21.5-01-PLAN.md — Humanized block-type labels + word-labelled verify/send-back row actions (R4, R5)
+- [ ] 21.5-02-PLAN.md — Adaptive Build→Review→Publish stepper + inline publish reason + Review orientation strip (R1, R6, R8, R9)
+- [ ] 21.5-03-PLAN.md — Dedicated Publish stage with always-visible blocked reason + gated publish button (R6, R7)
+- [ ] 21.5-04-PLAN.md — Review Station 3-zone grid (navigator / step-in-app + inline AI / source), responsive ≥768px (R2, R3, R9)
+- [ ] 21.5-05-PLAN.md — Builder stage shell integration + page wiring + safety-invariant verification spec (R1, R8, R10)
+
 ### Phase 1: Foundation
 **Goal**: Organisations and users can securely access the app with full tenant isolation, correct roles, and a functional PWA shell
 **Depends on**: Nothing (first phase)
