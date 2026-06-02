@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOP Builder — Review Station (redesign sketch)</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brand-yellow:#fbbf24;
+    --steel-900:#0a0a0b; --steel-800:#141416; --steel-700:#1f1f22; --steel-600:#2a2a2e;
+    --paper:#fafafa; --paper-2:#f4f4f5;
+    --ink-900:#09090b; --ink-700:#3f3f46; --ink-500:#71717a; --ink-300:#d4d4d8; --ink-200:#e5e5e5;
+    --accent-mcu:#06b6d4; --accent-measure:#f97316; --accent-decision:#ec4899;
+    --accent-hazard:#ef4444; --accent-signoff:#fbbf24; --accent-step:#3b82f6; --accent-ok:#10b981;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;font-family:'JetBrains Mono',ui-monospace,monospace;background:var(--paper-2);color:var(--ink-900)}
+  .prose{font-family:'Inter',system-ui,sans-serif}
+  .mono{font-family:'JetBrains Mono',monospace}
+  .up{text-transform:uppercase;letter-spacing:.08em}
+  .muted{color:var(--ink-500)}
+  .app{display:flex;flex-direction:column;height:100vh}
+
+  /* ---------- top bar ---------- */
+  .topbar{background:var(--steel-900);color:#fff;display:flex;align-items:center;gap:18px;padding:0 16px;height:52px;flex-shrink:0}
+  .topbar .back{color:#a1a1aa;font-size:12px;text-decoration:none}
+  .title{display:flex;flex-direction:column;line-height:1.15}
+  .title b{font-size:13px;font-weight:600}
+  .title span{font-size:10px;color:#a1a1aa}
+  .status-pill{border:1px solid #52525b;color:#d4d4d8;padding:2px 8px;border-radius:2px;font-size:10px;font-weight:500}
+  .spacer{flex:1}
+  .save{font-size:10px;color:#71717a}
+  .save b{color:#10b981;font-weight:500}
+
+  /* publish button (gated) */
+  .publish{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+  .publish button{background:var(--steel-700);color:#71717a;border:1px solid var(--steel-600);
+    padding:7px 16px;border-radius:4px;font-weight:700;font-size:12px;cursor:not-allowed;font-family:inherit}
+  .publish .reason{font-size:9px;color:#a1a1aa}
+
+  /* ---------- stepper ---------- */
+  .stepper{display:flex;align-items:center;gap:8px}
+  .step-chip{display:flex;align-items:center;gap:7px;padding:5px 12px;border-radius:2px;font-size:11px;font-weight:500}
+  .step-chip .n{width:17px;height:17px;border-radius:50%;display:grid;place-items:center;font-size:10px}
+  .step-chip.done{color:#10b981}
+  .step-chip.done .n{background:#10b981;color:#fff}
+  .step-chip.active{background:#fff;color:var(--ink-900)}
+  .step-chip.active .n{background:var(--accent-step);color:#fff}
+  .step-chip.todo{color:#71717a}
+  .step-chip.todo .n{border:1px solid #52525b}
+  .stepper .arr{color:#3f3f46;font-size:11px}
+
+  /* ---------- orientation strip ---------- */
+  .orient{display:flex;align-items:center;gap:10px;background:#fff;border-bottom:1px solid var(--ink-300);
+    padding:9px 18px;font-size:12px;flex-shrink:0}
+  .orient .badge{background:var(--accent-step);color:#fff;font-size:10px;font-weight:600;padding:2px 8px;border-radius:2px}
+  .orient .prog{margin-left:auto;display:flex;align-items:center;gap:10px;color:var(--ink-500);font-size:11px}
+  .orient .bar{width:120px;height:5px;background:var(--ink-200);border-radius:3px;overflow:hidden}
+  .orient .bar i{display:block;height:100%;background:var(--accent-step);width:18%}
+
+  /* ---------- review station 3 zones ---------- */
+  .station{flex:1;display:grid;grid-template-columns:280px 1fr 1fr;min-height:0}
+  .zone{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--ink-300);background:var(--paper)}
+  .zone:last-child{border-right:none}
+  .zone-head{padding:10px 14px;border-bottom:1px solid var(--ink-300);background:var(--paper-2);flex-shrink:0}
+  .zone-head .h{font-size:11px;font-weight:600}
+  .zone-head .sub{font-size:10px;color:var(--ink-500);margin-top:2px}
+  .zone-body{flex:1;overflow:auto;padding:14px}
+
+  /* navigator list */
+  .navrow{display:flex;align-items:center;gap:9px;padding:8px 9px;border-radius:3px;cursor:pointer;border:1px solid transparent}
+  .navrow:hover{background:var(--paper-2)}
+  .navrow.active{border-color:var(--accent-step);background:#eff4ff}
+  .navrow .chk{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--ink-300);display:grid;place-items:center;flex-shrink:0}
+  .navrow.verified .chk{background:var(--accent-ok);border-color:var(--accent-ok);color:#fff;font-size:10px}
+  .navrow .kind{font-size:9px;font-weight:600;padding:1px 5px;border-radius:2px;flex-shrink:0;width:74px;text-align:center}
+  .navrow .lbl{font-size:12px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .navrow.verified .lbl{color:var(--ink-500)}
+  .flag{background:var(--accent-hazard);color:#fff;font-size:9px;font-weight:700;border-radius:50%;min-width:16px;height:16px;display:grid;place-items:center;padding:0 4px;flex-shrink:0}
+  .kind-step{background:#eff4ff;color:var(--accent-step)}
+  .kind-haz{background:#fef2f2;color:var(--accent-hazard)}
+  .kind-meas{background:#fff5ed;color:var(--accent-measure)}
+  .kind-ins{background:#ecfdff;color:var(--accent-mcu)}
+  .kind-dec{background:#fdf2f8;color:var(--accent-decision)}
+  .kind-esc{background:#fef2f2;color:var(--accent-hazard)}
+  .kind-sign{background:#fffbeb;color:#b45309}
+
+  /* center: current block */
+  .block-card{border:1.5px solid var(--accent-step);border-radius:4px;background:#fff;overflow:hidden}
+  .block-card .strip{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--ink-200);background:#eff4ff}
+  .pill{display:inline-flex;align-items:center;gap:5px;border:1px solid currentColor;padding:2px 8px;border-radius:2px;font-size:10px;font-weight:600}
+  .block-card h2{font-family:'Inter',sans-serif;font-size:17px;margin:0;padding:14px 16px 6px}
+  .block-card .body{font-family:'Inter',sans-serif;font-size:13.5px;line-height:1.55;color:var(--ink-700);padding:0 16px 14px}
+  .meta-pills{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 16px}
+  .tag{font-size:10px;color:var(--ink-500);border:1px solid var(--ink-300);border-radius:2px;padding:2px 7px}
+
+  /* AI check panel */
+  .ai-panel{margin-top:14px;border:1px solid var(--ink-300);border-radius:4px;overflow:hidden}
+  .ai-head{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--paper-2);border-bottom:1px solid var(--ink-200)}
+  .ai-head .l{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--accent-ok)}
+  .ai-head .rerun{font-size:10px;color:var(--ink-500);border:1px solid var(--ink-300);border-radius:2px;padding:3px 8px;cursor:pointer;background:#fff}
+  .flagcard{display:flex;gap:9px;padding:11px 12px;border-bottom:1px solid var(--ink-200)}
+  .flagcard:last-child{border-bottom:none}
+  .flagcard .sev{font-size:9px;font-weight:700;padding:2px 6px;border-radius:2px;height:fit-content;flex-shrink:0}
+  .sev-warn{background:#fff7ed;color:#c2410c;border:1px solid #fdba74}
+  .flagcard .txt{font-size:12px;line-height:1.45}
+  .flagcard .txt b{font-family:'Inter',sans-serif}
+  .flagcard .src{font-size:10px;color:var(--ink-500);margin-top:3px}
+
+  /* right: source */
+  .src-doc{font-family:'Inter',sans-serif;font-size:13px;line-height:1.6;color:var(--ink-700)}
+  .src-doc p{margin:0 0 12px}
+  .src-doc .hl{background:#fff3cd;border-bottom:2px solid var(--brand-yellow);padding:1px 2px}
+  .src-doc .focusblock{border-left:3px solid var(--accent-step);background:#f8fbff;padding:10px 12px;margin:0 0 12px}
+  .pageref{font-size:10px;color:var(--ink-500);margin-bottom:12px}
+
+  /* action bar */
+  .actionbar{grid-column:2 / 4;display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:1px solid var(--ink-300);background:var(--paper-2)}
+  .btn{font-family:inherit;border-radius:4px;font-size:12px;font-weight:600;padding:10px 16px;cursor:pointer;border:1px solid var(--ink-300);background:#fff;color:var(--ink-700)}
+  .btn.primary{background:var(--accent-ok);border-color:var(--accent-ok);color:#fff;display:flex;align-items:center;gap:7px}
+  .btn.ghost{background:transparent}
+  .btn.sendback{border-color:var(--accent-measure);color:#c2410c}
+  .khint{margin-left:auto;font-size:10px;color:var(--ink-500)}
+  .khint kbd{border:1px solid var(--ink-300);border-radius:2px;padding:1px 5px;background:#fff;font-family:inherit;font-size:9px}
+
+  /* design notes */
+  .notes{background:var(--steel-900);color:#d4d4d8;padding:14px 20px;font-size:11px;line-height:1.6}
+  .notes b{color:var(--brand-yellow)}
+  .notes .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px}
+  .notes h4{margin:0 0 4px;color:#fff;font-size:11px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ TOP BAR ============ -->
+  <div class="topbar">
+    <a class="back" href="#">‹ Library</a>
+    <div class="title">
+      <b>Forklift Pre-Start Inspection</b>
+      <span>v2 draft · edited 14s ago</span>
+    </div>
+    <span class="status-pill up">Draft</span>
+
+    <div class="spacer"></div>
+
+    <!-- STEPPER: always shows where you are -->
+    <div class="stepper">
+      <div class="step-chip done"><span class="n">✓</span> Build</div>
+      <span class="arr">→</span>
+      <div class="step-chip active"><span class="n">2</span> Review &amp; verify</div>
+      <span class="arr">→</span>
+      <div class="step-chip todo"><span class="n">3</span> Publish</div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="save mono">Saved <b>14s ago</b></div>
+    <div class="publish">
+      <button title="9 steps still need verifying">Publish SOP</button>
+      <span class="reason">🔒 9 of 11 steps left to verify</span>
+    </div>
+  </div>
+
+  <!-- ============ ORIENTATION STRIP ============ -->
+  <div class="orient">
+    <span class="badge up">Step 2 of 3</span>
+    <span class="prose">Check each step against the original document, then mark it verified. The AI safety check flags anything that looks off.</span>
+    <div class="prog">
+      <span class="mono">2 / 11 verified</span>
+      <span class="bar"><i></i></span>
+    </div>
+  </div>
+
+  <!-- ============ REVIEW STATION (3 zones) ============ -->
+  <div class="station">
+
+    <!-- ZONE 1: navigator -->
+    <div class="zone">
+      <div class="zone-head">
+        <div class="h">Steps in this SOP</div>
+        <div class="sub">Click any step to review it</div>
+      </div>
+      <div class="zone-body" style="padding:8px">
+        <div class="navrow verified"><span class="chk">✓</span><span class="kind kind-haz up">Hazard</span><span class="lbl">PPE &amp; site hazards</span></div>
+        <div class="navrow verified"><span class="chk">✓</span><span class="kind kind-step up">Step 01</span><span class="lbl">Park &amp; isolate truck</span></div>
+        <div class="navrow active"><span class="chk"></span><span class="kind kind-step up">Step 02</span><span class="lbl">Tighten hydraulic cap</span><span class="flag">1</span></div>
+        <div class="navrow"><span class="chk"></span><span class="kind kind-meas up">Measure</span><span class="lbl">Check tyre pressure</span><span class="flag">1</span></div>
+        <div class="navrow"><span class="chk"></span><span class="kind kind-step up">Step 03</span><span class="lbl">Mast chain inspection</span></div>
+        <div class="navrow"><span class="chk"></span><span class="kind kind-ins up">Inspect</span><span class="lbl">Fork condition</span></div>
+        <div class="navrow"><span class="chk"></span><span class="kind kind-step up">Step 04</span><span class="lbl">Horn &amp; warning lights</span></div>
+        <div class="navrow"><span class="chk"></span><span class="kind kind-meas up">Measure</span><span class="lbl">Hydraulic fluid level</span></div>
+        <div class="navrow"><span class="chk"></span><span class="kind kind-dec up">Decision</span><span class="lbl">Load test pass?</span></div>
+        <div class="navrow"><span class="chk"></span><span class="kind kind-esc up">Escalate</span><span class="lbl">Report any faults</span></div>
+        <div class="navrow"><span class="chk"></span><span class="kind kind-sign up">Sign-off</span><span class="lbl">Operator sign-off</span></div>
+      </div>
+    </div>
+
+    <!-- ZONE 2: current step -->
+    <div class="zone">
+      <div class="zone-head">
+        <div class="h">The step, in the app</div>
+        <div class="sub">This is what the worker will see on their phone</div>
+      </div>
+      <div class="zone-body">
+        <div class="block-card">
+          <div class="strip">
+            <span class="pill" style="color:var(--accent-step)">● Step 02</span>
+            <span class="mono muted" style="font-size:10px">tools &amp; PPE</span>
+          </div>
+          <h2 class="prose">Tighten the hydraulic reservoir cap</h2>
+          <div class="body prose">Locate the hydraulic reservoir cap on the right-hand side of the engine bay. Hand-tighten, then secure with a spanner. Confirm there are no leaks around the seal before continuing.</div>
+          <div class="meta-pills">
+            <span class="tag">🔧 19&nbsp;mm spanner</span>
+            <span class="tag">🧤 Gloves</span>
+            <span class="tag">⏱ 2&nbsp;min</span>
+          </div>
+        </div>
+
+        <!-- AI SAFETY CHECK -->
+        <div class="ai-panel">
+          <div class="ai-head">
+            <div class="l"><span class="dot" style="background:var(--accent-measure)"></span> AI safety check · 1 thing to look at</div>
+            <button class="rerun mono up">↻ Re-run</button>
+          </div>
+          <div class="flagcard">
+            <span class="sev sev-warn up">Check</span>
+            <div class="txt">
+              <b class="prose">A torque value may be missing.</b> The source says “torque to 25&nbsp;Nm”, but this step only says “secure with a spanner”.
+              <div class="src">Matched to original → page 2, “Hydraulic system”</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ZONE 3: source -->
+    <div class="zone">
+      <div class="zone-head">
+        <div class="h">Original document</div>
+        <div class="sub">Auto-scrolled to the part this step came from</div>
+      </div>
+      <div class="zone-body">
+        <div class="pageref mono up">Forklift-SOP-2024.docx · page 2</div>
+        <div class="src-doc">
+          <p>2.3 &nbsp;Engine bay checks must be completed with the truck isolated and keys removed.</p>
+          <div class="focusblock">
+            Tighten the hydraulic reservoir cap to <span class="hl">25&nbsp;Nm</span> using a 19&nbsp;mm spanner. Inspect the seal for leaks. Gloves must be worn.
+          </div>
+          <p>2.4 &nbsp;Check tyre pressures against the plate inside the cab door (see step below).</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTION BAR spans zone 2+3 -->
+    <div class="actionbar">
+      <button class="btn ghost">◀ Prev</button>
+      <button class="btn primary">✓ Looks right — verify step</button>
+      <button class="btn sendback">✎ Send back to edit</button>
+      <span class="khint">or press <kbd>A</kbd> verify · <kbd>E</kbd> edit · <kbd>J</kbd>/<kbd>K</kbd> next/prev</span>
+    </div>
+
+  </div>
+
+  <!-- ============ DESIGN NOTES (sketch annotation, not part of UI) ============ -->
+  <div class="notes">
+    <b>SKETCH — what changed &amp; why</b> &nbsp;(this dark strip is annotation, not part of the product)
+    <div class="grid">
+      <div>
+        <h4>① Orientation &amp; sequence</h4>
+        Top stepper (Build → Review → Publish) + one-line "what to do" strip. You always know where you are and what's next. Publish shows its <b>lock reason inline</b> ("9 of 11 left"), not in a hover tooltip.
+      </div>
+      <div>
+        <h4>② One step at a time</h4>
+        Instead of 6 always-on panels, the screen is a <b>Review Station</b>: pick a step (left) → see it as the worker will (centre) → compare to the exact source region (right). The AI check sits <b>with the step it's about</b>, so a red badge finally means something.
+      </div>
+      <div>
+        <h4>③ Plain language</h4>
+        "StepBlock"→<b>Step 02</b>, "block"→<b>step</b>, "a/d"→<b>Verify / Send back to edit</b>. Every pane has a one-line purpose. Semantic colours (blue step, red hazard, orange measure) carry meaning, not decoration.
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

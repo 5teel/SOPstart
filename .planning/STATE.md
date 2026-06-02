@@ -1,21 +1,16 @@
 ---
 gsd_state_version: 1.0
 milestone: v4.0
-milestone_name: Safety-Critical Parsing + Voice + AI Foundation
+milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
 status: in-progress
-started_at: "2026-05-24T00:00:00.000Z"
-last_updated: "2026-05-26T15:00:00.000Z"
-last_activity: 2026-05-26
-previous_milestone: v3.0 (archived 2026-05-23 — see .planning/MILESTONES.md § v3.0)
+stopped_at: Completed Phase 21 Plan 21-03 (Wave 3 — AI Reviewer Jobs B/C/D/E + auto-trigger + flag panel)
+last_updated: "2026-06-02T11:51:49.145Z"
 progress:
-  total_phases: 3
-  completed_phases: 1
-  in_flight_phases: 0
-  percent: 33
-  phases:
-    - "21. Safety-Critical Parsing (S-02 + S-03 + S-04 + I-01) — complete (PASS-WITH-NOTES, see VERIFICATION.md)"
-    - "22. Voice-Driven Walkthrough (W-01 + X-02) — not started, next"
-    - "23. AI Field Layer + Version Supersede (X-03 + G-01) — not started"
+  total_phases: 25
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -31,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Milestone status:** v4.0 started 2026-05-24. 3 phases / 40 requirements (1 of 3 phases complete). See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
-**Active phase:** 22 (Voice-Driven Walkthrough) — not started, next. Phase 21 closed 2026-05-26: 6 plans merged (Plan 21-05 gap closure added 2026-05-26 after UAT surfaced a structural gap — parser now creates `sop_section_blocks` junctions per Puck item with `block_provenance` so the verify gate is no longer a no-op). 23/23 SCP-* requirements covered; BlockContentSchema covers all 17 Puck registry kinds; defence-in-depth publish gate live; D-21-07 no-bulk-verify lint guard in CI. Human UAT items captured in VERIFICATION.md `human_verification` frontmatter — now runnable end-to-end against freshly parsed SOPs.
+**Active phase:** 21.5
 
 **v4.0 phase sequence:**
 
@@ -39,7 +34,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 2. **Phase 22 — Voice-Driven Walkthrough** (next): W-01 literacy/visual/voice gaps + X-02 voice-driven walkthrough. 8 requirements (VDW-LIT ×4, VDW-VOICE ×4).
 3. **Phase 23 — AI Field Layer + Version Supersede**: X-03 universal AI read/write + G-01 version supersede + worker-instance sign-off. 9 requirements (AFL-AI ×4, AFL-VER ×5).
 
-**Next action:** Simon to run `npx supabase db push --include-all` (applies migration 00033 alongside 00032) → upload a fresh DOCX → resume the 5-item UAT runbook from chat history. Then `/gsd-spec-phase 22` to scope Voice-Driven Walkthrough.
+**Next action:** /gsd-spec-phase 21.5
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
