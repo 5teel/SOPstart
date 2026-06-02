@@ -65,7 +65,7 @@ Plans:
 - [x] 21.5-01-PLAN.md — Humanized block-type labels + word-labelled verify/send-back row actions (R4, R5)
 - [x] 21.5-02-PLAN.md — Adaptive Build→Review→Publish stepper + inline publish reason + Review orientation strip (R1, R6, R8, R9)
 - [x] 21.5-03-PLAN.md — Dedicated Publish stage with always-visible blocked reason + gated publish button (R6, R7)
-- [ ] 21.5-04-PLAN.md — Review Station 3-zone grid (navigator / step-in-app + inline AI / source), responsive ≥768px (R2, R3, R9)
+- [x] 21.5-04-PLAN.md — Review Station 3-zone grid (navigator / step-in-app + inline AI / source), responsive ≥768px (R2, R3, R9)
 - [ ] 21.5-05-PLAN.md — Builder stage shell integration + page wiring + safety-invariant verification spec (R1, R8, R10)
 
 ### Phase 1: Foundation
@@ -472,7 +472,7 @@ These two items belong with kiosk mode + site-tier work in Phase 15 because they
   9. Global app-wide Cmd+K mounted across all `(protected)` routes — surfaces app-wide navigation (Library, Blocks, Team, Create via Upload/Blank/AI, Settings, kiosk site selector for multi-site admins) alongside the existing SOP-scoped jump-to-step + ask-AI on SOP pages.
   10. Bundle isolation: kiosk mode chunks + voice Q&A RAG client do not leak into the existing mobile worker bundle; mobile worker walkthrough First Load JS does not grow as a result of Phase 15.
 
-**Plans:** 3/5 plans executed
+**Plans:** 4/5 plans executed
 
 Plans:
 
