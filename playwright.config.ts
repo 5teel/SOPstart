@@ -93,5 +93,11 @@ export default defineConfig({
       testMatch:
         /(validators\/__tests__\/block-content-extended|parsers\/__tests__\/parser-creates-junctions)\.test\.ts$/,
     },
+    {
+      // Phase 21.5 — builder label map unit tests.
+      name: 'phase21.5-unit',
+      testDir: './src/lib/builder/__tests__',
+      testMatch: /.*\.test\.ts$/,
+    },
   ],
 })
