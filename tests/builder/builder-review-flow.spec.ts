@@ -204,7 +204,7 @@ test('R8: BuilderStageShell derives hasSourceDoc/showPane and gates ReviewStatio
   // ReviewStation must only render when hasSourceDoc
   // Proxy: the ReviewStation JSX block should be guarded with hasSourceDoc
   expect(shellSrc, 'Shell must guard ReviewStation on hasSourceDoc').toMatch(
-    /hasSourceDoc.*ReviewStation|ReviewStation.*hasSourceDoc/s,
+    /hasSourceDoc[\s\S]*ReviewStation|ReviewStation[\s\S]*hasSourceDoc/,
   )
 
   // showVerifyGate must also be derived
