@@ -90,12 +90,16 @@ Respond with a JSON array only. No prose, no markdown.
 Each element: { "severity": "critical"|"warning", "section_title": "string", "step_number": null, "original_text": "the unverified phrase from the answer", "structured_text": "what the cited section actually says", "description": "why this claim is not grounded in the cited section" }
 If every claim is grounded, respond with exactly: []`
 
-// Model selection: claude-3-5-haiku for cost (~$0.01/SOP).
+// Model selection: claude-haiku-4-5 for cost-effective verification.
 // Override with ANTHROPIC_VERIFY_MODEL env var if needed.
+// [2026-06-02] Updated from the now-retired `claude-3-5-haiku-20241022`, which
+// Anthropic deprecated — every reviewer/verifier call returned
+// `404 not_found_error: model: claude-3-5-haiku-20241022`. Now matches
+// VOICE_QA_VERIFY_MODEL (the same current Haiku the voice-QA path already uses).
 // Phase 21 (Plan 21-01): exported for Job A of the AI reviewer. Plan 21-03
-// will A/B Sonnet 4.5 vs Haiku 4.5 for the full reviewer suite; this constant
+// will A/B Sonnet vs Haiku for the full reviewer suite; this constant
 // remains the Phase 6 transcript-mode default.
-export const VERIFY_MODEL = process.env.ANTHROPIC_VERIFY_MODEL || 'claude-3-5-haiku-20241022'
+export const VERIFY_MODEL = process.env.ANTHROPIC_VERIFY_MODEL || 'claude-haiku-4-5-20251001'
 
 // Phase 15 D-08: voice_qa uses claude-haiku-4-5 (same model as the answer call) so the
 // answer-call cache write at this exact model is reused by the verifier-call cache read.
