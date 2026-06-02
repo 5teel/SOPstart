@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
-status: in-progress
-stopped_at: Completed Phase 21 Plan 21-03 (Wave 3 — AI Reviewer Jobs B/C/D/E + auto-trigger + flag panel)
-last_updated: "2026-06-02T11:51:49.145Z"
+status: Executing Phase 21.5
+stopped_at: Phase 21.5 UI-SPEC approved (6/6 dimensions)
+last_updated: "2026-06-02T13:04:02.986Z"
 progress:
-  total_phases: 25
+  total_phases: 26
   completed_phases: 0
-  total_plans: 0
+  total_plans: 5
   completed_plans: 0
   percent: 0
 ---
@@ -20,10 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** v4.0 Phase 22 — Voice-Driven Walkthrough. Phase 21 complete (verdict PASS-WITH-NOTES — see `.planning/phases/21-safety-critical-parsing/VERIFICATION.md`).
+**Current focus:** Phase 21.5 — builder-review-ux
 
 ## Current Position
 
+Phase: 21.5 (builder-review-ux) — EXECUTING
+Plan: 1 of 5
 **Milestone status:** v4.0 started 2026-05-24. 3 phases / 40 requirements (1 of 3 phases complete). See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
 **Active phase:** 21.5
@@ -312,7 +314,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-25T15:03:38.000Z
-Stopped at: Completed Phase 21 Plan 21-03 (Wave 3 — AI Reviewer Jobs B/C/D/E + auto-trigger + flag panel)
-Resume file: None
+Last session: 2026-06-02T12:36:34.211Z
+Stopped at: Phase 21.5 UI-SPEC approved (6/6 dimensions)
+Resume file: .planning/phases/21.5-builder-review-ux/21.5-UI-SPEC.md
 Awaiting: Phase 21 Wave 4 — per-block verify checklist + publish gate. Migration 00032 push outstanding (creates verified_by_admin_id, ai_review_results, org_anthropic_spend, ai_review_rate_limits).
