@@ -127,10 +127,11 @@ test('humanizeBlockType("") returns "Block" fallback', () => {
   expect(humanizeBlockType('')).toBe('Block')
 })
 
-test('humanizeBlockType("SomeRandomBlock") returns "Block" fallback, not the input', () => {
+test('humanizeBlockType("SomeRandomBlock") returns "Block" fallback, not the raw input', () => {
   const result = humanizeBlockType('SomeRandomBlock')
-  // Must NOT echo raw input ending in 'Block'
-  expect(result).not.toMatch(/Block$/)
+  // R4 invariant: must NOT echo the raw input (which ends in 'Block')
+  // The safe fallback 'Block' is the single-word sentinel, not the raw symbol
+  expect(result).not.toBe('SomeRandomBlock')
   expect(result).toBe('Block')
 })
 
