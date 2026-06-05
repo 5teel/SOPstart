@@ -108,5 +108,14 @@ export default defineConfig({
       testDir: '.',
       testMatch: /(block-type-labels|builder-review-flow)\.(test|spec)\.ts$/,
     },
+    {
+      // Phase 21.6 — source-contract + lint guard stubs (Plan 01):
+      //   builder-edit-stage.spec.ts  — E3/E4/E5/E6/E7 structural invariants
+      //   no-raw-block-types-in-build.spec.ts — E2 raw block-type leak guard
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      name: 'phase21.6-stubs',
+      testDir: '.',
+      testMatch: /(no-raw-block-types-in-build|builder-edit-stage)\.(test|spec)\.ts$/,
+    },
   ],
 })
