@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
-status: Executing Phase 21.5
-stopped_at: Phase 21.6 planned — 5 plans / 4 waves, plan-checker PASSED
-last_updated: "2026-06-05T08:03:18.806Z"
+status: Executing Phase 21.6
+stopped_at: Phase 21.6 Plan 01 complete — Wave-0 scaffold (phase21.6-stubs project + E2-E7 specs)
+last_updated: "2026-06-05T12:18:00Z"
 progress:
   total_phases: 27
   completed_phases: 1
   total_plans: 10
-  completed_plans: 5
-  percent: 4
+  completed_plans: 6
+  percent: 5
 ---
 
 # Project State
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 21.5 — builder-review-ux
+**Current focus:** Phase 21.6 — builder-edit-stage-redesign
 
 ## Current Position
 
-Phase: 21.5 (builder-review-ux) — COMPLETE
-Plan: 5 of 5 (all plans complete)
+Phase: 21.6 (builder-edit-stage-redesign) — EXECUTING
+Plan: 2 of 5
 **Milestone status:** v4.0 started 2026-05-24. 3 phases / 40 requirements (1 of 3 phases complete). See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
 **Active phase:** 21.5
@@ -316,7 +316,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-05T08:03:18.799Z
-Stopped at: Phase 21.6 planned — 5 plans / 4 waves, plan-checker PASSED
-Resume file: .planning/phases/21.6-builder-edit-stage-redesign/21.6-01-PLAN.md
-Awaiting: (1) Phase 21.5 UAT on sopstart.com — verify Build→Review→Publish flow on live builder route (8 items in 21.5-HUMAN-UAT.md). (2) Phase 21.6 (Builder Edit Stage Redesign) inserted from 21.5 UAT feedback — next action is /gsd-spec-phase 21.6. Phase 22 (Voice-Driven Walkthrough) now follows 21.6.
+Last session: 2026-06-05T12:18:00Z
+Stopped at: Phase 21.6 Plan 01 complete — Wave-0 scaffold (phase21.6-stubs project + E2-E7 specs)
+Resume file: .planning/phases/21.6-builder-edit-stage-redesign/21.6-02-PLAN.md
+Awaiting: Phase 21.6 Plan 02 — puck-config.tsx reconfigure (suppress palette/outline + contentEditable inline editing).

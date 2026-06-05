@@ -78,7 +78,7 @@ Plans:
 
 Plans:
 
-- [ ] 21.6-01-PLAN.md — Wave 0: source-contract spec + E2 lint guard + phase21.6-stubs playwright project (E2-E7 gate)
+- [x] 21.6-01-PLAN.md — Wave 0: source-contract spec + E2 lint guard + phase21.6-stubs playwright project (E2-E7 gate)
 - [ ] 21.6-02-PLAN.md — Reconfigure puck-config: suppress palette/outline (E3) + contentEditable inline editing (E4); preserve componentItem/componentOverlay (E7)
 - [ ] 21.6-03-PLAN.md — BuilderTreeRail + Tree{Section,Step,Block}Row: humanised Section-Steps spine, reorder, Reference-images relabel (E1/E2/E5/E6)
 - [ ] 21.6-04-PLAN.md — AddMenu (humanised + From-library) + StructuredFieldPopover (E3/E4)
