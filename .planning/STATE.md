@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
 status: Executing Phase 21.5
-stopped_at: Phase 21.6 UI-SPEC approved
-last_updated: "2026-06-05T06:55:32.940Z"
+stopped_at: Phase 21.6 planned — 5 plans / 4 waves, plan-checker PASSED
+last_updated: "2026-06-05T08:03:18.806Z"
 progress:
   total_phases: 27
   completed_phases: 1
-  total_plans: 5
+  total_plans: 10
   completed_plans: 5
   percent: 4
 ---
@@ -316,7 +316,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-05T06:55:32.932Z
-Stopped at: Phase 21.6 UI-SPEC approved
-Resume file: .planning/phases/21.6-builder-edit-stage-redesign/21.6-UI-SPEC.md
+Last session: 2026-06-05T08:03:18.799Z
+Stopped at: Phase 21.6 planned — 5 plans / 4 waves, plan-checker PASSED
+Resume file: .planning/phases/21.6-builder-edit-stage-redesign/21.6-01-PLAN.md
 Awaiting: (1) Phase 21.5 UAT on sopstart.com — verify Build→Review→Publish flow on live builder route (8 items in 21.5-HUMAN-UAT.md). (2) Phase 21.6 (Builder Edit Stage Redesign) inserted from 21.5 UAT feedback — next action is /gsd-spec-phase 21.6. Phase 22 (Voice-Driven Walkthrough) now follows 21.6.
