@@ -219,22 +219,30 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
     return out
   }, [activeSection, junctionMap])
 
-  // Phase 21.6 Plan 05 (E6): build componentId → raw props lookup for the
-  // componentOverlay "Reference images" chip. Pure read of layout_data.
-  const componentIdToProps = useMemo<Map<string, Record<string, unknown>>>(() => {
-    const out = new Map<string, Record<string, unknown>>()
-    if (!activeSection?.layout_data) return out
+  // Phase 21.6 Plan 05 (E6 + D-04): build componentId → raw props and
+  // componentId → block type lookups. Pure read of layout_data.
+  // componentIdToProps feeds the "Reference images" chip in componentOverlay.
+  // componentIdToType feeds StructuredFieldPopover block-type detection.
+  const { componentIdToProps, componentIdToType } = useMemo<{
+    componentIdToProps: Map<string, Record<string, unknown>>
+    componentIdToType: Map<string, string>
+  }>(() => {
+    const propsMap = new Map<string, Record<string, unknown>>()
+    const typeMap = new Map<string, string>()
+    if (!activeSection?.layout_data) return { componentIdToProps: propsMap, componentIdToType: typeMap }
     const parsed = LayoutDataSchema.safeParse(activeSection.layout_data)
-    if (!parsed.success) return out
+    if (!parsed.success) return { componentIdToProps: propsMap, componentIdToType: typeMap }
     const items = (parsed.data.content ?? []) as Array<{
+      type?: string
       props?: Record<string, unknown> & { id?: string }
     }>
     for (const item of items) {
       const componentId = item?.props?.id
       if (!componentId || typeof componentId !== 'string') continue
-      out.set(componentId, item.props ?? {})
+      propsMap.set(componentId, item.props ?? {})
+      if (item.type) typeMap.set(componentId, item.type)
     }
-    return out
+    return { componentIdToProps: propsMap, componentIdToType: typeMap }
   }, [activeSection])
 
   // Phase 21 Plan 21-02 — selection-sync wiring (source viewer ↔ canvas).
@@ -353,18 +361,15 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
         onItemSelected: (info) => {
           onItemSelectedRef.current(info)
           // D-04: track selected block for StructuredFieldPopover.
-          // Look up the block's componentType from layout_data via componentIdToProps.
-          const props = componentIdToProps.get(info.componentId)
-          if (props && typeof props['__componentType'] === 'string') {
-            const btype = props['__componentType'] as string
-            if (STRUCTURED_BLOCK_TYPES.has(btype)) {
-              setSelectedBlockId(info.componentId)
-              setSelectedBlockType(btype)
-            } else {
-              // Text/non-structured block — close popover if open
-              setSelectedBlockId(null)
-              setSelectedBlockType(null)
-            }
+          // Look up the block type from componentIdToType (built from layout_data).
+          const btype = componentIdToType.get(info.componentId)
+          if (btype && STRUCTURED_BLOCK_TYPES.has(btype)) {
+            setSelectedBlockId(info.componentId)
+            setSelectedBlockType(btype)
+          } else {
+            // Text/non-structured block or unknown — close popover if open
+            setSelectedBlockId(null)
+            setSelectedBlockType(null)
           }
         },
         // Phase 21 Plan 21-03 — inline ReviewerFlagsPanel under each block.
@@ -374,7 +379,7 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
             <ReviewerFlagsPanel sopId={sopId} blockId={junctionId} />
           ) : null,
       }),
-    [junctionMap, componentIdToJunction, componentIdToProps, refreshJunctions, sopId]
+    [junctionMap, componentIdToJunction, componentIdToProps, componentIdToType, refreshJunctions, sopId]
   )
 
   // Reference highlighted state so React keeps the subscription effect alive
