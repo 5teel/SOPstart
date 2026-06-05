@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
 status: Executing Phase 21.5
-stopped_at: Phase 21.5 Plan 05 complete — BuilderStageShell live on builder route
-last_updated: "2026-06-02T13:33:00Z"
+stopped_at: Phase 21.5 Plan 05 complete — BuilderStageShell (shell integration) committed baf5ee6 + 132335f, pushed to Railway
+last_updated: "2026-06-05T04:16:48.220Z"
 progress:
-  total_phases: 26
-  completed_phases: 0
+  total_phases: 27
+  completed_phases: 1
   total_plans: 5
   completed_plans: 5
-  percent: 100
+  percent: 4
 ---
 
 # Project State
@@ -36,7 +36,9 @@ Plan: 5 of 5 (all plans complete)
 2. **Phase 22 — Voice-Driven Walkthrough** (next): W-01 literacy/visual/voice gaps + X-02 voice-driven walkthrough. 8 requirements (VDW-LIT ×4, VDW-VOICE ×4).
 3. **Phase 23 — AI Field Layer + Version Supersede**: X-03 universal AI read/write + G-01 version supersede + worker-instance sign-off. 9 requirements (AFL-AI ×4, AFL-VER ×5).
 
-**Next action:** /gsd-spec-phase 21.5
+**Next action:** /gsd-spec-phase 21.6 (Builder Edit Stage Redesign — inserted 2026-06-05 from 21.5 UAT feedback)
+
+**Roadmap evolution:** Phase 21.6 (Builder Edit Stage Redesign) INSERTED after 21.5, before 22, on 2026-06-05. Reason: 21.5 redesigned the Review/Publish stages but the Build/edit stage is still the untouched Puck editor — first-time admins hit jargon ("Block"), two redundant block lists (palette vs outline), unanchored canvas figures, and a cramped right-rail field editor. Decision by Simon during 21.5 UAT.
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
@@ -317,4 +319,4 @@ None yet.
 Last session: 2026-06-02T13:33:00Z
 Stopped at: Phase 21.5 Plan 05 complete — BuilderStageShell (shell integration) committed baf5ee6 + 132335f, pushed to Railway
 Resume file: .planning/phases/21.5-builder-review-ux/21.5-05-SUMMARY.md
-Awaiting: Phase 21.5 UAT on sopstart.com — verify Build→Review→Publish flow on live builder route; then plan Phase 22 (Voice-Driven Walkthrough).
+Awaiting: (1) Phase 21.5 UAT on sopstart.com — verify Build→Review→Publish flow on live builder route (8 items in 21.5-HUMAN-UAT.md). (2) Phase 21.6 (Builder Edit Stage Redesign) inserted from 21.5 UAT feedback — next action is /gsd-spec-phase 21.6. Phase 22 (Voice-Driven Walkthrough) now follows 21.6.

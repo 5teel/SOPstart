@@ -48,6 +48,7 @@ Three phases bundle the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` 
 
 - [x] **Phase 21: Safety-Critical Parsing** ✅ 2026-05-25 (PASS-WITH-NOTES) — Finishes the Phase 20 contract. Side-by-side source viewer (S-02) + AI reviewer × 5 verification jobs (S-03) + per-block verify checklist at publish gate (S-04) + Word/PDF parsing with step-level provenance (I-01). 5 plans / 5 waves merged; 23/23 SCP-* requirements covered; defence-in-depth publish gate (UI disabled + server 400); D-21-07 no-bulk-verify lint guard live in CI. See `.planning/phases/21-safety-critical-parsing/VERIFICATION.md`.
 - [x] **Phase 21.5: Builder Review UX** ✅ 2026-06-02 (5/5 plans) — Restructure the admin SOP builder review/publish surface to remove first-run confusion (currently 5–6 always-on panels, internal jargon like "StepBlock", a hidden publish gate). One-step-at-a-time "Review Station" (step navigator left · step-in-app centre · source document right), AI reviewer check rendered inside the step card it relates to, 3-stage stepper (Build → Review → Publish), humanized labels ("Verify / Send back to edit", not a/d), publish-gate lock reason shown inline. Validated design: `sketch-builder-redesign-01.html` on the paper/ink sketch-findings-SOPstart system. Reuses shipped Phase 21 code (BuilderWithSourceViewer, SourceViewerPane, VerifyChecklistGate, ReviewerFlagsPanel). Runs **before** Phase 22 per Simon's priority. UI-led — produces a UI-SPEC.
+- [ ] **Phase 21.6: Builder Edit Stage Redesign** (INSERTED 2026-06-05) — Apply the 21.5 review-redesign philosophy to the **Build/edit** stage, which is still the untouched Puck editor. First-time admins hit internal jargon ("Block"), two redundant block lists (Puck component palette = add-new vs outline = already-placed), unanchored canvas figures with no clear action, and a cramped right-rail field editor. Scope from UAT feedback: (1) humanize block-type labels in the Puck palette + outline (reuse `humanizeBlockType` / `block-type-labels.ts` from 21.5 — currently only on the review surface); (2) collapse palette + outline into one clear affordance; (3) move content editing into the central canvas instead of the narrow right rail; (4) clarify the `SectionListSidebar` purpose + 1st→last ordering; (5) clarify what the user does with canvas figures/images. UI-led — produces a UI-SPEC. Runs **before** Phase 22.
 - [ ] **Phase 22: Voice-Driven Walkthrough** — Worker walkthrough literacy gaps closed (W-01) + AI Voice Q&A that drives the walkthrough end-to-end (X-02). Bundle: voice infrastructure (transcription, TTS, multi-language) serves both the literacy story and the Q&A story.
 - [ ] **Phase 23: AI Field Layer + Version Supersede** — Universal AI read/write access to every editable field + Cmd+K extended across admin surfaces (X-03) + version history formal supersede + diff + restore + worker-instance sign-off chain (G-01). X-03 is the architectural backbone v5.0 conversational app builds on; G-01 fits naturally alongside as a small standalone bundle.
 
@@ -67,6 +68,17 @@ Plans:
 - [x] 21.5-03-PLAN.md — Dedicated Publish stage with always-visible blocked reason + gated publish button (R6, R7)
 - [x] 21.5-04-PLAN.md — Review Station 3-zone grid (navigator / step-in-app + inline AI / source), responsive ≥768px (R2, R3, R9)
 - [x] 21.5-05-PLAN.md — Builder stage shell integration + page wiring + safety-invariant verification spec (R1, R8, R10)
+
+### Phase 21.6: Builder Edit Stage Redesign (INSERTED)
+
+**Goal**: A first-time admin can edit SOP content in the Build stage without internal jargon or redundant panels — one block list (not separate palette + outline), humanized block labels, and content editing in the central canvas rather than a cramped side rail.
+**Depends on**: Phase 21.5 (reuses `block-type-labels.ts` / `humanizeBlockType`, `BuilderStageShell`, `SectionListSidebar`, the `BuilderClient` Puck editor)
+**Requirements**: To be defined in 21.6-SPEC.md — candidate IDs: E1 humanized-edit-labels, E2 unified-block-list, E3 central-canvas-editing, E4 section-list-clarity, E5 canvas-figure-handling
+**Plans**: Not planned yet
+
+Plans:
+
+- [ ] (run `/gsd-spec-phase 21.6` → `/gsd-discuss-phase 21.6` → `/gsd-plan-phase 21.6`)
 
 ### Phase 1: Foundation
 
