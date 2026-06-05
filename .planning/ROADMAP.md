@@ -73,7 +73,7 @@ Plans:
 
 **Goal**: A first-time admin can edit SOP content in the Build stage without internal jargon or redundant panels — one block list (not separate palette + outline), humanized block labels, and content editing in the central canvas rather than a cramped side rail.
 **Depends on**: Phase 21.5 (reuses `block-type-labels.ts` / `humanizeBlockType`, `BuilderStageShell`, `SectionListSidebar`, the `BuilderClient` Puck editor)
-**Requirements**: To be defined in 21.6-SPEC.md — candidate IDs: E1 humanized-edit-labels, E2 unified-block-list, E3 central-canvas-editing, E4 section-list-clarity, E5 canvas-figure-handling
+**Requirements** (21.6-SPEC.md is the ID source): E1 step-centric-list, E2 humanized-labels, E3 one-content-list, E4 inline-canvas-editing, E5 section-list-clarity, E6 reference-gallery, E7 no-safety-regression
 **Plans**: Not planned yet
 
 Plans:
