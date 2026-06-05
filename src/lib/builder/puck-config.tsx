@@ -877,6 +877,13 @@ export function createPuckOverrides(opts: {
   junctionMap?: Map<string, SopSectionBlockWithUpdate>
   /** Phase 13 plan 13-04: keyed by Puck componentId (= layout_data props.id) */
   componentIdToJunction?: Map<string, SopSectionBlockWithUpdate>
+  /**
+   * Phase 21.6 Plan 05 (E6): keyed by Puck componentId (= layout_data props.id)
+   * → the block's raw props object. Used to detect orphan-photo HeadingBlocks
+   * whose text startsWith('Unanchored figures') for the "Reference images" chip.
+   * Display-only — never written by the overlay (Pitfall 6).
+   */
+  componentIdToProps?: Map<string, Record<string, unknown>>
   /** Phase 13 plan 13-04: callback fired after Accept / Decline to refresh junctions */
   onReviewed?: () => void
   /**
@@ -963,6 +970,7 @@ export function createPuckOverrides(opts: {
     componentOverlay: ({
       children,
       componentId,
+      componentType,
       isSelected,
     }: {
       children: ReactNode
@@ -973,6 +981,38 @@ export function createPuckOverrides(opts: {
     }): ReactElement => {
       const map = opts.componentIdToJunction
       const onItemSelected = opts.onItemSelected
+
+      // Phase 21.6 Plan 05 (E6): display-only "Reference images" chip for
+      // orphan-photo HeadingBlocks. Rendered OVER the native block when the
+      // block's `props.text` startsWith('Unanchored figures'). No prop
+      // mutation, no layout_data write (Pitfall 6).
+      const blockProps = opts.componentIdToProps?.get(componentId)
+      const isOrphanPhotoHeading =
+        componentType === 'HeadingBlock' &&
+        String(blockProps?.text ?? '').startsWith('Unanchored figures')
+      const referenceImagesChip = isOrphanPhotoHeading ? (
+        <div
+          aria-label="Reference images"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '2px 8px',
+            fontSize: '10px',
+            fontFamily: 'JetBrains Mono, monospace',
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+            background: '#eff4ff',
+            color: 'var(--accent-step)',
+            border: '1px solid #93c5fd',
+            borderRadius: '2px',
+            marginBottom: '2px',
+            userSelect: 'none',
+          }}
+        >
+          Reference images
+        </div>
+      ) : null
       // Phase 21: fan selection events out to the source viewer. Wrap in
       // a tiny child component so the hook can use effects safely (Puck
       // re-renders componentOverlay on every selection change, so an
@@ -995,6 +1035,7 @@ export function createPuckOverrides(opts: {
       if (!map || map.size === 0) {
         return (
           <>
+            {referenceImagesChip}
             {selectionTap}
             {children}
             {flagPanel}
@@ -1003,6 +1044,7 @@ export function createPuckOverrides(opts: {
       }
       return (
         <>
+          {referenceImagesChip}
           {selectionTap}
           <PuckItemBadgeOverlay
             componentId={componentId}
