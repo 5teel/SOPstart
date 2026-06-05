@@ -216,7 +216,7 @@ export const puckConfig: Config = {
   components: {
     TextBlock: {
       fields: {
-        content: { type: 'textarea' },
+        content: { type: 'textarea', contentEditable: true },
       },
       defaultProps: { content: 'Text content…' } satisfies TextBlockProps,
       render: (rawProps) => {
@@ -237,7 +237,7 @@ export const puckConfig: Config = {
     },
     HeadingBlock: {
       fields: {
-        text: { type: 'text' },
+        text: { type: 'text', contentEditable: true },
         level: {
           type: 'select',
           options: [
@@ -295,8 +295,8 @@ export const puckConfig: Config = {
     },
     CalloutBlock: {
       fields: {
-        title: { type: 'text' },
-        body: { type: 'textarea' },
+        title: { type: 'text', contentEditable: true },
+        body: { type: 'textarea', contentEditable: true },
       },
       defaultProps: {
         title: 'Note',
@@ -321,7 +321,7 @@ export const puckConfig: Config = {
     StepBlock: {
       fields: {
         number: { type: 'number', min: 1 },
-        text: { type: 'textarea' },
+        text: { type: 'textarea', contentEditable: true },
       },
       defaultProps: {
         number: 1,
@@ -345,8 +345,8 @@ export const puckConfig: Config = {
     },
     HazardCardBlock: {
       fields: {
-        title: { type: 'text' },
-        body: { type: 'textarea' },
+        title: { type: 'text', contentEditable: true },
+        body: { type: 'textarea', contentEditable: true },
         severity: {
           type: 'select',
           options: [
@@ -379,7 +379,7 @@ export const puckConfig: Config = {
     },
     PPECardBlock: {
       fields: {
-        title: { type: 'text' },
+        title: { type: 'text', contentEditable: true },
         items: {
           type: 'array',
           arrayFields: {
@@ -426,7 +426,7 @@ export const puckConfig: Config = {
     },
     MeasurementBlock: {
       fields: {
-        label: { type: 'text', label: 'Label' },
+        label: { type: 'text', label: 'Label', contentEditable: true },
         unit: { type: 'text', label: 'Unit' },
         voiceEnabled: {
           type: 'select',
@@ -460,7 +460,7 @@ export const puckConfig: Config = {
     },
     DecisionBlock: {
       fields: {
-        question: { type: 'text', label: 'Question' },
+        question: { type: 'text', label: 'Question', contentEditable: true },
         options: {
           type: 'array',
           arrayFields: {
@@ -500,8 +500,8 @@ export const puckConfig: Config = {
     },
     EscalateBlock: {
       fields: {
-        title: { type: 'text', label: 'Title' },
-        reason: { type: 'textarea', label: 'Reason (optional)' },
+        title: { type: 'text', label: 'Title', contentEditable: true },
+        reason: { type: 'textarea', label: 'Reason (optional)', contentEditable: true },
         escalationMode: {
           type: 'select',
           label: 'Escalation mode',
@@ -534,7 +534,7 @@ export const puckConfig: Config = {
     },
     SignOffBlock: {
       fields: {
-        title: { type: 'text', label: 'Title' },
+        title: { type: 'text', label: 'Title', contentEditable: true },
         requiredRole: {
           type: 'select',
           label: 'Required role',
@@ -544,7 +544,7 @@ export const puckConfig: Config = {
             { label: 'Admin', value: 'admin' },
           ],
         },
-        acknowledgementText: { type: 'textarea', label: 'Acknowledgement text (optional)' },
+        acknowledgementText: { type: 'textarea', label: 'Acknowledgement text (optional)', contentEditable: true },
       },
       defaultProps: {
         title: 'Supervisor sign-off',
@@ -568,7 +568,7 @@ export const puckConfig: Config = {
     },
     ZoneBlock: {
       fields: {
-        label: { type: 'text', label: 'Zone name' },
+        label: { type: 'text', label: 'Zone name', contentEditable: true },
         zoneType: {
           type: 'select',
           label: 'Zone type',
@@ -579,7 +579,7 @@ export const puckConfig: Config = {
             { label: 'Pedestrian', value: 'pedestrian' },
           ],
         },
-        notes: { type: 'textarea', label: 'Notes (optional)' },
+        notes: { type: 'textarea', label: 'Notes (optional)', contentEditable: true },
       },
       defaultProps: {
         label: 'Forklift corridor',
@@ -603,7 +603,7 @@ export const puckConfig: Config = {
     },
     InspectBlock: {
       fields: {
-        title: { type: 'text', label: 'Title' },
+        title: { type: 'text', label: 'Title', contentEditable: true },
         items: {
           type: 'array',
           arrayFields: {
@@ -643,7 +643,7 @@ export const puckConfig: Config = {
     },
     VoiceNoteBlock: {
       fields: {
-        prompt: { type: 'text', label: 'Prompt' },
+        prompt: { type: 'text', label: 'Prompt', contentEditable: true },
         language: {
           type: 'select',
           label: 'Language',
@@ -704,7 +704,7 @@ export const puckConfig: Config = {
     StepWithPhotosBlock: {
       fields: {
         number: { type: 'number', min: 1 },
-        text: { type: 'textarea' },
+        text: { type: 'textarea', contentEditable: true },
         photos: {
           type: 'array',
           arrayFields: {
