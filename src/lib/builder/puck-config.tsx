@@ -913,6 +913,10 @@ export function createPuckOverrides(opts: {
   // can pass either / both as their needs evolve.
   void opts.junctionMap
   return {
+    // E3: suppress Puck's native component palette (left panel) — replaced by BuilderTreeRail
+    components: () => <></>,
+    // E3: suppress Puck's native outline tree (left panel tab) — replaced by BuilderTreeRail
+    outline: () => <></>,
     componentItem: ({
       children,
       name,
