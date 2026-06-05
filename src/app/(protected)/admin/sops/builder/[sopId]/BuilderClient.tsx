@@ -17,7 +17,12 @@ import { useNetworkStore } from '@/stores/network'
 import { db } from '@/lib/offline/db'
 import { listSectionBlocksWithUpdates } from '@/actions/sop-section-blocks'
 import { listBlockCategories } from '@/actions/blocks'
-import { SectionListSidebar } from './SectionListSidebar'
+import { BuilderTreeRail } from '@/components/admin/builder/BuilderTreeRail'
+import { AddMenu } from '@/components/admin/builder/AddMenu'
+import { StructuredFieldPopover } from '@/components/admin/builder/StructuredFieldPopover'
+import { BlockPicker } from '@/components/admin/blocks/BlockPicker'
+import type { BlockPickerOnAddInput } from '@/components/admin/blocks/BlockPicker'
+import { addBlockToSection } from '@/actions/sop-section-blocks'
 import { useSelectionSync } from '@/components/admin/source-viewer/useSelectionSync'
 import { ReviewerFlagsPanel } from '@/components/admin/ai-reviewer/ReviewerFlagsPanel'
 import { RerunReviewerButton } from '@/components/admin/ai-reviewer/RerunReviewerButton'
@@ -41,6 +46,16 @@ const Puck = dynamic(
 )
 
 const emptyData: Data = { content: [], root: { props: {} } }
+
+// Structured block types (D-04): non-text fields warrant the StructuredFieldPopover
+const STRUCTURED_BLOCK_TYPES = new Set([
+  'MeasurementBlock',
+  'DecisionBlock',
+  'InspectBlock',
+  'SignOffBlock',
+  'HazardCardBlock',
+  'PPECardBlock',
+])
 
 interface BuilderClientProps {
   sopId: string
@@ -204,6 +219,24 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
     return out
   }, [activeSection, junctionMap])
 
+  // Phase 21.6 Plan 05 (E6): build componentId → raw props lookup for the
+  // componentOverlay "Reference images" chip. Pure read of layout_data.
+  const componentIdToProps = useMemo<Map<string, Record<string, unknown>>>(() => {
+    const out = new Map<string, Record<string, unknown>>()
+    if (!activeSection?.layout_data) return out
+    const parsed = LayoutDataSchema.safeParse(activeSection.layout_data)
+    if (!parsed.success) return out
+    const items = (parsed.data.content ?? []) as Array<{
+      props?: Record<string, unknown> & { id?: string }
+    }>
+    for (const item of items) {
+      const componentId = item?.props?.id
+      if (!componentId || typeof componentId !== 'string') continue
+      out.set(componentId, item.props ?? {})
+    }
+    return out
+  }, [activeSection])
+
   // Phase 21 Plan 21-02 — selection-sync wiring (source viewer ↔ canvas).
   // The provider lives one level up in BuilderWithSourceViewer; when the
   // pane is absent (no source attached / wrapper disabled), useSelectionSync
@@ -270,6 +303,41 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
     return unregister
   }, [registerBlockClickHandler, componentIdToJunction])
 
+  // Phase 21.6 Plan 05 (D-03): AddMenu open/close state and insert anchor.
+  // insertAfterStepIndex tracks which step row is active in the rail so the
+  // AddMenu inserts after it. -1 = append at end of section.
+  const [addMenuOpen, setAddMenuOpen] = useState(false)
+  const [insertAfterStepIndex, setInsertAfterStepIndex] = useState(-1)
+
+  // Phase 21.6 Plan 05 (D-03): BlockPicker (Phase 13 library picker) state.
+  // Opened when AddMenu "From library…" is clicked. Reuses the existing
+  // Phase 13 addBlockToSection path — no reimplementation (T-21.6-05-03).
+  const [libraryPickerOpen, setLibraryPickerOpen] = useState(false)
+
+  // Handle a library block being added from the Phase 13 BlockPicker.
+  // After addBlockToSection returns the junctionId, refresh junctions so
+  // the UpdateAvailableBadge overlay has the latest data.
+  async function handleLibraryAdd(input: BlockPickerOnAddInput) {
+    if (!activeSection) return
+    const result = await addBlockToSection({
+      sopSectionId: activeSection.id,
+      blockId: input.blockId,
+      pinMode: input.pinMode,
+    })
+    if ('error' in result) {
+      console.warn('[BuilderClient] library addBlockToSection failed', result.error)
+      return
+    }
+    // Refresh junctions so the componentIdToJunction map picks up the new row.
+    void refreshJunctions()
+  }
+
+  // Phase 21.6 Plan 05 (D-04): StructuredFieldPopover state.
+  // Opened when a structured-type block is selected on canvas.
+  const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null)
+  const [selectedBlockType, setSelectedBlockType] = useState<string | null>(null)
+  const selectedBlockAnchorRef = useRef<HTMLElement | null>(null)
+
   // Memoized overrides factory — rebuilt when junctions or the section change
   // so the componentOverlay closure captures the latest map / refresh callback.
   const overrides = useMemo(
@@ -278,11 +346,26 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
         loadCategories: listBlockCategories,
         junctionMap,
         componentIdToJunction,
+        componentIdToProps,
         onReviewed: () => {
           void refreshJunctions()
         },
         onItemSelected: (info) => {
           onItemSelectedRef.current(info)
+          // D-04: track selected block for StructuredFieldPopover.
+          // Look up the block's componentType from layout_data via componentIdToProps.
+          const props = componentIdToProps.get(info.componentId)
+          if (props && typeof props['__componentType'] === 'string') {
+            const btype = props['__componentType'] as string
+            if (STRUCTURED_BLOCK_TYPES.has(btype)) {
+              setSelectedBlockId(info.componentId)
+              setSelectedBlockType(btype)
+            } else {
+              // Text/non-structured block — close popover if open
+              setSelectedBlockId(null)
+              setSelectedBlockType(null)
+            }
+          }
         },
         // Phase 21 Plan 21-03 — inline ReviewerFlagsPanel under each block.
         // Empty state renders nothing (no chrome) so verified blocks stay quiet.
@@ -291,7 +374,7 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
             <ReviewerFlagsPanel sopId={sopId} blockId={junctionId} />
           ) : null,
       }),
-    [junctionMap, componentIdToJunction, refreshJunctions, sopId]
+    [junctionMap, componentIdToJunction, componentIdToProps, refreshJunctions, sopId]
   )
 
   // Reference highlighted state so React keeps the subscription effect alive
@@ -373,16 +456,25 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
         </div>
       </header>
       <div className="flex flex-1 min-h-0">
-        {/* Left sidebar — section list with drag-reorder (Plan 04) */}
-        <SectionListSidebar
+        {/* Left rail — BuilderTreeRail (replaces SectionListSidebar neighbour role).
+            Phase 21.6 Plan 05: mounts the step-centric tree rail built in Plan 03.
+            SectionListSidebar.tsx remains on disk (source for fold reference). */}
+        <BuilderTreeRail
           sections={sections}
+          activeSection={
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (activeSection ?? null) as any
+          }
           activeSectionId={activeSectionId}
           onSelect={setActiveSectionId}
           sopId={sopId}
+          onStepSelect={(stepIdx) => setInsertAfterStepIndex(stepIdx)}
         />
         {/* Canvas — Puck owns the viewport clamp via BUILDER_VIEWPORTS.
-            Puck remounts per active section (Research Open Question 2). */}
-        <main className="flex-1 min-w-0 overflow-auto">
+            Puck remounts per active section (Research Open Question 2).
+            ui prop suppresses native sidebars (E3 one-list invariant, Pitfall 5:
+            pass as prop not setUi so it survives key={activeSection.id} remount). */}
+        <main className="flex-1 min-w-0 overflow-auto relative">
           {activeSection ? (
             <Puck
               key={activeSection.id}
@@ -391,14 +483,83 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
               data={sanitizedInitial}
               onChange={handleChange}
               viewports={BUILDER_VIEWPORTS}
+              ui={{ leftSideBarVisible: false, rightSideBarVisible: false }}
             />
           ) : (
             <div className="p-8 text-[var(--ink-500)]">
               No sections yet — add one from the sidebar.
             </div>
           )}
+
+          {/* Phase 21.6 Plan 05 (D-04): StructuredFieldPopover — anchored to
+              the selected structured-type block. Hosts existing Puck field
+              inputs via children slot; edits flow through Puck onChange path. */}
+          {selectedBlockId && selectedBlockType && (
+            <StructuredFieldPopover
+              blockId={selectedBlockId}
+              blockType={selectedBlockType}
+              anchorRef={selectedBlockAnchorRef}
+              onClose={() => {
+                setSelectedBlockId(null)
+                setSelectedBlockType(null)
+              }}
+            />
+          )}
         </main>
       </div>
+
+      {/* Phase 21.6 Plan 05 (D-03): AddMenu — rendered when the add-control is
+          clicked in the rail. Positioned relative to the active add button;
+          portal-mounted at body level for simplicity (outside canvas). */}
+      {addMenuOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 40,
+          }}
+          onClick={() => setAddMenuOpen(false)}
+        >
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '280px',
+              transform: 'translateY(-50%)',
+              zIndex: 50,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <AddMenu
+              insertAfterIndex={insertAfterStepIndex}
+              onClose={() => setAddMenuOpen(false)}
+              onOpenLibrary={() => {
+                setAddMenuOpen(false)
+                setLibraryPickerOpen(true)
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Phase 21.6 Plan 05 (D-03): Phase 13 BlockPicker (library picker).
+          Reuses the existing addBlockToSection path — not reimplemented (T-21.6-05-03).
+          kindSlug 'step' shows all kinds (no hard filter for the builder context). */}
+      {libraryPickerOpen && (
+        <BlockPicker
+          open={libraryPickerOpen}
+          onClose={() => setLibraryPickerOpen(false)}
+          kindSlug="step"
+          sopCategory={initialSop.category_tag ?? null}
+          onAdd={async (input: BlockPickerOnAddInput) => {
+            await handleLibraryAdd(input)
+            setLibraryPickerOpen(false)
+          }}
+        />
+      )}
     </div>
   )
 }
