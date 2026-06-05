@@ -74,11 +74,15 @@ Plans:
 **Goal**: A first-time admin can edit SOP content in the Build stage without internal jargon or redundant panels — one block list (not separate palette + outline), humanized block labels, and content editing in the central canvas rather than a cramped side rail.
 **Depends on**: Phase 21.5 (reuses `block-type-labels.ts` / `humanizeBlockType`, `BuilderStageShell`, `SectionListSidebar`, the `BuilderClient` Puck editor)
 **Requirements** (21.6-SPEC.md is the ID source): E1 step-centric-list, E2 humanized-labels, E3 one-content-list, E4 inline-canvas-editing, E5 section-list-clarity, E6 reference-gallery, E7 no-safety-regression
-**Plans**: Not planned yet
+**Plans**: 5 plans (3 waves)
 
 Plans:
 
-- [ ] (run `/gsd-spec-phase 21.6` → `/gsd-discuss-phase 21.6` → `/gsd-plan-phase 21.6`)
+- [ ] 21.6-01-PLAN.md — Wave 0: source-contract spec + E2 lint guard + phase21.6-stubs playwright project (E2-E7 gate)
+- [ ] 21.6-02-PLAN.md — Reconfigure puck-config: suppress palette/outline (E3) + contentEditable inline editing (E4); preserve componentItem/componentOverlay (E7)
+- [ ] 21.6-03-PLAN.md — BuilderTreeRail + Tree{Section,Step,Block}Row: humanised Section-Steps spine, reorder, Reference-images relabel (E1/E2/E5/E6)
+- [ ] 21.6-04-PLAN.md — AddMenu (humanised + From-library) + StructuredFieldPopover (E3/E4)
+- [ ] 21.6-05-PLAN.md — Wire BuilderTreeRail + ui sidebar suppression + Add/library/popover into BuilderClient; E6 canvas chip; preserve autosave/junction/gate (E1/E3/E6/E7)
 
 ### Phase 1: Foundation
 
