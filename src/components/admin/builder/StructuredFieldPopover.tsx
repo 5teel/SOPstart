@@ -96,6 +96,7 @@ export function StructuredFieldPopover({
     <div
       ref={popoverRef}
       role="dialog"
+      aria-modal="true"
       aria-label={`Edit ${humanizeBlockType(blockType)} fields`}
       data-testid="structured-field-popover"
       style={{

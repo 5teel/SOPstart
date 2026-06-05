@@ -346,6 +346,13 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
   const [selectedBlockType, setSelectedBlockType] = useState<string | null>(null)
   const selectedBlockAnchorRef = useRef<HTMLElement | null>(null)
 
+  // Stable identity so StructuredFieldPopover's Escape/mousedown listeners are
+  // not torn down and re-added on every BuilderClient render.
+  const closeStructuredPopover = useCallback(() => {
+    setSelectedBlockId(null)
+    setSelectedBlockType(null)
+  }, [])
+
   // Memoized overrides factory — rebuilt when junctions or the section change
   // so the componentOverlay closure captures the latest map / refresh callback.
   const overrides = useMemo(
@@ -474,6 +481,7 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
           onSelect={setActiveSectionId}
           sopId={sopId}
           onStepSelect={(stepIdx) => setInsertAfterStepIndex(stepIdx)}
+          onOpenAddMenu={() => setAddMenuOpen(true)}
         />
         {/* Canvas — Puck owns the viewport clamp via BUILDER_VIEWPORTS.
             Puck remounts per active section (Research Open Question 2).
@@ -504,10 +512,7 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
               blockId={selectedBlockId}
               blockType={selectedBlockType}
               anchorRef={selectedBlockAnchorRef}
-              onClose={() => {
-                setSelectedBlockId(null)
-                setSelectedBlockType(null)
-              }}
+              onClose={closeStructuredPopover}
             />
           )}
         </main>

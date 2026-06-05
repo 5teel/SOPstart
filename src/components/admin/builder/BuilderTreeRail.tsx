@@ -56,6 +56,8 @@ interface Props {
   sopId: string
   /** Called when a step row is selected — tracks active step for AddMenu insert anchor */
   onStepSelect?: (stepIndex: number) => void
+  /** Opens the AddMenu (owned by BuilderClient). Fired by the per-section add control. */
+  onOpenAddMenu?: () => void
 }
 
 // ---------------------------------------------------------------------------
@@ -163,6 +165,7 @@ export function BuilderTreeRail({
   onSelect,
   sopId,
   onStepSelect,
+  onOpenAddMenu,
 }: Props): React.JSX.Element {
   // ---- Section reorder state (folded from SectionListSidebar) ----
   const [order, setOrder] = useState<SectionLite[]>(() =>
@@ -341,6 +344,7 @@ export function BuilderTreeRail({
                             <TreeBlockRow
                               key={node.item.props?.id ?? nodeIdx}
                               item={{ ...node.item }}
+                              displayLabel={displayLabel}
                               onSelect={() => {}}
                             />
                           )
@@ -365,6 +369,7 @@ export function BuilderTreeRail({
                               <TreeBlockRow
                                 key={child.props?.id ?? childIdx}
                                 item={child}
+                                displayLabel={getDisplayLabel(child)}
                                 onSelect={() => {}}
                               />
                             ))}
@@ -374,7 +379,8 @@ export function BuilderTreeRail({
                     </>
                   )}
 
-                  {/* Add control — placeholder until Plan 04 wires AddMenu */}
+                  {/* Add control — opens the BuilderClient-owned AddMenu (E3 single
+                      explicit add affordance). Tracks this section as the insert anchor. */}
                   <div style={{ padding: '4px 8px 8px 24px' }}>
                     <button
                       type="button"
@@ -382,7 +388,8 @@ export function BuilderTreeRail({
                       aria-haspopup="menu"
                       aria-label={`Add step or block to ${s.title}`}
                       onClick={() => {
-                        // AddMenu wired in Plan 04
+                        if (s.id !== activeSectionId) onSelect(s.id)
+                        onOpenAddMenu?.()
                       }}
                       style={{
                         width: '100%',

@@ -26,6 +26,12 @@ import type { PuckItem } from './TreeStepRow'
 export interface TreeBlockRowProps {
   item: PuckItem
   onSelect: () => void
+  /**
+   * E6 display-label override (e.g. "Reference images" for orphan-photo
+   * headings). When provided, replaces the derived preview text. Display-only;
+   * layout_data is never written.
+   */
+  displayLabel?: string
 }
 
 /**
@@ -80,7 +86,7 @@ function getPillStyle(pillVariant: string): React.CSSProperties {
   }
 }
 
-export function TreeBlockRow({ item, onSelect }: TreeBlockRowProps): React.JSX.Element {
+export function TreeBlockRow({ item, onSelect, displayLabel }: TreeBlockRowProps): React.JSX.Element {
   const entry = BLOCK_TYPE_LABELS[item.type]
   const pillVariant = entry?.pillVariant ?? 'kind-step'
   const pillStyle = getPillStyle(pillVariant)
@@ -95,8 +101,10 @@ export function TreeBlockRow({ item, onSelect }: TreeBlockRowProps): React.JSX.E
     item.props?.question ??
     item.props?.content ??
     ''
-  const preview =
+  const derivedPreview =
     String(rawPreview).slice(0, 40) + (String(rawPreview).length > 40 ? '…' : '')
+  // E6: an explicit displayLabel (e.g. "Reference images") wins over derived text.
+  const preview = displayLabel ?? derivedPreview
 
   const ariaLabel = `${humanLabel}: ${preview || humanLabel}`
 
