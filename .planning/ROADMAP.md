@@ -79,7 +79,7 @@ Plans:
 Plans:
 
 - [x] 21.6-01-PLAN.md — Wave 0: source-contract spec + E2 lint guard + phase21.6-stubs playwright project (E2-E7 gate)
-- [ ] 21.6-02-PLAN.md — Reconfigure puck-config: suppress palette/outline (E3) + contentEditable inline editing (E4); preserve componentItem/componentOverlay (E7)
+- [x] 21.6-02-PLAN.md — Reconfigure puck-config: suppress palette/outline (E3) + contentEditable inline editing (E4); preserve componentItem/componentOverlay (E7)
 - [ ] 21.6-03-PLAN.md — BuilderTreeRail + Tree{Section,Step,Block}Row: humanised Section-Steps spine, reorder, Reference-images relabel (E1/E2/E5/E6)
 - [ ] 21.6-04-PLAN.md — AddMenu (humanised + From-library) + StructuredFieldPopover (E3/E4)
 - [ ] 21.6-05-PLAN.md — Wire BuilderTreeRail + ui sidebar suppression + Add/library/popover into BuilderClient; E6 canvas chip; preserve autosave/junction/gate (E1/E3/E6/E7)
@@ -488,7 +488,7 @@ These two items belong with kiosk mode + site-tier work in Phase 15 because they
   9. Global app-wide Cmd+K mounted across all `(protected)` routes — surfaces app-wide navigation (Library, Blocks, Team, Create via Upload/Blank/AI, Settings, kiosk site selector for multi-site admins) alongside the existing SOP-scoped jump-to-step + ask-AI on SOP pages.
   10. Bundle isolation: kiosk mode chunks + voice Q&A RAG client do not leak into the existing mobile worker bundle; mobile worker walkthrough First Load JS does not grow as a result of Phase 15.
 
-**Plans:** 4/5 plans executed
+**Plans:** 2/5 plans executed
 
 Plans:
 

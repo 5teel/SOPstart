@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
-status: Executing Phase 21.6
-stopped_at: Phase 21.6 Plan 01 complete — Wave-0 scaffold (phase21.6-stubs project + E2-E7 specs)
-last_updated: "2026-06-05T12:18:00Z"
+status: Ready to execute
+stopped_at: Phase 21.6 Plan 02 complete — palette/outline suppressed (E3) + contentEditable on text fields (E4)
+last_updated: "2026-06-05T12:26:23.311Z"
 progress:
   total_phases: 27
   completed_phases: 1
   total_plans: 10
-  completed_plans: 6
-  percent: 5
+  completed_plans: 7
+  percent: 4
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 21.6 (builder-edit-stage-redesign) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 **Milestone status:** v4.0 started 2026-05-24. 3 phases / 40 requirements (1 of 3 phases complete). See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
 **Active phase:** 21.5
@@ -126,6 +126,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 15 P04 | 10m | 5 tasks | 12 files |
 | Phase 21 P02 | 18m | 3 tasks | 17 files |
 | Phase 21 P03 | 25m | 3 tasks | 22 files |
+| Phase 21.6 P02 | 12 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -208,6 +209,7 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 15-02]: stepAckTrace persisted as informational evidence on sop_completions.step_ack_trace (jsonb) via Json cast; server does NOT gate on it (T-15-02-01 accept disposition)
 - [Phase ?]: [Phase 15-02]: Wave-2 runtime tests downgraded to live source-contract assertions (chromium binary not installed; same Rule-3 trade-off as Plan 15-01); runtime checks deferred to Task 5 phase UAT
 - [Phase ?]: [Phase 15-02]: First Load JS delta /sops/[sopId]/page = +7 KB (1088→1095); DesktopWalkthrough+WalkthroughVoiceModal correctly out-of-band as dynamic chunks; Wave 4 owns formal CI gate
+- [Phase ?]: Used bare () => <></> instead of (): ReactElement => <></> in createPuckOverrides — E3 test regex requires parens-arrow form without type annotation
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -316,7 +318,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-05T12:18:00Z
-Stopped at: Phase 21.6 Plan 01 complete — Wave-0 scaffold (phase21.6-stubs project + E2-E7 specs)
-Resume file: .planning/phases/21.6-builder-edit-stage-redesign/21.6-02-PLAN.md
+Last session: 2026-06-05T12:26:23.303Z
+Stopped at: Phase 21.6 Plan 02 complete — palette/outline suppressed (E3) + contentEditable on text fields (E4)
+Resume file: .planning/phases/21.6-builder-edit-stage-redesign/21.6-03-PLAN.md
 Awaiting: Phase 21.6 Plan 02 — puck-config.tsx reconfigure (suppress palette/outline + contentEditable inline editing).
