@@ -47,8 +47,13 @@ export function TreeSectionRow({
   onDragOver,
   onDrop,
 }: TreeSectionRowProps): React.JSX.Element {
+    // NOTE: root is a <div>, NOT a <li>. BuilderTreeRail already wraps each
+    // section in a <li> (the list item that also holds the expanded step tree).
+    // A nested <li> here is invalid HTML — the browser relocates it on the
+    // client, producing a hydration mismatch (React #418). See CLAUDE.md
+    // [2026-06-08] hydration learning.
   return (
-    <li
+    <div
       data-testid="tree-section-row"
       data-section-id={section.id}
       draggable={isDraggable}
@@ -136,6 +141,6 @@ export function TreeSectionRow({
           <ChevronRight size={14} aria-hidden="true" />
         )}
       </button>
-    </li>
+    </div>
   )
 }
