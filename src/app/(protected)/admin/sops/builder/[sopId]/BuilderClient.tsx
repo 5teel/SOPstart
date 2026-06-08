@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import type { Data, Viewports } from '@puckeditor/core'
+import type { Data, Viewports, Overrides } from '@puckeditor/core'
+import { useGetPuck } from '@puckeditor/core'
 import type { SopWithSections, SopSectionBlockWithUpdate } from '@/types/sop'
 import {
   puckConfig,
@@ -346,6 +347,33 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
   const [selectedBlockType, setSelectedBlockType] = useState<string | null>(null)
   const selectedBlockAnchorRef = useRef<HTMLElement | null>(null)
 
+  // Phase 21.6 crash fix — BuilderTreeRail + AddMenu render OUTSIDE <Puck>, so
+  // they cannot call useGetPuck() (it throws "usePuckGet must be used inside
+  // <Puck>"). The `puck` override below runs INSIDE the Puck context and parks
+  // the insert dispatch here; AddMenu requests inserts via the onInsert prop.
+  const insertFnRef = useRef<
+    ((componentType: string, afterIndex: number) => void) | null
+  >(null)
+
+  // Stable tap component (created once) used as the `puck` override. Created
+  // once so its identity never changes — otherwise Puck would remount the whole
+  // editor whenever `overrides` is rebuilt (on every junction refresh).
+  const PuckApiTap = useMemo(() => {
+    function PuckApiTap({ children }: { children?: React.ReactNode }) {
+      const getPuck = useGetPuck()
+      insertFnRef.current = (componentType: string, afterIndex: number) => {
+        getPuck().dispatch({
+          type: 'insert',
+          componentType,
+          destinationIndex: afterIndex + 1,
+          destinationZone: 'root:default-zone',
+        })
+      }
+      return <>{children}</>
+    }
+    return PuckApiTap
+  }, [])
+
   // Stable identity so StructuredFieldPopover's Escape/mousedown listeners are
   // not torn down and re-added on every BuilderClient render.
   const closeStructuredPopover = useCallback(() => {
@@ -387,6 +415,14 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
           ) : null,
       }),
     [junctionMap, componentIdToJunction, componentIdToProps, componentIdToType, refreshJunctions, sopId]
+  )
+
+  // Merge the dispatch-capturing `puck` override onto the overrides object.
+  // PuckApiTap keeps a stable identity, so adding it here does not trigger an
+  // editor remount when `overrides` is rebuilt.
+  const overridesWithTap = useMemo<Partial<Overrides>>(
+    () => ({ ...overrides, puck: PuckApiTap }),
+    [overrides, PuckApiTap]
   )
 
   // Reference highlighted state so React keeps the subscription effect alive
@@ -492,7 +528,7 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
             <Puck
               key={activeSection.id}
               config={puckConfig}
-              overrides={overrides}
+              overrides={overridesWithTap}
               data={sanitizedInitial}
               onChange={handleChange}
               viewports={BUILDER_VIEWPORTS}
@@ -544,7 +580,9 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
             onClick={(e) => e.stopPropagation()}
           >
             <AddMenu
-              insertAfterIndex={insertAfterStepIndex}
+              onInsert={(componentType) =>
+                insertFnRef.current?.(componentType, insertAfterStepIndex)
+              }
               onClose={() => setAddMenuOpen(false)}
               onOpenLibrary={() => {
                 setAddMenuOpen(false)

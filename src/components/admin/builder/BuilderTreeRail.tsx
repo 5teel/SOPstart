@@ -10,8 +10,9 @@
  *     `deriveStepTree` (pure read of layout_data.content[]; no mutation)
  *   - Renders TreeStepRow + nested TreeBlockRow children; "Before first step"
  *     header for pre-step blocks when the section HAS steps (D-01/D-02)
- *   - "＋ Add step or block" placeholder at each section end (wired in Plan 04)
- *   - `useGetPuck()` captured for programmatic block insert (AddMenu, Plan 04)
+ *   - "＋ Add step or block" placeholder at each section end (opens AddMenu via
+ *     onOpenAddMenu; the actual Puck insert is dispatched by BuilderClient's
+ *     `puck` override — the rail renders OUTSIDE <Puck> and must not use Puck hooks)
  *   - E6 display override: HeadingBlock with text starting "Unanchored figures"
  *     shows "Reference images" in the tree rail — NEVER mutated in props/layout_data
  *   - Optimistic reorder via `reorderSections` server action + revert-on-error strip
@@ -22,7 +23,6 @@
 
 import { useState } from 'react'
 import { GripVertical, ChevronDown, ChevronRight } from 'lucide-react'
-import { useGetPuck } from '@puckeditor/core'
 import { reorderSections } from '@/actions/sections'
 import { humanizeBlockType } from '@/lib/builder/block-type-labels'
 import { TreeSectionRow } from './TreeSectionRow'
@@ -182,20 +182,10 @@ export function BuilderTreeRail({
   // ---- Active step tracking (insert anchor for Plan 04 AddMenu) ----
   const [activeStepIndex, setActiveStepIndex] = useState<number | null>(null)
 
-  // ---- useGetPuck — captured here for Plan 04 block insert dispatch ----
-  // Must use useGetPuck (not usePuck) because BuilderTreeRail renders OUTSIDE <Puck>.
-  const getPuck = useGetPuck()
-
-  // insertBlock helper — dispatch wired in Plan 04; defined here as source of truth
-  function insertBlock(componentType: string, afterIndex: number) {
-    const puck = getPuck()
-    puck.dispatch({
-      type: 'insert',
-      componentType,
-      destinationIndex: afterIndex + 1,
-      destinationZone: 'root:default-zone',
-    })
-  }
+  // NOTE: the rail renders OUTSIDE the <Puck> provider, so it must NOT call any
+  // Puck hook (useGetPuck/usePuck both throw "usePuckGet must be used inside
+  // <Puck>"). Block insertion is requested via onOpenAddMenu → AddMenu →
+  // BuilderClient's `puck` override, which holds the dispatch inside the context.
 
   // ---- Section reorder handlers ----
   async function commitReorder(next: SectionLite[]) {

@@ -3,21 +3,23 @@
 
 import { useEffect } from 'react'
 import { Library } from 'lucide-react'
-import { useGetPuck } from '@puckeditor/core'
 import { humanizeBlockType, BLOCK_TYPE_LABELS } from '@/lib/builder/block-type-labels'
 
 // ---------------------------------------------------------------------------
 // Phase 21.6 Plan 04 — AddMenu
 //
-// A single grouped, humanised "＋ Add" menu that dispatches Puck inserts via
-// useGetPuck().dispatch at root:default-zone (RESEARCH Pitfall 2 — hard-coded).
-// Preserves Phase 13 library picker via onOpenLibrary callback (D-03).
+// A single grouped, humanised "＋ Add" menu. AddMenu renders OUTSIDE the <Puck>
+// provider, so it CANNOT call useGetPuck() directly (that throws "usePuckGet
+// must be used inside <Puck>"). Instead it requests an insert through the
+// onInsert callback, which BuilderClient routes to a dispatch captured by the
+// `puck` override that lives inside the Puck context (RESEARCH Pitfall 2 —
+// root:default-zone). Preserves Phase 13 library picker via onOpenLibrary (D-03).
 // All visible labels resolve through humanizeBlockType — no raw PascalCase.
 // ---------------------------------------------------------------------------
 
 interface AddMenuProps {
-  /** Insert after this index (0-based) in root:default-zone. Pass -1 to prepend. */
-  insertAfterIndex: number
+  /** Request insertion of a block type into the active section. */
+  onInsert: (componentType: string) => void
   /** Called after a block is inserted or the user dismisses. */
   onClose: () => void
   /** Opens the Phase 13 block picker (addBlockToSection path). D-03 preservation. */
@@ -89,18 +91,11 @@ const BLOCK_GROUPS: { label: string; types: string[] }[] = [
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
-export function AddMenu({ insertAfterIndex, onClose, onOpenLibrary }: AddMenuProps) {
-  const getPuck = useGetPuck()
-
-  // Insert a new block via Puck dispatch at root:default-zone (hard-coded per RESEARCH Pitfall 2).
+export function AddMenu({ onInsert, onClose, onOpenLibrary }: AddMenuProps) {
+  // Insert a new block by asking BuilderClient (which holds the Puck dispatch
+  // captured inside the `puck` override). AddMenu lives outside <Puck>.
   function insertBlock(componentType: string) {
-    const puck = getPuck()
-    puck.dispatch({
-      type: 'insert',
-      componentType,
-      destinationIndex: insertAfterIndex + 1,
-      destinationZone: 'root:default-zone',
-    })
+    onInsert(componentType)
     onClose()
   }
 
