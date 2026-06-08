@@ -276,7 +276,7 @@ export function PipelineProgressClient(props: Props) {
                 </div>
               </div>
               <Link
-                href={`/admin/sops/${sopId}/review?from=pipeline&pipelineId=${props.pipelineId}`}
+                href={`/admin/sops/builder/${sopId}`}
                 className="h-[72px] w-full bg-[var(--ink-900)] text-white font-semibold text-xl rounded-lg flex items-center justify-center hover:bg-[var(--ink-700)] transition-colors"
               >
                 Review SOP now →
@@ -370,10 +370,10 @@ export function PipelineProgressClient(props: Props) {
                     {snapshot.parseJob?.error_message ?? 'Parsing failed.'}
                   </p>
                   <Link
-                    href={`/admin/sops/${sopId}/review`}
+                    href={`/admin/sops/builder/${sopId}`}
                     className="text-xs text-[var(--ink-900)] hover:text-[var(--ink-700)] mt-2 inline-block"
                   >
-                    Open review page to retry →
+                    Open builder to retry →
                   </Link>
                 </div>
               </div>

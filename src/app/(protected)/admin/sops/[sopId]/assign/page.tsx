@@ -213,9 +213,9 @@ export default function AssignSopPage() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">
           <Link
-            href={`/admin/sops/${sopId}/review`}
+            href={`/admin/sops/builder/${sopId}`}
             className="flex items-center gap-2 text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors"
-            aria-label="Back to SOP review"
+            aria-label="Back to SOP builder"
           >
             <ArrowLeft size={18} />
             <span className="text-sm font-medium">Back to Review</span>

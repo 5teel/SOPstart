@@ -262,8 +262,8 @@ export function UploadDropzone() {
       }
 
       if (data.sopId) {
-        // Navigate to review page
-        window.location.href = `/admin/sops/${data.sopId}/review`
+        // Navigate to builder (review folded into builder — Phase 21.5)
+        window.location.href = `/admin/sops/builder/${data.sopId}`
       }
     } catch {
       setYoutubeError('Network error — please try again.')
@@ -760,7 +760,7 @@ export function UploadDropzone() {
                 {uploadedSopIds.length === 1 ? (
                   <button
                     type="button"
-                    onClick={() => router.push(`/admin/sops/${uploadedSopIds[0]}/review`)}
+                    onClick={() => router.push(`/admin/sops/builder/${uploadedSopIds[0]}`)}
                     className="flex-1 min-h-[44px] px-4 bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
                   >
                     Review parsed SOP
@@ -815,7 +815,7 @@ export function UploadDropzone() {
           onClose={() => setRecorderOpen(false)}
           onSubmitComplete={(sopId) => {
             setRecorderOpen(false)
-            window.location.href = `/admin/sops/${sopId}/review`
+            window.location.href = `/admin/sops/builder/${sopId}`
           }}
         />
       )}

@@ -144,8 +144,8 @@ export default function SopVersionHistoryPage() {
       // Notify assigned workers about the SOP update (MGMT-07)
       await notifyAssignedWorkers(sopId as string, result.newSopId)
 
-      // Redirect to new version's review page
-      router.push(`/admin/sops/${result.newSopId}/review`)
+      // Redirect to new version's builder (review folded into builder — Phase 21.5)
+      router.push(`/admin/sops/builder/${result.newSopId}`)
     } catch (err) {
       console.error('Upload error:', err)
       setError('An unexpected error occurred. Please try again.')
@@ -158,9 +158,9 @@ export default function SopVersionHistoryPage() {
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <Link
-          href={`/admin/sops/${sopId}/review`}
+          href={`/admin/sops/builder/${sopId}`}
           className="flex items-center justify-center w-10 h-10 rounded-lg bg-white hover:bg-[var(--paper-2)] transition-colors text-[var(--ink-500)] hover:text-[var(--ink-900)] flex-shrink-0"
-          aria-label="Back to SOP review"
+          aria-label="Back to SOP builder"
         >
           <ArrowLeftIcon className="h-5 w-5" />
         </Link>
@@ -287,7 +287,7 @@ export default function SopVersionHistoryPage() {
                 <div className="flex justify-end">
                   {isCurrent && (
                     <Link
-                      href={`/admin/sops/${ver.id}/review`}
+                      href={`/admin/sops/builder/${ver.id}`}
                       className="text-[var(--ink-900)] hover:text-[var(--ink-700)] text-sm font-medium transition-colors"
                     >
                       Review

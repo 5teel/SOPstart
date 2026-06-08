@@ -170,7 +170,7 @@ export default async function SopsLibraryPage({
               return (
                 <li key={sop.id} className="flex items-stretch gap-2">
                   <Link
-                    href={`/admin/sops/${sop.id}/review`}
+                    href={`/admin/sops/builder/${sop.id}`}
                     className="blueprint-frame flex-1 min-w-0 flex items-center gap-4 hover:shadow-[0_0_0_1px_var(--ink-900)] transition-shadow"
                   >
                     <div className="flex-1 min-w-0">

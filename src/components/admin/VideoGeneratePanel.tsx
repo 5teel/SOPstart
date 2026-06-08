@@ -66,9 +66,9 @@ export default function VideoGeneratePanel({ sop, versions, archivedVersions, au
       {/* Sticky header */}
       <div className="sticky top-0 z-20 bg-[var(--paper)] border-b border-[var(--ink-100)] px-4 flex items-center gap-3 h-[56px]">
         <Link
-          href={`/admin/sops/${sop.id}/review`}
+          href={`/admin/sops/builder/${sop.id}`}
           className="text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors"
-          aria-label="Back to review"
+          aria-label="Back to builder"
         >
           <ArrowLeft size={20} />
         </Link>

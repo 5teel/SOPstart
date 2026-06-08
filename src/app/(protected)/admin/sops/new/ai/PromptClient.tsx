@@ -65,7 +65,7 @@ export function PromptClient({ categories }: Props) {
         <ParseJobStatus
           sopId={sopId}
           initialIsVideo={false}
-          onCompleted={() => router.push(`/admin/sops/${sopId}/review`)}
+          onCompleted={() => router.push(`/admin/sops/builder/${sopId}`)}
         />
       </div>
     )
