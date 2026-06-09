@@ -245,12 +245,14 @@ export const UAT_TESTS: UatTest[] = [
       {
         id: 'compact',
         label: 'Compact (~32px rows)',
+        screenshot: '/uat/screens/rail-compact.png',
         description:
           'Tighter rows and indents — more of the SOP visible at once. Best for 20+ step procedures. Trades some breathing room.',
       },
       {
         id: 'roomy',
         label: 'Roomy (~40px rows)',
+        screenshot: '/uat/screens/rail-roomy.png',
         description:
           'Generous spacing and larger hit areas — easier to scan and click, consistent with the glove-friendly worker UI. Fewer rows per screen.',
       },
@@ -277,12 +279,14 @@ export const UAT_TESTS: UatTest[] = [
       {
         id: 'end-button',
         label: 'Single end-of-section button (current)',
+        screenshot: '/uat/screens/rail-add-end.png',
         description:
           'One clear ＋ control per section; to insert mid-list you add then drag into place. Clean, but a mid-list insert is a two-step move.',
       },
       {
         id: 'inline-insert',
         label: 'Inline insert points',
+        screenshot: '/uat/screens/rail-add-inline.png',
         description:
           'A subtle ＋ appears between steps on hover and inserts exactly there. Faster mid-SOP authoring, at the cost of more affordances on screen.',
       },
@@ -309,12 +313,14 @@ export const UAT_TESTS: UatTest[] = [
       {
         id: 'full-tree',
         label: 'Full 3-level tree (current)',
+        screenshot: '/uat/screens/rail-nest-full.png',
         description:
           'Sections → steps → nested block rows. A complete map of the SOP, but can get long on block-heavy steps.',
       },
       {
         id: 'steps-only',
         label: 'Sections + steps only',
+        screenshot: '/uat/screens/rail-nest-steps.png',
         description:
           'Blocks are shown and edited on the canvas, not in the rail. Much shorter rail and faster navigation; less at-a-glance detail.',
       },
