@@ -130,6 +130,7 @@ function linksForRole(role: Role): NavLink[] {
       { label: 'Blocks', href: '/admin/blocks' },
       { label: 'Team', href: '/admin/team' },
       { label: 'Activity', href: '/activity' },
+      { label: 'Pathways', href: '/pathways' },
       { label: 'Feedback', href: '/uat' },
     ]
   }
@@ -137,6 +138,7 @@ function linksForRole(role: Role): NavLink[] {
     { label: 'Home', href: '/dashboard' },
     { label: 'SOPs', href: '/sops' },
     { label: 'Activity', href: '/activity' },
+    { label: 'Pathways', href: '/pathways' },
     { label: 'Feedback', href: '/uat' },
   ]
 }
