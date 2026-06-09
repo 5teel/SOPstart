@@ -5,7 +5,28 @@ import { BlueprintCanvas } from '@/components/ui/BlueprintCanvas'
 import { BlueprintFrame } from '@/components/ui/BlueprintFrame'
 import { FlowGraphSchema, type FlowGraph } from '@/lib/validators/flow-graph'
 import { deriveFlowGraph } from '@/lib/sop/flow-graph'
+import { FlowGraphCanvas } from '@/components/sop/flow/FlowGraphCanvas'
 import type { SopStep, SopWithSections } from '@/types/sop'
+
+function ViewToggle({ view, setView }: { view: 'list' | 'graph'; setView: (v: 'list' | 'graph') => void }) {
+  return (
+    <div className="inline-flex rounded-lg border border-[var(--ink-100)] overflow-hidden text-xs font-semibold">
+      {(['list', 'graph'] as const).map((v) => (
+        <button
+          key={v}
+          onClick={() => setView(v)}
+          className="px-3 h-8 transition-colors"
+          style={{
+            background: view === v ? 'var(--ink-900)' : 'white',
+            color: view === v ? 'white' : 'var(--ink-700)',
+          }}
+        >
+          {v === 'list' ? 'List' : 'Graph (preview)'}
+        </button>
+      ))}
+    </div>
+  )
+}
 
 const TYPE_COLORS: Record<FlowGraph['nodes'][number]['type'], { accent: string; bg: string; label: string }> = {
   step:        { accent: 'var(--accent-step, #1e40af)',     bg: 'var(--accent-step, #1e40af)',     label: 'Step' },
@@ -166,6 +187,7 @@ function StepCard({
 export function FlowTab({ sop }: { sop: SopWithSections }) {
   const warnedRef = useRef(false)
   const [openId, setOpenId] = useState<string | null>(null)
+  const [view, setView] = useState<'list' | 'graph'>('list')
 
   const derivedGraph = useMemo(() => deriveFlowGraph(sop), [sop.id, sop.updated_at])
 
@@ -221,10 +243,28 @@ export function FlowTab({ sop }: { sop: SopWithSections }) {
     )
   }
 
+  if (view === 'graph') {
+    return (
+      <BlueprintCanvas fullBleed>
+        <div className="h-full flex flex-col">
+          <div className="flex items-center justify-end px-4 pt-3">
+            <ViewToggle view={view} setView={setView} />
+          </div>
+          <div className="flex-1 min-h-0">
+            <FlowGraphCanvas graph={graph} />
+          </div>
+        </div>
+      </BlueprintCanvas>
+    )
+  }
+
   return (
     <BlueprintCanvas fullBleed>
       <BlueprintFrame>
-        <h2 className="text-lg font-semibold mb-2">Flow</h2>
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-lg font-semibold">Flow</h2>
+          <ViewToggle view={view} setView={setView} />
+        </div>
         <p className="text-xs text-[var(--ink-500)] mb-4">
           Tap any step to expand it. Tap again to collapse.
         </p>
