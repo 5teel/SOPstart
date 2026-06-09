@@ -81,6 +81,7 @@ SafeStart is a multi-tenant SaaS progressive web app that helps blue-collar trad
 - Server actions in `src/actions/` for mutations; API routes for complex operations (parsing, file handling)
 - Zod schemas in `src/lib/validators/` for all form/API validation
 - Database migrations in `supabase/migrations/` (numbered sequentially)
+- **Living source-of-truth maps** — `src/lib/journeys/journeys.ts` (UX pathways → `/pathways`) and `src/lib/uat/tests.ts` (UAT/design feedback → `/uat`) render their pages entirely from config. Treat them like the route tree: when a flow/screen/feature changes, update the config in the **same change**. See `## Pathways Map Maintenance` below.
 
 ## Commands
 
@@ -97,6 +98,17 @@ npm run test:e2e     # E2E tests only
 
 - **Sketch findings for SOPstart** (design tokens, layout primitives, screen inventory, new block types, voice/cmdk/immersive walkthrough patterns) → `Skill("sketch-findings-SOPstart")` — load before building any worker-facing UI or adding new SOP block types.
 - **Customer interviews** (`.planning/research/customer-interviews/`) — primary-source field research from real SOP users. Consult before spec/discuss/plan on any new phase, before locking contentious UX decisions (mobile vs desktop, identity model, approval chains), and when triaging backlog ideas. Latest: 2026-05-05 Visy Packaging (~100 AU/NZ industrial sites, glass + cans + cardboard) — surfaces desktop-first reading, SOP-ownership governance gap, voice Q&A unlock, training-record / Success Factors integration.
+
+## Pathways Map Maintenance (`journeys.ts`) — GSD triggers
+
+`src/lib/journeys/journeys.ts` is the **single source of truth** for the `/pathways` UX-flow map: the page renders entirely from it, and the "All screens" panel is read live from the route tree and **flags any screen no pathway covers**. It only stays accurate if it's updated alongside the flows it describes. The GSD framework will NOT do this automatically — Claude MUST keep it current at these points (mirrors the `## Learnings` GSD-trigger model):
+
+1. **`/gsd-plan-phase`** — if a phase adds, removes, or reroutes any user-facing screen or flow, add the `journeys.ts` edit as an explicit task in PLAN.md.
+2. **`/gsd-execute-phase`** — whenever a `page.tsx` route is added/removed/renamed, or a navigation / redirect / server-action flow changes, update `journeys.ts` in the **same commit** (add or extend the relevant `Journey`; keep `route` values real so coverage + deep-links work).
+3. **`/gsd-verify-work` / `/gsd-code-review`** — confirm `/pathways` → "All screens" shows **0 not-mapped** for the phase's new routes. A flagged screen = an unfinished pathways update. (Open the page, or grep `src/lib/journeys/journeys.ts` for each new route.)
+4. **`/gsd-new-milestone` / roadmap** — when scoping new personas or surfaces, add their pathways so the map reflects intended flows, not just shipped ones.
+
+**Rule of thumb: a new route or changed flow is not "done" until `journeys.ts` reflects it** (and `src/lib/uat/tests.ts` is updated when the change is worth team review). This rule is mirrored in `.planning/codebase/CONVENTIONS.md` so GSD planning/execution agents pick it up from project intel.
 
 ## Learnings
 

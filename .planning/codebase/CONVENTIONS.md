@@ -164,6 +164,18 @@
 - Type-safe discriminated unions: `kind` field determines the content shape at compile time
 - Example block types: `hazard`, `ppe`, `step`, `emergency`, `custom`, `measurement`, `decision`, `escalate`, `signoff`, `zone`, `inspect`, `voicenote`, `text`, `heading`, `photo`, `callout`, `model`
 
+## Living Source-of-Truth Maps (keep in sync every phase)
+
+Two config files are the single source of truth for their pages and MUST be kept current as the product changes — treat them like the route tree, not optional docs:
+
+- **`src/lib/journeys/journeys.ts`** → `/pathways` UX-flow map. The page renders entirely from this config; the "All screens" panel reads the App Router tree live and flags any screen no pathway covers (`0 not-mapped` = complete).
+  - **When planning a phase:** if it adds/removes/reroutes a user-facing screen or flow, include the `journeys.ts` update as a PLAN.md task.
+  - **When executing:** any new/renamed `page.tsx` route, or changed navigation/redirect/server-action flow, updates `journeys.ts` in the **same commit** (real `route` values for coverage + deep-links).
+  - **When verifying:** `/pathways` → "All screens" must show **0 not-mapped** for the phase's new routes; a flag = unfinished work.
+- **`src/lib/uat/tests.ts`** → `/uat` team feedback hub. Add/refresh a test when a change is worth team review (before/after, design direction).
+
+**Definition-of-done addition:** a new route or changed user flow is not complete until `journeys.ts` reflects it. (Full rule + GSD trigger points: project `CLAUDE.md` → "Pathways Map Maintenance".)
+
 ---
 
-*Convention analysis: 2026-06-01*
+*Convention analysis: 2026-06-01 (Living-maps rule added 2026-06-09)*
