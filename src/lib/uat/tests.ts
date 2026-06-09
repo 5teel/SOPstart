@@ -227,6 +227,13 @@ export const UAT_TESTS: UatTest[] = [
     status: 'active',
     summary:
       'You can click on text in a procedure to change it. We want to know if editing feels natural and your changes are saved.',
+    spotlight: 'Editing text on the page',
+    comparison: {
+      improvement:
+        'Before, you changed wording in a cramped panel off to the side. Now you click the text and type right where it sits.',
+      before: { image: '/uat/screens/edit-before.png', caption: 'Before — edit in a side panel' },
+      after: { image: '/uat/screens/edit-after.png', caption: 'After — type right on the page' },
+    },
     tryIt: ["Click on a step's text.", 'Type a change.', 'Wait a moment, then refresh the page.'],
     links: [{ label: 'Open a procedure', href: '/admin/sops' }],
     questions: [
@@ -244,6 +251,13 @@ export const UAT_TESTS: UatTest[] = [
     status: 'active',
     summary:
       'Some blocks (like a measurement or a yes/no decision) have extra details. Clicking one opens a small panel to fill them in. We want to know if that feels clear.',
+    spotlight: 'Filling in measurement & decision details',
+    comparison: {
+      improvement:
+        'Before, these details were in a side panel away from the block. Now a small panel opens right beneath the block you clicked.',
+      before: { image: '/uat/screens/struct-before.png', caption: 'Before — far-off side panel' },
+      after: { image: '/uat/screens/struct-after.png', caption: 'After — opens beneath the block' },
+    },
     tryIt: ['Click a measurement or decision block.', 'Try changing a value.', 'Press Escape to close it.'],
     links: [{ label: 'Open a procedure', href: '/admin/sops' }],
     questions: [
@@ -284,6 +298,13 @@ export const UAT_TESTS: UatTest[] = [
     status: 'active',
     summary:
       'You can drag sections into a different order. We want to know if that feels easy and the new order sticks.',
+    spotlight: 'Reordering sections',
+    comparison: {
+      improvement:
+        'Before, there was no easy way to change the order. Now each section has a drag handle — drag to reorder and it sticks.',
+      before: { image: '/uat/screens/reorder-before.png', caption: 'Before — fixed order' },
+      after: { image: '/uat/screens/reorder-after.png', caption: 'After — drag handles' },
+    },
     tryIt: ['Drag a section up or down in the side list.', 'Refresh the page to check the order stuck.'],
     links: [{ label: 'Open a procedure', href: '/admin/sops' }],
     questions: [
@@ -300,6 +321,13 @@ export const UAT_TESTS: UatTest[] = [
     status: 'active',
     summary:
       "A procedure shouldn't go live until every safety point has been checked off. We want to confirm it stops you — with a clear message — until then.",
+    spotlight: 'The publish safety check',
+    comparison: {
+      improvement:
+        'Before, publishing just failed with a cryptic error code. Now it clearly lists exactly which safety items still need checking first.',
+      before: { image: '/uat/screens/publish-before.png', caption: 'Before — cryptic error' },
+      after: { image: '/uat/screens/publish-after.png', caption: 'After — clear checklist' },
+    },
     tryIt: ['Try to publish a procedure that still has unchecked safety items.'],
     links: [{ label: 'Open a procedure', href: '/admin/sops' }],
     questions: [
