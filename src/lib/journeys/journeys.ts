@@ -375,11 +375,25 @@ export const JOURNEYS: Journey[] = [
     summary: 'The team reviews design directions and before/after changes and leaves structured feedback for analysis.',
     steps: [
       { id: 's', type: 'start', label: 'Asked to review' },
+      { id: 'paths', type: 'screen', label: 'Review current workflows', route: '/pathways', detail: 'See how the app works today (this page).' },
       { id: 'uat', type: 'screen', label: 'Feedback hub', route: '/uat' },
       { id: 'open', type: 'action', label: 'Open a test → compare before/after' },
       { id: 'answer', type: 'action', label: 'Answer + save', detail: 'Yes/No/Not sure, overall, comments.' },
       { id: 'export', type: 'action', label: 'AI analyses results', route: '/api/uat/export' },
       { id: 'e', type: 'end', label: 'Feedback captured' },
+    ],
+  },
+  {
+    id: 'manage-account',
+    group: 'Everyone',
+    persona: 'Everyone',
+    title: 'Manage your account',
+    summary: 'A member views and updates their own profile and preferences.',
+    steps: [
+      { id: 's', type: 'start', label: 'Open your account' },
+      { id: 'profile', type: 'screen', label: 'Profile', route: '/profile', detail: 'Your details, preferences, and sign out.' },
+      { id: 'save', type: 'action', label: 'Update details' },
+      { id: 'e', type: 'end', label: 'Account updated' },
     ],
   },
 ]

@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Play,
   Flag,
@@ -9,6 +9,8 @@ import {
   GitBranch,
   ArrowUpRight,
   LayoutGrid,
+  Link2,
+  Check,
 } from 'lucide-react'
 import { JOURNEY_GROUPS } from '@/lib/journeys/journeys'
 import type { Journey, JourneyStep, StepType } from '@/lib/journeys/journeys'
@@ -30,6 +32,31 @@ const TYPE_META: Record<StepType, { icon: React.ReactNode; ring: string; bg: str
 export function PathwaysClient({ journeys, routes }: Props) {
   const [selected, setSelected] = useState<string>(journeys[0]?.id ?? 'all-screens')
 
+  // Deep-linking: keep the selection in sync with the URL hash (#pathway-id) so
+  // a specific flow can be shared or bookmarked. Hash-only changes don't trigger
+  // an RSC fetch, so this stays cheap. Read on mount (SSR-safe) + on hashchange/
+  // popstate for pasted links and back/forward.
+  useEffect(() => {
+    const isValid = (id: string) => id === 'all-screens' || journeys.some((j) => j.id === id)
+    const apply = () => {
+      const h = decodeURIComponent(window.location.hash.replace(/^#/, ''))
+      if (h && isValid(h)) setSelected(h)
+    }
+    apply()
+    window.addEventListener('hashchange', apply)
+    window.addEventListener('popstate', apply)
+    return () => {
+      window.removeEventListener('hashchange', apply)
+      window.removeEventListener('popstate', apply)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const select = (id: string) => {
+    setSelected(id)
+    if (typeof window !== 'undefined') window.history.pushState(null, '', '#' + id)
+  }
+
   const grouped = useMemo(
     () =>
       JOURNEY_GROUPS.map((group) => ({ group, items: journeys.filter((j) => j.group === group) })).filter(
@@ -45,7 +72,7 @@ export function PathwaysClient({ journeys, routes }: Props) {
       {/* ---------------- Index (navigable) ---------------- */}
       <nav className="lg:sticky lg:top-4 rounded-xl border border-[var(--ink-100)] bg-white overflow-hidden">
         <button
-          onClick={() => setSelected('all-screens')}
+          onClick={() => select('all-screens')}
           className="w-full flex items-center gap-2 px-3 py-2.5 text-sm font-semibold border-b border-[var(--ink-100)] transition-colors"
           style={{
             background: selected === 'all-screens' ? 'var(--ink-900)' : 'white',
@@ -64,7 +91,7 @@ export function PathwaysClient({ journeys, routes }: Props) {
                 return (
                   <button
                     key={j.id}
-                    onClick={() => setSelected(j.id)}
+                    onClick={() => select(j.id)}
                     className="w-full text-left px-3 py-1.5 text-sm transition-colors"
                     style={{
                       background: active ? 'var(--paper-2)' : 'transparent',
@@ -85,7 +112,7 @@ export function PathwaysClient({ journeys, routes }: Props) {
       {/* ---------------- Detail ---------------- */}
       <div className="min-w-0">
         {selected === 'all-screens' ? (
-          <ScreenInventory journeys={journeys} routes={routes} onOpenJourney={setSelected} />
+          <ScreenInventory journeys={journeys} routes={routes} onOpenJourney={select} />
         ) : journey ? (
           <JourneyView journey={journey} />
         ) : null}
@@ -99,17 +126,37 @@ export function PathwaysClient({ journeys, routes }: Props) {
 // ---------------------------------------------------------------------------
 
 function JourneyView({ journey }: { journey: Journey }) {
+  const [copied, setCopied] = useState(false)
   const labelOf = (id: string) =>
     id === 'end' ? 'End' : id === 'continue' ? 'Continue' : journey.steps.find((s) => s.id === id)?.label ?? id
+
+  function copyLink() {
+    const url = `${window.location.origin}${window.location.pathname}#${journey.id}`
+    void navigator.clipboard?.writeText(url)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1800)
+  }
 
   return (
     <div>
       <div className="rounded-xl border border-[var(--ink-100)] bg-white p-5 mb-5">
-        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-          <span className="pill">{journey.group}</span>
-          <span className="text-[11px] font-semibold text-[var(--ink-500)]">· {journey.persona}</span>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+              <span className="pill">{journey.group}</span>
+              <span className="text-[11px] font-semibold text-[var(--ink-500)]">· {journey.persona}</span>
+            </div>
+            <h2 className="text-xl font-semibold text-[var(--ink-900)] leading-snug">{journey.title}</h2>
+          </div>
+          <button
+            onClick={copyLink}
+            className="flex-shrink-0 evidence-btn !min-h-[34px] text-xs inline-flex items-center gap-1.5"
+            title="Copy a link straight to this pathway"
+          >
+            {copied ? <Check className="h-3.5 w-3.5" /> : <Link2 className="h-3.5 w-3.5" />}
+            {copied ? 'Copied' : 'Copy link'}
+          </button>
         </div>
-        <h2 className="text-xl font-semibold text-[var(--ink-900)] leading-snug">{journey.title}</h2>
         <p className="text-sm text-[var(--ink-700)] mt-2 leading-relaxed">{journey.summary}</p>
       </div>
 
