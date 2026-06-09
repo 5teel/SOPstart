@@ -130,12 +130,14 @@ function linksForRole(role: Role): NavLink[] {
       { label: 'Blocks', href: '/admin/blocks' },
       { label: 'Team', href: '/admin/team' },
       { label: 'Activity', href: '/activity' },
+      { label: 'Feedback', href: '/uat' },
     ]
   }
   return [
     { label: 'Home', href: '/dashboard' },
     { label: 'SOPs', href: '/sops' },
     { label: 'Activity', href: '/activity' },
+    { label: 'Feedback', href: '/uat' },
   ]
 }
 
