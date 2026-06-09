@@ -228,6 +228,104 @@ export const UAT_TESTS: UatTest[] = [
     ],
   },
 
+  // ---- Builder rail — design directions for the team to weigh in on ----
+  {
+    id: 'builder-rail-density',
+    dateAdded: '2026-06-09',
+    category: 'Builder · Direction',
+    title: 'Builder rail density — compact or roomy?',
+    status: 'active',
+    purpose:
+      'The Build-stage left rail lists sections, steps and nested blocks. On long SOPs it gets tall and needs scrolling; on short ones it feels sparse. We need to agree the default row density.',
+    target: 'BuilderTreeRail (left rail) at /admin/sops/builder/[sopId]',
+    intendedOutcome:
+      'A default density the team agrees scans well without excessive scrolling, while staying comfortable to click and drag.',
+    links: [{ label: 'Open the current rail', href: '/admin/sops' }],
+    directions: [
+      {
+        id: 'compact',
+        label: 'Compact (~32px rows)',
+        description:
+          'Tighter rows and indents — more of the SOP visible at once. Best for 20+ step procedures. Trades some breathing room.',
+      },
+      {
+        id: 'roomy',
+        label: 'Roomy (~40px rows)',
+        description:
+          'Generous spacing and larger hit areas — easier to scan and click, consistent with the glove-friendly worker UI. Fewer rows per screen.',
+      },
+    ],
+    criteria: [
+      { id: 'scan', text: 'A long SOP is easy to scan in the preferred density' },
+      { id: 'click', text: 'Rows are comfortable to click and drag without mis-hits' },
+      { id: 'consistency', text: 'The density feels consistent with the rest of the app' },
+    ],
+  },
+  {
+    id: 'builder-rail-add-affordance',
+    dateAdded: '2026-06-09',
+    category: 'Builder · Direction',
+    title: 'Where should "Add" live in the rail?',
+    status: 'active',
+    purpose:
+      'Today a single "＋ Add step or block" control sits at the end of a section and opens the Add menu. Admins building multi-step SOPs often want to insert in the middle. We need to decide the add model.',
+    target: '"＋ Add step or block" control + insertion anchor in BuilderTreeRail',
+    intendedOutcome:
+      'An add model that makes inserting at any position obvious and fast, without cluttering the rail.',
+    links: [{ label: 'Open the current rail', href: '/admin/sops' }],
+    directions: [
+      {
+        id: 'end-button',
+        label: 'Single end-of-section button (current)',
+        description:
+          'One clear ＋ control per section; to insert mid-list you add then drag into place. Clean, but a mid-list insert is a two-step move.',
+      },
+      {
+        id: 'inline-insert',
+        label: 'Inline insert points',
+        description:
+          'A subtle ＋ appears between steps on hover and inserts exactly there. Faster mid-SOP authoring, at the cost of more affordances on screen.',
+      },
+    ],
+    criteria: [
+      { id: 'discoverable', text: 'It is obvious how to add a block' },
+      { id: 'mid-insert', text: 'Inserting a block in the middle of a section is quick' },
+      { id: 'uncluttered', text: 'The rail does not feel busy or noisy' },
+    ],
+  },
+  {
+    id: 'builder-rail-nesting-depth',
+    dateAdded: '2026-06-09',
+    category: 'Builder · Direction',
+    title: 'How much should the rail show — blocks too, or just steps?',
+    status: 'active',
+    purpose:
+      'The rail currently shows three levels: sections → steps → the blocks nested under each step. On block-heavy steps this gets deep. Should the rail stay a full tree, or collapse to sections + steps and leave block detail to the canvas?',
+    target: 'BuilderTreeRail tree depth (deriveStepTree nesting)',
+    intendedOutcome:
+      'The right amount of detail in the rail — enough to navigate, not so much it overwhelms.',
+    links: [{ label: 'Open the current rail', href: '/admin/sops' }],
+    directions: [
+      {
+        id: 'full-tree',
+        label: 'Full 3-level tree (current)',
+        description:
+          'Sections → steps → nested block rows. A complete map of the SOP, but can get long on block-heavy steps.',
+      },
+      {
+        id: 'steps-only',
+        label: 'Sections + steps only',
+        description:
+          'Blocks are shown and edited on the canvas, not in the rail. Much shorter rail and faster navigation; less at-a-glance detail.',
+      },
+    ],
+    criteria: [
+      { id: 'navigate', text: 'It is easy to jump to the part of the SOP you want' },
+      { id: 'overwhelm', text: 'The rail does not feel overwhelming on a complex SOP' },
+      { id: 'findability', text: 'You can still find a specific block quickly' },
+    ],
+  },
+
   // ---------------------------------------------------------------------------
   // TEMPLATE — copy this block to put a design/UX DIRECTION to the team.
   // Delete or set status:'archived' once a direction is chosen.
