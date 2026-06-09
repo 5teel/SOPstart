@@ -62,6 +62,15 @@ export interface UatTest {
   directions?: UatDirection[]
   /** Standalone screenshots for context. */
   screenshots?: string[]
+  /** Plain label of the exact area being tested, e.g. "The list down the left side". */
+  spotlight?: string
+  /** Before/after comparison — the old version vs the new one (drag-to-compare slider). */
+  comparison?: {
+    /** Plain one-liner: what got better vs the previous version. */
+    improvement: string
+    before: { image: string; caption?: string }
+    after: { image: string; caption?: string }
+  }
   /** Simple Yes / No / Not sure questions. */
   questions: UatQuestion[]
   /** OPTIONAL technical context — hidden behind "Why we're asking"; jargon ok here. */
@@ -169,6 +178,13 @@ export const UAT_TESTS: UatTest[] = [
     status: 'active',
     summary:
       "When you open a procedure to edit it, there's a list on the left showing its sections and steps. We want to know if it's clear and easy to follow.",
+    spotlight: 'The list down the left side',
+    comparison: {
+      improvement:
+        "Before, there were two technical lists full of code-style names like 'StepBlock' and 'Block'. Now it's one simple list of numbered steps in plain words.",
+      before: { image: '/uat/screens/rail-before.png', caption: 'Before — two lists, technical names' },
+      after: { image: '/uat/screens/rail-after.png', caption: 'After — one plain, numbered list' },
+    },
     tryIt: ['Open any procedure to edit it.', 'Look at the list down the left side.'],
     links: [{ label: 'Open a procedure', href: '/admin/sops' }],
     questions: [
@@ -187,6 +203,13 @@ export const UAT_TESTS: UatTest[] = [
     status: 'active',
     summary:
       "There's a '＋ Add step or block' button for adding new content. We want to know if it's easy to find and works the way you'd expect.",
+    spotlight: 'The Add menu',
+    comparison: {
+      improvement:
+        "Before, adding meant scrolling a long list of technical names ('TextBlock', 'HazardCardBlock'). Now it's a short, grouped menu with plain names like 'Step', 'Hazard' and 'Measurement'.",
+      before: { image: '/uat/screens/addmenu-before.png', caption: 'Before — raw component list' },
+      after: { image: '/uat/screens/addmenu-after.png', caption: 'After — grouped, plain names' },
+    },
     tryIt: ['Open a procedure.', "Click '＋ Add step or block'.", 'Pick something from the menu.'],
     links: [{ label: 'Open a procedure', href: '/admin/sops' }],
     questions: [
@@ -238,6 +261,13 @@ export const UAT_TESTS: UatTest[] = [
     status: 'active',
     summary:
       "When a procedure has loose photos that aren't tied to a step, we group them together. We just want to check the label reads as plain English.",
+    spotlight: 'The photo group label',
+    comparison: {
+      improvement:
+        "Before, this group was labelled 'Unanchored figures' — confusing jargon. Now it reads 'Reference images'.",
+      before: { image: '/uat/screens/photo-before.png', caption: 'Before' },
+      after: { image: '/uat/screens/photo-after.png', caption: 'After' },
+    },
     tryIt: ['Open a procedure that has a group of reference photos.', 'Look at the label on that group.'],
     links: [{ label: 'Open a procedure', href: '/admin/sops' }],
     questions: [
