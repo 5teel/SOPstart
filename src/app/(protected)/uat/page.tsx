@@ -25,12 +25,12 @@ export default async function UatPage() {
           <span className="pill">UAT · TEAM FEEDBACK</span>
         </div>
         <h1 className="mono text-2xl font-semibold text-[var(--ink-900)]">
-          Test &amp; Design Feedback
+          Your feedback
         </h1>
         <p className="text-sm text-[var(--ink-500)] mt-2 max-w-2xl">
-          Review the directions below, tick how each criterion lands, and leave notes.
-          Your input is saved per test and shared with the team — an AI agent reads it back
-          to record and analyse where everyone landed.
+          Help us choose how SafeStart should look and work. Have a look at each one,
+          answer a couple of quick questions, and tell us what you think — there are no
+          wrong answers, and your honest take is exactly what we need.
         </p>
       </div>
 

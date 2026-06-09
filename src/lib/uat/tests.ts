@@ -3,19 +3,321 @@
  *
  * These are the test DEFINITIONS rendered on /uat. They are version-controlled
  * (not stored in the DB) so adding a test is a code change and shows up in git.
- * The team's RESPONSES are stored in the `uat_feedback` table (migration 00034)
- * and can be exported for an AI agent via GET /api/uat/export.
+ * Team RESPONSES live in the `uat_feedback` table (migration 00034) and can be
+ * exported for an AI agent via GET /api/uat/export.
  *
- * To add a test: append a UatTest object below. Give it a stable, unique `id`
- * (kebab-case), a `dateAdded` (ISO), and 1-N criteria. For a design-direction
- * comparison, use `directions` + optional `screenshots`. See the template at the
- * bottom of this file.
+ * WRITING FOR NON-TECHNICAL REVIEWERS:
+ *  - `summary` is plain English: what this is + what we want to know. 1-2 sentences.
+ *  - `questions` are simple, positively-phrased questions a reviewer answers
+ *    Yes / No / Not sure (Yes = good). No jargon.
+ *  - `tryIt` are friendly "have a look" steps.
+ *  - `background` is OPTIONAL technical context, shown only behind a "Why we're
+ *    asking" toggle and included in the AI export — keep jargon HERE, not above.
+ *
+ * To add a design choice for the team, use `directions` + `screenshot` per option.
+ * See the template at the bottom.
  */
 
-export type CriterionResponse = 'pass' | 'fail' | 'na'
+export type CriterionResponse = 'pass' | 'fail' | 'na' // shown as Yes / No / Not sure
 export type OverallVerdict = 'approve' | 'needs_work' | 'reject'
 
-/** A row from the uat_feedback table (migration 00034). Shared client/server shape. */
+export interface UatQuestion {
+  /** Stable id, unique WITHIN a test. Used as the key in criteria_responses. */
+  id: string
+  /** A plain Yes/No question — phrase it so "Yes" means it worked / felt good. */
+  text: string
+}
+
+export interface UatLink {
+  label: string
+  href: string
+}
+
+/** A named design/UX direction being put to the team for a preference call. */
+export interface UatDirection {
+  id: string
+  label: string
+  description: string
+  /** Image path/URL (e.g. /uat/screens/foo.png). */
+  screenshot?: string
+}
+
+export interface UatTest {
+  /** Stable unique slug. Becomes test_id in uat_feedback — DO NOT rename later. */
+  id: string
+  /** ISO date the test was added/last revised. */
+  dateAdded: string
+  /** Friendly grouping label, e.g. "Procedure builder", "Design choices". */
+  category: string
+  /** Plain-English title, ideally a question. */
+  title: string
+  status: 'active' | 'archived'
+  /** Plain English: what this is + what we want to know. 1-2 sentences. */
+  summary: string
+  /** Friendly "have a look" steps. */
+  tryIt?: string[]
+  /** Buttons that open the thing under review (new tab). */
+  links?: UatLink[]
+  /** Design options to choose between (renders a tap-to-pick image picker). */
+  directions?: UatDirection[]
+  /** Standalone screenshots for context. */
+  screenshots?: string[]
+  /** Simple Yes / No / Not sure questions. */
+  questions: UatQuestion[]
+  /** OPTIONAL technical context — hidden behind "Why we're asking"; jargon ok here. */
+  background?: string
+}
+
+// ---------------------------------------------------------------------------
+// Catalogue
+// ---------------------------------------------------------------------------
+
+export const UAT_TESTS: UatTest[] = [
+  // ===================== Design choices (pick A or B) =====================
+  {
+    id: 'builder-rail-density',
+    dateAdded: '2026-06-09',
+    category: 'Design choices',
+    title: 'Which list layout is easier to use?',
+    status: 'active',
+    summary:
+      "When you build a procedure, there's a list of its steps down the left side. We're trying two looks — a tighter one and a more spacious one. Have a look at both and tell us which feels easier for you.",
+    directions: [
+      {
+        id: 'compact',
+        label: 'Tighter',
+        description: 'More fits on the screen at once. Good for long procedures with lots of steps.',
+        screenshot: '/uat/screens/rail-compact.png',
+      },
+      {
+        id: 'roomy',
+        label: 'More spacious',
+        description: 'Bigger and easier to read and tap. Fewer items on screen at once.',
+        screenshot: '/uat/screens/rail-roomy.png',
+      },
+    ],
+    questions: [
+      { id: 'readable', text: 'Is your preferred option easy to read?' },
+      { id: 'touch', text: 'Would it be comfortable to use on a phone or tablet?' },
+    ],
+    background:
+      'BuilderTreeRail default row density. Compact ≈ 32px rows, Roomy ≈ 40px. Affects scroll length vs tap-target comfort.',
+  },
+  {
+    id: 'builder-rail-add-affordance',
+    dateAdded: '2026-06-09',
+    category: 'Design choices',
+    title: "Where's the best place to add a new step?",
+    status: 'active',
+    summary:
+      "Two ideas for adding a step. Option A is one '＋ Add' button at the bottom. Option B shows a small '＋' between steps so you can add right where you want. Which feels easier?",
+    directions: [
+      {
+        id: 'end-button',
+        label: "One '＋ Add' button at the end",
+        description: 'Simple and tidy. To add a step in the middle, you add it then drag it up.',
+        screenshot: '/uat/screens/rail-add-end.png',
+      },
+      {
+        id: 'inline-insert',
+        label: "A '＋' between steps",
+        description: 'A small ＋ appears between steps and adds one right there. Quicker for adding in the middle.',
+        screenshot: '/uat/screens/rail-add-inline.png',
+      },
+    ],
+    questions: [
+      { id: 'obvious', text: 'Is it obvious how to add a step in your preferred option?' },
+      { id: 'tidy', text: 'Does it feel uncluttered (not too busy)?' },
+    ],
+    background: 'Add affordance placement in BuilderTreeRail — single end control vs inline hover insert points.',
+  },
+  {
+    id: 'builder-rail-nesting-depth',
+    dateAdded: '2026-06-09',
+    category: 'Design choices',
+    title: 'How much detail should the side list show?',
+    status: 'active',
+    summary:
+      'The side list can show everything — sections, steps, and the items inside each step — or just the sections and steps to keep it short. Which do you prefer?',
+    directions: [
+      {
+        id: 'full-tree',
+        label: 'Show everything',
+        description: 'Sections, steps, and the items inside each step. A complete map, but it can get long.',
+        screenshot: '/uat/screens/rail-nest-full.png',
+      },
+      {
+        id: 'steps-only',
+        label: 'Just sections and steps',
+        description: "Shows steps with a small note like '2 items'. Shorter and quicker to scan.",
+        screenshot: '/uat/screens/rail-nest-steps.png',
+      },
+    ],
+    questions: [
+      { id: 'find', text: 'Can you find what you need easily in your preferred option?' },
+      { id: 'manageable', text: 'Does it feel manageable, not overwhelming?' },
+    ],
+    background: 'Rail tree depth (deriveStepTree) — 3 levels vs sections+steps with a block count.',
+  },
+
+  // ===================== Procedure builder (have a look) =====================
+  {
+    id: '21.6-rail-step-centric',
+    dateAdded: '2026-06-09',
+    category: 'Procedure builder',
+    title: 'Is the procedure outline clear?',
+    status: 'active',
+    summary:
+      "When you open a procedure to edit it, there's a list on the left showing its sections and steps. We want to know if it's clear and easy to follow.",
+    tryIt: ['Open any procedure to edit it.', 'Look at the list down the left side.'],
+    links: [{ label: 'Open a procedure', href: '/admin/sops' }],
+    questions: [
+      { id: 'glance', text: 'Can you tell what the sections and steps are at a glance?' },
+      { id: 'numbered', text: 'Are the steps clearly numbered (Step 1, Step 2…)?' },
+      { id: 'plain', text: 'Is it free of confusing technical words?' },
+    ],
+    background:
+      'Build-stage left rail (BuilderTreeRail): step-centric outline, blocks nested under steps, no raw PascalCase block-type names.',
+  },
+  {
+    id: '21.6-add-menu-insert',
+    dateAdded: '2026-06-09',
+    category: 'Procedure builder',
+    title: 'Is it easy to add a step or block?',
+    status: 'active',
+    summary:
+      "There's a '＋ Add step or block' button for adding new content. We want to know if it's easy to find and works the way you'd expect.",
+    tryIt: ['Open a procedure.', "Click '＋ Add step or block'.", 'Pick something from the menu.'],
+    links: [{ label: 'Open a procedure', href: '/admin/sops' }],
+    questions: [
+      { id: 'findable', text: 'Was it easy to find how to add something?' },
+      { id: 'labels', text: 'Were the choices in the menu easy to understand?' },
+      { id: 'appeared', text: 'Did your new item appear where you expected?' },
+    ],
+    background: 'AddMenu: grouped humanised labels (STEPS / ANNOTATIONS / SAFETY / STRUCTURED); inserts at the step anchor.',
+  },
+  {
+    id: '21.6-inline-edit-persists',
+    dateAdded: '2026-06-09',
+    category: 'Procedure builder',
+    title: 'Can you edit text easily?',
+    status: 'active',
+    summary:
+      'You can click on text in a procedure to change it. We want to know if editing feels natural and your changes are saved.',
+    tryIt: ["Click on a step's text.", 'Type a change.', 'Wait a moment, then refresh the page.'],
+    links: [{ label: 'Open a procedure', href: '/admin/sops' }],
+    questions: [
+      { id: 'click-edit', text: 'Could you edit the text just by clicking on it?' },
+      { id: 'saved', text: 'Did it show that your change was saved?' },
+      { id: 'persisted', text: 'Was your change still there after refreshing?' },
+    ],
+    background: 'Inline contentEditable on canvas blocks; autosave (Dexie → Supabase) round-trip.',
+  },
+  {
+    id: '21.6-structured-popover',
+    dateAdded: '2026-06-09',
+    category: 'Procedure builder',
+    title: 'Are measurement / decision details easy to fill in?',
+    status: 'active',
+    summary:
+      'Some blocks (like a measurement or a yes/no decision) have extra details. Clicking one opens a small panel to fill them in. We want to know if that feels clear.',
+    tryIt: ['Click a measurement or decision block.', 'Try changing a value.', 'Press Escape to close it.'],
+    links: [{ label: 'Open a procedure', href: '/admin/sops' }],
+    questions: [
+      { id: 'anchored', text: 'Did a panel open right next to the block you clicked?' },
+      { id: 'clear', text: 'Was it clear what to fill in?' },
+      { id: 'close', text: 'Did closing it (or pressing Escape) work as expected?' },
+    ],
+    background: 'StructuredFieldPopover anchored to the selected structured block; Puck field threading + autosave.',
+  },
+  {
+    id: '21.6-orphan-photos-relabel',
+    dateAdded: '2026-06-09',
+    category: 'Procedure builder',
+    title: 'Is the photo group label clear?',
+    status: 'active',
+    summary:
+      "When a procedure has loose photos that aren't tied to a step, we group them together. We just want to check the label reads as plain English.",
+    tryIt: ['Open a procedure that has a group of reference photos.', 'Look at the label on that group.'],
+    links: [{ label: 'Open a procedure', href: '/admin/sops' }],
+    questions: [
+      { id: 'reference', text: "Does the photo group read as 'Reference images'?" },
+      { id: 'no-jargon', text: 'Is the label clear and free of jargon?' },
+    ],
+    background: "Orphan PhotoGrid relabel — rail row + canvas chip must read 'Reference images', never 'Unanchored figures'.",
+  },
+  {
+    id: '21.6-section-reorder',
+    dateAdded: '2026-06-09',
+    category: 'Procedure builder',
+    title: 'Can you reorder sections easily?',
+    status: 'active',
+    summary:
+      'You can drag sections into a different order. We want to know if that feels easy and the new order sticks.',
+    tryIt: ['Drag a section up or down in the side list.', 'Refresh the page to check the order stuck.'],
+    links: [{ label: 'Open a procedure', href: '/admin/sops' }],
+    questions: [
+      { id: 'drag', text: 'Could you drag a section into a new position?' },
+      { id: 'stuck', text: 'Did the new order stay after refreshing?' },
+    ],
+    background: 'BuilderTreeRail drag-reorder via reorderSections server action; optimistic + revert-on-error.',
+  },
+  {
+    id: '21.6-publish-gate',
+    dateAdded: '2026-06-09',
+    category: 'Procedure builder',
+    title: 'Does it stop you publishing an unfinished procedure?',
+    status: 'active',
+    summary:
+      "A procedure shouldn't go live until every safety point has been checked off. We want to confirm it stops you — with a clear message — until then.",
+    tryIt: ['Try to publish a procedure that still has unchecked safety items.'],
+    links: [{ label: 'Open a procedure', href: '/admin/sops' }],
+    questions: [
+      { id: 'blocked', text: 'Were you stopped from publishing while items were unchecked?' },
+      { id: 'explained', text: 'Was the reason explained clearly?' },
+      { id: 'then-publish', text: 'Once everything was checked, could you publish?' },
+    ],
+    background: 'Publish gate (POST /api/sops/[sopId]/publish) returns 400 unverified_blocks; UI surfaces the error.',
+  },
+
+  // ---------------------------------------------------------------------------
+  // TEMPLATE — copy this to put a new design choice or check to the team.
+  // Set status:'archived' once it's decided.
+  // ---------------------------------------------------------------------------
+  {
+    id: 'example-direction-template',
+    dateAdded: '2026-06-09',
+    category: 'Examples',
+    title: '[Example] How to ask the team a design question',
+    status: 'active',
+    summary:
+      'This is an example showing the format. Replace it with a real question, swap in your own screenshots, then archive it once the team has decided.',
+    directions: [
+      { id: 'option-a', label: 'Option A', description: 'Describe the first option in plain language.' },
+      { id: 'option-b', label: 'Option B', description: 'Describe the second option in plain language.' },
+    ],
+    questions: [
+      { id: 'easy', text: 'Is your preferred option easy to use?' },
+      { id: 'comfortable', text: 'Would it work well on a phone or tablet?' },
+    ],
+  },
+]
+
+export const ACTIVE_UAT_TESTS = UAT_TESTS.filter((t) => t.status === 'active')
+
+export function getUatTest(id: string): UatTest | undefined {
+  return UAT_TESTS.find((t) => t.id === id)
+}
+
+export function uatCategories(): string[] {
+  return Array.from(new Set(UAT_TESTS.map((t) => t.category)))
+}
+
+// ---------------------------------------------------------------------------
+// Feedback row shapes (uat_feedback table, migration 00034). Shared client/server.
+// ---------------------------------------------------------------------------
+
+/** A row from the uat_feedback table. */
 export interface UatFeedbackRow {
   id: string
   test_id: string
@@ -38,340 +340,4 @@ export interface UatFeedbackInput {
   overallVerdict: OverallVerdict | null
   rating: number | null
   notes: string | null
-}
-
-export interface UatCriterion {
-  /** Stable id, unique WITHIN a test. Used as the key in criteria_responses. */
-  id: string
-  /** What the reviewer is checking. */
-  text: string
-}
-
-export interface UatLink {
-  label: string
-  href: string
-}
-
-/** A named design/UX direction being put to the team for a preference call. */
-export interface UatDirection {
-  id: string
-  label: string
-  description: string
-  /** Optional image path/URL (e.g. /uat/screens/foo.png or a Supabase URL). */
-  screenshot?: string
-}
-
-export interface UatTest {
-  /** Stable unique slug. Becomes test_id in uat_feedback — DO NOT rename later. */
-  id: string
-  /** ISO date the test was added/last revised. */
-  dateAdded: string
-  /** Grouping label, e.g. "Builder", "Walkthrough". */
-  category: string
-  title: string
-  status: 'active' | 'archived'
-  /** Why this test exists — what question are we answering? */
-  purpose: string
-  /** The page / feature / component under test. */
-  target: string
-  /** What success looks like — the intended outcome. */
-  intendedOutcome: string
-  /** Optional how-to-test steps (rendered as an ordered list when present). */
-  howToTest?: string[]
-  /** Deep links to the thing under test (opens in a new tab). */
-  links?: UatLink[]
-  /** Optional design directions to choose between (renders a preference picker). */
-  directions?: UatDirection[]
-  /** Optional standalone screenshots for context. */
-  screenshots?: string[]
-  /** Pass/fail/na criteria the reviewer ticks. */
-  criteria: UatCriterion[]
-}
-
-// ---------------------------------------------------------------------------
-// Catalogue
-// ---------------------------------------------------------------------------
-
-export const UAT_TESTS: UatTest[] = [
-  // ---- Phase 21.6 — Builder Edit Stage Redesign (real runtime UAT) ----
-  {
-    id: '21.6-rail-step-centric',
-    dateAdded: '2026-06-09',
-    category: 'Builder · Phase 21.6',
-    title: 'Step-centric rail renders without jargon',
-    status: 'active',
-    purpose:
-      'The Build stage was redesigned to drop Puck jargon and present a single, step-centric outline. We need to confirm a first-time admin sees a clear structure, not internal block-type names.',
-    target: 'Build stage left rail (BuilderTreeRail) at /admin/sops/builder/[sopId]',
-    intendedOutcome:
-      'The left rail shows a SECTIONS heading, section rows, and for the active section an ordered Step 1 / Step 2 list with nested block rows underneath. No PascalCase block names appear anywhere in the rail or canvas headers.',
-    howToTest: [
-      'Open any SOP in the Build stage.',
-      'Expand a section and look at the rail + canvas headers.',
-    ],
-    links: [{ label: 'Open a SOP builder', href: '/admin/sops' }],
-    criteria: [
-      { id: 'sections-heading', text: 'A "SECTIONS" heading is visible at the top of the rail' },
-      { id: 'numbered-steps', text: 'Steps are shown as an ordered Step 1 / Step 2 list' },
-      { id: 'nested-blocks', text: 'Non-step blocks are nested/indented under their parent step' },
-      { id: 'no-pascalcase', text: 'No raw block-type names (e.g. "StepBlock", "HazardCardBlock") appear anywhere' },
-    ],
-  },
-  {
-    id: '21.6-add-menu-insert',
-    dateAdded: '2026-06-09',
-    category: 'Builder · Phase 21.6',
-    title: 'Add menu opens and inserts a block',
-    status: 'active',
-    purpose:
-      'The central "+ Add" affordance replaces the old palette. Confirm it opens with humanised labels and actually inserts a block on the canvas.',
-    target: '"＋ Add step or block" control + AddMenu',
-    intendedOutcome:
-      'Clicking "＋ Add step or block" opens a grouped menu (STEPS / ANNOTATIONS / SAFETY / STRUCTURED) with humanised labels; selecting a type inserts a block on the canvas and the menu closes.',
-    links: [{ label: 'Open a SOP builder', href: '/admin/sops' }],
-    criteria: [
-      { id: 'opens', text: 'The Add menu opens when the control is clicked' },
-      { id: 'grouped-labels', text: 'Options are grouped (STEPS / ANNOTATIONS / SAFETY / STRUCTURED) with plain-English labels' },
-      { id: 'inserts', text: 'Selecting a type inserts a block on the canvas' },
-      { id: 'closes', text: 'The menu closes after insertion' },
-    ],
-  },
-  {
-    id: '21.6-inline-edit-persists',
-    dateAdded: '2026-06-09',
-    category: 'Builder · Phase 21.6',
-    title: 'Inline canvas editing persists',
-    status: 'active',
-    purpose:
-      'Content editing moved from a cramped side rail into the canvas. Confirm inline edits save and survive a reload.',
-    target: 'Canvas text editing (StepBlock / TextBlock) + autosave',
-    intendedOutcome:
-      'Clicking a StepBlock or TextBlock makes its text directly editable inline; a typed change persists via autosave and is visible after reloading the page.',
-    howToTest: [
-      'Click a step or text block on the canvas.',
-      'Type a change, wait for the SAVED pill, then reload.',
-    ],
-    links: [{ label: 'Open a SOP builder', href: '/admin/sops' }],
-    criteria: [
-      { id: 'editable', text: 'Clicking the block makes its text editable inline (in the canvas)' },
-      { id: 'saved-pill', text: 'The SAVED indicator confirms the change was saved' },
-      { id: 'survives-reload', text: 'The change is still there after a full page reload' },
-    ],
-  },
-  {
-    id: '21.6-structured-popover',
-    dateAdded: '2026-06-09',
-    category: 'Builder · Phase 21.6',
-    title: 'Structured field popover anchors and saves',
-    status: 'active',
-    purpose:
-      'Structured blocks (measurements, decisions) use a popover instead of the side rail. Confirm it anchors correctly and saves.',
-    target: 'StructuredFieldPopover (Measurement / Decision blocks)',
-    intendedOutcome:
-      'Clicking a Measurement or Decision block opens a popover anchored beneath the block with a humanised title; Escape dismisses it; a field change saves.',
-    links: [{ label: 'Open a SOP builder', href: '/admin/sops' }],
-    criteria: [
-      { id: 'anchors', text: 'The popover opens anchored beneath the selected block' },
-      { id: 'humanised-title', text: 'Its title is plain-English (not a block-type name)' },
-      { id: 'escape', text: 'Pressing Escape dismisses the popover' },
-      { id: 'saves', text: 'Editing a field value saves' },
-    ],
-  },
-  {
-    id: '21.6-orphan-photos-relabel',
-    dateAdded: '2026-06-09',
-    category: 'Builder · Phase 21.6',
-    title: 'Orphan photos relabel to "Reference images"',
-    status: 'active',
-    purpose:
-      'Parsed orphan photo groups previously showed the internal label "Unanchored figures". Confirm they now read "Reference images" everywhere.',
-    target: 'PhotoGrid rail row + canvas chip',
-    intendedOutcome:
-      'A section with an orphan-photo block shows "Reference images" in both the rail row and the canvas chip — never "Unanchored figures".',
-    criteria: [
-      { id: 'rail-label', text: 'The rail row reads "Reference images"' },
-      { id: 'canvas-chip', text: 'The canvas chip reads "Reference images"' },
-      { id: 'no-unanchored', text: '"Unanchored figures" does not appear anywhere' },
-    ],
-  },
-  {
-    id: '21.6-section-reorder',
-    dateAdded: '2026-06-09',
-    category: 'Builder · Phase 21.6',
-    title: 'Section drag-reorder is stable',
-    status: 'active',
-    purpose: 'Confirm reordering sections in the rail persists.',
-    target: 'BuilderTreeRail drag-reorder (reorderSections)',
-    intendedOutcome:
-      'Dragging sections in the rail updates their order; the new order survives a page reload and navigating away and back.',
-    criteria: [
-      { id: 'drag-works', text: 'Sections can be dragged into a new order' },
-      { id: 'survives-reload', text: 'The new order is preserved after a reload' },
-      { id: 'survives-nav', text: 'The order is stable after navigating away and back' },
-    ],
-  },
-  {
-    id: '21.6-publish-gate',
-    dateAdded: '2026-06-09',
-    category: 'Builder · Phase 21.6',
-    title: 'Publish gate unchanged — no safety regression',
-    status: 'active',
-    purpose:
-      'The redesign must not weaken the safety gate. Confirm publishing a draft with unverified blocks is still blocked.',
-    target: 'Publish flow (POST /api/sops/[sopId]/publish)',
-    intendedOutcome:
-      'Publishing a draft SOP that still has unverified blocks is rejected and the UI surfaces a clear error — the gate behaves exactly as before.',
-    criteria: [
-      { id: 'blocked', text: 'Publishing with unverified blocks is blocked' },
-      { id: 'error-shown', text: 'The UI shows a clear "needs verification" error' },
-      { id: 'publishes-when-clean', text: 'Once all blocks are verified, publishing succeeds' },
-    ],
-  },
-
-  // ---- Builder rail — design directions for the team to weigh in on ----
-  {
-    id: 'builder-rail-density',
-    dateAdded: '2026-06-09',
-    category: 'Builder · Direction',
-    title: 'Builder rail density — compact or roomy?',
-    status: 'active',
-    purpose:
-      'The Build-stage left rail lists sections, steps and nested blocks. On long SOPs it gets tall and needs scrolling; on short ones it feels sparse. We need to agree the default row density.',
-    target: 'BuilderTreeRail (left rail) at /admin/sops/builder/[sopId]',
-    intendedOutcome:
-      'A default density the team agrees scans well without excessive scrolling, while staying comfortable to click and drag.',
-    links: [{ label: 'Open the current rail', href: '/admin/sops' }],
-    directions: [
-      {
-        id: 'compact',
-        label: 'Compact (~32px rows)',
-        screenshot: '/uat/screens/rail-compact.png',
-        description:
-          'Tighter rows and indents — more of the SOP visible at once. Best for 20+ step procedures. Trades some breathing room.',
-      },
-      {
-        id: 'roomy',
-        label: 'Roomy (~40px rows)',
-        screenshot: '/uat/screens/rail-roomy.png',
-        description:
-          'Generous spacing and larger hit areas — easier to scan and click, consistent with the glove-friendly worker UI. Fewer rows per screen.',
-      },
-    ],
-    criteria: [
-      { id: 'scan', text: 'A long SOP is easy to scan in the preferred density' },
-      { id: 'click', text: 'Rows are comfortable to click and drag without mis-hits' },
-      { id: 'consistency', text: 'The density feels consistent with the rest of the app' },
-    ],
-  },
-  {
-    id: 'builder-rail-add-affordance',
-    dateAdded: '2026-06-09',
-    category: 'Builder · Direction',
-    title: 'Where should "Add" live in the rail?',
-    status: 'active',
-    purpose:
-      'Today a single "＋ Add step or block" control sits at the end of a section and opens the Add menu. Admins building multi-step SOPs often want to insert in the middle. We need to decide the add model.',
-    target: '"＋ Add step or block" control + insertion anchor in BuilderTreeRail',
-    intendedOutcome:
-      'An add model that makes inserting at any position obvious and fast, without cluttering the rail.',
-    links: [{ label: 'Open the current rail', href: '/admin/sops' }],
-    directions: [
-      {
-        id: 'end-button',
-        label: 'Single end-of-section button (current)',
-        screenshot: '/uat/screens/rail-add-end.png',
-        description:
-          'One clear ＋ control per section; to insert mid-list you add then drag into place. Clean, but a mid-list insert is a two-step move.',
-      },
-      {
-        id: 'inline-insert',
-        label: 'Inline insert points',
-        screenshot: '/uat/screens/rail-add-inline.png',
-        description:
-          'A subtle ＋ appears between steps on hover and inserts exactly there. Faster mid-SOP authoring, at the cost of more affordances on screen.',
-      },
-    ],
-    criteria: [
-      { id: 'discoverable', text: 'It is obvious how to add a block' },
-      { id: 'mid-insert', text: 'Inserting a block in the middle of a section is quick' },
-      { id: 'uncluttered', text: 'The rail does not feel busy or noisy' },
-    ],
-  },
-  {
-    id: 'builder-rail-nesting-depth',
-    dateAdded: '2026-06-09',
-    category: 'Builder · Direction',
-    title: 'How much should the rail show — blocks too, or just steps?',
-    status: 'active',
-    purpose:
-      'The rail currently shows three levels: sections → steps → the blocks nested under each step. On block-heavy steps this gets deep. Should the rail stay a full tree, or collapse to sections + steps and leave block detail to the canvas?',
-    target: 'BuilderTreeRail tree depth (deriveStepTree nesting)',
-    intendedOutcome:
-      'The right amount of detail in the rail — enough to navigate, not so much it overwhelms.',
-    links: [{ label: 'Open the current rail', href: '/admin/sops' }],
-    directions: [
-      {
-        id: 'full-tree',
-        label: 'Full 3-level tree (current)',
-        screenshot: '/uat/screens/rail-nest-full.png',
-        description:
-          'Sections → steps → nested block rows. A complete map of the SOP, but can get long on block-heavy steps.',
-      },
-      {
-        id: 'steps-only',
-        label: 'Sections + steps only',
-        screenshot: '/uat/screens/rail-nest-steps.png',
-        description:
-          'Blocks are shown and edited on the canvas, not in the rail. Much shorter rail and faster navigation; less at-a-glance detail.',
-      },
-    ],
-    criteria: [
-      { id: 'navigate', text: 'It is easy to jump to the part of the SOP you want' },
-      { id: 'overwhelm', text: 'The rail does not feel overwhelming on a complex SOP' },
-      { id: 'findability', text: 'You can still find a specific block quickly' },
-    ],
-  },
-
-  // ---------------------------------------------------------------------------
-  // TEMPLATE — copy this block to put a design/UX DIRECTION to the team.
-  // Delete or set status:'archived' once a direction is chosen.
-  // ---------------------------------------------------------------------------
-  {
-    id: 'example-direction-template',
-    dateAdded: '2026-06-09',
-    category: 'Examples',
-    title: '[Example] Builder rail density — which direction?',
-    status: 'active',
-    purpose:
-      'Template showing how to surface a design direction for a team preference call. Replace with a real question, add screenshots, then archive once decided.',
-    target: 'Example only — not a live feature',
-    intendedOutcome:
-      'The team converges on a preferred direction with rationale captured in notes.',
-    directions: [
-      {
-        id: 'compact',
-        label: 'Compact',
-        description: 'Tighter rows, more steps visible at once — better for long SOPs.',
-      },
-      {
-        id: 'roomy',
-        label: 'Roomy',
-        description: 'Larger tap targets and spacing — easier to scan, fewer steps per screen.',
-      },
-    ],
-    criteria: [
-      { id: 'readable', text: 'The preferred direction is easy to scan' },
-      { id: 'glove-friendly', text: 'Tap targets are comfortable on a touch device' },
-    ],
-  },
-]
-
-export const ACTIVE_UAT_TESTS = UAT_TESTS.filter((t) => t.status === 'active')
-
-export function getUatTest(id: string): UatTest | undefined {
-  return UAT_TESTS.find((t) => t.id === id)
-}
-
-export function uatCategories(): string[] {
-  return Array.from(new Set(UAT_TESTS.map((t) => t.category)))
 }
