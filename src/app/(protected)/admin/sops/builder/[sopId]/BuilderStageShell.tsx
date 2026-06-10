@@ -36,6 +36,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { BuilderClient } from './BuilderClient'
 import { BuilderStageStepper } from './BuilderStageStepper'
+import { BuilderFlowButton } from './BuilderFlowButton'
 import type { BuilderStage } from './BuilderStageStepper'
 import { OrientationStrip } from './OrientationStrip'
 import { ReviewStation } from './ReviewStation'
@@ -268,15 +269,18 @@ export function BuilderStageShell({
             )}
           </div>
 
-          {/* Right-of-center: stepper */}
-          <BuilderStageStepper
-            activeStage={activeStage}
-            hasSourceDoc={hasSourceDoc}
-            isReady={effectiveIsReady}
-            verifiedCount={effectiveVerifiedCount}
-            totalCount={effectiveTotalCount}
-            onStageSelect={handleStageSelect}
-          />
+          {/* Right-of-center: flow-graph preview + stepper */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <BuilderFlowButton sop={initialSop} />
+            <BuilderStageStepper
+              activeStage={activeStage}
+              hasSourceDoc={hasSourceDoc}
+              isReady={effectiveIsReady}
+              verifiedCount={effectiveVerifiedCount}
+              totalCount={effectiveTotalCount}
+              onStageSelect={handleStageSelect}
+            />
+          </div>
         </header>
 
         {/* ── Stage content area ───────────────────────────────────── */}
