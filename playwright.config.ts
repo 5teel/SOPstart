@@ -72,6 +72,13 @@ export default defineConfig({
       testMatch: /.*\.test\.ts$/,
     },
     {
+      // Phase 24 — branch-aware flow derivation unit tests.
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      name: 'phase24-unit',
+      testDir: './src/lib/sop/__tests__',
+      testMatch: /flow-graph-derivation\.test\.ts$/,
+    },
+    {
       name: 'phase21-source-viewer',
       testDir: './src/lib/parsers/source-viewer/__tests__',
       testMatch: /.*\.test\.ts$/,
