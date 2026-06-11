@@ -1,27 +1,29 @@
 'use client'
 
 /**
- * PROTOTYPE (Phase 24 backlog) — spatial node-graph view of an SOP's flow graph,
- * per the blueprint sketch's FLOW tab. Auto-lays out nodes in depth layers from
- * the edge list, draws arrowed SVG edges (yes/no/escalate labelled, escalate red),
- * and colour-codes nodes by type. Honours explicit node.position when authored
- * (distinct x's); otherwise auto-layout. Linear derived graphs render as a clean
- * vertical chain; branch-aware derivation lights up the columns automatically.
+ * Phase 24 — spatial node-graph view of an SOP's flow graph,
+ * per the blueprint sketch's FLOW tab. Supports two layout modes:
+ *  - Explicit positions: when any node.position.x !== 0, nodes render at
+ *    their authored coordinates (layoutFromPositions).
+ *  - Auto-layout: all-zero-x graphs fall back to the existing depth-layer
+ *    column layout (longest-path layering, branch-aware columns).
+ * Draws arrowed SVG edges (yes/no/escalate labelled, escalate red), and
+ * colour-codes nodes using the --accent-* CSS-var token set matching FlowTab.
  */
 
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useCallback } from 'react'
 import type { FlowGraph } from '@/lib/validators/flow-graph'
 
 type NodeType = FlowGraph['nodes'][number]['type']
 
 const NODE: Record<NodeType, { fill: string; stroke: string; label: string }> = {
-  step: { fill: '#eff4ff', stroke: '#2563eb', label: 'Step' },
-  measurement: { fill: '#fff5ed', stroke: '#ea580c', label: 'Measurement' },
-  decision: { fill: '#fdf2f8', stroke: '#db2777', label: 'Decision' },
-  escalate: { fill: '#fef2f2', stroke: '#dc2626', label: 'Escalate' },
-  signoff: { fill: '#f0fdf4', stroke: '#16a34a', label: 'Sign-off' },
-  inspect: { fill: '#ecfeff', stroke: '#0891b2', label: 'Inspect' },
-  zone: { fill: '#faf5ff', stroke: '#9333ea', label: 'Zone' },
+  step:        { fill: 'color-mix(in srgb, var(--accent-step, #1e40af) 12%, transparent)',     stroke: 'var(--accent-step, #1e40af)',     label: 'Step' },
+  measurement: { fill: 'color-mix(in srgb, var(--accent-measure, #0d9488) 12%, transparent)',  stroke: 'var(--accent-measure, #0d9488)',  label: 'Measurement' },
+  decision:    { fill: 'color-mix(in srgb, var(--accent-decision, #d97706) 12%, transparent)', stroke: 'var(--accent-decision, #d97706)', label: 'Decision' },
+  escalate:    { fill: 'color-mix(in srgb, var(--accent-escalate, #dc2626) 12%, transparent)', stroke: 'var(--accent-escalate, #dc2626)', label: 'Escalate' },
+  signoff:     { fill: 'color-mix(in srgb, var(--accent-signoff, #7c3aed) 12%, transparent)',  stroke: 'var(--accent-signoff, #7c3aed)',  label: 'Sign-off' },
+  inspect:     { fill: 'color-mix(in srgb, var(--accent-inspect, #0284c7) 12%, transparent)',  stroke: 'var(--accent-inspect, #0284c7)',  label: 'Inspect' },
+  zone:        { fill: 'color-mix(in srgb, var(--accent-zone, #16a34a) 12%, transparent)',     stroke: 'var(--accent-zone, #16a34a)',     label: 'Zone' },
 }
 
 const NW = 168
@@ -38,7 +40,27 @@ interface Placed {
   label: string
 }
 
+/** Returns true when any node has an authored x position (not all-zero derived). */
+export function hasExplicitPositions(graph: FlowGraph): boolean {
+  return graph.nodes.some((n) => n.position.x !== 0)
+}
+
+/** Layout pass for authored graphs: place each node at its authored position verbatim. */
+function layoutFromPositions(graph: FlowGraph): { placed: Map<string, Placed>; width: number; height: number } {
+  const placed = new Map<string, Placed>()
+  for (const n of graph.nodes) {
+    placed.set(n.id, { id: n.id, x: n.position.x, y: n.position.y, type: n.type, label: n.label })
+  }
+  const xs = graph.nodes.map((n) => n.position.x)
+  const ys = graph.nodes.map((n) => n.position.y)
+  const width = Math.max(...xs) + NW + PAD * 2
+  const height = Math.max(...ys) + NH + PAD * 2
+  return { placed, width, height }
+}
+
 function layout(graph: FlowGraph): { placed: Map<string, Placed>; width: number; height: number } {
+  if (hasExplicitPositions(graph)) return layoutFromPositions(graph)
+
   const ids = graph.nodes.map((n) => n.id)
   const incoming = new Map<string, number>()
   ids.forEach((id) => incoming.set(id, 0))
@@ -102,8 +124,65 @@ function wrap(label: string): string[] {
 
 export function FlowGraphCanvas({ graph }: { graph: FlowGraph }) {
   const scrollRef = useRef<HTMLDivElement>(null)
+  const svgRef = useRef<SVGSVGElement>(null)
   const { placed, width, height } = useMemo(() => layout(graph), [graph])
   const branchCount = graph.edges.filter((e) => e.kind === 'yes' || e.kind === 'no' || e.kind === 'escalate').length
+
+  const fitToView = useCallback(() => {
+    const svg = svgRef.current
+    const container = scrollRef.current
+    if (!svg || !container) return
+    const scale = Math.min(container.clientWidth / width, container.clientHeight / height, 1)
+    const vw = width / scale
+    const vh = height / scale
+    svg.setAttribute('viewBox', `0 0 ${vw} ${vh}`)
+    svg.setAttribute('width', String(container.clientWidth))
+    svg.setAttribute('height', String(container.clientHeight))
+  }, [width, height])
+
+  const exportPng = useCallback(async () => {
+    const svg = svgRef.current
+    if (!svg) return
+    // 1. Clone and inline CSS variable computed values (vars don't resolve in serialised SVG)
+    const clone = svg.cloneNode(true) as SVGSVGElement
+    const liveEls = svg.querySelectorAll('*')
+    const cloneEls = clone.querySelectorAll('*')
+    liveEls.forEach((liveEl, i) => {
+      const cloneEl = cloneEls[i] as SVGElement
+      if (!cloneEl) return
+      const cs = getComputedStyle(liveEl)
+      if (cs.fill && cs.fill !== 'none') cloneEl.style.fill = cs.fill
+      if (cs.stroke && cs.stroke !== 'none') cloneEl.style.stroke = cs.stroke
+    })
+    // 2. Serialise
+    const svgStr = new XMLSerializer().serializeToString(clone)
+    const url = URL.createObjectURL(new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' }))
+    // 3. Draw to canvas at devicePixelRatio
+    const dpr = window.devicePixelRatio || 1
+    const w = svg.width.baseVal.value || 800
+    const h = svg.height.baseVal.value || 600
+    const canvas = document.createElement('canvas')
+    canvas.width = w * dpr
+    canvas.height = h * dpr
+    const ctx = canvas.getContext('2d')!
+    ctx.scale(dpr, dpr)
+    await new Promise<void>((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => { ctx.drawImage(img, 0, 0, w, h); resolve() }
+      img.onerror = reject
+      img.src = url
+    })
+    URL.revokeObjectURL(url)
+    // 4. Trigger download
+    canvas.toBlob((b) => {
+      if (!b) return
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(b)
+      a.download = 'procedure-flow.png'
+      a.click()
+      URL.revokeObjectURL(a.href)
+    }, 'image/png')
+  }, [])
 
   return (
     <div className="h-full flex flex-col">
@@ -112,18 +191,25 @@ export function FlowGraphCanvas({ graph }: { graph: FlowGraph }) {
           <span className="mono text-[10px] tracking-widest text-[var(--ink-500)]">PROCEDURE FLOW</span>
           <span className="pill">{graph.nodes.length} NODES</span>
           <span className="pill">{branchCount} {branchCount === 1 ? 'BRANCH' : 'BRANCHES'}</span>
-          <span className="pill" style={{ opacity: 0.7 }}>PREVIEW</span>
         </div>
-        <button
-          onClick={() => scrollRef.current?.scrollTo({ top: 0, left: 0, behavior: 'smooth' })}
-          className="evidence-btn !min-h-[30px] text-[11px]"
-        >
-          Fit
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => void exportPng()}
+            className="evidence-btn !min-h-[30px] text-[11px]"
+          >
+            Export PNG
+          </button>
+          <button
+            onClick={fitToView}
+            className="evidence-btn !min-h-[30px] text-[11px]"
+          >
+            Fit
+          </button>
+        </div>
       </div>
 
       <div ref={scrollRef} className="flex-1 overflow-auto bg-grid scroll-thin" style={{ minHeight: 360 }}>
-        <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ display: 'block' }}>
+        <svg ref={svgRef} width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ display: 'block' }}>
           <defs>
             <marker id="fg-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
               <path d="M0 0 L10 5 L0 10 z" fill="#52525b" />
