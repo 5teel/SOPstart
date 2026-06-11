@@ -13,9 +13,9 @@ import { test, expect } from '@playwright/test'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 
-// TODO(24-02/24-03): un-fixme this test when Plans 02/03 remove the PREVIEW pill
-// from FlowGraphCanvas.tsx (line ~115) and the "Graph (preview)" label from FlowTab.tsx (line ~24).
-test.fixme('no PREVIEW pill or label in flow components', () => {
+// Un-fixme: Plans 02/03 removed PREVIEW pill from FlowGraphCanvas.tsx (Plan 02)
+// and "Graph (preview)" label from FlowTab.tsx + PREVIEW pill from BuilderFlowButton.tsx (Plan 03).
+test('no PREVIEW pill or label in flow components', () => {
   const files = [
     'src/components/sop/flow/FlowGraphCanvas.tsx',
     'src/components/sop/tabs/FlowTab.tsx',

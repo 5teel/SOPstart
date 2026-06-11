@@ -43,8 +43,8 @@ test('FlowGraphCanvas defines exportPng with canvas.toBlob and Export button onC
 
 // (c) FLOW-01: FlowTab imports useViewport AND seeds useState with 'list' (SSR-safe)
 //     AND has useEffect that sets view to 'graph' when viewport === 'desktop'
-// TODO(24-03): un-fixme when Plan 03 implements desktop-default auto-switch
-test.fixme('FlowTab imports useViewport and uses SSR-safe initial state with desktop useEffect', () => {
+// Un-fixme: Plan 03 implemented desktop-default auto-switch (FLOW-04)
+test('FlowTab imports useViewport and uses SSR-safe initial state with desktop useEffect', () => {
   const content = readFileSync(FLOW_TAB_FILE, 'utf8')
   // import present
   expect(content).toMatch(/import.*useViewport.*from.*@\/hooks\/useViewport/)

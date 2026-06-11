@@ -72,8 +72,7 @@ export function BuilderFlowButton({ sop }: { sop: SopWithSections }) {
             >
               <header className="flex items-center justify-between px-4 py-3 border-b border-[var(--ink-100)] bg-white">
                 <div>
-                  <span className="pill">PREVIEW</span>
-                  <h2 className="text-base font-semibold text-[var(--ink-900)] mt-1">Procedure flow</h2>
+                  <h2 className="text-base font-semibold text-[var(--ink-900)]">Procedure flow</h2>
                 </div>
                 <button
                   onClick={() => setOpen(false)}

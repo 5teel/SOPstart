@@ -1,11 +1,16 @@
 'use client'
-import { useRef, useMemo, useState } from 'react'
+// CLAUDE.md 2026-06-08: never derive first-render output from navigator/window at
+// module-load or in render — seed a stable SSR-safe constant and reconcile in an
+// effect. Initial state 'list' matches SSR; useViewport reconcile to 'graph' on
+// desktop runs only after hydration, so no React #418 hydration mismatch.
+import { useRef, useMemo, useState, useEffect } from 'react'
 import { AlertTriangle, Zap, Lightbulb, Wrench, Clock, ChevronDown, Camera } from 'lucide-react'
 import { BlueprintCanvas } from '@/components/ui/BlueprintCanvas'
 import { BlueprintFrame } from '@/components/ui/BlueprintFrame'
 import { FlowGraphSchema, type FlowGraph } from '@/lib/validators/flow-graph'
 import { deriveFlowGraph } from '@/lib/sop/flow-graph'
 import { FlowGraphCanvas } from '@/components/sop/flow/FlowGraphCanvas'
+import { useViewport } from '@/hooks/useViewport'
 import type { SopStep, SopWithSections } from '@/types/sop'
 
 function ViewToggle({ view, setView }: { view: 'list' | 'graph'; setView: (v: 'list' | 'graph') => void }) {
@@ -21,7 +26,7 @@ function ViewToggle({ view, setView }: { view: 'list' | 'graph'; setView: (v: 'l
             color: view === v ? 'white' : 'var(--ink-700)',
           }}
         >
-          {v === 'list' ? 'List' : 'Graph (preview)'}
+          {v === 'list' ? 'List' : 'Graph'}
         </button>
       ))}
     </div>
@@ -187,7 +192,15 @@ function StepCard({
 export function FlowTab({ sop }: { sop: SopWithSections }) {
   const warnedRef = useRef(false)
   const [openId, setOpenId] = useState<string | null>(null)
+  // SSR-safe seed: 'list' matches server render. Never read window here.
+  // See CLAUDE.md 2026-06-08 learning (navigator/window at module-load → hydration #418).
   const [view, setView] = useState<'list' | 'graph'>('list')
+  const viewport = useViewport()
+  // After hydration, upgrade to graph view on desktop. Mobile/SSR stays 'list'.
+  // useEffect runs only client-side (post-hydration), so no SSR/client mismatch.
+  useEffect(() => {
+    if (viewport === 'desktop') setView('graph')
+  }, [viewport])
 
   const derivedGraph = useMemo(() => deriveFlowGraph(sop), [sop.id, sop.updated_at])
 
