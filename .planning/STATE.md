@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
-status: Ready to execute
-stopped_at: Session resumed. Phase 21.6 all 5 plans + code review complete; VERIFICATION = human_needed (4-item UAT runbook in 21.6-HUMAN-UAT.md, post-fix commits 311dcf5 + hydration fix 2026-06-08). Phase 24 (Flow spatial node graph) prototype + branch-aware derivation landed on master 2026-06-09/10 outside GSD plans — ROADMAP marks it [→], no phase dir yet. Stale Phase 20 .continue-here.md deleted (signLayoutDataImages shipped).
-last_updated: "2026-06-11T13:36:30.710Z"
+status: Executing Phase 24
+stopped_at: "Phase 24 Plan 01 complete (2026-06-11). Schema relaxed, phase24-stubs registered, FLOW-02 coverage extended, FLOW-05 investigated. Plan 02 next."
+last_updated: "2026-06-11T00:00:00.000Z"
 progress:
-  total_phases: 27
+  total_phases: 28
   completed_phases: 2
-  total_plans: 10
-  completed_plans: 10
-  percent: 7
+  total_plans: 13
+  completed_plans: 11
+  percent: 8
 ---
 
 # Project State
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 24 — procedure-flow-spatial-node-graph (planned, ready to execute). Phase 21.6 complete pending its 4-item human UAT.
+**Current focus:** Phase 24 — procedure-flow-spatial-node-graph
 
 ## Current Position
 
-Phase: 24 (procedure-flow-spatial-node-graph) — PLANNED (3 plans / 3 waves)
-Plan: 0 of 3
+Phase: 24 (procedure-flow-spatial-node-graph) — EXECUTING
+Plan: 2 of 3
 **Milestone status:** v4.0 started 2026-05-24. 3 phases / 40 requirements (1 of 3 phases complete). See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
 **Active phase:** 21.5
@@ -214,6 +214,11 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 15-02]: First Load JS delta /sops/[sopId]/page = +7 KB (1088→1095); DesktopWalkthrough+WalkthroughVoiceModal correctly out-of-band as dynamic chunks; Wave 4 owns formal CI gate
 - [Phase ?]: Used bare () => <></> instead of (): ReactElement => <></> in createPuckOverrides — E3 test regex requires parens-arrow form without type annotation
 - [Phase ?]: deriveStepTree is pure read of layout_data.content[] — no mutations, presentation-only step grouping (21.6-03)
+- [Phase 24-01]: FlowGraphSchema id/from/to relaxed to z.string().min(1) — derived non-step nodes use junctionId/props.id which are not guaranteed UUIDs (FLOW-05 schema contract)
+- [Phase 24-01]: stepId stays z.string().uuid().optional() — always links to sop_steps.id
+- [Phase 24-01]: zod uuid validator requires version nibble [1-8] (RFC 4122) — sequential test UUIDs like 00000000-...-000042 are INVALID; use proper v4 format e.g. a0000000-0000-4000-8000-000000000001
+- [Phase 24-01]: FlowGraphField is unreachable from 21.6 builder (rightSideBarVisible:false at BuilderClient.tsx:535) — Plan 03 must re-surface via portaled modal/panel, not Puck right sidebar
+- [Phase 24-01]: useBuilderAutosave writes only layout_data per section_id to Dexie; never writes root.props.flowGraph — autosave cannot clobber sops.flow_graph
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -322,7 +327,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-11 (resume)
-Stopped at: Session resumed. Phase 21.6 all 5 plans + code review complete; VERIFICATION = human_needed (4-item UAT runbook in 21.6-HUMAN-UAT.md, post-fix commits 311dcf5 + hydration fix 2026-06-08). Phase 24 (Flow spatial node graph) prototype + branch-aware derivation landed on master 2026-06-09/10 outside GSD plans — ROADMAP marks it [→], no phase dir yet. Stale Phase 20 .continue-here.md deleted (signLayoutDataImages shipped).
+Last session: 2026-06-11
+Stopped at: Phase 24 Plan 01 complete. Schema relaxed, phase24-stubs registered (3 files discovered), FLOW-02 coverage extended (10/10 tests pass), FLOW-05 investigated (field unreachable via rightSideBarVisible:false, autosave no-clobber confirmed). Next: /gsd-execute-phase 24 plan 02.
 Resume file: none
-Awaiting: user choice — run 21.6 UAT, formalise/continue Phase 24, or spec Phase 22.
+Awaiting: Plan 02 execution.

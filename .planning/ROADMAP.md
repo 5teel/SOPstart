@@ -101,7 +101,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 24-01-PLAN.md — Wave-0 test surface + FlowGraphSchema relaxation (FLOW-05 schema) + FLOW-02 coverage audit + FLOW-05 round-trip investigation
+- [x] 24-01-PLAN.md — Wave-0 test surface + FlowGraphSchema relaxation (FLOW-05 schema) + FLOW-02 coverage audit + FLOW-05 round-trip investigation ✅ 2026-06-11
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
