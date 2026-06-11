@@ -51,7 +51,7 @@ Three phases bundle the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` 
 - [x] **Phase 21.6: Builder Edit Stage Redesign** (INSERTED 2026-06-05) — Apply the 21.5 review-redesign philosophy to the **Build/edit** stage, which is still the untouched Puck editor. First-time admins hit internal jargon ("Block"), two redundant block lists (Puck component palette = add-new vs outline = already-placed), unanchored canvas figures with no clear action, and a cramped right-rail field editor. Scope from UAT feedback: (1) humanize block-type labels in the Puck palette + outline (reuse `humanizeBlockType` / `block-type-labels.ts` from 21.5 — currently only on the review surface); (2) collapse palette + outline into one clear affordance; (3) move content editing into the central canvas instead of the narrow right rail; (4) clarify the `SectionListSidebar` purpose + 1st→last ordering; (5) clarify what the user does with canvas figures/images. UI-led — produces a UI-SPEC. Runs **before** Phase 22. (completed 2026-06-05)
 - [ ] **Phase 22: Voice-Driven Walkthrough** — Worker walkthrough literacy gaps closed (W-01) + AI Voice Q&A that drives the walkthrough end-to-end (X-02). Bundle: voice infrastructure (transcription, TTS, multi-language) serves both the literacy story and the Q&A story.
 - [ ] **Phase 23: AI Field Layer + Version Supersede** — Universal AI read/write access to every editable field + Cmd+K extended across admin surfaces (X-03) + version history formal supersede + diff + restore + worker-instance sign-off chain (G-01). X-03 is the architectural backbone v5.0 conversational app builds on; G-01 fits naturally alongside as a small standalone bundle.
-- [→] **Phase 24: Procedure Flow — Spatial Node Graph** — **v4.0 backlog, added 2026-06-09.** Closes a Phase 12.5 gap: req #8 ("Flow tab renders an SVG node graph") shipped as a vertical list of expandable step cards, NOT the blueprint sketch's design (`sketches/sop-blueprint/index.html` → FLOW tab) — a spatial node-graph canvas with positioned, colour-coded nodes, arrow-connected edges carrying yes/no/escalate branch labels, decision branching, node/branch counts, and FIT / EXPORT-PNG controls. The data model already supports it (`flow_graph` nodes carry `position`; edges carry `kind`). Scope: (1) spatial SVG renderer with auto-layout for derived/linear graphs + honour explicit positions from Puck authoring; (2) branch-aware derivation (`deriveFlowGraph` emits yes/no from DecisionBlock + escalate from EscalateBlock, not only `sequential`); (3) FIT + EXPORT PNG; (4) keep the list as a fallback/mobile view; (5) verify the Phase 12.5-carried Puck `FlowGraphField` round-trip. **Prototype landed 2026-06-09** (`FlowGraphCanvas.tsx`, behind a Flow-tab "Graph (preview)" toggle) — productionising it is the phase.
+- [ ] **Phase 24: Procedure Flow — Spatial Node Graph** — Promoted from v4.0 backlog 2026-06-11 (added 2026-06-09); prototype work already on master (commits `c1440fc`, `9a395bd`, `b223786`). Closes a Phase 12.5 gap: req #8 ("Flow tab renders an SVG node graph") shipped as a vertical list of expandable step cards, NOT the blueprint sketch's design (`sketches/sop-blueprint/index.html` → FLOW tab) — a spatial node-graph canvas with positioned, colour-coded nodes, arrow-connected edges carrying yes/no/escalate branch labels, decision branching, node/branch counts, and FIT / EXPORT-PNG controls. The data model already supports it (`flow_graph` nodes carry `position`; edges carry `kind`).
 
 ## Phase Details
 
@@ -84,6 +84,20 @@ Plans:
 - [x] 21.6-03-PLAN.md — BuilderTreeRail + Tree{Section,Step,Block}Row: humanised Section-Steps spine, reorder, Reference-images relabel (E1/E2/E5/E6)
 - [x] 21.6-04-PLAN.md — AddMenu (humanised + From-library) + StructuredFieldPopover (E3/E4)
 - [x] 21.6-05-PLAN.md — Wire BuilderTreeRail + ui sidebar suppression + Add/library/popover into BuilderClient; E6 canvas chip; preserve autosave/junction/gate (E1/E3/E6/E7)
+
+### Phase 24: Procedure Flow — Spatial Node Graph
+
+**Goal**: The Flow tab's default view is a production-quality spatial node-graph canvas matching the blueprint sketch (`sketches/sop-blueprint/index.html` → FLOW tab) — positioned, colour-coded nodes, arrow-connected edges with yes/no/escalate branch labels, node/branch counts, and FIT / EXPORT-PNG controls — productionising the prototype already on master.
+**Depends on**: Phase 12.5 (`sops.flow_graph` JSONB, `deriveFlowGraph`, Puck `FlowGraphField`), prototype commits `c1440fc` (FlowGraphCanvas.tsx + FlowTab "Graph (preview)" toggle), `9a395bd` (builder Flow preview button), `b223786` (branch-aware derivation + flow-graph-derivation tests)
+**Requirements** (defined here — no REQUIREMENTS.md mapping for this phase):
+
+- FLOW-01: Spatial SVG renderer with auto-layout for derived/linear graphs AND honouring explicit node positions from Puck authoring
+- FLOW-02: Branch-aware derivation — `deriveFlowGraph` emits yes/no edges from DecisionBlock + escalate edges from EscalateBlock (✅ shipped in `b223786`; verify coverage, no rework unless gaps found)
+- FLOW-03: FIT (zoom-to-fit) + EXPORT-PNG controls on the graph canvas
+- FLOW-04: Vertical step-card list retained as fallback/mobile view; graph becomes the desktop default (drop "preview" gating)
+- FLOW-05: Phase 12.5-carried Puck `FlowGraphField` round-trip verified (author positions in builder → persists to `sops.flow_graph` → renders in Flow tab)
+
+**Plans**: TBD
 
 ### Phase 1: Foundation
 

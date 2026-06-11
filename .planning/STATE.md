@@ -322,7 +322,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-05T12:55:58.757Z
-Stopped at: Phase 21.6 Plan 03 complete — TreeRail (E5/E6 GREEN)
-Resume file: .planning/phases/21.6-builder-edit-stage-redesign/21.6-04-PLAN.md
-Awaiting: Phase 21.6 Plan 02 — puck-config.tsx reconfigure (suppress palette/outline + contentEditable inline editing).
+Last session: 2026-06-11 (resume)
+Stopped at: Session resumed. Phase 21.6 all 5 plans + code review complete; VERIFICATION = human_needed (4-item UAT runbook in 21.6-HUMAN-UAT.md, post-fix commits 311dcf5 + hydration fix 2026-06-08). Phase 24 (Flow spatial node graph) prototype + branch-aware derivation landed on master 2026-06-09/10 outside GSD plans — ROADMAP marks it [→], no phase dir yet. Stale Phase 20 .continue-here.md deleted (signLayoutDataImages shipped).
+Resume file: none
+Awaiting: user choice — run 21.6 UAT, formalise/continue Phase 24, or spec Phase 22.
