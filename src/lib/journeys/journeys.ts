@@ -109,7 +109,7 @@ export const JOURNEYS: Journey[] = [
       { id: 's', type: 'start', label: 'Needs to do a task' },
       { id: 'home', type: 'screen', label: 'Dashboard', route: '/dashboard', detail: 'Shows assigned SOPs.' },
       { id: 'lib', type: 'screen', label: 'SOP library', route: '/sops', detail: 'Browse, search, filter by trade.' },
-      { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]', detail: 'Tabs: overview, tools, hazards, flow, model.' },
+      { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]', detail: 'Tabs: overview, tools, hazards, flow, model. Flow tab defaults to spatial graph on desktop (≥1024px) with a List/Graph toggle; mobile defaults to list.' },
       { id: 'go', type: 'decision', label: 'Ready to start?', branches: [
         { label: 'Yes — walk it', to: 'walk' },
         { label: 'Just reading', to: 'e' },

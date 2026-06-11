@@ -37,6 +37,7 @@ import { useRouter } from 'next/navigation'
 import { BuilderClient } from './BuilderClient'
 import { BuilderStageStepper } from './BuilderStageStepper'
 import { BuilderFlowButton } from './BuilderFlowButton'
+import { BuilderFlowEditButton } from './BuilderFlowEditButton'
 import type { BuilderStage } from './BuilderStageStepper'
 import { OrientationStrip } from './OrientationStrip'
 import { ReviewStation } from './ReviewStation'
@@ -269,8 +270,12 @@ export function BuilderStageShell({
             )}
           </div>
 
-          {/* Right-of-center: flow-graph preview + stepper */}
+          {/* Right-of-center: flow-graph preview + edit + stepper */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {/* Phase 24 Plan 03 — FLOW-05: "Edit flow" re-surfaces FlowGraphEditor
+                outside the suppressed Puck right sidebar via a portaled modal.
+                No Puck hook is called — avoids CLAUDE.md 2026-06-08 outside-Puck crash. */}
+            <BuilderFlowEditButton sop={initialSop} sopId={sopId} />
             <BuilderFlowButton sop={initialSop} />
             <BuilderStageStepper
               activeStage={activeStage}
