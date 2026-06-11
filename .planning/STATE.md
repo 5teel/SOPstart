@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
 status: Executing Phase 24
-stopped_at: "Phase 24 Plan 02 complete (2026-06-11). FlowGraphCanvas productionised: explicit positions, accent tokens, fitToView, exportPng, PREVIEW pill removed. Plan 03 next."
-last_updated: "2026-06-11T13:56:00.000Z"
+stopped_at: "Phase 24 Plan 03 partial (2026-06-12). Tasks 1+2 committed: FLOW-04 desktop-default graph view (SSR-safe) + PREVIEW removal; FLOW-05 FlowGraphEditor re-surfaced via BuilderFlowEditButton; journeys.ts updated. Stopped at Task 3 checkpoint:human-verify — awaiting UAT on sopstart.com (FLOW-05 round-trip, FLOW-03 export, FLOW-04 viewport) then Task 4 bundle gate."
+last_updated: "2026-06-12T00:00:00.000Z"
 progress:
   total_phases: 28
   completed_phases: 2
