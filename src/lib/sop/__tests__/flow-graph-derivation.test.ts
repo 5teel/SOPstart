@@ -214,3 +214,91 @@ test('sections honour sort_order for document-order chaining', () => {
   expect(g.nodes.map((n) => n.id)).toEqual([a, b])
   expect(g.edges[0]).toMatchObject({ from: a, to: b, kind: 'sequential' })
 })
+
+// ---------------------------------------------------------------------------
+// Phase 24 Plan 01 — FLOW-02 coverage gap closure
+// ---------------------------------------------------------------------------
+
+test('InspectBlock and ZoneBlock produce inspect and zone typed nodes', () => {
+  const g = deriveFlowGraph(
+    sop([
+      section(
+        'sec',
+        0,
+        [
+          { type: 'InspectBlock', props: { id: 'i1', title: 'Check bearings' } },
+          { type: 'ZoneBlock', props: { id: 'z1', label: 'Clean room entry' } },
+        ],
+        [],
+      ),
+    ]),
+  )
+  expect(g.nodes).toHaveLength(2)
+  expect(g.nodes[0].type).toBe('inspect')
+  expect(g.nodes[0].label).toBe('Check bearings')
+  expect(g.nodes[1].type).toBe('zone')
+  expect(g.nodes[1].label).toBe('Clean room entry')
+})
+
+test('DecisionBlock option label > 60 chars produces edge label truncated to ≤ 60 chars', () => {
+  const target = U()
+  const longLabel = 'A'.repeat(80) // 80-char option label — exceeds the 60-char cap
+  const g = deriveFlowGraph(
+    sop([
+      section(
+        'sec',
+        0,
+        [
+          {
+            type: 'DecisionBlock',
+            props: {
+              id: 'd',
+              question: 'Is pressure within tolerance?',
+              options: [{ label: longLabel, nextStepId: target }],
+            },
+          },
+          { type: 'StepBlock', props: { id: 's' } },
+        ],
+        [step(target, 'Proceed', 1)],
+      ),
+    ]),
+  )
+  const decId = g.nodes.find((n) => n.type === 'decision')!.id
+  const branches = g.edges.filter((e) => e.from === decId)
+  expect(branches).toHaveLength(1)
+  expect(branches[0].label!.length).toBeLessThanOrEqual(60)
+})
+
+test('cross-section branch: DecisionBlock in section A with nextStepId in section B produces correct edge', () => {
+  const stepInB = U()
+  const g = deriveFlowGraph(
+    sop([
+      section(
+        'secA',
+        0,
+        [
+          {
+            type: 'DecisionBlock',
+            props: {
+              id: 'd',
+              question: 'Pass?',
+              options: [{ label: 'Yes', nextStepId: stepInB }],
+            },
+          },
+        ],
+        [],
+      ),
+      section(
+        'secB',
+        1,
+        [{ type: 'StepBlock', props: { id: 'sb' } }],
+        [step(stepInB, 'Final check', 1)],
+      ),
+    ]),
+  )
+  const decNode = g.nodes.find((n) => n.type === 'decision')!
+  const branches = g.edges.filter((e) => e.from === decNode.id)
+  // The branch option resolved nextStepId to section B's step UUID
+  expect(branches.some((e) => e.to === stepInB)).toBe(true)
+  expect(branches.find((e) => e.to === stepInB)!.kind).toBe('yes')
+})
