@@ -105,7 +105,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 24-02-PLAN.md — FlowGraphCanvas productionisation: honour explicit positions (FLOW-01) + viewBox Fit & Export-PNG (FLOW-03) + accent-token unification
+- [x] 24-02-PLAN.md — FlowGraphCanvas productionisation: honour explicit positions (FLOW-01) + viewBox Fit & Export-PNG (FLOW-03) + accent-token unification ✅ 2026-06-11
 
 **Wave 3** *(blocked on Wave 2 completion)*
 

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
 status: Executing Phase 24
-stopped_at: "Phase 24 Plan 01 complete (2026-06-11). Schema relaxed, phase24-stubs registered, FLOW-02 coverage extended, FLOW-05 investigated. Plan 02 next."
-last_updated: "2026-06-11T00:00:00.000Z"
+stopped_at: "Phase 24 Plan 02 complete (2026-06-11). FlowGraphCanvas productionised: explicit positions, accent tokens, fitToView, exportPng, PREVIEW pill removed. Plan 03 next."
+last_updated: "2026-06-11T13:56:00.000Z"
 progress:
   total_phases: 28
   completed_phases: 2
   total_plans: 13
-  completed_plans: 11
-  percent: 8
+  completed_plans: 12
+  percent: 9
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 24 (procedure-flow-spatial-node-graph) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 **Milestone status:** v4.0 started 2026-05-24. 3 phases / 40 requirements (1 of 3 phases complete). See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
 **Active phase:** 21.5
@@ -219,6 +219,10 @@ Recent decisions affecting current work:
 - [Phase 24-01]: zod uuid validator requires version nibble [1-8] (RFC 4122) — sequential test UUIDs like 00000000-...-000042 are INVALID; use proper v4 format e.g. a0000000-0000-4000-8000-000000000001
 - [Phase 24-01]: FlowGraphField is unreachable from 21.6 builder (rightSideBarVisible:false at BuilderClient.tsx:535) — Plan 03 must re-surface via portaled modal/panel, not Puck right sidebar
 - [Phase 24-01]: useBuilderAutosave writes only layout_data per section_id to Dexie; never writes root.props.flowGraph — autosave cannot clobber sops.flow_graph
+- [Phase 24-02]: layoutFromPositions uses bounding box + NW/NH + PAD*2 for canvas dimensions — consistent with auto-layout sizing formula
+- [Phase 24-02]: color-mix(in srgb, var(--accent-X) 12%, transparent) used for node fills — matches FlowTab StepCard tint idiom
+- [Phase 24-02]: fitToView uses Math.min(cw/gw, ch/gh, 1) — never scales above 100% to avoid blurry upscaling on small graphs
+- [Phase 24-02]: exportPng wired as void exportPng() inline onClick — avoids returning a Promise to JSX onClick handler
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -328,6 +332,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-06-11
-Stopped at: Phase 24 Plan 01 complete. Schema relaxed, phase24-stubs registered (3 files discovered), FLOW-02 coverage extended (10/10 tests pass), FLOW-05 investigated (field unreachable via rightSideBarVisible:false, autosave no-clobber confirmed). Next: /gsd-execute-phase 24 plan 02.
+Stopped at: Phase 24 Plan 02 complete. FlowGraphCanvas productionised: hasExplicitPositions/layoutFromPositions (FLOW-01), accent token unification, fitToView viewBox zoom-to-fit, exportPng SVG→canvas→PNG, PREVIEW pill removed (FLOW-03). FLOW-01 token + FLOW-03 fit/export stubs flipped live. Next: /gsd-execute-phase 24 plan 03.
 Resume file: none
-Awaiting: Plan 02 execution.
+Awaiting: Plan 03 execution (useViewport desktop-default, FlowTab "(preview)" label removal, builder flow entry point).
