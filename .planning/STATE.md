@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 21.6 — builder-edit-stage-redesign
+**Current focus:** Phase 24 — procedure-flow-spatial-node-graph (planned, ready to execute). Phase 21.6 complete pending its 4-item human UAT.
 
 ## Current Position
 
-Phase: 21.6 (builder-edit-stage-redesign) — EXECUTING
-Plan: 5 of 5
+Phase: 24 (procedure-flow-spatial-node-graph) — PLANNED (3 plans / 3 waves)
+Plan: 0 of 3
 **Milestone status:** v4.0 started 2026-05-24. 3 phases / 40 requirements (1 of 3 phases complete). See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
 **Active phase:** 21.5
@@ -36,7 +36,7 @@ Plan: 5 of 5
 2. **Phase 22 — Voice-Driven Walkthrough** (next): W-01 literacy/visual/voice gaps + X-02 voice-driven walkthrough. 8 requirements (VDW-LIT ×4, VDW-VOICE ×4).
 3. **Phase 23 — AI Field Layer + Version Supersede**: X-03 universal AI read/write + G-01 version supersede + worker-instance sign-off. 9 requirements (AFL-AI ×4, AFL-VER ×5).
 
-**Next action:** /gsd-spec-phase 21.6 (Builder Edit Stage Redesign — inserted 2026-06-05 from 21.5 UAT feedback)
+**Next action:** /gsd-execute-phase 24 (Procedure Flow — Spatial Node Graph; promoted from backlog + planned 2026-06-11). Also outstanding: Phase 21.6 4-item human UAT (21.6-HUMAN-UAT.md) on sopstart.com.
 
 **Roadmap evolution:** Phase 21.6 (Builder Edit Stage Redesign) INSERTED after 21.5, before 22, on 2026-06-05. Reason: 21.5 redesigned the Review/Publish stages but the Build/edit stage is still the untouched Puck editor — first-time admins hit jargon ("Block"), two redundant block lists (palette vs outline), unanchored canvas figures, and a cramped right-rail field editor. Decision by Simon during 21.5 UAT.
 
