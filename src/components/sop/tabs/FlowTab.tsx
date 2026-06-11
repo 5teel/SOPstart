@@ -4,14 +4,30 @@
 // effect. Initial state 'list' matches SSR; useViewport reconcile to 'graph' on
 // desktop runs only after hydration, so no React #418 hydration mismatch.
 import { useRef, useMemo, useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { AlertTriangle, Zap, Lightbulb, Wrench, Clock, ChevronDown, Camera } from 'lucide-react'
 import { BlueprintCanvas } from '@/components/ui/BlueprintCanvas'
 import { BlueprintFrame } from '@/components/ui/BlueprintFrame'
 import { FlowGraphSchema, type FlowGraph } from '@/lib/validators/flow-graph'
 import { deriveFlowGraph } from '@/lib/sop/flow-graph'
-import { FlowGraphCanvas } from '@/components/sop/flow/FlowGraphCanvas'
 import { useViewport } from '@/hooks/useViewport'
 import type { SopStep, SopWithSections } from '@/types/sop'
+
+// Dynamic-import keeps the SVG renderer (layout, fitToView, exportPng) out of the
+// /sops/[sopId] First-Load-JS bundle (1104 KB ±2 KB gate, .bundle-baseline.json).
+// ssr: false is safe — the graph view never renders on the server (SSR default is
+// 'list'; 'graph' only activates via the post-hydration useViewport effect below).
+const FlowGraphCanvas = dynamic(
+  () => import('@/components/sop/flow/FlowGraphCanvas').then((m) => m.FlowGraphCanvas),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-full flex items-center justify-center bg-grid" style={{ minHeight: 360 }}>
+        <span className="mono text-[10px] tracking-widest text-[var(--ink-500)]">LOADING FLOW…</span>
+      </div>
+    ),
+  }
+)
 
 function ViewToggle({ view, setView }: { view: 'list' | 'graph'; setView: (v: 'list' | 'graph') => void }) {
   return (
