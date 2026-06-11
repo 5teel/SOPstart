@@ -14,7 +14,7 @@ import { test, expect } from '@playwright/test'
 import { FlowGraphSchema } from '../flow-graph'
 
 const BASE_NODE = {
-  id: '00000000-0000-0000-0000-000000000001',
+  id: 'a0000000-0000-4000-8000-000000000001', // valid v4-format UUID
   type: 'step' as const,
   label: 'Open valve',
   position: { x: 0, y: 0 },
@@ -66,10 +66,10 @@ test('non-UUID stepId fails while valid UUID stepId passes', () => {
   const bad = FlowGraphSchema.safeParse(graphBad)
   expect(bad.success, 'non-UUID stepId must be rejected (stepId stays uuid)').toBe(false)
 
-  // Valid UUID stepId should pass
+  // Valid UUID stepId should pass — use a proper v4-format UUID (version nibble [1-8])
   const graphGood = {
     ...BASE_GRAPH,
-    nodes: [{ ...BASE_NODE, stepId: '00000000-0000-0000-0000-000000000042' }],
+    nodes: [{ ...BASE_NODE, stepId: 'a1b2c3d4-e5f6-4789-abcd-ef0123456789' }],
   }
   const good = FlowGraphSchema.safeParse(graphGood)
   expect(good.success, 'valid UUID stepId must be accepted').toBe(true)
