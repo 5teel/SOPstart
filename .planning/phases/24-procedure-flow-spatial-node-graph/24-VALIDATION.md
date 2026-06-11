@@ -19,7 +19,7 @@ created: 2026-06-11
 |----------|-------|
 | **Framework** | Playwright (project-pattern: phaseNN-stubs source-contract + integration projects) |
 | **Config file** | `playwright.config.ts` |
-| **Quick run command** | `npx playwright test --project=phase24-flow` (project to be registered in Wave 0) |
+| **Quick run command** | `npx playwright test --project=phase24-stubs` (registered in Wave 0; derivation tests under `phase24-unit`) |
 | **Full suite command** | `npx tsc --noEmit && npx playwright test` |
 | **Estimated runtime** | ~60–120 seconds (contract tests; no browser binaries required for source-contract specs) |
 
@@ -27,8 +27,8 @@ created: 2026-06-11
 
 ## Sampling Rate
 
-- **After every task commit:** Run `npx playwright test --project=phase24-flow`
-- **After every plan wave:** Run `npx tsc --noEmit && npx playwright test --project=phase24-flow`
+- **After every task commit:** Run `npx playwright test --project=phase24-stubs`
+- **After every plan wave:** Run `npx tsc --noEmit && npx playwright test --project=phase24-stubs`
 - **Before `/gsd-verify-work`:** Full suite must be green + `npx tsx scripts/check-bundle-size.ts` within ±2 KB
 - **Max feedback latency:** ~120 seconds
 
@@ -56,7 +56,7 @@ created: 2026-06-11
 
 ## Wave 0 Requirements
 
-- [ ] Register a `phase24-flow` project regex in `playwright.config.ts` covering all new spec files (2026-05-25 learning: unregistered specs never run — validate with `npx playwright test --list --project=phase24-flow`)
+- [ ] Register a `phase24-stubs` project regex in `playwright.config.ts` covering all new spec files (2026-05-25 learning: unregistered specs never run — validate with `npx playwright test --list --project=phase24-stubs`)
 - [ ] Stub spec files for FLOW-01, FLOW-03, FLOW-04, FLOW-05 contract assertions
 
 ---

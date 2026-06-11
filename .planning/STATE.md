@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
-status: Phase complete — ready for verification
-stopped_at: Phase 21.6 Plan 03 complete — TreeRail (E5/E6 GREEN)
-last_updated: "2026-06-05T12:55:58.766Z"
+status: Ready to execute
+stopped_at: Session resumed. Phase 21.6 all 5 plans + code review complete; VERIFICATION = human_needed (4-item UAT runbook in 21.6-HUMAN-UAT.md, post-fix commits 311dcf5 + hydration fix 2026-06-08). Phase 24 (Flow spatial node graph) prototype + branch-aware derivation landed on master 2026-06-09/10 outside GSD plans — ROADMAP marks it [→], no phase dir yet. Stale Phase 20 .continue-here.md deleted (signLayoutDataImages shipped).
+last_updated: "2026-06-11T13:36:30.710Z"
 progress:
   total_phases: 27
   completed_phases: 2
