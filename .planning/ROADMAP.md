@@ -97,7 +97,12 @@ Plans:
 - FLOW-04: Vertical step-card list retained as fallback/mobile view; graph becomes the desktop default (drop "preview" gating)
 - FLOW-05: Phase 12.5-carried Puck `FlowGraphField` round-trip verified (author positions in builder → persists to `sops.flow_graph` → renders in Flow tab)
 
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+- [ ] 24-01-PLAN.md — Wave-0 test surface + FlowGraphSchema relaxation (FLOW-05 schema) + FLOW-02 coverage audit + FLOW-05 round-trip investigation
+- [ ] 24-02-PLAN.md — FlowGraphCanvas productionisation: honour explicit positions (FLOW-01) + viewBox Fit & Export-PNG (FLOW-03) + accent-token unification
+- [ ] 24-03-PLAN.md — Desktop-default graph view (FLOW-04) + re-surface FlowGraphEditor & round-trip (FLOW-05) + journeys.ts + bundle gate + human-UAT
 
 ### Phase 1: Foundation
 
