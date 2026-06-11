@@ -1,14 +1,13 @@
 /**
  * Phase 24 Plan 01 — FLOW-01/03/04 source-contract stubs.
  *
- * These are test.fixme assertions that go live when Plans 02/03 implement
- * the features. Per CLAUDE.md 2026-06-05 learning: assert handler IS WIRED
+ * These assertions go live when Plans 02/03 implement the features.
+ * Per CLAUDE.md 2026-06-05 learning: assert handler IS WIRED
  * (onClick references the function), not merely that a token exists.
  *
  * Registered in playwright.config.ts under project phase24-stubs.
  * CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
  *
- * TODO(24-02): un-fixme assertions (a), (b), (d) when fitToView + exportPng land.
  * TODO(24-03): un-fixme assertion (c) when useViewport desktop-default lands.
  */
 import { test, expect } from '@playwright/test'
@@ -19,8 +18,8 @@ const CANVAS_FILE = join(process.cwd(), 'src/components/sop/flow/FlowGraphCanvas
 const FLOW_TAB_FILE = join(process.cwd(), 'src/components/sop/tabs/FlowTab.tsx')
 
 // (a) FLOW-03: fitToView defined AND wired to Fit button onClick
-// TODO(24-02): un-fixme when Plan 02/03 implements real fitToView (replaces scrollTo stub)
-test.fixme('FlowGraphCanvas defines fitToView and wires it to Fit button onClick', () => {
+// Un-fixme: Plan 02 implemented real fitToView (replaces scrollTo stub)
+test('FlowGraphCanvas defines fitToView and wires it to Fit button onClick', () => {
   const content = readFileSync(CANVAS_FILE, 'utf8')
   // Function definition: useCallback-based fitToView
   expect(content).toMatch(/fitToView\s*=\s*useCallback/)
@@ -31,15 +30,15 @@ test.fixme('FlowGraphCanvas defines fitToView and wires it to Fit button onClick
 })
 
 // (b) FLOW-04: exportPng defined, calls canvas.toBlob, Export button wired
-// TODO(24-02): un-fixme when Plan 02/03 implements exportPng
-test.fixme('FlowGraphCanvas defines exportPng with canvas.toBlob and Export button onClick', () => {
+// Un-fixme: Plan 02 implemented exportPng
+test('FlowGraphCanvas defines exportPng with canvas.toBlob and Export button onClick', () => {
   const content = readFileSync(CANVAS_FILE, 'utf8')
   // Function definition
   expect(content).toMatch(/exportPng\s*=\s*useCallback/)
   // canvas.toBlob is the canonical canvas rasterisation pattern (photo-compress.ts analog)
   expect(content).toMatch(/canvas\.toBlob/)
   // Export button wired — onClick references exportPng
-  expect(content).toMatch(/onClick=\{exportPng\}|onClick=\{\s*\(\)\s*=>\s*exportPng\(\)\s*\}/)
+  expect(content).toMatch(/onClick=\{exportPng\}|onClick=\{\s*\(\)\s*=>\s*exportPng\(\)\s*\}|onClick=\{\s*\(\)\s*=>\s*void exportPng\(\)\s*\}/)
 })
 
 // (c) FLOW-01: FlowTab imports useViewport AND seeds useState with 'list' (SSR-safe)
@@ -57,8 +56,8 @@ test.fixme('FlowTab imports useViewport and uses SSR-safe initial state with des
 })
 
 // (d) FLOW colour token unification: node fills use var(--accent-) tokens, NOT #db2777
-// TODO(24-02): un-fixme when Plan 02/03 unifies FlowGraphCanvas NODE colours to match FlowTab TYPE_COLORS
-test.fixme('FlowGraphCanvas node fills reference var(--accent-) tokens and contain no #db2777', () => {
+// Un-fixme: Plan 02 unified FlowGraphCanvas NODE colours to match FlowTab TYPE_COLORS
+test('FlowGraphCanvas node fills reference var(--accent-) tokens and contain no #db2777', () => {
   const content = readFileSync(CANVAS_FILE, 'utf8')
   // At least one var(--accent- token present in NODE colour map
   expect(content).toMatch(/var\(--accent-/)
