@@ -180,16 +180,27 @@ export function FlowGraphCanvas({ graph, authored = false }: { graph: FlowGraph;
     canvas.height = h * dpr
     const ctx = canvas.getContext('2d')!
     ctx.scale(dpr, dpr)
-    await new Promise<void>((resolve, reject) => {
-      const img = new Image()
-      img.onload = () => { ctx.drawImage(img, 0, 0, w, h); resolve() }
-      img.onerror = reject
-      img.src = url
-    })
-    URL.revokeObjectURL(url)
+    // try/finally so a failed SVG load neither escapes as an unhandled
+    // rejection nor leaks the object URL (24-REVIEW.md WR-05).
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const img = new Image()
+        img.onload = () => { ctx.drawImage(img, 0, 0, w, h); resolve() }
+        img.onerror = () => reject(new Error('SVG image failed to load'))
+        img.src = url
+      })
+    } catch (err) {
+      console.error('[flow] PNG export failed', err)
+      return
+    } finally {
+      URL.revokeObjectURL(url)
+    }
     // 4. Trigger download
     canvas.toBlob((b) => {
-      if (!b) return
+      if (!b) {
+        console.error('[flow] PNG export failed — canvas.toBlob returned null')
+        return
+      }
       const a = document.createElement('a')
       a.href = URL.createObjectURL(b)
       a.download = 'procedure-flow.png'
