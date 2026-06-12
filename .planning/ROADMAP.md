@@ -51,7 +51,7 @@ Three phases bundle the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` 
 - [x] **Phase 21.6: Builder Edit Stage Redesign** (INSERTED 2026-06-05) — Apply the 21.5 review-redesign philosophy to the **Build/edit** stage, which is still the untouched Puck editor. First-time admins hit internal jargon ("Block"), two redundant block lists (Puck component palette = add-new vs outline = already-placed), unanchored canvas figures with no clear action, and a cramped right-rail field editor. Scope from UAT feedback: (1) humanize block-type labels in the Puck palette + outline (reuse `humanizeBlockType` / `block-type-labels.ts` from 21.5 — currently only on the review surface); (2) collapse palette + outline into one clear affordance; (3) move content editing into the central canvas instead of the narrow right rail; (4) clarify the `SectionListSidebar` purpose + 1st→last ordering; (5) clarify what the user does with canvas figures/images. UI-led — produces a UI-SPEC. Runs **before** Phase 22. (completed 2026-06-05)
 - [ ] **Phase 22: Voice-Driven Walkthrough** — Worker walkthrough literacy gaps closed (W-01) + AI Voice Q&A that drives the walkthrough end-to-end (X-02). Bundle: voice infrastructure (transcription, TTS, multi-language) serves both the literacy story and the Q&A story.
 - [ ] **Phase 23: AI Field Layer + Version Supersede** — Universal AI read/write access to every editable field + Cmd+K extended across admin surfaces (X-03) + version history formal supersede + diff + restore + worker-instance sign-off chain (G-01). X-03 is the architectural backbone v5.0 conversational app builds on; G-01 fits naturally alongside as a small standalone bundle.
-- [ ] **Phase 24: Procedure Flow — Spatial Node Graph** — Promoted from v4.0 backlog 2026-06-11 (added 2026-06-09); prototype work already on master (commits `c1440fc`, `9a395bd`, `b223786`). Closes a Phase 12.5 gap: req #8 ("Flow tab renders an SVG node graph") shipped as a vertical list of expandable step cards, NOT the blueprint sketch's design (`sketches/sop-blueprint/index.html` → FLOW tab) — a spatial node-graph canvas with positioned, colour-coded nodes, arrow-connected edges carrying yes/no/escalate branch labels, decision branching, node/branch counts, and FIT / EXPORT-PNG controls. The data model already supports it (`flow_graph` nodes carry `position`; edges carry `kind`).
+- [x] **Phase 24: Procedure Flow — Spatial Node Graph** — Promoted from v4.0 backlog 2026-06-11 (added 2026-06-09); prototype work already on master (commits `c1440fc`, `9a395bd`, `b223786`). Closes a Phase 12.5 gap: req #8 ("Flow tab renders an SVG node graph") shipped as a vertical list of expandable step cards, NOT the blueprint sketch's design (`sketches/sop-blueprint/index.html` → FLOW tab) — a spatial node-graph canvas with positioned, colour-coded nodes, arrow-connected edges carrying yes/no/escalate branch labels, decision branching, node/branch counts, and FIT / EXPORT-PNG controls. The data model already supports it (`flow_graph` nodes carry `position`; edges carry `kind`). (completed 2026-06-12)
 
 ## Phase Details
 
@@ -109,7 +109,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 24-03-PLAN.md — Desktop-default graph view (FLOW-04) + re-surface FlowGraphEditor & round-trip (FLOW-05) + journeys.ts + bundle gate + human-UAT
+- [x] 24-03-PLAN.md — Desktop-default graph view (FLOW-04) + re-surface FlowGraphEditor & round-trip (FLOW-05) + journeys.ts + bundle gate + human-UAT
 
 ### Phase 1: Foundation
 
@@ -515,7 +515,7 @@ These two items belong with kiosk mode + site-tier work in Phase 15 because they
   9. Global app-wide Cmd+K mounted across all `(protected)` routes — surfaces app-wide navigation (Library, Blocks, Team, Create via Upload/Blank/AI, Settings, kiosk site selector for multi-site admins) alongside the existing SOP-scoped jump-to-step + ask-AI on SOP pages.
   10. Bundle isolation: kiosk mode chunks + voice Q&A RAG client do not leak into the existing mobile worker bundle; mobile worker walkthrough First Load JS does not grow as a result of Phase 15.
 
-**Plans:** 5/5 plans complete
+**Plans:** 3/3 plans complete
 
 Plans:
 

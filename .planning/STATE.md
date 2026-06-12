@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
-status: Executing Phase 24
-stopped_at: "Phase 24 Plan 03 partial (2026-06-12). Tasks 1+2 committed: FLOW-04 desktop-default graph view (SSR-safe) + PREVIEW removal; FLOW-05 FlowGraphEditor re-surfaced via BuilderFlowEditButton; journeys.ts updated. Stopped at Task 3 checkpoint:human-verify — awaiting UAT on sopstart.com (FLOW-05 round-trip, FLOW-03 export, FLOW-04 viewport) then Task 4 bundle gate."
-last_updated: "2026-06-12T00:00:00.000Z"
+status: Phase complete — ready for verification
+stopped_at: "Phase 24 Plan 03 complete (2026-06-12). All 4 tasks done: FLOW-04 SSR-safe desktop-default graph, FLOW-05 FlowGraphEditor re-surface, human UAT passed (Simon 2026-06-12), bundle gate green at 1104 KB delta 0. Dynamic-import fix committed 20bb8a5. Phase 24 complete."
+last_updated: "2026-06-12T02:41:22.867Z"
 progress:
   total_phases: 28
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 13
-  completed_plans: 12
-  percent: 9
+  completed_plans: 13
+  percent: 11
 ---
 
 # Project State
@@ -130,6 +130,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 21.6 P03 | 5 | 2 tasks | 4 files |
 | Phase 21.6 P04 | 12 | 2 tasks | 2 files |
 | Phase 21.6 P05 | 20 | 2 tasks | 2 files |
+| Phase 24 P24-03 | 25m | 4 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -223,6 +224,7 @@ Recent decisions affecting current work:
 - [Phase 24-02]: color-mix(in srgb, var(--accent-X) 12%, transparent) used for node fills — matches FlowTab StepCard tint idiom
 - [Phase 24-02]: fitToView uses Math.min(cw/gw, ch/gh, 1) — never scales above 100% to avoid blurry upscaling on small graphs
 - [Phase 24-02]: exportPng wired as void exportPng() inline onClick — avoids returning a Promise to JSX onClick handler
+- [Phase ?]: FlowTab loads FlowGraphCanvas via next/dynamic ssr:false to hold bundle gate at 1104 KB; graph never SSR-renders (list is SSR default)
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -331,7 +333,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-11
-Stopped at: Phase 24 Plan 02 complete. FlowGraphCanvas productionised: hasExplicitPositions/layoutFromPositions (FLOW-01), accent token unification, fitToView viewBox zoom-to-fit, exportPng SVG→canvas→PNG, PREVIEW pill removed (FLOW-03). FLOW-01 token + FLOW-03 fit/export stubs flipped live. Next: /gsd-execute-phase 24 plan 03.
-Resume file: none
+Last session: 2026-06-12T02:41:22.860Z
+Stopped at: Phase 24 Plan 03 complete (2026-06-12). All 4 tasks done: FLOW-04 SSR-safe desktop-default graph, FLOW-05 FlowGraphEditor re-surface, human UAT passed (Simon 2026-06-12), bundle gate green at 1104 KB delta 0. Dynamic-import fix committed 20bb8a5. Phase 24 complete.
+Resume file: None
 Awaiting: Plan 03 execution (useViewport desktop-default, FlowTab "(preview)" label removal, builder flow entry point).

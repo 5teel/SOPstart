@@ -5,7 +5,21 @@
 
 ---
 
+## Status: PASSED
+
+All three scenarios approved by Simon on **2026-06-12** on sopstart.com (post-deploy, dynamic-import fix in commit `20bb8a5`).
+
+| Scenario | Result | Verified by |
+|----------|--------|-------------|
+| FLOW-05 Round-Trip | PASS | Simon, 2026-06-12 |
+| FLOW-03 Export (Fit + Export PNG) | PASS | Simon, 2026-06-12 |
+| FLOW-04 Viewport Default | PASS | Simon, 2026-06-12 |
+
+---
+
 ## Scenario 1: FLOW-05 Round-Trip (carried Phase 12.5 item)
+
+**Result: PASS**
 
 Confirms the admin can author explicit node positions and the worker Flow tab reflects them.
 
@@ -23,6 +37,8 @@ Confirms the admin can author explicit node positions and the worker Flow tab re
 
 ## Scenario 2: FLOW-03 Export (fit-to-view + Export PNG)
 
+**Result: PASS**
+
 Confirms the production renderer controls work correctly.
 
 1. Open `/sops/[sopId]` and click the **Graph** toggle (or it should already be selected on desktop).
@@ -37,6 +53,8 @@ Confirms the production renderer controls work correctly.
 ---
 
 ## Scenario 3: FLOW-04 Viewport Default (desktop graph / mobile list)
+
+**Result: PASS**
 
 Confirms the SSR-safe desktop-default logic and no hydration errors.
 
