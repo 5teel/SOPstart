@@ -43,16 +43,23 @@ interface Placed {
   label: string
 }
 
-/** Layout pass for authored graphs: place each node at its authored position verbatim. */
+/**
+ * Layout pass for authored graphs: place each node at its authored position,
+ * offset by the bounding-box minimum so negative coordinates (which the editor
+ * permits) are shifted into the visible 0-origin viewBox instead of clipped
+ * (24-REVIEW.md WR-04).
+ */
 function layoutFromPositions(graph: FlowGraph): { placed: Map<string, Placed>; width: number; height: number } {
-  const placed = new Map<string, Placed>()
-  for (const n of graph.nodes) {
-    placed.set(n.id, { id: n.id, x: n.position.x, y: n.position.y, type: n.type, label: n.label })
-  }
   const xs = graph.nodes.map((n) => n.position.x)
   const ys = graph.nodes.map((n) => n.position.y)
-  const width = Math.max(...xs) + NW + PAD * 2
-  const height = Math.max(...ys) + NH + PAD * 2
+  const minX = Math.min(0, ...xs)
+  const minY = Math.min(0, ...ys)
+  const placed = new Map<string, Placed>()
+  for (const n of graph.nodes) {
+    placed.set(n.id, { id: n.id, x: n.position.x - minX + PAD, y: n.position.y - minY + PAD, type: n.type, label: n.label })
+  }
+  const width = Math.max(...xs) - minX + NW + PAD * 2
+  const height = Math.max(...ys) - minY + NH + PAD * 2
   return { placed, width, height }
 }
 
