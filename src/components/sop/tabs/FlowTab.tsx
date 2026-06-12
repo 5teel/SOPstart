@@ -253,7 +253,10 @@ export function FlowTab({ sop }: { sop: SopWithSections }) {
       }
     }
     return graph.nodes.map((node) => {
-      const matched = stepMap.get(node.id)
+      // Derived nodes use the step UUID as their id; editor-authored nodes use
+      // crypto.randomUUID() ids with the linked step in node.stepId — honour
+      // both so authored graphs keep step detail (24-REVIEW.md WR-07).
+      const matched = stepMap.get(node.id) ?? (node.stepId ? stepMap.get(node.stepId) : undefined)
       return {
         node,
         step: matched?.step ?? null,
