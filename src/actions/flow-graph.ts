@@ -23,14 +23,20 @@ export async function updateSopFlowGraph(input: z.infer<typeof Input>) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
 
-  // Role gate — only admin and safety_manager may write flow graphs
-  const rawRole = (user.user_metadata?.['user_role'] as string | undefined)
-    ?? (user as unknown as { app_metadata?: { user_role?: string } }).app_metadata?.user_role
-    ?? ''
-  const role = (user as unknown as { user_role?: string }).user_role ?? rawRole
-  if (!['admin', 'safety_manager'].includes(role)) {
+  // Role gate — only admin and safety_manager may write flow graphs.
+  // Read role + org from JWT claims (server-controlled), never user_metadata,
+  // which is end-user-writable via supabase.auth.updateUser (24-REVIEW.md WR-02).
+  // Canonical pattern: src/actions/sops.ts.
+  const { data: { session } } = await supabase.auth.getSession()
+  const jwtClaims = session?.access_token
+    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    : {}
+  const role = jwtClaims['user_role']
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'Admin access required' }
   }
+  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  if (!organisationId) return { error: 'No organisation found' }
 
   // .select('id') so RLS-filtered zero-row updates surface as an error instead
   // of silent success (24-REVIEW.md WR-01): without it Supabase reports 0
@@ -40,6 +46,7 @@ export async function updateSopFlowGraph(input: z.infer<typeof Input>) {
     .from('sops')
     .update({ flow_graph: parsed.data.graph as unknown as import('@/types/database.types').Json })
     .eq('id', parsed.data.sopId)
+    .eq('organisation_id', organisationId)
     .select('id')
 
   if (error) return { error: error.message }
