@@ -107,9 +107,13 @@ function StepCard({
         >
           {colors.label}
         </span>
-        <span className="mono text-[11px] text-[var(--ink-500)] flex-shrink-0">
-          {entry.stepNumber}/{entry.totalSteps}
-        </span>
+        {/* Non-step nodes (decision/escalate/…) have no step match — hide the
+            counter rather than printing a wrong "0/N" (24-REVIEW.md WR-06). */}
+        {entry.stepNumber > 0 && (
+          <span className="mono text-[11px] text-[var(--ink-500)] flex-shrink-0">
+            {entry.stepNumber}/{entry.totalSteps}
+          </span>
+        )}
         <span className="text-base font-medium text-[var(--ink-900)] flex-1 truncate">
           {entry.node.label}
         </span>
