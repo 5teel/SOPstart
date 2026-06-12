@@ -118,6 +118,8 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 
 **Execution order:** 21 → 22 → 23. Phase 21 unblocks the most safety risk. Phase 23 lays the AI-field foundation that v5.0's conversational interface (X-05) builds on.
 
+**Current state:** Phase 24 complete (2026-06-12) — Flow tab ships the production spatial node-graph canvas (explicit positions, accent tokens, Fit/Export-PNG, desktop-default graph view, builder FlowGraphEditor re-surfaced), closing the Phase 12.5 req #8 gap. Promoted from backlog 2026-06-11.
+
 ## Context
 
 - **New Zealand market** — built for NZ professionals and organizations, NZ-based SaaS
@@ -170,4 +172,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-24 — v4.0 milestone kicked off. v3.0 archived (8 phases shipped: 11, 12, 12.5, 13, 14, 14.5, 15, 20 partial). v4.0 = Phases 21/22/23, source of truth `.planning/PRODUCT-ROADMAP.md` v0.3.*
+*Last updated: 2026-06-12 — Phase 24 (Procedure Flow — Spatial Node Graph) complete. v4.0 = Phases 21/22/23 (+24 promoted from backlog), source of truth `.planning/PRODUCT-ROADMAP.md` v0.3.*
