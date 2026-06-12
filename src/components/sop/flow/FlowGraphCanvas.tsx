@@ -3,9 +3,12 @@
 /**
  * Phase 24 — spatial node-graph view of an SOP's flow graph,
  * per the blueprint sketch's FLOW tab. Supports two layout modes:
- *  - Explicit positions: when any node.position.x !== 0, nodes render at
- *    their authored coordinates (layoutFromPositions).
- *  - Auto-layout: all-zero-x graphs fall back to the existing depth-layer
+ *  - Explicit positions: when the caller passes `authored` (i.e. the graph came
+ *    from a successfully parsed sop.flow_graph, not derivation), nodes render
+ *    at their authored coordinates (layoutFromPositions). Provenance is passed
+ *    down rather than inferred from coordinates — an x!==0 heuristic
+ *    misclassifies authored vertical stacks (24-REVIEW.md WR-03).
+ *  - Auto-layout: derived graphs use the existing depth-layer
  *    column layout (longest-path layering, branch-aware columns).
  * Draws arrowed SVG edges (yes/no/escalate labelled, escalate red), and
  * colour-codes nodes using the --accent-* CSS-var token set matching FlowTab.
@@ -40,11 +43,6 @@ interface Placed {
   label: string
 }
 
-/** Returns true when any node has an authored x position (not all-zero derived). */
-export function hasExplicitPositions(graph: FlowGraph): boolean {
-  return graph.nodes.some((n) => n.position.x !== 0)
-}
-
 /** Layout pass for authored graphs: place each node at its authored position verbatim. */
 function layoutFromPositions(graph: FlowGraph): { placed: Map<string, Placed>; width: number; height: number } {
   const placed = new Map<string, Placed>()
@@ -58,8 +56,10 @@ function layoutFromPositions(graph: FlowGraph): { placed: Map<string, Placed>; w
   return { placed, width, height }
 }
 
-function layout(graph: FlowGraph): { placed: Map<string, Placed>; width: number; height: number } {
-  if (hasExplicitPositions(graph)) return layoutFromPositions(graph)
+function layout(graph: FlowGraph, authored: boolean): { placed: Map<string, Placed>; width: number; height: number } {
+  // Provenance decides the layout mode (24-REVIEW.md WR-03): a parsed
+  // sop.flow_graph is authored even if every node sits at x = 0.
+  if (authored && graph.nodes.length > 0) return layoutFromPositions(graph)
 
   const ids = graph.nodes.map((n) => n.id)
   const incoming = new Map<string, number>()
@@ -122,10 +122,10 @@ function wrap(label: string): string[] {
   return lines.slice(0, 2)
 }
 
-export function FlowGraphCanvas({ graph }: { graph: FlowGraph }) {
+export function FlowGraphCanvas({ graph, authored = false }: { graph: FlowGraph; authored?: boolean }) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
-  const { placed, width, height } = useMemo(() => layout(graph), [graph])
+  const { placed, width, height } = useMemo(() => layout(graph, authored), [graph, authored])
   const branchCount = graph.edges.filter((e) => e.kind === 'yes' || e.kind === 'no' || e.kind === 'escalate').length
 
   // Fit lives in React state (not setAttribute) so re-renders restore it instead

@@ -27,12 +27,14 @@ export function BuilderFlowButton({ sop }: { sop: SopWithSections }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
 
-  const graph = (() => {
+  // `authored` records provenance (explicit sop.flow_graph vs derived) so the
+  // canvas honours authored positions without coordinate heuristics (WR-03).
+  const { graph, authored } = (() => {
     if (sop.flow_graph != null) {
       const parsed = FlowGraphSchema.safeParse(sop.flow_graph)
-      if (parsed.success) return parsed.data
+      if (parsed.success) return { graph: parsed.data, authored: true }
     }
-    return deriveFlowGraph(sop)
+    return { graph: deriveFlowGraph(sop), authored: false }
   })()
 
   return (
@@ -83,7 +85,7 @@ export function BuilderFlowButton({ sop }: { sop: SopWithSections }) {
                 </button>
               </header>
               <div className="flex-1 min-h-0">
-                <FlowGraphCanvas graph={graph} />
+                <FlowGraphCanvas graph={graph} authored={authored} />
               </div>
             </div>
           </div>,

@@ -223,16 +223,18 @@ export function FlowTab({ sop }: { sop: SopWithSections }) {
   // Memoized so `graph` keeps a stable identity across re-renders — a per-render
   // safeParse returns a fresh object every time, which re-runs the canvas layout
   // and reverts a just-clicked Fit (24-REVIEW.md WR-09 / CR-01 interaction).
-  const graph: FlowGraph = useMemo(() => {
+  // `authored` records provenance (explicit sop.flow_graph vs derived) so the
+  // canvas honours authored positions without coordinate heuristics (WR-03).
+  const { graph, authored } = useMemo((): { graph: FlowGraph; authored: boolean } => {
     if (sop.flow_graph != null) {
       const parsed = FlowGraphSchema.safeParse(sop.flow_graph)
-      if (parsed.success) return parsed.data
+      if (parsed.success) return { graph: parsed.data, authored: true }
       if (!warnedRef.current) {
         console.warn('[flow] explicit graph invalid, using derived', parsed.error)
         warnedRef.current = true
       }
     }
-    return derivedGraph
+    return { graph: derivedGraph, authored: false }
   }, [sop.flow_graph, derivedGraph])
 
   // Step lookup keyed by node id (which deriveFlowGraph sets to step.id).
@@ -279,7 +281,7 @@ export function FlowTab({ sop }: { sop: SopWithSections }) {
             <ViewToggle view={view} setView={setView} />
           </div>
           <div className="flex-1 min-h-0">
-            <FlowGraphCanvas graph={graph} />
+            <FlowGraphCanvas graph={graph} authored={authored} />
           </div>
         </div>
       </BlueprintCanvas>
