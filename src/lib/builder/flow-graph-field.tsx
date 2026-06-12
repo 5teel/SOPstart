@@ -36,11 +36,23 @@ interface FlowGraphEditorProps {
    *  opener can re-seed from the saved state on reopen (the server-fetched
    *  sop prop is never refreshed — see 24-REVIEW.md CR-02). */
   onSaved?: (graph: FlowGraph) => void
+  /** Reports whether the editor holds unsaved changes, so the opener can
+   *  confirm before a backdrop-click/Escape discards a long editing session
+   *  (24-REVIEW.md WR-08). Resets to false after a successful save. */
+  onDirtyChange?: (dirty: boolean) => void
 }
 
-export function FlowGraphEditor({ initialGraph, sopId, onSaved }: FlowGraphEditorProps) {
+export function FlowGraphEditor({ initialGraph, sopId, onSaved, onDirtyChange }: FlowGraphEditorProps) {
   const [nodes, setNodes] = useState<FlowNode[]>(initialGraph.nodes)
   const [edges, setEdges] = useState<FlowEdge[]>(initialGraph.edges)
+  // Dirty tracking baseline — re-pointed at the saved graph after each save.
+  const baselineRef = useRef<{ nodes: FlowNode[]; edges: FlowEdge[] }>({
+    nodes: initialGraph.nodes,
+    edges: initialGraph.edges,
+  })
+  useEffect(() => {
+    onDirtyChange?.(nodes !== baselineRef.current.nodes || edges !== baselineRef.current.edges)
+  }, [nodes, edges, onDirtyChange])
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
   const [selectedEdgeKey, setSelectedEdgeKey] = useState<string | null>(null)
   const [edgeMode, setEdgeMode] = useState(false)
@@ -168,9 +180,11 @@ export function FlowGraphEditor({ initialGraph, sopId, onSaved }: FlowGraphEdito
       setError(result.error ?? 'Unknown error')
     } else {
       setError(null)
+      baselineRef.current = { nodes, edges }
+      onDirtyChange?.(false)
       onSaved?.(localGraph)
     }
-  }, [sopId, nodes, edges, onSaved])
+  }, [sopId, nodes, edges, onSaved, onDirtyChange])
 
   const handleEdgeKindChange = useCallback(
     (from: string, to: string, kind: FlowEdge['kind']) => {

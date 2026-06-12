@@ -20,7 +20,7 @@
  * - modalRoot guard prevents SSR hydration errors (document.body is client-only).
  */
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { GitBranch, X } from 'lucide-react'
 import { FlowGraphSchema } from '@/lib/validators/flow-graph'
@@ -41,19 +41,28 @@ export function BuilderFlowEditButton({ sop, sopId }: BuilderFlowEditButtonProps
   // so reopening would re-seed from the pre-save graph and a second save would
   // clobber the first. Hold the last-saved graph and prefer it when seeding.
   const [savedGraph, setSavedGraph] = useState<FlowGraph | null>(null)
+  // WR-08: track unsaved editor changes so backdrop-click/Escape can't
+  // silently discard a long drag-editing session.
+  const [dirty, setDirty] = useState(false)
 
   // Portal guard: document.body only available on client
   useEffect(() => setMounted(true), [])
 
-  // Escape-to-close
+  const requestClose = useCallback(() => {
+    if (dirty && !window.confirm('Discard unsaved flow changes?')) return
+    setDirty(false)
+    setOpen(false)
+  }, [dirty])
+
+  // Escape-to-close (dirty-guarded)
   useEffect(() => {
     if (!open) return
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false)
+      if (e.key === 'Escape') requestClose()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [open])
+  }, [open, requestClose])
 
   // Seed initialGraph: last-saved graph from this session wins, then the
   // explicit graph if valid, else derive from SOP content so admin starts
@@ -70,7 +79,7 @@ export function BuilderFlowEditButton({ sop, sopId }: BuilderFlowEditButtonProps
   return (
     <>
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => { setDirty(false); setOpen(true) }}
         title="Edit the procedure flow graph (author node positions)"
         style={{
           display: 'inline-flex',
@@ -96,7 +105,7 @@ export function BuilderFlowEditButton({ sop, sopId }: BuilderFlowEditButtonProps
         createPortal(
           <div
             className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center sm:p-4"
-            onClick={() => setOpen(false)}
+            onClick={requestClose}
           >
             <div
               onClick={(e) => e.stopPropagation()}
@@ -110,7 +119,7 @@ export function BuilderFlowEditButton({ sop, sopId }: BuilderFlowEditButtonProps
                   </p>
                 </div>
                 <button
-                  onClick={() => setOpen(false)}
+                  onClick={requestClose}
                   aria-label="Close"
                   className="h-9 w-9 rounded-lg hover:bg-[var(--paper-2)] flex items-center justify-center text-[var(--ink-500)]"
                 >
@@ -118,7 +127,7 @@ export function BuilderFlowEditButton({ sop, sopId }: BuilderFlowEditButtonProps
                 </button>
               </header>
               <div className="flex-1 min-h-0 overflow-hidden p-4">
-                <FlowGraphEditor initialGraph={initialGraph} sopId={sopId} onSaved={setSavedGraph} />
+                <FlowGraphEditor initialGraph={initialGraph} sopId={sopId} onSaved={setSavedGraph} onDirtyChange={setDirty} />
               </div>
             </div>
           </div>,
