@@ -32,11 +32,19 @@ export async function updateSopFlowGraph(input: z.infer<typeof Input>) {
     return { error: 'Admin access required' }
   }
 
-  const { error } = await supabase
+  // .select('id') so RLS-filtered zero-row updates surface as an error instead
+  // of silent success (24-REVIEW.md WR-01): without it Supabase reports 0
+  // affected rows as { error: null } and the editor clears its error banner
+  // even though nothing was written.
+  const { data, error } = await supabase
     .from('sops')
     .update({ flow_graph: parsed.data.graph as unknown as import('@/types/database.types').Json })
     .eq('id', parsed.data.sopId)
+    .select('id')
 
   if (error) return { error: error.message }
+  if (!data || data.length === 0) {
+    return { error: 'SOP not found or you do not have permission to edit it' }
+  }
   return { success: true as const }
 }
