@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
-status: Phase complete — ready for verification
+status: Ready to plan
 stopped_at: "Phase 24 Plan 03 complete (2026-06-12). All 4 tasks done: FLOW-04 SSR-safe desktop-default graph, FLOW-05 FlowGraphEditor re-surface, human UAT passed (Simon 2026-06-12), bundle gate green at 1104 KB delta 0. Dynamic-import fix committed 20bb8a5. Phase 24 complete."
-last_updated: "2026-06-12T02:41:22.867Z"
+last_updated: "2026-06-12T02:59:38.155Z"
 progress:
   total_phases: 28
   completed_phases: 3
@@ -24,8 +24,8 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 24 (procedure-flow-spatial-node-graph) — EXECUTING
-Plan: 3 of 3
+Phase: 999.1
+Plan: Not started
 **Milestone status:** v4.0 started 2026-05-24. 3 phases / 40 requirements (1 of 3 phases complete). See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
 **Active phase:** 21.5
@@ -103,6 +103,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 04-completion-and-sign-off P03 | 7 | 2 tasks | 11 files |
 | 10 | 4 | - | - |
 | 11 | 4 | - | - |
+| 24 | 3 | - | - |
 
 **v2.0 By Phase:**
 
