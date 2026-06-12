@@ -220,21 +220,20 @@ export function FlowTab({ sop }: { sop: SopWithSections }) {
 
   const derivedGraph = useMemo(() => deriveFlowGraph(sop), [sop.id, sop.updated_at])
 
-  let graph: FlowGraph
-  if (sop.flow_graph != null) {
-    const parsed = FlowGraphSchema.safeParse(sop.flow_graph)
-    if (parsed.success) {
-      graph = parsed.data
-    } else {
+  // Memoized so `graph` keeps a stable identity across re-renders — a per-render
+  // safeParse returns a fresh object every time, which re-runs the canvas layout
+  // and reverts a just-clicked Fit (24-REVIEW.md WR-09 / CR-01 interaction).
+  const graph: FlowGraph = useMemo(() => {
+    if (sop.flow_graph != null) {
+      const parsed = FlowGraphSchema.safeParse(sop.flow_graph)
+      if (parsed.success) return parsed.data
       if (!warnedRef.current) {
         console.warn('[flow] explicit graph invalid, using derived', parsed.error)
         warnedRef.current = true
       }
-      graph = derivedGraph
     }
-  } else {
-    graph = derivedGraph
-  }
+    return derivedGraph
+  }, [sop.flow_graph, derivedGraph])
 
   // Step lookup keyed by node id (which deriveFlowGraph sets to step.id).
   const entries: NodeWithStep[] = useMemo(() => {

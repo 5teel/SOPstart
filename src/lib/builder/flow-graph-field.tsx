@@ -32,9 +32,13 @@ function snapToGrid(v: number): number {
 interface FlowGraphEditorProps {
   initialGraph: FlowGraph
   sopId: string
+  /** Called with the saved graph after a successful "Save to SOP" so the
+   *  opener can re-seed from the saved state on reopen (the server-fetched
+   *  sop prop is never refreshed — see 24-REVIEW.md CR-02). */
+  onSaved?: (graph: FlowGraph) => void
 }
 
-export function FlowGraphEditor({ initialGraph, sopId }: FlowGraphEditorProps) {
+export function FlowGraphEditor({ initialGraph, sopId, onSaved }: FlowGraphEditorProps) {
   const [nodes, setNodes] = useState<FlowNode[]>(initialGraph.nodes)
   const [edges, setEdges] = useState<FlowEdge[]>(initialGraph.edges)
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
@@ -160,9 +164,13 @@ export function FlowGraphEditor({ initialGraph, sopId }: FlowGraphEditorProps) {
     const localGraph: FlowGraph = { version: 1, nodes, edges }
     const result = await updateSopFlowGraph({ sopId, graph: localGraph })
     setSaving(false)
-    if ('error' in result) setError(result.error ?? 'Unknown error')
-    else setError(null)
-  }, [sopId, nodes, edges])
+    if ('error' in result) {
+      setError(result.error ?? 'Unknown error')
+    } else {
+      setError(null)
+      onSaved?.(localGraph)
+    }
+  }, [sopId, nodes, edges, onSaved])
 
   const handleEdgeKindChange = useCallback(
     (from: string, to: string, kind: FlowEdge['kind']) => {

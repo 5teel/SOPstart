@@ -11,7 +11,7 @@
  * colour-codes nodes using the --accent-* CSS-var token set matching FlowTab.
  */
 
-import { useMemo, useRef, useCallback } from 'react'
+import { useMemo, useRef, useCallback, useState, useEffect } from 'react'
 import type { FlowGraph } from '@/lib/validators/flow-graph'
 
 type NodeType = FlowGraph['nodes'][number]['type']
@@ -128,16 +128,23 @@ export function FlowGraphCanvas({ graph }: { graph: FlowGraph }) {
   const { placed, width, height } = useMemo(() => layout(graph), [graph])
   const branchCount = graph.edges.filter((e) => e.kind === 'yes' || e.kind === 'no' || e.kind === 'escalate').length
 
+  // Fit lives in React state (not setAttribute) so re-renders restore it instead
+  // of silently reverting it — the SVG width/height/viewBox are React-managed.
+  const [fit, setFit] = useState<{ vw: number; vh: number; cw: number; ch: number } | null>(null)
+
+  // A different graph has a different content extent — invalidate any prior fit.
+  useEffect(() => setFit(null), [graph])
+
   const fitToView = useCallback(() => {
-    const svg = svgRef.current
     const container = scrollRef.current
-    if (!svg || !container) return
-    const scale = Math.min(container.clientWidth / width, container.clientHeight / height, 1)
-    const vw = width / scale
-    const vh = height / scale
-    svg.setAttribute('viewBox', `0 0 ${vw} ${vh}`)
-    svg.setAttribute('width', String(container.clientWidth))
-    svg.setAttribute('height', String(container.clientHeight))
+    if (!container) return
+    const cw = container.clientWidth
+    const ch = container.clientHeight
+    const scale = Math.min(cw / width, ch / height, 1)
+    // The viewBox must cover the CONTAINER extent in content units (cw / scale).
+    // Dividing the CONTENT extent by scale compounds the zoom to scale²
+    // (24-REVIEW.md CR-01) — wrong exactly when graphs are big enough to need Fit.
+    setFit({ vw: cw / scale, vh: ch / scale, cw, ch })
   }, [width, height])
 
   const exportPng = useCallback(async () => {
@@ -209,7 +216,13 @@ export function FlowGraphCanvas({ graph }: { graph: FlowGraph }) {
       </div>
 
       <div ref={scrollRef} className="flex-1 overflow-auto bg-grid scroll-thin" style={{ minHeight: 360 }}>
-        <svg ref={svgRef} width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ display: 'block' }}>
+        <svg
+          ref={svgRef}
+          width={fit ? fit.cw : width}
+          height={fit ? fit.ch : height}
+          viewBox={fit ? `0 0 ${fit.vw} ${fit.vh}` : `0 0 ${width} ${height}`}
+          style={{ display: 'block' }}
+        >
           <defs>
             <marker id="fg-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
               <path d="M0 0 L10 5 L0 10 z" fill="#52525b" />

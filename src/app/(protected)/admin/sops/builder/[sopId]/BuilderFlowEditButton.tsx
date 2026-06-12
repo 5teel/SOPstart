@@ -37,6 +37,10 @@ interface BuilderFlowEditButtonProps {
 export function BuilderFlowEditButton({ sop, sopId }: BuilderFlowEditButtonProps) {
   const [open, setOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  // CR-02 fix: the server-fetched `sop` prop is never refreshed after a save,
+  // so reopening would re-seed from the pre-save graph and a second save would
+  // clobber the first. Hold the last-saved graph and prefer it when seeding.
+  const [savedGraph, setSavedGraph] = useState<FlowGraph | null>(null)
 
   // Portal guard: document.body only available on client
   useEffect(() => setMounted(true), [])
@@ -51,9 +55,11 @@ export function BuilderFlowEditButton({ sop, sopId }: BuilderFlowEditButtonProps
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
 
-  // Seed initialGraph: use explicit graph if valid, else derive from SOP content
-  // so admin starts from the current derived layout rather than a blank canvas.
+  // Seed initialGraph: last-saved graph from this session wins, then the
+  // explicit graph if valid, else derive from SOP content so admin starts
+  // from the current derived layout rather than a blank canvas.
   const initialGraph: FlowGraph = (() => {
+    if (savedGraph) return savedGraph
     if (sop.flow_graph != null) {
       const parsed = FlowGraphSchema.safeParse(sop.flow_graph)
       if (parsed.success) return parsed.data
@@ -112,7 +118,7 @@ export function BuilderFlowEditButton({ sop, sopId }: BuilderFlowEditButtonProps
                 </button>
               </header>
               <div className="flex-1 min-h-0 overflow-hidden p-4">
-                <FlowGraphEditor initialGraph={initialGraph} sopId={sopId} />
+                <FlowGraphEditor initialGraph={initialGraph} sopId={sopId} onSaved={setSavedGraph} />
               </div>
             </div>
           </div>,
