@@ -409,3 +409,51 @@ export interface VoiceQueryResponse {
   citations: string[]
   verifier_flags: VerificationFlag[]
 }
+
+// ---------------------------------------------------------------
+// Phase 25: Department as a First-Class Entity
+// Matches supabase/migrations/00035_departments_schema.sql.
+// ---------------------------------------------------------------
+
+/**
+ * A department is an org-scoped named grouping for SOPs, blocks, and members.
+ * owner_user_id is an accountability label only — it grants no extra permissions (D-03).
+ * ON DELETE SET NULL means a removed member surfaces a "no owner" warning (REQ-5).
+ */
+export interface Department {
+  id: string
+  organisation_id: string
+  name: string
+  /** Short uppercase code, unique per org (e.g. 'GEN', 'FORM', 'QC'). */
+  code: string
+  /** Hex colour string used for chips and swatches (e.g. '#3b82f6'). */
+  colour: string
+  /** Optional emoji or single character icon displayed on department cards. */
+  icon: string | null
+  /** Accountability label only — grants no write/approve permissions (D-03). */
+  owner_user_id: string | null
+  archived: boolean
+  created_at: string
+  updated_at: string
+}
+
+/**
+ * Department extended with aggregate counts for the /admin/departments UI.
+ * Counts are computed by server action listDepartments() via separate queries.
+ */
+export interface DepartmentWithCounts extends Department {
+  people_count: number
+  sop_count: number
+  block_count: number
+}
+
+/**
+ * Junction row: a member belongs to zero or more departments.
+ * Matches public.member_departments from migration 00035.
+ */
+export interface MemberDepartment {
+  member_id: string
+  department_id: string
+  assigned_at: string
+  assigned_by: string | null
+}
