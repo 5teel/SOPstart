@@ -134,5 +134,15 @@ export default defineConfig({
       testDir: '.',
       testMatch: /(no-preview-pill|flow-graph-canvas|flow-graph-schema)\.(test|spec)\.ts$/,
     },
+    {
+      // Phase 25 — departments RLS + SOP visibility integration specs.
+      //   departments-rls.spec.ts      — cross-tenant isolation + no-42P17 recursion (REQ-1, T-25-01/03, D-02a)
+      //   sop-dept-visibility.spec.ts  — OR-composed worker visibility: Forming sees Forming + all_departments (REQ-3, D-02)
+      //   (Plan 05 will add no-global-blocks-in-journeys.spec.ts to this regex)
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      name: 'phase25-integration',
+      testDir: '.',
+      testMatch: /(departments-rls|sop-dept-visibility|no-global-blocks-in-journeys)\.(test|spec)\.ts$/,
+    },
   ],
 })
