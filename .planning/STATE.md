@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
-status: Ready to execute
-stopped_at: Phase 25 context gathered
-last_updated: "2026-06-14T16:11:49.895Z"
+status: Executing Phase 25
+stopped_at: "Phase 25, Plan 1 of 6 complete (migrations 00035/00036/00037 written, types added)"
+last_updated: "2026-06-15T00:00:00Z"
 progress:
   total_phases: 28
   completed_phases: 3
-  total_plans: 13
-  completed_plans: 13
+  total_plans: 14
+  completed_plans: 14
   percent: 11
 ---
 
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 24 — procedure-flow-spatial-node-graph
+**Current focus:** Phase 25 — department-first-class-entity
 
 ## Current Position
 
-Phase: 999.1
-Plan: Not started
+Phase: 25 (department-first-class-entity) — EXECUTING
+Plan: 2 of 6
 **Milestone status:** v4.0 started 2026-05-24. 3 phases / 40 requirements (1 of 3 phases complete). See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
 **Active phase:** 21.5
@@ -226,6 +226,11 @@ Recent decisions affecting current work:
 - [Phase 24-02]: fitToView uses Math.min(cw/gw, ch/gh, 1) — never scales above 100% to avoid blurry upscaling on small graphs
 - [Phase 24-02]: exportPng wired as void exportPng() inline onClick — avoids returning a Promise to JSX onClick handler
 - [Phase ?]: FlowTab loads FlowGraphCanvas via next/dynamic ssr:false to hold bundle gate at 1104 KB; graph never SSR-renders (list is SSR default)
+- [Phase 25-01]: D-02a enforced: all three junction tables (block_departments, sop_departments, member_departments) use using(true) for SELECT — never reference parent sops/blocks from a junction policy (42P17 recursion avoidance per 00030/00031 learning)
+- [Phase 25-01]: D-01 non-destructive: global blocks COPIED per-org (not updated in place); category column retained read-only; DELETE of null-org rows only after copies confirmed; RAISE EXCEPTION asserts zero orphans
+- [Phase 25-01]: D-03 owner label: owner_user_id is ON DELETE SET NULL — dept surfaces 'no owner' warning on member removal (REQ-5)
+- [Phase 25-01]: is_platform_admin() NOT dropped in 00037 — migration 00032 (ai_review_results policy) still references it
+- [Phase 25-01]: 00036 data migration uses WHERE NOT EXISTS (org + kind_slug + name + current_version_id) for per-org global copy idempotency guard — blocks table has no unique constraint on (organisation_id, kind_slug, name)
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -334,7 +339,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-14T15:23:48.240Z
-Stopped at: Phase 25 context gathered
-Resume file: .planning/phases/25-department-first-class-entity/25-CONTEXT.md
-Awaiting: Plan 03 execution (useViewport desktop-default, FlowTab "(preview)" label removal, builder flow entry point).
+Last session: 2026-06-15T00:00:00Z
+Stopped at: Phase 25, Plan 1 complete — migrations 00035/00036/00037 written + Department types added
+Resume file: .planning/phases/25-department-first-class-entity/25-02-PLAN.md
+Awaiting: Plan 02 execution (apply migrations to live DB + cross-tenant/visibility/no-recursion integration tests).
