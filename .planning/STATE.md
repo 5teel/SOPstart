@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
 status: Ready to plan
-stopped_at: "Phase 24 Plan 03 complete (2026-06-12). All 4 tasks done: FLOW-04 SSR-safe desktop-default graph, FLOW-05 FlowGraphEditor re-surface, human UAT passed (Simon 2026-06-12), bundle gate green at 1104 KB delta 0. Dynamic-import fix committed 20bb8a5. Phase 24 complete."
-last_updated: "2026-06-12T02:59:38.155Z"
+stopped_at: Phase 25 context gathered
+last_updated: "2026-06-14T15:23:48.248Z"
 progress:
   total_phases: 28
   completed_phases: 3
@@ -334,7 +334,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-12T02:41:22.860Z
-Stopped at: Phase 24 Plan 03 complete (2026-06-12). All 4 tasks done: FLOW-04 SSR-safe desktop-default graph, FLOW-05 FlowGraphEditor re-surface, human UAT passed (Simon 2026-06-12), bundle gate green at 1104 KB delta 0. Dynamic-import fix committed 20bb8a5. Phase 24 complete.
-Resume file: None
+Last session: 2026-06-14T15:23:48.240Z
+Stopped at: Phase 25 context gathered
+Resume file: .planning/phases/25-department-first-class-entity/25-CONTEXT.md
 Awaiting: Plan 03 execution (useViewport desktop-default, FlowTab "(preview)" label removal, builder flow entry point).
