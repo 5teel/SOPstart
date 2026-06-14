@@ -54,6 +54,14 @@ Three phases bundle the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` 
 - [x] **Phase 24: Procedure Flow — Spatial Node Graph** — Promoted from v4.0 backlog 2026-06-11 (added 2026-06-09); prototype work already on master (commits `c1440fc`, `9a395bd`, `b223786`). Closes a Phase 12.5 gap: req #8 ("Flow tab renders an SVG node graph") shipped as a vertical list of expandable step cards, NOT the blueprint sketch's design (`sketches/sop-blueprint/index.html` → FLOW tab) — a spatial node-graph canvas with positioned, colour-coded nodes, arrow-connected edges carrying yes/no/escalate branch labels, decision branching, node/branch counts, and FIT / EXPORT-PNG controls. The data model already supports it (`flow_graph` nodes carry `position`; edges carry `kind`). (completed 2026-06-12)
 - [ ] **Phase 25: Department as a First-Class Entity** (added 2026-06-14) — First output of the UX-simplification initiative (sketches: `sketches/departments`, `sketches/unified-block-library`, `sketches/team-departments`). Introduces a `departments` table (org-scoped: name, code, colour, icon, **owner_user_id**, archived) with many-to-many junctions to blocks, SOPs, and members. **Replaces** the Phase 13 org-vs-global block model with a single-org + departments model (65 global seed blocks migrate to org-owned, tagged "All departments") and replaces the free-text SOP `category` with `sop_departments`. Department membership gates worker SOP visibility (RLS). Owner accountability addresses the Visy "nobody owns SOPs" finding. Sub-trade tags (00030/00031) are left untouched — dept↔sub-trade combination semantics deferred. Delivers all three sketched surfaces: `/admin/departments` management page, block-library department tagging/filter, team department assignment + ownership, and the create-SOP wizard department field. SPEC: `.planning/phases/25-department-first-class-entity/25-SPEC.md`.
 
+  **Plans:** 6 plans / 4 waves
+  - [ ] 25-01-PLAN.md — Schema + data + RLS migrations (00035/00036/00037) + Department types (Wave 1)
+  - [ ] 25-02-PLAN.md — [BLOCKING] apply migrations to live DB + cross-tenant/visibility/no-recursion integration tests (Wave 1)
+  - [ ] 25-03-PLAN.md — departments.ts actions + blocks/sops/auth rewiring + DChip/DepartmentPicker + member-dept test (Wave 2)
+  - [ ] 25-04-PLAN.md — /admin/departments page: cards, counts, owner accountability, create/edit/archive (Wave 3)
+  - [ ] 25-05-PLAN.md — Block library dept rework + delete /admin/global-blocks + journeys.ts + worker library (Wave 3)
+  - [ ] 25-06-PLAN.md — Team dept assignment + owner badge + create-SOP department field (blank + AI) (Wave 3)
+
 ## Phase Details
 
 ### Phase 21.5: Builder Review UX
@@ -99,7 +107,8 @@ Plans:
 - FLOW-05: Phase 12.5-carried Puck `FlowGraphField` round-trip verified (author positions in builder → persists to `sops.flow_graph` → renders in Flow tab)
 
 **Plans**: 3 plans
-Plans:
+
+Plans:
 **Wave 1**
 
 - [x] 24-01-PLAN.md — Wave-0 test surface + FlowGraphSchema relaxation (FLOW-05 schema) + FLOW-02 coverage audit + FLOW-05 round-trip investigation ✅ 2026-06-11
