@@ -250,6 +250,8 @@ export interface Block {
   created_by: string | null
   created_at: string
   updated_at: string
+  // Phase 25: org-wide flag (all_departments=true = visible under all departments, D-04)
+  all_departments?: boolean
 }
 
 export interface BlockVersion {

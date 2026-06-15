@@ -1,15 +1,19 @@
 'use client'
 
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 import { Archive } from 'lucide-react'
 import { archiveBlock } from '@/actions/blocks'
-import type { Block, BlockCategory } from '@/types/sop'
+import { DChip } from '@/components/admin/departments/DChip'
+import { DepartmentPicker } from '@/components/admin/departments/DepartmentPicker'
+import type { Block } from '@/types/sop'
+import type { Department } from '@/types/sop'
 
 interface Props {
-  blocks: Array<Block & { currentContent?: unknown }>
-  categories: BlockCategory[]
+  blocks: Array<Block & { currentContent?: unknown; departmentIds?: string[]; allDepartments?: boolean }>
+  departments: Department[]
 }
 
 function formatDate(iso: string): string {
@@ -20,11 +24,95 @@ function formatDate(iso: string): string {
   })
 }
 
-export function BlockListTable({ blocks, categories }: Props) {
+/**
+ * Popover wrapper for the DepartmentPicker in block-row mode.
+ * Closes on outside click (per UI-SPEC popover behaviour).
+ */
+function BlockDeptPopover({
+  block,
+  departments,
+  onClose,
+}: {
+  block: { id: string; departmentIds?: string[]; allDepartments?: boolean }
+  departments: Department[]
+  onClose: () => void
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        onClose()
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [onClose])
+
+  return (
+    <div
+      ref={ref}
+      className="absolute right-0 top-8 z-20 w-[230px] rounded-lg shadow-lg"
+      style={{
+        background: 'var(--paper)',
+        border: '1.5px solid var(--ink-900)',
+        borderRadius: '8px',
+        boxShadow: '0 12px 32px rgba(0,0,0,0.16)',
+        overflow: 'hidden',
+      }}
+    >
+      {/* Header */}
+      <div
+        className="px-3 pb-2 pt-[10px]"
+        style={{
+          fontSize: '9px',
+          fontWeight: 600,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+          color: 'var(--ink-500)',
+          borderBottom: '1px solid var(--ink-100)',
+        }}
+      >
+        IN DEPARTMENTS
+      </div>
+      {/* Picker body */}
+      <div className="p-3">
+        <DepartmentPicker
+          mode="block"
+          blockId={block.id}
+          departments={departments}
+          selectedIds={block.departmentIds ?? []}
+          allDepartments={block.allDepartments ?? false}
+          onChange={() => {
+            router.refresh()
+          }}
+        />
+      </div>
+      {/* Footer */}
+      <div
+        className="px-2 py-2 flex justify-end"
+        style={{ borderTop: '1px solid var(--ink-100)' }}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-[11px] font-semibold text-white rounded-[5px] px-3 py-[7px] transition-colors hover:opacity-80"
+          style={{ background: 'var(--ink-900)', border: 'none' }}
+        >
+          Done
+        </button>
+      </div>
+    </div>
+  )
+}
+
+export function BlockListTable({ blocks, departments }: Props) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const [openPickerId, setOpenPickerId] = useState<string | null>(null)
 
-  const categoryMap = new Map(categories.map((c) => [c.slug, c]))
+  const deptMap = new Map(departments.map((d) => [d.id, d]))
 
   function handleArchive(blockId: string) {
     if (!confirm('Archive this item? It will no longer appear in the picker, but existing SOPs keep their snapshot.')) {
@@ -58,7 +146,7 @@ export function BlockListTable({ blocks, categories }: Props) {
           <tr>
             <th className="px-4 py-3 text-left">Name</th>
             <th className="px-4 py-3 text-left">Kind</th>
-            <th className="px-4 py-3 text-left">Categories</th>
+            <th className="px-4 py-3 text-left">Departments</th>
             <th className="px-4 py-3 text-left">Updated</th>
             <th className="px-4 py-3 text-left">Status</th>
             <th className="px-4 py-3 text-right">Actions</th>
@@ -66,10 +154,10 @@ export function BlockListTable({ blocks, categories }: Props) {
         </thead>
         <tbody>
           {blocks.map((b) => {
-            const isGlobal = b.organisation_id === null
             const isArchived = b.archived_at !== null
+            const selectedDeptIds = b.departmentIds ?? []
             return (
-              <tr key={b.id} className="border-t border-[var(--ink-100)] hover:bg-[var(--paper-2)]/50">
+              <tr key={b.id} className="border-t border-[var(--ink-100)] hover:bg-[var(--paper-2)]/50 relative">
                 <td className="px-4 py-3">
                   <Link
                     href={`/admin/blocks/${b.id}`}
@@ -77,11 +165,6 @@ export function BlockListTable({ blocks, categories }: Props) {
                   >
                     {b.name}
                   </Link>
-                  {isGlobal && (
-                    <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-[var(--ink-500)] border border-[var(--ink-300)] rounded px-1.5 py-0.5">
-                      GLOBAL
-                    </span>
-                  )}
                 </td>
                 <td className="px-4 py-3">
                   <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-[var(--paper)] border border-[var(--ink-100)] text-[var(--ink-500)]">
@@ -90,18 +173,16 @@ export function BlockListTable({ blocks, categories }: Props) {
                 </td>
                 <td className="px-4 py-3">
                   <div className="flex flex-wrap gap-1">
-                    {(b.category_tags ?? []).map((slug) => {
-                      const cat = categoryMap.get(slug)
-                      return (
-                        <span
-                          key={slug}
-                          className="text-[11px] px-1.5 py-0.5 rounded bg-[var(--paper-2)] text-[var(--ink-700)] border border-[var(--ink-300)]"
-                        >
-                          {cat?.display_name ?? slug}
-                        </span>
-                      )
-                    })}
-                    {(b.category_tags ?? []).length === 0 && (
+                    {b.allDepartments ? (
+                      <DChip variant="all-departments" />
+                    ) : selectedDeptIds.length > 0 ? (
+                      selectedDeptIds.map((dId) => {
+                        const dept = deptMap.get(dId)
+                        return dept ? (
+                          <DChip key={dId} variant="department" department={dept} />
+                        ) : null
+                      })
+                    ) : (
                       <span className="text-xs text-[var(--ink-500)]">—</span>
                     )}
                   </div>
@@ -119,18 +200,35 @@ export function BlockListTable({ blocks, categories }: Props) {
                   )}
                 </td>
                 <td className="px-4 py-3 text-right">
-                  {!isArchived && !isGlobal && (
+                  <div className="flex items-center justify-end gap-1 relative">
+                    {/* Departments ▾ picker button (UI-SPEC .abtn.ghost) */}
                     <button
                       type="button"
-                      onClick={() => handleArchive(b.id)}
-                      disabled={isPending}
-                      className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs text-[var(--ink-500)] hover:text-red-300 hover:bg-red-950/30 transition-colors disabled:opacity-50"
-                      aria-label={`Archive ${b.name}`}
+                      onClick={() => setOpenPickerId(openPickerId === b.id ? null : b.id)}
+                      className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs text-[var(--ink-500)] border border-transparent hover:text-[var(--ink-900)] hover:border-[var(--ink-300)] transition-colors"
                     >
-                      <Archive className="h-3.5 w-3.5" />
-                      Archive
+                      Departments ▾
                     </button>
-                  )}
+                    {openPickerId === b.id && (
+                      <BlockDeptPopover
+                        block={b}
+                        departments={departments}
+                        onClose={() => setOpenPickerId(null)}
+                      />
+                    )}
+                    {!isArchived && (
+                      <button
+                        type="button"
+                        onClick={() => handleArchive(b.id)}
+                        disabled={isPending}
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs text-[var(--ink-500)] hover:text-red-300 hover:bg-red-950/30 transition-colors disabled:opacity-50"
+                        aria-label={`Archive ${b.name}`}
+                      >
+                        <Archive className="h-3.5 w-3.5" />
+                        Archive
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             )
