@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
-status: Executing Phase 25
-stopped_at: "Phase 25, Plan 1 of 6 complete (migrations 00035/00036/00037 written, types added)"
-last_updated: "2026-06-15T00:00:00Z"
+status: Ready to execute
+stopped_at: Completed 25-03-PLAN.md
+last_updated: "2026-06-15T02:22:36.980Z"
 progress:
   total_phases: 28
   completed_phases: 3
-  total_plans: 14
-  completed_plans: 14
+  total_plans: 13
+  completed_plans: 13
   percent: 11
 ---
 
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 25 (department-first-class-entity) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 **Milestone status:** v4.0 started 2026-05-24. 3 phases / 40 requirements (1 of 3 phases complete). See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
 **Active phase:** 21.5
@@ -132,6 +132,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 21.6 P04 | 12 | 2 tasks | 2 files |
 | Phase 21.6 P05 | 20 | 2 tasks | 2 files |
 | Phase 24 P24-03 | 25m | 4 tasks | 9 files |
+| Phase 25-department-first-class-entity P03 | 45min | 3 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -231,6 +232,10 @@ Recent decisions affecting current work:
 - [Phase 25-01]: D-03 owner label: owner_user_id is ON DELETE SET NULL — dept surfaces 'no owner' warning on member removal (REQ-5)
 - [Phase 25-01]: is_platform_admin() NOT dropped in 00037 — migration 00032 (ai_review_results policy) still references it
 - [Phase 25-01]: 00036 data migration uses WHERE NOT EXISTS (org + kind_slug + name + current_version_id) for per-org global copy idempotency guard — blocks table has no unique constraint on (organisation_id, kind_slug, name)
+- [Phase ?]: supabase as any cast used for new tables (departments, block_departments, sop_departments, member_departments) not yet in database.types.ts — consistent with existing blocks.ts pattern for block_suggestions
+- [Phase ?]: setDepartmentOwner creates fresh supabase client (not any-cast) for organisation_members check to ensure type safety on the RLS-guarded query
+- [Phase ?]: WizardClient.tsx passes empty departmentIds/allDepartments defaults — full DepartmentPicker integration deferred to Wave 4 plan 25-04
+- [Phase ?]: global-blocks/page.tsx and suggestions/page.tsx redirect to /admin/blocks — Wave 4 plan 25-05 will delete the route segments entirely
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -339,7 +344,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-15T00:00:00Z
-Stopped at: Phase 25, Plan 1 complete — migrations 00035/00036/00037 written + Department types added
+Last session: 2026-06-15T02:22:36.973Z
+Stopped at: Completed 25-03-PLAN.md
 Resume file: .planning/phases/25-department-first-class-entity/25-02-PLAN.md
 Awaiting: Plan 02 execution (apply migrations to live DB + cross-tenant/visibility/no-recursion integration tests).
