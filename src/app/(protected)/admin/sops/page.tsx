@@ -6,6 +6,8 @@ import { createClient } from '@/lib/supabase/server'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { DeleteSopButton } from '@/components/admin/DeleteSopButton'
 import { VideoJobIndicator } from '@/components/admin/VideoJobIndicator'
+import { SopDepartmentEditor } from '@/components/admin/sop/SopDepartmentEditor'
+import { listDepartments } from '@/actions/departments'
 import type { SopStatus } from '@/types/sop'
 
 export const metadata: Metadata = {
@@ -53,7 +55,7 @@ export default async function SopsLibraryPage({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let query: any = supabase
     .from('sops')
-    .select('id, title, sop_number, category, status, source_file_name, source_type, created_at, updated_at, published_at')
+    .select('id, title, sop_number, category, status, source_file_name, source_type, created_at, updated_at, published_at, all_departments')
     .order('created_at', { ascending: false })
 
   if (activeStatus !== 'all' && activeStatus !== 'failed') {
@@ -63,6 +65,25 @@ export default async function SopsLibraryPage({
   }
 
   const { data: sops } = await query
+
+  // Phase 25: department tagging for existing SOPs. Fetch the org's departments
+  // and each listed SOP's current sop_departments so each row can be re-tagged inline.
+  const departments = await listDepartments()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sopIds = (sops ?? []).map((s: any) => s.id)
+  const deptIdsForSop: Record<string, string[]> = {}
+  if (sopIds.length > 0) {
+    // sop_departments is not in the generated database.types.ts (like block_suggestions);
+    // cast to any, mirroring src/actions/departments.ts.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: sopDeptRows } = await (supabase as any)
+      .from('sop_departments')
+      .select('sop_id, department_id')
+      .in('sop_id', sopIds)
+    for (const r of (sopDeptRows ?? []) as Array<{ sop_id: string; department_id: string }>) {
+      ;(deptIdsForSop[r.sop_id] ??= []).push(r.department_id)
+    }
+  }
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10">
@@ -159,7 +180,8 @@ export default async function SopsLibraryPage({
             {sops.map((sop: any) => {
               const canEditInBuilder = sop.source_type && sop.source_type !== 'uploaded'
               return (
-                <li key={sop.id} className="flex items-stretch gap-2">
+                <li key={sop.id} className="flex flex-col gap-1.5">
+                  <div className="flex items-stretch gap-2">
                   <Link
                     href={`/admin/sops/builder/${sop.id}`}
                     className="blueprint-frame flex-1 min-w-0 flex items-center gap-4 hover:shadow-[0_0_0_1px_var(--ink-900)] transition-shadow"
@@ -246,6 +268,13 @@ export default async function SopsLibraryPage({
                       <DeleteSopButton sopId={sop.id} />
                     </div>
                   )}
+                  </div>
+                  <SopDepartmentEditor
+                    sopId={sop.id}
+                    departments={departments}
+                    selectedIds={deptIdsForSop[sop.id] ?? []}
+                    allDepartments={sop.all_departments ?? false}
+                  />
                 </li>
               )
             })}
