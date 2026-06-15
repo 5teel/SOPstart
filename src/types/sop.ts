@@ -447,6 +447,9 @@ export interface DepartmentWithCounts extends Department {
   people_count: number
   sop_count: number
   block_count: number
+  /** Phase 25: resolved owner display (email) + org role, null when no owner set. */
+  owner_name: string | null
+  owner_role: string | null
 }
 
 /**

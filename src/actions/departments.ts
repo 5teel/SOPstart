@@ -23,6 +23,7 @@
 
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import type { Department, DepartmentWithCounts } from '@/types/sop'
 
 // ---------------------------------------------------------------------------
@@ -122,6 +123,8 @@ export async function listDepartments(): Promise<DepartmentWithCounts[]> {
       people_count: 0,
       sop_count: 0,
       block_count: 0,
+      owner_name: null,
+      owner_role: null,
     }))
   }
 
@@ -158,11 +161,37 @@ export async function listDepartments(): Promise<DepartmentWithCounts[]> {
     blockCount[r.department_id] = (blockCount[r.department_id] ?? 0) + 1
   }
 
+  // Phase 25 (REQ-5): resolve owner display (email) + org role for owned departments
+  // so the department card renders the filled "Owner" line, not just the no-owner warning.
+  // Mirrors getTeamMembersWithEmails — emails come from the admin auth API (no profiles table).
+  const ownerIds = Array.from(
+    new Set((depts as Department[]).map(d => d.owner_user_id).filter((x): x is string => !!x))
+  )
+  const ownerName: Record<string, string> = {}
+  const ownerRole: Record<string, string> = {}
+  if (ownerIds.length > 0) {
+    const admin = createAdminClient()
+    const { data: roleRows } = await admin
+      .from('organisation_members')
+      .select('user_id, role')
+      .eq('organisation_id', organisationId)
+      .in('user_id', ownerIds)
+    for (const r of (roleRows ?? []) as Array<{ user_id: string; role: string }>) {
+      ownerRole[r.user_id] = r.role
+    }
+    const { data: { users } } = await admin.auth.admin.listUsers({ perPage: 1000 })
+    for (const u of users) {
+      if (ownerIds.includes(u.id) && u.email) ownerName[u.id] = u.email
+    }
+  }
+
   return (depts as Department[]).map(d => ({
     ...d,
     people_count: peopleCount[d.id] ?? 0,
     sop_count:    sopCount[d.id] ?? 0,
     block_count:  blockCount[d.id] ?? 0,
+    owner_name:   d.owner_user_id ? (ownerName[d.owner_user_id] ?? null) : null,
+    owner_role:   d.owner_user_id ? (ownerRole[d.owner_user_id] ?? null) : null,
   }))
 }
 

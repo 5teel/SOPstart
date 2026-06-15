@@ -75,6 +75,9 @@ export function DepartmentGrid({ departments, orgMembers = [] }: DepartmentGridP
           people_count: 0,
           sop_count: 0,
           block_count: 0,
+          // Resolved on next SSR load; optimistic create shows no-owner line until refresh.
+          owner_name: null,
+          owner_role: null,
         },
       ]
     })
@@ -211,7 +214,11 @@ export function DepartmentGrid({ departments, orgMembers = [] }: DepartmentGridP
           <DepartmentCard
             key={dept.id}
             department={dept}
-            owner={null} /* owner info resolved by parent SSR when available */
+            owner={
+              dept.owner_user_id && dept.owner_name
+                ? { name: dept.owner_name, role: dept.owner_role ?? '' }
+                : null
+            }
             onEdit={openEditModal}
             onArchive={handleArchive}
           />
