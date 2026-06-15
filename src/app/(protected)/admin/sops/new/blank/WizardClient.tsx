@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import type { SectionKind, BlockCategory } from '@/types/sop'
+import type { SectionKind, BlockCategory, Department } from '@/types/sop'
 import type { BlockContent } from '@/lib/validators/blocks'
 import { listSectionKinds } from '@/actions/sections'
 import { createSopFromWizard } from '@/actions/sops'
@@ -12,6 +12,8 @@ import { addBlockToSection } from '@/actions/sop-section-blocks'
 import { updateSectionLayout } from '@/actions/sections'
 import { BlockPicker } from '@/components/admin/blocks/BlockPicker'
 import { blockContentToPuckProps, blockKindToPuckType } from '@/lib/builder/puck-to-block-content'
+import { DepartmentPicker } from '@/components/admin/departments/DepartmentPicker'
+import { DChip } from '@/components/admin/departments/DChip'
 
 // Per SPEC SB-AUTH-01, the wizard exposes only the canonical section kinds.
 // 'custom' and 'content' are not offered at wizard time — admin adds them
@@ -51,14 +53,19 @@ type PickedBlock = {
 interface WizardClientProps {
   /** Phase 13 D-Tax-03: controlled vocab for SOP-level category select + library picker. */
   categories: BlockCategory[]
+  /** Phase 25: departments for the department multi-select field (localOnly create mode). */
+  departments: Department[]
 }
 
-export function WizardClient({ categories }: WizardClientProps) {
+export function WizardClient({ categories, departments }: WizardClientProps) {
   const router = useRouter()
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
   const [titleValues, setTitleValues] = useState<TitleStepValues | null>(null)
   // Phase 13 D-Tax-03 — SOP-level primary category, drives picker pre-filter.
   const [categoryTag, setCategoryTag] = useState<string | null>(null)
+  // Phase 25: department multi-select — localOnly (A4: sopId doesn't exist yet, write on submit).
+  const [departmentIds, setDepartmentIds] = useState<string[]>([])
+  const [allDepartments, setAllDepartments] = useState(false)
   const [kinds, setKinds] = useState<SectionKind[]>([])
   const [kindsLoading, setKindsLoading] = useState(true)
   const [selectedKindIds, setSelectedKindIds] = useState<string[]>([])
@@ -127,15 +134,14 @@ export function WizardClient({ categories }: WizardClientProps) {
     setSubmitting(true)
     setError(null)
     setStep(4)
+    // Phase 25: pass departmentIds + allDepartments from local state (A4: localOnly picker).
     const result = await createSopFromWizard({
       title: titleValues.title,
       sopNumber: titleValues.sopNumber || null,
       kindIds: selectedKindIds,
       categoryTag,
-      // Phase 25: departmentIds/allDepartments wired in Wave 4 WizardClient update.
-      // Pass empty defaults so the schema is satisfied without UI yet.
-      departmentIds: [],
-      allDepartments: false,
+      departmentIds,
+      allDepartments,
     })
     if ('error' in result) {
       setError(result.error)
@@ -166,15 +172,6 @@ export function WizardClient({ categories }: WizardClientProps) {
    *   3. updateSectionLayout to commit the new layout_data
    */
   async function attachPickedBlocks(sopId: string): Promise<void> {
-    // Fetch sections via RLS-scoped client (use server action call indirectly via fetch).
-    // To keep this client-side, we re-use the server action pattern: ask the server for
-    // the section ids by fetching the SOP detail page — but cleaner: use a direct
-    // Supabase call. Since this is a client component, we'll fetch via a small server
-    // action; reuse the existing pattern by calling a lightweight endpoint.
-    //
-    // Minimal solution: pull from /api/sops/[sopId]/sections if it exists. As a
-    // compatibility-safe fallback, use supabase from client SDK to read sop_sections
-    // (RLS allows the caller's org).
     const supabaseModule = await import('@/lib/supabase/client')
     const supabase = supabaseModule.createClient()
     const { data: sectionsRaw, error: secErr } = await supabase
@@ -201,7 +198,6 @@ export function WizardClient({ categories }: WizardClientProps) {
       )
       if (!section) continue
 
-      // Build Puck items as we add junctions, stamping junctionId onto each item.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const layoutData: any = section.layout_data ?? { content: [], root: { props: {} } }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -234,7 +230,6 @@ export function WizardClient({ categories }: WizardClientProps) {
         })
       }
 
-      // Persist updated layout_data.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const newLayout: any = {
         ...layoutData,
@@ -329,26 +324,47 @@ export function WizardClient({ categories }: WizardClientProps) {
             />
           </label>
 
-          {/* Phase 13 D-Tax-03 — SOP category select */}
-          <label className="flex flex-col gap-1">
-            <span className="text-sm text-[var(--ink-500)]">SOP category (optional)</span>
-            <select
-              value={categoryTag ?? ''}
-              onChange={(e) => setCategoryTag(e.target.value || null)}
-              className="rounded border border-[var(--ink-300)] bg-[var(--paper)] px-3 py-2 text-[var(--ink-900)]"
-              data-testid="wizard-category-tag"
-            >
-              <option value="">— None —</option>
-              {sopCategoryOptions.map((c) => (
-                <option key={c.slug} value={c.slug}>
-                  {c.display_name}
-                </option>
-              ))}
-            </select>
-            <span className="text-xs text-[var(--ink-500)]">
-              Used to surface the most relevant items when you pick from the library.
-            </span>
-          </label>
+          {/* Phase 25: Department multi-select — localOnly (A4: sopId doesn't exist yet).
+              Replaces the old free-text category select in the UI.
+              categoryTag is retained in state for the library picker pre-filter (backward compat). */}
+          {departments.length > 0 && (
+            <div className="flex flex-col gap-1" data-testid="wizard-dept-field">
+              <span className="text-sm font-semibold" style={{ color: 'var(--ink-900)' }}>
+                Department
+              </span>
+              {/* Show selected dept chips */}
+              {(departmentIds.length > 0 || allDepartments) && (
+                <div className="flex flex-wrap gap-1 mb-1">
+                  {allDepartments ? (
+                    <DChip variant="all-departments" />
+                  ) : (
+                    departmentIds.map(id => {
+                      const dept = departments.find(d => d.id === id)
+                      return dept ? (
+                        <DChip key={id} variant="department" department={dept} />
+                      ) : null
+                    })
+                  )}
+                </div>
+              )}
+              {/* localOnly DepartmentPicker (mode='sop', sopId sentinel '__new__') */}
+              <DepartmentPicker
+                mode="sop"
+                sopId="__new__"
+                localOnly
+                departments={departments}
+                selectedIds={departmentIds}
+                allDepartments={allDepartments}
+                onChange={(ids, all) => {
+                  setDepartmentIds(ids)
+                  setAllDepartments(all)
+                }}
+              />
+              <span className="text-xs" style={{ color: 'var(--ink-500)' }}>
+                Leave empty to make visible to all members, or select departments to restrict visibility.
+              </span>
+            </div>
+          )}
 
           <div className="flex justify-end">
             <button
@@ -490,11 +506,20 @@ export function WizardClient({ categories }: WizardClientProps) {
                 <dd className="text-[var(--ink-900)]">{titleValues.sopNumber}</dd>
               </div>
             )}
-            {categoryTag && (
+            {/* Phase 25: show department selection in review */}
+            {(departmentIds.length > 0 || allDepartments) && (
               <div>
-                <dt className="text-[var(--ink-500)]">Category</dt>
+                <dt className="text-[var(--ink-500)]">Departments</dt>
                 <dd className="text-[var(--ink-900)]">
-                  {sopCategoryOptions.find((c) => c.slug === categoryTag)?.display_name ?? categoryTag}
+                  {allDepartments ? (
+                    <span>All departments</span>
+                  ) : (
+                    <span>
+                      {departmentIds
+                        .map(id => departments.find(d => d.id === id)?.name ?? id)
+                        .join(', ')}
+                    </span>
+                  )}
                 </dd>
               </div>
             )}

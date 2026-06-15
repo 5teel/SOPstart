@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { listDepartments } from '@/actions/departments'
 import { PromptClient } from './PromptClient'
 
 export const metadata: Metadata = {
@@ -38,6 +39,9 @@ export default async function NewAiSopPage() {
     new Set((categoryRows ?? []).map((r) => r.category).filter((c): c is string => Boolean(c)))
   ).sort()
 
+  // Phase 25: fetch departments for the department multi-select field.
+  const departments = await listDepartments()
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 lg:px-8 lg:py-12">
       <div className="flex items-center justify-between mb-2">
@@ -53,7 +57,7 @@ export default async function NewAiSopPage() {
         Describe the procedure, site, or worker role in plain English. Claude drafts a structured
         SOP with hazards, PPE, steps and emergency procedures. You&apos;ll review and refine before publish.
       </p>
-      <PromptClient categories={categories} />
+      <PromptClient categories={categories} departments={departments} />
     </div>
   )
 }

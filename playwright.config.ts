@@ -138,11 +138,12 @@ export default defineConfig({
       // Phase 25 — departments RLS + SOP visibility integration specs.
       //   departments-rls.spec.ts      — cross-tenant isolation + no-42P17 recursion (REQ-1, T-25-01/03, D-02a)
       //   sop-dept-visibility.spec.ts  — OR-composed worker visibility: Forming sees Forming + all_departments (REQ-3, D-02)
-      //   (Plan 05 will add no-global-blocks-in-journeys.spec.ts to this regex)
+      //   member-dept.spec.ts          — member↔dept junction + owner-set (REQ-4, REQ-5, D-03)
+      //   wizard-sop-dept.spec.ts      — wizard writes sop_departments (REQ-9, D-04) [Plan 06]
       // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
       name: 'phase25-integration',
       testDir: '.',
-      testMatch: /(departments-rls|sop-dept-visibility|no-global-blocks-in-journeys|member-dept)\.(test|spec)\.ts$/,
+      testMatch: /(departments-rls|sop-dept-visibility|no-global-blocks-in-journeys|member-dept|wizard-sop-dept)\.(test|spec)\.ts$/,
     },
     {
       // Phase 25 Plan 04 — /admin/departments e2e smoke spec.
