@@ -487,6 +487,10 @@ const CreateSopFromWizardInput = z.object({
   // Phase 13 D-Tax-03: SOP-level category from controlled vocab (block_categories.slug).
   // Optional — picker scoring still works without it (falls back to all-of-kind).
   categoryTag: z.string().max(120).nullable().optional(),
+  // Phase 25 REQ-9, D-04: department assignment on SOP creation.
+  // allDepartments=true makes SOP visible org-wide; departmentIds writes sop_departments junction.
+  departmentIds:  z.array(z.string().uuid()).max(20).optional().default([]),
+  allDepartments: z.boolean().optional().default(false),
 })
 
 export async function createSopFromWizard(
@@ -552,6 +556,23 @@ export async function createSopFromWizard(
   if (sopError || !sop) {
     console.error('[createSopFromWizard] sop insert error', sopError)
     return { error: 'Failed to create SOP. Please try again.' }
+  }
+
+  // Phase 25 REQ-9, D-04: write department associations for the new SOP.
+  // allDepartments flag makes SOP visible org-wide (parallel to blocks.all_departments).
+  if (parsed.data.allDepartments) {
+    await admin.from('sops').update({ all_departments: true } as unknown as object).eq('id', sop.id)
+  } else if (parsed.data.departmentIds.length > 0) {
+    const deptRows = parsed.data.departmentIds.map((department_id: string) => ({
+      sop_id: sop.id,
+      department_id,
+    }))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: deptErr } = await (admin as any).from('sop_departments').insert(deptRows)
+    if (deptErr) {
+      // Non-fatal: SOP is created, dept tagging failed. Log but continue.
+      console.error('[createSopFromWizard] sop_departments insert error', deptErr)
+    }
   }
 
   // 2. Fetch the selected kinds via the caller's RLS-scoped supabase client

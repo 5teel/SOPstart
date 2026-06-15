@@ -50,7 +50,7 @@ export function BlockPicker({
     setLoading(true)
     setError(null)
     Promise.all([
-      listBlocks({ kindSlug, includeGlobal: true, includeContent: true }),
+      listBlocks({ kindSlug, includeContent: true }),
       listBlockCategories(),
     ])
       .then(([bs, cs]) => {

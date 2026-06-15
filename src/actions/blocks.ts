@@ -2,16 +2,17 @@
 
 /**
  * Phase 13 Reusable Block Library — server actions.
+ * Phase 25 update: org-vs-global model retired; global blocks converted to
+ * org-owned with all_departments = true. listBlocks now accepts departmentId
+ * for department-based filtering.
  *
- * Final option surface (consumed by 13-02 / 13-03 / 13-04 / 13-05):
- *  - createBlock({ ... scope: 'org' | 'global' })
- *  - listBlocks(opts: ListBlocksOptions) where opts.includeContent / opts.globalOnly
- *  - saveFromSection({ ... scope: 'org' | 'suggest_global' })
+ * Remaining surface:
+ *  - createBlock({ ... scope: 'org' })
+ *  - listBlocks(opts: ListBlocksOptions) where opts.departmentId filters to dept + all_departments
+ *  - saveFromSection({ ... scope: 'org' })
  *
  * All content writes call BlockContentSchema.parse() before the insert.
- * RLS handles cross-org isolation; createAdminClient() is used ONLY where the
- * insert/update target is organisation_id = null (global blocks) and the
- * caller has been verified as a platform super-admin via is_platform_admin().
+ * RLS handles cross-org isolation.
  */
 
 import { z } from 'zod'
@@ -22,7 +23,6 @@ import type { BlockContent } from '@/lib/validators/blocks'
 import type {
   Block,
   BlockVersion,
-  BlockSuggestion,
   BlockCategory,
 } from '@/types/sop'
 
@@ -54,22 +54,6 @@ async function requireAdmin(): Promise<AdminCtx | { error: string }> {
   return { supabase, user: { id: user.id }, role, organisationId }
 }
 
-/**
- * Defence-in-depth: verify caller is a platform super-admin via the
- * is_platform_admin() RPC. Used by createBlock when scope='global' is
- * requested AND by promoteSuggestion / rejectSuggestion. The full route
- * guard for /admin/global-blocks ships in plan 13-05.
- */
-async function requirePlatformAdmin(): Promise<{ ok: true } | { error: string }> {
-  const supabase = await createClient()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase as any).rpc('is_platform_admin')
-  if (error || data !== true) {
-    return { error: 'Platform super-admin required' }
-  }
-  return { ok: true }
-}
-
 // ---------------------------------------------------------------------------
 // Input schemas
 // ---------------------------------------------------------------------------
@@ -81,8 +65,8 @@ const CreateBlockInput = z.object({
   freeTextTags: z.array(z.string()).max(20).default([]),
   content: z.unknown(), // validated below via BlockContentSchema
   changeNote: z.string().max(500).optional(),
-  // 'global' requires platform super-admin (D-Global-01)
-  scope: z.enum(['org', 'global']).default('org'),
+  // Phase 25: 'global' scope removed — all blocks are org-owned.
+  scope: z.enum(['org']).default('org'),
   /**
    * Phase 21 Plan 21-05 — written to blocks.category. The picker filters
    * `category != 'parsed_inline'` by default so per-item library blocks
@@ -121,30 +105,28 @@ const SaveFromSectionInput = z.object({
   categoryTags: z.array(z.string()).max(20).default([]),
   freeTextTags: z.array(z.string()).max(20).default([]),
   content: z.unknown(),
-  scope: z.enum(['org', 'suggest_global']),
+  // Phase 25: only 'org' scope remains (A5/A6 — global model retired).
+  scope: z.enum(['org']),
 })
 
 /**
- * ListBlocks options surface — FINAL.
- * Downstream plans (13-03 picker, 13-04 follow-latest, 13-05 super-admin UI)
- * MUST consume these options as-is. Do NOT add new options in those plans.
+ * ListBlocks options surface — Phase 25 update.
+ * org-vs-global model retired; departmentId added for department-based filtering.
+ * departmentId: when set, returns blocks tagged to that department OR
+ * blocks with all_departments = true (org-wide blocks).
  */
 export type ListBlocksOptions = {
   kindSlug?: string
   includeArchived?: boolean
   categoryTag?: string
-  /** default true: include organisation_id is null rows alongside org-scoped blocks */
-  includeGlobal?: boolean
-  /** default false: when true, return ONLY organisation_id is null rows (consumed by 13-05) */
-  globalOnly?: boolean
-  /** default false: when true, hydrate currentContent on each block from block_versions (consumed by 13-03 to avoid N+1) */
+  /** Phase 25: filter to this department's blocks (junction) OR org-wide (all_departments=true) */
+  departmentId?: string
+  /** default false: when true, hydrate currentContent on each block from block_versions */
   includeContent?: boolean
   /**
    * Plan 21-05 / T-21-05-01 — default false:
    *   excludes blocks whose category = 'parsed_inline' so the library picker
    *   isn't bloated with single-use parser-created blocks.
-   * Set true ONLY in surfaces that genuinely need to surface parsed-inline
-   * blocks (e.g. an admin "promote inline to reusable" UI — deferred).
    */
   includeParsedInline?: boolean
 }
@@ -170,8 +152,6 @@ export async function createBlock(
     return { error: 'Invalid block content' }
   }
 
-  const isGlobal = data.scope === 'global'
-
   // Auth gates
   let organisationId: string | null = null
   let createdByUserId: string | null = null
@@ -179,27 +159,10 @@ export async function createBlock(
   let writer: any
   if (data.serviceRole) {
     // Plan 21-05 — parser invocation. Bypass requireAdmin (no session in the
-    // parse-job worker context). Always scoped to the caller-supplied org;
-    // never global. Defence-in-depth: refuse if 'global' was also requested.
-    if (isGlobal) {
-      return { error: 'serviceRole cannot be combined with scope=global' }
-    }
+    // parse-job worker context). Always scoped to the caller-supplied org.
     writer = createAdminClient()
     organisationId = data.serviceRole.organisationId
     createdByUserId = data.serviceRole.createdByUserId
-  } else if (isGlobal) {
-    const guard = await requirePlatformAdmin()
-    if ('error' in guard) {
-      return { error: 'Platform super-admin required to create global blocks' }
-    }
-    // For global writes (organisation_id = null) use the service-role client
-    // since the authenticated RLS path would also work (per 00022 policy) but
-    // the admin client avoids any ambiguity in tooling.
-    writer = createAdminClient()
-    // Capture the calling user id via the regular client.
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    createdByUserId = user?.id ?? null
   } else {
     const ctx = await requireAdmin()
     if ('error' in ctx) return { error: ctx.error }
@@ -417,9 +380,7 @@ export async function listBlocks(
   options?: ListBlocksOptions
 ): Promise<Array<Block & { currentContent?: BlockContent | null }>> {
   const opts: ListBlocksOptions = {
-    includeGlobal: true,
     includeArchived: false,
-    globalOnly: false,
     includeContent: false,
     includeParsedInline: false,
     ...(options ?? {}),
@@ -448,12 +409,26 @@ export async function listBlocks(
     query = query.contains('category_tags', [opts.categoryTag])
   }
 
-  if (opts.globalOnly) {
-    query = query.is('organisation_id', null)
-  } else if (!opts.includeGlobal) {
-    // RLS already restricts to org + globals; if caller does not want globals,
-    // exclude null org rows explicitly.
-    query = query.not('organisation_id', 'is', null)
+  // Phase 25: org-vs-global model retired. RLS already excludes organisation_id IS NULL
+  // after migration 00036 converts all global blocks to org-owned. No explicit filter needed.
+  // departmentId: restrict to blocks tagged to this dept OR with all_departments = true.
+  if (opts.departmentId) {
+    // Fetch block IDs tagged to this department from the junction table.
+    const { data: junctionRows } = await supabase
+      .from('block_departments' as Parameters<typeof supabase.from>[0])
+      .select('block_id')
+      .eq('department_id', opts.departmentId)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const taggedBlockIds: string[] = ((junctionRows ?? []) as any[]).map((r: any) => r.block_id)
+    if (taggedBlockIds.length > 0) {
+      // Include blocks tagged to this dept OR org-wide blocks.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      query = (query as any).or(`id.in.(${taggedBlockIds.join(',')}),all_departments.eq.true`)
+    } else {
+      // No tagged blocks — only org-wide blocks.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      query = (query as any).eq('all_departments', true)
+    }
   }
 
   // Plan 21-05 / T-21-05-01 — by default hide parser-created blocks from
@@ -538,15 +513,15 @@ export async function getBlock(
 
 export async function saveFromSection(
   input: z.input<typeof SaveFromSectionInput>
-): Promise<{ block: Block; suggestionId?: string } | { error: string }> {
+): Promise<{ block: Block } | { error: string }> {
   const parsed = SaveFromSectionInput.safeParse(input)
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
   }
   const data = parsed.data
 
-  // Always create the block in the caller's org (even when scope='suggest_global'
-  // the org keeps its own copy; promotion later copies to global).
+  // Create the block in the caller's org.
+  // Phase 25: only 'org' scope — global model retired (A5/A6).
   const created = await createBlock({
     kindSlug: data.kindSlug,
     name: data.name,
@@ -557,226 +532,14 @@ export async function saveFromSection(
   })
   if ('error' in created) return { error: created.error }
 
-  let suggestionId: string | undefined
-
-  if (data.scope === 'suggest_global') {
-    const ctx = await requireAdmin()
-    if ('error' in ctx) return { error: ctx.error }
-    const { supabase, user, organisationId } = ctx
-    if (!organisationId) return { error: 'No organisation' }
-
-    const snapshot = {
-      kind_slug: data.kindSlug,
-      name: data.name,
-      category_tags: data.categoryTags,
-      free_text_tags: data.freeTextTags,
-      content: data.content,
-    }
-
-    const { data: sugRow, error: sugErr } = await supabase
-      .from('block_suggestions')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .insert({
-        source_block_id: created.block.id,
-        suggested_by_org_id: organisationId,
-        suggested_by_user: user.id,
-        snapshot: snapshot as unknown as object,
-        status: 'pending',
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any)
-      .select('id')
-      .single()
-    if (sugErr || !sugRow) {
-      console.error('[saveFromSection] suggestion insert error', sugErr)
-      return { error: sugErr?.message ?? 'Failed to create suggestion' }
-    }
-    suggestionId = (sugRow as { id: string }).id
-  }
-
-  return { block: created.block, suggestionId }
+  return { block: created.block }
 }
 
 // ---------------------------------------------------------------------------
-// 7. listBlockSuggestions
+// 7. listBlockCategories
 // ---------------------------------------------------------------------------
-
-export async function listBlockSuggestions(
-  options?: { status?: 'pending' | 'promoted' | 'rejected' }
-): Promise<BlockSuggestion[]> {
-  const supabase = await createClient()
-  const status = options?.status ?? 'pending'
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase as any)
-    .from('block_suggestions')
-    .select('*')
-    .eq('status', status)
-    .order('created_at', { ascending: false })
-    .limit(500)
-
-  if (error) {
-    console.error('[listBlockSuggestions] error', error)
-    return []
-  }
-  return (data ?? []) as unknown as BlockSuggestion[]
-}
-
-// ---------------------------------------------------------------------------
-// 8. promoteSuggestion
-// ---------------------------------------------------------------------------
-
-export async function promoteSuggestion(
-  suggestionId: string,
-  decisionNote?: string
-): Promise<{ promotedBlockId: string } | { error: string }> {
-  if (!suggestionId) return { error: 'suggestionId required' }
-
-  const guard = await requirePlatformAdmin()
-  if ('error' in guard) return { error: guard.error }
-
-  // Capture caller user id via regular client (admin client has no auth context).
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  const admin = createAdminClient()
-
-  // Fetch suggestion (admin client bypasses RLS — fine since requirePlatformAdmin gated).
-  const { data: sug, error: sugErr } = await admin
-    .from('block_suggestions')
-    .select('*')
-    .eq('id', suggestionId)
-    .maybeSingle()
-  if (sugErr || !sug) {
-    return { error: sugErr?.message ?? 'Suggestion not found' }
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const snapshot = (sug as any).snapshot as {
-    kind_slug: string
-    name: string
-    category_tags: string[]
-    free_text_tags: string[]
-    content: unknown
-  }
-
-  // Validate snapshot content payload before promoting.
-  let content: BlockContent
-  try {
-    content = BlockContentSchema.parse(snapshot.content) as BlockContent
-  } catch {
-    return { error: 'Suggestion snapshot has invalid content' }
-  }
-
-  // Insert global block (organisation_id = null).
-  const { data: blockRow, error: blockErr } = await admin
-    .from('blocks')
-    .insert({
-      organisation_id: null,
-      kind_slug: snapshot.kind_slug,
-      name: snapshot.name,
-      category_tags: snapshot.category_tags ?? [],
-      free_text_tags: snapshot.free_text_tags ?? [],
-      created_by: user.id,
-    })
-    .select('id')
-    .single()
-  if (blockErr || !blockRow) {
-    console.error('[promoteSuggestion] block insert error', blockErr)
-    return { error: blockErr?.message ?? 'Failed to create global block' }
-  }
-
-  const newBlockId = (blockRow as { id: string }).id
-
-  // Insert v1 block_versions row.
-  const { data: vRow, error: vErr } = await admin
-    .from('block_versions')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .insert({
-      block_id: newBlockId,
-      version_number: 1,
-      content: content as unknown as object,
-      change_note: 'Promoted from suggestion',
-      created_by: user.id,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any)
-    .select('id')
-    .single()
-  if (vErr || !vRow) {
-    console.error('[promoteSuggestion] version insert error — rolling back block', vErr)
-    await admin.from('blocks').delete().eq('id', newBlockId)
-    return { error: vErr?.message ?? 'Failed to create block version' }
-  }
-
-  // Bump current_version_id on the new global block.
-  const { error: bumpErr } = await admin
-    .from('blocks')
-    .update({ current_version_id: (vRow as { id: string }).id })
-    .eq('id', newBlockId)
-  if (bumpErr) {
-    console.error('[promoteSuggestion] current_version_id bump error', bumpErr)
-    return { error: bumpErr.message }
-  }
-
-  // Mark suggestion promoted.
-  const { error: updErr } = await admin
-    .from('block_suggestions')
-    .update({
-      status: 'promoted',
-      decided_by: user.id,
-      decided_at: new Date().toISOString(),
-      decision_note: decisionNote ?? null,
-      promoted_block_id: newBlockId,
-    })
-    .eq('id', suggestionId)
-  if (updErr) {
-    console.error('[promoteSuggestion] suggestion update error', updErr)
-    return { error: updErr.message }
-  }
-
-  return { promotedBlockId: newBlockId }
-}
-
-// ---------------------------------------------------------------------------
-// 9. rejectSuggestion
-// ---------------------------------------------------------------------------
-
-export async function rejectSuggestion(
-  suggestionId: string,
-  decisionNote?: string
-): Promise<{ success: true } | { error: string }> {
-  if (!suggestionId) return { error: 'suggestionId required' }
-
-  const guard = await requirePlatformAdmin()
-  if ('error' in guard) return { error: guard.error }
-
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  // RLS update policy block_suggestions_update_platform_only allows this via
-  // the regular client because requirePlatformAdmin already passed.
-  const { error } = await supabase
-    .from('block_suggestions')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .update({
-      status: 'rejected',
-      decided_by: user.id,
-      decided_at: new Date().toISOString(),
-      decision_note: decisionNote ?? null,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any)
-    .eq('id', suggestionId)
-  if (error) {
-    console.error('[rejectSuggestion] update error', error)
-    return { error: error.message }
-  }
-  return { success: true }
-}
-
-// ---------------------------------------------------------------------------
-// 10. listBlockCategories
-// ---------------------------------------------------------------------------
+// NOTE: suggestion functions removed in Phase 25 (global model retired — A5/A6).
+// block_suggestions table dropped in migration 00037.
 
 /**
  * Phase 13 plan 13-04: count downstream SOP usages of a block in follow_latest

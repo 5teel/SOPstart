@@ -132,6 +132,10 @@ export function WizardClient({ categories }: WizardClientProps) {
       sopNumber: titleValues.sopNumber || null,
       kindIds: selectedKindIds,
       categoryTag,
+      // Phase 25: departmentIds/allDepartments wired in Wave 4 WizardClient update.
+      // Pass empty defaults so the schema is satisfied without UI yet.
+      departmentIds: [],
+      allDepartments: false,
     })
     if ('error' in result) {
       setError(result.error)

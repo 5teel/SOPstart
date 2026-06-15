@@ -19,15 +19,10 @@ const KIND_FILTERS = [
   { label: 'Custom', value: 'custom' },
 ]
 
-const SCOPE_TABS: { label: string; value: 'org' | 'global' }[] = [
-  { label: 'My library', value: 'org' },
-  { label: 'Global library', value: 'global' },
-]
-
 export default async function BlocksLibraryPage({
   searchParams,
 }: {
-  searchParams: Promise<{ scope?: 'org' | 'global'; kind?: string }>
+  searchParams: Promise<{ kind?: string }>
 }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -44,13 +39,11 @@ export default async function BlocksLibraryPage({
   }
 
   const params = await searchParams
-  const scope: 'org' | 'global' = params.scope === 'global' ? 'global' : 'org'
   const kind = params.kind && params.kind !== 'all' ? params.kind : undefined
 
+  // Phase 25: org-vs-global scope tabs removed. All blocks are org-owned.
   const [blocks, categories] = await Promise.all([
     listBlocks({
-      includeGlobal: scope === 'global' ? true : false,
-      globalOnly: scope === 'global',
       includeArchived: false,
       kindSlug: kind,
     }),
@@ -90,28 +83,6 @@ export default async function BlocksLibraryPage({
         </Link>
       </nav>
 
-      {/* Scope tabs */}
-      <div className="flex gap-2 mb-4">
-        {SCOPE_TABS.map((tab) => {
-          const isActive = scope === tab.value
-          const href = `/admin/blocks?scope=${tab.value}${kind ? `&kind=${kind}` : ''}`
-          return (
-            <Link
-              key={tab.value}
-              href={href}
-              className={[
-                'px-3 h-9 rounded-md text-sm font-medium inline-flex items-center transition-colors',
-                isActive
-                  ? 'bg-[var(--paper-2)] text-[var(--ink-900)] border border-[var(--ink-300)]'
-                  : 'bg-white text-[var(--ink-500)] border border-[var(--ink-100)] hover:text-[var(--ink-900)]',
-              ].join(' ')}
-            >
-              {tab.label}
-            </Link>
-          )
-        })}
-      </div>
-
       {/* Kind filter */}
       <div className="mb-6 flex items-center gap-3">
         <label htmlFor="kind-filter" className="text-xs uppercase tracking-wider text-[var(--ink-500)]">
@@ -120,7 +91,7 @@ export default async function BlocksLibraryPage({
         <div className="flex flex-wrap gap-2">
           {KIND_FILTERS.map((k) => {
             const isActive = (kind ?? 'all') === k.value
-            const href = `/admin/blocks?scope=${scope}${k.value === 'all' ? '' : `&kind=${k.value}`}`
+            const href = `/admin/blocks${k.value === 'all' ? '' : `?kind=${k.value}`}`
             return (
               <Link
                 key={k.value}

@@ -1,84 +1,15 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
-import { requirePlatformAdmin } from '@/lib/auth/platform-admin-guard'
-import { listBlockSuggestions } from '@/actions/blocks'
-import { SuggestionReviewRow } from '@/components/admin/blocks/SuggestionReviewRow'
+import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
-  title: 'Pending Suggestions — Platform admin',
+  title: 'Suggestions — deprecated',
 }
 
 /**
- * Phase 13 plan 13-05: Suggestions queue page for the platform super-admin.
- *
- * Lists all `block_suggestions` rows with status='pending'. Each row exposes
- * a Promote / Reject decision form via SuggestionReviewRow.
- *
- * Promote → inserts a global block (organisation_id = null) via
- * promoteSuggestion (built in 13-01); the trigger from 13-04
- * (`trg_propagate_block_update`) fires on the new block_versions row and
- * flips `update_available` on any follow-latest junctions referencing the
- * source org block.
- *
- * Reject → marks the suggestion rejected with optional decision note.
+ * Phase 25: Block suggestion curation surface retired (global model removed, A5/A6).
+ * block_suggestions table dropped in migration 00037.
+ * Full route deletion in Wave 4 plan 25-05.
  */
 export default async function SuggestionsQueuePage() {
-  await requirePlatformAdmin()
-  const pending = await listBlockSuggestions({ status: 'pending' })
-
-  return (
-    <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10 bg-[var(--paper)] min-h-screen">
-      <header className="mb-2">
-        <h1 className="text-2xl font-bold text-[var(--ink-900)]">
-          Pending Suggestions for Global Library
-        </h1>
-        <p className="text-sm text-[var(--ink-500)] mt-1 max-w-2xl">
-          Review, promote, or reject items submitted by orgs for the shared
-          NZ-industry library. Promoted items become read-only globals visible
-          to every org.
-        </p>
-      </header>
-
-      <nav className="flex gap-4 border-b border-[var(--ink-100)] mt-6 mb-6 text-sm">
-        <Link
-          href="/admin/global-blocks"
-          className="pb-3 px-1 font-medium text-[var(--ink-500)] hover:text-[var(--ink-900)]"
-        >
-          Global Library
-        </Link>
-        <Link
-          href="/admin/global-blocks/suggestions"
-          className="pb-3 px-1 font-medium border-b-2 border-[var(--ink-900)] text-[var(--ink-900)]"
-        >
-          Suggestions Queue
-          {pending.length > 0 && (
-            <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[11px] bg-[var(--ink-900)] text-white font-bold">
-              {pending.length}
-            </span>
-          )}
-        </Link>
-      </nav>
-
-      {pending.length === 0 ? (
-        <div className="bg-white border border-[var(--ink-100)] rounded-lg p-8 text-center">
-          <p className="text-base font-semibold text-[var(--ink-900)] mb-1">
-            No pending suggestions
-          </p>
-          <p className="text-sm text-[var(--ink-500)]">
-            Org admins can submit items via &ldquo;Suggest for global&rdquo; in
-            the Save to library modal. Promoted suggestions land in the Global
-            Library tab.
-          </p>
-        </div>
-      ) : (
-        <ul className="space-y-4">
-          {pending.map((s) => (
-            <li key={s.id}>
-              <SuggestionReviewRow suggestion={s} />
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  )
+  redirect('/admin/blocks')
 }

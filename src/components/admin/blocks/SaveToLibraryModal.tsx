@@ -38,7 +38,8 @@ export function SaveToLibraryModal({
   const [name, setName] = useState(suggestedName ?? '')
   const [categoryTags, setCategoryTags] = useState<string[]>([])
   const [freeTextTagsRaw, setFreeTextTagsRaw] = useState('')
-  const [scope, setScope] = useState<'org' | 'suggest_global'>('org')
+  // Phase 25: only 'org' scope — global suggestion model retired (A5/A6).
+  const scope = 'org' as const
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
 
@@ -81,10 +82,7 @@ export function SaveToLibraryModal({
       }
       // Lightweight toast via window.alert; production toast hook lives in
       // src/components/providers (deferred to integration plan 13-03).
-      const msg =
-        scope === 'suggest_global'
-          ? 'Saved to your library and submitted for global review.'
-          : 'Saved to library.'
+      const msg = 'Saved to library.'
       // eslint-disable-next-line no-alert
       alert(msg)
       onSaved?.(res.block.id)
@@ -172,44 +170,7 @@ export function SaveToLibraryModal({
           />
         </div>
 
-        {/* 4. Scope */}
-        <fieldset className="mb-5">
-          <legend className="block text-xs uppercase tracking-wider text-[var(--ink-500)] mb-2">
-            Scope
-          </legend>
-          <label className="flex items-start gap-2 mb-2 cursor-pointer">
-            <input
-              type="radio"
-              name="scope"
-              value="org"
-              checked={scope === 'org'}
-              onChange={() => setScope('org')}
-              className="mt-0.5 accent-[var(--ink-900)]"
-            />
-            <span className="text-sm text-[var(--ink-900)]">
-              My org only
-              <span className="block text-xs text-[var(--ink-500)]">
-                Save just to your organisation&apos;s library.
-              </span>
-            </span>
-          </label>
-          <label className="flex items-start gap-2 cursor-pointer">
-            <input
-              type="radio"
-              name="scope"
-              value="suggest_global"
-              checked={scope === 'suggest_global'}
-              onChange={() => setScope('suggest_global')}
-              className="mt-0.5 accent-[var(--ink-900)]"
-            />
-            <span className="text-sm text-[var(--ink-900)]">
-              Suggest for global
-              <span className="block text-xs text-[var(--ink-500)]">
-                Submit for review and possible promotion to the global library.
-              </span>
-            </span>
-          </label>
-        </fieldset>
+        {/* Phase 25: Scope field removed — all blocks are org-owned (global model retired). */}
 
         {error && (
           <div className="text-sm text-red-400 bg-red-950/30 border border-red-700/40 rounded-md p-3 mb-4">

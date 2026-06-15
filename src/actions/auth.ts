@@ -331,6 +331,8 @@ export interface TeamMember {
   role: AppRole
   email: string | null
   created_at: string | null
+  /** Phase 25: department IDs this member is assigned to (from member_departments junction). */
+  department_ids: string[]
 }
 
 export async function getTeamMembersWithEmails() {
@@ -372,12 +374,29 @@ export async function getTeamMembersWithEmails() {
     }
   }
 
+  // Phase 25: fetch department_ids per member from member_departments junction.
+  const memberUserIds = members.map((m) => m.user_id)
+  const deptMap: Record<string, string[]> = {}
+  if (memberUserIds.length > 0) {
+    // Use admin client since member_departments may not be accessible via regular RLS for all callers.
+    const { data: deptRows } = await admin
+      .from('member_departments' as Parameters<typeof admin.from>[0])
+      .select('member_id, department_id')
+      .in('member_id', memberUserIds)
+
+    for (const r of (deptRows ?? []) as Array<{ member_id: string; department_id: string }>) {
+      if (!deptMap[r.member_id]) deptMap[r.member_id] = []
+      deptMap[r.member_id].push(r.department_id)
+    }
+  }
+
   const result: TeamMember[] = members.map((m) => ({
     id: m.id,
     user_id: m.user_id,
     role: m.role as AppRole,
     email: emailMap[m.user_id] ?? null,
     created_at: m.created_at,
+    department_ids: deptMap[m.user_id] ?? [],
   }))
 
   return { members: result, currentUserId: user.id }

@@ -47,6 +47,9 @@ export async function POST(request: NextRequest) {
     )
   }
   const { promptText, categoryTag, detailLevel } = parseResult.data
+  // Phase 25 REQ-9, D-04: optional department fields from request body (not in aiPromptSchema — read directly).
+  const departmentIds: string[] = Array.isArray(body.departmentIds) ? body.departmentIds : []
+  const allDepartments: boolean = body.allDepartments === true
 
   const admin = createAdminClient()
 
@@ -72,6 +75,15 @@ export async function POST(request: NextRequest) {
     .single()
   if (sopError || !sop) {
     return NextResponse.json({ error: 'Failed to create SOP record' }, { status: 500 })
+  }
+
+  // Phase 25 REQ-9, D-04: write sop_departments junction rows for the new AI-drafted SOP.
+  if (allDepartments) {
+    await admin.from('sops').update({ all_departments: true } as object).eq('id', sop.id)
+  } else if (departmentIds.length > 0) {
+    const deptRows = departmentIds.map((department_id: string) => ({ sop_id: sop.id, department_id }))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (admin as any).from('sop_departments').insert(deptRows)
   }
 
   // --- 4. Create parse_jobs row (D-04: persist prompt_text for audit) ---
