@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
 status: Ready to execute
-stopped_at: Completed 25-05-PLAN.md
-last_updated: "2026-06-15T02:52:29.911Z"
+stopped_at: Completed 25-06-PLAN.md
+last_updated: "2026-06-15T03:03:00Z"
 progress:
   total_phases: 28
   completed_phases: 3
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 25 (department-first-class-entity) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 **Milestone status:** v4.0 started 2026-05-24. 3 phases / 40 requirements (1 of 3 phases complete). See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
 **Active phase:** 21.5
@@ -135,6 +135,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 25-department-first-class-entity P03 | 45min | 3 tasks | 16 files |
 | Phase 25-department-first-class-entity P04 | 496 | 3 tasks | 7 files |
 | Phase 25 P05 | 10m | 3 tasks | 11 files |
+| Phase 25-department-first-class-entity P06 | 7m | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -241,6 +242,10 @@ Recent decisions affecting current work:
 - [Phase ?]: Department-filtered block library uses separate block_departments junction query in page augmented via blockDeptMap
 - [Phase ?]: is_platform_admin() RPC retained — /admin/global-blocks UI removed but RPC still referenced by ai_review_results RLS in migration 00032
 - [Phase ?]: DepartmentBottomSheet uses draft-commit pattern (Done button) for mobile; DepartmentSidebar uses direct-toggle for desktop
+- [Phase 25-06]: DepartmentPicker in both wizard (blank) and AI-draft paths uses localOnly=true + sopId=__new__ sentinel — no server action fires on toggle; dept IDs accumulate in local state and write in a single createSopFromWizard / ai-prompt POST
+- [Phase 25-06]: Department filter bar on /admin/team filters the visible member list client-side from fetched members (no URL param needed — team page already loads all members via getTeamMembersWithEmails)
+- [Phase 25-06]: Owner badge reads departments.owner_user_id from Department objects passed from the server — onChange after DepartmentPicker fires fetchMembers() to refresh owner state
+- [Phase 25-06]: team/page.tsx role guard expanded from admin-only to admin|safety_manager (consistent with other admin pages)
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -349,7 +354,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-15T02:52:29.904Z
-Stopped at: Completed 25-05-PLAN.md
+Last session: 2026-06-15T03:03:00Z
+Stopped at: Completed 25-06-PLAN.md (Phase 25 complete — all 6 plans executed)
 Resume file: None
-Awaiting: Plan 02 execution (apply migrations to live DB + cross-tenant/visibility/no-recursion integration tests).
+Awaiting: Human UAT on sopstart.com (member dept assignment + owner badge + both create-SOP dept paths). Apply migrations 00035/00036 to live DB to activate runtime integration specs.
