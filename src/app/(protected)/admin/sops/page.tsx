@@ -47,12 +47,6 @@ export default async function SopsLibraryPage({
     redirect('/dashboard')
   }
 
-  // Detect platform-admin (per src/lib/auth/platform-admin-guard.ts) so we can
-  // surface the otherwise-orphaned /admin/global-blocks curation surface.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: platformAdminFlag } = await (supabase as any).rpc('is_platform_admin')
-  const isPlatformAdmin = platformAdminFlag === true
-
   const params = await searchParams
   const activeStatus = params.status ?? 'all'
 
@@ -111,17 +105,14 @@ export default async function SopsLibraryPage({
             SOPs
           </Link>
           <Link href="/admin/blocks" className="tab">
-            Blocks
+            Library
           </Link>
-          {isPlatformAdmin && (
-            <Link
-              href="/admin/global-blocks"
-              className="tab"
-              title="Platform-admin curated globals"
-            >
-              Curate Globals
-            </Link>
-          )}
+          <Link href="/admin/team" className="tab">
+            Team
+          </Link>
+          <Link href="/admin/departments" className="tab">
+            Departments
+          </Link>
         </nav>
 
         {/* Filter tabs */}
