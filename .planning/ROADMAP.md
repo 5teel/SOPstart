@@ -59,7 +59,7 @@ Three phases bundle the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` 
   - [x] 25-01-PLAN.md — Schema + data + RLS migrations (00035/00036/00037) + Department types (Wave 1)
   - [x] 25-02-PLAN.md — [BLOCKING] apply migrations to live DB + cross-tenant/visibility/no-recursion integration tests (Wave 1)
   - [x] 25-03-PLAN.md — departments.ts actions + blocks/sops/auth rewiring + DChip/DepartmentPicker + member-dept test (Wave 2)
-  - [ ] 25-04-PLAN.md — /admin/departments page: cards, counts, owner accountability, create/edit/archive (Wave 3)
+  - [x] 25-04-PLAN.md — /admin/departments page: cards, counts, owner accountability, create/edit/archive (Wave 3)
   - [ ] 25-05-PLAN.md — Block library dept rework + delete /admin/global-blocks + journeys.ts + worker library (Wave 3)
   - [ ] 25-06-PLAN.md — Team dept assignment + owner badge + create-SOP department field (blank + AI) (Wave 3)
 

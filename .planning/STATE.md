@@ -4,7 +4,7 @@ milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
 status: Ready to execute
 stopped_at: Completed 25-03-PLAN.md
-last_updated: "2026-06-15T02:22:36.980Z"
+last_updated: "2026-06-15T02:36:00.369Z"
 progress:
   total_phases: 28
   completed_phases: 3
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 25 (department-first-class-entity) — EXECUTING
-Plan: 3 of 6
+Plan: 4 of 6
 **Milestone status:** v4.0 started 2026-05-24. 3 phases / 40 requirements (1 of 3 phases complete). See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
 **Active phase:** 21.5
@@ -133,6 +133,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 21.6 P05 | 20 | 2 tasks | 2 files |
 | Phase 24 P24-03 | 25m | 4 tasks | 9 files |
 | Phase 25-department-first-class-entity P03 | 45min | 3 tasks | 16 files |
+| Phase 25-department-first-class-entity P04 | 496 | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -344,7 +345,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-15T02:22:36.973Z
+Last session: 2026-06-15T02:36:00.362Z
 Stopped at: Completed 25-03-PLAN.md
 Resume file: .planning/phases/25-department-first-class-entity/25-02-PLAN.md
 Awaiting: Plan 02 execution (apply migrations to live DB + cross-tenant/visibility/no-recursion integration tests).
