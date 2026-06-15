@@ -11,9 +11,13 @@ import {
   LayoutGrid,
   Link2,
   Check,
+  Users,
+  Minus,
 } from 'lucide-react'
 import { JOURNEY_GROUPS } from '@/lib/journeys/journeys'
 import type { Journey, JourneyStep, StepType } from '@/lib/journeys/journeys'
+import { ROLES, ROLE_KIND_LABEL, ACCESS_MATRIX, ACCESS_ROLE_ORDER } from '@/lib/journeys/roles'
+import type { RoleDef, RoleKind } from '@/lib/journeys/roles'
 import type { AppRoute } from '@/lib/journeys/routes'
 
 interface Props {
@@ -37,7 +41,8 @@ export function PathwaysClient({ journeys, routes }: Props) {
   // an RSC fetch, so this stays cheap. Read on mount (SSR-safe) + on hashchange/
   // popstate for pasted links and back/forward.
   useEffect(() => {
-    const isValid = (id: string) => id === 'all-screens' || journeys.some((j) => j.id === id)
+    const isValid = (id: string) =>
+      id === 'all-screens' || id === 'roles' || journeys.some((j) => j.id === id)
     const apply = () => {
       const h = decodeURIComponent(window.location.hash.replace(/^#/, ''))
       if (h && isValid(h)) setSelected(h)
@@ -82,6 +87,17 @@ export function PathwaysClient({ journeys, routes }: Props) {
           <LayoutGrid className="h-4 w-4" /> All screens
           <span className="ml-auto text-[11px] font-normal opacity-70">{routes.length} live</span>
         </button>
+        <button
+          onClick={() => select('roles')}
+          className="w-full flex items-center gap-2 px-3 py-2.5 text-sm font-semibold border-b border-[var(--ink-100)] transition-colors"
+          style={{
+            background: selected === 'roles' ? 'var(--ink-900)' : 'white',
+            color: selected === 'roles' ? 'white' : 'var(--ink-900)',
+          }}
+        >
+          <Users className="h-4 w-4" /> Roles &amp; access
+          <span className="ml-auto text-[11px] font-normal opacity-70">{ROLES.length}</span>
+        </button>
         <div className="max-h-[70vh] overflow-y-auto py-1">
           {grouped.map((g) => (
             <div key={g.group} className="py-1">
@@ -113,6 +129,8 @@ export function PathwaysClient({ journeys, routes }: Props) {
       <div className="min-w-0">
         {selected === 'all-screens' ? (
           <ScreenInventory journeys={journeys} routes={routes} onOpenJourney={select} />
+        ) : selected === 'roles' ? (
+          <RolesView />
         ) : journey ? (
           <JourneyView journey={journey} />
         ) : null}
@@ -331,6 +349,150 @@ function ScreenInventory({
           )
         })}
       </ul>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Roles & access (from src/lib/journeys/roles.ts)
+// ---------------------------------------------------------------------------
+
+function RoleCard({ role }: { role: RoleDef }) {
+  return (
+    <div className="rounded-xl border border-[var(--ink-100)] bg-white overflow-hidden">
+      <div className="h-1.5 w-full" style={{ background: role.colour }} />
+      <div className="p-4">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="h-2.5 w-2.5 rounded-full flex-shrink-0" style={{ background: role.colour }} />
+          <span className="text-[15px] font-semibold text-[var(--ink-900)]">{role.label}</span>
+          <span className="mono text-[10px] text-[var(--ink-500)] border border-[var(--ink-100)] rounded px-1.5 py-0.5">
+            {role.key}
+          </span>
+          {role.landsOn && (
+            <a
+              href={role.landsOn.route}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ml-auto mono text-[11px] inline-flex items-center gap-1 rounded px-1.5 py-0.5 border"
+              style={{
+                color: 'var(--accent-step,#2563eb)',
+                borderColor: 'color-mix(in srgb, var(--accent-step,#2563eb) 30%, transparent)',
+                background: 'color-mix(in srgb, var(--accent-step,#2563eb) 6%, white)',
+              }}
+              title={`Lands on ${role.landsOn.route}`}
+            >
+              {role.landsOn.label} <ArrowUpRight className="h-3 w-3" />
+            </a>
+          )}
+        </div>
+        <p className="text-[13px] text-[var(--ink-700)] mt-1.5 leading-snug">{role.who}</p>
+
+        {role.gates && (
+          <p className="text-[12px] mt-2 leading-snug rounded-md px-2 py-1.5 border border-[var(--ink-100)] bg-[var(--paper)]">
+            <span className="font-semibold text-[var(--ink-900)]">Gates: </span>
+            <span className="text-[var(--ink-700)]">{role.gates}</span>
+          </p>
+        )}
+
+        <ul className="mt-2.5 space-y-1">
+          {role.can.map((c, i) => (
+            <li key={i} className="flex items-start gap-1.5 text-[13px] text-[var(--ink-700)]">
+              <Check className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-green-700" />
+              <span>{c}</span>
+            </li>
+          ))}
+          {role.cannot?.map((c, i) => (
+            <li key={i} className="flex items-start gap-1.5 text-[13px] text-[var(--ink-500)]">
+              <Minus className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-[var(--ink-300)]" />
+              <span>{c}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  )
+}
+
+function RolesView() {
+  const kinds: RoleKind[] = ['org', 'platform', 'overlay']
+  const accessCell = (v: boolean | 'own') =>
+    v === true ? (
+      <Check className="h-4 w-4 text-green-700 mx-auto" />
+    ) : v === 'own' ? (
+      <span className="text-[10px] mono text-[var(--ink-500)]">own</span>
+    ) : (
+      <Minus className="h-4 w-4 text-[var(--ink-300)] mx-auto" />
+    )
+
+  return (
+    <div>
+      <div className="rounded-xl border border-[var(--ink-100)] bg-white p-5 mb-5">
+        <h2 className="text-xl font-semibold text-[var(--ink-900)]">Roles &amp; access</h2>
+        <p className="text-sm text-[var(--ink-700)] mt-2 leading-relaxed">
+          Who can do what. <span className="font-semibold">Organisation roles</span> escalate from Pending to Admin and set
+          where you land after login. <span className="font-semibold">Overlays</span> (department, owner, sub-trade) are
+          <em> not</em> roles — they gate visibility and accountability, never permissions. The admin gate in code is{' '}
+          <span className="mono text-[12px]">[&apos;admin&apos;, &apos;safety_manager&apos;]</span>.
+        </p>
+      </div>
+
+      {kinds.map((kind) => {
+        const items = ROLES.filter((r) => r.kind === kind)
+        if (items.length === 0) return null
+        return (
+          <div key={kind} className="mb-6">
+            <p className="mono text-[10px] uppercase tracking-wider text-[var(--ink-500)] px-1 mb-2">
+              {ROLE_KIND_LABEL[kind]}
+            </p>
+            <div className="grid sm:grid-cols-2 gap-3">
+              {items.map((r) => (
+                <RoleCard key={r.key} role={r} />
+              ))}
+            </div>
+          </div>
+        )
+      })}
+
+      {/* Access matrix */}
+      <div className="mb-2">
+        <p className="mono text-[10px] uppercase tracking-wider text-[var(--ink-500)] px-1 mb-2">
+          Access matrix — organisation roles × surface
+        </p>
+        <div className="rounded-xl border border-[var(--ink-100)] bg-white overflow-hidden overflow-x-auto">
+          <table className="w-full text-[13px] border-collapse">
+            <thead>
+              <tr className="border-b border-[var(--ink-100)] bg-[var(--paper-2)]">
+                <th className="text-left font-semibold text-[var(--ink-900)] px-3 py-2">Surface</th>
+                {ACCESS_ROLE_ORDER.map((rk) => (
+                  <th key={rk} className="font-semibold text-[var(--ink-700)] px-2 py-2 text-center capitalize">
+                    {rk.replace('_', ' ')}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {ACCESS_MATRIX.map((row) => (
+                <tr key={row.route} className="border-b border-[var(--ink-100)] last:border-0">
+                  <td className="px-3 py-2">
+                    <span className="text-[var(--ink-900)]">{row.surface}</span>
+                    <span className="mono text-[11px] text-[var(--ink-500)] ml-2">{row.route}</span>
+                  </td>
+                  {ACCESS_ROLE_ORDER.map((rk) => (
+                    <td key={rk} className="px-2 py-2 text-center">
+                      {accessCell(row.access[rk])}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-[11px] text-[var(--ink-500)] mt-2 px-1">
+          <Check className="inline h-3 w-3 text-green-700" /> full access ·{' '}
+          <span className="mono">own</span> own records only ·{' '}
+          <Minus className="inline h-3 w-3 text-[var(--ink-300)]" /> no access
+        </p>
+      </div>
     </div>
   )
 }
