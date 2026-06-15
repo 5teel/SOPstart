@@ -144,5 +144,16 @@ export default defineConfig({
       testDir: '.',
       testMatch: /(departments-rls|sop-dept-visibility|no-global-blocks-in-journeys|member-dept)\.(test|spec)\.ts$/,
     },
+    {
+      // Phase 25 Plan 04 — /admin/departments e2e smoke spec.
+      //   admin-departments.spec.ts — source-contract assertions for DepartmentCard/Grid/FormModal/page
+      //                               + runtime fixme stubs (REQ-6, D-03, T-25-01)
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // Verify registration: `npx playwright test --list | grep admin-departments`
+      name: 'phase25-e2e',
+      testDir: '.',
+      testMatch: /admin-departments\.(test|spec)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
