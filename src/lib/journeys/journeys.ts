@@ -345,8 +345,23 @@ export const JOURNEYS: Journey[] = [
     steps: [
       { id: 's', type: 'start', label: 'Set up the team' },
       { id: 'team', type: 'screen', label: 'Team management', route: '/admin/team' },
-      { id: 'roles', type: 'action', label: 'Set roles + sub-trades', detail: 'Worker / Supervisor / SOP Admin / Safety Manager.' },
+      { id: 'roles', type: 'action', label: 'Set roles + sub-trades + departments', detail: 'Worker / Supervisor / SOP Admin / Safety Manager. Departments gate SOP visibility.' },
       { id: 'e', type: 'end', label: 'Access configured' },
+    ],
+  },
+
+  {
+    id: 'manage-departments',
+    group: 'Library & team',
+    persona: 'SOP Admin',
+    title: 'Manage departments',
+    summary: 'An admin creates departments, assigns owners, and uses them to organise SOPs, blocks, and team members.',
+    steps: [
+      { id: 's', type: 'start', label: 'Need to organise by department' },
+      { id: 'depts', type: 'screen', label: 'Departments', route: '/admin/departments' },
+      { id: 'create', type: 'action', label: 'Create department', detail: 'Name, code, colour, icon, owner.' },
+      { id: 'owner', type: 'action', label: 'Set owner', detail: 'Clears the "No owner assigned" warning.' },
+      { id: 'e', type: 'end', label: 'Department ready' },
     ],
   },
 
