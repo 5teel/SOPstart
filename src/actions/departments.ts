@@ -332,6 +332,30 @@ export async function setDepartmentOwner(
 }
 
 // ---------------------------------------------------------------------------
+// Junction-write helper.
+//
+// The three junction tables (member/block/sop _departments) have NO authenticated
+// write policy by design (00035: "writes via admin server actions only"). So the
+// assigners below write with the service-role client, which bypasses RLS — meaning
+// the org gate is enforced HERE, not by the database. Every assigner therefore:
+//   1. requireAdmin() (role + organisation_id from JWT, never client input)
+//   2. confirms the parent row (member/block/sop) is in the caller's org
+//   3. filters department ids to the caller's org (orgScopedDeptIds)
+// ---------------------------------------------------------------------------
+
+/** Returns the subset of `ids` that are real departments in `organisationId`. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function orgScopedDeptIds(admin: any, organisationId: string, ids: string[]): Promise<string[]> {
+  if (!ids || ids.length === 0) return []
+  const { data } = await admin
+    .from('departments')
+    .select('id')
+    .eq('organisation_id', organisationId)
+    .in('id', ids)
+  return ((data ?? []) as Array<{ id: string }>).map(d => d.id)
+}
+
+// ---------------------------------------------------------------------------
 // 6. assignMemberDepartments — replace-semantics (REQ-4)
 // ---------------------------------------------------------------------------
 
@@ -343,25 +367,39 @@ export async function assignMemberDepartments(
 
   const ctx = await requireAdmin()
   if ('error' in ctx) return { error: ctx.error }
+  if (!ctx.organisationId) return { error: 'No organisation' }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const admin: any = createAdminClient()
+
+  // Guard: member must belong to the caller's organisation.
+  const { data: memberRow } = await admin
+    .from('organisation_members')
+    .select('user_id')
+    .eq('organisation_id', ctx.organisationId)
+    .eq('user_id', memberId)
+    .maybeSingle()
+  if (!memberRow) return { error: 'Member not found in your organisation' }
+
+  const validIds = await orgScopedDeptIds(admin, ctx.organisationId, departmentIds)
 
   // Replace semantics: delete existing rows for this member, then insert new ones.
-  const { error: delErr } = await ctx.supabase
+  const { error: delErr } = await admin
     .from('member_departments')
     .delete()
     .eq('member_id', memberId)
-
   if (delErr) {
     console.error('[assignMemberDepartments] delete error', delErr)
     return { error: delErr.message }
   }
 
-  if (departmentIds.length > 0) {
-    const rows = departmentIds.map((department_id: string) => ({
+  if (validIds.length > 0) {
+    const rows = validIds.map((department_id: string) => ({
       member_id: memberId,
       department_id,
       assigned_by: ctx.user.id,
     }))
-    const { error: insErr } = await ctx.supabase
+    const { error: insErr } = await admin
       .from('member_departments')
       .insert(rows)
     if (insErr) {
@@ -386,38 +424,38 @@ export async function assignBlockDepartments(
 
   const ctx = await requireAdmin()
   if ('error' in ctx) return { error: ctx.error }
+  if (!ctx.organisationId) return { error: 'No organisation' }
 
-  if (allDepartments) {
-    // D-04: all_departments=true → set flag on block, clear junction rows
-    const { error: flagErr } = await ctx.supabase
-      .from('blocks')
-      .update({ all_departments: true })
-      .eq('id', blockId)
-    if (flagErr) return { error: flagErr.message }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const admin: any = createAdminClient()
 
-    // Clear junction rows (block is now org-wide — no per-dept tags needed)
-    const { error: delErr } = await ctx.supabase
-      .from('block_departments')
-      .delete()
-      .eq('block_id', blockId)
-    if (delErr) return { error: delErr.message }
-  } else {
-    // Clear all_departments flag + replace junction rows
-    const { error: flagErr } = await ctx.supabase
-      .from('blocks')
-      .update({ all_departments: false })
-      .eq('id', blockId)
-    if (flagErr) return { error: flagErr.message }
+  // Guard: block must belong to the caller's organisation.
+  const { data: blockRow } = await admin
+    .from('blocks')
+    .select('id')
+    .eq('id', blockId)
+    .eq('organisation_id', ctx.organisationId)
+    .maybeSingle()
+  if (!blockRow) return { error: 'Block not found in your organisation' }
 
-    const { error: delErr } = await ctx.supabase
-      .from('block_departments')
-      .delete()
-      .eq('block_id', blockId)
-    if (delErr) return { error: delErr.message }
+  // Replace semantics: clear junction rows, set the flag, then re-insert if scoped.
+  const { error: delErr } = await admin
+    .from('block_departments')
+    .delete()
+    .eq('block_id', blockId)
+  if (delErr) return { error: delErr.message }
 
-    if (departmentIds.length > 0) {
-      const rows = departmentIds.map((department_id: string) => ({ block_id: blockId, department_id }))
-      const { error: insErr } = await ctx.supabase
+  const { error: flagErr } = await admin
+    .from('blocks')
+    .update({ all_departments: allDepartments })
+    .eq('id', blockId)
+  if (flagErr) return { error: flagErr.message }
+
+  if (!allDepartments) {
+    const validIds = await orgScopedDeptIds(admin, ctx.organisationId, departmentIds)
+    if (validIds.length > 0) {
+      const rows = validIds.map((department_id: string) => ({ block_id: blockId, department_id }))
+      const { error: insErr } = await admin
         .from('block_departments')
         .insert(rows)
       if (insErr) return { error: insErr.message }
@@ -440,37 +478,38 @@ export async function assignSopDepartments(
 
   const ctx = await requireAdmin()
   if ('error' in ctx) return { error: ctx.error }
+  if (!ctx.organisationId) return { error: 'No organisation' }
 
-  if (allDepartments) {
-    // D-04: all_departments=true → set flag on sop, clear junction rows
-    const { error: flagErr } = await ctx.supabase
-      .from('sops')
-      .update({ all_departments: true })
-      .eq('id', sopId)
-    if (flagErr) return { error: flagErr.message }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const admin: any = createAdminClient()
 
-    const { error: delErr } = await ctx.supabase
-      .from('sop_departments')
-      .delete()
-      .eq('sop_id', sopId)
-    if (delErr) return { error: delErr.message }
-  } else {
-    // Clear all_departments flag + replace junction rows
-    const { error: flagErr } = await ctx.supabase
-      .from('sops')
-      .update({ all_departments: false })
-      .eq('id', sopId)
-    if (flagErr) return { error: flagErr.message }
+  // Guard: SOP must belong to the caller's organisation.
+  const { data: sopRow } = await admin
+    .from('sops')
+    .select('id')
+    .eq('id', sopId)
+    .eq('organisation_id', ctx.organisationId)
+    .maybeSingle()
+  if (!sopRow) return { error: 'SOP not found in your organisation' }
 
-    const { error: delErr } = await ctx.supabase
-      .from('sop_departments')
-      .delete()
-      .eq('sop_id', sopId)
-    if (delErr) return { error: delErr.message }
+  // Replace semantics: clear junction rows, set the flag, then re-insert if scoped.
+  const { error: delErr } = await admin
+    .from('sop_departments')
+    .delete()
+    .eq('sop_id', sopId)
+  if (delErr) return { error: delErr.message }
 
-    if (departmentIds.length > 0) {
-      const rows = departmentIds.map((department_id: string) => ({ sop_id: sopId, department_id }))
-      const { error: insErr } = await ctx.supabase
+  const { error: flagErr } = await admin
+    .from('sops')
+    .update({ all_departments: allDepartments })
+    .eq('id', sopId)
+  if (flagErr) return { error: flagErr.message }
+
+  if (!allDepartments) {
+    const validIds = await orgScopedDeptIds(admin, ctx.organisationId, departmentIds)
+    if (validIds.length > 0) {
+      const rows = validIds.map((department_id: string) => ({ sop_id: sopId, department_id }))
+      const { error: insErr } = await admin
         .from('sop_departments')
         .insert(rows)
       if (insErr) return { error: insErr.message }
