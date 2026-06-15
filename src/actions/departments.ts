@@ -355,6 +355,22 @@ async function orgScopedDeptIds(admin: any, organisationId: string, ids: string[
   return ((data ?? []) as Array<{ id: string }>).map(d => d.id)
 }
 
+/**
+ * Authoritative organisation for the caller — read from their live
+ * organisation_members row, NOT the parsed JWT claim (which can lag a role/org
+ * change until the token refreshes). Falls back to the JWT claim only if no
+ * membership row is found.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function callerOrgId(admin: any, ctx: AdminCtx): Promise<string | null> {
+  const { data } = await admin
+    .from('organisation_members')
+    .select('organisation_id')
+    .eq('user_id', ctx.user.id)
+    .maybeSingle()
+  return (data?.organisation_id as string | undefined) ?? ctx.organisationId
+}
+
 // ---------------------------------------------------------------------------
 // 6. assignMemberDepartments — replace-semantics (REQ-4)
 // ---------------------------------------------------------------------------
@@ -367,21 +383,22 @@ export async function assignMemberDepartments(
 
   const ctx = await requireAdmin()
   if ('error' in ctx) return { error: ctx.error }
-  if (!ctx.organisationId) return { error: 'No organisation' }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const admin: any = createAdminClient()
+  const orgId = await callerOrgId(admin, ctx)
+  if (!orgId) return { error: 'No organisation' }
 
   // Guard: member must belong to the caller's organisation.
   const { data: memberRow } = await admin
     .from('organisation_members')
-    .select('user_id')
-    .eq('organisation_id', ctx.organisationId)
+    .select('organisation_id')
     .eq('user_id', memberId)
     .maybeSingle()
-  if (!memberRow) return { error: 'Member not found in your organisation' }
+  if (!memberRow) return { error: 'Member not found' }
+  if (memberRow.organisation_id !== orgId) return { error: 'Member belongs to another organisation' }
 
-  const validIds = await orgScopedDeptIds(admin, ctx.organisationId, departmentIds)
+  const validIds = await orgScopedDeptIds(admin, orgId, departmentIds)
 
   // Replace semantics: delete existing rows for this member, then insert new ones.
   const { error: delErr } = await admin
@@ -424,19 +441,25 @@ export async function assignBlockDepartments(
 
   const ctx = await requireAdmin()
   if ('error' in ctx) return { error: ctx.error }
-  if (!ctx.organisationId) return { error: 'No organisation' }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const admin: any = createAdminClient()
+  const orgId = await callerOrgId(admin, ctx)
+  if (!orgId) return { error: 'No organisation' }
 
-  // Guard: block must belong to the caller's organisation.
+  // Guard: block must exist and not belong to a DIFFERENT org (null-org legacy rows OK).
   const { data: blockRow } = await admin
     .from('blocks')
-    .select('id')
+    .select('id, organisation_id')
     .eq('id', blockId)
-    .eq('organisation_id', ctx.organisationId)
     .maybeSingle()
-  if (!blockRow) return { error: 'Block not found in your organisation' }
+  if (!blockRow) return { error: 'Block not found' }
+  if (blockRow.organisation_id && blockRow.organisation_id !== orgId) {
+    return { error: 'Block belongs to another organisation' }
+  }
+  if (!blockRow.organisation_id) {
+    await admin.from('blocks').update({ organisation_id: orgId }).eq('id', blockId)
+  }
 
   // Replace semantics: clear junction rows, set the flag, then re-insert if scoped.
   const { error: delErr } = await admin
@@ -452,7 +475,7 @@ export async function assignBlockDepartments(
   if (flagErr) return { error: flagErr.message }
 
   if (!allDepartments) {
-    const validIds = await orgScopedDeptIds(admin, ctx.organisationId, departmentIds)
+    const validIds = await orgScopedDeptIds(admin, orgId, departmentIds)
     if (validIds.length > 0) {
       const rows = validIds.map((department_id: string) => ({ block_id: blockId, department_id }))
       const { error: insErr } = await admin
@@ -478,19 +501,27 @@ export async function assignSopDepartments(
 
   const ctx = await requireAdmin()
   if ('error' in ctx) return { error: ctx.error }
-  if (!ctx.organisationId) return { error: 'No organisation' }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const admin: any = createAdminClient()
+  const orgId = await callerOrgId(admin, ctx)
+  if (!orgId) return { error: 'No organisation' }
 
-  // Guard: SOP must belong to the caller's organisation.
+  // Guard: SOP must exist and not belong to a DIFFERENT org. Legacy SOPs with a
+  // null organisation_id (visible to the admin via the department/all-departments
+  // RLS arm) are allowed and healed — this is what caused the false "not found".
   const { data: sopRow } = await admin
     .from('sops')
-    .select('id')
+    .select('id, organisation_id')
     .eq('id', sopId)
-    .eq('organisation_id', ctx.organisationId)
     .maybeSingle()
-  if (!sopRow) return { error: 'SOP not found in your organisation' }
+  if (!sopRow) return { error: 'SOP not found' }
+  if (sopRow.organisation_id && sopRow.organisation_id !== orgId) {
+    return { error: 'SOP belongs to another organisation' }
+  }
+  if (!sopRow.organisation_id) {
+    await admin.from('sops').update({ organisation_id: orgId }).eq('id', sopId)
+  }
 
   // Replace semantics: clear junction rows, set the flag, then re-insert if scoped.
   const { error: delErr } = await admin
@@ -506,7 +537,7 @@ export async function assignSopDepartments(
   if (flagErr) return { error: flagErr.message }
 
   if (!allDepartments) {
-    const validIds = await orgScopedDeptIds(admin, ctx.organisationId, departmentIds)
+    const validIds = await orgScopedDeptIds(admin, orgId, departmentIds)
     if (validIds.length > 0) {
       const rows = validIds.map((department_id: string) => ({ sop_id: sopId, department_id }))
       const { error: insErr } = await admin
