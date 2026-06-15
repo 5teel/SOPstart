@@ -44,7 +44,6 @@ export const JOURNEY_GROUPS = [
   'Create an SOP',
   'Refine & publish',
   'Library & team',
-  'Platform admin',
   'Everyone',
 ] as const
 
@@ -362,22 +361,6 @@ export const JOURNEYS: Journey[] = [
       { id: 'create', type: 'action', label: 'Create department', detail: 'Name, code, colour, icon, owner.' },
       { id: 'owner', type: 'action', label: 'Set owner', detail: 'Clears the "No owner assigned" warning.' },
       { id: 'e', type: 'end', label: 'Department ready' },
-    ],
-  },
-
-  // ============================ Platform admin ============================
-  {
-    id: 'curate-globals',
-    group: 'Platform admin',
-    persona: 'Platform Admin (Potenco)',
-    title: 'Curate global blocks',
-    summary: 'A platform admin maintains the shared global block library and reviews org-submitted suggestions.',
-    steps: [
-      { id: 's', type: 'start', label: 'Curate shared content' },
-      { id: 'globals', type: 'screen', label: 'Global blocks', route: '/admin/global-blocks' },
-      { id: 'sugg', type: 'screen', label: 'Suggestions', route: '/admin/global-blocks/suggestions' },
-      { id: 'review', type: 'action', label: 'Approve / reject', detail: 'Approved blocks become available to all orgs.' },
-      { id: 'e', type: 'end', label: 'Library curated' },
     ],
   },
 

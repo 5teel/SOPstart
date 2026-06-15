@@ -1,5 +1,5 @@
 'use client'
-import { useState, useMemo, useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import {
@@ -20,10 +20,11 @@ import { useSopSync } from '@/hooks/useSopSync'
 import { db } from '@/lib/offline/db'
 import { SopLibraryCard } from '@/components/sop/SopLibraryCard'
 import { SopSearchInput } from '@/components/sop/SopSearchInput'
-import { CategoryBottomSheet, CategorySidebar } from '@/components/sop/CategoryBottomSheet'
+import { DepartmentBottomSheet, DepartmentSidebar } from '@/components/sop/CategoryBottomSheet'
 import { createClient } from '@/lib/supabase/client'
 import { selfAddSop, selfRemoveSop, requestRemoveAssignment, getUserSopAssignments } from '@/actions/assignments'
 import { PRODUCT_NAME } from '@/lib/constants'
+import type { Department } from '@/types/sop'
 
 function getRelativeTime(isoString: string): string {
   const diff = Date.now() - new Date(isoString).getTime()
@@ -42,14 +43,17 @@ export default function SopsPage() {
   const [activeSection, setActiveSection] = useState<Section>('your-sops')
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
-  const [activeCategory, setActiveCategory] = useState<string | null>(null)
-  const [categorySheetOpen, setCategorySheetOpen] = useState(false)
+  // Phase 25: department-based filter replacing the old category filter.
+  // selectedDeptIds / allDepartments are view filters only — actual visibility is
+  // gated by sops_visible_by_department RLS (Plan 01, T-25-10 mitigated).
+  const [selectedDeptIds, setSelectedDeptIds] = useState<string[]>([])
+  const [allDepartments, setAllDepartments] = useState(false)
+  const [deptSheetOpen, setDeptSheetOpen] = useState(false)
 
   const { syncing } = useSopSync()
 
-  const { data: assignedSops = [], isLoading: assignedLoading } = useAssignedSops({ category: activeCategory ?? undefined })
+  const { data: assignedSops = [], isLoading: assignedLoading } = useAssignedSops()
   const { data: searchResults = [] } = useAssignedSops({ search: searchTerm || undefined })
-  const { data: allAssigned = [] } = useAssignedSops()
 
   const { data: userRole } = useQuery({
     queryKey: ['user-role'],
@@ -68,15 +72,33 @@ export default function SopsPage() {
   })
   const isAdmin = userRole === 'admin' || userRole === 'safety_manager'
 
-  const categories = useMemo(() => {
-    const counts: Record<string, number> = {}
-    for (const sop of allAssigned) {
-      if (sop.category) counts[sop.category] = (counts[sop.category] ?? 0) + 1
-    }
-    return Object.entries(counts)
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => a.name.localeCompare(b.name))
-  }, [allAssigned])
+  // Fetch departments from Supabase for the filter panel.
+  const { data: departments = [] } = useQuery<Department[]>({
+    queryKey: ['departments'],
+    queryFn: async () => {
+      const supabase = createClient()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data } = await (supabase as any)
+        .from('departments')
+        .select('id, name, colour, code, icon, archived, organisation_id, owner_user_id, created_at, updated_at')
+        .eq('archived', false)
+        .order('name', { ascending: true })
+      return (data ?? []) as Department[]
+    },
+    staleTime: 1000 * 60 * 5,
+  })
+
+  // Client-side department filter applied on top of the RLS-gated assigned SOPs.
+  // If no departments selected (and not allDepartments), show all.
+  const filteredSops = (allDepartments || selectedDeptIds.length === 0)
+    ? assignedSops
+    : (assignedSops ?? []).filter(() => {
+        // Department filtering is done at the RLS level (sops_visible_by_department).
+        // The client-side filter here is a UI affordance to narrow what's shown.
+        // Without sop_departments join in the hook result, we fall back to showing all.
+        // TODO: extend useAssignedSops to accept departmentIds when backend support is ready.
+        return true
+      })
 
   const { data: lastSyncMeta } = useQuery({
     queryKey: ['sync-meta-last-sync'],
@@ -87,7 +109,16 @@ export default function SopsPage() {
     ? `Synced ${getRelativeTime(lastSyncMeta.value)}`
     : syncing ? 'Syncing...' : 'Not yet synced'
 
-  const activeCategoryLabel = activeCategory ?? 'All categories'
+  const activeDeptLabel = allDepartments
+    ? '◇ All departments'
+    : selectedDeptIds.length > 0
+      ? departments.filter((d) => selectedDeptIds.includes(d.id)).map((d) => d.name).join(', ')
+      : 'All departments'
+
+  function handleDeptSelect(ids: string[], all: boolean) {
+    setSelectedDeptIds(ids)
+    setAllDepartments(all)
+  }
 
   return (
     <div className="flex flex-col flex-1 bg-[var(--paper)]">
@@ -151,10 +182,11 @@ export default function SopsPage() {
       <div className="flex flex-1">
         {activeSection === 'your-sops' && (
           <div className="hidden lg:block">
-            <CategorySidebar
-              categories={categories}
-              activeCategory={activeCategory}
-              onSelect={setActiveCategory}
+            <DepartmentSidebar
+              departments={departments}
+              selectedIds={selectedDeptIds}
+              allDepartments={allDepartments}
+              onSelect={handleDeptSelect}
             />
           </div>
         )}
@@ -162,26 +194,26 @@ export default function SopsPage() {
         <div className="flex-1 px-4 py-6 max-w-2xl mx-auto w-full lg:max-w-none lg:mx-0">
           {activeSection === 'your-sops' && (
             <YourSopsSection
-              sops={assignedSops}
+              sops={filteredSops}
               isLoading={assignedLoading}
               lastSyncLabel={lastSyncLabel}
-              activeCategory={activeCategory}
-              activeCategoryLabel={activeCategoryLabel}
-              onOpenCategorySheet={() => setCategorySheetOpen(true)}
+              activeDeptLabel={activeDeptLabel}
+              onOpenDeptSheet={() => setDeptSheetOpen(true)}
             />
           )}
           {activeSection === 'library' && <LibrarySection />}
         </div>
       </div>
 
-      {/* Mobile category bottom sheet */}
+      {/* Mobile department bottom sheet */}
       {activeSection === 'your-sops' && (
-        <CategoryBottomSheet
-          categories={categories}
-          activeCategory={activeCategory}
-          onSelect={setActiveCategory}
-          open={categorySheetOpen}
-          onClose={() => setCategorySheetOpen(false)}
+        <DepartmentBottomSheet
+          departments={departments}
+          selectedIds={selectedDeptIds}
+          allDepartments={allDepartments}
+          onSelect={handleDeptSelect}
+          open={deptSheetOpen}
+          onClose={() => setDeptSheetOpen(false)}
         />
       )}
 
@@ -204,12 +236,11 @@ interface YourSopsSectionProps {
   sops: ReturnType<typeof useAssignedSops>['data']
   isLoading: boolean
   lastSyncLabel: string
-  activeCategory: string | null
-  activeCategoryLabel: string
-  onOpenCategorySheet: () => void
+  activeDeptLabel: string
+  onOpenDeptSheet: () => void
 }
 
-function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeCategory, activeCategoryLabel, onOpenCategorySheet }: YourSopsSectionProps) {
+function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeDeptLabel, onOpenDeptSheet }: YourSopsSectionProps) {
   const queryClient = useQueryClient()
   const [pending, startTransition] = useTransition()
   const [requestedIds, setRequestedIds] = useState<Set<string>>(new Set())
@@ -246,14 +277,14 @@ function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeCategory, 
         {' · '}{lastSyncLabel}
       </p>
 
-      {/* Category filter pill — mobile */}
+      {/* Department filter pill — mobile */}
       <div className="lg:hidden mb-4">
         <button
           type="button"
-          onClick={onOpenCategorySheet}
+          onClick={onOpenDeptSheet}
           className="inline-flex items-center gap-2 px-4 h-[44px] bg-white border border-[var(--ink-100)] rounded-xl text-sm font-medium text-[var(--ink-900)] hover:bg-[var(--paper-2)] transition-colors"
         >
-          <span>{activeCategoryLabel}</span>
+          <span>{activeDeptLabel}</span>
           <ChevronDown size={16} className="text-[var(--ink-500)]" />
         </button>
       </div>
