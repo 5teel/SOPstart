@@ -142,7 +142,7 @@ export default defineConfig({
       // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
       name: 'phase25-integration',
       testDir: '.',
-      testMatch: /(departments-rls|sop-dept-visibility|no-global-blocks-in-journeys)\.(test|spec)\.ts$/,
+      testMatch: /(departments-rls|sop-dept-visibility|no-global-blocks-in-journeys|member-dept)\.(test|spec)\.ts$/,
     },
   ],
 })
