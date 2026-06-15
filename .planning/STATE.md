@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
 status: Ready to execute
-stopped_at: Completed 25-03-PLAN.md
-last_updated: "2026-06-15T02:36:00.369Z"
+stopped_at: Completed 25-05-PLAN.md
+last_updated: "2026-06-15T02:52:29.911Z"
 progress:
   total_phases: 28
   completed_phases: 3
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 25 (department-first-class-entity) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 **Milestone status:** v4.0 started 2026-05-24. 3 phases / 40 requirements (1 of 3 phases complete). See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
 **Active phase:** 21.5
@@ -134,6 +134,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 24 P24-03 | 25m | 4 tasks | 9 files |
 | Phase 25-department-first-class-entity P03 | 45min | 3 tasks | 16 files |
 | Phase 25-department-first-class-entity P04 | 496 | 3 tasks | 7 files |
+| Phase 25 P05 | 10m | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -237,6 +238,9 @@ Recent decisions affecting current work:
 - [Phase ?]: setDepartmentOwner creates fresh supabase client (not any-cast) for organisation_members check to ensure type safety on the RLS-guarded query
 - [Phase ?]: WizardClient.tsx passes empty departmentIds/allDepartments defaults — full DepartmentPicker integration deferred to Wave 4 plan 25-04
 - [Phase ?]: global-blocks/page.tsx and suggestions/page.tsx redirect to /admin/blocks — Wave 4 plan 25-05 will delete the route segments entirely
+- [Phase ?]: Department-filtered block library uses separate block_departments junction query in page augmented via blockDeptMap
+- [Phase ?]: is_platform_admin() RPC retained — /admin/global-blocks UI removed but RPC still referenced by ai_review_results RLS in migration 00032
+- [Phase ?]: DepartmentBottomSheet uses draft-commit pattern (Done button) for mobile; DepartmentSidebar uses direct-toggle for desktop
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -345,7 +349,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-15T02:36:00.362Z
-Stopped at: Completed 25-03-PLAN.md
-Resume file: .planning/phases/25-department-first-class-entity/25-02-PLAN.md
+Last session: 2026-06-15T02:52:29.904Z
+Stopped at: Completed 25-05-PLAN.md
+Resume file: None
 Awaiting: Plan 02 execution (apply migrations to live DB + cross-tenant/visibility/no-recursion integration tests).
