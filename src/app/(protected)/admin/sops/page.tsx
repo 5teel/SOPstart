@@ -180,11 +180,11 @@ export default async function SopsLibraryPage({
             {sops.map((sop: any) => {
               const canEditInBuilder = sop.source_type && sop.source_type !== 'uploaded'
               return (
-                <li key={sop.id} className="flex flex-col gap-1.5">
-                  <div className="flex items-stretch gap-2">
+                <li key={sop.id} className="flex items-stretch gap-2">
+                  <div className="blueprint-frame flex-1 min-w-0 hover:shadow-[0_0_0_1px_var(--ink-900)] transition-shadow">
                   <Link
                     href={`/admin/sops/builder/${sop.id}`}
-                    className="blueprint-frame flex-1 min-w-0 flex items-center gap-4 hover:shadow-[0_0_0_1px_var(--ink-900)] transition-shadow"
+                    className="flex items-center gap-4"
                   >
                     <div className="flex-1 min-w-0">
                       <p className="text-base font-semibold text-[var(--ink-900)] truncate">
@@ -213,6 +213,15 @@ export default async function SopsLibraryPage({
                     </div>
                     <StatusBadge status={sop.status as SopStatus} />
                   </Link>
+                  <div className="mt-2 pt-2 border-t border-[var(--ink-100)]">
+                    <SopDepartmentEditor
+                      sopId={sop.id}
+                      departments={departments}
+                      selectedIds={deptIdsForSop[sop.id] ?? []}
+                      allDepartments={sop.all_departments ?? false}
+                    />
+                  </div>
+                  </div>
                   {sop.status === 'published' && (
                     <VideoJobIndicator sopId={sop.id} />
                   )}
@@ -268,13 +277,6 @@ export default async function SopsLibraryPage({
                       <DeleteSopButton sopId={sop.id} />
                     </div>
                   )}
-                  </div>
-                  <SopDepartmentEditor
-                    sopId={sop.id}
-                    departments={departments}
-                    selectedIds={deptIdsForSop[sop.id] ?? []}
-                    allDepartments={sop.all_departments ?? false}
-                  />
                 </li>
               )
             })}
