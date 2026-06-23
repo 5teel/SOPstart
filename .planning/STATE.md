@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
-status: Ready to discuss Phase 22
-stopped_at: Phase 22 context gathered
+status: Ready to execute Phase 22
+stopped_at: Phase 22 planned — 4 plans / 3 waves, plan-checker PASSED (2 blockers fixed in revision)
 last_updated: "2026-06-23T14:15:51.062Z"
 progress:
   total_phases: 28
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 22 — voice-driven-walkthrough (context gathered 2026-06-23, ready to plan)
+**Current focus:** Phase 22 — voice-driven-walkthrough (planned 2026-06-24, ready to execute)
 
 ## Current Position
 
 Phase: 22 — Voice-Driven Walkthrough
-Plan: Not started (CONTEXT.md captured; next is /gsd-plan-phase 22)
+Plan: 4 plans / 3 waves, verified (plan-checker PASSED) — next is /gsd-execute-phase 22
 **Milestone status:** v4.0 started 2026-05-24. Phases 21, 21.5, 21.6, 24, 25 ✅ complete; 22 + 23 remaining. See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
 **Active phase:** 22
@@ -36,7 +36,7 @@ Plan: Not started (CONTEXT.md captured; next is /gsd-plan-phase 22)
 2. **Phase 22 — Voice-Driven Walkthrough** (next): W-01 literacy/visual/voice gaps + X-02 voice-driven walkthrough. 8 requirements (VDW-LIT ×4, VDW-VOICE ×4).
 3. **Phase 23 — AI Field Layer + Version Supersede**: X-03 universal AI read/write + G-01 version supersede + worker-instance sign-off. 9 requirements (AFL-AI ×4, AFL-VER ×5).
 
-**Next action:** /gsd-plan-phase 22 (Voice-Driven Walkthrough; CONTEXT.md gathered 2026-06-23 — see `.planning/phases/22-voice-driven-walkthrough/22-CONTEXT.md`). Key locks: lightweight voice "next" (D-01), push-to-talk + tap fallback (D-03), always-on visual layer mobile-first (D-05), **English-only — multi-language VDW-LIT-04/VDW-VOICE-04 deferred** (D-08). Also outstanding: Phase 25 human UAT (7 tests, `25-HUMAN-UAT.md`) + Phase 21.6 4-item human UAT on sopstart.com.
+**Next action:** /gsd-execute-phase 22 (Voice-Driven Walkthrough; 4 plans / 3 waves planned + verified 2026-06-24). Waves: W0 = 22-01 (phase22-stubs test scaffold); W1 = 22-02 (Deepgram keyterms + /api/voice/tts + useTtsPlayback + classifyIntent) ∥ 22-04 (always-on visual layer); W2 = 22-03 (live wiring onVoiceNext→handleMarkComplete + STT/intent/TTS + **blocking human UAT on sopstart.com**). Run W2 sequentially on main tree (cross-wave imports + human gate; 2026-06-02 worktree-base learning). Key locks: lightweight voice "next" (D-01), PTT+tap fallback (D-03), always-on visual layer mobile-first (D-05), **English-only — VDW-LIT-04/VDW-VOICE-04 deferred** (D-08). TTS=gpt-4o-mini-tts, STT=Deepgram nova-3 (both reuse existing code; no new npm deps). Also outstanding: Phase 25 human UAT (7 tests) + Phase 21.6 4-item human UAT on sopstart.com.
 
 **Roadmap evolution:** Phase 21.6 (Builder Edit Stage Redesign) INSERTED after 21.5, before 22, on 2026-06-05. Reason: 21.5 redesigned the Review/Publish stages but the Build/edit stage is still the untouched Puck editor — first-time admins hit jargon ("Block"), two redundant block lists (palette vs outline), unanchored canvas figures, and a cramped right-rail field editor. Decision by Simon during 21.5 UAT.
 
