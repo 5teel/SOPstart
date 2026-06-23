@@ -414,14 +414,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 - [ ] **VDW-LIT-01**: A worker with low literacy can complete an SOP without requiring fluent reading
 - [ ] **VDW-LIT-02**: A worker can complete an SOP entirely visually — diagrams, photos, icons — no required reading
 - [ ] **VDW-LIT-03**: A worker can complete an SOP entirely by voice — AI reads steps aloud, listens for "done," asks questions back
-- [ ] **VDW-LIT-04**: Walkthrough UI supports multi-language rendering (Te Reo, Tagalog, Hindi, Mandarin priority languages for NZ industrial sites)
+- [→] **VDW-LIT-04**: Walkthrough UI supports multi-language rendering (Te Reo, Tagalog, Hindi, Mandarin priority languages for NZ industrial sites) — **DEFERRED out of Phase 22 to a fast-follow** (CONTEXT D-08, 2026-06-23): Phase 22 ships English-only to prove the voice loop end-to-end first; multi-language adds translation-correctness risk and Te Reo STT/TTS vendor support is weak
 
 **Voice Q&A — Voice-Driven Mode (X-02):**
 
 - [ ] **VDW-VOICE-01**: Voice input transcribed reliably in industrial-floor noise (factory ambient, machinery) — accuracy target ≥ 90% for common SOP vocabulary
 - [ ] **VDW-VOICE-02**: AI answer is read back aloud — full audio loop, no required screen reading
 - [ ] **VDW-VOICE-03**: Voice Q&A drives step progression — "I've done step 4, what's next" advances the walkthrough state
-- [ ] **VDW-VOICE-04**: Multi-language voice input + output (matches VDW-LIT-04 language set)
+- [→] **VDW-VOICE-04**: Multi-language voice input + output (matches VDW-LIT-04 language set) — **DEFERRED out of Phase 22 to a fast-follow** (CONTEXT D-08, 2026-06-23): English-only this phase
 
 ### AI Field Layer + Version Supersede (Phase 23)
 

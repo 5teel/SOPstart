@@ -4,7 +4,7 @@ milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
 status: Ready to discuss Phase 22
 stopped_at: Phase 22 context gathered
-last_updated: "2026-06-23T13:08:47.065Z"
+last_updated: "2026-06-23T14:15:51.062Z"
 progress:
   total_phases: 28
   completed_phases: 3
