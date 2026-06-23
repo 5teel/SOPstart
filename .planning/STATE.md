@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
-status: Ready to plan
-stopped_at: Completed 25-06-PLAN.md (Phase 25 complete — all 6 plans executed)
-last_updated: "2026-06-15T03:20:35.259Z"
+status: Ready to discuss Phase 22
+stopped_at: Phase 22 context gathered
+last_updated: "2026-06-23T13:08:47.065Z"
 progress:
   total_phases: 28
   completed_phases: 3
@@ -355,7 +355,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-15T03:03:00Z
-Stopped at: Completed 25-06-PLAN.md (Phase 25 complete — all 6 plans executed)
-Resume file: None
-Awaiting: Human UAT on sopstart.com (member dept assignment + owner badge + both create-SOP dept paths). Apply migrations 00035/00036 to live DB to activate runtime integration specs.
+Last session: 2026-06-23T13:08:47.058Z
+Stopped at: Phase 22 context gathered
+Resume file: .planning/phases/22-voice-driven-walkthrough/22-CONTEXT.md
+Awaiting: (1) Phase 25 human UAT on sopstart.com — 7 tests still pending; apply migrations 00035/00036 to live DB to activate runtime integration specs. (2) Phase 22 discussion → plan → execute.
