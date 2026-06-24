@@ -1,11 +1,23 @@
 'use client'
 import { useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { CheckCircle2, Camera, X } from 'lucide-react'
+import { CheckCircle2, Camera, X, AlertTriangle, Shield, Siren, ListChecks, ClipboardCheck } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { useWalkthroughStore } from '@/stores/walkthrough'
 import { removePhoto } from '@/hooks/usePhotoQueue'
+import { SopImageInline } from '@/components/sop/SopImageInline'
 import type { SopWithSections } from '@/types/sop'
 import type { QueuedPhoto } from '@/lib/offline/db'
+
+// Phase 22 VDW-LIT-01: block-type icon fallback map — never blank visual area (D-05, D-06)
+const SECTION_TYPE_ICONS: Record<string, LucideIcon> = {
+  hazard: AlertTriangle,
+  hazards: AlertTriangle,
+  ppe: Shield,
+  emergency: Siren,
+  steps: ListChecks,
+  signoff: ClipboardCheck,
+}
 
 interface Props {
   sop: SopWithSections
@@ -35,9 +47,18 @@ export function ImmersiveStepCard({ sop, onStepChange, completedSteps, stepPhoto
 
   const prev = steps[currentIdx - 1]
   const next = steps[currentIdx + 1]
-  const sectionTitle =
-    sop.sop_sections.find((s) => (s.sop_steps ?? []).some((st) => st.id === current.id))?.title ??
-    'Section'
+
+  // Find the section that owns this step — reuse same lookup for title, section_type, and sop_images
+  const ownerSection = sop.sop_sections.find((s) => (s.sop_steps ?? []).some((st) => st.id === current.id))
+  const sectionTitle = ownerSection?.title ?? 'Section'
+  const sectionType = ownerSection?.section_type ?? 'steps'
+
+  // Phase 22 VDW-LIT-02: filter step images from the owning section's sop_images join
+  const stepImages = (ownerSection?.sop_images ?? []).filter((img) => img.step_id === current.id)
+
+  // Icon fallback: derived from section type, defaulting to ListChecks for unknown types (D-06)
+  const Icon: LucideIcon = SECTION_TYPE_ICONS[sectionType.toLowerCase()] ?? ListChecks
+
   const locked = !!lockedSteps[current.id]
   const done = completedSteps?.has(current.id) ?? false
 
@@ -96,6 +117,23 @@ export function ImmersiveStepCard({ sop, onStepChange, completedSteps, stepPhoto
             Est. {current.time_estimate_minutes} min
           </p>
         )}
+
+        {/* Phase 22 VDW-LIT-02: always-on visual layer — photo when authored, icon when not (D-05) */}
+        <div className="mt-4">
+          {stepImages.length > 0 ? (
+            stepImages
+              .slice()
+              .sort((a, b) => a.sort_order - b.sort_order)
+              .map((img) => (
+                <SopImageInline key={img.id} src={img.storage_path} alt={img.alt_text ?? current.text} />
+              ))
+          ) : (
+            <div className="flex items-center gap-2 text-[var(--ink-400)]">
+              <Icon className="h-8 w-8" aria-hidden="true" />
+              <span className="mono text-[11px] uppercase tracking-wider">{sectionType}</span>
+            </div>
+          )}
+        </div>
 
         {/* Evidence capture grid — shown when step requires a photo and isn't complete */}
         {current.photo_required && !done && (
