@@ -90,6 +90,27 @@ function slugify(label: string): string {
   return label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
 }
 
+/**
+ * Maps the specific error codes thrown by startVoiceStream (propagated from
+ * /api/voice/token) to worker-readable text. Unknown codes fall back to the raw
+ * message so nothing is silently swallowed (Phase 22 UAT — token_grant_failed
+ * was opaque about a Railway env-var mismatch).
+ */
+function friendlyVoiceError(raw: string): string {
+  switch (raw) {
+    case 'deepgram_not_configured':
+      return 'Voice isn’t set up on the server yet (speech key missing). Please tell your administrator — you can still type your question below.'
+    case 'token_grant_failed':
+      return 'Couldn’t start voice right now (speech service rejected the request). You can still type your question below.'
+    case 'unauthorized':
+      return 'Your session expired. Please refresh and sign in again.'
+    case 'Voice capture not supported in this browser':
+      return 'Voice isn’t supported in this browser. You can still type your question below.'
+    default:
+      return raw
+  }
+}
+
 export function WalkthroughVoiceModal({
   sopId,
   onClose,
@@ -199,12 +220,12 @@ export function WalkthroughVoiceModal({
       })
 
       h.onError((err) => {
-        setErrorMsg(err.message)
+        setErrorMsg(friendlyVoiceError(err.message))
         setState('error')
         streamHandleRef.current = null
       })
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'mic_start_failed')
+      setErrorMsg(friendlyVoiceError(err instanceof Error ? err.message : 'mic_start_failed'))
       setState('error')
     }
   }

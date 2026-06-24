@@ -25,7 +25,21 @@ export async function startVoiceStream(opts: VoiceStreamOpts): Promise<StreamHan
 
   // 1. Mint ephemeral token server-side
   const tokenRes = await fetch('/api/voice/token', { method: 'POST' })
-  if (!tokenRes.ok) throw new Error('token_grant_failed')
+  if (!tokenRes.ok) {
+    // Surface the SPECIFIC server cause instead of a blanket 'token_grant_failed'.
+    // The route distinguishes: 401 unauthorized, 503 deepgram_not_configured
+    // (DEEPGRAM_API_KEY missing in the deploy env), 502 token_grant_failed
+    // (key present but rejected by Deepgram). Collapsing these to one string made
+    // a Railway env-var mismatch indistinguishable from a code bug (Phase 22 UAT).
+    let code = 'token_grant_failed'
+    try {
+      const body = (await tokenRes.json()) as { error?: string }
+      if (body?.error) code = body.error
+    } catch {
+      /* non-JSON error body — keep default code */
+    }
+    throw new Error(code)
+  }
   const { access_token } = (await tokenRes.json()) as { access_token: string }
 
   // 2. Build Deepgram URL with format-matched encoding (Pitfall 9)
