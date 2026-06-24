@@ -4,6 +4,7 @@ import { pickRecorderFormat, type RecorderFormat } from './media-recorder'
 export interface VoiceStreamOpts {
   language: 'en-NZ' | 'en-AU' | 'en-US'
   numerals?: boolean // true for MeasurementBlock — biases "twenty two point five" → "22.5"
+  keyterms?: string[] // Phase 22 — SOP vocabulary injection (max 100) for ≥90% noise-accuracy target (VDW-VOICE-01)
 }
 
 export interface StreamHandle {
@@ -40,6 +41,14 @@ export async function startVoiceStream(opts: VoiceStreamOpts): Promise<StreamHan
     vad_events: 'true',
   })
   if (opts.numerals) params.set('numerals', 'true')
+  // Phase 22 — inject SOP vocabulary as per-term keyterm params (VDW-VOICE-01).
+  // Deepgram keyterms API requires one `keyterm=` append per term (not a joined list).
+  // Capped at 100 terms to match Deepgram's documented limit.
+  if (opts.keyterms?.length) {
+    for (const kt of opts.keyterms.slice(0, 100)) {
+      params.append('keyterm', kt)
+    }
+  }
 
   // 3. Open WebSocket with Sec-WebSocket-Protocol subprotocol auth (Pitfall 3)
   const ws = new WebSocket(`wss://api.deepgram.com/v1/listen?${params}`, [
