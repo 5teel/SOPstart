@@ -128,7 +128,11 @@ export async function startVoiceStream(opts: VoiceStreamOpts): Promise<StreamHan
         lastFinalConfidence = alt.confidence ?? lastFinalConfidence
         finalCb(lastFinalTranscript, lastFinalConfidence)
       } else {
-        partialCb(alt.transcript)
+        // Surface accumulated finals + the current interim segment so the UI
+        // shows the WHOLE question as it grows across pauses (Deepgram emits a
+        // separate is_final per segment; a bare interim would drop earlier finals).
+        const interim = (lastFinalTranscript ? lastFinalTranscript + ' ' : '') + alt.transcript
+        partialCb(interim)
       }
     } catch {
       /* malformed frame — ignore */

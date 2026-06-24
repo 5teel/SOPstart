@@ -214,8 +214,11 @@ export function WalkthroughVoiceModal({
       })
 
       h.onFinal((text) => {
+        // Keep the box in sync with the full accumulated transcript. Only voice
+        // NAVIGATION commands auto-act on a final; QUESTIONS keep listening and
+        // accumulating until the worker taps Stop — so a mid-question pause no
+        // longer truncates and submits half a question.
         setTranscript(text)
-        setState('transcribing')
         void handleFinalTranscript(text)
       })
 
@@ -269,11 +272,10 @@ export function WalkthroughVoiceModal({
       onAdvance?.()
       setState('idle')
     } else {
-      // 'question' — route to the Q&A path. Pass the freshly-finalised text
-      // explicitly: handleFinalTranscript runs from the Deepgram onFinal
-      // callback registered at mic-start, whose closure has a STALE `transcript`
-      // ('') — relying on the closed-over state here would lose the question.
-      void stopAndAsk(text)
+      // 'question' — do NOT submit here. Stay in 'listening' and let the
+      // transcript keep accumulating across pauses; the worker taps Stop
+      // (handleStopListening → stopAndAsk) to submit the full question.
+      // Acting on the first Deepgram final truncated questions mid-sentence.
     }
   }
 
@@ -353,8 +355,16 @@ export function WalkthroughVoiceModal({
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      {/* Hidden audio element for TTS playback (useTtsPlayback contract) */}
-      <audio ref={tts.audioRef} className="hidden" aria-hidden="true" />
+      {/* Hidden audio element for TTS playback (useTtsPlayback contract).
+          When playback finishes naturally, leave 'speaking' → 'answered' so the
+          mic re-enables for a follow-up question (multi-turn). Guarded so it
+          never clobbers a state the worker already moved on to (e.g. listening). */}
+      <audio
+        ref={tts.audioRef}
+        className="hidden"
+        aria-hidden="true"
+        onEnded={() => setState((s) => (s === 'speaking' ? 'answered' : s))}
+      />
 
       <div
         ref={dialogRef}
@@ -395,7 +405,7 @@ export function WalkthroughVoiceModal({
               {state === 'listening' && (
                 <>
                   <Mic className="h-4 w-4 text-[var(--accent-decision)] animate-pulse" aria-hidden="true" />
-                  Listening
+                  Listening — tap Stop to ask
                 </>
               )}
               {state === 'transcribing' && (
@@ -438,13 +448,21 @@ export function WalkthroughVoiceModal({
                 ref={stopBtnRef}
                 type="button"
                 onClick={startListening}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--accent-decision)] text-white text-sm font-medium hover:opacity-90"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--accent-decision)] text-white text-sm font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
                 data-testid="voice-start"
-                disabled={state === 'querying' || state === 'speaking'}
-                aria-label="Start recording — push to talk"
+                // Only block the mic while the answer is being fetched. During
+                // 'speaking'/'answered' it stays live so the worker can barge in —
+                // startListening() calls tts.stop() first, cutting off the spoken
+                // answer and starting a fresh question (multi-turn conversation).
+                disabled={state === 'querying'}
+                aria-label={
+                  state === 'answered' || state === 'speaking'
+                    ? 'Ask another question'
+                    : 'Start recording — push to talk'
+                }
               >
                 <Mic className="h-4 w-4" aria-hidden="true" />
-                Speak
+                {state === 'answered' || state === 'speaking' ? 'Ask again' : 'Speak'}
               </button>
             )}
           </div>
