@@ -269,28 +269,33 @@ export function WalkthroughVoiceModal({
       onAdvance?.()
       setState('idle')
     } else {
-      // 'question' — route to the existing Q&A path
-      void stopAndAsk()
+      // 'question' — route to the Q&A path. Pass the freshly-finalised text
+      // explicitly: handleFinalTranscript runs from the Deepgram onFinal
+      // callback registered at mic-start, whose closure has a STALE `transcript`
+      // ('') — relying on the closed-over state here would lose the question.
+      void stopAndAsk(text)
     }
   }
 
-  async function stopAndAsk() {
-    if (state !== 'listening' && state !== 'transcribing' && !transcript) {
-      // Nothing recorded — just dismiss
-      onClose()
-      return
-    }
-    const question = transcript.trim()
-    if (!question || question.length < 5) {
-      setErrorMsg('Question is too short. Please try again.')
-      setState('idle')
-      return
-    }
-
-    // Stop mic before querying (Pitfall 1)
+  // `explicitQuestion` is supplied by the voice path (stale-closure-safe);
+  // manual text entry / the Stop button fall back to the live `transcript`.
+  async function stopAndAsk(explicitQuestion?: string) {
+    // Stop mic before querying (Pitfall 1) — do this first so the stream is
+    // always released, even if the question turns out too short.
     if (streamHandleRef.current) {
       await streamHandleRef.current.stop().catch(() => {})
       streamHandleRef.current = null
+    }
+
+    const question = (explicitQuestion ?? transcript).trim()
+    if (!question || question.length < 5) {
+      // Don't close the modal here — just report and return to idle so the
+      // worker can retry or type. (The old guard read a stale `transcript`/`state`
+      // from the onFinal closure and wrongly called onClose(), dismissing the
+      // modal mid-transcription.)
+      setErrorMsg('Question is too short. Please try again.')
+      setState('idle')
+      return
     }
 
     setState('querying')
@@ -335,7 +340,7 @@ export function WalkthroughVoiceModal({
       streamHandleRef.current = null
     }
     if (transcript.trim()) {
-      void stopAndAsk()
+      void stopAndAsk(transcript)
     } else {
       setState('idle')
     }
@@ -463,7 +468,7 @@ export function WalkthroughVoiceModal({
           {transcript.trim().length >= 5 && state === 'idle' && (
             <button
               type="button"
-              onClick={stopAndAsk}
+              onClick={() => stopAndAsk(transcript)}
               className="w-full px-4 py-2 rounded-lg bg-[var(--ink-900)] text-[var(--paper)] text-sm font-medium hover:opacity-90"
             >
               Ask
