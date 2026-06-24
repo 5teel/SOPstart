@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
-status: Ready to execute
-stopped_at: "Completed 22-04: Always-on visual layer (ImmersiveStepCard photo-or-icon)"
-last_updated: "2026-06-24T03:10:00.000Z"
+status: Phase complete — ready for verification
+stopped_at: "Completed 22-04: Always-on visual layer in ImmersiveStepCard (photo-or-icon, SECTION_TYPE_ICONS, SopImageInline reuse)"
+last_updated: "2026-06-24T03:21:08.261Z"
 progress:
   total_phases: 28
   completed_phases: 3
   total_plans: 13
-  completed_plans: 14
+  completed_plans: 13
   percent: 11
 ---
 
@@ -367,7 +367,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-24T03:10:00.000Z
+Last session: 2026-06-24T03:21:08.253Z
 Stopped at: Completed 22-04: Always-on visual layer in ImmersiveStepCard (photo-or-icon, SECTION_TYPE_ICONS, SopImageInline reuse)
 Resume file: None
 Awaiting: (1) Phase 25 human UAT on sopstart.com — 7 tests still pending; apply migrations 00035/00036 to live DB. (2) Phase 22 plan 03 (22-03) — live voice wiring: onVoiceNext→handleMarkComplete + STT/intent/TTS + D-02 gate + blocking human UAT on sopstart.com (Wave 2, run sequentially on main tree per 2026-06-02 worktree-base learning).
