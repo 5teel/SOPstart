@@ -1,5 +1,5 @@
 'use client'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { CheckCircle2, ClipboardCheck, Camera } from 'lucide-react'
 import type { SopWithSections, SopSection } from '@/types/sop'
@@ -15,6 +15,29 @@ import { flushPhotoQueue } from '@/lib/offline/sync-engine'
 import { createClient } from '@/lib/supabase/client'
 import { db } from '@/lib/offline/db'
 import { upsertWalkthroughProgress } from '@/actions/walkthrough-progress'
+import React from 'react'
+
+/**
+ * Phase 22 — MobileWalkthroughHandle
+ *
+ * Imperative handle exposed via useImperativeHandle (forwardRef) so that
+ * WalkthroughSwitcher can bridge voice commands from WalkthroughVoiceModal
+ * into the walkthrough state machine WITHOUT hoisting state (D-22 additive option).
+ *
+ * Voice "next" always routes through onVoiceNext → handleMarkComplete, never
+ * directly through the store — preserving the D-02 safety-ack invariant and
+ * the completion audit trail (T-22-03-02).
+ */
+export interface MobileWalkthroughHandle {
+  /** Advance the walkthrough exactly as the tap "I've done this — Next" button does. */
+  onVoiceNext: () => void
+  /** Navigate to the previous step (voice "back"/"previous"). */
+  onVoicePrev: () => void
+  /** Text of the currently-displayed step (for TTS read-aloud; VDW-LIT-03). */
+  currentStepText: string
+  /** Whether the safety section has been acknowledged this session (D-02 gate). */
+  isAcknowledged: boolean
+}
 
 /**
  * Phase 15 — MobileWalkthrough.
@@ -31,11 +54,20 @@ import { upsertWalkthroughProgress } from '@/actions/walkthrough-progress'
  * 3. On submit, the ack trace is passed to `submitCompletion` so the
  *    completion record's `step_ack_trace` JSONB column is populated.
  *
+ * Phase 22 additions:
+ * 4. Converted to `forwardRef<MobileWalkthroughHandle>` — exposes an
+ *    imperative handle so WalkthroughSwitcher can wire voice commands into
+ *    the existing handleMarkComplete/handleStepChange paths. This is purely
+ *    additive: no existing callbacks are modified.
+ *
  * Everything else (photo capture, immersive card, sticky action bar,
  * desktop list view above 430px, ViewModeToggle) is preserved verbatim
  * so existing mobile UAT continues to pass (SPEC constraint #1).
  */
-export function MobileWalkthrough({ sop }: { sop: SopWithSections }) {
+export const MobileWalkthrough = React.forwardRef<
+  MobileWalkthroughHandle,
+  { sop: SopWithSections }
+>(function MobileWalkthrough({ sop }, ref) {
   const router = useRouter()
   const search = useSearchParams()
   const mode = useWalkthroughModeStore((s) => s.mode)
@@ -195,6 +227,44 @@ export function MobileWalkthrough({ sop }: { sop: SopWithSections }) {
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [activeCompletion, completionStore, walkthroughStore, sopId, sop.version, allSteps, completedSteps]
+  )
+
+  // ── Phase 22: Imperative handle for voice callbacks ───────────────────────
+  // Exposes a stable handle via useImperativeHandle so WalkthroughSwitcher
+  // can bridge voice commands from WalkthroughVoiceModal into the existing
+  // state machine WITHOUT hoisting state or breaking D-02 invariants.
+  //
+  // onVoiceNext calls handleMarkComplete — the SAME path as the tap button —
+  // so the safety-ack gate, completion audit trail, and store writes are
+  // all preserved (T-22-03-01, T-22-03-02).
+  //
+  // The ref that WalkthroughSwitcher reads is a REF (not state), so the
+  // caller MUST mirror currentStepText into useState after each advance call
+  // to make it reactive (CLAUDE.md 2026-06-08 non-reactive-source trap;
+  // T-22-03-06).
+  const handleMarkCompleteRef = useRef(handleMarkComplete)
+  handleMarkCompleteRef.current = handleMarkComplete
+  const handleStepChangeRef = useRef(handleStepChange)
+  handleStepChangeRef.current = handleStepChange
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      onVoiceNext: () => {
+        if (currentStep) handleMarkCompleteRef.current(currentStep.id)
+      },
+      onVoicePrev: () => {
+        if (prevStep) handleStepChangeRef.current(prevStep.id)
+      },
+      get currentStepText() {
+        return currentStep?.text ?? ''
+      },
+      get isAcknowledged() {
+        return acknowledged
+      },
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentStep, prevStep, acknowledged]
   )
 
   async function handleSubmit() {
@@ -524,4 +594,4 @@ export function MobileWalkthrough({ sop }: { sop: SopWithSections }) {
       )}
     </div>
   )
-}
+})
