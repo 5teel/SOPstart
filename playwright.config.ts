@@ -156,5 +156,27 @@ export default defineConfig({
       testMatch: /admin-departments\.(test|spec)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 22 — Voice-Driven Walkthrough source-contract + unit stub specs (Plan 01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // Specs are registered here so the Nyquist Wave-0 harness gates every requirement
+      // before production code ships in Waves 1-2.
+      //
+      // Verify registration: `npx playwright test --list --project=phase22-stubs`
+      // (should list all 6 tests/phase22/*.spec.ts files — zero discovered = FAIL)
+      //
+      // Files registered here:
+      //   tests/phase22/intent-classifier.spec.ts  — VDW-VOICE-03 unit test (Plan 02)
+      //   tests/phase22/tts-route.spec.ts           — VDW-LIT-03 TTS route auth gate (Plan 02)
+      //   tests/phase22/stt-keyterms.spec.ts        — VDW-VOICE-01 Deepgram keyterms (Plan 02)
+      //   tests/phase22/visual-layer.spec.ts        — VDW-LIT-01/02 icon+image layer (Plan 04)
+      //   tests/phase22/voice-modal.spec.ts         — VDW-VOICE-02/03 STT+TTS+intent wiring (Plan 03)
+      //   tests/phase22/voice-safety-gate.spec.ts   — D-02 onVoiceNext→handleMarkComplete chain (Plan 03)
+      name: 'phase22-stubs',
+      testDir: '.',
+      testMatch: /tests\/phase22\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
