@@ -42,12 +42,17 @@ export async function startVoiceStream(opts: VoiceStreamOpts): Promise<StreamHan
   }
   const { access_token } = (await tokenRes.json()) as { access_token: string }
 
-  // 2. Build Deepgram URL with format-matched encoding (Pitfall 9)
+  // 2. Build Deepgram URL.
+  // IMPORTANT: do NOT send `encoding`/`sample_rate`. MediaRecorder emits a
+  // *containerized* stream (WebM/Ogg/MP4); Deepgram auto-detects codec + rate
+  // from the container. Sending `encoding=opus` tells Deepgram to expect RAW
+  // Opus packets, so it silently fails to decode the WebM and returns ZERO
+  // transcripts (connection stays open, no error) — verified by streaming a
+  // real WebM/Opus clip both ways against Deepgram. `format` is still used for
+  // the MediaRecorder mimeType + blob extension below, just not for these params.
   const params = new URLSearchParams({
     model: 'nova-3',
     language: opts.language,
-    encoding: format.deepgramEncoding,
-    sample_rate: String(format.sampleRate),
     interim_results: 'true',
     smart_format: 'true',
     punctuate: 'true',
