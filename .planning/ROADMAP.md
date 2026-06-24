@@ -54,7 +54,7 @@ Three phases bundle the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` 
   **Plans:** 4 plans / 3 waves
 
   - [x] 22-01-PLAN.md — Wave 0: register `phase22-stubs` Playwright project + 6 source-contract/unit stub specs (Wave 0)
-  - [ ] 22-02-PLAN.md — Voice infra: Deepgram keyterms + `/api/voice/tts` route + `useTtsPlayback` hook + `classifyIntent` (Wave 1)
+  - [x] 22-02-PLAN.md — Voice infra: Deepgram keyterms + `/api/voice/tts` route + `useTtsPlayback` hook + `classifyIntent` (Wave 1)
   - [ ] 22-04-PLAN.md — Always-on visual layer (photo-or-icon per step) in `ImmersiveStepCard` (Wave 1)
   - [ ] 22-03-PLAN.md — Wire the live voice loop: STT + intent dispatch + TTS read-back + onVoiceNext→handleMarkComplete (D-02) + human UAT (Wave 2)
 - [ ] **Phase 23: AI Field Layer + Version Supersede** — Universal AI read/write access to every editable field + Cmd+K extended across admin surfaces (X-03) + version history formal supersede + diff + restore + worker-instance sign-off chain (G-01). X-03 is the architectural backbone v5.0 conversational app builds on; G-01 fits naturally alongside as a small standalone bundle.

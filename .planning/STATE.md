@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
 status: Ready to execute
-stopped_at: "Completed 22-01: phase22 stub test harness (Nyquist Wave-0)"
-last_updated: "2026-06-24T02:50:24.348Z"
+stopped_at: "Completed 22-02: TTS route + intent classifier + STT keyterms + useTtsPlayback"
+last_updated: "2026-06-24T03:03:05.630Z"
 progress:
   total_phases: 28
   completed_phases: 3
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 22 (voice-driven-walkthrough) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 **Milestone status:** v4.0 started 2026-05-24. Phases 21, 21.5, 21.6, 24, 25 ✅ complete; 22 + 23 remaining. See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
 **Active phase:** 22
@@ -138,6 +138,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 25 P05 | 10m | 3 tasks | 11 files |
 | Phase 25-department-first-class-entity P06 | 7m | 2 tasks | 7 files |
 | Phase 22 P01 | 15m | 2 tasks | 7 files |
+| Phase 22 P02 | 8m | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -252,6 +253,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase22 intent-classifier spec uses fs.existsSync guard + test.skip for green-when-absent / live-when-present without module-load errors
 - [Phase ?]: Phase22 TTS route spec asserts TTS_MODEL constant (not bare hardcoded string) per CLAUDE.md 2026-06-02 model-ID-rot learning
 - [Phase ?]: Phase22 voice-safety-gate encodes both D-02 positive bypass guard AND negative gate (isAcknowledged-false ack-prompt speak branch)
+- [Phase ?]: TTS_MODEL constant overridable via process.env.TTS_MODEL — prevents silent model-rot (CLAUDE.md 2026-06-02)
+- [Phase ?]: TTS route uses regular createClient() not createAdminClient — session RLS is org-scope gate; workers allowed (D-15)
+- [Phase ?]: Behavioral unit tests for classifyIntent in src/lib/voice/__tests__/intent-classifier.test.ts (phase15-unit) where static @/ imports resolve correctly
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -360,7 +364,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-24T02:50:24.341Z
-Stopped at: Completed 22-01: phase22 stub test harness (Nyquist Wave-0)
+Last session: 2026-06-24T03:03:05.622Z
+Stopped at: Completed 22-02: TTS route + intent classifier + STT keyterms + useTtsPlayback
 Resume file: None
 Awaiting: (1) Phase 25 human UAT on sopstart.com — 7 tests still pending; apply migrations 00035/00036 to live DB to activate runtime integration specs. (2) Phase 22 discussion → plan → execute.
