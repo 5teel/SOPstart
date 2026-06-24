@@ -127,6 +127,12 @@ export async function verifyTranscriptVsSop(
   // [D-07 — voice_qa mode extension]
   if (mode === 'voice_qa') {
     const voiceOutput = parsedOutput as { answer: string; citations: string[] }
+    // Nothing to verify against (empty / content-light SOP) → no claims can be
+    // grounded or ungrounded, so return no flags. This ALSO avoids Anthropic's
+    // 400 "cache_control cannot be set for empty text blocks", which otherwise
+    // trips the synthetic "Verification temporarily unavailable" banner on
+    // content-light SOPs (verified against the live API).
+    if (!sourceText.trim()) return []
     try {
       const response = await getAnthropic().messages.create({
         model: VOICE_QA_VERIFY_MODEL,
