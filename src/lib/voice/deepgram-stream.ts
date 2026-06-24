@@ -64,9 +64,13 @@ export async function startVoiceStream(opts: VoiceStreamOpts): Promise<StreamHan
     }
   }
 
-  // 3. Open WebSocket with Sec-WebSocket-Protocol subprotocol auth (Pitfall 3)
+  // 3. Open WebSocket with Sec-WebSocket-Protocol subprotocol auth (Pitfall 3).
+  // Temporary tokens minted by /v1/auth/grant are JWTs and MUST use the 'bearer'
+  // subprotocol. The 'token' subprotocol only accepts a raw DEEPGRAM_API_KEY and
+  // returns HTTP 401 INVALID_AUTH for a grant JWT (verified directly against
+  // Deepgram — this was the cause of the runtime "WebSocket error" on speak).
   const ws = new WebSocket(`wss://api.deepgram.com/v1/listen?${params}`, [
-    'token',
+    'bearer',
     access_token,
   ])
 
