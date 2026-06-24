@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
 status: Ready to execute
-stopped_at: "Completed 22-02: TTS route + intent classifier + STT keyterms + useTtsPlayback"
-last_updated: "2026-06-24T03:03:05.630Z"
+stopped_at: "Completed 22-04: Always-on visual layer (ImmersiveStepCard photo-or-icon)"
+last_updated: "2026-06-24T03:10:00.000Z"
 progress:
   total_phases: 28
   completed_phases: 3
   total_plans: 13
-  completed_plans: 13
+  completed_plans: 14
   percent: 11
 ---
 
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 22 (voice-driven-walkthrough) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 **Milestone status:** v4.0 started 2026-05-24. Phases 21, 21.5, 21.6, 24, 25 ✅ complete; 22 + 23 remaining. See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
 **Active phase:** 22
@@ -139,6 +139,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 25-department-first-class-entity P06 | 7m | 2 tasks | 7 files |
 | Phase 22 P01 | 15m | 2 tasks | 7 files |
 | Phase 22 P02 | 8m | 2 tasks | 9 files |
+| Phase 22 P04 | 5m | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -249,6 +250,8 @@ Recent decisions affecting current work:
 - [Phase 25-06]: Department filter bar on /admin/team filters the visible member list client-side from fetched members (no URL param needed — team page already loads all members via getTeamMembersWithEmails)
 - [Phase 25-06]: Owner badge reads departments.owner_user_id from Department objects passed from the server — onChange after DepartmentPicker fires fetchMembers() to refresh owner state
 - [Phase 25-06]: team/page.tsx role guard expanded from admin-only to admin|safety_manager (consistent with other admin pages)
+- [Phase 22-04]: SECTION_TYPE_ICONS uses Record<string, LucideIcon> with case-insensitive lookup + ?? ListChecks default — covers hazard/hazards/ppe/emergency/steps/signoff; any unmapped section_type gracefully degrades to ListChecks (D-06)
+- [Phase 22-04]: stepImages derived from ownerSection.sop_images.filter(img => img.step_id === current.id) with ?? [] guard — no query change needed; SopWithSections already carries sop_images per section (RESEARCH A3 confirmed)
 - [Phase ?]: Phase22 source-contract specs use [\s\S] not /s flag (CLAUDE.md 2026-06-02 TS target)
 - [Phase ?]: Phase22 intent-classifier spec uses fs.existsSync guard + test.skip for green-when-absent / live-when-present without module-load errors
 - [Phase ?]: Phase22 TTS route spec asserts TTS_MODEL constant (not bare hardcoded string) per CLAUDE.md 2026-06-02 model-ID-rot learning
@@ -364,7 +367,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-24T03:03:05.622Z
-Stopped at: Completed 22-02: TTS route + intent classifier + STT keyterms + useTtsPlayback
+Last session: 2026-06-24T03:10:00.000Z
+Stopped at: Completed 22-04: Always-on visual layer in ImmersiveStepCard (photo-or-icon, SECTION_TYPE_ICONS, SopImageInline reuse)
 Resume file: None
-Awaiting: (1) Phase 25 human UAT on sopstart.com — 7 tests still pending; apply migrations 00035/00036 to live DB to activate runtime integration specs. (2) Phase 22 discussion → plan → execute.
+Awaiting: (1) Phase 25 human UAT on sopstart.com — 7 tests still pending; apply migrations 00035/00036 to live DB. (2) Phase 22 plan 03 (22-03) — live voice wiring: onVoiceNext→handleMarkComplete + STT/intent/TTS + D-02 gate + blocking human UAT on sopstart.com (Wave 2, run sequentially on main tree per 2026-06-02 worktree-base learning).
