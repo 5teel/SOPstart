@@ -1,14 +1,13 @@
 {
-  "capturedAt": "2026-05-22T00:00:00.000Z",
-  "note": "Re-baselined 2026-05-22 to absorb the one-time +9 KB cost of the global TopHeader (src/components/layout/TopHeader.tsx) added to (protected)/layout.tsx. This affects every protected route, not just /sops/[sopId], so re-baselining is the honest fix — same pattern as Phase 15-04 Wave 4 re-baseline. Previous baseline was 1095 KB (Phase 15 Wave 4 post-MobileWalkthrough split); new baseline is 1104 KB. Forward enforcement: any drift > +2 KB from 1104 is a real regression. DO NOT edit by hand for further bloat — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts.",
-  "rationale": "TopHeader is a global navigation feature (brand wordmark + role-aware nav links + profile menu + mobile drawer) required to make admin/team/blocks/dashboard routes reachable from any page. Inline SVGs are used instead of lucide-react to keep the cost down (initial attempt with lucide also measured +9 KB — Lucide was not the dominant cost; the drawer + profile menu logic dominates). Splitting the drawer/menu into dynamic chunks would save ~3-5 KB but adds complexity for a one-time global cost. Re-baselining matches Phase 15-04 precedent (line 4 of previous note).",
+  "capturedAt": "2026-06-24T09:29:21.999Z",
+  "note": "Re-baselined 2026-06-24 (1104 → 1107 KB, +3 KB) to absorb the one-time cost of the role-aware navigation change: a RoleProvider context (src/components/providers/RoleProvider.tsx) added to (protected)/layout.tsx + an admin-only 'Edit in builder' link on the worker SOP view (/sops/[sopId]). Admins now default to worker pathways; admin tooling is reached via the account menu. All isolation gates still pass (DesktopWalkthrough + WalkthroughVoiceModal remain dynamic chunks; pdfjs + mammoth absent). Same re-baseline pattern as the 2026-05-22 TopHeader shift. Forward enforcement: any drift > +2 KB from 1107 is a real regression. DO NOT edit by hand for further bloat — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts.",
   "previousBaseline": {
-    "value": 1095,
-    "capturedAt": "2026-05-13T01:00:00.000Z",
-    "note": "Phase-15 Wave 4 baseline. Superseded by the 2026-05-22 TopHeader re-baseline."
+    "value": 1104,
+    "capturedAt": "2026-05-22T00:00:00.000Z",
+    "note": "TopHeader global-nav re-baseline. Superseded by the 2026-06-24 role-aware navigation re-baseline."
   },
   "routes": {
-    "/sops/[sopId]/page": 1104
+    "/sops/[sopId]/page": 1107
   },
-  "chunkCount": 22
+  "chunkCount": 21
 }

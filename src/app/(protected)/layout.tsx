@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { QueryProvider } from '@/components/providers/QueryProvider'
+import { RoleProvider } from '@/components/providers/RoleProvider'
 import { OnlineStatusBanner } from '@/components/layout/OnlineStatusBanner'
 import { BottomTabBar } from '@/components/layout/BottomTabBar'
 import { InstallPrompt } from '@/components/layout/InstallPrompt'
@@ -28,15 +29,17 @@ export default async function ProtectedLayout({ children }: { children: ReactNod
 
   return (
     <QueryProvider>
-      <div className="layout-shell h-dvh flex flex-col bg-[var(--paper)] overflow-hidden">
-        <OnlineStatusBanner />
-        <InstallPrompt />
-        <TopHeader role={role} userEmail={user.email ?? null} />
-        <main className="flex-1 overflow-y-auto">
-          <RouteTransition>{children}</RouteTransition>
-        </main>
-        <BottomTabBar />
-      </div>
+      <RoleProvider role={role}>
+        <div className="layout-shell h-dvh flex flex-col bg-[var(--paper)] overflow-hidden">
+          <OnlineStatusBanner />
+          <InstallPrompt />
+          <TopHeader role={role} userEmail={user.email ?? null} />
+          <main className="flex-1 overflow-y-auto">
+            <RouteTransition>{children}</RouteTransition>
+          </main>
+          <BottomTabBar />
+        </div>
+      </RoleProvider>
     </QueryProvider>
   )
 }

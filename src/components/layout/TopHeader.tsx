@@ -115,6 +115,24 @@ function SignOutIcon({ className }: { className?: string }) {
   )
 }
 
+function WrenchIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-2.4z" />
+    </svg>
+  )
+}
+
 type Role = 'admin' | 'safety_manager' | 'supervisor' | 'worker' | null
 
 interface NavLink {
@@ -122,25 +140,28 @@ interface NavLink {
   href: string
 }
 
-function linksForRole(role: Role): NavLink[] {
-  if (role === 'admin' || role === 'safety_manager' || role === 'supervisor') {
-    return [
-      { label: 'Dashboard', href: '/dashboard' },
-      { label: 'SOPs', href: '/admin/sops' },
-      { label: 'Blocks', href: '/admin/blocks' },
-      { label: 'Team', href: '/admin/team' },
-      { label: 'Activity', href: '/activity' },
-      { label: 'Pathways', href: '/pathways' },
-      { label: 'Feedback', href: '/uat' },
-    ]
-  }
-  return [
-    { label: 'Home', href: '/dashboard' },
-    { label: 'SOPs', href: '/sops' },
-    { label: 'Activity', href: '/activity' },
-    { label: 'Pathways', href: '/pathways' },
-    { label: 'Feedback', href: '/uat' },
-  ]
+// Primary nav is identical for everyone: an admin's default pathways mirror a
+// worker's. Clicking "SOPs" goes to the worker library (/sops), so selecting a
+// SOP opens the worker view (overview + walkthrough), not the admin builder.
+const BASE_LINKS: NavLink[] = [
+  { label: 'Dashboard', href: '/dashboard' },
+  { label: 'SOPs', href: '/sops' },
+  { label: 'Activity', href: '/activity' },
+  { label: 'Pathways', href: '/pathways' },
+  { label: 'Feedback', href: '/uat' },
+]
+
+// Admin-only destinations — reached deliberately via the account menu, never the
+// default nav. Going "off path" into admin tooling must be a conscious choice.
+// Gate mirrors the server-side admin/builder gate (['admin','safety_manager']).
+const ADMIN_LINKS: NavLink[] = [
+  { label: 'Manage SOPs', href: '/admin/sops' },
+  { label: 'Blocks', href: '/admin/blocks' },
+  { label: 'Team', href: '/admin/team' },
+]
+
+function isAdminRole(role: Role): boolean {
+  return role === 'admin' || role === 'safety_manager'
 }
 
 function isActive(pathname: string, href: string): boolean {
@@ -155,7 +176,8 @@ export interface TopHeaderProps {
 
 export function TopHeader({ role, userEmail }: TopHeaderProps) {
   const pathname = usePathname()
-  const links = linksForRole(role)
+  const links = BASE_LINKS
+  const isAdmin = isAdminRole(role)
 
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -278,6 +300,25 @@ export function TopHeader({ role, userEmail }: TopHeaderProps) {
                     <p className="text-sm text-[var(--ink-900)] truncate" title={userEmail}>
                       {userEmail}
                     </p>
+                  </div>
+                )}
+                {isAdmin && (
+                  <div className="border-b border-[var(--ink-100)] py-1">
+                    <p className="px-3 pb-1 pt-1 mono text-[10px] uppercase tracking-wider text-[var(--ink-500)]">
+                      Admin tools
+                    </p>
+                    {ADMIN_LINKS.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        role="menuitem"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--ink-900)] hover:bg-[var(--paper-2)]"
+                      >
+                        <WrenchIcon className="h-4 w-4 text-[var(--ink-500)]" />
+                        {link.label}
+                      </Link>
+                    ))}
                   </div>
                 )}
                 <Link

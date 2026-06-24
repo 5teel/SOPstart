@@ -108,7 +108,7 @@ export const JOURNEYS: Journey[] = [
       { id: 's', type: 'start', label: 'Needs to do a task' },
       { id: 'home', type: 'screen', label: 'Dashboard', route: '/dashboard', detail: 'Shows assigned SOPs.' },
       { id: 'lib', type: 'screen', label: 'SOP library', route: '/sops', detail: 'Browse, search, filter by trade.' },
-      { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]', detail: 'Tabs: overview, tools, hazards, flow, model. Flow tab defaults to spatial graph on desktop (≥1024px) with a List/Graph toggle; mobile defaults to list.' },
+      { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]', detail: 'Tabs: overview, tools, hazards, flow, model, walkthrough. Flow tab defaults to spatial graph on desktop (≥1024px) with a List/Graph toggle; mobile defaults to list. Admins/safety managers see an "Edit in builder" link here to deliberately open this SOP in the admin builder.' },
       { id: 'go', type: 'decision', label: 'Ready to start?', branches: [
         { label: 'Yes — walk it', to: 'walk' },
         { label: 'Just reading', to: 'e' },
@@ -191,6 +191,27 @@ export const JOURNEYS: Journey[] = [
   },
 
   // ============================ Create an SOP ============================
+  {
+    id: 'enter-admin-tools',
+    group: 'Create an SOP',
+    persona: 'SOP Admin',
+    title: 'Switch into admin tools',
+    summary: 'An admin’s default pathways mirror a worker’s — the primary nav opens the worker library. Admin tooling is a deliberate opt-in from the account menu, never the default route just because an admin is logged in.',
+    steps: [
+      { id: 's', type: 'start', label: 'Signed in as admin / safety manager' },
+      { id: 'home', type: 'screen', label: 'Worker pathways by default', route: '/dashboard', detail: 'Identical nav to a worker: Dashboard · SOPs (→/sops) · Activity · Pathways · Feedback. Selecting a SOP opens the worker view, not the builder.' },
+      { id: 'menu', type: 'decision', label: 'Go off-path into admin tools? (account menu → Admin tools)', branches: [
+        { label: 'Manage SOPs', to: 'sops' },
+        { label: 'Blocks', to: 'blocks' },
+        { label: 'Team', to: 'team' },
+        { label: 'Stay on worker path', to: 'e' },
+      ] },
+      { id: 'sops', type: 'screen', label: 'SOP management', route: '/admin/sops', detail: 'Reached via account menu → Admin tools → Manage SOPs.' },
+      { id: 'blocks', type: 'screen', label: 'Block library', route: '/admin/blocks' },
+      { id: 'team', type: 'screen', label: 'Team management', route: '/admin/team' },
+      { id: 'e', type: 'end', label: 'On the chosen path' },
+    ],
+  },
   {
     id: 'create-from-document',
     group: 'Create an SOP',

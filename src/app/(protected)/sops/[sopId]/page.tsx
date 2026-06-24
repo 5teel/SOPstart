@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { useSopDetail } from '@/hooks/useSopDetail'
+import { useIsAdmin } from '@/components/providers/RoleProvider'
 import { SopTabNav, useActiveTab } from '@/components/sop/SopTabNav'
 import { WorkerPreviewToggle, WorkerPreviewClamp } from '@/components/sop/WorkerPreviewToggle'
 import {
@@ -15,6 +16,7 @@ function SopDetailInner() {
   const sopId = params?.sopId ?? ''
   const { data: sop, isLoading, isError } = useSopDetail(sopId)
   const active = useActiveTab()
+  const isAdmin = useIsAdmin()
 
   if (isLoading) {
     return (
@@ -67,7 +69,18 @@ function SopDetailInner() {
             </Link>
             <h1 className="text-base font-semibold truncate">{sop.title ?? 'Untitled SOP'}</h1>
           </div>
-          <WorkerPreviewToggle />
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {isAdmin && (
+              <Link
+                href={`/admin/sops/builder/${sopId}`}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 h-9 rounded-lg border border-[var(--ink-300)] text-sm font-medium text-[var(--ink-700)] hover:border-[var(--ink-900)] hover:text-[var(--ink-900)] transition-colors"
+                title="Open this SOP in the admin builder"
+              >
+                Edit in builder
+              </Link>
+            )}
+            <WorkerPreviewToggle />
+          </div>
         </div>
         <div className="max-w-5xl mx-auto px-4">
           <SopTabNav />
