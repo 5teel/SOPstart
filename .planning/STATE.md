@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
-status: Ready to execute
-stopped_at: Phase 23 context gathered
-last_updated: "2026-06-25T13:14:13.693Z"
+status: Executing Phase 23
+stopped_at: Phase 23 Plan 00 complete
+last_updated: "2026-06-25T13:22:08.960Z"
 progress:
-  total_phases: 28
+  total_phases: 29
   completed_phases: 3
-  total_plans: 13
+  total_plans: 21
   completed_plans: 13
-  percent: 11
+  percent: 10
 ---
 
 # Project State
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 22 — voice-driven-walkthrough
+**Current focus:** Phase 23 — ai-field-layer-version-supersede
 
 ## Current Position
 
-Phase: 24
-Plan: Not started
+Phase: 23 (ai-field-layer-version-supersede) — EXECUTING
+Plan: 2 of 8
 **Milestone status:** v4.0 started 2026-05-24. Phases 21, 21.5, 21.6, 24, 25 ✅ complete; 22 + 23 remaining. See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
 **Active phase:** 22
@@ -260,6 +260,8 @@ Recent decisions affecting current work:
 - [Phase ?]: TTS_MODEL constant overridable via process.env.TTS_MODEL — prevents silent model-rot (CLAUDE.md 2026-06-02)
 - [Phase ?]: TTS route uses regular createClient() not createAdminClient — session RLS is org-scope gate; workers allowed (D-15)
 - [Phase ?]: Behavioral unit tests for classifyIntent in src/lib/voice/__tests__/intent-classifier.test.ts (phase15-unit) where static @/ imports resolve correctly
+- [Phase 23-00]: Wave-0 registry stub (src/lib/ai-fields/registry.ts) created so phase23-unit static @/ imports resolve during test discovery — Plan 23-02 replaces with full implementation; stub is intentionally minimal (idempotent Map-based) but sufficient for source-contract assertions
+- [Phase 23-00]: version-supersede.spec.ts guards on function presence in file (src.includes('cloneSopAsDraft')), not just file existence — versioning.ts already exists from Phase 3; guard must be content-level for files extended in later plans (not just file-existence level)
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -368,7 +370,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-25T12:38:51.838Z
-Stopped at: Phase 23 context gathered
-Resume file: .planning/phases/23-ai-field-layer-version-supersede/23-CONTEXT.md
-Awaiting: (1) Phase 25 human UAT on sopstart.com — 7 tests still pending; apply migrations 00035/00036 to live DB. (2) Phase 22 plan 03 (22-03) — live voice wiring: onVoiceNext→handleMarkComplete + STT/intent/TTS + D-02 gate + blocking human UAT on sopstart.com (Wave 2, run sequentially on main tree per 2026-06-02 worktree-base learning).
+Last session: 2026-06-25T13:30:00Z
+Stopped at: Completed 23-00-PLAN.md (Wave-0 test scaffold — phase23-stubs + phase23-unit + 4 source-contract specs + registry stub)
+Resume file: .planning/phases/23-ai-field-layer-version-supersede/23-01-PLAN.md
+Awaiting: (1) Phase 25 human UAT on sopstart.com — 7 tests still pending; apply migrations 00035/00036 to live DB. (2) Phase 22 plan 03 (22-03) — live voice wiring: onVoiceNext→handleMarkComplete + STT/intent/TTS + D-02 gate + blocking human UAT on sopstart.com (Wave 2, run sequentially on main tree per 2026-06-02 worktree-base learning). (3) Phase 23 Plan 01 (23-01) — migration 00038 schema (roster_worker_id + sop_completion_signatures + ai_field_proposals).

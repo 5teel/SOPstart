@@ -150,7 +150,7 @@ Plans:
 Plans:
 
 **Wave 0**
-- [ ] 23-00-PLAN.md — Register phase23-stubs + phase23-unit Playwright projects + source-contract stubs gating every AFL-* + D-11
+- [x] 23-00-PLAN.md — Register phase23-stubs + phase23-unit Playwright projects + source-contract stubs gating every AFL-* + D-11 ✅ 2026-06-25 (32 tests discovered; 10 pass; 22 skip pre-implementation; commits 544c882/9b30863/a44beb0)
 **Wave 1**
 - [ ] 23-01-PLAN.md — Migration 00038 (roster_worker_id + sop_completion_signatures + ai_field_proposals) + [BLOCKING] schema push + to_regclass verify
 **Wave 2** *(after schema)*
