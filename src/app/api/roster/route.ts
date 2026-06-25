@@ -16,6 +16,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { parseJwtPayload } from '@/lib/supabase/jwt'
 
 export async function GET() {
   const supabase = await createClient()
@@ -30,7 +31,7 @@ export async function GET() {
   // Extract organisation_id from JWT custom claims
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const organisationId: string | null = jwtClaims['organisation_id'] ?? null
   if (!organisationId) {

@@ -43,6 +43,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { getField } from '@/lib/ai-fields/registry'
 import { FieldContextSchema } from '@/lib/validators/ai-fields'
+import { parseJwtPayload } from '@/lib/supabase/jwt'
 
 /**
  * GET /api/ai-fields/read?fieldId=sop.title&sopId=...
@@ -63,7 +64,7 @@ export async function GET(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const organisationId: string | null = jwtClaims['organisation_id'] ?? null
   if (!organisationId) {

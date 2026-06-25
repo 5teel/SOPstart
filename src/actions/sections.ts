@@ -3,6 +3,7 @@
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { parseJwtPayload } from '@/lib/supabase/jwt'
 import type { SectionKind, SopSection } from '@/types/sop'
 
 /**
@@ -117,7 +118,7 @@ export async function reorderSections(
 
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const role = jwtClaims['user_role']
   if (!role || !['admin', 'safety_manager'].includes(role)) {
@@ -165,7 +166,7 @@ export async function updateSectionLayout(
 
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const role = jwtClaims['user_role']
   if (!role || !['admin', 'safety_manager'].includes(role)) {
@@ -227,7 +228,7 @@ export async function updateSectionTitle(
 
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const organisationId: string | null = jwtClaims['organisation_id'] ?? null
   if (!organisationId) return { error: 'No organisation found' }

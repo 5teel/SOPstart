@@ -30,6 +30,7 @@ import { AiWriteRequestSchema, AcceptProposalSchema, RejectProposalSchema } from
 import { gateWrite } from '@/lib/ai-fields/approval'
 import { getField } from '@/lib/ai-fields/registry'
 import type { WriteResult } from '@/lib/ai-fields/registry'
+import { parseJwtPayload } from '@/lib/supabase/jwt'
 
 // ────────────────────────────────────────────────────────────────────────────
 // applyAiWrite
@@ -54,7 +55,7 @@ export async function applyAiWrite(
 
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const organisationId: string | null = jwtClaims['organisation_id'] ?? null
   if (!organisationId) return { success: false, error: 'No organisation found' }
@@ -110,7 +111,7 @@ export async function acceptProposal(
 
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const role: string | undefined = jwtClaims['user_role']
   const organisationId: string | null = jwtClaims['organisation_id'] ?? null
@@ -227,7 +228,7 @@ export async function rejectProposal(
 
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const role: string | undefined = jwtClaims['user_role']
   const organisationId: string | null = jwtClaims['organisation_id'] ?? null

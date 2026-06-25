@@ -3,6 +3,7 @@
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { parseJwtPayload } from '@/lib/supabase/jwt'
 import { uploadSessionSchema, getSourceFileType, isBlockedMacroFile, createVideoSopPipelineSessionSchema } from '@/lib/validators/sop'
 import type { UploadSession } from '@/types/sop'
 
@@ -21,7 +22,7 @@ export async function createUploadSession(
   // Get org_id from JWT claims
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const organisationId: string | null = jwtClaims['organisation_id'] ?? null
   if (!organisationId) return { error: 'No organisation found' }
@@ -128,7 +129,7 @@ export async function createVideoUploadSession(
   // Get org_id and role from JWT claims (same pattern as createUploadSession)
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const organisationId: string | null = jwtClaims['organisation_id'] ?? null
   if (!organisationId) return { error: 'No organisation found' }
@@ -343,7 +344,7 @@ export async function updateSopTitle(
 
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const organisationId: string | null = jwtClaims['organisation_id'] ?? null
   if (!organisationId) return { error: 'No organisation found' }
@@ -372,7 +373,7 @@ export async function deleteSop(sopId: string): Promise<{ success: true } | { er
   // Verify admin role
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const role = jwtClaims['user_role']
   if (!role || !['admin', 'safety_manager'].includes(role)) {
@@ -413,7 +414,7 @@ export async function createVideoSopPipelineSession(input: {
 
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const organisationId: string | null = jwtClaims['organisation_id'] ?? null
   if (!organisationId) return { error: 'No organisation found' }
@@ -547,7 +548,7 @@ export async function createSopFromWizard(
 
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const organisationId: string | null = jwtClaims['organisation_id'] ?? null
   if (!organisationId) return { error: 'No organisation found' }

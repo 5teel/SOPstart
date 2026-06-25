@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { parseJwtPayload } from '@/lib/supabase/jwt'
 import type { Json } from '@/types/database.types'
 import {
   SubmitCompletionSchema as submitCompletionSchema,
@@ -33,7 +34,7 @@ export async function submitCompletion(
   // Extract organisation_id from JWT custom claims (set by custom_access_token_hook)
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const organisationId: string | null = jwtClaims['organisation_id'] ?? null
   if (!organisationId) return { success: false, error: 'No organisation found' }
@@ -146,7 +147,7 @@ export async function signOffCompletion(
   // Verify caller is supervisor or safety_manager
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const role: string | undefined = jwtClaims['user_role']
   const organisationId: string | null = jwtClaims['organisation_id'] ?? null
@@ -256,7 +257,7 @@ export async function getPhotoUploadUrl(input: {
   if (!orgId) {
     const { data: { session } } = await supabase.auth.getSession()
     const jwtClaims = session?.access_token
-      ? JSON.parse(atob(session.access_token.split('.')[1]))
+      ? parseJwtPayload(session.access_token)
       : {}
     orgId = jwtClaims['organisation_id'] ?? ''
   }
@@ -307,7 +308,7 @@ export async function recordSignature(
   // Extract organisation_id from JWT custom claims
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const organisationId: string | null = jwtClaims['organisation_id'] ?? null
   if (!organisationId) return { success: false, error: 'No organisation found' }

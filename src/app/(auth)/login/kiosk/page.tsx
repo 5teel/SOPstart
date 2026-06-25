@@ -20,6 +20,7 @@ import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import RosterSelector from '@/components/auth/RosterSelector'
+import { parseJwtPayload } from '@/lib/supabase/jwt'
 
 export const metadata: Metadata = {
   title: 'Select Your Name — SafeStart',
@@ -39,7 +40,7 @@ export default async function KioskLoginPage({
   const supabase = await createClient()
   const { data: { session } } = await supabase.auth.getSession()
   if (session?.access_token) {
-    const jwtClaims = JSON.parse(atob(session.access_token.split('.')[1]))
+    const jwtClaims = parseJwtPayload(session.access_token)
     const role: string | undefined = jwtClaims['user_role']
     if (role && ['admin', 'safety_manager', 'supervisor'].includes(role)) {
       redirect('/dashboard')

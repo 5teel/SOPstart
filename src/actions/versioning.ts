@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { parseJwtPayload } from '@/lib/supabase/jwt'
 
 // ------------------------------------------------------------
 // uploadNewVersion
@@ -22,7 +23,7 @@ export async function uploadNewVersion(
   // Verify admin/safety_manager role
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const role: string | undefined = jwtClaims['user_role']
   if (!role || !['admin', 'safety_manager'].includes(role)) {
@@ -134,7 +135,7 @@ export async function notifyAssignedWorkers(
 
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const role: string | undefined = jwtClaims['user_role']
   if (!role || !['admin', 'safety_manager'].includes(role)) {
@@ -311,7 +312,7 @@ export async function cloneSopAsDraft(
   // JWT role guard — same as uploadNewVersion lines 23–30
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const role: string | undefined = jwtClaims['user_role']
   if (!role || !['admin', 'safety_manager'].includes(role)) {
@@ -599,7 +600,7 @@ export async function getSopVersionForDiff(
   // JWT role guard — admin-only route
   const { data: { session } } = await supabase.auth.getSession()
   const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    ? parseJwtPayload(session.access_token)
     : {}
   const role: string | undefined = jwtClaims['user_role']
   if (!role || !['admin', 'safety_manager'].includes(role)) {
