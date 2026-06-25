@@ -6,8 +6,11 @@ import { ArrowLeft, Camera, Check, X } from 'lucide-react'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { CompletionStepRow } from '@/components/activity/CompletionStepRow'
 import { RejectReasonSheet } from '@/components/activity/RejectReasonSheet'
-import { signOffCompletion } from '@/actions/completions'
+import { signOffCompletion, recordSignature } from '@/actions/completions'
 import type { CompletionStatus } from '@/types/sop'
+
+// sessionStorage key for roster identity (set by RosterSelector on kiosk devices — D-11)
+const ROSTER_STORAGE_KEY = 'safestart_roster_worker_id'
 
 interface Photo {
   id: string
@@ -69,6 +72,7 @@ export function CompletionDetailClient({
   submittedAt,
   stepData,
   workerName,
+  workerId,
   steps,
   photos,
   signOff: initialSignOff,
@@ -95,6 +99,22 @@ export function CompletionDetailClient({
         setStatus('signed_off')
         setAlreadySigned(true)
         setSignOff({ id: '', supervisor_id: '', decision: 'approved', reason: null, created_at: new Date().toISOString() })
+
+        // D-10 / AFL-VER-05: Record supervisor counter-signature bound to roster identity.
+        // On kiosk devices, the supervisor's roster id is stored in sessionStorage by RosterSelector.
+        // On non-kiosk devices, we use workerId (the supervisor's own uid) as the roster identity.
+        // recordSignature is best-effort — sign-off is already committed above; signature
+        // failure is non-fatal (logged only). The completion is legally recorded via signOffCompletion.
+        const supervisorRosterId = sessionStorage.getItem(ROSTER_STORAGE_KEY) ?? workerId
+        if (supervisorRosterId) {
+          recordSignature({
+            completionId,
+            role: 'supervisor',
+            rosterUserId: supervisorRosterId,
+          }).catch((err) => {
+            console.warn('recordSignature (supervisor) failed — non-fatal:', err)
+          })
+        }
       } else {
         setActionError(result.error)
       }

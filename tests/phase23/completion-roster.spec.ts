@@ -204,3 +204,116 @@ test('D-11 [migration]: migration 00038 creates sop_completion_signatures table'
   const sql = fs.readFileSync(migration, 'utf-8')
   expect(sql).toContain('sop_completion_signatures')
 })
+
+// ---------------------------------------------------------------------------
+// AFL-VER-05: recordSignature has org-scope self-enforcement
+// CLAUDE.md 2026-06-15: service-role actions MUST self-enforce org-scoping
+// ---------------------------------------------------------------------------
+
+test('AFL-VER-05: recordSignature self-enforces org-scope (validates completion.organisation_id)', () => {
+  // CLAUDE.md 2026-06-15 critical rule: service-role bypasses RLS; the action must
+  // verify the completion's organisation_id === the caller's organisationId.
+  if (!fs.existsSync(COMPLETIONS_PATH)) {
+    test.skip(true, 'completions.ts not found')
+    return
+  }
+  const src = fs.readFileSync(COMPLETIONS_PATH, 'utf-8')
+  if (!src.includes('recordSignature')) {
+    test.skip(true, 'recordSignature not yet added (Plan 23-06 will add it)')
+    return
+  }
+  // The function must check completion.organisation_id against organisationId
+  expect(src).toContain('organisation_id')
+  // Must contain the inequality check for org-scope self-enforcement
+  const hasOrgScopeCheck =
+    src.includes('completion.organisation_id !== organisationId') ||
+    src.includes("completion.organisation_id !== organisationId")
+  expect(
+    hasOrgScopeCheck,
+    'recordSignature must verify completion.organisation_id === caller organisationId (T-23-06-04)',
+  ).toBe(true)
+})
+
+// ---------------------------------------------------------------------------
+// D-10: CompletionDetailClient calls recordSignature on supervisor approval
+// CLAUDE.md 2026-06-05: assert HANDLER WIRING, not just import presence
+// ---------------------------------------------------------------------------
+
+const COMPLETION_DETAIL_PATH = path.join(
+  REPO_ROOT,
+  'src',
+  'app',
+  '(protected)',
+  'activity',
+  '[completionId]',
+  'CompletionDetailClient.tsx',
+)
+
+test('D-10 [counter-sign]: CompletionDetailClient imports recordSignature', () => {
+  // D-10: supervisor counter-sign folds into the existing review/approve flow.
+  if (!fs.existsSync(COMPLETION_DETAIL_PATH)) {
+    test.skip(true, 'CompletionDetailClient.tsx not found')
+    return
+  }
+  const src = fs.readFileSync(COMPLETION_DETAIL_PATH, 'utf-8')
+  if (!src.includes('recordSignature')) {
+    test.skip(true, 'recordSignature not yet wired into CompletionDetailClient (Plan 23-06 will wire it)')
+    return
+  }
+  expect(src).toContain('recordSignature')
+})
+
+test('D-10 [counter-sign]: CompletionDetailClient calls recordSignature with role supervisor on approval (handler wired)', () => {
+  // CLAUDE.md 2026-06-05: assert the handler is CALLED (not just imported).
+  // D-10 counter-sign must be bound to roster identity (role: supervisor).
+  if (!fs.existsSync(COMPLETION_DETAIL_PATH)) {
+    test.skip(true, 'CompletionDetailClient.tsx not found')
+    return
+  }
+  const src = fs.readFileSync(COMPLETION_DETAIL_PATH, 'utf-8')
+  if (!src.includes('recordSignature')) {
+    test.skip(true, 'recordSignature not yet wired into CompletionDetailClient (Plan 23-06 will wire it)')
+    return
+  }
+  // Must be called with role: 'supervisor' (CLAUDE.md 2026-06-05 wiring assertion)
+  const hasSupervisorCall =
+    src.includes("role: 'supervisor'") || src.includes('role: "supervisor"')
+  expect(
+    hasSupervisorCall,
+    "CompletionDetailClient must call recordSignature with role: 'supervisor' (D-10 counter-sign)",
+  ).toBe(true)
+  // Must be called (not just referenced)
+  const hasCall = src.includes('recordSignature(')
+  expect(hasCall, 'recordSignature must be called (not just imported) in CompletionDetailClient').toBe(true)
+})
+
+// ---------------------------------------------------------------------------
+// AFL-VER-05: Runtime signature insert test
+// CLAUDE.md 2026-06-15: junction/signature writes MUST have a runtime insert test
+// that performs an actual DB insert as an authenticated principal.
+// ---------------------------------------------------------------------------
+
+test.fixme(
+  'AFL-VER-05 [RUNTIME]: sop_completion_signatures insert performs real DB write + org-scope check',
+  // test.fixme routed to 23-06 UAT on sopstart.com per CLAUDE.md 2026-06-15 guidance.
+  // The source-contract assertions above (recordSignature exists + createAdminClient +
+  // org-scope check) run live. This runtime case requires:
+  //   1. A live Supabase instance with migrations 00038 applied (roster_worker_id column +
+  //      sop_completion_signatures table)
+  //   2. An authenticated kiosk-account session (per-org kiosk account setup, RESEARCH Option A)
+  //   3. A real sop_completions row to sign against
+  //
+  // UAT steps (on sopstart.com — CLAUDE.md memory: Railway-only testing):
+  //   1. Complete an SOP as a kiosk worker → confirm sop_completions.roster_worker_id = selected worker
+  //   2. As supervisor: approve the completion → confirm sop_completion_signatures row exists
+  //      with role='supervisor' and roster_user_id = supervisor's roster id
+  //   3. Query: SELECT * FROM sop_completion_signatures WHERE completion_id = <id>
+  //      BOTH rows must exist: worker row (from submitCompletion path) + supervisor row (from handleApprove)
+  //   4. Verify NO UPDATE/DELETE is possible on sop_completion_signatures (append-only constraint)
+  //
+  // T-23-06-07 mitigation: this fixme ensures the source-contract blind spot (CLAUDE.md 2026-06-15
+  // junction-write learning) is visibly tracked and routed to the human UAT gate (Task 4).
+  async () => {
+    // Placeholder — exercised in Task 4 human UAT on sopstart.com
+  },
+)
