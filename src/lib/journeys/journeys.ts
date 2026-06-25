@@ -68,13 +68,21 @@ export const JOURNEYS: Journey[] = [
     group: 'Getting started',
     persona: 'Worker (kiosk device)',
     title: 'Kiosk roster name-select login (D-11)',
-    summary: 'A worker on a shared kiosk device selects their name from the org roster — no password required. The kiosk account session (role=worker) is established once by an admin.',
+    summary: 'A worker on a shared kiosk device selects their name from the org roster — no password required. The kiosk account session (role=worker) is established once by an admin. Completing the SOP is the legal signature (D-09).',
     steps: [
       { id: 's', type: 'start', label: 'Kiosk device (shared, admin-authenticated kiosk account)' },
       { id: 'kiosk', type: 'screen', label: 'Kiosk name-select', route: '/login/kiosk', detail: 'RosterSelector fetches org worker roster (/api/roster) and renders large glove-friendly tap-target name buttons. Admin/supervisor sessions are redirected to /dashboard (escalation guard T-23-06-02).' },
       { id: 'select', type: 'action', label: 'Tap name from roster', detail: 'roster_worker_id stored in sessionStorage. Kiosk account (RLS key) session unchanged.' },
-      { id: 'sops', type: 'screen', label: 'SOP library', route: '/sops', detail: 'Worker browses and starts a walkthrough.' },
-      { id: 'e', type: 'end', label: 'Walking through SOP as named worker' },
+      { id: 'sops', type: 'screen', label: 'SOP library', route: '/sops', detail: 'Worker browses SOPs. "Updated since last completion" badge appears on any SOP newer than their last completion (AFL-VER-04 / D-08).' },
+      { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]', detail: 'Reads the SOP before walking it.' },
+      { id: 'walk', type: 'screen', label: 'Step-by-step walkthrough', route: '/sops/[sopId]/walkthrough', detail: 'Worker steps through using tap or voice (Phase 22).' },
+      { id: 'complete', type: 'action', label: 'Complete + worker self-sign', detail: 'Completing the SOP IS the worker signature (D-09). recordSignature() binds roster_worker_id to the completion record for attribution.' },
+      { id: 'countersign', type: 'decision', label: 'Counter-sign required?', branches: [
+        { label: 'Yes — supervisor counter-signs', to: 'sup' },
+        { label: 'No', to: 'e' },
+      ] },
+      { id: 'sup', type: 'screen', label: 'Supervisor review + counter-sign', route: '/activity/[completionId]', detail: 'Supervisor selects their name from roster and counter-signs. Second immutable record (D-10).' },
+      { id: 'e', type: 'end', label: 'SOP completion signed and recorded' },
     ],
   },
   {
@@ -121,7 +129,7 @@ export const JOURNEYS: Journey[] = [
     steps: [
       { id: 's', type: 'start', label: 'Needs to do a task' },
       { id: 'home', type: 'screen', label: 'Dashboard', route: '/dashboard', detail: 'Shows assigned SOPs.' },
-      { id: 'lib', type: 'screen', label: 'SOP library', route: '/sops', detail: 'Browse, search, filter by trade.' },
+      { id: 'lib', type: 'screen', label: 'SOP library', route: '/sops', detail: 'Browse, search, filter by trade. "Updated since last completion" badge (AFL-VER-04) marks any SOP published after the worker\'s last completion.' },
       { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]', detail: 'Tabs: overview, tools, hazards, flow, model, walkthrough. Flow tab defaults to spatial graph on desktop (≥1024px) with a List/Graph toggle; mobile defaults to list. Admins/safety managers see an "Edit in builder" link here to deliberately open this SOP in the admin builder.' },
       { id: 'go', type: 'decision', label: 'Ready to start?', branches: [
         { label: 'Yes — walk it', to: 'walk' },
@@ -154,12 +162,12 @@ export const JOURNEYS: Journey[] = [
         { label: 'Yes', to: 'read' },
         { label: 'Last step done', to: 'complete' },
       ] },
-      { id: 'complete', type: 'action', label: 'Complete the procedure', detail: 'Creates an append-only completion record.' },
-      { id: 'signoff', type: 'decision', label: 'Sign-off required?', branches: [
-        { label: 'Yes → supervisor reviews', to: 'sup' },
+      { id: 'complete', type: 'action', label: 'Complete + worker self-sign', detail: 'Creates an append-only completion record. Completing IS the worker signature (D-09). recordSignature() binds roster_worker_id for attribution (AFL-VER-05).' },
+      { id: 'signoff', type: 'decision', label: 'Supervisor counter-sign required?', branches: [
+        { label: 'Yes → supervisor counter-signs', to: 'sup' },
         { label: 'No', to: 'e' },
       ] },
-      { id: 'sup', type: 'screen', label: 'Supervisor review', route: '/activity/[completionId]' },
+      { id: 'sup', type: 'screen', label: 'Supervisor review + counter-sign', route: '/activity/[completionId]', detail: 'Supervisor counter-signs — second immutable record (D-10 / AFL-VER-05).' },
       { id: 'e', type: 'end', label: 'Job recorded' },
     ],
   },
