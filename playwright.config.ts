@@ -178,5 +178,38 @@ export default defineConfig({
       testMatch: /tests\/phase22\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 23 — AI Field Layer + Version Supersede source-contract stubs (Wave 0 / Plan 23-00).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // Specs are registered here so the Nyquist Wave-0 harness gates every AFL-* requirement
+      // and D-11 BEFORE any production code ships in Waves 1-3.
+      //
+      // Verify registration: `npx playwright test --list --project=phase23-stubs`
+      // (should list all 4 tests/phase23/*.spec.ts files — zero discovered = FAIL per CLAUDE.md 2026-05-25)
+      //
+      // Files registered here:
+      //   tests/phase23/ai-field-registry.spec.ts  — AFL-AI-01/02/03 (Plan 23-02)
+      //   tests/phase23/version-supersede.spec.ts  — AFL-VER-01/02/03 (Plan 23-03)
+      //   tests/phase23/version-indicator.spec.ts  — AFL-VER-04 (Plan 23-05)
+      //   tests/phase23/completion-roster.spec.ts  — AFL-VER-05 + D-11 (Plan 23-04/06)
+      name: 'phase23-stubs',
+      testDir: '.',
+      testMatch: /tests\/phase23\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
+    {
+      // Phase 23 — field registry unit tests (pure module; static imports; no dynamic import()).
+      //
+      // CLAUDE.md 2026-04-24: dynamic import('@/...') fails in Playwright Node runner
+      // outside a testDir-scoped project — use STATIC @/ imports here.
+      // testDir: './src/lib/ai-fields/__tests__' so Playwright's TS compiler resolves
+      // @/ path aliases (mirrors phase15-unit pattern for voice/__tests__).
+      //
+      // Verify: `npx playwright test --list --project=phase23-unit`
+      name: 'phase23-unit',
+      testDir: './src/lib/ai-fields/__tests__',
+      testMatch: /.*\.test\.ts$/,
+    },
   ],
 })
