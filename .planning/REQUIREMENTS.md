@@ -431,7 +431,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 **Universal AI Read/Write Field Access (X-03):**
 
 - [ ] **AFL-AI-01**: Every editable field in the app exposes an AI read API (agent can fetch the current value)
-- [ ] **AFL-AI-02**: Most editable fields expose an AI write API (agent can propose / apply a value, with admin approval for high-stakes fields)
+- [x] **AFL-AI-02**: Most editable fields expose an AI write API (agent can propose / apply a value, with admin approval for high-stakes fields)
 - [ ] **AFL-AI-03**: Unified agent interface — every feature surface registers fields via a single shared mechanism, no per-feature bespoke API
 - [-] **AFL-AI-04**: ~~Cmd+K command palette extended to cover admin pages, team members, and settings~~ — **REMOVED from scope 2026-06-25** (product decision: Cmd+K dropped from SOPstart entirely; existing /sops palette + `cmdk` dep deleted in d06066b). Not implemented.
 
@@ -441,7 +441,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 - [ ] **AFL-VER-02**: Side-by-side diff between any two SOP versions
 - [ ] **AFL-VER-03**: Admin can restore an old version as the active one with one click
 - [ ] **AFL-VER-04**: Workers see an indicator on the SOP if it has been updated since their last completion
-- [ ] **AFL-VER-05**: Every SOP instance run by a worker is recorded with the worker's name (captured at instance start) + per-step approval, forming a personal sign-off chain — completing the SOP IS the legal signature
+- [x] **AFL-VER-05**: Every SOP instance run by a worker is recorded with the worker's name (captured at instance start) + per-step approval, forming a personal sign-off chain — completing the SOP IS the legal signature
 
 ### v4.0 Traceability
 
