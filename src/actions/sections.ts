@@ -120,7 +120,7 @@ export async function reorderSections(
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const role = jwtClaims['user_role']
+  const role = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'Admin access required' }
   }
@@ -168,7 +168,7 @@ export async function updateSectionLayout(
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const role = jwtClaims['user_role']
+  const role = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'Admin access required' }
   }
@@ -230,10 +230,10 @@ export async function updateSectionTitle(
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
   if (!organisationId) return { error: 'No organisation found' }
 
-  const role = jwtClaims['user_role']
+  const role = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'Admin access required to update section title.' }
   }

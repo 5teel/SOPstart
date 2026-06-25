@@ -33,7 +33,7 @@ export async function GET() {
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
   if (!organisationId) {
     return NextResponse.json(
       { error: 'No organisation associated with this session.' },
@@ -71,7 +71,7 @@ export async function GET() {
   while (fetched < total) {
     const { data: listData } = await admin.auth.admin.listUsers({ page, perPage: 1000 })
     if (!listData) break
-    total = listData.total ?? 0
+    total = ("total" in listData ? listData.total : undefined) ?? 0
     for (const u of listData.users) {
       if (userIds.includes(u.id) && u.email) {
         emailMap[u.id] = u.email

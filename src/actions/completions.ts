@@ -36,7 +36,7 @@ export async function submitCompletion(
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
   if (!organisationId) return { success: false, error: 'No organisation found' }
 
   const admin = createAdminClient()
@@ -149,8 +149,8 @@ export async function signOffCompletion(
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const role: string | undefined = jwtClaims['user_role']
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  const role: string | undefined = jwtClaims['user_role'] as string | undefined
+  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
 
   if (!role || !['supervisor', 'safety_manager'].includes(role)) {
     return { success: false, error: 'Only supervisors and safety managers can sign off completions.' }
@@ -266,7 +266,7 @@ export async function getPhotoUploadUrl(input: {
     const jwtClaims = session?.access_token
       ? parseJwtPayload(session.access_token)
       : {}
-    orgId = jwtClaims['organisation_id'] ?? ''
+    orgId = (jwtClaims['organisation_id'] as string | undefined) ?? ''
   }
   if (!orgId) return { error: 'No organisation found' }
 
@@ -317,7 +317,7 @@ export async function recordSignature(
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
   if (!organisationId) return { success: false, error: 'No organisation found' }
 
   const admin = createAdminClient()

@@ -41,7 +41,7 @@ export default async function KioskLoginPage({
   const { data: { session } } = await supabase.auth.getSession()
   if (session?.access_token) {
     const jwtClaims = parseJwtPayload(session.access_token)
-    const role: string | undefined = jwtClaims['user_role']
+    const role: string | undefined = jwtClaims['user_role'] as string | undefined
     if (role && ['admin', 'safety_manager', 'supervisor'].includes(role)) {
       redirect('/dashboard')
     }

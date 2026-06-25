@@ -24,11 +24,11 @@ export async function createUploadSession(
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
   if (!organisationId) return { error: 'No organisation found' }
 
   // Check role
-  const role = jwtClaims['user_role']
+  const role = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'You need admin access to upload SOPs.' }
   }
@@ -131,10 +131,10 @@ export async function createVideoUploadSession(
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
   if (!organisationId) return { error: 'No organisation found' }
 
-  const role = jwtClaims['user_role']
+  const role = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'You need admin access to upload SOPs.' }
   }
@@ -346,10 +346,10 @@ export async function updateSopTitle(
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
   if (!organisationId) return { error: 'No organisation found' }
 
-  const role = jwtClaims['user_role']
+  const role = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'Admin access required to update SOP title.' }
   }
@@ -375,7 +375,7 @@ export async function deleteSop(sopId: string): Promise<{ success: true } | { er
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const role = jwtClaims['user_role']
+  const role = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'Admin access required' }
   }
@@ -416,9 +416,9 @@ export async function createVideoSopPipelineSession(input: {
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
   if (!organisationId) return { error: 'No organisation found' }
-  const role = jwtClaims['user_role']
+  const role = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'You need admin access to upload SOPs.' }
   }
@@ -550,10 +550,10 @@ export async function createSopFromWizard(
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
   if (!organisationId) return { error: 'No organisation found' }
 
-  const role = jwtClaims['user_role']
+  const role = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'Admin access required' }
   }

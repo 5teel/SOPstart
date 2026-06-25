@@ -57,7 +57,7 @@ export async function applyAiWrite(
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
   if (!organisationId) return { success: false, error: 'No organisation found' }
 
   // Override context.organisationId with the JWT-derived value (never trust client).
@@ -132,8 +132,8 @@ export async function acceptProposal(
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const role: string | undefined = jwtClaims['user_role']
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  const role: string | undefined = jwtClaims['user_role'] as string | undefined
+  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
 
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { success: false, error: 'You need admin access to accept proposals.' }
@@ -249,8 +249,8 @@ export async function rejectProposal(
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const role: string | undefined = jwtClaims['user_role']
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  const role: string | undefined = jwtClaims['user_role'] as string | undefined
+  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
 
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { success: false, error: 'You need admin access to reject proposals.' }

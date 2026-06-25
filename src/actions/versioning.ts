@@ -25,7 +25,7 @@ export async function uploadNewVersion(
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const role: string | undefined = jwtClaims['user_role']
+  const role: string | undefined = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { success: false, error: 'You need admin access to upload SOP versions.' }
   }
@@ -144,7 +144,7 @@ export async function notifyAssignedWorkers(
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const role: string | undefined = jwtClaims['user_role']
+  const role: string | undefined = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { success: false, error: 'You need admin access to notify workers.' }
   }
@@ -321,7 +321,7 @@ export async function cloneSopAsDraft(
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const role: string | undefined = jwtClaims['user_role']
+  const role: string | undefined = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { success: false, error: 'You need admin access to clone SOP versions.' }
   }
@@ -338,7 +338,7 @@ export async function cloneSopAsDraft(
   }
 
   // Self-enforce org-scope (CLAUDE.md 2026-06-15): verify source belongs to caller's org
-  const jwtOrgId: string | undefined = jwtClaims['organisation_id']
+  const jwtOrgId: string | undefined = jwtClaims['organisation_id'] as string | undefined
   if (!jwtOrgId || sourceSop.organisation_id !== jwtOrgId) {
     return { success: false, error: 'Access denied: SOP belongs to a different organisation.' }
   }
@@ -632,7 +632,7 @@ export async function getSopVersionForDiff(
   const jwtClaims = session?.access_token
     ? parseJwtPayload(session.access_token)
     : {}
-  const role: string | undefined = jwtClaims['user_role']
+  const role: string | undefined = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { success: false, error: 'You need admin access to view version diffs.' }
   }
@@ -651,7 +651,7 @@ export async function getSopVersionForDiff(
   }
 
   // Self-enforce org-scope (T-23-05-01 — admin client bypasses RLS)
-  const jwtOrgId: string | undefined = jwtClaims['organisation_id']
+  const jwtOrgId: string | undefined = jwtClaims['organisation_id'] as string | undefined
   if (!jwtOrgId || sop.organisation_id !== jwtOrgId) {
     return { success: false, error: 'Access denied: SOP belongs to a different organisation.' }
   }
