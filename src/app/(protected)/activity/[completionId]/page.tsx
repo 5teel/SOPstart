@@ -148,6 +148,7 @@ export default async function CompletionDetailPage({ params }: CompletionDetailP
       signOff={signOff}
       isSupervisor={isSupervisor}
       alreadySigned={alreadySigned}
+      currentUserId={user.id}
     />
   )
 }

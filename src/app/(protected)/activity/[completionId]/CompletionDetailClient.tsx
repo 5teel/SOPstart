@@ -48,6 +48,7 @@ interface CompletionDetailClientProps {
   signOff: SignOff | null
   isSupervisor: boolean
   alreadySigned: boolean
+  currentUserId: string
 }
 
 function formatNZDateTime(isoString: string): string {
@@ -77,6 +78,7 @@ export function CompletionDetailClient({
   photos,
   signOff: initialSignOff,
   isSupervisor,
+  currentUserId,
   alreadySigned: initialAlreadySigned,
 }: CompletionDetailClientProps) {
   const [status, setStatus] = useState<CompletionStatus>(initialStatus)
@@ -102,10 +104,12 @@ export function CompletionDetailClient({
 
         // D-10 / AFL-VER-05: Record supervisor counter-signature bound to roster identity.
         // On kiosk devices, the supervisor's roster id is stored in sessionStorage by RosterSelector.
-        // On non-kiosk devices, we use workerId (the supervisor's own uid) as the roster identity.
+        // On non-kiosk devices, fall back to the supervisor's own user id (currentUserId).
+        // Using workerId here would record the WORKER's uid as the supervisor roster id,
+        // corrupting the sign-off chain (WR-05 fix).
         // recordSignature is best-effort — sign-off is already committed above; signature
         // failure is non-fatal (logged only). The completion is legally recorded via signOffCompletion.
-        const supervisorRosterId = sessionStorage.getItem(ROSTER_STORAGE_KEY) ?? workerId
+        const supervisorRosterId = sessionStorage.getItem(ROSTER_STORAGE_KEY) ?? currentUserId
         if (supervisorRosterId) {
           recordSignature({
             completionId,
