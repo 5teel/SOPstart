@@ -55,6 +55,11 @@ export const SubmitCompletionSchema = z.object({
   // (older mobile clients won't send this). When present, server persists
   // to sop_completions.step_ack_trace.
   stepAckTrace: z.array(StepAckEntrySchema).optional(),
+  // Phase 23 D-11: optional for back-compat with non-kiosk clients.
+  // When present on a kiosk session, the server validates this user belongs
+  // to the same org before writing to sop_completions.roster_worker_id.
+  // worker_id (the kiosk account uid used for RLS) is NEVER replaced by this.
+  rosterWorkerId: z.string().uuid().optional(),
 })
 export type SubmitCompletionInput = z.infer<typeof SubmitCompletionSchema>
 
@@ -67,3 +72,15 @@ export const SignOffSchema = z.object({
   reason: z.string().optional(),
 })
 export type SignOffInput = z.infer<typeof SignOffSchema>
+
+/**
+ * Phase 23 AFL-VER-05: append-only sign-off chain for worker + supervisor signatures.
+ * Inserts into sop_completion_signatures (no authenticated write policy — service-role only,
+ * per CLAUDE.md 2026-06-15).
+ */
+export const RecordSignatureSchema = z.object({
+  completionId: z.string().uuid(),
+  role: z.enum(['worker', 'supervisor']),
+  rosterUserId: z.string().uuid(),
+})
+export type RecordSignatureInput = z.infer<typeof RecordSignatureSchema>

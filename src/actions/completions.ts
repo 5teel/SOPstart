@@ -7,6 +7,7 @@ import type { Json } from '@/types/database.types'
 import {
   SubmitCompletionSchema as submitCompletionSchema,
   SignOffSchema as signOffSchema,
+  RecordSignatureSchema as recordSignatureSchema,
 } from '@/lib/validators/completions'
 
 // ---------------------------------------------------------------
@@ -38,21 +39,41 @@ export async function submitCompletion(
   if (!organisationId) return { success: false, error: 'No organisation found' }
 
   const admin = createAdminClient()
-  const { localId, sopId, sopVersion, contentHash, stepData, photoStoragePaths, stepAckTrace } =
+  const { localId, sopId, sopVersion, contentHash, stepData, photoStoragePaths, stepAckTrace, rosterWorkerId } =
     parsed.data
+
+  // Phase 23 D-11: validate rosterWorkerId belongs to the same org before writing.
+  // (RESEARCH Pitfall 4, CLAUDE.md 2026-06-15 — cross-tenant attribution attack surface)
+  // Uses the regular session client so RLS org-scope is enforced automatically.
+  let resolvedRosterWorkerId: string | null = null
+  if (rosterWorkerId) {
+    const { data: memberCheck } = await supabase
+      .from('organisation_members')
+      .select('user_id')
+      .eq('user_id', rosterWorkerId)
+      .eq('organisation_id', organisationId)
+      .single()
+    if (!memberCheck) {
+      return { success: false, error: 'Roster user not in this organisation.' }
+    }
+    resolvedRosterWorkerId = rosterWorkerId
+  }
 
   // Insert into sop_completions — client UUID as PK for idempotent retry
   // submitted_at intentionally omitted: DB DEFAULT now() is the authoritative server timestamp
   // step_ack_trace (Phase 15 D-21): append-only evidence of sequential reading.
   // Server treats client-supplied trace as informational — D-20 / threat model
   // T-15-02-01: it's evidence, not a gate.
+  // roster_worker_id (Phase 23 D-11): attribution column — worker_id STAYS as user.id (kiosk
+  // account uid, the RLS key). roster_worker_id is the floor-identity attribution column only.
   const { error: insertError } = await admin
     .from('sop_completions')
     .insert({
       id: localId,
       organisation_id: organisationId,
       sop_id: sopId,
-      worker_id: user.id,
+      worker_id: user.id,              // kiosk account uid (RLS key — DO NOT change)
+      roster_worker_id: resolvedRosterWorkerId,  // D-11 attribution (null for non-kiosk)
       sop_version: sopVersion,
       content_hash: contentHash,
       step_data: stepData as Record<string, number>,
@@ -256,4 +277,85 @@ export async function getPhotoUploadUrl(input: {
   }
 
   return { url: data.signedUrl, path }
+}
+
+// ---------------------------------------------------------------
+// recordSignature
+//
+// Appends a worker or supervisor signature to sop_completion_signatures.
+// This table has NO authenticated INSERT policy (append-only, legally
+// immutable — migration 00038). MUST use createAdminClient() with
+// self-enforced org-scope (CLAUDE.md 2026-06-15, T-23-06-04).
+//
+// AFL-VER-05: worker self-sign at completion + supervisor counter-sign (D-09/D-10).
+// The roster_user_id must belong to the caller's org (cross-tenant guard, T-23-06-01).
+// ---------------------------------------------------------------
+export async function recordSignature(
+  rawInput: unknown
+): Promise<{ success: true } | { success: false; error: string }> {
+  const parsed = recordSignatureSchema.safeParse(rawInput)
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
+  }
+
+  const { completionId, role, rosterUserId } = parsed.data
+
+  const supabase = await createClient()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  if (userError || !user) return { success: false, error: 'Not authenticated' }
+
+  // Extract organisation_id from JWT custom claims
+  const { data: { session } } = await supabase.auth.getSession()
+  const jwtClaims = session?.access_token
+    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    : {}
+  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  if (!organisationId) return { success: false, error: 'No organisation found' }
+
+  const admin = createAdminClient()
+
+  // Verify the completion belongs to the caller's org (org-scope self-enforcement,
+  // T-23-06-04 — service-role bypasses RLS so we must check manually)
+  const { data: completion, error: fetchError } = await admin
+    .from('sop_completions')
+    .select('id, organisation_id')
+    .eq('id', completionId)
+    .single()
+
+  if (fetchError || !completion) {
+    return { success: false, error: 'Completion not found.' }
+  }
+  if (completion.organisation_id !== organisationId) {
+    return { success: false, error: 'Completion does not belong to your organisation.' }
+  }
+
+  // Verify rosterUserId belongs to the same org (T-23-06-01 cross-tenant guard)
+  const { data: memberCheck } = await admin
+    .from('organisation_members')
+    .select('user_id')
+    .eq('user_id', rosterUserId)
+    .eq('organisation_id', organisationId)
+    .single()
+
+  if (!memberCheck) {
+    return { success: false, error: 'Roster user not in this organisation.' }
+  }
+
+  // Insert signature row — service-role, append-only (no UPDATE/DELETE)
+  // signed_at is DB DEFAULT now() (not client-supplied — authoritative server timestamp)
+  const { error: insertError } = await admin
+    .from('sop_completion_signatures')
+    .insert({
+      organisation_id: organisationId,
+      completion_id: completionId,
+      role,
+      roster_user_id: rosterUserId,
+    })
+
+  if (insertError) {
+    console.error('recordSignature insert error:', insertError)
+    return { success: false, error: 'Failed to record signature.' }
+  }
+
+  return { success: true }
 }
