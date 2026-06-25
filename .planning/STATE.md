@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
-status: Phase complete — ready for verification
+status: Ready to plan
 stopped_at: "Completed 22-04: Always-on visual layer in ImmersiveStepCard (photo-or-icon, SECTION_TYPE_ICONS, SopImageInline reuse)"
-last_updated: "2026-06-24T03:21:08.261Z"
+last_updated: "2026-06-25T04:05:43.066Z"
 progress:
   total_phases: 28
   completed_phases: 3
@@ -24,8 +24,8 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 22 (voice-driven-walkthrough) — EXECUTING
-Plan: 4 of 4
+Phase: 24
+Plan: Not started
 **Milestone status:** v4.0 started 2026-05-24. Phases 21, 21.5, 21.6, 24, 25 ✅ complete; 22 + 23 remaining. See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
 
 **Active phase:** 22
@@ -105,6 +105,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | 11 | 4 | - | - |
 | 24 | 3 | - | - |
 | 25 | 6 | - | - |
+| 22 | 4 | - | - |
 
 **v2.0 By Phase:**
 
