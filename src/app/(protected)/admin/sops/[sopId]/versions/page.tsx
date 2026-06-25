@@ -1,10 +1,29 @@
 'use client'
 
+/**
+ * Phase 23 Plan 23-05 — AFL-VER-01 / D-05/D-06: Versions page with
+ * "Edit into new version" (cloneSopAsDraft), "Restore as new version"
+ * (restoreVersionAsNew), and "Compare" (→ diff page) buttons.
+ *
+ * NOTE: journeys.ts must reflect the new version/diff/restore flows — the
+ * actual journeys.ts edit is in Plan 23-07 (same-change rule from CLAUDE.md).
+ *
+ * CLAUDE.md 2026-06-05: all onClick handlers are WIRED to the server actions
+ * (no empty handler).
+ */
+
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Users, Video } from 'lucide-react'
-import { getVersionHistory, uploadNewVersion, notifyAssignedWorkers, type VersionRecord } from '@/actions/versioning'
+import {
+  getVersionHistory,
+  uploadNewVersion,
+  notifyAssignedWorkers,
+  cloneSopAsDraft,
+  restoreVersionAsNew,
+  type VersionRecord,
+} from '@/actions/versioning'
 
 function ArrowLeftIcon({ className }: { className?: string }) {
   return (
@@ -65,6 +84,25 @@ function AlertTriangleIcon({ className }: { className?: string }) {
   )
 }
 
+function CopyIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden="true"
+    >
+      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+  )
+}
+
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('en-NZ', {
     day: 'numeric',
@@ -81,8 +119,21 @@ export default function SopVersionHistoryPage() {
   const [versions, setVersions] = useState<VersionRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Upload new version state (existing pattern retained — D-05: re-upload remains available)
   const [showUploadConfirm, setShowUploadConfirm] = useState(false)
   const [uploading, setUploading] = useState(false)
+
+  // Edit into new version (clone) state — D-05
+  const [showCloneConfirm, setShowCloneConfirm] = useState(false)
+  const [cloning, setCloning] = useState(false)
+
+  // Restore as new version state — D-06; tracks which version is being restored
+  const [restoringVersionId, setRestoringVersionId] = useState<string | null>(null)
+  const [showRestoreConfirmFor, setShowRestoreConfirmFor] = useState<string | null>(null)
+
+  // Compare: track which version to compare against current
+  const [selectedForCompare, setSelectedForCompare] = useState<string | null>(null)
 
   useEffect(() => {
     async function loadVersions() {
@@ -101,6 +152,7 @@ export default function SopVersionHistoryPage() {
   const currentSop = versions.find(v => v.superseded_by === null) ?? versions[0]
   const sopTitle = currentSop?.title ?? currentSop?.source_file_name ?? 'SOP'
 
+  // --- Upload new version handler (existing) ---
   async function handleFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -153,6 +205,35 @@ export default function SopVersionHistoryPage() {
     }
   }
 
+  // --- Edit into new version (clone) handler — D-05 ---
+  // CLAUDE.md 2026-06-05: wired to the server action, no empty handler
+  async function handleClone() {
+    if (!currentSop) return
+    setCloning(true)
+    setShowCloneConfirm(false)
+    const result = await cloneSopAsDraft(currentSop.id)
+    if (!result.success) {
+      setError(result.error)
+      setCloning(false)
+      return
+    }
+    router.push(`/admin/sops/builder/${result.newDraftId}`)
+  }
+
+  // --- Restore as new version handler — D-06 ---
+  // CLAUDE.md 2026-06-05: wired to the server action, no empty handler
+  async function handleRestore(versionId: string) {
+    setRestoringVersionId(versionId)
+    setShowRestoreConfirmFor(null)
+    const result = await restoreVersionAsNew(versionId)
+    if (!result.success) {
+      setError(result.error)
+      setRestoringVersionId(null)
+      return
+    }
+    router.push(`/admin/sops/builder/${result.newDraftId}`)
+  }
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 lg:px-8 lg:py-10">
       {/* Header */}
@@ -186,56 +267,99 @@ export default function SopVersionHistoryPage() {
         </Link>
       </div>
 
-      {/* Upload new version button */}
-      <div className="mb-6">
+      {/* Action buttons row — Upload New Version (D-05: re-upload stays) + Edit into new version */}
+      <div className="mb-6 flex flex-wrap gap-3">
+        {/* Upload New Version button — D-05: re-upload remains available */}
         <button
           type="button"
-          onClick={() => setShowUploadConfirm(true)}
-          disabled={uploading}
-          className="flex items-center gap-2 h-[56px] px-5 bg-[var(--ink-900)] text-white font-semibold rounded-xl hover:bg-[var(--ink-700)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+          onClick={() => { setShowUploadConfirm(true); setShowCloneConfirm(false) }}
+          disabled={uploading || cloning}
+          className="flex items-center gap-2 h-[56px] px-5 bg-[var(--paper-2)] border border-[var(--ink-200)] text-[var(--ink-900)] font-semibold rounded-xl hover:bg-white hover:border-[var(--ink-400)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
         >
           <UploadIcon className="h-4 w-4" />
           {uploading ? 'Uploading...' : 'Upload New Version'}
         </button>
 
-        {/* Inline confirmation card */}
-        {showUploadConfirm && (
-          <div className="mt-3 bg-[var(--accent-voice)]/10 border border-[var(--accent-voice)]/30 rounded-xl px-4 py-4">
-            <div className="flex items-start gap-3">
-              <AlertTriangleIcon className="h-5 w-5 text-[var(--accent-voice)] flex-shrink-0 mt-0.5" />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-[var(--ink-900)] leading-relaxed">
-                  Uploading a new version will replace what workers see -- the old version stays linked to any historical completions.
-                </p>
-                <div className="flex items-center gap-4 mt-3">
-                  <label className="cursor-pointer">
-                    <input
-                      type="file"
-                      accept=".docx,.doc,.pdf,.jpg,.jpeg,.png,.webp"
-                      className="sr-only"
-                      onChange={handleFileSelected}
-                    />
-                    <span className="text-[var(--accent-voice)] font-semibold text-sm hover:text-[var(--ink-700)] transition-colors">
-                      Got it, proceed
-                    </span>
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setShowUploadConfirm(false)}
-                    className="text-[var(--ink-500)] hover:text-[var(--ink-900)] text-sm transition-colors"
-                  >
-                    Cancel
-                  </button>
-                </div>
+        {/* Edit into new version button — D-05 primary supersede entry */}
+        <button
+          type="button"
+          onClick={() => { setShowCloneConfirm(true); setShowUploadConfirm(false) }}
+          disabled={uploading || cloning || !currentSop}
+          className="flex items-center gap-2 h-[56px] px-5 bg-[var(--ink-900)] text-white font-semibold rounded-xl hover:bg-[var(--ink-700)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+        >
+          <CopyIcon className="h-4 w-4" />
+          {cloning ? 'Creating draft...' : 'Edit into new version'}
+        </button>
+      </div>
+
+      {/* Upload confirmation card (existing pattern) */}
+      {showUploadConfirm && (
+        <div className="mb-4 bg-[var(--accent-voice)]/10 border border-[var(--accent-voice)]/30 rounded-xl px-4 py-4">
+          <div className="flex items-start gap-3">
+            <AlertTriangleIcon className="h-5 w-5 text-[var(--accent-voice)] flex-shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-[var(--ink-900)] leading-relaxed">
+                Uploading a new version will replace what workers see -- the old version stays linked to any historical completions.
+              </p>
+              <div className="flex items-center gap-4 mt-3">
+                <label className="cursor-pointer">
+                  <input
+                    type="file"
+                    accept=".docx,.doc,.pdf,.jpg,.jpeg,.png,.webp"
+                    className="sr-only"
+                    onChange={handleFileSelected}
+                  />
+                  <span className="text-[var(--accent-voice)] font-semibold text-sm hover:text-[var(--ink-700)] transition-colors">
+                    Got it, proceed
+                  </span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowUploadConfirm(false)}
+                  className="text-[var(--ink-500)] hover:text-[var(--ink-900)] text-sm transition-colors"
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {error && (
-          <p className="mt-3 text-sm text-red-400">{error}</p>
-        )}
-      </div>
+      {/* Clone confirmation card — same pattern as upload confirm */}
+      {showCloneConfirm && currentSop && (
+        <div className="mb-4 bg-[var(--accent-signoff)]/10 border border-[var(--accent-signoff)]/30 rounded-xl px-4 py-4">
+          <div className="flex items-start gap-3">
+            <CopyIcon className="h-5 w-5 text-[var(--accent-signoff)] flex-shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-[var(--ink-900)] leading-relaxed">
+                This will copy the current published version (v{currentSop.version}) into a new editable draft.
+                Workers continue using the current version until you publish the draft.
+              </p>
+              <div className="flex items-center gap-4 mt-3">
+                <button
+                  type="button"
+                  onClick={handleClone}
+                  className="text-[var(--accent-signoff)] font-semibold text-sm hover:text-[var(--ink-700)] transition-colors"
+                >
+                  Create draft copy
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowCloneConfirm(false)}
+                  className="text-[var(--ink-500)] hover:text-[var(--ink-900)] text-sm transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <p className="mb-4 text-sm text-red-400">{error}</p>
+      )}
 
       {/* Version history table */}
       {loading ? (
@@ -249,7 +373,7 @@ export default function SopVersionHistoryPage() {
       ) : (
         <div className="w-full bg-white rounded-lg overflow-hidden border border-[var(--ink-100)]">
           {/* Table header */}
-          <div className="grid grid-cols-[80px_1fr_1fr_120px] gap-4 px-4 py-3 bg-[var(--paper)]/60">
+          <div className="grid grid-cols-[80px_1fr_1fr_200px] gap-4 px-4 py-3 bg-[var(--paper)]/60">
             <span className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wide">Version</span>
             <span className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wide">Uploaded</span>
             <span className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wide">Status</span>
@@ -259,41 +383,102 @@ export default function SopVersionHistoryPage() {
           {/* Data rows */}
           {versions.map((ver) => {
             const isCurrent = ver.superseded_by === null && ver.status === 'published'
+            const isRestoringThis = restoringVersionId === ver.id
+            const showRestoreConfirm = showRestoreConfirmFor === ver.id
+
+            // Compare: A = this version, B = current
+            const currentId = currentSop?.id
+            const compareUrl = currentId
+              ? `/admin/sops/${sopId}/versions/diff?a=${ver.id}&b=${currentId}`
+              : null
+
             return (
-              <div
-                key={ver.id}
-                className="grid grid-cols-[80px_1fr_1fr_120px] gap-4 px-4 items-center border-t border-[var(--ink-100)] min-h-[56px] text-sm text-[var(--ink-900)]"
-              >
-                {/* Version number */}
-                <span className="text-sm font-mono font-semibold">v{ver.version}</span>
+              <div key={ver.id} className="border-t border-[var(--ink-100)]">
+                <div
+                  className="grid grid-cols-[80px_1fr_1fr_200px] gap-4 px-4 items-center min-h-[56px] text-sm text-[var(--ink-900)]"
+                >
+                  {/* Version number */}
+                  <span className="text-sm font-mono font-semibold">v{ver.version}</span>
 
-                {/* Upload date */}
-                <span className="text-sm text-[var(--ink-500)]">{formatDate(ver.created_at)}</span>
+                  {/* Upload date */}
+                  <span className="text-sm text-[var(--ink-500)]">{formatDate(ver.created_at)}</span>
 
-                {/* Status badge */}
-                <span>
-                  {isCurrent ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--ink-900)]/20 text-[var(--ink-900)] text-xs font-semibold rounded">
-                      Current
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center px-2 py-0.5 bg-[var(--paper-2)] text-[var(--ink-500)] text-xs font-medium rounded">
-                      Superseded
-                    </span>
-                  )}
-                </span>
+                  {/* Status badge */}
+                  <span>
+                    {isCurrent ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--ink-900)]/20 text-[var(--ink-900)] text-xs font-semibold rounded">
+                        Current
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center px-2 py-0.5 bg-[var(--paper-2)] text-[var(--ink-500)] text-xs font-medium rounded">
+                        Superseded
+                      </span>
+                    )}
+                  </span>
 
-                {/* Actions */}
-                <div className="flex justify-end">
-                  {isCurrent && (
-                    <Link
-                      href={`/admin/sops/builder/${ver.id}`}
-                      className="text-[var(--ink-900)] hover:text-[var(--ink-700)] text-sm font-medium transition-colors"
-                    >
-                      Review
-                    </Link>
-                  )}
+                  {/* Actions */}
+                  <div className="flex justify-end items-center gap-2 flex-wrap">
+                    {isCurrent && (
+                      <Link
+                        href={`/admin/sops/builder/${ver.id}`}
+                        className="text-[var(--ink-900)] hover:text-[var(--ink-700)] text-sm font-medium transition-colors"
+                      >
+                        Review
+                      </Link>
+                    )}
+
+                    {/* Compare — links to diff page: A=this version, B=current */}
+                    {compareUrl && !isCurrent && (
+                      <Link
+                        href={compareUrl}
+                        className="text-[var(--ink-500)] hover:text-[var(--ink-900)] text-sm font-medium transition-colors"
+                        title="Compare with current version"
+                      >
+                        Compare
+                      </Link>
+                    )}
+
+                    {/* Restore as new version — D-06: per non-current version */}
+                    {!isCurrent && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowRestoreConfirmFor(showRestoreConfirm ? null : ver.id)
+                        }
+                        disabled={!!restoringVersionId}
+                        className="text-[var(--accent-signoff)] hover:text-[var(--ink-700)] text-sm font-medium transition-colors disabled:opacity-50"
+                      >
+                        {isRestoringThis ? 'Restoring...' : 'Restore'}
+                      </button>
+                    )}
+                  </div>
                 </div>
+
+                {/* Inline restore confirmation — D-06, mirrors showUploadConfirm pattern */}
+                {showRestoreConfirm && !isCurrent && (
+                  <div className="mx-4 mb-3 bg-[var(--paper-2)] border border-[var(--ink-100)] rounded-xl px-4 py-3">
+                    <p className="text-sm text-[var(--ink-900)] leading-relaxed mb-2">
+                      This copies v{ver.version} content into a <strong>new draft</strong>.
+                      The old version is not reactivated — history stays append-only.
+                    </p>
+                    <div className="flex items-center gap-4">
+                      <button
+                        type="button"
+                        onClick={() => handleRestore(ver.id)}
+                        className="text-[var(--accent-signoff)] font-semibold text-sm hover:text-[var(--ink-700)] transition-colors"
+                      >
+                        Restore as new version
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowRestoreConfirmFor(null)}
+                        className="text-[var(--ink-500)] hover:text-[var(--ink-900)] text-sm transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )
           })}
