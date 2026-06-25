@@ -94,6 +94,7 @@ Also include any other relevant sections: Training Requirements, Tools/Equipment
 - Group related steps into named phases/stages (e.g., "Preparation", "Execution", "Cleanup")
 - Add warnings and cautions to steps where safety is relevant
 - Include time estimates where you can reasonably infer them
+- UNITS — NEW ZEALAND METRIC ONLY. This SOP is for a New Zealand worksite. Any units YOU add or infer must be metric: temperatures in Celsius (°C); length mm/cm/m/km; mass g/kg/tonnes; volume mL/L; pressure kPa/bar. NEVER introduce Fahrenheit or imperial units (inches, feet, yards, pounds/lb, ounces, gallons, PSI). PRESERVE any value the source document states EXACTLY as written — do NOT convert source values and do NOT add bracketed conversions; only your own added/inferred units must be metric.
 
 ### 3. ANALYSE — Extract safety intelligence
 - Flag hazards the speaker mentioned directly (even casually)
