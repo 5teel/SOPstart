@@ -430,9 +430,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 **Universal AI Read/Write Field Access (X-03):**
 
-- [ ] **AFL-AI-01**: Every editable field in the app exposes an AI read API (agent can fetch the current value)
+- [x] **AFL-AI-01**: Every editable field in the app exposes an AI read API (agent can fetch the current value)
 - [x] **AFL-AI-02**: Most editable fields expose an AI write API (agent can propose / apply a value, with admin approval for high-stakes fields)
-- [ ] **AFL-AI-03**: Unified agent interface — every feature surface registers fields via a single shared mechanism, no per-feature bespoke API
+- [x] **AFL-AI-03**: Unified agent interface — every feature surface registers fields via a single shared mechanism, no per-feature bespoke API
 - [-] **AFL-AI-04**: ~~Cmd+K command palette extended to cover admin pages, team members, and settings~~ — **REMOVED from scope 2026-06-25** (product decision: Cmd+K dropped from SOPstart entirely; existing /sops palette + `cmdk` dep deleted in d06066b). Not implemented.
 
 **Version History + Worker-Instance Sign-off (G-01):**

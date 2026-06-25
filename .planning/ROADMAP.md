@@ -57,7 +57,7 @@ Three phases bundle the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` 
   - [x] 22-02-PLAN.md — Voice infra: Deepgram keyterms + `/api/voice/tts` route + `useTtsPlayback` hook + `classifyIntent` (Wave 1)
   - [x] 22-04-PLAN.md — Always-on visual layer (photo-or-icon per step) in `ImmersiveStepCard` (Wave 1)
   - [x] 22-03-PLAN.md — Wire the live voice loop: STT + intent dispatch + TTS read-back + onVoiceNext→handleMarkComplete (D-02) + human UAT (Wave 2)
-- [ ] **Phase 23: AI Field Layer + Version Supersede** — Universal AI read/write access to every editable field (X-03) + version history formal supersede + diff + restore + worker-instance sign-off chain (G-01). X-03 is the architectural backbone v5.0 conversational app builds on; G-01 fits naturally alongside as a small standalone bundle. (Cmd+K / AFL-AI-04 **removed from scope 2026-06-25** — palette dropped from the product.)
+- [x] **Phase 23: AI Field Layer + Version Supersede** — Universal AI read/write access to every editable field (X-03) + version history formal supersede + diff + restore + worker-instance sign-off chain (G-01). X-03 is the architectural backbone v5.0 conversational app builds on; G-01 fits naturally alongside as a small standalone bundle. (Cmd+K / AFL-AI-04 **removed from scope 2026-06-25** — palette dropped from the product.) (completed 2026-06-25)
 - [x] **Phase 24: Procedure Flow — Spatial Node Graph** — Promoted from v4.0 backlog 2026-06-11 (added 2026-06-09); prototype work already on master (commits `c1440fc`, `9a395bd`, `b223786`). Closes a Phase 12.5 gap: req #8 ("Flow tab renders an SVG node graph") shipped as a vertical list of expandable step cards, NOT the blueprint sketch's design (`sketches/sop-blueprint/index.html` → FLOW tab) — a spatial node-graph canvas with positioned, colour-coded nodes, arrow-connected edges carrying yes/no/escalate branch labels, decision branching, node/branch counts, and FIT / EXPORT-PNG controls. The data model already supports it (`flow_graph` nodes carry `position`; edges carry `kind`). (completed 2026-06-12)
 - [x] **Phase 25: Department as a First-Class Entity** (added 2026-06-14) — First output of the UX-simplification initiative (sketches: `sketches/departments`, `sketches/unified-block-library`, `sketches/team-departments`). Introduces a `departments` table (org-scoped: name, code, colour, icon, **owner_user_id**, archived) with many-to-many junctions to blocks, SOPs, and members. **Replaces** the Phase 13 org-vs-global block model with a single-org + departments model (65 global seed blocks migrate to org-owned, tagged "All departments") and replaces the free-text SOP `category` with `sop_departments`. Department membership gates worker SOP visibility (RLS). Owner accountability addresses the Visy "nobody owns SOPs" finding. Sub-trade tags (00030/00031) are left untouched — dept↔sub-trade combination semantics deferred. Delivers all three sketched surfaces: `/admin/departments` management page, block-library department tagging/filter, team department assignment + ownership, and the create-SOP wizard department field. SPEC: `.planning/phases/25-department-first-class-entity/25-SPEC.md`. (completed 2026-06-15)
 
@@ -170,7 +170,7 @@ Plans:
 
 **Wave 4**
 
-- [ ] 23-07-PLAN.md — journeys.ts + uat/tests.ts updates + full-phase verification gate + final UAT
+- [x] 23-07-PLAN.md — journeys.ts + uat/tests.ts updates + full-phase verification gate + final UAT
 
 ### Phase 1: Foundation
 
@@ -576,7 +576,7 @@ These two items belong with kiosk mode + site-tier work in Phase 15 because they
   9. Global app-wide Cmd+K mounted across all `(protected)` routes — surfaces app-wide navigation (Library, Blocks, Team, Create via Upload/Blank/AI, Settings, kiosk site selector for multi-site admins) alongside the existing SOP-scoped jump-to-step + ask-AI on SOP pages.
   10. Bundle isolation: kiosk mode chunks + voice Q&A RAG client do not leak into the existing mobile worker bundle; mobile worker walkthrough First Load JS does not grow as a result of Phase 15.
 
-**Plans:** 7/8 plans executed
+**Plans:** 8/8 plans complete
 
 Plans:
 
