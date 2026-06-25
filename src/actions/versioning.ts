@@ -402,13 +402,16 @@ export async function cloneSopAsDraft(
         throw new Error(`Failed to copy sections: ${secInsertError?.message ?? 'no data'}`)
       }
 
-      // Build sectionIdMap by matching sort_order (stable within a SOP)
-      for (const oldSec of sections) {
-        const newSec = newSections.find(ns => ns.sort_order === oldSec.sort_order)
+      // Build sectionIdMap by array index: sections[] and newSections[] are both ordered
+      // sort_order ASC (sections fetched with .order), and RETURNING preserves insert order.
+      // Matching by sort_order is incorrect when two sections share a sort_order (no UNIQUE
+      // constraint) — index matching is always unambiguous (WR-02 fix).
+      sections.forEach((oldSec, idx) => {
+        const newSec = newSections[idx]
         if (newSec) {
           sectionIdMap.set(oldSec.id, newSec.id)
         }
-      }
+      })
 
       // Step 2c: Copy sop_steps for each section
       // Column names per database.types.ts: section_id (not sop_section_id), step_number (not sort_order), required_tools (not tools)
@@ -445,13 +448,33 @@ export async function cloneSopAsDraft(
           throw new Error(`Failed to copy steps: ${stepsInsertError?.message ?? 'no data'}`)
         }
 
-        // Build stepIdMap: old step id → new step id
-        for (const oldStep of steps) {
-          const newSectionId = sectionIdMap.get(oldStep.section_id)
-          const newStep = newSteps.find(ns => ns.section_id === newSectionId && ns.step_number === oldStep.step_number)
-          if (newStep) {
-            stepIdMap.set(oldStep.id, newStep.id)
-          }
+        // Build stepIdMap by array position within each old section group.
+        // steps[] is ordered step_number ASC, newSteps[] RETURNING preserves insert order.
+        // Matching by (section_id, step_number) is incorrect when step_number repeats
+        // within a section — index-based is unambiguous (WR-03 fix).
+        // Group old steps by old section id, newSteps by new section id, then zip by index.
+        const oldStepsBySec = new Map<string, typeof steps>()
+        for (const s of steps) {
+          const arr = oldStepsBySec.get(s.section_id) ?? []
+          arr.push(s)
+          oldStepsBySec.set(s.section_id, arr)
+        }
+        const newStepsByNewSec = new Map<string, typeof newSteps>()
+        for (const ns of newSteps) {
+          const arr = newStepsByNewSec.get(ns.section_id) ?? []
+          arr.push(ns)
+          newStepsByNewSec.set(ns.section_id, arr)
+        }
+        for (const [oldSecId, oldGroup] of oldStepsBySec) {
+          const newSecId = sectionIdMap.get(oldSecId)
+          if (!newSecId) continue
+          const newGroup = newStepsByNewSec.get(newSecId) ?? []
+          oldGroup.forEach((oldStep, idx) => {
+            const newStep = newGroup[idx]
+            if (newStep) {
+              stepIdMap.set(oldStep.id, newStep.id)
+            }
+          })
         }
       }
 
