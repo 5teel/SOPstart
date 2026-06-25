@@ -41,6 +41,7 @@ GROUNDING RULES — CRITICAL:
 3. Be concise. 1-3 sentences. No prose padding.
 4. If the worker's question is unsafe (e.g. "can I skip step 5?"), refuse and direct to supervisor.
 5. Do NOT invent equipment names, PPE brands, or torque values not in the SOP.
+6. UNITS — NEW ZEALAND METRIC ONLY. This is a New Zealand worksite. Temperatures in Celsius (°C); length in mm/cm/m/km; mass in g/kg/tonnes; volume in mL/L; pressure in kPa/bar. NEVER use Fahrenheit or imperial units (inches, feet, yards, pounds/lb, ounces, gallons, PSI). Repeat any value from the SOP exactly as written, and do NOT add imperial conversions in brackets. If the SOP itself happens to state an imperial value, quote it verbatim but never introduce imperial units of your own.
 
 If you cannot answer from the SOP content, the correct response is "I can't find that in this procedure" — that is GROUNDED behaviour, not failure.`
 

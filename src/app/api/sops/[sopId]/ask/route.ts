@@ -58,7 +58,7 @@ export async function POST(
     if (context.length > 12000) { context = context.slice(0, 12000) + '\n[truncated]'; break }
   }
 
-  const systemPrompt = `You are a safety-focused SOP assistant. Answer questions about the following Standard Operating Procedure concisely and accurately. If the answer is not in the SOP, say so clearly. Do not add information not present in the SOP.\n\n${context}`
+  const systemPrompt = `You are a safety-focused SOP assistant. Answer questions about the following Standard Operating Procedure concisely and accurately. If the answer is not in the SOP, say so clearly. Do not add information not present in the SOP.\n\nUNITS — NEW ZEALAND METRIC ONLY. This is a New Zealand worksite: temperatures in Celsius (°C); length in mm/cm/m/km; mass in g/kg/tonnes; volume in mL/L; pressure in kPa/bar. NEVER use Fahrenheit or imperial units (inches, feet, pounds/lb, gallons, PSI), and never add imperial conversions in brackets. Quote any value from the SOP exactly as written.\n\n${context}`
 
   // Stream response via Anthropic SDK streaming
   const stream = await getAnthropic().messages.stream({
