@@ -64,6 +64,20 @@ export const JOURNEYS: Journey[] = [
     ],
   },
   {
+    id: 'kiosk-login',
+    group: 'Getting started',
+    persona: 'Worker (kiosk device)',
+    title: 'Kiosk roster name-select login (D-11)',
+    summary: 'A worker on a shared kiosk device selects their name from the org roster — no password required. The kiosk account session (role=worker) is established once by an admin.',
+    steps: [
+      { id: 's', type: 'start', label: 'Kiosk device (shared, admin-authenticated kiosk account)' },
+      { id: 'kiosk', type: 'screen', label: 'Kiosk name-select', route: '/login/kiosk', detail: 'RosterSelector fetches org worker roster (/api/roster) and renders large glove-friendly tap-target name buttons. Admin/supervisor sessions are redirected to /dashboard (escalation guard T-23-06-02).' },
+      { id: 'select', type: 'action', label: 'Tap name from roster', detail: 'roster_worker_id stored in sessionStorage. Kiosk account (RLS key) session unchanged.' },
+      { id: 'sops', type: 'screen', label: 'SOP library', route: '/sops', detail: 'Worker browses and starts a walkthrough.' },
+      { id: 'e', type: 'end', label: 'Walking through SOP as named worker' },
+    ],
+  },
+  {
     id: 'sign-up',
     group: 'Getting started',
     persona: 'New organisation',
