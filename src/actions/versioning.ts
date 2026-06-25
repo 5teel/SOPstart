@@ -565,6 +565,92 @@ export async function restoreVersionAsNew(
 }
 
 // ------------------------------------------------------------
+// getSopVersionForDiff (AFL-VER-02 / D-07)
+// Fetches a single SOP version's header + sections for the diff page.
+// Uses the admin client (RESEARCH.md Pitfall 5) so superseded versions
+// — which may be invisible to the session client — are always readable.
+// Org-scope is self-enforced: verifies the SOP belongs to the caller's org.
+// This is an admin-only action; role is checked before invoking.
+// ------------------------------------------------------------
+export type SopVersionPayload = {
+  id: string
+  title: string | null
+  version: number
+  status: string
+  published_at: string | null
+  superseded_by: string | null
+  sections: Array<{
+    id: string
+    title: string
+    sort_order: number
+    section_type: string
+    content: string | null
+    layout_data: unknown
+  }>
+}
+
+export async function getSopVersionForDiff(
+  sopId: string
+): Promise<{ success: true; sop: SopVersionPayload } | { success: false; error: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Not authenticated' }
+
+  // JWT role guard — admin-only route
+  const { data: { session } } = await supabase.auth.getSession()
+  const jwtClaims = session?.access_token
+    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    : {}
+  const role: string | undefined = jwtClaims['user_role']
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
+    return { success: false, error: 'You need admin access to view version diffs.' }
+  }
+
+  // Use admin client to read superseded versions (RESEARCH Pitfall 5)
+  const admin = createAdminClient()
+
+  const { data: sop, error: sopError } = await admin
+    .from('sops')
+    .select('id, title, version, status, published_at, superseded_by, organisation_id')
+    .eq('id', sopId)
+    .single()
+
+  if (sopError || !sop) {
+    return { success: false, error: 'SOP version not found.' }
+  }
+
+  // Self-enforce org-scope (T-23-05-01 — admin client bypasses RLS)
+  const jwtOrgId: string | undefined = jwtClaims['organisation_id']
+  if (!jwtOrgId || sop.organisation_id !== jwtOrgId) {
+    return { success: false, error: 'Access denied: SOP belongs to a different organisation.' }
+  }
+
+  const { data: sections, error: sectionsError } = await admin
+    .from('sop_sections')
+    .select('id, title, sort_order, section_type, content, layout_data')
+    .eq('sop_id', sopId)
+    .order('sort_order', { ascending: true })
+
+  if (sectionsError) {
+    console.error('getSopVersionForDiff: sections error:', sectionsError)
+    return { success: false, error: 'Failed to load SOP sections.' }
+  }
+
+  return {
+    success: true,
+    sop: {
+      id: sop.id,
+      title: sop.title,
+      version: sop.version,
+      status: sop.status,
+      published_at: sop.published_at,
+      superseded_by: sop.superseded_by,
+      sections: (sections ?? []) as SopVersionPayload['sections'],
+    },
+  }
+}
+
+// ------------------------------------------------------------
 // markNotificationRead
 // Marks a single notification as read for the authenticated user.
 // ------------------------------------------------------------
