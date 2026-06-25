@@ -12,11 +12,9 @@
  * NEVER use `await import('@/lib/ai-fields/registry')` here — it will fail at runtime
  * in the Playwright Node runner with "SyntaxError: Unexpected token 'export'".
  *
- * These are the RED contract (TDD Wave 0): all tests are marked test.fixme because
- * src/lib/ai-fields/registry.ts does not exist until Plan 23-02.
- * Plan 23-02 turns them GREEN by creating the registry module.
+ * Plan 23-02: test.fixme markers removed — registry.ts full implementation is live.
  *
- * The 4 behavioral contracts this scaffold defines:
+ * The 4 behavioral contracts:
  *   1. round-trip  — registerField + getField returns same descriptor
  *   2. idempotent  — re-registering same ID does not duplicate (HMR-safe)
  *   3. read        — getField('id').read(context) resolves to the registered value
@@ -35,9 +33,8 @@ import { registerField, getField, getAllFields } from '@/lib/ai-fields/registry'
 // AFL-AI-03: registerField stores a descriptor; getField retrieves it by ID
 // ---------------------------------------------------------------------------
 
-test.fixme(
+test(
   'AFL-AI-03 [round-trip]: registerField + getField returns descriptor with matching id + label',
-  // GREEN in Plan 23-02 when registry.ts ships
   async () => {
     registerField({
       id: 'test.round-trip',
@@ -59,9 +56,8 @@ test.fixme(
 // AFL-AI-03 / D-04 / RESEARCH Pitfall 3: re-registering the same ID is a no-op
 // ---------------------------------------------------------------------------
 
-test.fixme(
+test(
   'AFL-AI-03 [idempotent]: registering the same ID twice does not throw and getAllFields count does not increase',
-  // GREEN in Plan 23-02 when registry.ts ships with the registry.has() idempotency guard
   async () => {
     const id = 'test.idempotent'
     const descriptor = {
@@ -87,9 +83,8 @@ test.fixme(
 // AFL-AI-01: the `read` function on FieldDescriptor is callable with a FieldContext
 // ---------------------------------------------------------------------------
 
-test.fixme(
+test(
   'AFL-AI-03 [read]: getField(id).read(context) resolves to the value returned by the registered read function',
-  // GREEN in Plan 23-02 when registry.ts ships
   async () => {
     registerField({
       id: 'test.read',
@@ -115,9 +110,8 @@ test.fixme(
 // AFL-AI-03: getAllFields() must return at least the descriptors registered above
 // ---------------------------------------------------------------------------
 
-test.fixme(
+test(
   'AFL-AI-03 [getAllFields]: getAllFields() includes a descriptor registered during this suite',
-  // GREEN in Plan 23-02 when registry.ts ships
   async () => {
     const id = 'test.list-check'
     registerField({
