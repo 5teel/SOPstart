@@ -41,6 +41,13 @@ export async function uploadNewVersion(
     return { success: false, error: 'SOP not found' }
   }
 
+  // WR-07: extract JWT org and assert it matches the SOP, mirroring cloneSopAsDraft.
+  // The session-client SOP fetch uses RLS as a first gate, but the admin client below
+  // bypasses RLS — explicit JWT org assertion is the self-enforcing defence-in-depth.
+  const jwtOrgId: string | undefined = jwtClaims['organisation_id'] as string | undefined
+  if (!jwtOrgId || oldSop.organisation_id !== jwtOrgId) {
+    return { success: false, error: 'Access denied: SOP belongs to a different organisation.' }
+  }
   const organisationId: string = oldSop.organisation_id
   // All versions of the same SOP share the same parent_sop_id (the first version's id)
   const newParentId: string = (oldSop.parent_sop_id as string | null) ?? oldSop.id
