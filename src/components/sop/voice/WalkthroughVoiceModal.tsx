@@ -323,7 +323,7 @@ export function WalkthroughVoiceModal({
     }
   }
 
-  function handleCitation(label: string) {
+  function scrollToSection(label: string) {
     // Scroll the underlying walkthrough to the cited section if a
     // matching anchor is present. The walkthrough surfaces sections
     // via section-{slug} ids when rendered.
@@ -333,6 +333,20 @@ export function WalkthroughVoiceModal({
       document.querySelector(`[data-section="${slug}"]`) ??
       document.querySelector(`[data-section-title="${label}"]`)
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  function handleCitation(label: string) {
+    scrollToSection(label)
+  }
+
+  // Verification-flag CTA: dismiss the voice modal and take the worker back to
+  // the SOP, scrolling to the flagged section when we have a real one. Section
+  // anchors live in the underlying SOP page, so the scroll runs a tick AFTER the
+  // modal closes (overlay gone first).
+  function goToSop(sectionTitle?: string) {
+    onClose()
+    if (!sectionTitle) return
+    window.setTimeout(() => scrollToSection(sectionTitle), 80)
   }
 
   // Stop the stream and show Stop/Speak buttons
@@ -507,6 +521,7 @@ export function WalkthroughVoiceModal({
                   key={idx}
                   entry={entry}
                   onCitationClick={handleCitation}
+                  onGoToSop={goToSop}
                 />
               ))}
             </div>
@@ -517,15 +532,26 @@ export function WalkthroughVoiceModal({
   )
 }
 
+// Synthetic placeholder section titles used by the verifier's fallback flags —
+// these are not real SOP sections, so the "go to section" link degrades to
+// "Open the SOP" rather than trying to scroll to a non-existent anchor.
+const SYNTHETIC_SECTION_TITLES = new Set(['(verification unavailable)', '(verifier exception)'])
+
 function AnswerCard({
   entry,
   onCitationClick,
+  onGoToSop,
 }: {
   entry: HistoryEntry
   onCitationClick: (label: string) => void
+  onGoToSop: (sectionTitle?: string) => void
 }) {
   const parts = splitAnswer(entry.r.answer)
   const flagged = (entry.r.verifier_flags ?? []).length > 0
+  // First real (non-synthetic) flagged section, if any — the link scrolls there.
+  const targetSection = (entry.r.verifier_flags ?? [])
+    .map((f) => f.section_title)
+    .find((s): s is string => !!s && !SYNTHETIC_SECTION_TITLES.has(s))
   return (
     <div className="space-y-2">
       <p className="text-sm text-[var(--ink-500)] mono uppercase tracking-wider">
@@ -566,6 +592,15 @@ function AnswerCard({
                 <li key={i}>• {f.description}</li>
               ))}
             </ul>
+            <button
+              type="button"
+              onClick={() => onGoToSop(targetSection)}
+              data-testid="verifier-flag-goto"
+              className="mt-2 inline-flex items-center gap-1 font-medium text-amber-900 underline underline-offset-2 hover:text-amber-700"
+            >
+              {targetSection ? `Open “${targetSection}” in the SOP` : 'Open the SOP'}
+              <span aria-hidden="true">→</span>
+            </button>
           </div>
         </div>
       )}
