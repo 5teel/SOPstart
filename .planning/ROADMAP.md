@@ -129,6 +129,24 @@ Plans:
 
 - [x] 24-03-PLAN.md — Desktop-default graph view (FLOW-04) + re-surface FlowGraphEditor & round-trip (FLOW-05) + journeys.ts + bundle gate + human-UAT
 
+### Phase 23: AI Field Layer + Version Supersede
+
+**Goal**: Ship two bundles — (X-03) a single unified AI field layer where every editable field registers a read API and (for most fields) a write API governed by a tiered approval model (low-stakes auto-apply; published-SOP + member-role changes require inline admin accept/reject), as the v5.0-consumable backbone with NO user-facing command surface this phase; and (G-01) a formal version-supersede flow (edit-into-draft clone → publish supersedes), side-by-side version diff, restore-as-new-version, an "updated since last completion" worker indicator, and a worker+supervisor instance sign-off chain where roster name-select identifies the signer and completing the SOP is the legal signature.
+**Depends on**: Phase 12.5 (`diff-block-content.ts`, block model), Phase 13 (version model in `versioning.ts`), Phase 4 (completions + supervisor review), Phase 15 (00030/00031 org + sub-trade RLS — must be reconciled with roster name-select login)
+**Requirements** (mapped in REQUIREMENTS.md § "AI Field Layer + Version Supersede (Phase 23)" L429):
+
+- AFL-AI-01: Every editable field exposes an AI read API (agent can fetch the current value)
+- AFL-AI-02: Most editable fields expose an AI write API with the tiered D-01/D-02/D-03 approval model (auto-apply vs inline admin accept/reject)
+- AFL-AI-03: Unified field registry — every feature surface registers fields via a single shared, v5.0-consumable mechanism (no per-feature bespoke API)
+- ~~AFL-AI-04~~: **REMOVED from scope 2026-06-25** (Cmd+K command palette dropped from the product)
+- AFL-VER-01: Admin edits an SOP into a new version via edit-into-draft clone; publishing supersedes and deprecates the prior version (formal supersede flow)
+- AFL-VER-02: Side-by-side diff between SOP versions (reuse `diff-block-content.ts`)
+- AFL-VER-03: Restore an old version as a NEW current version with one click (append-only history)
+- AFL-VER-04: Workers see an indicator when an SOP has a new published version since their last completion
+- AFL-VER-05: Every SOP instance is recorded against the worker's roster-selected identity with a worker + supervisor sign-off chain — completing the SOP is the legal signature
+
+**Plans**: TBD (set by /gsd-plan-phase)
+
 ### Phase 1: Foundation
 
 **Goal**: Organisations and users can securely access the app with full tenant isolation, correct roles, and a functional PWA shell
