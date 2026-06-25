@@ -170,6 +170,12 @@ export async function signOffCompletion(
     return { success: false, error: 'Completion record not found.' }
   }
 
+  // Org-scope guard — must run before the role branch so safety_manager cannot
+  // sign off completions from another org. Admin client bypasses RLS, so we
+  // self-enforce here (CLAUDE.md 2026-06-15 pattern, CR-04 fix).
+  if (completion.organisation_id !== organisationId) {
+    return { success: false, error: 'Completion record not found.' }
+  }
   // For supervisors: verify the worker is in their supervisor_assignments
   if (role === 'supervisor') {
     const { data: assignment } = await admin
@@ -207,6 +213,7 @@ export async function signOffCompletion(
     .from('sop_completions')
     .update({ status: newStatus })
     .eq('id', completionId)
+    .eq('organisation_id', organisationId)
 
   if (updateError) {
     console.error('signOffCompletion status update error:', updateError)
