@@ -150,17 +150,26 @@ Plans:
 Plans:
 
 **Wave 0**
+
 - [x] 23-00-PLAN.md — Register phase23-stubs + phase23-unit Playwright projects + source-contract stubs gating every AFL-* + D-11 ✅ 2026-06-25 (32 tests discovered; 10 pass; 22 skip pre-implementation; commits 544c882/9b30863/a44beb0)
+
 **Wave 1**
-- [ ] 23-01-PLAN.md — Migration 00038 (roster_worker_id + sop_completion_signatures + ai_field_proposals) + [BLOCKING] schema push + to_regclass verify
+
+- [x] 23-01-PLAN.md — Migration 00038 (roster_worker_id + sop_completion_signatures + ai_field_proposals) + [BLOCKING] schema push + to_regclass verify
+
 **Wave 2** *(after schema)*
+
 - [ ] 23-02-PLAN.md — X-03 backbone: unified field registry (AFL-AI-03) + read API (AFL-AI-01) + validators
 - [ ] 23-03-PLAN.md — Version actions: cloneSopAsDraft supersede (AFL-VER-01) + restoreVersionAsNew append-only (AFL-VER-03)
+
 **Wave 3**
+
 - [ ] 23-04-PLAN.md — AI write layer: gateWrite tiered approval (AFL-AI-02, D-01/D-02) + write API + inline Accept/Reject diff (D-03)
 - [ ] 23-05-PLAN.md — Version diff page (AFL-VER-02) + versions-page clone/restore/compare + "updated since" badge (AFL-VER-04)
 - [ ] 23-06-PLAN.md — Roster name-select kiosk login (D-11) + worker+supervisor sign-off chain (AFL-VER-05)
+
 **Wave 4**
+
 - [ ] 23-07-PLAN.md — journeys.ts + uat/tests.ts updates + full-phase verification gate + final UAT
 
 ### Phase 1: Foundation
@@ -567,7 +576,7 @@ These two items belong with kiosk mode + site-tier work in Phase 15 because they
   9. Global app-wide Cmd+K mounted across all `(protected)` routes — surfaces app-wide navigation (Library, Blocks, Team, Create via Upload/Blank/AI, Settings, kiosk site selector for multi-site admins) alongside the existing SOP-scoped jump-to-step + ask-AI on SOP pages.
   10. Bundle isolation: kiosk mode chunks + voice Q&A RAG client do not leak into the existing mobile worker bundle; mobile worker walkthrough First Load JS does not grow as a result of Phase 15.
 
-**Plans:** 3/3 plans complete
+**Plans:** 2/8 plans executed
 
 Plans:
 
