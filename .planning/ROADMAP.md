@@ -159,8 +159,8 @@ Plans:
 
 **Wave 2** *(after schema)*
 
-- [ ] 23-02-PLAN.md — X-03 backbone: unified field registry (AFL-AI-03) + read API (AFL-AI-01) + validators
-- [ ] 23-03-PLAN.md — Version actions: cloneSopAsDraft supersede (AFL-VER-01) + restoreVersionAsNew append-only (AFL-VER-03)
+- [x] 23-02-PLAN.md — X-03 backbone: unified field registry (AFL-AI-03) + read API (AFL-AI-01) + validators
+- [x] 23-03-PLAN.md — Version actions: cloneSopAsDraft supersede (AFL-VER-01) + restoreVersionAsNew append-only (AFL-VER-03)
 
 **Wave 3**
 
@@ -576,7 +576,7 @@ These two items belong with kiosk mode + site-tier work in Phase 15 because they
   9. Global app-wide Cmd+K mounted across all `(protected)` routes — surfaces app-wide navigation (Library, Blocks, Team, Create via Upload/Blank/AI, Settings, kiosk site selector for multi-site admins) alongside the existing SOP-scoped jump-to-step + ask-AI on SOP pages.
   10. Bundle isolation: kiosk mode chunks + voice Q&A RAG client do not leak into the existing mobile worker bundle; mobile worker walkthrough First Load JS does not grow as a result of Phase 15.
 
-**Plans:** 2/8 plans executed
+**Plans:** 4/8 plans executed
 
 Plans:
 
