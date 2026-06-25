@@ -2,6 +2,7 @@
 
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import type { SectionKind, SopSection } from '@/types/sop'
 
 /**
@@ -203,5 +204,67 @@ export async function updateSectionLayout(
     console.error('[updateSectionLayout] update error', updErr)
     return { error: updErr.message }
   }
+  return { success: true }
+}
+
+/**
+ * Phase 23 AFL-AI-03 — High-stake section title update.
+ * Used by the 'sop.section.title' AI field descriptor (stakeLevel:'high' when published).
+ * Validates admin role + org-scoping. Uses admin client for published SOPs
+ * (session client may miss superseded rows — RESEARCH Pitfall 5).
+ */
+export async function updateSectionTitle(
+  sectionId: string,
+  newTitle: string,
+): Promise<{ success: true } | { error: string }> {
+  if (!newTitle || typeof newTitle !== 'string' || !newTitle.trim()) {
+    return { error: 'Section title must be a non-empty string.' }
+  }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { data: { session } } = await supabase.auth.getSession()
+  const jwtClaims = session?.access_token
+    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    : {}
+  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  if (!organisationId) return { error: 'No organisation found' }
+
+  const role = jwtClaims['user_role']
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
+    return { error: 'Admin access required to update section title.' }
+  }
+
+  // Use admin client to handle published/superseded SOPs (RESEARCH Pitfall 5).
+  // Self-enforce org-scoping via the parent SOP's organisation_id FK check.
+  const admin = createAdminClient()
+
+  // Verify the section belongs to an SOP in this organisation (org-scope self-enforcement).
+  const { data: section } = await admin
+    .from('sop_sections')
+    .select('id, sop_id')
+    .eq('id', sectionId)
+    .single()
+
+  if (!section) return { error: 'Section not found.' }
+
+  // Verify the parent SOP belongs to this organisation (CLAUDE.md 2026-06-15 pattern).
+  const { data: sop } = await admin
+    .from('sops')
+    .select('id')
+    .eq('id', section.sop_id)
+    .eq('organisation_id', organisationId)
+    .single()
+
+  if (!sop) return { error: 'Section not in your organisation.' }
+
+  const { error: updateError } = await admin
+    .from('sop_sections')
+    .update({ title: newTitle.trim(), updated_at: new Date().toISOString() })
+    .eq('id', sectionId)
+
+  if (updateError) return { error: updateError.message }
   return { success: true }
 }

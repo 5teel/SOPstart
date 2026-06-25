@@ -324,6 +324,46 @@ export async function restructureSop(sopId: string): Promise<{ success: true; so
   return { success: true, sopId }
 }
 
+/**
+ * Phase 23 AFL-AI-03 — Low-stake SOP title update.
+ * Used by the 'sop.title' AI field descriptor (stakeLevel:'low').
+ * Validates admin role, verifies org ownership, then updates the title column.
+ */
+export async function updateSopTitle(
+  sopId: string,
+  newTitle: string,
+): Promise<{ success: true } | { error: string }> {
+  if (!newTitle || typeof newTitle !== 'string' || !newTitle.trim()) {
+    return { error: 'Title must be a non-empty string.' }
+  }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Not authenticated' }
+
+  const { data: { session } } = await supabase.auth.getSession()
+  const jwtClaims = session?.access_token
+    ? JSON.parse(atob(session.access_token.split('.')[1]))
+    : {}
+  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  if (!organisationId) return { error: 'No organisation found' }
+
+  const role = jwtClaims['user_role']
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
+    return { error: 'Admin access required to update SOP title.' }
+  }
+
+  // Use session client — RLS ensures the SOP belongs to the caller's org.
+  const { error: updateError } = await supabase
+    .from('sops')
+    .update({ title: newTitle.trim(), updated_at: new Date().toISOString() })
+    .eq('id', sopId)
+    .eq('organisation_id', organisationId)
+
+  if (updateError) return { error: updateError.message }
+  return { success: true }
+}
+
 export async function deleteSop(sopId: string): Promise<{ success: true } | { error: string }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
