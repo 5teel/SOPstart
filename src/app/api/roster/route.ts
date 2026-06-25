@@ -60,15 +60,27 @@ export async function GET() {
   if (!members || members.length === 0) {
     return NextResponse.json({ members: [] })
   }
-
   // Fetch display names from auth.users email (no user_profiles table — CLAUDE.md pattern)
+  // Paginate listUsers until all pages are consumed (perPage:1000 only returns first page
+  // — silently drops workers beyond the 1000th in large deployments). CR-03 fix.
   const userIds = members.map((m) => m.user_id)
-  const { data: { users: authUsers } } = await admin.auth.admin.listUsers({ perPage: 1000 })
   const emailMap: Record<string, string> = {}
-  for (const u of authUsers) {
-    if (userIds.includes(u.id) && u.email) {
-      emailMap[u.id] = u.email
+  let page = 1
+  let fetched = 0
+  let total = Infinity
+  while (fetched < total) {
+    const { data: listData } = await admin.auth.admin.listUsers({ page, perPage: 1000 })
+    if (!listData) break
+    total = listData.total ?? 0
+    for (const u of listData.users) {
+      if (userIds.includes(u.id) && u.email) {
+        emailMap[u.id] = u.email
+      }
     }
+    fetched += listData.users.length
+    // Guard: if the server returns 0 users on a non-first page, stop to avoid infinite loop
+    if (listData.users.length === 0) break
+    page++
   }
 
   // Build display name: prefer email local-part (before @), fall back to abbreviated uid
