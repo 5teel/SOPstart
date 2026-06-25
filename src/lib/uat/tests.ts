@@ -338,6 +338,85 @@ export const UAT_TESTS: UatTest[] = [
     background: 'Publish gate (POST /api/sops/[sopId]/publish) returns 400 unverified_blocks; UI surfaces the error.',
   },
 
+  // ===================== Phase 23 — AI Field Layer + Version Supersede =====================
+  {
+    id: 'p23-roster-kiosk-login',
+    dateAdded: '2026-06-26',
+    category: 'Phase 23 — AI Field Layer + Version Supersede',
+    title: 'Can a worker sign in on a shared device by picking their name?',
+    status: 'active',
+    summary:
+      'Workers on shared / kiosk devices sign in by tapping their name from a list — no password needed. We want to confirm the name-select screen works and the right SOPs appear after selecting a name.',
+    tryIt: [
+      'On a shared device, open the kiosk login page.',
+      'Pick a worker name from the list.',
+      'Confirm you land on the SOP library and can see the procedures assigned to that worker.',
+      'Complete a short SOP and confirm the completion is recorded against the selected worker name.',
+      'Switch to a different worker name and confirm you only see that worker\'s assigned SOPs (not the first worker\'s private data).',
+    ],
+    links: [{ label: 'Kiosk name-select', href: '/login/kiosk' }],
+    questions: [
+      { id: 'name-list', text: 'Was it easy to find and tap your name on the list?' },
+      { id: 'right-sops', text: 'Did the correct SOPs appear after selecting a name?' },
+      { id: 'completion-attributed', text: 'Was the completed SOP recorded against the right worker name?' },
+      { id: 'isolation', text: 'After switching workers, could you only see the new worker\'s SOPs (not the previous worker\'s)?' },
+    ],
+    background:
+      'AFL-VER-05 / D-11 (roster name-select login). Per-org kiosk account (role=worker) established once by admin. roster_worker_id stored in sessionStorage; RLS uses the kiosk account session for org-scoping while the roster_worker_id attributes signatures. recordSignature() enforces org-scope via createAdminClient() with explicit organisation_id check.',
+  },
+  {
+    id: 'p23-inline-ai-proposal',
+    dateAdded: '2026-06-26',
+    category: 'Phase 23 — AI Field Layer + Version Supersede',
+    title: 'Does the AI proposal Accept/Reject work at a field?',
+    status: 'active',
+    summary:
+      'The AI can suggest a change to a field in a published procedure. The proposed change appears inline — you can see the old and new value side by side, then Accept or Reject it. We want to confirm the experience is clear and the right thing happens when you choose.',
+    tryIt: [
+      'Trigger an AI field proposal on a published SOP (ask your admin to initiate one via the API, or use the test fixture if available).',
+      'Look at the field — you should see both the current value and the proposed change.',
+      'Try accepting the proposal and confirm the new value is applied.',
+      'On a different field, try rejecting a proposal and confirm the old value stays.',
+    ],
+    links: [{ label: 'SOP management', href: '/admin/sops' }],
+    questions: [
+      { id: 'visible-diff', text: 'Could you clearly see what the AI proposed to change?' },
+      { id: 'accept-works', text: 'Did accepting the proposal apply the new value correctly?' },
+      { id: 'reject-works', text: 'Did rejecting the proposal keep the original value unchanged?' },
+      { id: 'no-surprise', text: 'Were there any unexpected changes to other parts of the SOP?' },
+    ],
+    background:
+      'AFL-AI-02 / D-03 (inline accept/reject). High-stakes (published SOP) field writes go to pending_approval via gateWrite(); the inline diff component renders the proposal at the field; Accept calls the write descriptor; Reject discards. Low-stakes fields (drafts, tags) auto-apply without a prompt.',
+  },
+  {
+    id: 'p23-updated-since-badge',
+    dateAdded: '2026-06-26',
+    category: 'Phase 23 — AI Field Layer + Version Supersede',
+    title: 'Does the "updated since last completion" badge appear when a new version is published?',
+    status: 'active',
+    summary:
+      'When an admin publishes a new version of an SOP, workers who have already completed it should see a small badge on the SOP card telling them it has been updated. We want to confirm the badge appears at the right time and goes away after the worker completes the new version.',
+    tryIt: [
+      'As a worker, complete an SOP (confirm no badge before you start).',
+      'As an admin, publish a new version of that same SOP.',
+      'Log back in as the worker and open the SOP library.',
+      'Confirm the SOP card now shows an "Updated since your last completion" badge.',
+      'Walk through and complete the new version.',
+      'Confirm the badge disappears after completing the updated version.',
+    ],
+    links: [
+      { label: 'SOP library (worker view)', href: '/sops' },
+      { label: 'SOP management (admin — publish new version)', href: '/admin/sops' },
+    ],
+    questions: [
+      { id: 'badge-appears', text: 'Did the badge appear on the SOP card after the new version was published?' },
+      { id: 'badge-clear', text: 'Was it clear that the badge meant the SOP had been updated?' },
+      { id: 'badge-goes', text: 'Did the badge go away after you completed the new version?' },
+    ],
+    background:
+      'AFL-VER-04 / D-08 (updated-since indicator). Badge triggers when sop.published_at > worker\'s last completion. SopLibraryCard renders data-updated-badge when the showUpdatedBadge prop is true. The prop is derived server-side by comparing the SOP\'s current published_at against the most recent sop_completions.completed_at for that worker+SOP pair.',
+  },
+
   // ---------------------------------------------------------------------------
   // TEMPLATE — copy this to put a new design choice or check to the team.
   // Set status:'archived' once it's decided.
