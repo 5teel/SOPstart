@@ -145,7 +145,23 @@ Plans:
 - AFL-VER-04: Workers see an indicator when an SOP has a new published version since their last completion
 - AFL-VER-05: Every SOP instance is recorded against the worker's roster-selected identity with a worker + supervisor sign-off chain — completing the SOP is the legal signature
 
-**Plans**: TBD (set by /gsd-plan-phase)
+**Plans**: 8 plans / 5 waves
+
+Plans:
+
+**Wave 0**
+- [ ] 23-00-PLAN.md — Register phase23-stubs + phase23-unit Playwright projects + source-contract stubs gating every AFL-* + D-11
+**Wave 1**
+- [ ] 23-01-PLAN.md — Migration 00038 (roster_worker_id + sop_completion_signatures + ai_field_proposals) + [BLOCKING] schema push + to_regclass verify
+**Wave 2** *(after schema)*
+- [ ] 23-02-PLAN.md — X-03 backbone: unified field registry (AFL-AI-03) + read API (AFL-AI-01) + validators
+- [ ] 23-03-PLAN.md — Version actions: cloneSopAsDraft supersede (AFL-VER-01) + restoreVersionAsNew append-only (AFL-VER-03)
+**Wave 3**
+- [ ] 23-04-PLAN.md — AI write layer: gateWrite tiered approval (AFL-AI-02, D-01/D-02) + write API + inline Accept/Reject diff (D-03)
+- [ ] 23-05-PLAN.md — Version diff page (AFL-VER-02) + versions-page clone/restore/compare + "updated since" badge (AFL-VER-04)
+- [ ] 23-06-PLAN.md — Roster name-select kiosk login (D-11) + worker+supervisor sign-off chain (AFL-VER-05)
+**Wave 4**
+- [ ] 23-07-PLAN.md — journeys.ts + uat/tests.ts updates + full-phase verification gate + final UAT
 
 ### Phase 1: Foundation
 
