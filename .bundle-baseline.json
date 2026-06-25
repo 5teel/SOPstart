@@ -1,13 +1,13 @@
 {
-  "capturedAt": "2026-06-24T09:29:21.999Z",
-  "note": "Re-baselined 2026-06-24 (1104 → 1107 KB, +3 KB) to absorb the one-time cost of the role-aware navigation change: a RoleProvider context (src/components/providers/RoleProvider.tsx) added to (protected)/layout.tsx + an admin-only 'Edit in builder' link on the worker SOP view (/sops/[sopId]). Admins now default to worker pathways; admin tooling is reached via the account menu. All isolation gates still pass (DesktopWalkthrough + WalkthroughVoiceModal remain dynamic chunks; pdfjs + mammoth absent). Same re-baseline pattern as the 2026-05-22 TopHeader shift. Forward enforcement: any drift > +2 KB from 1107 is a real regression. DO NOT edit by hand for further bloat — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts.",
+  "capturedAt": "2026-06-25T12:12:01.091Z",
+  "note": "Re-baselined 2026-06-25 (1107 → 1054 KB, -53 KB) after REMOVING the Cmd+K command palette (cmdk dep + CommandPalette.tsx + CmdKProvider.tsx + sops/layout.tsx) per product decision — Cmd+K is no longer part of SOPstart. This lowered the mobile worker bundle; re-baselining to the new floor so future growth is measured honestly. Isolation gates still pass. Forward enforcement: any drift > +2 KB from 1054 is a real regression. DO NOT edit by hand for bloat — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts.",
   "previousBaseline": {
-    "value": 1104,
-    "capturedAt": "2026-05-22T00:00:00.000Z",
-    "note": "TopHeader global-nav re-baseline. Superseded by the 2026-06-24 role-aware navigation re-baseline."
+    "value": 1107,
+    "capturedAt": "2026-06-24T09:29:21.999Z",
+    "note": "Role-aware navigation re-baseline (RoleProvider + Edit-in-builder link). Superseded by the 2026-06-25 Cmd+K-removal re-baseline."
   },
   "routes": {
-    "/sops/[sopId]/page": 1107
+    "/sops/[sopId]/page": 1054
   },
-  "chunkCount": 21
+  "chunkCount": 19
 }
