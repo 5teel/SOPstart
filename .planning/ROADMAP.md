@@ -166,7 +166,7 @@ Plans:
 
 - [ ] 23-04-PLAN.md — AI write layer: gateWrite tiered approval (AFL-AI-02, D-01/D-02) + write API + inline Accept/Reject diff (D-03)
 - [ ] 23-05-PLAN.md — Version diff page (AFL-VER-02) + versions-page clone/restore/compare + "updated since" badge (AFL-VER-04)
-- [ ] 23-06-PLAN.md — Roster name-select kiosk login (D-11) + worker+supervisor sign-off chain (AFL-VER-05)
+- [x] 23-06-PLAN.md — Roster name-select kiosk login (D-11) + worker+supervisor sign-off chain (AFL-VER-05)
 
 **Wave 4**
 
@@ -576,7 +576,7 @@ These two items belong with kiosk mode + site-tier work in Phase 15 because they
   9. Global app-wide Cmd+K mounted across all `(protected)` routes — surfaces app-wide navigation (Library, Blocks, Team, Create via Upload/Blank/AI, Settings, kiosk site selector for multi-site admins) alongside the existing SOP-scoped jump-to-step + ask-AI on SOP pages.
   10. Bundle isolation: kiosk mode chunks + voice Q&A RAG client do not leak into the existing mobile worker bundle; mobile worker walkthrough First Load JS does not grow as a result of Phase 15.
 
-**Plans:** 4/8 plans executed
+**Plans:** 5/8 plans executed
 
 Plans:
 
