@@ -65,3 +65,17 @@ export type AiWriteRequest = z.infer<typeof AiWriteRequestSchema>
 
 export const ProposalStatusSchema = z.enum(['pending', 'applied', 'rejected'])
 export type ProposalStatus = z.infer<typeof ProposalStatusSchema>
+
+// ---------------------------------------------------------------------------
+// Accept/Reject proposal schemas (AFL-AI-02 — Plan 23-04 approval actions)
+// ---------------------------------------------------------------------------
+
+export const AcceptProposalSchema = z.object({
+  proposalId: z.string().uuid(),
+})
+export type AcceptProposalInput = z.infer<typeof AcceptProposalSchema>
+
+export const RejectProposalSchema = z.object({
+  proposalId: z.string().uuid(),
+})
+export type RejectProposalInput = z.infer<typeof RejectProposalSchema>

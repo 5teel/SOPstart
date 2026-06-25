@@ -65,7 +65,7 @@ test(
   async () => {
     const { spy, calls } = makeWriteSpy()
 
-    const lowDescriptor: FieldDescriptor<string> = {
+    const lowDescriptor: FieldDescriptor = {
       id: 'test.low-field',
       label: 'Low Field',
       stakeLevel: 'low',
@@ -97,7 +97,7 @@ test(
   async () => {
     const { spy, calls } = makeWriteSpy()
 
-    const highDescriptor: FieldDescriptor<string> = {
+    const highDescriptor: FieldDescriptor = {
       id: 'test.high-field',
       label: 'High Field',
       stakeLevel: 'high',
@@ -132,7 +132,7 @@ test(
   async () => {
     const { spy, calls } = makeWriteSpy()
 
-    const lowDescriptor: FieldDescriptor<string> = {
+    const lowDescriptor: FieldDescriptor = {
       id: 'test.low-but-published',
       label: 'Low Field on Published SOP',
       stakeLevel: 'low',
@@ -168,7 +168,7 @@ test(
   async () => {
     const { spy, calls } = makeWriteSpy()
 
-    const lowDescriptor: FieldDescriptor<string> = {
+    const lowDescriptor: FieldDescriptor = {
       id: 'test.ambiguous-field',
       label: 'Ambiguous Field',
       stakeLevel: 'low',
@@ -208,7 +208,7 @@ test(
       return FAKE_PROPOSAL_ID
     }
 
-    const highDescriptor: FieldDescriptor<string> = {
+    const highDescriptor: FieldDescriptor = {
       id: 'test.org-scope-field',
       label: 'Org Scope Field',
       stakeLevel: 'high',
