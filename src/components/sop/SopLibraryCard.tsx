@@ -6,9 +6,17 @@ import type { CachedSop } from '@/lib/offline/db'
 interface SopLibraryCardProps {
   sop: CachedSop
   isCached: boolean
+  /**
+   * AFL-VER-04 / D-08: true when a newer published version exists than the
+   * worker's last completion for this SOP lineage.
+   * Derived from sop.published_at vs the worker's last submitted_at — no schema
+   * change needed (RESEARCH.md AFL-VER-04).
+   * D-09: badge is informational only — no forced re-walk.
+   */
+  hasNewerVersion?: boolean
 }
 
-export function SopLibraryCard({ sop, isCached }: SopLibraryCardProps) {
+export function SopLibraryCard({ sop, isCached, hasNewerVersion = false }: SopLibraryCardProps) {
   const meta = [sop.category, sop.department].filter(Boolean).join(' · ')
 
   return (
@@ -44,6 +52,18 @@ export function SopLibraryCard({ sop, isCached }: SopLibraryCardProps) {
           <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--accent-signoff)]/10 text-[var(--accent-signoff)] text-xs font-semibold rounded">
             Assigned
           </span>
+          {/* AFL-VER-04 / D-08: "Updated" badge — derives from hasNewerVersion prop
+              (comparison of sop.published_at vs worker's last submitted_at, computed in
+              the parent page). D-09: badge is informational only, no onClick re-walk. */}
+          {hasNewerVersion && (
+            <span
+              data-updated-badge="true"
+              className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--accent-signoff)]/15 text-[var(--accent-signoff)] text-xs font-semibold rounded border border-[var(--accent-signoff)]/30"
+              title="This SOP has been updated since you last completed it"
+            >
+              Updated
+            </span>
+          )}
         </div>
       </div>
 

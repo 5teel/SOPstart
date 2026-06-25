@@ -251,8 +251,46 @@ function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeDeptLabel,
     staleTime: 1000 * 60 * 5,
   })
 
+  // AFL-VER-04 / D-08: fetch the worker's most recent completion submitted_at per SOP.
+  // Compares sops.published_at (on the CachedSop) vs MAX(sop_completions.submitted_at).
+  // Any newer published version triggers the "Updated" badge — no material-change
+  // classification (D-08). RLS scopes this to the current user (T-23-05-03 mitigated).
+  const { data: lastCompletionMap = {} } = useQuery<Record<string, string>>({
+    queryKey: ['worker-last-completions'],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('sop_completions')
+        .select('sop_id, submitted_at')
+        .order('submitted_at', { ascending: false }) as {
+          data: Array<{ sop_id: string; submitted_at: string }> | null
+        }
+      // Build a map: sop_id → most recent submitted_at
+      // (the query returns newest-first so first match per sop_id wins)
+      const map: Record<string, string> = {}
+      for (const row of data ?? []) {
+        if (!map[row.sop_id]) map[row.sop_id] = row.submitted_at
+      }
+      return map
+    },
+    staleTime: 1000 * 60 * 2,
+  })
+
   function getAssignmentInfo(sopId: string) {
     return assignments.find((a) => a.sop_id === sopId)
+  }
+
+  /**
+   * AFL-VER-04 / D-08: Returns true if the SOP's published_at is newer than
+   * the worker's last completion submitted_at for this SOP.
+   * Triggers on ANY newer published version — no material-change classification.
+   */
+  function hasNewerVersion(sop: (typeof sops)[number]): boolean {
+    const publishedAt = sop.published_at
+    if (!publishedAt) return false
+    const lastCompleted = lastCompletionMap[sop.id]
+    if (!lastCompleted) return false // never completed → no "updated" signal
+    return new Date(publishedAt) > new Date(lastCompleted)
   }
 
   function handleRemove(sopId: string) {
@@ -314,7 +352,7 @@ function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeDeptLabel,
             return (
               <div key={sop.id} className="flex items-stretch gap-2">
                 <div className="flex-1 min-w-0">
-                  <SopLibraryCard sop={sop} isCached={true} />
+                  <SopLibraryCard sop={sop} isCached={true} hasNewerVersion={hasNewerVersion(sop)} />
                 </div>
                 <button
                   type="button"
