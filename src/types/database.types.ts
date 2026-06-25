@@ -1246,6 +1246,8 @@ export type Database = {
           created_at: string
           // Phase 15 D-21: ordered ack-button click trace
           step_ack_trace: Json
+          // Phase 23 D-11: roster attribution FK, distinct from worker_id (kiosk uid for RLS)
+          roster_worker_id: string | null
         }
         Insert: {
           id: string
@@ -1259,6 +1261,8 @@ export type Database = {
           submitted_at?: string
           created_at?: string
           step_ack_trace?: Json | null
+          // Phase 23 D-11: roster attribution FK
+          roster_worker_id?: string | null
         }
         Update: {
           id?: string
@@ -1272,6 +1276,8 @@ export type Database = {
           submitted_at?: string
           created_at?: string
           step_ack_trace?: Json | null
+          // Phase 23 D-11: roster attribution FK
+          roster_worker_id?: string | null
         }
         Relationships: [
           {
@@ -1376,6 +1382,97 @@ export type Database = {
             columns: ["completion_id"]
             isOneToOne: false
             referencedRelation: "sop_completions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      // Phase 23 AFL-VER-05: append-only sign-off chain (migration 00038)
+      sop_completion_signatures: {
+        Row: {
+          id: string
+          organisation_id: string
+          completion_id: string
+          role: string  // 'worker' | 'supervisor'
+          roster_user_id: string
+          signed_at: string
+        }
+        Insert: {
+          id?: string
+          organisation_id: string
+          completion_id: string
+          role: string
+          roster_user_id: string
+          signed_at?: string
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          completion_id?: string
+          role?: string
+          roster_user_id?: string
+          signed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sop_completion_signatures_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sop_completion_signatures_completion_id_fkey"
+            columns: ["completion_id"]
+            isOneToOne: false
+            referencedRelation: "sop_completions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      // Phase 23 X-03: AI field write proposals pending admin approval (migration 00038)
+      ai_field_proposals: {
+        Row: {
+          id: string
+          organisation_id: string
+          field_id: string
+          field_label: string
+          context: Json
+          current_value: Json | null
+          proposed_value: Json | null
+          status: string  // 'pending' | 'applied' | 'rejected'
+          sop_version: number | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          organisation_id: string
+          field_id: string
+          field_label: string
+          context?: Json
+          current_value?: Json | null
+          proposed_value?: Json | null
+          status?: string
+          sop_version?: number | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          field_id?: string
+          field_label?: string
+          context?: Json
+          current_value?: Json | null
+          proposed_value?: Json | null
+          status?: string
+          sop_version?: number | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_field_proposals_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
             referencedColumns: ["id"]
           },
         ]
