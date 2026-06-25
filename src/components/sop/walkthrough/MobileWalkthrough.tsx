@@ -66,8 +66,19 @@ export interface MobileWalkthroughHandle {
  */
 export const MobileWalkthrough = React.forwardRef<
   MobileWalkthroughHandle,
-  { sop: SopWithSections }
->(function MobileWalkthrough({ sop }, ref) {
+  {
+    sop: SopWithSections
+    /**
+     * Phase 22 (CR-01/CR-02 fix): reactive push of voice-relevant state to the
+     * host. Fires whenever the current step OR the acknowledgement flag changes,
+     * so the voice modal always reads the CURRENT step text + ack status. This
+     * replaces the host's stale synchronous `mwRef.current.currentStepText` read
+     * taken right after an imperative advance (which returned the PRE-advance
+     * step because React had not re-rendered yet → new step never read aloud).
+     */
+    onVoiceStateChange?: (s: { stepText: string; isAcknowledged: boolean }) => void
+  }
+>(function MobileWalkthrough({ sop, onVoiceStateChange }, ref) {
   const router = useRouter()
   const search = useSearchParams()
   const mode = useWalkthroughModeStore((s) => s.mode)
@@ -246,6 +257,13 @@ export const MobileWalkthrough = React.forwardRef<
   handleMarkCompleteRef.current = handleMarkComplete
   const handleStepChangeRef = useRef(handleStepChange)
   handleStepChangeRef.current = handleStepChange
+
+  // [CR-01/CR-02] Reactive push of voice state. Fires AFTER each render in which
+  // the current step or ack flag changed — i.e. after an advance has actually
+  // taken effect — so the host always mirrors the fresh step text / ack status.
+  useEffect(() => {
+    onVoiceStateChange?.({ stepText: currentStep?.text ?? '', isAcknowledged: acknowledged })
+  }, [currentStep?.id, currentStep?.text, acknowledged, onVoiceStateChange])
 
   useImperativeHandle(
     ref,

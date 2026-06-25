@@ -22,6 +22,11 @@ import { useRef, useCallback } from 'react'
  */
 export function useTtsPlayback() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  // Track the active object URL so we can revoke it (createObjectURL leaks the
+  // blob until revoked; multi-turn Q&A would accumulate one per answer).
+  // Inlined at each use site (not a shared fn) to keep the useCallback dep
+  // arrays empty — it only ever touches the stable urlRef.
+  const urlRef = useRef<string | null>(null)
 
   /**
    * Speak the given text via /api/voice/tts.
@@ -52,7 +57,10 @@ export function useTtsPlayback() {
       if (!res.ok) return
 
       const blob = await res.blob()
+      // Revoke the previous answer's URL before minting a new one (no leak).
+      if (urlRef.current) { URL.revokeObjectURL(urlRef.current); urlRef.current = null }
       const url = URL.createObjectURL(blob)
+      urlRef.current = url
 
       if (audioRef.current) {
         audioRef.current.src = url
@@ -78,6 +86,7 @@ export function useTtsPlayback() {
       audioRef.current.pause()
       audioRef.current.currentTime = 0
     }
+    if (urlRef.current) { URL.revokeObjectURL(urlRef.current); urlRef.current = null }
   }, [])
 
   return { speak, stop, audioRef }

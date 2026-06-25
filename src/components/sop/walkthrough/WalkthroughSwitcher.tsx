@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 import type { SopWithSections } from '@/types/sop'
 import { useViewport } from '@/hooks/useViewport'
@@ -28,22 +28,17 @@ import { WalkthroughVoiceButton } from '@/components/sop/voice/WalkthroughVoiceB
  * SSR strategy (D-04):
  *   `useViewport()` returns 'mobile' on the first render (matches SSR
  *   output — server has no `window`) and switches to 'desktop' after
- *   mount on ≥ 1024px viewports. A brief mobile-render flash on
- *   desktop is acceptable for v1 (operators won't notice on a
- *   hot-reload-free production load).
+ *   mount on ≥ 1024px viewports.
  *
  * Phase 22 — voice bridge (D-01, D-02, D-22):
- *   `mwRef` is a React ref to the MobileWalkthrough imperative handle
- *   (MobileWalkthroughHandle). It bridges voice commands from
- *   WalkthroughVoiceModal to handleMarkComplete/handleStepChange inside
- *   MobileWalkthrough without hoisting state or breaking D-02 invariants.
- *
- *   `currentStepText` is a useState MIRROR of mwRef.current.currentStepText.
- *   Because mwRef.current is a REF (not state), reading it in JSX feeds the
- *   modal a STALE string and React does NOT re-render when the step advances.
- *   The mirror is set AFTER each ref advance call so the fresh value flows
- *   through the modal prop and re-triggers the modal's TTS read-aloud effect
- *   (CLAUDE.md 2026-06-08 non-reactive-source staleness trap; T-22-03-06).
+ *   `mwRef` is a React ref to the MobileWalkthrough imperative handle. It is
+ *   used ONLY to INVOKE imperative commands (onVoiceNext / onVoicePrev). It is
+ *   NOT read for state — the original code read `mwRef.current.currentStepText`
+ *   synchronously right after the advance, which returned the PRE-advance step
+ *   (React had not re-rendered), so the new step was never read aloud (CR-01)
+ *   and the ack flag could be stale (CR-02). Instead, MobileWalkthrough PUSHES
+ *   its voice state via `onVoiceStateChange`, which lands in `voiceState` and
+ *   flows reactively to the modal — always fresh.
  */
 const DesktopWalkthrough = dynamic(
   () =>
@@ -64,36 +59,30 @@ export function WalkthroughSwitcher({ sop }: { sop: SopWithSections }) {
   const [modalOpen, setModalOpen] = useState(false)
 
   // ── Phase 22: voice bridge ────────────────────────────────────────────────
-  // Ref to the MobileWalkthrough imperative handle.
-  // Voice callbacks call the ref method THEN setCurrentStepText so React
-  // re-renders with the fresh step text and the modal's TTS effect fires.
+  // Ref to the MobileWalkthrough imperative handle — used to INVOKE commands only.
   const mwRef = useRef<MobileWalkthroughHandle>(null)
 
-  // Reactive mirror of mwRef.current.currentStepText (set after each advance).
-  // CRITICAL: never pass mwRef.current?.currentStepText directly in JSX — that
-  // is the stale-ref bug this state exists to prevent (CLAUDE.md 2026-06-08).
-  const [currentStepText, setCurrentStepText] = useState<string>('')
+  // Reactive voice state, PUSHED from MobileWalkthrough's onVoiceStateChange
+  // whenever the step or ack flag changes (CR-01/CR-02 fix). Never derived from
+  // a synchronous ref read.
+  const [voiceState, setVoiceState] = useState<{ stepText: string; isAcknowledged: boolean }>({
+    stepText: '',
+    isAcknowledged: false,
+  })
+  // Stable callback so MobileWalkthrough's push effect doesn't re-fire each render.
+  const handleVoiceStateChange = useCallback(
+    (s: { stepText: string; isAcknowledged: boolean }) => setVoiceState(s),
+    [],
+  )
 
-  // Seed currentStepText when the modal opens so the first step is read aloud
-  // (VDW-LIT-03). The ref is populated by this point (modal-open is a user
-  // gesture that fires after the component has mounted and the ref is attached).
-  useEffect(() => {
-    if (modalOpen) {
-      setCurrentStepText(mwRef.current?.currentStepText ?? '')
-    }
-  }, [modalOpen])
-
-  // Voice callback: advance the walkthrough via handleMarkComplete, then mirror
-  // currentStepText so the modal's TTS effect fires on the NEW step text.
+  // Voice callbacks: invoke the imperative advance. The fresh step text is
+  // mirrored reactively via handleVoiceStateChange after the advance re-renders,
+  // which re-fires the modal's TTS read-aloud effect on the NEW step (VDW-LIT-03).
   const handleVoiceNext = () => {
     mwRef.current?.onVoiceNext()
-    setCurrentStepText(mwRef.current?.currentStepText ?? '')
   }
-
-  // Voice callback: navigate back via handleStepChange, then mirror.
   const handleVoicePrev = () => {
     mwRef.current?.onVoicePrev()
-    setCurrentStepText(mwRef.current?.currentStepText ?? '')
   }
 
   return (
@@ -101,7 +90,7 @@ export function WalkthroughSwitcher({ sop }: { sop: SopWithSections }) {
       {variant === 'desktop' ? (
         <DesktopWalkthrough sop={sop} />
       ) : (
-        <MobileWalkthrough ref={mwRef} sop={sop} />
+        <MobileWalkthrough ref={mwRef} sop={sop} onVoiceStateChange={handleVoiceStateChange} />
       )}
 
       <WalkthroughVoiceButton onOpen={() => setModalOpen(true)} />
@@ -112,8 +101,8 @@ export function WalkthroughSwitcher({ sop }: { sop: SopWithSections }) {
           onClose={() => setModalOpen(false)}
           onVoiceNext={handleVoiceNext}
           onVoicePrev={handleVoicePrev}
-          currentStepText={currentStepText}
-          isAcknowledged={mwRef.current?.isAcknowledged ?? false}
+          currentStepText={voiceState.stepText}
+          isAcknowledged={voiceState.isAcknowledged}
         />
       )}
     </>
