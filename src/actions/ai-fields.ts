@@ -60,8 +60,27 @@ export async function applyAiWrite(
   const organisationId: string | null = jwtClaims['organisation_id'] ?? null
   if (!organisationId) return { success: false, error: 'No organisation found' }
 
-  // Override context.organisationId with the JWT-derived value (never trust client)
-  const safeContext = { ...context, organisationId }
+  // Override context.organisationId with the JWT-derived value (never trust client).
+  // Also override sopIsPublished from the DB — never trust client-supplied value (CR-01).
+  // The write route enriches sopIsPublished as an optimisation, but a direct action call
+  // can pass sopIsPublished:false to force auto-apply on any low-stake field regardless of
+  // actual SOP status. The action is the security boundary.
+  let serverSopIsPublished: boolean | undefined = undefined
+  if (context.sopId) {
+    const admin = createAdminClient()
+    const { data: sopRow } = await admin
+      .from('sops')
+      .select('status')
+      .eq('id', context.sopId)
+      .eq('organisation_id', organisationId)
+      .single()
+    if (sopRow) {
+      serverSopIsPublished = sopRow.status === 'published'
+    }
+    // If sopRow is null (SOP not found / cross-org), leave sopIsPublished undefined —
+    // gateWrite's A6 fail-safe treats undefined-on-SOP-scoped as high-stake.
+  }
+  const safeContext = { ...context, organisationId, sopIsPublished: serverSopIsPublished }
 
   // ── 3. Registry lookup (allow-list gate — T-23-04-05) ─────────────────────
   const descriptor = getField(fieldId)
