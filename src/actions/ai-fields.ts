@@ -260,17 +260,21 @@ export async function rejectProposal(
   // ── 3. Update proposal status → 'rejected' (admin client + org-scope) ─────
   // ai_field_proposals has no authenticated write policy (CLAUDE.md 2026-06-15)
   const admin = createAdminClient()
-  const { error } = await admin
+  const { data: rejected, error } = await admin
     .from('ai_field_proposals')
     .update({ status: 'rejected' })
     .eq('id', proposalId)
     .eq('organisation_id', organisationId)
     .eq('status', 'pending')
+    .select('id')
 
   if (error) {
     return { success: false, error: 'Failed to reject proposal.' }
   }
-
+  // WR-06: detect 0-rows-updated — proposal was phantom or already resolved
+  if (!rejected || rejected.length === 0) {
+    return { success: false, error: 'Proposal not found or already resolved.' }
+  }
   // ── 4. Revalidate ─────────────────────────────────────────────────────────
   revalidatePath('/admin/sops')
 
