@@ -437,10 +437,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 **Version History + Worker-Instance Sign-off (G-01):**
 
-- [ ] **AFL-VER-01**: Admin can edit an SOP into a new version with the previous version explicitly deprecated and saved in version history (formal supersede flow)
-- [ ] **AFL-VER-02**: Side-by-side diff between any two SOP versions
-- [ ] **AFL-VER-03**: Admin can restore an old version as the active one with one click
-- [ ] **AFL-VER-04**: Workers see an indicator on the SOP if it has been updated since their last completion
+- [x] **AFL-VER-01**: Admin can edit an SOP into a new version with the previous version explicitly deprecated and saved in version history (formal supersede flow)
+- [x] **AFL-VER-02**: Side-by-side diff between any two SOP versions
+- [x] **AFL-VER-03**: Admin can restore an old version as the active one with one click
+- [x] **AFL-VER-04**: Workers see an indicator on the SOP if it has been updated since their last completion
 - [x] **AFL-VER-05**: Every SOP instance run by a worker is recorded with the worker's name (captured at instance start) + per-step approval, forming a personal sign-off chain — completing the SOP IS the legal signature
 
 ### v4.0 Traceability
