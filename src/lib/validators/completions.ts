@@ -55,10 +55,10 @@ export const SubmitCompletionSchema = z.object({
   // (older mobile clients won't send this). When present, server persists
   // to sop_completions.step_ack_trace.
   stepAckTrace: z.array(StepAckEntrySchema).optional(),
-  // Phase 23 D-11: optional for back-compat with non-kiosk clients.
-  // When present on a kiosk session, the server validates this user belongs
+  // Phase 23 D-11: optional for back-compat with personal-login clients.
+  // When present on a shared-device session, the server validates this user belongs
   // to the same org before writing to sop_completions.roster_worker_id.
-  // worker_id (the kiosk account uid used for RLS) is NEVER replaced by this.
+  // worker_id (the shared-device account uid used for RLS) is NEVER replaced by this.
   rosterWorkerId: z.string().uuid().optional(),
 })
 export type SubmitCompletionInput = z.infer<typeof SubmitCompletionSchema>

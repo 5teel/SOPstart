@@ -1246,7 +1246,7 @@ export type Database = {
           created_at: string
           // Phase 15 D-21: ordered ack-button click trace
           step_ack_trace: Json
-          // Phase 23 D-11: roster attribution FK, distinct from worker_id (kiosk uid for RLS)
+          // Phase 23 D-11: roster attribution FK, distinct from worker_id (shared-device uid for RLS)
           roster_worker_id: string | null
         }
         Insert: {

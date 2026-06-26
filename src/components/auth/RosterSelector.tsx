@@ -1,27 +1,27 @@
 'use client'
 
 /**
- * RosterSelector — D-11 kiosk name-select component
+ * RosterSelector — D-11 roster name-select component
  *
  * Fetches the org roster from organisation_members and renders large glove-friendly
  * name buttons (paper/ink tokens). On selecting a name, stores roster_worker_id in
  * component state AND sessionStorage for the walkthrough session.
  *
  * KEY DESIGN DECISIONS:
- * - The selected roster_worker_id is NOT a Supabase session. The kiosk account session
- *   (established once by the admin per RESEARCH Option A) remains unchanged.
+ * - The selected roster_worker_id is NOT a Supabase session. The shared-device account
+ *   session (established once by the admin per RESEARCH Option A) remains unchanged.
  * - roster_worker_id is passed into submitCompletion at completion time as rosterWorkerId.
  * - sessionStorage persists the selection across page navigations within the browser tab;
- *   cleared on tab close (appropriate kiosk session longevity).
+ *   cleared on tab close (appropriate shared-device session longevity).
  * - The org roster is fetched via /api/roster?org=<orgCode> — the server validates the
  *   org and returns only display names + user_ids for members in that org.
- * - No escalation: this component only stores an attribution identity. The kiosk account
- *   (role='worker') session controls all data access via Supabase RLS (T-23-06-03).
+ * - No escalation: this component only stores an attribution identity. The shared-device
+ *   account (role='worker') session controls all data access via Supabase RLS (T-23-06-03).
  *
- * KIOSK ACCOUNT SETUP (one-time admin action per org — RESEARCH Open Question #1):
- * 1. Create auth.users: kiosk+{org_id}@internal (Supabase dashboard or SQL)
- * 2. Add to organisation_members: user_id = kiosk account uid, role = 'worker', org = target org
- * 3. Sign the shared kiosk device into this account and leave it authenticated
+ * SHARED-DEVICE ACCOUNT SETUP (one-time admin action per org — RESEARCH Open Question #1):
+ * 1. Create auth.users: roster+{org_id}@internal (Supabase dashboard or SQL)
+ * 2. Add to organisation_members: user_id = shared-device account uid, role = 'worker', org = target org
+ * 3. Sign the shared device into this account and leave it authenticated
  * Auto-provisioning is deferred — this is a manual operator step for now.
  */
 
@@ -38,7 +38,7 @@ interface RosterMember {
 }
 
 interface RosterSelectorProps {
-  /** org query param from /login/kiosk?org=<orgCode> */
+  /** org query param from /login/roster?org=<orgCode> */
   orgCode: string
 }
 
@@ -72,7 +72,7 @@ export default function RosterSelector({ orgCode }: RosterSelectorProps) {
         const res = await fetch(url)
         if (!res.ok) {
           const body = await res.json().catch(() => ({}))
-          setError(body.error ?? 'Could not load roster. Ask your supervisor to check the kiosk setup.')
+          setError(body.error ?? 'Could not load roster. Ask your supervisor to check the device setup.')
           return
         }
         const data = await res.json()
@@ -90,7 +90,7 @@ export default function RosterSelector({ orgCode }: RosterSelectorProps) {
     setSelectedId(member.user_id)
     setSelectedName(member.display_name)
     // Store in sessionStorage — persists across page navigations within this tab
-    // (kiosk session longevity: cleared when the tab/browser closes)
+    // (shared-device session longevity: cleared when the tab/browser closes)
     sessionStorage.setItem(ROSTER_STORAGE_KEY, member.user_id)
     sessionStorage.setItem(ROSTER_NAME_STORAGE_KEY, member.display_name)
   }
@@ -131,7 +131,7 @@ export default function RosterSelector({ orgCode }: RosterSelectorProps) {
     return (
       <div className="rounded-xl border border-[var(--ink-100)] bg-[var(--paper-2)] p-6 text-center">
         <User size={24} className="text-[var(--ink-400)] mx-auto mb-3" />
-        <p className="text-sm text-[var(--ink-500)]">No workers found for this kiosk.</p>
+        <p className="text-sm text-[var(--ink-500)]">No workers found for this organisation.</p>
         <p className="text-xs text-[var(--ink-400)] mt-1">Ask your admin to add team members.</p>
       </div>
     )

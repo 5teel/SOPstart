@@ -1,20 +1,20 @@
 /**
- * /login/kiosk — Roster name-select kiosk login (D-11)
+ * /login/roster — Roster name-select login (D-11)
  *
- * This page is under (auth)/ so it renders WITHOUT a worker session.
- * The per-org kiosk account (role='worker') must be signed in on the shared
- * device by an admin as a one-time setup (RESEARCH Option A). Workers then
- * pick their name from the roster — no password required.
+ * A standard browser login page: it renders in the normal (auth) layout, WITHOUT
+ * a worker session. The per-org shared-device account (role='worker') must be signed
+ * in on the shared device by an admin as a one-time setup (RESEARCH Option A). Workers
+ * then pick their name from the roster — no password required.
  *
- * IMPORTANT: kiosk account setup is a one-time manual admin action per org:
- *   1. Create auth.users entry: kiosk+{org_id}@internal (no email verification needed)
+ * IMPORTANT: shared-device account setup is a one-time manual admin action per org:
+ *   1. Create auth.users entry: roster+{org_id}@internal (no email verification needed)
  *   2. Add to organisation_members with role='worker' for the org
  *   3. Sign the shared device into this account and leave it authenticated
- * Auto-provisioning of kiosk accounts is deferred (RESEARCH Open Question #1).
+ * Auto-provisioning of shared-device accounts is deferred (RESEARCH Open Question #1).
  *
  * Security: if an admin or safety_manager is already authenticated on this device,
- * they are redirected away — the kiosk route must not be an escalation surface.
- * The kiosk account is permanently role='worker' (T-23-06-02).
+ * they are redirected away — the roster login must not be an escalation surface.
+ * The shared-device account is permanently role='worker' (T-23-06-02).
  */
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   title: 'Select Your Name — SafeStart',
 }
 
-export default async function KioskLoginPage({
+export default async function RosterLoginPage({
   searchParams,
 }: {
   searchParams: Promise<{ org?: string }>
@@ -34,9 +34,9 @@ export default async function KioskLoginPage({
   const params = await searchParams
   const orgCode = params.org ?? ''
 
-  // Redirect admin/safety_manager away — kiosk route must not be an escalation surface
-  // (T-23-06-02: kiosk account is permanently role='worker'; other authed roles must not
-  // be able to impersonate workers via the roster route)
+  // Redirect admin/safety_manager away — the roster login must not be an escalation surface
+  // (T-23-06-02: the shared-device account is permanently role='worker'; other authed roles
+  // must not be able to impersonate workers via the roster route)
   const supabase = await createClient()
   const { data: { session } } = await supabase.auth.getSession()
   if (session?.access_token) {

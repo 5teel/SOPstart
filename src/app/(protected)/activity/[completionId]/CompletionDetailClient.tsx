@@ -9,7 +9,7 @@ import { RejectReasonSheet } from '@/components/activity/RejectReasonSheet'
 import { signOffCompletion, recordSignature } from '@/actions/completions'
 import type { CompletionStatus } from '@/types/sop'
 
-// sessionStorage key for roster identity (set by RosterSelector on kiosk devices — D-11)
+// sessionStorage key for roster identity (set by RosterSelector on shared devices — D-11)
 const ROSTER_STORAGE_KEY = 'safestart_roster_worker_id'
 
 interface Photo {
@@ -103,8 +103,8 @@ export function CompletionDetailClient({
         setSignOff({ id: '', supervisor_id: '', decision: 'approved', reason: null, created_at: new Date().toISOString() })
 
         // D-10 / AFL-VER-05: Record supervisor counter-signature bound to roster identity.
-        // On kiosk devices, the supervisor's roster id is stored in sessionStorage by RosterSelector.
-        // On non-kiosk devices, fall back to the supervisor's own user id (currentUserId).
+        // On shared devices, the supervisor's roster id is stored in sessionStorage by RosterSelector.
+        // On personal-login devices, fall back to the supervisor's own user id (currentUserId).
         // Using workerId here would record the WORKER's uid as the supervisor roster id,
         // corrupting the sign-off chain (WR-05 fix).
         // recordSignature is best-effort — sign-off is already committed above; signature

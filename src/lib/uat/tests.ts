@@ -340,21 +340,21 @@ export const UAT_TESTS: UatTest[] = [
 
   // ===================== Phase 23 — AI Field Layer + Version Supersede =====================
   {
-    id: 'p23-roster-kiosk-login',
+    id: 'p23-roster-login',
     dateAdded: '2026-06-26',
     category: 'Phase 23 — AI Field Layer + Version Supersede',
     title: 'Can a worker sign in on a shared device by picking their name?',
     status: 'active',
     summary:
-      'Workers on shared / kiosk devices sign in by tapping their name from a list — no password needed. We want to confirm the name-select screen works and the right SOPs appear after selecting a name.',
+      'Workers on a shared device sign in by tapping their name from a list — no password needed. We want to confirm the name-select screen works and the right SOPs appear after selecting a name.',
     tryIt: [
-      'On a shared device, open the kiosk login page.',
+      'On a shared device, open the roster login page.',
       'Pick a worker name from the list.',
       'Confirm you land on the SOP library and can see the procedures assigned to that worker.',
       'Complete a short SOP and confirm the completion is recorded against the selected worker name.',
       'Switch to a different worker name and confirm you only see that worker\'s assigned SOPs (not the first worker\'s private data).',
     ],
-    links: [{ label: 'Kiosk name-select', href: '/login/kiosk' }],
+    links: [{ label: 'Roster name-select', href: '/login/roster' }],
     questions: [
       { id: 'name-list', text: 'Was it easy to find and tap your name on the list?' },
       { id: 'right-sops', text: 'Did the correct SOPs appear after selecting a name?' },
@@ -362,7 +362,7 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'isolation', text: 'After switching workers, could you only see the new worker\'s SOPs (not the previous worker\'s)?' },
     ],
     background:
-      'AFL-VER-05 / D-11 (roster name-select login). Per-org kiosk account (role=worker) established once by admin. roster_worker_id stored in sessionStorage; RLS uses the kiosk account session for org-scoping while the roster_worker_id attributes signatures. recordSignature() enforces org-scope via createAdminClient() with explicit organisation_id check.',
+      'AFL-VER-05 / D-11 (roster name-select login). Per-org shared-device account (role=worker) established once by admin. roster_worker_id stored in sessionStorage; RLS uses the shared-device account session for org-scoping while the roster_worker_id attributes signatures. recordSignature() enforces org-scope via createAdminClient() with explicit organisation_id check.',
   },
   {
     id: 'p23-inline-ai-proposal',

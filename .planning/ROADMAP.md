@@ -166,7 +166,7 @@ Plans:
 
 - [x] 23-04-PLAN.md — AI write layer: gateWrite tiered approval (AFL-AI-02, D-01/D-02) + write API + inline Accept/Reject diff (D-03)
 - [x] 23-05-PLAN.md — Version diff page (AFL-VER-02) + versions-page clone/restore/compare + "updated since" badge (AFL-VER-04)
-- [x] 23-06-PLAN.md — Roster name-select kiosk login (D-11) + worker+supervisor sign-off chain (AFL-VER-05)
+- [x] 23-06-PLAN.md — Roster name-select login on shared devices (D-11) + worker+supervisor sign-off chain (AFL-VER-05)
 
 **Wave 4**
 

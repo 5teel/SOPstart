@@ -1,20 +1,20 @@
 /**
  * Phase 23 — AFL-VER-05 + D-11: Completion roster source-contract assertions.
  *
- * D-10 (kiosk mode: shared device where a supervisor authenticates once;
- *         workers select their name from an org roster to start a walkthrough)
+ * D-10 (shared-device login: shared device where the org's shared-device account
+ *         authenticates once; workers select their name from an org roster to start a walkthrough)
  * D-11 (roster attribution: roster_worker_id column on sop_completions records
  *         which roster worker completed the SOP — distinct from worker_id which is
- *         the kiosk account's UID used for RLS; NULL for all pre-Phase-23 completions)
+ *         the shared-device account's UID used for RLS; NULL for all pre-Phase-23 completions)
  *
  * AFL-VER-05 covers:
  *   - completions.ts submitCompletion writes roster_worker_id
  *   - completions.ts submitCompletion validates org-membership before writing roster_worker_id
  *   - completions.ts recordSignature exported and uses createAdminClient
- *   - /login/kiosk/page.tsx route exists with RosterSelector
+ *   - /login/roster/page.tsx route exists with RosterSelector
  *   - Migration 00038 contains roster_worker_id and sop_completion_signatures
  *
- * Tests turn GREEN when Plans 23-01 (migration), 23-04 (kiosk route), 23-06 (completions) ship.
+ * Tests turn GREEN when Plans 23-01 (migration), 23-04 (roster route), 23-06 (completions) ship.
  *
  * Unbuilt tokens are guarded with fs.existsSync + test.skip so Wave-0 is green-when-absent
  * and live-when-present (CLAUDE.md 2026-06-24 phase22 guard pattern).
@@ -33,13 +33,13 @@ import path from 'node:path'
 const REPO_ROOT = path.resolve(__dirname, '..', '..')
 
 const COMPLETIONS_PATH = path.join(REPO_ROOT, 'src', 'actions', 'completions.ts')
-const KIOSK_PAGE_PATH = path.join(
+const ROSTER_PAGE_PATH = path.join(
   REPO_ROOT,
   'src',
   'app',
   '(auth)',
   'login',
-  'kiosk',
+  'roster',
   'page.tsx',
 )
 // Migration 00038 will be created by Plan 23-01
@@ -63,7 +63,7 @@ test('AFL-VER-05: completions.ts exists', () => {
 
 test('AFL-VER-05: completions.ts submitCompletion writes roster_worker_id (D-11 attribution column)', () => {
   // D-11: submitCompletion must pass roster_worker_id in the insert payload.
-  // This is the attribution field — distinct from worker_id (kiosk account UID for RLS).
+  // This is the attribution field — distinct from worker_id (shared-device account UID for RLS).
   if (!fs.existsSync(COMPLETIONS_PATH)) {
     test.skip(true, 'completions.ts not found')
     return
@@ -134,35 +134,36 @@ test('AFL-VER-05: recordSignature uses createAdminClient (sop_completion_signatu
 })
 
 // ---------------------------------------------------------------------------
-// D-11: /login/kiosk/page.tsx route exists with RosterSelector
-// D-10: kiosk mode route lives under (auth)/ — no session required to render roster
+// D-11: /login/roster/page.tsx route exists with RosterSelector
+// D-10: the roster login route lives under (auth)/ — a standard browser login page,
+//       no worker session required to render the roster
 // ---------------------------------------------------------------------------
 
-test('D-11 [kiosk route]: /login/kiosk/page.tsx exists (D-10 kiosk mode entry point)', () => {
-  // D-10/D-11: the kiosk route is under (auth)/ so the roster list renders without
-  // a worker session — the supervisor authenticates the device; workers select their name.
-  if (!fs.existsSync(KIOSK_PAGE_PATH)) {
-    test.skip(true, '/login/kiosk/page.tsx not yet created (Plan 23-04 will create it)')
+test('D-11 [roster route]: /login/roster/page.tsx exists (D-10 shared-device login entry point)', () => {
+  // D-10/D-11: the roster route is under (auth)/ so the roster list renders without
+  // a worker session — the shared-device account authenticates the device; workers select their name.
+  if (!fs.existsSync(ROSTER_PAGE_PATH)) {
+    test.skip(true, '/login/roster/page.tsx not yet created (Plan 23-06 will create it)')
     return
   }
-  expect(fs.existsSync(KIOSK_PAGE_PATH)).toBe(true)
+  expect(fs.existsSync(ROSTER_PAGE_PATH)).toBe(true)
 })
 
-test('D-11 [kiosk route]: /login/kiosk/page.tsx renders RosterSelector component', () => {
-  // D-10: the kiosk page must render a RosterSelector (name-select client component).
+test('D-11 [roster route]: /login/roster/page.tsx renders RosterSelector component', () => {
+  // D-10: the roster login page must render a RosterSelector (name-select client component).
   // CLAUDE.md 2026-06-05: assert the component is rendered (JSX call), not just imported.
-  if (!fs.existsSync(KIOSK_PAGE_PATH)) {
-    test.skip(true, '/login/kiosk/page.tsx not yet created (Plan 23-04 will create it)')
+  if (!fs.existsSync(ROSTER_PAGE_PATH)) {
+    test.skip(true, '/login/roster/page.tsx not yet created (Plan 23-06 will create it)')
     return
   }
-  const src = fs.readFileSync(KIOSK_PAGE_PATH, 'utf-8')
+  const src = fs.readFileSync(ROSTER_PAGE_PATH, 'utf-8')
   // Both the import AND the JSX render call must be present
   expect(src).toContain('RosterSelector')
   const hasRosterSelectorRender =
     src.includes('<RosterSelector') || src.includes('RosterSelector(')
   expect(
     hasRosterSelectorRender,
-    'RosterSelector must be rendered (not just imported) in the kiosk page (D-10 wiring)',
+    'RosterSelector must be rendered (not just imported) in the roster login page (D-10 wiring)',
   ).toBe(true)
 })
 
@@ -300,11 +301,11 @@ test.fixme(
   // org-scope check) run live. This runtime case requires:
   //   1. A live Supabase instance with migrations 00038 applied (roster_worker_id column +
   //      sop_completion_signatures table)
-  //   2. An authenticated kiosk-account session (per-org kiosk account setup, RESEARCH Option A)
+  //   2. An authenticated shared-device-account session (per-org account setup, RESEARCH Option A)
   //   3. A real sop_completions row to sign against
   //
   // UAT steps (on sopstart.com — CLAUDE.md memory: Railway-only testing):
-  //   1. Complete an SOP as a kiosk worker → confirm sop_completions.roster_worker_id = selected worker
+  //   1. Complete an SOP as a roster worker on a shared device → confirm sop_completions.roster_worker_id = selected worker
   //   2. As supervisor: approve the completion → confirm sop_completion_signatures row exists
   //      with role='supervisor' and roster_user_id = supervisor's roster id
   //   3. Query: SELECT * FROM sop_completion_signatures WHERE completion_id = <id>

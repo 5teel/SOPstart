@@ -1,15 +1,15 @@
 /**
  * GET /api/roster
  *
- * Returns the worker roster for the kiosk login D-11 flow.
+ * Returns the worker roster for the roster name-select login D-11 flow.
  * Called by RosterSelector client component to fetch display names for name-select.
  *
- * Auth: requires an active session (the kiosk account session established by the admin).
- * Org scoping: the kiosk account's JWT org claim gates which members are returned.
+ * Auth: requires an active session (the shared-device account session established by the admin).
+ * Org scoping: the shared-device account's JWT org claim gates which members are returned.
  *
  * Returns: { members: Array<{ user_id: string; display_name: string }> }
  *
- * Security: only returns workers in the authenticated kiosk session's organisation.
+ * Security: only returns workers in the authenticated shared-device session's organisation.
  * Uses the admin auth API to read user email addresses (no user_profiles table exists —
  * CLAUDE.md 2026-04-04 pattern: names derived from email via admin.auth.admin.listUsers).
  */
@@ -23,7 +23,7 @@ export async function GET() {
   const { data: { user }, error: userError } = await supabase.auth.getUser()
   if (userError || !user) {
     return NextResponse.json(
-      { error: 'Not authenticated. The kiosk account must be signed in.' },
+      { error: 'Not authenticated. The shared-device account must be signed in.' },
       { status: 401 },
     )
   }

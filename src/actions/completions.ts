@@ -65,16 +65,16 @@ export async function submitCompletion(
   // step_ack_trace (Phase 15 D-21): append-only evidence of sequential reading.
   // Server treats client-supplied trace as informational — D-20 / threat model
   // T-15-02-01: it's evidence, not a gate.
-  // roster_worker_id (Phase 23 D-11): attribution column — worker_id STAYS as user.id (kiosk
-  // account uid, the RLS key). roster_worker_id is the floor-identity attribution column only.
+  // roster_worker_id (Phase 23 D-11): attribution column — worker_id STAYS as user.id (the
+  // shared-device account uid, the RLS key). roster_worker_id is the floor-identity attribution column only.
   const { error: insertError } = await admin
     .from('sop_completions')
     .insert({
       id: localId,
       organisation_id: organisationId,
       sop_id: sopId,
-      worker_id: user.id,              // kiosk account uid (RLS key — DO NOT change)
-      roster_worker_id: resolvedRosterWorkerId,  // D-11 attribution (null for non-kiosk)
+      worker_id: user.id,              // shared-device account uid (RLS key — DO NOT change)
+      roster_worker_id: resolvedRosterWorkerId,  // D-11 attribution (null for personal-login sessions)
       sop_version: sopVersion,
       content_hash: contentHash,
       step_data: stepData as Record<string, number>,
