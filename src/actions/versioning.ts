@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { parseJwtPayload } from '@/lib/supabase/jwt'
+import { computeNextVersionLineage } from '@/lib/builder/version-lineage'
 
 // ------------------------------------------------------------
 // uploadNewVersion
@@ -276,23 +277,9 @@ export interface VersionRecord {
   parent_sop_id: string | null
 }
 
-// ------------------------------------------------------------
-// computeNextVersionLineage
-// Pure helper — computes newVersion and newParentId from an existing SOP.
-// Exported so it is unit-testable without a DB (Plan 23-03 TDD task).
-// All versions of the same SOP lineage share the same parent_sop_id (the
-// first/root version's id). When oldSop has no parent_sop_id it IS the root.
-// ------------------------------------------------------------
-export function computeNextVersionLineage(oldSop: {
-  id: string
-  version: number
-  parent_sop_id: string | null
-}): { newVersion: number; newParentId: string } {
-  return {
-    newVersion: oldSop.version + 1,
-    newParentId: (oldSop.parent_sop_id as string | null) ?? oldSop.id,
-  }
-}
+// computeNextVersionLineage is a pure sync helper — it lives in
+// '@/lib/builder/version-lineage' because every export of this 'use server'
+// module must be an async function (Next.js server-action constraint).
 
 // ------------------------------------------------------------
 // cloneSopAsDraft (AFL-VER-01 / D-05)

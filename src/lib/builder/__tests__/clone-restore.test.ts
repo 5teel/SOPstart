@@ -12,7 +12,7 @@
  */
 
 import { test, expect } from '@playwright/test'
-import { computeNextVersionLineage } from '@/actions/versioning'
+import { computeNextVersionLineage } from '@/lib/builder/version-lineage'
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -94,9 +94,9 @@ test('append-only invariant: restoreVersionAsNew delegates to cloneSopAsDraft (r
 test('append-only invariant: only static imports at file top-level (CLAUDE.md 2026-06-24)', () => {
   const testSrc = fs.readFileSync(__filename, 'utf-8')
   // Verify imports are static (import keyword at line start, not inside an expression)
-  expect(testSrc).toContain("import { computeNextVersionLineage } from '@/actions/versioning'")
+  expect(testSrc).toContain("import { computeNextVersionLineage } from '@/lib/builder/version-lineage'")
   // The imports are at the top — not inside functions or awaited expressions
-  const importStatement = "import { computeNextVersionLineage } from '@/actions/versioning'"
+  const importStatement = "import { computeNextVersionLineage } from '@/lib/builder/version-lineage'"
   const importIdx = testSrc.indexOf(importStatement)
   expect(importIdx).toBeGreaterThan(-1)
   // Static import should appear before any test() call
