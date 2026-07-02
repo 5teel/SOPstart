@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
 status: Ready to execute
-stopped_at: Completed 23-07-PLAN.md — Phase 23 closeout; awaiting Task 4 human verify on sopstart.com
-last_updated: "2026-06-25T14:38:43.064Z"
+stopped_at: Phase 26 context gathered — full-bespoke builder, agent layer split to 26.5, Konva pulled forward, open v5.0
+last_updated: "2026-07-02T13:23:02.415Z"
 progress:
   total_phases: 29
   completed_phases: 4
@@ -380,7 +380,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-25T14:38:43.056Z
-Stopped at: Completed 23-07-PLAN.md — Phase 23 closeout; awaiting Task 4 human verify on sopstart.com
-Resume file: 
-None
+Last session: 2026-07-02T13:23:02.406Z
+Stopped at: Phase 26 context gathered — full-bespoke builder, agent layer split to 26.5, Konva pulled forward, open v5.0
+Resume file:
+.planning/phases/26-sop-builder-redesign/26-CONTEXT.md
