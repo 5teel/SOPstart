@@ -1,9 +1,9 @@
 ---
 gsd_state_version: 1.0
-milestone: v4.0
-milestone_name: — Safety-Critical Parsing + Voice + AI Foundation
-status: Ready to execute
-stopped_at: Phase 26 context gathered — full-bespoke builder, agent layer split to 26.5, Konva pulled forward, open v5.0
+milestone: v5.0
+milestone_name: — AI-Native Builder + Agent Foundation
+status: Phase 26 — ready to plan
+stopped_at: Phase 26 context gathered — full-bespoke builder, agent layer split to 26.5, Konva pulled forward, v5.0 opened; roadmap reconciled
 last_updated: "2026-07-02T13:23:02.415Z"
 progress:
   total_phases: 29
@@ -20,15 +20,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 23 — ai-field-layer-version-supersede
+**Current focus:** Phase 26 — sop-builder-redesign (v5.0 opener)
 
 ## Current Position
 
-Phase: 23 (ai-field-layer-version-supersede) — EXECUTING
-Plan: 8 of 8
-**Milestone status:** v4.0 started 2026-05-24. Phases 21, 21.5, 21.6, 24, 25 ✅ complete; 22 + 23 remaining. See `.planning/PRODUCT-ROADMAP.md` v0.3 + `.planning/MILESTONES.md` § v3.0 for predecessor record.
+Phase: 26 (sop-builder-redesign) — CONTEXT GATHERED, ready to plan
+Plan: none yet
+**Milestone status:** **v4.0 ✅ shipped 2026-07-02** (Phases 21, 21.5, 21.6, 22, 23, 24, 25 executed + code-reviewed; residual = human UAT on 21.6/22/23/25, carried per v3.0 field-verification precedent — archive via `/gsd-complete-milestone`). **v5.0 opened 2026-07-02** — Phase 26 (bespoke inline builder; Phase 17 Konva absorbed) → Phase 26.5 (agent-metadata layer on X-03 + graphify).
 
-**Active phase:** 22
+**Active phase:** 26
 
 **v4.0 phase sequence:**
 
@@ -36,7 +36,9 @@ Plan: 8 of 8
 2. **Phase 22 — Voice-Driven Walkthrough** (next): W-01 literacy/visual/voice gaps + X-02 voice-driven walkthrough. 8 requirements (VDW-LIT ×4, VDW-VOICE ×4).
 3. **Phase 23 — AI Field Layer + Version Supersede**: X-03 universal AI read/write + G-01 version supersede + worker-instance sign-off. 9 requirements (AFL-AI ×4, AFL-VER ×5).
 
-**Next action:** /gsd-execute-phase 22 (Voice-Driven Walkthrough; 4 plans / 3 waves planned + verified 2026-06-24). Waves: W0 = 22-01 (phase22-stubs test scaffold); W1 = 22-02 (Deepgram keyterms + /api/voice/tts + useTtsPlayback + classifyIntent) ∥ 22-04 (always-on visual layer); W2 = 22-03 (live wiring onVoiceNext→handleMarkComplete + STT/intent/TTS + **blocking human UAT on sopstart.com**). Run W2 sequentially on main tree (cross-wave imports + human gate; 2026-06-02 worktree-base learning). Key locks: lightweight voice "next" (D-01), PTT+tap fallback (D-03), always-on visual layer mobile-first (D-05), **English-only — VDW-LIT-04/VDW-VOICE-04 deferred** (D-08). TTS=gpt-4o-mini-tts, STT=Deepgram nova-3 (both reuse existing code; no new npm deps). Also outstanding: Phase 25 human UAT (7 tests) + Phase 21.6 4-item human UAT on sopstart.com.
+**Next action:** `/gsd-plan-phase 26` (SOP Builder Redesign — v5.0 opener). SPEC (`26-SPEC.md`, R1–R8) + CONTEXT (`26-CONTEXT.md`) locked 2026-07-02. Locked forks: **full-bespoke editor** replacing Puck (D-01, `layout_data`/junction/provenance frozen); **agent-metadata layer split to Phase 26.5** (contract hooks only here, D-02); **Phase 17 Konva annotation ABSORBED** into the Visual block (D-03, workers never download Konva — baked PNG read path); **v5.0 opened** (D-04). Expect a heavily-waved plan (bespoke render → tiered inserter+ghosts → re-wire autosave/provenance-sync/AI-overlays/verify-UI with **behavioural parity tests** → Visual+Konva slices → convert-golden-path regression). Validated sketch: `sketches/sop-builder-redesign/index.html`.
+
+**Also outstanding (v4.0 residual):** human UAT on sopstart.com — Phase 23 (4 tests), Phase 22 (voice loop), Phase 25 (7 tests), Phase 21.6 (4 items). Carry per v3.0 field-verification precedent or run before `/gsd-complete-milestone`.
 
 **Roadmap evolution:** Phase 21.6 (Builder Edit Stage Redesign) INSERTED after 21.5, before 22, on 2026-06-05. Reason: 21.5 redesigned the Review/Publish stages but the Build/edit stage is still the untouched Puck editor — first-time admins hit jargon ("Block"), two redundant block lists (palette vs outline), unanchored canvas figures, and a cramped right-rail field editor. Decision by Simon during 21.5 UAT.
 

@@ -35,16 +35,16 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 14.5: Blueprint Shell Rollout** - Paper/ink design language rolled across admin, auth, dashboard, library, and worker SOP surfaces (~90 files migrated 2026-05-11/12; legacy steel/yellow theme + SiteThemeProvider + ThemePicker removed). Residual scope (role-aware home + global Cmd+K) rolled into Phase 15.
 - [x] **Phase 15: Manufacturing-Line Mode** - Derived from Visy customer interview (2026-05-05). Six sub-scopes: site tier in multi-tenancy, terminal/kiosk shell, voice Q&A over a single SOP, SOP governance & lifecycle, sub-trade tags + extended roles, training-record export. Implementation 5/5 plans complete 2026-05-13; closed 2026-05-23 with migration 00030 confirmed live on prod (`db push` reported up-to-date). Visy demo dry-run carried as a manual pre-demo task.
 - [→] **Phase 16: NZ Template Library** — **deferred to v4.0 backlog** 2026-05-23. Curated WorkSafe / machinery / chemical handling templates as a third builder entry point. Defer reason: own milestone scale; not blocking v3.0 closure.
-- [→] **Phase 17: Image & Diagram Annotation** — **deferred to v4.0 backlog** 2026-05-23. Konva editor with dual-store, DiagramHotspotBlock, stylus + palm rejection. Defer reason: multi-week build; needs customer pull signal first.
+- [⤳] **Phase 17: Image & Diagram Annotation** — **ABSORBED into Phase 26 (v5.0) 2026-07-02**. Konva editor with dual-store, DiagramHotspotBlock, stylus + palm rejection. Pulled forward into the builder redesign (CONTEXT D-03); do not build separately — its three planned slices are reused verbatim inside Phase 26. (Was deferred to v4.0 backlog 2026-05-23.)
 - [→] **Phase 18: Collaborative Editing** — **deferred to v4.0 backlog** 2026-05-23. Section-level pessimistic locks, Realtime presence, conflict modal. Defer reason: multi-week build; current single-admin pattern has not surfaced contention.
 - ~~Phase 19: Pipeline Integration, Bundle Isolation & v3.0 Closeout~~ — **deleted from roadmap 2026-05-23**. Its only purpose was to tie Phases 9 + 12 + 16 + 17 together; with 9 unstarted and 16/17 deferred, there is nothing to close out. v3.0 archive captures the closeout instead.
 - [x] **Phase 20: Conversion Pipeline V2 (partial — v3.0 slice)** - DOCX → Puck `layout_data` directly in the Phase 12 builder with side-by-side step + photo blocks shipped 2026-05-15..17 (commits `1a2bbbc`, `c47baa7`, `e33669e`, `064e819`). SPEC + 4 validated spikes captured 2026-05-15..16. Remaining scope (persistent side-by-side source viewer, AI reviewer × 5 jobs auto/manual, mandatory per-block verify checklist at publish gate) **carried to v4.0 Phase 21: Safety-Critical Parsing**.
 
 ---
 
-## v4.0 — Safety-Critical Parsing + Voice + AI Foundation (started 2026-05-24)
+## v4.0 — Safety-Critical Parsing + Voice + AI Foundation (started 2026-05-24 · ✅ shipped 2026-07-02)
 
-Three phases bundle the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` v0.3. Execution order 21 → 22 → 23.
+Bundles the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` v0.3. Planned 21 → 22 → 23; grew in-flight with 21.5/21.6 (builder UX) and 24/25 (flow graph + departments). All phases executed and code-reviewed; residual = human UAT (21.6/22/23/25) carried per the v3.0 field-verification precedent. Archive via `/gsd-complete-milestone`.
 
 - [x] **Phase 21: Safety-Critical Parsing** ✅ 2026-05-25 (PASS-WITH-NOTES) — Finishes the Phase 20 contract. Side-by-side source viewer (S-02) + AI reviewer × 5 verification jobs (S-03) + per-block verify checklist at publish gate (S-04) + Word/PDF parsing with step-level provenance (I-01). 5 plans / 5 waves merged; 23/23 SCP-* requirements covered; defence-in-depth publish gate (UI disabled + server 400); D-21-07 no-bulk-verify lint guard live in CI. See `.planning/phases/21-safety-critical-parsing/VERIFICATION.md`.
 - [x] **Phase 21.5: Builder Review UX** ✅ 2026-06-02 (5/5 plans) — Restructure the admin SOP builder review/publish surface to remove first-run confusion (currently 5–6 always-on panels, internal jargon like "StepBlock", a hidden publish gate). One-step-at-a-time "Review Station" (step navigator left · step-in-app centre · source document right), AI reviewer check rendered inside the step card it relates to, 3-stage stepper (Build → Review → Publish), humanized labels ("Verify / Send back to edit", not a/d), publish-gate lock reason shown inline. Validated design: `sketch-builder-redesign-01.html` on the paper/ink sketch-findings-SOPstart system. Reuses shipped Phase 21 code (BuilderWithSourceViewer, SourceViewerPane, VerifyChecklistGate, ReviewerFlagsPanel). Runs **before** Phase 22 per Simon's priority. UI-led — produces a UI-SPEC.
@@ -69,6 +69,13 @@ Three phases bundle the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` 
   - [x] 25-04-PLAN.md — /admin/departments page: cards, counts, owner accountability, create/edit/archive (Wave 3)
   - [x] 25-05-PLAN.md — Block library dept rework + delete /admin/global-blocks + journeys.ts + worker library (Wave 3)
   - [x] 25-06-PLAN.md — Team dept assignment + owner badge + create-SOP department field (blank + AI) (Wave 3)
+
+## v5.0 — AI-Native Builder + Agent Foundation (started 2026-07-02)
+
+v4.0 (Phases 21–25) shipped. v5.0 rebuilds the SOP builder as a bespoke inline surface and lays the agent-metadata foundation the conversational/AI-native direction (Phase 23 X-03) builds on. Execution order 26 → 26.5. Forks locked in `26-CONTEXT.md` 2026-07-02.
+
+- [ ] **Phase 26: SOP Builder Redesign — Inline Surface (v5.0 opener)** — Replace Puck with a **full bespoke** inline editor: one surface for create / convert / edit where the admin edits the *exact document a worker reads*; a tiered, context-aware block inserter with auto-dismissing smart-suggestion ghosts; a unified **Visual** block (photo · diagram · video) with **full Konva diagram annotation (Phase 17 ABSORBED — D-03)** — all while preserving the frozen `layout_data` / `sop_section_blocks` junction / `block_provenance` contract so the parse → AI-review → verify → publish spine is untouched. Agent-metadata layer split to 26.5 (contract hooks only here — D-02). Highest-effort/-risk engine choice taken deliberately for the highest interface ceiling (D-01). **HARD constraint:** workers never download Konva (baked PNG read path). SPEC: `.planning/phases/26-sop-builder-redesign/26-SPEC.md`; CONTEXT: `26-CONTEXT.md`; sketch: `sketches/sop-builder-redesign/index.html`.
+- [ ] **Phase 26.5: Agent Metadata Layer** — The human-invisible per-SOP + per-block machine layer (semantic tags, entities, embeddings, cross-SOP links, **memory**, **learning proposals**, **review state**) that agents read, write, and traverse individually and collectively (summarise across SOPs). Builds on Phase 23 X-03 (universal AI field read/write) + graphify (cross-SOP graph). Delivers the `⚇ Agent layer` surfacing + the memory/learning/review reasoning that Phase 26 only wires contract hooks for.
 
 ## Phase Details
 
@@ -615,7 +622,9 @@ Plans:
 - [ ] 16-01-PLAN.md — Template catalog: `sop_templates` table (or flag on `sops` with `is_template`), curation list with NZ WorkSafe categories, seed data for forklift ops, grinder use, chemical handling, confined space entry, hot work permit
 - [ ] 16-02-PLAN.md — Template picker UI: `/admin/sops/new/template` route, category sidebar + card grid, template preview drawer, "Use this template" action that clones sections + blocks + layout into a fresh draft SOP
 
-### Phase 17: Image & Diagram Annotation
+### Phase 17: Image & Diagram Annotation — ⤳ ABSORBED into Phase 26 (v5.0) 2026-07-02
+
+> **This phase is not built separately.** Its scope + the four plans below were pulled forward into **Phase 26** (CONTEXT D-03) as the Visual block's diagram-annotation capability. The goal/criteria/plans below are retained as the authoritative spec Phase 26 reuses verbatim.
 
 **Goal**: Admin can non-destructively annotate any photo or diagram with arrows, rectangles, ellipses, text labels, numbered callouts, and freehand sketches (with Apple Pencil palm rejection), re-edit them later, and place numbered hotspots at freeform x/y on a machine diagram via a specialty `DiagramHotspotBlock` — while workers never download Konva because a baked PNG is served for the read path
 **Depends on**: Phase 11 (section schema), Phase 12 (builder shell — annotation is invoked from photo blocks)
@@ -725,11 +734,13 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11 → 12 → 12.5 → 13 → 14 → 14.5 → 15 → 20 → **21 → 22 → 23**
+Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 21.6 → 22 → 23 → 24 → 25** (v4.0) → **26 → 26.5** (v5.0)
 
 **v3.0 closeout 2026-05-23.** Phases 16, 17, 18 deferred to v4.0 backlog. Phase 19 deleted (no remaining dependencies). Phase 20 partial — DOCX-to-builder slice shipped on master; remaining safety-critical verification scope carried to v4.0 Phase 21.
 
-**v4.0 kicked off 2026-05-24.** Three phases (21, 22, 23) cover the 8 v0.3 NOW features. Execution sequential.
+**v4.0 kicked off 2026-05-24 · ✅ shipped 2026-07-02.** Phases 21, 21.5, 21.6, 22, 23, 24, 25 executed + code-reviewed. Residual = human UAT (21.6/22/23/25) carried per v3.0 field-verification precedent. Archive via `/gsd-complete-milestone`.
+
+**v5.0 kicked off 2026-07-02.** Phase 26 (bespoke inline builder redesign; Phase 17 Konva absorbed) → Phase 26.5 (agent-metadata layer on X-03 + graphify). Forks locked in `26-CONTEXT.md`.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -751,13 +762,19 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 14.5. Blueprint Shell Rollout | n/a | Complete (no formal plans — shipped ad-hoc) | 2026-05-12 |
 | 15. Manufacturing-Line Mode | 5/5 | Complete pending Simon's prod migration push | 2026-05-13 |
 | 16. NZ Template Library | — | Deferred to v4.0 backlog |  |
-| 17. Image & Diagram Annotation | — | Deferred to v4.0 backlog |  |
+| 17. Image & Diagram Annotation | — | ⤳ Absorbed into Phase 26 (v5.0) 2026-07-02 |  |
 | 18. Collaborative Editing | — | Deferred to v4.0 backlog |  |
 | 19. Pipeline Integration, Bundle Isolation & v3.0 Closeout | — | Deleted 2026-05-23 |  |
 | 20. Conversion Pipeline V2 | partial | Partial complete — DOCX→builder slice shipped; remainder → v4.0 Phase 21 | 2026-05-17 |
 | **21. Safety-Critical Parsing (v4.0)** | 6/6 | ✅ Complete — PASS-WITH-NOTES (includes 21-05 gap closure — parser→library junction integration) | 2026-05-26 |
-| **22. Voice-Driven Walkthrough (v4.0)** | 0/? | Not started |  |
-| **23. AI Field Layer + Version Supersede (v4.0)** | 0/? | Not started |  |
+| **21.5. Builder Review UX (v4.0)** | 5/5 | ✅ Complete | 2026-06-02 |
+| **21.6. Builder Edit Stage Redesign (v4.0)** | 5/5 | ✅ Complete (residual: 4 human-UAT items) | 2026-06-05 |
+| **22. Voice-Driven Walkthrough (v4.0)** | 4/4 | ✅ Complete (residual: human UAT on sopstart.com) | 2026-06-24 |
+| **23. AI Field Layer + Version Supersede (v4.0)** | 8/8 | ✅ Complete + code-reviewed (residual: 4 human-UAT items) | 2026-06-25 |
+| **24. Procedure Flow — Spatial Node Graph (v4.0)** | 3/3 | ✅ Complete | 2026-06-12 |
+| **25. Department as a First-Class Entity (v4.0)** | 6/6 | ✅ Complete (residual: 7 human-UAT tests) | 2026-06-15 |
+| **26. SOP Builder Redesign — Inline Surface (v5.0)** | 0/? | Context gathered — ready to plan | |
+| **26.5. Agent Metadata Layer (v5.0)** | 0/? | Deferred follow-on (built on X-03 + graphify) | |
 
 ## Backlog
 
