@@ -5,9 +5,9 @@
  * the block components in `src/components/sop/blocks/*` (+ the 26-09 VisualBlock)
  * accept exactly those props. Replacing Puck as the RENDER engine is therefore a `type → component`
  * switch, not a rewrite. This module is the single source of that mapping,
- * consumed by both the worker read path (`LayoutRenderer`) and — later waves —
- * the admin edit host. It carries NO `@puckeditor/core` import, so pulling it
- * into `/sops/[sopId]` drops Puck from the worker bundle.
+ * consumed by both the worker read path (`LayoutRenderer`) and the admin edit
+ * host. It carries NO Puck import, so pulling it into `/sops/[sopId]` keeps
+ * Puck out of the worker bundle (Puck is fully removed as of Plan 26-14).
  *
  * `UnsupportedBlockPlaceholder` + `sanitizeLayoutContent` live in
  * `./sanitize-layout` (P17) and consult `BLOCK_COMPONENTS` for the known-type

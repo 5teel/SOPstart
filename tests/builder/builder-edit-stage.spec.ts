@@ -9,21 +9,19 @@
  * defined in Phase 21.6 (E3–E7). Consistent with Phase 15/21/21.5 approach.
  *
  * Assertions:
- *   E3  — puck-config.tsx exports both `components:` and `outline:` null-renderers
- *          returning empty fragments <></> in createPuckOverrides
- *   E4  — puck-config.tsx has contentEditable: true on at least one field
+ *   E3  — bespoke render place exists (block-registry BLOCK_COMPONENTS) and the
+ *          old puck-config.tsx is GONE (Phase 26 D-01: Puck fully removed, 26-14)
+ *   E4  — bespoke inline editing uses contentEditable (InlineText.tsx)
  *   E5  — BuilderTreeRail.tsx exists and imports reorderSections
  *   E6  — BuilderTreeRail.tsx renders 'Reference images' and does NOT leak
  *          'Unanchored figures' as a user-visible text string
  *   E7  — server publish route still contains the unverified_blocks 400 gate
- *          (REGRESSION TRIPWIRE — must stay GREEN through Plans 02–05)
- *   E3-one-list — BuilderClient.tsx suppresses Puck's native sidebars via
- *          leftSideBarVisible: false + rightSideBarVisible: false
+ *          (REGRESSION TRIPWIRE — must stay GREEN)
+ *   E3-bespoke — BuilderClient.tsx mounts the bespoke EditableDocument and no
+ *          longer imports Puck (@puckeditor/core absent)
  *
- * RED/GREEN expectations at phase head (2026-06-05):
- *   GREEN now: E7 (tripwire — regression guard, no code needed)
- *   RED now:   E3, E4, E5, E6, E3-one-list (production code not yet written;
- *              downstream Plans 02–05 flip these GREEN)
+ * Updated in Plan 26-14: E3/E4/E3-one-list originally asserted Puck-config
+ * internals; Puck is removed, so they now assert the bespoke end-state.
  */
 
 import { test, expect } from '@playwright/test'
@@ -41,29 +39,23 @@ function readSrc(relPath: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// E3: puck-config.tsx — createPuckOverrides includes components + outline
-//     null-renderers returning empty fragments <></>
-//     Fails RED at phase head; passes GREEN after Plan 02.
+// E3: bespoke render place exists and Puck is gone (Phase 26 D-01 / 26-14).
 // ---------------------------------------------------------------------------
-test('E3: createPuckOverrides returns components and outline null-renderers', () => {
-  const src = readSrc('src/lib/builder/puck-config.tsx')
-  expect(src, 'puck-config must have components: () => <></>').toMatch(
-    /components:\s*\(\)\s*=>\s*<><\/>/,
+test('E3: bespoke BLOCK_COMPONENTS render place exists; puck-config.tsx is removed', () => {
+  const registry = readSrc('src/lib/builder/block-registry.tsx')
+  expect(registry, 'block-registry must export BLOCK_COMPONENTS').toContain(
+    'export const BLOCK_COMPONENTS',
   )
-  expect(src, 'puck-config must have outline: () => <></>').toMatch(
-    /outline:\s*\(\)\s*=>\s*<><\/>/,
-  )
+  const puckConfig = path.join(REPO_ROOT, 'src/lib/builder/puck-config.tsx')
+  expect(fs.existsSync(puckConfig), 'puck-config.tsx must be deleted (Puck removed)').toBe(false)
 })
 
 // ---------------------------------------------------------------------------
-// E4: puck-config.tsx — at least one field has contentEditable: true
-//     Fails RED at phase head; passes GREEN after Plan 02.
+// E4: bespoke inline editing uses contentEditable (InlineText.tsx).
 // ---------------------------------------------------------------------------
-test('E4: puck-config.tsx has contentEditable: true on text/textarea fields', () => {
-  const src = readSrc('src/lib/builder/puck-config.tsx')
-  expect(src, 'puck-config must contain contentEditable: true').toMatch(
-    /contentEditable:\s*true/,
-  )
+test('E4: bespoke InlineText uses contentEditable for in-place text editing', () => {
+  const src = readSrc('src/components/admin/builder-v2/InlineText.tsx')
+  expect(src, 'InlineText must use contentEditable').toContain('contentEditable')
 })
 
 // ---------------------------------------------------------------------------
@@ -113,19 +105,15 @@ test('E7: server publish route still contains the unverified_blocks 400 gate', (
 })
 
 // ---------------------------------------------------------------------------
-// E3-one-list: BuilderClient.tsx suppresses Puck's native sidebar panels.
-//     Fails RED at phase head; passes GREEN after Plan 05.
+// E3-bespoke: BuilderClient mounts the bespoke EditableDocument and no longer
+//     imports Puck (Phase 26 D-01 / 26-14 — Puck fully removed).
 // ---------------------------------------------------------------------------
-test('E3-one-list: BuilderClient.tsx passes leftSideBarVisible: false and rightSideBarVisible: false to Puck', () => {
+test('E3-bespoke: BuilderClient mounts EditableDocument and does not import Puck', () => {
   const src = readSrc(
     'src/app/(protected)/admin/sops/builder/[sopId]/BuilderClient.tsx',
   )
-  expect(
-    src,
-    'BuilderClient must pass leftSideBarVisible: false to Puck ui prop',
-  ).toContain('leftSideBarVisible: false')
-  expect(
-    src,
-    'BuilderClient must pass rightSideBarVisible: false to Puck ui prop',
-  ).toContain('rightSideBarVisible: false')
+  expect(src, 'BuilderClient must mount the bespoke EditableDocument').toContain(
+    'EditableDocument',
+  )
+  expect(src, 'BuilderClient must not import Puck').not.toContain('@puckeditor/core')
 })

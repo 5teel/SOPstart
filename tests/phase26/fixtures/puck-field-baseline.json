@@ -1,0 +1,99 @@
+{
+  "components": [
+    "CalloutBlock",
+    "DecisionBlock",
+    "EscalateBlock",
+    "HazardCardBlock",
+    "HeadingBlock",
+    "InspectBlock",
+    "MeasurementBlock",
+    "ModelBlock",
+    "PPECardBlock",
+    "PhotoBlock",
+    "PhotoGridBlock",
+    "SignOffBlock",
+    "StepBlock",
+    "StepWithPhotosBlock",
+    "TextBlock",
+    "VoiceNoteBlock",
+    "ZoneBlock"
+  ],
+  "fields": {
+    "CalloutBlock": [
+      "body",
+      "title"
+    ],
+    "DecisionBlock": [
+      "options",
+      "question"
+    ],
+    "EscalateBlock": [
+      "escalationMode",
+      "reason",
+      "title"
+    ],
+    "HazardCardBlock": [
+      "body",
+      "severity",
+      "title"
+    ],
+    "HeadingBlock": [
+      "level",
+      "text"
+    ],
+    "InspectBlock": [
+      "items",
+      "title"
+    ],
+    "MeasurementBlock": [
+      "hint",
+      "label",
+      "unit",
+      "voiceEnabled"
+    ],
+    "ModelBlock": [
+      "assetUrl"
+    ],
+    "PPECardBlock": [
+      "items",
+      "title"
+    ],
+    "PhotoBlock": [
+      "alt",
+      "caption",
+      "src"
+    ],
+    "PhotoGridBlock": [
+      "columns",
+      "items"
+    ],
+    "SignOffBlock": [
+      "acknowledgementText",
+      "requiredRole",
+      "title"
+    ],
+    "StepBlock": [
+      "number",
+      "text"
+    ],
+    "StepWithPhotosBlock": [
+      "layout",
+      "number",
+      "photos",
+      "text"
+    ],
+    "TextBlock": [
+      "content"
+    ],
+    "VoiceNoteBlock": [
+      "language",
+      "maxDurationSec",
+      "prompt"
+    ],
+    "ZoneBlock": [
+      "label",
+      "notes",
+      "zoneType"
+    ]
+  }
+}

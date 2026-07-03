@@ -7,8 +7,8 @@
  * children, so an unknown/malformed type never crashes the read path (T-26-03-01).
  *
  * Known-type membership is checked against `BLOCK_COMPONENTS` (the bespoke
- * registry) — no `@puckeditor/core` dependency. Both the worker read path
- * (`LayoutRenderer`) and the later admin edit host import from here.
+ * registry) — no Puck dependency. Both the worker read path (`LayoutRenderer`)
+ * and the admin edit host import from here.
  *
  * `UnsupportedBlockPlaceholder` is written with `createElement` (no JSX) so this
  * stays a `.ts` module per the plan's artifact contract.

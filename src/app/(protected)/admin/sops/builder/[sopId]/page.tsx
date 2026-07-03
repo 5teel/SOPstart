@@ -1,4 +1,3 @@
-import '@puckeditor/core/puck.css'
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'

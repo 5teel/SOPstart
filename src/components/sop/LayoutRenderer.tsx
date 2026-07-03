@@ -59,7 +59,7 @@ export function LayoutRenderer({
   ) as LayoutItem[]
 
   // D-01: bespoke type→component switch — renders the SAME block components the
-  // worker saw under Puck's <Render>, minus @puckeditor/core. `mode` is implicit
+  // worker saw under the old Puck <Render>, now with Puck removed. `mode` is implicit
   // (read) here; the later admin edit host reuses BLOCK_COMPONENTS with mode=edit.
   return (
     <>

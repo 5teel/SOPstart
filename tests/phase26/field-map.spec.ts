@@ -1,12 +1,16 @@
 /**
  * Phase 26 Plan 26-06 Task 1 — field-map reachability parity (P14).
  *
- * The hard SPEC rule: no field editable under Puck may become unreachable. This
- * proves it structurally against the LIVE `src/lib/builder/puck-config.tsx`
- * source: for every registered block, the FIELD_MAP field set MUST equal the
- * Puck `fields:` key set — no field dropped, none invented. Reading the real
- * source (not a transcribed literal) makes this drift-proof (CLAUDE.md
- * 2026-05-25 / 2026-06-05: a test must exercise the real contract, not a copy).
+ * The hard SPEC rule: no field editable under the old Puck config may become
+ * unreachable. For every registered block, the FIELD_MAP field set MUST equal
+ * the frozen Puck `fields:` key set — no field dropped, none invented.
+ *
+ * Plan 26-14 removed Puck (`puck-config.tsx` deleted). The frozen field baseline
+ * was snapshotted from the last live puck-config into
+ * `fixtures/puck-field-baseline.json` (captured with the SAME indent parser this
+ * spec used to read the live source), so the 0-unreachable guarantee still holds
+ * against the exact pre-removal contract. Regenerate ONLY if the P14 field
+ * surface legitimately changes.
  *
  * Pure in-process test: FIELD_MAP is a React-free data module, imported via the
  * relative path the phase26 project requires (no `@/` alias resolution).
@@ -16,42 +20,20 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { FIELD_MAP } from '../../src/components/admin/builder-v2/fields/field-map'
 
-const PUCK_CONFIG = readFileSync(
-  path.resolve(__dirname, '..', '..', 'src', 'lib', 'builder', 'puck-config.tsx'),
-  'utf8'
-)
-const LINES = PUCK_CONFIG.split(/\r?\n/)
+const BASELINE = JSON.parse(
+  readFileSync(path.resolve(__dirname, 'fixtures', 'puck-field-baseline.json'), 'utf8'),
+) as { components: string[]; fields: Record<string, string[]> }
 
-/**
- * Extract the direct field-key set for one block from puck-config text.
- * Component keys sit at 4-space indent (`    TextBlock: {`), the `fields:` object
- * at 6-space, and each direct field key at 8-space (`        content:`). Nested
- * arrayFields/options live at ≥10-space and are correctly excluded. The fields
- * object closes at the first 6-space `},`.
- */
+/** Frozen Puck field-key set for one block (snapshot of the deleted puck-config). */
 function puckFieldKeys(blockName: string): string[] {
-  const start = LINES.findIndex((l) => l === `    ${blockName}: {`)
-  if (start < 0) throw new Error(`block ${blockName} not found in puck-config`)
-  const fieldsOpen = LINES.findIndex((l, i) => i > start && l === '      fields: {')
-  if (fieldsOpen < 0) throw new Error(`no fields: block for ${blockName}`)
-  const keys: string[] = []
-  for (let i = fieldsOpen + 1; i < LINES.length; i++) {
-    if (LINES[i] === '      },') break // fields object close (6-space)
-    const m = /^ {8}(\w+):/.exec(LINES[i])
-    if (m) keys.push(m[1])
-  }
+  const keys = BASELINE.fields[blockName]
+  if (!keys) throw new Error(`block ${blockName} not found in puck-field-baseline`)
   return keys
 }
 
-/** All component keys declared in puck-config (excluding the non-authorable fallback). */
+/** All Puck-configured component keys (frozen baseline; VisualBlock is bespoke). */
 function puckComponentKeys(): string[] {
-  // Scope to the `components: {` object so the root config's own 4-space
-  // `fields: {` (and any other 4-space key outside components) is excluded.
-  const start = LINES.findIndex((l) => l === '  components: {')
-  const end = LINES.findIndex((l, i) => i > start && l === '  },')
-  return LINES.slice(start + 1, end < 0 ? undefined : end)
-    .map((l) => /^ {4}(\w+): \{$/.exec(l)?.[1])
-    .filter((k): k is string => Boolean(k) && k !== 'UnsupportedBlockPlaceholder')
+  return BASELINE.components
 }
 
 test.describe('field-map — reachability parity with puck-config fields (P14)', () => {
