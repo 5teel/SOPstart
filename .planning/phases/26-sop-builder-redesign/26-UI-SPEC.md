@@ -1,7 +1,8 @@
 ---
 phase: 26
 slug: sop-builder-redesign
-status: draft
+status: approved
+reviewed_at: 2026-07-03
 shadcn_initialized: false
 preset: none
 created: 2026-07-03
