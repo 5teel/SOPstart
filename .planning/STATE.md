@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
 status: Ready to execute
-stopped_at: Completed 26-08-PLAN.md (R3 — tiered context-aware inserter: paged InserterMenu keyed to section render-family "Fits here" LANE, keyboard nav + type-to-filter, ＋ dividers insert-at-cursor via content-ops + autosave, dept-scoped Reuse tier over the existing Phase 13 BlockPicker/addBlockToSection; ghosts deferred to 26-10)
-last_updated: "2026-07-03T17:20:00.000Z"
+stopped_at: Completed 26-09-PLAN.md (R5/R7 — unified Visual block: the 18th block type holding mixed medium-tagged media visual:photo|diagram|video, 3-place contract 18/18/18 + medium tags on /api/schema; Pattern E MediaGrid + medium sub-picker completes FIELD_MAP; legacy PhotoBlock/PhotoGridBlock/StepWithPhotosBlock edit THROUGH the Visual UI with layout_data kind + provenance frozen — A3 convert-golden byte-equivalence intact; worker bundle Δ0KB, Konva-free)
+last_updated: "2026-07-03T18:10:00.000Z"
 progress:
   total_phases: 29
   completed_phases: 4
-  total_plans: 25
-  completed_plans: 25
+  total_plans: 26
+  completed_plans: 26
   percent: 14
 ---
 
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 26 (sop-builder-redesign) — EXECUTING
-Plan: 8 of 14
+Plan: 9 of 14
 **Milestone status:** **v4.0 ✅ shipped 2026-07-02** (Phases 21, 21.5, 21.6, 22, 23, 24, 25 executed + code-reviewed; residual = human UAT on 21.6/22/23/25, carried per v3.0 field-verification precedent — archive via `/gsd-complete-milestone`). **v5.0 opened 2026-07-02** — Phase 26 (bespoke inline builder; Phase 17 Konva absorbed) → Phase 26.5 (agent-metadata layer on X-03 + graphify).
 
 **Active phase:** 26
@@ -36,7 +36,7 @@ Plan: 8 of 14
 2. **Phase 22 — Voice-Driven Walkthrough** (next): W-01 literacy/visual/voice gaps + X-02 voice-driven walkthrough. 8 requirements (VDW-LIT ×4, VDW-VOICE ×4).
 3. **Phase 23 — AI Field Layer + Version Supersede**: X-03 universal AI read/write + G-01 version supersede + worker-instance sign-off. 9 requirements (AFL-AI ×4, AFL-VER ×5).
 
-**Next action:** `/gsd-execute-phase 26` → next plan (26-08+). Plans 26-01..26-07 done: Nyquist harness + convert-golden baseline (26-02), Puck-free worker renderer + block-registry (26-03), the bespoke EDIT canvas + autosave re-wire + dnd-kit reorder (26-04), the Konva annotation foundation — spike PASSED, 00039 applied to live DB, worker bundle proven Konva-free (26-05), the P14 field-map reachability registry + bespoke A/B/D inline editors — EnumChip/InlineToken/FIELD_MAP-driven shell, one Zod-validated lossless commit path (26-06), and **P14 COMPLETE (26-07)**: Pattern C anchored FieldPanel + ArrayFieldEditor (dnd-kit rows, lossless nextStepId-preserving edits) for PPE/Decision/Inspect arrays + Photo alt / Model assetUrl scalars — phase-level parity gate lands: **0 unreachable fields across all 17 blocks (42 fields)**; only Pattern E (media grid) remains, deferred to 26-09. SPEC (`26-SPEC.md`, R1–R8) + CONTEXT (`26-CONTEXT.md`) locked 2026-07-02. Locked forks: **full-bespoke editor** replacing Puck (D-01, `layout_data`/junction/provenance frozen); **agent-metadata layer split to Phase 26.5** (contract hooks only here, D-02); **Phase 17 Konva annotation ABSORBED** into the Visual block (D-03, workers never download Konva — baked PNG read path); **v5.0 opened** (D-04). Expect a heavily-waved plan (bespoke render → tiered inserter+ghosts → re-wire autosave/provenance-sync/AI-overlays/verify-UI with **behavioural parity tests** → Visual+Konva slices → convert-golden-path regression). Validated sketch: `sketches/sop-builder-redesign/index.html`.
+**Next action:** `/gsd-execute-phase 26` → next plan (26-10+). Plan 26-09 done (R5/R7): the **unified Visual block** — 18th block type, mixed medium-tagged media (visual:photo|diagram|video), 3-place contract **18/18/18** + medium tags on /api/schema (agent-contract hook D-02); **Pattern E media grid COMPLETE** (MediaGrid + medium sub-picker) → FIELD_MAP has no stubs, P14 stays **0 unreachable across 18 blocks**; legacy photo blocks edit THROUGH the Visual UI with layout_data kind + provenance frozen (A3, convert-golden byte-equivalence green); worker bundle **Δ0KB, Konva-free**. Plan 26-08 done (R3): tiered context-aware inserter. Plans 26-01..26-07 done: Nyquist harness + convert-golden baseline (26-02), Puck-free worker renderer + block-registry (26-03), the bespoke EDIT canvas + autosave re-wire + dnd-kit reorder (26-04), the Konva annotation foundation — spike PASSED, 00039 applied to live DB, worker bundle proven Konva-free (26-05), the P14 field-map reachability registry + bespoke A/B/D inline editors — EnumChip/InlineToken/FIELD_MAP-driven shell, one Zod-validated lossless commit path (26-06), and **P14 COMPLETE (26-07)**: Pattern C anchored FieldPanel + ArrayFieldEditor (dnd-kit rows, lossless nextStepId-preserving edits) for PPE/Decision/Inspect arrays + Photo alt / Model assetUrl scalars — phase-level parity gate lands: **0 unreachable fields across all 17 blocks (42 fields)**; only Pattern E (media grid) remains, deferred to 26-09. SPEC (`26-SPEC.md`, R1–R8) + CONTEXT (`26-CONTEXT.md`) locked 2026-07-02. Locked forks: **full-bespoke editor** replacing Puck (D-01, `layout_data`/junction/provenance frozen); **agent-metadata layer split to Phase 26.5** (contract hooks only here, D-02); **Phase 17 Konva annotation ABSORBED** into the Visual block (D-03, workers never download Konva — baked PNG read path); **v5.0 opened** (D-04). Expect a heavily-waved plan (bespoke render → tiered inserter+ghosts → re-wire autosave/provenance-sync/AI-overlays/verify-UI with **behavioural parity tests** → Visual+Konva slices → convert-golden-path regression). Validated sketch: `sketches/sop-builder-redesign/index.html`.
 
 **Also outstanding (v4.0 residual):** human UAT on sopstart.com — Phase 23 (4 tests), Phase 22 (voice loop), Phase 25 (7 tests), Phase 21.6 (4 items). Carry per v3.0 field-verification precedent or run before `/gsd-complete-milestone`.
 
