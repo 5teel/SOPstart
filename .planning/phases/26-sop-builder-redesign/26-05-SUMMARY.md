@@ -2,14 +2,14 @@
 phase: 26-sop-builder-redesign
 plan: 05
 subsystem: admin-builder / annotation-foundation
-status: paused-at-blocking-gate
+status: complete
 tags: [konva, annotation, migration, rls, bundle-isolation, next16]
 requires:
   - "00038 append-only + org-scoped RLS pattern (current_organisation_id helper)"
   - "phase26 Playwright project (registered in 26-02)"
 provides:
   - "'canvas' externalization + dynamic ssr:false AnnotationEditor (Konva proven in Next 16)"
-  - "sop_image_annotations scene store (migration written; push PENDING at human gate)"
+  - "sop_image_annotations scene store (migration APPLIED to live DB — table + 1 org-scoped SELECT policy + 10 cols, verified via Management API to_regclass)"
   - "Konva-worker-isolation gate (bundle check + no-static-import lint)"
 affects:
   - "26-13 (real VisualBlock + saveAnnotation server action build on this foundation)"
@@ -31,14 +31,14 @@ decisions:
   - "Konva-in-Next-16 spike PASSED — no fallback (Excalidraw/custom SVG) needed"
   - "Added a throwaway admin spike route to force react-konva into the build graph (a component no route imports is never bundled, so the Pitfall-5 de-risk would be a no-op without it)"
 metrics:
-  duration: "~6 min (to blocking gate)"
-  completed: "2026-07-03 (non-gated work; push gate pending)"
+  duration: "~8 min (incl. push finalization)"
+  completed: "2026-07-03 (push applied + verified; plan complete)"
 requirements: [R5, R8]
 ---
 
 # Phase 26 Plan 05: Konva Annotation Foundation Summary
 
-Laid the Konva foundation for the absorbed Phase 17 diagram annotation and de-risked the one MEDIUM-confidence assumption (does react-konva render in Next 16) with a day-1 throwaway spike — **it passed**. Wrote the `sop_image_annotations` scene store (append-only, org-scoped, 42P17-safe) and fenced Konva out of the worker bundle with a bundle gate + no-static-import lint. **Paused at the [BLOCKING] `supabase db push` human-action gate** — the migration is written and committed; the live-DB push is deferred to the orchestrator.
+Laid the Konva foundation for the absorbed Phase 17 diagram annotation and de-risked the one MEDIUM-confidence assumption (does react-konva render in Next 16) with a day-1 throwaway spike — **it passed**. Wrote the `sop_image_annotations` scene store (append-only, org-scoped, 42P17-safe) and fenced Konva out of the worker bundle with a bundle gate + no-static-import lint. **The [BLOCKING] `supabase db push` gate is CLEARED** — migration 00039 is applied to the live DB and verified via the Management API (`to_regclass('public.sop_image_annotations')` returns the table; 1 org-scoped SELECT policy; 10 columns). Plan complete.
 
 ## What Was Built
 
@@ -58,16 +58,19 @@ Laid the Konva foundation for the absorbed Phase 17 diagram annotation and de-ri
 - `check-bundle-size.ts`: new negative-marker gate asserting `konva`/`react-konva` are absent from the `/sops/[sopId]` worker chunk bytes (mirrors the existing pdfjs/mammoth gates). Green.
 - `konva-worker-isolation.spec.ts`: 3 static-import leak guards (konva, react-konva, direct AnnotationEditor) — only `builder-v2/visual/` may statically import; `dynamic()` always allowed. Registered under the `phase26` project; all 3 green.
 
-## BLOCKING Gate — Awaiting Human Action
+## BLOCKING Gate — CLEARED (push applied + verified)
 
-**`supabase db push` for `00039_sop_image_annotations.sql` is NOT yet run.** This mutates the live DB and is a designated human-action gate. `SUPABASE_ACCESS_TOKEN` is present in `.env.local`, so the orchestrator can run the push non-TTY (per CLAUDE.md 2026-05-08) or spawn a continuation.
+**`supabase db push` for `00039_sop_image_annotations.sql` was run by the orchestrator and verified via the Management API (bypassing PostgREST cache):**
+- `to_regclass('public.sop_image_annotations')` → returns the table (exists).
+- **1 RLS policy** — org-scoped SELECT (`organisation_id = public.current_organisation_id()`); append-only, so NO write policies (as designed).
+- **10 columns** present.
 
-**RLS design to confirm before push:**
+RLS design as shipped:
 - Append-only: no authenticated write policy — service-role writes only (26-13), self-enforcing `organisation_id`.
 - Org-scoped SELECT via `current_organisation_id()` only — no cross-table `public.sops` reference (42P17-safe).
 - FKs cascade-delete from `organisations` and `sop_images`.
 
-**Post-push follow-up (CLAUDE.md 2026-06-15):** PostgREST schema-cache may lag after DDL — verify the table exists via `to_regclass('public.sop_image_annotations')` (bypasses cache), or `NOTIFY pgrst, 'reload schema'`, before asserting.
+**Post-push verification (CLAUDE.md 2026-06-15):** confirmed via `to_regclass` (bypasses the PostgREST schema cache) — no stale-cache false negative.
 
 ## Deviations from Plan
 
@@ -89,10 +92,17 @@ Laid the Konva foundation for the absorbed Phase 17 diagram annotation and de-ri
 - `0297992` — feat(26-05): migration 00039 sop_image_annotations — append-only, org-scoped, 42P17-safe
 - `cadfa18` — feat(26-05): Konva-worker-isolation gate — bundle check + no-static-import lint (D-03/R8)
 
-_(db-push commit / finalization pending the human gate.)_
+_(db-push applied by the orchestrator; this SUMMARY + STATE/ROADMAP finalization is the closing docs commit.)_
+
+## Final Verification (continuation)
+
+- `npx tsc --noEmit` → clean (exit 0).
+- `konva-worker-isolation.spec.ts` → 3/3 passed (no static konva/react-konva/AnnotationEditor import outside `builder-v2/visual/`).
+- `check-bundle-size.ts` → Konva + react-konva ABSENT from `/sops/[sopId]/page` worker bundle; First Load JS 1054 KB, Δ 0 KB.
+- Live DB → `sop_image_annotations` present (10 cols, 1 org-scoped SELECT policy), verified via Management API `to_regclass`.
 
 ## Self-Check: PASSED
 
 - All 5 created files present on disk.
 - All 3 task commits (`1912e9a`, `0297992`, `cadfa18`) exist in git.
-- Plan NOT advanced in STATE — paused at the [BLOCKING] db-push gate.
+- Plan advanced in STATE (26-05 complete).

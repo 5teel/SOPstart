@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
 status: Ready to execute
-stopped_at: Completed 26-04-PLAN.md (bespoke edit canvas — content-ops reducer + EditableDocument/BlockEditShell/InlineText + dnd-kit reorder + autosave re-wire P11)
-last_updated: "2026-07-03T05:30:00.000Z"
+stopped_at: Completed 26-05-PLAN.md (Konva annotation foundation — canvas externalization + dynamic ssr:false AnnotationEditor spike PASSED; 00039 sop_image_annotations applied to live DB; Konva-worker-isolation gate)
+last_updated: "2026-07-03T14:45:00.000Z"
 progress:
   total_phases: 29
   completed_phases: 4
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 26 (sop-builder-redesign) — EXECUTING
-Plan: 4 of 14
+Plan: 5 of 14
 **Milestone status:** **v4.0 ✅ shipped 2026-07-02** (Phases 21, 21.5, 21.6, 22, 23, 24, 25 executed + code-reviewed; residual = human UAT on 21.6/22/23/25, carried per v3.0 field-verification precedent — archive via `/gsd-complete-milestone`). **v5.0 opened 2026-07-02** — Phase 26 (bespoke inline builder; Phase 17 Konva absorbed) → Phase 26.5 (agent-metadata layer on X-03 + graphify).
 
 **Active phase:** 26
@@ -36,7 +36,7 @@ Plan: 4 of 14
 2. **Phase 22 — Voice-Driven Walkthrough** (next): W-01 literacy/visual/voice gaps + X-02 voice-driven walkthrough. 8 requirements (VDW-LIT ×4, VDW-VOICE ×4).
 3. **Phase 23 — AI Field Layer + Version Supersede**: X-03 universal AI read/write + G-01 version supersede + worker-instance sign-off. 9 requirements (AFL-AI ×4, AFL-VER ×5).
 
-**Next action:** `/gsd-execute-phase 26` → plan **26-05** (W2: 16 structured-field editor panels, P14 — the largest genuinely-new chunk). Plans 26-01..26-04 done: Nyquist harness + convert-golden baseline (26-02), Puck-free worker renderer + block-registry (26-03), and the bespoke EDIT canvas + autosave re-wire + dnd-kit reorder (26-04). SPEC (`26-SPEC.md`, R1–R8) + CONTEXT (`26-CONTEXT.md`) locked 2026-07-02. Locked forks: **full-bespoke editor** replacing Puck (D-01, `layout_data`/junction/provenance frozen); **agent-metadata layer split to Phase 26.5** (contract hooks only here, D-02); **Phase 17 Konva annotation ABSORBED** into the Visual block (D-03, workers never download Konva — baked PNG read path); **v5.0 opened** (D-04). Expect a heavily-waved plan (bespoke render → tiered inserter+ghosts → re-wire autosave/provenance-sync/AI-overlays/verify-UI with **behavioural parity tests** → Visual+Konva slices → convert-golden-path regression). Validated sketch: `sketches/sop-builder-redesign/index.html`.
+**Next action:** `/gsd-execute-phase 26` → next plan (W2: structured-field editor panels). Plans 26-01..26-05 done: Nyquist harness + convert-golden baseline (26-02), Puck-free worker renderer + block-registry (26-03), the bespoke EDIT canvas + autosave re-wire + dnd-kit reorder (26-04), and the Konva annotation foundation — spike PASSED, 00039 applied to live DB, worker bundle proven Konva-free (26-05, wave 3, parallel with 26-04). SPEC (`26-SPEC.md`, R1–R8) + CONTEXT (`26-CONTEXT.md`) locked 2026-07-02. Locked forks: **full-bespoke editor** replacing Puck (D-01, `layout_data`/junction/provenance frozen); **agent-metadata layer split to Phase 26.5** (contract hooks only here, D-02); **Phase 17 Konva annotation ABSORBED** into the Visual block (D-03, workers never download Konva — baked PNG read path); **v5.0 opened** (D-04). Expect a heavily-waved plan (bespoke render → tiered inserter+ghosts → re-wire autosave/provenance-sync/AI-overlays/verify-UI with **behavioural parity tests** → Visual+Konva slices → convert-golden-path regression). Validated sketch: `sketches/sop-builder-redesign/index.html`.
 
 **Also outstanding (v4.0 residual):** human UAT on sopstart.com — Phase 23 (4 tests), Phase 22 (voice loop), Phase 25 (7 tests), Phase 21.6 (4 items). Carry per v3.0 field-verification precedent or run before `/gsd-complete-milestone`.
 
@@ -150,6 +150,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 23 P07 | 4m | 3 tasks | 2 files |
 | Phase 26 P01 | 6min | 1 tasks | 2 files |
 | Phase 26 P02 | 12m | 2 tasks | 5 files |
+| Phase 26 P05 | 8m | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -282,6 +283,8 @@ Recent decisions affecting current work:
 - [Phase 26-03]: Puck replaced as RENDER engine on the worker read path (D-01) — bespoke BLOCK_COMPONENTS (17 type→component) + Puck-free LayoutRenderer over the FROZEN layout_data contract; UnsupportedBlockPlaceholder + sanitizeLayoutContent relocated to sanitize-layout.ts (P17). No per-block Zod SafeRender on read (write boundary already validates)
 - [Phase 26-03]: Worker /sops/[sopId] First Load JS is Δ0 (1054 KB) after the swap — @puckeditor/core was already an admin-only dynamic chunk (5fed561a, referenced only by admin/sops/builder route), never in worker First Load; the swap makes it structural (LayoutRenderer no longer references Puck). Baseline re-captured with previousBaseline history
 - [Phase 26-03]: contract-check.ts place (1) repointed off puck-config.tsx onto BLOCK_COMPONENTS in block-registry.tsx (RESEARCH Pitfall 1); guard spec asserts live target. Render-parity + contract-target specs shell out to tsx subprocesses — Playwright's JSX transform ({__pw_type}) is incompatible with real react-dom/server
+- [Phase 26-05]: Konva-in-Next-16 spike PASSED — react-konva renders via dynamic({ssr:false}) with 'canvas' in serverExternalPackages; compiled to its own client chunk, ABSENT from /sops/[sopId] worker bundle (Δ0). No Excalidraw/custom-SVG fallback needed. Throwaway /admin/builder-v2-konva-spike route forced react-konva into the build graph (a component no route imports is never bundled — tsc alone doesn't exercise canvas webpack resolution); delete in 26-13
+- [Phase 26-05]: 00039 sop_image_annotations APPLIED to live DB (verified via Management API to_regclass — table + 1 org-scoped SELECT policy + 10 cols). Append-only (no authenticated write; service-role writes in 26-13 self-enforce org-scope), org-scoped SELECT via current_organisation_id() only — NO cross-table public.sops reference (42P17-safe, copies 00038 pattern). Konva fenced out of worker tier by bundle gate + no-static-import lint (D-03/R8)
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -390,7 +393,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-03T04:20:00.000Z
-Stopped at: Completed 26-03-PLAN.md (Puck-free worker renderer + block-registry + contract-check repoint)
+Last session: 2026-07-03T14:45:00.000Z
+Stopped at: Completed 26-05-PLAN.md (Konva annotation foundation — spike PASSED; 00039 sop_image_annotations applied + verified on live DB; Konva-worker-isolation gate green)
 Resume file:
 None
