@@ -32,6 +32,7 @@ import { BLOCK_DEFAULTS, type BlockType } from '@/lib/builder/block-registry'
 import type { SectionRenderFamily, SopSectionBlockWithUpdate } from '@/types/sop'
 import { listSectionBlocksWithUpdates } from '@/actions/sop-section-blocks'
 import { useSelectionSync } from '@/components/admin/source-viewer/useSelectionSync'
+import { useReviewerFlags } from '@/components/admin/ai-reviewer/useReviewerFlags'
 import {
   resolveComponentIdFromSource,
   resolveRegion,
@@ -83,6 +84,13 @@ interface SortableBlockProps {
   selectable: boolean
   junctionId: string | null
   region: SourceProvenanceRegion | null
+  /** P13 overlays (26-12) — junction row + reviewer-flag surfacing. */
+  junction: SopSectionBlockWithUpdate | null
+  sopId: string
+  flagsCount: number
+  flagsOpen: boolean
+  onToggleFlags: () => void
+  onReviewed: () => void
 }
 
 /**
@@ -99,6 +107,12 @@ function SortableBlock({
   selectable,
   junctionId,
   region,
+  junction,
+  sopId,
+  flagsCount,
+  flagsOpen,
+  onToggleFlags,
+  onReviewed,
 }: SortableBlockProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.props.id,
@@ -120,6 +134,12 @@ function SortableBlock({
       selectable={selectable}
       junctionId={junctionId}
       region={region}
+      junction={junction}
+      sopId={sopId}
+      flagsCount={flagsCount}
+      flagsOpen={flagsOpen}
+      onToggleFlags={onToggleFlags}
+      onReviewed={onReviewed}
     />
   )
 }
@@ -250,6 +270,12 @@ export function EditableDocument({
   }, [content, junctionMap])
   const selectable = junctionMap.size > 0
 
+  // P13 reviewer flags — per-block open-flag counts (reused hook; TanStack-cached
+  // per sopId). `openFlagsFor` holds the ONE block whose panel is expanded
+  // (UI-SPEC: only one flags panel expanded at a time).
+  const reviewer = useReviewerFlags(sopId)
+  const [openFlagsFor, setOpenFlagsFor] = useState<string | null>(null)
+
   // P12 reverse binding — source-pane click → focus the matching canvas block.
   // `useSelectionSync` returns the no-op default outside the provider (source-
   // less SOPs), so registering is always safe.
@@ -261,8 +287,6 @@ export function EditableDocument({
     })
     return unregister
   }, [registerBlockClickHandler, componentIdToJunction])
-  // refreshJunctions is used by P13 badge-accept / P8 verify toggles (later tasks).
-  void refreshJunctions
 
   // R3 inserter: which ＋ divider is open (afterIndex; -1 = prepend), and whether
   // the dept-scoped Reuse tier (BlockPicker) modal is showing.
@@ -383,6 +407,8 @@ export function EditableDocument({
             />
             {content.map((item, idx) => {
               const jId = (item.props as { junctionId?: string }).junctionId ?? null
+              const junction = jId ? junctionMap.get(jId) ?? null : null
+              const flagsCount = jId ? (reviewer.byBlockId.get(jId)?.length ?? 0) : 0
               return (
               <div key={item.props.id} data-block-index={idx}>
                 <SortableBlock
@@ -397,6 +423,14 @@ export function EditableDocument({
                   selectable={selectable}
                   junctionId={jId}
                   region={resolveRegion(junctionMap, jId)}
+                  junction={junction}
+                  sopId={sopId}
+                  flagsCount={flagsCount}
+                  flagsOpen={openFlagsFor === item.props.id}
+                  onToggleFlags={() =>
+                    setOpenFlagsFor((prev) => (prev === item.props.id ? null : item.props.id))
+                  }
+                  onReviewed={refreshJunctions}
                 />
                 {/* Between-blocks hairline; section-end gets the big add bar. */}
                 <InsertDivider
