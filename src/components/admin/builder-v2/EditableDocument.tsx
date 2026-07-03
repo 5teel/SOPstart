@@ -24,12 +24,16 @@ import { useBuilderAutosave } from '@/hooks/useBuilderAutosave'
 import {
   deleteBlock,
   duplicateBlock,
+  insertBlock,
   reorderBlocks,
   type LayoutItem,
 } from '@/lib/builder/content-ops'
-import type { BlockType } from '@/lib/builder/block-registry'
+import { BLOCK_DEFAULTS, type BlockType } from '@/lib/builder/block-registry'
+import type { SectionRenderFamily } from '@/types/sop'
 import { BlockEditShell } from './BlockEditShell'
 import { commitFieldToContent } from './fields/field-commit'
+import { InserterMenu } from './inserter/InserterMenu'
+import { ReuseTier } from './inserter/ReuseTier'
 
 /**
  * The bespoke edit canvas (D-01, R2) — replaces `<Puck onChange>`.
@@ -54,6 +58,10 @@ interface SectionLike {
 interface EditableDocumentProps {
   section: SectionLike
   sopId: string
+  /** Section render-family — selects the inserter's "Fits here" LANE (R3). */
+  renderFamily: SectionRenderFamily
+  /** The SOP's category tag — the Reuse tier's "this department" scope. */
+  sopCategory: string | null
 }
 
 interface SortableBlockProps {
@@ -105,9 +113,80 @@ function seedRoot(layoutData: unknown): Record<string, unknown> {
   >
 }
 
-export function EditableDocument({ section, sopId }: EditableDocumentProps) {
+/**
+ * A ＋ insert affordance. `big` = the section-end "Add step or block" bar; the
+ * hairline variant sits between blocks and reveals a dashed pill on hover
+ * (UI-SPEC `.adddiv` / `.addbig`). When active, anchors the InserterMenu below.
+ */
+function InsertDivider({
+  big,
+  active,
+  onOpen,
+  menu,
+}: {
+  big?: boolean
+  active: boolean
+  onOpen: () => void
+  menu: React.ReactNode
+}) {
+  return (
+    <div className="relative">
+      {big ? (
+        <button
+          type="button"
+          data-add-divider
+          data-add-big
+          aria-label="Add step or block"
+          onClick={onOpen}
+          className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-[var(--ink-300,#d4d4d8)] py-3 font-mono text-[12px] uppercase tracking-wider text-[var(--ink-500,#71717a)] hover:border-[var(--accent-step,#3b82f6)] hover:text-[var(--accent-step,#3b82f6)]"
+        >
+          ＋ Add step or block
+        </button>
+      ) : (
+        <button
+          type="button"
+          data-add-divider
+          aria-label="Insert block"
+          onClick={onOpen}
+          className="group relative -my-1 flex w-full items-center justify-center py-1"
+        >
+          <span className="pointer-events-none absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-[var(--ink-100,#e4e4e7)] opacity-0 group-hover:opacity-100" />
+          <span
+            className={[
+              'relative rounded-full border border-dashed border-[var(--ink-300,#d4d4d8)] bg-[var(--paper,#fff)] px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-[var(--ink-500,#71717a)] transition-opacity',
+              active
+                ? 'opacity-100 border-[var(--accent-step,#3b82f6)] text-[var(--accent-step,#3b82f6)]'
+                : 'opacity-0 group-hover:opacity-100 group-hover:border-[var(--accent-step,#3b82f6)] group-hover:text-[var(--accent-step,#3b82f6)]',
+            ].join(' ')}
+          >
+            ＋ insert block
+          </span>
+        </button>
+      )}
+      {active && <div className="absolute left-0 top-full z-50 mt-1">{menu}</div>}
+    </div>
+  )
+}
+
+export function EditableDocument({
+  section,
+  sopId,
+  renderFamily,
+  sopCategory,
+}: EditableDocumentProps) {
   const [content, setContent] = useState<LayoutItem[]>(() => seedContent(section.layout_data))
   const root = useMemo(() => seedRoot(section.layout_data), [section.layout_data])
+
+  // R3 inserter: which ＋ divider is open (afterIndex; -1 = prepend), and whether
+  // the dept-scoped Reuse tier (BlockPicker) modal is showing.
+  const [inserterAt, setInserterAt] = useState<number | null>(null)
+  const [reuseOpen, setReuseOpen] = useState(false)
+
+  // Close any open inserter when the section switches.
+  useEffect(() => {
+    setInserterAt(null)
+    setReuseOpen(false)
+  }, [section.id])
 
   // P11: the SAME hook <Puck onChange> fed. Reads only { content, root }.
   const handleChange = useBuilderAutosave(section.id, sopId)
@@ -151,14 +230,41 @@ export function EditableDocument({ section, sopId }: EditableDocumentProps) {
     })
   }
 
+  // The context-aware inserter anchored at a given cursor (afterIndex).
+  // prevType (block above the cursor) drives the smart row; insert → content-ops
+  // insertBlock with fresh registry defaults → autosave via the content effect.
+  const menuFor = (afterIndex: number) => (
+    <InserterMenu
+      ctx={renderFamily}
+      prevType={afterIndex >= 0 ? ((content[afterIndex]?.type ?? null) as BlockType | null) : null}
+      onInsert={(type) => {
+        setContent((c) => insertBlock(c, type, afterIndex, BLOCK_DEFAULTS[type]))
+        setInserterAt(null)
+      }}
+      onClose={() => setInserterAt(null)}
+      onOpenReuse={() => {
+        setInserterAt(null)
+        setReuseOpen(true)
+      }}
+    />
+  )
+
   return (
     <div
       data-editable-document
-      className="mx-auto max-w-[680px] space-y-2 px-6 py-8"
+      className="mx-auto max-w-[680px] space-y-1 px-6 py-8"
       style={{ backgroundSize: '20px 20px' }}
     >
       {content.length === 0 ? (
-        <div className="p-8 text-center text-[var(--ink-500,#71717a)]">Nothing here yet</div>
+        <>
+          <div className="p-8 text-center text-[var(--ink-500,#71717a)]">Nothing here yet</div>
+          <InsertDivider
+            big
+            active={inserterAt === -1}
+            onOpen={() => setInserterAt(-1)}
+            menu={menuFor(-1)}
+          />
+        </>
       ) : (
         <DndContext
           sensors={sensors}
@@ -170,22 +276,44 @@ export function EditableDocument({ section, sopId }: EditableDocumentProps) {
             items={content.map((c) => c.props.id)}
             strategy={verticalListSortingStrategy}
           >
-            {content.map((item) => (
-              <SortableBlock
-                key={item.props.id}
-                item={item}
-                onCommitField={(field, value) =>
-                  setContent((c) =>
-                    commitFieldToContent(c, item.props.id, item.type as BlockType, field, value)
-                  )
-                }
-                onDuplicate={() => setContent((c) => duplicateBlock(c, item.props.id))}
-                onDelete={() => setContent((c) => deleteBlock(c, item.props.id))}
-              />
+            {/* Prepend divider (cursor above the first block). */}
+            <InsertDivider
+              active={inserterAt === -1}
+              onOpen={() => setInserterAt(-1)}
+              menu={menuFor(-1)}
+            />
+            {content.map((item, idx) => (
+              <div key={item.props.id}>
+                <SortableBlock
+                  item={item}
+                  onCommitField={(field, value) =>
+                    setContent((c) =>
+                      commitFieldToContent(c, item.props.id, item.type as BlockType, field, value)
+                    )
+                  }
+                  onDuplicate={() => setContent((c) => duplicateBlock(c, item.props.id))}
+                  onDelete={() => setContent((c) => deleteBlock(c, item.props.id))}
+                />
+                {/* Between-blocks hairline; section-end gets the big add bar. */}
+                <InsertDivider
+                  big={idx === content.length - 1}
+                  active={inserterAt === idx}
+                  onOpen={() => setInserterAt(idx)}
+                  menu={menuFor(idx)}
+                />
+              </div>
             ))}
           </SortableContext>
         </DndContext>
       )}
+
+      {/* R3 TIER 3 — dept-scoped Reuse (existing Phase 13 BlockPicker path). */}
+      <ReuseTier
+        open={reuseOpen}
+        sopSectionId={section.id}
+        categoryTag={sopCategory}
+        onClose={() => setReuseOpen(false)}
+      />
     </div>
   )
 }

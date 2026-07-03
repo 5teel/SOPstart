@@ -155,6 +155,8 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
               key={activeSection.id}
               section={activeSection}
               sopId={sopId}
+              renderFamily={activeSection.section_kind?.render_family ?? 'custom'}
+              sopCategory={initialSop.category_tag ?? null}
             />
           ) : (
             <div className="p-8 text-[var(--ink-500)]">
