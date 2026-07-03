@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
 status: Ready to execute
-stopped_at: Completed 26-07-PLAN.md (P14 COMPLETE — Pattern C anchored FieldPanel + ArrayFieldEditor for array/config fields; phase-level P14 gate lands: 0 unreachable fields across all 17 blocks, 42 fields; E media deferred to 26-09)
-last_updated: "2026-07-03T16:40:00.000Z"
+stopped_at: Completed 26-08-PLAN.md (R3 — tiered context-aware inserter: paged InserterMenu keyed to section render-family "Fits here" LANE, keyboard nav + type-to-filter, ＋ dividers insert-at-cursor via content-ops + autosave, dept-scoped Reuse tier over the existing Phase 13 BlockPicker/addBlockToSection; ghosts deferred to 26-10)
+last_updated: "2026-07-03T17:20:00.000Z"
 progress:
   total_phases: 29
   completed_phases: 4
-  total_plans: 24
-  completed_plans: 24
+  total_plans: 25
+  completed_plans: 25
   percent: 14
 ---
 
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 26 (sop-builder-redesign) — EXECUTING
-Plan: 7 of 14
+Plan: 8 of 14
 **Milestone status:** **v4.0 ✅ shipped 2026-07-02** (Phases 21, 21.5, 21.6, 22, 23, 24, 25 executed + code-reviewed; residual = human UAT on 21.6/22/23/25, carried per v3.0 field-verification precedent — archive via `/gsd-complete-milestone`). **v5.0 opened 2026-07-02** — Phase 26 (bespoke inline builder; Phase 17 Konva absorbed) → Phase 26.5 (agent-metadata layer on X-03 + graphify).
 
 **Active phase:** 26

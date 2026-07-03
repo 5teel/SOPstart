@@ -84,7 +84,7 @@ v4.0 (Phases 21–25) shipped. v5.0 rebuilds the SOP builder as a bespoke inline
   - [x] 26-05-PLAN.md — W3: Konva foundation — canvas externalization + Next-16 spike (PASSED) + 00039 migration (applied+verified on live DB) + worker-isolation gate (R5/R8, D-03) (completed 2026-07-03)
   - [x] 26-06-PLAN.md — W4: field editors part 1 — field-map reachability registry (all 17 blocks) + inline patterns A/B/D (EnumChip, InlineToken, FIELD_MAP-driven shell; one Zod-validated lossless commit path); C/E declared but deferred to 26-07/26-09 (P14 partial) (completed 2026-07-03)
   - [ ] 26-07-PLAN.md — W5: field editors part 2 — Pattern C array editors + per-block reachability parity (0 unreachable, all 18) (P14)
-  - [ ] 26-08-PLAN.md — W6: tiered context-aware inserter + Reuse tier + ＋ dividers (R3)
+  - [x] 26-08-PLAN.md — W6: tiered context-aware inserter + Reuse tier + ＋ dividers (R3) ✅ 2026-07-03
   - [ ] 26-09-PLAN.md — W6: unified Visual block 3-place contract + media grid + convert-through (R5/R7, D-02/D-03)
   - [ ] 26-10-PLAN.md — W7: smart-next auto-dismissing ghosts (R4)
   - [ ] 26-11-PLAN.md — W7: Konva annotation primitives + DiagramHotspotBlock + UX human-verify (R5, D-03)
