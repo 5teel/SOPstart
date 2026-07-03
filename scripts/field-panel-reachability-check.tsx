@@ -7,8 +7,8 @@
  * renders exactly one affordance row in the bespoke edit shell — so the count of
  * UNREACHABLE fields is 0 for all 17 blocks. Plus a representative field per
  * interaction pattern (A/B/C/D) is DRIVEN through the real, Zod-validated commit
- * path and asserted to land in valid layout_data; Pattern E (media) renders a
- * declared `media — soon` stub row pending 26-09 (accounted-for, not dropped).
+ * path and asserted to land in valid layout_data; Pattern E (media) renders the
+ * unified MediaGrid (26-09) — legacy photo blocks edit THROUGH the Visual UI.
  *
  * tsx subprocess: the phase26 project has no `@/` alias + can't load React/CSS
  * in-process. CLI: npx tsx scripts/field-panel-reachability-check.tsx
@@ -97,14 +97,24 @@ for (const type of types) {
   c = commitFieldToContent(c, 'd', 'VoiceNoteBlock', 'maxDurationSec', '90')
   check(c[0].props.maxDurationSec === 90, 'D-drive: VoiceNote maxDurationSec did not write')
 }
-// E-stub — PhotoBlock src renders the declared media-soon deferral row (26-09).
+// E — PhotoBlock src renders the unified MediaGrid THROUGH the Visual UI (26-09).
 {
   const item = { type: 'PhotoBlock', props: { id: 'e', src: null, alt: '', caption: '', ...meta } }
   const markup = renderToStaticMarkup(
     createElement(BlockEditShell as any, { item, onCommitField: () => {}, onDuplicate: () => {}, onDelete: () => {} })
   )
-  check(markup.includes('data-field="src"'), 'E-stub: Photo src field has no reachability row')
-  check(markup.includes('media — soon'), 'E-stub: Photo src should render the declared media-soon marker (26-09)')
+  check(markup.includes('data-field="src"'), 'E: Photo src field has no reachability row')
+  check(markup.includes('data-media-grid'), 'E: Photo src should render the unified MediaGrid (26-09)')
+  check(!markup.includes('media — soon'), 'E: the media-soon stub must be gone (26-09 implements Pattern E)')
+}
+// E (Visual) — the VisualBlock items field offers the photo/diagram/video sub-picker.
+{
+  const item = { type: 'VisualBlock', props: { id: 'v', items: [], ...meta } }
+  const markup = renderToStaticMarkup(
+    createElement(BlockEditShell as any, { item, onCommitField: () => {}, onDuplicate: () => {}, onDelete: () => {} })
+  )
+  check(markup.includes('data-field="items"'), 'E: Visual items field has no reachability row')
+  check(markup.includes('data-add-media'), 'E: Visual block should offer the add-media affordance')
 }
 
 console.error(`\nPer-block reachability (${totalFields} Puck-editable fields across ${types.length} blocks):`)

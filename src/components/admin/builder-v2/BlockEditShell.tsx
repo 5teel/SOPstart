@@ -10,6 +10,7 @@ import { InlineText } from './InlineText'
 import { EnumChip } from './fields/EnumChip'
 import { InlineToken } from './fields/InlineToken'
 import { FieldPanel, hasPanelFields } from './fields/FieldPanel'
+import { MediaGrid } from './visual/MediaGrid'
 
 /**
  * Per-block edit shell (R2 — edit == worker render; P14 — bespoke field editors).
@@ -19,11 +20,11 @@ import { FieldPanel, hasPanelFields } from './fields/FieldPanel'
  *   - block tools (grip / duplicate / delete / type label),
  *   - a FIELD_MAP-driven field strip that makes every Puck-editable field
  *     reachable — Pattern A → InlineText, B → EnumChip, D → InlineToken,
- *     C → the anchored FieldPanel (⚙ edit-fields tool; array + config editors).
+ *     C → the anchored FieldPanel (⚙ edit-fields tool; array + config editors),
+ *     E → the unified MediaGrid (media grid + medium sub-picker, 26-09).
  * Every edit commits through the caller's Zod-validated, lossless `onCommitField`
- * (junctionId / block_provenance survive — R7). Pattern E (media grid) is
- * declared in FIELD_MAP and lands in 26-09; until then its fields show a
- * `media — soon` marker (not yet inline-editable).
+ * (junctionId / block_provenance survive — R7). Pattern E routes the legacy photo
+ * blocks THROUGH the Visual media control without any layout_data kind rewrite (A3).
  *
  * `data-block-id={item.props.id}` is the stable hook the later selection-sync
  * reverse binding (P12) queries — always rendered. Worker read mode (LayoutRenderer)
@@ -124,13 +125,13 @@ function FieldControl({
     )
   }
 
-  // Pattern E (media grid) — declared for reachability, implemented in 26-09.
+  // Pattern E (media grid + medium sub-picker) — the unified Visual media control
+  // (26-09). Legacy photo blocks edit THROUGH it without any layout_data kind
+  // rewrite (A3); the Visual block adds the photo/diagram/video sub-picker.
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-start gap-2">
       {label}
-      <span className="rounded border border-dashed border-[var(--ink-300,#d4d4d8)] px-2 py-0.5 font-mono text-[10px] text-[var(--ink-500,#71717a)]">
-        media — soon
-      </span>
+      <MediaGrid item={item} field={spec.field} onCommitField={onCommitField} />
     </div>
   )
 }
