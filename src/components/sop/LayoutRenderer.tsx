@@ -1,9 +1,12 @@
 'use client'
-import { Render, type Data } from '@puckeditor/core'
 import type { ReactNode } from 'react'
 import { SUPPORTED_LAYOUT_VERSIONS } from '@/lib/builder/supported-versions'
 import { LayoutDataSchema } from '@/lib/builder/layout-schema'
-import { puckConfig, sanitizeLayoutContent } from '@/lib/builder/puck-config'
+import { BLOCK_COMPONENTS, stripMeta, type BlockType } from '@/lib/builder/block-registry'
+import {
+  sanitizeLayoutContent,
+  UnsupportedBlockPlaceholder,
+} from '@/lib/builder/sanitize-layout'
 
 // Module-level warn-once flags (reset per page load — D-13/D-14/D-15 "once per page")
 let warnedUnsupportedVersion = false
@@ -14,6 +17,11 @@ interface Props {
   layoutVersion: number
   sectionId: string
   fallback: ReactNode
+}
+
+interface LayoutItem {
+  type: string
+  props?: Record<string, unknown>
 }
 
 export function LayoutRenderer({
@@ -45,15 +53,31 @@ export function LayoutRenderer({
   }
 
   // D-13: rewrite unknown-type block entries to UnsupportedBlockPlaceholder
-  // BEFORE Puck iterates children, so unknown types never crash <Render>.
-  const sanitized = {
-    ...parsed.data,
-    content: sanitizeLayoutContent(
-      (parsed.data.content ?? []) as unknown[]
-    ),
-  }
-  // LayoutDataSchema is permissive; Puck's Data type is narrower. The cast
-  // is confined to the worker render-path entry point.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return <Render config={puckConfig} data={sanitized as any as Data} />
+  // BEFORE the switch iterates children, so unknown types never crash the render.
+  const content = sanitizeLayoutContent(
+    (parsed.data.content ?? []) as unknown[]
+  ) as LayoutItem[]
+
+  // D-01: bespoke type→component switch — renders the SAME block components the
+  // worker saw under Puck's <Render>, minus @puckeditor/core. `mode` is implicit
+  // (read) here; the later admin edit host reuses BLOCK_COMPONENTS with mode=edit.
+  return (
+    <>
+      {content.map((item, i) => {
+        const props = stripMeta(item.props)
+        const key = (props.id as string) ?? (item.props?.id as string) ?? `block-${i}`
+        const Block = BLOCK_COMPONENTS[item.type as BlockType]
+        if (!Block) {
+          // Unknown type (incl. the sanitize-rewritten placeholder, which carries
+          // the original type in props.type).
+          const original =
+            typeof props.type === 'string' ? (props.type as string) : item.type
+          return <UnsupportedBlockPlaceholder key={key} type={original} />
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const BlockAny = Block as any
+        return <BlockAny key={key} {...props} />
+      })}
+    </>
+  )
 }
