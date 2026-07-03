@@ -302,10 +302,10 @@ export const JOURNEYS: Journey[] = [
     group: 'Refine & publish',
     persona: 'SOP Admin',
     title: 'Review, verify & publish in the builder',
-    summary: 'The core editing flow: shape the content, check it against the source with AI help, verify every safety block, then publish.',
+    summary: 'The core editing flow: shape the content, check it against the source with AI help, verify every safety block, then publish. Create-from-scratch, AI-convert and edit-draft all converge on this one bespoke builder surface (Phase 26 D-01: Puck removed — inline block editing, no separate field popovers).',
     steps: [
       { id: 's', type: 'start', label: 'Have a draft' },
-      { id: 'build', type: 'screen', label: 'Build stage', route: '/admin/sops/builder/[sopId]', detail: 'Step-centric rail; add/edit blocks inline.' },
+      { id: 'build', type: 'screen', label: 'Build stage', route: '/admin/sops/builder/[sopId]', detail: 'Bespoke editor: step-centric rail; the admin edits the SAME block components the worker reads, in place (edit==worker parity, R2). Add/edit/reorder/duplicate blocks inline; every field reachable (P14, 0 unreachable). Image blocks open a Konva annotation layer (arrows/boxes/text, palm-reject) that bakes to a flat PNG on publish.' },
       { id: 'review', type: 'action', label: 'Review stage', detail: 'Source viewer side-by-side; AI reviewer flags omissions/anchoring; per-block verify checklist.' },
       { id: 'verify', type: 'decision', label: 'Every block verified?', branches: [
         { label: 'Yes', to: 'pubstage' },

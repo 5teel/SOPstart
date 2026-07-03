@@ -444,6 +444,59 @@ export const UAT_TESTS: UatTest[] = [
     background:
       'Phase 26-11 Task 3 residual (R5 / D-03 slice 2). The Konva annotation editor (AnnotationEditor.tsx + DiagramHotspotBlock.tsx, admin-only, dynamic-imported) plus its pure scene model (annotation-tools.ts) are built and machine-tested (14 phase26 specs green: primitives, undo/redo, non-destructive serialize, palm-reject, hotspot coordinate-stability; tsc clean; worker bundle Konva-free Δ0). The draw/transform/palm-reject FEEL is device-dependent and cannot be proven headless — carried as a deferred-residual per the v3.0 device-verification precedent. On-device verification is only possible once 26-13 wires the annotate→save→reopen launch point; run this item then, alongside the 26-13 persistence check.',
   },
+  {
+    id: 'p26-edit-worker-parity',
+    dateAdded: '2026-07-03',
+    category: 'Phase 26 — SOP Builder Redesign',
+    title: 'Does the block you edit look the same as what the worker sees?',
+    status: 'active',
+    summary:
+      'The builder was rebuilt so admins now edit the SAME block components the worker reads — no separate "editor look" vs "published look". This check is a visual side-by-side: edit a few block types, publish, then open the worker view and confirm they match.',
+    tryIt: [
+      'Open a published SOP in the builder and edit a Step, a Hazard card, and a Callout — change some text and a field (e.g. hazard severity).',
+      'Note how each block looks while you are editing it.',
+      'Publish, then open the same SOP in the worker view (/sops/[sopId]).',
+      'Compare each block: the layout, colours, icons and spacing should match what you saw while editing.',
+    ],
+    links: [
+      { label: 'SOP management (admin — builder)', href: '/admin/sops' },
+      { label: 'SOP library (worker view)', href: '/sops' },
+    ],
+    questions: [
+      { id: 'match', text: 'Did each block look the same in the editor as in the worker view?' },
+      { id: 'no-surprise', text: 'Was there anything that looked different after publishing than while editing?' },
+      { id: 'fields', text: 'Did field changes (e.g. hazard severity colour) carry through to the worker view?' },
+    ],
+    background:
+      'R2 edit==worker visual parity (Phase 26 D-01). LayoutRenderer + BLOCK_COMPONENTS render the same components in both mode=edit (admin canvas / EditableDocument) and mode=read (worker /sops/[sopId]) — Puck is fully removed, so there is no separate Puck-render path to diverge. Machine-proven structurally (block-registry contract-check 18/18/18, convert-golden byte-equivalence, worker bundle Δ0); the visual "they truly look identical" judgment is a human check.',
+  },
+  {
+    id: 'p26-baked-annotation-on-worker-read',
+    dateAdded: '2026-07-03',
+    category: 'Phase 26 — SOP Builder Redesign',
+    title: 'Do annotations you draw show up baked onto the worker\'s diagram?',
+    status: 'active',
+    summary:
+      'When you annotate a diagram in the builder (arrows/boxes/numbered markers) and publish, the worker should see those marks baked flat onto the image — no editing handles, exactly as drawn. This is the end-to-end annotate → publish → worker-read check on a real device.',
+    tryIt: [
+      'Open a procedure in the builder, add a Visual block with a diagram, and annotate it (arrow + box + a numbered marker).',
+      'Close and re-open the annotation editor once to confirm your marks reload exactly (re-edit round-trip).',
+      'Publish the SOP.',
+      'Open the SOP as a worker (/sops/[sopId]) and find that diagram.',
+      'Confirm the annotations appear baked onto the image — flat, in the right places, with no draggable handles or edit controls.',
+    ],
+    links: [
+      { label: 'SOP management (admin — builder)', href: '/admin/sops' },
+      { label: 'SOP library (worker view)', href: '/sops' },
+    ],
+    questions: [
+      { id: 'baked', text: 'Did your annotations appear on the worker\'s diagram exactly where you drew them?' },
+      { id: 'flat', text: 'On the worker view, were they flat (no edit handles or controls)?' },
+      { id: 'reopen', text: 'When you re-opened the editor before publishing, did your marks reload exactly?' },
+    ],
+    background:
+      'R5 / D-03 — annotate→re-edit→bake pipeline end-to-end. The non-destructive Konva scene (annotation-tools.ts) serializes to layout_data; on publish it bakes to a flat PNG for the worker read path (Konva stays admin-only, worker bundle Konva-free Δ0). Machine-tested for scene serialize/reopen + palm-reject + bundle isolation; the on-device annotate→publish→worker-read visual confirmation is a human check (run alongside p26-annotation-editor-feel once 26-13 wires the launch point).',
+  },
 
   // ---------------------------------------------------------------------------
   // TEMPLATE — copy this to put a new design choice or check to the team.
