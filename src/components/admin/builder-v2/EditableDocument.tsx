@@ -1,6 +1,23 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  sortableKeyboardCoordinates,
+  useSortable,
+} from '@dnd-kit/sortable'
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
+import { CSS } from '@dnd-kit/utilities'
 import { LayoutDataSchema } from '@/lib/builder/layout-schema'
 import { sanitizeLayoutContent } from '@/lib/builder/sanitize-layout'
 import { useBuilderAutosave } from '@/hooks/useBuilderAutosave'
@@ -8,6 +25,7 @@ import {
   updateBlockProps,
   deleteBlock,
   duplicateBlock,
+  reorderBlocks,
   type LayoutItem,
 } from '@/lib/builder/content-ops'
 import { BlockEditShell } from './BlockEditShell'
@@ -35,6 +53,41 @@ interface SectionLike {
 interface EditableDocumentProps {
   section: SectionLike
   sopId: string
+}
+
+interface SortableBlockProps {
+  item: LayoutItem
+  onCommitText: (field: string, value: string) => void
+  onDuplicate: () => void
+  onDelete: () => void
+}
+
+/**
+ * A single sortable block. Calls `useSortable` (must be inside SortableContext)
+ * and passes the drag ref/handle/transform down to the dnd-agnostic
+ * BlockEditShell. Grip = keyboard + pointer handle (dnd-kit gives keyboard
+ * reorder for free — a11y).
+ */
+function SortableBlock({ item, onCommitText, onDuplicate, onDelete }: SortableBlockProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: item.props.id,
+  })
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : undefined,
+  }
+  return (
+    <BlockEditShell
+      item={item}
+      onCommitText={onCommitText}
+      onDuplicate={onDuplicate}
+      onDelete={onDelete}
+      setNodeRef={setNodeRef}
+      style={style}
+      gripProps={{ ...attributes, ...listeners } as React.HTMLAttributes<HTMLButtonElement>}
+    />
+  )
 }
 
 function seedContent(layoutData: unknown): LayoutItem[] {
@@ -79,6 +132,24 @@ export function EditableDocument({ section, sopId }: EditableDocumentProps) {
     handleChange({ content, root } as unknown as Parameters<typeof handleChange>[0])
   }, [content, root, handleChange])
 
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  )
+
+  // Vertical-axis reflow only (blocks never free-drag — Konva is the sole
+  // freeform surface). Reorder round-trips props losslessly (reorderBlocks) then
+  // autosaves via the content effect above.
+  function handleDragEnd({ active, over }: DragEndEvent) {
+    if (!over || active.id === over.id) return
+    setContent((c) => {
+      const from = c.findIndex((it) => it.props.id === active.id)
+      const to = c.findIndex((it) => it.props.id === over.id)
+      if (from < 0 || to < 0) return c
+      return reorderBlocks(c, from, to)
+    })
+  }
+
   return (
     <div
       data-editable-document
@@ -88,17 +159,29 @@ export function EditableDocument({ section, sopId }: EditableDocumentProps) {
       {content.length === 0 ? (
         <div className="p-8 text-center text-[var(--ink-500,#71717a)]">Nothing here yet</div>
       ) : (
-        content.map((item) => (
-          <BlockEditShell
-            key={item.props.id}
-            item={item}
-            onCommitText={(field, value) =>
-              setContent((c) => updateBlockProps(c, item.props.id, { [field]: value }))
-            }
-            onDuplicate={() => setContent((c) => duplicateBlock(c, item.props.id))}
-            onDelete={() => setContent((c) => deleteBlock(c, item.props.id))}
-          />
-        ))
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          modifiers={[restrictToVerticalAxis]}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={content.map((c) => c.props.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {content.map((item) => (
+              <SortableBlock
+                key={item.props.id}
+                item={item}
+                onCommitText={(field, value) =>
+                  setContent((c) => updateBlockProps(c, item.props.id, { [field]: value }))
+                }
+                onDuplicate={() => setContent((c) => duplicateBlock(c, item.props.id))}
+                onDelete={() => setContent((c) => deleteBlock(c, item.props.id))}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
       )}
     </div>
   )
