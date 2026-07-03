@@ -22,13 +22,14 @@ import { LayoutDataSchema } from '@/lib/builder/layout-schema'
 import { sanitizeLayoutContent } from '@/lib/builder/sanitize-layout'
 import { useBuilderAutosave } from '@/hooks/useBuilderAutosave'
 import {
-  updateBlockProps,
   deleteBlock,
   duplicateBlock,
   reorderBlocks,
   type LayoutItem,
 } from '@/lib/builder/content-ops'
+import type { BlockType } from '@/lib/builder/block-registry'
 import { BlockEditShell } from './BlockEditShell'
+import { commitFieldToContent } from './fields/field-commit'
 
 /**
  * The bespoke edit canvas (D-01, R2) — replaces `<Puck onChange>`.
@@ -57,7 +58,7 @@ interface EditableDocumentProps {
 
 interface SortableBlockProps {
   item: LayoutItem
-  onCommitText: (field: string, value: string) => void
+  onCommitField: (field: string, value: unknown) => void
   onDuplicate: () => void
   onDelete: () => void
 }
@@ -68,7 +69,7 @@ interface SortableBlockProps {
  * BlockEditShell. Grip = keyboard + pointer handle (dnd-kit gives keyboard
  * reorder for free — a11y).
  */
-function SortableBlock({ item, onCommitText, onDuplicate, onDelete }: SortableBlockProps) {
+function SortableBlock({ item, onCommitField, onDuplicate, onDelete }: SortableBlockProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.props.id,
   })
@@ -80,7 +81,7 @@ function SortableBlock({ item, onCommitText, onDuplicate, onDelete }: SortableBl
   return (
     <BlockEditShell
       item={item}
-      onCommitText={onCommitText}
+      onCommitField={onCommitField}
       onDuplicate={onDuplicate}
       onDelete={onDelete}
       setNodeRef={setNodeRef}
@@ -173,8 +174,10 @@ export function EditableDocument({ section, sopId }: EditableDocumentProps) {
               <SortableBlock
                 key={item.props.id}
                 item={item}
-                onCommitText={(field, value) =>
-                  setContent((c) => updateBlockProps(c, item.props.id, { [field]: value }))
+                onCommitField={(field, value) =>
+                  setContent((c) =>
+                    commitFieldToContent(c, item.props.id, item.type as BlockType, field, value)
+                  )
                 }
                 onDuplicate={() => setContent((c) => duplicateBlock(c, item.props.id))}
                 onDelete={() => setContent((c) => deleteBlock(c, item.props.id))}

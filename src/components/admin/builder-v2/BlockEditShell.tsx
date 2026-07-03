@@ -1,71 +1,132 @@
 'use client'
 
-import { useState } from 'react'
 import { GripVertical, Copy, Trash2 } from 'lucide-react'
 import { BLOCK_COMPONENTS, stripMeta, type BlockType } from '@/lib/builder/block-registry'
 import { humanizeBlockType } from '@/lib/builder/block-type-labels'
 import type { LayoutItem } from '@/lib/builder/content-ops'
+import { FIELD_MAP, ACCENT_BY_TYPE, DEFAULT_ACCENT, type FieldSpec } from './fields/field-map'
 import { InlineText } from './InlineText'
+import { EnumChip } from './fields/EnumChip'
+import { InlineToken } from './fields/InlineToken'
 
 /**
- * Per-block edit shell (R2 — edit == worker render).
+ * Per-block edit shell (R2 — edit == worker render; P14 — bespoke field editors).
  *
  * The body IS the same worker component from `BLOCK_COMPONENTS` (no forked
- * renderer). On top we layer hover affordances (grip / duplicate / delete /
- * type label) and click-to-edit for the block's primary text field. The worker
- * read state (non-editing) is byte-identical to what the walkthrough renders.
+ * renderer). On hover we reveal:
+ *   - block tools (grip / duplicate / delete / type label),
+ *   - a FIELD_MAP-driven field strip that makes every Puck-editable field
+ *     reachable — Pattern A → InlineText, B → EnumChip, D → InlineToken.
+ * Every edit commits through the caller's Zod-validated, lossless `onCommitField`
+ * (junctionId / block_provenance survive — R7). Patterns C (array/multi-field
+ * panel) and E (media grid) are declared in FIELD_MAP and land in 26-07 / 26-09;
+ * until then their fields show a deferred marker (not yet inline-editable).
  *
  * `data-block-id={item.props.id}` is the stable hook the later selection-sync
- * reverse binding (P12) queries — always rendered.
+ * reverse binding (P12) queries — always rendered. Worker read mode (LayoutRenderer)
+ * never mounts this shell, so workers never see any edit affordance.
  */
-
-// Primary inline-editable text field per block type (Pattern A). The full
-// per-field structured panels (P14) land in a later wave; here we wire the one
-// main text field so click-to-edit works on the common blocks.
-// ponytail: primary text field only — array/config fields come with W2 panels.
-const PRIMARY_TEXT_FIELD: Partial<Record<BlockType, string>> = {
-  TextBlock: 'content',
-  HeadingBlock: 'text',
-  CalloutBlock: 'body',
-  StepBlock: 'text',
-  HazardCardBlock: 'body',
-  MeasurementBlock: 'label',
-  SignOffBlock: 'title',
-  ZoneBlock: 'label',
-  EscalateBlock: 'title',
-  VoiceNoteBlock: 'prompt',
-  InspectBlock: 'title',
-  PPECardBlock: 'title',
-  DecisionBlock: 'question',
-}
-
 interface BlockEditShellProps {
   item: LayoutItem
-  onCommitText: (field: string, value: string) => void
+  /** Commit a single field edit; value is raw (string for A/D, enum value for B). */
+  onCommitField: (field: string, value: unknown) => void
   onDuplicate: () => void
   onDelete: () => void
-  /** Task 3 (dnd-kit) supplies these to the grip; optional so Task 2 renders. */
+  /** Task 3 (dnd-kit) supplies these to the grip; optional so callers can omit. */
   gripProps?: React.HTMLAttributes<HTMLButtonElement>
   setNodeRef?: (node: HTMLElement | null) => void
   style?: React.CSSProperties
 }
 
+function FieldControl({
+  spec,
+  item,
+  accent,
+  onCommitField,
+}: {
+  spec: FieldSpec
+  item: LayoutItem
+  accent: string
+  onCommitField: (field: string, value: unknown) => void
+}) {
+  const raw = item.props[spec.field]
+  const label = (
+    <span className="min-w-[5rem] font-mono text-[9px] uppercase tracking-wider text-[var(--ink-500,#71717a)]">
+      {spec.field}
+    </span>
+  )
+
+  if (spec.pattern === 'A') {
+    return (
+      <div className="flex items-start gap-2">
+        {label}
+        <InlineText
+          autoFocus={false}
+          initialValue={raw == null ? '' : String(raw)}
+          ariaLabel={`Edit ${spec.field}`}
+          className="prose block flex-1 whitespace-pre-wrap rounded border border-[var(--ink-300,#d4d4d8)] px-2 py-1 text-[13px] outline-none focus:shadow-[0_0_0_2px_rgba(59,130,246,0.22)]"
+          onCommit={(value) => {
+            if (value !== raw) onCommitField(spec.field, value)
+          }}
+        />
+      </div>
+    )
+  }
+
+  if (spec.pattern === 'B') {
+    return (
+      <div className="flex items-center gap-2">
+        {label}
+        <EnumChip
+          value={raw}
+          options={spec.options ?? []}
+          accent={accent}
+          ariaLabel={`Edit ${spec.field}`}
+          onSelect={(value) => onCommitField(spec.field, value)}
+        />
+      </div>
+    )
+  }
+
+  if (spec.pattern === 'D') {
+    return (
+      <div className="flex items-center gap-2">
+        {label}
+        <InlineToken
+          value={raw}
+          ariaLabel={`Edit ${spec.field}`}
+          onCommit={(rawStr) => onCommitField(spec.field, rawStr)}
+        />
+      </div>
+    )
+  }
+
+  // Patterns C (array/panel) + E (media grid) — declared for reachability,
+  // implemented in 26-07 / 26-09. Marker keeps the field visible + accounted for.
+  return (
+    <div className="flex items-center gap-2">
+      {label}
+      <span className="rounded border border-dashed border-[var(--ink-300,#d4d4d8)] px-2 py-0.5 font-mono text-[10px] text-[var(--ink-500,#71717a)]">
+        {spec.pattern === 'E' ? 'media — soon' : 'panel — soon'}
+      </span>
+    </div>
+  )
+}
+
 export function BlockEditShell({
   item,
-  onCommitText,
+  onCommitField,
   onDuplicate,
   onDelete,
   gripProps,
   setNodeRef,
   style,
 }: BlockEditShellProps) {
-  const [editingField, setEditingField] = useState<string | null>(null)
   const type = item.type as BlockType
-  // Cast to include undefined: item.type may be an unregistered type (the `as
-  // BlockType` above is a convenience, not a guarantee).
+  // Cast to include undefined: item.type may be an unregistered type.
   const Block = BLOCK_COMPONENTS[type] as (typeof BLOCK_COMPONENTS)[BlockType] | undefined
-  const primaryField = PRIMARY_TEXT_FIELD[type]
-  const canEditText = Boolean(Block && primaryField)
+  const specs = FIELD_MAP[type] ?? []
+  const accent = ACCENT_BY_TYPE[type] ?? DEFAULT_ACCENT
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const BlockAny = Block as any
 
@@ -111,31 +172,30 @@ export function BlockEditShell({
         </button>
       </div>
 
-      {/* Body: the SAME worker component (R2). Click primary text to edit inline. */}
-      {canEditText && editingField === primaryField ? (
-        <InlineText
-          initialValue={String(item.props[primaryField as string] ?? '')}
-          ariaLabel={`Edit ${humanizeBlockType(item.type)} text`}
-          className="prose block w-full whitespace-pre-wrap rounded p-4 outline-none focus:shadow-[0_0_0_2px_rgba(59,130,246,0.22)]"
-          onCommit={(value) => {
-            setEditingField(null)
-            if (value !== item.props[primaryField as string]) {
-              onCommitText(primaryField as string, value)
-            }
-          }}
-        />
-      ) : (
+      {/* Body: the SAME worker component (R2) as the live preview. */}
+      <div className="p-4">
+        {Block ? (
+          <BlockAny {...stripMeta(item.props)} />
+        ) : (
+          <div className="text-sm text-[var(--ink-500,#71717a)]">Unsupported block: {item.type}</div>
+        )}
+      </div>
+
+      {/* FIELD_MAP-driven editors (P14) — hover-revealed, every field reachable. */}
+      {specs.length > 0 && (
         <div
-          onClick={canEditText ? () => setEditingField(primaryField as string) : undefined}
-          className={canEditText ? 'cursor-text' : undefined}
+          data-field-strip
+          className="space-y-1.5 border-t border-[var(--ink-300,#d4d4d8)] px-4 py-2 opacity-0 group-hover:opacity-100"
         >
-          {Block ? (
-            <BlockAny {...stripMeta(item.props)} />
-          ) : (
-            <div className="p-4 text-sm text-[var(--ink-500,#71717a)]">
-              Unsupported block: {item.type}
-            </div>
-          )}
+          {specs.map((spec) => (
+            <FieldControl
+              key={spec.field}
+              spec={spec}
+              item={item}
+              accent={accent}
+              onCommitField={onCommitField}
+            />
+          ))}
         </div>
       )}
     </div>
