@@ -15,8 +15,8 @@ type Entry = { type: string; props: Record<string, unknown> }
 test.describe('block-registry + sanitize-layout (P17)', () => {
   test('BLOCK_COMPONENTS has one component entry per registered block type (placeholder separate)', () => {
     const keys = Object.keys(BLOCK_COMPONENTS)
-    // 17 registered block types; UnsupportedBlockPlaceholder is handled in sanitize-layout, not here.
-    expect(keys.length).toBe(17)
+    // 18 registered block types (26-09 added VisualBlock); UnsupportedBlockPlaceholder is handled in sanitize-layout, not here.
+    expect(keys.length).toBe(18)
     expect(keys).not.toContain('UnsupportedBlockPlaceholder')
     for (const k of keys) {
       expect(typeof (BLOCK_COMPONENTS as Record<string, unknown>)[k]).toBe('function')

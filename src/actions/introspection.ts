@@ -40,6 +40,10 @@ import {
   StepWithPhotosBlockPropsSchema,
   PhotoGridBlockPropsSchema,
 } from '@/components/sop/blocks'
+// Phase 26 (26-09, R5): unified Visual block props schema. Its medium enum +
+// medium-tagged example are the /api/schema surfacing the 26.5 agent layer
+// consumes (R7/D-02 contract hook).
+import { VisualBlockPropsSchema } from '@/components/admin/builder-v2/visual/media-adapter'
 import { BlockContentSchema } from '@/lib/validators/blocks'
 import {
   StepDataSchema,
@@ -162,6 +166,18 @@ const BLOCK_REGISTRY: Record<string, {
     schema: PhotoGridBlockPropsSchema,
     description: 'Phase 20 CONV-03 — standalone N-image grid. Used for orphan/unanchored images surfaced by the parser, or admin-authored figure groups.',
     example: { items: [{ src: 'org/sop/images/img_0.png', alt: 'Hazard icon', caption: null }], columns: '2' },
+  },
+  VisualBlock: {
+    schema: VisualBlockPropsSchema,
+    description:
+      'Phase 26 R5 — unified visual media. One block holds mixed items, each medium-tagged visual:photo | visual:diagram | visual:video. Diagram items may carry an annotationId linking a Konva annotation overlay. The medium tags are the agent-layer contract (D-02).',
+    example: {
+      items: [
+        { medium: 'photo', src: 'org/sop/images/img_0.png', alt: 'Guard in place', caption: null },
+        { medium: 'diagram', src: 'org/sop/images/schematic.png', alt: 'Wiring schematic', caption: null },
+        { medium: 'video', src: 'org/sop/videos/lockout.mp4', alt: 'Lockout demo', caption: null },
+      ],
+    },
   },
 }
 

@@ -190,6 +190,26 @@ export const PhotoGridBlockContentSchema = z.object({
   columns: z.enum(['2', '3', '4']).default('2'),
 })
 
+// ---------------------------------------------------------------
+// Phase 26 Plan 26-09 (R5, D-03) — the unified Visual block. One
+// junction-stored block holding mixed media, each item medium-tagged
+// (visual:photo | visual:diagram | visual:video). `annotationId` links a
+// diagram item to its Konva overlay (26-11). Mirrors VisualBlockPropsSchema
+// in src/components/admin/builder-v2/visual/media-adapter.ts.
+// ---------------------------------------------------------------
+export const VisualItemContentSchema = z.object({
+  medium: z.enum(['photo', 'diagram', 'video']),
+  src: z.string().nullable(),
+  alt: z.string().max(200).default(''),
+  caption: z.string().max(500).nullable(),
+  annotationId: z.string().uuid().optional(),
+})
+
+export const VisualBlockContentSchema = z.object({
+  kind: z.literal('visual'),
+  items: z.array(VisualItemContentSchema).default([]),
+})
+
 export const BlockContentSchema = z.discriminatedUnion('kind', [
   HazardBlockContentSchema,
   PpeBlockContentSchema,
@@ -211,6 +231,8 @@ export const BlockContentSchema = z.discriminatedUnion('kind', [
   ModelBlockContentSchema,
   StepWithPhotosBlockContentSchema,
   PhotoGridBlockContentSchema,
+  // Plan 26-09 — unified Visual block (junction-stored, medium-tagged):
+  VisualBlockContentSchema,
 ])
 
 export type HazardBlockContent = z.infer<typeof HazardBlockContentSchema>
@@ -233,4 +255,6 @@ export type CalloutBlockContent = z.infer<typeof CalloutBlockContentSchema>
 export type ModelBlockContent = z.infer<typeof ModelBlockContentSchema>
 export type StepWithPhotosBlockContent = z.infer<typeof StepWithPhotosBlockContentSchema>
 export type PhotoGridBlockContent = z.infer<typeof PhotoGridBlockContentSchema>
+export type VisualItemContent = z.infer<typeof VisualItemContentSchema>
+export type VisualBlockContent = z.infer<typeof VisualBlockContentSchema>
 export type BlockContent = z.infer<typeof BlockContentSchema>

@@ -53,7 +53,7 @@ test.describe('contract-check target guard (Pitfall 1)', () => {
       throw new Error(`contract-check failed:\n${e.stdout ?? ''}\n${e.stderr ?? ''}`)
     }
     expect(out).toContain('Three-place contract intact')
-    // 17 keys extracted from BLOCK_COMPONENTS — a stale target would yield 0.
-    expect(out).toContain('BLOCK_COMPONENTS:   17 blocks')
+    // 18 keys extracted from BLOCK_COMPONENTS (26-09 added VisualBlock) — a stale target would yield 0.
+    expect(out).toContain('BLOCK_COMPONENTS:   18 blocks')
   })
 })

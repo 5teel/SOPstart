@@ -36,6 +36,6 @@ test.describe('LayoutRenderer render-parity (R2) — bespoke switch == component
       )
     }
     expect(out).toContain('RENDER-PARITY OK')
-    expect(out).toContain('17 block types')
+    expect(out).toContain('18 block types')
   })
 })

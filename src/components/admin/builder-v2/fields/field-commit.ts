@@ -34,6 +34,7 @@ import {
   StepWithPhotosBlockPropsSchema,
   PhotoGridBlockPropsSchema,
 } from '@/components/sop/blocks'
+import { VisualBlockPropsSchema } from '@/components/admin/builder-v2/visual/media-adapter'
 import { stripMeta, type BlockType } from '@/lib/builder/block-registry'
 import { updateBlockProps, type LayoutItem } from '@/lib/builder/content-ops'
 import { FIELD_MAP } from './field-map'
@@ -57,6 +58,7 @@ export const SCHEMA_BY_TYPE: Record<BlockType, ZodType> = {
   ModelBlock: ModelBlockPropsSchema,
   StepWithPhotosBlock: StepWithPhotosBlockPropsSchema,
   PhotoGridBlock: PhotoGridBlockPropsSchema,
+  VisualBlock: VisualBlockPropsSchema,
 }
 
 /** A sentinel returned when coercion itself rejects the raw value (before Zod). */

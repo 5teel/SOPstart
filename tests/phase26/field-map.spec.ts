@@ -55,15 +55,21 @@ function puckComponentKeys(): string[] {
 }
 
 test.describe('field-map — reachability parity with puck-config fields (P14)', () => {
+  // VisualBlock (26-09, R5) is a BESPOKE block with no puck-config entry — Puck is
+  // being removed, so a new block never had a Puck field set to be parity-checked.
+  const BESPOKE = new Set(['VisualBlock'])
+
   test('FIELD_MAP covers exactly the registered block types', () => {
     const fieldMapTypes = Object.keys(FIELD_MAP).sort()
     const puckTypes = puckComponentKeys().sort()
-    expect(fieldMapTypes).toEqual(puckTypes)
-    // Frozen registry is 17 authorable blocks (VisualBlock lands in a later wave).
-    expect(fieldMapTypes.length).toBe(17)
+    // Every Puck-configured block is still mapped (no legacy field dropped)…
+    expect(fieldMapTypes.filter((t) => !BESPOKE.has(t))).toEqual(puckTypes)
+    // …plus the bespoke VisualBlock → 18 authorable blocks total (26-09).
+    expect(fieldMapTypes.length).toBe(18)
   })
 
   for (const blockName of Object.keys(FIELD_MAP)) {
+    if (BESPOKE.has(blockName)) continue // no puck-config to compare against
     test(`${blockName}: FIELD_MAP field set === puck-config fields (0 unreachable)`, () => {
       const mapped = FIELD_MAP[blockName as keyof typeof FIELD_MAP].map((f) => f.field).sort()
       const puck = puckFieldKeys(blockName).sort()

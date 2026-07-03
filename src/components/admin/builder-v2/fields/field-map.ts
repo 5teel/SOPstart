@@ -187,6 +187,9 @@ export const FIELD_MAP: Record<BlockType, readonly FieldSpec[]> = {
       ],
     },
   ],
+  // Phase 26 (R5): the unified Visual block — one media-grid field (Pattern E).
+  // Not a Puck block (no puck-config entry); exempt from the puck-parity check.
+  VisualBlock: [{ field: 'items', pattern: 'E' }],
 }
 
 /**

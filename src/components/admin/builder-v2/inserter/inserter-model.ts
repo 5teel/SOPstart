@@ -37,7 +37,7 @@ export const SMART: Partial<Record<BlockType, { type: BlockType; why: string }>>
 export const GROUPS: [string, BlockType[]][] = [
   ['Actions & flow', ['StepBlock', 'StepWithPhotosBlock', 'DecisionBlock']],
   ['Safety', ['HazardCardBlock', 'PPECardBlock', 'EscalateBlock', 'ZoneBlock']],
-  ['Data capture', ['MeasurementBlock', 'InspectBlock', 'PhotoBlock', 'PhotoGridBlock', 'VoiceNoteBlock', 'ModelBlock']],
+  ['Data capture', ['MeasurementBlock', 'InspectBlock', 'VisualBlock', 'PhotoBlock', 'PhotoGridBlock', 'VoiceNoteBlock', 'ModelBlock']],
   ['Guidance & gates', ['TextBlock', 'HeadingBlock', 'CalloutBlock', 'SignOffBlock']],
 ]
 

@@ -2,8 +2,8 @@
  * Bespoke block registry (Phase 26, D-01) — the renderer "place" off Puck.
  *
  * `layout_data` is Puck-agnostic JSON (`{ content: [{ type, props }], root }`);
- * the 17 block components in `src/components/sop/blocks/*` accept exactly those
- * props. Replacing Puck as the RENDER engine is therefore a `type → component`
+ * the block components in `src/components/sop/blocks/*` (+ the 26-09 VisualBlock)
+ * accept exactly those props. Replacing Puck as the RENDER engine is therefore a `type → component`
  * switch, not a rewrite. This module is the single source of that mapping,
  * consumed by both the worker read path (`LayoutRenderer`) and — later waves —
  * the admin edit host. It carries NO `@puckeditor/core` import, so pulling it
@@ -19,9 +19,14 @@
  * can extract them (RESEARCH Pitfall 1).
  */
 import * as Blocks from '@/components/sop/blocks'
+// Phase 26 (26-09, R5): the unified Visual block. Konva-free DISPLAY component —
+// admin annotation editing is code-split (26-11), so importing it into the
+// worker render path keeps `/sops/[sopId]` Konva-free (R8).
+import { VisualBlock } from '@/components/admin/builder-v2/visual/VisualBlock'
 
 /**
- * The 17 registered layout_data block types → their worker component.
+ * The 18 registered layout_data block types → their worker component
+ * (17 in `src/components/sop/blocks/*` + the 26-09 unified VisualBlock).
  * `UnsupportedBlockPlaceholder` is handled separately in `./sanitize-layout`
  * (it is a fallback, not an authorable block).
  */
@@ -43,6 +48,7 @@ export const BLOCK_COMPONENTS = {
   ModelBlock: Blocks.ModelBlock,
   StepWithPhotosBlock: Blocks.StepWithPhotosBlock,
   PhotoGridBlock: Blocks.PhotoGridBlock,
+  VisualBlock: VisualBlock,
 } as const
 
 export type BlockType = keyof typeof BLOCK_COMPONENTS
@@ -86,6 +92,7 @@ export const BLOCK_DEFAULTS: Record<BlockType, Record<string, unknown>> = {
     layout: 'right',
   },
   PhotoGridBlock: { items: [{ src: null, alt: '', caption: null }], columns: '2' },
+  VisualBlock: { items: [] },
 }
 
 // layout_data carries frozen-contract metadata alongside component props

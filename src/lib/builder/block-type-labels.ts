@@ -53,6 +53,8 @@ export const BLOCK_TYPE_LABELS: Readonly<Record<string, BlockTypeEntry>> = {
   StepWithPhotosBlock: { label: 'Step + photos', pillVariant: 'kind-step' },
   PhotoGridBlock: { label: 'Photo grid', pillVariant: 'kind-step' },
   ModelBlock: { label: '3D model', pillVariant: 'kind-step' },
+  // Phase 26 (R5): the unified Visual block (photo·diagram·video). Cyan frame → kind-ins.
+  VisualBlock: { label: 'Visual', pillVariant: 'kind-ins' },
   // Legacy alias — named explicitly in SPEC R4 acceptance text
   PhotoGrid: { label: 'Photo grid', pillVariant: 'kind-step' },
 } as const
@@ -81,6 +83,7 @@ const SLUG_TO_KEY: Readonly<Record<string, string>> = {
   voicenote: 'VoiceNoteBlock',
   zone: 'ZoneBlock',
   photogrid: 'PhotoGrid',
+  visual: 'VisualBlock',
 } as const
 
 /** Safe fallback returned for any unrecognised or empty input (R4 invariant). */

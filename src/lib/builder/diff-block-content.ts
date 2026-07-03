@@ -190,6 +190,16 @@ function emitFields(content: BlockContent): BlockContentDiffField[] {
       })
       out.push({ key: 'columns', oldValue: content.columns ?? '2', newValue: '' })
       break
+    // Phase 26 Plan 26-09 — unified Visual block (mixed medium-tagged media).
+    case 'visual':
+      out.push({
+        key: 'items',
+        oldValue: (content.items ?? [])
+          .map((it) => `${it.medium}: ${it.src ?? ''}${it.caption ? ` — ${it.caption}` : ''}`)
+          .join('\n'),
+        newValue: '',
+      })
+      break
     default: {
       // Exhaustiveness guard — if a new BlockContent variant is added without
       // updating this switch, TypeScript will surface it here.

@@ -43,7 +43,7 @@ const meta = { junctionId: 'junc-r', block_provenance: { region: {}, parser_run_
 // ── Per-block: 0 unreachable fields. Every FIELD_MAP field (=== puck field) MUST
 //    render a data-field affordance row in the shell. ────────────────────────────
 const types = Object.keys(BLOCK_COMPONENTS) as BlockType[]
-check(types.length === 17, `expected 17 registered blocks, got ${types.length}`)
+check(types.length === 18, `expected 18 registered blocks, got ${types.length}`)
 
 let totalFields = 0
 const report: string[] = []
