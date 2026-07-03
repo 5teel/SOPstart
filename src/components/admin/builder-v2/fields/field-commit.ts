@@ -101,3 +101,21 @@ export function commitFieldToContent(
 
   return updateBlockProps(content, id, { [field]: value })
 }
+
+/**
+ * Would committing `value` to `field` pass the block's `*PropsSchema`? Used by
+ * the Pattern-C FieldPanel to surface an inline validity message (e.g. Decision
+ * `options` below the Zod min of 2) WITHOUT mutating content — the actual write
+ * still routes through `commitFieldToContent` (single validated path).
+ */
+export function isFieldValueValid(
+  props: Record<string, unknown>,
+  type: BlockType,
+  field: string,
+  value: unknown
+): boolean {
+  const schema = SCHEMA_BY_TYPE[type]
+  if (!schema) return true
+  const candidate = { ...stripMeta(props), [field]: value }
+  return schema.safeParse(candidate).success
+}

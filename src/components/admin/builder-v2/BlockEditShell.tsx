@@ -1,6 +1,7 @@
 'use client'
 
-import { GripVertical, Copy, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { GripVertical, Copy, Trash2, SlidersHorizontal } from 'lucide-react'
 import { BLOCK_COMPONENTS, stripMeta, type BlockType } from '@/lib/builder/block-registry'
 import { humanizeBlockType } from '@/lib/builder/block-type-labels'
 import type { LayoutItem } from '@/lib/builder/content-ops'
@@ -8,6 +9,7 @@ import { FIELD_MAP, ACCENT_BY_TYPE, DEFAULT_ACCENT, type FieldSpec } from './fie
 import { InlineText } from './InlineText'
 import { EnumChip } from './fields/EnumChip'
 import { InlineToken } from './fields/InlineToken'
+import { FieldPanel, hasPanelFields } from './fields/FieldPanel'
 
 /**
  * Per-block edit shell (R2 — edit == worker render; P14 — bespoke field editors).
@@ -16,11 +18,12 @@ import { InlineToken } from './fields/InlineToken'
  * renderer). On hover we reveal:
  *   - block tools (grip / duplicate / delete / type label),
  *   - a FIELD_MAP-driven field strip that makes every Puck-editable field
- *     reachable — Pattern A → InlineText, B → EnumChip, D → InlineToken.
+ *     reachable — Pattern A → InlineText, B → EnumChip, D → InlineToken,
+ *     C → the anchored FieldPanel (⚙ edit-fields tool; array + config editors).
  * Every edit commits through the caller's Zod-validated, lossless `onCommitField`
- * (junctionId / block_provenance survive — R7). Patterns C (array/multi-field
- * panel) and E (media grid) are declared in FIELD_MAP and land in 26-07 / 26-09;
- * until then their fields show a deferred marker (not yet inline-editable).
+ * (junctionId / block_provenance survive — R7). Pattern E (media grid) is
+ * declared in FIELD_MAP and lands in 26-09; until then its fields show a
+ * `media — soon` marker (not yet inline-editable).
  *
  * `data-block-id={item.props.id}` is the stable hook the later selection-sync
  * reverse binding (P12) queries — always rendered. Worker read mode (LayoutRenderer)
@@ -43,11 +46,13 @@ function FieldControl({
   item,
   accent,
   onCommitField,
+  onOpenPanel,
 }: {
   spec: FieldSpec
   item: LayoutItem
   accent: string
   onCommitField: (field: string, value: unknown) => void
+  onOpenPanel: () => void
 }) {
   const raw = item.props[spec.field]
   const label = (
@@ -101,13 +106,30 @@ function FieldControl({
     )
   }
 
-  // Patterns C (array/panel) + E (media grid) — declared for reachability,
-  // implemented in 26-07 / 26-09. Marker keeps the field visible + accounted for.
+  // Pattern C (array / config panel) — opens the anchored FieldPanel (26-07).
+  if (spec.pattern === 'C') {
+    return (
+      <div className="flex items-center gap-2">
+        {label}
+        <button
+          type="button"
+          data-open-field-panel
+          aria-label={`Edit ${spec.field} in field panel`}
+          onClick={onOpenPanel}
+          className="inline-flex items-center gap-1 rounded border border-[var(--ink-300,#d4d4d8)] px-2 py-0.5 font-mono text-[10px] text-[var(--ink-500,#71717a)] hover:border-[var(--accent-step,#3b82f6)] hover:text-[var(--accent-step,#3b82f6)]"
+        >
+          <SlidersHorizontal size={11} /> edit
+        </button>
+      </div>
+    )
+  }
+
+  // Pattern E (media grid) — declared for reachability, implemented in 26-09.
   return (
     <div className="flex items-center gap-2">
       {label}
       <span className="rounded border border-dashed border-[var(--ink-300,#d4d4d8)] px-2 py-0.5 font-mono text-[10px] text-[var(--ink-500,#71717a)]">
-        {spec.pattern === 'E' ? 'media — soon' : 'panel — soon'}
+        media — soon
       </span>
     </div>
   )
@@ -127,6 +149,8 @@ export function BlockEditShell({
   const Block = BLOCK_COMPONENTS[type] as (typeof BLOCK_COMPONENTS)[BlockType] | undefined
   const specs = FIELD_MAP[type] ?? []
   const accent = ACCENT_BY_TYPE[type] ?? DEFAULT_ACCENT
+  const showPanelTrigger = hasPanelFields(type)
+  const [panelOpen, setPanelOpen] = useState(false)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const BlockAny = Block as any
 
@@ -170,7 +194,23 @@ export function BlockEditShell({
         >
           <Trash2 size={12} />
         </button>
+        {showPanelTrigger && (
+          <button
+            type="button"
+            data-edit-fields-tool
+            aria-label="Edit fields"
+            onClick={() => setPanelOpen((o) => !o)}
+            className="grid h-6 w-6 place-items-center rounded border border-[var(--ink-300,#d4d4d8)] hover:text-[var(--accent-step,#3b82f6)]"
+          >
+            <SlidersHorizontal size={12} />
+          </button>
+        )}
       </div>
+
+      {/* Pattern C anchored field panel (P14) — array + config editors. */}
+      {showPanelTrigger && panelOpen && (
+        <FieldPanel item={item} onCommitField={onCommitField} onClose={() => setPanelOpen(false)} />
+      )}
 
       {/* Body: the SAME worker component (R2) as the live preview. */}
       <div className="p-4">
@@ -194,6 +234,7 @@ export function BlockEditShell({
               item={item}
               accent={accent}
               onCommitField={onCommitField}
+              onOpenPanel={() => setPanelOpen(true)}
             />
           ))}
         </div>
