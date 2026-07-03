@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
 status: Ready to execute
-stopped_at: Completed 26-02-PLAN.md (phase26 harness + R6 convert golden baseline)
+stopped_at: Completed 26-03-PLAN.md (Puck-free worker renderer + block-registry + contract-check repoint)
 last_updated: "2026-07-03T04:20:00.000Z"
 progress:
   total_phases: 29
   completed_phases: 4
-  total_plans: 21
-  completed_plans: 21
+  total_plans: 22
+  completed_plans: 22
   percent: 14
 ---
 
@@ -279,6 +279,9 @@ Recent decisions affecting current work:
 - [Phase 26]: [Phase 26-01]: Bespoke-editor deps (dnd-kit x3, konva, react-konva) exact-pinned in dependencies (not optionalDependencies — cross-platform); no app import yet so worker bundle untouched
 - [Phase 26-02]: phase26 Playwright project uses ONE broad testMatch (tests/phase26/**) — single registration point for the whole phase; later plans drop specs in tests/phase26/ with no config edit (CLAUDE.md 2026-05-25)
 - [Phase 26-02]: R6 convert golden baseline captured from the deterministic code-owned converter (parsedSopToPerSectionLayoutData + puckPropsToBlockContent) via a FIXED ParsedSop — not a live DOCX→GPT→DB run (GPT non-deterministic, junction writes need Supabase; neither byte-reproducible). Only props.id (Date.now) is normalized; the frozen D-01 contract is the converter itself, so this is a true runnable byte-baseline
+- [Phase 26-03]: Puck replaced as RENDER engine on the worker read path (D-01) — bespoke BLOCK_COMPONENTS (17 type→component) + Puck-free LayoutRenderer over the FROZEN layout_data contract; UnsupportedBlockPlaceholder + sanitizeLayoutContent relocated to sanitize-layout.ts (P17). No per-block Zod SafeRender on read (write boundary already validates)
+- [Phase 26-03]: Worker /sops/[sopId] First Load JS is Δ0 (1054 KB) after the swap — @puckeditor/core was already an admin-only dynamic chunk (5fed561a, referenced only by admin/sops/builder route), never in worker First Load; the swap makes it structural (LayoutRenderer no longer references Puck). Baseline re-captured with previousBaseline history
+- [Phase 26-03]: contract-check.ts place (1) repointed off puck-config.tsx onto BLOCK_COMPONENTS in block-registry.tsx (RESEARCH Pitfall 1); guard spec asserts live target. Render-parity + contract-target specs shell out to tsx subprocesses — Playwright's JSX transform ({__pw_type}) is incompatible with real react-dom/server
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -388,6 +391,6 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-07-03T04:20:00.000Z
-Stopped at: Completed 26-02-PLAN.md (phase26 harness + R6 convert golden baseline)
+Stopped at: Completed 26-03-PLAN.md (Puck-free worker renderer + block-registry + contract-check repoint)
 Resume file:
 None
