@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
 status: Phase 26 — ready to plan
-stopped_at: Phase 26 planning paused at UI-SPEC gate — run /gsd-ui-phase 26, then re-run /gsd-plan-phase 26 (research+validation+context already committed)
-last_updated: "2026-07-03T00:21:14.774Z"
+stopped_at: Phase 26 UI-SPEC approved (6/6) — ready to re-run /gsd-plan-phase 26
+last_updated: "2026-07-03T01:41:21.337Z"
 progress:
   total_phases: 29
   completed_phases: 4
@@ -382,7 +382,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-03T00:21:14.764Z
-Stopped at: Phase 26 planning paused at UI-SPEC gate — run /gsd-ui-phase 26, then re-run /gsd-plan-phase 26 (research+validation+context already committed)
+Last session: 2026-07-03T01:41:21.327Z
+Stopped at: Phase 26 UI-SPEC approved (6/6) — ready to re-run /gsd-plan-phase 26
 Resume file:
-.planning/phases/26-sop-builder-redesign/26-RESEARCH.md
+.planning/phases/26-sop-builder-redesign/26-UI-SPEC.md
