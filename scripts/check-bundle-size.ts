@@ -287,9 +287,34 @@ if (mammothLeaks.length > 0) {
   )
 }
 
+// ---------------------------------------------------------------------------
+// Phase 26 Plan 26-05 (D-03 / R8) — konva / react-konva must NOT ship in the
+// worker `/sops/[sopId]/page` bundle. The Konva annotation editor is admin-only
+// and reached exclusively through AnnotationEditorLoader (dynamic ssr:false).
+// A static `import ... from 'react-konva'` anywhere on the worker path would
+// pull the whole canvas engine into every worker's First Load JS.
+//
+// Same negative-assertion shape as the pdfjs/mammoth gates above: scan the
+// SAME worker chunkSet that drove the size gate. `konva` is not an English word
+// so a substring hit is a genuine leak, not a false positive.
+// ---------------------------------------------------------------------------
+const KONVA_MARKERS = ['react-konva', 'konva']
+const konvaLeaks = KONVA_MARKERS.filter((m) => workerJoined.includes(m))
+if (konvaLeaks.length > 0) {
+  fail(
+    `konva leaked into worker bundle ${ROUTE} (markers: ${konvaLeaks.join(', ')}). ` +
+      'AnnotationEditor MUST be reached only through AnnotationEditorLoader ' +
+      '(dynamic({ ssr: false })) from admin builder-v2 (D-03). Check for an ' +
+      "accidental static `import ... from 'react-konva'` or a direct AnnotationEditor import."
+  )
+}
+
 console.log(
   `check-bundle-size: ✓ Bundle isolation OK (chunks present, delta within tolerance) — DesktopWalkthrough at ${desktopFound.locations[0]}, WalkthroughVoiceModal at ${voiceFound.locations[0]}`
 )
 console.log(
   `check-bundle-size: ✓ Source-viewer isolation OK — pdfjs + mammoth not in ${ROUTE} bundle (D-21-09).`
+)
+console.log(
+  `check-bundle-size: ✓ Konva isolation OK — konva + react-konva not in ${ROUTE} bundle (26-05 D-03).`
 )
