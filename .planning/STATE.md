@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
-status: Phase 26 — ready to plan
-stopped_at: Phase 26 PLANNED — 14 plans / 10 waves, plan-checker PASSED (0 blockers, 3 advisories cleared/noted). Ready for /gsd-execute-phase 26
-last_updated: "2026-07-03T02:20:32.178Z"
+status: Ready to execute
+stopped_at: Completed 26-01-PLAN.md (deps install + pin)
+last_updated: "2026-07-03T03:40:56.741Z"
 progress:
   total_phases: 29
   completed_phases: 4
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 26 — sop-builder-redesign (v5.0 opener)
+**Current focus:** Phase 26 — sop-builder-redesign
 
 ## Current Position
 
-Phase: 26 (sop-builder-redesign) — CONTEXT GATHERED, ready to plan
-Plan: none yet
+Phase: 26 (sop-builder-redesign) — EXECUTING
+Plan: 2 of 14
 **Milestone status:** **v4.0 ✅ shipped 2026-07-02** (Phases 21, 21.5, 21.6, 22, 23, 24, 25 executed + code-reviewed; residual = human UAT on 21.6/22/23/25, carried per v3.0 field-verification precedent — archive via `/gsd-complete-milestone`). **v5.0 opened 2026-07-02** — Phase 26 (bespoke inline builder; Phase 17 Konva absorbed) → Phase 26.5 (agent-metadata layer on X-03 + graphify).
 
 **Active phase:** 26
@@ -148,6 +148,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 23 P06 | 452 | 3 tasks | 9 files |
 | Phase 23 P04 | 450s | 3 tasks | 6 files |
 | Phase 23 P07 | 4m | 3 tasks | 2 files |
+| Phase 26 P01 | 6min | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -274,6 +275,7 @@ Recent decisions affecting current work:
 - [Phase ?]: column names corrected to match database.types.ts: section_id/step_number/required_tools/confidence/content_type on sop tables (23-03)
 - [Phase 23]: D-11 kiosk account model: per-org kiosk account (role=worker) established once by admin; roster_worker_id distinct from worker_id; recordSignature uses createAdminClient with org-scope self-enforcement
 - [Phase ?]: Phase 23 pre-existing test failures (28) in older phase stubs are not regressions — phase-23 suite (49 tests) is fully green
+- [Phase 26]: [Phase 26-01]: Bespoke-editor deps (dnd-kit x3, konva, react-konva) exact-pinned in dependencies (not optionalDependencies — cross-platform); no app import yet so worker bundle untouched
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -382,7 +384,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-03T02:20:32.169Z
-Stopped at: Phase 26 PLANNED — 14 plans / 10 waves, plan-checker PASSED (0 blockers, 3 advisories cleared/noted). Ready for /gsd-execute-phase 26
+Last session: 2026-07-03T03:40:56.733Z
+Stopped at: Completed 26-01-PLAN.md (deps install + pin)
 Resume file:
-.planning/phases/26-sop-builder-redesign/26-01-PLAN.md
+None
