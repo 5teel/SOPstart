@@ -439,16 +439,18 @@ Matches the CONTEXT-expected shape; ordered so the FROZEN contract is proven ear
 | A5 | contentEditable single-field-per-block is sufficient (no rich-text framework) | Standard Stack | Low — verified: block text is one string field per `*PropsSchema` |
 | A6 | Bundle gate tolerates a decrease when Puck leaves the worker path (it's baseline+2KB max) | Bundle risks | Low — but baseline re-capture is required regardless |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Konva in Next 16 — verified?**
    - Known: works in Next 15 (Phase 17 research), `canvas` externalization + `ssr:false` pattern.
    - Unclear: Next 16 `--webpack` behaviour with `react-konva@19.2.5`.
-   - Recommendation: W5 opens with a throwaway spike; fallback chain (Excalidraw → custom SVG) already documented.
+   - **RESOLVED:** adopted in plan **26-05** — Wave-5 opens with a day-1 throwaway Konva-in-Next-16 spike, STOP/escalate on failure, fallback chain (Excalidraw → custom SVG) documented. Genuine external unknown, correctly gated at execution time.
 2. **Convert-parity vs Visual unification — which wins if they conflict?**
-   - Recommendation: preserve golden-path byte-equivalence (R6 is a hard acceptance) by rendering legacy photo kinds through the Visual UI rather than rewriting `layout_data`. Confirm with planner.
-3. **3D ModelBlock disposition** — keep separate (recommended, it's an unbuilt placeholder) vs `visual:3d`. Non-blocking (D-03 discretion).
-4. **When to actually remove `@puckeditor/core` from package.json** — after all 16 field panels + both render paths are Puck-free and parity-tested (Deferred "migration cleanup" slice). Keep the dep installed until then so a partial wave can't half-break the build.
+   - **RESOLVED:** adopted in plan **26-09** (A3) — render legacy photo kinds *through* the Visual UI, never rewrite `layout_data`, preserving golden-path byte-equivalence (R6 hard acceptance, asserted in 26-14).
+3. **3D ModelBlock disposition** — keep separate (recommended, it's an unbuilt placeholder) vs `visual:3d`.
+   - **RESOLVED:** keep separate; non-blocking planner discretion (D-03).
+4. **When to actually remove `@puckeditor/core` from package.json**
+   - **RESOLVED:** plan **26-14** — removal happens only after all field panels + both render paths are Puck-free and parity-tested; dep stays installed until then so a partial wave can't half-break the build.
 
 ## Environment Availability
 
