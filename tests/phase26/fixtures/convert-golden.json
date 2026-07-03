@@ -1,0 +1,462 @@
+{
+  "knownDocx": "SOP-009-Removing-parts-from-Alkaline-Cleaning-tank-Machine-Shop-(Tergo-Alakalox).docx",
+  "parserVersion": "21-05.1",
+  "sections": [
+    {
+      "order": 0,
+      "content": [
+        {
+          "type": "TextBlock",
+          "props": {
+            "id": "id#0.0",
+            "content": "This procedure covers safe removal of parts from the alkaline cleaning tank.",
+            "block_provenance": {
+              "region": {
+                "kind": "docx",
+                "paragraph_id": "p-0",
+                "run_start": 0,
+                "run_end": 0
+              },
+              "parser_run_id": "golden-run",
+              "parser_version": "21-05.1"
+            }
+          }
+        },
+        {
+          "type": "HeadingBlock",
+          "props": {
+            "id": "id#0.1",
+            "text": "Unanchored figures (review)",
+            "level": "h3",
+            "block_provenance": {
+              "region": {
+                "kind": "docx",
+                "paragraph_id": "p-0",
+                "run_start": 0,
+                "run_end": 0
+              },
+              "parser_run_id": "golden-run",
+              "parser_version": "21-05.1"
+            }
+          }
+        },
+        {
+          "type": "PhotoGridBlock",
+          "props": {
+            "id": "id#0.2",
+            "items": [
+              {
+                "src": "org/sop/images/img_3.png",
+                "alt": "Unanchored image 3",
+                "caption": null
+              }
+            ],
+            "columns": "2",
+            "block_provenance": {
+              "region": {
+                "kind": "docx",
+                "paragraph_id": "p-20",
+                "run_start": 0,
+                "run_end": 1
+              },
+              "parser_run_id": "golden-run",
+              "parser_version": "21-05.1"
+            }
+          }
+        }
+      ],
+      "junctions": [
+        {
+          "kind": "text",
+          "pin_mode": "pinned",
+          "verified": false,
+          "block_provenance": {
+            "region": {
+              "kind": "docx",
+              "paragraph_id": "p-0",
+              "run_start": 0,
+              "run_end": 0
+            },
+            "parser_run_id": "golden-run",
+            "parser_version": "21-05.1"
+          }
+        },
+        {
+          "kind": "heading",
+          "pin_mode": "pinned",
+          "verified": false,
+          "block_provenance": {
+            "region": {
+              "kind": "docx",
+              "paragraph_id": "p-0",
+              "run_start": 0,
+              "run_end": 0
+            },
+            "parser_run_id": "golden-run",
+            "parser_version": "21-05.1"
+          }
+        },
+        {
+          "kind": "photo_grid",
+          "pin_mode": "pinned",
+          "verified": false,
+          "block_provenance": {
+            "region": {
+              "kind": "docx",
+              "paragraph_id": "p-20",
+              "run_start": 0,
+              "run_end": 1
+            },
+            "parser_run_id": "golden-run",
+            "parser_version": "21-05.1"
+          }
+        }
+      ]
+    },
+    {
+      "order": 1,
+      "content": [
+        {
+          "type": "HazardCardBlock",
+          "props": {
+            "id": "id#1.0",
+            "title": "Hazard",
+            "body": "Alkaline solution causes chemical burns.",
+            "severity": "warning",
+            "block_provenance": {
+              "region": {
+                "kind": "docx",
+                "paragraph_id": "p-0",
+                "run_start": 0,
+                "run_end": 0
+              },
+              "parser_run_id": "golden-run",
+              "parser_version": "21-05.1"
+            }
+          }
+        },
+        {
+          "type": "HazardCardBlock",
+          "props": {
+            "id": "id#1.1",
+            "title": "Hazard",
+            "body": "Hot surfaces up to 80 degrees Celsius.",
+            "severity": "warning",
+            "block_provenance": {
+              "region": {
+                "kind": "docx",
+                "paragraph_id": "p-0",
+                "run_start": 0,
+                "run_end": 0
+              },
+              "parser_run_id": "golden-run",
+              "parser_version": "21-05.1"
+            }
+          }
+        }
+      ],
+      "junctions": [
+        {
+          "kind": "hazard",
+          "pin_mode": "pinned",
+          "verified": false,
+          "block_provenance": {
+            "region": {
+              "kind": "docx",
+              "paragraph_id": "p-0",
+              "run_start": 0,
+              "run_end": 0
+            },
+            "parser_run_id": "golden-run",
+            "parser_version": "21-05.1"
+          }
+        },
+        {
+          "kind": "hazard",
+          "pin_mode": "pinned",
+          "verified": false,
+          "block_provenance": {
+            "region": {
+              "kind": "docx",
+              "paragraph_id": "p-0",
+              "run_start": 0,
+              "run_end": 0
+            },
+            "parser_run_id": "golden-run",
+            "parser_version": "21-05.1"
+          }
+        }
+      ]
+    },
+    {
+      "order": 2,
+      "content": [
+        {
+          "type": "PPECardBlock",
+          "props": {
+            "id": "id#2.0",
+            "title": "PPE Required",
+            "items": [
+              "Chemical-resistant gloves",
+              "Face shield",
+              "Apron"
+            ],
+            "block_provenance": {
+              "region": {
+                "kind": "docx",
+                "paragraph_id": "p-0",
+                "run_start": 0,
+                "run_end": 0
+              },
+              "parser_run_id": "golden-run",
+              "parser_version": "21-05.1"
+            }
+          }
+        }
+      ],
+      "junctions": [
+        {
+          "kind": "ppe",
+          "pin_mode": "pinned",
+          "verified": false,
+          "block_provenance": {
+            "region": {
+              "kind": "docx",
+              "paragraph_id": "p-0",
+              "run_start": 0,
+              "run_end": 0
+            },
+            "parser_run_id": "golden-run",
+            "parser_version": "21-05.1"
+          }
+        }
+      ]
+    },
+    {
+      "order": 3,
+      "content": [
+        {
+          "type": "StepBlock",
+          "props": {
+            "id": "id#3.0",
+            "number": 1,
+            "text": "Switch off the agitator and confirm zero energy.",
+            "block_provenance": {
+              "region": {
+                "kind": "docx",
+                "paragraph_id": "p-0",
+                "run_start": 0,
+                "run_end": 0
+              },
+              "parser_run_id": "golden-run",
+              "parser_version": "21-05.1"
+            }
+          }
+        },
+        {
+          "type": "CalloutBlock",
+          "props": {
+            "id": "id#3.1",
+            "title": "Warning",
+            "body": "Do not proceed until lockout is verified.",
+            "block_provenance": {
+              "region": {
+                "kind": "docx",
+                "paragraph_id": "p-0",
+                "run_start": 0,
+                "run_end": 0
+              },
+              "parser_run_id": "golden-run",
+              "parser_version": "21-05.1"
+            }
+          }
+        },
+        {
+          "type": "StepWithPhotosBlock",
+          "props": {
+            "id": "id#3.2",
+            "number": 2,
+            "text": "Lift the parts basket clear of the solution.",
+            "photos": [
+              {
+                "src": "org/sop/images/img_0.png",
+                "alt": "Image 0",
+                "caption": null
+              }
+            ],
+            "layout": "right",
+            "block_provenance": {
+              "region": {
+                "kind": "docx",
+                "paragraph_id": "p-10",
+                "run_start": 0,
+                "run_end": 1
+              },
+              "parser_run_id": "golden-run",
+              "parser_version": "21-05.1"
+            }
+          }
+        },
+        {
+          "type": "CalloutBlock",
+          "props": {
+            "id": "id#3.3",
+            "title": "Caution",
+            "body": "Basket is heavy when loaded.",
+            "block_provenance": {
+              "region": {
+                "kind": "docx",
+                "paragraph_id": "p-10",
+                "run_start": 0,
+                "run_end": 1
+              },
+              "parser_run_id": "golden-run",
+              "parser_version": "21-05.1"
+            }
+          }
+        },
+        {
+          "type": "CalloutBlock",
+          "props": {
+            "id": "id#3.4",
+            "title": "Tip",
+            "body": "Use the overhead hoist.",
+            "block_provenance": {
+              "region": {
+                "kind": "docx",
+                "paragraph_id": "p-10",
+                "run_start": 0,
+                "run_end": 1
+              },
+              "parser_run_id": "golden-run",
+              "parser_version": "21-05.1"
+            }
+          }
+        },
+        {
+          "type": "StepWithPhotosBlock",
+          "props": {
+            "id": "id#3.5",
+            "number": 3,
+            "text": "Rinse parts at the wash station.",
+            "photos": [
+              {
+                "src": "org/sop/images/img_1.png",
+                "alt": "Image 1",
+                "caption": null
+              },
+              {
+                "src": "org/sop/images/img_2.png",
+                "alt": "Image 2",
+                "caption": null
+              }
+            ],
+            "layout": "grid-2",
+            "block_provenance": {
+              "region": {
+                "kind": "docx",
+                "paragraph_id": "p-14",
+                "run_start": 0,
+                "run_end": 1
+              },
+              "parser_run_id": "golden-run",
+              "parser_version": "21-05.1"
+            }
+          }
+        }
+      ],
+      "junctions": [
+        {
+          "kind": "step",
+          "pin_mode": "pinned",
+          "verified": false,
+          "block_provenance": {
+            "region": {
+              "kind": "docx",
+              "paragraph_id": "p-0",
+              "run_start": 0,
+              "run_end": 0
+            },
+            "parser_run_id": "golden-run",
+            "parser_version": "21-05.1"
+          }
+        },
+        {
+          "kind": "callout",
+          "pin_mode": "pinned",
+          "verified": false,
+          "block_provenance": {
+            "region": {
+              "kind": "docx",
+              "paragraph_id": "p-0",
+              "run_start": 0,
+              "run_end": 0
+            },
+            "parser_run_id": "golden-run",
+            "parser_version": "21-05.1"
+          }
+        },
+        {
+          "kind": "step_with_photos",
+          "pin_mode": "pinned",
+          "verified": false,
+          "block_provenance": {
+            "region": {
+              "kind": "docx",
+              "paragraph_id": "p-10",
+              "run_start": 0,
+              "run_end": 1
+            },
+            "parser_run_id": "golden-run",
+            "parser_version": "21-05.1"
+          }
+        },
+        {
+          "kind": "callout",
+          "pin_mode": "pinned",
+          "verified": false,
+          "block_provenance": {
+            "region": {
+              "kind": "docx",
+              "paragraph_id": "p-10",
+              "run_start": 0,
+              "run_end": 1
+            },
+            "parser_run_id": "golden-run",
+            "parser_version": "21-05.1"
+          }
+        },
+        {
+          "kind": "callout",
+          "pin_mode": "pinned",
+          "verified": false,
+          "block_provenance": {
+            "region": {
+              "kind": "docx",
+              "paragraph_id": "p-10",
+              "run_start": 0,
+              "run_end": 1
+            },
+            "parser_run_id": "golden-run",
+            "parser_version": "21-05.1"
+          }
+        },
+        {
+          "kind": "step_with_photos",
+          "pin_mode": "pinned",
+          "verified": false,
+          "block_provenance": {
+            "region": {
+              "kind": "docx",
+              "paragraph_id": "p-14",
+              "run_start": 0,
+              "run_end": 1
+            },
+            "parser_run_id": "golden-run",
+            "parser_version": "21-05.1"
+          }
+        }
+      ]
+    }
+  ]
+}
