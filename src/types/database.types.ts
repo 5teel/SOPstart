@@ -235,6 +235,60 @@ export type Database = {
           },
         ]
       }
+      sop_image_annotations: {
+        Row: {
+          baked_at: string | null
+          baked_storage_path: string | null
+          created_at: string
+          id: string
+          natural_height: number | null
+          natural_width: number | null
+          organisation_id: string
+          scene: Json
+          sop_image_id: string
+          updated_at: string
+        }
+        Insert: {
+          baked_at?: string | null
+          baked_storage_path?: string | null
+          created_at?: string
+          id?: string
+          natural_height?: number | null
+          natural_width?: number | null
+          organisation_id: string
+          scene: Json
+          sop_image_id: string
+          updated_at?: string
+        }
+        Update: {
+          baked_at?: string | null
+          baked_storage_path?: string | null
+          created_at?: string
+          id?: string
+          natural_height?: number | null
+          natural_width?: number | null
+          organisation_id?: string
+          scene?: Json
+          sop_image_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sop_image_annotations_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sop_image_annotations_sop_image_id_fkey"
+            columns: ["sop_image_id"]
+            isOneToOne: false
+            referencedRelation: "sop_images"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sop_sections: {
         Row: {
           approved: boolean
