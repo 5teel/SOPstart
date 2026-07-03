@@ -3,14 +3,13 @@ gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
 status: 26-14 complete — PHASE 26 COMPLETE (frozen-contract proof R6/R8 + Puck fully removed, D-01 end-state)
-stopped_at_prev: Completed 26-12-PLAN.md (W8, R8 — re-earned Puck's componentOverlay bindings on the bespoke canvas, all behaviourally proven per CLAUDE.md 2026-06-05). selection-bridge.ts (pure selectBlock/resolveRegion/resolveComponentIdFromSource) + BlockEditShell/EditableDocument re-wire: **P12** canvas↔source selection-sync (block focus → setActiveProvenance(region, junctionId); source click → focus [data-block-id]; [data-puck-item-id]→[data-block-id] repoint); **P13** ⚑ AI-flag header badge (--ai purple) toggling the reused inline ReviewerFlagsPanel (one open at a time via openFlagsFor) + reused 13-04 PuckItemBadgeOverlay update badge; **P9** dashed "Reference images" chip on Unanchored-figures HeadingBlocks; **P8** single-block "✦ tap to verify"→"✓ verified" chip writing through the EXISTING verifyBlock/unverifyBlock actions + verify-checklist query invalidation. Server publish route (`/api/sops/[sopId]/publish` 400 unverified_blocks) + useSelectionSync.tsx BOTH git-diff empty (reused UNCHANGED; only callers moved off Puck). 3 behavioural specs: selection-sync (spy on setActiveProvenance both directions), ai-overlay (seeds reviewer query → real FlagBadge row renders), verify-gate (invokes the REAL route handler with mocked Supabase → 400/200 paths). phase26 **85 green**, no-bulk-verify guard green (R8), tsc clean, next build green (worker bundle **Δ0KB** — admin-only overlays didn't leak). BuilderClient unchanged (26-04 split the canvas host to EditableDocument; plan's Puck-era line refs stale — noted as Rule-3 adjustment).
-stopped_at: Completed 26-14-PLAN.md (W10 final — close Phase 26). R6 convert-golden byte-equivalence (frozen deterministic converter unchanged) + new spine-regression.spec sweep the R8 invariants (publish 400 unverified_blocks gate; junctionId+block_provenance survive content-ops edit/reorder/duplicate — behavioural; every converted junction pinned/unverified/provenanced; no-bulk-verify lock; append-only completions). @puckeditor/core REMOVED from package.json+lockfile+node_modules; puck-config.tsx DELETED (dead — render place is block-registry since 26-03, fields bespoke since 26-06/07); last real consumers dropped (puck.css import in page.tsx, Data type in useBuilderAutosave). field-map P14 parity repointed to a committed puck-field-baseline.json fixture (0-unreachable, 18 blocks preserved with the live source gone); builder-edit-stage E3/E4/E3-bespoke repointed to the bespoke end-state. journeys.ts Build-stage enriched (edit==worker parity, Konva bake) + 2 Phase-26 UAT items added (p26-edit-worker-parity, p26-baked-annotation-on-worker-read). phase26 **102 green**, tsc clean, real `npm run build` green, worker bundle **Δ0KB** with Puck absent. Out-of-scope: pre-existing RED Phase-11 Puck-contract specs (sb-*.test.ts) logged to deferred-items.md. Next: Phase 26 verify/code-review, then Phase 26.5 (agent-metadata layer).
-last_updated: "2026-07-03T23:30:00.000Z"
+stopped_at: Phase 26 COMPLETE — verified PASS-WITH-NOTES (8/8 R, P1-P18 dispositioned, Puck removed). Awaiting push/deploy decision + 3 on-device UAT residuals.
+last_updated: "2026-07-03T10:32:13.014Z"
 progress:
   total_phases: 29
   completed_phases: 4
-  total_plans: 26
-  completed_plans: 26
+  total_plans: 21
+  completed_plans: 21
   percent: 14
 ---
 
@@ -398,7 +397,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-03T22:30:00.000Z
-Stopped at: Completed 26-13-PLAN.md (annotation persistence + bake-on-publish — R5/R8, D-03 slice 3, closes the absorbed Phase 17 arc). saveAnnotation + bakeAnnotation server actions (service-role, org self-enforce via parseJwtPayload, async-only 'use server' with pure baked-path helpers split to src/lib/builder/baked-path.ts); client bake-on-publish.ts (stage.toDataURL → content-versioned baked PNG); VisualBlock baked-vs-raw worker read (Konva-free); annotate launch wired MediaGrid→DiagramAnnotateModal→AnnotationEditorLoader (26-11 editor now reachable from a route); deleted the 26-05 konva-spike route. 27 phase26 specs green, tsc clean, next build green, worker bundle Δ0KB Konva-isolated. Known Stub: diagram VisualItems need sopImageId populated at parse/upload before "Save & bake" enables for hand-added slots. 26-11 device-UX residual now unblocked — verify on sopstart.com post-deploy. Next: 26-14 (final wave — convert-golden-path regression / phase close).
+Last session: 2026-07-03T10:32:13.003Z
+Stopped at: Phase 26 COMPLETE — verified PASS-WITH-NOTES (8/8 R, P1-P18 dispositioned, Puck removed). Awaiting push/deploy decision + 3 on-device UAT residuals.
 Resume file:
-None
+.planning/phases/26-sop-builder-redesign/26-VERIFICATION.md
