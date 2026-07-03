@@ -228,14 +228,17 @@ export function BlockEditShell({
           className="space-y-1.5 border-t border-[var(--ink-300,#d4d4d8)] px-4 py-2 opacity-0 group-hover:opacity-100"
         >
           {specs.map((spec) => (
-            <FieldControl
-              key={spec.field}
-              spec={spec}
-              item={item}
-              accent={accent}
-              onCommitField={onCommitField}
-              onOpenPanel={() => setPanelOpen(true)}
-            />
+            // data-field is the P14 reachability hook: every Puck-editable field
+            // renders exactly one affordance row (parity test asserts 0 missing).
+            <div key={spec.field} data-field={spec.field}>
+              <FieldControl
+                spec={spec}
+                item={item}
+                accent={accent}
+                onCommitField={onCommitField}
+                onOpenPanel={() => setPanelOpen(true)}
+              />
+            </div>
           ))}
         </div>
       )}

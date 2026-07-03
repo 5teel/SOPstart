@@ -35,3 +35,11 @@ test.describe('field-panel — Pattern C edit + persist (P14)', () => {
     expect(runHarness('field-panel-check.tsx')).toContain('FIELD-PANEL OK')
   })
 })
+
+test.describe('reachability — 0 unreachable fields, all 17 blocks (P14)', () => {
+  test('reachability: every Puck field renders an affordance; A/B/C/D drive valid layout_data', () => {
+    expect(runHarness('field-panel-reachability-check.tsx')).toContain(
+      'FIELD-PANEL-REACHABILITY OK'
+    )
+  })
+})
