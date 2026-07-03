@@ -137,10 +137,35 @@ if (totalKB <= 0) {
   fail(`Computed baseline is ${totalKB} KB — refusing to write a useless baseline.`)
 }
 
+// Carry the prior baseline forward as history so a re-capture never silently
+// erases the previous floor (the enforced number lives in routes[ROUTE]).
+type PriorBaseline = {
+  capturedAt?: string
+  note?: string
+  routes?: Record<string, number>
+}
+let previousBaseline: { value: number; capturedAt?: string; note?: string } | undefined
+if (fs.existsSync(BASELINE_FILE)) {
+  try {
+    const prior = JSON.parse(fs.readFileSync(BASELINE_FILE, 'utf-8')) as PriorBaseline
+    const priorValue = prior.routes?.[ROUTE]
+    if (typeof priorValue === 'number') {
+      previousBaseline = {
+        value: priorValue,
+        capturedAt: prior.capturedAt,
+        note: prior.note,
+      }
+    }
+  } catch {
+    // Corrupt/absent prior baseline — capture a fresh one without history.
+  }
+}
+
 const payload = {
   capturedAt: new Date().toISOString(),
   note:
-    'Pre-Phase-15 First Load JS baseline for the mobile worker route. Wave 4 enforces ≤ +2KB delta. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts.',
+    'First Load JS baseline for the mobile worker route (/sops/[sopId]). Postbuild check-bundle-size enforces ≤ +2KB delta. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts.',
+  ...(previousBaseline ? { previousBaseline } : {}),
   routes: {
     [ROUTE]: totalKB,
   },

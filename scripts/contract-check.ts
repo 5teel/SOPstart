@@ -1,9 +1,14 @@
 /**
- * Build-time enforcement of the three-place block contract
- * (see src/lib/builder/puck-config.tsx:399-418).
+ * Build-time enforcement of the three-place block contract.
+ *
+ * Phase 26 (D-01): place (1) moved off the soon-dead Puck config onto the
+ * bespoke renderer registry `src/lib/builder/block-registry.tsx`. If this is
+ * ever repointed back at a dead file the gate silently passes (RESEARCH
+ * Pitfall 1) — `tests/phase26/contract-check-target.spec.ts` asserts the path
+ * below equals the live registry.
  *
  * For each block type, the following MUST be true:
- *   1. It is a key of puckConfig.components
+ *   1. It is a key of BLOCK_COMPONENTS in src/lib/builder/block-registry.tsx
  *   2. It is a key of BLOCK_REGISTRY in src/actions/introspection.ts
  *   3. Its 'kind' literal appears in BlockContentSchema discriminatedUnion
  *      in src/lib/validators/blocks.ts
@@ -20,15 +25,19 @@
  */
 import fs from 'node:fs'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
-const PUCK_CONFIG = path.join(ROOT, 'src/lib/builder/puck-config.tsx')
+// Phase 26 D-01: place (1) is the bespoke registry, not puck-config. Exported so
+// the Pitfall-1 guard spec can assert this targets the live registry file.
+export const BLOCK_REGISTRY_FILE = path.join(ROOT, 'src/lib/builder/block-registry.tsx')
 const INTROSPECTION = path.join(ROOT, 'src/actions/introspection.ts')
 const VALIDATORS = path.join(ROOT, 'src/lib/validators/blocks.ts')
 
-// Blocks excluded from BLOCK_REGISTRY check (Puck-internal fallbacks)
+// Blocks excluded from BLOCK_REGISTRY check (render-only fallbacks). The
+// bespoke BLOCK_COMPONENTS map already omits UnsupportedBlockPlaceholder
+// (it lives in sanitize-layout), but keep the exclusion for defence in depth.
 const EXCLUDED_FROM_REGISTRY = new Set(['UnsupportedBlockPlaceholder'])
 
 // Blocks excluded from BlockContentSchema check.
@@ -110,9 +119,10 @@ function extractTopLevelPascalKeys(body: string): string[] {
   return [...keys]
 }
 
-function extractPuckComponentKeys(src: string): string[] {
-  // Find `components: {` inside puckConfig object
-  const body = extractObjectBody(src, /components\s*:\s*\{/)
+function extractRegistryComponentKeys(src: string): string[] {
+  // Find the `export const BLOCK_COMPONENTS = { … } as const` object literal in
+  // block-registry.tsx and extract its top-level PascalCase keys.
+  const body = extractObjectBody(src, /BLOCK_COMPONENTS\s*=\s*\{/)
   return extractTopLevelPascalKeys(body)
 }
 
@@ -164,11 +174,11 @@ function extractValidatorKinds(src: string): string[] {
 }
 
 function main(): void {
-  const puckSrc = fs.readFileSync(PUCK_CONFIG, 'utf8')
+  const registrySrc = fs.readFileSync(BLOCK_REGISTRY_FILE, 'utf8')
   const introSrc = fs.readFileSync(INTROSPECTION, 'utf8')
   const valSrc = fs.readFileSync(VALIDATORS, 'utf8')
 
-  const puckKeys = new Set(extractPuckComponentKeys(puckSrc))
+  const puckKeys = new Set(extractRegistryComponentKeys(registrySrc))
   const regKeys = new Set(extractRegistryKeys(introSrc))
   const valKinds = new Set(extractValidatorKinds(valSrc))
 
@@ -179,7 +189,7 @@ function main(): void {
     if (EXCLUDED_FROM_REGISTRY.has(k)) continue
     if (!regKeys.has(k)) {
       errors.push(
-        `[1→2] Block "${k}" is in puckConfig.components but NOT in BLOCK_REGISTRY`
+        `[1→2] Block "${k}" is in BLOCK_COMPONENTS but NOT in BLOCK_REGISTRY`
       )
     }
   }
@@ -187,7 +197,7 @@ function main(): void {
   for (const k of regKeys) {
     if (!puckKeys.has(k)) {
       errors.push(
-        `[2→1] Block "${k}" is in BLOCK_REGISTRY but NOT in puckConfig.components`
+        `[2→1] Block "${k}" is in BLOCK_REGISTRY but NOT in BLOCK_COMPONENTS`
       )
     }
   }
@@ -197,7 +207,7 @@ function main(): void {
     const expectedKind = nameToKind(k)
     if (!valKinds.has(expectedKind)) {
       errors.push(
-        `[1→3] Block "${k}" (expected kind "${expectedKind}") is in puckConfig.components but NOT in BlockContentSchema discriminated union`
+        `[1→3] Block "${k}" (expected kind "${expectedKind}") is in BLOCK_COMPONENTS but NOT in BlockContentSchema discriminated union`
       )
     }
   }
@@ -206,7 +216,7 @@ function main(): void {
     console.error('THREE-PLACE CONTRACT BROKEN:')
     for (const e of errors) console.error('  -', e)
     console.error(
-      '\npuckConfig.components:',
+      '\nBLOCK_COMPONENTS:',
       [...puckKeys].sort().join(', ')
     )
     console.error('BLOCK_REGISTRY:       ', [...regKeys].sort().join(', '))
@@ -215,9 +225,15 @@ function main(): void {
   }
 
   console.log('OK. Three-place contract intact.')
-  console.log(`  puckConfig.components: ${puckKeys.size} blocks`)
+  console.log(`  BLOCK_COMPONENTS:   ${puckKeys.size} blocks`)
   console.log(`  BLOCK_REGISTRY:        ${regKeys.size} blocks`)
   console.log(`  BlockContentSchema:    ${valKinds.size} kinds`)
 }
 
-main()
+// Run the gate only when executed directly (prebuild / `contract:check`), not
+// when imported by the Pitfall-1 guard spec — otherwise main() would run the
+// full check + process.exit inside the test runner.
+const isMain =
+  typeof process.argv[1] === 'string' &&
+  import.meta.url === pathToFileURL(process.argv[1]).href
+if (isMain) main()

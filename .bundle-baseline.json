@@ -1,10 +1,10 @@
 {
-  "capturedAt": "2026-06-25T12:12:01.091Z",
-  "note": "Re-baselined 2026-06-25 (1107 → 1054 KB, -53 KB) after REMOVING the Cmd+K command palette (cmdk dep + CommandPalette.tsx + CmdKProvider.tsx + sops/layout.tsx) per product decision — Cmd+K is no longer part of SOPstart. This lowered the mobile worker bundle; re-baselining to the new floor so future growth is measured honestly. Isolation gates still pass. Forward enforcement: any drift > +2 KB from 1054 is a real regression. DO NOT edit by hand for bloat — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts.",
+  "capturedAt": "2026-07-03T04:09:37.365Z",
+  "note": "First Load JS baseline for the mobile worker route (/sops/[sopId]). Postbuild check-bundle-size enforces ≤ +2KB delta. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts.",
   "previousBaseline": {
-    "value": 1107,
-    "capturedAt": "2026-06-24T09:29:21.999Z",
-    "note": "Role-aware navigation re-baseline (RoleProvider + Edit-in-builder link). Superseded by the 2026-06-25 Cmd+K-removal re-baseline."
+    "value": 1054,
+    "capturedAt": "2026-06-25T12:12:01.091Z",
+    "note": "Re-baselined 2026-06-25 (1107 → 1054 KB, -53 KB) after REMOVING the Cmd+K command palette (cmdk dep + CommandPalette.tsx + CmdKProvider.tsx + sops/layout.tsx) per product decision — Cmd+K is no longer part of SOPstart. This lowered the mobile worker bundle; re-baselining to the new floor so future growth is measured honestly. Isolation gates still pass. Forward enforcement: any drift > +2 KB from 1054 is a real regression. DO NOT edit by hand for bloat — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts."
   },
   "routes": {
     "/sops/[sopId]/page": 1054
