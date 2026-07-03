@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
-status: 26-11 complete (Task-3 device-UX carried as deferred-residual)
-stopped_at: Completed 26-11-PLAN.md (R5/D-03 slice 2 — absorbed Phase 17 annotation primitives). annotation-tools.ts (PURE scene-JSON model: Arrow/Rect/Ellipse/Text/numbered-callout/freehand factories, snapshot undo/redo, non-destructive serialize, acceptsPointer palm-rejection) + AnnotationEditor.tsx upgraded from the 26-05 spike shell to the full react-konva editor (Konva.Transformer resize/rotate, textarea text-edit overlay, Delete + Cmd/Ctrl+Z, Pen-only palm rejection, stage.destroy teardown) + DiagramHotspotBlock.tsx (the ONLY freeform surface — numbered callouts at freeform x/y in natural-image space, annotationId-linked, same scene model). annotation-primitives.spec 14 green (primitives/undo-redo/serialize-no-image/palm-reject/hotspot coordinate-stability/source-contract), tsc clean, next build green, worker bundle Δ0KB Konva-free (isolation gate green). Persist deferred to 26-13. **Task-3 human-verify UX gate carried as DEFERRED-RESIDUAL, not blocking** — on-device draw/select/undo/palm-reject/re-edit feel is unverifiable until 26-13 wires the annotate→save→reopen launch point (nothing mounts the editor from a route yet); deferred per the v3.0 device-verification precedent and recorded as UAT item `p26-annotation-editor-feel` to run on sopstart.com after 26-13.
-last_updated: "2026-07-03T20:05:00.000Z"
+status: 26-12 complete (spine re-wire — behavioural parity P12/P13/P9/P8)
+stopped_at: Completed 26-12-PLAN.md (W8, R8 — re-earned Puck's componentOverlay bindings on the bespoke canvas, all behaviourally proven per CLAUDE.md 2026-06-05). selection-bridge.ts (pure selectBlock/resolveRegion/resolveComponentIdFromSource) + BlockEditShell/EditableDocument re-wire: **P12** canvas↔source selection-sync (block focus → setActiveProvenance(region, junctionId); source click → focus [data-block-id]; [data-puck-item-id]→[data-block-id] repoint); **P13** ⚑ AI-flag header badge (--ai purple) toggling the reused inline ReviewerFlagsPanel (one open at a time via openFlagsFor) + reused 13-04 PuckItemBadgeOverlay update badge; **P9** dashed "Reference images" chip on Unanchored-figures HeadingBlocks; **P8** single-block "✦ tap to verify"→"✓ verified" chip writing through the EXISTING verifyBlock/unverifyBlock actions + verify-checklist query invalidation. Server publish route (`/api/sops/[sopId]/publish` 400 unverified_blocks) + useSelectionSync.tsx BOTH git-diff empty (reused UNCHANGED; only callers moved off Puck). 3 behavioural specs: selection-sync (spy on setActiveProvenance both directions), ai-overlay (seeds reviewer query → real FlagBadge row renders), verify-gate (invokes the REAL route handler with mocked Supabase → 400/200 paths). phase26 **85 green**, no-bulk-verify guard green (R8), tsc clean, next build green (worker bundle **Δ0KB** — admin-only overlays didn't leak). BuilderClient unchanged (26-04 split the canvas host to EditableDocument; plan's Puck-era line refs stale — noted as Rule-3 adjustment).
+last_updated: "2026-07-03T21:30:00.000Z"
 progress:
   total_phases: 29
   completed_phases: 4
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 26 (sop-builder-redesign) — EXECUTING
-Plan: 11 of 14 complete
+Plan: 12 of 14 complete
 **Milestone status:** **v4.0 ✅ shipped 2026-07-02** (Phases 21, 21.5, 21.6, 22, 23, 24, 25 executed + code-reviewed; residual = human UAT on 21.6/22/23/25, carried per v3.0 field-verification precedent — archive via `/gsd-complete-milestone`). **v5.0 opened 2026-07-02** — Phase 26 (bespoke inline builder; Phase 17 Konva absorbed) → Phase 26.5 (agent-metadata layer on X-03 + graphify).
 
 **Active phase:** 26
