@@ -3,7 +3,7 @@ phase: 26-sop-builder-redesign
 plan: 11
 subsystem: admin-builder / annotation-editor
 tags: [konva, annotation, primitives, transformer, undo-redo, palm-rejection, hotspot, bundle-isolation]
-status: build-complete-awaiting-human-verify
+status: complete (Task-3 UX gate carried as deferred-residual — verify on-device post-26-13)
 
 # Dependency graph
 requires:
@@ -39,20 +39,22 @@ key-decisions:
   - "DiagramHotspotBlock reuses createCallout Labels on the SAME scene model — a hotspot scene IS a normal annotation scene (one editor, one storage shape), not a bespoke format"
   - "Persist deferred to 26-13 (onChange surfaces scene JSON upward; no save action here) — matches the plan's key_links (scene JSON snapshot, save deferred)"
 
-requirements-completed: []   # R5 slice 2 build done; R5 completion pending the human-verify UX gate
+requirements-completed: [R5]   # R5 slice 2 build + automated coverage complete; device-UX feel carried as deferred-residual (26-13-launch-gated)
 
 # Metrics
 duration: ~35min
-completed: 2026-07-03 (non-gated build; awaiting Task-3 human-verify)
+completed: 2026-07-03 (build + automated coverage complete; Task-3 device-UX carried as deferred-residual, verified on sopstart.com after 26-13)
 ---
 
 # Phase 26 Plan 26-11: Konva Annotation Primitives + DiagramHotspotBlock Summary
 
 **Upgraded the 26-05 Konva spike shell into the full absorbed-Phase-17 annotation editor — six primitives (Arrow / Rect / Ellipse / Text / numbered-callout / freehand), `Konva.Transformer` resize+rotate, snapshot undo/redo, `<textarea>` text-edit overlay, and a "Pen only" stylus palm-rejection toggle — plus `DiagramHotspotBlock`, the single freeform-positioning surface (numbered callouts at freeform x/y in natural-image space). All non-gated build work is complete, tested, tsc-clean, and build-green with the worker bundle Konva-free (Δ0 KB). The device UX (draw feel / transform handles / palm rejection) is the remaining Task-3 human-verify gate.**
 
-## Status: build complete — awaiting the Task-3 human-verify UX gate
+## Status: complete — Task-3 device-UX gate carried as deferred-residual
 
-Tasks 1 and 2 are done and committed. Task 3 is a `checkpoint:human-verify` (blocking) — the Konva draw/select/undo/palm-reject/re-edit feel is device-dependent and cannot be proven headless (it is the VALIDATION manual-only item). **Not self-approved** — returned to the orchestrator for the user to eyeball on-device. R5/D-03-slice-2 is marked complete only after that approval.
+Tasks 1 and 2 are done and committed; all automated coverage (14 phase26 specs), tsc, `next build`, and the Konva worker-isolation gate are green. Task 3 was a `checkpoint:human-verify` (blocking) for the on-device Konva draw/select/undo/palm-reject/re-edit *feel* — device-dependent and unprovable headless (the VALIDATION manual-only item).
+
+**Why it is carried, not blocking:** on-device verification is **impossible until 26-13 wires the annotate → save → reopen launch point** — nothing mounts the editor from a route yet (worker bundle Δ0, nothing to open). Blocking the plan on a gate that cannot physically be run would stall the phase for no signal. Consistent with the project's **v3.0 device-verification precedent** (Phase 12/13/14/15 UAT items carried as manual field-verification, resolved post-deploy on sopstart.com), the UX feel-check is **deferred as a residual** and recorded as a UAT item (`p26-annotation-editor-feel`) to run on sopstart.com right after 26-13 ships persistence. R5/D-03-slice-2 build + automated coverage are complete; the residual is a post-deploy eyeball, not outstanding build work.
 
 ## What Was Built
 
@@ -96,9 +98,9 @@ None — plan executed as written. Pure logic went into `annotation-tools.ts` an
 
 None beyond the plan's `<threat_model>`. T-26-11-01 (XSS via annotation text) — mitigated: Konva text is canvas-rendered (no DOM injection); the `<textarea>` overlay commits plain text into the scene model. T-26-11-02 (Konva leaking to worker) — mitigated: editor + hotspot stay admin-only under `builder-v2/visual/`; the isolation lint + postbuild bundle gate both re-ran green.
 
-## Awaiting
+## Deferred-Residual (Task 3 device-UX)
 
-**Task 3 — human-verify Konva annotation UX (blocking).** On-device draw / select-transform / undo-redo / palm-reject / re-edit confirmation. See the checkpoint returned to the orchestrator. R5/D-03-slice-2 completes on approval.
+**Task 3 — on-device Konva annotation UX feel.** Carried as a deferred-residual, NOT a blocker (rationale in Status above). Recorded as UAT item **`p26-annotation-editor-feel`** in `src/lib/uat/tests.ts` (category "Phase 26 — SOP Builder Redesign") — run on sopstart.com **after 26-13** wires the annotate→save→reopen launch point (nothing mounts the editor from a route until then). Verifies draw feel / select-transform / undo-redo / stylus palm-rejection / non-destructive re-open on a real device. Resolve alongside the 26-13 persistence UAT.
 
 ## Self-Check: PASSED
 

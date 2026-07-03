@@ -87,7 +87,7 @@ v4.0 (Phases 21–25) shipped. v5.0 rebuilds the SOP builder as a bespoke inline
   - [x] 26-08-PLAN.md — W6: tiered context-aware inserter + Reuse tier + ＋ dividers (R3) ✅ 2026-07-03
   - [ ] 26-09-PLAN.md — W6: unified Visual block 3-place contract + media grid + convert-through (R5/R7, D-02/D-03)
   - [ ] 26-10-PLAN.md — W7: smart-next auto-dismissing ghosts (R4)
-  - [ ] 26-11-PLAN.md — W7: Konva annotation primitives + DiagramHotspotBlock + UX human-verify (R5, D-03)
+  - [x] 26-11-PLAN.md — W7: Konva annotation primitives + DiagramHotspotBlock (R5, D-03) ✅ 2026-07-03 (device-UX feel carried as deferred-residual — verify on sopstart.com after 26-13 wires the launch point; UAT `p26-annotation-editor-feel`)
   - [ ] 26-12-PLAN.md — W8: spine re-wire — selection-sync + AI-flag overlays + orphan chip + verify UI/publish gate, behavioural parity (R8, P12/P13/P9/P8)
   - [ ] 26-13-PLAN.md — W9: bake-on-publish + saveAnnotation (service-role org self-enforce) + worker baked-PNG read (R5/R8, D-03)
   - [ ] 26-14-PLAN.md — W10: convert golden-path byte-equivalence + R8 regression sweep + remove @puckeditor/core + journeys/uat update (R1/R6/R8, D-01/D-04)

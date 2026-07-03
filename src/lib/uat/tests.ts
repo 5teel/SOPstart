@@ -416,6 +416,34 @@ export const UAT_TESTS: UatTest[] = [
     background:
       'AFL-VER-04 / D-08 (updated-since indicator). Badge triggers when sop.published_at > worker\'s last completion. SopLibraryCard renders data-updated-badge when the showUpdatedBadge prop is true. The prop is derived server-side by comparing the SOP\'s current published_at against the most recent sop_completions.completed_at for that worker+SOP pair.',
   },
+  {
+    id: 'p26-annotation-editor-feel',
+    dateAdded: '2026-07-03',
+    category: 'Phase 26 — SOP Builder Redesign',
+    title: 'Does drawing on a diagram feel right on a real device?',
+    status: 'active',
+    summary:
+      'When editing a procedure you can now draw on a diagram — arrows, boxes, circles, numbered markers and freehand — and drag or resize what you drew. This one is about how it FEELS to draw on a touchscreen or with a stylus, which we can only judge on a real device. (Available once the annotate button is wired in a later step; verify after that ships.)',
+    tryIt: [
+      'Open a procedure in the builder, add a Visual block, add a diagram, and open the annotation editor.',
+      'Draw an arrow, a box, a numbered marker, and a freehand line.',
+      'Tap one shape and resize/rotate it with the handles; undo and redo a couple of times.',
+      'Turn on "Pen only" and confirm resting your palm or a finger does not draw while the pen does (iPad if you have one).',
+      'Close and re-open the same diagram — confirm exactly what you drew comes back.',
+    ],
+    links: [
+      { label: 'SOP management (admin — builder)', href: '/admin/sops' },
+    ],
+    questions: [
+      { id: 'draw-feel', text: 'Did drawing shapes feel smooth and responsive?' },
+      { id: 'transform', text: 'Could you easily select, move and resize a shape?' },
+      { id: 'undo-redo', text: 'Did undo and redo behave as you expected?' },
+      { id: 'palm-reject', text: 'With "Pen only" on, did it ignore your palm/finger while the pen drew?' },
+      { id: 'reopen', text: 'After closing and re-opening, did your annotations reload exactly?' },
+    ],
+    background:
+      'Phase 26-11 Task 3 residual (R5 / D-03 slice 2). The Konva annotation editor (AnnotationEditor.tsx + DiagramHotspotBlock.tsx, admin-only, dynamic-imported) plus its pure scene model (annotation-tools.ts) are built and machine-tested (14 phase26 specs green: primitives, undo/redo, non-destructive serialize, palm-reject, hotspot coordinate-stability; tsc clean; worker bundle Konva-free Δ0). The draw/transform/palm-reject FEEL is device-dependent and cannot be proven headless — carried as a deferred-residual per the v3.0 device-verification precedent. On-device verification is only possible once 26-13 wires the annotate→save→reopen launch point; run this item then, alongside the 26-13 persistence check.',
+  },
 
   // ---------------------------------------------------------------------------
   // TEMPLATE — copy this to put a new design choice or check to the team.
