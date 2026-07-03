@@ -73,6 +73,13 @@ interface BlockEditShellProps {
   onToggleFlags?: () => void
   /** Refresh junctions after the update-available badge Accept/Decline. */
   onReviewed?: () => void
+  /**
+   * P8 per-block verify (26-12). Single-block verify only — NO bulk affordance
+   * (R8 lint guard). Writes through the existing verify action (host-owned);
+   * the server publish gate (400 `unverified_blocks`) stays authoritative.
+   */
+  verified?: boolean
+  onToggleVerify?: () => void
 }
 
 function FieldControl({
@@ -187,6 +194,8 @@ export function BlockEditShell({
   flagsOpen = false,
   onToggleFlags,
   onReviewed,
+  verified = false,
+  onToggleVerify,
 }: BlockEditShellProps) {
   const type = item.type as BlockType
   // Cast to include undefined: item.type may be an unregistered type.
@@ -262,6 +271,25 @@ export function BlockEditShell({
               className="inline-flex items-center gap-1 rounded border border-[var(--accent-ai,#8b5cf6)] bg-[color-mix(in_srgb,var(--accent-ai,#8b5cf6)_12%,transparent)] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-[var(--accent-ai,#8b5cf6)]"
             >
               ⚑ {flagsCount}
+            </button>
+          )}
+          {/* P8 per-block verify chip — single-block only (NO bulk affordance, R8).
+              The server publish gate is authoritative; this just writes the row. */}
+          {junction && (
+            <button
+              type="button"
+              data-verify-chip
+              data-verified={verified ? 'true' : 'false'}
+              aria-pressed={verified}
+              aria-label={verified ? 'Verified — tap to unverify' : 'Tap to verify this block'}
+              onClick={onToggleVerify}
+              className={
+                verified
+                  ? 'inline-flex items-center gap-1 rounded border border-[var(--accent-ok,#10b981)] bg-[color-mix(in_srgb,var(--accent-ok,#10b981)_12%,transparent)] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-[var(--accent-ok,#10b981)]'
+                  : 'inline-flex items-center gap-1 rounded border border-[var(--ink-300,#d4d4d8)] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-[var(--ink-500,#71717a)] hover:border-[var(--accent-ok,#10b981)] hover:text-[var(--accent-ok,#10b981)]'
+              }
+            >
+              {verified ? '✓ verified' : '✦ tap to verify'}
             </button>
           )}
         </div>

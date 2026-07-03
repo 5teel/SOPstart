@@ -29,8 +29,13 @@ import {
   type LayoutItem,
 } from '@/lib/builder/content-ops'
 import { BLOCK_DEFAULTS, type BlockType } from '@/lib/builder/block-registry'
+import { useQueryClient } from '@tanstack/react-query'
 import type { SectionRenderFamily, SopSectionBlockWithUpdate } from '@/types/sop'
-import { listSectionBlocksWithUpdates } from '@/actions/sop-section-blocks'
+import {
+  listSectionBlocksWithUpdates,
+  verifyBlock,
+  unverifyBlock,
+} from '@/actions/sop-section-blocks'
 import { useSelectionSync } from '@/components/admin/source-viewer/useSelectionSync'
 import { useReviewerFlags } from '@/components/admin/ai-reviewer/useReviewerFlags'
 import {
@@ -91,6 +96,9 @@ interface SortableBlockProps {
   flagsOpen: boolean
   onToggleFlags: () => void
   onReviewed: () => void
+  /** P8 per-block verify (26-12). */
+  verified: boolean
+  onToggleVerify: () => void
 }
 
 /**
@@ -113,6 +121,8 @@ function SortableBlock({
   flagsOpen,
   onToggleFlags,
   onReviewed,
+  verified,
+  onToggleVerify,
 }: SortableBlockProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.props.id,
@@ -140,6 +150,8 @@ function SortableBlock({
       flagsOpen={flagsOpen}
       onToggleFlags={onToggleFlags}
       onReviewed={onReviewed}
+      verified={verified}
+      onToggleVerify={onToggleVerify}
     />
   )
 }
@@ -275,6 +287,23 @@ export function EditableDocument({
   // (UI-SPEC: only one flags panel expanded at a time).
   const reviewer = useReviewerFlags(sopId)
   const [openFlagsFor, setOpenFlagsFor] = useState<string | null>(null)
+
+  // P8 per-block verify — writes through the EXISTING verify action (server gate
+  // untouched, authoritative). Refresh junctions (chip state) + invalidate the
+  // shared verify-checklist query so the publish gate re-reads.
+  const queryClient = useQueryClient()
+  const toggleVerify = useCallback(
+    async (jId: string, isVerified: boolean) => {
+      const res = isVerified ? await unverifyBlock(jId) : await verifyBlock(jId)
+      if (!res.ok) {
+        console.warn('[EditableDocument] verify toggle failed', res.error)
+        return
+      }
+      await refreshJunctions()
+      queryClient.invalidateQueries({ queryKey: ['verify-checklist', sopId] })
+    },
+    [refreshJunctions, queryClient, sopId]
+  )
 
   // P12 reverse binding — source-pane click → focus the matching canvas block.
   // `useSelectionSync` returns the no-op default outside the provider (source-
@@ -431,6 +460,10 @@ export function EditableDocument({
                     setOpenFlagsFor((prev) => (prev === item.props.id ? null : item.props.id))
                   }
                   onReviewed={refreshJunctions}
+                  verified={!!junction?.verified_by_admin_id}
+                  onToggleVerify={() => {
+                    if (jId) void toggleVerify(jId, !!junction?.verified_by_admin_id)
+                  }}
                 />
                 {/* Between-blocks hairline; section-end gets the big add bar. */}
                 <InsertDivider
