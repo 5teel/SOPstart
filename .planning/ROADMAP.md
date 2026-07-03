@@ -75,6 +75,22 @@ Bundles the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` v0.3. Planne
 v4.0 (Phases 21–25) shipped. v5.0 rebuilds the SOP builder as a bespoke inline surface and lays the agent-metadata foundation the conversational/AI-native direction (Phase 23 X-03) builds on. Execution order 26 → 26.5. Forks locked in `26-CONTEXT.md` 2026-07-02.
 
 - [ ] **Phase 26: SOP Builder Redesign — Inline Surface (v5.0 opener)** — Replace Puck with a **full bespoke** inline editor: one surface for create / convert / edit where the admin edits the *exact document a worker reads*; a tiered, context-aware block inserter with auto-dismissing smart-suggestion ghosts; a unified **Visual** block (photo · diagram · video) with **full Konva diagram annotation (Phase 17 ABSORBED — D-03)** — all while preserving the frozen `layout_data` / `sop_section_blocks` junction / `block_provenance` contract so the parse → AI-review → verify → publish spine is untouched. Agent-metadata layer split to 26.5 (contract hooks only here — D-02). Highest-effort/-risk engine choice taken deliberately for the highest interface ceiling (D-01). **HARD constraint:** workers never download Konva (baked PNG read path). SPEC: `.planning/phases/26-sop-builder-redesign/26-SPEC.md`; CONTEXT: `26-CONTEXT.md`; sketch: `sketches/sop-builder-redesign/index.html`.
+  **Plans:** 14 plans / 10 waves (heavily-waved per D-01; builder arc + Konva arc run in parallel where files are disjoint)
+
+  - [ ] 26-01-PLAN.md — W1: dependency legitimacy checkpoint + install (@dnd-kit ×3, konva, react-konva)
+  - [ ] 26-02-PLAN.md — W1: phase26 Playwright project + pre-phase convert golden fixture (R6 baseline)
+  - [ ] 26-03-PLAN.md — W2: bespoke block-registry + sanitize-layout + Puck-free LayoutRenderer (read) + contract-check repoint + bundle re-baseline (R2/R6)
+  - [ ] 26-04-PLAN.md — W3: edit canvas — content-ops reducer + EditableDocument + BlockEditShell + InlineText + dnd-kit reorder + autosave re-wire (R1/R2/R7, P11)
+  - [ ] 26-05-PLAN.md — W3: Konva foundation — canvas externalization + Next-16 spike + 00039 migration + [BLOCKING] db push + worker-isolation gate (R5/R8, D-03)
+  - [ ] 26-06-PLAN.md — W4: field editors part 1 — field-map + inline patterns A/B/D (P14)
+  - [ ] 26-07-PLAN.md — W5: field editors part 2 — Pattern C array editors + per-block reachability parity (0 unreachable, all 18) (P14)
+  - [ ] 26-08-PLAN.md — W6: tiered context-aware inserter + Reuse tier + ＋ dividers (R3)
+  - [ ] 26-09-PLAN.md — W6: unified Visual block 3-place contract + media grid + convert-through (R5/R7, D-02/D-03)
+  - [ ] 26-10-PLAN.md — W7: smart-next auto-dismissing ghosts (R4)
+  - [ ] 26-11-PLAN.md — W7: Konva annotation primitives + DiagramHotspotBlock + UX human-verify (R5, D-03)
+  - [ ] 26-12-PLAN.md — W8: spine re-wire — selection-sync + AI-flag overlays + orphan chip + verify UI/publish gate, behavioural parity (R8, P12/P13/P9/P8)
+  - [ ] 26-13-PLAN.md — W9: bake-on-publish + saveAnnotation (service-role org self-enforce) + worker baked-PNG read (R5/R8, D-03)
+  - [ ] 26-14-PLAN.md — W10: convert golden-path byte-equivalence + R8 regression sweep + remove @puckeditor/core + journeys/uat update (R1/R6/R8, D-01/D-04)
 - [ ] **Phase 26.5: Agent Metadata Layer** — The human-invisible per-SOP + per-block machine layer (semantic tags, entities, embeddings, cross-SOP links, **memory**, **learning proposals**, **review state**) that agents read, write, and traverse individually and collectively (summarise across SOPs). Builds on Phase 23 X-03 (universal AI field read/write) + graphify (cross-SOP graph). Delivers the `⚇ Agent layer` surfacing + the memory/learning/review reasoning that Phase 26 only wires contract hooks for.
 
 ## Phase Details
@@ -773,7 +789,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | **23. AI Field Layer + Version Supersede (v4.0)** | 8/8 | ✅ Complete + code-reviewed (residual: 4 human-UAT items) | 2026-06-25 |
 | **24. Procedure Flow — Spatial Node Graph (v4.0)** | 3/3 | ✅ Complete | 2026-06-12 |
 | **25. Department as a First-Class Entity (v4.0)** | 6/6 | ✅ Complete (residual: 7 human-UAT tests) | 2026-06-15 |
-| **26. SOP Builder Redesign — Inline Surface (v5.0)** | 0/? | Context gathered — ready to plan | |
+| **26. SOP Builder Redesign — Inline Surface (v5.0)** | 0/14 | Planned — 14 plans / 10 waves | |
 | **26.5. Agent Metadata Layer (v5.0)** | 0/? | Deferred follow-on (built on X-03 + graphify) | |
 
 ## Backlog
