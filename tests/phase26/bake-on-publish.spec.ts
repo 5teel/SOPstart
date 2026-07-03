@@ -73,3 +73,38 @@ test.describe('saveAnnotation — service-role, org self-enforcing, parseJwtPayl
     expect(s).toMatch(/export\s+async\s+function\s+bakeAnnotation/)
   })
 })
+
+test.describe('bake-on-publish + Konva-free worker read (T-26-13-02/04, R8)', () => {
+  test('bake-on-publish rasterises via stage.toDataURL and delegates versioning/upload to the action', () => {
+    const s = src('src/components/admin/builder-v2/visual/bake-on-publish.ts')
+    expect(s).toContain('toDataURL')
+    expect(s).toContain('bakeAnnotation')
+  })
+
+  test('VisualBlock prefers the baked <img> for a diagram and imports NO Konva (worker read path)', () => {
+    const s = src('src/components/admin/builder-v2/visual/VisualBlock.tsx')
+    // baked-vs-raw selection: a baked diagram wins over the raw source.
+    expect(s).toContain('bakedSrc')
+    // the worker read path must never pull Konva or the editor leaf into its bundle
+    expect(s).not.toMatch(/from ['"](react-)?konva['"]/)
+    expect(s).not.toContain('AnnotationEditor')
+  })
+
+  test('the baked path carries through the media model + the private-bucket signer', () => {
+    expect(src('src/components/admin/builder-v2/visual/media-adapter.ts')).toContain('bakedSrc')
+    // worker read signs the raw baked path like every other sop-images ref
+    expect(src('src/lib/builder/sign-layout-data-images.ts')).toContain('bakedSrc')
+  })
+
+  test('the annotation editor is launched from the admin diagram edit surface (26-11 reachable)', () => {
+    const grid = src('src/components/admin/builder-v2/visual/MediaGrid.tsx')
+    // opens Konva via the sanctioned dynamic loader path — never the leaf directly
+    expect(grid).toMatch(/AnnotationEditorLoader|DiagramAnnotateModal/)
+  })
+
+  test('the 26-05 throwaway Konva spike route is deleted (real wiring replaces it)', () => {
+    expect(
+      existsSync(path.join(ROOT, 'src/app/(protected)/admin/builder-v2-konva-spike/page.tsx'))
+    ).toBe(false)
+  })
+})
