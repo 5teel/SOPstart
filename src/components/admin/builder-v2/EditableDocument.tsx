@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   DndContext,
   closestCenter,
@@ -29,7 +29,15 @@ import {
   type LayoutItem,
 } from '@/lib/builder/content-ops'
 import { BLOCK_DEFAULTS, type BlockType } from '@/lib/builder/block-registry'
-import type { SectionRenderFamily } from '@/types/sop'
+import type { SectionRenderFamily, SopSectionBlockWithUpdate } from '@/types/sop'
+import { listSectionBlocksWithUpdates } from '@/actions/sop-section-blocks'
+import { useSelectionSync } from '@/components/admin/source-viewer/useSelectionSync'
+import {
+  resolveComponentIdFromSource,
+  resolveRegion,
+  focusCanvasBlock,
+} from './selection-bridge'
+import type { SourceProvenanceRegion } from '@/lib/parsers/source-viewer'
 import { BlockEditShell } from './BlockEditShell'
 import { commitFieldToContent } from './fields/field-commit'
 import { InserterMenu } from './inserter/InserterMenu'
@@ -71,6 +79,10 @@ interface SortableBlockProps {
   onCommitField: (field: string, value: unknown) => void
   onDuplicate: () => void
   onDelete: () => void
+  /** P12 selection-sync (26-12) — convert-SOP provenance wiring. */
+  selectable: boolean
+  junctionId: string | null
+  region: SourceProvenanceRegion | null
 }
 
 /**
@@ -79,7 +91,15 @@ interface SortableBlockProps {
  * BlockEditShell. Grip = keyboard + pointer handle (dnd-kit gives keyboard
  * reorder for free — a11y).
  */
-function SortableBlock({ item, onCommitField, onDuplicate, onDelete }: SortableBlockProps) {
+function SortableBlock({
+  item,
+  onCommitField,
+  onDuplicate,
+  onDelete,
+  selectable,
+  junctionId,
+  region,
+}: SortableBlockProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: item.props.id,
   })
@@ -97,6 +117,9 @@ function SortableBlock({ item, onCommitField, onDuplicate, onDelete }: SortableB
       setNodeRef={setNodeRef}
       style={style}
       gripProps={{ ...attributes, ...listeners } as React.HTMLAttributes<HTMLButtonElement>}
+      selectable={selectable}
+      junctionId={junctionId}
+      region={region}
     />
   )
 }
@@ -178,6 +201,68 @@ export function EditableDocument({
 }: EditableDocumentProps) {
   const [content, setContent] = useState<LayoutItem[]>(() => seedContent(section.layout_data))
   const root = useMemo(() => seedRoot(section.layout_data), [section.layout_data])
+
+  // P12/P13/P8 (26-12): junction rows for the active section, keyed by junction
+  // id. Convert SOPs have rows (with block_provenance + verified state + the
+  // update-available flag); inline-authored SOPs have an empty map → no
+  // selection-sync / overlays / verify chip (UI-SPEC: non-convert shows none).
+  const [junctionMap, setJunctionMap] = useState<Map<string, SopSectionBlockWithUpdate>>(
+    () => new Map()
+  )
+  const refreshJunctions = useCallback(async () => {
+    try {
+      const rows = await listSectionBlocksWithUpdates(section.id)
+      setJunctionMap(new Map(rows.map((r) => [r.id, r])))
+    } catch (e) {
+      console.warn('[EditableDocument] junction fetch failed', e)
+      setJunctionMap(new Map())
+    }
+  }, [section.id])
+  useEffect(() => {
+    let cancelled = false
+    void (async () => {
+      try {
+        const rows = await listSectionBlocksWithUpdates(section.id)
+        if (!cancelled) setJunctionMap(new Map(rows.map((r) => [r.id, r])))
+      } catch (e) {
+        if (!cancelled) setJunctionMap(new Map())
+        console.warn('[EditableDocument] junction fetch failed', e)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [section.id])
+
+  // componentId (layout props.id) → junction row, matched via each item's
+  // props.junctionId. Powers the P12 reverse binding + P13 overlays.
+  const componentIdToJunction = useMemo<Map<string, SopSectionBlockWithUpdate>>(() => {
+    const out = new Map<string, SopSectionBlockWithUpdate>()
+    if (junctionMap.size === 0) return out
+    for (const item of content) {
+      const componentId = item.props.id as string | undefined
+      const jId = (item.props as { junctionId?: string }).junctionId
+      if (!componentId || !jId) continue
+      const j = junctionMap.get(jId)
+      if (j) out.set(componentId, j)
+    }
+    return out
+  }, [content, junctionMap])
+  const selectable = junctionMap.size > 0
+
+  // P12 reverse binding — source-pane click → focus the matching canvas block.
+  // `useSelectionSync` returns the no-op default outside the provider (source-
+  // less SOPs), so registering is always safe.
+  const { registerBlockClickHandler } = useSelectionSync()
+  useEffect(() => {
+    const unregister = registerBlockClickHandler((idFromSource: string) => {
+      const componentId = resolveComponentIdFromSource(componentIdToJunction, idFromSource)
+      if (componentId) focusCanvasBlock(componentId)
+    })
+    return unregister
+  }, [registerBlockClickHandler, componentIdToJunction])
+  // refreshJunctions is used by P13 badge-accept / P8 verify toggles (later tasks).
+  void refreshJunctions
 
   // R3 inserter: which ＋ divider is open (afterIndex; -1 = prepend), and whether
   // the dept-scoped Reuse tier (BlockPicker) modal is showing.
@@ -296,7 +381,9 @@ export function EditableDocument({
               onOpen={() => setInserterAt(-1)}
               menu={menuFor(-1)}
             />
-            {content.map((item, idx) => (
+            {content.map((item, idx) => {
+              const jId = (item.props as { junctionId?: string }).junctionId ?? null
+              return (
               <div key={item.props.id} data-block-index={idx}>
                 <SortableBlock
                   item={item}
@@ -307,6 +394,9 @@ export function EditableDocument({
                   }
                   onDuplicate={() => setContent((c) => duplicateBlock(c, item.props.id))}
                   onDelete={() => setContent((c) => deleteBlock(c, item.props.id))}
+                  selectable={selectable}
+                  junctionId={jId}
+                  region={resolveRegion(junctionMap, jId)}
                 />
                 {/* Between-blocks hairline; section-end gets the big add bar. */}
                 <InsertDivider
@@ -326,7 +416,8 @@ export function EditableDocument({
                   />
                 )}
               </div>
-            ))}
+              )
+            })}
           </SortableContext>
         </DndContext>
       )}

@@ -5,6 +5,9 @@ import { GripVertical, Copy, Trash2, SlidersHorizontal } from 'lucide-react'
 import { BLOCK_COMPONENTS, stripMeta, type BlockType } from '@/lib/builder/block-registry'
 import { humanizeBlockType } from '@/lib/builder/block-type-labels'
 import type { LayoutItem } from '@/lib/builder/content-ops'
+import { useSelectionSync } from '@/components/admin/source-viewer/useSelectionSync'
+import { selectBlock } from './selection-bridge'
+import type { SourceProvenanceRegion } from '@/lib/parsers/source-viewer'
 import { FIELD_MAP, ACCENT_BY_TYPE, DEFAULT_ACCENT, type FieldSpec } from './fields/field-map'
 import { InlineText } from './InlineText'
 import { EnumChip } from './fields/EnumChip'
@@ -40,6 +43,19 @@ interface BlockEditShellProps {
   gripProps?: React.HTMLAttributes<HTMLButtonElement>
   setNodeRef?: (node: HTMLElement | null) => void
   style?: React.CSSProperties
+  /**
+   * P12 selection-sync (26-12). When the SOP was converted from a source doc,
+   * the canvas host marks blocks `selectable` and supplies the block's junction
+   * id + resolved provenance region. Focusing/clicking the block fires
+   * `setActiveProvenance(region, junctionId)` → the source pane highlights it.
+   * Non-convert SOPs pass `selectable={false}` and see none of this (UI-SPEC
+   * §Convert-Provenance: `body:not(.convert) .verify{display:none}`).
+   */
+  selectable?: boolean
+  junctionId?: string | null
+  region?: SourceProvenanceRegion | null
+  /** Notify the host a block was selected (e.g. to lift single-panel state). */
+  onSelect?: () => void
 }
 
 function FieldControl({
@@ -144,6 +160,10 @@ export function BlockEditShell({
   gripProps,
   setNodeRef,
   style,
+  selectable = false,
+  junctionId = null,
+  region = null,
+  onSelect,
 }: BlockEditShellProps) {
   const type = item.type as BlockType
   // Cast to include undefined: item.type may be an unregistered type.
@@ -155,13 +175,28 @@ export function BlockEditShell({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const BlockAny = Block as any
 
+  // P12 forward binding — fire selection-sync on focus/click (convert SOPs only).
+  // `useSelectionSync` returns the no-op default outside the provider, so this is
+  // safe on the source-less Build canvas too; `selectable` gates it to convert SOPs.
+  const { setActiveProvenance } = useSelectionSync()
+  const handleSelect = selectable
+    ? () => {
+        selectBlock(setActiveProvenance, region, junctionId)
+        onSelect?.()
+      }
+    : undefined
+
   return (
     <div
       ref={setNodeRef}
       style={style}
       data-block-id={item.props.id}
       data-block-type={item.type}
-      className="group relative rounded-lg border border-transparent transition-colors hover:border-[var(--accent-step,#3b82f6)] hover:shadow-[0_0_0_3px_rgba(59,130,246,0.09)]"
+      data-selectable={selectable ? 'true' : undefined}
+      tabIndex={selectable ? 0 : undefined}
+      onFocusCapture={handleSelect}
+      onClick={handleSelect}
+      className="group relative rounded-lg border border-transparent transition-colors hover:border-[var(--accent-step,#3b82f6)] hover:shadow-[0_0_0_3px_rgba(59,130,246,0.09)] focus:outline-none focus-visible:border-[var(--accent-step,#3b82f6)] focus-visible:shadow-[0_0_0_3px_rgba(59,130,246,0.18)]"
     >
       {/* Drag grip — Task 3 wires @dnd-kit useSortable listeners via gripProps. */}
       <button
