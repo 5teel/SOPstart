@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
-status: 26-12 complete (spine re-wire — behavioural parity P12/P13/P9/P8)
+status: 26-13 complete (annotation persistence + bake-on-publish — closes absorbed Phase 17 arc, D-03 slice 3)
 stopped_at: Completed 26-12-PLAN.md (W8, R8 — re-earned Puck's componentOverlay bindings on the bespoke canvas, all behaviourally proven per CLAUDE.md 2026-06-05). selection-bridge.ts (pure selectBlock/resolveRegion/resolveComponentIdFromSource) + BlockEditShell/EditableDocument re-wire: **P12** canvas↔source selection-sync (block focus → setActiveProvenance(region, junctionId); source click → focus [data-block-id]; [data-puck-item-id]→[data-block-id] repoint); **P13** ⚑ AI-flag header badge (--ai purple) toggling the reused inline ReviewerFlagsPanel (one open at a time via openFlagsFor) + reused 13-04 PuckItemBadgeOverlay update badge; **P9** dashed "Reference images" chip on Unanchored-figures HeadingBlocks; **P8** single-block "✦ tap to verify"→"✓ verified" chip writing through the EXISTING verifyBlock/unverifyBlock actions + verify-checklist query invalidation. Server publish route (`/api/sops/[sopId]/publish` 400 unverified_blocks) + useSelectionSync.tsx BOTH git-diff empty (reused UNCHANGED; only callers moved off Puck). 3 behavioural specs: selection-sync (spy on setActiveProvenance both directions), ai-overlay (seeds reviewer query → real FlagBadge row renders), verify-gate (invokes the REAL route handler with mocked Supabase → 400/200 paths). phase26 **85 green**, no-bulk-verify guard green (R8), tsc clean, next build green (worker bundle **Δ0KB** — admin-only overlays didn't leak). BuilderClient unchanged (26-04 split the canvas host to EditableDocument; plan's Puck-era line refs stale — noted as Rule-3 adjustment).
-last_updated: "2026-07-03T21:30:00.000Z"
+last_updated: "2026-07-03T22:30:00.000Z"
 progress:
   total_phases: 29
   completed_phases: 4
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 26 (sop-builder-redesign) — EXECUTING
-Plan: 12 of 14 complete
+Plan: 13 of 14 complete
 **Milestone status:** **v4.0 ✅ shipped 2026-07-02** (Phases 21, 21.5, 21.6, 22, 23, 24, 25 executed + code-reviewed; residual = human UAT on 21.6/22/23/25, carried per v3.0 field-verification precedent — archive via `/gsd-complete-milestone`). **v5.0 opened 2026-07-02** — Phase 26 (bespoke inline builder; Phase 17 Konva absorbed) → Phase 26.5 (agent-metadata layer on X-03 + graphify).
 
 **Active phase:** 26
@@ -40,7 +40,7 @@ Plan: 12 of 14 complete
 
 **Also outstanding (v4.0 residual):** human UAT on sopstart.com — Phase 23 (4 tests), Phase 22 (voice loop), Phase 25 (7 tests), Phase 21.6 (4 items). Carry per v3.0 field-verification precedent or run before `/gsd-complete-milestone`.
 
-**v5.0 residual:** 26-11 annotation-editor device-UX feel (UAT `p26-annotation-editor-feel`) — deferred until 26-13 wires the annotate→save→reopen launch point; run on sopstart.com alongside the 26-13 persistence check.
+**v5.0 residual:** 26-11 annotation-editor device-UX feel (UAT `p26-annotation-editor-feel`) — **now unblocked**: 26-13 wired the annotate launch (MediaGrid diagram item → DiagramAnnotateModal → AnnotationEditorLoader), so the editor mounts from the admin builder route. Run on sopstart.com post-deploy alongside a 26-13 persistence check (annotate a pipeline diagram → Save & bake → worker read shows the baked image). Also note the 26-13 Known Stub: diagram VisualItems need `sopImageId` populated at parse/upload time before "Save & bake" enables for hand-added diagram slots.
 
 **Roadmap evolution:** Phase 21.6 (Builder Edit Stage Redesign) INSERTED after 21.5, before 22, on 2026-06-05. Reason: 21.5 redesigned the Review/Publish stages but the Build/edit stage is still the untouched Puck editor — first-time admins hit jargon ("Block"), two redundant block lists (palette vs outline), unanchored canvas figures, and a cramped right-rail field editor. Decision by Simon during 21.5 UAT.
 
@@ -153,6 +153,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 26 P01 | 6min | 1 tasks | 2 files |
 | Phase 26 P02 | 12m | 2 tasks | 5 files |
 | Phase 26 P05 | 8m | 3 tasks | 8 files |
+| Phase 26 P13 | 40m | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -287,6 +288,7 @@ Recent decisions affecting current work:
 - [Phase 26-03]: contract-check.ts place (1) repointed off puck-config.tsx onto BLOCK_COMPONENTS in block-registry.tsx (RESEARCH Pitfall 1); guard spec asserts live target. Render-parity + contract-target specs shell out to tsx subprocesses — Playwright's JSX transform ({__pw_type}) is incompatible with real react-dom/server
 - [Phase 26-05]: Konva-in-Next-16 spike PASSED — react-konva renders via dynamic({ssr:false}) with 'canvas' in serverExternalPackages; compiled to its own client chunk, ABSENT from /sops/[sopId] worker bundle (Δ0). No Excalidraw/custom-SVG fallback needed. Throwaway /admin/builder-v2-konva-spike route forced react-konva into the build graph (a component no route imports is never bundled — tsc alone doesn't exercise canvas webpack resolution); delete in 26-13
 - [Phase 26-05]: 00039 sop_image_annotations APPLIED to live DB (verified via Management API to_regclass — table + 1 org-scoped SELECT policy + 10 cols). Append-only (no authenticated write; service-role writes in 26-13 self-enforce org-scope), org-scoped SELECT via current_organisation_id() only — NO cross-table public.sops reference (42P17-safe, copies 00038 pattern). Konva fenced out of worker tier by bundle gate + no-static-import lint (D-03/R8)
+- [Phase 26-13]: saveAnnotation/bakeAnnotation server actions are service-role + async-only 'use server' (pure baked-path helpers moved to src/lib/builder/baked-path.ts — a sync export in a 'use server' module breaks next build, CLAUDE.md 2026-06-27); both self-enforce org-scope (org via parseJwtPayload not atob; sop_images has no org column so membership is gated through its org-scoped sops row; .eq('organisation_id', callerOrg) on the write). Baked PNG is content-versioned (.v{N}.png) to beat CDN cache; baked path lives on the VisualBlock props (bakedSrc), NOT a layout_data schema change (D-01 frozen). Bake runs at annotation SAVE (live Stage) not headless publish — identical outcome. Deleted the 26-05 throwaway konva-spike route; the real MediaGrid→DiagramAnnotateModal→AnnotationEditorLoader path now carries react-konva into the admin graph while the worker bundle stays Δ0KB Konva-free
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -395,7 +397,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-03T20:05:00.000Z
-Stopped at: Completed 26-11-PLAN.md (Konva annotation primitives + DiagramHotspotBlock — R5/D-03 slice 2; 14 phase26 specs green, tsc clean, next build green, worker bundle Δ0KB Konva-free). Task-3 device-UX gate carried as deferred-residual (UAT p26-annotation-editor-feel; verify on sopstart.com after 26-13 wires the launch point).
+Last session: 2026-07-03T22:30:00.000Z
+Stopped at: Completed 26-13-PLAN.md (annotation persistence + bake-on-publish — R5/R8, D-03 slice 3, closes the absorbed Phase 17 arc). saveAnnotation + bakeAnnotation server actions (service-role, org self-enforce via parseJwtPayload, async-only 'use server' with pure baked-path helpers split to src/lib/builder/baked-path.ts); client bake-on-publish.ts (stage.toDataURL → content-versioned baked PNG); VisualBlock baked-vs-raw worker read (Konva-free); annotate launch wired MediaGrid→DiagramAnnotateModal→AnnotationEditorLoader (26-11 editor now reachable from a route); deleted the 26-05 konva-spike route. 27 phase26 specs green, tsc clean, next build green, worker bundle Δ0KB Konva-isolated. Known Stub: diagram VisualItems need sopImageId populated at parse/upload before "Save & bake" enables for hand-added slots. 26-11 device-UX residual now unblocked — verify on sopstart.com post-deploy. Next: 26-14 (final wave — convert-golden-path regression / phase close).
 Resume file:
 None
