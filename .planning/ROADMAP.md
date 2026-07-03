@@ -95,6 +95,13 @@ v4.0 (Phases 21–25) shipped. v5.0 rebuilds the SOP builder as a bespoke inline
 
 ## Phase Details
 
+### Phase 26.5: Agent Metadata Layer
+
+**Goal**: Every published SOP carries a machine-readable agent-metadata layer — semantic tags, entities, Voyage-3/pgvector embeddings, cross-SOP links, append-only memory, evidence-backed learning proposals, and a per-SOP agent assessment — populated by a real synthesis job (Haiku 4.5) reading the four org signal sources, and surfaced to admins via the `⚇ Agent layer` builder toggle + an org dashboard (proposals queue + activity feed). Infrastructure + surfacing only; no flagship agent capability this phase, but no dead UI either — backfill embeds/tags/links all currently-published SOPs.
+**Depends on**: Phase 23 (X-03 `FieldDescriptor` registry + gateWrite approval path — proposals extend it), Phase 26 (D-02 contract hooks: `BLOCK_REGISTRY` medium tags on `/api/schema`, props round-trip in `content-ops.ts`; frozen `layout_data`/junction/provenance contract)
+**Requirements**: Locked decisions D-01..D-16 in `26.5-CONTEXT.md` (storage model, Voyage-3 + pgvector, on-publish regeneration, memory/proposal semantics, two admin surfaces, synthesis job + backfill). No REQUIREMENTS.md mapping — CONTEXT.md is the ID source.
+**Plans**: TBD
+
 ### Phase 21.5: Builder Review UX
 
 **Goal**: A first-time admin can, without guidance, understand each builder pane's purpose and complete review and publish — via a sequenced Build → Review → Publish flow that replaces the 5–6 always-on jargon-labelled panels.
