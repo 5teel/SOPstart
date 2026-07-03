@@ -4,7 +4,7 @@ milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
 status: 26-14 complete — PHASE 26 COMPLETE (frozen-contract proof R6/R8 + Puck fully removed, D-01 end-state)
 stopped_at: Phase 26.5 context gathered
-last_updated: "2026-07-03T14:45:13.279Z"
+last_updated: "2026-07-03T15:25:28.570Z"
 progress:
   total_phases: 29
   completed_phases: 4

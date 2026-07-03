@@ -101,15 +101,31 @@ v4.0 (Phases 21–25) shipped. v5.0 rebuilds the SOP builder as a bespoke inline
 **Depends on**: Phase 23 (X-03 `FieldDescriptor` registry + gateWrite approval path — proposals extend it), Phase 26 (D-02 contract hooks: `BLOCK_REGISTRY` medium tags on `/api/schema`, props round-trip in `content-ops.ts`; frozen `layout_data`/junction/provenance contract)
 **Requirements**: Locked decisions D-01..D-16 in `26.5-CONTEXT.md` (storage model, Voyage-3 + pgvector, on-publish regeneration, memory/proposal semantics, two admin surfaces, synthesis job + backfill). No REQUIREMENTS.md mapping — CONTEXT.md is the ID source.
 **Plans**: 8 plans / 6 waves
-
 Plans:
+**Wave 1**
+
 - [ ] 26.5-01-PLAN.md — Harness + package gate + lazy Voyage client & model constants (D-03, D-16)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 26.5-02-PLAN.md — Migration 00040: 5 append-only tables + pgvector + HNSW + similarity RPC + db push (D-01, D-02, D-03, D-05, D-07, D-08)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 26.5-03-PLAN.md — Voice Q&A transcript write path + 4 signal readers + similarity wrapper (D-05, D-06)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 26.5-04-PLAN.md — Proposal lifecycle + synthesis pipeline (embed/tag/memory/assessment/proposals) (D-04, D-07, D-08, D-12, D-16)
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
 - [ ] 26.5-05-PLAN.md — Publish-hook regeneration + backfill of all published SOPs (D-04, D-15)
 - [ ] 26.5-06-PLAN.md — Authed cron synthesis-sweep route + VOYAGE_API_KEY Railway gate (D-14)
 - [ ] 26.5-07-PLAN.md — Admin server actions + builder agentview toggle + read-only purple panel (D-02, D-09, D-10, D-12)
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
 - [ ] 26.5-08-PLAN.md — Org agent dashboard (proposals queue + activity feed) + pathways map (D-09, D-10, D-11, D-13)
 
 ### Phase 21.5: Builder Review UX
