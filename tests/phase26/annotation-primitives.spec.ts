@@ -142,6 +142,36 @@ test.describe('stylus palm rejection — pen-only filter', () => {
   })
 })
 
+test.describe('DiagramHotspotBlock — freeform numbered callouts in natural-image space', () => {
+  test('two callouts persist their x/y + numbering across a serialize → re-open', () => {
+    let scene = emptyScene(1600, 1200)
+    const c1 = createCallout(scene, { x: 440, y: 290, label: 'Pressure gauge' })
+    scene = addShape(scene, c1)
+    const c2 = createCallout(scene, { x: 980, y: 610, label: 'Relief valve' })
+    scene = addShape(scene, c2)
+
+    // Re-open the persisted scene (the DiagramHotspotBlock reloads it by annotationId).
+    const reopened = deserializeScene(serializeScene(scene))
+    const labels = reopened.shapes.filter((s) => s.type === 'Label')
+    expect(labels).toHaveLength(2)
+    // Coordinate stability: natural-image-space x/y unchanged (pitfall #2).
+    expect(labels[0]).toMatchObject({ x: 440, y: 290, number: 1 })
+    expect(labels[1]).toMatchObject({ x: 980, y: 610, number: 2 })
+  })
+
+  test('DiagramHotspotBlock is Konva-backed and links its scene via annotationId (source-contract)', () => {
+    const src = readFileSync(
+      path.join(ROOT, 'src/components/admin/builder-v2/visual/DiagramHotspotBlock.tsx'),
+      'utf8'
+    )
+    // The single freeform-positioning surface — placed callouts, natural-image space.
+    expect(src).toContain('annotationId')
+    expect(src).toContain('createCallout')
+    // Reuses the shared editor scene model, not a bespoke one.
+    expect(src).toContain('annotation-tools')
+  })
+})
+
 test.describe('Konva leaf stays admin-only + isolated (source-contract)', () => {
   test('annotation-tools.ts is PURE — no konva / react import (loads in-process)', () => {
     const src = readFileSync(
