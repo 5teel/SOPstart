@@ -48,6 +48,11 @@ export const BLOCK_TYPE_LABELS: Readonly<Record<string, BlockTypeEntry>> = {
   PPECardBlock: { label: 'PPE', pillVariant: 'kind-haz' },
   VoiceNoteBlock: { label: 'Voice note', pillVariant: 'kind-step' },
   ZoneBlock: { label: 'Zone', pillVariant: 'kind-step' },
+  // Phase 26 (R3): remaining authorable catalog types surfaced by the inserter —
+  // without these humanizeBlockType returns the raw 'Block' fallback (P16 break).
+  StepWithPhotosBlock: { label: 'Step + photos', pillVariant: 'kind-step' },
+  PhotoGridBlock: { label: 'Photo grid', pillVariant: 'kind-step' },
+  ModelBlock: { label: '3D model', pillVariant: 'kind-step' },
   // Legacy alias — named explicitly in SPEC R4 acceptance text
   PhotoGrid: { label: 'Photo grid', pillVariant: 'kind-step' },
 } as const
