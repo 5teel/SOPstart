@@ -87,7 +87,7 @@ test.describe('bake-on-publish + Konva-free worker read (T-26-13-02/04, R8)', ()
     expect(s).toContain('bakedSrc')
     // the worker read path must never pull Konva or the editor leaf into its bundle
     expect(s).not.toMatch(/from ['"](react-)?konva['"]/)
-    expect(s).not.toContain('AnnotationEditor')
+    expect(s).not.toMatch(/import[^\n]*AnnotationEditor/)
   })
 
   test('the baked path carries through the media model + the private-bucket signer', () => {

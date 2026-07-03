@@ -40,6 +40,12 @@ export const VisualItemSchema = z.object({
   alt: z.string().max(200).default(''),
   caption: z.string().max(500).nullable(),
   annotationId: z.string().uuid().optional(),
+  // 26-13: the flattened baked-PNG path/URL for a published diagram — the worker
+  // serves THIS <img> (Konva-free, R8). Lives on the VisualBlock props, not a
+  // layout_data schema change. Raw storage paths are signed on the worker read.
+  bakedSrc: z.string().nullable().optional(),
+  // 26-13: the sop_images row this diagram annotates — the FK saveAnnotation writes to.
+  sopImageId: z.string().uuid().optional(),
 })
 export type VisualItem = z.infer<typeof VisualItemSchema>
 
@@ -94,6 +100,8 @@ export function toVisualItems(type: MediaFieldType, props: Props): VisualItem[] 
         alt: asStr(it.alt),
         caption: asCaption(it.caption),
         ...(typeof it.annotationId === 'string' ? { annotationId: it.annotationId } : {}),
+        ...(typeof it.bakedSrc === 'string' ? { bakedSrc: it.bakedSrc } : {}),
+        ...(typeof it.sopImageId === 'string' ? { sopImageId: it.sopImageId } : {}),
       }))
     }
     case 'PhotoBlock':
@@ -131,6 +139,8 @@ export function fromVisualItems(type: MediaFieldType, items: VisualItem[]): unkn
         alt: it.alt,
         caption: it.caption,
         ...(it.annotationId ? { annotationId: it.annotationId } : {}),
+        ...(it.bakedSrc ? { bakedSrc: it.bakedSrc } : {}),
+        ...(it.sopImageId ? { sopImageId: it.sopImageId } : {}),
       }))
     case 'PhotoBlock':
       // Single slot — keep the first item's src (photo blocks hold one image).

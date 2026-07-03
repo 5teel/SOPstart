@@ -24,9 +24,12 @@ function MediaItem({ item, index }: { item: VisualItem; index: number }) {
       />
     )
   }
-  if (item.src) {
+  // 26-13: a published/annotated diagram flattens its Konva scene to a baked PNG;
+  // the worker serves THAT <img> (baked wins over raw) — never Konva (D-03/R8).
+  const displaySrc = item.medium === 'diagram' && item.bakedSrc ? item.bakedSrc : item.src
+  if (displaySrc) {
     // photo + baked diagram both display as an image (annotation is baked in).
-    return <SopImageInline src={item.src} alt={item.alt || `Visual ${index + 1}`} />
+    return <SopImageInline src={displaySrc} alt={item.alt || `Visual ${index + 1}`} />
   }
   return (
     <div className="bg-white border border-dashed border-[var(--ink-300)] rounded-xl p-6 text-center text-[var(--ink-500)] text-xs">

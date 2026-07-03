@@ -70,6 +70,8 @@ export type AnnotationEditorProps = {
   initialScene?: Scene
   /** Commit the scene JSON upward (persistence is Plan 26-13). */
   onChange?: (json: string) => void
+  /** Hand the live Konva Stage to the parent so it can bake-on-save (26-13). */
+  onStageReady?: (stage: Konva.Stage) => void
 }
 
 export default function AnnotationEditor({
@@ -78,6 +80,7 @@ export default function AnnotationEditor({
   imageUrl,
   initialScene,
   onChange,
+  onStageReady,
 }: AnnotationEditorProps) {
   const stageRef = useRef<Konva.Stage | null>(null)
   const trRef = useRef<Konva.Transformer | null>(null)
@@ -107,12 +110,14 @@ export default function AnnotationEditor({
   )
 
   // Pitfall 5: explicit teardown so a StrictMode double-mount doesn't leak the stage.
+  // Also hand the live Stage up so the parent can bake-on-save (26-13).
   useEffect(() => {
     const stage = stageRef.current
+    if (stage) onStageReady?.(stage)
     return () => {
       stage?.destroy()
     }
-  }, [])
+  }, [onStageReady])
 
   // Bind the Transformer to the selected node.
   useEffect(() => {

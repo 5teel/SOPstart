@@ -203,6 +203,9 @@ export const VisualItemContentSchema = z.object({
   alt: z.string().max(200).default(''),
   caption: z.string().max(500).nullable(),
   annotationId: z.string().uuid().optional(),
+  // Plan 26-13 — baked diagram PNG path/URL + the annotated sop_images FK.
+  bakedSrc: z.string().nullable().optional(),
+  sopImageId: z.string().uuid().optional(),
 })
 
 export const VisualBlockContentSchema = z.object({
