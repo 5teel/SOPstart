@@ -24,6 +24,8 @@ import {
   ghostsGoneOnTyping,
 } from '../../src/components/admin/builder-v2/ghosts/useSmartGhosts'
 import { SMART } from '../../src/components/admin/builder-v2/inserter/inserter-model'
+import { insertBlock, type LayoutItem } from '../../src/lib/builder/content-ops'
+import { BLOCK_DEFAULTS } from '../../src/lib/builder/block-registry'
 
 test.describe('smart ghosts — prediction + self-suppress (scenarios a, b)', () => {
   test('(a) a ghost appears after a Hazard block, predicting PPE from the SMART map', () => {
@@ -114,6 +116,51 @@ test.describe('smart ghosts — typing dismiss (scenario e)', () => {
     expect(ghostsGoneOnTyping(ghosts, 2).sort()).toEqual([0, 4])
     // Typing in a block with no ghost after it gones them all.
     expect(ghostsGoneOnTyping(ghosts, 3).sort()).toEqual([0, 2, 4])
+  })
+})
+
+test.describe('smart ghosts — accept inserts the predicted block (scenario c)', () => {
+  test('accepting the ghost after a Step block inserts a Measurement block at the cursor', () => {
+    const content: LayoutItem[] = [
+      { type: 'StepBlock', props: { id: 'a', number: 1, text: 'do it' } },
+      { type: 'TextBlock', props: { id: 'b', content: 'note' } },
+    ]
+    const [ghost] = computeGhosts(content.map((c) => c.type as never))
+    // Step predicts Measurement (the shared SMART map).
+    expect(ghost).toMatchObject({ afterIndex: 0, type: 'MeasurementBlock' })
+
+    // Accept === the exact call EditableDocument makes: insertBlock at afterIndex
+    // with fresh registry defaults → autosaves via the content effect.
+    const next = insertBlock(content, ghost.type, ghost.afterIndex, BLOCK_DEFAULTS[ghost.type])
+    expect(next).toHaveLength(3)
+    expect(next[1].type).toBe('MeasurementBlock') // placed right after the Step
+    expect(next.map((i) => i.props.id)).toEqual(['a', next[1].props.id, 'b'])
+    expect(next[1].props.id).not.toBe('a') // fresh id
+    // Original untouched (immutable op → autosave sees a new array).
+    expect(content).toHaveLength(2)
+    // After the insert, the ghost self-suppresses (Measurement now follows the Step).
+    expect(computeGhosts(next.map((i) => i.type as never))).not.toContainEqual(
+      expect.objectContaining({ afterIndex: 0, type: 'MeasurementBlock' })
+    )
+  })
+})
+
+test.describe('smart ghosts — injected into EditableDocument', () => {
+  test('EditableDocument wires useSmartGhosts → GhostRow → content-ops insert + block-index tag', () => {
+    const src = readFileSync(
+      join(__dirname, '../../src/components/admin/builder-v2/EditableDocument.tsx'),
+      'utf8'
+    )
+    // Hook driven by the block-type sequence, accept path calls content-ops insertBlock.
+    expect(src).toContain('useSmartGhosts')
+    expect(src).toMatch(/insertBlock\(c, type, afterIndex/)
+    // GhostRow rendered between blocks, keyed by ghost afterIndex.
+    expect(src).toContain('<GhostRow')
+    expect(src).toContain('ghostByIndex')
+    // Typing-dismiss needs the block wrapper tagged with its index.
+    expect(src).toContain('data-block-index')
+    // Tab-accept disabled while the inserter menu is open (no keyboard collision).
+    expect(src).toContain('disabled: inserterAt !== null')
   })
 })
 

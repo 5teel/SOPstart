@@ -34,6 +34,8 @@ import { BlockEditShell } from './BlockEditShell'
 import { commitFieldToContent } from './fields/field-commit'
 import { InserterMenu } from './inserter/InserterMenu'
 import { ReuseTier } from './inserter/ReuseTier'
+import { useSmartGhosts } from './ghosts/useSmartGhosts'
+import { GhostRow } from './ghosts/GhostRow'
 
 /**
  * The bespoke edit canvas (D-01, R2) — replaces `<Puck onChange>`.
@@ -249,6 +251,18 @@ export function EditableDocument({
     />
   )
 
+  // R4 smart ghosts: predicted-next from the SMART map, injected between blocks.
+  // Accepting inserts the predicted block (content-ops) → autosave via the
+  // content effect. Disabled while an inserter menu is open so Tab-accept never
+  // collides with the menu's keyboard nav.
+  const { ghosts, registerRef, onGhostEnter, onGhostLeave, onGhostClick } = useSmartGhosts(
+    content.map((c) => c.type as BlockType),
+    (afterIndex, type) =>
+      setContent((c) => insertBlock(c, type, afterIndex, BLOCK_DEFAULTS[type])),
+    { disabled: inserterAt !== null }
+  )
+  const ghostByIndex = new Map(ghosts.map((g) => [g.afterIndex, g]))
+
   return (
     <div
       data-editable-document
@@ -283,7 +297,7 @@ export function EditableDocument({
               menu={menuFor(-1)}
             />
             {content.map((item, idx) => (
-              <div key={item.props.id}>
+              <div key={item.props.id} data-block-index={idx}>
                 <SortableBlock
                   item={item}
                   onCommitField={(field, value) =>
@@ -301,6 +315,16 @@ export function EditableDocument({
                   onOpen={() => setInserterAt(idx)}
                   menu={menuFor(idx)}
                 />
+                {/* R4 smart ghost: predicted-next affordance (Tab/click accept). */}
+                {ghostByIndex.has(idx) && (
+                  <GhostRow
+                    ghost={ghostByIndex.get(idx)!}
+                    registerRef={registerRef}
+                    onEnter={onGhostEnter}
+                    onLeave={onGhostLeave}
+                    onClick={onGhostClick}
+                  />
+                )}
               </div>
             ))}
           </SortableContext>
