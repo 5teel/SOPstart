@@ -80,7 +80,7 @@ v4.0 (Phases 21–25) shipped. v5.0 rebuilds the SOP builder as a bespoke inline
   - [x] 26-01-PLAN.md — W1: dependency legitimacy checkpoint + install (@dnd-kit ×3, konva, react-konva)
   - [x] 26-02-PLAN.md — W1: phase26 Playwright project + pre-phase convert golden fixture (R6 baseline)
   - [x] 26-03-PLAN.md — W2: bespoke block-registry + sanitize-layout + Puck-free LayoutRenderer (read) + contract-check repoint + bundle re-baseline (R2/R6)
-  - [ ] 26-04-PLAN.md — W3: edit canvas — content-ops reducer + EditableDocument + BlockEditShell + InlineText + dnd-kit reorder + autosave re-wire (R1/R2/R7, P11)
+  - [x] 26-04-PLAN.md — W3: edit canvas — content-ops reducer + EditableDocument + BlockEditShell + InlineText + dnd-kit reorder + autosave re-wire (R1/R2/R7, P11) (completed 2026-07-03)
   - [ ] 26-05-PLAN.md — W3: Konva foundation — canvas externalization + Next-16 spike + 00039 migration + [BLOCKING] db push + worker-isolation gate (R5/R8, D-03)
   - [ ] 26-06-PLAN.md — W4: field editors part 1 — field-map + inline patterns A/B/D (P14)
   - [ ] 26-07-PLAN.md — W5: field editors part 2 — Pattern C array editors + per-block reachability parity (0 unreachable, all 18) (P14)

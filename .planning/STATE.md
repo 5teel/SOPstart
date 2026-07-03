@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
 status: Ready to execute
-stopped_at: Completed 26-03-PLAN.md (Puck-free worker renderer + block-registry + contract-check repoint)
-last_updated: "2026-07-03T04:20:00.000Z"
+stopped_at: Completed 26-04-PLAN.md (bespoke edit canvas — content-ops reducer + EditableDocument/BlockEditShell/InlineText + dnd-kit reorder + autosave re-wire P11)
+last_updated: "2026-07-03T05:30:00.000Z"
 progress:
   total_phases: 29
   completed_phases: 4
-  total_plans: 22
-  completed_plans: 22
+  total_plans: 23
+  completed_plans: 23
   percent: 14
 ---
 
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 26 (sop-builder-redesign) — EXECUTING
-Plan: 3 of 14
+Plan: 4 of 14
 **Milestone status:** **v4.0 ✅ shipped 2026-07-02** (Phases 21, 21.5, 21.6, 22, 23, 24, 25 executed + code-reviewed; residual = human UAT on 21.6/22/23/25, carried per v3.0 field-verification precedent — archive via `/gsd-complete-milestone`). **v5.0 opened 2026-07-02** — Phase 26 (bespoke inline builder; Phase 17 Konva absorbed) → Phase 26.5 (agent-metadata layer on X-03 + graphify).
 
 **Active phase:** 26
@@ -36,7 +36,7 @@ Plan: 3 of 14
 2. **Phase 22 — Voice-Driven Walkthrough** (next): W-01 literacy/visual/voice gaps + X-02 voice-driven walkthrough. 8 requirements (VDW-LIT ×4, VDW-VOICE ×4).
 3. **Phase 23 — AI Field Layer + Version Supersede**: X-03 universal AI read/write + G-01 version supersede + worker-instance sign-off. 9 requirements (AFL-AI ×4, AFL-VER ×5).
 
-**Next action:** `/gsd-plan-phase 26` (SOP Builder Redesign — v5.0 opener). SPEC (`26-SPEC.md`, R1–R8) + CONTEXT (`26-CONTEXT.md`) locked 2026-07-02. Locked forks: **full-bespoke editor** replacing Puck (D-01, `layout_data`/junction/provenance frozen); **agent-metadata layer split to Phase 26.5** (contract hooks only here, D-02); **Phase 17 Konva annotation ABSORBED** into the Visual block (D-03, workers never download Konva — baked PNG read path); **v5.0 opened** (D-04). Expect a heavily-waved plan (bespoke render → tiered inserter+ghosts → re-wire autosave/provenance-sync/AI-overlays/verify-UI with **behavioural parity tests** → Visual+Konva slices → convert-golden-path regression). Validated sketch: `sketches/sop-builder-redesign/index.html`.
+**Next action:** `/gsd-execute-phase 26` → plan **26-05** (W2: 16 structured-field editor panels, P14 — the largest genuinely-new chunk). Plans 26-01..26-04 done: Nyquist harness + convert-golden baseline (26-02), Puck-free worker renderer + block-registry (26-03), and the bespoke EDIT canvas + autosave re-wire + dnd-kit reorder (26-04). SPEC (`26-SPEC.md`, R1–R8) + CONTEXT (`26-CONTEXT.md`) locked 2026-07-02. Locked forks: **full-bespoke editor** replacing Puck (D-01, `layout_data`/junction/provenance frozen); **agent-metadata layer split to Phase 26.5** (contract hooks only here, D-02); **Phase 17 Konva annotation ABSORBED** into the Visual block (D-03, workers never download Konva — baked PNG read path); **v5.0 opened** (D-04). Expect a heavily-waved plan (bespoke render → tiered inserter+ghosts → re-wire autosave/provenance-sync/AI-overlays/verify-UI with **behavioural parity tests** → Visual+Konva slices → convert-golden-path regression). Validated sketch: `sketches/sop-builder-redesign/index.html`.
 
 **Also outstanding (v4.0 residual):** human UAT on sopstart.com — Phase 23 (4 tests), Phase 22 (voice loop), Phase 25 (7 tests), Phase 21.6 (4 items). Carry per v3.0 field-verification precedent or run before `/gsd-complete-milestone`.
 
