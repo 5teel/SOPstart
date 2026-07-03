@@ -23,6 +23,7 @@
  * Exit: 0 + "RENDER-PARITY OK" on parity; 1 + the failing block(s) on drift.
  */
 /* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any */
+export {} // isolate module scope (sibling *-check.tsx harnesses share globals otherwise)
 const Module = require('module')
 // Stub non-JS asset imports (CSS from react-lightbox, etc.) — Node can't parse them.
 for (const ext of ['.css', '.scss', '.sass', '.less', '.svg', '.png', '.jpg', '.jpeg', '.webp', '.gif']) {
