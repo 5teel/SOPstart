@@ -1945,6 +1945,13 @@ export type Database = {
       // Phase 15: sub-trade RLS helpers (migration 00030)
       current_user_sub_trades: { Args: Record<string, never>; Returns: string[] }
       sub_trade_id_intersects: { Args: { p_sop_id: string }; Returns: boolean }
+      // Phase 26.5 D-03: pgvector similarity RPC (migration 00040) — PostgREST
+      // cannot express the <=> operator, so this wraps it; SECURITY DEFINER,
+      // self-enforces organisation_id inside the function body.
+      match_sop_agent_metadata: {
+        Args: { p_organisation_id: string; query_embedding: string; match_count?: number }
+        Returns: { sop_id: string; similarity: number }[]
+      }
     }
     Enums: {
       app_role: "worker" | "supervisor" | "admin" | "safety_manager"
