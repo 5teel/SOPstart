@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
 status: Ready to execute
-stopped_at: Completed 26.5-01-PLAN.md
-last_updated: "2026-07-04T01:18:49.683Z"
+stopped_at: Completed 26.5-02-PLAN.md
+last_updated: "2026-07-04T01:32:57.722Z"
 progress:
   total_phases: 30
   completed_phases: 4
   total_plans: 29
-  completed_plans: 22
+  completed_plans: 23
   percent: 13
 ---
 
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 26.5 (agent-metadata-layer) — EXECUTING
-Plan: 2 of 8
+Plan: 3 of 8
 **Milestone status:** **v4.0 ✅ shipped 2026-07-02** (Phases 21, 21.5, 21.6, 22, 23, 24, 25 executed + code-reviewed; residual = human UAT on 21.6/22/23/25, carried per v3.0 field-verification precedent — archive via `/gsd-complete-milestone`). **v5.0 opened 2026-07-02** — Phase 26 (bespoke inline builder; Phase 17 Konva absorbed) → Phase 26.5 (agent-metadata layer on X-03 + graphify).
 
 **Active phase:** 26
@@ -155,6 +155,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 26 P05 | 8m | 3 tasks | 8 files |
 | Phase 26 P13 | 40m | 2 tasks | 12 files |
 | Phase 26.5 P1 | 12m | 3 tasks | 13 files |
+| Phase 26.5 P02 | 20m | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -291,6 +292,9 @@ Recent decisions affecting current work:
 - [Phase 26-05]: 00039 sop_image_annotations APPLIED to live DB (verified via Management API to_regclass — table + 1 org-scoped SELECT policy + 10 cols). Append-only (no authenticated write; service-role writes in 26-13 self-enforce org-scope), org-scoped SELECT via current_organisation_id() only — NO cross-table public.sops reference (42P17-safe, copies 00038 pattern). Konva fenced out of worker tier by bundle gate + no-static-import lint (D-03/R8)
 - [Phase 26-13]: saveAnnotation/bakeAnnotation server actions are service-role + async-only 'use server' (pure baked-path helpers moved to src/lib/builder/baked-path.ts — a sync export in a 'use server' module breaks next build, CLAUDE.md 2026-06-27); both self-enforce org-scope (org via parseJwtPayload not atob; sop_images has no org column so membership is gated through its org-scoped sops row; .eq('organisation_id', callerOrg) on the write). Baked PNG is content-versioned (.v{N}.png) to beat CDN cache; baked path lives on the VisualBlock props (bakedSrc), NOT a layout_data schema change (D-01 frozen). Bake runs at annotation SAVE (live Stage) not headless publish — identical outcome. Deleted the 26-05 throwaway konva-spike route; the real MediaGrid→DiagramAnnotateModal→AnnotationEditorLoader path now carries react-konva into the admin graph while the worker bundle stays Δ0KB Konva-free
 - [Phase ?]: voyageai 0.4.0 approved at blocking human gate; EMBED_MODEL defaults to voyage-3.5 (VOYAGE_EMBED_MODEL override), SYNTHESIS_MODEL to claude-haiku-4-5-20251001 — single-source constants in src/lib/agent-layer/model-constants.ts
+- [Phase 26.5-02]: agent_learning_proposals is a sibling table to ai_field_proposals (not shared row shape) — evidence jsonb is proposal-pattern-specific, D-07
+- [Phase 26.5-02]: block_agent_metadata keyed by sop_section_blocks junction id (D-02), unique-indexed
+- [Phase 26.5-02]: sop_voice_qa_log schema added in this plan (closes RESEARCH Pitfall 1 voice-signal gap); write path itself lands in Plan 26.5-03
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -399,7 +403,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-04T01:18:38.432Z
-Stopped at: Completed 26.5-01-PLAN.md
+Last session: 2026-07-04T01:32:57.708Z
+Stopped at: Completed 26.5-02-PLAN.md
 Resume file:
 None
