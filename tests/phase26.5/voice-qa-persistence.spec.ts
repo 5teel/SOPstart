@@ -1,11 +1,11 @@
 /**
- * Phase 26.5 — D-06 voice write path / RESEARCH Pitfall 1 (Wave-0 stub, Plan 26.5-01).
+ * Phase 26.5 — D-06 voice write path / RESEARCH Pitfall 1 (LIVE, Plan 26.5-03).
  *
- * /api/voice/query is currently PURE request-response — no transcript is
- * persisted anywhere, so signal source #3 does not exist until a write path
- * is added. Goes LIVE when the route gains the append-only transcript insert.
- * Content-level guard (phase23 version-supersede convention: the file exists
- * today, so guard on the new capability, not file existence).
+ * /api/voice/query now persists the Q&A transcript into sop_voice_qa_log via
+ * createAdminClient() (append-only, no authenticated write policy). These are
+ * source-contract assertions that the write is WIRED — the handler is called
+ * with the answer, sets organisation_id explicitly, and never falls back to
+ * atob() for the org claim (CLAUDE.md 2026-06-05/2026-06-26).
  */
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
@@ -19,26 +19,28 @@ function readRoute(): string {
   return fs.readFileSync(ROUTE_PATH, 'utf-8')
 }
 
-const hasWritePath = fs.existsSync(ROUTE_PATH) && /voice_qa/.test(readRoute())
-
 test('D-06/Pitfall-1: /api/voice/query persists the Q&A transcript (append-only)', () => {
-  if (!hasWritePath) {
-    test.skip(true, 'voice Q&A transcript write not yet added — waiting for Plan 26.5-03')
-    return
-  }
   const src = readRoute()
-  expect(src).toMatch(/voice_qa/)
-  expect(src).toContain('insert')
+  expect(src).toMatch(/sop_voice_qa_log/)
+  expect(src).toContain('.insert(')
+  expect(src).toContain('createAdminClient')
 })
 
 test('D-06/Pitfall-1: transcript write self-enforces org scope (service-role insert sets organisation_id)', () => {
-  if (!hasWritePath) {
-    test.skip(true, 'voice Q&A transcript write not yet added — waiting for Plan 26.5-03')
-    return
-  }
-  expect(readRoute()).toContain('organisation_id')
+  const src = readRoute()
+  expect(src).toContain('organisation_id: params.organisationId')
+  expect(src).not.toContain('atob(')
+})
+
+test('D-06/Pitfall-1: the log write is called with the computed answer, after answerSopQuestion resolves', () => {
+  const src = readRoute()
+  const answerIdx = src.indexOf('await answerSopQuestion(')
+  const logIdx = src.indexOf('logVoiceQaTranscript({')
+  expect(answerIdx).toBeGreaterThan(-1)
+  expect(logIdx).toBeGreaterThan(answerIdx)
 })
 
 test.fixme('D-06/Pitfall-1: a voice query produces a transcript row (runtime, seeded org)', () => {
-  // Live-route integration test — implemented in Plan 26.5-03.
+  // Live-route integration test — deferred to phase UAT (requires a seeded
+  // org + published SOP + live Anthropic call).
 })

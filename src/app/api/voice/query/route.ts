@@ -1,8 +1,48 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { voiceQuerySchema } from '@/lib/validators/voice-query'
 import { answerSopQuestion } from '@/lib/voice/voice-qa'
 import type { SopWithSections } from '@/types/sop'
+
+/**
+ * Phase 26.5 D-06 signal #3 (RESEARCH Pitfall 1) — persist the voice Q&A
+ * transcript so the agent-layer synthesis pipeline has a real signal source.
+ *
+ * sop_voice_qa_log has no authenticated write policy (append-only via
+ * service role only, migration 00040) — createAdminClient() is required.
+ * organisation_id is taken from the already RLS-verified `sop` row (not a
+ * JWT decode — CLAUDE.md 2026-06-26 prefers the already-fetched, already-
+ * verified value when available). Fire-and-forget: a log failure must NEVER
+ * change the 200 answer the worker receives (T-26.5-03-01/04).
+ */
+function logVoiceQaTranscript(params: {
+  organisationId: string
+  sopId: string
+  userId: string
+  question: string
+  answer: string
+  citations: string[]
+}) {
+  try {
+    createAdminClient()
+      .from('sop_voice_qa_log')
+      .insert({
+        organisation_id: params.organisationId,
+        sop_id: params.sopId,
+        user_id: params.userId,
+        question: params.question,
+        answer: params.answer,
+        citations: params.citations,
+      })
+      .then(({ error }) => {
+        if (error) console.error('voice_qa transcript log insert failed:', error.message)
+      })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'unknown'
+    console.error('voice_qa transcript log insert threw:', message)
+  }
+}
 
 // 30s safety cap for Anthropic timeouts (typical ≤2s answer + verifier round trip).
 // Mitigation for T-15-03-04 (cost runaway via long-running calls).
@@ -96,8 +136,17 @@ export async function POST(req: NextRequest) {
     }
 
     // ── 5. Two-call Anthropic pipeline (answer + verifier with cache HIT) ──
+    const sopWithSections = sop as unknown as SopWithSections
     try {
-      const result = await answerSopQuestion(sop as unknown as SopWithSections, question)
+      const result = await answerSopQuestion(sopWithSections, question)
+      logVoiceQaTranscript({
+        organisationId: sopWithSections.organisation_id,
+        sopId,
+        userId: user.id,
+        question,
+        answer: result.answer,
+        citations: result.citations,
+      })
       return NextResponse.json(result)
     } catch (err) {
       // T-15-03-05: log only error.message, never the request body. Anthropic
