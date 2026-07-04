@@ -10,6 +10,19 @@ import { db } from '@/lib/offline/db'
 import { BuilderTreeRail } from '@/components/admin/builder/BuilderTreeRail'
 import { RerunReviewerButton } from '@/components/admin/ai-reviewer/RerunReviewerButton'
 import { EditableDocument } from '@/components/admin/builder-v2/EditableDocument'
+import { AgentPanel } from '@/components/admin/builder-v2/agent/AgentPanel'
+import { AgentBlockMeta } from '@/components/admin/builder-v2/agent/AgentBlockMeta'
+import { AgentBanner } from '@/components/admin/builder-v2/agent/AgentBanner'
+import {
+  getSopAgentMetadata,
+  getBlockAgentMetadata,
+  getAgentDashboardData,
+  approveProposalAction,
+  declineProposalAction,
+  type SopAgentMetadataView,
+  type BlockAgentMetadataView,
+  type AgentDashboardData,
+} from '@/actions/agent-layer'
 
 interface BuilderClientProps {
   sopId: string
@@ -92,6 +105,46 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
     )
   }, [activeSection])
 
+  // Phase 26.5 (D-09): agentview toggle reveals the read-only machine-layer
+  // panel + per-block metadata rows over the same canvas. Lazy-fetched only
+  // while the toggle is on — admins who never look at the agent layer never
+  // pay the query cost.
+  const [agentview, setAgentview] = useState(false)
+  const [agentLoading, setAgentLoading] = useState(false)
+  const [sopAgentData, setSopAgentData] = useState<SopAgentMetadataView | null>(null)
+  const [blockAgentRows, setBlockAgentRows] = useState<BlockAgentMetadataView[]>([])
+  const [sopProposals, setSopProposals] = useState<AgentDashboardData['pendingProposals']>([])
+
+  useEffect(() => {
+    if (!agentview) return
+    let cancelled = false
+    setAgentLoading(true)
+    Promise.all([getSopAgentMetadata(sopId), getBlockAgentMetadata(sopId), getAgentDashboardData()])
+      .then(([sopRes, blockRes, dashRes]) => {
+        if (cancelled) return
+        setSopAgentData('data' in sopRes ? sopRes.data : null)
+        setBlockAgentRows('data' in blockRes ? blockRes.data : [])
+        setSopProposals(
+          'data' in dashRes ? dashRes.data.pendingProposals.filter((p) => p.sopId === sopId) : []
+        )
+      })
+      .finally(() => {
+        if (!cancelled) setAgentLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [agentview, sopId])
+
+  async function handleApproveProposal(proposalId: string) {
+    setSopProposals((prev) => prev.filter((p) => p.id !== proposalId))
+    await approveProposalAction(proposalId)
+  }
+  async function handleDeclineProposal(proposalId: string) {
+    setSopProposals((prev) => prev.filter((p) => p.id !== proposalId))
+    await declineProposalAction(proposalId)
+  }
+
   const savePillLabel = !isOnline
     ? 'OFFLINE · QUEUED'
     : syncing
@@ -103,7 +156,9 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
   void savedTick
 
   return (
-    <div className="flex h-screen flex-col bg-[var(--paper)] text-[var(--ink-900)]">
+    <div
+      className={`agent-layer-root flex h-screen flex-col bg-[var(--paper)] text-[var(--ink-900)] ${agentview ? 'agentview' : ''}`}
+    >
       <header className="flex items-center justify-between border-b border-[var(--ink-100)] px-4 py-3">
         <div className="flex items-center gap-3">
           <Link
@@ -136,8 +191,19 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
             {savePillLabel}
           </span>
           <RerunReviewerButton sopId={sopId} />
+          <button
+            type="button"
+            onClick={() => setAgentview((v) => !v)}
+            aria-pressed={agentview}
+            className="rounded border border-[var(--ink-300)] px-2 py-0.5 font-mono text-[11px] uppercase tracking-wider text-[var(--ink-500)] data-[on=true]:border-[var(--ai)] data-[on=true]:text-[var(--ai)]"
+            data-on={agentview}
+            data-testid="agentview-toggle"
+          >
+            ⚇ Agent layer
+          </button>
         </div>
       </header>
+      <AgentBanner />
       <div className="flex min-h-0 flex-1">
         <BuilderTreeRail
           sections={sections}
@@ -150,6 +216,18 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
           sopId={sopId}
         />
         <main className="relative min-w-0 flex-1 overflow-auto">
+          {agentview && (
+            <div className="px-4 pt-4">
+              <AgentPanel
+                data={sopAgentData}
+                loading={agentLoading}
+                pendingProposals={sopProposals}
+                onApprove={handleApproveProposal}
+                onDecline={handleDeclineProposal}
+              />
+              <AgentBlockMeta rows={blockAgentRows} />
+            </div>
+          )}
           {activeSection ? (
             <EditableDocument
               key={activeSection.id}

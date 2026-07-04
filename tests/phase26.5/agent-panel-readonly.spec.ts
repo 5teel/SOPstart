@@ -1,51 +1,73 @@
 /**
- * Phase 26.5 — D-09/D-10: builder agent panel is read-only (Wave-0 stub, Plan 26.5-01).
+ * Phase 26.5 Plan 07 — D-09/D-10: builder agent panel is read-only (LIVE).
  *
- * Goes LIVE when AgentPanel/AgentBlockMeta ship: asserts NO edit affordance
- * exists on machine metadata (tags/entities/embeddings render as display-only —
- * hand edits would be clobbered on next publish, D-10). Per CLAUDE.md
- * 2026-06-05: assert absence of handlers/inputs, not just a CSS class string.
- * Skips cleanly until the components exist.
+ * Asserts NO edit affordance exists on machine metadata (tags/entities/
+ * embeddings render as display-only — hand edits would be clobbered on the
+ * next publish, D-10) and that AgentBlockMeta keys rows by junctionId (D-02).
+ * Per CLAUDE.md 2026-06-05: assert ABSENCE of a handler behaviourally (real
+ * react-dom/server render via a tsx subprocess), not just a source-contract
+ * grep — the grep check below is kept as a cheap first line of defence, the
+ * harness proves the rendered markup itself.
  */
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
 import path from 'node:path'
+import { execFileSync } from 'node:child_process'
 
 const REPO_ROOT = path.resolve(__dirname, '..', '..')
+const HARNESS = path.join('scripts', 'agent-panel-check.tsx')
+const AGENT_DIR = path.join(REPO_ROOT, 'src', 'components', 'admin', 'builder-v2', 'agent')
+const BUILDER_CLIENT = path.join(
+  REPO_ROOT,
+  'src',
+  'app',
+  '(protected)',
+  'admin',
+  'sops',
+  'builder',
+  '[sopId]',
+  'BuilderClient.tsx'
+)
 
-function findAgentComponents(): string[] {
-  const results: string[] = []
-  const stack = [path.join(REPO_ROOT, 'src', 'components', 'admin')]
-  while (stack.length) {
-    const dir = stack.pop()!
-    if (!fs.existsSync(dir)) continue
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const p = path.join(dir, entry.name)
-      if (entry.isDirectory()) stack.push(p)
-      else if (/^Agent(Panel|BlockMeta)\.tsx$/.test(entry.name)) results.push(p)
+test.describe('D-09/D-10 — agent panel is read-only, keyed by junction id, and the toggle is wired', () => {
+  test('D-10: AgentPanel/AgentBlockMeta/AgentBanner render machine metadata with NO edit affordance (behavioural)', () => {
+    let out = ''
+    try {
+      out = execFileSync('npx', ['tsx', HARNESS], { cwd: REPO_ROOT, encoding: 'utf8', shell: true })
+    } catch (err) {
+      const e = err as { stdout?: string; stderr?: string }
+      throw new Error(`agent-panel harness failed:\n${e.stdout ?? ''}\n${e.stderr ?? ''}`)
     }
-  }
-  return results
-}
+    expect(out).toContain('AGENT-PANEL-CHECK OK')
+  })
 
-test('D-10: AgentPanel/AgentBlockMeta render machine metadata with NO edit affordance (no input/onChange on tags/entities)', () => {
-  const files = findAgentComponents()
-  if (files.length === 0) {
-    test.skip(true, 'agent panel components not yet created — waiting for the panel plan')
-    return
-  }
-  for (const file of files) {
-    const src = fs.readFileSync(file, 'utf-8')
-    expect(src).not.toContain('<input')
-    expect(src).not.toContain('<textarea')
-    expect(src).not.toContain('contentEditable')
-  }
-})
+  test('D-10: source contract — no <input>/<textarea>/contentEditable literal in any Agent*.tsx file', () => {
+    const files = fs
+      .readdirSync(AGENT_DIR)
+      .filter((f) => /^Agent(Panel|BlockMeta|Banner)\.tsx$/.test(f))
+    expect(files.length).toBe(3)
+    for (const f of files) {
+      const src = fs.readFileSync(path.join(AGENT_DIR, f), 'utf-8')
+      expect(src).not.toContain('<input')
+      expect(src).not.toContain('<textarea')
+      expect(src).not.toContain('contentEditable')
+      expect(src).not.toMatch(/onChange=/)
+    }
+  })
 
-test.fixme('D-09: builder toggle shows/hides the agent panel; workers never see it (behavioral render)', () => {
-  // Real component render (tsx subprocess harness per Phase 26 convention) — panel plan.
-})
+  test('D-02: AgentBlockMeta keys its rows by junctionId, not block_id or sort_order', () => {
+    const src = fs.readFileSync(path.join(AGENT_DIR, 'AgentBlockMeta.tsx'), 'utf-8')
+    expect(src).toContain('junctionId')
+    expect(src).toMatch(/key=\{row\.junctionId\}/)
+  })
 
-test.fixme('D-10: only proposal approve/decline actions are interactive (behavioral render)', () => {
-  // Behavioral assertion that the ONLY handlers present are proposal actions — panel plan.
+  test('D-09: BuilderClient agentview toggle is wired to the state setter (not an empty handler)', () => {
+    const src = fs.readFileSync(BUILDER_CLIENT, 'utf-8')
+    expect(src).toContain('useState(false)')
+    expect(src).toMatch(/onClick=\{\(\)\s*=>\s*setAgentview/)
+    expect(src).toContain('agent-layer-root')
+    expect(src).toContain('AgentPanel')
+    expect(src).toContain('AgentBlockMeta')
+    expect(src).toContain('AgentBanner')
+  })
 })

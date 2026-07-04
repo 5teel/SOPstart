@@ -46,6 +46,9 @@
   --accent-inspect:  #7c3aed;  /* violet — InspectBlock */
   --accent-zone:     #0891b2;  /* cyan   — ZoneBlock */
   --accent-voice:    #ea580c;  /* orange — VoiceNoteBlock */
+
+  /* Phase 26.5 — the human-invisible AGENT metadata layer (D-09) */
+  --ai: #8b5cf6; /* violet — agentview toggle, agent panel, per-block ameta rows */
 }
 
 /* ---------- SCOPED ONLY UNDER body[data-theme="paper"] ---------- */
@@ -242,4 +245,72 @@ body[data-theme="paper"] .bottom-tab-bar .tab-link[aria-current="page"] {
  * --------------------------------------------------------------- */
 body[data-theme="paper"] .layout-shell {
   background-color: var(--paper);
+}
+
+/* ---------------------------------------------------------------
+ * Phase 26.5 (D-09/D-10) — the human-invisible AGENT metadata layer.
+ * Scoped to `.agent-layer-root.agentview` (a class on the builder's own
+ * root wrapper) rather than global `body.agentview` — the sketch's
+ * selectors are lifted verbatim, just re-rooted to the component tree
+ * this app actually controls. Read-only: no rule here ever targets an
+ * <input>/<textarea>/contentEditable element (D-10).
+ * --------------------------------------------------------------- */
+.agent-layer-root .ameta,
+.agent-layer-root .agentpanel,
+.agent-layer-root .agentbanner {
+  display: none;
+}
+.agent-layer-root.agentview .ameta,
+.agent-layer-root.agentview .agentpanel {
+  display: block;
+}
+.agent-layer-root.agentview .agentbanner {
+  display: flex;
+}
+
+/* per-block metadata twin */
+.ameta {
+  margin-top: 12px;
+  border-top: 1px dashed var(--ai);
+  padding: 9px 16px 4px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 10px;
+  color: var(--ink-700);
+  background: rgba(139, 92, 246, 0.035);
+  border-radius: 0 0 4px 4px;
+}
+.ameta .mrow { display: flex; gap: 8px; padding: 2px 0; line-height: 1.5; }
+.ameta .mk { color: var(--ai); flex: 0 0 84px; text-transform: uppercase; letter-spacing: 0.04em; font-size: 9px; padding-top: 1px; }
+.ameta .mv { color: var(--ink-700); flex: 1; }
+.ameta .chip { display: inline-block; border: 1px solid var(--ink-300); border-radius: 2px; padding: 0 5px; margin: 1px 3px 1px 0; color: var(--ink-500); font-size: 9px; }
+.ameta .link { color: var(--accent-measure); }
+.ameta .ok { color: var(--accent-signoff); }
+
+/* SOP-level agent panel at top of canvas */
+.agentpanel {
+  border: 1.5px solid var(--ai);
+  background: rgba(139, 92, 246, 0.05);
+  border-radius: 7px;
+  padding: 15px 17px;
+  margin-bottom: 22px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+}
+.agentpanel h4 { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ai); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.agentpanel h4 .tag { margin-left: auto; font-size: 8px; border: 1px solid var(--ai); border-radius: 2px; padding: 1px 6px; color: var(--ai); }
+.agentpanel .arow { display: flex; gap: 10px; padding: 4px 0; border-top: 1px solid rgba(139, 92, 246, 0.15); line-height: 1.55; }
+.agentpanel .ak { color: var(--ai); flex: 0 0 108px; text-transform: uppercase; font-size: 9px; letter-spacing: 0.04em; padding-top: 1px; }
+.agentpanel .av { flex: 1; color: var(--ink-700); }
+.agentpanel .av .link { color: var(--accent-measure); }
+
+.agentbanner {
+  align-items: center;
+  gap: 8px;
+  background: var(--ai);
+  color: #fff;
+  font-size: 11px;
+  padding: 8px 18px;
+  position: sticky;
+  top: 0;
+  z-index: 19;
 }
