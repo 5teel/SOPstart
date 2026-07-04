@@ -4,12 +4,12 @@ milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
 status: Ready to execute
 stopped_at: Completed 26.5-04-PLAN.md
-last_updated: "2026-07-04T02:29:49.624Z"
+last_updated: "2026-07-04T02:46:02.420Z"
 progress:
   total_phases: 30
   completed_phases: 4
   total_plans: 29
-  completed_plans: 26
+  completed_plans: 27
   percent: 13
 ---
 
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 26.5 (agent-metadata-layer) — EXECUTING
-Plan: 6 of 8
+Plan: 7 of 8
 **Milestone status:** **v4.0 ✅ shipped 2026-07-02** (Phases 21, 21.5, 21.6, 22, 23, 24, 25 executed + code-reviewed; residual = human UAT on 21.6/22/23/25, carried per v3.0 field-verification precedent — archive via `/gsd-complete-milestone`). **v5.0 opened 2026-07-02** — Phase 26 (bespoke inline builder; Phase 17 Konva absorbed) → Phase 26.5 (agent-metadata layer on X-03 + graphify).
 
 **Active phase:** 26
@@ -159,6 +159,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 26.5 P03 | 25min | 2 tasks | 5 files |
 | Phase 26.5 P4 | 35m | 2 tasks | 4 files |
 | Phase 26.5 P05 | 15m | 2 tasks | 2 files |
+| Phase 26.5-agent-metadata-layer P07 | 15m | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -305,6 +306,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Per-run proposal cap (MAX_PROPOSALS_PER_RUN=3) as the discretionary cost guardrail (T-26.5-04-04)
 - [Phase ?]: [Phase 26.5-05]: triggerAgentSynthesis called bare (no .catch chain) at the publish-route call site — Plan 04 already made it void-returning and self-catching internally
 - [Phase ?]: [Phase 26.5-05]: backfill-agent-metadata.mjs imports synthesizeSop/createAdminClient from the real TS lib modules via tsx dynamic import, reusing the shared pipeline; per-org SOP cap (200) is the cost guardrail
+- [Phase 26.5-07]: AgentPanel/AgentBlockMeta/AgentBanner are presentational (data as props, no internal fetch) so a tsx react-dom/server harness can prove absence of edit handlers behaviourally
+- [Phase 26.5-07]: Per-block agent metadata rendered as a flat list under the SOP-level AgentPanel (grouped), not injected into EditableDocument's per-block loop, keyed by junctionId
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -413,7 +416,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-04T02:28:55.380Z
+Last session: 2026-07-04T02:45:18.380Z
 Stopped at: Completed 26.5-04-PLAN.md
 Resume file:
 None

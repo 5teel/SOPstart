@@ -122,7 +122,7 @@ Plans:
 
 - [x] 26.5-05-PLAN.md — Publish-hook regeneration + backfill of all published SOPs (D-04, D-15)
 - [ ] 26.5-06-PLAN.md — Authed cron synthesis-sweep route + VOYAGE_API_KEY Railway gate (D-14)
-- [ ] 26.5-07-PLAN.md — Admin server actions + builder agentview toggle + read-only purple panel (D-02, D-09, D-10, D-12)
+- [x] 26.5-07-PLAN.md — Admin server actions + builder agentview toggle + read-only purple panel (D-02, D-09, D-10, D-12)
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
@@ -632,7 +632,7 @@ These two items belong with kiosk mode + site-tier work in Phase 15 because they
   9. Global app-wide Cmd+K mounted across all `(protected)` routes — surfaces app-wide navigation (Library, Blocks, Team, Create via Upload/Blank/AI, Settings, kiosk site selector for multi-site admins) alongside the existing SOP-scoped jump-to-step + ask-AI on SOP pages.
   10. Bundle isolation: kiosk mode chunks + voice Q&A RAG client do not leak into the existing mobile worker bundle; mobile worker walkthrough First Load JS does not grow as a result of Phase 15.
 
-**Plans:** 5/8 plans executed
+**Plans:** 6/8 plans executed
 
 Plans:
 
