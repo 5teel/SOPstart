@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { enqueueVideoGenerationForPipeline } from '@/lib/video-gen/auto-queue'
+import { triggerAgentSynthesis } from '@/lib/agent-layer/synthesis'
 
 // POST /api/sops/[sopId]/publish — transition draft -> published
 //
@@ -130,6 +131,11 @@ export async function POST(
   if (queueResult.error) {
     console.error(`[publish] auto-queue failed for SOP ${sopId}:`, queueResult.error)
   }
+
+  // 5. Phase 26.5 D-04 — fire-and-forget agent-metadata regeneration.
+  //    Never awaited, never affects the response — a failed synthesis
+  //    never fails the publish (mirrors step 4's video auto-queue shape).
+  triggerAgentSynthesis(sopId, organisationId)
 
   return NextResponse.json({
     success: true,
