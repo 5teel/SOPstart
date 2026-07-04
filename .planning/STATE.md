@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
-status: 26-14 complete — PHASE 26 COMPLETE (frozen-contract proof R6/R8 + Puck fully removed, D-01 end-state)
-stopped_at: Phase 26.5 context gathered
-last_updated: "2026-07-03T15:25:28.570Z"
+status: Ready to execute
+stopped_at: Completed 26.5-01-PLAN.md
+last_updated: "2026-07-04T01:18:49.683Z"
 progress:
-  total_phases: 29
+  total_phases: 30
   completed_phases: 4
-  total_plans: 21
-  completed_plans: 21
-  percent: 14
+  total_plans: 29
+  completed_plans: 22
+  percent: 13
 ---
 
 # Project State
@@ -20,12 +20,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 26 — sop-builder-redesign
+**Current focus:** Phase 26.5 — agent-metadata-layer
 
 ## Current Position
 
-Phase: 26 (sop-builder-redesign) — COMPLETE (all 14 plans executed)
-Plan: 14 of 14 complete — Phase 26 done; convert-golden byte-equivalence (R6) + spine-regression (R8) prove the frozen contract survived the full-bespoke swap; Puck removed (D-01 end-state)
+Phase: 26.5 (agent-metadata-layer) — EXECUTING
+Plan: 2 of 8
 **Milestone status:** **v4.0 ✅ shipped 2026-07-02** (Phases 21, 21.5, 21.6, 22, 23, 24, 25 executed + code-reviewed; residual = human UAT on 21.6/22/23/25, carried per v3.0 field-verification precedent — archive via `/gsd-complete-milestone`). **v5.0 opened 2026-07-02** — Phase 26 (bespoke inline builder; Phase 17 Konva absorbed) → Phase 26.5 (agent-metadata layer on X-03 + graphify).
 
 **Active phase:** 26
@@ -154,6 +154,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 26 P02 | 12m | 2 tasks | 5 files |
 | Phase 26 P05 | 8m | 3 tasks | 8 files |
 | Phase 26 P13 | 40m | 2 tasks | 12 files |
+| Phase 26.5 P1 | 12m | 3 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -289,6 +290,7 @@ Recent decisions affecting current work:
 - [Phase 26-05]: Konva-in-Next-16 spike PASSED — react-konva renders via dynamic({ssr:false}) with 'canvas' in serverExternalPackages; compiled to its own client chunk, ABSENT from /sops/[sopId] worker bundle (Δ0). No Excalidraw/custom-SVG fallback needed. Throwaway /admin/builder-v2-konva-spike route forced react-konva into the build graph (a component no route imports is never bundled — tsc alone doesn't exercise canvas webpack resolution); delete in 26-13
 - [Phase 26-05]: 00039 sop_image_annotations APPLIED to live DB (verified via Management API to_regclass — table + 1 org-scoped SELECT policy + 10 cols). Append-only (no authenticated write; service-role writes in 26-13 self-enforce org-scope), org-scoped SELECT via current_organisation_id() only — NO cross-table public.sops reference (42P17-safe, copies 00038 pattern). Konva fenced out of worker tier by bundle gate + no-static-import lint (D-03/R8)
 - [Phase 26-13]: saveAnnotation/bakeAnnotation server actions are service-role + async-only 'use server' (pure baked-path helpers moved to src/lib/builder/baked-path.ts — a sync export in a 'use server' module breaks next build, CLAUDE.md 2026-06-27); both self-enforce org-scope (org via parseJwtPayload not atob; sop_images has no org column so membership is gated through its org-scoped sops row; .eq('organisation_id', callerOrg) on the write). Baked PNG is content-versioned (.v{N}.png) to beat CDN cache; baked path lives on the VisualBlock props (bakedSrc), NOT a layout_data schema change (D-01 frozen). Bake runs at annotation SAVE (live Stage) not headless publish — identical outcome. Deleted the 26-05 throwaway konva-spike route; the real MediaGrid→DiagramAnnotateModal→AnnotationEditorLoader path now carries react-konva into the admin graph while the worker bundle stays Δ0KB Konva-free
+- [Phase ?]: voyageai 0.4.0 approved at blocking human gate; EMBED_MODEL defaults to voyage-3.5 (VOYAGE_EMBED_MODEL override), SYNTHESIS_MODEL to claude-haiku-4-5-20251001 — single-source constants in src/lib/agent-layer/model-constants.ts
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -397,7 +399,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-03T14:45:13.269Z
-Stopped at: Phase 26.5 context gathered
+Last session: 2026-07-04T01:18:38.432Z
+Stopped at: Completed 26.5-01-PLAN.md
 Resume file:
-.planning/phases/26.5-agent-metadata-layer/26.5-CONTEXT.md
+None

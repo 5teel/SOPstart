@@ -104,7 +104,7 @@ v4.0 (Phases 21–25) shipped. v5.0 rebuilds the SOP builder as a bespoke inline
 Plans:
 **Wave 1**
 
-- [ ] 26.5-01-PLAN.md — Harness + package gate + lazy Voyage client & model constants (D-03, D-16)
+- [x] 26.5-01-PLAN.md — Harness + package gate + lazy Voyage client & model constants (D-03, D-16)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -632,7 +632,7 @@ These two items belong with kiosk mode + site-tier work in Phase 15 because they
   9. Global app-wide Cmd+K mounted across all `(protected)` routes — surfaces app-wide navigation (Library, Blocks, Team, Create via Upload/Blank/AI, Settings, kiosk site selector for multi-site admins) alongside the existing SOP-scoped jump-to-step + ask-AI on SOP pages.
   10. Bundle isolation: kiosk mode chunks + voice Q&A RAG client do not leak into the existing mobile worker bundle; mobile worker walkthrough First Load JS does not grow as a result of Phase 15.
 
-**Plans:** 8/8 plans complete
+**Plans:** 1/8 plans executed
 
 Plans:
 
