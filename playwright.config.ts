@@ -228,5 +228,24 @@ export default defineConfig({
       testMatch: /tests\/phase26\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 26.5 — Agent Metadata Layer Nyquist harness (Wave 0 / Plan 26.5-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase26.5/**) so every later plan in
+      // the phase drops specs into tests/phase26.5/ with NO further config edit —
+      // single registration point for the whole phase (mirrors phase26).
+      //
+      // Verify registration: `npx playwright test --list --project=phase26.5`
+      //
+      // Wave-0 stub files (9, per 26.5-RESEARCH.md § Validation Architecture):
+      //   schema-contract, synthesis-pipeline, proposal-evidence, signal-readers,
+      //   voice-qa-persistence, synthesis-sweep-auth, backfill-coverage,
+      //   agent-panel-readonly, agent-dashboard
+      name: 'phase26.5',
+      testDir: '.',
+      testMatch: /tests\/phase26\.5\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
