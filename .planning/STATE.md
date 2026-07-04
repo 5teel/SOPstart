@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
 status: Ready to execute
-stopped_at: Completed 26.5-03-PLAN.md
-last_updated: "2026-07-04T01:56:25.639Z"
+stopped_at: Completed 26.5-04-PLAN.md
+last_updated: "2026-07-04T02:19:39.184Z"
 progress:
   total_phases: 30
   completed_phases: 4
   total_plans: 29
-  completed_plans: 24
+  completed_plans: 25
   percent: 13
 ---
 
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 26.5 (agent-metadata-layer) — EXECUTING
-Plan: 4 of 8
+Plan: 5 of 8
 **Milestone status:** **v4.0 ✅ shipped 2026-07-02** (Phases 21, 21.5, 21.6, 22, 23, 24, 25 executed + code-reviewed; residual = human UAT on 21.6/22/23/25, carried per v3.0 field-verification precedent — archive via `/gsd-complete-milestone`). **v5.0 opened 2026-07-02** — Phase 26 (bespoke inline builder; Phase 17 Konva absorbed) → Phase 26.5 (agent-metadata layer on X-03 + graphify).
 
 **Active phase:** 26
@@ -157,6 +157,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 26.5 P1 | 12m | 3 tasks | 13 files |
 | Phase 26.5 P02 | 20m | 2 tasks | 4 files |
 | Phase 26.5 P03 | 25min | 2 tasks | 5 files |
+| Phase 26.5 P4 | 35m | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -298,6 +299,9 @@ Recent decisions affecting current work:
 - [Phase 26.5-02]: sop_voice_qa_log schema added in this plan (closes RESEARCH Pitfall 1 voice-signal gap); write path itself lands in Plan 26.5-03
 - [Phase 26.5]: [Phase 26.5-03]: voice log write reads organisation_id from the already RLS-verified sop row (SopWithSections cast), not a JWT decode
 - [Phase 26.5]: [Phase 26.5-03]: readVerifySignals self-enforces org-scope via a sops-row membership guard first, since sop_section_blocks has no organisation_id column of its own
+- [Phase ?]: agent-proposals.ts is a plain lib module (not 'use server') so Plan 26.5-07 server actions stay thin async wrappers (CLAUDE.md 2026-06-27)
+- [Phase ?]: Approving a proposal only flips status to applied; it does not edit SOP content this phase (D-13 infra-only)
+- [Phase ?]: Per-run proposal cap (MAX_PROPOSALS_PER_RUN=3) as the discretionary cost guardrail (T-26.5-04-04)
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -406,7 +410,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-04T01:56:25.622Z
-Stopped at: Completed 26.5-03-PLAN.md
+Last session: 2026-07-04T02:19:28.075Z
+Stopped at: Completed 26.5-04-PLAN.md
 Resume file:
 None
