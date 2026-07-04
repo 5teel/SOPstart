@@ -289,6 +289,299 @@ export type Database = {
           },
         ]
       }
+      // Plan 26.5-02: manually extended per CLAUDE.md learning (type regen unavailable).
+      // Source: migration 00040_agent_metadata_schema.sql.
+      sop_agent_metadata: {
+        Row: {
+          assessment: string
+          created_at: string
+          entities: Json
+          id: string
+          last_synthesis_error: string | null
+          last_synthesis_status: string | null
+          links: Json
+          organisation_id: string
+          regenerated_at: string | null
+          sop_id: string
+          summary: string | null
+          tags: string[]
+          updated_at: string
+          embedding: string | null
+        }
+        Insert: {
+          assessment?: string
+          created_at?: string
+          entities?: Json
+          id?: string
+          last_synthesis_error?: string | null
+          last_synthesis_status?: string | null
+          links?: Json
+          organisation_id: string
+          regenerated_at?: string | null
+          sop_id: string
+          summary?: string | null
+          tags?: string[]
+          updated_at?: string
+          embedding?: string | null
+        }
+        Update: {
+          assessment?: string
+          created_at?: string
+          entities?: Json
+          id?: string
+          last_synthesis_error?: string | null
+          last_synthesis_status?: string | null
+          links?: Json
+          organisation_id?: string
+          regenerated_at?: string | null
+          sop_id?: string
+          summary?: string | null
+          tags?: string[]
+          updated_at?: string
+          embedding?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sop_agent_metadata_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sop_agent_metadata_sop_id_fkey"
+            columns: ["sop_id"]
+            isOneToOne: true
+            referencedRelation: "sops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      block_agent_metadata: {
+        Row: {
+          created_at: string
+          block_id: string
+          embedding: string | null
+          entities: Json | null
+          id: string
+          organisation_id: string
+          regenerated_at: string | null
+          sop_id: string | null
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          block_id: string
+          embedding?: string | null
+          entities?: Json | null
+          id?: string
+          organisation_id: string
+          regenerated_at?: string | null
+          sop_id?: string | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          block_id?: string
+          embedding?: string | null
+          entities?: Json | null
+          id?: string
+          organisation_id?: string
+          regenerated_at?: string | null
+          sop_id?: string | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "block_agent_metadata_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "block_agent_metadata_block_id_fkey"
+            columns: ["block_id"]
+            isOneToOne: true
+            referencedRelation: "sop_section_blocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "block_agent_metadata_sop_id_fkey"
+            columns: ["sop_id"]
+            isOneToOne: false
+            referencedRelation: "sops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_memory: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json
+          observation: string
+          organisation_id: string
+          scope: string
+          signal_source: string | null
+          sop_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          observation: string
+          organisation_id: string
+          scope: string
+          signal_source?: string | null
+          sop_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          observation?: string
+          organisation_id?: string
+          scope?: string
+          signal_source?: string | null
+          sop_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_memory_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_memory_sop_id_fkey"
+            columns: ["sop_id"]
+            isOneToOne: false
+            referencedRelation: "sops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_learning_proposals: {
+        Row: {
+          created_at: string
+          description: string
+          evidence: Json
+          id: string
+          kind: string
+          organisation_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          sop_id: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          evidence?: Json
+          id?: string
+          kind: string
+          organisation_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sop_id?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          evidence?: Json
+          id?: string
+          kind?: string
+          organisation_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sop_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_learning_proposals_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_learning_proposals_sop_id_fkey"
+            columns: ["sop_id"]
+            isOneToOne: false
+            referencedRelation: "sops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_learning_proposals_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sop_voice_qa_log: {
+        Row: {
+          answer: string | null
+          citations: Json
+          created_at: string
+          id: string
+          organisation_id: string
+          question: string
+          sop_id: string
+          user_id: string | null
+        }
+        Insert: {
+          answer?: string | null
+          citations?: Json
+          created_at?: string
+          id?: string
+          organisation_id: string
+          question: string
+          sop_id: string
+          user_id?: string | null
+        }
+        Update: {
+          answer?: string | null
+          citations?: Json
+          created_at?: string
+          id?: string
+          organisation_id?: string
+          question?: string
+          sop_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sop_voice_qa_log_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sop_voice_qa_log_sop_id_fkey"
+            columns: ["sop_id"]
+            isOneToOne: false
+            referencedRelation: "sops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sop_voice_qa_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sop_sections: {
         Row: {
           approved: boolean
