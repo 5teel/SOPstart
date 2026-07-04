@@ -112,7 +112,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 26.5-03-PLAN.md — Voice Q&A transcript write path + 4 signal readers + similarity wrapper (D-05, D-06)
+- [x] 26.5-03-PLAN.md — Voice Q&A transcript write path + 4 signal readers + similarity wrapper (D-05, D-06)
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -632,7 +632,7 @@ These two items belong with kiosk mode + site-tier work in Phase 15 because they
   9. Global app-wide Cmd+K mounted across all `(protected)` routes — surfaces app-wide navigation (Library, Blocks, Team, Create via Upload/Blank/AI, Settings, kiosk site selector for multi-site admins) alongside the existing SOP-scoped jump-to-step + ask-AI on SOP pages.
   10. Bundle isolation: kiosk mode chunks + voice Q&A RAG client do not leak into the existing mobile worker bundle; mobile worker walkthrough First Load JS does not grow as a result of Phase 15.
 
-**Plans:** 2/8 plans executed
+**Plans:** 3/8 plans executed
 
 Plans:
 
