@@ -498,6 +498,34 @@ export const UAT_TESTS: UatTest[] = [
       'R5 / D-03 — annotate→re-edit→bake pipeline end-to-end. The non-destructive Konva scene (annotation-tools.ts) serializes to layout_data; on publish it bakes to a flat PNG for the worker read path (Konva stays admin-only, worker bundle Konva-free Δ0). Machine-tested for scene serialize/reopen + palm-reject + bundle isolation; the on-device annotate→publish→worker-read visual confirmation is a human check (run alongside p26-annotation-editor-feel once 26-13 wires the launch point).',
   },
 
+  {
+    id: 'agent-layer-dashboard',
+    dateAdded: '2026-07-05',
+    category: 'Phase 26.5 — Agent Metadata Layer',
+    title: 'Does the AI agent layer feel useful, not intrusive?',
+    status: 'active',
+    summary:
+      'There is now a machine layer working quietly behind every procedure — it reads what happens in the field and suggests improvements. You can peek at what it has learned in the builder (a purple "⚇ Agent layer" toggle) and review its suggestions on one org-wide dashboard.',
+    tryIt: [
+      'Open a published procedure in the builder and click the "⚇ Agent layer" toggle in the header.',
+      'Check the panel is read-only — summary, tags, entities, and per-block metadata, nothing editable.',
+      'Open the agent dashboard and look at the proposals queue and the recent activity feed.',
+      'If there is a pending proposal, approve or decline it and confirm it leaves the queue.',
+    ],
+    links: [
+      { label: 'SOP management (admin — builder)', href: '/admin/sops' },
+      { label: 'Agent dashboard', href: '/admin/agent' },
+    ],
+    questions: [
+      { id: 'panel-readonly', text: 'Was the agent panel in the builder clearly read-only (nothing to type into)?' },
+      { id: 'evidence-clear', text: 'Was it clear what evidence a proposal was based on?' },
+      { id: 'decide-works', text: 'Did approving/declining a proposal remove it from the queue?' },
+      { id: 'not-intrusive', text: 'Did the agent layer feel useful rather than getting in the way?' },
+    ],
+    background:
+      'D-09 (two surfaces: builder agentview panel, org /admin/agent dashboard), D-10 (strictly read-only metadata + approve/decline the only interactive affordance), D-11 (proposals queue primary, activity feed secondary, no cross-SOP graph viz), D-14 (activity feed proves the layer is alive). Both server actions and UI verified behaviourally (agent-panel-readonly.spec.ts, agent-dashboard.spec.ts) — this UAT entry is the human "does it feel right" check.',
+  },
+
   // ---------------------------------------------------------------------------
   // TEMPLATE — copy this to put a new design choice or check to the team.
   // Set status:'archived' once it's decided.

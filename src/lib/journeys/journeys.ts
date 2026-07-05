@@ -366,6 +366,24 @@ export const JOURNEYS: Journey[] = [
       { id: 'e', type: 'end', label: 'Video ready' },
     ],
   },
+  {
+    id: 'agent-layer',
+    group: 'Refine & publish',
+    persona: 'SOP Admin',
+    title: 'Inspect the machine layer & review proposals',
+    summary: 'An admin peeks behind the human-facing SOP at what the AI agent has synthesised — a read-only per-SOP/per-block metadata panel in the builder — then reviews and decides on the evidence-backed proposals it has raised across the whole org.',
+    steps: [
+      { id: 's', type: 'start', label: 'Curious what the agent has synthesised' },
+      { id: 'build', type: 'screen', label: 'Builder', route: '/admin/sops/builder/[sopId]', detail: 'Toggle "⚇ Agent layer" reveals a read-only purple panel: summary, tags, entities, embedding status, links, plus per-block metadata rows keyed by junction id.' },
+      { id: 'toggle', type: 'action', label: 'Toggle ⚇ Agent layer', detail: 'Strictly read-only — nothing here is hand-editable, it regenerates on publish (D-10).' },
+      { id: 'dash', type: 'screen', label: 'Org agent dashboard', route: '/admin/agent', detail: 'Evidence-backed proposals queue (primary) + recent memory/metadata-refresh activity feed (secondary). No cross-SOP graph viz this phase (D-11/D-13).' },
+      { id: 'decide', type: 'decision', label: 'Act on a proposal?', branches: [
+        { label: 'Approve', to: 'e' },
+        { label: 'Decline', to: 'e' },
+      ] },
+      { id: 'e', type: 'end', label: 'Proposal decided, row leaves the queue' },
+    ],
+  },
 
   // ============================ Library & team ============================
   {
