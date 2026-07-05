@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
 status: Ready to execute
-stopped_at: Completed 26.5-06-PLAN.md
-last_updated: "2026-07-05T00:00:00.000Z"
+stopped_at: Completed 26.5-08-PLAN.md
+last_updated: "2026-07-05T00:25:56.304Z"
 progress:
   total_phases: 30
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 29
-  completed_plans: 28
-  percent: 13
+  completed_plans: 29
+  percent: 17
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 26.5 (agent-metadata-layer) — EXECUTING
-Plan: 7 of 8
+Plan: 8 of 8
 **Milestone status:** **v4.0 ✅ shipped 2026-07-02** (Phases 21, 21.5, 21.6, 22, 23, 24, 25 executed + code-reviewed; residual = human UAT on 21.6/22/23/25, carried per v3.0 field-verification precedent — archive via `/gsd-complete-milestone`). **v5.0 opened 2026-07-02** — Phase 26 (bespoke inline builder; Phase 17 Konva absorbed) → Phase 26.5 (agent-metadata layer on X-03 + graphify).
 
 **Active phase:** 26
@@ -161,6 +161,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 26.5 P05 | 15m | 2 tasks | 2 files |
 | Phase 26.5-agent-metadata-layer P07 | 15m | 2 tasks | 7 files |
 | Phase 26.5 P06 | 10m | 2 tasks | 2 files |
+| Phase 26.5 P08 | 20m | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -312,6 +313,7 @@ Recent decisions affecting current work:
 - [Phase 26.5-06]: Sweep auth = Authorization: Bearer CRON_SECRET via crypto.timingSafeEqual, fails CLOSED when unset — machine endpoint, no session-cookie auth; specific 503 voyage_api_key_missing fail-fast before any work (Deepgram precedent)
 - [Phase 26.5-06]: Sweep staleness = any sop_completions/sop_voice_qa_log/parse_jobs row newer than sop_agent_metadata.regenerated_at (or no metadata row); per-candidate count probes bounded 100 evaluated / 20 processed per invocation — upgrade to trigger-maintained last_signal_at column if published-SOP volume grows past a few hundred
 - [Phase 26.5-06]: Route deploys as a Railway Cron job (one-shot process with CRON_SECRET) — never an in-process setInterval (single-process deploy constraint)
+- [Phase 26.5-08]: Dashboard reuses .agentpanel/.arow/.ak/.av classes directly (no agent-layer-root wrapper) since the display:none/block toggle rules only apply under that ancestor
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -421,7 +423,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-05T00:00:00.000Z
-Stopped at: Completed 26.5-06-PLAN.md
+Last session: 2026-07-05T00:25:56.296Z
+Stopped at: Completed 26.5-08-PLAN.md
 Resume file:
 None

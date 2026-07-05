@@ -91,7 +91,7 @@ v4.0 (Phases 21–25) shipped. v5.0 rebuilds the SOP builder as a bespoke inline
   - [x] 26-12-PLAN.md — W8: spine re-wire — selection-sync + AI-flag overlays + orphan chip + verify UI/publish gate, behavioural parity (R8, P12/P13/P9/P8) ✅ 2026-07-03 (canvas↔source selection-sync, ⚑ flag badge + reused ReviewerFlagsPanel, Reference-images chip, per-block verify chip; server publish gate UNCHANGED — real-route 400 regression green; phase26 85 green, next build Δ0KB)
   - [x] 26-13-PLAN.md — W9: bake-on-publish + saveAnnotation (service-role org self-enforce) + worker baked-PNG read (R5/R8, D-03) ✅ 2026-07-03 (saveAnnotation/bakeAnnotation service-role + org self-enforce via parseJwtPayload, async-only 'use server' with pure baked-path helpers split out; client stage.toDataURL → content-versioned baked PNG; VisualBlock baked-vs-raw Konva-free worker read; annotate launch wired MediaGrid→DiagramAnnotateModal→AnnotationEditorLoader — 26-11 editor now reachable; deleted 26-05 spike route; 27 phase26 specs green, next build Δ0KB Konva-isolated. Known Stub: diagram VisualItems need sopImageId at parse/upload before "Save & bake" enables for hand-added slots)
   - [x] 26-14-PLAN.md — W10: convert golden-path byte-equivalence + R8 regression sweep + remove @puckeditor/core + journeys/uat update (R1/R6/R8, D-01/D-04) ✅ 2026-07-03 (R6 convert-golden byte-equivalent to pre-phase fixture; spine-regression sweeps the R8 invariants — publish 400 gate, junctionId+block_provenance survive content-ops edits (behavioural), no-bulk-verify, append-only completions; **@puckeditor/core fully removed** — package.json+lockfile+node_modules, puck-config.tsx deleted, last consumers dropped; field-map P14 parity repointed to a committed puck-field-baseline.json fixture (0-unreachable/18 blocks preserved); journeys Build-stage + 2 UAT items updated; phase26 102 green, tsc clean, real npm run build green, worker bundle Δ0KB Puck-absent. Pre-existing obsolete Phase-11 Puck-contract specs logged to deferred-items.md)
-- [ ] **Phase 26.5: Agent Metadata Layer** — The human-invisible per-SOP + per-block machine layer (semantic tags, entities, embeddings, cross-SOP links, **memory**, **learning proposals**, **review state**) that agents read, write, and traverse individually and collectively (summarise across SOPs). Builds on Phase 23 X-03 (universal AI field read/write) + graphify (cross-SOP graph). Delivers the `⚇ Agent layer` surfacing + the memory/learning/review reasoning that Phase 26 only wires contract hooks for.
+- [x] **Phase 26.5: Agent Metadata Layer** — The human-invisible per-SOP + per-block machine layer (semantic tags, entities, embeddings, cross-SOP links, **memory**, **learning proposals**, **review state**) that agents read, write, and traverse individually and collectively (summarise across SOPs). Builds on Phase 23 X-03 (universal AI field read/write) + graphify (cross-SOP graph). Delivers the `⚇ Agent layer` surfacing + the memory/learning/review reasoning that Phase 26 only wires contract hooks for. (completed 2026-07-05)
 
 ## Phase Details
 
@@ -126,7 +126,7 @@ Plans:
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
-- [ ] 26.5-08-PLAN.md — Org agent dashboard (proposals queue + activity feed) + pathways map (D-09, D-10, D-11, D-13)
+- [x] 26.5-08-PLAN.md — Org agent dashboard (proposals queue + activity feed) + pathways map (D-09, D-10, D-11, D-13)
 
 ### Phase 21.5: Builder Review UX
 
@@ -632,7 +632,7 @@ These two items belong with kiosk mode + site-tier work in Phase 15 because they
   9. Global app-wide Cmd+K mounted across all `(protected)` routes — surfaces app-wide navigation (Library, Blocks, Team, Create via Upload/Blank/AI, Settings, kiosk site selector for multi-site admins) alongside the existing SOP-scoped jump-to-step + ask-AI on SOP pages.
   10. Bundle isolation: kiosk mode chunks + voice Q&A RAG client do not leak into the existing mobile worker bundle; mobile worker walkthrough First Load JS does not grow as a result of Phase 15.
 
-**Plans:** 6/8 plans executed
+**Plans:** 8/8 plans complete
 
 Plans:
 
