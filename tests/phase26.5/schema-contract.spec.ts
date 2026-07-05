@@ -101,6 +101,17 @@ test('D-03: match_sop_agent_metadata RPC wraps <=> and self-enforces org-scope i
   expect(sql).toMatch(/security definer/i)
 })
 
+test('CR-01 (review fix): match_sop_agent_metadata EXECUTE revoked from client roles (00041)', () => {
+  const file = fs.readdirSync(MIGRATIONS_DIR).find((f) => /match_rpc_lockdown/i.test(f))
+  expect(file, 'expected 00041_match_rpc_lockdown.sql').toBeTruthy()
+  const sql = fs.readFileSync(path.join(MIGRATIONS_DIR, file!), 'utf-8')
+  expect(sql).toMatch(/revoke execute on function public\.match_sop_agent_metadata/i)
+  expect(sql).toMatch(/from public, anon, authenticated/i)
+  expect(sql).toMatch(/grant execute on function public\.match_sop_agent_metadata[\s\S]*?to service_role/i)
+  // IN-01 folded in per the review: null-embedding rows never pad the result set
+  expect(sql).toContain('and embedding is not null')
+})
+
 test.fixme('D-01: no authenticated INSERT/UPDATE/DELETE policy on agent tables (runtime RLS probe)', () => {
   // Live DB probe — implemented against seeded data in a later plan.
 })
