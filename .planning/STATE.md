@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
-status: Ready to execute
+status: Ready to plan
 stopped_at: Completed 26.5-08-PLAN.md
-last_updated: "2026-07-05T00:25:56.304Z"
+last_updated: "2026-07-05T09:09:08.518Z"
 progress:
   total_phases: 30
   completed_phases: 5
@@ -24,8 +24,8 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 26.5 (agent-metadata-layer) — EXECUTING
-Plan: 8 of 8
+Phase: 999.1
+Plan: Not started
 **Milestone status:** **v4.0 ✅ shipped 2026-07-02** (Phases 21, 21.5, 21.6, 22, 23, 24, 25 executed + code-reviewed; residual = human UAT on 21.6/22/23/25, carried per v3.0 field-verification precedent — archive via `/gsd-complete-milestone`). **v5.0 opened 2026-07-02** — Phase 26 (bespoke inline builder; Phase 17 Konva absorbed) → Phase 26.5 (agent-metadata layer on X-03 + graphify).
 
 **Active phase:** 26
@@ -110,6 +110,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | 24 | 3 | - | - |
 | 25 | 6 | - | - |
 | 22 | 4 | - | - |
+| 26.5 | 8 | - | - |
 
 **v2.0 By Phase:**
 

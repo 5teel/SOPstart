@@ -172,4 +172,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-12 — Phase 24 (Procedure Flow — Spatial Node Graph) complete. v4.0 = Phases 21/22/23 (+24 promoted from backlog), source of truth `.planning/PRODUCT-ROADMAP.md` v0.3.*
+*Last updated: 2026-07-05 — Phase 26.5 (Agent Metadata Layer) complete: per-SOP/per-block machine layer (Voyage-3.5 embeddings + pgvector, tags/entities/links, append-only memory, evidence-backed proposals, assessments), Haiku 4.5 synthesis pipeline + cron sweep, agentview builder toggle + /admin/agent dashboard. v5.0 = Phase 26 + 26.5 shipped; source of truth `.planning/PRODUCT-ROADMAP.md` v0.3.*
