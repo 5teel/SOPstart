@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { parseJwtPayload } from '@/lib/supabase/jwt'
 import { enqueueVideoGenerationForPipeline } from '@/lib/video-gen/auto-queue'
 import { triggerAgentSynthesis } from '@/lib/agent-layer/synthesis'
 
@@ -27,10 +28,9 @@ export async function POST(
   }
 
   const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
-    : {}
-  const organisationId: string | undefined = jwtClaims['organisation_id']
+  // parseJwtPayload, not raw atob — JWT payloads are Base64URL (CLAUDE.md 2026-06-26)
+  const jwtClaims = session?.access_token ? parseJwtPayload(session.access_token) : {}
+  const organisationId = jwtClaims['organisation_id'] as string | undefined
   if (!organisationId) {
     return NextResponse.json({ error: 'No organisation found' }, { status: 403 })
   }
