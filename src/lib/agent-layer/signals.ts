@@ -120,9 +120,16 @@ export async function readReviewerSignals(
     for (const run of runs) {
       for (const flag of run.flags) flagCountsBySeverity[flag.severity]++
     }
+    // WR-04 (review fix): .every() on an empty array is vacuously true — a
+    // run with a missing/empty job_status (legacy envelope shape) must NOT
+    // count as "all jobs errored", or we manufacture a fake infra failure
+    // (the exact inverse of the 2026-06-02 lesson this flag exists for).
     const allRunsErrored =
       runs.length > 0 &&
-      runs.every((run) => Object.values(run.job_status ?? {}).every((s) => s === 'error'))
+      runs.every((run) => {
+        const statuses = Object.values(run.job_status ?? {})
+        return statuses.length > 0 && statuses.every((s) => s === 'error')
+      })
 
     return { totalRuns: runs.length, flagCountsBySeverity, allRunsErrored }
   } catch (err) {
