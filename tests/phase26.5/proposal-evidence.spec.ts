@@ -5,7 +5,15 @@
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
 import path from 'node:path'
-import { createLearningProposal, type AgentAdminInsertFn } from '@/lib/ai-fields/agent-proposals'
+import {
+  createLearningProposal,
+  type AgentAdminInsertFn,
+  type AgentPendingLookupFn,
+} from '@/lib/ai-fields/agent-proposals'
+
+// WR-02: injected everywhere a fake insert seam is used so the default
+// pending-duplicate lookup (createAdminClient) never touches a real DB.
+const noPending: AgentPendingLookupFn = async () => null
 
 const REPO_ROOT = path.resolve(__dirname, '..', '..')
 const PROPOSALS_PATH = path.join(REPO_ROOT, 'src', 'lib', 'ai-fields', 'agent-proposals.ts')
@@ -37,6 +45,7 @@ test('D-07: proposal insert carries source memory rows + signal counts (unit, in
       evidence: [{ source: 'reviewer', count: 2 }],
     },
     fakeInsert,
+    noPending,
   )
 
   // (a) fake-seam row carries status: 'pending' and non-empty evidence
@@ -57,8 +66,34 @@ test('D-07: createLearningProposal never calls a real DB when a fake seam is inj
     fakeCalled = true
     return 'id-2'
   }
-  await createLearningProposal('org-2', 'sop-2', { kind: 'k', description: 'd', evidence: [] }, fakeInsert)
+  await createLearningProposal(
+    'org-2',
+    'sop-2',
+    { kind: 'k', description: 'd', evidence: [] },
+    fakeInsert,
+    noPending,
+  )
   expect(fakeCalled).toBe(true)
+})
+
+test('WR-02 (review fix): createLearningProposal dedupes on an existing pending (sop, kind) proposal', async () => {
+  let insertCalled = false
+  const fakeInsert: AgentAdminInsertFn = async () => {
+    insertCalled = true
+    return 'should-not-be-returned'
+  }
+  const hasPending: AgentPendingLookupFn = async () => 'existing-pending-id'
+
+  const id = await createLearningProposal(
+    'org-3',
+    'sop-3',
+    { kind: 'reviewer-critical-flags', description: 'dup', evidence: [] },
+    fakeInsert,
+    hasPending,
+  )
+
+  expect(id).toBe('existing-pending-id')
+  expect(insertCalled).toBe(false)
 })
 
 test('D-07/D-10: approveProposal and declineProposal self-enforce org-scope on the update', () => {

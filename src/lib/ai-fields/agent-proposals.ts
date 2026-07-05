@@ -66,6 +66,30 @@ const defaultAgentAdminInsert: AgentAdminInsertFn = async (row) => {
   return data.id as string
 }
 
+/** Injectable pending-duplicate lookup seam (WR-02 dedupe) — returns the
+ * existing pending proposal id for (org, sop, kind), or null. */
+export type AgentPendingLookupFn = (
+  organisationId: string,
+  sopId: string,
+  kind: string,
+) => Promise<string | null>
+
+const defaultAgentPendingLookup: AgentPendingLookupFn = async (organisationId, sopId, kind) => {
+  const admin = createAdminClient()
+  const { data, error } = await admin
+    .from('agent_learning_proposals')
+    .select('id')
+    .eq('organisation_id', organisationId)
+    .eq('sop_id', sopId)
+    .eq('kind', kind)
+    .eq('status', 'pending')
+    .limit(1)
+  // Fail open on lookup error — a broken dedupe check must never block a
+  // legitimate proposal insert; worst case is one duplicate.
+  if (error) return null
+  return (data?.[0]?.id as string | undefined) ?? null
+}
+
 // ---------------------------------------------------------------------------
 // createLearningProposal — always-pending, evidence-carrying (D-07)
 // ---------------------------------------------------------------------------
@@ -74,13 +98,22 @@ const defaultAgentAdminInsert: AgentAdminInsertFn = async (row) => {
  * Insert a new evidence-backed learning proposal. Always pending — there is
  * no auto-apply path for agent-layer proposals; every one is admin-reviewed
  * via approveProposal/declineProposal (D-07/D-10).
+ *
+ * WR-02 (review fix): dedupes on (organisation_id, sop_id, kind, status=pending)
+ * — synthesis runs on every publish, backfill and 5-minute sweep hit, and the
+ * triggering conditions persist across runs, so without this every run
+ * re-raises the same proposal and the dashboard queue degrades into noise.
+ * Returns the existing pending proposal's id when one is found.
  */
 export async function createLearningProposal(
   organisationId: string,
   sopId: string,
   proposal: { kind: string; description: string; evidence: EvidenceRow[] },
   adminInsert: AgentAdminInsertFn = defaultAgentAdminInsert,
+  findPending: AgentPendingLookupFn = defaultAgentPendingLookup,
 ): Promise<string> {
+  const existingId = await findPending(organisationId, sopId, proposal.kind)
+  if (existingId) return existingId
   return adminInsert({
     organisation_id: organisationId,
     sop_id: sopId,
