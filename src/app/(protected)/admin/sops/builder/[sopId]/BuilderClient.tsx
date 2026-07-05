@@ -114,6 +114,7 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
   const [sopAgentData, setSopAgentData] = useState<SopAgentMetadataView | null>(null)
   const [blockAgentRows, setBlockAgentRows] = useState<BlockAgentMetadataView[]>([])
   const [sopProposals, setSopProposals] = useState<AgentDashboardData['pendingProposals']>([])
+  const [proposalActionError, setProposalActionError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!agentview) return
@@ -136,13 +137,26 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
     }
   }, [agentview, sopId])
 
+  // WR-01 (review fix): await first, check the result, only remove on success
+  // (mirrors AgentDashboardClient) — optimistic removal that ignores a failed
+  // action makes the proposal silently vanish while staying pending in the DB.
   async function handleApproveProposal(proposalId: string) {
+    setProposalActionError(null)
+    const result = await approveProposalAction(proposalId)
+    if ('error' in result) {
+      setProposalActionError(result.error)
+      return
+    }
     setSopProposals((prev) => prev.filter((p) => p.id !== proposalId))
-    await approveProposalAction(proposalId)
   }
   async function handleDeclineProposal(proposalId: string) {
+    setProposalActionError(null)
+    const result = await declineProposalAction(proposalId)
+    if ('error' in result) {
+      setProposalActionError(result.error)
+      return
+    }
     setSopProposals((prev) => prev.filter((p) => p.id !== proposalId))
-    await declineProposalAction(proposalId)
   }
 
   const savePillLabel = !isOnline
@@ -218,6 +232,14 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
         <main className="relative min-w-0 flex-1 overflow-auto">
           {agentview && (
             <div className="px-4 pt-4">
+              {proposalActionError && (
+                <p
+                  role="alert"
+                  className="mb-2 rounded border border-red-500/30 bg-red-500/10 px-3 py-1.5 font-mono text-xs text-red-400"
+                >
+                  Proposal action failed: {proposalActionError}
+                </p>
+              )}
               <AgentPanel
                 data={sopAgentData}
                 loading={agentLoading}
