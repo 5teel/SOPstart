@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
 status: Ready to execute
-stopped_at: Completed 26.5-04-PLAN.md
-last_updated: "2026-07-04T02:46:02.420Z"
+stopped_at: Completed 26.5-06-PLAN.md
+last_updated: "2026-07-05T00:00:00.000Z"
 progress:
   total_phases: 30
   completed_phases: 4
   total_plans: 29
-  completed_plans: 27
+  completed_plans: 28
   percent: 13
 ---
 
@@ -160,6 +160,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 26.5 P4 | 35m | 2 tasks | 4 files |
 | Phase 26.5 P05 | 15m | 2 tasks | 2 files |
 | Phase 26.5-agent-metadata-layer P07 | 15m | 2 tasks | 7 files |
+| Phase 26.5 P06 | 10m | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -308,6 +309,9 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 26.5-05]: backfill-agent-metadata.mjs imports synthesizeSop/createAdminClient from the real TS lib modules via tsx dynamic import, reusing the shared pipeline; per-org SOP cap (200) is the cost guardrail
 - [Phase 26.5-07]: AgentPanel/AgentBlockMeta/AgentBanner are presentational (data as props, no internal fetch) so a tsx react-dom/server harness can prove absence of edit handlers behaviourally
 - [Phase 26.5-07]: Per-block agent metadata rendered as a flat list under the SOP-level AgentPanel (grouped), not injected into EditableDocument's per-block loop, keyed by junctionId
+- [Phase 26.5-06]: Sweep auth = Authorization: Bearer CRON_SECRET via crypto.timingSafeEqual, fails CLOSED when unset — machine endpoint, no session-cookie auth; specific 503 voyage_api_key_missing fail-fast before any work (Deepgram precedent)
+- [Phase 26.5-06]: Sweep staleness = any sop_completions/sop_voice_qa_log/parse_jobs row newer than sop_agent_metadata.regenerated_at (or no metadata row); per-candidate count probes bounded 100 evaluated / 20 processed per invocation — upgrade to trigger-maintained last_signal_at column if published-SOP volume grows past a few hundred
+- [Phase 26.5-06]: Route deploys as a Railway Cron job (one-shot process with CRON_SECRET) — never an in-process setInterval (single-process deploy constraint)
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -413,10 +417,11 @@ None yet.
 - Phase 6: ffmpeg-static server-side bundling on Vercel is documented but described as bundle-sensitive — validate with a 20 MB file on Vercel preview before any other video work
 - Phase 8: Generated video storage costs are unbounded without retention policies — source videos deleted 30 days post-transcription; generated videos have 90-day TTL; per-tenant quota visible in settings
 - Phase 8: TTS mispronounces industrial terminology and NZ place names — build per-org pronunciation dictionary with SSML phoneme tags; mandatory admin audio preview before publish
+- Phase 26.5: **PRE-DEPLOY GATE OPEN** — VOYAGE_API_KEY NOT yet set on Railway (Simon: "not yet — continue anyway", 2026-07-04); CRON_SECRET also pending (add with Railway Cron job config for /api/agent-layer/synthesis-sweep). Both must be set before the first deploy of this phase — Deepgram precedent. Interim: sweep route 503-fails-fast; publish-hook synthesis records last_synthesis_status='error'.
 
 ## Session Continuity
 
-Last session: 2026-07-04T02:45:18.380Z
-Stopped at: Completed 26.5-04-PLAN.md
+Last session: 2026-07-05T00:00:00.000Z
+Stopped at: Completed 26.5-06-PLAN.md
 Resume file:
 None

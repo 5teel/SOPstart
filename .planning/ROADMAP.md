@@ -121,7 +121,7 @@ Plans:
 **Wave 5** *(blocked on Wave 4 completion)*
 
 - [x] 26.5-05-PLAN.md — Publish-hook regeneration + backfill of all published SOPs (D-04, D-15)
-- [ ] 26.5-06-PLAN.md — Authed cron synthesis-sweep route + VOYAGE_API_KEY Railway gate (D-14)
+- [x] 26.5-06-PLAN.md — Authed cron synthesis-sweep route + VOYAGE_API_KEY Railway gate (D-14) ✅ 2026-07-04 (route + live auth spec shipped; **gate DEFERRED — VOYAGE_API_KEY not yet on Railway, CRON_SECRET pending** — both must be set before first deploy of this phase; route 503-fails-fast in the interim)
 - [x] 26.5-07-PLAN.md — Admin server actions + builder agentview toggle + read-only purple panel (D-02, D-09, D-10, D-12)
 
 **Wave 6** *(blocked on Wave 5 completion)*
@@ -823,7 +823,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | **24. Procedure Flow — Spatial Node Graph (v4.0)** | 3/3 | ✅ Complete | 2026-06-12 |
 | **25. Department as a First-Class Entity (v4.0)** | 6/6 | ✅ Complete (residual: 7 human-UAT tests) | 2026-06-15 |
 | **26. SOP Builder Redesign — Inline Surface (v5.0)** | 0/14 | Planned — 14 plans / 10 waves | |
-| **26.5. Agent Metadata Layer (v5.0)** | 0/? | Deferred follow-on (built on X-03 + graphify) | |
+| **26.5. Agent Metadata Layer (v5.0)** | 7/8 | Executing — Wave 6 (26.5-08) remains; pre-deploy residual: VOYAGE_API_KEY + CRON_SECRET on Railway | |
 
 ## Backlog
 
