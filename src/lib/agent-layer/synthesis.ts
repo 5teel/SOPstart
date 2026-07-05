@@ -350,6 +350,12 @@ export async function synthesizeSop(sopId: string, organisationId: string): Prom
             sop_id: sopId,
             last_synthesis_status: 'error',
             last_synthesis_error: message.slice(0, 500),
+            // WR-03 (review fix): the attempt WAS the regeneration — without
+            // this stamp a persistently-failing SOP stays regenerated_at IS
+            // NULL, is classified stale forever, and re-bills Voyage/Anthropic
+            // on every 5-minute sweep tick while occupying a sweep slot.
+            // last_synthesis_status='error' still records that it failed.
+            regenerated_at: new Date().toISOString(),
           },
           { onConflict: 'sop_id' },
         )

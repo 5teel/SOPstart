@@ -64,6 +64,15 @@ async function findStaleSops(): Promise<StaleCandidate[]> {
     .from('sops')
     .select('id, organisation_id, sop_agent_metadata(regenerated_at)')
     .eq('status', 'published')
+    // WR-03 (review fix): deterministic ordering — without an .order() the
+    // 100-row candidate window is an arbitrary Postgres-chosen subset. Most-
+    // recently-updated SOPs are the ones accruing signals, so they belong in
+    // the window; combined with the error-path regenerated_at stamp in
+    // synthesizeSop, processed/failed rows leave the stale set instead of
+    // permanently occupying sweep slots.
+    // ponytail: >100 published SOPs beyond this window are never evaluated —
+    // replace with a trigger-maintained last_signal_at column if volume grows.
+    .order('updated_at', { ascending: false })
     .limit(MAX_CANDIDATES_EVALUATED)
   if (error || !sops) return []
 
