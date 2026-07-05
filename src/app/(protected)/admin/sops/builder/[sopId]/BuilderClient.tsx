@@ -115,19 +115,36 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
   const [blockAgentRows, setBlockAgentRows] = useState<BlockAgentMetadataView[]>([])
   const [sopProposals, setSopProposals] = useState<AgentDashboardData['pendingProposals']>([])
   const [proposalActionError, setProposalActionError] = useState<string | null>(null)
+  // WR-06 (review fix): a failed/offline load must render a distinct error
+  // state, not the "No synthesis run yet" empty state.
+  const [agentError, setAgentError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!agentview) return
     let cancelled = false
     setAgentLoading(true)
+    setAgentError(null)
     Promise.all([getSopAgentMetadata(sopId), getBlockAgentMetadata(sopId), getAgentDashboardData()])
       .then(([sopRes, blockRes, dashRes]) => {
         if (cancelled) return
+        // Surface a server-action { error } instead of conflating it with
+        // "no data" (WR-06) — the SOP-level read is the panel's primary source.
+        if ('error' in sopRes) setAgentError(sopRes.error)
         setSopAgentData('data' in sopRes ? sopRes.data : null)
         setBlockAgentRows('data' in blockRes ? blockRes.data : [])
         setSopProposals(
           'data' in dashRes ? dashRes.data.pendingProposals.filter((p) => p.sopId === sopId) : []
         )
+      })
+      .catch(() => {
+        // Transport-level rejection (offline, server unreachable) — WR-06:
+        // without this the rejection was unhandled and the panel silently
+        // showed the "No synthesis run yet" empty state.
+        if (cancelled) return
+        setSopAgentData(null)
+        setBlockAgentRows([])
+        setSopProposals([])
+        setAgentError('Failed to load the agent layer — check your connection and retry.')
       })
       .finally(() => {
         if (!cancelled) setAgentLoading(false)
@@ -240,14 +257,26 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
                   Proposal action failed: {proposalActionError}
                 </p>
               )}
-              <AgentPanel
-                data={sopAgentData}
-                loading={agentLoading}
-                pendingProposals={sopProposals}
-                onApprove={handleApproveProposal}
-                onDecline={handleDeclineProposal}
-              />
-              <AgentBlockMeta rows={blockAgentRows} />
+              {agentError ? (
+                <p
+                  role="alert"
+                  className="mb-2 rounded border border-red-500/30 bg-red-500/10 px-3 py-1.5 font-mono text-xs text-red-400"
+                  data-testid="agent-layer-error"
+                >
+                  Agent layer unavailable: {agentError}
+                </p>
+              ) : (
+                <>
+                  <AgentPanel
+                    data={sopAgentData}
+                    loading={agentLoading}
+                    pendingProposals={sopProposals}
+                    onApprove={handleApproveProposal}
+                    onDecline={handleDeclineProposal}
+                  />
+                  <AgentBlockMeta rows={blockAgentRows} />
+                </>
+              )}
             </div>
           )}
           {activeSection ? (
