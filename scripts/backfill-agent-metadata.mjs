@@ -76,6 +76,7 @@ async function main() {
 
   let sopsProcessed = 0
   let sopsSkipped = 0
+  let sopsFailed = 0
 
   for (const org of orgs ?? []) {
     const { data: sops, error: sopsErr } = await admin
@@ -101,13 +102,17 @@ async function main() {
     )
 
     for (const sop of toProcess) {
-      try {
-        await synthesizeSop(sop.id, org.id)
+      // WR-05 (review fix): synthesizeSop never throws — it returns
+      // { ok, error }, so check the result instead of a dead catch branch.
+      // Previously an all-failing run (bad VOYAGE/ANTHROPIC key) printed
+      // 100% OK (the 2026-06-02 "all-error run is invisible" failure mode).
+      const result = await synthesizeSop(sop.id, org.id)
+      if (result?.ok) {
         sopsProcessed++
         console.log(`  OK    ${sop.title} (${sop.id})`)
-      } catch (err) {
-        sopsSkipped++
-        console.error(`  FAIL  ${sop.title} (${sop.id}):`, err instanceof Error ? err.message : err)
+      } else {
+        sopsFailed++
+        console.error(`  FAIL  ${sop.title} (${sop.id}): ${result?.error ?? 'unknown synthesis failure'}`)
       }
     }
     sopsSkipped += overCap
@@ -115,7 +120,11 @@ async function main() {
 
   console.log('')
   console.log('=== Backfill complete ===')
-  console.log(JSON.stringify({ orgs: (orgs ?? []).length, sopsProcessed, sopsSkipped }))
+  console.log(JSON.stringify({ orgs: (orgs ?? []).length, sopsProcessed, sopsFailed, sopsSkipped }))
+  if (sopsFailed > 0) {
+    console.error(`ERROR: ${sopsFailed} SOP(s) failed synthesis — see FAIL lines above.`)
+    process.exit(1)
+  }
 }
 
 await main()

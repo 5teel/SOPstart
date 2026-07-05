@@ -289,19 +289,24 @@ async function raiseProposalsFromSignals(
   }
 }
 
+/** WR-05 (review fix): synthesizeSop reports its outcome so awaited callers
+ * (the backfill script) can detect failure — it still NEVER throws. */
+export type SynthesisResult = { ok: true } | { ok: false; error: string }
+
 /**
  * D-03/D-04/D-05/D-12 — synthesize the agent-metadata layer for one published
  * SOP. Fully additive: never touches the editor's layout/autosave column or path.
+ * Never throws — returns { ok: false, error } instead (Pitfall 5), so a
+ * backfill of 100% failures can no longer print 100% OK (WR-05).
  */
-export async function synthesizeSop(sopId: string, organisationId: string): Promise<void> {
+export async function synthesizeSop(sopId: string, organisationId: string): Promise<SynthesisResult> {
   try {
     const admin = createAdminClient()
     const sop = await loadPublishedSop(sopId, organisationId)
     if (!sop) {
-      console.error(
-        `[agent-layer] synthesis failed: SOP ${sopId} not found in organisation ${organisationId}`,
-      )
-      return
+      const error = `SOP ${sopId} not found in organisation ${organisationId}`
+      console.error(`[agent-layer] synthesis failed: ${error}`)
+      return { ok: false, error }
     }
 
     const fullText = packSopForPrompt(sop as unknown as SopWithSections)
@@ -336,6 +341,7 @@ export async function synthesizeSop(sopId: string, organisationId: string): Prom
       { onConflict: 'sop_id' },
     )
     if (error) throw new Error(error.message)
+    return { ok: true }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     // Pitfall 5 / CLAUDE.md 2026-06-02 — a distinct greppable line so an
@@ -362,6 +368,7 @@ export async function synthesizeSop(sopId: string, organisationId: string): Prom
     } catch (writeErr) {
       console.error('[agent-layer] failed to record synthesis error status:', writeErr)
     }
+    return { ok: false, error: message }
   }
 }
 
