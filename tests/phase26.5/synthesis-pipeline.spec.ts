@@ -104,3 +104,13 @@ test.fixme('D-04: draft saves never trigger synthesis (autosave path untouched)'
   // imports synthesis.ts; triggerAgentSynthesis is only called from the
   // publish route (Plan 26.5-05).
 })
+
+test('null-clobber guard: failed steps are omitted from the upsert, not written as null/empty', () => {
+  // 2026-07-05 incident: a backfill run without VOYAGE_API_KEY overwrote good
+  // prod embeddings with null. Failed steps must be conditionally spread.
+  const src = fs.readFileSync('src/lib/agent-layer/synthesis.ts', 'utf-8')
+  expect(src).toMatch(/\.\.\.\(tagResult !== null &&/)
+  expect(src).toMatch(/\.\.\.\(embedding !== null &&/)
+  expect(src).toContain("'partial'")
+  expect(src).not.toMatch(/embedding: embedding \? JSON\.stringify\(embedding\) : null/)
+})

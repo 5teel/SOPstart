@@ -109,10 +109,13 @@ async function embedSop(fullText: string): Promise<number[] | null> {
   }
 }
 
-/** Semantic tags/entities/summary via Haiku (SYNTHESIS_MODEL, D-16). Best-effort. */
+/** Semantic tags/entities/summary via Haiku (SYNTHESIS_MODEL, D-16). Best-effort.
+ * Returns null when the STEP failed (API error, parse error) — distinct from a
+ * successful run that legitimately found nothing. Callers must not overwrite
+ * previously-good columns on step failure (2026-07-05 null-clobber incident). */
 async function extractTagsAndEntities(
   fullText: string,
-): Promise<{ summary: string | null; tags: string[]; entities: unknown[] }> {
+): Promise<{ summary: string | null; tags: string[]; entities: unknown[] } | null> {
   const empty = { summary: null, tags: [] as string[], entities: [] as unknown[] }
   if (!fullText.trim()) return empty
   try {
@@ -140,7 +143,7 @@ async function extractTagsAndEntities(
       '[agent-layer] tag/entity extraction failed:',
       err instanceof Error ? err.message : err,
     )
-    return empty
+    return null
   }
 }
 
@@ -316,7 +319,6 @@ export async function synthesizeSop(sopId: string, organisationId: string): Prom
       extractTagsAndEntities(fullText),
       readAllSignals(organisationId, sopId),
     ])
-    const { summary, tags, entities } = tagResult
 
     await embedBlocks(organisationId, sopId, sop.sop_sections)
     await writeMemoryFromSignals(organisationId, sopId, bundle)
@@ -324,18 +326,30 @@ export async function synthesizeSop(sopId: string, organisationId: string): Prom
 
     const assessment = deriveAssessment(bundle)
 
+    // Null-clobber guard (2026-07-05 incident): a step that FAILED is omitted
+    // from the upsert entirely so previously-good columns survive — PostgREST
+    // upsert only updates provided columns. A step that succeeded with empty
+    // results still writes (legit "nothing found"). Partial failure is
+    // surfaced as last_synthesis_status='partial', not 'ok'.
+    const stepsFailed: string[] = []
+    if (embedding === null && fullText.trim()) stepsFailed.push('embed')
+    if (tagResult === null) stepsFailed.push('extract')
+
     const { error } = await admin.from('sop_agent_metadata').upsert(
       {
         organisation_id: organisationId,
         sop_id: sopId,
-        summary,
-        tags,
-        entities: entities as unknown as Json,
-        embedding: embedding ? JSON.stringify(embedding) : null,
+        ...(tagResult !== null && {
+          summary: tagResult.summary,
+          tags: tagResult.tags,
+          entities: tagResult.entities as unknown as Json,
+        }),
+        ...(embedding !== null && { embedding: JSON.stringify(embedding) }),
         assessment,
         links: [] as unknown as Json,
-        last_synthesis_status: 'ok',
-        last_synthesis_error: null,
+        last_synthesis_status: stepsFailed.length === 0 ? 'ok' : 'partial',
+        last_synthesis_error:
+          stepsFailed.length === 0 ? null : `steps failed: ${stepsFailed.join(', ')}`,
         regenerated_at: new Date().toISOString(),
       },
       { onConflict: 'sop_id' },
