@@ -54,3 +54,11 @@ test('D-14: every sweep write self-enforces org-scope (organisation_id on every 
   const orgIdRefs = src.match(/organisation_id/g) ?? []
   expect(orgIdRefs.length).toBeGreaterThan(2)
 })
+
+test('D-14: session middleware exempts the sweep route (cron callers have no cookies)', () => {
+  // Regression: without this exemption the middleware 307-redirects the cron
+  // POST to /login before the route's bearer auth ever runs (found live 2026-07-05).
+  const mw = fs.readFileSync('src/lib/supabase/middleware.ts', 'utf-8')
+  expect(mw).toContain("'/api/agent-layer/synthesis-sweep'")
+  expect(mw).toMatch(/isCronRoute/)
+})

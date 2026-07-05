@@ -25,7 +25,10 @@ export async function updateSession(request: NextRequest) {
   // JSON-Schema for layout_data) for AI agents and external integrations.
   // No tenant data, no RLS concerns - deliberately public.
   const isSchemaIntrospection = path === '/api/schema'
-  const isPublicRoute = path === '/' || isAuthRoute || isSchemaIntrospection
+  // Cron-invoked route: no session cookies by design. The handler enforces its
+  // own CRON_SECRET bearer auth (timing-safe, fails closed 401).
+  const isCronRoute = path === '/api/agent-layer/synthesis-sweep'
+  const isPublicRoute = path === '/' || isAuthRoute || isSchemaIntrospection || isCronRoute
 
   if (!isPublicRoute && !user) {
     return NextResponse.redirect(new URL('/login', request.url))
