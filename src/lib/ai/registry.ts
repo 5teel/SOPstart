@@ -7,8 +7,15 @@
  * swapping a model is a Railway env-var change, no code edit (CLAUDE.md
  * 2026-06-02 model-rot learning).
  *
+ * This module is deliberately LEAN — it is imported by client bundles
+ * (deepgram-stream, voice-queue), and the /sops/[sopId] page has a bundle-size
+ * gate. Selector metadata (candidate model lists, labels) lives in
+ * ./model-options.ts and is pulled in only by screens that render
+ * <AiModelSelect> (src/components/ai/AiModelSelect.tsx).
+ *
  * ## Adding a new model to an existing provider
- * Add an entry to AI_MODELS below. Done — `aiModel('your-key')` resolves it.
+ * Add an entry to AI_MODELS below (and its candidates in ./model-options.ts).
+ * Done — `aiModel('your-key')` and every AiModelSelect pick it up.
  *
  * ## Adding a new provider (e.g. OpenRouter/GLM, Replicate, ElevenLabs)
  * 1. Add the provider name to `AiProvider` and its API key env var to
@@ -23,8 +30,8 @@
  *
  * ## Notes
  * - `envVar` overrides only apply server-side. In client bundles process.env
- *   is shimmed, so `aiModel()` returns the default — fine for the one client
- *   caller (deepgram-stream), which treats the ID as a constant.
+ *   is shimmed, so `aiModel()` returns the default — fine for the client
+ *   callers (deepgram-stream, voice-queue), which treat the ID as a constant.
  * - Anthropic model IDs: prefer dateless aliases (`claude-haiku-4-5`) for new
  *   entries; existing dated pins are kept to avoid behavior drift.
  */
@@ -110,7 +117,7 @@ export const AI_MODELS = {
   'sop-ask': {
     capability: 'llm',
     provider: 'anthropic',
-    defaultId: 'claude-haiku-4-5',
+    defaultId: 'claude-haiku-4-5-20251001',
     envVar: 'SOP_ASK_MODEL',
     description: 'SOP question-answering endpoint (api/sops/[sopId]/ask)',
   },
@@ -153,7 +160,7 @@ export const AI_MODELS = {
     provider: 'deepgram',
     defaultId: 'nova-3',
     envVar: 'STT_STREAM_MODEL',
-    description: 'Live voice walkthrough streaming STT — client-side WS, env override has no effect in browser (voice/deepgram-stream.ts)',
+    description: 'Live voice walkthrough streaming STT — client-side WS, env override has no effect in browser (voice/deepgram-stream.ts, offline/voice-queue.ts)',
   },
 
   // ---- TTS (OpenAI) ------------------------------------------------------
