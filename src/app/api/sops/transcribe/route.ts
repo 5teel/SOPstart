@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { transcribeAudio } from '@/lib/parsers/transcribe-audio'
-import { parseSopWithGPT } from '@/lib/parsers/gpt-parser'
+import { parseSop } from '@/lib/parsers/sop-parser'
 import { verifyTranscriptVsSop, detectMissingSections } from '@/lib/parsers/verify-sop'
 import { triggerReviewerOnParseCompletion } from '@/lib/parsers/parse-pipeline'
 import type { ParsedSop } from '@/lib/validators/sop'
@@ -174,7 +174,7 @@ export async function POST(request: NextRequest) {
 
     // Stage 3: Structure SOP with GPT-4o using video format hint
     await updateStage(admin, job.id, 'structuring')
-    const parsed: ParsedSop = await parseSopWithGPT(transcriptText, { sourceMode: 'video' })
+    const parsed: ParsedSop = await parseSop(transcriptText, { sourceMode: 'video' })
 
     // Stage 4: Adversarial verification (D-04) + missing section detection (VID-07)
     await updateStage(admin, job.id, 'verifying')

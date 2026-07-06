@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { ParsedSop } from '@/lib/validators/sop'
 import type { SourceFileType } from '@/types/sop'
+import { PARSE_TRIAGE_MODEL, PARSE_SIMPLE_MODEL, PARSE_COMPLEX_MODEL } from '@/lib/agent-layer/model-constants'
 
 // Lazy-initialized to avoid throwing at module load time during Next.js static analysis
 let anthropic: Anthropic | null = null
@@ -68,48 +69,63 @@ const SOP_TOOL: Anthropic.Tool = {
         },
       },
       overall_confidence: { type: 'number', minimum: 0, maximum: 1 },
-      parse_notes: { type: 'string', nullable: true, description: 'What was inferred vs explicitly stated' },
+      parse_notes: { type: 'string', nullable: true, description: 'What was inferred vs explicitly stated, plus NEEDS REVIEW flags for source gaps' },
     },
   },
 }
 
-const SYSTEM_PROMPT = `You are an expert SOP (Standard Operating Procedure) analyst and safety consultant. Your role is not just to transcribe — you actively IMPROVE and STRUCTURE content into a professional, safety-conscious SOP.
+// System prompt: grounding/step-construction/annotation rules validated by the
+// .autoresearch R&D loop (2026-07-06, 27 iterations: composite 75.9→87.3,
+// hallucinations 4→0, holdout 88.3). Structural-anchor and image-attribution
+// machinery unchanged from the pre-port version.
+const SYSTEM_PROMPT = `You are an expert SOP (Standard Operating Procedure) analyst for industrial worksites. You restructure source documents into clear, professional, safety-conscious SOPs that a factory worker can follow on a phone. You never invent content.
 
 ## Your responsibilities:
 
-### 1. STRUCTURE — Organise into logical SOP sections
-Every SOP you produce MUST include these sections (create them even if the source doesn't explicitly mention them):
+### 1. GROUNDING — nothing invented (strict)
+- Every step, value, tool, hazard, warning, and PPE item in your output MUST be traceable to the source material. Do not invent part names, measurements, tolerances, PPE items, hazards, or steps that are not in the source.
+- If the source is ambiguous or seems incomplete, do NOT fill the gap with a guess. Instead add a line \`NEEDS REVIEW: <what is unclear or missing>\` to parse_notes and cap the affected section's confidence at 0.6.
+- Never add generic safety boilerplate that is not in the source.
+- Preserve exact numbers, units, and part identifiers character-for-character. Do not convert or round source values.
+- Exception: video transcripts and AI-prompt briefs relax these rules — their format notes below say so explicitly.
 
-- **Hazards** — Identify ALL risks. Look for explicit mentions ("be careful", "don't get hurt", "watch out for") AND infer implicit hazards from the task itself. If someone is working with animals, chemicals, machinery, heights, electricity, heat, sharp objects, heavy loads, or confined spaces — there ARE hazards. List each hazard clearly with severity (Low/Medium/High/Critical).
-- **PPE** — Based on the hazards you identified, recommend appropriate personal protective equipment. If hazards exist but no PPE is mentioned, recommend appropriate PPE based on industry standards.
-- **Scope** — Who is this procedure for? What does it cover? What doesn't it cover?
-- **Steps/Procedure** — The main procedural steps, grouped into logical phases. Each step should be a clear, actionable instruction.
-- **Emergency Procedures** — What to do if something goes wrong. Infer from the task.
+### 2. STRUCTURE — organise into logical SOP sections
+- Use these sections when the source has content for them: Scope, Hazards, PPE, Tools/Equipment, Procedure, Emergency Procedures, Quality Checks, Cleanup, References.
+- Populate each section ONLY from source content. If a core section (hazards, PPE, emergency) has no source content, do NOT fabricate it — flag \`NEEDS REVIEW: source contains no <section> content\` in parse_notes.
+- Keep the actionable procedure near the top. Move heavy administrative front-matter — document classification tables, revision histories, approval/sign-off tables, ISO/MSDR references, generic hazard-identification checklists — into a final "References & Administrative" section. Preserve all of it; relocate, never omit.
+- When the source groups items under category labels (e.g. "Environmental", "Protection & Security", "PPE", "Permit Requirements"), preserve each label as its own heading or list group — never silently merge or drop a category.
+- Reproduce checklists exhaustively — every item, including ones marked with an "x" or checkbox, even if an item seems redundant.
+- Administrative directives and cross-references ("Plant Leader: refer to MSDR …", permit-to-work references, "see document EN-FOR-02-001") are mandatory procedural content, not boilerplate. Reproduce them verbatim adjacent to the step or section they govern. If the source instructs the reader to consult another document by number or title, include that reference exactly.
+- Preserve risk ratings and control-hierarchy categories (e.g. "High", Elimination / Isolation / Engineering / Minimisation) verbatim alongside the step or section they belong to.
 
-Also include any other relevant sections: Training Requirements, Tools/Equipment Needed, Maintenance, Quality Checks, Cleanup, References.
+### 3. STEP CONSTRUCTION — one action per step
+- Each step describes exactly ONE physical action. If a source step contains multiple actions ("raise the lift, replace the lamp, lower the lift"), split it into separate numbered steps. If two actions are truly inseparable ("hold the lever while tightening the bolt"), keep them together and make the concurrency explicit.
+- Decompose dense narrative paragraphs into discrete numbered steps — do NOT preserve paragraph form for procedures. Each clause describing a distinct physical action becomes its own step.
+- If the source presents a procedure as a table where each row holds a step plus hazards/controls, convert each row into a numbered step and put the hazard/control in that step's \`warning\` field — the worker must see the risk with the action it guards.
+- Attach every hazard, caution, or warning to the step it guards via the \`warning\`/\`caution\` fields — never as a separate trailing step.
+- Self-check before output: scan every step; if it contains two or more action verbs ("remove and inspect"), split it.
+- Group related steps into named phases/stages (e.g. "Preparation", "Execution", "Cleanup").
 
-### 2. ENHANCE — Improve the instructions
-- Convert casual speech into clear, professional procedural language
-- Add detail where the source is vague
-- Group related steps into named phases/stages (e.g., "Preparation", "Execution", "Cleanup")
-- Add warnings and cautions to steps where safety is relevant
-- Include time estimates where you can reasonably infer them
-- UNITS — NEW ZEALAND METRIC ONLY. This SOP is for a New Zealand worksite. Any units YOU add or infer must be metric: temperatures in Celsius (°C); length mm/cm/m/km; mass g/kg/tonnes; volume mL/L; pressure kPa/bar. NEVER introduce Fahrenheit or imperial units (inches, feet, yards, pounds/lb, ounces, gallons, PSI). PRESERVE any value the source document states EXACTLY as written — do NOT convert source values and do NOT add bracketed conversions; only your own added/inferred units must be metric.
+### 4. IMAGE SUGGESTIONS — flag where a visual would genuinely help
+Where a photo or diagram of a specific part would meaningfully improve a step, set that step's \`tip\` field to: \`📷 Suggested image: <exact part or area>, <viewing angle e.g. close-up / overhead / before-after>, prevents <the specific mistake or confusion>\`.
+- YES: parts a new worker could misidentify (pins, arms, valves, gauges, fixtures); hand positions or tool orientations that words describe poorly; correct-vs-incorrect visual states (alignment, wear, engagement); machine-area location references.
+- NO: generic steps (press button, record on sheet, notify supervisor), PPE lists, or anywhere the text is already unambiguous. "Show the baffle arm" is not acceptable; "Close-up of the baffle arm locking pin fully engaged, flush with the housing — prevents inserting the pin halfway" is.
+- Aim for the few highest-value suggestions, not coverage. If a step has a genuine source tip AND a photo suggestion, combine both in the tip field.
 
-### 3. ANALYSE — Extract safety intelligence
-- Flag hazards the speaker mentioned directly (even casually)
-- Infer hazards from context (working with water → slip hazard; animals → bite/scratch risk)
-- For each hazard, recommend a mitigation
+### 5. CLARITY — professional language for shop-floor workers
+- Convert casual speech into clear procedural language. Short sentences, active voice ("Remove the pin", not "The pin should be removed").
+- Expand abbreviations on first use when the meaning is stated or obvious from the source (m/c → machine); if uncertain, keep the original abbreviation.
+- UNITS — NEW ZEALAND METRIC ONLY. This SOP is for a New Zealand worksite. Any units YOU add must be metric: temperatures in Celsius (°C); length mm/cm/m/km; mass g/kg/tonnes; volume mL/L; pressure kPa/bar. NEVER introduce Fahrenheit or imperial units. PRESERVE any value the source states EXACTLY as written — no conversions, no bracketed equivalents.
+- Include time estimates only when the source states or clearly implies them.
 
-### 4. CONFIDENCE — Score honestly
+### 6. CONFIDENCE — score honestly
 - 1.0 = comprehensive SOP with clear structure
-- 0.7-0.9 = good SOP, some sections inferred
-- 0.5-0.7 = significant inference required
+- 0.7-0.9 = good SOP, some structure inferred
+- 0.5-0.7 = significant restructuring required or source gaps flagged
 - Below 0.5 = source quality too poor
+Set parse_notes to describe what was restructured vs explicitly stated, and list every NEEDS REVIEW flag.
 
-Set parse_notes to describe what you inferred vs what was explicitly stated.
-
-### 5. STRUCTURED INPUT FORMAT — Read structural anchors strictly
+### 7. STRUCTURED INPUT FORMAT — Read structural anchors strictly
 The source may be provided as a STRUCTURED document with explicit block markers. When you see lines starting with:
 
 - \`HEADING L<n>: <text>\` — a section heading at level n.
@@ -147,7 +163,7 @@ const FORMAT_HINTS: Partial<Record<SourceFileType | 'prompt', string>> = {
   pptx: '\n\nNote: This text was extracted from a PowerPoint presentation. Each slide title is a likely section heading.',
   txt: '\n\nNote: Plain text file. Infer structure from numbering, indentation, and keywords.',
   image: '\n\nNote: OCR-extracted text from a photographed document. May contain errors. Flag uncertain values in parse_notes.',
-  video: `\n\nIMPORTANT: This is a transcript from a video recording of someone demonstrating a procedure. Apply MAXIMUM interpretation:
+  video: `\n\nIMPORTANT: This is a transcript from a video recording of someone demonstrating a procedure. The strict GROUNDING rules are relaxed for structure, hazards, and PPE (spoken demonstrations are informal), but every number, tool name, and product name must still come from the transcript. Apply MAXIMUM interpretation:
 
 1. Every action the speaker describes or demonstrates → numbered step
 2. Casual safety mentions ("be careful not to...", "watch out for...") → HAZARDS section with severity
@@ -158,7 +174,7 @@ const FORMAT_HINTS: Partial<Record<SourceFileType | 'prompt', string>> = {
 7. If speaker mentions tools/products/equipment → "Tools & Equipment" section
 8. Preserve exact numbers (measurements, temperatures, durations, dosages)`,
   // Phase 14 D-01: 'prompt' is the AI-prompt source mode — short NL brief from an admin requesting a brand-new SOP.
-  prompt: `\n\nIMPORTANT: This input is a short natural-language prompt from an admin requesting a brand-new SOP draft. It is NOT a source document — there is no transcript, no manual, no policy text behind it. Apply MAXIMUM inference:
+  prompt: `\n\nIMPORTANT: This input is a short natural-language prompt from an admin requesting a brand-new SOP draft. It is NOT a source document — there is no transcript, no manual, no policy text behind it. The strict GROUNDING rules do not apply to this mode. Apply MAXIMUM inference:
 
 1. Treat the prompt as a brief — your job is to author a complete, professional SOP from a one-line request.
 2. Infer the work context: location, equipment, hazards, regulatory frame (NZ WorkSafe / HSNO Act for chemical, AS/NZS standards for machinery), worker role.
@@ -184,7 +200,7 @@ Write a thorough SOP with comprehensive detail. Every step should include contex
 Write the most comprehensive SOP possible. Every step must be broken into sub-steps where applicable. Include detailed hazard analysis with severity ratings and specific mitigations. Full PPE justification. Emergency procedures for every identified risk. Quality control checkpoints. Regulatory references where applicable. Training prerequisites. Sign-off requirements. Leave nothing to interpretation. Ideal for: hazardous operations, regulatory audits, legal defensibility, chemical/electrical/confined space work.`,
 }
 
-// Complexity triage prompt for Haiku
+// Complexity triage prompt
 const TRIAGE_PROMPT = `Assess the complexity of structuring this text into a Standard Operating Procedure. Reply with ONLY one word: SIMPLE or COMPLEX.
 
 SIMPLE = single straightforward process, few hazards, no chemicals or heavy machinery, everyday tasks
@@ -194,19 +210,20 @@ Text to assess:
 `
 
 /**
- * Two-stage Claude parsing:
- * 1. Haiku triages complexity (fast, cheap)
- * 2. Simple → Haiku parses, Complex → Sonnet parses
+ * Two-stage parsing (models in agent-layer/model-constants.ts, env-overridable via
+ * PARSE_TRIAGE_MODEL / PARSE_SIMPLE_MODEL / PARSE_COMPLEX_MODEL):
+ * 1. Triage model assesses complexity (fast, cheap)
+ * 2. Simple → cheap model parses, Complex → capable model parses
  *
  * Phase 14 D-01: signature evolved to accept either:
- *  - legacy positional: parseSopWithGPT(text, 'video', 3)
- *  - new opts shape:    parseSopWithGPT(text, { sourceMode: 'prompt', detailLevel: 3 })
+ *  - legacy positional: parseSop(text, 'video', 3)
+ *  - new opts shape:    parseSop(text, { sourceMode: 'prompt', detailLevel: 3 })
  *
  * `sourceMode` admits `'prompt'` for the AI-prompt path; that value is NOT added to
  * SourceFileType (which gates the parse_jobs DB CHECK constraint) — kept isolated to
  * the FORMAT_HINTS keyspace and parser-call layer.
  */
-export async function parseSopWithGPT(
+export async function parseSop(
   extractedText: string,
   optsOrInputType?:
     | SourceFileType
@@ -228,16 +245,16 @@ export async function parseSopWithGPT(
   const detailHint = DETAIL_LEVEL_HINTS[Math.min(5, Math.max(1, Math.round(detailLevel)))] ?? DETAIL_LEVEL_HINTS[3]
   const hint = formatHint + detailHint
 
-  // Stage 1: Haiku complexity triage (~0.5s, ~$0.001)
+  // Stage 1: complexity triage (~0.5s, ~$0.001)
   const excerpt = extractedText.slice(0, 2000) // first 2000 chars is enough to assess
   const triageRes = await client.messages.create({
-    model: 'claude-haiku-4-5-20251001',
+    model: PARSE_TRIAGE_MODEL,
     max_tokens: 10,
     messages: [{ role: 'user', content: TRIAGE_PROMPT + excerpt }],
   })
   const triageText = triageRes.content[0]?.type === 'text' ? triageRes.content[0].text.trim().toUpperCase() : 'COMPLEX'
   const isSimple = triageText.includes('SIMPLE')
-  const model = isSimple ? 'claude-haiku-4-5-20251001' : 'claude-sonnet-4-6'
+  const model = isSimple ? PARSE_SIMPLE_MODEL : PARSE_COMPLEX_MODEL
 
   console.log(`[SOP Parser] Triage: ${triageText} → routing to ${model}`)
 

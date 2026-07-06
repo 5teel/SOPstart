@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { parseSopWithGPT } from '@/lib/parsers/gpt-parser'
+import { parseSop } from '@/lib/parsers/sop-parser'
 import { verifyTranscriptVsSop, detectMissingSections } from '@/lib/parsers/verify-sop'
 import { aiPromptSchema } from '@/lib/validators/sop'
 import type { ParsedSop } from '@/lib/validators/sop'
@@ -11,7 +11,7 @@ import type { VerificationFlag } from '@/types/sop'
 // Near-clone of /api/sops/youtube/route.ts with three swaps:
 //   - input_type = 'ai_prompt' (was 'youtube_url')
 //   - source_type = 'ai' (drives D-05 library chip)
-//   - parseSopWithGPT called with sourceMode: 'prompt' (selects new FORMAT_HINTS.prompt)
+//   - parseSop called with sourceMode: 'prompt' (selects new FORMAT_HINTS.prompt)
 // Plus one addition: section_kind_id resolver post-process (ROADMAP success #4).
 export const maxDuration = 300
 
@@ -110,13 +110,13 @@ export async function POST(request: NextRequest) {
   // fresh SOP+job; admin dedupes from the library.)
 
   try {
-    // --- 5. Drafting stage — call Claude via the extended parseSopWithGPT signature ---
+    // --- 5. Drafting stage — call Claude via the extended parseSop signature ---
     await admin
       .from('parse_jobs')
       .update({ current_stage: 'drafting', updated_at: new Date().toISOString() })
       .eq('id', job.id)
 
-    const parsed: ParsedSop = await parseSopWithGPT(promptText, { sourceMode: 'prompt', detailLevel })
+    const parsed: ParsedSop = await parseSop(promptText, { sourceMode: 'prompt', detailLevel })
 
     // --- 6. Verifying stage — adversarial verifier in PROMPT mode (D-02; mode param implemented in 14-03) ---
     await admin

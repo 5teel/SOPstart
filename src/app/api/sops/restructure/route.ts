@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { parseSopWithGPT } from '@/lib/parsers/gpt-parser'
+import { parseSop } from '@/lib/parsers/sop-parser'
 import { verifyTranscriptVsSop, detectMissingSections } from '@/lib/parsers/verify-sop'
 import { triggerReviewerOnParseCompletion } from '@/lib/parsers/parse-pipeline'
 import type { ParsedSop } from '@/lib/validators/sop'
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
   try {
     // Structure with Claude (skips download + transcription)
     console.log(`[Restructure] Parsing ${transcriptText.length} chars of transcript for SOP ${sopId}`)
-    const parsed: ParsedSop = await parseSopWithGPT(transcriptText, { sourceMode: 'video', detailLevel: detailLevel ?? 3 })
+    const parsed: ParsedSop = await parseSop(transcriptText, { sourceMode: 'video', detailLevel: detailLevel ?? 3 })
 
     // Adversarial verification + missing sections
     await admin.from('parse_jobs')

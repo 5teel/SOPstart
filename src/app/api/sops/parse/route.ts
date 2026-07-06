@@ -13,7 +13,7 @@ import { extractPptx } from '@/lib/parsers/extract-pptx'
 import { extractTxt } from '@/lib/parsers/extract-txt'
 import { extractImage } from '@/lib/parsers/extract-image'
 import { ocrFallback } from '@/lib/parsers/ocr-fallback'
-import { parseSopWithGPT } from '@/lib/parsers/gpt-parser'
+import { parseSop } from '@/lib/parsers/sop-parser'
 import { uploadExtractedImages } from '@/lib/parsers/image-uploader'
 import { triggerReviewerOnParseCompletion } from '@/lib/parsers/parse-pipeline'
 import {
@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 4. Parse with GPT-4o — pass file_type for format-specific prompt hints
-    const parsed: ParsedSop = await parseSopWithGPT(extractedText, { sourceMode: fileType })
+    const parsed: ParsedSop = await parseSop(extractedText, { sourceMode: fileType })
 
     // 5. Get the SOP's organisation_id for image storage paths
     const { data: sop } = await admin

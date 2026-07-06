@@ -157,7 +157,7 @@ export const updateVersionLabelSchema = z.object({
  * Phase 14: AI-prompt entry validator.
  * - D-06: min(20) blocks wasted-call prompts ("make me an SOP")
  * - Pitfall #6: max(2000) bounds LLM cost from pasted policy documents
- * - detailLevel mirrors the existing parseSopWithGPT(detailLevel: 1-5) parameter
+ * - detailLevel mirrors the existing parseSop(detailLevel: 1-5) parameter
  * - categoryTag optional, references the controlled vocab from 13's block_categories table
  */
 export const aiPromptSchema = z.object({

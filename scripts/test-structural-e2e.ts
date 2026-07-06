@@ -7,7 +7,7 @@
 import { readFile } from 'node:fs/promises'
 import { extractDocxStructural } from '../src/lib/parsers/extract-docx-structural'
 import { structuredDocToPrompt } from '../src/lib/parsers/structured-doc-to-prompt'
-import { parseSopWithGPT } from '../src/lib/parsers/gpt-parser'
+import { parseSop } from '../src/lib/parsers/sop-parser'
 
 async function loadEnv() {
   const env = await readFile('C:\\Development\\SOPstart\\.env.local', 'utf8')
@@ -53,7 +53,7 @@ async function main() {
   console.log('\n=== call gpt-parser with structured prompt (~$0.05) ===')
   const promptText = structuredDocToPrompt(doc)
   console.log(`prompt size: ${promptText.length} chars`)
-  const parsed = await parseSopWithGPT(promptText, { sourceMode: 'docx' })
+  const parsed = await parseSop(promptText, { sourceMode: 'docx' })
   console.log(`parsed: ${parsed.sections.length} sections, title="${parsed.title}"`)
 
   // Build a reverse index: which step did each image index land on?

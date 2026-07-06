@@ -8,7 +8,7 @@ export interface PptxExtractionResult {
  * Extracts text from PowerPoint (.pptx) files using officeparser.
  *
  * Officeparser concatenates slide text and speaker notes into a single
- * text stream. The GPT-4o prompt hint (in gpt-parser.ts) tells the model
+ * text stream. The parser prompt hint (in sop-parser.ts) tells the model
  * to treat slide titles as section headings and combine notes with slide text.
  */
 export async function extractPptx(buffer: ArrayBuffer): Promise<PptxExtractionResult> {

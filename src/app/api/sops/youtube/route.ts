@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { fetchYouTubeTranscript } from '@/lib/parsers/fetch-youtube-transcript'
-import { parseSopWithGPT } from '@/lib/parsers/gpt-parser'
+import { parseSop } from '@/lib/parsers/sop-parser'
 import { verifyTranscriptVsSop, detectMissingSections } from '@/lib/parsers/verify-sop'
 import { triggerReviewerOnParseCompletion } from '@/lib/parsers/parse-pipeline'
 import { youtubeUrlSchema, extractYouTubeId } from '@/lib/validators/sop'
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
 
   try {
     // 4. Structure SOP with GPT-4o using video format hint
-    const parsed: ParsedSop = await parseSopWithGPT(transcriptText, { sourceMode: 'video' })
+    const parsed: ParsedSop = await parseSop(transcriptText, { sourceMode: 'video' })
 
     // 5. Adversarial verification + missing section detection
     await admin.from('parse_jobs')

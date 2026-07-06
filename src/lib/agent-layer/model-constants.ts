@@ -15,3 +15,9 @@ export const EMBED_MODEL = process.env.VOYAGE_EMBED_MODEL ?? 'voyage-3.5'
 // D-16: Claude Haiku 4.5 for synthesis (tags, entities, assessment reasoning).
 // Env-overridable per CLAUDE.md 2026-06-02 model-rot learning.
 export const SYNTHESIS_MODEL = process.env.SYNTHESIS_MODEL ?? 'claude-haiku-4-5-20251001'
+
+// SOP parse pipeline (sop-parser.ts): Haiku triages complexity, then routes to a
+// cheap or capable model. Swap models via env — no code change needed.
+export const PARSE_TRIAGE_MODEL = process.env.PARSE_TRIAGE_MODEL ?? 'claude-haiku-4-5-20251001'
+export const PARSE_SIMPLE_MODEL = process.env.PARSE_SIMPLE_MODEL ?? 'claude-haiku-4-5-20251001'
+export const PARSE_COMPLEX_MODEL = process.env.PARSE_COMPLEX_MODEL ?? 'claude-sonnet-4-6'
