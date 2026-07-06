@@ -1,4 +1,5 @@
 import Tesseract from 'tesseract.js'
+import { aiModel } from '@/lib/ai/registry'
 
 export interface OcrResult {
   text: string
@@ -13,7 +14,7 @@ export interface OcrResult {
 export async function ocrFallback(imageBuffer: ArrayBuffer, contentType: string): Promise<OcrResult> {
   try {
     const buffer = Buffer.from(imageBuffer)
-    const { data } = await Tesseract.recognize(buffer, 'eng', {
+    const { data } = await Tesseract.recognize(buffer, aiModel('ocr-fallback'), {
       logger: () => {}, // silence progress logs
     })
 

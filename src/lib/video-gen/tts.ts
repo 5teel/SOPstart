@@ -5,6 +5,7 @@
  */
 
 import OpenAI from 'openai'
+import { aiModel } from '@/lib/ai/registry'
 
 // Lazy-initialized to avoid throwing at module load time during Next.js static analysis
 let openai: OpenAI | null = null
@@ -40,7 +41,7 @@ export async function generateSectionAudio(
     : BASE_INSTRUCTIONS
 
   const response = await getClient().audio.speech.create({
-    model: 'gpt-4o-mini-tts',
+    model: aiModel('tts-video'),
     voice: 'nova', // Clear, authoritative voice per research recommendation (D-08)
     input: sectionText,
     instructions,

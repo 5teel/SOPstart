@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import { verifyTranscriptVsSop } from '@/lib/parsers/verify-sop'
 import { packSopForPrompt } from '@/lib/voice/sop-pack'
 import type { SopWithSections, VoiceQueryResponse } from '@/types/sop'
+import { aiModel } from '@/lib/ai/registry'
 
 // [Pitfall 2 — lazy-init Anthropic]
 // Module-top-level `new Anthropic()` breaks Next.js 16 static analysis when ANTHROPIC_API_KEY
@@ -31,7 +32,7 @@ export function __resetAnthropicForTests(): void {
 
 // D-08: claude-haiku-4-5 for both the answer call AND the verifier call. The verifier reuses
 // the answer call's cache write — so both calls MUST use the same model id.
-const VOICE_QA_MODEL = 'claude-haiku-4-5-20251001'
+const VOICE_QA_MODEL = aiModel('voice-qa')
 
 const VOICE_QA_SYSTEM = `You are a shop-floor safety assistant. A worker is reading a Standard Operating Procedure and has asked you a question.
 

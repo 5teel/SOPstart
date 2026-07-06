@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
+import { aiModel } from '@/lib/ai/registry'
 import { createClient } from '@/lib/supabase/server'
 
 // Lazy-initialized to avoid throwing at module load time during Next.js static analysis
@@ -62,7 +63,7 @@ export async function POST(
 
   // Stream response via Anthropic SDK streaming
   const stream = await getAnthropic().messages.stream({
-    model: 'claude-haiku-4-5',
+    model: aiModel('sop-ask'),
     max_tokens: 512,
     system: systemPrompt,
     messages: [{ role: 'user', content: query }],

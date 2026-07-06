@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk'
 import type { ParsedSop } from '@/lib/validators/sop'
 import type { VerificationFlag } from '@/types/sop'
+import { aiModel } from '@/lib/ai/registry'
 
 // Lazy-initialized to avoid throwing at module load time during Next.js static analysis.
 //
@@ -90,20 +91,14 @@ Respond with a JSON array only. No prose, no markdown.
 Each element: { "severity": "critical"|"warning", "section_title": "string", "step_number": null, "original_text": "the unverified phrase from the answer", "structured_text": "what the cited section actually says", "description": "why this claim is not grounded in the cited section" }
 If every claim is grounded, respond with exactly: []`
 
-// Model selection: claude-haiku-4-5 for cost-effective verification.
-// Override with ANTHROPIC_VERIFY_MODEL env var if needed.
-// [2026-06-02] Updated from the now-retired `claude-3-5-haiku-20241022`, which
-// Anthropic deprecated — every reviewer/verifier call returned
-// `404 not_found_error: model: claude-3-5-haiku-20241022`. Now matches
-// VOICE_QA_VERIFY_MODEL (the same current Haiku the voice-QA path already uses).
-// Phase 21 (Plan 21-01): exported for Job A of the AI reviewer. Plan 21-03
-// will A/B Sonnet vs Haiku for the full reviewer suite; this constant
-// remains the Phase 6 transcript-mode default.
-export const VERIFY_MODEL = process.env.ANTHROPIC_VERIFY_MODEL || 'claude-haiku-4-5-20251001'
+// Model IDs resolve through the AI model registry (src/lib/ai/registry.ts) —
+// env-overridable, single source of truth (2026-06-02 model-rot learning).
+// Phase 21 (Plan 21-01): VERIFY_MODEL exported for Job A of the AI reviewer.
+export const VERIFY_MODEL = aiModel('draft-verify')
 
-// Phase 15 D-08: voice_qa uses claude-haiku-4-5 (same model as the answer call) so the
-// answer-call cache write at this exact model is reused by the verifier-call cache read.
-const VOICE_QA_VERIFY_MODEL = 'claude-haiku-4-5-20251001'
+// Phase 15 D-08: voice_qa verifier uses the SAME registry key as the answer call
+// (voice-qa.ts) so the answer-call cache write is reused by the verifier-call read.
+const VOICE_QA_VERIFY_MODEL = aiModel('voice-qa')
 
 /**
  * Phase 14 D-02: opts.mode selects the verifier framing.

@@ -1,5 +1,6 @@
 'use client'
 import { pickRecorderFormat, type RecorderFormat } from './media-recorder'
+import { aiModel } from '@/lib/ai/registry'
 
 export interface VoiceStreamOpts {
   language: 'en-NZ' | 'en-AU' | 'en-US'
@@ -51,7 +52,7 @@ export async function startVoiceStream(opts: VoiceStreamOpts): Promise<StreamHan
   // real WebM/Opus clip both ways against Deepgram. `format` is still used for
   // the MediaRecorder mimeType + blob extension below, just not for these params.
   const params = new URLSearchParams({
-    model: 'nova-3',
+    model: aiModel('stt-stream'),
     language: opts.language,
     interim_results: 'true',
     smart_format: 'true',

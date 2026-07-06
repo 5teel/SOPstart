@@ -1,6 +1,7 @@
 'use client'
 import { db } from './db'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { aiModel } from '@/lib/ai/registry'
 
 export interface FlushVoiceResult {
   flushed: number
@@ -21,7 +22,7 @@ export async function flushVoiceNoteQueue(supabase: SupabaseClient): Promise<Flu
 
       // 2. Transcribe via Deepgram REST (offline blobs: batch, not streaming)
       const dgParams = new URLSearchParams({
-        model: 'nova-3',
+        model: aiModel('stt-stream'),
         language: note.language,
         smart_format: 'true',
         punctuate: 'true',

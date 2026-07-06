@@ -15,4 +15,6 @@
  * Monitoring: watch for Content-Length: 0 in /api/voice/tts responses — zero-byte
  * audio is the silent rot signature (200 OK, 0 bytes of MP3 = model retired).
  */
-export const TTS_MODEL = process.env.TTS_MODEL ?? 'gpt-4o-mini-tts'
+import { aiModel } from '@/lib/ai/registry'
+
+export const TTS_MODEL = aiModel('tts-voice')

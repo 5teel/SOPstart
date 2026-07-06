@@ -1,5 +1,6 @@
 import OpenAI from 'openai'
 import sharp from 'sharp'
+import { aiModel } from '@/lib/ai/registry'
 
 // Lazy-initialized to avoid throwing at module load time during Next.js static analysis
 let openai: OpenAI | null = null
@@ -47,7 +48,7 @@ export async function extractImage(buffer: ArrayBuffer): Promise<ImageExtraction
   const base64 = processed.toString('base64')
 
   const response = await getOpenAI().chat.completions.create({
-    model: 'gpt-4o-2024-08-06',
+    model: aiModel('vision-image-describe'),
     messages: [
       {
         role: 'user',

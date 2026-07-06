@@ -1,4 +1,5 @@
 import type { TranscriptSegment } from '@/types/sop'
+import { aiModel } from '@/lib/ai/registry'
 
 // D-12: NZ industrial vocabulary for keyword boosting
 const NZ_INDUSTRY_KEYWORDS = [
@@ -50,7 +51,7 @@ export async function transcribeAudio(
 
   // Build query params
   const params = new URLSearchParams({
-    model: 'nova-2',
+    model: aiModel('stt-batch'),
     language: 'en-NZ',
     smart_format: 'true',
     punctuate: 'true',

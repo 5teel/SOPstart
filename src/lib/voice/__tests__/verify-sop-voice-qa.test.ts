@@ -83,9 +83,11 @@ test.describe('verify-sop.ts — source contract for the voice_qa extension', ()
     expect(src).toMatch(/const ADVERSARIAL_SYSTEM = /)
   })
 
-  test('claude-haiku-4-5-20251001 model used for voice_qa verifier call (D-08)', () => {
+  test('voice_qa verifier resolves its model via the shared voice-qa registry key (D-08 cache reuse)', () => {
     const src = read(VERIFY_SOP)
-    expect(src).toMatch(/claude-haiku-4-5-20251001/)
+    // Same registry key as the answer call in voice-qa.ts — guarantees both
+    // calls share one model ID so the verifier reuses the answer's cache write.
+    expect(src).toMatch(/VOICE_QA_VERIFY_MODEL = aiModel\('voice-qa'\)/)
   })
 })
 
