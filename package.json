@@ -71,13 +71,13 @@
     "eslint-config-next": "16.2.1",
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.12",
-    "supabase": "^2.22.6",
     "tailwindcss": "^4",
     "tsx": "4.19.2",
     "typescript": "^5"
   },
   "optionalDependencies": {
     "@tailwindcss/oxide-win32-x64-msvc": "^4.2.2",
-    "lightningcss-win32-x64-msvc": "^1.32.0"
+    "lightningcss-win32-x64-msvc": "^1.32.0",
+    "supabase": "^2.22.6"
   }
 }
