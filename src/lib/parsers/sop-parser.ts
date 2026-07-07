@@ -288,17 +288,22 @@ export async function parseSop(
       title: (s.title as string) ?? 'Untitled Section',
       content: (s.content as string) ?? null,
       steps: s.steps
-        ? (s.steps as Array<Record<string, unknown>>).map((st, j) => ({
-            order: (st.order as number) ?? j + 1,
-            text: (st.text as string) ?? '',
-            warning: (st.warning as string) ?? null,
-            caution: (st.caution as string) ?? null,
-            tip: (st.tip as string) ?? null,
-            required_tools: (st.required_tools as string[]) ?? null,
-            time_estimate_minutes: (st.time_estimate_minutes as number) ?? null,
-            has_image: (st.has_image as boolean) ?? false,
-            image_indexes: (st.image_indexes as number[] | null) ?? null,
-          }))
+        ? (s.steps as Array<Record<string, unknown>>)
+            .map((st, j) => ({
+              order: (st.order as number) ?? j + 1,
+              // Normalize model quirks (seen on non-Anthropic providers): empty
+              // strings become null/dropped so downstream min-length validators
+              // (StepBlock content schema) never see them.
+              text: ((st.text as string) ?? '').trim(),
+              warning: ((st.warning as string) || '').trim() || null,
+              caution: ((st.caution as string) || '').trim() || null,
+              tip: ((st.tip as string) || '').trim() || null,
+              required_tools: (st.required_tools as string[]) ?? null,
+              time_estimate_minutes: (st.time_estimate_minutes as number) ?? null,
+              has_image: (st.has_image as boolean) ?? false,
+              image_indexes: (st.image_indexes as number[] | null) ?? null,
+            }))
+            .filter((st) => st.text.length > 0)
         : null,
       confidence: (s.confidence as number) ?? 0.7,
     })),

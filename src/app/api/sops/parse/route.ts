@@ -70,6 +70,13 @@ export async function POST(request: NextRequest) {
     .eq('id', job.id)
 
   try {
+    // Retry semantics: a previous failed attempt may have inserted sections /
+    // steps / images before throwing (e.g. mid-pipeline validator error).
+    // Re-parsing replaces the draft wholesale — clear prior artifacts so a
+    // retry never duplicates sections. FK cascade removes steps/junctions.
+    await admin.from('sop_images').delete().eq('sop_id', sopId)
+    await admin.from('sop_sections').delete().eq('sop_id', sopId)
+
     // 1. Download the source file from Storage (using admin client — bypasses Storage RLS)
     const { data: fileData, error: downloadError } = await admin.storage
       .from('sop-documents')
