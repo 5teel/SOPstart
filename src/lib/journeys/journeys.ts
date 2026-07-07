@@ -307,7 +307,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin describes the procedure out loud; an AI interviewer asks follow-up questions, builds a brief, then drafts through the same AI pipeline.',
     steps: [
       { id: 's', type: 'start', label: 'Easier to say than type' },
-      { id: 'voice', type: 'screen', label: 'Voice draft conversation', route: '/admin/sops/new/voice', detail: 'Mic → live transcription → AI follow-up questions (spoken + text). Brief accumulates as you talk.' },
+      { id: 'voice', type: 'screen', label: 'Voice draft conversation (Talk it through tab)', route: '/admin/sops/new/ai', detail: 'Mic → live transcription → AI follow-up questions (spoken + text). Brief accumulates as you talk.' },
       { id: 'gen', type: 'action', label: 'Generate draft', detail: 'The accumulated brief feeds the same /api/sops/ai-prompt pipeline as the typed workflow.' },
       { id: 'builder', type: 'screen', label: 'Builder', route: '/admin/sops/builder/[sopId]' },
       { id: 'e', type: 'end', label: 'Draft ready' },
