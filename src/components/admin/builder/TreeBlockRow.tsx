@@ -31,11 +31,18 @@ import type { PuckItem } from './TreeStepRow'
  */
 export function blockPreviewText(props: Record<string, unknown> | undefined): string {
   if (!props) return ''
-  const KEYS = ['text', 'title', 'label', 'prompt', 'question', 'description', 'hazard', 'instruction']
+  // Content-bearing fields FIRST — `body` (HazardCardBlock), `text`, etc. —
+  // then generic `title`/`label` LAST, because block types like HazardCardBlock
+  // hardcode title='Hazard' as a card heading while the real content lives in
+  // `body`. Ordering title first made every hazard row read 'Hazard' (the bug).
+  const KEYS = ['body', 'text', 'description', 'hazard', 'instruction', 'prompt', 'question', 'label', 'title']
+  // Strip leading markdown so labels read cleanly (**bold**, • bullets, # headings).
+  const clean = (v: string): string =>
+    v.replace(/^[\s>#*•\-–—]+/, '').replace(/\*\*/g, '').trim()
   const pick = (obj: Record<string, unknown>): string => {
     for (const k of KEYS) {
       const v = obj[k]
-      if (typeof v === 'string' && v.trim()) return v.trim()
+      if (typeof v === 'string' && clean(v)) return clean(v)
     }
     const items = obj['items']
     if (Array.isArray(items) && items.length > 0) {
