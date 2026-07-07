@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { parseSop } from '@/lib/parsers/sop-parser'
+import {
+  parsedSopToPerSectionLayoutData,
+  materializeJunctionsForLayout,
+} from '@/lib/parsers/parsed-sop-to-layout-data'
 import { verifyTranscriptVsSop, detectMissingSections } from '@/lib/parsers/verify-sop'
 import { triggerReviewerOnParseCompletion } from '@/lib/parsers/parse-pipeline'
 import type { ParsedSop } from '@/lib/validators/sop'
@@ -91,6 +95,7 @@ export async function POST(request: NextRequest) {
     }).eq('id', sopId)
 
     // Insert sections and steps
+    const perSectionLayouts = parsedSopToPerSectionLayoutData(parsed, [])
     for (const section of parsed.sections) {
       const { data: sectionRow, error: sectionError } = await admin
         .from('sop_sections')
@@ -109,6 +114,28 @@ export async function POST(request: NextRequest) {
       if (sectionError || !sectionRow) {
         console.error('Section insert error:', sectionError)
         continue
+      }
+
+      // Builder canvas renders exclusively from per-section layout_data —
+      // without it a video-derived draft opens as an empty canvas (2026-07-07
+      // sweep, same fix as parse/ai-prompt). Fail-open: never lose the draft.
+      const sectionLayout = perSectionLayouts.layouts.get(section.order) ?? null
+      if (sectionLayout && sectionLayout.content.length > 0) {
+        try {
+          await materializeJunctionsForLayout({
+            organisationId: sop?.organisation_id ?? '',
+            sectionId: sectionRow.id,
+            puckItems: sectionLayout.content,
+            createdByUserId: null,
+          })
+          await admin
+            .from('sop_sections')
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .update({ layout_data: sectionLayout as unknown as object, layout_version: 1 } as any)
+            .eq('id', sectionRow.id)
+        } catch (err) {
+          console.error('[layout] section layout_data write failed', sectionRow.id, err)
+        }
       }
 
       if (section.steps) {
