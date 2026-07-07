@@ -271,10 +271,13 @@ export async function POST(request: NextRequest) {
       provenanceContext = ctx
     }
 
-    const perSectionLayouts =
-      fileType === 'docx'
-        ? parsedSopToPerSectionLayoutData(parsed, uploadedImages, { provenanceContext })
-        : null
+    // ALL file types get layout_data — the Phase 26 builder canvas renders from
+    // it exclusively, so a section without layout_data is invisible there (bug:
+    // pdf/txt/xlsx/pptx parses opened an empty builder). provenanceContext is
+    // undefined for types without source anchoring — converter tolerates that.
+    const perSectionLayouts = parsedSopToPerSectionLayoutData(parsed, uploadedImages, {
+      provenanceContext,
+    })
 
     // Update SOP metadata
     await admin

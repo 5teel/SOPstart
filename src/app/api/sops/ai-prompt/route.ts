@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { parseSop } from '@/lib/parsers/sop-parser'
+import {
+  parsedSopToPerSectionLayoutData,
+  materializeJunctionsForLayout,
+} from '@/lib/parsers/parsed-sop-to-layout-data'
 import { getOrgAiModels, resolveOrgModel } from '@/lib/ai/org-settings'
 import { ensureSopTitle } from '@/lib/parsers/sop-title'
 import { verifyTranscriptVsSop, detectMissingSections } from '@/lib/parsers/verify-sop'
@@ -191,6 +195,11 @@ export async function POST(request: NextRequest) {
     // Field-name mapping (verified in src/lib/validators/sop.ts):
     //   SopSectionSchema.order  -> sop_sections.sort_order
     //   SopStepSchema.order     -> sop_steps.step_number ---
+
+    // Builder canvas renders exclusively from per-section layout_data — without
+    // it an AI/voice draft opens as an empty canvas (bug fixed 2026-07-07).
+    const perSectionLayouts = parsedSopToPerSectionLayoutData(parsed, [])
+
     for (const section of parsed.sections) {
       const sectionKindId = resolveKindId(section.type)
       const { data: sectionRow, error: sectionError } = await admin
@@ -209,6 +218,28 @@ export async function POST(request: NextRequest) {
         .single()
 
       if (sectionError || !sectionRow) continue
+
+      // Write layout_data (with junction-stamped items) so the builder shows
+      // the draft. Fail-open: a layout failure must not lose the draft itself —
+      // sections/steps remain and the canvas degrades to empty for that section.
+      const sectionLayout = perSectionLayouts.layouts.get(section.order) ?? null
+      if (sectionLayout && sectionLayout.content.length > 0) {
+        try {
+          await materializeJunctionsForLayout({
+            organisationId,
+            sectionId: sectionRow.id,
+            puckItems: sectionLayout.content,
+            createdByUserId: null,
+          })
+          await admin
+            .from('sop_sections')
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .update({ layout_data: sectionLayout as unknown as object, layout_version: 1 } as any)
+            .eq('id', sectionRow.id)
+        } catch (err) {
+          console.error('[ai-prompt] layout_data write failed for section', sectionRow.id, err)
+        }
+      }
 
       if (section.steps?.length) {
         for (const step of section.steps) {
