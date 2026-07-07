@@ -426,6 +426,16 @@ export function EditableDocument({
       className="mx-auto max-w-[680px] space-y-1 px-6 py-8"
       style={{ backgroundSize: '20px 20px' }}
     >
+      {/* Section header — confirms which section the tree-rail click navigated
+          to (the canvas shows one section at a time). */}
+      {section.title && (
+        <div className="mb-4 border-b border-[var(--ink-100,#e4e4e7)] pb-2">
+          <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--ink-400,#a1a1aa)]">
+            Section
+          </span>
+          <h2 className="text-lg font-semibold text-[var(--ink-900,#09090b)]">{section.title}</h2>
+        </div>
+      )}
       {content.length === 0 ? (
         <>
           <div className="p-8 text-center text-[var(--ink-500,#71717a)]">Nothing here yet</div>

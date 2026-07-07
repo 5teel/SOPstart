@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import type { SopWithSections } from '@/types/sop'
 import { LayoutDataSchema } from '@/lib/builder/layout-schema'
@@ -46,6 +46,15 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
   )
   const [activeSectionId, setActiveSectionId] = useState(sections[0]?.id ?? '')
   const activeSection = sections.find((s) => s.id === activeSectionId)
+
+  // Canvas shows ONE section at a time; selecting a section in the tree rail is
+  // the navigation act. Scroll the canvas back to the top of the newly-selected
+  // section so clicking a section row always lands the admin at its start
+  // instead of mid-content wherever the previous section was scrolled to.
+  const canvasRef = useRef<HTMLElement>(null)
+  useEffect(() => {
+    canvasRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [activeSectionId])
 
   // Autosave/sync hooks. useDraftLayoutSync registers the mount/online/
   // visibility triggers that flush dirty draftLayouts rows to Supabase.
@@ -246,7 +255,7 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
           onSelect={setActiveSectionId}
           sopId={sopId}
         />
-        <main className="relative min-w-0 flex-1 overflow-auto">
+        <main ref={canvasRef} className="relative min-w-0 flex-1 overflow-auto">
           {agentview && (
             <div className="px-4 pt-4">
               {proposalActionError && (
