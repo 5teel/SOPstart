@@ -128,6 +128,13 @@ export const AI_MODELS = {
     envVar: 'SYNTHESIS_MODEL',
     description: 'Agent-metadata synthesis: tags, entities, assessment (agent-layer/synthesis.ts)',
   },
+  'voice-draft': {
+    capability: 'llm',
+    provider: 'anthropic',
+    defaultId: 'claude-haiku-4-5-20251001',
+    envVar: 'VOICE_DRAFT_MODEL',
+    description: 'Conversational voice SOP-drafting interviewer (api/sops/voice-draft)',
+  },
 
   // ---- Vision (OpenAI) -------------------------------------------------
   'vision-image-describe': {

@@ -45,6 +45,7 @@ export const AI_MODEL_OPTIONS: Record<AiModelKey, readonly AiModelOption[]> = {
   'voice-qa': ANTHROPIC_LLM_OPTIONS,
   'sop-ask': ANTHROPIC_LLM_OPTIONS,
   synthesis: ANTHROPIC_LLM_OPTIONS,
+  'voice-draft': ANTHROPIC_LLM_OPTIONS,
   'vision-image-describe': [
     { id: 'gpt-4o-2024-08-06', label: 'GPT-4o', note: 'current default' },
     { id: 'gpt-4o-mini', label: 'GPT-4o mini', note: 'cheaper · lower detail' },
@@ -69,6 +70,7 @@ export const AI_MODEL_LABELS: Record<AiModelKey, string> = {
   'voice-qa': 'Voice Q&A model',
   'sop-ask': 'SOP ask model',
   synthesis: 'Synthesis model',
+  'voice-draft': 'Voice draft interviewer model',
   'vision-image-describe': 'Image description model',
   embed: 'Embedding model',
   'stt-batch': 'Transcription model',

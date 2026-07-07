@@ -223,16 +223,23 @@ Text to assess:
  * SourceFileType (which gates the parse_jobs DB CHECK constraint) — kept isolated to
  * the FORMAT_HINTS keyspace and parser-call layer.
  */
+export interface ParseModelOverrides {
+  /** Org-level model overrides (AI Settings) — fall back to registry/env when unset. */
+  triage?: string
+  simple?: string
+  complex?: string
+}
+
 export async function parseSop(
   extractedText: string,
   optsOrInputType?:
     | SourceFileType
     | 'prompt'
-    | { sourceMode?: SourceFileType | 'prompt'; detailLevel?: number },
+    | { sourceMode?: SourceFileType | 'prompt'; detailLevel?: number; models?: ParseModelOverrides },
   detailLevelLegacy: number = 3,
 ): Promise<ParsedSop> {
   // Normalise legacy positional and new opts shape into a single opts object.
-  const opts: { sourceMode?: SourceFileType | 'prompt'; detailLevel?: number } =
+  const opts: { sourceMode?: SourceFileType | 'prompt'; detailLevel?: number; models?: ParseModelOverrides } =
     typeof optsOrInputType === 'object' && optsOrInputType !== null
       ? optsOrInputType
       : { sourceMode: optsOrInputType ?? undefined, detailLevel: detailLevelLegacy }
@@ -248,13 +255,15 @@ export async function parseSop(
   // Stage 1: complexity triage (~0.5s, ~$0.001)
   const excerpt = extractedText.slice(0, 2000) // first 2000 chars is enough to assess
   const triageRes = await client.messages.create({
-    model: PARSE_TRIAGE_MODEL,
+    model: opts.models?.triage ?? PARSE_TRIAGE_MODEL,
     max_tokens: 10,
     messages: [{ role: 'user', content: TRIAGE_PROMPT + excerpt }],
   })
   const triageText = triageRes.content[0]?.type === 'text' ? triageRes.content[0].text.trim().toUpperCase() : 'COMPLEX'
   const isSimple = triageText.includes('SIMPLE')
-  const model = isSimple ? PARSE_SIMPLE_MODEL : PARSE_COMPLEX_MODEL
+  const model = isSimple
+    ? (opts.models?.simple ?? PARSE_SIMPLE_MODEL)
+    : (opts.models?.complex ?? PARSE_COMPLEX_MODEL)
 
   console.log(`[SOP Parser] Triage: ${triageText} → routing to ${model}`)
 

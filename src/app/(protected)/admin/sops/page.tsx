@@ -114,6 +114,12 @@ export default async function SopsLibraryPage({
             >
               AI Draft
             </Link>
+            <Link
+              href="/admin/sops/new/voice"
+              className="evidence-btn !min-h-[40px] text-sm"
+            >
+              🎤 Voice Draft
+            </Link>
           </div>
         </div>
 
@@ -172,6 +178,7 @@ export default async function SopsLibraryPage({
               >
                 AI Draft
               </Link>
+              <Link href="/admin/sops/new/voice" className="evidence-btn text-sm">🎤 Voice Draft</Link>
             </div>
           </div>
         ) : (

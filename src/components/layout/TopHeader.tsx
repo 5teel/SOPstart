@@ -158,6 +158,7 @@ const ADMIN_LINKS: NavLink[] = [
   { label: 'Manage SOPs', href: '/admin/sops' },
   { label: 'Blocks', href: '/admin/blocks' },
   { label: 'Team', href: '/admin/team' },
+  { label: 'AI Settings', href: '/admin/ai-settings' },
 ]
 
 function isAdminRole(role: Role): boolean {

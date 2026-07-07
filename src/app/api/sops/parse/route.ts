@@ -14,6 +14,7 @@ import { extractTxt } from '@/lib/parsers/extract-txt'
 import { extractImage } from '@/lib/parsers/extract-image'
 import { ocrFallback } from '@/lib/parsers/ocr-fallback'
 import { parseSop } from '@/lib/parsers/sop-parser'
+import { getOrgAiModels, resolveOrgModel } from '@/lib/ai/org-settings'
 import { uploadExtractedImages } from '@/lib/parsers/image-uploader'
 import { triggerReviewerOnParseCompletion } from '@/lib/parsers/parse-pipeline'
 import {
@@ -141,10 +142,7 @@ export async function POST(request: NextRequest) {
       throw new Error('Could not extract meaningful text from the document. The file may be empty or corrupted.')
     }
 
-    // 4. Parse with GPT-4o — pass file_type for format-specific prompt hints
-    const parsed: ParsedSop = await parseSop(extractedText, { sourceMode: fileType })
-
-    // 5. Get the SOP's organisation_id for image storage paths
+    // 4b. Org context first — needed for AI Settings model overrides AND image paths.
     const { data: sop } = await admin
       .from('sops')
       .select('organisation_id')
@@ -152,6 +150,18 @@ export async function POST(request: NextRequest) {
       .single()
 
     const organisationId = sop?.organisation_id ?? ''
+
+    // 4. Parse — pass file_type for format-specific prompt hints + org model
+    // overrides from AI Settings (org setting > env > registry default).
+    const orgModels = organisationId ? await getOrgAiModels(admin, organisationId) : {}
+    const parsed: ParsedSop = await parseSop(extractedText, {
+      sourceMode: fileType,
+      models: {
+        triage: resolveOrgModel('parse-triage', orgModels),
+        simple: resolveOrgModel('parse-simple', orgModels),
+        complex: resolveOrgModel('parse-complex', orgModels),
+      },
+    })
 
     // 6. Upload extracted images to Storage
     const uploadedImages = await uploadExtractedImages(organisationId, sopId, extractedImages)

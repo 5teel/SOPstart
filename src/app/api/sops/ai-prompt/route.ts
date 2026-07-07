@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { parseSop } from '@/lib/parsers/sop-parser'
+import { getOrgAiModels, resolveOrgModel } from '@/lib/ai/org-settings'
 import { verifyTranscriptVsSop, detectMissingSections } from '@/lib/parsers/verify-sop'
 import { aiPromptSchema } from '@/lib/validators/sop'
 import type { ParsedSop } from '@/lib/validators/sop'
@@ -116,7 +117,16 @@ export async function POST(request: NextRequest) {
       .update({ current_stage: 'drafting', updated_at: new Date().toISOString() })
       .eq('id', job.id)
 
-    const parsed: ParsedSop = await parseSop(promptText, { sourceMode: 'prompt', detailLevel })
+    const orgModels = await getOrgAiModels(admin, organisationId)
+    const parsed: ParsedSop = await parseSop(promptText, {
+      sourceMode: 'prompt',
+      detailLevel,
+      models: {
+        triage: resolveOrgModel('parse-triage', orgModels),
+        simple: resolveOrgModel('parse-simple', orgModels),
+        complex: resolveOrgModel('parse-complex', orgModels),
+      },
+    })
 
     // --- 6. Verifying stage — adversarial verifier in PROMPT mode (D-02; mode param implemented in 14-03) ---
     await admin
