@@ -17,7 +17,18 @@ export interface AiModelOption {
   label: string
   /** Short tier/trade-off hint, shown alongside the label. */
   note?: string
+  /** Provider, when it differs from the use case's default provider. */
+  provider?: string
 }
+
+// Cross-provider LLM candidates — the llm adapter (./llm.ts) routes by model
+// ID shape, so any option here works wherever llmToolCall/llmText is the call
+// path (the parse pipeline + voice-draft). GLM 5.2 was validated for SOP work
+// by the .autoresearch R&D loop (2026-07-06).
+const CROSS_PROVIDER_LLM_OPTIONS: readonly AiModelOption[] = [
+  { id: 'z-ai/glm-5.2', label: 'GLM 5.2', note: 'via OpenRouter · very cheap', provider: 'openrouter' },
+  { id: 'gpt-4o-2024-08-06', label: 'GPT-4o', note: 'OpenAI', provider: 'openai' },
+]
 
 const ANTHROPIC_LLM_OPTIONS: readonly AiModelOption[] = [
   { id: 'claude-haiku-4-5-20251001', label: 'Claude Haiku 4.5', note: 'fast · cheapest' },
@@ -38,9 +49,9 @@ const DEEPGRAM_STT_OPTIONS: readonly AiModelOption[] = [
 ]
 
 export const AI_MODEL_OPTIONS: Record<AiModelKey, readonly AiModelOption[]> = {
-  'parse-triage': ANTHROPIC_LLM_OPTIONS,
-  'parse-simple': ANTHROPIC_LLM_OPTIONS,
-  'parse-complex': ANTHROPIC_LLM_OPTIONS,
+  'parse-triage': [...ANTHROPIC_LLM_OPTIONS, ...CROSS_PROVIDER_LLM_OPTIONS],
+  'parse-simple': [...ANTHROPIC_LLM_OPTIONS, ...CROSS_PROVIDER_LLM_OPTIONS],
+  'parse-complex': [...ANTHROPIC_LLM_OPTIONS, ...CROSS_PROVIDER_LLM_OPTIONS],
   'draft-verify': ANTHROPIC_LLM_OPTIONS,
   'voice-qa': ANTHROPIC_LLM_OPTIONS,
   'sop-ask': ANTHROPIC_LLM_OPTIONS,

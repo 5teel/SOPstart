@@ -81,7 +81,7 @@ export default function AiModelSelect({
       </select>
       {showNotes && (
         <p className="mt-1 text-[11px] text-[var(--ink-400)]">
-          {AI_MODELS[useCase].provider}
+          {options.find((o) => o.id === selected)?.provider ?? AI_MODELS[useCase].provider}
           {selected === aiModel(useCase) ? ' · default' : ''}
         </p>
       )}

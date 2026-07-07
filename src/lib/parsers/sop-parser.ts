@@ -1,19 +1,12 @@
-import Anthropic from '@anthropic-ai/sdk'
 import type { ParsedSop } from '@/lib/validators/sop'
 import type { SourceFileType } from '@/types/sop'
 import { PARSE_TRIAGE_MODEL, PARSE_SIMPLE_MODEL, PARSE_COMPLEX_MODEL } from '@/lib/agent-layer/model-constants'
+import { llmText, llmToolCall, type LlmTool } from '@/lib/ai/llm'
 
-// Lazy-initialized to avoid throwing at module load time during Next.js static analysis
-let anthropic: Anthropic | null = null
-function getAnthropic(): Anthropic {
-  if (!anthropic) {
-    anthropic = new Anthropic() // reads ANTHROPIC_API_KEY from env
-  }
-  return anthropic
-}
-
-// Claude tool definition matching ParsedSopSchema for structured output
-const SOP_TOOL: Anthropic.Tool = {
+// Tool definition matching ParsedSopSchema for structured output — provider-
+// agnostic: the llm adapter converts it to the Anthropic or OpenAI-compatible
+// tool shape depending on which model AI Settings resolves for this org.
+const SOP_TOOL: LlmTool = {
   name: 'create_sop',
   description: 'Create a structured SOP from the analysed source material',
   input_schema: {
@@ -247,19 +240,18 @@ export async function parseSop(
   const sourceMode = opts.sourceMode
   const detailLevel = opts.detailLevel ?? 3
 
-  const client = getAnthropic()
   const formatHint = sourceMode ? (FORMAT_HINTS[sourceMode] ?? '') : ''
   const detailHint = DETAIL_LEVEL_HINTS[Math.min(5, Math.max(1, Math.round(detailLevel)))] ?? DETAIL_LEVEL_HINTS[3]
   const hint = formatHint + detailHint
 
-  // Stage 1: complexity triage (~0.5s, ~$0.001)
+  // Stage 1: complexity triage (~0.5s, ~$0.001) — provider-agnostic
   const excerpt = extractedText.slice(0, 2000) // first 2000 chars is enough to assess
-  const triageRes = await client.messages.create({
+  const triageRaw = await llmText({
     model: opts.models?.triage ?? PARSE_TRIAGE_MODEL,
-    max_tokens: 10,
+    maxTokens: 10,
     messages: [{ role: 'user', content: TRIAGE_PROMPT + excerpt }],
-  })
-  const triageText = triageRes.content[0]?.type === 'text' ? triageRes.content[0].text.trim().toUpperCase() : 'COMPLEX'
+  }).catch(() => 'COMPLEX')
+  const triageText = (triageRaw || 'COMPLEX').trim().toUpperCase()
   const isSimple = triageText.includes('SIMPLE')
   const model = isSimple
     ? (opts.models?.simple ?? PARSE_SIMPLE_MODEL)
@@ -270,22 +262,13 @@ export async function parseSop(
   // Stage 2: Full parse with selected model
   const userContent = `Analyse this source material and produce a comprehensive, professional SOP. Use the create_sop tool to output the structured result.\n\n${extractedText}${hint}`
 
-  const parseRes = await client.messages.create({
+  const raw = (await llmToolCall({
     model,
-    max_tokens: 8192,
+    maxTokens: 8192,
     system: SYSTEM_PROMPT,
     messages: [{ role: 'user', content: userContent }],
-    tools: [SOP_TOOL],
-    tool_choice: { type: 'tool', name: 'create_sop' },
-  })
-
-  // Extract structured output from tool_use block
-  const toolBlock = parseRes.content.find((b) => b.type === 'tool_use' && b.name === 'create_sop')
-  if (!toolBlock || toolBlock.type !== 'tool_use') {
-    throw new Error('Claude returned no structured SOP output — tool_use block missing')
-  }
-
-  const raw = toolBlock.input as Record<string, unknown>
+    tool: SOP_TOOL,
+  })) as Record<string, unknown>
 
   // Map to ParsedSop type (ensure defaults for nullable fields)
   const parsed: ParsedSop = {

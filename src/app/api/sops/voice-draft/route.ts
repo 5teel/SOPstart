@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { parseJwtPayload } from '@/lib/supabase/jwt'
-import { getAnthropic } from '@/lib/parsers/verify-sop'
 import { aiModel } from '@/lib/ai/registry'
+import { llmToolCall, type LlmTool } from '@/lib/ai/llm'
 
 /**
  * Conversational voice SOP-drafting interviewer.
@@ -36,7 +36,7 @@ Rules:
 - The brief must be 20-2000 characters, written as a dense prose paragraph (it becomes the prompt for the SOP generator).
 - Keep replies natural to hear aloud: short, no markdown, no lists.`
 
-const INTERVIEW_TOOL = {
+const INTERVIEW_TOOL: LlmTool = {
   name: 'interview_turn',
   description: 'Return the interviewer reply and updated brief',
   input_schema: {
@@ -76,20 +76,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const client = getAnthropic()
-    const res = await client.messages.create({
+    const out = (await llmToolCall({
       model: aiModel('voice-draft'),
-      max_tokens: 1024,
+      maxTokens: 1024,
       system: INTERVIEWER_SYSTEM,
       messages,
-      tools: [INTERVIEW_TOOL],
-      tool_choice: { type: 'tool', name: 'interview_turn' },
-    })
-    const block = res.content.find((b) => b.type === 'tool_use' && b.name === 'interview_turn')
-    if (!block || block.type !== 'tool_use') {
-      return NextResponse.json({ error: 'No structured reply from model' }, { status: 502 })
-    }
-    const out = block.input as { reply?: string; brief?: string; ready?: boolean }
+      tool: INTERVIEW_TOOL,
+    })) as { reply?: string; brief?: string; ready?: boolean }
     return NextResponse.json({
       reply: out.reply ?? '',
       brief: out.brief ?? '',
