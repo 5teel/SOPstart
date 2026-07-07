@@ -21,13 +21,15 @@
  * UI-SPEC: § "Left Rail: Nested Tree (D-01/D-02)" + § Copywriting Contract
  */
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { GripVertical, ChevronDown, ChevronRight } from 'lucide-react'
 import { reorderSections } from '@/actions/sections'
 import { humanizeBlockType } from '@/lib/builder/block-type-labels'
 import { TreeSectionRow } from './TreeSectionRow'
 import { TreeStepRow } from './TreeStepRow'
-import { TreeBlockRow } from './TreeBlockRow'
+import { TreeBlockRow, blockPreviewText } from './TreeBlockRow'
+import { useVerifyChecklist } from '@/components/admin/verify-checklist/useVerifyChecklist'
+import { focusCanvasBlock } from '@/components/admin/builder-v2/selection-bridge'
 import type { PuckItem } from './TreeStepRow'
 
 // ---------------------------------------------------------------------------
@@ -126,7 +128,7 @@ function getDisplayLabel(item: PuckItem): string {
     return 'Reference images'
   }
   return (
-    String(item.props?.text ?? item.props?.title ?? item.props?.label ?? '') ||
+    blockPreviewText(item.props as Record<string, unknown> | undefined) ||
     humanizeBlockType(item.type)
   )
 }
@@ -175,6 +177,35 @@ export function BuilderTreeRail({
   const [reorderError, setReorderError] = useState<string | null>(null)
 
   // ---- Section expand state ----
+  // Verify rollups - shared TanStack query with the publish-gate checklist
+  // (same key, cached). Per-section n/m chips + per-block dots in the rail.
+  const { blocks: checklistBlocks } = useVerifyChecklist(sopId)
+  const sectionVerifyCounts = useMemo(() => {
+    const out = new Map<string, { done: number; total: number }>()
+    for (const b of checklistBlocks ?? []) {
+      const row = b as unknown as { sop_section_id?: string; verified_by_admin_id?: string | null }
+      if (!row.sop_section_id) continue
+      const c = out.get(row.sop_section_id) ?? { done: 0, total: 0 }
+      c.total++
+      if (row.verified_by_admin_id) c.done++
+      out.set(row.sop_section_id, c)
+    }
+    return out
+  }, [checklistBlocks])
+  const verifiedByJunction = useMemo(() => {
+    const out = new Map<string, boolean>()
+    for (const b of checklistBlocks ?? []) {
+      const row = b as unknown as { junctionId?: string; id?: string; verified_by_admin_id?: string | null }
+      const jid = row.junctionId ?? row.id
+      if (jid) out.set(jid, !!row.verified_by_admin_id)
+    }
+    return out
+  }, [checklistBlocks])
+  const blockVerified = (item: { props?: Record<string, unknown> }): boolean | undefined => {
+    const jid = item.props?.junctionId
+    return typeof jid === 'string' ? verifiedByJunction.get(jid) : undefined
+  }
+
   const [expandedSectionId, setExpandedSectionId] = useState<string | null>(
     activeSectionId
   )
@@ -278,6 +309,7 @@ export function BuilderTreeRail({
                 section={s}
                 isActive={isActive}
                 isExpanded={isExpanded}
+                verifiedSummary={sectionVerifyCounts.get(s.id) ?? null}
                 onToggle={() =>
                   setExpandedSectionId(prev => (prev === s.id ? null : s.id))
                 }
@@ -335,7 +367,11 @@ export function BuilderTreeRail({
                               key={node.item.props?.id ?? nodeIdx}
                               item={{ ...node.item }}
                               displayLabel={displayLabel}
-                              onSelect={() => {}}
+                              verified={blockVerified(node.item)}
+                              onSelect={() => {
+                                const cid = node.item.props?.id
+                                if (typeof cid === 'string') focusCanvasBlock(cid)
+                              }}
                             />
                           )
                         }
@@ -360,7 +396,11 @@ export function BuilderTreeRail({
                                 key={child.props?.id ?? childIdx}
                                 item={child}
                                 displayLabel={getDisplayLabel(child)}
-                                onSelect={() => {}}
+                                verified={blockVerified(child)}
+                                onSelect={() => {
+                                  const cid = child.props?.id
+                                  if (typeof cid === 'string') focusCanvasBlock(cid)
+                                }}
                               />
                             ))}
                           </div>

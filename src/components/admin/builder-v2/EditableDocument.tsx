@@ -299,10 +299,29 @@ export function EditableDocument({
         console.warn('[EditableDocument] verify toggle failed', res.error)
         return
       }
+      // Verify efficiency: after verifying, auto-advance focus to the NEXT
+      // unverified block (document order, wrapping) instead of leaving the
+      // admin parked on the block they just verified.
+      if (!isVerified) {
+        const idx = content.findIndex(
+          (it) => (it.props as { junctionId?: string }).junctionId === jId
+        )
+        for (let k = 1; k <= content.length; k++) {
+          const it = content[(Math.max(0, idx) + k) % content.length]
+          const nj = (it.props as { junctionId?: string }).junctionId
+          if (!nj || nj === jId) continue
+          const row = junctionMap.get(nj)
+          if (row && !row.verified_by_admin_id) {
+            const cid = it.props.id as string | undefined
+            if (cid) focusCanvasBlock(cid)
+            break
+          }
+        }
+      }
       await refreshJunctions()
       queryClient.invalidateQueries({ queryKey: ['verify-checklist', sopId] })
     },
-    [refreshJunctions, queryClient, sopId]
+    [refreshJunctions, queryClient, sopId, content, junctionMap]
   )
 
   // P12 reverse binding — source-pane click → focus the matching canvas block.

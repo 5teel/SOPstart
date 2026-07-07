@@ -23,9 +23,40 @@
 import { humanizeBlockType, BLOCK_TYPE_LABELS } from '@/lib/builder/block-type-labels'
 import type { PuckItem } from './TreeStepRow'
 
+/**
+ * Extract a human-useful preview from block props - checks direct props, the
+ * nested content object (HazardBlock etc. store fields under props.content),
+ * and list-type blocks (PPE items). Falls back to '' so callers can substitute
+ * the humanized type name.
+ */
+export function blockPreviewText(props: Record<string, unknown> | undefined): string {
+  if (!props) return ''
+  const KEYS = ['text', 'title', 'label', 'prompt', 'question', 'description', 'hazard', 'instruction']
+  const pick = (obj: Record<string, unknown>): string => {
+    for (const k of KEYS) {
+      const v = obj[k]
+      if (typeof v === 'string' && v.trim()) return v.trim()
+    }
+    const items = obj['items']
+    if (Array.isArray(items) && items.length > 0) {
+      return items.filter((i) => typeof i === 'string').join(', ')
+    }
+    return ''
+  }
+  const direct = pick(props)
+  if (direct) return direct
+  const content = props['content']
+  if (content && typeof content === 'object' && !Array.isArray(content)) {
+    return pick(content as Record<string, unknown>)
+  }
+  return ''
+}
+
 export interface TreeBlockRowProps {
   item: PuckItem
   onSelect: () => void
+  /** Verify state dot: true=verified, false=needs verify, undefined=no verify state. */
+  verified?: boolean
   /**
    * E6 display-label override (e.g. "Reference images" for orphan-photo
    * headings). When provided, replaces the derived preview text. Display-only;
@@ -86,7 +117,7 @@ function getPillStyle(pillVariant: string): React.CSSProperties {
   }
 }
 
-export function TreeBlockRow({ item, onSelect, displayLabel }: TreeBlockRowProps): React.JSX.Element {
+export function TreeBlockRow({ item, onSelect, displayLabel, verified }: TreeBlockRowProps): React.JSX.Element {
   const entry = BLOCK_TYPE_LABELS[item.type]
   const pillVariant = entry?.pillVariant ?? 'kind-step'
   const pillStyle = getPillStyle(pillVariant)
