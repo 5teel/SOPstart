@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { parseSop } from '@/lib/parsers/sop-parser'
 import { getOrgAiModels, resolveOrgModel } from '@/lib/ai/org-settings'
+import { ensureSopTitle } from '@/lib/parsers/sop-title'
 import { verifyTranscriptVsSop, detectMissingSections } from '@/lib/parsers/verify-sop'
 import { aiPromptSchema } from '@/lib/validators/sop'
 import type { ParsedSop } from '@/lib/validators/sop'
@@ -126,6 +127,11 @@ export async function POST(request: NextRequest) {
         simple: resolveOrgModel('parse-simple', orgModels),
         complex: resolveOrgModel('parse-complex', orgModels),
       },
+    })
+    parsed.title = await ensureSopTitle({
+      title: parsed.title,
+      extractedText: promptText,
+      model: resolveOrgModel('parse-simple', orgModels),
     })
 
     // --- 6. Verifying stage — adversarial verifier in PROMPT mode (D-02; mode param implemented in 14-03) ---

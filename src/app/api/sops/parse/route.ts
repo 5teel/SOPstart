@@ -15,6 +15,7 @@ import { extractImage } from '@/lib/parsers/extract-image'
 import { ocrFallback } from '@/lib/parsers/ocr-fallback'
 import { parseSop } from '@/lib/parsers/sop-parser'
 import { getOrgAiModels, resolveOrgModel } from '@/lib/ai/org-settings'
+import { ensureSopTitle } from '@/lib/parsers/sop-title'
 import { uploadExtractedImages } from '@/lib/parsers/image-uploader'
 import { triggerReviewerOnParseCompletion } from '@/lib/parsers/parse-pipeline'
 import {
@@ -152,7 +153,7 @@ export async function POST(request: NextRequest) {
     // 4b. Org context first — needed for AI Settings model overrides AND image paths.
     const { data: sop } = await admin
       .from('sops')
-      .select('organisation_id')
+      .select('organisation_id, source_file_name')
       .eq('id', sopId)
       .single()
 
@@ -168,6 +169,16 @@ export async function POST(request: NextRequest) {
         simple: resolveOrgModel('parse-simple', orgModels),
         complex: resolveOrgModel('parse-complex', orgModels),
       },
+    })
+
+    // Title guard — if the parse returned a placeholder title, one dedicated
+    // naming call (conventions in parsers/prompts/sop-title-conventions.md),
+    // falling back to a cleaned filename.
+    parsed.title = await ensureSopTitle({
+      title: parsed.title,
+      extractedText,
+      fileName: sop?.source_file_name ?? null,
+      model: resolveOrgModel('parse-simple', orgModels),
     })
 
     // 6. Upload extracted images to Storage

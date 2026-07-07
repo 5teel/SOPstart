@@ -2,6 +2,7 @@ import type { ParsedSop } from '@/lib/validators/sop'
 import type { SourceFileType } from '@/types/sop'
 import { PARSE_TRIAGE_MODEL, PARSE_SIMPLE_MODEL, PARSE_COMPLEX_MODEL } from '@/lib/agent-layer/model-constants'
 import { llmText, llmToolCall, type LlmTool } from '@/lib/ai/llm'
+import { TITLE_CONVENTIONS } from './sop-title'
 
 // Tool definition matching ParsedSopSchema for structured output — provider-
 // agnostic: the llm adapter converts it to the Anthropic or OpenAI-compatible
@@ -13,7 +14,7 @@ const SOP_TOOL: LlmTool = {
     type: 'object' as const,
     required: ['title', 'sections', 'overall_confidence'],
     properties: {
-      title: { type: 'string', description: 'Clear, professional SOP title' },
+      title: { type: 'string', description: 'SOP title following the TITLE NAMING conventions in the system prompt — action-first, specific equipment, no doc codes or filler. NEVER "Untitled SOP".' },
       sop_number: { type: 'string', nullable: true },
       revision_date: { type: 'string', nullable: true },
       author: { type: 'string', nullable: true },
@@ -151,6 +152,11 @@ Worked example. Given:
 
 Also continue setting \`has_image: true\` for backward compatibility whenever \`image_indexes\` is non-empty.`
 
+const SYSTEM_PROMPT_WITH_TITLE = SYSTEM_PROMPT + `
+
+### 8. TITLE NAMING — follow these conventions exactly
+${TITLE_CONVENTIONS}`
+
 const FORMAT_HINTS: Partial<Record<SourceFileType | 'prompt', string>> = {
   xlsx: '\n\nNote: This text was extracted from an Excel spreadsheet. Treat table headers as section titles, preserve numerical tolerances exactly.',
   pptx: '\n\nNote: This text was extracted from a PowerPoint presentation. Each slide title is a likely section heading.',
@@ -268,7 +274,7 @@ export async function parseSop(
     // output unparseable (surfaced by GLM on prod). All current parse models
     // support ≥16k output.
     maxTokens: 16000,
-    system: SYSTEM_PROMPT,
+    system: SYSTEM_PROMPT_WITH_TITLE,
     messages: [{ role: 'user', content: userContent }],
     tool: SOP_TOOL,
   })) as Record<string, unknown>
