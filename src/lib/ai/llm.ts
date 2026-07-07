@@ -101,20 +101,35 @@ async function openAiCompatCall(
   const args = msg?.tool_calls?.[0]?.function?.arguments
   let toolInput: unknown | null = null
   if (args) {
-    toolInput = JSON.parse(args)
-  } else if (opts.tool && msg?.content) {
-    // Some OpenRouter-served models answer forced tool calls with plain JSON in
-    // content — accept the first JSON object as a fallback rather than failing.
-    const m = msg.content.match(/\{[\s\S]*\}/)
-    if (m) {
-      try {
-        toolInput = JSON.parse(m[0])
-      } catch {
-        /* fall through to null */
-      }
+    try {
+      toolInput = JSON.parse(args)
+    } catch {
+      toolInput = extractJson(args)
     }
+  } else if (opts.tool && msg?.content) {
+    // Some OpenRouter-served models answer forced tool calls with JSON in
+    // content (often fenced) — accept that as a fallback rather than failing.
+    toolInput = extractJson(msg.content)
   }
   return { text: msg?.content ?? null, toolInput }
+}
+
+/** Best-effort JSON object extraction: direct parse → fenced block → outermost braces. */
+function extractJson(text: string): unknown | null {
+  const candidates: string[] = [text.trim()]
+  const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/)
+  if (fence) candidates.push(fence[1].trim())
+  const braces = text.match(/\{[\s\S]*\}/)
+  if (braces) candidates.push(braces[0])
+  for (const c of candidates) {
+    try {
+      const v = JSON.parse(c)
+      if (v && typeof v === 'object') return v
+    } catch {
+      /* next candidate */
+    }
+  }
+  return null
 }
 
 /** Plain text completion (e.g. the parse triage call). */
@@ -153,9 +168,12 @@ export async function llmToolCall(opts: LlmCallOpts & { tool: LlmTool }): Promis
     }
     return block.input
   }
-  const { toolInput } = await openAiCompatCall(opts)
-  if (toolInput === null) {
-    throw new Error(`${opts.model} returned no structured output — no tool call or parseable JSON`)
-  }
-  return toolInput
+  // OpenRouter-served models are occasionally flaky on forced tool calls with
+  // large schemas — one retry before failing (truncation is the common cause,
+  // so callers should pass a generous maxTokens).
+  const first = await openAiCompatCall(opts)
+  if (first.toolInput !== null) return first.toolInput
+  const second = await openAiCompatCall(opts)
+  if (second.toolInput !== null) return second.toolInput
+  throw new Error(`${opts.model} returned no structured output — no tool call or parseable JSON (2 attempts)`)
 }

@@ -264,7 +264,10 @@ export async function parseSop(
 
   const raw = (await llmToolCall({
     model,
-    maxTokens: 8192,
+    // Full SOP outputs can exceed 8k tokens — truncation makes structured
+    // output unparseable (surfaced by GLM on prod). All current parse models
+    // support ≥16k output.
+    maxTokens: 16000,
     system: SYSTEM_PROMPT,
     messages: [{ role: 'user', content: userContent }],
     tool: SOP_TOOL,
