@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { CheckCircle2, ClipboardCheck, AlertTriangle, Zap, Lightbulb, Wrench, Clock } from 'lucide-react'
 import type { SopWithSections, SopSection } from '@/types/sop'
 import { useWalkthroughStore } from '@/stores/walkthrough'
+import { ReadAloudButton, stepSpeechText } from '@/components/sop/voice/ReadAloudButton'
 import { useCompletionStore } from '@/stores/completionStore'
 import { PageShell } from '@/components/layout/PageShell'
 import { SafetyAcknowledgement } from '@/components/sop/SafetyAcknowledgement'
@@ -259,7 +260,7 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
           */}
           <div className="walkthrough-step-grid">
             <div key={currentStep.id} className="step-fade-in contents">
-              <div data-region="meta">
+              <div data-region="meta" className="flex items-center gap-3">
                 <span
                   className="mono text-base uppercase tracking-wider text-[var(--ink-500)]"
                   data-testid="step-counter"
@@ -267,6 +268,7 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
                   Step {currentIdx + 1} of {totalSteps}
                   {currentSection?.title ? ` · ${currentSection.title}` : ''}
                 </span>
+                <ReadAloudButton text={stepSpeechText(currentStep)} />
               </div>
 
               <div data-region="title">

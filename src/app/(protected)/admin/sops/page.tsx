@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Users, History, Video, Pencil } from 'lucide-react'
+import { Users, History, Video, Pencil, QrCode } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { DeleteSopButton } from '@/components/admin/DeleteSopButton'
@@ -55,10 +55,17 @@ export default async function SopsLibraryPage({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let query: any = supabase
     .from('sops')
-    .select('id, title, sop_number, category, status, source_file_name, source_type, created_at, updated_at, published_at, all_departments')
+    .select('id, title, sop_number, category, status, source_file_name, source_type, created_at, updated_at, published_at, all_departments, overall_confidence, parse_notes')
     .order('created_at', { ascending: false })
 
-  if (activeStatus !== 'all' && activeStatus !== 'failed') {
+  if (activeStatus === 'draft') {
+    // Triage ordering: worst parses first (lowest confidence, unparsed on top).
+    query = supabase
+      .from('sops')
+      .select('id, title, sop_number, category, status, source_file_name, source_type, created_at, updated_at, published_at, all_departments, overall_confidence, parse_notes')
+      .eq('status', 'draft')
+      .order('overall_confidence', { ascending: true, nullsFirst: true })
+  } else if (activeStatus !== 'all' && activeStatus !== 'failed') {
     query = query.eq('status', activeStatus as SopStatus)
   } else if (activeStatus === 'failed') {
     query = query.in('status', ['uploading', 'parsing'])
@@ -159,6 +166,20 @@ export default async function SopsLibraryPage({
           })}
         </div>
 
+        {/* Draft triage strip — surfaced on the All tab so review work is never invisible */}
+        {activeStatus === 'all' && (sops ?? []).some((s: { status: string }) => s.status === 'draft') && (
+          <Link
+            href="/admin/sops?status=draft"
+            className="flex items-center justify-between mb-4 px-4 py-3 rounded-xl border border-amber-300 bg-amber-50 hover:bg-amber-100 transition-colors"
+          >
+            <span className="text-sm font-medium text-amber-800">
+              {(sops ?? []).filter((s: { status: string }) => s.status === 'draft').length} draft
+              {(sops ?? []).filter((s: { status: string }) => s.status === 'draft').length === 1 ? '' : 's'} waiting for review
+            </span>
+            <span className="mono text-[11px] uppercase tracking-wider text-amber-700">Review worst-first →</span>
+          </Link>
+        )}
+
         {/* SOP list */}
         {!sops || sops.length === 0 ? (
           <div className="blueprint-frame text-center py-12">
@@ -216,6 +237,23 @@ export default async function SopsLibraryPage({
                         {sop.source_type === 'template' && (
                           <span className="pill">NZ TEMPLATE</span>
                         )}
+                        {sop.status === 'draft' && typeof sop.overall_confidence === 'number' && (
+                          <span
+                            className={`mono text-[11px] px-1.5 py-0.5 rounded ${
+                              sop.overall_confidence < 0.7
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-green-100 text-green-700'
+                            }`}
+                            title="AI parse confidence"
+                          >
+                            {Math.round(sop.overall_confidence * 100)}%
+                          </span>
+                        )}
+                        {sop.status === 'draft' && typeof sop.parse_notes === 'string' && sop.parse_notes.includes('NEEDS REVIEW') && (
+                          <span className="mono text-[11px] px-1.5 py-0.5 rounded bg-red-100 text-red-700" title="The parser flagged unclear or missing source content">
+                            ⚠ NEEDS REVIEW
+                          </span>
+                        )}
                       </div>
                     </div>
                     <StatusBadge status={sop.status as SopStatus} />
@@ -267,6 +305,14 @@ export default async function SopsLibraryPage({
                         aria-label="Generate video"
                       >
                         <Video className="h-4 w-4" />
+                      </Link>
+                      <Link
+                        href={`/admin/sops/${sop.id}/qr`}
+                        className="evidence-btn !min-w-[40px] !min-h-[40px] !p-0"
+                        title="Print QR code for this machine"
+                        aria-label="Print QR code"
+                      >
+                        <QrCode className="h-4 w-4" />
                       </Link>
                     </div>
                   ) : (

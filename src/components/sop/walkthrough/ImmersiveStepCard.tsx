@@ -5,6 +5,7 @@ import { CheckCircle2, Camera, X, AlertTriangle, Shield, Siren, ListChecks, Clip
 import type { LucideIcon } from 'lucide-react'
 import { useWalkthroughStore } from '@/stores/walkthrough'
 import { removePhoto } from '@/hooks/usePhotoQueue'
+import { ReadAloudButton, stepSpeechText } from '@/components/sop/voice/ReadAloudButton'
 import { SopImageInline } from '@/components/sop/SopImageInline'
 import type { SopWithSections } from '@/types/sop'
 import type { QueuedPhoto } from '@/lib/offline/db'
@@ -79,12 +80,15 @@ export function ImmersiveStepCard({ sop, onStepChange, completedSteps, stepPhoto
         <div className="mono text-[11px] uppercase tracking-wider text-[var(--ink-500)] truncate">
           {sectionTitle} · Step {currentIdx + 1}/{steps.length}
         </div>
-        {done && (
-          <div className="flex items-center gap-1 text-green-600 flex-shrink-0">
-            <CheckCircle2 size={14} />
-            <span className="mono text-[11px] uppercase tracking-wider">Done</span>
-          </div>
-        )}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {done && (
+            <div className="flex items-center gap-1 text-green-600">
+              <CheckCircle2 size={14} />
+              <span className="mono text-[11px] uppercase tracking-wider">Done</span>
+            </div>
+          )}
+          <ReadAloudButton text={stepSpeechText(current)} />
+        </div>
       </header>
 
       <div className="flex-1 px-4 py-6 overflow-y-auto">

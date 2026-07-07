@@ -285,6 +285,21 @@ export const JOURNEYS: Journey[] = [
     ],
   },
   {
+    id: 'machine-qr',
+    group: 'Follow a SOP',
+    persona: 'Worker',
+    title: 'Scan the machine QR code',
+    summary: 'Admin prints a QR sticker for the machine; the worker at the machine scans it and lands directly on that procedure — no library browsing.',
+    steps: [
+      { id: 's', type: 'start', label: 'Admin: SOP is published' },
+      { id: 'qr', type: 'screen', label: 'Print QR sticker', route: '/admin/sops/[sopId]/qr', detail: 'Server-rendered QR encoding the worker deep link. Stick it on the machine/work area.' },
+      { id: 'scan', type: 'action', label: 'Worker scans sticker on the machine' },
+      { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]' },
+      { id: 'walk', type: 'screen', label: 'Walkthrough', route: '/sops/[sopId]/walkthrough' },
+      { id: 'e', type: 'end', label: 'Right SOP, zero searching' },
+    ],
+  },
+  {
     id: 'create-with-voice',
     group: 'Create an SOP',
     persona: 'SOP Admin',

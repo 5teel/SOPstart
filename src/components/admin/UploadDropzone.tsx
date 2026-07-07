@@ -754,7 +754,7 @@ export function UploadDropzone() {
               <p className="text-green-400 text-sm mb-3">
                 {uploadedSopIds.length === 1
                   ? 'File uploaded — AI parsing is running now.'
-                  : `${uploadedSopIds.length} files uploaded — AI parsing is running now.`}
+                  : `${uploadedSopIds.length} files uploaded — AI parsing continues in the background. You can leave this page; drafts appear in the library as they finish.`}
               </p>
               <div className="flex gap-2">
                 {uploadedSopIds.length === 1 ? (
@@ -768,10 +768,10 @@ export function UploadDropzone() {
                 ) : (
                   <button
                     type="button"
-                    onClick={() => router.push('/admin/sops')}
+                    onClick={() => router.push('/admin/sops?status=draft')}
                     className="flex-1 min-h-[44px] px-4 bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
                   >
-                    Go to SOP library
+                    Review drafts
                   </button>
                 )}
                 <button
