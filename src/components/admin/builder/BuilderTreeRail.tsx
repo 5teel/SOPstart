@@ -388,6 +388,11 @@ export function BuilderTreeRail({
                                 const stepIdx = node.stepNumber - 1
                                 setActiveStepIndex(stepIdx)
                                 onStepSelect?.(stepIdx)
+                                // Step rows must also drive canvas navigation —
+                                // most procedure content is steps, so without
+                                // this a step click moved nothing in the canvas.
+                                const cid = node.item.props?.id
+                                if (typeof cid === 'string') focusCanvasBlock(cid)
                               }}
                             />
                             {/* Nested block children */}
