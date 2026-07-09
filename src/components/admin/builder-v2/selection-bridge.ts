@@ -83,5 +83,11 @@ export function focusCanvasBlock(componentId: string): void {
   const el = document.querySelector<HTMLElement>(`[data-block-id="${escaped}"]`)
   if (!el) return
   if (typeof el.focus === 'function') el.focus({ preventScroll: true })
-  requestAnimationFrame(() => el.scrollIntoView({ behavior: 'auto', block: 'center' }))
+  requestAnimationFrame(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }))
+  // Flash the target so navigation is confirmed even when it's already visible
+  // (short sections that need no scroll). Restart the animation on re-click.
+  el.classList.remove('block-focus-flash')
+  void el.offsetWidth // force reflow so re-adding the class replays the animation
+  el.classList.add('block-focus-flash')
+  window.setTimeout(() => el.classList.remove('block-focus-flash'), 1300)
 }

@@ -67,3 +67,18 @@
 .walkthrough-step-grid > [data-region="context"]  { grid-area: context; }
 .walkthrough-step-grid > [data-region="hint"]     { grid-area: hint; }
 .walkthrough-step-grid > [data-region="action"]   { grid-area: action; }
+
+/* Tree-rail navigation feedback: a brief highlight on the block/step the user
+   clicked in the left pane, so navigation is confirmed even when the target is
+   already fully visible (short sections that need no scroll). */
+@keyframes block-focus-flash {
+  0%   { box-shadow: 0 0 0 2px var(--accent-step, #3b82f6), 0 0 0 6px rgba(59, 130, 246, 0.25); }
+  100% { box-shadow: 0 0 0 2px transparent, 0 0 0 6px transparent; }
+}
+.block-focus-flash {
+  animation: block-focus-flash 1200ms ease-out;
+  border-radius: 8px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .block-focus-flash { animation: none; }
+}
