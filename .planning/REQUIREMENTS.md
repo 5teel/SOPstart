@@ -464,3 +464,51 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *v4.0 requirements added: 2026-05-24*
+
+## v5.0 Requirements — AI-Native Builder + Agent Foundation
+
+**Defined:** 2026-07-12
+**Milestone goal:** Phases 26/26.5 shipped the bespoke builder + agent metadata layer; the AI provider/model-selection arc (registry, adapter, org settings, grounding prompt, parser hardening) shipped ad-hoc on master 2026-07-06/07 without a GSD phase. Phase 27 formalizes it retroactively.
+**Source:** Code survey of `src/lib/ai/registry.ts`, `src/lib/ai/llm.ts`, `AiModelSelect`/`/admin/ai-settings`, `supabase/migrations/00042_ai_model_settings.sql`, `src/lib/parsers/sop-parser.ts`, `src/lib/parsers/sop-title.ts` (2026-07-12).
+
+### AI Provider & Settings (Phase 27)
+
+**Provider-Agnostic Model Layer:**
+
+- [x] **AIPS-REG-01**: Single-source model registry (`AI_MODELS`) maps every AI use-case to a provider + default model ID, resolvable via env override (shipped ad-hoc 2026-07-06)
+- [x] **AIPS-REG-02**: Provider-agnostic adapter (`llmText`/`llmToolCall`) routes Anthropic/OpenAI/OpenRouter by model-ID shape, with JSON-extraction fallback + one retry for non-native-tool-call providers (shipped ad-hoc 2026-07-06)
+
+**Org-Level Model Overrides:**
+
+- [x] **AIPS-SET-01**: Admin can override model selection per org for `parse-triage`/`parse-simple`/`parse-complex` use cases via `/admin/ai-settings` (shipped ad-hoc 2026-07-07)
+- [ ] **AIPS-SET-02**: `ai_model_settings` write path (`setAiModelSetting` server action, service-role per migration 00042) has a test proving org-scoping self-enforcement — same risk class as the 2026-06-15 cross-tenant admin-client learning
+
+**Grounding & Parsing Hardening:**
+
+- [x] **AIPS-PROMPT-01**: SOP parser system prompt encodes R&D-validated grounding/structure/title rules (`.autoresearch` loop: composite 75.9→87.3, hallucinations→0) (shipped ad-hoc 2026-07-06)
+- [x] **AIPS-PARSE-01**: Parser hardened for non-Anthropic model quirks — empty-field normalization, idempotent re-parse (delete-before-insert), OpenRouter structured-output fence/retry fallback (shipped ad-hoc 2026-07-06/07)
+- [x] **AIPS-TITLE-01**: SOP title-naming guard (`ensureSopTitle`) rejects placeholder titles and falls back to filename-derived or dedicated LLM-generated title (shipped ad-hoc 2026-07-07, added after GLM 5.2's first prod run returned placeholder titles)
+
+**Gaps Closed This Phase:**
+
+- [ ] **AIPS-GAP-01**: `OPENROUTER_API_KEY` documented in `.env.local.example` (currently absent despite being required by `llm.ts`)
+- [ ] **AIPS-GAP-02**: Regression test proving `ai_model_settings` writes cannot cross organisation boundaries
+- [ ] **AIPS-GAP-03**: Automated test coverage for registry resolution, `llm.ts` provider routing, and title-guard fallback chain (currently zero tests across this arc)
+
+### v5.0 Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| AIPS-REG-01..02 (2) | Phase 27 | ✅ Already shipped — formalizing |
+| AIPS-SET-01..02 (2) | Phase 27 | AIPS-SET-01 shipped; AIPS-SET-02 pending |
+| AIPS-PROMPT-01, AIPS-PARSE-01, AIPS-TITLE-01 (3) | Phase 27 | ✅ Already shipped — formalizing |
+| AIPS-GAP-01..03 (3) | Phase 27 | Pending |
+
+**v5.0 Coverage:**
+
+- v5.0 requirements: 10 total (AIPS ×10)
+- Mapped to phases: 10 (Phase 27; Phases 26/26.5 predate formal REQUIREMENTS.md tracking — see PROJECT.md Validated Requirements)
+- Unmapped: 0
+
+---
+*v5.0 requirements added: 2026-07-12*

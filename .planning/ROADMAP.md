@@ -40,6 +40,17 @@ Decimal phases appear between their surrounding integers in numeric order.
 - ~~Phase 19: Pipeline Integration, Bundle Isolation & v3.0 Closeout~~ — **deleted from roadmap 2026-05-23**. Its only purpose was to tie Phases 9 + 12 + 16 + 17 together; with 9 unstarted and 16/17 deferred, there is nothing to close out. v3.0 archive captures the closeout instead.
 - [x] **Phase 20: Conversion Pipeline V2 (partial — v3.0 slice)** - DOCX → Puck `layout_data` directly in the Phase 12 builder with side-by-side step + photo blocks shipped 2026-05-15..17 (commits `1a2bbbc`, `c47baa7`, `e33669e`, `064e819`). SPEC + 4 validated spikes captured 2026-05-15..16. Remaining scope (persistent side-by-side source viewer, AI reviewer × 5 jobs auto/manual, mandatory per-block verify checklist at publish gate) **carried to v4.0 Phase 21: Safety-Critical Parsing**.
 
+### Phase 27: AI Provider & Settings — formal spec pass
+
+**Goal:** Retroactively formalize the AI provider/model-selection arc that shipped ad-hoc 2026-07-06/07 (`src/lib/ai/registry.ts`, `src/lib/ai/llm.ts`, `AiModelSelect` + `/admin/ai-settings` (migration 00042), the R&D-validated grounding prompt + title-naming guard in `sop-parser.ts`/`sop-title.ts`): write a SPEC.md capturing the architecture as-built, add REQUIREMENTS.md traceability (AIPS-*), and close the 3 gaps the code survey found — `OPENROUTER_API_KEY` undocumented in `.env.local.example`, the `ai_model_settings` service-role write path has no test proving org self-enforcement (same class as the 2026-06-15 cross-tenant learning), and the whole arc currently has zero automated test coverage.
+**Requirements**: AIPS-REG-01, AIPS-REG-02, AIPS-SET-01, AIPS-SET-02, AIPS-PROMPT-01, AIPS-PARSE-01, AIPS-TITLE-01, AIPS-GAP-01, AIPS-GAP-02, AIPS-GAP-03
+**Depends on:** Phase 26, Phase 26.5
+**Plans:** 0 plans
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 27 to break down)
+
 ---
 
 ## v4.0 — Safety-Critical Parsing + Voice + AI Foundation (started 2026-05-24 · ✅ shipped 2026-07-02)
@@ -83,15 +94,24 @@ v4.0 (Phases 21–25) shipped. v5.0 rebuilds the SOP builder as a bespoke inline
   - [x] 26-04-PLAN.md — W3: edit canvas — content-ops reducer + EditableDocument + BlockEditShell + InlineText + dnd-kit reorder + autosave re-wire (R1/R2/R7, P11) (completed 2026-07-03)
   - [x] 26-05-PLAN.md — W3: Konva foundation — canvas externalization + Next-16 spike (PASSED) + 00039 migration (applied+verified on live DB) + worker-isolation gate (R5/R8, D-03) (completed 2026-07-03)
   - [x] 26-06-PLAN.md — W4: field editors part 1 — field-map reachability registry (all 17 blocks) + inline patterns A/B/D (EnumChip, InlineToken, FIELD_MAP-driven shell; one Zod-validated lossless commit path); C/E declared but deferred to 26-07/26-09 (P14 partial) (completed 2026-07-03)
-  - [ ] 26-07-PLAN.md — W5: field editors part 2 — Pattern C array editors + per-block reachability parity (0 unreachable, all 18) (P14)
+  - [x] 26-07-PLAN.md — W5: field editors part 2 — Pattern C array editors + per-block reachability parity (0 unreachable, all 18) (P14) ✅ 2026-07-03
   - [x] 26-08-PLAN.md — W6: tiered context-aware inserter + Reuse tier + ＋ dividers (R3) ✅ 2026-07-03
-  - [ ] 26-09-PLAN.md — W6: unified Visual block 3-place contract + media grid + convert-through (R5/R7, D-02/D-03)
-  - [ ] 26-10-PLAN.md — W7: smart-next auto-dismissing ghosts (R4)
+  - [x] 26-09-PLAN.md — W6: unified Visual block 3-place contract + media grid + convert-through (R5/R7, D-02/D-03) ✅ 2026-07-03
+  - [x] 26-10-PLAN.md — W7: smart-next auto-dismissing ghosts (R4) ✅ 2026-07-03
   - [x] 26-11-PLAN.md — W7: Konva annotation primitives + DiagramHotspotBlock (R5, D-03) ✅ 2026-07-03 (device-UX feel carried as deferred-residual — verify on sopstart.com after 26-13 wires the launch point; UAT `p26-annotation-editor-feel`)
   - [x] 26-12-PLAN.md — W8: spine re-wire — selection-sync + AI-flag overlays + orphan chip + verify UI/publish gate, behavioural parity (R8, P12/P13/P9/P8) ✅ 2026-07-03 (canvas↔source selection-sync, ⚑ flag badge + reused ReviewerFlagsPanel, Reference-images chip, per-block verify chip; server publish gate UNCHANGED — real-route 400 regression green; phase26 85 green, next build Δ0KB)
   - [x] 26-13-PLAN.md — W9: bake-on-publish + saveAnnotation (service-role org self-enforce) + worker baked-PNG read (R5/R8, D-03) ✅ 2026-07-03 (saveAnnotation/bakeAnnotation service-role + org self-enforce via parseJwtPayload, async-only 'use server' with pure baked-path helpers split out; client stage.toDataURL → content-versioned baked PNG; VisualBlock baked-vs-raw Konva-free worker read; annotate launch wired MediaGrid→DiagramAnnotateModal→AnnotationEditorLoader — 26-11 editor now reachable; deleted 26-05 spike route; 27 phase26 specs green, next build Δ0KB Konva-isolated. Known Stub: diagram VisualItems need sopImageId at parse/upload before "Save & bake" enables for hand-added slots)
   - [x] 26-14-PLAN.md — W10: convert golden-path byte-equivalence + R8 regression sweep + remove @puckeditor/core + journeys/uat update (R1/R6/R8, D-01/D-04) ✅ 2026-07-03 (R6 convert-golden byte-equivalent to pre-phase fixture; spine-regression sweeps the R8 invariants — publish 400 gate, junctionId+block_provenance survive content-ops edits (behavioural), no-bulk-verify, append-only completions; **@puckeditor/core fully removed** — package.json+lockfile+node_modules, puck-config.tsx deleted, last consumers dropped; field-map P14 parity repointed to a committed puck-field-baseline.json fixture (0-unreachable/18 blocks preserved); journeys Build-stage + 2 UAT items updated; phase26 102 green, tsc clean, real npm run build green, worker bundle Δ0KB Puck-absent. Pre-existing obsolete Phase-11 Puck-contract specs logged to deferred-items.md)
 - [x] **Phase 26.5: Agent Metadata Layer** — The human-invisible per-SOP + per-block machine layer (semantic tags, entities, embeddings, cross-SOP links, **memory**, **learning proposals**, **review state**) that agents read, write, and traverse individually and collectively (summarise across SOPs). Builds on Phase 23 X-03 (universal AI field read/write) + graphify (cross-SOP graph). Delivers the `⚇ Agent layer` surfacing + the memory/learning/review reasoning that Phase 26 only wires contract hooks for. (completed 2026-07-05)
+
+### Post-26.5 ad-hoc work (2026-07-06 → 2026-07-09, not formally phased)
+
+Shipped directly on master without a GSD phase/plan (Simon's "build fast, fix forward" mode). Two arcs:
+
+- **AI provider flexibility** — `src/lib/ai/registry.ts` single-source model catalog (13 callsites normalized); `src/lib/ai/llm.ts` provider-agnostic adapter (Anthropic/OpenAI/OpenRouter, routes GLM 5.2 + other OpenRouter models); `AiModelSelect` component + `/admin/ai-settings` org-level model override tool (migration 00042); R&D-validated grounding prompt ported from `.autoresearch` loop (composite 75.9→87.3, hallucinations→0); `gpt-parser.ts` renamed `sop-parser.ts`; SOP title-naming conventions + guard; parser hardening for non-Anthropic models (empty-field normalization, idempotent retries, OpenRouter structured-output fence extraction + retry).
+- **Builder + worker UX fixes** — unified AI-draft surface at `/admin/sops/new/ai` (Type a brief / Talk it through tabs, voice route folded in); QR machine deep links; read-step-aloud (mobile + desktop walkthrough); draft triage queue (worst-first ordering, confidence chips); tree-rail navigation overhaul (section/step/block rows all `focusCanvasBlock`, verify auto-advance, real preview text instead of generic titles, focus-flash feedback); the `layout_data`-trio bug fix across all 5 section-inserting routes (non-DOCX drafts were rendering an empty canvas) + prod backfill.
+
+Not tracked as a phase; folded into PROJECT.md Validated requirements and CLAUDE.md Learnings. No REQUIREMENTS.md mapping.
 
 ## Phase Details
 
@@ -822,8 +842,9 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | **23. AI Field Layer + Version Supersede (v4.0)** | 8/8 | ✅ Complete + code-reviewed (residual: 4 human-UAT items) | 2026-06-25 |
 | **24. Procedure Flow — Spatial Node Graph (v4.0)** | 3/3 | ✅ Complete | 2026-06-12 |
 | **25. Department as a First-Class Entity (v4.0)** | 6/6 | ✅ Complete (residual: 7 human-UAT tests) | 2026-06-15 |
-| **26. SOP Builder Redesign — Inline Surface (v5.0)** | 0/14 | Planned — 14 plans / 10 waves | |
-| **26.5. Agent Metadata Layer (v5.0)** | 7/8 | Executing — Wave 6 (26.5-08) remains; pre-deploy residual: VOYAGE_API_KEY + CRON_SECRET on Railway | |
+| **26. SOP Builder Redesign — Inline Surface (v5.0)** | 14/14 | ✅ Complete — Puck fully removed, worker bundle Δ0KB | 2026-07-03 |
+| **26.5. Agent Metadata Layer (v5.0)** | 8/8 | ✅ Complete | 2026-07-05 |
+| *(post-26.5 ad-hoc)* | — | AI provider flexibility + builder tree-rail UX — not phased, see note above | 2026-07-09 |
 
 ## Backlog
 
