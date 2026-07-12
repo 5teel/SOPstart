@@ -46,7 +46,7 @@ export const ROLES: RoleDef[] = [
     kind: 'org',
     colour: '#a8a29e',
     who: 'A new member whose role has not been set yet.',
-    landsOn: { label: 'Pending dashboard', route: '/dashboard' },
+    landsOn: { label: 'Account pending', route: '/pending' },
     can: ['Sign in and see a "your account is being set up" holding screen'],
     cannot: ['Read SOPs', 'Access any admin or activity surface — until an admin assigns a role'],
   },
@@ -97,7 +97,7 @@ export const ROLES: RoleDef[] = [
     kind: 'org',
     colour: '#b45309',
     who: 'The org’s administrator — the first sign-up becomes admin.',
-    landsOn: { label: 'Admin dashboard', route: '/dashboard' },
+    landsOn: { label: 'SOP library (admin)', route: '/admin/sops' },
     can: [
       'Create / upload / AI-parse SOPs and run them to publish',
       'Manage the block library (department tagging)',

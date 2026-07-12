@@ -21,6 +21,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import RosterSelector from '@/components/auth/RosterSelector'
 import { parseJwtPayload } from '@/lib/supabase/jwt'
+import { roleHome } from '@/lib/auth/role-home'
 
 export const metadata: Metadata = {
   title: 'Select Your Name — SafeStart',
@@ -43,7 +44,7 @@ export default async function RosterLoginPage({
     const jwtClaims = parseJwtPayload(session.access_token)
     const role: string | undefined = jwtClaims['user_role'] as string | undefined
     if (role && ['admin', 'safety_manager', 'supervisor'].includes(role)) {
-      redirect('/dashboard')
+      redirect(roleHome(role))
     }
   }
 

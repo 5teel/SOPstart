@@ -1,21 +1,18 @@
 /**
- * UX-01 — One home per role (Phase 30 Wave-0 stub).
+ * UX-01 — One home per role (flipped live in 30-02).
  *
- * Eventual contract (30-RESEARCH § Test Map + orchestrator decision #5):
+ * Contract (30-02-PLAN must_haves + orchestrator decision #5):
  *   - `roleHome(role)` lives in src/lib/auth/role-home.ts (NEVER exported from
  *     src/actions/* — 'use server' sync-export trap, CLAUDE.md 2026-06-27):
  *       worker → /sops · supervisor → /activity · safety_manager → /activity ·
- *       admin → /admin/sops · absent/unknown claim → safe default /sops (A1).
+ *       admin → /admin/sops · absent/unknown role → /pending (safe default A1).
  *   - middleware.ts + actions/auth.ts redirect through roleHome (JWT claim
  *     `user_role` via shared parseJwtPayload — never raw atob, 2026-06-26).
  *   - /dashboard survives ONLY as a redirect shim (role → home); the
- *     AdminDashboard/PendingDashboard UI is deleted; PendingDashboard JSX
- *     relocates (/pending or inline on /sops).
- *   - TopHeader, BottomTabBar, journeys.ts point directly at real role homes
- *     (zero '/dashboard' hrefs in nav components).
+ *     AdminDashboard/PendingDashboard UI is deleted; pending UI lives at /pending.
+ *   - TopHeader/BottomTabBar nav repoints are 30-04 scope (that test stays fixme).
  *
  * Source-contract idiom mirrors tests/phase28/governance-queue.spec.ts.
- * This file starts as test.fixme — the UX-01 plan flips it live.
  */
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
@@ -32,36 +29,58 @@ function read(p: string): string {
 }
 
 test.describe('UX-01 — one home per role', () => {
-  test.fixme('roleHome maps worker→/sops, supervisor/safety_manager→/activity, admin→/admin/sops, unknown→/sops', () => {
+  test('roleHome maps worker→/sops, supervisor/safety_manager→/activity, admin→/admin/sops, unknown→/pending', () => {
     const src = read(ROLE_HOME)
+    // all 5 cases of the mapping present in the ONE decision function
+    expect(src).toContain("case 'worker'")
+    expect(src).toContain("case 'supervisor'")
+    expect(src).toContain("case 'safety_manager'")
+    expect(src).toContain("case 'admin'")
     expect(src).toContain("'/sops'")
     expect(src).toContain("'/activity'")
     expect(src).toContain("'/admin/sops'")
+    expect(src).toContain("'/pending'")
+    // NOT a 'use server' file (sync export would break next build)
+    expect(src).not.toContain("'use server'")
   })
 
-  test.fixme('middleware routes authed users via roleHome (JWT claim, no DB call)', () => {
+  test('middleware routes authed users via roleHome (JWT claim, no DB call)', () => {
     const src = read(MIDDLEWARE)
     expect(src).toContain('roleHome')
     expect(src).toContain('parseJwtPayload')
+    // no raw atob claim read (Base64URL trap, 2026-06-26)
+    expect(src).not.toContain('atob(')
   })
 
-  test.fixme('auth actions redirect through roleHome, not hardcoded /dashboard', () => {
+  test('auth actions redirect through roleHome, not hardcoded /dashboard', () => {
     const src = read(AUTH_ACTIONS)
     expect(src).toContain('roleHome')
     expect(src).not.toContain("redirect('/dashboard')")
   })
 
+  // Flips live in 30-04 (TopHeader/BottomTabBar nav repoint is that plan's scope).
   test.fixme('TopHeader has zero /dashboard hrefs (brand + BASE_LINKS repointed)', () => {
     const src = read(TOP_HEADER)
     expect(src).not.toContain("'/dashboard'")
     expect(src).not.toContain('"/dashboard"')
   })
 
-  test.fixme('/dashboard page is a redirect-only shim (no AdminDashboard/PendingDashboard UI)', () => {
+  test('/dashboard page is a redirect-only shim (no AdminDashboard/PendingDashboard UI)', () => {
     const src = read(
       path.join(ROOT, 'src', 'app', '(protected)', 'dashboard', 'page.tsx'),
     )
+    expect(src).toContain('roleHome(')
     expect(src).toContain('redirect(')
     expect(src).not.toContain('DashTile')
+    expect(src).not.toContain('AdminDashboard')
+  })
+
+  test('/pending page + app-level not-found.tsx exist; journeys/roles land no role on /dashboard', () => {
+    expect(fs.existsSync(path.join(ROOT, 'src', 'app', '(protected)', 'pending', 'page.tsx'))).toBe(true)
+    expect(fs.existsSync(path.join(ROOT, 'src', 'app', 'not-found.tsx'))).toBe(true)
+    const journeys = read(path.join(ROOT, 'src', 'lib', 'journeys', 'journeys.ts'))
+    const roles = read(path.join(ROOT, 'src', 'lib', 'journeys', 'roles.ts'))
+    expect(journeys).not.toContain("'/dashboard'")
+    expect(roles).not.toContain("'/dashboard'")
   })
 })

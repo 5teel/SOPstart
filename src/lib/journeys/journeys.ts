@@ -58,8 +58,17 @@ export const JOURNEYS: Journey[] = [
     steps: [
       { id: 's', type: 'start', label: 'Has an account' },
       { id: 'login', type: 'screen', label: 'Login screen', route: '/login' },
-      { id: 'auth', type: 'action', label: 'Enter email + password', detail: 'Supabase Auth verifies and sets a session.' },
-      { id: 'home', type: 'screen', label: 'Home / dashboard', route: '/dashboard', detail: 'Role-aware landing.' },
+      { id: 'auth', type: 'action', label: 'Enter email + password', detail: 'Supabase Auth verifies and sets a session. roleHome(role) picks the landing screen (UX-01).' },
+      { id: 'role', type: 'decision', label: 'Role?', branches: [
+        { label: 'Worker', to: 'worker-home' },
+        { label: 'Supervisor / Safety manager', to: 'super-home' },
+        { label: 'Admin', to: 'admin-home' },
+        { label: 'No role yet', to: 'pending-home' },
+      ] },
+      { id: 'worker-home', type: 'screen', label: 'SOP library', route: '/sops' },
+      { id: 'super-home', type: 'screen', label: 'Activity', route: '/activity' },
+      { id: 'admin-home', type: 'screen', label: 'Admin SOP library', route: '/admin/sops' },
+      { id: 'pending-home', type: 'screen', label: 'Account pending', route: '/pending', detail: 'Holding screen until an admin assigns a role.' },
       { id: 'e', type: 'end', label: 'Signed in' },
     ],
   },
@@ -71,7 +80,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'A worker on a shared device selects their name from the org roster — no password required. This is a standard browser login page; the shared-device account session (role=worker) is established once by an admin. Completing the SOP is the legal signature (D-09).',
     steps: [
       { id: 's', type: 'start', label: 'Shared device (admin-authenticated shared-device account)' },
-      { id: 'roster', type: 'screen', label: 'Roster name-select', route: '/login/roster', detail: 'RosterSelector fetches org worker roster (/api/roster) and renders large glove-friendly tap-target name buttons. Admin/supervisor sessions are redirected to /dashboard (escalation guard T-23-06-02).' },
+      { id: 'roster', type: 'screen', label: 'Roster name-select', route: '/login/roster', detail: 'RosterSelector fetches org worker roster (/api/roster) and renders large glove-friendly tap-target name buttons. Admin/supervisor sessions are redirected to their role home (escalation guard T-23-06-02).' },
       { id: 'select', type: 'action', label: 'Tap name from roster', detail: 'roster_worker_id stored in sessionStorage. Shared-device account (RLS key) session unchanged.' },
       { id: 'sops', type: 'screen', label: 'SOP library', route: '/sops', detail: 'Worker browses SOPs. "Updated since last completion" badge appears on any SOP newer than their last completion (AFL-VER-04 / D-08).' },
       { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]', detail: 'Reads the SOP before walking it.' },
@@ -95,7 +104,7 @@ export const JOURNEYS: Journey[] = [
       { id: 's', type: 'start', label: 'New user' },
       { id: 'signup', type: 'screen', label: 'Sign-up screen', route: '/sign-up' },
       { id: 'create', type: 'action', label: 'Create account + organisation', detail: 'Becomes the org’s first admin.' },
-      { id: 'home', type: 'screen', label: 'Dashboard', route: '/dashboard' },
+      { id: 'home', type: 'screen', label: 'Admin home — SOP library', route: '/admin/sops' },
       { id: 'e', type: 'end', label: 'Org ready' },
     ],
   },
@@ -114,7 +123,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'invite', type: 'screen', label: 'Accept invite', route: '/invite/accept' },
       { id: 'join', type: 'screen', label: 'Join with code', route: '/join' },
       { id: 'added', type: 'action', label: 'Added to the org with a role' },
-      { id: 'home', type: 'screen', label: 'Dashboard', route: '/dashboard' },
+      { id: 'home', type: 'screen', label: 'Role home (workers → SOP library)', route: '/sops', detail: 'roleHome(role) dispatch — join-by-code always joins as worker.' },
       { id: 'e', type: 'end', label: 'On the team' },
     ],
   },
@@ -128,7 +137,6 @@ export const JOURNEYS: Journey[] = [
     summary: 'A worker finds the right SOP and opens it to read before starting work.',
     steps: [
       { id: 's', type: 'start', label: 'Needs to do a task' },
-      { id: 'home', type: 'screen', label: 'Dashboard', route: '/dashboard', detail: 'Shows assigned SOPs.' },
       { id: 'lib', type: 'screen', label: 'SOP library', route: '/sops', detail: 'Browse, search, filter by trade. "Updated since last completion" badge (AFL-VER-04) marks any SOP published after the worker\'s last completion.' },
       { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]', detail: 'Tabs: overview, tools, hazards, flow, model, walkthrough. Flow tab defaults to spatial graph on desktop (≥1024px) with a List/Graph toggle; mobile defaults to list. Admins/safety managers see an "Edit in builder" link here to deliberately open this SOP in the admin builder.' },
       { id: 'go', type: 'decision', label: 'Ready to start?', branches: [
@@ -218,11 +226,11 @@ export const JOURNEYS: Journey[] = [
     group: 'Create an SOP',
     persona: 'SOP Admin',
     title: 'Switch into admin tools',
-    summary: 'An admin’s default pathways mirror a worker’s — the primary nav opens the worker library. Admin tooling is a deliberate opt-in from the account menu, never the default route just because an admin is logged in.',
+    summary: 'An admin signs in and lands directly on the admin SOP library (UX-01 one home per role). Worker surfaces remain reachable from the primary nav, but admin tooling is the default landing for admins.',
     steps: [
       { id: 's', type: 'start', label: 'Signed in as admin / safety manager' },
-      { id: 'home', type: 'screen', label: 'Worker pathways by default', route: '/dashboard', detail: 'Identical nav to a worker: Dashboard · SOPs (→/sops) · Activity · Pathways · Feedback. Selecting a SOP opens the worker view, not the builder.' },
-      { id: 'menu', type: 'decision', label: 'Go off-path into admin tools? (account menu → Admin tools)', branches: [
+      { id: 'home', type: 'screen', label: 'Admin home — SOP library', route: '/admin/sops', detail: 'roleHome(admin) lands here. Worker surfaces (SOPs · Activity) stay one tap away in the primary nav.' },
+      { id: 'menu', type: 'decision', label: 'Open another admin surface? (account menu → Admin tools)', branches: [
         { label: 'Manage SOPs', to: 'sops' },
         { label: 'Blocks', to: 'blocks' },
         { label: 'Team', to: 'team' },

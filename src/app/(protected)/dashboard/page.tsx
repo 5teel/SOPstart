@@ -7,8 +7,8 @@ import { roleHome } from '@/lib/auth/role-home'
  *
  * The route survives ONLY so legacy guards, bookmarks, and stale PWA caches
  * that still target /dashboard forward to the caller's real role home.
- * No UI renders here — the old AdminDashboard tiles and inline
- * PendingDashboard were removed in Phase 30 (pending UI now lives at /pending).
+ * No UI renders here — the old admin tile grid and inline pending UI were
+ * removed in Phase 30 (the pending holding screen now lives at /pending).
  */
 export default async function DashboardPage() {
   const supabase = await createClient()

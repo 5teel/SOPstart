@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { roleHome } from '@/lib/auth/role-home'
 import { WorkerActivityView } from './WorkerActivityView'
 import { SupervisorActivityView } from './SupervisorActivityView'
 
@@ -27,5 +28,6 @@ export default async function ActivityPage() {
     return <SupervisorActivityView role={role} />
   }
 
-  redirect('/dashboard')
+  // Admin / no-role fallthrough → real home (admin → /admin/sops, no role → /pending)
+  redirect(roleHome(role))
 }

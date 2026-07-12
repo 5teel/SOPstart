@@ -1,5 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
+import { parseJwtPayload } from '@/lib/supabase/jwt'
+import { roleHome } from '@/lib/auth/role-home'
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request })
@@ -38,7 +40,13 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (isAuthRoute && user) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+    // UX-01: land each role directly on its home. Role comes from the JWT
+    // claim (no DB call in middleware); absent claim → /pending safe default.
+    const { data: { session } } = await supabase.auth.getSession()
+    const role = session?.access_token
+      ? (parseJwtPayload(session.access_token)['user_role'] as string | undefined)
+      : undefined
+    return NextResponse.redirect(new URL(roleHome(role), request.url))
   }
 
   return response

@@ -3,6 +3,8 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { parseJwtPayload } from '@/lib/supabase/jwt'
+import { roleHome } from '@/lib/auth/role-home'
 import type { TablesInsert, TablesUpdate } from '@/types/database.types'
 import type { AppRole } from '@/types/auth'
 import {
@@ -102,13 +104,15 @@ export async function loginWithEmail(formData: {
   const { email, password } = result.data
   const supabase = await createClient()
 
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
   if (error) {
     return { error: 'Invalid email or password' }
   }
 
-  redirect('/dashboard')
+  // UX-01: land the user directly on their role home (JWT claim, Base64URL-safe parse)
+  const claims = data.session ? parseJwtPayload(data.session.access_token) : {}
+  redirect(roleHome(claims['user_role'] as string | undefined))
 }
 
 // ─────────────────────────────────────────────
@@ -174,7 +178,8 @@ export async function joinWithInviteCode(formData: {
   })
   await supabase.auth.refreshSession()
 
-  redirect('/dashboard')
+  // UX-01: join-by-code always creates a worker membership → worker home
+  redirect(roleHome('worker'))
 }
 
 // ─────────────────────────────────────────────
@@ -288,7 +293,8 @@ export async function acceptInvite(formData: {
   // Refresh JWT to get updated org claims
   await supabase.auth.refreshSession()
 
-  redirect('/dashboard')
+  // UX-01: invited role is in hand → land directly on its home
+  redirect(roleHome(invitedRole))
 }
 
 // ─────────────────────────────────────────────
