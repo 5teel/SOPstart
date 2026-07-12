@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v5.0
-milestone_name: — AI-Native Builder + Agent Foundation
-status: Phase complete — awaiting next milestone decision
-stopped_at: Phase 27 verified PASS (10/10), PROJECT.md evolved, closed
-last_updated: "2026-07-12T03:28:37.413Z"
+milestone: v6.0
+milestone_name: SOP Ownership & Governance Infrastructure
+status: planning
+last_updated: "2026-07-12T06:08:49.817Z"
+last_activity: 2026-07-12
 progress:
-  total_phases: 30
-  completed_phases: 5
-  total_plans: 29
-  completed_plans: 29
-  percent: 17
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -24,27 +24,10 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 999.1
-Plan: Not started
-**Milestone status:** **v4.0 ✅ shipped 2026-07-02** (Phases 21, 21.5, 21.6, 22, 23, 24, 25 executed + code-reviewed; residual = human UAT on 21.6/22/23/25, carried per v3.0 field-verification precedent). **v5.0 ✅ shipped 2026-07-05** — Phase 26 (14/14 plans, bespoke inline builder, Puck fully removed) + Phase 26.5 (8/8 plans, agent-metadata layer). **Post-26.5 ad-hoc work (2026-07-06→09, NOT GSD-phased):** provider-agnostic AI layer (model registry `src/lib/ai/registry.ts`, adapter `src/lib/ai/llm.ts` for Anthropic/OpenAI/OpenRouter+GLM 5.2, `/admin/ai-settings` org model overrides, R&D-validated grounding prompt from `.autoresearch` loop), unified AI-draft surface (`/admin/sops/new/ai`), QR machine deep links + read-aloud + draft triage queue, builder tree-rail navigation overhaul (focus-flash, verify auto-advance, real preview text), and the layout_data-trio bug fix (non-DOCX drafts rendered empty canvas) + prod backfill. Full commit list + rationale: `git log 270a5c1..b13b990`, folded into PROJECT.md Validated + CLAUDE.md Learnings.
-
-**Active phase:** None — no phase currently planned or in progress. `.planning/ROADMAP.md` v5.0 section has no queued Phase 27. Next step is Simon's call: open a new phase for the ad-hoc AI-provider/builder-UX work retroactively, start a new milestone, or continue building ad-hoc.
-
-**v4.0 phase sequence:**
-
-1. **Phase 21 — Safety-Critical Parsing** ✅ COMPLETE 2026-05-26: S-02 side-by-side viewer + S-03 AI reviewer × 5 + S-04 per-block verify checklist + I-01 Phase 20 contract complete. 23 requirements (SCP-VIEWER ×5, SCP-AI ×8, SCP-VERIFY ×6, SCP-PARSE ×4) + 7 must-haves from Plan 21-05 gap closure (parser → library junction integration). VERIFICATION.md verdict: PASS-WITH-NOTES (residual = 5 human-UAT items only, all now unblocked).
-2. **Phase 22 — Voice-Driven Walkthrough** (next): W-01 literacy/visual/voice gaps + X-02 voice-driven walkthrough. 8 requirements (VDW-LIT ×4, VDW-VOICE ×4).
-3. **Phase 23 — AI Field Layer + Version Supersede**: X-03 universal AI read/write + G-01 version supersede + worker-instance sign-off. 9 requirements (AFL-AI ×4, AFL-VER ×5).
-
-**Historical note (Phase 26 execution, retained for context):** Phase 26 and 26.5 are both fully executed and closed — no verify-work/code-review pending. **26-14 closed the phase:** frozen-contract proof (R6 convert-golden byte-equivalence + R8 spine-regression) and full Puck removal (D-01 end-state); `@puckeditor/core` gone, `puck-config.tsx` deleted, worker bundle Δ0KB, phase26 102 green / build green. **26-13 complete**, **26-11 is complete** — its Task-3 on-device Konva UX gate is carried as a **deferred-residual** (verify on sopstart.com after 26-13 wires the annotate→save→reopen launch point; UAT `p26-annotation-editor-feel`), NOT a blocker, since the editor cannot be mounted from a route until 26-13. Plan 26-11 built (R5/D-03 slice 2): the absorbed **Phase 17 annotation primitives** inside the Visual/diagram medium — `annotation-tools.ts` PURE scene-JSON model (6 primitive factories Arrow/Rect/Ellipse/Text/numbered-callout/freehand, snapshot undo/redo, non-destructive serialize with the image URL kept OUT, `acceptsPointer` palm-rejection) drives `AnnotationEditor.tsx` (upgraded from the 26-05 spike shell: `Konva.Transformer` resize/rotate, textarea text-edit overlay, Delete + Cmd/Ctrl+Z, Pen-only palm rejection, `stage.destroy()` teardown) + `DiagramHotspotBlock.tsx` (the ONLY freeform surface — numbered callouts at freeform x/y in natural-image space, `annotationId`-linked, same scene model). `annotation-primitives.spec` **14 green**, tsc clean, `next build` green, worker bundle **Δ0KB Konva-free** (isolation gate green). Persist/save deferred to **26-13**. **Task-3 human-verify UX gate NOT self-approved** — carried per the v3.0 device-verification precedent. Plan 26-10 done (R4): **smart-next ghosts** — confident, non-redundant predictions from the shared `SMART` map (Hazard→PPE, Measurement→Decision, Step→Measurement) render as an inline dashed-purple `--ai` ghost. `useSmartGhosts` = pure state machine (`computeGhosts` self-suppresses when the predicted block already follows / `resolveGhostVisibility` one-live-nearest-centre + dim others + scroll-past<64px→gone-permanently / `ghostsGoneOnTyping` type-dismiss-except-next) + a thin rAF/ref hook that toggles `classList` on refs — the document NEVER re-renders on scroll (RESEARCH Pattern 4 / 2026-05-13 hot-path learning). `Tab`-or-click accepts (inert while the inserter menu is open → no keyboard collision) → `content-ops insertBlock` → autosave; no reducer / `layout_data` change. `GhostRow` injected into `EditableDocument` between blocks; `ghosts.spec` proves all 5 scenarios (9 green) + accept→insert + no-scroll-re-render; tsc + `next build` green. Plan 26-09 done (R5/R7): the **unified Visual block** — 18th block type, mixed medium-tagged media (visual:photo|diagram|video), 3-place contract **18/18/18** + medium tags on /api/schema (agent-contract hook D-02); **Pattern E media grid COMPLETE** (MediaGrid + medium sub-picker) → FIELD_MAP has no stubs, P14 stays **0 unreachable across 18 blocks**; legacy photo blocks edit THROUGH the Visual UI with layout_data kind + provenance frozen (A3, convert-golden byte-equivalence green); worker bundle **Δ0KB, Konva-free**. Plan 26-08 done (R3): tiered context-aware inserter. Plans 26-01..26-07 done: Nyquist harness + convert-golden baseline (26-02), Puck-free worker renderer + block-registry (26-03), the bespoke EDIT canvas + autosave re-wire + dnd-kit reorder (26-04), the Konva annotation foundation — spike PASSED, 00039 applied to live DB, worker bundle proven Konva-free (26-05), the P14 field-map reachability registry + bespoke A/B/D inline editors — EnumChip/InlineToken/FIELD_MAP-driven shell, one Zod-validated lossless commit path (26-06), and **P14 COMPLETE (26-07)**: Pattern C anchored FieldPanel + ArrayFieldEditor (dnd-kit rows, lossless nextStepId-preserving edits) for PPE/Decision/Inspect arrays + Photo alt / Model assetUrl scalars — phase-level parity gate lands: **0 unreachable fields across all 17 blocks (42 fields)**; only Pattern E (media grid) remains, deferred to 26-09. SPEC (`26-SPEC.md`, R1–R8) + CONTEXT (`26-CONTEXT.md`) locked 2026-07-02. Locked forks: **full-bespoke editor** replacing Puck (D-01, `layout_data`/junction/provenance frozen); **agent-metadata layer split to Phase 26.5** (contract hooks only here, D-02); **Phase 17 Konva annotation ABSORBED** into the Visual block (D-03, workers never download Konva — baked PNG read path); **v5.0 opened** (D-04). Expect a heavily-waved plan (bespoke render → tiered inserter+ghosts → re-wire autosave/provenance-sync/AI-overlays/verify-UI with **behavioural parity tests** → Visual+Konva slices → convert-golden-path regression). Validated sketch: `sketches/sop-builder-redesign/index.html`.
-
-**Also outstanding (v4.0 residual):** human UAT on sopstart.com — Phase 23 (4 tests), Phase 22 (voice loop), Phase 25 (7 tests), Phase 21.6 (4 items). Carry per v3.0 field-verification precedent or run before `/gsd-complete-milestone`.
-
-**v5.0 residual:** 26-11 annotation-editor device-UX feel (UAT `p26-annotation-editor-feel`) — **now unblocked**: 26-13 wired the annotate launch (MediaGrid diagram item → DiagramAnnotateModal → AnnotationEditorLoader), so the editor mounts from the admin builder route. Run on sopstart.com post-deploy alongside a 26-13 persistence check (annotate a pipeline diagram → Save & bake → worker read shows the baked image). Also note the 26-13 Known Stub: diagram VisualItems need `sopImageId` populated at parse/upload time before "Save & bake" enables for hand-added diagram slots.
-
-**Roadmap evolution:** Phase 21.6 (Builder Edit Stage Redesign) INSERTED after 21.5, before 22, on 2026-06-05. Reason: 21.5 redesigned the Review/Publish stages but the Build/edit stage is still the untouched Puck editor — first-time admins hit jargon ("Block"), two redundant block lists (palette vs outline), unanchored canvas figures, and a cramped right-rail field editor. Decision by Simon during 21.5 UAT.
-
-- Phase 27 added 2026-07-12: AI Provider & Settings — formal spec pass. Reason: the provider-agnostic AI layer (model registry, LLM adapter, AI Settings admin tool, OpenRouter/GLM 5.2) shipped ad-hoc 2026-07-06/07 and works end-to-end, but never got a spec/threat-model/UAT pass — RLS/audit on org-level model overrides, provider-outage fallback story, cost guardrails all unverified.
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-07-12 — Milestone v6.0 started
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 

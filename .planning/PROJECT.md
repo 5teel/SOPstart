@@ -63,19 +63,26 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 - ✓ QR machine deep links, read-step-aloud (mobile+desktop walkthrough), worst-first draft triage queue — shipped ad-hoc 2026-07-07
 - ✓ Builder tree-rail navigation overhaul — section/step/block rows all focus the canvas, verify auto-advance, real preview text, focus-flash feedback — shipped ad-hoc 2026-07-07/09
 
+- ✓ Side-by-side source viewer + AI reviewer × 5 jobs + per-block verify checklist at publish gate + step-level provenance — Phase 21 (v4.0)
+- ✓ Voice-driven walkthrough — literacy gaps closed, voice Q&A drives walkthrough, read-aloud, multi-language — Phase 22 (v4.0)
+- ✓ Universal AI read/write field access (unified agent interface) — Phase 23 (v4.0)
+- ✓ Version supersede + diff + restore + worker-instance sign-off chain (completing the SOP IS the legal signature) — Phase 23 (v4.0, G-01)
+- ✓ Spatial node-graph Flow tab — Phase 24 (v4.0)
+- ✓ Departments as first-class entities (member/SOP/block junctions) — Phase 25 (v4.0)
+- ✓ Self-healing video render finalization via Shotstack completion webhook — ad-hoc 2026-07-12 (replaces parked 999.1 cleanup service)
+
 ### Active
 
 <!-- Current scope. Building toward these. -->
 
-#### v4.0 — Safety-Critical Parsing + Voice + AI Foundation
-- Side-by-side source viewer (admin sees original document beside parsed blocks, click-to-sync scroll)
-- AI reviewer running five verification jobs (omission, anchoring, photo-step alignment, table fidelity, terminology) on every parsed SOP
-- Per-block verify checklist at publish gate (publish hard-disabled until 100% verified, no bulk-bypass)
-- Word/PDF parsing — Phase 20 contract complete (full step-level provenance for photos/diagrams/charts/tables)
-- Worker walkthrough literacy gaps closed — visual-only flow + voice-driven completion + multi-language UI
-- AI Voice Q&A drives walkthrough (full audio loop, advances on "I've done step 4," multi-language)
-- Universal AI read/write field access — every editable field AI-callable via unified agent interface (architectural backbone for v5.0 conversational app)
-- Version history formal supersede + diff + restore + worker-instance sign-off chain (completing the SOP IS the legal signature)
+#### v6.0 — SOP Ownership & Governance Infrastructure
+- Every SOP has a visible, accountable owner (auto-backfilled; never a data-entry campaign)
+- Review-due cadence per SOP + per-category defaults; overdue surfacing that never blocks worker reading
+- One unified governance queue (due-soon / overdue / unowned / stale-role) with one-click actions
+- AI-proposed maintenance schedule (prioritized review plan from staleness + usage + flags)
+- Optional multi-step approval chain per category, versioned, one-click approve — SOPs without a chain publish exactly as today
+- Per-worker training record view (completion = training evidence: SOP, version, date, sign-off chain) + CSV export
+- Workers see a lightweight "current as of" indicator — accuracy signal, zero added friction
 
 #### v3.0 carry-over (deferred to v4.5 backlog)
 - A-05 NZ Template Library (Visy glass-mfg-focused)
@@ -100,32 +107,24 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 - Integration with external HR/ERP systems
 - Video content within SOPs
 
-## Current Milestone: v4.0 Safety-Critical Parsing + Voice + AI Foundation
+## Current Milestone: v6.0 SOP Ownership & Governance Infrastructure
 
-**Started:** 2026-05-24
-**Goal:** No parsed SOP can be published without verified anchoring (Phase 20 contract complete). A worker who can't read English can still complete an SOP by voice. Every editable field in the app is AI-callable — laying the architectural backbone for the v5.0 conversational app.
+**Started:** 2026-07-12
+**Goal:** Close the #1 governance gap from the Visy interview ("Nobody owns SOPs — there isn't anybody") without adding a single unit of shop-floor friction. Every SOP gets an accountable owner and a review lifecycle; admins get one glanceable governance queue; completions become exportable training evidence — and none of it ever blocks a worker from reading or running an SOP.
 
-**Target features (8, grouped into 3 phases):**
+**NORTH STAR (locked by Simon, 2026-07-12):** User ease of use and maintenance FIRST. Process and blockers must never be prioritised over ease of use. SOPstart wins on (1) accuracy of SOP documentation and (2) ease of use by the actual people on the shop floor. Governance, ownership, and training records exist ONLY in service of those two things. Any governance feature that adds worker-facing friction is wrong by definition.
 
-- **Phase 21 — Safety-Critical Parsing** (S-02 + S-03 + S-04 + I-01):
-  - Side-by-side source viewer (admin sees original document beside parsed blocks)
-  - AI reviewer × 5 verification jobs (omission, anchoring, photo-step, table fidelity, terminology)
-  - Per-block verify checklist at publish gate (no bulk-bypass)
-  - Word/PDF parsing — full step-level provenance for photos/diagrams/charts/tables
-- **Phase 22 — Voice-Driven Walkthrough** (W-01 + X-02):
-  - Walkthrough literacy gaps closed — low-literacy / visual-only / voice-only completion + multi-language UI
-  - Voice Q&A drives walkthrough (reads aloud, advances on "done," multi-language)
-- **Phase 23 — AI Field Layer + Version Supersede** (X-03 + G-01):
-  - Universal AI read/write access to every editable field (unified agent interface)
-  - Cmd+K palette extended across admin pages + team + settings
-  - Version supersede + diff + one-click restore + worker-update indicator
-  - Worker-instance sign-off chain — completing the SOP IS the legal signature
+**Target features (grouped):**
 
-**Key context:** Source of truth is `.planning/PRODUCT-ROADMAP.md` v0.3 (Simon's 2026-05-24 review pass). v3.0's deferrals (NZ templates, kiosk mode, approval chains, search, security hardening, the compliance category) carry to v4.5. The Visy customer interview (2026-05-05) remains the primary domain anchor; v4.0 finishes the safety story before v4.5 broadens to multi-customer acquisition.
+- **Ownership (Visy pain #1):** owner on every SOP (auto-backfilled), ≤2-click reassign from the SOP itself, unowned-SOP surfacing when an owner leaves, "My SOPs" view
+- **Review lifecycle (G-03):** review-due date + per-category cadence, overdue grey-out in admin library (worker reading NEVER blocked), one-click "confirm current" or route into the existing edit/version flow, AI-proposed prioritized review plan
+- **Governance queue:** ONE unified queue — due-soon, overdue, unowned, stale-role — each row a one-click action; no separate consoles
+- **Approval chain (G-02):** optional per-category 1–4 step chain, stored per version, one-click approve from the SOP; absent chain = publish exactly as today
+- **Training records (G-06 lite):** per-worker training view built on existing completion + sign-off chain data, CSV export; NO HRIS API integration (stays out of scope)
 
-**Execution order:** 21 → 22 → 23. Phase 21 unblocks the most safety risk. Phase 23 lays the AI-field foundation that v5.0's conversational interface (X-05) builds on.
+**Key anti-goals (from north star + Visy §9):** no mandatory approval chains; no governance state that blocks worker access; no data-entry campaign on existing SOPs (defaults auto-backfill); no rigid global process replacing site judgment; no per-worker auth hardening beyond what exists.
 
-**Current state:** Phase 24 complete (2026-06-12) — Flow tab ships the production spatial node-graph canvas (explicit positions, accent tokens, Fit/Export-PNG, desktop-default graph view, builder FlowGraphEditor re-surfaced), closing the Phase 12.5 req #8 gap. Promoted from backlog 2026-06-11.
+**Build-on (do not rebuild):** version supersede + sign-off chain (Phase 23), departments (Phase 25), site tier (Phase 15), completions (Phase 4), agent metadata + AI adapter (Phase 26.5/27) for the AI maintenance schedule.
 
 ## Context
 
@@ -160,6 +159,9 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 | v3.0 adds native authoring | Upload flow shipped; orgs now ask for on-app authoring for net-new SOPs and customized variants — not just import | — Pending v3.0 |
 | Collaborative draft editing (v3.0) | Multiple admins share SOP drafting load; avoids email-attachment churn; needs conflict resolution model | — Pending v3.0 research |
 | Non-destructive image annotation (v3.0) | Admins must be able to re-edit annotations after saving; burned-in pixels would require re-upload | — Pending v3.0 research |
+| Governance never blocks workers (v6.0) | North star: ease of use + accuracy beat process; a worker must always be able to read/run any published SOP regardless of review/approval state | — Locked 2026-07-12 |
+| Approval chains opt-in per category (v6.0) | Visy needs 3–4-manager chains for some SOPs, but forcing chains everywhere adds friction; absent chain = today's publish flow | — Locked 2026-07-12 |
+| Training records = CSV export only (v6.0) | HRIS/Success Factors API integration stays out of scope; CSV covers the audit/training-evidence need without integration surface | — Locked 2026-07-12 |
 
 ## Evolution
 
@@ -179,4 +181,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-12 — v5.0 (Phase 26 + 26.5) shipped 2026-07-05. Ad-hoc work (not GSD-phased) shipped 2026-07-06→09: provider-agnostic AI layer (model registry + adapter + AI Settings admin tool, OpenRouter/GLM 5.2 support), unified AI-draft surface, QR deep links + read-aloud + draft triage, and a builder tree-rail navigation overhaul. Phase 27 (2026-07-12) retroactively formalized the AI provider layer: 27-SPEC.md as-built doc, AIPS-* requirement traceability, unit test backfill, and an org-scope write-isolation regression for `setAiModelSetting`. No active phase queued — next milestone/phase TBD. Source of truth `.planning/PRODUCT-ROADMAP.md` v0.3.*
+*Last updated: 2026-07-12 — Milestone v6.0 (SOP Ownership & Governance Infrastructure) started. Prior: v5.0 shipped 2026-07-05; ad-hoc AI-layer work 2026-07-06→09 formalized by Phase 27 (2026-07-12); self-healing video render webhook shipped 2026-07-12. Source of truth `.planning/PRODUCT-ROADMAP.md` v0.3 + Visy interview findings (2026-05-05).*
