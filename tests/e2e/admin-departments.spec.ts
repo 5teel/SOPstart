@@ -150,14 +150,12 @@ test.describe('admin/departments — page.tsx source contract', () => {
     expect(src).toContain('departments={departments}')
   })
 
-  test('page includes shared sub-nav with Departments tab', () => {
+  test('page mounts the shared AdminNav (Departments homed under Settings, 30-03)', () => {
     const src = read(PAGE)
-    // Shared sub-nav links
-    expect(src).toContain('/admin/sops')
-    expect(src).toContain('/admin/blocks')
-    expect(src).toContain('/admin/team')
-    expect(src).toContain('/admin/departments')
-    // Active Departments tab
+    // Phase 30 UX-02: the inline sub-nav was replaced by the ONE shared
+    // AdminNav; Departments has no own tab — the Settings hub is its home.
+    expect(src).toContain("from '@/components/admin/AdminNav'")
+    expect(src).toMatch(/<AdminNav active="settings"/)
     expect(src).toContain('Departments')
   })
 

@@ -80,7 +80,12 @@ test.describe('UX-01 — one home per role', () => {
     expect(fs.existsSync(path.join(ROOT, 'src', 'app', 'not-found.tsx'))).toBe(true)
     const journeys = read(path.join(ROOT, 'src', 'lib', 'journeys', 'journeys.ts'))
     const roles = read(path.join(ROOT, 'src', 'lib', 'journeys', 'roles.ts'))
-    expect(journeys).not.toContain("'/dashboard'")
+    // roles.ts (landsOn) never points anyone at the shim.
     expect(roles).not.toContain("'/dashboard'")
+    // journeys.ts maps /dashboard EXACTLY ONCE — as the legacy redirect shim
+    // (30-08: the route survives in the tree per decision #5, so /pathways
+    // needs it covered for 0 not-mapped; no journey LANDS anyone there).
+    expect(journeys.split("'/dashboard'").length - 1).toBe(1)
+    expect(journeys).toContain('Redirect-only shim')
   })
 })

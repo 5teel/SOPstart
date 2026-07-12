@@ -29,8 +29,13 @@ const SETTINGS_PAGE = path.join(
 )
 const TOP_HEADER = path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx')
 
-const ADMIN_PAGES = ['sops', 'governance', 'blocks', 'team', 'departments'].map(
+// 30-08: admin/governance became a redirect shim (no UI, no nav) — it keeps
+// its guard but no longer mounts AdminNav.
+const ADMIN_PAGES = ['sops', 'blocks', 'team', 'departments'].map(
   (dir) => path.join(ROOT, 'src', 'app', '(protected)', 'admin', dir, 'page.tsx'),
+)
+const GOVERNANCE_SHIM = path.join(
+  ROOT, 'src', 'app', '(protected)', 'admin', 'governance', 'page.tsx',
 )
 
 function read(p: string): string {
@@ -66,6 +71,11 @@ test.describe('UX-02 — one shared admin nav', () => {
       // T-30-03-01: the per-page role gate survives the nav swap verbatim
       expect(src).toContain("['admin', 'safety_manager']")
     }
+    // The governance shim keeps its guard but renders nothing (30-08).
+    const shim = read(GOVERNANCE_SHIM)
+    expect(shim).toContain("['admin', 'safety_manager']")
+    expect(shim).not.toContain('aria-label="Admin sections"')
+    expect(shim).not.toContain('<AdminNav')
   })
 
   test('/admin/settings exists, keeps the admin guard, and homes AI Settings + Departments + agent layer', () => {
