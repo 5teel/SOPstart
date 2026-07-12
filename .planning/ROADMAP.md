@@ -108,12 +108,26 @@ Closes the #1 governance gap surfaced by the 2026-05-05 Visy Packaging customer 
   4. When a chain exists, publish completes automatically after final approval; pending state ("who's next") is visible both on the SOP and in the governance queue
   5. Approval history (who, when, which version) is visible in the existing version-history surface
 
-**Plans**: TBD
+**Plans**: 6 plans in 4 waves
 **UI hint**: yes
-
 Plans:
+**Wave 1**
 
-- [ ] TBD (created by /gsd-plan-phase)
+- [ ] 29-01-PLAN.md — Schema (00045 live) + pure chain logic + performPublish extraction (byte-identical no-chain proof)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 29-02-PLAN.md — Server actions (setApprovalChain/approveStep/requestChanges) + publish-route chain-gate + awaiting_approval classifier
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 29-03-PLAN.md — Approval-chain config editor on /admin/governance (dnd-kit 1-4 step, admin/safety_manager scoped)
+- [ ] 29-04-PLAN.md — Builder PublishStage pending-chain panel + one-click approve/request-changes
+- [ ] 29-05-PLAN.md — Governance queue Approve action + awaiting-approval widget/chip + version-history approval log
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 29-06-PLAN.md — Merged-tree gate: full suite + phase28 regression + tsc + build + 5-req audit
 
 ### Phase 30: Training Records + AI Maintenance Schedule
 
