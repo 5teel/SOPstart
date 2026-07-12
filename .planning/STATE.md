@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
-current_plan: 4
+current_plan: 5
 status: executing
 stopped_at: Completed 29-03-PLAN.md
-last_updated: "2026-07-12T09:13:54.199Z"
+last_updated: "2026-07-12T09:21:49.348Z"
 last_activity: 2026-07-12 -- Completed 29-01-PLAN.md
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 12
-  completed_plans: 9
+  completed_plans: 10
   percent: 33
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 29
-Current Plan: 4
+Current Plan: 5
 Total Plans in Phase: 6
 Status: Ready to execute
 Last activity: 2026-07-12 -- Completed 29-01-PLAN.md
@@ -163,6 +163,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 29 P01 | 35min | 3 tasks | 12 files |
 | Phase 29 P02 | ~30min | 3 tasks | 11 files |
 | Phase 29 P03 | 15min | 2 tasks | 3 files |
+| Phase 29 P04 | 20min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -338,6 +339,7 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 29-02]: isCallerNextApprover kept OUT of the pure classifyGovernanceRow input — computed per-viewer in listGovernanceQueue, surfaced on GovernanceRow instead
 - [Phase ?]: ApprovalChainEditor is presentational-only; category/members/chains fetched server-side by governance/page.tsx, no internal data fetch
 - [Phase ?]: Distinct sops.category values fetched via plain select + JS dedupe, no new table/RPC
+- [Phase ?]: Request-changes comment required client-side (button disabled) AND server-side (requestChanges rejects empty) — client guard is UX only, server-side stepMatchesCaller + comment check is the real gate
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -447,7 +449,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-12T09:13:54.192Z
+Last session: 2026-07-12T09:21:18.068Z
 Stopped at: Completed 29-03-PLAN.md
 Resume file:
 None
