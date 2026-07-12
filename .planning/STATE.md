@@ -3,16 +3,16 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
 current_plan: 6
-status: executing
-stopped_at: Completed 29-03-PLAN.md
-last_updated: "2026-07-12T09:36:54.033Z"
-last_activity: 2026-07-12 -- Completed 29-01-PLAN.md
+status: phase_complete
+stopped_at: Phase 29 complete (6/6 plans, gate green)
+last_updated: "2026-07-12T12:00:00.000Z"
+last_activity: 2026-07-12 -- Completed 29-06-PLAN.md (phase gate green, APR-01..05 audited PASS)
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 12
-  completed_plans: 11
-  percent: 33
+  completed_plans: 12
+  percent: 67
 ---
 
 # Project State
@@ -22,15 +22,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 28 — Ownership + Review Lifecycle + Governance Queue
+**Current focus:** Phase 30 — Training Records + AI Maintenance Schedule (next up; Phase 29 complete)
 
 ## Current Position
 
-Phase: 29
-Current Plan: 6
-Total Plans in Phase: 6
-Status: Ready to execute
-Last activity: 2026-07-12 -- Completed 29-01-PLAN.md
+Phase: 29 — COMPLETE (6/6 plans, APR-01..05 audited PASS via tests/phase29/phase-gate.spec.ts)
+Next: Phase 30 — Training Records + AI Maintenance Schedule (no CONTEXT.md yet — discuss or plan)
+Status: Phase complete, ready to transition
+Last activity: 2026-07-12 -- Completed 29-06-PLAN.md
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
@@ -450,7 +449,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-12T09:32:57.680Z
-Stopped at: Completed 29-03-PLAN.md
+Last session: 2026-07-12 (resumed)
+Stopped at: Phase 29 complete + pushed; next action is Phase 30 discuss/plan
 Resume file:
 None
