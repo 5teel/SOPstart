@@ -200,15 +200,18 @@ export function BuilderStageStepper({
   onStageSelect,
 }: BuilderStageStepperProps) {
   // Build the ordered chip list based on whether source doc is present.
+  // Phase 30 (30-07, UX-07): DISPLAY labels are plain-language — Edit / Check /
+  // Send to workers. The BuilderStage union + stage keys stay 'build' |
+  // 'review' | 'publish' (routes/state names unchanged; labels only).
   const chips: StageChip[] = hasSourceDoc
     ? [
-        { stage: 'build', label: 'Build', ordinal: 1 },
-        { stage: 'review', label: 'Review & verify', ordinal: 2 },
-        { stage: 'publish', label: 'Publish', ordinal: 3 },
+        { stage: 'build', label: 'Edit', ordinal: 1 },
+        { stage: 'review', label: 'Check', ordinal: 2 },
+        { stage: 'publish', label: 'Send to workers', ordinal: 3 },
       ]
     : [
-        { stage: 'build', label: 'Build', ordinal: 1 },
-        { stage: 'publish', label: 'Publish', ordinal: 2 },
+        { stage: 'build', label: 'Edit', ordinal: 1 },
+        { stage: 'publish', label: 'Send to workers', ordinal: 2 },
       ];
 
   // Map stage → ordinal for state derivation.

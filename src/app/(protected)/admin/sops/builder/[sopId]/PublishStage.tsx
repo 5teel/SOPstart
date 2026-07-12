@@ -84,59 +84,22 @@ export function PublishStage({
   return (
     <div
       data-testid="publish-stage"
-      style={{
-        maxWidth: 640,
-        margin: '0 auto',
-        padding: '48px 24px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 16,
-      }}
+      className="mx-auto flex w-full max-w-[640px] flex-col gap-4 px-6 py-12"
     >
       {/* 1. Stage heading */}
-      <h1
-        style={{
-          fontFamily: 'Inter, sans-serif',
-          fontSize: 17,
-          fontWeight: 700,
-          lineHeight: 1.2,
-          color: 'var(--ink-900, #09090b)',
-          margin: 0,
-        }}
-      >
+      <h1 className="m-0 text-[17px] leading-tight font-bold text-[var(--ink-900)]">
         Publish this SOP
       </h1>
 
       {/* 2. Subtext */}
-      <p
-        style={{
-          fontFamily: 'Inter, sans-serif',
-          fontSize: 14,
-          fontWeight: 400,
-          lineHeight: 1.5,
-          color: 'var(--ink-500, #71717a)',
-          margin: 0,
-        }}
-      >
+      <p className="m-0 text-sm leading-normal text-[var(--ink-500)]">
         Once published, workers assigned to this SOP will see it in their library.
       </p>
 
       {/* 3. Progress summary — only when hasSourceDoc */}
       {hasSourceDoc && (
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            fontFamily: 'JetBrains Mono, monospace',
-            fontSize: 12,
-            fontWeight: 500,
-            color: 'var(--accent-ok, #10b981)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.08em',
-          }}
-        >
-          <span aria-hidden style={{ fontSize: 14 }}>&#10003;</span>
+        <div className="mono flex items-center gap-2 text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--accent-signoff)]">
+          <span aria-hidden className="text-sm">&#10003;</span>
           <span>{verifiedCount} steps verified</span>
         </div>
       )}
@@ -159,21 +122,9 @@ export function PublishStage({
       {!isReady && (
         <div
           data-testid="publish-blocked-reason"
-          style={{
-            border: '1px solid #fdba74',
-            background: '#fff7ed',
-            borderRadius: 4,
-            padding: '8px 16px',
-          }}
+          className="rounded border border-[var(--accent-decision)]/40 bg-[var(--accent-decision)]/10 px-4 py-2"
         >
-          <span
-            style={{
-              fontFamily: 'JetBrains Mono, monospace',
-              fontSize: 10,
-              fontWeight: 500,
-              color: '#c2410c',
-            }}
-          >
+          <span className="mono text-[10px] font-medium text-[var(--accent-decision)]">
             {remaining} of {totalCount} steps left to verify before you can publish
           </span>
         </div>
@@ -185,35 +136,19 @@ export function PublishStage({
         data-testid="publish-button"
         disabled={!isReady || publishing}
         onClick={onPublish}
-        style={
+        className={
           isReady && !publishing
-            ? {
-                background: 'var(--brand-yellow, #fbbf24)',
-                color: 'var(--ink-900, #09090b)',
-                fontWeight: 700,
-                fontFamily: 'Inter, sans-serif',
-                fontSize: 14,
-                padding: '10px 20px',
-                border: 'none',
-                borderRadius: 4,
-                cursor: 'pointer',
-                alignSelf: 'flex-start',
-              }
-            : {
-                background: 'var(--steel-700, #3f3f46)',
-                color: 'var(--ink-500, #71717a)',
-                fontFamily: 'Inter, sans-serif',
-                fontSize: 14,
-                padding: '10px 20px',
-                border: 'none',
-                borderRadius: 4,
-                cursor: 'not-allowed',
-                alignSelf: 'flex-start',
-              }
+            ? 'self-start cursor-pointer rounded border-none bg-[var(--ink-900)] px-5 py-2.5 text-sm font-bold text-[var(--paper)]'
+            : 'self-start cursor-not-allowed rounded border-none bg-[var(--ink-100)] px-5 py-2.5 text-sm text-[var(--ink-500)]'
         }
       >
         Publish SOP
       </button>
+
+      {/* 5b. Reversibility — UX-07: publishing is not a one-way door */}
+      <p className="m-0 text-xs leading-normal text-[var(--ink-500)]">
+        You can unpublish or edit later.
+      </p>
 
       {/* 7. Publish error banner — reuses the legacy Phase-21 shell markup */}
       {publishError && (
@@ -221,38 +156,20 @@ export function PublishStage({
           role="alert"
           data-testid="publish-error-banner"
           onClick={onDismissError}
-          style={{
-            padding: '8px 12px',
-            background: 'rgba(239,68,68,0.1)',
-            borderTop: '1px solid rgba(239,68,68,0.3)',
-            color: '#b91c1c',
-            fontSize: 13,
-            cursor: 'pointer',
-            borderRadius: 4,
-          }}
+          className="cursor-pointer rounded border-t border-[var(--accent-escalate)]/30 bg-[var(--accent-escalate)]/10 px-3 py-2 text-[13px] text-[var(--accent-escalate)]"
         >
           {publishError} (click to dismiss)
         </div>
       )}
 
-      {/* 6. Back to Review link — only when hasSourceDoc */}
+      {/* 6. Back to Check link — only when hasSourceDoc */}
       {hasSourceDoc && (
         <button
           type="button"
           onClick={onBackToReview}
-          style={{
-            background: 'none',
-            border: 'none',
-            padding: 0,
-            fontFamily: 'JetBrains Mono, monospace',
-            fontSize: 12,
-            color: 'var(--ink-500, #71717a)',
-            cursor: 'pointer',
-            alignSelf: 'flex-start',
-            textDecoration: 'underline',
-          }}
+          className="mono self-start cursor-pointer border-none bg-transparent p-0 text-[12px] text-[var(--ink-500)] underline"
         >
-          &#8592; Back to Review
+          &#8592; Back to Check
         </button>
       )}
     </div>
