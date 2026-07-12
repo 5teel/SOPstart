@@ -365,14 +365,16 @@ for (const sop of sopsWithoutOwnerOrDueDate) {
 
 **If this table is empty:** N/A — see above; both assumptions are low-risk given direct source verification, flagged only because the planner should re-confirm A2 against the actual current publish code path before writing task-level steps.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Where exactly does the draft→published transition happen?**
+1. **RESOLVED — Where exactly does the draft→published transition happen?**
+   - **Answer (used by plans):** the single publish route `src/app/api/sops/[sopId]/publish/route.ts` (Phase 21's `400 unverified_blocks` gate); 28-03 hooks the review-clock reset at its success path, confirmed in that plan's read_first.
    - What we know: Phase 6's "Publish gate computed as single derived boolean" and Phase 21's "publish route" (`400 unverified_blocks`) are both referenced in STATE.md/CLAUDE.md, implying a single route/action.
    - What's unclear: The exact file path wasn't re-verified in this research pass (out of the explicitly-listed read scope; grepping `src/app/api/sops` for a `publish` route or `src/actions/sops.ts` for a `publishSop` export is a 30-second check).
    - Recommendation: Planner's Wave 0 should grep `publish` across `src/actions/*.ts` and `src/app/api/sops/**` and confirm the single hook point before writing the "supersede resets review_due_at" task.
 
-2. **What are the org's existing `category_tag` values, to seed sensible `sop_review_cadences` categories?**
+2. **RESOLVED — What are the org's existing `category_tag` values, to seed sensible `sop_review_cadences` categories?**
+   - **Answer (used by plans):** single `category = 'default'` row at 12 months; per-category rows additive later; no speculative category-picker UI.
    - What we know: `sops.category_tag` is a single free-text-ish column (Phase 13 D-Tax-03); `block_categories` has a 34-tag controlled vocab for hazard/PPE tagging, but SOP-level categories are a smaller, separate set.
    - What's unclear: Whether `sop_review_cadences.category` should key off `sops.category_tag` verbatim (including NULL) or a normalized smaller taxonomy.
    - Recommendation: Default to a single `category = 'default'` row (12 months) satisfying REV-01's "per-category default cadence" at the simplest useful granularity; per-category rows are additive later if Simon wants finer control — do not build a category-picker UI speculatively before category values are confirmed with real data.

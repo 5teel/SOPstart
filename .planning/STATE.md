@@ -1,10 +1,11 @@
 ---
 gsd_state_version: 1.0
 milestone: v6.0
-milestone_name: SOP Ownership & Governance Infrastructure
-status: roadmapped
-last_updated: "2026-07-12T06:08:49.817Z"
-last_activity: 2026-07-12
+milestone_name: — SOP Ownership & Governance Infrastructure
+status: completed
+stopped_at: Phase 27 complete — 27-01 SUMMARY + VERIFICATION (PASS 10/10) + PROJECT.md evolution all committed (c29cc20). No incomplete work, no handoff, no checkpoint.
+last_updated: "2026-07-12T06:53:38.496Z"
+last_activity: 2026-07-12 — v6.0 roadmap created (Phases 28-30, 21/21 requirements mapped)
 progress:
   total_phases: 3
   completed_phases: 0
