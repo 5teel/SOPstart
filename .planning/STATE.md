@@ -4,14 +4,14 @@ milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
 current_plan: 1
 status: executing
-stopped_at: Completed 30-02-PLAN.md
-last_updated: "2026-07-12T15:36:36.886Z"
+stopped_at: Completed 30-07-PLAN.md
+last_updated: "2026-07-12T15:50:59.519Z"
 last_activity: 2026-07-12 -- Phase 30 execution started
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 20
-  completed_plans: 18
+  completed_plans: 19
   percent: 50
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 30 (ux-consolidation) — EXECUTING
-Plan: 7 of 8
+Plan: 8 of 8
 Current Plan: 1
 Status: Ready to execute
 Last activity: 2026-07-12 -- Phase 30 execution started
@@ -170,6 +170,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 30 P03 | ~20m | 2 tasks | 9 files |
 | Phase 30 P05 | ~8m | 2 tasks | 4 files |
 | Phase 30 P06 | 25m | 3 tasks | 17 files |
+| Phase 30 P07 | 25m | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -354,6 +355,7 @@ Recent decisions affecting current work:
 - [Phase 30]: 30-03 live admin-nav spec drops the stub's ApprovalChainEditor-in-settings assertion — panel relocation is 30-08 scope
 - [Phase ?]: 30-06: dept filter FIXED not removed — sop_departments SELECT using(true) live-verified via Management API before adding the worker client junction read (decision #3 branch A)
 - [Phase ?]: 30-06: OverviewTab/ToolsTab/HazardsTab deleted with the merge (nothing imports them after ReadTab); bundle re-baselined 1057→1056 KB via capture script
+- [Phase ?]: 30-07: Publish CTA moved off undefined --brand-yellow token to the established ink-900/paper primary-button idiom
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -463,7 +465,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-12T15:36:21.408Z
-Stopped at: Completed 30-02-PLAN.md
+Last session: 2026-07-12T15:50:59.511Z
+Stopped at: Completed 30-07-PLAN.md
 Resume file:
 None

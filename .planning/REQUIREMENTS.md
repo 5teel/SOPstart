@@ -562,7 +562,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 - [x] **UX-04**: One "New SOP" entry opening a method picker (Upload first, then Talk / Describe / Blank); all 8 scattered create buttons/tiles/tabs removed
 - [x] **UX-05**: Worker SOP detail has exactly 3 tabs (Read / Walk it / Flow); PPE + equipment render once; legacy ?tab= params and QR deep-links map to the new tabs
 - [ ] **UX-06**: Admin SOP list rows are one line (title · status chip · flag chip · owner); per-SOP actions live in the builder as a labelled action menu
-- [ ] **UX-07**: Plain-language pass — Check / Edit / Send to workers stage labels, plain AI-reviewer flag titles with human step names (never "block N"), every icon action labelled, reversibility stated near publish
+- [x] **UX-07**: Plain-language pass — Check / Edit / Send to workers stage labels, plain AI-reviewer flag titles with human step names (never "block N"), every icon action labelled, reversibility stated near publish
 - [x] **UX-08**: Dead weight removed — Model tab, walkthrough redirect route + orphan layout, legacy shims, fake notifications bell, no-op department filter; /pathways + /uat moved out of primary nav
 
 ### Training Records (TRN)
