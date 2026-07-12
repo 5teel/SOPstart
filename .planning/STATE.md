@@ -4,14 +4,14 @@ milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
 current_plan: 1
 status: executing
-stopped_at: Phase 29 complete + pushed; next action is Phase 30 discuss/plan
-last_updated: "2026-07-12T14:44:49.205Z"
+stopped_at: Completed 30-02-PLAN.md
+last_updated: "2026-07-12T14:58:51.879Z"
 last_activity: 2026-07-12 -- Phase 30 execution started
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 20
-  completed_plans: 13
+  completed_plans: 14
   percent: 50
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 30 (ux-consolidation) — EXECUTING
-Plan: 2 of 8
+Plan: 3 of 8
 Current Plan: 1
 Status: Ready to execute
 Last activity: 2026-07-12 -- Phase 30 execution started
@@ -166,6 +166,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 29 P04 | 20min | 3 tasks | 5 files |
 | Phase 29-approval-chains P05 | 15 | 3 tasks | 7 files |
 | Phase 30 P01 | 45m | 2 tasks | 26 files |
+| Phase 30 P02 | 25m | 2 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -344,6 +345,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Request-changes comment required client-side (button disabled) AND server-side (requestChanges rejects empty) — client guard is UX only, server-side stepMatchesCaller + comment check is the real gate
 - [Phase ?]: [Phase 30-01]: phase30 Wave-0 stubs are test.fixme with real path constants — each later plan flips its own spec live; deletion assertions flip in the plan that deletes
 - [Phase ?]: [Phase 30-01]: D-21-09 source-viewer isolation is enforced by check-bundle-size.ts pdfjs/mammoth worker-chunk scan, not a dynamic( token — ReviewStation statically imports SourceViewerPane (admin-only route); scp specs assert the scan
+- [Phase 30]: auth.ts dispatches via roleHome directly (role in hand at signIn/join/acceptInvite) instead of hopping through the /dashboard shim
+- [Phase 30]: roleHome fallback for absent/unknown role is /pending (truthful holding screen), not /sops
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -453,7 +456,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-12T14:44:22.179Z
-Stopped at: Phase 29 complete + pushed; next action is Phase 30 discuss/plan
+Last session: 2026-07-12T14:58:51.870Z
+Stopped at: Completed 30-02-PLAN.md
 Resume file:
 None
