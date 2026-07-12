@@ -127,12 +127,37 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 29-06-PLAN.md — Merged-tree gate: full suite + phase28 regression + tsc + build + 5-req audit
+- [x] 29-06-PLAN.md — Merged-tree gate: full suite + phase28 regression + tsc + build + 5-req audit
 
-### Phase 30: Training Records + AI Maintenance Schedule
+### Phase 30: UX Consolidation & Simplification
+
+**Goal**: Every question a user has gets exactly ONE place that answers it — one home per role, one admin nav, one create entry, one governance surface, a 3-tab worker SOP view, and plain language throughout — so workers and admins never have to learn the app.
+**Depends on**: Phase 29 (approval surfaces stable — governance merge must not regress APR-03/04), Phase 28 (governance queue is the merge target)
+**Requirements**: UX-01, UX-02, UX-03, UX-04, UX-05, UX-06, UX-07, UX-08
+**Source analysis**: 30-CONTEXT.md (full frontend audit 2026-07-12: 3 disagreeing admin menus, 5 list styles, 3 governance surfaces, 8 create entry points, dead Model tab/orphan routes; usability-lab SOP-0068A findings F-01..F-16)
+**Success Criteria** (what must be TRUE):
+
+  1. Dead weight removed: Model tab, walkthrough redirect route + orphan layout, legacy shims (WalkthroughTab.tsx, BuilderWithSourceViewer.tsx), fake notifications bell, no-op department filter — all gone (UX-08)
+  2. One shared AdminNav component renders the identical admin menu on every admin page; /admin/agent and /admin/governance are reachable from it; the three previous disagreeing menus are gone (UX-02)
+  3. One "New SOP" entry point opens a single method-picker (Upload first, then Talk/Describe/Blank); the 8 scattered create buttons are gone (UX-04)
+  4. Each role lands on its real home (worker /sops, supervisor+safety_manager /activity, admin /admin/sops); the dashboard page is deleted and no nav item points at it (UX-01)
+  5. Worker SOP detail has exactly 3 tabs (Read / Walk it / Flow) with PPE+equipment rendered once; QR deep-links still land correctly (UX-05)
+  6. Plain-language pass applied: Check/Edit/Send-to-workers stage names, plain AI-reviewer flag titles, human step names instead of "block N", every icon action labelled (UX-07)
+  7. Admin SOP list rows are one line (title · status chip · flag chip · owner) — click opens the builder where all per-SOP actions live as labelled actions (UX-06)
+  8. Governance folded into /admin/sops as the "Needs attention" filter with flag chips; GovernanceWidget and LibraryReviewCell removed as separate surfaces; approval-chain editor relocated to admin settings; APR-03/04 approve-from-queue behaviour preserved (UX-03)
+  9. journeys.ts updated in the same change for every rerouted/removed screen; /pathways shows 0 not-mapped
+
+**Plans**: TBD
+**UI hint**: yes
+
+Plans:
+
+- [ ] TBD (created by /gsd-plan-phase)
+
+### Phase 31: Training Records + AI Maintenance Schedule
 
 **Goal**: Completions become exportable per-worker training evidence, admins can see who trained on an outdated SOP version after a supersede, and the governance dashboard surfaces an AI-prioritized review plan built on the existing AI adapter + agent metadata layer.
-**Depends on**: Phase 28 (governance dashboard hosts the AI schedule), Phase 23 (completions + sign-off chain), Phase 26.5/27 (AI adapter + agent metadata layer powers the maintenance schedule)
+**Depends on**: Phase 30 (consolidated admin surfaces host the training + schedule views), Phase 28 (governance data), Phase 23 (completions + sign-off chain), Phase 26.5/27 (AI adapter + agent metadata layer powers the maintenance schedule)
 **Requirements**: TRN-01, TRN-02, TRN-03, REV-05
 **Success Criteria** (what must be TRUE):
 
@@ -908,7 +933,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 
 **v5.0 kicked off 2026-07-02.** Phase 26 (bespoke inline builder redesign; Phase 17 Konva absorbed) → Phase 26.5 (agent-metadata layer on X-03 + graphify). Forks locked in `26-CONTEXT.md`.
 
-**v6.0 kicked off 2026-07-12.** Phase 28 (ownership + review lifecycle + governance queue foundation) → Phase 29 (approval chains) → Phase 30 (training records + AI maintenance schedule). North star: ease of use beats process; governance never blocks worker access.
+**v6.0 kicked off 2026-07-12.** Phase 28 (ownership + review lifecycle + governance queue foundation) → Phase 29 (approval chains) → Phase 30 (UX consolidation & simplification — inserted 2026-07-12 from full frontend audit) → Phase 31 (training records + AI maintenance schedule). North star: ease of use beats process; governance never blocks worker access.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
