@@ -56,6 +56,13 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 - ✓ AI Voice Q&A grounded to single SOP with citations + uncertainty fail-safe — Phase 15
 - ✓ DOCX → Puck layout_data with side-by-side step+photo blocks — Phase 20 partial
 
+- ✓ Bespoke inline SOP builder (Puck fully removed) — tiered inserter, smart-next ghosts, unified Visual block w/ Konva diagram annotation, verify-checklist tree rail — Phase 26
+- ✓ Agent metadata layer — embeddings/tags/entities/memory/proposals per SOP+block, synthesis pipeline + cron sweep, `⚇ Agent layer` builder toggle + org dashboard — Phase 26.5
+- ✓ Provider-agnostic AI layer — single-source model registry + adapter (Anthropic/OpenAI/OpenRouter incl. GLM 5.2), org-level model overrides via AI Settings admin tool — shipped ad-hoc 2026-07-06/07, formalized (SPEC + tests + org-isolation regression) Phase 27
+- ✓ Unified AI-draft surface (`/admin/sops/new/ai` — type-a-brief / talk-it-through voice tabs), R&D-validated grounding prompt, SOP title-naming guard — shipped ad-hoc 2026-07-06/07
+- ✓ QR machine deep links, read-step-aloud (mobile+desktop walkthrough), worst-first draft triage queue — shipped ad-hoc 2026-07-07
+- ✓ Builder tree-rail navigation overhaul — section/step/block rows all focus the canvas, verify auto-advance, real preview text, focus-flash feedback — shipped ad-hoc 2026-07-07/09
+
 ### Active
 
 <!-- Current scope. Building toward these. -->
@@ -172,4 +179,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-05 — Phase 26.5 (Agent Metadata Layer) complete: per-SOP/per-block machine layer (Voyage-3.5 embeddings + pgvector, tags/entities/links, append-only memory, evidence-backed proposals, assessments), Haiku 4.5 synthesis pipeline + cron sweep, agentview builder toggle + /admin/agent dashboard. v5.0 = Phase 26 + 26.5 shipped; source of truth `.planning/PRODUCT-ROADMAP.md` v0.3.*
+*Last updated: 2026-07-12 — v5.0 (Phase 26 + 26.5) shipped 2026-07-05. Ad-hoc work (not GSD-phased) shipped 2026-07-06→09: provider-agnostic AI layer (model registry + adapter + AI Settings admin tool, OpenRouter/GLM 5.2 support), unified AI-draft surface, QR deep links + read-aloud + draft triage, and a builder tree-rail navigation overhaul. Phase 27 (2026-07-12) retroactively formalized the AI provider layer: 27-SPEC.md as-built doc, AIPS-* requirement traceability, unit test backfill, and an org-scope write-isolation regression for `setAiModelSetting`. No active phase queued — next milestone/phase TBD. Source of truth `.planning/PRODUCT-ROADMAP.md` v0.3.*
