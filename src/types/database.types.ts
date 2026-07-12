@@ -1167,14 +1167,18 @@ export type Database = {
           flow_graph: Json | null
           id: string
           is_ocr: boolean
+          last_reviewed_at: string | null
+          last_reviewed_by: string | null
           organisation_id: string
           overall_confidence: number | null
+          owner_user_id: string | null
           parent_sop_id: string | null
           parse_notes: string | null
           pipeline_run_id: string | null
           published_at: string | null
           related_sops: string[] | null
           required_certifications: string[] | null
+          review_due_at: string | null
           revision_date: string | null
           sop_number: string | null
           source_file_name: string
@@ -1197,14 +1201,18 @@ export type Database = {
           flow_graph?: Json | null
           id?: string
           is_ocr?: boolean
+          last_reviewed_at?: string | null
+          last_reviewed_by?: string | null
           organisation_id: string
           overall_confidence?: number | null
+          owner_user_id?: string | null
           parent_sop_id?: string | null
           parse_notes?: string | null
           pipeline_run_id?: string | null
           published_at?: string | null
           related_sops?: string[] | null
           required_certifications?: string[] | null
+          review_due_at?: string | null
           revision_date?: string | null
           sop_number?: string | null
           source_file_name: string
@@ -1227,14 +1235,18 @@ export type Database = {
           flow_graph?: Json | null
           id?: string
           is_ocr?: boolean
+          last_reviewed_at?: string | null
+          last_reviewed_by?: string | null
           organisation_id?: string
           overall_confidence?: number | null
+          owner_user_id?: string | null
           parent_sop_id?: string | null
           parse_notes?: string | null
           pipeline_run_id?: string | null
           published_at?: string | null
           related_sops?: string[] | null
           required_certifications?: string[] | null
+          review_due_at?: string | null
           revision_date?: string | null
           sop_number?: string | null
           source_file_name?: string
