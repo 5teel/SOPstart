@@ -82,10 +82,12 @@ test.describe('UX-02 — one shared admin nav', () => {
     expect(journeys).toContain("route: '/admin/settings'")
   })
 
-  test.fixme('account menu collapses to one Admin link (to /admin/sops)', () => {
-    // 30-04 scope: TopHeader ADMIN_LINKS collapse.
+  // Flipped live in 30-04: TopHeader ADMIN_LINKS collapsed to one Admin link.
+  test('account menu collapses to one Admin link (to /admin/sops)', () => {
     const src = read(TOP_HEADER)
     expect(src).toContain("'/admin/sops'")
     expect(src).not.toContain("'/admin/ai-settings'")
+    expect(src).not.toContain("'/admin/blocks'")
+    expect(src).not.toContain("'/admin/team'")
   })
 })

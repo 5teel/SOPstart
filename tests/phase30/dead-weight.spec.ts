@@ -42,11 +42,13 @@ test.describe('UX-08 — dead-weight sweep', () => {
     expect(fs.existsSync(routeDir)).toBe(false)
   })
 
-  test.fixme('fake notifications bell removed from TopHeader (NotificationBadge stays in BottomTabBar)', () => {
+  // LIVE from 30-04 Task 1: the fake bell (linked to /sops, no notifications screen) is gone.
+  test('fake notifications bell removed from TopHeader (NotificationBadge stays in BottomTabBar)', () => {
     const header = fs.readFileSync(
       path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx'), 'utf-8',
     )
     expect(header).not.toContain('NotificationBadge')
+    expect(header).not.toContain('aria-label="Notifications"')
     const tabBar = fs.readFileSync(
       path.join(ROOT, 'src', 'components', 'layout', 'BottomTabBar.tsx'), 'utf-8',
     )
@@ -60,13 +62,42 @@ test.describe('UX-08 — dead-weight sweep', () => {
     expect(src).not.toMatch(/\/\/ TODO.*useAssignedSops/)
   })
 
-  test.fixme('/pathways + /uat links live in the account menu, not primary nav', () => {
+  // LIVE from 30-04 Task 1: header consolidated (UX-01/02/08 slice).
+  test('/pathways + /uat links live in the account menu, not primary nav', () => {
     const header = fs.readFileSync(
       path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx'), 'utf-8',
     )
-    // BASE_LINKS (primary nav) no longer carries them — account menu does.
-    expect(header).toContain('/pathways')
-    expect(header).toContain('/uat')
+    // BASE_LINKS (primary nav) no longer carries them — the account-menu
+    // TOOLING_LINKS block does, and it is actually rendered (wiring, not
+    // token presence — CLAUDE.md 2026-06-05).
+    const baseLinks = header.match(/const BASE_LINKS[\s\S]*?\n\]/)?.[0] ?? ''
+    expect(baseLinks.length).toBeGreaterThan(0)
+    expect(baseLinks).not.toContain('/pathways')
+    expect(baseLinks).not.toContain('/uat')
+    const tooling = header.match(/const TOOLING_LINKS[\s\S]*?\n\]/)?.[0] ?? ''
+    expect(tooling).toContain('/pathways')
+    expect(tooling).toContain('/uat')
+    expect(header).toContain('TOOLING_LINKS.map')
+  })
+
+  // LIVE from 30-04 Task 1: nav landing model (UX-01) + one admin door (UX-02).
+  test('TopHeader has no /dashboard, brand resolves via roleHome, exactly one admin href wired', () => {
+    const header = fs.readFileSync(
+      path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx'), 'utf-8',
+    )
+    expect(header).not.toContain('/dashboard')
+    // Brand link WIRED to the role-home dispatcher, not a hardcoded route.
+    expect(header).toContain("from '@/lib/auth/role-home'")
+    expect(header).toContain('href={roleHome(role)}')
+    // Every /admin/* string in the file is /admin/sops, and the single
+    // Admin link's href is wired to it via ADMIN_LINK.
+    const adminHrefs = header.match(/\/admin\/[a-z-]+/g) ?? []
+    expect(adminHrefs.length).toBeGreaterThan(0)
+    expect(adminHrefs.every((h) => h === '/admin/sops')).toBe(true)
+    expect(header).toMatch(/const ADMIN_LINK[^\n]*'\/admin\/sops'/)
+    expect(header).toContain('href={ADMIN_LINK.href}')
+    // Visibility gate preserved (T-30-04-01): the link renders inside isAdmin.
+    expect(header).toContain('isAdminRole(role)')
   })
 
   test.fixme('journeys.ts contains no removed routes (/pathways shows 0 not-mapped)', () => {

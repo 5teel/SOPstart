@@ -58,8 +58,8 @@ test.describe('UX-01 — one home per role', () => {
     expect(src).not.toContain("redirect('/dashboard')")
   })
 
-  // Flips live in 30-04 (TopHeader/BottomTabBar nav repoint is that plan's scope).
-  test.fixme('TopHeader has zero /dashboard hrefs (brand + BASE_LINKS repointed)', () => {
+  // Flipped live in 30-04 (TopHeader/BottomTabBar nav repoint).
+  test('TopHeader has zero /dashboard hrefs (brand + BASE_LINKS repointed)', () => {
     const src = read(TOP_HEADER)
     expect(src).not.toContain("'/dashboard'")
     expect(src).not.toContain('"/dashboard"')

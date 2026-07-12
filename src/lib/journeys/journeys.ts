@@ -226,10 +226,10 @@ export const JOURNEYS: Journey[] = [
     group: 'Create an SOP',
     persona: 'SOP Admin',
     title: 'Switch into admin tools',
-    summary: 'An admin signs in and lands directly on the admin SOP library (UX-01 one home per role). Worker surfaces remain reachable from the primary nav, but admin tooling is the default landing for admins.',
+    summary: 'An admin signs in and lands directly on the admin SOP library (UX-01 one home per role). Worker surfaces remain reachable from the primary nav; from any worker surface, the account menu’s single "Admin" link returns here (UX-02 one door to admin).',
     steps: [
       { id: 's', type: 'start', label: 'Signed in as admin / safety manager' },
-      { id: 'home', type: 'screen', label: 'Admin home — SOP library', route: '/admin/sops', detail: 'roleHome(admin) lands here. Worker surfaces (SOPs · Activity) stay one tap away in the primary nav.' },
+      { id: 'home', type: 'screen', label: 'Admin home — SOP library', route: '/admin/sops', detail: 'roleHome(admin) lands here — the brand mark and the account menu’s one "Admin" link both resolve here too. Worker surfaces (SOPs · Activity) stay one tap away in the primary nav.' },
       { id: 'menu', type: 'decision', label: 'Open another admin surface? (shared AdminNav: SOPs · Governance · Blocks · Team · Settings)', branches: [
         { label: 'SOPs', to: 'sops' },
         { label: 'Governance (SOPs needing attention)', to: 'sops' },
@@ -503,6 +503,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'The team reviews design directions and before/after changes and leaves structured feedback for analysis.',
     steps: [
       { id: 's', type: 'start', label: 'Asked to review' },
+      { id: 'menu', type: 'action', label: 'Open the account menu', detail: 'Pathways + Feedback live under the avatar menu — internal team tooling, out of the primary nav (UX-08).' },
       { id: 'paths', type: 'screen', label: 'Review current workflows', route: '/pathways', detail: 'See how the app works today (this page).' },
       { id: 'uat', type: 'screen', label: 'Feedback hub', route: '/uat' },
       { id: 'open', type: 'action', label: 'Open a test → compare before/after' },
