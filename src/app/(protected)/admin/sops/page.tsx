@@ -7,7 +7,10 @@ import { StatusBadge } from '@/components/admin/StatusBadge'
 import { DeleteSopButton } from '@/components/admin/DeleteSopButton'
 import { VideoJobIndicator } from '@/components/admin/VideoJobIndicator'
 import { SopDepartmentEditor } from '@/components/admin/sop/SopDepartmentEditor'
+import { LibraryReviewCell } from '@/components/admin/sops/LibraryReviewCell'
+import { GovernanceWidget } from '@/components/admin/governance/GovernanceWidget'
 import { listDepartments } from '@/actions/departments'
+import { getTeamMembersWithEmails } from '@/actions/auth'
 import type { SopStatus } from '@/types/sop'
 
 export const metadata: Metadata = {
@@ -32,7 +35,7 @@ function formatDate(iso: string): string {
 export default async function SopsLibraryPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>
+  searchParams: Promise<{ status?: string; owner?: string }>
 }) {
   const supabase = await createClient()
 
@@ -51,18 +54,21 @@ export default async function SopsLibraryPage({
 
   const params = await searchParams
   const activeStatus = params.status ?? 'all'
+  const ownerOnly = params.owner === 'me'
+
+  const SOP_SELECT = 'id, title, sop_number, category, status, source_file_name, source_type, created_at, updated_at, published_at, all_departments, overall_confidence, parse_notes, owner_user_id, review_due_at'
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let query: any = supabase
     .from('sops')
-    .select('id, title, sop_number, category, status, source_file_name, source_type, created_at, updated_at, published_at, all_departments, overall_confidence, parse_notes')
+    .select(SOP_SELECT)
     .order('created_at', { ascending: false })
 
   if (activeStatus === 'draft') {
     // Triage ordering: worst parses first (lowest confidence, unparsed on top).
     query = supabase
       .from('sops')
-      .select('id, title, sop_number, category, status, source_file_name, source_type, created_at, updated_at, published_at, all_departments, overall_confidence, parse_notes')
+      .select(SOP_SELECT)
       .eq('status', 'draft')
       .order('overall_confidence', { ascending: true, nullsFirst: true })
   } else if (activeStatus !== 'all' && activeStatus !== 'failed') {
@@ -71,7 +77,21 @@ export default async function SopsLibraryPage({
     query = query.in('status', ['uploading', 'parsing'])
   }
 
+  // OWN-04/D28-08: "Owned by me" filter — a chip on the existing library, not a new page.
+  if (ownerOnly) {
+    query = query.eq('owner_user_id', user.id)
+  }
+
   const { data: sops } = await query
+
+  // Owner display labels (email/role), reusing the existing team fetcher — no new member query.
+  const teamResult = await getTeamMembersWithEmails()
+  const ownerLabelById: Record<string, string> = {}
+  if (!('error' in teamResult)) {
+    for (const m of teamResult.members) {
+      ownerLabelById[m.user_id] = m.email ?? `${m.role} (${m.user_id.slice(0, 8)})`
+    }
+  }
 
   // Phase 25: department tagging for existing SOPs. Fetch the org's departments
   // and each listed SOP's current sop_departments so each row can be re-tagged inline.
@@ -102,6 +122,7 @@ export default async function SopsLibraryPage({
             </div>
             <h1 className="mono text-2xl font-semibold text-[var(--ink-900)]">SOPs</h1>
           </div>
+          <GovernanceWidget />
           <div className="flex items-center gap-2 flex-wrap">
             <Link
               href="/admin/sops/upload"
@@ -164,6 +185,13 @@ export default async function SopsLibraryPage({
               </Link>
             )
           })}
+          <Link
+            href="/admin/sops?owner=me"
+            className="tab"
+            data-active={ownerOnly ? 'true' : undefined}
+          >
+            Owned by me
+          </Link>
         </div>
 
         {/* Draft triage strip — surfaced on the All tab so review work is never invisible */}
@@ -266,6 +294,11 @@ export default async function SopsLibraryPage({
                       allDepartments={sop.all_departments ?? false}
                     />
                   </div>
+                  <LibraryReviewCell
+                    sopId={sop.id}
+                    ownerLabel={sop.owner_user_id ? (ownerLabelById[sop.owner_user_id] ?? 'No owner') : null}
+                    reviewDueAt={sop.review_due_at}
+                  />
                   </div>
                   {sop.status === 'published' && (
                     <VideoJobIndicator sopId={sop.id} />

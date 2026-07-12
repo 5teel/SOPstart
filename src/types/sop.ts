@@ -70,6 +70,13 @@ export interface Sop {
   category_tag: string | null
   created_at: string
   updated_at: string
+  // Phase 28: ownership + review lifecycle (D28-01/D28-03). Additive, nullable,
+  // optional (like pipeline_run_id above) so existing partial Sop fixtures/mocks
+  // across the codebase don't need updating for this additive extension.
+  owner_user_id?: string | null
+  review_due_at?: string | null
+  last_reviewed_at?: string | null
+  last_reviewed_by?: string | null
 }
 
 export interface SopSection {
