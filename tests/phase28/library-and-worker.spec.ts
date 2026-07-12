@@ -10,11 +10,14 @@
  *     this admin-library-only badge is the sole place that guard may exist.
  *   GQ-04/D28-09: GovernanceWidget counts from listGovernanceQueue and
  *     deep-links all three flags to /admin/governance?filter=.
- *   REV-03/D28-07: OverviewTab contains the "Current as of" caption and
- *     contains NO review_due_at conditional/gate anywhere (hard rule).
- *   REV-02/D28-07: the worker walkthrough route and worker SOP detail route
- *     contain no review_due_at/owner_user_id gating branch — governance never
- *     blocks worker read/walkthrough access.
+ *   REV-03/D28-07: ReadTab (Phase 30 merged Overview+Tools+Hazards) contains
+ *     the "Current as of" caption and contains NO review_due_at
+ *     conditional/gate anywhere (hard rule). Repointed from OverviewTab in
+ *     30-06 (UX-05 tab merge).
+ *   REV-02/D28-07: the worker SOP detail route contains no
+ *     review_due_at/owner_user_id gating branch — governance never blocks
+ *     worker read/walkthrough access. (The /sops/[sopId]/walkthrough redirect
+ *     route was deleted in 30-06; walkthrough now lives on ?tab=walk.)
  *
  * Registration: playwright.config.ts `phase28` project
  *   testDir: '.', testMatch: /tests\/phase28\/.*\.(spec|test)\.ts$/
@@ -29,8 +32,7 @@ const ROOT = process.cwd()
 const LIBRARY_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'page.tsx')
 const REVIEW_CELL = path.join(ROOT, 'src', 'components', 'admin', 'sops', 'LibraryReviewCell.tsx')
 const WIDGET = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceWidget.tsx')
-const OVERVIEW_TAB = path.join(ROOT, 'src', 'components', 'sop', 'tabs', 'OverviewTab.tsx')
-const WORKER_WALKTHROUGH = path.join(ROOT, 'src', 'app', '(protected)', 'sops', '[sopId]', 'walkthrough', 'page.tsx')
+const READ_TAB = path.join(ROOT, 'src', 'components', 'sop', 'tabs', 'ReadTab.tsx')
 const WORKER_SOP_DETAIL = path.join(ROOT, 'src', 'app', '(protected)', 'sops', '[sopId]', 'page.tsx')
 
 function read(p: string): string {
@@ -101,11 +103,11 @@ test.describe('GovernanceWidget — counts + deep links', () => {
 })
 
 // ---------------------------------------------------------------------------
-// OverviewTab.tsx — REV-03/D28-07 worker no-gate hard rule
+// ReadTab.tsx — REV-03/D28-07 worker no-gate hard rule (merged tab, Phase 30)
 // ---------------------------------------------------------------------------
 
-test.describe('OverviewTab — passive currency caption, no gate (D28-07)', () => {
-  const src = read(OVERVIEW_TAB)
+test.describe('ReadTab — passive currency caption, no gate (D28-07)', () => {
+  const src = read(READ_TAB)
 
   test('renders exactly one "Current as of" caption', () => {
     expect(src).toContain('Current as of')
@@ -126,12 +128,7 @@ test.describe('OverviewTab — passive currency caption, no gate (D28-07)', () =
 // Worker routes — REV-02/D28-07 no-block hard rule
 // ---------------------------------------------------------------------------
 
-test.describe('Worker walkthrough + SOP detail routes — no governance gate', () => {
-  test('walkthrough route contains no review_due_at/owner_user_id gate', () => {
-    const src = read(WORKER_WALKTHROUGH)
-    expect(src).not.toMatch(GATE_PATTERN)
-  })
-
+test.describe('Worker SOP detail route — no governance gate', () => {
   test('worker SOP detail route contains no review_due_at/owner_user_id gate', () => {
     const src = read(WORKER_SOP_DETAIL)
     expect(src).not.toMatch(GATE_PATTERN)

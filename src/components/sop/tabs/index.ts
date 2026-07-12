@@ -1,7 +1,2 @@
 export * from './ReadTab'
-export * from './OverviewTab'
-export * from './ToolsTab'
-export * from './HazardsTab'
 export * from './FlowTab'
-export * from './ModelTab'
-export * from './WalkthroughTab'

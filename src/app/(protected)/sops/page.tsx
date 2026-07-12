@@ -10,7 +10,6 @@ import {
   RefreshCw,
   Plus,
   Minus,
-  Upload,
   FileText,
   BookOpen,
   Loader2,
@@ -55,23 +54,6 @@ export default function SopsPage() {
   const { data: assignedSops = [], isLoading: assignedLoading } = useAssignedSops()
   const { data: searchResults = [] } = useAssignedSops({ search: searchTerm || undefined })
 
-  const { data: userRole } = useQuery({
-    queryKey: ['user-role'],
-    queryFn: async () => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return null
-      const { data } = await supabase
-        .from('organisation_members')
-        .select('role')
-        .eq('user_id', user.id)
-        .maybeSingle() as { data: { role: string } | null }
-      return data?.role ?? null
-    },
-    staleTime: 1000 * 60 * 10,
-  })
-  const isAdmin = userRole === 'admin' || userRole === 'safety_manager'
-
   // Fetch departments from Supabase for the filter panel.
   const { data: departments = [] } = useQuery<Department[]>({
     queryKey: ['departments'],
@@ -88,17 +70,31 @@ export default function SopsPage() {
     staleTime: 1000 * 60 * 5,
   })
 
-  // Client-side department filter applied on top of the RLS-gated assigned SOPs.
+  // Phase 30 UX-08: real client-side department filter (was a no-op placebo).
+  // sop_departments has SELECT using(true) for authenticated (migration 00035,
+  // live-verified 2026-07-12) so workers can read the junction directly. Actual
+  // visibility is still gated by sops_visible_by_department RLS on sops itself.
+  const { data: sopDeptMap = {} } = useQuery<Record<string, string[]>>({
+    queryKey: ['sop-departments-map'],
+    queryFn: async () => {
+      const supabase = createClient()
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data } = await (supabase as any)
+        .from('sop_departments')
+        .select('sop_id, department_id') as { data: Array<{ sop_id: string; department_id: string }> | null }
+      const map: Record<string, string[]> = {}
+      for (const row of data ?? []) {
+        ;(map[row.sop_id] ??= []).push(row.department_id)
+      }
+      return map
+    },
+    staleTime: 1000 * 60 * 5,
+  })
+
   // If no departments selected (and not allDepartments), show all.
   const filteredSops = (allDepartments || selectedDeptIds.length === 0)
     ? assignedSops
-    : (assignedSops ?? []).filter(() => {
-        // Department filtering is done at the RLS level (sops_visible_by_department).
-        // The client-side filter here is a UI affordance to narrow what's shown.
-        // Without sop_departments join in the hook result, we fall back to showing all.
-        // TODO: extend useAssignedSops to accept departmentIds when backend support is ready.
-        return true
-      })
+    : assignedSops.filter((sop) => (sopDeptMap[sop.id] ?? []).some((id) => selectedDeptIds.includes(id)))
 
   const { data: lastSyncMeta } = useQuery({
     queryKey: ['sync-meta-last-sync'],
@@ -139,17 +135,8 @@ export default function SopsPage() {
         </button>
       </header>
 
-      {/* Section tabs */}
+      {/* Section tabs — UX-04: no worker-side "Create SOP" entry (admins create via admin nav) */}
       <nav className="flex border-b border-[var(--ink-100)] px-4 gap-1">
-        {isAdmin && (
-          <Link
-            href="/admin/sops/upload"
-            className="flex items-center gap-2 px-4 py-3 text-sm font-medium text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors whitespace-nowrap"
-          >
-            <Upload size={16} />
-            <span>Create SOP</span>
-          </Link>
-        )}
         <button
           type="button"
           onClick={() => setActiveSection('your-sops')}
