@@ -212,6 +212,29 @@ export default defineConfig({
       testMatch: /.*\.test\.ts$/,
     },
     {
+      // Phase 27 — AI Provider & Settings unit tests (pure modules; static imports).
+      //
+      // CLAUDE.md 2026-04-24: dynamic import('@/...') fails in Playwright Node runner
+      // outside a testDir-scoped project — use STATIC @/ imports here.
+      // testDir: './src/lib/ai/__tests__' so Playwright's TS compiler resolves
+      // @/ path aliases (mirrors phase23-unit pattern for ai-fields/__tests__).
+      //
+      // Verify: `npx playwright test --list --project=phase27-unit`
+      name: 'phase27-unit',
+      testDir: './src/lib/ai/__tests__',
+      testMatch: /.*\.test\.ts$/,
+    },
+    {
+      // Phase 27 — ai_model_settings org-scope regression (live Supabase integration).
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      //
+      // Verify: `npx playwright test --list --project=phase27-stubs`
+      name: 'phase27-stubs',
+      testDir: '.',
+      testMatch: /tests\/phase27\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
+    {
       // Phase 26 — SOP Builder Redesign Nyquist harness (Wave 1 / Plan 26-02).
       //
       // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
