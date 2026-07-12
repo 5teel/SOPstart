@@ -106,7 +106,7 @@ export async function POST(
   }
 
   // 3. Publish
-  const { error: publishError } = await supabase
+  const { data: publishedRows, error: publishError } = await supabase
     .from('sops')
     .update({
       status: 'published',
@@ -115,9 +115,18 @@ export async function POST(
     })
     .eq('id', sopId)
     .eq('status', 'draft') // Only publish drafts
+    .select('id')
 
   if (publishError) {
     return NextResponse.json({ error: 'Failed to publish SOP' }, { status: 500 })
+  }
+
+  // Updating 0 rows is NOT a PostgREST error — a replayed/duplicate publish of
+  // an already-published SOP would otherwise fall through and corrupt the audit
+  // trail (false 'superseded' event) + reset the review clock without a review
+  // (MR-01). Short-circuit before step 3b when nothing transitioned.
+  if (!publishedRows || publishedRows.length === 0) {
+    return NextResponse.json({ error: 'SOP is not a draft' }, { status: 409 })
   }
 
   // 3b. Phase 28 D28-04 — review-clock reset on publish. Non-fatal: the
