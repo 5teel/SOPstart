@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from '@/actions/auth'
-import { NotificationBadge } from '@/components/layout/NotificationBadge'
+import { roleHome } from '@/lib/auth/role-home'
 import { PRODUCT_NAME } from '@/lib/constants'
 
 function BrandMark({ className }: { className?: string }) {
@@ -143,22 +143,23 @@ interface NavLink {
 // Primary nav is identical for everyone: an admin's default pathways mirror a
 // worker's. Clicking "SOPs" goes to the worker library (/sops), so selecting a
 // SOP opens the worker view (overview + walkthrough), not the admin builder.
+// Each role's home is the brand link (roleHome); internal team tooling
+// (Pathways / Feedback) lives in the account menu, not here (UX-08).
 const BASE_LINKS: NavLink[] = [
-  { label: 'Dashboard', href: '/dashboard' },
   { label: 'SOPs', href: '/sops' },
   { label: 'Activity', href: '/activity' },
-  { label: 'Pathways', href: '/pathways' },
-  { label: 'Feedback', href: '/uat' },
 ]
 
-// Admin-only destinations — reached deliberately via the account menu, never the
-// default nav. Going "off path" into admin tooling must be a conscious choice.
-// Gate mirrors the server-side admin/builder gate (['admin','safety_manager']).
-const ADMIN_LINKS: NavLink[] = [
-  { label: 'Manage SOPs', href: '/admin/sops' },
-  { label: 'Blocks', href: '/admin/blocks' },
-  { label: 'Team', href: '/admin/team' },
-  { label: 'AI Settings', href: '/admin/ai-settings' },
+// One door to admin (UX-02): a single account-menu link into /admin/sops,
+// where the shared AdminNav takes over. Visibility gate mirrors the
+// server-side admin/builder gate (['admin','safety_manager']) — every admin
+// page keeps its own server guard; hiding the link is not access control.
+const ADMIN_LINK: NavLink = { label: 'Admin', href: '/admin/sops' }
+
+// Team tooling — kept, but reached via the account menu (UX-08).
+const TOOLING_LINKS: NavLink[] = [
+  { label: 'Pathways', href: '/pathways' },
+  { label: 'Feedback', href: '/uat' },
 ]
 
 function isAdminRole(role: Role): boolean {
@@ -166,7 +167,6 @@ function isAdminRole(role: Role): boolean {
 }
 
 function isActive(pathname: string, href: string): boolean {
-  if (href === '/dashboard') return pathname === '/dashboard' || pathname === '/'
   return pathname === href || pathname.startsWith(href + '/')
 }
 
@@ -222,7 +222,7 @@ export function TopHeader({ role, userEmail }: TopHeaderProps) {
         </button>
 
         <Link
-          href="/dashboard"
+          href={roleHome(role)}
           className="flex items-center gap-2 text-[var(--ink-900)] focus-visible:outline-2 focus-visible:outline-[var(--ink-900)] focus-visible:outline-offset-2 rounded-sm"
           aria-label={`${PRODUCT_NAME} — home`}
         >
@@ -255,28 +255,6 @@ export function TopHeader({ role, userEmail }: TopHeaderProps) {
         <div className="flex-1 md:hidden" />
 
         <div className="flex items-center gap-1">
-          <Link
-            href="/sops"
-            className="relative inline-flex h-10 w-10 items-center justify-center rounded-md text-[var(--ink-700)] hover:bg-[var(--paper-2)] focus-visible:outline-2 focus-visible:outline-[var(--ink-900)] focus-visible:outline-offset-2"
-            aria-label="Notifications"
-          >
-            <NotificationBadge />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-5 w-5"
-              aria-hidden="true"
-            >
-              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-              <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
-            </svg>
-          </Link>
-
           <div ref={menuRef} className="relative">
             <button
               type="button"
@@ -305,23 +283,30 @@ export function TopHeader({ role, userEmail }: TopHeaderProps) {
                 )}
                 {isAdmin && (
                   <div className="border-b border-[var(--ink-100)] py-1">
-                    <p className="px-3 pb-1 pt-1 mono text-[10px] uppercase tracking-wider text-[var(--ink-500)]">
-                      Admin tools
-                    </p>
-                    {ADMIN_LINKS.map((link) => (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        role="menuitem"
-                        onClick={() => setMenuOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--ink-900)] hover:bg-[var(--paper-2)]"
-                      >
-                        <WrenchIcon className="h-4 w-4 text-[var(--ink-500)]" />
-                        {link.label}
-                      </Link>
-                    ))}
+                    <Link
+                      href={ADMIN_LINK.href}
+                      role="menuitem"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--ink-900)] hover:bg-[var(--paper-2)]"
+                    >
+                      <WrenchIcon className="h-4 w-4 text-[var(--ink-500)]" />
+                      {ADMIN_LINK.label}
+                    </Link>
                   </div>
                 )}
+                <div className="border-b border-[var(--ink-100)] py-1">
+                  {TOOLING_LINKS.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      role="menuitem"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--ink-900)] hover:bg-[var(--paper-2)]"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
                 <Link
                   href="/profile"
                   role="menuitem"
