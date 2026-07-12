@@ -5,7 +5,7 @@ milestone_name: — SOP Ownership & Governance Infrastructure
 current_plan: 1
 status: executing
 stopped_at: Completed 30-02-PLAN.md
-last_updated: "2026-07-12T15:08:24.554Z"
+last_updated: "2026-07-12T15:08:44.525Z"
 last_activity: 2026-07-12 -- Phase 30 execution started
 progress:
   total_phases: 4
@@ -348,6 +348,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 30-01]: D-21-09 source-viewer isolation is enforced by check-bundle-size.ts pdfjs/mammoth worker-chunk scan, not a dynamic( token — ReviewStation statically imports SourceViewerPane (admin-only route); scp specs assert the scan
 - [Phase 30]: auth.ts dispatches via roleHome directly (role in hand at signIn/join/acceptInvite) instead of hopping through the /dashboard shim
 - [Phase 30]: roleHome fallback for absent/unknown role is /pending (truthful holding screen), not /sops
+- [Phase 30]: 30-03 AdminNav active keys — departments page passes active="settings" (Settings hub is its home), governance page passes active="sops" (view of SOPs)
+- [Phase 30]: 30-03 live admin-nav spec drops the stub's ApprovalChainEditor-in-settings assertion — panel relocation is 30-08 scope
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
