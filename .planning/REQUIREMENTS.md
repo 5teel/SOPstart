@@ -512,3 +512,83 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *v5.0 requirements added: 2026-07-12*
+
+---
+
+## v6.0 Requirements — SOP Ownership & Governance Infrastructure
+
+**Defined:** 2026-07-12
+**Milestone Goal:** Every SOP gets an accountable owner and a review lifecycle; admins get one glanceable governance queue; completions become exportable training evidence — with zero added shop-floor friction.
+
+**NORTH STAR (locked by Simon 2026-07-12):** Ease of use and maintenance FIRST. Process and blockers must never be prioritised over ease of use. SOPstart wins on (1) accuracy of SOP documentation and (2) ease of use by the people on the shop floor. Governance, ownership, and training records exist ONLY in service of those two things.
+
+**Primary source:** Visy interview findings (`.planning/research/customer-interviews/2026-05-05-visy-findings.md`) — pain #1: "I can't give you one person that's in charge of SOPs… there isn't anybody."
+
+### Ownership (OWN)
+
+- [ ] **OWN-01**: Every SOP displays a single accountable owner; existing SOPs are auto-backfilled with a sensible default (creator, else org admin) — no manual data-entry campaign
+- [ ] **OWN-02**: Admin can reassign an SOP's owner in ≤2 clicks from the SOP itself (library row or builder/detail), not a buried settings page
+- [ ] **OWN-03**: SOPs whose owner is deactivated or removed from the org surface automatically in the governance queue as "unowned" — never silently orphaned
+- [ ] **OWN-04**: An owner sees a "My SOPs" view listing the SOPs they own with review status at a glance
+
+### Review Lifecycle (REV)
+
+- [ ] **REV-01**: Each SOP has a review-due date derived from a per-category default cadence, overridable per SOP; existing SOPs auto-backfill (published/updated date + category cadence)
+- [ ] **REV-02**: Overdue SOPs show a visible "review overdue" state in the admin library (grey-out/badge) — worker read/walkthrough access is NEVER blocked by review state
+- [ ] **REV-03**: Workers see a lightweight currency indicator ("current as of <date>") on the SOP view — informational only, zero interaction cost
+- [ ] **REV-04**: Marking an SOP reviewed is one click ("Confirm current" → resets review-due) or routes into the existing edit → version-supersede flow when changes are needed
+- [ ] **REV-05**: AI maintenance schedule — prioritized review plan (ranked by staleness, usage, reviewer flags) on the governance dashboard, powered by the existing AI adapter + agent metadata layer
+
+### Governance Queue (GQ)
+
+- [ ] **GQ-01**: One unified governance queue for admins showing due-soon, overdue, unowned, and stale-role items — a single glanceable surface, no separate consoles
+- [ ] **GQ-02**: Every queue row has a one-click primary action inline (confirm current / assign owner / open in builder / fix assignment)
+- [ ] **GQ-03**: When a role or department referenced by an SOP's assignments is renamed or removed, affected SOPs surface in the governance queue as stale-role items
+- [ ] **GQ-04**: Governance dashboard widget on the admin home shows queue counts (overdue / unowned / awaiting approval) with deep links into the queue
+
+### Approval Chains (APR)
+
+- [ ] **APR-01**: Admin can define an optional approval chain (1–4 ordered approver steps, by role or named member) per SOP category; categories without a chain publish exactly as today
+- [ ] **APR-02**: The chain is snapshotted per SOP version — a new version can carry an adjusted chain; historical versions keep the chain they were approved under
+- [ ] **APR-03**: Approvers approve or request changes in one click from the SOP itself and from the governance queue — no separate approval console
+- [ ] **APR-04**: When a chain exists, publish completes automatically after final approval; pending state (who's next) visible on the SOP and in the queue
+- [ ] **APR-05**: Approval history (who, when, which version) visible in the existing version history surface
+
+### Training Records (TRN)
+
+- [ ] **TRN-01**: Per-worker training record view — SOP completions rendered as training evidence (SOP, version completed, date, sign-off chain) built on existing completion data
+- [ ] **TRN-02**: Admin can export training records as CSV (filterable by worker, SOP, department, date range)
+- [ ] **TRN-03**: SOP detail (admin) shows who has completed the current version vs a prior version — surfacing workers "trained on an outdated version" after a supersede
+
+### v6.0 Future Requirements (deferred)
+
+- Success Factors / HRIS API integration (CSV export covers the need)
+- Email/digest notifications for review-due and approval-pending (in-app queue first)
+- Cross-site "Discipline Leader" approver role (needs multi-site customer signal)
+- Per-site governance queue rollups (await customer pull)
+
+### v6.0 Out of Scope
+
+| Exclusion | Reason |
+|---|---|
+| Mandatory approval chains | North star: process never beats ease of use; chains are opt-in per category |
+| Blocking worker access to overdue/unreviewed SOPs | A stale SOP a worker can read beats no SOP; accuracy is signalled, never gated |
+| Data-entry campaign on existing SOPs | Owners and review dates auto-backfill from existing data |
+| HRIS/ERP API integration | Existing PROJECT.md exclusion stands; CSV export satisfies training-evidence need |
+| New identity/auth hardening (PIN/badge) | Separate concern (W-05 backlog); not governance |
+| Incident reporting / near-miss capture | Organisational culture problem per Visy §9 — software won't fix it |
+
+### v6.0 Traceability
+
+<!-- Filled by roadmapper: REQ-ID → Phase mapping -->
+
+| REQ-ID | Phase | Status |
+|--------|-------|--------|
+| OWN-01..04 | TBD | Pending |
+| REV-01..05 | TBD | Pending |
+| GQ-01..04 | TBD | Pending |
+| APR-01..05 | TBD | Pending |
+| TRN-01..03 | TBD | Pending |
+
+---
+*v6.0 requirements added: 2026-07-12*
