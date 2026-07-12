@@ -12,14 +12,15 @@ export async function GovernanceWidget() {
   const result = await listGovernanceQueue()
   if ('error' in result) return null
 
-  const counts = { overdue: 0, unowned: 0, due_soon: 0 }
+  const counts = { overdue: 0, unowned: 0, due_soon: 0, awaiting_approval: 0 }
   for (const row of result.rows) {
     if (row.flags.includes('overdue')) counts.overdue++
     if (row.flags.includes('unowned')) counts.unowned++
     if (row.flags.includes('due_soon')) counts.due_soon++
+    if (row.flags.includes('awaiting_approval')) counts.awaiting_approval++
   }
 
-  const total = counts.overdue + counts.unowned + counts.due_soon
+  const total = counts.overdue + counts.unowned + counts.due_soon + counts.awaiting_approval
   if (total === 0) {
     return (
       <div className="blueprint-frame px-3 py-2 flex items-center">
@@ -47,6 +48,12 @@ export async function GovernanceWidget() {
         className="mono text-[11px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-700"
       >
         {counts.due_soon} due soon
+      </Link>
+      <Link
+        href="/admin/governance?filter=awaiting_approval"
+        className="mono text-[11px] px-1.5 py-0.5 rounded bg-[var(--accent-signoff)]/20 text-[var(--accent-signoff)]"
+      >
+        {counts.awaiting_approval} awaiting approval
       </Link>
     </div>
   )

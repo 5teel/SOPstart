@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { confirmSopCurrent } from '@/actions/governance'
 import type { GovernanceRow } from '@/actions/governance'
+import { approveStep } from '@/actions/approvals'
 import { OwnerPicker } from './OwnerPicker'
 
 const FLAG_STYLE: Record<GovernanceRow['flags'][number], string> = {
@@ -12,9 +13,6 @@ const FLAG_STYLE: Record<GovernanceRow['flags'][number], string> = {
   due_soon: 'bg-amber-500/20 text-amber-700',
   unowned: 'bg-[var(--paper-2)] text-[var(--ink-500)]',
   stale_role: 'bg-[var(--paper-2)] text-[var(--ink-500)]',
-  // Phase 29 — backend-only this plan; the isCallerNextApprover-gated Approve
-  // action lands in a later plan (PATTERNS.md § 7). This entry only keeps the
-  // Record<GovernanceFlag, string> exhaustive now that classify.ts emits it.
   awaiting_approval: 'bg-[var(--accent-signoff)]/20 text-[var(--accent-signoff)]',
 }
 
@@ -48,6 +46,18 @@ export function GovernanceQueueRow({ row }: { row: GovernanceRow }) {
     })
   }
 
+  function handleApprove() {
+    setError(null)
+    startTransition(async () => {
+      const result = await approveStep(row.id)
+      if ('error' in result) {
+        setError(result.error)
+        return
+      }
+      router.refresh()
+    })
+  }
+
   return (
     <li className="blueprint-frame flex items-center gap-4">
       <div className="flex-1 min-w-0">
@@ -71,7 +81,16 @@ export function GovernanceQueueRow({ row }: { row: GovernanceRow }) {
       </div>
 
       <div className="flex-shrink-0">
-        {row.flags.includes('unowned') ? (
+        {row.flags.includes('awaiting_approval') && row.isCallerNextApprover ? (
+          <button
+            type="button"
+            onClick={handleApprove}
+            disabled={isPending}
+            className="evidence-btn !min-h-[36px] text-sm"
+          >
+            {isPending ? 'Approving…' : 'Approve'}
+          </button>
+        ) : row.flags.includes('unowned') ? (
           <OwnerPicker sopId={row.id} ownerUserId={row.ownerUserId} ownerLabel={row.ownerLabel} />
         ) : row.flags.includes('stale_role') ? (
           <Link href={`/admin/sops/${row.id}/assign`} className="evidence-btn !min-h-[36px] text-sm">

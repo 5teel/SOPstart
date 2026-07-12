@@ -57,6 +57,7 @@ export default async function GovernancePage({
     due_soon: flaggedRows.filter((r) => r.flags.includes('due_soon')).length,
     unowned: flaggedRows.filter((r) => r.flags.includes('unowned')).length,
     stale_role: flaggedRows.filter((r) => r.flags.includes('stale_role')).length,
+    awaiting_approval: flaggedRows.filter((r) => r.flags.includes('awaiting_approval')).length,
   }
 
   const visibleRows = activeFilter === 'all' ? flaggedRows : flaggedRows.filter((r) => r.flags.includes(activeFilter))

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-export type GovernanceFilter = 'all' | 'overdue' | 'due_soon' | 'unowned' | 'stale_role'
+export type GovernanceFilter = 'all' | 'overdue' | 'due_soon' | 'unowned' | 'stale_role' | 'awaiting_approval'
 
 const CHIPS: { label: string; value: GovernanceFilter }[] = [
   { label: 'All', value: 'all' },
@@ -8,6 +8,7 @@ const CHIPS: { label: string; value: GovernanceFilter }[] = [
   { label: 'Due soon', value: 'due_soon' },
   { label: 'Unowned', value: 'unowned' },
   { label: 'Stale-role', value: 'stale_role' },
+  { label: 'Awaiting approval', value: 'awaiting_approval' },
 ]
 
 export function GovernanceFilterChips({
