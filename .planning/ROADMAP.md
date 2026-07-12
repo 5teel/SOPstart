@@ -45,11 +45,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Goal:** Retroactively formalize the AI provider/model-selection arc that shipped ad-hoc 2026-07-06/07 (`src/lib/ai/registry.ts`, `src/lib/ai/llm.ts`, `AiModelSelect` + `/admin/ai-settings` (migration 00042), the R&D-validated grounding prompt + title-naming guard in `sop-parser.ts`/`sop-title.ts`): write a SPEC.md capturing the architecture as-built, add REQUIREMENTS.md traceability (AIPS-*), and close the 3 gaps the code survey found — `OPENROUTER_API_KEY` undocumented in `.env.local.example`, the `ai_model_settings` service-role write path has no test proving org self-enforcement (same class as the 2026-06-15 cross-tenant learning), and the whole arc currently has zero automated test coverage.
 **Requirements**: AIPS-REG-01, AIPS-REG-02, AIPS-SET-01, AIPS-SET-02, AIPS-PROMPT-01, AIPS-PARSE-01, AIPS-TITLE-01, AIPS-GAP-01, AIPS-GAP-02, AIPS-GAP-03
 **Depends on:** Phase 26, Phase 26.5
-**Plans:** 1 plan / 1 wave
+**Plans:** 1/1 plans complete
 
 Plans:
 
-- [ ] 27-01-PLAN.md — SPEC.md as-built + REQUIREMENTS traceability + phase27-unit/phase27-stubs Playwright projects + OPENROUTER_API_KEY doc + registry/llm-routing/title-guard unit tests + ai_model_settings org-scope runtime regression (Wave 1)
+- [x] 27-01-PLAN.md — SPEC.md as-built + REQUIREMENTS traceability + phase27-unit/phase27-stubs Playwright projects + OPENROUTER_API_KEY doc + registry/llm-routing/title-guard unit tests + ai_model_settings org-scope runtime regression (Wave 1)
 
 ---
 
