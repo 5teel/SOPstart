@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
-status: completed
-stopped_at: Phase 27 complete — 27-01 SUMMARY + VERIFICATION (PASS 10/10) + PROJECT.md evolution all committed (c29cc20). No incomplete work, no handoff, no checkpoint.
-last_updated: "2026-07-12T06:53:38.496Z"
-last_activity: 2026-07-12 — v6.0 roadmap created (Phases 28-30, 21/21 requirements mapped)
+status: executing
+stopped_at: Completed 28-01-PLAN.md - migration 00043 live, backfill executed (23/23 SOPs), Rule-1 trigger fix applied
+last_updated: "2026-07-12T07:02:01.940Z"
+last_activity: 2026-07-12 -- Phase 28 execution started
 progress:
   total_phases: 3
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 6
+  completed_plans: 1
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 28 — ownership-review-lifecycle-governance-queue
+**Current focus:** Phase 28 — Ownership + Review Lifecycle + Governance Queue
 
 ## Current Position
 
-Phase: 28 (Ownership + Review Lifecycle + Governance Queue) — not started
-Plan: —
-Status: Roadmap complete (3 phases: 28, 29, 30) — ready for /gsd-plan-phase 28
-Last activity: 2026-07-12 — v6.0 roadmap created (Phases 28-30, 21/21 requirements mapped)
+Phase: 28 (Ownership + Review Lifecycle + Governance Queue) — EXECUTING
+Plan: 2 of 6
+Status: Ready to execute
+Last activity: 2026-07-12 -- Phase 28 execution started
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
@@ -151,6 +151,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 26.5 P06 | 10m | 2 tasks | 2 files |
 | Phase 26.5 P08 | 20m | 2 tasks | 5 files |
 | Phase 27 P01 | 45min | 3 tasks | 9 files |
+| Phase 28 P01 | 25min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -309,6 +310,8 @@ Recent decisions affecting current work:
 - [Post-26.5 ad-hoc]: voice-draft flow folded into `/admin/sops/new/ai` as a mode tab (`?mode=voice`) instead of a separate route — one drafting surface, not two
 - [Phase 27]: extractJson exported from llm.ts (blocking-issue fix, no behavior change) to support the plan-mandated static-import unit test pattern
 - [Phase 27]: Runtime cross-org write-isolation assertion for setAiModelSetting carried as test.fixme (live-Supabase UAT) per Railway-only-testing convention; source-contract signature checks land green now
+- [Phase ?]: [Phase 28-01]: default_sop_owner trigger uses sops.uploaded_by (not created_by, which doesn't exist on sops)
+- [Phase ?]: [Phase 28-01]: sop_review_cadences has zero rows until Plan 28-03 writes them; backfill resolves every SOP to the 12-month default (correct per D28-03)
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -418,7 +421,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-12T03:23:28.439Z
-Stopped at: Phase 27 complete — 27-01 SUMMARY + VERIFICATION (PASS 10/10) + PROJECT.md evolution all committed (c29cc20). No incomplete work, no handoff, no checkpoint.
+Last session: 2026-07-12T07:02:01.933Z
+Stopped at: Completed 28-01-PLAN.md - migration 00043 live, backfill executed (23/23 SOPs), Rule-1 trigger fix applied
 Resume file:
 None

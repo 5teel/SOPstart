@@ -526,17 +526,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ### Ownership (OWN)
 
-- [ ] **OWN-01**: Every SOP displays a single accountable owner; existing SOPs are auto-backfilled with a sensible default (creator, else org admin) — no manual data-entry campaign
+- [x] **OWN-01**: Every SOP displays a single accountable owner; existing SOPs are auto-backfilled with a sensible default (creator, else org admin) — no manual data-entry campaign
 - [ ] **OWN-02**: Admin can reassign an SOP's owner in ≤2 clicks from the SOP itself (library row or builder/detail), not a buried settings page
 - [ ] **OWN-03**: SOPs whose owner is deactivated or removed from the org surface automatically in the governance queue as "unowned" — never silently orphaned
 - [ ] **OWN-04**: An owner sees a "My SOPs" view listing the SOPs they own with review status at a glance
 
 ### Review Lifecycle (REV)
 
-- [ ] **REV-01**: Each SOP has a review-due date derived from a per-category default cadence, overridable per SOP; existing SOPs auto-backfill (published/updated date + category cadence)
+- [x] **REV-01**: Each SOP has a review-due date derived from a per-category default cadence, overridable per SOP; existing SOPs auto-backfill (published/updated date + category cadence)
 - [ ] **REV-02**: Overdue SOPs show a visible "review overdue" state in the admin library (grey-out/badge) — worker read/walkthrough access is NEVER blocked by review state
 - [ ] **REV-03**: Workers see a lightweight currency indicator ("current as of <date>") on the SOP view — informational only, zero interaction cost
-- [ ] **REV-04**: Marking an SOP reviewed is one click ("Confirm current" → resets review-due) or routes into the existing edit → version-supersede flow when changes are needed
+- [x] **REV-04**: Marking an SOP reviewed is one click ("Confirm current" → resets review-due) or routes into the existing edit → version-supersede flow when changes are needed
 - [ ] **REV-05**: AI maintenance schedule — prioritized review plan (ranked by staleness, usage, reviewer flags) on the governance dashboard, powered by the existing AI adapter + agent metadata layer
 
 ### Governance Queue (GQ)
