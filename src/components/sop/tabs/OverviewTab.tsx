@@ -2,6 +2,14 @@
 import { BlueprintCanvas } from '@/components/ui/BlueprintCanvas'
 import type { SopWithSections } from '@/types/sop'
 
+// Phase 28 D28-07: worker-facing date formatting only — NO badge, NO warning,
+// NO conditional on review_due_at anywhere in this file. Plain informational
+// text, same visual weight as Author/Category.
+function formatNzDate(iso: string | null | undefined): string | null {
+  if (!iso) return null
+  return new Date(iso).toLocaleDateString('en-NZ', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
 function MetaRow({ label, value }: { label: string; value: string | null | undefined }) {
   if (!value) return null
   return (
@@ -44,6 +52,7 @@ export function OverviewTab({ sop }: { sop: SopWithSections }) {
             <MetaRow label="Department" value={sop.department} />
             <MetaRow label="Author" value={sop.author} />
             <MetaRow label="Revised" value={sop.revision_date} />
+            <MetaRow label="Current as of" value={formatNzDate(sop.last_reviewed_at ?? sop.published_at)} />
             <MetaRow label="Sections" value={`${totalSections} section${totalSections !== 1 ? 's' : ''}`} />
             <MetaRow label="Steps" value={`${totalSteps} step${totalSteps !== 1 ? 's' : ''}`} />
           </div>
