@@ -481,7 +481,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 **Org-Level Model Overrides:**
 
 - [x] **AIPS-SET-01**: Admin can override model selection per org for `parse-triage`/`parse-simple`/`parse-complex` use cases via `/admin/ai-settings` (shipped ad-hoc 2026-07-07)
-- [ ] **AIPS-SET-02**: `ai_model_settings` write path (`setAiModelSetting` server action, service-role per migration 00042) has a test proving org-scoping self-enforcement — same risk class as the 2026-06-15 cross-tenant admin-client learning
+- [x] **AIPS-SET-02**: `ai_model_settings` write path (`setAiModelSetting` server action, service-role per migration 00042) has a test proving org-scoping self-enforcement — same risk class as the 2026-06-15 cross-tenant admin-client learning (Phase 27: `tests/phase27/ai-settings-org-scope.spec.ts` — runtime isolation assertions carried as test.fixme, source-contract "no attack surface" assertions green)
 
 **Grounding & Parsing Hardening:**
 
@@ -491,18 +491,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 **Gaps Closed This Phase:**
 
-- [ ] **AIPS-GAP-01**: `OPENROUTER_API_KEY` documented in `.env.local.example` (currently absent despite being required by `llm.ts`)
-- [ ] **AIPS-GAP-02**: Regression test proving `ai_model_settings` writes cannot cross organisation boundaries
-- [ ] **AIPS-GAP-03**: Automated test coverage for registry resolution, `llm.ts` provider routing, and title-guard fallback chain (currently zero tests across this arc)
+- [x] **AIPS-GAP-01**: `OPENROUTER_API_KEY` documented in `.env.local.example` (currently absent despite being required by `llm.ts`) (Phase 27: `.env.local.example` OpenRouter block added)
+- [x] **AIPS-GAP-02**: Regression test proving `ai_model_settings` writes cannot cross organisation boundaries (Phase 27: `tests/phase27/ai-settings-org-scope.spec.ts`)
+- [x] **AIPS-GAP-03**: Automated test coverage for registry resolution, `llm.ts` provider routing, and title-guard fallback chain (currently zero tests across this arc) (Phase 27: `registry.test.ts`, `llm-routing.test.ts`, `sop-title.test.ts`)
 
 ### v5.0 Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AIPS-REG-01..02 (2) | Phase 27 | ✅ Already shipped — formalizing |
-| AIPS-SET-01..02 (2) | Phase 27 | AIPS-SET-01 shipped; AIPS-SET-02 pending |
-| AIPS-PROMPT-01, AIPS-PARSE-01, AIPS-TITLE-01 (3) | Phase 27 | ✅ Already shipped — formalizing |
-| AIPS-GAP-01..03 (3) | Phase 27 | Pending |
+| AIPS-REG-01..02 (2) | Phase 27 | ✅ Closed — documented + tested (27-SPEC.md, registry.test.ts, llm-routing.test.ts) |
+| AIPS-SET-01..02 (2) | Phase 27 | ✅ Closed — AIPS-SET-01 shipped ad-hoc; AIPS-SET-02 regression-locked |
+| AIPS-PROMPT-01, AIPS-PARSE-01, AIPS-TITLE-01 (3) | Phase 27 | ✅ Closed — documented (27-SPEC.md) + title-guard tested (sop-title.test.ts) |
+| AIPS-GAP-01..03 (3) | Phase 27 | ✅ Closed — env doc + org-scope regression + unit test backfill |
 
 **v5.0 Coverage:**
 
