@@ -450,6 +450,26 @@ export const JOURNEYS: Journey[] = [
   },
 
   {
+    id: 'governance-queue',
+    group: 'Library & team',
+    persona: 'SOP Admin',
+    title: 'Work the governance queue',
+    summary: 'An admin keeps every SOP owned and current from one unified queue — filter by Overdue / Due soon / Unowned / Stale-role, and act inline without leaving the page.',
+    steps: [
+      { id: 's', type: 'start', label: 'SOPs are drifting out of date or ownerless' },
+      { id: 'queue', type: 'screen', label: 'Governance queue', route: '/admin/governance', detail: 'One list, filter chips, ONE primary action per row (Confirm current / Assign owner / Fix assignment). Computed on read — no jobs, no materialized state (D28-05).' },
+      { id: 'action', type: 'decision', label: 'What does the row need?', branches: [
+        { label: 'Confirm current (overdue/due soon)', to: 'confirm' },
+        { label: 'Assign owner (unowned)', to: 'assign' },
+        { label: 'Fix assignment (stale-role)', to: 'fix' },
+      ] },
+      { id: 'confirm', type: 'action', label: 'Confirm current', detail: 'One click; stamps last_reviewed_at + resets review_due_at; appends an audited sop_review_events row (D28-04).' },
+      { id: 'assign', type: 'action', label: 'Reassign owner inline', detail: 'OwnerPicker popover — ≤2 clicks total via setSopOwner (OWN-02).' },
+      { id: 'fix', type: 'screen', label: 'Assign to team', route: '/admin/sops/[sopId]/assign', detail: 'Stale-role rows deep-link here to fix dangling/renamed department refs (GQ-03).' },
+      { id: 'e', type: 'end', label: 'Row leaves the queue' },
+    ],
+  },
+  {
     id: 'manage-departments',
     group: 'Library & team',
     persona: 'SOP Admin',
