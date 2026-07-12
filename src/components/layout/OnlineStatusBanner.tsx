@@ -21,7 +21,7 @@ export function OnlineStatusBanner() {
                  bg-[var(--accent-voice)] text-white text-sm font-medium py-2 px-4"
     >
       <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
-      Offline — changes saved locally
+      No internet — your work is saved on this device
     </div>
   )
 }

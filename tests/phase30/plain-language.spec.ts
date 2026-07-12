@@ -37,33 +37,58 @@ function read(p: string): string {
 }
 
 test.describe('UX-07 — plain-language pass (labels only)', () => {
-  test.fixme('stage chips read Edit / Check / Send to workers (BuilderStage union unchanged)', () => {
+  test('stage chips read Edit / Check / Send to workers (BuilderStage union unchanged)', () => {
     const src = read(STEPPER)
-    expect(src).toContain("'Edit'")
-    expect(src).toContain("'Check'")
-    expect(src).toContain("'Send to workers'")
+    expect(src).toContain("label: 'Edit'")
+    expect(src).toContain("label: 'Check'")
+    expect(src).toContain("label: 'Send to workers'")
+    // Engineer-speak display labels are gone.
+    expect(src).not.toContain("label: 'Build'")
+    expect(src).not.toContain("label: 'Review & verify'")
+    expect(src).not.toContain("label: 'Publish'")
     // Route/state names unchanged — the union stays.
     expect(src).toContain("'build' | 'review' | 'publish'")
+    expect(src).toContain("stage: 'build'")
+    expect(src).toContain("stage: 'review'")
+    expect(src).toContain("stage: 'publish'")
   })
 
-  test.fixme('KIND_LABEL maps all 5 reviewer kinds to plain outcomes', () => {
+  test('KIND_LABEL maps all 5 reviewer kinds to plain outcomes AND is rendered', () => {
     const src = read(FLAG_BADGE)
-    expect(src).toContain('Made-up content')
-    expect(src).toContain('Missing content')
-    expect(src).toContain('Picture not linked to its step')
-    expect(src).toContain('Table may be scrambled')
-    expect(src).toContain('Wording changed')
+    expect(src).toMatch(/KIND_LABEL:\s*Record<ReviewerFlagKind,\s*string>/)
+    expect(src).toContain("hallucination: 'Made-up content'")
+    expect(src).toContain("omission: 'Missing content'")
+    expect(src).toContain("anchoring: 'Picture not linked to its step'")
+    expect(src).toContain("table_fidelity: 'Table may be scrambled'")
+    expect(src).toContain("terminology: 'Wording changed'")
+    // WIRING (CLAUDE.md 2026-06-05): the plain title is actually rendered,
+    // not just declared — and the raw kind no longer appears in the title attr.
+    expect(src).toContain('KIND_LABEL[flag.kind]')
+    expect(src).toMatch(/\{plainTitle\}/)
+    expect(src).not.toMatch(/title=\{`[^`]*\$\{flag\.kind\}/)
   })
 
-  test.fixme('publish surface states reversibility ("You can unpublish or edit later")', () => {
+  test('flag UI never says "block N" — human step/section names only', () => {
+    const dir = path.join(ROOT, 'src', 'components', 'admin', 'ai-reviewer')
+    for (const f of fs.readdirSync(dir).filter((n) => n.endsWith('.tsx'))) {
+      const src = read(path.join(dir, f))
+      expect(src, `${f} must not render "block N" titles`).not.toMatch(/[Bb]lock \$\{/)
+      expect(src, `${f} must not render "block N" titles`).not.toContain('block N')
+    }
+    // FlagBadge surfaces the human location hint ("page 3 step 7" / "section 2.1").
+    expect(read(FLAG_BADGE)).toContain('flag.source_location_hint')
+  })
+
+  test('publish surface states reversibility ("You can unpublish or edit later")', () => {
     const src = read(PUBLISH_STAGE)
     expect(src).toContain('You can unpublish or edit later')
   })
 
-  test.fixme('offline pill is plain-languaged', () => {
+  test('offline pill is plain-languaged', () => {
     const src = read(
       path.join(ROOT, 'src', 'components', 'layout', 'OnlineStatusBanner.tsx'),
     )
     expect(src).not.toContain('Offline — changes saved locally')
+    expect(src).toContain('No internet — your work is saved on this device')
   })
 })
