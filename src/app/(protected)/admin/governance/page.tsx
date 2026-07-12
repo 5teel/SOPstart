@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { parseJwtPayload } from '@/lib/supabase/jwt'
 import { listGovernanceQueue, type GovernanceRow } from '@/actions/governance'
 import { GovernanceFilterChips, type GovernanceFilter } from '@/components/admin/governance/GovernanceFilterChips'
 import { GovernanceQueueRow } from '@/components/admin/governance/GovernanceQueueRow'
@@ -20,10 +21,19 @@ export default async function GovernancePage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  // Org-aware membership lookup (LR-05): scope to the caller's JWT org so a
+  // multi-org user resolves a single row and .maybeSingle() can't error on
+  // duplicate memberships. The real gate is requireAdmin() inside
+  // listGovernanceQueue (JWT-based) — this is belt-and-suspenders.
+  const { data: { session } } = await supabase.auth.getSession()
+  const claims = session?.access_token ? parseJwtPayload(session.access_token) : {}
+  const organisationId = claims['organisation_id'] as string | undefined
+
   const { data: member } = await supabase
     .from('organisation_members')
     .select('role')
     .eq('user_id', user.id)
+    .eq('organisation_id', organisationId ?? '')
     .maybeSingle()
 
   if (!member || !['admin', 'safety_manager'].includes(member.role)) {
