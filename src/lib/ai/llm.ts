@@ -115,7 +115,7 @@ async function openAiCompatCall(
 }
 
 /** Best-effort JSON object extraction: direct parse → fenced block → outermost braces. */
-function extractJson(text: string): unknown | null {
+export function extractJson(text: string): unknown | null {
   const candidates: string[] = [text.trim()]
   const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/)
   if (fence) candidates.push(fence[1].trim())
