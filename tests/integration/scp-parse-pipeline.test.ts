@@ -44,22 +44,32 @@ test.describe('SCP-PARSE — Phase 20 contract integration (Phase 21)', () => {
     expect(next).toContain("destination: '/admin/sops/builder/:sopId'")
     expect(next).toContain('permanent: true')
 
-    // Builder route exists + mounts the SOP via BuilderWithSourceViewer.
+    // Builder route exists + mounts the SOP via BuilderStageShell
+    // (Phase 26 superseded the legacy shell — 30-01 repoint).
     const page = read('src/app/(protected)/admin/sops/builder/[sopId]/page.tsx')
-    expect(page).toContain('BuilderWithSourceViewer')
+    expect(page).toContain('BuilderStageShell')
     expect(page).toContain('layout_data')
   })
 
   test('SCP-PARSE-03: side-by-side source viewer mounted in builder', () => {
-    const builder = read(
-      'src/app/(protected)/admin/sops/builder/[sopId]/BuilderWithSourceViewer.tsx',
+    // Repointed Phase 30 / 30-01: BuilderStageShell owns the provider +
+    // CONV-12 carve-out; ReviewStation (its Review stage) mounts the pane.
+    const shell = read(
+      'src/app/(protected)/admin/sops/builder/[sopId]/BuilderStageShell.tsx',
     )
-    // Source viewer dynamic-imported (D-21-09 bundle isolation).
-    expect(builder).toContain('SourceViewerPane')
-    expect(builder).toContain('dynamic(')
-    expect(builder).toContain('SourceViewerSelectionProvider')
+    expect(shell).toContain('SourceViewerSelectionProvider')
     // CONV-12 carve-out: AI-prompt SOPs skip the pane.
-    expect(builder).toMatch(/showPane.*sourceFilePath/)
+    expect(shell).toMatch(/showPane = !!sourceFilePath/)
+    const reviewStation = read(
+      'src/app/(protected)/admin/sops/builder/[sopId]/ReviewStation.tsx',
+    )
+    expect(reviewStation).toContain('SourceViewerPane')
+    // D-21-09 bundle isolation is enforced structurally by the postbuild
+    // gate: pdfjs/mammoth marker scan over the WORKER route's chunk set
+    // (the source-viewer chain is admin-route-only).
+    const bundleGate = read('scripts/check-bundle-size.ts')
+    expect(bundleGate).toContain('pdfjs-dist')
+    expect(bundleGate).toContain('mammoth')
   })
 
   test('SCP-PARSE-04: AI reviewer auto-invocation wired into parse-pipeline', () => {

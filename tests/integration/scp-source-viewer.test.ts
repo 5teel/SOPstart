@@ -47,9 +47,10 @@ test.describe('SCP-VIEWER — side-by-side source viewer (Phase 21)', () => {
     //   - Image-only SOPs render the original bitmap.
     //   - Video sources render <video> + transcript pane (CONV-11).
     //
-    // Wave 2 contract assertions: each renderer file exists; the public
-    // SourceViewerPane shell exports the persistent right-pane API; the
-    // server-component shell `BuilderWithSourceViewer` is wired into
+    // Contract assertions (repointed Phase 30 / 30-01 — Phase 26 replaced
+    // the legacy shell with BuilderStageShell): each renderer file exists;
+    // the public SourceViewerPane shell exports the persistent right-pane
+    // API; the builder shell `BuilderStageShell` is wired into
     // `builder/[sopId]/page.tsx`.
     const renderers = [
       'src/components/admin/source-viewer/PdfCanvasPage.tsx',
@@ -60,7 +61,7 @@ test.describe('SCP-VIEWER — side-by-side source viewer (Phase 21)', () => {
       'src/components/admin/source-viewer/useSelectionSync.tsx',
       'src/components/admin/source-viewer/index.ts',
       'src/app/api/sops/[sopId]/source-url/route.ts',
-      'src/app/(protected)/admin/sops/builder/[sopId]/BuilderWithSourceViewer.tsx',
+      'src/app/(protected)/admin/sops/builder/[sopId]/BuilderStageShell.tsx',
     ]
     for (const rel of renderers) {
       expect(existsSync(resolve(ROOT, rel)), `${rel} must exist`).toBe(true)
@@ -76,10 +77,10 @@ test.describe('SCP-VIEWER — side-by-side source viewer (Phase 21)', () => {
     expect(pane).toContain("effectiveType === 'docx'")
     expect(pane).toContain("effectiveType === 'scan'")
     expect(pane).toContain("effectiveType === 'video'")
-    // The page.tsx swap from BuilderClient → BuilderWithSourceViewer must
-    // have happened; SCP-VIEWER-04 (no close button) depends on this wiring.
+    // page.tsx must mount the builder shell (BuilderStageShell since Phase
+    // 26); SCP-VIEWER-04 (no close button) depends on this wiring.
     const pageTsx = readFile('src/app/(protected)/admin/sops/builder/[sopId]/page.tsx')
-    expect(pageTsx).toContain('BuilderWithSourceViewer')
+    expect(pageTsx).toContain('BuilderStageShell')
   })
 
   test('SCP-VIEWER-02: click→overlay budget is the Spike 002-validated production pattern (≤ 200ms)', () => {
@@ -111,21 +112,24 @@ test.describe('SCP-VIEWER — side-by-side source viewer (Phase 21)', () => {
     //     block whose `block_provenance.region` contains the click coordinates
     //     and applies a highlight class to that block in the left pane.
     //
-    // Wave 2 contract: the reverse channel exists in the selection-sync API
-    // (`onSourceClick` + `registerBlockClickHandler`), `BboxOverlay` exposes
-    // the click → forward path, and `BuilderClient` registers a handler that
-    // scrolls `[data-puck-item-id]` into view.
+    // Contract (repointed Phase 30 / 30-01 — the bespoke canvas re-earned
+    // both directions in Phase 26): the reverse channel exists in the
+    // selection-sync API (`onSourceClick` + `registerBlockClickHandler`),
+    // `BboxOverlay` exposes the click → forward path, and the bespoke
+    // canvas host (`EditableDocument`) registers a handler that resolves
+    // the source id and focuses/scrolls `[data-block-id]` via the
+    // selection-bridge helpers.
     const sync = readFile('src/components/admin/source-viewer/useSelectionSync.tsx')
     expect(sync).toContain('registerBlockClickHandler')
     expect(sync).toContain('onSourceClick')
     const overlay = readFile('src/components/admin/source-viewer/BboxOverlay.tsx')
     expect(overlay).toContain('onClick')
     expect(overlay).toContain('blockId')
-    const builderClient = readFile(
-      'src/app/(protected)/admin/sops/builder/[sopId]/BuilderClient.tsx'
-    )
-    expect(builderClient).toContain('registerBlockClickHandler')
-    expect(builderClient).toContain('data-puck-item-id')
+    const canvasHost = readFile('src/components/admin/builder-v2/EditableDocument.tsx')
+    expect(canvasHost).toContain('registerBlockClickHandler')
+    const bridge = readFile('src/components/admin/builder-v2/selection-bridge.ts')
+    expect(bridge).toContain('resolveComponentIdFromSource')
+    expect(bridge).toContain('data-block-id')
   })
 
   test('SCP-VIEWER-04: source viewer is persistent — no close button, collapse only', () => {
@@ -176,9 +180,10 @@ test.describe('SCP-VIEWER — side-by-side source viewer (Phase 21)', () => {
     expect(route).toContain('safety_manager')
     // Backward-compat path: 200 + null on no source_file_path.
     expect(route).toContain('no source available')
-    // Wrapper applies CONV-12 carve-out.
+    // Shell applies CONV-12 carve-out (BuilderStageShell carries the
+    // verbatim showPane / ai_prompt logic since Phase 26 — 30-01 repoint).
     const wrapper = readFile(
-      'src/app/(protected)/admin/sops/builder/[sopId]/BuilderWithSourceViewer.tsx'
+      'src/app/(protected)/admin/sops/builder/[sopId]/BuilderStageShell.tsx'
     )
     expect(wrapper).toContain('ai_prompt')
     expect(wrapper).toContain('showPane')

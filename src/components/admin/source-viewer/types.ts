@@ -41,7 +41,7 @@ export type ActiveBbox = {
  * Source kinds the pane can render. Matches the discriminated union on
  * `SourceProvenanceRegion` minus `ai_prompt` (which renders no pane —
  * CONV-12 carve-out). The mapping from `sops.source_file_type` →
- * `SourcePaneKind` happens in `BuilderWithSourceViewer.tsx`.
+ * `SourcePaneKind` happens in `BuilderStageShell.tsx` (deriveSourcePaneKind).
  */
 export type SourcePaneKind = 'pdf' | 'docx' | 'scan' | 'video'
 

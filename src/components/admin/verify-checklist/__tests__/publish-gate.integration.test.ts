@@ -14,7 +14,11 @@
  *     and for SOPs with no source_file_path (pre-Phase-20).
  *   - The branch returns `{ error: 'unverified_blocks', count }` on 400.
  *   - getPublishGateStatus mirrors the server-side bypass logic.
- *   - BuilderWithSourceViewer wires onPublish through to the POST.
+ *   - BuilderStageShell wires onPublish through to the POST.
+ *
+ * Phase 30 (30-01): repointed off the deleted legacy Phase-21 shell onto
+ * BuilderStageShell, and gate reads onto src/lib/governance/publish-core.ts
+ * (Phase 29 factored assertPublishGates/performPublish out of the route).
  */
 
 import { test, expect } from '@playwright/test'
@@ -33,6 +37,8 @@ const PUBLISH_ROUTE = path.join(
   'route.ts',
 )
 const ACTIONS = path.join(REPO_ROOT, 'src', 'actions', 'sop-section-blocks.ts')
+// Phase 29 factored the publish gates out of the route into publish-core.
+const GATE_CORE = path.join(REPO_ROOT, 'src', 'lib', 'governance', 'publish-core.ts')
 const BUILDER = path.join(
   REPO_ROOT,
   'src',
@@ -42,32 +48,35 @@ const BUILDER = path.join(
   'sops',
   'builder',
   '[sopId]',
-  'BuilderWithSourceViewer.tsx',
+  'BuilderStageShell.tsx',
 )
 
-test('publish endpoint queries sop_section_blocks for verified_by_admin_id IS NULL', () => {
-  const src = fs.readFileSync(PUBLISH_ROUTE, 'utf8')
+test('publish gate queries sop_section_blocks for verified_by_admin_id IS NULL (publish-core)', () => {
+  const src = fs.readFileSync(GATE_CORE, 'utf8')
   expect(src).toContain('verified_by_admin_id')
   expect(src).toContain("sop_section_blocks")
   // The actual count-via-PostgREST pattern.
   expect(src).toContain(".is('verified_by_admin_id', null)")
+  // The route still delegates to the gate (end-to-end wiring).
+  const route = fs.readFileSync(PUBLISH_ROUTE, 'utf8')
+  expect(route).toContain('performPublish(')
 })
 
-test('publish endpoint rejects with 400 + { error: "unverified_blocks", count }', () => {
-  const src = fs.readFileSync(PUBLISH_ROUTE, 'utf8')
+test('publish gate rejects with 400 + { error: "unverified_blocks", count }', () => {
+  const src = fs.readFileSync(GATE_CORE, 'utf8')
   expect(src).toContain("error: 'unverified_blocks'")
   // The numeric count must be in the response body for the UI to render.
   expect(src).toMatch(/count:\s*unverifiedCount/)
   expect(src).toContain('status: 400')
 })
 
-test('publish endpoint bypasses verify gate for ai_prompt sources (CONV-12)', () => {
-  const src = fs.readFileSync(PUBLISH_ROUTE, 'utf8')
+test('publish gate bypasses verify gate for ai_prompt sources (CONV-12)', () => {
+  const src = fs.readFileSync(GATE_CORE, 'utf8')
   expect(src).toContain("sourceType !== 'ai_prompt'")
 })
 
-test('publish endpoint bypasses verify gate for pre-Phase-20 SOPs (no source_file_path)', () => {
-  const src = fs.readFileSync(PUBLISH_ROUTE, 'utf8')
+test('publish gate bypasses verify gate for pre-Phase-20 SOPs (no source_file_path)', () => {
+  const src = fs.readFileSync(GATE_CORE, 'utf8')
   expect(src).toMatch(/!!sourceFilePath/)
 })
 
@@ -85,10 +94,10 @@ test('getPublishGateStatus returns ready=true only when verifiedCount === totalC
   expect(src).toMatch(/ready:\s*totalNum\s*>\s*0\s*&&\s*unverifiedNum\s*===\s*0/)
 })
 
-test('BuilderWithSourceViewer wires VerifyChecklistGate.onPublish to POST /publish', () => {
+test('BuilderStageShell wires handlePublish to POST /publish with the gate rules', () => {
   const src = fs.readFileSync(BUILDER, 'utf8')
-  // Component imported via dynamic.
-  expect(src).toContain('VerifyChecklistGate')
+  // Shared source of gate truth for stepper + stages.
+  expect(src).toContain('useVerifyChecklist')
   // POST endpoint URL used.
   expect(src).toMatch(/\/api\/sops\/\$\{sopId\}\/publish/)
   // Method must be POST.

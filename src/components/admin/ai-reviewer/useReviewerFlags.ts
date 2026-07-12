@@ -12,7 +12,7 @@
  *
  * Admin-only — D-21-09 isolation: this hook MUST NOT be imported by any
  * worker-side route. It lives under `src/components/admin/ai-reviewer/`
- * and is only consumed by `BuilderWithSourceViewer.tsx`.
+ * and is only consumed by the admin builder shell chain.
  */
 
 import { useCallback, useMemo, useState } from 'react'

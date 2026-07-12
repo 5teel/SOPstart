@@ -27,8 +27,8 @@ const BUILDER_DIR = path.join(
 const TABS_DIR = path.join(ROOT, 'src', 'components', 'sop', 'tabs')
 
 test.describe('UX-08 — dead-weight sweep', () => {
-  // Flips LIVE in 30-01 Task 2 (deletion happens in this plan).
-  test.fixme('BuilderWithSourceViewer.tsx is deleted (superseded by BuilderStageShell, Phase 26)', () => {
+  // LIVE from 30-01 Task 2: the legacy Phase-21 builder shell is gone.
+  test('BuilderWithSourceViewer.tsx is deleted (superseded by BuilderStageShell, Phase 26)', () => {
     expect(fs.existsSync(path.join(BUILDER_DIR, 'BuilderWithSourceViewer.tsx'))).toBe(false)
   })
 

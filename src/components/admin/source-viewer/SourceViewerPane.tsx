@@ -4,8 +4,8 @@
  * Phase 21 (Plan 21-02, Task 2) — Persistent right-pane source viewer.
  *
  * Renders the original uploaded source document (PDF, DOCX, scan, or video)
- * alongside the builder canvas. Used inside `BuilderWithSourceViewer` —
- * NEVER mounted on a worker route (D-21-09).
+ * alongside the builder canvas. Used inside the admin builder Review stage
+ * (ReviewStation) — NEVER mounted on a worker route (D-21-09).
  *
  * Hard requirements:
  *   - NO close button. The collapse toggle reduces width to 32px but the
@@ -15,7 +15,7 @@
  *     shell, discriminated child by `sourceType`.
  *   - Pane subscribes to `useSelectionSync()` indirectly via child
  *     renderers — the provider is mounted at the layout level
- *     (BuilderWithSourceViewer), not here.
+ *     (BuilderStageShell), not here.
  *
  * Source-URL fetching uses TanStack Query (project pattern; QueryProvider
  * is already mounted at `(protected)/layout.tsx`).

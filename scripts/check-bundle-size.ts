@@ -247,10 +247,10 @@ if (!voiceFound.found) {
 // ---------------------------------------------------------------------------
 // Phase 21 Plan 21-02 — pdfjs / mammoth must NOT ship in the worker
 // `/sops/[sopId]/page` bundle. Both are heavy (pdfjs ~ 300 KB minified)
-// and only the admin source viewer (BuilderWithSourceViewer) needs them.
-// `BuilderWithSourceViewer` dynamic-imports `SourceViewerPane` which in
-// turn dynamic-imports pdfjs / mammoth — verify that boundary by scanning
-// the worker route's chunk set.
+// and only the admin source viewer (BuilderStageShell → ReviewStation →
+// SourceViewerPane) needs them. The source-viewer chain is admin-route-only
+// so pdfjs / mammoth must never reach the worker route — verify that
+// boundary by scanning the worker route's chunk set.
 //
 // The negative assertion checks the SAME chunkSet that drove the size
 // gate above, so if pdfjs ever leaks in, both the delta gate AND this
@@ -274,8 +274,8 @@ const pdfjsLeaks = PDFJS_MARKERS.filter((m) => workerJoined.includes(m))
 if (pdfjsLeaks.length > 0) {
   fail(
     `pdfjs-dist leaked into worker bundle ${ROUTE} (markers: ${pdfjsLeaks.join(', ')}). ` +
-      'SourceViewerPane MUST be dynamic-imported with ssr: false from BuilderWithSourceViewer.tsx ' +
-      '(D-21-09). Check for accidental static `import { SourceViewerPane }` calls.'
+      'SourceViewerPane MUST stay on the admin builder chain (BuilderStageShell → ReviewStation) ' +
+      '(D-21-09). Check for accidental `import { SourceViewerPane }` on a worker-side route.'
   )
 }
 const MAMMOTH_MARKERS = ['mammoth', 'convertToHtml']

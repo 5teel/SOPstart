@@ -10,7 +10,7 @@
  *   4. Inline publish-gate blocked reason strip (always visible when !isReady)
  *   5. Gated "Publish SOP" button
  *   6. "← Back to Review" link (only when hasSourceDoc === true)
- *   7. Publish error banner (reuses same markup as BuilderWithSourceViewer)
+ *   7. Publish error banner (reuses the legacy Phase-21 shell markup)
  *
  * Does NOT call fetch / Supabase / publish route directly. Invokes
  * `onPublish` callback only (the existing handlePublish chain supplied by
@@ -215,7 +215,7 @@ export function PublishStage({
         Publish SOP
       </button>
 
-      {/* 7. Publish error banner — reuses same markup as BuilderWithSourceViewer */}
+      {/* 7. Publish error banner — reuses the legacy Phase-21 shell markup */}
       {publishError && (
         <div
           role="alert"

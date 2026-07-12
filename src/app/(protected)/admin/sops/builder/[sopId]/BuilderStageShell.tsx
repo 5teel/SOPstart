@@ -3,14 +3,13 @@
 /**
  * Phase 21.5 (Plan 21.5-05) — BuilderStageShell
  *
- * SUPERSEDES BuilderWithSourceViewer.tsx as the outermost builder shell.
- * BuilderWithSourceViewer.tsx is kept as a reference shim; nothing new should
- * import it. This shell replaces its role and adds the 3-stage Build → Review
+ * SUPERSEDES the legacy Phase-21 builder shell (deleted in Phase 30 Plan 01).
+ * This shell replaces its role and adds the 3-stage Build → Review
  * → Publish sequence (SPEC R1, R7, R8, R10).
  *
  * Architecture:
  *   - Migrates handlePublish, showPane, showVerifyGate, transcriptSegments
- *     VERBATIM from BuilderWithSourceViewer.tsx.
+ *     VERBATIM from the legacy Phase-21 shell.
  *   - Owns activeStage (useState — no router.push per CLAUDE.md 2026-05-13).
  *   - Calls useVerifyChecklist(sopId) once at shell level so BuilderStageStepper,
  *     ReviewStation, and PublishStage share one source of gate truth.
@@ -52,7 +51,7 @@ import type { SopWithSections, ParseJob } from '@/types/sop'
 import type { SourcePaneKind, TranscriptSegment } from '@/components/admin/source-viewer'
 
 // ---------------------------------------------------------------------------
-// Helpers — migrated verbatim from BuilderWithSourceViewer.tsx (CONV-12 logic)
+// Helpers — migrated verbatim from the legacy Phase-21 shell (CONV-12 logic)
 // ---------------------------------------------------------------------------
 
 function deriveSourcePaneKind(rawType: string | null | undefined): SourcePaneKind | null {
@@ -90,7 +89,7 @@ export function BuilderStageShell({
   const router = useRouter()
 
   // ------------------------------------------------------------------
-  // Source-doc derivation — VERBATIM from BuilderWithSourceViewer.tsx
+  // Source-doc derivation — VERBATIM from the legacy Phase-21 shell
   // ------------------------------------------------------------------
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const rawType = (initialSop as any).source_file_type as string | null | undefined
@@ -100,7 +99,7 @@ export function BuilderStageShell({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isAiPrompt = ((initialSop as any).source_type ?? rawType) === 'ai_prompt'
 
-  // CONV-12 backward-compat — mirrors BuilderWithSourceViewer.tsx exactly
+  // CONV-12 backward-compat — mirrors the legacy Phase-21 shell exactly
   const showPane = !!sourceFilePath && !isAiPrompt && sourceType !== null
   const showVerifyGate = !!sourceFilePath && !isAiPrompt
 
@@ -108,7 +107,7 @@ export function BuilderStageShell({
   const hasSourceDoc = showPane
 
   // ------------------------------------------------------------------
-  // Publish state — VERBATIM from BuilderWithSourceViewer.tsx
+  // Publish state — VERBATIM from the legacy Phase-21 shell
   // ------------------------------------------------------------------
   const [publishError, setPublishError] = useState<string | null>(null)
   const [publishing, setPublishing] = useState(false)
@@ -193,7 +192,7 @@ export function BuilderStageShell({
   )
 
   // ------------------------------------------------------------------
-  // Transcript segments — VERBATIM from BuilderWithSourceViewer.tsx
+  // Transcript segments — VERBATIM from the legacy Phase-21 shell
   // ------------------------------------------------------------------
   const transcriptSegments: TranscriptSegment[] = []
   if (sourceType === 'video' && parseJob) {

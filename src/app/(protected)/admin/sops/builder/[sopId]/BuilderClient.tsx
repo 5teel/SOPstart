@@ -38,7 +38,7 @@ interface BuilderClientProps {
  * Selection-sync, AI-flag overlays, structured-field panels and the tiered
  * inserter are RE-WIRED off Puck in later waves; this wave mounts the canvas
  * minimally while keeping the Build→Review→Publish stage flow (owned by
- * BuilderStageShell / BuilderWithSourceViewer) intact.
+ * BuilderStageShell) intact.
  */
 export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
   const sections = [...(initialSop.sop_sections ?? [])].sort(

@@ -1,7 +1,7 @@
 /**
  * Phase 21 (Plan 21-03 Task 3) — Admin AI-reviewer UI barrel.
  *
- * Public surface consumed by `BuilderWithSourceViewer.tsx`. D-21-09
+ * Public surface consumed by the admin builder shell chain. D-21-09
  * isolation: this barrel is admin-only — never imported by worker routes.
  */
 export { ReviewerFlagsPanel } from './ReviewerFlagsPanel'

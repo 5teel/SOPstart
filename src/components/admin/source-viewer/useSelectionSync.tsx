@@ -21,7 +21,7 @@
  *
  * D-21-09 — this file is admin-only and `'use client'`. It must NOT be
  * statically imported from any worker-side route — the source-viewer module
- * is dynamic-imported from BuilderWithSourceViewer (Task 3).
+ * is reached only through the admin builder shell chain (BuilderStageShell).
  */
 import {
   createContext,

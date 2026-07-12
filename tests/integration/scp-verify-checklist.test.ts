@@ -56,11 +56,15 @@ test.describe('SCP-VERIFY — per-block verify checklist + publish gate (Phase 2
     const hook = read('src/components/admin/verify-checklist/useVerifyChecklist.ts')
     expect(hook).toMatch(/isReady\s*=\s*totalCount\s*>\s*0\s*&&\s*verifiedCount\s*===\s*totalCount/)
 
-    // Server gate (defence in depth).
+    // Server gate (defence in depth). Phase 29 factored assertPublishGates/
+    // performPublish out of the route into publish-core.ts (30-01 repoint) —
+    // the route delegates, the gate logic lives in the core module.
+    const gateCore = read('src/lib/governance/publish-core.ts')
+    expect(gateCore).toContain("error: 'unverified_blocks'")
+    expect(gateCore).toContain('status: 400')
+    expect(gateCore).toContain(".is('verified_by_admin_id', null)")
     const route = read('src/app/api/sops/[sopId]/publish/route.ts')
-    expect(route).toContain("error: 'unverified_blocks'")
-    expect(route).toContain('status: 400')
-    expect(route).toContain(".is('verified_by_admin_id', null)")
+    expect(route).toContain('performPublish(')
   })
 
   test('SCP-VERIFY-03: verification timestamp + admin user_id stored (audit trail)', () => {
