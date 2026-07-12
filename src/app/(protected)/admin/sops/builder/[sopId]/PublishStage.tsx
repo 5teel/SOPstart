@@ -17,7 +17,14 @@
  * the parent shell — Req 10 callback-chain preservation).
  *
  * Safety gate: no bulk-verify wording anywhere in this file (D-21-07).
+ *
+ * Phase 29 (29-04) — optional `approvalStatus` prop. When state === 'pending'
+ * renders ApprovalChainPanel alongside the existing content; no-chain SOPs
+ * (approvalStatus undefined/null) render exactly as before (D29-03).
  */
+
+import { ApprovalChainPanel, type ApprovalRow } from '@/components/admin/governance/ApprovalChainPanel'
+import type { ChainStep } from '@/lib/governance/approvals'
 
 export type PublishStageProps = {
   /** Number of steps that have been verified */
@@ -38,6 +45,22 @@ export type PublishStageProps = {
   onDismissError: () => void
   /** Fires when the user clicks "← Back to Review" */
   onBackToReview: () => void
+  /** Phase 29 — non-null when this SOP's category has a chain and a publish has been requested */
+  approvalStatus?: {
+    state: 'pending' | 'approved' | null
+    steps: ChainStep[]
+    approvals: ApprovalRow[]
+    nextStepIndex: number
+    isCallerNextApprover: boolean
+  } | null
+  /** Fires when the matching approver clicks Approve */
+  onApproveStep?: (comment?: string) => void
+  /** Fires when the matching approver submits Request changes (comment required) */
+  onRequestChanges?: (comment: string) => void
+  /** True while approve/request-changes is in flight */
+  approvalActionPending?: boolean
+  /** Non-null when approveStep/requestChanges returned an error */
+  approvalError?: string | null
 }
 
 export function PublishStage({
@@ -50,6 +73,11 @@ export function PublishStage({
   onPublish,
   onDismissError,
   onBackToReview,
+  approvalStatus,
+  onApproveStep,
+  onRequestChanges,
+  approvalActionPending = false,
+  approvalError = null,
 }: PublishStageProps): React.JSX.Element {
   const remaining = Math.max(0, totalCount - verifiedCount)
 
@@ -111,6 +139,20 @@ export function PublishStage({
           <span aria-hidden style={{ fontSize: 14 }}>&#10003;</span>
           <span>{verifiedCount} steps verified</span>
         </div>
+      )}
+
+      {/* 3b. Pending approval chain — only when this category has a chain and a publish was requested */}
+      {approvalStatus?.state === 'pending' && (
+        <ApprovalChainPanel
+          steps={approvalStatus.steps}
+          approvals={approvalStatus.approvals}
+          nextStepIndex={approvalStatus.nextStepIndex}
+          canAct={approvalStatus.isCallerNextApprover}
+          onApprove={(comment) => onApproveStep?.(comment)}
+          onRequestChanges={(comment) => onRequestChanges?.(comment)}
+          pending={approvalActionPending}
+          error={approvalError}
+        />
       )}
 
       {/* 4. Inline publish-gate blocked reason — always visible when !isReady */}

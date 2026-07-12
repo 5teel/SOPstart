@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { signLayoutDataImages } from '@/lib/builder/sign-layout-data-images'
+import { getApprovalStatus } from '@/actions/approvals'
 import { BuilderStageShell } from './BuilderStageShell'
 import type { SopWithSections, ParseJob } from '@/types/sop'
 
@@ -69,12 +70,17 @@ export default async function BuilderPage({
     .limit(1)
     .maybeSingle()
 
+  // Phase 29 (29-04) — builder Publish stage's pending-chain panel.
+  const approvalResult = await getApprovalStatus(sopId)
+  const approvalStatus = 'status' in approvalResult ? approvalResult.status : null
+
   return (
     <Suspense fallback={null}>
       <BuilderStageShell
         sopId={sopId}
         initialSop={sop as unknown as SopWithSections}
         parseJob={(parseJob ?? null) as ParseJob | null}
+        approvalStatus={approvalStatus}
       />
     </Suspense>
   )

@@ -46,6 +46,8 @@ import {
   SourceViewerSelectionProvider,
 } from '@/components/admin/source-viewer/useSelectionSync'
 import { useVerifyChecklist } from '@/components/admin/verify-checklist/useVerifyChecklist'
+import { approveStep, requestChanges } from '@/actions/approvals'
+import type { ApprovalStatus } from '@/actions/approvals'
 import type { SopWithSections, ParseJob } from '@/types/sop'
 import type { SourcePaneKind, TranscriptSegment } from '@/components/admin/source-viewer'
 
@@ -71,6 +73,8 @@ export type BuilderStageShellProps = {
   sopId: string
   initialSop: SopWithSections
   parseJob: ParseJob | null
+  /** Phase 29 (29-04) — pending approval chain for this SOP, if any */
+  approvalStatus?: ApprovalStatus | null
 }
 
 // ---------------------------------------------------------------------------
@@ -81,6 +85,7 @@ export function BuilderStageShell({
   sopId,
   initialSop,
   parseJob,
+  approvalStatus,
 }: BuilderStageShellProps): React.JSX.Element {
   const router = useRouter()
 
@@ -130,7 +135,13 @@ export function BuilderStageShell({
         }
         return
       }
-      // Success — refresh server data so the new status flows in.
+      // Success branch covers both outcomes: a straight publish, or the
+      // chained-category divert ({ pendingApproval: true }) — NOT an error
+      // (Phase 29 D29-03). Either way, refresh so the re-fetched
+      // approvalStatus prop brings in the pending-chain panel if needed.
+      const body = (await res.json().catch(() => ({}))) as { pendingApproval?: boolean }
+      const enteredPendingApproval = body.pendingApproval === true
+      if (enteredPendingApproval) console.info('[handlePublish] entered pending approval')
       router.refresh()
     } catch (err) {
       setPublishError(err instanceof Error ? err.message : 'Publish failed')
@@ -138,6 +149,48 @@ export function BuilderStageShell({
       setPublishing(false)
     }
   }, [sopId, router])
+
+  // ------------------------------------------------------------------
+  // Approval chain actions — Phase 29 (29-04)
+  // ------------------------------------------------------------------
+  const [approvalActionPending, setApprovalActionPending] = useState(false)
+  const [approvalError, setApprovalError] = useState<string | null>(null)
+
+  const handleApproveStep = useCallback(
+    async (comment?: string) => {
+      setApprovalError(null)
+      setApprovalActionPending(true)
+      try {
+        const result = await approveStep(sopId, comment)
+        if ('error' in result) {
+          setApprovalError(result.error)
+          return
+        }
+        router.refresh()
+      } finally {
+        setApprovalActionPending(false)
+      }
+    },
+    [sopId, router],
+  )
+
+  const handleRequestChanges = useCallback(
+    async (comment: string) => {
+      setApprovalError(null)
+      setApprovalActionPending(true)
+      try {
+        const result = await requestChanges(sopId, comment)
+        if ('error' in result) {
+          setApprovalError(result.error)
+          return
+        }
+        router.refresh()
+      } finally {
+        setApprovalActionPending(false)
+      }
+    },
+    [sopId, router],
+  )
 
   // ------------------------------------------------------------------
   // Transcript segments — VERBATIM from BuilderWithSourceViewer.tsx
@@ -320,6 +373,11 @@ export function BuilderStageShell({
               onPublish={handlePublish}
               onDismissError={() => setPublishError(null)}
               onBackToReview={() => setActiveStage('review')}
+              approvalStatus={approvalStatus}
+              onApproveStep={handleApproveStep}
+              onRequestChanges={handleRequestChanges}
+              approvalActionPending={approvalActionPending}
+              approvalError={approvalError}
             />
           )}
         </main>
