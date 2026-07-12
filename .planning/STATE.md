@@ -2,17 +2,17 @@
 gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
-current_plan: 1
-status: executing
-stopped_at: Completed 30-07-PLAN.md
-last_updated: "2026-07-12T15:50:59.519Z"
-last_activity: 2026-07-12 -- Phase 30 execution started
+current_plan: 8
+status: phase_complete
+stopped_at: Completed 30-08-PLAN.md (Phase 30 final wave — phase gate green)
+last_updated: "2026-07-13T00:30:00.000Z"
+last_activity: 2026-07-13 -- Phase 30 complete (30-08 governance fold + one-line rows + gate)
 progress:
   total_phases: 4
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 20
-  completed_plans: 19
-  percent: 50
+  completed_plans: 20
+  percent: 75
 ---
 
 # Project State
@@ -26,11 +26,10 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 30 (ux-consolidation) — EXECUTING
-Plan: 8 of 8
-Current Plan: 1
-Status: Ready to execute
-Last activity: 2026-07-12 -- Phase 30 execution started
+Phase: 30 (ux-consolidation) — COMPLETE (8 of 8 plans; final gate green: full suite matches 30-01 baseline exactly, tsc + build + bundle gate clean, /pathways 0 not-mapped)
+Plan: 8 of 8 complete
+Status: Phase 30 complete — next: Phase 31 (Training Records)
+Last activity: 2026-07-13 -- 30-08 executed (UX-03 governance fold + UX-06 one-line rows + phase gate)
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
@@ -171,6 +170,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 30 P05 | ~8m | 2 tasks | 4 files |
 | Phase 30 P06 | 25m | 3 tasks | 17 files |
 | Phase 30 P07 | 25m | 3 tasks | 8 files |
+| Phase 30 P08 | ~40m | 3 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -356,6 +356,9 @@ Recent decisions affecting current work:
 - [Phase ?]: 30-06: dept filter FIXED not removed — sop_departments SELECT using(true) live-verified via Management API before adding the worker client junction read (decision #3 branch A)
 - [Phase ?]: 30-06: OverviewTab/ToolsTab/HazardsTab deleted with the merge (nothing imports them after ReadTab); bundle re-baselined 1057→1056 KB via capture script
 - [Phase ?]: 30-07: Publish CTA moved off undefined --brand-yellow token to the established ink-900/paper primary-button idiom
+- [Phase 30]: 30-08: one-line rows derive their ONE flag chip from the same listGovernanceQueue read as the header chips (worst-first via FLAG_PRIORITY) — no client-side date math, no second query; FLAG_STYLE/FLAG_LABEL duplicated locally because GovernanceQueueRow is 'use client' (consts not importable into a server component)
+- [Phase 30]: 30-08: journeys.ts maps /dashboard exactly once (legacy redirect-shim step) so /pathways shows 0 not-mapped while roles.ts still lands no role there; role-homes spec repointed from blanket ban to exactly-once assertion
+- [Phase 30]: 30-08: governance shim keeps the org-scoped admin guard IN FRONT of the redirect (T-30-08-03); approval-chain editor + its category/chains/members assembly moved verbatim to /admin/settings
 
 ### v2.0 Decisions (pending — to be filled during planning)
 

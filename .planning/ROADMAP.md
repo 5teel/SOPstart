@@ -59,7 +59,7 @@ Closes the #1 governance gap surfaced by the 2026-05-05 Visy Packaging customer 
 
 - [x] **Phase 28: Ownership + Review Lifecycle + Governance Queue** - Every SOP gets an accountable owner and review-due date (both auto-backfilled), plus one unified governance queue with one-click actions — worker read access is never gated by any of it (completed 2026-07-12)
 - [ ] **Phase 29: Approval Chains** - Optional per-category 1–4 step approval chain, snapshotted per version, one-click approve — categories without a chain publish exactly as today
-- [ ] **Phase 30: UX Consolidation & Simplification** - One home per role, one admin nav, one create entry, one governance surface, 3-tab worker SOP view, plain language throughout (UX-01..08)
+- [x] **Phase 30: UX Consolidation & Simplification** - One home per role, one admin nav, one create entry, one governance surface, 3-tab worker SOP view, plain language throughout (UX-01..08)
 
 ### Phase 28: Ownership + Review Lifecycle + Governance Queue
 
@@ -183,7 +183,7 @@ Plans:
 
 **Wave 8**
 
-- [ ] 30-08-PLAN.md — UX-03 governance fold into /admin/sops + one-line rows + /admin/governance shim + editor->settings + merged-tree gate (UX-03, UX-06)
+- [x] 30-08-PLAN.md — UX-03 governance fold into /admin/sops + one-line rows + /admin/governance shim + editor->settings + merged-tree gate (UX-03, UX-06)
 
 ### Phase 31: Training Records + AI Maintenance Schedule
 

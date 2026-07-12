@@ -18,3 +18,11 @@ Out-of-scope discoveries logged during execution (do NOT fix in the discovering 
 - **37 other pre-existing full-suite failures** (phase3/11/12.5/15 stubs, phase20-parsers,
   phase21-unit, phase26 verify-gate/reorder) — runtime/browser/live-DB dependent, long-standing.
   Full list in 30-01-SUMMARY.md § regression baseline. 30-08's gate compares against that list ("no NEW failures").
+
+## From 30-08 (2026-07-13)
+
+- **`VideoJobIndicator.tsx` + `SopDepartmentEditor.tsx` now have zero mounters:** both left the
+  admin list rows with the UX-06 one-line simplification (their capabilities live in the builder —
+  video via the SopActionsMenu "Generate video" link, department tagging via the Assign page).
+  Components still exist and compile. Candidate deletions for a future dead-weight sweep
+  (plan scope only deleted GovernanceWidget + LibraryReviewCell).
