@@ -27,6 +27,7 @@ Reuse the existing publish route as the single entry. When a chain applies: firs
 
 ### D29-04 — Approver resolution: role-based or named-member steps
 A step matches if (userId set and caller is that user) OR (role set and caller has that role in the org). Steps approve strictly in order — the "who's next" pointer is the first step index with no approval row.
+**A1 accepted (2026-07-12, autonomous):** approver steps are scoped to admin/safety_manager roles/members only — both approval surfaces already hard-redirect other roles, this matches Visy's "3-4 managers" reality, and it lets all sops writes ride the existing `admins_can_update_sops` RLS (no new service-role paths for sops).
 
 ### D29-05 — Approval surfaces: exactly two, both existing
 (1) SOP detail/builder publish stage shows the pending chain (step list, who's next, one-click Approve / Request changes for the matching approver). (2) Governance queue gains an `awaiting_approval` flag/chip — rows where the caller is the next approver get the one-click Approve action inline. NO new routes, NO approval console (APR-03). Chain CONFIG lives as a small section on the existing `/admin/governance` page (an "Approval chains" panel — category picker + 1–4 step editor), not a new route.
