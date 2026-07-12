@@ -115,7 +115,7 @@ export async function setSopOwner(
   }
 
   // Plain session client — admins_can_update_sops RLS (org + admin/safety_manager
-  // role) already gates this write. Do NOT use createAdminClient here (Pitfall 1).
+  // role) already gates this write. Do NOT use the service-role client here (Pitfall 1).
   const supabase = await createClient()
   const { error } = await supabase
     .from('sops')

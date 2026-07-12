@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { parseJwtPayload } from '@/lib/supabase/jwt'
 import { enqueueVideoGenerationForPipeline } from '@/lib/video-gen/auto-queue'
 import { triggerAgentSynthesis } from '@/lib/agent-layer/synthesis'
+import { resolveCadenceMonths, computeReviewDueDate } from '@/lib/governance/cadences'
 
 // POST /api/sops/[sopId]/publish — transition draft -> published
 //
@@ -60,7 +61,7 @@ export async function POST(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: sopRow, error: sopErr } = await (supabase as any)
     .from('sops')
-    .select('source_type, source_file_path')
+    .select('source_type, source_file_path, category, parent_sop_id')
     .eq('id', sopId)
     .maybeSingle()
 
@@ -117,6 +118,56 @@ export async function POST(
 
   if (publishError) {
     return NextResponse.json({ error: 'Failed to publish SOP' }, { status: 500 })
+  }
+
+  // 3b. Phase 28 D28-04 — review-clock reset on publish. Non-fatal: the
+  //     publish above already succeeded and is never rolled back for this.
+  //     Resolves cadence months from the org's sop_review_cadences for this
+  //     SOP's category, stamps review_due_at/last_reviewed_at on the
+  //     just-published row, and (when parent_sop_id is set — this publish
+  //     supersedes a prior version) appends a sop_review_events 'superseded'
+  //     row. Intentionally NOT run inside cloneSopAsDraft — a cloned-but-
+  //     unpublished draft must not look "just reviewed" (RESEARCH Pattern 4
+  //     anti-pattern).
+  try {
+    const publishedAt = new Date().toISOString()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: cadenceRows } = await (supabase as any)
+      .from('sop_review_cadences')
+      .select('category, months')
+      .eq('organisation_id', organisationId)
+
+    const orgCadences: Record<string, number> = {}
+    for (const row of (cadenceRows ?? []) as Array<{ category: string; months: number }>) {
+      orgCadences[row.category] = row.months
+    }
+    const months = resolveCadenceMonths(sopRow?.category ?? null, orgCadences)
+    const reviewDue = computeReviewDueDate(publishedAt, months)
+
+    const { error: resetErr } = await supabase
+      .from('sops')
+      .update({ review_due_at: reviewDue, last_reviewed_at: publishedAt })
+      .eq('id', sopId)
+    if (resetErr) {
+      console.error(`[publish] review-clock reset failed for SOP ${sopId}:`, resetErr)
+    }
+
+    if (sopRow?.parent_sop_id) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: eventErr } = await (supabase as any)
+        .from('sop_review_events')
+        .insert({
+          sop_id: sopId,
+          organisation_id: organisationId,
+          reviewed_by: user.id,
+          action: 'superseded',
+        })
+      if (eventErr) {
+        console.error(`[publish] superseded event insert failed for SOP ${sopId}:`, eventErr)
+      }
+    }
+  } catch (err) {
+    console.error(`[publish] review-clock reset threw for SOP ${sopId}:`, err)
   }
 
   // 4. Auto-queue video generation if this SOP arrived via the pipeline
