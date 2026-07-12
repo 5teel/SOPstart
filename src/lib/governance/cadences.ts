@@ -1,8 +1,8 @@
 // ------------------------------------------------------------
 // resolveCadenceMonths / computeReviewDueDate
 // Pure helpers — cadence resolution + due-date math for the review lifecycle
-// (REV-01/D28-03). No 'use server', no I/O — sync exports imported into
-// src/actions/governance.ts (2026-06-27 learning).
+// (REV-01/D28-03). No server-action directive, no I/O — sync exports
+// imported into src/actions/governance.ts (2026-06-27 learning).
 // ------------------------------------------------------------
 
 const DEFAULT_CADENCE_MONTHS = 12

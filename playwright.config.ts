@@ -242,6 +242,34 @@ export default defineConfig({
       use: { browserName: 'chromium' },
     },
     {
+      // Phase 28 — Ownership + Review Lifecycle + Governance Queue unit tests
+      // (pure modules; static imports).
+      //
+      // CLAUDE.md 2026-04-24: dynamic import('@/...') fails in Playwright Node runner
+      // outside a testDir-scoped project — use STATIC @/ imports here.
+      // testDir: './src/lib/governance/__tests__' so Playwright's TS compiler resolves
+      // @/ path aliases (mirrors phase27-unit pattern for ai/__tests__).
+      //
+      // Verify: `npx playwright test --list --project=phase28-unit`
+      name: 'phase28-unit',
+      testDir: './src/lib/governance/__tests__',
+      testMatch: /.*\.test\.ts$/,
+    },
+    {
+      // Phase 28 — Ownership + Review Lifecycle + Governance Queue Nyquist harness.
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase28/**) so every later plan in
+      // the phase drops specs into tests/phase28/ with NO further config edit —
+      // single registration point for the whole phase (mirrors phase26).
+      //
+      // Verify registration: `npx playwright test --list --project=phase28`
+      name: 'phase28',
+      testDir: '.',
+      testMatch: /tests\/phase28\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
+    {
       // Phase 26 — SOP Builder Redesign Nyquist harness (Wave 1 / Plan 26-02).
       //
       // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.

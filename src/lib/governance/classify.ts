@@ -2,9 +2,9 @@
 // classifyGovernanceRow
 // Pure helper — classifies a single SOP's governance flags (unowned /
 // overdue / due_soon / stale_role) from already-fetched, RLS-scoped inputs.
-// No 'use server', no I/O, no supabase import — sync export so it stays
-// directly unit-testable (2026-06-27 learning: a sync export inside a
-// 'use server' module breaks `next build`). Mirrors the extraction
+// No server-action directive, no I/O, no supabase import — sync export so it
+// stays directly unit-testable (2026-06-27 learning: a sync export inside a
+// server-action module breaks `next build`). Mirrors the extraction
 // discipline of src/lib/builder/version-lineage.ts.
 // ------------------------------------------------------------
 
