@@ -550,7 +550,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 - [x] **APR-01**: Admin can define an optional approval chain (1–4 ordered approver steps, by role or named member) per SOP category; categories without a chain publish exactly as today
 - [x] **APR-02**: The chain is snapshotted per SOP version — a new version can carry an adjusted chain; historical versions keep the chain they were approved under
-- [ ] **APR-03**: Approvers approve or request changes in one click from the SOP itself and from the governance queue — no separate approval console
+- [x] **APR-03**: Approvers approve or request changes in one click from the SOP itself and from the governance queue — no separate approval console
 - [x] **APR-04**: When a chain exists, publish completes automatically after final approval; pending state (who's next) visible on the SOP and in the queue
 - [ ] **APR-05**: Approval history (who, when, which version) visible in the existing version history surface
 

@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
-current_plan: 2
+current_plan: 3
 status: executing
-stopped_at: Completed 29-01-PLAN.md
-last_updated: "2026-07-12T08:49:47.048Z"
+stopped_at: Completed 29-02-PLAN.md
+last_updated: "2026-07-12T09:07:03.532Z"
 last_activity: 2026-07-12 -- Completed 29-01-PLAN.md
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 12
-  completed_plans: 7
+  completed_plans: 8
   percent: 33
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 29
-Current Plan: 2
+Current Plan: 3
 Total Plans in Phase: 6
 Status: Ready to execute
 Last activity: 2026-07-12 -- Completed 29-01-PLAN.md
@@ -161,6 +161,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 28 P05 | 25min | 3 tasks | 6 files |
 | Phase 28 P06 | 10min | 2 tasks | 0 files |
 | Phase 29 P01 | 35min | 3 tasks | 12 files |
+| Phase 29 P02 | ~30min | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -330,6 +331,10 @@ Recent decisions affecting current work:
 - [Phase 29]: approval_chains RLS uses current_organisation_id() from day one, closing the HR-01 bug class before it ships
 - [Phase 29]: sop_approvals idempotency guard is a partial unique index (where action='approved'), not a blanket 3-column unique constraint
 - [Phase 29]: assertPublishGates() factored out of performPublish() so Plan 29-02's chain-gate can reuse the identical gate checks before diverting into pending_approval
+- [Phase ?]: [Phase 29-02]: requireAdmin() exported once from governance.ts and reused by approvals.ts — single source of auth/org/role resolution, never duplicated
+- [Phase ?]: [Phase 29-02]: approveStep's final-step branch calls the SAME performPublish() the no-chain publish route calls — one publish path, not a parallel pipeline (D29-03)
+- [Phase ?]: [Phase 29-02]: assertPublishGates() runs BEFORE the pending-approval divert in the publish route (locked ordering) — an unverified/unapproved SOP can never enter pending_approval
+- [Phase ?]: [Phase 29-02]: isCallerNextApprover kept OUT of the pure classifyGovernanceRow input — computed per-viewer in listGovernanceQueue, surfaced on GovernanceRow instead
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -439,6 +444,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-12T08:49:47.040Z
-Stopped at: Completed 29-01-PLAN.md
+Last session: 2026-07-12T09:07:03.525Z
+Stopped at: Completed 29-02-PLAN.md
 Resume file:
