@@ -57,7 +57,7 @@ Plans:
 
 Closes the #1 governance gap surfaced by the 2026-05-05 Visy Packaging customer interview ("Nobody owns SOPs — there isn't anybody"). **NORTH STAR (locked by Simon 2026-07-12):** ease of use and maintenance first — process and blockers never beat ease of use; governance state NEVER blocks worker read/walkthrough access. Approval chains are opt-in per category (absent chain = today's publish flow, byte-identical). Owners and review dates auto-backfill — no admin data-entry campaign. Builds on existing infra only: version supersede + sign-off chain (Phase 23), departments (Phase 25), completions (Phase 4), AI adapter + agent metadata (Phase 26.5/27), site tier (Phase 15). Execution order 28 → 29 → 30.
 
-- [ ] **Phase 28: Ownership + Review Lifecycle + Governance Queue** - Every SOP gets an accountable owner and review-due date (both auto-backfilled), plus one unified governance queue with one-click actions — worker read access is never gated by any of it
+- [x] **Phase 28: Ownership + Review Lifecycle + Governance Queue** - Every SOP gets an accountable owner and review-due date (both auto-backfilled), plus one unified governance queue with one-click actions — worker read access is never gated by any of it (completed 2026-07-12)
 - [ ] **Phase 29: Approval Chains** - Optional per-category 1–4 step approval chain, snapshotted per version, one-click approve — categories without a chain publish exactly as today
 - [ ] **Phase 30: Training Records + AI Maintenance Schedule** - Per-worker training record view with CSV export, outdated-version surfacing, and an AI-prioritized review plan on the governance dashboard
 
@@ -93,7 +93,7 @@ Closes the #1 governance gap surfaced by the 2026-05-05 Visy Packaging customer 
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 28-06-PLAN.md — Merged-tree gate: full suite + tsc + npm run build + pathways coverage + 12-requirement audit (Wave 4)
+- [x] 28-06-PLAN.md — Merged-tree gate: full suite + tsc + npm run build + pathways coverage + 12-requirement audit (Wave 4)
 
 ### Phase 29: Approval Chains
 
@@ -145,7 +145,7 @@ Bundles the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` v0.3. Planne
 - [x] **Phase 21.6: Builder Edit Stage Redesign** (INSERTED 2026-06-05) — Apply the 21.5 review-redesign philosophy to the **Build/edit** stage, which is still the untouched Puck editor. First-time admins hit internal jargon ("Block"), two redundant block lists (Puck component palette = add-new vs outline = already-placed), unanchored canvas figures with no clear action, and a cramped right-rail field editor. Scope from UAT feedback: (1) humanize block-type labels in the Puck palette + outline (reuse `humanizeBlockType` / `block-type-labels.ts` from 21.5 — currently only on the review surface); (2) collapse palette + outline into one clear affordance; (3) move content editing into the central canvas instead of the narrow right rail; (4) clarify the `SectionListSidebar` purpose + 1st→last ordering; (5) clarify what the user does with canvas figures/images. UI-led — produces a UI-SPEC. Runs **before** Phase 22. (completed 2026-06-05)
 - [x] **Phase 22: Voice-Driven Walkthrough** — Turn the Phase 15 voice Q&A shell into a real end-to-end voice loop on the mobile immersive walkthrough: live Deepgram STT in (push-to-talk, SOP-keyterm-boosted for factory-floor noise), gpt-4o-mini-tts read-back out, spoken "next"/"done" driving step progression through the existing D-02 safety-gated path, plus an always-on visual layer (photo-or-icon per step) so a low-literacy worker can follow visually. Closes W-01 literacy gaps + X-02 voice-driven mode. **English-only this phase — multi-language (VDW-LIT-04, VDW-VOICE-04: Te Reo, Tagalog, Hindi, Mandarin) is DEFERRED to a fast-follow per CONTEXT D-08** (prove the loop first; translation-correctness risk on safety wording + weak Te Reo STT/TTS vendor support). Reuses the scaffolded `deepgram-stream.ts` + `WalkthroughVoiceModal` + `/api/voice/query`; preserves the SB-LINE-06 `next/dynamic` bundle isolation. No new npm packages. (completed 2026-06-24)
 
-  **Plans:** 5/6 plans executed
+  **Plans:** 6/6 plans complete
 
   - [x] 22-01-PLAN.md — Wave 0: register `phase22-stubs` Playwright project + 6 source-contract/unit stub specs (Wave 0)
   - [x] 22-02-PLAN.md — Voice infra: Deepgram keyterms + `/api/voice/tts` route + `useTtsPlayback` hook + `classifyIntent` (Wave 1)
@@ -931,7 +931,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | **26.5. Agent Metadata Layer (v5.0)** | 8/8 | ✅ Complete | 2026-07-05 |
 | *(post-26.5 ad-hoc)* | — | AI provider flexibility + builder tree-rail UX — not phased, see note above | 2026-07-09 |
 | **27. AI Provider & Settings (v5.0 close)** | 1/1 | ✅ Complete | 2026-07-12 |
-| 28. Ownership + Review Lifecycle + Governance Queue | 5/6 | In Progress|  |
+| 28. Ownership + Review Lifecycle + Governance Queue | 6/6 | Complete   | 2026-07-12 |
 | 29. Approval Chains | 0/TBD | Not started | - |
 | 30. Training Records + AI Maintenance Schedule | 0/TBD | Not started | - |
 

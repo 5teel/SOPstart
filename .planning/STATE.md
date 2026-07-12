@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
-status: executing
+status: verifying
 stopped_at: Completed 28-04-PLAN.md
-last_updated: "2026-07-12T07:39:25.778Z"
+last_updated: "2026-07-12T07:44:09.481Z"
 last_activity: 2026-07-12 -- Phase 28 execution started
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 6
-  completed_plans: 5
-  percent: 0
+  completed_plans: 6
+  percent: 33
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 Phase: 28 (Ownership + Review Lifecycle + Governance Queue) — EXECUTING
 Plan: 6 of 6
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-12 -- Phase 28 execution started
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
@@ -156,6 +156,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 28 P28-03 | 30min | 3 tasks | 3 files |
 | Phase 28 P04 | 25min | 3 tasks | 6 files |
 | Phase 28 P05 | 25min | 3 tasks | 6 files |
+| Phase 28 P06 | 10min | 2 tasks | 0 files |
 
 ## Accumulated Context
 
@@ -321,6 +322,7 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 28-04]: OwnerPicker.tsx built and committed in Task 1 (not Task 2) because GovernanceQueueRow imports it directly - compile-order dependency
 - [Phase 28]: [Phase 28-05]: Sop type's 4 new ownership/review fields made optional (?:) not required — matches pipeline_run_id?/flow_graph? precedent, avoids touching unrelated partial-Sop voice-QA test fixtures — Two pre-existing voice-QA unit tests construct partial SopWithSections fixtures; required fields would have broken unrelated tsc types for an additive extension.
 - [Phase 28]: [Phase 28-05]: overdue badge guard (review_due_at < now) lives EXCLUSIVELY in admin-only LibraryReviewCell.tsx — worker OverviewTab + walkthrough/detail routes verified gate-free by regex source-contract test (D28-07) — Closes the D28-07 north-star hard rule with an automated test rather than relying on manual review.
+- [Phase 28]: [Phase 28-06]: Final merged-tree gate green with zero fix-forward — all 12 phase-28 requirements (OWN/REV/GQ) audited PASS with implementation evidence
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -430,7 +432,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-12T07:38:41.427Z
+Last session: 2026-07-12T07:43:04.451Z
 Stopped at: Completed 28-04-PLAN.md
 Resume file:
 None
