@@ -554,6 +554,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 - [x] **APR-04**: When a chain exists, publish completes automatically after final approval; pending state (who's next) visible on the SOP and in the queue
 - [x] **APR-05**: Approval history (who, when, which version) visible in the existing version history surface
 
+### UX Consolidation (UX) — Phase 30, inserted 2026-07-12 from frontend audit
+
+- [ ] **UX-01**: One home per role — worker lands on /sops, supervisor + safety_manager on /activity, admin on /admin/sops; dashboard UI deleted (route survives only as a redirect shim); no nav item points at Dashboard
+- [ ] **UX-02**: One shared AdminNav component renders the identical admin menu on every admin page; /admin/agent and governance reachable from it; the 3 disagreeing admin menus and 5 copy-pasted sub-navs are gone
+- [ ] **UX-03**: One governance surface — queue folds into /admin/sops as the "Needs attention" view with flag chips; GovernanceWidget + LibraryReviewCell removed; approval-chain editor relocates to admin settings; APR-03/04 approve-from-queue preserved verbatim
+- [ ] **UX-04**: One "New SOP" entry opening a method picker (Upload first, then Talk / Describe / Blank); all 8 scattered create buttons/tiles/tabs removed
+- [ ] **UX-05**: Worker SOP detail has exactly 3 tabs (Read / Walk it / Flow); PPE + equipment render once; legacy ?tab= params and QR deep-links map to the new tabs
+- [ ] **UX-06**: Admin SOP list rows are one line (title · status chip · flag chip · owner); per-SOP actions live in the builder as a labelled action menu
+- [ ] **UX-07**: Plain-language pass — Check / Edit / Send to workers stage labels, plain AI-reviewer flag titles with human step names (never "block N"), every icon action labelled, reversibility stated near publish
+- [ ] **UX-08**: Dead weight removed — Model tab, walkthrough redirect route + orphan layout, legacy shims, fake notifications bell, no-op department filter; /pathways + /uat moved out of primary nav
+
 ### Training Records (TRN)
 
 - [ ] **TRN-01**: Per-worker training record view — SOP completions rendered as training evidence (SOP, version completed, date, sign-off chain) built on existing completion data
@@ -584,17 +595,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| OWN-01..04 (4) | Phase 28 | Pending |
-| REV-01..04 (4) | Phase 28 | Pending |
-| REV-05 (1) | Phase 30 | Pending |
-| GQ-01..04 (4) | Phase 28 | Pending |
-| APR-01..05 (5) | Phase 29 | Pending |
-| TRN-01..03 (3) | Phase 30 | Pending |
+| OWN-01..04 (4) | Phase 28 | Complete |
+| REV-01..04 (4) | Phase 28 | Complete |
+| REV-05 (1) | Phase 31 | Pending |
+| GQ-01..04 (4) | Phase 28 | Complete |
+| APR-01..05 (5) | Phase 29 | Complete |
+| UX-01..08 (8) | Phase 30 | Pending |
+| TRN-01..03 (3) | Phase 31 | Pending |
 
 **v6.0 Coverage:**
 
-- v6.0 requirements: 21 total (OWN ×4, REV ×5, GQ ×4, APR ×5, TRN ×3)
-- Mapped to phases: 21 (Phase 28: OWN-01..04, REV-01..04, GQ-01..04 = 12; Phase 29: APR-01..05 = 5; Phase 30: TRN-01..03, REV-05 = 4)
+- v6.0 requirements: 29 total (OWN ×4, REV ×5, GQ ×4, APR ×5, UX ×8, TRN ×3)
+- Mapped to phases: 29 (Phase 28: OWN-01..04, REV-01..04, GQ-01..04 = 12; Phase 29: APR-01..05 = 5; Phase 30: UX-01..08 = 8 — inserted 2026-07-12 from frontend audit; Phase 31: TRN-01..03, REV-05 = 4)
 - Unmapped: 0
 
 ---

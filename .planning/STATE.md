@@ -2,11 +2,10 @@
 gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
-current_plan: 6
-status: phase_complete
-stopped_at: Phase 29 complete (6/6 plans, gate green)
-last_updated: "2026-07-12T12:00:00.000Z"
-last_activity: 2026-07-12 -- Completed 29-06-PLAN.md (phase gate green, APR-01..05 audited PASS)
+status: executing
+stopped_at: Phase 29 complete + pushed; next action is Phase 30 discuss/plan
+last_updated: "2026-07-12T14:26:24.468Z"
+last_activity: 2026-07-12 -- Completed 29-06-PLAN.md
 progress:
   total_phases: 3
   completed_phases: 2
@@ -22,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 30 — Training Records + AI Maintenance Schedule (next up; Phase 29 complete)
+**Current focus:** Phase 30 — UX Consolidation & Simplification (inserted 2026-07-12 from frontend audit; Training Records → Phase 31)
 
 ## Current Position
 
-Phase: 29 — COMPLETE (6/6 plans, APR-01..05 audited PASS via tests/phase29/phase-gate.spec.ts)
-Next: Phase 30 — Training Records + AI Maintenance Schedule (no CONTEXT.md yet — discuss or plan)
-Status: Phase complete, ready to transition
-Last activity: 2026-07-12 -- Completed 29-06-PLAN.md
+Phase: 30 — ux-consolidation (UX-01..UX-08)
+Current Plan: 1 of 8 (sequential waves 1-8, main tree, no worktrees)
+Status: Planned (checker passed after orchestrator fix pass) — Ready to execute
+Last activity: 2026-07-13 -- Phase 30 planned: 8 plans; checker blocker (persist decisions #1-#5 into RESEARCH) + W1 (full-suite gate in 30-08) + W3 (VALIDATION frontmatter) fixed inline
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 

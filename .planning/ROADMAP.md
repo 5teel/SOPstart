@@ -59,7 +59,7 @@ Closes the #1 governance gap surfaced by the 2026-05-05 Visy Packaging customer 
 
 - [x] **Phase 28: Ownership + Review Lifecycle + Governance Queue** - Every SOP gets an accountable owner and review-due date (both auto-backfilled), plus one unified governance queue with one-click actions — worker read access is never gated by any of it (completed 2026-07-12)
 - [ ] **Phase 29: Approval Chains** - Optional per-category 1–4 step approval chain, snapshotted per version, one-click approve — categories without a chain publish exactly as today
-- [ ] **Phase 30: Training Records + AI Maintenance Schedule** - Per-worker training record view with CSV export, outdated-version surfacing, and an AI-prioritized review plan on the governance dashboard
+- [ ] **Phase 30: UX Consolidation & Simplification** - One home per role, one admin nav, one create entry, one governance surface, 3-tab worker SOP view, plain language throughout (UX-01..08)
 
 ### Phase 28: Ownership + Review Lifecycle + Governance Queue
 
@@ -76,7 +76,8 @@ Closes the #1 governance gap surfaced by the 2026-05-05 Visy Packaging customer 
 
 **Plans**: 6 plans
 **UI hint**: yes
-Plans:
+
+Plans:
 **Wave 1**
 
 - [x] 28-01-PLAN.md — Migration 00043 (owner + review columns + owner-default trigger + sop_review_cadences + sop_review_events) + db push + types + idempotent backfill (Wave 1)
@@ -147,12 +148,42 @@ Plans:
   8. Governance folded into /admin/sops as the "Needs attention" filter with flag chips; GovernanceWidget and LibraryReviewCell removed as separate surfaces; approval-chain editor relocated to admin settings; APR-03/04 approve-from-queue behaviour preserved (UX-03)
   9. journeys.ts updated in the same change for every rerouted/removed screen; /pathways shows 0 not-mapped
 
-**Plans**: TBD
+**Plans**: 8 plans in 8 sequential waves
 **UI hint**: yes
 
 Plans:
 
-- [ ] TBD (created by /gsd-plan-phase)
+**Wave 1**
+
+- [ ] 30-01-PLAN.md — Wave-0 phase30 test harness + fix 2 pre-existing scp failures + delete BuilderWithSourceViewer + bundle baseline (UX-05, UX-08)
+
+**Wave 2**
+
+- [ ] 30-02-PLAN.md — UX-01 role homes: roleHome helper + /dashboard redirect shim + /pending + not-found.tsx + login/middleware landing (UX-01)
+
+**Wave 3**
+
+- [ ] 30-03-PLAN.md — UX-02 shared AdminNav + /admin/settings hub + replace 5 copy-pasted sub-navs (UX-02)
+
+**Wave 4**
+
+- [ ] 30-04-PLAN.md — TopHeader/global-nav cleanup: one Admin link, no Dashboard, delete fake bell, move Pathways/UAT to account menu (UX-01, UX-02, UX-08)
+
+**Wave 5**
+
+- [ ] 30-05-PLAN.md — UX-04 single New SOP entry -> Upload-first method picker; scattered create buttons removed (UX-04)
+
+**Wave 6**
+
+- [ ] 30-06-PLAN.md — UX-05 worker 6->3 tabs (Read/Walk/Flow) + delete Model/Walkthrough tabs + walkthrough route + dept filter + bundle re-baseline (UX-05, UX-08, UX-04)
+
+**Wave 7**
+
+- [ ] 30-07-PLAN.md — UX-06 builder labelled action menu + UX-07 plain language (Check/Edit/Send-to-workers, plain flag titles, offline pill) (UX-06, UX-07)
+
+**Wave 8**
+
+- [ ] 30-08-PLAN.md — UX-03 governance fold into /admin/sops + one-line rows + /admin/governance shim + editor->settings + merged-tree gate (UX-03, UX-06)
 
 ### Phase 31: Training Records + AI Maintenance Schedule
 
@@ -972,7 +1003,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | **27. AI Provider & Settings (v5.0 close)** | 1/1 | ✅ Complete | 2026-07-12 |
 | 28. Ownership + Review Lifecycle + Governance Queue | 6/6 | Complete    | 2026-07-12 |
 | 29. Approval Chains | 5/6 | In Progress|  |
-| 30. Training Records + AI Maintenance Schedule | 0/TBD | Not started | - |
+| 30. UX Consolidation & Simplification | 0/8 | Planned | - |
 
 ## Backlog
 

@@ -266,11 +266,13 @@ Code: `middleware.ts:41` · `actions/auth.ts:111,177,291` · `roster/page.tsx:46
 | A2 | `BuilderStageShell.tsx` (or its chain) contains all tokens the scp-* tests need after repointing (`SourceViewerPane`, `dynamic(`, `showPane`, `ai_prompt` — first two verified in the shell's import chain, not the shell file itself) | Test repointing | Repointed assertion needs a different target file (ReviewStation/BuilderClient); verify at edit time |
 | A3 | Tab merge reduces (or holds) First Load JS | Bundle gate | If merge somehow grows the route, re-baseline is still legitimate (intentional shift) but must be justified in the plan |
 
-## Open Questions
+## Open Questions (RESOLVED — orchestrator decisions #1–#5, locked 2026-07-12, binding on all plans)
 
-1. **Governance nav item vs folded surface (UX-02 ↔ UX-03).** Recommendation: AdminNav "Governance" → `/admin/sops?view=attention`; `/admin/governance` becomes a `redirect()` page (kills 4 GovernanceWidget-era deep-link targets and old bookmarks safely, minimal test churn). Planner should lock one shape before writing plans.
-2. **Where the 5 row actions land in the builder** (labelled action menu in BuilderStageShell header vs a strip on the Publish/"Send to workers" stage). Menu in the shell header is reachable in every stage — recommended.
-3. **Dept filter: fix or remove.** The TODO says extend `useAssignedSops`. A client-side `sop_departments` fetch + filter is ~20 lines; removal is ~40 lines of deletion (sidebar, sheet, pill, state). Fix is the smaller honest diff if the RLS-side data is queryable by workers; verify `sop_departments` SELECT policy (`using(true)` per the 2026-06-15 learning) before choosing.
+1. **Governance nav shape (UX-02 ↔ UX-03) — RESOLVED (decision #1):** fold into `/admin/sops?view=attention`; AdminNav "Governance" item points there; `/admin/governance` becomes a `redirect()` shim that maps legacy `?filter=X` deep-links onto the new view's filter param (GQ-04 preserved). GovernanceQueueRow approve wiring (approveStep + isCallerNextApprover gate) moves VERBATIM — move, don't reimplement.
+2. **Row-action placement — RESOLVED (decision #2):** the 5 per-SOP actions (assign / versions / video / qr / delete-draft) land in a labelled action menu in the BuilderStageShell top bar (reachable from every stage). Admin list rows keep click→builder only.
+3. **Dept filter — RESOLVED (decision #3):** verify the `sop_departments` SELECT policy first (`using(true)` per 2026-06-15 learning); if workers can read it, FIX the filter (~20-line client-side junction fetch); otherwise REMOVE the filter UI entirely. Executor decides at edit time from the live policy.
+4. **STATUS_TAB collision — RESOLVED (decision #4):** the existing "Needs attention" status tab (value=`failed`) renames to "Parse issues"; the new folded governance view owns the "Needs attention" name.
+5. **/dashboard bound — RESOLVED (decision #5):** the ROUTE survives as a redirect-only shim (role → home); AdminDashboard/PendingDashboard UI is deleted. Internal admin-guard `redirect('/dashboard')` calls may remain (they forward through the shim), but TopHeader, BottomTabBar, and journeys.ts must point directly at the real role homes.
 
 ## Environment Availability
 
