@@ -2,15 +2,16 @@
 gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
+current_plan: 2
 status: executing
-stopped_at: Completed 28-04-PLAN.md
-last_updated: "2026-07-12T08:37:49.160Z"
-last_activity: 2026-07-12 -- Phase 29 planning complete
+stopped_at: Completed 29-01-PLAN.md
+last_updated: "2026-07-12T08:49:47.048Z"
+last_activity: 2026-07-12 -- Completed 29-01-PLAN.md
 progress:
   total_phases: 3
   completed_phases: 1
-  total_plans: 6
-  completed_plans: 6
+  total_plans: 12
+  completed_plans: 7
   percent: 33
 ---
 
@@ -26,9 +27,10 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 29
-Plan: Not started
+Current Plan: 2
+Total Plans in Phase: 6
 Status: Ready to execute
-Last activity: 2026-07-12 -- Phase 29 planning complete
+Last activity: 2026-07-12 -- Completed 29-01-PLAN.md
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
@@ -158,6 +160,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 28 P04 | 25min | 3 tasks | 6 files |
 | Phase 28 P05 | 25min | 3 tasks | 6 files |
 | Phase 28 P06 | 10min | 2 tasks | 0 files |
+| Phase 29 P01 | 35min | 3 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -324,6 +327,9 @@ Recent decisions affecting current work:
 - [Phase 28]: [Phase 28-05]: Sop type's 4 new ownership/review fields made optional (?:) not required — matches pipeline_run_id?/flow_graph? precedent, avoids touching unrelated partial-Sop voice-QA test fixtures — Two pre-existing voice-QA unit tests construct partial SopWithSections fixtures; required fields would have broken unrelated tsc types for an additive extension.
 - [Phase 28]: [Phase 28-05]: overdue badge guard (review_due_at < now) lives EXCLUSIVELY in admin-only LibraryReviewCell.tsx — worker OverviewTab + walkthrough/detail routes verified gate-free by regex source-contract test (D28-07) — Closes the D28-07 north-star hard rule with an automated test rather than relying on manual review.
 - [Phase 28]: [Phase 28-06]: Final merged-tree gate green with zero fix-forward — all 12 phase-28 requirements (OWN/REV/GQ) audited PASS with implementation evidence
+- [Phase 29]: approval_chains RLS uses current_organisation_id() from day one, closing the HR-01 bug class before it ships
+- [Phase 29]: sop_approvals idempotency guard is a partial unique index (where action='approved'), not a blanket 3-column unique constraint
+- [Phase 29]: assertPublishGates() factored out of performPublish() so Plan 29-02's chain-gate can reuse the identical gate checks before diverting into pending_approval
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -433,7 +439,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-12T07:43:04.451Z
-Stopped at: Completed 28-04-PLAN.md
+Last session: 2026-07-12T08:49:47.040Z
+Stopped at: Completed 29-01-PLAN.md
 Resume file:
-None
