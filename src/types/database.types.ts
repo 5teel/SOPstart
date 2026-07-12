@@ -1159,6 +1159,8 @@ export type Database = {
       sops: {
         Row: {
           applicable_equipment: string[] | null
+          approval_snapshot: Json | null
+          approval_state: string | null
           author: string | null
           category: string | null
           category_tag: string | null
@@ -1193,6 +1195,8 @@ export type Database = {
         }
         Insert: {
           applicable_equipment?: string[] | null
+          approval_snapshot?: Json | null
+          approval_state?: string | null
           author?: string | null
           category?: string | null
           category_tag?: string | null
@@ -1227,6 +1231,8 @@ export type Database = {
         }
         Update: {
           applicable_equipment?: string[] | null
+          approval_snapshot?: Json | null
+          approval_state?: string | null
           author?: string | null
           category?: string | null
           category_tag?: string | null
