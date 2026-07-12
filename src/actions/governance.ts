@@ -117,14 +117,20 @@ export async function setSopOwner(
   // Plain session client — admins_can_update_sops RLS (org + admin/safety_manager
   // role) already gates this write. Do NOT use the service-role client here (Pitfall 1).
   const supabase = await createClient()
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from('sops')
     .update({ owner_user_id: userId, updated_at: new Date().toISOString() })
     .eq('id', sopId)
+    .select('id')
 
   if (error) {
     console.error('[setSopOwner] update error', error)
     return { error: error.message }
+  }
+  // 0 rows means RLS filtered it out (SOP in another org / missing id) — the
+  // write was a no-op, so don't report success (LR-01).
+  if (!updated || updated.length === 0) {
+    return { error: 'SOP not found' }
   }
   return { success: true }
 }
