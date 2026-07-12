@@ -4,7 +4,10 @@ import path from 'node:path'
 
 /**
  * Phase 29 Plan 05 Task 3 — governance queue Approve action + awaiting_approval
- * surfacing (source-contract, no live DB required).
+ * surfacing (source-contract, no live DB required). Repointed in 30-08
+ * (UX-03): GovernanceWidget was deleted — the awaiting-approval count +
+ * deep-link now live on the /admin/sops header chips (APR-03/APR-04 hard
+ * constraint); QueueRow + FilterChips survive the fold verbatim.
  *
  * Verifies:
  *   - GovernanceQueueRow's Approve branch condition is
@@ -13,7 +16,7 @@ import path from 'node:path'
  *     wired inside a useTransition (not a bare/empty handler — CLAUDE.md
  *     2026-06-05 dead-feature learning).
  *   - GovernanceFilterChips CHIPS includes awaiting_approval.
- *   - GovernanceWidget counts object + Link both carry awaiting_approval.
+ *   - /admin/sops header chips carry the awaiting_approval count + deep-link.
  *
  * Registration: playwright.config.ts `phase29` project
  *   testDir: '.', testMatch: /tests\/phase29\/.*\.(spec|test)\.ts$/
@@ -22,7 +25,7 @@ import path from 'node:path'
 const ROOT = process.cwd()
 const QUEUE_ROW = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceQueueRow.tsx')
 const FILTER_CHIPS = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceFilterChips.tsx')
-const WIDGET = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceWidget.tsx')
+const LIBRARY_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'page.tsx')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
@@ -72,18 +75,15 @@ test.describe('GovernanceFilterChips — awaiting_approval chip', () => {
   })
 })
 
-test.describe('GovernanceWidget — awaiting_approval count + link', () => {
-  const src = read(WIDGET)
+test.describe('/admin/sops header chips — awaiting_approval count + link (was GovernanceWidget)', () => {
+  const src = read(LIBRARY_PAGE)
 
-  test('counts object includes awaiting_approval', () => {
-    expect(src).toContain('awaiting_approval: 0')
+  test('counts object includes awaiting_approval from the governance queue', () => {
+    expect(src).toContain("awaiting_approval: flaggedRows.filter((r) => r.flags.includes('awaiting_approval')).length")
   })
 
-  test('increments counts.awaiting_approval from row.flags', () => {
-    expect(src).toContain("if (row.flags.includes('awaiting_approval')) counts.awaiting_approval++")
-  })
-
-  test('renders a Link to /admin/governance?filter=awaiting_approval', () => {
-    expect(src).toContain('href="/admin/governance?filter=awaiting_approval"')
+  test('renders a Link to the folded view filtered on awaiting_approval', () => {
+    expect(src).toContain('href="/admin/sops?view=attention&filter=awaiting_approval"')
+    expect(src).toContain('{counts.awaiting_approval} awaiting approval')
   })
 })

@@ -4,12 +4,14 @@ import path from 'node:path'
 
 /**
  * Phase 29 Plan 03 — approval chains config panel (source-contract, no live DB).
+ * Repointed in 30-08 (UX-03): the editor relocated from the retired
+ * /admin/governance page to the /admin/settings hub.
  *
  * Verifies:
  *   - ApprovalChainEditor.tsx imports @dnd-kit and calls setApprovalChain(
  *   - role/member pickers are restricted to admin/safety_manager (Pitfall 3)
- *   - governance/page.tsx mounts <ApprovalChainEditor and calls getApprovalChains(
- *   - no new route was added (D29-05)
+ *   - admin/settings/page.tsx mounts <ApprovalChainEditor and calls getApprovalChains(
+ *   - no new route was added (D29-05); the governance shim no longer mounts it
  *
  * Registration: playwright.config.ts `phase29` project
  *   testDir: '.', testMatch: /tests\/phase29\/.*\.(spec|test)\.ts$/
@@ -17,7 +19,8 @@ import path from 'node:path'
 
 const ROOT = process.cwd()
 const EDITOR = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'ApprovalChainEditor.tsx')
-const PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'governance', 'page.tsx')
+const SETTINGS_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'settings', 'page.tsx')
+const GOVERNANCE_SHIM = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'governance', 'page.tsx')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
@@ -51,8 +54,8 @@ test.describe('ApprovalChainEditor — dnd-kit reorder wired to setApprovalChain
   })
 })
 
-test.describe('governance/page.tsx — mounts ApprovalChainEditor, no new route', () => {
-  const src = read(PAGE)
+test.describe('admin/settings/page.tsx — mounts ApprovalChainEditor (relocated in 30-08)', () => {
+  const src = read(SETTINGS_PAGE)
 
   test('imports and renders ApprovalChainEditor', () => {
     expect(src).toContain("import { ApprovalChainEditor")
@@ -63,8 +66,16 @@ test.describe('governance/page.tsx — mounts ApprovalChainEditor, no new route'
     expect(src).toContain('getApprovalChains(')
   })
 
+  test('guards the admin/safety_manager role', () => {
+    expect(src).toContain("['admin', 'safety_manager'].includes(member.role)")
+  })
+
   test('no new route file exists for approval chain config', () => {
     const newRoutePath = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'governance', 'approval-chains', 'page.tsx')
     expect(fs.existsSync(newRoutePath)).toBe(false)
+  })
+
+  test('the governance shim no longer mounts the editor', () => {
+    expect(read(GOVERNANCE_SHIM)).not.toContain('ApprovalChainEditor')
   })
 })

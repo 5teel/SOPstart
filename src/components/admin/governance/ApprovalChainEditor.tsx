@@ -1,11 +1,11 @@
 'use client'
 
 /**
- * Phase 29 Plan 03 — APR-01 admin-facing config panel (D29-05: one panel on
- * the existing /admin/governance page, no new route, no wizard).
+ * Phase 29 Plan 03 — APR-01 admin-facing config panel (D29-05: one panel, no
+ * new route, no wizard). Relocated to /admin/settings in 30-08 (UX-03 fold).
  *
  * Presentational + local edit state only — all data (categories, members,
- * existing chains) is fetched server-side by governance/page.tsx and passed
+ * existing chains) is fetched server-side by admin/settings/page.tsx and passed
  * in as props. Save wires directly to setApprovalChain (src/actions/approvals.ts).
  *
  * Step rows mirror chainStepSchema (src/lib/validators/approvals.ts): exactly

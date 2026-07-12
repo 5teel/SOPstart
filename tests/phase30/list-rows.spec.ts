@@ -31,11 +31,15 @@ function read(p: string): string {
 }
 
 test.describe('UX-06 — one-line admin rows + builder action menu', () => {
-  test.fixme('admin rows contain no SopDepartmentEditor / LibraryReviewCell / icon-only actions', () => {
+  test('admin rows contain no SopDepartmentEditor / LibraryReviewCell / icon-only actions', () => {
     const src = read(ADMIN_SOPS_PAGE)
     expect(src).not.toContain('SopDepartmentEditor')
     expect(src).not.toContain('LibraryReviewCell')
     expect(src).not.toContain('VideoJobIndicator')
+    // No icon-only action Links survive in the row region.
+    expect(src).not.toContain('!min-w-[40px]')
+    expect(src).not.toContain('DeleteSopButton')
+    expect(src).not.toContain('lucide-react')
   })
 
   test('builder shell owns a labelled action menu wired to the 5 destinations', () => {
@@ -67,8 +71,15 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
     expect(shell).toMatch(/aria-expanded=\{open\}/)
   })
 
-  test.fixme('row is one line: title + status chip + one flag chip + owner, click → builder', () => {
+  test('row is one line: title + status chip + one flag chip + owner, click → builder', () => {
     const src = read(ADMIN_SOPS_PAGE)
-    expect(src).toContain('/admin/sops/builder/')
+    // Whole row is the builder link (WIRING: interpolated sopId).
+    expect(src).toMatch(/href=\{`\/admin\/sops\/builder\/\$\{sop\.id\}`\}/)
+    // Title · status chip · ONE flag chip · owner.
+    expect(src).toContain('<StatusBadge status={sop.status as SopStatus} />')
+    expect(src).toContain('FLAG_LABEL[flag]')
+    expect(src).toContain('ownerLabelById[sop.owner_user_id]')
+    // ONE flag chip: worst-first pick from the governance queue flags.
+    expect(src).toContain('FLAG_PRIORITY.find((f) => r.flags.includes(f))')
   })
 })
