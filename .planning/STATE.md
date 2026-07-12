@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
-status: Phase complete — ready for verification
+status: Ready to plan
 stopped_at: Completed 27-01-PLAN.md
-last_updated: "2026-07-12T03:23:28.448Z"
+last_updated: "2026-07-12T03:28:37.413Z"
 progress:
   total_phases: 30
   completed_phases: 5
@@ -24,8 +24,8 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 27 (ai-provider-settings-formal-spec-pass) — EXECUTING
-Plan: 1 of 1
+Phase: 999.1
+Plan: Not started
 **Milestone status:** **v4.0 ✅ shipped 2026-07-02** (Phases 21, 21.5, 21.6, 22, 23, 24, 25 executed + code-reviewed; residual = human UAT on 21.6/22/23/25, carried per v3.0 field-verification precedent). **v5.0 ✅ shipped 2026-07-05** — Phase 26 (14/14 plans, bespoke inline builder, Puck fully removed) + Phase 26.5 (8/8 plans, agent-metadata layer). **Post-26.5 ad-hoc work (2026-07-06→09, NOT GSD-phased):** provider-agnostic AI layer (model registry `src/lib/ai/registry.ts`, adapter `src/lib/ai/llm.ts` for Anthropic/OpenAI/OpenRouter+GLM 5.2, `/admin/ai-settings` org model overrides, R&D-validated grounding prompt from `.autoresearch` loop), unified AI-draft surface (`/admin/sops/new/ai`), QR machine deep links + read-aloud + draft triage queue, builder tree-rail navigation overhaul (focus-flash, verify auto-advance, real preview text), and the layout_data-trio bug fix (non-DOCX drafts rendered empty canvas) + prod backfill. Full commit list + rationale: `git log 270a5c1..b13b990`, folded into PROJECT.md Validated + CLAUDE.md Learnings.
 
 **Active phase:** None — no phase currently planned or in progress. `.planning/ROADMAP.md` v5.0 section has no queued Phase 27. Next step is Simon's call: open a new phase for the ad-hoc AI-provider/builder-UX work retroactively, start a new milestone, or continue building ad-hoc.
@@ -113,6 +113,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | 25 | 6 | - | - |
 | 22 | 4 | - | - |
 | 26.5 | 8 | - | - |
+| 27 | 1 | - | - |
 
 **v2.0 By Phase:**
 
