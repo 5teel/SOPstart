@@ -1,3 +1,4 @@
+export * from './ReadTab'
 export * from './OverviewTab'
 export * from './ToolsTab'
 export * from './HazardsTab'

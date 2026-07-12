@@ -6,9 +6,7 @@ import { useSopDetail } from '@/hooks/useSopDetail'
 import { useIsAdmin } from '@/components/providers/RoleProvider'
 import { SopTabNav, useActiveTab } from '@/components/sop/SopTabNav'
 import { WorkerPreviewToggle, WorkerPreviewClamp } from '@/components/sop/WorkerPreviewToggle'
-import {
-  OverviewTab, ToolsTab, HazardsTab, FlowTab, ModelTab,
-} from '@/components/sop/tabs'
+import { ReadTab, FlowTab } from '@/components/sop/tabs'
 import { WalkthroughSwitcher } from '@/components/sop/walkthrough/WalkthroughSwitcher'
 
 function SopDetailInner() {
@@ -28,7 +26,7 @@ function SopDetailInner() {
         </div>
         {/* Skeleton tab bar */}
         <div className="h-[48px] bg-[var(--paper)] border-b border-[var(--ink-100)] flex items-center px-4 gap-4">
-          {[...Array(6)].map((_, i) => (
+          {[...Array(3)].map((_, i) => (
             <div key={i} className="w-16 h-3 rounded bg-[var(--ink-100)] animate-pulse" />
           ))}
         </div>
@@ -89,12 +87,9 @@ function SopDetailInner() {
 
       <main>
         <WorkerPreviewClamp>
-          {active === 'overview'    && <OverviewTab sop={sop} />}
-          {active === 'tools'       && <ToolsTab sop={sop} />}
-          {active === 'hazards'     && <HazardsTab sop={sop} />}
-          {active === 'flow'        && <FlowTab sop={sop} />}
-          {active === 'model'       && <ModelTab sop={sop} />}
-          {active === 'walkthrough' && <WalkthroughSwitcher sop={sop} />}
+          {active === 'read' && <ReadTab sop={sop} />}
+          {active === 'walk' && <WalkthroughSwitcher sop={sop} />}
+          {active === 'flow' && <FlowTab sop={sop} />}
         </WorkerPreviewClamp>
       </main>
 
