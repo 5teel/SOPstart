@@ -135,7 +135,7 @@ export default function SopsPage() {
         </button>
       </header>
 
-      {/* Section tabs — UX-04: no worker-side "Create SOP" entry (admins create via admin nav) */}
+      {/* Section tabs — UX-04: no worker-side create entry (admins create via admin nav) */}
       <nav className="flex border-b border-[var(--ink-100)] px-4 gap-1">
         <button
           type="button"

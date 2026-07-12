@@ -32,12 +32,17 @@ test.describe('UX-08 — dead-weight sweep', () => {
     expect(fs.existsSync(path.join(BUILDER_DIR, 'BuilderWithSourceViewer.tsx'))).toBe(false)
   })
 
-  test.fixme('ModelTab + WalkthroughTab shim are deleted with their tab entries', () => {
+  // LIVE from 30-06: UX-05 tab merge deletions.
+  test('ModelTab + WalkthroughTab shim are deleted with their tab entries', () => {
     expect(fs.existsSync(path.join(TABS_DIR, 'ModelTab.tsx'))).toBe(false)
     expect(fs.existsSync(path.join(TABS_DIR, 'WalkthroughTab.tsx'))).toBe(false)
+    // Their exports are gone from the tabs barrel too.
+    const barrel = fs.readFileSync(path.join(TABS_DIR, 'index.ts'), 'utf-8')
+    expect(barrel).not.toContain('ModelTab')
+    expect(barrel).not.toContain('WalkthroughTab')
   })
 
-  test.fixme('/sops/[sopId]/walkthrough route (page + orphan layout) is deleted', () => {
+  test('/sops/[sopId]/walkthrough route (page + orphan layout) is deleted', () => {
     const routeDir = path.join(ROOT, 'src', 'app', '(protected)', 'sops', '[sopId]', 'walkthrough')
     expect(fs.existsSync(routeDir)).toBe(false)
   })
@@ -55,11 +60,18 @@ test.describe('UX-08 — dead-weight sweep', () => {
     expect(tabBar).toContain('NotificationBadge')
   })
 
-  test.fixme('worker /sops department filter is fixed or removed (no placebo return true)', () => {
+  // LIVE from 30-06: decision #3 — sop_departments SELECT using(true) verified
+  // live, so the filter was FIXED (real junction fetch), not removed.
+  test('worker /sops department filter is fixed or removed (no placebo return true)', () => {
     const src = fs.readFileSync(
       path.join(ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx'), 'utf-8',
     )
     expect(src).not.toMatch(/\/\/ TODO.*useAssignedSops/)
+    // The fix is WIRED: junction fetch feeds the filter predicate.
+    expect(src).toContain("from('sop_departments')")
+    expect(src).toContain('sopDeptMap[sop.id]')
+    // UX-04: no worker-side Create SOP tab either.
+    expect(src).not.toContain('Create SOP')
   })
 
   // LIVE from 30-04 Task 1: header consolidated (UX-01/02/08 slice).
@@ -100,7 +112,8 @@ test.describe('UX-08 — dead-weight sweep', () => {
     expect(header).toContain('isAdminRole(role)')
   })
 
-  test.fixme('journeys.ts contains no removed routes (/pathways shows 0 not-mapped)', () => {
+  // LIVE from 30-06: walkthrough journeys repointed to /sops/[sopId] Walk tab.
+  test('journeys.ts contains no removed routes (/pathways shows 0 not-mapped)', () => {
     const journeys = fs.readFileSync(
       path.join(ROOT, 'src', 'lib', 'journeys', 'journeys.ts'), 'utf-8',
     )

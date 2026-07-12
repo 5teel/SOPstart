@@ -1,13 +1,13 @@
 {
-  "capturedAt": "2026-07-06T14:07:08.545Z",
+  "capturedAt": "2026-07-12T15:32:42.606Z",
   "note": "First Load JS baseline for the mobile worker route (/sops/[sopId]). Postbuild check-bundle-size enforces ≤ +2KB delta. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts.",
   "previousBaseline": {
-    "value": 1054,
-    "capturedAt": "2026-07-03T04:09:37.365Z",
+    "value": 1057,
+    "capturedAt": "2026-07-06T14:07:08.545Z",
     "note": "First Load JS baseline for the mobile worker route (/sops/[sopId]). Postbuild check-bundle-size enforces ≤ +2KB delta. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts."
   },
   "routes": {
-    "/sops/[sopId]/page": 1057
+    "/sops/[sopId]/page": 1056
   },
   "chunkCount": 19
 }

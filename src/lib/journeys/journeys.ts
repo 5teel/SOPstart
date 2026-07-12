@@ -84,7 +84,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'select', type: 'action', label: 'Tap name from roster', detail: 'roster_worker_id stored in sessionStorage. Shared-device account (RLS key) session unchanged.' },
       { id: 'sops', type: 'screen', label: 'SOP library', route: '/sops', detail: 'Worker browses SOPs. "Updated since last completion" badge appears on any SOP newer than their last completion (AFL-VER-04 / D-08).' },
       { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]', detail: 'Reads the SOP before walking it.' },
-      { id: 'walk', type: 'screen', label: 'Step-by-step walkthrough', route: '/sops/[sopId]/walkthrough', detail: 'Worker steps through using tap or voice (Phase 22).' },
+      { id: 'walk', type: 'screen', label: 'Step-by-step walkthrough (Walk it tab)', route: '/sops/[sopId]', detail: 'Worker steps through using tap or voice (Phase 22). Walk it tab on the SOP detail (?tab=walk; legacy ?tab=walkthrough still lands).' },
       { id: 'complete', type: 'action', label: 'Complete + worker self-sign', detail: 'Completing the SOP IS the worker signature (D-09). recordSignature() binds roster_worker_id to the completion record for attribution.' },
       { id: 'countersign', type: 'decision', label: 'Counter-sign required?', branches: [
         { label: 'Yes — supervisor counter-signs', to: 'sup' },
@@ -138,12 +138,12 @@ export const JOURNEYS: Journey[] = [
     steps: [
       { id: 's', type: 'start', label: 'Needs to do a task' },
       { id: 'lib', type: 'screen', label: 'SOP library', route: '/sops', detail: 'Browse, search, filter by trade. "Updated since last completion" badge (AFL-VER-04) marks any SOP published after the worker\'s last completion.' },
-      { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]', detail: 'Tabs: overview, tools, hazards, flow, model, walkthrough. Flow tab defaults to spatial graph on desktop (≥1024px) with a List/Graph toggle; mobile defaults to list. Admins/safety managers see an "Edit in builder" link here to deliberately open this SOP in the admin builder.' },
+      { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]', detail: 'Tabs: read, walk, flow (Phase 30 UX-05 — Read merges the old Overview/Tools/Hazards brief; legacy ?tab= params map onto the new tabs). Flow tab defaults to spatial graph on desktop (≥1024px) with a List/Graph toggle; mobile defaults to list. Admins/safety managers see an "Edit in builder" link here to deliberately open this SOP in the admin builder.' },
       { id: 'go', type: 'decision', label: 'Ready to start?', branches: [
         { label: 'Yes — walk it', to: 'walk' },
         { label: 'Just reading', to: 'e' },
       ] },
-      { id: 'walk', type: 'screen', label: 'Step-by-step walkthrough', route: '/sops/[sopId]/walkthrough' },
+      { id: 'walk', type: 'screen', label: 'Step-by-step walkthrough (Walk it tab)', route: '/sops/[sopId]', detail: 'Walk it tab (?tab=walk).' },
       { id: 'e', type: 'end', label: 'Procedure open' },
     ],
   },
@@ -154,7 +154,7 @@ export const JOURNEYS: Journey[] = [
     title: 'Follow a procedure & complete it',
     summary: 'A worker walks each step on their phone, captures evidence, and completes the job with a tamper-proof record.',
     steps: [
-      { id: 's', type: 'start', label: 'In the walkthrough', route: '/sops/[sopId]/walkthrough' },
+      { id: 's', type: 'start', label: 'In the walkthrough (Walk it tab)', route: '/sops/[sopId]' },
       { id: 'read', type: 'action', label: 'Read & acknowledge the step', detail: 'Must acknowledge to advance (safety).' },
       { id: 'kind', type: 'decision', label: 'What does the step need?', branches: [
         { label: 'Just read it', to: 'next' },
@@ -165,7 +165,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'photo', type: 'action', label: 'Capture photo', detail: 'Compressed + queued (works offline).' },
       { id: 'meas', type: 'action', label: 'Enter reading', detail: 'Flagged if out of range.' },
       { id: 'decide', type: 'action', label: 'Choose path', detail: 'May branch or escalate.' },
-      { id: 'ask', type: 'action', label: '(Optional) Voice interaction — ask a question or say "next"/"done"', detail: 'Phase 22: voice-driven mode on the mobile immersive surface. Mic pill → push-to-talk → classifyIntent routes to: (a) voice "next"/"done" → handleMarkComplete (same D-02 safety-ack path as the tap button); (b) voice question → AI Q&A grounded in this SOP, answer read aloud via TTS; step text is read aloud on each advance (VDW-LIT-03). Always-on tap equivalents remain (D-04). No new route — voice is a mode layer on /sops/[sopId]/walkthrough.' },
+      { id: 'ask', type: 'action', label: '(Optional) Voice interaction — ask a question or say "next"/"done"', detail: 'Phase 22: voice-driven mode on the mobile immersive surface. Mic pill → push-to-talk → classifyIntent routes to: (a) voice "next"/"done" → handleMarkComplete (same D-02 safety-ack path as the tap button); (b) voice question → AI Q&A grounded in this SOP, answer read aloud via TTS; step text is read aloud on each advance (VDW-LIT-03). Always-on tap equivalents remain (D-04). No new route — voice is a mode layer on the SOP detail Walk it tab (?tab=walk).' },
       { id: 'next', type: 'decision', label: 'More steps?', branches: [
         { label: 'Yes', to: 'read' },
         { label: 'Last step done', to: 'complete' },
@@ -308,7 +308,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'qr', type: 'screen', label: 'Print QR sticker', route: '/admin/sops/[sopId]/qr', detail: 'Server-rendered QR encoding the worker deep link. Stick it on the machine/work area.' },
       { id: 'scan', type: 'action', label: 'Worker scans sticker on the machine' },
       { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]' },
-      { id: 'walk', type: 'screen', label: 'Walkthrough', route: '/sops/[sopId]/walkthrough' },
+      { id: 'walk', type: 'screen', label: 'Walkthrough (Walk it tab)', route: '/sops/[sopId]', detail: 'Walk it tab (?tab=walk).' },
       { id: 'e', type: 'end', label: 'Right SOP, zero searching' },
     ],
   },
