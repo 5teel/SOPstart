@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
-current_plan: 5
+current_plan: 6
 status: executing
 stopped_at: Completed 29-03-PLAN.md
-last_updated: "2026-07-12T09:21:49.348Z"
+last_updated: "2026-07-12T09:36:54.033Z"
 last_activity: 2026-07-12 -- Completed 29-01-PLAN.md
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 12
-  completed_plans: 10
+  completed_plans: 11
   percent: 33
 ---
 
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 29
-Current Plan: 5
+Current Plan: 6
 Total Plans in Phase: 6
 Status: Ready to execute
 Last activity: 2026-07-12 -- Completed 29-01-PLAN.md
@@ -164,6 +164,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 29 P02 | ~30min | 3 tasks | 11 files |
 | Phase 29 P03 | 15min | 2 tasks | 3 files |
 | Phase 29 P04 | 20min | 3 tasks | 5 files |
+| Phase 29-approval-chains P05 | 15 | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -449,7 +450,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-12T09:21:18.068Z
+Last session: 2026-07-12T09:32:57.680Z
 Stopped at: Completed 29-03-PLAN.md
 Resume file:
 None
