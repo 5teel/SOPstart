@@ -4,8 +4,12 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { parseJwtPayload } from '@/lib/supabase/jwt'
 import { listGovernanceQueue, type GovernanceRow } from '@/actions/governance'
+import { getApprovalChains } from '@/actions/approvals'
+import { getOrgMembers } from '@/actions/assignments'
 import { GovernanceFilterChips, type GovernanceFilter } from '@/components/admin/governance/GovernanceFilterChips'
 import { GovernanceQueueRow } from '@/components/admin/governance/GovernanceQueueRow'
+import { ApprovalChainEditor, type ChainMember } from '@/components/admin/governance/ApprovalChainEditor'
+import type { ChainStep } from '@/lib/governance/approvals'
 
 export const metadata: Metadata = {
   title: 'Governance queue',
@@ -57,6 +61,32 @@ export default async function GovernancePage({
 
   const visibleRows = activeFilter === 'all' ? flaggedRows : flaggedRows.filter((r) => r.flags.includes(activeFilter))
 
+  // Approval chains config panel (D29-05) — distinct sops.category values for
+  // the org, no new table. Simple select + dedupe in JS.
+  const { data: categoryRows } = await supabase
+    .from('sops')
+    .select('category')
+    .eq('organisation_id', organisationId ?? '')
+    .not('category', 'is', null)
+
+  const categories = Array.from(
+    new Set((categoryRows ?? []).map((r) => r.category).filter((c): c is string => !!c)),
+  ).sort()
+
+  const chainsResult = await getApprovalChains()
+  const chains: Record<string, ChainStep[]> =
+    'success' in chainsResult && chainsResult.success
+      ? Object.fromEntries(chainsResult.chains.map((c) => [c.category, c.steps]))
+      : {}
+
+  const membersResult = await getOrgMembers()
+  const members: ChainMember[] =
+    membersResult.success
+      ? membersResult.members
+          .filter((m) => m.role === 'admin' || m.role === 'safety_manager')
+          .map((m) => ({ user_id: m.user_id, role: m.role, label: m.email ?? m.full_name ?? `${m.role} (${m.user_id.slice(0, 8)})` }))
+      : []
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10">
       <div className="flex items-start justify-between mb-6 gap-4 flex-wrap">
@@ -101,6 +131,14 @@ export default async function GovernancePage({
           ))}
         </ul>
       )}
+
+      <div className="mt-8">
+        <div className="flex items-center gap-3 mb-3">
+          <span className="pill">CONFIG</span>
+          <h2 className="mono text-lg font-semibold text-[var(--ink-900)]">Approval chains</h2>
+        </div>
+        <ApprovalChainEditor categories={categories} members={members} chains={chains} />
+      </div>
     </div>
   )
 }
