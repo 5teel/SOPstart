@@ -78,4 +78,17 @@ test.describe('computeReviewDueDate', () => {
     const result = computeReviewDueDate('2026-01-15T00:00:00.000Z', 12)
     expect(result).toBe('2027-01-15T00:00:00.000Z')
   })
+
+  test('clamps to end-of-month when the source day overflows (Jan 31 + 1mo -> Feb 28)', () => {
+    // 2026 is not a leap year -> Feb 28, NOT Mar 2/3.
+    expect(computeReviewDueDate('2026-01-31T00:00:00.000Z', 1)).toBe('2026-02-28T00:00:00.000Z')
+    // Leap year -> Feb 29.
+    expect(computeReviewDueDate('2024-01-31T00:00:00.000Z', 1)).toBe('2024-02-29T00:00:00.000Z')
+    // Aug 31 + 6mo -> Feb 28 (LR-02 exact repro).
+    expect(computeReviewDueDate('2026-08-31T00:00:00.000Z', 6)).toBe('2027-02-28T00:00:00.000Z')
+  })
+
+  test('preserves day-of-month for a normal mid-month case', () => {
+    expect(computeReviewDueDate('2026-03-15T00:00:00.000Z', 3)).toBe('2026-06-15T00:00:00.000Z')
+  })
 })

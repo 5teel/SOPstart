@@ -22,8 +22,16 @@ export function resolveCadenceMonths(
   return DEFAULT_CADENCE_MONTHS
 }
 
-export function computeReviewDueDate(baseIso: string, months: number, now?: Date): string {
+export function computeReviewDueDate(baseIso: string, months: number): string {
+  // UTC methods throughout — inputs are UTC ISO strings, so setMonth-drift
+  // guarding must stay in UTC or the end-of-month clamp becomes TZ-dependent.
   const base = new Date(baseIso)
-  base.setMonth(base.getMonth() + months)
+  const targetDay = base.getUTCDate()
+  base.setUTCDate(1)
+  base.setUTCMonth(base.getUTCMonth() + months)
+  // Clamp to the last day of the target month when the source day overflows
+  // (Jan 31 + 1mo -> Feb 28/29, not Mar 2/3).
+  const lastDayOfTargetMonth = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth() + 1, 0)).getUTCDate()
+  base.setUTCDate(Math.min(targetDay, lastDayOfTargetMonth))
   return base.toISOString()
 }
