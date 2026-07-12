@@ -254,7 +254,8 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin uploads an existing Word/PDF/Excel/PowerPoint/photo and AI turns it into a structured, mobile-friendly procedure.',
     steps: [
       { id: 's', type: 'start', label: 'Has an existing SOP doc' },
-      { id: 'lib', type: 'screen', label: 'SOP management', route: '/admin/sops' },
+      { id: 'lib', type: 'screen', label: 'SOP management', route: '/admin/sops', detail: 'Single "New SOP" button (UX-04 — the one create entry).' },
+      { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: '4 tiles, Upload first: Upload a document · Talk it through · Describe it · Start blank.' },
       { id: 'up', type: 'screen', label: 'Upload', route: '/admin/sops/upload', detail: 'Drag in .docx/.pdf/.xlsx/.pptx/photo.' },
       { id: 'parse', type: 'action', label: 'AI parses the document', detail: 'Async pipeline (30–120s); extracts sections, steps, hazards.' },
       { id: 'status', type: 'decision', label: 'Parse result?', branches: [
@@ -273,6 +274,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin uploads a video, records one, or pastes a YouTube link; the audio is transcribed into a draft procedure.',
     steps: [
       { id: 's', type: 'start', label: 'Has a video of the task' },
+      { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: 'Video lives behind "Upload a document".' },
       { id: 'up', type: 'screen', label: 'Upload / record / YouTube', route: '/admin/sops/upload' },
       { id: 'trans', type: 'action', label: 'Transcribe audio', detail: 'Domain vocabulary prompt; numbers + chemicals flagged for confirmation.' },
       { id: 'pipe', type: 'screen', label: 'Pipeline progress', route: '/admin/sops/pipeline/[pipelineId]' },
@@ -288,6 +290,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin describes the procedure in plain words and AI drafts a first version.',
     steps: [
       { id: 's', type: 'start', label: 'No document — just knowledge' },
+      { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: '"Describe it" tile.' },
       { id: 'ai', type: 'screen', label: 'AI draft', route: '/admin/sops/new/ai' },
       { id: 'prompt', type: 'action', label: 'Describe the procedure', detail: 'AI generates structured sections + steps.' },
       { id: 'builder', type: 'screen', label: 'Builder', route: '/admin/sops/builder/[sopId]' },
@@ -317,6 +320,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin describes the procedure out loud; an AI interviewer asks follow-up questions, builds a brief, then drafts through the same AI pipeline.',
     steps: [
       { id: 's', type: 'start', label: 'Easier to say than type' },
+      { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: '"Talk it through" tile deep-links ?mode=voice (honoured by AiDraftTabs).' },
       { id: 'voice', type: 'screen', label: 'Voice draft conversation (Talk it through tab)', route: '/admin/sops/new/ai', detail: 'Mic → live transcription → AI follow-up questions (spoken + text). Brief accumulates as you talk.' },
       { id: 'gen', type: 'action', label: 'Generate draft', detail: 'The accumulated brief feeds the same /api/sops/ai-prompt pipeline as the typed workflow.' },
       { id: 'builder', type: 'screen', label: 'Builder', route: '/admin/sops/builder/[sopId]' },
@@ -331,6 +335,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin builds a procedure from scratch using a guided wizard, then the builder.',
     steps: [
       { id: 's', type: 'start', label: 'Build it by hand' },
+      { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: '"Start blank" tile.' },
       { id: 'blank', type: 'screen', label: 'Blank wizard', route: '/admin/sops/new/blank', detail: 'Title, sections, category.' },
       { id: 'builder', type: 'screen', label: 'Builder', route: '/admin/sops/builder/[sopId]' },
       { id: 'e', type: 'end', label: 'Draft ready' },

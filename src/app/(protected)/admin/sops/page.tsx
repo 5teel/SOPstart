@@ -124,32 +124,13 @@ export default async function SopsLibraryPage({
             <h1 className="mono text-2xl font-semibold text-[var(--ink-900)]">SOPs</h1>
           </div>
           <GovernanceWidget />
-          <div className="flex items-center gap-2 flex-wrap">
-            <Link
-              href="/admin/sops/upload"
-              className="evidence-btn !min-h-[40px] text-sm"
-            >
-              Upload
-            </Link>
-            <Link
-              href="/admin/sops/new/blank"
-              className="evidence-btn !min-h-[40px] text-sm"
-            >
-              Blank
-            </Link>
-            <Link
-              href="/admin/sops/new/ai"
-              className="evidence-btn !min-h-[40px] text-sm !bg-[var(--ink-900)] !text-white !border-[var(--ink-900)] hover:!bg-[var(--ink-700)]"
-            >
-              AI Draft
-            </Link>
-            <Link
-              href="/admin/sops/new/ai?mode=voice"
-              className="evidence-btn !min-h-[40px] text-sm"
-            >
-              🎤 Voice Draft
-            </Link>
-          </div>
+          {/* UX-04: the ONE create entry — method picker at /admin/sops/new */}
+          <Link
+            href="/admin/sops/new"
+            className="evidence-btn !min-h-[40px] text-sm !bg-[var(--ink-900)] !text-white !border-[var(--ink-900)] hover:!bg-[var(--ink-700)]"
+          >
+            New SOP
+          </Link>
         </div>
 
         <AdminNav active="sops" />
@@ -199,20 +180,9 @@ export default async function SopsLibraryPage({
               EMPTY
             </p>
             <p className="text-lg font-semibold text-[var(--ink-900)] mb-1">No SOPs yet</p>
-            <p className="text-sm text-[var(--ink-500)] mb-6">
-              Pick a starting point above — upload a doc, start blank, or draft with AI.
+            <p className="text-sm text-[var(--ink-500)]">
+              Use the New SOP button above — upload a doc, talk it through, describe it, or start blank.
             </p>
-            <div className="flex justify-center gap-2 flex-wrap">
-              <Link href="/admin/sops/upload" className="evidence-btn text-sm">Upload</Link>
-              <Link href="/admin/sops/new/blank" className="evidence-btn text-sm">Blank</Link>
-              <Link
-                href="/admin/sops/new/ai"
-                className="evidence-btn text-sm !bg-[var(--ink-900)] !text-white !border-[var(--ink-900)]"
-              >
-                AI Draft
-              </Link>
-              <Link href="/admin/sops/new/ai?mode=voice" className="evidence-btn text-sm">🎤 Voice Draft</Link>
-            </div>
           </div>
         ) : (
           <ul className="space-y-2">
