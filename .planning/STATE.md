@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: SOP Ownership & Governance Infrastructure
-status: planning
+status: roadmapped
 last_updated: "2026-07-12T06:08:49.817Z"
 last_activity: 2026-07-12
 progress:
-  total_phases: 0
+  total_phases: 3
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 27 — ai-provider-settings-formal-spec-pass
+**Current focus:** Phase 28 — ownership-review-lifecycle-governance-queue
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 28 (Ownership + Review Lifecycle + Governance Queue) — not started
 Plan: —
-Status: Defining requirements
-Last activity: 2026-07-12 — Milestone v6.0 started
+Status: Roadmap complete (3 phases: 28, 29, 30) — ready for /gsd-plan-phase 28
+Last activity: 2026-07-12 — v6.0 roadmap created (Phases 28-30, 21/21 requirements mapped)
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 

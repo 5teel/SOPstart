@@ -584,11 +584,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| OWN-01..04 | TBD | Pending |
-| REV-01..05 | TBD | Pending |
-| GQ-01..04 | TBD | Pending |
-| APR-01..05 | TBD | Pending |
-| TRN-01..03 | TBD | Pending |
+| OWN-01..04 (4) | Phase 28 | Pending |
+| REV-01..04 (4) | Phase 28 | Pending |
+| REV-05 (1) | Phase 30 | Pending |
+| GQ-01..04 (4) | Phase 28 | Pending |
+| APR-01..05 (5) | Phase 29 | Pending |
+| TRN-01..03 (3) | Phase 30 | Pending |
+
+**v6.0 Coverage:**
+
+- v6.0 requirements: 21 total (OWN ×4, REV ×5, GQ ×4, APR ×5, TRN ×3)
+- Mapped to phases: 21 (Phase 28: OWN-01..04, REV-01..04, GQ-01..04 = 12; Phase 29: APR-01..05 = 5; Phase 30: TRN-01..03, REV-05 = 4)
+- Unmapped: 0
 
 ---
 *v6.0 requirements added: 2026-07-12*

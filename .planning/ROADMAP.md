@@ -53,6 +53,75 @@ Plans:
 
 ---
 
+## v6.0 — SOP Ownership & Governance Infrastructure (started 2026-07-12)
+
+Closes the #1 governance gap surfaced by the 2026-05-05 Visy Packaging customer interview ("Nobody owns SOPs — there isn't anybody"). **NORTH STAR (locked by Simon 2026-07-12):** ease of use and maintenance first — process and blockers never beat ease of use; governance state NEVER blocks worker read/walkthrough access. Approval chains are opt-in per category (absent chain = today's publish flow, byte-identical). Owners and review dates auto-backfill — no admin data-entry campaign. Builds on existing infra only: version supersede + sign-off chain (Phase 23), departments (Phase 25), completions (Phase 4), AI adapter + agent metadata (Phase 26.5/27), site tier (Phase 15). Execution order 28 → 29 → 30.
+
+- [ ] **Phase 28: Ownership + Review Lifecycle + Governance Queue** - Every SOP gets an accountable owner and review-due date (both auto-backfilled), plus one unified governance queue with one-click actions — worker read access is never gated by any of it
+- [ ] **Phase 29: Approval Chains** - Optional per-category 1–4 step approval chain, snapshotted per version, one-click approve — categories without a chain publish exactly as today
+- [ ] **Phase 30: Training Records + AI Maintenance Schedule** - Per-worker training record view with CSV export, outdated-version surfacing, and an AI-prioritized review plan on the governance dashboard
+
+### Phase 28: Ownership + Review Lifecycle + Governance Queue
+
+**Goal**: Every SOP displays a single accountable owner and a review-due date — both auto-backfilled with zero admin data-entry — and admins get one unified governance queue (due-soon / overdue / unowned / stale-role) with one-click actions; worker read/walkthrough access is never blocked by ownership or review state.
+**Depends on**: Phase 25 (departments + `owner_user_id` pattern), Phase 23 (version supersede — "confirm current" routes into it), Phase 4 (completions feed queue/staleness signals)
+**Requirements**: OWN-01, OWN-02, OWN-03, OWN-04, REV-01, REV-02, REV-03, REV-04, GQ-01, GQ-02, GQ-03, GQ-04
+**Success Criteria** (what must be TRUE):
+
+  1. Every SOP (existing and new) displays a single accountable owner, auto-backfilled to creator or org admin with no manual data-entry campaign; admin can reassign the owner in ≤2 clicks from the SOP library row or builder/detail page
+  2. An owner can open a "My SOPs" view listing every SOP they own with review status at a glance; if an owner is deactivated or removed from the org, their SOPs automatically surface as "unowned" in the governance queue rather than going silently orphaned
+  3. Every SOP has a review-due date derived from a per-category default cadence (overridable per SOP, auto-backfilled from published/updated date); marking it reviewed is one click ("Confirm current") or routes into the existing edit → version-supersede flow
+  4. Overdue SOPs show a visible badge/grey-out in the admin library and workers see a lightweight "current as of <date>" indicator on the SOP view — but review/ownership state never blocks a worker from opening, reading, or completing any SOP
+  5. Admin sees one unified governance queue (due-soon / overdue / unowned / stale-role — the latter triggered when a role/department referenced by an SOP's assignments is renamed or removed) with a one-click primary action inline on every row, plus a dashboard widget on the admin home showing queue counts with deep links into the queue
+
+**Plans**: TBD
+**UI hint**: yes
+
+Plans:
+
+- [ ] TBD (created by /gsd-plan-phase)
+
+### Phase 29: Approval Chains
+
+**Goal**: Admins can optionally define a per-category multi-step approval chain that gates publish only when configured — SOPs in categories without a chain continue to publish exactly as they do today.
+**Depends on**: Phase 28 (governance queue + schema foundation the chain hangs off)
+**Requirements**: APR-01, APR-02, APR-03, APR-04, APR-05
+**Success Criteria** (what must be TRUE):
+
+  1. Admin can define an optional approval chain (1–4 ordered approver steps, by role or named member) per SOP category; categories without a configured chain publish exactly as today with zero added friction
+  2. The chain is snapshotted per SOP version — a new version can carry an adjusted chain while historical versions retain the chain they were approved under
+  3. An approver can approve or request changes in one click from the SOP itself and from the governance queue — there is no separate approval console
+  4. When a chain exists, publish completes automatically after final approval; pending state ("who's next") is visible both on the SOP and in the governance queue
+  5. Approval history (who, when, which version) is visible in the existing version-history surface
+
+**Plans**: TBD
+**UI hint**: yes
+
+Plans:
+
+- [ ] TBD (created by /gsd-plan-phase)
+
+### Phase 30: Training Records + AI Maintenance Schedule
+
+**Goal**: Completions become exportable per-worker training evidence, admins can see who trained on an outdated SOP version after a supersede, and the governance dashboard surfaces an AI-prioritized review plan built on the existing AI adapter + agent metadata layer.
+**Depends on**: Phase 28 (governance dashboard hosts the AI schedule), Phase 23 (completions + sign-off chain), Phase 26.5/27 (AI adapter + agent metadata layer powers the maintenance schedule)
+**Requirements**: TRN-01, TRN-02, TRN-03, REV-05
+**Success Criteria** (what must be TRUE):
+
+  1. A per-worker training record view renders every SOP completion as training evidence (SOP, version completed, date, sign-off chain), built entirely on existing completion data
+  2. Admin can export training records as CSV, filterable by worker, SOP, department, and date range
+  3. SOP detail (admin) shows which workers have completed the current version vs. a prior version, surfacing workers "trained on an outdated version" after a supersede
+  4. The governance dashboard shows an AI-proposed maintenance schedule — a prioritized review plan ranked by staleness, usage, and reviewer flags, powered by the existing AI adapter + agent metadata layer (no new AI infrastructure)
+
+**Plans**: TBD
+**UI hint**: yes
+
+Plans:
+
+- [ ] TBD (created by /gsd-plan-phase)
+
+---
+
 ## v4.0 — Safety-Critical Parsing + Voice + AI Foundation (started 2026-05-24 · ✅ shipped 2026-07-02)
 
 Bundles the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` v0.3. Planned 21 → 22 → 23; grew in-flight with 21.5/21.6 (builder UX) and 24/25 (flow graph + departments). All phases executed and code-reviewed; residual = human UAT (21.6/22/23/25) carried per the v3.0 field-verification precedent. Archive via `/gsd-complete-milestone`.
@@ -803,13 +872,15 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 21.6 → 22 → 23 → 24 → 25** (v4.0) → **26 → 26.5** (v5.0)
+Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 21.6 → 22 → 23 → 24 → 25** (v4.0) → **26 → 26.5** (v5.0) → **27** (v5.0 close) → **28 → 29 → 30** (v6.0)
 
 **v3.0 closeout 2026-05-23.** Phases 16, 17, 18 deferred to v4.0 backlog. Phase 19 deleted (no remaining dependencies). Phase 20 partial — DOCX-to-builder slice shipped on master; remaining safety-critical verification scope carried to v4.0 Phase 21.
 
 **v4.0 kicked off 2026-05-24 · ✅ shipped 2026-07-02.** Phases 21, 21.5, 21.6, 22, 23, 24, 25 executed + code-reviewed. Residual = human UAT (21.6/22/23/25) carried per v3.0 field-verification precedent. Archive via `/gsd-complete-milestone`.
 
 **v5.0 kicked off 2026-07-02.** Phase 26 (bespoke inline builder redesign; Phase 17 Konva absorbed) → Phase 26.5 (agent-metadata layer on X-03 + graphify). Forks locked in `26-CONTEXT.md`.
+
+**v6.0 kicked off 2026-07-12.** Phase 28 (ownership + review lifecycle + governance queue foundation) → Phase 29 (approval chains) → Phase 30 (training records + AI maintenance schedule). North star: ease of use beats process; governance never blocks worker access.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -845,6 +916,10 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | **26. SOP Builder Redesign — Inline Surface (v5.0)** | 14/14 | ✅ Complete — Puck fully removed, worker bundle Δ0KB | 2026-07-03 |
 | **26.5. Agent Metadata Layer (v5.0)** | 8/8 | ✅ Complete | 2026-07-05 |
 | *(post-26.5 ad-hoc)* | — | AI provider flexibility + builder tree-rail UX — not phased, see note above | 2026-07-09 |
+| **27. AI Provider & Settings (v5.0 close)** | 1/1 | ✅ Complete | 2026-07-12 |
+| 28. Ownership + Review Lifecycle + Governance Queue | 0/TBD | Not started | - |
+| 29. Approval Chains | 0/TBD | Not started | - |
+| 30. Training Records + AI Maintenance Schedule | 0/TBD | Not started | - |
 
 ## Backlog
 
