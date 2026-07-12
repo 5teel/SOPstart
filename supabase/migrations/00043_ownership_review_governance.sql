@@ -30,13 +30,16 @@ create index if not exists sops_review_due_at_idx on public.sops(review_due_at);
 -- Section 2: default owner on insert (D28-01) — one trigger covers every
 -- create path (wizard/upload/ai-prompt/voice/blank/clone) with zero route edits.
 -- ------------------------------------------------------------
+-- NOTE: sops has no created_by column (only uploaded_by, set to user.id at
+-- every insert site — src/actions/sops.ts, versioning.ts, ai-prompt/youtube
+-- routes). Rule-1 fix: default owner from uploaded_by, not created_by.
 create or replace function public.default_sop_owner()
 returns trigger
 language plpgsql
 as $$
 begin
   if new.owner_user_id is null then
-    new.owner_user_id := new.created_by;
+    new.owner_user_id := new.uploaded_by;
   end if;
   return new;
 end;
