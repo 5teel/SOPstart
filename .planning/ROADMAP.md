@@ -74,12 +74,17 @@ Closes the #1 governance gap surfaced by the 2026-05-05 Visy Packaging customer 
   4. Overdue SOPs show a visible badge/grey-out in the admin library and workers see a lightweight "current as of <date>" indicator on the SOP view — but review/ownership state never blocks a worker from opening, reading, or completing any SOP
   5. Admin sees one unified governance queue (due-soon / overdue / unowned / stale-role — the latter triggered when a role/department referenced by an SOP's assignments is renamed or removed) with a one-click primary action inline on every row, plus a dashboard widget on the admin home showing queue counts with deep links into the queue
 
-**Plans**: TBD
+**Plans**: 6 plans
 **UI hint**: yes
 
 Plans:
 
-- [ ] TBD (created by /gsd-plan-phase)
+- [ ] 28-01-PLAN.md — Migration 00043 (owner + review columns + owner-default trigger + sop_review_cadences + sop_review_events) + db push + types + idempotent backfill (Wave 1)
+- [ ] 28-02-PLAN.md — Pure governance logic (classifyGovernanceRow, resolveCadenceMonths) + phase28/phase28-unit Playwright projects + unit specs (Wave 1)
+- [ ] 28-03-PLAN.md — governance.ts server actions (setSopOwner / confirmSopCurrent / setReviewCadence / listGovernanceQueue) + publish-route review-clock reset + source-contract specs (Wave 2)
+- [ ] 28-04-PLAN.md — /admin/governance queue page + filter chips + one-wired-action rows + inline OwnerPicker + journeys.ts entry (Wave 3)
+- [ ] 28-05-PLAN.md — Admin library owner column/overdue badge/confirm-current + owner=me filter + dashboard widget + worker "Current as of" caption (Wave 3)
+- [ ] 28-06-PLAN.md — Merged-tree gate: full suite + tsc + npm run build + pathways coverage + 12-requirement audit (Wave 4)
 
 ### Phase 29: Approval Chains
 
