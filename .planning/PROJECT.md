@@ -71,18 +71,17 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 - ✓ Departments as first-class entities (member/SOP/block junctions) — Phase 25 (v4.0)
 - ✓ Self-healing video render finalization via Shotstack completion webhook — ad-hoc 2026-07-12 (replaces parked 999.1 cleanup service)
 
+- ✓ SOP ownership (owner on every SOP, auto-backfilled 23/23, trigger-defaulted, ≤2-click reassign) + review lifecycle (12mo default cadence, one-click Confirm current, append-only review events) + unified governance queue (/admin/governance: overdue/due-soon/unowned/stale-role, one-click actions) + dashboard widget + worker "Current as of" caption — Phase 28 (v6.0), verified 12/12 vs live prod DB
+
 ### Active
 
 <!-- Current scope. Building toward these. -->
 
-#### v6.0 — SOP Ownership & Governance Infrastructure
-- Every SOP has a visible, accountable owner (auto-backfilled; never a data-entry campaign)
-- Review-due cadence per SOP + per-category defaults; overdue surfacing that never blocks worker reading
-- One unified governance queue (due-soon / overdue / unowned / stale-role) with one-click actions
-- AI-proposed maintenance schedule (prioritized review plan from staleness + usage + flags)
-- Optional multi-step approval chain per category, versioned, one-click approve — SOPs without a chain publish exactly as today
-- Per-worker training record view (completion = training evidence: SOP, version, date, sign-off chain) + CSV export
-- Workers see a lightweight "current as of" indicator — accuracy signal, zero added friction
+#### v6.0 — SOP Ownership & Governance Infrastructure (Phase 28 ✅ · 29–30 remaining)
+- Optional multi-step approval chain per category, versioned, one-click approve — SOPs without a chain publish exactly as today (Phase 29)
+- AI-proposed maintenance schedule (prioritized review plan from staleness + usage + flags) (Phase 30)
+- Per-worker training record view (completion = training evidence: SOP, version, date, sign-off chain) + CSV export (Phase 30)
+- Deferred within v6.0: cadence-config UI (12mo default suffices; per-SOP override = Phase 30 candidate slice, see 28-HUMAN-UAT)
 
 #### v3.0 carry-over (deferred to v4.5 backlog)
 - A-05 NZ Template Library (Visy glass-mfg-focused)
