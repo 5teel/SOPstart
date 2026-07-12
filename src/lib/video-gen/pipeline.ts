@@ -338,6 +338,15 @@ export async function runVideoGenerationPipeline(jobId: string): Promise<void> {
         ? buildSlideshowEdit(sectionsWithAudio)
         : buildScrollEdit(sectionsWithAudio)
 
+    // Self-heal: register a Shotstack completion webhook so the job finalizes
+    // itself the moment the render finishes/fails, even if the poll below times
+    // out. Requires SHOTSTACK_CALLBACK_SECRET + NEXT_PUBLIC_SITE_URL on Railway.
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? '').replace(/\/$/, '')
+    const callbackSecret = process.env.SHOTSTACK_CALLBACK_SECRET
+    if (siteUrl && callbackSecret) {
+      edit.callback = `${siteUrl}/api/sops/generate-video/callback?secret=${encodeURIComponent(callbackSecret)}`
+    }
+
     // -------------------------------------------------------------------
     // Stage 5: Rendering — submit to Shotstack
     // -------------------------------------------------------------------
@@ -380,6 +389,15 @@ export async function runVideoGenerationPipeline(jobId: string): Promise<void> {
     }
 
     if (!shotstackUrl) {
+      // The poll budget expired but the render often still completes on
+      // Shotstack. If a callback is registered it will finalize this job the
+      // moment the render finishes — so leave it in `rendering` rather than
+      // marking it failed. Only fail hard when there's no webhook to save it.
+      if (edit.callback) {
+        await updateJobStatus(admin, jobId, 'rendering', 'rendering_pending')
+        console.log(`[video-pipeline] Job ${jobId} poll timed out; awaiting Shotstack callback for render ${renderId}`)
+        return
+      }
       throw new Error(`Shotstack render timed out after ${Math.round(remainingMs / 1000)}s — render ${renderId} may still complete on Shotstack but this job has been marked failed. Re-generate to try again.`)
     }
 

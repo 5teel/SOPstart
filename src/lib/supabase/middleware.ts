@@ -28,7 +28,10 @@ export async function updateSession(request: NextRequest) {
   // Cron-invoked route: no session cookies by design. The handler enforces its
   // own CRON_SECRET bearer auth (timing-safe, fails closed 401).
   const isCronRoute = path === '/api/agent-layer/synthesis-sweep'
-  const isPublicRoute = path === '/' || isAuthRoute || isSchemaIntrospection || isCronRoute
+  // Shotstack completion webhook: no session cookies by design. The handler
+  // enforces its own SHOTSTACK_CALLBACK_SECRET query-param auth (fails 401).
+  const isShotstackCallback = path === '/api/sops/generate-video/callback'
+  const isPublicRoute = path === '/' || isAuthRoute || isSchemaIntrospection || isCronRoute || isShotstackCallback
 
   if (!isPublicRoute && !user) {
     return NextResponse.redirect(new URL('/login', request.url))

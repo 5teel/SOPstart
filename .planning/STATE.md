@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v5.0
 milestone_name: — AI-Native Builder + Agent Foundation
-status: Ready to plan
-stopped_at: Completed 27-01-PLAN.md
+status: Phase complete — awaiting next milestone decision
+stopped_at: Phase 27 verified PASS (10/10), PROJECT.md evolved, closed
 last_updated: "2026-07-12T03:28:37.413Z"
 progress:
   total_phases: 30
@@ -430,11 +430,11 @@ None yet.
 - Phase 6: ffmpeg-static server-side bundling on Vercel is documented but described as bundle-sensitive — validate with a 20 MB file on Vercel preview before any other video work
 - Phase 8: Generated video storage costs are unbounded without retention policies — source videos deleted 30 days post-transcription; generated videos have 90-day TTL; per-tenant quota visible in settings
 - Phase 8: TTS mispronounces industrial terminology and NZ place names — build per-org pronunciation dictionary with SSML phoneme tags; mandatory admin audio preview before publish
-- Phase 26.5: **PRE-DEPLOY GATE OPEN** — VOYAGE_API_KEY NOT yet set on Railway (Simon: "not yet — continue anyway", 2026-07-04); CRON_SECRET also pending (add with Railway Cron job config for /api/agent-layer/synthesis-sweep). Both must be set before the first deploy of this phase — Deepgram precedent. Interim: sweep route 503-fails-fast; publish-hook synthesis records last_synthesis_status='error'.
+- ~~Phase 26.5 PRE-DEPLOY GATE~~ **CLOSED 2026-07-12** — VOYAGE_API_KEY + CRON_SECRET now set on Railway (Simon confirmed). Synthesis sweep route + publish-hook embedding path are live-capable. Verify next deploy: `/api/agent-layer/synthesis-sweep` runs (not 503) and `last_synthesis_status='ok'` on publish.
 
 ## Session Continuity
 
 Last session: 2026-07-12T03:23:28.439Z
-Stopped at: Completed 27-01-PLAN.md
+Stopped at: Phase 27 complete — 27-01 SUMMARY + VERIFICATION (PASS 10/10) + PROJECT.md evolution all committed (c29cc20). No incomplete work, no handoff, no checkpoint.
 Resume file:
 None

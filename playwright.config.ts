@@ -72,6 +72,13 @@ export default defineConfig({
       testMatch: /.*\.test\.ts$/,
     },
     {
+      // Self-healing Shotstack render finalizer (idempotency + branching).
+      // CLAUDE.md 2026-05-25: a test file not in any project regex NEVER runs.
+      name: 'video-gen-unit',
+      testDir: './src/lib/video-gen/__tests__',
+      testMatch: /.*\.test\.ts$/,
+    },
+    {
       // Phase 24 — branch-aware flow derivation unit tests.
       // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
       name: 'phase24-unit',

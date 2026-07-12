@@ -13,6 +13,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getShotstackRender } from '@/lib/video-gen/shotstack-client'
+import { finalizeRenderJob } from '@/lib/video-gen/finalize-job'
 
 export async function POST() {
   // Auth check — admin only
@@ -52,7 +53,7 @@ export async function POST() {
     jobId: string
     renderId: string
     previousStatus: string
-    outcome: 'recovered' | 'still_rendering' | 'render_failed' | 'download_failed' | 'check_failed'
+    outcome: 'already_ready' | 'recovered' | 'still_rendering' | 'render_failed' | 'download_failed' | 'check_failed'
     detail?: string
   }> = []
 
@@ -61,103 +62,8 @@ export async function POST() {
 
     try {
       const render = await getShotstackRender(renderId)
-
-      if (render.status === 'done' && render.url) {
-        // Render completed on Shotstack — download and re-upload
-        try {
-          const videoResponse = await fetch(render.url)
-          if (!videoResponse.ok) {
-            results.push({
-              jobId: job.id,
-              renderId,
-              previousStatus: job.status,
-              outcome: 'download_failed',
-              detail: `Shotstack URL returned ${videoResponse.status} — video may have expired (24h TTL)`,
-            })
-            continue
-          }
-
-          const contentLength = videoResponse.headers.get('content-length')
-          console.log(`[recover-renders] Downloading ${renderId}: ${contentLength ?? 'unknown'} bytes`)
-
-          const arrayBuffer = await videoResponse.arrayBuffer()
-          const buffer = Buffer.from(arrayBuffer)
-          const path = `${job.organisation_id}/${job.sop_id}/video/${job.id}.mp4`
-
-          console.log(`[recover-renders] Uploading ${buffer.length} bytes to ${path}`)
-
-          const { error: uploadError } = await admin.storage
-            .from('sop-generated-videos')
-            .upload(path, buffer, { contentType: 'video/mp4', upsert: true, duplex: 'half' } as Record<string, unknown>)
-
-          if (uploadError) {
-            results.push({
-              jobId: job.id,
-              renderId,
-              previousStatus: job.status,
-              outcome: 'download_failed',
-              detail: `Storage upload failed: ${uploadError.message}`,
-            })
-            continue
-          }
-
-          // Mark as ready
-          await admin
-            .from('video_generation_jobs')
-            .update({
-              status: 'ready',
-              current_stage: 'ready',
-              video_url: path,
-              error_message: null,
-              completed_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', job.id)
-
-          results.push({
-            jobId: job.id,
-            renderId,
-            previousStatus: job.status,
-            outcome: 'recovered',
-          })
-        } catch (dlErr) {
-          results.push({
-            jobId: job.id,
-            renderId,
-            previousStatus: job.status,
-            outcome: 'download_failed',
-            detail: dlErr instanceof Error ? dlErr.message : String(dlErr),
-          })
-        }
-      } else if (render.status === 'failed') {
-        // Mark as failed with Shotstack's error
-        await admin
-          .from('video_generation_jobs')
-          .update({
-            status: 'failed',
-            current_stage: 'failed',
-            error_message: `Shotstack render failed: ${render.error ?? 'unknown'}`,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', job.id)
-
-        results.push({
-          jobId: job.id,
-          renderId,
-          previousStatus: job.status,
-          outcome: 'render_failed',
-          detail: render.error ?? 'unknown',
-        })
-      } else {
-        // Still rendering or other status
-        results.push({
-          jobId: job.id,
-          renderId,
-          previousStatus: job.status,
-          outcome: 'still_rendering',
-          detail: `Shotstack status: ${render.status}`,
-        })
-      }
+      const result = await finalizeRenderJob(admin, job, render)
+      results.push({ jobId: job.id, renderId, previousStatus: job.status, ...result })
     } catch (err) {
       results.push({
         jobId: job.id,
