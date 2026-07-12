@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
 status: executing
-stopped_at: Completed 28-03-PLAN.md
-last_updated: "2026-07-12T07:21:03.278Z"
+stopped_at: Completed 28-04-PLAN.md
+last_updated: "2026-07-12T07:29:22.201Z"
 last_activity: 2026-07-12 -- Phase 28 execution started
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 6
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 28 (Ownership + Review Lifecycle + Governance Queue) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-07-12 -- Phase 28 execution started
 
@@ -154,6 +154,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 28 P01 | 25min | 3 tasks | 3 files |
 | Phase 28 P02 | 20min | 2 tasks | 5 files |
 | Phase 28 P28-03 | 30min | 3 tasks | 3 files |
+| Phase 28 P04 | 25min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -316,6 +317,7 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 28-01]: sop_review_cadences has zero rows until Plan 28-03 writes them; backfill resolves every SOP to the 12-month default (correct per D28-03)
 - [Phase ?]: Governance classifier/cadence modules kept pure (no server directive) outside src/actions/ per 2026-06-27 learning
 - [Phase 28-03]: sops.category (not category_tag) used as the cadence-resolution key across confirmSopCurrent/listGovernanceQueue/publish-route to match the field the existing admin library page already displays
+- [Phase ?]: [Phase 28-04]: OwnerPicker.tsx built and committed in Task 1 (not Task 2) because GovernanceQueueRow imports it directly - compile-order dependency
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -425,7 +427,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-12T07:21:03.270Z
-Stopped at: Completed 28-03-PLAN.md
+Last session: 2026-07-12T07:29:22.194Z
+Stopped at: Completed 28-04-PLAN.md
 Resume file:
-None
