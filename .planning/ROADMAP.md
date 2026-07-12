@@ -163,7 +163,7 @@ Plans:
 
 **Wave 3**
 
-- [ ] 30-03-PLAN.md — UX-02 shared AdminNav + /admin/settings hub + replace 5 copy-pasted sub-navs (UX-02)
+- [x] 30-03-PLAN.md — UX-02 shared AdminNav + /admin/settings hub + replace 5 copy-pasted sub-navs (UX-02)
 
 **Wave 4**
 
@@ -215,7 +215,7 @@ Bundles the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` v0.3. Planne
 - [x] **Phase 21.6: Builder Edit Stage Redesign** (INSERTED 2026-06-05) — Apply the 21.5 review-redesign philosophy to the **Build/edit** stage, which is still the untouched Puck editor. First-time admins hit internal jargon ("Block"), two redundant block lists (Puck component palette = add-new vs outline = already-placed), unanchored canvas figures with no clear action, and a cramped right-rail field editor. Scope from UAT feedback: (1) humanize block-type labels in the Puck palette + outline (reuse `humanizeBlockType` / `block-type-labels.ts` from 21.5 — currently only on the review surface); (2) collapse palette + outline into one clear affordance; (3) move content editing into the central canvas instead of the narrow right rail; (4) clarify the `SectionListSidebar` purpose + 1st→last ordering; (5) clarify what the user does with canvas figures/images. UI-led — produces a UI-SPEC. Runs **before** Phase 22. (completed 2026-06-05)
 - [x] **Phase 22: Voice-Driven Walkthrough** — Turn the Phase 15 voice Q&A shell into a real end-to-end voice loop on the mobile immersive walkthrough: live Deepgram STT in (push-to-talk, SOP-keyterm-boosted for factory-floor noise), gpt-4o-mini-tts read-back out, spoken "next"/"done" driving step progression through the existing D-02 safety-gated path, plus an always-on visual layer (photo-or-icon per step) so a low-literacy worker can follow visually. Closes W-01 literacy gaps + X-02 voice-driven mode. **English-only this phase — multi-language (VDW-LIT-04, VDW-VOICE-04: Te Reo, Tagalog, Hindi, Mandarin) is DEFERRED to a fast-follow per CONTEXT D-08** (prove the loop first; translation-correctness risk on safety wording + weak Te Reo STT/TTS vendor support). Reuses the scaffolded `deepgram-stream.ts` + `WalkthroughVoiceModal` + `/api/voice/query`; preserves the SB-LINE-06 `next/dynamic` bundle isolation. No new npm packages. (completed 2026-06-24)
 
-  **Plans:** 2/8 plans executed
+  **Plans:** 3/8 plans executed
 
   - [x] 22-01-PLAN.md — Wave 0: register `phase22-stubs` Playwright project + 6 source-contract/unit stub specs (Wave 0)
   - [x] 22-02-PLAN.md — Voice infra: Deepgram keyterms + `/api/voice/tts` route + `useTtsPlayback` hook + `classifyIntent` (Wave 1)
@@ -1003,7 +1003,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | **27. AI Provider & Settings (v5.0 close)** | 1/1 | ✅ Complete | 2026-07-12 |
 | 28. Ownership + Review Lifecycle + Governance Queue | 6/6 | Complete    | 2026-07-12 |
 | 29. Approval Chains | 5/6 | In Progress|  |
-| 30. UX Consolidation & Simplification | 2/8 | In Progress|  |
+| 30. UX Consolidation & Simplification | 3/8 | In Progress|  |
 
 ## Backlog
 
