@@ -5,7 +5,17 @@ import { Trash2, Loader2 } from 'lucide-react'
 import { deleteSop } from '@/actions/sops'
 import { useRouter } from 'next/navigation'
 
-export function DeleteSopButton({ sopId }: { sopId: string }) {
+export function DeleteSopButton({
+  sopId,
+  redirectTo,
+  showLabel = false,
+}: {
+  sopId: string
+  /** When set, navigate here after delete instead of refreshing (builder context — the deleted SOP's page can't refresh). */
+  redirectTo?: string
+  /** Render a visible text label next to the icon (labelled action menu, UX-06). */
+  showLabel?: boolean
+}) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
   const [confirming, setConfirming] = useState(false)
@@ -19,7 +29,11 @@ export function DeleteSopButton({ sopId }: { sopId: string }) {
             startTransition(async () => {
               await deleteSop(sopId)
               setConfirming(false)
-              router.refresh()
+              if (redirectTo) {
+                router.push(redirectTo)
+              } else {
+                router.refresh()
+              }
             })
           }}
           disabled={pending}
@@ -40,6 +54,20 @@ export function DeleteSopButton({ sopId }: { sopId: string }) {
           No
         </button>
       </div>
+    )
+  }
+
+  if (showLabel) {
+    return (
+      <button
+        type="button"
+        onClick={() => setConfirming(true)}
+        className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-[var(--accent-escalate)] hover:bg-[var(--paper-2)] transition-colors"
+        aria-label="Delete SOP"
+      >
+        <Trash2 className="h-4 w-4 shrink-0" aria-hidden="true" />
+        Delete SOP
+      </button>
     )
   }
 

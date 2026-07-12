@@ -33,6 +33,9 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { ChevronDown } from 'lucide-react'
+import { DeleteSopButton } from '@/components/admin/DeleteSopButton'
 import { BuilderClient } from './BuilderClient'
 import { BuilderStageStepper } from './BuilderStageStepper'
 import { BuilderFlowButton } from './BuilderFlowButton'
@@ -62,6 +65,84 @@ function deriveSourcePaneKind(rawType: string | null | undefined): SourcePaneKin
   if (v === 'image' || v === 'scan' || v === 'jpg' || v === 'jpeg' || v === 'png') return 'scan'
   if (v === 'video' || v === 'mp4' || v === 'mov' || v === 'youtube') return 'video'
   return null
+}
+
+// ---------------------------------------------------------------------------
+// Per-SOP labelled action menu — Phase 30 (30-07, UX-06 orchestrator decision #2)
+//
+// The 5 per-SOP actions (Assign / Versions / Video / QR / Delete-draft) move
+// OFF the admin list rows (30-08) into this labelled menu in the builder top
+// bar, reachable from every stage. Fixes usability-lab F-09 (icon-only
+// actions, WCAG) — every control here carries a visible text label.
+// ---------------------------------------------------------------------------
+
+function SopActionsMenu({
+  sopId,
+  isDraft,
+}: {
+  sopId: string
+  isDraft: boolean
+}): React.JSX.Element {
+  const [open, setOpen] = useState(false)
+
+  const items: { label: string; href: string }[] = [
+    { label: 'Assign to team', href: `/admin/sops/${sopId}/assign` },
+    { label: 'Version history', href: `/admin/sops/${sopId}/versions` },
+    { label: 'Generate video', href: `/admin/sops/${sopId}/video` },
+    { label: 'Print QR code', href: `/admin/sops/${sopId}/qr` },
+  ]
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        data-testid="sop-actions-trigger"
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label="SOP actions"
+        className="mono inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-xs border border-[var(--ink-500)] bg-transparent px-3 text-[12px] text-[var(--paper)] hover:border-[var(--ink-300)] transition-colors"
+      >
+        Actions
+        <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
+      </button>
+
+      {open && (
+        <>
+          {/* Backdrop closes the menu on outside click */}
+          <button
+            type="button"
+            aria-label="Close actions menu"
+            tabIndex={-1}
+            className="fixed inset-0 z-40 cursor-default"
+            onClick={() => setOpen(false)}
+          />
+          <div
+            role="menu"
+            aria-label="SOP actions"
+            data-testid="sop-actions-menu"
+            className="absolute right-0 top-full z-50 mt-1 min-w-[200px] rounded-sm border border-[var(--ink-100)] bg-[var(--paper)] py-1 shadow-lg"
+          >
+            {items.map((item) => (
+              <Link
+                key={item.href}
+                role="menuitem"
+                href={item.href}
+                className="block px-3 py-2 text-sm text-[var(--ink-900)] hover:bg-[var(--paper-2)] transition-colors"
+              >
+                {item.label}
+              </Link>
+            ))}
+            {isDraft && (
+              <div role="menuitem" className="mt-1 border-t border-[var(--ink-100)] pt-1">
+                <DeleteSopButton sopId={sopId} redirectTo="/admin/sops" showLabel />
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  )
 }
 
 // ---------------------------------------------------------------------------
@@ -322,8 +403,10 @@ export function BuilderStageShell({
             )}
           </div>
 
-          {/* Right-of-center: flow-graph preview + edit + stepper */}
+          {/* Right-of-center: actions menu + flow-graph preview + edit + stepper */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {/* Phase 30 (30-07) — UX-06 labelled per-SOP action menu */}
+            <SopActionsMenu sopId={sopId} isDraft={initialSop.status === 'draft'} />
             {/* Phase 24 Plan 03 — FLOW-05: "Edit flow" re-surfaces FlowGraphEditor
                 outside the suppressed Puck right sidebar via a portaled modal.
                 No Puck hook is called — avoids CLAUDE.md 2026-06-08 outside-Puck crash. */}

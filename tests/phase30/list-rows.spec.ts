@@ -38,14 +38,33 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
     expect(src).not.toContain('VideoJobIndicator')
   })
 
-  test.fixme('builder shell owns a labelled action menu wired to the 5 destinations', () => {
+  test('builder shell owns a labelled action menu wired to the 5 destinations', () => {
     const shell = read(STAGE_SHELL)
-    expect(shell).toMatch(/\/assign/)
-    expect(shell).toMatch(/\/versions/)
-    expect(shell).toMatch(/\/video/)
-    expect(shell).toMatch(/\/qr/)
-    // Delete for drafts survives in the menu (wired, not just named).
-    expect(shell).toContain('DeleteSopButton')
+    // Href WIRING (CLAUDE.md 2026-06-05): the menu links interpolate the real
+    // sopId into the real destination routes — not just route-name tokens.
+    expect(shell).toMatch(/\/admin\/sops\/\$\{sopId\}\/assign/)
+    expect(shell).toMatch(/\/admin\/sops\/\$\{sopId\}\/versions/)
+    expect(shell).toMatch(/\/admin\/sops\/\$\{sopId\}\/video/)
+    expect(shell).toMatch(/\/admin\/sops\/\$\{sopId\}\/qr/)
+    // Delete for drafts survives in the menu (wired, not just named):
+    // DeleteSopButton receives the sopId and the menu gates it on draft status.
+    expect(shell).toMatch(/<DeleteSopButton\s+sopId=\{sopId\}/)
+    expect(shell).toMatch(/isDraft=\{initialSop\.status === 'draft'\}/)
+    expect(shell).toMatch(/\{isDraft && \(/)
+  })
+
+  test('action menu controls are labelled, not icon-only (usability-lab F-09)', () => {
+    const shell = read(STAGE_SHELL)
+    // Visible text labels for each destination.
+    expect(shell).toContain('Assign to team')
+    expect(shell).toContain('Version history')
+    expect(shell).toContain('Generate video')
+    expect(shell).toContain('Print QR code')
+    // The menu never uses the icon-only evidence-btn idiom from the old rows.
+    expect(shell).not.toContain('evidence-btn')
+    // Trigger is a labelled control ("Actions" visible text + aria).
+    expect(shell).toMatch(/aria-haspopup="menu"/)
+    expect(shell).toMatch(/aria-expanded=\{open\}/)
   })
 
   test.fixme('row is one line: title + status chip + one flag chip + owner, click → builder', () => {
