@@ -34,8 +34,21 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { parseJwtPayload } from '@/lib/supabase/jwt'
 import { resolveCadenceMonths, computeReviewDueDate } from '@/lib/governance/cadences'
+import { classifyGovernanceRow, type GovernanceFlag } from '@/lib/governance/classify'
+import { getOrgMembers } from '@/actions/assignments'
 
 type AdminCtx = { userId: string; organisationId: string }
+
+export interface GovernanceRow {
+  id: string
+  title: string | null
+  category: string | null
+  status: string
+  ownerUserId: string | null
+  ownerLabel: string
+  reviewDueAt: string | null
+  flags: GovernanceFlag[]
+}
 
 async function requireAdmin(): Promise<AdminCtx | { error: string }> {
   const supabase = await createClient()
@@ -218,4 +231,114 @@ export async function setReviewCadence(
     return { error: error.message }
   }
   return { success: true }
+}
+
+// ---------------------------------------------------------------------------
+// listGovernanceQueue — GQ-01/GQ-02/GQ-03, D28-02/D28-05/D28-06
+// Single composed read: sops + organisation_members + sop_departments ->
+// departments, each row mapped through the pure classifyGovernanceRow.
+// Scoped to departments ONLY for stale-role detection — sub-trade tags have no
+// admin rename path, nothing to detect there (RESEARCH Pitfall 3).
+// ---------------------------------------------------------------------------
+
+export async function listGovernanceQueue(): Promise<
+  { success: true; rows: GovernanceRow[] } | { error: string }
+> {
+  const ctx = await requireAdmin()
+  if ('error' in ctx) return { error: ctx.error }
+
+  const supabase = await createClient()
+
+  // RLS (org_members_can_view_sops) already scopes this to the caller's org.
+  const { data: sops, error: sopsErr } = await supabase
+    .from('sops')
+    .select('id, title, category, status, owner_user_id, review_due_at, last_reviewed_at')
+    .order('review_due_at', { ascending: true, nullsFirst: false })
+
+  if (sopsErr) {
+    console.error('[listGovernanceQueue] sops read error', sopsErr)
+    return { error: sopsErr.message }
+  }
+
+  const sopRows = sops ?? []
+  const sopIds = sopRows.map((s) => s.id)
+
+  // Active-member lookup (OWN-03/D28-02) — absence means unowned; removeMember
+  // hard-deletes the organisation_members row, so there is no other
+  // "deactivated" state to model.
+  const { data: memberRows } = await supabase
+    .from('organisation_members')
+    .select('user_id')
+    .eq('organisation_id', ctx.organisationId)
+  const memberSet = new Set((memberRows ?? []).map((m) => m.user_id))
+
+  // sop_departments / departments are not yet in database.types.ts — (as any)
+  // casts match the departments.ts/ai-settings.ts precedent (Pitfall 4).
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: sopDeptRows } = sopIds.length > 0
+    ? await (supabase as any)
+        .from('sop_departments')
+        .select('sop_id, department_id')
+        .in('sop_id', sopIds)
+    : { data: [] }
+  const deptIdsBySop: Record<string, string[]> = {}
+  for (const r of (sopDeptRows ?? []) as Array<{ sop_id: string; department_id: string }>) {
+    ;(deptIdsBySop[r.sop_id] ??= []).push(r.department_id)
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: deptRows } = await (supabase as any)
+    .from('departments')
+    .select('id, updated_at')
+    .eq('organisation_id', ctx.organisationId)
+  const deptMap = new Map(
+    ((deptRows ?? []) as Array<{ id: string; updated_at: string }>).map((d) => [d.id, d.updated_at]),
+  )
+
+  // Reuse the existing member-list fetcher (assignments.ts) rather than
+  // hand-rolling a second "list org members" query (RESEARCH Don't Hand-Roll).
+  const membersResult = await getOrgMembers()
+  const ownerLabelById: Record<string, string> = {}
+  if (membersResult.success) {
+    for (const m of membersResult.members) {
+      ownerLabelById[m.user_id] = m.email ?? m.full_name ?? `${m.role} (${m.user_id.slice(0, 8)})`
+    }
+  }
+
+  const rows: GovernanceRow[] = sopRows.map((sop) => {
+    const taggedDeptIds = deptIdsBySop[sop.id] ?? []
+    const danglingDepartmentRefs = taggedDeptIds.some((id) => !deptMap.has(id))
+    // NULL-GUARD REQUIRED (plan-checker WARNING-1): last_reviewed_at is null
+    // for every backfilled/never-confirmed SOP — an unguarded comparison would
+    // spuriously flag nearly every department-tagged SOP as stale_role.
+    const departmentRenamedSinceReview = sop.last_reviewed_at
+      ? taggedDeptIds.some((id) => {
+          const updatedAt = deptMap.get(id)
+          return updatedAt ? new Date(updatedAt) > new Date(sop.last_reviewed_at as string) : false
+        })
+      : false
+
+    const ownerIsActiveMember = sop.owner_user_id ? memberSet.has(sop.owner_user_id) : false
+
+    const flags = classifyGovernanceRow({
+      reviewDueAt: sop.review_due_at,
+      ownerUserId: sop.owner_user_id,
+      ownerIsActiveMember,
+      danglingDepartmentRefs,
+      departmentRenamedSinceReview,
+    })
+
+    return {
+      id: sop.id,
+      title: sop.title,
+      category: sop.category,
+      status: sop.status,
+      ownerUserId: sop.owner_user_id,
+      ownerLabel: sop.owner_user_id ? (ownerLabelById[sop.owner_user_id] ?? 'No owner') : 'No owner',
+      reviewDueAt: sop.review_due_at,
+      flags,
+    }
+  })
+
+  return { success: true, rows }
 }
