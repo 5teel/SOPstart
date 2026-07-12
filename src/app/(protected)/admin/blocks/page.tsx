@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { listBlocks } from '@/actions/blocks'
 import { listDepartments } from '@/actions/departments'
 import { BlockListTable } from '@/components/admin/blocks/BlockListTable'
+import { AdminNav } from '@/components/admin/AdminNav'
 
 export const metadata: Metadata = {
   title: 'Library',
@@ -94,33 +95,7 @@ export default async function BlocksLibraryPage({
         Reusable hazards, PPE, steps and emergency blocks. Each block can belong to any number of departments — tag a burn hazard to both Forming and Maintenance, or mark a block All departments to make it org-wide.
       </p>
 
-      {/* Admin sub-nav */}
-      <nav className="flex gap-4 border-b border-[var(--ink-100)] mb-6 text-sm">
-        <Link
-          href="/admin/sops"
-          className="pb-3 px-1 font-medium text-[var(--ink-500)] hover:text-[var(--ink-900)]"
-        >
-          SOPs
-        </Link>
-        <Link
-          href="/admin/blocks"
-          className="pb-3 px-1 font-medium border-b-2 border-[var(--ink-900)] text-[var(--ink-900)]"
-        >
-          Library
-        </Link>
-        <Link
-          href="/admin/team"
-          className="pb-3 px-1 font-medium text-[var(--ink-500)] hover:text-[var(--ink-900)]"
-        >
-          Team
-        </Link>
-        <Link
-          href="/admin/departments"
-          className="pb-3 px-1 font-medium text-[var(--ink-500)] hover:text-[var(--ink-900)]"
-        >
-          Departments
-        </Link>
-      </nav>
+      <AdminNav active="blocks" />
 
       {/* Department filter bar (.deptrow) */}
       {departments.length > 0 && (

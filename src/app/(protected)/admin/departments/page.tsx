@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { listDepartments } from '@/actions/departments'
 import { getTeamMembersWithEmails } from '@/actions/auth'
 import { DepartmentGrid } from '@/components/admin/departments/DepartmentGrid'
+import { AdminNav } from '@/components/admin/AdminNav'
 
 export const metadata: Metadata = {
   title: 'Departments',
@@ -81,67 +81,8 @@ export default async function DepartmentsPage() {
         procedures.
       </p>
 
-      {/* Shared admin sub-nav: SOPs | Library | Team | Departments */}
-      <nav
-        aria-label="Admin sections"
-        style={{
-          display: 'flex',
-          gap: '18px',
-          borderBottom: '1px solid var(--ink-100)',
-          margin: '18px 0 22px',
-          fontSize: '13px',
-        }}
-      >
-        <Link
-          href="/admin/sops"
-          style={{
-            paddingBottom: '11px',
-            fontWeight: 500,
-            color: 'var(--ink-500)',
-            textDecoration: 'none',
-            borderBottom: '2px solid transparent',
-          }}
-        >
-          SOPs
-        </Link>
-        <Link
-          href="/admin/blocks"
-          style={{
-            paddingBottom: '11px',
-            fontWeight: 500,
-            color: 'var(--ink-500)',
-            textDecoration: 'none',
-            borderBottom: '2px solid transparent',
-          }}
-        >
-          Library
-        </Link>
-        <Link
-          href="/admin/team"
-          style={{
-            paddingBottom: '11px',
-            fontWeight: 500,
-            color: 'var(--ink-500)',
-            textDecoration: 'none',
-            borderBottom: '2px solid transparent',
-          }}
-        >
-          Team
-        </Link>
-        <Link
-          href="/admin/departments"
-          style={{
-            paddingBottom: '11px',
-            fontWeight: 500,
-            color: 'var(--ink-900)',
-            textDecoration: 'none',
-            borderBottom: '2px solid var(--ink-900)',
-          }}
-          aria-current="page"
-        >
-          Departments
-        </Link>
-      </nav>
+      {/* Departments is homed under Settings (UX-02 settings hub links here) */}
+      <AdminNav active="settings" />
 
       {/* Department card grid — client component owns h1 + CTA + create/edit/archive state */}
       <DepartmentGrid departments={departments} orgMembers={orgMembers} />

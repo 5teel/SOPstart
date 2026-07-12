@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { parseJwtPayload } from '@/lib/supabase/jwt'
 import { listGovernanceQueue, type GovernanceRow } from '@/actions/governance'
@@ -9,6 +8,7 @@ import { getOrgMembers } from '@/actions/assignments'
 import { GovernanceFilterChips, type GovernanceFilter } from '@/components/admin/governance/GovernanceFilterChips'
 import { GovernanceQueueRow } from '@/components/admin/governance/GovernanceQueueRow'
 import { ApprovalChainEditor, type ChainMember } from '@/components/admin/governance/ApprovalChainEditor'
+import { AdminNav } from '@/components/admin/AdminNav'
 import type { ChainStep } from '@/lib/governance/approvals'
 
 export const metadata: Metadata = {
@@ -99,14 +99,8 @@ export default async function GovernancePage({
         </div>
       </div>
 
-      {/* Admin sub-nav */}
-      <nav aria-label="Admin sections" className="flex gap-1 border-b border-[var(--ink-100)] mb-6">
-        <Link href="/admin/sops" className="tab">SOPs</Link>
-        <Link href="/admin/blocks" className="tab">Library</Link>
-        <Link href="/admin/team" className="tab">Team</Link>
-        <Link href="/admin/departments" className="tab">Departments</Link>
-        <Link href="/admin/governance" className="tab" data-active="true">Governance</Link>
-      </nav>
+      {/* Governance is a view of SOPs (UX-03 fold lands in 30-08) */}
+      <AdminNav active="sops" />
 
       <GovernanceFilterChips active={activeFilter} counts={counts} />
 

@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import RoleAssignmentTable from '@/components/admin/RoleAssignmentTable'
+import { AdminNav } from '@/components/admin/AdminNav'
 import { listDepartments } from '@/actions/departments'
 
 export const metadata: Metadata = {
@@ -47,37 +48,7 @@ export default async function AdminTeamPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      {/* Sub-nav: SOPs | Library | Team | Departments */}
-      <nav className="flex gap-[18px] border-b mb-6" style={{ borderColor: 'var(--ink-100)', marginBottom: '22px' }}>
-        <Link
-          href="/admin/sops"
-          className="pb-[11px] font-medium text-[13px] border-b-2 border-transparent"
-          style={{ color: 'var(--ink-500)' }}
-        >
-          SOPs
-        </Link>
-        <Link
-          href="/admin/blocks"
-          className="pb-[11px] font-medium text-[13px] border-b-2 border-transparent"
-          style={{ color: 'var(--ink-500)' }}
-        >
-          Library
-        </Link>
-        <Link
-          href="/admin/team"
-          className="pb-[11px] font-medium text-[13px] border-b-2"
-          style={{ color: 'var(--ink-900)', borderBottomColor: 'var(--ink-900)' }}
-        >
-          Team
-        </Link>
-        <Link
-          href="/admin/departments"
-          className="pb-[11px] font-medium text-[13px] border-b-2 border-transparent"
-          style={{ color: 'var(--ink-500)' }}
-        >
-          Departments
-        </Link>
-      </nav>
+      <AdminNav active="team" />
 
       <div className="flex items-center justify-between mb-6">
         <div>

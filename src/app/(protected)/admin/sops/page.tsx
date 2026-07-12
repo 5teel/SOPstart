@@ -9,6 +9,7 @@ import { VideoJobIndicator } from '@/components/admin/VideoJobIndicator'
 import { SopDepartmentEditor } from '@/components/admin/sop/SopDepartmentEditor'
 import { LibraryReviewCell } from '@/components/admin/sops/LibraryReviewCell'
 import { GovernanceWidget } from '@/components/admin/governance/GovernanceWidget'
+import { AdminNav } from '@/components/admin/AdminNav'
 import { listDepartments } from '@/actions/departments'
 import { getTeamMembersWithEmails } from '@/actions/auth'
 import type { SopStatus } from '@/types/sop'
@@ -151,24 +152,7 @@ export default async function SopsLibraryPage({
           </div>
         </div>
 
-        {/* Admin sub-nav */}
-        <nav
-          aria-label="Admin sections"
-          className="flex gap-1 border-b border-[var(--ink-100)] mb-6"
-        >
-          <Link href="/admin/sops" className="tab" data-active="true">
-            SOPs
-          </Link>
-          <Link href="/admin/blocks" className="tab">
-            Library
-          </Link>
-          <Link href="/admin/team" className="tab">
-            Team
-          </Link>
-          <Link href="/admin/departments" className="tab">
-            Departments
-          </Link>
-        </nav>
+        <AdminNav active="sops" />
 
         {/* Filter tabs */}
         <div className="flex gap-1 border-b border-[var(--ink-100)] mb-6 overflow-x-auto">
