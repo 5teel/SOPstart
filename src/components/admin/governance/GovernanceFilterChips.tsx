@@ -25,7 +25,7 @@ export function GovernanceFilterChips({
         return (
           <Link
             key={chip.value}
-            href={chip.value === 'all' ? '/admin/governance' : `/admin/governance?filter=${chip.value}`}
+            href={chip.value === 'all' ? '/admin/sops?view=attention' : `/admin/sops?view=attention&filter=${chip.value}`}
             className="tab"
             data-active={isActive ? 'true' : undefined}
           >

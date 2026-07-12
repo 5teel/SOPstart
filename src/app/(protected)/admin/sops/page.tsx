@@ -8,21 +8,25 @@ import { DeleteSopButton } from '@/components/admin/DeleteSopButton'
 import { VideoJobIndicator } from '@/components/admin/VideoJobIndicator'
 import { SopDepartmentEditor } from '@/components/admin/sop/SopDepartmentEditor'
 import { LibraryReviewCell } from '@/components/admin/sops/LibraryReviewCell'
-import { GovernanceWidget } from '@/components/admin/governance/GovernanceWidget'
 import { AdminNav } from '@/components/admin/AdminNav'
 import { listDepartments } from '@/actions/departments'
 import { getTeamMembersWithEmails } from '@/actions/auth'
+import { listGovernanceQueue, type GovernanceRow } from '@/actions/governance'
+import { GovernanceFilterChips, type GovernanceFilter } from '@/components/admin/governance/GovernanceFilterChips'
+import { GovernanceQueueRow } from '@/components/admin/governance/GovernanceQueueRow'
 import type { SopStatus } from '@/types/sop'
 
 export const metadata: Metadata = {
   title: 'SOP Library',
 }
 
+// UX-03 decision #4: the folded governance view owns the "Needs attention"
+// name; the old failed-status tab (uploading/parsing) renames to "Parse issues".
 const STATUS_TABS: { label: string; value: string }[] = [
   { label: 'All', value: 'all' },
   { label: 'Drafts', value: 'draft' },
   { label: 'Published', value: 'published' },
-  { label: 'Needs attention', value: 'failed' },
+  { label: 'Parse issues', value: 'failed' },
 ]
 
 function formatDate(iso: string): string {
@@ -36,7 +40,7 @@ function formatDate(iso: string): string {
 export default async function SopsLibraryPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; owner?: string }>
+  searchParams: Promise<{ status?: string; owner?: string; view?: string; filter?: string }>
 }) {
   const supabase = await createClient()
 
@@ -56,6 +60,12 @@ export default async function SopsLibraryPage({
   const params = await searchParams
   const activeStatus = params.status ?? 'all'
   const ownerOnly = params.owner === 'me'
+
+  // UX-03: the governance queue folds in as the "Needs attention" view
+  // (?view=attention), reusing GovernanceQueueRow/GovernanceFilterChips
+  // verbatim — approveStep + isCallerNextApprover gating lives in the row.
+  const isAttentionView = params.view === 'attention'
+  const activeFilter = (params.filter ?? 'all') as GovernanceFilter
 
   const SOP_SELECT = 'id, title, sop_number, category, status, source_file_name, source_type, created_at, updated_at, published_at, all_departments, overall_confidence, parse_notes, owner_user_id, review_due_at'
 
@@ -84,6 +94,24 @@ export default async function SopsLibraryPage({
   }
 
   const { data: sops } = await query
+
+  // One org-scoped governance read powers the header chips (GQ-04), the
+  // needs-attention view, and the per-row flag chips — same call the old
+  // GovernanceWidget made on this page, so cost is unchanged (server component).
+  const govResult = await listGovernanceQueue()
+  const govRows: GovernanceRow[] = 'success' in govResult && govResult.success ? govResult.rows : []
+  const flaggedRows = govRows.filter((r) => r.flags.length > 0)
+
+  const counts: Record<GovernanceFilter, number> = {
+    all: flaggedRows.length,
+    overdue: flaggedRows.filter((r) => r.flags.includes('overdue')).length,
+    due_soon: flaggedRows.filter((r) => r.flags.includes('due_soon')).length,
+    unowned: flaggedRows.filter((r) => r.flags.includes('unowned')).length,
+    stale_role: flaggedRows.filter((r) => r.flags.includes('stale_role')).length,
+    awaiting_approval: flaggedRows.filter((r) => r.flags.includes('awaiting_approval')).length,
+  }
+
+  const visibleRows = activeFilter === 'all' ? flaggedRows : flaggedRows.filter((r) => r.flags.includes(activeFilter))
 
   // Owner display labels (email/role), reusing the existing team fetcher — no new member query.
   const teamResult = await getTeamMembersWithEmails()
@@ -123,7 +151,46 @@ export default async function SopsLibraryPage({
             </div>
             <h1 className="mono text-2xl font-semibold text-[var(--ink-900)]">SOPs</h1>
           </div>
-          <GovernanceWidget />
+          {/* UX-03/GQ-04: governance counts + deep-links live on the library
+              header (replaces GovernanceWidget; server-rendered). */}
+          {flaggedRows.length === 0 ? (
+            <div className="blueprint-frame px-3 py-2 flex items-center">
+              <span className="mono text-[11px] text-[var(--ink-500)] uppercase tracking-wider">All current</span>
+            </div>
+          ) : (
+            <div className="blueprint-frame px-3 py-2 flex items-center gap-2 flex-wrap">
+              <Link
+                href="/admin/sops?view=attention&filter=overdue"
+                className="mono text-[11px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-600"
+              >
+                {counts.overdue} overdue
+              </Link>
+              <Link
+                href="/admin/sops?view=attention&filter=due_soon"
+                className="mono text-[11px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-700"
+              >
+                {counts.due_soon} due soon
+              </Link>
+              <Link
+                href="/admin/sops?view=attention&filter=unowned"
+                className="mono text-[11px] px-1.5 py-0.5 rounded bg-[var(--paper-2)] text-[var(--ink-500)]"
+              >
+                {counts.unowned} unowned
+              </Link>
+              <Link
+                href="/admin/sops?view=attention&filter=stale_role"
+                className="mono text-[11px] px-1.5 py-0.5 rounded bg-[var(--paper-2)] text-[var(--ink-500)]"
+              >
+                {counts.stale_role} stale role
+              </Link>
+              <Link
+                href="/admin/sops?view=attention&filter=awaiting_approval"
+                className="mono text-[11px] px-1.5 py-0.5 rounded bg-[var(--accent-signoff)]/20 text-[var(--accent-signoff)]"
+              >
+                {counts.awaiting_approval} awaiting approval
+              </Link>
+            </div>
+          )}
           {/* UX-04: the ONE create entry — method picker at /admin/sops/new */}
           <Link
             href="/admin/sops/new"
@@ -138,7 +205,7 @@ export default async function SopsLibraryPage({
         {/* Filter tabs */}
         <div className="flex gap-1 border-b border-[var(--ink-100)] mb-6 overflow-x-auto">
           {STATUS_TABS.map(tab => {
-            const isActive = activeStatus === tab.value
+            const isActive = !isAttentionView && activeStatus === tab.value
             return (
               <Link
                 key={tab.value}
@@ -151,14 +218,51 @@ export default async function SopsLibraryPage({
             )
           })}
           <Link
+            href="/admin/sops?view=attention"
+            className="tab"
+            data-active={isAttentionView ? 'true' : undefined}
+          >
+            Needs attention{flaggedRows.length > 0 ? ` (${flaggedRows.length})` : ''}
+          </Link>
+          <Link
             href="/admin/sops?owner=me"
             className="tab"
-            data-active={ownerOnly ? 'true' : undefined}
+            data-active={!isAttentionView && ownerOnly ? 'true' : undefined}
           >
             Owned by me
           </Link>
         </div>
 
+        {isAttentionView ? (
+          <>
+            {/* UX-03: needs-attention view — the governance queue, folded in. */}
+            <GovernanceFilterChips active={activeFilter} counts={counts} />
+
+            {'error' in govResult && (
+              <div className="blueprint-frame text-center py-12">
+                <p className="mono text-[11px] text-red-600 uppercase tracking-wider mb-2">ERROR</p>
+                <p className="text-sm text-[var(--ink-500)]">{govResult.error}</p>
+              </div>
+            )}
+
+            {'success' in govResult && visibleRows.length === 0 && (
+              <div className="blueprint-frame text-center py-12">
+                <p className="mono text-[11px] text-[var(--ink-500)] uppercase tracking-wider mb-2">CLEAR</p>
+                <p className="text-lg font-semibold text-[var(--ink-900)] mb-1">Nothing needs attention</p>
+                <p className="text-sm text-[var(--ink-500)]">Every SOP in this filter is owned, current, and correctly assigned.</p>
+              </div>
+            )}
+
+            {visibleRows.length > 0 && (
+              <ul className="space-y-2">
+                {visibleRows.map((row) => (
+                  <GovernanceQueueRow key={row.id} row={row} />
+                ))}
+              </ul>
+            )}
+          </>
+        ) : (
+          <>
         {/* Draft triage strip — surfaced on the All tab so review work is never invisible */}
         {activeStatus === 'all' && (sops ?? []).some((s: { status: string }) => s.status === 'draft') && (
           <Link
@@ -321,7 +425,9 @@ export default async function SopsLibraryPage({
               )
             })}
           </ul>
-      )}
+        )}
+          </>
+        )}
     </div>
   )
 }
