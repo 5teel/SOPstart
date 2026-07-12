@@ -84,7 +84,7 @@ test.describe('UX-04 — one create entry', () => {
     expect(src).toContain("route: '/admin/sops/new'")
   })
 
-  test.fixme('worker /sops "Create SOP" tab removed', () => {
+  test('worker /sops "Create SOP" tab removed', () => {
     const src = read(WORKER_SOPS_PAGE)
     expect(src).not.toContain('/admin/sops/upload')
     expect(src).not.toContain('Create SOP')

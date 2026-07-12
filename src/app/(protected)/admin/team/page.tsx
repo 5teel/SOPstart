@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import RoleAssignmentTable from '@/components/admin/RoleAssignmentTable'
 import { AdminNav } from '@/components/admin/AdminNav'
@@ -57,12 +56,6 @@ export default async function AdminTeamPage() {
             Invite people, set their role, and place them in one or more departments.
           </p>
         </div>
-        <Link
-          href="/dashboard"
-          className="text-sm text-[var(--ink-500)] hover:text-[var(--ink-700)] transition-colors"
-        >
-          Back to Dashboard
-        </Link>
       </div>
 
       <RoleAssignmentTable orgId={org.id} inviteCode={org.invite_code} departments={departments} />
