@@ -931,7 +931,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | **26.5. Agent Metadata Layer (v5.0)** | 8/8 | ✅ Complete | 2026-07-05 |
 | *(post-26.5 ad-hoc)* | — | AI provider flexibility + builder tree-rail UX — not phased, see note above | 2026-07-09 |
 | **27. AI Provider & Settings (v5.0 close)** | 1/1 | ✅ Complete | 2026-07-12 |
-| 28. Ownership + Review Lifecycle + Governance Queue | 6/6 | Complete   | 2026-07-12 |
+| 28. Ownership + Review Lifecycle + Governance Queue | 6/6 | Complete    | 2026-07-12 |
 | 29. Approval Chains | 0/TBD | Not started | - |
 | 30. Training Records + AI Maintenance Schedule | 0/TBD | Not started | - |
 

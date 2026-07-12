@@ -4,8 +4,8 @@ milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
 status: verifying
 stopped_at: Completed 28-04-PLAN.md
-last_updated: "2026-07-12T07:44:09.481Z"
-last_activity: 2026-07-12 -- Phase 28 execution started
+last_updated: "2026-07-12T08:05:04.834Z"
+last_activity: 2026-07-12
 progress:
   total_phases: 3
   completed_phases: 1
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 28 (Ownership + Review Lifecycle + Governance Queue) — EXECUTING
-Plan: 6 of 6
+Phase: 29
+Plan: Not started
 Status: Phase complete — ready for verification
-Last activity: 2026-07-12 -- Phase 28 execution started
+Last activity: 2026-07-12
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
@@ -98,6 +98,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | 22 | 4 | - | - |
 | 26.5 | 8 | - | - |
 | 27 | 1 | - | - |
+| 28 | 6 | - | - |
 
 **v2.0 By Phase:**
 
