@@ -556,8 +556,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ### UX Consolidation (UX) — Phase 30, inserted 2026-07-12 from frontend audit
 
-- [ ] **UX-01**: One home per role — worker lands on /sops, supervisor + safety_manager on /activity, admin on /admin/sops; dashboard UI deleted (route survives only as a redirect shim); no nav item points at Dashboard
-- [ ] **UX-02**: One shared AdminNav component renders the identical admin menu on every admin page; /admin/agent and governance reachable from it; the 3 disagreeing admin menus and 5 copy-pasted sub-navs are gone
+- [x] **UX-01**: One home per role — worker lands on /sops, supervisor + safety_manager on /activity, admin on /admin/sops; dashboard UI deleted (route survives only as a redirect shim); no nav item points at Dashboard
+- [x] **UX-02**: One shared AdminNav component renders the identical admin menu on every admin page; /admin/agent and governance reachable from it; the 3 disagreeing admin menus and 5 copy-pasted sub-navs are gone
 - [ ] **UX-03**: One governance surface — queue folds into /admin/sops as the "Needs attention" view with flag chips; GovernanceWidget + LibraryReviewCell removed; approval-chain editor relocates to admin settings; APR-03/04 approve-from-queue preserved verbatim
 - [ ] **UX-04**: One "New SOP" entry opening a method picker (Upload first, then Talk / Describe / Blank); all 8 scattered create buttons/tiles/tabs removed
 - [ ] **UX-05**: Worker SOP detail has exactly 3 tabs (Read / Walk it / Flow); PPE + equipment render once; legacy ?tab= params and QR deep-links map to the new tabs
