@@ -37,7 +37,11 @@ import path from 'node:path'
 
 const ROOT = process.cwd()
 const GOVERNANCE_ACTION = path.join(ROOT, 'src', 'actions', 'governance.ts')
-const PUBLISH_ROUTE = path.join(ROOT, 'src', 'app', 'api', 'sops', '[sopId]', 'publish', 'route.ts')
+// Phase 29 Plan 01 relocated the publish route's review-clock-reset/superseded-
+// event logic (verbatim) into publish-core.ts's performPublish() — the route
+// itself is now a thin caller. Point at the relocated source so these
+// assertions keep testing the real logic, not a thin wrapper (D29-03).
+const PUBLISH_ROUTE = path.join(ROOT, 'src', 'lib', 'governance', 'publish-core.ts')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
