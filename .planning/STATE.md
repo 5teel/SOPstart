@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
 status: executing
-stopped_at: Completed 28-01-PLAN.md - migration 00043 live, backfill executed (23/23 SOPs), Rule-1 trigger fix applied
-last_updated: "2026-07-12T07:02:01.940Z"
+stopped_at: Completed 28-02-PLAN.md
+last_updated: "2026-07-12T07:09:59.159Z"
 last_activity: 2026-07-12 -- Phase 28 execution started
 progress:
   total_phases: 3
   completed_phases: 0
   total_plans: 6
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 28 (Ownership + Review Lifecycle + Governance Queue) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-07-12 -- Phase 28 execution started
 
@@ -152,6 +152,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 26.5 P08 | 20m | 2 tasks | 5 files |
 | Phase 27 P01 | 45min | 3 tasks | 9 files |
 | Phase 28 P01 | 25min | 3 tasks | 3 files |
+| Phase 28 P02 | 20min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -312,6 +313,7 @@ Recent decisions affecting current work:
 - [Phase 27]: Runtime cross-org write-isolation assertion for setAiModelSetting carried as test.fixme (live-Supabase UAT) per Railway-only-testing convention; source-contract signature checks land green now
 - [Phase ?]: [Phase 28-01]: default_sop_owner trigger uses sops.uploaded_by (not created_by, which doesn't exist on sops)
 - [Phase ?]: [Phase 28-01]: sop_review_cadences has zero rows until Plan 28-03 writes them; backfill resolves every SOP to the 12-month default (correct per D28-03)
+- [Phase ?]: Governance classifier/cadence modules kept pure (no server directive) outside src/actions/ per 2026-06-27 learning
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -421,7 +423,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-12T07:02:01.933Z
-Stopped at: Completed 28-01-PLAN.md - migration 00043 live, backfill executed (23/23 SOPs), Rule-1 trigger fix applied
+Last session: 2026-07-12T07:09:59.152Z
+Stopped at: Completed 28-02-PLAN.md
 Resume file:
 None

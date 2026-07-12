@@ -528,7 +528,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 - [x] **OWN-01**: Every SOP displays a single accountable owner; existing SOPs are auto-backfilled with a sensible default (creator, else org admin) — no manual data-entry campaign
 - [ ] **OWN-02**: Admin can reassign an SOP's owner in ≤2 clicks from the SOP itself (library row or builder/detail), not a buried settings page
-- [ ] **OWN-03**: SOPs whose owner is deactivated or removed from the org surface automatically in the governance queue as "unowned" — never silently orphaned
+- [x] **OWN-03**: SOPs whose owner is deactivated or removed from the org surface automatically in the governance queue as "unowned" — never silently orphaned
 - [ ] **OWN-04**: An owner sees a "My SOPs" view listing the SOPs they own with review status at a glance
 
 ### Review Lifecycle (REV)
@@ -541,9 +541,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ### Governance Queue (GQ)
 
-- [ ] **GQ-01**: One unified governance queue for admins showing due-soon, overdue, unowned, and stale-role items — a single glanceable surface, no separate consoles
+- [x] **GQ-01**: One unified governance queue for admins showing due-soon, overdue, unowned, and stale-role items — a single glanceable surface, no separate consoles
 - [ ] **GQ-02**: Every queue row has a one-click primary action inline (confirm current / assign owner / open in builder / fix assignment)
-- [ ] **GQ-03**: When a role or department referenced by an SOP's assignments is renamed or removed, affected SOPs surface in the governance queue as stale-role items
+- [x] **GQ-03**: When a role or department referenced by an SOP's assignments is renamed or removed, affected SOPs surface in the governance queue as stale-role items
 - [ ] **GQ-04**: Governance dashboard widget on the admin home shows queue counts (overdue / unowned / awaiting approval) with deep links into the queue
 
 ### Approval Chains (APR)
