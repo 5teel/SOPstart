@@ -8,7 +8,7 @@
 // discipline of src/lib/builder/version-lineage.ts.
 // ------------------------------------------------------------
 
-export type GovernanceFlag = 'overdue' | 'due_soon' | 'unowned' | 'stale_role'
+export type GovernanceFlag = 'overdue' | 'due_soon' | 'unowned' | 'stale_role' | 'awaiting_approval'
 
 export interface GovernanceInput {
   reviewDueAt: string | null // sops.review_due_at
@@ -16,6 +16,11 @@ export interface GovernanceInput {
   ownerIsActiveMember: boolean // computed via LEFT JOIN organisation_members
   danglingDepartmentRefs: boolean // sop_departments row references archived/missing department
   departmentRenamedSinceReview: boolean // departments.updated_at > sops.last_reviewed_at
+  // Phase 29: sops.approval_state === 'pending'. Informational — visible to
+  // EVERY admin regardless of whether they can act (GQ-01 glanceable
+  // surface); who CAN act (isCallerNextApprover) is a per-viewer concern
+  // surfaced on GovernanceRow, deliberately NOT part of this pure classifier.
+  hasPendingApproval: boolean
   now?: Date
 }
 
@@ -34,6 +39,8 @@ export function classifyGovernanceRow(input: GovernanceInput): GovernanceFlag[] 
   }
 
   if (input.danglingDepartmentRefs || input.departmentRenamedSinceReview) flags.push('stale_role')
+
+  if (input.hasPendingApproval) flags.push('awaiting_approval')
 
   return flags
 }

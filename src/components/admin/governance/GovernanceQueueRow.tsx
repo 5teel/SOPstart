@@ -12,6 +12,10 @@ const FLAG_STYLE: Record<GovernanceRow['flags'][number], string> = {
   due_soon: 'bg-amber-500/20 text-amber-700',
   unowned: 'bg-[var(--paper-2)] text-[var(--ink-500)]',
   stale_role: 'bg-[var(--paper-2)] text-[var(--ink-500)]',
+  // Phase 29 — backend-only this plan; the isCallerNextApprover-gated Approve
+  // action lands in a later plan (PATTERNS.md § 7). This entry only keeps the
+  // Record<GovernanceFlag, string> exhaustive now that classify.ts emits it.
+  awaiting_approval: 'bg-[var(--accent-signoff)]/20 text-[var(--accent-signoff)]',
 }
 
 const FLAG_LABEL: Record<GovernanceRow['flags'][number], string> = {
@@ -19,6 +23,7 @@ const FLAG_LABEL: Record<GovernanceRow['flags'][number], string> = {
   due_soon: 'Due soon',
   unowned: 'Unowned',
   stale_role: 'Stale role',
+  awaiting_approval: 'Awaiting approval',
 }
 
 function formatDate(iso: string | null): string {

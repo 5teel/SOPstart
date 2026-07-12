@@ -11,6 +11,7 @@ const base = {
   ownerIsActiveMember: true,
   danglingDepartmentRefs: false,
   departmentRenamedSinceReview: false,
+  hasPendingApproval: false,
   now: NOW,
 }
 
@@ -61,6 +62,16 @@ test.describe('classifyGovernanceRow', () => {
     expect(flags).toContain('unowned')
     expect(flags).toContain('overdue')
     expect(flags).toHaveLength(2)
+  })
+
+  test('awaiting_approval when hasPendingApproval is true', () => {
+    const flags = classifyGovernanceRow({ ...base, hasPendingApproval: true })
+    expect(flags).toContain('awaiting_approval')
+  })
+
+  test('no awaiting_approval when hasPendingApproval is false', () => {
+    const flags = classifyGovernanceRow({ ...base, hasPendingApproval: false })
+    expect(flags).not.toContain('awaiting_approval')
   })
 })
 

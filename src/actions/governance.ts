@@ -40,6 +40,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { parseJwtPayload } from '@/lib/supabase/jwt'
 import { resolveCadenceMonths, computeReviewDueDate } from '@/lib/governance/cadences'
 import { classifyGovernanceRow, type GovernanceFlag } from '@/lib/governance/classify'
+import { resolveNextStepIndex, stepMatchesCaller, type ChainStep } from '@/lib/governance/approvals'
 import { getOrgMembers } from '@/actions/assignments'
 import type { AppRole } from '@/types/auth'
 
@@ -59,6 +60,10 @@ export interface GovernanceRow {
   ownerLabel: string
   reviewDueAt: string | null
   flags: GovernanceFlag[]
+  /** Phase 29: true when the CURRENT viewer is the next approver for this
+   * row's pending approval chain (stepMatchesCaller against approval_snapshot;
+   * always false for non-pending rows). */
+  isCallerNextApprover: boolean
 }
 
 export async function requireAdmin(): Promise<AdminCtx | { error: string }> {
@@ -267,9 +272,13 @@ export async function listGovernanceQueue(): Promise<
   const supabase = await createClient()
 
   // RLS (org_members_can_view_sops) already scopes this to the caller's org.
+  // Phase 29: approval_state/approval_snapshot/version added for the
+  // awaiting_approval flag + per-row isCallerNextApprover computation.
   const { data: sops, error: sopsErr } = await supabase
     .from('sops')
-    .select('id, title, category, status, owner_user_id, review_due_at, last_reviewed_at')
+    .select(
+      'id, title, category, status, owner_user_id, review_due_at, last_reviewed_at, approval_state, approval_snapshot, version',
+    )
     .order('review_due_at', { ascending: true, nullsFirst: false })
 
   if (sopsErr) {
@@ -312,6 +321,22 @@ export async function listGovernanceQueue(): Promise<
     ((deptRows ?? []) as Array<{ id: string; updated_at: string }>).map((d) => [d.id, d.updated_at]),
   )
 
+  // Phase 29: only pending-approval rows need the extra sop_approvals query —
+  // skip it entirely for non-pending rows (plan-mandated optimisation).
+  const pendingSopIds = sopRows.filter((s) => s.approval_state === 'pending').map((s) => s.id)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: pendingApprovalRows } = pendingSopIds.length > 0
+    ? await (supabase as any)
+        .from('sop_approvals')
+        .select('sop_id, step_index')
+        .in('sop_id', pendingSopIds)
+        .eq('action', 'approved')
+    : { data: [] }
+  const approvedIndexesBySop: Record<string, Set<number>> = {}
+  for (const r of (pendingApprovalRows ?? []) as Array<{ sop_id: string; step_index: number }>) {
+    ;(approvedIndexesBySop[r.sop_id] ??= new Set()).add(r.step_index)
+  }
+
   // Reuse the existing member-list fetcher (assignments.ts) rather than
   // hand-rolling a second "list org members" query (RESEARCH Don't Hand-Roll).
   const membersResult = await getOrgMembers()
@@ -337,12 +362,27 @@ export async function listGovernanceQueue(): Promise<
 
     const ownerIsActiveMember = sop.owner_user_id ? memberSet.has(sop.owner_user_id) : false
 
+    // Phase 29: awaiting_approval flag (visible to every admin) + per-viewer
+    // isCallerNextApprover (only meaningful for pending rows) — computed via
+    // the SAME resolveNextStepIndex/stepMatchesCaller pure resolver used by
+    // src/actions/approvals.ts, never a duplicated ad-hoc comparison.
+    const hasPendingApproval = sop.approval_state === 'pending'
+    let isCallerNextApprover = false
+    if (hasPendingApproval) {
+      const snapshot = (sop.approval_snapshot as unknown as ChainStep[]) ?? []
+      const approvedIndexes = approvedIndexesBySop[sop.id] ?? new Set<number>()
+      const nextIndex = resolveNextStepIndex(snapshot.length, approvedIndexes)
+      isCallerNextApprover =
+        nextIndex !== -1 && stepMatchesCaller(snapshot[nextIndex], { userId: ctx.userId, role: ctx.role })
+    }
+
     const flags = classifyGovernanceRow({
       reviewDueAt: sop.review_due_at,
       ownerUserId: sop.owner_user_id,
       ownerIsActiveMember,
       danglingDepartmentRefs,
       departmentRenamedSinceReview,
+      hasPendingApproval,
     })
 
     return {
@@ -354,6 +394,7 @@ export async function listGovernanceQueue(): Promise<
       ownerLabel: sop.owner_user_id ? (ownerLabelById[sop.owner_user_id] ?? 'No owner') : 'No owner',
       reviewDueAt: sop.review_due_at,
       flags,
+      isCallerNextApprover,
     }
   })
 
