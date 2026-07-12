@@ -24,6 +24,7 @@ import {
   restoreVersionAsNew,
   type VersionRecord,
 } from '@/actions/versioning'
+import { getApprovalHistory, type ApprovalHistoryRow } from '@/actions/approvals'
 
 function ArrowLeftIcon({ className }: { className?: string }) {
   return (
@@ -117,6 +118,7 @@ export default function SopVersionHistoryPage() {
   const sopId = params.sopId as string
 
   const [versions, setVersions] = useState<VersionRecord[]>([])
+  const [approvals, setApprovals] = useState<ApprovalHistoryRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -141,6 +143,14 @@ export default function SopVersionHistoryPage() {
       const result = await getVersionHistory(sopId)
       if (result.success) {
         setVersions(result.versions)
+        // Read-only approval history (D29-06) — fetched for every version id
+        // in the lineage; approver + step labels come already-resolved from
+        // getApprovalHistory (reuses getOrgMembers() + approval_snapshot
+        // server-side, no second member query, no label column).
+        const approvalsResult = await getApprovalHistory(result.versions.map((v) => v.id))
+        if ('success' in approvalsResult && approvalsResult.success) {
+          setApprovals(approvalsResult.rows)
+        }
       } else {
         setError(result.error)
       }
@@ -385,6 +395,7 @@ export default function SopVersionHistoryPage() {
             const isCurrent = ver.superseded_by === null && ver.status === 'published'
             const isRestoringThis = restoringVersionId === ver.id
             const showRestoreConfirm = showRestoreConfirmFor === ver.id
+            const verApprovals = approvals.filter((a) => a.sopId === ver.id)
 
             // Compare: A = this version, B = current
             const currentId = currentSop?.id
@@ -478,6 +489,26 @@ export default function SopVersionHistoryPage() {
                       </button>
                     </div>
                   </div>
+                )}
+
+                {/* Approval history — read-only, D29-06 (APR-05). Grouped under
+                    this version; approver + step labels already resolved by
+                    getApprovalHistory server-side. */}
+                {verApprovals.length > 0 && (
+                  <ul className="mx-4 mb-3 space-y-1">
+                    {verApprovals.map((a) => (
+                      <li key={a.id} className="text-xs text-[var(--ink-500)]">
+                        <span className="font-medium text-[var(--ink-900)]">{a.approverLabel}</span>
+                        {' — '}
+                        {a.action === 'approved' ? 'Approved' : 'Requested changes'}
+                        {' — '}
+                        {a.stepLabel}
+                        {' — '}
+                        {formatDate(a.createdAt)}
+                        {a.comment && <span className="italic"> ({a.comment})</span>}
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </div>
             )
