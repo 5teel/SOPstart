@@ -16,7 +16,12 @@
  *                            (no authenticated write policy by design, ai_model_settings
  *                            shape); organisation_id sourced ONLY from the caller's JWT,
  *                            never a parameter (T-28-03-02)
- *  - listGovernanceQueue()— composed governance-queue read (Task 2)
+ *  - listGovernanceQueue()— composed governance-queue read (Task 2); Phase 29
+ *                            Plan 02 additionally computes isCallerNextApprover
+ *                            per row (pending rows only) via stepMatchesCaller
+ *  - requireAdmin()       — EXPORTED (Phase 29 Plan 02) so src/actions/approvals.ts
+ *                            reuses the SAME auth/org/role resolution instead of
+ *                            duplicating it
  *
  * All pure math (cadence resolution, due-date computation, flag classification)
  * is imported from src/lib/governance/* — never inlined here (a sync export in a
@@ -36,8 +41,14 @@ import { parseJwtPayload } from '@/lib/supabase/jwt'
 import { resolveCadenceMonths, computeReviewDueDate } from '@/lib/governance/cadences'
 import { classifyGovernanceRow, type GovernanceFlag } from '@/lib/governance/classify'
 import { getOrgMembers } from '@/actions/assignments'
+import type { AppRole } from '@/types/auth'
 
-type AdminCtx = { userId: string; organisationId: string }
+// Phase 29 Plan 02: requireAdmin() is now EXPORTED (was private) and its ctx
+// carries `role` so approvals.ts can reuse it instead of duplicating the
+// auth/org/role resolution (ladder rung 2 — don't hand-roll a second
+// requireAdmin). Additive change: existing `{ userId, organisationId }`
+// destructures are unaffected.
+export type AdminCtx = { userId: string; organisationId: string; role: AppRole }
 
 export interface GovernanceRow {
   id: string
@@ -50,7 +61,7 @@ export interface GovernanceRow {
   flags: GovernanceFlag[]
 }
 
-async function requireAdmin(): Promise<AdminCtx | { error: string }> {
+export async function requireAdmin(): Promise<AdminCtx | { error: string }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Not authenticated' }
@@ -62,7 +73,7 @@ async function requireAdmin(): Promise<AdminCtx | { error: string }> {
   }
   const organisationId = claims['organisation_id'] as string | undefined
   if (!organisationId) return { error: 'No organisation found' }
-  return { userId: user.id, organisationId }
+  return { userId: user.id, organisationId, role: role as AppRole }
 }
 
 /** Reads the caller's org-scoped cadence settings into a category -> months map. */
