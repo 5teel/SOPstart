@@ -1,0 +1,78 @@
+/**
+ * UX-08 — Dead-weight sweep (Phase 30 Wave-0 stub).
+ *
+ * Eventual contract (30-RESEARCH § Current Wiring 7 + § Dead-Href Inventory):
+ *   - Deleted: ModelTab.tsx + tab entry, /sops/[sopId]/walkthrough route
+ *     (page.tsx + layout.tsx — hrefs become ?tab=walk), WalkthroughTab.tsx
+ *     shim, BuilderWithSourceViewer.tsx (this plan, 30-01), fake
+ *     notifications bell (TopHeader — NotificationBadge itself stays for
+ *     BottomTabBar), AdminDashboard/PendingDashboard UI (UX-01).
+ *   - No-op worker department filter fixed or removed (decision #3 —
+ *     executor checks the sop_departments SELECT policy at edit time).
+ *   - /pathways + /uat links move from primary nav to the account menu.
+ *   - Zero dead-href strings per removal (CLAUDE.md 2026-06-08); journeys.ts
+ *     contains no removed routes; /pathways "All screens" → 0 not-mapped.
+ *
+ * BuilderWithSourceViewer deletion happens IN this plan (30-01 Task 2), so
+ * that assertion runs LIVE. The rest flip in the UX-08 sweep plan.
+ */
+import { test, expect } from '@playwright/test'
+import fs from 'node:fs'
+import path from 'node:path'
+
+const ROOT = process.cwd()
+const BUILDER_DIR = path.join(
+  ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]',
+)
+const TABS_DIR = path.join(ROOT, 'src', 'components', 'sop', 'tabs')
+
+test.describe('UX-08 — dead-weight sweep', () => {
+  // Flips LIVE in 30-01 Task 2 (deletion happens in this plan).
+  test.fixme('BuilderWithSourceViewer.tsx is deleted (superseded by BuilderStageShell, Phase 26)', () => {
+    expect(fs.existsSync(path.join(BUILDER_DIR, 'BuilderWithSourceViewer.tsx'))).toBe(false)
+  })
+
+  test.fixme('ModelTab + WalkthroughTab shim are deleted with their tab entries', () => {
+    expect(fs.existsSync(path.join(TABS_DIR, 'ModelTab.tsx'))).toBe(false)
+    expect(fs.existsSync(path.join(TABS_DIR, 'WalkthroughTab.tsx'))).toBe(false)
+  })
+
+  test.fixme('/sops/[sopId]/walkthrough route (page + orphan layout) is deleted', () => {
+    const routeDir = path.join(ROOT, 'src', 'app', '(protected)', 'sops', '[sopId]', 'walkthrough')
+    expect(fs.existsSync(routeDir)).toBe(false)
+  })
+
+  test.fixme('fake notifications bell removed from TopHeader (NotificationBadge stays in BottomTabBar)', () => {
+    const header = fs.readFileSync(
+      path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx'), 'utf-8',
+    )
+    expect(header).not.toContain('NotificationBadge')
+    const tabBar = fs.readFileSync(
+      path.join(ROOT, 'src', 'components', 'layout', 'BottomTabBar.tsx'), 'utf-8',
+    )
+    expect(tabBar).toContain('NotificationBadge')
+  })
+
+  test.fixme('worker /sops department filter is fixed or removed (no placebo return true)', () => {
+    const src = fs.readFileSync(
+      path.join(ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx'), 'utf-8',
+    )
+    expect(src).not.toMatch(/\/\/ TODO.*useAssignedSops/)
+  })
+
+  test.fixme('/pathways + /uat links live in the account menu, not primary nav', () => {
+    const header = fs.readFileSync(
+      path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx'), 'utf-8',
+    )
+    // BASE_LINKS (primary nav) no longer carries them — account menu does.
+    expect(header).toContain('/pathways')
+    expect(header).toContain('/uat')
+  })
+
+  test.fixme('journeys.ts contains no removed routes (/pathways shows 0 not-mapped)', () => {
+    const journeys = fs.readFileSync(
+      path.join(ROOT, 'src', 'lib', 'journeys', 'journeys.ts'), 'utf-8',
+    )
+    expect(journeys).not.toContain("'/sops/[sopId]/walkthrough'")
+  })
+})

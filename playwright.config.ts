@@ -298,6 +298,26 @@ export default defineConfig({
       use: { browserName: 'chromium' },
     },
     {
+      // Phase 30 — UX Consolidation & Simplification Nyquist harness (Wave 0 / Plan 30-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase30/**) so every later plan in
+      // the phase drops specs into tests/phase30/ with NO further config edit —
+      // single registration point for the whole phase (mirrors phase28/phase29).
+      //
+      // Verify registration: `npx playwright test --list --project=phase30`
+      // (should list all 8 tests/phase30/*.spec.ts files — zero discovered = FAIL)
+      //
+      // Wave-0 stub files (one per UX requirement):
+      //   role-homes (UX-01) · admin-nav (UX-02) · governance-fold (UX-03) ·
+      //   create-entry (UX-04) · tab-merge (UX-05) · list-rows (UX-06) ·
+      //   plain-language (UX-07) · dead-weight (UX-08)
+      name: 'phase30',
+      testDir: '.',
+      testMatch: /tests\/phase30\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
+    {
       // Phase 26 — SOP Builder Redesign Nyquist harness (Wave 1 / Plan 26-02).
       //
       // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
