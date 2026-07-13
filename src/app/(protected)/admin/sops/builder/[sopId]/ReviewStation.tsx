@@ -4,14 +4,26 @@
  * Phase 21.5 (Plan 21.5-04 Task 2) — Review Station: 3-zone synced review grid.
  *
  * Zone 1 (left,  280px/240px): Step navigator — NavRow list, one per block
- * Zone 2 (centre, flex-1):     Step in app — one step card + inline AI flags
+ * Zone 2 (centre, flex-1):     Step in app — the blocks, as the worker sees them
  * Zone 3 (right,  flex-1):     Original document — SourceViewerPane as-is
+ *
+ * Zone 2 is a CONTINUOUS SCROLL column: every block is rendered, each with its
+ * own inline verify action. It replaced a one-block-at-a-time pager whose
+ * bottom action bar forced 48 × (click → read → verify) round-trips through a
+ * 48-step SOP. Scrolling the column moves the active block, which drives the
+ * source pane (zone 3) — so the original document follows the reviewer's eye
+ * instead of demanding a click per step.
+ *
+ * D-21-07 / SCP-VERIFY-05 is UNTOUCHED by that change: there is still exactly
+ * ONE deliberate verify act per block, and no affordance that verifies more
+ * than one. The lock bans a BULK action, not a scrolling layout — the
+ * per-block friction (the actual safety feature, Spike 004) is preserved.
  *
  * Reuses shipped data layer (no new fetch/mutations):
  *   - useVerifyChecklist    — blocks, activeIdx, setActiveIdx, approve, decline
- *   - useReviewerFlags      — byBlockId for the AI panel header count
+ *   - useReviewerFlags      — byBlockId for the per-block AI panel
  *   - useChecklistKeybinds  — j/k nav, a verify, d send-back, Enter focus-source
- *   - useSelectionSync      — setActiveProvenance syncs source pane on row select
+ *   - useSelectionSync      — setActiveProvenance syncs source pane on active change
  *   - ReviewerFlagsPanel    — inline per-step AI flags (self-hides when clean)
  *   - SourceViewerPane      — zone 3, rendered as-is
  *
@@ -22,7 +34,6 @@
  * CLAUDE.md 2026-05-13: Active-step state driven from hook's activeIdx.
  * Never uses router.push for step navigation.
  *
- * D-21-07 / SCP-VERIFY-05: NO bulk-verify affordance. Single-block verify only.
  * D-21-09 isolation: admin-only; never imported by worker routes.
  */
 
@@ -47,6 +58,13 @@ import {
   blockKindToPuckType,
 } from '@/lib/builder/puck-to-block-content'
 import type { ChecklistBlock } from '@/components/admin/verify-checklist/useVerifyChecklist'
+import type { ReviewerFlag } from '@/lib/parsers/ai-reviewer'
+
+export type ReviewStationProps = {
+  sopId: string
+  sourceType: SourcePaneKind | null
+  transcriptSegments?: TranscriptSegment[]
+}
 
 /**
  * Render the step as the worker actually sees it — the zone's stated promise.
@@ -82,10 +100,258 @@ function StepInApp({ block }: { block: ChecklistBlock }): React.JSX.Element {
   return <BlockAny {...props} />
 }
 
-export type ReviewStationProps = {
+/**
+ * One block in the review column: what the worker sees, what the AI flagged,
+ * and the single verify decision for THIS block (D-21-07 — one act, one block).
+ */
+function ReviewCard({
+  block,
+  index,
+  total,
+  active,
+  flags,
+  sopId,
+  onSelect,
+  onApprove,
+  onDecline,
+  registerRef,
+}: {
+  block: ChecklistBlock
+  index: number
+  total: number
+  active: boolean
+  flags: ReviewerFlag[]
   sopId: string
-  sourceType: SourcePaneKind | null
-  transcriptSegments?: TranscriptSegment[]
+  onSelect: () => void
+  onApprove: () => void
+  onDecline: () => void
+  registerRef: (el: HTMLElement | null) => void
+}): React.JSX.Element {
+  const verified = block.verified_by_admin_id !== null
+  const hasAiFlags = flags.length > 0
+
+  return (
+    <div
+      ref={registerRef}
+      data-testid="review-card"
+      data-block-id={block.id}
+      data-active={active ? 'true' : undefined}
+      data-verified={verified ? 'true' : undefined}
+      onClick={onSelect}
+      style={{
+        border: active
+          ? '1.5px solid var(--accent-step)'
+          : '1px solid var(--ink-300)',
+        borderRadius: '4px',
+        background: '#fff',
+        overflow: 'hidden',
+        marginBottom: '12px',
+        // The active card is what zone 3 is showing the source for — make that
+        // legible without shouting, since every card is on screen at once now.
+        boxShadow: active ? '0 0 0 3px rgba(59,130,246,0.10)' : 'none',
+        scrollMarginTop: '12px',
+      }}
+    >
+      {/* Card strip */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '8px 12px',
+          background: active ? '#eff4ff' : 'var(--paper-2, #f4f4f5)',
+          borderBottom: '1px solid var(--ink-200)',
+        }}
+      >
+        {/* Type pill (outline variant) */}
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            fontSize: '10px',
+            fontWeight: 600,
+            fontFamily: 'JetBrains Mono, monospace',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            color: 'var(--accent-step)',
+            border: '1px solid var(--accent-step)',
+            borderRadius: '2px',
+            padding: '2px 8px',
+          }}
+        >
+          {humanizeBlockType(block.type)}
+        </span>
+
+        {/* Context label */}
+        <span
+          style={{
+            fontFamily: 'JetBrains Mono, monospace',
+            fontSize: '10px',
+            fontWeight: 500,
+            color: 'var(--ink-500)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.06em',
+          }}
+        >
+          Step {index + 1} of {total}
+        </span>
+      </div>
+
+      {/* The real worker block. */}
+      <div style={{ padding: '16px' }}>
+        <StepInApp block={block} />
+      </div>
+
+      {/* Inline AI Safety Check — only when THIS block has flags. A clean block
+          used to render an "all clear" box plus its own re-run button; across a
+          48-step SOP that was 48 repetitions of nothing. Silence signals clean. */}
+      {hasAiFlags && (
+        <div
+          style={{
+            margin: '0 16px 16px',
+            border: '1px solid var(--ink-300)',
+            borderRadius: '4px',
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '8px 12px',
+              background: 'var(--paper-2, #f4f4f5)',
+              borderBottom: '1px solid var(--ink-200)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span
+                aria-hidden
+                style={{
+                  width: '7px',
+                  height: '7px',
+                  borderRadius: '50%',
+                  background: 'var(--accent-measure)',
+                  flexShrink: 0,
+                }}
+              />
+              <span
+                style={{
+                  fontFamily: 'JetBrains Mono, monospace',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  color: 'var(--ink-900)',
+                }}
+              >
+                {`AI safety check · ${flags.length} thing${flags.length === 1 ? '' : 's'} to look at`}
+              </span>
+            </div>
+          </div>
+
+          <ReviewerFlagsPanel
+            sopId={sopId}
+            blockId={block.id}
+            blockProvenance={block.provenance}
+          />
+        </div>
+      )}
+
+      {/* Per-block decision — the ONE deliberate act for this block (D-21-07). */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          padding: '10px 16px',
+          borderTop: '1px solid var(--ink-200)',
+          background: verified ? 'rgba(22,163,74,0.06)' : 'var(--paper-2, #f4f4f5)',
+        }}
+      >
+        {verified ? (
+          <>
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontFamily: 'JetBrains Mono, monospace',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: 'var(--accent-ok)',
+              }}
+            >
+              ✓ Verified
+            </span>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                onDecline()
+              }}
+              style={{
+                marginLeft: 'auto',
+                padding: '6px 12px',
+                border: '1px solid var(--ink-300)',
+                borderRadius: '2px',
+                background: 'transparent',
+                color: 'var(--ink-700)',
+                cursor: 'pointer',
+                fontFamily: 'JetBrains Mono, monospace',
+                fontSize: '12px',
+                fontWeight: 600,
+              }}
+            >
+              ✎ Send back to edit
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              type="button"
+              data-testid="verify-step"
+              onClick={(e) => {
+                e.stopPropagation()
+                onApprove()
+              }}
+              style={{
+                padding: '6px 14px',
+                border: 'none',
+                borderRadius: '2px',
+                background: 'var(--accent-ok)',
+                color: '#fff',
+                cursor: 'pointer',
+                fontFamily: 'JetBrains Mono, monospace',
+                fontSize: '12px',
+                fontWeight: 600,
+              }}
+            >
+              ✓ Looks right — verify step
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                onDecline()
+              }}
+              style={{
+                padding: '6px 12px',
+                border: '1px solid var(--accent-measure)',
+                borderRadius: '2px',
+                background: 'transparent',
+                color: '#c2410c',
+                cursor: 'pointer',
+                fontFamily: 'JetBrains Mono, monospace',
+                fontSize: '12px',
+                fontWeight: 600,
+              }}
+            >
+              ✎ Send back to edit
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  )
 }
 
 export function ReviewStation({
@@ -98,93 +364,132 @@ export function ReviewStation({
   const selection = useSelectionSync()
   const navListRef = useRef<HTMLDivElement | null>(null)
 
+  // Zone 2 scroll container + one ref per rendered card, so nav/keyboard can
+  // reveal a card and the scroll handler can work out which card is being read.
+  const columnRef = useRef<HTMLDivElement | null>(null)
+  const cardRefs = useRef<Map<string, HTMLElement>>(new Map())
+
+  // Scrolling the column drives activeIdx. A programmatic reveal (nav click,
+  // j/k) also fires scroll events — suppress the handler briefly so it cannot
+  // fight the reveal it just triggered.
+  const suppressScrollSyncRef = useRef(false)
+  const suppressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const rafRef = useRef<number | null>(null)
+
   // Zone 3 drawer state for tablet (768–1023px). CSS hides zone 3 at tablet;
   // the drawer toggle overlays it as a side panel. No JS breakpoint detection
   // per D-04 SSR-safety pattern — the button only shows at tablet via CSS.
   const [drawerOpen, setDrawerOpen] = useState(false)
 
+  const { setActiveProvenance } = selection
+  const { blocks, activeIdx, activeBlockId, setActiveIdx } = checklist
+
+  useEffect(() => {
+    return () => {
+      if (suppressTimerRef.current) clearTimeout(suppressTimerRef.current)
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
+    }
+  }, [])
+
+  const revealCard = useCallback((blockId: string) => {
+    const el = cardRefs.current.get(blockId)
+    if (!el || typeof el.scrollIntoView !== 'function') return
+    suppressScrollSyncRef.current = true
+    el.scrollIntoView({ block: 'start', behavior: 'smooth' })
+    if (suppressTimerRef.current) clearTimeout(suppressTimerRef.current)
+    suppressTimerRef.current = setTimeout(() => {
+      suppressScrollSyncRef.current = false
+    }, 700)
+  }, [])
+
+  /**
+   * Explicit navigation (nav row click, j/k). Unlike a scroll-driven change,
+   * this must bring the card to the reader. Passed to useChecklistKeybinds as
+   * `setActiveIdx` so the keyboard contract keeps working in a scrolling column.
+   */
+  const selectAndReveal = useCallback(
+    (idx: number) => {
+      setActiveIdx(idx)
+      const block = blocks[idx]
+      if (block) revealCard(block.id)
+    },
+    [blocks, setActiveIdx, revealCard],
+  )
+
   const focusSourcePane = useCallback(
     (blockId: string) => {
-      const block = checklist.blocks.find((b) => b.id === blockId)
+      const block = blocks.find((b) => b.id === blockId)
       if (!block) return
-      selection.setActiveProvenance(block.provenance ?? null, block.id)
+      setActiveProvenance(block.provenance ?? null, block.id)
     },
-    [checklist.blocks, selection],
+    [blocks, setActiveProvenance],
   )
 
   useChecklistKeybinds({
-    blocks: checklist.blocks,
-    activeIdx: checklist.activeIdx,
-    setActiveIdx: checklist.setActiveIdx,
+    blocks,
+    activeIdx,
+    setActiveIdx: selectAndReveal,
     approve: checklist.approve,
     decline: checklist.decline,
     focusSourcePane,
     enabled: true,
   })
 
+  /**
+   * The source pane follows the active block — however it became active
+   * (nav click, j/k, or simply scrolling the column). This is what removes the
+   * click-per-step: read down zone 2, and zone 3 tracks you.
+   */
+  useEffect(() => {
+    const block = blocks[activeIdx]
+    if (!block) return
+    setActiveProvenance(block.provenance ?? null, block.id)
+  }, [activeIdx, blocks, setActiveProvenance])
+
   // Auto-scroll the active nav row into view when activeIdx changes.
   useEffect(() => {
     const container = navListRef.current
     if (!container) return
     const row = container.querySelector<HTMLElement>(
-      `[data-testid="nav-row"][data-block-id="${checklist.activeBlockId}"]`,
+      `[data-testid="nav-row"][data-block-id="${activeBlockId}"]`,
     )
     if (row && typeof row.scrollIntoView === 'function') {
       row.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
     }
-  }, [checklist.activeIdx, checklist.activeBlockId])
+  }, [activeIdx, activeBlockId])
 
-  const activeBlock = checklist.blocks[checklist.activeIdx] ?? null
-  const activeBlockFlags = activeBlock
-    ? (reviewer.byBlockId.get(activeBlock.id) ?? [])
-    : []
-  const hasAiFlags = activeBlockFlags.length > 0
+  /**
+   * Scroll → active. The card whose top edge sits nearest the top of the
+   * column is the one being read. rAF-throttled; no-ops during a reveal.
+   */
+  const syncActiveToScroll = useCallback(() => {
+    if (suppressScrollSyncRef.current) return
+    const root = columnRef.current
+    if (!root) return
+    const rootTop = root.getBoundingClientRect().top
 
-  const handleSelectRow = useCallback(
-    (idx: number) => {
-      checklist.setActiveIdx(idx)
-      const block = checklist.blocks[idx]
-      if (block) {
-        selection.setActiveProvenance(block.provenance ?? null, block.id)
+    let bestIdx = -1
+    let bestDist = Number.POSITIVE_INFINITY
+    blocks.forEach((block, idx) => {
+      const el = cardRefs.current.get(block.id)
+      if (!el) return
+      const dist = Math.abs(el.getBoundingClientRect().top - rootTop)
+      if (dist < bestDist) {
+        bestDist = dist
+        bestIdx = idx
       }
-    },
-    [checklist, selection],
-  )
+    })
 
-  const handleApprove = useCallback(async () => {
-    if (!activeBlock) return
-    await checklist.approve(activeBlock.id)
-    // Advance to next unverified block after verifying
-    const nextIdx = checklist.blocks.findIndex(
-      (b, i) => i > checklist.activeIdx && b.verified_by_admin_id === null,
-    )
-    if (nextIdx !== -1) {
-      checklist.setActiveIdx(nextIdx)
-      const nextBlock = checklist.blocks[nextIdx]
-      if (nextBlock) {
-        selection.setActiveProvenance(nextBlock.provenance ?? null, nextBlock.id)
-      }
-    } else if (checklist.activeIdx < checklist.blocks.length - 1) {
-      const next = checklist.activeIdx + 1
-      checklist.setActiveIdx(next)
-      const nextBlock = checklist.blocks[next]
-      if (nextBlock) {
-        selection.setActiveProvenance(nextBlock.provenance ?? null, nextBlock.id)
-      }
-    }
-  }, [activeBlock, checklist, selection])
+    if (bestIdx !== -1 && bestIdx !== activeIdx) setActiveIdx(bestIdx)
+  }, [blocks, activeIdx, setActiveIdx])
 
-  const handleDecline = useCallback(async () => {
-    if (!activeBlock) return
-    await checklist.decline(activeBlock.id)
-  }, [activeBlock, checklist])
-
-  const handlePrev = useCallback(() => {
-    const idx = Math.max(0, checklist.activeIdx - 1)
-    checklist.setActiveIdx(idx)
-    const b = checklist.blocks[idx]
-    if (b) selection.setActiveProvenance(b.provenance ?? null, b.id)
-  }, [checklist, selection])
+  const handleColumnScroll = useCallback(() => {
+    if (rafRef.current != null) return
+    rafRef.current = requestAnimationFrame(() => {
+      rafRef.current = null
+      syncActiveToScroll()
+    })
+  }, [syncActiveToScroll])
 
   // ─── Loading state ───────────────────────────────────────────────────────────
   if (checklist.isLoading) {
@@ -249,6 +554,8 @@ export function ReviewStation({
       </div>
     )
   }
+
+  const remaining = checklist.totalCount - checklist.verifiedCount
 
   return (
     <>
@@ -353,7 +660,7 @@ export function ReviewStation({
                 margin: '2px 0 0',
               }}
             >
-              Click any step to review it
+              Jump to any step — or just scroll
             </p>
           </div>
 
@@ -369,18 +676,18 @@ export function ReviewStation({
               gap: '2px',
             }}
           >
-            {checklist.blocks.map((block, idx) => (
+            {blocks.map((block, idx) => (
               <NavRow
                 key={block.id}
                 block={block}
-                active={idx === checklist.activeIdx}
-                onSelect={() => handleSelectRow(idx)}
+                active={idx === activeIdx}
+                onSelect={() => selectAndReveal(idx)}
               />
             ))}
           </div>
         </aside>
 
-        {/* ── Zone 2: Step in App ──────────────────────────────────────────── */}
+        {/* ── Zone 2: The blocks, as the worker sees them ───────────────────── */}
         <section
           className="rs-zone2"
           style={{
@@ -415,7 +722,7 @@ export function ReviewStation({
                   margin: 0,
                 }}
               >
-                The step, in the app
+                The steps, in the app
               </p>
               <p
                 style={{
@@ -426,7 +733,7 @@ export function ReviewStation({
                   margin: '2px 0 0',
                 }}
               >
-                This is what the worker will see on their phone
+                This is what the worker will see on their phone — scroll to read, verify as you go
               </p>
             </div>
 
@@ -455,153 +762,38 @@ export function ReviewStation({
             </button>
           </div>
 
-          {/* Step card + AI panel */}
+          {/* The review column — every block, each with its own verify act. */}
           <div
+            ref={columnRef}
+            onScroll={handleColumnScroll}
             style={{
               flex: 1,
               overflowY: 'auto',
               padding: '16px',
             }}
           >
-            {activeBlock ? (
-              <>
-                {/* Step card — primary visual anchor */}
-                <div
-                  key={activeBlock.id}
-                  data-block-id={activeBlock.id}
-                  style={{
-                    border: '1.5px solid var(--accent-step)',
-                    borderRadius: '4px',
-                    background: '#fff',
-                    overflow: 'hidden',
-                  }}
-                >
-                  {/* Card strip */}
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      padding: '8px 12px',
-                      background: '#eff4ff',
-                      borderBottom: '1px solid var(--ink-200)',
-                    }}
-                  >
-                    {/* Type pill (outline variant) */}
-                    <span
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        fontSize: '10px',
-                        fontWeight: 600,
-                        fontFamily: 'JetBrains Mono, monospace',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.08em',
-                        color: 'var(--accent-step)',
-                        border: '1px solid var(--accent-step)',
-                        borderRadius: '2px',
-                        padding: '2px 8px',
-                      }}
-                    >
-                      {humanizeBlockType(activeBlock.type)}
-                    </span>
-
-                    {/* Context label */}
-                    <span
-                      style={{
-                        fontFamily: 'JetBrains Mono, monospace',
-                        fontSize: '10px',
-                        fontWeight: 500,
-                        color: 'var(--ink-500)',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.06em',
-                      }}
-                    >
-                      Step {checklist.activeIdx + 1} of {checklist.totalCount}
-                    </span>
-                  </div>
-
-                  {/* The real worker block. Replaces the old h2-preview +
-                      canned "parsed from the source document" sentence, which
-                      restated the left-rail row and read identically on every
-                      block — nothing to review against the source. */}
-                  <div style={{ padding: '16px' }}>
-                    <StepInApp block={activeBlock} />
-                  </div>
-                </div>
-
-                {/* Inline AI Safety Check panel — only when this block HAS flags.
-                    A clean block previously rendered an "all clear" box plus its
-                    own re-run button, repeating identically on every block while
-                    the same re-run action already sits in the page header. Silence
-                    is the correct signal for clean; the header carries the count. */}
-                {hasAiFlags && (
-                  <div
-                    style={{
-                      marginTop: '16px',
-                      border: '1px solid var(--ink-300)',
-                      borderRadius: '4px',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {/* AI panel header */}
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        padding: '8px 12px',
-                        background: 'var(--paper-2, #f4f4f5)',
-                        borderBottom: '1px solid var(--ink-200)',
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px',
-                        }}
-                      >
-                        {/* Status dot */}
-                        <span
-                          aria-hidden
-                          style={{
-                            width: '7px',
-                            height: '7px',
-                            borderRadius: '50%',
-                            background: 'var(--accent-measure)',
-                            flexShrink: 0,
-                          }}
-                        />
-                        {/* Label */}
-                        <span
-                          style={{
-                            fontFamily: 'JetBrains Mono, monospace',
-                            fontSize: '12px',
-                            fontWeight: 600,
-                            color: 'var(--ink-900)',
-                          }}
-                        >
-                          {`AI safety check · ${activeBlockFlags.length} thing${activeBlockFlags.length === 1 ? '' : 's'} to look at`}
-                        </span>
-                      </div>
-
-                      {/* Re-run button (restyled) */}
-                      <RerunReviewerButton
-                        sopId={sopId}
-                      />
-                    </div>
-
-                    {/* Flag rows rendered by ReviewerFlagsPanel */}
-                    <ReviewerFlagsPanel
-                      sopId={sopId}
-                      blockId={activeBlock.id}
-                      blockProvenance={activeBlock.provenance}
-                    />
-                  </div>
-                )}
-              </>
-            ) : null}
+            {blocks.map((block, idx) => (
+              <ReviewCard
+                key={block.id}
+                block={block}
+                index={idx}
+                total={checklist.totalCount}
+                active={idx === activeIdx}
+                flags={reviewer.byBlockId.get(block.id) ?? []}
+                sopId={sopId}
+                onSelect={() => setActiveIdx(idx)}
+                onApprove={() => {
+                  void checklist.approve(block.id)
+                }}
+                onDecline={() => {
+                  void checklist.decline(block.id)
+                }}
+                registerRef={(el) => {
+                  if (el) cardRefs.current.set(block.id, el)
+                  else cardRefs.current.delete(block.id)
+                }}
+              />
+            ))}
           </div>
         </section>
 
@@ -646,7 +838,7 @@ export function ReviewStation({
                 margin: '2px 0 0',
               }}
             >
-              Auto-scrolled to the part this step came from
+              Follows the step you&rsquo;re reading
             </p>
           </div>
 
@@ -660,7 +852,10 @@ export function ReviewStation({
           </div>
         </aside>
 
-        {/* ── Action Bar ───────────────────────────────────────────────────── */}
+        {/* ── Status bar ───────────────────────────────────────────────────────
+            Progress + the AI re-run (once for the SOP, not once per block) +
+            the keyboard contract. The old per-step Previous/Verify/Send-back
+            pager lived here; those decisions now sit on the block they concern. */}
         <div
           className="rs-actionbar"
           style={{
@@ -673,65 +868,22 @@ export function ReviewStation({
             flexShrink: 0,
           }}
         >
-          {/* Previous step */}
-          <button
-            type="button"
-            onClick={handlePrev}
-            disabled={checklist.activeIdx === 0}
+          <span
+            data-testid="verify-progress"
             style={{
-              padding: '8px 12px',
-              border: '1px solid var(--ink-300)',
-              borderRadius: '2px',
-              background: 'transparent',
-              color: checklist.activeIdx === 0 ? 'var(--ink-300)' : 'var(--ink-700)',
-              cursor: checklist.activeIdx === 0 ? 'not-allowed' : 'pointer',
               fontFamily: 'JetBrains Mono, monospace',
               fontSize: '12px',
               fontWeight: 600,
+              color: remaining === 0 ? 'var(--accent-ok)' : 'var(--ink-900)',
+              whiteSpace: 'nowrap',
             }}
           >
-            ◀ Previous step
-          </button>
+            {remaining === 0
+              ? `✓ All ${checklist.totalCount} steps verified`
+              : `${checklist.verifiedCount} of ${checklist.totalCount} steps verified · ${remaining} to go`}
+          </span>
 
-          {/* Verify step — primary action */}
-          <button
-            type="button"
-            onClick={() => { void handleApprove() }}
-            disabled={!activeBlock}
-            style={{
-              padding: '8px 16px',
-              border: 'none',
-              borderRadius: '2px',
-              background: activeBlock ? 'var(--accent-ok)' : 'var(--ink-300)',
-              color: '#fff',
-              cursor: activeBlock ? 'pointer' : 'not-allowed',
-              fontFamily: 'JetBrains Mono, monospace',
-              fontSize: '12px',
-              fontWeight: 600,
-            }}
-          >
-            ✓ Looks right — verify step
-          </button>
-
-          {/* Send back to edit */}
-          <button
-            type="button"
-            onClick={() => { void handleDecline() }}
-            disabled={!activeBlock}
-            style={{
-              padding: '8px 12px',
-              border: '1px solid var(--accent-measure)',
-              borderRadius: '2px',
-              background: 'transparent',
-              color: '#c2410c',
-              cursor: activeBlock ? 'pointer' : 'not-allowed',
-              fontFamily: 'JetBrains Mono, monospace',
-              fontSize: '12px',
-              fontWeight: 600,
-            }}
-          >
-            ✎ Send back to edit
-          </button>
+          <RerunReviewerButton sopId={sopId} />
 
           {/* Keyboard hint — right-aligned */}
           <div

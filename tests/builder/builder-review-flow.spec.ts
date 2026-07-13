@@ -216,3 +216,49 @@ test('R8: BuilderStageShell derives hasSourceDoc/showPane and gates ReviewStatio
   // showVerifyGate must also be derived
   expect(shellSrc, 'Shell must derive showVerifyGate').toContain('showVerifyGate')
 })
+
+// ---------------------------------------------------------------------------
+// Test 7: Review column — continuous scroll, ONE verify act per block
+//
+// The Check stage used to page through blocks one at a time via a bottom action
+// bar, so a 48-step SOP cost 48 × (click → read → verify). Zone 2 now renders
+// every block in a scrolling column with its own inline verify decision.
+//
+// D-21-07 / SCP-VERIFY-05 is preserved BY CONSTRUCTION, and that is what these
+// assertions pin: the verify control lives INSIDE the per-block card component,
+// so it cannot be hoisted into a single control that verifies many. (The banned
+// bulk phrases themselves are covered repo-wide by tests/lint/no-bulk-verify-ui.)
+// ---------------------------------------------------------------------------
+test('R-SCROLL: Check stage renders every block with a per-block verify act (no pager, no bulk)', () => {
+  const src = readSrc('src/app/(protected)/admin/sops/builder/[sopId]/ReviewStation.tsx')
+
+  // The column renders ALL blocks, not just the active one.
+  expect(src, 'Zone 2 must map over every block').toMatch(
+    /blocks\.map\(\(block, idx\)[\s\S]*?<ReviewCard/,
+  )
+
+  // The verify affordance lives on the per-block card — one act, one block.
+  const cardStart = src.indexOf('function ReviewCard')
+  const cardEnd = src.indexOf('export function ReviewStation')
+  expect(cardStart, 'ReviewCard component must exist').toBeGreaterThan(-1)
+  expect(cardEnd, 'ReviewStation must follow ReviewCard').toBeGreaterThan(cardStart)
+  const cardSrc = src.slice(cardStart, cardEnd)
+
+  expect(cardSrc, 'Per-block card owns the verify button').toContain('data-testid="verify-step"')
+  expect(cardSrc, 'Verify button must call this block\'s onApprove').toMatch(
+    /data-testid="verify-step"[\s\S]*?onApprove\(\)/,
+  )
+  expect(cardSrc, 'Per-block card owns the send-back action').toContain('onDecline()')
+
+  // approve/decline are always addressed to a specific block id — never to a
+  // collection. A call like approve(blocks) / approve(ids) would not match.
+  expect(src, 'approve must target a single block id').toContain('checklist.approve(block.id)')
+  expect(src, 'decline must target a single block id').toContain('checklist.decline(block.id)')
+
+  // The old one-at-a-time pager is gone.
+  expect(src, 'Bottom pager must not survive').not.toContain('Previous step')
+
+  // Scrolling the column drives the source pane (zone 3 follows the reader).
+  expect(src, 'Scroll must sync the active block').toContain('syncActiveToScroll')
+  expect(src, 'Active block must drive the source pane').toContain('setActiveProvenance')
+})
