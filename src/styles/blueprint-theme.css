@@ -47,6 +47,26 @@
   --accent-zone:     #0891b2;  /* cyan   — ZoneBlock */
   --accent-voice:    #ea580c;  /* orange — VoiceNoteBlock */
 
+  /* UI-state accents. These were REFERENCED bare by six builder components
+   * (ReviewStation, NavRow, BuilderStageStepper, OrientationStrip, AddMenu,
+   * BuilderTreeRail) but never DEFINED — so `background: var(--accent-ok)`
+   * resolved to nothing and the review surface's primary "verify step" button
+   * rendered white-on-transparent, i.e. invisible. The only prior use with a
+   * fallback (globals.css `var(--accent-step, #3b82f6)`) is what kept this
+   * hidden; those values are adopted here as the definitions. Same class as
+   * the 30-07 undefined --brand-yellow bug. */
+  --accent-step:     #3b82f6;  /* blue   — the active/current step */
+  --accent-ok:       #16a34a;  /* green  — verified / all clear */
+  --accent-hazard:   #b91c1c;  /* red-700  — hazard pill text (red-50/red-300 pill) */
+  --accent-mcu:      #0e7490;  /* cyan-700 — inspect pill text (cyan-50/cyan-300 pill) */
+
+  /* Neutral steps the components referenced but the scale never defined.
+   * Zinc-aligned, consistent with the ink-* ramp above. */
+  --ink-600:   #52525b;
+  --ink-400:   #a1a1aa;
+  --ink-200:   #e4e4e7;
+  --paper-1:   #ffffff;  /* input/field surface — sits above --paper */
+
   /* Phase 26.5 — the human-invisible AGENT metadata layer (D-09) */
   --ai: #8b5cf6; /* violet — agentview toggle, agent panel, per-block ameta rows */
 }

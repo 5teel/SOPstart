@@ -54,7 +54,7 @@ export default defineConfig({
     {
       name: 'phase15-stubs',
       testMatch:
-        /(desktop-walkthrough-layout|sequential-ack|voice-qa-happy-path|voice-grounding-scope|sub-trade-rls-backward-compat|sub-trade-assignment|no-static-desktop-import|no-bulk-verify-ui|use-viewport|walkthrough-store-ack)\.spec\.ts$/,
+        /(desktop-walkthrough-layout|sequential-ack|voice-qa-happy-path|voice-grounding-scope|sub-trade-rls-backward-compat|sub-trade-assignment|no-static-desktop-import|no-bulk-verify-ui|no-undefined-css-tokens|use-viewport|walkthrough-store-ack)\.spec\.ts$/,
       use: { browserName: 'chromium' },
     },
     {
