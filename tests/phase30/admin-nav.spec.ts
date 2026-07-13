@@ -65,7 +65,9 @@ test.describe('UX-02 — one shared admin nav', () => {
       const src = read(page)
       // Handler-wiring, not token presence: the component is imported AND rendered
       expect(src).toContain("from '@/components/admin/AdminNav'")
-      expect(src).toMatch(/<AdminNav active="/)
+      // active is a string literal on most pages; /admin/sops computes it
+      // (governance when ?view=attention, sops otherwise).
+      expect(src).toMatch(/<AdminNav active=["{]/)
       // The old copy-pasted inline nav idiom is gone from every page
       expect(src).not.toContain('aria-label="Admin sections"')
       // T-30-03-01: the per-page role gate survives the nav swap verbatim

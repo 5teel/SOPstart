@@ -191,7 +191,10 @@ export default async function SopsLibraryPage({
           </Link>
         </div>
 
-        <AdminNav active="sops" />
+        {/* The Governance nav item deep-links ?view=attention on this same
+            route — highlight it (not SOPs) when the attention view is up,
+            or the click reads as a no-op. */}
+        <AdminNav active={isAttentionView ? 'governance' : 'sops'} />
 
         {/* Filter tabs */}
         <div className="flex gap-1 border-b border-[var(--ink-100)] mb-6 overflow-x-auto">
