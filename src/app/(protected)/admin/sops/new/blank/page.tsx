@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { listBlockCategories } from '@/actions/blocks'
 import { listDepartments } from '@/actions/departments'
 import { WizardClient } from './WizardClient'
@@ -11,19 +11,11 @@ export const metadata: Metadata = {
 }
 
 export default async function NewBlankSopPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { userId, role } = await getSessionContext()
+  if (!userId) redirect('/login')
 
   // Admin / safety_manager guard — matches Phase 2 precedent
-  // (src/app/(protected)/admin/sops/upload/page.tsx lines 18-26).
-  const { data: member } = await supabase
-    .from('organisation_members')
-    .select('role')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  if (!member || !['admin', 'safety_manager'].includes(member.role)) {
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
     redirect('/dashboard')
   }
 

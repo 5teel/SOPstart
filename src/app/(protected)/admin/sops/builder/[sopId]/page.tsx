@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { signLayoutDataImages } from '@/lib/builder/sign-layout-data-images'
 import { getApprovalStatus } from '@/actions/approvals'
 import { BuilderStageShell } from './BuilderStageShell'
@@ -17,21 +17,11 @@ export default async function BuilderPage({
   params: Promise<{ sopId: string }>
 }) {
   const { sopId } = await params
-  const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { supabase, userId, role } = await getSessionContext()
+  if (!userId) redirect('/login')
 
   // Check user is admin or safety_manager (mirrors review/page.tsx)
-  const { data: member } = await supabase
-    .from('organisation_members')
-    .select('role')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  if (!member || !['admin', 'safety_manager'].includes(member.role)) {
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
     redirect('/dashboard')
   }
 

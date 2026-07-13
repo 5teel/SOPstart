@@ -1,13 +1,12 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { LogoutButton } from '@/components/profile/LogoutButton'
 import { OrgSwitcher } from '@/components/profile/OrgSwitcher'
 
 export default async function ProfilePage() {
-  const supabase = await createClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
+  const { userId, userEmail } = await getSessionContext()
 
-  if (error || !user) {
+  if (!userId) {
     redirect('/login')
   }
 
@@ -22,7 +21,7 @@ export default async function ProfilePage() {
         </h2>
         <div className="flex items-center justify-between">
           <span className="text-sm text-[var(--ink-500)]">Email</span>
-          <span className="text-sm text-[var(--ink-900)]">{user.email}</span>
+          <span className="text-sm text-[var(--ink-900)]">{userEmail}</span>
         </div>
       </section>
 

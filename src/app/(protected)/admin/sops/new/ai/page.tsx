@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { listDepartments } from '@/actions/departments'
 import { AiDraftTabs } from './AiDraftTabs'
 
@@ -11,36 +11,30 @@ export const metadata: Metadata = {
 }
 
 export default async function NewAiSopPage() {
-  // Auth guard — mirrors /admin/sops/new/blank/page.tsx (organisation_members.role lookup).
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  // Auth guard — shared per-request session context (JWT verified locally).
+  const { supabase, userId, role } = await getSessionContext()
+  if (!userId) redirect('/login')
 
-  const { data: member } = await supabase
-    .from('organisation_members')
-    .select('role')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  if (!member || !['admin', 'safety_manager'].includes(member.role)) {
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
     redirect('/dashboard')
   }
 
   // Distinct existing SOP categories — populates the optional category dropdown.
   // Same query pattern used elsewhere in the admin surface; service-role isolation
-  // not needed here (RLS-scoped reader).
-  const { data: categoryRows } = await supabase
-    .from('sops')
-    .select('category')
-    .not('category', 'is', null)
-    .limit(500)
+  // not needed here (RLS-scoped reader). Categories + departments are
+  // independent reads — fetch concurrently.
+  const [{ data: categoryRows }, departments] = await Promise.all([
+    supabase
+      .from('sops')
+      .select('category')
+      .not('category', 'is', null)
+      .limit(500),
+    listDepartments(),
+  ])
 
   const categories = Array.from(
     new Set((categoryRows ?? []).map((r) => r.category).filter((c): c is string => Boolean(c)))
   ).sort()
-
-  // Phase 25: fetch departments for the department multi-select field.
-  const departments = await listDepartments()
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 lg:px-8 lg:py-12">

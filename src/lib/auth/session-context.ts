@@ -30,11 +30,16 @@ export const getSessionContext = cache(async (): Promise<SessionContext> => {
     return { supabase, userId: null, userEmail: null, role: null, organisationId: null }
   }
 
-  const { data: member } = await supabase
+  // Org-aware membership lookup (LR-05): scope to the caller's JWT org when
+  // the claim is present so a multi-org user resolves a single row and
+  // .maybeSingle() can't error on duplicate memberships.
+  const orgClaim = (claims as Record<string, unknown>)['organisation_id'] as string | undefined
+  let memberQuery = supabase
     .from('organisation_members')
     .select('role, organisation_id')
     .eq('user_id', claims.sub)
-    .maybeSingle()
+  if (orgClaim) memberQuery = memberQuery.eq('organisation_id', orgClaim)
+  const { data: member } = await memberQuery.maybeSingle()
 
   return {
     supabase,

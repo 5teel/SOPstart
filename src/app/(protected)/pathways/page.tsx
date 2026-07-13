@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { JOURNEYS } from '@/lib/journeys/journeys'
 import { listAppRoutes } from '@/lib/journeys/routes'
 import { PathwaysClient } from './PathwaysClient'
@@ -10,11 +10,8 @@ export const metadata: Metadata = {
 }
 
 export default async function PathwaysPage() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { userId } = await getSessionContext()
+  if (!userId) redirect('/login')
 
   const routes = listAppRoutes()
 

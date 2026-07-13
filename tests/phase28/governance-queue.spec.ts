@@ -75,7 +75,8 @@ test.describe('governance page — redirect shim mapping legacy ?filter=', () =>
   const src = read(SHIM)
 
   test('keeps the admin guard IN FRONT of the redirect', () => {
-    expect(src).toContain("['admin', 'safety_manager'].includes(member.role)")
+    // 2026-07-13: member.role → role (shared getSessionContext auth refactor)
+    expect(src).toContain("['admin', 'safety_manager'].includes(role)")
     expect(src).toContain("redirect('/dashboard')")
   })
 

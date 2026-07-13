@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import VideoGeneratePanel from '@/components/admin/VideoGeneratePanel'
 import type { VideoGenerationJob } from '@/types/sop'
@@ -18,22 +18,12 @@ export default async function VideoGeneratePage({
 }) {
   const { sopId } = await params
   const { play: autoPlayJobId } = await searchParams
-  const supabase = await createClient()
-
-  // Auth check
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  // Auth check — shared per-request session context (JWT verified locally).
+  const { userId, role } = await getSessionContext()
+  if (!userId) redirect('/login')
 
   // Check user is admin or safety_manager
-  const { data: member } = await supabase
-    .from('organisation_members')
-    .select('role')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  if (!member || !['admin', 'safety_manager'].includes(member.role)) {
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
     redirect('/dashboard')
   }
 

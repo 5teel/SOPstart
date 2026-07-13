@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { AdminNav } from '@/components/admin/AdminNav'
 
 export const metadata: Metadata = {
@@ -46,18 +46,11 @@ const METHODS: { eyebrow: string; title: string; description: string; href: stri
 ]
 
 export default async function NewSopMethodPickerPage() {
-  // Auth guard — mirrors /admin/sops/new/ai/page.tsx (organisation_members.role lookup).
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  // Auth guard — shared per-request session context (JWT verified locally).
+  const { userId, role } = await getSessionContext()
+  if (!userId) redirect('/login')
 
-  const { data: member } = await supabase
-    .from('organisation_members')
-    .select('role')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  if (!member || !['admin', 'safety_manager'].includes(member.role)) {
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
     redirect('/dashboard')
   }
 

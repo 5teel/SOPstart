@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { AI_MODELS, aiModel, PROVIDER_ENV_KEYS, type AiModelKey, type AiProvider } from '@/lib/ai/registry'
 import { ORG_CONFIGURABLE_KEYS, getOrgAiModels } from '@/lib/ai/org-settings'
@@ -12,23 +12,16 @@ export const metadata: Metadata = {
 }
 
 export default async function AiSettingsPage() {
-  // Auth guard — mirrors /admin/sops/new/ai/page.tsx (organisation_members.role lookup).
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  // Auth guard — shared per-request session context (JWT verified locally).
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId) redirect('/login')
 
-  const { data: member } = await supabase
-    .from('organisation_members')
-    .select('role, organisation_id')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  if (!member || !['admin', 'safety_manager'].includes(member.role)) {
+  if (!role || !['admin', 'safety_manager'].includes(role) || !organisationId) {
     redirect('/dashboard')
   }
 
   const admin = createAdminClient()
-  const orgSettings = await getOrgAiModels(admin, member.organisation_id)
+  const orgSettings = await getOrgAiModels(admin, organisationId)
 
   // Server-side snapshot: resolved model (env overrides visible only here) +
   // provider key presence per use case.

@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { PipelineProgressClient } from './PipelineProgressClient'
 
@@ -35,21 +35,8 @@ type VideoJobRow = {
 export default async function PipelineProgressPage({ params }: PageProps) {
   const { pipelineId } = await params
 
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? (JSON.parse(
-        Buffer.from(session.access_token.split('.')[1], 'base64').toString('utf-8')
-      ) as Record<string, unknown>)
-    : {}
-  const organisationId = jwtClaims['organisation_id'] as string | undefined
+  const { userId, organisationId } = await getSessionContext()
+  if (!userId) redirect('/login')
   if (!organisationId) redirect('/dashboard')
 
   const admin = createAdminClient()

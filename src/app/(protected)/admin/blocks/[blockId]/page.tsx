@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronLeft } from 'lucide-react'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { getBlock, listBlockCategories } from '@/actions/blocks'
 import { BlockEditorClient } from './BlockEditorClient'
 
@@ -15,25 +15,17 @@ export default async function BlockEditorPage({
 }: {
   params: Promise<{ blockId: string }>
 }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { userId, role } = await getSessionContext()
+  if (!userId) redirect('/login')
 
-  const { data: member } = await supabase
-    .from('organisation_members')
-    .select('role')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  if (!member || !['admin', 'safety_manager'].includes(member.role)) {
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
     redirect('/dashboard')
   }
 
   const { blockId } = await params
-  const result = await getBlock(blockId)
+  // Block + categories are independent reads — fetch concurrently.
+  const [result, categories] = await Promise.all([getBlock(blockId), listBlockCategories()])
   if (!result) notFound()
-
-  const categories = await listBlockCategories()
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10 bg-[var(--paper)] min-h-screen">

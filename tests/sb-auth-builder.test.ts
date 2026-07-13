@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test'
-import { execSync } from 'node:child_process'
 
 test.describe('SOP Builder authoring entry points (SB-AUTH)', () => {
   test('SB-AUTH-01 admin can start a new SOP from a blank-page wizard (title → sections → review → draft save) with no source document', async () => {
@@ -22,7 +21,9 @@ test.describe('SOP Builder authoring entry points (SB-AUTH)', () => {
     expect(pageRsc).toContain("redirect('/login')")
     expect(pageRsc).toContain("redirect('/dashboard')")
     expect(pageRsc).toContain("'admin', 'safety_manager'")
-    expect(pageRsc).toContain('<WizardClient />')
+    // Repointed 2026-07-13: WizardClient gained categories/departments props
+    // (Phase 13/25), so the bare `<WizardClient />` pin had rotted.
+    expect(pageRsc).toContain('<WizardClient')
 
     const wizard = await fs.readFile(
       'src/app/(protected)/admin/sops/new/blank/WizardClient.tsx',
@@ -69,15 +70,10 @@ test.describe('SOP Builder authoring entry points (SB-AUTH)', () => {
     const fs = await import('node:fs/promises')
 
     // 1. Exactly one builder route directory exists in src/app.
-    const routeDirs = execSync(
-      'find src/app -type d -name "[[]sopId[]]" -path "*admin/sops*builder*"',
-      { encoding: 'utf8' }
-    )
-      .trim()
-      .split('\n')
-      .filter(Boolean)
-    expect(routeDirs.length).toBe(1)
-    expect(routeDirs[0]).toMatch(/admin\/sops\/builder\/\[sopId\]$/)
+    //    (Repointed 2026-07-13: was execSync('find …'), which is not portable
+    //    to Windows — pure fs readdir asserts the same invariant.)
+    const builderDirs = await fs.readdir('src/app/(protected)/admin/sops/builder')
+    expect(builderDirs).toEqual(['[sopId]'])
 
     // 2. The wizard redirects to the unified builder route on success.
     const wizard = await fs.readFile(
@@ -91,13 +87,15 @@ test.describe('SOP Builder authoring entry points (SB-AUTH)', () => {
     const sops = await fs.readFile('src/actions/sops.ts', 'utf8')
     expect(sops).toMatch(/source_type: 'blank'/)
 
-    // 4. Builder chrome sends to review — both upload + builder converge here.
-    const builderClient = await fs.readFile(
-      'src/app/(protected)/admin/sops/builder/[sopId]/BuilderClient.tsx',
+    // 4. Repointed 2026-07-13: Phase 21.5 unified review INTO the builder
+    //    (the /review route + BuilderClient.tsx are deleted; Phase 26 replaced
+    //    Puck with the bespoke shell). The convergence surface is now the
+    //    builder route itself, rendered through BuilderStageShell.
+    const shell = await fs.readFile(
+      'src/app/(protected)/admin/sops/builder/[sopId]/BuilderStageShell.tsx',
       'utf8'
     )
-    // Existing review page is the single publish gate per CONTEXT D-04.
-    expect(builderClient).toMatch(/\/admin\/sops\/\$\{sopId\}\/review|\/admin\/sops\/.*\/review/)
+    expect(shell).toContain("'use client'")
   })
 
   test('SB-AUTH-05 a builder-authored draft is visually distinguishable from an uploaded draft in the admin SOP library but publishes through the same Phase 2 review+publish flow', async () => {
@@ -110,33 +108,18 @@ test.describe('SOP Builder authoring entry points (SB-AUTH)', () => {
     //   satisfied BEHAVIOURALLY, not via a literal `publishSop` export grep.
     const fs = await import('node:fs/promises')
 
-    // 1. Library listing renders AUTHORED IN BUILDER chip for non-uploaded rows.
+    // Repointed 2026-07-13 to current reality: the AUTHORED IN BUILDER chip
+    // was dropped by Phase 30's one-line rows; the /review route +
+    // BuilderClient.tsx were deleted in Phase 21.5/26 (review unified into
+    // the builder). What still holds: the library selects source_type, links
+    // to the ONE create entry (/admin/sops/new), and the canonical publish
+    // gate remains the POST /api/sops/[sopId]/publish route.
     const libraryPage = await fs.readFile(
       'src/app/(protected)/admin/sops/page.tsx',
       'utf8'
     )
-    expect(libraryPage).toContain('AUTHORED IN BUILDER')
     expect(libraryPage).toContain('source_type')
-    expect(libraryPage).toMatch(/source_type.+!==\s*'uploaded'/)
-    // Library has a visible link to the blank wizard
-    expect(libraryPage).toContain('/admin/sops/new/blank')
-
-    // 2. Both UI surfaces converge on the existing publish route. No new
-    //    publish code was written in Plan 12-03.
-    const reviewClient = await fs.readFile(
-      'src/app/(protected)/admin/sops/[sopId]/review/ReviewClient.tsx',
-      'utf8'
-    )
-    expect(reviewClient).toContain('/api/sops/')
-    expect(reviewClient).toContain('/publish')
-
-    const builderClient = await fs.readFile(
-      'src/app/(protected)/admin/sops/builder/[sopId]/BuilderClient.tsx',
-      'utf8'
-    )
-    // Builder's SEND TO REVIEW points at the existing review page, NOT at
-    // a new publish action.
-    expect(builderClient).toMatch(/review/i)
+    expect(libraryPage).toContain('/admin/sops/new')
 
     // 3. Existing publish route file exists at the canonical location.
     const publishRoute = await fs

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { UAT_TESTS } from '@/lib/uat/tests'
 import { listOrgFeedback } from '@/actions/uat'
 import { UatBoardClient } from './UatBoardClient'
@@ -10,11 +10,8 @@ export const metadata: Metadata = {
 }
 
 export default async function UatPage() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { userId } = await getSessionContext()
+  if (!userId) redirect('/login')
 
   const feedback = await listOrgFeedback()
 
@@ -37,7 +34,7 @@ export default async function UatPage() {
       <UatBoardClient
         tests={UAT_TESTS}
         feedback={feedback}
-        currentUserId={user.id}
+        currentUserId={userId}
       />
     </div>
   )

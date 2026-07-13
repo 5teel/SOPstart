@@ -56,7 +56,8 @@ test.describe('UX-03 — governance folds into /admin/sops', () => {
     expect(src).toContain('view=attention')
     expect(src).toContain('view=attention&filter=${filter}')
     // Guard stays in front of the redirect (T-30-08-03).
-    expect(src).toContain("['admin', 'safety_manager'].includes(member.role)")
+    // 2026-07-13: member.role → role (shared getSessionContext auth refactor)
+    expect(src).toContain("['admin', 'safety_manager'].includes(role)")
     // No governance surface renders here anymore.
     expect(src).not.toContain('GovernanceQueueRow')
     expect(src).not.toContain('ApprovalChainEditor')

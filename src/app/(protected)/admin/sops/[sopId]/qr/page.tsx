@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import QRCode from 'qrcode'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { PrintButton } from './PrintButton'
 
 export const metadata: Metadata = {
@@ -18,17 +18,10 @@ export const metadata: Metadata = {
  */
 export default async function SopQrPage({ params }: { params: Promise<{ sopId: string }> }) {
   const { sopId } = await params
-  const supabase = await createClient()
+  const { supabase, userId, role } = await getSessionContext()
+  if (!userId) redirect('/login')
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
-
-  const { data: member } = await supabase
-    .from('organisation_members')
-    .select('role')
-    .eq('user_id', user.id)
-    .maybeSingle()
-  if (!member || !['admin', 'safety_manager'].includes(member.role)) {
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
     redirect('/dashboard')
   }
 
