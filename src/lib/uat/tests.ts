@@ -82,6 +82,29 @@ export interface UatTest {
 // ---------------------------------------------------------------------------
 
 export const UAT_TESTS: UatTest[] = [
+  // ===================== Speed & feel =====================
+  {
+    id: 'nav-instant-feedback',
+    dateAdded: '2026-07-13',
+    category: 'Speed & feel',
+    title: 'Does the app respond instantly when you tap around?',
+    status: 'active',
+    summary:
+      'Links and tabs now acknowledge your tap straight away — you should see the page start changing (a grey placeholder or a small spinner) the moment you tap, even if the content takes a second to arrive.',
+    tryIt: [
+      'Tap between SOPs, Activity and Profile in the bottom bar (phone) or the top tabs (desktop).',
+      'In Admin, switch between the SOPs, Blocks, Team and Settings tabs.',
+      'Open a SOP from the library, go back, and open another one.',
+    ],
+    questions: [
+      { id: 'instant', text: 'Did something visibly happen the instant you tapped each link?' },
+      { id: 'faster', text: 'Does moving around the app feel faster than before?' },
+      { id: 'no-dead-taps', text: 'Did you avoid any "did my tap register?" moments?' },
+    ],
+    background:
+      'Navigation-responsiveness pass (2026-07-13): route-level loading.tsx skeletons so the App Router paints instantly on navigation; useLinkStatus pending spinners on BottomTabBar/TopHeader/AdminNav; middleware getUser()→getClaims() (local ES256 JWT verify, no per-request Supabase Auth round-trip); per-request cached getSessionContext deduplicating auth+role queries; Promise.all on independent server-page fetches.',
+  },
+
   // ===================== Design choices (pick A or B) =====================
   {
     id: 'builder-rail-density',

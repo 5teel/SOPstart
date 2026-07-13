@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { AdminNav } from '@/components/admin/AdminNav'
 import { getApprovalChains } from '@/actions/approvals'
 import { getOrgMembers } from '@/actions/assignments'
@@ -49,40 +49,35 @@ const SECTIONS = [
 ]
 
 export default async function AdminSettingsPage() {
-  // Auth guard — mirrors /admin/ai-settings/page.tsx (organisation_members.role lookup).
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  // Auth guard — shared per-request session context (JWT verified locally).
+  const { supabase, userId, role, organisationId } = await getSessionContext()
+  if (!userId) redirect('/login')
 
-  const { data: member } = await supabase
-    .from('organisation_members')
-    .select('role, organisation_id')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  if (!member || !['admin', 'safety_manager'].includes(member.role)) {
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
     redirect('/dashboard')
   }
 
   // Approval chains config panel (D29-05, relocated here in 30-08) — distinct
   // sops.category values for the org, no new table. Simple select + dedupe in JS.
-  const { data: categoryRows } = await supabase
-    .from('sops')
-    .select('category')
-    .eq('organisation_id', member.organisation_id)
-    .not('category', 'is', null)
+  // The three reads are independent — run concurrently.
+  const [{ data: categoryRows }, chainsResult, membersResult] = await Promise.all([
+    supabase
+      .from('sops')
+      .select('category')
+      .eq('organisation_id', organisationId ?? '')
+      .not('category', 'is', null),
+    getApprovalChains(),
+    getOrgMembers(),
+  ])
 
   const categories = Array.from(
     new Set((categoryRows ?? []).map((r) => r.category).filter((c): c is string => !!c)),
   ).sort()
 
-  const chainsResult = await getApprovalChains()
   const chains: Record<string, ChainStep[]> =
     'success' in chainsResult && chainsResult.success
       ? Object.fromEntries(chainsResult.chains.map((c) => [c.category, c.steps]))
       : {}
-
-  const membersResult = await getOrgMembers()
   const members: ChainMember[] =
     membersResult.success
       ? membersResult.members

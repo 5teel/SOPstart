@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { CompletionDetailClient } from './CompletionDetailClient'
 
@@ -34,18 +34,8 @@ interface RawCompletionData {
 export default async function CompletionDetailPage({ params }: CompletionDetailPageProps) {
   const { completionId } = await params
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
-
-  // Role check
-  const { data: member } = await supabase
-    .from('organisation_members')
-    .select('role')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  const role = member?.role ?? null
+  const { supabase, userId, role } = await getSessionContext()
+  if (!userId) redirect('/login')
   if (!role) redirect('/dashboard')
 
   // Fetch completion with all joins (use admin client to bypass RLS for presigned URLs)
@@ -75,7 +65,7 @@ export default async function CompletionDetailPage({ params }: CompletionDetailP
   const data = rawData as unknown as RawCompletionData
 
   // Access control: workers can only view their own completions
-  if (role === 'worker' && data.worker_id !== user.id) {
+  if (role === 'worker' && data.worker_id !== userId) {
     redirect('/activity')
   }
 
@@ -148,7 +138,7 @@ export default async function CompletionDetailPage({ params }: CompletionDetailP
       signOff={signOff}
       isSupervisor={isSupervisor}
       alreadySigned={alreadySigned}
-      currentUserId={user.id}
+      currentUserId={userId}
     />
   )
 }

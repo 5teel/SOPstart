@@ -55,7 +55,8 @@ test.describe('admin library — owner=me filter + owner/flag columns', () => {
 
   test('handles ?owner=me with a real .eq owner_user_id filter', () => {
     expect(src).toContain("params.owner === 'me'")
-    expect(src).toContain("query.eq('owner_user_id', user.id)")
+    // 2026-07-13: user.id → userId (shared getSessionContext auth refactor)
+    expect(src).toContain("query.eq('owner_user_id', userId)")
   })
 
   test('selects owner_user_id and review_due_at columns', () => {

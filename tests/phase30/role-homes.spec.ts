@@ -47,7 +47,11 @@ test.describe('UX-01 — one home per role', () => {
   test('middleware routes authed users via roleHome (JWT claim, no DB call)', () => {
     const src = read(MIDDLEWARE)
     expect(src).toContain('roleHome')
-    expect(src).toContain('parseJwtPayload')
+    // 2026-07-13: getClaims() replaces getUser() + parseJwtPayload — verifies
+    // the JWT locally (asymmetric ES256 keys) and hands back parsed claims,
+    // so no per-request Supabase Auth round-trip and no manual decoding.
+    expect(src).toContain('getClaims')
+    expect(src).toContain("'user_role'")
     // no raw atob claim read (Base64URL trap, 2026-06-26)
     expect(src).not.toContain('atob(')
   })

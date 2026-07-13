@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { listDepartments } from '@/actions/departments'
 import { getTeamMembersWithEmails } from '@/actions/auth'
 import { DepartmentGrid } from '@/components/admin/departments/DepartmentGrid'
@@ -24,27 +24,18 @@ export const metadata: Metadata = {
  * Analog: src/app/(protected)/admin/blocks/page.tsx (auth pattern copied exactly).
  */
 export default async function DepartmentsPage() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { userId, role } = await getSessionContext()
+  if (!userId) redirect('/login')
 
-  const { data: member } = await supabase
-    .from('organisation_members')
-    .select('role')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  if (!member || !['admin', 'safety_manager'].includes(member.role)) {
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
     redirect('/dashboard')
   }
 
-  // Fetch departments (DepartmentWithCounts[]) for the org
-  const departments = await listDepartments()
-
-  // Fetch org members for the owner selector inside the form modal
-  const teamResult = await getTeamMembersWithEmails()
+  // Departments + org members are independent reads — fetch concurrently.
+  const [departments, teamResult] = await Promise.all([
+    listDepartments(),
+    getTeamMembersWithEmails(),
+  ])
   const orgMembers =
     'members' in teamResult && teamResult.members
       ? teamResult.members.map((m) => ({

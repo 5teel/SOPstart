@@ -1,6 +1,5 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
-import { parseJwtPayload } from '@/lib/supabase/jwt'
 import { roleHome } from '@/lib/auth/role-home'
 
 export async function updateSession(request: NextRequest) {
@@ -19,7 +18,13 @@ export async function updateSession(request: NextRequest) {
       },
     }
   )
-  const { data: { user } } = await supabase.auth.getUser()
+  // getClaims() verifies the JWT locally — the project uses asymmetric ES256
+  // signing keys (JWKS live-verified 2026-07-13), so unlike the old getUser()
+  // there is NO Supabase network round-trip on every request. Expired tokens
+  // are still refreshed first (that path alone hits the network), and the
+  // refreshed cookies are written to the response exactly as before.
+  const { data } = await supabase.auth.getClaims()
+  const claims = data?.claims ?? null
 
   const path = request.nextUrl.pathname
   const isAuthRoute = path.startsWith('/login') || path.startsWith('/sign-up') || path.startsWith('/join') || path.startsWith('/invite')
@@ -35,17 +40,14 @@ export async function updateSession(request: NextRequest) {
   const isShotstackCallback = path === '/api/sops/generate-video/callback'
   const isPublicRoute = path === '/' || isAuthRoute || isSchemaIntrospection || isCronRoute || isShotstackCallback
 
-  if (!isPublicRoute && !user) {
+  if (!isPublicRoute && !claims) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  if (isAuthRoute && user) {
+  if (isAuthRoute && claims) {
     // UX-01: land each role directly on its home. Role comes from the JWT
     // claim (no DB call in middleware); absent claim → /pending safe default.
-    const { data: { session } } = await supabase.auth.getSession()
-    const role = session?.access_token
-      ? (parseJwtPayload(session.access_token)['user_role'] as string | undefined)
-      : undefined
+    const role = (claims as Record<string, unknown>)['user_role'] as string | undefined
     return NextResponse.redirect(new URL(roleHome(role), request.url))
   }
 

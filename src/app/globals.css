@@ -32,10 +32,26 @@
   animation-fill-mode: both;
 }
 
+/* Nav-link pending spinner (useLinkStatus). The 120ms delay means instant
+   prefetched navigations never flash a spinner; slower ones fade it in. */
+@keyframes nav-pending-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.nav-pending-in {
+  opacity: 0;
+  animation: nav-pending-in 150ms ease 120ms forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .page-shell-enter,
   .step-fade-in {
     animation: none !important;
+  }
+  .nav-pending-in {
+    animation: none !important;
+    opacity: 1;
   }
 }
 

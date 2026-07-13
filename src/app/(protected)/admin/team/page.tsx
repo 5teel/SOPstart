@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import RoleAssignmentTable from '@/components/admin/RoleAssignmentTable'
 import { AdminNav } from '@/components/admin/AdminNav'
 import { listDepartments } from '@/actions/departments'
@@ -17,33 +17,25 @@ export const metadata: Metadata = {
  * The sub-trade section below RoleAssignmentTable is retained for backward-compat.
  */
 export default async function AdminTeamPage() {
-  const supabase = await createClient()
-
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  const { supabase, userId, role, organisationId } = await getSessionContext()
+  if (!userId) redirect('/login')
 
   // Check user is admin
-  const { data: member } = await supabase
-    .from('organisation_members')
-    .select('role, organisation_id')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  if (!member || !['admin', 'safety_manager'].includes(member.role)) {
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
     redirect('/dashboard')
   }
 
-  // Fetch org details for invite code
-  const { data: org } = await supabase
-    .from('organisations')
-    .select('id, invite_code')
-    .eq('id', member.organisation_id)
-    .single()
+  // Org invite code + departments are independent reads — fetch concurrently.
+  const [{ data: org }, departments] = await Promise.all([
+    supabase
+      .from('organisations')
+      .select('id, invite_code')
+      .eq('id', organisationId ?? '')
+      .single(),
+    listDepartments(),
+  ])
 
   if (!org) redirect('/dashboard')
-
-  // Phase 25: fetch departments for the department filter + Departments column
-  const departments = await listDepartments()
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">

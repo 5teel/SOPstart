@@ -51,7 +51,8 @@ test.describe('folded governance view on /admin/sops — queue read + role guard
   })
 
   test('guards admin/safety_manager role and redirects otherwise', () => {
-    expect(src).toContain("['admin', 'safety_manager'].includes(member.role)")
+    // 2026-07-13: member.role → role (shared getSessionContext auth refactor)
+    expect(src).toContain("['admin', 'safety_manager'].includes(role)")
     expect(src).toContain("redirect('/dashboard')")
   })
 

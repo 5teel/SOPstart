@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { AdminNav } from '@/components/admin/AdminNav'
 import { getTeamMembersWithEmails } from '@/actions/auth'
@@ -51,18 +51,10 @@ export default async function SopsLibraryPage({
 }: {
   searchParams: Promise<{ status?: string; owner?: string; view?: string; filter?: string }>
 }) {
-  const supabase = await createClient()
+  const { supabase, userId, role } = await getSessionContext()
+  if (!userId) redirect('/login')
 
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
-
-  const { data: member } = await supabase
-    .from('organisation_members')
-    .select('role')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  if (!member || !['admin', 'safety_manager'].includes(member.role)) {
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
     redirect('/dashboard')
   }
 
@@ -99,15 +91,19 @@ export default async function SopsLibraryPage({
 
   // OWN-04/D28-08: "Owned by me" filter — a chip on the existing library, not a new page.
   if (ownerOnly) {
-    query = query.eq('owner_user_id', user.id)
+    query = query.eq('owner_user_id', userId)
   }
-
-  const { data: sops } = await query
 
   // One org-scoped governance read powers the header chips (GQ-04), the
   // needs-attention view, and the per-row flag chips — the same call the old
   // header widget made on this page, so cost is unchanged (server component).
-  const govResult = await listGovernanceQueue()
+  // The three reads are independent — run them concurrently, not as a
+  // waterfall (each is a Railway→Supabase round-trip).
+  const [{ data: sops }, govResult, teamResult] = await Promise.all([
+    query,
+    listGovernanceQueue(),
+    getTeamMembersWithEmails(),
+  ])
   const govRows: GovernanceRow[] = 'success' in govResult && govResult.success ? govResult.rows : []
   const flaggedRows = govRows.filter((r) => r.flags.length > 0)
 
@@ -129,7 +125,6 @@ export default async function SopsLibraryPage({
   }
 
   // Owner display labels (email/role), reusing the existing team fetcher — no new member query.
-  const teamResult = await getTeamMembersWithEmails()
   const ownerLabelById: Record<string, string> = {}
   if (!('error' in teamResult)) {
     for (const m of teamResult.members) {

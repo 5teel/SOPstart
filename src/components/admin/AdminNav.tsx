@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { NavPendingSpinner } from '@/components/layout/NavPendingSpinner'
 
 /**
  * Phase 30 (UX-02) — the ONE shared admin sub-nav.
@@ -37,6 +38,7 @@ export function AdminNav({ active }: { active: AdminNavKey }) {
           data-active={active === item.key ? 'true' : undefined}
         >
           {item.label}
+          <NavPendingSpinner className="h-3 w-3" />
         </Link>
       ))}
     </nav>

@@ -67,7 +67,8 @@ test.describe('admin/settings/page.tsx — mounts ApprovalChainEditor (relocated
   })
 
   test('guards the admin/safety_manager role', () => {
-    expect(src).toContain("['admin', 'safety_manager'].includes(member.role)")
+    // 2026-07-13: member.role → role (shared getSessionContext auth refactor)
+    expect(src).toContain("['admin', 'safety_manager'].includes(role)")
   })
 
   test('no new route file exists for approval chain config', () => {

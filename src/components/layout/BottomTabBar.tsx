@@ -1,6 +1,7 @@
 'use client'
-import Link from 'next/link'
+import Link, { useLinkStatus } from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Loader2 } from 'lucide-react'
 import { NotificationBadge } from '@/components/layout/NotificationBadge'
 
 function DocumentIcon({ className }: { className?: string }) {
@@ -69,6 +70,44 @@ const tabs = [
   { label: 'Profile', href: '/profile', Icon: UserIcon },
 ]
 
+/**
+ * Renders inside each tab <Link>: swaps the tab icon for a spinner while the
+ * navigation is pending so the tap is acknowledged immediately. Must be a
+ * descendant of the Link (useLinkStatus contract). The .nav-pending-in delay
+ * keeps instant prefetched navigations spinner-free.
+ */
+function TabContent({
+  label,
+  Icon,
+  withBadge,
+}: {
+  label: string
+  Icon: (props: { className?: string }) => React.JSX.Element
+  withBadge: boolean
+}) {
+  const { pending } = useLinkStatus()
+  const icon = pending ? (
+    <span className="nav-pending-in inline-flex" aria-hidden="true">
+      <Loader2 className="h-5 w-5 animate-spin" />
+    </span>
+  ) : (
+    <Icon className="h-5 w-5" />
+  )
+  return (
+    <>
+      {withBadge ? (
+        <span className="relative">
+          {icon}
+          <NotificationBadge />
+        </span>
+      ) : (
+        icon
+      )}
+      <span>{label}</span>
+    </>
+  )
+}
+
 export function BottomTabBar() {
   const pathname = usePathname()
 
@@ -94,15 +133,7 @@ export function BottomTabBar() {
               ].join(' ')}
               aria-current={isActive ? 'page' : undefined}
             >
-              {label === 'SOPs' ? (
-                <span className="relative">
-                  <Icon className="h-5 w-5" />
-                  <NotificationBadge />
-                </span>
-              ) : (
-                <Icon className="h-5 w-5" />
-              )}
-              <span>{label}</span>
+              <TabContent label={label} Icon={Icon} withBadge={label === 'SOPs'} />
             </Link>
           )
         })}

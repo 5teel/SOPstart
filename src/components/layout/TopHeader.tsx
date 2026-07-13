@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { signOut } from '@/actions/auth'
 import { roleHome } from '@/lib/auth/role-home'
 import { PRODUCT_NAME } from '@/lib/constants'
+import { NavPendingSpinner } from '@/components/layout/NavPendingSpinner'
 
 function BrandMark({ className }: { className?: string }) {
   return (
@@ -247,6 +248,7 @@ export function TopHeader({ role, userEmail }: TopHeaderProps) {
                 aria-current={active ? 'page' : undefined}
               >
                 {link.label}
+                <NavPendingSpinner className="h-3 w-3" />
               </Link>
             )
           })}
@@ -380,6 +382,9 @@ export function TopHeader({ role, userEmail }: TopHeaderProps) {
                     aria-current={active ? 'page' : undefined}
                   >
                     {link.label}
+                    <span className="ml-auto">
+                      <NavPendingSpinner className="h-4 w-4" />
+                    </span>
                   </Link>
                 )
               })}
