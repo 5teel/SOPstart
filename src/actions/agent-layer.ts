@@ -7,10 +7,8 @@
  * panel, plus the proposal approve/decline actions that back Plan 08's
  * dashboard. All org-scoped from the JWT — never from client input.
  *
- * requireAdmin() mirrors src/actions/departments.ts's shape but decodes the
- * JWT via parseJwtPayload (NOT atob — CLAUDE.md 2026-06-26: atob breaks on
- * non-ASCII claim bytes; departments.ts's raw atob is a legacy instance of
- * the pre-fix pattern, not the target to imitate).
+ * requireAdmin() delegates to the shared requireAdminContext() guard
+ * (src/lib/auth/guards.ts — local ES256 JWT verify, no JWT string parsing).
  *
  * Every export here is async ('use server' files may only export async
  * functions — CLAUDE.md 2026-06-27); approveProposalAction/declineProposalAction
@@ -18,35 +16,15 @@
  * src/lib/ai-fields/agent-proposals.ts.
  */
 
-import type { SupabaseClient } from '@supabase/supabase-js'
-import { createClient } from '@/lib/supabase/server'
-import { parseJwtPayload } from '@/lib/supabase/jwt'
 import { approveProposal, declineProposal } from '@/lib/ai-fields/agent-proposals'
-import type { Database } from '@/types/database.types'
+import { requireAdminContext } from '@/lib/auth/guards'
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-type AdminCtx = {
-  supabase: SupabaseClient<Database>
-  user: { id: string }
-  role: string
-  organisationId: string | null
-}
-
-async function requireAdmin(): Promise<AdminCtx | { error: string }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-  const { data: { session } } = await supabase.auth.getSession()
-  const claims = session?.access_token ? parseJwtPayload(session.access_token) : {}
-  const role = (claims['user_role'] as string | undefined) ?? ''
-  if (!role || !['admin', 'safety_manager'].includes(role)) {
-    return { error: 'Admin access required' }
-  }
-  const organisationId = (claims['organisation_id'] as string | undefined) ?? null
-  return { supabase, user: { id: user.id }, role, organisationId }
+async function requireAdmin() {
+  return requireAdminContext()
 }
 
 // ---------------------------------------------------------------------------

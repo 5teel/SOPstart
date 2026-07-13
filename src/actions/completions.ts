@@ -1,9 +1,8 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { parseJwtPayload } from '@/lib/supabase/jwt'
 import type { Json } from '@/types/database.types'
 import {
   SubmitCompletionSchema as submitCompletionSchema,
@@ -27,16 +26,8 @@ export async function submitCompletion(
     return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
   }
 
-  const supabase = await createClient()
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-  if (userError || !user) return { success: false, error: 'Not authenticated' }
-
-  // Extract organisation_id from JWT custom claims (set by custom_access_token_hook)
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
+  const { supabase, userId, organisationId } = await getSessionContext()
+  if (!userId) return { success: false, error: 'Not authenticated' }
   if (!organisationId) return { success: false, error: 'No organisation found' }
 
   const admin = createAdminClient()
@@ -73,7 +64,7 @@ export async function submitCompletion(
       id: localId,
       organisation_id: organisationId,
       sop_id: sopId,
-      worker_id: user.id,              // shared-device account uid (RLS key — DO NOT change)
+      worker_id: userId,               // shared-device account uid (RLS key — DO NOT change)
       roster_worker_id: resolvedRosterWorkerId,  // D-11 attribution (null for personal-login sessions)
       sop_version: sopVersion,
       content_hash: contentHash,
@@ -140,18 +131,10 @@ export async function signOffCompletion(
     }
   }
 
-  const supabase = await createClient()
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-  if (userError || !user) return { success: false, error: 'Not authenticated' }
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { success: false, error: 'Not authenticated' }
 
   // Verify caller is supervisor or safety_manager
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const role: string | undefined = jwtClaims['user_role'] as string | undefined
-  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
-
   if (!role || !['supervisor', 'safety_manager'].includes(role)) {
     return { success: false, error: 'Only supervisors and safety managers can sign off completions.' }
   }
@@ -181,7 +164,7 @@ export async function signOffCompletion(
     const { data: assignment } = await admin
       .from('supervisor_assignments')
       .select('id')
-      .eq('supervisor_id', user.id)
+      .eq('supervisor_id', userId)
       .eq('worker_id', completion.worker_id)
       .eq('organisation_id', organisationId)
       .single()
@@ -197,7 +180,7 @@ export async function signOffCompletion(
     .insert({
       organisation_id: organisationId,
       completion_id: completionId,
-      supervisor_id: user.id,
+      supervisor_id: userId,
       decision,
       reason: reason ?? null,
     })
@@ -255,19 +238,12 @@ export async function getPhotoUploadUrl(input: {
   orgId: string
   completionLocalId: string
 }): Promise<{ url: string; path: string } | { error: string }> {
-  const supabase = await createClient()
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-  if (userError || !user) return { error: 'Not authenticated' }
+  const { userId, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
 
-  // Derive orgId from JWT if caller passed empty string (offline client pattern)
-  let orgId = input.orgId
-  if (!orgId) {
-    const { data: { session } } = await supabase.auth.getSession()
-    const jwtClaims = session?.access_token
-      ? parseJwtPayload(session.access_token)
-      : {}
-    orgId = (jwtClaims['organisation_id'] as string | undefined) ?? ''
-  }
+  // Derive orgId from the session context if caller passed empty string
+  // (offline client pattern)
+  const orgId = input.orgId || organisationId || ''
   if (!orgId) return { error: 'No organisation found' }
 
   // Determine file extension from content type
@@ -308,16 +284,8 @@ export async function recordSignature(
 
   const { completionId, role, rosterUserId } = parsed.data
 
-  const supabase = await createClient()
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-  if (userError || !user) return { success: false, error: 'Not authenticated' }
-
-  // Extract organisation_id from JWT custom claims
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
+  const { userId, organisationId } = await getSessionContext()
+  if (!userId) return { success: false, error: 'Not authenticated' }
   if (!organisationId) return { success: false, error: 'No organisation found' }
 
   const admin = createAdminClient()

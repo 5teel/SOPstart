@@ -1,8 +1,8 @@
 'use server'
 
 import { after } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { recordVideoViewSchema } from '@/lib/validators/sop'
 import { runVideoGenerationPipeline } from '@/lib/video-gen/pipeline'
 import type { VideoFormat } from '@/types/sop'
@@ -11,40 +11,22 @@ import type { VideoFormat } from '@/types/sop'
 // Helpers
 // ---------------------------------------------------------------
 
-/** Extract JWT claims from the current session. */
-async function getJwtClaims(): Promise<{
-  user: { id: string } | null
-  role: string | undefined
-  organisationId: string | undefined
-}> {
-  const supabase = await createClient()
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-  if (userError || !user) return { user: null, role: undefined, organisationId: undefined }
-
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
-    : {}
-
-  return {
-    user,
-    role: jwtClaims['user_role'],
-    organisationId: jwtClaims['organisation_id'],
-  }
-}
-
-/** Check that the caller is an admin or safety manager. */
+/**
+ * Check that the caller is an admin or safety manager.
+ * Local (not requireAdminContext): ok-discriminated shape + different
+ * role-gate error string.
+ */
 async function requireAdmin(): Promise<
   | { ok: true; userId: string; organisationId: string }
   | { ok: false; error: string }
 > {
-  const { user, role, organisationId } = await getJwtClaims()
-  if (!user) return { ok: false, error: 'Not authenticated' }
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { ok: false, error: 'Not authenticated' }
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { ok: false, error: 'Admin or Safety Manager role required' }
   }
   if (!organisationId) return { ok: false, error: 'No organisation found' }
-  return { ok: true, userId: user.id, organisationId }
+  return { ok: true, userId, organisationId }
 }
 
 // ---------------------------------------------------------------
@@ -63,15 +45,8 @@ export async function recordVideoView(input: {
 
   const { sopId, sopVersion, videoJobId } = validation.data
 
-  const supabase = await createClient()
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-  if (userError || !user) return
-
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
-    : {}
-  const organisationId: string | undefined = jwtClaims['organisation_id']
+  const { userId, organisationId } = await getSessionContext()
+  if (!userId) return
   if (!organisationId) return
 
   const admin = createAdminClient()
@@ -85,7 +60,7 @@ export async function recordVideoView(input: {
       id: crypto.randomUUID(),
       organisation_id: organisationId,
       sop_id: sopId,
-      worker_id: user.id,
+      worker_id: userId,
       sop_version: sopVersion,
       // completion_type and video_job_id were added by migration 00013
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

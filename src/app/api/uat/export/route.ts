@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { UAT_TESTS, type UatFeedbackRow } from '@/lib/uat/tests'
 
 /**
@@ -10,12 +10,8 @@ import { UAT_TESTS, type UatFeedbackRow } from '@/lib/uat/tests'
  * RLS on uat_feedback scopes the rows to the caller's organisation.
  */
 export async function GET() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-    error: userErr,
-  } = await supabase.auth.getUser()
-  if (userErr || !user) {
+  const { supabase, userId } = await getSessionContext()
+  if (!userId) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 

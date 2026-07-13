@@ -3,7 +3,8 @@
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { parseJwtPayload } from '@/lib/supabase/jwt'
+import { getSessionContext } from '@/lib/auth/session-context'
+import { requireAdminContext } from '@/lib/auth/guards'
 import type { SectionKind, SopSection } from '@/types/sop'
 
 /**
@@ -112,18 +113,9 @@ export async function reorderSections(
     return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
   }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const role = jwtClaims['user_role'] as string | undefined
-  if (!role || !['admin', 'safety_manager'].includes(role)) {
-    return { error: 'Admin access required' }
-  }
+  const ctx = await requireAdminContext()
+  if ('error' in ctx) return ctx
+  const { supabase } = ctx
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { error } = await (supabase as any).rpc('reorder_sections', {
@@ -160,18 +152,9 @@ export async function updateSectionLayout(
     return { error: 'Layout exceeds 128 KB; reduce block count or content' }
   }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const role = jwtClaims['user_role'] as string | undefined
-  if (!role || !['admin', 'safety_manager'].includes(role)) {
-    return { error: 'Admin access required' }
-  }
+  const ctx = await requireAdminContext()
+  if ('error' in ctx) return ctx
+  const { supabase } = ctx
 
   // LWW check (D-07): if server updated_at is newer than clientUpdatedAt,
   // signal server_newer so the caller (flushDraftLayouts) drops the local row.
@@ -222,18 +205,10 @@ export async function updateSectionTitle(
     return { error: 'Section title must be a non-empty string.' }
   }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
   if (!organisationId) return { error: 'No organisation found' }
 
-  const role = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'Admin access required to update section title.' }
   }

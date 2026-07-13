@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { aiModel } from '@/lib/ai/registry'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 
 // Lazy-initialized to avoid throwing at module load time during Next.js static analysis
 let anthropic: Anthropic | null = null
@@ -17,9 +17,8 @@ export async function POST(
   const { sopId } = await params
 
   // Auth gate — same pattern as /api/voice/token
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return new Response('Unauthorized', { status: 401 })
+  const { supabase, userId } = await getSessionContext()
+  if (!userId) return new Response('Unauthorized', { status: 401 })
 
   const body = await req.json() as { query?: string; sopId?: string }
   const query = typeof body.query === 'string' ? body.query.slice(0, 500) : ''

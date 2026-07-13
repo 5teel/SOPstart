@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { parseSop } from '@/lib/parsers/sop-parser'
 import {
@@ -23,25 +23,17 @@ export const maxDuration = 300
 
 export async function POST(request: NextRequest) {
   // --- 1. Auth + role guard (mirrors youtube/route.ts lines 14-35) ---
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
-
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
-    : {}
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
   if (!organisationId) {
     return NextResponse.json({ error: 'No organisation found' }, { status: 403 })
   }
-  const role = jwtClaims['user_role']
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return NextResponse.json({ error: 'You need admin access to create SOPs.' }, { status: 403 })
   }
-  const uploadedBy = user.id
+  const uploadedBy = userId
 
   // --- 2. Validate body via aiPromptSchema (D-06: min 20 / max 2000) ---
   const body = await request.json()
@@ -69,7 +61,7 @@ export async function POST(request: NextRequest) {
       title: null,
       status: 'parsing',
       version: 1,
-      source_file_path: `ai-prompt/${user.id}/${Date.now()}`,
+      source_file_path: `ai-prompt/${userId}/${Date.now()}`,
       source_file_type: 'txt',
       source_file_name: 'AI prompt',
       source_type: 'ai',
@@ -99,7 +91,7 @@ export async function POST(request: NextRequest) {
       organisation_id: organisationId,
       sop_id: sop.id,
       status: 'processing',
-      file_path: `ai-prompt/${user.id}`,
+      file_path: `ai-prompt/${userId}`,
       file_type: 'txt',
       input_type: 'ai_prompt',
       current_stage: 'prompting',

@@ -21,7 +21,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import {
   runReviewerJobs,
@@ -45,22 +45,14 @@ const ALL_JOBS: ReviewerJobId[] = ['A', 'B', 'C', 'D', 'E']
 async function assertAdminAuth(): Promise<
   { kind: 'ok'; userId: string } | { kind: 'err'; status: number; body: { error: string } }
 > {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) {
+  const { userId, role } = await getSessionContext()
+  if (!userId) {
     return { kind: 'err', status: 401, body: { error: 'unauthenticated' } }
   }
-  const { data: member } = await supabase
-    .from('organisation_members')
-    .select('role')
-    .eq('user_id', user.id)
-    .maybeSingle()
-  if (!member || !['admin', 'safety_manager'].includes(member.role)) {
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { kind: 'err', status: 403, body: { error: 'forbidden' } }
   }
-  return { kind: 'ok', userId: user.id }
+  return { kind: 'ok', userId }
 }
 
 async function loadLatestParseJobId(sopId: string): Promise<string | null> {

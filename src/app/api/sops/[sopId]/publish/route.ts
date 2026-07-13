@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { parseJwtPayload } from '@/lib/supabase/jwt'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { performPublish, assertPublishGates } from '@/lib/governance/publish-core'
 
 // POST /api/sops/[sopId]/publish — transition draft -> published
@@ -27,18 +26,12 @@ export async function POST(
   { params }: { params: Promise<{ sopId: string }> }
 ) {
   const { sopId } = await params
-  const supabase = await createClient()
 
   // 1. Resolve user + org for downstream auto-queue call
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
+  const { supabase, userId, organisationId } = await getSessionContext()
+  if (!userId) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
-
-  const { data: { session } } = await supabase.auth.getSession()
-  // parseJwtPayload, not raw atob — JWT payloads are Base64URL (CLAUDE.md 2026-06-26)
-  const jwtClaims = session?.access_token ? parseJwtPayload(session.access_token) : {}
-  const organisationId = jwtClaims['organisation_id'] as string | undefined
   if (!organisationId) {
     return NextResponse.json({ error: 'No organisation found' }, { status: 403 })
   }
@@ -90,7 +83,7 @@ export async function POST(
 
   // No chain configured — falls through to performPublish(), BYTE IDENTICAL to
   // the pre-Phase-29 response shape.
-  const result = await performPublish(supabase, { sopId, organisationId, userId: user.id })
+  const result = await performPublish(supabase, { sopId, organisationId, userId })
 
   if (!result.success) {
     // count is only present for the unverified_blocks 400 — byte-identical

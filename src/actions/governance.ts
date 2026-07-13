@@ -27,8 +27,8 @@
  * is imported from src/lib/governance/* — never inlined here (a sync export in a
  * 'use server' file breaks `next build`, CLAUDE.md 2026-06-27).
  *
- * requireAdmin() reads role + organisation_id from JWT claims via parseJwtPayload
- * (never raw atob, CLAUDE.md 2026-06-26) — never from client input.
+ * requireAdmin() resolves role + organisation_id via getSessionContext()
+ * (local ES256 JWT verify + organisation_members read) — never from client input.
  *
  * sop_review_cadences / sop_review_events are not yet in the generated
  * database.types.ts — accessed via `(supabase as any)` casts, matching the
@@ -37,7 +37,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { parseJwtPayload } from '@/lib/supabase/jwt'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { resolveCadenceMonths, computeReviewDueDate } from '@/lib/governance/cadences'
 import { classifyGovernanceRow, type GovernanceFlag } from '@/lib/governance/classify'
 import { resolveNextStepIndex, stepMatchesCaller, type ChainStep } from '@/lib/governance/approvals'
@@ -67,18 +67,13 @@ export interface GovernanceRow {
 }
 
 export async function requireAdmin(): Promise<AdminCtx | { error: string }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-  const { data: { session } } = await supabase.auth.getSession()
-  const claims = session?.access_token ? parseJwtPayload(session.access_token) : {}
-  const role = claims['user_role'] as string | undefined
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'Admin access required' }
   }
-  const organisationId = claims['organisation_id'] as string | undefined
   if (!organisationId) return { error: 'No organisation found' }
-  return { userId: user.id, organisationId, role: role as AppRole }
+  return { userId, organisationId, role: role as AppRole }
 }
 
 /** Reads the caller's org-scoped cadence settings into a category -> months map. */

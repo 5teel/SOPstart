@@ -76,7 +76,11 @@ test.describe('SCP-VERIFY — per-block verify checklist + publish gate (Phase 2
 
     // requireAdmin gate ensures only admin / safety_manager roles can write
     // — workers can't poke the verify column even within their own org.
-    expect(actions).toContain("'admin', 'safety_manager'")
+    // 2026-07-13: the role gate now lives in the shared requireAdminContext()
+    // (src/lib/auth/guards.ts) — assert the wiring AND the gate itself.
+    expect(actions).toContain('requireAdminContext')
+    const guards = read('src/lib/auth/guards.ts')
+    expect(guards).toContain("'admin', 'safety_manager'")
   })
 
   test('SCP-VERIFY-04: re-editing a block clears that block (and only that block)', () => {

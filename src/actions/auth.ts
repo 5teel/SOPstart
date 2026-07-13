@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { parseJwtPayload } from '@/lib/supabase/jwt'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { roleHome } from '@/lib/auth/role-home'
 import type { TablesInsert, TablesUpdate } from '@/types/database.types'
 import type { AppRole } from '@/types/auth'
@@ -128,11 +129,9 @@ export async function joinWithInviteCode(formData: {
   }
 
   const { code } = result.data
-  const supabase = await createClient()
+  const { supabase, userId } = await getSessionContext()
 
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-
-  if (userError || !user) {
+  if (!userId) {
     redirect('/login')
   }
 
@@ -152,7 +151,7 @@ export async function joinWithInviteCode(formData: {
   const { data: existingMember } = await admin
     .from('organisation_members')
     .select('id')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .eq('organisation_id', org.id)
     .maybeSingle()
 
@@ -163,7 +162,7 @@ export async function joinWithInviteCode(formData: {
   // Join the organisation as a worker (multi-org allowed)
   const { error: memberError } = await admin.from('organisation_members').insert({
     organisation_id: org.id,
-    user_id: user.id,
+    user_id: userId,
     role: 'worker',
   })
 
@@ -195,18 +194,10 @@ export async function inviteWorker(formData: {
   }
 
   const { email } = result.data
-  const supabase = await createClient()
-
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-  if (userError || !user) {
+  const { userId, organisationId } = await getSessionContext()
+  if (!userId) {
     redirect('/login')
   }
-
-  // Get the admin's organisation_id from JWT claims
-  const { data: { session } } = await supabase.auth.getSession()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const jwtClaims = (session?.access_token ? JSON.parse(atob(session.access_token.split('.')[1])) : {}) as Record<string, any>
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
 
   if (!organisationId) {
     return { error: 'You must be part of an organisation to invite workers.' }
@@ -342,19 +333,10 @@ export interface TeamMember {
 }
 
 export async function getTeamMembersWithEmails() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
-    : {}
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  const { supabase, userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
   if (!organisationId) return { error: 'No organisation' }
-
-  const role: string = jwtClaims['user_role'] ?? ''
-  if (!['admin', 'safety_manager'].includes(role)) {
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'Admin access required' }
   }
 
@@ -405,7 +387,7 @@ export async function getTeamMembersWithEmails() {
     department_ids: deptMap[m.user_id] ?? [],
   }))
 
-  return { members: result, currentUserId: user.id }
+  return { members: result, currentUserId: userId }
 }
 
 // ─────────────────────────────────────────────
@@ -413,20 +395,11 @@ export async function getTeamMembersWithEmails() {
 // ─────────────────────────────────────────────
 
 export async function removeMember(memberId: string) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
-    : {}
-  const role: string = jwtClaims['user_role'] ?? ''
-  if (!['admin', 'safety_manager'].includes(role)) {
+  const { supabase, userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'Admin access required' }
   }
-
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
   if (!organisationId) return { error: 'No organisation' }
 
   // Prevent removing yourself
@@ -437,7 +410,7 @@ export async function removeMember(memberId: string) {
     .maybeSingle()
 
   if (!target) return { error: 'Member not found' }
-  if (target.user_id === user.id) return { error: 'You cannot remove yourself' }
+  if (target.user_id === userId) return { error: 'You cannot remove yourself' }
 
   // Prevent removing the last admin
   if (target.role === 'admin') {
@@ -466,18 +439,9 @@ export async function removeMember(memberId: string) {
 // ─────────────────────────────────────────────
 
 export async function regenerateInviteCode() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
-    : {}
-  const role: string = jwtClaims['user_role'] ?? ''
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
   if (role !== 'admin') return { error: 'Only admins can regenerate invite codes' }
-
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
   if (!organisationId) return { error: 'No organisation' }
 
   // Generate new 8-char code
@@ -511,15 +475,8 @@ export async function updateMemberRoleSafe(formData: {
   }
 
   const { memberId, role: newRole } = result.data
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
-    : {}
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
+  const { supabase, userId, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
 
   // Check if this is self-demotion from admin
   const { data: target } = await supabase
@@ -530,7 +487,7 @@ export async function updateMemberRoleSafe(formData: {
 
   if (!target) return { error: 'Member not found' }
 
-  if (target.user_id === user.id && target.role === 'admin' && newRole !== 'admin') {
+  if (target.user_id === userId && target.role === 'admin' && newRole !== 'admin') {
     // Check if they're the last admin
     const { count } = await supabase
       .from('organisation_members')
@@ -561,16 +518,15 @@ export async function updateMemberRoleSafe(formData: {
 // ─────────────────────────────────────────────
 
 export async function switchOrganisation(organisationId: string) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
+  const { supabase, userId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
 
   // Verify user is a member of this org
   const admin = createAdminClient()
   const { data: membership } = await admin
     .from('organisation_members')
     .select('id')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .eq('organisation_id', organisationId)
     .maybeSingle()
 
@@ -596,15 +552,18 @@ export interface UserMembership {
 }
 
 export async function getUserMemberships() {
+  // getClaims (local JWT verify) instead of getSessionContext: this function
+  // needs user_metadata.active_org_id, which the context doesn't expose.
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { memberships: [] as UserMembership[], activeOrgId: null as string | null }
+  const { data: claimsData } = await supabase.auth.getClaims()
+  const claims = claimsData?.claims
+  if (!claims?.sub) return { memberships: [] as UserMembership[], activeOrgId: null as string | null }
 
   const admin = createAdminClient()
   const { data: members } = await admin
     .from('organisation_members')
     .select('organisation_id, role, created_at')
-    .eq('user_id', user.id)
+    .eq('user_id', claims.sub)
     .order('created_at', { ascending: true })
 
   if (!members) return { memberships: [] as UserMembership[], activeOrgId: null as string | null }
@@ -627,7 +586,10 @@ export async function getUserMemberships() {
     joinedAt: m.created_at,
   }))
 
-  const activeOrgId = user.user_metadata?.active_org_id ?? memberships[0]?.organisationId ?? null
+  const activeOrgId =
+    (((claims as Record<string, unknown>)['user_metadata'] as Record<string, unknown> | undefined)?.[
+      'active_org_id'
+    ] as string | undefined) ?? memberships[0]?.organisationId ?? null
 
   return { memberships, activeOrgId }
 }
@@ -637,19 +599,11 @@ export async function getUserMemberships() {
 // ─────────────────────────────────────────────
 
 export async function addMemberByEmail(email: string, role: AppRole) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
-    : {}
-  const currentRole: string = jwtClaims['user_role'] ?? ''
-  if (!['admin', 'safety_manager'].includes(currentRole)) {
+  const { userId, role: currentRole, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
+  if (!currentRole || !['admin', 'safety_manager'].includes(currentRole)) {
     return { error: 'Admin access required' }
   }
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
   if (!organisationId) return { error: 'No organisation' }
 
   const admin = createAdminClient()

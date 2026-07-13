@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { parseJwtPayload } from '@/lib/supabase/jwt'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { aiModel } from '@/lib/ai/registry'
 import { llmToolCall, type LlmTool } from '@/lib/ai/llm'
 
@@ -52,12 +51,8 @@ const INTERVIEW_TOOL: LlmTool = {
 
 export async function POST(request: NextRequest) {
   // Auth + role guard — mirrors /api/sops/ai-prompt.
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
-  const { data: { session } } = await supabase.auth.getSession()
-  const claims = session?.access_token ? parseJwtPayload(session.access_token) : {}
-  const role = claims['user_role'] as string | undefined
+  const { userId, role } = await getSessionContext()
+  if (!userId) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return NextResponse.json({ error: 'You need admin access to create SOPs.' }, { status: 403 })
   }

@@ -12,7 +12,7 @@
  *   - sop_image_annotations has NO authenticated write policy (append-only,
  *     migration 00039) → all writes go through createAdminClient() (service-role).
  *   - Service-role BYPASSES RLS, so BOTH actions self-enforce org-scope: the
- *     caller's org comes from parseJwtPayload(access_token) (NEVER `atob`), the
+ *     caller's org comes from getSessionContext() (locally-verified JWT), the
  *     target sop_image is confirmed to belong to that org (via its sop), and every
  *     write is filtered with `.eq('organisation_id', callerOrg)` — a service-role
  *     write can never touch another org's row (recurring bug family CR-02/WR-05).
@@ -20,27 +20,19 @@
  *     src/lib/builder/baked-path.ts (a sync export here breaks next build).
  */
 
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { parseJwtPayload } from '@/lib/supabase/jwt'
 import { bakedStoragePath, nextBakedVersion } from '@/lib/builder/baked-path'
 import type { Json } from '@/types/database.types'
 
 type SaveResult = { success: true; annotationId: string } | { success: false; error: string }
 type BakeResult = { success: true; bakedStoragePath: string } | { success: false; error: string }
 
-/** Caller's org id from the verified JWT (parseJwtPayload, not atob). */
+/** Caller's org id from the locally-verified session context. */
 async function callerOrgId(): Promise<string | null> {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return null
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  const claims = session?.access_token ? parseJwtPayload(session.access_token) : {}
-  return (claims['organisation_id'] as string | undefined) ?? null
+  const { userId, organisationId } = await getSessionContext()
+  if (!userId) return null
+  return organisationId
 }
 
 /**

@@ -1,9 +1,9 @@
 'use server'
 
 import { z } from 'zod'
-import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { parseJwtPayload } from '@/lib/supabase/jwt'
+import { getSessionContext } from '@/lib/auth/session-context'
+import { requireAdminContext } from '@/lib/auth/guards'
 import { uploadSessionSchema, getSourceFileType, isBlockedMacroFile, createVideoSopPipelineSessionSchema } from '@/lib/validators/sop'
 import type { UploadSession } from '@/types/sop'
 
@@ -15,20 +15,11 @@ export async function createUploadSession(
     return { error: result.error.issues[0]?.message ?? 'Invalid files' }
   }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  // Get org_id from JWT claims
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
   if (!organisationId) return { error: 'No organisation found' }
 
   // Check role
-  const role = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'You need admin access to upload SOPs.' }
   }
@@ -52,7 +43,7 @@ export async function createUploadSession(
         source_file_name: file.name,
         source_file_type: fileType,
         source_file_path: '', // will update after upload
-        uploaded_by: user.id,
+        uploaded_by: userId,
         status: 'uploading',
       })
       .select('id')
@@ -100,9 +91,8 @@ export async function createUploadSession(
 }
 
 export async function triggerParse(sopId: string): Promise<{ success: boolean } | { error: string }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
+  const { supabase, userId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
 
   // Update SOP status to parsing
   const { error } = await supabase
@@ -122,19 +112,10 @@ export async function triggerParse(sopId: string): Promise<{ success: boolean } 
 export async function createVideoUploadSession(
   file: { name: string; size: string; type: string }
 ): Promise<{ sopId: string; path: string; token: string; signedUploadUrl: string | null } | { error: string }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  // Get org_id and role from JWT claims (same pattern as createUploadSession)
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
   if (!organisationId) return { error: 'No organisation found' }
 
-  const role = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'You need admin access to upload SOPs.' }
   }
@@ -152,7 +133,7 @@ export async function createVideoUploadSession(
       source_file_type: 'video' as const,
       source_file_name: file.name,
       is_ocr: false,
-      uploaded_by: user.id,
+      uploaded_by: userId,
     })
     .select('id')
     .single()
@@ -219,9 +200,8 @@ export async function createVideoUploadSession(
 }
 
 export async function reparseSop(sopId: string): Promise<{ success: true; sopId: string } | { error: string }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
+  const { supabase, userId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
 
   // Delete existing sections (cascade deletes steps and images)
   await supabase.from('sop_sections').delete().eq('sop_id', sopId)
@@ -277,9 +257,8 @@ export async function reparseSop(sopId: string): Promise<{ success: true; sopId:
  * Much faster than full re-parse (~3-5s vs ~15-30s).
  */
 export async function restructureSop(sopId: string): Promise<{ success: true; sopId: string } | { error: string }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
+  const { supabase, userId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
 
   // Find existing parse job with transcript
   const { data: existingJob } = await supabase
@@ -338,18 +317,10 @@ export async function updateSopTitle(
     return { error: 'Title must be a non-empty string.' }
   }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
+  const { supabase, userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
   if (!organisationId) return { error: 'No organisation found' }
 
-  const role = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'Admin access required to update SOP title.' }
   }
@@ -366,19 +337,8 @@ export async function updateSopTitle(
 }
 
 export async function deleteSop(sopId: string): Promise<{ success: true } | { error: string }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  // Verify admin role
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const role = jwtClaims['user_role'] as string | undefined
-  if (!role || !['admin', 'safety_manager'].includes(role)) {
-    return { error: 'Admin access required' }
-  }
+  const ctx = await requireAdminContext()
+  if ('error' in ctx) return ctx
 
   // Delete sections (cascade deletes steps/images), parse jobs, assignments, then SOP
   const admin = createAdminClient()
@@ -407,18 +367,10 @@ export async function createVideoSopPipelineSession(input: {
   }
   const { file, format } = parsed.data
 
-  // 2. Auth + role check (same JWT pattern as createUploadSession)
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
+  // 2. Auth + role check (same pattern as createUploadSession)
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
   if (!organisationId) return { error: 'No organisation found' }
-  const role = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'You need admin access to upload SOPs.' }
   }
@@ -445,7 +397,7 @@ export async function createVideoSopPipelineSession(input: {
       organisation_id: organisationId,
       requested_video_format: format,
       status: 'active',
-      created_by: user.id,
+      created_by: userId,
     })
     .select('id')
     .single()
@@ -463,7 +415,7 @@ export async function createVideoSopPipelineSession(input: {
       source_file_name: file.name,
       source_file_type: fileType,
       source_file_path: '',
-      uploaded_by: user.id,
+      uploaded_by: userId,
       status: 'uploading',
       pipeline_run_id: pipelineRun.id,
     })
@@ -512,7 +464,7 @@ export async function createVideoSopPipelineSession(input: {
 // createSopFromWizard (Phase 12 SB-AUTH-01)
 // Atomic SOP + sections create for the blank-page authoring wizard.
 // - Zod-validates input (title required, kindIds min 1 max 10)
-// - JWT admin/safety_manager role guard
+// - admin/safety_manager role guard (via session context)
 // - Inserts sops row with source_type='blank', status='draft'
 // - Fetches section_kinds via the user's RLS-scoped client (prevents
 //   cross-org kind forgery — T-12-03-02)
@@ -542,18 +494,10 @@ export async function createSopFromWizard(
     return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
   }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
+  const { supabase, userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
   if (!organisationId) return { error: 'No organisation found' }
 
-  const role = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'Admin access required' }
   }
@@ -582,7 +526,7 @@ export async function createSopFromWizard(
       source_file_name: parsed.data.title,
       source_file_type: 'docx',
       source_file_path: '',
-      uploaded_by: user.id,
+      uploaded_by: userId,
       status: 'draft',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       source_type: 'blank' as any,

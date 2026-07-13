@@ -7,7 +7,7 @@
  * CLAUDE.md 2026-06-05: assert WIRING, not just token presence.
  * Asserts:
  *   - Route file exists
- *   - Auth gate: `supabase.auth.getUser()` present (workers are authed)
+ *   - Auth gate: `getSessionContext()` present (workers are authed; local JWT verify, 2026-07-13)
  *   - TTS model: imported from shared constant (`@/lib/voice/tts-constants` or `TTS_MODEL`)
  *     OR references `gpt-4o-mini-tts` but NOT as a bare hardcoded string literal in the route body
  *   - Concurrency cap: `inFlight` Set present (per-user concurrency guard, mirror query/route.ts)
@@ -35,9 +35,11 @@ test('VDW-LIT-03: TTS route file exists', () => {
   ).toBe(true)
 })
 
-test('VDW-LIT-03: TTS route is auth-gated (supabase.auth.getUser)', () => {
+test('VDW-LIT-03: TTS route is auth-gated (getSessionContext)', () => {
   const text = readTtsRoute()
-  expect(text).toContain('supabase.auth.getUser()')
+  // 2026-07-13: getSessionContext() replaces getUser() — local ES256 JWT
+  // verify + member-role read, no per-request Supabase Auth round-trip.
+  expect(text).toContain('getSessionContext()')
 })
 
 test('VDW-LIT-03: TTS route references TTS_MODEL constant or shared tts-constants import (not bare hardcoded model string in route body)', () => {

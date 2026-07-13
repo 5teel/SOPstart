@@ -32,7 +32,7 @@
 import '@/lib/ai-fields/registrations'
 
 import { NextResponse, type NextRequest } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { getField } from '@/lib/ai-fields/registry'
 import { AiWriteRequestSchema } from '@/lib/validators/ai-fields'
 import { applyAiWrite } from '@/actions/ai-fields'
@@ -50,11 +50,8 @@ import { applyAiWrite } from '@/actions/ai-fields'
  */
 export async function POST(req: NextRequest) {
   // ── 1. Auth ──────────────────────────────────────────────────────────────
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) {
+  const { supabase, userId } = await getSessionContext()
+  if (!userId) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   }
 

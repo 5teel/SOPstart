@@ -32,9 +32,16 @@ function makeSupabase(cfg: Cfg) {
   function builder(table: string) {
     const state = { table, count: false, head: false, isUpdate: false }
     const resolve = () => {
-      if (state.table === 'sops' && state.isUpdate) return { error: cfg.publishError ?? null }
+      // update().eq('status','draft').select('id') — publish-core's Phase 29
+      // zero-rows-updated guard 409s unless the update returns the row.
+      if (state.table === 'sops' && state.isUpdate)
+        return cfg.publishError
+          ? { data: null, error: cfg.publishError }
+          : { data: [{ id: 'sop-1' }], error: null }
       if (state.table === 'sops')
-        return { data: { source_type: cfg.sourceType ?? 'pdf', source_file_path: cfg.sourceFilePath ?? 'x.pdf' }, error: null }
+        // status: publish-core (Phase 29 extraction) verifies the SOP is a
+        // draft before flipping it — without this the harness 409s.
+        return { data: { status: 'draft', source_type: cfg.sourceType ?? 'pdf', source_file_path: cfg.sourceFilePath ?? 'x.pdf' }, error: null }
       if (state.table === 'sop_sections' && state.count) return { count: cfg.unapprovedCount ?? 0, error: null }
       if (state.table === 'sop_sections') return { data: (cfg.sectionIds ?? ['sec-1']).map((id) => ({ id })), error: null }
       if (state.table === 'sop_section_blocks' && state.count) return { count: cfg.unverifiedCount ?? 0, error: null }
@@ -69,14 +76,29 @@ function makeSupabase(cfg: Cfg) {
 }
 
 let currentSupabase: any = makeSupabase({})
+let currentOrgId = 'org1'
 
-// Intercept the route's two collaborators (substring-match handles both the
+// Intercept the route's collaborators (substring-match handles both the
 // '@/…' alias and any resolved path form under tsx).
 const Module = require('module')
 const origLoad = Module._load
 Module._load = function (request: string, parent: unknown, isMain: boolean) {
   if (request.includes('lib/supabase/server')) {
     return { createClient: async () => currentSupabase }
+  }
+  // 2026-07-13: the route resolves auth via getSessionContext() (local JWT
+  // verify + member-role read) instead of getUser/getSession — mock it as a
+  // collaborator, handing back the same fake supabase + org identity.
+  if (request.includes('lib/auth/session-context')) {
+    return {
+      getSessionContext: async () => ({
+        supabase: currentSupabase,
+        userId: 'u1',
+        userEmail: null,
+        role: 'admin',
+        organisationId: currentOrgId,
+      }),
+    }
   }
   if (request.includes('video-gen/auto-queue')) {
     return { enqueueVideoGenerationForPipeline: async () => ({}) }
@@ -94,6 +116,7 @@ const check = (cond: boolean, msg: string) => {
 
 async function callPublish(cfg: Cfg) {
   currentSupabase = makeSupabase(cfg)
+  currentOrgId = cfg.orgId ?? 'org1'
   const res = await POST({} as any, { params: Promise.resolve({ sopId: 'sop-1' }) })
   const body = await res.json().catch(() => ({}))
   return { status: res.status, body }

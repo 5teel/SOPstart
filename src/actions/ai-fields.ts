@@ -24,13 +24,12 @@
  */
 
 import { revalidatePath } from 'next/cache'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { AiWriteRequestSchema, AcceptProposalSchema, RejectProposalSchema } from '@/lib/validators/ai-fields'
 import { gateWrite } from '@/lib/ai-fields/approval'
 import { getField } from '@/lib/ai-fields/registry'
 import type { WriteResult } from '@/lib/ai-fields/registry'
-import { parseJwtPayload } from '@/lib/supabase/jwt'
 
 // ────────────────────────────────────────────────────────────────────────────
 // applyAiWrite
@@ -49,15 +48,8 @@ export async function applyAiWrite(
   const { fieldId, context, newValue } = parsed.data
 
   // ── 2. Auth + org claim ────────────────────────────────────────────────────
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: 'Not authenticated' }
-
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
+  const { userId, organisationId } = await getSessionContext()
+  if (!userId) return { success: false, error: 'Not authenticated' }
   if (!organisationId) return { success: false, error: 'No organisation found' }
 
   // Override context.organisationId with the JWT-derived value (never trust client).
@@ -124,16 +116,8 @@ export async function acceptProposal(
   }
 
   // ── 2. Auth + admin role guard ────────────────────────────────────────────
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: 'Not authenticated' }
-
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const role: string | undefined = jwtClaims['user_role'] as string | undefined
-  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { success: false, error: 'Not authenticated' }
 
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { success: false, error: 'You need admin access to accept proposals.' }
@@ -241,16 +225,8 @@ export async function rejectProposal(
   }
 
   // ── 2. Auth + admin role guard ────────────────────────────────────────────
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: 'Not authenticated' }
-
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const role: string | undefined = jwtClaims['user_role'] as string | undefined
-  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { success: false, error: 'Not authenticated' }
 
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { success: false, error: 'You need admin access to reject proposals.' }

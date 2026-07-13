@@ -1,6 +1,6 @@
 'use server'
 import { z } from 'zod'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { FlowGraphSchema } from '@/lib/validators/flow-graph'
 
 const MAX_BYTES = 256 * 1024  // 256KB
@@ -19,23 +19,16 @@ export async function updateSopFlowGraph(input: z.infer<typeof Input>) {
     return { error: `Flow graph exceeds ${MAX_BYTES / 1024}KB limit` }
   }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
+  const { supabase, userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
 
   // Role gate — only admin and safety_manager may write flow graphs.
-  // Read role + org from JWT claims (server-controlled), never user_metadata,
-  // which is end-user-writable via supabase.auth.updateUser (24-REVIEW.md WR-02).
-  // Canonical pattern: src/actions/sops.ts.
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
-    : {}
-  const role = jwtClaims['user_role']
+  // Role + org come from getSessionContext (server-controlled, same table the
+  // JWT claims are minted from), never user_metadata, which is
+  // end-user-writable via supabase.auth.updateUser (24-REVIEW.md WR-02).
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'Admin access required' }
   }
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
   if (!organisationId) return { error: 'No organisation found' }
 
   // .select('id') so RLS-filtered zero-row updates surface as an error instead

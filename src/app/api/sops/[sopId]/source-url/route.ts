@@ -25,7 +25,7 @@
  * their own org).
  */
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import type { SourcePaneKind, SourceUrlResponse } from '@/components/admin/source-viewer/types'
 
 const SIGNED_URL_TTL_SECONDS = 300 // 5 minutes — short enough to bound leak risk
@@ -50,23 +50,15 @@ export async function GET(
   { params }: { params: Promise<{ sopId: string }> }
 ): Promise<NextResponse<SourceUrlResponse | { error: string }>> {
   const { sopId } = await params
-  const supabase = await createClient()
 
   // 1. Auth gate.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) {
+  const { supabase, userId, role } = await getSessionContext()
+  if (!userId) {
     return NextResponse.json({ error: 'unauthenticated' }, { status: 401 })
   }
 
   // 2. Role gate (defence-in-depth on top of RLS).
-  const { data: member } = await supabase
-    .from('organisation_members')
-    .select('role')
-    .eq('user_id', user.id)
-    .maybeSingle()
-  if (!member || !['admin', 'safety_manager'].includes(member.role)) {
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
     return NextResponse.json({ error: 'forbidden' }, { status: 403 })
   }
 

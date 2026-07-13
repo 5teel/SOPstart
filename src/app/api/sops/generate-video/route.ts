@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse, after } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { generateVideoSchema } from '@/lib/validators/sop'
 import { runVideoGenerationPipeline } from '@/lib/video-gen/pipeline'
 
@@ -27,18 +27,10 @@ export async function POST(request: NextRequest) {
   const { sopId, format } = parsed.data
 
   // 2. Auth check — get user and verify admin/safety_manager role
-  const supabase = await createClient()
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-  if (userError || !user) {
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
-
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
-    : {}
-  const role: string | undefined = jwtClaims['user_role']
-  const organisationId: string | undefined = jwtClaims['organisation_id']
 
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return NextResponse.json({ error: 'Admin or Safety Manager role required' }, { status: 403 })
@@ -107,7 +99,7 @@ export async function POST(request: NextRequest) {
       format,
       version_number: nextVersion,
       status: 'queued' as const,
-      created_by: user.id,
+      created_by: userId,
     })
     .select('id')
     .single()

@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import OpenAI from 'openai'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { voiceTtsSchema } from '@/lib/validators/voice-tts'
 import { TTS_MODEL } from '@/lib/voice/tts-constants'
 
@@ -55,11 +55,8 @@ const TTS_INSTRUCTIONS =
  */
 export async function POST(req: NextRequest) {
   // ── 1. Auth ──────────────────────────────────────────────────────────────
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) {
+  const { userId } = await getSessionContext()
+  if (!userId) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   }
   // NOTE: no admin-role check — workers must be allowed to use TTS (D-15).
@@ -77,10 +74,10 @@ export async function POST(req: NextRequest) {
   const { text } = parsed.data
 
   // ── 3. Concurrency cap (1 in-flight per user) ────────────────────────────
-  if (inFlight.has(user.id)) {
+  if (inFlight.has(userId)) {
     return NextResponse.json({ error: 'concurrent_query' }, { status: 429 })
   }
-  inFlight.add(user.id)
+  inFlight.add(userId)
 
   try {
     // ── 4. OpenAI TTS call ───────────────────────────────────────────────
@@ -108,6 +105,6 @@ export async function POST(req: NextRequest) {
     console.error('TTS route error:', message)
     return NextResponse.json({ error: 'tts_failed' }, { status: 502 })
   } finally {
-    inFlight.delete(user.id)
+    inFlight.delete(userId)
   }
 }

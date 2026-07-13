@@ -175,8 +175,10 @@ test.describe('SCP-VIEWER — side-by-side source viewer (Phase 21)', () => {
     expect(route).toContain('sop-videos')
     expect(route).toContain('sop-documents')
     expect(route).toContain('deriveSourcePaneKind')
-    // RLS + role gate present.
-    expect(route).toContain('organisation_members')
+    // RLS + role gate present. 2026-07-13: the member-role read moved into
+    // getSessionContext() (local JWT verify + organisation_members lookup) —
+    // the route keeps the admin/safety_manager gate on the context role.
+    expect(route).toContain('getSessionContext')
     expect(route).toContain('safety_manager')
     // Backward-compat path: 200 + null on no source_file_path.
     expect(route).toContain('no source available')

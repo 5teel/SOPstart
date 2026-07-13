@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 
 /**
  * Streams a generated video to authorised users by generating a fresh
@@ -23,9 +23,8 @@ export async function GET(
   const { jobId } = await params
 
   // 1. Auth check
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
+  const { userId } = await getSessionContext()
+  if (!userId) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
 
@@ -50,7 +49,7 @@ export async function GET(
   const { data: member } = await admin
     .from('organisation_members')
     .select('organisation_id')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .eq('organisation_id', job.organisation_id)
     .maybeSingle()
 

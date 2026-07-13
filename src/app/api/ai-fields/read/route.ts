@@ -40,33 +40,21 @@
 import '@/lib/ai-fields/registrations'
 
 import { NextResponse, type NextRequest } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { getField } from '@/lib/ai-fields/registry'
 import { FieldContextSchema } from '@/lib/validators/ai-fields'
-import { parseJwtPayload } from '@/lib/supabase/jwt'
 
 /**
  * GET /api/ai-fields/read?fieldId=sop.title&sopId=...
  */
 export async function GET(req: NextRequest) {
   // ── 1. Auth ──────────────────────────────────────────────────────────
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) {
+  // organisationId comes from the session context — NEVER trust client-supplied
+  // value (T-23-02-01: information disclosure via cross-org reads).
+  const { userId, organisationId } = await getSessionContext()
+  if (!userId) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   }
-
-  // Extract organisationId from JWT claim — NEVER trust client-supplied value
-  // (T-23-02-01: information disclosure via cross-org reads).
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
   if (!organisationId) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   }

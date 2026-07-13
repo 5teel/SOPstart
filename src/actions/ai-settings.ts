@@ -8,28 +8,23 @@
  * org scoping: organisation_id always comes from the caller's JWT, never from
  * client input (2026-06-15 learning).
  */
-import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { parseJwtPayload } from '@/lib/supabase/jwt'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { AI_MODELS, type AiModelKey } from '@/lib/ai/registry'
 import { AI_MODEL_OPTIONS } from '@/lib/ai/model-options'
 import { ORG_CONFIGURABLE_KEYS, getOrgAiModels, type OrgAiModels } from '@/lib/ai/org-settings'
 
 type AdminCtx = { userId: string; organisationId: string }
 
+// Local (not requireAdminContext): narrower return shape + 'No organisation found'.
 async function requireAdmin(): Promise<AdminCtx | { error: string }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-  const { data: { session } } = await supabase.auth.getSession()
-  const claims = session?.access_token ? parseJwtPayload(session.access_token) : {}
-  const role = claims['user_role'] as string | undefined
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'Admin access required' }
   }
-  const organisationId = claims['organisation_id'] as string | undefined
   if (!organisationId) return { error: 'No organisation found' }
-  return { userId: user.id, organisationId }
+  return { userId, organisationId }
 }
 
 /** Current org overrides for the caller's organisation. */

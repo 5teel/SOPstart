@@ -1,11 +1,10 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { z } from 'zod'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { AppRole } from '@/types/auth'
-import type { User } from '@supabase/supabase-js'
 
 // ─── Schemas ────────────────────────────────────────────────────────────────
 
@@ -16,27 +15,19 @@ const roleSchema = z.enum(APP_ROLES)
 
 type AdminContext =
   | { error: string }
-  | { supabase: SupabaseClient; user: User; organisationId: string }
+  | { supabase: SupabaseClient; user: { id: string }; organisationId: string }
 
 async function getAdminContext(): Promise<AdminContext> {
-  const supabase = await createClient()
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-  if (userError || !user) return { error: 'Not authenticated' }
+  const { supabase, userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
 
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
-    : {}
-
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
   if (!organisationId) return { error: 'No organisation found' }
 
-  const role: string = jwtClaims['user_role'] ?? ''
-  if (!['admin', 'safety_manager'].includes(role)) {
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { error: 'You need admin access to manage assignments.' }
   }
 
-  return { supabase: supabase as SupabaseClient, user, organisationId }
+  return { supabase: supabase as SupabaseClient, user: { id: userId }, organisationId }
 }
 
 // ─── Actions ────────────────────────────────────────────────────────────────
@@ -142,9 +133,8 @@ export async function getAssignments(
 ): Promise<{ success: true; assignments: SopAssignment[] } | { success: false; error: string }> {
   if (!sopId) return { success: false, error: 'Invalid SOP ID' }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: 'Not authenticated' }
+  const { supabase, userId } = await getSessionContext()
+  if (!userId) return { success: false, error: 'Not authenticated' }
 
   const { data, error } = await supabase
     .from('sop_assignments')
@@ -194,19 +184,14 @@ export async function getOrgMembers(): Promise<
 // ─── Worker Self-Assignment ─────────────────────────────────────────────────
 
 async function getWorkerContext() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' } as const
+  // getSessionContext already resolves role + organisation_id from
+  // organisation_members — no separate member query needed.
+  const { supabase, userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' } as const
 
-  const { data: member } = await supabase
-    .from('organisation_members')
-    .select('organisation_id, role')
-    .eq('user_id', user.id)
-    .maybeSingle()
+  if (!organisationId) return { error: 'No organisation membership' } as const
 
-  if (!member) return { error: 'No organisation membership' } as const
-
-  return { supabase, user, organisationId: member.organisation_id, role: member.role }
+  return { supabase, user: { id: userId }, organisationId, role: role as AppRole | null }
 }
 
 /**

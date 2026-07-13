@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(
@@ -8,23 +8,10 @@ export async function GET(
 ) {
   const { pipelineId } = await params
 
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) {
+  const { userId, organisationId } = await getSessionContext()
+  if (!userId) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? (JSON.parse(
-        Buffer.from(session.access_token.split('.')[1], 'base64').toString('utf-8')
-      ) as Record<string, unknown>)
-    : {}
-  const organisationId = jwtClaims['organisation_id'] as string | undefined
   if (!organisationId) {
     return NextResponse.json({ error: 'No organisation' }, { status: 403 })
   }

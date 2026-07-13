@@ -5,7 +5,7 @@
  * write + Konva raster are device/server surfaces that can't run headless here
  * (no `@/` alias, no browser) — so this proves the PURE versioning core in
  * process and asserts the security/wiring source-contracts (createAdminClient +
- * org self-enforce + parseJwtPayload, toDataURL bake, baked-vs-raw worker read,
+ * org self-enforce + getSessionContext, toDataURL bake, baked-vs-raw worker read,
  * Konva stays out of the worker). The full save→publish→worker path is the
  * device-UAT residual carried from 26-11 (`p26-annotation-editor-feel`).
  *
@@ -45,7 +45,7 @@ test.describe('baked-path — content-versioned baked PNG storage path (26-13)',
   })
 })
 
-test.describe('saveAnnotation — service-role, org self-enforcing, parseJwtPayload (T-26-13-01/03)', () => {
+test.describe('saveAnnotation — service-role, org self-enforcing, getSessionContext (T-26-13-01/03)', () => {
   const s = src('src/actions/annotations.ts')
 
   test("async-only 'use server' module — no sync value export (CLAUDE.md 2026-06-27)", () => {
@@ -63,8 +63,10 @@ test.describe('saveAnnotation — service-role, org self-enforcing, parseJwtPayl
     expect(s).toMatch(/\.eq\(\s*['"]organisation_id['"]/)
   })
 
-  test('reads the caller org via parseJwtPayload, NEVER atob (CLAUDE.md 2026-06-26)', () => {
-    expect(s).toContain('parseJwtPayload')
+  test('reads the caller org via getSessionContext, NEVER atob (CLAUDE.md 2026-06-26)', () => {
+    // 2026-07-13: getSessionContext() replaced parseJwtPayload — org comes
+    // from the locally-verified session, no manual claim decoding anywhere.
+    expect(s).toContain('getSessionContext')
     expect(s).not.toMatch(/\batob\s*\(/)
   })
 

@@ -1,7 +1,8 @@
 'use server'
 
 import { z } from 'zod'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
+import type { SessionContext } from '@/lib/auth/session-context'
 import type { UatFeedbackRow } from '@/lib/uat/tests'
 
 // ---------------------------------------------------------------------------
@@ -13,29 +14,17 @@ type OrgUserCtx =
   | { ok: false; error: string }
   | {
       ok: true
-      supabase: Awaited<ReturnType<typeof createClient>>
+      supabase: SessionContext['supabase']
       user: { id: string; email?: string }
       organisationId: string
     }
 
 async function requireOrgUser(): Promise<OrgUserCtx> {
-  const supabase = await createClient()
-  const {
-    data: { user },
-    error: userErr,
-  } = await supabase.auth.getUser()
-  if (userErr || !user) return { ok: false, error: 'Not authenticated' }
-
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  const claims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
-    : {}
-  const organisationId: string | null = claims['organisation_id'] ?? null
+  const { supabase, userId, userEmail, organisationId } = await getSessionContext()
+  if (!userId) return { ok: false, error: 'Not authenticated' }
   if (!organisationId) return { ok: false, error: 'No organisation found' }
 
-  return { ok: true, supabase, user: { id: user.id, email: user.email }, organisationId }
+  return { ok: true, supabase, user: { id: userId, email: userEmail ?? undefined }, organisationId }
 }
 
 // ---------------------------------------------------------------------------

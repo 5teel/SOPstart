@@ -1,28 +1,16 @@
 'use server'
 import { z } from 'zod'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 
 // ---------------------------------------------------------------
 // Shared auth helper — extracts user + org from current session
 // ---------------------------------------------------------------
 async function authOrg() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' as const }
+  const { supabase, userId, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' as const }
+  if (!organisationId) return { error: 'Missing organisation_id claim' as const }
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  const claims = session?.access_token
-    ? (JSON.parse(
-        Buffer.from(session.access_token.split('.')[1], 'base64url').toString()
-      ) as { organisation_id?: string })
-    : {}
-  if (!claims.organisation_id) return { error: 'Missing organisation_id claim' as const }
-
-  return { supabase, user, orgId: claims.organisation_id }
+  return { supabase, user: { id: userId }, orgId: organisationId }
 }
 
 // ---------------------------------------------------------------

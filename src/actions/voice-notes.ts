@@ -1,6 +1,6 @@
 'use server'
 import { z } from 'zod'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 
 const Input = z.object({
   sopId: z.string().uuid(),
@@ -18,28 +18,14 @@ export async function saveVoiceNote(input: z.infer<typeof Input>) {
   const parsed = Input.safeParse(input)
   if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
 
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-
-  // Extract organisation_id from JWT claims
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  const claims = session?.access_token
-    ? (JSON.parse(
-        Buffer.from(session.access_token.split('.')[1], 'base64url').toString()
-      ) as { organisation_id?: string })
-    : {}
-  const orgId = claims.organisation_id
-  if (!orgId) return { error: 'Missing organisation_id claim' }
+  const { supabase, userId, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
+  if (!organisationId) return { error: 'Missing organisation_id claim' }
 
   const id = crypto.randomUUID()
   const { error } = await supabase.from('sop_voice_notes').insert({
     id,
-    organisation_id: orgId,
+    organisation_id: organisationId,
     sop_id: parsed.data.sopId,
     section_id: parsed.data.sectionId ?? null,
     step_id: parsed.data.stepId ?? null,
@@ -49,7 +35,7 @@ export async function saveVoiceNote(input: z.infer<typeof Input>) {
     audio_storage_path: parsed.data.audioStoragePath,
     confidence: parsed.data.confidence ?? null,
     language: parsed.data.language,
-    created_by: user.id,
+    created_by: userId,
   })
   if (error) return { error: error.message }
   return { success: true as const, id }

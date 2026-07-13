@@ -3,8 +3,8 @@
  *
  * Verifies:
  *   AIPS-SET-02: `setAiModelSetting` (src/actions/ai-settings.ts:47-90) self-enforces
- *     org scope — organisation_id is sourced only from the caller's JWT via
- *     parseJwtPayload(), NEVER from a client-supplied parameter, and both the
+ *     org scope — organisation_id is sourced only from the caller's verified
+ *     session via getSessionContext(), NEVER from a client-supplied parameter, and both the
  *     .upsert() and .delete() calls carry .eq('organisation_id', ctx.organisationId).
  *   AIPS-GAP-02: a regression test proving `ai_model_settings` writes cannot
  *     cross organisation boundaries.
@@ -63,11 +63,13 @@ test.describe('AIPS-SET-02 — ai_model_settings write isolation (source contrac
     expect(params.toLowerCase()).not.toContain('organisationid')
   })
 
-  test('requireAdmin() derives organisationId from JWT claims, not from any function argument', () => {
+  test('requireAdmin() derives organisationId from the verified session, not from any function argument', () => {
     const src = read(AI_SETTINGS_ACTION)
-    // requireAdmin takes no arguments — organisationId can only be JWT-derived.
+    // requireAdmin takes no arguments — organisationId can only be session-derived.
+    // 2026-07-13: getSessionContext() replaced parseJwtPayload (local ES256
+    // JWT verify + member-role read) — same no-spoofable-parameter property.
     expect(src).toMatch(/async function requireAdmin\(\)\s*:/)
-    expect(src).toContain('parseJwtPayload(session.access_token)')
+    expect(src).toContain('getSessionContext()')
   })
 })
 

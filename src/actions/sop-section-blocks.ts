@@ -24,6 +24,7 @@
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { requireAdminContext } from '@/lib/auth/guards'
 import { BlockContentSchema } from '@/lib/validators/blocks'
 import type { BlockContent } from '@/lib/validators/blocks'
 import { BlockProvenanceSchema } from '@/lib/validators/sop'
@@ -39,32 +40,8 @@ import { getBlock } from '@/actions/blocks'
 // Helpers
 // ---------------------------------------------------------------------------
 
-type AdminCtx = {
-  supabase: Awaited<ReturnType<typeof createClient>>
-  user: { id: string }
-  role: string
-  organisationId: string | null
-}
-
-async function requireAdmin(): Promise<AdminCtx | { error: string }> {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  if (!user) return { error: 'Not authenticated' }
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const jwtClaims: Record<string, any> = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
-    : {}
-  const role: string = jwtClaims['user_role'] ?? ''
-  if (!role || !['admin', 'safety_manager'].includes(role)) {
-    return { error: 'Admin access required' }
-  }
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
-  return { supabase, user: { id: user.id }, role, organisationId }
+async function requireAdmin() {
+  return requireAdminContext()
 }
 
 // ---------------------------------------------------------------------------

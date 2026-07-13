@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { fetchYouTubeTranscript } from '@/lib/parsers/fetch-youtube-transcript'
 import { parseSop } from '@/lib/parsers/sop-parser'
@@ -17,27 +17,18 @@ export const maxDuration = 300
 
 export async function POST(request: NextRequest) {
   // --- Server-side auth (same pattern as createUploadSession) ---
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
   }
-
-  // Derive organisationId and role from JWT claims
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? JSON.parse(atob(session.access_token.split('.')[1]))
-    : {}
-  const organisationId: string | null = jwtClaims['organisation_id'] ?? null
   if (!organisationId) {
     return NextResponse.json({ error: 'No organisation found' }, { status: 403 })
   }
-  const role = jwtClaims['user_role']
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return NextResponse.json({ error: 'You need admin access to create SOPs.' }, { status: 403 })
   }
 
-  const uploadedBy = user.id
+  const uploadedBy = userId
 
   // --- Parse request body (client sends only url + termsAccepted) ---
   const body = await request.json()

@@ -14,26 +14,18 @@
  * CLAUDE.md 2026-04-04 pattern: names derived from email via admin.auth.admin.listUsers).
  */
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { parseJwtPayload } from '@/lib/supabase/jwt'
 
 export async function GET() {
-  const supabase = await createClient()
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
-  if (userError || !user) {
+  const { userId, organisationId } = await getSessionContext()
+  if (!userId) {
     return NextResponse.json(
       { error: 'Not authenticated. The shared-device account must be signed in.' },
       { status: 401 },
     )
   }
 
-  // Extract organisation_id from JWT custom claims
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const organisationId: string | null = (jwtClaims['organisation_id'] as string | undefined) ?? null
   if (!organisationId) {
     return NextResponse.json(
       { error: 'No organisation associated with this session.' },

@@ -55,8 +55,9 @@ test.describe('SB-LINE-04 — Voice grounding scope (source contract)', () => {
 
   test('route uses regular Supabase client (NOT admin client) — RLS enforces org + sub-trade gate', () => {
     const src = read(ROUTE)
-    expect(src).toContain("from '@/lib/supabase/server'")
-    expect(src).toContain('createClient()')
+    // 2026-07-13: the session client now arrives via getSessionContext()
+    // (which wraps @/lib/supabase/server createClient) — still RLS-scoped.
+    expect(src).toContain('getSessionContext')
     expect(src).not.toContain('createAdminClient')
   })
 
@@ -69,9 +70,9 @@ test.describe('SB-LINE-04 — Voice grounding scope (source contract)', () => {
     expect(src).not.toMatch(/\.neq\(['"]id['"]/)
   })
 
-  test('route enforces auth via supabase.auth.getUser() (401 envelope)', () => {
+  test('route enforces auth via getSessionContext() (401 envelope)', () => {
     const src = read(ROUTE)
-    expect(src).toMatch(/supabase\.auth\.getUser\(\)/)
+    expect(src).toMatch(/getSessionContext\(\)/)
     expect(src).toMatch(/status:\s*401/)
     expect(src).toContain("error: 'unauthorized'")
   })

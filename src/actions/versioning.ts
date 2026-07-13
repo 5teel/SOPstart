@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { parseJwtPayload } from '@/lib/supabase/jwt'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { computeNextVersionLineage } from '@/lib/builder/version-lineage'
 
 // ------------------------------------------------------------
@@ -17,16 +17,10 @@ export async function uploadNewVersion(
   | { success: true; newSopId: string; uploadUrl: string; token: string; path: string }
   | { success: false; error: string }
 > {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: 'Not authenticated' }
+  const { supabase, userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { success: false, error: 'Not authenticated' }
 
   // Verify admin/safety_manager role
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const role: string | undefined = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { success: false, error: 'You need admin access to upload SOP versions.' }
   }
@@ -42,14 +36,12 @@ export async function uploadNewVersion(
     return { success: false, error: 'SOP not found' }
   }
 
-  // WR-07: extract JWT org and assert it matches the SOP, mirroring cloneSopAsDraft.
+  // WR-07: assert the caller's org matches the SOP, mirroring cloneSopAsDraft.
   // The session-client SOP fetch uses RLS as a first gate, but the admin client below
-  // bypasses RLS — explicit JWT org assertion is the self-enforcing defence-in-depth.
-  const jwtOrgId: string | undefined = jwtClaims['organisation_id'] as string | undefined
-  if (!jwtOrgId || oldSop.organisation_id !== jwtOrgId) {
+  // bypasses RLS — explicit org assertion is the self-enforcing defence-in-depth.
+  if (!organisationId || oldSop.organisation_id !== organisationId) {
     return { success: false, error: 'Access denied: SOP belongs to a different organisation.' }
   }
-  const organisationId: string = oldSop.organisation_id
   // All versions of the same SOP share the same parent_sop_id (the first version's id)
   const newParentId: string = (oldSop.parent_sop_id as string | null) ?? oldSop.id
   const newVersion: number = oldSop.version + 1
@@ -75,7 +67,7 @@ export async function uploadNewVersion(
       source_file_name: file.name,
       source_file_type: fileType,
       source_file_path: '',
-      uploaded_by: user.id,
+      uploaded_by: userId,
       status: 'uploading' as const,
       version: newVersion,
       parent_sop_id: newParentId,
@@ -137,15 +129,9 @@ export async function notifyAssignedWorkers(
   oldSopId: string,
   newSopId: string
 ): Promise<{ success: true; notified: number } | { success: false; error: string }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: 'Not authenticated' }
+  const { supabase, userId, role } = await getSessionContext()
+  if (!userId) return { success: false, error: 'Not authenticated' }
 
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const role: string | undefined = jwtClaims['user_role'] as string | undefined
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { success: false, error: 'You need admin access to notify workers.' }
   }
@@ -299,16 +285,10 @@ export interface VersionRecord {
 export async function cloneSopAsDraft(
   publishedSopId: string
 ): Promise<{ success: true; newDraftId: string } | { success: false; error: string }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: 'Not authenticated' }
+  const { supabase, userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { success: false, error: 'Not authenticated' }
 
-  // JWT role guard — same as uploadNewVersion lines 23–30
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const role: string | undefined = jwtClaims['user_role'] as string | undefined
+  // Role guard — same gate as uploadNewVersion
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { success: false, error: 'You need admin access to clone SOP versions.' }
   }
@@ -325,8 +305,7 @@ export async function cloneSopAsDraft(
   }
 
   // Self-enforce org-scope (CLAUDE.md 2026-06-15): verify source belongs to caller's org
-  const jwtOrgId: string | undefined = jwtClaims['organisation_id'] as string | undefined
-  if (!jwtOrgId || sourceSop.organisation_id !== jwtOrgId) {
+  if (!organisationId || sourceSop.organisation_id !== organisationId) {
     return { success: false, error: 'Access denied: SOP belongs to a different organisation.' }
   }
 
@@ -342,7 +321,7 @@ export async function cloneSopAsDraft(
       source_file_name: sourceSop.source_file_name,
       source_file_type: sourceSop.source_file_type,
       source_file_path: sourceSop.source_file_path,
-      uploaded_by: user.id,
+      uploaded_by: userId,
       status: 'uploading' as const,
       version: newVersion,
       parent_sop_id: newParentId,
@@ -610,16 +589,10 @@ export type SopVersionPayload = {
 export async function getSopVersionForDiff(
   sopId: string
 ): Promise<{ success: true; sop: SopVersionPayload } | { success: false; error: string }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: 'Not authenticated' }
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { success: false, error: 'Not authenticated' }
 
-  // JWT role guard — admin-only route
-  const { data: { session } } = await supabase.auth.getSession()
-  const jwtClaims = session?.access_token
-    ? parseJwtPayload(session.access_token)
-    : {}
-  const role: string | undefined = jwtClaims['user_role'] as string | undefined
+  // Role guard — admin-only route
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     return { success: false, error: 'You need admin access to view version diffs.' }
   }
@@ -638,8 +611,7 @@ export async function getSopVersionForDiff(
   }
 
   // Self-enforce org-scope (T-23-05-01 — admin client bypasses RLS)
-  const jwtOrgId: string | undefined = jwtClaims['organisation_id'] as string | undefined
-  if (!jwtOrgId || sop.organisation_id !== jwtOrgId) {
+  if (!organisationId || sop.organisation_id !== organisationId) {
     return { success: false, error: 'Access denied: SOP belongs to a different organisation.' }
   }
 
@@ -675,9 +647,8 @@ export async function getSopVersionForDiff(
 export async function markNotificationRead(
   notificationId: string
 ): Promise<{ success: true } | { success: false; error: string }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: 'Not authenticated' }
+  const { supabase, userId } = await getSessionContext()
+  if (!userId) return { success: false, error: 'Not authenticated' }
 
   const { error } = await supabase
     .from('worker_notifications')
