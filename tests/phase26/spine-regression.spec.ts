@@ -33,10 +33,16 @@ const read = (rel: string) => fs.readFileSync(path.join(ROOT, rel), 'utf8')
 
 test.describe('R8 — frozen spine regression (post-bespoke swap)', () => {
   // (a) Publish gate — the server verify gate is the safety keystone.
+  // Phase 29 factored the gate out of the route into assertPublishGates()
+  // (publish-core.ts) so the chain-gate divert could reuse it. Assert the gate
+  // WHERE IT LIVES, and that the route still CALLS it — wiring, not presence.
   test('publish route still rejects unverified blocks with 400 unverified_blocks', () => {
-    const src = read('src/app/api/sops/[sopId]/publish/route.ts')
-    expect(src, 'publish must emit the unverified_blocks error').toContain('unverified_blocks')
-    expect(src, 'publish must gate with a 400').toContain('{ status: 400 }')
+    const core = read('src/lib/governance/publish-core.ts')
+    expect(core, 'gate must emit the unverified_blocks error').toContain("error: 'unverified_blocks'")
+    expect(core, 'gate must reject with a 400').toMatch(/unverified_blocks',\s*status:\s*400/)
+
+    const route = read('src/app/api/sops/[sopId]/publish/route.ts')
+    expect(route, 'publish route must call the shared gate').toContain('assertPublishGates(')
   })
 
   // (b) Meta survival — the WHOLE point of D-01/R7: bespoke edit ops must never

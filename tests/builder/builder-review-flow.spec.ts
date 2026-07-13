@@ -114,13 +114,19 @@ test('R7/R10: Shell has handlePublish/onPublish and POST /publish; no VerifyProg
 // ---------------------------------------------------------------------------
 // Test 3: R10 server gate — publish route still returns 400 unverified_blocks
 // ---------------------------------------------------------------------------
+// Phase 29 factored the gate out of the route into assertPublishGates()
+// (publish-core.ts) so the chain-gate divert could reuse the identical checks.
+// Assert the gate WHERE IT LIVES, plus that the route still CALLS it.
 test('R10: Server publish route still contains the 400 unverified_blocks gate', () => {
-  const routeSrc = readSrc('src/app/api/sops/[sopId]/publish/route.ts')
+  const coreSrc = readSrc('src/lib/governance/publish-core.ts')
 
-  expect(routeSrc, "Publish route must contain 'unverified_blocks' literal").toContain(
-    'unverified_blocks',
+  expect(coreSrc, "Publish gate must contain 'unverified_blocks' literal").toContain(
+    "error: 'unverified_blocks'",
   )
-  expect(routeSrc, 'Publish route must contain status: 400').toMatch(/status:\s*400/)
+  expect(coreSrc, 'Publish gate must reject with status: 400').toMatch(/status:\s*400/)
+
+  const routeSrc = readSrc('src/app/api/sops/[sopId]/publish/route.ts')
+  expect(routeSrc, 'Publish route must call the shared gate').toContain('assertPublishGates(')
 })
 
 // ---------------------------------------------------------------------------

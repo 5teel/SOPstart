@@ -33,11 +33,20 @@ import { createClient } from '@/lib/supabase/client'
 import { verifyBlock, unverifyBlock } from '@/actions/sop-section-blocks'
 import { useReviewerFlags } from '@/components/admin/ai-reviewer/useReviewerFlags'
 import type { SourceProvenanceRegion } from '@/lib/parsers/source-viewer'
+import { BlockContentSchema, type BlockContent } from '@/lib/validators/blocks'
 
 export type ChecklistBlock = {
   id: string
   type: string
   preview: string
+  /**
+   * The block's full authored content, kept so the review surface can render
+   * the REAL worker block (via blockContentToPuckProps + BLOCK_COMPONENTS)
+   * instead of a 60-char preview. Already on the fetched row — costs no
+   * extra query. `null` when the snapshot fails BlockContentSchema (unknown
+   * or legacy kind); callers fall back to the preview line.
+   */
+  content: BlockContent | null
   verified_by_admin_id: string | null
   flags_count: number
   provenance: SourceProvenanceRegion | null
@@ -114,10 +123,14 @@ async function fetchBlocks(sopId: string): Promise<ChecklistBlock[]> {
   for (const raw of blockRows as RawBlockRow[]) {
     const snapshot = raw.snapshot_content as { kind?: string } | null
     const kind = (snapshot?.kind as string | undefined) ?? 'unknown'
+    // Validate rather than cast: a legacy/unknown snapshot kind must degrade to
+    // the preview line, never reach blockContentToPuckProps' kind switch.
+    const parsedContent = BlockContentSchema.safeParse(snapshot)
     blocks.push({
       id: raw.id,
       type: kind,
       preview: previewFromSnapshot(snapshot, kind),
+      content: parsedContent.success ? parsedContent.data : null,
       verified_by_admin_id: raw.verified_by_admin_id,
       flags_count: 0, // populated below from reviewer envelope
       provenance: (raw.block_provenance as SourceProvenanceRegion | null) ?? null,

@@ -41,6 +41,46 @@ import type { TranscriptSegment } from '@/components/admin/source-viewer/VideoSo
 import { SourceViewerPane } from '@/components/admin/source-viewer/SourceViewerPane'
 import { NavRow } from './NavRow'
 import { humanizeBlockType } from '@/lib/builder/block-type-labels'
+import { BLOCK_COMPONENTS, type BlockType } from '@/lib/builder/block-registry'
+import {
+  blockContentToPuckProps,
+  blockKindToPuckType,
+} from '@/lib/builder/puck-to-block-content'
+import type { ChecklistBlock } from '@/components/admin/verify-checklist/useVerifyChecklist'
+
+/**
+ * Render the step as the worker actually sees it — the zone's stated promise.
+ *
+ * Uses the SAME BLOCK_COMPONENTS registry the worker read path (LayoutRenderer)
+ * and the edit host (BlockEditShell) use, so there is no forked renderer to
+ * drift. Falls back to the preview line for blocks whose kind has no worker
+ * component (text/heading/callout primitives) or whose snapshot didn't validate.
+ */
+function StepInApp({ block }: { block: ChecklistBlock }): React.JSX.Element {
+  const puckType = block.content ? blockKindToPuckType(block.content.kind) : null
+  const Block = puckType ? BLOCK_COMPONENTS[puckType as BlockType] : undefined
+
+  if (!block.content || !Block) {
+    return (
+      <p
+        style={{
+          fontFamily: 'Inter, sans-serif',
+          fontSize: '14px',
+          lineHeight: 1.55,
+          color: 'var(--ink-700)',
+          margin: 0,
+        }}
+      >
+        {block.preview || 'No preview available for this block.'}
+      </p>
+    )
+  }
+
+  const props = blockContentToPuckProps(block.content)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const BlockAny = Block as any
+  return <BlockAny {...props} />
+}
 
 export type ReviewStationProps = {
   sopId: string
@@ -481,106 +521,85 @@ export function ReviewStation({
                     </span>
                   </div>
 
-                  {/* Step title (h2) */}
-                  <h2
-                    style={{
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '17px',
-                      fontWeight: 600,
-                      lineHeight: 1.2,
-                      color: 'var(--ink-900)',
-                      padding: '16px 16px 8px',
-                      margin: 0,
-                    }}
-                  >
-                    {activeBlock.preview || humanizeBlockType(activeBlock.type)}
-                  </h2>
-
-                  {/* Body prose */}
-                  <div
-                    className="prose"
-                    style={{
-                      fontFamily: 'Inter, sans-serif',
-                      fontSize: '14px',
-                      lineHeight: 1.55,
-                      color: 'var(--ink-700)',
-                      padding: '0 16px 16px',
-                    }}
-                  >
-                    {activeBlock.preview
-                      ? `This step has been parsed from the source document. Review it against the original to the right.`
-                      : 'No preview available for this block.'}
+                  {/* The real worker block. Replaces the old h2-preview +
+                      canned "parsed from the source document" sentence, which
+                      restated the left-rail row and read identically on every
+                      block — nothing to review against the source. */}
+                  <div style={{ padding: '16px' }}>
+                    <StepInApp block={activeBlock} />
                   </div>
                 </div>
 
-                {/* Inline AI Safety Check panel */}
-                <div
-                  style={{
-                    marginTop: '16px',
-                    border: '1px solid var(--ink-300)',
-                    borderRadius: '4px',
-                    overflow: 'hidden',
-                  }}
-                >
-                  {/* AI panel header */}
+                {/* Inline AI Safety Check panel — only when this block HAS flags.
+                    A clean block previously rendered an "all clear" box plus its
+                    own re-run button, repeating identically on every block while
+                    the same re-run action already sits in the page header. Silence
+                    is the correct signal for clean; the header carries the count. */}
+                {hasAiFlags && (
                   <div
                     style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      padding: '8px 12px',
-                      background: 'var(--paper-2, #f4f4f5)',
-                      borderBottom: hasAiFlags ? '1px solid var(--ink-200)' : 'none',
+                      marginTop: '16px',
+                      border: '1px solid var(--ink-300)',
+                      borderRadius: '4px',
+                      overflow: 'hidden',
                     }}
                   >
+                    {/* AI panel header */}
                     <div
                       style={{
                         display: 'flex',
+                        justifyContent: 'space-between',
                         alignItems: 'center',
-                        gap: '8px',
+                        padding: '8px 12px',
+                        background: 'var(--paper-2, #f4f4f5)',
+                        borderBottom: '1px solid var(--ink-200)',
                       }}
                     >
-                      {/* Status dot */}
-                      <span
-                        aria-hidden
+                      <div
                         style={{
-                          width: '7px',
-                          height: '7px',
-                          borderRadius: '50%',
-                          background: hasAiFlags
-                            ? 'var(--accent-measure)'
-                            : 'var(--accent-ok)',
-                          flexShrink: 0,
-                        }}
-                      />
-                      {/* Label */}
-                      <span
-                        style={{
-                          fontFamily: 'JetBrains Mono, monospace',
-                          fontSize: '12px',
-                          fontWeight: 600,
-                          color: 'var(--ink-900)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
                         }}
                       >
-                        {hasAiFlags
-                          ? `AI safety check · ${activeBlockFlags.length} thing${activeBlockFlags.length === 1 ? '' : 's'} to look at`
-                          : 'AI safety check — all clear'}
-                      </span>
+                        {/* Status dot */}
+                        <span
+                          aria-hidden
+                          style={{
+                            width: '7px',
+                            height: '7px',
+                            borderRadius: '50%',
+                            background: 'var(--accent-measure)',
+                            flexShrink: 0,
+                          }}
+                        />
+                        {/* Label */}
+                        <span
+                          style={{
+                            fontFamily: 'JetBrains Mono, monospace',
+                            fontSize: '12px',
+                            fontWeight: 600,
+                            color: 'var(--ink-900)',
+                          }}
+                        >
+                          {`AI safety check · ${activeBlockFlags.length} thing${activeBlockFlags.length === 1 ? '' : 's'} to look at`}
+                        </span>
+                      </div>
+
+                      {/* Re-run button (restyled) */}
+                      <RerunReviewerButton
+                        sopId={sopId}
+                      />
                     </div>
 
-                    {/* Re-run button (restyled) */}
-                    <RerunReviewerButton
+                    {/* Flag rows rendered by ReviewerFlagsPanel */}
+                    <ReviewerFlagsPanel
                       sopId={sopId}
+                      blockId={activeBlock.id}
+                      blockProvenance={activeBlock.provenance}
                     />
                   </div>
-
-                  {/* Flag rows rendered by ReviewerFlagsPanel (renders null when clean) */}
-                  <ReviewerFlagsPanel
-                    sopId={sopId}
-                    blockId={activeBlock.id}
-                    blockProvenance={activeBlock.provenance}
-                  />
-                </div>
+                )}
               </>
             ) : null}
           </div>
