@@ -3,15 +3,27 @@
 /**
  * Phase 21.5 (Plan 21.5-04 Task 1) — Single navigator row in the Review Station.
  *
- * Renders the left-zone (Zone 1) row anatomy per UI-SPEC § "Zone 1 — Step Navigator":
- *   [check-dot 16px] [kind-pill 74px] [label flex-1 truncated] [flag-badge?]
+ * The rail exists for ONE job: let the reviewer scan 48 rows and decide, at a
+ * glance, where to jump. So the row leads with the thing that actually
+ * identifies a step — its text — and demotes everything else.
  *
- * Row states (per UI-SPEC):
+ * Row anatomy:
+ *   [type bar 3px] [check-dot 16px] [ n · TYPE   (muted meta line)      ] [flag?]
+ *                                   [ step text, 2 lines, ink-900       ]
+ *
+ * This replaced an anatomy that led with a 74px uppercase colour-filled kind
+ * pill and pushed the step text into a 12px mono line truncated at ~20 chars.
+ * The pill was the loudest element on every row while carrying the LEAST
+ * information — in a hazards section all 48 rows read "HAZARD" — and the one
+ * discriminating field was the one that got clipped. Type is still present
+ * (colour bar + muted caption, R4 keeps it humanized) but it no longer
+ * out-shouts the content.
+ *
+ * Row states:
  *   - Default:  border 1px transparent; hover → background --paper-2
  *   - Active:   border 1px solid --accent-step; background #eff4ff
  *   - Verified: check dot filled --accent-ok + white ✓; text color --ink-500
  *
- * Kind pill colors come from BLOCK_TYPE_LABELS.pillVariant → CSS class .kind-*.
  * Flag badge appears only when flags_count > 0 && !verified.
  *
  * Presentational only — no data fetching.
@@ -26,69 +38,43 @@ import {
 
 export type NavRowProps = {
   block: ChecklistBlock
+  /** 0-based position; rendered 1-based so the row can be jumped to by number. */
+  index: number
   active: boolean
   onSelect: () => void
 }
 
 /**
- * Map a pillVariant string → inline background + text + border colors.
- * Matches UI-SPEC kind pill color table.
+ * Map a pillVariant string → the block family's accent colour. Carried by a 3px
+ * bar instead of a filled pill: same categorical signal, a fraction of the ink.
  */
-function getPillStyle(pillVariant: string): React.CSSProperties {
+function getAccentColor(pillVariant: string): string {
   switch (pillVariant) {
     case 'kind-haz':
-      return {
-        background: '#fef2f2',
-        color: 'var(--accent-hazard)',
-        border: '1px solid #fca5a5',
-      }
+      return 'var(--accent-hazard)'
     case 'kind-meas':
-      return {
-        background: '#fff5ed',
-        color: 'var(--accent-measure)',
-        border: '1px solid #fdba74',
-      }
+      return 'var(--accent-measure)'
     case 'kind-ins':
-      return {
-        background: '#ecfdff',
-        color: 'var(--accent-mcu)',
-        border: '1px solid #67e8f9',
-      }
+      return 'var(--accent-mcu)'
     case 'kind-dec':
-      return {
-        background: '#fdf2f8',
-        color: 'var(--accent-decision)',
-        border: '1px solid #f9a8d4',
-      }
+      return 'var(--accent-decision)'
     case 'kind-esc':
-      return {
-        background: '#fef2f2',
-        color: 'var(--accent-hazard)',
-        border: '1px solid #fca5a5',
-      }
+      return 'var(--accent-escalate)'
     case 'kind-sign':
-      return {
-        background: '#fffbeb',
-        color: '#b45309',
-        border: '1px solid #fcd34d',
-      }
+      return 'var(--accent-signoff)'
     case 'kind-step':
     default:
-      return {
-        background: '#eff4ff',
-        color: 'var(--accent-step)',
-        border: '1px solid #93c5fd',
-      }
+      return 'var(--accent-step)'
   }
 }
 
-export function NavRow({ block, active, onSelect }: NavRowProps): React.JSX.Element {
+export function NavRow({ block, index, active, onSelect }: NavRowProps): React.JSX.Element {
   const verified = block.verified_by_admin_id !== null
   const showFlagBadge = block.flags_count > 0 && !verified
 
   const entry = BLOCK_TYPE_LABELS[block.type]
   const pillVariant = entry?.pillVariant ?? 'kind-step'
-  const pillStyle = getPillStyle(pillVariant)
+  const accent = getAccentColor(pillVariant)
   const humanLabel = humanizeBlockType(block.type)
 
   return (
@@ -100,6 +86,7 @@ export function NavRow({ block, active, onSelect }: NavRowProps): React.JSX.Elem
       onClick={onSelect}
       role="button"
       tabIndex={0}
+      aria-label={`Step ${index + 1}, ${humanLabel}: ${block.preview}`}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault()
@@ -108,34 +95,45 @@ export function NavRow({ block, active, onSelect }: NavRowProps): React.JSX.Elem
       }}
       style={{
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'stretch',
         gap: '8px',
-        padding: '8px',
+        padding: '7px 8px',
         borderRadius: '3px',
         cursor: 'pointer',
         border: active
           ? '1px solid var(--accent-step)'
           : '1px solid transparent',
         background: active ? '#eff4ff' : 'transparent',
-        color: verified ? 'var(--ink-500)' : 'var(--ink-900)',
         transition: 'background 0.1s ease',
       }}
       className="hover:bg-[var(--paper-2)]"
     >
+      {/* Type bar — the categorical signal, quietly */}
+      <span
+        aria-hidden
+        style={{
+          flexShrink: 0,
+          width: '3px',
+          borderRadius: '2px',
+          background: accent,
+          opacity: verified ? 0.35 : 1,
+        }}
+      />
+
       {/* Check dot — 16×16px */}
       <span
         aria-hidden
         style={{
           flexShrink: 0,
+          alignSelf: 'flex-start',
+          marginTop: '1px',
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
           width: '16px',
           height: '16px',
           borderRadius: '50%',
-          border: verified
-            ? 'none'
-            : '1.5px solid var(--ink-300)',
+          border: verified ? 'none' : '1.5px solid var(--ink-300)',
           background: verified ? 'var(--accent-ok)' : 'transparent',
           color: '#fff',
           fontSize: '10px',
@@ -146,46 +144,53 @@ export function NavRow({ block, active, onSelect }: NavRowProps): React.JSX.Elem
         {verified ? '✓' : null}
       </span>
 
-      {/* Kind pill — 74px fixed width */}
-      <span
-        aria-label={`Block type: ${humanLabel}`}
-        style={{
-          flexShrink: 0,
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: '74px',
-          minWidth: '74px',
-          fontSize: '10px',
-          fontWeight: 600,
-          fontFamily: 'JetBrains Mono, monospace',
-          textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-          borderRadius: '2px',
-          padding: '2px 4px',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          ...pillStyle,
-        }}
-      >
-        {humanLabel}
-      </span>
+      {/* Content — meta line above, step text as the primary element */}
+      <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        {/* Meta: position + type. Small, muted — orientation, not headline. */}
+        <span
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px',
+            fontFamily: 'JetBrains Mono, monospace',
+            fontSize: '9px',
+            fontWeight: 600,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
+            color: 'var(--ink-500)',
+            lineHeight: 1,
+          }}
+        >
+          <span>{index + 1}</span>
+          <span aria-hidden style={{ opacity: 0.5 }}>·</span>
+          <span
+            style={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {humanLabel}
+          </span>
+        </span>
 
-      {/* Label — flex-1 truncated */}
-      <span
-        title={block.preview}
-        style={{
-          flex: 1,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          fontSize: '12px',
-          fontFamily: 'JetBrains Mono, monospace',
-          color: verified ? 'var(--ink-500)' : 'var(--ink-700)',
-        }}
-      >
-        {block.preview}
+        {/* The step itself — what the reviewer actually navigates by. */}
+        <span
+          title={block.preview}
+          style={{
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '13px',
+            lineHeight: 1.35,
+            fontWeight: active ? 600 : 400,
+            color: verified ? 'var(--ink-500)' : 'var(--ink-900)',
+          }}
+        >
+          {block.preview}
+        </span>
       </span>
 
       {/* Flag badge — only when unresolved flags exist */}
@@ -195,6 +200,8 @@ export function NavRow({ block, active, onSelect }: NavRowProps): React.JSX.Elem
           aria-label={`${block.flags_count} unresolved flag(s)`}
           style={{
             flexShrink: 0,
+            alignSelf: 'flex-start',
+            marginTop: '1px',
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',

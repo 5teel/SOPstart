@@ -69,16 +69,20 @@ export type UseVerifyChecklistResult = {
 
 const QUERY_KEY = (sopId: string) => ['verify-checklist', sopId] as const
 
-// 60-char preview from a Puck-block snapshot. We probe the most common
+// Short preview from a Puck-block snapshot. We probe the most common
 // content-bearing fields on the discriminated content shape and fall back
 // to the block type label.
+//
+// 110 chars, not 60: the nav rail's step text is now the row's PRIMARY element
+// and wraps to two lines, so a 60-char clip (tuned for a single truncated mono
+// line) cut most steps mid-phrase — exactly the field the reviewer navigates by.
 function previewFromSnapshot(snapshot: unknown, type: string): string {
   if (snapshot && typeof snapshot === 'object') {
     const s = snapshot as Record<string, unknown>
     const candidates = [s.text, s.title, s.body, s.content, s.heading]
     for (const c of candidates) {
       if (typeof c === 'string' && c.trim().length > 0) {
-        return c.trim().slice(0, 60)
+        return c.trim().slice(0, 110)
       }
     }
   }

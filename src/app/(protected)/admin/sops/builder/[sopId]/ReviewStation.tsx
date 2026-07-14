@@ -680,6 +680,7 @@ export function ReviewStation({
               <NavRow
                 key={block.id}
                 block={block}
+                index={idx}
                 active={idx === activeIdx}
                 onSelect={() => selectAndReveal(idx)}
               />
