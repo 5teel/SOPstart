@@ -416,7 +416,10 @@ export function BlockEditShell({
       {specs.length > 0 && editing && (
         <div
           data-field-strip
-          className="space-y-1.5 px-4 py-3"
+          // pt-10 clears the absolutely-positioned overlay row (verify chip left,
+          // type + tools right). The body used to provide that clearance with its
+          // own p-4; now that the strip stands in for the body, it must too.
+          className="space-y-1.5 px-4 pb-3 pt-10"
         >
           {specs.map((spec) => (
             // data-field is the P14 reachability hook: every Puck-editable field
