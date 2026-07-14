@@ -37,7 +37,7 @@
  * D-21-09 isolation: admin-only; never imported by worker routes.
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useVerifyChecklist } from '@/components/admin/verify-checklist/useVerifyChecklist'
 import {
   useChecklistKeybinds,
@@ -50,8 +50,7 @@ import { useSelectionSync } from '@/components/admin/source-viewer/useSelectionS
 import type { SourcePaneKind } from '@/components/admin/source-viewer/types'
 import type { TranscriptSegment } from '@/components/admin/source-viewer/VideoSourcePreview'
 import { SourceViewerPane } from '@/components/admin/source-viewer/SourceViewerPane'
-import { NavRow } from './NavRow'
-import { humanizeBlockType } from '@/lib/builder/block-type-labels'
+import { NavRow, NavGroupHeader, getGroupAccent } from './NavRow'
 import { BLOCK_COMPONENTS, type BlockType } from '@/lib/builder/block-registry'
 import {
   blockContentToPuckProps,
@@ -152,53 +151,13 @@ function ReviewCard({
         scrollMarginTop: '12px',
       }}
     >
-      {/* Card strip */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '8px 12px',
-          background: active ? '#eff4ff' : 'var(--paper-2, #f4f4f5)',
-          borderBottom: '1px solid var(--ink-200)',
-        }}
-      >
-        {/* Type pill (outline variant) */}
-        <span
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            fontSize: '10px',
-            fontWeight: 600,
-            fontFamily: 'JetBrains Mono, monospace',
-            textTransform: 'uppercase',
-            letterSpacing: '0.08em',
-            color: 'var(--accent-step)',
-            border: '1px solid var(--accent-step)',
-            borderRadius: '2px',
-            padding: '2px 8px',
-          }}
-        >
-          {humanizeBlockType(block.type)}
-        </span>
-
-        {/* Context label */}
-        <span
-          style={{
-            fontFamily: 'JetBrains Mono, monospace',
-            fontSize: '10px',
-            fontWeight: 500,
-            color: 'var(--ink-500)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.06em',
-          }}
-        >
-          Step {index + 1} of {total}
-        </span>
-      </div>
-
-      {/* The real worker block. */}
-      <div style={{ padding: '16px' }}>
+      {/* The real worker block.
+          The old top strip (type pill + "STEP n OF m") is gone: the block
+          renders its own type visually (a hazard card looks like a hazard),
+          and the rail now carries both the type and the step number. Two rows
+          of chrome per card × 48 cards was the vertical-space cost that made
+          the column feel padded. The step marker moved into the action row. */}
+      <div style={{ padding: '12px' }}>
         <StepInApp block={block} />
       </div>
 
@@ -208,7 +167,7 @@ function ReviewCard({
       {hasAiFlags && (
         <div
           style={{
-            margin: '0 16px 16px',
+            margin: '0 12px 12px',
             border: '1px solid var(--ink-300)',
             borderRadius: '4px',
             overflow: 'hidden',
@@ -256,17 +215,32 @@ function ReviewCard({
         </div>
       )}
 
-      {/* Per-block decision — the ONE deliberate act for this block (D-21-07). */}
+      {/* Per-block decision — the ONE deliberate act for this block (D-21-07).
+          Also carries the step marker, so the card needs only this one row of
+          chrome instead of a header strip AND a footer. */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           gap: '8px',
-          padding: '10px 16px',
+          padding: '7px 12px',
           borderTop: '1px solid var(--ink-200)',
           background: verified ? 'rgba(22,163,74,0.06)' : 'var(--paper-2, #f4f4f5)',
         }}
       >
+        <span
+          style={{
+            flexShrink: 0,
+            fontFamily: 'JetBrains Mono, monospace',
+            fontSize: '10px',
+            fontWeight: 500,
+            color: 'var(--ink-500)',
+            letterSpacing: '0.06em',
+          }}
+        >
+          {index + 1}/{total}
+        </span>
+
         {verified ? (
           <>
             <span
@@ -383,6 +357,23 @@ export function ReviewStation({
 
   const { setActiveProvenance } = selection
   const { blocks, activeIdx, activeBlockId, setActiveIdx } = checklist
+
+  /**
+   * Runs of CONSECUTIVE same-type blocks. A real SOP arrives in type blocks —
+   * 14 hazards, then 6 PPE, then 20 steps — so the rail states the type once per
+   * run and hangs the steps under it, instead of stamping the same pill on 14
+   * rows. Runs (not a global group-by) because reading order is the navigation
+   * order: the rail must stay a faithful index of the column beside it.
+   */
+  const navGroups = useMemo(() => {
+    const groups: { type: string; items: { block: ChecklistBlock; idx: number }[] }[] = []
+    blocks.forEach((block, idx) => {
+      const last = groups[groups.length - 1]
+      if (last && last.type === block.type) last.items.push({ block, idx })
+      else groups.push({ type: block.type, items: [{ block, idx }] })
+    })
+    return groups
+  }, [blocks])
 
   useEffect(() => {
     return () => {
@@ -676,14 +667,30 @@ export function ReviewStation({
               gap: '2px',
             }}
           >
-            {blocks.map((block, idx) => (
-              <NavRow
-                key={block.id}
-                block={block}
-                index={idx}
-                active={idx === activeIdx}
-                onSelect={() => selectAndReveal(idx)}
-              />
+            {navGroups.map((group) => (
+              <div key={`${group.type}-${group.items[0]?.idx}`} style={{ marginBottom: '4px' }}>
+                <NavGroupHeader type={group.type} count={group.items.length} />
+                <div
+                  style={{
+                    borderLeft: `2px solid ${getGroupAccent(group.type)}`,
+                    marginLeft: '8px',
+                    paddingLeft: '4px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '1px',
+                  }}
+                >
+                  {group.items.map(({ block, idx }) => (
+                    <NavRow
+                      key={block.id}
+                      block={block}
+                      index={idx}
+                      active={idx === activeIdx}
+                      onSelect={() => selectAndReveal(idx)}
+                    />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </aside>

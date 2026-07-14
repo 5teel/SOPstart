@@ -45,6 +45,83 @@ export type NavRowProps = {
 }
 
 /**
+ * Header for a run of consecutive same-type steps. In a real SOP the types come
+ * in blocks — 14 hazards, then 6 PPE, then 20 steps — so repeating the type on
+ * every row spent the rail's scarcest resource (horizontal space, vertical
+ * rhythm) restating a fact that changes maybe five times in 48 rows. The type
+ * is stated ONCE per run and the steps hang under it as children.
+ */
+export function NavGroupHeader({
+  type,
+  count,
+}: {
+  type: string
+  count: number
+}): React.JSX.Element {
+  const entry = BLOCK_TYPE_LABELS[type]
+  const pillVariant = entry?.pillVariant ?? 'kind-step'
+  const accent = getAccentColor(pillVariant)
+
+  return (
+    <div
+      data-testid="nav-group-header"
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        padding: '6px 4px 4px',
+        background: 'var(--paper, #fafafa)',
+      }}
+    >
+      <span
+        style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          fontFamily: 'JetBrains Mono, monospace',
+          fontSize: '9px',
+          fontWeight: 700,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+          color: accent,
+          borderRadius: '2px',
+          padding: '2px 6px',
+          background: 'color-mix(in srgb, currentColor 10%, transparent)',
+        }}
+      >
+        {humanizeBlockType(type)}
+      </span>
+      <span
+        style={{
+          fontFamily: 'JetBrains Mono, monospace',
+          fontSize: '9px',
+          fontWeight: 500,
+          color: 'var(--ink-500)',
+        }}
+      >
+        {count}
+      </span>
+      <span
+        aria-hidden
+        style={{
+          flex: 1,
+          height: '1px',
+          background: 'var(--ink-100)',
+        }}
+      />
+    </div>
+  )
+}
+
+/** The accent bar colour for a run of steps — exported for the group container. */
+export function getGroupAccent(type: string): string {
+  const entry = BLOCK_TYPE_LABELS[type]
+  return getAccentColor(entry?.pillVariant ?? 'kind-step')
+}
+
+/**
  * Map a pillVariant string → the block family's accent colour. Carried by a 3px
  * bar instead of a filled pill: same categorical signal, a fraction of the ink.
  */
@@ -72,9 +149,9 @@ export function NavRow({ block, index, active, onSelect }: NavRowProps): React.J
   const verified = block.verified_by_admin_id !== null
   const showFlagBadge = block.flags_count > 0 && !verified
 
-  const entry = BLOCK_TYPE_LABELS[block.type]
-  const pillVariant = entry?.pillVariant ?? 'kind-step'
-  const accent = getAccentColor(pillVariant)
+  // The type is no longer rendered on the row (the group header states it once),
+  // but it stays in the accessible name — a screen reader has no group context
+  // when it lands on a row.
   const humanLabel = humanizeBlockType(block.type)
 
   return (
@@ -95,9 +172,9 @@ export function NavRow({ block, index, active, onSelect }: NavRowProps): React.J
       }}
       style={{
         display: 'flex',
-        alignItems: 'stretch',
-        gap: '8px',
-        padding: '7px 8px',
+        alignItems: 'flex-start',
+        gap: '7px',
+        padding: '6px 8px',
         borderRadius: '3px',
         cursor: 'pointer',
         border: active
@@ -108,18 +185,6 @@ export function NavRow({ block, index, active, onSelect }: NavRowProps): React.J
       }}
       className="hover:bg-[var(--paper-2)]"
     >
-      {/* Type bar — the categorical signal, quietly */}
-      <span
-        aria-hidden
-        style={{
-          flexShrink: 0,
-          width: '3px',
-          borderRadius: '2px',
-          background: accent,
-          opacity: verified ? 0.35 : 1,
-        }}
-      />
-
       {/* Check dot — 16×16px */}
       <span
         aria-hidden
@@ -144,53 +209,41 @@ export function NavRow({ block, index, active, onSelect }: NavRowProps): React.J
         {verified ? '✓' : null}
       </span>
 
-      {/* Content — meta line above, step text as the primary element */}
-      <span style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: '2px' }}>
-        {/* Meta: position + type. Small, muted — orientation, not headline. */}
-        <span
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            fontFamily: 'JetBrains Mono, monospace',
-            fontSize: '9px',
-            fontWeight: 600,
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
-            color: 'var(--ink-500)',
-            lineHeight: 1,
-          }}
-        >
-          <span>{index + 1}</span>
-          <span aria-hidden style={{ opacity: 0.5 }}>·</span>
-          <span
-            style={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {humanLabel}
-          </span>
-        </span>
+      {/* Step number — a fixed gutter, so the eye can run down it to find "17". */}
+      <span
+        style={{
+          flexShrink: 0,
+          width: '18px',
+          textAlign: 'right',
+          fontFamily: 'JetBrains Mono, monospace',
+          fontSize: '10px',
+          fontWeight: 600,
+          color: 'var(--ink-500)',
+          lineHeight: 1.5,
+        }}
+      >
+        {index + 1}
+      </span>
 
-        {/* The step itself — what the reviewer actually navigates by. */}
-        <span
-          title={block.preview}
-          style={{
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            fontFamily: 'Inter, sans-serif',
-            fontSize: '13px',
-            lineHeight: 1.35,
-            fontWeight: active ? 600 : 400,
-            color: verified ? 'var(--ink-500)' : 'var(--ink-900)',
-          }}
-        >
-          {block.preview}
-        </span>
+      {/* The step itself — the whole point of the row. The type used to sit here
+          as a caption; it now lives once on the group header above. */}
+      <span
+        title={block.preview}
+        style={{
+          flex: 1,
+          minWidth: 0,
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+          fontFamily: 'Inter, sans-serif',
+          fontSize: '13px',
+          lineHeight: 1.35,
+          fontWeight: active ? 600 : 400,
+          color: verified ? 'var(--ink-500)' : 'var(--ink-900)',
+        }}
+      >
+        {block.preview}
       </span>
 
       {/* Flag badge — only when unresolved flags exist */}
