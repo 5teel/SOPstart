@@ -80,6 +80,20 @@ interface BlockEditShellProps {
    */
   verified?: boolean
   onToggleVerify?: () => void
+  /**
+   * Edit mode for THIS block. Lifted to the host (same idiom as `flagsOpen`) so
+   * only ONE block is open for editing at a time.
+   *
+   * When false the card shows the block exactly as the worker sees it, and the
+   * field editors are NOT in the DOM. When true the fields REPLACE the rendered
+   * block. Previously the strip was always mounted at `opacity-0` and revealed on
+   * hover BELOW the body — so every block rendered its content twice (once as the
+   * worker sees it, once as a column of editable inputs holding the same text),
+   * and the invisible strip still occupied layout height on every card even when
+   * nobody was hovering. Read or edit, never both.
+   */
+  editing?: boolean
+  onToggleEdit?: () => void
 }
 
 function FieldControl({
@@ -196,6 +210,8 @@ export function BlockEditShell({
   onReviewed,
   verified = false,
   onToggleVerify,
+  editing = false,
+  onToggleEdit,
 }: BlockEditShellProps) {
   const type = item.type as BlockType
   // Cast to include undefined: item.type may be an unregistered type.
@@ -306,11 +322,32 @@ export function BlockEditShell({
         <GripVertical size={16} />
       </button>
 
-      {/* Type label + tools — hidden until hover (worker read mode shows none). */}
-      <div className="absolute right-1 top-1 z-10 flex items-center gap-1 opacity-0 group-hover:opacity-100">
+      {/* Type label + tools — hidden until hover (worker read mode shows none).
+          Stays visible while editing, so the way out is always on screen. */}
+      <div
+        className={`absolute right-1 top-1 z-10 flex items-center gap-1 group-hover:opacity-100 ${
+          editing ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
         <span className="px-1 font-mono text-[9px] uppercase tracking-wider text-[var(--ink-500,#71717a)]">
           {humanizeBlockType(item.type)}
         </span>
+        {specs.length > 0 && onToggleEdit && (
+          <button
+            type="button"
+            data-edit-block-tool
+            aria-label={editing ? 'Done editing block' : 'Edit block'}
+            aria-pressed={editing}
+            onClick={onToggleEdit}
+            className={
+              editing
+                ? 'grid h-6 place-items-center rounded border px-2 font-mono text-[10px] font-semibold border-[var(--accent-step,#3b82f6)] text-[var(--accent-step,#3b82f6)]'
+                : 'grid h-6 place-items-center rounded border px-2 font-mono text-[10px] font-semibold border-[var(--ink-300,#d4d4d8)] text-[var(--ink-500,#71717a)] hover:border-[var(--accent-step,#3b82f6)] hover:text-[var(--accent-step,#3b82f6)]'
+            }
+          >
+            {editing ? 'Done' : 'Edit'}
+          </button>
+        )}
         <button
           type="button"
           aria-label="Duplicate block"
@@ -347,18 +384,21 @@ export function BlockEditShell({
 
       {/* Body: the SAME worker component (R2) as the live preview. P13 wraps it
           in the reused 13-04 PuckItemBadgeOverlay so a linked block with a newer
-          library version surfaces the "update ▸" badge (no-op when up to date). */}
-      {selectable && junction ? (
-        <PuckItemBadgeOverlay
-          componentId={item.props.id}
-          componentIdToJunction={badgeMap}
-          onReviewed={onReviewed}
-        >
-          {body}
-        </PuckItemBadgeOverlay>
-      ) : (
-        body
-      )}
+          library version surfaces the "update ▸" badge (no-op when up to date).
+          Hidden while editing — the field editors below take its place, rather
+          than restating its content underneath it. */}
+      {!editing &&
+        (selectable && junction ? (
+          <PuckItemBadgeOverlay
+            componentId={item.props.id}
+            componentIdToJunction={badgeMap}
+            onReviewed={onReviewed}
+          >
+            {body}
+          </PuckItemBadgeOverlay>
+        ) : (
+          body
+        ))}
 
       {/* P13 inline AI-flag panel (reused AS-IS; renders null when clean). One
           panel expanded at a time — `flagsOpen` is lifted to the canvas host. */}
@@ -368,11 +408,15 @@ export function BlockEditShell({
         </div>
       )}
 
-      {/* FIELD_MAP-driven editors (P14) — hover-revealed, every field reachable. */}
-      {specs.length > 0 && (
+      {/* FIELD_MAP-driven editors (P14) — every field reachable, shown only in
+          edit mode. Previously this was `opacity-0 group-hover:opacity-100`,
+          which (a) duplicated the body's content as inputs directly beneath it
+          and (b) still consumed layout height on every card while invisible,
+          because opacity does not remove an element from flow. */}
+      {specs.length > 0 && editing && (
         <div
           data-field-strip
-          className="space-y-1.5 border-t border-[var(--ink-300,#d4d4d8)] px-4 py-2 opacity-0 group-hover:opacity-100"
+          className="space-y-1.5 px-4 py-3"
         >
           {specs.map((spec) => (
             // data-field is the P14 reachability hook: every Puck-editable field

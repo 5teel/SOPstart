@@ -11,6 +11,13 @@
  * tsx subprocess (not in-Playwright): the phase26 project has no `@/` alias + can't
  * load React/CSS in-process (same pattern as scripts/field-patterns-check.tsx).
  * CLI: npx tsx scripts/field-panel-check.tsx
+ *
+ * NOTE: shell renders pass `editing: true`. Field editors live in EDIT mode only.
+ * Read mode renders the worker block and NO field strip — the strip used to be
+ * mounted always at opacity-0 beneath the body, which restated the block's own
+ * content as a column of inputs and consumed layout height on every card. So
+ * reachability is asserted in the mode that owns the fields; the read-mode
+ * negative (no duplicate inputs) is asserted in field-patterns-check.tsx.
  */
 /* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any */
 export {} // isolate module scope (sibling *-check.tsx harnesses share globals otherwise)
@@ -107,7 +114,7 @@ const meta = {
 
   const ppe: Item = { type: 'PPECardBlock', props: { id: 'p2', title: 'PPE', items: ['Gloves'], ...meta } }
   const shell = renderToStaticMarkup(
-    createElement(BlockEditShell as any, { item: ppe, onCommitField: () => {}, onDuplicate: () => {}, onDelete: () => {} })
+    createElement(BlockEditShell as any, { item: ppe, onCommitField: () => {}, onDuplicate: () => {}, onDelete: () => {}, editing: true })
   )
   check(shell.includes('data-edit-fields-tool'), 'BlockEditShell did not render the ⚙ edit-fields trigger for a C-field block')
   check(shell.includes('data-open-field-panel'), 'BlockEditShell strip did not render the per-field open-panel affordance')
@@ -115,7 +122,7 @@ const meta = {
   // A block with no C field (Text) shows NO ⚙ trigger.
   const text: Item = { type: 'TextBlock', props: { id: 't', content: 'hi', ...meta } }
   const textShell = renderToStaticMarkup(
-    createElement(BlockEditShell as any, { item: text, onCommitField: () => {}, onDuplicate: () => {}, onDelete: () => {} })
+    createElement(BlockEditShell as any, { item: text, onCommitField: () => {}, onDuplicate: () => {}, onDelete: () => {}, editing: true })
   )
   check(!textShell.includes('data-edit-fields-tool'), 'TextBlock (no C field) should NOT render the ⚙ edit-fields trigger')
 }

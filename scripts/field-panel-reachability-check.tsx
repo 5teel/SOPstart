@@ -12,6 +12,13 @@
  *
  * tsx subprocess: the phase26 project has no `@/` alias + can't load React/CSS
  * in-process. CLI: npx tsx scripts/field-panel-reachability-check.tsx
+ *
+ * NOTE: shell renders pass `editing: true`. Field editors live in EDIT mode only.
+ * Read mode renders the worker block and NO field strip — the strip used to be
+ * mounted always at opacity-0 beneath the body, which restated the block's own
+ * content as a column of inputs and consumed layout height on every card. So
+ * reachability is asserted in the mode that owns the fields; the read-mode
+ * negative (no duplicate inputs) is asserted in field-patterns-check.tsx.
  */
 /* eslint-disable @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any */
 export {} // isolate module scope (sibling *-check.tsx harnesses share globals otherwise)
@@ -58,6 +65,7 @@ for (const type of types) {
         onCommitField: () => {},
         onDuplicate: () => {},
         onDelete: () => {},
+        editing: true,
       })
     )
   } catch (e) {
@@ -101,7 +109,7 @@ for (const type of types) {
 {
   const item = { type: 'PhotoBlock', props: { id: 'e', src: null, alt: '', caption: '', ...meta } }
   const markup = renderToStaticMarkup(
-    createElement(BlockEditShell as any, { item, onCommitField: () => {}, onDuplicate: () => {}, onDelete: () => {} })
+    createElement(BlockEditShell as any, { item, onCommitField: () => {}, onDuplicate: () => {}, onDelete: () => {}, editing: true })
   )
   check(markup.includes('data-field="src"'), 'E: Photo src field has no reachability row')
   check(markup.includes('data-media-grid'), 'E: Photo src should render the unified MediaGrid (26-09)')
@@ -111,7 +119,7 @@ for (const type of types) {
 {
   const item = { type: 'VisualBlock', props: { id: 'v', items: [], ...meta } }
   const markup = renderToStaticMarkup(
-    createElement(BlockEditShell as any, { item, onCommitField: () => {}, onDuplicate: () => {}, onDelete: () => {} })
+    createElement(BlockEditShell as any, { item, onCommitField: () => {}, onDuplicate: () => {}, onDelete: () => {}, editing: true })
   )
   check(markup.includes('data-field="items"'), 'E: Visual items field has no reachability row')
   check(markup.includes('data-add-media'), 'E: Visual block should offer the add-media affordance')

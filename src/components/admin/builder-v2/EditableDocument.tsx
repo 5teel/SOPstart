@@ -96,6 +96,9 @@ interface SortableBlockProps {
   flagsOpen: boolean
   onToggleFlags: () => void
   onReviewed: () => void
+  /** Edit mode for this block — lifted so only ONE block edits at a time. */
+  editing: boolean
+  onToggleEdit: () => void
   /** P8 per-block verify (26-12). */
   verified: boolean
   onToggleVerify: () => void
@@ -121,6 +124,8 @@ function SortableBlock({
   flagsOpen,
   onToggleFlags,
   onReviewed,
+  editing,
+  onToggleEdit,
   verified,
   onToggleVerify,
 }: SortableBlockProps) {
@@ -150,6 +155,8 @@ function SortableBlock({
       flagsOpen={flagsOpen}
       onToggleFlags={onToggleFlags}
       onReviewed={onReviewed}
+      editing={editing}
+      onToggleEdit={onToggleEdit}
       verified={verified}
       onToggleVerify={onToggleVerify}
     />
@@ -287,6 +294,11 @@ export function EditableDocument({
   // (UI-SPEC: only one flags panel expanded at a time).
   const reviewer = useReviewerFlags(sopId)
   const [openFlagsFor, setOpenFlagsFor] = useState<string | null>(null)
+
+  // The ONE block currently open for editing. Same single-open idiom as
+  // `openFlagsFor`: a canvas full of expanded field forms is exactly the
+  // duplicate-content wall this replaced.
+  const [editingBlockId, setEditingBlockId] = useState<string | null>(null)
 
   // P8 per-block verify — writes through the EXISTING verify action (server gate
   // untouched, authoritative). Refresh junctions (chip state) + invalidate the
@@ -489,6 +501,10 @@ export function EditableDocument({
                     setOpenFlagsFor((prev) => (prev === item.props.id ? null : item.props.id))
                   }
                   onReviewed={refreshJunctions}
+                  editing={editingBlockId === item.props.id}
+                  onToggleEdit={() =>
+                    setEditingBlockId((prev) => (prev === item.props.id ? null : item.props.id))
+                  }
                   verified={!!junction?.verified_by_admin_id}
                   onToggleVerify={() => {
                     if (jId) void toggleVerify(jId, !!junction?.verified_by_admin_id)

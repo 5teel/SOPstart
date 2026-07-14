@@ -100,7 +100,12 @@ const meta = {
   check(content[0].props.junctionId === 'junc-x', 'junctionId dropped on A commit')
 }
 
-// ── Wiring: BlockEditShell mounts an A/B/D control per FIELD_MAP entry. ────────
+// ── Wiring: BlockEditShell mounts an A/B/D control per FIELD_MAP entry. ───────
+// Fields are reachable in EDIT mode (`editing: true`). Read mode deliberately
+// renders NO field strip: it used to mount the strip always at opacity-0 below
+// the block, which restated the block's content as inputs and stole layout
+// height on every card. Read or edit, never both — so reachability is asserted
+// in the mode that owns it, plus a negative assertion that read mode is clean.
 {
   const hazard: Item = {
     type: 'HazardCardBlock',
@@ -112,6 +117,7 @@ const meta = {
       onCommitField: () => {},
       onDuplicate: () => {},
       onDelete: () => {},
+      editing: true,
     })
   )
   check(markup.includes('data-field-strip'), 'shell did not render the FIELD_MAP field strip')
@@ -130,10 +136,33 @@ const meta = {
       onCommitField: () => {},
       onDuplicate: () => {},
       onDelete: () => {},
+      editing: true,
     })
   )
   check(vMarkup.includes('data-inline-token'), 'shell did not render an InlineToken (Pattern D) for maxDurationSec')
   check(vMarkup.includes('data-enum-chip'), 'shell did not render an EnumChip (Pattern B) for language')
+
+  // Read mode (the default) must NOT duplicate the block as editable inputs.
+  const readMarkup = renderToStaticMarkup(
+    createElement(BlockEditShell as any, {
+      item: hazard,
+      onCommitField: () => {},
+      onDuplicate: () => {},
+      onDelete: () => {},
+    })
+  )
+  check(
+    !readMarkup.includes('data-field-strip'),
+    'read mode still mounts the field strip — the block content is duplicated as inputs below itself'
+  )
+  check(
+    !readMarkup.includes('aria-label="Edit body"'),
+    'read mode still mounts an editable copy of the body text'
+  )
+  check(
+    readMarkup.includes('Keep clear'),
+    'read mode must still render the worker block itself'
+  )
 }
 
 if (failures.length > 0) {
