@@ -103,21 +103,41 @@
   .sop-card.off .state { background: var(--paper-2); color: var(--ink-500); }
   .illum-headline { font-size: 13px; color: var(--ink-700); margin-bottom: 12px; }
   .illum-headline b { font-weight: 700; }
+
+  /* In-page view switcher — the affordance that SHIPS (decision 2026-07-17):
+     one permissions surface, Wiring default, Matrix + Illuminate as views. */
+  .view-toggle {
+    margin-left: auto; display: inline-flex; border: 1px solid var(--ink-300);
+    border-radius: 3px; overflow: hidden; background: var(--paper-1);
+  }
+  .view-toggle button {
+    font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: 0.05em;
+    text-transform: uppercase; padding: 5px 12px; border: none; background: transparent;
+    color: var(--ink-500); cursor: pointer;
+  }
+  .view-toggle button + button { border-left: 1px solid var(--ink-300); }
+  .view-toggle button.on { background: var(--ink-900); color: #fff; }
 </style>
 </head>
 <body>
 
 <div id="variant-nav">
   <span class="sketch-title">002 · Permission Wiring</span>
-  <button class="variant-tab active" onclick="showVariant('a', event)">A: Patch Bay</button>
-  <button class="variant-tab" onclick="showVariant('b', event)">B: Access Matrix</button>
-  <button class="variant-tab" onclick="showVariant('c', event)">C: Select &amp; Illuminate</button>
+  <button class="variant-tab active" data-v="a" onclick="showVariant('a')">★ A: Patch Bay</button>
+  <button class="variant-tab" data-v="b" onclick="showVariant('b')">B: Access Matrix</button>
+  <button class="variant-tab" data-v="c" onclick="showVariant('c')">C: Select &amp; Illuminate</button>
 </div>
 
 <!-- ════════════════ VARIANT A — PATCH BAY ════════════════ -->
 <div id="variant-a" class="variant active">
   <div class="page">
-    <div class="page-head"><span class="pill">LIBRARY ACCESS</span><h1>Who sees what</h1></div>
+    <div class="page-head"><span class="pill">LIBRARY ACCESS</span><h1>Who sees what</h1>
+      <span class="view-toggle">
+        <button class="on">⌇ Wiring</button>
+        <button onclick="showVariant('b')">▦ Matrix</button>
+        <button onclick="showVariant('c')">◉ Illuminate</button>
+      </span>
+    </div>
     <div class="page-sub">Org units on the left, library collections on the right, access drawn as wires. Click either side to trace its connections.</div>
 
     <div class="bay bg-grid" id="bay" style="border:1px solid var(--ink-300); border-radius:6px; padding:24px;">
@@ -199,7 +219,13 @@
 <!-- ════════════════ VARIANT B — ACCESS MATRIX ════════════════ -->
 <div id="variant-b" class="variant">
   <div class="page">
-    <div class="page-head"><span class="pill">LIBRARY ACCESS</span><h1>Access matrix</h1></div>
+    <div class="page-head"><span class="pill">LIBRARY ACCESS</span><h1>Access matrix</h1>
+      <span class="view-toggle">
+        <button onclick="showVariant('a')">⌇ Wiring</button>
+        <button class="on">▦ Matrix</button>
+        <button onclick="showVariant('c')">◉ Illuminate</button>
+      </span>
+    </div>
     <div class="page-sub">Every org unit × every collection on one screen. Click any cell to toggle. Dashed = inherited from Whole site.</div>
 
     <div class="matrix">
@@ -285,7 +311,13 @@
 <!-- ════════════════ VARIANT C — SELECT & ILLUMINATE ════════════════ -->
 <div id="variant-c" class="variant">
   <div class="page">
-    <div class="page-head"><span class="pill">LIBRARY ACCESS</span><h1>Select &amp; illuminate</h1></div>
+    <div class="page-head"><span class="pill">LIBRARY ACCESS</span><h1>Select &amp; illuminate</h1>
+      <span class="view-toggle">
+        <button onclick="showVariant('a')">⌇ Wiring</button>
+        <button onclick="showVariant('b')">▦ Matrix</button>
+        <button class="on">◉ Illuminate</button>
+      </span>
+    </div>
     <div class="page-sub">Pick anyone on the left — the library lights up with what they can see and why. Click a collection to grant / revoke for the selection.</div>
 
     <div class="illum">
@@ -326,11 +358,13 @@
 </div>
 
 <script>
-function showVariant(id, ev) {
+// Winner (2026-07-17): Patch Bay (Wiring) is the default view; Matrix and
+// Illuminate remain as alternative views on the in-page toggle.
+function showVariant(id) {
   document.querySelectorAll('.variant').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.variant-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.variant-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.v === id));
   document.getElementById('variant-' + id).classList.add('active');
-  ev.target.classList.add('active');
   if (id === 'a') requestAnimationFrame(drawWires);
 }
 

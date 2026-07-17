@@ -101,15 +101,29 @@
   .tree-row .rowmeta { font-family: var(--mono); font-size: 10px; color: var(--ink-500); }
   .tree-add { padding: 6px 14px 6px 66px; }
   .tree-add.at-role { padding-left: 40px; }
+
+  /* In-page view switcher — the affordance that SHIPS (decision 2026-07-17):
+     one org surface, Chart default, Columns as alternative view. */
+  .view-toggle {
+    margin-left: auto; display: inline-flex; border: 1px solid var(--ink-300);
+    border-radius: 3px; overflow: hidden; background: var(--paper-1);
+  }
+  .view-toggle button {
+    font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: 0.05em;
+    text-transform: uppercase; padding: 5px 12px; border: none; background: transparent;
+    color: var(--ink-500); cursor: pointer;
+  }
+  .view-toggle button + button { border-left: 1px solid var(--ink-300); }
+  .view-toggle button.on { background: var(--ink-900); color: #fff; }
 </style>
 </head>
 <body>
 
 <div id="variant-nav">
   <span class="sketch-title">001 · Org Model Canvas</span>
-  <button class="variant-tab active" onclick="showVariant('a', event)">A: Column Builder</button>
-  <button class="variant-tab" onclick="showVariant('b', event)">B: Node Chart</button>
-  <button class="variant-tab" onclick="showVariant('c', event)">C: Outline Tree</button>
+  <button class="variant-tab" data-v="a" onclick="showVariant('a')">A: Column Builder</button>
+  <button class="variant-tab active" data-v="b" onclick="showVariant('b')">★ B: Node Chart</button>
+  <button class="variant-tab" data-v="c" onclick="showVariant('c')">C: Outline Tree</button>
 </div>
 
 <!-- ════════════════ VARIANT A — COLUMN BUILDER ════════════════ -->
@@ -118,6 +132,10 @@
     <div class="page-head">
       <span class="pill">ORG MODEL</span>
       <h1>Visy Glass — Kawerau</h1>
+      <span class="view-toggle">
+        <button onclick="showVariant('b')">⊞ Chart</button>
+        <button class="on">▤ Columns</button>
+      </span>
     </div>
     <div class="page-sub">Departments are columns · roles are cards · people are chips. Everything added in place.</div>
 
@@ -238,6 +256,10 @@
     <div class="page-head">
       <span class="pill">ORG MODEL</span>
       <h1>Visy Glass — Kawerau</h1>
+      <span class="view-toggle">
+        <button class="on">⊞ Chart</button>
+        <button onclick="showVariant('a')">▤ Columns</button>
+      </span>
     </div>
     <div class="page-sub">A spatial org chart on grid paper — same language as the SOP Flow tab. Click a node to select.</div>
 
@@ -432,12 +454,15 @@
 </div>
 
 <script>
-function showVariant(id, ev) {
+function showVariant(id) {
   document.querySelectorAll('.variant').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.variant-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.variant-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.v === id));
   document.getElementById('variant-' + id).classList.add('active');
-  ev.target.classList.add('active');
 }
+// Winner (2026-07-17): Node Chart is the default view; Columns is the
+// alternative reachable via the in-page toggle. Open on the winner.
+showVariant('b');
 function selectNode(el) {
   document.querySelectorAll('.node').forEach(n => n.classList.remove('selected'));
   el.classList.add('selected');

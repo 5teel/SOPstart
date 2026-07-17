@@ -14,5 +14,9 @@ Paper/ink engineering-drawing system (established in the blueprint-redesign expl
 
 | # | Name | Design Question | Winner | Tags |
 |---|------|----------------|--------|------|
-| 001 | org-model-canvas | How does a business draw departments → roles → people quickly (named or unnamed)? | — | org-model, departments, roles |
-| 002 | permission-wiring | How do SOP-access connections read at a glance across 1:N, N:1, N:M? | — | permissions, library-access |
+| 001 | org-model-canvas | How does a business draw departments → roles → people quickly (named or unnamed)? | B (Node Chart default · Columns alt view) | org-model, departments, roles |
+| 002 | permission-wiring | How do SOP-access connections read at a glance across 1:N, N:1, N:M? | A (Patch Bay default · Matrix + Illuminate alt views) | permissions, library-access |
+
+## Decisions
+
+- **2026-07-17 — Multi-view, not either/or.** Both surfaces ship as ONE page with an in-page view toggle (pattern validated in the sketches themselves): org model = ⊞ Chart (default) / ▤ Columns; library access = ⌇ Wiring (default) / ▦ Matrix / ◉ Illuminate. All views are lenses over the same underlying model — no view has private state.

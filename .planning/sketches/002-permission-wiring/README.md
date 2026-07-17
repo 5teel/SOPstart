@@ -2,9 +2,14 @@
 sketch: 002
 name: permission-wiring
 question: "How do SOP-library access connections read at a glance across one-to-many, many-to-one, and many-to-many?"
-winner: null
+winner: "A"
 tags: [permissions, library-access, departments, at-a-glance]
 ---
+
+> **Decision (2026-07-17):** Patch Bay (A) is the DEFAULT view; Access Matrix (B)
+> and Select & Illuminate (C) both ship as alternative views on an in-page
+> ⌇ Wiring / ▦ Matrix / ◉ Illuminate toggle (affordance added to the sketch).
+> One permissions surface, three lenses over the same access model.
 
 # Sketch 002: Permission Wiring
 

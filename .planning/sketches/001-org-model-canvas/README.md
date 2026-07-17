@@ -2,9 +2,13 @@
 sketch: 001
 name: org-model-canvas
 question: "How does a business draw departments → roles → people quickly, with named or unnamed role-holders?"
-winner: null
+winner: "B"
 tags: [org-model, departments, roles, people, onboarding]
 ---
+
+> **Decision (2026-07-17):** Node Chart (B) is the DEFAULT view; Column Builder (A)
+> ships alongside it as an alternative view on an in-page ⊞ Chart / ▤ Columns
+> toggle (affordance added to the sketch). Outline Tree (C) explored, not shipping.
 
 # Sketch 001: Org Model Canvas
 
