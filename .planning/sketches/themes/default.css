@@ -1,0 +1,120 @@
+/* SOPstart sketch theme — paper/ink engineering-drawing system.
+ * Mirrors src/styles/blueprint-theme.css tokens so sketches preview
+ * what the shipped app can actually render. */
+
+:root {
+  color-scheme: light; /* sketches are light-only; stop Chrome auto-dark inverting the canvas */
+  --paper: #fafafa;
+  --paper-1: #ffffff;
+  --paper-2: #f4f4f5;
+  --ink-900: #09090b;
+  --ink-700: #27272a;
+  --ink-600: #52525b;
+  --ink-500: #71717a;
+  --ink-400: #a1a1aa;
+  --ink-300: #d4d4d8;
+  --ink-200: #e4e4e7;
+  --ink-100: #e4e4e7;
+
+  /* Semantic accents — one per role, never decorative */
+  --accent-step: #3b82f6;      /* blue — procedural */
+  --accent-measure: #2563eb;
+  --accent-decision: #d97706;
+  --accent-hazard: #b91c1c;    /* red — hazards */
+  --accent-escalate: #dc2626;
+  --accent-ok: #16a34a;        /* green — done/granted */
+  --accent-signoff: #16a34a;
+  --accent-zone: #0891b2;      /* cyan */
+  --accent-inspect: #7c3aed;   /* violet */
+  --accent-voice: #ea580c;     /* orange */
+  --brand-yellow: #fbbf24;
+
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sans: Inter, system-ui, -apple-system, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html { background: var(--paper); }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink-900);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.mono { font-family: var(--mono); }
+
+/* 20px grid-paper background for canvases */
+.bg-grid {
+  background-image:
+    linear-gradient(var(--ink-200) 1px, transparent 1px),
+    linear-gradient(90deg, var(--ink-200) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-color: var(--paper);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border: 1px solid var(--ink-300);
+  border-radius: 2px;
+  padding: 2px 8px;
+  color: var(--ink-500);
+  background: var(--paper-1);
+}
+
+/* Blueprint corner-tick frame */
+.blueprint-frame {
+  position: relative;
+  background: var(--paper-1);
+  border: 1px solid var(--ink-300);
+  border-radius: 3px;
+  padding: 12px;
+}
+
+/* Variant tab bar (fixed top) */
+#variant-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9998;
+  background: var(--ink-900);
+  padding: 8px 16px;
+  display: flex; gap: 8px; align-items: center;
+  font-family: var(--mono);
+}
+#variant-nav .sketch-title {
+  color: var(--paper);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-right: 12px;
+}
+.variant-tab {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 2px;
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+  cursor: pointer;
+  letter-spacing: 0.03em;
+}
+.variant-tab.active {
+  background: var(--brand-yellow);
+  border-color: var(--brand-yellow);
+  color: var(--ink-900);
+}
+.variant { display: none; }
+.variant.active { display: block; }
+
+body { padding-top: 46px; }

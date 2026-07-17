@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sketch 001 — Org Model Canvas</title>
+<link rel="stylesheet" href="../themes/default.css?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { font-family: var(--sans); }
+
+  .page { max-width: 1280px; margin: 0 auto; padding: 24px; }
+  .page-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px; }
+  .page-head h1 { font-family: var(--mono); font-size: 20px; margin: 0; }
+  .page-sub { font-family: var(--mono); font-size: 11px; color: var(--ink-500); margin-bottom: 20px; }
+
+  /* ---------- shared atoms ---------- */
+  .dept-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+  .person-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1px solid var(--ink-300); border-radius: 999px;
+    background: var(--paper-1); padding: 3px 10px 3px 4px;
+    font-size: 12px; color: var(--ink-700); cursor: default;
+  }
+  .person-chip .avatar {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--ink-900); color: #fff;
+    font-family: var(--mono); font-size: 9px; font-weight: 700;
+    display: grid; place-items: center;
+  }
+  .person-chip.vacant { border-style: dashed; color: var(--ink-500); background: transparent; }
+  .person-chip.vacant .avatar { background: transparent; border: 1.5px dashed var(--ink-400); color: var(--ink-400); }
+  .add-ghost {
+    display: inline-flex; align-items: center; gap: 4px;
+    border: 1px dashed var(--ink-300); border-radius: 999px;
+    background: transparent; padding: 4px 10px;
+    font-family: var(--mono); font-size: 10px; color: var(--ink-500);
+    cursor: pointer;
+  }
+  .add-ghost:hover { border-color: var(--accent-step); color: var(--accent-step); }
+
+  .role-count { font-family: var(--mono); font-size: 10px; color: var(--ink-500); }
+
+  /* ---------- Variant A: column builder ---------- */
+  .col-board { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 20px; align-items: flex-start; }
+  .dept-col {
+    flex: 0 0 250px; background: var(--paper-2);
+    border: 1px solid var(--ink-300); border-radius: 6px; padding: 10px;
+  }
+  .dept-col-head { display: flex; align-items: center; gap: 8px; padding: 2px 4px 10px; }
+  .dept-col-head .name { font-family: var(--mono); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; flex: 1; }
+  .role-card {
+    background: var(--paper-1); border: 1px solid var(--ink-300); border-radius: 4px;
+    padding: 8px 10px; margin-bottom: 8px;
+  }
+  .role-card .role-name { font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .role-card .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .add-col {
+    flex: 0 0 200px; border: 1.5px dashed var(--ink-300); border-radius: 6px;
+    display: grid; place-items: center; min-height: 120px;
+    font-family: var(--mono); font-size: 11px; color: var(--ink-500); cursor: pointer;
+  }
+  .add-col:hover { border-color: var(--accent-step); color: var(--accent-step); }
+
+  /* ---------- Variant B: node canvas ---------- */
+  .canvas-wrap { position: relative; height: 660px; border: 1px solid var(--ink-300); border-radius: 6px; overflow: hidden; }
+  .canvas-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .node {
+    position: absolute; background: var(--paper-1);
+    border: 1.5px solid var(--ink-300); border-radius: 5px;
+    padding: 8px 12px; cursor: pointer; min-width: 130px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .node.selected { border-color: var(--accent-step); box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
+  .node .kicker { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-500); display: flex; align-items: center; gap: 5px; }
+  .node .title { font-size: 13px; font-weight: 700; margin-top: 2px; }
+  .node .meta { font-family: var(--mono); font-size: 10px; color: var(--ink-500); margin-top: 2px; }
+  .node.org-root { border-width: 2px; border-color: var(--ink-900); }
+  .node .mini-chips { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; max-width: 190px; }
+  .mini-chip {
+    font-size: 10px; padding: 1px 7px; border-radius: 999px;
+    border: 1px solid var(--ink-300); background: var(--paper-2); color: var(--ink-700);
+  }
+  .mini-chip.vacant { border-style: dashed; color: var(--ink-400); background: transparent; }
+  .canvas-hint { position: absolute; bottom: 10px; left: 12px; font-family: var(--mono); font-size: 10px; color: var(--ink-500); }
+
+  /* ---------- Variant C: outline tree ---------- */
+  .tree { max-width: 720px; border: 1px solid var(--ink-300); border-radius: 6px; background: var(--paper-1); overflow: hidden; }
+  .tree-row { display: flex; align-items: center; gap: 8px; padding: 7px 14px; border-bottom: 1px solid var(--ink-100); cursor: default; }
+  .tree-row:hover { background: var(--paper-2); }
+  .tree-row .twisty { font-family: var(--mono); font-size: 10px; color: var(--ink-400); width: 14px; cursor: pointer; user-select: none; }
+  .tree-row.lvl-1 { padding-left: 14px; }
+  .tree-row.lvl-2 { padding-left: 40px; }
+  .tree-row.lvl-3 { padding-left: 66px; }
+  .tree-row .label { flex: 1; display: flex; align-items: center; gap: 8px; }
+  .tree-row.dept .label { font-family: var(--mono); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .tree-row.role .label { font-weight: 600; font-size: 13px; }
+  .tree-row.person .label { font-size: 13px; color: var(--ink-700); }
+  .tree-row.person.vacant .label { color: var(--ink-400); font-style: italic; }
+  .tree-row .rowmeta { font-family: var(--mono); font-size: 10px; color: var(--ink-500); }
+  .tree-add { padding: 6px 14px 6px 66px; }
+  .tree-add.at-role { padding-left: 40px; }
+</style>
+</head>
+<body>
+
+<div id="variant-nav">
+  <span class="sketch-title">001 · Org Model Canvas</span>
+  <button class="variant-tab active" onclick="showVariant('a', event)">A: Column Builder</button>
+  <button class="variant-tab" onclick="showVariant('b', event)">B: Node Chart</button>
+  <button class="variant-tab" onclick="showVariant('c', event)">C: Outline Tree</button>
+</div>
+
+<!-- ════════════════ VARIANT A — COLUMN BUILDER ════════════════ -->
+<div id="variant-a" class="variant active">
+  <div class="page">
+    <div class="page-head">
+      <span class="pill">ORG MODEL</span>
+      <h1>Visy Glass — Kawerau</h1>
+    </div>
+    <div class="page-sub">Departments are columns · roles are cards · people are chips. Everything added in place.</div>
+
+    <div class="col-board">
+
+      <div class="dept-col">
+        <div class="dept-col-head">
+          <span class="dept-dot" style="background:var(--accent-step)"></span>
+          <span class="name">Forming</span>
+          <span class="role-count">3 roles · 5 people</span>
+        </div>
+        <div class="role-card">
+          <div class="role-name">Shift Supervisor <span class="role-count">1/1</span></div>
+          <div class="chips">
+            <span class="person-chip"><span class="avatar">TH</span>Tane Hohepa</span>
+          </div>
+        </div>
+        <div class="role-card">
+          <div class="role-name">Forming Operator <span class="role-count">3/4</span></div>
+          <div class="chips">
+            <span class="person-chip"><span class="avatar">SM</span>Sarah Mitchell</span>
+            <span class="person-chip"><span class="avatar">DK</span>Dave Kowalski</span>
+            <span class="person-chip"><span class="avatar">LO</span>Liam O'Connor</span>
+            <span class="person-chip vacant"><span class="avatar">+</span>Operator — night shift</span>
+            <button class="add-ghost" onclick="addChip(this)">+ person</button>
+          </div>
+        </div>
+        <div class="role-card">
+          <div class="role-name">IS Machine Specialist <span class="role-count">1/1</span></div>
+          <div class="chips">
+            <span class="person-chip"><span class="avatar">MP</span>Mike Peters</span>
+          </div>
+        </div>
+        <button class="add-ghost" style="width:100%;justify-content:center;border-radius:4px;">+ Add role</button>
+      </div>
+
+      <div class="dept-col">
+        <div class="dept-col-head">
+          <span class="dept-dot" style="background:var(--accent-zone)"></span>
+          <span class="name">Cold End</span>
+          <span class="role-count">2 roles · 3 people</span>
+        </div>
+        <div class="role-card">
+          <div class="role-name">Cold End Operator <span class="role-count">2/2</span></div>
+          <div class="chips">
+            <span class="person-chip"><span class="avatar">AN</span>Aroha Ngata</span>
+            <span class="person-chip"><span class="avatar">JB</span>Jim Bolger</span>
+          </div>
+        </div>
+        <div class="role-card">
+          <div class="role-name">Palletiser Operator <span class="role-count">1/2</span></div>
+          <div class="chips">
+            <span class="person-chip"><span class="avatar">RT</span>Rangi Te Ao</span>
+            <span class="person-chip vacant"><span class="avatar">+</span>Palletiser — unfilled</span>
+          </div>
+        </div>
+        <button class="add-ghost" style="width:100%;justify-content:center;border-radius:4px;">+ Add role</button>
+      </div>
+
+      <div class="dept-col">
+        <div class="dept-col-head">
+          <span class="dept-dot" style="background:var(--accent-inspect)"></span>
+          <span class="name">Quality</span>
+          <span class="role-count">2 roles · 3 people</span>
+        </div>
+        <div class="role-card">
+          <div class="role-name">QA Inspector <span class="role-count">2/2</span></div>
+          <div class="chips">
+            <span class="person-chip"><span class="avatar">HK</span>Hemi Kata</span>
+            <span class="person-chip"><span class="avatar">EW</span>Emma Watson</span>
+          </div>
+        </div>
+        <div class="role-card">
+          <div class="role-name">Lab Technician <span class="role-count">1/1</span></div>
+          <div class="chips">
+            <span class="person-chip"><span class="avatar">PS</span>Priya Sharma</span>
+          </div>
+        </div>
+        <button class="add-ghost" style="width:100%;justify-content:center;border-radius:4px;">+ Add role</button>
+      </div>
+
+      <div class="dept-col">
+        <div class="dept-col-head">
+          <span class="dept-dot" style="background:var(--accent-voice)"></span>
+          <span class="name">Maintenance</span>
+          <span class="role-count">3 roles · 3 people</span>
+        </div>
+        <div class="role-card">
+          <div class="role-name">Fitter <span class="role-count">1/2</span></div>
+          <div class="chips">
+            <span class="person-chip"><span class="avatar">SC</span>Steve Chen</span>
+            <span class="person-chip vacant"><span class="avatar">+</span>Fitter — day shift</span>
+          </div>
+        </div>
+        <div class="role-card">
+          <div class="role-name">Electrician <span class="role-count">1/1</span></div>
+          <div class="chips">
+            <span class="person-chip"><span class="avatar">MW</span>Moana Waititi</span>
+          </div>
+        </div>
+        <div class="role-card">
+          <div class="role-name">Maintenance Planner <span class="role-count">1/1</span></div>
+          <div class="chips">
+            <span class="person-chip"><span class="avatar">GR</span>Grace Ropata</span>
+          </div>
+        </div>
+        <button class="add-ghost" style="width:100%;justify-content:center;border-radius:4px;">+ Add role</button>
+      </div>
+
+      <div class="add-col">+ ADD DEPARTMENT</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ VARIANT B — NODE CHART ════════════════ -->
+<div id="variant-b" class="variant">
+  <div class="page">
+    <div class="page-head">
+      <span class="pill">ORG MODEL</span>
+      <h1>Visy Glass — Kawerau</h1>
+    </div>
+    <div class="page-sub">A spatial org chart on grid paper — same language as the SOP Flow tab. Click a node to select.</div>
+
+    <div class="canvas-wrap bg-grid">
+      <svg class="canvas-svg">
+        <!-- root → departments -->
+        <path d="M 560 86 C 560 130, 150 120, 150 160" fill="none" stroke="#a1a1aa" stroke-width="1.5"/>
+        <path d="M 560 86 C 560 130, 425 120, 425 160" fill="none" stroke="#a1a1aa" stroke-width="1.5"/>
+        <path d="M 560 86 C 560 130, 700 120, 700 160" fill="none" stroke="#a1a1aa" stroke-width="1.5"/>
+        <path d="M 560 86 C 560 130, 975 120, 975 160" fill="none" stroke="#a1a1aa" stroke-width="1.5"/>
+        <!-- departments → roles -->
+        <path d="M 150 214 C 150 250, 90 244, 90 280"  fill="none" stroke="#d4d4d8" stroke-width="1.5"/>
+        <path d="M 150 214 C 150 250, 235 244, 235 280" fill="none" stroke="#d4d4d8" stroke-width="1.5"/>
+        <path d="M 150 214 C 150 330, 160 350, 160 420" fill="none" stroke="#d4d4d8" stroke-width="1.5"/>
+        <path d="M 425 214 C 425 250, 390 244, 390 280" fill="none" stroke="#d4d4d8" stroke-width="1.5"/>
+        <path d="M 425 214 C 425 320, 500 330, 500 400" fill="none" stroke="#d4d4d8" stroke-width="1.5"/>
+        <path d="M 700 214 C 700 250, 672 244, 672 280" fill="none" stroke="#d4d4d8" stroke-width="1.5"/>
+        <path d="M 700 214 C 700 330, 740 350, 740 430" fill="none" stroke="#d4d4d8" stroke-width="1.5"/>
+        <path d="M 975 214 C 975 250, 930 244, 930 280" fill="none" stroke="#d4d4d8" stroke-width="1.5"/>
+        <path d="M 975 214 C 975 330, 1010 350, 1010 430" fill="none" stroke="#d4d4d8" stroke-width="1.5"/>
+      </svg>
+
+      <div class="node org-root" style="left:490px; top:36px;" onclick="selectNode(this)">
+        <div class="kicker">ORGANISATION</div>
+        <div class="title">Visy Glass — Kawerau</div>
+        <div class="meta">4 departments · 14 people · 3 vacancies</div>
+      </div>
+
+      <div class="node" style="left:88px; top:160px;" onclick="selectNode(this)">
+        <div class="kicker"><span class="dept-dot" style="background:var(--accent-step)"></span>FORMING</div>
+        <div class="title">Forming</div>
+        <div class="meta">3 roles · 5 people</div>
+      </div>
+      <div class="node" style="left:30px; top:280px;" onclick="selectNode(this)">
+        <div class="kicker">ROLE</div>
+        <div class="title">Shift Supervisor</div>
+        <div class="mini-chips"><span class="mini-chip">Tane H.</span></div>
+      </div>
+      <div class="node" style="left:180px; top:280px;" onclick="selectNode(this)">
+        <div class="kicker">ROLE</div>
+        <div class="title">Forming Operator</div>
+        <div class="mini-chips" style="max-width:150px;">
+          <span class="mini-chip">Sarah M.</span><span class="mini-chip">Dave K.</span>
+          <span class="mini-chip">Liam O.</span><span class="mini-chip vacant">+ night shift</span>
+        </div>
+      </div>
+      <div class="node" style="left:100px; top:420px;" onclick="selectNode(this)">
+        <div class="kicker">ROLE</div>
+        <div class="title">IS Machine Specialist</div>
+        <div class="mini-chips"><span class="mini-chip">Mike P.</span></div>
+      </div>
+
+      <div class="node" style="left:363px; top:160px;" onclick="selectNode(this)">
+        <div class="kicker"><span class="dept-dot" style="background:var(--accent-zone)"></span>COLD END</div>
+        <div class="title">Cold End</div>
+        <div class="meta">2 roles · 3 people</div>
+      </div>
+      <div class="node" style="left:368px; top:280px;" onclick="selectNode(this)">
+        <div class="kicker">ROLE</div>
+        <div class="title">Cold End Operator</div>
+        <div class="mini-chips"><span class="mini-chip">Aroha N.</span><span class="mini-chip">Jim B.</span></div>
+      </div>
+      <div class="node" style="left:440px; top:400px;" onclick="selectNode(this)">
+        <div class="kicker">ROLE</div>
+        <div class="title">Palletiser Operator</div>
+        <div class="mini-chips"><span class="mini-chip">Rangi T.</span><span class="mini-chip vacant">+ unfilled</span></div>
+      </div>
+
+      <div class="node" style="left:640px; top:160px;" onclick="selectNode(this)">
+        <div class="kicker"><span class="dept-dot" style="background:var(--accent-inspect)"></span>QUALITY</div>
+        <div class="title">Quality</div>
+        <div class="meta">2 roles · 3 people</div>
+      </div>
+      <div class="node" style="left:610px; top:280px;" onclick="selectNode(this)">
+        <div class="kicker">ROLE</div>
+        <div class="title">QA Inspector</div>
+        <div class="mini-chips"><span class="mini-chip">Hemi K.</span><span class="mini-chip">Emma W.</span></div>
+      </div>
+      <div class="node" style="left:680px; top:430px;" onclick="selectNode(this)">
+        <div class="kicker">ROLE</div>
+        <div class="title">Lab Technician</div>
+        <div class="mini-chips"><span class="mini-chip">Priya S.</span></div>
+      </div>
+
+      <div class="node" style="left:912px; top:160px;" onclick="selectNode(this)">
+        <div class="kicker"><span class="dept-dot" style="background:var(--accent-voice)"></span>MAINTENANCE</div>
+        <div class="title">Maintenance</div>
+        <div class="meta">3 roles · 3 people</div>
+      </div>
+      <div class="node" style="left:870px; top:280px;" onclick="selectNode(this)">
+        <div class="kicker">ROLE</div>
+        <div class="title">Fitter</div>
+        <div class="mini-chips"><span class="mini-chip">Steve C.</span><span class="mini-chip vacant">+ day shift</span></div>
+      </div>
+      <div class="node" style="left:950px; top:430px;" onclick="selectNode(this)">
+        <div class="kicker">ROLE</div>
+        <div class="title">Electrician</div>
+        <div class="mini-chips"><span class="mini-chip">Moana W.</span></div>
+      </div>
+
+      <div class="node" style="left:1120px; top:160px; border-style:dashed; color:var(--ink-500);" onclick="selectNode(this)">
+        <div class="kicker">+ NEW</div>
+        <div class="title" style="color:var(--ink-500)">Add department</div>
+      </div>
+
+      <div class="canvas-hint">CLICK NODE TO SELECT · DOUBLE-CLICK TO RENAME · DRAG TO REPOSITION (real build)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ VARIANT C — OUTLINE TREE ════════════════ -->
+<div id="variant-c" class="variant">
+  <div class="page">
+    <div class="page-head">
+      <span class="pill">ORG MODEL</span>
+      <h1>Visy Glass — Kawerau</h1>
+    </div>
+    <div class="page-sub">Text-first outline — fastest possible entry. Tab to indent, Enter for a sibling. Reads like a site roster.</div>
+
+    <div class="tree">
+      <div class="tree-row dept lvl-1">
+        <span class="twisty" onclick="toggleGroup(this,'g-form')">▾</span>
+        <span class="label"><span class="dept-dot" style="background:var(--accent-step)"></span>Forming</span>
+        <span class="rowmeta">3 roles · 5 people</span>
+      </div>
+      <div data-group="g-form">
+        <div class="tree-row role lvl-2"><span class="twisty">▾</span><span class="label">Shift Supervisor</span><span class="rowmeta">1/1</span></div>
+        <div class="tree-row person lvl-3"><span class="twisty"></span><span class="label">Tane Hohepa</span><span class="rowmeta">tane.h@visy.co.nz</span></div>
+        <div class="tree-row role lvl-2"><span class="twisty">▾</span><span class="label">Forming Operator</span><span class="rowmeta">3/4</span></div>
+        <div class="tree-row person lvl-3"><span class="twisty"></span><span class="label">Sarah Mitchell</span><span class="rowmeta">day</span></div>
+        <div class="tree-row person lvl-3"><span class="twisty"></span><span class="label">Dave Kowalski</span><span class="rowmeta">day</span></div>
+        <div class="tree-row person lvl-3"><span class="twisty"></span><span class="label">Liam O'Connor</span><span class="rowmeta">swing</span></div>
+        <div class="tree-row person vacant lvl-3"><span class="twisty"></span><span class="label">Operator — night shift (unfilled)</span><span class="rowmeta">vacancy</span></div>
+        <div class="tree-add"><button class="add-ghost">+ person</button></div>
+        <div class="tree-row role lvl-2"><span class="twisty">▾</span><span class="label">IS Machine Specialist</span><span class="rowmeta">1/1</span></div>
+        <div class="tree-row person lvl-3"><span class="twisty"></span><span class="label">Mike Peters</span><span class="rowmeta">day</span></div>
+        <div class="tree-add at-role"><button class="add-ghost">+ role</button></div>
+      </div>
+
+      <div class="tree-row dept lvl-1">
+        <span class="twisty" onclick="toggleGroup(this,'g-cold')">▾</span>
+        <span class="label"><span class="dept-dot" style="background:var(--accent-zone)"></span>Cold End</span>
+        <span class="rowmeta">2 roles · 3 people</span>
+      </div>
+      <div data-group="g-cold">
+        <div class="tree-row role lvl-2"><span class="twisty">▾</span><span class="label">Cold End Operator</span><span class="rowmeta">2/2</span></div>
+        <div class="tree-row person lvl-3"><span class="twisty"></span><span class="label">Aroha Ngata</span><span class="rowmeta">day</span></div>
+        <div class="tree-row person lvl-3"><span class="twisty"></span><span class="label">Jim Bolger</span><span class="rowmeta">night</span></div>
+        <div class="tree-row role lvl-2"><span class="twisty">▾</span><span class="label">Palletiser Operator</span><span class="rowmeta">1/2</span></div>
+        <div class="tree-row person lvl-3"><span class="twisty"></span><span class="label">Rangi Te Ao</span><span class="rowmeta">day</span></div>
+        <div class="tree-row person vacant lvl-3"><span class="twisty"></span><span class="label">Palletiser — unfilled</span><span class="rowmeta">vacancy</span></div>
+        <div class="tree-add at-role"><button class="add-ghost">+ role</button></div>
+      </div>
+
+      <div class="tree-row dept lvl-1">
+        <span class="twisty" onclick="toggleGroup(this,'g-qual')">▾</span>
+        <span class="label"><span class="dept-dot" style="background:var(--accent-inspect)"></span>Quality</span>
+        <span class="rowmeta">2 roles · 3 people</span>
+      </div>
+      <div data-group="g-qual">
+        <div class="tree-row role lvl-2"><span class="twisty">▾</span><span class="label">QA Inspector</span><span class="rowmeta">2/2</span></div>
+        <div class="tree-row person lvl-3"><span class="twisty"></span><span class="label">Hemi Kata</span><span class="rowmeta">day</span></div>
+        <div class="tree-row person lvl-3"><span class="twisty"></span><span class="label">Emma Watson</span><span class="rowmeta">night</span></div>
+        <div class="tree-row role lvl-2"><span class="twisty">▾</span><span class="label">Lab Technician</span><span class="rowmeta">1/1</span></div>
+        <div class="tree-row person lvl-3"><span class="twisty"></span><span class="label">Priya Sharma</span><span class="rowmeta">day</span></div>
+        <div class="tree-add at-role"><button class="add-ghost">+ role</button></div>
+      </div>
+
+      <div class="tree-row dept lvl-1">
+        <span class="twisty" onclick="toggleGroup(this,'g-main')">▾</span>
+        <span class="label"><span class="dept-dot" style="background:var(--accent-voice)"></span>Maintenance</span>
+        <span class="rowmeta">3 roles · 3 people</span>
+      </div>
+      <div data-group="g-main">
+        <div class="tree-row role lvl-2"><span class="twisty">▾</span><span class="label">Fitter</span><span class="rowmeta">1/2</span></div>
+        <div class="tree-row person lvl-3"><span class="twisty"></span><span class="label">Steve Chen</span><span class="rowmeta">night</span></div>
+        <div class="tree-row person vacant lvl-3"><span class="twisty"></span><span class="label">Fitter — day shift (unfilled)</span><span class="rowmeta">vacancy</span></div>
+        <div class="tree-row role lvl-2"><span class="twisty">▾</span><span class="label">Electrician</span><span class="rowmeta">1/1</span></div>
+        <div class="tree-row person lvl-3"><span class="twisty"></span><span class="label">Moana Waititi</span><span class="rowmeta">day</span></div>
+        <div class="tree-row role lvl-2"><span class="twisty">▾</span><span class="label">Maintenance Planner</span><span class="rowmeta">1/1</span></div>
+        <div class="tree-row person lvl-3"><span class="twisty"></span><span class="label">Grace Ropata</span><span class="rowmeta">day</span></div>
+        <div class="tree-add at-role"><button class="add-ghost">+ role</button></div>
+      </div>
+
+      <div class="tree-add" style="padding-left:14px;"><button class="add-ghost">+ department</button></div>
+    </div>
+  </div>
+</div>
+
+<div id="sketch-tools" style="position:fixed;bottom:12px;right:12px;z-index:9999;font-family:system-ui;font-size:12px;background:rgba(0,0,0,0.7);color:white;padding:8px 12px;border-radius:8px;opacity:0.4;transition:opacity 0.2s;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.4'">
+  sketch 001 · paper/ink theme
+</div>
+
+<script>
+function showVariant(id, ev) {
+  document.querySelectorAll('.variant').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.variant-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('variant-' + id).classList.add('active');
+  ev.target.classList.add('active');
+}
+function selectNode(el) {
+  document.querySelectorAll('.node').forEach(n => n.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function toggleGroup(twisty, group) {
+  const g = document.querySelector('[data-group="' + group + '"]');
+  const open = g.style.display !== 'none';
+  g.style.display = open ? 'none' : '';
+  twisty.textContent = open ? '▸' : '▾';
+}
+function addChip(btn) {
+  const chip = document.createElement('span');
+  chip.className = 'person-chip vacant';
+  chip.innerHTML = '<span class="avatar">+</span>New role holder (unnamed)';
+  btn.parentNode.insertBefore(chip, btn);
+}
+</script>
+</body>
+</html>
