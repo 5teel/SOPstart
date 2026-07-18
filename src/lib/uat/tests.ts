@@ -549,6 +549,31 @@ export const UAT_TESTS: UatTest[] = [
       'D-09 (two surfaces: builder agentview panel, org /admin/agent dashboard), D-10 (strictly read-only metadata + approve/decline the only interactive affordance), D-11 (proposals queue primary, activity feed secondary, no cross-SOP graph viz), D-14 (activity feed proves the layer is alive). Both server actions and UI verified behaviourally (agent-panel-readonly.spec.ts, agent-dashboard.spec.ts) — this UAT entry is the human "does it feel right" check.',
   },
 
+  {
+    id: 'p32-org-model-team-view',
+    dateAdded: '2026-07-18',
+    category: 'Phase 32 — Visual Org Model',
+    title: 'Does the org chart make it easy to see and grow your team structure?',
+    status: 'active',
+    summary:
+      'The Team tab is now a visual org model: a chart of your areas, departments, roles and people, with a Columns view for adding people fast. Open roles you haven\'t filled yet show up as a dashed "Vacant" chip instead of just being missing.',
+    tryIt: [
+      'Open Team from the admin nav — you should see a chart with your organisation at the top branching down to departments and roles.',
+      'Click the ▤ Columns button top-right and confirm departments render as side-by-side columns with role cards.',
+      'Try the "+ Add role" and "+ ADD DEPARTMENT" dashed buttons in either view.',
+      'Open "Manage members, invites & org roles" at the bottom of Columns and confirm inviting people and changing someone\'s org role still works exactly as before.',
+    ],
+    links: [{ label: 'Team & org model', href: '/admin/team' }],
+    questions: [
+      { id: 'chart-clear', text: 'Was it clear from the chart how your org is structured?' },
+      { id: 'columns-fast', text: 'Did Columns feel faster for adding roles/departments than the chart?' },
+      { id: 'vacancy-clear', text: 'Was an unfilled role obviously different from an error or missing data?' },
+      { id: 'member-mgmt-intact', text: 'Could you still invite people and change their org role without trouble?' },
+    ],
+    background:
+      'D-08 — /admin/team becomes the org model; AdminNav stays 5 tabs (UX-02). Node Chart (layoutOrgTree, 32-06) is the default view; Columns (32-07) wins on raw entry speed and absorbs the Phase 15/25 RoleAssignmentTable roster as a collapsible sub-panel so invite/org-role/department-picker editing is never lost. Vacancies (budgeted_count - filled) render as first-class dashed chips, never styled as an error.',
+  },
+
   // ---------------------------------------------------------------------------
   // TEMPLATE — copy this to put a new design choice or check to the team.
   // Set status:'archived' once it's decided.

@@ -1,20 +1,22 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { getSessionContext } from '@/lib/auth/session-context'
-import RoleAssignmentTable from '@/components/admin/RoleAssignmentTable'
 import { AdminNav } from '@/components/admin/AdminNav'
 import { listDepartments } from '@/actions/departments'
+import { listOrgTree } from '@/actions/org-model'
+import { TeamViewShell } from '@/components/admin/org-model/TeamViewShell'
 
 export const metadata: Metadata = {
   title: 'Manage Team',
 }
 
 /**
- * Phase 15 / Wave 4 — Manage Team page.
- *
- * Phase 25 extension: fetches departments + passes them to RoleAssignmentTable so the
- * Departments column (member-mode DepartmentPicker + DChip + owner badge) is rendered.
- * The sub-trade section below RoleAssignmentTable is retained for backward-compat.
+ * Phase 32-07 (D-08) — /admin/team is now the org model surface: Node Chart
+ * (org -> area -> department -> role) renders by default with an in-page
+ * ⊞ Chart / ▤ Columns toggle (TeamViewShell). Columns absorbs the Phase
+ * 15/25 member roster (RoleAssignmentTable — invite, org-privilege role,
+ * department picker) as a collapsible sub-panel; nothing was deleted.
+ * AdminNav stays 5 tabs, Team tab still lands here (UX-02).
  */
 export default async function AdminTeamPage() {
   const { supabase, userId, role, organisationId } = await getSessionContext()
@@ -25,32 +27,43 @@ export default async function AdminTeamPage() {
     redirect('/dashboard')
   }
 
-  // Org invite code + departments are independent reads — fetch concurrently.
-  const [{ data: org }, departments] = await Promise.all([
+  // Independent reads — fetch concurrently ([2026-07-13] no serial waterfall).
+  const [{ data: org }, departments, tree] = await Promise.all([
     supabase
       .from('organisations')
-      .select('id, invite_code')
+      .select('id, invite_code, name')
       .eq('id', organisationId ?? '')
       .single(),
     listDepartments(),
+    listOrgTree(),
   ])
 
   if (!org) redirect('/dashboard')
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-8">
       <AdminNav active="team" />
 
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--ink-900)]">Manage Team</h1>
+          <h1 className="text-2xl font-bold text-[var(--ink-900)]">Team &amp; Org Model</h1>
           <p className="text-xs mt-1" style={{ color: 'var(--ink-500)' }}>
-            Invite people, set their role, and place them in one or more departments.
+            Draw your org structure — areas, departments, roles and people — or switch to Columns to add people fast.
           </p>
         </div>
       </div>
 
-      <RoleAssignmentTable orgId={org.id} inviteCode={org.invite_code} departments={departments} />
+      {'error' in tree ? (
+        <p className="text-sm text-red-500">Could not load the org model: {tree.error}</p>
+      ) : (
+        <TeamViewShell
+          tree={tree}
+          orgName={org.name ?? 'Organisation'}
+          orgId={org.id}
+          inviteCode={org.invite_code}
+          departments={departments}
+        />
+      )}
     </div>
   )
 }
