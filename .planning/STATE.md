@@ -2,17 +2,16 @@
 gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
-current_plan: 8
-status: phase_complete
-stopped_at: Completed 30-08-PLAN.md (Phase 30 final wave — phase gate green)
-last_updated: "2026-07-13T00:30:00.000Z"
-last_activity: 2026-07-13 -- Phase 30 complete (30-08 governance fold + one-line rows + gate)
+status: completed
+stopped_at: Phase 32 context gathered
+last_updated: "2026-07-18T06:08:01.335Z"
+last_activity: 2026-07-13 -- 30-08 executed (UX-03 governance fold + UX-06 one-line rows + phase gate)
 progress:
-  total_phases: 4
+  total_phases: 5
   completed_phases: 3
   total_plans: 20
   completed_plans: 20
-  percent: 75
+  percent: 60
 ---
 
 # Project State
@@ -472,7 +471,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-12T15:50:59.511Z
-Stopped at: Completed 30-07-PLAN.md
+Last session: 2026-07-18T06:08:01.325Z
+Stopped at: Phase 32 context gathered
 Resume file:
-None
+.planning/phases/32-visual-org-model-library-permissions/32-CONTEXT.md
