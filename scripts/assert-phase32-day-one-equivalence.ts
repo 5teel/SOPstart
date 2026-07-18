@@ -8,6 +8,15 @@
  * Usage:
  *   npx tsx scripts/assert-phase32-day-one-equivalence.ts --capture   (run BEFORE db push)
  *   npx tsx scripts/assert-phase32-day-one-equivalence.ts --verify    (run AFTER db push)
+ *   npx tsx scripts/assert-phase32-day-one-equivalence.ts --diff-materialization
+ *     (WR-02: diff the resolver's dept set vs live sop_departments for EVERY
+ *      SOP — not a single sample. 00047 Step C seeds one (department,
+ *      collection) grant per pair that exists via sop_departments, which
+ *      widens a department that saw ONE SOP in a category to the WHOLE
+ *      collection on first re-materialization. Run this BEFORE any grant CRUD
+ *      / re-materialization on prod: exit 0 = materialization is a no-op
+ *      everywhere; exit 1 = the listed SOPs would change, review before
+ *      proceeding.)
  *
  * Requirements:
  *   - .env.local must contain:
@@ -243,14 +252,106 @@ async function verify() {
   }
 }
 
+// ---------------------------------------------------------------------------
+// WR-02: full-corpus materialization diff — resolver output vs sop_departments
+// for EVERY SOP (the person-grant-rls faithfulness spec samples ONE SOP, which
+// can pass while siblings in the same collection diverge). Mirrors
+// grants.ts materializeSopAccessForOrg's department computation exactly.
+// ponytail: unpaginated reads — fine at current prod scale (<1000 rows/table);
+// switch to .range() paging if any table outgrows PostgREST's 1000-row default.
+// ---------------------------------------------------------------------------
+async function diffMaterialization() {
+  console.log('=== Phase 32 Materialization Diff — resolver vs live sop_departments (ALL SOPs) ===')
+  console.log('Target:', SUPABASE_URL)
+  console.log('')
+
+  const { resolveEffectiveAccess } = await import('../src/lib/org-model/resolve-access')
+
+  const [{ data: sops }, { data: sopDepts }, { data: sopColls }, { data: depts }, { data: grants }] = await Promise.all([
+    admin.from('sops').select('id, organisation_id, title'),
+    admin.from('sop_departments').select('sop_id, department_id'),
+    admin.from('sop_collections').select('sop_id, collection_id'),
+    admin.from('departments').select('id, organisation_id, area_id, archived'),
+    admin.from('access_grants').select('organisation_id, subject_type, subject_id, collection_id'),
+  ])
+
+  const actualBySop = new Map<string, Set<string>>()
+  for (const r of (sopDepts ?? []) as Array<{ sop_id: string; department_id: string }>) {
+    if (!actualBySop.has(r.sop_id)) actualBySop.set(r.sop_id, new Set())
+    actualBySop.get(r.sop_id)!.add(r.department_id)
+  }
+  const collsBySop = new Map<string, Set<string>>()
+  for (const r of (sopColls ?? []) as Array<{ sop_id: string; collection_id: string }>) {
+    if (!collsBySop.has(r.sop_id)) collsBySop.set(r.sop_id, new Set())
+    collsBySop.get(r.sop_id)!.add(r.collection_id)
+  }
+  const deptsByOrg = new Map<string, Array<{ id: string; area_id: string | null }>>()
+  for (const d of (depts ?? []) as Array<{ id: string; organisation_id: string; area_id: string | null; archived: boolean }>) {
+    if (d.archived) continue
+    if (!deptsByOrg.has(d.organisation_id)) deptsByOrg.set(d.organisation_id, [])
+    deptsByOrg.get(d.organisation_id)!.push({ id: d.id, area_id: d.area_id })
+  }
+  const grantsByOrg = new Map<string, Record<string, string[]>>()
+  for (const g of (grants ?? []) as Array<{ organisation_id: string; subject_type: string; subject_id: string | null; collection_id: string }>) {
+    const key = g.subject_type === 'org' ? g.organisation_id : g.subject_id
+    if (!key) continue
+    if (!grantsByOrg.has(g.organisation_id)) grantsByOrg.set(g.organisation_id, {})
+    const byUnit = grantsByOrg.get(g.organisation_id)!
+    ;(byUnit[key] ??= []).push(g.collection_id)
+  }
+
+  let diverged = 0
+  let checked = 0
+  for (const sop of (sops ?? []) as Array<{ id: string; organisation_id: string | null; title: string | null }>) {
+    if (!sop.organisation_id) continue
+    const sopCollectionIds = collsBySop.get(sop.id) ?? new Set<string>()
+    const actual = actualBySop.get(sop.id) ?? new Set<string>()
+    // grants.ts CR-02 guard: a SOP with no collection is never materialized —
+    // its sop_departments rows are preserved as-is, so no diff to report.
+    if (sopCollectionIds.size === 0) continue
+    checked++
+
+    const grantsByUnit = grantsByOrg.get(sop.organisation_id) ?? {}
+    const computed = new Set<string>()
+    for (const d of deptsByOrg.get(sop.organisation_id) ?? []) {
+      const chain = d.area_id
+        ? [{ unitId: sop.organisation_id, subjectType: 'org' as const }, { unitId: d.area_id, subjectType: 'area' as const }, { unitId: d.id, subjectType: 'department' as const }]
+        : [{ unitId: sop.organisation_id, subjectType: 'org' as const }, { unitId: d.id, subjectType: 'department' as const }]
+      const access = resolveEffectiveAccess(chain, grantsByUnit)
+      const collections = new Set<string>([...access.direct, ...Object.keys(access.inherited)])
+      if ([...sopCollectionIds].some(c => collections.has(c))) computed.add(d.id)
+    }
+
+    const gained = [...computed].filter(d => !actual.has(d))
+    const lost = [...actual].filter(d => !computed.has(d))
+    if (gained.length > 0 || lost.length > 0) {
+      diverged++
+      console.error(`  DIVERGES  SOP ${sop.id} (${sop.title ?? 'untitled'})`)
+      if (gained.length > 0) console.error(`            would GAIN departments: ${gained.join(', ')}`)
+      if (lost.length > 0) console.error(`            would LOSE departments: ${lost.join(', ')}`)
+    }
+  }
+
+  console.log('')
+  console.log(`Checked ${checked} collection-bearing SOPs; ${diverged} diverge from current sop_departments.`)
+  if (diverged > 0) {
+    console.error('=== DIVERGENCE FOUND — re-materialization would CHANGE worker visibility for the SOPs above. Review before any grant CRUD on those collections. ===')
+    process.exit(1)
+  }
+  console.log('=== EQUIVALENT — materialization is a no-op for every SOP ===')
+  process.exit(0)
+}
+
 async function main() {
   const mode = process.argv[2]
   if (mode === '--capture') {
     await capture()
   } else if (mode === '--verify') {
     await verify()
+  } else if (mode === '--diff-materialization') {
+    await diffMaterialization()
   } else {
-    console.error('Usage: npx tsx scripts/assert-phase32-day-one-equivalence.ts --capture|--verify')
+    console.error('Usage: npx tsx scripts/assert-phase32-day-one-equivalence.ts --capture|--verify|--diff-materialization')
     process.exit(1)
   }
 }
