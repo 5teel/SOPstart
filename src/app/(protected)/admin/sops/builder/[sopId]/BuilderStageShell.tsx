@@ -369,8 +369,23 @@ export function BuilderStageShell({
             flexShrink: 0,
           }}
         >
-          {/* Left: SOP title + version */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {/* Left: back-link + SOP title + version — the single navigation/
+              identity row (32-uat: BuilderClient no longer repeats the title) */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <Link
+              href="/admin/sops"
+              style={{
+                fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                fontSize: 12,
+                color: '#a1a1aa',
+                textDecoration: 'none',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+              }}
+            >
+              ← Library
+            </Link>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {sopTitle && (
               <span
                 style={{
@@ -401,17 +416,45 @@ export function BuilderStageShell({
                 v{sopVersion}
               </span>
             )}
+            </div>
           </div>
 
-          {/* Right-of-center: actions menu + flow-graph preview + edit + stepper */}
+          {/* Right-of-center: labelled tools cluster + stepper (progress) */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            {/* Phase 30 (30-07) — UX-06 labelled per-SOP action menu */}
-            <SopActionsMenu sopId={sopId} isDraft={initialSop.status === 'draft'} />
-            {/* Phase 24 Plan 03 — FLOW-05: "Edit flow" re-surfaces FlowGraphEditor
-                outside the suppressed Puck right sidebar via a portaled modal.
-                No Puck hook is called — avoids CLAUDE.md 2026-06-08 outside-Puck crash. */}
-            <BuilderFlowEditButton sop={initialSop} sopId={sopId} />
-            <BuilderFlowButton sop={initialSop} />
+            {/* 32-uat: group the per-SOP tools in one bordered cluster so they
+                read as tools, distinct from navigation (left) and the stage
+                stepper (progress, right). */}
+            <div
+              data-testid="builder-tools-cluster"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '3px 8px',
+                border: '1px solid #27272a',
+                borderRadius: 4,
+              }}
+            >
+              <span
+                aria-hidden="true"
+                style={{
+                  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                  fontSize: 9,
+                  textTransform: 'uppercase',
+                  letterSpacing: 1,
+                  color: '#71717a', // --ink-500
+                }}
+              >
+                Tools
+              </span>
+              {/* Phase 30 (30-07) — UX-06 labelled per-SOP action menu */}
+              <SopActionsMenu sopId={sopId} isDraft={initialSop.status === 'draft'} />
+              {/* Phase 24 Plan 03 — FLOW-05: "Edit flow" re-surfaces FlowGraphEditor
+                  outside the suppressed Puck right sidebar via a portaled modal.
+                  No Puck hook is called — avoids CLAUDE.md 2026-06-08 outside-Puck crash. */}
+              <BuilderFlowEditButton sop={initialSop} sopId={sopId} />
+              <BuilderFlowButton sop={initialSop} />
+            </div>
             <BuilderStageStepper
               activeStage={activeStage}
               hasSourceDoc={hasSourceDoc}

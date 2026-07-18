@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
 import type { SopWithSections } from '@/types/sop'
 import { LayoutDataSchema } from '@/lib/builder/layout-schema'
 import { useDraftLayoutSync } from '@/hooks/useDraftLayoutSync'
@@ -199,16 +198,9 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
     <div
       className={`agent-layer-root flex h-screen flex-col bg-[var(--paper)] text-[var(--ink-900)] ${agentview ? 'agentview' : ''}`}
     >
-      <header className="flex items-center justify-between border-b border-[var(--ink-100)] px-4 py-3">
-        <div className="flex items-center gap-3">
-          <Link
-            href="/admin/sops"
-            className="text-sm text-[var(--ink-500)] transition-colors hover:text-[var(--ink-700)]"
-          >
-            ← Library
-          </Link>
-          <h1 className="text-base font-semibold">{initialSop.title ?? 'Untitled SOP'}</h1>
-        </div>
+      {/* 32-uat: navigation + SOP title live ONCE in BuilderStageShell's top
+          bar — this row is status + tools only (no duplicate title). */}
+      <header className="flex items-center justify-end border-b border-[var(--ink-100)] px-4 py-3">
         <div className="flex items-center gap-3">
           {layoutErrorToast && (
             <div
@@ -230,17 +222,30 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
           <span className="rounded border border-[var(--ink-300)] px-2 py-0.5 font-mono text-[11px] uppercase tracking-wider text-[var(--ink-500)]">
             {savePillLabel}
           </span>
-          <RerunReviewerButton sopId={sopId} />
-          <button
-            type="button"
-            onClick={() => setAgentview((v) => !v)}
-            aria-pressed={agentview}
-            className="rounded border border-[var(--ink-300)] px-2 py-0.5 font-mono text-[11px] uppercase tracking-wider text-[var(--ink-500)] data-[on=true]:border-[var(--ai)] data-[on=true]:text-[var(--ai)]"
-            data-on={agentview}
-            data-testid="agentview-toggle"
+          {/* 32-uat: tools cluster — matches the shell top bar's bordered
+              "Tools" grouping so tools read distinctly from status/navigation. */}
+          <div
+            data-testid="builder-tools-cluster-edit"
+            className="flex items-center gap-2 rounded border border-[var(--ink-100)] px-2 py-1"
           >
-            ⚇ Agent layer
-          </button>
+            <span
+              aria-hidden="true"
+              className="font-mono text-[9px] uppercase tracking-widest text-[var(--ink-500)]"
+            >
+              Tools
+            </span>
+            <RerunReviewerButton sopId={sopId} />
+            <button
+              type="button"
+              onClick={() => setAgentview((v) => !v)}
+              aria-pressed={agentview}
+              className="rounded border border-[var(--ink-300)] px-2 py-0.5 font-mono text-[11px] uppercase tracking-wider text-[var(--ink-500)] data-[on=true]:border-[var(--ai)] data-[on=true]:text-[var(--ai)]"
+              data-on={agentview}
+              data-testid="agentview-toggle"
+            >
+              ⚇ Agent layer
+            </button>
+          </div>
         </div>
       </header>
       <AgentBanner />

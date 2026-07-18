@@ -31,6 +31,14 @@ export function OrientationStrip({
     totalCount > 0 ? Math.min(1, Math.max(0, verifiedCount / totalCount)) : 0;
   const fillPercent = `${Math.round(progress * 100)}%`;
 
+  // 32-uat orientation sentence — plain language, live counts (same
+  // verifiedCount/totalCount source as the stepper's 🔒 lock label).
+  const remaining = Math.max(0, totalCount - verifiedCount);
+  const orientationSentence =
+    remaining > 0
+      ? `You're checking this SOP — verify the remaining ${remaining} of ${totalCount} blocks below to unlock Send to workers.`
+      : `All ${totalCount} blocks verified — Send to workers is unlocked.`;
+
   return (
     <div
       data-testid="orientation-strip"
@@ -68,8 +76,9 @@ export function OrientationStrip({
         {stageBadge}
       </span>
 
-      {/* Centre: Review prose — exact text from Copywriting Contract */}
+      {/* Centre: orientation sentence — what this list is and what it unlocks */}
       <p
+        data-testid="orientation-sentence"
         style={{
           flex: 1,
           margin: 0,
@@ -81,7 +90,7 @@ export function OrientationStrip({
           minWidth: 0,
         }}
       >
-        Check each step against the original document, then mark it verified. The AI safety check flags anything that looks off.
+        {orientationSentence}
       </p>
 
       {/* Right: progress counter + progress bar */}
