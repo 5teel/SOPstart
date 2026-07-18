@@ -460,6 +460,7 @@ export function BuilderStageShell({
               onRequestChanges={handleRequestChanges}
               approvalActionPending={approvalActionPending}
               approvalError={approvalError}
+              wireUpHref={initialSop.status === 'published' ? `/admin/sops?view=access&sop=${sopId}` : undefined}
             />
           )}
         </main>

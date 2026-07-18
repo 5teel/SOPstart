@@ -21,8 +21,14 @@
  * Phase 29 (29-04) — optional `approvalStatus` prop. When state === 'pending'
  * renders ApprovalChainPanel alongside the existing content; no-chain SOPs
  * (approvalStatus undefined/null) render exactly as before (D29-03).
+ *
+ * Phase 32-09 — optional `wireUpHref` prop (D-12a). When set (the parent
+ * shell supplies it once initialSop.status === 'published'), renders a
+ * "Wire up access" CTA to /admin/sops?view=access&sop={sopId}, pinning the
+ * SOP NEW · UNWIRED on the wiring surface for organic wire-up.
  */
 
+import Link from 'next/link'
 import { ApprovalChainPanel, type ApprovalRow } from '@/components/admin/governance/ApprovalChainPanel'
 import type { ChainStep } from '@/lib/governance/approvals'
 
@@ -61,6 +67,8 @@ export type PublishStageProps = {
   approvalActionPending?: boolean
   /** Non-null when approveStep/requestChanges returned an error */
   approvalError?: string | null
+  /** Phase 32-09 (D-12a) — set by the parent shell once this SOP is published; links to the wiring surface with this SOP pinned. */
+  wireUpHref?: string
 }
 
 export function PublishStage({
@@ -78,6 +86,7 @@ export function PublishStage({
   onRequestChanges,
   approvalActionPending = false,
   approvalError = null,
+  wireUpHref,
 }: PublishStageProps): React.JSX.Element {
   const remaining = Math.max(0, totalCount - verifiedCount)
 
@@ -149,6 +158,17 @@ export function PublishStage({
       <p className="m-0 text-xs leading-normal text-[var(--ink-500)]">
         You can unpublish or edit later.
       </p>
+
+      {/* 5c. Wire up access — D-12a post-publish CTA, lands NEW · UNWIRED */}
+      {wireUpHref && (
+        <Link
+          href={wireUpHref}
+          data-testid="wire-up-access-cta"
+          className="self-start rounded border border-[var(--ink-900)] bg-transparent px-4 py-2 text-sm font-semibold text-[var(--ink-900)] no-underline"
+        >
+          Wire up access →
+        </Link>
+      )}
 
       {/* 7. Publish error banner — reuses the legacy Phase-21 shell markup */}
       {publishError && (

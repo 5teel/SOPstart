@@ -574,6 +574,31 @@ export const UAT_TESTS: UatTest[] = [
       'D-08 — /admin/team becomes the org model; AdminNav stays 5 tabs (UX-02). Node Chart (layoutOrgTree, 32-06) is the default view; Columns (32-07) wins on raw entry speed and absorbs the Phase 15/25 RoleAssignmentTable roster as a collapsible sub-panel so invite/org-role/department-picker editing is never lost. Vacancies (budgeted_count - filled) render as first-class dashed chips, never styled as an error.',
   },
 
+  {
+    id: 'p32-wiring-access-view',
+    dateAdded: '2026-07-18',
+    category: 'Phase 32 — Visual Org Model',
+    title: 'Is it clear who can see a SOP, and easy to wire up a new one?',
+    status: 'active',
+    summary:
+      'SOPs list now has an "Access" tab: a wiring diagram where you click an area, department or person to trace which library collections they can see, and click a new SOP to wire it up to the right parts of your org. The same view doubles as a library filter.',
+    tryIt: [
+      'Publish a SOP and click the "Wire up access →" button that appears — you should land on the Access view with that SOP pinned "NEW · UNWIRED".',
+      'Click a department or person on the left to see the wires light up and a "Visible to N people via M grants" banner.',
+      'Click the pinned new SOP, toggle a department or two, and hit "✓ Done wiring" — confirm the banner and wire count update live.',
+      'With something focused, click "Open in library →" and confirm the SOP list filters down to just that department/collection with a count.',
+    ],
+    links: [{ label: 'SOPs — Access view', href: '/admin/sops?view=access' }],
+    questions: [
+      { id: 'trace-clear', text: 'Was it clear which SOPs an area/department/person can see when you clicked it?' },
+      { id: 'wireup-easy', text: 'Was wiring up a new SOP\'s access straightforward?' },
+      { id: 'filter-useful', text: 'Was jumping from the diagram to a filtered library list useful?' },
+      { id: 'blast-radius-trust', text: 'Did the "Visible to N people" count feel trustworthy before you confirmed?' },
+    ],
+    background:
+      'D-09 (?view=access, third fold beside Needs attention), D-12 (wire-up entry from both the post-publish CTA and organically), D-11 (additive-only grants — no in-place revoke here), SC-4 (viz-as-library-filter deep-links). WiringPatchBay/SelectionStrip built in 32-08; the page arm, deep-links, and publish CTA land in 32-09.',
+  },
+
   // ---------------------------------------------------------------------------
   // TEMPLATE — copy this to put a new design choice or check to the team.
   // Set status:'archived' once it's decided.
