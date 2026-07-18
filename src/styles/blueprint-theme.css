@@ -441,3 +441,233 @@ body[data-theme="paper"] .org-add-ghost:hover {
   color: var(--accent-step);
   border-color: var(--accent-step);
 }
+
+/* ---------------------------------------------------------------
+ * Phase 32-08 — Wiring Patch Bay (D-hybrid, sketch 003 variant D).
+ * .jack/.bay/.strip-slot CSS translated verbatim from
+ * permission-wiring-views.md + sketch 003's <style> block.
+ * --------------------------------------------------------------- */
+body[data-theme="paper"] .searchbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+body[data-theme="paper"] .searchbar input {
+  font-size: 12px;
+  padding: 8px 12px;
+  width: 320px;
+  border: 1.5px solid var(--ink-300);
+  border-radius: 4px;
+  background: var(--paper-1);
+  color: var(--ink-900);
+  outline: none;
+}
+body[data-theme="paper"] .searchbar input:focus {
+  border-color: var(--accent-step);
+}
+
+body[data-theme="paper"] .bay {
+  position: relative;
+  border: 1px solid var(--ink-300);
+  border-radius: 6px;
+  padding: 20px;
+}
+body[data-theme="paper"] .bay-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+body[data-theme="paper"] .cols {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: 40px;
+  z-index: 2;
+}
+body[data-theme="paper"] .col {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+body[data-theme="paper"] .col h2 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-500);
+  margin: 0 0 6px;
+}
+body[data-theme="paper"] .bay-hint {
+  font-size: 10px;
+  color: var(--ink-500);
+  margin-top: 12px;
+}
+
+body[data-theme="paper"] .jack {
+  background: var(--paper-1);
+  border: 1.5px solid var(--ink-300);
+  border-radius: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 32px;
+}
+body[data-theme="paper"] .jack .name {
+  font-size: 12.5px;
+  font-weight: 600;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body[data-theme="paper"] .jack .meta {
+  font-size: 9.5px;
+  color: var(--ink-500);
+  flex-shrink: 0;
+}
+body[data-theme="paper"] .jack:hover {
+  border-color: var(--ink-500);
+}
+body[data-theme="paper"] .jack.lit {
+  border-color: var(--accent-step);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+body[data-theme="paper"] .jack.dim {
+  opacity: 0.3;
+}
+body[data-theme="paper"] .jack.group-jack {
+  border-width: 2px;
+  min-height: 38px;
+}
+body[data-theme="paper"] .jack.child {
+  margin-left: 18px;
+}
+body[data-theme="paper"] .jack.site-jack {
+  border-color: var(--ink-900);
+  border-width: 2px;
+  margin-bottom: 8px;
+}
+body[data-theme="paper"] .jack .twist {
+  font-size: 9px;
+  color: var(--ink-400);
+  cursor: pointer;
+}
+body[data-theme="paper"] .jack .dept-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+body[data-theme="paper"] .jack .port {
+  position: absolute;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--paper-1);
+  border: 2px solid var(--ink-400);
+  transform: translateY(-50%);
+}
+body[data-theme="paper"] .col.left .jack .port {
+  right: -5px;
+}
+body[data-theme="paper"] .col.right .jack .port {
+  left: -5px;
+}
+body[data-theme="paper"] .jack.lit .port {
+  border-color: var(--accent-step);
+  background: var(--accent-step);
+}
+body[data-theme="paper"] .jack.match .name {
+  text-decoration: underline;
+  text-decoration-color: var(--accent-decision);
+  text-decoration-thickness: 3px;
+}
+body[data-theme="paper"] .jack.nomatch {
+  opacity: 0.25;
+}
+body[data-theme="paper"] .jack.newsop {
+  border: 2px solid var(--accent-decision);
+}
+body[data-theme="paper"] .jack.newsop .newpill {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  background: var(--accent-decision);
+  color: #fff;
+  border-radius: 2px;
+  padding: 1px 5px;
+  flex-shrink: 0;
+}
+body[data-theme="paper"] .jack.wired-target {
+  border-color: var(--accent-ok);
+  background: rgba(22, 163, 74, 0.06);
+}
+body[data-theme="paper"] .jack.wired-target .port {
+  border-color: var(--accent-ok);
+  background: var(--accent-ok);
+}
+
+/* D-hybrid: ONE permanently-reserved strip slot (SC-6) — fixed height so the
+ * bay below NEVER moves when the selection state changes; only the slot's
+ * content and colours swap (idle hint / selection / wiring). */
+body[data-theme="paper"] .strip-slot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  box-sizing: border-box;
+  border: 1.5px dashed var(--ink-200);
+  border-radius: 4px;
+  background: transparent;
+  padding: 0 14px;
+  font-size: 13px;
+}
+body[data-theme="paper"] .strip-slot .headline {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body[data-theme="paper"] .strip-slot .headline b {
+  font-weight: 700;
+}
+body[data-theme="paper"] .strip-slot.idle {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-400);
+  justify-content: center;
+}
+body[data-theme="paper"] .strip-slot.selection {
+  border-style: solid;
+  border-color: var(--accent-step);
+  background: #eff4ff;
+}
+body[data-theme="paper"] .strip-slot.wiring {
+  border-style: solid;
+  border-color: var(--accent-ok);
+  background: rgba(22, 163, 74, 0.07);
+}
+body[data-theme="paper"] .strip-slot .done {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 7px 12px;
+  border: none;
+  border-radius: 3px;
+  color: #fff;
+  cursor: pointer;
+  background: var(--accent-ok);
+}
+body[data-theme="paper"] .strip-slot .done:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
