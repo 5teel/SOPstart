@@ -34,6 +34,7 @@ import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminContext } from '@/lib/auth/guards'
 import { resolveEffectiveAccess } from '@/lib/org-model/resolve-access'
+import { ensureSopCollectionsForOrg } from '@/lib/org-model/sop-collections'
 import type { ChainLink, SubjectType } from '@/types/org-model'
 
 // ---------------------------------------------------------------------------
@@ -282,6 +283,31 @@ export async function materializeCollectionAccess(collectionId: string): Promise
 }
 
 // ---------------------------------------------------------------------------
+// 6. ensureSopCollections — the runtime sop_collections write path (CR-02).
+// Mirrors migration 00047 Steps A/B for one SOP (collection from sops.category
+// + junction row) via the shared ensureSopCollectionsForOrg helper. Called by
+// the access-view page for a pinned ?sop= so wire-up always has a real
+// collection to grant (CR-01). performPublish() runs the same helper on every
+// publish path.
+// ---------------------------------------------------------------------------
+
+export async function ensureSopCollections(sopId: string): Promise<{ collectionIds: string[] } | { error: string }> {
+  if (!sopId) return { error: 'sopId required' }
+
+  const ctx = await requireAdmin()
+  if ('error' in ctx) return { error: ctx.error }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const admin: any = createAdminClient()
+  const orgId = await callerOrgId(admin, ctx)
+  if (!orgId) return { error: 'No organisation' }
+
+  // ensureSopCollectionsForOrg re-verifies sops.organisation_id === orgId
+  // before any write (2026-06-15 self-enforced org scope).
+  return ensureSopCollectionsForOrg(admin, orgId, sopId)
+}
+
+// ---------------------------------------------------------------------------
 // Internal fanout — org already verified by the caller above. Shared by
 // createGrant/revokeGrant (already hold orgId) and the public wrappers.
 // ---------------------------------------------------------------------------
@@ -316,6 +342,16 @@ async function materializeSopAccessForOrg(admin: any, orgId: string, sopId: stri
   const { data: sopCollRows, error: sopCollErr } = await admin.from('sop_collections').select('collection_id').eq('sop_id', sopId)
   if (sopCollErr) return { error: sopCollErr.message }
   const sopCollectionIds = new Set(((sopCollRows ?? []) as Array<{ collection_id: string }>).map(r => r.collection_id))
+
+  // CR-02 guard (documented decision): a SOP with NO collection is OUTSIDE the
+  // grant system — no grant of any level can reach it, so materializing would
+  // replace-write sop_departments/sop_access_people down to EMPTY, silently
+  // revoking live (legacy, pre-Phase-32) worker visibility. Preserve existing
+  // rows and skip instead. The companion write path (ensureSopCollectionsForOrg,
+  // called on publish and from the wire-up page) is what brings a SOP INTO the
+  // grant system; until it has a collection, its sop_departments rows stay
+  // authoritative exactly as they were before Phase 32.
+  if (sopCollectionIds.size === 0) return { success: true }
 
   const [{ data: deptsData, error: deptsErr }, { data: rolesData, error: rolesErr }, { data: grantsData, error: grantsErr }] = await Promise.all([
     admin.from('departments').select('id, area_id').eq('organisation_id', orgId).eq('archived', false),

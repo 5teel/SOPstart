@@ -3,6 +3,8 @@ import type { Database } from '@/types/database.types'
 import { enqueueVideoGenerationForPipeline } from '@/lib/video-gen/auto-queue'
 import { triggerAgentSynthesis } from '@/lib/agent-layer/synthesis'
 import { resolveCadenceMonths, computeReviewDueDate } from '@/lib/governance/cadences'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { ensureSopCollectionsForOrg } from '@/lib/org-model/sop-collections'
 
 // ------------------------------------------------------------
 // Phase 29 D29-03/Pattern 4 — performPublish() is the SINGLE relocated
@@ -211,6 +213,22 @@ export async function performPublish(
     }
   } catch (err) {
     console.error(`[performPublish] review-clock reset threw for SOP ${sopId}:`, err)
+  }
+
+  // Step 3c: Phase 32 CR-02 — the runtime sop_collections companion write.
+  //     Mirrors migration 00047 Steps A/B for this SOP so every published SOP
+  //     is reachable by the grant system (collections are the ONLY unit
+  //     access_grants can target). Non-fatal like steps 3b/4 — the publish
+  //     already succeeded — but logged loudly; the access-view wire-up page
+  //     re-runs the same ensure as a second chance.
+  try {
+    const admin = createAdminClient()
+    const ensured = await ensureSopCollectionsForOrg(admin, organisationId, sopId)
+    if ('error' in ensured) {
+      console.error(`[performPublish] ensureSopCollections failed for SOP ${sopId}:`, ensured.error)
+    }
+  } catch (err) {
+    console.error(`[performPublish] ensureSopCollections threw for SOP ${sopId}:`, err)
   }
 
   // Step 4: Auto-queue video generation if this SOP arrived via the pipeline
