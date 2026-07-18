@@ -185,7 +185,24 @@ export async function createGrant(
     .select('*')
     .single()
 
-  if (error || !data) {
+  let row = data
+  if ((error || !data) && (error as { code?: string } | null)?.code === '23505') {
+    // WR-04: unique violation (00049 uq_access_grants_subject_collection) —
+    // the identical grant already exists. Idempotent success: re-read the
+    // existing row and fall through to re-materialization (double-click Done /
+    // re-entered wire-up mode must never surface as an error).
+    let existingQuery = admin
+      .from('access_grants')
+      .select('*')
+      .eq('organisation_id', orgId)
+      .eq('subject_type', subjectType)
+      .eq('collection_id', collectionId)
+    existingQuery = subjectId === null ? existingQuery.is('subject_id', null) : existingQuery.eq('subject_id', subjectId)
+    const { data: existing } = await existingQuery.maybeSingle()
+    row = existing
+  }
+
+  if (!row) {
     console.error('[createGrant] insert error', error)
     return { error: error?.message ?? 'Failed to create grant' }
   }
@@ -198,12 +215,12 @@ export async function createGrant(
 
   return {
     grant: {
-      id: data.id,
-      subjectType: data.subject_type,
-      subjectId: data.subject_id,
-      collectionId: data.collection_id,
-      grantedBy: data.granted_by,
-      createdAt: data.created_at,
+      id: row.id,
+      subjectType: row.subject_type,
+      subjectId: row.subject_id,
+      collectionId: row.collection_id,
+      grantedBy: row.granted_by,
+      createdAt: row.created_at,
     },
   }
 }
