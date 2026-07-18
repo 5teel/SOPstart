@@ -636,6 +636,18 @@ body[data-theme="paper"] .strip-slot .headline {
 body[data-theme="paper"] .strip-slot .headline b {
   font-weight: 700;
 }
+body[data-theme="paper"] .strip-slot .open-in-library {
+  margin-left: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent-step);
+  text-decoration: none;
+}
+body[data-theme="paper"] .strip-slot .open-in-library:hover {
+  text-decoration: underline;
+}
 body[data-theme="paper"] .strip-slot.idle {
   font-size: 10px;
   text-transform: uppercase;

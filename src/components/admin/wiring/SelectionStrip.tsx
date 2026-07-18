@@ -14,6 +14,7 @@
  */
 
 import type { ReactNode } from 'react'
+import Link from 'next/link'
 
 export type SelectionStripState = 'idle' | 'selection' | 'wiring'
 
@@ -25,6 +26,8 @@ export interface SelectionStripProps {
   grantCount?: number
   onDone?: () => void
   doneDisabled?: boolean
+  /** 32-09 SC-4: set when the focused unit is a department/collection — viz-as-library-filter deep-link. */
+  openInLibraryHref?: string
 }
 
 export function SelectionStrip({
@@ -34,6 +37,7 @@ export function SelectionStrip({
   grantCount = 0,
   onDone,
   doneDisabled,
+  openInLibraryHref,
 }: SelectionStripProps) {
   return (
     <div data-state={state} className={`strip-slot h-[48px] overflow-hidden ${state}`}>
@@ -46,6 +50,11 @@ export function SelectionStrip({
         <span className="headline">
           {label ? <><b>{label}</b> — </> : null}
           Visible to <b>{peopleCount}</b> {peopleCount === 1 ? 'person' : 'people'} via {grantCount} grant{grantCount === 1 ? '' : 's'}.
+          {openInLibraryHref && (
+            <Link href={openInLibraryHref} className="mono open-in-library">
+              Open in library →
+            </Link>
+          )}
         </span>
       )}
       {state === 'wiring' && (
