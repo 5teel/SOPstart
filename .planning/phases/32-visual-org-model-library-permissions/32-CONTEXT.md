@@ -33,6 +33,9 @@ A business (Visy first) draws its org structure visually — areas → departmen
 - **D-11:** Grants are **additive-only** in v1. No "exclude from broadcast" carve-outs; revoking an inherited grant happens at its source (as sketch 003-D enforced). Exclude affordance is a deferred follow-up.
 - **D-12:** Wire-up mode triggers from BOTH: (a) a post-publish "Wire up access" CTA that lands on `?view=access` with the SOP pinned `NEW · UNWIRED`, and (b) organically from the access view for any unwired or existing SOP.
 
+### Enforcement of role/person-level grants (resolved 2026-07-18, post-research)
+- **D-13:** Role- and person-level grants enforce via **one narrow, additive RLS arm**: a new person/role-grant junction (populated by the materialization layer) read by a new SECURITY-DEFINER-backed policy arm mirroring the shipped 00035 template exactly. Shipped policies stay byte-untouched — D-02's "no new RLS" is hereby clarified to mean "don't touch or modify shipped policies", not "zero net-new policies". Full 5-level enforcement (incl. the Priya personal-grant scenario) works day one. The new helper must follow the [2026-07-05] SECURITY DEFINER rule (self-scoping via auth.uid()) and the [2026-05-13] RLS-recursion rule.
+
 ### Claude's Discretion
 - Grants table shape (single polymorphic subject_type/subject_id vs per-level columns), materialization mechanics (trigger vs server-action sync vs on-write fanout), chart auto-layout algorithm, and all component structure — planner/researcher decide within the locked decisions above.
 - Blast-radius people count derivation (distinct people across granted units) — implementation detail, but the UNIT is people, not SOPs (locked by sketch findings).
