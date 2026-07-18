@@ -204,6 +204,28 @@ Plans:
 
 - [ ] TBD (created by /gsd-plan-phase)
 
+### Phase 32: Visual Org Model & Library Permissions
+
+**Goal:** A business (Visy first) draws its org structure visually — departments grouped into areas, roles inside departments, people in roles (named or held as role-descriptor vacancies) — and wires SOP-library access onto that model across every arity (1:N, N:1, N:M), with the visualization doubling as a library filter and as the surface where permissions are CREATED (wire-up mode for newly published SOPs).
+**Design validated:** sketches 001 (winner B Node Chart + Columns alt view), 002 (winner A Patch Bay + Matrix/Illuminate alt views), 003 (winner D hybrid at 15×20 scale) — all folded into `sketch-findings-SOPstart` (org-model-views + permission-wiring-views references). Auto-loads at build time.
+**Depends on:** Phase 30 (admin shell / Settings-Team surfaces), Phase 25 (departments + junctions — extended, not replaced)
+**Requirements**: TBD (formalize at plan time)
+**Success Criteria** (what must be TRUE):
+
+  1. Admin draws departments → roles → people on a node-chart canvas (grid-paper, Flow-tab language), with a Columns alternative view on an in-page toggle; unnamed role-holders ("Operator — night shift, unfilled") are first-class with role capacity counts
+  2. Library access is assigned at Org / area / department / person level (roles when the layer lands) and the effective-access model resolves union-up-the-chain with the direct / inherited-via / personal-grant vocabulary from the sketches
+  3. The wiring view survives real scale (~15 depts × ~20 collections): grouped structure with expand-in-place, quiet-by-default focus interaction, count badges
+  4. Focusing any unit deep-links into the library as a filter (`/admin/sops?departments=…|collection=…`) with a visible "Open in library (N)" affordance
+  5. A newly published SOP can be wired up visually: connect mode with live grant wires and a people blast-radius count before confirming
+  6. Contextual banners occupy permanently-reserved fixed-height slots — the graph never moves on selection
+
+**Pre-plan gates:** (a) roles entity schema decision (`roles` + `role_members` + budgeted_count; Phase 25 model has no role layer); (b) inherited-revoke ("exclude from broadcast grant") UX decision; (c) how dept-visibility RLS (sop_departments) extends to area/person-level grants.
+**Plans:** 0 plans
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 32 to break down)
+
 ---
 
 ## v4.0 — Safety-Critical Parsing + Voice + AI Foundation (started 2026-05-24 · ✅ shipped 2026-07-02)

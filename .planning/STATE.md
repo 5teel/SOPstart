@@ -174,6 +174,10 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 
 ## Accumulated Context
 
+### Roadmap Evolution
+
+- Phase 32 added (2026-07-18): Visual Org Model & Library Permissions — design pre-validated via sketches 001/002/003 (Node Chart org builder + D-hybrid wiring surface with library-filter deep-links and wire-up mode); findings in sketch-findings-SOPstart. Pre-plan gates: roles entity schema, inherited-revoke UX, RLS extension to area/person grants.
+
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
