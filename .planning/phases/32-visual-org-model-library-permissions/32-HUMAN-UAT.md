@@ -14,34 +14,37 @@ updated: 2026-07-18T09:00:00Z
 
 ### 1. Node Chart renders on /admin/team
 expected: Chart (areas → departments → roles → people) renders by default with bezier connectors; vacancy chips dashed, not error-styled; role capacity shows filled/budgeted; ⊞/▤ toggle swaps to Columns board (one column per department, role cards, person/vacancy chips) without a page reload; AdminNav still exactly 5 tabs.
-result: [pending]
+result: pass (2026-07-18)
 
 ### 2. WiringPatchBay at scale on /admin/sops?view=access
 expected: With ~15 departments × ~20 collections, area/department groups collapse to single jacks with count badges; NO wires drawn until search/click; focusing a unit lights only its own wires (others dim); no spaghetti or layout breakage.
-result: [pending]
+result: pass (2026-07-18)
 
 ### 3. Library deep-link click-through
 expected: Focus a department jack with SOPs → "Open in library →" appears in the selection banner → click navigates to /admin/sops?departments=<id> with correctly filtered list and accurate "Open in library (N)" count.
+result: pass (2026-07-18)
+
+### 4. Wiring a SOP up actually saves
+How: Go to /admin/sops → open a SOP in the builder → last stage (Publish) → publish it → a "Wire up access →" button appears under the published confirmation. Click it. (Or skip publishing: open /admin/sops?view=access directly and click any SOP in the right column.) Turn on 2-3 departments — the count of people who'd see the SOP should update as you toggle. Click "✓ Done wiring". Then click the same SOP again.
+expected: The departments you picked show as already connected (wires light up). If it still says "NEW · UNWIRED" or your picks are gone, the save failed — report it.
 result: [pending]
 
-### 4. Wire-up mode end-to-end (CR-01 fix exercised in real UI)
-expected: Publish a SOP → "Wire up access" CTA lands on /admin/sops?view=access&sop=<id> pinned NEW·UNWIRED → connect mode: toggle 2-3 org units, SelectionStrip people count updates live per toggle → ✓ Done writes REAL access_grants rows (re-open wiring: grants show as existing, not NEW·UNWIRED).
+### 5. The page doesn't jump around
+How: On /admin/sops?view=access, click a department, then click a SOP and start wiring, then press Esc / deselect. Watch the banner strip at the top of the diagram as it changes between "nothing selected", "something selected", and "wiring mode".
+expected: The stuff below the banner never shifts up or down when the banner content changes. If the diagram visibly jumps, that's a fail.
 result: [pending]
 
-### 5. SelectionStrip pixel stability
-expected: idle → selection → wiring transitions keep the strip's bounding-box top pixel-identical; page content below never jumps.
-result: [pending]
-
-### 6. Product decision: WR-02 materialization divergence
-expected: Review `npx tsx scripts/assert-phase32-day-one-equivalence.ts --diff-materialization` (1 of 15 SOPs — "Changing Plenum Chamber — IS Machine Forming Section" gains dept 4587a6ed on next re-materialization). Decide: accept collection-granularity access, or narrow the seeded Step-C grant first. Record the decision.
+### 6. Decision: is slightly broader access OK?
+Background: Access is now granted per collection (a folder of SOPs), not per individual SOP. One existing SOP — "Changing Plenum Chamber" (IS Machine Forming Section) — sits in a collection that a second department has access to, so the next time anyone edits access for that collection, that department will start seeing this SOP too.
+Question: Is that acceptable? Answer "6: yes, broader is fine" (collection-level access is the model, done) or "6: no, keep it narrow" (I'll tighten that one grant so nothing changes for that SOP).
 result: [pending]
 
 ## Summary
 
 total: 6
-passed: 0
+passed: 3
 issues: 0
-pending: 6
+pending: 3
 skipped: 0
 blocked: 0
 
