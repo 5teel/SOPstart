@@ -17,10 +17,10 @@ import type { OrgTree } from '@/types/org-model'
 
 export const NODE_WIDTH = 180
 export const NODE_HEIGHT = 64
-const GAP_X = 24
-const ROW_HEIGHT = 140
-const PAD = 40
-const SLOT_WIDTH = NODE_WIDTH + GAP_X
+export const GAP_X = 24
+export const ROW_HEIGHT = 140
+export const PAD = 40
+export const SLOT_WIDTH = NODE_WIDTH + GAP_X
 
 export interface PlacedNode {
   x: number
