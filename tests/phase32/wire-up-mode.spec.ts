@@ -28,6 +28,7 @@ import path from 'node:path'
 
 const ROOT = process.cwd()
 const BAY = path.join(ROOT, 'src', 'components', 'admin', 'wiring', 'WiringPatchBay.tsx')
+const PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'page.tsx')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
@@ -80,11 +81,34 @@ test.describe('SC-5 — ✓ Done writes grants via createGrant', () => {
     expect(src).toContain('createGrant(')
   })
 
-  test('Done calls createGrant once per pending toggle with subjectType/subjectId/collectionId=newSop.id', () => {
+  test('Done grants the SOP\'s COLLECTION(s) — never the SOP id (CR-01 regression pin)', () => {
     const src = read(BAY)
     expect(src).toContain('const handleDone = useCallback(async () => {')
     expect(src).toContain('for (const grant of pending.values()) {')
-    expect(src).toContain('createGrant({ subjectType: grant.subjectType, subjectId: grant.subjectId, collectionId: newSop.id })')
+    // CR-01: createGrant validates collectionId against the collections table —
+    // a SOP id can never pass, so granting newSop.id wrote NOTHING while the
+    // UI reported success. The contract is the server-resolved collection ids.
+    expect(src).not.toContain('collectionId: newSop.id')
+    expect(src).toContain('for (const collectionId of newSop.collectionIds) {')
+    expect(src).toContain('createGrant({ subjectType: grant.subjectType, subjectId: grant.subjectId, collectionId })')
+  })
+
+  test('a createGrant failure surfaces to the UI, aborts, and keeps pending — never console-swallowed success (CR-01)', () => {
+    const src = read(BAY)
+    const doneBody = src.match(/const handleDone = useCallback\(async \(\) => \{([\s\S]*?)\n  \}, \[/)?.[1] ?? ''
+    expect(doneBody).toContain('setSaveError(result.error)')
+    expect(doneBody).toContain('return')
+    // Success-path cleanup must come AFTER the error return, inside the same body.
+    expect(doneBody.indexOf('setSaveError(result.error)')).toBeLessThan(doneBody.indexOf('onWireUpComplete?.()'))
+    expect(doneBody).not.toContain('console.error')
+    // The error is rendered, not just stored.
+    expect(src).toContain('{saveError && (')
+  })
+
+  test('the page resolves the pinned SOP\'s collections server-side via ensureSopCollections (CR-02 runtime path)', () => {
+    const page = read(PAGE)
+    expect(page).toContain('ensureSopCollections(params.sop)')
+    expect(page).toContain('collectionIds: ensuredCollectionIds')
   })
 
   test('Done is wired to the SelectionStrip onDone prop and clears pending state on completion', () => {

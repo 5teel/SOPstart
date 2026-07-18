@@ -54,6 +54,12 @@ export interface WiringCollection {
 export interface WiringNewSop {
   id: string
   title: string
+  /**
+   * CR-01: grants target COLLECTIONS, never SOP ids — the page resolves (and,
+   * via ensureSopCollections, creates) the SOP's collection(s) server-side.
+   * Empty means the SOP has no category/collection and cannot be wired yet.
+   */
+  collectionIds: string[]
 }
 
 interface WiringPatchBayProps {
@@ -101,6 +107,7 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
   const [pending, setPending] = useState<Map<string, PendingGrant>>(new Map())
   const [search, setSearch] = useState('')
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   const bayRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
@@ -310,6 +317,7 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
     setConnecting((c) => !c)
     setFocus(null)
     setPending(new Map())
+    setSaveError(null)
   }, [newSop])
 
   // Blast radius = distinct people reached by the DRAFT grants (D-11, unit is
@@ -320,13 +328,28 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
     return s.size
   }, [pending, peopleIndex])
 
+  // CR-01: grants are written against the SOP's COLLECTION(s) — a SOP id can
+  // never pass createGrant's collection guard, so granting newSop.id silently
+  // wrote NOTHING while the UI reported success. Any failure now aborts,
+  // surfaces in the banner, and KEEPS the pending toggles (never a false
+  // "wired" state).
   const handleDone = useCallback(async () => {
     if (!newSop || pending.size === 0) return
     setSaving(true)
+    setSaveError(null)
     try {
+      if (newSop.collectionIds.length === 0) {
+        setSaveError('This SOP has no collection — set its category first, then wire up access.')
+        return
+      }
       for (const grant of pending.values()) {
-        const result = await createGrant({ subjectType: grant.subjectType, subjectId: grant.subjectId, collectionId: newSop.id })
-        if ('error' in result) console.error('[WiringPatchBay] createGrant failed', result.error)
+        for (const collectionId of newSop.collectionIds) {
+          const result = await createGrant({ subjectType: grant.subjectType, subjectId: grant.subjectId, collectionId })
+          if ('error' in result) {
+            setSaveError(result.error)
+            return
+          }
+        }
       }
       setConnecting(false)
       setPending(new Map())
@@ -427,6 +450,12 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
         doneDisabled={saving || pending.size === 0}
         openInLibraryHref={openInLibraryHref}
       />
+
+      {saveError && (
+        <div role="alert" className="mono text-[11px] uppercase tracking-wide text-red-600 mt-1">
+          Wiring failed — {saveError} Nothing was saved; your pending grants are kept.
+        </div>
+      )}
 
       <div ref={bayRef} className="bay" onClick={(e) => { if (e.target === e.currentTarget) resetFocus() }}>
         <svg ref={svgRef} className="bay-svg" />

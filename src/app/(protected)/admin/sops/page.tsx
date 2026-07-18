@@ -10,7 +10,7 @@ import type { GovernanceFlag } from '@/lib/governance/classify'
 import { GovernanceFilterChips, type GovernanceFilter } from '@/components/admin/governance/GovernanceFilterChips'
 import { GovernanceQueueRow } from '@/components/admin/governance/GovernanceQueueRow'
 import { listOrgTree } from '@/actions/org-model'
-import { listGrants, type GrantRow } from '@/actions/grants'
+import { ensureSopCollections, listGrants, type GrantRow } from '@/actions/grants'
 import { WiringPatchBayShell } from '@/components/admin/wiring/WiringPatchBayShell'
 import type { WiringCollection, WiringNewSop } from '@/components/admin/wiring/WiringPatchBay'
 import type { SopStatus } from '@/types/sop'
@@ -138,6 +138,17 @@ export default async function SopsLibraryPage({
     query = query.in('id', filterIds.length > 0 ? filterIds : [NO_MATCH_ID])
   }
 
+  // CR-01/CR-02: grants target COLLECTIONS, never SOP ids. For a pinned
+  // ?sop= (post-publish wire-up CTA), resolve — and if the SOP only has a
+  // category, create — its collection(s) BEFORE the collections list below is
+  // read, so a just-created category collection renders in the right column.
+  // ensureSopCollections self-enforces admin + org scope server-side.
+  let ensuredCollectionIds: string[] = []
+  if (isAccessView && params.sop) {
+    const ensured = await ensureSopCollections(params.sop)
+    if (!('error' in ensured)) ensuredCollectionIds = ensured.collectionIds
+  }
+
   // One org-scoped governance read powers the header chips (GQ-04), the
   // needs-attention view, and the per-row flag chips — the same call the old
   // header widget made on this page, so cost is unchanged (server component).
@@ -193,7 +204,7 @@ export default async function SopsLibraryPage({
     collections = collRows.map((c) => ({ id: c.id, name: c.name, colour: c.colour, sopCount: countByCollection[c.id] ?? 0 }))
 
     const newSopRow = newSopResult?.data as { id: string; title: string | null } | null
-    if (newSopRow) newSop = { id: newSopRow.id, title: newSopRow.title ?? 'Untitled SOP' }
+    if (newSopRow) newSop = { id: newSopRow.id, title: newSopRow.title ?? 'Untitled SOP', collectionIds: ensuredCollectionIds }
   }
 
   const counts: Record<GovernanceFilter, number> = {
