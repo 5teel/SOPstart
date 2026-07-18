@@ -49,3 +49,15 @@ skipped: 0
 blocked: 0
 
 ## Gaps
+
+### G1. Builder header is disorienting (2026-07-19, Simon)
+Four stacked UI zones (breadcrumb, title+version, stage stepper, tool buttons) with a duplicate title and no "you are here / what's next / why is it locked" context. The verify block-list has no banner explaining it's the queue that unlocks "Send to workers". Reported while attempting UAT test 4.
+status: quick-fix in progress (context bar + dedupe + tool grouping); full redesign → sketches, then future phase
+
+### G2. No SOP-level drill-down in the wiring graph (2026-07-19, Simon)
+The library column shows collections only; an individual SOP appears only when pinned via ?sop=<id> (the post-publish CTA). A user landing on the Access view organically cannot pick a specific SOP to wire — the D-12b "organic" path isn't discoverable. Blocked UAT test 4 until a direct pin URL was supplied.
+status: logged — design question for sketches (expand collection → SOP chips, or SOP search/pin affordance)
+
+### G3. "Wiring / grants" terminology unclear to end users (2026-07-19, Simon)
+The wire/patch-bay metaphor and words like "grants" don't self-explain. UAT copy must be layman's language; the surface itself likely needs plainer labels ("Who can see this SOP").
+status: logged — fold into sketches
