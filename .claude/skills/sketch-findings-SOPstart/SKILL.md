@@ -62,7 +62,7 @@ shared model, no view-private state.
 | New block types | references/new-block-types.md | 8 new block types beyond Phase 12: Measurement, Decision, Escalate, SignOff, Zone, Inspect, VoiceNote, Model |
 | Interaction patterns | references/interaction-patterns.md | Voice state machine, cmdk, preview toggle, mobile immersive walkthrough |
 | Org model views | references/org-model-views.md | Node Chart default + Column Builder alt view; roles layer between depts and people; vacancies as dashed first-class chips |
-| Permission wiring views | references/permission-wiring-views.md | Patch Bay default + Matrix/Illuminate alt views; direct/inherited/personal access vocabulary; trace-on-click |
+| Permission wiring views | references/permission-wiring-views.md | Patch Bay default + Matrix/Illuminate alt views; direct/inherited/personal access vocabulary; trace-on-click. At scale (15×20): the D hybrid — groups + focus + viz-as-library-filter + wire-up mode with live blast-radius; fixed-height banner slot so the graph never moves |
 
 ## Theme
 
@@ -99,6 +99,7 @@ Original sketch HTML preserved at `sources/blueprint-sketch.html` (2015 lines, a
 - 20 PNG screenshots at repo root
 - `001-org-model-canvas` (winner B, Node Chart — wrapped 2026-07-18)
 - `002-permission-wiring` (winner A, Patch Bay — wrapped 2026-07-18)
+- `003-wiring-at-scale` (winner D, hybrid + wire-up — wrapped 2026-07-18)
 
 ## Related planning docs
 

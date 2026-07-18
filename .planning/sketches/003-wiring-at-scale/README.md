@@ -2,9 +2,15 @@
 sketch: 003
 name: wiring-at-scale
 question: "Does the Patch Bay survive real Visy scale (~15 depts × ~20 collections), and what collapse/filter/focus behaviour keeps it legible?"
-winner: null
+winner: "D"
 tags: [permissions, library-access, scale, patch-bay]
 ---
+
+> **Decision (2026-07-18):** the D hybrid ships — A's grouped structure + B's
+> focus interaction + viz-as-library-filter + wire-up mode. A/B/C stand as the
+> strategy exploration that produced it; C (always-on bus routing) rejected as
+> most build effort for least added clarity, though it proves an always-on
+> audit/wall-display mode is possible if ever wanted.
 
 # Sketch 003: Wiring at Scale
 

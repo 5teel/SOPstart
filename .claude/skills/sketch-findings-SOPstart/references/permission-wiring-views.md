@@ -106,7 +106,61 @@ Illuminate card states:
   stress-pass at ~15 × ~20 (real Visy scale) before build. The patch bay
   especially risks wire spaghetti; likely needs collapse-to-group behaviour.
 
+---
+
+# At Scale: the D Hybrid (sketch 003, winner — 2026-07-18)
+
+The 002 Patch Bay was validated at 4 depts × 6 collections. Sketch 003
+stress-tested it at real Visy scale (15 depts in 5 areas × 20 collections in
+6 domains, 34 grants) and produced the SHIPPING form of the wiring view — the
+"D hybrid". This supersedes the naive all-wires patch bay for any real dataset.
+
+## The hybrid's four pillars
+
+1. **Grouped structure** (from strategy A): org units live under area headers,
+   collections under domain headers; groups collapse to single jacks with
+   aggregated wires + count badges, expand in place. 15×20 collapses to a 6×6
+   overview that reads instantly. Endpoint resolution: a wire anchors at the
+   dept if its group is expanded, else at the group jack; grants can attach AT
+   the group (area) level and anchor there.
+2. **Focus interaction** (from strategy B): quiet by default — no wires drawn
+   until the user searches or clicks. Focusing draws only that unit's wires;
+   everything else dims. Search auto-expands groups containing matches.
+   Rejected: strategy C (always-on orthogonal bus routing) — proved always-on
+   density is possible without spaghetti, but most build effort for least
+   clarity; keep in the back pocket for an audit/wall-display mode.
+3. **Viz as library filter**: focusing any unit fills a selection strip —
+   "Engineering can see **37 SOPs** across 8 collections, e.g. <real titles>"
+   — with an "→ Open in library (N)" deep-link. URL contract:
+   `/admin/sops?departments=<id>` / `/admin/sops?collection=<id>` (the library
+   page already filters server-side; the viz is a filter front-end for it).
+4. **Wire-up mode — permission CREATION** (the surface's most important job):
+   a just-published SOP arrives pinned atop the library column as
+   `NEW · UNWIRED · 0 grants`. Clicking it enters connect mode: left-side org
+   units (Org / area / department / person — roles same mechanics later)
+   become grant toggles; each click draws/removes a live green wire (personal
+   grants dashed); a banner keeps a running **blast radius** — "Visible to
+   **104 people** via 3 grants" — so the admin knows exactly what ✓ Done
+   publishes. The blast-radius unit is PEOPLE, not SOPs: in wire-up mode the
+   decision being made is who gets reached.
+
+## Layout stability rule (applies to ANY contextual banner in the app)
+
+The selection/wiring strips must live in a **permanently-reserved fixed-height
+slot** (48px, `overflow:hidden`, headline `nowrap`+ellipsis) that swaps
+content + state class (idle hint / selection / wiring) and NEVER mounts or
+unmounts. Mount-on-select reflows the page and visibly jumps the graph on
+every click — verified fix: bay `getBoundingClientRect().top` pixel-identical
+across all state transitions. The idle state doubles as onboarding copy
+("Select anything to trace who it reaches · click the NEW SOP to wire it up").
+
+## Rest state
+
+Land quiet: only fresh wiring (the new SOP's wires) is visible, not the full
+graph. The collapsed 6×6 overview is one click away via groups.
+
 ## Origin
 
-Synthesized from sketch: 002-permission-wiring (winner A, Patch Bay).
-Source: sources/002-permission-wiring/index.html
+Synthesized from sketches: 002-permission-wiring (winner A, Patch Bay) and
+003-wiring-at-scale (winner D, hybrid + wire-up).
+Sources: sources/002-permission-wiring/index.html · sources/003-wiring-at-scale/index.html

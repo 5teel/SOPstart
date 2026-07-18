@@ -146,3 +146,13 @@ permissions: ⌇ Wiring / ▦ Matrix / ◉ Illuminate), and no view has private 
   the rest dims
 - Open: inherited-revoke ("exclude") affordance; wire behaviour at Visy scale
   (~15 depts × ~20 collections) needs a stress sketch before build
+
+### Session 2 addendum (2026-07-18)
+
+Sketch 003-wiring-at-scale (winner D) folded into the skill's
+permission-wiring-views reference: the shipping wiring view is the D hybrid —
+grouped structure + focus interaction + viz-as-library-filter
+(`/admin/sops?departments=|collection=` deep-links) + wire-up mode for new
+SOPs with a live people blast-radius count. Strategy C (always-on bus routing)
+rejected. New cross-cutting rule captured: contextual banners live in
+permanently-reserved fixed-height slots so canvases never move on selection.
