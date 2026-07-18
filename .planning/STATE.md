@@ -4,13 +4,13 @@ milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
 status: executing
 stopped_at: Completed 32-03-PLAN.md
-last_updated: "2026-07-18T07:42:45.901Z"
+last_updated: "2026-07-18T07:58:08.840Z"
 last_activity: 2026-07-18 -- Phase 32 execution started
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 29
-  completed_plans: 23
+  completed_plans: 24
   percent: 60
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 32 (visual-org-model-library-permissions) — EXECUTING
-Plan: 2 of 9
+Plan: 3 of 9
 Status: Ready to execute
 Last activity: 2026-07-18 -- Phase 32 execution started
 
@@ -171,6 +171,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 30 P07 | 25m | 3 tasks | 8 files |
 | Phase 30 P08 | ~40m | 3 tasks | 16 files |
 | Phase 32 P03 | 12min | 2 tasks | 2 files |
+| Phase 32 P04 | 20min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -364,6 +365,8 @@ Recent decisions affecting current work:
 - [Phase 30]: 30-08: journeys.ts maps /dashboard exactly once (legacy redirect-shim step) so /pathways shows 0 not-mapped while roles.ts still lands no role there; role-homes spec repointed from blanket ban to exactly-once assertion
 - [Phase 30]: 30-08: governance shim keeps the org-scoped admin guard IN FRONT of the redirect (T-30-08-03); approval-chain editor + its category/chains/members assembly moved verbatim to /admin/settings
 - [Phase 32-03]: Live-pushed migrations 00046+00047; tsx .ts scripts must wrap async logic in main() (no top-level await under CJS transform); 00047 access_grants seed insert required null::uuid cast
+- [Phase ?]: [Phase 32-04]: archiveArea/archiveRole are real DELETEs (no archived column on areas/roles, unlike departments REQ-6) - relies on ON DELETE SET NULL/CASCADE for cleanup
+- [Phase ?]: [Phase 32-04]: resolveEffectiveAccess(chain, grantsByUnit) is the ONE pure 5-level union resolver - every future org-model view must call it, never recompute inheritance per-view
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -473,7 +476,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-18T07:42:45.892Z
+Last session: 2026-07-18T07:56:08.238Z
 Stopped at: Completed 32-03-PLAN.md
 Resume file:
 None
