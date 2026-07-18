@@ -243,12 +243,16 @@ async function verify() {
   }
 }
 
-const mode = process.argv[2]
-if (mode === '--capture') {
-  await capture()
-} else if (mode === '--verify') {
-  await verify()
-} else {
-  console.error('Usage: npx tsx scripts/assert-phase32-day-one-equivalence.ts --capture|--verify')
-  process.exit(1)
+async function main() {
+  const mode = process.argv[2]
+  if (mode === '--capture') {
+    await capture()
+  } else if (mode === '--verify') {
+    await verify()
+  } else {
+    console.error('Usage: npx tsx scripts/assert-phase32-day-one-equivalence.ts --capture|--verify')
+    process.exit(1)
+  }
 }
+
+main()
