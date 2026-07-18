@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
 status: executing
-stopped_at: Completed 32-05-PLAN.md
-last_updated: "2026-07-18T08:26:23.489Z"
+stopped_at: Completed 32-06-PLAN.md
+last_updated: "2026-07-18T08:45:34.508Z"
 last_activity: 2026-07-18 -- Phase 32 execution started
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 29
-  completed_plans: 25
+  completed_plans: 26
   percent: 60
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 32 (visual-org-model-library-permissions) — EXECUTING
-Plan: 5 of 9
+Plan: 6 of 9
 Status: Ready to execute
 Last activity: 2026-07-18 -- Phase 32 execution started
 
@@ -173,6 +173,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 32 P03 | 12min | 2 tasks | 2 files |
 | Phase 32 P04 | 20min | 2 tasks | 5 files |
 | Phase 32 P05 | 24min | 2 tasks | 3 files |
+| Phase 32 P06 | 20min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -371,6 +372,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 32-05]: sop_departments becomes fully derived from access_grants via materializeSopAccess replace-semantics — verified faithful against live day-one-seeded access_grants for a sampled real SOP
 - [Phase ?]: [Phase 32-05]: person-level grants materialize via a direct access_grants filter (subject_type=person), not a resolveEffectiveAccess chain — a direct person grant is always personal regardless of ancestors
 - [Phase ?]: [Phase 32-05]: real runtime tests for cross-tenant write isolation and the D-13 RLS arm use ephemeral throwaway orgs (no staging Supabase project exists) since createGrant/materializeSopAccess cannot be invoked directly outside a Next.js request scope and no UI wires grants.ts yet
+- [Phase 32-06]: OrgChartCanvas add-affordance ghosts call org-model.ts createRole / departments.ts createDepartment directly via a caller-supplied onChange callback -- chart-rendering scope owns no fetch/refresh state; /admin/team page wiring (32-07) owns onChange -> refetch
+- [Phase 32-06]: Added .node/.person-chip/.view-toggle/.org-add-ghost CSS to blueprint-theme.css (not in plan files_modified) -- org-model-views.md's sketch CSS had no prior stylesheet declaration, so without it every chart element would render invisibly (Rule 2, CLAUDE.md 2026-07-14 undefined-token class)
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -480,7 +483,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-18T08:26:23.480Z
-Stopped at: Completed 32-05-PLAN.md
+Last session: 2026-07-18T08:45:34.498Z
+Stopped at: Completed 32-06-PLAN.md
 Resume file:
 None
