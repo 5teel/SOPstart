@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SafeStart — Library Access Hierarchy (sketch)</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --brand-yellow:#fbbf24;
+    --steel-900:#0a0a0b; --steel-700:#1f1f22;
+    --paper:#fafafa; --paper-2:#f4f4f5;
+    --ink-900:#09090b; --ink-700:#3f3f46; --ink-500:#71717a; --ink-300:#d4d4d8; --ink-100:#e7e7ea;
+    --accent-step:#3b82f6; --accent-ok:#10b981;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{font-family:'JetBrains Mono',ui-monospace,monospace;background:var(--paper);color:var(--ink-900);-webkit-font-smoothing:antialiased}
+  .prose{font-family:'Inter',system-ui,sans-serif}
+  button{font-family:inherit;cursor:pointer}
+
+  /* ---------- sketch meta chrome ---------- */
+  .flowsw{background:#18181b;border-bottom:1px solid #27272a;color:#a1a1aa;display:flex;align-items:center;gap:14px;padding:10px 18px;font-size:11px;position:sticky;top:0;z-index:50;flex-wrap:wrap}
+  .flowsw .lbl{text-transform:uppercase;letter-spacing:.1em;font-size:9px;color:#71717a}
+  .flowsw .seg{display:flex;gap:2px;background:#27272a;border-radius:4px;padding:3px}
+  .flowsw .seg button{font-size:11px;color:#a1a1aa;background:transparent;border:none;padding:6px 14px;border-radius:3px;letter-spacing:.03em}
+  .flowsw .seg button.on{background:var(--brand-yellow);color:#0a0a0b;font-weight:600}
+  .flowsw .note{margin-left:auto;color:#52525b;font-size:10px}
+
+  .concept{display:none}
+  .concept.show{display:block}
+  .chead{max-width:1060px;margin:30px auto 16px;padding:0 24px}
+  .chead .eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-500);margin-bottom:8px}
+  .chead h2{font-size:21px;font-weight:600;letter-spacing:-.01em;margin-bottom:6px}
+  .chead p{font-size:12.5px;color:var(--ink-700);line-height:1.6;max-width:720px;font-family:'Inter'}
+
+  .annos{max-width:1060px;margin:14px auto 44px;padding:0 24px;display:flex;gap:10px;flex-wrap:wrap}
+  .anno{border:1px dashed var(--ink-300);border-radius:4px;padding:9px 12px;font-size:11px;color:var(--ink-700);font-family:'Inter';flex:1 1 210px;background:var(--paper-2)}
+  .anno b{font-family:'JetBrains Mono';font-size:10px;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:3px;color:var(--ink-900)}
+
+  /* ---------- shared banner slot (fixed height — never reflows) ---------- */
+  .banner{max-width:1060px;margin:0 auto;padding:0 24px}
+  .banner .slot{height:52px;border:1.5px solid var(--ink-300);border-radius:4px;background:#fff;display:flex;align-items:center;gap:14px;padding:0 16px;overflow:hidden}
+  .banner .slot.wiring{border-color:var(--accent-ok);background:rgba(16,185,129,.05)}
+  .banner .msg{font-family:'Inter';font-size:12.5px;color:var(--ink-700);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1 1 auto}
+  .banner .msg b{color:var(--ink-900)}
+  .banner .done{flex:0 0 auto;font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;border-radius:3px;border:1.5px solid var(--accent-ok);background:var(--accent-ok);color:#fff;padding:7px 13px;display:none}
+  .banner .slot.wiring .done{display:block}
+
+  /* ================= CONCEPT A — PATCH BAY + DRILL-DOWN ================= */
+  .bay{max-width:1060px;margin:14px auto 0;padding:0 24px;position:relative}
+  .baycols{display:grid;grid-template-columns:1fr 220px 1fr;gap:0;position:relative}
+  .colhead{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-500);margin-bottom:10px}
+  .jack{background:#fff;border:1.5px solid var(--ink-300);border-radius:5px;padding:9px 12px;position:relative;cursor:pointer;margin-bottom:8px;transition:.12s}
+  .jack .nm{font-size:12px;font-weight:600}
+  .jack .meta{font-size:10px;color:var(--ink-500);font-family:'Inter';margin-top:2px}
+  .jack:hover{border-color:var(--ink-900)}
+  .jack.lit{border-color:var(--accent-step);box-shadow:0 0 0 3px rgba(59,130,246,.14)}
+  .jack.granted{border-color:var(--accent-ok);box-shadow:0 0 0 3px rgba(16,185,129,.14)}
+  .jack.dim{opacity:.38}
+  .port{position:absolute;top:50%;width:9px;height:9px;border-radius:50%;background:#fff;border:2px solid var(--ink-500);transform:translateY(-50%)}
+  .orgcol .port{right:-5px}
+  .libcol .port{left:-5px}
+  .jack.granted .port{border-color:var(--accent-ok);background:var(--accent-ok)}
+  .jack.lit .port{border-color:var(--accent-step);background:var(--accent-step)}
+  #wires{position:absolute;inset:0;pointer-events:none;overflow:visible}
+
+  /* collection groups with nested SOPs */
+  .coll{background:#fff;border:1.5px solid var(--ink-300);border-radius:5px;margin-bottom:8px;position:relative}
+  .coll > .chd{padding:9px 12px;cursor:pointer;display:flex;align-items:center;gap:9px}
+  .coll .tw{font-size:10px;color:var(--ink-500);width:11px;transition:.12s}
+  .coll.open .tw{transform:rotate(90deg)}
+  .coll .nm{font-size:12px;font-weight:600;flex:1}
+  .coll .cnt{font-size:10px;color:var(--ink-500);font-family:'Inter'}
+  .coll .soplist{display:none;border-top:1px dashed var(--ink-100);padding:6px 8px 8px 10px}
+  .coll.open .soplist{display:block}
+  .soprow{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:3px;cursor:pointer;position:relative;border:1.5px solid transparent}
+  .soprow .tree{color:var(--ink-300);font-size:11px}
+  .soprow .snm{font-family:'Inter';font-size:11.5px;color:var(--ink-700);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .soprow:hover{background:var(--paper-2)}
+  .soprow.sel{border-color:var(--accent-ok);background:rgba(16,185,129,.06)}
+  .soprow.sel .snm{color:var(--ink-900);font-weight:600}
+  .soprow .spill{font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;border:1px solid currentColor;border-radius:2px;padding:1px 5px;color:var(--ink-500);flex:0 0 auto}
+  .soprow .spill.new{color:#b45309;border-color:#f59e0b;background:rgba(251,191,36,.12)}
+  .coll.lit{border-color:var(--accent-step);box-shadow:0 0 0 3px rgba(59,130,246,.14)}
+  .coll.dim,.orgcol .jack.faded{opacity:.38}
+  .coll .port{left:-5px}
+
+  /* ================= CONCEPT B — WHO CAN SEE THIS? PANEL ================= */
+  .wcs{max-width:1060px;margin:14px auto 0;padding:0 24px;display:grid;grid-template-columns:400px 1fr;gap:18px;align-items:start}
+  .treecard,.panelcard{background:#fff;border:1.5px solid var(--ink-300);border-radius:5px}
+  .treecard .hd,.panelcard .hd{padding:11px 14px;border-bottom:1px solid var(--ink-100);font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-500)}
+  .tnode{padding:2px 8px}
+  .tnode .row{display:flex;align-items:center;gap:8px;padding:8px 8px;border-radius:3px;cursor:pointer;border:1.5px solid transparent}
+  .tnode .row:hover{background:var(--paper-2)}
+  .tnode .row.sel{border-color:var(--accent-step);background:rgba(59,130,246,.06)}
+  .tnode .tw{font-size:10px;color:var(--ink-500);width:11px;transition:.12s}
+  .tnode.open > .row .tw{transform:rotate(90deg)}
+  .tnode .fold{font-size:13px}
+  .tnode .nm{font-size:12px;font-weight:600;flex:1}
+  .tnode .who{font-size:10px;color:var(--ink-500);font-family:'Inter'}
+  .tnode .kids{display:none;padding-left:26px}
+  .tnode.open > .kids{display:block}
+  .leaf{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:3px;cursor:pointer;border:1.5px solid transparent}
+  .leaf:hover{background:var(--paper-2)}
+  .leaf.sel{border-color:var(--accent-step);background:rgba(59,130,246,.06)}
+  .leaf .doc{font-size:11px;color:var(--ink-500)}
+  .leaf .nm{font-family:'Inter';font-size:11.5px;color:var(--ink-700);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .leaf.sel .nm{color:var(--ink-900);font-weight:600}
+
+  .panelcard .hd{display:flex;justify-content:space-between;align-items:center}
+  .panelbody{padding:16px}
+  .panelbody h3{font-size:15px;font-weight:600;margin-bottom:3px}
+  .panelbody .sub{font-family:'Inter';font-size:11.5px;color:var(--ink-500);margin-bottom:14px}
+  .bigsent{font-family:'Inter';font-size:13px;color:var(--ink-700);border-left:3px solid var(--accent-ok);background:rgba(16,185,129,.05);padding:10px 13px;border-radius:0 3px 3px 0;margin-bottom:16px}
+  .bigsent b{color:var(--ink-900)}
+  .deptrow{display:flex;align-items:center;gap:11px;border:1.5px solid var(--ink-300);border-radius:4px;padding:11px 13px;margin-bottom:8px;cursor:pointer}
+  .deptrow:hover{border-color:var(--ink-900)}
+  .deptrow.on{border-color:var(--accent-ok);background:rgba(16,185,129,.05)}
+  .deptrow .box{width:18px;height:18px;border:2px solid var(--ink-300);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;flex:0 0 auto}
+  .deptrow.on .box{background:var(--accent-ok);border-color:var(--accent-ok)}
+  .deptrow .nm{font-size:12.5px;font-weight:600;flex:1}
+  .deptrow .who{font-size:11px;color:var(--ink-500);font-family:'Inter'}
+  .inherit-note{font-family:'Inter';font-size:11.5px;color:var(--ink-500);border:1px dashed var(--ink-300);border-radius:4px;padding:10px 13px;line-height:1.55;margin-bottom:8px}
+  .inherit-note b{color:var(--ink-700)}
+  .inherit-note a{color:var(--accent-step);cursor:pointer;text-decoration:underline}
+
+  /* ================= CONCEPT C — ACCESS CARDS ================= */
+  .cards{max-width:1060px;margin:14px auto 0;padding:0 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;align-items:start}
+  .acard{background:#fff;border:1.5px solid var(--ink-300);border-radius:5px;overflow:hidden}
+  .acard .top{padding:14px 16px 12px}
+  .acard h3{font-size:14px;font-weight:600;margin-bottom:2px}
+  .acard .cnt{font-size:10.5px;color:var(--ink-500);font-family:'Inter'}
+  .acard .seen{font-family:'Inter';font-size:12px;color:var(--ink-700);padding:0 16px 12px}
+  .acard .seen b{color:var(--ink-900)}
+  .acard .actions{display:flex;gap:8px;padding:0 16px 14px}
+  .acard .actions button{font-size:10.5px;letter-spacing:.04em;padding:6px 11px;border-radius:3px;border:1.5px solid var(--ink-300);background:var(--paper-2);color:var(--ink-700)}
+  .acard .actions button:hover{border-color:var(--ink-900)}
+  .acard .soplist2{border-top:1px dashed var(--ink-100);padding:8px 10px;display:none}
+  .acard.open .soplist2{display:block}
+  .acard .soplist2 .soprow{cursor:default}
+  .acard .editor{display:none;border-top:1.5px solid var(--accent-ok);background:rgba(16,185,129,.04);padding:12px 16px}
+  .acard.editing .editor{display:block}
+  .acard .editor .et{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-500);margin-bottom:9px}
+</style>
+</head>
+<body>
+
+<!-- meta switcher -->
+<div class="flowsw">
+  <span class="lbl">Sketch · library access hierarchy (G2 + G3)</span>
+  <div class="seg" id="sw">
+    <button data-c="a" class="on">A · Access map + drill-down</button>
+    <button data-c="b">B · "Who can see this?" panel</button>
+    <button data-c="c">C · Access cards</button>
+  </div>
+  <span class="note">Departments: Forming (14) · General (9) — Collections: Maintenance / Manufacturing / Safety &amp; Environment</span>
+</div>
+
+<!-- ============ CONCEPT A ============ -->
+<section class="concept show" id="c-a">
+  <div class="chead">
+    <div class="eyebrow">Concept A · keeps the map metaphor</div>
+    <h2>Access map with SOP drill-down</h2>
+    <p class="prose">The shipped patch bay, renamed <b>"Access map"</b> and given the missing hierarchy: every collection is expandable, its SOPs nest inside with tree lines, and clicking any SOP starts <b>"choose who sees it"</b> mode — no magic URL needed. All "wiring / grants" copy replaced: lines mean <i>can see</i>, the banner speaks in people. Try it: expand Maintenance, click the keyboard SOP, then toggle departments.</p>
+  </div>
+
+  <div class="banner">
+    <div class="slot" id="a-slot">
+      <span class="msg" id="a-msg">Click a department to see what it can see · open a collection and pick a SOP to change who sees it</span>
+      <button class="done" id="a-done">✓ Save — done</button>
+    </div>
+  </div>
+
+  <div class="bay">
+    <div class="baycols" id="a-bay">
+      <div class="orgcol">
+        <div class="colhead">Your teams</div>
+        <div class="jack" data-unit="site"><div class="nm">Whole site</div><div class="meta">everyone · 23 people</div><span class="port"></span></div>
+        <div class="jack" data-unit="forming"><div class="nm">Forming</div><div class="meta">14 people</div><span class="port"></span></div>
+        <div class="jack" data-unit="general"><div class="nm">General</div><div class="meta">9 people</div><span class="port"></span></div>
+      </div>
+      <div><!-- wire gutter --></div>
+      <div class="libcol">
+        <div class="colhead">Your SOP library</div>
+
+        <div class="coll open" data-coll="maint">
+          <div class="chd"><span class="tw">▶</span><span class="nm">Maintenance</span><span class="cnt">3 SOPs · seen by Forming, General</span></div>
+          <span class="port"></span>
+          <div class="soplist">
+            <div class="soprow" data-sop="kbd"><span class="tree">└</span><span class="snm">Replacing a Desktop Computer Keyboard at a Workstation</span><span class="spill new">New</span></div>
+            <div class="soprow" data-sop="plenum"><span class="tree">└</span><span class="snm">Changing Plenum Chamber — IS Machine Forming Section</span><span class="spill">Live</span></div>
+            <div class="soprow" data-sop="oil"><span class="tree">└</span><span class="snm">Monthly Compressor Oil Check</span><span class="spill">Live</span></div>
+          </div>
+        </div>
+
+        <div class="coll" data-coll="manuf">
+          <div class="chd"><span class="tw">▶</span><span class="nm">Manufacturing</span><span class="cnt">2 SOPs · seen by Forming</span></div>
+          <span class="port"></span>
+          <div class="soplist">
+            <div class="soprow" data-sop="jobchange"><span class="tree">└</span><span class="snm">IS Machine Job Change</span><span class="spill">Live</span></div>
+            <div class="soprow" data-sop="gob"><span class="tree">└</span><span class="snm">Gob Weight Adjustment</span><span class="spill">Live</span></div>
+          </div>
+        </div>
+
+        <div class="coll" data-coll="safety">
+          <div class="chd"><span class="tw">▶</span><span class="nm">Safety and Environment</span><span class="cnt">2 SOPs · seen by everyone</span></div>
+          <span class="port"></span>
+          <div class="soplist">
+            <div class="soprow" data-sop="hearing"><span class="tree">└</span><span class="snm">Hearing Protection Zones</span><span class="spill">Live</span></div>
+            <div class="soprow" data-sop="spill"><span class="tree">└</span><span class="snm">Chemical Spill Response</span><span class="spill">Live</span></div>
+          </div>
+        </div>
+      </div>
+      <svg id="wires"></svg>
+    </div>
+  </div>
+
+  <div class="annos">
+    <div class="anno"><b>SOPs live inside collections</b>Expandable groups with tree lines — the hierarchy is visible, not implied. Any SOP is reachable in two clicks.</div>
+    <div class="anno"><b>Plain words</b>"Access map" not "wiring" · "seen by Forming, General" not "2 grants" · "Save — done" not "✓ Done wiring". Lines still do the explaining.</div>
+    <div class="anno"><b>SOP click = change who sees it</b>Selecting a SOP turns the left column into on/off toggles; the banner counts people, live. Same wire-up mechanics as shipped — just discoverable.</div>
+    <div class="anno"><b>Collection-level truth</b>Toggling a SOP actually toggles its collection (the model is collection-level); the banner says so: "…everyone who can see Maintenance". Honest about the D-13 model.</div>
+  </div>
+</section>
+
+<!-- ============ CONCEPT B ============ -->
+<section class="concept" id="c-b">
+  <div class="chead">
+    <div class="eyebrow">Concept B · abandons the metaphor</div>
+    <h2>Library tree + "Who can see this?" panel</h2>
+    <p class="prose">No lines at all. Left: the library as folders — collections open to show their SOPs, exactly like a file explorer everyone already knows. Right: a panel that always answers one question about whatever is selected: <b>"Who can see this?"</b> Departments are checkboxes with people counts; a green summary sentence states the total. Selecting a SOP explains that it follows its collection, with a one-click jump to change it at the source.</p>
+  </div>
+
+  <div class="wcs">
+    <div class="treecard">
+      <div class="hd">Your SOP library</div>
+      <div style="padding:6px 4px 10px">
+        <div class="tnode open" id="b-maint">
+          <div class="row" data-sel="coll-maint"><span class="tw">▶</span><span class="fold">📁</span><span class="nm">Maintenance</span><span class="who">seen by 23 people</span></div>
+          <div class="kids">
+            <div class="leaf sel" data-sel="sop-kbd"><span class="doc">📄</span><span class="nm">Replacing a Desktop Computer Keyboard at a Workstation</span></div>
+            <div class="leaf" data-sel="sop-plenum"><span class="doc">📄</span><span class="nm">Changing Plenum Chamber — IS Machine Forming Section</span></div>
+            <div class="leaf" data-sel="sop-oil"><span class="doc">📄</span><span class="nm">Monthly Compressor Oil Check</span></div>
+          </div>
+        </div>
+        <div class="tnode">
+          <div class="row" data-sel="coll-manuf"><span class="tw">▶</span><span class="fold">📁</span><span class="nm">Manufacturing</span><span class="who">seen by 14 people</span></div>
+          <div class="kids">
+            <div class="leaf" data-sel="sop-jobchange"><span class="doc">📄</span><span class="nm">IS Machine Job Change</span></div>
+            <div class="leaf" data-sel="sop-gob"><span class="doc">📄</span><span class="nm">Gob Weight Adjustment</span></div>
+          </div>
+        </div>
+        <div class="tnode">
+          <div class="row" data-sel="coll-safety"><span class="tw">▶</span><span class="fold">📁</span><span class="nm">Safety and Environment</span><span class="who">seen by everyone</span></div>
+          <div class="kids">
+            <div class="leaf" data-sel="sop-hearing"><span class="doc">📄</span><span class="nm">Hearing Protection Zones</span></div>
+            <div class="leaf" data-sel="sop-spill"><span class="doc">📄</span><span class="nm">Chemical Spill Response</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panelcard" id="b-panel">
+      <div class="hd"><span>Who can see this?</span><span id="b-crumb" style="letter-spacing:0;text-transform:none;font-family:'Inter';color:var(--ink-500)">Maintenance › keyboard SOP</span></div>
+      <!-- SOP view -->
+      <div class="panelbody" id="b-sopview">
+        <h3>Replacing a Desktop Computer Keyboard at a Workstation</h3>
+        <div class="sub">In the <b>Maintenance</b> collection · sent to workers 19 Jul</div>
+        <div class="bigsent"><b>23 people</b> can see this SOP — everyone in <b>Forming</b> and <b>General</b>.</div>
+        <div class="inherit-note">
+          This SOP is seen by whoever can see its collection, <b>Maintenance</b>.
+          To change who sees it, <a id="b-jump">change who sees Maintenance</a> — or move this SOP to a different collection.
+        </div>
+      </div>
+      <!-- Collection view -->
+      <div class="panelbody" id="b-collview" style="display:none">
+        <h3>Maintenance</h3>
+        <div class="sub">3 SOPs · changing this changes who sees all of them</div>
+        <div class="bigsent" id="b-sent"><b>23 people</b> can see the Maintenance collection.</div>
+        <div class="deptrow on" data-people="14"><span class="box">✓</span><span class="nm">Forming</span><span class="who">14 people</span></div>
+        <div class="deptrow on" data-people="9"><span class="box">✓</span><span class="nm">General</span><span class="who">9 people</span></div>
+        <div class="inherit-note" style="margin-top:10px">Ticking a department means everyone in it can open these SOPs on their phone. Nobody is notified until a SOP is sent to workers.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annos">
+    <div class="anno"><b>A question, not a metaphor</b>The panel headline IS the user's question. Zero learned vocabulary — folders, files, checkboxes, a sentence.</div>
+    <div class="anno"><b>Honest inheritance</b>A SOP's panel says it follows its collection and links to the one place that changes it. No silent per-SOP toggles that secretly edit the collection.</div>
+    <div class="anno"><b>People counts everywhere</b>Every row and every summary is denominated in people — the number a safety manager actually reasons about.</div>
+    <div class="anno"><b>Trade-off</b>Loses the whole-org overview in one glance (which department can see what, across everything). That stays a job for the map/matrix view.</div>
+  </div>
+</section>
+
+<!-- ============ CONCEPT C ============ -->
+<section class="concept" id="c-c">
+  <div class="chead">
+    <div class="eyebrow">Concept C · middle ground</div>
+    <h2>Access cards — one card per collection, sentence on the face</h2>
+    <p class="prose">The library as a grid of collection cards. Each card face answers the question before it's asked: <b>"Seen by Forming and General — 23 people."</b> "Show SOPs" expands the card to list what's inside; <b>"Change who sees these"</b> flips the card into a department checklist in place. Browsing and permissioning are the same surface, and there is no diagram to learn.</p>
+  </div>
+
+  <div class="cards">
+    <div class="acard open editing" id="c-maint">
+      <div class="top"><h3>Maintenance</h3><div class="cnt">3 SOPs</div></div>
+      <div class="seen" id="c-seen">Seen by <b>Forming</b> and <b>General</b> — <b>23 people</b>.</div>
+      <div class="actions"><button data-act="sops">Show SOPs ▾</button><button data-act="edit">Change who sees these</button></div>
+      <div class="soplist2">
+        <div class="soprow"><span class="tree">└</span><span class="snm">Replacing a Desktop Computer Keyboard at a Workstation</span><span class="spill new">New</span></div>
+        <div class="soprow"><span class="tree">└</span><span class="snm">Changing Plenum Chamber — IS Machine Forming Section</span><span class="spill">Live</span></div>
+        <div class="soprow"><span class="tree">└</span><span class="snm">Monthly Compressor Oil Check</span><span class="spill">Live</span></div>
+      </div>
+      <div class="editor">
+        <div class="et">Who can see the 3 SOPs in Maintenance?</div>
+        <div class="deptrow on" data-people="14"><span class="box">✓</span><span class="nm">Forming</span><span class="who">14 people</span></div>
+        <div class="deptrow on" data-people="9"><span class="box">✓</span><span class="nm">General</span><span class="who">9 people</span></div>
+      </div>
+    </div>
+
+    <div class="acard">
+      <div class="top"><h3>Manufacturing</h3><div class="cnt">2 SOPs</div></div>
+      <div class="seen">Seen by <b>Forming</b> — <b>14 people</b>.</div>
+      <div class="actions"><button data-act="sops">Show SOPs ▾</button><button data-act="edit">Change who sees these</button></div>
+      <div class="soplist2">
+        <div class="soprow"><span class="tree">└</span><span class="snm">IS Machine Job Change</span><span class="spill">Live</span></div>
+        <div class="soprow"><span class="tree">└</span><span class="snm">Gob Weight Adjustment</span><span class="spill">Live</span></div>
+      </div>
+      <div class="editor">
+        <div class="et">Who can see the 2 SOPs in Manufacturing?</div>
+        <div class="deptrow on"><span class="box">✓</span><span class="nm">Forming</span><span class="who">14 people</span></div>
+        <div class="deptrow"><span class="box"></span><span class="nm">General</span><span class="who">9 people</span></div>
+      </div>
+    </div>
+
+    <div class="acard">
+      <div class="top"><h3>Safety and Environment</h3><div class="cnt">2 SOPs</div></div>
+      <div class="seen">Seen by <b>everyone at the site</b> — <b>23 people</b>.</div>
+      <div class="actions"><button data-act="sops">Show SOPs ▾</button><button data-act="edit">Change who sees these</button></div>
+      <div class="soplist2">
+        <div class="soprow"><span class="tree">└</span><span class="snm">Hearing Protection Zones</span><span class="spill">Live</span></div>
+        <div class="soprow"><span class="tree">└</span><span class="snm">Chemical Spill Response</span><span class="spill">Live</span></div>
+      </div>
+      <div class="editor">
+        <div class="et">Who can see the 2 SOPs in Safety and Environment?</div>
+        <div class="deptrow on"><span class="box">✓</span><span class="nm">Whole site</span><span class="who">23 people</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="annos">
+    <div class="anno"><b>Sentence on the face</b>The answer to "who can see this?" is printed on every card before any interaction — the audit view IS the browse view.</div>
+    <div class="anno"><b>Edit in place</b>"Change who sees these" flips the same card into checkboxes; no mode, no second page, no diagram.</div>
+    <div class="anno"><b>Scale question</b>~20 collections = ~20 cards; fine with search/filter on top, but no single-glance org↔library overview and no per-person overrides visible.</div>
+  </div>
+</section>
+
+<script>
+  // ---------- concept switcher ----------
+  const sw = document.getElementById('sw');
+  sw.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    sw.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+    document.querySelectorAll('.concept').forEach(c => c.classList.remove('show'));
+    document.getElementById('c-' + b.dataset.c).classList.add('show');
+    window.scrollTo(0, 0);
+    if (b.dataset.c === 'a') requestAnimationFrame(drawWires);
+  });
+
+  // ================= Concept A logic =================
+  // Access model: which units can see which collections (collection-level truth).
+  const SEES = { maint: ['forming', 'general'], manuf: ['forming'], safety: ['site'] };
+  const PEOPLE = { site: 23, forming: 14, general: 9 };
+  const SOP_COLL = { kbd: 'maint', plenum: 'maint', oil: 'maint', jobchange: 'manuf', gob: 'manuf', hearing: 'safety', spill: 'safety' };
+  const SOP_NAME = { kbd: 'Replacing a Desktop Computer Keyboard…', plenum: 'Changing Plenum Chamber…', oil: 'Monthly Compressor Oil Check', jobchange: 'IS Machine Job Change', gob: 'Gob Weight Adjustment', hearing: 'Hearing Protection Zones', spill: 'Chemical Spill Response' };
+  const COLL_NAME = { maint: 'Maintenance', manuf: 'Manufacturing', safety: 'Safety and Environment' };
+
+  const bay = document.getElementById('a-bay');
+  const svg = document.getElementById('wires');
+  const slot = document.getElementById('a-slot');
+  const msg = document.getElementById('a-msg');
+  let selSop = null;       // sop id in "choose who sees it" mode
+  let focusUnit = null;    // focused dept
+
+  function peopleFor(collId) {
+    const units = SEES[collId] || [];
+    if (units.includes('site')) return PEOPLE.site;
+    return units.reduce((n, u) => n + (PEOPLE[u] || 0), 0);
+  }
+
+  function wire(fromEl, toEl, cls) {
+    const b = bay.getBoundingClientRect();
+    const f = fromEl.getBoundingClientRect(), t = toEl.getBoundingClientRect();
+    const x1 = f.right - b.left, y1 = f.top + f.height / 2 - b.top;
+    const x2 = t.left - b.left, y2 = t.top + t.height / 2 - b.top;
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', `M ${x1} ${y1} C ${(x1 + x2) / 2} ${y1}, ${(x1 + x2) / 2} ${y2}, ${x2} ${y2}`);
+    p.setAttribute('fill', 'none');
+    p.setAttribute('stroke', cls === 'ok' ? 'var(--accent-ok)' : 'var(--accent-step)');
+    p.setAttribute('stroke-width', '2');
+    svg.appendChild(p);
+  }
+
+  function drawWires() {
+    svg.innerHTML = '';
+    svg.setAttribute('width', bay.offsetWidth); svg.setAttribute('height', bay.offsetHeight);
+    const unitEl = (u) => bay.querySelector(`.jack[data-unit="${u}"]`);
+    const collEl = (c) => bay.querySelector(`.coll[data-coll="${c}"]`);
+    if (selSop) {
+      const c = SOP_COLL[selSop];
+      (SEES[c] || []).forEach((u) => wire(unitEl(u), collEl(c), 'ok'));
+    } else if (focusUnit) {
+      Object.keys(SEES).forEach((c) => {
+        const units = SEES[c];
+        if (units.includes(focusUnit) || (units.includes('site'))) wire(unitEl(units.includes(focusUnit) ? focusUnit : 'site'), collEl(c), 'ok');
+      });
+    }
+  }
+
+  function render() {
+    // jacks
+    bay.querySelectorAll('.jack').forEach((j) => {
+      const u = j.dataset.unit;
+      j.classList.remove('lit', 'granted', 'dim');
+      if (selSop) {
+        const c = SOP_COLL[selSop];
+        if ((SEES[c] || []).includes(u)) j.classList.add('granted');
+      } else if (focusUnit) {
+        // 'site' stays visible when it is the source of an inherited line
+        const contributes = u === 'site' && Object.values(SEES).some((units) => units.includes('site'));
+        if (u === focusUnit) j.classList.add('lit');
+        else if (!contributes) j.classList.add('dim');
+      }
+    });
+    // collections
+    bay.querySelectorAll('.coll').forEach((cEl) => {
+      const c = cEl.dataset.coll;
+      cEl.classList.remove('lit', 'dim');
+      if (selSop) { if (SOP_COLL[selSop] !== c) cEl.classList.add('dim'); }
+      else if (focusUnit) {
+        const canSee = (SEES[c] || []).includes(focusUnit) || (SEES[c] || []).includes('site');
+        cEl.classList.toggle('lit', canSee); if (!canSee) cEl.classList.add('dim');
+      }
+      // face copy
+      const units = SEES[c] || [];
+      const label = units.includes('site') ? 'seen by everyone' : units.length ? 'seen by ' + units.map((u) => u[0].toUpperCase() + u.slice(1)).join(', ') : 'not visible to anyone yet';
+      cEl.querySelector('.cnt').textContent = `${cEl.querySelectorAll('.soprow').length} SOPs · ${label}`;
+    });
+    // sop rows
+    bay.querySelectorAll('.soprow').forEach((r) => r.classList.toggle('sel', r.dataset.sop === selSop));
+    // banner
+    slot.classList.toggle('wiring', !!selSop);
+    if (selSop) {
+      const c = SOP_COLL[selSop];
+      msg.innerHTML = `Choosing who sees <b>"${SOP_NAME[selSop]}"</b> — tap teams on the left. Right now <b>${peopleFor(c)} people</b> can see it (everyone who can see ${COLL_NAME[c]}).`;
+    } else if (focusUnit) {
+      const n = Object.keys(SEES).filter((c) => SEES[c].includes(focusUnit) || SEES[c].includes('site')).length;
+      msg.innerHTML = `<b>${focusUnit[0].toUpperCase() + focusUnit.slice(1)}</b> can see <b>${n} collections</b> — highlighted on the right. Click a SOP to change who sees it.`;
+    } else {
+      msg.textContent = 'Click a department to see what it can see · open a collection and pick a SOP to change who sees it';
+    }
+    requestAnimationFrame(drawWires);
+  }
+
+  bay.addEventListener('click', (e) => {
+    const chd = e.target.closest('.chd');
+    if (chd) { chd.parentElement.classList.toggle('open'); render(); return; }
+    const row = e.target.closest('.soprow');
+    if (row) { selSop = selSop === row.dataset.sop ? null : row.dataset.sop; focusUnit = null; render(); return; }
+    const jack = e.target.closest('.jack');
+    if (jack) {
+      const u = jack.dataset.unit;
+      if (selSop) { // toggle who sees the selected SOP's collection
+        const c = SOP_COLL[selSop]; const i = SEES[c].indexOf(u);
+        if (i >= 0) SEES[c].splice(i, 1); else SEES[c].push(u);
+      } else { focusUnit = focusUnit === u ? null : u; }
+      render(); return;
+    }
+    selSop = null; focusUnit = null; render();
+  });
+  document.getElementById('a-done').addEventListener('click', (e) => { e.stopPropagation(); selSop = null; render(); });
+  window.addEventListener('resize', drawWires);
+  render();
+
+  // ================= Concept B logic =================
+  const bPanelViews = { sop: document.getElementById('b-sopview'), coll: document.getElementById('b-collview') };
+  document.querySelectorAll('#c-b .tnode > .row, #c-b .leaf').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      if (el.classList.contains('row') && e.target.closest('.tw')) { el.parentElement.classList.toggle('open'); return; }
+      if (el.classList.contains('row')) el.parentElement.classList.toggle('open');
+      document.querySelectorAll('#c-b .row, #c-b .leaf').forEach((x) => x.classList.remove('sel'));
+      el.classList.add('sel');
+      const isColl = (el.dataset.sel || '').startsWith('coll-');
+      bPanelViews.sop.style.display = isColl ? 'none' : 'block';
+      bPanelViews.coll.style.display = isColl ? 'block' : 'none';
+      document.getElementById('b-crumb').textContent = isColl ? 'collection' : 'Maintenance › ' + el.querySelector('.nm').textContent.slice(0, 28) + '…';
+    });
+  });
+  document.getElementById('b-jump').addEventListener('click', () => {
+    document.querySelector('#c-b .row[data-sel="coll-maint"]').click();
+  });
+  // dept checkbox toggles (concept B collection view)
+  document.querySelectorAll('#b-collview .deptrow').forEach((r) => r.addEventListener('click', () => {
+    r.classList.toggle('on'); r.querySelector('.box').textContent = r.classList.contains('on') ? '✓' : '';
+    const total = [...document.querySelectorAll('#b-collview .deptrow.on')].reduce((n, x) => n + (+x.dataset.people || 0), 0);
+    document.getElementById('b-sent').innerHTML = total ? `<b>${total} people</b> can see the Maintenance collection.` : `<b>Nobody</b> can see the Maintenance collection yet — tick a department below.`;
+  }));
+
+  // ================= Concept C logic =================
+  document.querySelectorAll('#c-c .acard .actions button').forEach((b) => b.addEventListener('click', () => {
+    const card = b.closest('.acard');
+    if (b.dataset.act === 'sops') card.classList.toggle('open');
+    else card.classList.toggle('editing');
+  }));
+  document.querySelectorAll('#c-c .editor .deptrow').forEach((r) => r.addEventListener('click', () => {
+    r.classList.toggle('on'); r.querySelector('.box').textContent = r.classList.contains('on') ? '✓' : '';
+    const card = r.closest('.acard');
+    const on = [...card.querySelectorAll('.editor .deptrow.on')];
+    const total = on.reduce((n, x) => n + (+(x.dataset.people || x.querySelector('.who').textContent.match(/\d+/)?.[0] || 0)), 0);
+    const names = on.map((x) => x.querySelector('.nm').textContent);
+    card.querySelector('.seen').innerHTML = names.length ? `Seen by <b>${names.join('</b> and <b>')}</b> — <b>${total} people</b>.` : `Not visible to anyone yet — tick a department below.`;
+  }));
+</script>
+</body>
+</html>
