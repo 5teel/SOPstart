@@ -18,9 +18,11 @@ export interface WiringPatchBayShellProps {
   collections: WiringCollection[]
   grants: AccessGrant[]
   newSop?: WiringNewSop | null
+  /** WR-03: dept id -> member ids from the Phase 25 member_departments junction. */
+  deptMembers?: Record<string, string[]>
 }
 
-export function WiringPatchBayShell({ tree, orgName, collections, grants, newSop }: WiringPatchBayShellProps) {
+export function WiringPatchBayShell({ tree, orgName, collections, grants, newSop, deptMembers }: WiringPatchBayShellProps) {
   const router = useRouter()
   return (
     <WiringPatchBay
@@ -29,6 +31,7 @@ export function WiringPatchBayShell({ tree, orgName, collections, grants, newSop
       collections={collections}
       grants={grants}
       newSop={newSop}
+      deptMembers={deptMembers}
       onWireUpComplete={() => router.refresh()}
     />
   )

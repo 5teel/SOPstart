@@ -68,6 +68,13 @@ interface WiringPatchBayProps {
   collections: WiringCollection[]
   grants: AccessGrant[]
   newSop?: WiringNewSop | null
+  /**
+   * WR-03: dept id -> member ids from the Phase 25 member_departments junction
+   * (fetched server-side). Dept-level grants materialize into sop_departments,
+   * which workers see via member_departments — role_members alone materially
+   * under-reports the blast radius (day-one orgs have no job roles at all).
+   */
+  deptMembers?: Record<string, string[]>
   /** Called after wire-up ✓ Done successfully writes grants — caller decides how to refetch. */
   onWireUpComplete?: () => void
 }
@@ -99,7 +106,7 @@ function deptPeopleIds(dept: OrgTreeDepartment): string[] {
   return dept.roles.flatMap((r) => r.people.filter((p) => !p.isVacancy && p.id).map((p) => p.id as string))
 }
 
-export function WiringPatchBay({ tree, orgName = 'Whole site', collections, grants, newSop, onWireUpComplete }: WiringPatchBayProps) {
+export function WiringPatchBay({ tree, orgName = 'Whole site', collections, grants, newSop, deptMembers, onWireUpComplete }: WiringPatchBayProps) {
   const [lens, setLens] = useState<LensView>('wiring')
   const [expandedAreas, setExpandedAreas] = useState<Set<string>>(new Set())
   const [focus, setFocus] = useState<string | null>(null)
@@ -134,7 +141,10 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
     const idx = new Map<string, string[]>()
     const allIds: string[] = []
     for (const dept of depts) {
-      const ids = deptPeopleIds(dept)
+      // WR-03: role members UNION member_departments members — dept-level
+      // grants reach both populations. Only dept ids in OUR tree are indexed,
+      // so any foreign-org member_departments rows are ignored here.
+      const ids = [...new Set([...deptPeopleIds(dept), ...(deptMembers?.[dept.id] ?? [])])]
       idx.set(dept.id, ids)
       allIds.push(...ids)
     }
@@ -142,7 +152,7 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
     idx.set(tree.organisationId, [...new Set(allIds)])
     for (const id of personIds) if (!idx.has(id)) idx.set(id, [id])
     return idx
-  }, [tree, depts, personIds])
+  }, [tree, depts, personIds, deptMembers])
 
   const chains = useMemo(() => {
     const m = new Map<string, ChainLink[]>()

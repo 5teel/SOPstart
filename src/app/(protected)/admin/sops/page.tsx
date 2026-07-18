@@ -163,6 +163,7 @@ export default async function SopsLibraryPage({
     grantsResult,
     collectionsResult,
     newSopResult,
+    memberDeptsResult,
   ] = await Promise.all([
     isAccessView ? Promise.resolve({ data: null }) : query,
     listGovernanceQueue(),
@@ -176,6 +177,15 @@ export default async function SopsLibraryPage({
     isAccessView && params.sop
       ? supabase.from('sops').select('id, title').eq('id', params.sop).maybeSingle()
       : Promise.resolve({ data: null }),
+    // WR-03: dept-level grants reach workers via the Phase 25 member_departments
+    // junction, not only role_members — without it the blast-radius banner
+    // reads "Visible to 0 people" for any org that hasn't adopted job roles.
+    // Foreign-org rows (if any leak through RLS) are ignored downstream: the
+    // patch bay only indexes department ids present in the caller's own tree.
+    isAccessView
+      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (supabase as any).from('member_departments').select('member_id, department_id')
+      : Promise.resolve({ data: null }),
   ])
   const govRows: GovernanceRow[] = 'success' in govResult && govResult.success ? govResult.rows : []
   const flaggedRows = govRows.filter((r) => r.flags.length > 0)
@@ -187,7 +197,11 @@ export default async function SopsLibraryPage({
   let grantsList: GrantRow[] = []
   let collections: WiringCollection[] = []
   let newSop: WiringNewSop | null = null
+  const deptMembers: Record<string, string[]> = {}
   if (isAccessView) {
+    for (const r of ((memberDeptsResult?.data ?? []) as Array<{ member_id: string; department_id: string }>)) {
+      ;(deptMembers[r.department_id] ??= []).push(r.member_id)
+    }
     if (treeResult && !('error' in treeResult)) orgTree = treeResult
     if (grantsResult && !('error' in grantsResult)) grantsList = grantsResult.grants
 
@@ -348,7 +362,7 @@ export default async function SopsLibraryPage({
                 </p>
               </div>
             ) : (
-              <WiringPatchBayShell tree={orgTree} collections={collections} grants={grantsList} newSop={newSop} />
+              <WiringPatchBayShell tree={orgTree} collections={collections} grants={grantsList} newSop={newSop} deptMembers={deptMembers} />
             )}
           </>
         ) : isAttentionView ? (
