@@ -104,3 +104,45 @@ Auto-load routing line added to the project `CLAUDE.md` so the skill is loaded a
 ## Next step
 
 Run `/gsd-spec-phase 12.5` with the SOPstart sketch-findings skill in context. The spec interview will resolve the 10 open questions captured in `references/new-block-types.md` and `references/interaction-patterns.md` (phasing, voice on-device vs server, 3D upload flow, ModelBlock deferral, etc.), then produce `12.5-SPEC.md` locking what ships in this phase.
+
+---
+
+# Sketch Wrap-Up Summary — Session 2
+
+**Date:** 2026-07-18
+**Sketches processed:** 2 (001-org-model-canvas, 002-permission-wiring)
+**Design areas:** 2 (org model views, permission wiring views)
+**Skill output:** `./.claude/skills/sketch-findings-SOPstart/` (appended)
+
+## Included Sketches
+
+| # | Name | Winner | Design Area |
+|---|------|--------|-------------|
+| 001 | org-model-canvas | B: Node Chart (default) + A: Column Builder as alt view | org-model-views |
+| 002 | permission-wiring | A: Patch Bay (default) + B: Matrix + C: Illuminate as alt views | permission-wiring-views |
+
+## Excluded Sketches
+
+| # | Name | Reason |
+|---|------|--------|
+| 001-C | Outline Tree variant | Reads as a roster table, not a visual model — interaction ideas retained as potential keyboard shortcuts only |
+
+## Design Direction
+
+Extends the paper/ink blueprint system to the org-model + library-permissions
+surfaces. Core decision: **multi-view over one shared model** — each surface is
+one page with an in-page segmented view toggle (org: ⊞ Chart / ▤ Columns;
+permissions: ⌇ Wiring / ▦ Matrix / ◉ Illuminate), and no view has private state.
+
+## Key Decisions
+
+- Roles become an entity between departments and people; vacancies (unnamed
+  role-holders) are first-class dashed chips with capacity counts (3/4)
+- Access vocabulary shared across all permission views: direct (solid green),
+  inherited (dashed green + "VIA <source>"), personal grant (dashed wire),
+  no-access (muted, never red)
+- Collections (not individual SOPs) are the wiring unit
+- Trace-on-click is the at-a-glance move: select anything, related lights up,
+  the rest dims
+- Open: inherited-revoke ("exclude") affordance; wire behaviour at Visy scale
+  (~15 depts × ~20 collections) needs a stress sketch before build

@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sketch 002 — Permission Wiring</title>
+<link rel="stylesheet" href="../themes/default.css?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  .page { max-width: 1280px; margin: 0 auto; padding: 24px; }
+  .page-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px; }
+  .page-head h1 { font-family: var(--mono); font-size: 20px; margin: 0; }
+  .page-sub { font-family: var(--mono); font-size: 11px; color: var(--ink-500); margin-bottom: 20px; }
+  .dept-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+  /* ---------- Variant A: patch bay ---------- */
+  .bay { position: relative; display: flex; justify-content: space-between; gap: 40px; min-height: 620px; }
+  .bay-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .bay-col { width: 300px; z-index: 2; display: flex; flex-direction: column; gap: 10px; }
+  .bay-col h2 { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-500); margin: 0 0 4px; }
+  .jack {
+    background: var(--paper-1); border: 1.5px solid var(--ink-300); border-radius: 5px;
+    padding: 9px 12px; cursor: pointer; position: relative;
+  }
+  .jack:hover { border-color: var(--ink-500); }
+  .jack.lit { border-color: var(--accent-step); box-shadow: 0 0 0 3px rgba(59,130,246,0.14); }
+  .jack.dim { opacity: 0.35; }
+  .jack .kicker { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-500); display:flex; align-items:center; gap:5px; }
+  .jack .title { font-size: 13px; font-weight: 700; }
+  .jack .meta { font-family: var(--mono); font-size: 10px; color: var(--ink-500); }
+  .jack.person-jack { margin-left: 26px; }
+  .jack.person-jack .title { font-weight: 600; }
+  .port { position: absolute; top: 50%; width: 9px; height: 9px; border-radius: 50%; background: var(--paper-1); border: 2px solid var(--ink-400); transform: translateY(-50%); }
+  .bay-col.left .port { right: -5px; }
+  .bay-col.right .port { left: -5px; }
+  .jack.lit .port { border-color: var(--accent-step); background: var(--accent-step); }
+  .bay-hint { font-family: var(--mono); font-size: 10px; color: var(--ink-500); margin-top: 14px; }
+  .wire-badge {
+    position: absolute; font-family: var(--mono); font-size: 9px; font-weight: 700;
+    background: var(--ink-900); color: #fff; border-radius: 999px; padding: 1px 7px;
+    transform: translate(-50%, -50%); z-index: 3; pointer-events: none;
+  }
+
+  /* ---------- Variant B: matrix ---------- */
+  .matrix { border: 1px solid var(--ink-300); border-radius: 6px; overflow: hidden; background: var(--paper-1); }
+  .matrix table { border-collapse: collapse; width: 100%; }
+  .matrix th, .matrix td { border-bottom: 1px solid var(--ink-100); padding: 0; }
+  .matrix thead th {
+    font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--ink-700); padding: 10px 8px; background: var(--paper-2);
+    border-left: 1px solid var(--ink-100); vertical-align: bottom; min-width: 92px;
+  }
+  .matrix thead th .cnt { display:block; color: var(--ink-400); font-weight: 400; margin-top: 2px; }
+  .matrix .rowhead {
+    text-align: left; padding: 9px 14px; font-size: 13px; font-weight: 600; white-space: nowrap;
+    display: flex; align-items: center; gap: 8px; border-left: none;
+  }
+  .matrix .rowhead .sub { font-family: var(--mono); font-size: 10px; color: var(--ink-500); font-weight: 400; }
+  .matrix tr.person-row .rowhead { padding-left: 38px; font-weight: 400; color: var(--ink-700); }
+  .matrix td.cell { text-align: center; cursor: pointer; border-left: 1px solid var(--ink-100); height: 40px; min-width: 92px; }
+  .matrix td.cell:hover { background: #eff4ff; }
+  .matrix tr:hover td { background: rgba(59,130,246,0.045); }
+  .dotmark { display: inline-block; width: 14px; height: 14px; border-radius: 50%; }
+  .dotmark.direct { background: var(--accent-ok); }
+  .dotmark.inherit { border: 2px dashed var(--accent-ok); background: transparent; }
+  .dotmark.none { border: 1px solid var(--ink-200); background: transparent; }
+  .matrix-legend { display: flex; gap: 18px; margin-top: 10px; font-family: var(--mono); font-size: 10px; color: var(--ink-500); align-items: center; }
+  .matrix-legend .dotmark { width: 11px; height: 11px; }
+
+  /* ---------- Variant C: illuminate ---------- */
+  .illum { display: flex; gap: 24px; align-items: flex-start; }
+  .illum-tree { width: 290px; border: 1px solid var(--ink-300); border-radius: 6px; background: var(--paper-1); overflow: hidden; flex-shrink: 0; }
+  .it-row { display: flex; align-items: center; gap: 8px; padding: 8px 12px; cursor: pointer; border-bottom: 1px solid var(--ink-100); }
+  .it-row:hover { background: var(--paper-2); }
+  .it-row.sel { background: #eff4ff; box-shadow: inset 3px 0 0 var(--accent-step); }
+  .it-row.lit-by-sop { background: rgba(22,163,74,0.08); }
+  .it-row .label { flex: 1; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 7px; }
+  .it-row.person { padding-left: 34px; }
+  .it-row.person .label { font-weight: 400; color: var(--ink-700); }
+  .it-row.root .label { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .it-row .cnt { font-family: var(--mono); font-size: 10px; color: var(--ink-500); }
+  .illum-lib { flex: 1; }
+  .illum-lib h2 { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-500); margin: 0 0 10px; }
+  .lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+  .sop-card {
+    border: 1.5px solid var(--ink-300); border-radius: 6px; background: var(--paper-1);
+    padding: 12px; cursor: pointer; transition: border-color .12s, opacity .12s;
+  }
+  .sop-card .kicker { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-500); }
+  .sop-card .title { font-size: 14px; font-weight: 700; margin: 3px 0 2px; }
+  .sop-card .meta { font-family: var(--mono); font-size: 10px; color: var(--ink-500); }
+  .sop-card .state {
+    margin-top: 10px; display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: 0.05em;
+    padding: 3px 9px; border-radius: 999px;
+  }
+  .sop-card.direct { border-color: var(--accent-ok); }
+  .sop-card.direct .state { background: rgba(22,163,74,0.12); color: var(--accent-ok); }
+  .sop-card.inherit { border-color: rgba(22,163,74,0.45); border-style: dashed; }
+  .sop-card.inherit .state { background: transparent; border: 1px dashed rgba(22,163,74,0.5); color: var(--accent-ok); }
+  .sop-card.off { opacity: 0.55; }
+  .sop-card.off .state { background: var(--paper-2); color: var(--ink-500); }
+  .illum-headline { font-size: 13px; color: var(--ink-700); margin-bottom: 12px; }
+  .illum-headline b { font-weight: 700; }
+
+  /* In-page view switcher — the affordance that SHIPS (decision 2026-07-17):
+     one permissions surface, Wiring default, Matrix + Illuminate as views. */
+  .view-toggle {
+    margin-left: auto; display: inline-flex; border: 1px solid var(--ink-300);
+    border-radius: 3px; overflow: hidden; background: var(--paper-1);
+  }
+  .view-toggle button {
+    font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: 0.05em;
+    text-transform: uppercase; padding: 5px 12px; border: none; background: transparent;
+    color: var(--ink-500); cursor: pointer;
+  }
+  .view-toggle button + button { border-left: 1px solid var(--ink-300); }
+  .view-toggle button.on { background: var(--ink-900); color: #fff; }
+</style>
+</head>
+<body>
+
+<div id="variant-nav">
+  <span class="sketch-title">002 · Permission Wiring</span>
+  <button class="variant-tab active" data-v="a" onclick="showVariant('a')">★ A: Patch Bay</button>
+  <button class="variant-tab" data-v="b" onclick="showVariant('b')">B: Access Matrix</button>
+  <button class="variant-tab" data-v="c" onclick="showVariant('c')">C: Select &amp; Illuminate</button>
+</div>
+
+<!-- ════════════════ VARIANT A — PATCH BAY ════════════════ -->
+<div id="variant-a" class="variant active">
+  <div class="page">
+    <div class="page-head"><span class="pill">LIBRARY ACCESS</span><h1>Who sees what</h1>
+      <span class="view-toggle">
+        <button class="on">⌇ Wiring</button>
+        <button onclick="showVariant('b')">▦ Matrix</button>
+        <button onclick="showVariant('c')">◉ Illuminate</button>
+      </span>
+    </div>
+    <div class="page-sub">Org units on the left, library collections on the right, access drawn as wires. Click either side to trace its connections.</div>
+
+    <div class="bay bg-grid" id="bay" style="border:1px solid var(--ink-300); border-radius:6px; padding:24px;">
+      <svg class="bay-svg" id="bay-svg"></svg>
+
+      <div class="bay-col left">
+        <h2>Org — Visy Kawerau</h2>
+        <div class="jack" data-id="org" onclick="bayClick('org')">
+          <div class="kicker">ORGANISATION</div>
+          <div class="title">Whole site</div>
+          <div class="meta">everyone, incl. new starters</div>
+          <span class="port"></span>
+        </div>
+        <div class="jack" data-id="forming" onclick="bayClick('forming')">
+          <div class="kicker"><span class="dept-dot" style="background:var(--accent-step)"></span>DEPARTMENT</div>
+          <div class="title">Forming</div><div class="meta">3 roles · 5 people</div>
+          <span class="port"></span>
+        </div>
+        <div class="jack" data-id="cold" onclick="bayClick('cold')">
+          <div class="kicker"><span class="dept-dot" style="background:var(--accent-zone)"></span>DEPARTMENT</div>
+          <div class="title">Cold End</div><div class="meta">2 roles · 3 people</div>
+          <span class="port"></span>
+        </div>
+        <div class="jack" data-id="quality" onclick="bayClick('quality')">
+          <div class="kicker"><span class="dept-dot" style="background:var(--accent-inspect)"></span>DEPARTMENT</div>
+          <div class="title">Quality</div><div class="meta">2 roles · 3 people</div>
+          <span class="port"></span>
+        </div>
+        <div class="jack person-jack" data-id="priya" onclick="bayClick('priya')">
+          <div class="kicker">PERSON · LAB TECHNICIAN</div>
+          <div class="title">Priya Sharma</div><div class="meta">+1 personal grant</div>
+          <span class="port"></span>
+        </div>
+        <div class="jack" data-id="maint" onclick="bayClick('maint')">
+          <div class="kicker"><span class="dept-dot" style="background:var(--accent-voice)"></span>DEPARTMENT</div>
+          <div class="title">Maintenance</div><div class="meta">3 roles · 3 people</div>
+          <span class="port"></span>
+        </div>
+      </div>
+
+      <div class="bay-col right">
+        <h2>SOP Library — 43 procedures</h2>
+        <div class="jack" data-id="safety" onclick="bayClick('safety')">
+          <div class="kicker"><span class="dept-dot" style="background:var(--accent-hazard)"></span>COLLECTION</div>
+          <div class="title">Site Safety &amp; Emergency</div><div class="meta">6 SOPs · assigned site-wide</div>
+          <span class="port"></span>
+        </div>
+        <div class="jack" data-id="hotend" onclick="bayClick('hotend')">
+          <div class="kicker"><span class="dept-dot" style="background:var(--accent-step)"></span>COLLECTION</div>
+          <div class="title">Forming / Hot End</div><div class="meta">12 SOPs</div>
+          <span class="port"></span>
+        </div>
+        <div class="jack" data-id="chemical" onclick="bayClick('chemical')">
+          <div class="kicker"><span class="dept-dot" style="background:var(--accent-decision)"></span>COLLECTION</div>
+          <div class="title">Chemical Handling</div><div class="meta">5 SOPs · incl. Alkaline Cleaning Tank</div>
+          <span class="port"></span>
+        </div>
+        <div class="jack" data-id="machmaint" onclick="bayClick('machmaint')">
+          <div class="kicker"><span class="dept-dot" style="background:var(--accent-voice)"></span>COLLECTION</div>
+          <div class="title">Machine Maintenance</div><div class="meta">9 SOPs</div>
+          <span class="port"></span>
+        </div>
+        <div class="jack" data-id="qa" onclick="bayClick('qa')">
+          <div class="kicker"><span class="dept-dot" style="background:var(--accent-inspect)"></span>COLLECTION</div>
+          <div class="title">Quality &amp; Inspection</div><div class="meta">7 SOPs</div>
+          <span class="port"></span>
+        </div>
+        <div class="jack" data-id="warehouse" onclick="bayClick('warehouse')">
+          <div class="kicker"><span class="dept-dot" style="background:var(--accent-ok)"></span>COLLECTION</div>
+          <div class="title">Warehouse &amp; Forklift</div><div class="meta">4 SOPs</div>
+          <span class="port"></span>
+        </div>
+      </div>
+    </div>
+    <div class="bay-hint">ONE→MANY: Forming feeds 2 collections · MANY→ONE: Chemical Handling is fed by Forming + Maintenance + Priya (personal) · SITE-WIDE: Whole site → Site Safety. Click empty space to reset.</div>
+  </div>
+</div>
+
+<!-- ════════════════ VARIANT B — ACCESS MATRIX ════════════════ -->
+<div id="variant-b" class="variant">
+  <div class="page">
+    <div class="page-head"><span class="pill">LIBRARY ACCESS</span><h1>Access matrix</h1>
+      <span class="view-toggle">
+        <button onclick="showVariant('a')">⌇ Wiring</button>
+        <button class="on">▦ Matrix</button>
+        <button onclick="showVariant('c')">◉ Illuminate</button>
+      </span>
+    </div>
+    <div class="page-sub">Every org unit × every collection on one screen. Click any cell to toggle. Dashed = inherited from Whole site.</div>
+
+    <div class="matrix">
+      <table>
+        <thead>
+          <tr>
+            <th style="border-left:none; text-align:left; padding-left:14px;">ORG UNIT</th>
+            <th>Site Safety<span class="cnt">6 SOPs</span></th>
+            <th>Forming / Hot End<span class="cnt">12 SOPs</span></th>
+            <th>Chemical<span class="cnt">5 SOPs</span></th>
+            <th>Machine Maint.<span class="cnt">9 SOPs</span></th>
+            <th>Quality<span class="cnt">7 SOPs</span></th>
+            <th>Warehouse<span class="cnt">4 SOPs</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="rowhead"><span class="dept-dot" style="background:var(--ink-900)"></span>Whole site <span class="sub">14 people</span></td>
+            <td class="cell" data-state="direct" onclick="cycleCell(this)"><span class="dotmark direct"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+          </tr>
+          <tr>
+            <td class="rowhead"><span class="dept-dot" style="background:var(--accent-step)"></span>Forming <span class="sub">5 people</span></td>
+            <td class="cell" data-state="inherit" onclick="cycleCell(this)"><span class="dotmark inherit"></span></td>
+            <td class="cell" data-state="direct" onclick="cycleCell(this)"><span class="dotmark direct"></span></td>
+            <td class="cell" data-state="direct" onclick="cycleCell(this)"><span class="dotmark direct"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+          </tr>
+          <tr>
+            <td class="rowhead"><span class="dept-dot" style="background:var(--accent-zone)"></span>Cold End <span class="sub">3 people</span></td>
+            <td class="cell" data-state="inherit" onclick="cycleCell(this)"><span class="dotmark inherit"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+            <td class="cell" data-state="direct" onclick="cycleCell(this)"><span class="dotmark direct"></span></td>
+          </tr>
+          <tr>
+            <td class="rowhead"><span class="dept-dot" style="background:var(--accent-inspect)"></span>Quality <span class="sub">3 people</span></td>
+            <td class="cell" data-state="inherit" onclick="cycleCell(this)"><span class="dotmark inherit"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+            <td class="cell" data-state="direct" onclick="cycleCell(this)"><span class="dotmark direct"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+          </tr>
+          <tr class="person-row">
+            <td class="rowhead">Priya Sharma <span class="sub">Lab Technician</span></td>
+            <td class="cell" data-state="inherit" onclick="cycleCell(this)"><span class="dotmark inherit"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+            <td class="cell" data-state="direct" onclick="cycleCell(this)"><span class="dotmark direct"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+            <td class="cell" data-state="inherit" onclick="cycleCell(this)"><span class="dotmark inherit"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+          </tr>
+          <tr>
+            <td class="rowhead"><span class="dept-dot" style="background:var(--accent-voice)"></span>Maintenance <span class="sub">3 people</span></td>
+            <td class="cell" data-state="inherit" onclick="cycleCell(this)"><span class="dotmark inherit"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+            <td class="cell" data-state="direct" onclick="cycleCell(this)"><span class="dotmark direct"></span></td>
+            <td class="cell" data-state="direct" onclick="cycleCell(this)"><span class="dotmark direct"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+            <td class="cell" data-state="none" onclick="cycleCell(this)"><span class="dotmark none"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="matrix-legend">
+      <span class="dotmark direct"></span> direct grant (click to remove)
+      <span class="dotmark inherit"></span> inherited from Whole site — click to add a direct grant on top
+      <span class="dotmark none"></span> no access
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ VARIANT C — SELECT & ILLUMINATE ════════════════ -->
+<div id="variant-c" class="variant">
+  <div class="page">
+    <div class="page-head"><span class="pill">LIBRARY ACCESS</span><h1>Select &amp; illuminate</h1>
+      <span class="view-toggle">
+        <button onclick="showVariant('a')">⌇ Wiring</button>
+        <button onclick="showVariant('b')">▦ Matrix</button>
+        <button class="on">◉ Illuminate</button>
+      </span>
+    </div>
+    <div class="page-sub">Pick anyone on the left — the library lights up with what they can see and why. Click a collection to grant / revoke for the selection.</div>
+
+    <div class="illum">
+      <div class="illum-tree" id="illum-tree">
+        <div class="it-row root" data-org="org" onclick="illumSelect('org')">
+          <span class="label"><span class="dept-dot" style="background:var(--ink-900)"></span>Whole site</span><span class="cnt">14</span>
+        </div>
+        <div class="it-row" data-org="forming" onclick="illumSelect('forming')">
+          <span class="label"><span class="dept-dot" style="background:var(--accent-step)"></span>Forming</span><span class="cnt">5</span>
+        </div>
+        <div class="it-row person" data-org="sarah" onclick="illumSelect('sarah')">
+          <span class="label">Sarah Mitchell — Forming Operator</span>
+        </div>
+        <div class="it-row" data-org="cold" onclick="illumSelect('cold')">
+          <span class="label"><span class="dept-dot" style="background:var(--accent-zone)"></span>Cold End</span><span class="cnt">3</span>
+        </div>
+        <div class="it-row" data-org="quality" onclick="illumSelect('quality')">
+          <span class="label"><span class="dept-dot" style="background:var(--accent-inspect)"></span>Quality</span><span class="cnt">3</span>
+        </div>
+        <div class="it-row person" data-org="priya" onclick="illumSelect('priya')">
+          <span class="label">Priya Sharma — Lab Technician</span>
+        </div>
+        <div class="it-row" data-org="maint" onclick="illumSelect('maint')">
+          <span class="label"><span class="dept-dot" style="background:var(--accent-voice)"></span>Maintenance</span><span class="cnt">3</span>
+        </div>
+      </div>
+
+      <div class="illum-lib">
+        <div class="illum-headline" id="illum-headline"></div>
+        <div class="lib-grid" id="lib-grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="sketch-tools" style="position:fixed;bottom:12px;right:12px;z-index:9999;font-family:system-ui;font-size:12px;background:rgba(0,0,0,0.7);color:white;padding:8px 12px;border-radius:8px;opacity:0.4;transition:opacity 0.2s;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.4'">
+  sketch 002 · paper/ink theme
+</div>
+
+<script>
+// Winner (2026-07-17): Patch Bay (Wiring) is the default view; Matrix and
+// Illuminate remain as alternative views on the in-page toggle.
+function showVariant(id) {
+  document.querySelectorAll('.variant').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.variant-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.v === id));
+  document.getElementById('variant-' + id).classList.add('active');
+  if (id === 'a') requestAnimationFrame(drawWires);
+}
+
+/* ───── shared model ───── */
+const CONNECTIONS = [
+  { from: 'org',     to: 'safety',    color: '#b91c1c' },
+  { from: 'forming', to: 'hotend',    color: '#3b82f6' },
+  { from: 'forming', to: 'chemical',  color: '#3b82f6' },
+  { from: 'cold',    to: 'warehouse', color: '#0891b2' },
+  { from: 'quality', to: 'qa',        color: '#7c3aed' },
+  { from: 'priya',   to: 'chemical',  color: '#7c3aed', dashed: true },
+  { from: 'maint',   to: 'machmaint', color: '#ea580c' },
+  { from: 'maint',   to: 'chemical',  color: '#ea580c' },
+];
+
+/* ───── Variant A: patch bay ───── */
+let baySelected = null;
+
+function drawWires() {
+  const bay = document.getElementById('bay');
+  const svg = document.getElementById('bay-svg');
+  if (!bay || !svg) return;
+  const bayRect = bay.getBoundingClientRect();
+  svg.innerHTML = '';
+  svg.setAttribute('viewBox', `0 0 ${bayRect.width} ${bayRect.height}`);
+
+  CONNECTIONS.forEach(c => {
+    const fromEl = bay.querySelector(`.bay-col.left  .jack[data-id="${c.from}"]`) || bay.querySelector(`.jack[data-id="${c.from}"]`);
+    const toEl = bay.querySelector(`.bay-col.right .jack[data-id="${c.to}"]`);
+    if (!fromEl || !toEl) return;
+    const f = fromEl.getBoundingClientRect(), t = toEl.getBoundingClientRect();
+    const x1 = f.right - bayRect.left, y1 = f.top + f.height / 2 - bayRect.top;
+    const x2 = t.left - bayRect.left,  y2 = t.top + t.height / 2 - bayRect.top;
+    const mid = (x1 + x2) / 2;
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `M ${x1} ${y1} C ${mid} ${y1}, ${mid} ${y2}, ${x2} ${y2}`);
+    path.setAttribute('fill', 'none');
+    const active = baySelected && (c.from === baySelected || c.to === baySelected);
+    path.setAttribute('stroke', active || !baySelected ? c.color : '#e4e4e7');
+    path.setAttribute('stroke-width', active ? 2.5 : 1.5);
+    if (c.dashed) path.setAttribute('stroke-dasharray', '5 4');
+    path.setAttribute('opacity', !baySelected ? 0.55 : active ? 1 : 0.4);
+    svg.appendChild(path);
+  });
+}
+
+function bayClick(id) {
+  baySelected = (baySelected === id) ? null : id;
+  const related = new Set([baySelected]);
+  CONNECTIONS.forEach(c => {
+    if (c.from === baySelected) related.add(c.to);
+    if (c.to === baySelected) related.add(c.from);
+  });
+  document.querySelectorAll('#bay .jack').forEach(j => {
+    j.classList.remove('lit', 'dim');
+    if (!baySelected) return;
+    if (related.has(j.dataset.id)) j.classList.add('lit');
+    else j.classList.add('dim');
+  });
+  drawWires();
+  event.stopPropagation();
+}
+document.addEventListener('click', (e) => {
+  if (e.target.closest('#bay') && !e.target.closest('.jack')) {
+    baySelected = null;
+    document.querySelectorAll('#bay .jack').forEach(j => j.classList.remove('lit', 'dim'));
+    drawWires();
+  }
+});
+window.addEventListener('resize', drawWires);
+window.addEventListener('load', drawWires);
+
+/* ───── Variant B: matrix ───── */
+function cycleCell(td) {
+  const mark = td.querySelector('.dotmark');
+  const state = td.dataset.state;
+  // direct → base (inherit if the site-wide column grants it, else none); none/inherit → direct
+  if (state === 'direct') {
+    const col = td.cellIndex;
+    const siteRow = td.closest('tbody').rows[0];
+    const siteHas = td.closest('tr') !== siteRow && siteRow.cells[col].dataset.state === 'direct';
+    td.dataset.state = siteHas ? 'inherit' : 'none';
+  } else {
+    td.dataset.state = 'direct';
+  }
+  mark.className = 'dotmark ' + td.dataset.state;
+  // site-wide row propagates inheritance down its column
+  const tbody = td.closest('tbody');
+  if (td.closest('tr') === tbody.rows[0]) {
+    const col = td.cellIndex;
+    for (let r = 1; r < tbody.rows.length; r++) {
+      const cell = tbody.rows[r].cells[col];
+      if (cell.dataset.state === 'direct') continue;
+      cell.dataset.state = td.dataset.state === 'direct' ? 'inherit' : 'none';
+      cell.querySelector('.dotmark').className = 'dotmark ' + cell.dataset.state;
+    }
+  }
+}
+
+/* ───── Variant C: select & illuminate ───── */
+const LIB = [
+  { id: 'safety',    name: 'Site Safety & Emergency', count: 6,  color: 'var(--accent-hazard)' },
+  { id: 'hotend',    name: 'Forming / Hot End',       count: 12, color: 'var(--accent-step)' },
+  { id: 'chemical',  name: 'Chemical Handling',       count: 5,  color: 'var(--accent-decision)' },
+  { id: 'machmaint', name: 'Machine Maintenance',     count: 9,  color: 'var(--accent-voice)' },
+  { id: 'qa',        name: 'Quality & Inspection',    count: 7,  color: 'var(--accent-inspect)' },
+  { id: 'warehouse', name: 'Warehouse & Forklift',    count: 4,  color: 'var(--accent-ok)' },
+];
+const GRANTS = {
+  org:     ['safety'],
+  forming: ['hotend', 'chemical'],
+  cold:    ['warehouse'],
+  quality: ['qa'],
+  maint:   ['machmaint', 'chemical'],
+  sarah:   [],
+  priya:   ['chemical'],
+};
+const CHAIN = { // inheritance path, nearest last
+  org: ['org'],
+  forming: ['org', 'forming'], cold: ['org', 'cold'], quality: ['org', 'quality'], maint: ['org', 'maint'],
+  sarah: ['org', 'forming', 'sarah'],
+  priya: ['org', 'quality', 'priya'],
+};
+const NAMES = {
+  org: 'Whole site', forming: 'Forming', cold: 'Cold End', quality: 'Quality', maint: 'Maintenance',
+  sarah: 'Sarah Mitchell', priya: 'Priya Sharma',
+};
+let illumSel = 'forming';
+
+function illumRender() {
+  document.querySelectorAll('#illum-tree .it-row').forEach(r =>
+    r.classList.toggle('sel', r.dataset.org === illumSel));
+  const chain = CHAIN[illumSel];
+  const direct = new Set(GRANTS[illumSel]);
+  const inherited = {};
+  chain.slice(0, -1).forEach(anc => GRANTS[anc].forEach(g => { if (!direct.has(g)) inherited[g] = anc; }));
+
+  const total = LIB.filter(l => direct.has(l.id) || inherited[l.id])
+                   .reduce((n, l) => n + l.count, 0);
+  document.getElementById('illum-headline').innerHTML =
+    `<b>${NAMES[illumSel]}</b> can see <b>${total} SOPs</b> across ` +
+    `${LIB.filter(l => direct.has(l.id) || inherited[l.id]).length} collections. ` +
+    `Click a collection to grant or revoke.`;
+
+  const grid = document.getElementById('lib-grid');
+  grid.innerHTML = '';
+  LIB.forEach(l => {
+    const isDirect = direct.has(l.id);
+    const via = inherited[l.id];
+    const card = document.createElement('div');
+    card.className = 'sop-card ' + (isDirect ? 'direct' : via ? 'inherit' : 'off');
+    card.innerHTML =
+      `<div class="kicker" style="color:${l.color}">COLLECTION</div>` +
+      `<div class="title">${l.name}</div>` +
+      `<div class="meta">${l.count} SOPs</div>` +
+      `<span class="state">${isDirect ? '✓ GRANTED' : via ? `✓ VIA ${NAMES[via].toUpperCase()}` : '+ GRANT ACCESS'}</span>`;
+    card.onclick = () => {
+      if (isDirect) GRANTS[illumSel] = GRANTS[illumSel].filter(g => g !== l.id);
+      else if (!via) GRANTS[illumSel] = [...GRANTS[illumSel], l.id];
+      else return; // inherited — revoke at the source, not here (real build: offer "exclude")
+      illumRender();
+    };
+    grid.appendChild(card);
+  });
+}
+function illumSelect(id) { illumSel = id; illumRender(); }
+illumRender();
+</script>
+</body>
+</html>

@@ -17,6 +17,14 @@ Sketched across 4 commits on `sketch/sop-blueprint-redesign` branch (Feb 2026):
 - `f66840b` voice input for measurements and notes
 
 Wrapped up 2026-04-24.
+
+**Second wrap-up 2026-07-18** — org-model + library-permissions exploration
+(`.planning/sketches/001-org-model-canvas`, `002-permission-wiring`, Visy-seeded
+content): a business draws departments → roles → people (named or vacancy),
+then wires SOP-library access onto the org model across every arity (1:N, N:1,
+N:M) with site-wide inheritance and person-level overrides. Both surfaces ship
+as ONE page with an in-page segmented view toggle — multiple lenses over one
+shared model, no view-private state.
 </context>
 
 <design_direction>
@@ -53,6 +61,8 @@ Wrapped up 2026-04-24.
 | Screen inventory | references/screen-inventory.md | 8 tabs: overview, tools, hazards, flow, model, walkthrough (desktop + mobile), cmdk, voice |
 | New block types | references/new-block-types.md | 8 new block types beyond Phase 12: Measurement, Decision, Escalate, SignOff, Zone, Inspect, VoiceNote, Model |
 | Interaction patterns | references/interaction-patterns.md | Voice state machine, cmdk, preview toggle, mobile immersive walkthrough |
+| Org model views | references/org-model-views.md | Node Chart default + Column Builder alt view; roles layer between depts and people; vacancies as dashed first-class chips |
+| Permission wiring views | references/permission-wiring-views.md | Patch Bay default + Matrix/Illuminate alt views; direct/inherited/personal access vocabulary; trace-on-click |
 
 ## Theme
 
@@ -71,6 +81,8 @@ Original sketch HTML preserved at `sources/blueprint-sketch.html` (2015 lines, a
 - `references/screen-inventory.md` if implementing a specific tab / screen
 - `references/new-block-types.md` **always when adding or extending block types** — includes the AI-accessibility three-place contract that every new block MUST satisfy (Puck config + introspection registry + BlockContentSchema)
 - `references/interaction-patterns.md` if building voice input, cmdk, or the mobile immersive walkthrough
+- `references/org-model-views.md` if building the org-chart / departments / roles / team surfaces
+- `references/permission-wiring-views.md` if building SOP-library access assignment, department↔SOP visibility, or any permissions UI
 - `sources/blueprint-sketch.html` directly only if a reference doc points to a line range and you need the exact HTML/CSS
 
 ## When NOT to use this skill
@@ -85,6 +97,8 @@ Original sketch HTML preserved at `sources/blueprint-sketch.html` (2015 lines, a
 
 - `sketches/sop-blueprint/index.html` (single-file sketch built iteratively across 4 commits)
 - 20 PNG screenshots at repo root
+- `001-org-model-canvas` (winner B, Node Chart — wrapped 2026-07-18)
+- `002-permission-wiring` (winner A, Patch Bay — wrapped 2026-07-18)
 
 ## Related planning docs
 
