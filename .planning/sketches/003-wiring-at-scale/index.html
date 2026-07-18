@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sketch 003 — Wiring at Scale</title>
+<link rel="stylesheet" href="../themes/default.css?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  .page { max-width: 1320px; margin: 0 auto; padding: 24px; }
+  .page-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px; }
+  .page-head h1 { font-family: var(--mono); font-size: 20px; margin: 0; }
+  .page-sub { font-family: var(--mono); font-size: 11px; color: var(--ink-500); margin-bottom: 16px; }
+  .dept-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+  .bay { position: relative; border: 1px solid var(--ink-300); border-radius: 6px; padding: 20px; }
+  .bay-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .cols { position: relative; display: flex; justify-content: space-between; gap: 40px; z-index: 2; }
+  .col { width: 300px; display: flex; flex-direction: column; gap: 5px; }
+  .col h2 { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-500); margin: 0 0 6px; }
+
+  /* compact single-line jack for scale */
+  .jack {
+    background: var(--paper-1); border: 1.5px solid var(--ink-300); border-radius: 4px;
+    padding: 6px 10px; cursor: pointer; position: relative;
+    display: flex; align-items: center; gap: 7px; min-height: 32px;
+  }
+  .jack .name { font-size: 12.5px; font-weight: 600; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .jack .meta { font-family: var(--mono); font-size: 9.5px; color: var(--ink-500); flex-shrink: 0; }
+  .jack:hover { border-color: var(--ink-500); }
+  .jack.lit { border-color: var(--accent-step); box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
+  .jack.dim { opacity: 0.3; }
+  .jack.group-jack { border-width: 2px; min-height: 38px; }
+  .jack.group-jack .name { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .jack.child { margin-left: 18px; }
+  .jack.site-jack { border-color: var(--ink-900); border-width: 2px; margin-bottom: 8px; }
+  .jack .twist { font-family: var(--mono); font-size: 9px; color: var(--ink-400); }
+  .cnt-badge {
+    font-family: var(--mono); font-size: 9px; font-weight: 700;
+    background: var(--ink-900); color: #fff; border-radius: 999px; padding: 1px 6px; flex-shrink: 0;
+  }
+  .port { position: absolute; top: 50%; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--paper-1); border: 2px solid var(--ink-400); transform: translateY(-50%); }
+  .col.left  .port { right: -5px; }
+  .col.right .port { left: -5px; }
+  .jack.lit .port { border-color: var(--accent-step); background: var(--accent-step); }
+
+  .group-label { font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-400); margin: 8px 0 2px; display: flex; align-items: center; gap: 6px; }
+  .group-label::after { content: ''; flex: 1; height: 1px; background: var(--ink-100); }
+
+  .bay-hint { font-family: var(--mono); font-size: 10px; color: var(--ink-500); margin-top: 12px; }
+
+  /* B: search bar */
+  .searchbar {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+  }
+  .searchbar input {
+    font-family: var(--mono); font-size: 12px; padding: 8px 12px; width: 340px;
+    border: 1.5px solid var(--ink-300); border-radius: 4px; background: var(--paper-1);
+    color: var(--ink-900); outline: none;
+  }
+  .searchbar input:focus { border-color: var(--accent-step); }
+  .ghost-btn {
+    font-family: var(--mono); font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.05em; padding: 7px 12px; border: 1px solid var(--ink-300);
+    border-radius: 3px; background: var(--paper-1); color: var(--ink-500); cursor: pointer;
+  }
+  .ghost-btn.on { background: var(--ink-900); color: #fff; border-color: var(--ink-900); }
+  .jack.match .name { text-decoration: underline; text-decoration-color: var(--brand-yellow); text-decoration-thickness: 3px; }
+  .jack.nomatch { opacity: 0.25; }
+</style>
+</head>
+<body>
+
+<div id="variant-nav">
+  <span class="sketch-title">003 · Wiring at Scale — 15 depts × 20 collections</span>
+  <button class="variant-tab active" data-v="a" onclick="showVariant('a')">A: Collapse to Groups</button>
+  <button class="variant-tab" data-v="b" onclick="showVariant('b')">B: Focus Mode</button>
+  <button class="variant-tab" data-v="c" onclick="showVariant('c')">C: Bus Routing</button>
+</div>
+
+<div id="variant-a" class="variant active">
+  <div class="page">
+    <div class="page-head"><span class="pill">LIBRARY ACCESS</span><h1>Who sees what — grouped</h1></div>
+    <div class="page-sub">Areas and domains collapse the graph. Wires aggregate with counts; click a group to expand it in place. Trace still works at any granularity.</div>
+    <div class="bay" id="bay-a">
+      <svg class="bay-svg"></svg>
+      <div class="cols">
+        <div class="col left" id="a-left"><h2>Org — 15 departments in 5 areas</h2></div>
+        <div class="col right" id="a-right"><h2>Library — 20 collections in 6 domains</h2></div>
+      </div>
+    </div>
+    <div class="bay-hint">CLICK ▸ GROUP TO EXPAND · CLICK A JACK TO TRACE · CLICK EMPTY SPACE TO RESET</div>
+  </div>
+</div>
+
+<div id="variant-b" class="variant">
+  <div class="page">
+    <div class="page-head"><span class="pill">LIBRARY ACCESS</span><h1>Who sees what — focus</h1></div>
+    <div class="page-sub">Nothing is drawn until you ask. Search or click to focus one unit; only its wires exist. "Show all" reveals why this is the default.</div>
+    <div class="searchbar">
+      <input id="b-search" type="search" placeholder="Search departments or collections…" oninput="bSearch(this.value)">
+      <button class="ghost-btn" id="b-showall" onclick="bToggleAll()">Show all 34 wires</button>
+    </div>
+    <div class="bay" id="bay-b">
+      <svg class="bay-svg"></svg>
+      <div class="cols">
+        <div class="col left" id="b-left"><h2>Org — 15 departments</h2></div>
+        <div class="col right" id="b-right"><h2>Library — 20 collections</h2></div>
+      </div>
+    </div>
+    <div class="bay-hint">TYPE TO FILTER · CLICK TO FOCUS · FOCUS DRAWS ONLY THAT UNIT'S WIRES</div>
+  </div>
+</div>
+
+<div id="variant-c" class="variant">
+  <div class="page">
+    <div class="page-head"><span class="pill">LIBRARY ACCESS</span><h1>Who sees what — schematic</h1></div>
+    <div class="page-sub">Everything always drawn, but orthogonally routed down per-department bus lanes — an engineering schematic, not spaghetti. Click to raise one circuit.</div>
+    <div class="bay" id="bay-c">
+      <svg class="bay-svg"></svg>
+      <div class="cols">
+        <div class="col left" id="c-left"><h2>Org — 15 departments</h2></div>
+        <div class="col right" id="c-right"><h2>Library — 20 collections</h2></div>
+      </div>
+    </div>
+    <div class="bay-hint">ALL 34 WIRES ALWAYS ON, BUS-ROUTED · CLICK A JACK TO RAISE ITS CIRCUIT · CLICK EMPTY SPACE TO RESET</div>
+  </div>
+</div>
+
+<div id="sketch-tools" style="position:fixed;bottom:12px;right:12px;z-index:9999;font-family:system-ui;font-size:12px;background:rgba(0,0,0,0.7);color:white;padding:8px 12px;border-radius:8px;opacity:0.4;transition:opacity 0.2s;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.4'">
+  sketch 003 · paper/ink theme
+</div>
+
+<script>
+/* ═══════════ ONE data model, three lenses ═══════════ */
+const DEPT_GROUPS = [
+  { id:'g-prod', name:'Production', color:'#3b82f6', depts:[
+    ['batch','Batch House',4],['furnace','Furnace / Hot End',6],['forming','Forming',9],
+    ['mould','Mould Shop',5],['coldend','Cold End',7],['lehr','Annealing / Lehr',3]]},
+  { id:'g-qual', name:'Quality', color:'#7c3aed', depts:[
+    ['quality','Quality',5],['lab','Lab Services',3]]},
+  { id:'g-eng', name:'Engineering', color:'#ea580c', depts:[
+    ['mmaint','Machine Maintenance',6],['elec','Electrical',4],['sitesvc','Site Services',4]]},
+  { id:'g-log', name:'Logistics', color:'#16a34a', depts:[
+    ['warehouse','Warehouse & Dispatch',6],['forklift','Forklift Ops',5]]},
+  { id:'g-site', name:'Site', color:'#71717a', depts:[
+    ['ehs','EHS / Safety',2],['admin','Administration',4]]},
+];
+const COL_GROUPS = [
+  { id:'h-safe', name:'Safety Core', color:'#b91c1c', cols:[
+    ['sitesafety','Site Safety & Emergency',6],['chemical','Chemical Handling',5],
+    ['manual','Manual Handling',3],['height','Working at Height',4],
+    ['confined','Confined Space',3],['loto','Lockout / Tagout',4]]},
+  { id:'h-prod', name:'Production Ops', color:'#3b82f6', cols:[
+    ['rawmat','Batch & Raw Materials',5],['furnops','Furnace Operations',7],
+    ['ismachine','IS Machine / Forming',12],['mouldmnt','Mould Maintenance',6],
+    ['coldhand','Cold End Handling',5],['lehrops','Lehr & Annealing',3]]},
+  { id:'h-qual', name:'Quality', color:'#7c3aed', cols:[
+    ['inspect','Quality & Inspection',7],['labmeth','Lab Methods',4]]},
+  { id:'h-eng', name:'Engineering', color:'#ea580c', cols:[
+    ['mechmnt','Mechanical Maintenance',9],['elecsafe','Electrical Safety',5]]},
+  { id:'h-log', name:'Logistics', color:'#16a34a', cols:[
+    ['vehicles','Forklift & Vehicles',4],['dispatch','Warehouse & Dispatch',4]]},
+  { id:'h-site', name:'Site & Env', color:'#71717a', cols:[
+    ['waste','Waste & Environment',3],['contractor','Contractor Management',4]]},
+];
+const SITE_GRANTS = ['sitesafety','manual'];
+const GRANTS = [
+  ['batch','rawmat'],['batch','chemical'],
+  ['furnace','furnops'],['furnace','confined'],['furnace','loto'],
+  ['forming','ismachine'],['forming','chemical'],
+  ['mould','mouldmnt'],['mould','mechmnt'],
+  ['coldend','coldhand'],['lehr','lehrops'],
+  ['quality','inspect'],['lab','labmeth'],['lab','chemical'],
+  ['mmaint','mechmnt'],['mmaint','loto'],['mmaint','height'],['mmaint','chemical'],
+  ['elec','elecsafe'],['elec','loto'],
+  ['sitesvc','height'],['sitesvc','confined'],['sitesvc','waste'],['sitesvc','contractor'],
+  ['warehouse','dispatch'],['warehouse','vehicles'],
+  ['forklift','vehicles'],
+  ['ehs','contractor'],['ehs','waste'],['ehs','chemical'],['ehs','loto'],['ehs','confined'],
+];
+const ALL_WIRES = GRANTS.length + SITE_GRANTS.length; // 34
+
+const deptOf = {}, colOf = {}, deptGroupOf = {}, colGroupOf = {};
+DEPT_GROUPS.forEach(g => g.depts.forEach(([id,name,ppl]) => { deptOf[id]={id,name,ppl,g}; deptGroupOf[id]=g.id; }));
+COL_GROUPS.forEach(g => g.cols.forEach(([id,name,n]) => { colOf[id]={id,name,n,g}; colGroupOf[id]=g.id; }));
+
+function jackEl({id, name, meta, side, cls='', color=null, badge=null, twist=null}) {
+  const d = document.createElement('div');
+  d.className = 'jack ' + cls;
+  d.dataset.id = id;
+  d.innerHTML =
+    (twist ? `<span class="twist">${twist}</span>` : '') +
+    (color ? `<span class="dept-dot" style="background:${color}"></span>` : '') +
+    `<span class="name">${name}</span>` +
+    (badge != null ? `<span class="cnt-badge">${badge}</span>` : '') +
+    (meta ? `<span class="meta">${meta}</span>` : '') +
+    `<span class="port"></span>`;
+  return d;
+}
+
+function drawBezier(svg, x1, y1, x2, y2, opts) {
+  const mid = (x1 + x2) / 2;
+  const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+  p.setAttribute('d', `M ${x1} ${y1} C ${mid} ${y1}, ${mid} ${y2}, ${x2} ${y2}`);
+  p.setAttribute('fill','none');
+  p.setAttribute('stroke', opts.stroke); p.setAttribute('stroke-width', opts.width);
+  p.setAttribute('opacity', opts.opacity);
+  if (opts.dash) p.setAttribute('stroke-dasharray','5 4');
+  svg.appendChild(p);
+  return p;
+}
+function anchor(el, bay, side) {
+  const r = el.getBoundingClientRect(), b = bay.getBoundingClientRect();
+  return [side === 'left' ? r.right - b.left : r.left - b.left, r.top + r.height/2 - b.top];
+}
+function wireBadge(bay, x, y, text) {
+  const s = document.createElement('span');
+  s.className = 'cnt-badge'; s.textContent = text;
+  s.style.cssText = `position:absolute;left:${x}px;top:${y}px;transform:translate(-50%,-50%);z-index:3;`;
+  bay.appendChild(s); s.dataset.wirebadge = '1';
+}
+function clearWires(bay) {
+  bay.querySelector('.bay-svg').innerHTML = '';
+  bay.querySelectorAll('[data-wirebadge]').forEach(b => b.remove());
+}
+
+/* ═══════════ Variant A — collapse to groups ═══════════ */
+const aExpL = new Set(), aExpR = new Set();
+let aSel = null;
+
+function aRender() {
+  const L = document.getElementById('a-left'), R = document.getElementById('a-right');
+  L.querySelectorAll('.jack,.group-label').forEach(e => e.remove());
+  R.querySelectorAll('.jack,.group-label').forEach(e => e.remove());
+
+  L.appendChild(jackEl({id:'org', name:'Whole site', meta:'69 people', side:'left', cls:'site-jack'}));
+
+  DEPT_GROUPS.forEach(g => {
+    if (aExpL.has(g.id)) {
+      const lbl = document.createElement('div'); lbl.className = 'group-label';
+      lbl.innerHTML = `<span style="cursor:pointer" onclick="aToggle('L','${g.id}')">▾ ${g.name}</span>`;
+      L.appendChild(lbl);
+      g.depts.forEach(([id,name,ppl]) =>
+        L.appendChild(jackEl({id, name, meta:`${ppl}p`, side:'left', cls:'child', color:g.color})));
+    } else {
+      const j = jackEl({id:g.id, name:g.name, meta:`${g.depts.length} depts`, side:'left', cls:'group-jack', color:g.color, twist:'▸'});
+      j.querySelector('.twist').onclick = (e) => { e.stopPropagation(); aToggle('L', g.id); };
+      L.appendChild(j);
+    }
+  });
+  COL_GROUPS.forEach(g => {
+    if (aExpR.has(g.id)) {
+      const lbl = document.createElement('div'); lbl.className = 'group-label';
+      lbl.innerHTML = `<span style="cursor:pointer" onclick="aToggle('R','${g.id}')">▾ ${g.name}</span>`;
+      R.appendChild(lbl);
+      g.cols.forEach(([id,name,n]) =>
+        R.appendChild(jackEl({id, name, meta:`${n} SOPs`, side:'right', cls:'child', color:g.color})));
+    } else {
+      const total = g.cols.reduce((s,[,,n]) => s+n, 0);
+      const j = jackEl({id:g.id, name:g.name, meta:`${total} SOPs`, side:'right', cls:'group-jack', color:g.color, twist:'▸'});
+      j.querySelector('.twist').onclick = (e) => { e.stopPropagation(); aToggle('R', g.id); };
+      R.appendChild(j);
+    }
+  });
+
+  document.querySelectorAll('#bay-a .jack').forEach(j =>
+    j.addEventListener('click', () => { aSel = (aSel === j.dataset.id) ? null : j.dataset.id; aRender(); }));
+  aWires();
+}
+
+// endpoint id at current granularity
+const aEndL = d => aExpL.has(deptGroupOf[d]) ? d : deptGroupOf[d];
+const aEndR = c => aExpR.has(colGroupOf[c]) ? c : colGroupOf[c];
+
+function aWires() {
+  const bay = document.getElementById('bay-a'), svg = bay.querySelector('.bay-svg');
+  clearWires(bay);
+  svg.setAttribute('viewBox', `0 0 ${bay.clientWidth} ${bay.clientHeight}`);
+
+  // aggregate grants to visible endpoints
+  const agg = new Map(); // "l|r" -> count
+  GRANTS.forEach(([d,c]) => {
+    const k = aEndL(d) + '|' + aEndR(c);
+    agg.set(k, (agg.get(k) ?? 0) + 1);
+  });
+  SITE_GRANTS.forEach(c => agg.set('org|' + aEndR(c), (agg.get('org|' + aEndR(c)) ?? 0) + 1));
+
+  // related set for trace
+  const related = new Set();
+  if (aSel) { related.add(aSel);
+    agg.forEach((n, k) => { const [l, r] = k.split('|');
+      if (l === aSel) related.add(r); if (r === aSel) related.add(l); });
+  }
+
+  agg.forEach((n, k) => {
+    const [l, r] = k.split('|');
+    const le = bay.querySelector(`.col.left .jack[data-id="${l}"]`);
+    const re = bay.querySelector(`.col.right .jack[data-id="${r}"]`);
+    if (!le || !re) return;
+    const [x1, y1] = anchor(le, bay, 'left'), [x2, y2] = anchor(re, bay, 'right');
+    const active = aSel && (l === aSel || r === aSel);
+    const color = (deptOf[l]?.g.color) ?? DEPT_GROUPS.find(g => g.id === l)?.color ?? '#71717a';
+    drawBezier(svg, x1, y1, x2, y2, {
+      stroke: !aSel || active ? color : '#e4e4e7',
+      width: active ? 2.5 : (n > 1 ? 2 : 1.2),
+      opacity: !aSel ? 0.55 : active ? 1 : 0.35,
+    });
+    if (n > 1) wireBadge(bay, (x1 + x2) / 2, (y1 + y2) / 2, n);
+  });
+
+  bay.querySelectorAll('.jack').forEach(j => {
+    j.classList.remove('lit','dim');
+    if (!aSel) return;
+    if (related.has(j.dataset.id)) j.classList.add('lit'); else j.classList.add('dim');
+  });
+}
+function aToggle(side, gid) {
+  const set = side === 'L' ? aExpL : aExpR;
+  set.has(gid) ? set.delete(gid) : set.add(gid);
+  aRender();
+}
+
+/* ═══════════ Variant B — focus mode ═══════════ */
+let bFocus = null, bShowAll = false;
+
+function bRender() {
+  const L = document.getElementById('b-left'), R = document.getElementById('b-right');
+  L.querySelectorAll('.jack,.group-label').forEach(e => e.remove());
+  R.querySelectorAll('.jack,.group-label').forEach(e => e.remove());
+  L.appendChild(jackEl({id:'org', name:'Whole site', meta:'69 people', side:'left', cls:'site-jack'}));
+  DEPT_GROUPS.forEach(g => g.depts.forEach(([id,name,ppl]) =>
+    L.appendChild(jackEl({id, name, meta:`${ppl}p`, side:'left', color:g.color}))));
+  COL_GROUPS.forEach(g => g.cols.forEach(([id,name,n]) =>
+    R.appendChild(jackEl({id, name, meta:`${n} SOPs`, side:'right', color:g.color}))));
+  document.querySelectorAll('#bay-b .jack').forEach(j =>
+    j.addEventListener('click', () => { bFocus = (bFocus === j.dataset.id) ? null : j.dataset.id; bShowAll = false;
+      document.getElementById('b-showall').classList.remove('on'); bWires(); }));
+  bWires();
+}
+function bWires() {
+  const bay = document.getElementById('bay-b'), svg = bay.querySelector('.bay-svg');
+  clearWires(bay);
+  svg.setAttribute('viewBox', `0 0 ${bay.clientWidth} ${bay.clientHeight}`);
+  const all = [...GRANTS.map(([d,c]) => [d,c]), ...SITE_GRANTS.map(c => ['org', c])];
+  const related = new Set(bFocus ? [bFocus] : []);
+  all.forEach(([d,c]) => {
+    const show = bShowAll || (bFocus && (d === bFocus || c === bFocus));
+    if (!show) return;
+    if (bFocus === d) related.add(c); if (bFocus === c) related.add(d);
+    const le = bay.querySelector(`.col.left .jack[data-id="${d}"]`);
+    const re = bay.querySelector(`.col.right .jack[data-id="${c}"]`);
+    if (!le || !re) return;
+    const [x1,y1] = anchor(le, bay, 'left'), [x2,y2] = anchor(re, bay, 'right');
+    const color = d === 'org' ? '#b91c1c' : deptOf[d].g.color;
+    drawBezier(svg, x1, y1, x2, y2, { stroke: color, width: bShowAll ? 1 : 2.2, opacity: bShowAll ? 0.4 : 1 });
+  });
+  bay.querySelectorAll('.jack').forEach(j => {
+    j.classList.remove('lit','dim');
+    if (!bFocus) return;
+    if (related.has(j.dataset.id)) j.classList.add('lit'); else j.classList.add('dim');
+  });
+}
+function bToggleAll() {
+  bShowAll = !bShowAll; bFocus = null;
+  document.getElementById('b-showall').classList.toggle('on', bShowAll);
+  bWires();
+}
+function bSearch(q) {
+  q = q.trim().toLowerCase();
+  document.querySelectorAll('#bay-b .jack').forEach(j => {
+    j.classList.remove('match','nomatch');
+    if (!q) return;
+    const hit = j.querySelector('.name').textContent.toLowerCase().includes(q);
+    j.classList.add(hit ? 'match' : 'nomatch');
+  });
+}
+
+/* ═══════════ Variant C — orthogonal bus routing ═══════════ */
+let cSel = null;
+
+function cRender() {
+  const L = document.getElementById('c-left'), R = document.getElementById('c-right');
+  L.querySelectorAll('.jack,.group-label').forEach(e => e.remove());
+  R.querySelectorAll('.jack,.group-label').forEach(e => e.remove());
+  const outCount = id => GRANTS.filter(([d]) => d === id).length;
+  L.appendChild(jackEl({id:'org', name:'Whole site', meta:'', side:'left', cls:'site-jack', badge: SITE_GRANTS.length}));
+  DEPT_GROUPS.forEach(g => g.depts.forEach(([id,name]) =>
+    L.appendChild(jackEl({id, name, meta:'', side:'left', color:g.color, badge: outCount(id) || null}))));
+  const inCount = id => GRANTS.filter(([,c]) => c === id).length + (SITE_GRANTS.includes(id) ? 1 : 0);
+  COL_GROUPS.forEach(g => g.cols.forEach(([id,name]) =>
+    R.appendChild(jackEl({id, name, meta:'', side:'right', color:g.color, badge: inCount(id) || null}))));
+  document.querySelectorAll('#bay-c .jack').forEach(j =>
+    j.addEventListener('click', () => { cSel = (cSel === j.dataset.id) ? null : j.dataset.id; cWires(); }));
+  cWires();
+}
+function cWires() {
+  const bay = document.getElementById('bay-c'), svg = bay.querySelector('.bay-svg');
+  clearWires(bay);
+  svg.setAttribute('viewBox', `0 0 ${bay.clientWidth} ${bay.clientHeight}`);
+  const sources = ['org', ...DEPT_GROUPS.flatMap(g => g.depts.map(([id]) => id))];
+  const busX0 = 380, laneW = (bay.clientWidth - 760) / sources.length;
+  const all = [...SITE_GRANTS.map(c => ['org', c]), ...GRANTS.map(([d,c]) => [d,c])];
+  all.forEach(([d, c]) => {
+    const le = bay.querySelector(`.col.left .jack[data-id="${d}"]`);
+    const re = bay.querySelector(`.col.right .jack[data-id="${c}"]`);
+    if (!le || !re) return;
+    const [x1,y1] = anchor(le, bay, 'left'), [x2,y2] = anchor(re, bay, 'right');
+    const lane = busX0 + sources.indexOf(d) * laneW;
+    const active = cSel && (d === cSel || c === cSel);
+    const color = d === 'org' ? '#b91c1c' : deptOf[d].g.color;
+    const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+    const r = 6; // corner radius
+    const dir = y2 > y1 ? 1 : -1;
+    p.setAttribute('d',
+      `M ${x1} ${y1} H ${lane - r}` +
+      ` Q ${lane} ${y1} ${lane} ${y1 + r * dir}` +
+      ` V ${y2 - r * dir}` +
+      ` Q ${lane} ${y2} ${lane + r} ${y2}` +
+      ` H ${x2}`);
+    p.setAttribute('fill','none');
+    p.setAttribute('stroke', !cSel || active ? color : '#e4e4e7');
+    p.setAttribute('stroke-width', active ? 2.5 : 1.2);
+    p.setAttribute('opacity', !cSel ? 0.5 : active ? 1 : 0.25);
+    svg.appendChild(p);
+  });
+  const related = new Set(cSel ? [cSel] : []);
+  all.forEach(([d,c]) => { if (d === cSel) related.add(c); if (c === cSel) related.add(d); });
+  bay.querySelectorAll('.jack').forEach(j => {
+    j.classList.remove('lit','dim');
+    if (!cSel) return;
+    if (related.has(j.dataset.id)) j.classList.add('lit'); else j.classList.add('dim');
+  });
+}
+
+/* ═══════════ shell ═══════════ */
+function showVariant(id) {
+  document.querySelectorAll('.variant').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.variant-tab').forEach(t => t.classList.toggle('active', t.dataset.v === id));
+  document.getElementById('variant-' + id).classList.add('active');
+  requestAnimationFrame(() => { if (id==='a') aWires(); if (id==='b') bWires(); if (id==='c') cWires(); });
+}
+document.addEventListener('click', (e) => {
+  const bay = e.target.closest('.bay');
+  if (bay && !e.target.closest('.jack')) {
+    if (bay.id === 'bay-a') { aSel = null; aWires(); }
+    if (bay.id === 'bay-b') { bFocus = null; bWires(); }
+    if (bay.id === 'bay-c') { cSel = null; cWires(); }
+  }
+});
+window.addEventListener('resize', () => { aWires(); const v = document.querySelector('.variant.active').id;
+  if (v === 'variant-b') bWires(); if (v === 'variant-c') cWires(); });
+
+aRender(); bRender(); cRender();
+</script>
+</body>
+</html>

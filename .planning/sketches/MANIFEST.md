@@ -16,6 +16,7 @@ Paper/ink engineering-drawing system (established in the blueprint-redesign expl
 |---|------|----------------|--------|------|
 | 001 | org-model-canvas | How does a business draw departments → roles → people quickly (named or unnamed)? | B (Node Chart default · Columns alt view) | org-model, departments, roles |
 | 002 | permission-wiring | How do SOP-access connections read at a glance across 1:N, N:1, N:M? | A (Patch Bay default · Matrix + Illuminate alt views) | permissions, library-access |
+| 003 | wiring-at-scale | Does the Patch Bay survive ~15 depts × ~20 collections, and what keeps it legible? | — | permissions, scale |
 
 ## Decisions
 
