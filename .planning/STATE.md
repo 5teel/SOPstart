@@ -4,13 +4,13 @@ milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
 status: executing
 stopped_at: Completed 32-06-PLAN.md
-last_updated: "2026-07-18T08:45:34.508Z"
+last_updated: "2026-07-18T09:02:42.092Z"
 last_activity: 2026-07-18 -- Phase 32 execution started
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 29
-  completed_plans: 26
+  completed_plans: 27
   percent: 60
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 32 (visual-org-model-library-permissions) — EXECUTING
-Plan: 6 of 9
+Plan: 7 of 9
 Status: Ready to execute
 Last activity: 2026-07-18 -- Phase 32 execution started
 
@@ -174,6 +174,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 32 P04 | 20min | 2 tasks | 5 files |
 | Phase 32 P05 | 24min | 2 tasks | 3 files |
 | Phase 32 P06 | 20min | 2 tasks | 5 files |
+| Phase 32 P07 | 20min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -374,6 +375,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 32-05]: real runtime tests for cross-tenant write isolation and the D-13 RLS arm use ephemeral throwaway orgs (no staging Supabase project exists) since createGrant/materializeSopAccess cannot be invoked directly outside a Next.js request scope and no UI wires grants.ts yet
 - [Phase 32-06]: OrgChartCanvas add-affordance ghosts call org-model.ts createRole / departments.ts createDepartment directly via a caller-supplied onChange callback -- chart-rendering scope owns no fetch/refresh state; /admin/team page wiring (32-07) owns onChange -> refetch
 - [Phase 32-06]: Added .node/.person-chip/.view-toggle/.org-add-ghost CSS to blueprint-theme.css (not in plan files_modified) -- org-model-views.md's sketch CSS had no prior stylesheet declaration, so without it every chart element would render invisibly (Rule 2, CLAUDE.md 2026-07-14 undefined-token class)
+- [Phase 32]: [Phase 32-07]: TeamViewShell.tsx added as a thin client wrapper (not in plan files_modified) -- async Server Component page.tsx cannot hold client toggle state or pass client callbacks across the RSC boundary
+- [Phase 32]: [Phase 32-07]: OrgColumnsBoard absorbs RoleAssignmentTable as a collapsible sub-panel rather than reimplementing invite/org-role/department-picker UI, preserving role-edit capability with zero duplication
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -483,7 +486,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-18T08:45:34.498Z
+Last session: 2026-07-18T09:01:07.208Z
 Stopped at: Completed 32-06-PLAN.md
 Resume file:
 None
