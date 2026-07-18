@@ -25,7 +25,7 @@ expected: Focus a department jack with SOPs → "Open in library →" appears in
 result: pass (2026-07-18)
 
 ### 4. Wiring a SOP up actually saves
-How: Go to /admin/sops → open a SOP in the builder → last stage (Publish) → publish it → a "Wire up access →" button appears under the published confirmation. Click it. (Or skip publishing: open /admin/sops?view=access directly and click any SOP in the right column.) Turn on 2-3 departments — the count of people who'd see the SOP should update as you toggle. Click "✓ Done wiring". Then click the same SOP again.
+How: Go to /admin/sops → open a SOP in the builder → click the "Send to workers" chip in the stepper at the top (greyed out until every block passes Check) → send it to workers → a "Wire up access →" button appears on that screen. Click it. (Easier: skip publishing — open /admin/sops?view=access directly and click any SOP in the right column.) Turn on 2-3 departments — the count of people who'd see the SOP should update as you toggle. Click "✓ Done wiring". Then click the same SOP again.
 expected: The departments you picked show as already connected (wires light up). If it still says "NEW · UNWIRED" or your picks are gone, the save failed — report it.
 result: [pending]
 
