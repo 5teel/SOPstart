@@ -69,6 +69,42 @@
   .ghost-btn.on { background: var(--ink-900); color: #fff; border-color: var(--ink-900); }
   .jack.match .name { text-decoration: underline; text-decoration-color: var(--brand-yellow); text-decoration-thickness: 3px; }
   .jack.nomatch { opacity: 0.25; }
+
+  /* D: hybrid — selection strip (viz-as-filter) + connect mode */
+  .sel-strip {
+    display: none; align-items: center; gap: 12px; margin-bottom: 14px;
+    border: 1.5px solid var(--accent-step); border-radius: 4px; background: #eff4ff;
+    padding: 9px 14px; font-size: 13px;
+  }
+  .sel-strip.show { display: flex; }
+  .sel-strip .headline b { font-weight: 700; }
+  .sel-strip .titles { font-family: var(--mono); font-size: 10px; color: var(--ink-500); }
+  .sel-strip .open-lib {
+    margin-left: auto; flex-shrink: 0;
+    font-family: var(--mono); font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; padding: 7px 12px; border: none; border-radius: 3px;
+    background: var(--ink-900); color: #fff; cursor: pointer;
+  }
+  .connect-strip {
+    display: none; align-items: center; gap: 12px; margin-bottom: 14px;
+    border: 1.5px solid var(--accent-ok); border-radius: 4px; background: rgba(22,163,74,0.07);
+    padding: 9px 14px; font-size: 13px;
+  }
+  .connect-strip.show { display: flex; }
+  .connect-strip .done {
+    margin-left: auto; flex-shrink: 0;
+    font-family: var(--mono); font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; padding: 7px 12px; border: none; border-radius: 3px;
+    background: var(--accent-ok); color: #fff; cursor: pointer;
+  }
+  .jack.newsop { border: 2px solid var(--accent-decision); }
+  .jack.newsop .newpill {
+    font-family: var(--mono); font-size: 8px; font-weight: 700; letter-spacing: 0.06em;
+    background: var(--accent-decision); color: #fff; border-radius: 2px; padding: 1px 5px; flex-shrink: 0;
+  }
+  .jack.wired-target { border-color: var(--accent-ok); background: rgba(22,163,74,0.06); }
+  .jack.wired-target .port { border-color: var(--accent-ok); background: var(--accent-ok); }
+  #bay-d.connecting .col.left .jack { cursor: copy; }
 </style>
 </head>
 <body>
@@ -78,6 +114,7 @@
   <button class="variant-tab active" data-v="a" onclick="showVariant('a')">A: Collapse to Groups</button>
   <button class="variant-tab" data-v="b" onclick="showVariant('b')">B: Focus Mode</button>
   <button class="variant-tab" data-v="c" onclick="showVariant('c')">C: Bus Routing</button>
+  <button class="variant-tab" data-v="d" onclick="showVariant('d')">D: Hybrid + Wire-Up</button>
 </div>
 
 <div id="variant-a" class="variant active">
@@ -126,6 +163,26 @@
       </div>
     </div>
     <div class="bay-hint">ALL 34 WIRES ALWAYS ON, BUS-ROUTED · CLICK A JACK TO RAISE ITS CIRCUIT · CLICK EMPTY SPACE TO RESET</div>
+  </div>
+</div>
+
+<div id="variant-d" class="variant">
+  <div class="page">
+    <div class="page-head"><span class="pill">LIBRARY ACCESS</span><h1>Who sees what — hybrid</h1></div>
+    <div class="page-sub">A's grouped structure + B's focus interaction. Selection doubles as a LIBRARY FILTER. The new unwired SOP at the top-right is waiting to be connected — click it to wire it up.</div>
+    <div class="searchbar">
+      <input id="d-search" type="search" placeholder="Search org or collections…" oninput="dSearch(this.value)">
+    </div>
+    <div class="sel-strip" id="d-selstrip"></div>
+    <div class="connect-strip" id="d-connectstrip"></div>
+    <div class="bay" id="bay-d">
+      <svg class="bay-svg"></svg>
+      <div class="cols">
+        <div class="col left" id="d-left"><h2>Org — Visy Kawerau</h2></div>
+        <div class="col right" id="d-right"><h2>Library — 20 collections + 1 new SOP</h2></div>
+      </div>
+    </div>
+    <div class="bay-hint">CLICK ▸ TO EXPAND A GROUP · CLICK ANYTHING TO FOCUS (WIRES + LIBRARY FILTER) · CLICK THE NEW SOP TO ENTER WIRE-UP MODE</div>
   </div>
 </div>
 
@@ -435,12 +492,200 @@ function cWires() {
   });
 }
 
+/* ═══════════ Variant D — A+B hybrid + wire-up mode ═══════════ */
+const NEWSOP = { id:'newsop', name:'Tergo Alkalox Tank — Emergency Purge', group:'h-safe' };
+const SAMPLE_TITLES = {
+  chemical: ['Alkaline Cleaning Tank Operation', 'Tergo Alkalox — Mixing & Decant', 'Acid Store Spill Response'],
+  mechmnt: ['IS Machine Bearing Change', 'Conveyor Gearbox Swap', 'Shear Blade Replacement'],
+  ismachine: ['IS Machine Start of Shift', 'Gob Weight Adjustment', 'Mould Swap — Running Machine'],
+  sitesafety: ['Emergency Evacuation', 'First Aid Response', 'Incident Reporting'],
+};
+const dExpL = new Set(), dExpR = new Set(['h-safe']);
+let dFocus = null, dConnecting = false;
+const dNewGrants = new Set();
+
+const dPeopleOf = id => id === 'org' ? 69 : id === 'priya' ? 1
+  : deptOf[id] ? deptOf[id].ppl
+  : DEPT_GROUPS.find(g => g.id === id)?.depts.reduce((s,[,,p]) => s+p, 0) ?? 0;
+
+function dRender() {
+  const L = document.getElementById('d-left'), R = document.getElementById('d-right');
+  L.querySelectorAll('.jack,.group-label').forEach(e => e.remove());
+  R.querySelectorAll('.jack,.group-label').forEach(e => e.remove());
+
+  L.appendChild(jackEl({id:'org', name:'Whole site', meta:'69 people', side:'left', cls:'site-jack'}));
+  DEPT_GROUPS.forEach(g => {
+    if (dExpL.has(g.id)) {
+      const lbl = document.createElement('div'); lbl.className = 'group-label';
+      lbl.innerHTML = `<span style="cursor:pointer" onclick="dToggle('L','${g.id}')">▾ ${g.name}</span>`;
+      L.appendChild(lbl);
+      g.depts.forEach(([id,name,ppl]) =>
+        L.appendChild(jackEl({id, name, meta:`${ppl}p`, side:'left', cls:'child', color:g.color})));
+    } else {
+      const j = jackEl({id:g.id, name:g.name, meta:`${g.depts.length} depts`, side:'left', cls:'group-jack', color:g.color, twist:'▸'});
+      j.querySelector('.twist').onclick = (e) => { e.stopPropagation(); dToggle('L', g.id); };
+      L.appendChild(j);
+    }
+  });
+  L.appendChild(jackEl({id:'priya', name:'Priya Sharma — Lab Technician', meta:'person', side:'left', cls:'child'}));
+
+  // pinned new SOP first — the wire-up entry point
+  const ns = jackEl({id:'newsop', name:NEWSOP.name, meta: dNewGrants.size ? `${dNewGrants.size} grants` : '0 grants', side:'right', cls:'newsop'});
+  ns.insertAdjacentHTML('afterbegin', `<span class="newpill">${dNewGrants.size ? 'NEW' : 'NEW · UNWIRED'}</span>`);
+  R.appendChild(ns);
+
+  COL_GROUPS.forEach(g => {
+    if (dExpR.has(g.id)) {
+      const lbl = document.createElement('div'); lbl.className = 'group-label';
+      lbl.innerHTML = `<span style="cursor:pointer" onclick="dToggle('R','${g.id}')">▾ ${g.name}</span>`;
+      R.appendChild(lbl);
+      g.cols.forEach(([id,name,n]) =>
+        R.appendChild(jackEl({id, name, meta:`${n} SOPs`, side:'right', cls:'child', color:g.color})));
+    } else {
+      const total = g.cols.reduce((s,[,,n]) => s+n, 0);
+      const j = jackEl({id:g.id, name:g.name, meta:`${total} SOPs`, side:'right', cls:'group-jack', color:g.color, twist:'▸'});
+      j.querySelector('.twist').onclick = (e) => { e.stopPropagation(); dToggle('R', g.id); };
+      R.appendChild(j);
+    }
+  });
+
+  document.querySelectorAll('#bay-d .jack').forEach(j =>
+    j.addEventListener('click', () => dClick(j.dataset.id)));
+  dWires();
+}
+function dToggle(side, gid) {
+  const set = side === 'L' ? dExpL : dExpR;
+  set.has(gid) ? set.delete(gid) : set.add(gid);
+  dRender();
+}
+function dClick(id) {
+  if (id === 'newsop') {           // enter/exit wire-up mode
+    dConnecting = !dConnecting; dFocus = null;
+  } else if (dConnecting) {        // in wire-up mode, left clicks toggle grants
+    if (deptOf[id] || DEPT_GROUPS.some(g => g.id === id) || id === 'org' || id === 'priya') {
+      dNewGrants.has(id) ? dNewGrants.delete(id) : dNewGrants.add(id);
+    }
+  } else {
+    dFocus = (dFocus === id) ? null : id;
+  }
+  dRender();
+}
+
+const dEndL = d => d === 'org' || d === 'priya' ? d
+  : DEPT_GROUPS.some(g => g.id === d) ? d   // group-level grant anchors at the group jack
+  : (dExpL.has(deptGroupOf[d]) ? d : deptGroupOf[d]);
+const dEndR = c => c === 'newsop' ? c : (dExpR.has(colGroupOf[c]) ? c : colGroupOf[c]);
+
+function dWires() {
+  const bay = document.getElementById('bay-d'), svg = bay.querySelector('.bay-svg');
+  clearWires(bay);
+  svg.setAttribute('viewBox', `0 0 ${bay.clientWidth} ${bay.clientHeight}`);
+  bay.classList.toggle('connecting', dConnecting);
+
+  const agg = new Map();
+  GRANTS.forEach(([d,c]) => { const k = dEndL(d) + '|' + dEndR(c); agg.set(k, (agg.get(k) ?? 0) + 1); });
+  SITE_GRANTS.forEach(c => { const k = 'org|' + dEndR(c); agg.set(k, (agg.get(k) ?? 0) + 1); });
+  dNewGrants.forEach(u => agg.set(dEndL(u) + '|newsop', 1));
+
+  const visible = ([l, r]) => {
+    if (dConnecting) return r === 'newsop';                       // wire-up: only the new SOP's circuit
+    if (!dFocus) return r === 'newsop' && dNewGrants.size > 0;    // rest state: only fresh wiring shows
+    return l === dFocus || r === dFocus;                          // focus: that unit's wires
+  };
+
+  const related = new Set(dFocus ? [dFocus] : []);
+  agg.forEach((n, k) => {
+    const [l, r] = k.split('|');
+    if (!visible([l, r])) return;
+    if (dFocus === l) related.add(r); if (dFocus === r) related.add(l);
+    const le = bay.querySelector(`.col.left .jack[data-id="${l}"]`);
+    const re = bay.querySelector(`.col.right .jack[data-id="${r}"]`);
+    if (!le || !re) return;
+    const [x1,y1] = anchor(le, bay, 'left'), [x2,y2] = anchor(re, bay, 'right');
+    const color = r === 'newsop' ? '#16a34a'
+      : l === 'org' ? '#b91c1c'
+      : (deptOf[l]?.g.color ?? DEPT_GROUPS.find(g => g.id === l)?.color ?? '#7c3aed');
+    drawBezier(svg, x1, y1, x2, y2, { stroke: color, width: 2.2, opacity: 1, dash: l === 'priya' });
+    if (n > 1) wireBadge(bay, (x1+x2)/2, (y1+y2)/2, n);
+  });
+
+  bay.querySelectorAll('.jack').forEach(j => {
+    j.classList.remove('lit','dim','wired-target');
+    const id = j.dataset.id;
+    if (dConnecting) {
+      if (id === 'newsop') j.classList.add('lit');
+      else if (dNewGrants.has(id) || (DEPT_GROUPS.some(g => g.id === id) && [...dNewGrants].some(u => deptGroupOf[u] === id)))
+        j.classList.add('wired-target');
+      else if (!j.closest('.col.left')) j.classList.add('dim');
+    } else if (dFocus) {
+      if (related.has(id)) j.classList.add('lit'); else j.classList.add('dim');
+    }
+  });
+  dStrips();
+}
+
+function dStrips() {
+  const sel = document.getElementById('d-selstrip');
+  const con = document.getElementById('d-connectstrip');
+  con.classList.toggle('show', dConnecting);
+  sel.classList.toggle('show', !dConnecting && !!dFocus);
+
+  if (dConnecting) {
+    const ppl = [...dNewGrants].reduce((s,u) => s + dPeopleOf(u), 0);
+    con.innerHTML =
+      `<span class="headline">⚡ Wiring <b>${NEWSOP.name}</b> — click org units to grant access.` +
+      ` Visible to <b>${ppl} people</b> via ${dNewGrants.size} grant${dNewGrants.size === 1 ? '' : 's'}.</span>` +
+      `<button class="done" onclick="dClick('newsop')">✓ Done wiring</button>`;
+    return;
+  }
+  if (!dFocus) return;
+
+  const isLeft = dFocus === 'org' || dFocus === 'priya' || deptOf[dFocus] || DEPT_GROUPS.some(g => g.id === dFocus);
+  const name = deptOf[dFocus]?.name ?? colOf[dFocus]?.name
+    ?? DEPT_GROUPS.find(g => g.id === dFocus)?.name ?? COL_GROUPS.find(g => g.id === dFocus)?.name
+    ?? (dFocus === 'org' ? 'Whole site' : dFocus === 'priya' ? 'Priya Sharma' : dFocus === 'newsop' ? NEWSOP.name : dFocus);
+
+  if (isLeft) {
+    // what this unit can see = its direct wires (+ site-wide)
+    const cols = new Set();
+    GRANTS.forEach(([d,c]) => { if (dEndL(d) === dFocus || d === dFocus) cols.add(c); });
+    const n = [...cols].reduce((s,c) => s + colOf[c].n, 0);
+    const titles = [...cols].flatMap(c => SAMPLE_TITLES[c] ?? []).slice(0,3);
+    sel.innerHTML =
+      `<span class="headline"><b>${name}</b> can see <b>${n} SOPs</b> across ${cols.size} collections` +
+      ` <span class="titles">+ ${SITE_GRANTS.length} site-wide · ${titles.length ? 'e.g. ' + titles.join(' · ') : ''}</span></span>` +
+      `<button class="open-lib" title="/admin/sops?departments=${dFocus}">→ Open in library (${n})</button>`;
+  } else {
+    const feeders = new Set();
+    GRANTS.forEach(([d,c]) => { if (dEndR(c) === dFocus || c === dFocus) feeders.add(d); });
+    const ppl = [...feeders].reduce((s,d) => s + dPeopleOf(d), 0);
+    const nSops = colOf[dFocus]?.n ?? COL_GROUPS.find(g => g.id === dFocus)?.cols.reduce((s,[,,n]) => s+n, 0) ?? 0;
+    sel.innerHTML =
+      `<span class="headline"><b>${name}</b> — <b>${nSops} SOPs</b>, visible to <b>${ppl} people</b> via ${feeders.size} org units</span>` +
+      `<button class="open-lib" title="/admin/sops?collection=${dFocus}">→ Open in library (${nSops})</button>`;
+  }
+}
+function dSearch(q) {
+  q = q.trim().toLowerCase();
+  if (q) { // auto-expand groups containing matches
+    DEPT_GROUPS.forEach(g => { if (g.depts.some(([,n]) => n.toLowerCase().includes(q))) dExpL.add(g.id); });
+    COL_GROUPS.forEach(g => { if (g.cols.some(([,n]) => n.toLowerCase().includes(q))) dExpR.add(g.id); });
+    dRender();
+  }
+  document.querySelectorAll('#bay-d .jack').forEach(j => {
+    j.classList.remove('match','nomatch');
+    if (!q) return;
+    const hit = j.querySelector('.name').textContent.toLowerCase().includes(q);
+    j.classList.add(hit ? 'match' : 'nomatch');
+  });
+}
+
 /* ═══════════ shell ═══════════ */
 function showVariant(id) {
   document.querySelectorAll('.variant').forEach(v => v.classList.remove('active'));
   document.querySelectorAll('.variant-tab').forEach(t => t.classList.toggle('active', t.dataset.v === id));
   document.getElementById('variant-' + id).classList.add('active');
-  requestAnimationFrame(() => { if (id==='a') aWires(); if (id==='b') bWires(); if (id==='c') cWires(); });
+  requestAnimationFrame(() => { if (id==='a') aWires(); if (id==='b') bWires(); if (id==='c') cWires(); if (id==='d') dWires(); });
 }
 document.addEventListener('click', (e) => {
   const bay = e.target.closest('.bay');
@@ -448,12 +693,16 @@ document.addEventListener('click', (e) => {
     if (bay.id === 'bay-a') { aSel = null; aWires(); }
     if (bay.id === 'bay-b') { bFocus = null; bWires(); }
     if (bay.id === 'bay-c') { cSel = null; cWires(); }
+    if (bay.id === 'bay-d' && !dConnecting) { dFocus = null; dWires(); }
   }
 });
-window.addEventListener('resize', () => { aWires(); const v = document.querySelector('.variant.active').id;
-  if (v === 'variant-b') bWires(); if (v === 'variant-c') cWires(); });
+window.addEventListener('resize', () => {
+  const v = document.querySelector('.variant.active').id;
+  if (v === 'variant-a') aWires(); if (v === 'variant-b') bWires();
+  if (v === 'variant-c') cWires(); if (v === 'variant-d') dWires();
+});
 
-aRender(); bRender(); cRender();
+aRender(); bRender(); cRender(); dRender();
 </script>
 </body>
 </html>
