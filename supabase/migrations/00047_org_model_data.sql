@@ -45,7 +45,7 @@ on conflict do nothing;
 -- Does NOT write to sop_departments or sop_access_people.
 -- ============================================================
 insert into public.access_grants (organisation_id, subject_type, subject_id, collection_id, granted_by)
-select distinct d.organisation_id, 'department'::public.grant_subject_type, sd.department_id, sc.collection_id, null
+select distinct d.organisation_id, 'department'::public.grant_subject_type, sd.department_id, sc.collection_id, null::uuid
 from public.sop_departments sd
 join public.departments d on d.id = sd.department_id
 join public.sop_collections sc on sc.sop_id = sd.sop_id
