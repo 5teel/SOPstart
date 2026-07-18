@@ -392,6 +392,18 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
     return s.size
   }, [focus, isLeftId, peopleIndex, visibleRawEdges])
 
+  // WR-05: for a focused COLLECTION, "via M grants" counts the real source
+  // grants on that collection — visibleRawEdges holds one derived edge per
+  // unit that RESOLVES access (org + each area + each dept + each person from
+  // a single org-level grant), so one grant rendered as "via 12 grants". For
+  // a focused left-side unit the edge count IS its effective collections —
+  // kept as-is.
+  const focusGrantCount = useMemo(() => {
+    if (!focus) return 0
+    if (collectionById.has(focus)) return grants.filter((g) => g.collectionId === focus).length
+    return visibleRawEdges.length
+  }, [focus, collectionById, grants, visibleRawEdges])
+
   // 32-09 SC-4 (viz-as-library-filter): a focused department or collection is
   // a valid /admin/sops server-side filter target — org/area/person focus
   // has no equivalent library query param, so no link renders for those.
@@ -455,7 +467,7 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
         state={stripState}
         label={focusLabel}
         peopleCount={connecting ? blastRadiusPeople : focusPeopleCount}
-        grantCount={connecting ? pending.size : visibleRawEdges.length}
+        grantCount={connecting ? pending.size : focusGrantCount}
         onDone={() => void handleDone()}
         doneDisabled={saving || pending.size === 0}
         openInLibraryHref={openInLibraryHref}

@@ -70,7 +70,9 @@ test.describe('SC-5 — PEOPLE blast-radius source contract', () => {
     const src = read(BAY)
     expect(src).toContain('state={stripState}')
     expect(src).toContain('peopleCount={connecting ? blastRadiusPeople : focusPeopleCount}')
-    expect(src).toContain('grantCount={connecting ? pending.size : visibleRawEdges.length}')
+    // WR-05: a focused collection counts DISTINCT SOURCE GRANTS, not derived edges.
+    expect(src).toContain('grantCount={connecting ? pending.size : focusGrantCount}')
+    expect(src).toContain('if (collectionById.has(focus)) return grants.filter((g) => g.collectionId === focus).length')
   })
 })
 
