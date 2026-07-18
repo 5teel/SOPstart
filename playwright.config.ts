@@ -353,5 +353,25 @@ export default defineConfig({
       testMatch: /tests\/phase26\.5\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 32 — Visual Org Model & Library Permissions Nyquist harness (Wave 0 / Plan 32-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase32/**) so every later plan in
+      // the phase drops specs into tests/phase32/ with NO further config edit —
+      // single registration point for the whole phase (mirrors phase26/28/29/30).
+      //
+      // Verify registration: `npx playwright test --list --project=phase32`
+      // (should list all 8 tests/phase32/*.spec.ts files — zero discovered = FAIL)
+      //
+      // Wave-0 stub files (one per SC-1..SC-6 + 2 project-learning-mandated guards):
+      //   org-chart-build (SC-1) · resolve-access (SC-2) · wiring-at-scale (SC-3) ·
+      //   library-filter-deeplink (SC-4) · wire-up-mode (SC-5) · banner-slot-stability (SC-6) ·
+      //   grants-org-isolation (cross-tenant, [2026-06-15]) · person-grant-rls (D-13, [2026-06-15])
+      name: 'phase32',
+      testDir: '.',
+      testMatch: /tests\/phase32\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
