@@ -4,12 +4,12 @@ milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
 status: executing
 stopped_at: Phase 32 context gathered
-last_updated: "2026-07-18T06:59:59.946Z"
-last_activity: 2026-07-13 -- 30-08 executed (UX-03 governance fold + UX-06 one-line rows + phase gate)
+last_updated: "2026-07-18T07:11:53.870Z"
+last_activity: 2026-07-18 -- Phase 32 execution started
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 20
+  total_plans: 29
   completed_plans: 20
   percent: 60
 ---
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 30 — ux-consolidation
+**Current focus:** Phase 32 — visual-org-model-library-permissions
 
 ## Current Position
 
-Phase: 30 (ux-consolidation) — COMPLETE (8 of 8 plans; final gate green: full suite matches 30-01 baseline exactly, tsc + build + bundle gate clean, /pathways 0 not-mapped)
-Plan: 8 of 8 complete
-Status: Ready to execute
-Last activity: 2026-07-13 -- 30-08 executed (UX-03 governance fold + UX-06 one-line rows + phase gate)
+Phase: 32 (visual-org-model-library-permissions) — EXECUTING
+Plan: 1 of 9
+Status: Executing Phase 32
+Last activity: 2026-07-18 -- Phase 32 execution started
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 

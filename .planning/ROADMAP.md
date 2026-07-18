@@ -220,13 +220,13 @@ Plans:
   6. Contextual banners occupy permanently-reserved fixed-height slots — the graph never moves on selection
 
 **Pre-plan gates:** (a) roles entity schema decision (`roles` + `role_members` + budgeted_count; Phase 25 model has no role layer); (b) inherited-revoke ("exclude from broadcast grant") UX decision; (c) how dept-visibility RLS (sop_departments) extends to area/person-level grants.
-**Plans:** 9 plans / 6 waves
+**Plans:** 2/9 plans executed
 **Pre-plan gates resolved:** (a) roles schema → `roles`+`role_members`+budgeted_count (D-05, 32-02); (b) inherited-revoke → additive-only v1, revoke-at-source (D-11); (c) area/person RLS → materialize onto `sop_departments` + ONE additive person/role RLS arm `sops_visible_by_person_grant` reading `sop_access_people` (D-13, 32-02).
 Plans:
 **Wave 1**
 
-- [ ] 32-01-PLAN.md — Wave 1: phase32 Playwright project + 8 stub specs (SC-1..SC-6 + org-isolation + person-grant-rls)
-- [ ] 32-02-PLAN.md — Wave 1: migrations 00046 schema (7 tables + area_id + grant_subject_type + D-13 RLS arm) + 00047 data seed (day-one equivalence)
+- [x] 32-01-PLAN.md — Wave 1: phase32 Playwright project + 8 stub specs (SC-1..SC-6 + org-isolation + person-grant-rls)
+- [x] 32-02-PLAN.md — Wave 1: migrations 00046 schema (7 tables + area_id + grant_subject_type + D-13 RLS arm) + 00047 data seed (day-one equivalence)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
