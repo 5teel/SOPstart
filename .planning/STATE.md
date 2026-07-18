@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
 status: executing
-stopped_at: Phase 32 context gathered
-last_updated: "2026-07-18T07:11:53.870Z"
+stopped_at: Completed 32-03-PLAN.md
+last_updated: "2026-07-18T07:42:45.901Z"
 last_activity: 2026-07-18 -- Phase 32 execution started
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 29
-  completed_plans: 20
+  completed_plans: 23
   percent: 60
 ---
 
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 32 (visual-org-model-library-permissions) — EXECUTING
-Plan: 1 of 9
-Status: Executing Phase 32
+Plan: 2 of 9
+Status: Ready to execute
 Last activity: 2026-07-18 -- Phase 32 execution started
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
@@ -170,6 +170,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 30 P06 | 25m | 3 tasks | 17 files |
 | Phase 30 P07 | 25m | 3 tasks | 8 files |
 | Phase 30 P08 | ~40m | 3 tasks | 16 files |
+| Phase 32 P03 | 12min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -362,6 +363,7 @@ Recent decisions affecting current work:
 - [Phase 30]: 30-08: one-line rows derive their ONE flag chip from the same listGovernanceQueue read as the header chips (worst-first via FLAG_PRIORITY) — no client-side date math, no second query; FLAG_STYLE/FLAG_LABEL duplicated locally because GovernanceQueueRow is 'use client' (consts not importable into a server component)
 - [Phase 30]: 30-08: journeys.ts maps /dashboard exactly once (legacy redirect-shim step) so /pathways shows 0 not-mapped while roles.ts still lands no role there; role-homes spec repointed from blanket ban to exactly-once assertion
 - [Phase 30]: 30-08: governance shim keeps the org-scoped admin guard IN FRONT of the redirect (T-30-08-03); approval-chain editor + its category/chains/members assembly moved verbatim to /admin/settings
+- [Phase 32-03]: Live-pushed migrations 00046+00047; tsx .ts scripts must wrap async logic in main() (no top-level await under CJS transform); 00047 access_grants seed insert required null::uuid cast
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -471,7 +473,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-18T06:08:01.325Z
-Stopped at: Phase 32 context gathered
+Last session: 2026-07-18T07:42:45.892Z
+Stopped at: Completed 32-03-PLAN.md
 Resume file:
-.planning/phases/32-visual-org-model-library-permissions/32-CONTEXT.md
+None
