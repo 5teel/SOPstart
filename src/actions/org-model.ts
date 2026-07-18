@@ -29,6 +29,7 @@
 import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminContext } from '@/lib/auth/guards'
+import { materializeOrgAccess } from '@/actions/grants'
 import type { Area, DeptRole, OrgPerson, OrgTree, OrgTreeArea, OrgTreeDepartment, OrgTreeRole } from '@/types/org-model'
 
 // ---------------------------------------------------------------------------
@@ -301,6 +302,12 @@ export async function archiveArea(
     console.error('[archiveArea] delete error', error)
     return { error: error.message }
   }
+
+  // CR-03: removing an area ungroups its departments (area_id -> null), so
+  // area-level grants stop applying — re-materialize or revocation never
+  // propagates to sop_departments/sop_access_people.
+  const mat = await materializeOrgAccess()
+  if ('error' in mat) return { error: `Area removed, but access re-materialization failed: ${mat.error}` }
   return { success: true }
 }
 
@@ -421,6 +428,11 @@ export async function archiveRole(
     console.error('[archiveRole] delete error', error)
     return { error: error.message }
   }
+
+  // CR-03: role_members cascade-deleted with the role — re-materialize so the
+  // ex-members' sop_access_people rows are revoked, not retained.
+  const mat = await materializeOrgAccess()
+  if ('error' in mat) return { error: `Role removed, but access re-materialization failed: ${mat.error}` }
   return { success: true }
 }
 
@@ -495,6 +507,13 @@ export async function assignRoleMembers(
     }
   }
 
+  // CR-03: role membership drives sop_access_people — re-materialize so a
+  // REMOVED member's materialized rows are revoked immediately (the Priya
+  // scenario in reverse: retained access after revocation is the dangerous
+  // direction), and an added member gains access without waiting for
+  // unrelated grant CRUD.
+  const mat = await materializeOrgAccess()
+  if ('error' in mat) return { error: `Members saved, but access re-materialization failed: ${mat.error}` }
   return { success: true }
 }
 
@@ -534,5 +553,10 @@ export async function setDepartmentArea(
     console.error('[setDepartmentArea] update error', error)
     return { error: error.message }
   }
+
+  // CR-03: moving a department into/out of an area changes its inheritance
+  // chain (area-level grants start/stop applying) — re-materialize.
+  const mat = await materializeOrgAccess()
+  if ('error' in mat) return { error: `Department moved, but access re-materialization failed: ${mat.error}` }
   return { success: true }
 }

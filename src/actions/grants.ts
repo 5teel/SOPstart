@@ -10,6 +10,9 @@
  *  - revokeGrant(grantId)                  — deletes the source grant (additive-only, D-11)
  *  - materializeSopAccess(sopId)           — resolves + replace-writes sop_departments AND sop_access_people for one SOP
  *  - materializeCollectionAccess(collectionId) — materializeSopAccess for every SOP in a collection
+ *  - materializeOrgAccess()                — re-materializes every collection-bearing SOP in the org (CR-03:
+ *    called by org-model.ts after chain/membership mutations so revocation propagates)
+ *  - ensureSopCollections(sopId)           — runtime sop_collections companion write (CR-02, mirrors 00047 A/B)
  *
  * This is the security-critical write path (T-32-05-01/02/03/04). access_grants,
  * sop_departments, and sop_access_people have NO authenticated write policy —
@@ -280,6 +283,46 @@ export async function materializeCollectionAccess(collectionId: string): Promise
   if (!orgId) return { error: 'No organisation' }
 
   return materializeCollectionAccessForOrg(admin, orgId, collectionId)
+}
+
+// ---------------------------------------------------------------------------
+// 5b. materializeOrgAccess — re-materializes EVERY collection-bearing SOP in
+// the caller's org (CR-03). Resolved access changes not only on grant CRUD but
+// whenever the inheritance chain or role membership changes (assignRoleMembers,
+// archiveRole, setDepartmentArea, archiveArea in org-model.ts). Without this,
+// removing a person from a role left their materialized sop_access_people rows
+// live indefinitely — retained access after revocation. Sequential per-SOP
+// fanout is fine at this scale (50-500 SOPs); per-role narrowing is an
+// optimization, not a correctness requirement.
+// ---------------------------------------------------------------------------
+
+export async function materializeOrgAccess(): Promise<{ success: true } | { error: string }> {
+  const ctx = await requireAdmin()
+  if ('error' in ctx) return { error: ctx.error }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const admin: any = createAdminClient()
+  const orgId = await callerOrgId(admin, ctx)
+  if (!orgId) return { error: 'No organisation' }
+
+  const { data: sopRows, error: sopsErr } = await admin.from('sops').select('id').eq('organisation_id', orgId)
+  if (sopsErr) return { error: sopsErr.message }
+  const sopIds = ((sopRows ?? []) as Array<{ id: string }>).map(r => r.id)
+  if (sopIds.length === 0) return { success: true }
+
+  // Only SOPs with a sop_collections row are inside the grant system — the
+  // CR-02 guard in materializeSopAccessForOrg would skip the rest anyway;
+  // filtering here just avoids pointless per-SOP round-trips.
+  const { data: scRows, error: scErr } = await admin.from('sop_collections').select('sop_id').in('sop_id', sopIds)
+  if (scErr) return { error: scErr.message }
+  const collectionBearing = new Set(((scRows ?? []) as Array<{ sop_id: string }>).map(r => r.sop_id))
+
+  for (const sopId of sopIds) {
+    if (!collectionBearing.has(sopId)) continue
+    const result = await materializeSopAccessForOrg(admin, orgId, sopId)
+    if ('error' in result) return result
+  }
+  return { success: true }
 }
 
 // ---------------------------------------------------------------------------
