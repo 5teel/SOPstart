@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
 status: executing
-stopped_at: Completed 32-08-PLAN.md
-last_updated: "2026-07-18T09:28:12.979Z"
+stopped_at: Completed 32-09-PLAN.md
+last_updated: "2026-07-18T09:52:31.851Z"
 last_activity: 2026-07-18 -- Phase 32 execution started
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 29
-  completed_plans: 28
-  percent: 60
+  completed_plans: 29
+  percent: 80
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 32 (visual-org-model-library-permissions) — EXECUTING
-Plan: 8 of 9
+Plan: 9 of 9
 Status: Ready to execute
 Last activity: 2026-07-18 -- Phase 32 execution started
 
@@ -176,6 +176,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 32 P06 | 20min | 2 tasks | 5 files |
 | Phase 32 P07 | 20min | 2 tasks | 6 files |
 | Phase 32 P08 | 20min | 2 tasks | 6 files |
+| Phase 32 P09 | 45min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -381,6 +382,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 32-08: Collections render flat (no domain/group layer) — D-01 has no domain table; sketch 003's COL_GROUPS was presentational demo data
 - [Phase ?]: Phase 32-08: Area group jacks stay clickable/focusable/wireable whether collapsed or expanded — D-06 makes areas a real grantable chain level, unlike sketch 003's presentational-only groups
 - [Phase ?]: Phase 32-08: Wire-up blast-radius uses an exact distinct-person union via OrgTree's role.people, not sketch 003's per-unit sum approximation
+- [Phase ?]: Phase 32-09: Open in library is an explicit SelectionStrip link (not click-to-navigate) — preserves WiringPatchBay's quiet-by-default trace (SC-3)
+- [Phase ?]: Phase 32-09: WiringPatchBayShell added — async page.tsx cannot hold the onWireUpComplete router.refresh() callback (same RSC-boundary class as 32-07's TeamViewShell)
+- [Phase ?]: Phase 32-09: PublishStage wireUpHref derived from initialSop.status === 'published' by the parent shell, not a local just-published flag
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -490,7 +494,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-18T09:28:12.970Z
-Stopped at: Completed 32-08-PLAN.md
+Last session: 2026-07-18T09:52:31.842Z
+Stopped at: Completed 32-09-PLAN.md
 Resume file:
 None
