@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
 status: executing
-stopped_at: Completed 32-06-PLAN.md
-last_updated: "2026-07-18T09:02:42.092Z"
+stopped_at: Completed 32-08-PLAN.md
+last_updated: "2026-07-18T09:28:12.979Z"
 last_activity: 2026-07-18 -- Phase 32 execution started
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 29
-  completed_plans: 27
+  completed_plans: 28
   percent: 60
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 32 (visual-org-model-library-permissions) — EXECUTING
-Plan: 7 of 9
+Plan: 8 of 9
 Status: Ready to execute
 Last activity: 2026-07-18 -- Phase 32 execution started
 
@@ -175,6 +175,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 32 P05 | 24min | 2 tasks | 3 files |
 | Phase 32 P06 | 20min | 2 tasks | 5 files |
 | Phase 32 P07 | 20min | 2 tasks | 6 files |
+| Phase 32 P08 | 20min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -377,6 +378,9 @@ Recent decisions affecting current work:
 - [Phase 32-06]: Added .node/.person-chip/.view-toggle/.org-add-ghost CSS to blueprint-theme.css (not in plan files_modified) -- org-model-views.md's sketch CSS had no prior stylesheet declaration, so without it every chart element would render invisibly (Rule 2, CLAUDE.md 2026-07-14 undefined-token class)
 - [Phase 32]: [Phase 32-07]: TeamViewShell.tsx added as a thin client wrapper (not in plan files_modified) -- async Server Component page.tsx cannot hold client toggle state or pass client callbacks across the RSC boundary
 - [Phase 32]: [Phase 32-07]: OrgColumnsBoard absorbs RoleAssignmentTable as a collapsible sub-panel rather than reimplementing invite/org-role/department-picker UI, preserving role-edit capability with zero duplication
+- [Phase ?]: Phase 32-08: Collections render flat (no domain/group layer) — D-01 has no domain table; sketch 003's COL_GROUPS was presentational demo data
+- [Phase ?]: Phase 32-08: Area group jacks stay clickable/focusable/wireable whether collapsed or expanded — D-06 makes areas a real grantable chain level, unlike sketch 003's presentational-only groups
+- [Phase ?]: Phase 32-08: Wire-up blast-radius uses an exact distinct-person union via OrgTree's role.people, not sketch 003's per-unit sum approximation
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -486,7 +490,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-18T09:01:07.208Z
-Stopped at: Completed 32-06-PLAN.md
+Last session: 2026-07-18T09:28:12.970Z
+Stopped at: Completed 32-08-PLAN.md
 Resume file:
 None
