@@ -373,5 +373,18 @@ export default defineConfig({
       testMatch: /tests\/phase32\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 32 Plan 04 — resolveEffectiveAccess unit tests (pure module; static imports).
+      //
+      // CLAUDE.md 2026-04-24: dynamic import('@/...') fails in Playwright Node runner
+      // outside a testDir-scoped project — use STATIC @/ imports here.
+      // testDir: './src/lib/org-model/__tests__' so Playwright's TS compiler resolves
+      // @/ path aliases (mirrors phase28-unit pattern for governance/__tests__).
+      //
+      // Verify: `npx playwright test --list --project=phase32-unit`
+      name: 'phase32-unit',
+      testDir: './src/lib/org-model/__tests__',
+      testMatch: /.*\.test\.ts$/,
+    },
   ],
 })
