@@ -132,6 +132,19 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
 
   const personGrants = useMemo(() => grants.filter((g) => g.subjectType === 'person' && g.subjectId), [grants])
   const personIds = useMemo(() => [...new Set(personGrants.map((g) => g.subjectId as string))], [personGrants])
+
+  // UAT G2 fix: the pinned SOP's saved state must come from the GRANTS list,
+  // not the in-session `pending` toggles — otherwise a reload shows a wired
+  // SOP as "NEW · UNWIRED" and ✓ Done looks like it never persisted.
+  const sopExistingGrants = useMemo(
+    () => (newSop ? grants.filter((g) => newSop.collectionIds.includes(g.collectionId)) : []),
+    [grants, newSop],
+  )
+  const sopWired = sopExistingGrants.length > 0
+  // UAT G2 fix: nest the pinned SOP under its collection (hierarchy), not as a
+  // sibling of the collections list. Falls back to top-of-column when the SOP
+  // has no collection yet.
+  const sopParentCollectionId = newSop && newSop.collectionIds.length > 0 ? newSop.collectionIds[0] : null
   const personName = useCallback((id: string): string => {
     for (const dept of depts) for (const role of dept.roles) for (const p of role.people) if (p.id === id) return p.name
     return 'Person'
@@ -232,11 +245,17 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
     }
     if (connecting && newSop) {
       for (const [unitId, grant] of pending) add(leftEndpoint(unitId), newSop.id, grant.subjectType === 'person')
+      // Saved grants draw too — entering wire-up on an already-wired SOP shows
+      // what's connected instead of pretending it's blank.
+      for (const g of sopExistingGrants) {
+        const unitId = g.subjectType === 'org' ? tree.organisationId : g.subjectId
+        if (unitId) add(leftEndpoint(unitId), newSop.id, g.subjectType === 'person')
+      }
       return [...agg.values()]
     }
     for (const e of visibleRawEdges) add(leftEndpoint(e.unitId), e.collectionId, e.personal)
     return [...agg.values()]
-  }, [connecting, newSop, pending, visibleRawEdges, leftEndpoint])
+  }, [connecting, newSop, pending, sopExistingGrants, tree.organisationId, visibleRawEdges, leftEndpoint])
 
   const litIds = useMemo(() => {
     const s = new Set<string>()
@@ -573,32 +592,48 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
           <div className="col right">
             <h2 className="mono">Library — {collections.length} collections{newSop ? ' + 1 new SOP' : ''}</h2>
 
-            {newSop && (
+            {/* Fallback position only when the SOP has no collection yet —
+                otherwise it renders nested under its collection below. */}
+            {newSop && !sopParentCollectionId && (
               <div
                 ref={registerNode(newSop.id)}
                 className={`jack newsop${connecting ? ' lit' : ''}`}
                 onClick={enterWireUp}
               >
-                <span className="newpill mono">{pending.size > 0 ? 'NEW' : 'NEW · UNWIRED'}</span>
+                <span className="newpill mono">{connecting && pending.size > 0 ? 'NEW' : sopWired ? 'WIRED' : 'NEW · UNWIRED'}</span>
                 <span className="name">{newSop.title}</span>
-                <span className="meta mono">{pending.size} grant{pending.size === 1 ? '' : 's'}</span>
+                <span className="meta mono">{connecting ? pending.size : sopExistingGrants.length} grant{(connecting ? pending.size : sopExistingGrants.length) === 1 ? '' : 's'}</span>
                 <span className="port" />
               </div>
             )}
 
             {collections.map((c) => {
               const dim = connecting || (!!focus && !litIds.has(c.id))
+              const holdsPinnedSop = !!newSop && sopParentCollectionId === c.id
               return (
-                <div
-                  key={c.id}
-                  ref={registerNode(c.id)}
-                  className={jackClasses(undefined, litIds.has(c.id), dim, !!matchIds?.has(c.id))}
-                  onClick={() => handleRightClick(c.id)}
-                >
-                  <span className="dept-dot" style={{ background: c.colour }} />
-                  <span className="name">{c.name}</span>
-                  <span className="meta mono">{c.sopCount} SOPs</span>
-                  <span className="port" />
+                <div key={c.id}>
+                  <div
+                    ref={registerNode(c.id)}
+                    className={jackClasses(undefined, litIds.has(c.id), dim && !holdsPinnedSop, !!matchIds?.has(c.id))}
+                    onClick={() => handleRightClick(c.id)}
+                  >
+                    <span className="dept-dot" style={{ background: c.colour }} />
+                    <span className="name">{c.name}</span>
+                    <span className="meta mono">{c.sopCount} SOPs</span>
+                    <span className="port" />
+                  </div>
+                  {holdsPinnedSop && newSop && (
+                    <div
+                      ref={registerNode(newSop.id)}
+                      className={`jack child newsop${connecting ? ' lit' : ''}`}
+                      onClick={enterWireUp}
+                    >
+                      <span className="newpill mono">{connecting && pending.size > 0 ? 'NEW' : sopWired ? 'WIRED' : 'NEW · UNWIRED'}</span>
+                      <span className="name">{newSop.title}</span>
+                      <span className="meta mono">{connecting ? pending.size : sopExistingGrants.length} grant{(connecting ? pending.size : sopExistingGrants.length) === 1 ? '' : 's'}</span>
+                      <span className="port" />
+                    </div>
+                  )}
                 </div>
               )
             })}

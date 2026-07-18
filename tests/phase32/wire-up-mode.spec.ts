@@ -138,9 +138,25 @@ test.describe('SC-5 — wire-up mode runtime (requires chromium + live app, 32-0
       await expect(page.locator('.bay-svg path')).toHaveCount(1)
       await expect(page.locator('.strip-slot.wiring')).toContainText('people')
       await page.getByRole('button', { name: '✓ Done wiring' }).click()
-      await expect(page.locator('.jack.newsop .newpill')).toHaveText('NEW')
+      // UAT G2 fix: after Done (and on any later reload) the pinned SOP reads
+      // its state from saved grants — WIRED, never back to NEW · UNWIRED.
+      await expect(page.locator('.jack.newsop .newpill')).toHaveText('WIRED')
     },
   )
+
+  test('pinned SOP reflects SAVED grants and nests under its collection (UAT G2 fix)', () => {
+    const src = read(BAY)
+    // Saved-state source of truth is the grants prop, not in-session pending
+    expect(src).toContain('const sopExistingGrants = useMemo')
+    expect(src).toContain('grants.filter((g) => newSop.collectionIds.includes(g.collectionId))')
+    // Badge: WIRED when saved grants exist; NEW · UNWIRED only when truly unwired
+    expect(src).toContain("sopWired ? 'WIRED' : 'NEW · UNWIRED'")
+    // Entering wire-up draws the saved wires alongside pending toggles
+    expect(src).toContain('for (const g of sopExistingGrants) {')
+    // Hierarchy: the pinned SOP renders as a child of its collection jack
+    expect(src).toContain('const holdsPinnedSop = !!newSop && sopParentCollectionId === c.id')
+    expect(src).toContain("className={`jack child newsop")
+  })
 
   test.fixme(
     'PublishStage shows a "Wire up access" CTA linking to ?view=access&sop=<id> pinned NEW·UNWIRED (32-09)',
