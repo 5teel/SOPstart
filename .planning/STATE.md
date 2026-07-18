@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
 status: executing
-stopped_at: Completed 32-03-PLAN.md
-last_updated: "2026-07-18T07:58:08.840Z"
+stopped_at: Completed 32-05-PLAN.md
+last_updated: "2026-07-18T08:26:23.489Z"
 last_activity: 2026-07-18 -- Phase 32 execution started
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 29
-  completed_plans: 24
+  completed_plans: 25
   percent: 60
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 32 (visual-org-model-library-permissions) — EXECUTING
-Plan: 3 of 9
+Plan: 5 of 9
 Status: Ready to execute
 Last activity: 2026-07-18 -- Phase 32 execution started
 
@@ -172,6 +172,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 30 P08 | ~40m | 3 tasks | 16 files |
 | Phase 32 P03 | 12min | 2 tasks | 2 files |
 | Phase 32 P04 | 20min | 2 tasks | 5 files |
+| Phase 32 P05 | 24min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -367,6 +368,9 @@ Recent decisions affecting current work:
 - [Phase 32-03]: Live-pushed migrations 00046+00047; tsx .ts scripts must wrap async logic in main() (no top-level await under CJS transform); 00047 access_grants seed insert required null::uuid cast
 - [Phase ?]: [Phase 32-04]: archiveArea/archiveRole are real DELETEs (no archived column on areas/roles, unlike departments REQ-6) - relies on ON DELETE SET NULL/CASCADE for cleanup
 - [Phase ?]: [Phase 32-04]: resolveEffectiveAccess(chain, grantsByUnit) is the ONE pure 5-level union resolver - every future org-model view must call it, never recompute inheritance per-view
+- [Phase ?]: [Phase 32-05]: sop_departments becomes fully derived from access_grants via materializeSopAccess replace-semantics — verified faithful against live day-one-seeded access_grants for a sampled real SOP
+- [Phase ?]: [Phase 32-05]: person-level grants materialize via a direct access_grants filter (subject_type=person), not a resolveEffectiveAccess chain — a direct person grant is always personal regardless of ancestors
+- [Phase ?]: [Phase 32-05]: real runtime tests for cross-tenant write isolation and the D-13 RLS arm use ephemeral throwaway orgs (no staging Supabase project exists) since createGrant/materializeSopAccess cannot be invoked directly outside a Next.js request scope and no UI wires grants.ts yet
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -476,7 +480,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-18T07:56:08.238Z
-Stopped at: Completed 32-03-PLAN.md
+Last session: 2026-07-18T08:26:23.480Z
+Stopped at: Completed 32-05-PLAN.md
 Resume file:
 None

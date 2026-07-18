@@ -125,3 +125,11 @@ None - no external service configuration required. (`.env.local` already had `SU
 ---
 *Phase: 32-visual-org-model-library-permissions*
 *Completed: 2026-07-18*
+
+## Self-Check: PASSED
+
+- FOUND: src/actions/grants.ts
+- FOUND: tests/phase32/grants-org-isolation.spec.ts
+- FOUND: tests/phase32/person-grant-rls.spec.ts
+- FOUND: 962c73a (Task 1 commit)
+- FOUND: ea7c28e (Task 2 commit)
