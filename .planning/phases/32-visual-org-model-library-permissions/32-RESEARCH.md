@@ -328,17 +328,17 @@ ON CONFLICT DO NOTHING;
 
 ## Open Questions
 
-1. **How do role-level and person-level grants actually enforce, given D-02's "materialize onto `sop_departments`, no new RLS" constraint?**
+1. **(RESOLVED — D-13 in 32-CONTEXT.md, 2026-07-18)** **How do role-level and person-level grants actually enforce, given D-02's "materialize onto `sop_departments`, no new RLS" constraint?** → Simon chose Option 1: one narrow additive RLS arm (`sop_access_people` junction + self-scoping SECURITY DEFINER helper); shipped policies stay byte-untouched. Consumed by plans 32-02/32-03/32-05.
    - What we know: department/area/org-level grants map cleanly; role/person-level do not (see Pitfall 1).
    - What's unclear: whether "no new RLS policies" is a hard zero-net-new-policies rule or specifically protects the SHIPPED policies from modification.
    - Recommendation: surface to Simon explicitly before Wave 1 (schema) locks the `access_grants` write path — this changes what "success criterion 2" (union-up-the-chain across all 5 levels) actually means in practice.
 
-2. **Should `roles` (D-05, dept-scoped job title) also drive `member_departments`, or stay fully independent per D-07?**
+2. **(RESOLVED — locked by D-07, no action)** **Should `roles` (D-05, dept-scoped job title) also drive `member_departments`, or stay fully independent per D-07?**
    - What we know: D-07 locks `member_departments` as unchanged, `role_members` sits alongside it, a person's dept membership is NOT derived from roles this phase.
    - What's unclear: nothing — this is a locked decision, listed here only so the planner doesn't accidentally "helpfully" derive one from the other.
    - Recommendation: no action needed; just don't build a sync between the two.
 
-3. **Auto-layout algorithm for the Node Chart at Visy scale (15 depts × ~20 roles/people) — reuse FlowGraphCanvas's approach, or does org-chart's tree shape (strict depth levels vs FlowGraphCanvas's freer step-graph) need a different layered layout?**
+3. **(RESOLVED — recommendation adopted in plan 32-06: dedicated leveled-tree layout, FlowGraphCanvas pattern only)** **Auto-layout algorithm for the Node Chart at Visy scale (15 depts × ~20 roles/people) — reuse FlowGraphCanvas's approach, or does org-chart's tree shape (strict depth levels vs FlowGraphCanvas's freer step-graph) need a different layered layout?**
    - What we know: FlowGraphCanvas already solved bounding-box-based deterministic layout for a similar hand-drawn aesthetic.
    - What's unclear: FlowGraphCanvas lays out a step-flow graph (branching, not strictly leveled); the org chart is a strict 4-level tree (org→area→dept→role, plus person chips inside role nodes) which is a simpler, more constrained layout problem (classic layered/Sugiyama-lite).
    - Recommendation: don't force-reuse FlowGraphCanvas's exact function — reuse its PATTERN (pure TS, bounding-box sizing, no library) but write a dedicated leveled-tree layout (depth = column or row, siblings evenly spaced) since the org chart's constraints are simpler and a dedicated function will be shorter than adapting a step-graph layout.

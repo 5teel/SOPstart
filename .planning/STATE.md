@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
-status: completed
+status: executing
 stopped_at: Phase 32 context gathered
-last_updated: "2026-07-18T06:08:01.335Z"
+last_updated: "2026-07-18T06:59:59.946Z"
 last_activity: 2026-07-13 -- 30-08 executed (UX-03 governance fold + UX-06 one-line rows + phase gate)
 progress:
   total_phases: 5
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 Phase: 30 (ux-consolidation) — COMPLETE (8 of 8 plans; final gate green: full suite matches 30-01 baseline exactly, tsc + build + bundle gate clean, /pathways 0 not-mapped)
 Plan: 8 of 8 complete
-Status: Phase 30 complete — next: Phase 31 (Training Records)
+Status: Ready to execute
 Last activity: 2026-07-13 -- 30-08 executed (UX-03 governance fold + UX-06 one-line rows + phase gate)
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)

@@ -222,17 +222,32 @@ Plans:
 **Pre-plan gates:** (a) roles entity schema decision (`roles` + `role_members` + budgeted_count; Phase 25 model has no role layer); (b) inherited-revoke ("exclude from broadcast grant") UX decision; (c) how dept-visibility RLS (sop_departments) extends to area/person-level grants.
 **Plans:** 9 plans / 6 waves
 **Pre-plan gates resolved:** (a) roles schema → `roles`+`role_members`+budgeted_count (D-05, 32-02); (b) inherited-revoke → additive-only v1, revoke-at-source (D-11); (c) area/person RLS → materialize onto `sop_departments` + ONE additive person/role RLS arm `sops_visible_by_person_grant` reading `sop_access_people` (D-13, 32-02).
-
-Plans:
+Plans:
+**Wave 1**
 
 - [ ] 32-01-PLAN.md — Wave 1: phase32 Playwright project + 8 stub specs (SC-1..SC-6 + org-isolation + person-grant-rls)
 - [ ] 32-02-PLAN.md — Wave 1: migrations 00046 schema (7 tables + area_id + grant_subject_type + D-13 RLS arm) + 00047 data seed (day-one equivalence)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 32-03-PLAN.md — Wave 2: [BLOCKING] db push + day-one equivalence assertion + person-grant arm verify
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 32-04-PLAN.md — Wave 3: resolve-access.ts (5-level resolver) + org-model.ts (areas/roles/role_members CRUD + listOrgTree)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 32-05-PLAN.md — Wave 4: grants.ts (CRUD + materialize into sop_departments + sop_access_people) + org-isolation/person-grant runtime tests
 - [ ] 32-06-PLAN.md — Wave 4: auto-layout.ts + OrgChartCanvas + ViewToggle (Node Chart)
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
 - [ ] 32-07-PLAN.md — Wave 5: OrgColumnsBoard + /admin/team rewrite (D-08) + journeys/uat
 - [ ] 32-08-PLAN.md — Wave 5: WiringPatchBay + SelectionStrip (D-hybrid grouped/focus/trace + wire-up blast-radius)
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
 - [ ] 32-09-PLAN.md — Wave 6: /admin/sops?view=access arm + library deep-link filter + publish wire-up CTA + journeys/uat + phase gate
 
 ---
