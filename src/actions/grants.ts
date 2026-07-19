@@ -448,14 +448,18 @@ async function materializeSopAccessForOrg(admin: any, orgId: string, sopId: stri
   if (sopCollErr) return { error: sopCollErr.message }
   const sopCollectionIds = new Set(((sopCollRows ?? []) as Array<{ collection_id: string }>).map(r => r.collection_id))
 
-  const [{ data: deptsData, error: deptsErr }, { data: rolesData, error: rolesErr }, { data: grantsData, error: grantsErr }] = await Promise.all([
+  const [{ data: deptsData, error: deptsErr }, { data: rolesData, error: rolesErr }, { data: grantsData, error: grantsErr }, { data: sopFlagsData, error: sopFlagsErr }] = await Promise.all([
     admin.from('departments').select('id, area_id').eq('organisation_id', orgId).eq('archived', false),
     admin.from('roles').select('id, department_id').eq('organisation_id', orgId),
     admin.from('access_grants').select('subject_type, subject_id, collection_id, sop_id').eq('organisation_id', orgId),
+    admin.from('sops').select('all_departments, all_departments_pre_override').eq('id', sopId).maybeSingle(),
   ])
   if (deptsErr) return { error: deptsErr.message }
   if (rolesErr) return { error: rolesErr.message }
   if (grantsErr) return { error: grantsErr.message }
+  if (sopFlagsErr) return { error: sopFlagsErr.message }
+  const currentAllDepartments = (sopFlagsData as { all_departments: boolean; all_departments_pre_override: boolean | null } | null)?.all_departments ?? null
+  const currentPreOverride = (sopFlagsData as { all_departments: boolean; all_departments_pre_override: boolean | null } | null)?.all_departments_pre_override ?? null
 
   const depts = (deptsData ?? []) as Array<{ id: string; area_id: string | null }>
   const roles = (rolesData ?? []) as Array<{ id: string; department_id: string }>
@@ -511,9 +515,22 @@ async function materializeSopAccessForOrg(admin: any, orgId: string, sopId: stri
   // Override forces all_departments=false — the 00035 bypass would otherwise
   // make the narrowing override cosmetic (a SOP could still reach everyone
   // via the all_departments arm regardless of materialized junction rows).
+  // WR-02 fix: snapshot the pre-override value on the FIRST override so a
+  // pre-Phase-32 org-wide SOP (all_departments=true) can be restored on
+  // re-follow instead of being ratcheted permanently to false.
   if (overridden) {
-    const { error: allDeptErr } = await admin.from('sops').update({ all_departments: false }).eq('id', sopId)
+    const { error: allDeptErr } = await admin
+      .from('sops')
+      .update(currentPreOverride === null ? { all_departments: false, all_departments_pre_override: currentAllDepartments } : { all_departments: false })
+      .eq('id', sopId)
     if (allDeptErr) return { error: allDeptErr.message }
+  } else if (currentPreOverride !== null) {
+    // Re-follow: last SOP-target grant was revoked — restore the snapshot.
+    const { error: restoreErr } = await admin
+      .from('sops')
+      .update({ all_departments: currentPreOverride, all_departments_pre_override: null })
+      .eq('id', sopId)
+    if (restoreErr) return { error: restoreErr.message }
   }
 
   // Replace-write sop_departments.
