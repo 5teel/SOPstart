@@ -599,6 +599,31 @@ export const UAT_TESTS: UatTest[] = [
       'D-09 (?view=access, third fold beside Needs attention), D-12 (wire-up entry from both the post-publish CTA and organically), D-11 (additive-only grants — no in-place revoke here), SC-4 (viz-as-library-filter deep-links). WiringPatchBay/SelectionStrip built in 32-08; the page arm, deep-links, and publish CTA land in 32-09.',
   },
 
+  {
+    id: 'p33-wayfinder-header',
+    dateAdded: '2026-07-19',
+    category: 'Phase 33 — Builder header',
+    title: 'Is the new builder header clear about where you are and what unlocks next?',
+    status: 'active',
+    summary:
+      'The dark bar at the top of the SOP builder is now a light bar with three parts: a "Back to SOP library" link, a "You\'re editing" tag with the SOP title, and a button showing the next stage — which tells you in plain words if it\'s locked and why. All the other tools (assign, versions, video, QR code, flow diagram, delete) are now in one "Tools for this SOP" menu.',
+    tryIt: [
+      'Open any draft SOP in the builder and look at the header — check you can tell where you are and what SOP you\'re editing at a glance.',
+      'With some steps still unchecked, look at the button on the right — read the sentence under it out loud; is it clear what\'s stopping you from sending this to workers?',
+      'Click "Tools for this SOP ▾" and confirm every item (assign, versions, video, QR code, see/edit flow diagram, delete draft) is there with a plain-English label.',
+      'Check every step, then look at the same button again — it should turn green and say you\'re ready to send it to workers.',
+    ],
+    links: [{ label: 'SOP library', href: '/admin/sops' }],
+    questions: [
+      { id: 'orientation-clear', text: 'Could you tell where you were and what SOP you were editing at a glance?' },
+      { id: 'lock-reason-clear', text: 'Was it clear why "Send to workers" was locked, and what to do about it?' },
+      { id: 'tools-menu-findable', text: 'Did the "Tools for this SOP" menu have everything you expected, clearly labelled?' },
+      { id: 'no-clutter', text: 'Did the header feel calmer than before, without losing anything you needed?' },
+    ],
+    background:
+      'SC-6 (33-04) — replaces the dark #0a0a0b header with a light paper/hairline "Wayfinder" bar (back/here/forward zones); the old SopActionsMenu + BuilderFlowButton + BuilderFlowEditButton + DeleteSopButton cluster collapses into one "Tools for this SOP ▾" menu. Winner of a 3-concept sketch review (sketches/builder-header-orientation), locked 2026-07-19. Screenshot check per CLAUDE.md 2026-07-14 (an undefined CSS token renders wrong but fails no automated gate) — this entry exists so a human actually looks at the rendered bar.',
+  },
+
   // ---------------------------------------------------------------------------
   // TEMPLATE — copy this to put a new design choice or check to the team.
   // Set status:'archived' once it's decided.

@@ -59,14 +59,23 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
 
   test('action menu controls are labelled, not icon-only (usability-lab F-09)', () => {
     const shell = read(STAGE_SHELL)
-    // Visible text labels for each destination.
-    expect(shell).toContain('Assign to team')
-    expect(shell).toContain('Version history')
-    expect(shell).toContain('Generate video')
-    expect(shell).toContain('Print QR code')
+    // Visible text labels for each destination — Phase 33 (33-04) Wayfinder
+    // "Tools for this SOP" menu locked labels (sketches/builder-header-
+    // orientation README § Decisions 2026-07-19), repointed off the old
+    // Phase 30 labels in the SAME commit as the source change (CLAUDE.md
+    // 2026-07-13 stale-guard class).
+    expect(shell).toContain('Assign this SOP to workers')
+    expect(shell).toContain('See earlier versions')
+    expect(shell).toContain('Make a training video')
+    expect(shell).toContain('Print a QR code')
+    // The old Phase 30 labels no longer appear.
+    expect(shell).not.toContain('Assign to team')
+    expect(shell).not.toContain('Version history')
+    expect(shell).not.toContain('Generate video')
+    expect(shell).not.toContain('Print QR code')
     // The menu never uses the icon-only evidence-btn idiom from the old rows.
     expect(shell).not.toContain('evidence-btn')
-    // Trigger is a labelled control ("Actions" visible text + aria).
+    // Trigger is a labelled control ("Tools for this SOP" visible text + aria).
     expect(shell).toMatch(/aria-haspopup="menu"/)
     expect(shell).toMatch(/aria-expanded=\{open\}/)
   })

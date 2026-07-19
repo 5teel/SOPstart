@@ -16,51 +16,114 @@
  *     tests/phase30/plain-language.spec.ts + builder-review-flow.spec.ts).
  *   - Tools cluster consolidated into ONE "Tools for this SOP ▾" menu in a
  *     `--paper-2` tools row: the 4 SopActionsMenu links with locked new
- *     labels (repointing tests/phase30/list-rows.spec.ts's 4 OLD labels),
+ *     labels (repointed tests/phase30/list-rows.spec.ts's 4 OLD labels),
  *     the 2 flow-modal triggers, Delete this draft
  *     (`<DeleteSopButton sopId={sopId}` shape kept, regex-pinned).
  *   - Only declared CSS tokens used (`--ink-100`, `--paper-2`,
  *     `--brand-yellow`, `--accent-ok`) — grep `-- "--token:" src/` before
  *     referencing anything new (2026-07-14 undefined-token learning).
  *
- * Flipped LIVE in: 33-04 (files_modified: tests/phase33/wayfinder-header.spec.ts)
- * — this Wave-0 version is a placeholder test.fixme ONLY until 33-04 lands;
- * do not treat it as done once 33-04 ships without confirming the fixme was
- * removed.
+ * Flipped LIVE in 33-04 — this file was a Wave-0 test.fixme placeholder;
+ * every assertion below reads the real BuilderStageShell/BuilderStageStepper
+ * source (source-contract, matching the WIRING discipline of
+ * tests/phase30/list-rows.spec.ts).
  *
  * Registration: playwright.config.ts `phase33` project
  *   testDir: '.', testMatch: /tests\/phase33\/.*\.(spec|test)\.ts$/
  * Verify: `npx playwright test --list --project=phase33`
  */
 import { test, expect } from '@playwright/test'
+import fs from 'node:fs'
+import path from 'node:path'
 
-test.describe('SC-6 — Wayfinder builder header (Wave 0 stub — flips live in 33-04)', () => {
-  test.fixme(
-    'BuilderStageShell renders back/here/forward Wayfinder zones with inline lock-reason chip and a single "Tools for this SOP" menu, all pinned identifiers (component name, stage labels, DeleteSopButton shape) kept verbatim',
-    async ({ page }) => {
-      /**
-       * Real path constant this will assert against once built:
-       *   - src/app/(protected)/admin/sops/builder/[sopId]/BuilderStageShell.tsx
-       *     (component name KEPT verbatim)
-       *
-       * Steps (once flipped live):
-       * 1. Source-contract: confirm BuilderStageShell still exports the
-       *    same component name, handlePublish/approval handlers, and
-       *    hasSourceDoc = showPane derivation (zero-repoint pinned specs).
-       * 2. Source-contract: confirm the header renders back/here/forward
-       *    zones with `--ink-100` dividers; only declared CSS tokens
-       *    referenced (no undefined bare var(--x)).
-       * 3. Navigate to a locked builder stage; confirm the forward chip's
-       *    text reads "Locked — {N} steps below still need checking"
-       *    (inline lock reason, not a separate subline).
-       * 4. Click "Tools for this SOP"; confirm ONE menu opens containing
-       *    the locked new labels + both flow-modal triggers + Delete this
-       *    draft (`<DeleteSopButton sopId={sopId}` shape intact).
-       * 5. Confirm BuilderStageStepper's stage keys and 'Edit'/'Check'/
-       *    'Send to workers' labels are unchanged.
-       */
-      void page
-      expect(true).toBe(true)
-    },
-  )
+const ROOT = process.cwd()
+const SHELL = path.join(
+  ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'BuilderStageShell.tsx',
+)
+const STEPPER = path.join(
+  ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'BuilderStageStepper.tsx',
+)
+
+function read(p: string): string {
+  return fs.readFileSync(p, 'utf-8')
+}
+
+test.describe('SC-6 — Wayfinder builder header', () => {
+  test('BuilderStageShell keeps component name + zero-repoint pins (handlers, hasSourceDoc = showPane)', () => {
+    const src = read(SHELL)
+    expect(src).toContain('export function BuilderStageShell(')
+    expect(src).toContain('handlePublish')
+    expect(src).toContain('hasSourceDoc = showPane')
+    expect(src).toContain("import { approveStep, requestChanges } from '@/actions/approvals'")
+  })
+
+  test('header renders back/here/forward Wayfinder zones with --ink-100 dividers', () => {
+    const src = read(SHELL)
+    expect(src).toContain('data-testid="wayfinder-bar"')
+    expect(src).toContain('data-testid="wayfinder-back"')
+    expect(src).toContain('data-testid="wayfinder-here"')
+    expect(src).toContain('data-testid="wayfinder-forward"')
+    // Light schema — no dark #0a0a0b bar remains.
+    expect(src).not.toContain('#0a0a0b')
+    expect(src).toMatch(/border-\[var\(--ink-100\)\]/)
+    // Back zone keeps its href.
+    expect(src).toMatch(/href="\/admin\/sops"/)
+    // Here zone: amber tick over a --brand-yellow rule + title + version.
+    expect(src).toContain('var(--brand-yellow, #fbbf24)')
+    expect(src).toContain('{sopTitle}')
+    expect(src).toContain('v{sopVersion}')
+  })
+
+  test('forward chip carries the inline lock reason sentence', () => {
+    const src = read(STEPPER)
+    expect(src).toContain('Locked — ${remaining} steps below still need checking')
+    expect(src).toContain("data-testid=\"wayfinder-forward-chip\"")
+    // Phase 29 pending-approval third chip state.
+    expect(src).toContain('Waiting for approval')
+    expect(src).toContain('approvalPending')
+  })
+
+  test('ONE "Tools for this SOP" menu holds all 7 locked items — no standalone triggers', () => {
+    const src = read(SHELL)
+    // Exactly one menu trigger.
+    const triggerMatches = src.match(/data-testid="tools-menu-trigger"/g) ?? []
+    expect(triggerMatches.length).toBe(1)
+    expect(src).toContain('Tools for this SOP')
+    // No old standalone action-menu component survives.
+    expect(src).not.toContain('SopActionsMenu')
+    // The 4 link items with locked labels.
+    expect(src).toContain('Assign this SOP to workers')
+    expect(src).toContain('See earlier versions')
+    expect(src).toContain('Make a training video')
+    expect(src).toContain('Print a QR code')
+    // Both flow-modal triggers render inside the popover.
+    expect(src).toContain('<BuilderFlowButton sop={sop} />')
+    expect(src).toContain('<BuilderFlowEditButton sop={sop} sopId={sopId} />')
+    // DeleteSopButton shape intact (regex-pinned by tests/phase30/list-rows.spec.ts).
+    expect(src).toMatch(/<DeleteSopButton\s+sopId=\{sopId\}/)
+    expect(src).toMatch(/isDraft=\{initialSop\.status === 'draft'\}/)
+    expect(src).toMatch(/\{isDraft && \(/)
+  })
+
+  test('BuilderStageStepper stage keys and Edit/Check/Send to workers labels are unchanged', () => {
+    const src = read(STEPPER)
+    expect(src).toContain("export type BuilderStage = 'build' | 'review' | 'publish';")
+    expect(src).toContain("label: 'Edit'")
+    expect(src).toContain("label: 'Check'")
+    expect(src).toContain("label: 'Send to workers'")
+  })
+
+  test('only declared CSS tokens referenced (no undefined bare var(--x))', () => {
+    const shellSrc = read(SHELL)
+    const stepperSrc = read(STEPPER)
+    for (const src of [shellSrc, stepperSrc]) {
+      for (const m of src.matchAll(/var\(\s*(--[a-zA-Z0-9-]+)\s*\)/g)) {
+        // Every bare var(--x) reference in these two files must be one of
+        // the tokens declared in src/styles/blueprint-theme.css.
+        expect(
+          ['--ink-100', '--ink-300', '--ink-500', '--ink-700', '--ink-900', '--paper-2', '--accent-ok'],
+        ).toContain(m[1])
+      }
+    }
+  })
 })

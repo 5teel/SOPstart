@@ -70,7 +70,7 @@ function deriveSourcePaneKind(rawType: string | null | undefined): SourcePaneKin
 // ---------------------------------------------------------------------------
 // ONE self-describing tools menu — Phase 33 (33-04, SC-6 winner decision #2)
 //
-// Absorbs the old SopActionsMenu (Assign / Versions / Video / QR /
+// Absorbs the old per-SOP actions menu (Assign / Versions / Video / QR /
 // Delete-draft — Phase 30 30-07 UX-06) PLUS BuilderFlowButton +
 // BuilderFlowEditButton, which render as menu rows below. Every item is a
 // plain-language verb phrase about THIS SOP with a one-line hint — labels
