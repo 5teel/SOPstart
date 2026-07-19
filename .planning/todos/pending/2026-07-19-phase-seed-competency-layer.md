@@ -2,6 +2,7 @@
 created: 2026-07-19
 title: "Phase seed: Competency layer — training matrix, competency states, supervisor observations"
 area: general
+resolves_phase: 35
 source: Safety-org SOP guidance-notes review (2026-07-19) + Visy interview (2026-05-05, training-record / SuccessFactors ask)
 suggested: next milestone after v6.0 (SOP Ownership & Governance Infrastructure) closes
 files:
