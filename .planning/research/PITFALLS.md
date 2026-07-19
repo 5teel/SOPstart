@@ -1,7 +1,7 @@
 # Pitfalls Research
 
 **Domain:** Mobile-first SOP management SaaS — industrial / blue-collar tradespeople
-**Researched:** 2026-03-23 (v1.0), updated 2026-03-29 (v2.0 additions)
+**Researched:** 2026-03-23 (v1.0), updated 2026-03-29 (v2.0 additions), updated 2026-07-19 (v7.0 additions)
 **Confidence:** HIGH (multiple authoritative sources; pitfalls drawn from documented production incidents, official platform limitations, and verified community patterns)
 
 ---
@@ -447,6 +447,180 @@ Generate a narrated SOP with at least 10 industrial terms and 2 NZ-specific name
 
 ---
 
+## v7.0 Critical Pitfalls — Competency & Training Layer
+
+These pitfalls are specific to ADDING competency/training tracking to this codebase as it exists today (post-Phase 33): RLS multi-tenancy with three prior logged cross-org service-role holes, an immutable sign-off chain, an access-grant materialization pipeline, and a locked "worker friction is wrong by definition" north star. They are grounded directly in `supabase/migrations/` and `CLAUDE.md` incident history, not generic training-software advice.
+
+### Pitfall 19: Competency State Anchored to `sop_id`, Orphaned on Version Supersede
+
+**What goes wrong:**
+A worker is marked "competent" on SOP X v3. An admin edits and republishes — the existing versioning model (`00008_sop_versioning.sql`) creates a **new row**: `superseded_by` on the old row points to the new row's `id`, and both share `parent_sop_id`. If a new `competency_states` table foreign-keys `sop_id → sops.id` directly, the worker's "competent" state points at the now-superseded v3 row. The training matrix either shows them as having NO record against the new v4 (looks like nobody is trained), or — if the matrix naively joins on `sop_id` without resolving lineage — keeps showing "competent" against a dead row while the live SOP shows nothing.
+
+**Why it happens:**
+Whether competence "carries forward" across a version bump is a genuine design question, not just a bug. The existing `sop_completions` table pins a completion to the exact version text walked through (`sop_version int`) and never carries forward — copying that pattern for competency turns every SOP edit into a forced re-training event (tick-box-ification). Ignoring versioning entirely lets someone stay "competent" on a SOP that materially changed underneath them with no re-confirmation — the exact audit gap ACC/WorkSafe reviewers ask about.
+
+**How to avoid:**
+- FK `competency_states.sop_id → sops.id`, but always resolve the **lineage root** (`parent_sop_id ?? id`) when computing "what does this state mean against the CURRENT version" — reuse the existing `current_sop_version(p_parent_id)` SQL function rather than reimplementing lineage resolution.
+- Add an explicit `sop_version int` column to the competency-state row (mirrors `sop_completions.sop_version`) so "competent as of which version" is answerable without a join.
+- Decide the carry-forward rule explicitly: status persists across a supersede, but a distinct `trained_on_outdated_version` flag (already named in PROJECT.md as a TRN rollforward item) flips true when `sop_version < current published version` for that lineage — surfaced in the matrix as its own visual state, never a silent downgrade to "not started."
+
+**Warning signs:**
+- Matrix cell for a person×SOP goes blank immediately after any admin edits and republishes a SOP nobody's competency should have been affected by.
+- Two admin screens disagree on whether a worker is "trained" because one resolves lineage and the other doesn't.
+
+**Phase to address:** Competency-state schema/foundation phase, before the matrix UI is built — this is a data-model decision.
+
+---
+
+### Pitfall 20: New Competency Tables Repeat the RLS-Recursion Trap
+
+**What goes wrong:**
+A new RLS SELECT policy on `competency_states` or `supervisor_observations` does an `EXISTS (SELECT 1 FROM sops WHERE ...)` or `EXISTS (SELECT 1 FROM sop_completions WHERE ...)` to check org/ownership. Postgres detects the cross-policy cycle and throws `42P17 infinite recursion detected in policy for relation`, and PostgREST surfaces it as a broad 500 on ANY query touching the referenced table — not just the new one.
+
+**Why it happens:**
+This exact bug already happened twice in this codebase (`00030`→`00031` sub-trades recursion, logged 2026-05-13), and the fix pattern is now codified in comments across `00038` and `00046` ("do NOT reference public.sops or public.sop_completions from this policy"). It is a trap that has to be independently rediscovered by whoever writes the NEXT table's policy — the compiler gives no warning, it only fails at runtime, potentially on a query that doesn't even touch the new table.
+
+**How to avoid:**
+- Every new competency/observation table's RLS SELECT policy uses `organisation_id = public.current_organisation_id()` directly (a denormalized column on the row itself), never a cross-table `EXISTS` against `sops`, `sop_completions`, or `sop_completion_signatures`.
+- For self/role-scoped reads (workers see own rows, supervisors see supervised workers'), copy the same-table `member_id = auth.uid() OR admin` pattern from `sop_access_people_self_read` (`00046`) — not a cross-table existence check.
+- If a genuine cross-table check is unavoidable, wrap it in a `SECURITY DEFINER` helper that self-scopes via `auth.uid()` (like `sop_in_user_person_grants()`), never a raw policy-level join.
+- Denormalize `organisation_id` onto every new table — every append-only/junction table in this schema already does this specifically to avoid the join-in-policy trap.
+
+**Warning signs:**
+- Any `500` on an UNRELATED query (e.g. `/sop_assignments?select=…,sops(…)`) right after a competency migration ships — broad collateral breakage is the signature of `42P17`, not a bug in the feature you just built.
+
+**Phase to address:** Every phase adding a new competency/observation/assessor table — a per-migration checklist item. Verify by grepping every new policy for `EXISTS.*from public\.(sops|sop_completions|sop_completion_signatures)` before merge.
+
+---
+
+### Pitfall 21: A Fourth Cross-Org Service-Role Write Hole
+
+**What goes wrong:**
+Competency states, observations, and the assessor-capability gate all need admin/supervisor-gated writes with no plausible authenticated RLS write policy (mirrors `role_members`, `sop_access_people`, `sop_completion_signatures`, `ai_field_proposals`, `sop_review_cadences` — every one "no authenticated write, writes via `createAdminClient()` in a server action"). If the new server action writes/reads by `id` alone, or accepts a caller-supplied org/subject parameter, without re-checking `row.organisation_id === ctx.organisationId`, any authenticated user can write or read another org's data — the service-role client bypasses RLS entirely.
+
+**Why it happens:**
+This is CLAUDE.md's single most repeated incident class: 2026-06-15 `signOffCompletion` org-scoped the write only inside ONE role branch, letting a `safety_manager` sign off another org's completion; 2026-06-15 all three Phase 25 department-assigner actions initially used the wrong client entirely; 2026-07-05 `match_sop_agent_metadata` RPC took `p_organisation_id` as a caller-supplied parameter, letting any authenticated user pass any org's UUID. Three separate features, same root mistake, all caught only at code review — never by the green stub-test gate.
+
+**How to avoid:**
+- Every new admin-client write derives `organisation_id` from `requireAdminContext()`/`getSessionContext()`, never from a client-supplied parameter, and filters/verifies EVERY write and read (`.eq('organisation_id', ctx.organisationId)`) on ALL role branches, not just the first one written.
+- Any new `SECURITY DEFINER` RPC self-scopes via `auth.uid()` internally; if it must accept an org parameter for legitimate service-role batch use, `REVOKE EXECUTE FROM PUBLIC, anon, authenticated; GRANT TO service_role` explicitly (the `00041` lockdown pattern).
+- Write ONE runtime test per new admin-client write path that attempts a cross-org write/read (org A session, org B target id) and asserts rejection — the 2026-06-15 `sop_departments` incident shipped green specifically because tests only asserted the action *existed*, never exercised the insert.
+
+**Warning signs:**
+- A server action branching on role with org-scoping logic duplicated (or missing) in only some branches.
+- Any new RPC signature with a `p_organisation_id`/`p_org_id`-style parameter.
+
+**Phase to address:** Every phase with new writes (competency transitions, observation creation, assessor sign-off, matrix materialization). Highest-priority pitfall given the three-incident history — every new write path needs code review, not just new features.
+
+---
+
+### Pitfall 22: Training Matrix Becomes an Unbounded Live Cross-Join, or a Stale Materialized Snapshot Nobody Refreshes
+
+**What goes wrong:**
+The matrix is "people × required-SOPs × status," explicitly derived from access grants joined to completions/sign-offs per PROJECT.md — not a table someone fills in. Two realistic failure modes: (1) **live-compute trap** — every matrix page load runs `people × sop_access_people fanout × sop_completions × competency_states` synchronously; at 500 SOPs × hundreds of workers this is tens of thousands of cells per load, the exact shape of query this codebase was already burned by (Phase 26.5's "5-7 serial round-trips per navigation" incident, 2026-07-13); (2) **stale-materialization trap** — `access_grants → sop_access_people` is ALREADY a materialization pipeline (Phase 32/33) with its own staleness window; layering a SECOND derived view (the matrix) on top compounds "when does this go stale."
+
+**Why it happens:**
+The materialization pipeline already exists and already has a known staleness risk — it only updates when the admin action that changes a grant also re-runs materialization. Building a third derivation layer instead of reading the existing fanout compounds the problem.
+
+**How to avoid:**
+- Matrix reads `sop_access_people` (the already-materialized fanout) directly, not `access_grants` — no third derivation layer. "Required SOPs for person X" = `sop_access_people` rows for that `member_id`, joined to `sop_completions`/`competency_states`.
+- Default-scope the matrix by department or SOP collection (it's a supervisor/admin audit view, not an infinite grid) — never render all people × all SOPs unfiltered.
+- One indexed query (or a view refreshed alongside the existing `sop_access_people` fanout job) rather than N+1 fetches per cell.
+- Document matrix staleness in the UI ("as of grant sync") rather than let it look authoritative when the underlying fanout lags.
+
+**Warning signs:**
+- Matrix load time scales with org size in a way no other admin dashboard page in this codebase does.
+- Matrix shows a worker as still required to know a SOP their department was moved off days ago.
+
+**Phase to address:** Training matrix phase — decide read path (live join vs materialized view) as a schema decision before UI work, paired with whatever refresh trigger already fires `sop_access_people` materialization.
+
+---
+
+### Pitfall 23: Supervisor Observations Read as Workplace Surveillance
+
+**What goes wrong:**
+PROJECT.md frames observations as a "30-second supervisor-initiated record ... watched worker do X against the SOP — consistent / needs reset" — evaluative notes about a specific named worker in an append-only, audit-grade record. Two distinct failure modes: (1) **worker trust collapse** — if workers can't see their own observation records, this reads as covert performance surveillance, undermining the app's core "worker ease of use" premise; (2) **NZ employment-law exposure** — under the Employment Relations Act's good-faith obligation and the Privacy Act 2020, an employee generally has a right to know personal information is being collected about them and to access it, and using safety-observation records as backdoor disciplinary evidence without disclosure is exactly what PROJECT.md's own anti-goals try to head off ("no disciplinary workflow... enforcement stays human").
+
+**Why it happens:**
+The feature is genuinely useful (complacency-reset, real evidence for ACC/WorkSafe), but the natural implementation — supervisor writes a note, worker never sees it, note sits in an audit table forever — is indistinguishable in worker experience from a secret performance file, regardless of stated intent.
+
+**How to avoid:**
+- Worker-visible by default: the worker whose observation was recorded should be able to see the record (mirrors "workers see their own completions" RLS pattern already in `00010`).
+- Constrain observation content to conduct against the SOP ("followed lockout steps 1-4 correctly, missed step 5 — PPE removal order"), not general performance commentary.
+- Enforce the anti-goal in the schema, not just UI copy: no `disciplinary_action`/`warning_level` field anywhere near this table.
+- Make sure both the observation record and the training-record CSV export are producible for a worker's own NZ Privacy Act access request without a bespoke query.
+
+**Warning signs:**
+- Observation UI ships with no worker-facing view of their own records.
+- Any field on the observation table that maps to disciplinary/performance-review language rather than "did this match the SOP."
+
+**Phase to address:** Supervisor observations phase — worker read policy and field set must be right at schema time; retrofitting visibility after workers notice they can't see their own records is a trust cost, not just an engineering one.
+
+---
+
+### Pitfall 24: The Completeness Rubric and Refresher Cadence Tick-Box-ify Training
+
+**What goes wrong:**
+PROJECT.md explicitly names this risk: "adopt the guidance notes' intent... never their rigid choreography." The AI-reviewer completeness rubric and the refresher re-walkthrough cadence, implemented naively, become exactly what safety-training guidance warns against: (1) **rubric risk** — an AI check for "missing E-stops≠isolation" is valuable for SOP *quality*, but if its pass/fail becomes the org's proxy for "training-ready," admins optimize for satisfying the checklist rather than writing a genuinely clear SOP (Goodhart's law); (2) **cadence risk** — a blind "12 months since last completion → force re-walkthrough" (mirroring the existing `sop_review_cadences` 12-month default) treats every SOP and worker identically, generating alert fatigue and — critically — **worker-facing friction**, which the locked north star says is "wrong by definition."
+
+**Why it happens:**
+Both features are modeled on existing governance infrastructure (Phase 21 AI reviewer, Phase 28 review cadence) built for SOP *governance* (is the document current/complete), not worker *competence* (does this person know the job). Reusing that machinery without adapting trigger conditions naturally produces choreography instead of judgment.
+
+**How to avoid:**
+- Rubric output is an admin-facing quality signal on the SOP (same lane as existing AI reviewer flags — informational, never gating). Keep rubric-pass and competency-eligible as separate tables with no FK dependency.
+- Refresher cadence triggers on **substantive SOP change** (detectable via the version-diff machinery already built in Phase 23) as a first-class trigger, not just elapsed time.
+- Per the locked anti-goal, a due/overdue refresher surfaces in the governance queue (Phase 28) and/or a soft in-app nudge — never a lock screen or forced re-walkthrough blocking a worker from reading the SOP they need right now.
+- Avoid a numeric/percentage "completeness score" UI — binary-plus-explanation is harder to game than a score admins chase upward without reading the underlying issue.
+
+**Warning signs:**
+- Admins ask "how do I get the rubric to 100%" instead of "is this SOP clear."
+- Refresher notifications fire on a fixed calendar regardless of SOP change, and workers start ignoring them.
+- Any code path where a `competency_state` write is conditional on rubric pass/fail.
+
+**Phase to address:** Guidance-notes adoptions phase — the "rubric informs, never gates" and "cadence triggers on relevance not just elapsed time" rules need to be locked before implementation, not caught at review.
+
+---
+
+### Pitfall 25: CSV Training-Record Export Leaks Cross-Tenant Data or Unminimized PII
+
+**What goes wrong:**
+CSV is locked as the ONLY training-record interop mechanism for this milestone (no HRIS API). Two failure modes given this codebase's history: (1) the export action queries by a caller-supplied filter without re-verifying every returned row belongs to `ctx.organisationId` — same class as the `match_sop_agent_metadata` RPC hole (2026-07-05); (2) the export dumps more PII than needed (full names, worker IDs, observation free-text) into a downloadable file with no access logging.
+
+**Why it happens:**
+Export endpoints tempt the "just join everything and dump it" shortcut — there's no UI to design, and it's easy to reach for the admin/service-role client and skip the org-scope self-check RLS would otherwise enforce for free.
+
+**How to avoid:**
+- Build the export query like any other admin-client read: `requireAdminContext()` first, explicit `.eq('organisation_id', ctx.organisationId)` on every joined table.
+- Scope columns to exactly what's needed for training-evidence purposes (worker name, SOP title, version, completion/sign-off date, competency state); exclude observation free-text unless explicitly requested with a stated reason; never include auth/session identifiers.
+- Since this is the org's only interop surface, log "who exported what, when" — it's the one place PII leaves the RLS-protected app boundary.
+
+**Warning signs:**
+- Export action uses `createAdminClient()` without a visible org filter on every joined table in the query.
+- Export includes columns nobody asked for "just in case."
+
+**Phase to address:** Training records/export phase. Verification: run the export as an org-A admin against seeded org-B data and assert zero leakage.
+
+---
+
+### Pitfall 26: Assessor-Capability Gate Creates a Bootstrap Deadlock
+
+**What goes wrong:**
+PROJECT.md: "who may assess/sign off is itself governed (trainer must be signed off)." Taken literally, this is circular for the first trainer in any org — nobody can be signed off as competent-to-assess until an already-signed-off assessor signs them off, and a new org has zero assessors on day one. Strictly enforced with no bootstrap path, org onboarding silently blocks.
+
+**Why it happens:**
+This is a natural consequence of the (correct) design goal but only manifests once, at org creation — easy to miss when testing against a seeded dev org that already has assessors.
+
+**How to avoid:**
+- Give org admins (already elevated in every other governance surface) an explicit, audited override to designate the first assessor(s) without a prior sign-off — same "someone with admin authority breaks the cycle once" pattern used to seed the first `platform_admin` (`00027_seed_initial_platform_admin.sql`).
+- Log the override distinctly from a peer-assessed sign-off (e.g. `assessed_by: null, designated_by_admin: true`) so the audit trail is honest about how the org's first assessor was qualified.
+
+**Warning signs:**
+- New/demo orgs cannot get any worker into "competent" state because there is no eligible assessor.
+
+**Phase to address:** Assessor capability phase (folds into G-04 role work) — bootstrap path must be designed alongside the gate itself.
+
+---
+
 ## Technical Debt Patterns
 
 | Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
@@ -462,6 +636,10 @@ Generate a narrated SOP with at least 10 industrial terms and 2 NZ-specific name
 | Synchronous video generation in a request handler | Simpler to prototype | Times out on Vercel for any real SOP; no retry; no status feedback | Prototype only, never production |
 | Cache generated video files in service worker | One caching strategy for all assets | 1 GB+ on device within a week; iOS evicts everything including SOPs | Never |
 | Use yt-dlp to download YouTube URLs server-side | Easiest implementation | DMCA exposure; ToS violation; platform ban risk | Never in a SaaS product |
+| Competency state FK'd to exact `sop_id` (no lineage resolution) | Simpler query, ships faster | Silent state loss on every version supersede (Pitfall 19) | Never — resolve lineage from day one |
+| Matrix computed live with no pagination/scoping | No materialization pipeline to build/maintain | Page-load time scales with org size; repeats the Phase 26.5 nav-latency incident | Only for a first internal demo with a handful of seeded workers |
+| Observation table with free-text-only `notes`, no structured status enum | Fast to ship, flexible | Free text drifts into disciplinary language with no schema guardrail (Pitfall 23/24) | Acceptable as a SUPPLEMENT to a structured status field, never as the only field |
+| Refresher cadence reusing `sop_review_cadences`' fixed-months-only model with no change-trigger arm | Reuses existing table/UI, zero new schema | Pure calendar cadence = alert fatigue + worker friction, violates the locked north star | Never for this feature — the whole point is a relevance trigger the review cadence doesn't have |
 
 ---
 
@@ -481,6 +659,12 @@ Generate a narrated SOP with at least 10 industrial terms and 2 NZ-specific name
 | YouTube URL transcription | Use yt-dlp or similar server-side download | Violates YouTube ToS and DMCA. Use YouTube Data API v3 `captions.list` for auto-generated captions. If none exist, prompt user to download and upload the file |
 | Video generation (TTS output) | Store generated video permanently like source documents | Generated videos are reproducible — store with 90-day TTL. Never cache in service worker. Treat as derived, not primary, asset |
 | Office file parsing (Excel/PowerPoint) | Accept all Excel/PowerPoint variants including macro-enabled | Block `.xlsm`, `.xlsb`, `.pptm` at upload validation before parsing. Validate magic bytes server-side, not just file extension |
+| Versioning (`00008`) × competency state | FK straight to `sops.id`, ignore `parent_sop_id`/`superseded_by` lineage | Resolve via `current_sop_version(parent_sop_id)`; add a `sop_version` column to competency rows for point-in-time truth (Pitfall 19) |
+| Access-grant materialization (`00046`/`00050`) × training matrix | Build a third derivation layer on top of `access_grants` directly, duplicating fanout logic | Read `sop_access_people` (already materialized), never re-derive from `access_grants` in the matrix query (Pitfall 22) |
+| Completions/sign-off chain (`00010`/`00038`) × competency state | Treat `sop_completions.status = signed_off` as automatically implying `competency_states = competent` | Keep as related-but-distinct facts — a signed-off completion is EVIDENCE toward a competency-state transition, not the same row; the transition itself needs its own append-only event (mirrors `sop_review_events`, not a mutable status column) |
+| RLS policies × any new competency/observation table | Cross-table `EXISTS` against `sops`/`sop_completions` in a new policy | Denormalize `organisation_id`, self-scoped policies only (Pitfall 20) |
+| AI reviewer (Phase 21) × completeness rubric | Rubric result gates competency-state writes | Rubric is a SOP-quality signal only, stored separately, never referenced by competency-state write logic (Pitfall 24) |
+| Offline PWA / sync engine (`src/lib/offline/sync-engine.ts`) × supervisor observations | Assume observations are always recorded with connectivity | If observations are captured shop-floor, use the SAME idempotent-client-UUID-PK + Dexie queue + sync-engine pattern `sop_completions` already uses — do not assume always-online on a PWA whose whole premise is intermittent connectivity |
 
 ---
 
@@ -496,6 +680,9 @@ Generate a narrated SOP with at least 10 industrial terms and 2 NZ-specific name
 | Video transcription as a synchronous API call in the request lifecycle | 504 timeout on any video over ~30 seconds | Transcription must be an async job: create job row, return job ID, process in background, client polls status | Video > 30 seconds |
 | Generating TTS audio synchronously for a full SOP | Times out for SOPs with >10 steps (each step ~5s TTS = 50s+ total) | TTS generation must be chunked and async; generate per-step and assemble — allows partial progress visibility | SOPs with >8 steps |
 | Streaming large video from Supabase Storage through the Next.js API layer | High Vercel function execution cost; bandwidth bottleneck | Generate short-lived signed download URLs client-side; stream directly from Supabase Storage CDN, not through the Next.js server | Any video file |
+| Live person×SOP cross-join training matrix, no scoping | Admin matrix page slow to load, scales with org size | Read materialized `sop_access_people` fanout, default-scope by department/collection, paginate | Breaks first at the org's stated top end — 500 SOPs × hundreds of workers |
+| Per-cell N+1 fetch for competency status | Matrix waterfalls dozens of sequential Supabase calls (same signature as the 2026-07-13 nav-latency incident) | One indexed join query (or view) covering the whole matrix page in one round-trip | Immediately at any org above trivial seed-data size |
+| Refresher-cadence sweep scanning every SOP×worker pair on every cron tick with no change-detection filter | Cron job cost/duration grows linearly with org size × SOP count, mirrors the Phase 26.5 agent-metadata sweep cost profile | Filter to SOPs with version changes or elapsed-cadence since last check, not a full re-scan every run | Noticeable once an org has enough history that most rows haven't changed since the last sweep |
 
 ---
 
@@ -512,6 +699,11 @@ Generate a narrated SOP with at least 10 industrial terms and 2 NZ-specific name
 | Accepting macro-enabled Office files without rejection | Remote code execution or SSRF via malicious macro payload in parsing process | Block `.xlsm`, `.xlsb`, `.pptm` at MIME/extension validation before any parsing library touches the file |
 | Storing raw uploaded video files without a retention policy | Unbounded storage growth; unexpected billing; GDPR retention violation | Explicit per-bucket retention: source video 30 days post-transcription, generated video 90 days, then delete |
 | Generated video signed URLs that never expire | Anyone with a leaked URL can stream the video indefinitely | Generated video URLs expire in 24 hours; regenerate on demand from the stored job record |
+| Admin-client write in a new competency/observation action without `.eq('organisation_id', ctx.organisationId)` on every branch | Cross-tenant read/write — the exact hole class logged 3x already (2026-06-15 ×2, 2026-07-05) | `requireAdminContext()` first; explicit org filter on every write AND read, on every role branch, no exceptions (Pitfall 21) |
+| New RPC (matrix refresh, rubric trigger) accepting `p_organisation_id` as a parameter | `SECURITY DEFINER` cross-tenant read via direct `POST /rest/v1/rpc/<name>` call with any org's UUID | Derive org id from `auth.uid()`/JWT claim inside the function; if service-role-only, explicitly `REVOKE EXECUTE FROM PUBLIC, anon, authenticated` |
+| CSV export query joins without re-scoping | Bulk cross-tenant PII exfiltration in one download | Explicit org filter on every joined table in the export query; minimize columns to training-evidence purpose only (Pitfall 25) |
+| Cross-table `EXISTS` in a new RLS SELECT policy | `42P17` recursion → broad 500s on unrelated queries (denial of service, not just a bug) | Denormalized `organisation_id`, self-scoped policies only (Pitfall 20) |
+| Assessor bootstrap override left unaudited or silently equivalent to a normal peer sign-off | Fabricated audit trail — "who assessed the first assessor" becomes unanswerable or dishonest | Distinct `designated_by_admin` flag, logged separately from peer assessment (Pitfall 26) |
 
 ---
 
@@ -528,6 +720,11 @@ Generate a narrated SOP with at least 10 industrial terms and 2 NZ-specific name
 | No progress feedback during video transcription | Admin submits video and sees a spinner for 2–10 minutes with no indication of progress | Show transcription progress stages: "Uploading → Extracting audio → Transcribing → Structuring steps" with estimated time remaining |
 | Generated video playback requires streaming on factory floor | Workers on intermittent WiFi cannot play back generated videos | Generated videos are an admin review / training tool, not a field tool. Clearly communicate this scope and do not surface video playback in the worker walkthrough UI |
 | Admin uploads a video, sees no indication of whether sound was detected | Silent videos (e.g., screen recordings, timelapse footage) produce empty or garbage transcriptions | Check audio track presence server-side before starting transcription; warn "No audio track detected — upload a video with spoken narration for transcription" |
+| Observations recorded without worker visibility | Reads as covert surveillance, breaks trust, plausible NZ Privacy Act access-request friction | Worker can always see their own observation records (Pitfall 23) |
+| Competency status gates worker's read/walkthrough access to a SOP | Violates the locked north star directly — worker-facing friction is "wrong by definition" | Competency state is purely informational/audit; access stays governed exclusively by existing `sop_access_people`/department grants, never by competency status |
+| Refresher notifications on a fixed calendar regardless of relevance | Alert fatigue, ignored notifications, erodes trust in ALL app notifications (including safety-critical ones) | Trigger refreshers on substantive SOP change or genuinely long inactivity, surface via governance queue not worker-blocking UI (Pitfall 24) |
+| Matrix/rubric surfaced as a numeric score admins chase upward | Admins optimize the score instead of the underlying SOP/training quality (Goodhart's law) | Binary-plus-explanation signals ("missing X"), never a bare percentage |
+| Assessor bootstrap has no path for a brand-new org | Org stuck — no worker can ever reach "competent" state | Admin override path designed alongside the gate (Pitfall 26) |
 
 ---
 
@@ -552,6 +749,16 @@ Generate a narrated SOP with at least 10 industrial terms and 2 NZ-specific name
 - [ ] **Service worker video exclusion:** Load a generated video SOP, then inspect the service worker cache — verify no video files appear in the cached assets.
 - [ ] **TTS pronunciation:** Play the generated narration for an SOP containing NZ-specific terms and industrial abbreviations — verify all are intelligible to a NZ listener.
 - [ ] **Video generation idempotency:** Click "Generate Video" twice in rapid succession — verify only one job is created, not two.
+- [ ] **Competency state on version supersede:** verify a matrix cell survives (or correctly flags `trained_on_outdated_version`) a live SOP edit+republish — don't just test against a never-versioned SOP.
+- [ ] **New RLS policies:** grep every new policy for `EXISTS.*from public\.(sops|sop_completions|sop_completion_signatures)` — confirm none exist before merge.
+- [ ] **Every new admin-client write path:** confirm a runtime test exists that attempts a cross-org write/read and asserts rejection — not just a source-contract test asserting the action exists.
+- [ ] **Training matrix:** confirm it reads `sop_access_people` (materialized), not a live re-derivation from `access_grants`, and confirm it's scoped/paginated, not an unbounded grid.
+- [ ] **Observation records:** confirm the worker whose observation was recorded can see it in their own UI — don't just verify the supervisor-side write path.
+- [ ] **Completeness rubric:** confirm no code path makes a competency-state write conditional on rubric pass/fail.
+- [ ] **Refresher cadence:** confirm the trigger checks for substantive version change, not just elapsed months, and confirm surfacing is via the governance queue / soft nudge, never a walkthrough-blocking gate.
+- [ ] **CSV export:** confirm org-scope filter is present on every joined table, and run the export as an org-A admin against seeded org-B data to confirm zero leakage.
+- [ ] **Assessor gate:** confirm a first-assessor bootstrap path exists and is exercised by a test against a freshly-seeded org with zero existing assessors.
+- [ ] **`journeys.ts`:** per this project's CLAUDE.md convention, every new worker- or admin-facing screen (matrix, observation form, training-record view, export) must be added to `src/lib/journeys/journeys.ts` in the same change — check `/pathways` shows 0 not-mapped for new routes.
 
 ---
 
@@ -569,6 +776,11 @@ Generate a narrated SOP with at least 10 industrial terms and 2 NZ-specific name
 | DMCA takedown from YouTube URL download implementation | CRITICAL | Immediately disable the URL pathway; respond to takedown within 10-day window; remove all cached video bytes; switch to Captions API approach; legal review |
 | Video storage costs spike from unbounded retention | MEDIUM | Run emergency cleanup job; implement retention policy immediately; review pricing model; notify affected tenants if data is to be deleted |
 | Generated video TTS mispronounces safety-critical term after publish | HIGH | Unpublish generated video; regenerate with corrected pronunciation dictionary entry; notify admins who used the video for training; add the term to the permanent pronunciation dictionary |
+| Competency state orphaned by version supersede (Pitfall 19) | LOW | Backfill script resolving `parent_sop_id` lineage for existing rows, same shape as the Phase 26 `backfill-section-layouts.ts` precedent — only touches rows that need it |
+| Cross-org write hole discovered post-ship (Pitfall 21) | MEDIUM | Same remediation shape as the 2026-06-15/2026-07-05 fixes: patch the action to self-enforce org-scope on every branch, add the missing runtime test, audit for the SAME pattern across every other new write path in the milestone |
+| RLS recursion (Pitfall 20) | LOW | Drop the offending cross-table policy, replace with denormalized-column self-check or a `SECURITY DEFINER` helper — same fix shape as `00031` |
+| Matrix performance collapse at scale (Pitfall 22) | MEDIUM | Add a materialized view or scoped default filter after the fact — recoverable without a schema rewrite since the underlying `sop_access_people` data is already correct |
+| Observation trust breach (worker discovers hidden records) (Pitfall 23) | HIGH | Not a code fix — requires org communication + retroactively surfacing existing records to affected workers; prevention is far cheaper than recovery here |
 
 ---
 
@@ -596,6 +808,14 @@ Generate a narrated SOP with at least 10 industrial terms and 2 NZ-specific name
 | Low-quality OCR on phone photos | Pathway 2 — OCR integration | Test: 10 real industrial document photos; confidence flag rate > 0; safety terms flagged |
 | Macro-enabled Office file execution | Pathway 2 — file validation | Test: upload .xlsm file; verify rejected before parsing library is called |
 | TTS mispronunciation of NZ/industrial terms | Pathway 3 — TTS generation | Audio review: 10 industrial terms + 2 NZ place names all intelligible to NZ listener |
+| Competency state orphaned on version supersede | Competency-state schema/foundation phase (before matrix UI) | Test: supersede a SOP with an existing competency record, assert lineage resolves and `trained_on_outdated_version` flips correctly |
+| RLS recursion on new competency/observation tables | Every phase adding a new table | Grep gate: no cross-table `EXISTS` in any new policy; broad-500 smoke test after each migration |
+| Cross-org service-role write hole (4th instance risk) | Every phase with new admin-client writes | Runtime cross-org attempt test per write path (not just source-contract) |
+| Training matrix performance / staleness | Training matrix phase | Load-test matrix query at seeded scale (500 SOPs × hundreds of workers); confirm it reads `sop_access_people` not `access_grants` directly |
+| Observations read as surveillance | Supervisor observations phase | Confirm worker-facing read view exists and ships in the SAME change as the supervisor write UI |
+| Tick-box-ification (rubric + cadence) | Guidance-notes adoptions phase | Code review check: zero references from competency-state write logic to rubric pass/fail; cadence trigger includes a version-change arm, not calendar-only |
+| CSV export PII/cross-org leakage | Training records/export phase | Cross-org export attempt test; column audit against stated training-evidence purpose |
+| Assessor bootstrap deadlock | Assessor capability phase | Test: fresh org, zero assessors, confirm admin override path reaches first competent-assessor state |
 
 ---
 
@@ -638,8 +858,16 @@ Generate a narrated SOP with at least 10 industrial terms and 2 NZ-specific name
 - [Best TTS APIs in 2026 — Speechmatics](https://www.speechmatics.com/company/articles-and-news/best-tts-apis-in-2025-top-12-text-to-speech-services-for-developers) — MEDIUM confidence: TTS pronunciation accuracy comparison
 - [PWA with Offline Streaming — web.dev](https://web.dev/articles/pwa-with-offline-streaming) — HIGH confidence: IndexedDB approach for large video offline
 - [How I Solved Background Jobs using Supabase Tables and Edge Functions — jigz.dev](https://www.jigz.dev/blogs/how-i-solved-background-jobs-using-supabase-tables-and-edge-functions) — MEDIUM confidence: async job pattern with Supabase
+- `supabase/migrations/00008_sop_versioning.sql` — HIGH confidence (primary source, this codebase): version lineage model (`parent_sop_id`/`superseded_by`/`current_sop_version()`)
+- `supabase/migrations/00010_completion_schema.sql` — HIGH confidence (primary source, this codebase): append-only completion/sign-off RLS pattern the competency layer should mirror
+- `supabase/migrations/00038_phase23_schema.sql` — HIGH confidence (primary source, this codebase): sign-off chain + RLS-recursion-avoidance comments, direct precedent for competency-state RLS
+- `supabase/migrations/00043_ownership_review_governance.sql` — HIGH confidence (primary source, this codebase): review-cadence/governance-queue pattern the refresher cadence should reuse, not duplicate
+- `supabase/migrations/00046_org_model_schema.sql`, `00050_access_grants_sop_target.sql` — HIGH confidence (primary source, this codebase): access-grant materialization (`sop_access_people`) the training matrix must read from
+- `CLAUDE.md` `## Learnings` — HIGH confidence (primary source, this codebase): direct incident history — cross-org service-role holes (2026-06-15 ×2, 2026-06-26, 2026-07-05), RLS recursion (2026-05-13), fail-open pipeline null-clobber (2026-07-05), nav-latency/N+1 (2026-07-13), source-contract-tests-don't-catch-wiring-bugs (2026-06-05, 2026-06-08, 2026-07-13 ×2)
+- `.planning/PROJECT.md` — HIGH confidence (primary source, this codebase): v7.0 milestone scope, locked north star (no worker friction), anti-goals (no disciplinary workflow, CSV-only export)
+- NZ Employment Relations Act 2000 (good faith) and Privacy Act 2020 (IPP 6 access to personal information) — MEDIUM confidence, general framing for observation-record and export design, not project-specific legal advice; recommend legal review before observations ship if the feature scope expands beyond safety-conduct notes
 
 ---
 
 *Pitfalls research for: SOP Assistant — mobile-first SOP management SaaS for blue-collar tradespeople*
-*v1.0 researched: 2026-03-23 | v2.0 additions researched: 2026-03-29*
+*v1.0 researched: 2026-03-23 | v2.0 additions researched: 2026-03-29 | v7.0 additions researched: 2026-07-19 (Competency & Training Layer)*

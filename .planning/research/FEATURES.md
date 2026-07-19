@@ -1,424 +1,172 @@
-# Feature Landscape: SOP Creation Pathways (v2.0)
+# Feature Research
 
-**Domain:** SOP / Procedure Management — Three new creation and delivery pathways
-**Researched:** 2026-03-29
-**Confidence:** MEDIUM-HIGH (competitor products verified via multiple sources; PWA/platform constraints verified via official docs and real-world reports)
+**Domain:** Competency management / training-matrix layer for an industrial SOP PWA (AU/NZ manufacturing, blue-collar workforce)
+**Researched:** 2026-07-19
+**Confidence:** MEDIUM — NZ-specific regulator text (WorkSafe/ACC) is not published as a machine-readable checklist; findings are synthesized from ACC's Workplace Safety Management Practices (WSMP) audit-guideline pattern, NZ H&S-software vendor guidance (tribalhabits.com, NZ-focused), and generic manufacturing competency-matrix practice, cross-checked against the Visy interview (primary source, AU/NZ 100-site manufacturer). SAP SuccessFactors field-level detail is MEDIUM (help.sap.com fetch was blocked by JS rendering; corroborated via SAP support-KB snippets instead of the full connector doc).
 
----
+> Supersedes the prior FEATURES.md (2026-03-29, v2.0 SOP-creation-pathways research). That research is stale and not needed for this milestone; see git history if it's needed for reference.
 
-## Context: What Already Exists
+## Feature Landscape
 
-The following are already built and validated. Do not re-research these.
+### Table Stakes (Users Expect These)
 
-- Admin uploads PDF/DOCX → AI parses to structured SOP (hazards, PPE, steps, emergency sections)
-- Admin reviews parsed output alongside original, edits, publishes
-- Workers walk through SOPs step-by-step on mobile with offline access
-- Photo evidence capture during completion, supervisor sign-off
-- SOP library with search, categories, assignments, versioning
-- Multi-tenant with RLS isolation, PWA with offline support
-
-This document covers only the three new pathways.
-
----
-
-## Pathway 1: Video → SOP
-
-### What It Is
-
-User provides a video (uploaded file, YouTube/Vimeo URL, or in-app recording), the system transcribes the audio and analyzes the content, then structures the transcript into the existing SOP format (title, hazards, PPE, steps, emergency). Admin reviews and publishes.
-
-### Competitive Landscape
-
-Tools in this space: ScreenApp, Trupeer, Guidde, Synthesia, Kommodo, Clueso, Docsie. These tools target software screen recording workflows (SaaS onboarding, product demos). None specifically target industrial safety procedures with mandatory section detection (hazards, PPE, emergency). The safety-specific context is the differentiation here — competitors produce generic numbered steps, not structured industrial SOPs.
-
----
-
-### Table Stakes (Pathway 1)
-
-Features users already expect from comparable tools. Absence feels like the product is broken.
+Auditors and site managers ask for one artifact first: "who is required to know X, and what's their status." Everything here exists to answer that in under a minute.
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| File upload (MP4/MOV) | Standard entry point — tools like ScreenApp and Trupeer show users expect drag-and-drop or file picker with immediate confirmation | LOW | Enforce 500 MB or configurable max; display file size before upload starts |
-| YouTube / Vimeo URL paste | Paste-URL is the dominant pattern for video import in 2025 — every transcription tool supports it | LOW | Extract transcript from auto-generated captions first (fast path), fall back to audio transcription (slow path); both YouTube and Vimeo expose this via API |
-| Async processing with progress feedback | Video transcription takes 30 seconds to several minutes — users cannot stare at a spinner without context. Research confirms async with step-by-step status updates (uploading → transcribing → structuring → ready) is the minimum viable feedback pattern | MEDIUM | Show named stages, not just a spinner; allow user to navigate away and return; notify when done |
-| Structured output into existing SOP format | Users of this product are SOP admins — they expect output in the same section format as PDF-parsed SOPs (hazards, PPE, steps, emergency). A raw transcript dump is not acceptable. | HIGH | Run transcript through same GPT-based structuring pipeline as existing document parsing; confidence scoring must apply |
-| Admin review before publish | Every competitor in this space shows a "review and edit" step before publishing. Particularly important for safety-critical content from audio. | MEDIUM | Reuse existing admin review UI; transcript source alongside structured output |
-| Section confidence scoring | Existing PDF parser flags low-confidence sections for admin review. Video transcription has higher error rates, especially with industrial terminology (chemical names, equipment identifiers). Same pattern must apply. | MEDIUM | Flag sections where transcript confidence is low or where mandatory SOP sections (hazards, PPE) are absent from the source |
-| Basic transcript display/editing | Users need to see what was transcribed before or during review, especially to catch misheard safety-critical terms. Competitors like Exemplary AI show transcript alongside structured output. | MEDIUM | Editable transcript panel alongside structured output in the review screen |
+| Training matrix (people × required-SOPs × status grid) | This is THE audit artifact — ACC/WorkSafe auditors and site managers ask "who is compliant for X right now" and "what's overdue." A folder of PDFs or a spreadsheet is the status quo it replaces. | MEDIUM | Pure read-model: join existing access grants (Phase 32-33 = "required") to completions/sign-offs (Phase 4/23 = "evidenced"). No new source-of-truth table needed for the base grid — only the competency-state column is new data. |
+| Per-worker training record view | "Show me one worker's full training history" is a standard audit question (tribalhabits NZ guidance, ACC WSMP pattern). Visy explicitly wants this ("this SOP thing will form a sort of training record for new employees" [00:32:34]). | LOW | Already scoped as Phase 31 rollforward (TRN-01). Filter the matrix by one worker; reuse completions + sign-off chain data. |
+| CSV export of training records | Every NZ H&S-software audit guide and the Visy interview converge on "exportable" as the baseline evidence format — auditors want to take the record away, not just view it on-screen. | LOW | Flat file: worker, role, site/dept, SOP + doc code, version, completion date, assessor, status. This is also the de facto SuccessFactors import shape (see Differentiators). |
+| Competency state per person-per-SOP (3-4 states) | "Completed" alone isn't enough for higher-risk tasks — ACC WSMP audit guidance explicitly separates "proof of completion" from "proof of competence." Binary complete/incomplete undersells what the org actually needs to defend. | MEDIUM | New data: a state column per (worker, SOP) beyond raw completion rows. Keep it to 3-4 states (not-started / read / supervised-in-progress / competent-signed-off) — do NOT import the guidance notes' rigid 5-rung NYC-ladder (locked decision, see Anti-Features). |
+| Supervisor observation record ("watched X do Y — consistent / needs reset") | ACC WSMP's "practical demonstration" / "signed evidence of achievement" evidence class requires more than a worker ticking a walkthrough — someone else has to have watched them. Also the direct fix for Visy's #1 pain point: fraudulent/shared sign-offs (a supervisor's own record can't be shared). | MEDIUM | New table: supervisor_id, worker_id, sop_id, verdict, optional note, timestamp. 30-second capture — must not become a form. Feeds the matrix as evidence, not as a gate. |
+| Refresher/recertification due-date surfacing | NZ H&S guidance frames refreshers as risk-tiered (12/24/36 months) with reminder windows (30/14/7 days). WorkSafe's "suitable and adequate training" duty is an ongoing, not one-time, obligation — a record with no expiry can't demonstrate currency. | LOW-MEDIUM | Reuses Phase 28's governance-queue due/overdue pattern (already built for SOP review cadence) — apply the same pattern to per-worker-per-SOP refresher dates instead of building a second cadence engine. |
+| Trained-on-outdated-version surfacing | When an SOP supersedes, workers trained on the old version are no longer evidence of current competency — auditors specifically ask "what version were they trained on, and is that still current" (tribalhabits: "version control so you can show what someone was trained on at the time"). SafeStart already has version supersede (Phase 23) so this gap is now visible and cheap to close. | LOW | Compare completion's `sop_version` to the SOP's current published version; flag on the matrix and in governance queue. No new capture — pure derived state. |
 
----
+### Differentiators (Competitive Advantage)
 
-### Differentiators (Pathway 1)
-
-Features specific competitors lack or do poorly, where the safety-focused context creates real value.
+Where SafeStart can win over a bolt-on LMS or a spreadsheet, by leaning on data it already uniquely has (grants = who-must-know, immutable sign-off chain = tamper-evident evidence).
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| In-app camera recording (video → immediate SOP) | No current video-to-SOP competitor supports in-app recording directly — they all require separate recording tools. A supervisor could walk a process on the factory floor, record it, and have a draft SOP in 5 minutes. | HIGH | Uses MediaRecorder API (WebRTC). Critical iOS constraint: Safari does not support MediaRecorder — will require a fallback warning or native media element on iOS. Test thoroughly. |
-| Industrial terminology correction pass | Generic transcription (Whisper, GPT-4o Transcribe) handles technical language with 90-95% accuracy but struggles with brand-specific chemical names, NZ-specific nomenclature, equipment model numbers. A post-transcription terminology review step — where admin can add known vocabulary — substantially increases usable accuracy. | MEDIUM | Allow org-level custom vocabulary list. Run transcript through term-matching correction before structuring. |
-| Mandatory section detection flag | If a video SOP source has no hazard warnings or PPE discussion in the transcript, the system should flag this explicitly to the admin before publishing — not silently publish a step list. No competitor does this; it is the key safety differentiator. | LOW | Simple check: if structured output has empty hazards/PPE sections, surface a prominent warning on the review screen. |
-| Timestamp linking from SOP step to source video | Users of the final SOP can see "(at 2:14 in source video)" on a step and tap to review the original footage for clarification. This is available in tools like Docustream.ai and ScreenApp for screen recording content; rare in safety SOP context. | MEDIUM | Store timestamps with each extracted step; render as optional attribution in admin review; optionally surface to workers on published SOP |
+| Matrix derived from access grants, not manually maintained | Most competency-matrix tools (AG5, Qualmark-style, spreadsheets) require someone to manually populate "who needs what." SafeStart already knows this from Phase 32-33 grants — the matrix is nearly free and never drifts out of sync with actual assignments. | LOW (given Phase 32-33 exists) | This is the actual moat vs. generic training-matrix SaaS: zero double-entry. |
+| Export shaped for SuccessFactors import (not a live API) | Visy's explicit ask is Success Factors integration, but a live HRIS API is out of scope by decision. SuccessFactors' own "Learning History Connector" ingests external completions via a flat file (employee ID, course/item ID, completion date, completion status pass/fail/incomplete, score) — so a well-shaped CSV with those columns IS effectively "integration" from the customer's perspective, at a fraction of the build cost. | LOW | Map SafeStart's export columns (worker external-ID field, SOP doc-code as course-ID, completion date, status, assessor) 1:1 to the connector's expected shape. Confirm exact field names with a real Visy SuccessFactors export sample when the deal progresses — treat current mapping as best-effort, not guaranteed-compatible. |
+| AI-prioritized maintenance schedule (staleness + usage + flags → review queue) | Turns governance from reactive ("someone remembered to check") to proactive — reuses the existing AI adapter (Phase 26.5/27) and governance queue (Phase 28) rather than building a new scheduling engine. Differentiator because most competency tools require a human to run the prioritization manually. | MEDIUM | Already scoped (v6.0 Phase 30 rollforward). Inputs: SOP staleness (review-due age), usage (completion volume), AI-reviewer flag count. |
+| Assessor-governance ("who may sign off is itself governed") | Directly answers ACC WSMP's "signed evidence of achievement by competent people" — an org can prove not just that a worker was assessed, but that the assessor was themselves qualified to assess. Rare in competency tools, which usually treat "supervisor" as a fixed role rather than a competency itself. | MEDIUM | Fold into Phase 25/28 role work — a supervisor's own competency-signed-off state on a "trainer" capability (or per relevant SOP) gates whether their observation counts as assessor-grade evidence. Keep minimal: a flag, not a parallel certification system. |
+| Document-code + register-style export (999.5) | Real NZ/AU industrial orgs navigate SOPs by document code (e.g. `ENF4-03-031`, matches Visy's own example SOP and the Raw SOPs corpus), not by title. A register export (code, title, version, status, issue date, change history) is the exact shape ISO/audit reviewers expect — and ties the training matrix's "SOP" column to something auditors already recognize. | LOW-MEDIUM | Add a `document_code` field to SOPs; export is a formatted view of existing library + version data, not new tracking. |
+| Risk/priority rating for SOP triage (999.6) | Orgs with 50-500 SOPs currently treat all uploads/verifications as equal priority. A lightweight risk rating (manual or AI-suggested from parsed hazard density) lets an admin/governance queue sort "digitize the ones that can kill someone first" — directly serves the ACC/WorkSafe liability narrative Visy leads with ("millions... jail time"). | LOW-MEDIUM | AI-suggested from existing hazard-parsing output (no new extraction pipeline) with manual override. |
+| AI-reviewer completeness rubric (hazards/controls/LOTO, named "E-stops ≠ isolation" check, quality outcomes, too-long flag) (999.4) | Extends the existing AI reviewer (Phase 21) rather than building a new one — cheapest of the guidance-notes adoptions. Makes SOPs better training modules by construction, which is the actual point of a competency layer (garbage SOP in = garbage competency evidence out). | LOW (extends existing job) | Builds on `job-b-omission` which already checks lockout — add named LOTO-vs-E-stop distinction, quality-outcome check, and a length/complexity flag. |
 
----
+### Anti-Features (Commonly Requested, Often Problematic)
 
-### Anti-Features (Pathway 1)
+| Feature | Why Requested | Why Problematic | Alternative |
+|---------|---------------|------------------|-------------|
+| Rigid 5-rung competency ladder (guidance-notes' NYC→Competent choreography) | The safety-org guidance notes this milestone draws on prescribe a formal staged ladder (e.g. Not Yet Competent → various intermediate rungs → Competent), and it's tempting to copy it 1:1 as "the proper way." | Over-choreographs a blue-collar workforce that the north star explicitly protects from friction; more states = more admin data-entry burden, more stale/inconsistent data, no evidence Visy or similar orgs actually track 5 distinct states in practice (they don't even own SOPs today — Visy: "I can't give you one person that's in charge of SOPs" [00:52:23]). | 3-4 minimal states (not started / read / supervised / competent-signed-off) — adopt the *spirit* (staged, observed, evidenced) not the letter (rigid rung count). Already the locked decision in PROJECT.md. |
+| Competency status gating worker's read/walkthrough access | Feels like "obviously we should stop an unqualified worker from even opening the SOP" — a natural extension of an access-control mindset. | Directly violates the north star: "a worker's read/walkthrough access is never gated by competency status." A worker who's genuinely unsure NEEDS to be able to open the SOP and read it (that's the whole product); gating it turns a training tool into a lockout tool and creates exactly the "I can't get in, I'll just wing it" shortcut-taking Visy already flagged as a top pain point [00:22:09]. | Competency state is a read-only overlay on top of unrestricted access — surfaced to supervisors/admins in the matrix, never enforced against the worker's own UI. |
+| Disciplinary workflow (write-ups, escalation, HR case tracking) tied to competency gaps | Natural next step once you have "who's non-compliant" data — looks like a small addition. | Explicit anti-goal (locked in PROJECT.md): "records exportable, enforcement stays human." Productizing discipline turns SafeStart into a surveillance/HR tool, which contradicts Visy's own stated sensitivity ("I don't want to sell the worker out" [00:43:57]) and adds legal/HR-policy surface area SafeStart has no business owning. | Export the record; let the org's own HR/management process consume it. Never build an in-app escalation state machine. |
+| Live SuccessFactors (or other HRIS) API integration | Visy explicitly asked for Success Factors integration, and "integration" sounds like the premium answer to their ask. | Locked out of scope for this milestone (PROJECT.md: "no HRIS API integration yet... SuccessFactors is a Later target"). API integration means auth/credential management per org, schema-version fragility against SAP's own connector changes, and a support burden disproportionate to a still-unsigned deal. | CSV export shaped to match SuccessFactors' Learning History Connector import format — gets Visy 90% of the value at near-zero integration risk, and is the honest MVP to validate the ask before building a real integration. |
+| Quiz/assessment engine (formal pass/fail knowledge tests per SOP) | Common LMS-lite pattern — "competency" often implies a quiz score, and ACC WSMP guidance does list "assessment results (quiz)" as one evidence type. | Adds authoring burden (every SOP needs quiz questions maintained in parallel with content) and worker-facing friction (a low-literacy, glove-handed workforce doing multiple-choice on a phone is a bad UX fit — contradicts the literacy/voice-first findings from Visy). Supervisor observation already covers the "practical demonstration" evidence class ACC guidance treats as sufficient for higher-risk tasks. | Supervisor observation record (verdict + note) substitutes for a quiz as the competence-evidence layer; the walkthrough completion substitutes for "proof of completion." No formal quiz engine. |
+| Automatic competency expiry that silently downgrades a worker's state with no notice | Feels like the "correct" behavior for a refresher-cadence system — if the due date passes, flip the state back. | Silent downgrades without visibility create exactly the audit gap the feature exists to prevent (a worker looks "not competent" with no record of why or when it happened), and can feel punitive/opaque to the worker if ever surfaced to them. | Governance-queue style surfacing (Phase 28 pattern): flag as "refresher due/overdue" alongside the still-valid last-competent record, don't erase or silently change history. Supervisor/admin acts on it explicitly. |
 
-| Anti-Feature | Why Problematic | What to Do Instead |
-|--------------|-----------------|-------------------|
-| Auto-publish without admin review | Video transcription error rates for industrial terminology run 5-15% (WER) even with GPT-4o Transcribe. Auto-publishing a safety procedure with a transcription error is a liability. | Always require admin review before publish, with no bypass |
-| In-app video playback / media player | The output of this pathway is an SOP document, not a media player. Building a full video player is scope creep and competes with existing hosting platforms. | Store source video URL/reference only; link to original hosting platform if needed |
-| Real-time transcription (while recording) | Real-time display during in-app recording creates complex state management and has no user benefit — the admin will review the structured output anyway. | Process after recording ends, not during |
-| Transcription of any video for any purpose | Positioning as a generic transcription tool bloats scope. The output is always a structured SOP for this product. | Hard-code the output to SOP format; add generic export only if customers explicitly request it post-launch |
-| Simultaneous upload of many videos | Batch video import adds significant backend complexity (queue management, storage, cost) and has low demand in the target market — organizations will rarely have more than a handful of "process videos" | Single file/URL at a time for v1; batch as v2 if requested |
-
----
-
-### Sub-Pathway Comparison: Upload vs URL vs In-App Recording
-
-| Sub-Pathway | User Expectation | Key Technical Constraint | Priority |
-|-------------|-----------------|--------------------------|---------|
-| File upload (MP4/MOV) | Drag-drop or file picker; processing in under 3 min for 10-min video; clear status updates | OpenAI Whisper API has 25 MB limit; GPT-4o Transcribe supports up to 100 MB via file API; longer videos need chunked processing | P1 |
-| YouTube URL | Paste URL, click go; auto-detects existing captions (fast), falls back to audio extraction | YouTube Data API v3 provides caption tracks for most videos; private/corporate YouTube videos may have no captions; third-party services (Apify, AssemblyAI) cover edge cases | P1 |
-| Vimeo URL | Same UX as YouTube paste | Vimeo API provides transcript data for videos on paid plans; many enterprise Vimeo videos will have transcripts available; fall back to audio extraction if not | P1 |
-| In-app recording | Record, stop, review — same as phone's camera app feel | MediaRecorder API works in Chrome/Android; iOS Safari does NOT support MediaRecorder (as of early 2026) — must display browser warning or restrict feature to Android/Chrome | P2 (after file upload is stable) |
-
----
-
-### Feature Dependencies (Pathway 1)
+## Feature Dependencies
 
 ```
-[Video File Upload]
-    └──requires──> [Async Processing Queue]
-                       └──requires──> [Transcription Service (Whisper / GPT-4o)]
-                                          └──requires──> [SOP Structuring Pipeline]
-                                                             └──requires──> [Confidence Scoring]
-                                                                                └──requires──> [Admin Review UI (existing)]
+Access grants (Phase 32-33)
+    └──requires for──> Training matrix (people × required-SOPs grid)
 
-[YouTube/Vimeo URL]
-    └──requires──> [Caption Extraction API]
-                       └──fallback──> [Audio Download + Transcription Service]
-                                          └──same path as file upload from here
+Completions + immutable sign-off chain (Phase 4/23)
+    └──requires for──> Training matrix (status column)
+    └──requires for──> Per-worker training record view
+    └──requires for──> CSV export
 
-[In-App Recording]
-    └──requires──> [MediaRecorder API (PWA)]
-    └──requires──> [iOS Safari fallback warning]
-    └──requires──> [Async Processing Queue]
-                       └──same path as file upload from here
+Training matrix
+    └──requires for──> Competency states (states are the extra column on the matrix)
+    └──enhances──> CSV export (export = matrix, flattened)
 
-[Transcript Display]
-    └──requires──> [Raw Transcript Storage]
-    └──required by──> [Admin Review UI]
+Competency states
+    └──requires for──> Supervisor observation records (observation is the evidence that advances a state)
+
+Departments (Phase 25) + role work (G-04 backlog)
+    └──requires for──> Assessor capability governance (who may observe/sign off)
+
+Version supersede (Phase 23)
+    └──requires for──> Trained-on-outdated-version surfacing
+
+Governance queue (Phase 28)
+    └──enhances──> Refresher/recertification due-date surfacing (reuse due/overdue pattern)
+    └──enhances──> AI-prioritized maintenance schedule (Phase 30 rollforward)
+
+Agent metadata + AI adapter (Phase 26.5/27)
+    └──requires for──> AI-prioritized maintenance schedule
+    └──requires for──> Risk/priority AI-suggestion (999.6)
+
+AI reviewer jobs (Phase 21)
+    └──requires for──> AI-reviewer completeness rubric (999.4)
+
+Document code field (999.5) ──enhances──> Training matrix + CSV export (SOP identified by code, not just title)
+Risk/priority rating (999.6) ──enhances──> Governance queue + AI maintenance schedule (sort input)
+
+Competency states ──conflicts──> Worker-facing access gating (explicitly must NOT connect — north star)
 ```
 
----
-
-## Pathway 2: File → SOP (Expanded)
-
-### What It Is
-
-Three distinct expansions to the existing PDF/DOCX intake:
-1. Photo/image upload with OCR → structured SOP (camera capture or gallery image)
-2. Additional file formats: Excel (.xlsx), PowerPoint (.pptx), plain text (.txt, .csv)
-3. Improved AI parsing accuracy (better section detection, formatting, handling of complex layouts)
-
-### Competitive Landscape
-
-No competitor in the industrial SOP space specifically supports photo-to-SOP. The capability comes from the document processing / OCR world (Docparser, Mindee, Google Document AI, Azure Form Recognizer). Excel/PowerPoint parsing is available in Azure AI Document Intelligence and as a general capability in OpenAI's file API. The differentiation here is context: these are safety procedures, so accuracy expectations are higher than generic document processing.
-
----
-
-### Sub-Pathway 2A: Photo / Image Upload with OCR
-
-#### Table Stakes (2A)
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Camera capture from device | Mobile users expect a camera-open button, not file-picker only. The target users are on factory floors with printed SOPs. Photo-of-document is the primary use case. | LOW | Use `<input type="file" accept="image/*" capture="environment">` for PWA — this opens the device camera directly on mobile. No additional library needed. |
-| Gallery / file picker fallback | Users may already have photos of documents. File picker must accept image formats (JPEG, PNG, HEIC, WebP). | LOW | Standard file input without `capture` attribute covers this |
-| Image quality feedback before processing | OCR accuracy is highly sensitive to image quality. A blurry, glare-affected, or rotated photo produces unusable output. Users need to know before they wait 30 seconds. | MEDIUM | Client-side quality check before upload: detect blur (Laplacian variance), detect extreme rotation (above 10°), check minimum resolution. Display "image may be hard to read" warning with option to retake |
-| Deskew and preprocessing server-side | Even good photos of printed documents are skewed, have curved pages, and uneven contrast. Server-side preprocessing (deskew, binarization, contrast normalization) improves OCR accuracy by up to 20% per research. | MEDIUM | Apply before passing to OCR model; use established libraries (OpenCV, Pillow, or cloud API preprocessing options) |
-| Same structured output as existing parser | Admin expects the same sections (hazards, PPE, steps, emergency) and the same review UI regardless of source. OCR-sourced SOPs must go through the same structuring pipeline. | LOW | Route OCR text output through existing GPT structuring pipeline; same admin review UI |
-| Confidence scoring | OCR text quality varies widely. A photo of a damaged document may yield 60% accuracy. Confidence scoring must reflect OCR quality, not just parsing quality. | MEDIUM | Combine OCR confidence score (from vision model) with parsing confidence; surface combined score to admin |
-
-#### Differentiators (2A)
-
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| Multi-page photo sequence (document "scanning" flow) | A printed SOP may be multiple pages. Allowing sequential photo capture with automatic stitching is the UX of modern mobile document scanners (CamScanner, Apple Notes built-in). No current SOP tool supports this. | HIGH | "Add page" button after each capture; preview strip showing captured pages; reorder/delete pages; submit all for combined OCR pass |
-| Handwritten annotation recognition | Many industrial SOPs have handwritten amendments — dates, revised quantities, signatures. Flagging these sections (even if not fully readable) prevents silently discarding safety-relevant handwritten notes. | MEDIUM | Flag regions where handwriting is detected; mark those sections as "requires manual review" in admin UI. Do not attempt to OCR handwriting accurately — flag and defer to human. |
-| Existing document plus photo amendment | Admin uploads the base Word/PDF SOP, then photo-captures a handwritten amendment page. System merges and flags the amendments for admin reconciliation. | HIGH | Complex merge logic — defer to v2 unless specifically requested |
-
-#### Anti-Features (2A)
-
-| Anti-Feature | Why Problematic | What to Do Instead |
-|--------------|-----------------|-------------------|
-| Silent low-quality processing | If the image is too blurry or glare-ridden, running it through OCR produces garbage output that could become a published SOP with wrong safety instructions. | Block processing if quality thresholds are not met; require retake |
-| HEIC format without conversion | iOS camera saves in HEIC by default. Most browsers and server libraries do not natively process HEIC. Silently failing is a bad experience. | Convert HEIC to JPEG server-side or client-side before OCR. Display error with instruction if conversion fails. |
-| Free-form image types (product photos, site photos) | Users will try uploading a photo of a chemical container or a machine, expecting a SOP. This is not a valid use case and produces nonsensical output. | Detect if uploaded image is unlikely to contain a document (use vision model to classify) and warn the user before processing |
-
----
-
-### Sub-Pathway 2B: Additional File Formats
-
-#### Table Stakes (2B)
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Plain text (.txt) | Lowest-friction format — copy-paste a procedure into a .txt file. Every document parser handles this. | LOW | Extract text, run through existing structuring pipeline. No special handling. |
-| PowerPoint (.pptx) | Many industrial training SOPs are maintained as slide decks with one step per slide. Azure AI Document Intelligence maps each slide to a page. OpenAI file API handles PPTX directly. | MEDIUM | Extract slide text and any embedded images; treat each slide as a candidate step; run through structuring pipeline. Speaker notes should be included in extraction. |
-| Excel (.xlsx) | Some SOPs maintained as process tables or checklists. Common in manufacturing for equipment calibration procedures with measurement columns. | MEDIUM | Extract tabular data per sheet; AI must interpret tables as step sequences or parameter tables within steps. This is harder than text — more likely to need manual structuring by admin post-parse. Surface low confidence. |
-| Consistent upload UI across all formats | Users should not have a different upload flow per format. One upload button with format filtering covers all. | LOW | Extend existing file input `accept` attribute to include `.pptx`, `.xlsx`, `.txt`, `.csv`; backend routes by MIME type to appropriate extraction pipeline |
-
-#### Differentiators (2B)
-
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| Table extraction within steps | Excel SOPs often include parameter tables (e.g., "Torque settings: Model A = 12 Nm, Model B = 18 Nm"). Rendering these as readable tables within an SOP step, rather than raw comma-separated text, is better than competitors. | MEDIUM | Detect tabular structures in Excel and PowerPoint during extraction; pass structured table data to GPT for formatting as a Markdown table within the appropriate step |
-| Improved section detection for atypical layouts | PowerPoint SOPs often do not use standardized headers. AI must detect "slide 1 = hazard overview" from context, not header text. This requires a stronger structuring pass with examples specific to slide deck formats. | MEDIUM | Format-specific prompt engineering in the structuring pipeline; different prompts/examples for PPTX vs DOCX vs plain text |
-
-#### Anti-Features (2B)
-
-| Anti-Feature | Why Problematic | What to Do Instead |
-|--------------|-----------------|-------------------|
-| Support for every possible format (.odt, .pages, .rtf, etc.) | Long tail of formats adds maintenance burden with minimal usage. Each format needs its own extraction path. | Limit to: PDF, DOCX (existing), PPTX, XLSX, TXT, images (new). Display "unsupported format" with suggestion for covered formats. |
-| Full Excel formula / computation execution | Some Excel SOPs have computed fields. Executing macros or formulas on uploaded files is a security risk. | Extract cell values (not formulas); ignore any formula logic; flag to admin if computed values appear to be present |
-
----
-
-### Sub-Pathway 2C: Improved AI Parsing Accuracy
-
-This is an infrastructure improvement, not a user-facing feature. Its effects surface as fewer flagged sections, fewer admin corrections, and higher admin trust in parsed output.
-
-#### What "Improved" Means in Practice
-
-| Area | Current State (inferred) | Target | Approach |
-|------|--------------------------|--------|----------|
-| Section detection | Relies on header text matching | Semantic detection even when headers are absent or non-standard | Few-shot examples with non-standard layouts in structuring prompt |
-| Formatting fidelity | Tables may collapse to text; lists may not be detected | Tables render as tables; nested lists preserve hierarchy | Markdown-preserving extraction pipeline; post-processing pass |
-| Industrial terminology accuracy | General parsing model has no SOP domain knowledge | Improved through system prompt specificity and domain-specific few-shot examples | Prompt engineering; optionally fine-tuned system prompts per tenant configuration |
-| Confidence scoring accuracy | Single confidence score per section | Per-sentence or per-item confidence; better calibrated | Use model logprob data for confidence estimation where available |
-
----
-
-### Feature Dependencies (Pathway 2)
-
-```
-[Photo Upload]
-    └──requires──> [Client-Side Quality Check]
-    └──requires──> [Server-Side Preprocessing (deskew, contrast)]
-                       └──requires──> [OCR Model (Vision LLM or Document AI API)]
-                                          └──requires──> [SOP Structuring Pipeline (existing)]
-                                                             └──requires──> [Admin Review UI (existing)]
-
-[PPTX / XLSX Upload]
-    └──requires──> [Format-Specific Extraction Library]
-                       └──requires──> [Text + Table Extraction]
-                                          └──requires──> [SOP Structuring Pipeline (existing)]
-
-[Plain Text Upload]
-    └──requires──> [SOP Structuring Pipeline (existing)]
-    (No intermediate extraction step needed)
-
-[Improved Accuracy]
-    └──requires──> [Prompt Engineering / System Prompt Revision]
-    └──enhances──> [All intake pathways] (not a separate pipeline; improvement applied uniformly)
-```
-
----
-
-## Pathway 3: File → Video SOP
-
-### What It Is
-
-Take an existing parsed SOP (or a document uploaded for parsing) and generate a video version. Three output formats:
-
-1. **Narrated slideshow** — Auto-generated slides/cards from SOP sections with AI voiceover (TTS)
-2. **Full AI video** — Generated visuals/animations with narration (AI avatar or visual synthesis)
-3. **Screen recording style** — Scrolling SOP content with AI voice overlay
-
-All outputs include searchable timestamps and chapter markers linked to SOP sections.
-
-### Competitive Landscape
-
-This is the most competitive and technically complex pathway. Synthesia dominates enterprise AI training video (avatar-based narration, 240+ avatars, 130 languages, built-in SOP templates). HeyGen competes at similar level. Docustream.ai specifically targets SOP-to-video. These tools cost $50-300/month as standalone products. The differentiation for SafeStart is native integration — generating video from an already-structured SOP in the same platform, output immediately accessible to workers in the same app, with timestamps and chapter navigation linked to the SOP structure. No competitor offers the full integrated loop of intake → structure → deliver as text + video in one product.
-
----
-
-### Table Stakes (Pathway 3 — All Formats)
-
-Features expected regardless of which output format is chosen.
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Chapter markers per SOP section | Users of video learning content in 2025 expect chapter navigation (YouTube has normalized this). Jumping to "PPE Requirements" directly is essential for safety reference use. Tools like Mux and FastPix support AI-generated chapters. | MEDIUM | Map each SOP section (hazards, PPE, steps, emergency) to a chapter; embed chapter markers in video metadata and player UI |
-| Timestamps linked to SOP steps | Workers need to navigate to step 7 in a 15-minute video without scrubbing. Step-level timestamps let them jump directly. This is standard in Docustream.ai and ScreenApp. | MEDIUM | Generate timestamp map during video creation; store in SOP record; render as navigation overlay in video player |
-| Preview before publishing | Admins must be able to watch the generated video before it becomes visible to workers. Quality control is mandatory — a TTS voice mispronouncing a chemical name is a safety issue. | LOW | Video preview in admin review screen; "Re-generate" and "Publish" buttons |
-| AI voice narration (TTS) | All three output formats require narration. ElevenLabs, Google Cloud TTS, and Murf are the standard options in 2025. Quality is now high enough for professional training use. | MEDIUM | Use a clear, neutral professional voice (not conversational). Allow admin to choose from a small set of voice options. ElevenLabs recommended for naturalness; Google Cloud TTS for cost at scale. |
-| Worker access to generated video in existing SOP view | The video is supplementary to the text SOP, not a replacement. Workers should be able to tap a "Video version" button within the existing SOP walkthrough screen. | LOW | Attach video URL to SOP record; render optional video player above or alongside the step-by-step walkthrough |
-| Generation time feedback | Full AI video generation takes 2-10 minutes for a typical SOP. Async with named stages (analyzing → generating visuals → adding narration → finalizing) is the minimum viable feedback. | MEDIUM | Same async progress pattern as transcription pipeline; email or in-app notification on completion |
-
----
-
-### Format-Specific Table Stakes
-
-#### Format A: Narrated Slideshow
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| One slide/card per SOP section or major step | Slide deck structure maps naturally to SOP sections. Users expect a clean, PowerPoint-like output with minimal text per slide. | MEDIUM | Auto-generate slide content from section summaries, not raw step text; limit to 3-4 bullet points per slide |
-| SOP title card and safety warning card first | Industrial safety slides must lead with hazards/PPE before steps — not with title + company logo. | LOW | Enforce slide order: Title → Hazards/PPE card → Steps → Emergency. Non-negotiable for safety. |
-| Text legibility standards | Workers may view on phones (small screen) or projection in a meeting room. Text must be readable at both scales. | LOW | Minimum 18pt equivalent font size; high contrast; max 40 words per slide |
-
-#### Format B: Full AI Video
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| AI avatar or animated visuals synchronized to narration | This is what Synthesia/HeyGen provides. Users expect lip-sync or at minimum visuals that match the topic being narrated. | HIGH | Use an AI avatar API (Synthesia, HeyGen, or D-ID). This pathway has significant external API cost per generation. Budget per SOP video must be considered. |
-| Organization branding (logo, color) | Enterprise customers expect branded outputs. Synthesia makes this a paid feature. | MEDIUM | Simple brand overlay: org logo top-right, org color scheme applied to title/chapter cards |
-
-**IMPORTANT: Full AI video generation (Format B) has the highest unit cost and complexity. This format should be P2 — ship Format A (narrated slideshow) and Format C (screen recording style) first, validate demand, then build Format B.**
-
-#### Format C: Screen Recording Style
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| SOP text scrolling at readable pace | The "screen recording style" format is essentially a teleprompter-on-screen with voiceover. Users expect the text scroll rate to match the narration pace. | MEDIUM | Sync scroll timing to TTS audio timing; pre-generate audio, calculate duration per text block, render scroll timing accordingly |
-| Section headers visible as text scrolls | Workers watching a 10-minute video need visual anchors. Chapter titles (PPE, Step 3, Emergency) must appear as the narration passes them. | LOW | Overlay section header text at calculated timestamps |
-| Playback speed control | Workers watching for reference (not first time) want 1.25x or 1.5x. This is standard browser video player behavior. | LOW | Use standard HTML5 video player controls; playback rate control is native. No custom implementation needed. |
-
----
-
-### Differentiators (Pathway 3)
-
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| Integrated SOP text + video in one experience | Competitors offer either the text SOP platform or the video generation tool, not both in one product. Workers see the text SOP, tap "Watch Video", and the video opens with chapters pre-linked to the sections they just navigated. | MEDIUM | This is an integration differentiator, not a feature to build per se — it comes from building Pathway 3 inside the existing app rather than as a separate tool. |
-| Safety-first slide ordering (hazards before steps, always) | General-purpose AI video tools (Synthesia, HeyGen) let users order slides however they want. For safety SOPs, hazards and PPE must come first. No general-purpose tool enforces this. | LOW | Hard-coded slide ordering rule in the generation pipeline. Not configurable. Safety before steps, always. |
-| Re-generation on SOP update | When an SOP is edited and a new version is published, the video becomes stale. Auto-detecting this and prompting the admin to regenerate the video (or auto-regenerating if budget allows) is a workflow feature no competitor offers in a SaaS SOP context. | MEDIUM | SOP versioning event triggers "video is outdated" flag on the video record; admin notification with "Regenerate" button |
-| Worker video completion tracking | If workers are assigned to watch the video SOP, their completion should be tracked alongside text walkthrough completions. No current tool connects video consumption to compliance records. | MEDIUM | Store video completion event (watched to 80%+ counts as complete) tied to worker/SOP/version record; surfaces in supervisor dashboard |
-
----
-
-### Anti-Features (Pathway 3)
-
-| Anti-Feature | Why Problematic | What to Do Instead |
-|--------------|-----------------|-------------------|
-| Full AI video (Format B) as launch priority | Format B requires an AI avatar API with per-generation cost ($0.10-0.50/minute of output) and complex orchestration. Shipping Format B before validating demand for Pathway 3 at all is high-cost, high-risk. | Ship Format A (narrated slideshow) and Format C (scroll + voice) first. Format B on validated demand. |
-| Video replacing text SOP for workers | Some workers need offline access; video requires connectivity. Some workers need to reference a specific step quickly; video is slower to navigate than text. | Video is always supplementary, never a replacement for the text SOP. Both always available when online. Offline = text only. |
-| Custom voice cloning | "Use our HSE Manager's voice" sounds appealing but introduces legal, ethical, and quality concerns. If the voice sounds wrong, it damages credibility of the safety content. | Use a library of pre-approved professional AI voices. Custom voice cloning as a v3 enterprise feature only, with legal review. |
-| Real-time generation preview | Streaming video generation frame-by-frame while processing is technically difficult and provides minimal value — admins will review the full output anyway. | Generate async, notify on completion, admin reviews finished video |
-| Interactive video branching ("if you are doing X, watch section Y") | Conditional branching in training video requires significant authoring UI (similar to Articulate Storyline). This is a different product category. | Linear video with chapter navigation is sufficient. Workers who need conditional guidance use the text walkthrough with its optional steps. |
-
----
-
-### Feature Dependencies (Pathway 3)
-
-```
-[Video SOP Generation]
-    └──requires──> [Parsed + Published SOP (existing)]
-                       └──requires──> [SOP Structuring Pipeline (existing)]
-
-[All Formats]
-    └──requires──> [TTS Service (ElevenLabs / Google Cloud TTS)]
-    └──requires──> [Video Rendering Service]
-    └──requires──> [Async Processing Queue]
-    └──requires──> [Video Storage + CDN (e.g. Cloudflare R2 + Stream, Mux, or Bunny.net)]
-    └──requires──> [Admin Preview UI]
-    └──requires──> [Worker Video Player UI]
-
-[Format A: Narrated Slideshow]
-    └──requires──> [Slide Generation from SOP Sections]
-    └──requires──> [TTS Audio per Slide]
-    └──requires──> [Slide-to-Video Compositor]
-
-[Format B: Full AI Video]
-    └──requires──> [AI Avatar API (Synthesia / HeyGen / D-ID)]
-    └──requires──> [Script Generation from SOP]
-    └──requires──> [High external API cost — budget required]
-
-[Format C: Screen Recording Style]
-    └──requires──> [Scroll Timing Calculator (text block duration from TTS)]
-    └──requires──> [Video Rendering (scrolling text + audio sync)]
-
-[Chapter Navigation]
-    └──requires──> [Timestamp Map per Section/Step]
-    └──requires──> [Video Player with Chapter Markers]
-    └──requires──> [Mux Player or equivalent with chapter API support]
-
-[Video Completion Tracking]
-    └──requires──> [Completion Tracking System (existing)]
-    └──requires──> [Video Player Progress Events]
-    └──enhances──> [Supervisor Dashboard (existing)]
-```
-
----
-
-## Cross-Pathway Feature Comparison
-
-| Feature Area | Pathway 1 (Video→SOP) | Pathway 2 (File→SOP) | Pathway 3 (File→Video) |
-|---|---|---|---|
-| Async processing queue | Required | Required | Required |
-| Admin review before publish | Required | Required (reuse existing) | Required (preview) |
-| Confidence scoring | Required (transcript quality) | Required (OCR/parse quality) | N/A (human script) |
-| Offline support | Text output cached offline (existing) | Text output cached offline (existing) | Video NOT available offline |
-| Complexity | MEDIUM-HIGH | LOW-MEDIUM | HIGH |
-| External API dependency | Transcription (Whisper/GPT-4o) | OCR (Vision LLM) | TTS + Video render |
-| Unique iOS constraint | MediaRecorder not supported on Safari (in-app recording only) | HEIC conversion needed | No significant iOS constraint |
-| Rollout order | P1 (file upload + URL), P2 (in-app recording) | P1 (photo OCR, plain text), P1 (PPTX/XLSX) | P1 (Format A+C), P2 (Format B) |
-
----
-
-## Overall MVP Recommendation for v2.0
-
-### Launch With (v2.0)
-
-Minimum viable scope that demonstrates all three pathways without the highest-cost/risk sub-features.
-
-- [ ] **P1: Video file upload (MP4/MOV) → SOP** — Core Pathway 1 entry point; async processing; transcript display; structured output via existing pipeline; admin review
-- [ ] **P1: YouTube/Vimeo URL → SOP** — Most common real-world video source; caption-first fast path; audio fallback
-- [ ] **P1: Photo/image upload → SOP** — Pathway 2A; camera capture + gallery; server-side preprocessing; quality warning before processing
-- [ ] **P1: PPTX/XLSX/TXT upload → SOP** — Pathway 2B; extend existing upload with new MIME type routing
-- [ ] **P1: Narrated slideshow (Format A)** — Pathway 3, lowest complexity format; TTS; chapter markers; admin preview
-- [ ] **P1: Screen recording style (Format C)** — Pathway 3, second-lowest complexity; scroll-sync to TTS audio; no external avatar API
-- [ ] **P1: Worker video access within SOP** — In-app video player on published SOP record; chapter navigation; completion tracking event
-
-### Defer to v2.1+
-
-- [ ] **P2: In-app camera recording → SOP** — iOS Safari blocker makes this Android/Chrome-only until Safari MediaRecorder support; defer until platform support improves or iOS-specific fallback is designed
-- [ ] **P2: Full AI video (Format B)** — High cost per generation; validate demand with Formats A and C first
-- [ ] **P2: Multi-page photo sequence** — Useful but complex; single-page photo is sufficient for v2.0
-- [ ] **P2: Re-generation on SOP update** — Nice-to-have; versioning + video tracking covers the gap for v2.0
-- [ ] **P2: Custom vocabulary for transcription** — Improves accuracy; implement after first real-world usage reveals which terms are most commonly misheard
-
----
+### Dependency Notes
+
+- **Training matrix requires access grants + completions:** both halves already exist (Phases 32-33 and 4/23) — this is why PROJECT.md calls the matrix "nearly free." No new source-of-truth capture needed for the base grid, only new read/aggregation logic.
+- **Competency states require the training matrix to exist first:** states are meaningless without the required-SOPs × person context to hang them on — build the matrix's join logic before adding the state column.
+- **Supervisor observations require competency states:** an observation's purpose is to move a person's state forward (e.g. supervised → competent-signed-off) — building observations before states exist gives you data with nowhere to attach.
+- **Assessor governance requires department/role infrastructure (Phase 25 + G-04):** "is this supervisor qualified to assess" is a role/competency question about the supervisor themselves — reuses the same competency-state mechanism recursively rather than a parallel certification system.
+- **CSV export enhances (doesn't require) every other feature:** export can ship as soon as the matrix + states exist; observations and version-flagging make the export richer but aren't blocking.
+- **Competency states conflicts with worker-facing access gating:** this is a deliberate architectural boundary, not a technical dependency — flagging it here so no future phase accidentally wires competency status into the walkthrough/read access checks.
+
+## MVP Definition
+
+Given this is a milestone within an existing product (not a greenfield v1), "MVP" = smallest slice that gives an org one honest audit answer; "later" = enrichment once the shape is validated.
+
+### Launch With (v7.0 core slice)
+
+- [ ] Training matrix (people × required-SOPs × status grid, per-dept/per-worker cuts) — the single artifact every stakeholder (auditor, ACC reviewer, site manager) asks for; everything else is enrichment on top of it
+- [ ] Competency states (3-4 states, not started/read/supervised/competent) — makes the matrix's status column meaningful beyond raw "completed"
+- [ ] Supervisor observation records — the tamper-evident, non-shareable evidence layer that directly fixes Visy's #1 named pain point (fraudulent/shared sign-offs)
+- [ ] Per-worker training record view + CSV export — Phase 31 rollforward, near-free once the matrix exists, is the concrete (low-risk) answer to the SuccessFactors ask
+- [ ] Trained-on-outdated-version surfacing — cheap derived flag, closes an audit gap now visible because version supersede already exists
+
+### Add After Validation (rest of v7.0)
+
+- [ ] Assessor capability governance (trainer must be signed off) — needs the states/observations mechanism proven first, and touches role infrastructure (G-04) that's still backlog
+- [ ] Refresher/recertification cadence + due-date surfacing — reuse Phase 28's governance-queue pattern once it's clear which SOPs actually need risk-tiered refresh (don't guess tiers before real data exists)
+- [ ] AI-prioritized maintenance schedule — Phase 30 rollforward, depends on staleness/usage/flag signals accumulating post-launch
+- [ ] AI-reviewer completeness rubric (999.4), document codes + register export (999.5), risk/priority triage (999.6) — guidance-notes adoptions that make individual SOPs better training modules; valuable but orthogonal to the matrix/states/observations spine, can land in any order after it
+
+### Future Consideration (post-v7.0)
+
+- [ ] Live SuccessFactors/HRIS API integration — defer until a real customer (Visy or similar) is signed and the CSV export has proven the field mapping is actually right
+- [ ] Formal quiz/assessment engine — only reconsider if supervisor-observation evidence proves insufficient for a specific regulator/auditor pushback; default answer is no
+
+## Feature Prioritization Matrix
+
+| Feature | User Value | Implementation Cost | Priority |
+|---------|------------|---------------------|----------|
+| Training matrix | HIGH | MEDIUM | P1 |
+| Competency states (3-4) | HIGH | MEDIUM | P1 |
+| Supervisor observation records | HIGH | MEDIUM | P1 |
+| Per-worker training record + CSV export | HIGH | LOW | P1 |
+| Trained-on-outdated-version flag | MEDIUM | LOW | P1 |
+| Assessor capability governance | MEDIUM | MEDIUM | P2 |
+| Refresher/recertification cadence | MEDIUM | LOW-MEDIUM | P2 |
+| AI-prioritized maintenance schedule | MEDIUM | MEDIUM | P2 |
+| AI-reviewer completeness rubric (999.4) | MEDIUM | LOW | P2 |
+| Document codes + register export (999.5) | LOW-MEDIUM | LOW-MEDIUM | P3 |
+| Risk/priority triage rating (999.6) | LOW-MEDIUM | LOW-MEDIUM | P3 |
+| Live HRIS API integration | MEDIUM (one customer) | HIGH | P3 (deferred) |
+| Formal quiz engine | LOW | MEDIUM | Not planned |
+
+**Priority key:**
+- P1: Must have for v7.0 — the matrix/states/observations spine + its export
+- P2: Should have, add once spine is proven — governance/cadence/AI enrichment
+- P3: Nice to have, likely later phases (999.x backlog) or explicitly deferred (HRIS API)
+
+## Competitor Feature Analysis
+
+Direct competitors in this exact niche (SOP-execution PWA + competency layer, AU/NZ industrial) are not publicly documented in detail; comparison instead draws on the adjacent categories orgs like Visy would otherwise buy from.
+
+| Feature | Generic competency-matrix SaaS (AG5-style) | Enterprise LMS (SuccessFactors Learning) | SafeStart's approach |
+|---------|---------------------------------------------|-------------------------------------------|------------------------|
+| "Who needs what" data | Manually entered/maintained matrix | Manually assigned learning plans | Derived from existing access grants — zero double-entry |
+| Evidence of competence | Often just a completion tick or manual matrix cell edit | Formal assessment/quiz completion status (pass/fail) | Supervisor observation record — tamper-evident, no shared-login exposure |
+| Evidence of currency | Manual expiry tracking, often spreadsheet-driven | Certification expiry rules, recert workflows | Reuses existing governance-queue due/overdue pattern (Phase 28), applied per-worker-per-SOP |
+| Worker-facing friction | Varies; many gate task assignment on matrix status | Learning plans/assignments can block access to work systems | Explicitly never gates worker read/walkthrough access — locked north star |
+| Export/integration | Often exports to Excel; some have HRIS connectors | Native import/export via Learning History Connector (flat file: employee ID, item ID, completion date, status, score) | CSV shaped to match the SuccessFactors import format as a de facto integration, without building the live API |
+| SOP-to-competency linkage | None — matrix is a separate system from the procedure content | Loose — courses reference content, not living procedures | Tight — the SOP IS the training content, walkthrough completion IS the training event |
 
 ## Sources
 
-- [ScreenApp — How to Automatically Create an SOP from a Video (Ultimate Guide 2025)](https://screenapp.io/blog/how-to-create-sop-from-video-ai)
-- [Docsie — Loom Video to SOP Converter 2026](https://www.docsie.io/blog/articles/loom-video-to-sop-converter-2026/)
-- [Trupeer AI — How to Create Effective Video SOPs](https://www.trupeer.ai/blog/how-to-create-effective-video-sops)
-- [Synthesia — How to Create Effective Video SOPs](https://www.synthesia.io/post/video-sop)
-- [Docustream.ai — Convert SOPs Into Training Videos](https://docustream.ai/sop-to-video/)
-- [HeyGen — AI Video Generator / SOP Video Generator](https://www.heygen.com/video/sop-video-generator)
-- [Mux — AI-Generated Chapters for Your Videos](https://www.mux.com/blog/ai-generated-chapters-for-your-videos-with-mux-player)
-- [FastPix — AI-Generated Chapters Developer's Guide](https://www.fastpix.io/blog/ai-generated-chapters-for-your-videos-a-developers-guide)
-- [Progressier — Video Recording PWA Demo](https://progressier.com/pwa-capabilities/video-recording)
-- [SimiCart — How to Access the Camera in a PWA (2025)](https://simicart.com/blog/pwa-camera-access/)
-- [Vimeo Developer API — Transcript Metadata Reference](https://developer.vimeo.com/api/reference/response/transcript-metadata)
-- [OpenAI — Speech to Text API Guide](https://developers.openai.com/api/docs/guides/speech-to-text)
-- [OpenAI Whisper Review 2026 — Accuracy Benchmarks](https://diyai.io/ai-tools/speech-to-text/reviews/openai-whisper-review/)
-- [Scanbot — How Image Pre-Processing Enhances OCR Accuracy](https://scanbot.io/blog/improve-ocr-accuracy-with-image-processing/)
-- [Docparser — Improve OCR Accuracy with Advanced Image Preprocessing](https://docparser.com/blog/improve-ocr-accuracy/)
-- [v7labs — Document Processing Platform Guide: AI, OCR & IDP Solutions 2025](https://www.v7labs.com/blog/document-processing-platform)
-- [Microsoft Learn — Azure AI Document Intelligence Structured Content](https://learn.microsoft.com/en-us/azure/ai-services/content-understanding/document/elements)
-- [Flowith — HeyGen 5.0 vs Synthesia 2.0: Which AI Avatar Platform for Enterprise Training?](https://flowith.io/blog/heygen-5-0-vs-synthesia-enterprise-training-videos/)
-- [AWS Blog — Accelerate Video Q&A Workflows Using Amazon Bedrock and Amazon Transcribe](https://aws.amazon.com/blogs/machine-learning/accelerate-video-qa-workflows-using-amazon-bedrock-knowledge-bases-amazon-transcribe-and-thoughtful-ux-design/)
-- [Lollypop Design — Boost SaaS UX with Smarter Progress Indicators (2025)](https://lollypop.design/blog/2025/november/progress-indicator-design/)
-- [3Play Media — File Size and Duration Limits](https://support.3playmedia.com/hc/en-us/articles/227730188-File-Size-and-Duration-Limits)
-- [OpenAI Community — GPT-4o Transcribe Audio Length Limits](https://community.openai.com/t/gpt-4o-transcribe-audio-length-limits/1148374)
+- ACC Workplace Safety Management Practices (WSMP) audit-guideline pattern — evidence-layer structure (completion/competence/currency) cross-referenced via [Employee Training Records NZ: Template + Simple System](https://tribalhabits.com/employee-training-records-nz/) and [Health & Safety Training Software NZ: What to Track](https://tribalhabits.com/health-safety-training-software-nz/) (NZ-focused vendor guidance, MEDIUM confidence — not the raw ACC PDF, which was unreadable/garbled on fetch)
+- [What Regulators Expect From Your Training Records](https://tribalhabits.com/what-regulators-expect/) — evidence fields, refresher cadence examples (LOW-MEDIUM confidence; article is AU-regulator-weighted with only light NZ coverage)
+- [WorkSafe NZ — Registers](https://www.worksafe.govt.nz/tools-registers-resources/registers/) and hazardous-substances record-keeping duty (training record retention/inspector access) — official source, HIGH confidence for the general duty, not fully detailed for competency specifics
+- SAP SuccessFactors Learning — [Adding Course Completion Status](https://help.sap.com/docs/SAP_SUCCESSFACTORS_LEARNING/5fae31b1299d4033b665edabea7b9087/5921a6b0bf194d9893a15e6a76306b09.html) and Learning History Connector support-KB references (pass/fail/incomplete completion-status model, employee/item/date/status/score import shape) — MEDIUM confidence, official SAP docs but full connector field list not directly readable during this research pass
+- General manufacturing competency-matrix practice — [AG5: What is Competency Management?](https://www.ag5.com/competency-management/), [SC Training: Competency Matrices](https://training.safetyculture.com/blog/competency-matrices/), [Azumuta: Skills Matrix & Training](https://www.azumuta.com/blog/the-ultimate-guide-to-skills-matrix-and-training/) — LOW-MEDIUM confidence, generic (non-NZ) manufacturing pattern, used only for state-model and matrix-usage conventions, not for regulatory claims
+- Primary source: `.planning/research/customer-interviews/2026-05-05-visy-findings.md` — Visy Packaging (~100 AU/NZ industrial sites), HIGH confidence, direct customer signal on training-record ask, fraudulent sign-off pain, SuccessFactors integration target, literacy/UX constraints
+- Project source: `.planning/PROJECT.md` (v7.0 milestone scope, locked north star and anti-goals), `.planning/ROADMAP.md` (Phase 999.4-999.7 guidance-notes adoption specs), `.planning/todos/pending/2026-07-19-phase-seed-competency-layer.md` (phase-seed problem/solution framing)
 
 ---
-
-*Feature research for: SOP Creation Pathways v2.0 — Video → SOP, File → SOP (expanded), File → Video SOP*
-*Researched: 2026-03-29*
+*Feature research for: Competency & Training Layer (SafeStart v7.0)*
+*Researched: 2026-07-19*

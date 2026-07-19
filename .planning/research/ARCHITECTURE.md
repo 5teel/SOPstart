@@ -1,639 +1,231 @@
-# Architecture Research
+# Architecture Research — v7.0 Competency & Training Layer
 
-**Domain:** Multi-tenant SaaS PWA — SOP management with video transcription, expanded file parsing, and AI video generation
-**Researched:** 2026-03-29
-**Confidence:** HIGH (core integration patterns verified via official docs and live service documentation)
+**Domain:** Integration of a competency/training layer into an existing multi-tenant Next.js + Supabase SOP platform
+**Researched:** 2026-07-19
+**Confidence:** HIGH (all findings verified directly against live source files, not training-data assumption)
 
----
+This is an integration-architecture doc, not greenfield domain research. Every recommendation below is anchored to a specific existing file, table, or pattern already in this codebase — the mandate is "extend the established shapes," not invent new ones. (Supersedes the stale 2026-03-29 v2.0 video-pathways version of this file, which no longer reflects the shipped architecture.)
 
-## What This Document Covers
-
-This is a milestone-scoped update to the original architecture research (2026-03-23). It answers the specific integration question for v2.0: **how do three new SOP creation pathways slot into the existing Next.js 16 + Supabase + Vercel architecture without requiring a rewrite?**
-
-The original architecture document covers the base system (multi-tenant auth, RLS, offline-first data layer, async parsing pipeline). This document extends it with new components only.
-
----
-
-## Existing Architecture Anchor Points
-
-These are the elements of the current system that new features must integrate with cleanly:
-
-| Component | Current Role | Extension Point for v2.0 |
-|-----------|-------------|--------------------------|
-| `parse_jobs` table | Tracks doc → SOP jobs (queued/processing/completed/failed) | Extend with `input_type` column to support video, image, xlsx, pptx, txt |
-| `POST /api/sops/parse` route | Orchestrates mammoth/unpdf → GPT-4o → DB write | Extract into shared pipeline; per-input-type branches |
-| `src/lib/parsers/` | `extract-docx.ts`, `extract-pdf.ts`, `ocr-fallback.ts`, `gpt-parser.ts`, `image-uploader.ts` | Add new extractors alongside existing ones |
-| `createUploadSession` server action | Creates SOP + parse_job + presigned Supabase Storage URL | Extend with video upload path (TUS resumable instead of signed URL) |
-| Supabase Storage | `sop-documents` bucket for original files | Add `sop-videos` bucket (raw input), `sop-generated-videos` bucket (output) |
-| Supabase Realtime | `parse_jobs` subscribed for live status in admin UI | Reuse as-is for new job types — same status FSM |
-| GPT-4o structured output (`gpt-parser.ts`) | Text → `ParsedSopSchema` via `zodResponseFormat` | Second pass: transcript text → same schema; reuse unchanged |
-
----
-
-## Vercel Constraint Reality Check
-
-Understanding Vercel's limits is the foundation of every architectural decision here.
-
-| Constraint | Limit | Impact on v2.0 |
-|-----------|-------|----------------|
-| Request body size | **4.5 MB hard limit** | Video files cannot pass through a Vercel Function. Must bypass entirely via client-to-storage direct upload. |
-| Function bundle size | 250 MB (uncompressed) | FFmpeg binary (~50 MB) is feasible, but `@remotion` requires Chromium (~120 MB+) — too large. Chromium-based video render is NOT viable on Vercel Functions. |
-| Max duration (Pro, no Fluid Compute) | **300 s (5 min)** | Audio extraction + Whisper transcription for a 15-min video could exceed this. Must use the existing `maxDuration = 300` pattern with care, or use durable jobs via Inngest. |
-| Max duration (Pro, with Fluid Compute) | **800 s (13 min)** | More headroom. Large transcription jobs still borderline — durable jobs remain safer. |
-| ffmpeg-static on Vercel | ~50 MB binary, feasible but risky on bundle size | Audio extraction from video for Whisper: use `ffmpeg-static` in a Node.js Route Handler with `outputFileTracingIncludes` to bundle the binary. Tested pattern, not trivial. |
-
-**Decision forced by constraints:** Video files must be uploaded by the client directly to Supabase Storage using TUS resumable upload. Processing happens entirely server-side in a long-running Route Handler or durable job function — never in the upload request path.
-
----
-
-## Standard Architecture (Updated for v2.0)
-
-### System Overview
+## System Overview — where the new layer sits
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│                        CLIENT LAYER (PWA)                            │
-├──────────────────────────────────────────────────────────────────────┤
-│  ┌────────────────────────────────────────────────────────────────┐  │
-│  │                    SOP Admin UI                                 │  │
-│  │                                                                 │  │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌────────────────────┐    │  │
-│  │  │ File → SOP   │  │ Video → SOP  │  │ File → Video SOP   │    │  │
-│  │  │ (expanded)   │  │ (NEW)        │  │ (NEW)              │    │  │
-│  │  │              │  │              │  │                    │    │  │
-│  │  │ - docx/pdf   │  │ - upload MP4 │  │ - select input SOP │    │  │
-│  │  │ - image/OCR  │  │ - YouTube URL│  │ - choose format    │    │  │
-│  │  │ - xlsx/pptx  │  │ - record in  │  │ - narrated slides  │    │  │
-│  │  │ - plain text │  │   browser    │  │ - screen recording │    │  │
-│  │  └──────┬───────┘  └──────┬───────┘  └─────────┬──────────┘    │  │
-│  │         │                 │                     │               │  │
-│  │  ┌──────▼─────────────────▼─────────────────────▼────────────┐  │  │
-│  │  │  Upload Orchestrator (client-side)                         │  │  │
-│  │  │  - Small files (<50 MB): existing signed URL flow          │  │  │
-│  │  │  - Video files: TUS resumable upload (tus-js-client)       │  │  │
-│  │  │  - YouTube/Vimeo URL: POST to API with URL only            │  │  │
-│  │  │  - In-app recording: MediaRecorder → blob → TUS upload     │  │  │
-│  │  └───────────────────────────┬────────────────────────────────┘  │  │
-│  └─────────────────────────────┬┘                                   │  │
-└────────────────────────────────┬────────────────────────────────────┘
-                                 │
-            ┌────────────────────┴────────────────────┐
-            │ TUS Resumable (large video)              │ HTTPS API (all others)
-            ▼                                          ▼
-┌───────────────────────┐       ┌────────────────────────────────────────┐
-│  Supabase Storage     │       │            API LAYER (Next.js)          │
-│                       │       ├────────────────────────────────────────┤
-│  sop-documents        │       │  /api/sops/parse (existing, extended)   │
-│  sop-videos (NEW)     │       │  /api/sops/transcribe (NEW)             │
-│  sop-generated-videos │       │  /api/sops/generate-video (NEW)         │
-│    (NEW)              │       │  /api/sops/youtube (NEW)                │
-└──────────┬────────────┘       └────────────────┬───────────────────────┘
-           │                                      │
-           └─────────────────┬────────────────────┘
-                             │
-┌────────────────────────────▼───────────────────────────────────────────┐
-│                    ASYNC PROCESSING LAYER                               │
-├────────────────────────────────────────────────────────────────────────┤
-│                                                                         │
-│  parse_jobs table (extended — same FSM, new input_type values)          │
-│                                                                         │
-│  ┌─────────────────────────┐   ┌────────────────────────────────────┐  │
-│  │  Document Parsers       │   │  Video Processing Pipeline (NEW)   │  │
-│  │  (existing)             │   │                                    │  │
-│  │  - extract-docx.ts      │   │  Step 1: fetch/download from       │  │
-│  │  - extract-pdf.ts       │   │    Storage or YouTube URL          │  │
-│  │  - ocr-fallback.ts      │   │  Step 2: extract audio             │  │
-│  │  (new)                  │   │    (ffmpeg-static, server-side)    │  │
-│  │  - extract-image.ts     │   │  Step 3: transcribe audio          │  │
-│  │  - extract-xlsx.ts      │   │    (OpenAI gpt-4o-transcribe)      │  │
-│  │  - extract-pptx.ts      │   │  Step 4: structure transcript      │  │
-│  │  - extract-txt.ts       │   │    (GPT-4o structured output)      │  │
-│  └───────────┬─────────────┘   └────────────────┬───────────────────┘  │
-│              │                                   │                      │
-│              └──────────────┬────────────────────┘                      │
-│                             │                                           │
-│  ┌──────────────────────────▼──────────────────────────────────────┐   │
-│  │          gpt-parser.ts (unchanged) — text → ParsedSopSchema     │   │
-│  └──────────────────────────┬──────────────────────────────────────┘   │
-│                             │                                           │
-│  ┌──────────────────────────▼──────────────────────────────────────┐   │
-│  │       Video Generation Pipeline (NEW — Pathway 3)               │   │
-│  │  Input: published SOP (existing structured data)                │   │
-│  │  Step 1: ElevenLabs TTS — generate narration audio per section  │   │
-│  │  Step 2a (narrated slides): Remotion Lambda render              │   │
-│  │  Step 2b (screen recording): Remotion Lambda render             │   │
-│  │  Step 2c (full AI video): Runway/Luma API (external)            │   │
-│  │  Step 3: store MP4 in sop-generated-videos bucket               │   │
-│  └─────────────────────────────────────────────────────────────────┘   │
-│                                                                         │
-└────────────────────────────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────────────────┐
+│  REQUIREMENTS SIDE (who must know what)         EVIDENCE SIDE (what's proven) │
+│  ───────────────────────────────────────        ─────────────────────────── │
+│  access_grants (Phase 32/33)                     sop_completions (D-17)      │
+│    → materializeSopAccess()                      completion_sign_offs       │
+│    → sop_departments (junction)                  sop_completion_signatures  │
+│    → sop_access_people (junction)                  ▲                        │
+│  member_departments (Phase 25)                     │ NEW                    │
+│         │                                          │ sop_observations       │
+│         ▼                                          │ (supervisor-initiated) │
+│  ┌──────────────────────────────────────────────────┴──────────────────┐   │
+│  │   NEW: classifyCompetencyState() — pure function, mirrors            │   │
+│  │   classifyGovernanceRow() (src/lib/governance/classify.ts)           │   │
+│  │   input: required(worker,sop) + latest completion + latest sign-off  │   │
+│  │          + latest observation + sop.version vs completion.sop_version│   │
+│  │   output: 'not_started' | 'read' | 'supervised' | 'competent'        │   │
+│  └──────────────────────────────────────────────────┬──────────────────┘   │
+│                                                       ▼                     │
+│         NEW: getTrainingMatrix() — bulk composed read (src/actions/training.ts) │
+│         mirrors listGovernanceQueue() shape exactly: N bulk queries in     │
+│         Promise.all → one .map() reduce → array of computed rows          │
+└───────────────────────────────────────────────────────────────────────────┘
+                                    │
+                    ┌───────────────┼────────────────────┐
+                    ▼               ▼                     ▼
+        /admin/team (3rd view    /admin/sops?view=      /activity
+        mode: Training matrix)   attention (rollup       (supervisors log
+                                  chip, SOP-level only)   observations,
+                                                          sign off completions)
 ```
 
----
+## Existing Pieces This Layer Reuses (do not rebuild)
 
-## New Components Required
-
-### Pathway 1 — Video → SOP
-
-#### New: `src/lib/parsers/extract-audio.ts`
-- Runs server-side in a Next.js Route Handler
-- Uses `ffmpeg-static` (Node.js binary, bundled via `outputFileTracingIncludes`)
-- Reads video file from Supabase Storage, streams audio out as MP3
-- Must handle: MP4, MOV, WEBM input formats
-- Output: MP3 buffer or temp file path for Whisper
-- Confidence: MEDIUM — `ffmpeg-static` on Vercel is documented but bundle-sensitive; test early
-
-#### New: `src/lib/parsers/transcribe-audio.ts`
-- Calls `openai.audio.transcriptions.create` with model `gpt-4o-transcribe`
-- 25 MB file limit on OpenAI API; videos up to ~45 minutes at typical speech bitrate before file splitting is needed
-- Returns raw transcript text + timestamps (VTT format optional)
-- Feed transcript text into existing `gpt-parser.ts` unchanged — same `ParsedSopSchema` output
-- Confidence: HIGH — official OpenAI SDK, well-documented
-
-#### New: `src/lib/parsers/fetch-youtube-transcript.ts`
-- For YouTube URLs: use `youtube-transcript` npm package (fetches existing auto-captions, no video download needed)
-- Falls back to: download audio via `ytdl-core`, then transcribe via Whisper (requires ffmpeg for format conversion)
-- For Vimeo URLs: no caption API — must download audio stream and transcribe
-- Legal note: only use for the customer's own content — state in UI
-- Confidence: MEDIUM — `youtube-transcript` works when captions exist; `ytdl-core` is a grey-area dependency that breaks when YouTube updates
-
-#### New: `src/app/api/sops/transcribe/route.ts`
-- Orchestrates the video transcription pipeline
-- `export const maxDuration = 300` (existing pattern)
-- For very long videos (>15 min), split audio into chunks before Whisper API call (25 MB limit)
-- Parallelize chunk transcription with `Promise.all`
-
-#### Modified: `createUploadSession` server action
-- Add branch: if `input_type === 'video'`, return TUS endpoint URL + auth token instead of presigned URL
-- TUS upload goes directly from client to Supabase Storage (bypasses Vercel's 4.5 MB limit)
-
-#### New: Client upload component for video
-- `src/components/admin/VideoUploader.tsx`
-- Uses `tus-js-client` for chunked resumable upload
-- Progress bar (bytes uploaded / bytes total)
-- Shows recording UI trigger if user selects "record in browser"
-
-#### New: `src/components/admin/VideoRecorder.tsx`
-- Uses `MediaRecorder` API with `getUserMedia({ video: true, audio: true })`
-- Records to WEBM blob chunks, accumulates, triggers TUS upload on stop
-- iOS Safari caveat: MediaRecorder for video works on iOS 15.1+, but long recordings (>1 min) may cause page reload — cap in-app recording at 5 minutes, show warning
-- Confidence: MEDIUM — iOS Safari video recording is documented as unstable for long durations
+| Piece | File | What it gives the competency layer |
+|-------|------|-------------------------------------|
+| Materialized access junctions | `src/actions/grants.ts` → `sop_departments`, `sop_access_people` | The "requirements side" — who must know each SOP. Already resolves org/area/department/role/person tiers + SOP-target overrides. Read-only for this layer; never re-resolve `resolveEffectiveAccess` per worker at matrix time. |
+| Member→department roster | `member_departments` (00035) | Joins a `worker_id` to the department set used to test matrix membership. |
+| Completion evidence | `src/actions/completions.ts` → `sop_completions`, `completion_photos` | `submitted_at`, `sop_version`, `status`, `worker_id`/`roster_worker_id` — the primary "did this person do the walkthrough" signal. |
+| Sign-off chain | `completion_sign_offs` (D-17, append-only) | Supervisor approve/reject decision per completion — feeds the "competent-signed-off" state. |
+| Legal signature | `sop_completion_signatures` (00038, append-only) | Worker + supervisor signature rows — precedent for how `sop_observations` should be shaped (append-only, service-role insert, `reviewed_by = auth.uid()`-style check). |
+| Cadence + due-date math | `src/lib/governance/cadences.ts` → `resolveCadenceMonths()`, `computeReviewDueDate()` | Pure functions already computing "due date = anchor date + N months by category, org-configurable, with a default fallback." Reuse verbatim for refresher due-dates — different anchor date, same function. |
+| Governance composed-read pattern | `src/actions/governance.ts` → `listGovernanceQueue()` | The exact shape to copy for `getTrainingMatrix()`: bulk reads via `Promise.all`, then a single `.map()` through a pure classifier (`classifyGovernanceRow`). No caching, no stored "queue" table — computed live on every page load, same choice Phase 30 already made for governance. |
+| Governance queue host page | `src/app/(protected)/admin/sops/page.tsx` (`?view=attention`) | SOP-level rollup surface — extend with a `refresher_due` aggregate chip, do not duplicate the person-level matrix here. Note: `/admin/governance` itself is now only a redirect shim (Phase 30 folded it into `/admin/sops`). |
+| Team/org page | `src/app/(protected)/admin/team/page.tsx` + `TeamViewShell` | Already has a client-side view-mode toggle (⊞ Chart / ▤ Columns). Natural third mode for the training matrix — reuse the toggle component, don't build a new page shell. |
+| AI adapter + agent metadata | `src/lib/ai/`, `src/lib/agent-layer/synthesis.ts` | Provider-agnostic model calls, already org-scoped. Reuse for the AI maintenance schedule and the completeness rubric — do not add a second AI client. |
+| AI reviewer jobs | `src/lib/parsers/ai-reviewer/` (Phase 21) | Existing job orchestrator (5 jobs today) — completeness rubric is a 6th job, not a new subsystem. |
+| Cron pattern | `src/app/api/agent-layer/synthesis-sweep/route.ts` + `src/lib/supabase/middleware.ts` (`isCronRoute`) | Bearer-secret auth + middleware exemption — copy exactly for any new sweep endpoint; **must** add the new route to the middleware exemption list or it 307-redirects to `/login` (2026-07-05 learning, already bit this codebase once). |
+| Admin auth guard | `src/lib/auth/guards.ts` → `requireAdminContext()` | Every new server action in this layer uses this, not a hand-rolled role check. |
+| Service-role org self-enforcement | Pattern used identically in `grants.ts`, `governance.ts`, `departments.ts` | Every new write (`sop_observations` insert, cadence upsert) goes through `createAdminClient()` only where the table has no authenticated write policy, and self-enforces `organisation_id` from `getSessionContext()`, never from client input — the CLAUDE.md 2026-06-15/2026-06-26/2026-07-05 cross-tenant class of bug. |
 
 ---
 
-### Pathway 2 — File → SOP (Expanded)
+## 1. Data Model
 
-#### New: `src/lib/parsers/extract-image.ts`
-- For uploaded images (JPG, PNG, HEIC, WEBP)
-- Use GPT-4o vision (`openai.chat.completions.create` with image URL in message content) — superior to tesseract.js for structured industrial documents
-- Tesseract.js already installed (Phase 2) — retain as fallback for large-batch cases where cost matters
-- GPT-4o vision cost: ~$0.002–0.005 per image at typical SOP photo sizes — acceptable for admin upload flow
-- Confidence: HIGH — GPT-4o vision for OCR is well-documented and outperforms Tesseract on complex layouts
+### 1.1 Competency state — DERIVED, not stored
 
-#### New: `src/lib/parsers/extract-xlsx.ts`
-- Use `xlsx` (SheetJS) — best-in-class, TypeScript-native, handles `.xlsx` and `.xls`
-- Convert each sheet to JSON rows, then feed text summary to `gpt-parser.ts`
-- Tables/checklists in spreadsheets map well to SOP step structures
-- Confidence: HIGH — SheetJS is the standard, well-maintained, official npm package
+**Decision: no `competency_states` table.** Compute state at read time via a pure function, mirroring `classifyGovernanceRow`.
 
-#### New: `src/lib/parsers/extract-pptx.ts`
-- Use `officeparser` — v6.0.0 (released late 2025) added AST output with slide text, notes, embedded images
-- Extracts speaker notes (often contain step-by-step instructions), slide text, and image references
-- Feed combined slide text + notes into `gpt-parser.ts`
-- Confidence: MEDIUM — `officeparser` v6 is recent; verify package stability before committing
+**Why derived wins over stored here (explicit trade-off):**
 
-#### New: `src/lib/parsers/extract-txt.ts`
-- Plain text: minimal processing — strip excess whitespace, feed directly to `gpt-parser.ts`
-- Also handles `.md` (Markdown) and `.csv` (convert rows to readable text first)
-- Confidence: HIGH — trivial implementation
+| | Stored (`competency_states` table, one row per person×SOP) | Derived (pure function over existing tables) |
+|---|---|---|
+| Consistency | Needs an invalidation trigger/re-write on every `submitCompletion`, `signOffCompletion`, and new `sop_observations` insert — a second source of truth that can drift (exactly the class of bug the 2026-07-05 "best-effort pipelines null-clobber on partial failure" and 2026-07-07 "layout_data must be re-emitted by every insert path" learnings warn about: every write path that can produce evidence must remember to also touch the derived table, or it silently rots). | No invalidation surface. State is *always* a live function of the evidence tables — cannot go stale because there is nothing to go stale. |
+| Query cost at 500×200 | O(1) read per cell once written, but write amplification on every completion. | Recompute per matrix load — but the matrix is a bounded admin-only bulk read (see §2), not a per-worker realtime need. Cheap because the underlying evidence sets per org are small (hundreds of completions/sign-offs/observations, not millions). |
+| Precedent in this codebase | None — nothing else in the app stores a derived "status" column separately from its source rows (governance flags, approval `awaiting_approval`, ownership flags are ALL computed live). | Matches `classifyGovernanceRow` (governance flags), `resolveSopAccess` (access override), and the `sop_completions.status` transition pattern — one canonical event stream, state computed from it. |
+| Why materialization WAS used for grants (`sop_departments`/`sop_access_people`) but should NOT be used here | Grants materialization exists because access resolution is a 5-tier union (org/area/department/role/person) recomputed from a *different, mutable* graph (org chart) that changes independently of any single write, and workers need it under RLS on every SOP read (hot path, every walkthrough load). Competency state is read only by admins on an admin-only matrix page (cold path, infrequent), and its inputs (completions, sign-offs, observations) are already flat evidence rows, not a graph needing resolution. | — |
 
-#### Modified: `POST /api/sops/parse` route
-- Add `input_type` routing at top of handler
-- Delegate to new extractors based on MIME type / file extension
-- All paths converge at `gpt-parser.ts(text)` → `ParsedSopSchema` — no schema changes needed
+So: `classifyCompetencyState({ required, latestCompletion, latestSignOff, latestObservation, currentSopVersion })` → returns one of:
 
-#### Modified: `UploadDropzone.tsx`
-- Add new accepted MIME types: `image/*`, `.xlsx`, `.xls`, `.pptx`, `.ppt`, `.txt`, `.md`, `.csv`
-- Adjust file size limit messaging (images/text can still use 50 MB limit)
+```
+'not_started'         // required but no completion at all
+'read'                // has a completion, no approving sign-off and no 'consistent' observation
+'supervised'          // has ≥1 observation (any outcome) but not yet competent
+'competent'           // latest completion is signed_off AND (no observation required OR latest observation outcome = 'consistent')
+```
 
----
+Lives in `src/lib/competency/classify.ts` (new file, same directory convention as `src/lib/governance/classify.ts`).
 
-### Pathway 3 — File → Video SOP
+Also derived, same function, using existing columns — no new storage:
+- **Trained-on-outdated-version flag** — `latestCompletion.sop_version < sops.version` (or `sops.superseded_by is not null` chain, 00008 precedent) — pure comparison of two integers already on hand.
+- **Refresher due-date** — `computeReviewDueDate(latestCompletion.submitted_at, resolveCadenceMonths(sop.category, orgCadences))`, i.e. reuse `src/lib/governance/cadences.ts` verbatim with a different anchor date (worker's last completion instead of SOP's last review). **Trade-off flagged**: this reuses the *same* `sop_review_cadences` org+category months config for both "content review due" (SOP-level, Phase 28) and "worker refresher due" (person-level, new). That is the lazy-correct default — v7.0 scope does not ask for separate cadences, and North Star favors avoiding an extra admin settings surface. If Simon later wants a shorter refresher interval than content-review interval for hazardous tasks, split into a second `training_refresher_cadences` table with the identical shape — a small change given the helper functions are already generic over "months by category."
 
-This is architecturally the most distinct pathway. It runs on an already-published SOP, not on raw file input.
+### 1.2 New table: `sop_observations` (stored — this one has no derivable source)
 
-#### New: `src/app/api/sops/generate-video/route.ts`
-- Input: SOP ID + output format choice (narrated_slides | screen_recording | ai_video)
-- Creates a new `video_generation_jobs` record (new table, same FSM pattern)
-- Delegates to the appropriate generator
-- `export const maxDuration = 300`
+Naming follows the existing `sop_`-prefixed evidence-table convention (`sop_completions`, `sop_completion_signatures`). Append-only, mirrors `completion_sign_offs`/`sop_review_events` RLS shape exactly (both already reviewed and hardened against the cross-tenant/tampering classes):
 
-#### New DB table: `video_generation_jobs`
 ```sql
-create table public.video_generation_jobs (
-  id           uuid primary key default gen_random_uuid(),
-  sop_id       uuid not null references public.sops(id),
-  org_id       uuid not null references public.organisations(id),
-  output_format text not null check (output_format in ('narrated_slides', 'screen_recording', 'ai_video')),
-  status        text not null default 'queued'
-               check (status in ('queued', 'generating_audio', 'rendering_video', 'uploading', 'completed', 'failed')),
-  error_message text,
-  output_url    text,         -- presigned read URL once complete
-  created_at    timestamptz default now(),
-  completed_at  timestamptz
+create table public.sop_observations (
+  id               uuid primary key default gen_random_uuid(),
+  organisation_id  uuid not null references public.organisations(id) on delete cascade,
+  sop_id           uuid not null references public.sops(id) on delete cascade,
+  worker_id        uuid not null references auth.users(id),        -- the person observed (organisation_members.user_id, same identity as sop_completions.worker_id / member_departments.member_id)
+  observer_id      uuid not null references auth.users(id),        -- the supervisor who logged it (mirrors completion_sign_offs.supervisor_id)
+  outcome          text not null check (outcome in ('consistent','needs_reset')),
+  note             text,
+  created_at       timestamptz not null default now()
 );
--- RLS: org_id matches JWT tenant
+-- RLS: SELECT org-scoped, three-tier (workers see own / supervisors see supervised via supervisor_assignments / safety_managers see all) — copy sop_completions' three policies verbatim.
+-- INSERT: role in ('supervisor','safety_manager'), observer_id = auth.uid(), organisation_id = current_organisation_id() — copy sop_review_events_insert_admin shape.
+-- NO update/delete policy — append-only legal evidence (D-17/COMP-07 precedent, third instance of this exact shape in the codebase).
 ```
 
-#### New: `src/lib/video-gen/tts.ts`
-- Calls ElevenLabs TTS API to generate narration audio for each SOP section/step
-- Input: array of text strings (section title + step content)
-- Output: array of MP3 audio buffers or storage URLs
-- Cost: ~$0.30 per 1,000 characters (Creator plan overage) — a 50-step SOP ≈ 3,000 chars = ~$0.90
-- Confidence: HIGH — ElevenLabs has a stable REST API with Node.js SDK
+Independent of the matrix and of access grants — can be built and shipped standalone (see §4 build order).
 
-#### New: `src/lib/video-gen/render-slides.ts` (narrated slideshow + screen recording)
-- Uses `@remotion/lambda` to trigger a render job on AWS Lambda
-- Remotion Lambda is the ONLY viable approach: full Chromium + FFmpeg (~150 MB+) cannot run on Vercel Functions
-- Vercel Sandbox is an alternative but is slower (sequential, not parallel) and has startup latency
-- Recommendation: Remotion Lambda for production reliability; Vercel Sandbox acceptable for v2.0 prototype
-- Remotion React component: renders SOP sections as slides with TTS audio synced to slide transitions
-- Output: MP4 file stored in `sop-generated-videos` Supabase Storage bucket
-- Confidence: HIGH — Remotion Lambda is a well-documented, production-ready pattern
+### 1.3 Other net-new stored columns (additive, no new tables)
 
-#### New: `src/lib/video-gen/ai-video.ts` (full AI video with animations — Phase 3 of Pathway 3)
-- Delegates to Runway Gen-3 API (or Luma Dream Machine) via REST
-- Input: text prompt derived from SOP step content
-- Output: short video clips per step, then concatenate via ffmpeg
-- This format is the most complex and highest cost — recommend deferring to a later iteration
-- Confidence: MEDIUM — Runway API is production-ready but cost is high (~$0.05–0.10/second of video) and output quality for industrial SOPs (e.g., "torque bolts to 40Nm") is unreliable
+- `sops.document_code text`, `sops.risk_priority text` — additive `ALTER TABLE`, same shape as the Phase 28 `owner_user_id`/`review_due_at` migration (00043 precedent: `add column if not exists`, index if queried, ride the existing `admins_can_update_sops` RLS policy, zero new policies).
+- Assessor capability: **no new column.** "Trainer must be signed off" is a *check*, computed at the point `sop_observations` or `completion_sign_offs` is inserted (does the observer/supervisor's own role + optionally their own competency state qualify them) — folds into the existing G-04 stale-role work already tracked in governance, not a new state machine.
 
 ---
 
-## Database Schema Additions
+## 2. The Matrix Query — 500 SOPs × 200 workers under RLS
 
-### Extended `parse_jobs` Table
+**Do not compute per-cell.** Follow `listGovernanceQueue()`'s shape: a fixed small number of bulk queries via `Promise.all`, reduced in one JS pass.
 
-The existing `parse_jobs` table needs a new column to distinguish input types:
+**Requirements side (who needs what) — 3-4 bulk reads, already materialized:**
+1. `sop_departments` (sop_id, department_id) — all rows for the org's SOPs (Phase 32/33 output, already exists).
+2. `sop_access_people` (sop_id, member_id) — same.
+3. `member_departments` (member_id, department_id) — worker → department roster (Phase 25, already exists).
+4. `sops.all_departments` flag per SOP (already selected in `listGovernanceQueue`, same query can be shared/extended).
 
-```sql
-alter table public.parse_jobs
-  add column input_type text not null default 'document'
-    check (input_type in ('document', 'video_file', 'youtube_url', 'vimeo_url', 'in_app_recording', 'image', 'xlsx', 'pptx', 'txt'));
-```
+Reduce to `Map<workerId, Set<sopId>>` in JS: a worker requires a SOP if `sop.all_departments`, or the worker's department ∈ that SOP's `sop_departments`, or the worker ∈ that SOP's `sop_access_people`. This is the exact same union logic `resolveSopAccess` already encodes for materialization — here it's applied to *already-materialized* rows, so no re-resolution of the 5-tier grant graph is needed, just a set-membership join.
 
-No other schema changes to `parse_jobs`. Status FSM, RLS policies, and Realtime publication are all reused unchanged.
+**Evidence side (what's proven) — 3 bulk reads:**
+5. Latest `sop_completions` per (worker_id, sop_id) for the org. Supabase-js has no `DISTINCT ON`; use a `SECURITY DEFINER` SQL function (`latest_completions_for_org(p_organisation_id uuid)` using `select distinct on (worker_id, sop_id) ... order by worker_id, sop_id, submitted_at desc`), called via `createAdminClient().rpc(...)`. **Must** `REVOKE EXECUTE FROM PUBLIC, anon, authenticated; GRANT TO service_role` — this is a parameter-trusting RPC (takes `p_organisation_id`), the exact shape the 2026-07-05 `match_sop_agent_metadata` cross-tenant hole was built and fixed under. Never expose it to `authenticated`.
+6. `completion_sign_offs` filtered `.in('completion_id', latestCompletionIds)` — small (bounded by #completions returned in step 5, not the full history table).
+7. `sop_observations` filtered `.in('sop_id', requiredSopIds).in('worker_id', requiredWorkerIds)` or, simpler at this org scale, all observations for the org (an org's total row count here is small — training records get CSV-exported, not paginated at DB scale) reduced client-side to latest-per-pair.
 
-### New: `video_generation_jobs` Table
+All 7 reads run inside one `Promise.all` (2026-07-13 "independent server-page fetches belong in Promise.all, not serial" learning already logged in CLAUDE.md — applies here identically). Then one `.map()`/reduce pass over the required-pairs Map (not the full 500×200 cross-product — most workers aren't assigned most SOPs, so the real cell count is bounded by department/role fan-out, typically a small fraction of 100,000) builds the matrix rows through `classifyCompetencyState`.
 
-See schema above. Keep separate from `parse_jobs` — it has a different status vocabulary, different input (SOP ID vs file), and different outputs.
-
-### New Supabase Storage Buckets
-
-| Bucket | Contents | RLS | Notes |
-|--------|----------|-----|-------|
-| `sop-videos` | Raw uploaded video files, in-app recordings | Admin write, admin read | Large files — up to 2 GB. TUS upload. |
-| `sop-generated-videos` | Rendered MP4 outputs from Pathway 3 | Admin write, admin read; workers read | Presigned read URLs for playback. Lifecycle policy: delete if SOP archived. |
-
-Existing `sop-documents` bucket is unchanged.
+**Rendering:** don't ship one 100k-cell payload to the client. `/admin/team`'s Training view groups by department (mirrors the existing Columns roster grouping) and paginates/lazily-expands per department — server action accepts an optional `departmentId` filter so the first paint is one department's worth of rows, not the whole org.
 
 ---
 
-## Data Flow Changes
+## 3. Which Existing Surfaces Host the New Views
 
-### New: Video File → SOP
-
-```
-Admin uploads MP4/MOV (any size, up to ~2 GB)
-    ↓
-Client: createUploadSession server action (input_type='video_file')
-    → returns TUS endpoint + auth token (not a presigned URL)
-    ↓
-Client: tus-js-client uploads directly to Supabase Storage 'sop-videos' bucket
-    → chunks 6 MB at a time, resumable
-    ↓
-Client: POST /api/sops/transcribe (after TUS upload completes — tus onSuccess callback)
-    ↓
-Route Handler:
-    1. Set parse_job status = 'processing'
-    2. Download video from Supabase Storage → temp buffer
-    3. extract-audio.ts: ffmpeg-static converts to MP3
-    4. transcribe-audio.ts: gpt-4o-transcribe → raw transcript text
-    5. gpt-parser.ts: transcript → ParsedSopSchema (REUSED UNCHANGED)
-    6. Write sop_sections/sop_steps to DB (REUSED UNCHANGED)
-    7. Set parse_job status = 'completed'
-    ↓
-Admin UI: Supabase Realtime notifies → same review UI as document SOPs
-```
-
-### New: YouTube/Vimeo URL → SOP
-
-```
-Admin pastes YouTube or Vimeo URL
-    ↓
-Client: POST /api/sops/youtube { url, sop_id }
-    ↓
-Route Handler:
-    1. Validate URL format (YouTube/Vimeo regex)
-    2. YouTube: fetch-youtube-transcript.ts → attempt caption fetch (fast, free)
-       - If captions available: text ready
-       - If no captions: download audio via ytdl-core → transcribe-audio.ts
-    3. Vimeo: download audio stream → transcribe-audio.ts
-    4. gpt-parser.ts → ParsedSopSchema (REUSED UNCHANGED)
-    5. Write to DB, set status = 'completed'
-    ↓
-Admin UI: same review UI
-```
-
-### New: SOP → Narrated Video
-
-```
-Admin selects published SOP, clicks "Generate Video", chooses format
-    ↓
-Client: POST /api/sops/generate-video { sop_id, format: 'narrated_slides' }
-    ↓
-Route Handler:
-    1. Create video_generation_jobs record (status='queued')
-    2. Fetch sop_sections/sop_steps from DB
-    3. Set status = 'generating_audio'
-    4. tts.ts: call ElevenLabs for each section/step → array of MP3 audio
-    5. Set status = 'rendering_video'
-    6. render-slides.ts: trigger Remotion Lambda render with SOP data + audio URLs
-    7. Poll Remotion Lambda render status (async with Inngest, or synchronous for short SOPs)
-    8. Set status = 'uploading'
-    9. Store MP4 in sop-generated-videos bucket
-    10. Set status = 'completed', output_url = presigned URL
-    ↓
-Admin UI: Supabase Realtime notifies → video playback + download button
-```
+| New view | Host | Why here, not a new route |
+|---|---|---|
+| **Training matrix** (people × required-SOPs × status) | `/admin/team` — third mode on `TeamViewShell`'s existing ⊞ Chart / ▤ Columns toggle | `AdminNav` is locked at 5 tabs (Phase 30 UX-02 decision — governance was *folded into* `/admin/sops` rather than given a 6th tab; same consolidation instinct applies here). `TeamViewShell` already owns the "how do I look at my people" surface and already has a working mode-toggle pattern — extend it, don't build a new page shell. |
+| **Per-worker training record + CSV export** | Drill-down from a Columns roster row (`RoleAssignmentTable`) or a matrix cell → `/admin/team/[userId]` (new sub-route, not a new nav item) | The roster already lists every person; adding a "Training record" link per row is a smaller diff than a new top-level page. CSV export is a server action returning a blob, same shape as any existing export action — no new route needed for the export itself. |
+| **Supervisor observations** ("watched worker do X — consistent/needs reset") | `/activity` (existing supervisor completion-review surface, `signOffCompletion`'s home) | Supervisors already land here to sign off completions for their assigned workers (`supervisor_assignments`-scoped, same RLS this new table reuses). Add "Log observation" as a lightweight action beside the existing sign-off UI rather than a new supervisor-facing page — same audience, same trust boundary, same page load. |
+| **Refresher-due rollup** | `/admin/sops?view=attention` (governance queue) — new SOP-level aggregate chip only (e.g. "12 SOPs have overdue refreshers"), linking through to the Training matrix filtered to that SOP | Governance stays SOP-level (document signal: ownership/review/approval). Person-level refresher-due detail belongs in the Training matrix, not duplicated into `GovernanceRow`. Keeps `classifyGovernanceRow`'s existing per-SOP contract intact — extending it with per-worker data would break its shape and force a second bulk-fetch it doesn't otherwise need. |
+| **AI maintenance schedule** | `/admin/sops?view=attention` — an AI-scored `priority` sort/badge added to the *already-fetched* `GovernanceRow[]`, not a separate page or stored queue | Phase 30 already chose live-computed-not-cached for governance. The maintenance schedule is a ranking layer on top of rows that already exist in memory at that point — call the AI adapter with the computed rows (staleness + usage + flags already on hand), get back a priority order/score, sort. If per-page-load AI cost becomes a concern, cache the score keyed by a flags+staleness hash and refresh via the *existing* `synthesis-sweep` cron (add one more job to it) rather than standing up a second cron endpoint. |
+| **Completeness rubric** | AI reviewer job pipeline (`src/lib/parsers/ai-reviewer/`), surfaced wherever reviewer flags already render (publish gate side-by-side panel, Phase 21) | 6th job in the existing orchestrator, not a new subsystem or new page. |
+| **Document codes + register export** | `/admin/sops` list — new column + filter, CSV export action alongside the training-record export | Additive `sops` columns, same list page, same export utility reused for both training records and the register (write one `toCsv()` helper, use it twice — ladder rung 2). |
 
 ---
 
-## Recommended Component File Structure (New Additions Only)
+## 4. Build Order
+
+Dependency graph (arrows = "must exist before"):
 
 ```
-src/
-├── app/
-│   └── api/
-│       └── sops/
-│           ├── parse/route.ts          # MODIFIED: add input_type routing
-│           ├── transcribe/route.ts     # NEW: video transcription pipeline
-│           ├── youtube/route.ts        # NEW: YouTube/Vimeo URL ingestion
-│           └── generate-video/route.ts # NEW: video generation trigger
-├── components/
-│   └── admin/
-│       ├── UploadDropzone.tsx          # MODIFIED: add new MIME types
-│       ├── VideoUploader.tsx           # NEW: TUS resumable upload UI
-│       └── VideoRecorder.tsx           # NEW: in-app MediaRecorder UI
-├── lib/
-│   ├── parsers/
-│   │   ├── extract-docx.ts             # UNCHANGED
-│   │   ├── extract-pdf.ts              # UNCHANGED
-│   │   ├── ocr-fallback.ts             # UNCHANGED (kept as cost fallback)
-│   │   ├── gpt-parser.ts               # UNCHANGED (reused for all pathways)
-│   │   ├── image-uploader.ts           # UNCHANGED
-│   │   ├── extract-audio.ts            # NEW: ffmpeg-static video → MP3
-│   │   ├── transcribe-audio.ts         # NEW: gpt-4o-transcribe
-│   │   ├── fetch-youtube-transcript.ts # NEW: caption fetch + ytdl fallback
-│   │   ├── extract-image.ts            # NEW: GPT-4o vision OCR
-│   │   ├── extract-xlsx.ts             # NEW: SheetJS
-│   │   ├── extract-pptx.ts             # NEW: officeparser
-│   │   └── extract-txt.ts              # NEW: plain text / markdown / CSV
-│   └── video-gen/
-│       ├── tts.ts                      # NEW: ElevenLabs TTS
-│       ├── render-slides.ts            # NEW: Remotion Lambda trigger
-│       └── ai-video.ts                 # NEW: Runway API (defer to later)
-└── types/
-    ├── sop.ts                          # MODIFIED: add input_type union type
-    └── video-generation.ts             # NEW: VideoGenerationJob types
+sop_observations (independent) ──────┐
+                                       ├──► classifyCompetencyState() ──► getTrainingMatrix() ──┬──► Training matrix UI (/admin/team)
+access grants materialization (done) ─┘         │                                                ├──► Per-worker record + CSV export
+completions/sign-offs (done) ─────────────────────────────────────────────────────────────────────┘
+                                                  │
+                                                  └──► refresher due-date (reuses cadences.ts) ──► Governance rollup chip
+                                                  └──► assessor capability check (needs states to exist)
+
+document_code/risk_priority columns (independent) ─┐
+completeness rubric (independent, extends Phase 21) ├── can run in parallel with all of the above
+AI maintenance schedule (needs governance rows,     ┘   done in Phase 28; optionally consumes competency
+  done in Phase 28) — soft dependency on matrix        rollups once they exist, so sequence last among AI items
+  for a richer priority signal, not a hard blocker
 ```
+
+**Recommended sequence:**
+
+1. **`sop_observations` table + `recordObservation` action + "Log observation" UI on `/activity`.** Zero dependencies on new work — pure append to the evidence side using patterns already proven three times (`completion_sign_offs`, `sop_completion_signatures`, `sop_review_events`). Fast, standalone win; also the RLS/append-only shape this whole layer leans on.
+2. **`classifyCompetencyState()` pure function + the bulk-read plumbing (`latest_completions_for_org` RPC, requirements-side reducer).** Depends on (1) existing as a data source, plus already-shipped grants/completions. This is the load-bearing piece — get it right once, everything else consumes it.
+3. **Training matrix UI** (`/admin/team` third mode) + **per-worker training record + CSV export.** Both consume the output of (2); can be built in parallel with each other once (2) lands, since both are just different groupings of the same evidence fetch.
+4. **Refresher due-dates**, reusing `cadences.ts`. Bundle with (3) — needs `classifyCompetencyState`'s "latest completion date" output, and the cadence-config decision (§1.1 trade-off) should be made explicit at this point, not deferred.
+5. **Assessor capability gating.** Needs (2) to exist if the check is "assessor must themselves be competent-signed-off on something" — sequence after states exist. Folds into the existing role/G-04 stale-role work rather than a new gate mechanism.
+6. **Document codes + risk-priority columns + register export** and **completeness rubric AI-reviewer job** — fully independent of 1–5, can be done any time in parallel (good filler work for a second workstream, low risk, additive columns / additive reviewer job only).
+7. **AI maintenance schedule.** Lowest urgency per North Star (ease-of-use first; this is a prioritization aid, not a blocking gate) and benefits from competency rollups existing (a maintenance signal like "many workers overdue for refresher" is stronger with (2)–(4) shipped) — do last, extend the existing `synthesis-sweep` cron rather than adding a new one.
 
 ---
 
-## Architectural Patterns
-
-### Pattern 1: Converging Extraction Pipelines (All Pathways)
-
-**What:** Every new input type (video, image, xlsx, pptx, txt, YouTube URL) has its own extractor module that returns a `string` — the extracted text content. All extractors feed into the same `gpt-parser.ts → ParsedSopSchema` final step, which is completely unchanged.
-
-**Why:** The LLM understands all these formats equally well when given plain text. The extraction layer handles format-specific parsing; the structuring layer is format-agnostic.
-
-**Trade-offs:** Some fidelity is lost (Excel column relationships, slide visual context) but this is acceptable — admins review the parsed output before publishing. The benefit is a single path to the SOP data model with no schema divergence.
-
-**Example:**
-```typescript
-// Every new extractor has the same contract:
-export async function extractXlsx(buffer: Buffer): Promise<string>
-export async function extractPptx(buffer: Buffer): Promise<string>
-export async function extractImage(imageUrl: string): Promise<string>
-export async function transcribeAudio(mp3Buffer: Buffer): Promise<string>
-// Then all feed into:
-const parsed = await parseSopWithGPT(extractedText) // unchanged
-```
-
-### Pattern 2: TUS Resumable Upload for Large Files
-
-**What:** Files above ~10 MB (especially video) bypass the 4.5 MB Vercel body limit by uploading directly from the browser to Supabase Storage using the TUS protocol via `tus-js-client`. The Next.js server action issues a TUS endpoint URL and auth token; the client uploads directly.
-
-**When to use:** Video file uploads (MP4/MOV/WEBM). Existing presigned URL flow remains for documents and images.
-
-**Trade-offs:** TUS adds client-side dependency (`tus-js-client`, ~25 KB gzipped). Upload progress is natively available via `onProgress` callback. Resumability is critical for factory floor connectivity.
-
-**Example:**
-```typescript
-// In VideoUploader.tsx
-import * as tus from 'tus-js-client'
-
-const upload = new tus.Upload(file, {
-  endpoint: `https://${projectRef}.storage.supabase.co/storage/v1/upload/resumable`,
-  headers: { authorization: `Bearer ${anonKey}` },
-  metadata: {
-    bucketName: 'sop-videos',
-    objectName: `${orgId}/${sopId}/original/${file.name}`,
-    contentType: file.type,
-  },
-  chunkSize: 6 * 1024 * 1024,
-  onProgress(bytesUploaded, bytesTotal) {
-    setProgress(Math.round((bytesUploaded / bytesTotal) * 100))
-  },
-  onSuccess() {
-    // NOW trigger the transcription job
-    triggerTranscription({ sopId, filePath })
-  },
-})
-upload.start()
-```
-
-### Pattern 3: Reuse parse_jobs for New Input Types
-
-**What:** Rather than creating new job queue tables per pathway, extend `parse_jobs.input_type` with new enum values. All existing infrastructure (Supabase Realtime subscription, status polling hybrid, admin UI job status display, retry logic) works without change.
-
-**When to use:** All three new input pathways during SOP creation (Pathways 1 and 2). Pathway 3 (video generation from SOP) uses a separate `video_generation_jobs` table because its input, output, and status vocabulary are distinct.
-
-**Trade-offs:** Adding more `input_type` values to `parse_jobs` keeps the table general-purpose, which may feel awkward later. The alternative (a separate `video_transcription_jobs` table) adds migration overhead and a separate Realtime subscription. The extension is low-risk because the status FSM is identical.
-
-### Pattern 4: Remotion Lambda for Video Rendering (Not Vercel Functions)
-
-**What:** Remotion's headless Chromium + FFmpeg stack cannot fit in a Vercel Function (250 MB bundle limit; Chromium alone is ~120 MB). Use `@remotion/lambda` to deploy a Remotion render function to AWS Lambda separately, then trigger renders via the Remotion Lambda SDK from a lightweight Vercel Function.
-
-**When to use:** Pathway 3 narrated slides and screen recording formats.
-
-**Trade-offs:** Introduces AWS Lambda as a dependency alongside Vercel. One-time setup to deploy the Remotion Lambda. Render cost is low (~$0.003 per GB-second; a 2-minute video costs ~$0.05). Alternative is Vercel Sandbox (simpler setup, but slower sequential rendering — acceptable for v2.0 prototype).
-
-**Build order implication:** Set up Remotion Lambda in AWS before building the video generation UI. The Vercel Sandbox prototype path can be used initially to validate the UX before committing to Lambda setup.
-
-### Pattern 5: Two-Stage Transcription for Long Videos
-
-**What:** OpenAI's transcription API has a 25 MB file limit. A 30-minute video audio track typically exceeds this. Split the MP3 into overlapping 10-minute chunks (with 30-second overlaps to prevent cut-off sentences), transcribe each chunk in parallel with `Promise.all`, then concatenate transcripts preserving timestamps.
-
-**When to use:** Any video longer than approximately 15 minutes (depends on audio bitrate; 25 MB at 128kbps ≈ 26 min).
-
-**Example:**
-```typescript
-// transcribe-audio.ts
-async function transcribeLargeAudio(mp3Buffer: Buffer): Promise<string> {
-  const chunks = splitIntoChunks(mp3Buffer, 10 * 60) // 10-min chunks
-  const transcripts = await Promise.all(
-    chunks.map(chunk => openai.audio.transcriptions.create({
-      file: new File([chunk], 'chunk.mp3', { type: 'audio/mpeg' }),
-      model: 'gpt-4o-transcribe',
-      response_format: 'text',
-    }))
-  )
-  return transcripts.join(' ')
-}
-```
-
----
-
-## Integration Points
-
-### New External Services
-
-| Service | Integration Pattern | Why | Confidence |
-|---------|---------------------|-----|------------|
-| OpenAI Transcription API (`gpt-4o-transcribe`) | REST via existing `openai` SDK (`openai.audio.transcriptions.create`) | Best transcription accuracy, already have OpenAI SDK and API key | HIGH |
-| ElevenLabs TTS API | REST via `elevenlabs` npm SDK | Best-in-class voice quality for narrated video; per-character billing | HIGH |
-| Remotion Lambda | AWS Lambda deployment via `@remotion/lambda` SDK | Only viable video render option within Vercel deployment constraints | HIGH |
-| Runway Gen-3 API | REST (`fetch`) — no official npm SDK | Fallback for "full AI video" format (Pathway 3, deferred) | MEDIUM |
-| `youtube-transcript` (npm) | Direct import, no auth required | Fetches YouTube auto-captions without video download | MEDIUM |
-| Supabase TUS endpoint | `tus-js-client` from browser | Bypass Vercel 4.5 MB body limit for large video uploads | HIGH |
-
-### Modified Internal Boundaries
-
-| Boundary | Before | After |
-|----------|--------|-------|
-| Client → Storage | Presigned URL (signed URL, one-shot PUT) | Presigned URL for docs; TUS resumable for video |
-| `createUploadSession` → `parse` trigger | Unified: always POST /api/sops/parse | Branched: docs → POST /api/sops/parse; video files → POST /api/sops/transcribe; YouTube → POST /api/sops/youtube |
-| `parse_jobs` input_type | Implicitly 'document' | Explicit column: 'document' | 'video_file' | 'youtube_url' | 'vimeo_url' | 'in_app_recording' | 'image' | 'xlsx' | 'pptx' | 'txt' |
-| Admin review UI | Reads from sop_sections/sop_steps after parse | Unchanged — all pathways write to the same schema |
-| `gpt-parser.ts` | Called from parse route handler only | Called from parse route, transcribe route, youtube route — all pass plain text, all get ParsedSopSchema back |
-
----
-
-## Build Order
-
-Build order is determined by dependency graph and risk. De-risk the novel parts (video upload, ffmpeg, Remotion) before the cosmetically simple parts (xlsx, txt parsing).
-
-1. **`parse_jobs` migration** — Add `input_type` column. Prerequisite for everything else. (1 migration, 15 min)
-
-2. **`sop-videos` and `sop-generated-videos` storage buckets** — Create buckets + RLS policies. All video upload flows depend on these. (1 migration, 30 min)
-
-3. **Expanded document parsers (Pathway 2)** — `extract-image.ts` (GPT-4o vision), `extract-xlsx.ts` (SheetJS), `extract-pptx.ts` (officeparser), `extract-txt.ts`. These are low-risk additions to `src/lib/parsers/` alongside existing extractors. Wire into `/api/sops/parse` with `input_type` routing. (2–3 plans)
-
-4. **TUS video upload infrastructure** — `VideoUploader.tsx` client component + modified `createUploadSession` + TUS endpoint config. This must be validated early because it's the most novel integration. (1 plan)
-
-5. **Video transcription pipeline (Pathway 1 — file upload)** — `extract-audio.ts` (ffmpeg-static), `transcribe-audio.ts` (gpt-4o-transcribe), `/api/sops/transcribe` route. Validate with a short test video first to confirm ffmpeg binary bundle size and Vercel cold start behavior. (2 plans)
-
-6. **YouTube/Vimeo URL pathway (Pathway 1 — URL)** — `fetch-youtube-transcript.ts` + `/api/sops/youtube` route. Lower priority than file upload; use as a refinement after file upload is stable. (1 plan)
-
-7. **In-app video recording (Pathway 1 — record in browser)** — `VideoRecorder.tsx` using MediaRecorder → TUS upload. iOS Safari limitations require careful testing. Defer until file upload and YouTube paths are shipped. (1 plan)
-
-8. **`video_generation_jobs` table + video generation skeleton (Pathway 3)** — DB migration + `generate-video` route skeleton + admin UI trigger. Set up Remotion Lambda AWS deployment. (1 plan setup + 1 plan UI)
-
-9. **ElevenLabs TTS + narrated slides render (Pathway 3 narrated slides)** — `tts.ts` + `render-slides.ts` + Remotion React component for slides. This is the highest-value Pathway 3 format. (2 plans)
-
-10. **Screen recording format (Pathway 3 screen recording style)** — Variant of narrated slides with scrolling SOP content. Low additional effort if Remotion Lambda is already set up. (1 plan)
-
-11. **Full AI video format (Pathway 3 AI video)** — Runway/Luma API. Defer until the simpler formats are validated with real users. The quality and cost need user validation before investing in the integration. (1 plan — later iteration)
-
----
-
-## Scaling Considerations
-
-| Scale | Architecture Adjustments |
-|-------|--------------------------|
-| 0-500 SOPs/month | All processing in Route Handlers with `maxDuration = 300`. Remotion Lambda for video gen. No additional infra. |
-| 500-5k SOPs/month | Add Inngest for durable job orchestration (replaces polling + timeout risk on long videos). Inngest wraps existing route handlers — minimal code change. |
-| 5k+ SOPs/month | Dedicated Supabase Storage CDN for video delivery. Consider Mux for video hosting + built-in transcription (replaces ffmpeg + Whisper combination at scale with one API). |
-
-**First bottleneck for v2.0:** ffmpeg-static cold start on Vercel. The binary must be bundled into the function; first invocation will be slow. Mitigate by keeping the transcription function warm or migrating to Inngest where the function environment persists between steps.
-
-**Second bottleneck:** ElevenLabs TTS rate limits. At Starter/Creator tier, concurrent request limits apply. Queue TTS requests serially per video generation job.
-
----
-
-## Anti-Patterns
-
-### Anti-Pattern 1: Routing Video Through a Next.js API Body
-
-**What people do:** Accept the video file as a `multipart/form-data` body in a Next.js Route Handler.
-
-**Why it's wrong:** Vercel's 4.5 MB hard limit will reject any video file. This fails silently in development (no Vercel limits) and catastrophically in production.
-
-**Do this instead:** Issue a TUS resumable upload token from the server action. The client uploads directly to Supabase Storage. The Vercel function is never in the data path.
-
-### Anti-Pattern 2: Bundling Chromium in a Vercel Function for Video Rendering
-
-**What people do:** Install `@remotion/renderer` directly in a Next.js Route Handler, expecting to call `renderMedia()` server-side on Vercel.
-
-**Why it's wrong:** Remotion's renderer requires Chromium (~120 MB) + FFmpeg (~50 MB). The Vercel function bundle limit is 250 MB. Even if it fits, Chromium cannot run in Vercel's serverless sandbox.
-
-**Do this instead:** Deploy Remotion Lambda to AWS. Trigger renders from Vercel via the `@remotion/lambda` SDK's `renderMediaOnLambda()` — the Vercel function sends a job to Lambda; Lambda does the actual render.
-
-### Anti-Pattern 3: Synchronous Video Transcription in the Upload Request
-
-**What people do:** On upload success, immediately await the full transcription pipeline in the same request cycle.
-
-**Why it's wrong:** A 10-minute video → audio extraction (~30s) + Whisper transcription (~60s) = ~90 seconds minimum. Vercel's default timeout is 300s but cold starts and LLM latency can push this. More critically, the user is blocked waiting with no progress updates.
-
-**Do this instead:** Return `202 Accepted` from the transcription trigger endpoint. Update `parse_job.status` in real time. The admin UI subscribes to Supabase Realtime on `parse_jobs` — existing code handles this already.
-
-### Anti-Pattern 4: Using a Single Job Table for Both Parsing and Video Generation
-
-**What people do:** Add video generation jobs to `parse_jobs` as another `input_type` value.
-
-**Why it's wrong:** Video generation (Pathway 3) has a different input (SOP ID, not a file), different status stages (`generating_audio`, `rendering_video`), and a different output (video URL, not structured SOP sections). Forcing it into `parse_jobs` creates schema confusion and makes the Realtime subscription logic in the admin UI brittle.
-
-**Do this instead:** Separate `video_generation_jobs` table. Separate admin UI section for video generation status. The two tables can share the same Realtime notification pattern — just subscribe to both.
-
-### Anti-Pattern 5: Using ytdl-core as the Primary YouTube Ingestion Path
-
-**What people do:** Default to downloading YouTube video/audio via `ytdl-core` for all YouTube URLs.
-
-**Why it's wrong:** YouTube actively blocks `ytdl-core` as it violates YouTube's ToS for automated downloading. The library has frequent breakage as YouTube changes its internals. Server IPs get rate-limited or blocked.
-
-**Do this instead:** Primary path is `youtube-transcript` (fetches auto-captions from YouTube's own caption API, no download needed, works on public videos with captions). Only fall back to audio download if captions are absent — and document clearly in the UI that the user is responsible for having rights to transcribe the video content.
+## Anti-Patterns to Avoid (specific to this integration)
+
+### Anti-Pattern 1: A stored `competency_states` table with a sync trigger
+**What people do:** Add a table with one row per (person, SOP) and a Postgres trigger or app-level write on every completion/sign-off/observation insert to keep it current.
+**Why it's wrong:** Every future evidence-producing write path must remember to also touch this table — the exact "materialize on every mutation path" trap that bit this codebase twice already (2026-07-07 `layout_data` omitted on non-DOCX insert paths; 2026-06-15 junction tables needing re-materialization on every org-chart mutation, CR-03). Competency state has no need for this cost — see §1.1.
+**Do this instead:** Derive it live via a pure function, same as governance flags.
+
+### Anti-Pattern 2: Recomputing `resolveEffectiveAccess` per worker for the matrix
+**What people do:** Re-run the 5-tier grant resolution graph (org/area/department/role/person) for each of 200 workers × 500 SOPs to figure out "who needs this."
+**Why it's wrong:** That resolution already ran once at grant-write time and its output is sitting in `sop_departments`/`sop_access_people`. Recomputing it at matrix-read time duplicates expensive graph logic that Phase 32/33 already paid for.
+**Do this instead:** Read the materialized junctions + `member_departments`, join in memory (§2).
+
+### Anti-Pattern 3: A parameter-trusting RPC for the bulk-completions read
+**What people do:** Write `latest_completions_for_org(p_organisation_id uuid)` as `SECURITY DEFINER` and leave it callable by `authenticated`.
+**Why it's wrong:** Every Postgres function is auto-exposed at `POST /rest/v1/rpc/<name>`; a caller-supplied org-id parameter on a `SECURITY DEFINER` function is a cross-tenant read hole regardless of who's "supposed" to call it — this exact bug shipped to prod once already (`match_sop_agent_metadata`, 2026-07-05, CR fixed via `REVOKE`/`GRANT service_role`).
+**Do this instead:** `REVOKE EXECUTE FROM PUBLIC, anon, authenticated; GRANT EXECUTE TO service_role`, call only via `createAdminClient()` inside an already-`requireAdminContext()`-gated server action.
+
+### Anti-Pattern 4: A new nav tab or new cron route for every new feature
+**What people do:** Add "Training" as a 6th `AdminNav` item, or a second cron endpoint for the maintenance schedule.
+**Why it's wrong:** Phase 30 already made the opposite call (fold governance into `/admin/sops` rather than grow the nav) and the codebase already has one working cron+bearer+middleware-exemption pattern that a second one would duplicate (and risk the exact 2026-07-05 "forgot the middleware exemption → 307 to /login" bug on a second route).
+**Do this instead:** Extend existing surfaces (`TeamViewShell` mode toggle, `synthesis-sweep` cron with one more job) per §3.
 
 ---
 
 ## Sources
 
-- [Vercel Functions Limits — official docs](https://vercel.com/docs/functions/limitations) — body size 4.5 MB, max duration 300s (Pro) / 800s (Pro + Fluid Compute), bundle 250 MB — HIGH confidence
-- [Supabase Resumable Uploads — TUS protocol](https://supabase.com/docs/guides/storage/uploads/resumable-uploads) — TUS, 50 GB max, 6 MB chunk size — HIGH confidence
-- [OpenAI Speech to Text API](https://platform.openai.com/docs/guides/speech-to-text) — 25 MB limit, gpt-4o-transcribe model, $0.006/min — HIGH confidence
-- [Remotion on Vercel — limitations](https://www.remotion.dev/docs/miscellaneous/vercel-functions) — "not possible to render on Vercel Functions due to Chromium" — HIGH confidence
-- [Remotion Lambda docs](https://www.remotion.dev/docs/lambda) — distributed rendering, AWS Lambda, recommended approach — HIGH confidence
-- [Remotion Vercel Sandbox docs](https://www.remotion.dev/docs/vercel-sandbox) — 45 min timeout Hobby, 5 hr Pro, 10 concurrent Hobby — HIGH confidence
-- [ElevenLabs API pricing](https://elevenlabs.io/pricing/api) — per-character billing, Creator plan overage $0.30/1k chars — HIGH confidence
-- [youtube-transcript npm](https://www.npmjs.com/package/youtube-transcript) — fetches YouTube auto-captions without download — MEDIUM confidence (community package)
-- [ffmpeg-wasm Vercel issues](https://github.com/ffmpegwasm/ffmpeg.wasm/issues/622) — not viable for server-side on Vercel; ffmpeg-static is the approach — MEDIUM confidence
-- [SheetJS xlsx npm](https://www.npmjs.com/package/xlsx) — Excel parsing, TypeScript support — HIGH confidence
-- [officeparser npm v6.0.0](https://github.com/harshankur/officeParser) — PPTX/DOCX/XLSX AST output, late 2025 major release — MEDIUM confidence (recent major version)
-- [OpenAI gpt-4o vision for OCR](https://intuitionlabs.ai/articles/ai-ocr-models-pdf-structured-text-comparison) — GPT-4o vision superior to Tesseract for complex layouts — MEDIUM confidence (independent comparison)
-- [Inngest Next.js background jobs](https://www.inngest.com/blog/run-nextjs-functions-in-the-background) — durable jobs for long-running video processing — MEDIUM confidence (vendor blog, but well-documented)
+- Direct source reads (HIGH confidence, no training-data inference used for any table/file name below):
+  - `src/actions/grants.ts` — access-grant CRUD + materialization fanout (Phase 32/33)
+  - `src/actions/completions.ts` — completion submit/sign-off/signature actions (Phase 4/23, D-17)
+  - `src/actions/governance.ts` + `src/app/(protected)/admin/sops/page.tsx` — governance queue composed-read pattern, folded-into-sops surface (Phase 28/30)
+  - `src/app/(protected)/admin/team/page.tsx` — org model + roster host page (Phase 32-07), `TeamViewShell`
+  - `supabase/migrations/00050_access_grants_sop_target.sql`, `00010_completion_schema.sql`, `00038_phase23_schema.sql`, `00035_departments_schema.sql`, `00008_sop_versioning.sql` — schema precedents for RLS shape, append-only pattern, versioning columns
+  - `.planning/milestones/v6.0/phases/28-ownership-review-lifecycle-governance-queue/28-01-PLAN.md` — migration/cadence/audit-event precedent this layer copies
+  - `src/app/api/agent-layer/synthesis-sweep/route.ts` + `src/lib/supabase/middleware.ts` — cron auth pattern
+  - `.planning/PROJECT.md` — v7.0 milestone scope, North Star, build-on list
+  - `CLAUDE.md` Learnings section — cross-tenant RLS/service-role class of bugs (2026-06-15, 2026-06-26, 2026-07-05), Promise.all serial-fetch learning (2026-07-13), materialization-must-be-re-triggered class (2026-07-07)
 
 ---
-
-*Architecture research for: SOP Assistant v2.0 — SOP Creation Pathways (video transcription, expanded file parsing, AI video generation)*
-*Researched: 2026-03-29*
+*Architecture research for: SafeStart (SOPstart) v7.0 Competency & Training Layer*
+*Researched: 2026-07-19*
