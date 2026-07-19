@@ -326,7 +326,9 @@ const { email } = await createEphemeralAdmin(admin, orgA)
 | A2 | The wizard/creation dual-write closure (rewire `assignSopDepartments` through SOP-target grants) is acceptable product behaviour (hand-picked SOPs are overridden from birth) | Pattern 2 #7 | Medium — needs Simon's confirmation at discuss/plan; fallback options listed in Open Questions #1 |
 | A3 | `scripts/assert-phase32-day-one-equivalence.ts` does not hard-pin the 00049 index name in an assertion (comments only) | Pitfall 8 | Low — one-line check before the migration wave |
 
-## Open Questions
+## Open Questions (RESOLVED 2026-07-19 — all four adopted at plan time)
+
+_OQ1 → option (i) adopted (ROADMAP entry + 33-07: dual-write closure via SOP-target grants, overridden-from-birth). OQ2 → "check"-verb in new copy only (33-04/33-09). OQ3 → approval-chain state on the forward chip (33-04). OQ4 → vacancies shown dashed-inert (33-06)._
 
 1. **Dual-write closure default (A2):** when an admin hand-picks departments at SOP creation, does the SOP (i) become chosen-by-name/overridden (recommended — truthful, stable, matches the new model), (ii) get collection-level grants seeded at publish (WR-02 widening class), or (iii) keep the legacy direct-write until first touched in the access map (leaves the silent-drop hole open)? Recommendation: (i). Needs a locked decision before the grants.ts wave.
 2. **"Check" vs "Verify" product-wide verb** (carried from the sketch README) — the Wayfinder lock sentence reads "…still need checking" while the checklist says "verify". Recommend: adopt "check" in the new copy only; a product-wide verb sweep is out of scope.
