@@ -386,5 +386,26 @@ export default defineConfig({
       testDir: './src/lib/org-model/__tests__',
       testMatch: /.*\.test\.ts$/,
     },
+    {
+      // Phase 33 -- Per-SOP Access Granularity + Wayfinder Builder Header
+      // Nyquist harness (Wave 0 / Plan 33-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase33/**) so every later plan in
+      // the phase drops specs into tests/phase33/ with NO further config edit --
+      // single registration point for the whole phase (mirrors phase26/28/29/30/32).
+      //
+      // Verify registration: `npx playwright test --list --project=phase33`
+      // (should list all 6 tests/phase33/*.spec.ts files -- zero discovered = FAIL)
+      //
+      // Wave-0 stub files (one per SC-1..SC-6):
+      //   teams-ladder (SC-1) - sop-drilldown (SC-2) - sop-grant-schema (SC-3) -
+      //   sop-grant-materialization (SC-4, [2026-06-15]-mandated real runtime) -
+      //   plain-language-access (SC-5) - wayfinder-header (SC-6)
+      name: 'phase33',
+      testDir: '.',
+      testMatch: /tests\/phase33\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
