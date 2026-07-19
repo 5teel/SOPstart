@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Workflow, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { deriveFlowGraph } from '@/lib/sop/flow-graph'
 import { FlowGraphSchema } from '@/lib/validators/flow-graph'
 import { FlowGraphCanvas } from '@/components/sop/flow/FlowGraphCanvas'
@@ -13,6 +13,10 @@ import type { SopWithSections } from '@/types/sop'
  * so admins can see the spatial flow without leaving the builder. Resolves the
  * same graph the Flow tab does (explicit flow_graph if valid, else derived) and
  * shows it in a portaled modal.
+ *
+ * Phase 33 (33-04) — trigger restyled as a "Tools for this SOP ▾" menu row
+ * (rendered inside BuilderStageShell's ToolsMenu popover); the modal itself
+ * is unchanged, still portaled to document.body.
  */
 export function BuilderFlowButton({ sop }: { sop: SopWithSections }) {
   const [open, setOpen] = useState(false)
@@ -40,25 +44,13 @@ export function BuilderFlowButton({ sop }: { sop: SopWithSections }) {
   return (
     <>
       <button
+        type="button"
+        role="menuitem"
         onClick={() => setOpen(true)}
-        title="View the procedure flow graph"
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          height: 30,
-          padding: '0 10px',
-          borderRadius: 7,
-          border: '1px solid #3f3f46',
-          background: 'transparent',
-          color: '#fafafa',
-          fontSize: 12,
-          fontWeight: 600,
-          cursor: 'pointer',
-          whiteSpace: 'nowrap',
-        }}
+        className="flex w-full flex-col items-start gap-0.5 rounded-xs px-3 py-2 text-left hover:bg-[var(--paper-2)] transition-colors"
       >
-        <Workflow size={14} /> Flow
+        <span className="text-[12.5px] text-[var(--ink-900)]">See the flow diagram</span>
+        <span className="text-[10.5px] text-[var(--ink-500)]">a map of how the steps connect — view only</span>
       </button>
 
       {open &&

@@ -22,7 +22,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { GitBranch, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { FlowGraphSchema } from '@/lib/validators/flow-graph'
 import type { FlowGraph } from '@/lib/validators/flow-graph'
 import { deriveFlowGraph } from '@/lib/sop/flow-graph'
@@ -79,25 +79,13 @@ export function BuilderFlowEditButton({ sop, sopId }: BuilderFlowEditButtonProps
   return (
     <>
       <button
+        type="button"
+        role="menuitem"
         onClick={() => { setDirty(false); setOpen(true) }}
-        title="Edit the procedure flow graph (author node positions)"
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: 6,
-          height: 30,
-          padding: '0 10px',
-          borderRadius: 7,
-          border: '1px solid #3f3f46',
-          background: 'transparent',
-          color: '#fafafa',
-          fontSize: 12,
-          fontWeight: 600,
-          cursor: 'pointer',
-          whiteSpace: 'nowrap',
-        }}
+        className="flex w-full flex-col items-start gap-0.5 rounded-xs px-3 py-2 text-left hover:bg-[var(--paper-2)] transition-colors"
       >
-        <GitBranch size={14} /> Edit flow
+        <span className="text-[12.5px] text-[var(--ink-900)]">Edit the flow diagram</span>
+        <span className="text-[10.5px] text-[var(--ink-500)]">drag the boxes around, then save the layout</span>
       </button>
 
       {open &&
