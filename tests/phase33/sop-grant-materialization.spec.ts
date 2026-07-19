@@ -121,6 +121,9 @@ async function materialize(admin: SupabaseClient, orgId: string, sopId: string):
   const { data: deptsData } = await admin.from('departments').select('id, area_id').eq('organisation_id', orgId).eq('archived', false)
   const { data: rolesData } = await admin.from('roles').select('id, department_id').eq('organisation_id', orgId)
   const { data: grantsData } = await admin.from('access_grants').select('subject_type, subject_id, collection_id, sop_id').eq('organisation_id', orgId)
+  const { data: sopFlagsData } = await admin.from('sops').select('all_departments, all_departments_pre_override').eq('id', sopId).maybeSingle()
+  const currentAllDepartments = (sopFlagsData as { all_departments: boolean; all_departments_pre_override: boolean | null } | null)?.all_departments ?? null
+  const currentPreOverride = (sopFlagsData as { all_departments: boolean; all_departments_pre_override: boolean | null } | null)?.all_departments_pre_override ?? null
 
   const depts = (deptsData ?? []) as Array<{ id: string; area_id: string | null }>
   const roles = (rolesData ?? []) as Array<{ id: string; department_id: string }>
@@ -158,7 +161,12 @@ async function materialize(admin: SupabaseClient, orgId: string, sopId: string):
   })
 
   if (overridden) {
-    await admin.from('sops').update({ all_departments: false }).eq('id', sopId)
+    await admin
+      .from('sops')
+      .update(currentPreOverride === null ? { all_departments: false, all_departments_pre_override: currentAllDepartments } : { all_departments: false })
+      .eq('id', sopId)
+  } else if (currentPreOverride !== null) {
+    await admin.from('sops').update({ all_departments: currentPreOverride, all_departments_pre_override: null }).eq('id', sopId)
   }
 
   await admin.from('sop_departments').delete().eq('sop_id', sopId)
@@ -469,5 +477,70 @@ test.describe('SC-4 — SOP-target override materialization (live Supabase)', ()
 
     const { data: rows } = await admin.from('access_grants').select('id').eq('sop_id', orgBSopId)
     expect(rows ?? []).toHaveLength(0)
+  })
+
+  test('a pre-Phase-32 org-wide SOP (all_departments=true, no collection grant) regains visibility after override then revoke', async () => {
+    const admin = serviceClient()
+
+    const orgId = await createEphemeralOrg(admin, 'Phase33 SGM WR-02 Org')
+    const { userId: grantee } = await createEphemeralWorker(admin, orgId, 'wr02-grantee')
+
+    // Collection carries NO access_grants rows — the untested WR-02 precondition.
+    const { data: collection } = await admin
+      .from('collections')
+      .insert({ organisation_id: orgId, name: 'WR-02 Ungranted Collection', colour: '#3b82f6', sort: 0 })
+      .select('id')
+      .single()
+    const collectionId = (collection as { id: string }).id
+
+    // Legacy pre-Phase-32 org-wide SOP: all_departments=true.
+    const { data: sop } = await admin
+      .from('sops')
+      .insert({
+        organisation_id: orgId,
+        title: 'Phase33 SGM WR-02 SOP',
+        category: 'WR-02 Ungranted Collection',
+        status: 'published',
+        source_file_path: 'phase33-test/fixture.docx',
+        source_file_type: 'docx',
+        source_file_name: 'fixture.docx',
+        uploaded_by: grantee,
+        all_departments: true,
+      })
+      .select('id')
+      .single()
+    const sopId = (sop as { id: string }).id
+
+    await admin.from('sop_collections').insert({ sop_id: sopId, collection_id: collectionId })
+
+    // 1. Person-subject SOP-target grant -> override.
+    const { data: sopTargetGrant, error: sopGrantErr } = await admin
+      .from('access_grants')
+      .insert({ organisation_id: orgId, subject_type: 'person', subject_id: grantee, sop_id: sopId })
+      .select('id')
+      .single()
+    expect(sopGrantErr).toBeNull()
+
+    await materialize(admin, orgId, sopId)
+
+    const { data: sopRowAfterOverride } = await admin.from('sops').select('all_departments, all_departments_pre_override').eq('id', sopId).single()
+    expect((sopRowAfterOverride as { all_departments: boolean; all_departments_pre_override: boolean | null }).all_departments).toBe(false)
+    expect((sopRowAfterOverride as { all_departments: boolean; all_departments_pre_override: boolean | null }).all_departments_pre_override).toBe(true)
+
+    const { data: peopleRowsAfterOverride } = await admin.from('sop_access_people').select('member_id').eq('sop_id', sopId)
+    expect((peopleRowsAfterOverride ?? []).map(r => r.member_id)).toEqual([grantee])
+    const { data: deptRowsAfterOverride } = await admin.from('sop_departments').select('department_id').eq('sop_id', sopId)
+    expect(deptRowsAfterOverride ?? []).toHaveLength(0)
+
+    // 2. Revoke the last SOP-target grant -> re-follow -> visibility RESTORED
+    //    (not silently invisible — the WR-02 bug this test closes).
+    const { error: revokeErr } = await admin.from('access_grants').delete().eq('id', (sopTargetGrant as { id: string }).id)
+    expect(revokeErr).toBeNull()
+
+    await materialize(admin, orgId, sopId)
+
+    const { data: sopRowAfterRevoke } = await admin.from('sops').select('all_departments, all_departments_pre_override').eq('id', sopId).single()
+    expect((sopRowAfterRevoke as { all_departments: boolean; all_departments_pre_override: boolean | null }).all_departments).toBe(true)
+    expect((sopRowAfterRevoke as { all_departments: boolean; all_departments_pre_override: boolean | null }).all_departments_pre_override).toBeNull()
   })
 })
