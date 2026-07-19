@@ -340,9 +340,23 @@ export async function updateSopTitle(
 export async function deleteSop(sopId: string): Promise<{ success: true } | { error: string }> {
   const ctx = await requireAdminContext()
   if ('error' in ctx) return ctx
+  if (!ctx.organisationId) return { error: 'No organisation' }
+
+  const admin = createAdminClient()
+
+  // Org-ownership guard — a Server Action is a directly-invokable POST endpoint,
+  // so sopId is attacker-controllable. Must reject BEFORE any service-role delete.
+  const { data: sopRow } = await admin
+    .from('sops')
+    .select('id, organisation_id')
+    .eq('id', sopId)
+    .maybeSingle()
+  if (!sopRow) return { error: 'SOP not found' }
+  if (sopRow.organisation_id !== ctx.organisationId) {
+    return { error: 'SOP belongs to another organisation' }
+  }
 
   // Delete sections (cascade deletes steps/images), parse jobs, assignments, then SOP
-  const admin = createAdminClient()
   await admin.from('sop_sections').delete().eq('sop_id', sopId)
   await admin.from('parse_jobs').delete().eq('sop_id', sopId)
   await admin.from('sop_assignments').delete().eq('sop_id', sopId)
