@@ -172,6 +172,46 @@ async function materialize(admin: SupabaseClient, orgId: string, sopId: string):
   }
 }
 
+/**
+ * Faithful stand-in for assignSopDepartments (src/actions/departments.ts,
+ * Phase 33 Plan 07) — replace-writes ONLY the dept-subject SOP-target
+ * access_grants rows for one SOP (never sop_departments directly), mirrors
+ * the production cross-org guard before writing anything, then calls the
+ * same materialize() stand-in used above so sop_departments derives from
+ * the grants just written.
+ */
+async function assignSopDepartmentsStandIn(
+  admin: SupabaseClient,
+  orgId: string,
+  sopId: string,
+  departmentIds: string[],
+  allDepartments = false,
+): Promise<{ success: true } | { error: string }> {
+  const { data: sopRow } = await admin.from('sops').select('id, organisation_id').eq('id', sopId).maybeSingle()
+  const sop = sopRow as { organisation_id: string | null } | null
+  if (!sop) return { error: 'SOP not found' }
+  if (sop.organisation_id && sop.organisation_id !== orgId) return { error: 'SOP belongs to another organisation' }
+
+  await admin.from('access_grants').delete().eq('organisation_id', orgId).eq('sop_id', sopId).eq('subject_type', 'department')
+  await admin.from('sops').update({ all_departments: allDepartments }).eq('id', sopId)
+
+  if (!allDepartments && departmentIds.length > 0) {
+    const { error: insErr } = await admin.from('access_grants').insert(
+      departmentIds.map(department_id => ({
+        organisation_id: orgId,
+        subject_type: 'department',
+        subject_id: department_id,
+        collection_id: null,
+        sop_id: sopId,
+      })),
+    )
+    if (insErr) return { error: insErr.message }
+  }
+
+  await materialize(admin, orgId, sopId)
+  return { success: true }
+}
+
 test.describe('SC-4 — SOP-target override materialization (live Supabase)', () => {
   test.skip(!LIVE_ENV_READY, 'requires NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY / NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY in .env.local')
 
@@ -314,6 +354,120 @@ test.describe('SC-4 — SOP-target override materialization (live Supabase)', ()
     expect(insertResult).toBeFalsy()
 
     const { data: rows } = await admin.from('access_grants').select('id').in('organisation_id', [orgAId, orgBId])
+    expect(rows ?? []).toHaveLength(0)
+  })
+
+  test('assignSopDepartments: hand-picked SOP is overridden-from-birth, survives an unrelated sibling collection materialize, and re-follows the collection once picks are cleared', async () => {
+    const admin = serviceClient()
+
+    const orgId = await createEphemeralOrg(admin, 'Phase33 SGM Closure Org')
+    const { userId: uploader } = await createEphemeralWorker(admin, orgId, 'uploader')
+
+    const { data: deptPicked1 } = await admin.from('departments').insert({ organisation_id: orgId, name: 'Picked One', code: 'pick1' }).select('id').single()
+    const { data: deptPicked2 } = await admin.from('departments').insert({ organisation_id: orgId, name: 'Picked Two', code: 'pick2' }).select('id').single()
+    const { data: deptCollection } = await admin.from('departments').insert({ organisation_id: orgId, name: 'Collection Dept', code: 'colld' }).select('id').single()
+    const picked1Id = (deptPicked1 as { id: string }).id
+    const picked2Id = (deptPicked2 as { id: string }).id
+    const collDeptId = (deptCollection as { id: string }).id
+
+    const { data: collection } = await admin
+      .from('collections')
+      .insert({ organisation_id: orgId, name: 'Closure Test Collection', colour: '#3b82f6', sort: 0 })
+      .select('id')
+      .single()
+    const collectionId = (collection as { id: string }).id
+
+    const { data: sop } = await admin
+      .from('sops')
+      .insert({
+        organisation_id: orgId,
+        title: 'Phase33 SGM Closure SOP',
+        category: 'Closure Test Collection',
+        status: 'published',
+        source_file_path: 'phase33-test/fixture.docx',
+        source_file_type: 'docx',
+        source_file_name: 'fixture.docx',
+        uploaded_by: uploader,
+        all_departments: false,
+      })
+      .select('id')
+      .single()
+    const sopId = (sop as { id: string }).id
+
+    await admin.from('sop_collections').insert({ sop_id: sopId, collection_id: collectionId })
+
+    // The collection carries a dept-subject grant for a DIFFERENT department —
+    // this is what the SOP would follow if it were NOT hand-picked/overridden.
+    const { error: collGrantErr } = await admin
+      .from('access_grants')
+      .insert({ organisation_id: orgId, subject_type: 'department', subject_id: collDeptId, collection_id: collectionId })
+    expect(collGrantErr).toBeNull()
+
+    // 1. From-birth: hand-pick 2 departments via the rewired write path.
+    //    sop_departments must be DERIVED — assert grant rows exist first.
+    const assignResult = await assignSopDepartmentsStandIn(admin, orgId, sopId, [picked1Id, picked2Id])
+    expect(assignResult).toEqual({ success: true })
+
+    const { data: grantRows } = await admin
+      .from('access_grants')
+      .select('subject_id')
+      .eq('organisation_id', orgId)
+      .eq('sop_id', sopId)
+      .eq('subject_type', 'department')
+    expect(((grantRows ?? []) as Array<{ subject_id: string }>).map(r => r.subject_id).sort()).toEqual([picked1Id, picked2Id].sort())
+
+    const deptRows = async () => ((await admin.from('sop_departments').select('department_id').eq('sop_id', sopId)).data ?? []) as Array<{ department_id: string }>
+    expect((await deptRows()).map(r => r.department_id).sort()).toEqual([picked1Id, picked2Id].sort())
+
+    // 2. Silent-drop closure — the exact 32-VERIFICATION hole: an UNRELATED
+    //    sibling-collection materialize (the "unrelated wiring" trigger) must
+    //    NOT replace the hand-picked set with the collection's department.
+    await materialize(admin, orgId, sopId)
+    expect((await deptRows()).map(r => r.department_id).sort()).toEqual([picked1Id, picked2Id].sort())
+
+    // 3. Clear the picks (empty set) -> SOP re-follows its collection (emergent).
+    const clearResult = await assignSopDepartmentsStandIn(admin, orgId, sopId, [])
+    expect(clearResult).toEqual({ success: true })
+
+    const { data: grantRowsAfterClear } = await admin
+      .from('access_grants')
+      .select('id')
+      .eq('organisation_id', orgId)
+      .eq('sop_id', sopId)
+      .eq('subject_type', 'department')
+    expect(grantRowsAfterClear ?? []).toHaveLength(0)
+    expect((await deptRows()).map(r => r.department_id)).toEqual([collDeptId])
+  })
+
+  test('assignSopDepartments: cross-org sopId is rejected before any write', async () => {
+    const admin = serviceClient()
+
+    const orgAId = await createEphemeralOrg(admin, 'Phase33 SGM Cross Org A')
+    const orgBId = await createEphemeralOrg(admin, 'Phase33 SGM Cross Org B')
+    const { userId: uploaderB } = await createEphemeralWorker(admin, orgBId, 'uploader-b')
+
+    const { data: deptA } = await admin.from('departments').insert({ organisation_id: orgAId, name: 'Org A Dept', code: 'orga' }).select('id').single()
+    const deptAId = (deptA as { id: string }).id
+
+    const { data: orgBSop } = await admin
+      .from('sops')
+      .insert({
+        organisation_id: orgBId,
+        title: 'Org B SOP',
+        source_file_name: 'fixture.docx',
+        source_file_type: 'docx',
+        source_file_path: '',
+        uploaded_by: uploaderB,
+        status: 'draft',
+      })
+      .select('id')
+      .single()
+    const orgBSopId = (orgBSop as { id: string }).id
+
+    const result = await assignSopDepartmentsStandIn(admin, orgAId, orgBSopId, [deptAId])
+    expect(result).toEqual({ error: 'SOP belongs to another organisation' })
+
+    const { data: rows } = await admin.from('access_grants').select('id').eq('sop_id', orgBSopId)
     expect(rows ?? []).toHaveLength(0)
   })
 })
