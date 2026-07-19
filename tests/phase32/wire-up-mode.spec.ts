@@ -35,12 +35,14 @@ function read(p: string): string {
 }
 
 test.describe('SC-5 — connect mode source contract', () => {
-  test('clicking a NEW·UNWIRED SOP jack toggles connect mode', () => {
+  test('clicking ANY SOP row (pinned or drilled-down) toggles connect mode — generalized 33-08', () => {
     const src = read(BAY)
     expect(src).toContain('NEW · UNWIRED')
-    expect(src).toContain('const enterWireUp = useCallback')
-    expect(src).toContain('setConnecting((c) => !c)')
-    expect(src).toContain('onClick={enterWireUp}')
+    // 33-08: enterWireUp generalizes from "the one pinned newSop" to "the
+    // selected SOP" — it now takes a sopId and every SOP row's onClick calls it.
+    expect(src).toContain('const enterWireUp = useCallback(')
+    expect(src).toContain('setConnecting((c) => (c && activeSopId === sopId ? false : true))')
+    expect(src).toContain('onClick={() => enterWireUp(s.id)}')
   })
 
   test('while connecting, clicking a left-side org unit toggles a pending grant (draws/removes a live wire)', () => {
@@ -51,10 +53,10 @@ test.describe('SC-5 — connect mode source contract', () => {
     expect(src).toContain('if (next.has(id)) next.delete(id)')
   })
 
-  test('pending grants render as live wires to the new SOP jack (org/area/dept endpoint -> newSop.id)', () => {
+  test('pending grants render as live wires to the active SOP (org/area/dept endpoint -> rightEndpoint(activeSop.id))', () => {
     const src = read(BAY)
-    expect(src).toContain('if (connecting && newSop) {')
-    expect(src).toContain('add(leftEndpoint(unitId), newSop.id, grant.subjectType === \'person\')')
+    expect(src).toContain('if (connecting && activeSop) {')
+    expect(src).toContain("add(leftEndpoint(unitId), rightEndpoint(activeSop.id), grant.subjectType === 'person')")
   })
 })
 
@@ -83,16 +85,15 @@ test.describe('SC-5 — ✓ Done writes grants via createGrant', () => {
     expect(src).toContain('createGrant(')
   })
 
-  test('Done grants the SOP\'s COLLECTION(s) — never the SOP id (CR-01 regression pin)', () => {
+  test('Done grants the SOP by sopId — never a collection id masquerading as one (CR-01 guard, evolved 33-08 SC-3)', () => {
     const src = read(BAY)
     expect(src).toContain('const handleDone = useCallback(async () => {')
     expect(src).toContain('for (const grant of pending.values()) {')
-    // CR-01: createGrant validates collectionId against the collections table —
-    // a SOP id can never pass, so granting newSop.id wrote NOTHING while the
-    // UI reported success. The contract is the server-resolved collection ids.
-    expect(src).not.toContain('collectionId: newSop.id')
-    expect(src).toContain('for (const collectionId of newSop.collectionIds) {')
-    expect(src).toContain('createGrant({ subjectType: grant.subjectType, subjectId: grant.subjectId, collectionId })')
+    // 33-05's SOP-target arm: createGrant XORs collectionId/sopId — a SOP
+    // selection writes sopId (collectionId omitted/null), never the old
+    // per-collection loop this guard used to require (CR-01 era).
+    expect(src).not.toContain('for (const collectionId of newSop.collectionIds)')
+    expect(src).toContain('createGrant({ subjectType: grant.subjectType, subjectId: grant.subjectId, sopId: activeSop.id })')
   })
 
   test('a createGrant failure surfaces to the UI, aborts, and keeps pending — never console-swallowed success (CR-01)', () => {
@@ -144,18 +145,20 @@ test.describe('SC-5 — wire-up mode runtime (requires chromium + live app, 32-0
     },
   )
 
-  test('pinned SOP reflects SAVED grants and nests under its collection (UAT G2 fix)', () => {
+  test('pinned SOP reflects SAVED grants and nests under its collection (UAT G2 fix, generalized 33-08)', () => {
     const src = read(BAY)
-    // Saved-state source of truth is the grants prop, not in-session pending
-    expect(src).toContain('const sopExistingGrants = useMemo')
-    expect(src).toContain('grants.filter((g) => newSop.collectionIds.includes(g.collectionId))')
+    // Saved-state source of truth is the grants prop (SOP-target grants,
+    // sopId === activeSopId), not in-session pending toggles.
+    expect(src).toContain('const activeSopExistingGrants = useMemo')
+    expect(src).toContain('grants.filter((g) => g.sopId === activeSopId)')
     // Badge: WIRED when saved grants exist; NEW · UNWIRED only when truly unwired
-    expect(src).toContain("sopWired ? 'WIRED' : 'NEW · UNWIRED'")
+    expect(src).toContain("overridden ? 'WIRED' : 'NEW · UNWIRED'")
     // Entering wire-up draws the saved wires alongside pending toggles
-    expect(src).toContain('for (const g of sopExistingGrants) {')
-    // Hierarchy: the pinned SOP renders as a child of its collection jack
-    expect(src).toContain('const holdsPinnedSop = !!newSop && sopParentCollectionId === c.id')
-    expect(src).toContain("className={`jack child newsop")
+    expect(src).toContain('for (const g of activeSopExistingGrants) {')
+    // Hierarchy: every SOP row (pinned or drilled-down) renders as a child
+    // of its collection jack via the generalized renderSopRow.
+    expect(src).toContain('const renderSopRow = (s: WiringSop, opts: { isPinned: boolean; nested: boolean }) => {')
+    expect(src).toContain("className={`jack${opts.nested ? ' child' : ''} newsop")
   })
 
   test.fixme(

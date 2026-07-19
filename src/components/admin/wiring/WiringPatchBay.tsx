@@ -14,18 +14,25 @@
  *     FLAT: D-01 defines `collections` as a flat org-scoped entity with no
  *     domain/group table — sketch 003's COL_GROUPS was demo-data grouping,
  *     not a real model; at ~20 rows a flat list stays scannable without it.
+ *     Each collection also expands in place to its own SOP rows (33-08, SC-2
+ *     — closes G2): `expandedCollections` mirrors `expandedAreas`.
  *  2. FOCUS — quiet by default: zero wires drawn until a click/search.
  *     Focusing a unit or collection draws only its wires, dims the rest.
  *  3. TRACE — every wire is resolved via the ONE resolveEffectiveAccess()
  *     (RESEARCH Pattern 2, no per-view recompute): direct/inherited = solid,
- *     personal (D-13) = dashed.
- *  4. WIRE-UP (D-12) — a NEW·UNWIRED SOP pins atop the library column;
- *     clicking it enters connect mode where left-side org units (org / area
- *     / department / role / person — the full ladder, 33-06) become grant
+ *     personal (D-13) = dashed. Called twice (33-08): once over collection
+ *     grants (`grantsByUnit`), once over SOP-target grants (`sopGrantsByUnit`)
+ *     — same pure resolver, a second grant-kind input, per Pattern 1.
+ *  4. WIRE-UP (D-12, generalized 33-08) — ANY SOP row (the pinned post-publish
+ *     `newSop`, or any SOP drilled into from its collection) is organically
+ *     selectable into connect mode: left-side org units (org / area /
+ *     department / role / person — the full ladder, 33-06) become grant
  *     toggles. Each toggle draws a live wire and updates a PEOPLE
- *     blast-radius banner. ✓ Done writes via `createGrant` (T-32-08-01 —
- *     the action self-enforces org scope, client toggles are never trusted
- *     directly).
+ *     blast-radius banner. ✓ Done writes ONE SOP-target grant per pending
+ *     subject via `createGrant({..., sopId})` (33-05's arm — the SOP becomes
+ *     chosen-by-name/overridden, stops following its collection). The
+ *     `?sop=` pin survives only as a deep-link nicety that pre-selects and
+ *     pre-expands — it is no longer a wiring precondition.
  *
  * D-11 (additive-only): there is NO in-place inherited-revoke affordance in
  * this component — revoking a grant happens at its source (a future
@@ -53,13 +60,20 @@ export interface WiringCollection {
   sopCount: number
 }
 
+/** 33-08 SC-2: one row of a collection's SOP drill-down (page.tsx `sopsByCollection`). */
+export interface WiringSop {
+  id: string
+  title: string
+  status: string
+}
+
 export interface WiringNewSop {
   id: string
   title: string
   /**
-   * CR-01: grants target COLLECTIONS, never SOP ids — the page resolves (and,
-   * via ensureSopCollections, creates) the SOP's collection(s) server-side.
-   * Empty means the SOP has no category/collection and cannot be wired yet.
+   * Deep-link nicety only (33-08): pre-selects/pre-expands the pinned SOP's
+   * collection. NOT a wiring precondition — a collection-less SOP is fully
+   * wireable by name via the SOP-target grant arm (33-05 CR-02 relaxation).
    */
   collectionIds: string[]
 }
@@ -68,6 +82,8 @@ interface WiringPatchBayProps {
   tree: OrgTree
   orgName?: string
   collections: WiringCollection[]
+  /** 33-08 SC-2: collection id -> its SOPs (id/title/status), for drill-down. */
+  sopsByCollection?: Record<string, WiringSop[]>
   grants: AccessGrant[]
   newSop?: WiringNewSop | null
   /**
@@ -108,13 +124,15 @@ function deptPeopleIds(dept: OrgTreeDepartment): string[] {
   return dept.roles.flatMap((r) => r.people.filter((p) => !p.isVacancy && p.id).map((p) => p.id as string))
 }
 
-export function WiringPatchBay({ tree, orgName = 'Whole site', collections, grants, newSop, deptMembers, onWireUpComplete }: WiringPatchBayProps) {
+export function WiringPatchBay({ tree, orgName = 'Whole site', collections, sopsByCollection = {}, grants, newSop, deptMembers, onWireUpComplete }: WiringPatchBayProps) {
   const [lens, setLens] = useState<LensView>('wiring')
   const [expandedAreas, setExpandedAreas] = useState<Set<string>>(new Set())
   const [expandedDepts, setExpandedDepts] = useState<Set<string>>(new Set())
   const [expandedRoles, setExpandedRoles] = useState<Set<string>>(new Set())
+  const [expandedCollections, setExpandedCollections] = useState<Set<string>>(new Set())
   const [focus, setFocus] = useState<string | null>(null)
   const [connecting, setConnecting] = useState(false)
+  const [activeSopId, setActiveSopId] = useState<string | null>(null)
   const [pending, setPending] = useState<Map<string, PendingGrant>>(new Map())
   const [search, setSearch] = useState('')
   const [saving, setSaving] = useState(false)
@@ -144,18 +162,34 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
   const personGrants = useMemo(() => grants.filter((g) => g.subjectType === 'person' && g.subjectId), [grants])
   const personIds = useMemo(() => [...new Set(personGrants.map((g) => g.subjectId as string))], [personGrants])
 
-  // UAT G2 fix: the pinned SOP's saved state must come from the GRANTS list,
-  // not the in-session `pending` toggles — otherwise a reload shows a wired
-  // SOP as "NEW · UNWIRED" and ✓ Done looks like it never persisted.
-  const sopExistingGrants = useMemo(
-    () => (newSop ? grants.filter((g) => newSop.collectionIds.includes(g.collectionId)) : []),
-    [grants, newSop],
-  )
-  const sopWired = sopExistingGrants.length > 0
-  // UAT G2 fix: nest the pinned SOP under its collection (hierarchy), not as a
-  // sibling of the collections list. Falls back to top-of-column when the SOP
-  // has no collection yet.
-  const sopParentCollectionId = newSop && newSop.collectionIds.length > 0 ? newSop.collectionIds[0] : null
+  // 33-08 SC-2: id -> SOP lookup and id -> parent collection id, across every
+  // drilled-down collection PLUS the pinned newSop (merged in even if its
+  // collection's join read hasn't caught up yet — its own collectionIds win).
+  const sopById = useMemo(() => {
+    const m = new Map<string, WiringSop>()
+    for (const sops of Object.values(sopsByCollection)) for (const s of sops) m.set(s.id, s)
+    if (newSop && !m.has(newSop.id)) m.set(newSop.id, { id: newSop.id, title: newSop.title, status: 'draft' })
+    return m
+  }, [sopsByCollection, newSop])
+
+  const sopParentCollection = useMemo(() => {
+    const m = new Map<string, string>()
+    for (const [cid, sops] of Object.entries(sopsByCollection)) for (const s of sops) m.set(s.id, cid)
+    if (newSop && newSop.collectionIds.length > 0 && !m.has(newSop.id)) m.set(newSop.id, newSop.collectionIds[0])
+    return m
+  }, [sopsByCollection, newSop])
+
+  // UAT G2 fix, generalized 33-08: the pinned SOP nests under its collection
+  // (hierarchy) — falls back to top-of-column only when it truly has none.
+  const sopParentCollectionId = newSop ? (sopParentCollection.get(newSop.id) ?? null) : null
+
+  // Deep-link nicety: a pinned ?sop= pre-expands its collection so the drill-
+  // down UX shows it immediately, without making expansion a precondition.
+  useEffect(() => {
+    if (!sopParentCollectionId) return
+    setExpandedCollections((prev) => (prev.has(sopParentCollectionId) ? prev : new Set(prev).add(sopParentCollectionId)))
+  }, [sopParentCollectionId])
+
   const personName = useCallback((id: string): string => {
     for (const dept of depts) for (const role of dept.roles) for (const p of role.people) if (p.id === id) return p.name
     return 'Person'
@@ -213,9 +247,24 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
   const grantsByUnit = useMemo(() => {
     const m: Record<string, string[]> = {}
     for (const g of grants) {
+      if (!g.collectionId) continue // 33-08: SOP-target grants (null collectionId) go through sopGrantsByUnit
       const key = g.subjectType === 'org' ? tree.organisationId : g.subjectId
       if (!key) continue
       ;(m[key] ??= []).push(g.collectionId)
+    }
+    return m
+  }, [grants, tree.organisationId])
+
+  // 33-08 SC-3: the same union resolver, fed SOP ids instead of collection
+  // ids (Pattern 1) — org/area/department/role/person SOP-target grants
+  // inherit down the chain exactly like collection grants.
+  const sopGrantsByUnit = useMemo(() => {
+    const m: Record<string, string[]> = {}
+    for (const g of grants) {
+      if (!g.sopId) continue
+      const key = g.subjectType === 'org' ? tree.organisationId : g.subjectId
+      if (!key) continue
+      ;(m[key] ??= []).push(g.sopId)
     }
     return m
   }, [grants, tree.organisationId])
@@ -226,6 +275,12 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
     for (const [unitId, chain] of chains) m.set(unitId, resolveEffectiveAccess(chain, grantsByUnit))
     return m
   }, [chains, grantsByUnit])
+
+  const sopAccessByUnit = useMemo(() => {
+    const m = new Map<string, EffectiveAccess>()
+    for (const [unitId, chain] of chains) m.set(unitId, resolveEffectiveAccess(chain, sopGrantsByUnit))
+    return m
+  }, [chains, sopGrantsByUnit])
 
   const collectionById = useMemo(() => new Map(collections.map((c) => [c.id, c])), [collections])
 
@@ -270,8 +325,20 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
     [chains, isCollapsed],
   )
 
-  // Every unit's own resolved access, flattened to raw edges (T-32-08-02 —
-  // display uses the SAME resolver as materialization, can't disagree).
+  // 33-08 rightEndpoint: mirror of leftEndpoint for the library side — a
+  // SOP-target wire anchors at the SOP row when its collection is expanded,
+  // else collapses to the collection jack (aggregated via WireAgg.count).
+  const rightEndpoint = useCallback(
+    (sopId: string): string => {
+      const collectionId = sopParentCollection.get(sopId)
+      if (!collectionId) return sopId
+      return expandedCollections.has(collectionId) ? sopId : collectionId
+    },
+    [sopParentCollection, expandedCollections],
+  )
+
+  // Every unit's own resolved COLLECTION access, flattened to raw edges
+  // (T-32-08-02 — display uses the SAME resolver as materialization).
   const rawEdges = useMemo(() => {
     const edges: Array<{ unitId: string; collectionId: string; personal: boolean }> = []
     for (const [unitId, access] of accessByUnit) {
@@ -282,6 +349,19 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
     return edges
   }, [accessByUnit, collectionById])
 
+  // 33-08: the SOP-target counterpart of rawEdges — kept as a separate array
+  // (not unioned into rawEdges) so the shipped collection-edge shape/pin
+  // stays byte-identical.
+  const rawSopEdges = useMemo(() => {
+    const edges: Array<{ unitId: string; sopId: string; personal: boolean }> = []
+    for (const [unitId, access] of sopAccessByUnit) {
+      for (const s of access.direct) if (sopParentCollection.has(s)) edges.push({ unitId, sopId: s, personal: false })
+      for (const s of Object.keys(access.inherited)) if (sopParentCollection.has(s)) edges.push({ unitId, sopId: s, personal: false })
+      for (const s of access.personal) if (sopParentCollection.has(s)) edges.push({ unitId, sopId: s, personal: true })
+    }
+    return edges
+  }, [sopAccessByUnit, sopParentCollection])
+
   // Quiet-by-default guard: zero wires until connect mode or a focus click.
   const visibleRawEdges = useMemo(() => {
     if (connecting) return []
@@ -290,6 +370,26 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
     return rawEdges.filter((e) => e.collectionId === focus)
   }, [connecting, focus, isLeftId, rawEdges])
 
+  const visibleSopEdges = useMemo(() => {
+    if (connecting) return []
+    if (!focus) return []
+    if (isLeftId(focus)) return rawSopEdges.filter((e) => e.unitId === focus)
+    return rawSopEdges.filter((e) => e.sopId === focus)
+  }, [connecting, focus, isLeftId, rawSopEdges])
+
+  // 33-08: the SOP currently targeted by connect mode — the pinned newSop or
+  // any SOP drilled into from its collection, resolved through the one
+  // sopById index so both sources render identically.
+  const activeSop = useMemo(() => (activeSopId ? (sopById.get(activeSopId) ?? null) : null), [activeSopId, sopById])
+
+  // UAT G2 fix, generalized 33-08: a SOP's saved state comes from the GRANTS
+  // list (SOP-target grants, sopId === activeSopId), not in-session `pending`
+  // toggles — otherwise a reload shows a wired SOP as unwired.
+  const activeSopExistingGrants = useMemo(
+    () => (activeSopId ? grants.filter((g) => g.sopId === activeSopId) : []),
+    [grants, activeSopId],
+  )
+
   const wires = useMemo((): WireAgg[] => {
     const agg = new Map<string, WireAgg>()
     const add = (l: string, r: string, dashed: boolean) => {
@@ -297,19 +397,20 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
       const prev = agg.get(key)
       if (prev) { prev.count += 1; prev.dashed = prev.dashed || dashed } else agg.set(key, { l, r, count: 1, dashed })
     }
-    if (connecting && newSop) {
-      for (const [unitId, grant] of pending) add(leftEndpoint(unitId), newSop.id, grant.subjectType === 'person')
+    if (connecting && activeSop) {
+      for (const [unitId, grant] of pending) add(leftEndpoint(unitId), rightEndpoint(activeSop.id), grant.subjectType === 'person')
       // Saved grants draw too — entering wire-up on an already-wired SOP shows
       // what's connected instead of pretending it's blank.
-      for (const g of sopExistingGrants) {
+      for (const g of activeSopExistingGrants) {
         const unitId = g.subjectType === 'org' ? tree.organisationId : g.subjectId
-        if (unitId) add(leftEndpoint(unitId), newSop.id, g.subjectType === 'person')
+        if (unitId) add(leftEndpoint(unitId), rightEndpoint(activeSop.id), g.subjectType === 'person')
       }
       return [...agg.values()]
     }
     for (const e of visibleRawEdges) add(leftEndpoint(e.unitId), e.collectionId, e.personal)
+    for (const e of visibleSopEdges) add(leftEndpoint(e.unitId), rightEndpoint(e.sopId), e.personal)
     return [...agg.values()]
-  }, [connecting, newSop, pending, sopExistingGrants, tree.organisationId, visibleRawEdges, leftEndpoint])
+  }, [connecting, activeSop, pending, activeSopExistingGrants, tree.organisationId, visibleRawEdges, visibleSopEdges, leftEndpoint, rightEndpoint])
 
   const litIds = useMemo(() => {
     const s = new Set<string>()
@@ -389,6 +490,15 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
     })
   }, [])
 
+  const toggleCollection = useCallback((collectionId: string) => {
+    setExpandedCollections((prev) => {
+      const next = new Set(prev)
+      if (next.has(collectionId)) next.delete(collectionId)
+      else next.add(collectionId)
+      return next
+    })
+  }, [])
+
   const handleLeftClick = useCallback(
     (id: string, subjectType: SubjectType) => {
       if (connecting) {
@@ -413,13 +523,19 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
     [connecting],
   )
 
-  const enterWireUp = useCallback(() => {
-    if (!newSop) return
-    setConnecting((c) => !c)
-    setFocus(null)
-    setPending(new Map())
-    setSaveError(null)
-  }, [newSop])
+  // 33-08: generalized WIRE-UP entry — ANY SOP row (pinned or drilled-down)
+  // enters/exits connect mode targeting that SOP. Re-clicking the SAME
+  // already-active SOP exits; clicking a different SOP switches target.
+  const enterWireUp = useCallback(
+    (sopId: string) => {
+      setConnecting((c) => (c && activeSopId === sopId ? false : true))
+      setActiveSopId(sopId)
+      setFocus(null)
+      setPending(new Map())
+      setSaveError(null)
+    },
+    [activeSopId],
+  )
 
   // Blast radius = distinct people reached by the DRAFT grants (D-11, unit is
   // PEOPLE not SOPs — the whole point of wire-up mode).
@@ -429,42 +545,38 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
     return s.size
   }, [pending, peopleIndex])
 
-  // CR-01: grants are written against the SOP's COLLECTION(s) — a SOP id can
-  // never pass createGrant's collection guard, so granting newSop.id silently
-  // wrote NOTHING while the UI reported success. Any failure now aborts,
-  // surfaces in the banner, and KEEPS the pending toggles (never a false
-  // "wired" state).
+  // 33-08 SC-3: Done writes ONE SOP-target grant per pending subject
+  // (sopId set, collectionId omitted/null — the createGrant XOR schema
+  // defaults it) — any tier. The SOP becomes chosen-by-name/overridden; no
+  // collection is required (CR-02 relaxation, 33-05), so the old "this SOP
+  // has no collection" dead-end is gone. A createGrant failure still aborts,
+  // surfaces in the banner, and keeps pending (never a false "wired" state).
   const handleDone = useCallback(async () => {
-    if (!newSop || pending.size === 0) return
+    if (!activeSop || pending.size === 0) return
     setSaving(true)
     setSaveError(null)
     try {
-      if (newSop.collectionIds.length === 0) {
-        setSaveError('This SOP has no collection — set its category first, then wire up access.')
-        return
-      }
       for (const grant of pending.values()) {
-        for (const collectionId of newSop.collectionIds) {
-          const result = await createGrant({ subjectType: grant.subjectType, subjectId: grant.subjectId, collectionId })
-          if ('error' in result) {
-            setSaveError(result.error)
-            return
-          }
+        const result = await createGrant({ subjectType: grant.subjectType, subjectId: grant.subjectId, sopId: activeSop.id })
+        if ('error' in result) {
+          setSaveError(result.error)
+          return
         }
       }
       setConnecting(false)
       setPending(new Map())
+      setActiveSopId(null)
       onWireUpComplete?.()
     } finally {
       setSaving(false)
     }
-  }, [newSop, pending, onWireUpComplete])
+  }, [activeSop, pending, onWireUpComplete])
 
   // ---- selection-strip content ----------------------------------------------
   const stripState = connecting ? 'wiring' : focus ? 'selection' : 'idle'
 
   const focusLabel = useMemo(() => {
-    if (connecting) return newSop?.title
+    if (connecting) return activeSop?.title
     if (!focus) return undefined
     if (focus === tree.organisationId) return orgName
     const area = tree.areas.find((a) => a.id === focus)
@@ -474,28 +586,32 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
     const role = roleById.get(focus)
     if (role) return role.name
     if (personIds.includes(focus) || treePersonIds.has(focus)) return personName(focus)
+    const sop = sopById.get(focus)
+    if (sop) return sop.title
     return collectionById.get(focus)?.name
-  }, [connecting, focus, newSop, tree, deptById, roleById, personIds, treePersonIds, personName, collectionById, orgName])
+  }, [connecting, focus, activeSop, tree, deptById, roleById, personIds, treePersonIds, personName, sopById, collectionById, orgName])
 
   const focusPeopleCount = useMemo(() => {
     if (!focus) return 0
     if (isLeftId(focus)) return (peopleIndex.get(focus) ?? []).length
     const s = new Set<string>()
     for (const e of visibleRawEdges) for (const pid of peopleIndex.get(e.unitId) ?? []) s.add(pid)
+    for (const e of visibleSopEdges) for (const pid of peopleIndex.get(e.unitId) ?? []) s.add(pid)
     return s.size
-  }, [focus, isLeftId, peopleIndex, visibleRawEdges])
+  }, [focus, isLeftId, peopleIndex, visibleRawEdges, visibleSopEdges])
 
   // WR-05: for a focused COLLECTION, "via M grants" counts the real source
   // grants on that collection — visibleRawEdges holds one derived edge per
   // unit that RESOLVES access (org + each area + each dept + each person from
   // a single org-level grant), so one grant rendered as "via 12 grants". For
   // a focused left-side unit the edge count IS its effective collections —
-  // kept as-is.
+  // kept as-is. 33-08: a focused SOP counts its own direct grant rows.
   const focusGrantCount = useMemo(() => {
     if (!focus) return 0
     if (collectionById.has(focus)) return grants.filter((g) => g.collectionId === focus).length
+    if (sopById.has(focus)) return grants.filter((g) => g.sopId === focus).length
     return visibleRawEdges.length
-  }, [focus, collectionById, grants, visibleRawEdges])
+  }, [focus, collectionById, sopById, grants, visibleRawEdges])
 
   // 32-09 SC-4 (viz-as-library-filter): a focused department or collection is
   // a valid /admin/sops server-side filter target — org/area/person focus
@@ -507,7 +623,7 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
     return undefined
   }, [connecting, focus, deptById, collectionById])
 
-  // ---- search: auto-expand areas containing matches -------------------------
+  // ---- search: auto-expand areas/depts/roles/collections containing matches -
   const matchIds = useMemo(() => {
     const q = search.trim().toLowerCase()
     if (!q) return null
@@ -521,12 +637,13 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
     }
     for (const area of tree.areas) if (area.name.toLowerCase().includes(q)) s.add(area.id)
     for (const c of collections) if (c.name.toLowerCase().includes(q)) s.add(c.id)
+    for (const sops of Object.values(sopsByCollection)) for (const sop of sops) if (sop.title.toLowerCase().includes(q)) s.add(sop.id)
     return s
-  }, [search, depts, tree.areas, collections])
+  }, [search, depts, tree.areas, collections, sopsByCollection])
 
   // Search auto-expands every ancestor tier of a match (mirrors the shipped
-  // area auto-expand) so a role/person match is never hidden behind a
-  // collapsed dept or role twist.
+  // area auto-expand) so a role/person/SOP match is never hidden behind a
+  // collapsed twist.
   useEffect(() => {
     if (!matchIds) return
     const deptHasMatch = (dept: OrgTreeDepartment): boolean =>
@@ -546,7 +663,12 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
       for (const dept of depts) for (const role of dept.roles) if (role.people.some((p) => p.id && matchIds.has(p.id))) next.add(role.id)
       return next
     })
-  }, [matchIds, tree.areas, depts])
+    setExpandedCollections((prev) => {
+      const next = new Set(prev)
+      for (const [cid, sops] of Object.entries(sopsByCollection)) if (sops.some((s) => matchIds.has(s.id))) next.add(cid)
+      return next
+    })
+  }, [matchIds, tree.areas, depts, sopsByCollection])
 
   const resetFocus = useCallback(() => {
     if (!connecting) setFocus(null)
@@ -623,6 +745,34 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
           <span className="port" />
         </div>
         {expanded && dept.roles.map((role) => renderRoleRow(role, indent + 18))}
+      </div>
+    )
+  }
+
+  // 33-08 SC-2: one SOP row — the child-row pattern from d3fc9f5, generalized
+  // from "the one pinned newSop" to any SOP. `isPinned` keeps the post-publish
+  // NEW · UNWIRED/WIRED pill on the deep-linked SOP only; every other row
+  // shows a "chosen by name" pill when it carries a direct SOP-target grant
+  // (the override trigger, derived client-side — no stored flag).
+  const renderSopRow = (s: WiringSop, opts: { isPinned: boolean; nested: boolean }) => {
+    const active = connecting && activeSopId === s.id
+    const overridden = grants.some((g) => g.sopId === s.id)
+    const grantCount = grants.filter((g) => g.sopId === s.id).length
+    return (
+      <div
+        key={s.id}
+        ref={registerNode(s.id)}
+        className={`jack${opts.nested ? ' child' : ''} newsop${active ? ' lit' : ''}`}
+        onClick={() => enterWireUp(s.id)}
+      >
+        {opts.isPinned ? (
+          <span className="newpill mono">{active && pending.size > 0 ? 'NEW' : overridden ? 'WIRED' : 'NEW · UNWIRED'}</span>
+        ) : overridden ? (
+          <span className="newpill mono">CHOSEN BY NAME</span>
+        ) : null}
+        <span className="name">{s.title}</span>
+        <span className="meta mono">{grantCount} grant{grantCount === 1 ? '' : 's'}</span>
+        <span className="port" />
       </div>
     )
   }
@@ -734,46 +884,32 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
 
             {/* Fallback position only when the SOP has no collection yet —
                 otherwise it renders nested under its collection below. */}
-            {newSop && !sopParentCollectionId && (
-              <div
-                ref={registerNode(newSop.id)}
-                className={`jack newsop${connecting ? ' lit' : ''}`}
-                onClick={enterWireUp}
-              >
-                <span className="newpill mono">{connecting && pending.size > 0 ? 'NEW' : sopWired ? 'WIRED' : 'NEW · UNWIRED'}</span>
-                <span className="name">{newSop.title}</span>
-                <span className="meta mono">{connecting ? pending.size : sopExistingGrants.length} grant{(connecting ? pending.size : sopExistingGrants.length) === 1 ? '' : 's'}</span>
-                <span className="port" />
-              </div>
-            )}
+            {newSop && !sopParentCollectionId && renderSopRow({ id: newSop.id, title: newSop.title, status: 'draft' }, { isPinned: true, nested: false })}
 
             {collections.map((c) => {
+              const expanded = expandedCollections.has(c.id)
               const dim = connecting || (!!focus && !litIds.has(c.id))
-              const holdsPinnedSop = !!newSop && sopParentCollectionId === c.id
+              const sopsHere = sopsByCollection[c.id] ?? []
+              const sopsHereWithPin =
+                newSop && sopParentCollectionId === c.id && !sopsHere.some((s) => s.id === newSop.id)
+                  ? [...sopsHere, { id: newSop.id, title: newSop.title, status: 'draft' }]
+                  : sopsHere
               return (
                 <div key={c.id}>
                   <div
                     ref={registerNode(c.id)}
-                    className={jackClasses(undefined, litIds.has(c.id), dim && !holdsPinnedSop, !!matchIds?.has(c.id))}
+                    className={jackClasses(undefined, litIds.has(c.id), dim, !!matchIds?.has(c.id))}
                     onClick={() => handleRightClick(c.id)}
                   >
+                    <span className="twist mono" onClick={(e) => { e.stopPropagation(); toggleCollection(c.id) }}>
+                      {expanded ? '▾' : '▸'}
+                    </span>
                     <span className="dept-dot" style={{ background: c.colour }} />
                     <span className="name">{c.name}</span>
                     <span className="meta mono">{c.sopCount} SOPs</span>
                     <span className="port" />
                   </div>
-                  {holdsPinnedSop && newSop && (
-                    <div
-                      ref={registerNode(newSop.id)}
-                      className={`jack child newsop${connecting ? ' lit' : ''}`}
-                      onClick={enterWireUp}
-                    >
-                      <span className="newpill mono">{connecting && pending.size > 0 ? 'NEW' : sopWired ? 'WIRED' : 'NEW · UNWIRED'}</span>
-                      <span className="name">{newSop.title}</span>
-                      <span className="meta mono">{connecting ? pending.size : sopExistingGrants.length} grant{(connecting ? pending.size : sopExistingGrants.length) === 1 ? '' : 's'}</span>
-                      <span className="port" />
-                    </div>
-                  )}
+                  {expanded && sopsHereWithPin.map((s) => renderSopRow(s, { isPinned: !!newSop && s.id === newSop.id, nested: true }))}
                 </div>
               )
             })}
@@ -781,7 +917,7 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
         </div>
       </div>
       <div className="bay-hint mono">
-        CLICK ▸ TO EXPAND A GROUP · CLICK ANYTHING TO FOCUS · CLICK THE NEW SOP TO WIRE IT UP
+        CLICK ▸ TO EXPAND A GROUP · CLICK ANYTHING TO FOCUS · CLICK A SOP TO WIRE IT UP
       </div>
     </div>
   )
