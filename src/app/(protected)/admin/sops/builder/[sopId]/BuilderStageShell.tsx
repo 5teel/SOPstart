@@ -68,42 +68,46 @@ function deriveSourcePaneKind(rawType: string | null | undefined): SourcePaneKin
 }
 
 // ---------------------------------------------------------------------------
-// Per-SOP labelled action menu — Phase 30 (30-07, UX-06 orchestrator decision #2)
+// ONE self-describing tools menu — Phase 33 (33-04, SC-6 winner decision #2)
 //
-// The 5 per-SOP actions (Assign / Versions / Video / QR / Delete-draft) move
-// OFF the admin list rows (30-08) into this labelled menu in the builder top
-// bar, reachable from every stage. Fixes usability-lab F-09 (icon-only
-// actions, WCAG) — every control here carries a visible text label.
+// Absorbs the old per-SOP actions menu (Assign / Versions / Video / QR /
+// Delete-draft — Phase 30 30-07 UX-06) PLUS BuilderFlowButton +
+// BuilderFlowEditButton, which render as menu rows below. Every item is a
+// plain-language verb phrase about THIS SOP with a one-line hint — labels
+// traced from the shipped code (sketches/builder-header-orientation
+// README § Decisions 2026-07-19).
 // ---------------------------------------------------------------------------
 
-function SopActionsMenu({
+function ToolsMenu({
   sopId,
   isDraft,
+  sop,
 }: {
   sopId: string
   isDraft: boolean
+  sop: SopWithSections
 }): React.JSX.Element {
   const [open, setOpen] = useState(false)
 
-  const items: { label: string; href: string }[] = [
-    { label: 'Assign to team', href: `/admin/sops/${sopId}/assign` },
-    { label: 'Version history', href: `/admin/sops/${sopId}/versions` },
-    { label: 'Generate video', href: `/admin/sops/${sopId}/video` },
-    { label: 'Print QR code', href: `/admin/sops/${sopId}/qr` },
+  const items: { label: string; hint: string; href: string }[] = [
+    { label: 'Assign this SOP to workers', hint: 'choose who must do it and by when', href: `/admin/sops/${sopId}/assign` },
+    { label: 'See earlier versions', hint: 'what changed, and when', href: `/admin/sops/${sopId}/versions` },
+    { label: 'Make a training video', hint: 'turn these steps into a narrated video', href: `/admin/sops/${sopId}/video` },
+    { label: 'Print a QR code', hint: 'stick it on the machine — scanning opens this SOP', href: `/admin/sops/${sopId}/qr` },
   ]
 
   return (
     <div className="relative">
       <button
         type="button"
-        data-testid="sop-actions-trigger"
+        data-testid="tools-menu-trigger"
         onClick={() => setOpen((o) => !o)}
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-label="SOP actions"
-        className="mono inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-xs border border-[var(--ink-500)] bg-transparent px-3 text-[12px] text-[var(--paper)] hover:border-[var(--ink-300)] transition-colors"
+        aria-label="Tools for this SOP"
+        className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-xs border border-[var(--ink-300)] bg-white px-3 text-[11px] text-[var(--ink-700)] hover:border-[var(--ink-900)] transition-colors"
       >
-        Actions
+        Tools for this SOP
         <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
       </button>
 
@@ -112,31 +116,38 @@ function SopActionsMenu({
           {/* Backdrop closes the menu on outside click */}
           <button
             type="button"
-            aria-label="Close actions menu"
+            aria-label="Close tools menu"
             tabIndex={-1}
             className="fixed inset-0 z-40 cursor-default"
             onClick={() => setOpen(false)}
           />
           <div
             role="menu"
-            aria-label="SOP actions"
-            data-testid="sop-actions-menu"
-            className="absolute right-0 top-full z-50 mt-1 min-w-[200px] rounded-sm border border-[var(--ink-100)] bg-[var(--paper)] py-1 shadow-lg"
+            aria-label="Tools for this SOP"
+            data-testid="tools-menu"
+            className="absolute left-0 top-full z-50 mt-1.5 min-w-[300px] rounded-md border border-[var(--ink-300)] bg-white py-1 shadow-lg"
           >
             {items.map((item) => (
               <Link
                 key={item.href}
                 role="menuitem"
                 href={item.href}
-                className="block px-3 py-2 text-sm text-[var(--ink-900)] hover:bg-[var(--paper-2)] transition-colors"
+                className="flex flex-col gap-0.5 px-3 py-2 hover:bg-[var(--paper-2)] transition-colors"
               >
-                {item.label}
+                <span className="text-[12.5px] text-[var(--ink-900)]">{item.label}</span>
+                <span className="text-[10.5px] text-[var(--ink-500)]">{item.hint}</span>
               </Link>
             ))}
+            <div className="my-1 h-px bg-[var(--ink-100)]" />
+            <BuilderFlowButton sop={sop} />
+            <BuilderFlowEditButton sop={sop} sopId={sopId} />
             {isDraft && (
-              <div role="menuitem" className="mt-1 border-t border-[var(--ink-100)] pt-1">
-                <DeleteSopButton sopId={sopId} redirectTo="/admin/sops" showLabel />
-              </div>
+              <>
+                <div className="my-1 h-px bg-[var(--ink-100)]" />
+                <div role="menuitem">
+                  <DeleteSopButton sopId={sopId} redirectTo="/admin/sops" showLabel />
+                </div>
+              </>
             )}
           </div>
         </>
@@ -340,6 +351,18 @@ export function BuilderStageShell({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sopVersion = (initialSop as any).version as number | undefined
 
+  // "You're editing / checking / sending" here-zone verb — Phase 33 (33-04)
+  const HERE_VERB: Record<BuilderStage, string> = {
+    build: 'editing',
+    review: 'checking',
+    publish: 'sending',
+  }
+
+  const approvalPending = approvalStatus?.state === 'pending'
+  const nextApproverLabel = approvalPending
+    ? approvalStatus?.steps?.[approvalStatus.nextStepIndex]?.label
+    : undefined
+
   // ------------------------------------------------------------------
   // Render
   // ------------------------------------------------------------------
@@ -356,105 +379,56 @@ export function BuilderStageShell({
           background: '#fafafa',
         }}
       >
-        {/* ── Top bar (48px, --steel-900) ──────────────────────────── */}
+        {/* ── Wayfinder bar (Phase 33, 33-04, SC-6) ────────────────────
+            Light paper/hairline schema — back / here / forward zones.
+            The amber "YOU'RE EDITING" tick and the green ready-chip are
+            the only colour. ─────────────────────────────────────────── */}
         <header
-          style={{
-            height: 48,
-            minHeight: 48,
-            background: '#0a0a0b',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0 16px',
-            flexShrink: 0,
-          }}
+          data-testid="wayfinder-bar"
+          className="flex items-stretch bg-white border-b border-[var(--ink-100)]"
+          style={{ height: 58, minHeight: 58, flexShrink: 0 }}
         >
-          {/* Left: back-link + SOP title + version — the single navigation/
-              identity row (32-uat: BuilderClient no longer repeats the title) */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <Link
-              href="/admin/sops"
-              style={{
-                fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-                fontSize: 12,
-                color: '#a1a1aa',
-                textDecoration: 'none',
-                whiteSpace: 'nowrap',
-                flexShrink: 0,
-              }}
+          {/* Back zone */}
+          <Link
+            href="/admin/sops"
+            data-testid="wayfinder-back"
+            className="flex flex-shrink-0 items-center gap-2 px-[18px] border-r border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] no-underline transition-colors"
+          >
+            <span className="text-[15px]" aria-hidden="true">←</span>
+            <span className="flex flex-col leading-tight">
+              <span className="text-[9px] uppercase tracking-wider text-[var(--ink-300)]">Back to</span>
+              <span className="text-[12px]">SOP library</span>
+            </span>
+          </Link>
+
+          {/* Here zone */}
+          <div
+            data-testid="wayfinder-here"
+            className="flex min-w-0 flex-1 items-center gap-[11px] px-[18px] border-r border-[var(--ink-100)]"
+          >
+            <span
+              className="flex-shrink-0 text-[9px] uppercase leading-tight tracking-wider text-amber-700"
+              style={{ borderLeft: '3px solid var(--brand-yellow, #fbbf24)', paddingLeft: 9 }}
             >
-              ← Library
-            </Link>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              You&rsquo;re<br />{HERE_VERB[activeStage]}
+            </span>
             {sopTitle && (
               <span
-                style={{
-                  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: '#fafafa',
-                  lineHeight: 1.3,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  maxWidth: 320,
-                }}
+                className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[13.5px] font-semibold text-[var(--ink-900)]"
+                title={sopTitle}
               >
                 {sopTitle}
               </span>
             )}
             {sopVersion !== undefined && (
-              <span
-                style={{
-                  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-                  fontSize: 10,
-                  fontWeight: 400,
-                  color: '#71717a',
-                  lineHeight: 1.3,
-                }}
-              >
+              <span className="flex-shrink-0 rounded-xs border border-[var(--ink-300)] px-1.5 py-0.5 text-[9px] text-[var(--ink-500)]">
                 v{sopVersion}
               </span>
             )}
-            </div>
           </div>
 
-          {/* Right-of-center: labelled tools cluster + stepper (progress) */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            {/* 32-uat: group the per-SOP tools in one bordered cluster so they
-                read as tools, distinct from navigation (left) and the stage
-                stepper (progress, right). */}
-            <div
-              data-testid="builder-tools-cluster"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                padding: '3px 8px',
-                border: '1px solid #27272a',
-                borderRadius: 4,
-              }}
-            >
-              <span
-                aria-hidden="true"
-                style={{
-                  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-                  fontSize: 9,
-                  textTransform: 'uppercase',
-                  letterSpacing: 1,
-                  color: '#71717a', // --ink-500
-                }}
-              >
-                Tools
-              </span>
-              {/* Phase 30 (30-07) — UX-06 labelled per-SOP action menu */}
-              <SopActionsMenu sopId={sopId} isDraft={initialSop.status === 'draft'} />
-              {/* Phase 24 Plan 03 — FLOW-05: "Edit flow" re-surfaces FlowGraphEditor
-                  outside the suppressed Puck right sidebar via a portaled modal.
-                  No Puck hook is called — avoids CLAUDE.md 2026-06-08 outside-Puck crash. */}
-              <BuilderFlowEditButton sop={initialSop} sopId={sopId} />
-              <BuilderFlowButton sop={initialSop} />
-            </div>
+          {/* Forward zone — single next-stage chip, lock reason inline */}
+          <div data-testid="wayfinder-forward" className="flex flex-shrink-0 items-center px-[14px]">
             <BuilderStageStepper
               activeStage={activeStage}
               hasSourceDoc={hasSourceDoc}
@@ -462,9 +436,22 @@ export function BuilderStageShell({
               verifiedCount={effectiveVerifiedCount}
               totalCount={effectiveTotalCount}
               onStageSelect={handleStageSelect}
+              approvalPending={approvalPending}
+              approverLabel={nextApproverLabel}
             />
           </div>
         </header>
+
+        {/* ── Tools row (--paper-2) ─────────────────────────────────── */}
+        <div className="flex h-9 flex-shrink-0 items-center gap-2 border-b border-[var(--ink-100)] bg-[var(--paper-2)] px-[18px]">
+          <ToolsMenu sopId={sopId} isDraft={initialSop.status === 'draft'} sop={initialSop} />
+          <span className="flex-1" />
+          {showVerifyGate && (
+            <span className="text-[10.5px] text-[var(--ink-500)]">
+              <b className="text-[var(--ink-900)]">{effectiveVerifiedCount} of {effectiveTotalCount}</b> steps checked
+            </span>
+          )}
+        </div>
 
         {/* ── Stage content area ───────────────────────────────────── */}
         <main style={{ flex: '1 1 0', minHeight: 0, display: 'flex', flexDirection: 'column' }}>

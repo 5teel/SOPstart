@@ -3,15 +3,24 @@
 /**
  * BuilderStageStepper
  *
- * Renders the Build → Review & verify → Publish chip row inside the dark top
- * bar. When `hasSourceDoc` is true, all three chips are shown; when false the
- * Review chip is omitted (Build → Publish only).
+ * Phase 33 (33-04, SC-6) — the forward-zone renderer for the Wayfinder bar.
+ * Renders a SINGLE next-stage chip (not the old 3-chip breadcrumb row) that
+ * carries its own lock reason inline: "Locked — {N} steps below still need
+ * checking". When Phase 29's approval chain is pending, the chip becomes an
+ * amber "Waiting for approval" state — that blocks the whole SOP regardless
+ * of which internal stage is active, so it takes priority over the next-stage
+ * chip.
  *
  * This is a fully controlled presentational component — it fetches no data.
- * All state comes from props supplied by the BuilderStageShell (Plan 05).
+ * All state comes from props supplied by the BuilderStageShell.
  *
  * Requirements: R1 (3-stage sequence), R6 (inline publish reason), R8 (adaptive
- * 2-vs-3 stage), R9 (tablet number-only chips).
+ * 2-vs-3 stage), SC-6 (Wayfinder forward chip).
+ *
+ * KEPT verbatim (pinned by tests/phase30/plain-language.spec.ts +
+ * tests/builder/builder-review-flow.spec.ts): the BuilderStage union, the
+ * `chips` stage/label literals, and the display labels 'Edit' / 'Check' /
+ * 'Send to workers'.
  */
 
 export type BuilderStage = 'build' | 'review' | 'publish';
@@ -23,173 +32,17 @@ export interface BuilderStageStepperProps {
   verifiedCount: number;
   totalCount: number;
   onStageSelect: (stage: BuilderStage) => void;
+  /** Phase 29 — true when this SOP's approval chain is currently pending. */
+  approvalPending?: boolean;
+  /** Phase 29 — the next approver's label, when known. */
+  approverLabel?: string;
 }
-
-type ChipState = 'done' | 'active' | 'todo';
 
 interface StageChip {
   stage: BuilderStage;
   label: string;
   ordinal: number;
 }
-
-/**
- * Derive whether a chip is done / active / todo based on active stage and
- * position in the ordered stage list.
- */
-function chipState(
-  chipOrdinal: number,
-  activeOrdinal: number,
-): ChipState {
-  if (chipOrdinal < activeOrdinal) return 'done';
-  if (chipOrdinal === activeOrdinal) return 'active';
-  return 'todo';
-}
-
-// ---------------------------------------------------------------------------
-// Sub-components
-// ---------------------------------------------------------------------------
-
-interface NumberDotProps {
-  state: ChipState;
-  ordinal: number;
-}
-
-function NumberDot({ state, ordinal }: NumberDotProps) {
-  if (state === 'done') {
-    return (
-      <span
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 16,
-          height: 16,
-          borderRadius: '50%',
-          background: '#10b981', // --accent-ok
-          flexShrink: 0,
-          fontSize: 10,
-          color: '#ffffff',
-          fontWeight: 700,
-          lineHeight: 1,
-        }}
-        aria-hidden="true"
-      >
-        ✓
-      </span>
-    );
-  }
-
-  if (state === 'active') {
-    return (
-      <span
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 16,
-          height: 16,
-          borderRadius: '50%',
-          background: '#3b82f6', // --accent-step
-          flexShrink: 0,
-          fontSize: 10,
-          color: '#ffffff',
-          fontWeight: 700,
-          lineHeight: 1,
-        }}
-        aria-hidden="true"
-      >
-        {ordinal}
-      </span>
-    );
-  }
-
-  // todo
-  return (
-    <span
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: 16,
-        height: 16,
-        borderRadius: '50%',
-        border: '1px solid #52525b',
-        background: 'transparent',
-        flexShrink: 0,
-        fontSize: 10,
-        color: '#71717a', // --ink-500
-        fontWeight: 700,
-        lineHeight: 1,
-      }}
-      aria-hidden="true"
-    >
-      {ordinal}
-    </span>
-  );
-}
-
-interface ChipProps {
-  chip: StageChip;
-  state: ChipState;
-  disabled: boolean;
-  onSelect: (stage: BuilderStage) => void;
-}
-
-function StageChipButton({ chip, state, disabled, onSelect }: ChipProps) {
-  const chipBg =
-    state === 'active' ? '#ffffff' : 'transparent';
-  const chipColor =
-    state === 'done'
-      ? '#10b981' // --accent-ok
-      : state === 'active'
-        ? '#09090b' // --ink-900
-        : '#71717a'; // --ink-500 (todo)
-
-  const handleClick = () => {
-    if (!disabled) onSelect(chip.stage);
-  };
-
-  return (
-    <button
-      type="button"
-      onClick={handleClick}
-      disabled={disabled}
-      aria-disabled={disabled}
-      aria-label={`Go to ${chip.label} stage`}
-      aria-current={state === 'active' ? 'step' : undefined}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 8,
-        padding: '4px 12px',
-        borderRadius: 2,
-        border: 'none',
-        background: chipBg,
-        color: chipColor,
-        cursor: disabled ? 'default' : 'pointer',
-        opacity: disabled ? 0.5 : 1,
-        fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-        fontSize: 12,
-        fontWeight: 500,
-        lineHeight: 1.3,
-        whiteSpace: 'nowrap',
-        flexShrink: 0,
-        transition: 'background 120ms',
-      }}
-    >
-      <NumberDot state={state} ordinal={chip.ordinal} />
-      {/* Full label — hidden on tablet via CSS */}
-      <span className="stepper-chip-label" title={chip.label}>
-        {chip.label}
-      </span>
-    </button>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Main component
-// ---------------------------------------------------------------------------
 
 export function BuilderStageStepper({
   activeStage,
@@ -198,8 +51,9 @@ export function BuilderStageStepper({
   verifiedCount,
   totalCount,
   onStageSelect,
+  approvalPending = false,
+  approverLabel,
 }: BuilderStageStepperProps) {
-  // Build the ordered chip list based on whether source doc is present.
   // Phase 30 (30-07, UX-07): DISPLAY labels are plain-language — Edit / Check /
   // Send to workers. The BuilderStage union + stage keys stay 'build' |
   // 'review' | 'publish' (routes/state names unchanged; labels only).
@@ -214,7 +68,6 @@ export function BuilderStageStepper({
         { stage: 'publish', label: 'Send to workers', ordinal: 2 },
       ];
 
-  // Map stage → ordinal for state derivation.
   const stageToOrdinal: Record<BuilderStage, number> = {
     build: 1,
     review: hasSourceDoc ? 2 : -1, // -1 = not present
@@ -222,98 +75,73 @@ export function BuilderStageStepper({
   };
 
   const activeOrdinal = stageToOrdinal[activeStage];
+  const remaining = Math.max(0, totalCount - verifiedCount);
 
-  const remaining = totalCount - verifiedCount;
+  // The forward chip is whichever chip sits one ordinal ahead of the active
+  // stage. On the final stage there is nothing ahead — the chip disappears
+  // (unless an approval chain is blocking, handled first below).
+  const forwardChip = chips.find((c) => c.ordinal === activeOrdinal + 1) ?? null;
+
+  if (approvalPending) {
+    return (
+      <div
+        data-testid="wayfinder-forward-chip"
+        data-chip-state="pending-approval"
+        className="flex flex-col items-start gap-0.5 rounded-sm border-[1.5px] px-3.5 py-1.5 text-left"
+        style={{ borderColor: '#b45309', background: 'rgba(180,83,9,0.08)' }}
+      >
+        <span className="text-[11.5px] font-semibold" style={{ color: '#b45309' }}>
+          Waiting for approval
+        </span>
+        <span className="text-[10px]" style={{ color: '#b45309' }}>
+          {approverLabel ? `Next: ${approverLabel}` : 'An approver needs to review this'}
+        </span>
+      </div>
+    );
+  }
+
+  if (!forwardChip) return null;
+
+  const locked = forwardChip.stage === 'publish' && !isReady;
+  const ready = forwardChip.stage === 'publish' && isReady;
+
+  const handleClick = () => {
+    if (!locked) onStageSelect(forwardChip.stage);
+  };
 
   return (
-    <>
-      {/* Responsive styles for tablet breakpoint (768–1023px) */}
-      <style>{`
-        @media (min-width: 768px) and (max-width: 1023px) {
-          .stepper-chip-label { display: none; }
-        }
-        @media (min-width: 1024px) {
-          .stepper-chip-label { display: inline; }
-        }
-      `}</style>
-
-      <div
-        data-testid="builder-stage-stepper"
-        data-active-stage={activeStage}
-        style={{
-          display: 'inline-flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 4,
-        }}
+    <button
+      type="button"
+      data-testid="wayfinder-forward-chip"
+      data-chip-state={locked ? 'locked' : ready ? 'ready' : 'next'}
+      onClick={handleClick}
+      disabled={locked}
+      aria-disabled={locked}
+      aria-label={`Go to ${forwardChip.label} stage`}
+      className={`flex flex-col items-start gap-0.5 rounded-sm border-[1.5px] px-3.5 py-1.5 text-left transition-colors ${
+        ready ? 'border-[var(--accent-ok)]' : 'border-[var(--ink-300)] bg-[var(--paper-2)]'
+      } ${locked ? 'cursor-default' : 'cursor-pointer'}`}
+      style={ready ? { background: 'rgba(16,185,129,.08)' } : undefined}
+    >
+      <span
+        className="flex items-center gap-1.5 text-[11.5px]"
+        style={{ color: ready ? 'var(--accent-ok)' : locked ? 'var(--ink-700)' : 'var(--ink-900)' }}
       >
-        {/* Chip row */}
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 0,
-          }}
-        >
-          {chips.map((chip, idx) => {
-            const state = chipState(chip.ordinal, activeOrdinal);
-
-            // Determine disabled state per chip.
-            // - Publish: disabled when !isReady
-            // - Review: disabled when !hasSourceDoc (won't appear in 2-stage but guard for safety)
-            // - Build: always enabled
-            const isDisabled =
-              (chip.stage === 'publish' && !isReady) ||
-              (chip.stage === 'review' && !hasSourceDoc);
-
-            return (
-              <span
-                key={chip.stage}
-                style={{ display: 'inline-flex', alignItems: 'center' }}
-              >
-                <StageChipButton
-                  chip={chip}
-                  state={state}
-                  disabled={isDisabled}
-                  onSelect={onStageSelect}
-                />
-                {/* Arrow glyph between chips */}
-                {idx < chips.length - 1 && (
-                  <span
-                    aria-hidden="true"
-                    style={{
-                      color: '#3f3f46',
-                      fontSize: 10,
-                      lineHeight: 1,
-                      padding: '0 2px',
-                      fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-                    }}
-                  >
-                    →
-                  </span>
-                )}
-              </span>
-            );
-          })}
-        </div>
-
-        {/* Inline publish-gate reason — present ONLY when !isReady */}
-        {!isReady && (
-          <span
-            data-testid="stepper-publish-reason"
-            style={{
-              fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-              fontSize: 10,
-              color: '#a1a1aa',
-              lineHeight: 1.3,
-              display: 'block',
-              textAlign: 'center',
-            }}
-          >
-            🔒 {remaining} of {totalCount} steps left to verify
-          </span>
-        )}
-      </div>
-    </>
+        <span className="text-[9px] uppercase tracking-wider text-[var(--ink-500)]">Next →</span>
+        <span className={ready ? 'font-semibold' : ''}>{forwardChip.label}</span>
+        {locked && <span aria-hidden="true">🔒</span>}
+      </span>
+      <span
+        data-testid="wayfinder-lock-reason"
+        className="text-[10px]"
+        style={{ color: ready ? 'var(--accent-ok)' : 'var(--ink-500)' }}
+      >
+        {locked
+          ? `Locked — ${remaining} steps below still need checking`
+          : ready
+            ? `All ${totalCount} steps checked — ready to go`
+            : `Continue to ${forwardChip.label.toLowerCase()}`}
+      </span>
+    </button>
   );
 }

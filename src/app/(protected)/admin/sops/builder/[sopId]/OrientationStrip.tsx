@@ -31,13 +31,15 @@ export function OrientationStrip({
     totalCount > 0 ? Math.min(1, Math.max(0, verifiedCount / totalCount)) : 0;
   const fillPercent = `${Math.round(progress * 100)}%`;
 
-  // 32-uat orientation sentence — plain language, live counts (same
-  // verifiedCount/totalCount source as the stepper's 🔒 lock label).
+  // 33-04: the "unlocks Send to workers" reason now lives on the Wayfinder
+  // bar's forward chip ("Locked — N steps below still need checking") — this
+  // sentence only needs to say what this list IS, not restate the lock
+  // condition a second time (RESEARCH Pattern 6: dedupe).
   const remaining = Math.max(0, totalCount - verifiedCount);
   const orientationSentence =
     remaining > 0
-      ? `You're checking this SOP — verify the remaining ${remaining} of ${totalCount} blocks below to unlock Send to workers.`
-      : `All ${totalCount} blocks verified — Send to workers is unlocked.`;
+      ? `Check each block below against the source document — ${remaining} of ${totalCount} left.`
+      : `All ${totalCount} blocks checked against the source document.`;
 
   return (
     <div
