@@ -222,7 +222,8 @@ Plans:
 **Pre-plan gates:** (a) roles entity schema decision (`roles` + `role_members` + budgeted_count; Phase 25 model has no role layer); (b) inherited-revoke ("exclude from broadcast grant") UX decision; (c) how dept-visibility RLS (sop_departments) extends to area/person-level grants.
 **Plans:** 9/9 plans complete
 **Pre-plan gates resolved:** (a) roles schema → `roles`+`role_members`+budgeted_count (D-05, 32-02); (b) inherited-revoke → additive-only v1, revoke-at-source (D-11); (c) area/person RLS → materialize onto `sop_departments` + ONE additive person/role RLS arm `sops_visible_by_person_grant` reading `sop_access_people` (D-13, 32-02).
-Plans:
+
+Plans:
 **Wave 1**
 
 - [x] 32-01-PLAN.md — Wave 1: phase32 Playwright project + 8 stub specs (SC-1..SC-6 + org-isolation + person-grant-rls)
@@ -255,7 +256,7 @@ Plans:
 **Goal:** Any org tier (site / area / department / role / person) can be granted access down to an INDIVIDUAL SOP — "only Dave and Priya see Pump Rebuild while Maintenance department sees the rest of the collection" — on an access map whose teams column shows the full org ladder, with plain-language copy throughout; plus the builder header becomes the Wayfinder bar (light schema, one self-describing tools menu). Closes Phase 32 UAT gaps G1/G2/G3.
 **Design validated:** `sketches/builder-header-orientation/` (winner A Wayfinder — light paper schema, single "Tools for this SOP" menu; decisions 2026-07-19) + `sketches/access-hierarchy/` (winner A Access map with B's "Who can see this?" panel absorbed; full org ladder + per-SOP chosen-by-name; decisions 2026-07-19). Seed: `.planning/todos/pending/phase-seed-per-sop-access-and-wayfinder.md`.
 **Depends on:** Phase 32 (access map surface, grants engine + materialization, org model)
-**Requirements**: TBD (formalize at plan time)
+**Requirements**: SC-1..SC-6 (the success criteria below serve as the requirement IDs; every plan's frontmatter references them)
 **Success Criteria** (what must be TRUE):
 
   1. The access map's teams column shows site → area → department → role → person as expandable, selectable tiers (mirrors `OrgTree` from /admin/team)
@@ -266,6 +267,32 @@ Plans:
   6. Builder header is the light-schema Wayfinder bar — back / you-are-here / forward zones with the lock reason inline, and ONE "Tools for this SOP" menu with self-describing labels (Assign to workers / See earlier versions / Make a training video / Print a QR code / See the flow diagram / Edit the flow diagram / Delete this draft)
 
 **Pre-plan gates:** (a) `access_grants` SOP-target schema decision (nullable `sop_id` arm vs target-type enum); (b) exact narrowing-override semantics in resolve-access + materialization (first override in the additive D-11 model — includes what happens when the last named person is removed); (c) wire-density strategy for chosen-SOP person-lines at 15×20 scale (extend Phase 32 focus/group-collapse to SOP rows).
+
+**Planned:** 2026-07-19 — 9 plans / 5 waves. Gates (a)/(b)/(c) resolved by 33-RESEARCH: (a) nullable `sop_id` arm + XOR check (00050); (b) override = any direct SOP-target grant from any tier, implemented in materialization only, re-follow emergent when the last one is revoked; (c) rightEndpoint collapse to the collection jack + shipped quiet/focus rules. Dual-write closure default adopted: hand-picked departments = SOP-target grants, overridden-from-birth (research Open Question 1, option i).
+
+**Wave 1**
+
+- [ ] 33-01-PLAN.md — phase33 Playwright project + 6 SC stub specs + override-rule unit stub
+- [ ] 33-02-PLAN.md — migration 00050 (nullable `sop_id` arm + XOR + 00049 index swap) + equivalence script (files only)
+
+**Wave 2**
+
+- [ ] 33-03-PLAN.md — [BLOCKING] live `db push` 00050 + pre/post grant-row equivalence + index-swap assertions
+- [ ] 33-04-PLAN.md — Wayfinder builder header (light bar, inline lock reason) + ONE "Tools for this SOP" menu (SC-6)
+
+**Wave 3**
+
+- [ ] 33-05-PLAN.md — grants.ts SOP-target arm + narrowing-override materialization + LIVE ephemeral-org runtime tests (SC-3/SC-4)
+- [ ] 33-06-PLAN.md — WiringPatchBay full teams ladder: dept→role→person tiers, dashed vacancies (SC-1)
+
+**Wave 4**
+
+- [ ] 33-07-PLAN.md — dual-write closure: assignSopDepartments/wizard/ai-prompt rewired through SOP-target grants (closes the 32-VERIFICATION anti-pattern)
+- [ ] 33-08-PLAN.md — collection→SOP drill-down + organic choose-mode + rightEndpoint + chosen-by-name pill (SC-2)
+
+**Wave 5**
+
+- [ ] 33-09-PLAN.md — plain-language copy + AccessAnswerPanel + journeys/uat (incl. WR-02 closure) + phase gate (SC-5)
 
 ---
 
