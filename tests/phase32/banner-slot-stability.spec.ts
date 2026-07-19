@@ -39,21 +39,21 @@ test.describe('SC-6 — SelectionStrip source contract', () => {
     expect(src).not.toMatch(/state === '\w+' \? <div/)
   })
 
-  test('idle state renders the onboarding copy', () => {
+  test('idle state renders the onboarding copy (33-09 plain language)', () => {
     const src = read(STRIP)
-    expect(src).toContain('Select anything to trace who it reaches')
-    expect(src).toContain('click the NEW SOP to wire it up')
+    expect(src).toContain('Click a team, role or person to see what they can see')
+    expect(src).toContain('click a collection or SOP to choose who sees it')
   })
 
-  test('selection and wiring states render the "Visible to N people via M grants" template', () => {
+  test('selection and wiring states render people-first plain-language sentences (33-09, no "grant" wording)', () => {
     const src = read(STRIP)
-    expect(src).toContain('Visible to <b>{peopleCount}</b>')
-    expect(src).toContain('via {grantCount} grant')
+    expect(src).toContain('<b>{peopleCount}</b> {peopleCount === 1 ? \'person\' : \'people\'} can see this.')
+    expect(src).toContain('Choosing who sees <b>{label}</b>')
   })
 
-  test('wiring state exposes a ✓ Done control wired to onDone', () => {
+  test('wiring state exposes a ✓ Save — done control wired to onDone (33-09)', () => {
     const src = read(STRIP)
-    expect(src).toContain('✓ Done wiring')
+    expect(src).toContain('✓ Save — done')
     expect(src).toContain('onClick={onDone}')
   })
 
@@ -79,7 +79,7 @@ test.describe('SC-6 — banner slot stability runtime (requires chromium + live 
       await page.locator('.jack').first().click()
       const selection = await bayTop()
       expect(selection?.y).toBe(idle?.y)
-      // Enter wire-up mode on the pinned NEW·UNWIRED SOP, if present.
+      // Enter wire-up mode on the pinned NEW SOP, if present.
       const newSopJack = page.locator('.jack.newsop')
       if (await newSopJack.count()) {
         await newSopJack.click()

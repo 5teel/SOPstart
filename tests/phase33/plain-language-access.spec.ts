@@ -21,43 +21,103 @@
  *   - Internal identifiers (`createGrant`, `pending`, testids) are OUT of
  *     scope — SC-5 is user-visible copy only.
  *
- * Flipped LIVE in: 33-09 (files_modified: tests/phase33/plain-language-access.spec.ts)
- * — this Wave-0 version is a placeholder test.fixme ONLY until 33-09 lands;
- * do not treat it as done once 33-09 ships without confirming the fixme was
- * removed.
+ * Flipped LIVE in: 33-09.
  *
  * Registration: playwright.config.ts `phase33` project
  *   testDir: '.', testMatch: /tests\/phase33\/.*\.(spec|test)\.ts$/
  * Verify: `npx playwright test --list --project=phase33`
  */
 import { test, expect } from '@playwright/test'
+import fs from 'node:fs'
+import path from 'node:path'
 
-test.describe('SC-5 — plain-language access copy (Wave 0 stub — flips live in 33-09)', () => {
-  test.fixme(
-    'no grants/wire-up/UNWIRED jargon literals anywhere in the wiring UI source; AccessAnswerPanel renders people-first "Who can see this?"/"What can they see?" sentences',
-    async ({ page }) => {
-      /**
-       * Real path constants this will assert against once built:
-       *   - src/components/admin/wiring/AccessAnswerPanel.tsx (NEW)
-       *   - src/components/admin/wiring/WiringPatchBay.tsx (jargon sweep)
-       *   - src/components/admin/wiring/SelectionStrip.tsx (copy sweep,
-       *     structure unchanged)
-       *
-       * Steps (once flipped live):
-       * 1. Source-contract sweep: grep WiringPatchBay/SelectionStrip/
-       *    PublishStage for "grant"/"wire up"/"UNWIRED" (case-insensitive,
-       *    excluding internal identifiers createGrant/pending/testids) —
-       *    expect zero matches in user-visible JSX text.
-       * 2. Navigate to /admin/sops?view=access; select a SOP; confirm
-       *    AccessAnswerPanel renders a "Who can see this?" sentence naming
-       *    people, not grant counts.
-       * 3. Select a person/team; confirm the panel flips to "What can they
-       *    see?".
-       * 4. Confirm SelectionStrip's 48px fixed slot still never mounts/
-       *    unmounts (banner-slot-stability.spec.ts structural pins intact).
-       */
-      void page
-      expect(true).toBe(true)
-    },
-  )
+const ROOT = process.cwd()
+const STRIP = path.join(ROOT, 'src', 'components', 'admin', 'wiring', 'SelectionStrip.tsx')
+const BAY = path.join(ROOT, 'src', 'components', 'admin', 'wiring', 'WiringPatchBay.tsx')
+const PANEL = path.join(ROOT, 'src', 'components', 'admin', 'wiring', 'AccessAnswerPanel.tsx')
+const PUBLISH_STAGE = path.join(
+  ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'PublishStage.tsx',
+)
+
+function read(p: string): string {
+  return fs.readFileSync(p, 'utf-8')
+}
+
+// Extract only the JSX render body of each source-contract file (skip doc
+// comments, which are allowed to reference the old jargon for history/
+// context — the ACTUAL rendered strings are what SC-5 gates).
+function renderBody(src: string): string {
+  return src.replace(/\/\*\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '')
+}
+
+test.describe('SC-5 — no jargon literals in rendered wiring UI copy', () => {
+  test('SelectionStrip render body contains no "grant"/"wire up"/"UNWIRED" text', () => {
+    const body = renderBody(read(STRIP))
+    expect(body).not.toMatch(/UNWIRED/i)
+    expect(body).not.toMatch(/wire up/i)
+    // "grantCount" is an internal prop name (identifiers exempt) — the JSX
+    // strings themselves must not say "grant".
+    expect(body).not.toContain('grant.')
+    expect(body).not.toContain('grants.')
+    expect(body).not.toMatch(/\d grant/i)
+  })
+
+  test('WiringPatchBay render body contains no "UNWIRED"/"Wire up" text and drops "N grants" counts', () => {
+    const body = renderBody(read(BAY))
+    expect(body).not.toMatch(/UNWIRED/i)
+    expect(body).not.toMatch(/Wire up/i)
+    expect(body).not.toContain("grant{grantCount")
+    expect(body).not.toMatch(/\d grants?</i)
+    // Plain-language replacements are present.
+    expect(body).toContain('follows collection')
+    expect(body).toContain('chosen by name')
+    expect(body).toContain("That didn&apos;t save")
+  })
+
+  test('PublishStage CTA no longer says "Wire up access"', () => {
+    const body = renderBody(read(PUBLISH_STAGE))
+    expect(body).not.toMatch(/Wire up access/i)
+    expect(body).toContain('Choose who sees it')
+  })
+})
+
+test.describe('SC-5 — AccessAnswerPanel answers "Who can see this?" / "What can they see?"', () => {
+  test('renders "Who can see this?" for SOP/collection selection, chosen-by-name sentence + re-follow note', () => {
+    const src = read(PANEL)
+    expect(src).toContain('Who can see this?')
+    expect(src).toContain("chosen by name.")
+    expect(src).toContain('Remove all named people and this SOP follows its collection again.')
+  })
+
+  test('renders "What can they see?" for person/team selection', () => {
+    const src = read(PANEL)
+    expect(src).toContain('What can they see?')
+    const heading = src.match(/const heading = ([\s\S]*?)\n/)?.[1] ?? ''
+    expect(heading).toContain("'unit'")
+    expect(heading).toContain("'What can they see?'")
+  })
+
+  test('WiringPatchBay wires AccessAnswerPanel from its EXISTING accessByUnit/grants/peopleIndex memos — no new fetch, no second resolver', () => {
+    const src = read(BAY)
+    expect(src).toContain('<AccessAnswerPanel data={panelData} />')
+    expect(src).toContain('const panelData = useMemo((): AccessAnswerPanelData => {')
+    // Reuses the shipped memos — not a second resolveEffectiveAccess call.
+    expect(src).toContain('const access = accessByUnit.get(panelTargetId)')
+    expect(src).toContain('const sopAccess = sopAccessByUnit.get(panelTargetId)')
+    // The two existing resolver call sites (accessByUnit + sopAccessByUnit,
+    // unchanged from 33-08) are the only ones with real arguments.
+    const resolverCallSites = src.match(/resolveEffectiveAccess\(chain, \w+\)/g) ?? []
+    expect(resolverCallSites.length).toBe(2)
+  })
+})
+
+test.describe('SC-5 — SelectionStrip 48px structural pins survive the copy sweep', () => {
+  test('h-[48px] slot structure is untouched', () => {
+    const src = read(STRIP)
+    expect(src).toContain('h-[48px] overflow-hidden')
+    expect(src).toContain('className={`strip-slot h-[48px] overflow-hidden ${state}`}')
+    expect(src).toContain('onClick={onDone}')
+    const divCount = (src.match(/<div data-state=/g) ?? []).length
+    expect(divCount).toBe(1)
+  })
 })

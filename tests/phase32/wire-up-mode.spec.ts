@@ -37,7 +37,9 @@ function read(p: string): string {
 test.describe('SC-5 — connect mode source contract', () => {
   test('clicking ANY SOP row (pinned or drilled-down) toggles connect mode — generalized 33-08', () => {
     const src = read(BAY)
-    expect(src).toContain('NEW · UNWIRED')
+    // 33-09: jargon sweep — the pinned NEW pill drops "UNWIRED"; plain
+    // "NEW" (default) / "CHOSEN BY NAME" (overridden) pills only.
+    expect(src).toContain("opts.isPinned && !overridden && <span className=\"newpill mono\">NEW</span>")
     // 33-08: enterWireUp generalizes from "the one pinned newSop" to "the
     // selected SOP" — it now takes a sopId and every SOP row's onClick calls it.
     expect(src).toContain('const enterWireUp = useCallback(')
@@ -123,9 +125,9 @@ test.describe('SC-5 — ✓ Done writes grants via createGrant', () => {
 })
 
 // ---------------------------------------------------------------------------
-// Runtime smoke — requires chromium + live app + a published NEW·UNWIRED SOP
-// (Rule-3 fallback documented above). The post-publish "Wire up access" CTA
-// (PublishStage.tsx -> ?view=access&sop=<id>) is 32-09 scope.
+// Runtime smoke — requires chromium + live app + a published NEW SOP
+// (Rule-3 fallback documented above). The post-publish "Choose who sees it"
+// CTA (PublishStage.tsx -> ?view=access&sop=<id>) is 32-09/33-09 scope.
 // ---------------------------------------------------------------------------
 
 test.describe('SC-5 — wire-up mode runtime (requires chromium + live app, 32-09 page arm)', () => {
@@ -138,10 +140,10 @@ test.describe('SC-5 — wire-up mode runtime (requires chromium + live app, 32-0
       await page.locator('.col.left .jack').first().click()
       await expect(page.locator('.bay-svg path')).toHaveCount(1)
       await expect(page.locator('.strip-slot.wiring')).toContainText('people')
-      await page.getByRole('button', { name: '✓ Done wiring' }).click()
+      await page.getByRole('button', { name: '✓ Save — done' }).click()
       // UAT G2 fix: after Done (and on any later reload) the pinned SOP reads
-      // its state from saved grants — WIRED, never back to NEW · UNWIRED.
-      await expect(page.locator('.jack.newsop .newpill')).toHaveText('WIRED')
+      // its state from saved grants — CHOSEN BY NAME, never back to NEW.
+      await expect(page.locator('.jack.newsop .newpill')).toHaveText('CHOSEN BY NAME')
     },
   )
 
@@ -151,8 +153,8 @@ test.describe('SC-5 — wire-up mode runtime (requires chromium + live app, 32-0
     // sopId === activeSopId), not in-session pending toggles.
     expect(src).toContain('const activeSopExistingGrants = useMemo')
     expect(src).toContain('grants.filter((g) => g.sopId === activeSopId)')
-    // Badge: WIRED when saved grants exist; NEW · UNWIRED only when truly unwired
-    expect(src).toContain("overridden ? 'WIRED' : 'NEW · UNWIRED'")
+    // 33-09: Badge: "CHOSEN BY NAME" when saved grants exist; plain "NEW" only when truly unset
+    expect(src).toContain('{overridden && <span className="newpill mono">CHOSEN BY NAME</span>}')
     // Entering wire-up draws the saved wires alongside pending toggles
     expect(src).toContain('for (const g of activeSopExistingGrants) {')
     // Hierarchy: every SOP row (pinned or drilled-down) renders as a child
@@ -162,7 +164,7 @@ test.describe('SC-5 — wire-up mode runtime (requires chromium + live app, 32-0
   })
 
   test.fixme(
-    'PublishStage shows a "Wire up access" CTA linking to ?view=access&sop=<id> pinned NEW·UNWIRED (32-09)',
+    'PublishStage shows a "Choose who sees it" CTA linking to ?view=access&sop=<id> pinned NEW (32-09/33-09)',
     async ({ page }) => {
       void page
     },

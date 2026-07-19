@@ -583,9 +583,9 @@ export const UAT_TESTS: UatTest[] = [
     summary:
       'SOPs list now has an "Access" tab: a wiring diagram where you click an area, department or person to trace which library collections they can see, and click a new SOP to wire it up to the right parts of your org. The same view doubles as a library filter.',
     tryIt: [
-      'Publish a SOP and click the "Wire up access →" button that appears — you should land on the Access view with that SOP pinned "NEW · UNWIRED".',
-      'Click a department or person on the left to see the wires light up and a "Visible to N people via M grants" banner.',
-      'Click the pinned new SOP, toggle a department or two, and hit "✓ Done wiring" — confirm the banner and wire count update live.',
+      'Publish a SOP and click the "Choose who sees it →" button that appears — you should land on the Access view with that SOP tagged "NEW".',
+      'Click a department or person on the left to see the lines light up and a plain "N people can see this" banner.',
+      'Click the new SOP, choose a department or two, and hit "✓ Save — done" — confirm the banner and the "Who can see this?" panel below update live.',
       'With something focused, click "Open in library →" and confirm the SOP list filters down to just that department/collection with a count.',
     ],
     links: [{ label: 'SOPs — Access view', href: '/admin/sops?view=access' }],
@@ -593,10 +593,10 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'trace-clear', text: 'Was it clear which SOPs an area/department/person can see when you clicked it?' },
       { id: 'wireup-easy', text: 'Was wiring up a new SOP\'s access straightforward?' },
       { id: 'filter-useful', text: 'Was jumping from the diagram to a filtered library list useful?' },
-      { id: 'blast-radius-trust', text: 'Did the "Visible to N people" count feel trustworthy before you confirmed?' },
+      { id: 'blast-radius-trust', text: 'Did the "N people can see this" count feel trustworthy before you confirmed?' },
     ],
     background:
-      'D-09 (?view=access, third fold beside Needs attention), D-12 (wire-up entry from both the post-publish CTA and organically), D-11 (additive-only grants — no in-place revoke here), SC-4 (viz-as-library-filter deep-links). WiringPatchBay/SelectionStrip built in 32-08; the page arm, deep-links, and publish CTA land in 32-09.',
+      'D-09 (?view=access, third fold beside Needs attention), D-12 (wire-up entry from both the post-publish CTA and organically), D-11 (additive-only grants — no in-place revoke here), SC-4 (viz-as-library-filter deep-links). WiringPatchBay/SelectionStrip built in 32-08; the page arm, deep-links, and publish CTA land in 32-09; drill-down + plain-language copy + the answer panel land in 33-08/33-09 (see the Phase 33 — Access map entries below for current copy).',
   },
 
   {
@@ -622,6 +622,54 @@ export const UAT_TESTS: UatTest[] = [
     ],
     background:
       'SC-6 (33-04) — replaces the dark #0a0a0b header with a light paper/hairline "Wayfinder" bar (back/here/forward zones); the old SopActionsMenu + BuilderFlowButton + BuilderFlowEditButton + DeleteSopButton cluster collapses into one "Tools for this SOP ▾" menu. Winner of a 3-concept sketch review (sketches/builder-header-orientation), locked 2026-07-19. Screenshot check per CLAUDE.md 2026-07-14 (an undefined CSS token renders wrong but fails no automated gate) — this entry exists so a human actually looks at the rendered bar.',
+  },
+
+  {
+    id: 'p33-plain-language-access',
+    dateAdded: '2026-07-19',
+    category: 'Phase 33 — Access map',
+    title: 'Can you find a SOP inside its folder and understand who sees it, without any jargon?',
+    status: 'active',
+    summary:
+      'The Access map now lets you open a collection and see the SOPs inside it, and every screen answers a plain question — "Who can see this?" or "What can they see?" — instead of talking about "wiring" or "grants".',
+    tryIt: [
+      'Open the Access view and click a collection on the right to open it — you should see the SOPs inside it listed underneath.',
+      'Click one of those SOPs, then click a department or person on the left to choose who sees it, and click "Save — done".',
+      'Read the panel that appears under the map out loud — does it plainly say who can see the SOP you picked?',
+      'Click a person or team on the left instead — the same panel should flip to say what THEY can see.',
+      'Look through the whole screen for the words "wire", "wiring", "grant" or "UNWIRED" — you shouldn\'t find any.',
+    ],
+    links: [{ label: 'SOPs — Access view', href: '/admin/sops?view=access' }],
+    questions: [
+      { id: 'drilldown-clear', text: 'Was it obvious you could open a collection and pick one of the SOPs inside it?' },
+      { id: 'panel-plain', text: 'Did the "Who can see this?" / "What can they see?" panel read like plain English, not tech jargon?' },
+      { id: 'no-jargon-spotted', text: 'Did you find the screen free of words like "wire", "wiring", "grant" or "UNWIRED"?' },
+    ],
+    background:
+      'SC-2/SC-3 (33-08) — collection→SOP drill-down + organic choose-mode, any SOP wireable by name via a SOP-target grant. SC-5 (33-09) — full jargon sweep + the absorbed AccessAnswerPanel (sketches/access-hierarchy concept B, adopted into the shipped concept A per its README § Decisions).',
+  },
+
+  {
+    id: 'p33-wr02-plenum-chamber',
+    dateAdded: '2026-07-19',
+    category: 'Phase 33 — Access map',
+    title: 'One SOP\'s access needs a deliberate call — can you set it?',
+    status: 'active',
+    summary:
+      '"Changing Plenum Chamber — IS Machine Forming Section" is the one SOP flagged during Phase 32 review as about to widen to a department it didn\'t originally reach, the next time anything else in its collection changes. This phase gives you the tool to fix that — pick exactly who should see this one SOP by name.',
+    tryIt: [
+      'Open the Access view and find "Changing Plenum Chamber — IS Machine Forming Section" (drill into its collection if it\'s not pinned).',
+      'Click it and read the "Who can see this?" panel — it currently follows its collection, which is wider than intended.',
+      'Choose the department(s)/person(s) who should actually see this one SOP, then click "Save — done".',
+      'Confirm the panel now says the SOP is "chosen by name" and no longer follows the wider collection.',
+    ],
+    links: [{ label: 'SOPs — Access view', href: '/admin/sops?view=access' }],
+    questions: [
+      { id: 'wr02-found', text: 'Could you find this SOP and see the plain-language explanation of who currently sees it?' },
+      { id: 'wr02-narrowed', text: 'Were you able to choose the right people/department by name and save it?' },
+    ],
+    background:
+      '32-REVIEW-FIX.md WR-02 / 32-VERIFICATION.md human-item 6: SOP `95772b8e` would GAIN department `4587a6ed` on the next unrelated re-materialization of its collection — a live, still-open product decision. This phase\'s SOP-target grant mechanism (33-05) is the intended closure: expressing the narrow intent explicitly via the UI pins the divergence deliberately instead of leaving it to drift.',
   },
 
   // ---------------------------------------------------------------------------
