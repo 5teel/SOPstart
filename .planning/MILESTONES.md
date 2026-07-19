@@ -121,3 +121,44 @@ Move SOP authoring from "upload-and-parse only" to first-class native authoring 
 - The Puck `layout_data` model and the block-junction tables (`sop_section_blocks`, `block_versions`, `sop_block_update_decisions`) are the substrate the Phase 20 remainder builds on — the AI reviewer + per-block verify checklist both operate on block-level state, not the legacy linear section model.
 - The paper/ink shell + global `TopHeader` (added 2026-05-22) give v4.0 a stable surface for any new admin/worker views.
 - The sub-trade tag RLS pattern from Phase 15 is the template for any future tenant-scoped visibility rules.
+
+## v4.0 — Safety-Critical Parsing + Voice + AI Foundation
+
+**Started:** 2026-05-24 · **Shipped:** 2026-07-02 *(backfilled entry 2026-07-19 — closeout was never formally run)*
+
+- **Phase 21 + 21.5 + 21.6:** Safety-critical parsing contract (side-by-side source viewer, AI reviewer × 5 jobs, per-block verify checklist at publish gate) + builder review/edit UX redesign (Review Station, 3-stage stepper, humanized labels).
+- **Phase 22:** Voice-driven walkthrough — live Deepgram STT push-to-talk, TTS read-back, spoken step progression, always-on visual layer (English-only; multi-language deferred).
+- **Phase 23:** AI field layer (universal AI read/write on every editable field — the X-03 backbone) + version supersede/diff/restore + worker-instance sign-off chain.
+- **Phase 24:** Procedure Flow spatial node graph (positioned colour-coded nodes, branch-labelled edges, FIT/EXPORT-PNG).
+- **Phase 25:** Department as a first-class entity (org-scoped departments, m2m junctions to blocks/SOPs/members, RLS visibility gating, owner accountability).
+- Residual human-UAT items (21.6/22/23/25) carried per the v3.0 field-verification precedent.
+
+## v5.0 — AI-Native Builder + Agent Foundation
+
+**Started:** 2026-07-02 · **Shipped:** 2026-07-12 *(backfilled entry 2026-07-19)*
+
+- **Phase 26 (14 plans):** Puck fully replaced with a bespoke inline editor — one surface for create/convert/edit, tiered context-aware inserter, smart ghosts, unified Visual block with Konva diagram annotation (Phase 17 absorbed), bake-on-publish so workers never download Konva. The frozen `layout_data` / `sop_section_blocks` / `block_provenance` contract preserved — parse→AI-review→verify→publish spine untouched (git-diff-empty KEEP files).
+- **Phase 26.5:** Agent metadata layer — per-SOP/per-block semantic tags, entities, embeddings, cross-SOP links, memory, learning proposals, review state.
+- **Post-26.5 ad-hoc (2026-07-06→09):** AI provider flexibility (model registry, provider-agnostic adapter, org-level model override), unified AI-draft surface, QR deep links, read-aloud, draft triage queue, tree-rail overhaul, layout_data-trio fix + prod backfill.
+- **Phase 27:** AI provider & settings formalization (v5.0 close).
+
+## v6.0 — SOP Ownership & Governance Infrastructure
+
+**Started:** 2026-07-12 · **Closed:** 2026-07-19 (quick-close)
+
+North star (locked): ease of use and maintenance first — governance never blocks worker read/walkthrough access.
+
+- **Phase 28 (6/6):** Owner on every SOP (auto-backfilled), review-due dates + cadence, unified governance queue with one-click actions.
+- **Phase 29 (6/6):** Optional per-category 1–4 step approval chains, snapshotted per version, one-click approve; absent chain = publish exactly as before (assertPublishGates extraction).
+- **Phase 30 (8/8):** UX consolidation — one home per role, one admin nav, one create entry, one governance surface, 3-tab worker SOP view, plain language (UX-01..08).
+- **Phase 32 (9/9):** Visual org model & library permissions — access map (WiringPatchBay), access_grants model + materialization into sop_departments/sop_access_people junctions, org-scope isolation.
+- **Phase 33 (11/11):** Per-SOP access granularity (SOP-target grants, narrowing override with snapshot/restore), full org-ladder teams column, plain-language access panel, Wayfinder builder header + single Tools menu. Gap-closure hardened deleteSop org-scoping (CR-01) and the all_departments restore ratchet (WR-02). Human UAT (5 items) verbally approved 2026-07-19; `33-HUMAN-UAT.md` retained.
+
+### Rolled forward into v7.0
+
+- **Phase 31: Training Records + AI Maintenance Schedule** (TRN-01..03, REV-05) — never planned/executed in v6.0. Its scope (per-worker training evidence, CSV export, trained-on-outdated-version surfacing, AI-prioritized review plan) is subsumed and extended by the v7.0 competency layer.
+
+### What v6.0 enables for v7.0
+
+- Access grants (Phases 32–33) encode who is REQUIRED to know what — the left-hand side of a training/competency matrix.
+- Completions + immutable sign-off chains (Phase 23/D-17) are the evidence half. v7.0 joins the two.

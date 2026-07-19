@@ -58,7 +58,7 @@ Plans:
 Closes the #1 governance gap surfaced by the 2026-05-05 Visy Packaging customer interview ("Nobody owns SOPs — there isn't anybody"). **NORTH STAR (locked by Simon 2026-07-12):** ease of use and maintenance first — process and blockers never beat ease of use; governance state NEVER blocks worker read/walkthrough access. Approval chains are opt-in per category (absent chain = today's publish flow, byte-identical). Owners and review dates auto-backfill — no admin data-entry campaign. Builds on existing infra only: version supersede + sign-off chain (Phase 23), departments (Phase 25), completions (Phase 4), AI adapter + agent metadata (Phase 26.5/27), site tier (Phase 15). Execution order 28 → 29 → 30.
 
 - [x] **Phase 28: Ownership + Review Lifecycle + Governance Queue** - Every SOP gets an accountable owner and review-due date (both auto-backfilled), plus one unified governance queue with one-click actions — worker read access is never gated by any of it (completed 2026-07-12)
-- [ ] **Phase 29: Approval Chains** - Optional per-category 1–4 step approval chain, snapshotted per version, one-click approve — categories without a chain publish exactly as today
+- [x] **Phase 29: Approval Chains** - Optional per-category 1–4 step approval chain, snapshotted per version, one-click approve — categories without a chain publish exactly as today (completed 2026-07-13)
 - [x] **Phase 30: UX Consolidation & Simplification** - One home per role, one admin nav, one create entry, one governance surface, 3-tab worker SOP view, plain language throughout (UX-01..08)
 
 ### Phase 28: Ownership + Review Lifecycle + Governance Queue
@@ -1097,9 +1097,9 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | *(post-26.5 ad-hoc)* | — | AI provider flexibility + builder tree-rail UX — not phased, see note above | 2026-07-09 |
 | **27. AI Provider & Settings (v5.0 close)** | 1/1 | ✅ Complete | 2026-07-12 |
 | 28. Ownership + Review Lifecycle + Governance Queue | 6/6 | Complete    | 2026-07-12 |
-| 29. Approval Chains | 5/6 | In Progress|  |
-| 30. UX Consolidation & Simplification | 7/8 | In Progress|  |
-| 32. Visual Org Model & Library Permissions | 9/9 | Executed — human UAT open (3 items) |  |
+| 29. Approval Chains | 6/6 | Complete    | 2026-07-13 |
+| 30. UX Consolidation & Simplification | 8/8 | Complete    | 2026-07-14 |
+| 32. Visual Org Model & Library Permissions | 9/9 | Complete    | 2026-07-18 |
 | 33. Per-SOP Access Granularity + Wayfinder Header | 11/11 | Complete    | 2026-07-19 |
 
 ## Backlog
