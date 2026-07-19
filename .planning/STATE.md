@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
 status: executing
-stopped_at: Completed 32-09-PLAN.md
-last_updated: "2026-07-19T05:13:23.388Z"
+stopped_at: Completed 33-10-PLAN.md
+last_updated: "2026-07-19T05:54:01.418Z"
 last_activity: 2026-07-19 -- Phase 33 execution started
 progress:
   total_phases: 6
   completed_phases: 4
-  total_plans: 38
-  completed_plans: 29
+  total_plans: 40
+  completed_plans: 39
   percent: 67
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 33 (per-sop-access-granularity-wayfinder-builder-header) — EXECUTING
-Plan: 1 of 9
+Plan: 2 of 11
 Status: Ready to execute
 Last activity: 2026-07-19 -- Phase 33 execution started
 
@@ -177,6 +177,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 32 P07 | 20min | 2 tasks | 6 files |
 | Phase 32 P08 | 20min | 2 tasks | 6 files |
 | Phase 32 P09 | 45min | 2 tasks | 9 files |
+| Phase 33 P10 | 25min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -385,6 +386,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 32-09: Open in library is an explicit SelectionStrip link (not click-to-navigate) — preserves WiringPatchBay's quiet-by-default trace (SC-3)
 - [Phase ?]: Phase 32-09: WiringPatchBayShell added — async page.tsx cannot hold the onWireUpComplete router.refresh() callback (same RSC-boundary class as 32-07's TeamViewShell)
 - [Phase ?]: Phase 32-09: PublishStage wireUpHref derived from initialSop.status === 'published' by the parent shell, not a local just-published flag
+- [Phase 33]: deleteSop guarded with organisation_id fetch-and-compare before delete cascade (CR-01 closure)
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -494,7 +496,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-18T09:52:31.842Z
-Stopped at: Completed 32-09-PLAN.md
+Last session: 2026-07-19T05:54:01.409Z
+Stopped at: Completed 33-10-PLAN.md
 Resume file:
 None
