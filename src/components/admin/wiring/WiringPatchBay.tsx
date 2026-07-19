@@ -21,24 +21,26 @@
  *     personal (D-13) = dashed.
  *  4. WIRE-UP (D-12) — a NEW·UNWIRED SOP pins atop the library column;
  *     clicking it enters connect mode where left-side org units (org / area
- *     / department / person — role-level grants share the same mechanics,
- *     UI deferred) become grant toggles. Each toggle draws a live wire and
- *     updates a PEOPLE blast-radius banner. ✓ Done writes via `createGrant`
- *     (T-32-08-01 — the action self-enforces org scope, client toggles are
- *     never trusted directly).
+ *     / department / role / person — the full ladder, 33-06) become grant
+ *     toggles. Each toggle draws a live wire and updates a PEOPLE
+ *     blast-radius banner. ✓ Done writes via `createGrant` (T-32-08-01 —
+ *     the action self-enforces org scope, client toggles are never trusted
+ *     directly).
  *
  * D-11 (additive-only): there is NO in-place inherited-revoke affordance in
  * this component — revoking a grant happens at its source (a future
  * `/admin/team` or grants-list surface), never as a click here.
  *
- * Person-level jacks are derived from the `grants` prop (subjectType=
- * 'person') — like sketch 003's single hardcoded "Priya" node, this only
- * ever surfaces EXISTING personal-grant subjects, never an arbitrary
- * org-member picker (that's a deferred idea, not this phase's scope).
+ * Person-level jacks come from two sources: (1) the full org ladder — every
+ * dept→role→person in `tree` (33-06, Pattern 3) is a real grantable jack,
+ * vacancies rendered dashed/inert; (2) a legacy flat list derived from the
+ * `grants` prop (subjectType='person') for any grant subject NOT present in
+ * the tree (pre-roles-era grants). No arbitrary org-member picker — every
+ * person jack is either a tree member or an existing grant subject.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import type { AccessGrant, ChainLink, EffectiveAccess, OrgTree, OrgTreeDepartment, SubjectType } from '@/types/org-model'
+import type { AccessGrant, ChainLink, EffectiveAccess, OrgPerson, OrgTree, OrgTreeDepartment, OrgTreeRole, SubjectType } from '@/types/org-model'
 import { resolveEffectiveAccess } from '@/lib/org-model/resolve-access'
 import { createGrant } from '@/actions/grants'
 import { SelectionStrip } from './SelectionStrip'
@@ -109,6 +111,8 @@ function deptPeopleIds(dept: OrgTreeDepartment): string[] {
 export function WiringPatchBay({ tree, orgName = 'Whole site', collections, grants, newSop, deptMembers, onWireUpComplete }: WiringPatchBayProps) {
   const [lens, setLens] = useState<LensView>('wiring')
   const [expandedAreas, setExpandedAreas] = useState<Set<string>>(new Set())
+  const [expandedDepts, setExpandedDepts] = useState<Set<string>>(new Set())
+  const [expandedRoles, setExpandedRoles] = useState<Set<string>>(new Set())
   const [focus, setFocus] = useState<string | null>(null)
   const [connecting, setConnecting] = useState(false)
   const [pending, setPending] = useState<Map<string, PendingGrant>>(new Map())
@@ -123,12 +127,19 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
   // ---- data indices (rebuilt when inputs change) --------------------------
   const depts = useMemo(() => allDepartments(tree), [tree])
   const deptById = useMemo(() => new Map(depts.map((d) => [d.id, d])), [depts])
-  const deptAreaId = useMemo(() => {
-    const m = new Map<string, string | null>()
-    for (const area of tree.areas) for (const d of area.departments) m.set(d.id, area.id)
-    for (const d of tree.ungroupedDepartments) m.set(d.id, null)
+  const roleById = useMemo(() => {
+    const m = new Map<string, OrgTreeRole>()
+    for (const dept of depts) for (const role of dept.roles) m.set(role.id, role)
     return m
-  }, [tree])
+  }, [depts])
+  // Person ids that exist as real (non-vacancy) members of a role in the tree
+  // — these route through the role→dept→area?→org chain (Pattern 3), not the
+  // flat legacy org→person chain.
+  const treePersonIds = useMemo(() => {
+    const s = new Set<string>()
+    for (const dept of depts) for (const role of dept.roles) for (const p of role.people) if (!p.isVacancy && p.id) s.add(p.id)
+    return s
+  }, [depts])
 
   const personGrants = useMemo(() => grants.filter((g) => g.subjectType === 'person' && g.subjectId), [grants])
   const personIds = useMemo(() => [...new Set(personGrants.map((g) => g.subjectId as string))], [personGrants])
@@ -160,6 +171,9 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
       const ids = [...new Set([...deptPeopleIds(dept), ...(deptMembers?.[dept.id] ?? [])])]
       idx.set(dept.id, ids)
       allIds.push(...ids)
+      for (const role of dept.roles) {
+        idx.set(role.id, role.people.filter((p) => !p.isVacancy && p.id).map((p) => p.id as string))
+      }
     }
     for (const area of tree.areas) idx.set(area.id, [...new Set(area.departments.flatMap((d) => idx.get(d.id) ?? []))])
     idx.set(tree.organisationId, [...new Set(allIds)])
@@ -177,9 +191,24 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
       for (const dept of area.departments) m.set(dept.id, [orgLink, areaLink, { unitId: dept.id, subjectType: 'department' }])
     }
     for (const dept of tree.ungroupedDepartments) m.set(dept.id, [orgLink, { unitId: dept.id, subjectType: 'department' }])
-    for (const id of personIds) m.set(id, [orgLink, { unitId: id, subjectType: 'person' }])
+    // Pattern 3: role chains (org→area?→dept→role) + person chains routed
+    // through their role (…→role→person). Vacancies (no id) are skipped.
+    for (const dept of depts) {
+      const deptChain = m.get(dept.id) ?? [orgLink, { unitId: dept.id, subjectType: 'department' }]
+      for (const role of dept.roles) {
+        const roleChain: ChainLink[] = [...deptChain, { unitId: role.id, subjectType: 'role' }]
+        m.set(role.id, roleChain)
+        for (const p of role.people) {
+          if (p.isVacancy || !p.id) continue
+          m.set(p.id, [...roleChain, { unitId: p.id, subjectType: 'person' }])
+        }
+      }
+    }
+    // Legacy flat org→person chain, kept only for person-grant subjects not
+    // present in any tree role (a role chain above always wins if present).
+    for (const id of personIds) if (!m.has(id)) m.set(id, [orgLink, { unitId: id, subjectType: 'person' }])
     return m
-  }, [tree, personIds])
+  }, [tree, personIds, depts])
 
   const grantsByUnit = useMemo(() => {
     const m: Record<string, string[]> = {}
@@ -201,19 +230,44 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
   const collectionById = useMemo(() => new Map(collections.map((c) => [c.id, c])), [collections])
 
   const isLeftId = useCallback(
-    (id: string): boolean => id === tree.organisationId || tree.areas.some((a) => a.id === id) || deptById.has(id) || personIds.includes(id),
-    [tree, deptById, personIds],
+    (id: string): boolean =>
+      id === tree.organisationId ||
+      tree.areas.some((a) => a.id === id) ||
+      deptById.has(id) ||
+      roleById.has(id) ||
+      personIds.includes(id) ||
+      treePersonIds.has(id),
+    [tree, deptById, roleById, personIds, treePersonIds],
   )
 
-  // Group-collapse endpoint resolution: a department's wire anchors at the
-  // dept if its area is expanded, else at the area's own group jack.
+  // Which tiers are currently collapsed (children not rendered).
+  const isCollapsed = useCallback(
+    (link: ChainLink): boolean => {
+      if (link.subjectType === 'area') return !expandedAreas.has(link.unitId)
+      if (link.subjectType === 'department') return !expandedDepts.has(link.unitId)
+      if (link.subjectType === 'role') return !expandedRoles.has(link.unitId)
+      return false
+    },
+    [expandedAreas, expandedDepts, expandedRoles],
+  )
+
+  // Nearest-collapsed-ancestor endpoint resolution: walk the unit's chain
+  // root-first and anchor the wire at the first collapsed tier found — that
+  // tier is always the deepest one still actually rendered (a collapsed
+  // ancestor hides everything below it, so nothing past it exists in the DOM
+  // to anchor to). Generalizes the old area-only collapse redirect to
+  // area/department/role.
   const leftEndpoint = useCallback(
     (unitId: string): string => {
-      const areaId = deptAreaId.get(unitId)
-      if (areaId && !expandedAreas.has(areaId)) return areaId
+      const chain = chains.get(unitId)
+      if (!chain) return unitId
+      for (const link of chain) {
+        if (link.unitId === unitId) break
+        if (isCollapsed(link)) return link.unitId
+      }
       return unitId
     },
-    [deptAreaId, expandedAreas],
+    [chains, isCollapsed],
   )
 
   // Every unit's own resolved access, flattened to raw edges (T-32-08-02 —
@@ -317,6 +371,24 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
     })
   }, [])
 
+  const toggleDept = useCallback((deptId: string) => {
+    setExpandedDepts((prev) => {
+      const next = new Set(prev)
+      if (next.has(deptId)) next.delete(deptId)
+      else next.add(deptId)
+      return next
+    })
+  }, [])
+
+  const toggleRole = useCallback((roleId: string) => {
+    setExpandedRoles((prev) => {
+      const next = new Set(prev)
+      if (next.has(roleId)) next.delete(roleId)
+      else next.add(roleId)
+      return next
+    })
+  }, [])
+
   const handleLeftClick = useCallback(
     (id: string, subjectType: SubjectType) => {
       if (connecting) {
@@ -399,9 +471,11 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
     if (area) return area.name
     const dept = deptById.get(focus)
     if (dept) return dept.name
-    if (personIds.includes(focus)) return personName(focus)
+    const role = roleById.get(focus)
+    if (role) return role.name
+    if (personIds.includes(focus) || treePersonIds.has(focus)) return personName(focus)
     return collectionById.get(focus)?.name
-  }, [connecting, focus, newSop, tree, deptById, personIds, personName, collectionById, orgName])
+  }, [connecting, focus, newSop, tree, deptById, roleById, personIds, treePersonIds, personName, collectionById, orgName])
 
   const focusPeopleCount = useMemo(() => {
     if (!focus) return 0
@@ -438,24 +512,120 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
     const q = search.trim().toLowerCase()
     if (!q) return null
     const s = new Set<string>()
-    for (const dept of depts) if (dept.name.toLowerCase().includes(q)) s.add(dept.id)
+    for (const dept of depts) {
+      if (dept.name.toLowerCase().includes(q)) s.add(dept.id)
+      for (const role of dept.roles) {
+        if (role.name.toLowerCase().includes(q)) s.add(role.id)
+        for (const p of role.people) if (!p.isVacancy && p.id && p.name.toLowerCase().includes(q)) s.add(p.id)
+      }
+    }
     for (const area of tree.areas) if (area.name.toLowerCase().includes(q)) s.add(area.id)
     for (const c of collections) if (c.name.toLowerCase().includes(q)) s.add(c.id)
     return s
   }, [search, depts, tree.areas, collections])
 
+  // Search auto-expands every ancestor tier of a match (mirrors the shipped
+  // area auto-expand) so a role/person match is never hidden behind a
+  // collapsed dept or role twist.
   useEffect(() => {
     if (!matchIds) return
+    const deptHasMatch = (dept: OrgTreeDepartment): boolean =>
+      matchIds.has(dept.id) || dept.roles.some((r) => matchIds.has(r.id) || r.people.some((p) => p.id && matchIds.has(p.id)))
     setExpandedAreas((prev) => {
       const next = new Set(prev)
-      for (const area of tree.areas) if (area.departments.some((d) => matchIds.has(d.id))) next.add(area.id)
+      for (const area of tree.areas) if (area.departments.some(deptHasMatch)) next.add(area.id)
       return next
     })
-  }, [matchIds, tree.areas])
+    setExpandedDepts((prev) => {
+      const next = new Set(prev)
+      for (const dept of depts) if (dept.roles.some((r) => matchIds.has(r.id) || r.people.some((p) => p.id && matchIds.has(p.id)))) next.add(dept.id)
+      return next
+    })
+    setExpandedRoles((prev) => {
+      const next = new Set(prev)
+      for (const dept of depts) for (const role of dept.roles) if (role.people.some((p) => p.id && matchIds.has(p.id))) next.add(role.id)
+      return next
+    })
+  }, [matchIds, tree.areas, depts])
 
   const resetFocus = useCallback(() => {
     if (!connecting) setFocus(null)
   }, [connecting])
+
+  // ---- Pattern 3: role/person row renderers (mirror the area/dept jack
+  // machinery above, one indent level deeper each tier) -------------------
+  const renderPersonRow = (p: OrgPerson, indent: number, key: string) => {
+    if (p.isVacancy || !p.id) {
+      return (
+        <div key={key} className="jack vacancy" style={{ marginLeft: indent }}>
+          <span className="name">{p.name}</span>
+          <span className="meta mono">vacant</span>
+        </div>
+      )
+    }
+    const id = p.id
+    const dim = !connecting && !!focus && !litIds.has(id)
+    return (
+      <div
+        key={id}
+        ref={registerNode(id)}
+        className={jackClasses(undefined, litIds.has(id), dim, !!matchIds?.has(id), connecting && pending.has(id))}
+        style={{ marginLeft: indent }}
+        onClick={() => handleLeftClick(id, 'person')}
+      >
+        <span className="name">{p.name}</span>
+        <span className="meta mono">person</span>
+        <span className="port" />
+      </div>
+    )
+  }
+
+  const renderRoleRow = (role: OrgTreeRole, indent: number) => {
+    const expanded = expandedRoles.has(role.id)
+    const dim = !connecting && !!focus && !litIds.has(role.id)
+    return (
+      <div key={role.id}>
+        <div
+          ref={registerNode(role.id)}
+          className={jackClasses(undefined, litIds.has(role.id), dim, !!matchIds?.has(role.id), connecting && pending.has(role.id))}
+          style={{ marginLeft: indent }}
+          onClick={() => handleLeftClick(role.id, 'role')}
+        >
+          <span className="twist mono" onClick={(e) => { e.stopPropagation(); toggleRole(role.id) }}>
+            {expanded ? '▾' : '▸'}
+          </span>
+          <span className="name">{role.name}</span>
+          <span className="meta mono">{role.filledCount}/{role.budgetedCount}</span>
+          <span className="port" />
+        </div>
+        {expanded && role.people.map((p, i) => renderPersonRow(p, indent + 18, p.id ?? `${role.id}-vacancy-${i}`))}
+      </div>
+    )
+  }
+
+  const renderDeptRow = (dept: OrgTreeDepartment, indent: number, colour: string) => {
+    const expanded = expandedDepts.has(dept.id)
+    const dim = !connecting && !!focus && !litIds.has(dept.id)
+    return (
+      <div key={dept.id}>
+        <div
+          ref={registerNode(dept.id)}
+          className={jackClasses(undefined, litIds.has(dept.id), dim, !!matchIds?.has(dept.id), connecting && pending.has(dept.id))}
+          style={{ marginLeft: indent }}
+          onClick={() => handleLeftClick(dept.id, 'department')}
+        >
+          <span className="twist mono" onClick={(e) => { e.stopPropagation(); toggleDept(dept.id) }}>
+            {expanded ? '▾' : '▸'}
+          </span>
+          <span className="dept-dot" style={{ background: colour }} />
+          <span className="name">{dept.name}</span>
+          {!expanded && <span className="meta mono">{deptPeopleIds(dept).length}p</span>}
+          <span className="port" />
+        </div>
+        {expanded && dept.roles.map((role) => renderRoleRow(role, indent + 18))}
+      </div>
+    )
+  }
 
   if (lens !== 'wiring') {
     return (
@@ -535,44 +705,14 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, gran
                     {!expanded && <span className="meta mono">{area.departments.length} depts</span>}
                     <span className="port" />
                   </div>
-                  {expanded && area.departments.map((dept) => {
-                    const dDim = !connecting && !!focus && !litIds.has(dept.id)
-                    return (
-                      <div
-                        key={dept.id}
-                        ref={registerNode(dept.id)}
-                        className={jackClasses('child', litIds.has(dept.id), dDim, !!matchIds?.has(dept.id), connecting && pending.has(dept.id))}
-                        onClick={() => handleLeftClick(dept.id, 'department')}
-                      >
-                        <span className="dept-dot" style={{ background: area.colour }} />
-                        <span className="name">{dept.name}</span>
-                        <span className="meta mono">{deptPeopleIds(dept).length}p</span>
-                        <span className="port" />
-                      </div>
-                    )
-                  })}
+                  {expanded && area.departments.map((dept) => renderDeptRow(dept, 18, area.colour))}
                 </div>
               )
             })}
 
-            {tree.ungroupedDepartments.map((dept) => {
-              const dim = !connecting && !!focus && !litIds.has(dept.id)
-              return (
-                <div
-                  key={dept.id}
-                  ref={registerNode(dept.id)}
-                  className={jackClasses(undefined, litIds.has(dept.id), dim, !!matchIds?.has(dept.id), connecting && pending.has(dept.id))}
-                  onClick={() => handleLeftClick(dept.id, 'department')}
-                >
-                  <span className="dept-dot" style={{ background: dept.colour }} />
-                  <span className="name">{dept.name}</span>
-                  <span className="meta mono">{deptPeopleIds(dept).length}p</span>
-                  <span className="port" />
-                </div>
-              )
-            })}
+            {tree.ungroupedDepartments.map((dept) => renderDeptRow(dept, 0, dept.colour))}
 
-            {personIds.map((id) => {
+            {personIds.filter((id) => !treePersonIds.has(id)).map((id) => {
               const dim = !connecting && !!focus && !litIds.has(id)
               return (
                 <div
