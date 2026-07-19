@@ -277,13 +277,13 @@ Plans:
 
 **Wave 2**
 
-- [ ] 33-03-PLAN.md — [BLOCKING] live `db push` 00050 + pre/post grant-row equivalence + index-swap assertions
-- [ ] 33-04-PLAN.md — Wayfinder builder header (light bar, inline lock reason) + ONE "Tools for this SOP" menu (SC-6)
+- [x] 33-03-PLAN.md — [BLOCKING] live `db push` 00050 + pre/post grant-row equivalence + index-swap assertions
+- [x] 33-04-PLAN.md — Wayfinder builder header (light bar, inline lock reason) + ONE "Tools for this SOP" menu (SC-6)
 
 **Wave 3**
 
 - [ ] 33-05-PLAN.md — grants.ts SOP-target arm + narrowing-override materialization + LIVE ephemeral-org runtime tests (SC-3/SC-4)
-- [ ] 33-06-PLAN.md — WiringPatchBay full teams ladder: dept→role→person tiers, dashed vacancies (SC-1)
+- [x] 33-06-PLAN.md — WiringPatchBay full teams ladder: dept→role→person tiers, dashed vacancies (SC-1)
 
 **Wave 4**
 
@@ -305,7 +305,7 @@ Bundles the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` v0.3. Planne
 - [x] **Phase 21.6: Builder Edit Stage Redesign** (INSERTED 2026-06-05) — Apply the 21.5 review-redesign philosophy to the **Build/edit** stage, which is still the untouched Puck editor. First-time admins hit internal jargon ("Block"), two redundant block lists (Puck component palette = add-new vs outline = already-placed), unanchored canvas figures with no clear action, and a cramped right-rail field editor. Scope from UAT feedback: (1) humanize block-type labels in the Puck palette + outline (reuse `humanizeBlockType` / `block-type-labels.ts` from 21.5 — currently only on the review surface); (2) collapse palette + outline into one clear affordance; (3) move content editing into the central canvas instead of the narrow right rail; (4) clarify the `SectionListSidebar` purpose + 1st→last ordering; (5) clarify what the user does with canvas figures/images. UI-led — produces a UI-SPEC. Runs **before** Phase 22. (completed 2026-06-05)
 - [x] **Phase 22: Voice-Driven Walkthrough** — Turn the Phase 15 voice Q&A shell into a real end-to-end voice loop on the mobile immersive walkthrough: live Deepgram STT in (push-to-talk, SOP-keyterm-boosted for factory-floor noise), gpt-4o-mini-tts read-back out, spoken "next"/"done" driving step progression through the existing D-02 safety-gated path, plus an always-on visual layer (photo-or-icon per step) so a low-literacy worker can follow visually. Closes W-01 literacy gaps + X-02 voice-driven mode. **English-only this phase — multi-language (VDW-LIT-04, VDW-VOICE-04: Te Reo, Tagalog, Hindi, Mandarin) is DEFERRED to a fast-follow per CONTEXT D-08** (prove the loop first; translation-correctness risk on safety wording + weak Te Reo STT/TTS vendor support). Reuses the scaffolded `deepgram-stream.ts` + `WalkthroughVoiceModal` + `/api/voice/query`; preserves the SB-LINE-06 `next/dynamic` bundle isolation. No new npm packages. (completed 2026-06-24)
 
-  **Plans:** 2/9 plans executed
+  **Plans:** 5/9 plans executed
 
   - [x] 22-01-PLAN.md — Wave 0: register `phase22-stubs` Playwright project + 6 source-contract/unit stub specs (Wave 0)
   - [x] 22-02-PLAN.md — Voice infra: Deepgram keyterms + `/api/voice/tts` route + `useTtsPlayback` hook + `classifyIntent` (Wave 1)
@@ -1095,7 +1095,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | 29. Approval Chains | 5/6 | In Progress|  |
 | 30. UX Consolidation & Simplification | 7/8 | In Progress|  |
 | 32. Visual Org Model & Library Permissions | 9/9 | Executed — human UAT open (3 items) |  |
-| 33. Per-SOP Access Granularity + Wayfinder Header | 2/9 | In Progress|  |
+| 33. Per-SOP Access Granularity + Wayfinder Header | 5/9 | In Progress|  |
 
 ## Backlog
 
