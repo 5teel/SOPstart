@@ -479,6 +479,7 @@ None yet.
 
 ### Pending Todos
 
+- [ ] Phase seed: Competency layer — training matrix, competency states, supervisor observations (from safety-org SOP guidance-notes review 2026-07-19; see .planning/todos/pending/2026-07-19-phase-seed-competency-layer.md)
 - [ ] Confirm Vimeo URL scope for Phase 6 before planning begins (separate API token required; research flags this as product decision)
 - [ ] Phase 6 planning: research TUS integration with current Supabase JS SDK version and confirm tus-js-client vs Uppy choice
 - [ ] Phase 7 planning: verify current iOS Safari MediaRecorder support status (post-iOS 17.2) and design fallback UX

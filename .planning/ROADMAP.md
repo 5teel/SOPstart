@@ -1143,3 +1143,43 @@ Also consider whether OCR should move server-side to drop tesseract.js from the 
 Plans:
 
 - [ ] TBD (promote with /gsd-review-backlog when ready)
+
+### Phase 999.4: AI-reviewer completeness rubric — hazards, LOTO, E-stop, quality, length (BACKLOG)
+
+**Goal:** Extend the existing AI reviewer jobs (src/lib/parsers/ai-reviewer/) with a per-SOP completeness rubric derived from the safety-org guidance-notes review (2026-07-19): every published SOP must address (1) significant hazards, (2) robust controls, (3) isolation/LOTO for routine + emergency access — with an explicit named check that E-stops are NOT isolation, (4) quality outcomes as first-class alongside safety. Also flag SOPs that are too long/complicated to work through (the guidance notes' own cited failure mode) so the "finer points are coached on-job" principle holds. Cheapest of the guidance-notes adoptions — builds on job-b-omission which already checks lockout.
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+
+- [ ] TBD (promote with /gsd-review-backlog when ready)
+
+### Phase 999.5: Document codes + SOP register export (BACKLOG)
+
+**Goal:** Surface a document-code field on SOPs (EN-FOR-02-001 style — real orgs navigate by these codes; the Raw SOPs corpus uses them) plus a register-style export per department (code, title, version, status, issue date, change history) for ISO/audit use. Spirit: SOPstart's library IS the register — don't rebuild the spreadsheet, just make the library exportable in the shape auditors expect. From the safety-org guidance-notes review (2026-07-19).
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+
+- [ ] TBD (promote with /gsd-review-backlog when ready)
+
+### Phase 999.6: Risk/priority rating for SOP backlog triage (BACKLOG)
+
+**Goal:** "Start with the tasks that can cause the most harm" — a lightweight risk/priority rating at upload (or AI-suggested from parsed hazard content) so orgs with 50–500 SOPs can triage which to digitise/verify/publish first instead of treating all uploads equally. Library and admin queues sort by it. From the safety-org guidance-notes review (2026-07-19).
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+
+- [ ] TBD (promote with /gsd-review-backlog when ready)
+
+### Phase 999.7: Refresher re-walkthrough cadence (BACKLOG)
+
+**Goal:** Address the second of the two ways people get hurt (long-tenure complacency, shortcuts, bad habits): periodic re-walkthrough scheduling per SOP or per assignment (e.g. re-walk high-risk SOPs every N months), surfacing due/overdue refreshers on the worker dashboard and in supervisor views. Complements the supervisor-observations layer in the competency-layer phase seed (.planning/todos/pending/2026-07-19-phase-seed-competency-layer.md). From the safety-org guidance-notes review (2026-07-19).
+**Requirements:** TBD
+**Plans:** 0 plans
+
+Plans:
+
+- [ ] TBD (promote with /gsd-review-backlog when ready)
