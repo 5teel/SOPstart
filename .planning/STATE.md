@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
 status: executing
-stopped_at: Completed 33-10-PLAN.md
-last_updated: "2026-07-19T05:54:01.418Z"
+stopped_at: Completed 33-11-PLAN.md
+last_updated: "2026-07-19T06:04:23.111Z"
 last_activity: 2026-07-19 -- Phase 33 execution started
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 40
-  completed_plans: 39
-  percent: 67
+  completed_plans: 40
+  percent: 83
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 33 (per-sop-access-granularity-wayfinder-builder-header) — EXECUTING
-Plan: 2 of 11
+Plan: 3 of 11
 Status: Ready to execute
 Last activity: 2026-07-19 -- Phase 33 execution started
 
@@ -178,6 +178,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 32 P08 | 20min | 2 tasks | 6 files |
 | Phase 32 P09 | 45min | 2 tasks | 9 files |
 | Phase 33 P10 | 25min | 2 tasks | 2 files |
+| Phase 33 P11 | 20min | 4 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -387,6 +388,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Phase 32-09: WiringPatchBayShell added — async page.tsx cannot hold the onWireUpComplete router.refresh() callback (same RSC-boundary class as 32-07's TeamViewShell)
 - [Phase ?]: Phase 32-09: PublishStage wireUpHref derived from initialSop.status === 'published' by the parent shell, not a local just-published flag
 - [Phase 33]: deleteSop guarded with organisation_id fetch-and-compare before delete cascade (CR-01 closure)
+- [Phase 33]: WR-02 fix: snapshot column (not derived flag) distinguishes legacy org-wide SOPs from collection-following SOPs across the override/re-follow transition
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -496,7 +498,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-19T05:54:01.409Z
-Stopped at: Completed 33-10-PLAN.md
+Last session: 2026-07-19T06:04:23.102Z
+Stopped at: Completed 33-11-PLAN.md
 Resume file:
 None
