@@ -77,11 +77,13 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 
 <!-- Current scope. Building toward these. -->
 
-#### v6.0 — SOP Ownership & Governance Infrastructure (Phase 28 ✅ · 29–30 remaining)
-- Optional multi-step approval chain per category, versioned, one-click approve — SOPs without a chain publish exactly as today (Phase 29)
-- AI-proposed maintenance schedule (prioritized review plan from staleness + usage + flags) (Phase 30)
-- Per-worker training record view (completion = training evidence: SOP, version, date, sign-off chain) + CSV export (Phase 30)
-- Deferred within v6.0: cadence-config UI (12mo default suffices; per-SOP override = Phase 30 candidate slice, see 28-HUMAN-UAT)
+#### v7.0 — Competency & Training Layer (defined 2026-07-19)
+- Derived competency states per person × required-SOP (CMP-01..04 — never gates worker access)
+- Training matrix on /admin/team (MTX-01..03 — grants × completions join, zero double-entry)
+- Supervisor observations, append-only + worker-visible (OBS-01..03)
+- Assessor governance with audited bootstrap override (ASR-01)
+- Training records rollforward from v6.0 Phase 31: per-worker view, SuccessFactors-shaped CSV, outdated-version surfacing, AI maintenance schedule (TRN-01..03, REV-05)
+- Guidance-notes adoptions: completeness rubric incl. E-stops≠isolation (RUB-01..03), document codes + register export (DOC-01..02), risk triage (TRI-01), refresher cadence (REF-01..02)
 
 #### v3.0 carry-over (deferred to v4.5 backlog)
 - A-05 NZ Template Library (Visy glass-mfg-focused)

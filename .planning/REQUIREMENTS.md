@@ -611,3 +611,72 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *v6.0 requirements added: 2026-07-12*
+
+## v7.0 Requirements — Competency & Training Layer
+
+**Defined:** 2026-07-19 · Source: safety-org SOP guidance-notes review (2026-07-19, spirit-over-letter), Visy interview (2026-05-05), v6.0 Phase 31 rollforward, v7.0 research (.planning/research/SUMMARY.md).
+**North star (carried):** ease of use first — competency tracking never adds worker-facing friction; worker read/walkthrough access is never gated by competency status.
+
+### Competency States (CMP)
+
+- [ ] **CMP-01**: Admin/supervisor can see a derived competency state for every person × required-SOP pair (not started / read / supervised / competent-signed-off) — computed live from existing evidence, never stored redundantly
+- [ ] **CMP-02**: Evidence events (completion, sign-off, observation) advance the derived state — no manual state editing
+- [ ] **CMP-03**: A SOP version supersede surfaces "trained on outdated version" rather than resetting or orphaning competency history (resolves via version lineage / current_sop_version)
+- [ ] **CMP-04**: Competency state NEVER gates worker read/walkthrough access (locked guard — regression-tested)
+
+### Training Matrix (MTX)
+
+- [ ] **MTX-01**: Admin can view a training matrix (people × required SOPs × state) as a third mode on the existing /admin/team view toggle
+- [ ] **MTX-02**: Matrix derives requirements from access grants (materialized junctions) and evidence from completions/sign-offs — zero double-entry, no third derivation layer
+- [ ] **MTX-03**: Admin can cut the matrix by department, worker, and SOP
+
+### Supervisor Observations (OBS)
+
+- [ ] **OBS-01**: Supervisor can record a 30-second observation of a worker against a SOP (verdict + optional note) — append-only, mirrors the sign-off/review-event RLS pattern
+- [ ] **OBS-02**: Worker can see observations recorded about them (trust / NZ Privacy Act framing — ships in the same change as the supervisor write UI)
+- [ ] **OBS-03**: Observations appear under the worker's profile and feed the derived competency state
+
+### Assessor (ASR)
+
+- [ ] **ASR-01**: Only signed-off assessors can record competence-advancing observations; audited admin-override path covers the new-org bootstrap deadlock
+
+### Training Records — Phase 31 rollforward (TRN + REV)
+
+- [ ] **TRN-01**: Per-worker training record view renders every completion as training evidence (SOP, version, date, sign-off chain)
+- [ ] **TRN-02**: Admin can export training records as CSV, filterable by worker/SOP/department/date range, shaped for SuccessFactors Learning History import
+- [ ] **TRN-03**: Admin can see which workers completed the current vs a prior version after a supersede
+- [ ] **REV-05**: Governance surface shows an AI-prioritized maintenance schedule (staleness + usage + reviewer flags) on the existing AI adapter — no new AI infrastructure
+
+### Completeness Rubric (RUB)
+
+- [ ] **RUB-01**: AI reviewer flags missing hazards/controls/isolation-LOTO coverage, including an explicit named "E-stops are not isolation" check
+- [ ] **RUB-02**: AI reviewer flags absent quality outcomes and too-long/too-complicated SOPs
+- [ ] **RUB-03**: Rubric informs, never gates — publish flow byte-unchanged (locked guard)
+
+### Document Codes & Register (DOC)
+
+- [ ] **DOC-01**: Admin can assign a document code to a SOP (EN-FOR-02-001 style); code displays in library, builder, and exports
+- [ ] **DOC-02**: Admin can export a per-department register (code, title, version, status, dates)
+
+### Risk Triage (TRI)
+
+- [ ] **TRI-01**: Admin can set or accept an AI-suggested risk/priority rating per SOP; library and admin queues can sort by it
+
+### Refresher Cadence (REF)
+
+- [ ] **REF-01**: Refresher cadence per SOP surfaces due/overdue re-walkthroughs to workers and supervisors — never blocking access
+- [ ] **REF-02**: Refresher due-dates derive from last completion + cadence via the existing governance cadence helpers
+
+### v7.0 Out of Scope
+
+- Quiz/test engine — supervisor observation IS the practical-demonstration evidence (Visy literacy findings)
+- Competency-gated worker access — violates the locked north star by definition
+- The guidance notes' rigid 5-step NYC ladder — spirit (staged, observed, evidenced) not letter
+- Disciplinary workflow — records exportable, enforcement stays human
+- Live HRIS/SuccessFactors API — CSV export only this milestone
+
+### v7.0 Traceability
+
+| REQ-ID | Phase | Status |
+|--------|-------|--------|
+| (filled by roadmap) | | |
