@@ -41,10 +41,14 @@ test.describe('SC-3 — WiringPatchBay grouped structure source contract', () =>
     expect(src).toContain('expanded && area.departments.map')
   })
 
-  test('a collapsed area redirects its departments\' wires to the area jack (leftEndpoint collapse)', () => {
+  test('a collapsed area redirects its departments\' wires to the area jack (leftEndpoint collapse, generalized 33-06 to nearest-collapsed-ancestor)', () => {
     const src = read(BAY)
     expect(src).toContain('const leftEndpoint = useCallback(')
-    expect(src).toContain('!expandedAreas.has(areaId)) return areaId')
+    expect(src).toContain('if (isCollapsed(link)) return link.unitId')
+    // 33-06: the generalization covers all three collapsible tiers, not just area.
+    expect(src).toContain("if (link.subjectType === 'area') return !expandedAreas.has(link.unitId)")
+    expect(src).toContain("if (link.subjectType === 'department') return !expandedDepts.has(link.unitId)")
+    expect(src).toContain("if (link.subjectType === 'role') return !expandedRoles.has(link.unitId)")
   })
 
   test('every rendered jack shows a count/meta badge (people, SOPs, or depts)', () => {
