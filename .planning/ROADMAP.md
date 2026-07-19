@@ -301,6 +301,130 @@ Plans:
 
 ---
 
+## v7.0 — Competency & Training Layer (started 2026-07-19)
+
+Turns data SafeStart already stores (access grants = who must know what; completions + immutable sign-off chains = what's been evidenced) into a full competency system: a training matrix, derived competency states, and supervisor observation records — the audit artifact every ACC reviewer, WorkSafe inspector, and site manager asks for. Absorbs v6.0's unshipped Phase 31 (training records + AI maintenance schedule) and promotes four guidance-notes backlog items (999.4-999.7). **NORTH STAR (carried from v6.0, locked by Simon 2026-07-12):** ease of use and maintenance first — competency tracking exists only in service of accurate documentation and shop-floor ease of use; worker read/walkthrough access is NEVER gated by competency state (locked guard, regression-tested). Builds on existing infra only: access grants + materialization (Phases 32-33), completions + sign-off chain (Phases 4/23), departments (Phase 25), AI reviewer jobs (Phase 21), agent metadata + AI adapter (Phase 26.5/27), governance queue (Phase 28). Execution order 34 → 35 → 36 → 37 → 38 → 39 (38 is parallel-safe and can run alongside 35-37).
+
+- [ ] **Phase 34: Supervisor Observations** - Append-only, org-scoped observation records supervisors log against a worker + SOP, visible to the worker themselves — the standalone evidence-layer foundation
+- [ ] **Phase 35: Competency Classifier + Training Matrix + Records** - Derived-live competency state per person×SOP, a training matrix on /admin/team, and per-worker training record + CSV export — one pure classifier, zero stored/stale state
+- [ ] **Phase 36: Refresher Cadence + Version-Currency** - Trained-on-outdated-version surfacing after supersede, plus due/overdue refresher re-walkthroughs — informational only, never blocking (promotes backlog 999.7)
+- [ ] **Phase 37: Assessor Governance** - Only a signed-off assessor can record a competence-advancing observation, with an audited admin-override path for new-org bootstrap
+- [ ] **Phase 38: Guidance-Notes Adoptions** - AI-reviewer completeness rubric (hazards/controls/LOTO + named E-stops-is-not-isolation check, quality outcomes, length flag), document codes + register export, risk/priority triage — all additive and informing-only (promotes backlog 999.4, 999.5, 999.6)
+- [ ] **Phase 39: AI-Prioritized Maintenance Schedule** - Governance surface shows an AI-ranked review list (staleness + usage + reviewer flags) on the existing AI adapter — no new AI infrastructure
+
+### Phase 34: Supervisor Observations
+
+**Goal**: Supervisors can record a 30-second, append-only observation of a worker against a specific SOP, and workers can see every observation recorded about them — the tamper-evident evidence layer that directly answers Visy's #1 named pain point (fraudulent/shared sign-offs), independent of everything else in the milestone.
+**Depends on**: Nothing new — copies the append-only/org-scoped pattern already proven three times (`completion_sign_offs`, `sop_completion_signatures`, `sop_review_events`)
+**Requirements**: OBS-01, OBS-02, OBS-03
+**Success Criteria** (what must be TRUE):
+
+  1. Supervisor can record an observation (verdict + optional note) of a worker against a SOP in a few taps from the worker's profile or /activity
+  2. Observation records are append-only — no edit or delete path exists, matching the sign-off chain's immutability
+  3. Worker can see every observation recorded about them on their own profile (trust / NZ Privacy Act framing ships in the same change as the supervisor write UI)
+  4. Observations are strictly org-scoped — a runtime cross-org write/read test proves no leakage (the codebase's recurring service-role write-hole class)
+
+**Plans**: TBD
+**UI hint**: yes
+
+Plans:
+
+- [ ] TBD (created by /gsd-plan-phase)
+
+### Phase 35: Competency Classifier + Training Matrix + Records
+
+**Goal**: Admins get one derived-live training matrix (people × required SOPs × competency state), a per-worker training record view, and CSV export — all reading from one pure classifier function over existing evidence (grants, completions, sign-offs, observations), never a second stored/stale layer.
+**Depends on**: Phase 34 (observations feed the classifier), Phase 32/33 (access grants — who must know what), Phase 4/23 (completions + sign-off chain — what's evidenced)
+**Requirements**: CMP-01, CMP-02, CMP-04, MTX-01, MTX-02, MTX-03, TRN-01, TRN-02
+**Success Criteria** (what must be TRUE):
+
+  1. Admin/supervisor sees a derived competency state (not started / read / supervised / competent-signed-off) for every person × required-SOP pair, computed live — no manual state editing, no redundant stored table
+  2. Admin can view a training matrix as a third view mode on the existing /admin/team, cut by department, worker, and SOP
+  3. Worker read/walkthrough access is never gated by competency state — enforced by a locked regression guard (mirrors the Phase 28 north-star guard)
+  4. Admin can open a per-worker training record showing every completion as evidence (SOP, version, date, sign-off chain) and export it as CSV filterable by worker/SOP/department/date range, shaped for SuccessFactors Learning History import
+
+**Plans**: TBD
+**UI hint**: yes
+
+Plans:
+
+- [ ] TBD (created by /gsd-plan-phase)
+
+### Phase 36: Refresher Cadence + Version-Currency
+
+**Goal**: A SOP version supersede surfaces "trained on an outdated version" instead of silently orphaning competency history, and due/overdue refresher re-walkthroughs surface to workers and supervisors — both derived from the same cadence/version-lineage math the governance queue already uses. Promotes backlog 999.7.
+**Depends on**: Phase 35 (classifier + latest-completion output), Phase 28 (cadence helpers in `cadences.ts`), Phase 23 (version supersede/lineage)
+**Requirements**: CMP-03, TRN-03, REF-01, REF-02
+**Success Criteria** (what must be TRUE):
+
+  1. A SOP version supersede surfaces "trained on outdated version" for affected workers rather than resetting or orphaning their competency history (resolved via version lineage / current_sop_version)
+  2. SOP detail (admin) shows which workers completed the current version vs. a prior version
+  3. Refresher due/overdue re-walkthroughs surface to workers and supervisors, computed from last completion + per-SOP cadence
+  4. Refresher state never blocks worker access — informational only, consistent with the locked north star
+
+**Plans**: TBD
+**UI hint**: yes
+
+Plans:
+
+- [ ] TBD (created by /gsd-plan-phase)
+
+### Phase 37: Assessor Governance
+
+**Goal**: Recording a competence-advancing observation requires the recorder to be a signed-off assessor themselves, with an audited override path so a brand-new organisation with zero assessors isn't permanently deadlocked.
+**Depends on**: Phase 35 (competency states — the mechanism "is this person signed off"), Phase 34 (the observation write path this gate sits on)
+**Requirements**: ASR-01
+**Success Criteria** (what must be TRUE):
+
+  1. Only a worker/supervisor who is themselves signed-off as an assessor can record a competence-advancing observation
+  2. A new organisation with zero assessors has an admin-override path to bootstrap the first one, and every override use is recorded in an audit trail
+
+**Plans**: TBD
+**UI hint**: yes
+
+Plans:
+
+- [ ] TBD (created by /gsd-plan-phase)
+
+### Phase 38: Guidance-Notes Adoptions
+
+**Goal**: The AI reviewer gets a named completeness rubric (hazards/controls/isolation-LOTO with an explicit "E-stops are not isolation" check, quality outcomes, length flag), every SOP can carry a document code and roll up into a per-department register export, and admins can set/accept a risk/priority rating for triage — all additive columns and reviewer jobs, all informing rather than gating. Promotes backlog 999.4, 999.5, 999.6. Fully independent of Phases 34-37 — parallel-safe.
+**Depends on**: Phase 21 (AI reviewer job orchestrator — this is a 6th job on the existing pipeline)
+**Requirements**: RUB-01, RUB-02, RUB-03, DOC-01, DOC-02, TRI-01
+**Success Criteria** (what must be TRUE):
+
+  1. AI reviewer flags missing hazards/controls/isolation-LOTO coverage, including an explicit named "E-stops are not isolation" check
+  2. AI reviewer flags absent quality outcomes and SOPs that are too long/complicated to work through
+  3. The rubric only informs — publish flow is byte-unchanged, verified by a locked regression guard
+  4. Admin can assign a document code to a SOP (EN-FOR-02-001 style, visible in library/builder/exports) and export a per-department register (code, title, version, status, dates)
+  5. Admin can set or accept an AI-suggested risk/priority rating per SOP; library and admin queues can sort by it
+
+**Plans**: TBD
+**UI hint**: yes
+
+Plans:
+
+- [ ] TBD (created by /gsd-plan-phase)
+
+### Phase 39: AI-Prioritized Maintenance Schedule
+
+**Goal**: The governance surface shows an AI-ranked "review this next" list built from staleness, usage, and reviewer flags, reusing the existing AI adapter and agent metadata layer — no new AI infrastructure.
+**Depends on**: Phase 36 (cadence/staleness data), Phase 38 (reviewer flags as a ranking input), Phase 26.5/27 (AI adapter + agent metadata layer)
+**Requirements**: REV-05
+**Success Criteria** (what must be TRUE):
+
+  1. Governance dashboard shows a prioritized review/maintenance list ranked by staleness, usage, and reviewer flags
+  2. The schedule is a read-only prioritization aid — it never blocks or gates anything, consistent with the locked north star
+
+**Plans**: TBD
+**UI hint**: yes
+
+Plans:
+
+- [ ] TBD (created by /gsd-plan-phase)
+
+---
+
 ## v4.0 — Safety-Critical Parsing + Voice + AI Foundation (started 2026-05-24 · ✅ shipped 2026-07-02)
 
 Bundles the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` v0.3. Planned 21 → 22 → 23; grew in-flight with 21.5/21.6 (builder UX) and 24/25 (flow graph + departments). All phases executed and code-reviewed; residual = human UAT (21.6/22/23/25) carried per the v3.0 field-verification precedent. Archive via `/gsd-complete-milestone`.
@@ -1051,7 +1175,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 21.6 → 22 → 23 → 24 → 25** (v4.0) → **26 → 26.5** (v5.0) → **27** (v5.0 close) → **28 → 29 → 30** (v6.0)
+Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 21.6 → 22 → 23 → 24 → 25** (v4.0) → **26 → 26.5** (v5.0) → **27** (v5.0 close) → **28 → 29 → 30** (v6.0) → **34 → 35 → 36 → 37 → 38 → 39** (v7.0)
 
 **v3.0 closeout 2026-05-23.** Phases 16, 17, 18 deferred to v4.0 backlog. Phase 19 deleted (no remaining dependencies). Phase 20 partial — DOCX-to-builder slice shipped on master; remaining safety-critical verification scope carried to v4.0 Phase 21.
 
@@ -1060,6 +1184,8 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 **v5.0 kicked off 2026-07-02.** Phase 26 (bespoke inline builder redesign; Phase 17 Konva absorbed) → Phase 26.5 (agent-metadata layer on X-03 + graphify). Forks locked in `26-CONTEXT.md`.
 
 **v6.0 kicked off 2026-07-12.** Phase 28 (ownership + review lifecycle + governance queue foundation) → Phase 29 (approval chains) → Phase 30 (UX consolidation & simplification — inserted 2026-07-12 from full frontend audit) → Phase 31 (training records + AI maintenance schedule). North star: ease of use beats process; governance never blocks worker access.
+
+**v7.0 kicked off 2026-07-19 · roadmap created 2026-07-19 (6 phases).** Phase 34 (supervisor observations) → Phase 35 (competency classifier + training matrix + records) → Phase 36 (refresher cadence + version-currency) → Phase 37 (assessor governance) → Phase 38 (guidance-notes adoptions — parallel-safe with 35-37) → Phase 39 (AI-prioritized maintenance schedule). Absorbs v6.0's unshipped Phase 31 and promotes backlog 999.4-999.7. North star carried: competency tracking never gates worker access.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -1101,6 +1227,12 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | 30. UX Consolidation & Simplification | 8/8 | Complete    | 2026-07-14 |
 | 32. Visual Org Model & Library Permissions | 9/9 | Complete    | 2026-07-18 |
 | 33. Per-SOP Access Granularity + Wayfinder Header | 11/11 | Complete    | 2026-07-19 |
+| 34. Supervisor Observations | 0/TBD | Not started |  |
+| 35. Competency Classifier + Training Matrix + Records | 0/TBD | Not started |  |
+| 36. Refresher Cadence + Version-Currency | 0/TBD | Not started |  |
+| 37. Assessor Governance | 0/TBD | Not started |  |
+| 38. Guidance-Notes Adoptions | 0/TBD | Not started |  |
+| 39. AI-Prioritized Maintenance Schedule | 0/TBD | Not started |  |
 
 ## Backlog
 
@@ -1144,42 +1276,6 @@ Plans:
 
 - [ ] TBD (promote with /gsd-review-backlog when ready)
 
-### Phase 999.4: AI-reviewer completeness rubric — hazards, LOTO, E-stop, quality, length (BACKLOG)
+### Promoted to v7.0 (2026-07-19)
 
-**Goal:** Extend the existing AI reviewer jobs (src/lib/parsers/ai-reviewer/) with a per-SOP completeness rubric derived from the safety-org guidance-notes review (2026-07-19): every published SOP must address (1) significant hazards, (2) robust controls, (3) isolation/LOTO for routine + emergency access — with an explicit named check that E-stops are NOT isolation, (4) quality outcomes as first-class alongside safety. Also flag SOPs that are too long/complicated to work through (the guidance notes' own cited failure mode) so the "finer points are coached on-job" principle holds. Cheapest of the guidance-notes adoptions — builds on job-b-omission which already checks lockout.
-**Requirements:** TBD
-**Plans:** 0 plans
-
-Plans:
-
-- [ ] TBD (promote with /gsd-review-backlog when ready)
-
-### Phase 999.5: Document codes + SOP register export (BACKLOG)
-
-**Goal:** Surface a document-code field on SOPs (EN-FOR-02-001 style — real orgs navigate by these codes; the Raw SOPs corpus uses them) plus a register-style export per department (code, title, version, status, issue date, change history) for ISO/audit use. Spirit: SOPstart's library IS the register — don't rebuild the spreadsheet, just make the library exportable in the shape auditors expect. From the safety-org guidance-notes review (2026-07-19).
-**Requirements:** TBD
-**Plans:** 0 plans
-
-Plans:
-
-- [ ] TBD (promote with /gsd-review-backlog when ready)
-
-### Phase 999.6: Risk/priority rating for SOP backlog triage (BACKLOG)
-
-**Goal:** "Start with the tasks that can cause the most harm" — a lightweight risk/priority rating at upload (or AI-suggested from parsed hazard content) so orgs with 50–500 SOPs can triage which to digitise/verify/publish first instead of treating all uploads equally. Library and admin queues sort by it. From the safety-org guidance-notes review (2026-07-19).
-**Requirements:** TBD
-**Plans:** 0 plans
-
-Plans:
-
-- [ ] TBD (promote with /gsd-review-backlog when ready)
-
-### Phase 999.7: Refresher re-walkthrough cadence (BACKLOG)
-
-**Goal:** Address the second of the two ways people get hurt (long-tenure complacency, shortcuts, bad habits): periodic re-walkthrough scheduling per SOP or per assignment (e.g. re-walk high-risk SOPs every N months), surfacing due/overdue refreshers on the worker dashboard and in supervisor views. Complements the supervisor-observations layer in the competency-layer phase seed (.planning/todos/pending/2026-07-19-phase-seed-competency-layer.md). From the safety-org guidance-notes review (2026-07-19).
-**Requirements:** TBD
-**Plans:** 0 plans
-
-Plans:
-
-- [ ] TBD (promote with /gsd-review-backlog when ready)
+Phases 999.4 (AI-reviewer completeness rubric), 999.5 (document codes + register export), and 999.6 (risk/priority triage) promoted into **v7.0 Phase 38: Guidance-Notes Adoptions**. Phase 999.7 (refresher re-walkthrough cadence) promoted into **v7.0 Phase 36: Refresher Cadence + Version-Currency**. See ROADMAP.md § v7.0 above and REQUIREMENTS.md § v7.0 Requirements.

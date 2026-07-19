@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: Competency & Training Layer
 status: planning
-last_updated: "2026-07-19T10:18:12.804Z"
+last_updated: "2026-07-19T14:00:00.000Z"
 last_activity: 2026-07-19
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 33 — per-sop-access-granularity-wayfinder-builder-header
+**Current focus:** Phase 34 — supervisor-observations (v7.0 roadmap created 2026-07-19)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 34 — Supervisor Observations (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-07-19 — Milestone v7.0 started
+Status: Roadmap created — ready for /gsd-plan-phase 34
+Last activity: 2026-07-19 — v7.0 roadmap created (6 phases: 34-39)
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
@@ -184,6 +184,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 
 ### Roadmap Evolution
 
+- v7.0 roadmap created (2026-07-19): 6 phases (34-39) mapping all 23 v7.0 REQ-IDs — Phase 34 Supervisor Observations, Phase 35 Competency Classifier + Training Matrix + Records, Phase 36 Refresher Cadence + Version-Currency, Phase 37 Assessor Governance, Phase 38 Guidance-Notes Adoptions (promotes backlog 999.4-999.6), Phase 39 AI-Prioritized Maintenance Schedule (absorbs Phase 31 rollforward). Backlog 999.7 promoted into Phase 36.
 - Phase 32 added (2026-07-18): Visual Org Model & Library Permissions — design pre-validated via sketches 001/002/003 (Node Chart org builder + D-hybrid wiring surface with library-filter deep-links and wire-up mode); findings in sketch-findings-SOPstart. Pre-plan gates: roles entity schema, inherited-revoke UX, RLS extension to area/person grants.
 
 ### Decisions
@@ -478,7 +479,7 @@ None yet.
 
 ### Pending Todos
 
-- [ ] Phase seed: Competency layer — training matrix, competency states, supervisor observations (from safety-org SOP guidance-notes review 2026-07-19; see .planning/todos/pending/2026-07-19-phase-seed-competency-layer.md)
+- [x] Phase seed: Competency layer — resolved by v7.0 roadmap creation 2026-07-19 (Phases 34-39; see ROADMAP.md § v7.0 and REQUIREMENTS.md § v7.0)
 - [ ] Confirm Vimeo URL scope for Phase 6 before planning begins (separate API token required; research flags this as product decision)
 - [ ] Phase 6 planning: research TUS integration with current Supabase JS SDK version and confirm tus-js-client vs Uppy choice
 - [ ] Phase 7 planning: verify current iOS Safari MediaRecorder support status (post-iOS 17.2) and design fallback UX

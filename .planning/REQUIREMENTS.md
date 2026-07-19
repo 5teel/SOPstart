@@ -679,4 +679,35 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| (filled by roadmap) | | |
+| OBS-01 | Phase 34 | Pending |
+| OBS-02 | Phase 34 | Pending |
+| OBS-03 | Phase 34 | Pending |
+| CMP-01 | Phase 35 | Pending |
+| CMP-02 | Phase 35 | Pending |
+| CMP-04 | Phase 35 | Pending |
+| MTX-01 | Phase 35 | Pending |
+| MTX-02 | Phase 35 | Pending |
+| MTX-03 | Phase 35 | Pending |
+| TRN-01 | Phase 35 | Pending |
+| TRN-02 | Phase 35 | Pending |
+| CMP-03 | Phase 36 | Pending |
+| TRN-03 | Phase 36 | Pending |
+| REF-01 | Phase 36 | Pending |
+| REF-02 | Phase 36 | Pending |
+| ASR-01 | Phase 37 | Pending |
+| RUB-01 | Phase 38 | Pending |
+| RUB-02 | Phase 38 | Pending |
+| RUB-03 | Phase 38 | Pending |
+| DOC-01 | Phase 38 | Pending |
+| DOC-02 | Phase 38 | Pending |
+| TRI-01 | Phase 38 | Pending |
+| REV-05 | Phase 39 | Pending |
+
+**v7.0 Coverage:**
+
+- v7.0 requirements: 23 total (CMP ×4, MTX ×3, OBS ×3, ASR ×1, TRN ×3, REV-05 ×1, RUB ×3, DOC ×2, TRI ×1, REF ×2) — note: the milestone brief referenced 21, off by two; 23 is the actual count of REQ-IDs listed in the v7.0 Requirements section above (consistent with prior off-by-N corrections logged in this file's v2.0/v3.0 coverage notes)
+- Mapped to phases: 23 (Phase 34: OBS×3 = 3; Phase 35: CMP-01/02/04 + MTX×3 + TRN-01/02 = 8; Phase 36: CMP-03 + TRN-03 + REF×2 = 4; Phase 37: ASR-01 = 1; Phase 38: RUB×3 + DOC×2 + TRI-01 = 6; Phase 39: REV-05 = 1)
+- Unmapped: 0
+
+---
+*v7.0 requirements added: 2026-07-19 · roadmap created 2026-07-19 (Phases 34-39)*
