@@ -106,24 +106,25 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 - Integration with external HR/ERP systems
 - Video content within SOPs
 
-## Current Milestone: v6.0 SOP Ownership & Governance Infrastructure
+## Current Milestone: v7.0 Competency & Training Layer
 
-**Started:** 2026-07-12
-**Goal:** Close the #1 governance gap from the Visy interview ("Nobody owns SOPs — there isn't anybody") without adding a single unit of shop-floor friction. Every SOP gets an accountable owner and a review lifecycle; admins get one glanceable governance queue; completions become exportable training evidence — and none of it ever blocks a worker from reading or running an SOP.
+**Started:** 2026-07-19
+**Goal:** Turn the data SOPstart already stores (access grants = who must know what; completions + immutable sign-off chains = what's been evidenced) into a full competency system: a training matrix, competency states per person-per-SOP, and supervisor observation records — the audit artifact every ACC reviewer, WorkSafe inspector, and site manager asks for. Plus the safety-org guidance-notes quality adoptions that make individual SOPs better training modules. Absorbs v6.0's unshipped Phase 31 (training records + AI maintenance schedule).
 
-**NORTH STAR (locked by Simon, 2026-07-12):** User ease of use and maintenance FIRST. Process and blockers must never be prioritised over ease of use. SOPstart wins on (1) accuracy of SOP documentation and (2) ease of use by the actual people on the shop floor. Governance, ownership, and training records exist ONLY in service of those two things. Any governance feature that adds worker-facing friction is wrong by definition.
+**NORTH STAR (carried from v6.0, locked by Simon 2026-07-12):** User ease of use and maintenance FIRST. Process and blockers must never be prioritised over ease of use. SOPstart wins on (1) accuracy of SOP documentation and (2) ease of use by the actual people on the shop floor. Competency tracking exists ONLY in service of those two things — any feature that adds worker-facing friction is wrong by definition. Spirit over letter: adopt the guidance notes' intent (staged, observed, evidenced training), never their rigid choreography.
 
 **Target features (grouped):**
 
-- **Ownership (Visy pain #1):** owner on every SOP (auto-backfilled), ≤2-click reassign from the SOP itself, unowned-SOP surfacing when an owner leaves, "My SOPs" view
-- **Review lifecycle (G-03):** review-due date + per-category cadence, overdue grey-out in admin library (worker reading NEVER blocked), one-click "confirm current" or route into the existing edit/version flow, AI-proposed prioritized review plan
-- **Governance queue:** ONE unified queue — due-soon, overdue, unowned, stale-role — each row a one-click action; no separate consoles
-- **Approval chain (G-02):** optional per-category 1–4 step chain, stored per version, one-click approve from the SOP; absent chain = publish exactly as today
-- **Training records (G-06 lite):** per-worker training view built on existing completion + sign-off chain data, CSV export; NO HRIS API integration (stays out of scope)
+- **Training matrix:** people × required-SOPs × status view derived from access grants (Phases 32–33) joined to completions/sign-offs — the audit artifact; per-department and per-worker cuts
+- **Competency states:** 3–4 minimal states per person-per-SOP (e.g. not started / read / supervised / competent-signed-off) — NOT the guidance notes' rigid 5-step ladder
+- **Supervisor observations:** 30-second supervisor-initiated record ("watched worker do X against the SOP — consistent / needs reset") under the worker's profile; the legal-evidence layer and complacency-reset mechanism
+- **Assessor capability:** who may assess/sign off is itself governed (trainer must be signed off) — folds into the G-04 role work
+- **Training records (Phase 31 rollforward, TRN-01..03 + REV-05):** per-worker training evidence view, CSV export, trained-on-outdated-version surfacing after supersede, AI-prioritized maintenance schedule on the existing AI adapter
+- **Guidance-notes adoptions (999.4–999.7 promoted):** AI-reviewer completeness rubric (hazards/controls/LOTO with named "E-stops ≠ isolation" check, quality outcomes, too-long flag); document codes + register-style export; risk/priority rating for SOP triage; refresher re-walkthrough cadence
 
-**Key anti-goals (from north star + Visy §9):** no mandatory approval chains; no governance state that blocks worker access; no data-entry campaign on existing SOPs (defaults auto-backfill); no rigid global process replacing site judgment; no per-worker auth hardening beyond what exists.
+**Key anti-goals:** no disciplinary workflow (records exportable, enforcement stays human); no HRIS API integration yet (CSV export only — SuccessFactors is a "Later" target); no worker-facing friction from competency states (a worker's read/walkthrough access is never gated by competency status); no rigid training choreography.
 
-**Build-on (do not rebuild):** version supersede + sign-off chain (Phase 23), departments (Phase 25), site tier (Phase 15), completions (Phase 4), agent metadata + AI adapter (Phase 26.5/27) for the AI maintenance schedule.
+**Build-on (do not rebuild):** access grants + materialization (Phases 32–33), completions + immutable sign-off chain (Phases 4/23, D-17), departments (Phase 25), AI reviewer jobs (Phase 21) for the completeness rubric, agent metadata + AI adapter (Phase 26.5/27) for the maintenance schedule, governance queue (Phase 28) for surfacing due refreshers.
 
 ## Context
 
@@ -180,4 +181,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-19 — Phase 33 complete (per-SOP access granularity + Wayfinder builder header): final phase of Milestone v6.0 (SOP Ownership & Governance Infrastructure) — all phases done, milestone ready for `/gsd-complete-milestone`. Prior: v5.0 shipped 2026-07-05; ad-hoc AI-layer work 2026-07-06→09 formalized by Phase 27 (2026-07-12); self-healing video render webhook shipped 2026-07-12. Source of truth `.planning/PRODUCT-ROADMAP.md` v0.3 + Visy interview findings (2026-05-05).*
+*Last updated: 2026-07-19 — Milestone v7.0 (Competency & Training Layer) started; v6.0 quick-closed same day (Phase 31 rolled forward into v7.0). Prior: v5.0 shipped 2026-07-05; ad-hoc AI-layer work 2026-07-06→09 formalized by Phase 27 (2026-07-12); self-healing video render webhook shipped 2026-07-12. Source of truth `.planning/PRODUCT-ROADMAP.md` v0.3 + Visy interview findings (2026-05-05).*

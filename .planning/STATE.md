@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v6.0
-milestone_name: — SOP Ownership & Governance Infrastructure
-status: executing
-stopped_at: Completed 33-11-PLAN.md
-last_updated: "2026-07-19T09:19:37.244Z"
+milestone: v7.0
+milestone_name: Competency & Training Layer
+status: planning
+last_updated: "2026-07-19T10:18:12.804Z"
 last_activity: 2026-07-19
 progress:
-  total_phases: 6
-  completed_phases: 5
-  total_plans: 40
-  completed_plans: 40
-  percent: 83
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -25,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 33
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-07-19
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-07-19 — Milestone v7.0 started
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
