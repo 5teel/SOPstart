@@ -46,26 +46,35 @@
   .banner .done{flex:0 0 auto;font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;border-radius:3px;border:1.5px solid var(--accent-ok);background:var(--accent-ok);color:#fff;padding:7px 13px;display:none}
   .banner .slot.wiring .done{display:block}
 
-  /* ================= CONCEPT A — PATCH BAY + DRILL-DOWN ================= */
+  /* ================= CONCEPT A (v2) — ACCESS MAP, FULL LADDER ================= */
   .bay{max-width:1060px;margin:14px auto 0;padding:0 24px;position:relative}
-  .baycols{display:grid;grid-template-columns:1fr 220px 1fr;gap:0;position:relative}
+  .baycols{display:grid;grid-template-columns:1.1fr 130px 1fr;gap:0;position:relative}
   .colhead{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-500);margin-bottom:10px}
-  .jack{background:#fff;border:1.5px solid var(--ink-300);border-radius:5px;padding:9px 12px;position:relative;cursor:pointer;margin-bottom:8px;transition:.12s}
-  .jack .nm{font-size:12px;font-weight:600}
-  .jack .meta{font-size:10px;color:var(--ink-500);font-family:'Inter';margin-top:2px}
-  .jack:hover{border-color:var(--ink-900)}
-  .jack.lit{border-color:var(--accent-step);box-shadow:0 0 0 3px rgba(59,130,246,.14)}
-  .jack.granted{border-color:var(--accent-ok);box-shadow:0 0 0 3px rgba(16,185,129,.14)}
-  .jack.dim{opacity:.38}
-  .port{position:absolute;top:50%;width:9px;height:9px;border-radius:50%;background:#fff;border:2px solid var(--ink-500);transform:translateY(-50%)}
-  .orgcol .port{right:-5px}
-  .libcol .port{left:-5px}
-  .jack.granted .port{border-color:var(--accent-ok);background:var(--accent-ok)}
-  .jack.lit .port{border-color:var(--accent-step);background:var(--accent-step)}
+
+  /* teams ladder rows */
+  .trow{display:flex;align-items:center;gap:7px;background:#fff;border:1.5px solid var(--ink-300);border-radius:5px;padding:7px 10px;margin-bottom:6px;cursor:pointer;position:relative;transition:.12s}
+  .trow:hover{border-color:var(--ink-900)}
+  .trow .tw{font-size:9px;color:var(--ink-500);width:11px;flex:0 0 auto;transition:.12s}
+  .trow .tw.o{transform:rotate(90deg)}
+  .trow .tw.sp{visibility:hidden}
+  .trow .nm{font-size:12px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .trow .who{font-size:10px;color:var(--ink-500);font-family:'Inter';flex:0 0 auto}
+  .t-site .nm{font-size:12.5px}
+  .t-area .nm{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-700)}
+  .t-area{background:var(--paper-2)}
+  .t-role .nm{font-family:'Inter';font-weight:500;font-size:11.5px}
+  .t-person{border-style:dashed}
+  .t-person .nm{font-family:'Inter';font-weight:400;font-size:11.5px;color:var(--ink-700)}
+  .trow.sel{border-color:var(--accent-step);box-shadow:0 0 0 3px rgba(59,130,246,.14)}
+  .trow.sel .nm{color:var(--ink-900)}
+  .trow.granted{border-color:var(--accent-ok);box-shadow:0 0 0 3px rgba(16,185,129,.14)}
+  .trow.granted .nm::after{content:' ✓';color:var(--accent-ok)}
+  .trow.dim{opacity:.38}
+
   #wires{position:absolute;inset:0;pointer-events:none;overflow:visible}
 
   /* collection groups with nested SOPs */
-  .coll{background:#fff;border:1.5px solid var(--ink-300);border-radius:5px;margin-bottom:8px;position:relative}
+  .coll{background:#fff;border:1.5px solid var(--ink-300);border-radius:5px;margin-bottom:8px;position:relative;transition:.12s}
   .coll > .chd{padding:9px 12px;cursor:pointer;display:flex;align-items:center;gap:9px}
   .coll .tw{font-size:10px;color:var(--ink-500);width:11px;transition:.12s}
   .coll.open .tw{transform:rotate(90deg)}
@@ -73,17 +82,18 @@
   .coll .cnt{font-size:10px;color:var(--ink-500);font-family:'Inter'}
   .coll .soplist{display:none;border-top:1px dashed var(--ink-100);padding:6px 8px 8px 10px}
   .coll.open .soplist{display:block}
+  .coll.sel{border-color:var(--accent-step);box-shadow:0 0 0 3px rgba(59,130,246,.14)}
+  .coll.dim{opacity:.38}
   .soprow{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:3px;cursor:pointer;position:relative;border:1.5px solid transparent}
   .soprow .tree{color:var(--ink-300);font-size:11px}
   .soprow .snm{font-family:'Inter';font-size:11.5px;color:var(--ink-700);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .soprow:hover{background:var(--paper-2)}
-  .soprow.sel{border-color:var(--accent-ok);background:rgba(16,185,129,.06)}
+  .soprow.sel{border-color:var(--accent-step);background:rgba(59,130,246,.06)}
   .soprow.sel .snm{color:var(--ink-900);font-weight:600}
+  .soprow.dim{opacity:.38}
   .soprow .spill{font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;border:1px solid currentColor;border-radius:2px;padding:1px 5px;color:var(--ink-500);flex:0 0 auto}
   .soprow .spill.new{color:#b45309;border-color:#f59e0b;background:rgba(251,191,36,.12)}
-  .coll.lit{border-color:var(--accent-step);box-shadow:0 0 0 3px rgba(59,130,246,.14)}
-  .coll.dim,.orgcol .jack.faded{opacity:.38}
-  .coll .port{left:-5px}
+  .soprow .spill.chosen{color:#0f766e;border-color:var(--accent-ok);background:rgba(16,185,129,.08);text-transform:none;letter-spacing:0}
 
   /* ================= CONCEPT B — WHO CAN SEE THIS? PANEL ================= */
   .wcs{max-width:1060px;margin:14px auto 0;padding:0 24px;display:grid;grid-template-columns:400px 1fr;gap:18px;align-items:start}
@@ -123,6 +133,10 @@
   .inherit-note{font-family:'Inter';font-size:11.5px;color:var(--ink-500);border:1px dashed var(--ink-300);border-radius:4px;padding:10px 13px;line-height:1.55;margin-bottom:8px}
   .inherit-note b{color:var(--ink-700)}
   .inherit-note a{color:var(--accent-step);cursor:pointer;text-decoration:underline}
+  .panelbody .muted{color:var(--ink-500)}
+  .seelist{font-family:'Inter';font-size:12px;color:var(--ink-700);line-height:1.6}
+  .seelist li{margin:0 0 6px 18px}
+  .seelist b{color:var(--ink-900)}
 
   /* ================= CONCEPT C — ACCESS CARDS ================= */
   .cards{max-width:1060px;margin:14px auto 0;padding:0 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px;align-items:start}
@@ -149,24 +163,24 @@
 <div class="flowsw">
   <span class="lbl">Sketch · library access hierarchy (G2 + G3)</span>
   <div class="seg" id="sw">
-    <button data-c="a" class="on">A · Access map + drill-down</button>
+    <button data-c="a" class="on">A · Access map ★ winner (v2)</button>
     <button data-c="b">B · "Who can see this?" panel</button>
     <button data-c="c">C · Access cards</button>
   </div>
-  <span class="note">Departments: Forming (14) · General (9) — Collections: Maintenance / Manufacturing / Safety &amp; Environment</span>
+  <span class="note">Site: 27 people — Forming (14) · General (9) · Maintenance (4) — Collections: Maintenance / Manufacturing / Safety &amp; Environment</span>
 </div>
 
-<!-- ============ CONCEPT A ============ -->
+<!-- ============ CONCEPT A (WINNER — revised per 19 Jul feedback) ============ -->
 <section class="concept show" id="c-a">
   <div class="chead">
-    <div class="eyebrow">Concept A · keeps the map metaphor</div>
-    <h2>Access map with SOP drill-down</h2>
-    <p class="prose">The shipped patch bay, renamed <b>"Access map"</b> and given the missing hierarchy: every collection is expandable, its SOPs nest inside with tree lines, and clicking any SOP starts <b>"choose who sees it"</b> mode — no magic URL needed. All "wiring / grants" copy replaced: lines mean <i>can see</i>, the banner speaks in people. Try it: expand Maintenance, click the keyboard SOP, then toggle departments.</p>
+    <div class="eyebrow">Concept A · winner — revised 19 Jul</div>
+    <h2>Access map — the whole ladder, down to one person and one SOP</h2>
+    <p class="prose">v2 after review. The teams column now shows the <b>full ladder — site → area → department → role → person</b> (mirroring the org chart at /admin/team), and <b>every level can be chosen</b>. Access can go all the way down to a single SOP: here the whole <b>Maintenance department</b> can see the Maintenance collection (solid line), while <b>Pump Rebuild</b> inside it is seen by just two named people (dashed lines). When anything is selected, the "Who can see this?" panel below the map answers in plain words. Try it: click <b>Pump Rebuild</b>, then tap people, roles or departments on the left. Click <b>Dave Hohaia</b> to see everything he can see.</p>
   </div>
 
   <div class="banner">
     <div class="slot" id="a-slot">
-      <span class="msg" id="a-msg">Click a department to see what it can see · open a collection and pick a SOP to change who sees it</span>
+      <span class="msg" id="a-msg"></span>
       <button class="done" id="a-done">✓ Save — done</button>
     </div>
   </div>
@@ -174,40 +188,35 @@
   <div class="bay">
     <div class="baycols" id="a-bay">
       <div class="orgcol">
-        <div class="colhead">Your teams</div>
-        <div class="jack" data-unit="site"><div class="nm">Whole site</div><div class="meta">everyone · 23 people</div><span class="port"></span></div>
-        <div class="jack" data-unit="forming"><div class="nm">Forming</div><div class="meta">14 people</div><span class="port"></span></div>
-        <div class="jack" data-unit="general"><div class="nm">General</div><div class="meta">9 people</div><span class="port"></span></div>
+        <div class="colhead">Your teams — site · area · department · role · person</div>
+        <div id="a-teams"></div>
       </div>
       <div><!-- wire gutter --></div>
       <div class="libcol">
         <div class="colhead">Your SOP library</div>
 
-        <div class="coll open" data-coll="maint">
-          <div class="chd"><span class="tw">▶</span><span class="nm">Maintenance</span><span class="cnt">3 SOPs · seen by Forming, General</span></div>
-          <span class="port"></span>
+        <div class="coll open" data-id="coll:maint">
+          <div class="chd"><span class="tw">▶</span><span class="nm">Maintenance</span><span class="cnt"></span></div>
           <div class="soplist">
-            <div class="soprow" data-sop="kbd"><span class="tree">└</span><span class="snm">Replacing a Desktop Computer Keyboard at a Workstation</span><span class="spill new">New</span></div>
-            <div class="soprow" data-sop="plenum"><span class="tree">└</span><span class="snm">Changing Plenum Chamber — IS Machine Forming Section</span><span class="spill">Live</span></div>
-            <div class="soprow" data-sop="oil"><span class="tree">└</span><span class="snm">Monthly Compressor Oil Check</span><span class="spill">Live</span></div>
+            <div class="soprow" data-id="sop:otg"><span class="tree">└</span><span class="snm">OTG Probe Maintenance</span><span class="spill">Live</span></div>
+            <div class="soprow" data-id="sop:pump"><span class="tree">└</span><span class="snm">Pump Rebuild</span><span class="spill chosen" data-chosen></span><span class="spill">Live</span></div>
+            <div class="soprow" data-id="sop:kbd"><span class="tree">└</span><span class="snm">Replacing a Desktop Computer Keyboard at a Workstation</span><span class="spill new">New</span></div>
           </div>
         </div>
 
-        <div class="coll" data-coll="manuf">
-          <div class="chd"><span class="tw">▶</span><span class="nm">Manufacturing</span><span class="cnt">2 SOPs · seen by Forming</span></div>
-          <span class="port"></span>
+        <div class="coll" data-id="coll:manuf">
+          <div class="chd"><span class="tw">▶</span><span class="nm">Manufacturing</span><span class="cnt"></span></div>
           <div class="soplist">
-            <div class="soprow" data-sop="jobchange"><span class="tree">└</span><span class="snm">IS Machine Job Change</span><span class="spill">Live</span></div>
-            <div class="soprow" data-sop="gob"><span class="tree">└</span><span class="snm">Gob Weight Adjustment</span><span class="spill">Live</span></div>
+            <div class="soprow" data-id="sop:jobchange"><span class="tree">└</span><span class="snm">IS Machine Job Change</span><span class="spill">Live</span></div>
+            <div class="soprow" data-id="sop:gob"><span class="tree">└</span><span class="snm">Gob Weight Adjustment</span><span class="spill">Live</span></div>
           </div>
         </div>
 
-        <div class="coll" data-coll="safety">
-          <div class="chd"><span class="tw">▶</span><span class="nm">Safety and Environment</span><span class="cnt">2 SOPs · seen by everyone</span></div>
-          <span class="port"></span>
+        <div class="coll" data-id="coll:safety">
+          <div class="chd"><span class="tw">▶</span><span class="nm">Safety and Environment</span><span class="cnt"></span></div>
           <div class="soplist">
-            <div class="soprow" data-sop="hearing"><span class="tree">└</span><span class="snm">Hearing Protection Zones</span><span class="spill">Live</span></div>
-            <div class="soprow" data-sop="spill"><span class="tree">└</span><span class="snm">Chemical Spill Response</span><span class="spill">Live</span></div>
+            <div class="soprow" data-id="sop:hearing"><span class="tree">└</span><span class="snm">Hearing Protection Zones</span><span class="spill">Live</span></div>
+            <div class="soprow" data-id="sop:spill"><span class="tree">└</span><span class="snm">Chemical Spill Response</span><span class="spill">Live</span></div>
           </div>
         </div>
       </div>
@@ -215,18 +224,25 @@
     </div>
   </div>
 
+  <div class="banner" style="margin-top:16px">
+    <div class="panelcard" id="a-panel">
+      <div class="hd"><span id="a-panel-q">Who can see this?</span></div>
+      <div class="panelbody" id="a-panel-body"></div>
+    </div>
+  </div>
+
   <div class="annos">
-    <div class="anno"><b>SOPs live inside collections</b>Expandable groups with tree lines — the hierarchy is visible, not implied. Any SOP is reachable in two clicks.</div>
-    <div class="anno"><b>Plain words</b>"Access map" not "wiring" · "seen by Forming, General" not "2 grants" · "Save — done" not "✓ Done wiring". Lines still do the explaining.</div>
-    <div class="anno"><b>SOP click = change who sees it</b>Selecting a SOP turns the left column into on/off toggles; the banner counts people, live. Same wire-up mechanics as shipped — just discoverable.</div>
-    <div class="anno"><b>Collection-level truth</b>Toggling a SOP actually toggles its collection (the model is collection-level); the banner says so: "…everyone who can see Maintenance". Honest about the D-13 model.</div>
+    <div class="anno"><b>The full ladder</b>Site → area → department → role → person, expandable like the org chart at /admin/team. Any tier can be chosen — tapping "Fitter" means every Fitter; tapping "Dave Hohaia" means just Dave. People rows are dashed, echoing the personal-access line style.</div>
+    <div class="anno"><b>Down to one SOP</b>Pump Rebuild shows the coexistence the model needs: two dashed person-lines to one SOP, next to a solid department-line to the whole collection. Once people are chosen by name for a SOP, it stops following its collection — the pill on the row says so.</div>
+    <div class="anno"><b>The panel answers in words</b>Concept B's "Who can see this?" content is the detail view: select anything and the panel below states the answer as a sentence ("Only 2 people can see this SOP — Dave Hohaia and Priya Sharma, chosen by name"). Select a person and it flips to "What can they see?".</div>
+    <div class="anno"><b>Plain words everywhere</b>"Choose who sees it", "seen by the Maintenance department", "Save — done". Lines mean <i>can see</i>; nothing is called a wire or a grant.</div>
   </div>
 </section>
 
-<!-- ============ CONCEPT B ============ -->
+<!-- ============ CONCEPT B (reference — its panel is now A's detail view) ============ -->
 <section class="concept" id="c-b">
   <div class="chead">
-    <div class="eyebrow">Concept B · abandons the metaphor</div>
+    <div class="eyebrow">Concept B · reference — panel adopted into A</div>
     <h2>Library tree + "Who can see this?" panel</h2>
     <p class="prose">No lines at all. Left: the library as folders — collections open to show their SOPs, exactly like a file explorer everyone already knows. Right: a panel that always answers one question about whatever is selected: <b>"Who can see this?"</b> Departments are checkboxes with people counts; a green summary sentence states the total. Selecting a SOP explains that it follows its collection, with a one-click jump to change it at the source.</p>
   </div>
@@ -292,10 +308,10 @@
   </div>
 </section>
 
-<!-- ============ CONCEPT C ============ -->
+<!-- ============ CONCEPT C (reference — not selected) ============ -->
 <section class="concept" id="c-c">
   <div class="chead">
-    <div class="eyebrow">Concept C · middle ground</div>
+    <div class="eyebrow">Concept C · reference</div>
     <h2>Access cards — one card per collection, sentence on the face</h2>
     <p class="prose">The library as a grid of collection cards. Each card face answers the question before it's asked: <b>"Seen by Forming and General — 23 people."</b> "Show SOPs" expands the card to list what's inside; <b>"Change who sees these"</b> flips the card into a department checklist in place. Browsing and permissioning are the same surface, and there is no diagram to learn.</p>
   </div>
@@ -366,118 +382,302 @@
     if (b.dataset.c === 'a') requestAnimationFrame(drawWires);
   });
 
-  // ================= Concept A logic =================
-  // Access model: which units can see which collections (collection-level truth).
-  const SEES = { maint: ['forming', 'general'], manuf: ['forming'], safety: ['site'] };
-  const PEOPLE = { site: 23, forming: 14, general: 9 };
-  const SOP_COLL = { kbd: 'maint', plenum: 'maint', oil: 'maint', jobchange: 'manuf', gob: 'manuf', hearing: 'safety', spill: 'safety' };
-  const SOP_NAME = { kbd: 'Replacing a Desktop Computer Keyboard…', plenum: 'Changing Plenum Chamber…', oil: 'Monthly Compressor Oil Check', jobchange: 'IS Machine Job Change', gob: 'Gob Weight Adjustment', hearing: 'Hearing Protection Zones', spill: 'Chemical Spill Response' };
-  const COLL_NAME = { maint: 'Maintenance', manuf: 'Manufacturing', safety: 'Safety and Environment' };
+  // ================= Concept A logic (v2 — full ladder, per-SOP choosing) =================
 
+  // Library
+  const COLLS = { 'coll:maint': 'Maintenance', 'coll:manuf': 'Manufacturing', 'coll:safety': 'Safety and Environment' };
+  const SOPS = {
+    'sop:otg': { name: 'OTG Probe Maintenance', coll: 'coll:maint' },
+    'sop:pump': { name: 'Pump Rebuild', coll: 'coll:maint' },
+    'sop:kbd': { name: 'Replacing a Desktop Computer Keyboard at a Workstation', coll: 'coll:maint' },
+    'sop:jobchange': { name: 'IS Machine Job Change', coll: 'coll:manuf' },
+    'sop:gob': { name: 'Gob Weight Adjustment', coll: 'coll:manuf' },
+    'sop:hearing': { name: 'Hearing Protection Zones', coll: 'coll:safety' },
+    'sop:spill': { name: 'Chemical Spill Response', coll: 'coll:safety' },
+  };
+
+  // Teams ladder: site -> area -> department -> role -> person (mirrors OrgTree)
+  const TEAM = {
+    id: 'site', name: 'Whole site', tier: 'site', count: 27, kids: [
+      { id: 'area:prod', name: 'Production', tier: 'area', count: 23, kids: [
+        { id: 'dept:forming', name: 'Forming', tier: 'dept', count: 14, kids: [
+          { id: 'role:f-op', name: 'Machine Operator', tier: 'role', count: 11, kids: [] },
+          { id: 'role:f-sup', name: 'Shift Supervisor', tier: 'role', count: 3, kids: [] },
+        ]},
+        { id: 'dept:general', name: 'General', tier: 'dept', count: 9, kids: [
+          { id: 'role:g-hand', name: 'General Hand', tier: 'role', count: 7, kids: [] },
+          { id: 'role:g-sup', name: 'Shift Supervisor', tier: 'role', count: 2, kids: [] },
+        ]},
+      ]},
+      { id: 'area:eng', name: 'Engineering & Trades', tier: 'area', count: 4, kids: [
+        { id: 'dept:maint', name: 'Maintenance', tier: 'dept', count: 4, kids: [
+          { id: 'role:m-fit', name: 'Fitter', tier: 'role', count: 2, kids: [
+            { id: 'person:dave', name: 'Dave Hohaia', tier: 'person', count: 1, kids: [] },
+            { id: 'person:priya', name: 'Priya Sharma', tier: 'person', count: 1, kids: [] },
+          ]},
+          { id: 'role:m-sup', name: 'Shift Supervisor', tier: 'role', count: 1, kids: [
+            { id: 'person:mere', name: 'Mere Kaur', tier: 'person', count: 1, kids: [] },
+          ]},
+          { id: 'role:m-elec', name: 'Electrician', tier: 'role', count: 1, kids: [
+            { id: 'person:sam', name: 'Sam Waititi', tier: 'person', count: 1, kids: [] },
+          ]},
+        ]},
+      ]},
+    ],
+  };
+  const byId = {}, parentOf = {};
+  (function index(n, p) { byId[n.id] = n; parentOf[n.id] = p; (n.kids || []).forEach((k) => index(k, n.id)); })(TEAM, null);
+  const ROLE_COUNT = { 'role:f-op': 11, 'role:f-sup': 3, 'role:g-hand': 7, 'role:g-sup': 2, 'role:m-fit': 2, 'role:m-sup': 1, 'role:m-elec': 1 };
+  const PERSON_ROLE = { 'person:dave': 'role:m-fit', 'person:priya': 'role:m-fit', 'person:mere': 'role:m-sup', 'person:sam': 'role:m-elec' };
+
+  // Who can see what. s = any ladder level, t = a collection OR a single SOP.
+  let GRANTS = [
+    { s: 'dept:maint', t: 'coll:maint' },       // whole department -> whole collection
+    { s: 'person:dave', t: 'sop:pump' },        // two named people -> one SOP inside it
+    { s: 'person:priya', t: 'sop:pump' },
+    { s: 'dept:forming', t: 'coll:manuf' },
+    { s: 'site', t: 'coll:safety' },
+  ];
+
+  let openSet = new Set(['site', 'area:prod', 'area:eng', 'dept:maint', 'role:m-fit']);
+  let selTeam = null, selTarget = null;
+
+  // ---------- helpers ----------
+  const hasGrant = (s, t) => GRANTS.some((g) => g.s === s && g.t === t);
+  const toggleGrant = (s, t) => {
+    const i = GRANTS.findIndex((g) => g.s === s && g.t === t);
+    if (i >= 0) GRANTS.splice(i, 1); else GRANTS.push({ s, t });
+  };
+  function ancestorsOf(id) { const out = []; let cur = id; while (cur) { out.push(cur); cur = parentOf[cur]; } return out; }
+  function descendantsOf(id) { const out = []; (function walk(n) { out.push(n.id); (n.kids || []).forEach(walk); })(byId[id]); return out; }
+  function rolesUnder(id) {
+    const n = byId[id]; if (!n) return [];
+    if (n.tier === 'role') return [n.id];
+    if (n.tier === 'person') return [];
+    return (n.kids || []).flatMap((k) => rolesUnder(k.id));
+  }
+  // Union people-count across subjects without double counting a named person inside a fully-covered role.
+  function viewerCount(subjects) {
+    const full = new Set(), persons = new Set();
+    subjects.forEach((s) => { if (s.startsWith('person:')) persons.add(s); else rolesUnder(s).forEach((r) => full.add(r)); });
+    let total = 0;
+    full.forEach((r) => { total += ROLE_COUNT[r]; });
+    persons.forEach((p) => { if (!full.has(PERSON_ROLE[p])) total += 1; });
+    return total;
+  }
+  const collSubjects = (c) => GRANTS.filter((g) => g.t === c).map((g) => g.s);
+  // A SOP with people chosen by name stops following its collection.
+  function sopSubjects(sopId) {
+    const own = GRANTS.filter((g) => g.t === sopId).map((g) => g.s);
+    if (own.length) return { subjects: own, chosen: true };
+    return { subjects: collSubjects(SOPS[sopId].coll), chosen: false };
+  }
+  function subjPhrase(s) {
+    const n = byId[s]; if (!n) return s;
+    if (n.id === 'site') return '<b>everyone at the site</b>';
+    if (n.tier === 'area') return `everyone in <b>${n.name}</b>`;
+    if (n.tier === 'dept') return `the whole <b>${n.name}</b> department`;
+    if (n.tier === 'role') return `every <b>${n.name}</b> in ${byId[parentOf[s]].name}`;
+    return `<b>${n.name}</b>`;
+  }
+  const joinPhrases = (arr) => arr.length <= 1 ? (arr[0] || '') : arr.slice(0, -1).join(', ') + ' and ' + arr[arr.length - 1];
+
+  // ---------- teams column ----------
+  const teamsBox = document.getElementById('a-teams');
+  function renderTeams() {
+    const rows = [];
+    (function walk(n, depth) {
+      rows.push({ n, depth, expandable: (n.kids || []).length > 0 });
+      if ((n.kids || []).length && openSet.has(n.id)) n.kids.forEach((k) => walk(k, depth + 1));
+    })(TEAM, 0);
+    teamsBox.innerHTML = rows.map(({ n, depth, expandable }) => {
+      const cls = ['trow', 't-' + n.tier];
+      if (selTeam === n.id) cls.push('sel');
+      if (selTarget) {
+        if (selTarget.startsWith('sop:') ? sopSubjects(selTarget).subjects.includes(n.id) : hasGrant(n.id, selTarget)) cls.push('granted');
+      } else if (selTeam && ![...ancestorsOf(selTeam), ...descendantsOf(selTeam)].includes(n.id)) cls.push('dim');
+      const tw = expandable ? `<span class="tw${openSet.has(n.id) ? ' o' : ''}">▶</span>` : '<span class="tw sp">▶</span>';
+      const who = n.tier === 'person' ? '' : `<span class="who">${n.count} ${n.count === 1 ? 'person' : 'people'}</span>`;
+      return `<div class="${cls.join(' ')}" data-id="${n.id}" style="margin-left:${depth * 14}px">${tw}<span class="nm">${n.name}</span>${who}</div>`;
+    }).join('');
+  }
+
+  // ---------- library column ----------
   const bay = document.getElementById('a-bay');
+  function renderLibrary() {
+    bay.querySelectorAll('.coll').forEach((cEl) => {
+      const c = cEl.dataset.id;
+      const subs = collSubjects(c);
+      const label = subs.includes('site') ? 'seen by everyone' :
+        subs.length ? 'seen by ' + subs.map((s) => byId[s]?.name || s).join(', ') : 'not visible to anyone yet';
+      cEl.querySelector('.cnt').textContent = `${cEl.querySelectorAll('.soprow').length} SOPs · ${label}`;
+      cEl.classList.toggle('sel', selTarget === c);
+      const dimColl = (selTarget && selTarget !== c && SOPS[selTarget]?.coll !== c) ||
+        (selTeam && !GRANTS.some((g) => (g.t === c || SOPS[g.t]?.coll === c) && [...ancestorsOf(selTeam), ...descendantsOf(selTeam)].includes(g.s)));
+      cEl.classList.toggle('dim', !!dimColl);
+    });
+    bay.querySelectorAll('.soprow').forEach((r) => {
+      const id = r.dataset.id;
+      r.classList.toggle('sel', selTarget === id);
+      const ss = sopSubjects(id);
+      let dim = false;
+      if (selTarget) dim = selTarget !== id && SOPS[id].coll !== selTarget;
+      else if (selTeam) {
+        const rel = [...ancestorsOf(selTeam), ...descendantsOf(selTeam)];
+        dim = !ss.subjects.some((s) => rel.includes(s));
+      }
+      r.classList.toggle('dim', dim);
+      const pill = r.querySelector('[data-chosen]');
+      if (pill) {
+        if (ss.chosen) { pill.style.display = ''; pill.textContent = `only ${viewerCount(ss.subjects)} people`; }
+        else pill.style.display = 'none';
+      }
+    });
+  }
+
+  // ---------- wires ----------
   const svg = document.getElementById('wires');
-  const slot = document.getElementById('a-slot');
-  const msg = document.getElementById('a-msg');
-  let selSop = null;       // sop id in "choose who sees it" mode
-  let focusUnit = null;    // focused dept
-
-  function peopleFor(collId) {
-    const units = SEES[collId] || [];
-    if (units.includes('site')) return PEOPLE.site;
-    return units.reduce((n, u) => n + (PEOPLE[u] || 0), 0);
+  function teamElFor(id) {
+    let cur = id;
+    while (cur) { const el = teamsBox.querySelector(`[data-id="${cur}"]`); if (el) return el; cur = parentOf[cur]; }
+    return null;
   }
-
-  function wire(fromEl, toEl, cls) {
-    const b = bay.getBoundingClientRect();
-    const f = fromEl.getBoundingClientRect(), t = toEl.getBoundingClientRect();
-    const x1 = f.right - b.left, y1 = f.top + f.height / 2 - b.top;
-    const x2 = t.left - b.left, y2 = t.top + t.height / 2 - b.top;
-    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    p.setAttribute('d', `M ${x1} ${y1} C ${(x1 + x2) / 2} ${y1}, ${(x1 + x2) / 2} ${y2}, ${x2} ${y2}`);
-    p.setAttribute('fill', 'none');
-    p.setAttribute('stroke', cls === 'ok' ? 'var(--accent-ok)' : 'var(--accent-step)');
-    p.setAttribute('stroke-width', '2');
-    svg.appendChild(p);
+  function libElFor(id) {
+    if (id.startsWith('sop:')) {
+      const el = bay.querySelector(`.soprow[data-id="${id}"]`);
+      if (el && el.offsetHeight) return el;
+      return bay.querySelector(`.coll[data-id="${SOPS[id].coll}"]`);
+    }
+    return bay.querySelector(`.coll[data-id="${id}"]`);
   }
-
+  function wiresToDraw() {
+    if (selTarget) {
+      if (selTarget.startsWith('sop:')) {
+        const ss = sopSubjects(selTarget);
+        // chosen -> its own lines to the SOP row; follows-collection -> the collection's lines
+        return ss.chosen ? GRANTS.filter((g) => g.t === selTarget) : GRANTS.filter((g) => g.t === SOPS[selTarget].coll);
+      }
+      return GRANTS.filter((g) => g.t === selTarget || SOPS[g.t]?.coll === selTarget);
+    }
+    if (selTeam) {
+      const rel = new Set([...ancestorsOf(selTeam), ...descendantsOf(selTeam)]);
+      return GRANTS.filter((g) => rel.has(g.s));
+    }
+    return GRANTS; // resting picture: every line that exists
+  }
   function drawWires() {
     svg.innerHTML = '';
     svg.setAttribute('width', bay.offsetWidth); svg.setAttribute('height', bay.offsetHeight);
-    const unitEl = (u) => bay.querySelector(`.jack[data-unit="${u}"]`);
-    const collEl = (c) => bay.querySelector(`.coll[data-coll="${c}"]`);
-    if (selSop) {
-      const c = SOP_COLL[selSop];
-      (SEES[c] || []).forEach((u) => wire(unitEl(u), collEl(c), 'ok'));
-    } else if (focusUnit) {
-      Object.keys(SEES).forEach((c) => {
-        const units = SEES[c];
-        if (units.includes(focusUnit) || (units.includes('site'))) wire(unitEl(units.includes(focusUnit) ? focusUnit : 'site'), collEl(c), 'ok');
-      });
-    }
+    const b = bay.getBoundingClientRect();
+    wiresToDraw().forEach((g) => {
+      const fEl = teamElFor(g.s), tEl = libElFor(g.t);
+      if (!fEl || !tEl) return;
+      const f = fEl.getBoundingClientRect(), t = tEl.getBoundingClientRect();
+      const x1 = f.right - b.left, y1 = f.top + f.height / 2 - b.top;
+      const x2 = t.left - b.left, y2 = t.top + t.height / 2 - b.top;
+      const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      p.setAttribute('d', `M ${x1} ${y1} C ${(x1 + x2) / 2} ${y1}, ${(x1 + x2) / 2} ${y2}, ${x2} ${y2}`);
+      p.setAttribute('fill', 'none');
+      p.setAttribute('stroke', 'var(--accent-ok)');
+      p.setAttribute('stroke-width', '2');
+      if (g.s.startsWith('person:') || g.t.startsWith('sop:')) p.setAttribute('stroke-dasharray', '5 4');
+      svg.appendChild(p);
+    });
   }
 
-  function render() {
-    // jacks
-    bay.querySelectorAll('.jack').forEach((j) => {
-      const u = j.dataset.unit;
-      j.classList.remove('lit', 'granted', 'dim');
-      if (selSop) {
-        const c = SOP_COLL[selSop];
-        if ((SEES[c] || []).includes(u)) j.classList.add('granted');
-      } else if (focusUnit) {
-        // 'site' stays visible when it is the source of an inherited line
-        const contributes = u === 'site' && Object.values(SEES).some((units) => units.includes('site'));
-        if (u === focusUnit) j.classList.add('lit');
-        else if (!contributes) j.classList.add('dim');
-      }
-    });
-    // collections
-    bay.querySelectorAll('.coll').forEach((cEl) => {
-      const c = cEl.dataset.coll;
-      cEl.classList.remove('lit', 'dim');
-      if (selSop) { if (SOP_COLL[selSop] !== c) cEl.classList.add('dim'); }
-      else if (focusUnit) {
-        const canSee = (SEES[c] || []).includes(focusUnit) || (SEES[c] || []).includes('site');
-        cEl.classList.toggle('lit', canSee); if (!canSee) cEl.classList.add('dim');
-      }
-      // face copy
-      const units = SEES[c] || [];
-      const label = units.includes('site') ? 'seen by everyone' : units.length ? 'seen by ' + units.map((u) => u[0].toUpperCase() + u.slice(1)).join(', ') : 'not visible to anyone yet';
-      cEl.querySelector('.cnt').textContent = `${cEl.querySelectorAll('.soprow').length} SOPs · ${label}`;
-    });
-    // sop rows
-    bay.querySelectorAll('.soprow').forEach((r) => r.classList.toggle('sel', r.dataset.sop === selSop));
-    // banner
-    slot.classList.toggle('wiring', !!selSop);
-    if (selSop) {
-      const c = SOP_COLL[selSop];
-      msg.innerHTML = `Choosing who sees <b>"${SOP_NAME[selSop]}"</b> — tap teams on the left. Right now <b>${peopleFor(c)} people</b> can see it (everyone who can see ${COLL_NAME[c]}).`;
-    } else if (focusUnit) {
-      const n = Object.keys(SEES).filter((c) => SEES[c].includes(focusUnit) || SEES[c].includes('site')).length;
-      msg.innerHTML = `<b>${focusUnit[0].toUpperCase() + focusUnit.slice(1)}</b> can see <b>${n} collections</b> — highlighted on the right. Click a SOP to change who sees it.`;
+  // ---------- banner + panel ----------
+  const slot = document.getElementById('a-slot'), msg = document.getElementById('a-msg');
+  const panelQ = document.getElementById('a-panel-q'), panelBody = document.getElementById('a-panel-body');
+  function targetName(t) { return t.startsWith('coll:') ? `the ${COLLS[t]} collection` : `"${SOPS[t].name}"`; }
+
+  function renderBannerPanel() {
+    slot.classList.toggle('wiring', !!selTarget);
+    if (selTarget) {
+      const subjects = selTarget.startsWith('sop:') ? sopSubjects(selTarget).subjects : collSubjects(selTarget);
+      const n = viewerCount(subjects);
+      msg.innerHTML = `Choosing who sees <b>${targetName(selTarget)}</b> — tap a department, role or person on the left. <b>${n} ${n === 1 ? 'person' : 'people'}</b> can see it now.`;
+    } else if (selTeam) {
+      msg.innerHTML = `<b>${byId[selTeam].name}</b> — the lines show everything they can see. Click a SOP or collection on the right to change who sees it.`;
     } else {
-      msg.textContent = 'Click a department to see what it can see · open a collection and pick a SOP to change who sees it';
+      msg.textContent = 'Click a team, role or person to see what they can see · click a collection or SOP to choose who sees it';
     }
-    requestAnimationFrame(drawWires);
+
+    // ----- panel -----
+    if (selTarget && selTarget.startsWith('sop:')) {
+      panelQ.textContent = 'Who can see this?';
+      const s = SOPS[selTarget], ss = sopSubjects(selTarget), n = viewerCount(ss.subjects);
+      const names = joinPhrases(ss.subjects.map(subjPhrase));
+      if (ss.chosen) {
+        const collSubs = collSubjects(s.coll);
+        panelBody.innerHTML = `
+          <h3>${s.name}</h3>
+          <div class="sub">In the <b>${COLLS[s.coll]}</b> collection</div>
+          <div class="bigsent"><b>Only ${n} ${n === 1 ? 'person' : 'people'}</b> can see this SOP — ${names}, chosen by name.</div>
+          <div class="inherit-note">Because people are chosen by name here, this SOP <b>no longer follows its collection</b>. The rest of ${COLLS[s.coll]} is seen by ${joinPhrases(collSubs.map(subjPhrase)) || 'nobody yet'} (${viewerCount(collSubs)} people). To go back to following the collection, un-tap everyone chosen on the left.</div>`;
+      } else {
+        panelBody.innerHTML = `
+          <h3>${s.name}</h3>
+          <div class="sub">In the <b>${COLLS[s.coll]}</b> collection</div>
+          <div class="bigsent"><b>${n} ${n === 1 ? 'person' : 'people'}</b> can see this SOP — everyone who can see its collection${ss.subjects.length ? ': ' + names : ''}.</div>
+          <div class="inherit-note">Right now this SOP follows its collection. To narrow it down, tap just the people, roles or teams who should see it — this SOP will then be seen <b>only</b> by them, without changing the rest of ${COLLS[s.coll]}.</div>`;
+      }
+    } else if (selTarget) {
+      panelQ.textContent = 'Who can see this?';
+      const subs = collSubjects(selTarget), n = viewerCount(subs);
+      const chosenSops = Object.keys(SOPS).filter((k) => SOPS[k].coll === selTarget && sopSubjects(k).chosen);
+      panelBody.innerHTML = `
+        <h3>${COLLS[selTarget]}</h3>
+        <div class="sub">Changing this changes who sees every SOP inside — except SOPs with people chosen by name</div>
+        <div class="bigsent"><b>${n} ${n === 1 ? 'person' : 'people'}</b> can see the ${COLLS[selTarget]} collection${subs.length ? ' — ' + joinPhrases(subs.map(subjPhrase)) : ' — nobody yet. Tap a team on the left.'}</div>
+        ${chosenSops.map((k) => `<div class="inherit-note">One SOP inside is narrower: <b>${SOPS[k].name}</b> — seen by only ${viewerCount(sopSubjects(k).subjects)} people, chosen by name (the dashed lines).</div>`).join('')}`;
+    } else if (selTeam) {
+      panelQ.textContent = 'What can they see?';
+      const nTeam = byId[selTeam];
+      const rel = [...ancestorsOf(selTeam), ...descendantsOf(selTeam)];
+      const items = [];
+      Object.keys(COLLS).forEach((c) => {
+        const via = collSubjects(c).filter((s) => ancestorsOf(selTeam).includes(s));
+        const chosenSops = Object.keys(SOPS).filter((k) => SOPS[k].coll === c && sopSubjects(k).chosen);
+        if (via.length) {
+          const excluded = chosenSops.filter((k) => !sopSubjects(k).subjects.some((s) => rel.includes(s)));
+          items.push(`<li><b>${COLLS[c]}</b> — because ${subjPhrase(via[0])} can see it${excluded.length ? ` <span class="muted">(except ${excluded.map((k) => SOPS[k].name).join(', ')} — chosen people only)</span>` : ''}</li>`);
+        }
+        chosenSops.forEach((k) => {
+          if (sopSubjects(k).subjects.some((s) => rel.includes(s))) items.push(`<li><b>${SOPS[k].name}</b> — chosen by name <span class="muted">(dashed line)</span></li>`);
+        });
+      });
+      const role = nTeam.tier === 'person' ? `${byId[PERSON_ROLE[selTeam]].name} · ${byId[parentOf[PERSON_ROLE[selTeam]]].name}` : `${nTeam.count} people`;
+      panelBody.innerHTML = `
+        <h3>${nTeam.name}</h3>
+        <div class="sub">${role}</div>
+        ${items.length ? `<ul class="seelist">${items.join('')}</ul>` : '<div class="bigsent">Nothing yet — click a collection or SOP on the right, then tap this row to let them see it.</div>'}`;
+    } else {
+      panelQ.textContent = 'Who can see this?';
+      panelBody.innerHTML = `<div class="sub" style="margin-bottom:0">Select a collection or SOP on the right to see — and change — who can see it. Or select a team, role or person on the left to see everything they can see. Nothing here is changed until you tap.</div>`;
+    }
   }
 
-  bay.addEventListener('click', (e) => {
-    const chd = e.target.closest('.chd');
-    if (chd) { chd.parentElement.classList.toggle('open'); render(); return; }
-    const row = e.target.closest('.soprow');
-    if (row) { selSop = selSop === row.dataset.sop ? null : row.dataset.sop; focusUnit = null; render(); return; }
-    const jack = e.target.closest('.jack');
-    if (jack) {
-      const u = jack.dataset.unit;
-      if (selSop) { // toggle who sees the selected SOP's collection
-        const c = SOP_COLL[selSop]; const i = SEES[c].indexOf(u);
-        if (i >= 0) SEES[c].splice(i, 1); else SEES[c].push(u);
-      } else { focusUnit = focusUnit === u ? null : u; }
-      render(); return;
-    }
-    selSop = null; focusUnit = null; render();
+  function render() { renderTeams(); renderLibrary(); renderBannerPanel(); requestAnimationFrame(drawWires); }
+
+  // ---------- interactions ----------
+  teamsBox.addEventListener('click', (e) => {
+    const row = e.target.closest('.trow'); if (!row) return;
+    const id = row.dataset.id;
+    if (e.target.closest('.tw') && !e.target.closest('.tw.sp')) { openSet.has(id) ? openSet.delete(id) : openSet.add(id); render(); return; }
+    if (selTarget) { toggleGrant(id, selTarget); render(); return; }   // choosing who sees the selected target
+    selTeam = selTeam === id ? null : id; render();
   });
-  document.getElementById('a-done').addEventListener('click', (e) => { e.stopPropagation(); selSop = null; render(); });
+  bay.querySelector('.libcol').addEventListener('click', (e) => {
+    const chd = e.target.closest('.chd');
+    if (chd) {
+      const cEl = chd.parentElement;
+      if (e.target.closest('.tw')) { cEl.classList.toggle('open'); render(); return; }
+      selTarget = selTarget === cEl.dataset.id ? null : cEl.dataset.id; selTeam = null; render(); return;
+    }
+    const row = e.target.closest('.soprow');
+    if (row) { selTarget = selTarget === row.dataset.id ? null : row.dataset.id; selTeam = null; render(); }
+  });
+  document.getElementById('a-done').addEventListener('click', (e) => { e.stopPropagation(); selTarget = null; render(); });
   window.addEventListener('resize', drawWires);
   render();
 

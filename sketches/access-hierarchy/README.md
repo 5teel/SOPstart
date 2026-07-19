@@ -13,7 +13,7 @@ Demo data mirrors the real org from the UAT session: departments **Forming** (14
 
 ## Concepts
 
-### A · Access map with SOP drill-down (keeps the patch-bay metaphor)
+### A · Access map with SOP drill-down (keeps the patch-bay metaphor) ← winner (see Decisions below)
 The shipped patch bay renamed "Access map" and given the missing hierarchy: collections are expandable groups, SOPs nest inside with tree lines, and clicking any SOP enters "choose who sees it" mode — the left column becomes on/off toggles, the fixed-height banner counts people live. All jargon replaced: lines mean *can see*, "Save — done" not "✓ Done wiring", "seen by Forming, General" not "2 grants". Crucially it stays honest about the collection-level model (D-13): toggling a SOP visibly toggles its collection, and the banner says so. Smallest change from shipped code that fixes both gaps.
 
 ### B · Library tree + "Who can see this?" panel (abandons the metaphor)
@@ -37,6 +37,18 @@ A grid of collection cards, each with the answer printed on its face: "Seen by *
 ## Recommendation
 
 **A as the evolution of the shipped surface, with B's panel as its selection detail.** Concretely: keep the map (it is the only concept that shows the whole org↔library picture, and the shipped scale/focus/banner work carries over), add the drill-down and plain-language copy from sketch A — and when a single SOP or collection is selected, render B's "Who can see this?" content *as* the banner/side detail instead of the current grants-speak strip. B standalone is the best pure answer to G3 but gives up the at-a-glance overview that the whole Phase-32 surface exists for; C is pleasant but can't show org structure or personal overrides. If a future simplified "lite" admin view is ever wanted for small orgs, C is the shape to reach for.
+
+## Decisions (2026-07-19)
+
+**Winner: A · Access map**, with a major extension, revised in place (`index.html`, concept A tab — B and C kept for reference; B's panel is adopted into A):
+
+1. **Full hierarchy in the teams column.** Site → area → department → role → person as expandable, selectable tiers (mirroring `OrgTree` at `/admin/team` — see `src/types/org-model.ts`). Person rows are dashed, echoing the personal-access line style.
+2. **Any level grantable down to a single SOP.** The sketch's resting state shows the required coexistence: the whole **Maintenance department** wired solid to the Maintenance collection, while **Pump Rebuild** inside it is seen by only two named people (Dave Hohaia, Priya Sharma — dashed lines). Choosing people by name for a SOP makes it stop following its collection, and the row pill + panel copy say so.
+3. **B's "Who can see this?" panel is A's detail view.** Selecting anything renders a plain-language answer below the map ("Only 2 people can see this SOP — Dave Hohaia and Priya Sharma, chosen by name"); selecting a person/team flips it to "What can they see?".
+
+### Data-model implications
+
+Per-SOP choosing requires extending `access_grants`: today a grant's target is `collection_id` only (`AccessGrant` in `src/types/org-model.ts`), so "only Dave and Priya see Pump Rebuild" has nowhere to live. The subject side needs nothing new — the resolver already handles the full 5-level chain (org/area/department/role/person, `SubjectType` + `resolveEffectiveAccess`) — **target granularity is the new part**: a grant must be able to point at either a collection or a single SOP, and the resolver needs one extra rule (a SOP with any direct grants stops following its collection). That rule sits in tension with the additive-only grant model (D-11/D-13), because "chosen people only" is effectively a narrowing override, not an addition.
 
 ## Open questions
 

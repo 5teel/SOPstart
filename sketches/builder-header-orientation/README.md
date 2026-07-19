@@ -8,7 +8,7 @@ The SOP builder stacks four UI zones — breadcrumb, title+version, stage steppe
 
 ## Concepts
 
-### A · Wayfinder bar
+### A · Wayfinder bar ← winner (see Decisions below)
 One 58px dark bar split by hairlines into three fixed zones: **back** (left, "Back to · SOP library"), **here** (centre, yellow "YOU'RE EDITING" tick + title + version), **next** (right, a single forward chip that carries its own lock reason as a plain sentence — "Locked — 29 steps below still need checking"). Tools drop into a thin light toolbar below the dark bar, so orientation and furniture never compete. The strongest separation of concerns: each question has exactly one home, and the lock reason lives on the thing that's locked.
 
 ### B · Journey line
@@ -32,6 +32,22 @@ Dark deck = place only (back, title, version, tools). Light deck = a plain-Engli
 ## Recommendation
 
 **C (Two decks)**, with A's forward-chip idea folded in: keep the dark deck for place, and make the light deck's Send button carry the A-style two-line reason when disabled. C is the only concept where a non-technical reader gets the whole story in one sentence, it degrades best with long titles, and it is the shortest path from the shipped interim fix. B is the most delightful but pays for it in fragility; keep the dashed-future-track idea (it could style C's progress bar segments).
+
+## Decisions (2026-07-19)
+
+**Winner: A · Wayfinder bar**, revised in place (`index.html`, concept A tab — B and C kept for reference). Two changes decided:
+
+1. **No dark deck.** The bar is restyled to the light paper/hairline schema the rest of the app uses: white bar, `--ink-100` zone dividers, `--paper-2` tools row. The yellow "YOU'RE EDITING" tick (amber text on a `--brand-yellow` rule) and the green ready-chip are the only colour.
+2. **One Tools menu.** "Actions ▾ / Edit flow / Flow" collapse into a single **"Tools for this SOP ▾"** menu whose items are self-describing plain-language actions, labels traced from the shipped code (`SopActionsMenu` in `BuilderStageShell.tsx`, `BuilderFlowButton.tsx`, `BuilderFlowEditButton.tsx`):
+   - Assign this SOP to workers *(→ `/admin/sops/[id]/assign`)*
+   - See earlier versions *(→ `/versions`)*
+   - Make a training video *(→ `/video`)*
+   - Print a QR code *(→ `/qr`)*
+   - See the flow diagram *(BuilderFlowButton — view-only flow modal)*
+   - Edit the flow diagram *(BuilderFlowEditButton — drag node positions, save)*
+   - Delete this draft *(drafts only)*
+
+This also answers the "does Actions ▾ absorb Edit flow + Flow?" open question below: yes — one menu.
 
 ## Open questions
 

@@ -49,35 +49,45 @@
   .anno{border:1px dashed var(--ink-300);border-radius:4px;padding:9px 12px;font-size:11px;color:var(--ink-700);font-family:'Inter';flex:1 1 200px;background:var(--paper-2)}
   .anno b{font-family:'JetBrains Mono';font-size:10px;text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:3px;color:var(--ink-900)}
 
-  /* ================= CONCEPT A — WAYFINDER BAR ================= */
-  .wf-bar{height:58px;background:var(--steel-900);display:flex;align-items:stretch;color:#fff}
+  /* ================= CONCEPT A — WAYFINDER BAR (v2 · light paper schema) ================= */
+  .wf-bar{height:58px;background:#fff;border-bottom:1px solid var(--ink-100);display:flex;align-items:stretch;color:var(--ink-900)}
   .wf-zone{display:flex;align-items:center;padding:0 18px;min-width:0}
-  .wf-zone + .wf-zone{border-left:1px solid var(--steel-700)}
-  .wf-back{flex:0 0 auto;gap:9px;color:#a1a1aa;text-decoration:none;font-size:12px;cursor:pointer}
-  .wf-back:hover{color:#fff}
+  .wf-zone + .wf-zone{border-left:1px solid var(--ink-100)}
+  .wf-back{flex:0 0 auto;gap:9px;color:var(--ink-500);text-decoration:none;font-size:12px;cursor:pointer}
+  .wf-back:hover{color:var(--ink-900)}
   .wf-back .arr{font-size:15px}
   .wf-back .crumbs{display:flex;flex-direction:column;line-height:1.35}
-  .wf-back .crumbs .top{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#52525b}
+  .wf-back .crumbs .top{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-300)}
   .wf-here{flex:1 1 auto;gap:11px}
-  .wf-here .youare{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--brand-yellow);border-left:2px solid var(--brand-yellow);padding-left:9px;line-height:1.4;flex:0 0 auto}
-  .wf-here .ttl{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .wf-here .ver{font-size:9px;color:#a1a1aa;border:1px solid #3f3f46;border-radius:2px;padding:1px 6px;flex:0 0 auto}
+  .wf-here .youare{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#b45309;border-left:3px solid var(--brand-yellow);padding-left:9px;line-height:1.4;flex:0 0 auto}
+  .wf-here .ttl{font-size:13.5px;font-weight:600;color:var(--ink-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .wf-here .ver{font-size:9px;color:var(--ink-500);border:1px solid var(--ink-300);border-radius:2px;padding:1px 6px;flex:0 0 auto}
   .wf-next{flex:0 0 auto;padding-right:14px}
-  .wf-cta{display:flex;flex-direction:column;align-items:flex-start;gap:2px;border:1.5px solid #3f3f46;background:var(--steel-800);border-radius:4px;padding:7px 14px;color:#a1a1aa;text-align:left}
+  .wf-cta{display:flex;flex-direction:column;align-items:flex-start;gap:2px;border:1.5px solid var(--ink-300);background:var(--paper-2);border-radius:4px;padding:7px 14px;color:var(--ink-500);text-align:left}
   .wf-cta .l1{font-size:11.5px;display:flex;gap:7px;align-items:center}
-  .wf-cta .l1 .nx{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:#71717a}
-  .wf-cta .l2{font-size:10px;color:#71717a;font-family:'Inter'}
-  .wf-cta.locked .l1 .name{color:#d4d4d8}
-  .wf-cta.ready{border-color:var(--accent-ok);background:rgba(16,185,129,.1)}
+  .wf-cta .l1 .nx{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-500)}
+  .wf-cta .l2{font-size:10px;color:var(--ink-500);font-family:'Inter'}
+  .wf-cta.locked .l1 .name{color:var(--ink-700)}
+  .wf-cta.ready{border-color:var(--accent-ok);background:rgba(16,185,129,.08)}
   .wf-cta.ready .l1 .name{color:var(--accent-ok);font-weight:600}
   .wf-cta.ready .l2{color:var(--accent-ok)}
   .wf-tools{height:36px;background:var(--paper-2);border-bottom:1px solid var(--ink-100);display:flex;align-items:center;gap:6px;padding:0 18px}
-  .wf-tools .tl{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-500);margin-right:6px}
-  .wf-tools button{font-size:11px;color:var(--ink-700);background:#fff;border:1px solid var(--ink-300);border-radius:3px;padding:4px 11px}
-  .wf-tools button:hover{border-color:var(--ink-900)}
   .wf-tools .spacer{flex:1}
   .wf-tools .prog{font-size:10.5px;color:var(--ink-500);font-family:'Inter'}
   .wf-tools .prog b{color:var(--ink-900)}
+
+  /* the ONE tools menu (v2) — every item says what it does to this SOP */
+  .wf-menuwrap{position:relative}
+  .wf-menubtn{font-size:11px;color:var(--ink-700);background:#fff;border:1px solid var(--ink-300);border-radius:3px;padding:5px 12px}
+  .wf-menubtn:hover{border-color:var(--ink-900)}
+  .wf-menu{display:none;position:absolute;left:0;top:calc(100% + 6px);z-index:30;min-width:300px;background:#fff;border:1.5px solid var(--ink-300);border-radius:5px;box-shadow:0 10px 28px rgba(9,9,11,.13);padding:5px}
+  .wf-menu.open{display:block}
+  .wf-menu .mi{display:flex;flex-direction:column;gap:1px;padding:8px 10px;border-radius:3px;cursor:pointer}
+  .wf-menu .mi:hover{background:var(--paper-2)}
+  .wf-menu .mi .l{font-family:'Inter';font-size:12.5px;color:var(--ink-900)}
+  .wf-menu .mi .hint{font-family:'Inter';font-size:10.5px;color:var(--ink-500)}
+  .wf-menu .sep{height:1px;background:var(--ink-100);margin:5px 4px}
+  .wf-menu .mi.danger .l{color:var(--accent-hazard)}
 
   /* ================= CONCEPT B — JOURNEY LINE ================= */
   .jl-bar{background:var(--steel-900);color:#fff;padding:12px 18px 14px;display:flex;align-items:center;gap:22px}
@@ -130,22 +140,22 @@
 <div class="flowsw">
   <span class="lbl">Sketch · builder header orientation (G1)</span>
   <div class="seg" id="sw">
-    <button data-c="a" class="on">A · Wayfinder bar</button>
+    <button data-c="a" class="on">A · Wayfinder bar ★ winner (v2)</button>
     <button data-c="b">B · Journey line</button>
     <button data-c="c">C · Two decks</button>
   </div>
   <span class="note">SOP: Replacing a Desktop Computer Keyboard at a Workstation · v3 draft · 4 of 33 steps checked</span>
 </div>
 
-<!-- ============ CONCEPT A ============ -->
+<!-- ============ CONCEPT A (WINNER — revised per 19 Jul feedback) ============ -->
 <section class="concept show" id="c-a">
   <div class="chead">
-    <div class="eyebrow">Concept A</div>
-    <h2>Wayfinder bar — three zones, one dark row</h2>
-    <p class="prose">One 58px bar split by hairlines into three fixed zones: <b>where I came from</b> (left), <b>where I am</b> (centre, marked "YOU'RE EDITING"), <b>what's next</b> (right, a single forward chip that carries its own lock reason). Tools drop out of the dark bar entirely into a thin light toolbar — they are page furniture, not orientation.</p>
+    <div class="eyebrow">Concept A · winner — revised 19 Jul</div>
+    <h2>Wayfinder bar — light paper schema, one self-describing Tools menu</h2>
+    <p class="prose">v2 after review. Two changes: <b>(1)</b> the dark deck is gone — the bar sits on the same white-paper / hairline schema as the rest of the app, with the yellow "YOU'RE EDITING" tick as the only accent. <b>(2)</b> the three opaque tool buttons (Actions ▾ / Edit flow / Flow) collapse into <b>one menu</b> whose items say exactly what they do to this SOP — labels traced from the shipped code, not guessed. The menu is shown open in State 1; click the button to toggle it.</p>
   </div>
 
-  <div class="statelbl">State 1 · Locked — steps still need checking</div>
+  <div class="statelbl">State 1 · Locked — steps still need checking (Tools menu open)</div>
   <div class="mockwrap">
     <div class="wf-bar">
       <div class="wf-zone wf-back">
@@ -165,10 +175,20 @@
       </div>
     </div>
     <div class="wf-tools">
-      <span class="tl">Tools</span>
-      <button>Actions ▾</button>
-      <button>Edit flow</button>
-      <button>Flow</button>
+      <div class="wf-menuwrap">
+        <button class="wf-menubtn" data-menu="m-a1">Tools for this SOP ▾</button>
+        <div class="wf-menu open" id="m-a1">
+          <div class="mi"><span class="l">Assign this SOP to workers</span><span class="hint">choose who must do it and by when</span></div>
+          <div class="mi"><span class="l">See earlier versions</span><span class="hint">what changed, and when</span></div>
+          <div class="mi"><span class="l">Make a training video</span><span class="hint">turn these steps into a narrated video</span></div>
+          <div class="mi"><span class="l">Print a QR code</span><span class="hint">stick it on the machine — scanning opens this SOP</span></div>
+          <div class="sep"></div>
+          <div class="mi"><span class="l">See the flow diagram</span><span class="hint">a map of how the steps connect — view only</span></div>
+          <div class="mi"><span class="l">Edit the flow diagram</span><span class="hint">drag the boxes around, then save the layout</span></div>
+          <div class="sep"></div>
+          <div class="mi danger"><span class="l">Delete this draft</span><span class="hint">only possible while it's still a draft</span></div>
+        </div>
+      </div>
       <span class="spacer"></span>
       <span class="prog"><b>4 of 33</b> steps checked</span>
     </div>
@@ -179,7 +199,7 @@
     </div>
   </div>
 
-  <div class="statelbl">State 2 · Unlocked — every step checked</div>
+  <div class="statelbl">State 2 · Unlocked — every step checked (menu closed)</div>
   <div class="mockwrap">
     <div class="wf-bar">
       <div class="wf-zone wf-back">
@@ -199,27 +219,35 @@
       </div>
     </div>
     <div class="wf-tools">
-      <span class="tl">Tools</span>
-      <button>Actions ▾</button>
-      <button>Edit flow</button>
-      <button>Flow</button>
+      <div class="wf-menuwrap">
+        <button class="wf-menubtn" data-menu="m-a2">Tools for this SOP ▾</button>
+        <div class="wf-menu" id="m-a2">
+          <div class="mi"><span class="l">Assign this SOP to workers</span><span class="hint">choose who must do it and by when</span></div>
+          <div class="mi"><span class="l">See earlier versions</span><span class="hint">what changed, and when</span></div>
+          <div class="mi"><span class="l">Make a training video</span><span class="hint">turn these steps into a narrated video</span></div>
+          <div class="mi"><span class="l">Print a QR code</span><span class="hint">stick it on the machine — scanning opens this SOP</span></div>
+          <div class="sep"></div>
+          <div class="mi"><span class="l">See the flow diagram</span><span class="hint">a map of how the steps connect — view only</span></div>
+          <div class="mi"><span class="l">Edit the flow diagram</span><span class="hint">drag the boxes around, then save the layout</span></div>
+        </div>
+      </div>
       <span class="spacer"></span>
       <span class="prog"><b>33 of 33</b> steps checked</span>
     </div>
   </div>
 
   <div class="annos">
-    <div class="anno"><b>Left zone · back</b>Always a real destination with a "Back to" eyebrow — never a bare breadcrumb trail.</div>
-    <div class="anno"><b>Centre zone · here</b>Yellow "YOU'RE EDITING" tick-mark claims the title as the current place. Only spot the title appears.</div>
-    <div class="anno"><b>Right zone · next</b>The ONLY forward affordance. Lock reason lives inside the chip as a plain sentence, not a mystery padlock.</div>
-    <div class="anno"><b>Tools row</b>Light, small, labelled "Tools". Progress count repeats here so it sits next to the step list it describes.</div>
+    <div class="anno"><b>Light schema (change 1)</b>No dark deck — white bar, hairline zone dividers, paper-2 tools row. The yellow editing tick and the green ready-chip are the only colour, matching the app's paper/ink language.</div>
+    <div class="anno"><b>One menu (change 2)</b>"Tools for this SOP ▾" replaces Actions ▾ / Edit flow / Flow. Items map 1:1 to shipped code: SopActionsMenu (assign / versions / video / QR / delete-draft), BuilderFlowButton (view-only flow modal), BuilderFlowEditButton (drag-and-save flow editor).</div>
+    <div class="anno"><b>Self-describing labels</b>Every item is a verb phrase about this SOP plus a one-line hint. "See the flow diagram" vs "Edit the flow diagram" makes the view/edit split obvious — the old "Flow" / "Edit flow" pair didn't.</div>
+    <div class="anno"><b>Unchanged</b>Three-zone grammar stays: back (left), you-are-here (centre), the single forward chip carrying its own lock reason (right). Progress count stays beside the step list it describes.</div>
   </div>
 </section>
 
-<!-- ============ CONCEPT B ============ -->
+<!-- ============ CONCEPT B (reference — not selected) ============ -->
 <section class="concept" id="c-b">
   <div class="chead">
-    <div class="eyebrow">Concept B</div>
+    <div class="eyebrow">Concept B · reference</div>
     <h2>Journey line — breadcrumb and stepper become one track</h2>
     <p class="prose">The insight: the breadcrumb and the stage stepper describe the <i>same journey</i>, so draw them as one line. Past stops sit left of the you-are-here dot (clickable, they go back). Future stops sit right (dashed track = not yet reachable). The lock reason hangs directly under the locked stop. Tools sit in a bordered cluster off the track.</p>
   </div>
@@ -281,10 +309,10 @@
   </div>
 </section>
 
-<!-- ============ CONCEPT C ============ -->
+<!-- ============ CONCEPT C (reference — not selected) ============ -->
 <section class="concept" id="c-c">
   <div class="chead">
-    <div class="eyebrow">Concept C</div>
+    <div class="eyebrow">Concept C · reference</div>
     <h2>Two decks — place on dark, progress on light</h2>
     <p class="prose">Deck 1 (dark): identity and navigation only — back link, title, version, tools at far right. Deck 2 (light): a full-width plain-English progress sentence plus a real progress bar that doubles as the stage control; "Send to workers" is a button at the end of the bar, disabled with its reason shown in the sentence, not a padlock. The stepper numbers ("1 Edit → 2 Send") disappear entirely.</p>
   </div>
@@ -345,6 +373,10 @@
     document.getElementById('c-' + b.dataset.c).classList.add('show');
     window.scrollTo(0, 0);
   });
+
+  // v2: the one Tools menu — click to toggle
+  document.querySelectorAll('.wf-menubtn').forEach((b) =>
+    b.addEventListener('click', () => document.getElementById(b.dataset.menu).classList.toggle('open')));
 </script>
 </body>
 </html>
