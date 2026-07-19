@@ -95,3 +95,12 @@ None - no external service configuration required. This plan is files-only; the 
 ---
 *Phase: 33-per-sop-access-granularity-wayfinder-builder-header*
 *Completed: 2026-07-19*
+
+## Self-Check: PASSED
+
+- FOUND: supabase/migrations/00050_access_grants_sop_target.sql
+- FOUND: scripts/assert-phase33-sop-target-schema.ts
+- FOUND: .planning/phases/33-per-sop-access-granularity-wayfinder-builder-header/33-02-SUMMARY.md
+- FOUND commit: 34dbf03 (Task 1)
+- FOUND commit: a230e47 (Task 2)
+- FOUND commit: e9afb33 (docs: complete plan)
