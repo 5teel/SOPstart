@@ -294,6 +294,11 @@ Plans:
 
 - [x] 33-09-PLAN.md — plain-language copy + AccessAnswerPanel + journeys/uat (incl. WR-02 closure) + phase gate (SC-5)
 
+**Wave 6 — gap closure** (from 33-VERIFICATION.md · 6/8 → closing CR-01 + WR-02)
+
+- [ ] 33-10-PLAN.md — CR-01: deleteSop org-ownership guard (cross-tenant delete blocked) + live/source-contract test (SC-6)
+- [ ] 33-11-PLAN.md — WR-02: migration 00051 all_departments_pre_override snapshot/restore in materializeSopAccessForOrg + live re-follow test (SC-4)
+
 ---
 
 ## v4.0 — Safety-Critical Parsing + Voice + AI Foundation (started 2026-05-24 · ✅ shipped 2026-07-02)
