@@ -180,4 +180,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-12 — Milestone v6.0 (SOP Ownership & Governance Infrastructure) started. Prior: v5.0 shipped 2026-07-05; ad-hoc AI-layer work 2026-07-06→09 formalized by Phase 27 (2026-07-12); self-healing video render webhook shipped 2026-07-12. Source of truth `.planning/PRODUCT-ROADMAP.md` v0.3 + Visy interview findings (2026-05-05).*
+*Last updated: 2026-07-19 — Phase 33 complete (per-SOP access granularity + Wayfinder builder header): final phase of Milestone v6.0 (SOP Ownership & Governance Infrastructure) — all phases done, milestone ready for `/gsd-complete-milestone`. Prior: v5.0 shipped 2026-07-05; ad-hoc AI-layer work 2026-07-06→09 formalized by Phase 27 (2026-07-12); self-healing video render webhook shipped 2026-07-12. Source of truth `.planning/PRODUCT-ROADMAP.md` v0.3 + Visy interview findings (2026-05-05).*

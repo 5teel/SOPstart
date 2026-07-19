@@ -4,8 +4,8 @@ milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
 status: executing
 stopped_at: Completed 33-11-PLAN.md
-last_updated: "2026-07-19T06:04:23.111Z"
-last_activity: 2026-07-19 -- Phase 33 execution started
+last_updated: "2026-07-19T09:19:37.244Z"
+last_activity: 2026-07-19
 progress:
   total_phases: 6
   completed_phases: 5
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 33 (per-sop-access-granularity-wayfinder-builder-header) — EXECUTING
-Plan: 3 of 11
+Phase: 33
+Plan: Not started
 Status: Ready to execute
-Last activity: 2026-07-19 -- Phase 33 execution started
+Last activity: 2026-07-19
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
@@ -99,6 +99,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | 26.5 | 8 | - | - |
 | 27 | 1 | - | - |
 | 28 | 6 | - | - |
+| 33 | 11 | - | - |
 
 **v2.0 By Phase:**
 
