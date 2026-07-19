@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sketch — Supervisor Observations (Phase 34)</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --brand-yellow:#fbbf24; --steel-900:#0a0a0b; --steel-800:#141416; --steel-700:#1f1f22;
+  --paper:#fafafa; --paper-2:#f4f4f5;
+  --ink-900:#09090b; --ink-700:#3f3f46; --ink-500:#71717a; --ink-300:#d4d4d8;
+  --accent-hazard:#ef4444; --accent-signoff:#fbbf24; --accent-step:#3b82f6;
+  --accent-ok:#10b981; --accent-measure:#f97316; --accent-decision:#ec4899; --accent-mcu:#06b6d4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{font-family:'JetBrains Mono',ui-monospace,monospace;background:var(--paper);color:var(--ink-900)}
+.prose{font-family:'Inter',system-ui,sans-serif}
+.bg-grid{background-color:#fff;background-image:linear-gradient(to right,rgba(0,0,0,0.04) 1px,transparent 1px),linear-gradient(to bottom,rgba(0,0,0,0.04) 1px,transparent 1px);background-size:20px 20px}
+.pill{display:inline-flex;align-items:center;gap:4px;border:1px solid currentColor;padding:2px 8px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;border-radius:2px}
+.pill-filled{background:currentColor}
+.pill-filled span{color:#fff}
+.frame{border:1.5px solid var(--ink-300);background:var(--paper);border-radius:4px}
+.wrap{max-width:1100px;margin:0 auto;padding:40px 24px 120px}
+.sketch-label{display:flex;align-items:center;gap:12px;margin:64px 0 8px}
+.sketch-label .num{font-size:22px;font-weight:700;color:var(--ink-300)}
+.sketch-label h2{font-size:15px;text-transform:uppercase;letter-spacing:.08em}
+.rationale{border-left:3px solid var(--brand-yellow);background:var(--paper-2);padding:14px 18px;margin:12px 0 20px;font-family:'Inter',system-ui,sans-serif;font-size:13.5px;line-height:1.6;color:var(--ink-700)}
+.rationale b{color:var(--ink-900)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--ink-300);background:var(--paper);padding:10px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;border-radius:4px;cursor:pointer}
+.btn.primary{background:var(--ink-900);color:#fff;border-color:var(--ink-900)}
+.btn.yellow{background:var(--brand-yellow);border-color:var(--brand-yellow);color:var(--ink-900)}
+.verdict-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;border:1.5px solid currentColor;padding:18px 14px;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;border-radius:4px;cursor:pointer;background:var(--paper)}
+.verdict-btn small{font-size:10px;font-weight:400;letter-spacing:.04em;color:var(--ink-500);text-transform:none;font-family:'Inter',system-ui,sans-serif}
+.verdict-ok{color:var(--accent-ok)}
+.verdict-ok.selected{background:rgba(16,185,129,.08)}
+.verdict-support{color:var(--accent-measure)}
+.obs-row{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-bottom:1px solid var(--ink-300)}
+.obs-row:last-child{border-bottom:none}
+.obs-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--ink-300);background:var(--paper-2);border-radius:4px 4px 0 0}
+.hdr .crumb{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-500)}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--ink-300);background:#fff;padding:6px 10px;border-radius:2px;font-size:11px}
+.note{font-size:11px;color:var(--ink-500);font-family:'Inter',system-ui,sans-serif;margin-top:10px;line-height:1.5}
+.annot{position:relative;border:1px dashed var(--accent-mcu);color:var(--accent-mcu);font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:2px 6px;border-radius:2px;background:rgba(6,182,212,.05)}
+table{border-collapse:collapse;width:100%}
+th,td{border:1px solid var(--ink-300);padding:8px 10px;font-size:11px;text-align:center}
+th{background:var(--paper-2);text-transform:uppercase;letter-spacing:.06em;font-size:10px;color:var(--ink-500)}
+td.name{text-align:left;font-weight:600}
+.state{display:inline-block;padding:2px 8px;border-radius:2px;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ HEADER + CONCEPT ============ -->
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+    <span class="pill" style="color:var(--accent-signoff)">PHASE 34 SKETCH</span>
+    <span class="pill" style="color:var(--ink-500)">FOR REVIEW — NOT BUILT</span>
+  </div>
+  <h1 style="font-size:24px;letter-spacing:-.01em">Supervisor Observations</h1>
+  <p class="prose" style="color:var(--ink-500);font-size:13px;margin-top:4px">What an observation is, why it exists, where it's recorded, and what the worker sees.</p>
+
+  <div class="sketch-label"><span class="num">00</span><h2>What is an observation? Why does it exist?</h2></div>
+  <div class="rationale">
+    <b>Definition:</b> a timestamped, unchangeable record made by a supervisor that says
+    <i>"I stood at the machine and watched [worker] perform [SOP]. Verdict: performed to SOP / needs support. Optional note."</i>
+    It takes ~30 seconds to record. It can never be edited or deleted (same immutability as your sign-off chain).
+    <br><br>
+    <b>Why it should exist — four reasons:</b><br>
+    <b>1. It answers Visy's #1 named pain: fraudulent / shared sign-offs.</b> Today every record in SOPstart is <i>worker-initiated</i> — a worker taps through a walkthrough and says "I did it". Two workers can share a phone; a signature proves someone tapped, not that someone watched. An observation is the only record that is <i>supervisor-initiated</i>: it's the supervisor's own account, on their own login, that they personally witnessed the work. That's the counter-evidence that makes the whole record set trustworthy.<br>
+    <b>2. It's the legal evidence layer (HSWA due diligence).</b> When WorkSafe NZ or an auditor asks "how do you know your people are competent?", "they read the SOP once" is a weak answer. "A supervisor observed them doing it, here's the dated record" is the strong answer — it demonstrates people were correctly shown, by competent people.<br>
+    <b>3. It's the missing middle of competency.</b> Right now there's nothing between "read the SOP" and "signed off". Phase 35's training matrix needs a "watched doing it correctly" state — observations are the raw data that state derives from. Without Phase 34, the matrix can only say read / not-read.<br>
+    <b>4. Complacency reset for long-tenured workers.</b> Dave has run the beader for 12 years and hasn't looked at the SOP since induction. A periodic 30-second observation ("still consistent with SOP" or "needs reset — shortcuts creeping in") is the industry-standard mechanism for catching drift before it becomes an incident.
+  </div>
+
+  <!-- ============ SKETCH 1: ENTRY POINT A ============ -->
+  <div class="sketch-label"><span class="num">01</span><h2>Entry point A — person panel on /admin/team</h2></div>
+  <div class="rationale">
+    You already have the org chart on /admin/team (Phase 32). Click a person → a side panel opens with their info,
+    their observation history, and a <b>Record observation</b> button. The worker is pre-filled — the supervisor only picks the SOP.
+    <b>Bonus:</b> this same panel is exactly where Phase 35's per-person training record will live, so building it now is not throwaway.
+  </div>
+
+  <div class="frame" style="overflow:hidden">
+    <div class="hdr">
+      <span class="crumb">ADMIN / TEAM &amp; ORG MODEL</span>
+      <span class="pill" style="color:var(--ink-500)">⊞ CHART · ▤ COLUMNS</span>
+    </div>
+    <div style="display:flex;min-height:420px">
+      <!-- org chart (existing) -->
+      <div class="bg-grid" style="flex:1;padding:28px;position:relative">
+        <div style="font-size:10px;color:var(--ink-500);text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px">Existing org chart — unchanged</div>
+        <div style="display:flex;flex-direction:column;gap:14px;align-items:flex-start">
+          <div class="chip" style="border-color:var(--ink-900);font-weight:600">FORMING DEPT</div>
+          <div style="display:flex;gap:10px;margin-left:24px">
+            <div class="chip">MACHINE OPERATOR</div>
+          </div>
+          <div style="display:flex;gap:10px;margin-left:48px;flex-wrap:wrap">
+            <div class="chip" style="border-color:var(--accent-step);border-width:1.5px;background:rgba(59,130,246,.06)">👤 DAVE K. <span style="color:var(--accent-step);font-size:9px">◀ CLICKED</span></div>
+            <div class="chip">👤 MERE T.</div>
+            <div class="chip">👤 SIONE F.</div>
+          </div>
+        </div>
+        <div class="annot" style="position:absolute;bottom:20px;left:28px">click any person → panel opens on the right</div>
+      </div>
+      <!-- person panel (new) -->
+      <div style="width:340px;border-left:1.5px solid var(--ink-300);background:var(--paper);display:flex;flex-direction:column">
+        <div style="padding:16px;border-bottom:1px solid var(--ink-300)">
+          <div style="font-size:15px;font-weight:700">DAVE K.</div>
+          <div class="prose" style="font-size:12px;color:var(--ink-500)">Machine Operator · Forming Dept</div>
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <span class="pill" style="color:var(--accent-step)">12 SOPS REQUIRED</span>
+            <span class="pill" style="color:var(--accent-ok)">9 COMPLETED</span>
+          </div>
+        </div>
+        <div style="padding:12px 16px;border-bottom:1px solid var(--ink-300)">
+          <button class="btn yellow" style="width:100%">＋ RECORD OBSERVATION</button>
+          <div class="note" style="text-align:center;margin-top:6px">~30 seconds · worker pre-filled, just pick the SOP</div>
+        </div>
+        <div style="flex:1;overflow:auto">
+          <div style="padding:10px 16px 4px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500)">Observation history</div>
+          <div class="obs-row">
+            <span class="obs-dot" style="background:var(--accent-ok)"></span>
+            <div>
+              <div style="font-size:11.5px;font-weight:600">IS-12 Glass Beader Start-up</div>
+              <div class="prose" style="font-size:11px;color:var(--ink-500)">Performed to SOP · S. Reweti · 14 JUL 2026</div>
+            </div>
+          </div>
+          <div class="obs-row">
+            <span class="obs-dot" style="background:var(--accent-measure)"></span>
+            <div>
+              <div style="font-size:11.5px;font-weight:600">IS-07 Furnace Isolation (LOTO)</div>
+              <div class="prose" style="font-size:11px;color:var(--ink-500)">Needs support · S. Reweti · 02 JUL 2026</div>
+              <div class="prose" style="font-size:11px;color:var(--ink-700);margin-top:2px">"Skipped verify-zero-energy step — walked it again together."</div>
+            </div>
+          </div>
+          <div class="obs-row">
+            <span class="obs-dot" style="background:var(--accent-ok)"></span>
+            <div>
+              <div style="font-size:11.5px;font-weight:600">IS-07 Furnace Isolation (LOTO)</div>
+              <div class="prose" style="font-size:11px;color:var(--ink-500)">Performed to SOP · M. Chen · 28 MAY 2026</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SKETCH 2: ENTRY POINT B ============ -->
+  <div class="sketch-label"><span class="num">02</span><h2>Entry point B — /activity supervisor view</h2></div>
+  <div class="rationale">
+    Alternative (or addition): a <b>Record observation</b> button in the header of the existing supervisor activity feed,
+    plus a per-row shortcut on completions — "I watched this walkthrough happen, record it as observed".
+    Cheapest to build (no new surface), but the supervisor must pick <b>both</b> worker and SOP, and /activity is
+    completion-centric — ad-hoc floor observations ("I watched Dave, no walkthrough running") fit awkwardly here.
+  </div>
+
+  <div class="frame" style="overflow:hidden">
+    <div class="hdr">
+      <span class="crumb">ACTIVITY / SUPERVISOR VIEW</span>
+      <button class="btn yellow" style="padding:6px 12px">＋ RECORD OBSERVATION</button>
+    </div>
+    <div>
+      <div class="obs-row" style="align-items:center">
+        <span class="obs-dot" style="background:var(--accent-signoff)"></span>
+        <div style="flex:1">
+          <div style="font-size:11.5px;font-weight:600">Mere T. completed IS-12 Glass Beader Start-up</div>
+          <div class="prose" style="font-size:11px;color:var(--ink-500)">Awaiting sign-off · 22 min ago</div>
+        </div>
+        <button class="btn" style="padding:6px 10px;font-size:10px">REVIEW</button>
+        <button class="btn" style="padding:6px 10px;font-size:10px;border-color:var(--accent-ok);color:var(--accent-ok)">👁 I OBSERVED THIS</button>
+      </div>
+      <div class="obs-row" style="align-items:center">
+        <span class="obs-dot" style="background:var(--accent-ok)"></span>
+        <div style="flex:1">
+          <div style="font-size:11.5px;font-weight:600">Sione F. completed IS-03 Forklift Pre-start</div>
+          <div class="prose" style="font-size:11px;color:var(--ink-500)">Signed off · 2 h ago</div>
+        </div>
+        <button class="btn" style="padding:6px 10px;font-size:10px">VIEW</button>
+      </div>
+    </div>
+    <div class="note" style="padding:0 16px 14px">The "I OBSERVED THIS" row action pre-fills worker + SOP + links the observation to that completion — zero typing.</div>
+  </div>
+
+  <!-- ============ SKETCH 3: RECORDING FLOW ============ -->
+  <div class="sketch-label"><span class="num">03</span><h2>The 30-second recording flow (desktop modal)</h2></div>
+  <div class="rationale">
+    Same modal regardless of entry point. Three fields, two of which are often pre-filled:
+    <b>worker</b> (pre-filled from person panel / activity row), <b>SOP</b> (searchable picker, scoped to SOPs the worker is required to know),
+    <b>verdict</b> (two big buttons — your binary choice), optional note. The current SOP version is stamped automatically.
+    Append-only: once saved there is no edit and no delete, which is stated right on the form so supervisors know it's evidence, not a chat message.
+  </div>
+
+  <div style="background:rgba(0,0,0,.35);padding:44px;border-radius:4px">
+    <div class="frame" style="max-width:520px;margin:0 auto;background:var(--paper);border-radius:6px;overflow:hidden">
+      <div class="hdr" style="border-radius:6px 6px 0 0">
+        <span class="crumb">RECORD OBSERVATION</span>
+        <span class="pill" style="color:var(--ink-500)">✕</span>
+      </div>
+      <div style="padding:20px;display:flex;flex-direction:column;gap:16px">
+        <div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500);margin-bottom:6px">Worker</div>
+          <div class="chip" style="width:100%;padding:10px;border-color:var(--ink-900)">👤 DAVE K. — Machine Operator, Forming <span style="margin-left:auto;color:var(--ink-500);font-size:9px">PRE-FILLED</span></div>
+        </div>
+        <div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500);margin-bottom:6px">SOP observed</div>
+          <div class="chip" style="width:100%;padding:10px">🔍 IS-07 Furnace Isolation (LOTO) <span style="margin-left:auto;color:var(--ink-500);font-size:9px">v4 (CURRENT) — STAMPED</span></div>
+          <div class="note">Picker lists this worker's required SOPs first.</div>
+        </div>
+        <div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500);margin-bottom:6px">Verdict</div>
+          <div style="display:flex;gap:12px">
+            <button class="verdict-btn verdict-ok selected">✓ PERFORMED TO SOP<small>Watched full task, consistent with procedure</small></button>
+            <button class="verdict-btn verdict-support">⚠ NEEDS SUPPORT<small>Coaching flag — not a disciplinary record</small></button>
+          </div>
+          <div class="note">Labels renamable per organisation (your call from earlier) — underlying values fixed so the competency engine can read them.</div>
+        </div>
+        <div>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500);margin-bottom:6px">Note (optional)</div>
+          <div class="frame" style="border-style:dashed;padding:12px;min-height:56px" class="prose">
+            <span class="prose" style="font-size:12px;color:var(--ink-500)">e.g. "Correct lock order, verified zero energy without prompting."</span>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="btn primary" style="flex:1;padding:13px">SAVE OBSERVATION</button>
+        </div>
+        <div class="prose" style="font-size:11px;color:var(--ink-500);text-align:center;border-top:1px solid var(--ink-300);padding-top:10px">
+          🔒 Permanent record — cannot be edited or deleted after saving. Visible to Dave K.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SKETCH 4: WORKER VIEW ============ -->
+  <div class="sketch-label"><span class="num">04</span><h2>What the worker sees — their own profile</h2></div>
+  <div class="rationale">
+    Trust is the whole game. If observations are secret supervisor notes, workers will (rightly) treat them as surveillance,
+    and under the <b>NZ Privacy Act workers are entitled to see records held about them anyway</b>. So worker visibility ships
+    in the same change as the supervisor write UI: a new section on the worker's own /profile page listing every observation about them,
+    verdict and note included. Side effect: knowing the worker will read it keeps supervisor notes professional and coaching-toned.
+  </div>
+
+  <div class="frame" style="max-width:560px;overflow:hidden">
+    <div class="hdr"><span class="crumb">PROFILE (WORKER'S OWN VIEW)</span></div>
+    <div style="padding:16px">
+      <div class="frame" style="padding:14px;margin-bottom:14px">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500);margin-bottom:8px">Account</div>
+        <div class="prose" style="font-size:12px;color:var(--ink-700)">dave.k@example.co.nz — existing section, unchanged</div>
+      </div>
+      <div class="frame" style="padding:0;overflow:hidden">
+        <div style="padding:12px 14px;border-bottom:1px solid var(--ink-300);display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500)">Observations about you</span>
+          <span class="pill" style="color:var(--ink-500)">3 RECORDS</span>
+        </div>
+        <div style="padding:10px 14px;border-bottom:1px solid var(--ink-300);background:rgba(251,191,36,.06)">
+          <div class="prose" style="font-size:11.5px;color:var(--ink-700);line-height:1.5">
+            These are records your supervisors made after watching you work — they're part of your training evidence,
+            and they're yours to see. Nothing here is hidden from you.
+          </div>
+        </div>
+        <div class="obs-row">
+          <span class="obs-dot" style="background:var(--accent-ok)"></span>
+          <div>
+            <div style="font-size:11.5px;font-weight:600">IS-12 Glass Beader Start-up — Performed to SOP</div>
+            <div class="prose" style="font-size:11px;color:var(--ink-500)">Observed by S. Reweti · 14 JUL 2026 · SOP v3</div>
+          </div>
+        </div>
+        <div class="obs-row">
+          <span class="obs-dot" style="background:var(--accent-measure)"></span>
+          <div>
+            <div style="font-size:11.5px;font-weight:600">IS-07 Furnace Isolation (LOTO) — Needs support</div>
+            <div class="prose" style="font-size:11px;color:var(--ink-500)">Observed by S. Reweti · 02 JUL 2026 · SOP v4</div>
+            <div class="prose" style="font-size:11px;color:var(--ink-700);margin-top:2px">"Skipped verify-zero-energy step — walked it again together."</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SKETCH 5: WHERE IT FEEDS ============ -->
+  <div class="sketch-label"><span class="num">05</span><h2>Context — where observations go next (Phase 35, not this phase)</h2></div>
+  <div class="rationale">
+    This is why the record exists beyond the panel it's typed into. Phase 35 computes a live training matrix —
+    people × required SOPs × state. Observations are what unlock the middle state: without them a cell can only ever be
+    "read it" or "signed off". <b>Nothing below is built in Phase 34</b> — it's shown so the observation record isn't judged in isolation.
+  </div>
+
+  <div class="frame" style="padding:18px;overflow-x:auto">
+    <table>
+      <tr><th style="text-align:left">Forming Dept</th><th>IS-03 Forklift</th><th>IS-07 LOTO</th><th>IS-12 Beader</th></tr>
+      <tr>
+        <td class="name">Dave K.</td>
+        <td><span class="state" style="background:rgba(16,185,129,.12);color:var(--accent-ok)">Signed off</span></td>
+        <td><span class="state" style="background:rgba(59,130,246,.12);color:var(--accent-step)">Observed ✓</span></td>
+        <td><span class="state" style="background:rgba(59,130,246,.12);color:var(--accent-step)">Observed ✓</span></td>
+      </tr>
+      <tr>
+        <td class="name">Mere T.</td>
+        <td><span class="state" style="background:rgba(16,185,129,.12);color:var(--accent-ok)">Signed off</span></td>
+        <td><span class="state" style="background:var(--paper-2);color:var(--ink-500)">Read only</span></td>
+        <td><span class="state" style="background:rgba(251,191,36,.15);color:#b45309">Awaiting sign-off</span></td>
+      </tr>
+      <tr>
+        <td class="name">Sione F.</td>
+        <td><span class="state" style="background:rgba(16,185,129,.12);color:var(--accent-ok)">Signed off</span></td>
+        <td><span class="state" style="background:var(--paper-2);color:var(--ink-500)">Not started</span></td>
+        <td><span class="state" style="background:var(--paper-2);color:var(--ink-500)">Read only</span></td>
+      </tr>
+    </table>
+    <div class="note">The "Observed ✓" cells exist <b>only because</b> a Phase-34 observation record backs them. This matrix is the audit artifact Visy's auditors / ACC ask for.</div>
+  </div>
+
+  <!-- ============ DECISION SUMMARY ============ -->
+  <div class="sketch-label"><span class="num">Q</span><h2>The decision this sketch is asking you to make</h2></div>
+  <div class="rationale">
+    <b>Where does the supervisor record from?</b><br>
+    <b>A — Person panel on /admin/team</b> (sketch 01): builds the member-detail panel Phase 35 needs anyway; worker pre-filled; best for periodic "walk the floor" observing.<br>
+    <b>B — /activity</b> (sketch 02): cheapest; best for "I just watched that walkthrough" moments; awkward for ad-hoc observations.<br>
+    <b>A + B</b>: panel as the home, plus the one-tap "I observed this" shortcut on activity rows.<br><br>
+    Already locked from earlier answers: binary verdict (org-renamable labels), supervisor+admin+safety-manager can record, desktop-first.
+  </div>
+
+</div>
+</body>
+</html>
