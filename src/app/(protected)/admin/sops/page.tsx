@@ -12,7 +12,7 @@ import { GovernanceQueueRow } from '@/components/admin/governance/GovernanceQueu
 import { listOrgTree } from '@/actions/org-model'
 import { ensureSopCollections, listGrants, type GrantRow } from '@/actions/grants'
 import { WiringPatchBayShell } from '@/components/admin/wiring/WiringPatchBayShell'
-import type { WiringCollection, WiringNewSop } from '@/components/admin/wiring/WiringPatchBay'
+import type { WiringCollection, WiringNewSop, WiringSop } from '@/components/admin/wiring/WiringPatchBay'
 import type { SopStatus } from '@/types/sop'
 
 export const metadata: Metadata = {
@@ -196,6 +196,7 @@ export default async function SopsLibraryPage({
   let orgTree: Exclude<Awaited<ReturnType<typeof listOrgTree>>, { error: string }> | null = null
   let grantsList: GrantRow[] = []
   let collections: WiringCollection[] = []
+  let sopsByCollection: Record<string, WiringSop[]> = {}
   let newSop: WiringNewSop | null = null
   const deptMembers: Record<string, string[]> = {}
   if (isAccessView) {
@@ -205,15 +206,22 @@ export default async function SopsLibraryPage({
     if (treeResult && !('error' in treeResult)) orgTree = treeResult
     if (grantsResult && !('error' in grantsResult)) grantsList = grantsResult.grants
 
+    // SC-2 (33-08): ONE .in('collection_id', ids) join read on
+    // sop_collections->sops per collection, replacing the old count-only
+    // read — same dependent-await shape (collIds needs the collections read
+    // above first), no new serial await added.
     const collRows = ((collectionsResult?.data ?? []) as Array<{ id: string; name: string; colour: string }>)
     const collIds = collRows.map((c) => c.id)
-    const { data: sopCollCountRows } = collIds.length > 0
+    type SopCollJoinRow = { collection_id: string; sops: { id: string; title: string | null; status: string } | null }
+    const { data: sopCollRows } = collIds.length > 0
       ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (supabase as any).from('sop_collections').select('collection_id').in('collection_id', collIds)
-      : { data: [] as Array<{ collection_id: string }> }
+        await (supabase as any).from('sop_collections').select('collection_id, sops(id, title, status)').in('collection_id', collIds)
+      : { data: [] as SopCollJoinRow[] }
     const countByCollection: Record<string, number> = {}
-    for (const r of (sopCollCountRows ?? []) as Array<{ collection_id: string }>) {
+    for (const r of (sopCollRows ?? []) as SopCollJoinRow[]) {
+      if (!r.sops) continue
       countByCollection[r.collection_id] = (countByCollection[r.collection_id] ?? 0) + 1
+      ;(sopsByCollection[r.collection_id] ??= []).push({ id: r.sops.id, title: r.sops.title ?? 'Untitled SOP', status: r.sops.status })
     }
     collections = collRows.map((c) => ({ id: c.id, name: c.name, colour: c.colour, sopCount: countByCollection[c.id] ?? 0 }))
 
@@ -362,7 +370,7 @@ export default async function SopsLibraryPage({
                 </p>
               </div>
             ) : (
-              <WiringPatchBayShell tree={orgTree} collections={collections} grants={grantsList} newSop={newSop} deptMembers={deptMembers} />
+              <WiringPatchBayShell tree={orgTree} collections={collections} sopsByCollection={sopsByCollection} grants={grantsList} newSop={newSop} deptMembers={deptMembers} />
             )}
           </>
         ) : isAttentionView ? (
