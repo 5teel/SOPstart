@@ -612,6 +612,16 @@ body[data-theme="paper"] .jack.wired-target .port {
   border-color: var(--accent-ok);
   background: var(--accent-ok);
 }
+/* 33-06: vacancy chips (Pattern 3) — dashed and inert, no id to grant. */
+body[data-theme="paper"] .jack.vacancy {
+  cursor: default;
+  border-style: dashed;
+  border-color: var(--ink-300);
+  opacity: 0.65;
+}
+body[data-theme="paper"] .jack.vacancy:hover {
+  border-color: var(--ink-300);
+}
 
 /* D-hybrid: ONE permanently-reserved strip slot (SC-6) — fixed height so the
  * bay below NEVER moves when the selection state changes; only the slot's
