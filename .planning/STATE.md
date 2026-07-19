@@ -4,14 +4,14 @@ milestone: v6.0
 milestone_name: — SOP Ownership & Governance Infrastructure
 status: executing
 stopped_at: Completed 32-09-PLAN.md
-last_updated: "2026-07-18T09:52:31.851Z"
-last_activity: 2026-07-18 -- Phase 32 execution started
+last_updated: "2026-07-19T02:37:45.454Z"
+last_activity: 2026-07-19 -- Phase 33 execution started
 progress:
-  total_phases: 5
+  total_phases: 6
   completed_phases: 4
-  total_plans: 29
+  total_plans: 38
   completed_plans: 29
-  percent: 80
+  percent: 67
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 32 — visual-org-model-library-permissions
+**Current focus:** Phase 33 — per-sop-access-granularity-wayfinder-builder-header
 
 ## Current Position
 
-Phase: 32 (visual-org-model-library-permissions) — EXECUTING
-Plan: 9 of 9
-Status: Ready to execute
-Last activity: 2026-07-18 -- Phase 32 execution started
+Phase: 33 (per-sop-access-granularity-wayfinder-builder-header) — EXECUTING
+Plan: 1 of 9
+Status: Executing Phase 33
+Last activity: 2026-07-19 -- Phase 33 execution started
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
