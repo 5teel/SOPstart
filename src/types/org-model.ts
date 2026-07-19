@@ -62,12 +62,14 @@ export interface OrgTree {
   ungroupedDepartments: OrgTreeDepartment[]
 }
 
-/** access_grants row shape — an org-unit x collection grant (D-02/D-06/D-11, additive-only). */
+/** access_grants row shape — an org-unit x collection/SOP grant (D-02/D-06/D-11, additive-only). */
 export interface AccessGrant {
   subjectType: SubjectType
   /** null only when subjectType === 'org'. */
   subjectId: string | null
   collectionId: string
+  /** Phase 33 SC-3: null for collection-target grants (the only kind the wiring UI writes today); set for SOP-target grants (createGrant/listGrants, XOR with collectionId at the DB layer). */
+  sopId: string | null
 }
 
 /** One link in an org-unit's ancestor chain — root (org) first, the unit itself last. */

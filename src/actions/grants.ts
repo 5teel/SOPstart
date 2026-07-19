@@ -36,9 +36,9 @@
 import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminContext } from '@/lib/auth/guards'
-import { resolveEffectiveAccess } from '@/lib/org-model/resolve-access'
+import { resolveSopAccess } from '@/lib/org-model/resolve-sop-access'
 import { ensureSopCollectionsForOrg } from '@/lib/org-model/sop-collections'
-import type { ChainLink, SubjectType } from '@/types/org-model'
+import type { SubjectType } from '@/types/org-model'
 
 // ---------------------------------------------------------------------------
 // Helpers (mirror src/actions/org-model.ts / departments.ts verbatim)
@@ -94,10 +94,17 @@ const CreateGrantInput = z
   .object({
     subjectType: z.enum(GRANT_SUBJECT_TYPES),
     subjectId: z.string().uuid().nullable(),
-    collectionId: z.string().uuid(),
+    // Phase 33 SC-3: a grant targets exactly one of collectionId/sopId
+    // (XOR, mirrors the 00050 DB constraint). Both default to null so
+    // existing callers passing only collectionId are unaffected.
+    collectionId: z.string().uuid().nullable().default(null),
+    sopId: z.string().uuid().nullable().default(null),
   })
   .refine(v => (v.subjectType === 'org') === (v.subjectId === null), {
     message: 'subjectId must be null for org grants, and required for every other subject type',
+  })
+  .refine(v => (v.collectionId === null) !== (v.sopId === null), {
+    message: 'Exactly one of collectionId or sopId must be set',
   })
 
 export interface GrantRow {
@@ -105,6 +112,8 @@ export interface GrantRow {
   subjectType: SubjectType
   subjectId: string | null
   collectionId: string
+  /** Phase 33 SC-3: set for SOP-target grants, null for collection-target grants. */
+  sopId: string | null
   grantedBy: string | null
   createdAt: string
 }
@@ -130,13 +139,14 @@ export async function listGrants(): Promise<{ grants: GrantRow[] } | { error: st
     return { error: error.message }
   }
 
-  const rows = (data ?? []) as Array<{ id: string; subject_type: SubjectType; subject_id: string | null; collection_id: string; granted_by: string | null; created_at: string }>
+  const rows = (data ?? []) as Array<{ id: string; subject_type: SubjectType; subject_id: string | null; collection_id: string; sop_id: string | null; granted_by: string | null; created_at: string }>
   return {
     grants: rows.map(r => ({
       id: r.id,
       subjectType: r.subject_type,
       subjectId: r.subject_id,
       collectionId: r.collection_id,
+      sopId: r.sop_id,
       grantedBy: r.granted_by,
       createdAt: r.created_at,
     })),
@@ -164,14 +174,21 @@ export async function createGrant(
   const orgId = await callerOrgId(admin, ctx)
   if (!orgId) return { error: 'No organisation' }
 
-  const { subjectType, subjectId, collectionId } = parsed.data
+  const { subjectType, subjectId, collectionId, sopId } = parsed.data
 
-  // Guard: subjectId (per type) AND collectionId must both belong to the caller's org.
+  // Guard: subjectId (per type) AND the target (collectionId XOR sopId) must
+  // both belong to the caller's org — every new write path, not just the
+  // happy one (RESEARCH Pitfall 1, T-32-05-01/T-33-05-01).
   const subjectOk = await verifySubjectInOrg(admin, orgId, subjectType, subjectId)
   if (!subjectOk) return { error: 'Subject not found in this organisation' }
 
-  const { data: collRow } = await admin.from('collections').select('id').eq('id', collectionId).eq('organisation_id', orgId).maybeSingle()
-  if (!collRow) return { error: 'Collection not found in this organisation' }
+  if (collectionId) {
+    const { data: collRow } = await admin.from('collections').select('id').eq('id', collectionId).eq('organisation_id', orgId).maybeSingle()
+    if (!collRow) return { error: 'Collection not found in this organisation' }
+  } else if (sopId) {
+    const { data: sopRow } = await admin.from('sops').select('id').eq('id', sopId).eq('organisation_id', orgId).maybeSingle()
+    if (!sopRow) return { error: 'SOP not found in this organisation' }
+  }
 
   const { data, error } = await admin
     .from('access_grants')
@@ -180,6 +197,7 @@ export async function createGrant(
       subject_type: subjectType,
       subject_id: subjectId,
       collection_id: collectionId,
+      sop_id: sopId,
       granted_by: ctx.user.id,
     })
     .select('*')
@@ -187,8 +205,8 @@ export async function createGrant(
 
   let row = data
   if ((error || !data) && (error as { code?: string } | null)?.code === '23505') {
-    // WR-04: unique violation (00049 uq_access_grants_subject_collection) —
-    // the identical grant already exists. Idempotent success: re-read the
+    // WR-04: unique violation (00050 uq_access_grants_subject_target) — the
+    // identical grant already exists. Idempotent success: re-read the
     // existing row and fall through to re-materialization (double-click Done /
     // re-entered wire-up mode must never surface as an error).
     let existingQuery = admin
@@ -196,8 +214,9 @@ export async function createGrant(
       .select('*')
       .eq('organisation_id', orgId)
       .eq('subject_type', subjectType)
-      .eq('collection_id', collectionId)
     existingQuery = subjectId === null ? existingQuery.is('subject_id', null) : existingQuery.eq('subject_id', subjectId)
+    existingQuery = collectionId === null ? existingQuery.is('collection_id', null) : existingQuery.eq('collection_id', collectionId)
+    existingQuery = sopId === null ? existingQuery.is('sop_id', null) : existingQuery.eq('sop_id', sopId)
     const { data: existing } = await existingQuery.maybeSingle()
     row = existing
   }
@@ -208,7 +227,9 @@ export async function createGrant(
   }
 
   // Materialize immediately — a grant with no fanout is silent stale visibility (T-32-05-03).
-  const materialized = await materializeCollectionAccessForOrg(admin, orgId, collectionId)
+  const materialized = collectionId
+    ? await materializeCollectionAccessForOrg(admin, orgId, collectionId)
+    : await materializeSopAccessForOrg(admin, orgId, sopId as string)
   if ('error' in materialized) {
     return { error: `Grant created but materialization failed: ${materialized.error}` }
   }
@@ -219,6 +240,7 @@ export async function createGrant(
       subjectType: row.subject_type,
       subjectId: row.subject_id,
       collectionId: row.collection_id,
+      sopId: row.sop_id,
       grantedBy: row.granted_by,
       createdAt: row.created_at,
     },
@@ -241,8 +263,8 @@ export async function revokeGrant(grantId: string): Promise<{ success: true } | 
   const orgId = await callerOrgId(admin, ctx)
   if (!orgId) return { error: 'No organisation' }
 
-  // Guard: grant must belong to the caller's org. Capture collectionId before delete.
-  const { data: grantRow } = await admin.from('access_grants').select('id, organisation_id, collection_id').eq('id', grantId).maybeSingle()
+  // Guard: grant must belong to the caller's org. Capture the target (collectionId XOR sopId) before delete.
+  const { data: grantRow } = await admin.from('access_grants').select('id, organisation_id, collection_id, sop_id').eq('id', grantId).maybeSingle()
   if (!grantRow) return { error: 'Grant not found' }
   if (grantRow.organisation_id !== orgId) return { error: 'Grant belongs to another organisation' }
 
@@ -252,7 +274,12 @@ export async function revokeGrant(grantId: string): Promise<{ success: true } | 
     return { error: delErr.message }
   }
 
-  const materialized = await materializeCollectionAccessForOrg(admin, orgId, grantRow.collection_id)
+  // SOP-target branch re-materializes the SOP directly — this is what makes
+  // last-person-removed re-follow work (the SOP's collection path resumes
+  // the instant its last SOP-target grant is gone).
+  const materialized = grantRow.collection_id
+    ? await materializeCollectionAccessForOrg(admin, orgId, grantRow.collection_id)
+    : await materializeSopAccessForOrg(admin, orgId, grantRow.sop_id as string)
   if ('error' in materialized) {
     return { error: `Grant revoked but materialization failed: ${materialized.error}` }
   }
@@ -327,15 +354,27 @@ export async function materializeOrgAccess(): Promise<{ success: true } | { erro
   const sopIds = ((sopRows ?? []) as Array<{ id: string }>).map(r => r.id)
   if (sopIds.length === 0) return { success: true }
 
-  // Only SOPs with a sop_collections row are inside the grant system — the
-  // CR-02 guard in materializeSopAccessForOrg would skip the rest anyway;
-  // filtering here just avoids pointless per-SOP round-trips.
+  // Only SOPs with a sop_collections row or a direct SOP-target grant are
+  // inside the grant system — the CR-02 guard in materializeSopAccessForOrg
+  // would skip the rest anyway; filtering here just avoids pointless
+  // per-SOP round-trips. SOP-target-bearing SOPs must be included too
+  // (Phase 33 CR-02 update) or role-membership/chain changes won't
+  // propagate revocation to overridden SOPs — the same retained-access
+  // class CR-03 originally closed.
   const { data: scRows, error: scErr } = await admin.from('sop_collections').select('sop_id').in('sop_id', sopIds)
   if (scErr) return { error: scErr.message }
   const collectionBearing = new Set(((scRows ?? []) as Array<{ sop_id: string }>).map(r => r.sop_id))
 
+  const { data: sopTargetRows, error: sopTargetErr } = await admin
+    .from('access_grants')
+    .select('sop_id')
+    .eq('organisation_id', orgId)
+    .not('sop_id', 'is', null)
+  if (sopTargetErr) return { error: sopTargetErr.message }
+  const sopTargetBearing = new Set(((sopTargetRows ?? []) as Array<{ sop_id: string }>).map(r => r.sop_id))
+
   for (const sopId of sopIds) {
-    if (!collectionBearing.has(sopId)) continue
+    if (!collectionBearing.has(sopId) && !sopTargetBearing.has(sopId)) continue
     const result = await materializeSopAccessForOrg(admin, orgId, sopId)
     if ('error' in result) return result
   }
@@ -396,6 +435,12 @@ async function materializeCollectionAccessForOrg(admin: any, orgId: string, coll
  * access (direct person grants) -> sop_access_people. A person grant is read
  * straight off access_grants (subject_type='person') and NEVER routed through
  * a department/role chain, so it can never widen sop_departments (D-13).
+ *
+ * Phase 33 SC-3/SC-4: a SOP with ANY direct SOP-target grant (any subject
+ * tier) is "overridden" — it stops following its collection entirely. The
+ * override decision + final dept/person sets are computed by the pure
+ * resolveSopAccess() helper (resolve-sop-access.ts); this function only
+ * assembles its DB-sourced inputs and performs the replace-write.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function materializeSopAccessForOrg(admin: any, orgId: string, sopId: string): Promise<{ success: true } | { error: string }> {
@@ -403,20 +448,10 @@ async function materializeSopAccessForOrg(admin: any, orgId: string, sopId: stri
   if (sopCollErr) return { error: sopCollErr.message }
   const sopCollectionIds = new Set(((sopCollRows ?? []) as Array<{ collection_id: string }>).map(r => r.collection_id))
 
-  // CR-02 guard (documented decision): a SOP with NO collection is OUTSIDE the
-  // grant system — no grant of any level can reach it, so materializing would
-  // replace-write sop_departments/sop_access_people down to EMPTY, silently
-  // revoking live (legacy, pre-Phase-32) worker visibility. Preserve existing
-  // rows and skip instead. The companion write path (ensureSopCollectionsForOrg,
-  // called on publish and from the wire-up page) is what brings a SOP INTO the
-  // grant system; until it has a collection, its sop_departments rows stay
-  // authoritative exactly as they were before Phase 32.
-  if (sopCollectionIds.size === 0) return { success: true }
-
   const [{ data: deptsData, error: deptsErr }, { data: rolesData, error: rolesErr }, { data: grantsData, error: grantsErr }] = await Promise.all([
     admin.from('departments').select('id, area_id').eq('organisation_id', orgId).eq('archived', false),
     admin.from('roles').select('id, department_id').eq('organisation_id', orgId),
-    admin.from('access_grants').select('subject_type, subject_id, collection_id').eq('organisation_id', orgId),
+    admin.from('access_grants').select('subject_type, subject_id, collection_id, sop_id').eq('organisation_id', orgId),
   ])
   if (deptsErr) return { error: deptsErr.message }
   if (rolesErr) return { error: rolesErr.message }
@@ -424,7 +459,20 @@ async function materializeSopAccessForOrg(admin: any, orgId: string, sopId: stri
 
   const depts = (deptsData ?? []) as Array<{ id: string; area_id: string | null }>
   const roles = (rolesData ?? []) as Array<{ id: string; department_id: string }>
-  const grants = (grantsData ?? []) as Array<{ subject_type: SubjectType; subject_id: string | null; collection_id: string }>
+  const grants = (grantsData ?? []) as Array<{ subject_type: SubjectType; subject_id: string | null; collection_id: string | null; sop_id: string | null }>
+
+  // SOP-target grants for THIS sop trigger the narrowing override (locked
+  // 2026-07-19: any direct SOP-target grant, any subject tier).
+  const sopTargetGrants = grants.filter(g => g.sop_id === sopId).map(g => ({ subjectType: g.subject_type, subjectId: g.subject_id }))
+
+  // CR-02 guard (documented decision, extended for Phase 33): a SOP outside
+  // the grant system entirely — no collection membership AND no SOP-target
+  // grant — would replace-write sop_departments/sop_access_people down to
+  // EMPTY, silently revoking live (legacy, pre-Phase-32) worker visibility.
+  // Preserve existing rows and skip instead. A collection-less SOP WITH a
+  // SOP-target grant IS inside the grant system (can be wired by name
+  // before it has a category).
+  if (sopCollectionIds.size === 0 && sopTargetGrants.length === 0) return { success: true }
 
   const roleIds = roles.map(r => r.id)
   const { data: roleMembersData, error: roleMembersErr } = roleIds.length > 0
@@ -436,48 +484,36 @@ async function materializeSopAccessForOrg(admin: any, orgId: string, sopId: stri
     ;(membersByRole[rm.role_id] ??= []).push(rm.member_id)
   }
 
-  // grantsByUnit: 'org' grants have subject_id=null in the DB — keyed by orgId itself.
-  const grantsByUnit: Record<string, string[]> = {}
+  // collectionGrantsByUnit: 'org' grants have subject_id=null in the DB —
+  // keyed by orgId itself. SOP-target rows have collection_id === null and
+  // are naturally excluded here — old code paths stay blind to them.
+  const collectionGrantsByUnit: Record<string, string[]> = {}
+  const collectionPersonGrants: Array<{ subjectId: string; collectionId: string }> = []
   for (const g of grants) {
+    if (!g.collection_id) continue
     const key = g.subject_type === 'org' ? orgId : g.subject_id
     if (!key) continue
-    ;(grantsByUnit[key] ??= []).push(g.collection_id)
+    ;(collectionGrantsByUnit[key] ??= []).push(g.collection_id)
+    if (g.subject_type === 'person' && g.subject_id) collectionPersonGrants.push({ subjectId: g.subject_id, collectionId: g.collection_id })
   }
 
-  const deptById = new Map(depts.map(d => [d.id, d]))
+  const { overridden, deptSet, personSet } = resolveSopAccess({
+    orgId,
+    depts: depts.map(d => ({ id: d.id, areaId: d.area_id })),
+    roles: roles.map(r => ({ id: r.id, departmentId: r.department_id })),
+    membersByRole,
+    collectionGrantsByUnit,
+    collectionPersonGrants,
+    sopCollectionIds,
+    sopTargetGrants,
+  })
 
-  // Department-level -> sop_departments.
-  const deptSet = new Set<string>()
-  for (const d of depts) {
-    const chain: ChainLink[] = [{ unitId: orgId, subjectType: 'org' }]
-    if (d.area_id) chain.push({ unitId: d.area_id, subjectType: 'area' })
-    chain.push({ unitId: d.id, subjectType: 'department' })
-    const access = resolveEffectiveAccess(chain, grantsByUnit)
-    const collections = new Set<string>([...access.direct, ...Object.keys(access.inherited)])
-    if (anyIntersect(sopCollectionIds, collections)) deptSet.add(d.id)
-  }
-
-  // Role-level -> fans out to role_members -> sop_access_people.
-  const personSet = new Set<string>()
-  for (const r of roles) {
-    const dept = deptById.get(r.department_id)
-    if (!dept) continue
-    const chain: ChainLink[] = [{ unitId: orgId, subjectType: 'org' }]
-    if (dept.area_id) chain.push({ unitId: dept.area_id, subjectType: 'area' })
-    chain.push({ unitId: dept.id, subjectType: 'department' })
-    chain.push({ unitId: r.id, subjectType: 'role' })
-    const access = resolveEffectiveAccess(chain, grantsByUnit)
-    const collections = new Set<string>([...access.direct, ...Object.keys(access.inherited)])
-    if (anyIntersect(sopCollectionIds, collections)) {
-      for (const memberId of membersByRole[r.id] ?? []) personSet.add(memberId)
-    }
-  }
-
-  // Person-level direct grants -> sop_access_people ONLY (never sop_departments — D-13, the Priya scenario).
-  for (const g of grants) {
-    if (g.subject_type === 'person' && g.subject_id && sopCollectionIds.has(g.collection_id)) {
-      personSet.add(g.subject_id)
-    }
+  // Override forces all_departments=false — the 00035 bypass would otherwise
+  // make the narrowing override cosmetic (a SOP could still reach everyone
+  // via the all_departments arm regardless of materialized junction rows).
+  if (overridden) {
+    const { error: allDeptErr } = await admin.from('sops').update({ all_departments: false }).eq('id', sopId)
+    if (allDeptErr) return { error: allDeptErr.message }
   }
 
   // Replace-write sop_departments.
@@ -499,9 +535,4 @@ async function materializeSopAccessForOrg(admin: any, orgId: string, sopId: stri
   }
 
   return { success: true }
-}
-
-function anyIntersect(a: Set<string>, b: Set<string>): boolean {
-  for (const v of a) if (b.has(v)) return true
-  return false
 }
