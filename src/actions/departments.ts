@@ -25,6 +25,7 @@ import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminContext } from '@/lib/auth/guards'
+import { materializeSopAccess } from '@/actions/grants'
 import type { Department, DepartmentWithCounts } from '@/types/sop'
 
 // ---------------------------------------------------------------------------
@@ -478,7 +479,16 @@ export async function assignBlockDepartments(
 }
 
 // ---------------------------------------------------------------------------
-// 8. assignSopDepartments — replace-semantics + all_departments flag (D-04)
+// 8. assignSopDepartments — SOP-target dept-subject grants (Phase 33 SC-3/SC-4)
+//
+// sop_departments is 100% derived — this function NEVER writes it directly.
+// Replace semantics on the SOP's dept-subject SOP-target access_grants rows,
+// then materializeSopAccess() turns those grants into sop_departments. A
+// hand-picked SOP is therefore overridden-from-birth (research OQ1 option i):
+// it stops following its collection and survives sibling-collection
+// re-materialization — this is what closes the 32-VERIFICATION silent-drop
+// hole. Empty pick-set = delete-all grants + materialize (SOP re-follows its
+// collection, emergent — no stored flag).
 // ---------------------------------------------------------------------------
 
 export async function assignSopDepartments(
@@ -512,13 +522,20 @@ export async function assignSopDepartments(
     await admin.from('sops').update({ organisation_id: orgId }).eq('id', sopId)
   }
 
-  // Replace semantics: clear junction rows, set the flag, then re-insert if scoped.
+  // Replace semantics: clear this SOP's dept-subject SOP-target grants only —
+  // never touch other subject-tier SOP-target grants (those belong to the
+  // org-model wiring surface, 32-08/33-08).
   const { error: delErr } = await admin
-    .from('sop_departments')
+    .from('access_grants')
     .delete()
+    .eq('organisation_id', orgId)
     .eq('sop_id', sopId)
+    .eq('subject_type', 'department')
   if (delErr) return { error: delErr.message }
 
+  // 33-05's override rule only forces all_departments=false when a SOP-target
+  // grant EXISTS for this SOP — setting the flag here first and re-inserting
+  // grants after cannot conflict with that rule.
   const { error: flagErr } = await admin
     .from('sops')
     .update({ all_departments: allDepartments })
@@ -528,13 +545,24 @@ export async function assignSopDepartments(
   if (!allDepartments) {
     const validIds = await orgScopedDeptIds(admin, orgId, departmentIds)
     if (validIds.length > 0) {
-      const rows = validIds.map((department_id: string) => ({ sop_id: sopId, department_id }))
+      const rows = validIds.map((department_id: string) => ({
+        organisation_id: orgId,
+        subject_type: 'department',
+        subject_id: department_id,
+        collection_id: null,
+        sop_id: sopId,
+        granted_by: ctx.user.id,
+      }))
       const { error: insErr } = await admin
-        .from('sop_departments')
+        .from('access_grants')
         .insert(rows)
       if (insErr) return { error: insErr.message }
     }
   }
+
+  // sop_departments derives entirely from the grants just written.
+  const materialized = await materializeSopAccess(sopId)
+  if ('error' in materialized) return { error: `Departments assigned but materialization failed: ${materialized.error}` }
 
   return { success: true }
 }

@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { requireAdminContext } from '@/lib/auth/guards'
+import { assignSopDepartments } from '@/actions/departments'
 import { uploadSessionSchema, getSourceFileType, isBlockedMacroFile, createVideoSopPipelineSessionSchema } from '@/lib/validators/sop'
 import type { UploadSession } from '@/types/sop'
 
@@ -543,20 +544,16 @@ export async function createSopFromWizard(
     return { error: 'Failed to create SOP. Please try again.' }
   }
 
-  // Phase 25 REQ-9, D-04: write department associations for the new SOP.
-  // allDepartments flag makes SOP visible org-wide (parallel to blocks.all_departments).
-  if (parsed.data.allDepartments) {
-    await admin.from('sops').update({ all_departments: true } as unknown as object).eq('id', sop.id)
-  } else if (parsed.data.departmentIds.length > 0) {
-    const deptRows = parsed.data.departmentIds.map((department_id: string) => ({
-      sop_id: sop.id,
-      department_id,
-    }))
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error: deptErr } = await (admin as any).from('sop_departments').insert(deptRows)
-    if (deptErr) {
+  // Phase 33 SC-3/SC-4: department assignment funnels through the single
+  // grant-backed write path (assignSopDepartments) — sop_departments is
+  // 100% derived, never inserted directly (closes the 32-VERIFICATION
+  // silent-drop hole). allDepartments flag makes SOP visible org-wide
+  // (parallel to blocks.all_departments).
+  if (parsed.data.allDepartments || parsed.data.departmentIds.length > 0) {
+    const deptResult = await assignSopDepartments(sop.id, parsed.data.departmentIds, parsed.data.allDepartments)
+    if ('error' in deptResult) {
       // Non-fatal: SOP is created, dept tagging failed. Log but continue.
-      console.error('[createSopFromWizard] sop_departments insert error', deptErr)
+      console.error('[createSopFromWizard] assignSopDepartments error', deptResult.error)
     }
   }
 

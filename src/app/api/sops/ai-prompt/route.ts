@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { assignSopDepartments } from '@/actions/departments'
 import { parseSop } from '@/lib/parsers/sop-parser'
 import {
   parsedSopToPerSectionLayoutData,
@@ -75,13 +76,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to create SOP record' }, { status: 500 })
   }
 
-  // Phase 25 REQ-9, D-04: write sop_departments junction rows for the new AI-drafted SOP.
-  if (allDepartments) {
-    await admin.from('sops').update({ all_departments: true } as object).eq('id', sop.id)
-  } else if (departmentIds.length > 0) {
-    const deptRows = departmentIds.map((department_id: string) => ({ sop_id: sop.id, department_id }))
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (admin as any).from('sop_departments').insert(deptRows)
+  // Phase 33 SC-3/SC-4: department assignment funnels through the single
+  // grant-backed write path (assignSopDepartments) — sop_departments is
+  // 100% derived, never inserted directly.
+  if (allDepartments || departmentIds.length > 0) {
+    await assignSopDepartments(sop.id, departmentIds, allDepartments)
   }
 
   // --- 4. Create parse_jobs row (D-04: persist prompt_text for audit) ---
