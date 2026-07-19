@@ -250,6 +250,23 @@ Plans:
 
 - [x] 32-09-PLAN.md — Wave 6: /admin/sops?view=access arm + library deep-link filter + publish wire-up CTA + journeys/uat + phase gate
 
+### Phase 33: Per-SOP Access Granularity + Wayfinder Builder Header
+
+**Goal:** Any org tier (site / area / department / role / person) can be granted access down to an INDIVIDUAL SOP — "only Dave and Priya see Pump Rebuild while Maintenance department sees the rest of the collection" — on an access map whose teams column shows the full org ladder, with plain-language copy throughout; plus the builder header becomes the Wayfinder bar (light schema, one self-describing tools menu). Closes Phase 32 UAT gaps G1/G2/G3.
+**Design validated:** `sketches/builder-header-orientation/` (winner A Wayfinder — light paper schema, single "Tools for this SOP" menu; decisions 2026-07-19) + `sketches/access-hierarchy/` (winner A Access map with B's "Who can see this?" panel absorbed; full org ladder + per-SOP chosen-by-name; decisions 2026-07-19). Seed: `.planning/todos/pending/phase-seed-per-sop-access-and-wayfinder.md`.
+**Depends on:** Phase 32 (access map surface, grants engine + materialization, org model)
+**Requirements**: TBD (formalize at plan time)
+**Success Criteria** (what must be TRUE):
+
+  1. The access map's teams column shows site → area → department → role → person as expandable, selectable tiers (mirrors `OrgTree` from /admin/team)
+  2. Collections expand in place to their SOPs; any SOP is selectable for "choose who sees it" — no pinned `?sop=` URL required to wire anything
+  3. A grant can target an individual SOP from any subject tier; a SOP with people chosen by name STOPS following its collection's access (narrowing override — locked decision 2026-07-19)
+  4. Resolver + materialization honor SOP-level targets with live runtime tests proving org isolation and no stale visibility after revoke/override
+  5. Selection detail is the plain-language "Who can see this?" / "What can they see?" panel — no "grants"/"wire-up" jargon anywhere in UI copy
+  6. Builder header is the light-schema Wayfinder bar — back / you-are-here / forward zones with the lock reason inline, and ONE "Tools for this SOP" menu with self-describing labels (Assign to workers / See earlier versions / Make a training video / Print a QR code / See the flow diagram / Edit the flow diagram / Delete this draft)
+
+**Pre-plan gates:** (a) `access_grants` SOP-target schema decision (nullable `sop_id` arm vs target-type enum); (b) exact narrowing-override semantics in resolve-access + materialization (first override in the additive D-11 model — includes what happens when the last named person is removed); (c) wire-density strategy for chosen-SOP person-lines at 15×20 scale (extend Phase 32 focus/group-collapse to SOP rows).
+
 ---
 
 ## v4.0 — Safety-Critical Parsing + Voice + AI Foundation (started 2026-05-24 · ✅ shipped 2026-07-02)
@@ -1050,6 +1067,8 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | 28. Ownership + Review Lifecycle + Governance Queue | 6/6 | Complete    | 2026-07-12 |
 | 29. Approval Chains | 5/6 | In Progress|  |
 | 30. UX Consolidation & Simplification | 7/8 | In Progress|  |
+| 32. Visual Org Model & Library Permissions | 9/9 | Executed — human UAT open (3 items) |  |
+| 33. Per-SOP Access Granularity + Wayfinder Header | 0/? | Not started |  |
 
 ## Backlog
 
