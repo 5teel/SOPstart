@@ -4,7 +4,7 @@ milestone: v7.0
 milestone_name: — Competency & Training Layer
 status: Roadmap created — ready for /gsd-plan-phase 34
 stopped_at: Phase 34 context gathered
-last_updated: "2026-07-19T12:22:59.210Z"
+last_updated: "2026-07-19T20:32:28.439Z"
 last_activity: "2026-07-19 — v7.0 roadmap created (6 phases: 34-39)"
 progress:
   total_phases: 6
