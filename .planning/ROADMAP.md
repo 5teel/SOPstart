@@ -324,12 +324,37 @@ Turns data SafeStart already stores (access grants = who must know what; complet
   3. Worker can see every observation recorded about them on their own profile (trust / NZ Privacy Act framing ships in the same change as the supervisor write UI)
   4. Observations are strictly org-scoped — a runtime cross-org write/read test proves no leakage (the codebase's recurring service-role write-hole class)
 
-**Plans**: TBD
+**Plans**: 9 plans in 6 waves
 **UI hint**: yes
 
 Plans:
 
-- [ ] TBD (created by /gsd-plan-phase)
+**Wave 1**
+
+- [ ] 34-01-PLAN.md — phase34 Playwright project + 5 Wave-0 stub specs (OBS-01/02/03 + SC-4 cross-org isolation)
+- [ ] 34-02-PLAN.md — migration 00052 sop_observations (append-only RLS + worker self-read + verdict check) + organisations.observation_labels (D-02) + RecordObservationSchema validator (files only)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 34-03-PLAN.md — [BLOCKING] db push 00052 + PGRST reload + live cross-org isolation (SC-4) + append-only immutability runtime proofs
+
+**Wave 3** *(blocked on Wave 2)*
+
+- [ ] 34-04-PLAN.md — observations.ts server actions (recordObservation session-client/no-admin-client + version auto-stamp + listObservationsForWorker/Person + listWorkerSopsForPicker + get/setObservationLabels) + record/version specs live
+
+**Wave 4** *(blocked on Wave 3)*
+
+- [ ] 34-05-PLAN.md — shared RecordObservationModal + VerdictButtons + ObservationRow (org labels, declared tokens, permanent-record framing)
+
+**Wave 5** *(blocked on Wave 4)*
+
+- [ ] 34-06-PLAN.md — entry A: PersonPanel + org-chart/columns person-click via TeamViewShell + verdict-label settings editor (D-02, D-03)
+- [ ] 34-07-PLAN.md — entry B: /activity header button + CompletionSummaryCard "I observed this" row action (D-03, D-11)
+- [ ] 34-08-PLAN.md — worker /profile "Observations about you" + trust banner (OBS-02, D-08) + worker-visibility spec live + journeys/uat
+
+**Wave 6** *(blocked on Wave 5)*
+
+- [ ] 34-09-PLAN.md — merged-tree gate: full suite + tsc + next build + pathways coverage + OBS-01/02/03 + SC-4 audit
 
 ### Phase 35: Competency Classifier + Training Matrix + Records
 
