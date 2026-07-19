@@ -24,8 +24,9 @@
  *
  * Phase 32-09 — optional `wireUpHref` prop (D-12a). When set (the parent
  * shell supplies it once initialSop.status === 'published'), renders a
- * "Wire up access" CTA to /admin/sops?view=access&sop={sopId}, pinning the
- * SOP NEW · UNWIRED on the wiring surface for organic wire-up.
+ * "Choose who sees it" CTA to /admin/sops?view=access&sop={sopId}, pinning
+ * the SOP on the access map for organic wire-up (33-09 SC-5: plain
+ * language, href unchanged).
  */
 
 import Link from 'next/link'
@@ -159,14 +160,14 @@ export function PublishStage({
         You can unpublish or edit later.
       </p>
 
-      {/* 5c. Wire up access — D-12a post-publish CTA, lands NEW · UNWIRED */}
+      {/* 5c. Choose who sees it — D-12a post-publish CTA to the access map */}
       {wireUpHref && (
         <Link
           href={wireUpHref}
           data-testid="wire-up-access-cta"
           className="self-start rounded border border-[var(--ink-900)] bg-transparent px-4 py-2 text-sm font-semibold text-[var(--ink-900)] no-underline"
         >
-          Wire up access →
+          Choose who sees it →
         </Link>
       )}
 

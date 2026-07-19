@@ -33,6 +33,13 @@
  *     chosen-by-name/overridden, stops following its collection). The
  *     `?sop=` pin survives only as a deep-link nicety that pre-selects and
  *     pre-expands — it is no longer a wiring precondition.
+ *  5. PLAIN LANGUAGE (SC-5, 33-09) — no "grant"/"wire up"/"UNWIRED" wording
+ *     anywhere user-facing. SelectionStrip and every pill/hint/error string
+ *     in this file speak in people-first sentences; `AccessAnswerPanel`
+ *     (below the bay) answers "Who can see this?" for a selected SOP/
+ *     collection or "What can they see?" for a selected person/team, from
+ *     this component's EXISTING accessByUnit/grants/peopleIndex memos — no
+ *     new fetch, no second resolver.
  *
  * D-11 (additive-only): there is NO in-place inherited-revoke affordance in
  * this component — revoking a grant happens at its source (a future
@@ -51,6 +58,7 @@ import type { AccessGrant, ChainLink, EffectiveAccess, OrgPerson, OrgTree, OrgTr
 import { resolveEffectiveAccess } from '@/lib/org-model/resolve-access'
 import { createGrant } from '@/actions/grants'
 import { SelectionStrip } from './SelectionStrip'
+import { AccessAnswerPanel, type AccessAnswerPanelData } from './AccessAnswerPanel'
 import { ViewToggle } from '@/components/admin/org-model/ViewToggle'
 
 export interface WiringCollection {
@@ -623,6 +631,101 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, sops
     return undefined
   }, [connecting, focus, deptById, collectionById])
 
+  // ---- 33-09 SC-5: AccessAnswerPanel data — plain-language "Who can see
+  // this?" / "What can they see?" sentences, derived entirely from the
+  // memos above (grants/peopleIndex/sopById/sopParentCollection) — no new
+  // fetch, no second resolver call. -------------------------------------
+  const subjectLabel = useCallback(
+    (subjectType: SubjectType, subjectId: string | null): string => {
+      if (subjectType === 'org') return orgName
+      if (!subjectId) return 'Unknown'
+      if (subjectType === 'area') return tree.areas.find((a) => a.id === subjectId)?.name ?? 'Area'
+      if (subjectType === 'department') return deptById.get(subjectId)?.name ?? 'Department'
+      if (subjectType === 'role') return roleById.get(subjectId)?.name ?? 'Role'
+      return personName(subjectId)
+    },
+    [orgName, tree.areas, deptById, roleById, personName],
+  )
+
+  const grantUnitId = useCallback(
+    (g: AccessGrant): string => (g.subjectType === 'org' ? tree.organisationId : (g.subjectId ?? '')),
+    [tree.organisationId],
+  )
+
+  const collectionPeople = useCallback(
+    (collectionId: string): { count: number; names: string[] } => {
+      const collGrants = grants.filter((g) => g.collectionId === collectionId)
+      const people = new Set<string>()
+      for (const g of collGrants) for (const pid of peopleIndex.get(grantUnitId(g)) ?? []) people.add(pid)
+      return { count: people.size, names: [...new Set(collGrants.map((g) => subjectLabel(g.subjectType, g.subjectId)))] }
+    },
+    [grants, peopleIndex, grantUnitId, subjectLabel],
+  )
+
+  const sopDirectPeopleCount = useCallback(
+    (sopId: string): number => {
+      const s = new Set<string>()
+      for (const g of grants.filter((gr) => gr.sopId === sopId)) for (const pid of peopleIndex.get(grantUnitId(g)) ?? []) s.add(pid)
+      return s.size
+    },
+    [grants, peopleIndex, grantUnitId],
+  )
+
+  // Panel tracks the SOP being wired while connecting, else the plain focus.
+  const panelTargetId = connecting ? activeSopId : focus
+
+  const panelData = useMemo((): AccessAnswerPanelData => {
+    if (!panelTargetId) return { kind: 'empty' }
+
+    const sop = sopById.get(panelTargetId)
+    if (sop) {
+      const sopGrants = grants.filter((g) => g.sopId === sop.id)
+      const overridden = sopGrants.length > 0
+      const collectionId = sopParentCollection.get(sop.id)
+      const collectionName = collectionId ? collectionById.get(collectionId)?.name : undefined
+      const collInfo = collectionId ? collectionPeople(collectionId) : { count: 0, names: [] }
+      if (overridden) {
+        const people = new Set<string>()
+        for (const g of sopGrants) for (const pid of peopleIndex.get(grantUnitId(g)) ?? []) people.add(pid)
+        const names = [...new Set(sopGrants.map((g) => subjectLabel(g.subjectType, g.subjectId)))]
+        return {
+          kind: 'sop', title: sop.title, collectionName, overridden: true,
+          peopleCount: people.size, names,
+          collectionPeopleCount: collInfo.count, collectionNames: collInfo.names,
+        }
+      }
+      return {
+        kind: 'sop', title: sop.title, collectionName, overridden: false,
+        peopleCount: collInfo.count, names: collInfo.names,
+        collectionPeopleCount: collInfo.count, collectionNames: collInfo.names,
+      }
+    }
+
+    const collection = collectionById.get(panelTargetId)
+    if (collection) {
+      const { count, names } = collectionPeople(collection.id)
+      const narrowerSops = (sopsByCollection[collection.id] ?? [])
+        .filter((s) => grants.some((g) => g.sopId === s.id))
+        .map((s) => ({ title: s.title, peopleCount: sopDirectPeopleCount(s.id) }))
+      return { kind: 'collection', title: collection.name, peopleCount: count, names, narrowerSops }
+    }
+
+    if (isLeftId(panelTargetId)) {
+      const access = accessByUnit.get(panelTargetId)
+      const sopAccess = sopAccessByUnit.get(panelTargetId)
+      const collIds = new Set<string>([...(access?.direct ?? []), ...Object.keys(access?.inherited ?? {}), ...(access?.personal ?? [])])
+      const sopIds = new Set<string>([...(sopAccess?.direct ?? []), ...Object.keys(sopAccess?.inherited ?? {}), ...(sopAccess?.personal ?? [])])
+      const collections = [...collIds].map((id) => ({
+        title: collectionById.get(id)?.name ?? 'Collection',
+        hasNarrowerSops: (sopsByCollection[id] ?? []).some((s) => grants.some((g) => g.sopId === s.id)),
+      }))
+      const sops = [...sopIds].map((id) => ({ title: sopById.get(id)?.title ?? 'SOP' }))
+      return { kind: 'unit', title: focusLabel ?? 'Selected', collections, sops }
+    }
+
+    return { kind: 'empty' }
+  }, [panelTargetId, sopById, grants, sopParentCollection, collectionById, collectionPeople, peopleIndex, grantUnitId, subjectLabel, sopsByCollection, sopDirectPeopleCount, isLeftId, accessByUnit, sopAccessByUnit, focusLabel])
+
   // ---- search: auto-expand areas/depts/roles/collections containing matches -
   const matchIds = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -750,14 +853,15 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, sops
   }
 
   // 33-08 SC-2: one SOP row — the child-row pattern from d3fc9f5, generalized
-  // from "the one pinned newSop" to any SOP. `isPinned` keeps the post-publish
-  // NEW · UNWIRED/WIRED pill on the deep-linked SOP only; every other row
-  // shows a "chosen by name" pill when it carries a direct SOP-target grant
-  // (the override trigger, derived client-side — no stored flag).
+  // from "the one pinned newSop" to any SOP. `isPinned` adds a NEW tag on the
+  // deep-linked SOP only (before anyone's been chosen); every SOP — pinned or
+  // drilled-down — shows "CHOSEN BY NAME" when it carries a direct SOP-target
+  // grant (the override trigger, derived client-side — no stored flag).
+  // 33-09 SC-5: plain language only — no "grant"/"wire"/"UNWIRED" wording.
   const renderSopRow = (s: WiringSop, opts: { isPinned: boolean; nested: boolean }) => {
     const active = connecting && activeSopId === s.id
     const overridden = grants.some((g) => g.sopId === s.id)
-    const grantCount = grants.filter((g) => g.sopId === s.id).length
+    const chosenCount = grants.filter((g) => g.sopId === s.id).length
     return (
       <div
         key={s.id}
@@ -765,13 +869,10 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, sops
         className={`jack${opts.nested ? ' child' : ''} newsop${active ? ' lit' : ''}`}
         onClick={() => enterWireUp(s.id)}
       >
-        {opts.isPinned ? (
-          <span className="newpill mono">{active && pending.size > 0 ? 'NEW' : overridden ? 'WIRED' : 'NEW · UNWIRED'}</span>
-        ) : overridden ? (
-          <span className="newpill mono">CHOSEN BY NAME</span>
-        ) : null}
+        {opts.isPinned && !overridden && <span className="newpill mono">NEW</span>}
+        {overridden && <span className="newpill mono">CHOSEN BY NAME</span>}
         <span className="name">{s.title}</span>
-        <span className="meta mono">{grantCount} grant{grantCount === 1 ? '' : 's'}</span>
+        <span className="meta mono">{chosenCount === 0 ? 'follows collection' : `${chosenCount} chosen by name`}</span>
         <span className="port" />
       </div>
     )
@@ -814,7 +915,7 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, sops
 
       {saveError && (
         <div role="alert" className="mono text-[11px] uppercase tracking-wide text-red-600 mt-1">
-          Wiring failed — {saveError} Nothing was saved; your pending grants are kept.
+          That didn&apos;t save — {saveError} Nothing changed yet; your choices are still here, try again.
         </div>
       )}
 
@@ -917,8 +1018,10 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, sops
         </div>
       </div>
       <div className="bay-hint mono">
-        CLICK ▸ TO EXPAND A GROUP · CLICK ANYTHING TO FOCUS · CLICK A SOP TO WIRE IT UP
+        CLICK ▸ TO EXPAND A GROUP · CLICK ANYTHING TO SEE WHO IT REACHES · CLICK A SOP TO CHOOSE WHO SEES IT
       </div>
+
+      <AccessAnswerPanel data={panelData} />
     </div>
   )
 }

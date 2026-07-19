@@ -8,9 +8,11 @@
  * below never reflows on click (verified by the graph container's
  * getBoundingClientRect().top staying pixel-identical across transitions).
  *
- * Idle copy doubles as onboarding. Selection and wiring share the same
- * "Visible to N people via M grants" template (32-08-PLAN Task 1 literal
- * spec) — wiring adds the live ✓ Done control.
+ * Phase 33-09 (SC-5) — copy rewritten to plain language ("Save — done" not
+ * "✓ Done wiring"; people-first sentences, no "grant"/"wire up"/"UNWIRED"
+ * wording anywhere). The 48px slot STRUCTURE below (className template,
+ * unconditional mount, onClick={onDone}) is byte-untouched — Phase 32 SC-6
+ * pixel-stability contract.
  */
 
 import type { ReactNode } from 'react'
@@ -34,7 +36,6 @@ export function SelectionStrip({
   state,
   label,
   peopleCount = 0,
-  grantCount = 0,
   onDone,
   doneDisabled,
   openInLibraryHref,
@@ -43,13 +44,13 @@ export function SelectionStrip({
     <div data-state={state} className={`strip-slot h-[48px] overflow-hidden ${state}`}>
       {state === 'idle' && (
         <span className="mono idle-copy">
-          Select anything to trace who it reaches · click the NEW SOP to wire it up
+          Click a team, role or person to see what they can see · click a collection or SOP to choose who sees it
         </span>
       )}
       {state === 'selection' && (
         <span className="headline">
           {label ? <><b>{label}</b> — </> : null}
-          Visible to <b>{peopleCount}</b> {peopleCount === 1 ? 'person' : 'people'} via {grantCount} grant{grantCount === 1 ? '' : 's'}.
+          <b>{peopleCount}</b> {peopleCount === 1 ? 'person' : 'people'} can see this.
           {openInLibraryHref && (
             <Link href={openInLibraryHref} className="mono open-in-library">
               Open in library →
@@ -60,10 +61,10 @@ export function SelectionStrip({
       {state === 'wiring' && (
         <>
           <span className="headline">
-            ⚡ Wiring <b>{label}</b> — click org units to grant access. Visible to <b>{peopleCount}</b> {peopleCount === 1 ? 'person' : 'people'} via {grantCount} grant{grantCount === 1 ? '' : 's'}.
+            Choosing who sees <b>{label}</b> — click a team or person on the left. <b>{peopleCount}</b> {peopleCount === 1 ? 'person' : 'people'} can see it now.
           </span>
           <button type="button" className="done" onClick={onDone} disabled={doneDisabled}>
-            ✓ Done wiring
+            ✓ Save — done
           </button>
         </>
       )}
