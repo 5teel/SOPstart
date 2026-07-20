@@ -407,5 +407,28 @@ export default defineConfig({
       testMatch: /tests\/phase33\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 34 -- Supervisor Observations
+      // Nyquist harness (Wave 0 / Plan 34-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase34/**) so every later plan in
+      // the phase drops specs into tests/phase34/ with NO further config edit --
+      // single registration point for the whole phase (mirrors phase26/28/29/30/32/33).
+      //
+      // Verify registration: `npx playwright test --list --project=phase34`
+      // (should list all 5 tests/phase34/*.spec.ts files -- zero discovered = FAIL)
+      //
+      // Wave-0 stub files (one per requirement + success criterion 4):
+      //   record-observation (OBS-01, live in 34-04) -
+      //   observation-immutability (OBS-01 append-only, live in 34-03) -
+      //   worker-observation-visibility (OBS-02, live in 34-08) -
+      //   sop-version-stamp (OBS-03/D-10, live in 34-04) -
+      //   observation-cross-org-isolation (success criterion 4, live in 34-03)
+      name: 'phase34',
+      testDir: '.',
+      testMatch: /tests\/phase34\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
