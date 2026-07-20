@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: — Competency & Training Layer
 status: executing
-stopped_at: Completed 34-05-PLAN.md
-last_updated: "2026-07-20T06:25:18.844Z"
+stopped_at: Completed 34-09-PLAN.md
+last_updated: "2026-07-20T06:44:14.822Z"
 last_activity: 2026-07-20 -- Phase 34 execution started
 progress:
   total_phases: 6
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 9
-  completed_plans: 5
-  percent: 0
+  completed_plans: 9
+  percent: 17
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 34 (supervisor-observations) — EXECUTING
-Plan: 4 of 9
+Plan: 9 of 9
 Status: Ready to execute
 Last activity: 2026-07-20 -- Phase 34 execution started
 
@@ -183,6 +183,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 34 P03 | 35min | 2 tasks | 3 files |
 | Phase 34 P04 | 25min | 2 tasks | 2 files |
 | Phase 34 P05 | ~15min | 2 tasks | 3 files |
+| Phase 34 P09 | ~15min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -398,6 +399,7 @@ Recent decisions affecting current work:
 - [Phase 34-04]: Scoped the record-observation.spec.ts createAdminClient ban to recordObservation's function body only, not the whole file — setObservationLabels legitimately needs createAdminClient (organisations has no authenticated UPDATE policy)
 - [Phase 34-04]: listWorkerSopsForPicker maps the picker's 'code' field to sops.sop_number (existing column) — no new document-code column exists yet (Phase 38 DOC-01/02 scope)
 - [Phase 34-05]: react-hooks/set-state-in-effect requires the render-time 'adjusting state on prop change' pattern (useState-tracked prevOpen, not useRef) for modal reset-on-open logic; async fetch results must land only inside .then() callbacks, never synchronously at the top of a useEffect body
+- [Phase 34-09]: 34 pre-existing test failures in the full suite (phase3/11/12.5/15/20/21-stubs, phase26, phase29, phase33) confirmed out-of-scope via git log over phase 34's commit range - none touch files any 34-01..34-08 plan modified; logged as deferred, not fixed
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -508,7 +510,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-20T06:25:18.836Z
-Stopped at: Completed 34-05-PLAN.md
+Last session: 2026-07-20T06:44:14.815Z
+Stopped at: Completed 34-09-PLAN.md
 Resume file:
 None
