@@ -221,6 +221,39 @@ export const JOURNEYS: Journey[] = [
     ],
   },
 
+  {
+    id: 'record-observation',
+    group: 'Supervisor',
+    persona: 'Supervisor',
+    title: 'Record an observation of a worker',
+    summary: 'A supervisor watches a worker perform a SOP in person and records a verdict + optional note — supervisor-initiated counter-evidence to worker-initiated completions (D-01/D-03).',
+    steps: [
+      { id: 's', type: 'start', label: 'Watched a worker perform a SOP' },
+      { id: 'entry', type: 'decision', label: 'Where from?', branches: [
+        { label: 'Walking the floor — org chart/team', to: 'team' },
+        { label: 'Just watched a completion', to: 'activity' },
+      ] },
+      { id: 'team', type: 'screen', label: 'Team — person panel', route: '/admin/team', detail: 'Click a person chip on the org chart or columns board to open their PersonPanel; "Record observation" pre-fills the worker.' },
+      { id: 'activity', type: 'screen', label: 'Activity — record button / row action', route: '/activity', detail: '"Record observation" header button, or a per-completion "I observed this" row action pre-filling worker + SOP + completion_id.' },
+      { id: 'modal', type: 'screen', label: 'Record observation modal', detail: 'Shared modal: worker chip, SOP picker (assigned-first), verdict buttons, optional note. "Permanent record — cannot be edited or deleted after saving" (D-08).' },
+      { id: 'save', type: 'action', label: 'Save observation', detail: 'recordObservation() inserts append-only; sop_version server-resolved (D-10).' },
+      { id: 'e', type: 'end', label: 'Observation saved' },
+    ],
+  },
+  {
+    id: 'worker-sees-observations',
+    group: 'Worker',
+    persona: 'Worker',
+    title: 'See observations recorded about you',
+    summary: 'A worker views every observation their supervisors have made about them, in full — verdict, note, observer, date, SOP version — with no ability to edit, delete or hide any of it (D-08).',
+    steps: [
+      { id: 's', type: 'start', label: 'Wants to check their training evidence' },
+      { id: 'profile', type: 'screen', label: 'Profile', route: '/profile', detail: '"Observations about you" section, with a plain-language trust banner (NZ Privacy Act framing).' },
+      { id: 'read', type: 'action', label: 'Read observation history', detail: 'Verdict, note, observer name, date, SOP version — every row where observed_worker_id = self, newest first.' },
+      { id: 'e', type: 'end', label: 'Sees the full record' },
+    ],
+  },
+
   // ============================ Create an SOP ============================
   {
     id: 'enter-admin-tools',

@@ -677,6 +677,53 @@ export const UAT_TESTS: UatTest[] = [
   // Set status:'archived' once it's decided.
   // ---------------------------------------------------------------------------
   {
+    id: 'p34-record-observation',
+    dateAdded: '2026-07-20',
+    category: 'Phase 34 — Supervisor observations',
+    title: 'Can you record an observation of a worker doing a SOP right?',
+    status: 'active',
+    summary:
+      'Supervisors can now record that they personally watched a worker perform a SOP — a verdict (performed to SOP / needs support) plus an optional note. You can start this from a person\'s panel in Team, or straight from a completion in Activity.',
+    tryIt: [
+      'Open a worker in Team, click their name/chip to open their panel, then click "Record observation".',
+      'Pick a SOP, choose a verdict, add a short note, and save — check it appears in their observation history.',
+      'Now try the other way in: open Activity, find a completion, and use the "I observed this" row action instead — confirm it pre-fills the worker and SOP.',
+    ],
+    links: [{ label: 'Team', href: '/admin/team' }, { label: 'Activity', href: '/activity' }],
+    questions: [
+      { id: 'entry-found', text: 'Was it easy to find "Record observation" from both Team and Activity?' },
+      { id: 'save-clear', text: 'Was it clear the record is permanent once saved (can\'t be edited or deleted)?' },
+      { id: 'appears-history', text: 'Did the new observation show up straight away in that worker\'s history?' },
+    ],
+    background:
+      'OBS-01 (34-04/34-06/34-07) — recordObservation() writes an append-only row (D-12, RLS-gated); shared RecordObservationModal (34-05) is mounted from both entry points (D-03).',
+  },
+
+  {
+    id: 'p34-worker-sees-observations',
+    dateAdded: '2026-07-20',
+    category: 'Phase 34 — Supervisor observations',
+    title: 'As a worker, can you see the observations your supervisor recorded about you?',
+    status: 'active',
+    summary:
+      'Full transparency is the point — anything a supervisor records about you shows up on your own Profile page, in plain language, and you can\'t edit, delete or hide it.',
+    tryIt: [
+      'As a worker, open Profile — scroll to "Observations about you".',
+      'Read the banner explaining why these records exist and that nothing is hidden from you.',
+      'Check each observation shows the SOP, the verdict, any note your supervisor wrote, who observed you, and when.',
+      'Confirm there is no button to edit, delete, or dismiss any of them.',
+    ],
+    links: [{ label: 'Profile', href: '/profile' }],
+    questions: [
+      { id: 'section-found', text: 'Was it easy to find the observations about you on your Profile page?' },
+      { id: 'banner-clear', text: 'Did the explanation banner make it clear these records are for your training and not hidden from you?' },
+      { id: 'no-edit-control', text: 'Did you confirm there\'s no way to edit, delete, or hide an observation?' },
+    ],
+    background:
+      'OBS-02 (34-08) — listObservationsForWorker() is self-scoped (observed_worker_id = auth.uid()); ObservationsSection ships in the same change as the write UI per D-08 (worker visibility is what makes this coaching evidence, not surveillance).',
+  },
+
+  {
     id: 'example-direction-template',
     dateAdded: '2026-06-09',
     category: 'Examples',
