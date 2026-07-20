@@ -5,7 +5,9 @@ import { getSessionContext } from '@/lib/auth/session-context'
 import { AdminNav } from '@/components/admin/AdminNav'
 import { getApprovalChains } from '@/actions/approvals'
 import { getOrgMembers } from '@/actions/assignments'
+import { getObservationLabels } from '@/actions/observations'
 import { ApprovalChainEditor, type ChainMember } from '@/components/admin/governance/ApprovalChainEditor'
+import { ObservationLabelsCard } from '@/components/admin/observations/ObservationLabelsCard'
 import type { ChainStep } from '@/lib/governance/approvals'
 
 export const metadata: Metadata = {
@@ -60,7 +62,7 @@ export default async function AdminSettingsPage() {
   // Approval chains config panel (D29-05, relocated here in 30-08) — distinct
   // sops.category values for the org, no new table. Simple select + dedupe in JS.
   // The three reads are independent — run concurrently.
-  const [{ data: categoryRows }, chainsResult, membersResult] = await Promise.all([
+  const [{ data: categoryRows }, chainsResult, membersResult, observationLabels] = await Promise.all([
     supabase
       .from('sops')
       .select('category')
@@ -68,6 +70,7 @@ export default async function AdminSettingsPage() {
       .not('category', 'is', null),
     getApprovalChains(),
     getOrgMembers(),
+    getObservationLabels(),
   ])
 
   const categories = Array.from(
@@ -121,6 +124,14 @@ export default async function AdminSettingsPage() {
           <h2 className="mono text-lg font-semibold text-[var(--ink-900)]">Approval chains</h2>
         </div>
         <ApprovalChainEditor categories={categories} members={members} chains={chains} />
+      </div>
+
+      <div className="mt-8">
+        <div className="flex items-center gap-3 mb-3">
+          <span className="pill">CONFIG</span>
+          <h2 className="mono text-lg font-semibold text-[var(--ink-900)]">Observation labels</h2>
+        </div>
+        <ObservationLabelsCard initial={observationLabels} />
       </div>
     </div>
   )
