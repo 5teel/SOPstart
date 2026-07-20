@@ -5,14 +5,24 @@ import { Camera, ChevronRight } from 'lucide-react'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import type { CompletionStatus } from '@/types/sop'
 
+interface ObserveContext {
+  workerId: string
+  workerName: string
+  sopId: string
+  sopTitle: string | null
+  completionId: string
+}
+
 interface CompletionSummaryCardProps {
   id: string
+  sopId: string
   sopTitle: string | null
   submittedAt: string
   status: CompletionStatus
   photoCount: number
   workerName: string
   workerId: string
+  onObserve?: (ctx: ObserveContext) => void
 }
 
 function formatNZDateTime(isoString: string): string {
@@ -37,11 +47,14 @@ function getInitials(name: string): string {
 
 export function CompletionSummaryCard({
   id,
+  sopId,
   sopTitle,
   submittedAt,
   status,
   photoCount,
   workerName,
+  workerId,
+  onObserve,
 }: CompletionSummaryCardProps) {
   const isPending = status === 'pending_sign_off'
 
@@ -77,6 +90,21 @@ export function CompletionSummaryCard({
             )}
           </div>
         </div>
+
+        {onObserve && (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              e.preventDefault()
+              onObserve({ workerId, workerName, sopId, sopTitle, completionId: id })
+            }}
+            className="flex-shrink-0 self-center px-2.5 py-1.5 rounded border text-[10px] font-bold uppercase tracking-wide"
+            style={{ borderColor: 'var(--accent-ok)', color: 'var(--accent-ok)' }}
+          >
+            👁 I observed this
+          </button>
+        )}
 
         <ChevronRight size={18} className="text-[var(--ink-300)] flex-shrink-0 mt-2.5" />
       </div>

@@ -8,6 +8,7 @@ import { useSupervisorCompletions } from '@/hooks/useCompletions'
 import type { FilterState } from '@/hooks/useCompletions'
 import { CompletionSummaryCard } from '@/components/activity/CompletionSummaryCard'
 import { ActivityFilter } from '@/components/activity/ActivityFilter'
+import { RecordObservationModal } from '@/components/observations/RecordObservationModal'
 
 interface SupervisorActivityViewProps {
   role: 'supervisor' | 'safety_manager'
@@ -37,9 +38,17 @@ function useWorkerProfiles(workerIds: string[]) {
   })
 }
 
+interface ObserveState {
+  worker: { id: string; name: string }
+  presetSopId?: string
+  presetCompletionId?: string
+}
+
 export function SupervisorActivityView({ role: _role }: SupervisorActivityViewProps) {
   const [filter, setFilter] = useState<FilterState>({ type: 'all' })
   const { data: completions = [], isLoading } = useSupervisorCompletions(filter)
+  const [observe, setObserve] = useState<ObserveState | null>(null)
+  const [pickerOpen, setPickerOpen] = useState(false)
 
   const workerIds = useMemo(
     () => [...new Set(completions.map((c) => c.worker_id))],
@@ -71,7 +80,39 @@ export function SupervisorActivityView({ role: _role }: SupervisorActivityViewPr
 
   return (
     <div className="px-4 py-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold text-[var(--ink-900)] mb-1">Activity</h1>
+      <div className="flex items-start justify-between gap-3 mb-1">
+        <h1 className="text-2xl font-bold text-[var(--ink-900)]">Activity</h1>
+        <div className="relative flex-shrink-0">
+          <button
+            type="button"
+            onClick={() => setPickerOpen((v) => !v)}
+            disabled={workerOptions.length === 0}
+            className="px-3 py-2 rounded text-xs font-bold uppercase tracking-wide bg-[var(--ink-900)] text-white disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            ＋ Record observation
+          </button>
+          {pickerOpen && (
+            <div className="absolute right-0 top-full mt-1 w-56 max-h-56 overflow-y-auto bg-[var(--paper)] border border-[var(--ink-300)] rounded shadow-xl z-20">
+              <p className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--ink-500)] border-b border-[var(--ink-100)]">
+                Select worker
+              </p>
+              {workerOptions.map((w) => (
+                <button
+                  key={w.id}
+                  type="button"
+                  onClick={() => {
+                    setObserve({ worker: { id: w.id, name: w.name } })
+                    setPickerOpen(false)
+                  }}
+                  className="w-full text-left px-3 py-2 text-sm text-[var(--ink-900)] hover:bg-[var(--paper-2)]"
+                >
+                  {w.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
       {!isLoading && (
         <p className="text-sm text-[var(--ink-500)] mb-6">
           {pendingCount} completion{pendingCount !== 1 ? 's' : ''} awaiting review
@@ -127,18 +168,36 @@ export function SupervisorActivityView({ role: _role }: SupervisorActivityViewPr
                 <CompletionSummaryCard
                   key={completion.id}
                   id={completion.id}
+                  sopId={completion.sop_id}
                   sopTitle={completion.sop_title}
                   submittedAt={completion.submitted_at}
                   status={completion.status}
                   photoCount={completion.photo_count}
                   workerName={workerMap.get(completion.worker_id) ?? 'Unknown Worker'}
                   workerId={completion.worker_id}
+                  onObserve={(ctx) =>
+                    setObserve({
+                      worker: { id: ctx.workerId, name: ctx.workerName },
+                      presetSopId: ctx.sopId,
+                      presetCompletionId: ctx.completionId,
+                    })
+                  }
                 />
               ))}
             </div>
           )}
         </div>
       </div>
+
+      {observe && (
+        <RecordObservationModal
+          open={!!observe}
+          onClose={() => setObserve(null)}
+          worker={observe.worker}
+          presetSopId={observe.presetSopId}
+          presetCompletionId={observe.presetCompletionId}
+        />
+      )}
     </div>
   )
 }
