@@ -28,6 +28,8 @@ interface OrgColumnsBoardProps {
   departments: Department[]
   /** Called after any add/assign mutation succeeds — caller decides how to refetch. */
   onChange?: () => void
+  /** Phase 34-06 (D-03 entry A) — called only for a named (non-vacancy) person chip. */
+  onSelectPerson?: (person: { id: string; name: string; roleLabel?: string }) => void
 }
 
 const NEW_DEPT_COLOUR = '#f97316'
@@ -40,7 +42,7 @@ function initials(name: string): string {
   return name.trim().slice(0, 1).toUpperCase() || '?'
 }
 
-export function OrgColumnsBoard({ tree, orgId, inviteCode, departments, onChange }: OrgColumnsBoardProps) {
+export function OrgColumnsBoard({ tree, orgId, inviteCode, departments, onChange, onSelectPerson }: OrgColumnsBoardProps) {
   const [members, setMembers] = useState<TeamMember[]>([])
 
   useEffect(() => {
@@ -101,12 +103,23 @@ export function OrgColumnsBoard({ tree, orgId, inviteCode, departments, onChange
                 </div>
                 <div className="text-[13px] font-medium text-[var(--ink-900)] mb-1.5">{role.name}</div>
                 <div className="flex flex-wrap gap-1 mb-1.5">
-                  {role.people.map((person, i) => (
-                    <span key={person.id ?? `vacant-${i}`} className={`person-chip${person.isVacancy ? ' vacant' : ''}`}>
-                      <span className="avatar">{person.isVacancy ? '+' : initials(person.name)}</span>
-                      {person.isVacancy ? 'Vacant' : person.name}
-                    </span>
-                  ))}
+                  {role.people.map((person, i) => {
+                    const clickable = !person.isVacancy && Boolean(person.id)
+                    return (
+                      <span
+                        key={person.id ?? `vacant-${i}`}
+                        className={`person-chip${person.isVacancy ? ' vacant' : ''}${clickable ? ' cursor-pointer' : ''}`}
+                        onClick={
+                          clickable
+                            ? () => onSelectPerson?.({ id: person.id as string, name: person.name, roleLabel: role.name })
+                            : undefined
+                        }
+                      >
+                        <span className="avatar">{person.isVacancy ? '+' : initials(person.name)}</span>
+                        {person.isVacancy ? 'Vacant' : person.name}
+                      </span>
+                    )
+                  })}
                 </div>
                 <button
                   type="button"
