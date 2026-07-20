@@ -73,6 +73,8 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 
 - ✓ SOP ownership (owner on every SOP, auto-backfilled 23/23, trigger-defaulted, ≤2-click reassign) + review lifecycle (12mo default cadence, one-click Confirm current, append-only review events) + unified governance queue (/admin/governance: overdue/due-soon/unowned/stale-role, one-click actions) + dashboard widget + worker "Current as of" caption — Phase 28 (v6.0), verified 12/12 vs live prod DB
 
+- ✓ Supervisor observations — append-only sop_observations table (RLS: recorder-role org reads + worker self-read only, cross-org guard, no update/delete), 30-second record modal from PersonPanel + /activity, worker-visible history on /profile with NZ Privacy Act trust framing, org-renamable verdict labels — Phase 34 (v7.0, OBS-01..03), re-verified 5/5 after gap closure 34-10
+
 ### Active
 
 <!-- Current scope. Building toward these. -->
@@ -80,7 +82,6 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 #### v7.0 — Competency & Training Layer (defined 2026-07-19)
 - Derived competency states per person × required-SOP (CMP-01..04 — never gates worker access)
 - Training matrix on /admin/team (MTX-01..03 — grants × completions join, zero double-entry)
-- Supervisor observations, append-only + worker-visible (OBS-01..03)
 - Assessor governance with audited bootstrap override (ASR-01)
 - Training records rollforward from v6.0 Phase 31: per-worker view, SuccessFactors-shaped CSV, outdated-version surfacing, AI maintenance schedule (TRN-01..03, REV-05)
 - Guidance-notes adoptions: completeness rubric incl. E-stops≠isolation (RUB-01..03), document codes + register export (DOC-01..02), risk triage (TRI-01), refresher cadence (REF-01..02)
@@ -183,4 +184,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-19 — Milestone v7.0 (Competency & Training Layer) started; v6.0 quick-closed same day (Phase 31 rolled forward into v7.0). Prior: v5.0 shipped 2026-07-05; ad-hoc AI-layer work 2026-07-06→09 formalized by Phase 27 (2026-07-12); self-healing video render webhook shipped 2026-07-12. Source of truth `.planning/PRODUCT-ROADMAP.md` v0.3 + Visy interview findings (2026-05-05).*
+*Last updated: 2026-07-20 — Phase 34 (supervisor observations) complete, re-verified 5/5 after gap closure. Milestone v7.0 (Competency & Training Layer) started 2026-07-19; v6.0 quick-closed same day (Phase 31 rolled forward into v7.0). Prior: v5.0 shipped 2026-07-05; ad-hoc AI-layer work 2026-07-06→09 formalized by Phase 27 (2026-07-12); self-healing video render webhook shipped 2026-07-12. Source of truth `.planning/PRODUCT-ROADMAP.md` v0.3 + Visy interview findings (2026-05-05).*

@@ -1252,7 +1252,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | 30. UX Consolidation & Simplification | 8/8 | Complete    | 2026-07-14 |
 | 32. Visual Org Model & Library Permissions | 9/9 | Complete    | 2026-07-18 |
 | 33. Per-SOP Access Granularity + Wayfinder Header | 11/11 | Complete    | 2026-07-19 |
-| 34. Supervisor Observations | 10/10 | Complete   | 2026-07-20 |
+| 34. Supervisor Observations | 10/10 | Complete    | 2026-07-20 |
 | 35. Competency Classifier + Training Matrix + Records | 0/TBD | Not started |  |
 | 36. Refresher Cadence + Version-Currency | 0/TBD | Not started |  |
 | 37. Assessor Governance | 0/TBD | Not started |  |
