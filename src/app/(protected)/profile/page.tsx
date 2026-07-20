@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { LogoutButton } from '@/components/profile/LogoutButton'
 import { OrgSwitcher } from '@/components/profile/OrgSwitcher'
+import { ObservationsSection } from '@/components/profile/ObservationsSection'
 
 export default async function ProfilePage() {
   const { userId, userEmail } = await getSessionContext()
@@ -27,6 +28,9 @@ export default async function ProfilePage() {
 
       {/* Org memberships + switcher */}
       <OrgSwitcher />
+
+      {/* Observations about you (OBS-02) */}
+      <ObservationsSection />
 
       {/* Sign out */}
       <LogoutButton />

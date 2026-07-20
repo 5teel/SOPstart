@@ -56,6 +56,25 @@ test.describe('OBS-02 — worker self-read source contract', () => {
     }
     expect(src).toContain('export async function listObservationsForWorker')
   })
+
+  test('listObservationsForWorker takes no worker-id parameter and filters observed_worker_id by the session userId — self-scoped, never another worker\'s rows', () => {
+    if (!fs.existsSync(OBSERVATIONS_ACTION)) {
+      test.skip(true, 'src/actions/observations.ts not yet created — waiting for Plan 34-04/34-08')
+      return
+    }
+    const src = read(OBSERVATIONS_ACTION)
+    if (!src.includes('listObservationsForWorker')) {
+      test.skip(true, 'listObservationsForWorker not yet exported — waiting for Plan 34-08')
+      return
+    }
+    const start = src.indexOf('export async function listObservationsForWorker')
+    const nextExport = src.indexOf('\nexport ', start + 1)
+    const fnBody = nextExport === -1 ? src.slice(start) : src.slice(start, nextExport)
+    // Signature takes no parameters — identity comes only from the session.
+    expect(fnBody).toMatch(/export async function listObservationsForWorker\(\s*\)/)
+    expect(fnBody).toContain('getSessionContext(')
+    expect(fnBody).toContain("eq('observed_worker_id', userId)")
+  })
 })
 
 // ---------------------------------------------------------------------------
@@ -67,9 +86,17 @@ test.describe('OBS-02 — worker self-read runtime (requires chromium + live app
   test.fixme(
     'an authenticated worker reads /profile and sees every observation where observed_worker_id = self (verdict, note, observer name, date, sop version) — never another worker\'s rows',
     async ({ page }) => {
+      // Full steps for the Railway-only UAT pass (CLAUDE.md 2026-04-24/2026-05-08
+      // convention — cookie-based session install, no local dev/localhost):
+      // 1. Sign in as a supervisor, record an observation against worker A
+      //    (verdict + note) via /admin/team person panel or /activity.
+      // 2. Sign in as worker A, visit /profile.
+      // 3. Assert the "Observations about you" section shows that row with
+      //    verdict, note, observer name, date, and "SOP v{n}" — and that no
+      //    edit/delete/hide control exists on it (append-only, D-08).
+      // 4. Sign in as worker B (same org, never observed) and visit /profile —
+      //    assert the section renders "No observations yet." (never worker A's row).
       await page.goto('/profile')
-      // Assert the "Observations about you" section renders only rows where
-      // observed_worker_id matches the logged-in worker's own id.
     },
   )
 })
