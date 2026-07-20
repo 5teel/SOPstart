@@ -14,7 +14,7 @@
  */
 import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { RecordObservationSchema } from '@/lib/validators/observations'
+import { RecordObservationSchema, ObservationLabelsSchema } from '@/lib/validators/observations'
 
 const DEFAULT_LABELS = {
   performed_to_sop: 'Performed to SOP',
@@ -87,10 +87,14 @@ export async function getObservationLabels(): Promise<typeof DEFAULT_LABELS> {
   return { ...DEFAULT_LABELS, ...(data?.observation_labels ?? {}) }
 }
 
-export async function setObservationLabels(input: {
-  performed_to_sop?: string
-  needs_support?: string
-}): Promise<{ success: true } | { success: false; error: string }> {
+export async function setObservationLabels(
+  rawInput: unknown
+): Promise<{ success: true } | { success: false; error: string }> {
+  const parsed = ObservationLabelsSchema.safeParse(rawInput)
+  if (!parsed.success) {
+    return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid label input' }
+  }
+
   const { userId, role, organisationId } = await getSessionContext()
   if (!userId) return { success: false, error: 'Not authenticated' }
   if (!role || !['admin', 'safety_manager'].includes(role)) {
@@ -100,8 +104,8 @@ export async function setObservationLabels(input: {
 
   const current = await getObservationLabels()
   const labels = {
-    performed_to_sop: input.performed_to_sop ?? current.performed_to_sop,
-    needs_support: input.needs_support ?? current.needs_support,
+    performed_to_sop: parsed.data.performed_to_sop ?? current.performed_to_sop,
+    needs_support: parsed.data.needs_support ?? current.needs_support,
   }
 
   // organisations has no authenticated UPDATE policy (00002_rls_policies.sql
@@ -207,9 +211,14 @@ export interface WorkerSopOption {
 // Org's published SOPs, sorted assigned-first for the given worker (D-06).
 // Sourced from sop_assignments (individual + role rows) — no new
 // "required SOPs" data source (34-RESEARCH Open Question 1).
+//
+// Gated to recorder roles: the caller is always a supervisor/admin/safety_manager
+// recording ON BEHALF OF the observed worker (workerId), never the worker
+// themselves.
 export async function listWorkerSopsForPicker(workerId: string): Promise<WorkerSopOption[]> {
-  const { supabase, userId, organisationId } = await getSessionContext()
+  const { supabase, userId, role, organisationId } = await getSessionContext()
   if (!userId || !organisationId) return []
+  if (!role || !RECORDER_ROLES.includes(role)) return []
 
   const { data: sops, error: sopsError } = await supabase
     .from('sops')
@@ -219,6 +228,9 @@ export async function listWorkerSopsForPicker(workerId: string): Promise<WorkerS
 
   if (sopsError || !sops) return []
 
+  // org_members_can_view_own_org already permits any org member to read
+  // this row — unlike sop_assignments below, this query is not the
+  // defective policy and stays on the session client.
   const { data: workerMember } = await supabase
     .from('organisation_members')
     .select('role')
@@ -226,17 +238,27 @@ export async function listWorkerSopsForPicker(workerId: string): Promise<WorkerS
     .eq('organisation_id', organisationId)
     .maybeSingle()
 
-  const { data: individual } = await supabase
+  // sop_assignments RLS (00007 workers_can_view_own_assignments) only
+  // exposes rows matching the CALLER's own id/role, never the observed
+  // worker's — so for a supervisor caller these reads are always empty via
+  // the session client. Use the admin client, self-enforcing org scope on
+  // both queries (CLAUDE.md 2026-06-15 pattern), keyed to the OBSERVED
+  // worker's id/role, never the caller's.
+  const admin = createAdminClient()
+
+  const { data: individual } = await admin
     .from('sop_assignments')
     .select('sop_id')
+    .eq('organisation_id', organisationId)
     .eq('user_id', workerId)
     .eq('assignment_type', 'individual')
 
   let roleAssigned: { sop_id: string }[] = []
   if (workerMember?.role) {
-    const { data } = await supabase
+    const { data } = await admin
       .from('sop_assignments')
       .select('sop_id')
+      .eq('organisation_id', organisationId)
       .eq('role', workerMember.role)
       .eq('assignment_type', 'role')
     roleAssigned = data ?? []

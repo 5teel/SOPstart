@@ -22,3 +22,11 @@ export const RecordObservationSchema = z.object({
   completionId: z.string().uuid().optional(),
 })
 export type RecordObservationInput = z.infer<typeof RecordObservationSchema>
+
+// WR-01: setObservationLabels payload — a malformed label (e.g. an
+// oversized string) must not crash every worker's /profile render.
+export const ObservationLabelsSchema = z.object({
+  performed_to_sop: z.string().trim().min(1).max(80).optional(),
+  needs_support: z.string().trim().min(1).max(80).optional(),
+})
+export type ObservationLabelsInput = z.infer<typeof ObservationLabelsSchema>
