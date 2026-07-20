@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: — Competency & Training Layer
 status: executing
-stopped_at: Completed 34-04-PLAN.md
-last_updated: "2026-07-20T06:14:44.361Z"
+stopped_at: Completed 34-05-PLAN.md
+last_updated: "2026-07-20T06:25:18.844Z"
 last_activity: 2026-07-20 -- Phase 34 execution started
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 9
-  completed_plans: 4
+  completed_plans: 5
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 34 (supervisor-observations) — EXECUTING
-Plan: 3 of 9
+Plan: 4 of 9
 Status: Ready to execute
 Last activity: 2026-07-20 -- Phase 34 execution started
 
@@ -182,6 +182,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 33 P11 | 20min | 4 tasks | 3 files |
 | Phase 34 P03 | 35min | 2 tasks | 3 files |
 | Phase 34 P04 | 25min | 2 tasks | 2 files |
+| Phase 34 P05 | ~15min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -396,6 +397,7 @@ Recent decisions affecting current work:
 - [Phase 34-03]: sop_observations INSERT policy requires a SECURITY DEFINER cross-table FK-ownership guard (sop_observation_refs_in_org) — org-scope check alone does not verify referenced sop_id/observed_worker_id belong to that org — Live probe found an org-B supervisor could insert an observation using their own organisation_id while naming an org-A sop/worker; migration 00053 closes it
 - [Phase 34-04]: Scoped the record-observation.spec.ts createAdminClient ban to recordObservation's function body only, not the whole file — setObservationLabels legitimately needs createAdminClient (organisations has no authenticated UPDATE policy)
 - [Phase 34-04]: listWorkerSopsForPicker maps the picker's 'code' field to sops.sop_number (existing column) — no new document-code column exists yet (Phase 38 DOC-01/02 scope)
+- [Phase 34-05]: react-hooks/set-state-in-effect requires the render-time 'adjusting state on prop change' pattern (useState-tracked prevOpen, not useRef) for modal reset-on-open logic; async fetch results must land only inside .then() callbacks, never synchronously at the top of a useEffect body
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -506,7 +508,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-20T06:14:44.354Z
-Stopped at: Completed 34-04-PLAN.md
+Last session: 2026-07-20T06:25:18.836Z
+Stopped at: Completed 34-05-PLAN.md
 Resume file:
 None
