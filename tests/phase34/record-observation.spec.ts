@@ -55,8 +55,17 @@ test.describe('OBS-01 — recordObservation source contract', () => {
       return
     }
     const src = read(OBSERVATIONS_ACTION)
-    expect(src).toContain('getSessionContext(')
-    expect(src).not.toContain('createAdminClient(')
+    // Scoped to the recordObservation function body (D-12 applies to the
+    // observation insert path specifically) — setObservationLabels and
+    // observer-name resolution legitimately use createAdminClient elsewhere
+    // in this file (organisations has no authenticated UPDATE policy;
+    // auth.admin.listUsers requires service-role — both self-enforce org
+    // scope per the CLAUDE.md 2026-06-15 pattern).
+    const start = src.indexOf('export async function recordObservation')
+    const nextExport = src.indexOf('\nexport async function', start + 1)
+    const fnBody = nextExport === -1 ? src.slice(start) : src.slice(start, nextExport)
+    expect(fnBody).toContain('getSessionContext(')
+    expect(fnBody).not.toContain('createAdminClient(')
   })
 })
 
