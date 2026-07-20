@@ -25,6 +25,8 @@ interface OrgChartCanvasProps {
   orgName?: string
   /** Called after any add-affordance mutation succeeds — caller decides how to refetch. */
   onChange?: () => void
+  /** Phase 34-06 (D-03 entry A) — called only for a named (non-vacancy) person chip. */
+  onSelectPerson?: (person: { id: string; name: string; roleLabel?: string }) => void
 }
 
 /** organisationId -> areas -> [ungrouped depts] edges, mirroring auto-layout's own children map (kept local — layoutOrgTree's contract is Map/width/height only). */
@@ -54,7 +56,7 @@ function initials(name: string): string {
 
 const NEW_DEPT_COLOUR = '#f97316'
 
-export function OrgChartCanvas({ tree, orgName = 'Organisation', onChange }: OrgChartCanvasProps) {
+export function OrgChartCanvas({ tree, orgName = 'Organisation', onChange, onSelectPerson }: OrgChartCanvasProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
@@ -229,12 +231,23 @@ export function OrgChartCanvas({ tree, orgName = 'Organisation', onChange }: Org
                       </div>
                       <div className="text-[13px] font-medium text-[var(--ink-900)] mb-1.5">{role.name}</div>
                       <div className="flex flex-wrap gap-1">
-                        {role.people.map((person, i) => (
-                          <span key={person.id ?? `vacant-${i}`} className={`person-chip${person.isVacancy ? ' vacant' : ''}`}>
-                            <span className="avatar">{person.isVacancy ? '+' : initials(person.name)}</span>
-                            {person.isVacancy ? 'Vacant' : person.name}
-                          </span>
-                        ))}
+                        {role.people.map((person, i) => {
+                          const clickable = !person.isVacancy && Boolean(person.id)
+                          return (
+                            <span
+                              key={person.id ?? `vacant-${i}`}
+                              className={`person-chip${person.isVacancy ? ' vacant' : ''}${clickable ? ' cursor-pointer' : ''}`}
+                              onClick={
+                                clickable
+                                  ? () => onSelectPerson?.({ id: person.id as string, name: person.name, roleLabel: role.name })
+                                  : undefined
+                              }
+                            >
+                              <span className="avatar">{person.isVacancy ? '+' : initials(person.name)}</span>
+                              {person.isVacancy ? 'Vacant' : person.name}
+                            </span>
+                          )
+                        })}
                       </div>
                     </div>
                   )

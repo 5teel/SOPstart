@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation'
 import { ViewToggle } from '@/components/admin/org-model/ViewToggle'
 import { OrgChartCanvas } from '@/components/admin/org-model/OrgChartCanvas'
 import { OrgColumnsBoard } from '@/components/admin/org-model/OrgColumnsBoard'
+import { PersonPanel } from '@/components/admin/org-model/PersonPanel'
 import type { OrgTree } from '@/types/org-model'
 import type { Department } from '@/types/sop'
 
@@ -35,6 +36,7 @@ interface TeamViewShellProps {
 
 export function TeamViewShell({ tree, orgName, orgId, inviteCode, departments }: TeamViewShellProps) {
   const [view, setView] = useState<'chart' | 'columns'>('chart')
+  const [selectedPerson, setSelectedPerson] = useState<{ id: string; name: string; roleLabel?: string } | null>(null)
   const router = useRouter()
   const refetch = () => router.refresh()
 
@@ -48,7 +50,7 @@ export function TeamViewShell({ tree, orgName, orgId, inviteCode, departments }:
         />
       </div>
       {view === 'chart' ? (
-        <OrgChartCanvas tree={tree} orgName={orgName} onChange={refetch} />
+        <OrgChartCanvas tree={tree} orgName={orgName} onChange={refetch} onSelectPerson={setSelectedPerson} />
       ) : (
         <OrgColumnsBoard
           tree={tree}
@@ -56,8 +58,10 @@ export function TeamViewShell({ tree, orgName, orgId, inviteCode, departments }:
           inviteCode={inviteCode}
           departments={departments}
           onChange={refetch}
+          onSelectPerson={setSelectedPerson}
         />
       )}
+      <PersonPanel person={selectedPerson} onClose={() => setSelectedPerson(null)} />
     </div>
   )
 }
