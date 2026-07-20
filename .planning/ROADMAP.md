@@ -305,7 +305,7 @@ Plans:
 
 Turns data SafeStart already stores (access grants = who must know what; completions + immutable sign-off chains = what's been evidenced) into a full competency system: a training matrix, derived competency states, and supervisor observation records — the audit artifact every ACC reviewer, WorkSafe inspector, and site manager asks for. Absorbs v6.0's unshipped Phase 31 (training records + AI maintenance schedule) and promotes four guidance-notes backlog items (999.4-999.7). **NORTH STAR (carried from v6.0, locked by Simon 2026-07-12):** ease of use and maintenance first — competency tracking exists only in service of accurate documentation and shop-floor ease of use; worker read/walkthrough access is NEVER gated by competency state (locked guard, regression-tested). Builds on existing infra only: access grants + materialization (Phases 32-33), completions + sign-off chain (Phases 4/23), departments (Phase 25), AI reviewer jobs (Phase 21), agent metadata + AI adapter (Phase 26.5/27), governance queue (Phase 28). Execution order 34 → 35 → 36 → 37 → 38 → 39 (38 is parallel-safe and can run alongside 35-37).
 
-- [x] **Phase 34: Supervisor Observations** - Append-only, org-scoped observation records supervisors log against a worker + SOP, visible to the worker themselves — the standalone evidence-layer foundation (completed 2026-07-20)
+- [ ] **Phase 34: Supervisor Observations** - Append-only, org-scoped observation records supervisors log against a worker + SOP, visible to the worker themselves — the standalone evidence-layer foundation (verification 2026-07-20: gaps_found — see 34-VERIFICATION.md)
 - [ ] **Phase 35: Competency Classifier + Training Matrix + Records** - Derived-live competency state per person×SOP, a training matrix on /admin/team, and per-worker training record + CSV export — one pure classifier, zero stored/stale state
 - [ ] **Phase 36: Refresher Cadence + Version-Currency** - Trained-on-outdated-version surfacing after supersede, plus due/overdue refresher re-walkthroughs — informational only, never blocking (promotes backlog 999.7)
 - [ ] **Phase 37: Assessor Governance** - Only a signed-off assessor can record a competence-advancing observation, with an audited admin-override path for new-org bootstrap
@@ -1252,7 +1252,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | 30. UX Consolidation & Simplification | 8/8 | Complete    | 2026-07-14 |
 | 32. Visual Org Model & Library Permissions | 9/9 | Complete    | 2026-07-18 |
 | 33. Per-SOP Access Granularity + Wayfinder Header | 11/11 | Complete    | 2026-07-19 |
-| 34. Supervisor Observations | 9/9 | Complete   | 2026-07-20 |
+| 34. Supervisor Observations | 9/9 | Gaps found | 2026-07-20 |
 | 35. Competency Classifier + Training Matrix + Records | 0/TBD | Not started |  |
 | 36. Refresher Cadence + Version-Currency | 0/TBD | Not started |  |
 | 37. Assessor Governance | 0/TBD | Not started |  |
