@@ -120,3 +120,139 @@ export async function setObservationLabels(input: {
   }
   return { success: true }
 }
+
+// ---------------------------------------------------------------
+// Read actions
+// ---------------------------------------------------------------
+
+const RECORDER_ROLES = ['supervisor', 'admin', 'safety_manager']
+
+export interface ObservationRow {
+  id: string
+  sopId: string
+  sopTitle: string | null
+  sopVersion: number
+  verdict: string
+  note: string | null
+  observerName: string
+  createdAt: string
+}
+
+async function resolveDisplayNames(userIds: string[]): Promise<Record<string, string>> {
+  const names: Record<string, string> = {}
+  const ids = Array.from(new Set(userIds))
+  if (ids.length === 0) return names
+
+  const admin = createAdminClient()
+  const { data } = await admin.auth.admin.listUsers({ perPage: 1000 })
+  for (const u of data.users) {
+    if (ids.includes(u.id) && u.email) names[u.id] = u.email
+  }
+  return names
+}
+
+async function mapObservationRows(rows: any[]): Promise<ObservationRow[]> {
+  const observerNames = await resolveDisplayNames(rows.map((r) => r.observed_by).filter(Boolean))
+  return rows.map((r) => ({
+    id: r.id,
+    sopId: r.sop_id,
+    sopTitle: r.sops?.title ?? null,
+    sopVersion: r.sop_version,
+    verdict: r.verdict,
+    note: r.note,
+    observerName: (r.observed_by && observerNames[r.observed_by]) || 'Unknown',
+    createdAt: r.created_at,
+  }))
+}
+
+// Self-scoped: the worker's own observation history (OBS-02, /profile).
+export async function listObservationsForWorker(): Promise<ObservationRow[]> {
+  const { supabase, userId } = await getSessionContext()
+  if (!userId) return []
+
+  const { data, error } = await (supabase as any)
+    .from('sop_observations')
+    .select('id, sop_id, sop_version, verdict, note, observed_by, created_at, sops(title)')
+    .eq('observed_worker_id', userId)
+    .order('created_at', { ascending: false })
+
+  if (error || !data) return []
+  return mapObservationRows(data)
+}
+
+// Org-scoped: observation history for an arbitrary worker (person panel).
+// Gated to recorder roles — RLS already confines rows to the caller's org.
+export async function listObservationsForPerson(workerId: string): Promise<ObservationRow[]> {
+  const { supabase, userId, role } = await getSessionContext()
+  if (!userId) return []
+  if (!role || !RECORDER_ROLES.includes(role)) return []
+
+  const { data, error } = await (supabase as any)
+    .from('sop_observations')
+    .select('id, sop_id, sop_version, verdict, note, observed_by, created_at, sops(title)')
+    .eq('observed_worker_id', workerId)
+    .order('created_at', { ascending: false })
+
+  if (error || !data) return []
+  return mapObservationRows(data)
+}
+
+export interface WorkerSopOption {
+  id: string
+  title: string | null
+  code: string | null
+  assigned: boolean
+}
+
+// Org's published SOPs, sorted assigned-first for the given worker (D-06).
+// Sourced from sop_assignments (individual + role rows) — no new
+// "required SOPs" data source (34-RESEARCH Open Question 1).
+export async function listWorkerSopsForPicker(workerId: string): Promise<WorkerSopOption[]> {
+  const { supabase, userId, organisationId } = await getSessionContext()
+  if (!userId || !organisationId) return []
+
+  const { data: sops, error: sopsError } = await supabase
+    .from('sops')
+    .select('id, title, sop_number')
+    .eq('organisation_id', organisationId)
+    .eq('status', 'published')
+
+  if (sopsError || !sops) return []
+
+  const { data: workerMember } = await supabase
+    .from('organisation_members')
+    .select('role')
+    .eq('user_id', workerId)
+    .eq('organisation_id', organisationId)
+    .maybeSingle()
+
+  const { data: individual } = await supabase
+    .from('sop_assignments')
+    .select('sop_id')
+    .eq('user_id', workerId)
+    .eq('assignment_type', 'individual')
+
+  let roleAssigned: { sop_id: string }[] = []
+  if (workerMember?.role) {
+    const { data } = await supabase
+      .from('sop_assignments')
+      .select('sop_id')
+      .eq('role', workerMember.role)
+      .eq('assignment_type', 'role')
+    roleAssigned = data ?? []
+  }
+
+  const assignedIds = new Set([
+    ...(individual ?? []).map((a) => a.sop_id),
+    ...roleAssigned.map((a) => a.sop_id),
+  ])
+
+  return sops
+    .map((s) => ({
+      id: s.id,
+      title: s.title,
+      code: s.sop_number,
+      assigned: assignedIds.has(s.id),
+    }))
+    .sort((a, b) => Number(b.assigned) - Number(a.assigned))
+}
