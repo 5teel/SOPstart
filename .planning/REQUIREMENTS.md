@@ -634,7 +634,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 - [x] **OBS-01**: Supervisor can record a 30-second observation of a worker against a SOP (verdict + optional note) — append-only, mirrors the sign-off/review-event RLS pattern
 - [x] **OBS-02**: Worker can see observations recorded about them (trust / NZ Privacy Act framing — ships in the same change as the supervisor write UI)
-- [ ] **OBS-03**: Observations appear under the worker's profile and feed the derived competency state
+- [x] **OBS-03**: Observations appear under the worker's profile and feed the derived competency state
 
 ### Assessor (ASR)
 
@@ -681,7 +681,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 |--------|-------|--------|
 | OBS-01 | Phase 34 | Complete |
 | OBS-02 | Phase 34 | Complete |
-| OBS-03 | Phase 34 | Pending |
+| OBS-03 | Phase 34 | Complete |
 | CMP-01 | Phase 35 | Pending |
 | CMP-02 | Phase 35 | Pending |
 | CMP-04 | Phase 35 | Pending |
