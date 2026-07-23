@@ -47,6 +47,7 @@ created: 2026-07-23
 | 35-03-T1 | 35-03 | 3 | MTX-01, MTX-03, CMP-01 | T-35-03-02 | matrix pills passive (no worker gate); fit-driven compaction | source-contract | `npx playwright test --project=phase35 tests/phase35/training-matrix-view.spec.ts tests/phase35/matrix-filters.spec.ts` | ❌ create | ⬜ pending |
 | 35-03-T2 | 35-03 | 3 | TRN-01 | T-35-03-01 | grouped-by-SOP record + other-completed; informational | source-contract | `npx playwright test --project=phase35 tests/phase35/training-record.spec.ts` | ❌ create | ⬜ pending |
 | 35-03-T3 | 35-03 | 3 | MTX-01 | T-35-03-03 | matrix view wired; /pathways 0 not-mapped | build/type + source-contract | `npx tsc --noEmit && npx playwright test --project=phase35` | ❌ create | ⬜ pending |
+| 35-03-T4 | 35-03 | 3 | TRN-02 | T-35-03-04 | both D-16 export buttons INVOKE exportTrainingCsv → Blob download (wiring, not string presence) | source-contract | `npx playwright test --project=phase35 tests/phase35/training-matrix-view.spec.ts tests/phase35/training-record.spec.ts` | ❌ create | ⬜ pending |
 | 35-04-T1 | 35-04 | 3 | CMP-01, CMP-04 | T-35-04-01/02 | worker own-states informational; guard now active on CompetencySection | source-contract | `npx tsc --noEmit && npx playwright test --project=phase35 tests/phase35/no-competency-gate.spec.ts` | ❌ create | ⬜ pending |
 | 35-04-T2 | 35-04 | 3 | CMP-04 | T-35-04-01/02 | self-scoped (getMyCompetencyStates only); gate-free | source-contract | `npx playwright test --project=phase35 tests/phase35/profile-competency.spec.ts` | ❌ create | ⬜ pending |
 

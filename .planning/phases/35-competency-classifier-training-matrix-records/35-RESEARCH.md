@@ -303,17 +303,19 @@ interface PersonPanelProps {
 
 **If this table is empty:** N/A — see above; none of these block planning, all are flagged appropriately.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Exact "awaiting sign-off" pill treatment (sketch nuance, Claude's discretion per CONTEXT.md)**
    - What we know: sketch 05 shows 5 pill labels but the classifier only has 4 canonical states; "Awaiting sign-off" is `read` + "a completion exists with no sign-off yet."
    - What's unclear: whether this needs a 5th *presentation* state (derived: `read` AND `hasCompletion` AND not yet observed/signed) or folds into the plain `read` pill.
    - Recommendation: Add a presentation-only derived boolean (`awaitingSignOff = state === 'read' && hasCompletion`) computed from the SAME evidence the classifier already produces — do not add a 5th canonical `CompetencyState` value, keep the state enum at 4 members (matches CMP-01's exact wording: "not started / read / supervised / competent-signed-off").
+   - **RESOLVED (planning):** Adopted the recommendation. 35-01 Task 1 keeps `CompetencyState` at exactly four members and adds a presentation-only `awaitingSignOff` boolean (`state === 'read' && hasCompletion && !needsSupportFlag`) to `CompetencyResult`; StatePill (35-02) renders the "Awaiting sign-off" pill from that boolean, not a 5th state.
 
 2. **Which existing `sop_access_people` RLS branch shape actually exists today**
    - What we know: 00046 defines `sop_access_people_self_read`, described in-migration as mirroring `member_departments_self_read`.
    - What's unclear: I did not read the full policy body (truncated in this research pass) — whether the admin/safety_manager/supervisor branch checks role or just org.
    - Recommendation: Planner/Wave-0 should `grep -A15 "sop_access_people_self_read" supabase/migrations/00046_org_model_schema.sql` and confirm before writing `getTrainingMatrix` reads against the session client vs. admin client.
+   - **RESOLVED (planning):** Confirmed against migration 00046 — the `sop_access_people_self_read` org branch gates on `role in ('admin','safety_manager')` and EXCLUDES `'supervisor'`. Therefore 35-02 Task 2 reads `sop_access_people` via the **admin client** with self-enforced org-scope (a supervisor caller on the session client would get zero rows — the Phase 34-10 dead-feature class); pinned by `competency-actions.spec.ts` + staged in the runtime RLS probe.
 
 ## Environment Availability
 
