@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: — Competency & Training Layer
 status: verifying
-stopped_at: Completed 34-10-PLAN.md (gap closure)
-last_updated: "2026-07-20T11:35:59.171Z"
+stopped_at: Phase 35 context gathered
+last_updated: "2026-07-23T13:18:50.769Z"
 last_activity: 2026-07-20
 progress:
   total_phases: 6
@@ -514,7 +514,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-20T11:27:50.358Z
-Stopped at: Completed 34-10-PLAN.md (gap closure)
+Last session: 2026-07-23T13:18:50.759Z
+Stopped at: Phase 35 context gathered
 Resume file:
-None
+.planning/phases/35-competency-classifier-training-matrix-records/35-CONTEXT.md
