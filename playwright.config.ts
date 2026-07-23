@@ -430,5 +430,35 @@ export default defineConfig({
       testMatch: /tests\/phase34\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 35 -- Competency Classifier + Training Matrix + Records
+      // Nyquist harness (Wave 0 / Plan 35-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase35/**) so every later plan in
+      // the phase drops specs into tests/phase35/ with NO further config edit --
+      // single registration point for the whole phase (mirrors phase26/28/29/30/32/33/34).
+      //
+      // Verify registration: `npx playwright test --list --project=phase35`
+      //
+      // Wave-0 stub files: matrix-derivation (MTX-02) - no-competency-gate (CMP-04)
+      name: 'phase35',
+      testDir: '.',
+      testMatch: /tests\/phase35\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
+    {
+      // Phase 35 Plan 01 -- classify/matrix/csv unit tests (pure modules; static imports).
+      //
+      // CLAUDE.md 2026-04-24: dynamic import('@/...') fails in Playwright Node runner
+      // outside a testDir-scoped project -- use STATIC @/ imports here.
+      // testDir: './src/lib/competency/__tests__' so Playwright's TS compiler resolves
+      // @/ path aliases (mirrors phase28-unit/phase32-unit pattern).
+      //
+      // Verify: `npx playwright test --list --project=phase35-unit`
+      name: 'phase35-unit',
+      testDir: './src/lib/competency/__tests__',
+      testMatch: /.*\.test\.ts$/,
+    },
   ],
 })
