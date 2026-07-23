@@ -368,12 +368,23 @@ Plans:
   3. Worker read/walkthrough access is never gated by competency state — enforced by a locked regression guard (mirrors the Phase 28 north-star guard)
   4. Admin can open a per-worker training record showing every completion as evidence (SOP, version, date, sign-off chain) and export it as CSV filterable by worker/SOP/department/date range, shaped for SuccessFactors Learning History import
 
-**Plans**: TBD
+**Plans**: 4 plans in 3 waves
 **UI hint**: yes
 
 Plans:
 
-- [ ] TBD (created by /gsd-plan-phase)
+**Wave 1**
+
+- [ ] 35-01-PLAN.md — Pure competency core (classify/matrix/csv) + Wave-0 harness (phase35 + phase35-unit projects, CMP-04 guard, MTX-02 no-double-derivation contract)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 35-02-PLAN.md — Server actions (matrix/record/self/CSV) + Zod filter validators + StatePill/CSS tokens + auth/org-scope source-contract + per-role RLS probe
+
+**Wave 3** *(blocked on Wave 2, parallel)*
+
+- [ ] 35-03-PLAN.md — Training matrix third /admin/team view + PersonPanel training record + cell-click deep-link + journeys/uat (MTX-01/03, TRN-01)
+- [ ] 35-04-PLAN.md — Worker /profile "My competency" own-states section (informational, activates CMP-04 guard on CompetencySection)
 
 ### Phase 36: Refresher Cadence + Version-Currency
 
