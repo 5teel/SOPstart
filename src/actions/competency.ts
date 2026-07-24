@@ -56,16 +56,25 @@ async function callerOrgId(admin: any, userId: string, sessionOrgId: string | nu
   return (data?.organisation_id as string | undefined) ?? sessionOrgId
 }
 
-/** No full-name field exists anywhere in this codebase — email is the display name everywhere (mirrors observations.ts resolveDisplayNames). */
+/** No full-name field exists anywhere in this codebase — email is the display name everywhere (mirrors observations.ts resolveDisplayNames).
+ * Pages through listUsers (the auth admin API pools ALL tenants) until every
+ * requested id is resolved or pages are exhausted — a single perPage:1000
+ * call silently renders users beyond page 1 as 'Unknown'/'unknown'. */
 async function resolveDisplayNames(userIds: string[]): Promise<Record<string, string>> {
   const names: Record<string, string> = {}
-  const ids = Array.from(new Set(userIds.filter(Boolean)))
-  if (ids.length === 0) return names
+  const remaining = new Set(userIds.filter(Boolean))
+  if (remaining.size === 0) return names
 
   const admin = createAdminClient()
-  const { data } = await admin.auth.admin.listUsers({ perPage: 1000 })
-  for (const u of data.users) {
-    if (ids.includes(u.id) && u.email) names[u.id] = u.email
+  for (let page = 1; remaining.size > 0; page++) {
+    const { data } = await admin.auth.admin.listUsers({ page, perPage: 1000 })
+    for (const u of data.users) {
+      if (remaining.has(u.id) && u.email) {
+        names[u.id] = u.email
+        remaining.delete(u.id)
+      }
+    }
+    if (data.users.length < 1000) break
   }
   return names
 }

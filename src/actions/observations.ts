@@ -142,15 +142,24 @@ export interface ObservationRow {
   createdAt: string
 }
 
+/** Pages through listUsers (the auth admin API pools ALL tenants) until every
+ * requested id is resolved or pages are exhausted — a single perPage:1000
+ * call silently renders users beyond page 1 as 'Unknown'. */
 async function resolveDisplayNames(userIds: string[]): Promise<Record<string, string>> {
   const names: Record<string, string> = {}
-  const ids = Array.from(new Set(userIds))
-  if (ids.length === 0) return names
+  const remaining = new Set(userIds.filter(Boolean))
+  if (remaining.size === 0) return names
 
   const admin = createAdminClient()
-  const { data } = await admin.auth.admin.listUsers({ perPage: 1000 })
-  for (const u of data.users) {
-    if (ids.includes(u.id) && u.email) names[u.id] = u.email
+  for (let page = 1; remaining.size > 0; page++) {
+    const { data } = await admin.auth.admin.listUsers({ page, perPage: 1000 })
+    for (const u of data.users) {
+      if (remaining.has(u.id) && u.email) {
+        names[u.id] = u.email
+        remaining.delete(u.id)
+      }
+    }
+    if (data.users.length < 1000) break
   }
   return names
 }
