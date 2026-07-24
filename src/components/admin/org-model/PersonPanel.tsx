@@ -17,15 +17,18 @@ import {
 } from '@/actions/observations'
 import { ObservationRow } from '@/components/observations/ObservationRow'
 import { RecordObservationModal } from '@/components/observations/RecordObservationModal'
+import { TrainingRecordSection } from '@/components/admin/competency/TrainingRecordSection'
 
 interface PersonPanelProps {
   person: { id: string; name: string; roleLabel?: string } | null
+  /** Phase 35 (D-09) — scroll+highlight this SOP's evidence block on open. */
+  focusSopId?: string | null
   onClose: () => void
 }
 
 const DEFAULT_LABELS = { performed_to_sop: 'Performed to SOP', needs_support: 'Needs support' }
 
-export function PersonPanel({ person, onClose }: PersonPanelProps) {
+export function PersonPanel({ person, focusSopId, onClose }: PersonPanelProps) {
   const [history, setHistory] = useState<ObservationRowData[]>([])
   const [labels, setLabels] = useState(DEFAULT_LABELS)
   const [loading, setLoading] = useState(false)
@@ -124,9 +127,8 @@ export function PersonPanel({ person, onClose }: PersonPanelProps) {
             </div>
           </section>
 
-          {/* Growth point (Phase 35): this section list is where the
-              per-worker training record will be appended. Nothing to
-              render here yet — intentionally lean. */}
+          {/* Training record (Phase 35, TRN-01/D-09/D-11) */}
+          <TrainingRecordSection personId={person.id} focusSopId={focusSopId} />
         </div>
       </div>
 
