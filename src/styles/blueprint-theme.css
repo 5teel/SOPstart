@@ -109,6 +109,15 @@ body[data-theme="paper"] .pill {
   background: transparent;
 }
 
+/* Phase 35 -- "Needs support" flag chip (CMP-01/D-02): coaching-toned amber,
+ * never red -- the complacency-reset mechanism is a nudge, not a penalty.
+ * color-mix idiom mirrors the 32-06 org-model tint pattern. */
+body[data-theme="paper"] .state-pill-support {
+  color: var(--accent-decision);
+  border-color: var(--accent-decision);
+  background: color-mix(in srgb, var(--accent-decision) 12%, transparent);
+}
+
 body[data-theme="paper"] .tab {
   display: inline-flex;
   align-items: center;
