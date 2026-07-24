@@ -449,11 +449,19 @@ export async function getMyCompetencyStates(): Promise<MyCompetencyState[]> {
   const { data: sopRows } = await supabase.from('sops').select('id, title').in('id', requiredSopIds)
   const sopById = new Map(((sopRows ?? []) as Array<{ id: string; title: string }>).map(s => [s.id, s]))
 
+  // The member_departments / sop_access_people self-read RLS branches span
+  // ALL the caller's organisations; the sops read above IS org-RLS-scoped.
+  // Intersecting confines the requirement set to the active org — otherwise
+  // a multi-org user sees foreign-org requirements as phantom "Untitled SOP"
+  // rows permanently stuck at not_started.
+  const scopedSopIds = requiredSopIds.filter(id => sopById.has(id))
+  if (scopedSopIds.length === 0) return []
+
   const { data: completionRows } = await supabase
     .from('sop_completions')
     .select('id, sop_id')
     .eq('worker_id', userId)
-    .in('sop_id', requiredSopIds)
+    .in('sop_id', scopedSopIds)
   const completions = (completionRows ?? []) as Array<{ id: string; sop_id: string }>
 
   const completionIds = completions.map(c => c.id)
@@ -467,12 +475,12 @@ export async function getMyCompetencyStates(): Promise<MyCompetencyState[]> {
     .from('sop_observations')
     .select('sop_id, verdict, created_at')
     .eq('observed_worker_id', userId)
-    .in('sop_id', requiredSopIds)
+    .in('sop_id', scopedSopIds)
   const observations = (observationRows ?? []) as Array<{ sop_id: string; verdict: string; created_at: string }>
 
   const signOffByCompletion = new Map(signOffs.map(s => [s.completion_id, s]))
 
-  return requiredSopIds.map(sopId => {
+  return scopedSopIds.map(sopId => {
     const sopCompletions = completions.filter(c => c.sop_id === sopId)
     const sopObservations = observations.filter(o => o.sop_id === sopId)
 
