@@ -39,8 +39,13 @@ const HEADER = [
 ]
 
 export function csvField(val: string | number | null): string {
-  const str = val === null || val === undefined ? '' : String(val)
-  if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+  let str = val === null || val === undefined ? '' : String(val)
+  // Neutralize formula triggers for Excel/Sheets consumers (CSV injection /
+  // DDE — worker_email and sop_title are user-authored). The UAT script
+  // explicitly tells users to open this file in Excel.
+  if (/^[=+\-@\t\r]/.test(str)) str = "'" + str
+  // RFC 4180: force-quote on comma, quote, LF and CR.
+  if (/[",\n\r]/.test(str)) {
     return '"' + str.replace(/"/g, '""') + '"'
   }
   return str

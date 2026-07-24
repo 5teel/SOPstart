@@ -41,4 +41,17 @@ test.describe('generateTrainingCsv', () => {
   test('csvField leaves plain values unquoted', () => {
     expect(csvField('plain-value')).toBe('plain-value')
   })
+
+  test('csvField neutralizes formula triggers with a leading apostrophe (CSV injection)', () => {
+    expect(csvField('=HYPERLINK("http://evil.example","click")')).toBe(
+      '"\'=HYPERLINK(""http://evil.example"",""click"")"',
+    )
+    expect(csvField('+worker@example.com')).toBe("'+worker@example.com")
+    expect(csvField('-2 handed lift')).toBe("'-2 handed lift")
+    expect(csvField('@sheet')).toBe("'@sheet")
+  })
+
+  test('csvField force-quotes a bare CR (RFC 4180)', () => {
+    expect(csvField('line one\rline two')).toBe('"line one\rline two"')
+  })
 })
