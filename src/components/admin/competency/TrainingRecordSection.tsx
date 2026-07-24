@@ -33,6 +33,9 @@ function formatNZDate(iso: string): string {
 export function TrainingRecordSection({ personId, focusSopId }: TrainingRecordSectionProps) {
   const [record, setRecord] = useState<TrainingRecord | null>(null)
   const [loading, setLoading] = useState(true)
+  // A returned { error } must render as a message, never as a silently
+  // blank panel (2026-07-20 silent-dead-feature class).
+  const [fetchError, setFetchError] = useState<string | null>(null)
   const [exporting, setExporting] = useState(false)
   const [exportError, setExportError] = useState<string | null>(null)
   const blockRefs = useRef<Record<string, HTMLDivElement | null>>({})
@@ -44,6 +47,7 @@ export function TrainingRecordSection({ personId, focusSopId }: TrainingRecordSe
   if (prevPersonId !== personId) {
     setPrevPersonId(personId)
     setRecord(null)
+    setFetchError(null)
     setLoading(true)
   }
 
@@ -52,7 +56,11 @@ export function TrainingRecordSection({ personId, focusSopId }: TrainingRecordSe
     getTrainingRecordForPerson(personId).then((result) => {
       if (cancelled) return
       setLoading(false)
-      if ('record' in result) setRecord(result.record)
+      if ('record' in result) {
+        setRecord(result.record)
+      } else {
+        setFetchError(result.error)
+      }
     })
     return () => {
       cancelled = true
@@ -98,6 +106,12 @@ export function TrainingRecordSection({ personId, focusSopId }: TrainingRecordSe
       {exportError && <div className="text-xs text-[var(--accent-decision)] mb-1.5">{exportError}</div>}
 
       {loading && <div className="px-3.5 py-3 text-xs text-[var(--ink-500)]">Loading…</div>}
+
+      {!loading && fetchError && (
+        <div className="px-3.5 py-3 text-xs text-[var(--accent-decision)] rounded border border-[var(--ink-100)]">
+          {fetchError}
+        </div>
+      )}
 
       {!loading && record && record.requiredSops.length === 0 && (
         <div className="px-3.5 py-3 text-xs text-[var(--ink-500)] rounded border border-[var(--ink-100)]">

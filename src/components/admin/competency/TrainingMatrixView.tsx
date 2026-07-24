@@ -67,6 +67,10 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
   const [people, setPeople] = useState<MatrixPerson[]>([])
   const [sops, setSops] = useState<MatrixSop[]>([])
   const [loading, setLoading] = useState(false)
+  // A returned { error } must render as an error, never as the "no people"
+  // empty state — an authorization regression must not look like an empty
+  // department (2026-07-20 silent-dead-feature class).
+  const [fetchError, setFetchError] = useState<string | null>(null)
 
   const [containerWidth, setContainerWidth] = useState(0)
   const scrollRef = useRef<HTMLDivElement | null>(null)
@@ -76,7 +80,12 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
     let cancelled = false
     getTrainingMatrix({ departmentId }).then((result) => {
       if (cancelled) return
-      if ('error' in result) return
+      if ('error' in result) {
+        // Never leave the previous department's filter options in place.
+        setAllPeople([])
+        setAllSops([])
+        return
+      }
       setAllPeople(result.people)
       setAllSops(result.sops)
     })
@@ -96,11 +105,13 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
       if (cancelled) return
       setLoading(false)
       if ('error' in result) {
+        setFetchError(result.error)
         setMatrix(null)
         setPeople([])
         setSops([])
         return
       }
+      setFetchError(null)
       setMatrix(result.matrix)
       setPeople(result.people)
       setSops(result.sops)
@@ -231,7 +242,11 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
 
       {loading && <div className="text-sm text-[var(--ink-500)] py-8 text-center">Loading matrix…</div>}
 
-      {!loading && people.length === 0 && (
+      {!loading && fetchError && (
+        <div className="text-sm text-[var(--accent-decision)] py-8 text-center">{fetchError}</div>
+      )}
+
+      {!loading && !fetchError && people.length === 0 && (
         <div className="text-sm text-[var(--ink-500)] py-8 text-center">No people with required SOPs in this cut.</div>
       )}
 
