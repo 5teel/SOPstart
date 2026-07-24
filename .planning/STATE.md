@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: — Competency & Training Layer
 status: executing
-stopped_at: Phase 35 context gathered
-last_updated: "2026-07-23T13:56:39.947Z"
-last_activity: 2026-07-23 -- Phase 35 planning complete
+stopped_at: Completed 35-01-PLAN.md
+last_updated: "2026-07-24T00:04:29.788Z"
+last_activity: 2026-07-23 -- Phase 35 execution started
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 14
+  completed_plans: 11
   percent: 17
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 34 — supervisor-observations
+**Current focus:** Phase 35 — competency-classifier-training-matrix-records
 
 ## Current Position
 
-Phase: 35
-Plan: Not started
+Phase: 35 (competency-classifier-training-matrix-records) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-07-23 -- Phase 35 planning complete
+Last activity: 2026-07-23 -- Phase 35 execution started
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
@@ -186,6 +186,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 34 P05 | ~15min | 2 tasks | 3 files |
 | Phase 34 P09 | ~15min | 2 tasks | 1 files |
 | Phase 34-supervisor-observations P10 | 35min | 2 tasks | 7 files |
+| Phase 35 P01 | 35min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -404,6 +405,8 @@ Recent decisions affecting current work:
 - [Phase 34-09]: 34 pre-existing test failures in the full suite (phase3/11/12.5/15/20/21-stubs, phase26, phase29, phase33) confirmed out-of-scope via git log over phase 34's commit range - none touch files any 34-01..34-08 plan modified; logged as deferred, not fixed
 - [Phase 34-10]: Migration 00054 wraps only the org-wide branch of sop_observations_read_org in a recorder-role check; the OBS-02 self-read branch stays unchanged
 - [Phase 34-10]: listWorkerSopsForPicker reads sop_assignments via the admin client keyed to the OBSERVED worker's role, never the caller's -- RLS 00007 only ever exposes the caller's own rows
+- [Phase ?]: [Phase 35-01]: CompetencyState kept at exactly four members; awaitingSignOff added as a presentation-only boolean rather than a 5th canonical state
+- [Phase ?]: [Phase 35-01]: csv.ts/matrix.ts header comments avoid literal access_grants/use-server substrings so the MTX-02 source-contract guard doesn't false-positive on its own documentation
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -514,7 +517,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-23T13:18:50.759Z
-Stopped at: Phase 35 context gathered
+Last session: 2026-07-24T00:04:29.780Z
+Stopped at: Completed 35-01-PLAN.md
 Resume file:
-.planning/phases/35-competency-classifier-training-matrix-records/35-CONTEXT.md
+None

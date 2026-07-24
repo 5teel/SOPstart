@@ -568,7 +568,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 ### Training Records (TRN)
 
 - [ ] **TRN-01**: Per-worker training record view — SOP completions rendered as training evidence (SOP, version completed, date, sign-off chain) built on existing completion data
-- [ ] **TRN-02**: Admin can export training records as CSV (filterable by worker, SOP, department, date range)
+- [x] **TRN-02**: Admin can export training records as CSV (filterable by worker, SOP, department, date range)
 - [ ] **TRN-03**: SOP detail (admin) shows who has completed the current version vs a prior version — surfacing workers "trained on an outdated version" after a supersede
 
 ### v6.0 Future Requirements (deferred)
@@ -619,15 +619,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ### Competency States (CMP)
 
-- [ ] **CMP-01**: Admin/supervisor can see a derived competency state for every person × required-SOP pair (not started / read / supervised / competent-signed-off) — computed live from existing evidence, never stored redundantly
-- [ ] **CMP-02**: Evidence events (completion, sign-off, observation) advance the derived state — no manual state editing
+- [x] **CMP-01**: Admin/supervisor can see a derived competency state for every person × required-SOP pair (not started / read / supervised / competent-signed-off) — computed live from existing evidence, never stored redundantly
+- [x] **CMP-02**: Evidence events (completion, sign-off, observation) advance the derived state — no manual state editing
 - [ ] **CMP-03**: A SOP version supersede surfaces "trained on outdated version" rather than resetting or orphaning competency history (resolves via version lineage / current_sop_version)
-- [ ] **CMP-04**: Competency state NEVER gates worker read/walkthrough access (locked guard — regression-tested)
+- [x] **CMP-04**: Competency state NEVER gates worker read/walkthrough access (locked guard — regression-tested)
 
 ### Training Matrix (MTX)
 
 - [ ] **MTX-01**: Admin can view a training matrix (people × required SOPs × state) as a third mode on the existing /admin/team view toggle
-- [ ] **MTX-02**: Matrix derives requirements from access grants (materialized junctions) and evidence from completions/sign-offs — zero double-entry, no third derivation layer
+- [x] **MTX-02**: Matrix derives requirements from access grants (materialized junctions) and evidence from completions/sign-offs — zero double-entry, no third derivation layer
 - [ ] **MTX-03**: Admin can cut the matrix by department, worker, and SOP
 
 ### Supervisor Observations (OBS)
@@ -643,7 +643,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 ### Training Records — Phase 31 rollforward (TRN + REV)
 
 - [ ] **TRN-01**: Per-worker training record view renders every completion as training evidence (SOP, version, date, sign-off chain)
-- [ ] **TRN-02**: Admin can export training records as CSV, filterable by worker/SOP/department/date range, shaped for SuccessFactors Learning History import
+- [x] **TRN-02**: Admin can export training records as CSV, filterable by worker/SOP/department/date range, shaped for SuccessFactors Learning History import
 - [ ] **TRN-03**: Admin can see which workers completed the current vs a prior version after a supersede
 - [ ] **REV-05**: Governance surface shows an AI-prioritized maintenance schedule (staleness + usage + reviewer flags) on the existing AI adapter — no new AI infrastructure
 
@@ -682,14 +682,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OBS-01 | Phase 34 | Complete |
 | OBS-02 | Phase 34 | Complete |
 | OBS-03 | Phase 34 | Complete |
-| CMP-01 | Phase 35 | Pending |
-| CMP-02 | Phase 35 | Pending |
-| CMP-04 | Phase 35 | Pending |
+| CMP-01 | Phase 35 | Complete |
+| CMP-02 | Phase 35 | Complete |
+| CMP-04 | Phase 35 | Complete |
 | MTX-01 | Phase 35 | Pending |
-| MTX-02 | Phase 35 | Pending |
+| MTX-02 | Phase 35 | Complete |
 | MTX-03 | Phase 35 | Pending |
 | TRN-01 | Phase 35 | Pending |
-| TRN-02 | Phase 35 | Pending |
+| TRN-02 | Phase 35 | Complete |
 | CMP-03 | Phase 36 | Pending |
 | TRN-03 | Phase 36 | Pending |
 | REF-01 | Phase 36 | Pending |
