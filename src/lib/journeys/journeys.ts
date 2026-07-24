@@ -516,6 +516,23 @@ export const JOURNEYS: Journey[] = [
   },
 
   {
+    id: 'training-matrix-records',
+    group: 'Library & team',
+    persona: 'Supervisor / Admin',
+    title: 'See training status & records',
+    summary: 'A supervisor or admin opens the training matrix to see who has read, been observed on, or been signed off for each required SOP, drills into one worker\'s record, and exports a SuccessFactors-shaped CSV for an audit. Workers see their own states too, read-only.',
+    steps: [
+      { id: 's', type: 'start', label: 'Needs a pre-audit training scan' },
+      { id: 'team', type: 'screen', label: 'Team & org model', route: '/admin/team', detail: 'Phase 35 (D-06): a third ▦ Matrix view mode alongside ⊞ Chart / ▤ Columns.' },
+      { id: 'toggle', type: 'action', label: 'Toggle ▦ Matrix', detail: 'Department-first cut with labelled state pills + both-axis rollups; MTX-03 department/worker/SOP filters narrow it further.' },
+      { id: 'cell', type: 'action', label: 'Click a state pill cell', detail: 'onSelectCell opens the PersonPanel focused on that person + SOP (D-09).' },
+      { id: 'record', type: 'screen', label: 'PersonPanel training record', route: '/admin/team', detail: 'Grouped-by-SOP evidence trail + "Other completed SOPs" section (TRN-01/D-12/D-13).' },
+      { id: 'export', type: 'action', label: 'Export CSV', detail: 'Matrix header (filtered cut) or PersonPanel (one worker) — both call the same exportTrainingCsv generator (D-16/TRN-02).' },
+      { id: 'own', type: 'screen', label: 'Worker sees their own competency state', route: '/profile', detail: '"My competency" section — read-only, informational, never gates access (CMP-04).' },
+      { id: 'e', type: 'end', label: 'Training status visible, evidence exportable' },
+    ],
+  },
+  {
     id: 'governance-queue',
     group: 'Library & team',
     persona: 'SOP Admin',

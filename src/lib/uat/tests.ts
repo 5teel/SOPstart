@@ -724,6 +724,62 @@ export const UAT_TESTS: UatTest[] = [
   },
 
   {
+    id: 'p35-training-matrix',
+    dateAdded: '2026-07-24',
+    category: 'Phase 35 — Training matrix & records',
+    title: 'Open Team, switch to the Matrix view — do you see each person\'s training state per SOP?',
+    status: 'active',
+    summary:
+      'Team now has a third view: a Matrix showing, for each person and each procedure they need to know, whether they\'ve read it, been watched doing it, or been signed off.',
+    tryIt: [
+      'Open Team from the admin nav.',
+      'Click the ▦ Matrix button top-right.',
+      'Look down a column and along a row — each cell should be a coloured/labelled pill.',
+    ],
+    links: [{ label: 'Team & org model', href: '/admin/team' }],
+    questions: [
+      { id: 'matrix-clear', text: 'Was it clear which SOPs each person has and hasn\'t completed?' },
+      { id: 'labels-clear', text: 'Were the labels (e.g. "Signed off", "Read only") easy to understand?' },
+    ],
+  },
+  {
+    id: 'p35-cell-click-record',
+    dateAdded: '2026-07-24',
+    category: 'Phase 35 — Training matrix & records',
+    title: 'Click a coloured cell — does the person\'s record open at that SOP?',
+    status: 'active',
+    summary:
+      'Clicking any cell in the Matrix should open that person\'s side panel, scrolled straight to the procedure you clicked, showing what evidence exists for it.',
+    tryIt: [
+      'From the Matrix view, click any cell.',
+      'Check the panel opens for the right person, and that the procedure you clicked is highlighted or already in view.',
+    ],
+    links: [{ label: 'Team & org model', href: '/admin/team' }],
+    questions: [
+      { id: 'right-person', text: 'Did the panel open for the right person?' },
+      { id: 'right-sop', text: 'Was the procedure you clicked already scrolled into view?' },
+    ],
+  },
+  {
+    id: 'p35-export-csv',
+    dateAdded: '2026-07-24',
+    category: 'Phase 35 — Training matrix & records',
+    title: 'Press Export CSV and open the file — are the columns and the completion-date range right?',
+    status: 'active',
+    summary:
+      'Both the Matrix and a person\'s panel have an "Export CSV" button that downloads a spreadsheet of training records — useful for handing to an auditor.',
+    tryIt: [
+      'From the Matrix, press "Export CSV" and open the downloaded file in Excel/Sheets.',
+      'From a person\'s panel, press their "Export CSV" and open that file too.',
+      'Check the worker name/email, procedure, dates, and sign-off columns look right.',
+    ],
+    links: [{ label: 'Team & org model', href: '/admin/team' }],
+    questions: [
+      { id: 'file-opens', text: 'Did the downloaded file open cleanly in a spreadsheet program?' },
+      { id: 'columns-right', text: 'Did the columns (worker, procedure, dates, sign-off) look correct?' },
+    ],
+  },
+  {
     id: 'example-direction-template',
     dateAdded: '2026-06-09',
     category: 'Examples',
