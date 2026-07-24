@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: — Competency & Training Layer
 status: verifying
-stopped_at: Completed 35-03-PLAN.md
-last_updated: "2026-07-24T00:34:48.868Z"
+stopped_at: Completed 35-04-PLAN.md
+last_updated: "2026-07-24T00:41:29.236Z"
 last_activity: 2026-07-23 -- Phase 35 execution started
 progress:
   total_phases: 6
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 14
-  completed_plans: 13
-  percent: 17
+  completed_plans: 14
+  percent: 33
 ---
 
 # Project State
@@ -189,6 +189,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 35 P01 | 35min | 3 tasks | 8 files |
 | Phase 35 P02 | 50min | 3 tasks | 6 files |
 | Phase 35 P03 | 50min | 4 tasks | 10 files |
+| Phase 35 P04 | 20m | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -414,6 +415,7 @@ Recent decisions affecting current work:
 - [Phase 35]: Compaction threshold computed from a ResizeObserver-measured container width divided by an estimated pill column width, never a hardcoded column-count integer (D-07)
 - [Phase 35]: Matrix filter dropdown option lists come from a separate unfiltered per-department fetch, independent of the filtered matrix-cut fetch, so choosing a worker/SOP filter never removes other options from the dropdowns
 - [Phase 35]: downloadCsv() Blob helper forked verbatim from FlowGraphCanvas's PNG-export idiom — one generator behind both D-16 CSV export entry points
+- [Phase ?]: CompetencySection (35-04) copies ObservationsSection's shape wholesale for consistent /profile trust framing; no new CSS tokens or components needed
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -524,7 +526,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-24T00:34:48.859Z
-Stopped at: Completed 35-03-PLAN.md
+Last session: 2026-07-24T00:41:29.227Z
+Stopped at: Completed 35-04-PLAN.md
 Resume file:
 None
