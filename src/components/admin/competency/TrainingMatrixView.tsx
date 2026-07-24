@@ -73,18 +73,27 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
 
   useEffect(() => {
     if (!departmentId) return
+    let cancelled = false
     getTrainingMatrix({ departmentId }).then((result) => {
+      if (cancelled) return
       if ('error' in result) return
       setAllPeople(result.people)
       setAllSops(result.sops)
     })
+    return () => {
+      cancelled = true
+    }
   }, [departmentId])
 
-  // MTX-03 — re-fetches the matrix on every department/worker/SOP filter change.
+  // MTX-03 — re-fetches the matrix on every department/worker/SOP filter
+  // change. `cancelled` guard (mirrors TrainingRecordSection) so an earlier,
+  // slower department's response can never overwrite a later selection.
   useEffect(() => {
     if (!departmentId) return
+    let cancelled = false
     setLoading(true)
     getTrainingMatrix({ departmentId, workerId: workerId || undefined, sopId: sopId || undefined }).then((result) => {
+      if (cancelled) return
       setLoading(false)
       if ('error' in result) {
         setMatrix(null)
@@ -96,6 +105,9 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
       setPeople(result.people)
       setSops(result.sops)
     })
+    return () => {
+      cancelled = true
+    }
   }, [departmentId, workerId, sopId])
 
   useEffect(() => {
