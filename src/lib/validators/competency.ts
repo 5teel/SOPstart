@@ -20,8 +20,10 @@ export const CsvExportFiltersSchema = z.object({
   departmentId: z.string().uuid().optional(),
   workerId: z.string().uuid().optional(),
   sopId: z.string().uuid().optional(),
-  // D-16: date-range filters on completion date (ISO date/datetime strings).
-  dateFrom: z.string().optional(),
-  dateTo: z.string().optional(),
+  // D-16: date-range filters on completion date. Strict YYYY-MM-DD only —
+  // the UI feeds <input type="date"> values; anything else would reach
+  // PostgREST raw and surface as a generic fetch failure.
+  dateFrom: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Dates must be YYYY-MM-DD').optional(),
+  dateTo: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Dates must be YYYY-MM-DD').optional(),
 })
 export type CsvExportFiltersInput = z.infer<typeof CsvExportFiltersSchema>

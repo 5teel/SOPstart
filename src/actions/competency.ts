@@ -70,6 +70,15 @@ async function resolveDisplayNames(userIds: string[]): Promise<Record<string, st
   return names
 }
 
+/** dateTo is a YYYY-MM-DD day — make the end bound inclusive of that whole
+ * day by comparing `< midnight of the NEXT day` (a bare lte against the date
+ * string would silently drop every completion submitted on the To-day). */
+function nextDayIso(date: string): string {
+  const d = new Date(`${date}T00:00:00Z`)
+  d.setUTCDate(d.getUTCDate() + 1)
+  return d.toISOString().slice(0, 10)
+}
+
 function latestOf(timestamps: string[]): string | null {
   if (timestamps.length === 0) return null
   return timestamps.reduce((latest, ts) => (ts > latest ? ts : latest))
@@ -527,7 +536,7 @@ export async function exportTrainingCsv(rawFilters: unknown): Promise<{ csv: str
   if (workerIds) query = query.in('worker_id', workerIds)
   if (sopId) query = query.eq('sop_id', sopId)
   if (dateFrom) query = query.gte('submitted_at', dateFrom)
-  if (dateTo) query = query.lte('submitted_at', dateTo)
+  if (dateTo) query = query.lt('submitted_at', nextDayIso(dateTo))
 
   const { data: completionRows, error: completionsErr } = await query
   if (completionsErr) return { error: 'Failed to fetch completions.' }
