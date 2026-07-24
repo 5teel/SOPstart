@@ -19,11 +19,16 @@
  *   4. worker calling getMyCompetencyStates -> returns ONLY own rows,
  *      never a peer's (positive self-read + negative peer-read).
  *
- * Un-fixme by removing `test.fixme(...)` guards once run against a real
- * Supabase project with NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY
- * / NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY in .env.local (mirrors
+ * ACTIVATION (WR-07): removing the `test.fixme(...)` guards is NOT enough —
+ * each probe body is fixture scaffolding that ends in a deliberate TRIPWIRE
+ * failure. To activate a probe you must WRITE the real assertion described
+ * in its trailing comment (replacing the tripwire), then remove the fixme
+ * guard, then run against a real Supabase project with
+ * NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY /
+ * NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY in .env.local (mirrors
  * tests/phase34/observation-cross-org-isolation.spec.ts's live-fixture
- * helpers, reused here).
+ * helpers, reused here). An un-fixme'd placeholder fails loudly — it can
+ * never read as green RLS coverage (2026-06-05 presence-vs-wiring class).
  *
  * Registration: playwright.config.ts `phase35` project
  *   testDir: '.', testMatch: /tests\/phase35\/.*\.(spec|test)\.ts$/
@@ -134,9 +139,9 @@ test.describe('Probe 1 -- supervisor same-org matrix read', () => {
     const accessToken = await mintAccessToken(admin, supEmail)
     void asUserClient(accessToken)
 
-    // Real assertion (un-fixme to run): call getTrainingMatrix as the
-    // supervisor session and confirm `people` includes workerId, never [].
-    expect(deptId).toBeTruthy()
+    // Real assertion (WRITE before un-fixme-ing): call getTrainingMatrix as
+    // the supervisor session and confirm `people` includes workerId, never [].
+    expect(false, `TRIPWIRE — Probe 1 body not implemented (deptId=${deptId}). Write the real getTrainingMatrix supervisor assertion before activating.`).toBe(true)
   })
 })
 
@@ -155,9 +160,10 @@ test.describe('Probe 2 -- worker session denied at getTrainingMatrix / exportTra
     const accessToken = await mintAccessToken(admin, workerEmail)
     void asUserClient(accessToken)
 
-    // Real assertion (un-fixme to run): call getTrainingMatrix / exportTrainingCsv
-    // as the worker session and confirm { error } is returned, never data.
-    expect(orgId).toBeTruthy()
+    // Real assertion (WRITE before un-fixme-ing): call getTrainingMatrix /
+    // exportTrainingCsv as the worker session and confirm { error } is
+    // returned, never data.
+    expect(false, `TRIPWIRE — Probe 2 body not implemented (orgId=${orgId}). Write the real worker-denied assertion before activating.`).toBe(true)
   })
 })
 
@@ -178,9 +184,10 @@ test.describe('Probe 3 -- admin cross-org departmentId denied', () => {
     const accessToken = await mintAccessToken(admin, adminAEmail)
     void asUserClient(accessToken)
 
-    // Real assertion (un-fixme to run): call getTrainingMatrix({ departmentId: deptBId })
-    // as the org-A admin session and confirm { error } is returned.
-    expect(deptBId).toBeTruthy()
+    // Real assertion (WRITE before un-fixme-ing): call
+    // getTrainingMatrix({ departmentId: deptBId }) as the org-A admin session
+    // and confirm { error } is returned.
+    expect(false, `TRIPWIRE — Probe 3 body not implemented (deptBId=${deptBId}). Write the real cross-org-denied assertion before activating.`).toBe(true)
   })
 })
 
@@ -205,9 +212,11 @@ test.describe('Probe 4 -- getMyCompetencyStates self-only (positive self + negat
     const accessToken = await mintAccessToken(admin, workerAEmail)
     void asUserClient(accessToken)
 
-    // Real assertion (un-fixme to run): call getMyCompetencyStates() as
-    // worker A's session; confirm every returned row's evidence resolves
-    // only from worker A's own completions/observations, never worker B's.
-    expect(workerBId).toBeTruthy()
+    // Real assertion (WRITE before un-fixme-ing): call getMyCompetencyStates()
+    // as worker A's session; confirm every returned row's evidence resolves
+    // only from worker A's own completions/observations, never worker B's
+    // (e.g. worker A's PostgREST client reading worker B's sop_observations
+    // must return zero rows).
+    expect(false, `TRIPWIRE — Probe 4 body not implemented (workerBId=${workerBId}). Write the real self-only assertion before activating.`).toBe(true)
   })
 })
