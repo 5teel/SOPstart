@@ -23,7 +23,7 @@ test.describe('TrainingMatrixView — imports + wiring', () => {
   const src = read(MATRIX_VIEW)
 
   test('imports getTrainingMatrix and StatePill', () => {
-    expect(src).toMatch(/import\s*\{\s*getTrainingMatrix\s*\}\s*from\s*'@\/actions\/competency'/)
+    expect(src).toMatch(/import\s*\{\s*getTrainingMatrix,\s*exportTrainingCsv\s*\}\s*from\s*'@\/actions\/competency'/)
     expect(src).toMatch(/import\s*\{\s*StatePill\s*\}\s*from\s*['"]\.\/StatePill['"]/)
   })
 
@@ -51,5 +51,26 @@ test.describe('TrainingMatrixView — imports + wiring', () => {
 
   test('no disabled/lock affordance keyed on competency state anywhere in the view (CMP-04)', () => {
     expect(src).not.toMatch(/disabled=/)
+  })
+})
+
+test.describe('TrainingMatrixView — D-16 Export CSV (filtered cut)', () => {
+  const src = read(MATRIX_VIEW)
+
+  test('imports exportTrainingCsv and downloadCsv', () => {
+    expect(src).toMatch(/import\s*\{\s*getTrainingMatrix,\s*exportTrainingCsv\s*\}\s*from\s*'@\/actions\/competency'/)
+    expect(src).toMatch(/import\s*\{\s*downloadCsv\s*\}\s*from\s*'@\/lib\/competency\/download-csv'/)
+  })
+
+  test('the Export CSV button handler INVOKES exportTrainingCsv with the current filters, then downloadCsv (wiring, not a bare mention)', () => {
+    const handlerMatch = src.match(/async function handleExport\(\)\s*\{[\s\S]*?\n  \}/)
+    expect(handlerMatch).not.toBeNull()
+    const handlerBody = handlerMatch![0]
+    expect(handlerBody).toMatch(/exportTrainingCsv\(\{\s*\n?\s*departmentId,/)
+    expect(handlerBody).toMatch(/downloadCsv\(result\.csv,\s*result\.filename\)/)
+  })
+
+  test('the Export CSV button is wired to the handler and carries no disabled= (CMP-04)', () => {
+    expect(src).toMatch(/onClick=\{\(\)\s*=>\s*void handleExport\(\)\}/)
   })
 })

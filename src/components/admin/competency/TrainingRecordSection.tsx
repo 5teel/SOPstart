@@ -10,11 +10,15 @@
  * focusSopId is set, the matching required-SOP block scrolls into view.
  * Purely informational — no edit/gate control anywhere (CMP-04).
  *
- * D-16 per-worker Export CSV button lands here in Task 4.
+ * D-16 Export CSV (entry point 2 of 2 — this one worker): the header
+ * button's onClick calls exportTrainingCsv({ workerId: personId }) and
+ * streams the returned { csv, filename } to downloadCsv() — same shared
+ * generator as the matrix header export.
  */
 
 import { useEffect, useRef, useState } from 'react'
-import { getTrainingRecordForPerson, type TrainingRecord } from '@/actions/competency'
+import { getTrainingRecordForPerson, exportTrainingCsv, type TrainingRecord } from '@/actions/competency'
+import { downloadCsv } from '@/lib/competency/download-csv'
 import { StatePill } from './StatePill'
 
 interface TrainingRecordSectionProps {
@@ -29,6 +33,8 @@ function formatNZDate(iso: string): string {
 export function TrainingRecordSection({ personId, focusSopId }: TrainingRecordSectionProps) {
   const [record, setRecord] = useState<TrainingRecord | null>(null)
   const [loading, setLoading] = useState(true)
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
   const blockRefs = useRef<Record<string, HTMLDivElement | null>>({})
 
   // Reset at the moment personId changes, during render (not inside an
@@ -60,14 +66,36 @@ export function TrainingRecordSection({ personId, focusSopId }: TrainingRecordSe
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [focusSopId, record])
 
+  // D-16 entry point 2 — exports this ONE worker. Passive action, never
+  // gated on competency state (CMP-04).
+  async function handleExport() {
+    setExporting(true)
+    setExportError(null)
+    const result = await exportTrainingCsv({ workerId: personId })
+    setExporting(false)
+    if ('error' in result) {
+      setExportError(result.error)
+      return
+    }
+    downloadCsv(result.csv, result.filename)
+  }
+
   return (
     <section>
       <div className="flex items-center justify-between mb-1.5">
         <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--ink-500)]">
           Training record
         </div>
-        {/* Export CSV button lands here in Task 4 */}
+        <button
+          type="button"
+          onClick={() => void handleExport()}
+          className="px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wide bg-[var(--ink-900)] text-white"
+        >
+          {exporting ? 'Exporting…' : 'Export CSV'}
+        </button>
       </div>
+
+      {exportError && <div className="text-xs text-[var(--accent-decision)] mb-1.5">{exportError}</div>}
 
       {loading && <div className="px-3.5 py-3 text-xs text-[var(--ink-500)]">Loading…</div>}
 

@@ -24,7 +24,7 @@ test.describe('TrainingRecordSection — imports + structure', () => {
   const src = read(TRAINING_RECORD)
 
   test('imports getTrainingRecordForPerson and StatePill', () => {
-    expect(src).toMatch(/import\s*\{\s*getTrainingRecordForPerson,\s*type TrainingRecord\s*\}\s*from\s*'@\/actions\/competency'/)
+    expect(src).toMatch(/import\s*\{\s*getTrainingRecordForPerson,\s*exportTrainingCsv,\s*type TrainingRecord\s*\}\s*from\s*'@\/actions\/competency'/)
     expect(src).toMatch(/import\s*\{\s*StatePill\s*\}\s*from\s*['"]\.\/StatePill['"]/)
   })
 
@@ -48,6 +48,28 @@ test.describe('TrainingRecordSection — imports + structure', () => {
 
   test('resets on person change via the render-time idiom, not setState-in-effect', () => {
     expect(src).toMatch(/prevPersonId\s*!==\s*personId/)
+  })
+})
+
+test.describe('TrainingRecordSection — D-16 Export CSV (this worker)', () => {
+  const src = read(TRAINING_RECORD)
+
+  test('imports exportTrainingCsv and downloadCsv', () => {
+    expect(src).toMatch(/import\s*\{\s*getTrainingRecordForPerson,\s*exportTrainingCsv,\s*type TrainingRecord\s*\}\s*from\s*'@\/actions\/competency'/)
+    expect(src).toMatch(/import\s*\{\s*downloadCsv\s*\}\s*from\s*'@\/lib\/competency\/download-csv'/)
+  })
+
+  test('the Export CSV button handler INVOKES exportTrainingCsv({ workerId: personId }), then downloadCsv (wiring, not a bare mention)', () => {
+    const handlerMatch = src.match(/async function handleExport\(\)\s*\{[\s\S]*?\n  \}/)
+    expect(handlerMatch).not.toBeNull()
+    const handlerBody = handlerMatch![0]
+    expect(handlerBody).toMatch(/exportTrainingCsv\(\{\s*workerId:\s*personId\s*\}\)/)
+    expect(handlerBody).toMatch(/downloadCsv\(result\.csv,\s*result\.filename\)/)
+  })
+
+  test('the Export CSV button is wired to the handler and carries no disabled= (CMP-04)', () => {
+    expect(src).toMatch(/onClick=\{\(\)\s*=>\s*void handleExport\(\)\}/)
+    expect(src).not.toMatch(/disabled=/)
   })
 })
 

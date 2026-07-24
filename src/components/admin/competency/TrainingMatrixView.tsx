@@ -10,11 +10,15 @@
  * evidence renderer. Cells are passive buttons only; nothing here is ever
  * disabled/locked on competency state (CMP-04).
  *
- * D-16 Export CSV (matrix filtered cut) is wired in Plan 03 Task 4.
+ * D-16 Export CSV (entry point 1 of 2 — the matrix's current filtered cut):
+ * the header button's onClick calls exportTrainingCsv(filters) and streams
+ * the returned { csv, filename } to downloadCsv(). Native date inputs feed
+ * the completion-date range filter (no picker library, ladder rung 4).
  */
 
 import { useEffect, useRef, useState } from 'react'
-import { getTrainingMatrix } from '@/actions/competency'
+import { getTrainingMatrix, exportTrainingCsv } from '@/actions/competency'
+import { downloadCsv } from '@/lib/competency/download-csv'
 import { StatePill } from './StatePill'
 import type { MatrixPerson, MatrixSop, MatrixCell, TrainingMatrix } from '@/lib/competency/matrix'
 import type { Department } from '@/types/sop'
@@ -47,6 +51,10 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
   const [departmentId, setDepartmentId] = useState(departments[0]?.id ?? '')
   const [workerId, setWorkerId] = useState('')
   const [sopId, setSopId] = useState('')
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
+  const [exporting, setExporting] = useState(false)
+  const [exportError, setExportError] = useState<string | null>(null)
 
   // Unfiltered per-department option lists for the worker/SOP filter
   // dropdowns (MTX-03) — fetched once per department change, independent of
@@ -103,6 +111,26 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
 
   const isCompact = containerWidth > 0 && sops.length * COLUMN_WIDTH_PX > containerWidth
 
+  // D-16 entry point 1 — exports the CURRENT filtered cut (dept/worker/SOP +
+  // date-range). Passive action, never gated on competency state (CMP-04).
+  async function handleExport() {
+    setExporting(true)
+    setExportError(null)
+    const result = await exportTrainingCsv({
+      departmentId,
+      workerId: workerId || undefined,
+      sopId: sopId || undefined,
+      dateFrom: dateFrom || undefined,
+      dateTo: dateTo || undefined,
+    })
+    setExporting(false)
+    if ('error' in result) {
+      setExportError(result.error)
+      return
+    }
+    downloadCsv(result.csv, result.filename)
+  }
+
   const cellFor = (personId: string, forSopId: string) => matrix?.cells.find((c) => c.personId === personId && c.sopId === forSopId)
   const rowRollupFor = (personId: string) => matrix?.rowRollups.find((r) => r.personId === personId)
   const colRollupFor = (forSopId: string) => matrix?.colRollups.find((r) => r.sopId === forSopId)
@@ -158,7 +186,36 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
             ))}
           </select>
         </label>
+
+        <label className="flex flex-col gap-1 text-xs text-[var(--ink-500)]">
+          From
+          <input
+            type="date"
+            className="border border-[var(--ink-100)] rounded px-2 py-1.5 text-sm"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-xs text-[var(--ink-500)]">
+          To
+          <input
+            type="date"
+            className="border border-[var(--ink-100)] rounded px-2 py-1.5 text-sm"
+            value={dateTo}
+            onChange={(e) => setDateTo(e.target.value)}
+          />
+        </label>
+
+        <button
+          type="button"
+          onClick={() => void handleExport()}
+          className="ml-auto px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wide bg-[var(--ink-900)] text-white"
+        >
+          {exporting ? 'Exporting…' : 'Export CSV'}
+        </button>
       </div>
+
+      {exportError && <div className="text-xs text-[var(--accent-decision)]">{exportError}</div>}
 
       {loading && <div className="text-sm text-[var(--ink-500)] py-8 text-center">Loading matrix…</div>}
 
