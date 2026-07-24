@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: — Competency & Training Layer
 status: executing
-stopped_at: Completed 35-01-PLAN.md
-last_updated: "2026-07-24T00:04:29.788Z"
+stopped_at: Completed 35-02-PLAN.md
+last_updated: "2026-07-24T00:18:52.214Z"
 last_activity: 2026-07-23 -- Phase 35 execution started
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 14
-  completed_plans: 11
+  completed_plans: 12
   percent: 17
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 35 (competency-classifier-training-matrix-records) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-07-23 -- Phase 35 execution started
 
@@ -187,6 +187,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 34 P09 | ~15min | 2 tasks | 1 files |
 | Phase 34-supervisor-observations P10 | 35min | 2 tasks | 7 files |
 | Phase 35 P01 | 35min | 3 tasks | 8 files |
+| Phase 35 P02 | 50min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -407,6 +408,8 @@ Recent decisions affecting current work:
 - [Phase 34-10]: listWorkerSopsForPicker reads sop_assignments via the admin client keyed to the OBSERVED worker's role, never the caller's -- RLS 00007 only ever exposes the caller's own rows
 - [Phase ?]: [Phase 35-01]: CompetencyState kept at exactly four members; awaitingSignOff added as a presentation-only boolean rather than a 5th canonical state
 - [Phase ?]: [Phase 35-01]: csv.ts/matrix.ts header comments avoid literal access_grants/use-server substrings so the MTX-02 source-contract guard doesn't false-positive on its own documentation
+- [Phase 35]: [Phase 35-02] sop_access_people read via admin client in matrix/record/CSV paths -- self-read RLS branch (migration 00046) excludes 'supervisor', session client would silently return zero rows for the primary matrix persona
+- [Phase 35]: [Phase 35-02] getMyCompetencyStates is self-scoped (session client, no admin client, no role gate) -- every table it reads has a self-read RLS branch keyed to auth.uid()
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -517,7 +520,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-24T00:04:29.780Z
-Stopped at: Completed 35-01-PLAN.md
+Last session: 2026-07-24T00:18:52.206Z
+Stopped at: Completed 35-02-PLAN.md
 Resume file:
 None

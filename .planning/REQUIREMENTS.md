@@ -567,7 +567,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ### Training Records (TRN)
 
-- [ ] **TRN-01**: Per-worker training record view — SOP completions rendered as training evidence (SOP, version completed, date, sign-off chain) built on existing completion data
+- [x] **TRN-01**: Per-worker training record view — SOP completions rendered as training evidence (SOP, version completed, date, sign-off chain) built on existing completion data
 - [x] **TRN-02**: Admin can export training records as CSV (filterable by worker, SOP, department, date range)
 - [ ] **TRN-03**: SOP detail (admin) shows who has completed the current version vs a prior version — surfacing workers "trained on an outdated version" after a supersede
 
@@ -628,7 +628,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 - [ ] **MTX-01**: Admin can view a training matrix (people × required SOPs × state) as a third mode on the existing /admin/team view toggle
 - [x] **MTX-02**: Matrix derives requirements from access grants (materialized junctions) and evidence from completions/sign-offs — zero double-entry, no third derivation layer
-- [ ] **MTX-03**: Admin can cut the matrix by department, worker, and SOP
+- [x] **MTX-03**: Admin can cut the matrix by department, worker, and SOP
 
 ### Supervisor Observations (OBS)
 
@@ -642,7 +642,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ### Training Records — Phase 31 rollforward (TRN + REV)
 
-- [ ] **TRN-01**: Per-worker training record view renders every completion as training evidence (SOP, version, date, sign-off chain)
+- [x] **TRN-01**: Per-worker training record view renders every completion as training evidence (SOP, version, date, sign-off chain)
 - [x] **TRN-02**: Admin can export training records as CSV, filterable by worker/SOP/department/date range, shaped for SuccessFactors Learning History import
 - [ ] **TRN-03**: Admin can see which workers completed the current vs a prior version after a supersede
 - [ ] **REV-05**: Governance surface shows an AI-prioritized maintenance schedule (staleness + usage + reviewer flags) on the existing AI adapter — no new AI infrastructure
@@ -687,8 +687,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CMP-04 | Phase 35 | Complete |
 | MTX-01 | Phase 35 | Pending |
 | MTX-02 | Phase 35 | Complete |
-| MTX-03 | Phase 35 | Pending |
-| TRN-01 | Phase 35 | Pending |
+| MTX-03 | Phase 35 | Complete |
+| TRN-01 | Phase 35 | Complete |
 | TRN-02 | Phase 35 | Complete |
 | CMP-03 | Phase 36 | Pending |
 | TRN-03 | Phase 36 | Pending |
