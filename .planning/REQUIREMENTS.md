@@ -626,7 +626,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ### Training Matrix (MTX)
 
-- [ ] **MTX-01**: Admin can view a training matrix (people × required SOPs × state) as a third mode on the existing /admin/team view toggle
+- [x] **MTX-01**: Admin can view a training matrix (people × required SOPs × state) as a third mode on the existing /admin/team view toggle
 - [x] **MTX-02**: Matrix derives requirements from access grants (materialized junctions) and evidence from completions/sign-offs — zero double-entry, no third derivation layer
 - [x] **MTX-03**: Admin can cut the matrix by department, worker, and SOP
 
@@ -685,7 +685,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CMP-01 | Phase 35 | Complete |
 | CMP-02 | Phase 35 | Complete |
 | CMP-04 | Phase 35 | Complete |
-| MTX-01 | Phase 35 | Pending |
+| MTX-01 | Phase 35 | Complete |
 | MTX-02 | Phase 35 | Complete |
 | MTX-03 | Phase 35 | Complete |
 | TRN-01 | Phase 35 | Complete |
