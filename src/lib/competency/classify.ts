@@ -13,9 +13,11 @@
 //
 // D-02 (needs_support reset): a needs_support observation NEWER than the
 // latest positive evidence (sign-off OR performed_to_sop observation) resets
-// the state to 'read' and flags it — the complacency-reset mechanism. Never
-// demotes below 'read' (the completion happened) and never advances
-// not_started.
+// the state and flags it — the complacency-reset mechanism. The reset floor
+// is the highest state the remaining evidence supports: 'read' when a
+// completion exists, otherwise 'not_started' (supervised is reachable via
+// observation alone — never fabricate a read that never happened). Never
+// advances not_started.
 // ------------------------------------------------------------
 
 export type CompetencyState = 'not_started' | 'read' | 'supervised' | 'competent_signed_off'
@@ -45,15 +47,17 @@ export function classifyCompetency(ev: CompetencyEvidence): CompetencyResult {
   if (ev.hasSignOff) state = 'competent_signed_off'
 
   // D-02: a needs_support observation newer than the latest positive evidence
-  // resets state to 'read' (never below — the completion happened) and
-  // flags it. Never applies to not_started (nothing to reset).
+  // resets state to the floor the remaining evidence supports — 'read' only
+  // if a completion actually happened, else 'not_started' (a worker observed
+  // but never completed must not be shown as having read the SOP). Never
+  // applies to not_started (nothing to reset).
   let needsSupportFlag = false
   if (
     ev.latestNeedsSupportAt &&
     state !== 'not_started' &&
     (!ev.latestPositiveEvidenceAt || ev.latestNeedsSupportAt > ev.latestPositiveEvidenceAt)
   ) {
-    state = 'read'
+    state = ev.hasCompletion ? 'read' : 'not_started'
     needsSupportFlag = true
   }
 

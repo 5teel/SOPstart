@@ -59,6 +59,31 @@ test.describe('classifyCompetency', () => {
     expect(result.needsSupportFlag).toBe(false)
   })
 
+  test('observation-only (no completion) + newer needs_support -> not_started + flag (never fabricates read)', () => {
+    const result = classifyCompetency({
+      ...base,
+      hasPerformedToSopObservation: true,
+      latestPositiveEvidenceAt: '2026-01-01T00:00:00.000Z',
+      latestNeedsSupportAt: '2026-02-01T00:00:00.000Z',
+    })
+    expect(result.state).toBe('not_started')
+    expect(result.needsSupportFlag).toBe(true)
+    expect(result.awaitingSignOff).toBe(false)
+  })
+
+  test('completion + observation + newer needs_support -> read + flag (floor stays at read when the completion happened)', () => {
+    const result = classifyCompetency({
+      ...base,
+      hasCompletion: true,
+      hasPerformedToSopObservation: true,
+      latestPositiveEvidenceAt: '2026-01-01T00:00:00.000Z',
+      latestNeedsSupportAt: '2026-02-01T00:00:00.000Z',
+    })
+    expect(result.state).toBe('read')
+    expect(result.needsSupportFlag).toBe(true)
+    expect(result.awaitingSignOff).toBe(false)
+  })
+
   test('not_started + needs_support -> stays not_started, no flag (never demotes below read)', () => {
     const result = classifyCompetency({
       ...base,
