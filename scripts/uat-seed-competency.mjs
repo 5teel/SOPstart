@@ -116,7 +116,37 @@ async function main() {
     if (error) throw error
   }
 
+  // 6b. Org-model role placement so workers appear in Chart/Columns views
+  // (listOrgTree renders people from roles + role_members, not member_departments).
+  // Cleanup: cascades via department delete (roles) + user delete (role_members).
+  let role
+  const { data: existingRole } = await admin.from('roles')
+    .select('id').eq('department_id', dept.id).eq('name', 'UAT Operator').maybeSingle()
+  if (existingRole) {
+    role = existingRole
+  } else {
+    const { data, error } = await admin.from('roles')
+      .insert({ organisation_id: orgId, department_id: dept.id, name: 'UAT Operator', budgeted_count: personas.length })
+      .select('id').single()
+    if (error) throw error
+    role = data
+  }
+  for (const w of workers) {
+    const { error } = await admin.from('role_members')
+      .upsert({ role_id: role.id, member_id: w.id, assigned_by: adminUser.id }, { onConflict: 'role_id,member_id' })
+    if (error) throw error
+  }
+  console.log(`Role: UAT Operator (${workers.length} placed)`)
+
   // 7. Evidence per persona, spread across the seeded SOPs
+  // Idempotency guard: evidence inserts are append-only — skip on re-run.
+  const { count: seededCount } = await admin.from('sop_completions')
+    .select('id', { count: 'exact', head: true }).eq('content_hash', 'uat-seed')
+  if (seededCount && seededCount > 0) {
+    console.log(`Evidence already seeded (${seededCount} completions) — skipping.`)
+    console.log('\nSeed complete (re-run).')
+    return
+  }
   const completion = async (workerId, sop, when, status = 'pending_sign_off') => {
     const id = randomUUID()
     const { error } = await admin.from('sop_completions').insert({

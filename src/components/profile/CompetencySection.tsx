@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { getMyCompetencyStates } from '@/actions/competency'
 import { StatePill } from '@/components/admin/competency/StatePill'
 
@@ -37,7 +38,9 @@ export async function CompetencySection() {
               key={s.sopId}
               className="flex items-center justify-between px-5 py-3 border-b border-[var(--ink-100)] last:border-b-0"
             >
-              <span className="text-sm text-[var(--ink-900)]">{s.sopTitle}</span>
+              <Link href={`/sops/${s.sopId}`} className="text-sm text-[var(--ink-900)] hover:underline">
+                {s.sopTitle}
+              </Link>
               <StatePill result={s} />
             </div>
           ))}
