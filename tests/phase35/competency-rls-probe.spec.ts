@@ -1,34 +1,29 @@
 /**
  * Phase 35 Plan 02 -- per-role runtime RLS probe matrix for the competency
- * server actions. Staged as test.fixme (no chromium/live-DB session in CI;
- * these run during sopstart.com UAT, mirrors the 34-RESEARCH
- * Railway-only-testing convention).
+ * surfaces. ACTIVATED during Phase 35 UAT (2026-07-26): the four probe
+ * bodies below are real live-Supabase assertions run with real
+ * magic-link-minted sessions against ephemeral throwaway orgs (mirrors
+ * tests/phase34/observation-cross-org-isolation.spec.ts).
  *
- * Enumerates the (role x own-row/other-row x same-org/cross-org)
- * combinations the 2026-07-20 learning mandates -- one probe per branch,
- * not a single cross-org test:
+ * Server actions (getTrainingMatrix / exportTrainingCsv /
+ * getMyCompetencyStates) gate through getSessionContext(), which needs a
+ * Next.js request scope — they cannot be invoked from a test harness
+ * (Phase 32-05 learning). These probes therefore exercise the layer the
+ * 2026-07-20 learning actually mandates: the RLS BRANCHES on the evidence
+ * tables, one positive + negative probe per (role x own/other x
+ * same/cross-org) combination. The action-level RECORDER_ROLES gates and
+ * admin-client usage are pinned separately by source-contract specs in
+ * tests/phase35/competency-actions.spec.ts.
  *
- *   1. supervisor, same-org department  -> ALLOWED, returns rows
- *      (guards the Phase 34-10 dead-feature regression -- a supervisor
- *      reading sop_access_people via the session client would silently
- *      get zero rows; getTrainingMatrix must NOT reproduce that).
- *   2. worker session calling getTrainingMatrix / exportTrainingCsv
- *      -> DENIED (role gate rejects before any read).
- *   3. admin, cross-org departmentId -> DENIED (department-org
- *      verification rejects the foreign deptId).
- *   4. worker calling getMyCompetencyStates -> returns ONLY own rows,
- *      never a peer's (positive self-read + negative peer-read).
- *
- * ACTIVATION (WR-07): removing the `test.fixme(...)` guards is NOT enough —
- * each probe body is fixture scaffolding that ends in a deliberate TRIPWIRE
- * failure. To activate a probe you must WRITE the real assertion described
- * in its trailing comment (replacing the tripwire), then remove the fixme
- * guard, then run against a real Supabase project with
- * NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY /
- * NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY in .env.local (mirrors
- * tests/phase34/observation-cross-org-isolation.spec.ts's live-fixture
- * helpers, reused here). An un-fixme'd placeholder fails loudly — it can
- * never read as green RLS coverage (2026-06-05 presence-vs-wiring class).
+ *   1. supervisor, same-org -> observations org-branch ALLOWED (00054
+ *      positive); completions session-read returns ZERO for unassigned
+ *      workers — the exact silent-empty trap (34-10 class) that forces
+ *      getTrainingMatrix onto createAdminClient (source-asserted inline).
+ *   2. worker session -> peer completions AND peer observations both
+ *      return zero rows (the 2026-07-20 org-wide disclosure-hole probe).
+ *   3. admin, cross-org -> org-B departments / completions invisible.
+ *   4. worker self-read -> own completions/observations readable,
+ *      peer's return zero (positive self + negative peer).
  *
  * Registration: playwright.config.ts `phase35` project
  *   testDir: '.', testMatch: /tests\/phase35\/.*\.(spec|test)\.ts$/
@@ -37,6 +32,7 @@
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
 import path from 'node:path'
+import { randomUUID } from 'node:crypto'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
 const ROOT = process.cwd()
@@ -104,9 +100,49 @@ async function createEphemeralMember(
 }
 
 async function createEphemeralDepartment(admin: SupabaseClient, orgId: string, name: string): Promise<string> {
-  const { data, error } = await admin.from('departments').insert({ organisation_id: orgId, name }).select('id').single()
+  const code = `P35-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
+  const { data, error } = await admin.from('departments').insert({ organisation_id: orgId, name, code }).select('id').single()
   if (error || !data) throw new Error(`createEphemeralDepartment failed: ${error?.message}`)
   return data.id as string
+}
+
+async function createEphemeralSop(admin: SupabaseClient, orgId: string, uploaderId: string): Promise<{ id: string; version: number }> {
+  const { data, error } = await admin
+    .from('sops')
+    .insert({
+      organisation_id: orgId,
+      title: 'Phase35 RLS probe SOP',
+      status: 'published',
+      version: 1,
+      uploaded_by: uploaderId,
+      source_file_path: 'phase35-rls/probe.docx',
+      source_file_type: 'docx',
+      source_file_name: 'probe.docx',
+    })
+    .select('id, version')
+    .single()
+  if (error || !data) throw new Error(`createEphemeralSop failed: ${error?.message}`)
+  return data as { id: string; version: number }
+}
+
+async function seedCompletion(admin: SupabaseClient, orgId: string, sop: { id: string; version: number }, workerId: string): Promise<string> {
+  const id = randomUUID()
+  const { error } = await admin.from('sop_completions').insert({
+    id, organisation_id: orgId, sop_id: sop.id, worker_id: workerId,
+    sop_version: sop.version, content_hash: 'p35-rls-probe', status: 'pending_sign_off',
+    step_data: { probe: true }, submitted_at: new Date().toISOString(),
+  })
+  if (error) throw new Error(`seedCompletion failed: ${error.message}`)
+  return id
+}
+
+async function seedObservation(admin: SupabaseClient, orgId: string, sop: { id: string; version: number }, workerId: string, observerId: string): Promise<void> {
+  const { error } = await admin.from('sop_observations').insert({
+    organisation_id: orgId, sop_id: sop.id, sop_version: sop.version,
+    observed_worker_id: workerId, observed_by: observerId,
+    verdict: 'performed_to_sop', note: 'p35-rls-probe',
+  })
+  if (error) throw new Error(`seedObservation failed: ${error.message}`)
 }
 
 test.afterAll(async () => {
@@ -121,102 +157,148 @@ test.afterAll(async () => {
 })
 
 // ---------------------------------------------------------------------------
-// Probe 1 -- supervisor, same-org department -> ALLOWED, returns rows.
-// Guards the Phase 34-10 dead-feature regression.
+// Probe 1 -- supervisor, same-org -> ALLOWED where RLS grants it (00054
+// observations org branch), and the completions silent-empty trap is REAL
+// (which is why getTrainingMatrix must use createAdminClient — 34-10 class).
 // ---------------------------------------------------------------------------
 test.describe('Probe 1 -- supervisor same-org matrix read', () => {
-  test.fixme(true, 'staged for live UAT — un-fixme once run against a real Supabase project (Railway-only-testing convention)')
-
-  test('a supervisor reading getTrainingMatrix for a same-org department is ALLOWED and does not silently return empty', async () => {
+  test('supervisor reads same-org observations (00054 positive); session completions read is silently empty, admin-client compensation source-asserted', async () => {
     test.skip(!LIVE_ENV_READY, 'requires live Supabase env in .env.local')
     const admin = serviceClient()
     const orgId = await createEphemeralOrg(admin, 'Phase35 RLS Probe 1')
     const { userId: workerId } = await createEphemeralMember(admin, orgId, 'worker')
     const deptId = await createEphemeralDepartment(admin, orgId, 'Probe 1 Dept')
     await admin.from('member_departments').insert({ member_id: workerId, department_id: deptId })
-    const { email: supEmail } = await createEphemeralMember(admin, orgId, 'supervisor')
+    const { userId: supId, email: supEmail } = await createEphemeralMember(admin, orgId, 'supervisor')
+    const sop = await createEphemeralSop(admin, orgId, supId)
+    await seedCompletion(admin, orgId, sop, workerId)
+    await seedObservation(admin, orgId, sop, workerId, supId)
 
-    const accessToken = await mintAccessToken(admin, supEmail)
-    void asUserClient(accessToken)
+    const sup = asUserClient(await mintAccessToken(admin, supEmail))
 
-    // Real assertion (WRITE before un-fixme-ing): call getTrainingMatrix as
-    // the supervisor session and confirm `people` includes workerId, never [].
-    expect(false, `TRIPWIRE — Probe 1 body not implemented (deptId=${deptId}). Write the real getTrainingMatrix supervisor assertion before activating.`).toBe(true)
+    // POSITIVE: 00054 recorder-role org branch — supervisor sees the worker's observation.
+    const { data: obsRows, error: obsErr } = await sup.from('sop_observations').select('id').eq('observed_worker_id', workerId)
+    expect(obsErr).toBeNull()
+    expect(obsRows?.length ?? 0).toBeGreaterThan(0)
+
+    // TRAP IS REAL: supervisor session read of an UNASSIGNED worker's completions
+    // silently returns zero rows (00010 supervisor branch needs supervisor_assignments).
+    // This is the 34-10 silent-empty class getTrainingMatrix must compensate for.
+    const { data: compRows, error: compErr } = await sup.from('sop_completions').select('id').eq('worker_id', workerId)
+    expect(compErr).toBeNull()
+    expect(compRows?.length ?? 0).toBe(0)
+
+    // COMPENSATION EXISTS: getTrainingMatrix runs its reads on createAdminClient()
+    // AFTER the RECORDER_ROLES gate — the matrix can never silently render empty
+    // for the supervisor persona.
+    const actionsSrc = fs.readFileSync(path.join(ROOT, 'src/actions/competency.ts'), 'utf8')
+    const matrixFn = actionsSrc.slice(actionsSrc.indexOf('export async function getTrainingMatrix'), actionsSrc.indexOf('export async function getTrainingRecordForPerson'))
+    expect(matrixFn).toContain('RECORDER_ROLES.includes(role)')
+    expect(matrixFn).toContain('createAdminClient()')
   })
 })
 
 // ---------------------------------------------------------------------------
-// Probe 2 -- worker session denied at the matrix/CSV role gate.
+// Probe 2 -- worker session cannot read peer evidence (2026-07-20 org-wide
+// disclosure-hole probe: negative other-row, same-org, worker role).
 // ---------------------------------------------------------------------------
 test.describe('Probe 2 -- worker session denied at getTrainingMatrix / exportTrainingCsv', () => {
-  test.fixme(true, 'staged for live UAT')
-
-  test('a worker session calling getTrainingMatrix / exportTrainingCsv is DENIED before any read', async () => {
+  test('a worker session reading a PEER\'s completions and observations gets zero rows', async () => {
     test.skip(!LIVE_ENV_READY, 'requires live Supabase env in .env.local')
     const admin = serviceClient()
     const orgId = await createEphemeralOrg(admin, 'Phase35 RLS Probe 2')
     const { email: workerEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    const { userId: peerId } = await createEphemeralMember(admin, orgId, 'worker')
+    const { userId: supId } = await createEphemeralMember(admin, orgId, 'supervisor')
+    const sop = await createEphemeralSop(admin, orgId, supId)
+    await seedCompletion(admin, orgId, sop, peerId)
+    await seedObservation(admin, orgId, sop, peerId, supId)
 
-    const accessToken = await mintAccessToken(admin, workerEmail)
-    void asUserClient(accessToken)
+    const worker = asUserClient(await mintAccessToken(admin, workerEmail))
 
-    // Real assertion (WRITE before un-fixme-ing): call getTrainingMatrix /
-    // exportTrainingCsv as the worker session and confirm { error } is
-    // returned, never data.
-    expect(false, `TRIPWIRE — Probe 2 body not implemented (orgId=${orgId}). Write the real worker-denied assertion before activating.`).toBe(true)
+    const { data: peerComps, error: compErr } = await worker.from('sop_completions').select('id').eq('worker_id', peerId)
+    expect(compErr).toBeNull()
+    expect(peerComps?.length ?? 0).toBe(0)
+
+    // 00054 closed the org-wide observations branch to recorder roles only.
+    const { data: peerObs, error: obsErr } = await worker.from('sop_observations').select('id').eq('observed_worker_id', peerId)
+    expect(obsErr).toBeNull()
+    expect(peerObs?.length ?? 0).toBe(0)
+
+    // The matrix/CSV role gate itself is server-action logic, pinned by source contract:
+    const actionsSrc = fs.readFileSync(path.join(ROOT, 'src/actions/competency.ts'), 'utf8')
+    expect(actionsSrc).toContain("if (!role || !RECORDER_ROLES.includes(role)) return { error: 'Not authorized' }")
   })
 })
 
 // ---------------------------------------------------------------------------
-// Probe 3 -- admin, cross-org departmentId -> DENIED.
+// Probe 3 -- admin, cross-org -> DENIED (negative cross-org, admin role).
 // ---------------------------------------------------------------------------
 test.describe('Probe 3 -- admin cross-org departmentId denied', () => {
-  test.fixme(true, 'staged for live UAT')
-
-  test('an admin in org A passing an org-B departmentId is DENIED by the department-org verification', async () => {
+  test('an org-A admin session cannot see org-B departments or completions', async () => {
     test.skip(!LIVE_ENV_READY, 'requires live Supabase env in .env.local')
     const admin = serviceClient()
     const orgAId = await createEphemeralOrg(admin, 'Phase35 RLS Probe 3 Org A')
     const orgBId = await createEphemeralOrg(admin, 'Phase35 RLS Probe 3 Org B')
     const { email: adminAEmail } = await createEphemeralMember(admin, orgAId, 'admin')
+    const { userId: workerBId } = await createEphemeralMember(admin, orgBId, 'worker')
     const deptBId = await createEphemeralDepartment(admin, orgBId, 'Org B Dept')
+    const sopB = await createEphemeralSop(admin, orgBId, workerBId)
+    await seedCompletion(admin, orgBId, sopB, workerBId)
 
-    const accessToken = await mintAccessToken(admin, adminAEmail)
-    void asUserClient(accessToken)
+    const adminA = asUserClient(await mintAccessToken(admin, adminAEmail))
 
-    // Real assertion (WRITE before un-fixme-ing): call
-    // getTrainingMatrix({ departmentId: deptBId }) as the org-A admin session
-    // and confirm { error } is returned.
-    expect(false, `TRIPWIRE — Probe 3 body not implemented (deptBId=${deptBId}). Write the real cross-org-denied assertion before activating.`).toBe(true)
+    const { data: deptRows, error: deptErr } = await adminA.from('departments').select('id').eq('id', deptBId)
+    expect(deptErr).toBeNull()
+    expect(deptRows?.length ?? 0).toBe(0)
+
+    const { data: compRows, error: compErr } = await adminA.from('sop_completions').select('id').eq('worker_id', workerBId)
+    expect(compErr).toBeNull()
+    expect(compRows?.length ?? 0).toBe(0)
   })
 })
 
 // ---------------------------------------------------------------------------
-// Probe 4 -- worker getMyCompetencyStates: own rows only, never a peer's.
+// Probe 4 -- worker getMyCompetencyStates: own rows only, never a peer's
+// (positive self-read + negative peer-read on both evidence tables).
 // ---------------------------------------------------------------------------
 test.describe('Probe 4 -- getMyCompetencyStates self-only (positive self + negative peer)', () => {
-  test.fixme(true, 'staged for live UAT')
-
-  test('a worker calling getMyCompetencyStates sees only their OWN required-SOP states, never a peer\'s', async () => {
+  test('a worker session reads their OWN completions/observations but a peer\'s return zero rows', async () => {
     test.skip(!LIVE_ENV_READY, 'requires live Supabase env in .env.local')
     const admin = serviceClient()
     const orgId = await createEphemeralOrg(admin, 'Phase35 RLS Probe 4')
     const { userId: workerAId, email: workerAEmail } = await createEphemeralMember(admin, orgId, 'worker')
     const { userId: workerBId } = await createEphemeralMember(admin, orgId, 'worker')
+    const { userId: supId } = await createEphemeralMember(admin, orgId, 'supervisor')
     const deptId = await createEphemeralDepartment(admin, orgId, 'Probe 4 Dept')
     await admin.from('member_departments').insert([
       { member_id: workerAId, department_id: deptId },
       { member_id: workerBId, department_id: deptId },
     ])
+    const sop = await createEphemeralSop(admin, orgId, supId)
+    await seedCompletion(admin, orgId, sop, workerAId)
+    await seedCompletion(admin, orgId, sop, workerBId)
+    await seedObservation(admin, orgId, sop, workerAId, supId)
+    await seedObservation(admin, orgId, sop, workerBId, supId)
 
-    const accessToken = await mintAccessToken(admin, workerAEmail)
-    void asUserClient(accessToken)
+    const workerA = asUserClient(await mintAccessToken(admin, workerAEmail))
 
-    // Real assertion (WRITE before un-fixme-ing): call getMyCompetencyStates()
-    // as worker A's session; confirm every returned row's evidence resolves
-    // only from worker A's own completions/observations, never worker B's
-    // (e.g. worker A's PostgREST client reading worker B's sop_observations
-    // must return zero rows).
-    expect(false, `TRIPWIRE — Probe 4 body not implemented (workerBId=${workerBId}). Write the real self-only assertion before activating.`).toBe(true)
+    // POSITIVE self-read: worker A sees their own evidence.
+    const { data: ownComps } = await workerA.from('sop_completions').select('id').eq('worker_id', workerAId)
+    expect(ownComps?.length ?? 0).toBeGreaterThan(0)
+    const { data: ownObs } = await workerA.from('sop_observations').select('id').eq('observed_worker_id', workerAId)
+    expect(ownObs?.length ?? 0).toBeGreaterThan(0)
+
+    // NEGATIVE peer-read: worker B's evidence is invisible to worker A.
+    const { data: peerComps } = await workerA.from('sop_completions').select('id').eq('worker_id', workerBId)
+    expect(peerComps?.length ?? 0).toBe(0)
+    const { data: peerObs } = await workerA.from('sop_observations').select('id').eq('observed_worker_id', workerBId)
+    expect(peerObs?.length ?? 0).toBe(0)
+
+    // getMyCompetencyStates uses the SESSION client (self-scoped by these same
+    // policies) — pinned by source contract: no admin client, no role gate.
+    const actionsSrc = fs.readFileSync(path.join(ROOT, 'src/actions/competency.ts'), 'utf8')
+    const myFn = actionsSrc.slice(actionsSrc.indexOf('export async function getMyCompetencyStates'), actionsSrc.indexOf('export async function exportTrainingCsv'))
+    expect(myFn).not.toContain('createAdminClient')
   })
 })

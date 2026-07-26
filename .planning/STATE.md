@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: — Competency & Training Layer
-status: verifying
-stopped_at: Completed 35-04-PLAN.md
-last_updated: "2026-07-24T00:41:29.236Z"
-last_activity: 2026-07-23 -- Phase 35 execution started
+status: phase_complete
+stopped_at: Phase 35 UAT complete — 8/8 passed
+last_updated: "2026-07-26T00:00:00Z"
+last_activity: 2026-07-26 -- Phase 35 UAT passed 8/8 (incl. live RLS probes); ready for Phase 36
 progress:
   total_phases: 6
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 14
   completed_plans: 14
-  percent: 33
+  percent: 50
 ---
 
 # Project State
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 35 (competency-classifier-training-matrix-records) — EXECUTING
+Phase: 35 (competency-classifier-training-matrix-records) — COMPLETE (UAT 8/8, 2026-07-26)
 Plan: 4 of 4
-Status: Phase complete — ready for verification
-Last activity: 2026-07-23 -- Phase 35 execution started
+Status: Phase 35 done — next: Phase 36 (Refresher Cadence + Version-Currency)
+Last activity: 2026-07-26 -- Phase 35 UAT passed 8/8; WR-07 RLS probes activated and green live; UAT seed data still in prod (cleanup: node scripts/uat-seed-cleanup.mjs)
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
@@ -526,7 +526,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-24T00:41:29.227Z
-Stopped at: Completed 35-04-PLAN.md
+Last session: 2026-07-26
+Stopped at: Phase 35 UAT complete (8/8). RLS probe spec activated (tests/phase35/competency-rls-probe.spec.ts, live-green). UAT seed data live in prod — remove with `node scripts/uat-seed-cleanup.mjs` when done demoing.
 Resume file:
 None
