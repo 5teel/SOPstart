@@ -398,12 +398,38 @@ Plans:
   3. Refresher due/overdue re-walkthroughs surface to workers and supervisors, computed from last completion + per-SOP cadence
   4. Refresher state never blocks worker access — informational only, consistent with the locked north star
 
-**Plans**: TBD
+**Plans**: 10 plans in 6 waves
 **UI hint**: yes
 
 Plans:
 
-- [ ] TBD (created by /gsd-plan-phase)
+**Wave 1**
+
+- [ ] 36-01-PLAN.md — phase36 Playwright project + 3 spec files (live CMP-04-style informational-only guard + CMP-03/TRN-03 self-activating stubs)
+- [ ] 36-02-PLAN.md — migration 00055 `sops.refresher_interval_months` + database.types.ts + pure `isOutdatedVersion` / `refresherDueDate` modules + unit tests
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 36-03-PLAN.md — [BLOCKING] db push 00055 + PGRST reload + live column/constraint proof; interval copy-forward through BOTH supersede paths; `setRefresherInterval` admin action
+- [ ] 36-04-PLAN.md — pure layer: MatrixCell/rollup version-currency + refresher fields, CSV `on_current_version` / `refresher_due_date`, unit coverage incl. never-demote regression
+
+**Wave 3** *(blocked on Wave 2)*
+
+- [ ] 36-05-PLAN.md — lineage-widen `getTrainingMatrix` / `getTrainingRecordForPerson` / `getMyCompetencyStates` (closes the CMP-03 evidence-orphaning gap) + org-scope guard spec
+
+**Wave 4** *(blocked on Wave 3)*
+
+- [ ] 36-06-PLAN.md — populate the two CSV columns from lineage data + `getVersionCompletionBreakdown` (TRN-03 read, admin/safety_manager gate)
+
+**Wave 5** *(blocked on Wave 4)*
+
+- [ ] 36-07-PLAN.md — StatePill outdated/refresher sibling chips + matrix rollup tallies + axis-swap toggle (folded todo)
+- [ ] 36-08-PLAN.md — worker library refresher chip (SopLibraryCard + Your SOPs computation) + bundle gate
+- [ ] 36-09-PLAN.md — versions page: TRN-03 per-version completion breakdown panel + per-SOP refresher interval control
+
+**Wave 6** *(blocked on Wave 5)*
+
+- [ ] 36-10-PLAN.md — live supersede/orphaning runtime probe, guard extended to all surfaces, journeys.ts + uat/tests.ts, full phase gate
 
 ### Phase 37: Assessor Governance
 
