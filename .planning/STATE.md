@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: — Competency & Training Layer
-status: phase_complete
-stopped_at: Phase 35 UAT complete — 8/8 passed
-last_updated: "2026-07-26T00:00:00Z"
-last_activity: 2026-07-26 -- Phase 35 UAT passed 8/8 (incl. live RLS probes); ready for Phase 36
+status: completed
+stopped_at: Phase 36 context gathered
+last_updated: "2026-07-26T12:34:17.386Z"
+last_activity: "2026-07-26 -- Phase 35 UAT passed 8/8; WR-07 RLS probes activated and green live; UAT seed data still in prod (cleanup: node scripts/uat-seed-cleanup.mjs)"
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 2
   total_plans: 14
   completed_plans: 14
-  percent: 50
+  percent: 33
 ---
 
 # Project State
@@ -526,7 +526,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-26
-Stopped at: Phase 35 UAT complete (8/8). RLS probe spec activated (tests/phase35/competency-rls-probe.spec.ts, live-green). UAT seed data live in prod — remove with `node scripts/uat-seed-cleanup.mjs` when done demoing.
+Last session: 2026-07-26T12:34:17.369Z
+Stopped at: Phase 36 context gathered
 Resume file:
-None
+.planning/phases/36-refresher-cadence-version-currency/36-CONTEXT.md
