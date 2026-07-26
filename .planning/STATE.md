@@ -4,7 +4,7 @@ milestone: v7.0
 milestone_name: — Competency & Training Layer
 status: completed
 stopped_at: Phase 36 context gathered
-last_updated: "2026-07-26T12:34:17.386Z"
+last_updated: "2026-07-26T13:20:29.950Z"
 last_activity: "2026-07-26 -- Phase 35 UAT passed 8/8; WR-07 RLS probes activated and green live; UAT seed data still in prod (cleanup: node scripts/uat-seed-cleanup.mjs)"
 progress:
   total_phases: 6
