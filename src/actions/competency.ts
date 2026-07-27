@@ -784,7 +784,25 @@ export async function exportTrainingCsv(rawFilters: unknown): Promise<{ csv: str
     .eq('organisation_id', orgId)
     .order('submitted_at', { ascending: false })
   if (workerIds) query = query.in('worker_id', workerIds)
-  if (sopId) query = query.eq('sop_id', sopId)
+  if (sopId) {
+    // WR-05: widen the SOP filter across the whole version lineage — the
+    // matrix cut is lineage-widened, so a per-SOP export must include the
+    // same pre-supersede completions the matrix shows (D-16: both entry
+    // points export the same evidence the UI renders).
+    const { data: filterSop } = await admin
+      .from('sops')
+      .select('id, version, parent_sop_id, refresher_interval_months')
+      .eq('id', sopId)
+      .eq('organisation_id', orgId)
+      .maybeSingle()
+    if (!filterSop) return { error: 'SOP not found in this organisation' }
+    const filterLineage = await resolveLineage(
+      [filterSop as { id: string; version: number | null; parent_sop_id: string | null; refresher_interval_months: number | null }],
+      admin,
+      orgId
+    )
+    query = query.in('sop_id', filterLineage.allSopIds)
+  }
   if (dateFrom) query = query.gte('submitted_at', dateFrom)
   if (dateTo) query = query.lt('submitted_at', nextDayIso(dateTo))
 
