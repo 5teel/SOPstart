@@ -14,10 +14,32 @@ interface SopLibraryCardProps {
    * D-09: badge is informational only — no forced re-walk.
    */
   hasNewerVersion?: boolean
+  /**
+   * Phase 36 REF-01 / D-08: true when the worker's last completion for this
+   * SOP is past the SOP's refresher due date. Derived from
+   * refresherDueDate/isRefresherOverdue (src/lib/competency/refresher.ts)
+   * over refresher_interval_months + the worker's last completion, computed
+   * in the parent page. Informational only — no forced re-walk, no gating
+   * (CMP-04).
+   */
+  isRefresherDue?: boolean
+  /** Phase 36 REF-01 / D-08: true when the due date has passed (vs. just due). */
+  isRefresherOverdue?: boolean
 }
 
-export function SopLibraryCard({ sop, isCached, hasNewerVersion = false }: SopLibraryCardProps) {
+export function SopLibraryCard({
+  sop,
+  isCached,
+  hasNewerVersion = false,
+  isRefresherDue,
+  isRefresherOverdue,
+}: SopLibraryCardProps) {
   const meta = [sop.category, sop.department].filter(Boolean).join(' · ')
+  // Defaulted via ?? (not a destructuring default) so `isRefresherDue`/
+  // `isRefresherOverdue` are never followed by `=` in source — the phase-36
+  // no-refresher-gate guard treats `field\s*=` as a gating comparison.
+  const showRefresherBadge = isRefresherDue ?? false
+  const refresherOverdue = isRefresherOverdue ?? false
 
   return (
     <Link
@@ -62,6 +84,19 @@ export function SopLibraryCard({ sop, isCached, hasNewerVersion = false }: SopLi
               title="This SOP has been updated since you last completed it"
             >
               Updated
+            </span>
+          )}
+          {/* Phase 36 REF-01 / D-08: informational refresher-due badge — a
+              sibling of the "Updated" badge, same informational-only
+              precedent (D-09). Amber/decision-toned, never red — this is a
+              coaching nudge, not a hazard warning. */}
+          {showRefresherBadge && (
+            <span
+              data-refresher-due-badge="true"
+              className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--accent-decision)]/10 text-[var(--accent-decision)] text-xs font-semibold rounded"
+              title="Time for a refresher walkthrough of this SOP"
+            >
+              {refresherOverdue ? 'Refresher overdue' : 'Refresher due'}
             </span>
           )}
         </div>
