@@ -2,8 +2,8 @@
 phase: 36
 slug: refresher-cadence-version-currency
 status: draft
-nyquist_compliant: false
-wave_0_complete: false
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-07-26
 ---
 
@@ -38,7 +38,10 @@ created: 2026-07-26
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| (filled by planner) | — | — | CMP-03 / TRN-03 / REF-01 / REF-02 | — | — | — | — | ❌ W0 | ⬜ pending |
+| 36-01-T2 | 36-01 | 0 | CMP-03 | T-36-01-01 | Worker's v1 completion evidence survives supersede to v2, flagged isOutdatedVersion (not orphaned) | Runtime probe (test.fixme, activates 36-10) | `npx playwright test --project=phase36 --grep "CMP-03"` | ✅ | ✅ green (fixme) |
+| 36-01-T2 | 36-01 | 0 | TRN-03 | T-36-01-02 | getVersionCompletionBreakdown exists, gated to `['admin','safety_manager']` (stricter than RECORDER_ROLES), wired into versions page | Source-contract (self-activating stub) | `npx playwright test --project=phase36 --grep "TRN-03"` | ✅ | ✅ green (skipped) |
+| 36-01-T2 | 36-01 | 0 | REF-01 | T-36-01-01 | No refresher/version-currency derived field (isOutdatedVersion, refresherDueAt, isRefresherOverdue, isRefresherDue, refresher_interval_months) gates control flow on 5 worker-facing files | Source-contract (live guard, GATE_PATTERN) | `npx playwright test --project=phase36 --grep "REF-01"` | ✅ | ✅ green |
+| 36-01-T2 | 36-01 | 0 | REF-02 | — | Pure refresher-cadence math (refresherDueDate, isRefresherOverdue) unit-tested | Unit | `npx playwright test --project=phase35-unit` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -46,8 +49,8 @@ created: 2026-07-26
 
 ## Wave 0 Requirements
 
-- [ ] `tests/phase36/` spec stubs for CMP-03, TRN-03, REF-01, REF-02
-- [ ] `playwright.config.ts` — register a `phase36` project with `testMatch: tests/phase36/**` (single broad registration per CLAUDE.md 2026-05-25 unregistered-spec learning)
+- [x] `tests/phase36/` spec stubs for CMP-03, TRN-03, REF-01, REF-02
+- [x] `playwright.config.ts` — register a `phase36` project with `testMatch: tests/phase36/**` (single broad registration per CLAUDE.md 2026-05-25 unregistered-spec learning)
 
 ---
 
@@ -61,11 +64,11 @@ created: 2026-07-26
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 180s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 180s
+- [x] frontmatter `nyquist_compliant` flag set true
 
-**Approval:** pending
+**Approval:** Wave 0 approved (36-01)
