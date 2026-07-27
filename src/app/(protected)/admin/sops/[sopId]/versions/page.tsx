@@ -182,7 +182,11 @@ export default function SopVersionHistoryPage() {
     loadVersions()
   }, [loadVersions])
 
-  const currentSop = versions.find(v => v.superseded_by === null) ?? versions[0]
+  // WR-01: a cloned-but-unpublished draft also has superseded_by === null and
+  // the highest version, so it must never win — the refresher control, clone
+  // source, title, and compare baseline all target the live PUBLISHED current
+  // (same predicate as the row-level "Current" badge below).
+  const currentSop = versions.find(v => v.superseded_by === null && v.status === 'published') ?? versions[0]
   const sopTitle = currentSop?.title ?? currentSop?.source_file_name ?? 'SOP'
 
   // Seed the refresher-interval input from the current version's persisted value.
