@@ -32,7 +32,19 @@ function extractFunction(name: string, nextMarker: string | null): string {
 
 const getTrainingMatrixSrc = extractFunction('getTrainingMatrix', 'export async function getTrainingRecordForPerson(')
 const getTrainingRecordForPersonSrc = extractFunction('getTrainingRecordForPerson', 'export async function getMyCompetencyStates(')
-const getMyCompetencyStatesSrc = extractFunction('getMyCompetencyStates', 'export async function exportTrainingCsv(')
+// End marker is the divider comment immediately preceding
+// getVersionCompletionBreakdown (Phase 36-06 inserted that function between
+// getMyCompetencyStates and exportTrainingCsv) -- NOT the
+// 'export async function getVersionCompletionBreakdown(' line itself, whose
+// OWN doc-comment mentions RECORDER_ROLES in prose (would still falsely trip
+// the "does NOT check RECORDER_ROLES" assertion below), and NOT
+// exportTrainingCsv, which would silently pull the whole
+// getVersionCompletionBreakdown body's createAdminClient() call into this
+// slice too (stale-marker class, CLAUDE.md 2026-07-13).
+const getMyCompetencyStatesSrc = extractFunction(
+  'getMyCompetencyStates',
+  '// getVersionCompletionBreakdown (TRN-03)'
+)
 const exportTrainingCsvSrc = extractFunction('exportTrainingCsv', null)
 
 test.describe('src/actions/competency.ts -- file-level contract', () => {

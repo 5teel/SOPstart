@@ -138,7 +138,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'A worker finds the right SOP and opens it to read before starting work.',
     steps: [
       { id: 's', type: 'start', label: 'Needs to do a task' },
-      { id: 'lib', type: 'screen', label: 'SOP library', route: '/sops', detail: 'Browse, search, filter by trade. "Updated since last completion" badge (AFL-VER-04) marks any SOP published after the worker\'s last completion.' },
+      { id: 'lib', type: 'screen', label: 'SOP library', route: '/sops', detail: 'Browse, search, filter by trade. "Updated since last completion" badge (AFL-VER-04) marks any SOP published after the worker\'s last completion. Phase 36 (REF-01): a "Refresher due"/"Refresher overdue" chip appears alongside it once the SOP\'s refresher interval has elapsed since the worker\'s last completion — informational only, never blocks opening the card.' },
       { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]', detail: 'Tabs: read, walk, flow (Phase 30 UX-05 — Read merges the old Overview/Tools/Hazards brief; legacy ?tab= params map onto the new tabs). Flow tab defaults to spatial graph on desktop (≥1024px) with a List/Graph toggle; mobile defaults to list. Admins/safety managers see an "Edit in builder" link here to deliberately open this SOP in the admin builder.' },
       { id: 'go', type: 'decision', label: 'Ready to start?', branches: [
         { label: 'Yes — walk it', to: 'walk' },
@@ -435,7 +435,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin revises a live procedure via clone-to-draft or file upload; the new version supersedes the old and assigned workers are told to re-read. Admins can also compare any two versions side-by-side or restore an old version as a new draft. (Phase 23-05: D-05 clone, D-06 restore, D-07 diff)',
     steps: [
       { id: 's', type: 'start', label: 'SOP needs an update' },
-      { id: 'versions', type: 'screen', label: 'Version history', route: '/admin/sops/[sopId]/versions', detail: 'Edit into new version (clone), Upload new version, Restore old version, or Compare two versions.' },
+      { id: 'versions', type: 'screen', label: 'Version history', route: '/admin/sops/[sopId]/versions', detail: 'Edit into new version (clone), Upload new version, Restore old version, or Compare two versions. Phase 36 (TRN-03): each version row also shows a completion-count breakdown (how many workers completed that version, expandable to names + dates), an "outdated version" coaching note for stragglers, and a refresher-interval control (REF-01/REF-02) for how often workers must re-walk this SOP — informational/admin-only, never gates a worker\'s read access.' },
       { id: 'choose', type: 'decision', label: 'How to create the new version?', branches: [
         { label: 'Edit into new version (clone)', to: 'clone' },
         { label: 'Upload a new file', to: 'builder' },
@@ -528,7 +528,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'cell', type: 'action', label: 'Click a state pill cell', detail: 'onSelectCell opens the PersonPanel focused on that person + SOP (D-09).' },
       { id: 'record', type: 'screen', label: 'PersonPanel training record', route: '/admin/team', detail: 'Grouped-by-SOP evidence trail + "Other completed SOPs" section (TRN-01/D-12/D-13).' },
       { id: 'export', type: 'action', label: 'Export CSV', detail: 'Matrix header (filtered cut) or PersonPanel (one worker) — both call the same exportTrainingCsv generator (D-16/TRN-02).' },
-      { id: 'own', type: 'screen', label: 'Worker sees their own competency state', route: '/profile', detail: '"My competency" section — read-only, informational, never gates access (CMP-04).' },
+      { id: 'own', type: 'screen', label: 'Worker sees their own competency state', route: '/profile', detail: '"My competency" section — read-only, informational, never gates access (CMP-04). Phase 36 (REF-01/CMP-03): each SOP row can also carry an "Outdated version" chip (their last completion predates the current version, but their evidence is never lost or reset) and a "Refresher due"/"Refresher overdue" chip — both passive coaching signals, never a lock.' },
       { id: 'e', type: 'end', label: 'Training status visible, evidence exportable' },
     ],
   },

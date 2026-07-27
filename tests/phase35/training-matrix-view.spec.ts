@@ -40,7 +40,11 @@ test.describe('TrainingMatrixView — imports + wiring', () => {
   })
 
   test('cell click INVOKES onSelectCell with the real person/sop ids (not just mentioned)', () => {
-    expect(src).toMatch(/onClick=\{?\(\)\s*=>\s*onSelectCell\(person\.id,\s*sop\.id\)\}?/)
+    // Variable names became personId/forSopId under Phase 36-07's axis-swap
+    // presentation remap (rowItems/colItems can be either person- or
+    // sop-headed) -- the ids passed to onSelectCell are still the real
+    // resolved person/sop ids, not the display-orientation-dependent labels.
+    expect(src).toMatch(/onClick=\{?\(\)\s*=>\s*onSelectCell\(personId,\s*forSopId\)\}?/)
   })
 
   test('compaction is fit-driven — measures container width, not a hardcoded column-count threshold', () => {

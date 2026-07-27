@@ -780,6 +780,62 @@ export const UAT_TESTS: UatTest[] = [
     ],
   },
   {
+    id: 'p36-outdated-version',
+    dateAdded: '2026-07-27',
+    category: 'Phase 36 — Refresher cadence & version currency',
+    title: 'Publish a new version of a procedure — can you tell who\'s still trained on the old one?',
+    status: 'active',
+    summary:
+      'When a procedure gets updated, workers who already did the old version keep their training record — they just get a gentle "outdated version" note until they read the new one.',
+    tryIt: [
+      'Pick a procedure someone has already completed, and publish a new version of it (Edit into new version, then publish).',
+      'Open Team → Matrix, or that person\'s training record, and look at that procedure.',
+    ],
+    links: [{ label: 'Team & org model', href: '/admin/team' }],
+    questions: [
+      { id: 'outdated-visible', text: 'Could you tell at a glance who is still trained on the older version?' },
+      { id: 'record-intact', text: 'Did their existing training record stay intact (nothing was reset or removed)?' },
+    ],
+  },
+  {
+    id: 'p36-refresher-cadence',
+    dateAdded: '2026-07-27',
+    category: 'Phase 36 — Refresher cadence & version currency',
+    title: 'Set a refresher reminder on a procedure — does it show up without blocking anyone?',
+    status: 'active',
+    summary:
+      'Admins can set how often workers should re-walk a procedure (e.g. every 6 months). Once that time passes, workers see a friendly reminder — it never stops them opening or completing the procedure.',
+    tryIt: [
+      'Open a procedure\'s Version History page and set a refresher interval (e.g. 1 month, to see it trigger quickly for testing).',
+      'As a worker who\'s already completed that procedure, check your SOP list and the training matrix for a reminder.',
+      'Try opening and completing the procedure again — confirm nothing blocks you.',
+    ],
+    links: [{ label: 'Team & org model', href: '/admin/team' }],
+    questions: [
+      { id: 'cadence-clear', text: 'Was it clear how often workers need to re-walk this procedure?' },
+      { id: 'reminder-visible', text: 'Did the reminder appear where you\'d expect (your SOP list / the matrix)?' },
+      { id: 'never-blocked', text: 'Did it ever stop anyone from opening or completing the SOP?' },
+    ],
+  },
+  {
+    id: 'p36-version-breakdown',
+    dateAdded: '2026-07-27',
+    category: 'Phase 36 — Refresher cadence & version currency',
+    title: 'Open a procedure\'s Version History — can you see who completed each version?',
+    status: 'active',
+    summary:
+      'The Version History page now shows how many people completed each version of a procedure, with a list you can expand to see names and dates.',
+    tryIt: [
+      'Open any procedure with more than one published version and go to its Version History page.',
+      'Look at each version row and expand the worker list on one of them.',
+    ],
+    links: [{ label: 'Version history', href: '/admin/sops' }],
+    questions: [
+      { id: 'breakdown-visible', text: 'Could you see how many people completed each version?' },
+      { id: 'current-obvious', text: 'Was the current version obvious?' },
+    ],
+  },
+  {
     id: 'example-direction-template',
     dateAdded: '2026-06-09',
     category: 'Examples',

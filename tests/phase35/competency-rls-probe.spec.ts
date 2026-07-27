@@ -297,8 +297,14 @@ test.describe('Probe 4 -- getMyCompetencyStates self-only (positive self + negat
 
     // getMyCompetencyStates uses the SESSION client (self-scoped by these same
     // policies) — pinned by source contract: no admin client, no role gate.
+    // End marker is the divider comment immediately preceding
+    // getVersionCompletionBreakdown (Phase 36-06 inserted that function
+    // between getMyCompetencyStates and exportTrainingCsv) -- NOT
+    // exportTrainingCsv, which would silently pull the whole
+    // getVersionCompletionBreakdown body's createAdminClient() call into this
+    // slice (stale-marker class, CLAUDE.md 2026-07-13).
     const actionsSrc = fs.readFileSync(path.join(ROOT, 'src/actions/competency.ts'), 'utf8')
-    const myFn = actionsSrc.slice(actionsSrc.indexOf('export async function getMyCompetencyStates'), actionsSrc.indexOf('export async function exportTrainingCsv'))
+    const myFn = actionsSrc.slice(actionsSrc.indexOf('export async function getMyCompetencyStates'), actionsSrc.indexOf('// getVersionCompletionBreakdown (TRN-03)'))
     expect(myFn).not.toContain('createAdminClient')
   })
 })
