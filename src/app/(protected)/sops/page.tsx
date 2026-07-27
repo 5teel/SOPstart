@@ -270,27 +270,42 @@ function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeDeptLabel,
     staleTime: 1000 * 60 * 2,
   })
 
-  // Phase 36 REF-01 / D-08: per-SOP refresher interval, read from `sops`
-  // directly (RLS-scoped to what the worker can see via
-  // org_members_can_view_sops). One boolean-worth of data per card — no
-  // server action, no competency classifier call (T-36-08-01/03 accepted).
-  const { data: refresherIntervalMap = {} } = useQuery<Record<string, number | null>>({
+  // Phase 36 REF-01 / D-08: per-SOP refresher interval + lineage root, read
+  // from `sops` directly (RLS-scoped to what the worker can see via
+  // org_members_can_view_sops — superseded rows included). Still no server
+  // action, no competency classifier call (T-36-08-01/03 accepted).
+  const { data: sopMetaMap = {} } = useQuery<Record<string, { root: string; interval: number | null }>>({
     queryKey: ['sop-refresher-intervals'],
     queryFn: async () => {
       const supabase = createClient()
       const { data } = await supabase
         .from('sops')
-        .select('id, refresher_interval_months') as {
-          data: Array<{ id: string; refresher_interval_months: number | null }> | null
+        .select('id, parent_sop_id, refresher_interval_months') as {
+          data: Array<{ id: string; parent_sop_id: string | null; refresher_interval_months: number | null }> | null
         }
-      const map: Record<string, number | null> = {}
+      const map: Record<string, { root: string; interval: number | null }> = {}
       for (const row of data ?? []) {
-        map[row.id] = row.refresher_interval_months
+        map[row.id] = { root: row.parent_sop_id ?? row.id, interval: row.refresher_interval_months }
       }
       return map
     },
     staleTime: 1000 * 60 * 5,
   })
+
+  // WR-03: after a supersede, notifyAssignedWorkers repoints the assignment
+  // to the NEW sop id while the worker's completions stay on the OLD id — so
+  // an exact-sop_id lookup silently reset the refresher clock (and killed the
+  // "Updated" badge) the moment a SOP was republished. Key the completion
+  // clock by lineage ROOT (parent_sop_id ?? id), mirroring the server-side
+  // CMP-03 lineage widening. Lineage is flat, one level deep.
+  const rootOf = (sopId: string): string => sopMetaMap[sopId]?.root ?? sopId
+  const lastCompletionByRoot: Record<string, string> = {}
+  for (const [sopId, submittedAt] of Object.entries(lastCompletionMap)) {
+    const root = rootOf(sopId)
+    if (!lastCompletionByRoot[root] || submittedAt > lastCompletionByRoot[root]) {
+      lastCompletionByRoot[root] = submittedAt
+    }
+  }
 
   function getAssignmentInfo(sopId: string) {
     return assignments.find((a) => a.sop_id === sopId)
@@ -305,7 +320,7 @@ function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeDeptLabel,
    */
   function refresherState(sop: (typeof sops)[number]): { isRefresherDue: boolean; isRefresherOverdue: boolean } {
     const now = new Date().toISOString()
-    const due = refresherDueDate(lastCompletionMap[sop.id] ?? null, refresherIntervalMap[sop.id] ?? null)
+    const due = refresherDueDate(lastCompletionByRoot[rootOf(sop.id)] ?? null, sopMetaMap[sop.id]?.interval ?? null)
     const isDue = due !== null && now >= due
     const isOverdue = computeRefresherOverdue(due, now)
     return { isRefresherDue: isDue, isRefresherOverdue: isOverdue }
@@ -319,7 +334,7 @@ function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeDeptLabel,
   function hasNewerVersion(sop: (typeof sops)[number]): boolean {
     const publishedAt = sop.published_at
     if (!publishedAt) return false
-    const lastCompleted = lastCompletionMap[sop.id]
+    const lastCompleted = lastCompletionByRoot[rootOf(sop.id)]
     if (!lastCompleted) return false // never completed → no "updated" signal
     return new Date(publishedAt) > new Date(lastCompleted)
   }
