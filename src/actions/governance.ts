@@ -19,6 +19,11 @@
  *  - listGovernanceQueue()— composed governance-queue read (Task 2); Phase 29
  *                            Plan 02 additionally computes isCallerNextApprover
  *                            per row (pending rows only) via stepMatchesCaller
+ *  - setRefresherInterval()— Phase 36 REF-01/REF-02: sets/clears the per-SOP
+ *                            worker refresher interval; PLAIN session client
+ *                            (admins_can_update_sops RLS is the real gate,
+ *                            same posture as setSopOwner — never
+ *                            createAdminClient() here, CLAUDE.md 2026-06-15/26)
  *  - requireAdmin()       — EXPORTED (Phase 29 Plan 02) so src/actions/approvals.ts
  *                            reuses the SAME auth/org/role resolution instead of
  *                            duplicating it
@@ -140,6 +145,49 @@ export async function setSopOwner(
   }
   // 0 rows means RLS filtered it out (SOP in another org / missing id) — the
   // write was a no-op, so don't report success (LR-01).
+  if (!updated || updated.length === 0) {
+    return { error: 'SOP not found' }
+  }
+  return { success: true }
+}
+
+// ---------------------------------------------------------------------------
+// setRefresherInterval — REF-01/REF-02, T-36-03-01/02/03
+// ---------------------------------------------------------------------------
+
+export async function setRefresherInterval(
+  sopId: string,
+  months: number | null,
+): Promise<{ success: true } | { error: string }> {
+  if (!sopId) return { error: 'sopId required' }
+
+  const ctx = await requireAdmin()
+  if ('error' in ctx) return { error: ctx.error }
+
+  // null clears the interval (D-02 — turns the refresher OFF for this SOP:
+  // no due-date, no chip, no rollup contribution). Otherwise range-validate.
+  if (months !== null) {
+    if (!Number.isInteger(months) || months < 1 || months > 120) {
+      return { error: 'months must be an integer between 1 and 120' }
+    }
+  }
+
+  // Plain session client — admins_can_update_sops RLS (org + admin/safety_manager
+  // role) already gates this write. Do NOT use the service-role client here
+  // (T-36-03-01, mirrors setSopOwner).
+  const supabase = await createClient()
+  const { data: updated, error } = await supabase
+    .from('sops')
+    .update({ refresher_interval_months: months, updated_at: new Date().toISOString() })
+    .eq('id', sopId)
+    .select('id')
+
+  if (error) {
+    console.error('[setRefresherInterval] update error', error)
+    return { error: error.message }
+  }
+  // 0 rows means RLS filtered it out (SOP in another org / missing id) — the
+  // write was a no-op, so don't report success (LR-01, T-36-03-03).
   if (!updated || updated.length === 0) {
     return { error: 'SOP not found' }
   }
