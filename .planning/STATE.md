@@ -4,13 +4,13 @@ milestone: v7.0
 milestone_name: — Competency & Training Layer
 status: executing
 stopped_at: Completed 36-03-PLAN.md
-last_updated: "2026-07-27T12:33:58.567Z"
+last_updated: "2026-07-27T12:44:49.771Z"
 last_activity: 2026-07-27 -- Phase 36 execution started
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 24
-  completed_plans: 17
+  completed_plans: 18
   percent: 33
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 36 (refresher-cadence-version-currency) — EXECUTING
-Plan: 4 of 10
+Plan: 5 of 10
 Status: Ready to execute
 Last activity: 2026-07-27 -- Phase 36 execution started
 
@@ -193,6 +193,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 36 P01 | 20min | 2 tasks | 4 files |
 | Phase 36 P02 | 2min | 3 tasks | 6 files |
 | Phase 36 P03 | 4min | 3 tasks | 4 files |
+| Phase 36 P04 | 10min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -423,6 +424,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 36-01]: TRN-03 breakdown-panel role gate targets ['admin','safety_manager'] (the existing stricter versions-page gate), not RECORDER_ROLES
 - [Phase ?]: [Phase 36-03]: setRefresherInterval writes with the plain session client (admins_can_update_sops RLS is the enforcing gate), never createAdminClient — mirrors setSopOwner posture
 - [Phase ?]: [Phase 36-03]: null months clears the refresher (D-02) with no range validation branch; non-null months validated 1..120 integer
+- [Phase 36-04]: competency.ts patched with null/false placeholders for new required MatrixSop/TrainingCsvRow fields (Rule 3 blocking-fix); 36-05 wires real DB columns
+- [Phase 36-04]: refresherDueAt computed from latest completion regardless of sign-off status (D-03)
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -533,7 +536,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-27T12:33:58.557Z
+Last session: 2026-07-27T12:43:59.743Z
 Stopped at: Completed 36-03-PLAN.md
 Resume file:
 None
