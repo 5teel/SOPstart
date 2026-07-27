@@ -267,6 +267,12 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
                           {rollup.needsSupportCount > 0 && (
                             <span className="text-[var(--accent-decision)]"> · {rollup.needsSupportCount} needs support</span>
                           )}
+                          {rollup.outdatedCount > 0 && (
+                            <span className="text-[var(--accent-voice)]"> · {rollup.outdatedCount} on outdated version</span>
+                          )}
+                          {rollup.refresherOverdueCount > 0 && (
+                            <span className="text-[var(--accent-decision)]"> · {rollup.refresherOverdueCount} refresher overdue</span>
+                          )}
                         </div>
                       )}
                     </th>
@@ -286,6 +292,12 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
                           {rollup.competentCount}/{rollup.total} competent
                           {rollup.needsSupportCount > 0 && (
                             <span className="text-[var(--accent-decision)]"> · {rollup.needsSupportCount} needs support</span>
+                          )}
+                          {rollup.outdatedCount > 0 && (
+                            <span className="text-[var(--accent-voice)]"> · {rollup.outdatedCount} on outdated version</span>
+                          )}
+                          {rollup.refresherOverdueCount > 0 && (
+                            <span className="text-[var(--accent-decision)]"> · {rollup.refresherOverdueCount} refresher overdue</span>
                           )}
                         </div>
                       )}
