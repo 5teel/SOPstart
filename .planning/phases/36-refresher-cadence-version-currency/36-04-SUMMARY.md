@@ -112,3 +112,11 @@ None - no external service configuration required.
 ---
 *Phase: 36-refresher-cadence-version-currency*
 *Completed: 2026-07-27*
+
+## Self-Check: PASSED
+
+- FOUND: src/lib/competency/matrix.ts
+- FOUND: src/lib/competency/csv.ts
+- FOUND: .planning/phases/36-refresher-cadence-version-currency/36-04-SUMMARY.md
+- FOUND commit: 2bf4729
+- FOUND commit: d5c8048
