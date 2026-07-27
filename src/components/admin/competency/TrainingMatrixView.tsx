@@ -14,13 +14,21 @@
  * the header button's onClick calls exportTrainingCsv(filters) and streams
  * the returned { csv, filename } to downloadCsv(). Native date inputs feed
  * the completion-date range filter (no picker library, ladder rung 4).
+ *
+ * Phase 36 Plan 07 — appended outdated-version/refresher-overdue tallies to
+ * both rollup axes (D-05, additive only) and a `transposed` axis-swap toggle
+ * (folded 2026-07-26 UAT todo). Transpose is a presentation-only remap of
+ * `people`/`sops` into generic `rowItems`/`colItems` immediately before
+ * render — matrix.cells/rowRollups/colRollups and the server fetch are
+ * entirely unchanged. `isCompact` follows the orientation-aware column count
+ * (colItems.length), never a hardcoded axis (35 D-07).
  */
 
 import { useEffect, useRef, useState } from 'react'
 import { getTrainingMatrix, exportTrainingCsv } from '@/actions/competency'
 import { downloadCsv } from '@/lib/competency/download-csv'
 import { StatePill } from './StatePill'
-import type { MatrixPerson, MatrixSop, MatrixCell, TrainingMatrix } from '@/lib/competency/matrix'
+import type { MatrixPerson, MatrixSop, MatrixCell, TrainingMatrix, RowRollup, ColRollup } from '@/lib/competency/matrix'
 import type { Department } from '@/types/sop'
 
 interface TrainingMatrixViewProps {
@@ -47,6 +55,14 @@ function compactAccentVar(cell: Pick<MatrixCell, 'state' | 'awaitingSignOff'>): 
   return '--ink-500'
 }
 
+// A RowRollup's primary tally is "competent"; a ColRollup's is "signed off"
+// — everything else (needsSupport/outdated/refresherOverdue/total) is shared
+// shape, so only the primary count+label diverges by rollup kind.
+function primaryTally(rollup: RowRollup | ColRollup): { count: number; label: string } {
+  if ('competentCount' in rollup) return { count: rollup.competentCount, label: 'competent' }
+  return { count: rollup.signedOffCount, label: 'signed off' }
+}
+
 export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrixViewProps) {
   const [departmentId, setDepartmentId] = useState(departments[0]?.id ?? '')
   const [workerId, setWorkerId] = useState('')
@@ -55,6 +71,7 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
   const [dateTo, setDateTo] = useState('')
   const [exporting, setExporting] = useState(false)
   const [exportError, setExportError] = useState<string | null>(null)
+  const [transposed, setTransposed] = useState(false)
 
   // Unfiltered per-department option lists for the worker/SOP filter
   // dropdowns (MTX-03) — fetched once per department change, independent of
@@ -132,7 +149,19 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
     return () => observer.disconnect()
   }, [])
 
-  const isCompact = containerWidth > 0 && sops.length * COLUMN_WIDTH_PX > containerWidth
+  // Presentation-only axis remap (folded 2026-07-26 UAT todo). Normally rows
+  // = people, columns = sops; `transposed` swaps which entity heads the rows
+  // vs the columns. matrix.cells/rowRollups/colRollups are untouched — only
+  // which array feeds rowItems/colItems changes.
+  const rowIsSop = transposed
+  const rowItems: Array<{ id: string; label: string }> = rowIsSop
+    ? sops.map((s) => ({ id: s.id, label: s.title }))
+    : people.map((p) => ({ id: p.id, label: p.displayName }))
+  const colItems: Array<{ id: string; label: string }> = rowIsSop
+    ? people.map((p) => ({ id: p.id, label: p.displayName }))
+    : sops.map((s) => ({ id: s.id, label: s.title }))
+
+  const isCompact = containerWidth > 0 && colItems.length * COLUMN_WIDTH_PX > containerWidth
 
   // D-16 entry point 1 — exports the CURRENT filtered cut (dept/worker/SOP +
   // date-range). Passive action, never gated on competency state (CMP-04).
@@ -229,13 +258,23 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
           />
         </label>
 
-        <button
-          type="button"
-          onClick={() => void handleExport()}
-          className="ml-auto px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wide bg-[var(--ink-900)] text-white"
-        >
-          {exporting ? 'Exporting…' : 'Export CSV'}
-        </button>
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setTransposed((t) => !t)}
+            aria-pressed={transposed}
+            className="px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wide border border-[var(--ink-300)] text-[var(--ink-700)]"
+          >
+            Swap rows/columns
+          </button>
+          <button
+            type="button"
+            onClick={() => void handleExport()}
+            className="px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wide bg-[var(--ink-900)] text-white"
+          >
+            {exporting ? 'Exporting…' : 'Export CSV'}
+          </button>
+        </div>
       </div>
 
       {exportError && <div className="text-xs text-[var(--accent-decision)]">{exportError}</div>}
@@ -255,15 +294,18 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
           <table className="min-w-full text-sm">
             <thead>
               <tr className="border-b border-[var(--ink-100)]">
-                <th className="text-left px-3 py-2 font-semibold text-[var(--ink-900)] sticky left-0 bg-[var(--paper)]">Worker</th>
-                {sops.map((sop) => {
-                  const rollup = colRollupFor(sop.id)
+                <th className="text-left px-3 py-2 font-semibold text-[var(--ink-900)] sticky left-0 bg-[var(--paper)]">
+                  {transposed ? 'SOP' : 'Worker'}
+                </th>
+                {colItems.map((colItem) => {
+                  const rollup = rowIsSop ? rowRollupFor(colItem.id) : colRollupFor(colItem.id)
+                  const tally = rollup && primaryTally(rollup)
                   return (
-                    <th key={sop.id} className="text-left px-3 py-2 font-semibold text-[var(--ink-900)] whitespace-nowrap">
-                      {sop.title}
-                      {rollup && (
+                    <th key={colItem.id} className="text-left px-3 py-2 font-semibold text-[var(--ink-900)] whitespace-nowrap">
+                      {colItem.label}
+                      {rollup && tally && (
                         <div className="text-[10px] font-normal text-[var(--ink-500)] mt-0.5">
-                          {rollup.signedOffCount}/{rollup.total} signed off
+                          {tally.count}/{rollup.total} {tally.label}
                           {rollup.needsSupportCount > 0 && (
                             <span className="text-[var(--accent-decision)]"> · {rollup.needsSupportCount} needs support</span>
                           )}
@@ -281,15 +323,16 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
               </tr>
             </thead>
             <tbody>
-              {people.map((person) => {
-                const rollup = rowRollupFor(person.id)
+              {rowItems.map((rowItem) => {
+                const rollup = rowIsSop ? colRollupFor(rowItem.id) : rowRollupFor(rowItem.id)
+                const tally = rollup && primaryTally(rollup)
                 return (
-                  <tr key={person.id} className="border-b border-[var(--ink-100)] last:border-b-0">
+                  <tr key={rowItem.id} className="border-b border-[var(--ink-100)] last:border-b-0">
                     <td className="px-3 py-2 font-medium text-[var(--ink-900)] sticky left-0 bg-[var(--paper)] whitespace-nowrap">
-                      {person.displayName}
-                      {rollup && (
+                      {rowItem.label}
+                      {rollup && tally && (
                         <div className="text-[10px] font-normal text-[var(--ink-500)] mt-0.5">
-                          {rollup.competentCount}/{rollup.total} competent
+                          {tally.count}/{rollup.total} {tally.label}
                           {rollup.needsSupportCount > 0 && (
                             <span className="text-[var(--accent-decision)]"> · {rollup.needsSupportCount} needs support</span>
                           )}
@@ -302,16 +345,20 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
                         </div>
                       )}
                     </td>
-                    {sops.map((sop) => {
-                      const cell = cellFor(person.id, sop.id)
-                      if (!cell) return <td key={sop.id} className="px-3 py-2" />
+                    {colItems.map((colItem) => {
+                      const personId = rowIsSop ? colItem.id : rowItem.id
+                      const forSopId = rowIsSop ? rowItem.id : colItem.id
+                      const cell = cellFor(personId, forSopId)
+                      if (!cell) return <td key={colItem.id} className="px-3 py-2" />
+                      const personLabel = rowIsSop ? colItem.label : rowItem.label
+                      const sopLabel = rowIsSop ? rowItem.label : colItem.label
                       return (
-                        <td key={sop.id} className="px-3 py-2">
+                        <td key={colItem.id} className="px-3 py-2">
                           <button
                             type="button"
-                            onClick={() => onSelectCell(person.id, sop.id)}
+                            onClick={() => onSelectCell(personId, forSopId)}
                             className="cursor-pointer"
-                            aria-label={`${person.displayName} — ${sop.title}`}
+                            aria-label={`${personLabel} — ${sopLabel}`}
                           >
                             {isCompact ? (
                               <span

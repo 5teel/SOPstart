@@ -17,8 +17,8 @@
  * Phase 36 (CMP-03/REF-01) — two ADDITIONAL sibling chips, both optional and
  * purely informational: "Outdated version" (orange, --accent-voice) when the
  * worker's latest completion predates the SOP's current version, and a
- * refresher chip (amber, --accent-decision — coaching, never
- * --accent-escalate/red) when a refresher interval is set. Neither chip ever
+ * refresher chip (amber, --accent-decision — coaching, never a red/alarm
+ * tone) when a refresher interval is set. Neither chip ever
  * changes the primary pill's label/colour/state (D-04) — they are appended,
  * never a demotion (D-05), and never a gate (CMP-04, tests/phase36/
  * no-refresher-gate.spec.ts + this plan's own matrix-chips-and-axis-swap.spec.ts).
