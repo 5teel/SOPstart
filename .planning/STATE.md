@@ -4,8 +4,8 @@ milestone: v7.0
 milestone_name: — Competency & Training Layer
 status: verifying
 stopped_at: Completed 36-10-PLAN.md
-last_updated: "2026-07-27T14:09:59.324Z"
-last_activity: 2026-07-27 -- Phase 36 execution started
+last_updated: "2026-07-27T14:46:37.271Z"
+last_activity: 2026-07-27
 progress:
   total_phases: 6
   completed_phases: 3
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 36 (refresher-cadence-version-currency) — EXECUTING
-Plan: 10 of 10
+Phase: 37
+Plan: Not started
 Status: Phase complete — ready for verification
-Last activity: 2026-07-27 -- Phase 36 execution started
+Last activity: 2026-07-27
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
@@ -101,6 +101,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | 28 | 6 | - | - |
 | 33 | 11 | - | - |
 | 34 | 10 | - | - |
+| 36 | 10 | - | - |
 
 **v2.0 By Phase:**
 
