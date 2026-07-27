@@ -136,3 +136,16 @@ None — no external service configuration required. The live CMP-03 probe reads
 ---
 *Phase: 36-refresher-cadence-version-currency*
 *Completed: 2026-07-28*
+
+## Self-Check: PASSED
+
+- FOUND: tests/phase36/version-currency-lineage.spec.ts
+- FOUND: tests/phase36/no-refresher-gate.spec.ts
+- FOUND: src/lib/journeys/journeys.ts
+- FOUND: src/lib/uat/tests.ts
+- FOUND: src/actions/competency.ts
+- FOUND: .planning/phases/36-refresher-cadence-version-currency/36-10-SUMMARY.md
+- FOUND commit: 45b4577
+- FOUND commit: 7856eaf
+- FOUND commit: a3f80b8
+- FOUND commit: 099f502
