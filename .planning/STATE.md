@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: — Competency & Training Layer
 status: executing
-stopped_at: Completed 36-03-PLAN.md
-last_updated: "2026-07-27T12:44:49.771Z"
+stopped_at: Completed 36-05-PLAN.md
+last_updated: "2026-07-27T12:59:11.193Z"
 last_activity: 2026-07-27 -- Phase 36 execution started
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 24
-  completed_plans: 18
+  completed_plans: 19
   percent: 33
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 36 (refresher-cadence-version-currency) — EXECUTING
-Plan: 5 of 10
+Plan: 6 of 10
 Status: Ready to execute
 Last activity: 2026-07-27 -- Phase 36 execution started
 
@@ -194,6 +194,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 36 P02 | 2min | 3 tasks | 6 files |
 | Phase 36 P03 | 4min | 3 tasks | 4 files |
 | Phase 36 P04 | 10min | 3 tasks | 5 files |
+| Phase 36 P05 | 25min | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -426,6 +427,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 36-03]: null months clears the refresher (D-02) with no range validation branch; non-null months validated 1..120 integer
 - [Phase 36-04]: competency.ts patched with null/false placeholders for new required MatrixSop/TrainingCsvRow fields (Rule 3 blocking-fix); 36-05 wires real DB columns
 - [Phase 36-04]: refresherDueAt computed from latest completion regardless of sign-off status (D-03)
+- [Phase 36-05]: resolveLineage uses the caller's session client for getMyCompetencyStates (orgId=null, RLS self-enforces) vs admin client + explicit org filter for the two RECORDER_ROLES reads
+- [Phase 36-05]: Refresher due-date clock is always the latest COMPLETION (D-03), never sign-off/observation timestamps, consistently across all three competency reads
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -536,7 +539,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-27T12:43:59.743Z
-Stopped at: Completed 36-03-PLAN.md
+Last session: 2026-07-27T12:59:11.185Z
+Stopped at: Completed 36-05-PLAN.md
 Resume file:
 None
