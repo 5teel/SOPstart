@@ -242,14 +242,20 @@ function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeDeptLabel,
   // AFL-VER-04 / D-08: fetch the worker's most recent completion submitted_at per SOP.
   // Compares sops.published_at (on the CachedSop) vs MAX(sop_completions.submitted_at).
   // Any newer published version triggers the "Updated" badge — no material-change
-  // classification (D-08). RLS scopes this to the current user (T-23-05-03 mitigated).
+  // classification (D-08). WR-02: RLS alone is NOT a self-scope here —
+  // admins/safety managers read org-wide completions and supervisors read
+  // their assigned workers', so without an explicit worker_id filter those
+  // roles' refresher chips and "Updated" badges render from OTHER people's
+  // training clocks. Filter to the current user explicitly.
   const { data: lastCompletionMap = {} } = useQuery<Record<string, string>>({
     queryKey: ['worker-last-completions'],
     queryFn: async () => {
       const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
       const { data } = await supabase
         .from('sop_completions')
         .select('sop_id, submitted_at')
+        .eq('worker_id', user?.id ?? '')
         .order('submitted_at', { ascending: false }) as {
           data: Array<{ sop_id: string; submitted_at: string }> | null
         }
