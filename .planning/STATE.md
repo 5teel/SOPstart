@@ -4,13 +4,13 @@ milestone: v7.0
 milestone_name: — Competency & Training Layer
 status: executing
 stopped_at: Completed 36-08-PLAN.md
-last_updated: "2026-07-27T13:35:33.014Z"
+last_updated: "2026-07-27T13:45:53.976Z"
 last_activity: 2026-07-27 -- Phase 36 execution started
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 24
-  completed_plans: 22
+  completed_plans: 23
   percent: 33
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 36 (refresher-cadence-version-currency) — EXECUTING
-Plan: 9 of 10
+Plan: 10 of 10
 Status: Ready to execute
 Last activity: 2026-07-27 -- Phase 36 execution started
 
@@ -198,6 +198,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 36 P06 | ~15min | 2 tasks | 2 files |
 | Phase 36 P07 | 30min | 3 tasks | 3 files |
 | Phase 36 P08 | 20min | 2 tasks | 3 files |
+| Phase 36 P09 | 20min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -436,6 +437,7 @@ Recent decisions affecting current work:
 - [Phase 36]: [Phase 36-06]: exportTrainingCsv resolves per-completion version-currency/refresher-due-date via the shared resolveLineage() helper -- no second lineage query
 - [Phase 36]: Phase 36-07: matrix axis-swap is a pure presentation remap (rowItems/colItems derived just before render) -- matrix.cells/rollups and the server fetch stay untouched
 - [Phase 36]: Refresher chip fields assigned via ?? defaults + inline-object spread, never destructuring defaults or literal propName=, to avoid a false-positive on tests/phase36/no-refresher-gate.spec.ts GATE_PATTERN
+- [Phase ?]: [Phase 36-09]: TRN-03 lands entirely on the existing versions page (no new admin route); loadVersions() lifted to useCallback so refresher save/clear handlers can re-run it
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -546,7 +548,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-27T13:35:33.004Z
+Last session: 2026-07-27T13:45:02.646Z
 Stopped at: Completed 36-08-PLAN.md
 Resume file:
 None
