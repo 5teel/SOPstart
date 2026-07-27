@@ -94,8 +94,13 @@ interface LineageResult {
   refresherIntervalBySopId: Map<string, number | null>
 }
 
+// Exported (Plan 36-10) so tests/phase36/version-currency-lineage.spec.ts can
+// run the REAL lineage resolver against live Supabase data instead of a
+// source-contract grep or a test-local reimplementation. Safe under the
+// 'use server' async-only-export constraint (CLAUDE.md 2026-06-27) since this
+// was already an async function.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function resolveLineage(requiredSops: LineageInputSop[], client: any, orgId: string | null): Promise<LineageResult> {
+export async function resolveLineage(requiredSops: LineageInputSop[], client: any, orgId: string | null): Promise<LineageResult> {
   const currentVersionBySopId = new Map(requiredSops.map(s => [s.id, s.version]))
   const refresherIntervalBySopId = new Map(requiredSops.map(s => [s.id, s.refresher_interval_months]))
 

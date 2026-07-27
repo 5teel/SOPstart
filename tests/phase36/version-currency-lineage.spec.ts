@@ -9,12 +9,18 @@
  * read (lineage is NOT orphaned -- state is never reset to 'not_started'),
  * and must be flagged `isOutdatedVersion: true`.
  *
- * test.fixme until Plan 36-10 activates it -- the body is pre-written now
- * (ephemeral-org scaffolding + full scenario) so activation in 36-10 is a
- * single-line flip (`test.fixme` -> `test`), not a from-scratch rewrite.
- * The functions/columns this probe exercises (isOutdatedVersion, the
- * lineage resolver, refresher_interval_months) do not exist until plans
- * 36-02/36-05 land, which is fine -- a fixme body never executes.
+ * getTrainingMatrix/getTrainingRecordForPerson/getMyCompetencyStates all
+ * gate through getSessionContext(), which needs a Next.js request scope and
+ * cannot be invoked from this harness (Phase 32-05 learning). This probe
+ * therefore exercises the REAL, EXPORTED pure/data functions those actions
+ * call -- resolveLineage (now exported from src/actions/competency.ts for
+ * this purpose), classifyCompetency, isOutdatedVersion, refresherDueDate,
+ * isRefresherOverdue -- against REAL rows created and read against the live
+ * database (ephemeral org, real sops/sop_departments/sop_completions rows,
+ * a real supersede, a real materialize-replace-write of sop_departments,
+ * and a real admin-session read). This is strictly stronger evidence than a
+ * source-contract grep: it is the shipped lineage-resolution code running
+ * against the shipped schema with live data, not a reimplementation.
  *
  * Registration: playwright.config.ts `phase36` project
  *   testDir: '.', testMatch: /tests\/phase36\/.*\.(spec|test)\.ts$/
@@ -26,6 +32,10 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { resolveLineage } from '@/actions/competency'
+import { classifyCompetency } from '@/lib/competency/classify'
+import { isOutdatedVersion } from '@/lib/competency/version-currency'
+import { refresherDueDate, isRefresherOverdue } from '@/lib/competency/refresher'
 
 const ROOT = process.cwd()
 
@@ -45,6 +55,7 @@ loadEnv()
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 const ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+const LIVE_ENV_READY = !!(SUPABASE_URL && SERVICE_KEY && ANON_KEY)
 
 function serviceClient(): SupabaseClient {
   return createClient(SUPABASE_URL!, SERVICE_KEY!, { auth: { autoRefreshToken: false, persistSession: false } })
@@ -90,41 +101,71 @@ async function createEphemeralMember(
   return { userId: userResp.user.id, email }
 }
 
-async function createEphemeralSop(admin: SupabaseClient, orgId: string, uploaderId: string): Promise<{ id: string; version: number }> {
+async function createEphemeralDepartment(admin: SupabaseClient, orgId: string, name: string): Promise<string> {
+  const code = `P36L-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
+  const { data, error } = await admin.from('departments').insert({ organisation_id: orgId, name, code }).select('id').single()
+  if (error || !data) throw new Error(`createEphemeralDepartment failed: ${error?.message}`)
+  return data.id as string
+}
+
+interface SopRow {
+  id: string
+  version: number
+  parent_sop_id: string | null
+  refresher_interval_months: number | null
+}
+
+async function createSop(
+  admin: SupabaseClient,
+  orgId: string,
+  uploaderId: string,
+  opts: { version: number; parentSopId: string | null; refresherIntervalMonths: number | null }
+): Promise<SopRow> {
   const { data, error } = await admin
     .from('sops')
     .insert({
       organisation_id: orgId,
       title: 'Phase36 lineage probe SOP',
       status: 'published',
-      version: 1,
+      version: opts.version,
+      parent_sop_id: opts.parentSopId,
+      refresher_interval_months: opts.refresherIntervalMonths,
       uploaded_by: uploaderId,
-      source_file_path: 'phase36-lineage/probe.docx',
+      source_file_path: `phase36-lineage/probe-v${opts.version}.docx`,
       source_file_type: 'docx',
-      source_file_name: 'probe.docx',
+      source_file_name: `probe-v${opts.version}.docx`,
     })
-    .select('id, version')
+    .select('id, version, parent_sop_id, refresher_interval_months')
     .single()
-  if (error || !data) throw new Error(`createEphemeralSop failed: ${error?.message}`)
-  return data as { id: string; version: number }
+  if (error || !data) throw new Error(`createSop failed: ${error?.message}`)
+  return data as SopRow
 }
 
-async function seedCompletion(admin: SupabaseClient, orgId: string, sop: { id: string; version: number }, workerId: string): Promise<string> {
+async function seedCompletion(
+  admin: SupabaseClient,
+  orgId: string,
+  sop: { id: string; version: number },
+  workerId: string,
+  submittedAt: string
+): Promise<string> {
   const id = randomUUID()
   const { error } = await admin.from('sop_completions').insert({
     id, organisation_id: orgId, sop_id: sop.id, worker_id: workerId,
     sop_version: sop.version, content_hash: 'p36-lineage-probe', status: 'pending_sign_off',
-    step_data: { probe: true }, submitted_at: new Date().toISOString(),
+    step_data: { probe: true }, submitted_at: submittedAt,
   })
   if (error) throw new Error(`seedCompletion failed: ${error.message}`)
   return id
 }
 
 test.afterAll(async () => {
-  if (!(SUPABASE_URL && SERVICE_KEY && ANON_KEY)) return
+  if (!LIVE_ENV_READY) return
   const admin = serviceClient()
   for (const orgId of cleanupOrgIds) {
     await admin.from('organisations').delete().eq('id', orgId)
+    // Verify teardown actually removed the ephemeral org (T-36-10-02).
+    const { data: residual } = await admin.from('organisations').select('id').eq('id', orgId).maybeSingle()
+    expect(residual).toBeNull()
   }
   for (const userId of cleanupUserIds) {
     await admin.auth.admin.deleteUser(userId).catch(() => {})
@@ -132,49 +173,118 @@ test.afterAll(async () => {
 })
 
 test.describe('CMP-03 -- version-currency lineage survives supersede (orphaning scenario)', () => {
-  test.fixme(
-    'worker v1 completion still surfaces as evidence under v2 read, flagged isOutdatedVersion (activates in Plan 36-10)',
-    async () => {
-      const admin = serviceClient()
-      const orgId = await createEphemeralOrg(admin, 'Phase36 Lineage Probe')
-      const { userId: adminId } = await createEphemeralMember(admin, orgId, 'admin')
-      const { userId: workerId, email: workerEmail } = await createEphemeralMember(admin, orgId, 'worker')
+  test('worker v1 completion still surfaces as evidence under v2 read, flagged isOutdatedVersion (positive + negative control)', async () => {
+    test.skip(!LIVE_ENV_READY, 'requires live Supabase env in .env.local')
 
-      // Worker completes SOP v1.
-      const sopV1 = await createEphemeralSop(admin, orgId, adminId)
-      await seedCompletion(admin, orgId, sopV1, workerId)
+    const admin = serviceClient()
+    const orgId = await createEphemeralOrg(admin, 'Phase36 Lineage Probe')
+    const { userId: adminId, email: adminEmail } = await createEphemeralMember(admin, orgId, 'admin')
+    const { userId: workerId } = await createEphemeralMember(admin, orgId, 'worker')
+    const { userId: workerBId } = await createEphemeralMember(admin, orgId, 'worker')
+    const deptId = await createEphemeralDepartment(admin, orgId, 'Lineage Probe Dept')
+    await admin.from('member_departments').insert([
+      { member_id: workerId, department_id: deptId },
+      { member_id: workerBId, department_id: deptId },
+    ])
 
-      // Admin supersedes the SOP to v2 (exact call TBD -- Plan 36-02/36-05
-      // will have created the real supersede path; this probe activates
-      // once that path and isOutdatedVersion exist).
-      const { data: sopV2, error: superErr } = await admin
-        .from('sops')
-        .update({ version: 2 })
-        .eq('id', sopV1.id)
-        .select('id, version')
-        .single()
-      if (superErr || !sopV2) throw new Error(`supersede failed: ${superErr?.message}`)
+    // --- v1: published, required for the department (MTX-02: sop_departments,
+    // never re-derived from access_grants), and the worker completes it. ---
+    const sopV1 = await createSop(admin, orgId, adminId, { version: 1, parentSopId: null, refresherIntervalMonths: 6 })
+    const { error: deptSopErr } = await admin.from('sop_departments').insert({ sop_id: sopV1.id, department_id: deptId })
+    if (deptSopErr) throw new Error(`sop_departments seed failed: ${deptSopErr.message}`)
 
-      const worker = asUserClient(await mintAccessToken(admin, workerEmail))
+    const nowIso = new Date().toISOString()
+    await seedCompletion(admin, orgId, sopV1, workerId, nowIso)
 
-      // The worker's v1 completion row must still surface as evidence
-      // after supersede -- lineage is NOT orphaned/deleted.
-      const { data: ownCompletion, error: compErr } = await worker
-        .from('sop_completions')
-        .select('id, sop_version')
-        .eq('sop_id', sopV1.id)
-        .eq('worker_id', workerId)
-        .single()
-      expect(compErr).toBeNull()
-      expect(ownCompletion?.sop_version).toBe(1)
+    // --- Supersede to v2 (mirrors uploadNewVersion: new row with the same
+    // lineage root via parent_sop_id, old row gets superseded_by set,
+    // refresher_interval_months carried forward per D-01). ---
+    const sopV2 = await createSop(admin, orgId, adminId, { version: 2, parentSopId: sopV1.id, refresherIntervalMonths: sopV1.refresher_interval_months })
+    const { error: supersedeErr } = await admin.from('sops').update({ superseded_by: sopV2.id }).eq('id', sopV1.id)
+    if (supersedeErr) throw new Error(`supersede update failed: ${supersedeErr.message}`)
 
-      // getMyCompetencyStates() (src/actions/competency.ts) is the real
-      // consumer of this lineage -- it runs behind getSessionContext() and
-      // cannot be invoked from this harness (Phase 32-05 learning), so
-      // Plan 36-10 asserts the derived fields via its own request-scoped
-      // integration path. This probe proves the underlying evidence row
-      // survives the supersede, which is the precondition for that assertion.
-      expect(sopV2.version).toBe(2)
-    }
-  )
+    // --- Materialize replace-write (mirrors materializeSopAccessForOrg's
+    // replace semantics): the department's requirement junction now points
+    // at the CURRENT version only. ---
+    const { error: delDeptSopErr } = await admin.from('sop_departments').delete().eq('sop_id', sopV1.id).eq('department_id', deptId)
+    if (delDeptSopErr) throw new Error(`sop_departments delete failed: ${delDeptSopErr.message}`)
+    const { error: insDeptSopErr } = await admin.from('sop_departments').insert({ sop_id: sopV2.id, department_id: deptId })
+    if (insDeptSopErr) throw new Error(`sop_departments re-insert failed: ${insDeptSopErr.message}`)
+
+    // Negative control: worker B completes v2 directly.
+    await seedCompletion(admin, orgId, sopV2, workerBId, new Date().toISOString())
+
+    // --- Read as the admin (RECORDER_ROLES persona) via a real minted
+    // session -- proves the worker's pre-supersede completion row is still
+    // visible live, not merely present in the service-role view. ---
+    const adminSession = asUserClient(await mintAccessToken(admin, adminEmail))
+    const { data: adminVisibleComp, error: adminReadErr } = await adminSession
+      .from('sop_completions')
+      .select('id, sop_version')
+      .eq('sop_id', sopV1.id)
+      .eq('worker_id', workerId)
+    expect(adminReadErr).toBeNull()
+    expect(adminVisibleComp?.length ?? 0).toBeGreaterThan(0)
+
+    // --- Required-sop resolution: the matrix's own read path (sop_departments
+    // for this department) must now report ONLY the current version. ---
+    const { data: deptSopRows } = await admin.from('sop_departments').select('sop_id').eq('department_id', deptId)
+    const requiredSopIds = (deptSopRows ?? []).map(r => r.sop_id as string)
+    expect(requiredSopIds).toEqual([sopV2.id])
+
+    const { data: requiredSopRows } = await admin
+      .from('sops')
+      .select('id, version, parent_sop_id, refresher_interval_months')
+      .in('id', requiredSopIds)
+
+    // --- The REAL lineage resolver (exported from src/actions/competency.ts). ---
+    const lineage = await resolveLineage((requiredSopRows ?? []) as SopRow[], admin, orgId)
+    expect(lineage.canonicalBySopId.get(sopV1.id)).toBe(sopV2.id)
+    expect(lineage.allSopIds).toEqual(expect.arrayContaining([sopV1.id, sopV2.id]))
+
+    // --- Evidence read across the whole lineage (mirrors getTrainingRecordForPerson). ---
+    const { data: compRowsA } = await admin
+      .from('sop_completions')
+      .select('id, sop_id, sop_version, submitted_at')
+      .eq('worker_id', workerId)
+      .in('sop_id', lineage.allSopIds)
+    // ORPHANING ASSERTION: the pre-supersede completion row still surfaces.
+    expect(compRowsA?.length ?? 0).toBeGreaterThan(0)
+
+    const canonicalOf = (sopId: string): string => lineage.canonicalBySopId.get(sopId) ?? sopId
+    const latestA = (compRowsA ?? [])[0] as { sop_id: string; sop_version: number; submitted_at: string }
+    expect(canonicalOf(latestA.sop_id)).toBe(sopV2.id)
+
+    // ORPHANING ASSERTION: classifying this evidence must NEVER read as
+    // not_started -- the worker's v1 read is real evidence of state 'read'.
+    const classifiedA = classifyCompetency({
+      hasCompletion: true,
+      hasPerformedToSopObservation: false,
+      hasSignOff: false,
+      latestNeedsSupportAt: null,
+      latestPositiveEvidenceAt: null,
+    })
+    expect(classifiedA.state).not.toBe('not_started')
+
+    // POSITIVE: worker A's latest completion (v1) is outdated against v2.
+    const currentVersionForA = lineage.currentVersionBySopId.get(canonicalOf(latestA.sop_id)) ?? null
+    expect(isOutdatedVersion(latestA.sop_version, currentVersionForA)).toBe(true)
+
+    // Refresher lineage behaviour (RESEARCH Assumption A3): a RECENT v1
+    // completion must NOT be instantly refresher-overdue the moment v2
+    // publishes.
+    const dueAtA = refresherDueDate(latestA.submitted_at, lineage.refresherIntervalBySopId.get(canonicalOf(latestA.sop_id)) ?? null)
+    expect(isRefresherOverdue(dueAtA, new Date().toISOString())).toBe(false)
+
+    // --- NEGATIVE control: worker B's completion is directly against v2. ---
+    const { data: compRowsB } = await admin
+      .from('sop_completions')
+      .select('id, sop_id, sop_version, submitted_at')
+      .eq('worker_id', workerBId)
+      .in('sop_id', lineage.allSopIds)
+    const latestB = (compRowsB ?? [])[0] as { sop_id: string; sop_version: number }
+    expect(canonicalOf(latestB.sop_id)).toBe(sopV2.id)
+    const currentVersionForB = lineage.currentVersionBySopId.get(canonicalOf(latestB.sop_id)) ?? null
+    expect(isOutdatedVersion(latestB.sop_version, currentVersionForB)).toBe(false)
+  })
 })
