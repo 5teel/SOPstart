@@ -54,6 +54,26 @@ test.describe('TRN-03 -- version completion breakdown panel', () => {
     expect(src).toMatch(/export (interface|type) VersionCompletionBreakdown/)
   })
 
+  test('getVersionCompletionBreakdown self-enforces organisation scope', () => {
+    const src = read(COMPETENCY_ACTIONS)
+    test.skip(!src.includes('getVersionCompletionBreakdown'), 'getVersionCompletionBreakdown not yet created (lands in Plan 36-06)')
+    const start = src.indexOf('export async function getVersionCompletionBreakdown')
+    const nextFnMatch = src.slice(start + 1).search(/\nexport async function /)
+    const fnBody = nextFnMatch === -1 ? src.slice(start) : src.slice(start, start + 1 + nextFnMatch)
+    expect(fnBody).toContain(".eq('organisation_id'")
+  })
+
+  test('getVersionCompletionBreakdown is read-only (no write calls)', () => {
+    const src = read(COMPETENCY_ACTIONS)
+    test.skip(!src.includes('getVersionCompletionBreakdown'), 'getVersionCompletionBreakdown not yet created (lands in Plan 36-06)')
+    const start = src.indexOf('export async function getVersionCompletionBreakdown')
+    const nextFnMatch = src.slice(start + 1).search(/\nexport async function /)
+    const fnBody = nextFnMatch === -1 ? src.slice(start) : src.slice(start, start + 1 + nextFnMatch)
+    expect(fnBody).not.toContain('.update(')
+    expect(fnBody).not.toContain('.insert(')
+    expect(fnBody).not.toContain('.delete(')
+  })
+
   test('versions page wires the breakdown panel/action', () => {
     const src = read(VERSIONS_PAGE)
     const wired = src.includes('getVersionCompletionBreakdown') || /VersionBreakdownPanel|VersionCompletionBreakdown/.test(src)
