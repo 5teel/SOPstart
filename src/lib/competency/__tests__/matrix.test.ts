@@ -11,8 +11,8 @@ const baseInput: BuildMatrixInput = {
     p2: ['sop-a'],
   },
   sops: [
-    { id: 'sop-a', title: 'SOP A', sopNumber: 'A-1' },
-    { id: 'sop-b', title: 'SOP B', sopNumber: 'B-1' },
+    { id: 'sop-a', title: 'SOP A', sopNumber: 'A-1', currentVersion: 2, refresherIntervalMonths: null },
+    { id: 'sop-b', title: 'SOP B', sopNumber: 'B-1', currentVersion: 1, refresherIntervalMonths: null },
   ],
   completions: [],
   signOffs: [],
@@ -77,5 +77,102 @@ test.describe('buildMatrix', () => {
     expect(cell?.needsSupportFlag).toBe(true)
     const rowRollup = result.rowRollups.find(r => r.personId === 'p1')
     expect(rowRollup?.needsSupportCount).toBe(1)
+  })
+
+  // Phase 36 (CMP-03/REF-01/REF-02) ----------------------------------------
+
+  test('CMP-03: outdated-version cell carries isOutdatedVersion true while state/competentCount/signedOffCount are byte-identical to pre-Phase-36 (never demote)', () => {
+    const input: BuildMatrixInput = {
+      ...baseInput,
+      completions: [{ id: 'c1', workerId: 'p1', sopId: 'sop-a', sopVersion: 1, submittedAt: '2026-01-01T00:00:00.000Z' }],
+      signOffs: [{ completionId: 'c1', decision: 'approved', createdAt: '2026-01-02T00:00:00.000Z' }],
+      nowIso: '2026-02-01T00:00:00.000Z',
+    }
+    const result = buildMatrix(input)
+    const cell = result.cells.find(c => c.personId === 'p1' && c.sopId === 'sop-a')
+    // sop-a currentVersion is 2, completion was on version 1 -> outdated
+    expect(cell?.isOutdatedVersion).toBe(true)
+    // Byte-identical to the pre-Phase-36 expectation: same evidence still yields
+    // competent_signed_off — outdated is an ADDITIVE tally, never a demotion.
+    expect(cell?.state).toBe('competent_signed_off')
+
+    const rowRollup = result.rowRollups.find(r => r.personId === 'p1')
+    expect(rowRollup?.competentCount).toBe(1)
+    const colRollup = result.colRollups.find(c => c.sopId === 'sop-a')
+    expect(colRollup?.signedOffCount).toBe(1)
+  })
+
+  test('current-version cell carries isOutdatedVersion false', () => {
+    const input: BuildMatrixInput = {
+      ...baseInput,
+      completions: [{ id: 'c1', workerId: 'p1', sopId: 'sop-a', sopVersion: 2, submittedAt: '2026-01-01T00:00:00.000Z' }],
+    }
+    const result = buildMatrix(input)
+    const cell = result.cells.find(c => c.personId === 'p1' && c.sopId === 'sop-a')
+    expect(cell?.isOutdatedVersion).toBe(false)
+  })
+
+  test('no-completion cell: isOutdatedVersion false, refresherDueAt null, isRefresherOverdue false', () => {
+    const result = buildMatrix(baseInput)
+    const cell = result.cells.find(c => c.personId === 'p1' && c.sopId === 'sop-a')
+    expect(cell?.isOutdatedVersion).toBe(false)
+    expect(cell?.refresherDueAt).toBeNull()
+    expect(cell?.isRefresherOverdue).toBe(false)
+  })
+
+  test('D-02: refresher-unset SOP -> refresherDueAt null / isRefresherOverdue false for every cell, 0 rollup tallies', () => {
+    const input: BuildMatrixInput = {
+      ...baseInput,
+      completions: [{ id: 'c1', workerId: 'p1', sopId: 'sop-a', sopVersion: 2, submittedAt: '2020-01-01T00:00:00.000Z' }],
+      nowIso: '2026-01-01T00:00:00.000Z',
+    }
+    const result = buildMatrix(input)
+    const cell = result.cells.find(c => c.personId === 'p1' && c.sopId === 'sop-a')
+    expect(cell?.refresherDueAt).toBeNull()
+    expect(cell?.isRefresherOverdue).toBe(false)
+    const rowRollup = result.rowRollups.find(r => r.personId === 'p1')
+    expect(rowRollup?.refresherOverdueCount).toBe(0)
+    const colRollup = result.colRollups.find(c => c.sopId === 'sop-a')
+    expect(colRollup?.refresherOverdueCount).toBe(0)
+  })
+
+  test('D-03: refresher-overdue SOP with a completion that was NOT signed off still marks isRefresherOverdue true', () => {
+    const input: BuildMatrixInput = {
+      ...baseInput,
+      sops: [
+        { id: 'sop-a', title: 'SOP A', sopNumber: 'A-1', currentVersion: 2, refresherIntervalMonths: 6 },
+        { id: 'sop-b', title: 'SOP B', sopNumber: 'B-1', currentVersion: 1, refresherIntervalMonths: null },
+      ],
+      completions: [{ id: 'c1', workerId: 'p1', sopId: 'sop-a', sopVersion: 2, submittedAt: '2025-01-01T00:00:00.000Z' }],
+      signOffs: [],
+      nowIso: '2026-01-01T00:00:00.000Z',
+    }
+    const result = buildMatrix(input)
+    const cell = result.cells.find(c => c.personId === 'p1' && c.sopId === 'sop-a')
+    expect(cell?.awaitingSignOff).toBe(true)
+    expect(cell?.refresherDueAt).not.toBeNull()
+    expect(cell?.isRefresherOverdue).toBe(true)
+
+    const rowRollup = result.rowRollups.find(r => r.personId === 'p1')
+    expect(rowRollup?.refresherOverdueCount).toBe(1)
+    const colRollup = result.colRollups.find(c => c.sopId === 'sop-a')
+    expect(colRollup?.refresherOverdueCount).toBe(1)
+  })
+
+  test('rollup tallies: outdatedCount counts exactly the cells with isOutdatedVersion true', () => {
+    const input: BuildMatrixInput = {
+      ...baseInput,
+      completions: [
+        { id: 'c1', workerId: 'p1', sopId: 'sop-a', sopVersion: 1, submittedAt: '2026-01-01T00:00:00.000Z' }, // outdated (current 2)
+        { id: 'c2', workerId: 'p2', sopId: 'sop-a', sopVersion: 2, submittedAt: '2026-01-01T00:00:00.000Z' }, // current
+      ],
+    }
+    const result = buildMatrix(input)
+    const rowRollupP1 = result.rowRollups.find(r => r.personId === 'p1')
+    const rowRollupP2 = result.rowRollups.find(r => r.personId === 'p2')
+    expect(rowRollupP1?.outdatedCount).toBe(1)
+    expect(rowRollupP2?.outdatedCount).toBe(0)
+    const colRollup = result.colRollups.find(c => c.sopId === 'sop-a')
+    expect(colRollup?.outdatedCount).toBe(1)
   })
 })

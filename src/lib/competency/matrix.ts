@@ -8,9 +8,20 @@
 // already-materialized sop_departments/sop_access_people output only — this
 // module must never re-derive the inheritance chain a second time). Mirrors
 // the pure-assembler discipline of src/lib/org-model/resolve-sop-access.ts.
+//
+// Phase 36 (CMP-03/REF-01/REF-02): version-currency and refresher-due
+// derivations are layered ADDITIVELY on top of the classifyCompetency()
+// ladder above — that ladder is untouched (classify.ts is not modified by
+// this plan). isOutdatedVersion/refresherDueAt/isRefresherOverdue never
+// change `state`, `competentCount`, or `signedOffCount`; they are appended
+// tallies, never a demotion or reset (D-04/D-05). `nowIso` is injected via
+// BuildMatrixInput (resolved once, not per-cell) so the module stays pure
+// and deterministic for tests.
 // ------------------------------------------------------------
 
 import { classifyCompetency, type CompetencyState } from './classify'
+import { isOutdatedVersion } from './version-currency'
+import { refresherDueDate, isRefresherOverdue } from './refresher'
 
 export interface MatrixPerson {
   id: string
@@ -21,6 +32,8 @@ export interface MatrixSop {
   id: string
   title: string
   sopNumber: string | null
+  currentVersion: number | null
+  refresherIntervalMonths: number | null
 }
 
 export interface MatrixCompletion {
@@ -52,6 +65,8 @@ export interface BuildMatrixInput {
   completions: MatrixCompletion[]
   signOffs: MatrixSignOff[]
   observations: MatrixObservation[]
+  /** Phase 36: injected clock for refresher-overdue math; defaults to now. */
+  nowIso?: string
 }
 
 export interface MatrixCell {
@@ -63,6 +78,9 @@ export interface MatrixCell {
   /** Phase 36 forward-compat (D-05): expose latest completion per pair. */
   latestCompletionAt: string | null
   latestCompletionVersion: number | null
+  isOutdatedVersion: boolean
+  refresherDueAt: string | null
+  isRefresherOverdue: boolean
 }
 
 export interface RowRollup {
@@ -70,6 +88,8 @@ export interface RowRollup {
   total: number
   competentCount: number
   needsSupportCount: number
+  outdatedCount: number
+  refresherOverdueCount: number
 }
 
 export interface ColRollup {
@@ -77,6 +97,8 @@ export interface ColRollup {
   total: number
   signedOffCount: number
   needsSupportCount: number
+  outdatedCount: number
+  refresherOverdueCount: number
 }
 
 export interface TrainingMatrix {
@@ -90,8 +112,10 @@ const NEEDS_SUPPORT_VERDICT = 'needs_support'
 const APPROVED_DECISION = 'approved'
 
 export function buildMatrix(input: BuildMatrixInput): TrainingMatrix {
-  const { people, requiredSopsByPerson, completions, signOffs, observations } = input
+  const { people, requiredSopsByPerson, sops, completions, signOffs, observations } = input
+  const nowIso = input.nowIso ?? new Date().toISOString()
 
+  const sopsById = new Map(sops.map(sop => [sop.id, sop]))
   const approvedCompletionIds = new Set(signOffs.filter(s => s.decision === APPROVED_DECISION).map(s => s.completionId))
 
   const cells: MatrixCell[] = []
@@ -102,8 +126,11 @@ export function buildMatrix(input: BuildMatrixInput): TrainingMatrix {
     const requiredSopIds = requiredSopsByPerson[person.id] ?? []
     let competentCount = 0
     let needsSupportCount = 0
+    let rowOutdatedCount = 0
+    let rowRefresherOverdueCount = 0
 
     for (const sopId of requiredSopIds) {
+      const sop = sopsById.get(sopId)
       const personCompletions = completions.filter(c => c.workerId === person.id && c.sopId === sopId)
       const hasCompletion = personCompletions.length > 0
       const hasSignOff = personCompletions.some(c => approvedCompletionIds.has(c.id))
@@ -136,6 +163,10 @@ export function buildMatrix(input: BuildMatrixInput): TrainingMatrix {
         return latest
       }, null)
 
+      const cellIsOutdated = isOutdatedVersion(latestCompletion?.sopVersion ?? null, sop?.currentVersion ?? null)
+      const cellRefresherDueAt = refresherDueDate(latestCompletion?.submittedAt ?? null, sop?.refresherIntervalMonths ?? null)
+      const cellIsRefresherOverdue = isRefresherOverdue(cellRefresherDueAt, nowIso)
+
       cells.push({
         personId: person.id,
         sopId,
@@ -144,15 +175,22 @@ export function buildMatrix(input: BuildMatrixInput): TrainingMatrix {
         awaitingSignOff: result.awaitingSignOff,
         latestCompletionAt: latestCompletion?.submittedAt ?? null,
         latestCompletionVersion: latestCompletion?.sopVersion ?? null,
+        isOutdatedVersion: cellIsOutdated,
+        refresherDueAt: cellRefresherDueAt,
+        isRefresherOverdue: cellIsRefresherOverdue,
       })
 
       if (result.state === 'competent_signed_off') competentCount++
       if (result.needsSupportFlag) needsSupportCount++
+      if (cellIsOutdated) rowOutdatedCount++
+      if (cellIsRefresherOverdue) rowRefresherOverdueCount++
 
-      const colRollup = colRollupsBySop.get(sopId) ?? { sopId, total: 0, signedOffCount: 0, needsSupportCount: 0 }
+      const colRollup = colRollupsBySop.get(sopId) ?? { sopId, total: 0, signedOffCount: 0, needsSupportCount: 0, outdatedCount: 0, refresherOverdueCount: 0 }
       colRollup.total++
       if (result.state === 'competent_signed_off') colRollup.signedOffCount++
       if (result.needsSupportFlag) colRollup.needsSupportCount++
+      if (cellIsOutdated) colRollup.outdatedCount++
+      if (cellIsRefresherOverdue) colRollup.refresherOverdueCount++
       colRollupsBySop.set(sopId, colRollup)
     }
 
@@ -161,6 +199,8 @@ export function buildMatrix(input: BuildMatrixInput): TrainingMatrix {
       total: requiredSopIds.length,
       competentCount,
       needsSupportCount,
+      outdatedCount: rowOutdatedCount,
+      refresherOverdueCount: rowRefresherOverdueCount,
     })
   }
 

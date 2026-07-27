@@ -195,6 +195,11 @@ export async function getTrainingMatrix(
     id: s.id,
     title: s.title,
     sopNumber: s.sop_number,
+    // ponytail: currentVersion/refresherIntervalMonths wired in 36-05 once the
+    // query above selects `version`/`refresher_interval_months`; null here
+    // matches the pre-Phase-36 no-outdated/no-refresher behavior exactly.
+    currentVersion: null,
+    refresherIntervalMonths: null,
   }))
   const completions: MatrixCompletion[] = ((completionRows ?? []) as Array<{ id: string; worker_id: string; sop_id: string; sop_version: number; submitted_at: string }>).map(c => ({
     id: c.id,
