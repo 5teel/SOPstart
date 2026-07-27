@@ -711,6 +711,107 @@ export async function getMyCompetencyStates(): Promise<MyCompetencyState[]> {
 }
 
 // ---------------------------------------------------------------
+// getVersionCompletionBreakdown (TRN-03) — per-version completion counts +
+// worker lists for the versions page (D-09). Gated to the STRICTER
+// ['admin', 'safety_manager'] boundary the versions page already enforces
+// (uploadNewVersion/cloneSopAsDraft in versioning.ts) — deliberately NOT
+// RECORDER_ROLES, which also grants 'supervisor': widening who can see
+// version/approval history is a product decision CONTEXT does not make
+// (RESEARCH Open Question 1). Read-only: never writes, never gates
+// anything, not referenced from any worker-facing file.
+// ---------------------------------------------------------------
+export interface VersionCompletionBreakdown {
+  sopId: string
+  versions: Array<{
+    sopId: string
+    version: number
+    isCurrent: boolean
+    completionCount: number
+    workers: Array<{ userId: string; displayName: string; completedAt: string }>
+  }>
+}
+
+export async function getVersionCompletionBreakdown(
+  sopId: string
+): Promise<{ breakdown: VersionCompletionBreakdown } | { error: string }> {
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId) return { error: 'Not authenticated' }
+  if (!role || !['admin', 'safety_manager'].includes(role)) return { error: 'Not authorized' }
+  if (!organisationId) return { error: 'No organisation' }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const admin: any = createAdminClient()
+  const orgId = await callerOrgId(admin, userId, organisationId)
+  if (!orgId) return { error: 'No organisation' }
+
+  // Never trust a client-supplied sopId — verify it belongs to the caller's
+  // org BEFORE any further read (T-36-06-01).
+  const { data: sopRow } = await admin
+    .from('sops')
+    .select('id, version, parent_sop_id, refresher_interval_months')
+    .eq('id', sopId)
+    .eq('organisation_id', orgId)
+    .maybeSingle()
+  if (!sopRow) return { error: 'SOP not found in this organisation' }
+
+  const lineage = await resolveLineage([sopRow], admin, orgId)
+
+  const { data: lineageSopRows } = await admin
+    .from('sops')
+    .select('id, version')
+    .eq('organisation_id', orgId)
+    .in('id', lineage.allSopIds)
+  const versionBySopId = new Map(((lineageSopRows ?? []) as Array<{ id: string; version: number }>).map(s => [s.id, s.version]))
+
+  const { data: completionRows } = await admin
+    .from('sop_completions')
+    .select('worker_id, sop_id, submitted_at')
+    .eq('organisation_id', orgId)
+    .in('sop_id', lineage.allSopIds)
+  const completions = (completionRows ?? []) as Array<{ worker_id: string; sop_id: string; submitted_at: string }>
+
+  // Grouped by the ACTUAL sop_id (per-version reporting) — NOT remapped
+  // through canonicalBySopId, which the matrix/record reads use instead.
+  const completionsBySop = new Map<string, typeof completions>()
+  for (const c of completions) {
+    if (!completionsBySop.has(c.sop_id)) completionsBySop.set(c.sop_id, [])
+    completionsBySop.get(c.sop_id)!.push(c)
+  }
+
+  const names = await resolveDisplayNames(completions.map(c => c.worker_id))
+
+  const versions = lineage.allSopIds
+    .map(id => {
+      const version = versionBySopId.get(id)
+      if (version === undefined) return null
+      const rows = completionsBySop.get(id) ?? []
+      // One worker entry per distinct worker (dedupe multiple completion
+      // events against the same version), keeping the latest completion.
+      const latestByWorker = new Map<string, string>()
+      for (const r of rows) {
+        const existing = latestByWorker.get(r.worker_id)
+        if (!existing || r.submitted_at > existing) latestByWorker.set(r.worker_id, r.submitted_at)
+      }
+      const workers = Array.from(latestByWorker.entries()).map(([workerId, completedAt]) => ({
+        userId: workerId,
+        displayName: names[workerId] ?? 'Unknown',
+        completedAt,
+      }))
+      return {
+        sopId: id,
+        version,
+        isCurrent: version === sopRow.version,
+        completionCount: workers.length,
+        workers,
+      }
+    })
+    .filter((v): v is NonNullable<typeof v> => v !== null)
+    .sort((a, b) => b.version - a.version)
+
+  return { breakdown: { sopId, versions } }
+}
+
+// ---------------------------------------------------------------
 // exportTrainingCsv — role-gated 'use server' action, NEVER a cookie-less
 // route (T-35-02-04). One row per completion event (D-14). Two entry
 // points (matrix header cut + PersonPanel single-worker export) call this
@@ -764,17 +865,40 @@ export async function exportTrainingCsv(rawFilters: unknown): Promise<{ csv: str
 
   const [{ data: signOffRows }, { data: sopRows }] = await Promise.all([
     admin.from('completion_sign_offs').select('completion_id, decision, created_at, supervisor_id').in('completion_id', completionIds),
-    admin.from('sops').select('id, title, sop_number').eq('organisation_id', orgId).in('id', sopIds),
+    admin
+      .from('sops')
+      .select('id, title, sop_number, version, parent_sop_id, refresher_interval_months')
+      .eq('organisation_id', orgId)
+      .in('id', sopIds),
   ])
   const signOffs = (signOffRows ?? []) as Array<{ completion_id: string; decision: string; created_at: string; supervisor_id: string }>
-  const sopById = new Map(((sopRows ?? []) as Array<{ id: string; title: string; sop_number: string | null }>).map(s => [s.id, s]))
+  const sopRowsTyped = (sopRows ?? []) as Array<{
+    id: string
+    title: string
+    sop_number: string | null
+    version: number | null
+    parent_sop_id: string | null
+    refresher_interval_months: number | null
+  }>
+  const sopById = new Map(sopRowsTyped.map(s => [s.id, s]))
   const signOffByCompletion = new Map(signOffs.map(s => [s.completion_id, s]))
+  // sopIds here is keyed on the DISTINCT sop_ids present in the completion
+  // result, which after a supersede includes superseded rows — resolve each
+  // completion's lineage context through the SAME resolveLineage() helper
+  // (no second lineage query) rather than re-deriving version currency here.
+  const lineage = await resolveLineage(sopRowsTyped, admin, orgId)
 
   const names = await resolveDisplayNames([...workerIdsInResult, ...signOffs.map(s => s.supervisor_id)])
 
   const rows: TrainingCsvRow[] = completions.map(c => {
     const sop = sopById.get(c.sop_id)
     const signOff = signOffByCompletion.get(c.id)
+    // The completion's own sop row can itself be superseded — resolve its
+    // canonical (current) lineage entry first, falling back to the
+    // completion's own sop row when no canonical mapping exists.
+    const canonicalSopId = lineage.canonicalBySopId.get(c.sop_id) ?? c.sop_id
+    const currentVersionForThisLineage = lineage.currentVersionBySopId.get(canonicalSopId) ?? sop?.version ?? null
+    const intervalForThisLineage = lineage.refresherIntervalBySopId.get(canonicalSopId) ?? sop?.refresher_interval_months ?? null
     return {
       workerEmail: names[c.worker_id] ?? 'unknown',
       workerName: names[c.worker_id] ?? null,
@@ -785,10 +909,8 @@ export async function exportTrainingCsv(rawFilters: unknown): Promise<{ csv: str
       signoffStatus: signOff?.decision ?? null,
       signoffBy: signOff ? names[signOff.supervisor_id] ?? 'Unknown' : null,
       signoffDate: signOff?.created_at ?? null,
-      // ponytail: wired in 36-05 once this query joins version-currency +
-      // refresher inputs; placeholders preserve pre-Phase-36 CSV output.
-      onCurrentVersion: false,
-      refresherDueDate: null,
+      onCurrentVersion: !isOutdatedVersion(c.sop_version, currentVersionForThisLineage),
+      refresherDueDate: refresherDueDate(c.submitted_at, intervalForThisLineage),
     }
   })
 
