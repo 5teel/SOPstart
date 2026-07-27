@@ -12,7 +12,7 @@
  * (no empty handler).
  */
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Users, Video } from 'lucide-react'
@@ -25,6 +25,8 @@ import {
   type VersionRecord,
 } from '@/actions/versioning'
 import { getApprovalHistory, type ApprovalHistoryRow } from '@/actions/approvals'
+import { getVersionCompletionBreakdown, type VersionCompletionBreakdown } from '@/actions/competency'
+import { setRefresherInterval } from '@/actions/governance'
 
 function ArrowLeftIcon({ className }: { className?: string }) {
   return (
@@ -122,6 +124,16 @@ export default function SopVersionHistoryPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // TRN-03 per-version completion breakdown (Plan 36-09) — failures surface
+  // as a message, never as a silently-empty panel (CLAUDE.md 2026-07-20).
+  const [breakdown, setBreakdown] = useState<VersionCompletionBreakdown | null>(null)
+  const [breakdownError, setBreakdownError] = useState<string | null>(null)
+  const [expandedVersionIds, setExpandedVersionIds] = useState<Set<string>>(new Set())
+
+  // REF-01/REF-02 refresher interval control (Plan 36-09)
+  const [refresherInput, setRefresherInput] = useState<string>('')
+  const [savingRefresher, setSavingRefresher] = useState(false)
+
   // Upload new version state (existing pattern retained — D-05: re-upload remains available)
   const [showUploadConfirm, setShowUploadConfirm] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -137,30 +149,89 @@ export default function SopVersionHistoryPage() {
   // Compare: track which version to compare against current
   const [selectedForCompare, setSelectedForCompare] = useState<string | null>(null)
 
-  useEffect(() => {
-    async function loadVersions() {
-      setLoading(true)
-      const result = await getVersionHistory(sopId)
-      if (result.success) {
-        setVersions(result.versions)
-        // Read-only approval history (D29-06) — fetched for every version id
-        // in the lineage; approver + step labels come already-resolved from
-        // getApprovalHistory (reuses getOrgMembers() + approval_snapshot
-        // server-side, no second member query, no label column).
-        const approvalsResult = await getApprovalHistory(result.versions.map((v) => v.id))
-        if ('success' in approvalsResult && approvalsResult.success) {
-          setApprovals(approvalsResult.rows)
-        }
-      } else {
-        setError(result.error)
+  const loadVersions = useCallback(async () => {
+    setLoading(true)
+    const result = await getVersionHistory(sopId)
+    if (result.success) {
+      setVersions(result.versions)
+      // Read-only approval history (D29-06) — fetched for every version id
+      // in the lineage; approver + step labels come already-resolved from
+      // getApprovalHistory (reuses getOrgMembers() + approval_snapshot
+      // server-side, no second member query, no label column).
+      const approvalsResult = await getApprovalHistory(result.versions.map((v) => v.id))
+      if ('success' in approvalsResult && approvalsResult.success) {
+        setApprovals(approvalsResult.rows)
       }
-      setLoading(false)
+      // TRN-03 completion breakdown (D-09) — surfaced as an error message on
+      // failure, never a silent empty panel.
+      const breakdownResult = await getVersionCompletionBreakdown(sopId)
+      if ('breakdown' in breakdownResult) {
+        setBreakdown(breakdownResult.breakdown)
+        setBreakdownError(null)
+      } else {
+        setBreakdown(null)
+        setBreakdownError(breakdownResult.error)
+      }
+    } else {
+      setError(result.error)
     }
-    loadVersions()
+    setLoading(false)
   }, [sopId])
+
+  useEffect(() => {
+    loadVersions()
+  }, [loadVersions])
 
   const currentSop = versions.find(v => v.superseded_by === null) ?? versions[0]
   const sopTitle = currentSop?.title ?? currentSop?.source_file_name ?? 'SOP'
+
+  // Seed the refresher-interval input from the current version's persisted value.
+  useEffect(() => {
+    setRefresherInput(
+      currentSop?.refresher_interval_months != null ? String(currentSop.refresher_interval_months) : ''
+    )
+  }, [currentSop?.refresher_interval_months])
+
+  function toggleVersionExpanded(versionId: string) {
+    setExpandedVersionIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(versionId)) next.delete(versionId)
+      else next.add(versionId)
+      return next
+    })
+  }
+
+  // --- Refresher interval handlers — REF-01/REF-02 ---
+  // CLAUDE.md 2026-06-05: wired to the server action, no empty handler.
+  async function handleSaveRefresher() {
+    if (!currentSop) return
+    const trimmed = refresherInput.trim()
+    const months = trimmed === '' ? null : Number(trimmed)
+    if (months !== null && (!Number.isInteger(months) || months < 1 || months > 120)) {
+      setError('Refresher interval must be a whole number of months between 1 and 120.')
+      return
+    }
+    setSavingRefresher(true)
+    const result = await setRefresherInterval(currentSop.id, months)
+    setSavingRefresher(false)
+    if ('error' in result) {
+      setError(result.error)
+      return
+    }
+    await loadVersions()
+  }
+
+  async function handleClearRefresher() {
+    if (!currentSop) return
+    setSavingRefresher(true)
+    const result = await setRefresherInterval(currentSop.id, null)
+    setSavingRefresher(false)
+    if ('error' in result) {
+      setError(result.error)
+      return
+    }
+    await loadVersions()
+  }
 
   // --- Upload new version handler (existing) ---
   async function handleFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
@@ -300,7 +371,60 @@ export default function SopVersionHistoryPage() {
           <CopyIcon className="h-4 w-4" />
           {cloning ? 'Creating draft...' : 'Edit into new version'}
         </button>
+
+        {/* Refresher interval control — REF-01/REF-02: how often WORKERS must
+            re-walk this procedure. Separate from the document's own review
+            cycle (D28 cadence). Disabled ONLY while a save is in flight —
+            never based on competency/refresher-due/version-currency state. */}
+        {currentSop && (
+          <div className="flex items-center gap-2 h-[56px] px-4 bg-white border border-[var(--ink-200)] rounded-xl">
+            <label htmlFor="refresher-interval-months" className="text-xs text-[var(--ink-500)] leading-tight">
+              Refresher (months)
+            </label>
+            <input
+              id="refresher-interval-months"
+              type="number"
+              min={1}
+              max={120}
+              step={1}
+              value={refresherInput}
+              onChange={(e) => setRefresherInput(e.target.value)}
+              placeholder="Off"
+              className="w-16 h-9 px-2 rounded-lg border border-[var(--ink-200)] text-sm text-[var(--ink-900)]"
+            />
+            <button
+              type="button"
+              onClick={handleSaveRefresher}
+              disabled={savingRefresher}
+              className="h-9 px-3 bg-[var(--ink-900)] text-white text-xs font-semibold rounded-lg hover:bg-[var(--ink-700)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {savingRefresher ? 'Saving...' : 'Save'}
+            </button>
+            {currentSop.refresher_interval_months !== null && currentSop.refresher_interval_months !== undefined && (
+              <button
+                type="button"
+                onClick={handleClearRefresher}
+                disabled={savingRefresher}
+                className="text-xs text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Turn off
+              </button>
+            )}
+          </div>
+        )}
       </div>
+
+      {currentSop && (
+        <p className="-mt-4 mb-6 text-xs text-[var(--ink-500)] leading-relaxed max-w-xl">
+          This sets how often workers must re-walk this procedure on their phone to stay current
+          — it&apos;s separate from this document&apos;s own review cycle. Leave it blank and
+          workers get no refresher prompts for this SOP.
+        </p>
+      )}
+
+      {breakdownError && (
+        <p className="mb-4 text-sm text-red-400">{breakdownError}</p>
+      )}
 
       {/* Upload confirmation card (existing pattern) */}
       {showUploadConfirm && (
@@ -510,6 +634,55 @@ export default function SopVersionHistoryPage() {
                     ))}
                   </ul>
                 )}
+
+                {/* TRN-03 completion breakdown (D-09) — coaching framing, no
+                    write control, no "force re-walk" action. Renders a zero
+                    state so an admin can tell "nobody" from "not loaded". */}
+                {(() => {
+                  const verBreakdown = breakdown?.versions.find((v) => v.sopId === ver.id)
+                  const completionCount = verBreakdown?.completionCount ?? 0
+                  const isExpanded = expandedVersionIds.has(ver.id)
+                  const outdatedNote = !isCurrent && completionCount > 0
+                  return (
+                    <div className="mx-4 mb-3 pt-2 border-t border-[var(--ink-100)]">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <button
+                          type="button"
+                          aria-expanded={isExpanded}
+                          onClick={() => toggleVersionExpanded(ver.id)}
+                          className="text-xs font-medium text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors"
+                        >
+                          {isExpanded ? 'Hide' : 'Show'} workers
+                        </button>
+                        <span className="text-xs text-[var(--ink-500)]">
+                          {completionCount === 0
+                            ? 'No completions on this version'
+                            : `${completionCount} completed this version`}
+                        </span>
+                        {outdatedNote && (
+                          <span className="text-xs font-medium text-[var(--accent-voice)]">
+                            — trained on an outdated version
+                          </span>
+                        )}
+                      </div>
+                      {isExpanded && (
+                        verBreakdown && verBreakdown.workers.length > 0 ? (
+                          <ul className="mt-2 space-y-1 pl-1">
+                            {verBreakdown.workers.map((w) => (
+                              <li key={w.userId} className="text-xs text-[var(--ink-500)]">
+                                <span className="font-medium text-[var(--ink-900)]">{w.displayName}</span>
+                                {' — '}
+                                {formatDate(w.completedAt)}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="mt-2 text-xs text-[var(--ink-500)]">No workers to show.</p>
+                        )
+                      )}
+                    </div>
+                  )
+                })()}
               </div>
             )
           })}

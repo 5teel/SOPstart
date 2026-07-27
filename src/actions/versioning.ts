@@ -243,7 +243,7 @@ export async function getVersionHistory(
   // Query all SOPs in the lineage
   const { data: versions, error: versionsError } = await supabase
     .from('sops')
-    .select('id, version, status, uploaded_by, created_at, superseded_by, title, source_file_name, parent_sop_id')
+    .select('id, version, status, uploaded_by, created_at, superseded_by, title, source_file_name, parent_sop_id, refresher_interval_months')
     .or(`parent_sop_id.eq.${parentId},id.eq.${parentId}`)
     .order('version', { ascending: false })
 
@@ -265,6 +265,7 @@ export interface VersionRecord {
   title: string | null
   source_file_name: string
   parent_sop_id: string | null
+  refresher_interval_months: number | null
 }
 
 // computeNextVersionLineage is a pure sync helper — it lives in
