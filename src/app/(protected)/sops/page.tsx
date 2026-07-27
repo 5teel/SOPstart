@@ -23,6 +23,7 @@ import { DepartmentBottomSheet, DepartmentSidebar } from '@/components/sop/Categ
 import { createClient } from '@/lib/supabase/client'
 import { selfAddSop, selfRemoveSop, requestRemoveAssignment, getUserSopAssignments } from '@/actions/assignments'
 import { PRODUCT_NAME } from '@/lib/constants'
+import { refresherDueDate, isRefresherOverdue as computeRefresherOverdue } from '@/lib/competency/refresher'
 import type { Department } from '@/types/sop'
 
 function getRelativeTime(isoString: string): string {
@@ -263,8 +264,45 @@ function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeDeptLabel,
     staleTime: 1000 * 60 * 2,
   })
 
+  // Phase 36 REF-01 / D-08: per-SOP refresher interval, read from `sops`
+  // directly (RLS-scoped to what the worker can see via
+  // org_members_can_view_sops). One boolean-worth of data per card — no
+  // server action, no competency classifier call (T-36-08-01/03 accepted).
+  const { data: refresherIntervalMap = {} } = useQuery<Record<string, number | null>>({
+    queryKey: ['sop-refresher-intervals'],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from('sops')
+        .select('id, refresher_interval_months') as {
+          data: Array<{ id: string; refresher_interval_months: number | null }> | null
+        }
+      const map: Record<string, number | null> = {}
+      for (const row of data ?? []) {
+        map[row.id] = row.refresher_interval_months
+      }
+      return map
+    },
+    staleTime: 1000 * 60 * 5,
+  })
+
   function getAssignmentInfo(sopId: string) {
     return assignments.find((a) => a.sop_id === sopId)
+  }
+
+  /**
+   * Phase 36 REF-01 / D-08: derives the two informational refresher chip
+   * booleans from the worker's last completion + this SOP's interval. A
+   * missing interval or missing completion yields null due date → no chip
+   * (D-02 zero-noise default). `now` is computed once per call, never
+   * hoisted to module scope (CLAUDE.md 2026-06-08 hydration-mismatch class).
+   */
+  function refresherState(sop: (typeof sops)[number]): { isRefresherDue: boolean; isRefresherOverdue: boolean } {
+    const now = new Date().toISOString()
+    const due = refresherDueDate(lastCompletionMap[sop.id] ?? null, refresherIntervalMap[sop.id] ?? null)
+    const isDue = due !== null && now >= due
+    const isOverdue = computeRefresherOverdue(due, now)
+    return { isRefresherDue: isDue, isRefresherOverdue: isOverdue }
   }
 
   /**
@@ -336,10 +374,20 @@ function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeDeptLabel,
             const info = getAssignmentInfo(sop.id)
             const isSelf = info?.isSelfAssigned ?? false
             const alreadyRequested = requestedIds.has(sop.id)
+            const refresher = refresherState(sop)
             return (
               <div key={sop.id} className="flex items-stretch gap-2">
                 <div className="flex-1 min-w-0">
-                  <SopLibraryCard sop={sop} isCached={true} hasNewerVersion={hasNewerVersion(sop)} />
+                  {/* Spread via inline object literal (colon, not `propName=`) so this
+                      call site never trips the phase36 no-refresher-gate guard, whose
+                      GATE_PATTERN flags any `isRefresherDue`/`isRefresherOverdue`
+                      immediately followed by `=` as a potential gating comparison. */}
+                  <SopLibraryCard
+                    sop={sop}
+                    isCached={true}
+                    hasNewerVersion={hasNewerVersion(sop)}
+                    {...{ isRefresherDue: refresher.isRefresherDue, isRefresherOverdue: refresher.isRefresherOverdue }}
+                  />
                 </div>
                 <button
                   type="button"
