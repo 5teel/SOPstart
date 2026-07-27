@@ -39,6 +39,7 @@
 import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { classifyCompetency, type CompetencyState } from '@/lib/competency/classify'
+import { resolveLineage } from '@/lib/competency/lineage'
 import { isOutdatedVersion } from '@/lib/competency/version-currency'
 import { refresherDueDate, isRefresherOverdue } from '@/lib/competency/refresher'
 import {
@@ -66,82 +67,12 @@ async function callerOrgId(admin: any, userId: string, sessionOrgId: string | nu
   return (data?.organisation_id as string | undefined) ?? sessionOrgId
 }
 
-/**
- * Lineage resolver (CMP-03 — RESEARCH Pitfall 1). `sop_completions` /
- * `sop_observations` are keyed to a SPECIFIC sop row, not a lineage root, so
- * a worker who trained on a since-superseded version reads as `not_started`
- * unless evidence queries are widened across the whole version lineage.
- * Lineage is flat, one level deep (a version's `parent_sop_id` always points
- * at the ORIGINAL row) — never a recursive walker, mirrors
- * getVersionHistory's `.or('parent_sop_id.eq.X,id.eq.X')` shape, batched
- * across every required SOP's root in one query.
- *
- * Currency is never derived from `superseded_by` (cloneSopAsDraft/
- * performPublish do not set it — RESEARCH Pitfall 3) — it comes solely from
- * the monotonic `version` integer on the required-sop row.
- */
-interface LineageInputSop {
-  id: string
-  version: number | null
-  parent_sop_id: string | null
-  refresher_interval_months: number | null
-}
-
-interface LineageResult {
-  allSopIds: string[]
-  canonicalBySopId: Map<string, string>
-  currentVersionBySopId: Map<string, number | null>
-  refresherIntervalBySopId: Map<string, number | null>
-}
-
-// Exported (Plan 36-10) so tests/phase36/version-currency-lineage.spec.ts can
-// run the REAL lineage resolver against live Supabase data instead of a
-// source-contract grep or a test-local reimplementation. Safe under the
-// 'use server' async-only-export constraint (CLAUDE.md 2026-06-27) since this
-// was already an async function.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function resolveLineage(requiredSops: LineageInputSop[], client: any, orgId: string | null): Promise<LineageResult> {
-  const currentVersionBySopId = new Map(requiredSops.map(s => [s.id, s.version]))
-  const refresherIntervalBySopId = new Map(requiredSops.map(s => [s.id, s.refresher_interval_months]))
-
-  if (requiredSops.length === 0) {
-    return { allSopIds: [], canonicalBySopId: new Map(), currentVersionBySopId, refresherIntervalBySopId }
-  }
-
-  const roots = Array.from(new Set(requiredSops.map(s => s.parent_sop_id ?? s.id)))
-  let query = client.from('sops').select('id, parent_sop_id').or(`parent_sop_id.in.(${roots.join(',')}),id.in.(${roots.join(',')})`)
-  if (orgId) query = query.eq('organisation_id', orgId)
-  const { data: lineageRows } = await query
-  const members = (lineageRows ?? []) as Array<{ id: string; parent_sop_id: string | null }>
-
-  // Root -> required sop, preferring the HIGHEST version when two required
-  // rows share a root (a lingering superseded-version junction — RESEARCH
-  // Open Question 3), so evidence is never double-counted across columns.
-  const requiredByRoot = new Map<string, LineageInputSop>()
-  for (const s of requiredSops) {
-    const root = s.parent_sop_id ?? s.id
-    const existing = requiredByRoot.get(root)
-    if (!existing || (s.version ?? 0) > (existing.version ?? 0)) requiredByRoot.set(root, s)
-  }
-
-  const canonicalBySopId = new Map<string, string>()
-  const allSopIdSet = new Set<string>()
-  for (const member of members) {
-    const root = member.parent_sop_id ?? member.id
-    const required = requiredByRoot.get(root)
-    if (!required) continue
-    canonicalBySopId.set(member.id, required.id)
-    allSopIdSet.add(member.id)
-  }
-  // Always include the required sops themselves even if the lineage query
-  // (org-scoped) somehow missed a row.
-  for (const s of requiredSops) {
-    canonicalBySopId.set(s.id, requiredByRoot.get(s.parent_sop_id ?? s.id)?.id ?? s.id)
-    allSopIdSet.add(s.id)
-  }
-
-  return { allSopIds: Array.from(allSopIdSet), canonicalBySopId, currentVersionBySopId, refresherIntervalBySopId }
-}
+// Lineage resolver (CMP-03 — RESEARCH Pitfall 1) lives in
+// '@/lib/competency/lineage' (imported above): a plain module, NOT this
+// 'use server' file, because every async export here is a POST-invokable
+// server-action endpoint for any authenticated client (Phase 36 review
+// WR-07 — the 2026-07-05 parameter-trusting class one refactor away).
+// tests/phase36/version-currency-lineage.spec.ts imports it from there.
 
 /** No full-name field exists anywhere in this codebase — email is the display name everywhere (mirrors observations.ts resolveDisplayNames).
  * Pages through listUsers (the auth admin API pools ALL tenants) until every

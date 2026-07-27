@@ -13,8 +13,9 @@
  * gate through getSessionContext(), which needs a Next.js request scope and
  * cannot be invoked from this harness (Phase 32-05 learning). This probe
  * therefore exercises the REAL, EXPORTED pure/data functions those actions
- * call -- resolveLineage (now exported from src/actions/competency.ts for
- * this purpose), classifyCompetency, isOutdatedVersion, refresherDueDate,
+ * call -- resolveLineage (a plain module at src/lib/competency/lineage.ts,
+ * moved out of the 'use server' file per review WR-07 so it is not a
+ * POST-invokable endpoint), classifyCompetency, isOutdatedVersion, refresherDueDate,
  * isRefresherOverdue -- against REAL rows created and read against the live
  * database (ephemeral org, real sops/sop_departments/sop_completions rows,
  * a real supersede, a real materialize-replace-write of sop_departments,
@@ -32,7 +33,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-import { resolveLineage } from '@/actions/competency'
+import { resolveLineage } from '@/lib/competency/lineage'
 import { classifyCompetency } from '@/lib/competency/classify'
 import { isOutdatedVersion } from '@/lib/competency/version-currency'
 import { refresherDueDate, isRefresherOverdue } from '@/lib/competency/refresher'

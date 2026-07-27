@@ -24,6 +24,10 @@ import path from 'node:path'
 
 const ROOT = process.cwd()
 const COMPETENCY_FILE = path.join(ROOT, 'src', 'actions', 'competency.ts')
+// WR-07: resolveLineage lives in a plain module, NOT the 'use server' file
+// (a 'use server' async export is a POST-invokable endpoint for any
+// authenticated client).
+const LINEAGE_FILE = path.join(ROOT, 'src', 'lib', 'competency', 'lineage.ts')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8').replace(/\r\n/g, '\n')
@@ -44,10 +48,15 @@ function extractFunctionBody(source: string, fnName: string): string {
 }
 
 test.describe('resolveLineage wiring across all three competency reads', () => {
-  test('resolveLineage is defined once', () => {
-    const src = read(COMPETENCY_FILE)
-    const defCount = (src.match(/async function resolveLineage\(/g) ?? []).length
+  test('resolveLineage is defined once, in the plain lineage module (WR-07)', () => {
+    const lineageSrc = read(LINEAGE_FILE)
+    const defCount = (lineageSrc.match(/async function resolveLineage\(/g) ?? []).length
     expect(defCount).toBe(1)
+    // The 'use server' action file must IMPORT it, never define/re-export it
+    // (every async export there is a POST-invokable endpoint).
+    const actionsSrc = read(COMPETENCY_FILE)
+    expect(actionsSrc).not.toMatch(/async function resolveLineage\(/)
+    expect(actionsSrc).toMatch(/import\s*\{[^}]*resolveLineage[^}]*\}\s*from\s*['"]@\/lib\/competency\/lineage['"]/)
   })
 
   test('getTrainingMatrix calls resolveLineage', () => {
@@ -84,22 +93,19 @@ test.describe('evidence queries are lineage-widened, not bare current-sop scoped
 })
 
 test.describe('lineage query is batched, not a per-SOP loop', () => {
-  test('parent_sop_id.in. appears exactly once in the file', () => {
-    const src = read(COMPETENCY_FILE)
-    const count = (src.match(/parent_sop_id\.in\./g) ?? []).length
+  test('parent_sop_id.in. appears exactly once, in the lineage module', () => {
+    const count = (read(LINEAGE_FILE).match(/parent_sop_id\.in\./g) ?? []).length
     expect(count).toBe(1)
+    expect(read(COMPETENCY_FILE)).not.toMatch(/parent_sop_id\.in\./)
   })
 })
 
 test.describe('org self-enforcement on the batched lineage query', () => {
   test('resolveLineage carries .eq(\'organisation_id\' for admin-client callers', () => {
-    const src = read(COMPETENCY_FILE)
+    const src = read(LINEAGE_FILE)
     const startIdx = src.indexOf('async function resolveLineage(')
     expect(startIdx).toBeGreaterThanOrEqual(0)
-    const rest = src.slice(startIdx)
-    const nextFnIdx = rest.indexOf('\nasync function ', 1)
-    const helperBody = nextFnIdx === -1 ? rest : rest.slice(0, nextFnIdx)
-    expect(helperBody).toContain(".eq('organisation_id', orgId)")
+    expect(src.slice(startIdx)).toContain(".eq('organisation_id', orgId)")
   })
 })
 
