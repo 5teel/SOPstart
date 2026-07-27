@@ -575,6 +575,9 @@ export interface MyCompetencyState {
   state: CompetencyState
   needsSupportFlag: boolean
   awaitingSignOff: boolean
+  isOutdatedVersion: boolean
+  refresherDueAt: string | null
+  isRefresherOverdue: boolean
 }
 
 export async function getMyCompetencyStates(): Promise<MyCompetencyState[]> {
@@ -601,8 +604,20 @@ export async function getMyCompetencyStates(): Promise<MyCompetencyState[]> {
   )
   if (requiredSopIds.length === 0) return []
 
-  const { data: sopRows } = await supabase.from('sops').select('id, title').in('id', requiredSopIds)
-  const sopById = new Map(((sopRows ?? []) as Array<{ id: string; title: string }>).map(s => [s.id, s]))
+  // Widened to version/parent_sop_id/refresher_interval_months for the
+  // Phase 36 lineage resolve below (org_members_can_view_sops grants every
+  // org member SELECT on every sop row in their org, superseded versions
+  // included — so the session client can see lineage members without an
+  // admin client; this preserves the self-scoped/no-admin-client posture).
+  const { data: sopRows } = await supabase
+    .from('sops')
+    .select('id, title, version, parent_sop_id, refresher_interval_months')
+    .in('id', requiredSopIds)
+  const sopById = new Map(
+    ((sopRows ?? []) as Array<{ id: string; title: string; version: number | null; parent_sop_id: string | null; refresher_interval_months: number | null }>).map(
+      s => [s.id, s]
+    )
+  )
 
   // The member_departments / sop_access_people self-read RLS branches span
   // ALL the caller's organisations; the sops read above IS org-RLS-scoped.
@@ -612,12 +627,24 @@ export async function getMyCompetencyStates(): Promise<MyCompetencyState[]> {
   const scopedSopIds = requiredSopIds.filter(id => sopById.has(id))
   if (scopedSopIds.length === 0) return []
 
+  // RLS already org-scopes this read (session client, no admin client) —
+  // orgId is null here on purpose (see resolveLineage's doc comment).
+  const lineage = await resolveLineage(
+    scopedSopIds.map(id => sopById.get(id)!),
+    supabase,
+    null
+  )
+  const canonicalSopId = (id: string): string => lineage.canonicalBySopId.get(id) ?? id
+
   const { data: completionRows } = await supabase
     .from('sop_completions')
-    .select('id, sop_id')
+    .select('id, sop_id, sop_version, submitted_at')
     .eq('worker_id', userId)
-    .in('sop_id', scopedSopIds)
-  const completions = (completionRows ?? []) as Array<{ id: string; sop_id: string }>
+    .in('sop_id', lineage.allSopIds)
+  const completions = ((completionRows ?? []) as Array<{ id: string; sop_id: string; sop_version: number; submitted_at: string }>).map(c => ({
+    ...c,
+    sop_id: canonicalSopId(c.sop_id),
+  }))
 
   const completionIds = completions.map(c => c.id)
   const { data: signOffRows } =
@@ -630,10 +657,14 @@ export async function getMyCompetencyStates(): Promise<MyCompetencyState[]> {
     .from('sop_observations')
     .select('sop_id, verdict, created_at')
     .eq('observed_worker_id', userId)
-    .in('sop_id', scopedSopIds)
-  const observations = (observationRows ?? []) as Array<{ sop_id: string; verdict: string; created_at: string }>
+    .in('sop_id', lineage.allSopIds)
+  const observations = ((observationRows ?? []) as Array<{ sop_id: string; verdict: string; created_at: string }>).map(o => ({
+    ...o,
+    sop_id: canonicalSopId(o.sop_id),
+  }))
 
   const signOffByCompletion = new Map(signOffs.map(s => [s.completion_id, s]))
+  const nowIso = new Date().toISOString()
 
   return scopedSopIds.map(sopId => {
     const sopCompletions = completions.filter(c => c.sop_id === sopId)
@@ -659,12 +690,22 @@ export async function getMyCompetencyStates(): Promise<MyCompetencyState[]> {
       latestPositiveEvidenceAt,
     })
 
+    // Refresher clock is the latest COMPLETION (D-03).
+    const latestCompletion = sopCompletions.reduce<(typeof sopCompletions)[number] | null>((latest, c) => {
+      if (!latest || c.submitted_at > latest.submitted_at) return c
+      return latest
+    }, null)
+    const dueAt = refresherDueDate(latestCompletion?.submitted_at ?? null, lineage.refresherIntervalBySopId.get(sopId) ?? null)
+
     return {
       sopId,
       sopTitle: sopById.get(sopId)?.title ?? 'Untitled SOP',
       state: result.state,
       needsSupportFlag: result.needsSupportFlag,
       awaitingSignOff: result.awaitingSignOff,
+      isOutdatedVersion: isOutdatedVersion(latestCompletion?.sop_version ?? null, lineage.currentVersionBySopId.get(sopId) ?? null),
+      refresherDueAt: dueAt,
+      isRefresherOverdue: isRefresherOverdue(dueAt, nowIso),
     }
   })
 }
