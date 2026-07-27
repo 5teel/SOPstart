@@ -1178,6 +1178,7 @@ export type Database = {
           parse_notes: string | null
           pipeline_run_id: string | null
           published_at: string | null
+          refresher_interval_months: number | null
           related_sops: string[] | null
           required_certifications: string[] | null
           review_due_at: string | null
@@ -1214,6 +1215,7 @@ export type Database = {
           parse_notes?: string | null
           pipeline_run_id?: string | null
           published_at?: string | null
+          refresher_interval_months?: number | null
           related_sops?: string[] | null
           required_certifications?: string[] | null
           review_due_at?: string | null
@@ -1250,6 +1252,7 @@ export type Database = {
           parse_notes?: string | null
           pipeline_run_id?: string | null
           published_at?: string | null
+          refresher_interval_months?: number | null
           related_sops?: string[] | null
           required_certifications?: string[] | null
           review_due_at?: string | null
