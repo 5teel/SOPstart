@@ -569,7 +569,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 - [x] **TRN-01**: Per-worker training record view — SOP completions rendered as training evidence (SOP, version completed, date, sign-off chain) built on existing completion data
 - [x] **TRN-02**: Admin can export training records as CSV (filterable by worker, SOP, department, date range)
-- [ ] **TRN-03**: SOP detail (admin) shows who has completed the current version vs a prior version — surfacing workers "trained on an outdated version" after a supersede
+- [x] **TRN-03**: SOP detail (admin) shows who has completed the current version vs a prior version — surfacing workers "trained on an outdated version" after a supersede
 
 ### v6.0 Future Requirements (deferred)
 
@@ -621,7 +621,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 - [x] **CMP-01**: Admin/supervisor can see a derived competency state for every person × required-SOP pair (not started / read / supervised / competent-signed-off) — computed live from existing evidence, never stored redundantly
 - [x] **CMP-02**: Evidence events (completion, sign-off, observation) advance the derived state — no manual state editing
-- [ ] **CMP-03**: A SOP version supersede surfaces "trained on outdated version" rather than resetting or orphaning competency history (resolves via version lineage / current_sop_version)
+- [x] **CMP-03**: A SOP version supersede surfaces "trained on outdated version" rather than resetting or orphaning competency history (resolves via version lineage / current_sop_version)
 - [x] **CMP-04**: Competency state NEVER gates worker read/walkthrough access (locked guard — regression-tested)
 
 ### Training Matrix (MTX)
@@ -644,7 +644,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 - [x] **TRN-01**: Per-worker training record view renders every completion as training evidence (SOP, version, date, sign-off chain)
 - [x] **TRN-02**: Admin can export training records as CSV, filterable by worker/SOP/department/date range, shaped for SuccessFactors Learning History import
-- [ ] **TRN-03**: Admin can see which workers completed the current vs a prior version after a supersede
+- [x] **TRN-03**: Admin can see which workers completed the current vs a prior version after a supersede
 - [ ] **REV-05**: Governance surface shows an AI-prioritized maintenance schedule (staleness + usage + reviewer flags) on the existing AI adapter — no new AI infrastructure
 
 ### Completeness Rubric (RUB)
@@ -664,8 +664,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ### Refresher Cadence (REF)
 
-- [ ] **REF-01**: Refresher cadence per SOP surfaces due/overdue re-walkthroughs to workers and supervisors — never blocking access
-- [ ] **REF-02**: Refresher due-dates derive from last completion + cadence via the existing governance cadence helpers
+- [x] **REF-01**: Refresher cadence per SOP surfaces due/overdue re-walkthroughs to workers and supervisors — never blocking access
+- [x] **REF-02**: Refresher due-dates derive from last completion + cadence via the existing governance cadence helpers
 
 ### v7.0 Out of Scope
 
@@ -690,10 +690,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MTX-03 | Phase 35 | Complete |
 | TRN-01 | Phase 35 | Complete |
 | TRN-02 | Phase 35 | Complete |
-| CMP-03 | Phase 36 | Pending |
-| TRN-03 | Phase 36 | Pending |
-| REF-01 | Phase 36 | Pending |
-| REF-02 | Phase 36 | Pending |
+| CMP-03 | Phase 36 | Complete |
+| TRN-03 | Phase 36 | Complete |
+| REF-01 | Phase 36 | Complete |
+| REF-02 | Phase 36 | Complete |
 | ASR-01 | Phase 37 | Pending |
 | RUB-01 | Phase 38 | Pending |
 | RUB-02 | Phase 38 | Pending |

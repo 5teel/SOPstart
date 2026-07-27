@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: — Competency & Training Layer
-status: completed
+status: executing
 stopped_at: Phase 36 context gathered
-last_updated: "2026-07-26T13:20:29.950Z"
-last_activity: "2026-07-26 -- Phase 35 UAT passed 8/8; WR-07 RLS probes activated and green live; UAT seed data still in prod (cleanup: node scripts/uat-seed-cleanup.mjs)"
+last_updated: "2026-07-27T12:15:17.941Z"
+last_activity: 2026-07-27 -- Phase 36 execution started
 progress:
   total_phases: 6
   completed_phases: 2
-  total_plans: 14
-  completed_plans: 14
+  total_plans: 24
+  completed_plans: 15
   percent: 33
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 35 — competency-classifier-training-matrix-records
+**Current focus:** Phase 36 — refresher-cadence-version-currency
 
 ## Current Position
 
-Phase: 35 (competency-classifier-training-matrix-records) — COMPLETE (UAT 8/8, 2026-07-26)
-Plan: 4 of 4
-Status: Phase 35 done — next: Phase 36 (Refresher Cadence + Version-Currency)
-Last activity: 2026-07-26 -- Phase 35 UAT passed 8/8; WR-07 RLS probes activated and green live; UAT seed data still in prod (cleanup: node scripts/uat-seed-cleanup.mjs)
+Phase: 36 (refresher-cadence-version-currency) — EXECUTING
+Plan: 2 of 10
+Status: Ready to execute
+Last activity: 2026-07-27 -- Phase 36 execution started
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
@@ -190,6 +190,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 35 P02 | 50min | 3 tasks | 6 files |
 | Phase 35 P03 | 50min | 4 tasks | 10 files |
 | Phase 35 P04 | 20m | 2 tasks | 3 files |
+| Phase 36 P01 | 20min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -416,6 +417,8 @@ Recent decisions affecting current work:
 - [Phase 35]: Matrix filter dropdown option lists come from a separate unfiltered per-department fetch, independent of the filtered matrix-cut fetch, so choosing a worker/SOP filter never removes other options from the dropdowns
 - [Phase 35]: downloadCsv() Blob helper forked verbatim from FlowGraphCanvas's PNG-export idiom — one generator behind both D-16 CSV export entry points
 - [Phase ?]: CompetencySection (35-04) copies ObservationsSection's shape wholesale for consistent /profile trust framing; no new CSS tokens or components needed
+- [Phase ?]: [Phase 36-01]: GATE_PATTERN idiom covers isOutdatedVersion/refresherDueAt/isRefresherOverdue/isRefresherDue/refresher_interval_months as one combined regex with an explicit JSX-render-guard non-match self-check
+- [Phase ?]: [Phase 36-01]: TRN-03 breakdown-panel role gate targets ['admin','safety_manager'] (the existing stricter versions-page gate), not RECORDER_ROLES
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -526,7 +529,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-26T12:34:17.369Z
+Last session: 2026-07-27T12:15:17.931Z
 Stopped at: Phase 36 context gathered
 Resume file:
-.planning/phases/36-refresher-cadence-version-currency/36-CONTEXT.md
+None
