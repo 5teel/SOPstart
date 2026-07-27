@@ -37,3 +37,16 @@ export function isRefresherOverdue(dueIso: string | null, nowIso: string): boole
   if (dueIso === null) return false
   return nowIso > dueIso
 }
+
+/** Days before the due date at which the worker-facing "Refresher due"
+ * nudge starts showing (REF-01). WR-04: without a lead window, "due" and
+ * "overdue" differed by a single millisecond and the "Refresher due" label
+ * was dead UI — this gives workers a real heads-up period before the chip
+ * escalates to "Refresher overdue". */
+export const REFRESHER_DUE_WINDOW_DAYS = 14
+
+export function isRefresherDue(dueIso: string | null, nowIso: string): boolean {
+  if (dueIso === null) return false
+  const windowStart = new Date(new Date(dueIso).getTime() - REFRESHER_DUE_WINDOW_DAYS * 86_400_000).toISOString()
+  return nowIso >= windowStart
+}

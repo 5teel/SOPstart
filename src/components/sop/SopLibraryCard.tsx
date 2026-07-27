@@ -15,15 +15,16 @@ interface SopLibraryCardProps {
    */
   hasNewerVersion?: boolean
   /**
-   * Phase 36 REF-01 / D-08: true when the worker's last completion for this
-   * SOP is past the SOP's refresher due date. Derived from
-   * refresherDueDate/isRefresherOverdue (src/lib/competency/refresher.ts)
-   * over refresher_interval_months + the worker's last completion, computed
-   * in the parent page. Informational only — no forced re-walk, no gating
-   * (CMP-04).
+   * Phase 36 REF-01 / D-08: true when the refresher due date is within the
+   * lead-in window (REFRESHER_DUE_WINDOW_DAYS before it) or has passed.
+   * Derived from refresherDueDate/isRefresherDue
+   * (src/lib/competency/refresher.ts) over refresher_interval_months + the
+   * worker's last completion, computed in the parent page. Informational
+   * only — no forced re-walk, no gating (CMP-04).
    */
   isRefresherDue?: boolean
-  /** Phase 36 REF-01 / D-08: true when the due date has passed (vs. just due). */
+  /** Phase 36 REF-01 / D-08: true when the due date has actually passed —
+   * escalates the chip label from "Refresher due" to "Refresher overdue". */
   isRefresherOverdue?: boolean
 }
 

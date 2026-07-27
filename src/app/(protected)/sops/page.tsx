@@ -23,7 +23,7 @@ import { DepartmentBottomSheet, DepartmentSidebar } from '@/components/sop/Categ
 import { createClient } from '@/lib/supabase/client'
 import { selfAddSop, selfRemoveSop, requestRemoveAssignment, getUserSopAssignments } from '@/actions/assignments'
 import { PRODUCT_NAME } from '@/lib/constants'
-import { refresherDueDate, isRefresherOverdue as computeRefresherOverdue } from '@/lib/competency/refresher'
+import { refresherDueDate, isRefresherDue as computeRefresherDue, isRefresherOverdue as computeRefresherOverdue } from '@/lib/competency/refresher'
 import type { Department } from '@/types/sop'
 
 function getRelativeTime(isoString: string): string {
@@ -315,15 +315,16 @@ function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeDeptLabel,
    * Phase 36 REF-01 / D-08: derives the two informational refresher chip
    * booleans from the worker's last completion + this SOP's interval. A
    * missing interval or missing completion yields null due date → no chip
-   * (D-02 zero-noise default). `now` is computed once per call, never
-   * hoisted to module scope (CLAUDE.md 2026-06-08 hydration-mismatch class).
+   * (D-02 zero-noise default). WR-04: "due" now has a real lead-in window
+   * (REFRESHER_DUE_WINDOW_DAYS before the due date) so the "Refresher due"
+   * label is reachable before it escalates to "Refresher overdue". `now` is
+   * computed once per call, never hoisted to module scope (CLAUDE.md
+   * 2026-06-08 hydration-mismatch class).
    */
   function refresherState(sop: (typeof sops)[number]): { isRefresherDue: boolean; isRefresherOverdue: boolean } {
     const now = new Date().toISOString()
     const due = refresherDueDate(lastCompletionByRoot[rootOf(sop.id)] ?? null, sopMetaMap[sop.id]?.interval ?? null)
-    const isDue = due !== null && now >= due
-    const isOverdue = computeRefresherOverdue(due, now)
-    return { isRefresherDue: isDue, isRefresherOverdue: isOverdue }
+    return { isRefresherDue: computeRefresherDue(due, now), isRefresherOverdue: computeRefresherOverdue(due, now) }
   }
 
   /**
