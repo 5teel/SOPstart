@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: — Competency & Training Layer
 status: executing
-stopped_at: Completed 36-06-PLAN.md
-last_updated: "2026-07-27T13:08:00.786Z"
+stopped_at: Completed 36-07-PLAN.md
+last_updated: "2026-07-27T13:22:06.502Z"
 last_activity: 2026-07-27 -- Phase 36 execution started
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 24
-  completed_plans: 20
+  completed_plans: 21
   percent: 33
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 36 (refresher-cadence-version-currency) — EXECUTING
-Plan: 7 of 10
+Plan: 8 of 10
 Status: Ready to execute
 Last activity: 2026-07-27 -- Phase 36 execution started
 
@@ -196,6 +196,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 36 P04 | 10min | 3 tasks | 5 files |
 | Phase 36 P05 | 25min | 3 tasks | 2 files |
 | Phase 36 P06 | ~15min | 2 tasks | 2 files |
+| Phase 36 P07 | 30min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -432,6 +433,7 @@ Recent decisions affecting current work:
 - [Phase 36-05]: Refresher due-date clock is always the latest COMPLETION (D-03), never sign-off/observation timestamps, consistently across all three competency reads
 - [Phase 36]: [Phase 36-06]: getVersionCompletionBreakdown groups completions by ACTUAL sop_id (per-version, not canonical-remapped) and gates to the versions page's stricter admin/safety_manager boundary, not RECORDER_ROLES
 - [Phase 36]: [Phase 36-06]: exportTrainingCsv resolves per-completion version-currency/refresher-due-date via the shared resolveLineage() helper -- no second lineage query
+- [Phase 36]: Phase 36-07: matrix axis-swap is a pure presentation remap (rowItems/colItems derived just before render) -- matrix.cells/rollups and the server fetch stay untouched
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -542,7 +544,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-27T13:08:00.778Z
-Stopped at: Completed 36-06-PLAN.md
+Last session: 2026-07-27T13:22:06.494Z
+Stopped at: Completed 36-07-PLAN.md
 Resume file:
 None
