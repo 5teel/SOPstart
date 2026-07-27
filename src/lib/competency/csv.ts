@@ -12,6 +12,13 @@
 // Console). worker_name falls back to worker_email because no full-name
 // field exists anywhere in this codebase (RESEARCH Assumption A1) — do not
 // invent a full_name source.
+//
+// Phase 36 (D-05/D-07): on_current_version + refresher_due_date appended at
+// the END of HEADER so existing consumers' column positions are unchanged.
+// Both values are machine-generated (a literal 'yes'/'no' and an ISO date),
+// so they carry no injection risk of their own — but they still route
+// through csvField() because any future column reusing user-authored text
+// must inherit that discipline by default.
 // ------------------------------------------------------------
 
 export interface TrainingCsvRow {
@@ -24,6 +31,8 @@ export interface TrainingCsvRow {
   signoffStatus: string | null
   signoffBy: string | null
   signoffDate: string | null
+  onCurrentVersion: boolean
+  refresherDueDate: string | null
 }
 
 const HEADER = [
@@ -36,6 +45,8 @@ const HEADER = [
   'signoff_status',
   'signoff_by',
   'signoff_date',
+  'on_current_version',
+  'refresher_due_date',
 ]
 
 export function csvField(val: string | number | null): string {
@@ -65,6 +76,8 @@ export function generateTrainingCsv(rows: TrainingCsvRow[]): string {
         csvField(row.signoffStatus),
         csvField(row.signoffBy),
         csvField(row.signoffDate),
+        csvField(row.onCurrentVersion ? 'yes' : 'no'),
+        csvField(row.refresherDueDate),
       ].join(','),
     )
   }

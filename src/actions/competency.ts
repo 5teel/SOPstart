@@ -594,6 +594,10 @@ export async function exportTrainingCsv(rawFilters: unknown): Promise<{ csv: str
       signoffStatus: signOff?.decision ?? null,
       signoffBy: signOff ? names[signOff.supervisor_id] ?? 'Unknown' : null,
       signoffDate: signOff?.created_at ?? null,
+      // ponytail: wired in 36-05 once this query joins version-currency +
+      // refresher inputs; placeholders preserve pre-Phase-36 CSV output.
+      onCurrentVersion: false,
+      refresherDueDate: null,
     }
   })
 
