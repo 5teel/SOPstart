@@ -460,5 +460,24 @@ export default defineConfig({
       testDir: './src/lib/competency/__tests__',
       testMatch: /.*\.test\.ts$/,
     },
+    {
+      // Phase 36 -- Refresher Cadence + Version Currency
+      // Nyquist harness (Wave 0 / Plan 36-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase36/**) so every later plan in
+      // the phase drops specs into tests/phase36/ with NO further config edit --
+      // single registration point for the whole phase (mirrors phase26/28/29/30/32/33/34/35).
+      //
+      // Verify registration: `npx playwright test --list --project=phase36`
+      //
+      // Wave-0 stub files: no-refresher-gate (REF-01/CMP-04, live) --
+      //   version-currency-lineage (CMP-03, activates 36-10) --
+      //   version-breakdown-panel (TRN-03, activates 36-09)
+      name: 'phase36',
+      testDir: '.',
+      testMatch: /tests\/phase36\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
