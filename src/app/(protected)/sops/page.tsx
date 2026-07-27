@@ -400,15 +400,12 @@ function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeDeptLabel,
             return (
               <div key={sop.id} className="flex items-stretch gap-2">
                 <div className="flex-1 min-w-0">
-                  {/* Spread via inline object literal (colon, not `propName=`) so this
-                      call site never trips the phase36 no-refresher-gate guard, whose
-                      GATE_PATTERN flags any `isRefresherDue`/`isRefresherOverdue`
-                      immediately followed by `=` as a potential gating comparison. */}
                   <SopLibraryCard
                     sop={sop}
                     isCached={true}
                     hasNewerVersion={hasNewerVersion(sop)}
-                    {...{ isRefresherDue: refresher.isRefresherDue, isRefresherOverdue: refresher.isRefresherOverdue }}
+                    isRefresherDue={refresher.isRefresherDue}
+                    isRefresherOverdue={refresher.isRefresherOverdue}
                   />
                 </div>
                 <button

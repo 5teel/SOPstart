@@ -32,15 +32,10 @@ export function SopLibraryCard({
   sop,
   isCached,
   hasNewerVersion = false,
-  isRefresherDue,
-  isRefresherOverdue,
+  isRefresherDue = false,
+  isRefresherOverdue = false,
 }: SopLibraryCardProps) {
   const meta = [sop.category, sop.department].filter(Boolean).join(' · ')
-  // Defaulted via ?? (not a destructuring default) so `isRefresherDue`/
-  // `isRefresherOverdue` are never followed by `=` in source — the phase-36
-  // no-refresher-gate guard treats `field\s*=` as a gating comparison.
-  const showRefresherBadge = isRefresherDue ?? false
-  const refresherOverdue = isRefresherOverdue ?? false
 
   return (
     <Link
@@ -91,13 +86,13 @@ export function SopLibraryCard({
               sibling of the "Updated" badge, same informational-only
               precedent (D-09). Amber/decision-toned, never red — this is a
               coaching nudge, not a hazard warning. */}
-          {showRefresherBadge && (
+          {isRefresherDue && (
             <span
               data-refresher-due-badge="true"
               className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--accent-decision)]/10 text-[var(--accent-decision)] text-xs font-semibold rounded"
               title="Time for a refresher walkthrough of this SOP"
             >
-              {refresherOverdue ? 'Refresher overdue' : 'Refresher due'}
+              {isRefresherOverdue ? 'Refresher overdue' : 'Refresher due'}
             </span>
           )}
         </div>

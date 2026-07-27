@@ -54,13 +54,20 @@ test.describe('REF-01 / D-08 -- worker library page wires the chip from real dat
 
   test('neither file contains a gating branch on the new fields', () => {
     const GATE_FIELDS = 'isRefresherOverdue|isRefresherDue|refresher_interval_months'
-    // Same shape as tests/phase36/no-refresher-gate.spec.ts GATE_PATTERN, but
-    // excludes the `{...{ field: value }}` spread idiom (colon, not `=`) this
-    // plan uses at the call site specifically to avoid a false-positive on
-    // that broader guard.
+    // Same corrected shape as tests/phase36/no-refresher-gate.spec.ts
+    // GATE_PATTERN (WR-06): the old `[<>!]` class missed equality gates
+    // entirely (`isRefresherDue === true` starts with `=`) and bare
+    // ternaries. This catches ===/==/!==/!=/</<=/>/>= comparisons, bare
+    // ternary gates, and if-branches — while passing plain JSX props /
+    // destructuring defaults (single `=`), optional props (`?:`), nullish
+    // defaults (`??`), and string-literal label ternaries.
     const GATE_PATTERN = new RegExp(
-      `(${GATE_FIELDS})\\s*[<>!]|if\\s*\\([^)]*(${GATE_FIELDS})[^)]*\\)`
+      `(${GATE_FIELDS})\\s*(===|!==|==|!=|<=?|>=?|\\?(?![?.:]|\\s*['"\`]))|if\\s*\\([^)]*(${GATE_FIELDS})[^)]*\\)`
     )
+    // Self-check: the pattern is live (an equality gate the old class missed
+    // must match; the card's passive optional-prop syntax must not).
+    expect('isRefresherDue === true ? blocked : open').toMatch(GATE_PATTERN)
+    expect('isRefresherDue?: boolean').not.toMatch(GATE_PATTERN)
     expect(read(SOP_LIBRARY_CARD)).not.toMatch(GATE_PATTERN)
     expect(pageSrc).not.toMatch(GATE_PATTERN)
   })

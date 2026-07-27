@@ -18,16 +18,21 @@
  * IMPORTANT distinction (do NOT "fix" this regex into uselessness): a chip
  * render guard like `{isRefresherDue && <span .../>}` is a JSX conditional
  * RENDER, not a gate, and must NOT match GATE_PATTERN. An `if (isRefresherDue)`
- * branch or a comparison (`isRefresherOverdue === true`, `refresherDueAt <
- * now`, `refresher_interval_months > 0`) IS a gate and MUST match. Plain JSX
- * attribute-passing (`propName={value}`) and destructuring defaults
- * (`field = false`) are NEITHER of those things -- they are syntax, not
- * control flow -- so the regex only fires on an actual `if (...)` branch or a
- * `[<>=!]` comparison operator, never on bare `=` adjacency. This is why
- * 36-08's inline-object-spread/`??`-default workarounds in SopLibraryCard.tsx
- * and sops/page.tsx are no longer required by THIS guard (they were needed
- * only because the regex was originally written more conservatively); they
- * are left in place as harmless, not because the regex still demands them.
+ * branch, a comparison (`isRefresherOverdue === true`, `refresherDueAt <
+ * now`, `refresher_interval_months > 0`), or a bare ternary branch
+ * (`isRefresherOverdue ? lockedView : normalView`) IS a gate and MUST match.
+ * Passive SYNTAX must NOT match (WR-06 -- the earlier `[<>=!]` class flagged
+ * bare `=`, i.e. plain JSX props and destructuring defaults, which forced
+ * spread/`??` workarounds at the call sites; those are now plain syntax
+ * again): JSX attribute-passing (`propName={value}`), destructuring/param
+ * defaults (`field = false`), optional props (`field?: boolean`), nullish
+ * defaults (`field ?? false`), optional chaining (`field?.x`), and label
+ * ternaries whose branch is a string literal
+ * (`isRefresherOverdue ? 'Refresher overdue' : ...` -- a render-text choice,
+ * not control flow; StatePill.tsx relies on this carve-out). Known ceiling:
+ * a string-literal ternary feeding className (e.g. 'pointer-events-none')
+ * would evade the carve-out -- that class of gate is for human review, not
+ * this regex.
  *
  * Registration: playwright.config.ts `phase36` project
  *   testDir: '.', testMatch: /tests\/phase36\/.*\.(spec|test)\.ts$/
@@ -78,13 +83,15 @@ function sliceAroundOccurrences(content: string, label: string, radius = 250): s
   return slices.join('\n---\n')
 }
 
-// A refresher/version-currency gating branch: any comparison or if-branch
-// that inspects the new derived fields and could alter worker-facing
-// control flow. A bare JSX render guard (`{x && <...`) does NOT match --
-// only an `if (...)` branch or a `[<>=!]` comparison does.
+// A refresher/version-currency gating branch: any comparison, bare ternary,
+// or if-branch that inspects the new derived fields and could alter
+// worker-facing control flow. A bare JSX render guard (`{x && <...`), a
+// plain JSX prop / destructuring default (single `=`), optional-prop /
+// nullish / optional-chaining syntax (`?:`, `??`, `?.`), and a
+// string-literal label ternary do NOT match (see header comment).
 const GATE_FIELDS = 'isOutdatedVersion|refresherDueAt|isRefresherOverdue|isRefresherDue|refresher_interval_months'
 const GATE_PATTERN = new RegExp(
-  `(${GATE_FIELDS})\\s*[<>=!]|if\\s*\\([^)]*(${GATE_FIELDS})[^)]*\\)`
+  `(${GATE_FIELDS})\\s*(===|!==|==|!=|<=?|>=?|\\?(?![?.:]|\\s*['"\`]))|if\\s*\\([^)]*(${GATE_FIELDS})[^)]*\\)`
 )
 
 test.describe('GATE_PATTERN self-check -- proves the regex is live, not inert', () => {
@@ -99,8 +106,22 @@ test.describe('GATE_PATTERN self-check -- proves the regex is live, not inert', 
     expect('isRefresherDue === true').toMatch(GATE_PATTERN)
   })
 
+  test('matches a bare ternary gate', () => {
+    expect('isRefresherOverdue ? lockedView : normalView').toMatch(GATE_PATTERN)
+    expect('return isOutdatedVersion ? null : sop').toMatch(GATE_PATTERN)
+  })
+
   test('does NOT match a bare JSX render guard', () => {
     expect('{isRefresherDue && <span').not.toMatch(GATE_PATTERN)
+  })
+
+  test('does NOT match passive syntax: JSX prop, destructuring default, optional prop, nullish default, label ternary', () => {
+    expect('isRefresherDue={refresher.isRefresherDue}').not.toMatch(GATE_PATTERN)
+    expect('isRefresherDue = false,').not.toMatch(GATE_PATTERN)
+    expect('isRefresherDue?: boolean').not.toMatch(GATE_PATTERN)
+    expect('isRefresherDue ?? false').not.toMatch(GATE_PATTERN)
+    expect("isRefresherOverdue ? 'Refresher overdue' : 'Refresher due'").not.toMatch(GATE_PATTERN)
+    expect('isRefresherOverdue ? `Refresher due ${formatNZDate(x)}` : y').not.toMatch(GATE_PATTERN)
   })
 })
 
