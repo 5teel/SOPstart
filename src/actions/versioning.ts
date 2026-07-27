@@ -28,7 +28,7 @@ export async function uploadNewVersion(
   // Fetch old SOP record
   const { data: oldSop, error: fetchError } = await supabase
     .from('sops')
-    .select('id, version, parent_sop_id, organisation_id, source_file_type')
+    .select('id, version, parent_sop_id, organisation_id, source_file_type, refresher_interval_months')
     .eq('id', oldSopId)
     .single()
 
@@ -71,6 +71,10 @@ export async function uploadNewVersion(
       status: 'uploading' as const,
       version: newVersion,
       parent_sop_id: newParentId,
+      // Phase 36 / REF-01: the refresher interval is the worker's re-walkthrough
+      // clock and must survive supersede (D-01) — this insert is an explicit
+      // field list, so any future per-SOP column must be added here too.
+      refresher_interval_months: oldSop.refresher_interval_months ?? null,
     })
     .select('id')
     .single()
@@ -296,7 +300,7 @@ export async function cloneSopAsDraft(
   // Fetch source SOP — use RLS-scoped client to verify org ownership
   const { data: sourceSop, error: fetchError } = await supabase
     .from('sops')
-    .select('id, version, parent_sop_id, organisation_id, title, source_file_name, source_file_type, source_file_path')
+    .select('id, version, parent_sop_id, organisation_id, title, source_file_name, source_file_type, source_file_path, refresher_interval_months')
     .eq('id', publishedSopId)
     .single()
 
@@ -325,6 +329,10 @@ export async function cloneSopAsDraft(
       status: 'uploading' as const,
       version: newVersion,
       parent_sop_id: newParentId,
+      // Phase 36 / REF-01: the refresher interval is the worker's re-walkthrough
+      // clock and must survive supersede (D-01) — this insert is an explicit
+      // field list, so any future per-SOP column must be added here too.
+      refresher_interval_months: sourceSop.refresher_interval_months ?? null,
     })
     .select('id')
     .single()
