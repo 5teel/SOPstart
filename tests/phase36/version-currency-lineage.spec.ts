@@ -287,5 +287,44 @@ test.describe('CMP-03 -- version-currency lineage survives supersede (orphaning 
     expect(canonicalOf(latestB.sop_id)).toBe(sopV2.id)
     const currentVersionForB = lineage.currentVersionBySopId.get(canonicalOf(latestB.sop_id)) ?? null
     expect(isOutdatedVersion(latestB.sop_version, currentVersionForB)).toBe(false)
+
+    // --- CR-01 regression: the EXPORT-path shape. exportTrainingCsv seeds
+    // resolveLineage with the SOPs of the completions in the export cut —
+    // for a single-worker export whose only completion is on v1, that is the
+    // superseded v1 row ALONE. The resolver must still report the lineage's
+    // published current (v2), never "v1 is current" (the pre-fix defect
+    // emitted on_current_version=yes in an auditor-facing CSV). Also covers
+    // the stale-interval sibling: refresher_due_date's interval must come
+    // from the CURRENT version, not the completed row.
+    await admin.from('sops').update({ refresher_interval_months: 12 }).eq('id', sopV2.id)
+    const { data: v1RowOnly } = await admin
+      .from('sops')
+      .select('id, version, parent_sop_id, refresher_interval_months')
+      .eq('id', sopV1.id)
+      .single()
+    const exportLineage = await resolveLineage([v1RowOnly as SopRow], admin, orgId)
+    const exportCanonical = exportLineage.canonicalBySopId.get(sopV1.id) ?? sopV1.id
+    expect(exportLineage.currentVersionBySopId.get(exportCanonical)).toBe(2)
+    expect(isOutdatedVersion(1, exportLineage.currentVersionBySopId.get(exportCanonical) ?? null)).toBe(true)
+    expect(exportLineage.refresherIntervalBySopId.get(exportCanonical)).toBe(12)
+
+    // --- CR-01 draft exclusion: a cloned-but-unpublished v3 draft in flight
+    // must NOT move the currency baseline — workers are never outdated
+    // against an unshipped version.
+    const { error: draftErr } = await admin.from('sops').insert({
+      organisation_id: orgId,
+      title: 'Phase36 lineage probe SOP (draft)',
+      status: 'draft',
+      version: 3,
+      parent_sop_id: sopV1.id,
+      refresher_interval_months: 12,
+      uploaded_by: adminId,
+      source_file_path: 'phase36-lineage/probe-v3.docx',
+      source_file_type: 'docx',
+      source_file_name: 'probe-v3.docx',
+    })
+    expect(draftErr).toBeNull()
+    const draftLineage = await resolveLineage([v1RowOnly as SopRow], admin, orgId)
+    expect(draftLineage.currentVersionBySopId.get(draftLineage.canonicalBySopId.get(sopV1.id) ?? sopV1.id)).toBe(2)
   })
 })

@@ -46,10 +46,16 @@ export async function resolveLineage(requiredSops: LineageInputSop[], client: an
   }
 
   const roots = Array.from(new Set(requiredSops.map(s => s.parent_sop_id ?? s.id)))
-  let query = client.from('sops').select('id, parent_sop_id').or(`parent_sop_id.in.(${roots.join(',')}),id.in.(${roots.join(',')})`)
+  let query = client.from('sops').select('id, parent_sop_id, version, status, refresher_interval_months').or(`parent_sop_id.in.(${roots.join(',')}),id.in.(${roots.join(',')})`)
   if (orgId) query = query.eq('organisation_id', orgId)
   const { data: lineageRows } = await query
-  const members = (lineageRows ?? []) as Array<{ id: string; parent_sop_id: string | null }>
+  const members = (lineageRows ?? []) as Array<{
+    id: string
+    parent_sop_id: string | null
+    version: number | null
+    status: string
+    refresher_interval_months: number | null
+  }>
 
   // Root -> required sop, preferring the HIGHEST version when two required
   // rows share a root (a lingering superseded-version junction — RESEARCH
@@ -59,6 +65,34 @@ export async function resolveLineage(requiredSops: LineageInputSop[], client: an
     const root = s.parent_sop_id ?? s.id
     const existing = requiredByRoot.get(root)
     if (!existing || (s.version ?? 0) > (existing.version ?? 0)) requiredByRoot.set(root, s)
+  }
+
+  // CR-01: currency comes from the lineage MEMBERS themselves — the highest
+  // PUBLISHED version per root — never from the input rows alone. In the
+  // CSV-export path the input rows are the SOPs of the completions in the
+  // export cut, which can all be superseded; trusting them reported
+  // on_current_version=yes for workers trained on a superseded version (and
+  // took refresher_due_date's interval from the stale row). Drafts are
+  // excluded so a cloned-but-unpublished v+1 draft never marks every worker
+  // outdated against an unshipped version. This also hardens the
+  // matrix/record paths against the stale-junction case above.
+  const currentByRoot = new Map<string, { version: number | null; interval: number | null }>()
+  for (const m of members) {
+    if (m.status !== 'published') continue
+    const root = m.parent_sop_id ?? m.id
+    const prev = currentByRoot.get(root)
+    if (!prev || (m.version ?? 0) > (prev.version ?? 0)) {
+      currentByRoot.set(root, { version: m.version, interval: m.refresher_interval_months })
+    }
+  }
+  for (const s of requiredSops) {
+    const current = currentByRoot.get(s.parent_sop_id ?? s.id)
+    if (current) {
+      currentVersionBySopId.set(s.id, current.version)
+      refresherIntervalBySopId.set(s.id, current.interval)
+    }
+    // No published member (e.g. the org-scoped lineage query filtered
+    // everything out) → keep the input row's own values seeded above.
   }
 
   const canonicalBySopId = new Map<string, string>()
