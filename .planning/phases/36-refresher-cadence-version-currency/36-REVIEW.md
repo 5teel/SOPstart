@@ -42,6 +42,10 @@ findings:
   info: 4
   total: 12
 status: issues_found
+fix_status: critical_and_warnings_fixed
+fixed_at: 2026-07-28
+fixed: 8
+skipped: 4
 ---
 
 # Phase 36: Code Review Report
@@ -181,6 +185,26 @@ if (sopId) {
 
 ---
 
+## Fix Outcomes (2026-07-28)
+
+All Critical and Warning findings fixed; Info findings deliberately not in scope. One atomic commit per finding. Verified: `npx tsc --noEmit` clean, `npm run build` clean (bundle gates OK), `npx playwright test --project=phase36 --project=phase35 --project=phase35-unit` — 179 passed (live probes included).
+
+| Finding | Status | Commit | Notes |
+|---------|--------|--------|-------|
+| CR-01 | fixed | `017c256` | resolveLineage now derives currency + interval from the highest PUBLISHED lineage member per root (drafts excluded); live-probe regression added for the export-path shape (v1-only input → current=2, current interval) and draft exclusion. |
+| WR-01 | fixed | `0b5f14d` | `currentSop` predicate now `superseded_by === null && status === 'published'` (matches the row badge); refresher control/clone/title/compare all target the live published current. |
+| WR-02 | fixed | `2a189bf` | worker-library completion query explicitly `.eq('worker_id', user.id)` — corrects refresher chips AND the pre-existing Updated badge for supervisor/admin/safety_manager sessions. |
+| WR-03 | fixed | `c05135c` | completion clock keyed by lineage root (`parent_sop_id ?? id`) via one extra column on the existing sops query — chip survives supersede; no server action added, no gating. |
+| WR-04 | fixed | `86fc3d1` | new pure `isRefresherDue()` (14-day lead window, `REFRESHER_DUE_WINDOW_DAYS`) in refresher.ts, unit-tested; "Refresher due" label now reachable; overdue unchanged (strictly past). |
+| WR-05 | fixed | `3933966` | SOP-filtered export resolves the filter SOP's lineage (org-verified) and widens the completion filter to `allSopIds`. |
+| WR-06 | fixed | `308f929` | both guards share one corrected GATE_PATTERN (equality/relational/bare-ternary/if; passive `=`/`?:`/`??`/string-label-ternary excluded, ceiling documented); proven live by a temporary real gate turning both specs red; 36-08 spread/`??` call-site workarounds normalized to plain JSX props/defaults. |
+| WR-07 | fixed | `15f4c27` | resolveLineage moved to `src/lib/competency/lineage.ts` (plain module); competency.ts imports it; both phase36 specs repointed in the same commit. |
+| IN-01 | skipped | — | Info tier, out of fix scope (page derives currency itself; field still caller-relative). |
+| IN-02 | skipped | — | Info tier, out of fix scope. |
+| IN-03 | skipped | — | Info tier, out of fix scope. |
+| IN-04 | skipped | — | Info tier, out of fix scope (roots remain DB-sourced uuids on every call path). |
+
 _Reviewed: 2026-07-28_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
+_Fixed: 2026-07-28 — Claude (gsd-code-fixer)_
