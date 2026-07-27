@@ -27,6 +27,14 @@
  * every table it touches has a self-read RLS branch (member_departments,
  * sop_access_people, sop_completions, completion_sign_offs, sop_observations
  * all carry a `= auth.uid()` self-read arm).
+ *
+ * Phase 36 (CMP-03/REF-01/REF-02): evidence is fetched LINEAGE-WIDE — every
+ * sop_id across a required SOP's version lineage — via resolveLineage(),
+ * then remapped onto the canonical (current) required sop id before it
+ * reaches the pure layer (matrix.ts/classify.ts never learn about versions).
+ * This closes the evidence-orphaning gap where a worker who trained on a
+ * since-superseded version would otherwise read as `not_started` the
+ * instant the SOP is republished (RESEARCH Pitfall 1).
  */
 import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -54,6 +62,78 @@ async function callerOrgId(admin: any, userId: string, sessionOrgId: string | nu
     .eq('user_id', userId)
     .maybeSingle()
   return (data?.organisation_id as string | undefined) ?? sessionOrgId
+}
+
+/**
+ * Lineage resolver (CMP-03 — RESEARCH Pitfall 1). `sop_completions` /
+ * `sop_observations` are keyed to a SPECIFIC sop row, not a lineage root, so
+ * a worker who trained on a since-superseded version reads as `not_started`
+ * unless evidence queries are widened across the whole version lineage.
+ * Lineage is flat, one level deep (a version's `parent_sop_id` always points
+ * at the ORIGINAL row) — never a recursive walker, mirrors
+ * getVersionHistory's `.or('parent_sop_id.eq.X,id.eq.X')` shape, batched
+ * across every required SOP's root in one query.
+ *
+ * Currency is never derived from `superseded_by` (cloneSopAsDraft/
+ * performPublish do not set it — RESEARCH Pitfall 3) — it comes solely from
+ * the monotonic `version` integer on the required-sop row.
+ */
+interface LineageInputSop {
+  id: string
+  version: number | null
+  parent_sop_id: string | null
+  refresher_interval_months: number | null
+}
+
+interface LineageResult {
+  allSopIds: string[]
+  canonicalBySopId: Map<string, string>
+  currentVersionBySopId: Map<string, number | null>
+  refresherIntervalBySopId: Map<string, number | null>
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function resolveLineage(requiredSops: LineageInputSop[], client: any, orgId: string | null): Promise<LineageResult> {
+  const currentVersionBySopId = new Map(requiredSops.map(s => [s.id, s.version]))
+  const refresherIntervalBySopId = new Map(requiredSops.map(s => [s.id, s.refresher_interval_months]))
+
+  if (requiredSops.length === 0) {
+    return { allSopIds: [], canonicalBySopId: new Map(), currentVersionBySopId, refresherIntervalBySopId }
+  }
+
+  const roots = Array.from(new Set(requiredSops.map(s => s.parent_sop_id ?? s.id)))
+  let query = client.from('sops').select('id, parent_sop_id').or(`parent_sop_id.in.(${roots.join(',')}),id.in.(${roots.join(',')})`)
+  if (orgId) query = query.eq('organisation_id', orgId)
+  const { data: lineageRows } = await query
+  const members = (lineageRows ?? []) as Array<{ id: string; parent_sop_id: string | null }>
+
+  // Root -> required sop, preferring the HIGHEST version when two required
+  // rows share a root (a lingering superseded-version junction — RESEARCH
+  // Open Question 3), so evidence is never double-counted across columns.
+  const requiredByRoot = new Map<string, LineageInputSop>()
+  for (const s of requiredSops) {
+    const root = s.parent_sop_id ?? s.id
+    const existing = requiredByRoot.get(root)
+    if (!existing || (s.version ?? 0) > (existing.version ?? 0)) requiredByRoot.set(root, s)
+  }
+
+  const canonicalBySopId = new Map<string, string>()
+  const allSopIdSet = new Set<string>()
+  for (const member of members) {
+    const root = member.parent_sop_id ?? member.id
+    const required = requiredByRoot.get(root)
+    if (!required) continue
+    canonicalBySopId.set(member.id, required.id)
+    allSopIdSet.add(member.id)
+  }
+  // Always include the required sops themselves even if the lineage query
+  // (org-scoped) somehow missed a row.
+  for (const s of requiredSops) {
+    canonicalBySopId.set(s.id, requiredByRoot.get(s.parent_sop_id ?? s.id)?.id ?? s.id)
+    allSopIdSet.add(s.id)
+  }
+
+  return { allSopIds: Array.from(allSopIdSet), canonicalBySopId, currentVersionBySopId, refresherIntervalBySopId }
 }
 
 /** No full-name field exists anywhere in this codebase — email is the display name everywhere (mirrors observations.ts resolveDisplayNames).
@@ -166,15 +246,27 @@ export async function getTrainingMatrix(
     requiredSopsByPerson[personId] = sopIds.filter(id => personSops.has(id))
   }
 
-  const [{ data: sopRows }, { data: completionRows }] = await Promise.all([
-    admin.from('sops').select('id, title, sop_number').eq('organisation_id', orgId).in('id', sopIds),
-    admin
-      .from('sop_completions')
-      .select('id, worker_id, sop_id, sop_version, submitted_at')
-      .eq('organisation_id', orgId)
-      .in('worker_id', personIds)
-      .in('sop_id', sopIds),
-  ])
+  const { data: sopRows } = await admin
+    .from('sops')
+    .select('id, title, sop_number, version, parent_sop_id, refresher_interval_months')
+    .eq('organisation_id', orgId)
+    .in('id', sopIds)
+  const requiredSopRows = (sopRows ?? []) as Array<{
+    id: string
+    title: string
+    sop_number: string | null
+    version: number | null
+    parent_sop_id: string | null
+    refresher_interval_months: number | null
+  }>
+  const lineage = await resolveLineage(requiredSopRows, admin, orgId)
+
+  const { data: completionRows } = await admin
+    .from('sop_completions')
+    .select('id, worker_id, sop_id, sop_version, submitted_at')
+    .eq('organisation_id', orgId)
+    .in('worker_id', personIds)
+    .in('sop_id', lineage.allSopIds)
 
   const completionIds = ((completionRows ?? []) as Array<{ id: string }>).map(c => c.id)
   const [{ data: signOffRows }, { data: observationRows }] = await Promise.all([
@@ -186,39 +278,48 @@ export async function getTrainingMatrix(
       .select('observed_worker_id, sop_id, verdict, created_at')
       .eq('organisation_id', orgId)
       .in('observed_worker_id', personIds)
-      .in('sop_id', sopIds),
+      .in('sop_id', lineage.allSopIds),
   ])
 
   const names = await resolveDisplayNames(personIds)
   const people: MatrixPerson[] = personIds.map(id => ({ id, displayName: names[id] ?? 'Unknown' }))
-  const sops: MatrixSop[] = ((sopRows ?? []) as Array<{ id: string; title: string; sop_number: string | null }>).map(s => ({
+  const sops: MatrixSop[] = requiredSopRows.map(s => ({
     id: s.id,
     title: s.title,
     sopNumber: s.sop_number,
-    // ponytail: currentVersion/refresherIntervalMonths wired in 36-05 once the
-    // query above selects `version`/`refresher_interval_months`; null here
-    // matches the pre-Phase-36 no-outdated/no-refresher behavior exactly.
-    currentVersion: null,
-    refresherIntervalMonths: null,
+    currentVersion: lineage.currentVersionBySopId.get(s.id) ?? null,
+    refresherIntervalMonths: lineage.refresherIntervalBySopId.get(s.id) ?? null,
   }))
-  const completions: MatrixCompletion[] = ((completionRows ?? []) as Array<{ id: string; worker_id: string; sop_id: string; sop_version: number; submitted_at: string }>).map(c => ({
-    id: c.id,
-    workerId: c.worker_id,
-    sopId: c.sop_id,
-    sopVersion: c.sop_version,
-    submittedAt: c.submitted_at,
-  }))
+  const completions: MatrixCompletion[] = ((completionRows ?? []) as Array<{ id: string; worker_id: string; sop_id: string; sop_version: number; submitted_at: string }>)
+    .map(c => {
+      const canonicalSopId = lineage.canonicalBySopId.get(c.sop_id)
+      if (!canonicalSopId) return null
+      return {
+        id: c.id,
+        workerId: c.worker_id,
+        sopId: canonicalSopId,
+        sopVersion: c.sop_version,
+        submittedAt: c.submitted_at,
+      }
+    })
+    .filter((c): c is NonNullable<typeof c> => c !== null)
   const signOffs: MatrixSignOff[] = ((signOffRows ?? []) as Array<{ completion_id: string; decision: string; created_at: string }>).map(s => ({
     completionId: s.completion_id,
     decision: s.decision,
     createdAt: s.created_at,
   }))
-  const observations: MatrixObservation[] = ((observationRows ?? []) as Array<{ observed_worker_id: string; sop_id: string; verdict: string; created_at: string }>).map(o => ({
-    observedWorkerId: o.observed_worker_id,
-    sopId: o.sop_id,
-    verdict: o.verdict,
-    createdAt: o.created_at,
-  }))
+  const observations: MatrixObservation[] = ((observationRows ?? []) as Array<{ observed_worker_id: string; sop_id: string; verdict: string; created_at: string }>)
+    .map(o => {
+      const canonicalSopId = lineage.canonicalBySopId.get(o.sop_id)
+      if (!canonicalSopId) return null
+      return {
+        observedWorkerId: o.observed_worker_id,
+        sopId: canonicalSopId,
+        verdict: o.verdict,
+        createdAt: o.created_at,
+      }
+    })
+    .filter((o): o is NonNullable<typeof o> => o !== null)
 
   const matrix = buildMatrix({ people, requiredSopsByPerson, sops, completions, signOffs, observations })
   return { matrix, people, sops }
