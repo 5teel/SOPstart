@@ -39,6 +39,8 @@
 import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { classifyCompetency, type CompetencyState } from '@/lib/competency/classify'
+import { isOutdatedVersion } from '@/lib/competency/version-currency'
+import { refresherDueDate, isRefresherOverdue } from '@/lib/competency/refresher'
 import {
   buildMatrix,
   type MatrixPerson,
@@ -352,6 +354,9 @@ export interface RequiredSopRecord {
   awaitingSignOff: boolean
   completions: CompletionEvidence[]
   observations: ObservationEvidence[]
+  isOutdatedVersion: boolean
+  refresherDueAt: string | null
+  isRefresherOverdue: boolean
 }
 
 export interface OtherCompletedSop {
@@ -402,6 +407,24 @@ export async function getTrainingRecordForPerson(personId: string): Promise<{ re
   )
   const requiredSopIdSet = new Set(requiredSopIds)
 
+  const { data: requiredSopRows } =
+    requiredSopIds.length > 0
+      ? await admin
+          .from('sops')
+          .select('id, title, sop_number, version, parent_sop_id, refresher_interval_months')
+          .eq('organisation_id', orgId)
+          .in('id', requiredSopIds)
+      : { data: [] }
+  const requiredSops_ = (requiredSopRows ?? []) as Array<{
+    id: string
+    title: string
+    sop_number: string | null
+    version: number | null
+    parent_sop_id: string | null
+    refresher_interval_months: number | null
+  }>
+  const lineage = await resolveLineage(requiredSops_, admin, orgId)
+
   const { data: completionRows } = await admin
     .from('sop_completions')
     .select('id, sop_id, sop_version, submitted_at')
@@ -425,12 +448,23 @@ export async function getTrainingRecordForPerson(personId: string): Promise<{ re
   const signOffs = (signOffRows ?? []) as Array<{ completion_id: string; decision: string; created_at: string; supervisor_id: string }>
   const observations = (observationRows ?? []) as Array<{ sop_id: string; verdict: string; created_at: string; note: string | null; observed_by: string }>
 
-  const allSopIds = Array.from(new Set([...requiredSopIds, ...completions.map(c => c.sop_id)]))
-  const { data: sopRows } =
-    allSopIds.length > 0
-      ? await admin.from('sops').select('id, title, sop_number').eq('organisation_id', orgId).in('id', allSopIds)
+  // Pre-supersede evidence (a completion/observation against an old lineage
+  // member) is remapped onto the canonical (current) required sop id here —
+  // this is the fix for the orphaning bug (RESEARCH Pitfall 1): the row
+  // itself was never missing, only mis-grouped under a dead sop_id.
+  const canonicalSopId = (id: string): string => lineage.canonicalBySopId.get(id) ?? id
+
+  const otherSopIds = Array.from(new Set(completions.map(c => canonicalSopId(c.sop_id)))).filter(id => !requiredSopIdSet.has(id))
+  const { data: otherSopRows } =
+    otherSopIds.length > 0
+      ? await admin.from('sops').select('id, title, sop_number').eq('organisation_id', orgId).in('id', otherSopIds)
       : { data: [] }
-  const sopById = new Map(((sopRows ?? []) as Array<{ id: string; title: string; sop_number: string | null }>).map(s => [s.id, s]))
+  const sopById = new Map<string, { title: string; sop_number: string | null }>([
+    ...requiredSops_.map(s => [s.id, { title: s.title, sop_number: s.sop_number }] as const),
+    ...((otherSopRows ?? []) as Array<{ id: string; title: string; sop_number: string | null }>).map(
+      s => [s.id, { title: s.title, sop_number: s.sop_number }] as const
+    ),
+  ])
 
   const names = await resolveDisplayNames([...observations.map(o => o.observed_by), ...signOffs.map(s => s.supervisor_id)])
 
@@ -451,14 +485,18 @@ export async function getTrainingRecordForPerson(personId: string): Promise<{ re
 
   const completionsBySop = new Map<string, typeof completions>()
   for (const c of completions) {
-    if (!completionsBySop.has(c.sop_id)) completionsBySop.set(c.sop_id, [])
-    completionsBySop.get(c.sop_id)!.push(c)
+    const key = canonicalSopId(c.sop_id)
+    if (!completionsBySop.has(key)) completionsBySop.set(key, [])
+    completionsBySop.get(key)!.push(c)
   }
   const observationsBySop = new Map<string, typeof observations>()
   for (const o of observations) {
-    if (!observationsBySop.has(o.sop_id)) observationsBySop.set(o.sop_id, [])
-    observationsBySop.get(o.sop_id)!.push(o)
+    const key = canonicalSopId(o.sop_id)
+    if (!observationsBySop.has(key)) observationsBySop.set(key, [])
+    observationsBySop.get(key)!.push(o)
   }
+
+  const nowIso = new Date().toISOString()
 
   const requiredSops: RequiredSopRecord[] = requiredSopIds.map(sopId => {
     const sopRow = sopById.get(sopId)
@@ -485,6 +523,14 @@ export async function getTrainingRecordForPerson(personId: string): Promise<{ re
       latestPositiveEvidenceAt,
     })
 
+    // Refresher clock is the latest COMPLETION, not the latest sign-off or
+    // positive observation (D-03).
+    const latestCompletion = sopCompletions.reduce<(typeof sopCompletions)[number] | null>((latest, c) => {
+      if (!latest || c.submitted_at > latest.submitted_at) return c
+      return latest
+    }, null)
+    const dueAt = refresherDueDate(latestCompletion?.submitted_at ?? null, lineage.refresherIntervalBySopId.get(sopId) ?? null)
+
     return {
       sopId,
       sopTitle: sopRow?.title ?? 'Untitled SOP',
@@ -499,6 +545,9 @@ export async function getTrainingRecordForPerson(personId: string): Promise<{ re
         observerName: names[o.observed_by] ?? 'Unknown',
         note: o.note,
       })),
+      isOutdatedVersion: isOutdatedVersion(latestCompletion?.sop_version ?? null, lineage.currentVersionBySopId.get(sopId) ?? null),
+      refresherDueAt: dueAt,
+      isRefresherOverdue: isRefresherOverdue(dueAt, nowIso),
     }
   })
 
