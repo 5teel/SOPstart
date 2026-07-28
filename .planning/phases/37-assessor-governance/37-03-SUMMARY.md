@@ -101,3 +101,14 @@ None - migration applied directly via the Supabase Management API + CLI using cr
 ---
 *Phase: 37-assessor-governance*
 *Completed: 2026-07-28*
+
+## Self-Check: PASSED
+
+- FOUND: scripts/apply-phase37-migration.mjs
+- FOUND: src/actions/observations.ts
+- FOUND: tests/phase37/assessor-gate.spec.ts
+- FOUND: .planning/phases/37-assessor-governance/37-03-SUMMARY.md
+- FOUND commit: ab23c39 (Task 1)
+- FOUND commit: fa981ff (Task 2)
+- FOUND commit: b436b77 (Task 3)
+- FOUND commit: 0493b03 (SUMMARY.md)
