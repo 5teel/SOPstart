@@ -2,11 +2,13 @@
 /**
  * apply-phase37-migration.mjs
  *
- * Phase 37 migration applier — pushes 00056 (assessor governance override
- * audit columns + constraints + insert-policy override clause) to the live
- * remote DB and runs post-apply assertions that bypass the PostgREST schema
- * cache. Copy-adapted from scripts/apply-phase36-migration.mjs (CLAUDE.md
- * 2026-06-15 PostgREST schema-cache learning).
+ * Phase 37 migration applier — pushes 00056 + 00057 (assessor governance
+ * override audit columns + constraints + insert-policy override clause,
+ * PLUS the 00057 fix-forward that restores the cross-org write guard 00056
+ * dropped) to the live remote DB and runs post-apply assertions that bypass
+ * the PostgREST schema cache. Copy-adapted from
+ * scripts/apply-phase36-migration.mjs (CLAUDE.md 2026-06-15 PostgREST
+ * schema-cache learning).
  *
  * Usage:
  *   node scripts/apply-phase37-migration.mjs
@@ -26,7 +28,15 @@ import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
-const MIGRATION_FILE = path.join(ROOT, 'supabase/migrations/00056_assessor_governance.sql')
+// CR-02: both files, in order. 00057 re-creates the SAME policy 00056
+// creates, re-adding the sop_observation_refs_in_org cross-org conjunct that
+// 00056 dropped (T-34-03-01). Applying 00056 alone, or out of order, leaves
+// the live policy WITHOUT that conjunct — i.e. re-opens the cross-tenant
+// write hole on production. Do NOT "simplify" this back to one file.
+const MIGRATION_FILES = [
+  path.join(ROOT, 'supabase/migrations/00056_assessor_governance.sql'),
+  path.join(ROOT, 'supabase/migrations/00057_restore_sop_observations_cross_org_guard.sql'),
+]
 
 // ---------------------------------------------------------------------------
 // .env.local loader
@@ -87,11 +97,11 @@ async function managementSql(sql) {
 // Step 1: Apply migration via `npx supabase db push`, falling back to the
 // Management API raw-SQL endpoint if `db push` lacks a DB password.
 // ---------------------------------------------------------------------------
-console.log('=== Phase 37 Migration Applier (00056 assessor_governance) ===')
+console.log('=== Phase 37 Migration Applier (00056 + 00057 assessor_governance) ===')
 console.log('Target:', SUPABASE_URL)
 console.log('Project ref:', PROJECT_REF)
 console.log('')
-console.log('[1/4] Applying migration 00056 via supabase db push ...')
+console.log('[1/4] Applying migrations 00056 + 00057 via supabase db push ...')
 console.log('      (Only unapplied migrations are run — idempotent)')
 console.log('')
 
@@ -112,23 +122,37 @@ try {
   console.error('Falling back to Management API raw-SQL apply ...')
   console.error('')
   try {
-    const migrationSql = readFileSync(MIGRATION_FILE, 'utf8')
-    await managementSql(migrationSql)
-    console.log('Management API raw-SQL apply: SUCCESS')
+    // CR-02: apply BOTH files, in order, via the fallback. 00057 must run
+    // AFTER 00056 — it re-creates sop_observations_insert_recorder with the
+    // restored sop_observation_refs_in_org conjunct on top of 00056's
+    // is_assessor_override clause. Applying only 00056 here (the prior
+    // single-file fallback) is exactly how the cross-org write guard got
+    // silently dropped on production the first time (00057's own header).
+    for (const file of MIGRATION_FILES) {
+      console.log(`  Applying ${path.basename(file)} via Management API ...`)
+      const migrationSql = readFileSync(file, 'utf8')
+      await managementSql(migrationSql)
+    }
+    console.log('Management API raw-SQL apply: SUCCESS (00056 + 00057)')
     pushSucceeded = true
     pushPath = 'management-api-fallback'
   } catch (fallbackErr) {
     console.error('Management API raw-SQL apply also failed:', fallbackErr.message)
     console.error('')
-    console.error('FALLBACK — apply the migration manually:')
+    console.error('FALLBACK — apply the migrations manually, IN ORDER:')
     console.error('')
-    console.error('Option A: Supabase SQL Editor (paste file body):')
-    console.error('  supabase/migrations/00056_assessor_governance.sql')
+    console.error('Option A: Supabase SQL Editor (paste each file body, in order):')
+    console.error('  1. supabase/migrations/00056_assessor_governance.sql')
+    console.error('  2. supabase/migrations/00057_restore_sop_observations_cross_org_guard.sql')
     console.error(`  URL: https://supabase.com/dashboard/project/${PROJECT_REF}/sql`)
+    console.error('  WARNING: applying 00056 without 00057 reopens the cross-org write guard.')
     console.error('')
-    console.error('Option B: psql:')
+    console.error('Option B: psql (run both, in order):')
     console.error('  psql "postgresql://postgres:<password>@db.<ref>.supabase.co:5432/postgres" \\')
     console.error('    -f supabase/migrations/00056_assessor_governance.sql')
+    console.error('  psql "postgresql://postgres:<password>@db.<ref>.supabase.co:5432/postgres" \\')
+    console.error('    -f supabase/migrations/00057_restore_sop_observations_cross_org_guard.sql')
+    console.error('  WARNING: applying 00056 without 00057 reopens the cross-org write guard.')
     console.error('')
     console.error('After applying manually, re-run this script for the post-apply assertions.')
     process.exit(1)
@@ -334,14 +358,25 @@ await assertSql(
 // ---------------------------------------------------------------------------
 // Assertion group 3: the re-created insert policy carries the override clause.
 // ---------------------------------------------------------------------------
+// CR-02: this is the exact assertion whose absence caused the original
+// regression — 00056's post-apply assertion only checked for
+// current_user_role + is_assessor_override, so the silent drop of the
+// sop_observation_refs_in_org cross-org conjunct went undetected until a
+// runtime spec caught it (see 00057's migration header). Pinning all three
+// substrings here means this script can no longer print ALL PASS while the
+// live policy is missing the org-ref guard.
 await assertSql(
-  'sop_observations_insert_recorder policy with_check contains current_user_role AND is_assessor_override',
+  'sop_observations_insert_recorder policy with_check contains current_user_role AND is_assessor_override AND sop_observation_refs_in_org',
   "SELECT policyname, with_check FROM pg_policies WHERE schemaname='public' AND tablename='sop_observations' AND policyname='sop_observations_insert_recorder'",
   (rows) => {
     const row = rows?.[0]
     const withCheck = row?.with_check ?? ''
     return {
-      ok: !!row && withCheck.includes('current_user_role') && withCheck.includes('is_assessor_override'),
+      ok:
+        !!row &&
+        withCheck.includes('current_user_role') &&
+        withCheck.includes('is_assessor_override') &&
+        withCheck.includes('sop_observation_refs_in_org'),
       detail: row ? `with_check=${withCheck}` : 'policy not found',
     }
   }
@@ -385,9 +420,10 @@ console.log('[4/4] Summary')
 if (allPassed) {
   console.log('=== ALL POST-APPLY ASSERTIONS PASSED ===')
   console.log('')
-  console.log('Migration 00056 is live on the DB: all five columns, both CHECK')
-  console.log('constraints (behaviourally proven), and the amended insert policy')
-  console.log('are live and visible to PostgREST.')
+  console.log('Migrations 00056 + 00057 are live on the DB: all five columns, both')
+  console.log('CHECK constraints (behaviourally proven), and the amended insert')
+  console.log('policy — carrying BOTH the override clause and the restored')
+  console.log('cross-org guard — are live and visible to PostgREST.')
   process.exit(0)
 } else {
   console.error('=== ONE OR MORE ASSERTIONS FAILED ===')

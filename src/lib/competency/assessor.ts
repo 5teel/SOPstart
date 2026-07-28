@@ -66,17 +66,23 @@ export async function isSignedOffAssessor(personId: string, sopId: string, clien
   const signOffs = (signOffRows ?? []) as Array<{ completion_id: string; decision: string; created_at: string }>
   const observations = (observationRows ?? []) as Array<{ sop_id: string; verdict: string; created_at: string }>
 
-  const signOffByCompletion = new Map(signOffs.map(s => [s.completion_id, s]))
-
+  // WR-01: no per-completion Map here. completion_sign_offs is append-only
+  // and signOffCompletion never checks for an existing row (the
+  // `alreadySigned` guard is client-side only), so a completion can carry
+  // more than one row — a Map keyed by completion_id keeps only the LAST row
+  // in unordered query results, which can shadow an earlier `approved` row
+  // with a later `rejected` one and falsely deny a legitimately signed-off
+  // assessor. `.some()`/`.filter()` over ALL rows is order-independent and
+  // correct. Note: the Map was never providing org/person scoping either —
+  // `signOffs` is already restricted by `.in('completion_id', completionIds)`
+  // where completionIds come from the org-scoped, person-scoped completions
+  // query above — so do not reintroduce a Map as a "missing scope" fix.
   const hasCompletion = completions.length > 0
-  const hasSignOff = completions.some(c => signOffByCompletion.get(c.id)?.decision === 'approved')
+  const hasSignOff = signOffs.some(s => s.decision === 'approved')
   const hasPerformedToSopObservation = observations.some(o => o.verdict === 'performed_to_sop')
   const latestPositiveEvidenceAt = latestOf([
     ...observations.filter(o => o.verdict === 'performed_to_sop').map(o => o.created_at),
-    ...completions
-      .map(c => signOffByCompletion.get(c.id))
-      .filter((s): s is NonNullable<typeof s> => !!s && s.decision === 'approved')
-      .map(s => s.created_at),
+    ...signOffs.filter(s => s.decision === 'approved').map(s => s.created_at),
   ])
   const latestNeedsSupportAt = latestOf(observations.filter(o => o.verdict === 'needs_support').map(o => o.created_at))
 

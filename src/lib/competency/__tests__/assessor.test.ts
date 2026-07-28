@@ -117,6 +117,24 @@ test.describe('isSignedOffAssessor', () => {
     expect(await isSignedOffAssessor('p1', 'sop-missing', client, 'org-1')).toBe(false)
   })
 
+  test('WR-01: a later REJECTED sign-off row cannot shadow an earlier APPROVED row on the same completion -> true', async () => {
+    // RED against the old signOffByCompletion Map implementation (which keeps
+    // only the LAST row per completion_id in unordered query results — here
+    // the rejected row would shadow the approved one and this would return
+    // false). GREEN after the fix, which evaluates .some()/.filter() over
+    // ALL rows regardless of order.
+    const client = makeStubClient({
+      sops: [targetSop],
+      sop_completions: [{ id: 'c1', sop_id: 'sop-1', submitted_at: '2026-01-01T00:00:00.000Z' }],
+      completion_sign_offs: [
+        { completion_id: 'c1', decision: 'approved', created_at: '2026-01-02T00:00:00.000Z' },
+        { completion_id: 'c1', decision: 'rejected', created_at: '2026-01-03T00:00:00.000Z' },
+      ],
+      sop_observations: [],
+    })
+    expect(await isSignedOffAssessor('p1', 'sop-1', client, 'org-1')).toBe(true)
+  })
+
   test('orgId null -> false without querying evidence', async () => {
     const client = makeStubClient({
       sops: [targetSop],
