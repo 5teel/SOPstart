@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: — Competency & Training Layer
-status: executing
-stopped_at: Completed 37-05-PLAN.md
-last_updated: "2026-07-28T04:01:15.601Z"
+status: completed
+stopped_at: v7.0 closed at Phase 37 — Phases 38/39 deferred to backlog 999.4/999.5/999.6
+last_updated: "2026-07-28T04:30:48.369Z"
 last_activity: 2026-07-28
 progress:
-  total_phases: 6
+  total_phases: 4
   completed_phases: 4
   total_plans: 32
   completed_plans: 32
-  percent: 67
+  percent: 100
 ---
 
 # Project State
@@ -21,14 +21,26 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 37 — assessor-governance
+**Current focus:** v7.0 closed — next milestone is the SOP creation / conversion / authoring foundation (pre-alpha)
 
 ## Current Position
 
-Phase: 38
+Phase: — (v7.0 complete at Phase 37)
 Plan: Not started
-Status: Executing Phase 37
+Status: milestone-complete
 Last activity: 2026-07-28
+
+### v7.0 scope change (2026-07-28)
+
+Phases 38 (Guidance-Notes Adoptions) and 39 (AI-Prioritized Maintenance Schedule) were **deferred to backlog before being planned or started** — the milestone closes at Phase 37 with 4/4 phases and 32/32 plans complete.
+
+Reason: both phases critique or rank SOP *content*, and the SOP creation/conversion/authoring pipeline is still pre-alpha. A completeness rubric tuned against pre-alpha parse output would need retuning once that pipeline matures, and its flags render into builder/library surfaces currently under redesign. Phase 39 depends on 38's flags so it defers with it.
+
+- **999.4** — completeness rubric (RUB-01/02/03) + risk triage (TRI-01). Blocked on pipeline maturity.
+- **999.5** — document codes + register export (DOC-01/02). **Independently promotable** — plain metadata + CSV, no pipeline dependency; pull forward if a real org needs the audit register.
+- **999.6** — AI-prioritized maintenance schedule (REV-05). Blocked on 999.4's flags.
+
+**Next milestone:** scope around SOP creation/conversion/authoring maturity (`/gsd-new-milestone`). Active design exploration already on disk: `sketches/sop-builder-redesign/`, `sketches/unified-sop-surface/`, `sketches/admin-sop-new-wizard/`, `usability-lab/`.
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 

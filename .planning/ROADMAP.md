@@ -303,14 +303,16 @@ Plans:
 
 ## v7.0 — Competency & Training Layer (started 2026-07-19)
 
-Turns data SafeStart already stores (access grants = who must know what; completions + immutable sign-off chains = what's been evidenced) into a full competency system: a training matrix, derived competency states, and supervisor observation records — the audit artifact every ACC reviewer, WorkSafe inspector, and site manager asks for. Absorbs v6.0's unshipped Phase 31 (training records + AI maintenance schedule) and promotes four guidance-notes backlog items (999.4-999.7). **NORTH STAR (carried from v6.0, locked by Simon 2026-07-12):** ease of use and maintenance first — competency tracking exists only in service of accurate documentation and shop-floor ease of use; worker read/walkthrough access is NEVER gated by competency state (locked guard, regression-tested). Builds on existing infra only: access grants + materialization (Phases 32-33), completions + sign-off chain (Phases 4/23), departments (Phase 25), AI reviewer jobs (Phase 21), agent metadata + AI adapter (Phase 26.5/27), governance queue (Phase 28). Execution order 34 → 35 → 36 → 37 → 38 → 39 (38 is parallel-safe and can run alongside 35-37).
+Turns data SafeStart already stores (access grants = who must know what; completions + immutable sign-off chains = what's been evidenced) into a full competency system: a training matrix, derived competency states, and supervisor observation records — the audit artifact every ACC reviewer, WorkSafe inspector, and site manager asks for. Absorbs v6.0's unshipped Phase 31 (training records + AI maintenance schedule) and promotes four guidance-notes backlog items (999.4-999.7). **NORTH STAR (carried from v6.0, locked by Simon 2026-07-12):** ease of use and maintenance first — competency tracking exists only in service of accurate documentation and shop-floor ease of use; worker read/walkthrough access is NEVER gated by competency state (locked guard, regression-tested). Builds on existing infra only: access grants + materialization (Phases 32-33), completions + sign-off chain (Phases 4/23), departments (Phase 25), AI reviewer jobs (Phase 21), agent metadata + AI adapter (Phase 26.5/27), governance queue (Phase 28). Executed 34 → 35 → 36 → 37.
+
+**Scope change 2026-07-28 (Simon):** Phases 38 and 39 **deferred back to backlog** — the milestone closes at Phase 37. Rationale: the SOP creation/conversion/authoring pipeline is still pre-alpha, and both deferred phases critique or rank SOP *content*. A completeness rubric tuned against pre-alpha parse output would be re-tuned once the pipeline matures (double work), its flags render into builder/library surfaces currently being redesigned, and informing-only signals have nobody to inform until content flow is stable. Phase 39 depends on 38's flags, so it defers with it. Nothing else depends on either. Document codes + register export (DOC-01/02) do NOT share this dependency — split out as independently promotable backlog item 999.5.
 
 - [x] **Phase 34: Supervisor Observations** - Append-only, org-scoped observation records supervisors log against a worker + SOP, visible to the worker themselves — the standalone evidence-layer foundation (verification 2026-07-20: gaps_found — see 34-VERIFICATION.md) (completed 2026-07-20)
 - [x] **Phase 35: Competency Classifier + Training Matrix + Records** - Derived-live competency state per person×SOP, a training matrix on /admin/team, and per-worker training record + CSV export — one pure classifier, zero stored/stale state (completed 2026-07-24)
 - [x] **Phase 36: Refresher Cadence + Version-Currency** - Trained-on-outdated-version surfacing after supersede, plus due/overdue refresher re-walkthroughs — informational only, never blocking (promotes backlog 999.7) (completed 2026-07-27)
 - [x] **Phase 37: Assessor Governance** - Only a signed-off assessor can record a competence-advancing observation, with an audited admin-override path for new-org bootstrap (core gate complete 2026-07-28; gap closure 37-07/37-08 pending) (completed 2026-07-28)
-- [ ] **Phase 38: Guidance-Notes Adoptions** - AI-reviewer completeness rubric (hazards/controls/LOTO + named E-stops-is-not-isolation check, quality outcomes, length flag), document codes + register export, risk/priority triage — all additive and informing-only (promotes backlog 999.4, 999.5, 999.6)
-- [ ] **Phase 39: AI-Prioritized Maintenance Schedule** - Governance surface shows an AI-ranked review list (staleness + usage + reviewer flags) on the existing AI adapter — no new AI infrastructure
+- [~] **Phase 38: Guidance-Notes Adoptions** — **DEFERRED to backlog 2026-07-28** (never planned or started). Split into backlog 999.4 (rubric + risk triage — blocked on creation/conversion maturity) and 999.5 (document codes + register export — independently promotable).
+- [~] **Phase 39: AI-Prioritized Maintenance Schedule** — **DEFERRED to backlog 2026-07-28** (never planned or started) as backlog 999.6. Depends on 38's reviewer flags as a ranking input.
 
 ### Phase 34: Supervisor Observations
 
@@ -469,42 +471,13 @@ Plans:
 - [x] 37-07-PLAN.md — CR-01 org-scope guard on `/activity/[completionId]` (+ rule-5 sibling `/admin/sops/[sopId]/video`), WR-02 role gate on `requestAssessorReview`, WR-05 org+worker validation of the observation `completionId`, plus a directory-wide admin-client org-guard sweep spec
 - [x] 37-08-PLAN.md — CR-02 migration applier applies 00056+00057 in order and asserts the restored `sop_observation_refs_in_org` conjunct, WR-01 order-independent sign-off evaluation, WR-03 per-SOP modal state reset, WR-04 server-demanded override sheet
 
-### Phase 38: Guidance-Notes Adoptions
+### Phase 38: Guidance-Notes Adoptions — DEFERRED 2026-07-28
 
-**Goal**: The AI reviewer gets a named completeness rubric (hazards/controls/isolation-LOTO with an explicit "E-stops are not isolation" check, quality outcomes, length flag), every SOP can carry a document code and roll up into a per-department register export, and admins can set/accept a risk/priority rating for triage — all additive columns and reviewer jobs, all informing rather than gating. Promotes backlog 999.4, 999.5, 999.6. Fully independent of Phases 34-37 — parallel-safe.
-**Depends on**: Phase 21 (AI reviewer job orchestrator — this is a 6th job on the existing pipeline)
-**Requirements**: RUB-01, RUB-02, RUB-03, DOC-01, DOC-02, TRI-01
-**Success Criteria** (what must be TRUE):
+Never planned or started. Full goal, dependencies, and success criteria moved to **backlog 999.4** (completeness rubric + risk triage — RUB-01/02/03, TRI-01) and **backlog 999.5** (document codes + register export — DOC-01/02). See § Backlog below.
 
-  1. AI reviewer flags missing hazards/controls/isolation-LOTO coverage, including an explicit named "E-stops are not isolation" check
-  2. AI reviewer flags absent quality outcomes and SOPs that are too long/complicated to work through
-  3. The rubric only informs — publish flow is byte-unchanged, verified by a locked regression guard
-  4. Admin can assign a document code to a SOP (EN-FOR-02-001 style, visible in library/builder/exports) and export a per-department register (code, title, version, status, dates)
-  5. Admin can set or accept an AI-suggested risk/priority rating per SOP; library and admin queues can sort by it
+### Phase 39: AI-Prioritized Maintenance Schedule — DEFERRED 2026-07-28
 
-**Plans**: TBD
-**UI hint**: yes
-
-Plans:
-
-- [ ] TBD (created by /gsd-plan-phase)
-
-### Phase 39: AI-Prioritized Maintenance Schedule
-
-**Goal**: The governance surface shows an AI-ranked "review this next" list built from staleness, usage, and reviewer flags, reusing the existing AI adapter and agent metadata layer — no new AI infrastructure.
-**Depends on**: Phase 36 (cadence/staleness data), Phase 38 (reviewer flags as a ranking input), Phase 26.5/27 (AI adapter + agent metadata layer)
-**Requirements**: REV-05
-**Success Criteria** (what must be TRUE):
-
-  1. Governance dashboard shows a prioritized review/maintenance list ranked by staleness, usage, and reviewer flags
-  2. The schedule is a read-only prioritization aid — it never blocks or gates anything, consistent with the locked north star
-
-**Plans**: TBD
-**UI hint**: yes
-
-Plans:
-
-- [ ] TBD (created by /gsd-plan-phase)
+Never planned or started. Full goal, dependencies, and success criteria moved to **backlog 999.6** (REV-05). See § Backlog below.
 
 ---
 
@@ -1314,8 +1287,8 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | 35. Competency Classifier + Training Matrix + Records | 4/4 | Complete   | 2026-07-24 |
 | 36. Refresher Cadence + Version-Currency | 10/10 | Complete    | 2026-07-27 |
 | 37. Assessor Governance | 8/8 | Complete    | 2026-07-28 |
-| 38. Guidance-Notes Adoptions | 0/TBD | Not started |  |
-| 39. AI-Prioritized Maintenance Schedule | 0/TBD | Not started |  |
+| 38. Guidance-Notes Adoptions | 0/0 | Deferred → backlog 999.4 + 999.5 | 2026-07-28 |
+| 39. AI-Prioritized Maintenance Schedule | 0/0 | Deferred → backlog 999.6 | 2026-07-28 |
 
 ## Backlog
 
@@ -1359,6 +1332,66 @@ Plans:
 
 - [ ] TBD (promote with /gsd-review-backlog when ready)
 
-### Promoted to v7.0 (2026-07-19)
+### Phase 999.4: AI-reviewer completeness rubric + risk/priority triage (BACKLOG)
 
-Phases 999.4 (AI-reviewer completeness rubric), 999.5 (document codes + register export), and 999.6 (risk/priority triage) promoted into **v7.0 Phase 38: Guidance-Notes Adoptions**. Phase 999.7 (refresher re-walkthrough cadence) promoted into **v7.0 Phase 36: Refresher Cadence + Version-Currency**. See ROADMAP.md § v7.0 above and REQUIREMENTS.md § v7.0 Requirements.
+**Goal:** A named completeness rubric as a 6th job on the existing Phase 21 AI reviewer pipeline — flags missing hazards/controls/isolation-LOTO coverage (including an explicit named "E-stops are not isolation" check), absent quality outcomes, and SOPs too long/complicated to work through. Plus an admin-set-or-accept risk/priority rating per SOP that library and admin queues can sort by. All additive columns and reviewer jobs; the rubric informs and never gates (publish flow byte-unchanged, locked regression guard).
+
+**Requirements:** RUB-01, RUB-02, RUB-03, TRI-01
+**Depends on:** Phase 21 (AI reviewer job orchestrator — `src/lib/parsers/ai-reviewer/orchestrator.ts`, jobs A–E in `jobs/`)
+**Plans:** 0 plans
+
+**Deferred 2026-07-28 (Simon), was v7.0 Phase 38.** Blocked on SOP creation/conversion/authoring pipeline maturity — currently pre-alpha. The rubric critiques SOP *content*: its prompts, flag thresholds, and the "too long/complicated" heuristic would all be calibrated against parse output the pipeline rework will change, forcing a retune. Its flags also render into builder/library surfaces under active redesign (see `sketches/sop-builder-redesign/`, `sketches/unified-sop-surface/`), and informing-only signals have nobody to inform until content flow is stable.
+
+**Promote when:** the creation/conversion pipeline is stable enough that parse output is representative — i.e. rubric tuning done then survives.
+
+**Open questions carried from the aborted Phase 38 discussion** (unanswered — resolve at promotion):
+
+- One combined Job F vs split jobs per rubric dimension?
+- The A–E pipeline only runs at parse time — does the rubric also need to be re-runnable against already-published SOPs? (999.6 wants these flags as a ranking input across the whole library, which implies yes.)
+- Risk scale: High/Med/Low vs 1–5 vs likelihood×severity matrix? Where does the AI suggestion come from, and how does "accept" work (suggested vs confirmed states)?
+
+Plans:
+
+- [ ] TBD (promote with /gsd-review-backlog when ready)
+
+### Phase 999.5: Document codes + per-department register export (BACKLOG)
+
+**Goal:** Every SOP can carry a document code (EN-FOR-02-001 style) visible in library, builder, and exports; admin can export a per-department register (code, title, version, status, dates).
+
+**Requirements:** DOC-01, DOC-02
+**Depends on:** Nothing new — additive columns on `sops` plus a CSV export reusing the Phase 35 helper (`src/lib/competency/csv.ts`; note its formula-injection neutralization per the 2026-07-24 learning)
+**Plans:** 0 plans
+
+**Deferred 2026-07-28 (Simon), was part of v7.0 Phase 38 — but independently promotable.** Unlike 999.4, this slice does NOT depend on creation/conversion maturity: it is plain metadata plus a CSV, and it is what auditors ask for. Worth pulling forward on its own if a real org starts using the library at scale.
+
+**Open questions carried from the aborted Phase 38 discussion** (unanswered — resolve at promotion):
+
+- Free-text code vs structured segments (area-type-dept-sequence) with auto-suggested next sequence?
+- Uniqueness enforced per org? Backfill/leave-blank policy for existing SOPs with no code?
+- One CSV per department vs one file with a department column, and where the export button lives.
+
+Plans:
+
+- [ ] TBD (promote with /gsd-review-backlog when ready)
+
+### Phase 999.6: AI-prioritized maintenance schedule (BACKLOG)
+
+**Goal:** The governance surface shows an AI-ranked "review this next" list built from staleness, usage, and reviewer flags, reusing the existing AI adapter and agent metadata layer — no new AI infrastructure. Read-only prioritization aid; never blocks or gates anything, consistent with the locked north star.
+
+**Requirements:** REV-05
+**Depends on:** Phase 36 (cadence/staleness data), backlog 999.4 (reviewer flags as a ranking input), Phase 26.5/27 (AI adapter + agent metadata layer)
+**Plans:** 0 plans
+
+**Deferred 2026-07-28 (Simon), was v7.0 Phase 39.** Deferred with 999.4 — reviewer flags are a required ranking input, so this cannot lead.
+
+**Promote when:** 999.4 has shipped and produced flags across a real library.
+
+Plans:
+
+- [ ] TBD (promote with /gsd-review-backlog when ready)
+
+### Promoted to v7.0 (2026-07-19) — partially reversed 2026-07-28
+
+Phases 999.4 (AI-reviewer completeness rubric), 999.5 (document codes + register export), and 999.6 (risk/priority triage) were promoted into **v7.0 Phase 38: Guidance-Notes Adoptions**; Phase 999.7 (refresher re-walkthrough cadence) into **v7.0 Phase 36: Refresher Cadence + Version-Currency**.
+
+**Outcome:** 999.7 shipped in Phase 36. Phase 38 was deferred back to backlog on 2026-07-28 without being planned or started, re-entering above as 999.4 (rubric + triage, merged) and 999.5 (document codes + register). Phase 39 followed as 999.6. See § v7.0 scope-change note above for rationale.
