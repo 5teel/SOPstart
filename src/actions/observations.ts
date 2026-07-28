@@ -326,3 +326,136 @@ export async function listWorkerSopsForPicker(workerId: string): Promise<WorkerS
     }))
     .sort((a, b) => Number(b.assigned) - Number(a.assigned))
 }
+
+// ---------------------------------------------------------------
+// Phase 37 ASR-01 — assessor status read, request-assessment write,
+// request list (D-08).
+// ---------------------------------------------------------------
+
+export interface AssessorStatus {
+  isAssessor: boolean
+  canOverride: boolean
+}
+
+// UX-only up-front read so the UI can disable the advancing control before
+// a failed save — Task 2's server-side recomputation in recordObservation
+// remains the authority and is never skipped. Fail-closed on any auth/role/
+// org failure.
+export async function getAssessorStatusForSop(sopId: string): Promise<AssessorStatus> {
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId || !organisationId || !role || !RECORDER_ROLES.includes(role)) {
+    return { isAssessor: false, canOverride: false }
+  }
+  return {
+    isAssessor: await isSignedOffAssessor(userId, sopId, createAdminClient(), organisationId),
+    canOverride: role === 'admin' || role === 'safety_manager',
+  }
+}
+
+// D-08 — a blocked supervisor requests someone assess THEM on this SOP.
+// Recipients are the org's admin/safety_manager members (Assumption A1 —
+// not a fan-out to every currently-signed-off peer, which would need a
+// per-member predicate evaluation).
+//
+// admins_can_insert_notifications (00009_worker_notifications.sql) only
+// permits admin/safety_manager inserts, and the caller here is typically a
+// plain SUPERVISOR — a session-client write would be denied with 42501
+// (the exact Phase 25 bug, CLAUDE.md 2026-06-15). Use the admin client for
+// BOTH the recipient lookup and the insert, self-enforcing org scope by
+// deriving organisationId from the session (never from client input) and
+// filtering every query on it.
+export async function requestAssessorReview(
+  sopId: string
+): Promise<{ success: true } | { success: false; error: string }> {
+  const { userId, organisationId } = await getSessionContext()
+  if (!userId) return { success: false, error: 'Not authenticated' }
+  if (!organisationId) return { success: false, error: 'No organisation found' }
+
+  const admin = createAdminClient()
+
+  // Verify the SOP belongs to this org before inserting — a foreign sopId
+  // must not create rows referencing another org's SOP (T-37-03-04).
+  const { data: sopRow } = await admin
+    .from('sops')
+    .select('id')
+    .eq('id', sopId)
+    .eq('organisation_id', organisationId)
+    .maybeSingle()
+  if (!sopRow) return { success: false, error: 'SOP not found.' }
+
+  const { data: recipients } = await admin
+    .from('organisation_members')
+    .select('user_id')
+    .eq('organisation_id', organisationId)
+    .in('role', ['admin', 'safety_manager'])
+  if (!recipients || recipients.length === 0) {
+    return { success: false, error: 'No admin or safety manager available to request assessment from.' }
+  }
+
+  // Dedupe: repeat taps must not spam the list (T-37-03-05).
+  const { data: existing } = await (admin as any)
+    .from('worker_notifications')
+    .select('id')
+    .eq('organisation_id', organisationId)
+    .eq('sop_id', sopId)
+    .eq('subject_user_id', userId)
+    .eq('type', 'assessment_requested')
+    .eq('read', false)
+    .limit(1)
+  if (existing && existing.length > 0) return { success: true }
+
+  const rows = recipients.map((r) => ({
+    organisation_id: organisationId,
+    user_id: r.user_id,
+    sop_id: sopId,
+    subject_user_id: userId,
+    type: 'assessment_requested',
+    read: false,
+  }))
+
+  const { error } = await (admin as any).from('worker_notifications').insert(rows)
+  if (error) {
+    console.error('requestAssessorReview insert error:', error)
+    return { success: false, error: 'Failed to request assessment.' }
+  }
+  return { success: true }
+}
+
+export interface AssessmentRequest {
+  id: string
+  sopId: string
+  sopTitle: string | null
+  subjectUserId: string
+  subjectName: string
+  createdAt: string
+}
+
+// Role-gated to admin/safety_manager — a plain supervisor has no
+// assess-others queue. Reads the CALLER's own unread requests with the
+// SESSION client: users_see_own_notifications (00009) already scopes to
+// user_id = auth.uid() + org — the correct gate, no admin client needed.
+export async function listAssessmentRequests(): Promise<AssessmentRequest[]> {
+  const { supabase, userId, role, organisationId } = await getSessionContext()
+  if (!userId || !organisationId) return []
+  if (!role || !['admin', 'safety_manager'].includes(role)) return []
+
+  const { data, error } = await (supabase as any)
+    .from('worker_notifications')
+    .select('id, sop_id, subject_user_id, created_at, sops(title)')
+    .eq('type', 'assessment_requested')
+    .eq('read', false)
+    .order('created_at', { ascending: false })
+    .limit(20)
+
+  if (error || !data) return []
+
+  const subjectNames = await resolveDisplayNames(data.map((r: any) => r.subject_user_id).filter(Boolean))
+  return data.map((r: any) => ({
+    id: r.id,
+    sopId: r.sop_id,
+    sopTitle: r.sops?.title ?? null,
+    subjectUserId: r.subject_user_id,
+    subjectName: (r.subject_user_id && subjectNames[r.subject_user_id]) || 'Unknown',
+    createdAt: r.created_at,
+  }))
+}

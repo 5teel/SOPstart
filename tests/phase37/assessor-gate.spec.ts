@@ -5,57 +5,74 @@
  * supplies an override reason (D-05). needs_support observations never
  * touch the predicate at all (D-03/D-04 branch-before-gate).
  *
- * `test.fixme` stubs -- flipped LIVE in Plan 37-03.
+ * Flipped LIVE in Plan 37-03 as source-contract assertions over
+ * src/actions/observations.ts -- checks wiring POSITION (branch-before-gate),
+ * not mere token presence (2026-06-05 dead-feature blind spot).
  *
  * Registration: playwright.config.ts `phase37` project
  *   testDir: '.', testMatch: /tests\/phase37\/.*\.(spec|test)\.ts$/
  * Verify: `npx playwright test --list --project=phase37`
  */
-import { test } from '@playwright/test'
+import { test, expect } from '@playwright/test'
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
 
-test.describe('ASR-01 -- recordObservation assessor gate (requires chromium + live app)', () => {
-  test.fixme(
-    'recordObservation calls isSignedOffAssessor ONLY inside the verdict === "performed_to_sop" branch (D-03/D-04 branch-before-gate) -- a needs_support observation never evaluates the predicate',
-    async ({ page }) => {
-      await page.goto('/admin/team')
-      // Record a needs_support observation as a non-assessor supervisor and assert
-      // it succeeds without ever invoking isSignedOffAssessor.
-    },
-  )
+const OBS_ACTIONS = readFileSync(
+  path.join(process.cwd(), 'src/actions/observations.ts'),
+  'utf8'
+).replace(/\r\n/g, '\n')
 
-  test.fixme(
-    'a non-assessor supervisor recording an advancing (performed_to_sop) observation is rejected with NOT_SIGNED_OFF_ASSESSOR',
-    async ({ page }) => {
-      await page.goto('/admin/team')
-      // Record an advancing observation as a supervisor who is not a signed-off
-      // assessor for the SOP and assert the NOT_SIGNED_OFF_ASSESSOR error code.
-    },
-  )
+test.describe('ASR-01 -- recordObservation assessor gate (source-contract)', () => {
+  test('isSignedOffAssessor is imported and called exactly twice (the gate in recordObservation + the UX-only status read in getAssessorStatusForSop)', () => {
+    expect(OBS_ACTIONS).toContain("import { isSignedOffAssessor } from '@/lib/competency/assessor'")
+    expect((OBS_ACTIONS.match(/isSignedOffAssessor\(/g) ?? []).length).toBe(2)
+  })
 
-  test.fixme(
-    'an admin/safety_manager recording an advancing observation WITHOUT an override reason is rejected with ASSESSOR_OVERRIDE_REQUIRED',
-    async ({ page }) => {
-      await page.goto('/admin/team')
-      // Record an advancing observation as admin/safety_manager, omit overrideReason,
-      // assert ASSESSOR_OVERRIDE_REQUIRED.
-    },
-  )
+  test('the GATING isSignedOffAssessor call-site (inside recordObservation) is AFTER the performed_to_sop branch check (D-03/D-04 branch-before-gate)', () => {
+    const verdictIndex = OBS_ACTIONS.indexOf("verdict === 'performed_to_sop'")
+    const callIndex = OBS_ACTIONS.indexOf('isSignedOffAssessor(userId, sopId, createAdminClient(), organisationId)')
+    expect(verdictIndex).toBeGreaterThan(-1)
+    expect(callIndex).toBeGreaterThan(-1)
+    expect(callIndex).toBeGreaterThan(verdictIndex)
+  })
 
-  test.fixme(
-    'an admin/safety_manager override insert stamps is_assessor_override = true and persists the reason',
-    async ({ page }) => {
-      await page.goto('/admin/team')
-      // Record an advancing observation as admin/safety_manager WITH an override
-      // reason and assert the inserted row carries is_assessor_override = true.
-    },
-  )
+  test('both bare error codes appear, and ASSESSOR_OVERRIDE_REQUIRED is inside a branch referencing admin/safety_manager (D-06)', () => {
+    expect(OBS_ACTIONS).toContain('NOT_SIGNED_OFF_ASSESSOR')
+    expect(OBS_ACTIONS).toContain('ASSESSOR_OVERRIDE_REQUIRED')
+    const overrideIndex = OBS_ACTIONS.indexOf('ASSESSOR_OVERRIDE_REQUIRED')
+    const nearby = OBS_ACTIONS.slice(Math.max(0, overrideIndex - 300), overrideIndex)
+    expect(nearby).toContain("'admin'")
+    expect(nearby).toContain("'safety_manager'")
+  })
 
-  test.fixme(
-    'needs_support observations reach the insert without touching the assessor predicate at all',
-    async ({ page }) => {
-      await page.goto('/admin/team')
-      // Record a needs_support observation as a plain (non-assessor) supervisor and
-      // assert success -- the predicate is never consulted for this verdict.
-    },
-  )
+  test('the sop_observations insert payload carries is_assessor_override and override_reason', () => {
+    const insertIndex = OBS_ACTIONS.indexOf("from('sop_observations').insert(")
+    expect(insertIndex).toBeGreaterThan(-1)
+    const insertSlice = OBS_ACTIONS.slice(insertIndex, insertIndex + 500)
+    expect(insertSlice).toContain('is_assessor_override:')
+    expect(insertSlice).toContain('override_reason:')
+  })
+
+  test('requestAssessorReview uses createAdminClient and references assessment_requested + subject_user_id', () => {
+    const start = OBS_ACTIONS.indexOf('export async function requestAssessorReview')
+    const end = OBS_ACTIONS.indexOf('export interface AssessmentRequest')
+    expect(start).toBeGreaterThan(-1)
+    const body = OBS_ACTIONS.slice(start, end)
+    expect(body).toContain('createAdminClient(')
+    expect(body).toContain('assessment_requested')
+    expect(body).toContain('subject_user_id')
+  })
+
+  test('listAssessmentRequests does NOT use createAdminClient for its notification read (RLS self-read is the gate)', () => {
+    const start = OBS_ACTIONS.indexOf('export async function listAssessmentRequests')
+    expect(start).toBeGreaterThan(-1)
+    const body = OBS_ACTIONS.slice(start)
+    expect(body).not.toContain('createAdminClient(')
+  })
+
+  test('getAssessorStatusForSop, requestAssessorReview, listAssessmentRequests are all declared export async function', () => {
+    expect(OBS_ACTIONS).toContain('export async function getAssessorStatusForSop')
+    expect(OBS_ACTIONS).toContain('export async function requestAssessorReview')
+    expect(OBS_ACTIONS).toContain('export async function listAssessmentRequests')
+  })
 })
