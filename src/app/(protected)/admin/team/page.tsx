@@ -5,6 +5,7 @@ import { AdminNav } from '@/components/admin/AdminNav'
 import { listDepartments } from '@/actions/departments'
 import { listOrgTree } from '@/actions/org-model'
 import { TeamViewShell } from '@/components/admin/org-model/TeamViewShell'
+import { AssessmentRequestsPanel } from '@/components/observations/AssessmentRequestsPanel'
 
 export const metadata: Metadata = {
   title: 'Manage Team',
@@ -52,6 +53,8 @@ export default async function AdminTeamPage() {
           </p>
         </div>
       </div>
+
+      <AssessmentRequestsPanel />
 
       {'error' in tree ? (
         <p className="text-sm text-red-500">Could not load the org model: {tree.error}</p>
