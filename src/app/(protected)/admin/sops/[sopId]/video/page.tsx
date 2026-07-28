@@ -19,7 +19,7 @@ export default async function VideoGeneratePage({
   const { sopId } = await params
   const { play: autoPlayJobId } = await searchParams
   // Auth check — shared per-request session context (JWT verified locally).
-  const { userId, role } = await getSessionContext()
+  const { userId, role, organisationId } = await getSessionContext()
   if (!userId) redirect('/login')
 
   // Check user is admin or safety_manager
@@ -32,11 +32,14 @@ export default async function VideoGeneratePage({
   // Fetch SOP record
   const { data: sop } = await admin
     .from('sops')
-    .select('id, title, status, updated_at, version')
+    .select('id, title, status, updated_at, version, organisation_id')
     .eq('id', sopId)
     .single()
 
-  if (!sop || sop.status !== 'published') {
+  // Phase 37-07 rule-5 sibling of CR-01: org-scope guard against the
+  // attacker-controlled sopId route param — an admin/safety_manager of ANY
+  // organisation could otherwise read another org's SOP + video jobs.
+  if (!sop || !organisationId || sop.organisation_id !== organisationId || sop.status !== 'published') {
     redirect('/admin/sops')
   }
 
