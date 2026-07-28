@@ -441,12 +441,28 @@ Plans:
   1. Only a worker/supervisor who is themselves signed-off as an assessor can record a competence-advancing observation
   2. A new organisation with zero assessors has an admin-override path to bootstrap the first one, and every override use is recorded in an audit trail
 
-**Plans**: TBD
+**Plans**: 6 plans in 4 waves
 **UI hint**: yes
 
 Plans:
 
-- [ ] TBD (created by /gsd-plan-phase)
+**Wave 1**
+
+- [ ] 37-01-PLAN.md — phase37 Playwright project + 6 Wave-0 specs (CMP-04 worker guard live) + migration 00056 file (override audit columns, CHECK constraints, insert-policy override clause, worker_notifications.subject_user_id) + database.types.ts + `overrideReason` on both write schemas
+- [ ] 37-02-PLAN.md — pure `isSignedOffAssessor` predicate (classifyCompetency + resolveLineage, no forked ladder, D-01/D-02) + 8 behavioural unit tests
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 37-03-PLAN.md — [BLOCKING] db push 00056 + live column/constraint/policy proof; `recordObservation` gate on `performed_to_sop` only (D-03/D-04); `getAssessorStatusForSop` / `requestAssessorReview` / `listAssessmentRequests` (D-08)
+
+**Wave 3** *(blocked on Wave 2)*
+
+- [ ] 37-04-PLAN.md — `signOffCompletion` gate on `approved` only + role array widened to admin (Pitfall 2, D-06) + blocked/override sign-off UI with request CTA
+- [ ] 37-05-PLAN.md — three-state recording modal (blocked teaching copy, override disclosure, coaching untouched — D-08/D-09/D-05) + AssessmentRequestsPanel on /admin/team
+
+**Wave 4** *(blocked on Wave 3)*
+
+- [ ] 37-06-PLAN.md — live zero-assessor bootstrap runtime probe (SC-1 + SC-2, reset + resolve) + journeys.ts request pathway + 3 layman UAT items + full phase gate
 
 ### Phase 38: Guidance-Notes Adoptions
 
