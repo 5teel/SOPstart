@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v8.0
 milestone_name: Authoring Convergence
 status: planning
-last_updated: "2026-07-28T06:12:49.426Z"
+last_updated: "2026-07-28T00:00:00.000Z"
 last_activity: 2026-07-28
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,14 +20,38 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** v7.0 closed — next milestone is the SOP creation / conversion / authoring foundation (pre-alpha)
+**Current focus:** v8.0 Authoring Convergence — one SOP surface for every role, and one creation flow that lands in the builder (consolidation, not new capability)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 40 — Shared Creation Foundation (not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-07-28 — Milestone v8.0 started
+Status: Roadmap re-derived after SUR scope correction — ready for `/gsd-plan-phase 40`
+Last activity: 2026-07-28 — v8.0 roadmap re-derived (Phases 40-43, 21/21 requirements mapped)
+
+Progress: 0/4 phases · [░░░░░░░░░░] 0%
+
+### v8.0 roadmap (created 2026-07-28 · re-derived 2026-07-28 after the SUR scope correction)
+
+Four phases, coarse granularity, strictly sequential. Numbering starts at **40** — Phases 38/39 were deferred to backlog before planning and those numbers are burned.
+
+**Scope correction:** the first cut (3 phases, 15 requirements) deduplicated components *inside* the admin creation flow but left two top-level entries both labelled "SOPs" (`TopHeader.tsx:150` → `/sops`, `AdminNav.tsx:20` → `/admin/sops`) and two route chains to the same builder. Six requirements (SUR-01..06) were added and the phase structure re-derived around them.
+
+| Phase | Goal (one line) | Requirements |
+|-------|-----------------|--------------|
+| 40. Shared Creation Foundation | One file-intake component, one metadata picker, one progress component, one page shell; one category column + backfill | DUP-01..04, DAT-01 (5) |
+| 41. One SOP Surface | One route lists SOPs for every role; admin views become code-split lenses; one top-level "SOPs" entry; one path to the builder | SUR-01..06 (6) |
+| 42. One Creation Flow | Every on-ramp from one entry on that surface, same core metadata, lands in the builder; builder renders parse state; client-side nav throughout | CRE-01..04, PRG-01..02 (6) |
+| 43. Dead-Surface Removal & Route Truth | No CTA to a missing route, no coming-soon controls, no orphaned shims/dead state, docs + `journeys.ts` match reality | DED-01..04 (4) |
+
+**Coverage:** 21/21 mapped, 0 unmapped, 0 duplicated.
+
+**Sequencing:** 40 → 41 → 42 → 43. DUP+DAT first (converging flows is a rewiring job once they share components; DUP-04's single shell makes 41's nav change a one-line edit). **SUR before CRE** — the "New SOP" entry lives *on* the list surface (`admin/sops/page.tsx:308-313`), so converging the creation flow into a surface about to be merged builds it twice and rewrites its role gating; merging first gives the creation flow a stable home and one settled SOP→builder chain. SUR kept as one phase, not split: SUR-03 (one top-level "SOPs" entry) can't be satisfied while `?view=attention`/`?view=access` still live at the old route, so a "merge list, then fold lenses" split would ship a visible half-merge. DED last — route truth can only be certified after 41 and 42 stop changing routes.
+
+**Phase 41's hard constraint and its real risk.** `SB-LINE-06` (mobile worker First Load JS within 2 KB of baseline, CI-gated) is non-negotiable: the governance queue, org tree, and wiring patch bay must be dynamically imported and absent from the worker bundle — the pattern `WalkthroughSwitcher`/`DesktopWalkthrough` already uses. A bundle regression fails the phase. The *risk*, separately, is the rendering-model mismatch: `/sops` is a 574-line client component (Dexie/offline, `useAssignedSops`, `useSopSync`), `/admin/sops` is a 479-line server component. Phase 41's first plan must decide and state the model (server shell + lazy client lenses, or client list + code-split admin lenses) before any surface work.
+
+
+**Standing constraints for every v8.0 phase** (from CLAUDE.md): update `src/lib/journeys/journeys.ts` in the same change as any route add/remove/rename; grep and repoint every internal link on a route change (internal links are not type-checked); `'use server'` files export only async functions; a phase is not verified until a real `npm run build` runs clean.
 
 ### v7.0 scope change (2026-07-28)
 

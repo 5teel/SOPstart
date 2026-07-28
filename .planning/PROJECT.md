@@ -83,6 +83,7 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 <!-- Current scope. Building toward these. -->
 
 #### v8.0 — Authoring Convergence (defined 2026-07-28)
+- One SOP surface: one route lists SOPs for every role, admin views are code-split lenses on it, one top-level "SOPs" entry, one path to the builder (SUR-01..06) — *added 2026-07-28 in a scope correction*
 - One creation flow: every on-ramp (upload, video, AI-describe, AI-voice, blank) funnels through one entry and lands in the builder (CRE-01..04)
 - Deduplication: one file-intake component, one department/metadata picker, one progress component, one page shell (DUP-01..04)
 - Data convergence: SOP category resolves to a single column + single vocabulary, existing rows backfilled (DAT-01)
@@ -130,13 +131,14 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 
 **Target features (grouped):**
 
+- **SOP surface convergence (SUR-01..06):** one route lists SOPs for every role · admin status/governance/access views become lenses on it, not destinations · one top-level "SOPs" entry (the duplicate `AdminNav` item goes; `UX-02` is superseded in part) · one route chain from a SOP to its builder · worker bundle unaffected (`SB-LINE-06` CI gate is the hard constraint) · "library" survives only as a filter name
 - **Creation flow (CRE-01..04):** one entry funnelling every on-ramp including video generation · the same core metadata collected on every path · every path lands in the builder · each method presented exactly once
 - **Deduplication (DUP-01..04):** one file-intake component (accept list, size limits, HEIC conversion) · one department/metadata picker · one parse-progress component · one admin page shell
 - **Data convergence (DAT-01):** SOP category resolves to one column with one vocabulary, existing rows backfilled — AI-created and wizard-created SOPs filterable together
 - **Progress honesty (PRG-01..02):** the builder renders parsing/uploading state so a queued parse never presents as an empty builder · navigation to the builder is consistent client-side routing
 - **Dead-surface removal (DED-01..04):** no CTA to a non-existent route · no non-functional affordances shipped · orphaned shims and dead state removed · docs/journeys match real routes
 
-**Key anti-goals:** no new authoring capabilities (the template on-ramp from the sketches is a new capability — deferred); no merge of the worker route and admin builder into one URL (architecturally large, and the worker side is already one route with three tabs); no conversion/parse *quality* work — that is v9.0.
+**Key anti-goals:** no new authoring capabilities (the template on-ramp from the sketches is a new capability — deferred); no merge of the SOP *detail* route and the admin builder into one URL (sketch decision D-A9 — architecturally large, and the worker side is already one route with three tabs; SUR converges the **list** surfaces only); no conversion/parse *quality* work — that is v9.0.
 
 **Design contract:** `.claude/skills/sketch-findings-SOPstart/references/authoring-flow.md` (wrapped 2026-07-28) — decision D-A1 "every on-ramp lands in the identical builder" is exactly what CRE-01..04 execute. This milestone implements an already-validated design rather than inventing one.
 

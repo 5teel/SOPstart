@@ -728,6 +728,21 @@ Which phases cover which requirements. Updated during roadmap creation.
 - [ ] **CRE-03**: Every creation on-ramp lands the user in the builder; the video-generation path no longer terminates in a separate pipeline surface
 - [ ] **CRE-04**: The creation picker presents each distinct method exactly once — no two tiles resolving to the same route, no method absent from the picker
 
+### SOP Surface Convergence (SUR)
+
+**Added 2026-07-28 after Simon challenged the original scope:** the first cut of v8.0 deduplicated components *inside* the admin creation flow while leaving two top-level entries both labelled "SOPs" (`TopHeader.tsx:150` → `/sops`, `AdminNav.tsx:20` → `/admin/sops`) and two separate route chains for an admin to reach the same SOP. That is the most visible duplication in the product and it was out of scope by oversight, not by decision.
+
+The two surfaces are genuinely different in content (worker: assigned SOPs, offline sync, refresher dates; admin: status, governance queue, org tree, access grants) but that difference is *permissions and columns on the same list*, not two products. Merging is affordable because `/sops` already carries the lens pattern (`type Section = 'your-sops' | 'library'`, `sops/page.tsx:40`) — admin views become additional lenses on an existing toggle, matching the "multi-view over one shared model, no view has private state" decision locked for the org model and permission wiring.
+
+- [ ] **SUR-01**: One route lists SOPs for every role — what a person sees and can do is determined by their permissions, not by which URL they visited
+- [ ] **SUR-02**: Admin capabilities (draft/published status, governance queue, access/wiring) are lenses on that one surface, not separate destinations
+- [ ] **SUR-03**: One top-level "SOPs" entry across all roles — no second identically-labelled door, and no role sees two nav paths to the same list
+- [ ] **SUR-04**: One path from a SOP to editing it — an admin does not have two separate route chains reaching the same builder
+- [ ] **SUR-05**: The mobile worker bundle is unaffected — admin lenses are code-split, and the existing `SB-LINE-06` CI bundle gate stays green (this is the one hard constraint on the merge; it dictates technique, not outcome)
+- [ ] **SUR-06**: "Library" no longer names a destination; it survives only where it names a *filter* ("Your SOPs" vs all published), consistent with the plain-language standard applied in Phase 30/33
+
+**Supersedes:** `UX-02` (Phase 30, "one shared AdminNav … one door to admin") is superseded in part — its goal was one *consistent* admin menu, which this achieves more directly by removing the second SOP destination entirely. The AdminNav component may still exist for Governance/Blocks/Team/Settings; what goes is its duplicate "SOPs" entry.
+
 ### Shared-Component Deduplication (DUP)
 
 - [ ] **DUP-01**: One file-intake component owns accepted MIME types, blocked extensions, size limits, and HEIC→JPEG conversion; every upload path (creation, video-generate, new-version) uses it, and the accept lists no longer disagree
@@ -754,7 +769,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 ### v8.0 Out of Scope
 
 - **Template on-ramp** (pre-structured section skeletons at creation) — a genuinely new capability from the authoring-flow sketches; deferred despite being designed
-- **Merging the worker route and admin builder into one URL** — architecturally large; the worker side is already one route with three tabs (`/sops/[sopId]?tab=read|walk|flow`)
+- **Merging the SOP *detail* route and the admin builder into one URL** — `/sops/[sopId]` and `/admin/sops/builder/[sopId]` stay separate this milestone. SUR-01..06 converge the **list** surfaces only. The detail-level merge is the sketches' D-A9 (read/walk/edit as modes of one URL) and is architecturally larger; the worker side is already one route with three tabs
 - **Conversion/parse quality** — whether the parse produces good output is v9.0, the deliberately sequenced next milestone
 - **Agent-layer surfacing changes** and the `--ai` violet token from the sketches — presentation work, not convergence
 - **New block types** — the block registry is shared and working; leave it alone
@@ -764,23 +779,44 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |---|---|---|
-| CRE-01 | TBD | Pending |
-| CRE-02 | TBD | Pending |
-| CRE-03 | TBD | Pending |
-| CRE-04 | TBD | Pending |
-| DUP-01 | TBD | Pending |
-| DUP-02 | TBD | Pending |
-| DUP-03 | TBD | Pending |
-| DUP-04 | TBD | Pending |
-| DAT-01 | TBD | Pending |
-| PRG-01 | TBD | Pending |
-| PRG-02 | TBD | Pending |
-| DED-01 | TBD | Pending |
-| DED-02 | TBD | Pending |
-| DED-03 | TBD | Pending |
-| DED-04 | TBD | Pending |
+| DUP-01 | Phase 40 | Pending |
+| DUP-02 | Phase 40 | Pending |
+| DUP-03 | Phase 40 | Pending |
+| DUP-04 | Phase 40 | Pending |
+| DAT-01 | Phase 40 | Pending |
+| SUR-01 | Phase 41 | Pending |
+| SUR-02 | Phase 41 | Pending |
+| SUR-03 | Phase 41 | Pending |
+| SUR-04 | Phase 41 | Pending |
+| SUR-05 | Phase 41 | Pending |
+| SUR-06 | Phase 41 | Pending |
+| CRE-01 | Phase 42 | Pending |
+| CRE-02 | Phase 42 | Pending |
+| CRE-03 | Phase 42 | Pending |
+| CRE-04 | Phase 42 | Pending |
+| PRG-01 | Phase 42 | Pending |
+| PRG-02 | Phase 42 | Pending |
+| DED-01 | Phase 43 | Pending |
+| DED-02 | Phase 43 | Pending |
+| DED-03 | Phase 43 | Pending |
+| DED-04 | Phase 43 | Pending |
 
-**v8.0 Coverage:** 15 requirements (CRE ×4, DUP ×4, DAT ×1, PRG ×2, DED ×4). Phase mapping filled by the roadmapper.
+**v8.0 Coverage:** 21 requirements (SUR ×6, CRE ×4, DUP ×4, DAT ×1, PRG ×2, DED ×4).
+
+- **Phase 40 — Shared Creation Foundation: 5** (DUP-01, DUP-02, DUP-03, DUP-04, DAT-01)
+- **Phase 41 — One SOP Surface: 6** (SUR-01, SUR-02, SUR-03, SUR-04, SUR-05, SUR-06)
+- **Phase 42 — One Creation Flow: 6** (CRE-01, CRE-02, CRE-03, CRE-04, PRG-01, PRG-02)
+- **Phase 43 — Dead-Surface Removal & Route Truth: 4** (DED-01, DED-02, DED-03, DED-04)
+- **Mapped: 21/21 ✓ · Unmapped: 0 · Duplicated across phases: 0**
+
+Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the first pass mapped 15 requirements across Phases 40–42 and predates SUR).
+
+**Sequencing rationale:**
+
+- **DUP + DAT first (Phase 40), unchanged from the first pass.** Converging four flows onto one is a rewiring job once they already share a dropzone, a picker, a progress component, and a shell — and DAT-01’s single category column is what CRE-02’s “same core metadata on every path” writes into. DUP-04 (one page shell/nav) additionally makes Phase 41’s nav change a one-line edit in one file rather than a sweep.
+- **SUR before CRE (Phase 41 before 42).** The creation entry point lives *on* the list surface (`admin/sops/page.tsx:308-313`). Converging the creation flow first would anchor the new entry — and its role gating — to a surface about to be merged, building it twice and rewriting route-gated visibility into permission-gated visibility on the second pass. Merging the surface first gives the creation flow a stable home and one settled SOP→builder route chain for CRE-03 to land in. SUR is the largest single piece of work in the milestone, so this front-loads effort; the risk it front-loads is a *rendering-model decision* every later phase inherits, which is cheaper to take in Phase 41 than to discover in Phase 43.
+- **SUR kept as ONE phase, not split.** A “merge the list, then fold in the admin lenses” split was considered and rejected: SUR-03 (one top-level “SOPs” entry) cannot be satisfied while `?view=attention` / `?view=access` still live at the old route, so the split would ship a user-visible half-merge with two SOP destinations still standing. Wave the work inside the phase instead.
+- **DED last (Phase 43).** Route truth can only be certified after every phase has stopped changing routes — Phase 41 retires or shims a list route and rewires the admin nav; Phase 42 orphans `/admin/sops/upload`, `/admin/sops/new/ai`, and `/admin/sops/new/blank`.
 
 ---
-*v8.0 requirements added: 2026-07-28*
+*v8.0 requirements added: 2026-07-28 · roadmap created 2026-07-28 (Phases 40-42, 15 reqs) · **re-derived 2026-07-28 after the SUR scope correction (Phases 40-43, 21/21 mapped, 0 unmapped)***

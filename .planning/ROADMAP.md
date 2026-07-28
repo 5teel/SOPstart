@@ -481,6 +481,103 @@ Never planned or started. Full goal, dependencies, and success criteria moved to
 
 ---
 
+## v8.0 — Authoring Convergence (started 2026-07-28)
+
+**CONSOLIDATION milestone — nothing here is a new capability.** Every phase below removes, merges, or unifies something that already ships. The product governs SOPs extremely well (v6.0/v7.0); what it cannot yet do reliably is get a good SOP *into* the system. A line-verified audit of every creation surface (2026-07-28) found: a picker showing 4 tiles that hit 3 routes; a 5th creation method (video generation) buried inside the Upload route and terminating somewhere different from all the others; upload collecting *no* metadata while its siblings require title or prompt; category written to **two different DB columns from two different vocabularies**; the department picker duplicated three times; HEIC conversion implemented twice; three disagreeing file-accept lists; two progress steppers each re-implementing realtime-with-polling; a builder with no parsing state; and a 404ing primary CTA on the Blocks library.
+
+**Scope correction, 2026-07-28 (after Simon challenged the first cut):** that audit stopped at the admin *creation* flow and missed the product's most visible duplication — **two top-level entries both labelled "SOPs"** (`TopHeader.tsx:150` → `/sops`, `AdminNav.tsx:20` → `/admin/sops`) and two separate route chains for an admin to reach the same SOP's builder. The two lists differ in *content* (worker: assigned SOPs, offline sync, refresher dates; admin: status, governance queue, org tree, access grants) but that difference is permissions and columns on one list, not two products. Six requirements (SUR-01..06) were added and the milestone was re-derived around them: **4 phases, 21 requirements.**
+
+**Design contract:** `.claude/skills/sketch-findings-SOPstart/references/authoring-flow.md`, decision **D-A1** — *"every path lands in the same builder … One flow, not four."* This milestone implements an already-validated design rather than inventing one. The surface merge applies the same logic one level up: one list, not two. It stops short of the sketches' **D-A9** (read/walk/edit as modes of one URL) — the *detail*-level merge stays out of scope this milestone.
+
+**NORTH STAR (carried, locked 2026-07-12):** ease of use and maintenance first. A converged flow that is harder to use than what it replaced has failed regardless of how much duplication it removed.
+
+**Build-on (do not rebuild):** the Phase 26 bespoke inline builder + `BLOCK_COMPONENTS` registry, the frozen `layout_data` / `sop_section_blocks` / `block_provenance` contract, the parse→AI-review→verify→publish spine (`assertPublishGates`), and — for the surface merge — the lens pattern `/sops` already carries (`type Section = 'your-sops' | 'library'`, `sops/page.tsx:40`, toggled at :156). Admin views become additional lenses on an existing toggle; that is what makes the merge affordable.
+
+**Anti-goals:** no template on-ramp (a genuinely new capability, deferred despite being sketched); no merge of the SOP *detail* route and the admin builder into one URL (D-A9, architecturally larger — SUR converges the **list** surfaces only); no conversion/parse *quality* work (that is v9.0); no new block types.
+
+**The one hard constraint:** `SB-LINE-06` — a CI-gated requirement that mobile First Load JS for the worker SOP route stays within 2 KB of the pre-Phase-15 baseline. The governance queue, org tree, and wiring patch bay must never enter the worker bundle. The codebase already solves this class by dynamic import (`WalkthroughSwitcher` loads `DesktopWalkthrough` only at ≥1024px). A bundle regression is a **phase-failing condition**, not a nice-to-have.
+
+**Phase numbering:** starts at **40**. Phases 38/39 were deferred to backlog before planning — those numbers are burned and are not reused.
+
+Executes 40 → 41 → 42 → 43, strictly sequential.
+
+**Sequencing rationale — SUR before CRE.** The creation entry point ("New SOP") lives *on* the list surface (`admin/sops/page.tsx:308-313`). Converging the creation flow first would anchor the new entry, and its role gating, to a surface about to be merged — building it twice, and rewriting route-gated visibility into permission-gated visibility on the second pass. Merging the surface first gives the creation flow a stable home and a single, settled SOP→builder route chain for CRE-03 to land in. The counter-argument (SUR is the largest single piece, so front-loading it front-loads risk) is accepted but answered: the risk in SUR is a *rendering-model decision*, not scope, and every later phase inherits that decision — discovering it in Phase 43, after CRE has already built on a client-only or server-only assumption, is the worse failure. DUP still precedes both, unchanged from the first pass: converging four flows onto one is a rewiring job once they already share a dropzone, a picker, a progress component, and a shell. DED-04 still lands last: route truth can only be certified after every phase has stopped changing routes.
+
+- [ ] **Phase 40: Shared Creation Foundation** - One file-intake component, one metadata picker, one progress component, one page shell — and one category column with one vocabulary, backfilled
+- [ ] **Phase 41: One SOP Surface** - One route lists SOPs for every role, admin views become code-split lenses on it, one top-level "SOPs" entry, one path to the builder — with the worker bundle gate green
+- [ ] **Phase 42: One Creation Flow** - Every on-ramp reachable from one entry on that surface, collecting the same metadata, landing in the builder — which now renders parse state honestly
+- [ ] **Phase 43: Dead-Surface Removal & Route Truth** - No CTA to a route that does not exist, no coming-soon controls, no orphaned shims or dead state, docs and `journeys.ts` matching the real route tree
+
+### Phase 40: Shared Creation Foundation
+
+**Goal**: The four creation surfaces stop each carrying their own copy of the same thing — file intake (accept list, size limits, HEIC conversion), the department/metadata picker, job progress, and the page shell each become exactly one component — and a SOP's category resolves to one column backed by one vocabulary, with existing rows backfilled. Nothing about the user-visible flow changes yet; this is what makes Phase 41's nav change a one-line edit and Phase 42's convergence a rewiring job rather than a rewrite.
+
+**Depends on**: Nothing new — refactors shipped surfaces (`UploadDropzone.tsx`, `VideoFormatSelectionModal.tsx`, `versions/page.tsx`, `PromptClient.tsx`, `WizardClient.tsx`, `VoiceDraftClient.tsx`, `ParseJobStatus.tsx`, `PipelineStepper.tsx` / `PipelineProgressClient.tsx`, `AdminNav.tsx`)
+**Requirements**: DUP-01, DUP-02, DUP-03, DUP-04, DAT-01
+**Success Criteria** (what must be TRUE):
+
+  1. A file the creation dropzone accepts is accepted identically by the video-generate and new-version dropzones, and rejected identically when oversized or an unsupported type — one component owns the accept list, blocked extensions, size limits, and HEIC→JPEG conversion, and the three previously-disagreeing accept lists (`.doc`, `.webp`, video types) no longer exist as separate literals
+  2. Changing a label or an option in the department/category/title picker changes it on every creation surface at once — the three near-identical copies are gone, proven by a source sweep rather than by eye
+  3. A document parse and a video-generation job both report progress through the same component, with the same realtime-plus-polling-fallback behaviour and the same stage vocabulary
+  4. Every admin creation route renders the shared admin nav/page shell — no route hand-rolls its own back-link while its siblings use `AdminNav` — so a nav change is one edit in one file (which Phase 41 then makes)
+  5. A SOP created via the AI route and a SOP created via the wizard appear together under the same category filter; every pre-existing row carrying the retired column is backfilled, no code path writes the retired column, and a live query against prod proves zero rows left behind
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 41: One SOP Surface
+
+**Goal**: There is one place SOPs are listed. What a person sees and can do there is decided by their permissions, not by which URL they typed. The admin-only views that live at `/admin/sops` today — draft/published status, the governance queue (`?view=attention`), and the access/wiring patch bay (`?view=access`) — become lenses on that one surface, loaded only for the people entitled to them. The second "SOPs" door closes, and an admin has one route chain from a SOP to its builder.
+
+The phase must **decide and state a rendering model in its first plan, before any surface work**: the worker list is a 574-line client component (`useAssignedSops`, `useSopSync`, Dexie offline, self-add/remove, refresher due dates, search) and the admin list is a 479-line server component (`listGovernanceQueue`, `listOrgTree`, `listGrants`, `WiringPatchBayShell`). That mismatch — not the merge itself — is the phase's real technical risk. The two viable shapes are a server shell hosting lazily-loaded client lenses, or keeping the list client-side and code-splitting the admin lenses; either is acceptable, an undecided one is not.
+
+**Depends on**: Phase 40 (the shared `AdminNav`/page shell this phase edits in one place, and the single category column the merged surface's filters read)
+**Requirements**: SUR-01, SUR-02, SUR-03, SUR-04, SUR-05, SUR-06
+**Success Criteria** (what must be TRUE):
+
+  1. A worker, a supervisor, and an admin all reach the SOP list at the same URL and each sees only what their permissions allow — the second list route survives at most as a redirect shim, never as a destination — and every worker behaviour on that list is preserved verbatim: assigned-SOPs-first, offline read via Dexie, self-add/remove, department filter, search, refresher due dates
+  2. Draft/published status, the governance queue, and the access/wiring patch bay render as lenses on that one surface, and the Phase 33 deep-link filters (`?departments=`, `?collection=`) plus the post-publish wire-up link (`?sop=`) still resolve to the same views they resolve to today
+  3. Exactly one top-level "SOPs" entry exists for every role — `AdminNav` no longer carries a duplicate SOPs item (it survives for Governance/Blocks/Team/Settings, with Governance deep-linking a lens on the merged surface); re-adding that entry is a regression, not a restoration of Phase 30's UX-02 — and the word "Library" survives only where it names a *filter* ("Your SOPs" vs all published), never a destination or a nav label
+  4. From the merged list, an admin reaches a SOP's builder by one route chain — there is no second chain to the same builder, and no third chain is introduced by the merge
+  5. The `SB-LINE-06` CI bundle check is green: mobile First Load JS for the worker SOP list is within 2 KB of its baseline, and a worker-session bundle contains none of the governance-queue, org-tree, or wiring-patch-bay code (dynamically imported, in the manner `WalkthroughSwitcher` already uses for `DesktopWalkthrough`). A regression here fails the phase
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 42: One Creation Flow
+
+**Goal**: There is one way to start a SOP, and it starts from the surface Phase 41 merged. Every on-ramp — document upload, YouTube, video record, video-generate, AI-describe, AI-voice, blank — is reachable from that one entry, is presented exactly once, collects the same core metadata before the SOP exists, and lands the admin in the builder. The builder tells the truth about what is happening to a SOP while it is still parsing.
+
+**Depends on**: Phase 41 (the creation entry lives on the merged surface, and the SOP→builder route chain this phase targets is the one Phase 41 settled), Phase 40 (the shared intake / picker / progress / shell components and the single category column every on-ramp now writes)
+**Requirements**: CRE-01, CRE-02, CRE-03, CRE-04, PRG-01, PRG-02
+**Success Criteria** (what must be TRUE):
+
+  1. All seven creation methods are reachable from the single creation entry on the merged surface and each appears exactly once — no two tiles resolving to the same route, no method reachable only from inside another route's button row (video generation is no longer buried as the 5th button in Upload)
+  2. No creation path can produce a SOP without a title, a department, and a category — including the upload path, which today collects none of the three, and the voice path, which today hardcodes its category and detail level
+  3. Starting from any on-ramp, including video generation, the admin ends up in the builder for that SOP — no path terminates in a separate pipeline or review surface
+  4. Opening a SOP whose upload or parse is still queued or running shows that state with live progress and an expected duration, never an empty builder with no explanation
+  5. Every navigation from an on-ramp into the builder is client-side routing — no path triggers a full page reload (the two `window.location.href` jumps are gone)
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 43: Dead-Surface Removal & Route Truth
+
+**Goal**: Nothing visible in the app leads nowhere. Every CTA resolves to a real route, every enabled control does something, orphaned shims and dead state are deleted, and the documented route tree — `journeys.ts`, `/pathways`, `.planning/codebase/ARCHITECTURE.md` — describes the app that actually exists after the surface merge and the creation-flow convergence.
+
+**Depends on**: Phase 42 (route truth can only be certified once routes have stopped changing — Phase 41 retires or shims a list route and rewires the admin nav, Phase 42 orphans `/admin/sops/upload`, `/admin/sops/new/ai`, and `/admin/sops/new/blank`, which only the old picker links to)
+**Requirements**: DED-01, DED-02, DED-03, DED-04
+**Success Criteria** (what must be TRUE):
+
+  1. Every internal href resolves to a route that exists — proven by a repo-wide sweep that fails on a dead link, not by spot checks (internal links are not type-checked, so the build stays green with dead URLs) — and the Blocks-library primary CTA opens a working surface instead of 404ing
+  2. No enabled control leads to a "coming soon" dead end: the Scan-document button either drives the already-shipped `PhotoScanner` component or is removed, and no other placeholder modal ships behind an enabled control
+  3. Orphaned redirect shims (`/admin/governance`, plus whatever Phase 41 leaves behind) and dead state in the creation and list surfaces (set-never-called setters, computed-never-rendered memos) are gone, and a clean `npm run build` plus lint passes with no unused-symbol carve-outs
+  4. `/pathways` → "All screens" shows **0 not-mapped** for every route this milestone added, removed, renamed, or merged, and `.planning/codebase/ARCHITECTURE.md` no longer references routes deleted in earlier phases (e.g. `/admin/sops/[sopId]/review`, removed in Phase 21.5)
+
+**Plans**: TBD
+
+---
+
 ## v4.0 — Safety-Critical Parsing + Voice + AI Foundation (started 2026-05-24 · ✅ shipped 2026-07-02)
 
 Bundles the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` v0.3. Planned 21 → 22 → 23; grew in-flight with 21.5/21.6 (builder UX) and 24/25 (flow graph + departments). All phases executed and code-reviewed; residual = human UAT (21.6/22/23/25) carried per the v3.0 field-verification precedent. Archive via `/gsd-complete-milestone`.
@@ -1231,7 +1328,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 21.6 → 22 → 23 → 24 → 25** (v4.0) → **26 → 26.5** (v5.0) → **27** (v5.0 close) → **28 → 29 → 30** (v6.0) → **34 → 35 → 36 → 37 → 38 → 39** (v7.0)
+Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 21.6 → 22 → 23 → 24 → 25** (v4.0) → **26 → 26.5** (v5.0) → **27** (v5.0 close) → **28 → 29 → 30** (v6.0) → **34 → 35 → 36 → 37** (v7.0; 38/39 deferred to backlog) → **40 → 41 → 42** (v8.0)
 
 **v3.0 closeout 2026-05-23.** Phases 16, 17, 18 deferred to v4.0 backlog. Phase 19 deleted (no remaining dependencies). Phase 20 partial — DOCX-to-builder slice shipped on master; remaining safety-critical verification scope carried to v4.0 Phase 21.
 
@@ -1242,6 +1339,8 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 **v6.0 kicked off 2026-07-12.** Phase 28 (ownership + review lifecycle + governance queue foundation) → Phase 29 (approval chains) → Phase 30 (UX consolidation & simplification — inserted 2026-07-12 from full frontend audit) → Phase 31 (training records + AI maintenance schedule). North star: ease of use beats process; governance never blocks worker access.
 
 **v7.0 kicked off 2026-07-19 · roadmap created 2026-07-19 (6 phases).** Phase 34 (supervisor observations) → Phase 35 (competency classifier + training matrix + records) → Phase 36 (refresher cadence + version-currency) → Phase 37 (assessor governance) → Phase 38 (guidance-notes adoptions — parallel-safe with 35-37) → Phase 39 (AI-prioritized maintenance schedule). Absorbs v6.0's unshipped Phase 31 and promotes backlog 999.4-999.7. North star carried: competency tracking never gates worker access.
+
+**v8.0 kicked off 2026-07-28 · roadmap created 2026-07-28 (3 phases, coarse granularity).** Phase 40 (shared creation foundation — one intake / picker / progress / shell component, one category column + backfill) → Phase 41 (one creation flow — every on-ramp from one entry, same metadata, lands in the builder, honest parse state) → Phase 42 (dead-surface removal + route truth). Strictly sequential. CONSOLIDATION milestone: every requirement removes, merges, or unifies something that already exists — no new authoring capabilities. Numbering starts at 40; 38/39 are burned. Implements design contract D-A1 ("one flow, not four").
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -1289,6 +1388,9 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | 37. Assessor Governance | 8/8 | Complete    | 2026-07-28 |
 | 38. Guidance-Notes Adoptions | 0/0 | Deferred → backlog 999.4 + 999.5 | 2026-07-28 |
 | 39. AI-Prioritized Maintenance Schedule | 0/0 | Deferred → backlog 999.6 | 2026-07-28 |
+| **40. Shared Creation Foundation (v8.0)** | 0/0 | Not started |  |
+| **41. One Creation Flow (v8.0)** | 0/0 | Not started |  |
+| **42. Dead-Surface Removal & Route Truth (v8.0)** | 0/0 | Not started |  |
 
 ## Backlog
 
