@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: — Competency & Training Layer
 status: executing
-stopped_at: Completed 37-03-PLAN.md
-last_updated: "2026-07-28T01:45:14.373Z"
+stopped_at: Completed 37-04-PLAN.md
+last_updated: "2026-07-28T01:57:41.888Z"
 last_activity: 2026-07-28 -- Phase 37 execution started
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 30
-  completed_plans: 27
+  completed_plans: 28
   percent: 50
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 37 (assessor-governance) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-07-28 -- Phase 37 execution started
 
@@ -202,6 +202,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 36 P09 | 20min | 3 tasks | 3 files |
 | Phase 36 P10 | 55min | 3 tasks | 8 files |
 | Phase 37 P37-03 | 35min | 3 tasks | 3 files |
+| Phase 37 P04 | 30min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -446,6 +447,8 @@ Recent decisions affecting current work:
 - [Phase 37-03]: recordObservation gates only verdict === performed_to_sop; isSignedOffAssessor never called for needs_support (branch-before-gate, D-03/D-04)
 - [Phase 37-03]: Assessor predicate reads use the admin client with self-enforced org scope (session-client RLS falsely denies a supervisor's own evidence about other workers)
 - [Phase 37-03]: D-08 request/list split: requestAssessorReview uses admin client (RLS only allows admin/safety_manager notification inserts), listAssessmentRequests uses session client (RLS self-read already correct)
+- [Phase 37]: signOffCompletion gate composes with (not replaces) the supervisor_assignments check; admin/safety_manager override skips both exactly as before
+- [Phase 37]: Override reason UI built inline in CompletionDetailClient rather than forking RejectReasonSheet (which hardcodes its own title/copy)
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -556,7 +559,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-28T01:45:14.364Z
-Stopped at: Completed 37-03-PLAN.md
+Last session: 2026-07-28T01:57:41.879Z
+Stopped at: Completed 37-04-PLAN.md
 Resume file:
 None
