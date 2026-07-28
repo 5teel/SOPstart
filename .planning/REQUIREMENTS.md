@@ -638,7 +638,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ### Assessor (ASR)
 
-- [ ] **ASR-01**: Only signed-off assessors can record competence-advancing observations; audited admin-override path covers the new-org bootstrap deadlock
+- [x] **ASR-01**: Only signed-off assessors can record competence-advancing observations; audited admin-override path covers the new-org bootstrap deadlock
 
 ### Training Records — Phase 31 rollforward (TRN + REV)
 
@@ -694,7 +694,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TRN-03 | Phase 36 | Complete |
 | REF-01 | Phase 36 | Complete |
 | REF-02 | Phase 36 | Complete |
-| ASR-01 | Phase 37 | Pending |
+| ASR-01 | Phase 37 | Complete |
 | RUB-01 | Phase 38 | Pending |
 | RUB-02 | Phase 38 | Pending |
 | RUB-03 | Phase 38 | Pending |

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: — Competency & Training Layer
 status: executing
-stopped_at: Phase 37 context gathered
-last_updated: "2026-07-28T01:23:41.615Z"
+stopped_at: Completed 37-03-PLAN.md
+last_updated: "2026-07-28T01:45:14.373Z"
 last_activity: 2026-07-28 -- Phase 37 execution started
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 30
-  completed_plans: 24
+  completed_plans: 27
   percent: 50
 ---
 
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 37 (assessor-governance) — EXECUTING
-Plan: 1 of 6
-Status: Executing Phase 37
+Plan: 2 of 6
+Status: Ready to execute
 Last activity: 2026-07-28 -- Phase 37 execution started
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
@@ -201,6 +201,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 36 P08 | 20min | 2 tasks | 3 files |
 | Phase 36 P09 | 20min | 3 tasks | 3 files |
 | Phase 36 P10 | 55min | 3 tasks | 8 files |
+| Phase 37 P37-03 | 35min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -442,6 +443,9 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 36-09]: TRN-03 lands entirely on the existing versions page (no new admin route); loadVersions() lifted to useCallback so refresher save/clear handlers can re-run it
 - [Phase 36]: Exported resolveLineage from src/actions/competency.ts so the CMP-03 live probe invokes the real shipped lineage resolver instead of a reimplementation
 - [Phase 36]: no-refresher-gate guard widened to 8 files; passive-chip check scoped to chip-defining markup (StatePill/SopLibraryCard) only, never files that merely render StatePill
+- [Phase 37-03]: recordObservation gates only verdict === performed_to_sop; isSignedOffAssessor never called for needs_support (branch-before-gate, D-03/D-04)
+- [Phase 37-03]: Assessor predicate reads use the admin client with self-enforced org scope (session-client RLS falsely denies a supervisor's own evidence about other workers)
+- [Phase 37-03]: D-08 request/list split: requestAssessorReview uses admin client (RLS only allows admin/safety_manager notification inserts), listAssessmentRequests uses session client (RLS self-read already correct)
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -552,7 +556,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-28T00:46:25.356Z
-Stopped at: Phase 37 context gathered
+Last session: 2026-07-28T01:45:14.364Z
+Stopped at: Completed 37-03-PLAN.md
 Resume file:
-.planning/phases/37-assessor-governance/37-CONTEXT.md
+None
