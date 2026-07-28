@@ -8,13 +8,17 @@
  * `(supabase as any)` / `(admin as any)` casts, matching the departments.ts /
  * org-model.ts / approvals.ts precedent.
  *
- * recordObservation writes with the SESSION client only — RLS (migrations
- * 00052/00053) is the safety mechanism (D-12); no admin client is reached
- * for on the observation insert path.
+ * recordObservation writes with the SESSION client — RLS (migrations
+ * 00052/00053/00056) is the safety mechanism (D-12). Phase 37 ASR-01 adds
+ * one admin-client read on the observation path: the advancing
+ * ('performed_to_sop') branch calls isSignedOffAssessor with an admin
+ * client for the PREDICATE READ ONLY (see comment at the call site); the
+ * insert itself stays on the session client exactly as before.
  */
 import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { RecordObservationSchema, ObservationLabelsSchema } from '@/lib/validators/observations'
+import { isSignedOffAssessor } from '@/lib/competency/assessor'
 
 const DEFAULT_LABELS = {
   performed_to_sop: 'Performed to SOP',
@@ -26,7 +30,9 @@ const DEFAULT_LABELS = {
 //
 // Inserts an append-only observation row. Server-resolves sop_version
 // from sops.version (D-10 — never trust a client-supplied version).
-// Uses the SESSION client — RLS is the gate, no createAdminClient here.
+// The INSERT uses the SESSION client — RLS is the write gate. Phase 37
+// adds one admin-client PREDICATE READ (isSignedOffAssessor) on the
+// performed_to_sop branch only; see the gate comment below for why.
 // ---------------------------------------------------------------
 export async function recordObservation(
   rawInput: unknown
@@ -49,6 +55,37 @@ export async function recordObservation(
     .from('sops').select('version').eq('id', sopId).single()
   if (sopError || !sop) return { success: false, error: 'SOP not found.' }
 
+  // ASR-01 gate — only the advancing verdict is gated (D-03/D-04
+  // branch-before-gate). needs_support is the coaching-not-discipline
+  // default (Phase 34 D-01, this phase's D-04) and the higher-frequency
+  // write; the predicate is never called for it.
+  let isOverride = false
+  let overrideReasonToStamp: string | null = null
+  if (verdict === 'performed_to_sop') {
+    // Admin client for the PREDICATE READ ONLY: isSignedOffAssessor reads
+    // sop_completions/completion_sign_offs/sop_observations on the CALLER's
+    // own behalf, and RLS on those tables does not reliably return a
+    // supervisor's own sign-off rows for other workers — a session-client
+    // read would return empty and falsely report a legitimate assessor as
+    // blocked (2026-07-20 "RLS silently EMPTIES a same-org read" class,
+    // inverted into a false deny). The predicate self-enforces org scope on
+    // every query; organisationId here is session-derived, never accepted
+    // from client input. The INSERT below stays on the session client — RLS
+    // remains the write gate (Phase 34 D-12).
+    const assessor = await isSignedOffAssessor(userId, sopId, createAdminClient(), organisationId)
+    if (!assessor) {
+      if (role === 'admin' || role === 'safety_manager') {
+        if (!parsed.data.overrideReason) {
+          return { success: false, error: 'ASSESSOR_OVERRIDE_REQUIRED' }
+        }
+        isOverride = true
+        overrideReasonToStamp = parsed.data.overrideReason
+      } else {
+        return { success: false, error: 'NOT_SIGNED_OFF_ASSESSOR' }
+      }
+    }
+  }
+
   const { error } = await (supabase as any).from('sop_observations').insert({
     organisation_id: organisationId,
     sop_id: sopId,
@@ -58,6 +95,8 @@ export async function recordObservation(
     verdict,
     note: note ?? null,
     completion_id: completionId ?? null,
+    is_assessor_override: isOverride,
+    override_reason: overrideReasonToStamp,
   })
 
   if (error) {
