@@ -49,23 +49,38 @@ test.describe('OBS-01 — recordObservation source contract', () => {
     expect(src).toContain("['supervisor', 'admin', 'safety_manager'].includes(role)")
   })
 
-  test('write uses the session client (getSessionContext) — never createAdminClient for this table', () => {
+  test('the INSERT itself uses the session client (getSessionContext) — never createAdminClient for the write', () => {
     if (!fs.existsSync(OBSERVATIONS_ACTION)) {
       test.skip(true, 'src/actions/observations.ts not yet created — waiting for Plan 34-04')
       return
     }
     const src = read(OBSERVATIONS_ACTION)
     // Scoped to the recordObservation function body (D-12 applies to the
-    // observation insert path specifically) — setObservationLabels and
+    // observation INSERT path specifically) — setObservationLabels and
     // observer-name resolution legitimately use createAdminClient elsewhere
     // in this file (organisations has no authenticated UPDATE policy;
     // auth.admin.listUsers requires service-role — both self-enforce org
     // scope per the CLAUDE.md 2026-06-15 pattern).
+    //
+    // Phase 37 ASR-01 legitimately added a SCOPED admin-client PREDICATE
+    // READ (isSignedOffAssessor) inside this same function body — RLS on
+    // sop_completions/completion_sign_offs/sop_observations does not
+    // reliably return a supervisor's own rows about OTHER workers via the
+    // session client (2026-07-20 inverted-false-deny class), so the read
+    // (not the write) needs the admin client. D-12 still holds: the assert
+    // below is scoped to the `.insert(` call itself, not the whole function
+    // body, so it fails if the WRITE ever moves off the session client
+    // while staying green for the predicate read (CLAUDE.md 2026-07-13:
+    // repoint stale guards to what actually moved, not a blanket ban).
     const start = src.indexOf('export async function recordObservation')
     const nextExport = src.indexOf('\nexport async function', start + 1)
     const fnBody = nextExport === -1 ? src.slice(start) : src.slice(start, nextExport)
     expect(fnBody).toContain('getSessionContext(')
-    expect(fnBody).not.toContain('createAdminClient(')
+    const insertStart = fnBody.indexOf("await (supabase as any).from('sop_observations').insert(")
+    expect(insertStart, 'sop_observations insert call not found in recordObservation').toBeGreaterThan(-1)
+    const insertCallLine = fnBody.slice(insertStart, fnBody.indexOf('\n', insertStart))
+    expect(insertCallLine).not.toContain('createAdminClient(')
+    expect(insertCallLine).not.toMatch(/\badmin\b/)
   })
 })
 
