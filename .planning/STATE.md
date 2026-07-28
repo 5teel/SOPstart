@@ -4,12 +4,12 @@ milestone: v7.0
 milestone_name: — Competency & Training Layer
 status: executing
 stopped_at: Phase 37 context gathered
-last_updated: "2026-07-28T01:20:32.864Z"
-last_activity: 2026-07-28 -- Phase 37 planning complete
+last_updated: "2026-07-28T01:23:41.615Z"
+last_activity: 2026-07-28 -- Phase 37 execution started
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 24
+  total_plans: 30
   completed_plans: 24
   percent: 50
 ---
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 36 — refresher-cadence-version-currency
+**Current focus:** Phase 37 — assessor-governance
 
 ## Current Position
 
-Phase: 37
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-07-28 -- Phase 37 planning complete
+Phase: 37 (assessor-governance) — EXECUTING
+Plan: 1 of 6
+Status: Executing Phase 37
+Last activity: 2026-07-28 -- Phase 37 execution started
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
