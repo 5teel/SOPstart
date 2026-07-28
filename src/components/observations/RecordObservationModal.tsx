@@ -5,7 +5,10 @@ import {
   recordObservation,
   getObservationLabels,
   listWorkerSopsForPicker,
+  getAssessorStatusForSop,
+  requestAssessorReview,
   type WorkerSopOption,
+  type AssessorStatus,
 } from '@/actions/observations'
 import { VerdictButtons } from './VerdictButtons'
 import type { Verdict } from '@/lib/validators/observations'
@@ -20,6 +23,21 @@ interface RecordObservationModalProps {
 }
 
 const DEFAULT_LABELS = { performed_to_sop: 'Performed to SOP', needs_support: 'Needs support' }
+
+// Phase 37 ASR-01/D-08: plain-language copy for a recorder blocked from
+// the advancing verdict because they are not themselves signed off on
+// this SOP. Mirrors the exact copy used on the sign-off surface (37-04).
+const NOT_ASSESSOR_COPY = 'You need to be signed off on this SOP yourself before you can assess others on it'
+// D-05: honesty copy shown before an admin/safety_manager override commits.
+const OVERRIDE_DISCLOSURE_COPY = 'This will be recorded as an assessor override with your reason, visible in the audit trail.'
+
+function mapObservationError(error: string): string {
+  if (error === 'NOT_SIGNED_OFF_ASSESSOR') return NOT_ASSESSOR_COPY + '.'
+  if (error === 'ASSESSOR_OVERRIDE_REQUIRED') {
+    return 'Add a reason (at least 10 characters) to record this as an assessor override.'
+  }
+  return error
+}
 
 export function RecordObservationModal({
   open,
@@ -39,6 +57,13 @@ export function RecordObservationModal({
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  // Phase 37 ASR-01: assessor gate UI state.
+  const [assessorStatus, setAssessorStatus] = useState<AssessorStatus | null>(null)
+  const [overrideOpen, setOverrideOpen] = useState(false)
+  const [overrideReason, setOverrideReason] = useState('')
+  const [requestSent, setRequestSent] = useState(false)
+  const [requestingAssessment, setRequestingAssessment] = useState(false)
+
   // Reset form state at the moment `open` transitions, during render (not
   // inside an effect) — React's documented pattern for adjusting state on a
   // prop change without a cascading-render effect.
@@ -51,6 +76,10 @@ export function RecordObservationModal({
     setSearch('')
     setError(null)
     setLoadingSops(open)
+    setAssessorStatus(null)
+    setOverrideOpen(false)
+    setOverrideReason('')
+    setRequestSent(false)
   }
 
   // Fetch fresh picker data + labels every time the modal opens. All state
@@ -72,6 +101,21 @@ export function RecordObservationModal({
     }
   }, [open, worker.id])
 
+  // Phase 37 ASR-01: assessor status for the selected SOP. While the fetch
+  // is in flight, assessorStatus stays null (its prior reset), so `blocked`
+  // below stays false — the UI never flashes a blocked state.
+  useEffect(() => {
+    if (!sopId) return
+    let cancelled = false
+    getAssessorStatusForSop(sopId).then((status) => {
+      if (cancelled) return
+      setAssessorStatus(status)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [sopId])
+
   const filteredSops = useMemo(() => {
     const term = search.trim().toLowerCase()
     if (!term) return sops
@@ -83,7 +127,21 @@ export function RecordObservationModal({
   }, [sops, search])
 
   const selectedSop = sops.find((s) => s.id === sopId) ?? null
-  const canSave = Boolean(sopId && verdict) && !busy
+
+  // Phase 37 ASR-01/D-08/D-09: blocked is derived, never trusted as the
+  // authority — recordObservation recomputes the gate server-side (D-03).
+  const blocked = Boolean(sopId) && assessorStatus !== null && !assessorStatus.isAssessor
+  const canOverride = assessorStatus?.canOverride ?? false
+  // While the override sheet is open, the advancing verdict becomes
+  // selectable again (the override IS the permission) — VerdictButtons only
+  // disables it outside that state.
+  const blockedVerdict: Verdict | null = blocked && !overrideOpen ? 'performed_to_sop' : null
+
+  const overrideReasonValid = overrideReason.trim().length >= 10
+  const canSave =
+    Boolean(sopId && verdict) &&
+    !busy &&
+    !(overrideOpen && verdict === 'performed_to_sop' && !overrideReasonValid)
 
   async function handleSave() {
     if (!sopId || !verdict) return
@@ -95,14 +153,26 @@ export function RecordObservationModal({
       verdict,
       note: note.trim() || undefined,
       completionId: presetCompletionId,
+      overrideReason: overrideOpen && verdict === 'performed_to_sop' ? overrideReason.trim() : undefined,
     })
     setBusy(false)
     if (!result.success) {
-      setError(result.error)
+      setError(mapObservationError(result.error))
       return
     }
     onRecorded?.()
     onClose()
+  }
+
+  async function handleRequestAssessment() {
+    if (!sopId || requestingAssessment) return
+    setRequestingAssessment(true)
+    try {
+      const result = await requestAssessorReview(sopId)
+      if (result.success) setRequestSent(true)
+    } finally {
+      setRequestingAssessment(false)
+    }
   }
 
   if (!open) return null
@@ -207,8 +277,62 @@ export function RecordObservationModal({
             <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--ink-500)] mb-1.5">
               Verdict
             </div>
-            <VerdictButtons value={verdict} onChange={setVerdict} labels={labels} />
+            <VerdictButtons
+              value={verdict}
+              onChange={setVerdict}
+              labels={labels}
+              blockedVerdict={blockedVerdict}
+              blockedHint={blockedVerdict ? NOT_ASSESSOR_COPY : undefined}
+            />
           </div>
+
+          {/* Phase 37 ASR-01/D-08/D-05: blocked-advancing state */}
+          {blocked && (
+            <div className="p-3 rounded bg-[var(--paper-2)] border border-[var(--ink-100)]">
+              <p className="text-sm text-[var(--ink-900)] mb-2">{NOT_ASSESSOR_COPY}</p>
+
+              {!canOverride && (
+                requestSent ? (
+                  <p className="text-sm text-[var(--ink-900)] font-medium">
+                    Request sent — an admin or safety manager will be notified.
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleRequestAssessment}
+                    disabled={requestingAssessment}
+                    className="text-sm font-semibold text-[var(--ink-900)] underline disabled:opacity-50"
+                  >
+                    {requestingAssessment ? 'Sending…' : 'Request assessment'}
+                  </button>
+                )
+              )}
+
+              {canOverride && !overrideOpen && (
+                <button
+                  type="button"
+                  onClick={() => setOverrideOpen(true)}
+                  className="text-sm font-semibold text-[var(--ink-900)] underline"
+                >
+                  Use assessor override
+                </button>
+              )}
+
+              {canOverride && overrideOpen && (
+                <div className="flex flex-col gap-2 mt-1">
+                  <p className="text-xs text-[var(--ink-500)]">{OVERRIDE_DISCLOSURE_COPY}</p>
+                  <textarea
+                    value={overrideReason}
+                    onChange={(e) => setOverrideReason(e.target.value.slice(0, 500))}
+                    maxLength={500}
+                    disabled={busy}
+                    placeholder="Reason for override (min. 10 characters)…"
+                    className="w-full min-h-[64px] px-3 py-2 border border-[var(--ink-300)] rounded text-sm text-[var(--ink-900)] bg-[var(--paper-1)] outline-none focus:border-[var(--ink-900)] resize-none"
+                  />
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Note */}
           <div>
