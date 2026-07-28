@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: — Competency & Training Layer
-status: executing
+status: verifying
 stopped_at: Completed 37-05-PLAN.md
-last_updated: "2026-07-28T02:09:07.497Z"
+last_updated: "2026-07-28T02:26:20.173Z"
 last_activity: 2026-07-28 -- Phase 37 execution started
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 30
-  completed_plans: 29
-  percent: 50
+  completed_plans: 30
+  percent: 67
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 Phase: 37 (assessor-governance) — EXECUTING
 Plan: 6 of 6
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-28 -- Phase 37 execution started
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
@@ -204,6 +204,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 37 P37-03 | 35min | 3 tasks | 3 files |
 | Phase 37 P04 | 30min | 3 tasks | 4 files |
 | Phase 37 P05 | 25min | 3 tasks | 5 files |
+| Phase 37 P06 | 55min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -452,6 +453,7 @@ Recent decisions affecting current work:
 - [Phase 37]: Override reason UI built inline in CompletionDetailClient rather than forking RejectReasonSheet (which hardcodes its own title/copy)
 - [Phase ?]: [Phase 37-05]: VerdictButtons blockedVerdict is a single-verdict disable (isBlocked = blockedVerdict === verdict) — needs_support structurally cannot be gated (D-09)
 - [Phase ?]: [Phase 37-05]: AssessmentRequestsPanel mounted on /admin/team only, reusing the existing RecordObservationModal (worker+presetSopId) and markNotificationRead — closes 37-RESEARCH Pitfall 1 (no inbox surface for D-08 requests)
+- [Phase 37]: Migration 00057 fix-forward (37-06) -- 00056 had silently dropped the 00053 cross-org RLS guard on sop_observations_insert_recorder; restored both conjuncts after the full-suite gate caught it live
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -562,7 +564,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-28T02:09:07.488Z
+Last session: 2026-07-28T02:25:58.476Z
 Stopped at: Completed 37-05-PLAN.md
 Resume file:
 None
