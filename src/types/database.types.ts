@@ -1371,6 +1371,7 @@ export type Database = {
           organisation_id: string
           read: boolean
           sop_id: string
+          subject_user_id: string | null
           type: string
           user_id: string
         }
@@ -1380,6 +1381,7 @@ export type Database = {
           organisation_id: string
           read?: boolean
           sop_id: string
+          subject_user_id?: string | null
           type?: string
           user_id: string
         }
@@ -1389,6 +1391,7 @@ export type Database = {
           organisation_id?: string
           read?: boolean
           sop_id?: string
+          subject_user_id?: string | null
           type?: string
           user_id?: string
         }
@@ -1717,6 +1720,8 @@ export type Database = {
           supervisor_id: string
           decision: string
           reason: string | null
+          is_assessor_override: boolean
+          override_reason: string | null
           created_at: string
         }
         Insert: {
@@ -1726,6 +1731,8 @@ export type Database = {
           supervisor_id: string
           decision: string
           reason?: string | null
+          is_assessor_override?: boolean
+          override_reason?: string | null
           created_at?: string
         }
         Update: {
@@ -1735,6 +1742,8 @@ export type Database = {
           supervisor_id?: string
           decision?: string
           reason?: string | null
+          is_assessor_override?: boolean
+          override_reason?: string | null
           created_at?: string
         }
         Relationships: [
