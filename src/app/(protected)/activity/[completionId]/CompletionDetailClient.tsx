@@ -156,6 +156,16 @@ export function CompletionDetailClient({
         // T-37-04-01: the server is the authority and can differ from the
         // client's blocked state (e.g. a needs_support reset landing between
         // render and click) — map both gate error codes to human copy.
+        // WR-04: if the server demanded an override that the stale-true
+        // client-side isAssessor never routed through handleApproveClick's
+        // sheet-opening branch, open the sheet now so the demand is
+        // actionable instead of a dead end — the error copy below still
+        // explains why. Safe to call when the sheet is already open (the
+        // override-confirm re-entry path with a too-short reason): setting
+        // an already-true state is a no-op.
+        if (result.error === 'ASSESSOR_OVERRIDE_REQUIRED' && canOverride) {
+          setOverrideSheetOpen(true)
+        }
         setActionError(mapSignOffError(result.error))
       }
     } catch {

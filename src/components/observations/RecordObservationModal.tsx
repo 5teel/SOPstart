@@ -101,10 +101,20 @@ export function RecordObservationModal({
     }
   }, [open, worker.id])
 
-  // Phase 37 ASR-01: assessor status for the selected SOP. While the fetch
-  // is in flight, assessorStatus stays null (its prior reset), so `blocked`
-  // below stays false — the UI never flashes a blocked state.
+  // Phase 37 ASR-01/WR-03: assessor status for the selected SOP. Per-SOP
+  // state is reset on EVERY sopId change (not only the open-transition),
+  // because tapping "Change" and picking a different SOP must never carry
+  // the PREVIOUS SOP's blocked/override/request state into the new fetch —
+  // otherwise a blocked panel (or an enabled advancing verdict) flashes for
+  // the wrong SOP, and "Request sent" can display for a SOP no request was
+  // made for. While the fetch is in flight, assessorStatus stays null (just
+  // reset), so `blocked` below stays false — the UI never flashes a blocked
+  // state for the wrong SOP.
   useEffect(() => {
+    setAssessorStatus(null)
+    setRequestSent(false)
+    setOverrideOpen(false)
+    setOverrideReason('')
     if (!sopId) return
     let cancelled = false
     getAssessorStatusForSop(sopId).then((status) => {
