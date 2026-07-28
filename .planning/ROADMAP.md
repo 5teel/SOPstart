@@ -308,7 +308,7 @@ Turns data SafeStart already stores (access grants = who must know what; complet
 - [x] **Phase 34: Supervisor Observations** - Append-only, org-scoped observation records supervisors log against a worker + SOP, visible to the worker themselves — the standalone evidence-layer foundation (verification 2026-07-20: gaps_found — see 34-VERIFICATION.md) (completed 2026-07-20)
 - [x] **Phase 35: Competency Classifier + Training Matrix + Records** - Derived-live competency state per person×SOP, a training matrix on /admin/team, and per-worker training record + CSV export — one pure classifier, zero stored/stale state (completed 2026-07-24)
 - [x] **Phase 36: Refresher Cadence + Version-Currency** - Trained-on-outdated-version surfacing after supersede, plus due/overdue refresher re-walkthroughs — informational only, never blocking (promotes backlog 999.7) (completed 2026-07-27)
-- [x] **Phase 37: Assessor Governance** - Only a signed-off assessor can record a competence-advancing observation, with an audited admin-override path for new-org bootstrap (completed 2026-07-28)
+- [ ] **Phase 37: Assessor Governance** - Only a signed-off assessor can record a competence-advancing observation, with an audited admin-override path for new-org bootstrap (core gate complete 2026-07-28; gap closure 37-07/37-08 pending)
 - [ ] **Phase 38: Guidance-Notes Adoptions** - AI-reviewer completeness rubric (hazards/controls/LOTO + named E-stops-is-not-isolation check, quality outcomes, length flag), document codes + register export, risk/priority triage — all additive and informing-only (promotes backlog 999.4, 999.5, 999.6)
 - [ ] **Phase 39: AI-Prioritized Maintenance Schedule** - Governance surface shows an AI-ranked review list (staleness + usage + reviewer flags) on the existing AI adapter — no new AI infrastructure
 
@@ -441,7 +441,7 @@ Plans:
   1. Only a worker/supervisor who is themselves signed-off as an assessor can record a competence-advancing observation
   2. A new organisation with zero assessors has an admin-override path to bootstrap the first one, and every override use is recorded in an audit trail
 
-**Plans**: 6 plans in 4 waves
+**Plans**: 8 plans in 5 waves (37-07/37-08 = gap closure)
 **UI hint**: yes
 
 Plans:
@@ -463,6 +463,11 @@ Plans:
 **Wave 4** *(blocked on Wave 3)*
 
 - [x] 37-06-PLAN.md — live zero-assessor bootstrap runtime probe (SC-1 + SC-2, reset + resolve) + journeys.ts request pathway + 3 layman UAT items + full phase gate
+
+**Wave 5** *(gap closure — verification found 2 blockers + 5 warnings; 37-07 and 37-08 have no file overlap and run in parallel)*
+
+- [ ] 37-07-PLAN.md — CR-01 org-scope guard on `/activity/[completionId]` (+ rule-5 sibling `/admin/sops/[sopId]/video`), WR-02 role gate on `requestAssessorReview`, WR-05 org+worker validation of the observation `completionId`, plus a directory-wide admin-client org-guard sweep spec
+- [ ] 37-08-PLAN.md — CR-02 migration applier applies 00056+00057 in order and asserts the restored `sop_observation_refs_in_org` conjunct, WR-01 order-independent sign-off evaluation, WR-03 per-SOP modal state reset, WR-04 server-demanded override sheet
 
 ### Phase 38: Guidance-Notes Adoptions
 
