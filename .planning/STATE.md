@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v7.0
-milestone_name: — Competency & Training Layer
-status: completed
-stopped_at: v7.0 closed at Phase 37 — Phases 38/39 deferred to backlog 999.4/999.5/999.6
-last_updated: "2026-07-28T04:30:48.369Z"
+milestone: v8.0
+milestone_name: Authoring Convergence
+status: planning
+last_updated: "2026-07-28T06:12:49.426Z"
 last_activity: 2026-07-28
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 32
-  completed_plans: 32
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -25,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: — (v7.0 complete at Phase 37)
-Plan: Not started
-Status: milestone-complete
-Last activity: 2026-07-28
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-07-28 — Milestone v8.0 started
 
 ### v7.0 scope change (2026-07-28)
 

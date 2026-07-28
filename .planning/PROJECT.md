@@ -74,17 +74,25 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 - ✓ SOP ownership (owner on every SOP, auto-backfilled 23/23, trigger-defaulted, ≤2-click reassign) + review lifecycle (12mo default cadence, one-click Confirm current, append-only review events) + unified governance queue (/admin/governance: overdue/due-soon/unowned/stale-role, one-click actions) + dashboard widget + worker "Current as of" caption — Phase 28 (v6.0), verified 12/12 vs live prod DB
 
 - ✓ Supervisor observations — append-only sop_observations table (RLS: recorder-role org reads + worker self-read only, cross-org guard, no update/delete), 30-second record modal from PersonPanel + /activity, worker-visible history on /profile with NZ Privacy Act trust framing, org-renamable verdict labels — Phase 34 (v7.0, OBS-01..03), re-verified 5/5 after gap closure 34-10
+- ✓ Competency classifier + training matrix + per-worker training records + SuccessFactors-shaped CSV export — derived live from existing evidence, zero stored state — Phase 35 (v7.0, CMP-01/02/04, MTX-01..03, TRN-01/02)
+- ✓ Refresher cadence + version-currency — trained-on-outdated-version surfacing after supersede, due/overdue re-walkthroughs, informational only — Phase 36 (v7.0, CMP-03, TRN-03, REF-01/02)
+- ✓ Assessor governance — only a signed-off assessor can record a competence-advancing observation, audited always-available admin override for new-org bootstrap — Phase 37 (v7.0, ASR-01), re-verified 14/14 after gap closure 37-07/37-08
 
 ### Active
 
 <!-- Current scope. Building toward these. -->
 
-#### v7.0 — Competency & Training Layer (defined 2026-07-19)
-- Derived competency states per person × required-SOP (CMP-01..04 — never gates worker access)
-- Training matrix on /admin/team (MTX-01..03 — grants × completions join, zero double-entry)
-- Assessor governance with audited bootstrap override (ASR-01)
-- Training records rollforward from v6.0 Phase 31: per-worker view, SuccessFactors-shaped CSV, outdated-version surfacing, AI maintenance schedule (TRN-01..03, REV-05)
-- Guidance-notes adoptions: completeness rubric incl. E-stops≠isolation (RUB-01..03), document codes + register export (DOC-01..02), risk triage (TRI-01), refresher cadence (REF-01..02)
+#### v8.0 — Authoring Convergence (defined 2026-07-28)
+- One creation flow: every on-ramp (upload, video, AI-describe, AI-voice, blank) funnels through one entry and lands in the builder (CRE-01..04)
+- Deduplication: one file-intake component, one department/metadata picker, one progress component, one page shell (DUP-01..04)
+- Data convergence: SOP category resolves to a single column + single vocabulary, existing rows backfilled (DAT-01)
+- Progress honesty: builder renders parsing state; consistent client-side navigation (PRG-01..02)
+- Dead-surface removal: no CTA to a non-existent route, no non-functional affordances, dead shims/vars gone, docs match real routes (DED-01..04)
+
+#### Deferred to backlog (2026-07-28)
+- 999.4 AI-reviewer completeness rubric + risk triage (RUB-01..03, TRI-01) — blocked on conversion-pipeline maturity
+- 999.5 Document codes + register export (DOC-01..02) — independently promotable, no pipeline dependency
+- 999.6 AI-prioritized maintenance schedule (REV-05) — blocked on 999.4's flags
 
 #### v3.0 carry-over (deferred to v4.5 backlog)
 - A-05 NZ Template Library (Visy glass-mfg-focused)
@@ -109,21 +117,34 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 - Integration with external HR/ERP systems
 - Video content within SOPs
 
-## Current Milestone: v7.0 Competency & Training Layer
+## Current Milestone: v8.0 Authoring Convergence
 
-**Started:** 2026-07-19
-**Goal:** Turn the data SOPstart already stores (access grants = who must know what; completions + immutable sign-off chains = what's been evidenced) into a full competency system: a training matrix, competency states per person-per-SOP, and supervisor observation records — the audit artifact every ACC reviewer, WorkSafe inspector, and site manager asks for. Plus the safety-org guidance-notes quality adoptions that make individual SOPs better training modules. Absorbs v6.0's unshipped Phase 31 (training records + AI maintenance schedule).
+**Started:** 2026-07-28
+**Goal:** Collapse the SOP creation path from five divergent on-ramps into one consistent flow — removing duplicated components, dead routes, and inconsistent metadata collection — so every way of making a SOP behaves the same way and lands in the same place. This is a **consolidation milestone**: tighten what exists, delete what duplicates, simplify the workflow. It is explicitly NOT a greenfield rebuild of the builder.
 
-**NORTH STAR (carried from v6.0, locked by Simon 2026-07-12):** User ease of use and maintenance FIRST. Process and blockers must never be prioritised over ease of use. SOPstart wins on (1) accuracy of SOP documentation and (2) ease of use by the actual people on the shop floor. Competency tracking exists ONLY in service of those two things — any feature that adds worker-facing friction is wrong by definition. Spirit over letter: adopt the guidance notes' intent (staged, observed, evidenced training), never their rigid choreography.
+**NORTH STAR (carried, locked by Simon 2026-07-12):** User ease of use and maintenance FIRST. SOPstart wins on (1) accuracy of SOP documentation and (2) ease of use by the actual people on the shop floor. Governance and process never come before ease of use.
+
+**Why now (locked by Simon 2026-07-28):** The product governs SOPs extremely well — ownership, approvals, access, competency, observations, training records all shipped across v6.0/v7.0. What it cannot yet do reliably is get a good SOP *into* the system. v7.0's Phases 38/39 were deferred to backlog precisely because they critique and rank SOP content, and the creation pipeline underneath is pre-alpha. Foundation before more layers on top.
+
+**Evidence base:** a line-verified audit of every creation surface (2026-07-28) found: a picker showing 4 tiles that hit 3 routes; a 5th creation method buried inside the Upload route that lands somewhere different from all the others; upload collecting *no* metadata while its siblings require title or prompt; category written to **two different DB columns from two different vocabularies**; the department picker duplicated three times; HEIC conversion implemented twice; three disagreeing file-accept lists; two progress steppers each re-implementing realtime-with-polling; a builder with no parsing state; and a 404ing primary CTA on the Blocks library.
 
 **Target features (grouped):**
 
-- **Training matrix:** people × required-SOPs × status view derived from access grants (Phases 32–33) joined to completions/sign-offs — the audit artifact; per-department and per-worker cuts
-- **Competency states:** 3–4 minimal states per person-per-SOP (e.g. not started / read / supervised / competent-signed-off) — NOT the guidance notes' rigid 5-step ladder
-- **Supervisor observations:** 30-second supervisor-initiated record ("watched worker do X against the SOP — consistent / needs reset") under the worker's profile; the legal-evidence layer and complacency-reset mechanism
-- **Assessor capability:** who may assess/sign off is itself governed (trainer must be signed off) — folds into the G-04 role work
-- **Training records (Phase 31 rollforward, TRN-01..03 + REV-05):** per-worker training evidence view, CSV export, trained-on-outdated-version surfacing after supersede, AI-prioritized maintenance schedule on the existing AI adapter
-- **Guidance-notes adoptions (999.4–999.7 promoted):** AI-reviewer completeness rubric (hazards/controls/LOTO with named "E-stops ≠ isolation" check, quality outcomes, too-long flag); document codes + register-style export; risk/priority rating for SOP triage; refresher re-walkthrough cadence
+- **Creation flow (CRE-01..04):** one entry funnelling every on-ramp including video generation · the same core metadata collected on every path · every path lands in the builder · each method presented exactly once
+- **Deduplication (DUP-01..04):** one file-intake component (accept list, size limits, HEIC conversion) · one department/metadata picker · one parse-progress component · one admin page shell
+- **Data convergence (DAT-01):** SOP category resolves to one column with one vocabulary, existing rows backfilled — AI-created and wizard-created SOPs filterable together
+- **Progress honesty (PRG-01..02):** the builder renders parsing/uploading state so a queued parse never presents as an empty builder · navigation to the builder is consistent client-side routing
+- **Dead-surface removal (DED-01..04):** no CTA to a non-existent route · no non-functional affordances shipped · orphaned shims and dead state removed · docs/journeys match real routes
+
+**Key anti-goals:** no new authoring capabilities (the template on-ramp from the sketches is a new capability — deferred); no merge of the worker route and admin builder into one URL (architecturally large, and the worker side is already one route with three tabs); no conversion/parse *quality* work — that is v9.0.
+
+**Design contract:** `.claude/skills/sketch-findings-SOPstart/references/authoring-flow.md` (wrapped 2026-07-28) — decision D-A1 "every on-ramp lands in the identical builder" is exactly what CRE-01..04 execute. This milestone implements an already-validated design rather than inventing one.
+
+**Build-on (do not rebuild):** the Phase 26 bespoke inline builder and its `BLOCK_COMPONENTS` registry (already shared between worker read path and admin edit path), the frozen `layout_data` / `sop_section_blocks` / `block_provenance` contract, the parse→AI-review→verify→publish spine.
+
+## Next Milestone (planned): v9.0 Conversion Quality
+
+Sequenced by Simon 2026-07-28: **v8.0 authoring UX first, then v9.0 conversion quality.** v9.0 addresses whether the parse produces something worth editing — the actual pre-alpha concern. It is also the unblocking dependency for backlog 999.4 (AI-reviewer completeness rubric), which was deferred because a rubric tuned against pre-alpha parse output would need retuning.
 
 **Key anti-goals:** no disciplinary workflow (records exportable, enforcement stays human); no HRIS API integration yet (CSV export only — SuccessFactors is a "Later" target); no worker-facing friction from competency states (a worker's read/walkthrough access is never gated by competency status); no rigid training choreography.
 
@@ -165,6 +186,9 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 | Governance never blocks workers (v6.0) | North star: ease of use + accuracy beat process; a worker must always be able to read/run any published SOP regardless of review/approval state | — Locked 2026-07-12 |
 | Approval chains opt-in per category (v6.0) | Visy needs 3–4-manager chains for some SOPs, but forcing chains everywhere adds friction; absent chain = today's publish flow | — Locked 2026-07-12 |
 | Training records = CSV export only (v6.0) | HRIS/Success Factors API integration stays out of scope; CSV covers the audit/training-evidence need without integration surface | — Locked 2026-07-12 |
+| Foundation before more governance layers (v8.0) | Governance shipped well across v6.0/v7.0, but every layer sits on content whose creation path is fragmented and whose parse quality is pre-alpha. Phases 38/39 deferred rather than built on unstable ground | — Locked 2026-07-28 |
+| v8.0 is consolidation, not rebuild | The ask is tightening current design, removing duplicative routes, simplifying workflows — not a greenfield builder. New capabilities (template on-ramp) are deferred even where sketched | — Locked 2026-07-28 |
+| Authoring UX before conversion quality | Two-milestone sequence: v8.0 converges the creation flow, v9.0 makes the parse output trustworthy. Ordering chosen by Simon | — Locked 2026-07-28 |
 
 ## Evolution
 
@@ -184,4 +208,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-28 — Phase 37 (assessor governance, ASR-01) complete, re-verified 14/14 after gap closure (37-07/37-08 closed CR-01/CR-02 + WR-01..WR-05; post-closure review's 2 new warnings fixed same day). Phase 36 (refresher cadence + version-currency) complete, verified 4/4; code review 1 Critical + 7 Warnings all fixed pre-verification (CMP-03/TRN-03/REF-01/REF-02 validated). Phase 35 (competency classifier + training matrix) complete 2026-07-26, UAT 8/8. Prior: Phase 34 (supervisor observations) complete, re-verified 5/5 after gap closure. Milestone v7.0 (Competency & Training Layer) started 2026-07-19; v6.0 quick-closed same day (Phase 31 rolled forward into v7.0). Prior: v5.0 shipped 2026-07-05; ad-hoc AI-layer work 2026-07-06→09 formalized by Phase 27 (2026-07-12); self-healing video render webhook shipped 2026-07-12. Source of truth `.planning/PRODUCT-ROADMAP.md` v0.3 + Visy interview findings (2026-05-05).*
+*Last updated: 2026-07-28 — **Milestone v8.0 (Authoring Convergence) started**; v7.0 closed at Phase 37 with 4/4 phases and 32/32 plans, Phases 38/39 deferred to backlog 999.4/999.5/999.6 (creation pipeline pre-alpha). v9.0 (Conversion Quality) sequenced next. Prior: Phase 37 (assessor governance, ASR-01) complete, re-verified 14/14 after gap closure (37-07/37-08 closed CR-01/CR-02 + WR-01..WR-05; post-closure review's 2 new warnings fixed same day). Phase 36 (refresher cadence + version-currency) complete, verified 4/4; code review 1 Critical + 7 Warnings all fixed pre-verification (CMP-03/TRN-03/REF-01/REF-02 validated). Phase 35 (competency classifier + training matrix) complete 2026-07-26, UAT 8/8. Prior: Phase 34 (supervisor observations) complete, re-verified 5/5 after gap closure. Milestone v7.0 (Competency & Training Layer) started 2026-07-19; v6.0 quick-closed same day (Phase 31 rolled forward into v7.0). Prior: v5.0 shipped 2026-07-05; ad-hoc AI-layer work 2026-07-06→09 formalized by Phase 27 (2026-07-12); self-healing video render webhook shipped 2026-07-12. Source of truth `.planning/PRODUCT-ROADMAP.md` v0.3 + Visy interview findings (2026-05-05).*
