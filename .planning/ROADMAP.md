@@ -1313,7 +1313,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | 34. Supervisor Observations | 10/10 | Complete    | 2026-07-20 |
 | 35. Competency Classifier + Training Matrix + Records | 4/4 | Complete   | 2026-07-24 |
 | 36. Refresher Cadence + Version-Currency | 10/10 | Complete    | 2026-07-27 |
-| 37. Assessor Governance | 8/8 | Complete   | 2026-07-28 |
+| 37. Assessor Governance | 8/8 | Complete    | 2026-07-28 |
 | 38. Guidance-Notes Adoptions | 0/TBD | Not started |  |
 | 39. AI-Prioritized Maintenance Schedule | 0/TBD | Not started |  |
 

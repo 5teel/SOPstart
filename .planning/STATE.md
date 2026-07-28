@@ -4,14 +4,14 @@ milestone: v7.0
 milestone_name: — Competency & Training Layer
 status: executing
 stopped_at: Completed 37-05-PLAN.md
-last_updated: "2026-07-28T03:29:20.267Z"
-last_activity: 2026-07-28 -- Phase 37 execution started
+last_updated: "2026-07-28T04:01:15.601Z"
+last_activity: 2026-07-28
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 32
-  completed_plans: 30
-  percent: 50
+  completed_plans: 32
+  percent: 67
 ---
 
 # Project State
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 37 (assessor-governance) — EXECUTING
-Plan: 1 of 8
+Phase: 38
+Plan: Not started
 Status: Executing Phase 37
-Last activity: 2026-07-28 -- Phase 37 execution started
+Last activity: 2026-07-28
 
 ### v3.0 closeout dispositions (closed without separate UAT runs)
 
@@ -102,6 +102,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | 33 | 11 | - | - |
 | 34 | 10 | - | - |
 | 36 | 10 | - | - |
+| 37 | 8 | - | - |
 
 **v2.0 By Phase:**
 
