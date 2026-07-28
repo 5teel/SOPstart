@@ -20,6 +20,16 @@ export const RecordObservationSchema = z.object({
   verdict: VerdictSchema,
   note: z.string().max(2000).optional(),
   completionId: z.string().uuid().optional(),
+  // Phase 37 ASR-01/D-05: mandatory whenever the override path is taken (the
+  // recorder is admin/safety_manager but not a signed-off assessor for this
+  // SOP). Optional here because the field is only required on the override
+  // branch — the server action (Plan 37-03) enforces presence when
+  // is_assessor_override would be true, and the DB CHECK constraint
+  // (migration 00056) is the third and final backstop. Layer 1 of 3
+  // (Zod → server action → DB CHECK). Same 10-char floor as the existing
+  // signOffCompletion rejection-reason threshold — one reason-quality bar,
+  // not two.
+  overrideReason: z.string().trim().min(10).max(500).optional(),
 })
 export type RecordObservationInput = z.infer<typeof RecordObservationSchema>
 
