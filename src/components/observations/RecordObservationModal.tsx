@@ -157,21 +157,26 @@ export function RecordObservationModal({
     if (!sopId || !verdict) return
     setBusy(true)
     setError(null)
-    const result = await recordObservation({
-      workerId: worker.id,
-      sopId,
-      verdict,
-      note: note.trim() || undefined,
-      completionId: presetCompletionId,
-      overrideReason: overrideOpen && verdict === 'performed_to_sop' ? overrideReason.trim() : undefined,
-    })
-    setBusy(false)
-    if (!result.success) {
-      setError(mapObservationError(result.error))
-      return
+    try {
+      const result = await recordObservation({
+        workerId: worker.id,
+        sopId,
+        verdict,
+        note: note.trim() || undefined,
+        completionId: presetCompletionId,
+        overrideReason: overrideOpen && verdict === 'performed_to_sop' ? overrideReason.trim() : undefined,
+      })
+      if (!result.success) {
+        setError(mapObservationError(result.error))
+        return
+      }
+      onRecorded?.()
+      onClose()
+    } catch {
+      setError('Could not save the observation. Check your connection and try again.')
+    } finally {
+      setBusy(false)
     }
-    onRecorded?.()
-    onClose()
   }
 
   async function handleRequestAssessment() {

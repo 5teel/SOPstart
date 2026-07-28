@@ -73,6 +73,7 @@ export async function recordObservation(
       .eq('id', completionId)
       .eq('organisation_id', organisationId)
       .eq('worker_id', workerId)
+      .eq('sop_id', sopId)
       .maybeSingle()
     if (!completionRow) return { success: false, error: 'Completion not found.' }
   }
