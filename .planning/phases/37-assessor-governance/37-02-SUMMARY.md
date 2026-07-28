@@ -90,3 +90,12 @@ None - no external service configuration required.
 ---
 *Phase: 37-assessor-governance*
 *Completed: 2026-07-28*
+
+## Self-Check: PASSED
+
+- FOUND: src/lib/competency/assessor.ts
+- FOUND: src/lib/competency/__tests__/assessor.test.ts
+- FOUND: .planning/phases/37-assessor-governance/37-02-SUMMARY.md
+- FOUND commit: bc11dc0 (Task 1)
+- FOUND commit: 906bd58 (Task 2)
+- FOUND commit: 89e239b (SUMMARY.md)
