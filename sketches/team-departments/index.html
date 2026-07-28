@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SafeStart — Team & Departments (sketch)</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --brand-yellow:#fbbf24;
+    --steel-900:#0a0a0b; --steel-800:#141416; --steel-700:#1f1f22; --steel-600:#2a2a2e;
+    --paper:#fafafa; --paper-2:#f4f4f5;
+    --ink-900:#09090b; --ink-700:#3f3f46; --ink-500:#71717a; --ink-300:#d4d4d8; --ink-100:#e7e7ea;
+    --accent-mcu:#06b6d4; --accent-measure:#f97316; --accent-decision:#ec4899;
+    --accent-hazard:#ef4444; --accent-signoff:#fbbf24; --accent-step:#3b82f6; --accent-ok:#10b981;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{font-family:'JetBrains Mono',ui-monospace,monospace;background:var(--paper);color:var(--ink-900);-webkit-font-smoothing:antialiased}
+  .prose{font-family:'Inter',system-ui,sans-serif}
+  button{font-family:inherit;cursor:pointer}
+
+  .topbar{height:54px;background:var(--steel-900);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px;position:sticky;top:0;z-index:30;gap:16px}
+  .brand{display:flex;align-items:center;gap:9px}
+  .brand .dot{width:9px;height:9px;background:var(--brand-yellow);border-radius:1px}
+  .brand .wm{font-weight:600;font-size:13px}
+  .brand .crumb{font-size:11px;color:#a1a1aa;letter-spacing:.05em;text-transform:uppercase}
+  .org{font-size:11px;color:#d4d4d8;display:flex;align-items:center;gap:7px}
+  .org .badge{background:var(--steel-700);border:1px solid var(--steel-600);border-radius:3px;padding:3px 9px;letter-spacing:.04em}
+
+  .wrap{max-width:1040px;margin:0 auto;padding:26px 24px 60px}
+  .head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:6px}
+  h1{font-size:22px;font-weight:700;letter-spacing:-.01em}
+  .sub{font-size:12px;color:var(--ink-500);margin-top:4px;max-width:600px;line-height:1.5}
+  .newbtn{background:var(--ink-900);color:#fff;font-size:12px;font-weight:600;padding:11px 16px;border-radius:6px;border:none;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+  .newbtn:hover{background:var(--steel-800)}
+
+  .subnav{display:flex;gap:18px;border-bottom:1px solid var(--ink-100);margin:18px 0 18px;font-size:13px}
+  .subnav a{padding-bottom:11px;color:var(--ink-500);text-decoration:none;font-weight:500;border-bottom:2px solid transparent}
+  .subnav a.on{color:var(--ink-900);border-bottom-color:var(--ink-900)}
+
+  .deptrow{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+  .deptlbl{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-500);margin-right:4px}
+  .dept{display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border:1.5px solid var(--ink-300);background:var(--paper);border-radius:6px;font-size:12px;font-weight:500;color:var(--ink-500)}
+  .dept:hover{color:var(--ink-900);border-color:var(--ink-700)}
+  .dept.on{background:var(--ink-900);color:#fff;border-color:var(--ink-900)}
+  .dept .swatch{width:8px;height:8px;border-radius:2px}
+  .dept .cnt{font-size:10px;background:var(--paper-2);color:var(--ink-700);border-radius:10px;padding:1px 7px;font-weight:700}
+  .dept.on .cnt{background:var(--steel-700);color:#fff}
+
+  .ctxline{font-size:11px;color:var(--ink-500);margin:8px 0 16px;line-height:1.5}
+
+  .colhead{display:flex;align-items:center;gap:14px;padding:0 16px 8px;font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500)}
+  .colhead .c-id{flex:1;min-width:0}
+  .colhead .c-role{width:150px;flex:0 0 150px}
+  .colhead .c-dept{width:230px;flex:0 0 230px}
+  .colhead .c-act{width:70px;flex:0 0 70px}
+
+  .list{border:1.5px solid var(--ink-300);border-radius:8px;background:var(--paper)}
+  .row{display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:1px solid var(--ink-100);position:relative}
+  .row:last-child{border-bottom:none}
+  .row:hover{background:var(--paper-2)}
+  .person{flex:1;min-width:0;display:flex;align-items:center;gap:11px}
+  .av{width:34px;height:34px;border-radius:50%;background:var(--ink-900);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex:0 0 34px}
+  .pinfo{min-width:0}
+  .pname{font-size:13px;font-weight:600;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .pmail{font-size:11px;color:var(--ink-500);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ownbadge{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#a16207;background:rgba(251,191,36,.16);border:1px solid var(--accent-signoff);border-radius:3px;padding:1px 5px;display:inline-flex;align-items:center;gap:3px}
+
+  .c-role{width:150px;flex:0 0 150px}
+  .roleSel{width:100%;font-family:inherit;font-size:11px;font-weight:600;padding:7px 9px;border:1.5px solid var(--ink-300);border-radius:5px;background:var(--paper);color:var(--ink-900);outline:none}
+  .roleSel:focus{border-color:var(--accent-step)}
+
+  .c-dept{width:230px;flex:0 0 230px;display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+  .dchip{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--ink-700);background:var(--paper-2);border:1px solid var(--ink-300);border-radius:3px;padding:2px 7px}
+  .dchip .sw{width:7px;height:7px;border-radius:2px}
+  .dchip.add{color:var(--accent-step);border-style:dashed;border-color:var(--accent-step);background:rgba(59,130,246,.04);cursor:pointer}
+  .nodept{font-size:10px;color:var(--ink-500);font-style:italic}
+
+  .c-act{width:70px;flex:0 0 70px;text-align:right}
+  .kebab{color:var(--ink-500);font-size:16px;background:none;border:none;padding:4px 8px}
+  .kebab:hover{color:var(--ink-900)}
+
+  .pop{position:absolute;top:54px;right:90px;z-index:20;width:230px;background:var(--paper);border:1.5px solid var(--ink-900);border-radius:8px;box-shadow:0 12px 32px rgba(0,0,0,.16);overflow:hidden}
+  .pop .ph{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500);padding:10px 12px 8px;border-bottom:1px solid var(--ink-100)}
+  .opt{display:flex;align-items:center;gap:9px;padding:9px 12px;font-size:12px;color:var(--ink-700)}
+  .opt:hover{background:var(--paper-2)}
+  .opt .box{width:16px;height:16px;border:1.5px solid var(--ink-300);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff}
+  .opt.sel .box{background:var(--ink-900);border-color:var(--ink-900)}
+  .opt .sw{width:8px;height:8px;border-radius:2px}
+  .opt .ownset{margin-left:auto;font-size:8px;text-transform:uppercase;letter-spacing:.05em;color:#a16207;border:1px solid var(--accent-signoff);border-radius:3px;padding:1px 5px}
+  .pop .pf{border-top:1px solid var(--ink-100);padding:8px;display:flex;justify-content:flex-end}
+  .pop .pf button{font-size:11px;font-weight:600;background:var(--ink-900);color:#fff;border:none;border-radius:5px;padding:7px 12px}
+
+  .note{margin-top:22px;font-size:11px;color:var(--ink-500);border-left:2px solid var(--accent-ok);padding:10px 0 10px 14px;line-height:1.7;max-width:800px}
+  .note b{color:var(--accent-ok)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span><span class="wm">SafeStart</span><span class="crumb">/ Admin / Team</span></div>
+  <div class="org"><span>Organisation</span><span class="badge">Visy — Auckland</span></div>
+</div>
+
+<div class="wrap">
+  <div class="head">
+    <div>
+      <h1>Team</h1>
+      <p class="sub prose">Invite people, set their role, and place them in <b>one or more departments</b>. A person's departments decide which SOPs they see; a department <b>owner</b> is accountable for that department's procedures.</p>
+    </div>
+    <button class="newbtn">＋ Invite member</button>
+  </div>
+
+  <nav class="subnav">
+    <a href="#">SOPs</a>
+    <a href="#">Library</a>
+    <a href="#" class="on">Team</a>
+    <a href="#">Departments</a>
+  </nav>
+
+  <div class="deptrow" id="depts"><span class="deptlbl">Department</span></div>
+  <p class="ctxline" id="ctxline"></p>
+
+  <div class="colhead">
+    <span class="c-id">Member</span>
+    <span class="c-role">Role</span>
+    <span class="c-dept">Departments</span>
+    <span class="c-act"></span>
+  </div>
+  <div class="list" id="list"></div>
+
+  <p class="note"><b>People ↔ departments is many-to-many too.</b> Aroha works across Forming + Cleaning; tick both in the picker (shown open). The ★ <b>Owner</b> badge is set right here in the same picker — Bryce owns Forming, so he carries the badge and the Departments page stops flagging it. Roles (Worker / Supervisor / SOP Admin / Safety Manager) are orthogonal to departments — both gate SOP visibility.</p>
+</div>
+
+<script>
+  const DEPT = { Forming:{sw:'#f97316'}, Maintenance:{sw:'#3b82f6'}, Quality:{sw:'#06b6d4'}, Cleaning:{sw:'#10b981'} };
+  const DEPT_NAMES = Object.keys(DEPT);
+  const ROLES = ['Worker','Supervisor','SOP Admin','Safety Manager'];
+
+  // owns: dept name this member owns (or null)
+  const MEMBERS = [
+    {name:'Bryce Tan', mail:'bryce.tan@visy.co.nz', role:'SOP Admin', depts:['Forming','Maintenance'], owns:'Forming'},
+    {name:'Dane Wright', mail:'dane.wright@visy.co.nz', role:'Supervisor', depts:['Maintenance'], owns:'Maintenance'},
+    {name:'Priya Nair', mail:'priya.nair@visy.co.nz', role:'Safety Manager', depts:['Quality'], owns:'Quality'},
+    {name:'Aroha Ngata', mail:'aroha.ngata@visy.co.nz', role:'Worker', depts:['Forming','Cleaning'], owns:null, pickerOpen:true},
+    {name:'Sam Cole', mail:'sam.cole@visy.co.nz', role:'Worker', depts:['Forming'], owns:null},
+    {name:'Wiremu Park', mail:'wiremu.park@visy.co.nz', role:'Worker', depts:['Cleaning'], owns:null},
+  ];
+
+  const state = { dept:'all' };
+  const initials = n => n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const inDept = (m,d) => d==='all' ? true : m.depts.includes(d);
+  const countFor = d => MEMBERS.filter(m=>inDept(m,d)).length;
+
+  function renderDepts(){
+    const tabs = [{v:'all',label:'All'}, ...DEPT_NAMES.map(d=>({v:d,label:d,sw:DEPT[d].sw}))];
+    const el = document.getElementById('depts');
+    el.innerHTML = '<span class="deptlbl">Department</span>' + tabs.map(t=>`
+      <button class="dept ${state.dept===t.v?'on':''}" data-dept="${t.v}">
+        ${t.sw?`<span class="swatch" style="background:${t.sw}"></span>`:''}${t.label}<span class="cnt">${countFor(t.v)}</span>
+      </button>`).join('');
+    el.querySelectorAll('.dept').forEach(b=>b.addEventListener('click',()=>{ state.dept=b.dataset.dept; render(); }));
+    document.getElementById('ctxline').textContent = state.dept==='all'
+      ? 'Everyone in the organisation. A member in several departments appears under each.'
+      : `People assigned to ${state.dept}.`;
+  }
+
+  function dchip(d, owner){
+    return `<span class="dchip"><span class="sw" style="background:${DEPT[d].sw}"></span>${d}${owner===d?' ★':''}</span>`;
+  }
+  function picker(m){
+    return `<div class="pop"><div class="ph">Departments &amp; ownership</div>` +
+      DEPT_NAMES.map(d=>{
+        const sel = m.depts.includes(d);
+        const owns = m.owns===d;
+        return `<div class="opt ${sel?'sel':''}"><span class="box">${sel?'✓':''}</span>
+          <span class="sw" style="background:${DEPT[d].sw}"></span>${d}
+          ${sel?`<span class="ownset">${owns?'★ Owner':'Set owner'}</span>`:''}</div>`;
+      }).join('') +
+      `<div class="pf"><button>Done</button></div></div>`;
+  }
+
+  function render(){
+    renderDepts();
+    const data = MEMBERS.filter(m=>inDept(m,state.dept));
+    document.getElementById('list').innerHTML = data.map(m=>`
+      <div class="row">
+        <div class="person">
+          <div class="av">${initials(m.name)}</div>
+          <div class="pinfo">
+            <div class="pname">${m.name} ${m.owns?`<span class="ownbadge">★ Owns ${m.owns}</span>`:''}</div>
+            <div class="pmail">${m.mail}</div>
+          </div>
+        </div>
+        <div class="c-role">
+          <select class="roleSel">${ROLES.map(r=>`<option ${r===m.role?'selected':''}>${r}</option>`).join('')}</select>
+        </div>
+        <div class="c-dept">
+          ${m.depts.length ? m.depts.map(d=>dchip(d,m.owns)).join('') : '<span class="nodept">No department</span>'}
+          <span class="dchip add">＋</span>
+        </div>
+        <div class="c-act"><button class="kebab">⋯</button></div>
+        ${m.pickerOpen ? picker(m) : ''}
+      </div>`).join('');
+  }
+
+  render();
+</script>
+</body>
+</html>

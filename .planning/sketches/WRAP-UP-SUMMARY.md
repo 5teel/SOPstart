@@ -156,3 +156,77 @@ grouped structure + focus interaction + viz-as-library-filter
 SOPs with a live people blast-radius count. Strategy C (always-on bus routing)
 rejected. New cross-cutting rule captured: contextual banners live in
 permanently-reserved fixed-height slots so canvases never move on selection.
+
+---
+
+# Sketch Wrap-Up Summary — Session 3
+
+**Date:** 2026-07-28
+**Sketches processed:** 9 (3 included, 6 excluded)
+**Design areas:** 1 new (authoring & creation flow)
+**Skill output:** `./.claude/skills/sketch-findings-SOPstart/` (appended)
+
+All three `.planning/sketches/` numbered sketches (001–003) were already wrapped
+in session 2. This session covered the **root-level `sketches/` directory**, which
+had accumulated 9 unprocessed explorations — the previous wrap-ups had only ever
+processed `sketches/sop-blueprint/` from that location.
+
+## Included Sketches
+
+| Sketch | Variants | Design Area |
+|---|---|---|
+| `sketches/sop-builder-redesign` (885 lines) | 3 on-ramp flows, one shared builder | authoring-flow |
+| `sketches/unified-sop-surface` (376 lines) | Read / Walk / Edit modes, one URL | authoring-flow |
+| `sketches/admin-sop-new-wizard` (450 lines) | 4-step wizard, 5 on-ramps | authoring-flow |
+
+None carried a README — decisions were read from the markup, inline copy, and JS
+state machines. All three date from 2026-07-14 and are **untracked in git**.
+
+## Excluded Sketches
+
+Excluded because the design decision **already shipped** — the code is the source
+of truth and a second description in the skill would only drift. Marked processed
+so they never resurface in a future wrap-up.
+
+| Sketch | Shipped in | Note |
+|---|---|---|
+| `sketches/departments` | Phase 25 | single-concept mockup, no variants |
+| `sketches/team-departments` | Phase 25 | single-concept mockup |
+| `sketches/unified-block-library` | Phase 25 | m2m dept↔block library |
+| `sketches/access-hierarchy` | Phase 33 | winner A "Access map"; README has full A/B/C trade-off table + data-model implications — kept in place as historical record |
+| `sketches/builder-header-orientation` | Phase 33 | winner A "Wayfinder bar"; README has full A/B/C trade-off table — kept in place |
+| `sketches/supervisor-observations` | Phase 34 | single-concept mockup |
+
+## Design Direction
+
+Extends the paper/ink blueprint system into the **authoring** path — the one part
+of the product a safety manager uses most and the one the sketches judged most
+fragmented. The through-line across all three: **collapse surfaces rather than add
+them.** Five on-ramps become one wizard; four creation screens become one funnel;
+three URLs (read / walkthrough / builder) become three modes of one page; the
+block palette, outline panel, and field inspector collapse into the document
+itself.
+
+Introduces one new token — `--ai: #8b5cf6` (violet) — marking AI-generated and
+AI-suggested content wherever it appears.
+
+## Key Decisions
+
+- **Every on-ramp lands in the identical builder.** No per-method editor, no import-review screen distinct from the authoring screen.
+- **The canvas IS the worker document.** No block palette, no outline, no field rail — `contenteditable` on the same cards a worker reads, tools on hover only. The mobile preview proves the worker's view rather than authoring separately.
+- **Four-tier context-aware inserter**: smart-next prediction (`Tab`) → "fits here" per section → full catalog → department-scoped reuse library + multi-block snippets.
+- **Self-expiring AI ghosts.** Suppressed when the prediction already follows; only the viewport-nearest ghost is live; scrolled-past ghosts never return; `Tab` accepts and never opens a menu. The restraint rules *are* the design.
+- **Read / Walk / Edit are three modes of one URL**, sharing one DOM pane for read+edit so "you edit what the worker reads" is structurally true. Role gating **hides** the Edit control rather than disabling it.
+- **The agent-metadata layer is visible and toggleable** — SOP-level (summary, entities, hazard rollup, cross-SOP links, memory, agent proposals) plus a per-block machine-readable twin. Bet: inspectability makes AI behaviour auditable to the safety manager.
+- **Conversion provenance is per-block** (`✦ from source · page 1 ¶2`) and cleared block-by-block; no bulk verify.
+- **Placement (department / trade / site) is an authoring-time input**, feeding the Phase 32/33 access model, with site framed as an overlay on the org template.
+
+## Relationship to the Roadmap
+
+Wrapped the same day Phases 38/39 were deferred to backlog and v7.0 closed at
+Phase 37 — precisely because the SOP creation/conversion pipeline is still
+pre-alpha. This reference file is therefore the **design input for the next
+milestone**, and `references/authoring-flow.md` carries an explicit NOT-SHIPPED
+caveat plus a carried list of open questions (wizard default selection conflict,
+wizard length, agent-layer scope, section colour derivation, approval-chain
+placement, `--ai` accessibility pass) to resolve at spec time.

@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SafeStart — SOP Builder Redesign (sketch)</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --brand-yellow:#fbbf24;
+    --steel-900:#0a0a0b; --steel-800:#141416; --steel-700:#1f1f22;
+    --paper:#fafafa; --paper-2:#f4f4f5;
+    --ink-900:#09090b; --ink-700:#3f3f46; --ink-500:#71717a; --ink-300:#d4d4d8; --ink-100:#e7e7ea;
+    --accent-mcu:#06b6d4; --accent-measure:#f97316; --accent-decision:#ec4899;
+    --accent-hazard:#ef4444; --accent-signoff:#fbbf24; --accent-step:#3b82f6; --accent-ok:#10b981;
+    --ai:#8b5cf6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{font-family:'JetBrains Mono',ui-monospace,monospace;background:var(--paper);color:var(--ink-900);-webkit-font-smoothing:antialiased}
+  .prose{font-family:'Inter',system-ui,sans-serif}
+  button{font-family:inherit;cursor:pointer}
+
+  /* ---------- top chrome ---------- */
+  .topbar{height:54px;background:var(--steel-900);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px;position:sticky;top:0;z-index:40;gap:16px}
+  .brand{display:flex;align-items:center;gap:9px;min-width:0}
+  .brand .dot{width:9px;height:9px;background:var(--brand-yellow);border-radius:1px;flex:0 0 auto}
+  .brand .wm{font-weight:600;font-size:13px}
+  .brand .title{font-size:12px;color:#d4d4d8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}
+  .brand .title[contenteditable]{outline:none;border-bottom:1px dashed transparent;padding-bottom:1px}
+  .brand .title[contenteditable]:hover{border-bottom-color:#52525b}
+  .brand .title[contenteditable]:focus{border-bottom-color:var(--brand-yellow);color:#fff}
+  .brand .rev{font-size:9px;color:#a1a1aa;border:1px solid #3f3f46;border-radius:2px;padding:1px 6px;letter-spacing:.06em;flex:0 0 auto}
+  .brand .rev.live{color:var(--accent-ok);border-color:var(--accent-ok)}
+  .brand .rev.draft{color:var(--brand-yellow);border-color:#a16207}
+
+  /* stage stepper (Build → Review → Publish) */
+  .stages{display:flex;gap:4px}
+  .stages .st{font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:6px 13px;border:1px solid #3f3f46;border-radius:2px;color:#a1a1aa;background:transparent;display:flex;align-items:center;gap:6px}
+  .stages .st .n{opacity:.6}
+  .stages .st.on{background:var(--paper);color:var(--ink-900);border-color:var(--paper)}
+  .stages .st.done{color:var(--accent-ok);border-color:var(--accent-ok)}
+
+  .topright{display:flex;align-items:center;gap:10px}
+  .prevw{display:flex;border:1px solid #3f3f46;border-radius:2px;overflow:hidden}
+  .prevw button{font-size:10px;color:#a1a1aa;background:transparent;border:none;padding:6px 10px;text-transform:uppercase;letter-spacing:.05em}
+  .prevw button.on{background:var(--brand-yellow);color:#0a0a0b;font-weight:600}
+  .tbtn{font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;padding:8px 14px;border-radius:3px;border:1.5px solid #3f3f46;background:transparent;color:#e4e4e7}
+  .tbtn.cta{background:var(--accent-ok);border-color:var(--accent-ok);color:#fff}
+
+  /* ---------- sketch flow switcher (meta, not part of product) ---------- */
+  .flowsw{background:#18181b;border-bottom:1px solid #27272a;color:#a1a1aa;display:flex;align-items:center;gap:14px;padding:8px 18px;font-size:11px;position:sticky;top:54px;z-index:39}
+  .flowsw .lbl{text-transform:uppercase;letter-spacing:.1em;font-size:9px;color:#71717a}
+  .flowsw .seg{display:flex;gap:2px;background:#27272a;border-radius:4px;padding:3px}
+  .flowsw .seg button{font-size:11px;color:#a1a1aa;background:transparent;border:none;padding:6px 14px;border-radius:3px;letter-spacing:.03em}
+  .flowsw .seg button.on{background:var(--brand-yellow);color:#0a0a0b;font-weight:600}
+  .flowsw .note{margin-left:auto;color:#52525b;font-size:10px}
+
+  /* ---------- generic on-ramp canvas ---------- */
+  .onramp{max-width:860px;margin:0 auto;padding:46px 28px 80px}
+  .eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-500);margin-bottom:10px}
+  .h1{font-size:26px;font-weight:600;letter-spacing:-.01em;margin-bottom:8px}
+  .lead{font-size:13px;color:var(--ink-700);line-height:1.6;max-width:620px;margin-bottom:30px}
+  .screen{display:none}
+  .screen.show{display:block}
+
+  /* method tiles (new-from-scratch on-ramp) */
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .tile{text-align:left;border:1.5px solid var(--ink-300);background:var(--paper);border-radius:6px;padding:18px;display:flex;gap:14px;align-items:flex-start;transition:.12s;position:relative}
+  .tile:hover{border-color:var(--ink-900);box-shadow:0 4px 14px rgba(0,0,0,.05)}
+  .tile.sel{border-color:var(--accent-step);box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+  .tile.wide{grid-column:1 / -1}
+  .tile .ic{font-size:22px;flex:0 0 auto;line-height:1}
+  .tile h3{font-size:14px;font-weight:600;margin-bottom:5px;display:flex;align-items:center;gap:8px}
+  .tile p{font-size:12px;color:var(--ink-500);line-height:1.55;font-family:'Inter'}
+  .tile .fmt{display:block;margin-top:8px;font-size:10px;color:var(--ink-500);letter-spacing:.03em}
+  .pill{display:inline-flex;align-items:center;gap:4px;border:1px solid currentColor;padding:1px 7px;font-size:9px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;border-radius:2px}
+
+  .rampfoot{display:flex;justify-content:space-between;align-items:center;margin-top:26px}
+  .rampfoot .hint{font-size:11px;color:var(--ink-500);font-family:'Inter'}
+  .gbtn{font-size:12px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;padding:12px 22px;border-radius:4px;border:1.5px solid var(--ink-900);background:var(--ink-900);color:#fff}
+  .gbtn.ghost{background:var(--paper);color:var(--ink-700);border-color:var(--ink-300)}
+
+  /* upload dropzone (convert on-ramp) */
+  .drop{border:2px dashed var(--ink-300);border-radius:8px;background:var(--paper-2);padding:54px 30px;text-align:center}
+  .drop .big{font-size:38px;margin-bottom:14px}
+  .drop h3{font-size:16px;font-weight:600;margin-bottom:6px}
+  .drop p{font-size:12px;color:var(--ink-500);font-family:'Inter';margin-bottom:18px}
+  .drop .fmt{font-size:10px;color:var(--ink-500);letter-spacing:.04em;margin-top:16px}
+  .parsing{text-align:center;padding:60px 20px}
+  .parsing .spin{width:44px;height:44px;border:3px solid var(--ink-300);border-top-color:var(--ai);border-radius:50%;margin:0 auto 20px;animation:sp 1s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .parsing h3{font-size:16px;font-weight:600;margin-bottom:6px}
+  .parsing p{font-size:12px;color:var(--ink-500);font-family:'Inter'}
+  .plist{max-width:340px;margin:22px auto 0;text-align:left;font-size:12px}
+  .plist .pl{display:flex;align-items:center;gap:10px;padding:6px 0;color:var(--ink-500)}
+  .plist .pl.ok{color:var(--ink-900)}
+  .plist .pl .m{width:16px}
+
+  /* ============ THE BUILDER (shared by all 3 flows) ============ */
+  #builder{display:none}
+  #builder.show{display:block}
+  .body{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 54px - 39px)}
+
+  /* section rail — the ONLY chrome panel. no puck palette, no outline, no field rail */
+  .rail{border-right:1px solid var(--ink-300);background:var(--paper-2);padding:16px 12px;font-size:12px}
+  .rail .rh{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-500);margin:2px 4px 10px}
+  .rail .item{display:flex;align-items:center;gap:9px;padding:9px 8px;border-radius:3px;color:var(--ink-700);cursor:pointer}
+  .rail .item:hover{background:var(--paper)}
+  .rail .item.cur{background:var(--ink-900);color:#fff}
+  .rail .item .mk{width:8px;height:8px;border-radius:2px;flex:0 0 8px}
+  .rail .item .ct{margin-left:auto;font-size:9px;color:var(--ink-500)}
+  .rail .item.cur .ct{color:#a1a1aa}
+  .rail .add{margin-top:10px;width:100%;font-size:10px;color:var(--accent-step);border:1px dashed var(--accent-step);border-radius:3px;padding:9px;text-transform:uppercase;letter-spacing:.05em;background:rgba(59,130,246,.04)}
+  .rail .tip{margin-top:18px;padding:10px;border-left:2px solid var(--ink-300);font-size:10px;color:var(--ink-500);line-height:1.6;font-family:'Inter'}
+
+  /* main = grid-paper canvas rendering the REAL worker document, editable inline */
+  .canvas{
+    background-color:var(--paper);
+    background-image:linear-gradient(to right,rgba(0,0,0,.028) 1px,transparent 1px),linear-gradient(to bottom,rgba(0,0,0,.028) 1px,transparent 1px);
+    background-size:20px 20px;padding:26px 30px 90px;overflow-x:hidden;
+  }
+  .doc{max-width:680px;margin:0 auto}
+  .whoedit{font-size:11px;color:var(--ink-500);font-family:'Inter';background:var(--paper-2);border:1px solid var(--ink-100);border-radius:4px;padding:8px 12px;margin-bottom:22px;display:flex;align-items:center;gap:8px}
+  .whoedit b{color:var(--ink-900)}
+
+  .sec{margin-bottom:30px}
+  .sec-h{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .sec-h .n{font-size:10px;color:var(--ink-500);letter-spacing:.08em}
+  .sec-h h2{font-size:15px;font-weight:600;letter-spacing:.01em}
+  .sec-h h2[contenteditable]{outline:none;border-radius:2px;padding:0 3px}
+  .sec-h h2[contenteditable]:hover{background:rgba(59,130,246,.06)}
+  .sec-h h2[contenteditable]:focus{background:rgba(59,130,246,.1);box-shadow:0 0 0 2px rgba(59,130,246,.25)}
+  .sec-h .line{flex:1;height:1px;background:var(--ink-300)}
+
+  /* a block: the worker-facing card, WITH inline edit affordances on hover */
+  .blk{position:relative;border:1.5px solid var(--ink-300);background:var(--paper);border-radius:5px;padding:15px 16px 15px 16px;margin-bottom:10px;transition:.1s}
+  .blk:hover{border-color:var(--accent-step);box-shadow:0 0 0 3px rgba(59,130,246,.09)}
+  .blk .grip{position:absolute;left:-22px;top:50%;transform:translateY(-50%);color:var(--ink-300);font-size:15px;opacity:0;cursor:grab;transition:.1s}
+  .blk:hover .grip{opacity:1}
+  .blk .bh{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;padding-bottom:7px;border-bottom:1px solid var(--ink-100)}
+  .blk .ty{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500);display:flex;align-items:center;gap:6px}
+  .blk .tools{display:flex;gap:4px;opacity:0;transition:.1s}
+  .blk:hover .tools{opacity:1}
+  .blk .tools button{font-size:11px;border:1px solid var(--ink-300);background:var(--paper);color:var(--ink-500);border-radius:3px;width:24px;height:24px;line-height:1}
+  .blk .tools button:hover{border-color:var(--ink-900);color:var(--ink-900)}
+  .blk .bd{font-size:13px;line-height:1.6;color:var(--ink-700)}
+  .blk .bd[contenteditable]{outline:none;border-radius:3px;padding:2px 4px;margin:-2px -4px}
+  .blk .bd[contenteditable]:hover{background:rgba(59,130,246,.05)}
+  .blk .bd[contenteditable]:focus{background:rgba(59,130,246,.09);box-shadow:0 0 0 2px rgba(59,130,246,.22)}
+
+  /* semantic block variants — identical to worker render */
+  .blk.hazard{border-color:var(--accent-hazard);background:rgba(239,68,68,.04)}
+  .blk.hazard .ty{color:var(--accent-hazard)}
+  .blk.measure{border-color:var(--accent-measure);background:rgba(249,115,22,.04)}
+  .blk.measure .ty{color:var(--accent-measure)}
+  .blk.decision{border-color:var(--accent-decision);background:rgba(236,72,153,.04)}
+  .blk.decision .ty{color:var(--accent-decision)}
+  .blk.signoff{border-color:var(--accent-signoff);background:rgba(251,191,36,.06)}
+  .blk.signoff .ty{color:#a16207}
+
+  /* step block has a number chip */
+  .step{display:flex;gap:13px;align-items:flex-start}
+  .step .sn{width:28px;height:28px;flex:0 0 28px;border-radius:4px;background:var(--accent-step);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;margin-top:1px}
+  .step .stxt{flex:1}
+  .step .stxt .sub{display:block;color:var(--ink-500);font-size:11px;margin-top:5px}
+
+  .mbox{display:flex;align-items:center;gap:10px;margin-top:10px}
+  .mbox input{flex:1;font-family:'JetBrains Mono';font-size:18px;font-weight:500;border:1.5px solid var(--accent-measure);background:rgba(249,115,22,.05);border-radius:4px;padding:8px 12px;color:var(--ink-900);outline:none}
+  .mbox .unit{font-size:13px;color:var(--accent-measure);font-weight:600}
+
+  .dbtns{display:flex;gap:10px;margin-top:12px}
+  .dbtns .db{flex:1;border:1.5px solid var(--accent-decision);color:var(--accent-decision);background:rgba(236,72,153,.05);border-radius:4px;padding:9px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;text-align:center}
+
+  /* Visual block — mixed media, each item tagged by medium */
+  .blk.visual{border-color:var(--accent-mcu);background:rgba(6,182,212,.03)}
+  .blk.visual .ty{color:var(--accent-mcu)}
+  .vmedia{display:grid;grid-template-columns:repeat(3,1fr) auto;gap:10px}
+  .vitem{border:1.5px solid var(--ink-300);border-radius:5px;background:var(--paper);min-height:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:10px;text-align:center;position:relative}
+  .vitem .vic{font-size:20px}
+  .vitem .vlb{font-size:11px;color:var(--ink-700);font-family:'Inter'}
+  .vitem .vtag{font-size:8px;letter-spacing:.04em;color:#fff;border-radius:2px;padding:1px 5px}
+  .vitem.photo{border-color:var(--accent-mcu)} .vitem.photo .vtag{background:var(--accent-mcu)}
+  .vitem.diagram{border-color:var(--accent-step)} .vitem.diagram .vtag{background:var(--accent-step)}
+  .vitem.video{border-color:var(--accent-decision)} .vitem.video .vtag{background:var(--accent-decision)}
+  .vadd{border:1.5px dashed var(--accent-mcu);color:var(--accent-mcu);border-radius:5px;min-height:78px;display:flex;align-items:center;justify-content:center;padding:0 14px;font-size:10px;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;background:rgba(6,182,212,.04)}
+
+  /* ===== the human-invisible AGENT metadata layer ===== */
+  .ameta,.agentpanel{display:none}
+  body.agentview .ameta,body.agentview .agentpanel{display:block}
+  body.agentview .whoedit{display:none}
+  /* per-block metadata twin */
+  .ameta{margin-top:12px;border-top:1px dashed var(--ai);padding-top:9px;font-family:'JetBrains Mono';font-size:10px;color:var(--ink-700);background:rgba(139,92,246,.035);border-radius:0 0 4px 4px;margin-left:-16px;margin-right:-16px;padding:9px 16px 4px}
+  .ameta .mrow{display:flex;gap:8px;padding:2px 0;line-height:1.5}
+  .ameta .mk{color:var(--ai);flex:0 0 84px;text-transform:uppercase;letter-spacing:.04em;font-size:9px;padding-top:1px}
+  .ameta .mv{color:var(--ink-700);flex:1}
+  .ameta .chip{display:inline-block;border:1px solid var(--ink-300);border-radius:2px;padding:0 5px;margin:1px 3px 1px 0;color:var(--ink-500);font-size:9px}
+  .ameta .link{color:var(--accent-step)}
+  .ameta .edit{color:var(--ai)}
+  .ameta .ok{color:var(--accent-ok)}
+  /* SOP-level agent panel at top of canvas */
+  .agentpanel{border:1.5px solid var(--ai);background:rgba(139,92,246,.05);border-radius:7px;padding:15px 17px;margin-bottom:22px;font-family:'JetBrains Mono';font-size:11px}
+  .agentpanel h4{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ai);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .agentpanel h4 .tag{margin-left:auto;font-size:8px;border:1px solid var(--ai);border-radius:2px;padding:1px 6px;color:var(--ai)}
+  .agentpanel .arow{display:flex;gap:10px;padding:4px 0;border-top:1px solid rgba(139,92,246,.15);line-height:1.55}
+  .agentpanel .ak{color:var(--ai);flex:0 0 108px;text-transform:uppercase;font-size:9px;letter-spacing:.04em;padding-top:1px}
+  .agentpanel .av{flex:1;color:var(--ink-700)}
+  .agentpanel .av .link{color:var(--accent-step)}
+  .agentpanel .av .prop{color:var(--ai)}
+  .agentbanner{display:none}
+  body.agentview .agentbanner{display:flex;align-items:center;gap:8px;background:var(--ai);color:#fff;font-size:11px;padding:8px 18px;position:sticky;top:93px;z-index:19}
+  #agentBtn.on{background:var(--ai);border-color:var(--ai);color:#fff}
+
+  /* AI-verify chip — only shows in the CONVERT flow */
+  .verify{display:inline-flex;align-items:center;gap:5px;font-size:9px;text-transform:uppercase;letter-spacing:.05em;font-weight:600;border-radius:2px;padding:2px 8px;border:1px solid var(--ai);color:var(--ai);background:rgba(139,92,246,.06);cursor:pointer}
+  .verify.done{border-color:var(--accent-ok);color:var(--accent-ok);background:rgba(16,185,129,.08)}
+  body:not(.convert) .verify{display:none}
+
+  /* provenance line (convert) */
+  .prov{font-size:10px;color:var(--ai);font-family:'Inter';margin-top:8px;display:none;align-items:center;gap:6px}
+  body.convert .prov{display:flex}
+
+  /* the inline ADD affordance — replaces Puck palette entirely */
+  .adddiv{position:relative;height:20px;margin:2px 0}
+  .adddiv .rule{position:absolute;top:50%;left:0;right:0;height:1px;background:transparent}
+  .adddiv .plus{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--accent-step);background:var(--paper);border:1px dashed var(--accent-step);border-radius:20px;padding:3px 12px;opacity:0;transition:.1s;white-space:nowrap}
+  .adddiv:hover .rule{background:rgba(59,130,246,.3)}
+  .adddiv:hover .plus{opacity:1}
+  .addbig{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:1.5px dashed var(--accent-step);background:rgba(59,130,246,.04);color:var(--accent-step);border-radius:5px;padding:13px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-top:4px}
+
+  /* ===== paged command-menu inserter ===== */
+  .picker{position:fixed;z-index:60;background:var(--paper);border:1.5px solid var(--ink-900);border-radius:10px;box-shadow:0 18px 50px rgba(0,0,0,.24);width:320px;padding:0;display:none;overflow:hidden}
+  .picker.show{display:block}
+  /* header row: back + title + context */
+  .pk-head{display:flex;align-items:center;gap:8px;padding:11px 12px 9px;border-bottom:1px solid var(--ink-100)}
+  .pk-back{border:none;background:transparent;color:var(--ink-500);font-size:15px;padding:0 2px;display:none}
+  .pk-back:hover{color:var(--ink-900)}
+  .pk-title{font-size:12px;font-weight:600}
+  .pk-where{margin-left:auto;font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-500)}
+  .pk-where b{color:var(--ink-900)}
+  /* search */
+  .pk-search{padding:8px 10px 4px}
+  .pk-search input{width:100%;font-family:'JetBrains Mono';font-size:12px;border:1.5px solid var(--ink-300);border-radius:6px;padding:8px 10px;outline:none;color:var(--ink-900)}
+  .pk-search input:focus{border-color:var(--accent-step)}
+  .pk-list{max-height:340px;overflow:auto;padding:4px 0 6px}
+  .pk-grp{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-500);padding:9px 12px 3px}
+  .pk-sep{height:1px;background:var(--ink-100);margin:7px 12px}
+  /* a row */
+  .picker .opt{display:flex;align-items:center;gap:11px;padding:9px 12px;cursor:pointer;border-left:2px solid transparent}
+  .picker .opt:hover,.picker .opt.hi{background:var(--paper-2);border-left-color:var(--accent-step)}
+  .picker .opt .sw{width:9px;height:9px;border-radius:2px;flex:0 0 9px}
+  .picker .opt .nm{font-size:12px;font-weight:500}
+  .picker .opt .de{font-size:10px;color:var(--ink-500);font-family:'Inter';margin-left:auto;text-align:right;white-space:nowrap}
+  .picker .opt .go{margin-left:auto;color:var(--ink-300);font-size:14px}
+  .picker .opt:hover .go{color:var(--ink-900)}
+  /* smart row */
+  .picker .opt.smart{background:rgba(139,92,246,.07);border-left-color:var(--ai);margin:4px 0}
+  .picker .opt.smart.hi{background:rgba(139,92,246,.13)}
+  .picker .opt.smart .nm{color:var(--ai)}
+  .picker .opt.smart .k{margin-left:auto;font-size:9px;color:#fff;background:var(--ai);border-radius:3px;padding:2px 6px;font-family:'JetBrains Mono'}
+  .picker .opt.nav .ic{width:14px;text-align:center;color:var(--ink-500)}
+  .picker .opt.lib .sw{border-radius:50%}
+  .picker .opt.snip .sw{border-radius:2px;border:1px dashed currentColor;background:transparent!important}
+  .picker .opt .badge{font-size:8px;border:1px solid var(--ink-300);border-radius:2px;padding:0 4px;color:var(--ink-500);margin-left:6px;letter-spacing:.04em}
+  /* scope toggle inside library page */
+  .pk-scope{display:flex;gap:2px;background:var(--paper-2);border-radius:5px;padding:3px;margin:6px 12px 2px}
+  .pk-scope button{flex:1;font-size:10px;border:none;background:transparent;color:var(--ink-500);padding:6px;border-radius:3px;letter-spacing:.03em}
+  .pk-scope button.on{background:var(--paper);color:var(--ink-900);font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+  .pk-foot{border-top:1px solid var(--ink-100);padding:8px 12px;font-size:10px;color:var(--ink-500);font-family:'Inter';display:flex;gap:12px;align-items:center}
+  .pk-foot kbd{font-family:'JetBrains Mono';font-size:9px;border:1px solid var(--ink-300);border-radius:3px;padding:0 4px;color:var(--ink-700)}
+
+  /* inline "ghost" smart suggestion at the insertion point (aggressive path) */
+  .ghost{display:flex;align-items:center;gap:9px;border:1px dashed var(--ai);background:rgba(139,92,246,.06);color:var(--ai);border-radius:6px;padding:9px 12px;margin:2px 0 10px;font-size:11px;font-family:'Inter';cursor:pointer;transition:opacity .16s ease, background .12s}
+  .ghost:hover{background:rgba(139,92,246,.12)}
+  .ghost.dim{opacity:.3}                 /* not the one near your view */
+  .ghost.dim:hover{opacity:1}
+  .ghost .kb{font-family:'JetBrains Mono';font-size:9px;background:var(--ai);color:#fff;border-radius:3px;padding:2px 6px;text-transform:uppercase;letter-spacing:.05em}
+  .ghost .muted{color:var(--ink-500);margin-left:auto;font-size:10px}
+  .ghost.gone{display:none}
+
+  /* clickable inline meta bits on blocks (severity pill / photo toggle / tolerance) */
+  .sevpill{font-size:9px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;border:1px solid currentColor;border-radius:2px;padding:1px 7px;cursor:pointer}
+  .toggle{font-size:11px;color:var(--ink-500);cursor:pointer;border:1px dashed var(--ink-300);border-radius:3px;padding:1px 7px;display:inline-flex;gap:5px;align-items:center}
+  .toggle.on{color:var(--accent-ok);border-style:solid;border-color:var(--accent-ok);background:rgba(16,185,129,.07)}
+  .tol{color:var(--accent-measure);border-bottom:1px dashed var(--accent-measure);outline:none;cursor:text}
+
+  /* empty-state for blank canvas (new from scratch) */
+  .empty{border:1.5px dashed var(--ink-300);border-radius:6px;padding:34px;text-align:center;color:var(--ink-500);font-family:'Inter'}
+  .empty h3{font-family:'JetBrains Mono';font-size:14px;color:var(--ink-900);margin-bottom:6px}
+  .empty p{font-size:12px;line-height:1.6;max-width:360px;margin:0 auto 16px}
+
+  /* mobile preview frame */
+  .phone{max-width:390px;margin:0 auto;border:10px solid var(--steel-900);border-radius:34px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.22)}
+  .phone .pcanvas{background:var(--paper);padding:16px 14px 30px;min-height:520px}
+  body.phoneview .rail{display:none}
+  body.phoneview .doc{max-width:100%}
+  body:not(.phoneview) .phonewrap{display:none}
+  body.phoneview .canvas .doc.deskdoc{display:none}
+
+  .footnote{max-width:680px;margin:26px auto 0;font-size:11px;color:var(--ink-500);border-left:2px solid var(--accent-ok);padding:10px 0 10px 14px;line-height:1.7;font-family:'Inter'}
+  .footnote b{color:var(--accent-ok)}
+
+  @media(max-width:860px){
+    .tiles{grid-template-columns:1fr}
+    .body{grid-template-columns:1fr}
+    .rail{display:none}
+    .stages{display:none}
+  }
+</style>
+</head>
+<body class="edit">
+
+<!-- ===== TOP CHROME ===== -->
+<div class="topbar">
+  <div class="brand">
+    <span class="dot"></span><span class="wm">SafeStart</span>
+    <span class="title" id="sopTitle" contenteditable="true" spellcheck="false">Blank Side Hanger Change</span>
+    <span class="rev" id="revBadge">REV 14 · DRAFT</span>
+  </div>
+
+  <div class="stages" id="stages">
+    <span class="st on"><span class="n">1</span> Build</span>
+    <span class="st"><span class="n">2</span> Review</span>
+    <span class="st"><span class="n">3</span> Publish</span>
+  </div>
+
+  <div class="topright">
+    <div class="prevw">
+      <button id="pvDesk" class="on" onclick="setPreview('desk')">Desktop</button>
+      <button id="pvMob" onclick="setPreview('mob')">Mobile</button>
+    </div>
+    <button class="tbtn" id="agentBtn" onclick="toggleAgent()" title="Reveal the invisible layer agents read &amp; write">⚇ Agent layer</button>
+    <button class="tbtn cta" onclick="alert('→ advances to Review stage')">Continue → Review</button>
+  </div>
+</div>
+
+<!-- ===== SKETCH FLOW SWITCHER (meta) ===== -->
+<div class="flowsw">
+  <span class="lbl">Sketch · flow</span>
+  <div class="seg" id="flowseg">
+    <button data-flow="new" onclick="setFlow('new')">① New from scratch</button>
+    <button data-flow="convert" onclick="setFlow('convert')">② Convert a document</button>
+    <button data-flow="edit" class="on" onclick="setFlow('edit')">③ Edit existing</button>
+  </div>
+  <span class="note">All three on-ramps land in the identical inline builder →</span>
+</div>
+
+<!-- ================= ON-RAMP: NEW FROM SCRATCH ================= -->
+<div class="onramp" id="ramp-new" style="display:none">
+  <!-- method pick -->
+  <section class="screen show" id="new-method">
+    <div class="eyebrow">New SOP · step 1 of 2</div>
+    <h1 class="h1">How do you want to start?</h1>
+    <p class="lead prose">Every path lands in the same builder — this just picks the fastest on-ramp. You can restructure anything once you're in.</p>
+    <div class="tiles">
+      <button class="tile sel" data-m="template">
+        <span class="ic">▤</span>
+        <span><h3>Start from a template <span class="pill" style="color:var(--accent-step)">Standardise</span></h3>
+        <p>A pre-structured skeleton (Purpose · Hazards · Steps · Sign-off) so every SOP has the same shape. Recommended.</p></span>
+      </button>
+      <button class="tile" data-m="ai">
+        <span class="ic">✦</span>
+        <span><h3>Draft with AI</h3><p>Describe the procedure in plain words; AI writes a structured first version you refine.</p></span>
+      </button>
+      <button class="tile" data-m="blank">
+        <span class="ic">▢</span>
+        <span><h3>Blank canvas</h3><p>Author from nothing. Full control, more work.</p></span>
+      </button>
+      <button class="tile" data-m="convert" onclick="setFlow('convert')">
+        <span class="ic">📄</span>
+        <span><h3>I already have a document</h3><p>Switch to convert — upload a Word/PDF/photo and AI extracts it.</p></span>
+      </button>
+    </div>
+    <div class="rampfoot">
+      <span class="hint prose">Picked: <b>Start from a template</b></span>
+      <button class="gbtn" onclick="showScreen('new-tmpl')">Next: choose template →</button>
+    </div>
+  </section>
+
+  <!-- template pick -->
+  <section class="screen" id="new-tmpl">
+    <div class="eyebrow">New SOP · step 2 of 2</div>
+    <h1 class="h1">Pick a shape</h1>
+    <p class="lead prose">The skeleton drops empty sections into the builder. You fill the steps — hazards and sign-off are already positioned where workers expect them.</p>
+    <div class="tiles">
+      <button class="tile wide sel" data-t="general">
+        <span class="ic">▤</span>
+        <span><h3>General Procedure <span class="pill" style="color:var(--accent-ok)">Most used</span></h3>
+        <p>Purpose &amp; scope · Hazards &amp; PPE · Procedure steps · Sign-off. Works for almost anything.</p></span>
+      </button>
+      <button class="tile" data-t="machine"><span class="ic">⚙</span><span><h3>Machine Operation</h3><p>Hazards &amp; LOTO · Pre-start · Operating steps · Measurements.</p></span></button>
+      <button class="tile" data-t="loto"><span class="ic">🔒</span><span><h3>Maintenance / LOTO</h3><p>Energy isolation · Lockout · Verify zero · Permit sign-off.</p></span></button>
+    </div>
+    <div class="rampfoot">
+      <button class="gbtn ghost" onclick="showScreen('new-method')">← Back</button>
+      <button class="gbtn" onclick="openBuilder('new')">Create &amp; open builder →</button>
+    </div>
+  </section>
+</div>
+
+<!-- ================= ON-RAMP: CONVERT A DOCUMENT ================= -->
+<div class="onramp" id="ramp-convert" style="display:none">
+  <section class="screen show" id="conv-drop">
+    <div class="eyebrow">Convert · step 1 of 2</div>
+    <h1 class="h1">Drop in the SOP you already have</h1>
+    <p class="lead prose">AI reads the document, extracts the sections, steps, hazards and measurements, and drops them straight into the builder — flagged for you to verify. Nothing is published until you confirm it.</p>
+    <div class="drop">
+      <div class="big">📄</div>
+      <h3>Drag a file here, or click to browse</h3>
+      <p class="prose">Word, PDF, Excel, PowerPoint, or a photo / scan of a printed SOP.</p>
+      <button class="gbtn" onclick="showScreen('conv-parse');setTimeout(()=>openBuilder('convert'),2400)">Choose file → (demo)</button>
+      <div class="fmt">.docx · .pdf · .xlsx · .pptx · .jpg / .png / scan</div>
+    </div>
+    <div class="rampfoot">
+      <span class="hint prose">Most teams start here — standardise what you already have.</span>
+      <button class="gbtn ghost" onclick="setFlow('new')">Rather start fresh? →</button>
+    </div>
+  </section>
+
+  <section class="screen" id="conv-parse">
+    <div class="parsing">
+      <div class="spin"></div>
+      <h3>Reading “EN-FOR-03-042.docx”…</h3>
+      <p class="prose">AI is extracting structure. This usually takes 30–90 seconds for a real document.</p>
+      <div class="plist">
+        <div class="pl ok"><span class="m">✓</span> Split into 4 sections</div>
+        <div class="pl ok"><span class="m">✓</span> Found 4 procedure steps</div>
+        <div class="pl ok"><span class="m">✓</span> Detected 1 hazard · 1 measurement</div>
+        <div class="pl"><span class="m">◷</span> Matching photos to steps…</div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ================= THE BUILDER (shared) ================= -->
+<div id="builder">
+  <div class="agentbanner">⚇ <b>Agent layer visible</b> — this metadata never renders for workers. Agents read, write &amp; reason from it (context · memory · learning · review).</div>
+  <div class="body">
+    <!-- section rail: the ONLY panel -->
+    <aside class="rail">
+      <div class="rh">Sections</div>
+      <div class="item cur"><span class="mk" style="background:var(--ink-500)"></span> Purpose &amp; scope <span class="ct">1</span></div>
+      <div class="item"><span class="mk" style="background:var(--accent-hazard)"></span> Hazards &amp; PPE <span class="ct">1</span></div>
+      <div class="item"><span class="mk" style="background:var(--accent-step)"></span> Procedure steps <span class="ct">6</span></div>
+      <div class="item"><span class="mk" style="background:var(--accent-signoff)"></span> Sign-off <span class="ct">1</span></div>
+      <button class="add">＋ Add section</button>
+      <div class="tip">Drag a section to reorder. Everything you edit here is <b>exactly</b> what a worker reads.</div>
+    </aside>
+
+    <!-- canvas: the real worker document, editable inline -->
+    <main class="canvas">
+      <!-- desktop doc -->
+      <div class="doc deskdoc" id="deskdoc">
+        <div class="whoedit prose">✎ You're editing the live worker document. <b>Click any text to change it. Hover a block for its tools. Use ＋ to add.</b></div>
+
+        <!-- SOP-level agent metadata (invisible to workers; toggled by ⚇ Agent layer) -->
+        <div class="agentpanel">
+          <h4>⚇ Agent layer · sop_88 <span class="tag">machine-readable · not shown to workers</span></h4>
+          <div class="arow"><span class="ak">Summary</span><span class="av">End-of-shift blank-side-hanger swap on IS forming line; LOTO-gated; one tolerance check (8.0–8.4 mm); operator + supervisor sign-off. <span class="prop">↻ regenerated by agent 2026-06-30</span></span></div>
+          <div class="arow"><span class="ak">Entities</span><span class="av">IS forming machine · blank side hanger · Auckland glass line · 600°C · 8.0–8.4 mm · LOTO</span></div>
+          <div class="arow"><span class="ak">Hazard rollup</span><span class="av">molten-glass:critical · hot-surface · moving-machinery</span></div>
+          <div class="arow"><span class="ak">Cross-SOP</span><span class="av">shares <span class="link">block_lib/loto-verify-zero</span> with 23 SOPs · same line as <span class="link">sop_142</span>, <span class="link">sop_201</span> · supersedes <span class="link">sop_88@rev13</span></span></div>
+          <div class="arow"><span class="ak">Memory</span><span class="av">3 worker voice-Q&amp;A hits on “torque spec” (Q2) · 2 near-misses logged at step 2 · last agent edit: tightened hazard wording</span></div>
+          <div class="arow"><span class="ak">Learning</span><span class="av"><span class="prop">agent proposal:</span> workers keep asking torque value → suggest adding a Measurement after step 3 <span class="prop">[review ▸]</span></span></div>
+          <div class="arow"><span class="ak">Review</span><span class="av">AI-reviewed ✓ (0 open flags) · human-verified ✓ · embeddings: 6/6 blocks indexed</span></div>
+        </div>
+
+        <!-- SECTION: purpose -->
+        <div class="sec">
+          <div class="sec-h"><span class="n">01</span><h2 contenteditable spellcheck="false">Purpose &amp; scope</h2><span class="line"></span></div>
+          <div class="adddiv"><div class="rule"></div><span class="plus" onclick="openPicker(event,'purpose')">＋ insert block</span></div>
+          <div class="blk">
+            <span class="grip">⠿</span>
+            <div class="bh"><span class="ty">Text</span><span class="tools"><button title="duplicate">⧉</button><button title="delete">🗑</button></span></div>
+            <div class="bd prose" contenteditable spellcheck="false">Replace the blank side hanger on the IS glass-forming machine at end of shift. Applies to forming operators on the Auckland glass line.</div>
+            <div class="prov">✦ from source · page 1 ¶2 <span class="verify" onclick="toggleVerify(this)">✦ tap to verify</span></div>
+          </div>
+        </div>
+
+        <!-- SECTION: hazards -->
+        <div class="sec">
+          <div class="sec-h"><span class="n">02</span><h2 contenteditable spellcheck="false">Hazards &amp; PPE</h2><span class="line"></span></div>
+          <div class="adddiv"><div class="rule"></div><span class="plus" onclick="openPicker(event,'hazards')">＋ insert block</span></div>
+          <div class="blk hazard">
+            <span class="grip">⠿</span>
+            <div class="bh"><span class="ty">⚠ Hazard · acknowledge required <span class="sevpill" data-i="0" style="color:var(--accent-hazard)" onclick="cycleSev(this)" title="click to change severity">Critical</span></span><span class="tools"><button>⧉</button><button>🗑</button></span></div>
+            <div class="bd prose" contenteditable spellcheck="false">Molten glass &amp; hot surfaces (&gt;600°C). Machine must be isolated (LOTO) before reaching into the forming zone. Heat-resistant gloves + face shield mandatory.</div>
+            <div class="prov">✦ from source · page 1 “Safety” <span class="verify" onclick="toggleVerify(this)">✦ tap to verify</span></div>
+          </div>
+        </div>
+
+        <!-- SECTION: steps -->
+        <div class="sec">
+          <div class="sec-h"><span class="n">03</span><h2 contenteditable spellcheck="false">Procedure steps</h2><span class="line"></span></div>
+          <div class="adddiv"><div class="rule"></div><span class="plus" onclick="openPicker(event,'steps')">＋ insert block</span></div>
+
+          <div class="blk step">
+            <span class="grip">⠿</span>
+            <div class="sn">1</div>
+            <div class="stxt"><div class="bd prose" contenteditable spellcheck="false">Isolate the machine and apply your lock.</div><span class="sub">LOTO · verify zero energy at the panel</span></div>
+            <span class="tools"><button>⧉</button><button>🗑</button></span>
+          </div>
+          <div class="adddiv"><div class="rule"></div><span class="plus" onclick="openPicker(event,'steps','step')">＋</span></div>
+
+          <div class="blk step">
+            <span class="grip">⠿</span>
+            <div class="sn">2</div>
+            <div class="stxt"><div class="bd prose" contenteditable spellcheck="false">Remove the worn blank side hanger.</div><span class="sub"><span class="toggle on" onclick="togglePhoto(this)">📷 Photo required ✓</span> — show the removed part</span></div>
+            <span class="tools"><button>⧉</button><button>🗑</button></span>
+          </div>
+          <div class="adddiv"><div class="rule"></div><span class="plus" onclick="openPicker(event,'steps','step')">＋</span></div>
+
+          <div class="blk measure">
+            <span class="grip">⠿</span>
+            <div class="bh"><span class="ty">◷ Measurement · tolerance <span class="tol" contenteditable spellcheck="false">8.0–8.4</span> mm</span><span class="tools"><button>⧉</button><button>🗑</button></span></div>
+            <div class="bd prose" contenteditable spellcheck="false">Confirm hanger gap is in tolerance before restart.</div>
+            <div class="mbox"><input value="8.2" /><span class="unit">mm</span></div>
+            <div class="prov">✦ from source · table 2 <span class="verify" onclick="toggleVerify(this)">✦ tap to verify</span></div>
+          </div>
+          <div class="adddiv"><div class="rule"></div><span class="plus" onclick="openPicker(event,'steps','measure')">＋</span></div>
+
+          <div class="blk decision">
+            <span class="grip">⠿</span>
+            <div class="bh"><span class="ty">◆ Decision · branch</span><span class="tools"><button>⧉</button><button>🗑</button></span></div>
+            <div class="bd prose" contenteditable spellcheck="false">Is the gap within tolerance?</div>
+            <div class="dbtns"><div class="db">Yes → restart line</div><div class="db">No → escalate to supervisor</div></div>
+          </div>
+          <div class="adddiv"><div class="rule"></div><span class="plus" onclick="openPicker(event,'steps','decision')">＋</span></div>
+
+          <div class="blk visual">
+            <span class="grip">⠿</span>
+            <div class="bh"><span class="ty">▣ Visual · mixed media</span><span class="tools"><button>⧉</button><button>🗑</button></span></div>
+            <div class="vmedia">
+              <div class="vitem photo"><span class="vic">📷</span><span class="vlb">Hanger, seated</span><span class="vtag">visual:photo</span></div>
+              <div class="vitem diagram"><span class="vic">▧</span><span class="vlb">Mount torque points</span><span class="vtag">visual:diagram</span></div>
+              <div class="vitem video"><span class="vic">▶</span><span class="vlb">Removal, 12s loop</span><span class="vtag">visual:video</span></div>
+              <div class="vadd" onclick="alert('→ pick photo / diagram / video to add another medium')">＋ add media</div>
+            </div>
+          </div>
+
+          <button class="addbig" onclick="openPicker(event,'steps','decision')"><span>＋</span> Add step or block</button>
+        </div>
+
+        <!-- SECTION: signoff -->
+        <div class="sec">
+          <div class="sec-h"><span class="n">04</span><h2 contenteditable spellcheck="false">Sign-off</h2><span class="line"></span></div>
+          <div class="blk signoff">
+            <span class="grip">⠿</span>
+            <div class="bh"><span class="ty">✓ Sign-off · operator + supervisor</span><span class="tools"><button>⧉</button><button>🗑</button></span></div>
+            <div class="bd prose" contenteditable spellcheck="false">Operator signs on completion; supervisor counter-signs. Both timestamped to the named user — becomes the training record for this procedure.</div>
+          </div>
+        </div>
+
+        <p class="footnote"><b>One document, edited in place.</b> No block palette, no outline, no field rail — you change the same cards a worker sees. <span id="convNote" style="display:none">Purple ✦ marks came from your uploaded file; verify each to clear them.</span></p>
+      </div>
+
+      <!-- mobile preview -->
+      <div class="phonewrap">
+        <div class="phone"><div class="pcanvas">
+          <div class="whoedit prose" style="font-size:10px">📱 Worker view · same blocks, one column</div>
+          <div class="sec-h" style="margin-bottom:8px"><span class="n">03</span><h2 style="font-size:13px">Procedure steps</h2></div>
+          <div class="blk step" style="margin-bottom:8px"><div class="sn">2</div><div class="stxt"><div class="bd prose">Remove the worn blank side hanger.</div><span class="sub">📷 Photo required</span></div></div>
+          <div class="blk measure" style="margin-bottom:8px"><div class="ty" style="margin-bottom:6px">◷ Measurement 8.0–8.4 mm</div><div class="mbox"><input value="8.2" style="font-size:15px" /><span class="unit">mm</span></div></div>
+          <div class="blk decision"><div class="ty" style="margin-bottom:6px">◆ Decision</div><div class="bd prose">Is the gap within tolerance?</div><div class="dbtns" style="flex-direction:column"><div class="db">Yes → restart</div><div class="db">No → escalate</div></div></div>
+        </div></div>
+        <p class="footnote"><b>Edit once.</b> Desktop and phone render the same source — the mobile toggle just proves what the worker gets.</p>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- tiered, context-aware inserter — filled by JS per context -->
+<div class="picker" id="picker"></div>
+
+<script>
+  // ---------- flow switching ----------
+  function setFlow(f){
+    document.querySelectorAll('#flowseg button').forEach(b=>b.classList.toggle('on', b.dataset.flow===f));
+    document.getElementById('ramp-new').style.display = 'none';
+    document.getElementById('ramp-convert').style.display = 'none';
+    document.getElementById('builder').classList.remove('show');
+    document.body.classList.remove('convert');
+
+    if(f==='new'){ document.getElementById('ramp-new').style.display='block'; showScreen('new-method'); }
+    else if(f==='convert'){ document.getElementById('ramp-convert').style.display='block'; showScreen('conv-drop'); }
+    else { openBuilder('edit'); }        // edit lands straight in the builder
+    window.scrollTo({top:0});
+  }
+  function showScreen(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('show'));
+    const el=document.getElementById(id); if(el) el.classList.add('show');
+  }
+
+  // ---------- open builder, themed per flow ----------
+  function openBuilder(flow){
+    document.getElementById('ramp-new').style.display='none';
+    document.getElementById('ramp-convert').style.display='none';
+    document.getElementById('builder').classList.add('show');
+    const rev = document.getElementById('revBadge');
+    const conv = flow==='convert';
+    document.body.classList.toggle('convert', conv);
+    document.getElementById('convNote').style.display = conv ? 'inline' : 'none';
+
+    if(flow==='edit'){ rev.textContent='REV 14 · LIVE'; rev.className='rev live'; document.getElementById('sopTitle').textContent='Blank Side Hanger Change'; }
+    else if(flow==='convert'){ rev.textContent='DRAFT · from EN-FOR-03-042.docx'; rev.className='rev draft'; document.getElementById('sopTitle').textContent='EN-FOR-03-042 (imported)'; }
+    else { rev.textContent='NEW DRAFT'; rev.className='rev draft'; document.getElementById('sopTitle').textContent='Untitled SOP'; }
+    injectGhosts();
+    window.scrollTo({top:0});
+  }
+
+  // ---------- preview toggle ----------
+  function setPreview(p){
+    document.body.classList.toggle('phoneview', p==='mob');
+    document.getElementById('pvDesk').classList.toggle('on', p==='desk');
+    document.getElementById('pvMob').classList.toggle('on', p==='mob');
+  }
+
+  // ---------- agent metadata layer ----------
+  // every block gets a machine-readable twin: nothing in the SOP is hidden from agents
+  const AMETA={
+    text:    {tags:['scope','forming','end-of-shift'], ent:'IS machine · Auckland line', extra:''},
+    hazard:  {tags:['molten-glass','hot-surface','LOTO','PPE:gloves','PPE:face-shield'], ent:'temp:600°C · equipment:IS machine', extra:'near_miss_count: 2'},
+    step:    {tags:['action','loto','isolation'], ent:'lockout · energy:zero-verify', extra:'photo_required: derived'},
+    measure: {tags:['tolerance','gap','mm'], ent:'target:8.0–8.4mm · captured:8.2', extra:'unit: mm · out_of_range → escalate'},
+    decision:{tags:['branch','tolerance-gate'], ent:'yes→restart · no→supervisor', extra:'branches: 2'},
+    visual:  {tags:['visual:photo','visual:diagram','visual:video'], ent:'media:3 · alt-text:auto', extra:'ocr: on diagram · frames: 12'},
+    signoff: {tags:['gate','signature','training-record'], ent:'roles:operator+supervisor', extra:'immutable: true'},
+  };
+  function injectAgentMeta(){
+    document.querySelectorAll('#deskdoc .ameta').forEach(m=>m.remove());
+    const blocks=[...document.querySelectorAll('#deskdoc .blk')];
+    blocks.forEach((b,i)=>{
+      const t=blkType(b); const m=AMETA[t]||AMETA.text;
+      const id='blk_'+(0xa30+i).toString(16);
+      const chips=m.tags.map(x=>`<span class="chip">${x}</span>`).join('');
+      const el=document.createElement('div'); el.className='ameta';
+      el.innerHTML=`
+        <div class="mrow"><span class="mk">id · type</span><span class="mv">${id} · <b>${t}</b>${m.extra?` · ${m.extra}`:''}</span></div>
+        <div class="mrow"><span class="mk">tags</span><span class="mv">${chips}</span></div>
+        <div class="mrow"><span class="mk">entities</span><span class="mv">${m.ent}</span></div>
+        <div class="mrow"><span class="mk">vector</span><span class="mv"><span class="ok">✓ embedded 1536d</span> · confidence ${(0.86+i*0.02).toFixed(2)}</span></div>
+        <div class="mrow"><span class="mk">links</span><span class="mv"><span class="link">→ sop_142#${t}</span> · <span class="link">↔ block_lib/${t}</span></span></div>
+        <div class="mrow"><span class="mk">agent</span><span class="mv"><span class="edit">read ✓ · write ✓</span> · memory + review attach here</span></div>`;
+      b.appendChild(el);
+    });
+  }
+  function toggleAgent(){
+    const on=document.body.classList.toggle('agentview');
+    document.getElementById('agentBtn').classList.toggle('on',on);
+    if(on) injectAgentMeta(); else document.querySelectorAll('#deskdoc .ameta').forEach(m=>m.remove());
+    injectGhosts();  // ghosts sit inside blocks; re-place after meta changes
+  }
+
+  // ---------- tiered, context-aware inserter ----------
+  // every block type, one definition reused across tiers + (future) transform menu
+  const BLK={
+    step:{c:'--accent-step',n:'Step',d:'numbered action'},
+    hazard:{c:'--accent-hazard',n:'Hazard',d:'acknowledge-to-pass'},
+    ppe:{c:'--accent-hazard',n:'PPE required',d:'gear checklist'},
+    emergency:{c:'--accent-hazard',n:'Emergency contact',d:'who to call'},
+    measure:{c:'--accent-measure',n:'Measurement',d:'value + tolerance'},
+    decision:{c:'--accent-decision',n:'Decision',d:'yes / no branch'},
+    text:{c:'--ink-500',n:'Text / note',d:'plain guidance'},
+    visual:{c:'--accent-mcu',n:'Visual',d:'photo · diagram · video'},
+    tool:{c:'--accent-mcu',n:'Tool / material',d:'what you need'},
+    signoff:{c:'--accent-signoff',n:'Sign-off',d:'signature gate'},
+  };
+  // Visual sub-types — each stored + tagged differently so agents can filter by medium
+  const VISUAL=[
+    {n:'Photo',   d:'tag: visual:photo',   c:'--accent-mcu'},
+    {n:'Diagram', d:'tag: visual:diagram', c:'--accent-step'},
+    {n:'Video',   d:'tag: visual:video',   c:'--accent-decision'},
+  ];
+  // TIER 1 — "fits here": which block types are relevant per section
+  const LANE={
+    purpose:['text','visual','tool'],
+    hazards:['hazard','ppe','emergency','text'],
+    steps:['step','measure','decision','visual','tool'],
+    signoff:['signoff','text'],
+  };
+  const LANE_LABEL={purpose:'Purpose & scope',hazards:'Hazards & PPE',steps:'Procedure steps',signoff:'Sign-off'};
+  // TIER 0 — "smart next": predicted from the block ABOVE the insertion point
+  const SMART={ measure:{t:'decision',why:'branch on the result'}, hazard:{t:'ppe',why:'the gear this needs'}, step:{t:'measure',why:'capture a value'} };
+  // TIER 2 — full catalog grouped
+  const GROUPS=[
+    ['Actions & flow',['step','decision']],
+    ['Safety',['hazard','ppe','emergency']],
+    ['Data capture',['measure','visual','tool']],
+    ['Guidance & gates',['text','signoff']],
+  ];
+  // TIER 3 — reuse (dept-scoped library) + snippets (multi-block clusters)
+  const LIB=[
+    {n:'Molten glass · hot surfaces',d:'Hazard · used ×12',c:'--accent-hazard',dept:'Forming'},
+    {n:'Heat gloves + face shield',d:'PPE · used ×9',c:'--accent-hazard',dept:'Forming'},
+    {n:'LOTO — verify zero energy',d:'Step · used ×23',c:'--accent-step',dept:'Forming'},
+    {n:'Forklift exclusion zone',d:'Hazard · used ×7',c:'--accent-hazard',dept:'Warehouse'},
+    {n:'Hearing protection required',d:'PPE · used ×15',c:'--accent-hazard',dept:'Packing'},
+    {n:'Quality pass / fail check',d:'Decision · used ×11',c:'--accent-decision',dept:'QA'},
+  ];
+  const SNIP=[
+    {n:'LOTO isolation sequence',d:'5 steps + verify',c:'--accent-step'},
+    {n:'Pre-start checklist',d:'6 checks',c:'--accent-mcu'},
+    {n:'QA pass / fail gate',d:'measure + decision',c:'--accent-decision'},
+  ];
+
+  // ---- popup state: which context, and which PAGE we're on ----
+  const PK={ctx:'steps', prev:null, page:'home', scope:'dept', hi:0};
+  const pkEl=()=>document.getElementById('picker');
+
+  function optRow(key){ const b=BLK[key];
+    if(key==='visual')  // Visual drills into a photo/diagram/video sub-choice
+      return `<div class="opt nav row" data-nav="visual"><span class="sw" style="background:var(${b.c})"></span><span class="nm">${b.n}</span><span class="de">${b.d}</span><span class="go">›</span></div>`;
+    return `<div class="opt row" data-ins="${b.n}"><span class="sw" style="background:var(${b.c})"></span><span class="nm">${b.n}</span><span class="de">${b.d}</span></div>`;
+  }
+  function pageVisual(){
+    let h=header('Visual',true);
+    h+=`<div class="pk-list" id="pklist"><div class="pk-grp">Pick a medium — each tagged for agents</div>`;
+    VISUAL.forEach(v=>h+=`<div class="opt row" data-ins="Visual · ${v.n}"><span class="sw" style="background:var(${v.c})"></span><span class="nm">${v.n}</span><span class="de">${v.d}</span></div>`);
+    h+=`</div><div class="pk-foot">One Visual block can hold <b>all three</b> — photo + diagram + video together.</div>`;
+    return h;
+  }
+  function header(title, back){
+    return `<div class="pk-head">
+      <button class="pk-back" style="display:${back?'block':'none'}" data-back>‹</button>
+      <span class="pk-title">${title}</span>
+      <span class="pk-where">in <b>${LANE_LABEL[PK.ctx]||PK.ctx}</b></span></div>`;
+  }
+  const footHome=`<div class="pk-foot"><kbd>↑↓</kbd> move <kbd>↵</kbd> insert <kbd>esc</kbd> close</div>`;
+
+  // ---- HOME: calm. search + smart + fits-here + 3 drill rows ----
+  function pageHome(){
+    let h=header('Add a block',false);
+    h+=`<div class="pk-search"><input id="pkq" placeholder="Type to filter…" /></div><div class="pk-list" id="pklist">`;
+    if(PK.prev && SMART[PK.prev]){ const s=SMART[PK.prev];
+      h+=`<div class="opt smart row" data-ins="${BLK[s.t].n}" title="${s.why}"><span class="sw" style="background:var(--ai)"></span><span class="nm">${BLK[s.t].n}</span><span class="k">↵ or Tab</span></div>`;
+    }
+    h+=`<div class="pk-grp">Fits here</div>`;
+    (LANE[PK.ctx]||LANE.steps).forEach(k=>h+=optRow(k));
+    h+=`<div class="pk-sep"></div>`;
+    h+=`<div class="opt nav row" data-nav="all"><span class="ic">▦</span><span class="nm">More block types</span><span class="go">›</span></div>`;
+    h+=`<div class="opt nav row" data-nav="reuse"><span class="ic">◷</span><span class="nm">Reuse a block or snippet</span><span class="go">›</span></div>`;
+    h+=`<div class="opt nav row" data-ins="✦ AI-drafted block" style="color:var(--ai)"><span class="ic" style="color:var(--ai)">✦</span><span class="nm" style="color:var(--ai)">Describe with AI</span></div>`;
+    h+=`</div>${footHome}`;
+    return h;
+  }
+  function pageAll(){
+    let h=header('All block types',true);
+    h+=`<div class="pk-search"><input id="pkq" placeholder="Filter blocks…" /></div><div class="pk-list" id="pklist">`;
+    GROUPS.forEach(([g,ks])=>{ h+=`<div class="pk-grp">${g}</div>`; ks.forEach(k=>h+=optRow(k)); });
+    h+=`</div>${footHome}`; return h;
+  }
+  function pageReuse(){
+    const dept = PK.scope==='dept';
+    let h=header('Reuse',true);
+    h+=`<div class="pk-scope"><button data-scope="dept" class="${dept?'on':''}">Forming dept</button><button data-scope="all" class="${dept?'':'on'}">All departments</button></div><div class="pk-list" id="pklist">`;
+    h+=`<div class="pk-grp">Saved blocks</div>`;
+    LIB.filter(l=>dept?l.dept==='Forming':true).forEach(l=>{
+      h+=`<div class="opt lib row" data-ins="library: ${l.n}"><span class="sw" style="background:var(${l.c})"></span><span class="nm">${l.n}</span>${dept?'':`<span class="badge">${l.dept}</span>`}<span class="de">${l.d}</span></div>`;
+    });
+    h+=`<div class="pk-grp">Snippets · several blocks at once</div>`;
+    SNIP.forEach(s=>h+=`<div class="opt snip row" style="color:var(${s.c})" data-ins="snippet: ${s.n}"><span class="sw"></span><span class="nm" style="color:var(--ink-900)">${s.n}</span><span class="de">${s.d}</span></div>`);
+    h+=`</div><div class="pk-foot">Reused blocks stay <b>linked</b> — edit the source once, every SOP updates.</div>`; return h;
+  }
+  const PAGES={home:pageHome, all:pageAll, reuse:pageReuse, visual:pageVisual};
+
+  function renderPicker(){
+    const pk=pkEl();
+    pk.innerHTML=PAGES[PK.page]();
+    PK.hi=0; paintHi();
+    // wire rows
+    pk.querySelectorAll('[data-ins]').forEach(o=>o.onclick=()=>insert(o.dataset.ins));
+    pk.querySelectorAll('[data-nav]').forEach(o=>o.onclick=()=>{PK.page=o.dataset.nav;renderPicker();});
+    pk.querySelectorAll('[data-back]').forEach(b=>b.onclick=()=>{PK.page='home';renderPicker();});
+    pk.querySelectorAll('[data-scope]').forEach(b=>b.onclick=()=>{PK.scope=b.dataset.scope;renderPicker();});
+    const q=document.getElementById('pkq');
+    if(q){ q.focus(); q.oninput=()=>filterPicker(q.value); }
+  }
+  function rows(){ return [...pkEl().querySelectorAll('#pklist .row')].filter(r=>r.style.display!=='none'); }
+  function paintHi(){ const rs=rows(); rs.forEach((r,i)=>r.classList.toggle('hi',i===PK.hi)); }
+  function filterPicker(v){
+    v=v.toLowerCase().trim();
+    pkEl().querySelectorAll('#pklist .row').forEach(o=>{
+      const t=o.querySelector('.nm').textContent.toLowerCase();
+      o.style.display=(!v||t.includes(v))?'':'none';
+    });
+    PK.hi=0; paintHi();
+  }
+  window.insert=function(name){ pkEl().classList.remove('show'); clearGhost();
+    alert('→ inserts “'+name+'” right where you clicked (empty, ready to type)'); };
+
+  window.openPicker=function(e,ctx,prev){
+    e.stopPropagation();
+    PK.ctx=ctx||'steps'; PK.prev=prev||null; PK.page='home'; PK.scope='dept';
+    const pk=pkEl(); pk.classList.add('show'); renderPicker();
+    const w=320,h=Math.min(pk.scrollHeight,window.innerHeight*0.8);
+    pk.style.left=Math.min(e.clientX,window.innerWidth-w-12)+'px';
+    pk.style.top=Math.min(e.clientY+8,window.innerHeight-h-12)+'px';
+  };
+  // keyboard nav
+  document.addEventListener('keydown',e=>{
+    const pk=pkEl(); if(!pk.classList.contains('show')) return;
+    const rs=rows();
+    if(e.key==='ArrowDown'){e.preventDefault();PK.hi=Math.min(PK.hi+1,rs.length-1);paintHi();rs[PK.hi].scrollIntoView({block:'nearest'});}
+    else if(e.key==='ArrowUp'){e.preventDefault();PK.hi=Math.max(PK.hi-1,0);paintHi();rs[PK.hi].scrollIntoView({block:'nearest'});}
+    else if(e.key==='Enter'){e.preventDefault();const r=rs[PK.hi]; if(r){ r.dataset.nav?(PK.page=r.dataset.nav,renderPicker()):insert(r.dataset.ins); }}
+    else if(e.key==='Escape'){pk.classList.remove('show');}
+  });
+  document.addEventListener('click',e=>{
+    const pk=pkEl();
+    if(pk.classList.contains('show') && !pk.contains(e.target) && !e.target.classList.contains('plus') && !e.target.classList.contains('addbig')){
+      pk.classList.remove('show');
+    }
+  });
+
+  // ---------- aggressive path: confident ghosts that auto-dismiss ----------
+  function blkType(b){ for(const t of ['step','hazard','measure','decision','signoff']) if(b.classList.contains(t)) return t; return 'text'; }
+  let activeGhost=null;
+  const liveGhosts=()=>[...document.querySelectorAll('#deskdoc .ghost:not(.gone)')];
+  function injectGhosts(){
+    document.querySelectorAll('#deskdoc .ghost').forEach(g=>g.remove());
+    const blocks=[...document.querySelectorAll('#deskdoc .blk')];
+    blocks.forEach((b,i)=>{
+      const pred=SMART[blkType(b)]; if(!pred) return;
+      const next=blocks[i+1];
+      if(next && blkType(next)===pred.t) return;              // predicted block already follows → stay quiet
+      const g=document.createElement('div');
+      g.className='ghost dim';
+      g.dataset.ins=BLK[pred.t].n;
+      g.innerHTML=`<span class="kb">Tab</span><span>✦ add <b>${BLK[pred.t].n}</b> — ${pred.why}</span><span class="muted">or ＋</span>`;
+      g.onclick=()=>acceptGhost(g);
+      g.onmouseenter=()=>{ activeGhost=g; g.classList.remove('dim'); };
+      g.onmouseleave=()=>{ if(activeGhost===g) activeGhost=null; refreshGhosts(); };
+      b.insertAdjacentElement('afterend', g);
+    });
+    refreshGhosts();
+  }
+  // keep only the ghost nearest the view "live"; drop any scrolled past
+  function refreshGhosts(){
+    const gs=liveGhosts(); if(!gs.length){ activeGhost=null; return; }
+    const center=window.innerHeight*0.5; let live=null, best=1e9;
+    gs.forEach(g=>{
+      const r=g.getBoundingClientRect();
+      if(r.bottom<64){ g.classList.add('gone'); return; }     // scrolled past → dismiss for good
+      const d=Math.abs((r.top+r.bottom)/2 - center);
+      if(d<best){ best=d; live=g; }
+    });
+    liveGhosts().forEach(g=>g.classList.toggle('dim', g!==live && g!==activeGhost));
+    if(live) live.classList.remove('dim');
+    if(!activeGhost) activeGhost=live;                          // Tab targets the live one, even without hover
+  }
+  let ghRaf=0;
+  window.addEventListener('scroll',()=>{ if(ghRaf) return; ghRaf=requestAnimationFrame(()=>{ ghRaf=0; refreshGhosts(); }); }, true);
+  // start typing in a block → dismiss every ghost except the one right after that block
+  document.addEventListener('input',e=>{
+    const blk=e.target.closest && e.target.closest('#deskdoc .blk'); if(!blk) return;
+    const keep=(blk.nextElementSibling && blk.nextElementSibling.classList.contains('ghost')) ? blk.nextElementSibling : null;
+    liveGhosts().forEach(g=>{ if(g!==keep) g.classList.add('gone'); });
+    refreshGhosts();
+  });
+  function clearGhost(){ /* insertion handled by acceptGhost */ }
+  window.acceptGhost=function(el){ insert(el.dataset.ins); };
+  document.addEventListener('keydown',e=>{                     // Tab accepts the live/hovered ghost — never opens a menu
+    if(e.key!=='Tab' || !activeGhost) return;
+    e.preventDefault(); acceptGhost(activeGhost);
+  });
+
+  // ---------- inline meta edits on components ----------
+  window.cycleSev=function(el){
+    const order=[['Critical','--accent-hazard'],['Warning','--accent-measure'],['Notice','--accent-mcu']];
+    const i=(+el.dataset.i+1)%3; el.dataset.i=i;
+    el.textContent=order[i][0]; el.style.color='var('+order[i][1]+')';
+  };
+  window.togglePhoto=function(el){ el.classList.toggle('on');
+    el.innerHTML = el.classList.contains('on') ? '📷 Photo required ✓' : '📷 Photo required'; };
+
+  // ---------- verify chips (convert flow) ----------
+  function toggleVerify(el){
+    el.classList.toggle('done');
+    el.textContent = el.classList.contains('done') ? '✓ verified' : '✦ tap to verify';
+  }
+
+  // start on Edit flow
+  setFlow('edit');
+</script>
+</body>
+</html>

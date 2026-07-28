@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SafeStart — Block Library (many-to-many depts)</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --brand-yellow:#fbbf24;
+    --steel-900:#0a0a0b; --steel-800:#141416; --steel-700:#1f1f22; --steel-600:#2a2a2e;
+    --paper:#fafafa; --paper-2:#f4f4f5;
+    --ink-900:#09090b; --ink-700:#3f3f46; --ink-500:#71717a; --ink-300:#d4d4d8; --ink-100:#e7e7ea;
+    --accent-mcu:#06b6d4; --accent-measure:#f97316; --accent-decision:#ec4899;
+    --accent-hazard:#ef4444; --accent-signoff:#fbbf24; --accent-step:#3b82f6; --accent-ok:#10b981;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{font-family:'JetBrains Mono',ui-monospace,monospace;background:var(--paper);color:var(--ink-900);-webkit-font-smoothing:antialiased}
+  .prose{font-family:'Inter',system-ui,sans-serif}
+  button{font-family:inherit;cursor:pointer}
+
+  .topbar{height:54px;background:var(--steel-900);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px;position:sticky;top:0;z-index:30;gap:16px}
+  .brand{display:flex;align-items:center;gap:9px}
+  .brand .dot{width:9px;height:9px;background:var(--brand-yellow);border-radius:1px}
+  .brand .wm{font-weight:600;font-size:13px}
+  .brand .crumb{font-size:11px;color:#a1a1aa;letter-spacing:.05em;text-transform:uppercase}
+  .org{font-size:11px;color:#d4d4d8;display:flex;align-items:center;gap:7px}
+  .org .badge{background:var(--steel-700);border:1px solid var(--steel-600);border-radius:3px;padding:3px 9px;letter-spacing:.04em}
+
+  .wrap{max-width:1000px;margin:0 auto;padding:26px 24px 60px}
+  .head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:6px}
+  h1{font-size:22px;font-weight:700;letter-spacing:-.01em}
+  .sub{font-size:12px;color:var(--ink-500);margin-top:4px;max-width:620px;line-height:1.5}
+  .newbtn{background:var(--ink-900);color:#fff;font-size:12px;font-weight:600;padding:11px 16px;border-radius:6px;border:none;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+  .newbtn:hover{background:var(--steel-800)}
+
+  .subnav{display:flex;gap:18px;border-bottom:1px solid var(--ink-100);margin:18px 0 18px;font-size:13px}
+  .subnav a{padding-bottom:11px;color:var(--ink-500);text-decoration:none;font-weight:500;border-bottom:2px solid transparent}
+  .subnav a.on{color:var(--ink-900);border-bottom-color:var(--ink-900)}
+
+  .deptrow{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+  .deptlbl{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-500);margin-right:4px}
+  .dept{display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border:1.5px solid var(--ink-300);background:var(--paper);border-radius:6px;font-size:12px;font-weight:500;color:var(--ink-500)}
+  .dept:hover{color:var(--ink-900);border-color:var(--ink-700)}
+  .dept.on{background:var(--ink-900);color:#fff;border-color:var(--ink-900)}
+  .dept .swatch{width:8px;height:8px;border-radius:2px}
+  .dept .cnt{font-size:10px;background:var(--paper-2);color:var(--ink-700);border-radius:10px;padding:1px 7px;font-weight:700}
+  .dept.on .cnt{background:var(--steel-700);color:#fff}
+
+  .ctxline{font-size:11px;color:var(--ink-500);margin:8px 0 16px;line-height:1.5}
+
+  .filters{display:flex;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+  .search{flex:1;min-width:200px;display:flex;align-items:center;gap:8px;border:1.5px solid var(--ink-300);border-radius:6px;padding:9px 12px;background:var(--paper)}
+  .search input{flex:1;border:none;outline:none;background:transparent;font-family:inherit;font-size:12px;color:var(--ink-900)}
+  .search .ic{color:var(--ink-500);font-size:13px}
+  .kinds{display:flex;gap:6px;flex-wrap:wrap}
+  .kind{font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;border:1px solid var(--ink-300);border-radius:4px;background:var(--paper);color:var(--ink-500)}
+  .kind.on{background:var(--ink-900);color:#fff;border-color:var(--ink-900)}
+
+  .list{border:1.5px solid var(--ink-300);border-radius:8px;overflow:visible;background:var(--paper)}
+  .row{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid var(--ink-100);position:relative}
+  .row:last-child{border-bottom:none}
+  .row:hover{background:var(--paper-2)}
+  .kic{width:38px;height:38px;flex:0 0 38px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;border:1.5px solid;background:var(--paper)}
+  .rmain{flex:1;min-width:0}
+  .rname{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .rmeta{font-size:11px;color:var(--ink-500);margin-top:5px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .pill{display:inline-flex;align-items:center;gap:4px;border:1px solid currentColor;padding:1px 6px;font-size:9px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;border-radius:2px}
+  .dchip{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--ink-700);background:var(--paper-2);border:1px solid var(--ink-300);border-radius:3px;padding:2px 7px}
+  .dchip .sw{width:7px;height:7px;border-radius:2px}
+  .dchip.all{color:var(--accent-mcu);border-color:var(--accent-mcu);background:rgba(6,182,212,.06)}
+  .usage{color:var(--ink-500)}
+  .ract{display:flex;align-items:center;gap:7px;flex:0 0 auto}
+  .abtn{font-size:11px;font-weight:600;padding:7px 11px;border-radius:5px;border:1.5px solid var(--ink-300);background:var(--paper);color:var(--ink-700);white-space:nowrap}
+  .abtn:hover{border-color:var(--ink-900);color:var(--ink-900)}
+  .abtn.danger{color:var(--accent-hazard);border-color:rgba(239,68,68,.4)}
+  .abtn.danger:hover{background:var(--accent-hazard);color:#fff;border-color:var(--accent-hazard)}
+  .abtn.ghost{border-color:transparent;color:var(--ink-500)}
+  .abtn.ghost:hover{color:var(--ink-900);border-color:var(--ink-300)}
+
+  /* multi-select popover (open on the demo row) */
+  .pop{position:absolute;top:58px;right:120px;z-index:20;width:230px;background:var(--paper);border:1.5px solid var(--ink-900);border-radius:8px;box-shadow:0 12px 32px rgba(0,0,0,.16);overflow:hidden}
+  .pop .ph{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500);padding:10px 12px 8px;border-bottom:1px solid var(--ink-100)}
+  .opt{display:flex;align-items:center;gap:9px;padding:9px 12px;font-size:12px;color:var(--ink-700)}
+  .opt:hover{background:var(--paper-2)}
+  .opt .box{width:16px;height:16px;border:1.5px solid var(--ink-300);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff}
+  .opt.sel .box{background:var(--ink-900);border-color:var(--ink-900)}
+  .opt .sw{width:8px;height:8px;border-radius:2px}
+  .pop .pf{border-top:1px solid var(--ink-100);padding:8px;display:flex;justify-content:flex-end}
+  .pop .pf button{font-size:11px;font-weight:600;background:var(--ink-900);color:#fff;border:none;border-radius:5px;padding:7px 12px}
+
+  .note{margin-top:22px;font-size:11px;color:var(--ink-500);border-left:2px solid var(--accent-ok);padding:10px 0 10px 14px;line-height:1.7;max-width:780px}
+  .note b{color:var(--accent-ok)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span><span class="wm">SafeStart</span><span class="crumb">/ Admin / Library</span></div>
+  <div class="org"><span>Organisation</span><span class="badge">Visy — Auckland</span></div>
+</div>
+
+<div class="wrap">
+  <div class="head">
+    <div>
+      <h1>Block Library</h1>
+      <p class="sub prose">Reusable hazards, PPE, steps and emergency blocks. Each block can belong to <b>any number of departments</b> — tag a burn hazard to both Forming and Maintenance, or mark a block <b>All departments</b> to make it org-wide.</p>
+    </div>
+    <button class="newbtn" id="newbtn">＋ New block</button>
+  </div>
+
+  <nav class="subnav">
+    <a href="#">SOPs</a>
+    <a href="#" class="on">Library</a>
+    <a href="#">Team</a>
+    <a href="#">Departments</a>
+  </nav>
+
+  <div class="deptrow" id="depts"><span class="deptlbl">Department</span></div>
+  <p class="ctxline" id="ctxline"></p>
+
+  <div class="filters">
+    <div class="search"><span class="ic">⌕</span><input placeholder="Search blocks…" /></div>
+    <div class="kinds" id="kinds">
+      <button class="kind on" data-k="all">All kinds</button>
+      <button class="kind" data-k="hazard">Hazard</button>
+      <button class="kind" data-k="ppe">PPE</button>
+      <button class="kind" data-k="step">Step</button>
+      <button class="kind" data-k="emergency">Emergency</button>
+      <button class="kind" data-k="custom">Custom</button>
+    </div>
+  </div>
+
+  <div class="list" id="list"></div>
+
+  <p class="note"><b>Many-to-many.</b> A block is linked to a <i>set</i> of departments, not one bucket. The “Burn hazard” row below shows the editor open — tick Forming + Maintenance and it appears in both. <b>All departments</b> is its own toggle for truly org-wide blocks (evacuation, hi-vis). Filtering by a department returns every block tagged to it, plus all org-wide blocks.</p>
+</div>
+
+<script>
+  const KIND = {
+    hazard:{ic:'⚠', c:'var(--accent-hazard)'}, ppe:{ic:'🛡', c:'var(--accent-mcu)'},
+    step:{ic:'▸', c:'var(--accent-step)'}, emergency:{ic:'⛑', c:'var(--accent-measure)'}, custom:{ic:'◇', c:'var(--ink-500)'},
+  };
+  const DEPT = {
+    Forming:{sw:'#f97316'}, Maintenance:{sw:'#3b82f6'}, Quality:{sw:'#06b6d4'}, Cleaning:{sw:'#10b981'},
+  };
+  const DEPT_NAMES = Object.keys(DEPT);
+
+  // depts: array of dept names; all:true = org-wide
+  const BLOCKS = [
+    {name:'Burn hazard — forming / line maintenance', kind:'hazard', depts:['Forming','Maintenance'], used:16, upd:'2w ago', editOpen:true},
+    {name:'Heat-resistant gloves + face shield', kind:'ppe', depts:['Forming'], used:18, upd:'2w ago'},
+    {name:'Apply LOTO & verify zero energy', kind:'step', depts:['Maintenance','Forming'], used:14, upd:'1mo ago'},
+    {name:'Confined space entry permit', kind:'hazard', depts:['Maintenance','Quality'], used:9, upd:'6w ago'},
+    {name:'Surface inspection — pass / fail', kind:'step', depts:['Quality'], used:7, upd:'3w ago'},
+    {name:'Caustic chemical handling', kind:'hazard', depts:['Cleaning'], used:5, upd:'1mo ago'},
+    {name:'Blank hanger torque spec (42 Nm)', kind:'custom', depts:['Forming'], used:2, upd:'5d ago'},
+    {name:'Hi-vis + steel-cap boots', kind:'ppe', all:true, used:30, upd:'2mo ago'},
+    {name:'Site evacuation route', kind:'emergency', all:true, used:6, upd:'3mo ago'},
+  ];
+
+  const state = { dept:'all', kind:'all' };
+
+  const matchesDept = (b,d) => d==='all' ? true : (b.all || (b.depts||[]).includes(d));
+
+  function countFor(d){ return BLOCKS.filter(b=>matchesDept(b,d)).length; }
+
+  function renderDepts(){
+    const tabs = [{v:'all',label:'All'}, ...DEPT_NAMES.map(d=>({v:d,label:d,sw:DEPT[d].sw}))];
+    const el = document.getElementById('depts');
+    el.innerHTML = '<span class="deptlbl">Department</span>' + tabs.map(t=>`
+      <button class="dept ${state.dept===t.v?'on':''}" data-dept="${t.v}">
+        ${t.sw?`<span class="swatch" style="background:${t.sw}"></span>`:''}${t.label}<span class="cnt">${countFor(t.v)}</span>
+      </button>`).join('');
+    el.querySelectorAll('.dept').forEach(b=>b.addEventListener('click',()=>{ state.dept=b.dataset.dept; render(); }));
+    document.getElementById('ctxline').textContent = state.dept==='all'
+      ? 'Every block in the organisation. Org-wide blocks appear under all departments.'
+      : `${state.dept} blocks, plus org-wide blocks. A block tagged to several departments shows up under each.`;
+  }
+
+  const kic = k => `<div class="kic" style="border-color:${KIND[k].c};color:${KIND[k].c}">${KIND[k].ic}</div>`;
+  const kpill = k => `<span class="pill" style="color:${KIND[k].c}">${k}</span>`;
+  function dchips(b){
+    if(b.all) return `<span class="dchip all">◇ All departments</span>`;
+    return b.depts.map(d=>`<span class="dchip"><span class="sw" style="background:${DEPT[d].sw}"></span>${d}</span>`).join('');
+  }
+
+  function popover(b){
+    const opts = [{n:'All departments',all:true}, ...DEPT_NAMES.map(d=>({n:d,sw:DEPT[d].sw}))];
+    return `<div class="pop"><div class="ph">In departments</div>` +
+      opts.map(o=>{
+        const sel = o.all ? !!b.all : (b.depts||[]).includes(o.n);
+        return `<div class="opt ${sel?'sel':''}"><span class="box">${sel?'✓':''}</span>${o.sw?`<span class="sw" style="background:${o.sw}"></span>`:''}${o.n}</div>`;
+      }).join('') +
+      `<div class="pf"><button>Done</button></div></div>`;
+  }
+
+  function render(){
+    renderDepts();
+    let data = BLOCKS.filter(b=>matchesDept(b,state.dept));
+    if(state.kind!=='all') data = data.filter(b=>b.kind===state.kind);
+    document.getElementById('list').innerHTML = data.map(b=>`
+      <div class="row">${kic(b.kind)}
+        <div class="rmain"><div class="rname">${b.name} ${kpill(b.kind)}</div>
+          <div class="rmeta">${dchips(b)} <span class="usage">· used in ${b.used} SOPs · ${b.upd}</span></div></div>
+        <div class="ract">
+          <button class="abtn ghost">Departments ▾</button>
+          <button class="abtn">Edit</button>
+          <button class="abtn danger">Archive</button>
+        </div>
+        ${b.editOpen ? popover(b) : ''}
+      </div>`).join('');
+  }
+
+  document.querySelectorAll('#kinds .kind').forEach(b=>b.addEventListener('click',()=>{
+    state.kind=b.dataset.k;
+    document.querySelectorAll('#kinds .kind').forEach(x=>x.classList.toggle('on',x.dataset.k===state.kind));
+    render();
+  }));
+
+  render();
+</script>
+</body>
+</html>

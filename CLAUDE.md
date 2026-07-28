@@ -96,7 +96,7 @@ npm run test:e2e     # E2E tests only
 
 ## Auto-load routing
 
-- **Sketch findings for SOPstart** (design tokens, layout primitives, screen inventory, new block types, voice/cmdk/immersive walkthrough patterns, org-model views, permission-wiring views) → `Skill("sketch-findings-SOPstart")` — load before building any worker-facing UI, adding new SOP block types, or building org-chart / roles / library-permission surfaces.
+- **Sketch findings for SOPstart** (design tokens, layout primitives, screen inventory, new block types, voice/immersive walkthrough patterns, org-model views, permission-wiring views, **authoring & creation flow**) → `Skill("sketch-findings-SOPstart")` — load before building any worker-facing UI, adding new SOP block types, building org-chart / roles / library-permission surfaces, or touching the **SOP creation / conversion / authoring path** (new-SOP wizard, upload-parse review, builder canvas, block inserter, read/walk/edit surface — see `references/authoring-flow.md`, which is a not-yet-shipped design contract).
 - **Customer interviews** (`.planning/research/customer-interviews/`) — primary-source field research from real SOP users. Consult before spec/discuss/plan on any new phase, before locking contentious UX decisions (mobile vs desktop, identity model, approval chains), and when triaging backlog ideas. Latest: 2026-05-05 Visy Packaging (~100 AU/NZ industrial sites, glass + cans + cardboard) — surfaces desktop-first reading, SOP-ownership governance gap, voice Q&A unlock, training-record / Success Factors integration.
 
 ## Pathways Map Maintenance (`journeys.ts`) — GSD triggers

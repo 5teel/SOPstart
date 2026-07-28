@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SafeStart — Departments (sketch)</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --brand-yellow:#fbbf24;
+    --steel-900:#0a0a0b; --steel-800:#141416; --steel-700:#1f1f22; --steel-600:#2a2a2e;
+    --paper:#fafafa; --paper-2:#f4f4f5;
+    --ink-900:#09090b; --ink-700:#3f3f46; --ink-500:#71717a; --ink-300:#d4d4d8; --ink-100:#e7e7ea;
+    --accent-mcu:#06b6d4; --accent-measure:#f97316; --accent-decision:#ec4899;
+    --accent-hazard:#ef4444; --accent-signoff:#fbbf24; --accent-step:#3b82f6; --accent-ok:#10b981;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{font-family:'JetBrains Mono',ui-monospace,monospace;background:var(--paper);color:var(--ink-900);-webkit-font-smoothing:antialiased}
+  .prose{font-family:'Inter',system-ui,sans-serif}
+  button{font-family:inherit;cursor:pointer}
+
+  .topbar{height:54px;background:var(--steel-900);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px;position:sticky;top:0;z-index:30;gap:16px}
+  .brand{display:flex;align-items:center;gap:9px}
+  .brand .dot{width:9px;height:9px;background:var(--brand-yellow);border-radius:1px}
+  .brand .wm{font-weight:600;font-size:13px}
+  .brand .crumb{font-size:11px;color:#a1a1aa;letter-spacing:.05em;text-transform:uppercase}
+  .org{font-size:11px;color:#d4d4d8;display:flex;align-items:center;gap:7px}
+  .org .badge{background:var(--steel-700);border:1px solid var(--steel-600);border-radius:3px;padding:3px 9px;letter-spacing:.04em}
+
+  .wrap{max-width:1000px;margin:0 auto;padding:26px 24px 60px}
+  .head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:6px}
+  h1{font-size:22px;font-weight:700;letter-spacing:-.01em}
+  .sub{font-size:12px;color:var(--ink-500);margin-top:4px;max-width:620px;line-height:1.5}
+  .newbtn{background:var(--ink-900);color:#fff;font-size:12px;font-weight:600;padding:11px 16px;border-radius:6px;border:none;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+  .newbtn:hover{background:var(--steel-800)}
+
+  .subnav{display:flex;gap:18px;border-bottom:1px solid var(--ink-100);margin:18px 0 22px;font-size:13px}
+  .subnav a{padding-bottom:11px;color:var(--ink-500);text-decoration:none;font-weight:500;border-bottom:2px solid transparent}
+  .subnav a.on{color:var(--ink-900);border-bottom-color:var(--ink-900)}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .card{border:1.5px solid var(--ink-300);border-radius:8px;background:var(--paper);overflow:hidden;display:flex}
+  .card .stripe{width:6px;flex:0 0 6px}
+  .card .inner{flex:1;padding:18px 18px 16px}
+  .ctop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+  .cname{display:flex;align-items:center;gap:10px}
+  .cdot{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:700}
+  .cname h3{font-size:15px;font-weight:700}
+  .cname .code{font-size:10px;color:var(--ink-500);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+  .cmenu{color:var(--ink-500);font-size:16px;background:none;border:none;padding:2px 6px}
+  .cmenu:hover{color:var(--ink-900)}
+
+  .owner{display:flex;align-items:center;gap:9px;margin-top:14px;padding:9px 10px;background:var(--paper-2);border:1px solid var(--ink-100);border-radius:6px}
+  .owner .av{width:24px;height:24px;border-radius:50%;background:var(--ink-900);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex:0 0 24px}
+  .owner .ow{min-width:0}
+  .owner .lab{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500)}
+  .owner .nm{font-size:12px;font-weight:600;color:var(--ink-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .owner.empty{border-style:dashed;color:var(--accent-hazard)}
+  .owner.empty .av{background:rgba(239,68,68,.1);color:var(--accent-hazard)}
+  .owner.empty .nm{color:var(--accent-hazard)}
+
+  .stats{display:flex;gap:0;margin-top:14px;border:1px solid var(--ink-100);border-radius:6px;overflow:hidden}
+  .stat{flex:1;text-align:center;padding:10px 6px;border-right:1px solid var(--ink-100)}
+  .stat:last-child{border-right:none}
+  .stat .v{font-size:17px;font-weight:700}
+  .stat .l{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-500);margin-top:2px}
+
+  .addcard{border:1.5px dashed var(--ink-300);border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--ink-500);min-height:200px;background:rgba(0,0,0,.01)}
+  .addcard:hover{border-color:var(--accent-step);color:var(--accent-step);background:rgba(59,130,246,.03)}
+  .addcard .big{font-size:26px}
+  .addcard .t{font-size:12px;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+
+  .note{margin-top:24px;font-size:11px;color:var(--ink-500);border-left:2px solid var(--accent-ok);padding:10px 0 10px 14px;line-height:1.7;max-width:780px}
+  .note b{color:var(--accent-ok)}
+  .refs{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap}
+  .ref{font-size:10px;color:var(--ink-700);background:var(--paper-2);border:1px solid var(--ink-300);border-radius:4px;padding:5px 9px;display:flex;align-items:center;gap:6px}
+  .ref .d{width:6px;height:6px;border-radius:50%;background:var(--accent-step)}
+
+  @media(max-width:760px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span><span class="wm">SafeStart</span><span class="crumb">/ Admin / Departments</span></div>
+  <div class="org"><span>Organisation</span><span class="badge">Visy — Auckland</span></div>
+</div>
+
+<div class="wrap">
+  <div class="head">
+    <div>
+      <h1>Departments</h1>
+      <p class="sub prose">A first-class entity. SOPs, blocks and people all reference departments — define them once here and everything else points back. Each department has an <b>owner</b> accountable for its procedures.</p>
+    </div>
+    <button class="newbtn">＋ New department</button>
+  </div>
+
+  <nav class="subnav">
+    <a href="#">SOPs</a>
+    <a href="#">Library</a>
+    <a href="#">Team</a>
+    <a href="#" class="on">Departments</a>
+  </nav>
+
+  <div class="grid" id="grid"></div>
+
+  <p class="note"><b>Solves the ownership gap.</b> Visy's #1 pain was “nobody owns SOPs.” Every department now names an <b>owner</b> — and the card flags it red when one's missing (see Cleaning). Because departments are first-class, the same record drives three surfaces:</p>
+  <div class="refs">
+    <span class="ref"><span class="d"></span>Block library — filter &amp; tag blocks by department</span>
+    <span class="ref"><span class="d"></span>Create SOP wizard — “Department” field</span>
+    <span class="ref"><span class="d"></span>Team — assign people to departments</span>
+  </div>
+</div>
+
+<script>
+  const DEPTS = [
+    {name:'Forming', code:'FRM', color:'#f97316', icon:'🔥', owner:'Bryce Tan', role:'Engineering Mgr', people:14, sops:23, blocks:6},
+    {name:'Maintenance', code:'MNT', color:'#3b82f6', icon:'🔧', owner:'Dane Wright', role:'Maintenance Lead', people:8, sops:15, blocks:5},
+    {name:'Quality', code:'QA', color:'#06b6d4', icon:'✓', owner:'Priya Nair', role:'QA Manager', people:5, sops:9, blocks:3},
+    {name:'Cleaning', code:'CLN', color:'#10b981', icon:'🧽', owner:null, role:null, people:6, sops:7, blocks:4},
+  ];
+  const initials = n => n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+
+  document.getElementById('grid').innerHTML = DEPTS.map(d=>`
+    <div class="card">
+      <div class="stripe" style="background:${d.color}"></div>
+      <div class="inner">
+        <div class="ctop">
+          <div class="cname">
+            <div class="cdot" style="background:${d.color}">${d.icon}</div>
+            <div><h3>${d.name}</h3><div class="code">${d.code} · department</div></div>
+          </div>
+          <button class="cmenu">⋯</button>
+        </div>
+
+        ${d.owner ? `
+        <div class="owner">
+          <div class="av">${initials(d.owner)}</div>
+          <div class="ow"><div class="lab">Owner</div><div class="nm">${d.owner} · ${d.role}</div></div>
+        </div>` : `
+        <div class="owner empty">
+          <div class="av">!</div>
+          <div class="ow"><div class="lab">Owner</div><div class="nm">No owner assigned — set one</div></div>
+        </div>`}
+
+        <div class="stats">
+          <div class="stat"><div class="v">${d.people}</div><div class="l">People</div></div>
+          <div class="stat"><div class="v">${d.sops}</div><div class="l">SOPs</div></div>
+          <div class="stat"><div class="v">${d.blocks}</div><div class="l">Blocks</div></div>
+        </div>
+      </div>
+    </div>`).join('') + `
+    <button class="addcard"><span class="big">＋</span><span class="t">New department</span></button>`;
+</script>
+</body>
+</html>

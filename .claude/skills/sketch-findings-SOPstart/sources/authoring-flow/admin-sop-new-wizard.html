@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SafeStart — New SOP Wizard (sketch)</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --brand-yellow:#fbbf24;
+    --steel-900:#0a0a0b; --steel-800:#141416; --steel-700:#1f1f22; --steel-600:#2a2a2e;
+    --paper:#fafafa; --paper-2:#f4f4f5;
+    --ink-900:#09090b; --ink-700:#3f3f46; --ink-500:#71717a; --ink-300:#d4d4d8; --ink-100:#e7e7ea;
+    --accent-mcu:#06b6d4; --accent-measure:#f97316; --accent-decision:#ec4899;
+    --accent-hazard:#ef4444; --accent-signoff:#fbbf24; --accent-step:#3b82f6; --accent-ok:#10b981;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{font-family:'JetBrains Mono',ui-monospace,monospace;background:var(--paper);color:var(--ink-900);-webkit-font-smoothing:antialiased}
+  .prose{font-family:'Inter',system-ui,sans-serif}
+  button{font-family:inherit;cursor:pointer}
+
+  /* ---- top chrome ---- */
+  .topbar{height:52px;background:var(--steel-900);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:20}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:13px;letter-spacing:.02em}
+  .brand .dot{width:9px;height:9px;background:var(--brand-yellow);border-radius:1px}
+  .crumb{font-size:11px;color:#a1a1aa;letter-spacing:.05em;text-transform:uppercase}
+  .close{color:#a1a1aa;font-size:18px;line-height:1;background:none;border:none;padding:6px}
+  .close:hover{color:#fff}
+
+  /* ---- step rail ---- */
+  .rail{border-bottom:1px solid var(--ink-300);background:var(--paper);position:sticky;top:52px;z-index:10}
+  .rail-inner{max-width:1040px;margin:0 auto;display:flex;align-items:center;gap:6px;padding:14px 24px;flex-wrap:wrap}
+  .node{display:flex;align-items:center;gap:9px;padding:6px 10px;border-radius:2px}
+  .node .num{width:22px;height:22px;border:1.5px solid var(--ink-300);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--ink-500)}
+  .node .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-500)}
+  .node.active .num{background:var(--ink-900);border-color:var(--ink-900);color:#fff}
+  .node.active .lbl{color:var(--ink-900)}
+  .node.done .num{background:var(--accent-ok);border-color:var(--accent-ok);color:#fff}
+  .node.done .lbl{color:var(--ink-700)}
+  .rail .sep{flex:0 0 22px;height:1px;background:var(--ink-300)}
+
+  /* ---- canvas ---- */
+  .canvas{
+    min-height:calc(100vh - 52px - 53px - 72px);
+    background-color:var(--paper);
+    background-image:linear-gradient(to right,rgba(0,0,0,.035) 1px,transparent 1px),linear-gradient(to bottom,rgba(0,0,0,.035) 1px,transparent 1px);
+    background-size:20px 20px;padding:40px 24px 32px;
+  }
+  .stage{max-width:1040px;margin:0 auto}
+  .step{display:none;animation:fade .18s ease}
+  .step.show{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  .eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-500);margin-bottom:8px}
+  h1.title{font-size:24px;font-weight:600;letter-spacing:-.01em}
+  .sub{font-size:13px;color:var(--ink-500);margin-top:8px;max-width:560px;line-height:1.5}
+
+  .pill{display:inline-flex;align-items:center;gap:4px;border:1px solid currentColor;padding:2px 7px;font-size:9px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;border-radius:2px}
+
+  /* ---- method tiles ---- */
+  .tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:28px}
+  .tile{position:relative;text-align:left;border:1.5px solid var(--ink-300);background:var(--paper);border-radius:4px;padding:20px;transition:all .12s;display:flex;gap:16px;align-items:flex-start}
+  .tile:hover{border-color:var(--ink-700)}
+  .tile.sel{border-color:var(--accent-step);box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+  .tile.wide{grid-column:1 / -1}
+  .tile.muted{opacity:.62}
+  .tile.muted:hover{opacity:1}
+  .ic{width:40px;height:40px;flex:0 0 40px;border:1.5px solid var(--ink-300);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:18px;background:var(--paper-2)}
+  .tile.sel .ic{border-color:var(--accent-step);color:var(--accent-step)}
+  .tile h3{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .tile p{font-size:12px;color:var(--ink-500);margin-top:5px;line-height:1.5}
+  .tile .fmt{margin-top:9px;font-size:10px;color:var(--ink-500);letter-spacing:.04em}
+  .check{position:absolute;top:14px;right:14px;width:20px;height:20px;border-radius:50%;background:var(--accent-step);color:#fff;display:none;align-items:center;justify-content:center;font-size:12px}
+  .tile.sel .check{display:flex}
+
+  /* ---- template cards ---- */
+  .tcards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
+  .tcard{text-align:left;border:1.5px solid var(--ink-300);background:var(--paper);border-radius:4px;padding:16px;transition:all .12s;position:relative}
+  .tcard:hover{border-color:var(--ink-700)}
+  .tcard.sel{border-color:var(--accent-step);box-shadow:0 0 0 3px rgba(59,130,246,.12)}
+  .tcard h4{font-size:13px;font-weight:600}
+  .tcard .meta{font-size:10px;color:var(--ink-500);text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
+  .skel{margin-top:12px;display:flex;flex-direction:column;gap:5px}
+  .schip{font-size:10px;color:var(--ink-700);background:var(--paper-2);border:1px solid var(--ink-100);border-radius:2px;padding:3px 7px;display:flex;align-items:center;gap:6px}
+  .schip .b{width:5px;height:5px;border-radius:1px}
+  .tcard.muted{opacity:.6}
+  .tcard.muted:hover{opacity:1}
+
+  /* ---- details form ---- */
+  .grid2{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;margin-top:28px;align-items:start}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500);font-weight:600;margin-bottom:6px}
+  .field input,.field select,.field textarea{width:100%;font-family:'JetBrains Mono',monospace;font-size:13px;padding:10px 12px;border:1.5px solid var(--ink-300);border-radius:2px;background:var(--paper);color:var(--ink-900);outline:none}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent-step)}
+  .field .hint{font-size:10px;color:var(--ink-500);margin-top:5px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+  .sourcebox{border:1.5px solid var(--ink-300);border-radius:4px;background:var(--paper-2);padding:18px}
+  .sourcebox .head{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-500);font-weight:600;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+  .dropzone{border:1.5px dashed var(--ink-300);border-radius:4px;background:var(--paper);padding:30px 16px;text-align:center;color:var(--ink-500);font-size:12px}
+  .dropzone .big{font-size:26px;margin-bottom:8px}
+  .dropzone .fmt{margin-top:10px;font-size:10px;letter-spacing:.04em}
+  textarea.prompt{min-height:120px;resize:vertical;line-height:1.55}
+  .vtabs{display:flex;gap:6px;margin-bottom:12px}
+  .vtab{font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;border:1px solid var(--ink-300);border-radius:2px;background:var(--paper);color:var(--ink-500)}
+  .vtab.on{background:var(--ink-900);color:#fff;border-color:var(--ink-900)}
+
+  /* ---- review ---- */
+  .review{margin-top:28px;border:1.5px solid var(--ink-300);border-radius:4px;background:var(--paper);overflow:hidden;max-width:680px}
+  .review .rhead{background:var(--steel-900);color:#fff;padding:14px 20px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;display:flex;justify-content:space-between;align-items:center}
+  .rrow{display:flex;gap:14px;padding:14px 20px;border-bottom:1px solid var(--ink-100);align-items:flex-start}
+  .rrow:last-child{border-bottom:none}
+  .rrow .k{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-500);width:120px;flex:0 0 120px;padding-top:2px}
+  .rrow .v{font-size:13px;color:var(--ink-900);font-weight:500;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .flowline{margin-top:18px;font-size:12px;color:var(--ink-700);line-height:1.6;max-width:680px}
+  .flowline b{color:var(--ink-900)}
+  .note{margin-top:24px;font-size:11px;color:var(--ink-500);border-left:2px solid var(--accent-ok);padding:8px 0 8px 14px;line-height:1.6;max-width:680px}
+  .note b{color:var(--accent-ok)}
+
+  /* ---- footer ---- */
+  .footer{position:sticky;bottom:0;background:var(--paper);border-top:1px solid var(--ink-300);z-index:10}
+  .footer-inner{max-width:1040px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between}
+  .btn{font-size:12px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;padding:11px 18px;border-radius:4px;border:1.5px solid var(--ink-300);background:var(--paper);color:var(--ink-700)}
+  .btn:hover{border-color:var(--ink-900);color:var(--ink-900)}
+  .btn.primary{background:var(--ink-900);color:#fff;border-color:var(--ink-900)}
+  .btn.primary:hover{background:var(--steel-800)}
+  .btn.primary:disabled{opacity:.35;cursor:not-allowed}
+  .btn.go{background:var(--accent-ok);border-color:var(--accent-ok);color:#fff}
+  .btn.go:hover{background:#0ea672}
+  .ghost{color:var(--ink-500);font-size:11px;background:none;border:none;text-transform:uppercase;letter-spacing:.05em}
+  .ghost:hover{color:var(--ink-900)}
+
+  @media(max-width:760px){
+    .tiles,.tcards,.grid2{grid-template-columns:1fr}
+    .tile.wide{grid-column:auto}
+    .node .lbl{display:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span> SafeStart <span class="crumb">/ Admin / SOPs / New</span></div>
+  <button class="close" title="Cancel">✕</button>
+</div>
+
+<div class="rail">
+  <div class="rail-inner" id="rail">
+    <div class="node active" data-n="0"><span class="num">1</span><span class="lbl">Start method</span></div>
+    <span class="sep"></span>
+    <div class="node" data-n="1"><span class="num">2</span><span class="lbl">Template</span></div>
+    <span class="sep"></span>
+    <div class="node" data-n="2"><span class="num">3</span><span class="lbl">Details</span></div>
+    <span class="sep"></span>
+    <div class="node" data-n="3"><span class="num">4</span><span class="lbl">Review</span></div>
+  </div>
+</div>
+
+<div class="canvas">
+  <div class="stage">
+
+    <!-- ============ STEP 1 — METHOD ============ -->
+    <section class="step show" data-step="0">
+      <div class="eyebrow">Step 1 of 4</div>
+      <h1 class="title">How do you want to start?</h1>
+      <p class="sub prose">Every path lands in the same builder — this just picks the fastest on-ramp. Most teams start from an existing document.</p>
+
+      <div class="tiles">
+        <button class="tile wide sel" data-method="upload">
+          <span class="check">✓</span>
+          <span class="ic">📄</span>
+          <span>
+            <h3>Upload a document <span class="pill" style="color:var(--accent-ok)">Recommended</span></h3>
+            <p>Drag in an existing SOP — AI extracts the sections, steps and hazards into your chosen template. The fastest way to standardise what you already have.</p>
+            <span class="fmt">.docx · .pdf · .xlsx · .pptx · photo / scan</span>
+          </span>
+        </button>
+
+        <button class="tile" data-method="template">
+          <span class="check">✓</span>
+          <span class="ic">▤</span>
+          <span>
+            <h3>Build from a template <span class="pill" style="color:var(--accent-step)">Standardise</span></h3>
+            <p>Start with a pre-structured NZ/AU skeleton and fill in the steps. Keeps 100+ sites consistent.</p>
+          </span>
+        </button>
+
+        <button class="tile" data-method="video">
+          <span class="check">✓</span>
+          <span class="ic">🎬</span>
+          <span>
+            <h3>From a video or recording</h3>
+            <p>Upload a clip, record the task, or paste a YouTube link — the audio is transcribed into a draft.</p>
+          </span>
+        </button>
+
+        <button class="tile" data-method="ai">
+          <span class="check">✓</span>
+          <span class="ic">✦</span>
+          <span>
+            <h3>Draft with AI</h3>
+            <p>Describe the procedure in plain words and AI writes a structured first version into the template.</p>
+          </span>
+        </button>
+
+        <button class="tile muted" data-method="blank">
+          <span class="check">✓</span>
+          <span class="ic">▢</span>
+          <span>
+            <h3>Blank canvas</h3>
+            <p>Author from scratch in the builder. Advanced — most teams pick a template instead.</p>
+          </span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ============ STEP 2 — TEMPLATE ============ -->
+    <section class="step" data-step="1">
+      <div class="eyebrow">Step 2 of 4</div>
+      <h1 class="title">Choose a template</h1>
+      <p class="sub prose">A standard skeleton gives every SOP the same shape — so workers always know where to find hazards, PPE and sign-off. <span id="tmplCtx"></span></p>
+
+      <div class="tcards">
+        <button class="tcard sel" data-tmpl="general">
+          <h4>General Procedure</h4>
+          <div class="meta">6 sections · all-purpose</div>
+          <div class="skel">
+            <span class="schip"><span class="b" style="background:var(--ink-500)"></span>Purpose &amp; scope</span>
+            <span class="schip"><span class="b" style="background:var(--accent-hazard)"></span>Hazards &amp; PPE</span>
+            <span class="schip"><span class="b" style="background:var(--accent-step)"></span>Procedure steps</span>
+            <span class="schip"><span class="b" style="background:var(--accent-signoff)"></span>Sign-off</span>
+          </div>
+        </button>
+
+        <button class="tcard" data-tmpl="machine">
+          <h4>Machine Operation</h4>
+          <div class="meta">8 sections · forming / line</div>
+          <div class="skel">
+            <span class="schip"><span class="b" style="background:var(--accent-hazard)"></span>Hazards &amp; LOTO</span>
+            <span class="schip"><span class="b" style="background:var(--accent-mcu)"></span>Pre-start checks</span>
+            <span class="schip"><span class="b" style="background:var(--accent-step)"></span>Operating steps</span>
+            <span class="schip"><span class="b" style="background:var(--accent-measure)"></span>Measurements</span>
+          </div>
+        </button>
+
+        <button class="tcard" data-tmpl="loto">
+          <h4>Maintenance / LOTO</h4>
+          <div class="meta">7 sections · isolation</div>
+          <div class="skel">
+            <span class="schip"><span class="b" style="background:var(--accent-hazard)"></span>Energy isolation</span>
+            <span class="schip"><span class="b" style="background:var(--accent-step)"></span>Lockout steps</span>
+            <span class="schip"><span class="b" style="background:var(--accent-mcu)"></span>Verify zero energy</span>
+            <span class="schip"><span class="b" style="background:var(--accent-signoff)"></span>Permit sign-off</span>
+          </div>
+        </button>
+
+        <button class="tcard" data-tmpl="inspect">
+          <h4>Inspection &amp; QA</h4>
+          <div class="meta">5 sections · checks</div>
+          <div class="skel">
+            <span class="schip"><span class="b" style="background:var(--accent-mcu)"></span>Inspect points</span>
+            <span class="schip"><span class="b" style="background:var(--accent-measure)"></span>Tolerances</span>
+            <span class="schip"><span class="b" style="background:var(--accent-decision)"></span>Pass / fail</span>
+          </div>
+        </button>
+
+        <button class="tcard" data-tmpl="clean">
+          <h4>Cleaning &amp; Sanitation</h4>
+          <div class="meta">6 sections · hygiene</div>
+          <div class="skel">
+            <span class="schip"><span class="b" style="background:var(--accent-hazard)"></span>Chemicals &amp; PPE</span>
+            <span class="schip"><span class="b" style="background:var(--accent-step)"></span>Clean steps</span>
+            <span class="schip"><span class="b" style="background:var(--accent-mcu)"></span>Frequency</span>
+          </div>
+        </button>
+
+        <button class="tcard muted" data-tmpl="none">
+          <h4>No template</h4>
+          <div class="meta">advanced · freeform</div>
+          <div class="skel">
+            <span class="schip"><span class="b" style="background:var(--ink-300)"></span>Empty — structure it yourself</span>
+          </div>
+        </button>
+      </div>
+    </section>
+
+    <!-- ============ STEP 3 — DETAILS ============ -->
+    <section class="step" data-step="2">
+      <div class="eyebrow">Step 3 of 4</div>
+      <h1 class="title">Procedure details</h1>
+      <p class="sub prose">Name it and place it. Site &amp; trade decide which workers see it once it's published.</p>
+
+      <div class="grid2">
+        <div>
+          <div class="field">
+            <label>SOP title</label>
+            <input type="text" value="Blank Side Hanger Change" />
+          </div>
+          <div class="two">
+            <div class="field">
+              <label>Department / category</label>
+              <select><option>Forming</option><option>Maintenance</option><option>Quality</option><option>Cleaning</option></select>
+            </div>
+            <div class="field">
+              <label>Trade / sub-trade</label>
+              <select><option>Operator</option><option>Fitter</option><option>Electrician / Sparky</option><option>All trades</option></select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Site <span style="color:var(--accent-mcu)">· overlay</span></label>
+            <select><option>Auckland — Glass</option><option>Christchurch — Cans</option><option>Org-wide (all sites)</option></select>
+            <div class="hint">Site-specific SOPs sit on top of the org template, so hazards can differ per plant.</div>
+          </div>
+        </div>
+
+        <div class="sourcebox" id="sourcebox">
+          <!-- filled by JS per chosen method -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ STEP 4 — REVIEW ============ -->
+    <section class="step" data-step="3">
+      <div class="eyebrow">Step 4 of 4</div>
+      <h1 class="title">Review &amp; create</h1>
+      <p class="sub prose">Confirm the on-ramp. Everything below opens in the builder, where you review, verify every safety block, then publish.</p>
+
+      <div class="review">
+        <div class="rhead"><span>New SOP</span><span class="pill" style="color:var(--brand-yellow)">Draft</span></div>
+        <div class="rrow"><span class="k">Title</span><span class="v">Blank Side Hanger Change</span></div>
+        <div class="rrow"><span class="k">Start method</span><span class="v" id="rMethod">Upload a document</span></div>
+        <div class="rrow"><span class="k">Template</span><span class="v" id="rTmpl">General Procedure</span></div>
+        <div class="rrow"><span class="k">Placement</span><span class="v">Forming · Operator · <span style="color:var(--accent-mcu)">Auckland — Glass</span></span></div>
+      </div>
+
+      <p class="flowline" id="flowline"></p>
+
+      <p class="note"><b>One flow, not four.</b> This single wizard replaces the old separate <code>/upload</code>, <code>/new/ai</code>, <code>/new/blank</code> and video screens — every on-ramp now funnels through the same template + review step before the builder.</p>
+    </section>
+
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-inner">
+    <button class="ghost" id="cancel">Cancel</button>
+    <div style="display:flex;gap:10px;align-items:center">
+      <button class="btn" id="back" style="visibility:hidden">← Back</button>
+      <button class="btn primary" id="next">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const state = { step:0, method:'upload', tmpl:'general' };
+  const methodLabels = {
+    upload:'Upload a document', template:'Build from a template',
+    video:'From a video or recording', ai:'Draft with AI', blank:'Blank canvas'
+  };
+  const tmplLabels = {
+    general:'General Procedure', machine:'Machine Operation', loto:'Maintenance / LOTO',
+    inspect:'Inspection & QA', clean:'Cleaning & Sanitation', none:'No template'
+  };
+
+  const steps = [...document.querySelectorAll('.step')];
+  const nodes = [...document.querySelectorAll('#rail .node')];
+  const backBtn = document.getElementById('back');
+  const nextBtn = document.getElementById('next');
+
+  function sourceHTML(m){
+    if(m==='upload') return `<div class="head">Source document <span class="pill" style="color:var(--ink-500)">AI parse</span></div>
+      <div class="dropzone"><div class="big">⤓</div>Drop a file or <u>browse</u><div class="fmt">.docx · .pdf · .xlsx · .pptx · photo</div></div>`;
+    if(m==='ai') return `<div class="head">Describe the procedure <span class="pill" style="color:var(--ink-500)">AI draft</span></div>
+      <textarea class="prompt" placeholder="e.g. How to change the blank side hanger on the IS glass-forming machine — isolation, removal, new hanger fitment, restart checks…">How to change the blank side hanger on the IS glass-forming machine, including isolation and restart checks.</textarea>`;
+    if(m==='video') return `<div class="head">Source recording</div>
+      <div class="vtabs"><span class="vtab on">Upload</span><span class="vtab">Record</span><span class="vtab">YouTube</span></div>
+      <div class="dropzone"><div class="big">🎬</div>Drop a video or <u>browse</u><div class="fmt">audio is transcribed → draft steps</div></div>`;
+    if(m==='template') return `<div class="head">Template skeleton</div>
+      <div class="dropzone" style="border-style:solid;background:var(--paper)"><div class="big">▤</div>Starts pre-filled with the <b id="sbTmpl">General Procedure</b> sections<div class="fmt">add your steps in the builder</div></div>`;
+    return `<div class="head">Blank</div>
+      <div class="dropzone" style="border-style:solid;background:var(--paper)"><div class="big">▢</div>Opens an empty builder<div class="fmt">no structure — advanced</div></div>`;
+  }
+
+  function flowText(){
+    const t = tmplLabels[state.tmpl];
+    const map = {
+      upload:`AI will parse <b>blank-hanger.docx</b> into the <b>${t}</b> template, flag low-confidence blocks, then open the <b>Builder</b> for review.`,
+      template:`A <b>${t}</b> skeleton will be created and opened in the <b>Builder</b>, ready for you to add steps.`,
+      video:`The recording's audio will be transcribed and mapped into the <b>${t}</b> template, then opened in the <b>Builder</b>.`,
+      ai:`AI will draft structured sections into the <b>${t}</b> template from your description, then open the <b>Builder</b> for review.`,
+      blank:`An empty draft will open directly in the <b>Builder</b>.`
+    };
+    return map[state.method];
+  }
+
+  function render(){
+    steps.forEach(s=>s.classList.toggle('show', +s.dataset.step===state.step));
+    nodes.forEach(n=>{
+      const i=+n.dataset.n;
+      n.classList.toggle('active', i===state.step);
+      n.classList.toggle('done', i<state.step);
+    });
+    backBtn.style.visibility = state.step===0 ? 'hidden':'visible';
+
+    // template step skips for blank/none context line
+    document.getElementById('tmplCtx').textContent =
+      state.method==='upload' ? 'AI fills it from your document.' :
+      state.method==='video' ? 'AI fills it from the transcript.' :
+      state.method==='ai' ? 'AI drafts into it from your description.' : '';
+
+    // details source box
+    if(state.step===2){ document.getElementById('sourcebox').innerHTML = sourceHTML(state.method);
+      const sb=document.getElementById('sbTmpl'); if(sb) sb.textContent=tmplLabels[state.tmpl]; }
+
+    // review
+    document.getElementById('rMethod').textContent = methodLabels[state.method];
+    document.getElementById('rTmpl').textContent = tmplLabels[state.tmpl];
+    document.getElementById('flowline').innerHTML = flowText();
+
+    if(state.step===3){ nextBtn.className='btn go'; nextBtn.textContent='Create & open Builder →'; }
+    else { nextBtn.className='btn primary'; nextBtn.textContent='Continue →'; }
+
+    // skip template step entirely if blank/none chosen? keep visible but mark
+  }
+
+  // method select
+  document.querySelectorAll('.tile').forEach(t=>t.addEventListener('click',()=>{
+    document.querySelectorAll('.tile').forEach(x=>x.classList.remove('sel'));
+    t.classList.add('sel'); state.method=t.dataset.method;
+    if(state.method==='blank'){ state.tmpl='none'; }
+  }));
+  // template select
+  document.querySelectorAll('.tcard').forEach(c=>c.addEventListener('click',()=>{
+    document.querySelectorAll('.tcard').forEach(x=>x.classList.remove('sel'));
+    c.classList.add('sel'); state.tmpl=c.dataset.tmpl;
+  }));
+
+  nextBtn.addEventListener('click',()=>{
+    if(state.step<3){ state.step++; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+    else { alert('→ Redirect to /admin/sops/builder/[sopId]\n\n(All five on-ramps converge here.)'); }
+  });
+  backBtn.addEventListener('click',()=>{ if(state.step>0){state.step--;render();window.scrollTo({top:0,behavior:'smooth'});} });
+  // rail click nav
+  nodes.forEach(n=>n.addEventListener('click',()=>{ state.step=+n.dataset.n; render(); }));
+  document.getElementById('cancel').addEventListener('click',()=>alert('→ Back to /admin/sops'));
+
+  render();
+</script>
+</body>
+</html>

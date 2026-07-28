@@ -1,6 +1,6 @@
 ---
 name: sketch-findings-SOPstart
-description: Validated design decisions, tokens, CSS patterns, new block types, and interaction flows from the SOPstart blueprint-redesign sketch exploration. Auto-loads when building UI for SafeStart / sopstart.com.
+description: Validated design decisions, tokens, CSS patterns, new block types, and interaction flows from the SOPstart sketch explorations — blueprint redesign, org model + library permissions, and the SOP authoring/creation flow (new-SOP wizard, inline builder canvas, block inserter, AI ghosts, read/walk/edit modes). Auto-loads when building UI for SafeStart / sopstart.com.
 ---
 
 <context>
@@ -25,6 +25,14 @@ then wires SOP-library access onto the org model across every arity (1:N, N:1,
 N:M) with site-wide inheritance and person-level overrides. Both surfaces ship
 as ONE page with an in-page segmented view toggle — multiple lenses over one
 shared model, no view-private state.
+
+**Third wrap-up 2026-07-28** — SOP authoring & creation flow
+(`sketches/sop-builder-redesign`, `unified-sop-surface`, `admin-sop-new-wizard`):
+one wizard funnels five on-ramps (upload · template · video · AI · blank) into a
+single inline builder where the canvas IS the worker document; Read/Walk/Edit
+become three modes of one URL. **This area is NOT shipped** — it is the design
+contract for the SOP creation/conversion milestone (see
+`references/authoring-flow.md` for the not-shipped caveat).
 </context>
 
 <design_direction>
@@ -63,6 +71,7 @@ shared model, no view-private state.
 | Interaction patterns | references/interaction-patterns.md | Voice state machine, cmdk, preview toggle, mobile immersive walkthrough |
 | Org model views | references/org-model-views.md | Node Chart default + Column Builder alt view; roles layer between depts and people; vacancies as dashed first-class chips |
 | Permission wiring views | references/permission-wiring-views.md | Patch Bay default + Matrix/Illuminate alt views; direct/inherited/personal access vocabulary; trace-on-click. At scale (15×20): the D hybrid — groups + focus + viz-as-library-filter + wire-up mode with live blast-radius; fixed-height banner slot so the graph never moves |
+| Authoring & creation flow ⚠ **not shipped** | references/authoring-flow.md | Five on-ramps → one wizard → one inline builder; canvas IS the worker document (no palette/inspector); 4-tier context-aware inserter + self-expiring AI ghosts; Read/Walk/Edit as three modes of one URL; visible agent-metadata layer |
 
 ## Theme
 
@@ -83,11 +92,14 @@ Original sketch HTML preserved at `sources/blueprint-sketch.html` (2015 lines, a
 - `references/interaction-patterns.md` if building voice input, cmdk, or the mobile immersive walkthrough
 - `references/org-model-views.md` if building the org-chart / departments / roles / team surfaces
 - `references/permission-wiring-views.md` if building SOP-library access assignment, department↔SOP visibility, or any permissions UI
+- `references/authoring-flow.md` if building **anything in the SOP creation / conversion / authoring path** — the new-SOP wizard, upload/parse review, the inline builder canvas, block insertion, AI suggestions in the editor, or the read/walk/edit surface. Read its "NOT SHIPPED" caveat first: it is a design contract, not a description of current code.
 - `sources/blueprint-sketch.html` directly only if a reference doc points to a line range and you need the exact HTML/CSS
+- `sources/authoring-flow/*.html` for the exact builder/wizard/mode-switch markup and JS (picker tiers, ghost lifecycle, mode state machine)
 
 ## When NOT to use this skill
 
 - Phase 12 admin builder work — that's shipped; use the existing code in `src/components/sop/blocks/` and `src/lib/builder/puck-config.tsx` as the source of truth.
+- Surfaces whose sketches already shipped — org/departments/team (Phase 25), library access hierarchy + builder wayfinder header (Phase 33), supervisor observations (Phase 34). Those sketches are marked processed below but have no reference file: the shipped code is the source of truth, and a second description would only drift.
 - Backend / API work — this skill is UI-only.
 - If the user explicitly asks for a different visual direction (e.g. "make it look like Notion"), this skill should be ignored.
 </routing>
@@ -101,6 +113,18 @@ Original sketch HTML preserved at `sources/blueprint-sketch.html` (2015 lines, a
 - `002-permission-wiring` (winner A, Patch Bay — wrapped 2026-07-18)
 - `003-wiring-at-scale` (winner D, hybrid + wire-up — wrapped 2026-07-18)
 
+### Wrapped 2026-07-28 — included
+
+- `sketches/sop-builder-redesign` → references/authoring-flow.md
+- `sketches/unified-sop-surface` → references/authoring-flow.md
+- `sketches/admin-sop-new-wizard` → references/authoring-flow.md
+
+### Wrapped 2026-07-28 — processed, deliberately excluded (shipped; code is source of truth)
+
+- `sketches/departments`, `sketches/team-departments`, `sketches/unified-block-library` — Phase 25
+- `sketches/access-hierarchy` (winner A, Access map), `sketches/builder-header-orientation` (winner A, Wayfinder bar) — Phase 33; both have READMEs with full trade-off tables and decisions, kept in place as historical record
+- `sketches/supervisor-observations` — Phase 34
+
 ## Related planning docs
 
 - `.planning/sketches/WRAP-UP-FINDINGS.md` — the raw analysis doc that seeded this skill
@@ -108,5 +132,5 @@ Original sketch HTML preserved at `sources/blueprint-sketch.html` (2015 lines, a
 
 ## Wrap-up
 
-2026-04-24
+2026-04-24 (blueprint redesign) · 2026-07-18 (org model + permissions) · 2026-07-28 (authoring & creation flow)
 </metadata>
