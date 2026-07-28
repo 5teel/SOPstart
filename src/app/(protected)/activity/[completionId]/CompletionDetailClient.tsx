@@ -7,6 +7,7 @@ import { StatusBadge } from '@/components/admin/StatusBadge'
 import { CompletionStepRow } from '@/components/activity/CompletionStepRow'
 import { RejectReasonSheet } from '@/components/activity/RejectReasonSheet'
 import { signOffCompletion, recordSignature } from '@/actions/completions'
+import { requestAssessorReview } from '@/actions/observations'
 import type { CompletionStatus } from '@/types/sop'
 
 // sessionStorage key for roster identity (set by RosterSelector on shared devices — D-11)
@@ -36,6 +37,7 @@ interface SignOff {
 
 interface CompletionDetailClientProps {
   completionId: string
+  sopId: string
   sopTitle: string | null
   sopVersion: number
   status: CompletionStatus
@@ -49,6 +51,20 @@ interface CompletionDetailClientProps {
   isSupervisor: boolean
   alreadySigned: boolean
   currentUserId: string
+  isAssessor: boolean
+  canOverride: boolean
+}
+
+// Phase 37 ASR-01/D-08: plain-language copy for a supervisor blocked from
+// approving because they are not themselves signed off on this SOP.
+const NOT_ASSESSOR_COPY = 'You need to be signed off on this SOP yourself before you can assess others on it'
+// D-05: honesty copy shown before an admin/safety_manager override commits.
+const OVERRIDE_DISCLOSURE_COPY = 'This will be recorded as an assessor override with your reason, visible in the audit trail.'
+
+function mapSignOffError(error: string): string {
+  if (error === 'NOT_SIGNED_OFF_ASSESSOR') return NOT_ASSESSOR_COPY + '.'
+  if (error === 'ASSESSOR_OVERRIDE_REQUIRED') return 'An override reason (10+ characters) is required to approve without assessor status.'
+  return error
 }
 
 function formatNZDateTime(isoString: string): string {
@@ -67,6 +83,7 @@ function getInitials(name: string): string {
 
 export function CompletionDetailClient({
   completionId,
+  sopId,
   sopTitle,
   sopVersion,
   status: initialStatus,
@@ -80,6 +97,8 @@ export function CompletionDetailClient({
   isSupervisor,
   currentUserId,
   alreadySigned: initialAlreadySigned,
+  isAssessor,
+  canOverride,
 }: CompletionDetailClientProps) {
   const [status, setStatus] = useState<CompletionStatus>(initialStatus)
   const [signOff, setSignOff] = useState<SignOff | null>(initialSignOff)
@@ -87,20 +106,34 @@ export function CompletionDetailClient({
   const [isApproving, setIsApproving] = useState(false)
   const [isRejecting, setIsRejecting] = useState(false)
   const [rejectSheetOpen, setRejectSheetOpen] = useState(false)
+  const [overrideSheetOpen, setOverrideSheetOpen] = useState(false)
+  const [overrideReason, setOverrideReason] = useState('')
   const [actionError, setActionError] = useState<string | null>(null)
+  const [requestingAssessment, setRequestingAssessment] = useState(false)
+  const [requestSent, setRequestSent] = useState(false)
 
   const totalPhotoCount = photos.length
+  // Phase 37 ASR-01: the client's blocked/disabled state is UX only —
+  // signOffCompletion recomputes isSignedOffAssessor server-side and is the
+  // real authority (T-37-04-01).
+  const blockedFromApproving = !isAssessor
 
-  async function handleApprove() {
+  async function handleApprove(withOverrideReason?: string) {
     if (isApproving) return
     setIsApproving(true)
     setActionError(null)
     try {
-      const result = await signOffCompletion({ completionId, decision: 'approved' })
+      const result = await signOffCompletion({
+        completionId,
+        decision: 'approved',
+        overrideReason: withOverrideReason,
+      })
       if (result.success) {
         setStatus('signed_off')
         setAlreadySigned(true)
         setSignOff({ id: '', supervisor_id: '', decision: 'approved', reason: null, created_at: new Date().toISOString() })
+        setOverrideSheetOpen(false)
+        setOverrideReason('')
 
         // D-10 / AFL-VER-05: Record supervisor counter-signature bound to roster identity.
         // On shared devices, the supervisor's roster id is stored in sessionStorage by RosterSelector.
@@ -120,12 +153,34 @@ export function CompletionDetailClient({
           })
         }
       } else {
-        setActionError(result.error)
+        // T-37-04-01: the server is the authority and can differ from the
+        // client's blocked state (e.g. a needs_support reset landing between
+        // render and click) — map both gate error codes to human copy.
+        setActionError(mapSignOffError(result.error))
       }
     } catch {
       setActionError('An unexpected error occurred.')
     } finally {
       setIsApproving(false)
+    }
+  }
+
+  function handleApproveClick() {
+    if (blockedFromApproving && canOverride) {
+      setOverrideSheetOpen(true)
+      return
+    }
+    void handleApprove()
+  }
+
+  async function handleRequestAssessment() {
+    if (requestingAssessment) return
+    setRequestingAssessment(true)
+    try {
+      const result = await requestAssessorReview(sopId)
+      if (result.success) setRequestSent(true)
+    } finally {
+      setRequestingAssessment(false)
     }
   }
 
@@ -257,29 +312,52 @@ export function CompletionDetailClient({
       {/* Sign-off bar (supervisor only) */}
       {showSignOffBar && (
         <div className="sticky bottom-0 z-30 bg-[var(--paper)] border-t border-[var(--ink-100)] px-4 pt-3 pb-3">
-          <div className="flex gap-3 max-w-2xl mx-auto">
-            <button
-              type="button"
-              onClick={handleApprove}
-              disabled={isApproving || isRejecting}
-              className={`flex-1 h-[72px] rounded-xl font-bold text-base bg-[var(--accent-signoff)] text-white flex items-center justify-center gap-2 transition-opacity ${
-                isApproving || isRejecting ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
-              }`}
-            >
-              <Check size={20} />
-              {isApproving ? 'Approving…' : 'Approve'}
-            </button>
-            <button
-              type="button"
-              onClick={() => setRejectSheetOpen(true)}
-              disabled={isApproving || isRejecting}
-              className={`flex-1 h-[72px] rounded-xl font-bold text-base bg-white border-2 border-[var(--accent-escalate)] text-[var(--accent-escalate)] flex items-center justify-center gap-2 transition-opacity ${
-                isApproving || isRejecting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[var(--accent-escalate)]/5'
-              }`}
-            >
-              <X size={20} />
-              Reject
-            </button>
+          <div className="flex flex-col gap-3 max-w-2xl mx-auto">
+            {/* Phase 37 D-08: blocked-supervisor teaching state — the reject
+                control below is UNAFFECTED by this and stays fully enabled. */}
+            {blockedFromApproving && !canOverride && (
+              <div className="p-3 rounded-xl bg-[var(--paper-2)] border border-[var(--ink-100)]">
+                <p className="text-sm text-[var(--ink-900)] mb-2">{NOT_ASSESSOR_COPY}</p>
+                {requestSent ? (
+                  <p className="text-sm text-[var(--accent-signoff)] font-medium">
+                    Request sent — an admin or safety manager will be notified
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleRequestAssessment}
+                    disabled={requestingAssessment}
+                    className="text-sm font-semibold text-[var(--accent-measure)] hover:underline disabled:opacity-50"
+                  >
+                    {requestingAssessment ? 'Sending…' : 'Request assessment'}
+                  </button>
+                )}
+              </div>
+            )}
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={handleApproveClick}
+                disabled={isApproving || isRejecting || (blockedFromApproving && !canOverride)}
+                className={`flex-1 h-[72px] rounded-xl font-bold text-base bg-[var(--accent-signoff)] text-white flex items-center justify-center gap-2 transition-opacity ${
+                  isApproving || isRejecting || (blockedFromApproving && !canOverride) ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
+                }`}
+              >
+                <Check size={20} />
+                {isApproving ? 'Approving…' : 'Approve'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setRejectSheetOpen(true)}
+                disabled={isApproving || isRejecting}
+                className={`flex-1 h-[72px] rounded-xl font-bold text-base bg-white border-2 border-[var(--accent-escalate)] text-[var(--accent-escalate)] flex items-center justify-center gap-2 transition-opacity ${
+                  isApproving || isRejecting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[var(--accent-escalate)]/5'
+                }`}
+              >
+                <X size={20} />
+                Reject
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -290,6 +368,66 @@ export function CompletionDetailClient({
         onConfirm={handleRejectConfirm}
         isSubmitting={isRejecting}
       />
+
+      {/* Phase 37 D-05: progressive-disclosure override reason sheet for
+          admin/safety_manager approving without assessor status. Added
+          inline (not a fork of RejectReasonSheet) since that sheet hardcodes
+          its own title/copy. */}
+      {overrideSheetOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-[var(--ink-900)]/40 backdrop-blur-sm"
+            onClick={() => setOverrideSheetOpen(false)}
+            aria-hidden="true"
+          />
+          <div
+            className="fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-2xl pt-4 pb-[calc(16px+env(safe-area-inset-bottom,0px))] px-4 flex flex-col gap-4 border-t border-[var(--ink-100)]"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Assessor override"
+          >
+            <div className="w-10 h-1 bg-[var(--ink-300)] rounded-full mx-auto mb-2" />
+            <h2 className="text-lg font-semibold text-[var(--ink-900)]">Approve as assessor override</h2>
+            <p className="text-sm text-[var(--ink-500)] -mt-2">{OVERRIDE_DISCLOSURE_COPY}</p>
+            <div className="border-t border-[var(--ink-100)]" />
+            <div className="flex flex-col gap-1">
+              <label htmlFor="override-reason" className="text-sm font-semibold text-[var(--ink-900)]">
+                Reason for override
+              </label>
+            </div>
+            <div className="flex flex-col gap-1">
+              <textarea
+                id="override-reason"
+                className="w-full bg-[var(--paper-2)] border border-[var(--ink-100)] rounded-xl text-base text-[var(--ink-900)] p-3 resize-none min-h-[120px] focus:outline-none focus:ring-2 focus:ring-[var(--accent-signoff)]/30 placeholder:text-[var(--ink-300)]"
+                placeholder="e.g. I've directly verified this worker's competence on this task."
+                value={overrideReason}
+                onChange={(e) => setOverrideReason(e.target.value.slice(0, 500))}
+                disabled={isApproving}
+              />
+              <span className="mono text-xs text-[var(--ink-500)] text-right tabular-nums">{overrideReason.length}/500</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => void handleApprove(overrideReason.trim())}
+              disabled={overrideReason.trim().length < 10 || isApproving}
+              className={`w-full h-[72px] rounded-xl font-bold text-lg bg-[var(--accent-signoff)] text-white flex items-center justify-center gap-2 transition-opacity ${
+                overrideReason.trim().length < 10 || isApproving ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
+              }`}
+            >
+              <Check size={20} />
+              {isApproving ? 'Approving…' : 'Confirm override'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setOverrideSheetOpen(false)}
+              disabled={isApproving}
+              className="text-sm text-[var(--ink-500)] hover:text-[var(--ink-900)] text-center mt-1 py-2 cursor-pointer transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </>
+      )}
     </>
   )
 }

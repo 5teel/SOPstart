@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { isSignedOffAssessor } from '@/lib/competency/assessor'
 import { CompletionDetailClient } from './CompletionDetailClient'
 
 interface CompletionDetailPageProps {
@@ -11,6 +12,7 @@ interface RawCompletionData {
   id: string
   sop_id: string
   worker_id: string
+  organisation_id: string
   sop_version: number
   status: string
   submitted_at: string
@@ -47,6 +49,7 @@ export default async function CompletionDetailPage({ params }: CompletionDetailP
       id,
       sop_id,
       worker_id,
+      organisation_id,
       sop_version,
       status,
       submitted_at,
@@ -83,29 +86,36 @@ export default async function CompletionDetailPage({ params }: CompletionDetailP
   // Worker display info — no profiles table, use abbreviated user_id as display name
   const workerName = `Worker ${data.worker_id.slice(0, 8)}`
 
-  // Generate presigned read URLs for all photos (1hr expiry)
+  // Generate presigned read URLs for all photos (1hr expiry), fetch SOP
+  // steps, and compute derived assessor state IN PARALLEL — no serial
+  // waterfall on this hot page (CLAUDE.md 2026-07-13).
   const photos = data.completion_photos ?? []
-  const photosWithUrls = await Promise.all(
-    photos.map(async (photo) => {
-      const { data: urlData } = await admin.storage
-        .from('completion-photos')
-        .createSignedUrl(photo.storage_path, 3600)
-      return {
-        id: photo.id,
-        step_id: photo.step_id,
-        storage_path: photo.storage_path,
-        content_type: photo.content_type,
-        signed_url: urlData?.signedUrl ?? '',
-      }
-    })
-  )
-
-  // Fetch SOP steps so we can show step text
-  const { data: sections } = await supabase
-    .from('sop_sections')
-    .select('id, sort_order, sop_steps ( id, step_number, text )')
-    .eq('sop_id', data.sop_id)
-    .order('sort_order', { ascending: true })
+  const [photosWithUrls, { data: sections }, isAssessor] = await Promise.all([
+    Promise.all(
+      photos.map(async (photo) => {
+        const { data: urlData } = await admin.storage
+          .from('completion-photos')
+          .createSignedUrl(photo.storage_path, 3600)
+        return {
+          id: photo.id,
+          step_id: photo.step_id,
+          storage_path: photo.storage_path,
+          content_type: photo.content_type,
+          signed_url: urlData?.signedUrl ?? '',
+        }
+      })
+    ),
+    supabase
+      .from('sop_sections')
+      .select('id, sort_order, sop_steps ( id, step_number, text )')
+      .eq('sop_id', data.sop_id)
+      .order('sort_order', { ascending: true }),
+    // Phase 37 ASR-01: server-computed so the client's disabled Approve
+    // button is never trusted as the authority (signOffCompletion
+    // recomputes this itself) — this is purely for the UI's blocked/override
+    // state.
+    isSignedOffAssessor(userId, data.sop_id, admin, data.organisation_id),
+  ])
 
   type RawSection = {
     id: string
@@ -120,12 +130,17 @@ export default async function CompletionDetailPage({ params }: CompletionDetailP
   const signOffs = data.completion_sign_offs ?? []
   const signOff = signOffs.length > 0 ? signOffs[0] : null
 
-  const isSupervisor = role === 'supervisor' || role === 'safety_manager'
+  // Phase 37 D-06: admin must reach the sign-off bar too — it holds the
+  // override path, so excluding it here would make the override unreachable
+  // on this surface no matter how correct the gate is.
+  const isSupervisor = role === 'supervisor' || role === 'safety_manager' || role === 'admin'
   const alreadySigned = signOff !== null
+  const canOverride = role === 'admin' || role === 'safety_manager'
 
   return (
     <CompletionDetailClient
       completionId={completionId}
+      sopId={data.sop_id}
       sopTitle={sopTitle}
       sopVersion={sopVersion}
       status={data.status as 'pending_sign_off' | 'signed_off' | 'rejected'}
@@ -139,6 +154,8 @@ export default async function CompletionDetailPage({ params }: CompletionDetailP
       isSupervisor={isSupervisor}
       alreadySigned={alreadySigned}
       currentUserId={userId}
+      isAssessor={isAssessor}
+      canOverride={canOverride}
     />
   )
 }
