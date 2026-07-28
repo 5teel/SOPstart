@@ -711,4 +711,76 @@ Which phases cover which requirements. Updated during roadmap creation.
 - Unmapped: 0
 
 ---
-*v7.0 requirements added: 2026-07-19 · roadmap created 2026-07-19 (Phases 34-39)*
+*v7.0 requirements added: 2026-07-19 · roadmap created 2026-07-19 (Phases 34-39) · closed at Phase 37 on 2026-07-28 with 38/39 deferred*
+
+## v8.0 Requirements — Authoring Convergence
+
+**Defined:** 2026-07-28 · Source: line-verified audit of every SOP creation surface (2026-07-28), `.claude/skills/sketch-findings-SOPstart/references/authoring-flow.md` design contract (wrapped 2026-07-28), Simon's scoping call ("tightening the current design, removing duplicative routes, simplifying the user workflows").
+
+**Milestone character:** CONSOLIDATION. Every requirement below removes, merges, or unifies something that already exists. No requirement adds a new authoring capability. If a plan finds itself building a net-new feature, that is scope creep — defer it.
+
+**North star (carried):** ease of use and maintenance first. A converged flow that is harder to use than what it replaced has failed regardless of how much duplication it removed.
+
+### Creation Flow Convergence (CRE)
+
+- [ ] **CRE-01**: Every creation on-ramp — document upload, YouTube, video record, video-generate, AI-describe, AI-voice, blank — is reachable from the single creation entry point; no on-ramp is hidden inside another route's tab or button row
+- [ ] **CRE-02**: Every creation on-ramp collects the same core metadata (title, department, category) before the SOP is created; no path can produce an untitled or unplaced SOP
+- [ ] **CRE-03**: Every creation on-ramp lands the user in the builder; the video-generation path no longer terminates in a separate pipeline surface
+- [ ] **CRE-04**: The creation picker presents each distinct method exactly once — no two tiles resolving to the same route, no method absent from the picker
+
+### Shared-Component Deduplication (DUP)
+
+- [ ] **DUP-01**: One file-intake component owns accepted MIME types, blocked extensions, size limits, and HEIC→JPEG conversion; every upload path (creation, video-generate, new-version) uses it, and the accept lists no longer disagree
+- [ ] **DUP-02**: One department/metadata picker component is used by every creation surface — the three near-identical copies collapse to one
+- [ ] **DUP-03**: One parse/job progress component serves both the parse flow and the video pipeline; realtime-with-polling-fallback is implemented once
+- [ ] **DUP-04**: All admin creation routes render the same page shell and navigation — no route hand-rolls its own back-link while others use the shared nav
+
+### Data-Model Convergence (DAT)
+
+- [ ] **DAT-01**: A SOP's category resolves to a single column backed by a single vocabulary; SOPs created via any on-ramp are filterable together, and existing rows carrying the other column are backfilled
+
+### Progress & State Honesty (PRG)
+
+- [ ] **PRG-01**: The builder renders uploading/parsing state — a SOP whose parse is still queued or running never presents as an empty builder with no explanation
+- [ ] **PRG-02**: Navigation into the builder is consistent client-side routing from every on-ramp; no path triggers a full page reload
+
+### Dead-Surface Removal (DED)
+
+- [ ] **DED-01**: No CTA in the admin UI points at a route that does not exist
+- [ ] **DED-02**: No non-functional affordance ships as an enabled control — a feature is either implemented or its control is removed
+- [ ] **DED-03**: Orphaned redirect shims and dead state (set-never-called variables, computed-never-rendered memos) in the creation surfaces are removed
+- [ ] **DED-04**: `journeys.ts`, `.planning/codebase/ARCHITECTURE.md`, and any other route documentation match the real route tree after convergence; `/pathways` shows 0 not-mapped for changed routes
+
+### v8.0 Out of Scope
+
+- **Template on-ramp** (pre-structured section skeletons at creation) — a genuinely new capability from the authoring-flow sketches; deferred despite being designed
+- **Merging the worker route and admin builder into one URL** — architecturally large; the worker side is already one route with three tabs (`/sops/[sopId]?tab=read|walk|flow`)
+- **Conversion/parse quality** — whether the parse produces good output is v9.0, the deliberately sequenced next milestone
+- **Agent-layer surfacing changes** and the `--ai` violet token from the sketches — presentation work, not convergence
+- **New block types** — the block registry is shared and working; leave it alone
+- **AI-reviewer rubric, document codes, risk triage** — deferred to backlog 999.4/999.5/999.6, blocked on conversion maturity
+
+### v8.0 Traceability
+
+| Requirement | Phase | Status |
+|---|---|---|
+| CRE-01 | TBD | Pending |
+| CRE-02 | TBD | Pending |
+| CRE-03 | TBD | Pending |
+| CRE-04 | TBD | Pending |
+| DUP-01 | TBD | Pending |
+| DUP-02 | TBD | Pending |
+| DUP-03 | TBD | Pending |
+| DUP-04 | TBD | Pending |
+| DAT-01 | TBD | Pending |
+| PRG-01 | TBD | Pending |
+| PRG-02 | TBD | Pending |
+| DED-01 | TBD | Pending |
+| DED-02 | TBD | Pending |
+| DED-03 | TBD | Pending |
+| DED-04 | TBD | Pending |
+
+**v8.0 Coverage:** 15 requirements (CRE ×4, DUP ×4, DAT ×1, PRG ×2, DED ×4). Phase mapping filled by the roadmapper.
+
+---
+*v8.0 requirements added: 2026-07-28*
