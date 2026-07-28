@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v7.0
 milestone_name: — Competency & Training Layer
 status: verifying
-stopped_at: Completed 36-10-PLAN.md
-last_updated: "2026-07-27T14:46:37.271Z"
+stopped_at: Phase 37 context gathered
+last_updated: "2026-07-28T00:46:25.367Z"
 last_activity: 2026-07-27
 progress:
   total_phases: 6
@@ -552,7 +552,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-27T14:09:59.316Z
-Stopped at: Completed 36-10-PLAN.md
+Last session: 2026-07-28T00:46:25.356Z
+Stopped at: Phase 37 context gathered
 Resume file:
-None
+.planning/phases/37-assessor-governance/37-CONTEXT.md
