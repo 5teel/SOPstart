@@ -836,6 +836,75 @@ export const UAT_TESTS: UatTest[] = [
     ],
   },
   {
+    id: 'p37-blocked-supervisor',
+    dateAdded: '2026-07-28',
+    category: 'Phase 37 — Assessor governance',
+    title: 'As a supervisor who hasn\'t been signed off on a procedure yet, try to record that someone else did it correctly',
+    status: 'active',
+    summary:
+      'Only someone who has themselves been checked off on a procedure can vouch for someone else doing it right. If you haven\'t been signed off yet, that one option is turned off for you — everything else about recording what you saw still works.',
+    tryIt: [
+      'As a supervisor, open a worker\'s panel in Team (or a completion in Activity) and start recording an observation for a procedure you\'ve never been signed off on yourself.',
+      'Try to pick "performed to SOP" (done correctly) and see what happens.',
+      'Check the coaching option ("needs support") still works normally.',
+      'Look for a way to ask someone to sign you off, and try it.',
+    ],
+    links: [{ label: 'Team', href: '/admin/team' }, { label: 'Activity', href: '/activity' }],
+    questions: [
+      { id: 'option-unavailable', text: 'Was it clear that "done correctly" wasn\'t available to you yet?' },
+      { id: 'explanation-clear', text: 'Did the on-screen message explain why, in a way that made sense?' },
+      { id: 'coaching-still-works', text: 'Could you still record "needs support" for coaching purposes?' },
+      { id: 'can-request', text: 'Was it easy to ask someone to sign you off?' },
+    ],
+    background:
+      'ASR-01 (37-03/37-04/37-05) — recordObservation/signOffCompletion gate the advancing verdict on isSignedOffAssessor (D-03/D-04); requestAssessorReview closes the D-08 request loop.',
+  },
+  {
+    id: 'p37-admin-override',
+    dateAdded: '2026-07-28',
+    category: 'Phase 37 — Assessor governance',
+    title: 'As an admin on a brand-new organisation with nobody signed off yet, record that a worker did a procedure correctly',
+    status: 'active',
+    summary:
+      'On day one, nobody at a new organisation has been formally signed off on anything yet — so nobody could ever record the first "done correctly" result. Admins and safety managers can break that deadlock, as long as they give a reason, which goes on the permanent record.',
+    tryIt: [
+      'As an admin (or safety manager) at a new organisation with no one signed off yet, record an observation for a worker and choose "performed to SOP" (done correctly).',
+      'Check that you\'re asked to type a reason before it will save.',
+      'Read the on-screen message about what happens to that reason.',
+      'Save it and confirm it goes through.',
+    ],
+    links: [{ label: 'Team', href: '/admin/team' }],
+    questions: [
+      { id: 'asked-for-reason', text: 'Were you asked for a reason before it would let you save?' },
+      { id: 'permanent-record-explained', text: 'Did the screen make it clear this goes on the permanent record?' },
+      { id: 'saved-successfully', text: 'Did it save without any confusing errors?' },
+    ],
+    background:
+      'ASR-01/D-05 — the override path is admin/safety_manager only, mandatory reason enforced by Zod, the server action, and a DB CHECK constraint three layers deep; is_assessor_override + override_reason stamped on the row.',
+  },
+  {
+    id: 'p37-assessment-requests',
+    dateAdded: '2026-07-28',
+    category: 'Phase 37 — Assessor governance',
+    title: 'As an admin or safety manager, check the assessment-requests list on Team',
+    status: 'active',
+    summary:
+      'When a supervisor who isn\'t signed off yet asks to be assessed, it shows up in a short list for admins and safety managers, with a one-tap way to go and assess them.',
+    tryIt: [
+      'Open Team as an admin or safety manager.',
+      'Find the assessment-requests list and check it shows who asked and which procedure it\'s for.',
+      'Click "Assess now" on one of the requests.',
+      'Confirm the recording screen opens with the right person and procedure already filled in.',
+    ],
+    links: [{ label: 'Team', href: '/admin/team' }],
+    questions: [
+      { id: 'list-shows-who-and-what', text: 'Was it clear who asked and which procedure they need to be assessed on?' },
+      { id: 'assess-now-prefilled', text: 'Did "Assess now" open the form with the right person and procedure already filled in?' },
+    ],
+    background:
+      'ASR-01/D-08 — AssessmentRequestsPanel (37-05) reads listAssessmentRequests() and mounts the shared RecordObservationModal preset to the requester + SOP; requestAssessorReview (37-03) writes the underlying worker_notifications row.',
+  },
+  {
     id: 'example-direction-template',
     dateAdded: '2026-06-09',
     category: 'Examples',
