@@ -479,5 +479,29 @@ export default defineConfig({
       testMatch: /tests\/phase36\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 37 -- Assessor Governance
+      // Nyquist harness (Wave 0 / Plan 37-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase37/**) so every later plan in
+      // the phase drops specs into tests/phase37/ with NO further config edit --
+      // single registration point for the whole phase (mirrors phase26/28/29/30/32/33/34/35/36).
+      //
+      // Verify registration: `npx playwright test --list --project=phase37`
+      // (should list all 6 tests/phase37/*.spec.ts files -- zero discovered = FAIL)
+      //
+      // Wave-0 stub files (ASR-01):
+      //   no-competency-gate-worker (CMP-04 north star, live) --
+      //   override-audit-schema (D-05/D-07, live) --
+      //   assessor-gate (fixme, activates 37-03) --
+      //   assessor-ui-observation (fixme, activates 37-05) --
+      //   assessor-ui-signoff (fixme, activates 37-04) --
+      //   bootstrap-override-runtime (fixme, activates 37-06)
+      name: 'phase37',
+      testDir: '.',
+      testMatch: /tests\/phase37\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
