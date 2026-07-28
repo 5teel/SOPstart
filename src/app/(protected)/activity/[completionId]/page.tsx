@@ -36,7 +36,7 @@ interface RawCompletionData {
 export default async function CompletionDetailPage({ params }: CompletionDetailPageProps) {
   const { completionId } = await params
 
-  const { supabase, userId, role } = await getSessionContext()
+  const { supabase, userId, role, organisationId } = await getSessionContext()
   if (!userId) redirect('/login')
   if (!role) redirect('/dashboard')
 
@@ -66,6 +66,15 @@ export default async function CompletionDetailPage({ params }: CompletionDetailP
   }
 
   const data = rawData as unknown as RawCompletionData
+
+  // Phase 37-07 CR-01: org-scope guard against the attacker-controlled
+  // completionId route param, evaluated against the SESSION organisation
+  // (never the row's own organisation_id) — service-role self-enforcement
+  // class per CLAUDE.md 2026-06-15 / 2026-07-20. Must run before the
+  // presigned-URL Promise.all below or it leaks the photo URLs it protects.
+  if (!organisationId || data.organisation_id !== organisationId) {
+    redirect('/activity')
+  }
 
   // Access control: workers can only view their own completions
   if (role === 'worker' && data.worker_id !== userId) {
@@ -114,7 +123,12 @@ export default async function CompletionDetailPage({ params }: CompletionDetailP
     // button is never trusted as the authority (signOffCompletion
     // recomputes this itself) — this is purely for the UI's blocked/override
     // state.
-    isSignedOffAssessor(userId, data.sop_id, admin, data.organisation_id),
+    // Phase 37-07 CR-01: fourth arg is the SESSION organisationId, not the
+    // row's own org field — that field is attacker-influenced (whatever org
+    // the supplied completionId UUID happens to belong to). The guard above
+    // already proves the two equal; this is defence-in-depth so the
+    // predicate stays correct even if the guard is later moved or deleted.
+    isSignedOffAssessor(userId, data.sop_id, admin, organisationId),
   ])
 
   type RawSection = {
