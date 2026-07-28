@@ -9,6 +9,7 @@ import {
   SignOffSchema as signOffSchema,
   RecordSignatureSchema as recordSignatureSchema,
 } from '@/lib/validators/completions'
+import { isSignedOffAssessor } from '@/lib/competency/assessor'
 
 // ---------------------------------------------------------------
 // submitCompletion
@@ -134,9 +135,12 @@ export async function signOffCompletion(
   const { userId, role, organisationId } = await getSessionContext()
   if (!userId) return { success: false, error: 'Not authenticated' }
 
-  // Verify caller is supervisor or safety_manager
-  if (!role || !['supervisor', 'safety_manager'].includes(role)) {
-    return { success: false, error: 'Only supervisors and safety managers can sign off completions.' }
+  // Verify caller is supervisor, safety_manager or admin. Phase 37 D-06:
+  // admin is a peer of safety_manager on every other governance surface —
+  // widening this array is what makes the override path below reachable at
+  // all (37-RESEARCH Pitfall 2 — admin was previously hard-excluded here).
+  if (!role || !['supervisor', 'safety_manager', 'admin'].includes(role)) {
+    return { success: false, error: 'Only supervisors, safety managers and admins can sign off completions.' }
   }
   if (!organisationId) return { success: false, error: 'No organisation found' }
 
@@ -159,6 +163,33 @@ export async function signOffCompletion(
   if (completion.organisation_id !== organisationId) {
     return { success: false, error: 'Completion record not found.' }
   }
+
+  // ASR-01 gate (D-03) — the completion sign-off is the strongest
+  // competence-advancing record, so it is gated identically to
+  // recordObservation's performed_to_sop branch. Only 'approved' is gated
+  // (branch-before-gate) — rejecting is never competence-advancing and must
+  // stay reachable regardless of assessor status.
+  let isOverride = false
+  if (decision === 'approved') {
+    // Admin client for the PREDICATE READ ONLY (mirrors observations.ts):
+    // isSignedOffAssessor reads sop_completions/completion_sign_offs/
+    // sop_observations on the caller's own behalf, and RLS does not
+    // reliably return a supervisor's own rows about OTHER workers — a
+    // session-client read would falsely deny a legitimate assessor. The
+    // predicate self-enforces org scope; organisationId is session-derived.
+    const assessor = await isSignedOffAssessor(userId, completion.sop_id, admin, organisationId)
+    if (!assessor) {
+      if (role === 'admin' || role === 'safety_manager') {
+        if (!parsed.data.overrideReason || parsed.data.overrideReason.trim().length < 10) {
+          return { success: false, error: 'ASSESSOR_OVERRIDE_REQUIRED' }
+        }
+        isOverride = true
+      } else {
+        return { success: false, error: 'NOT_SIGNED_OFF_ASSESSOR' }
+      }
+    }
+  }
+
   // For supervisors: verify the worker is in their supervisor_assignments
   if (role === 'supervisor') {
     const { data: assignment } = await admin
@@ -183,6 +214,8 @@ export async function signOffCompletion(
       supervisor_id: userId,
       decision,
       reason: reason ?? null,
+      is_assessor_override: isOverride,
+      override_reason: isOverride ? parsed.data.overrideReason : null,
     })
 
   if (signOffError) {
