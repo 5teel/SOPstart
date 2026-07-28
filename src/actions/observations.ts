@@ -55,6 +55,28 @@ export async function recordObservation(
     .from('sops').select('version').eq('id', sopId).single()
   if (sopError || !sop) return { success: false, error: 'SOP not found.' }
 
+  // Phase 37-07 WR-05: sop_observations is append-only, so a foreign or
+  // unrelated completionId is unfixable once written — the insert policy's
+  // sop_observation_refs_in_org (00057) deliberately covers sop_id and
+  // observed_worker_id but NOT completion_id, so this is the only place the
+  // gap can be closed. Runs before the ASR-01 predicate read below so an
+  // invalid reference is rejected without spending a predicate read. Admin
+  // client, not session: sop_completions RLS only returns a supervisor their
+  // OWN assigned workers' rows, so a session read would falsely reject
+  // legitimate recorders (2026-07-20 "RLS silently EMPTIES a same-org read"
+  // class). organisationId and workerId are already session-derived /
+  // schema-validated, so the admin client self-enforces its own scope.
+  if (completionId) {
+    const { data: completionRow } = await createAdminClient()
+      .from('sop_completions')
+      .select('id')
+      .eq('id', completionId)
+      .eq('organisation_id', organisationId)
+      .eq('worker_id', workerId)
+      .maybeSingle()
+    if (!completionRow) return { success: false, error: 'Completion not found.' }
+  }
+
   // ASR-01 gate — only the advancing verdict is gated (D-03/D-04
   // branch-before-gate). needs_support is the coaching-not-discipline
   // default (Phase 34 D-01, this phase's D-04) and the higher-frequency
@@ -367,8 +389,15 @@ export async function getAssessorStatusForSop(sopId: string): Promise<AssessorSt
 export async function requestAssessorReview(
   sopId: string
 ): Promise<{ success: true } | { success: false; error: string }> {
-  const { userId, organisationId } = await getSessionContext()
+  const { userId, role, organisationId } = await getSessionContext()
   if (!userId) return { success: false, error: 'Not authenticated' }
+  // Phase 37-07 WR-02: gate before any admin-client work — every sibling
+  // action in this file gates on RECORDER_ROLES; this one previously did
+  // not, so any authenticated worker could POST-invoke it and spam every
+  // admin's notification badge (T-37-07-04).
+  if (!role || !RECORDER_ROLES.includes(role)) {
+    return { success: false, error: 'Only supervisors, admins and safety managers can request assessment.' }
+  }
   if (!organisationId) return { success: false, error: 'No organisation found' }
 
   const admin = createAdminClient()
