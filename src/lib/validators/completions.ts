@@ -70,6 +70,16 @@ export const SignOffSchema = z.object({
   completionId: z.string().uuid(),
   decision: SignOffDecisionSchema,
   reason: z.string().optional(),
+  // Phase 37 ASR-01/D-05: mandatory whenever the override path is taken (the
+  // approver is admin/safety_manager but not a signed-off assessor for this
+  // SOP). Optional here because the field is only required on the override
+  // branch — the server action (Plan 37-04) enforces presence when
+  // is_assessor_override would be true, and the DB CHECK constraint
+  // (migration 00056) is the third and final backstop. Layer 1 of 3
+  // (Zod → server action → DB CHECK). Same 10-char floor as the existing
+  // rejection-reason threshold in signOffCompletion — one reason-quality
+  // bar across the whole sign-off surface, not two.
+  overrideReason: z.string().trim().min(10).max(500).optional(),
 })
 export type SignOffInput = z.infer<typeof SignOffSchema>
 
