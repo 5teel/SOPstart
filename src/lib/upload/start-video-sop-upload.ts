@@ -1,9 +1,9 @@
 import { tusUpload } from '@/lib/upload/tus-upload'
+import { createClient } from '@/lib/supabase/client'
 
 export interface StartVideoSopUploadSession {
   sopId: string
   path: string
-  token: string
 }
 
 export interface StartVideoSopUploadArgs {
@@ -27,6 +27,10 @@ export interface StartVideoSopUploadResult {
  *
  * Progress: audio extraction is the first half of the bar (0-50%), the TUS
  * upload is the second half (50-100%) -- preserves current behaviour exactly.
+ *
+ * T-40-14-01: authenticates the TUS request with the caller's own session
+ * access_token (resolved here), never a server-supplied service-role key —
+ * mirrors the document TUS branch in UploadDropzone.tsx.
  */
 export async function startVideoSopUpload({
   file,
@@ -35,6 +39,14 @@ export async function startVideoSopUpload({
   onError,
 }: StartVideoSopUploadArgs): Promise<StartVideoSopUploadResult> {
   try {
+    const supabase = createClient()
+    const { data: { session: authSession } } = await supabase.auth.getSession()
+    if (!authSession) {
+      const message = 'Not authenticated'
+      onError?.(message)
+      return { ok: false, error: message }
+    }
+
     const { extractAudioFromVideo } = await import('@/lib/parsers/extract-video-audio')
 
     const audioFile = await extractAudioFromVideo(file, (pct) => {
@@ -45,7 +57,7 @@ export async function startVideoSopUpload({
       const upload = tusUpload({
         file: audioFile,
         storagePath: session.path,
-        accessToken: session.token,
+        accessToken: authSession.access_token,
         bucketName: 'sop-videos',
         onProgress: (pct) => {
           onProgress(50 + Math.round(pct / 2))

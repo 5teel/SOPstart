@@ -87,7 +87,7 @@ export function VideoFormatSelectionModal({ open, onClose }: Props) {
       // pipeline, never handed to the document parser.
       const videoResult = await startVideoSopUpload({
         file,
-        session: { sopId: session.sopId, path: session.path, token: session.token },
+        session: { sopId: session.sopId, path: session.path },
         onProgress: () => {},
         onError: (message) => setError(message),
       })
@@ -98,6 +98,12 @@ export function VideoFormatSelectionModal({ open, onClose }: Props) {
       }
 
       router.push(`/admin/sops/pipeline/${session.pipelineId}`)
+      return
+    }
+
+    if (!session.token) {
+      setError('Failed to create upload URL. Please try again.')
+      setSubmitting(false)
       return
     }
 

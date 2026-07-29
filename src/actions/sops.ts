@@ -113,7 +113,7 @@ export async function triggerParse(sopId: string): Promise<{ success: boolean } 
 
 export async function createVideoUploadSession(
   file: { name: string; size: string; type: string }
-): Promise<{ sopId: string; path: string; token: string; signedUploadUrl: string | null } | { error: string }> {
+): Promise<{ sopId: string; path: string; signedUploadUrl: string | null } | { error: string }> {
   const { userId, role, organisationId } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
   if (!organisationId) return { error: 'No organisation found' }
@@ -180,9 +180,6 @@ export async function createVideoUploadSession(
     return { error: 'Failed to create upload session. Please try again.' }
   }
 
-  // Use service role key for TUS upload auth
-  const token = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
-
   // Generate a presigned upload URL for direct upload (small files < 10MB)
   let signedUploadUrl: string | null = null
   const fileSize = parseInt(file.size, 10)
@@ -196,7 +193,6 @@ export async function createVideoUploadSession(
   return {
     sopId: sop.id,
     path: storagePath,
-    token,
     signedUploadUrl,
   }
 }
@@ -384,7 +380,7 @@ export async function createVideoSopPipelineSession(input: {
   file: { name: string; size: number; type: string }
   format: 'narrated_slideshow' | 'screen_recording'
 }): Promise<
-  | { pipelineId: string; sopId: string; uploadUrl: string; token: string; path: string; isVideo: boolean }
+  | { pipelineId: string; sopId: string; uploadUrl: string; token?: string; path: string; isVideo: boolean }
   | { error: string }
 > {
   // 1. Validate input
@@ -485,7 +481,6 @@ export async function createVideoSopPipelineSession(input: {
       pipelineId: pipelineRun.id,
       sopId: sop.id,
       uploadUrl: '',
-      token: process.env.SUPABASE_SERVICE_ROLE_KEY ?? '',
       path,
       isVideo: true,
     }

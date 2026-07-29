@@ -261,7 +261,7 @@ export default function SopVersionHistoryPage() {
       if (result.isVideo) {
         const videoResult = await startVideoSopUpload({
           file,
-          session: { sopId: result.newSopId, path: result.path, token: result.token },
+          session: { sopId: result.newSopId, path: result.path },
           onProgress: (pct) => setUploadProgress(pct),
           onError: (message) => setError(message),
         })

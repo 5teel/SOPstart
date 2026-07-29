@@ -21,7 +21,7 @@ export async function uploadNewVersion(
   oldSopId: string,
   file: { name: string; size: number; type: string }
 ): Promise<
-  | { success: true; newSopId: string; uploadUrl: string; token: string; path: string; isVideo: boolean }
+  | { success: true; newSopId: string; uploadUrl: string; token?: string; path: string; isVideo: boolean }
   | { success: false; error: string }
 > {
   const { supabase, userId, role, organisationId } = await getSessionContext()
@@ -127,13 +127,12 @@ export async function uploadNewVersion(
     // Mark old SOP as superseded by new SOP
     await admin.from('sops').update({ superseded_by: newSop.id }).eq('id', oldSopId)
 
-    // TUS uploads authenticate via the service-role key, the same token
-    // source createVideoUploadSession uses — not a presigned PUT URL.
+    // TUS uploads authenticate with the caller's own session access token
+    // (resolved client-side in startVideoSopUpload), not a presigned PUT URL.
     return {
       success: true,
       newSopId: newSop.id,
       uploadUrl: '',
-      token: process.env.SUPABASE_SERVICE_ROLE_KEY ?? '',
       path,
       isVideo: true,
     }

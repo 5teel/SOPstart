@@ -145,7 +145,7 @@ export function VideoPreviewPanel({
       return
     }
 
-    const { sopId, path, token, signedUploadUrl } = sessionResult
+    const { sopId, path, signedUploadUrl } = sessionResult
 
     // Direct upload for small files (< 10MB), TUS for large
     if (signedUploadUrl && audioFile.size < 10 * 1024 * 1024) {
@@ -190,12 +190,21 @@ export function VideoPreviewPanel({
         setPanelState('upload-error')
       }
     } else {
-      // TUS upload for large files
+      // TUS upload for large files — authenticate with the caller's own
+      // session access token (T-40-14-01), never a server-supplied key.
+      const supabaseAuth = createClient()
+      const { data: { session: authSession } } = await supabaseAuth.auth.getSession()
+      if (!authSession) {
+        showToast('Not authenticated')
+        setPanelState('upload-error')
+        return
+      }
+
       await new Promise<void>((resolve) => {
         const upload = tusUpload({
           file: audioFile,
           storagePath: path,
-          accessToken: token,
+          accessToken: authSession.access_token,
           bucketName: 'sop-videos',
           onProgress: (pct) => {
             setUploadProgress(pct)
