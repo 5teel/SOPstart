@@ -27,6 +27,8 @@ import {
 import { getApprovalHistory, type ApprovalHistoryRow } from '@/actions/approvals'
 import { getVersionCompletionBreakdown, type VersionCompletionBreakdown } from '@/actions/competency'
 import { setRefresherInterval } from '@/actions/governance'
+import { ACCEPT_ATTR, INTAKE_HINT, validateIntakeFile } from '@/lib/upload/file-intake'
+import { startVideoSopUpload } from '@/lib/upload/start-video-sop-upload'
 
 function ArrowLeftIcon({ className }: { className?: string }) {
   return (
@@ -137,6 +139,9 @@ export default function SopVersionHistoryPage() {
   // Upload new version state (existing pattern retained — D-05: re-upload remains available)
   const [showUploadConfirm, setShowUploadConfirm] = useState(false)
   const [uploading, setUploading] = useState(false)
+  // Video re-upload progress (D-06) — percentage shown in the button label;
+  // no new progress component (plan 40-03 owns progress UI).
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null)
 
   // Edit into new version (clone) state — D-05
   const [showCloneConfirm, setShowCloneConfirm] = useState(false)
@@ -237,13 +242,26 @@ export default function SopVersionHistoryPage() {
     await loadVersions()
   }
 
-  // --- Upload new version handler (existing) ---
+  // --- Upload new version handler ---
+  // D-04/D-05: validated + (when needed) HEIC-converted through the shared
+  // intake module, same as UploadDropzone/VideoFormatSelectionModal.
+  // D-06: a video source is routed through startVideoSopUpload (audio
+  // extraction + TUS + /api/sops/transcribe), never the document parser.
   async function handleFileSelected(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const picked = e.target.files?.[0]
+    if (!picked) return
+
+    setShowUploadConfirm(false)
+
+    const intake = await validateIntakeFile(picked)
+    if (!intake.ok) {
+      setError(intake.message)
+      return
+    }
+    const file = intake.file
 
     setUploading(true)
-    setShowUploadConfirm(false)
+    setUploadProgress(null)
 
     try {
       const result = await uploadNewVersion(sopId, {
@@ -258,25 +276,39 @@ export default function SopVersionHistoryPage() {
         return
       }
 
-      // Upload file to presigned URL
-      const uploadResponse = await fetch(result.uploadUrl, {
-        method: 'PUT',
-        body: file,
-        headers: { 'Content-Type': file.type },
-      })
+      if (result.isVideo) {
+        const videoResult = await startVideoSopUpload({
+          file,
+          session: { sopId: result.newSopId, path: result.path, token: result.token },
+          onProgress: (pct) => setUploadProgress(pct),
+          onError: (message) => setError(message),
+        })
 
-      if (!uploadResponse.ok) {
-        setError('File upload failed. Please try again.')
-        setUploading(false)
-        return
+        if (!videoResult.ok) {
+          setUploading(false)
+          return
+        }
+      } else {
+        // Upload file to presigned URL
+        const uploadResponse = await fetch(result.uploadUrl, {
+          method: 'PUT',
+          body: file,
+          headers: { 'Content-Type': file.type },
+        })
+
+        if (!uploadResponse.ok) {
+          setError('File upload failed. Please try again.')
+          setUploading(false)
+          return
+        }
+
+        // Trigger parse for the new SOP version (client-side per Phase 2 decisions)
+        await fetch('/api/sops/parse', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sopId: result.newSopId }),
+        })
       }
-
-      // Trigger parse for the new SOP version (client-side per Phase 2 decisions)
-      await fetch('/api/sops/parse', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sopId: result.newSopId }),
-      })
 
       // Notify assigned workers about the SOP update (MGMT-07)
       await notifyAssignedWorkers(sopId as string, result.newSopId)
@@ -362,7 +394,11 @@ export default function SopVersionHistoryPage() {
           className="flex items-center gap-2 h-[56px] px-5 bg-[var(--paper-2)] border border-[var(--ink-200)] text-[var(--ink-900)] font-semibold rounded-xl hover:bg-white hover:border-[var(--ink-400)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
         >
           <UploadIcon className="h-4 w-4" />
-          {uploading ? 'Uploading...' : 'Upload New Version'}
+          {uploading
+            ? uploadProgress != null
+              ? `Uploading... ${uploadProgress}%`
+              : 'Uploading...'
+            : 'Upload New Version'}
         </button>
 
         {/* Edit into new version button — D-05 primary supersede entry */}
@@ -438,12 +474,13 @@ export default function SopVersionHistoryPage() {
             <div className="flex-1 min-w-0">
               <p className="text-sm text-[var(--ink-900)] leading-relaxed">
                 Uploading a new version will replace what workers see -- the old version stays linked to any historical completions.
+                Supports {INTAKE_HINT}.
               </p>
               <div className="flex items-center gap-4 mt-3">
                 <label className="cursor-pointer">
                   <input
                     type="file"
-                    accept=".docx,.doc,.pdf,.jpg,.jpeg,.png,.webp"
+                    accept={ACCEPT_ATTR}
                     className="sr-only"
                     onChange={handleFileSelected}
                   />
