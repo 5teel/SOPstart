@@ -202,9 +202,41 @@ export async function createVideoUploadSession(
 }
 
 export async function reparseSop(sopId: string): Promise<{ success: true; sopId: string } | { error: string }> {
-  const { supabase, userId } = await getSessionContext()
+  const { supabase, userId, role, organisationId } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
 
+  // Gap-closure (40-13, CR-04/WR-02): every precondition below must hold
+  // BEFORE anything destructive runs. Nothing deletes sections or touches
+  // SOP status until the source file is confirmed to exist.
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
+    return { error: 'You need admin access to re-parse SOPs.' }
+  }
+
+  // Fetch SOP details for the new parse job (and to verify org ownership)
+  const { data: sop } = await supabase
+    .from('sops')
+    .select('organisation_id, source_file_path, source_file_type')
+    .eq('id', sopId)
+    .single()
+
+  if (!sop) return { error: 'SOP not found' }
+  // Compare against the SESSION org, never a value derived from the fetched
+  // row itself (CLAUDE.md [2026-07-28]) — the row could belong to any org.
+  if (sop.organisation_id !== organisationId) return { error: 'SOP not found' }
+
+  const admin = createAdminClient()
+
+  // Verify the source file exists in storage before queuing re-parse
+  const bucket = sop.source_file_type === 'video' ? 'sop-videos' : 'sop-documents'
+  const { data: fileCheck } = await admin.storage
+    .from(bucket)
+    .createSignedUrl(sop.source_file_path, 10)
+
+  if (!fileCheck?.signedUrl) {
+    return { error: 'Source file not found — the original upload may not have completed. Please re-upload the file.' }
+  }
+
+  // Every precondition holds — safe to destroy and re-queue.
   // Delete existing sections (cascade deletes steps and images)
   await supabase.from('sop_sections').delete().eq('sop_id', sopId)
 
@@ -219,27 +251,6 @@ export async function reparseSop(sopId: string): Promise<{ success: true; sopId:
       updated_at: new Date().toISOString(),
     })
     .eq('id', sopId)
-
-  // Fetch SOP details for the new parse job
-  const { data: sop } = await supabase
-    .from('sops')
-    .select('organisation_id, source_file_path, source_file_type')
-    .eq('id', sopId)
-    .single()
-
-  if (!sop) return { error: 'SOP not found' }
-
-  const admin = createAdminClient()
-
-  // Verify the source file exists in storage before queuing re-parse
-  const bucket = sop.source_file_type === 'video' ? 'sop-videos' : 'sop-documents'
-  const { data: fileCheck } = await admin.storage
-    .from(bucket)
-    .createSignedUrl(sop.source_file_path, 10)
-
-  if (!fileCheck?.signedUrl) {
-    return { error: 'Source file not found — the original upload may not have completed. Please re-upload the file.' }
-  }
 
   await admin.from('parse_jobs').insert({
     organisation_id: sop.organisation_id,
