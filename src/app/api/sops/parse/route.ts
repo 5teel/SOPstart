@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { extractDocx } from '@/lib/parsers/extract-docx'
 import { extractDocxStructural } from '@/lib/parsers/extract-docx-structural'
@@ -42,7 +43,35 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'sopId is required' }, { status: 400 })
   }
 
+  // Session + admin role + session-org guard (40-REVIEW.md CR-02 / T-40-12-01..04):
+  // this route previously operated on a client-supplied sopId exclusively through
+  // createAdminClient() (RLS bypass) with no auth check — any authenticated user,
+  // worker role included, could trigger a destructive re-parse of another org's
+  // SOP. Guard runs before any admin-client read/write below.
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId) {
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+  }
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
+    return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+  }
+  if (!organisationId) {
+    return NextResponse.json({ error: 'No organisation found' }, { status: 403 })
+  }
+
   const admin = createAdminClient()
+
+  // Org mismatch returns 404 (not 403) so the endpoint never confirms the
+  // existence of another org's SOP. Right-hand side is the SESSION org, not
+  // a value derived from the fetched row.
+  const { data: sopOrg } = await admin
+    .from('sops')
+    .select('organisation_id')
+    .eq('id', sopId)
+    .maybeSingle()
+  if (!sopOrg || sopOrg.organisation_id !== organisationId) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
 
   // Find the parse job for this SOP
   const { data: job, error: jobError } = await admin
@@ -151,14 +180,14 @@ export async function POST(request: NextRequest) {
       throw new Error('Could not extract meaningful text from the document. The file may be empty or corrupted.')
     }
 
-    // 4b. Org context first — needed for AI Settings model overrides AND image paths.
+    // 4b. Source filename for the title-guard fallback below. organisationId
+    // is already the session-verified value from the guard above — CLAUDE.md
+    // [2026-07-28] CR-01: never re-derive it from the fetched row.
     const { data: sop } = await admin
       .from('sops')
-      .select('organisation_id, source_file_name')
+      .select('source_file_name')
       .eq('id', sopId)
       .single()
-
-    const organisationId = sop?.organisation_id ?? ''
 
     // 4. Parse — pass file_type for format-specific prompt hints + org model
     // overrides from AI Settings (org setting > env > registry default).

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { assignSopDepartments } from '@/actions/departments'
@@ -47,9 +48,22 @@ export async function POST(request: NextRequest) {
     )
   }
   const { promptText, categorySlug, title, detailLevel } = parseResult.data
-  // Phase 25 REQ-9, D-04: optional department fields from request body (not in aiPromptSchema — read directly).
-  const departmentIds: string[] = Array.isArray(body.departmentIds) ? body.departmentIds : []
-  const allDepartments: boolean = body.allDepartments === true
+  // Phase 25 REQ-9, D-04: optional department fields from request body.
+  // Phase 40 WR-03: validated via a local Zod schema instead of a raw
+  // Array.isArray read — uuid element types + a .max(20) bound, matching the
+  // trust-boundary standard the rest of this route already uses. Folding
+  // these two fields into aiPromptSchema proper is the tidier end state,
+  // deferred as a one-line follow-up once plan 40-10 lands (that plan owns
+  // src/lib/validators/sop.ts in this same wave).
+  const deptSchema = z.object({
+    departmentIds: z.array(z.string().uuid()).max(20).optional().default([]),
+    allDepartments: z.boolean().optional().default(false),
+  })
+  const deptResult = deptSchema.safeParse(body)
+  if (!deptResult.success) {
+    return NextResponse.json({ error: 'Invalid department selection' }, { status: 400 })
+  }
+  const { departmentIds, allDepartments } = deptResult.data
 
   const admin = createAdminClient()
 
