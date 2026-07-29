@@ -111,10 +111,10 @@ export async function POST(req: NextRequest) {
       .from('sops')
       .select(`
         id, title, version, status, organisation_id, sop_number, revision_date,
-        author, category, department, related_sops, applicable_equipment,
+        author, category_slug, department, related_sops, applicable_equipment,
         required_certifications, source_file_path, source_file_type,
         source_file_name, overall_confidence, parse_notes, is_ocr, uploaded_by,
-        published_at, source_type, category_tag, created_at, updated_at,
+        published_at, source_type, created_at, updated_at,
         sop_sections(
           id, sop_id, section_type, section_kind_id, title, content, sort_order,
           confidence, approved, layout_data, layout_version, created_at, updated_at,

@@ -24,6 +24,7 @@ const SOP_CATEGORIES = path.join(SRC_DIR, 'lib', 'sop-categories.ts')
 const SOP_COLLECTIONS = path.join(SRC_DIR, 'lib', 'org-model', 'sop-collections.ts')
 const GOVERNANCE_ACTIONS = path.join(SRC_DIR, 'actions', 'governance.ts')
 const SOPS_ACTIONS = path.join(SRC_DIR, 'actions', 'sops.ts')
+const PUBLISH_ROUTE = path.join(SRC_DIR, 'app', 'api', 'sops', '[sopId]', 'publish', 'route.ts')
 
 const SOP_CREATING_ROUTES = [
   path.join(SRC_DIR, 'app', 'api', 'sops', 'parse', 'route.ts'),
@@ -64,7 +65,30 @@ function hasCategoryTagColumnRef(src: string): boolean {
   return re.test(src)
 }
 
+// A bare `category` reference on a `.from('sops')...select(...)` chain is a
+// DAT-01 violation; the SAME word on `sop_review_cadences`/`approval_chains`
+// selects is intentional (those tables keep their `category` column name and
+// type by design -- only the VALUES stored in it migrate, per plan 40-06's
+// backfill). Scope the check to selects chained off `.from('sops')` only.
+function hasBareCategoryOnSopsSelect(src: string): boolean {
+  const re = /\.from\(['"]sops['"]\)[\s\S]{0,300}?\.select\(['"]([^'"]*)['"]\)/g
+  let m: RegExpExecArray | null
+  while ((m = re.exec(src))) {
+    if (/\bcategory\b(?!_slug)/.test(m[1])) return true
+  }
+  return false
+}
+
 test.describe('DAT-01 -- one category column (sops.category_slug)', () => {
+  // Still test.fixme: `BuilderClient.tsx`'s `initialSop.category_tag` feeds
+  // `sopCategory` into `match-blocks.ts`/`BlockPicker.tsx` -- the BLOCK
+  // LIBRARY's Phase 13 category-tag taxonomy (`area-forming`,
+  // `area-machine-repair`, ...), a DIFFERENT vocabulary from the new
+  // SOP_CATEGORIES slugs this plan introduces. Renaming that read to
+  // `category_slug` would silently break block soft-filtering (wrong
+  // vocabulary), not fix a bug -- out of scope for every 40-0x plan's
+  // files_modified list (confirmed: not owned by 40-06/07/08/09 either).
+  // Left as a documented gap; see 40-05-SUMMARY.md Known Stubs.
   test.fixme('zero occurrences of category_tag as a sops column read/write anywhere under src/ (excludes blocks.category_tags)', () => {
     const files: string[] = []
     walk(SRC_DIR, files)
@@ -86,11 +110,25 @@ test.describe('DAT-01 -- one category column (sops.category_slug)', () => {
     expect(src).toContain('export function isValidCategorySlug')
   })
 
-  test.fixme('sop-collections.ts and governance.ts select category_slug, not category', () => {
+  test('sop-collections.ts and governance.ts select category_slug, not category', () => {
     for (const file of [SOP_COLLECTIONS, GOVERNANCE_ACTIONS]) {
       const src = stripComments(read(file))
       expect(src).toContain('category_slug')
-      expect(src).not.toMatch(/\.select\(['"][^'"]*\bcategory\b(?!_slug)/)
+      expect(hasBareCategoryOnSopsSelect(src)).toBe(false)
     }
+  })
+
+  // CLAUDE.md [2026-07-28]: an assertion must pin every security-relevant
+  // clause of the object it verifies -- the repoint from `category` to
+  // `category_slug` must not have dropped the org-scope filter on either of
+  // the two hidden category-keyed settings tables (T-40-05-02).
+  test('the two category-keyed settings tables still carry an organisation_id filter after the repoint', () => {
+    const governanceSrc = stripComments(read(GOVERNANCE_ACTIONS))
+    expect(governanceSrc).toContain("from('sop_review_cadences')")
+    expect(governanceSrc).toMatch(/sop_review_cadences[\s\S]{0,400}?\.eq\(['"]organisation_id['"]/)
+
+    const publishRouteSrc = stripComments(read(PUBLISH_ROUTE))
+    expect(publishRouteSrc).toContain("from('approval_chains')")
+    expect(publishRouteSrc).toMatch(/approval_chains[\s\S]{0,400}?\.eq\(['"]organisation_id['"]/)
   })
 })

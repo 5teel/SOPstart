@@ -2,6 +2,7 @@
 import { useMemo } from 'react'
 import { AlertTriangle, Siren, Zap, Wrench, ShieldCheck } from 'lucide-react'
 import { BlueprintCanvas } from '@/components/ui/BlueprintCanvas'
+import { categoryLabel } from '@/lib/sop-categories'
 import type { SopWithSections } from '@/types/sop'
 
 // Phase 30 UX-05: merged Overview + Tools + Hazards into one scrollable brief.
@@ -116,7 +117,7 @@ export function ReadTab({ sop }: { sop: SopWithSections }) {
             <span className="mono text-xs uppercase tracking-wider text-[var(--ink-500)]">SOP Details</span>
           </div>
           <div className="px-4 divide-y divide-[var(--ink-100)]">
-            <MetaRow label="Category" value={sop.category} />
+            <MetaRow label="Category" value={categoryLabel(sop.category_slug ?? null)} />
             <MetaRow label="Department" value={sop.department} />
             <MetaRow label="Author" value={sop.author} />
             <MetaRow label="Revised" value={sop.revision_date} />

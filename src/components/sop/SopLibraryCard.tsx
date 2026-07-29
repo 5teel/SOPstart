@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import { FileText, ChevronRight } from 'lucide-react'
 import type { CachedSop } from '@/lib/offline/db'
+import { categoryLabel } from '@/lib/sop-categories'
 
 interface SopLibraryCardProps {
   sop: CachedSop
@@ -35,7 +36,7 @@ export function SopLibraryCard({
   isRefresherDue = false,
   isRefresherOverdue = false,
 }: SopLibraryCardProps) {
-  const meta = [sop.category, sop.department].filter(Boolean).join(' · ')
+  const meta = [categoryLabel(sop.category_slug ?? null), sop.department].filter(Boolean).join(' · ')
 
   return (
     <Link
