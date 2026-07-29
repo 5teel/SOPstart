@@ -373,7 +373,7 @@ export async function createVideoSopPipelineSession(input: {
   file: { name: string; size: number; type: string }
   format: 'narrated_slideshow' | 'screen_recording'
 }): Promise<
-  | { pipelineId: string; sopId: string; uploadUrl: string; token: string; path: string }
+  | { pipelineId: string; sopId: string; uploadUrl: string; token: string; path: string; isVideo: boolean }
   | { error: string }
 > {
   // 1. Validate input
@@ -443,6 +443,43 @@ export async function createVideoSopPipelineSession(input: {
     return { error: 'Failed to create upload session. Please try again.' }
   }
 
+  // D-05/D-06: a video source picked in this modal is transcribed through
+  // the shipped pipeline, never handed to the document parser. Storage path
+  // + parse_jobs shape mirror createVideoUploadSession/uploadNewVersion's
+  // video branch exactly.
+  if (fileType === 'video') {
+    const ext = file.name.split('.').pop() || 'mp4'
+    const path = `${organisationId}/${sop.id}/audio/audio.${ext}`
+
+    await admin.from('sops').update({ source_file_path: path }).eq('id', sop.id)
+
+    const { error: jobError } = await admin.from('parse_jobs').insert({
+      organisation_id: organisationId,
+      sop_id: sop.id,
+      file_path: path,
+      file_type: 'video',
+      input_type: 'video_file',
+      current_stage: 'uploading',
+      status: 'queued',
+      pipeline_run_id: pipelineRun.id,
+    })
+
+    if (jobError) {
+      console.error('Parse job creation error:', jobError)
+      await admin.from('sops').delete().eq('id', sop.id)
+      return { error: 'Failed to create upload session. Please try again.' }
+    }
+
+    return {
+      pipelineId: pipelineRun.id,
+      sopId: sop.id,
+      uploadUrl: '',
+      token: process.env.SUPABASE_SERVICE_ROLE_KEY ?? '',
+      path,
+      isVideo: true,
+    }
+  }
+
   // 7. Build storage path + presigned URL
   const path = `${organisationId}/${sop.id}/original/${file.name}`
   const { data: signedData, error: signError } = await admin.storage
@@ -473,6 +510,7 @@ export async function createVideoSopPipelineSession(input: {
     uploadUrl: signedData.signedUrl,
     token: signedData.token,
     path,
+    isVideo: false,
   }
 }
 

@@ -2,14 +2,11 @@
  * Phase 40 -- DUP-01 (D-04/D-05): one shared file-intake module. Today
  * ACCEPTED_MIME_TYPES / MAX_FILE_SIZE / BLOCKED_EXTENSIONS / heic2any wiring
  * is duplicated across UploadDropzone.tsx, VideoFormatSelectionModal.tsx,
- * and the versions page's re-upload flow. Plan 40-02 extracts
- * `@/lib/upload/file-intake` as the single source of truth and repoints
+ * and the versions page's re-upload flow. Plan 40-02 extracted
+ * `@/lib/upload/file-intake` as the single source of truth and repointed
  * UploadDropzone + VideoFormatSelectionModal onto it; Plan 40-07 repoints the
- * versions page (the third surface) and un-fixmes the remaining
- * all-three-surfaces / `.doc,` assertions below.
- *
- * `test.fixme` until 40-07 -- CLAUDE.md 2026-05-25 fixme-stub idiom
- * (listed + skipped, not failing CI, until the later plan activates it).
+ * versions page (the third surface) -- all three surfaces now share one
+ * accept list and route video through startVideoSopUpload.
  *
  * Registration: playwright.config.ts `phase40` project
  *   testDir: '.', testMatch: /tests\/phase40\/.*\.(spec|test)\.ts$/
@@ -84,7 +81,7 @@ test.describe('DUP-01 -- one shared file-intake module', () => {
     expect(declarers).toEqual([FILE_INTAKE])
   })
 
-  test.fixme(
+  test(
     'UploadDropzone, VideoFormatSelectionModal, and versions page import from @/lib/upload/file-intake and declare no local accept-list',
     () => {
       for (const file of [UPLOAD_DROPZONE, VIDEO_FORMAT_MODAL, VERSIONS_PAGE]) {
@@ -114,9 +111,7 @@ test.describe('DUP-01 -- one shared file-intake module', () => {
     }
   })
 
-  test.fixme('zero occurrences of the dropped ".doc," extension anywhere in src/ (D-04)', () => {
-    // Stays fixme until 40-07 repoints versions/page.tsx (the one remaining
-    // surface with a literal ".doc," in its accept attribute).
+  test('zero occurrences of the dropped ".doc," extension anywhere in src/ (D-04)', () => {
     const files: string[] = []
     walk(SRC_DIR, files)
     const hits: string[] = []
@@ -124,6 +119,13 @@ test.describe('DUP-01 -- one shared file-intake module', () => {
       if (stripComments(read(file)).includes('.doc,')) hits.push(file)
     }
     expect(hits).toEqual([])
+  })
+
+  test('the new-version page and video-generate modal route video sources through startVideoSopUpload, not the document parser (D-06 honesty rule)', () => {
+    for (const file of [VERSIONS_PAGE, VIDEO_FORMAT_MODAL]) {
+      const src = stripComments(read(file))
+      expect(src).toContain('startVideoSopUpload(')
+    }
   })
 
   test("the shared module's accept list contains image/webp, video/mp4, video/quicktime", () => {

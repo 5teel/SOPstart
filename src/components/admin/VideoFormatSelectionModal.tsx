@@ -6,6 +6,7 @@ import { X, Loader2, Upload } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { createVideoSopPipelineSession } from '@/actions/sops'
 import { ACCEPT_ATTR, INTAKE_HINT, validateIntakeFile } from '@/lib/upload/file-intake'
+import { startVideoSopUpload } from '@/lib/upload/start-video-sop-upload'
 import type { PipelineVideoFormat } from '@/types/sop'
 
 interface Props {
@@ -78,6 +79,25 @@ export function VideoFormatSelectionModal({ open, onClose }: Props) {
     if ('error' in session) {
       setError(session.error)
       setSubmitting(false)
+      return
+    }
+
+    if (session.isVideo) {
+      // D-05/D-06: a video source is transcribed through the shipped
+      // pipeline, never handed to the document parser.
+      const videoResult = await startVideoSopUpload({
+        file,
+        session: { sopId: session.sopId, path: session.path, token: session.token },
+        onProgress: () => {},
+        onError: (message) => setError(message),
+      })
+
+      if (!videoResult.ok) {
+        setSubmitting(false)
+        return
+      }
+
+      router.push(`/admin/sops/pipeline/${session.pipelineId}`)
       return
     }
 
