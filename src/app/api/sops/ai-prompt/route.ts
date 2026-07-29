@@ -13,6 +13,7 @@ import { verifyTranscriptVsSop, detectMissingSections } from '@/lib/parsers/veri
 import { aiPromptSchema } from '@/lib/validators/sop'
 import type { ParsedSop } from '@/lib/validators/sop'
 import type { VerificationFlag } from '@/types/sop'
+import { isValidCategorySlug, normaliseToCategorySlug } from '@/lib/sop-categories'
 
 // Phase 14-02: AI-prompt structured-draft pipeline.
 // Near-clone of /api/sops/youtube/route.ts with three swaps:
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
       { status: 400 },
     )
   }
-  const { promptText, categoryTag, detailLevel } = parseResult.data
+  const { promptText, categorySlug, title, detailLevel } = parseResult.data
   // Phase 25 REQ-9, D-04: optional department fields from request body (not in aiPromptSchema — read directly).
   const departmentIds: string[] = Array.isArray(body.departmentIds) ? body.departmentIds : []
   const allDepartments: boolean = body.allDepartments === true
@@ -59,14 +60,14 @@ export async function POST(request: NextRequest) {
     .from('sops')
     .insert({
       organisation_id: organisationId,
-      title: null,
+      title: title ?? null,
       status: 'parsing',
       version: 1,
       source_file_path: `ai-prompt/${userId}/${Date.now()}`,
       source_file_type: 'txt',
       source_file_name: 'AI prompt',
       source_type: 'ai',
-      category: categoryTag ?? null,
+      category_slug: isValidCategorySlug(categorySlug) ? categorySlug : null,
       is_ocr: false,
       uploaded_by: uploadedBy,
     })
@@ -123,7 +124,9 @@ export async function POST(request: NextRequest) {
         complex: resolveOrgModel('parse-complex', orgModels),
       },
     })
-    parsed.title = await ensureSopTitle({
+    // Phase 40 CRE (A2): admin-supplied title wins over the AI-derived
+    // fallback -- only derive a title when the request didn't supply one.
+    parsed.title = title?.trim() || await ensureSopTitle({
       title: parsed.title,
       extractedText: promptText,
       model: resolveOrgModel('parse-simple', orgModels),
@@ -171,7 +174,7 @@ export async function POST(request: NextRequest) {
         sop_number: parsed.sop_number ?? null,
         revision_date: parsed.revision_date ?? null,
         author: parsed.author ?? null,
-        category: parsed.category ?? categoryTag ?? null,
+        category_slug: (isValidCategorySlug(categorySlug) ? categorySlug : null) ?? normaliseToCategorySlug(parsed.category),
         related_sops: parsed.related_sops ?? null,
         applicable_equipment: parsed.applicable_equipment ?? null,
         required_certifications: parsed.required_certifications ?? null,

@@ -126,7 +126,7 @@ export function VoiceDraftClient({ departments }: { departments: Department[] })
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           promptText: brief.slice(0, 2000),
-          categoryTag: null,
+          categorySlug: null,
           detailLevel: 3,
           departmentIds,
           allDepartments,

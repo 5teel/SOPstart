@@ -24,6 +24,7 @@ import {
 } from '@/lib/parsers/source-viewer'
 import type { ProvenanceContext } from '@/lib/parsers/parsed-sop-to-layout-data'
 import type { ParsedSop } from '@/lib/validators/sop'
+import { normaliseToCategorySlug } from '@/lib/sop-categories'
 import type { SourceFileType } from '@/types/sop'
 
 // Phase 21 (Plan 21-04 Task 3) — bump when the parsed-sop-to-layout-data
@@ -287,7 +288,7 @@ export async function POST(request: NextRequest) {
         sop_number: parsed.sop_number ?? null,
         revision_date: parsed.revision_date ?? null,
         author: parsed.author ?? null,
-        category: parsed.category ?? null,
+        category_slug: normaliseToCategorySlug(parsed.category),
         related_sops: parsed.related_sops ?? null,
         applicable_equipment: parsed.applicable_equipment ?? null,
         required_certifications: parsed.required_certifications ?? null,

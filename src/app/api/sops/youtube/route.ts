@@ -12,6 +12,7 @@ import { triggerReviewerOnParseCompletion } from '@/lib/parsers/parse-pipeline'
 import { youtubeUrlSchema, extractYouTubeId } from '@/lib/validators/sop'
 import type { ParsedSop } from '@/lib/validators/sop'
 import type { VerificationFlag } from '@/types/sop'
+import { normaliseToCategorySlug } from '@/lib/sop-categories'
 
 export const maxDuration = 300
 
@@ -138,7 +139,7 @@ export async function POST(request: NextRequest) {
         sop_number: parsed.sop_number ?? null,
         revision_date: parsed.revision_date ?? null,
         author: parsed.author ?? null,
-        category: parsed.category ?? null,
+        category_slug: normaliseToCategorySlug(parsed.category),
         related_sops: parsed.related_sops ?? null,
         applicable_equipment: parsed.applicable_equipment ?? null,
         required_certifications: parsed.required_certifications ?? null,

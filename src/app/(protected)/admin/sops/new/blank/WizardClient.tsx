@@ -139,7 +139,7 @@ export function WizardClient({ categories, departments }: WizardClientProps) {
       title: titleValues.title,
       sopNumber: titleValues.sopNumber || null,
       kindIds: selectedKindIds,
-      categoryTag,
+      categorySlug: categoryTag,
       departmentIds,
       allDepartments,
     })

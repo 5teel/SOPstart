@@ -72,14 +72,14 @@ test.describe('DAT-01 -- one category column (sops.category_slug)', () => {
     expect(hits).toEqual([])
   })
 
-  test.fixme('zero write-side occurrences of "category:" in the five SOP-creating routes and sops.ts', () => {
+  test('zero write-side occurrences of "category:" in the five SOP-creating routes and sops.ts', () => {
     for (const file of [...SOP_CREATING_ROUTES, SOPS_ACTIONS]) {
       const src = stripComments(read(file))
       expect(src).not.toContain('category:')
     }
   })
 
-  test.fixme('sop-categories.ts exports SOP_CATEGORIES, categoryLabel, isValidCategorySlug', () => {
+  test('sop-categories.ts exports SOP_CATEGORIES, categoryLabel, isValidCategorySlug', () => {
     const src = read(SOP_CATEGORIES)
     expect(src).toContain('export const SOP_CATEGORIES')
     expect(src).toContain('export function categoryLabel')

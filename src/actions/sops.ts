@@ -7,6 +7,7 @@ import { requireAdminContext } from '@/lib/auth/guards'
 import { assignSopDepartments } from '@/actions/departments'
 import { uploadSessionSchema, getSourceFileType, isBlockedMacroFile, createVideoSopPipelineSessionSchema } from '@/lib/validators/sop'
 import type { UploadSession } from '@/types/sop'
+import { isValidCategorySlug } from '@/lib/sop-categories'
 
 export async function createUploadSession(
   files: { name: string; size: number; type: string }[]
@@ -492,9 +493,11 @@ const CreateSopFromWizardInput = z.object({
   title: z.string().min(1).max(200),
   sopNumber: z.string().max(60).nullable().optional(),
   kindIds: z.array(z.string().uuid()).min(1).max(10),
-  // Phase 13 D-Tax-03: SOP-level category from controlled vocab (block_categories.slug).
-  // Optional — picker scoring still works without it (falls back to all-of-kind).
-  categoryTag: z.string().max(120).nullable().optional(),
+  // Phase 40 DAT-01: SOP-level category from the fixed SOP_CATEGORIES vocab
+  // (src/lib/sop-categories.ts). Optional — picker scoring still works
+  // without it (falls back to all-of-kind). Validated at the write site,
+  // not here -- an unknown slug degrades to null (uncategorised).
+  categorySlug: z.string().max(120).nullable().optional(),
   // Phase 25 REQ-9, D-04: department assignment on SOP creation.
   // allDepartments=true makes SOP visible org-wide; departmentIds writes sop_departments junction.
   departmentIds:  z.array(z.string().uuid()).max(20).optional().default([]),
@@ -519,18 +522,6 @@ export async function createSopFromWizard(
 
   const admin = createAdminClient()
 
-  // Phase 13 D-Tax-03: validate categoryTag against the controlled
-  // block_categories.slug vocab before insert. T-13-03-07 mitigation —
-  // no DB FK enforces this, so the application layer is the gate.
-  if (parsed.data.categoryTag) {
-    const { data: cat } = await supabase
-      .from('block_categories')
-      .select('slug')
-      .eq('slug', parsed.data.categoryTag)
-      .maybeSingle()
-    if (!cat) return { error: 'Invalid category tag' }
-  }
-
   // 1. Insert the SOP row (source_type='blank', status='draft').
   //    source_file_type='docx' is a placeholder — source_type='blank' is the
   //    authoritative signal that this SOP was built from scratch.
@@ -547,8 +538,8 @@ export async function createSopFromWizard(
       source_type: 'blank' as any,
       title: parsed.data.title,
       sop_number: parsed.data.sopNumber ?? null,
-      // Phase 13 D-Tax-03: SOP-level primary category for picker pre-filter.
-      category_tag: parsed.data.categoryTag ?? null,
+      // Phase 40 DAT-01: SOP-level primary category for picker pre-filter.
+      category_slug: isValidCategorySlug(parsed.data.categorySlug) ? parsed.data.categorySlug : null,
     })
     .select('id')
     .single()

@@ -45,3 +45,18 @@ export function categoryLabel(slug: string | null): string | null {
 export function isValidCategorySlug(slug: unknown): slug is SopCategorySlug {
   return typeof slug === 'string' && SOP_CATEGORIES.some((c) => c.slug === slug)
 }
+
+/**
+ * Deterministic runtime twin of migration 00058's pass-1 SQL (D-02 exact/
+ * slug match). Returns the slug when `raw` matches a slug exactly or a
+ * label case-insensitively, otherwise null. The AI-mapping pass exists only
+ * in the one-off 40-06 backfill, never at runtime -- an unmatched value
+ * degrades to uncategorised (null), it does not 400 the request.
+ */
+export function normaliseToCategorySlug(raw: string | null | undefined): SopCategorySlug | null {
+  if (!raw) return null
+  const v = raw.trim().toLowerCase()
+  if (!v) return null
+  const match = SOP_CATEGORIES.find((c) => c.slug === v || c.label.toLowerCase() === v)
+  return match?.slug ?? null
+}

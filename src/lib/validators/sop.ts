@@ -158,14 +158,20 @@ export const updateVersionLabelSchema = z.object({
  * - D-06: min(20) blocks wasted-call prompts ("make me an SOP")
  * - Pitfall #6: max(2000) bounds LLM cost from pasted policy documents
  * - detailLevel mirrors the existing parseSop(detailLevel: 1-5) parameter
- * - categoryTag optional, references the controlled vocab from 13's block_categories table
+ * - Phase 40 DAT-01: categorySlug references the fixed SOP_CATEGORIES vocab
+ *   (src/lib/sop-categories.ts), validated at the write site, not here (an
+ *   unknown slug degrades to null rather than 400ing the whole request).
+ * - Phase 40 CRE (shared metadata picker): optional title, submitted by
+ *   plan 40-08's shared picker. Admin-supplied title wins over the
+ *   AI-derived fallback (see ai-prompt/route.ts).
  */
 export const aiPromptSchema = z.object({
   promptText: z
     .string()
     .min(20, 'Prompt must be at least 20 characters — describe the procedure, site, or worker role')
     .max(2000, 'Prompt cannot exceed 2000 characters — paste a shorter brief'),
-  categoryTag: z.string().nullable().optional(),
+  categorySlug: z.string().nullable().optional(),
+  title: z.string().min(1).max(200).nullable().optional(),
   detailLevel: z.number().int().min(1).max(5).default(3),
 })
 
