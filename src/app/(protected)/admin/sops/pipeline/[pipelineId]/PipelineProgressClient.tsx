@@ -3,13 +3,13 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import {
-  ArrowLeft,
   ClipboardCheck,
   CheckCircle,
   AlertTriangle,
   Loader2,
 } from 'lucide-react'
 import ParseJobStatus from '@/components/admin/ParseJobStatus'
+import { AdminPageShell } from '@/components/admin/AdminPageShell'
 import { derivePipelineStage, type Snapshot } from '@/lib/admin/job-stages'
 
 type SopRow = {
@@ -59,19 +59,16 @@ export function PipelineProgressClient(props: Props) {
     snapshot.sop?.title ?? snapshot.sop?.source_file_name ?? 'New SOP'
 
   return (
-    <div className="min-h-screen bg-[var(--paper)]">
-      <header className="h-[56px] sticky top-0 z-20 bg-[var(--paper)] border-b border-[var(--ink-100)] px-4 flex items-center gap-3">
-        <Link
-          href="/admin/sops"
-          aria-label="Back to SOP list"
-          className="text-[var(--ink-500)] hover:text-[var(--ink-900)]"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
-        <h1 className="text-sm font-medium text-[var(--ink-900)] truncate">{sopTitle}</h1>
-      </header>
-
-      <main className="max-w-2xl mx-auto px-4 py-8">
+    <AdminPageShell
+      active="sops"
+      title={sopTitle}
+      backLink={
+        sopId
+          ? { href: `/admin/sops/builder/${sopId}`, label: 'Back to SOP' }
+          : { href: '/admin/sops', label: 'Back to library' }
+      }
+    >
+      <div className="space-y-4">
         <ParseJobStatus pipelineId={props.pipelineId} initialSnapshot={snapshot} onSnapshot={setSnapshot} />
 
         <div className="mt-6 space-y-4">
@@ -215,7 +212,7 @@ export function PipelineProgressClient(props: Props) {
             </div>
           )}
         </div>
-      </main>
-    </div>
+      </div>
+    </AdminPageShell>
   )
 }

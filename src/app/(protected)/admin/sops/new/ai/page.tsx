@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import Link from 'next/link'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { listDepartments } from '@/actions/departments'
+import { AdminPageShell } from '@/components/admin/AdminPageShell'
 import { AiDraftTabs } from './AiDraftTabs'
 
 export const metadata: Metadata = {
@@ -25,23 +25,14 @@ export default async function NewAiSopPage() {
   const departments = await listDepartments()
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 lg:px-8 lg:py-12">
-      <div className="flex items-start justify-between mb-6 gap-4">
-        <div>
-          <span className="pill">AI DRAFT</span>
-          <h1 className="mono text-2xl font-semibold text-[var(--ink-900)] mt-1">Draft a SOP with AI</h1>
-          <p className="text-sm text-[var(--ink-500)] mt-1">
-            Type a brief or talk it through — either way you review the draft in the builder before publish.
-          </p>
-        </div>
-        <Link
-          href="/admin/sops"
-          className="text-sm text-[var(--ink-500)] hover:text-[var(--ink-700)] transition-colors flex-shrink-0"
-        >
-          Back to library
-        </Link>
-      </div>
+    <AdminPageShell
+      active="sops"
+      badge="AI DRAFT"
+      mono
+      title="Draft a SOP with AI"
+      description="Type a brief or talk it through — either way you review the draft in the builder before publish."
+    >
       <AiDraftTabs departments={departments} />
-    </div>
+    </AdminPageShell>
   )
 }
