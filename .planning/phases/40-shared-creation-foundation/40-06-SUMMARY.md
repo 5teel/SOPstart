@@ -34,28 +34,24 @@ key-files:
     - tests/phase40/dat01-migration.spec.ts
 
 key-decisions:
-  - "Task 2 (the live production --apply run) is a [BLOCKING] human-verify checkpoint per the plan's own frontmatter (autonomous: false). This executor authored, dry-ran (read-only), and confirmed all three scripts work end-to-end against the live project, but did NOT run --apply -- that is reserved for the orchestrator per this plan's explicit instruction."
+  - "Task 2 (the live production --apply run) was a [BLOCKING] human-verify checkpoint per the plan's own frontmatter (autonomous: false). This executor authored, dry-ran (read-only), and confirmed all three scripts work end-to-end against the live project, but did not run --apply itself -- the orchestrator ran the full six-step sequence from the main repo (scripts merged to master first so .env.local + node_modules were available) and approved the AI mapping dictionary before the live write."
   - "Both scripts/backfill-sop-category.mjs and scripts/verify-category-backfill.mjs require `npx tsx`, not plain `node` -- they dynamically import src/lib/sop-categories.ts and src/lib/ai/llm.ts (TypeScript source), same requirement as the existing scripts/backfill-agent-metadata.mjs analog. Documented in each script's own header; the plan's literal `node ... --dry-run` verify line undershoots this -- treated as a Rule 1 deviation (see below)."
 
-requirements-completed: []
-# DAT-01 is NOT marked complete here -- SC-5 (the live production proof) is
-# the checkpoint in Task 2, not yet run. Do not mark DAT-01 complete until
-# the orchestrator confirms the live --apply + verify-category-backfill.mjs
-# output.
+requirements-completed: [DAT-01]
 
 # Metrics
-duration: "~45min (Tasks 1 + 3; Task 2 blocked pending orchestrator action)"
-completed: "in progress -- blocked at Task 2 checkpoint"
+duration: "~1h total (Tasks 1 + 3 authoring; Task 2 live run executed by the orchestrator against production)"
+completed: 2026-07-29
 ---
 
-# Phase 40 Plan 06: Backfill SOP Category + Retire Old Columns (partial -- Task 2 blocking checkpoint)
+# Phase 40 Plan 06: Backfill SOP Category + Retire Old Columns Summary
 
-**Three operator scripts authored and verified read-only against live production (an ordered migration applier with four clause-pinning assertions, a three-pass null-clobber-safe backfill with settings-table remap, and the SC-5 zero-rows proof) plus a fully-live migration-integrity spec; the live `--apply` run and SC-5 proof are a [BLOCKING] checkpoint reserved for the orchestrator.**
+**Three operator scripts (ordered migration applier with four clause-pinning assertions, three-pass null-clobber-safe backfill with settings-table remap, and the SC-5 zero-rows proof) plus a fully-live migration-integrity spec; the live production `--apply` run retired both legacy columns with zero data loss, and `verify-category-backfill.mjs` proves SC-5 on the live database.**
 
 ## Status
 
 - **Task 1 (author the scripts):** COMPLETE — commit `eb0ec19`
-- **Task 2 (run the backfill against production, prove SC-5):** BLOCKED — [BLOCKING] checkpoint, requires orchestrator/human action (see below)
+- **Task 2 (run the backfill against production, prove SC-5):** COMPLETE — run by the orchestrator against live production (see Live Production Results below)
 - **Task 3 (activate the migration spec):** COMPLETE — commit `00a11d8`
 
 ## Task Commits
@@ -109,7 +105,7 @@ AI mapping dictionary (printed in full during the dry run — 7 distinct residua
 
 `sop_review_cadences` and `approval_chains` are both empty in prod (confirmed in 40-04's survey) so Step 3 has zero rows to remap either way — expected, not a gap. 7 `collections` rows were reported as non-vocabulary-label names (read-only info, no write) — consistent with the 40-05 decision that collections are never renamed.
 
-### `verify-category-backfill.mjs` pre-checkpoint output (expected FAIL — apply has not run)
+### `verify-category-backfill.mjs` pre-checkpoint output (expected FAIL — apply had not run yet)
 
 ```
 category is not null (must be 0)        -> count = 15
@@ -119,6 +115,60 @@ sop_review_cadences non-vocab (reported) -> count = 0
 approval_chains non-vocab (reported)     -> count = 0
 === SC-5 FAILED — one or both retired columns still carry data ===
 ```
+
+## Live Production Results (Task 2 — run by the orchestrator, main repo)
+
+All six steps ran from `C:\Development\SOPstart` against the live database (scripts merged to `master` first so `.env.local` + `node_modules` were available there).
+
+**Step 1 — `node scripts/apply-phase40-migration.mjs`:** ALL POST-APPLY ASSERTIONS PASSED (all 4 pinned clauses live: `category_slug` column, `sops_category_slug_idx` index, both retirement comments, non-zero backfilled count; `NOTIFY pgrst` reload issued).
+
+**Step 2 — dry run (`npx tsx scripts/backfill-sop-category.mjs --dry-run`):** audit written (24 rows), deterministic pass 0 (already resolved by the migration), AI pass mapped the same 7 distinct values → 9 rows, status `ok`. Dictionary reviewed and accepted as-is (identical to the authoring-time dry run captured above):
+
+```
+"Operation" -> machine-operation
+"area-forming" -> manufacturing
+"Manufacturing / Chemical Handling" -> manufacturing
+"Safety and Environment" -> safety
+"Information Technology / Office Safety" -> admin-office
+"Animal Care" -> null (no reasonable match)
+"Vehicle Safety / Roadside Emergency" -> forklift-vehicles
+```
+
+**Step 3 — live `--apply` (`npx tsx scripts/backfill-sop-category.mjs --apply`):** summary JSON —
+
+```json
+{
+  "rowsTotal": 24,
+  "resolvedByPass1": 0,
+  "resolvedByPass2": 9,
+  "leftUncategorised": 9,
+  "cadenceRowsRemapped": 0,
+  "cadenceCollisions": 0,
+  "chainRowsRemapped": 0,
+  "chainCollisions": 0,
+  "retiredColumnRowsNulled": 16,
+  "status": "ok"
+}
+```
+
+The 7 non-vocabulary `collections` names were reported (read-only, never renamed, per the 40-05 decision).
+
+**Step 4 — audit file check:** `.planning/phases/40-shared-creation-foundation/category-backfill-audit.json` exists in the **main repo** (not this worktree — generated at runtime per this plan's `artifacts_this_phase_produces`), 5816 bytes, non-empty. Contains the full pre-write row snapshot plus the AI mapping dictionary, per Step 0's audit-before-any-write guarantee.
+
+**Step 5 — SC-5 proof (`npx tsx scripts/verify-category-backfill.mjs`):**
+
+```
+=== SC-5 PASSED — zero rows carry either retired column ===
+category is not null        -> count = 0
+category_tag is not null    -> count = 0
+sop_review_cadences non-vocab -> count = 0
+approval_chains non-vocab     -> count = 0
+exit code: 0
+```
+
+**Step 6 — idempotency re-run (`npx tsx scripts/backfill-sop-category.mjs --apply` again):** `resolvedByPass2: 0`, `retiredColumnRowsNulled: 0`, `leftUncategorised` unchanged at 9, status `ok` — a pure no-op. Nothing regressed; no previously-categorised row reverted to uncategorised.
+
+**SC-5 is proven live on production.** DAT-01 is complete: every pre-existing SOP category value is now on `category_slug` (15 resolved across pass-1 migration backfill + pass-2 AI mapping; 9 genuinely uncategorised, matching the rows that had no `category`/`category_tag` value to begin with) and both retired columns (`sops.category`, `sops.category_tag`) are null on every row.
 
 ## Decisions Made
 
@@ -166,25 +216,27 @@ None beyond the deviations documented above.
 
 ## Self-Check
 
-- `scripts/apply-phase40-migration.mjs` — FOUND, ran successfully against live prod (4/4 assertions PASS)
-- `scripts/backfill-sop-category.mjs` — FOUND, dry-run ran successfully against live prod (read-only)
-- `scripts/verify-category-backfill.mjs` — FOUND, ran successfully against live prod (read-only), correctly reports pre-checkpoint FAIL state
+- `scripts/apply-phase40-migration.mjs` — FOUND, ran successfully against live prod (4/4 assertions PASS, both authoring-time and Task 2's live re-run)
+- `scripts/backfill-sop-category.mjs` — FOUND, dry-run + live `--apply` + idempotency re-run all ran successfully against live prod
+- `scripts/verify-category-backfill.mjs` — FOUND, ran successfully against live prod, reports SC-5 PASSED (both retired-column counts = 0), exit 0
 - `tests/phase40/dat01-migration.spec.ts` — FOUND, zero `test.fixme` remaining, 7/7 passing
+- `.planning/phases/40-shared-creation-foundation/category-backfill-audit.json` — FOUND in the main repo (generated at runtime by Task 2's live run; not present in this worktree by design — see plan's `artifacts_this_phase_produces`), 5816 bytes, non-empty
 - Commit `eb0ec19` — FOUND
 - Commit `00a11d8` — FOUND
 - `npx tsc --noEmit` — clean
 - `npx playwright test --project=phase40` — 40 passed, 4 skipped (owned by other plans), 0 failed
+- Live SC-5 proof — CONFIRMED: `category is not null` = 0, `category_tag is not null` = 0, exit 0
 
-## Self-Check: PASSED (for Tasks 1 + 3; Task 2 is an intentional, not-yet-run checkpoint)
+## Self-Check: PASSED
 
 ## User Setup Required
 
-**[BLOCKING] Task 2 must be run by the orchestrator/human, against the LIVE production database, from `C:\Development\SOPstart` (not this worktree).** See the CHECKPOINT section of this executor's return message for the exact commands and what to paste back into this SUMMARY once run.
+None — Task 2's live production run is complete. No further manual action required for this plan.
 
 ## Next Phase Readiness
 
-Not yet ready to close this plan — Task 2's live proof is outstanding. Once the orchestrator runs the sequence in the checkpoint and confirms `verify-category-backfill.mjs` exits 0 with both retired-column counts at 0, this SUMMARY should be updated (or a follow-up SUMMARY appended) with the live output, and `requirements-completed: [DAT-01]` set.
+Plan 40-06 is complete. DAT-01 is satisfied end-to-end: migration 00058 live, every reader repointed (40-05), the backfill run live with zero data loss and a full audit trail, and SC-5 proven on production. `sops.category` and `sops.category_tag` are retired (null on every row, both `comment on column` markers live) — `src/lib/sop-categories.ts`'s `SOP_CATEGORIES` + `category_slug` is now the single source of truth for SOP categorisation. The one carried-forward gap (`BuilderClient.tsx`'s `category_tag` read now always resolving to `null`, feeding the block-library's DIFFERENT category-tag vocabulary) remains the phase orchestrator's flagged follow-up per 40-05's SUMMARY — degrades to "no category hint" in block soft-filtering, not a crash.
 
 ---
 *Phase: 40-shared-creation-foundation*
-*Status: IN PROGRESS — blocked at Task 2 [BLOCKING] checkpoint*
+*Completed: 2026-07-29*
