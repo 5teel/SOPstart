@@ -1,0 +1,175 @@
+{
+  "generatedAt": "2026-07-29T08:07:22.325Z",
+  "mode": "apply",
+  "rows": [
+    {
+      "id": "125cf9f1-547e-4cc6-8baf-813d9236a691",
+      "organisation_id": "bd2c2b88-b26e-46ca-a6b4-a89161a98aea",
+      "category": null,
+      "category_tag": null,
+      "category_slug": "maintenance"
+    },
+    {
+      "id": "813dc19f-f321-46e7-bd6c-790e7b80f96e",
+      "organisation_id": "afcebcf7-a502-430e-b661-51ae5321e7d8",
+      "category": null,
+      "category_tag": null,
+      "category_slug": null
+    },
+    {
+      "id": "aef337b2-a7d8-40c5-a040-0142649645b8",
+      "organisation_id": "bd2c2b88-b26e-46ca-a6b4-a89161a98aea",
+      "category": null,
+      "category_tag": null,
+      "category_slug": null
+    },
+    {
+      "id": "a8957c2f-f3db-4853-bbf9-e3c0247305ac",
+      "organisation_id": "bd2c2b88-b26e-46ca-a6b4-a89161a98aea",
+      "category": null,
+      "category_tag": null,
+      "category_slug": "machine-operation"
+    },
+    {
+      "id": "10e7b783-23cb-4d25-a952-679d7345e5e7",
+      "organisation_id": "bd2c2b88-b26e-46ca-a6b4-a89161a98aea",
+      "category": null,
+      "category_tag": null,
+      "category_slug": "manufacturing"
+    },
+    {
+      "id": "891d1d14-8102-4445-8d75-35412704e50a",
+      "organisation_id": "bd2c2b88-b26e-46ca-a6b4-a89161a98aea",
+      "category": null,
+      "category_tag": null,
+      "category_slug": null
+    },
+    {
+      "id": "9428b010-b292-4795-9df7-45bca4190621",
+      "organisation_id": "bd2c2b88-b26e-46ca-a6b4-a89161a98aea",
+      "category": null,
+      "category_tag": null,
+      "category_slug": "machine-operation"
+    },
+    {
+      "id": "39fcfe45-1aea-489a-8cf8-4dfc594193bb",
+      "organisation_id": "8b53bee7-9fc6-4e55-a467-a624c50ce23f",
+      "category": null,
+      "category_tag": null,
+      "category_slug": "maintenance"
+    },
+    {
+      "id": "35ec81bc-d55d-4e40-8273-45b7753e4835",
+      "organisation_id": "8b53bee7-9fc6-4e55-a467-a624c50ce23f",
+      "category": null,
+      "category_tag": null,
+      "category_slug": "manufacturing"
+    },
+    {
+      "id": "95772b8e-db6c-47f1-a8ff-757ca1894220",
+      "organisation_id": "bd2c2b88-b26e-46ca-a6b4-a89161a98aea",
+      "category": null,
+      "category_tag": null,
+      "category_slug": "manufacturing"
+    },
+    {
+      "id": "646c4ba3-3976-4a35-8985-cfd2bfa3d9a6",
+      "organisation_id": "bd2c2b88-b26e-46ca-a6b4-a89161a98aea",
+      "category": null,
+      "category_tag": null,
+      "category_slug": null
+    },
+    {
+      "id": "e38f8ae6-5a7b-4058-aa5a-27561511bb2c",
+      "organisation_id": "8b53bee7-9fc6-4e55-a467-a624c50ce23f",
+      "category": null,
+      "category_tag": null,
+      "category_slug": null
+    },
+    {
+      "id": "12272c55-ae00-42bd-b3de-9663e44e12fe",
+      "organisation_id": "bd2c2b88-b26e-46ca-a6b4-a89161a98aea",
+      "category": null,
+      "category_tag": null,
+      "category_slug": "manufacturing"
+    },
+    {
+      "id": "1834f09a-d718-4fa4-b68f-173b77e4a81b",
+      "organisation_id": "8b53bee7-9fc6-4e55-a467-a624c50ce23f",
+      "category": null,
+      "category_tag": null,
+      "category_slug": "manufacturing"
+    },
+    {
+      "id": "6e31f699-e0ed-46e3-9caa-da03c4d5ee68",
+      "organisation_id": "8b53bee7-9fc6-4e55-a467-a624c50ce23f",
+      "category": null,
+      "category_tag": null,
+      "category_slug": null
+    },
+    {
+      "id": "7367dfdf-78c2-4701-b343-476a4145cf66",
+      "organisation_id": "bd2c2b88-b26e-46ca-a6b4-a89161a98aea",
+      "category": null,
+      "category_tag": null,
+      "category_slug": null
+    },
+    {
+      "id": "b09bfad2-0b48-4a14-991e-97fe4f399876",
+      "organisation_id": "bd2c2b88-b26e-46ca-a6b4-a89161a98aea",
+      "category": null,
+      "category_tag": null,
+      "category_slug": null
+    },
+    {
+      "id": "9b351c00-2884-4f45-9561-81edf144ead8",
+      "organisation_id": "bd2c2b88-b26e-46ca-a6b4-a89161a98aea",
+      "category": null,
+      "category_tag": null,
+      "category_slug": "manufacturing"
+    },
+    {
+      "id": "a3103ff8-073d-411e-a5e0-93bd499d2283",
+      "organisation_id": "bd2c2b88-b26e-46ca-a6b4-a89161a98aea",
+      "category": null,
+      "category_tag": null,
+      "category_slug": "safety"
+    },
+    {
+      "id": "203be502-85c1-4d5c-93e4-2f917816514f",
+      "organisation_id": "bd2c2b88-b26e-46ca-a6b4-a89161a98aea",
+      "category": null,
+      "category_tag": null,
+      "category_slug": "manufacturing"
+    },
+    {
+      "id": "1ae63606-d83a-454b-b045-683d934b6bd0",
+      "organisation_id": "bd2c2b88-b26e-46ca-a6b4-a89161a98aea",
+      "category": null,
+      "category_tag": null,
+      "category_slug": "admin-office"
+    },
+    {
+      "id": "c8d12da5-687b-4f47-bb6e-ff2476cfd7f9",
+      "organisation_id": "bd2c2b88-b26e-46ca-a6b4-a89161a98aea",
+      "category": null,
+      "category_tag": null,
+      "category_slug": null
+    },
+    {
+      "id": "60565938-95eb-4515-ba20-ff45bf7a9790",
+      "organisation_id": "bd2c2b88-b26e-46ca-a6b4-a89161a98aea",
+      "category": null,
+      "category_tag": null,
+      "category_slug": "forklift-vehicles"
+    },
+    {
+      "id": "43dfc255-19f5-4f7a-8ce6-84d258415cb8",
+      "organisation_id": "8029a4f5-da4f-4899-bcf1-d692b49bd2dc",
+      "category": null,
+      "category_tag": null,
+      "category_slug": "manufacturing"
+    }
+  ],
+  "aiMappingDictionary": {}
+}
