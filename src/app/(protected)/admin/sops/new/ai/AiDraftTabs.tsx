@@ -17,10 +17,8 @@ import type { Department } from '@/types/sop'
 type Mode = 'type' | 'voice'
 
 export function AiDraftTabs({
-  categories,
   departments,
 }: {
-  categories: string[]
   departments: Department[]
 }) {
   const search = useSearchParams()
@@ -55,7 +53,7 @@ export function AiDraftTabs({
             Describe the procedure in a sentence or two — AI drafts structured sections, steps,
             hazards and PPE for you to review in the builder.
           </p>
-          <PromptClient categories={categories} departments={departments} />
+          <PromptClient departments={departments} />
         </div>
       ) : (
         <div className="blueprint-frame">

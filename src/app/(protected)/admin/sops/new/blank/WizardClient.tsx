@@ -1,8 +1,6 @@
 'use client'
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import type { SectionKind, BlockCategory, Department } from '@/types/sop'
 import type { BlockContent } from '@/lib/validators/blocks'
@@ -12,8 +10,8 @@ import { addBlockToSection } from '@/actions/sop-section-blocks'
 import { updateSectionLayout } from '@/actions/sections'
 import { BlockPicker } from '@/components/admin/blocks/BlockPicker'
 import { blockContentToPuckProps, blockKindToPuckType } from '@/lib/builder/puck-to-block-content'
-import { DepartmentPicker } from '@/components/admin/departments/DepartmentPicker'
-import { DChip } from '@/components/admin/departments/DChip'
+import { SopMetadataFields } from '@/components/admin/SopMetadataFields'
+import type { SopMetadataValue } from '@/components/admin/SopMetadataFields'
 
 // Per SPEC SB-AUTH-01, the wizard exposes only the canonical section kinds.
 // 'custom' and 'content' are not offered at wizard time — admin adds them
@@ -61,11 +59,18 @@ export function WizardClient({ categories, departments }: WizardClientProps) {
   const router = useRouter()
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
   const [titleValues, setTitleValues] = useState<TitleStepValues | null>(null)
-  // Phase 13 D-Tax-03 — SOP-level primary category, drives picker pre-filter.
-  const [categoryTag, setCategoryTag] = useState<string | null>(null)
-  // Phase 25: department multi-select — localOnly (A4: sopId doesn't exist yet, write on submit).
-  const [departmentIds, setDepartmentIds] = useState<string[]>([])
-  const [allDepartments, setAllDepartments] = useState(false)
+  const [titleError, setTitleError] = useState<string | undefined>(undefined)
+  const [sopNumber, setSopNumber] = useState('')
+  // Phase 40 DUP-02: one shared metadata value (title + departments + category)
+  // driving SopMetadataFields — replaces the old departmentIds/allDepartments
+  // state and the dead SOP-level-category state that used to sit here
+  // (previously set once at declaration and never mutated by any control).
+  const [meta, setMeta] = useState<SopMetadataValue>({
+    title: '',
+    departmentIds: [],
+    allDepartments: false,
+    categorySlug: null,
+  })
   const [kinds, setKinds] = useState<SectionKind[]>([])
   const [kindsLoading, setKindsLoading] = useState(true)
   const [selectedKindIds, setSelectedKindIds] = useState<string[]>([])
@@ -80,11 +85,6 @@ export function WizardClient({ categories, departments }: WizardClientProps) {
   } | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  const titleForm = useForm<TitleStepValues>({
-    resolver: zodResolver(TitleStepSchema),
-    defaultValues: titleValues ?? { title: '', sopNumber: '' },
-  })
 
   // SOP-level categories — pulled from the same controlled vocab as block_categories.
   // Filter to hazard / area / procedure groups (PPE is a sub-tag, not a SOP-level category).
@@ -134,14 +134,14 @@ export function WizardClient({ categories, departments }: WizardClientProps) {
     setSubmitting(true)
     setError(null)
     setStep(4)
-    // Phase 25: pass departmentIds + allDepartments from local state (A4: localOnly picker).
+    // Phase 25/40: pass departmentIds + allDepartments + categorySlug from meta (localOnly picker).
     const result = await createSopFromWizard({
       title: titleValues.title,
       sopNumber: titleValues.sopNumber || null,
       kindIds: selectedKindIds,
-      categorySlug: categoryTag,
-      departmentIds,
-      allDepartments,
+      categorySlug: meta.categorySlug,
+      departmentIds: meta.departmentIds,
+      allDepartments: meta.allDepartments,
     })
     if ('error' in result) {
       setError(result.error)
@@ -294,77 +294,43 @@ export function WizardClient({ categories, departments }: WizardClientProps) {
 
       {step === 1 && (
         <form
-          onSubmit={titleForm.handleSubmit((values) => {
-            setTitleValues(values)
+          onSubmit={(e) => {
+            e.preventDefault()
+            const parsed = TitleStepSchema.safeParse({
+              title: meta.title,
+              sopNumber: sopNumber || undefined,
+            })
+            if (!parsed.success) {
+              const titleIssue = parsed.error.issues.find((i) => i.path[0] === 'title')
+              setTitleError(titleIssue?.message ?? 'Title is required')
+              return
+            }
+            setTitleError(undefined)
+            setTitleValues(parsed.data)
             setStep(2)
-          })}
+          }}
           className="flex flex-col gap-4"
         >
-          <label className="flex flex-col gap-1">
-            <span className="text-sm text-[var(--ink-500)]">Title *</span>
-            <input
-              {...titleForm.register('title')}
-              className="rounded border border-[var(--ink-300)] bg-[var(--paper)] px-3 py-2 text-[var(--ink-900)]"
-              placeholder="e.g. Forklift pre-start checklist"
-              data-testid="wizard-title-input"
-            />
-            {titleForm.formState.errors.title && (
-              <span className="text-xs text-red-400">
-                {titleForm.formState.errors.title.message}
-              </span>
-            )}
-          </label>
+          {/* Phase 40 DUP-02: shared title + departments + category picker.
+              Replaces the old separate title input + department block. */}
+          <SopMetadataFields
+            value={meta}
+            onChange={setMeta}
+            departments={departments}
+            titleError={titleError}
+            idPrefix="wizard"
+          />
+
           <label className="flex flex-col gap-1">
             <span className="text-sm text-[var(--ink-500)]">SOP number (optional)</span>
             <input
-              {...titleForm.register('sopNumber')}
+              value={sopNumber}
+              onChange={(e) => setSopNumber(e.target.value)}
               className="rounded border border-[var(--ink-300)] bg-[var(--paper)] px-3 py-2 text-[var(--ink-900)]"
               placeholder="e.g. SOP-042"
               data-testid="wizard-sop-number-input"
             />
           </label>
-
-          {/* Phase 25: Department multi-select — localOnly (A4: sopId doesn't exist yet).
-              Replaces the old free-text category select in the UI.
-              categoryTag is retained in state for the library picker pre-filter (backward compat). */}
-          {departments.length > 0 && (
-            <div className="flex flex-col gap-1" data-testid="wizard-dept-field">
-              <span className="text-sm font-semibold" style={{ color: 'var(--ink-900)' }}>
-                Department
-              </span>
-              {/* Show selected dept chips */}
-              {(departmentIds.length > 0 || allDepartments) && (
-                <div className="flex flex-wrap gap-1 mb-1">
-                  {allDepartments ? (
-                    <DChip variant="all-departments" />
-                  ) : (
-                    departmentIds.map(id => {
-                      const dept = departments.find(d => d.id === id)
-                      return dept ? (
-                        <DChip key={id} variant="department" department={dept} />
-                      ) : null
-                    })
-                  )}
-                </div>
-              )}
-              {/* localOnly DepartmentPicker (mode='sop', sopId sentinel '__new__') */}
-              <DepartmentPicker
-                mode="sop"
-                sopId="__new__"
-                localOnly
-                departments={departments}
-                selectedIds={departmentIds}
-                allDepartments={allDepartments}
-                onChange={(ids, all) => {
-                  setDepartmentIds(ids)
-                  setAllDepartments(all)
-                }}
-              />
-              <span className="text-xs" style={{ color: 'var(--ink-500)' }}>
-                Leave empty to make visible to all members, or select departments to restrict visibility.
-              </span>
-            </div>
-          )}
 
           <div className="flex justify-end">
             <button
@@ -506,16 +472,16 @@ export function WizardClient({ categories, departments }: WizardClientProps) {
                 <dd className="text-[var(--ink-900)]">{titleValues.sopNumber}</dd>
               </div>
             )}
-            {/* Phase 25: show department selection in review */}
-            {(departmentIds.length > 0 || allDepartments) && (
+            {/* Phase 25/40: show department selection in review, read from meta */}
+            {(meta.departmentIds.length > 0 || meta.allDepartments) && (
               <div>
                 <dt className="text-[var(--ink-500)]">Departments</dt>
                 <dd className="text-[var(--ink-900)]">
-                  {allDepartments ? (
+                  {meta.allDepartments ? (
                     <span>All departments</span>
                   ) : (
                     <span>
-                      {departmentIds
+                      {meta.departmentIds
                         .map(id => departments.find(d => d.id === id)?.name ?? id)
                         .join(', ')}
                     </span>
@@ -580,7 +546,10 @@ export function WizardClient({ categories, departments }: WizardClientProps) {
           open={true}
           onClose={() => setPickerTarget(null)}
           kindSlug={pickerTarget.libraryKindSlug}
-          sopCategory={categoryTag}
+          // Phase 40: the old SOP-level-category state that fed this prop was
+          // already permanently null (dead state) — pass null explicitly
+          // rather than reintroducing that dead state.
+          sopCategory={null}
           onAdd={handlePickerAdd}
         />
       )}
