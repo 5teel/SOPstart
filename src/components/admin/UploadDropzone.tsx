@@ -19,28 +19,11 @@ import {
 import { createClient } from '@/lib/supabase/client'
 import { createUploadSession, createVideoUploadSession } from '@/actions/sops'
 import { tusUpload, TUS_THRESHOLD } from '@/lib/upload/tus-upload'
+import { ACCEPT_ATTR, INTAKE_HINT, validateIntakeFile } from '@/lib/upload/file-intake'
+import { startVideoSopUpload } from '@/lib/upload/start-video-sop-upload'
 import { TusUploadProgress } from './TusUploadProgress'
 import { VideoRecorder } from './VideoRecorder'
 import { VideoFormatSelectionModal } from './VideoFormatSelectionModal'
-
-const ACCEPTED_MIME_TYPES = [
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
-  'application/pdf',
-  'image/jpeg',
-  'image/png',
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',       // .xlsx
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
-  'text/plain',                                                               // .txt
-  'image/heic',                                                               // iPhone HEIC
-  'image/heif',                                                               // HEIF variant
-  'video/mp4',
-  'video/quicktime', // MOV
-]
-
-const BLOCKED_EXTENSIONS = ['.xlsm', '.xlsb', '.xltm', '.pptm', '.potm', '.ppam']
-
-const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
-const MAX_VIDEO_FILE_SIZE = 2 * 1024 * 1024 * 1024 // 2GB
 
 type FileStatus = 'queued' | 'uploading' | 'uploaded' | 'error'
 
@@ -124,56 +107,18 @@ export function UploadDropzone() {
   const validateAndAddFiles = useCallback(async (files: File[]) => {
     const newItems: QueuedFile[] = []
     for (const file of files) {
-      // Check blocked macro-enabled extensions first
-      const lowerName = file.name.toLowerCase()
-      if (BLOCKED_EXTENSIONS.some(ext => lowerName.endsWith(ext))) {
-        showToast(`${file.name} is not supported -- macro-enabled Office files are blocked for security. Save as .xlsx or .pptx and try again.`)
-        continue
-      }
-
-      const isVideo = file.type === 'video/mp4' || file.type === 'video/quicktime'
-      const maxSize = isVideo ? MAX_VIDEO_FILE_SIZE : MAX_FILE_SIZE
-
-      if (file.size > maxSize) {
-        if (isVideo) {
-          showToast(`${file.name} is over 2GB. Please compress the video or split into shorter clips.`)
-        } else {
-          showToast(`${file.name} is over 50MB and cannot be uploaded.`)
-        }
-        continue
-      }
-
-      // Handle HEIC/HEIF conversion
-      if (file.type === 'image/heic' || file.type === 'image/heif') {
-        try {
-          const heic2any = (await import('heic2any')).default
-          const blob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.92 }) as Blob
-          const jpgName = file.name.replace(/\.(heic|heif)$/i, '.jpg')
-          const convertedFile = new File([blob], jpgName, { type: 'image/jpeg' })
-          newItems.push({
-            id: `${convertedFile.name}-${convertedFile.size}-${Date.now()}-${Math.random()}`,
-            file: convertedFile,
-            status: 'queued',
-            useTus: convertedFile.size > TUS_THRESHOLD,
-          })
-          continue
-        } catch {
-          showToast(`Failed to convert ${file.name}. Please try a different format.`)
-          continue
-        }
-      }
-
-      if (!ACCEPTED_MIME_TYPES.includes(file.type)) {
-        showToast(`${file.name} is not a supported format. Use Word, PDF, Excel (.xlsx), PowerPoint (.pptx), plain text (.txt), photo, or MP4/MOV video.`)
+      const result = await validateIntakeFile(file)
+      if (!result.ok) {
+        showToast(result.message)
         continue
       }
 
       newItems.push({
-        id: `${file.name}-${file.size}-${Date.now()}-${Math.random()}`,
-        file,
+        id: `${result.file.name}-${result.file.size}-${Date.now()}-${Math.random()}`,
+        file: result.file,
         status: 'queued',
-        useTus: file.size > TUS_THRESHOLD,
-        isVideo,
+        useTus: result.file.size > TUS_THRESHOLD,
+        isVideo: result.isVideo,
       })
     }
     if (newItems.length > 0) {
@@ -288,77 +233,41 @@ export function UploadDropzone() {
 
       if (item.isVideo) {
         // Video upload: extract audio client-side, then TUS upload to sop-videos bucket
-        try {
-          // Dynamically import to avoid loading FFmpeg WASM unless needed
-          const { extractAudioFromVideo } = await import('@/lib/parsers/extract-video-audio')
+        setQueue(prev => prev.map(f =>
+          f.id === item.id ? { ...f, tusProgress: 0 } : f
+        ))
 
-          // Update progress to show extraction happening
+        // Get video upload session (sopId + storage path + token)
+        const sessionResult = await createVideoUploadSession({
+          name: item.file.name,
+          size: String(item.file.size),
+          type: item.file.type,
+        })
+
+        if ('error' in sessionResult) {
           setQueue(prev => prev.map(f =>
-            f.id === item.id ? { ...f, tusProgress: 0 } : f
+            f.id === item.id ? { ...f, status: 'error' as FileStatus, error: sessionResult.error } : f
           ))
-
-          const audioFile = await extractAudioFromVideo(item.file, (pct) => {
-            // Show extraction progress as first half (0-50%) of total
-            setQueue(prev => prev.map(f =>
-              f.id === item.id ? { ...f, tusProgress: Math.round(pct / 2) } : f
-            ))
-          })
-
-          // Get video upload session (sopId + storage path + token)
-          const sessionResult = await createVideoUploadSession({
-            name: item.file.name,
-            size: String(item.file.size),
-            type: item.file.type,
-          })
-
-          if ('error' in sessionResult) {
-            setQueue(prev => prev.map(f =>
-              f.id === item.id ? { ...f, status: 'error' as FileStatus, error: sessionResult.error } : f
-            ))
-            continue
-          }
-
-          // TUS upload the extracted audio to sop-videos bucket
-          await new Promise<void>((resolve) => {
-            const upload = tusUpload({
-              file: audioFile,
-              storagePath: sessionResult.path,
-              accessToken: sessionResult.token,
-              bucketName: 'sop-videos',
-              onProgress: (pct) => {
-                // Upload progress is second half (50-100%)
-                setQueue(prev => prev.map(f =>
-                  f.id === item.id ? { ...f, tusProgress: 50 + Math.round(pct / 2) } : f
-                ))
-              },
-              onSuccess: () => {
-                // Trigger transcription pipeline
-                fetch('/api/sops/transcribe', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ sopId: sessionResult.sopId }),
-                }).catch(console.error)
-
-                setQueue(prev => prev.map(f =>
-                  f.id === item.id ? { ...f, status: 'uploaded' as FileStatus } : f
-                ))
-                resolve()
-              },
-              onError: (err) => {
-                setQueue(prev => prev.map(f =>
-                  f.id === item.id ? { ...f, status: 'error' as FileStatus, error: err.message || 'Upload failed' } : f
-                ))
-                resolve()
-              },
-            })
-            upload.start()
-          })
-        } catch (err) {
-          const message = err instanceof Error ? err.message : 'Video processing failed'
-          setQueue(prev => prev.map(f =>
-            f.id === item.id ? { ...f, status: 'error' as FileStatus, error: message } : f
-          ))
+          continue
         }
+
+        const result = await startVideoSopUpload({
+          file: item.file,
+          session: sessionResult,
+          onProgress: (pct) => {
+            setQueue(prev => prev.map(f =>
+              f.id === item.id ? { ...f, tusProgress: pct } : f
+            ))
+          },
+        })
+
+        setQueue(prev => prev.map(f =>
+          f.id === item.id
+            ? result.ok
+              ? { ...f, status: 'uploaded' as FileStatus }
+              : { ...f, status: 'error' as FileStatus, error: result.error || 'Upload failed' }
+            : f
+        ))
         continue
       }
 
@@ -608,7 +517,7 @@ export function UploadDropzone() {
                 <Upload className="w-10 h-10 text-[var(--ink-500)]" />
                 <div>
                   <p className="text-base font-semibold text-[var(--ink-900)]">Drop your SOPs here</p>
-                  <p className="text-sm text-[var(--ink-500)] mt-1">Word (.docx), PDF, Excel (.xlsx), PowerPoint (.pptx), plain text (.txt), photos, or MP4/MOV video up to 2GB</p>
+                  <p className="text-sm text-[var(--ink-500)] mt-1">{INTAKE_HINT}</p>
                 </div>
               </>
             )}
@@ -668,7 +577,7 @@ export function UploadDropzone() {
               ref={fileInputRef}
               type="file"
               className="hidden"
-              accept=".docx,.pdf,.xlsx,.pptx,.txt,image/jpeg,image/png,image/heic,image/heif"
+              accept={ACCEPT_ATTR}
               multiple
               onChange={handleFileInput}
             />
@@ -684,7 +593,7 @@ export function UploadDropzone() {
               ref={videoInputRef}
               type="file"
               className="hidden"
-              accept="video/mp4,video/quicktime"
+              accept={ACCEPT_ATTR}
               onChange={handleFileInput}
             />
           </div>
