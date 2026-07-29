@@ -47,6 +47,7 @@ import { resolveCadenceMonths, computeReviewDueDate } from '@/lib/governance/cad
 import { classifyGovernanceRow, type GovernanceFlag } from '@/lib/governance/classify'
 import { resolveNextStepIndex, stepMatchesCaller, type ChainStep } from '@/lib/governance/approvals'
 import { getOrgMembers } from '@/actions/assignments'
+import { categoryLabel, isValidCategorySlug } from '@/lib/sop-categories'
 import type { AppRole } from '@/types/auth'
 
 // Phase 29 Plan 02: requireAdmin() is now EXPORTED (was private) and its ctx
@@ -59,7 +60,7 @@ export type AdminCtx = { userId: string; organisationId: string; role: AppRole }
 export interface GovernanceRow {
   id: string
   title: string | null
-  category: string | null
+  category_slug: string | null
   status: string
   ownerUserId: string | null
   ownerLabel: string
@@ -81,7 +82,15 @@ export async function requireAdmin(): Promise<AdminCtx | { error: string }> {
   return { userId, organisationId, role: role as AppRole }
 }
 
-/** Reads the caller's org-scoped cadence settings into a category -> months map. */
+/**
+ * Reads the caller's org-scoped cadence settings into a category -> months map.
+ *
+ * Phase 40 DAT-01: `sop_review_cadences.category` keeps its column name and
+ * text type (00043 schema unchanged) -- only the VALUES stored in it change,
+ * from the old free-text `sops.category` string to a `SOP_CATEGORIES` slug.
+ * Plan 40-06's backfill remaps existing rows with the same mapping applied
+ * to `sops`. The map key below is therefore a slug, not free text.
+ */
 async function fetchOrgCadences(organisationId: string): Promise<Record<string, number>> {
   const supabase = await createClient()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -209,7 +218,7 @@ export async function confirmSopCurrent(
   const supabase = await createClient()
   const { data: sopRow, error: sopErr } = await supabase
     .from('sops')
-    .select('category')
+    .select('category_slug')
     .eq('id', sopId)
     .maybeSingle()
 
@@ -219,7 +228,7 @@ export async function confirmSopCurrent(
   }
 
   const orgCadences = await fetchOrgCadences(ctx.organisationId)
-  const months = resolveCadenceMonths(sopRow.category, orgCadences)
+  const months = resolveCadenceMonths(sopRow.category_slug, orgCadences)
   const now = new Date().toISOString()
   const reviewDue = computeReviewDueDate(now, months)
 
@@ -273,6 +282,9 @@ export async function setReviewCadence(
   if (!Number.isInteger(months) || months < 1 || months > 120) {
     return { error: 'months must be an integer between 1 and 120' }
   }
+  // Phase 40 DAT-01: gate the incoming value against the fixed vocabulary so a
+  // free-text cadence key can never be minted after the migration (T-40-05-04).
+  if (!isValidCategorySlug(category)) return { error: 'unknown category' }
 
   // sop_review_cadences has NO authenticated write policy by design — writes
   // go through the service-role client, self-enforcing org scope from the
@@ -320,7 +332,7 @@ export async function listGovernanceQueue(): Promise<
   const { data: sops, error: sopsErr } = await supabase
     .from('sops')
     .select(
-      'id, title, category, status, owner_user_id, review_due_at, last_reviewed_at, approval_state, approval_snapshot, version',
+      'id, title, category_slug, status, owner_user_id, review_due_at, last_reviewed_at, approval_state, approval_snapshot, version',
     )
     .order('review_due_at', { ascending: true, nullsFirst: false })
 
@@ -431,7 +443,7 @@ export async function listGovernanceQueue(): Promise<
     return {
       id: sop.id,
       title: sop.title,
-      category: sop.category,
+      category_slug: categoryLabel(sop.category_slug),
       status: sop.status,
       ownerUserId: sop.owner_user_id,
       ownerLabel: sop.owner_user_id ? (ownerLabelById[sop.owner_user_id] ?? 'No owner') : 'No owner',

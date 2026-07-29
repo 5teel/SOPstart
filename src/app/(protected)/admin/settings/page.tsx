@@ -9,6 +9,7 @@ import { getObservationLabels } from '@/actions/observations'
 import { ApprovalChainEditor, type ChainMember } from '@/components/admin/governance/ApprovalChainEditor'
 import { ObservationLabelsCard } from '@/components/admin/observations/ObservationLabelsCard'
 import type { ChainStep } from '@/lib/governance/approvals'
+import { SOP_CATEGORIES } from '@/lib/sop-categories'
 
 export const metadata: Metadata = {
   title: 'Settings — SOPstart',
@@ -52,35 +53,36 @@ const SECTIONS = [
 
 export default async function AdminSettingsPage() {
   // Auth guard — shared per-request session context (JWT verified locally).
-  const { supabase, userId, role, organisationId } = await getSessionContext()
+  const { userId, role } = await getSessionContext()
   if (!userId) redirect('/login')
 
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     redirect('/dashboard')
   }
 
-  // Approval chains config panel (D29-05, relocated here in 30-08) — distinct
-  // sops.category values for the org, no new table. Simple select + dedupe in JS.
-  // The three reads are independent — run concurrently.
-  const [{ data: categoryRows }, chainsResult, membersResult, observationLabels] = await Promise.all([
-    supabase
-      .from('sops')
-      .select('category')
-      .eq('organisation_id', organisationId ?? '')
-      .not('category', 'is', null),
+  // Approval chains config panel (D29-05, relocated here in 30-08). Phase 40
+  // DAT-01: this used to be a live `DISTINCT sops.category` query — RESEARCH.md
+  // names that pattern as the anti-pattern DAT-01 must retire (it re-diverges
+  // from the vocabulary the moment an admin free-types a new value). The
+  // category list is now the fixed seed (SOP_CATEGORIES), merged with any
+  // distinct keys already present on `approval_chains` rows so an admin can
+  // still see and clear a pre-migration chain keyed by a legacy value that
+  // has no vocabulary equivalent. The three reads are independent — run
+  // concurrently.
+  const [chainsResult, membersResult, observationLabels] = await Promise.all([
     getApprovalChains(),
     getOrgMembers(),
     getObservationLabels(),
   ])
 
-  const categories = Array.from(
-    new Set((categoryRows ?? []).map((r) => r.category).filter((c): c is string => !!c)),
-  ).sort()
-
   const chains: Record<string, ChainStep[]> =
     'success' in chainsResult && chainsResult.success
       ? Object.fromEntries(chainsResult.chains.map((c) => [c.category, c.steps]))
       : {}
+
+  const vocabSlugs = SOP_CATEGORIES.map((c) => c.slug)
+  const legacyChainKeys = Object.keys(chains).filter((k) => !(vocabSlugs as string[]).includes(k))
+  const categories = [...vocabSlugs, ...legacyChainKeys.sort()]
   const members: ChainMember[] =
     membersResult.success
       ? membersResult.members

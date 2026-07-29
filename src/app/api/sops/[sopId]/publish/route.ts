@@ -46,18 +46,22 @@ export async function POST(
 
   const { data: sopRow } = await supabase
     .from('sops')
-    .select('category, approval_state')
+    .select('category_slug, approval_state')
     .eq('id', sopId)
     .maybeSingle()
 
   // approval_chains is not yet in database.types.ts — (as any) cast matches
   // the sop_review_cadences/ai_model_settings precedent (RESEARCH Pitfall 4).
+  // Phase 40 DAT-01: this is the SECOND category-keyed settings table (the
+  // first is sop_review_cadences). Its `category` column keeps its name/type
+  // (00045 schema unchanged) — only the values change, from free text to a
+  // SOP_CATEGORIES slug, via plan 40-06's backfill.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: chainRow } = await (supabase as any)
     .from('approval_chains')
     .select('steps')
     .eq('organisation_id', organisationId)
-    .eq('category', sopRow?.category ?? '')
+    .eq('category', sopRow?.category_slug ?? '')
     .maybeSingle()
 
   if (chainRow?.steps?.length > 0) {

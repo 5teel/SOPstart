@@ -132,13 +132,14 @@ export async function performPublish(
     return { success: false, error: gate.error, status: gate.status, count: gate.count }
   }
 
-  // Reload the fields step 3b needs (category, parent_sop_id) — a second
+  // Reload the fields step 3b needs (category_slug, parent_sop_id) — a second
   // lightweight select rather than threading assertPublishGates' internal
   // sopRow out, keeping assertPublishGates' signature exactly as locked.
+  // Phase 40 DAT-01: category (free text) -> category_slug (fixed vocabulary).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: sopRow } = await (supabase as any)
     .from('sops')
-    .select('category, parent_sop_id')
+    .select('category_slug, parent_sop_id')
     .eq('id', sopId)
     .maybeSingle()
 
@@ -186,7 +187,7 @@ export async function performPublish(
     for (const row of (cadenceRows ?? []) as Array<{ category: string; months: number }>) {
       orgCadences[row.category] = row.months
     }
-    const months = resolveCadenceMonths(sopRow?.category ?? null, orgCadences)
+    const months = resolveCadenceMonths(sopRow?.category_slug ?? null, orgCadences)
     const reviewDue = computeReviewDueDate(publishedAt, months)
 
     const { error: resetErr } = await supabase
