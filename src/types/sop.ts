@@ -48,7 +48,12 @@ export interface Sop {
   sop_number: string | null
   revision_date: string | null
   author: string | null
+  /** @deprecated Phase 40 DAT-01 — retired, read category_slug */
   category: string | null
+  // Phase 40 DAT-01 — the single SOP category, slug from src/lib/sop-categories.ts.
+  // Additive, nullable, optional (like pipeline_run_id/owner_user_id above) so
+  // existing partial Sop fixtures/mocks across the codebase don't need updating.
+  category_slug?: string | null
   department: string | null
   related_sops: string[] | null
   applicable_equipment: string[] | null
@@ -67,6 +72,7 @@ export interface Sop {
   source_type: SourceType
   flow_graph?: unknown | null
   // Phase 13: SOP-level primary category tag (D-Tax-03). Drives picker pre-filter input.
+  /** @deprecated Phase 40 DAT-01 — retired, read category_slug */
   category_tag: string | null
   created_at: string
   updated_at: string

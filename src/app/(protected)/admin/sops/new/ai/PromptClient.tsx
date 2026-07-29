@@ -39,7 +39,7 @@ export function PromptClient({ categories, departments }: Props) {
     watch,
   } = useForm<AiPromptFormInput, undefined, AiPromptInput>({
     resolver: zodResolver(aiPromptSchema),
-    defaultValues: { promptText: '', categoryTag: null, detailLevel: 3 },
+    defaultValues: { promptText: '', categorySlug: null, detailLevel: 3 },
   })
 
   const detailLevel = watch('detailLevel') ?? 3
@@ -142,12 +142,12 @@ export function PromptClient({ categories, departments }: Props) {
       )}
 
       <div>
-        <label htmlFor="categoryTag" className="block text-sm font-medium text-[var(--ink-700)] mb-1">
+        <label htmlFor="categorySlug" className="block text-sm font-medium text-[var(--ink-700)] mb-1">
           Category (optional)
         </label>
         <select
-          id="categoryTag"
-          {...register('categoryTag')}
+          id="categorySlug"
+          {...register('categorySlug')}
           className="w-full bg-white border border-[var(--ink-100)] rounded-lg p-2 text-[var(--ink-900)]"
         >
           <option value="">— None —</option>

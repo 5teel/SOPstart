@@ -1163,6 +1163,7 @@ export type Database = {
           approval_state: string | null
           author: string | null
           category: string | null
+          category_slug: string | null
           category_tag: string | null
           created_at: string
           department: string | null
@@ -1200,6 +1201,7 @@ export type Database = {
           approval_state?: string | null
           author?: string | null
           category?: string | null
+          category_slug?: string | null
           category_tag?: string | null
           created_at?: string
           department?: string | null
@@ -1237,6 +1239,7 @@ export type Database = {
           approval_state?: string | null
           author?: string | null
           category?: string | null
+          category_slug?: string | null
           category_tag?: string | null
           created_at?: string
           department?: string | null
