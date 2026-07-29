@@ -503,5 +503,30 @@ export default defineConfig({
       testMatch: /tests\/phase37\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 40 -- Shared Creation Foundation
+      // Nyquist harness (Wave 0 / Plan 40-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase40/**) so every later plan in
+      // the phase drops specs into tests/phase40/ with NO further config edit --
+      // single registration point for the whole phase (mirrors phase26/28/29/30/32/33/34/35/36/37).
+      //
+      // Verify registration: `npx playwright test --list --project=phase40`
+      // (should list all 7 tests/phase40/*.spec.ts files -- zero discovered = FAIL)
+      //
+      // Wave-0 stub files:
+      //   spine-freeze (frozen publish spine guard, LIVE) --
+      //   dup01-file-intake (DUP-01, fixme, activates 40-02/40-07) --
+      //   dup02-metadata-picker (DUP-02, fixme, activates 40-08) --
+      //   dup03-job-progress (DUP-03, fixme, activates 40-03) --
+      //   dup04-page-shell (DUP-04, fixme, activates 40-09) --
+      //   dat01-category-column (DAT-01, fixme, activates 40-04/40-05) --
+      //   dat01-migration (DAT-01, fixme, activates 40-04/40-06)
+      name: 'phase40',
+      testDir: '.',
+      testMatch: /tests\/phase40\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
