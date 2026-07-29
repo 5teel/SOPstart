@@ -248,15 +248,25 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
       setReParsing(false)
       return
     }
-    const endpoint =
-      inputType === 'ai_prompt' ? '/api/sops/ai-prompt'
-      : isVideoSop ? '/api/sops/transcribe'
-      : '/api/sops/parse'
-    fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sopId }),
-    }).catch(console.error)
+    const endpoint = isVideoSop ? '/api/sops/transcribe' : '/api/sops/parse'
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sopId }),
+      })
+      if (!res.ok) {
+        setErrorMessage('Could not start the retry — please try again.')
+        setStatus('failed')
+        setReParsing(false)
+        return
+      }
+    } catch {
+      setErrorMessage('Could not start the retry — check your connection and try again.')
+      setStatus('failed')
+      setReParsing(false)
+      return
+    }
     setStatus('queued')
     setErrorMessage(null)
     setCurrentStage(null)
@@ -294,6 +304,10 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
     await fetch(`/api/sops/${sopId}`, { method: 'DELETE' })
     router.push('/admin/sops')
   }
+
+  // Gap-closure (40-13, CR-04/WR-02): an AI-prompt draft has no source file to
+  // re-parse, so the retry affordance must not be offered for it.
+  const canRetry = inputType !== 'ai_prompt'
 
   // Parse failed stage name from error_message format: "Failed at {stage}: {message}"
   const failedStageMatch = errorMessage?.match(/^Failed at ([^:]+):/)
@@ -480,14 +494,21 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
           {errorMessage && (
             <p className="text-xs text-[var(--ink-500)] mt-1 line-clamp-2">{errorMessage}</p>
           )}
+          {!canRetry && (
+            <p className="text-xs text-[var(--ink-500)] mt-1">
+              This draft was written from a prompt, so there&apos;s nothing to re-parse — start a new AI draft instead.
+            </p>
+          )}
           <div className="flex items-center gap-4 mt-3">
-            <button
-              onClick={handleReparse}
-              disabled={reParsing}
-              className="text-[var(--accent-voice)] text-sm hover:text-[var(--ink-700)] font-medium"
-            >
-              {reParsing ? 'Trying again…' : 'Try again'}
-            </button>
+            {canRetry && (
+              <button
+                onClick={handleReparse}
+                disabled={reParsing}
+                className="text-[var(--accent-voice)] text-sm hover:text-[var(--ink-700)] font-medium"
+              >
+                {reParsing ? 'Trying again…' : 'Try again'}
+              </button>
+            )}
             <button
               onClick={handleDelete}
               disabled={deleting}
