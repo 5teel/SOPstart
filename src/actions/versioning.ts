@@ -357,7 +357,7 @@ export async function cloneSopAsDraft(
   // Fetch source SOP — use RLS-scoped client to verify org ownership
   const { data: sourceSop, error: fetchError } = await supabase
     .from('sops')
-    .select('id, version, parent_sop_id, organisation_id, title, source_file_name, source_file_type, source_file_path, refresher_interval_months')
+    .select('id, version, parent_sop_id, organisation_id, title, source_file_name, source_file_type, source_file_path, refresher_interval_months, category_slug')
     .eq('id', publishedSopId)
     .single()
 
@@ -386,10 +386,13 @@ export async function cloneSopAsDraft(
       status: 'uploading' as const,
       version: newVersion,
       parent_sop_id: newParentId,
-      // Phase 36 / REF-01: the refresher interval is the worker's re-walkthrough
-      // clock and must survive supersede (D-01) — this insert is an explicit
-      // field list, so any future per-SOP column must be added here too.
+      // Phase 36 / REF-01, Phase 40 / DAT-01: the refresher interval and category
+      // are per-SOP columns that must survive supersede (D-01) — this insert is an
+      // explicit field list, so any future per-SOP column must be added here too.
       refresher_interval_months: sourceSop.refresher_interval_months ?? null,
+      // Phase 40 / DAT-01: a cloned/restored draft keeps the source SOP's category,
+      // so cadence, approval-chain gating and Collection membership survive the clone.
+      category_slug: sourceSop.category_slug ?? null,
     })
     .select('id')
     .single()
