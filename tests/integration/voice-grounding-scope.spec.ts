@@ -58,7 +58,24 @@ test.describe('SB-LINE-04 — Voice grounding scope (source contract)', () => {
     // 2026-07-13: the session client now arrives via getSessionContext()
     // (which wraps @/lib/supabase/server createClient) — still RLS-scoped.
     expect(src).toContain('getSessionContext')
-    expect(src).not.toContain('createAdminClient')
+
+    // Phase 26.5 legitimately added createAdminClient() elsewhere in this file
+    // for a fire-and-forget append-only write to sop_voice_qa_log (migration
+    // 00040 — no authenticated write policy on that table). The SB-LINE-04
+    // grounding-scope guarantee is about the SOP FETCH specifically, so assert
+    // that block uses the RLS-scoped session client, not admin.
+    const fetchMatch = src.match(/const \{ data: sop, error: fetchErr \} = await ([\s\S]*?)\.single\(\)/)
+    expect(fetchMatch).not.toBeNull()
+    const fetchBlock = fetchMatch![0]
+    expect(fetchBlock).toMatch(/= await supabase/)
+    expect(fetchBlock).not.toContain('createAdminClient')
+
+    // Any remaining admin-client write must self-scope organisation_id from the
+    // already-RLS-verified sop row (CLAUDE.md 2026-06-26 rule), never a raw
+    // client-supplied value — guards against the recurring cross-tenant class.
+    if (src.includes('createAdminClient')) {
+      expect(src).toMatch(/organisationId:\s*sopWithSections\.organisation_id/)
+    }
   })
 
   test('route does NOT perform cross-SOP joins or semantic searches', () => {

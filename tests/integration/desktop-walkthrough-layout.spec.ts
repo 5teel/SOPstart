@@ -57,9 +57,11 @@ test.describe('SB-LINE-01 — Desktop walkthrough layout (Wave 2 contract)', () 
     expect(src).toMatch(/I&apos;ve done this\s*—\s*Next/)
   })
 
-  test('DesktopWalkthrough has forward-jump guard (router.replace + strict > check)', () => {
+  test('DesktopWalkthrough has forward-jump guard (history.replaceState + strict > check)', () => {
     const src = read(DESKTOP)
-    expect(src).toMatch(/router\.replace\(/)
+    // Phase 15 perf fix (3b541b6) swapped router.replace for window.history.replaceState
+    // to avoid an RSC fetch on every step nav — see CLAUDE.md Learnings 2026-05-13.
+    expect(src).toMatch(/history\.replaceState\(/)
     expect(src).toMatch(/requestedIdx\s*>\s*highestAckIdx\s*\+\s*1/)
   })
 

@@ -33,7 +33,9 @@ test.describe('versions page — fetches approval history alongside version hist
   })
 
   test('calls getApprovalHistory( with the version id lineage inside loadVersions', () => {
-    const fnMatch = src.match(/async function loadVersions\(\) \{([\s\S]*?)\n    \}/)
+    // loadVersions was later wrapped in useCallback (exhaustive-deps fix) —
+    // repointed the regex from a plain function declaration to the arrow form.
+    const fnMatch = src.match(/const loadVersions = useCallback\(async \(\) => \{([\s\S]*?)\n  \}, \[sopId\]\)/)
     expect(fnMatch).not.toBeNull()
     expect(fnMatch![0]).toContain('getApprovalHistory(result.versions.map((v) => v.id))')
   })

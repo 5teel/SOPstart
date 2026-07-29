@@ -102,7 +102,15 @@ test.describe('createGrant — SOP-target arm source-contract (wired, not just p
 
   test('materializeSopAccessForOrg forces all_departments=false on override (closes the 00035 bypass)', () => {
     const body = src.match(/async function materializeSopAccessForOrg\(([\s\S]*?)\n\}/)![0]
-    expect(body).toContain("update({ all_departments: false })")
+    // WR-02 (all_departments_pre_override snapshot/restore) split the single
+    // `update({ all_departments: false })` call into a ternary — both arms
+    // still force all_departments: false on override, only the "first
+    // override" arm additionally snapshots the pre-override value.
+    expect(body).toMatch(/if \(overridden\) \{/)
+    const overrideBlock = body.match(/if \(overridden\) \{([\s\S]*?)\n {2}\} else/)
+    expect(overrideBlock).not.toBeNull()
+    expect(overrideBlock![1]).toContain('all_departments: false, all_departments_pre_override: currentAllDepartments')
+    expect(overrideBlock![1]).toContain('{ all_departments: false }')
   })
 })
 

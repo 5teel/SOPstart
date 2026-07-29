@@ -61,10 +61,22 @@ test.describe('reorder — dnd-kit vertical sortable (keyboard + pointer)', () =
     expect(source).toContain('verticalListSortingStrategy')
   })
 
-  test('@dnd-kit is imported only under builder-v2/ (admin-only, worker-safe)', () => {
+  test('@dnd-kit is imported only under components/admin/ (admin-only, worker-safe)', () => {
+    // Phase 29 added ApprovalChainEditor.tsx (components/admin/governance/) —
+    // a second legitimate admin-only dnd-kit consumer outside builder-v2/.
+    // The real threat (T-26-04-03) is keeping dnd-kit out of the WORKER
+    // bundle, not confining it to one specific admin subfolder — broaden the
+    // guard to the admin/ boundary and confirm ApprovalChainEditor is only
+    // reachable from an admin route.
     const offenders = walk(SRC)
       .filter((f) => /@dnd-kit\//.test(fs.readFileSync(f, 'utf8')))
-      .filter((f) => !f.split(path.sep).join('/').includes('/admin/builder-v2/'))
-    expect(offenders, `@dnd-kit imported outside builder-v2: ${offenders.join(', ')}`).toEqual([])
+      .filter((f) => !f.split(path.sep).join('/').includes('/components/admin/'))
+    expect(offenders, `@dnd-kit imported outside components/admin/: ${offenders.join(', ')}`).toEqual([])
+
+    const settingsPage = fs.readFileSync(
+      path.join(SRC, 'app', '(protected)', 'admin', 'settings', 'page.tsx'),
+      'utf8',
+    )
+    expect(settingsPage).toContain('ApprovalChainEditor')
   })
 })

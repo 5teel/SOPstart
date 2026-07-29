@@ -123,7 +123,12 @@ test.describe('Plan 21-05 — parser materializes junctions', () => {
     expect(src).toContain('category: z.string().max(60).nullable().optional()')
     expect(src).toContain('serviceRole: z')
     expect(src).toContain('organisationId: z.string().uuid()')
-    expect(src).toContain("serviceRole cannot be combined with scope=global")
+    // Phase 25 (A5/A6) retired the 'global' scope entirely — scope is now
+    // z.enum(['org']) only, which makes the old serviceRole+scope=global
+    // combination structurally impossible (zod rejects any non-'org' value
+    // before the check could ever run). Assert the enum is locked down
+    // instead of the now-dead runtime guard string.
+    expect(src).toContain("scope: z.enum(['org']).default('org')")
   })
 
   test('migration 00033 seeds 7 new section_kinds', () => {

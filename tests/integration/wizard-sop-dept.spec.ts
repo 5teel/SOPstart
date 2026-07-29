@@ -42,11 +42,13 @@ test('WizardClient includes allDepartments in createSopFromWizard call', () => {
   expect(src).toContain('allDepartments')
 })
 
-test('WizardClient uses DepartmentPicker (localOnly) for department field', () => {
-  const src = readSrc('app/(protected)/admin/sops/new/blank/WizardClient.tsx')
-  expect(src).toContain('DepartmentPicker')
-  expect(src).toContain('localOnly')
-})
+// Phase 40 Plan 40-08 (DUP-02) extracted the per-page <DepartmentPicker
+// localOnly> markup into a shared <SopMetadataFields> composite; WizardClient
+// no longer renders DepartmentPicker directly. That contract (WizardClient
+// imports SopMetadataFields + renders no local <DepartmentPicker; and
+// SopMetadataFields itself renders <DepartmentPicker localOnly>) is already
+// covered by tests/phase40/dup02-metadata-picker.spec.ts — no need to
+// duplicate it here.
 
 test('WizardClient passes departmentIds state into createSopFromWizard arguments', () => {
   const src = readSrc('app/(protected)/admin/sops/new/blank/WizardClient.tsx')
@@ -57,7 +59,10 @@ test('WizardClient passes departmentIds state into createSopFromWizard arguments
 // ── A4: localOnly = no server action on toggle during create ─────────────────
 
 test('DepartmentPicker in wizard mode uses sopId sentinel __new__ (A4)', () => {
-  const src = readSrc('app/(protected)/admin/sops/new/blank/WizardClient.tsx')
+  // Phase 40-08: the __new__ sentinel now lives inside the shared
+  // SopMetadataFields composite (hardcoded there), not per-page in
+  // WizardClient — repointed from WizardClient.tsx (STALE-GUARD).
+  const src = readSrc('components/admin/SopMetadataFields.tsx')
   expect(src).toContain('__new__')
 })
 
@@ -90,11 +95,9 @@ test('PromptClient includes allDepartments in POST body (A3)', () => {
   expect(src).toContain('allDepartments')
 })
 
-test('PromptClient uses DepartmentPicker (localOnly) for department field (A3)', () => {
-  const src = readSrc('app/(protected)/admin/sops/new/ai/PromptClient.tsx')
-  expect(src).toContain('DepartmentPicker')
-  expect(src).toContain('localOnly')
-})
+// Phase 40 Plan 40-08 (DUP-02): PromptClient's DepartmentPicker (localOnly)
+// was also absorbed into SopMetadataFields — covered by
+// tests/phase40/dup02-metadata-picker.spec.ts, not duplicated here.
 
 // ── Surface 4: both server pages fetch departments ───────────────────────────
 

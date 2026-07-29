@@ -93,19 +93,29 @@ test.describe('SB-LINE-05 — SubTradePicker component contract', () => {
 })
 
 test.describe('SB-LINE-05 — admin/team page integration', () => {
-  test('team page imports SubTradePicker', () => {
+  // Phase 25 (REQ-4) + Phase 32-07 org-model rewrite: /admin/team's per-worker
+  // SubTradePicker (mode="user") was superseded by RoleAssignmentTable's
+  // member-mode DepartmentPicker (organisation department, not SOP sub-trade).
+  // SubTradePicker mode="user" is now dead code — SubTradePicker survives only
+  // for SOP-level trade assignment (mode="sop" on the assign page, still
+  // covered below). Guard the replacement behaviour instead of the removed one.
+  const ROLE_ASSIGNMENT_TABLE = path.join(ROOT, 'src', 'components', 'admin', 'RoleAssignmentTable.tsx')
+
+  test('team page renders RoleAssignmentTable (via TeamViewShell/OrgColumnsBoard)', () => {
     const src = read(TEAM_PAGE)
-    expect(src).toContain("from '@/components/admin/SubTradePicker'")
+    expect(src).toContain('TeamViewShell')
   })
 
-  test('team page renders SubTradePicker per worker row', () => {
-    const src = read(TEAM_PAGE)
-    expect(src).toMatch(/<SubTradePicker\s+mode="user"\s+userId=/)
+  test('RoleAssignmentTable renders member-mode DepartmentPicker per worker row', () => {
+    const src = read(ROLE_ASSIGNMENT_TABLE)
+    expect(src).toContain("from '@/components/admin/departments/DepartmentPicker'")
+    expect(src).toMatch(/<DepartmentPicker\s*\n?\s*mode="member"/)
   })
 
   test('team page preserves existing RoleAssignmentTable', () => {
-    const src = read(TEAM_PAGE)
-    expect(src).toContain('RoleAssignmentTable')
+    const src = read(ROLE_ASSIGNMENT_TABLE)
+    expect(fs.existsSync(ROLE_ASSIGNMENT_TABLE)).toBe(true)
+    expect(src).toContain('export default function RoleAssignmentTable')
   })
 })
 

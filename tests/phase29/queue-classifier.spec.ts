@@ -24,7 +24,10 @@ const CLASSIFY_PATH = path.join(ROOT, 'src', 'lib', 'governance', 'classify.ts')
 const GOVERNANCE_ACTION = path.join(ROOT, 'src', 'actions', 'governance.ts')
 
 function read(p: string): string {
-  return fs.readFileSync(p, 'utf-8')
+  // Worktree checkouts can CRLF-normalize source files (repo has no
+  // .gitattributes — CLAUDE.md 2026-07-18); normalize before matching
+  // \n-joined literals so this spec doesn't depend on checkout line endings.
+  return fs.readFileSync(p, 'utf-8').replace(/\r\n/g, '\n')
 }
 
 test.describe('queue classifier — awaiting_approval', () => {

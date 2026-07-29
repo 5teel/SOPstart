@@ -1,9 +1,11 @@
 /**
  * Phase 21 Plan 21-05 — BlockContentSchema extended-kinds unit tests.
  *
- * Asserts that BlockContentSchema.options has 19 entries (12 pre-21-05 + 7 new)
- * and that each of the 7 new schemas parses a representative payload that
- * matches the corresponding Puck Props shape from src/components/sop/blocks/.
+ * Asserts that BlockContentSchema.options has 20 entries (12 pre-21-05 + 7
+ * from 21-05 + 1 from Plan 26-13's VisualBlockContentSchema, the annotated-
+ * diagram block) and that each of the 7 Plan 21-05 schemas parses a
+ * representative payload that matches the corresponding Puck Props shape
+ * from src/components/sop/blocks/.
  *
  * Runs under the `phase21-stubs` Playwright project (no browser needed —
  * pure Zod work).
@@ -21,8 +23,8 @@ import {
 } from '@/lib/validators/blocks'
 
 test.describe('BlockContentSchema — Plan 21-05 extended kinds', () => {
-  test('discriminated union has 19 members (12 existing + 7 new)', () => {
-    expect(BlockContentSchema.options.length).toBe(19)
+  test('discriminated union has 20 members (12 existing + 7 from 21-05 + 1 from 26-13 visual)', () => {
+    expect(BlockContentSchema.options.length).toBe(20)
   })
 
   test('text — parses representative TextBlock content', () => {
