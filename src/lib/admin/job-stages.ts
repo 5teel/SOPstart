@@ -48,7 +48,7 @@ export const STAGE_SETS: Record<string, ReadonlyArray<PlainStageKey>> = {
   // Plain document parse (parse_jobs.input_type === 'upload') -- closes the
   // gap where a plain document parse rendered no stepper at all.
   upload: ['upload', 'read', 'draft', 'check'],
-  // D-08's new set, replacing PipelineStepper's uploading/parsing/review/generating/ready.
+  // D-08's new set, replacing the old pipeline stepper's uploading/parsing/review/generating/ready.
   video_generation: ['upload', 'read', 'check', 'render', 'ready'],
 }
 

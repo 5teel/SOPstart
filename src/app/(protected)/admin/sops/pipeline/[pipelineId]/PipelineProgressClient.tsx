@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import {
   ArrowLeft,
@@ -9,12 +9,8 @@ import {
   AlertTriangle,
   Loader2,
 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
-import {
-  PipelineStepper,
-  type PipelineStageKey,
-  type PipelineStageState,
-} from '@/components/admin/PipelineStepper'
+import ParseJobStatus from '@/components/admin/ParseJobStatus'
+import { derivePipelineStage, type Snapshot } from '@/lib/admin/job-stages'
 
 type SopRow = {
   id: string
@@ -41,12 +37,6 @@ type VideoJobRow = {
   current_stage: string | null
 }
 
-type Snapshot = {
-  sop: SopRow | null
-  parseJob: ParseJobRow | null
-  videoJob: VideoJobRow | null
-}
-
 interface Props {
   pipelineId: string
   initialPipelineStatus: string
@@ -56,169 +46,14 @@ interface Props {
   initialVideoJob: VideoJobRow | null
 }
 
-function deriveStage(s: Snapshot): {
-  stage: PipelineStageState
-  errorStage: PipelineStageKey | null
-} {
-  if (s.parseJob?.status === 'failed') {
-    return { stage: 'error', errorStage: 'parsing' }
-  }
-  if (s.videoJob?.status === 'failed') {
-    return { stage: 'error', errorStage: 'generating' }
-  }
-  if (!s.sop || s.sop.status === 'uploading') {
-    return { stage: 'uploading', errorStage: null }
-  }
-  if (
-    s.sop.status === 'parsing' ||
-    s.parseJob?.status === 'queued' ||
-    s.parseJob?.status === 'processing'
-  ) {
-    return { stage: 'parsing', errorStage: null }
-  }
-  if (s.sop.status === 'draft') {
-    return { stage: 'review', errorStage: null }
-  }
-  if (s.videoJob?.status === 'ready') {
-    return { stage: 'ready', errorStage: null }
-  }
-  return { stage: 'generating', errorStage: null }
-}
-
-const POLL_INTERVAL_MS = 5000
-const REALTIME_GRACE_MS = 5000
-const REALTIME_STALE_MS = 15000
-
 export function PipelineProgressClient(props: Props) {
   const [snapshot, setSnapshot] = useState<Snapshot>({
     sop: props.initialSop,
     parseJob: props.initialParseJob,
     videoJob: props.initialVideoJob,
   })
-  const lastUpdateRef = useRef<number>(Date.now())
-  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  useEffect(() => {
-    const supabase = createClient()
-
-    async function fetchSnapshot() {
-      try {
-        const res = await fetch(`/api/sops/pipeline/${props.pipelineId}/snapshot`)
-        if (!res.ok) return
-        const next = (await res.json()) as Snapshot
-        setSnapshot(next)
-        lastUpdateRef.current = Date.now()
-      } catch {
-        // swallow network errors — polling will retry
-      }
-    }
-
-    function startPolling() {
-      if (pollingRef.current) return
-      pollingRef.current = setInterval(() => {
-        // If realtime has gone silent for more than REALTIME_STALE_MS, keep polling.
-        // This also catches the case where realtime connected, delivered events,
-        // then silently dropped — polling resumes automatically on stale data.
-        fetchSnapshot()
-      }, POLL_INTERVAL_MS)
-    }
-
-    function markRealtimeActivity() {
-      lastUpdateRef.current = Date.now()
-    }
-
-    const channel = supabase
-      .channel(`pipeline-${props.pipelineId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'sop_pipeline_runs',
-          filter: `id=eq.${props.pipelineId}`,
-        },
-        () => {
-          markRealtimeActivity()
-          fetchSnapshot()
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'parse_jobs',
-          filter: `pipeline_run_id=eq.${props.pipelineId}`,
-        },
-        () => {
-          markRealtimeActivity()
-          fetchSnapshot()
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'sops',
-          filter: `pipeline_run_id=eq.${props.pipelineId}`,
-        },
-        () => {
-          markRealtimeActivity()
-          fetchSnapshot()
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'video_generation_jobs',
-          filter: `pipeline_run_id=eq.${props.pipelineId}`,
-        },
-        () => {
-          markRealtimeActivity()
-          fetchSnapshot()
-        }
-      )
-      .subscribe((status) => {
-        // Fall back to polling immediately on channel errors or timeouts.
-        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
-          startPolling()
-        }
-      })
-
-    // Polling grace period: if no realtime event fires within REALTIME_GRACE_MS, start polling.
-    // Once polling is running, each tick re-fetches the snapshot unconditionally — which also
-    // serves as the safety net for silently-dropped realtime connections (stale-update recovery).
-    // REALTIME_STALE_MS is retained as the implicit threshold: polling every 5s means any stale
-    // window > 15s is impossible as long as polling is active.
-    const startPollingTimeout = setTimeout(() => {
-      if (Date.now() - lastUpdateRef.current >= REALTIME_GRACE_MS) {
-        startPolling()
-      }
-    }, REALTIME_GRACE_MS)
-
-    // Defensive: even if realtime is delivering events, start polling after REALTIME_STALE_MS
-    // to catch silent drops. pollingRef guard makes this a no-op if already polling.
-    const staleWatchdog = setInterval(() => {
-      if (Date.now() - lastUpdateRef.current >= REALTIME_STALE_MS) {
-        startPolling()
-      }
-    }, REALTIME_STALE_MS)
-
-    return () => {
-      clearTimeout(startPollingTimeout)
-      clearInterval(staleWatchdog)
-      if (pollingRef.current) {
-        clearInterval(pollingRef.current)
-        pollingRef.current = null
-      }
-      supabase.removeChannel(channel)
-    }
-  }, [props.pipelineId])
-
-  const { stage, errorStage } = deriveStage(snapshot)
+  const { plainKey, errorAt } = derivePipelineStage(snapshot)
   const sopId = snapshot.sop?.id ?? null
   const sopTitle =
     snapshot.sop?.title ?? snapshot.sop?.source_file_name ?? 'New SOP'
@@ -237,17 +72,17 @@ export function PipelineProgressClient(props: Props) {
       </header>
 
       <main className="max-w-2xl mx-auto px-4 py-8">
-        <PipelineStepper currentStage={stage} errorAtStage={errorStage} />
+        <ParseJobStatus pipelineId={props.pipelineId} initialSnapshot={snapshot} onSnapshot={setSnapshot} />
 
         <div className="mt-6 space-y-4">
-          {stage === 'uploading' && (
+          {!errorAt && plainKey === 'upload' && (
             <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5 flex items-center gap-3">
               <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
               <p className="text-sm text-[var(--ink-900)]">Uploading your file...</p>
             </div>
           )}
 
-          {stage === 'parsing' && (
+          {!errorAt && plainKey === 'read' && (
             <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5">
               <div className="flex items-center gap-3">
                 <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
@@ -261,7 +96,7 @@ export function PipelineProgressClient(props: Props) {
             </div>
           )}
 
-          {stage === 'review' && sopId && (
+          {!errorAt && plainKey === 'check' && sopId && (
             <div className="bg-[var(--accent-voice)]/20 border border-[var(--accent-voice)]/50 rounded-xl p-5">
               <div className="flex items-start gap-3 mb-3">
                 <ClipboardCheck className="w-6 h-6 text-[var(--accent-voice)] shrink-0" />
@@ -284,7 +119,7 @@ export function PipelineProgressClient(props: Props) {
             </div>
           )}
 
-          {stage === 'generating' && snapshot.videoJob && (
+          {!errorAt && plainKey === 'render' && snapshot.videoJob && (
             <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5">
               <div className="flex items-center gap-3 mb-2">
                 <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
@@ -299,14 +134,14 @@ export function PipelineProgressClient(props: Props) {
             </div>
           )}
 
-          {stage === 'generating' && !snapshot.videoJob && (
+          {!errorAt && plainKey === 'render' && !snapshot.videoJob && (
             <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5 flex items-center gap-3">
               <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
               <p className="text-sm text-[var(--ink-900)]">Queuing video generation…</p>
             </div>
           )}
 
-          {stage === 'ready' && sopId && (
+          {!errorAt && plainKey === 'ready' && sopId && (
             <div className="bg-green-500/20 border border-green-500/40 rounded-xl px-5 py-5">
               <div className="flex items-start gap-3 mb-3">
                 <CheckCircle className="w-6 h-6 text-green-400 shrink-0" />
@@ -329,7 +164,7 @@ export function PipelineProgressClient(props: Props) {
             </div>
           )}
 
-          {stage === 'error' && errorStage === 'generating' && sopId && (
+          {errorAt === 'render' && sopId && (
             <div
               className="bg-white border border-[var(--ink-100)] rounded-xl p-5"
               role="alert"
@@ -355,7 +190,7 @@ export function PipelineProgressClient(props: Props) {
             </div>
           )}
 
-          {stage === 'error' && errorStage === 'parsing' && sopId && (
+          {errorAt === 'read' && sopId && (
             <div
               className="bg-white border border-[var(--ink-100)] rounded-xl p-5"
               role="alert"

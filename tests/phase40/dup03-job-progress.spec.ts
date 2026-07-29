@@ -8,8 +8,6 @@
  * the DB stage values themselves, so this spec also locks the internal
  * keys as an anti-rename guard.
  *
- * `test.fixme` until 40-03.
- *
  * Registration: playwright.config.ts `phase40` project
  *   testDir: '.', testMatch: /tests\/phase40\/.*\.(spec|test)\.ts$/
  * Verify: `npx playwright test --list --project=phase40`
@@ -18,6 +16,7 @@
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
 import path from 'node:path'
+import { shouldStartPolling } from '@/lib/admin/job-stages'
 
 const ROOT = process.cwd()
 const SRC_DIR = path.join(ROOT, 'src')
@@ -61,18 +60,19 @@ function walk(dir: string, out: string[]): void {
 }
 
 test.describe('DUP-03 -- one shared job-progress component', () => {
-  test.fixme('PipelineStepper.tsx does not exist', () => {
+  test('PipelineStepper.tsx does not exist', () => {
     expect(fs.existsSync(PIPELINE_STEPPER)).toBe(false)
   })
 
-  test.fixme('PipelineProgressClient contains zero realtime/polling wiring of its own', () => {
+  test('PipelineProgressClient contains zero realtime/polling wiring of its own', () => {
     const src = stripComments(read(PIPELINE_PROGRESS_CLIENT))
     for (const token of ['postgres_changes', 'setInterval', 'REALTIME_GRACE_MS', 'REALTIME_STALE_MS', 'POLL_INTERVAL_MS']) {
       expect(src).not.toContain(token)
     }
+    expect(src).toContain('<ParseJobStatus')
   })
 
-  test.fixme('exactly one file under src/ contains both REALTIME_GRACE_MS and REALTIME_STALE_MS, and it is ParseJobStatus.tsx', () => {
+  test('exactly one file under src/ contains both REALTIME_GRACE_MS and REALTIME_STALE_MS, and it is ParseJobStatus.tsx', () => {
     const files: string[] = []
     walk(SRC_DIR, files)
     const owners = files.filter((f) => {
@@ -82,7 +82,7 @@ test.describe('DUP-03 -- one shared job-progress component', () => {
     expect(owners).toEqual([PARSE_JOB_STATUS])
   })
 
-  test.fixme('job-stages.ts exports STAGE_SETS with a video_generation key and a plain-language map', () => {
+  test('job-stages.ts exports STAGE_SETS with a video_generation key and a plain-language map', () => {
     const src = read(JOB_STAGES)
     expect(src).toContain('export const STAGE_SETS')
     expect(src).toContain('video_generation')
@@ -98,7 +98,7 @@ test.describe('DUP-03 -- one shared job-progress component', () => {
     }
   })
 
-  test.fixme('D-07: DB stage keys are never renamed -- job-stages.ts still maps every internal key', () => {
+  test('D-07: DB stage keys are never renamed -- job-stages.ts still maps every internal key', () => {
     const src = read(JOB_STAGES)
     for (const key of [
       'extracting_audio',
@@ -110,5 +110,19 @@ test.describe('DUP-03 -- one shared job-progress component', () => {
     ]) {
       expect(src).toContain(key)
     }
+  })
+
+  test('ParseJobStatus subscribes to all four pipeline tables in pipeline mode', () => {
+    const src = stripComments(read(PARSE_JOB_STATUS))
+    for (const literal of ['sop_pipeline_runs', 'video_generation_jobs', 'pipeline_run_id=eq.']) {
+      expect(src).toContain(literal)
+    }
+  })
+
+  // D-08 runtime assertion: source-contract presence alone doesn't prove the
+  // grace/stale timer predicate actually fires at the right threshold.
+  test('shouldStartPolling fires exactly at the threshold boundary', () => {
+    expect(shouldStartPolling(0, 5001, 5000)).toBe(true)
+    expect(shouldStartPolling(0, 4999, 5000)).toBe(false)
   })
 })
