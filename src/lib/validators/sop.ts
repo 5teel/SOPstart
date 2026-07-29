@@ -253,7 +253,7 @@ export function isBlockedMacroFile(filename: string): boolean {
 export function getSourceFileType(mimeType: string): SourceFileType {
   if (mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') return 'docx'
   if (mimeType === 'application/pdf') return 'pdf'
-  if (mimeType === 'image/jpeg' || mimeType === 'image/png' || mimeType === 'image/heic' || mimeType === 'image/heif') return 'image'
+  if (mimeType === 'image/jpeg' || mimeType === 'image/png' || mimeType === 'image/webp' || mimeType === 'image/heic' || mimeType === 'image/heif') return 'image'
   if (mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') return 'xlsx'
   if (mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') return 'pptx'
   if (mimeType === 'text/plain') return 'txt'

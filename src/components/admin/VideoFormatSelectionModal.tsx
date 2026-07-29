@@ -5,13 +5,8 @@ import { useRouter } from 'next/navigation'
 import { X, Loader2, Upload } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { createVideoSopPipelineSession } from '@/actions/sops'
+import { ACCEPT_ATTR, INTAKE_HINT, validateIntakeFile } from '@/lib/upload/file-intake'
 import type { PipelineVideoFormat } from '@/types/sop'
-
-const ACCEPT = '.docx,.pdf,.xlsx,.pptx,.txt,image/jpeg,image/png,image/heic,image/heif'
-const BLOCKED_EXTENSIONS = ['.xlsm', '.xlsb', '.xltm', '.pptm', '.potm', '.ppam']
-const HEIC_EXTENSIONS = ['.heic', '.heif']
-const HEIC_MIME_TYPES = ['image/heic', 'image/heif']
-const MAX_FILE_SIZE = 50 * 1024 * 1024
 
 interface Props {
   open: boolean
@@ -48,45 +43,13 @@ export function VideoFormatSelectionModal({ open, onClose }: Props) {
       setFile(null)
       return
     }
-    const lower = picked.name.toLowerCase()
-    if (BLOCKED_EXTENSIONS.some((ext) => lower.endsWith(ext))) {
-      setError(
-        'Macro-enabled Office files are blocked for security. Save as .xlsx or .pptx and try again.',
-      )
+    const result = await validateIntakeFile(picked)
+    if (!result.ok) {
+      setError(result.message)
       setFile(null)
       return
     }
-    if (picked.size > MAX_FILE_SIZE) {
-      setError(`${picked.name} is over 50MB and cannot be uploaded.`)
-      setFile(null)
-      return
-    }
-    // Convert HEIC/HEIF (iPhone photos) to JPEG client-side so the parser can handle them.
-    // Mirrors UploadDropzone.validateAndAddFiles conversion path.
-    const isHeic =
-      HEIC_MIME_TYPES.includes(picked.type) ||
-      HEIC_EXTENSIONS.some((ext) => lower.endsWith(ext))
-    if (isHeic) {
-      try {
-        const heic2any = (await import('heic2any')).default
-        const blob = (await heic2any({
-          blob: picked,
-          toType: 'image/jpeg',
-          quality: 0.92,
-        })) as Blob
-        const jpgName = picked.name.replace(/\.(heic|heif)$/i, '.jpg')
-        const converted = new File([blob], jpgName, { type: 'image/jpeg' })
-        setFile(converted)
-        return
-      } catch {
-        setError(
-          `Failed to convert ${picked.name}. Please try a different format (JPEG or PNG).`,
-        )
-        setFile(null)
-        return
-      }
-    }
-    setFile(picked)
+    setFile(result.file)
   }
 
   function reset() {
@@ -187,7 +150,7 @@ export function VideoFormatSelectionModal({ open, onClose }: Props) {
               </>
             ) : (
               <p className="text-sm text-[var(--ink-500)]">
-                Choose a Word, PDF, Excel, PowerPoint, text or photo file
+                {INTAKE_HINT}
               </p>
             )}
           </div>
@@ -196,7 +159,7 @@ export function VideoFormatSelectionModal({ open, onClose }: Props) {
           ref={inputRef}
           type="file"
           className="hidden"
-          accept={ACCEPT}
+          accept={ACCEPT_ATTR}
           onChange={handleFileChange}
         />
 
