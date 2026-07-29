@@ -522,7 +522,7 @@ Executes 40 → 41 → 42 → 43, strictly sequential.
   4. Every admin creation route renders the shared admin nav/page shell — no route hand-rolls its own back-link while its siblings use `AdminNav` — so a nav change is one edit in one file (which Phase 41 then makes)
   5. A SOP created via the AI route and a SOP created via the wizard appear together under the same category filter; every pre-existing row carrying the retired column is backfilled, no code path writes the retired column, and a live query against prod proves zero rows left behind
 
-**Plans:** 9/9 plans complete
+**Plans:** 9/9 shipped plans complete · 5 gap-closure plans (40-10..40-14) pending
 Plans:
 **Wave 1**
 
@@ -546,6 +546,16 @@ Executes 40 → 41 → 42 → 43, strictly sequential.
 - [x] 40-09-PLAN.md — DUP-04: one `AdminPageShell` with a contextual back-link slot across all five non-compliant admin creation routes
 
 **Waves:** 1 → {40-01} · 2 → {40-02, 40-03, 40-04} · 3 → {40-05, 40-07, 40-08} · 4 → {40-06, 40-09}
+
+**Gap closure** *(from 40-VERIFICATION.md gaps_found + 40-REVIEW.md criticals — plans 40-01..09 unchanged)*
+
+- [ ] 40-10-PLAN.md — GAP 1 / DUP-01: `uploadFileSchema` derives its accept list from `file-intake.ts` (webp drift closed), plus a runnable parity harness replacing the presence-only spec
+- [ ] 40-11-PLAN.md — GAP 3 / DAT-01: `cloneSopAsDraft` carries `category_slug` (Edit-into-new-version + Restore), plus a `sops`-table write census
+- [ ] 40-12-PLAN.md — CR-02: session + admin role + session-org guards ahead of the admin-client writes in `/api/sops/parse|transcribe|restructure`, pinned positionally
+- [ ] 40-13-PLAN.md — CR-04/WR-02: `reparseSop` verifies before it destroys; retry hidden where it cannot work
+- [ ] 40-14-PLAN.md — GAP 2 / CR-01: no server action ships `SUPABASE_SERVICE_ROLE_KEY` to the browser (all 3 sites), video TUS on the caller session token, migration 00059 scoping the `sop-videos` bucket [BLOCKING human check]
+
+**Gap waves:** 1 → {40-10, 40-11, 40-12, 40-13} · 2 → {40-14}
 **UI hint**: yes
 
 ### Phase 41: One SOP Surface
