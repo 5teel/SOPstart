@@ -1,5 +1,14 @@
 import { z } from 'zod'
 import type { SourceFileType } from '@/types/sop'
+import {
+  ACCEPTED_MIME_TYPES,
+  BLOCKED_MIME_TYPES,
+  BLOCKED_EXTENSIONS,
+  MAX_FILE_SIZE,
+  MAX_VIDEO_FILE_SIZE,
+  VIDEO_MIME_TYPES,
+  INTAKE_HINT,
+} from '@/lib/upload/file-intake'
 
 // GPT-4o structured output schemas (used with zodResponseFormat)
 // OpenAI requires .nullable() not .optional() for structured outputs
@@ -45,39 +54,16 @@ export type ParsedSop = z.infer<typeof ParsedSopSchema>
 export type ParsedSopSection = z.infer<typeof SopSectionSchema>
 export type ParsedSopStep = z.infer<typeof SopStepSchema>
 
-// Upload validation
-const ACCEPTED_TYPES = [
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // docx
-  'application/pdf',
-  'image/jpeg',
-  'image/png',
-  'image/heic', // HEIC from iOS
-  'image/heif', // HEIF variant
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // xlsx
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation', // pptx
-  'text/plain', // txt
-  'video/mp4',
-  'video/quicktime', // MOV
-] as const
-
-// Macro-enabled Office formats — blocked for security (cannot be safely parsed)
-const BLOCKED_MIME_TYPES = [
-  'application/vnd.ms-excel.sheet.macroEnabled.12',       // xlsm
-  'application/vnd.ms-powerpoint.presentation.macroEnabled.12', // pptm
-  'application/vnd.ms-excel.sheet.binary.macroEnabled.12', // xlsb
-] as const
-
-const BLOCKED_EXTENSIONS = ['.xlsm', '.xlsb', '.xltm', '.pptm', '.potm', '.ppam'] as const
-
-const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
-const MAX_VIDEO_FILE_SIZE = 2 * 1024 * 1024 * 1024 // 2GB
-
+// Upload validation — accept list, blocked lists and size limits derive from
+// the single shared intake module (Phase 40 DUP-01 / WR-01): this schema is
+// the authoritative server-side gate, but it must agree with the client's
+// shared validateIntakeFile on every type it advertises as supported.
 export const uploadFileSchema = z.object({
   name: z.string().min(1),
   size: z.number().max(MAX_FILE_SIZE, 'File must be under 50MB'),
   type: z.string().refine(
-    (t) => (ACCEPTED_TYPES as readonly string[]).includes(t) && !(BLOCKED_MIME_TYPES as readonly string[]).includes(t),
-    'Accepted formats: Word (.docx), PDF, Excel (.xlsx), PowerPoint (.pptx), plain text (.txt), or photos (jpg, png). Macro-enabled files are blocked for security.'
+    (t) => (ACCEPTED_MIME_TYPES as readonly string[]).includes(t) && !(BLOCKED_MIME_TYPES as readonly string[]).includes(t),
+    `Accepted formats: ${INTAKE_HINT}. Macro-enabled files are blocked for security.`
   ),
 })
 
@@ -85,7 +71,7 @@ export const uploadVideoFileSchema = z.object({
   name: z.string().min(1),
   size: z.number().max(MAX_VIDEO_FILE_SIZE, 'Video must be under 2GB'),
   type: z.string().refine(
-    (t) => t === 'video/mp4' || t === 'video/quicktime',
+    (t) => (VIDEO_MIME_TYPES as readonly string[]).includes(t),
     'Accepted video formats: MP4 (.mp4) or MOV (.mov)'
   ),
 })

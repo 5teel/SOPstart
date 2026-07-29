@@ -32,6 +32,15 @@ export const ACCEPTED_MIME_TYPES = [
 // parser or conversion library reads the file.
 export const BLOCKED_EXTENSIONS = ['.xlsm', '.xlsb', '.xltm', '.pptm', '.potm', '.ppam'] as const
 
+// Macro-enabled Office formats — blocked for security (cannot be safely parsed).
+// Checked alongside BLOCKED_EXTENSIONS so a macro workbook renamed to .xlsx
+// (extension check bypassed) is still caught by its declared MIME type.
+export const BLOCKED_MIME_TYPES = [
+  'application/vnd.ms-excel.sheet.macroEnabled.12', // xlsm
+  'application/vnd.ms-powerpoint.presentation.macroEnabled.12', // pptm
+  'application/vnd.ms-excel.sheet.binary.macroEnabled.12', // xlsb
+] as const
+
 export const HEIC_MIME_TYPES = ['image/heic', 'image/heif'] as const
 export const HEIC_EXTENSIONS = ['.heic', '.heif'] as const
 
@@ -110,7 +119,10 @@ export type IntakeResult =
 export async function validateIntakeFile(file: File): Promise<IntakeResult> {
   const lowerName = file.name.toLowerCase()
 
-  if ((BLOCKED_EXTENSIONS as readonly string[]).some((ext) => lowerName.endsWith(ext))) {
+  if (
+    (BLOCKED_EXTENSIONS as readonly string[]).some((ext) => lowerName.endsWith(ext)) ||
+    (BLOCKED_MIME_TYPES as readonly string[]).includes(file.type)
+  ) {
     return {
       ok: false,
       reason: 'blocked-macro',

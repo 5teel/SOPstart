@@ -14,6 +14,7 @@
  */
 
 import { test, expect } from '@playwright/test'
+import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import {
@@ -135,11 +136,43 @@ test.describe('DUP-01 -- one shared file-intake module', () => {
     expect(src).toContain('video/quicktime')
   })
 
-  test('every ACCEPTED_MIME_TYPES entry is handled by getSourceFileType without throwing', () => {
-    const validatorsSrc = stripComments(read(SOP_VALIDATORS))
-    for (const mime of ACCEPTED_MIME_TYPES) {
-      expect(validatorsSrc).toContain(mime)
+  // Replaces the old getSourceFileType presence-assertion test, which only
+  // grepped the validators source for each MIME string (a presence
+  // assertion masquerading as a behavioural one -- 40-REVIEW.md IN-03). This
+  // shells out to the real tsx harness, which exercises the ACTUAL
+  // uploadFileSchema/uploadVideoFileSchema/getSourceFileType against every
+  // ACCEPTED_MIME_TYPES and BLOCKED_MIME_TYPES entry.
+  test('accept-list parity harness: every shared accepted MIME type passes the real server schema, every blocked type fails it', () => {
+    let out = ''
+    try {
+      out = execFileSync('npx', ['tsx', 'scripts/accept-list-parity-check.tsx'], {
+        cwd: ROOT,
+        encoding: 'utf8',
+        shell: true,
+      })
+    } catch (err) {
+      const e = err as { stdout?: string; stderr?: string }
+      throw new Error(`accept-list-parity-check harness failed:\n${e.stdout ?? ''}\n${e.stderr ?? ''}`)
     }
+    expect(out).toContain('ACCEPT-LIST PARITY OK')
+  })
+
+  // Structural single-source sweep keyed on the DATA (the five lists), not on
+  // a planner-enumerated file list -- any future file that re-declares one of
+  // these consts as its own `const` fails this spec (40-REVIEW.md WR-01).
+  test('ACCEPTED_MIME_TYPES / BLOCKED_EXTENSIONS / BLOCKED_MIME_TYPES / MAX_FILE_SIZE / MAX_VIDEO_FILE_SIZE are declared as a const in exactly one file: file-intake.ts', () => {
+    const files: string[] = []
+    walk(SRC_DIR, files)
+    const tokens = ['ACCEPTED_MIME_TYPES', 'BLOCKED_EXTENSIONS', 'BLOCKED_MIME_TYPES', 'MAX_FILE_SIZE', 'MAX_VIDEO_FILE_SIZE']
+    for (const token of tokens) {
+      const declarers = files.filter((f) => new RegExp(`const\\s+${token}\\b`).test(stripComments(read(f))))
+      expect(declarers, `${token} must be declared as a const only in file-intake.ts`).toEqual([FILE_INTAKE])
+    }
+  })
+
+  test('validators/sop.ts imports its upload lists from the shared intake module', () => {
+    const validatorsSrc = stripComments(read(SOP_VALIDATORS))
+    expect(validatorsSrc).toContain("from '@/lib/upload/file-intake'")
   })
 
   test('BLOCKED_EXTENSIONS is byte-identical to the original UploadDropzone list', () => {
