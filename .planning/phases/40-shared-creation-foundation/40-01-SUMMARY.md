@@ -104,3 +104,11 @@ None - no external service configuration required.
 ---
 *Phase: 40-shared-creation-foundation*
 *Completed: 2026-07-29*
+
+## Self-Check: PASSED
+
+- All 7 spec files + playwright.config.ts + this SUMMARY.md verified present on disk with `[ -f ]`
+- All 3 commits (`ec61fc9`, `9ba8a78`, `7134fb1`) verified in `git log`
+- `npx playwright test --list --project=phase40` lists exactly 27 tests across 7 files
+- `npx playwright test --project=phase40` — 24 skipped (fixme), 3 passed (spine-freeze), 0 failures, exit 0
+- `npx tsc --noEmit` clean
