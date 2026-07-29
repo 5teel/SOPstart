@@ -522,7 +522,7 @@ Executes 40 → 41 → 42 → 43, strictly sequential.
   4. Every admin creation route renders the shared admin nav/page shell — no route hand-rolls its own back-link while its siblings use `AdminNav` — so a nav change is one edit in one file (which Phase 41 then makes)
   5. A SOP created via the AI route and a SOP created via the wizard appear together under the same category filter; every pre-existing row carrying the retired column is backfilled, no code path writes the retired column, and a live query against prod proves zero rows left behind
 
-**Plans:** 1/9 plans executed
+**Plans:** 4/9 plans executed
 Plans:
 **Wave 1**
 
@@ -530,9 +530,9 @@ Executes 40 → 41 → 42 → 43, strictly sequential.
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 40-02-PLAN.md — DUP-01: one file-intake module (accept list, blocked extensions, size limits, HEIC), adopted by the creation dropzone and the video-generate picker
-- [ ] 40-03-PLAN.md — DUP-03: one plain-language stage vocabulary + `ParseJobStatus` as the single realtime-plus-polling progress component; `PipelineStepper` retired
-- [ ] 40-04-PLAN.md — DAT-01a: the fixed-seed category vocabulary, migration 00058 adding `sops.category_slug`, the [BLOCKING] schema push, and every write site repointed
+- [x] 40-02-PLAN.md — DUP-01: one file-intake module (accept list, blocked extensions, size limits, HEIC), adopted by the creation dropzone and the video-generate picker
+- [x] 40-03-PLAN.md — DUP-03: one plain-language stage vocabulary + `ParseJobStatus` as the single realtime-plus-polling progress component; `PipelineStepper` retired
+- [x] 40-04-PLAN.md — DAT-01a: the fixed-seed category vocabulary, migration 00058 adding `sops.category_slug`, the [BLOCKING] schema push, and every write site repointed
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
