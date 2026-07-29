@@ -28,8 +28,17 @@ const MIGRATIONS_DIR = path.join(ROOT, 'supabase', 'migrations')
 const APPLIER = path.join(ROOT, 'scripts', 'apply-phase40-migration.mjs')
 const BACKFILL = path.join(ROOT, 'scripts', 'backfill-sop-category.mjs')
 const MIGRATION_00058 = path.join(MIGRATIONS_DIR, '00058_sop_category_slug.sql')
+const MIGRATION_00059 = path.join(MIGRATIONS_DIR, '00059_sop_videos_storage_scope.sql')
 const SOP_CATEGORIES = path.join(ROOT, 'src', 'lib', 'sop-categories.ts')
 const VERIFY_SCRIPT = path.join(ROOT, 'scripts', 'verify-category-backfill.mjs')
+
+// Every phase-40 migration on disk. A filter narrower than this set (e.g.
+// the original `f.startsWith('00058')`) silently exempts a later corrective
+// migration from the ordering guard below — the exact regression class
+// this file's own header cites (CLAUDE.md 2026-07-28: apply-phase37's
+// fallback applied only its OWN migration and re-dropped a later one while
+// its assertions stayed green). Extend this array, never narrow the filter.
+const PHASE40_MIGRATION_PREFIXES = ['00058', '00059']
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8').replace(/\r\n/g, '\n')
@@ -66,7 +75,7 @@ test.describe('DAT-01 -- migration applier integrity (CLAUDE.md 2026-07-28)', ()
 
     const onDiskPhase40Migrations = fs
       .readdirSync(MIGRATIONS_DIR)
-      .filter((f) => f.startsWith('00058'))
+      .filter((f) => PHASE40_MIGRATION_PREFIXES.some((prefix) => f.startsWith(prefix)))
       .sort()
 
     // Index-by-index, not set equality -- apply order is load-bearing
@@ -104,6 +113,24 @@ test.describe('DAT-01 -- migration applier integrity (CLAUDE.md 2026-07-28)', ()
     const whereCategorySlugNullCount = (src.match(/where[\s\S]{0,200}?category_slug is null/g) ?? []).length
     expect(whereCategorySlugNullCount).toBeGreaterThanOrEqual(2)
     // Migration clause pinning: this migration must stay purely additive.
+    expect(src).not.toContain('drop column')
+    expect(src).not.toContain('create table')
+    expect(src).not.toContain('security definer')
+  })
+
+  test('00059_sop_videos_storage_scope.sql drops the old permissive policy and scopes INSERT/UPDATE to org + admin role, adding no table/drop-column/security-definer', () => {
+    const rawSrc = read(MIGRATION_00059)
+    const sqlOnly = rawSrc
+      .split('\n')
+      .filter((l) => !l.trim().startsWith('--'))
+      .join('\n')
+    const src = sqlOnly.toLowerCase()
+    expect(src).toContain('drop policy if exists "authenticated users can upload to sop-videos"')
+    expect(src).toContain('storage.foldername')
+    expect(src).toContain('current_organisation_id')
+    expect(src).toContain('current_user_role')
+    expect(src).toMatch(/for insert/)
+    expect(src).toMatch(/for update/)
     expect(src).not.toContain('drop column')
     expect(src).not.toContain('create table')
     expect(src).not.toContain('security definer')

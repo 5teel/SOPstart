@@ -38,7 +38,7 @@ const ROOT = path.resolve(__dirname, '..')
 // first entry, or applies out of order, can silently re-open a hole a later
 // migration in this array exists to close. tests/phase40/dat01-migration.spec.ts
 // asserts this array equals every phase-40 migration on disk, index by index.
-const MIGRATIONS = ['00058_sop_category_slug.sql']
+const MIGRATIONS = ['00058_sop_category_slug.sql', '00059_sop_videos_storage_scope.sql']
 const MIGRATION_FILES = MIGRATIONS.map((f) => path.join(ROOT, 'supabase/migrations', f))
 
 // ---------------------------------------------------------------------------
@@ -97,16 +97,38 @@ async function managementSql(sql) {
 }
 
 // ---------------------------------------------------------------------------
+// Pre-apply audit (T-40-14-06, printed not enforced): 00059 scopes writes to
+// the caller's own org-prefix path. Any pre-existing sop-videos object
+// stored outside the `{org_id}/...` convention would lose write access
+// (e.g. resumable-upload UPDATE) under the new policy. This does not block
+// the apply — it is reported here so the count is visible in the SUMMARY.
+// ---------------------------------------------------------------------------
+console.log('=== Phase 40 Migration Applier (00058 sops.category_slug, 00059 sop-videos storage scope) ===')
+console.log('Target:', SUPABASE_URL)
+console.log('Project ref:', PROJECT_REF)
+console.log('Migrations (ordered):', MIGRATIONS.join(', '))
+console.log('')
+console.log('[0/4] Pre-apply audit: sop-videos objects outside the {org_id}/... convention ...')
+try {
+  const auditRows = await managementSql(
+    "SELECT count(*) AS non_uuid_count FROM storage.objects WHERE bucket_id = 'sop-videos' AND (storage.foldername(name))[1] !~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'"
+  )
+  const auditCount = Number(auditRows?.[0]?.non_uuid_count ?? 0)
+  console.log(`      non-UUID-prefixed sop-videos objects: ${auditCount}`)
+  if (auditCount > 0) {
+    console.log('      NOTE: these objects will lose write access under the new org-scoped policy (report in SUMMARY).')
+  }
+} catch (e) {
+  console.log(`      Could not run pre-apply audit (non-fatal): ${e.message}`)
+}
+console.log('')
+
+// ---------------------------------------------------------------------------
 // Step 1: Apply migration(s) via `npx supabase db push`, falling back to the
 // Management API raw-SQL endpoint if `db push` lacks a DB password. The
 // fallback applies EVERY entry in MIGRATIONS, in order — never just the
 // first (CLAUDE.md 2026-07-28).
 // ---------------------------------------------------------------------------
-console.log('=== Phase 40 Migration Applier (00058 sops.category_slug) ===')
-console.log('Target:', SUPABASE_URL)
-console.log('Project ref:', PROJECT_REF)
-console.log('Migrations (ordered):', MIGRATIONS.join(', '))
-console.log('')
 console.log(`[1/4] Applying ${MIGRATIONS.join(', ')} via supabase db push ...`)
 console.log('      (Only unapplied migrations are run — idempotent)')
 console.log('')
@@ -271,6 +293,56 @@ await assertSql(
   }
 )
 
+// Assertion 5: the old bucket-wide INSERT policy from 00012 is gone.
+await assertSql(
+  'old policy "Authenticated users can upload to sop-videos" no longer exists',
+  "SELECT count(*) AS cnt FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname='Authenticated users can upload to sop-videos'",
+  (rows) => {
+    const row = rows?.[0]
+    return {
+      ok: !!row && Number(row.cnt) === 0,
+      detail: row ? `remaining_policy_count=${row.cnt}` : 'no row returned',
+    }
+  }
+)
+
+// Assertion 6: the new INSERT policy exists and its with_check pins all
+// three clauses (bucket, org-prefix, admin role) — existence alone would
+// not catch a policy that dropped the org or role predicate (CLAUDE.md
+// 2026-07-28).
+await assertSql(
+  'new INSERT policy admins_can_upload_sop_videos pins bucket + org + role in with_check',
+  "SELECT with_check FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname='admins_can_upload_sop_videos' AND cmd='INSERT'",
+  (rows) => {
+    const withCheck = rows?.[0]?.with_check ?? ''
+    const hasBucket = withCheck.includes('sop-videos')
+    const hasOrg = withCheck.includes('current_organisation_id')
+    const hasRole = withCheck.includes('current_user_role')
+    return {
+      ok: !!rows?.[0] && hasBucket && hasOrg && hasRole,
+      detail: `with_check=${JSON.stringify(withCheck)}`,
+    }
+  }
+)
+
+// Assertion 7: the new UPDATE policy exists with the same three tokens in
+// BOTH qual (USING) and with_check — required for x-upsert:'true' resumed
+// uploads (T-40-14-04).
+await assertSql(
+  'new UPDATE policy admins_can_update_sop_videos pins bucket + org + role in both qual and with_check',
+  "SELECT qual, with_check FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname='admins_can_update_sop_videos' AND cmd='UPDATE'",
+  (rows) => {
+    const row = rows?.[0]
+    const qual = row?.qual ?? ''
+    const withCheck = row?.with_check ?? ''
+    const pins = (s) => s.includes('sop-videos') && s.includes('current_organisation_id') && s.includes('current_user_role')
+    return {
+      ok: !!row && pins(qual) && pins(withCheck),
+      detail: `qual=${JSON.stringify(qual)}, with_check=${JSON.stringify(withCheck)}`,
+    }
+  }
+)
+
 // ---------------------------------------------------------------------------
 // Step 3: NOTIFY pgrst to flush the PostgREST schema cache immediately.
 // ---------------------------------------------------------------------------
@@ -295,6 +367,10 @@ if (allPassed) {
   console.log('Migration 00058 is live on the DB: sops.category_slug column,')
   console.log('sops_category_slug_idx index, both retirement comments, and at least')
   console.log('one backfilled row are all live and visible to PostgREST.')
+  console.log('')
+  console.log('Migration 00059 is live on the DB: the old bucket-wide sop-videos INSERT')
+  console.log('policy is gone, and the org-prefix + admin-role INSERT/UPDATE policies')
+  console.log('are live and visible to PostgREST.')
   process.exit(0)
 } else {
   console.error('=== ONE OR MORE ASSERTIONS FAILED ===')
