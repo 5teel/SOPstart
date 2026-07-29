@@ -523,16 +523,26 @@ Executes 40 → 41 → 42 → 43, strictly sequential.
   5. A SOP created via the AI route and a SOP created via the wizard appear together under the same category filter; every pre-existing row carrying the retired column is backfilled, no code path writes the retired column, and a live query against prod proves zero rows left behind
 
 **Plans:** 9 plans in 4 waves
+Plans:
+**Wave 1**
 
-Plans:
 - [ ] 40-01-PLAN.md — Nyquist harness: register the `phase40` Playwright project + seven wave-0 specs (one live spine-freeze guard)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 40-02-PLAN.md — DUP-01: one file-intake module (accept list, blocked extensions, size limits, HEIC), adopted by the creation dropzone and the video-generate picker
 - [ ] 40-03-PLAN.md — DUP-03: one plain-language stage vocabulary + `ParseJobStatus` as the single realtime-plus-polling progress component; `PipelineStepper` retired
 - [ ] 40-04-PLAN.md — DAT-01a: the fixed-seed category vocabulary, migration 00058 adding `sops.category_slug`, the [BLOCKING] schema push, and every write site repointed
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 40-05-PLAN.md — DAT-01b: every reader repointed, including the three category-keyed consumers a source sweep misses (`sop_review_cadences`, `approval_chains`, org-model `collections`)
-- [ ] 40-06-PLAN.md — DAT-01c: ordered applier, three-pass null-clobber-safe backfill + settings remap, and the [BLOCKING] live production proof (SC-5)
 - [ ] 40-07-PLAN.md — DUP-01b: the new-version page and the video-generate picker on the shared accept list, with video routed through the Phase 6 transcription pipeline
 - [ ] 40-08-PLAN.md — DUP-02: one `SopMetadataFields` composite (title + departments + category) replacing the three near-identical copies
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 40-06-PLAN.md — DAT-01c: ordered applier, three-pass null-clobber-safe backfill + settings remap, and the [BLOCKING] live production proof (SC-5)
 - [ ] 40-09-PLAN.md — DUP-04: one `AdminPageShell` with a contextual back-link slot across all five non-compliant admin creation routes
 
 **Waves:** 1 → {40-01} · 2 → {40-02, 40-03, 40-04} · 3 → {40-05, 40-07, 40-08} · 4 → {40-06, 40-09}

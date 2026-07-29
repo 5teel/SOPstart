@@ -4,7 +4,7 @@ milestone: v8.0
 milestone_name: — Authoring Convergence
 status: Roadmap re-derived after SUR scope correction — ready for `/gsd-plan-phase 40`
 stopped_at: Phase 40 context gathered
-last_updated: "2026-07-29T02:25:05.572Z"
+last_updated: "2026-07-29T04:34:24.398Z"
 last_activity: 2026-07-28 — v8.0 roadmap re-derived (Phases 40-43, 21/21 requirements mapped)
 progress:
   total_phases: 4
