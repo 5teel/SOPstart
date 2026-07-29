@@ -18,8 +18,8 @@ import { useTtsPlayback } from '@/components/sop/voice/useTtsPlayback'
 import { isVoiceCaptureSupported } from '@/lib/voice/media-recorder'
 import ParseJobStatus from '@/components/admin/ParseJobStatus'
 import type { Department } from '@/types/sop'
-import { DepartmentPicker } from '@/components/admin/departments/DepartmentPicker'
-import { DChip } from '@/components/admin/departments/DChip'
+import { SopMetadataFields } from '@/components/admin/SopMetadataFields'
+import type { SopMetadataValue } from '@/components/admin/SopMetadataFields'
 
 interface Msg {
   role: 'user' | 'assistant'
@@ -46,8 +46,15 @@ export function VoiceDraftClient({ departments }: { departments: Department[] })
   const [generating, setGenerating] = useState(false)
   const [muted, setMuted] = useState(false)
 
-  const [departmentIds, setDepartmentIds] = useState<string[]>([])
-  const [allDepartments, setAllDepartments] = useState(false)
+  // Phase 40 DUP-02: one shared metadata value (title + departments + category)
+  // driving SopMetadataFields — replaces the two separate pieces of state
+  // this component used to carry.
+  const [meta, setMeta] = useState<SopMetadataValue>({
+    title: '',
+    departmentIds: [],
+    allDepartments: false,
+    categorySlug: null,
+  })
 
   const busyRef = useRef(false)
   const voiceSupported = typeof window === 'undefined' ? true : isVoiceCaptureSupported()
@@ -126,10 +133,12 @@ export function VoiceDraftClient({ departments }: { departments: Department[] })
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           promptText: brief.slice(0, 2000),
-          categorySlug: null,
+          title: meta.title || null,
+          categorySlug: meta.categorySlug,
+          // D-09: voice keeps its detail-level hardcoding until Phase 42 — out of scope here.
           detailLevel: 3,
-          departmentIds,
-          allDepartments,
+          departmentIds: meta.departmentIds,
+          allDepartments: meta.allDepartments,
         }),
       })
       const json = await res.json().catch(() => ({}))
@@ -252,37 +261,10 @@ export function VoiceDraftClient({ departments }: { departments: Department[] })
         </div>
       )}
 
-      {/* Departments (same field as the typed workflow) */}
-      {departments.length > 0 && brief && (
-        <div>
-          <label className="block text-sm font-medium mb-1 text-[var(--ink-700)]">
-            Department <span className="font-normal text-[var(--ink-500)]">(optional)</span>
-          </label>
-          {(departmentIds.length > 0 || allDepartments) && (
-            <div className="flex flex-wrap gap-1 mb-2">
-              {allDepartments ? (
-                <DChip variant="all-departments" />
-              ) : (
-                departmentIds.map((id) => {
-                  const dept = departments.find((d) => d.id === id)
-                  return dept ? <DChip key={id} variant="department" department={dept} /> : null
-                })
-              )}
-            </div>
-          )}
-          <DepartmentPicker
-            mode="sop"
-            sopId="__new__"
-            localOnly
-            departments={departments}
-            selectedIds={departmentIds}
-            allDepartments={allDepartments}
-            onChange={(ids, all) => {
-              setDepartmentIds(ids)
-              setAllDepartments(all)
-            }}
-          />
-        </div>
+      {/* Phase 40 DUP-02: shared title + departments + category picker — same
+          field group as the typed workflow, shown once a brief has started. */}
+      {brief && (
+        <SopMetadataFields value={meta} onChange={setMeta} departments={departments} idPrefix="voice-draft" />
       )}
 
       {error && (

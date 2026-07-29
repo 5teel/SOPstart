@@ -8,8 +8,8 @@ import { z } from 'zod'
 import { aiPromptSchema, type AiPromptInput } from '@/lib/validators/sop'
 import ParseJobStatus from '@/components/admin/ParseJobStatus'
 import type { Department } from '@/types/sop'
-import { DepartmentPicker } from '@/components/admin/departments/DepartmentPicker'
-import { DChip } from '@/components/admin/departments/DChip'
+import { SopMetadataFields } from '@/components/admin/SopMetadataFields'
+import type { SopMetadataValue } from '@/components/admin/SopMetadataFields'
 
 // Zod's `.default(3)` on detailLevel makes the input shape (form values) differ
 // from the output shape (parsed values). Pin RHF to the parsed (output) shape so
@@ -17,20 +17,25 @@ import { DChip } from '@/components/admin/departments/DChip'
 type AiPromptFormInput = z.input<typeof aiPromptSchema>
 
 type Props = {
-  categories: string[]
   /** Phase 25: departments for the department multi-select field (localOnly create mode). */
   departments: Department[]
 }
 
-export function PromptClient({ categories, departments }: Props) {
+export function PromptClient({ departments }: Props) {
   const router = useRouter()
   const [sopId, setSopId] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [serverError, setServerError] = useState<string | null>(null)
 
-  // Phase 25: department multi-select — localOnly (A3: passed in POST body to ai-prompt route).
-  const [departmentIds, setDepartmentIds] = useState<string[]>([])
-  const [allDepartments, setAllDepartments] = useState(false)
+  // Phase 40 DUP-02: one shared metadata value (title + departments + category)
+  // driving SopMetadataFields — replaces the three separate pieces of state
+  // this form used to carry.
+  const [meta, setMeta] = useState<SopMetadataValue>({
+    title: '',
+    departmentIds: [],
+    allDepartments: false,
+    categorySlug: null,
+  })
 
   const {
     register,
@@ -39,7 +44,7 @@ export function PromptClient({ categories, departments }: Props) {
     watch,
   } = useForm<AiPromptFormInput, undefined, AiPromptInput>({
     resolver: zodResolver(aiPromptSchema),
-    defaultValues: { promptText: '', categorySlug: null, detailLevel: 3 },
+    defaultValues: { promptText: '', detailLevel: 3 },
   })
 
   const detailLevel = watch('detailLevel') ?? 3
@@ -51,9 +56,15 @@ export function PromptClient({ categories, departments }: Props) {
       const res = await fetch('/api/sops/ai-prompt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // Phase 25: include departmentIds + allDepartments (A3).
-        // The ai-prompt route reads these and writes sop_departments post-insert.
-        body: JSON.stringify({ ...values, departmentIds, allDepartments }),
+        // Phase 25/40: departmentIds + allDepartments (A3) — the ai-prompt route
+        // reads these and writes sop_departments post-insert via assignSopDepartments.
+        body: JSON.stringify({
+          ...values,
+          title: meta.title || null,
+          categorySlug: meta.categorySlug,
+          departmentIds: meta.departmentIds,
+          allDepartments: meta.allDepartments,
+        }),
       })
       const json = await res.json().catch(() => ({}))
       if (!res.ok || !json.sopId) {
@@ -102,62 +113,9 @@ export function PromptClient({ categories, departments }: Props) {
         )}
       </div>
 
-      {/* Phase 25: Department multi-select (localOnly — A3: written in ai-prompt route post-insert) */}
-      {departments.length > 0 && (
-        <div data-testid="ai-prompt-dept-field">
-          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--ink-700)' }}>
-            Department <span className="font-normal text-[var(--ink-500)]">(optional)</span>
-          </label>
-          {/* Show selected dept chips */}
-          {(departmentIds.length > 0 || allDepartments) && (
-            <div className="flex flex-wrap gap-1 mb-2">
-              {allDepartments ? (
-                <DChip variant="all-departments" />
-              ) : (
-                departmentIds.map(id => {
-                  const dept = departments.find(d => d.id === id)
-                  return dept ? (
-                    <DChip key={id} variant="department" department={dept} />
-                  ) : null
-                })
-              )}
-            </div>
-          )}
-          <DepartmentPicker
-            mode="sop"
-            sopId="__new__"
-            localOnly
-            departments={departments}
-            selectedIds={departmentIds}
-            allDepartments={allDepartments}
-            onChange={(ids, all) => {
-              setDepartmentIds(ids)
-              setAllDepartments(all)
-            }}
-          />
-          <p className="mt-1 text-xs" style={{ color: 'var(--ink-500)' }}>
-            Leave empty to make visible to all members, or select departments to restrict visibility.
-          </p>
-        </div>
-      )}
-
-      <div>
-        <label htmlFor="categorySlug" className="block text-sm font-medium text-[var(--ink-700)] mb-1">
-          Category (optional)
-        </label>
-        <select
-          id="categorySlug"
-          {...register('categorySlug')}
-          className="w-full bg-white border border-[var(--ink-100)] rounded-lg p-2 text-[var(--ink-900)]"
-        >
-          <option value="">— None —</option>
-          {categories.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
-          ))}
-        </select>
-      </div>
+      {/* Phase 40 DUP-02: shared title + departments + category picker.
+          Title is not offered by RHF here — meta.title flows straight into the POST body. */}
+      <SopMetadataFields value={meta} onChange={setMeta} departments={departments} idPrefix="ai-prompt" />
 
       <div>
         <label htmlFor="detailLevel" className="block text-sm font-medium text-[var(--ink-700)] mb-1">

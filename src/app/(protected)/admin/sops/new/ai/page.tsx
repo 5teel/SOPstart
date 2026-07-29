@@ -12,29 +12,17 @@ export const metadata: Metadata = {
 
 export default async function NewAiSopPage() {
   // Auth guard — shared per-request session context (JWT verified locally).
-  const { supabase, userId, role } = await getSessionContext()
+  const { userId, role } = await getSessionContext()
   if (!userId) redirect('/login')
 
   if (!role || !['admin', 'safety_manager'].includes(role)) {
     redirect('/dashboard')
   }
 
-  // Distinct existing SOP categories — populates the optional category dropdown.
-  // Same query pattern used elsewhere in the admin surface; service-role isolation
-  // not needed here (RLS-scoped reader). Categories + departments are
-  // independent reads — fetch concurrently.
-  const [{ data: categoryRows }, departments] = await Promise.all([
-    supabase
-      .from('sops')
-      .select('category')
-      .not('category', 'is', null)
-      .limit(500),
-    listDepartments(),
-  ])
-
-  const categories = Array.from(
-    new Set((categoryRows ?? []).map((r) => r.category).filter((c): c is string => Boolean(c)))
-  ).sort()
+  // Phase 40 DAT-01: category options now come from the fixed SOP_CATEGORIES
+  // vocabulary inside SopMetadataFields — the live DISTINCT sops.category
+  // query (an anti-pattern retired by DAT-01) is gone.
+  const departments = await listDepartments()
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 lg:px-8 lg:py-12">
@@ -53,7 +41,7 @@ export default async function NewAiSopPage() {
           Back to library
         </Link>
       </div>
-      <AiDraftTabs categories={categories} departments={departments} />
+      <AiDraftTabs departments={departments} />
     </div>
   )
 }
