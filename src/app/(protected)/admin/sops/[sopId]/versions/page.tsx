@@ -16,6 +16,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Users, Video } from 'lucide-react'
+import { AdminPageShell } from '@/components/admin/AdminPageShell'
 import {
   getVersionHistory,
   uploadNewVersion,
@@ -29,25 +30,6 @@ import { getVersionCompletionBreakdown, type VersionCompletionBreakdown } from '
 import { setRefresherInterval } from '@/actions/governance'
 import { ACCEPT_ATTR, INTAKE_HINT, validateIntakeFile } from '@/lib/upload/file-intake'
 import { startVideoSopUpload } from '@/lib/upload/start-video-sop-upload'
-
-function ArrowLeftIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d="M19 12H5" />
-      <polyline points="12 19 5 12 12 5" />
-    </svg>
-  )
-}
 
 function UploadIcon({ className }: { className?: string }) {
   return (
@@ -352,22 +334,19 @@ export default function SopVersionHistoryPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 lg:px-8 lg:py-10">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <Link
-          href={`/admin/sops/builder/${sopId}`}
-          className="flex items-center justify-center w-10 h-10 rounded-lg bg-white hover:bg-[var(--paper-2)] transition-colors text-[var(--ink-500)] hover:text-[var(--ink-900)] flex-shrink-0"
-          aria-label="Back to SOP builder"
-        >
-          <ArrowLeftIcon className="h-5 w-5" />
-        </Link>
-        <div className="min-w-0 flex-1">
-          <h1 className="text-xl font-bold text-[var(--ink-900)] truncate">Version History</h1>
-          {sopTitle && (
-            <p className="text-sm text-[var(--ink-500)] truncate mt-0.5">{sopTitle}</p>
-          )}
-        </div>
+    <AdminPageShell
+      active="sops"
+      title="Version History"
+      description={sopTitle}
+      backLink={{
+        href: `/admin/sops/builder/${sopId}`,
+        label: 'Back to SOP',
+        ariaLabel: 'Back to SOP builder',
+      }}
+      contentClassName="max-w-3xl mx-auto px-4 py-8 lg:px-8 lg:py-10"
+    >
+      {/* Per-SOP quick links — assign + video versions */}
+      <div className="flex justify-end gap-2 mb-4">
         <Link
           href={`/admin/sops/${sopId}/assign`}
           className="w-8 h-8 rounded-lg bg-white border border-[var(--ink-100)] hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors flex items-center justify-center flex-shrink-0"
@@ -729,6 +708,6 @@ export default function SopVersionHistoryPage() {
           })}
         </div>
       )}
-    </div>
+    </AdminPageShell>
   )
 }
