@@ -132,3 +132,121 @@ test.describe('DAT-01 -- one category column (sops.category_slug)', () => {
     expect(publishRouteSrc).toMatch(/approval_chains[\s\S]{0,400}?\.eq\(['"]organisation_id['"]/)
   })
 })
+
+// ------------------------------------------------------------------------
+// Plan 40-11 -- table-write census (CLAUDE.md [2026-07-29]: a sweep keyed on
+// a planner-enumerated feature list misses the sibling function nobody
+// listed -- cloneSopAsDraft/restoreVersionAsNew were exactly that miss).
+//
+// This census is keyed on the DATA: every `.from('sops')....insert(|.update(
+// |.upsert(` under src/. A write whose payload contains `category_slug`
+// passes automatically. Any other write must have a matching entry below
+// naming why it's exempt -- a new, unclassified write site fails the suite
+// instead of silently shipping a categoryless SOP.
+// ------------------------------------------------------------------------
+
+interface CategoryExemptEntry {
+  /** Path relative to repo root, forward slashes. */
+  file: string
+  /** Sorted, comma-joined top-level payload keys -- the write's fingerprint. */
+  keys: string
+  reason: string
+}
+
+// Each entry is keyed on (file, keys) -- multiple physical call sites with the
+// identical fingerprint in the same file share one entry (e.g. the four
+// `source_file_path`-only finalize writes across the upload-session creators).
+const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
+  { file: 'src/actions/approvals.ts', keys: 'approval_state', reason: 'Approval-chain state stamp; not a category-bearing write.' },
+  { file: 'src/actions/departments.ts', keys: 'organisation_id', reason: 'Repairs a SOP row’s organisation_id; not a category-bearing write.' },
+  { file: 'src/actions/departments.ts', keys: 'all_departments', reason: 'Toggles the all-departments grant flag; not a category-bearing write.' },
+  { file: 'src/actions/flow-graph.ts', keys: 'flow_graph', reason: 'Persists the builder flow-graph JSON only; not a category-bearing write.' },
+  { file: 'src/actions/governance.ts', keys: 'owner_user_id,updated_at', reason: 'SOP-owner reassignment; not a category-bearing write.' },
+  { file: 'src/actions/governance.ts', keys: 'refresher_interval_months,updated_at', reason: 'Per-SOP refresher-interval override; category is set via a separate action, not this one.' },
+  { file: 'src/actions/governance.ts', keys: 'last_reviewed_at,last_reviewed_by,review_due_at,updated_at', reason: 'Manual "confirm current" review-clock stamp; category_slug is read (not written) to resolve the cadence.' },
+  { file: 'src/actions/grants.ts', keys: 'all_departments,all_departments_pre_override', reason: 'Grant-system all-departments override bookkeeping; not a category-bearing write.' },
+  { file: 'src/actions/sop-section-blocks.ts', keys: 'status', reason: 'Resets SOP status to draft after a block edit invalidates verification; not a category-bearing write.' },
+  { file: 'src/actions/sops.ts', keys: 'organisation_id,source_file_name,source_file_path,source_file_type,status', reason: 'createUploadSession -- pre-parse shell insert; /api/sops/parse’s post-parse UPDATE sets category_slug once the document is classified.' },
+  { file: 'src/actions/sops.ts', keys: 'source_file_path', reason: 'Finalises the uploaded file path after a presigned PUT/TUS upload; not a category-bearing write (4 call sites across the upload-session creators).' },
+  { file: 'src/actions/sops.ts', keys: 'status', reason: 'Status-only transition; not a category-bearing write.' },
+  { file: 'src/actions/sops.ts', keys: 'is_ocr,organisation_id,source_file_name,source_file_path,source_file_type,status,title,uploaded_by,version', reason: 'createVideoUploadSession -- pre-parse shell insert; the transcribe route’s post-parse UPDATE sets category_slug once the transcript is classified.' },
+  { file: 'src/actions/sops.ts', keys: 'overall_confidence,parse_notes,status,title,updated_at', reason: 'reparseSop/restructureSop reset status to re-trigger parsing; category_slug is left untouched so the existing value survives unchanged.' },
+  { file: 'src/actions/sops.ts', keys: 'title,updated_at', reason: 'Title-only rename; not a category-bearing write.' },
+  { file: 'src/actions/sops.ts', keys: 'organisation_id,pipeline_run_id,source_file_name,source_file_path,source_file_type,status,uploaded_by', reason: 'createVideoSopPipelineSession -- pre-parse shell insert; the pipeline’s post-parse UPDATE sets category_slug once classified.' },
+  { file: 'src/actions/versioning.ts', keys: 'source_file_path', reason: 'Finalises the new-version/clone file path after upload; category was already carried into the insert above (2 call sites: uploadNewVersion, cloneSopAsDraft).' },
+  { file: 'src/actions/versioning.ts', keys: 'superseded_by', reason: 'Marks the OLD SOP as superseded when a new version/clone publishes; the new row already carries its own category via its own insert (2 call sites).' },
+  { file: 'src/actions/versioning.ts', keys: 'status', reason: 'Flips the sentinel status uploading -> draft once cloneSopAsDraft’s copy completes; category was already carried into the insert.' },
+  { file: 'src/app/api/sops/parse/route.ts', keys: 'parse_notes,status', reason: 'Parse-failure early exit; category is only set on the success-path post-parse UPDATE.' },
+  { file: 'src/app/api/sops/restructure/route.ts', keys: 'status', reason: 'Status-only transition; not a category-bearing write.' },
+  { file: 'src/app/api/sops/restructure/route.ts', keys: 'parse_notes,status', reason: 'Restructure-failure early exit; category is only set on the success-path post-parse UPDATE.' },
+  { file: 'src/app/api/sops/transcribe/route.ts', keys: 'status', reason: 'Status-only transition (recording/transcribing progress, 2 call sites); not a category-bearing write.' },
+  { file: 'src/app/api/sops/transcribe/route.ts', keys: 'parse_notes,status', reason: 'Transcription-failure early exit; category is only set on the success-path post-parse UPDATE.' },
+  { file: 'src/app/api/sops/youtube/route.ts', keys: 'is_ocr,organisation_id,source_file_name,source_file_path,source_file_type,status,title,uploaded_by,version', reason: 'Pre-parse shell insert for a YouTube-sourced SOP; this file’s own post-parse UPDATE sets category_slug once the transcript is classified.' },
+  { file: 'src/app/api/sops/[sopId]/publish/route.ts', keys: 'approval_snapshot,approval_state', reason: 'Approval-chain state stamp on publish; not a category-bearing write.' },
+  { file: 'src/lib/governance/publish-core.ts', keys: '', reason: 'performPublish’s status/published_at/updated_at(+approval_state) transition, built as a typed variable payload rather than an inline object literal; not a category-bearing write.' },
+  { file: 'src/lib/governance/publish-core.ts', keys: 'last_reviewed_at,review_due_at', reason: 'Review-clock reset on publish; category_slug is read (not written) to resolve the cadence.' },
+]
+
+// A changed count means a new sops write path was added or removed and MUST
+// be classified against CATEGORY_EXEMPT above (or shown to already carry
+// category_slug) -- update this constant deliberately, never to silence a
+// failing run.
+const EXPECTED_SOPS_WRITE_SITE_COUNT = 45
+
+// Extracts the substring between a `(` at `openIdx` and its matching `)`,
+// tracking paren depth so nested calls/objects don't truncate the payload.
+function extractBalancedParens(src: string, openIdx: number): string {
+  let depth = 0
+  for (let i = openIdx; i < src.length; i++) {
+    if (src[i] === '(') depth++
+    else if (src[i] === ')') {
+      depth--
+      if (depth === 0) return src.slice(openIdx + 1, i)
+    }
+  }
+  return src.slice(openIdx + 1)
+}
+
+function findSopsWrites(src: string): Array<{ op: string; keys: string }> {
+  const re = /\.from\(['"]sops['"]\)\s*\.(insert|update|upsert)\(/g
+  const out: Array<{ op: string; keys: string }> = []
+  let m: RegExpExecArray | null
+  while ((m = re.exec(src))) {
+    const openIdx = m.index + m[0].length - 1
+    const payload = extractBalancedParens(src, openIdx)
+    const keys = [...new Set([...payload.matchAll(/(?:[{,]|^)\s*\n?\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*:(?!:)/g)].map((k) => k[1]))]
+      .sort()
+      .join(',')
+    out.push({ op: m[1], keys })
+  }
+  return out
+}
+
+test.describe('DAT-01 -- sops-table write census (Plan 40-11)', () => {
+  test('every sops-table write under src/ either carries category_slug or is a justified CATEGORY_EXEMPT entry', () => {
+    const files: string[] = []
+    walk(SRC_DIR, files)
+    let totalWrites = 0
+    const violations: string[] = []
+    for (const file of files) {
+      const src = stripComments(read(file))
+      const rel = path.relative(ROOT, file).split(path.sep).join('/')
+      for (const w of findSopsWrites(src)) {
+        totalWrites++
+        if (w.keys.split(',').includes('category_slug')) continue
+        const exempt = CATEGORY_EXEMPT.some((e) => e.file === rel && e.keys === w.keys)
+        if (!exempt) {
+          violations.push(`${rel} [.${w.op}(...)] keys=(${w.keys || '<none -- variable payload, inspect manually'}) -- add category_slug to the payload or add a justified CATEGORY_EXEMPT entry`)
+        }
+      }
+    }
+    expect(violations).toEqual([])
+    expect(totalWrites).toBe(EXPECTED_SOPS_WRITE_SITE_COUNT)
+  })
+
+  test('every CATEGORY_EXEMPT entry carries a non-empty reason', () => {
+    for (const entry of CATEGORY_EXEMPT) {
+      expect(entry.reason.length).toBeGreaterThan(0)
+    }
+  })
+})
