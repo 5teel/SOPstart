@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { parseSop } from '@/lib/parsers/sop-parser'
 import {
@@ -21,7 +22,34 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'sopId is required' }, { status: 400 })
   }
 
+  // Session + admin role + session-org guard (40-REVIEW.md CR-02 / T-40-12-01..04):
+  // this route previously flipped an arbitrary sopId's parse_jobs/sops status
+  // and burned OpenAI/Anthropic spend for any authenticated user. Guard runs
+  // before any admin-client read/write below.
+  const { userId, role, organisationId } = await getSessionContext()
+  if (!userId) {
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+  }
+  if (!role || !['admin', 'safety_manager'].includes(role)) {
+    return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
+  }
+  if (!organisationId) {
+    return NextResponse.json({ error: 'No organisation found' }, { status: 403 })
+  }
+
   const admin = createAdminClient()
+
+  // Org mismatch returns 404 (not 403) so the endpoint never confirms the
+  // existence of another org's SOP. Right-hand side is the SESSION org, not
+  // a value derived from the fetched row.
+  const { data: sopOrg } = await admin
+    .from('sops')
+    .select('organisation_id')
+    .eq('id', sopId)
+    .maybeSingle()
+  if (!sopOrg || sopOrg.organisation_id !== organisationId) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
 
   // Find the latest parse job — must have transcript_text already
   const { data: job, error: jobError } = await admin
@@ -73,13 +101,9 @@ export async function POST(request: NextRequest) {
       .update({ verification_flags: allFlags as unknown as import('@/types/database.types').Json })
       .eq('id', job.id)
 
-    // Write parsed SOP to database
-    const { data: sop } = await admin
-      .from('sops')
-      .select('organisation_id')
-      .eq('id', sopId)
-      .single()
-
+    // Write parsed SOP to database. organisationId is already the
+    // session-verified value from the guard above — CLAUDE.md [2026-07-28]
+    // CR-01: never re-derive it from the row.
     await admin.from('sops').update({
       title: parsed.title,
       sop_number: parsed.sop_number ?? null,
@@ -124,7 +148,7 @@ export async function POST(request: NextRequest) {
       if (sectionLayout && sectionLayout.content.length > 0) {
         try {
           await materializeJunctionsForLayout({
-            organisationId: sop?.organisation_id ?? '',
+            organisationId,
             sectionId: sectionRow.id,
             puckItems: sectionLayout.content,
             createdByUserId: null,
