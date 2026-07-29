@@ -522,7 +522,7 @@ Executes 40 → 41 → 42 → 43, strictly sequential.
   4. Every admin creation route renders the shared admin nav/page shell — no route hand-rolls its own back-link while its siblings use `AdminNav` — so a nav change is one edit in one file (which Phase 41 then makes)
   5. A SOP created via the AI route and a SOP created via the wizard appear together under the same category filter; every pre-existing row carrying the retired column is backfilled, no code path writes the retired column, and a live query against prod proves zero rows left behind
 
-**Plans:** 4/9 plans executed
+**Plans:** 7/9 plans executed
 Plans:
 **Wave 1**
 
@@ -536,9 +536,9 @@ Executes 40 → 41 → 42 → 43, strictly sequential.
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 40-05-PLAN.md — DAT-01b: every reader repointed, including the three category-keyed consumers a source sweep misses (`sop_review_cadences`, `approval_chains`, org-model `collections`)
-- [ ] 40-07-PLAN.md — DUP-01b: the new-version page and the video-generate picker on the shared accept list, with video routed through the Phase 6 transcription pipeline
-- [ ] 40-08-PLAN.md — DUP-02: one `SopMetadataFields` composite (title + departments + category) replacing the three near-identical copies
+- [x] 40-05-PLAN.md — DAT-01b: every reader repointed, including the three category-keyed consumers a source sweep misses (`sop_review_cadences`, `approval_chains`, org-model `collections`)
+- [x] 40-07-PLAN.md — DUP-01b: the new-version page and the video-generate picker on the shared accept list, with video routed through the Phase 6 transcription pipeline
+- [x] 40-08-PLAN.md — DUP-02: one `SopMetadataFields` composite (title + departments + category) replacing the three near-identical copies
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
