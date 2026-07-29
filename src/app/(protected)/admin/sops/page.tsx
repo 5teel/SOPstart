@@ -108,7 +108,7 @@ export default async function SopsLibraryPage({
     filterIds = ((data ?? []) as Array<{ sop_id: string }>).map((r) => r.sop_id)
   }
 
-  const SOP_SELECT = 'id, title, sop_number, category, status, source_file_name, source_type, created_at, updated_at, published_at, all_departments, overall_confidence, parse_notes, owner_user_id, review_due_at'
+  const SOP_SELECT = 'id, title, sop_number, category_slug, status, source_file_name, source_type, created_at, updated_at, published_at, all_departments, overall_confidence, parse_notes, owner_user_id, review_due_at'
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let query: any = supabase

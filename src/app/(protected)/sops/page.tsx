@@ -24,6 +24,7 @@ import { createClient } from '@/lib/supabase/client'
 import { selfAddSop, selfRemoveSop, requestRemoveAssignment, getUserSopAssignments } from '@/actions/assignments'
 import { PRODUCT_NAME } from '@/lib/constants'
 import { refresherDueDate, isRefresherDue as computeRefresherDue, isRefresherOverdue as computeRefresherOverdue } from '@/lib/competency/refresher'
+import { categoryLabel } from '@/lib/sop-categories'
 import type { Department } from '@/types/sop'
 
 function getRelativeTime(isoString: string): string {
@@ -444,7 +445,7 @@ function LibrarySection() {
     id: string
     title: string | null
     sop_number: string | null
-    category: string | null
+    category_slug: string | null
     department: string | null
     status: string
   }
@@ -455,7 +456,7 @@ function LibrarySection() {
       const supabase = createClient()
       const { data } = await supabase
         .from('sops')
-        .select('id, title, sop_number, category, department, status')
+        .select('id, title, sop_number, category_slug, department, status')
         .eq('status', 'published')
         .order('title', { ascending: true }) as { data: LibrarySop[] | null }
       return data ?? []
@@ -513,7 +514,7 @@ function LibrarySection() {
           {librarySops.map((sop) => {
             const assigned = isAssigned(sop.id)
             const selfAdded = isSelfAssigned(sop.id)
-            const meta = [sop.category, sop.department].filter(Boolean).join(' · ')
+            const meta = [categoryLabel(sop.category_slug), sop.department].filter(Boolean).join(' · ')
 
             return (
               <div key={sop.id} className="flex items-stretch gap-2">

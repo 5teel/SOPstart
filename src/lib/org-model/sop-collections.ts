@@ -21,7 +21,21 @@
  * Plain module (no 'use server') — a sync-free async helper importable by
  * both API-route code and server actions ([2026-06-27] 'use server' files
  * may export only async server actions).
+ *
+ * Phase 40 DAT-01 (RESEARCH open question 2 — RESOLVED): existing
+ * `collections` rows are left in place; they are never renamed or merged.
+ * Collections carry admin-customised colour/sort and are wired into the
+ * Phase 33 grant surface, so renaming them risks that wiring for no
+ * user-visible gain. This function reads `category_slug` and names NEW
+ * collections with the vocabulary LABEL (via `categoryLabel`) — where an
+ * existing collection is already named e.g. "Safety" and the vocabulary
+ * label is "Safety", the select-then-insert below matches by name and the
+ * SOP joins the collection it would have joined anyway. Collections named
+ * after a free-text value with no vocabulary equivalent simply stop gaining
+ * new members.
  */
+
+import { categoryLabel } from '@/lib/sop-categories'
 
 export type EnsureSopCollectionsResult = { collectionIds: string[] } | { error: string }
 
@@ -29,7 +43,7 @@ export type EnsureSopCollectionsResult = { collectionIds: string[] } | { error: 
 export async function ensureSopCollectionsForOrg(admin: any, orgId: string, sopId: string): Promise<EnsureSopCollectionsResult> {
   const { data: sopRow, error: sopErr } = await admin
     .from('sops')
-    .select('id, organisation_id, category')
+    .select('id, organisation_id, category_slug')
     .eq('id', sopId)
     .maybeSingle()
   if (sopErr) return { error: sopErr.message }
@@ -43,7 +57,7 @@ export async function ensureSopCollectionsForOrg(admin: any, orgId: string, sopI
   if (existingErr) return { error: existingErr.message }
   const collectionIds = new Set(((existingRows ?? []) as Array<{ collection_id: string }>).map(r => r.collection_id))
 
-  const category: string | null = (sopRow.category as string | null) ?? null
+  const category = categoryLabel((sopRow.category_slug as string | null) ?? null)
   if (!category) {
     // No category and no collection rows — the SOP stays outside the grant
     // system (materializeSopAccessForOrg preserves its legacy sop_departments

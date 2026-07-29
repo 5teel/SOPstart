@@ -65,7 +65,12 @@ export function GovernanceQueueRow({ row }: { row: GovernanceRow }) {
           {row.title ?? 'Untitled SOP'}
         </p>
         <div className="flex items-center gap-3 mt-1 flex-wrap">
-          {row.category && <span className="text-xs text-[var(--ink-500)]">{row.category}</span>}
+          {/* Phase 40 DAT-01: GovernanceRow.category_slug already holds the
+              resolved vocabulary LABEL (governance.ts maps it via
+              categoryLabel() at read time) — do not re-wrap here or a
+              non-slug string gets looked up against SOP_CATEGORIES and
+              silently returns null. */}
+          {row.category_slug && <span className="text-xs text-[var(--ink-500)]">{row.category_slug}</span>}
           <span className="mono text-[11px] text-[var(--ink-500)]">Owner: {row.ownerLabel}</span>
           <span className="mono text-[11px] text-[var(--ink-500)]">Due: {formatDate(row.reviewDueAt)}</span>
           {row.flags.map((flag) => (

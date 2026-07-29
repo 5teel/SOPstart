@@ -3,9 +3,10 @@ import { useQuery } from '@tanstack/react-query'
 import { db } from '@/lib/offline/db'
 import { queryPersister } from '@/lib/offline/query-persister'
 import type { CachedSop } from '@/lib/offline/db'
+import { categoryLabel } from '@/lib/sop-categories'
 
 interface UseAssignedSopsOptions {
-  category?: string
+  category_slug?: string
   search?: string
 }
 
@@ -14,16 +15,18 @@ function matchesSearch(sop: CachedSop, searchTerm: string): boolean {
   return (
     (sop.title?.toLowerCase().includes(term) ?? false) ||
     (sop.sop_number?.toLowerCase().includes(term) ?? false) ||
-    (sop.category?.toLowerCase().includes(term) ?? false) ||
+    // Phase 40 DAT-01: match on the human LABEL, not the raw slug, so a
+    // worker typing "safety" still finds Safety SOPs.
+    (categoryLabel(sop.category_slug ?? null)?.toLowerCase().includes(term) ?? false) ||
     (sop.department?.toLowerCase().includes(term) ?? false)
   )
 }
 
 export function useAssignedSops(options?: UseAssignedSopsOptions) {
-  const { category, search } = options ?? {}
+  const { category_slug, search } = options ?? {}
 
   return useQuery({
-    queryKey: ['assigned-sops', category, search],
+    queryKey: ['assigned-sops', category_slug, search],
     queryFn: async () => {
       let collection = db.sops.where('status').equals('published')
 
@@ -31,8 +34,8 @@ export function useAssignedSops(options?: UseAssignedSopsOptions) {
 
       let filtered = results
 
-      if (category) {
-        filtered = filtered.filter((sop) => sop.category === category)
+      if (category_slug) {
+        filtered = filtered.filter((sop) => sop.category_slug === category_slug)
       }
 
       if (search) {

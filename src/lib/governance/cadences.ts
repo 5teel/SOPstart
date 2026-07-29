@@ -7,15 +7,22 @@
 
 const DEFAULT_CADENCE_MONTHS = 12
 
+/**
+ * Phase 40 DAT-01: `categorySlug` is a `SOP_CATEGORIES` slug (previously a
+ * free-text `sops.category` value). `sop_review_cadences.category` keeps its
+ * column name/type — only the values stored in it are remapped by plan
+ * 40-06's backfill, so the lookup below is unchanged (a text key against a
+ * text-keyed map).
+ */
 export function resolveCadenceMonths(
-  category: string | null,
+  categorySlug: string | null,
   orgCadences: Record<string, number>,
   perSopOverrideMonths?: number | null
 ): number {
   if (typeof perSopOverrideMonths === 'number' && perSopOverrideMonths > 0) {
     return perSopOverrideMonths
   }
-  const categoryMonths = orgCadences[category ?? '']
+  const categoryMonths = orgCadences[categorySlug ?? '']
   if (typeof categoryMonths === 'number') return categoryMonths
   const defaultMonths = orgCadences['default']
   if (typeof defaultMonths === 'number') return defaultMonths
