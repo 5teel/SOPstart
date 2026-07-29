@@ -1,10 +1,11 @@
 ---
 gsd_state_version: 1.0
 milestone: v8.0
-milestone_name: Authoring Convergence
-status: planning
-last_updated: "2026-07-28T00:00:00.000Z"
-last_activity: 2026-07-28
+milestone_name: — Authoring Convergence
+status: Roadmap re-derived after SUR scope correction — ready for `/gsd-plan-phase 40`
+stopped_at: Phase 40 context gathered
+last_updated: "2026-07-29T02:25:05.572Z"
+last_activity: 2026-07-28 — v8.0 roadmap re-derived (Phases 40-43, 21/21 requirements mapped)
 progress:
   total_phases: 4
   completed_phases: 0
@@ -49,7 +50,6 @@ Four phases, coarse granularity, strictly sequential. Numbering starts at **40**
 **Sequencing:** 40 → 41 → 42 → 43. DUP+DAT first (converging flows is a rewiring job once they share components; DUP-04's single shell makes 41's nav change a one-line edit). **SUR before CRE** — the "New SOP" entry lives *on* the list surface (`admin/sops/page.tsx:308-313`), so converging the creation flow into a surface about to be merged builds it twice and rewrites its role gating; merging first gives the creation flow a stable home and one settled SOP→builder chain. SUR kept as one phase, not split: SUR-03 (one top-level "SOPs" entry) can't be satisfied while `?view=attention`/`?view=access` still live at the old route, so a "merge list, then fold lenses" split would ship a visible half-merge. DED last — route truth can only be certified after 41 and 42 stop changing routes.
 
 **Phase 41's hard constraint and its real risk.** `SB-LINE-06` (mobile worker First Load JS within 2 KB of baseline, CI-gated) is non-negotiable: the governance queue, org tree, and wiring patch bay must be dynamically imported and absent from the worker bundle — the pattern `WalkthroughSwitcher`/`DesktopWalkthrough` already uses. A bundle regression fails the phase. The *risk*, separately, is the rendering-model mismatch: `/sops` is a 574-line client component (Dexie/offline, `useAssignedSops`, `useSopSync`), `/admin/sops` is a 479-line server component. Phase 41's first plan must decide and state the model (server shell + lazy client lenses, or client list + code-split admin lenses) before any surface work.
-
 
 **Standing constraints for every v8.0 phase** (from CLAUDE.md): update `src/lib/journeys/journeys.ts` in the same change as any route add/remove/rename; grep and repoint every internal link on a route change (internal links are not type-checked); `'use server'` files export only async functions; a phase is not verified until a real `npm run build` runs clean.
 
@@ -600,7 +600,7 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-07-28T02:25:58.476Z
-Stopped at: Completed 37-05-PLAN.md
+Last session: 2026-07-29T02:25:05.559Z
+Stopped at: Phase 40 context gathered
 Resume file:
-None
+.planning/phases/40-shared-creation-foundation/40-CONTEXT.md
