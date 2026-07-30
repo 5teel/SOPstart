@@ -93,7 +93,7 @@ export const UAT_TESTS: UatTest[] = [
       'Links and tabs now acknowledge your tap straight away — you should see the page start changing (a grey placeholder or a small spinner) the moment you tap, even if the content takes a second to arrive.',
     tryIt: [
       'Tap between SOPs, Sign-off and Profile in the bottom bar (phone) or the top tabs (desktop).',
-      'In Admin, switch between the SOPs, Blocks, Team and Settings tabs.',
+      'In Admin, switch between the SOPs, Content, Team and Settings tabs.',
       'Open a SOP from the library, go back, and open another one.',
     ],
     questions: [
@@ -112,11 +112,11 @@ export const UAT_TESTS: UatTest[] = [
     title: 'Do the main menu names make sense?',
     status: 'active',
     summary:
-      'The old "Activity" tab is now called "Sign-off", and admins now see the sign-off queue when they tap it instead of being bounced to the SOP admin area. The admin "Blocks" tab now opens a page called "Block Library".',
+      'The old "Activity" tab is now called "Sign-off", and admins now see the sign-off queue when they tap it instead of being bounced to the SOP admin area. The admin "Blocks" tab is now "Content" and opens the "Content Library" — the reusable warnings, PPE and steps you drop into SOPs.',
     tryIt: [
       'Sign in and look at the two tabs at the top: SOPs and Sign-off.',
       'Tap Sign-off — you should see completed procedures waiting for review, not an editing screen.',
-      'If you are an admin: open the account menu (top right), go to Admin, then the Blocks tab — the page should be called "Block Library".',
+      'If you are an admin: open the account menu (top right), go to Admin, then the Content tab — the page should be called "Content Library".',
     ],
     questions: [
       { id: 'clear', text: 'Without anyone explaining it, could you guess what lives under "SOPs" and what lives under "Sign-off"?' },
@@ -124,7 +124,7 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'lost', text: 'In your first five taps, did you ever land somewhere you did not expect?' },
     ],
     background:
-      'Nav clarity pass (2026-07-30): "Activity" renamed to "Sign-off" in TopHeader + BottomTabBar; /activity no longer redirects admins to /admin/sops (they see the supervisor sign-off queue); /admin/blocks retitled "Block Library" to stop clashing with the worker-side "SOP Library" tab.',
+      'Nav clarity pass (2026-07-30): "Activity" renamed to "Sign-off" in TopHeader + BottomTabBar; /activity no longer redirects admins to /admin/sops (they see the supervisor sign-off queue); /admin/blocks de-jargoned — nav tab "Content", page "Content Library" (was "Blocks"/"Library", clashing with the worker-side "SOP Library" tab).',
   },
 
   // ===================== Design choices (pick A or B) =====================

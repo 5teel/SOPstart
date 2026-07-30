@@ -286,16 +286,16 @@ export const JOURNEYS: Journey[] = [
     steps: [
       { id: 's', type: 'start', label: 'Signed in as admin / safety manager' },
       { id: 'home', type: 'screen', label: 'Admin home — SOP library', route: '/admin/sops', detail: 'roleHome(admin) lands here — the brand mark and the account menu’s one "Admin" link both resolve here too. Worker surfaces (SOPs · Sign-off) stay one tap away in the primary nav.' },
-      { id: 'menu', type: 'decision', label: 'Open another admin surface? (shared AdminNav: SOPs · Needs attention · Blocks · Team · Settings)', branches: [
+      { id: 'menu', type: 'decision', label: 'Open another admin surface? (shared AdminNav: SOPs · Needs attention · Content · Team · Settings)', branches: [
         { label: 'SOPs', to: 'sops' },
         { label: 'Needs attention (governance queue)', to: 'sops' },
-        { label: 'Blocks', to: 'blocks' },
+        { label: 'Content', to: 'blocks' },
         { label: 'Team', to: 'team' },
         { label: 'Settings', to: 'settings' },
         { label: 'Stay on worker path', to: 'e' },
       ] },
       { id: 'sops', type: 'screen', label: 'SOP management', route: '/admin/sops', detail: 'The "Needs attention" nav item (governance queue) deep-links /admin/sops?view=attention — the folded needs-attention view (UX-03): governance queue, filter chips, header flag counts. An "Access" tab deep-links /admin/sops?view=access — the D-hybrid wiring surface (D-09), a third fold of this same route.' },
-      { id: 'blocks', type: 'screen', label: 'Block library', route: '/admin/blocks' },
+      { id: 'blocks', type: 'screen', label: 'Content Library', route: '/admin/blocks' },
       { id: 'team', type: 'screen', label: 'Team & org model', route: '/admin/team', detail: 'Org model surface (D-08) — Node Chart default, ▤ Columns toggle absorbs member management.' },
       { id: 'settings', type: 'screen', label: 'Settings hub', route: '/admin/settings', detail: 'Groups AI Settings, Departments, the AI agent layer, and the approval-chain editor under one home.' },
       { id: 'ai', type: 'screen', label: 'AI Settings', route: '/admin/ai-settings', detail: 'Reached from the Settings hub. Per-organisation AI model overrides (parse pipeline) + read-only view of every env-managed model.' },
@@ -513,7 +513,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'Admins keep a library of reusable safety blocks; when a block changes, SOPs using it flag the update for review.',
     steps: [
       { id: 's', type: 'start', label: 'Standardise a hazard / PPE / step' },
-      { id: 'blocks', type: 'screen', label: 'Block library', route: '/admin/blocks' },
+      { id: 'blocks', type: 'screen', label: 'Content Library', route: '/admin/blocks' },
       { id: 'edit', type: 'screen', label: 'Edit a block', route: '/admin/blocks/[blockId]' },
       { id: 'update', type: 'action', label: 'Block updated', detail: 'SOPs using it show an “update available” badge.' },
       { id: 'review', type: 'decision', label: 'Per SOP', branches: [

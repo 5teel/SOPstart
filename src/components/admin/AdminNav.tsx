@@ -19,7 +19,7 @@ export type AdminNavKey = 'sops' | 'governance' | 'blocks' | 'team' | 'settings'
 const ITEMS: { key: AdminNavKey; label: string; href: string }[] = [
   { key: 'sops', label: 'SOPs', href: '/admin/sops' },
   { key: 'governance', label: 'Needs attention', href: '/admin/sops?view=attention' },
-  { key: 'blocks', label: 'Blocks', href: '/admin/blocks' },
+  { key: 'blocks', label: 'Content', href: '/admin/blocks' },
   { key: 'team', label: 'Team', href: '/admin/team' },
   { key: 'settings', label: 'Settings', href: '/admin/settings' },
 ]
