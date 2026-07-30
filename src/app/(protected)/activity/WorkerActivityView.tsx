@@ -10,7 +10,7 @@ export function WorkerActivityView() {
 
   return (
     <div className="px-4 py-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold text-[var(--ink-900)] mb-1">My Completions</h1>
+      <h1 className="text-2xl font-bold text-[var(--ink-900)] mb-1">My sign-offs</h1>
       {!isLoading && (
         <p className="text-sm text-[var(--ink-500)] mb-6">
           {completions.length} completed procedure{completions.length !== 1 ? 's' : ''}

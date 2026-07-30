@@ -16,7 +16,7 @@ import type { WiringCollection, WiringNewSop, WiringSop } from '@/components/adm
 import type { SopStatus } from '@/types/sop'
 
 export const metadata: Metadata = {
-  title: 'SOP Library',
+  title: 'Manage SOPs',
 }
 
 // UX-03 decision #4: the folded governance view owns the "Needs attention"

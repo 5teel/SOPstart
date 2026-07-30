@@ -8,7 +8,7 @@ import { TeamViewShell } from '@/components/admin/org-model/TeamViewShell'
 import { AssessmentRequestsPanel } from '@/components/observations/AssessmentRequestsPanel'
 
 export const metadata: Metadata = {
-  title: 'Manage Team',
+  title: 'Team',
 }
 
 /**
@@ -47,7 +47,7 @@ export default async function AdminTeamPage() {
 
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--ink-900)]">Team &amp; Org Model</h1>
+          <h1 className="text-2xl font-bold text-[var(--ink-900)]">Team</h1>
           <p className="text-xs mt-1" style={{ color: 'var(--ink-500)' }}>
             Draw your org structure — areas, departments, roles and people — or switch to Columns to add people fast.
           </p>

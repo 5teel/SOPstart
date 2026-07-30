@@ -154,7 +154,7 @@ test.describe('SC-1 — /admin/team runtime smoke (requires chromium + live app)
     '/admin/team renders Node Chart by default with vacancy chips + ⊞/▤ toggle to Columns',
     async ({ page }) => {
       await page.goto('/admin/team')
-      await expect(page.getByText('Team & Org Model')).toBeVisible()
+      await expect(page.getByRole('heading', { name: 'Team' })).toBeVisible()
       // Node Chart default: at least the org-root node renders.
       await expect(page.locator('.node.org-root')).toBeVisible()
       // Switch to Columns.

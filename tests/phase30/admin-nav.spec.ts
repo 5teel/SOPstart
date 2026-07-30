@@ -45,7 +45,7 @@ function read(p: string): string {
 test.describe('UX-02 — one shared admin nav', () => {
   test('AdminNav component exists with the 5 canonical items', () => {
     const src = read(ADMIN_NAV)
-    for (const item of ['SOPs', 'Governance', 'Blocks', 'Team', 'Settings']) {
+    for (const item of ['SOPs', 'Needs attention', 'Blocks', 'Team', 'Settings']) {
       expect(src).toContain(item)
     }
     // The 5 canonical hrefs, incl. the Governance deep-link (decision #1)
