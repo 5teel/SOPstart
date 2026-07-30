@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sketch 004 — Admin SOP hub hierarchy</title>
+<link rel="stylesheet" href="../themes/default.css">
+<style>
+  /* ── sketch chrome ─────────────────────────────────────────── */
+  .variant-nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--ink-900); color: #fff;
+    display: flex; align-items: center; gap: 4px;
+    padding: 8px 16px; font-family: var(--mono); font-size: 12px;
+  }
+  .variant-nav .vlabel { color: var(--ink-400); margin-right: 8px; }
+  .variant-nav button {
+    background: transparent; color: var(--ink-300); border: 1px solid transparent;
+    font: inherit; padding: 4px 10px; border-radius: 4px; cursor: pointer;
+  }
+  .variant-nav button.active { background: #fff; color: var(--ink-900); font-weight: 700; }
+  .variant { display: none; }
+  .variant.active { display: block; }
+  .variant-title {
+    max-width: 1024px; margin: 0 auto; padding: 14px 16px 0;
+    font-family: var(--mono); font-size: 11px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--ink-500);
+  }
+  .variant-title b { color: var(--ink-900); }
+  .variant-title p { font-family: var(--sans); text-transform: none; letter-spacing: 0; font-size: 13px; color: var(--ink-600); margin: 6px 0 0; max-width: 640px; }
+
+  /* ── shared app chrome mock ────────────────────────────────── */
+  .app { border: 1px solid var(--ink-300); border-radius: 10px; overflow: hidden; background: var(--paper); max-width: 1024px; margin: 16px auto 48px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .topbar { border-bottom: 1px solid var(--ink-200); background: var(--paper-1); }
+  .topbar-in { max-width: 1024px; margin: 0 auto; display: flex; align-items: center; gap: 12px; height: 52px; padding: 0 20px; }
+  .brand { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-weight: 700; font-size: 14px; }
+  .brand svg { width: 22px; height: 22px; }
+  .topnav { display: flex; gap: 2px; margin-left: 12px; flex: 1; }
+  .topnav a {
+    text-decoration: none; color: var(--ink-500); font-size: 13px; font-weight: 500;
+    padding: 6px 10px; border-radius: 6px;
+  }
+  .topnav a:hover { color: var(--ink-900); background: var(--paper-2); }
+  .topnav a.on { color: var(--ink-900); background: var(--paper-2); font-weight: 600; }
+  .topnav .sep { width: 1px; background: var(--ink-200); margin: 6px 6px; }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--ink-300); background: #fff; font-family: var(--mono); font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .page { padding: 24px 20px 32px; }
+
+  /* ── shared list rows ──────────────────────────────────────── */
+  .rows { display: flex; flex-direction: column; }
+  .row {
+    display: flex; align-items: center; gap: 12px; padding: 11px 12px;
+    border-bottom: 1px solid var(--ink-100); background: var(--paper-1);
+  }
+  .rows .row:first-child { border-top: 1px solid var(--ink-100); }
+  .row:hover { background: var(--paper-2); }
+  .row .t { flex: 1; min-width: 0; font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .meta { font-family: var(--mono); font-size: 10.5px; color: var(--ink-500); white-space: nowrap; }
+  .badge { font-family: var(--mono); font-size: 10px; letter-spacing: .05em; padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
+  .b-draft { background: var(--paper-2); color: var(--ink-600); border: 1px dashed var(--ink-300); }
+  .b-pub { background: rgba(22,163,74,.1); color: var(--accent-ok); }
+  .b-unowned { background: rgba(185,28,28,.09); color: var(--accent-hazard); }
+  .b-stale { background: rgba(217,119,6,.12); color: var(--accent-decision); }
+  .btn-new {
+    background: var(--ink-900); color: #fff; border: none; border-radius: 7px;
+    font-family: var(--mono); font-size: 12px; font-weight: 700; padding: 9px 16px; cursor: pointer;
+  }
+  .h1 { font-family: var(--mono); font-size: 21px; font-weight: 600; margin: 0; }
+  .tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--ink-200); }
+  .tabs a {
+    text-decoration: none; color: var(--ink-500); font-size: 13px; font-weight: 500;
+    padding: 8px 12px; border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer;
+  }
+  .tabs a.on { color: var(--ink-900); border-bottom-color: var(--ink-900); font-weight: 600; }
+  .tabs a:hover { color: var(--ink-900); }
+  .count { color: var(--ink-400); font-family: var(--mono); font-size: 11px; margin-left: 3px; }
+  .tabs a.attn .count, .attn-accent { color: var(--accent-hazard); font-weight: 700; }
+  .group-h {
+    display: flex; align-items: center; gap: 8px; margin: 22px 0 8px;
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+  }
+  .group-h .line { flex: 1; height: 1px; background: var(--ink-200); }
+  .quiet { font-size: 12.5px; color: var(--ink-500); }
+</style>
+</head>
+<body>
+
+<nav class="variant-nav">
+  <span class="vlabel">SKETCH 004 · ADMIN SOP HUB</span>
+  <button data-v="a" class="active">A · One rail</button>
+  <button data-v="b">B · Sidebar</button>
+  <button data-v="c">C · Two pages</button>
+  <button data-v="d">D · Count cards</button>
+  <button data-v="e">E · One table</button>
+</nav>
+
+<!-- ════════════════ VARIANT A — ONE RAIL ════════════════ -->
+<section class="variant active" id="v-a">
+  <div class="variant-title"><b>Variant A — One rail.</b>
+    <p>AdminNav deleted (header already owns Create New SOP · Team · Settings). One single tab row is the only control tier. The attention view has no chip row — the queue itself is grouped by problem, worst first. Rare filters live behind one ⚙ Filter menu.</p>
+  </div>
+  <div class="app">
+    <div class="topbar"><div class="topbar-in">
+      <span class="brand"><svg viewBox="0 0 32 32"><path d="M16 2 L28 6 L28 15 C28 22 22 28 16 30 C10 28 4 22 4 15 L4 6 Z" fill="none" stroke="currentColor" stroke-width="2"/><text x="16" y="21" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor" font-family="monospace">S</text></svg>SOPstart</span>
+      <nav class="topnav">
+        <a href="#">SOPs</a><a href="#">Sign-off</a>
+        <span class="sep"></span>
+        <a href="#" class="on">Manage SOPs</a><a href="#">Create New SOP</a><a href="#">Content</a><a href="#">Team</a><a href="#">Settings</a>
+      </nav>
+      <span class="avatar">SS</span>
+    </div></div>
+    <div class="page">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;">
+        <h1 class="h1">Manage SOPs</h1>
+        <button class="btn-new">＋ NEW SOP</button>
+      </div>
+      <div class="tabs" id="a-tabs">
+        <a class="on" data-t="all">All<span class="count">9</span></a>
+        <a data-t="drafts">Drafts<span class="count">3</span></a>
+        <a data-t="pub">Published<span class="count">6</span></a>
+        <a data-t="attn" class="attn">Needs attention<span class="count">7</span></a>
+        <a data-t="access">Access</a>
+        <span style="flex:1"></span>
+        <a data-t="filter" title="Owned by me · Parse issues" style="color:var(--ink-400)">⚙ Filter ▾</a>
+      </div>
+      <div id="a-list" style="margin-top:14px;"></div>
+      <div id="a-attn" style="display:none;margin-top:2px;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ VARIANT B — SIDEBAR ════════════════ -->
+<section class="variant" id="v-b">
+  <div class="variant-title"><b>Variant B — Sidebar.</b>
+    <p>Hierarchy made spatial: a left rail groups LIBRARY / NEEDS ATTENTION / ACCESS with counts, exactly one level deep. The content pane has zero tabs of its own — what you clicked in the rail is the only filter in play, echoed as the pane title.</p>
+  </div>
+  <div class="app">
+    <div class="topbar"><div class="topbar-in">
+      <span class="brand"><svg viewBox="0 0 32 32"><path d="M16 2 L28 6 L28 15 C28 22 22 28 16 30 C10 28 4 22 4 15 L4 6 Z" fill="none" stroke="currentColor" stroke-width="2"/><text x="16" y="21" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor" font-family="monospace">S</text></svg>SOPstart</span>
+      <nav class="topnav">
+        <a href="#">SOPs</a><a href="#">Sign-off</a>
+        <span class="sep"></span>
+        <a href="#" class="on">Manage SOPs</a><a href="#">Create New SOP</a><a href="#">Content</a><a href="#">Team</a><a href="#">Settings</a>
+      </nav>
+      <span class="avatar">SS</span>
+    </div></div>
+    <div style="display:flex;">
+      <aside style="width:210px;flex-shrink:0;border-right:1px solid var(--ink-200);padding:20px 12px;background:var(--paper);">
+        <button class="btn-new" style="width:100%;margin-bottom:20px;">＋ NEW SOP</button>
+        <div id="b-rail"></div>
+      </aside>
+      <div class="page" style="flex:1;">
+        <h1 class="h1" id="b-title" style="margin-bottom:14px;font-size:17px;">All SOPs <span class="count" style="font-size:12px">9</span></h1>
+        <div id="b-list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ VARIANT C — TWO PAGES ════════════════ -->
+<section class="variant" id="v-c">
+  <div class="variant-title"><b>Variant C — Two pages.</b>
+    <p>Needs-attention stops being a fold of the library and becomes its own page, reached from a red banner (and a header count). Each page then only needs ONE control row. Shown stacked: page 1 is Manage SOPs, page 2 is what the banner opens.</p>
+  </div>
+  <div class="app">
+    <div class="topbar"><div class="topbar-in">
+      <span class="brand"><svg viewBox="0 0 32 32"><path d="M16 2 L28 6 L28 15 C28 22 22 28 16 30 C10 28 4 22 4 15 L4 6 Z" fill="none" stroke="currentColor" stroke-width="2"/><text x="16" y="21" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor" font-family="monospace">S</text></svg>SOPstart</span>
+      <nav class="topnav">
+        <a href="#">SOPs</a><a href="#">Sign-off</a>
+        <span class="sep"></span>
+        <a href="#" class="on">Manage SOPs</a><a href="#">Create New SOP</a><a href="#">Content</a><a href="#">Team</a><a href="#">Settings</a>
+      </nav>
+      <span class="avatar">SS</span>
+    </div></div>
+    <div class="page">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px;">
+        <h1 class="h1">Manage SOPs</h1>
+        <button class="btn-new">＋ NEW SOP</button>
+      </div>
+      <a href="#" style="display:flex;align-items:center;gap:10px;text-decoration:none;background:rgba(185,28,28,.07);border:1px solid rgba(185,28,28,.25);border-radius:8px;padding:10px 14px;margin-bottom:16px;">
+        <span class="badge b-unowned">7</span>
+        <span style="font-size:13.5px;color:var(--ink-900);font-weight:500;">SOPs need attention — 6 have no owner, 1 owner role no longer exists</span>
+        <span style="margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--accent-hazard);">REVIEW →</span>
+      </a>
+      <div class="tabs">
+        <a class="on">All<span class="count">9</span></a>
+        <a>Drafts<span class="count">3</span></a>
+        <a>Published<span class="count">6</span></a>
+        <a>Access</a>
+        <span style="flex:1"></span>
+        <a style="color:var(--ink-400)">⚙ Filter ▾</a>
+      </div>
+      <div id="c-list" style="margin-top:14px;"></div>
+    </div>
+  </div>
+
+  <div class="variant-title" style="padding-top:0;"><b>Page 2 — /admin/attention</b> (opened by the banner)</div>
+  <div class="app" style="margin-top:8px;">
+    <div class="page">
+      <a href="#" class="quiet" style="text-decoration:none;">← Manage SOPs</a>
+      <div style="display:flex;align-items:baseline;gap:10px;margin:10px 0 4px;">
+        <h1 class="h1">Needs attention</h1>
+        <span class="mono attn-accent" style="font-size:13px;">7</span>
+      </div>
+      <p class="quiet" style="margin:0 0 10px;">Worst first. Fix the top one, the list shrinks.</p>
+      <div id="c-attn"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ VARIANT D — COUNT CARDS ════════════════ -->
+<section class="variant" id="v-d">
+  <div class="variant-title"><b>Variant D — Count cards.</b>
+    <p>The counts ARE the controls. One card strip replaces header-summary + tabs + chips: click a card, the list below filters, the active card is inked. Nothing is displayed twice.</p>
+  </div>
+  <div class="app">
+    <div class="topbar"><div class="topbar-in">
+      <span class="brand"><svg viewBox="0 0 32 32"><path d="M16 2 L28 6 L28 15 C28 22 22 28 16 30 C10 28 4 22 4 15 L4 6 Z" fill="none" stroke="currentColor" stroke-width="2"/><text x="16" y="21" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor" font-family="monospace">S</text></svg>SOPstart</span>
+      <nav class="topnav">
+        <a href="#">SOPs</a><a href="#">Sign-off</a>
+        <span class="sep"></span>
+        <a href="#" class="on">Manage SOPs</a><a href="#">Create New SOP</a><a href="#">Content</a><a href="#">Team</a><a href="#">Settings</a>
+      </nav>
+      <span class="avatar">SS</span>
+    </div></div>
+    <div class="page">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;">
+        <h1 class="h1">Manage SOPs</h1>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <a href="#" class="quiet" style="text-decoration:underline;">Access wiring</a>
+          <button class="btn-new">＋ NEW SOP</button>
+        </div>
+      </div>
+      <div id="d-cards" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:18px;"></div>
+      <div id="d-list"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════ VARIANT E — ONE TABLE ════════════════ -->
+<section class="variant" id="v-e">
+  <div class="variant-title"><b>Variant E — One table.</b>
+    <p>No attention view at all: problems are badges ON the rows, and an "attention first" sort floats flagged SOPs to the top under a red rule. One segmented status control is the only other chrome.</p>
+  </div>
+  <div class="app">
+    <div class="topbar"><div class="topbar-in">
+      <span class="brand"><svg viewBox="0 0 32 32"><path d="M16 2 L28 6 L28 15 C28 22 22 28 16 30 C10 28 4 22 4 15 L4 6 Z" fill="none" stroke="currentColor" stroke-width="2"/><text x="16" y="21" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor" font-family="monospace">S</text></svg>SOPstart</span>
+      <nav class="topnav">
+        <a href="#">SOPs</a><a href="#">Sign-off</a>
+        <span class="sep"></span>
+        <a href="#" class="on">Manage SOPs</a><a href="#">Create New SOP</a><a href="#">Content</a><a href="#">Team</a><a href="#">Settings</a>
+      </nav>
+      <span class="avatar">SS</span>
+    </div></div>
+    <div class="page">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;">
+        <h1 class="h1">Manage SOPs</h1>
+        <button class="btn-new">＋ NEW SOP</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+        <div id="e-seg" style="display:inline-flex;border:1px solid var(--ink-300);border-radius:7px;overflow:hidden;">
+          <button data-s="all" class="on">All 9</button><button data-s="draft">Drafts 3</button><button data-s="published">Published 6</button>
+        </div>
+        <label style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-600);cursor:pointer;">
+          <input type="checkbox" id="e-sort" checked> attention first
+        </label>
+        <span style="flex:1"></span>
+        <a href="#" class="quiet" style="text-decoration:underline;">Access wiring</a>
+      </div>
+      <div id="e-list"></div>
+    </div>
+  </div>
+</section>
+
+<div id="sketch-tools" style="position:fixed;bottom:12px;right:12px;z-index:9999;font-family:system-ui;font-size:12px;background:rgba(0,0,0,0.7);color:white;padding:8px 12px;border-radius:8px;opacity:0.4;transition:opacity 0.2s;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.4'">
+  viewport
+  <button onclick="setVw('375px')" style="margin-left:6px">📱</button>
+  <button onclick="setVw('768px')">💻</button>
+  <button onclick="setVw('')">🖥</button>
+</div>
+
+<script>
+/* ── data — real-ish Visy-style content + the live test SOP ─── */
+const SOPS = [
+  { t: 'Dog Bathing and Grooming Procedure', status: 'draft', dept: 'Training', flag: 'unowned' },
+  { t: 'Furnace Start-up After Cold Repair', status: 'published', dept: 'Hot End', flag: 'unowned' },
+  { t: 'IS Machine Job Change', status: 'published', dept: 'Hot End', flag: 'unowned' },
+  { t: 'Cold-End Palletiser Jam Clearance', status: 'published', dept: 'Cold End', flag: 'unowned' },
+  { t: 'Forklift Pre-Start Checklist', status: 'published', dept: 'Warehouse', flag: 'stale' },
+  { t: 'Glass Cullet Handling', status: 'draft', dept: 'Batch House', flag: 'unowned' },
+  { t: 'Batch House Silo Entry Permit', status: 'draft', dept: 'Batch House', flag: 'unowned' },
+  { t: 'Mould Swap Quick-Change', status: 'published', dept: 'Hot End', flag: null, owner: 'T. Aperahama' },
+  { t: 'Annealing Lehr Temperature Check', status: 'published', dept: 'Cold End', flag: null, owner: 'M. Kereama' },
+]
+
+function statusBadge(s) {
+  return s === 'draft' ? '<span class="badge b-draft">DRAFT</span>' : '<span class="badge b-pub">PUBLISHED</span>'
+}
+function flagBadge(f) {
+  if (f === 'unowned') return '<span class="badge b-unowned">NO OWNER</span>'
+  if (f === 'stale') return '<span class="badge b-stale">OWNER ROLE GONE</span>'
+  return ''
+}
+function row(s, withFlag) {
+  return `<div class="row">
+    <span class="t">${s.t}</span>
+    ${withFlag ? flagBadge(s.flag) : ''}
+    ${statusBadge(s.status)}
+    <span class="meta">${s.dept}${s.owner ? ' · ' + s.owner : ''}</span>
+  </div>`
+}
+function rows(list, withFlag) { return '<div class="rows">' + list.map(s => row(s, withFlag)).join('') + '</div>' }
+
+function attnGrouped(target) {
+  const un = SOPS.filter(s => s.flag === 'unowned')
+  const st = SOPS.filter(s => s.flag === 'stale')
+  target.innerHTML = `
+    <div class="group-h" style="color:var(--accent-hazard);">NO OWNER · ${un.length}<span class="line"></span><span style="text-transform:none;letter-spacing:0;color:var(--ink-500);font-family:var(--sans);">nobody is responsible for keeping these current</span></div>
+    ${rows(un, false)}
+    <div class="group-h" style="color:var(--accent-decision);">OWNER ROLE GONE · ${st.length}<span class="line"></span><span style="text-transform:none;letter-spacing:0;color:var(--ink-500);font-family:var(--sans);">the owning role was deleted from Team</span></div>
+    ${rows(st, false)}`
+}
+
+/* ── variant switcher ── */
+document.querySelectorAll('.variant-nav button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.variant-nav button').forEach(x => x.classList.remove('active'))
+  document.querySelectorAll('.variant').forEach(x => x.classList.remove('active'))
+  b.classList.add('active')
+  document.getElementById('v-' + b.dataset.v).classList.add('active')
+  window.scrollTo(0, 0)
+}))
+function setVw(w) { document.querySelectorAll('.app').forEach(a => a.style.maxWidth = w || '1024px') }
+
+/* ── A ── */
+const aList = document.getElementById('a-list'), aAttn = document.getElementById('a-attn')
+aList.innerHTML = rows(SOPS, true)
+attnGrouped(aAttn)
+document.querySelectorAll('#a-tabs a').forEach(a => a.addEventListener('click', () => {
+  const t = a.dataset.t
+  if (t === 'access' || t === 'filter') return
+  document.querySelectorAll('#a-tabs a').forEach(x => x.classList.remove('on'))
+  a.classList.add('on')
+  aAttn.style.display = t === 'attn' ? 'block' : 'none'
+  aList.style.display = t === 'attn' ? 'none' : 'block'
+  if (t === 'all') aList.innerHTML = rows(SOPS, true)
+  if (t === 'drafts') aList.innerHTML = rows(SOPS.filter(s => s.status === 'draft'), true)
+  if (t === 'pub') aList.innerHTML = rows(SOPS.filter(s => s.status === 'published'), true)
+}))
+
+/* ── B ── */
+const B_ITEMS = [
+  { g: 'LIBRARY' },
+  { id: 'all', label: 'All SOPs', n: 9 },
+  { id: 'drafts', label: 'Drafts', n: 3 },
+  { id: 'pub', label: 'Published', n: 6 },
+  { g: 'NEEDS ATTENTION', accent: true },
+  { id: 'unowned', label: 'No owner', n: 6, accent: true },
+  { id: 'stale', label: 'Owner role gone', n: 1, accent: true },
+  { g: 'ACCESS' },
+  { id: 'access', label: 'Who sees what', n: null },
+]
+const bRail = document.getElementById('b-rail'), bList = document.getElementById('b-list'), bTitle = document.getElementById('b-title')
+bRail.innerHTML = B_ITEMS.map(i => i.g
+  ? `<div class="group-h" style="margin:16px 4px 6px;${i.accent ? 'color:var(--accent-hazard);' : 'color:var(--ink-400);'}">${i.g}</div>`
+  : `<a href="#" data-id="${i.id}" style="display:flex;justify-content:space-between;align-items:center;text-decoration:none;color:var(--ink-700);font-size:13px;padding:7px 10px;border-radius:6px;${i.id === 'all' ? 'background:var(--paper-2);font-weight:600;color:var(--ink-900);' : ''}">${i.label}${i.n !== null ? `<span class="count" ${i.accent ? 'style="color:var(--accent-hazard);font-weight:700;"' : ''}>${i.n}</span>` : ''}</a>`
+).join('')
+bList.innerHTML = rows(SOPS, true)
+bRail.querySelectorAll('a').forEach(a => a.addEventListener('click', e => {
+  e.preventDefault()
+  bRail.querySelectorAll('a').forEach(x => x.style.cssText = x.style.cssText.replace(/background:[^;]+;font-weight:600;color:[^;]+;/, ''))
+  a.style.cssText += 'background:var(--paper-2);font-weight:600;color:var(--ink-900);'
+  const id = a.dataset.id
+  const M = {
+    all: [SOPS, 'All SOPs', 9], drafts: [SOPS.filter(s => s.status === 'draft'), 'Drafts', 3],
+    pub: [SOPS.filter(s => s.status === 'published'), 'Published', 6],
+    unowned: [SOPS.filter(s => s.flag === 'unowned'), 'No owner', 6],
+    stale: [SOPS.filter(s => s.flag === 'stale'), 'Owner role gone', 1],
+  }
+  if (id === 'access') { bTitle.innerHTML = 'Who sees what'; bList.innerHTML = '<div class="row quiet">Access wiring map (patch bay) renders here — unchanged.</div>'; return }
+  const [list, label, n] = M[id]
+  bTitle.innerHTML = `${label} <span class="count" style="font-size:12px">${n}</span>`
+  bList.innerHTML = rows(list, id === 'all' || id === 'drafts' || id === 'pub')
+}))
+
+/* ── C ── */
+document.getElementById('c-list').innerHTML = rows(SOPS, true)
+attnGrouped(document.getElementById('c-attn'))
+
+/* ── D ── */
+const D_CARDS = [
+  { id: 'all', label: 'ALL SOPS', n: 9, sub: 'everything' },
+  { id: 'draft', label: 'DRAFTS', n: 3, sub: 'not yet live' },
+  { id: 'published', label: 'PUBLISHED', n: 6, sub: 'live for workers' },
+  { id: 'unowned', label: 'NO OWNER', n: 6, sub: 'assign an owner', accent: 'var(--accent-hazard)' },
+  { id: 'stale', label: 'OWNER ROLE GONE', n: 1, sub: 'role was deleted', accent: 'var(--accent-decision)' },
+]
+const dCards = document.getElementById('d-cards'), dList = document.getElementById('d-list')
+function dRender(active) {
+  dCards.innerHTML = D_CARDS.map(c => `
+    <button data-id="${c.id}" style="text-align:left;background:var(--paper-1);border:1px solid ${active === c.id ? 'var(--ink-900)' : 'var(--ink-200)'};border-top:3px solid ${c.accent || (active === c.id ? 'var(--ink-900)' : 'var(--ink-200)')};border-radius:8px;padding:10px 12px;cursor:pointer;${active === c.id ? 'box-shadow:0 1px 4px rgba(0,0,0,.08);' : ''}">
+      <div class="mono" style="font-size:9.5px;letter-spacing:.08em;color:${c.accent || 'var(--ink-500)'};">${c.label}</div>
+      <div class="mono" style="font-size:22px;font-weight:700;color:${c.accent || 'var(--ink-900)'};">${c.n}</div>
+      <div style="font-size:11px;color:var(--ink-500);">${c.sub}</div>
+    </button>`).join('')
+  const F = { all: SOPS, draft: SOPS.filter(s => s.status === 'draft'), published: SOPS.filter(s => s.status === 'published'), unowned: SOPS.filter(s => s.flag === 'unowned'), stale: SOPS.filter(s => s.flag === 'stale') }
+  dList.innerHTML = rows(F[active], true)
+  dCards.querySelectorAll('button').forEach(b => b.addEventListener('click', () => dRender(b.dataset.id)))
+}
+dRender('all')
+
+/* ── E ── */
+const eSeg = document.getElementById('e-seg'), eSort = document.getElementById('e-sort'), eList = document.getElementById('e-list')
+eSeg.querySelectorAll('button').forEach(b => b.style.cssText = 'background:transparent;border:none;font:inherit;font-size:12.5px;padding:7px 13px;cursor:pointer;color:var(--ink-500);')
+function eRender() {
+  const s = eSeg.querySelector('.on').dataset.s
+  eSeg.querySelectorAll('button').forEach(b => {
+    const on = b.classList.contains('on')
+    b.style.background = on ? 'var(--ink-900)' : 'transparent'
+    b.style.color = on ? '#fff' : 'var(--ink-500)'
+    b.style.fontWeight = on ? '700' : '400'
+  })
+  let list = s === 'all' ? [...SOPS] : SOPS.filter(x => x.status === s)
+  if (eSort.checked) {
+    const flagged = list.filter(x => x.flag), clean = list.filter(x => !x.flag)
+    eList.innerHTML =
+      (flagged.length ? `<div class="group-h" style="color:var(--accent-hazard);">NEEDS ATTENTION · ${flagged.length}<span class="line" style="background:rgba(185,28,28,.3);"></span></div>` + rows(flagged, true) : '') +
+      (clean.length ? `<div class="group-h" style="color:var(--ink-400);">ALL GOOD · ${clean.length}<span class="line"></span></div>` + rows(clean, true) : '')
+  } else {
+    eList.innerHTML = rows(list, true)
+  }
+}
+eSeg.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+  eSeg.querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); eRender()
+}))
+eSort.addEventListener('change', eRender)
+eRender()
+</script>
+</body>
+</html>
