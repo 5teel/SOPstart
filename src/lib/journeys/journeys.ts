@@ -282,10 +282,10 @@ export const JOURNEYS: Journey[] = [
     group: 'Create an SOP',
     persona: 'SOP Admin',
     title: 'Switch into admin tools',
-    summary: 'An admin signs in and lands directly on the admin SOP library (UX-01 one home per role). Worker surfaces remain reachable from the primary nav; from any worker surface, the account menu’s single "Admin" link returns here (UX-02 one door to admin).',
+    summary: 'An admin signs in and lands directly on the admin SOP library (UX-01 one home per role). Admin surfaces live in the primary header for admin roles — Create New SOP · Team · Settings sit right of Sign-off (2026-07-30, supersedes the UX-02 account-menu door).',
     steps: [
       { id: 's', type: 'start', label: 'Signed in as admin / safety manager' },
-      { id: 'home', type: 'screen', label: 'Admin home — SOP library', route: '/admin/sops', detail: 'roleHome(admin) lands here — the brand mark and the account menu’s one "Admin" link both resolve here too. Worker surfaces (SOPs · Sign-off) stay one tap away in the primary nav.' },
+      { id: 'home', type: 'screen', label: 'Admin home — SOP library', route: '/admin/sops', detail: 'roleHome(admin) lands here via the brand mark. The primary header adds Create New SOP (/admin/sops/new) · Team · Settings for admin roles; worker surfaces (SOPs · Sign-off) stay one tap away.' },
       { id: 'menu', type: 'decision', label: 'Open another admin surface? (shared AdminNav: SOPs · Needs attention · Content · Team · Settings)', branches: [
         { label: 'SOPs', to: 'sops' },
         { label: 'Needs attention (governance queue)', to: 'sops' },
@@ -310,8 +310,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin uploads an existing Word/PDF/Excel/PowerPoint/photo and AI turns it into a structured, mobile-friendly procedure.',
     steps: [
       { id: 's', type: 'start', label: 'Has an existing SOP doc' },
-      { id: 'lib', type: 'screen', label: 'SOP management', route: '/admin/sops', detail: 'Single "New SOP" button (UX-04 — the one create entry).' },
-      { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: '4 tiles, Upload first: Upload a document · Talk it through · Describe it · Start blank.' },
+      { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: 'Header "Create New SOP" link (admin roles) lands here directly; also the "New SOP" button on /admin/sops. 4 tiles, Upload first: Upload a document · Talk it through · Describe it · Start blank.' },
       { id: 'up', type: 'screen', label: 'Upload', route: '/admin/sops/upload', detail: 'Drag in .docx/.pdf/.xlsx/.pptx/photo.' },
       { id: 'parse', type: 'action', label: 'AI parses the document', detail: 'Async pipeline (30–120s); extracts sections, steps, hazards.' },
       { id: 'status', type: 'decision', label: 'Parse result?', branches: [

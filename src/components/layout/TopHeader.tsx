@@ -7,6 +7,7 @@ import { signOut } from '@/actions/auth'
 import { roleHome } from '@/lib/auth/role-home'
 import { PRODUCT_NAME } from '@/lib/constants'
 import { NavPendingSpinner } from '@/components/layout/NavPendingSpinner'
+import { NotificationBadge } from '@/components/layout/NotificationBadge'
 
 function BrandMark({ className }: { className?: string }) {
   return (
@@ -116,24 +117,6 @@ function SignOutIcon({ className }: { className?: string }) {
   )
 }
 
-function WrenchIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-      aria-hidden="true"
-    >
-      <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-2.4z" />
-    </svg>
-  )
-}
-
 type Role = 'admin' | 'safety_manager' | 'supervisor' | 'worker' | null
 
 interface NavLink {
@@ -141,9 +124,9 @@ interface NavLink {
   href: string
 }
 
-// Primary nav is identical for everyone: an admin's default pathways mirror a
-// worker's. Clicking "SOPs" goes to the worker library (/sops), so selecting a
-// SOP opens the worker view (overview + walkthrough), not the admin builder.
+// Primary nav: worker surfaces for everyone; admin surfaces appended for
+// admin/safety_manager (2026-07-30 direction — supersedes UX-02's account-menu
+// "one door to admin"). Clicking "SOPs" goes to the worker library (/sops).
 // Each role's home is the brand link (roleHome); internal team tooling
 // (Pathways / Feedback) lives in the account menu, not here (UX-08).
 const BASE_LINKS: NavLink[] = [
@@ -151,11 +134,14 @@ const BASE_LINKS: NavLink[] = [
   { label: 'Sign-off', href: '/activity' },
 ]
 
-// One door to admin (UX-02): a single account-menu link into /admin/sops,
-// where the shared AdminNav takes over. Visibility gate mirrors the
-// server-side admin/builder gate (['admin','safety_manager']) — every admin
-// page keeps its own server guard; hiding the link is not access control.
-const ADMIN_LINK: NavLink = { label: 'Admin', href: '/admin/sops' }
+// Admin links in the primary header, right of Sign-off. Visibility gate
+// mirrors the server-side admin gate (['admin','safety_manager']) — every
+// admin page keeps its own server guard; hiding links is not access control.
+const ADMIN_LINKS: NavLink[] = [
+  { label: 'Create New SOP', href: '/admin/sops/new' },
+  { label: 'Team', href: '/admin/team' },
+  { label: 'Settings', href: '/admin/settings' },
+]
 
 // Team tooling — kept, but reached via the account menu (UX-08).
 const TOOLING_LINKS: NavLink[] = [
@@ -178,8 +164,8 @@ export interface TopHeaderProps {
 
 export function TopHeader({ role, userEmail }: TopHeaderProps) {
   const pathname = usePathname()
-  const links = BASE_LINKS
   const isAdmin = isAdminRole(role)
+  const links = isAdmin ? [...BASE_LINKS, ...ADMIN_LINKS] : BASE_LINKS
 
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -247,7 +233,14 @@ export function TopHeader({ role, userEmail }: TopHeaderProps) {
                 data-active={active ? 'true' : undefined}
                 aria-current={active ? 'page' : undefined}
               >
-                {link.label}
+                {link.href === '/sops' ? (
+                  <span className="relative">
+                    {link.label}
+                    <NotificationBadge />
+                  </span>
+                ) : (
+                  link.label
+                )}
                 <NavPendingSpinner className="h-3 w-3" />
               </Link>
             )
@@ -281,19 +274,6 @@ export function TopHeader({ role, userEmail }: TopHeaderProps) {
                     <p className="text-sm text-[var(--ink-900)] truncate" title={userEmail}>
                       {userEmail}
                     </p>
-                  </div>
-                )}
-                {isAdmin && (
-                  <div className="border-b border-[var(--ink-100)] py-1">
-                    <Link
-                      href={ADMIN_LINK.href}
-                      role="menuitem"
-                      onClick={() => setMenuOpen(false)}
-                      className="flex items-center gap-2 px-3 py-2 text-sm text-[var(--ink-900)] hover:bg-[var(--paper-2)]"
-                    >
-                      <WrenchIcon className="h-4 w-4 text-[var(--ink-500)]" />
-                      {ADMIN_LINK.label}
-                    </Link>
                   </div>
                 )}
                 <div className="border-b border-[var(--ink-100)] py-1">

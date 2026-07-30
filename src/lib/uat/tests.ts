@@ -92,7 +92,7 @@ export const UAT_TESTS: UatTest[] = [
     summary:
       'Links and tabs now acknowledge your tap straight away — you should see the page start changing (a grey placeholder or a small spinner) the moment you tap, even if the content takes a second to arrive.',
     tryIt: [
-      'Tap between SOPs, Sign-off and Profile in the bottom bar (phone) or the top tabs (desktop).',
+      'Tap between SOPs and Sign-off in the top tabs (on a phone, open them from the menu button, top left).',
       'In Admin, switch between the SOPs, Content, Team and Settings tabs.',
       'Open a SOP from the library, go back, and open another one.',
     ],
@@ -116,7 +116,7 @@ export const UAT_TESTS: UatTest[] = [
     tryIt: [
       'Sign in and look at the two tabs at the top: SOPs and Sign-off.',
       'Tap Sign-off — you should see completed procedures waiting for review, not an editing screen.',
-      'If you are an admin: open the account menu (top right), go to Admin, then the Content tab — the page should be called "Content Library".',
+      'If you are an admin: you should see Create New SOP, Team and Settings in the header next to Sign-off. Open Create New SOP — it should take you straight to the four ways of making a SOP.',
     ],
     questions: [
       { id: 'clear', text: 'Without anyone explaining it, could you guess what lives under "SOPs" and what lives under "Sign-off"?' },

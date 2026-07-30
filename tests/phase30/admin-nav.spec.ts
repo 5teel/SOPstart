@@ -94,12 +94,15 @@ test.describe('UX-02 — one shared admin nav', () => {
     expect(journeys).toContain("route: '/admin/settings'")
   })
 
-  // Flipped live in 30-04: TopHeader ADMIN_LINKS collapsed to one Admin link.
-  test('account menu collapses to one Admin link (to /admin/sops)', () => {
+  // 2026-07-30: account-menu Admin door removed — admin links (Create New
+  // SOP · Team · Settings) live in the primary header, gated on isAdmin.
+  test('primary header carries Create New SOP / Team / Settings; no account-menu Admin link', () => {
     const src = read(TOP_HEADER)
-    expect(src).toContain("'/admin/sops'")
+    expect(src).toContain("'/admin/sops/new'")
+    expect(src).toContain("'/admin/team'")
+    expect(src).toContain("'/admin/settings'")
+    expect(src).not.toContain('ADMIN_LINK.href')
     expect(src).not.toContain("'/admin/ai-settings'")
     expect(src).not.toContain("'/admin/blocks'")
-    expect(src).not.toContain("'/admin/team'")
   })
 })

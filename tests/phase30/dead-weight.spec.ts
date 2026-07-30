@@ -47,17 +47,18 @@ test.describe('UX-08 — dead-weight sweep', () => {
     expect(fs.existsSync(routeDir)).toBe(false)
   })
 
-  // LIVE from 30-04 Task 1: the fake bell (linked to /sops, no notifications screen) is gone.
-  test('fake notifications bell removed from TopHeader (NotificationBadge stays in BottomTabBar)', () => {
+  // 2026-07-30: BottomTabBar deleted (redundant with TopHeader); its
+  // NotificationBadge moved onto the TopHeader SOPs link. The fake bell
+  // (aria-label="Notifications", linked to /sops) stays gone.
+  test('BottomTabBar deleted; NotificationBadge lives on the TopHeader SOPs link', () => {
     const header = fs.readFileSync(
       path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx'), 'utf-8',
     )
-    expect(header).not.toContain('NotificationBadge')
+    expect(header).toContain('NotificationBadge')
     expect(header).not.toContain('aria-label="Notifications"')
-    const tabBar = fs.readFileSync(
-      path.join(ROOT, 'src', 'components', 'layout', 'BottomTabBar.tsx'), 'utf-8',
-    )
-    expect(tabBar).toContain('NotificationBadge')
+    expect(
+      fs.existsSync(path.join(ROOT, 'src', 'components', 'layout', 'BottomTabBar.tsx')),
+    ).toBe(false)
   })
 
   // LIVE from 30-06: decision #3 — sop_departments SELECT using(true) verified
@@ -92,8 +93,9 @@ test.describe('UX-08 — dead-weight sweep', () => {
     expect(header).toContain('TOOLING_LINKS.map')
   })
 
-  // LIVE from 30-04 Task 1: nav landing model (UX-01) + one admin door (UX-02).
-  test('TopHeader has no /dashboard, brand resolves via roleHome, exactly one admin href wired', () => {
+  // 2026-07-30 direction: admin links promoted into the primary header
+  // (Create New SOP · Team · Settings), supersedes UX-02's account-menu door.
+  test('TopHeader has no /dashboard, brand resolves via roleHome, ADMIN_LINKS wired behind isAdmin', () => {
     const header = fs.readFileSync(
       path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx'), 'utf-8',
     )
@@ -101,14 +103,14 @@ test.describe('UX-08 — dead-weight sweep', () => {
     // Brand link WIRED to the role-home dispatcher, not a hardcoded route.
     expect(header).toContain("from '@/lib/auth/role-home'")
     expect(header).toContain('href={roleHome(role)}')
-    // Every /admin/* string in the file is /admin/sops, and the single
-    // Admin link's href is wired to it via ADMIN_LINK.
-    const adminHrefs = header.match(/\/admin\/[a-z-]+/g) ?? []
-    expect(adminHrefs.length).toBeGreaterThan(0)
-    expect(adminHrefs.every((h) => h === '/admin/sops')).toBe(true)
-    expect(header).toMatch(/const ADMIN_LINK[^\n]*'\/admin\/sops'/)
-    expect(header).toContain('href={ADMIN_LINK.href}')
-    // Visibility gate preserved (T-30-04-01): the link renders inside isAdmin.
+    // ADMIN_LINKS carries exactly the three promoted surfaces.
+    const adminLinks = header.match(/const ADMIN_LINKS[\s\S]*?\n\]/)?.[0] ?? ''
+    expect(adminLinks).toContain("'/admin/sops/new'")
+    expect(adminLinks).toContain("'/admin/team'")
+    expect(adminLinks).toContain("'/admin/settings'")
+    expect(adminLinks).toContain('Create New SOP')
+    // Wiring, not token presence: links render only for admin roles.
+    expect(header).toMatch(/isAdmin \? \[\.\.\.BASE_LINKS, \.\.\.ADMIN_LINKS\] : BASE_LINKS/)
     expect(header).toContain('isAdminRole(role)')
   })
 
