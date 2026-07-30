@@ -16,7 +16,7 @@ export default async function PathwaysPage() {
   const routes = listAppRoutes()
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 lg:px-8 lg:py-10">
+    <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10">
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-1">
           <span className="pill">UX · PATHWAYS</span>

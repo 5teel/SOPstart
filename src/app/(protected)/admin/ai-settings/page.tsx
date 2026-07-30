@@ -42,7 +42,7 @@ export default async function AiSettingsPage() {
   })
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
+    <div className="max-w-5xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold text-[var(--ink-900)]">AI Settings</h1>
       <p className="mt-1 text-sm text-[var(--ink-500)]">
         Which AI models power each part of SOPstart. Organisation overrides apply to your org only;

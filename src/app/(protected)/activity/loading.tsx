@@ -4,7 +4,7 @@
  */
 export default function ActivityLoading() {
   return (
-    <div className="px-4 py-6 max-w-4xl mx-auto" aria-busy="true">
+    <div className="px-4 py-6 max-w-5xl mx-auto" aria-busy="true">
       <div className="w-32 h-6 rounded bg-[var(--ink-100)] animate-pulse mb-6" />
       <div className="flex flex-col gap-3">
         {[...Array(6)].map((_, i) => (

@@ -180,7 +180,7 @@ export default function SopsPage() {
           </div>
         )}
 
-        <div className="flex-1 px-4 py-6 max-w-2xl mx-auto w-full lg:max-w-none lg:mx-0">
+        <div className="flex-1 px-4 py-6 max-w-5xl mx-auto w-full lg:max-w-none lg:mx-0">
           {activeSection === 'your-sops' && (
             <YourSopsSection
               sops={filteredSops}

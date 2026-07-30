@@ -5,7 +5,7 @@
  */
 export default function SopsLoading() {
   return (
-    <div className="flex-1 px-4 py-6 max-w-2xl mx-auto w-full" aria-busy="true">
+    <div className="flex-1 px-4 py-6 max-w-5xl mx-auto w-full" aria-busy="true">
       <div className="flex items-center justify-between mb-4">
         <div className="w-32 h-5 rounded bg-[var(--ink-100)] animate-pulse" />
         <div className="w-10 h-10 rounded-full bg-[var(--paper-2)] animate-pulse" />

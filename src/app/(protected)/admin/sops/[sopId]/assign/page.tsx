@@ -201,14 +201,14 @@ export default function AssignSopPage() {
 
   if (isPageLoading) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-8 lg:px-8 lg:py-10 flex items-center justify-center min-h-[200px]">
+      <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10 flex items-center justify-center min-h-[200px]">
         <p className="text-[var(--ink-500)] text-sm">Loading...</p>
       </div>
     )
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 lg:px-8 lg:py-10">
+    <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-4">

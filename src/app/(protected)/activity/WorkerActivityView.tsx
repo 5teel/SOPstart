@@ -9,7 +9,7 @@ export function WorkerActivityView() {
   const { data: completions = [], isLoading } = useWorkerCompletions()
 
   return (
-    <div className="px-4 py-6 max-w-2xl mx-auto">
+    <div className="px-4 py-6 max-w-5xl mx-auto">
       <h1 className="text-2xl font-bold text-[var(--ink-900)] mb-1">My sign-offs</h1>
       {!isLoading && (
         <p className="text-sm text-[var(--ink-500)] mb-6">

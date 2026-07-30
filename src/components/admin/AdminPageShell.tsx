@@ -46,7 +46,7 @@ export function AdminPageShell({
   backLink,
   mono,
   children,
-  contentClassName = 'max-w-2xl mx-auto px-4 py-8 lg:px-8 lg:py-12',
+  contentClassName = 'max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-12',
 }: AdminPageShellProps) {
   return (
     <div className={contentClassName}>

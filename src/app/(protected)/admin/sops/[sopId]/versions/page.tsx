@@ -343,7 +343,7 @@ export default function SopVersionHistoryPage() {
         label: 'Back to SOP',
         ariaLabel: 'Back to SOP builder',
       }}
-      contentClassName="max-w-3xl mx-auto px-4 py-8 lg:px-8 lg:py-10"
+      contentClassName="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10"
     >
       {/* Per-SOP quick links — assign + video versions */}
       <div className="flex justify-end gap-2 mb-4">

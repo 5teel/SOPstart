@@ -44,7 +44,7 @@ export default async function SopQrPage({ params }: { params: Promise<{ sopId: s
   })
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-8">
+    <div className="max-w-5xl mx-auto px-4 py-8">
       {/* Print stylesheet: only the sticker prints */}
       <style>{`@media print { header, nav, footer, .no-print { display: none !important } body { background: white } }`}</style>
 

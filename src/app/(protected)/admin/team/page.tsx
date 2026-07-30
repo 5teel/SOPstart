@@ -42,7 +42,7 @@ export default async function AdminTeamPage() {
   if (!org) redirect('/dashboard')
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-5xl mx-auto px-4 py-8">
       <AdminNav active="team" />
 
       <div className="flex items-center justify-between mb-6">

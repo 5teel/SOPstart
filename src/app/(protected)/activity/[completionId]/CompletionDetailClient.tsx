@@ -239,7 +239,7 @@ export function CompletionDetailClient({
       </div>
 
       {/* Page content */}
-      <div className={`px-4 py-6 max-w-2xl mx-auto ${showSignOffBar ? 'pb-[100px]' : ''}`}>
+      <div className={`px-4 py-6 max-w-5xl mx-auto ${showSignOffBar ? 'pb-[100px]' : ''}`}>
 
         {/* Summary banner */}
         <div className="blueprint-frame p-5 mb-6">
@@ -322,7 +322,7 @@ export function CompletionDetailClient({
       {/* Sign-off bar (supervisor only) */}
       {showSignOffBar && (
         <div className="sticky bottom-0 z-30 bg-[var(--paper)] border-t border-[var(--ink-100)] px-4 pt-3 pb-3">
-          <div className="flex flex-col gap-3 max-w-2xl mx-auto">
+          <div className="flex flex-col gap-3 max-w-5xl mx-auto">
             {/* Phase 37 D-08: blocked-supervisor teaching state — the reject
                 control below is UNAFFECTED by this and stays fully enabled. */}
             {blockedFromApproving && !canOverride && (

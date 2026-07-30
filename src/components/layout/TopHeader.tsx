@@ -210,7 +210,7 @@ export function TopHeader({ role, userEmail }: TopHeaderProps) {
       role="banner"
       className="top-header flex-shrink-0 border-b border-[var(--ink-100)] bg-[var(--paper)] pt-[env(safe-area-inset-top)]"
     >
-      <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:px-6">
+      <div className="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4 sm:px-6">
         <button
           type="button"
           onClick={() => setDrawerOpen(true)}
