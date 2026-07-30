@@ -65,7 +65,7 @@ export function PipelineProgressClient(props: Props) {
       backLink={
         sopId
           ? { href: `/admin/sops/builder/${sopId}`, label: 'Back to SOP' }
-          : { href: '/admin/sops', label: 'Back to library' }
+          : { href: '/admin/sops', label: 'Back to SOPs' }
       }
     >
       <div className="space-y-4">

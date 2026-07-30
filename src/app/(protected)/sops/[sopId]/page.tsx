@@ -51,7 +51,7 @@ function SopDetailInner() {
           href="/sops"
           className="mt-2 inline-flex items-center gap-2 px-4 h-[44px] border border-[var(--ink-300)] rounded-lg text-sm font-medium text-[var(--ink-700)] hover:border-[var(--ink-900)] transition-colors"
         >
-          ← Library
+          ← SOPs
         </Link>
       </div>
     )
@@ -63,7 +63,7 @@ function SopDetailInner() {
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <Link href="/sops" className="text-sm text-[var(--ink-500)] hover:text-[var(--ink-900)] flex-shrink-0">
-              ← Library
+              ← SOPs
             </Link>
             <h1 className="text-base font-semibold truncate">{sop.title ?? 'Untitled SOP'}</h1>
           </div>
