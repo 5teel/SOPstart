@@ -9,7 +9,7 @@ import { BlockListTable } from '@/components/admin/blocks/BlockListTable'
 import { AdminNav } from '@/components/admin/AdminNav'
 
 export const metadata: Metadata = {
-  title: 'Library',
+  title: 'Block Library',
 }
 
 const KIND_FILTERS = [
@@ -75,7 +75,7 @@ export default async function BlocksLibraryPage({
     <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10 bg-[var(--paper)] min-h-screen">
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
-        <h1 className="text-2xl font-bold text-[var(--ink-900)]">Library</h1>
+        <h1 className="text-2xl font-bold text-[var(--ink-900)]">Block Library</h1>
         <Link
           href="/admin/blocks/new"
           className="bg-[var(--ink-900)] text-white font-semibold px-4 h-[44px] rounded-lg hover:bg-[var(--ink-700)] transition-colors text-sm inline-flex items-center gap-2"

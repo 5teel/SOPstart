@@ -6,7 +6,7 @@ import { WorkerActivityView } from './WorkerActivityView'
 import { SupervisorActivityView } from './SupervisorActivityView'
 
 export const metadata: Metadata = {
-  title: 'Activity',
+  title: 'Sign-off',
 }
 
 export default async function ActivityPage() {
@@ -14,10 +14,10 @@ export default async function ActivityPage() {
   if (!userId) redirect('/login')
 
   if (role === 'worker') return <WorkerActivityView />
-  if (role === 'supervisor' || role === 'safety_manager') {
+  if (role === 'supervisor' || role === 'safety_manager' || role === 'admin') {
     return <SupervisorActivityView role={role} />
   }
 
-  // Admin / no-role fallthrough → real home (admin → /admin/sops, no role → /pending)
+  // No-role fallthrough → /pending
   redirect(roleHome(role))
 }

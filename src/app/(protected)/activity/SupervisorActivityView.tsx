@@ -11,7 +11,7 @@ import { ActivityFilter } from '@/components/activity/ActivityFilter'
 import { RecordObservationModal } from '@/components/observations/RecordObservationModal'
 
 interface SupervisorActivityViewProps {
-  role: 'supervisor' | 'safety_manager'
+  role: 'supervisor' | 'safety_manager' | 'admin'
 }
 
 interface WorkerProfile {
@@ -81,7 +81,7 @@ export function SupervisorActivityView({ role: _role }: SupervisorActivityViewPr
   return (
     <div className="px-4 py-6 max-w-4xl mx-auto">
       <div className="flex items-start justify-between gap-3 mb-1">
-        <h1 className="text-2xl font-bold text-[var(--ink-900)]">Activity</h1>
+        <h1 className="text-2xl font-bold text-[var(--ink-900)]">Sign-off</h1>
         <div className="relative flex-shrink-0">
           <button
             type="button"

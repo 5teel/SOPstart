@@ -148,7 +148,7 @@ interface NavLink {
 // (Pathways / Feedback) lives in the account menu, not here (UX-08).
 const BASE_LINKS: NavLink[] = [
   { label: 'SOPs', href: '/sops' },
-  { label: 'Activity', href: '/activity' },
+  { label: 'Sign-off', href: '/activity' },
 ]
 
 // One door to admin (UX-02): a single account-menu link into /admin/sops,

@@ -67,7 +67,7 @@ export const JOURNEYS: Journey[] = [
         { label: 'No role yet', to: 'pending-home' },
       ] },
       { id: 'worker-home', type: 'screen', label: 'SOP library', route: '/sops' },
-      { id: 'super-home', type: 'screen', label: 'Activity', route: '/activity' },
+      { id: 'super-home', type: 'screen', label: 'Sign-off', route: '/activity' },
       { id: 'admin-home', type: 'screen', label: 'Admin SOP library', route: '/admin/sops' },
       { id: 'pending-home', type: 'screen', label: 'Account pending', route: '/pending', detail: 'Holding screen until an admin assigns a role.' },
       { id: 'e', type: 'end', label: 'Signed in' },
@@ -210,7 +210,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'A supervisor checks a worker’s completed procedure and signs it off, creating a second immutable record.',
     steps: [
       { id: 's', type: 'start', label: 'Completion submitted' },
-      { id: 'activity', type: 'screen', label: 'Activity records', route: '/activity', detail: 'All completions for the org.' },
+      { id: 'activity', type: 'screen', label: 'Sign-off records', route: '/activity', detail: 'All completions for the org. Admins see the same sign-off queue (no longer redirected to /admin/sops).' },
       { id: 'one', type: 'screen', label: 'Completion detail', route: '/activity/[completionId]', detail: 'Steps, photos, measurements, who/when.' },
       { id: 'ok', type: 'decision', label: 'Done correctly?', branches: [
         { label: 'Yes — sign off', to: 'sign' },
@@ -234,7 +234,7 @@ export const JOURNEYS: Journey[] = [
         { label: 'Just watched a completion', to: 'activity' },
       ] },
       { id: 'team', type: 'screen', label: 'Team — person panel', route: '/admin/team', detail: 'Click a person chip on the org chart or columns board to open their PersonPanel; "Record observation" pre-fills the worker.' },
-      { id: 'activity', type: 'screen', label: 'Activity — record button / row action', route: '/activity', detail: '"Record observation" header button, or a per-completion "I observed this" row action pre-filling worker + SOP + completion_id.' },
+      { id: 'activity', type: 'screen', label: 'Sign-off — record button / row action', route: '/activity', detail: '"Record observation" header button, or a per-completion "I observed this" row action pre-filling worker + SOP + completion_id.' },
       { id: 'modal', type: 'screen', label: 'Record observation modal', detail: 'Shared modal: worker chip, SOP picker (assigned-first), verdict buttons, optional note. "Permanent record — cannot be edited or deleted after saving" (D-08).' },
       { id: 'assessor-check', type: 'decision', label: 'Recording "performed to SOP"? Is the recorder a signed-off assessor on this SOP? (ASR-01 gate — "needs support" is never gated, D-04)', branches: [
         { label: 'Signed off — proceed as normal', to: 'save' },
@@ -285,7 +285,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin signs in and lands directly on the admin SOP library (UX-01 one home per role). Worker surfaces remain reachable from the primary nav; from any worker surface, the account menu’s single "Admin" link returns here (UX-02 one door to admin).',
     steps: [
       { id: 's', type: 'start', label: 'Signed in as admin / safety manager' },
-      { id: 'home', type: 'screen', label: 'Admin home — SOP library', route: '/admin/sops', detail: 'roleHome(admin) lands here — the brand mark and the account menu’s one "Admin" link both resolve here too. Worker surfaces (SOPs · Activity) stay one tap away in the primary nav.' },
+      { id: 'home', type: 'screen', label: 'Admin home — SOP library', route: '/admin/sops', detail: 'roleHome(admin) lands here — the brand mark and the account menu’s one "Admin" link both resolve here too. Worker surfaces (SOPs · Sign-off) stay one tap away in the primary nav.' },
       { id: 'menu', type: 'decision', label: 'Open another admin surface? (shared AdminNav: SOPs · Governance · Blocks · Team · Settings)', branches: [
         { label: 'SOPs', to: 'sops' },
         { label: 'Governance (SOPs needing attention)', to: 'sops' },

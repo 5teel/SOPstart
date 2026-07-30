@@ -66,7 +66,7 @@ function UserIcon({ className }: { className?: string }) {
 
 const tabs = [
   { label: 'SOPs', href: '/sops', Icon: DocumentIcon },
-  { label: 'Activity', href: '/activity', Icon: ClockIcon },
+  { label: 'Sign-off', href: '/activity', Icon: ClockIcon },
   { label: 'Profile', href: '/profile', Icon: UserIcon },
 ]
 
