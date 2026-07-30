@@ -121,24 +121,27 @@ export default function SopsPage() {
   return (
     <div className="flex flex-col flex-1 bg-[var(--paper)]">
       {/* Sticky header */}
-      <header className="sticky top-0 z-20 bg-[var(--paper)] border-b border-[var(--ink-100)] px-4 flex items-center justify-between h-[56px]">
-        <span className="mono text-sm font-semibold text-[var(--ink-900)] tracking-tight">{PRODUCT_NAME}</span>
-        <button
-          type="button"
-          onClick={() => { setSearchTerm(''); setSearchOpen(true) }}
-          aria-label="Search SOPs"
-          className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-[var(--paper-2)] transition-colors"
-        >
-          {syncing ? (
-            <RefreshCw size={22} className="text-[var(--accent-measure)] animate-spin" />
-          ) : (
-            <Search size={22} className="text-[var(--ink-500)] hover:text-[var(--ink-900)]" />
-          )}
-        </button>
+      <header className="sticky top-0 z-20 bg-[var(--paper)] border-b border-[var(--ink-100)]">
+        <div className="max-w-5xl mx-auto px-4 flex items-center justify-between h-[56px]">
+          <span className="mono text-sm font-semibold text-[var(--ink-900)] tracking-tight">{PRODUCT_NAME}</span>
+          <button
+            type="button"
+            onClick={() => { setSearchTerm(''); setSearchOpen(true) }}
+            aria-label="Search SOPs"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-[var(--paper-2)] transition-colors"
+          >
+            {syncing ? (
+              <RefreshCw size={22} className="text-[var(--accent-measure)] animate-spin" />
+            ) : (
+              <Search size={22} className="text-[var(--ink-500)] hover:text-[var(--ink-900)]" />
+            )}
+          </button>
+        </div>
       </header>
 
       {/* Section tabs — UX-04: no worker-side create entry (admins create via admin nav) */}
-      <nav className="flex border-b border-[var(--ink-100)] px-4 gap-1">
+      <nav className="border-b border-[var(--ink-100)]">
+        <div className="max-w-5xl mx-auto px-4 flex gap-1">
         <button
           type="button"
           onClick={() => setActiveSection('your-sops')}
@@ -165,10 +168,11 @@ export default function SopsPage() {
           <BookOpen size={16} />
           <span>SOP Library</span>
         </button>
+        </div>
       </nav>
 
-      {/* Desktop layout: sidebar + content */}
-      <div className="flex flex-1">
+      {/* Desktop layout: sidebar + content, on the shared 5xl rail */}
+      <div className="flex flex-1 max-w-5xl mx-auto w-full">
         {activeSection === 'your-sops' && (
           <div className="hidden lg:block">
             <DepartmentSidebar
@@ -180,7 +184,7 @@ export default function SopsPage() {
           </div>
         )}
 
-        <div className="flex-1 px-4 py-6 max-w-5xl mx-auto w-full lg:max-w-none lg:mx-0">
+        <div className="flex-1 px-4 py-6 min-w-0">
           {activeSection === 'your-sops' && (
             <YourSopsSection
               sops={filteredSops}
