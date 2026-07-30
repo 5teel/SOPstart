@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { getSessionContext } from '@/lib/auth/session-context'
-import { AdminNav } from '@/components/admin/AdminNav'
 import { listDepartments } from '@/actions/departments'
 import { listOrgTree } from '@/actions/org-model'
 import { TeamViewShell } from '@/components/admin/org-model/TeamViewShell'
@@ -17,7 +16,7 @@ export const metadata: Metadata = {
  * ⊞ Chart / ▤ Columns toggle (TeamViewShell). Columns absorbs the Phase
  * 15/25 member roster (RoleAssignmentTable — invite, org-privilege role,
  * department picker) as a collapsible sub-panel; nothing was deleted.
- * AdminNav stays 5 tabs, Team tab still lands here (UX-02).
+ * Admin nav lives in the app header (sketch 004); Team link still lands here.
  */
 export default async function AdminTeamPage() {
   const { supabase, userId, role, organisationId } = await getSessionContext()
@@ -43,7 +42,6 @@ export default async function AdminTeamPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
-      <AdminNav active="team" />
 
       <div className="flex items-center justify-between mb-6">
         <div>

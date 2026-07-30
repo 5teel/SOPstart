@@ -132,10 +132,9 @@ test.describe('SC-1 — /admin/team page source contract', () => {
     expect(src).toContain("redirect('/dashboard')")
   })
 
-  test('mounts the shared AdminNav with active="team" (UX-02, 5-tab lock)', () => {
+  test('renders no AdminNav (admin nav lives in the app header — sketch 004, 2026-07-30)', () => {
     const src = read(PAGE)
-    expect(src).toContain("from '@/components/admin/AdminNav'")
-    expect(src).toMatch(/<AdminNav active="team"/)
+    expect(src).not.toContain('AdminNav')
   })
 })
 
@@ -160,8 +159,8 @@ test.describe('SC-1 — /admin/team runtime smoke (requires chromium + live app)
       // Switch to Columns.
       await page.getByRole('button', { name: '▤ Columns' }).click()
       await expect(page.locator('details summary', { hasText: 'Manage members' })).toBeVisible()
-      // AdminNav still exactly 5 tabs, Team still lands here.
-      await expect(page.getByRole('navigation', { name: 'Admin sections' }).getByRole('link')).toHaveCount(5)
+      // Admin links live in the app header (sketch 004); Team still lands here.
+      await expect(page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: 'Team' })).toBeVisible()
     },
   )
 })

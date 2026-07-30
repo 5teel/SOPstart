@@ -19,8 +19,8 @@ const FLAG_STYLE: Record<GovernanceRow['flags'][number], string> = {
 const FLAG_LABEL: Record<GovernanceRow['flags'][number], string> = {
   overdue: 'Overdue',
   due_soon: 'Due soon',
-  unowned: 'Unowned',
-  stale_role: 'Stale role',
+  unowned: 'No owner',
+  stale_role: 'Owner role gone',
   awaiting_approval: 'Awaiting approval',
 }
 

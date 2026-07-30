@@ -150,12 +150,10 @@ test.describe('admin/departments — page.tsx source contract', () => {
     expect(src).toContain('departments={departments}')
   })
 
-  test('page mounts the shared AdminNav (Departments homed under Settings, 30-03)', () => {
+  test('page renders no AdminNav (admin nav lives in the app header — sketch 004, 2026-07-30)', () => {
     const src = read(PAGE)
-    // Phase 30 UX-02: the inline sub-nav was replaced by the ONE shared
-    // AdminNav; Departments has no own tab — the Settings hub is its home.
-    expect(src).toContain("from '@/components/admin/AdminNav'")
-    expect(src).toMatch(/<AdminNav active="settings"/)
+    // Departments has no own header tab — the Settings hub is its home.
+    expect(src).not.toContain('AdminNav')
     expect(src).toContain('Departments')
   })
 

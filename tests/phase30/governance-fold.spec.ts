@@ -46,7 +46,10 @@ test.describe('UX-03 — governance folds into /admin/sops', () => {
     const src = read(ADMIN_SOPS_PAGE)
     expect(src).toContain("params.view === 'attention'")
     expect(src).toContain('<GovernanceQueueRow')
-    expect(src).toContain('<GovernanceFilterChips')
+    // 2026-07-30 (sketch 004): the chip row is gone — the attention view is
+    // a grouped worst-first queue instead (every flag always visible).
+    expect(src).not.toContain('<GovernanceFilterChips')
+    expect(src).toContain('attentionGroups.map')
     expect(src).toContain('listGovernanceQueue')
   })
 
@@ -73,10 +76,11 @@ test.describe('UX-03 — governance folds into /admin/sops', () => {
     expect(read(PUBLISH_STAGE)).toContain('approveStep')
   })
 
-  test('awaiting-approval count + deep-link survive on /admin/sops header chips', () => {
+  test('awaiting-approval survives as an always-visible attention group (header chips deleted, sketch 004)', () => {
     const src = read(ADMIN_SOPS_PAGE)
-    expect(src).toContain("awaiting_approval: flaggedRows.filter((r) => r.flags.includes('awaiting_approval')).length")
-    expect(src).toContain('href="/admin/sops?view=attention&filter=awaiting_approval"')
+    expect(src).toContain("'overdue', 'due_soon', 'awaiting_approval', 'unowned', 'stale_role'")
+    expect(src).toContain("awaiting_approval: 'Awaiting approval'")
+    expect(src).toContain('attentionGroups.map')
   })
 
   test('GovernanceWidget and LibraryReviewCell no longer exist as separate surfaces', () => {
@@ -91,9 +95,12 @@ test.describe('UX-03 — governance folds into /admin/sops', () => {
     ).toBe(false)
   })
 
-  test('the failed STATUS_TAB renamed to "Parse issues"; the folded view owns "Needs attention" (decision #4)', () => {
+  test('Parse issues lives in the rail filter menu; the folded view owns "Needs attention" (decision #4, sketch 004)', () => {
     const src = read(ADMIN_SOPS_PAGE)
-    expect(src).toContain("{ label: 'Parse issues', value: 'failed' }")
+    // 2026-07-30: failed-status moved from a top-level tab into the rail's
+    // details Filter menu — still reachable, still named Parse issues.
+    expect(src).toContain('Parse issues')
+    expect(src).toContain('href="/admin/sops?status=failed"')
     expect(src).not.toContain("{ label: 'Needs attention', value: 'failed' }")
     // The folded view's tab carries the "Needs attention" name.
     expect(src).toContain('Needs attention')

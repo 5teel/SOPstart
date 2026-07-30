@@ -26,7 +26,6 @@ export default async function NewAiSopPage() {
 
   return (
     <AdminPageShell
-      active="sops"
       badge="AI DRAFT"
       mono
       title="Draft a SOP with AI"

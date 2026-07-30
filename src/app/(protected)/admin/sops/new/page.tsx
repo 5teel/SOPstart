@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getSessionContext } from '@/lib/auth/session-context'
-import { AdminNav } from '@/components/admin/AdminNav'
 
 export const metadata: Metadata = {
   title: 'New SOP — SOPstart',
@@ -64,7 +63,6 @@ export default async function NewSopMethodPickerPage() {
         </p>
       </div>
 
-      <AdminNav active="sops" />
 
       <div className="grid gap-4 sm:grid-cols-2">
         {METHODS.map((m) => (

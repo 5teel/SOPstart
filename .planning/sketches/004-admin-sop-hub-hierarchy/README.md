@@ -2,7 +2,7 @@
 sketch: 004
 name: admin-sop-hub-hierarchy
 question: "How do the /admin/sops control tiers collapse into ONE comprehensible hierarchy?"
-winner: null
+winner: "A"
 tags: [admin, information-architecture, governance, navigation]
 ---
 

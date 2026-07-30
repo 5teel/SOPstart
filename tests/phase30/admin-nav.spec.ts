@@ -43,34 +43,35 @@ function read(p: string): string {
 }
 
 test.describe('UX-02 — one shared admin nav', () => {
-  test('AdminNav component exists with the 5 canonical items', () => {
-    const src = read(ADMIN_NAV)
-    for (const item of ['SOPs', 'Needs attention', 'Content', 'Team', 'Settings']) {
-      expect(src).toContain(item)
+  // 2026-07-30 (sketch 004 variant A): AdminNav is DELETED — the app header
+  // is the only admin nav tier. The /admin/sops rail carries the in-page
+  // views (status tabs · Needs attention · Access).
+  test('AdminNav component is deleted; header carries the admin links', () => {
+    expect(fs.existsSync(ADMIN_NAV)).toBe(false)
+    const header = read(TOP_HEADER)
+    for (const item of ['Manage SOPs', 'Create New SOP', 'Content', 'Team', 'Settings']) {
+      expect(header).toContain(item)
     }
-    // The 5 canonical hrefs, incl. the Governance deep-link (decision #1)
     for (const href of [
       "'/admin/sops'",
-      "'/admin/sops?view=attention'",
+      "'/admin/sops/new'",
       "'/admin/blocks'",
       "'/admin/team'",
       "'/admin/settings'",
     ]) {
-      expect(src).toContain(href)
+      expect(header).toContain(href)
     }
+    // The attention view stays reachable from the /admin/sops rail.
+    const sopsPage = read(ADMIN_PAGES[0])
+    expect(sopsPage).toContain('/admin/sops?view=attention')
   })
 
-  test('every admin page mounts AdminNav; zero inline "Admin sections" sub-navs remain', () => {
+  test('no admin page mounts AdminNav or an inline "Admin sections" sub-nav; guards survive', () => {
     for (const page of ADMIN_PAGES) {
       const src = read(page)
-      // Handler-wiring, not token presence: the component is imported AND rendered
-      expect(src).toContain("from '@/components/admin/AdminNav'")
-      // active is a string literal on most pages; /admin/sops computes it
-      // (governance when ?view=attention, sops otherwise).
-      expect(src).toMatch(/<AdminNav active=["{]/)
-      // The old copy-pasted inline nav idiom is gone from every page
+      expect(src).not.toContain('AdminNav')
       expect(src).not.toContain('aria-label="Admin sections"')
-      // T-30-03-01: the per-page role gate survives the nav swap verbatim
+      // T-30-03-01: the per-page role gate survives the nav removal verbatim
       expect(src).toContain("['admin', 'safety_manager']")
     }
     // The governance shim keeps its guard but renders nothing (30-08).
@@ -103,6 +104,5 @@ test.describe('UX-02 — one shared admin nav', () => {
     expect(src).toContain("'/admin/settings'")
     expect(src).not.toContain('ADMIN_LINK.href')
     expect(src).not.toContain("'/admin/ai-settings'")
-    expect(src).not.toContain("'/admin/blocks'")
   })
 })

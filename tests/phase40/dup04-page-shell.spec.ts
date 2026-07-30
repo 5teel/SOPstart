@@ -93,9 +93,9 @@ test.describe('DUP-04 -- one shared admin page shell', () => {
     expect(hits).toEqual([])
   })
 
-  test('AdminPageShell renders <AdminNav and accepts an optional contextual back-link prop (RESEARCH Pitfall 5)', () => {
+  test('AdminPageShell has no nav of its own (header owns it, sketch 004) and accepts the back-link prop (RESEARCH Pitfall 5)', () => {
     const src = read(ADMIN_PAGE_SHELL)
-    expect(src).toContain('<AdminNav')
+    expect(src).not.toContain('AdminNav')
     expect(src).toMatch(/backHref\?:|backLink\?:/)
   })
 

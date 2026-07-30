@@ -335,7 +335,6 @@ export default function SopVersionHistoryPage() {
 
   return (
     <AdminPageShell
-      active="sops"
       title="Version History"
       description={sopTitle}
       backLink={{

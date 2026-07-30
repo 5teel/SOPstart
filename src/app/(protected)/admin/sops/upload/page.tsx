@@ -20,7 +20,6 @@ export default async function UploadSopsPage() {
 
   return (
     <AdminPageShell
-      active="sops"
       title="Upload SOPs"
       description={`Upload your SOP documents and we'll parse them into mobile-friendly procedures. Supported formats: ${INTAKE_HINT}.`}
     >

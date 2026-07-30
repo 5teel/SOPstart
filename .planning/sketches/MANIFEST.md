@@ -17,7 +17,7 @@ Paper/ink engineering-drawing system (established in the blueprint-redesign expl
 | 001 | org-model-canvas | How does a business draw departments → roles → people quickly (named or unnamed)? | B (Node Chart default · Columns alt view) | org-model, departments, roles |
 | 002 | permission-wiring | How do SOP-access connections read at a glance across 1:N, N:1, N:M? | A (Patch Bay default · Matrix + Illuminate alt views) | permissions, library-access |
 | 003 | wiring-at-scale | Does the Patch Bay survive ~15 depts × ~20 collections, and what keeps it legible? | D (hybrid: groups + focus + library-filter + wire-up mode) | permissions, scale |
-| 004 | admin-sop-hub-hierarchy | How do the four stacked /admin/sops control tiers collapse into one comprehensible hierarchy? | — | admin, information-architecture, governance |
+| 004 | admin-sop-hub-hierarchy | How do the four stacked /admin/sops control tiers collapse into one comprehensible hierarchy? | A (one rail, no page header, grouped attention queue) | admin, information-architecture, governance |
 
 ## Decisions
 

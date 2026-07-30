@@ -56,14 +56,14 @@ test.describe('folded governance view on /admin/sops — queue read + role guard
     expect(src).toContain("redirect('/dashboard')")
   })
 
-  test('reads the ?filter= searchParam behind ?view=attention', () => {
-    expect(src).toContain('params.filter')
+  test('serves the attention view behind ?view=attention', () => {
     expect(src).toContain("params.view === 'attention'")
   })
 
-  test('renders the queue rows and filter chips (moved verbatim, not reimplemented)', () => {
+  test('renders the queue rows grouped by worst flag (chips deleted, sketch 004)', () => {
     expect(src).toContain('<GovernanceQueueRow')
-    expect(src).toContain('<GovernanceFilterChips')
+    expect(src).not.toContain('<GovernanceFilterChips')
+    expect(src).toContain('attentionGroups.map')
   })
 })
 
@@ -117,18 +117,12 @@ test.describe('GovernanceQueueRow — one wired primary action per row', () => {
 // GovernanceFilterChips.tsx — GQ-01/GQ-03
 // ---------------------------------------------------------------------------
 
-test.describe('GovernanceFilterChips — all 5 chips link the folded view', () => {
-  const src = read(CHIPS)
-
-  test('includes all five filter values', () => {
-    for (const value of ['all', 'overdue', 'due_soon', 'unowned', 'stale_role']) {
-      expect(src).toContain(`value: '${value}'`)
-    }
-  })
-
-  test('links to /admin/sops?view=attention&filter=<value> (stale_role included, GQ-03)', () => {
-    expect(src).toContain('/admin/sops?view=attention&filter=${chip.value}')
-    expect(src).toContain("'/admin/sops?view=attention'")
+// 2026-07-30 (sketch 004): GovernanceFilterChips deleted — every flag is
+// always visible as its own group in the attention view, so per-flag filter
+// chips have nothing left to do.
+test.describe('GovernanceFilterChips — deleted (grouped queue replaces chips)', () => {
+  test('the chips component no longer exists', () => {
+    expect(fs.existsSync(CHIPS)).toBe(false)
   })
 })
 

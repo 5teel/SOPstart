@@ -3,11 +3,9 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { StatusBadge } from '@/components/admin/StatusBadge'
-import { AdminNav } from '@/components/admin/AdminNav'
 import { getTeamMembersWithEmails } from '@/actions/auth'
 import { listGovernanceQueue, type GovernanceRow } from '@/actions/governance'
 import type { GovernanceFlag } from '@/lib/governance/classify'
-import { GovernanceFilterChips, type GovernanceFilter } from '@/components/admin/governance/GovernanceFilterChips'
 import { GovernanceQueueRow } from '@/components/admin/governance/GovernanceQueueRow'
 import { listOrgTree } from '@/actions/org-model'
 import { ensureSopCollections, listGrants, type GrantRow } from '@/actions/grants'
@@ -19,13 +17,13 @@ export const metadata: Metadata = {
   title: 'Manage SOPs',
 }
 
-// UX-03 decision #4: the folded governance view owns the "Needs attention"
-// name; the old failed-status tab (uploading/parsing) renames to "Parse issues".
+// Sketch 004 variant A — ONE rail: All · Drafts · Published · Needs attention
+// · Access, with the rare filters (Parse issues · Owned by me) folded behind
+// a native <details> menu. The rail is the page's only control tier.
 const STATUS_TABS: { label: string; value: string }[] = [
   { label: 'All', value: 'all' },
   { label: 'Drafts', value: 'draft' },
   { label: 'Published', value: 'published' },
-  { label: 'Parse issues', value: 'failed' },
 ]
 
 // UX-06 one-line rows: ONE flag chip per row, worst-first. Styling mirrors
@@ -45,9 +43,19 @@ const FLAG_STYLE: Record<GovernanceFlag, string> = {
 const FLAG_LABEL: Record<GovernanceFlag, string> = {
   overdue: 'Overdue',
   due_soon: 'Due soon',
-  unowned: 'Unowned',
-  stale_role: 'Stale role',
+  unowned: 'No owner',
+  stale_role: 'Owner role gone',
   awaiting_approval: 'Awaiting approval',
+}
+
+// Plain-language group blurbs for the attention view (sketch 004: the queue
+// is grouped by problem, worst first — no chip row).
+const FLAG_DESC: Record<GovernanceFlag, string> = {
+  overdue: 'past their review date',
+  due_soon: 'review due within 30 days',
+  unowned: 'nobody is responsible for keeping these current',
+  stale_role: 'the owning role was deleted from Team',
+  awaiting_approval: 'waiting on an approval step',
 }
 
 // Sentinel non-existent id: forces a zero-row `.in('id', …)` result without
@@ -79,12 +87,14 @@ export default async function SopsLibraryPage({
   const ownerOnly = params.owner === 'me'
 
   // UX-03: the governance queue folds in as the "Needs attention" view
-  // (?view=attention), reusing GovernanceQueueRow/GovernanceFilterChips
-  // verbatim — approveStep + isCallerNextApprover gating lives in the row.
+  // (?view=attention), reusing GovernanceQueueRow verbatim — approveStep +
+  // isCallerNextApprover gating lives in the row.
   // D-09: ?view=access is a third fold — the D-hybrid wiring surface.
   const isAttentionView = params.view === 'attention'
   const isAccessView = params.view === 'access'
-  const activeFilter = (params.filter ?? 'all') as GovernanceFilter
+  // Legacy ?filter= deep-links (old header chips / governance shim) are
+  // accepted but ignored — the attention view is now grouped by flag, so
+  // every flag is always visible.
 
   // SC-4 viz-as-library-filter: ?departments=<id> / ?collection=<id> only
   // apply to the plain library list (never inside the access view itself).
@@ -164,6 +174,7 @@ export default async function SopsLibraryPage({
     collectionsResult,
     newSopResult,
     memberDeptsResult,
+    statusCountsResult,
   ] = await Promise.all([
     isAccessView ? Promise.resolve({ data: null }) : query,
     listGovernanceQueue(),
@@ -186,9 +197,20 @@ export default async function SopsLibraryPage({
       ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (supabase as any).from('member_departments').select('member_id, department_id')
       : Promise.resolve({ data: null }),
+    // Rail counts (sketch 004): one cheap org-scoped status read, independent
+    // of whatever filter the main query applies.
+    supabase.from('sops').select('id, status'),
   ])
   const govRows: GovernanceRow[] = 'success' in govResult && govResult.success ? govResult.rows : []
   const flaggedRows = govRows.filter((r) => r.flags.length > 0)
+
+  const allStatuses = ((statusCountsResult?.data ?? []) as Array<{ status: string }>).map((r) => r.status)
+  const railCounts = {
+    all: allStatuses.length,
+    draft: allStatuses.filter((s) => s === 'draft').length,
+    published: allStatuses.filter((s) => s === 'published').length,
+    failed: allStatuses.filter((s) => s === 'uploading' || s === 'parsing').length,
+  }
 
   // Access-view data assembly (WiringPatchBay props). collections' sopCount
   // is a second, dependent read (needs collection ids first) — a single fast
@@ -229,22 +251,17 @@ export default async function SopsLibraryPage({
     if (newSopRow) newSop = { id: newSopRow.id, title: newSopRow.title ?? 'Untitled SOP', collectionIds: ensuredCollectionIds }
   }
 
-  const counts: Record<GovernanceFilter, number> = {
-    all: flaggedRows.length,
-    overdue: flaggedRows.filter((r) => r.flags.includes('overdue')).length,
-    due_soon: flaggedRows.filter((r) => r.flags.includes('due_soon')).length,
-    unowned: flaggedRows.filter((r) => r.flags.includes('unowned')).length,
-    stale_role: flaggedRows.filter((r) => r.flags.includes('stale_role')).length,
-    awaiting_approval: flaggedRows.filter((r) => r.flags.includes('awaiting_approval')).length,
-  }
-
-  const visibleRows = activeFilter === 'all' ? flaggedRows : flaggedRows.filter((r) => r.flags.includes(activeFilter))
-
   // UX-06: ONE flag chip per library row, worst flag first.
   const rowFlag: Record<string, GovernanceFlag | undefined> = {}
   for (const r of flaggedRows) {
     rowFlag[r.id] = FLAG_PRIORITY.find((f) => r.flags.includes(f))
   }
+
+  // Attention view groups: each flagged SOP appears once, under its WORST
+  // flag, in priority order (sketch 004: grouped queue replaces the chip row).
+  const attentionGroups = FLAG_PRIORITY
+    .map((flag) => ({ flag, rows: flaggedRows.filter((r) => rowFlag[r.id] === flag) }))
+    .filter((g) => g.rows.length > 0)
 
   // Owner display labels (email/role), reusing the existing team fetcher — no new member query.
   const ownerLabelById: Record<string, string> = {}
@@ -256,73 +273,12 @@ export default async function SopsLibraryPage({
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-6 gap-4 flex-wrap">
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <span className="pill">LIBRARY</span>
-            </div>
-            <h1 className="mono text-2xl font-semibold text-[var(--ink-900)]">SOPs</h1>
-          </div>
-          {/* UX-03/GQ-04: governance counts + deep-links live on the library
-              header (replaces the old dashboard widget; server-rendered). */}
-          {flaggedRows.length === 0 ? (
-            <div className="blueprint-frame px-3 py-2 flex items-center">
-              <span className="mono text-[11px] text-[var(--ink-500)] uppercase tracking-wider">All current</span>
-            </div>
-          ) : (
-            <div className="blueprint-frame px-3 py-2 flex items-center gap-2 flex-wrap">
-              <Link
-                href="/admin/sops?view=attention&filter=overdue"
-                className="mono text-[11px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-600"
-              >
-                {counts.overdue} overdue
-              </Link>
-              <Link
-                href="/admin/sops?view=attention&filter=due_soon"
-                className="mono text-[11px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-700"
-              >
-                {counts.due_soon} due soon
-              </Link>
-              <Link
-                href="/admin/sops?view=attention&filter=unowned"
-                className="mono text-[11px] px-1.5 py-0.5 rounded bg-[var(--paper-2)] text-[var(--ink-500)]"
-              >
-                {counts.unowned} unowned
-              </Link>
-              <Link
-                href="/admin/sops?view=attention&filter=stale_role"
-                className="mono text-[11px] px-1.5 py-0.5 rounded bg-[var(--paper-2)] text-[var(--ink-500)]"
-              >
-                {counts.stale_role} stale role
-              </Link>
-              <Link
-                href="/admin/sops?view=attention&filter=awaiting_approval"
-                className="mono text-[11px] px-1.5 py-0.5 rounded bg-[var(--accent-signoff)]/20 text-[var(--accent-signoff)]"
-              >
-                {counts.awaiting_approval} awaiting approval
-              </Link>
-            </div>
-          )}
-          {/* UX-04: the ONE create entry — method picker at /admin/sops/new */}
-          <Link
-            href="/admin/sops/new"
-            className="evidence-btn !min-h-[40px] text-sm !bg-[var(--ink-900)] !text-white !border-[var(--ink-900)] hover:!bg-[var(--ink-700)]"
-          >
-            New SOP
-          </Link>
-        </div>
-
-        {/* The Governance nav item deep-links ?view=attention on this same
-            route — highlight it (not SOPs) when the attention view is up,
-            or the click reads as a no-op. Access view stays under SOPs
-            (D-09: a third fold of this same route, not a separate surface). */}
-        <AdminNav active={isAttentionView ? 'governance' : 'sops'} />
-
-        {/* Filter tabs */}
-        <div className="flex gap-1 border-b border-[var(--ink-100)] mb-6 overflow-x-auto">
+        {/* Sketch 004 variant A — ONE rail. No page header (the app header
+            already says Manage SOPs and carries Create New SOP), no section
+            nav, no chip row: this tab rail is the page's only control tier. */}
+        <div className="flex gap-1 border-b border-[var(--ink-100)] mb-6 overflow-x-auto items-center">
           {STATUS_TABS.map(tab => {
-            const isActive = !isAttentionView && !isAccessView && activeStatus === tab.value
+            const isActive = !isAttentionView && !isAccessView && !ownerOnly && activeStatus === tab.value
             return (
               <Link
                 key={tab.value}
@@ -331,6 +287,9 @@ export default async function SopsLibraryPage({
                 data-active={isActive ? 'true' : undefined}
               >
                 {tab.label}
+                <span className="mono text-[11px] text-[var(--ink-400)] ml-1">
+                  {railCounts[tab.value as keyof typeof railCounts]}
+                </span>
               </Link>
             )
           })}
@@ -339,7 +298,10 @@ export default async function SopsLibraryPage({
             className="tab"
             data-active={isAttentionView ? 'true' : undefined}
           >
-            Needs attention{flaggedRows.length > 0 ? ` (${flaggedRows.length})` : ''}
+            Needs attention
+            {flaggedRows.length > 0 && (
+              <span className="mono text-[11px] text-red-600 font-bold ml-1">{flaggedRows.length}</span>
+            )}
           </Link>
           <Link
             href="/admin/sops?view=access"
@@ -348,13 +310,29 @@ export default async function SopsLibraryPage({
           >
             Access
           </Link>
-          <Link
-            href="/admin/sops?owner=me"
-            className="tab"
-            data-active={!isAttentionView && !isAccessView && ownerOnly ? 'true' : undefined}
-          >
-            Owned by me
-          </Link>
+          <div className="flex-1" />
+          {/* Rare filters — native details menu, no client JS. */}
+          <details className="relative flex-shrink-0">
+            <summary className="tab cursor-pointer list-none select-none text-[var(--ink-400)]"
+              data-active={ownerOnly || activeStatus === 'failed' ? 'true' : undefined}
+            >
+              {ownerOnly ? 'Owned by me' : activeStatus === 'failed' ? 'Parse issues' : 'Filter'} ▾
+            </summary>
+            <div className="absolute right-0 top-full mt-1 w-44 rounded-md border border-[var(--ink-200)] bg-white shadow-lg z-30 py-1">
+              <Link href="/admin/sops?owner=me" className="block px-3 py-2 text-sm text-[var(--ink-900)] hover:bg-[var(--paper-2)]">
+                Owned by me
+              </Link>
+              <Link href="/admin/sops?status=failed" className="block px-3 py-2 text-sm text-[var(--ink-900)] hover:bg-[var(--paper-2)]">
+                Parse issues
+                {railCounts.failed > 0 && <span className="mono text-[11px] text-[var(--ink-400)] ml-1">{railCounts.failed}</span>}
+              </Link>
+              {(ownerOnly || activeStatus === 'failed') && (
+                <Link href="/admin/sops" className="block px-3 py-2 text-sm text-[var(--ink-500)] hover:bg-[var(--paper-2)] border-t border-[var(--ink-100)]">
+                  Clear filter
+                </Link>
+              )}
+            </div>
+          </details>
         </div>
 
         {isAccessView ? (
@@ -375,9 +353,8 @@ export default async function SopsLibraryPage({
           </>
         ) : isAttentionView ? (
           <>
-            {/* UX-03: needs-attention view — the governance queue, folded in. */}
-            <GovernanceFilterChips active={activeFilter} counts={counts} />
-
+            {/* Sketch 004: grouped worst-first queue — every flagged SOP
+                appears once, under its worst flag. No chip row. */}
             {'error' in govResult && (
               <div className="blueprint-frame text-center py-12">
                 <p className="mono text-[11px] text-red-600 uppercase tracking-wider mb-2">ERROR</p>
@@ -385,21 +362,30 @@ export default async function SopsLibraryPage({
               </div>
             )}
 
-            {'success' in govResult && visibleRows.length === 0 && (
+            {'success' in govResult && attentionGroups.length === 0 && (
               <div className="blueprint-frame text-center py-12">
                 <p className="mono text-[11px] text-[var(--ink-500)] uppercase tracking-wider mb-2">CLEAR</p>
                 <p className="text-lg font-semibold text-[var(--ink-900)] mb-1">Nothing needs attention</p>
-                <p className="text-sm text-[var(--ink-500)]">Every SOP in this filter is owned, current, and correctly assigned.</p>
+                <p className="text-sm text-[var(--ink-500)]">Every SOP is owned, current, and correctly assigned.</p>
               </div>
             )}
 
-            {visibleRows.length > 0 && (
-              <ul className="space-y-2">
-                {visibleRows.map((row) => (
-                  <GovernanceQueueRow key={row.id} row={row} />
-                ))}
-              </ul>
-            )}
+            {attentionGroups.map(({ flag, rows }) => (
+              <section key={flag} className="mb-6">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className={`mono text-[11px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded ${FLAG_STYLE[flag]}`}>
+                    {FLAG_LABEL[flag]} · {rows.length}
+                  </span>
+                  <span className="h-px flex-1 bg-[var(--ink-100)]" />
+                  <span className="text-xs text-[var(--ink-500)]">{FLAG_DESC[flag]}</span>
+                </div>
+                <ul className="space-y-2">
+                  {rows.map((row) => (
+                    <GovernanceQueueRow key={row.id} row={row} />
+                  ))}
+                </ul>
+              </section>
+            ))}
           </>
         ) : (
           <>
@@ -440,7 +426,7 @@ export default async function SopsLibraryPage({
             </p>
             <p className="text-lg font-semibold text-[var(--ink-900)] mb-1">No SOPs yet</p>
             <p className="text-sm text-[var(--ink-500)]">
-              Use the New SOP button above — upload a doc, talk it through, describe it, or start blank.
+              Use Create New SOP in the header — upload a doc, talk it through, describe it, or start blank.
             </p>
           </div>
         ) : (

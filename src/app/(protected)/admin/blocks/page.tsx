@@ -6,7 +6,6 @@ import { getSessionContext } from '@/lib/auth/session-context'
 import { listBlocks } from '@/actions/blocks'
 import { listDepartments } from '@/actions/departments'
 import { BlockListTable } from '@/components/admin/blocks/BlockListTable'
-import { AdminNav } from '@/components/admin/AdminNav'
 
 export const metadata: Metadata = {
   title: 'Content Library',
@@ -88,7 +87,6 @@ export default async function BlocksLibraryPage({
         Reusable hazards, PPE, steps and emergency blocks. Each block can belong to any number of departments — tag a burn hazard to both Forming and Maintenance, or mark a block All departments to make it org-wide.
       </p>
 
-      <AdminNav active="blocks" />
 
       {/* Department filter bar (.deptrow) */}
       {departments.length > 0 && (

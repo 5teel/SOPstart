@@ -4,7 +4,6 @@ import { getSessionContext } from '@/lib/auth/session-context'
 import { listDepartments } from '@/actions/departments'
 import { getTeamMembersWithEmails } from '@/actions/auth'
 import { DepartmentGrid } from '@/components/admin/departments/DepartmentGrid'
-import { AdminNav } from '@/components/admin/AdminNav'
 
 export const metadata: Metadata = {
   title: 'Departments',
@@ -73,7 +72,6 @@ export default async function DepartmentsPage() {
       </p>
 
       {/* Departments is homed under Settings (UX-02 settings hub links here) */}
-      <AdminNav active="settings" />
 
       {/* Department card grid — client component owns h1 + CTA + create/edit/archive state */}
       <DepartmentGrid departments={departments} orgMembers={orgMembers} />

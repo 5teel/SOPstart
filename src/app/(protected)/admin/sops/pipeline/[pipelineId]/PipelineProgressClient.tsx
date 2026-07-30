@@ -60,7 +60,6 @@ export function PipelineProgressClient(props: Props) {
 
   return (
     <AdminPageShell
-      active="sops"
       title={sopTitle}
       backLink={
         sopId

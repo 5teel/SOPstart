@@ -63,27 +63,21 @@ test.describe('GovernanceQueueRow — awaiting_approval priority Approve branch'
   })
 })
 
-test.describe('GovernanceFilterChips — awaiting_approval chip', () => {
-  const src = read(FILTER_CHIPS)
-
-  test('GovernanceFilter union includes awaiting_approval', () => {
-    expect(src).toMatch(/export type GovernanceFilter = [^\n]*'awaiting_approval'/)
-  })
-
-  test('CHIPS array includes the awaiting_approval entry', () => {
-    expect(src).toContain("{ label: 'Awaiting approval', value: 'awaiting_approval' }")
-  })
-})
-
-test.describe('/admin/sops header chips — awaiting_approval count + link (was GovernanceWidget)', () => {
+// 2026-07-30 (sketch 004): GovernanceFilterChips deleted — the attention
+// view is a grouped worst-first queue, so awaiting_approval is ALWAYS
+// visible as its own group instead of behind a chip/filter.
+test.describe('/admin/sops attention view — awaiting_approval surfaced (chips deleted)', () => {
   const src = read(LIBRARY_PAGE)
 
-  test('counts object includes awaiting_approval from the governance queue', () => {
-    expect(src).toContain("awaiting_approval: flaggedRows.filter((r) => r.flags.includes('awaiting_approval')).length")
+  test('GovernanceFilterChips is gone from the page and from disk', () => {
+    expect(src).not.toContain('GovernanceFilterChips')
+    expect(fs.existsSync(FILTER_CHIPS)).toBe(false)
   })
 
-  test('renders a Link to the folded view filtered on awaiting_approval', () => {
-    expect(src).toContain('href="/admin/sops?view=attention&filter=awaiting_approval"')
-    expect(src).toContain('{counts.awaiting_approval} awaiting approval')
+  test('awaiting_approval is a grouped section with a plain-language blurb', () => {
+    expect(src).toContain("FLAG_PRIORITY: GovernanceFlag[] = ['overdue', 'due_soon', 'awaiting_approval', 'unowned', 'stale_role']")
+    expect(src).toContain("awaiting_approval: 'Awaiting approval'")
+    expect(src).toContain("awaiting_approval: 'waiting on an approval step'")
+    expect(src).toContain('attentionGroups.map')
   })
 })

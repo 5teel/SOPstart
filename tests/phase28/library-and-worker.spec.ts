@@ -109,10 +109,14 @@ test.describe('/admin/sops header chips — counts + deep links', () => {
     expect(src).toContain('listGovernanceQueue()')
   })
 
-  test('deep-links overdue/unowned/due_soon to the folded needs-attention view', () => {
-    expect(src).toContain('/admin/sops?view=attention&filter=overdue')
-    expect(src).toContain('/admin/sops?view=attention&filter=unowned')
-    expect(src).toContain('/admin/sops?view=attention&filter=due_soon')
+  test('attention view groups every flag (header chips deleted, sketch 004)', () => {
+    // 2026-07-30: per-flag chip deep-links replaced by the grouped queue —
+    // every flag renders as its own always-visible section.
+    expect(src).toContain('/admin/sops?view=attention')
+    expect(src).toContain('attentionGroups.map')
+    for (const flag of ['overdue', 'due_soon', 'unowned', 'stale_role', 'awaiting_approval']) {
+      expect(src).toContain(`${flag}:`)
+    }
   })
 })
 

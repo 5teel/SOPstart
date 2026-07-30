@@ -93,7 +93,7 @@ export const UAT_TESTS: UatTest[] = [
       'Links and tabs now acknowledge your tap straight away — you should see the page start changing (a grey placeholder or a small spinner) the moment you tap, even if the content takes a second to arrive.',
     tryIt: [
       'Tap between SOPs and Sign-off in the top tabs (on a phone, open them from the menu button, top left).',
-      'In Admin, switch between the SOPs, Content, Team and Settings tabs.',
+      'If you are an admin, switch between Manage SOPs, Content, Team and Settings using the header links.',
       'Open a SOP from the library, go back, and open another one.',
     ],
     questions: [

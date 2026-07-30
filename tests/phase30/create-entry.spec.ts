@@ -51,16 +51,21 @@ test.describe('UX-04 — one create entry', () => {
     // Upload must appear BEFORE the other destinations in source order.
     expect(src.indexOf('/admin/sops/upload')).toBeLessThan(src.indexOf('/admin/sops/new/ai'))
     expect(src.indexOf('/admin/sops/upload')).toBeLessThan(src.indexOf('/admin/sops/new/blank'))
-    // Admin guard present (T-30-05-01) + shared nav rendered.
+    // Admin guard present (T-30-05-01). Section nav lives in the app header
+    // (sketch 004 — AdminNav deleted 2026-07-30).
     expect(src).toContain("['admin', 'safety_manager']")
-    expect(src).toContain('<AdminNav active="sops" />')
+    expect(src).not.toContain('<AdminNav')
   })
 
-  test('/admin/sops has exactly one New SOP entry (header buttons + empty-state tiles collapsed)', () => {
+  test('/admin/sops has no duplicate create entry (the header Create New SOP link is the one entry)', () => {
     const src = read(ADMIN_SOPS_PAGE)
-    // The single entry links to the method picker, not the 3 intake routes.
+    // 2026-07-30: the page-level New SOP button moved to the app header
+    // (TopHeader ADMIN_LINKS "Create New SOP" → /admin/sops/new). The page
+    // itself must not re-add a second create entry.
     const pickerLinks = src.match(/href="\/admin\/sops\/new"/g) ?? []
-    expect(pickerLinks).toHaveLength(1)
+    expect(pickerLinks).toHaveLength(0)
+    const header = read(path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx'))
+    expect(header).toContain("{ label: 'Create New SOP', href: '/admin/sops/new' }")
     expect(src).not.toContain('href="/admin/sops/upload"')
     expect(src).not.toContain('href="/admin/sops/new/ai"')
     expect(src).not.toContain('href="/admin/sops/new/blank"')

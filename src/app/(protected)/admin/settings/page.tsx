@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getSessionContext } from '@/lib/auth/session-context'
-import { AdminNav } from '@/components/admin/AdminNav'
 import { getApprovalChains } from '@/actions/approvals'
 import { getOrgMembers } from '@/actions/assignments'
 import { getObservationLabels } from '@/actions/observations'
@@ -100,7 +99,6 @@ export default async function AdminSettingsPage() {
         Organisation-level configuration — AI models, departments, approval chains, and the AI agent layer.
       </p>
 
-      <AdminNav active="settings" />
 
       <div className="grid gap-3 sm:grid-cols-2">
         {SECTIONS.map((section) => (

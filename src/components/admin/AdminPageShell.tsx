@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
-import { AdminNav, type AdminNavKey } from '@/components/admin/AdminNav'
 
 /**
  * Phase 40 (DUP-04) — the one shared admin creation-flow page shell.
@@ -9,16 +8,16 @@ import { AdminNav, type AdminNavKey } from '@/components/admin/AdminNav'
  * across /admin/sops/upload, /admin/sops/new/blank, /admin/sops/new/ai,
  * /admin/sops/[sopId]/versions and the pipeline progress page. The optional
  * `backLink` slot preserves the per-SOP contextual link those last two pages
- * need — AdminNav's `active` prop is section-level only and cannot express
- * "back to this SOP's builder" (RESEARCH Pitfall 5).
+ * need (RESEARCH Pitfall 5). Admin section nav lives in the app header
+ * (sketch 004 variant A) — this shell renders no nav of its own.
  *
- * Presentation only — no auth logic (T-40-09-01, restates AdminNav's own
- * T-30-03-01 disposition). Every page keeps its own getSessionContext guard
- * and redirect(); this component must never be mistaken for that boundary.
+ * Presentation only — no auth logic (T-40-09-01). Every page keeps its own
+ * getSessionContext guard and redirect(); this component must never be
+ * mistaken for that boundary.
  *
- * No 'use client'/'use server' directive — AdminNav is server-renderable, so
- * this composes into both server pages (upload, new/blank, new/ai) and
- * client pages (versions, PipelineProgressClient) without forcing either.
+ * No 'use client'/'use server' directive — composes into both server pages
+ * (upload, new/blank, new/ai) and client pages (versions,
+ * PipelineProgressClient) without forcing either.
  */
 
 export interface AdminPageShellBackLink {
@@ -28,7 +27,6 @@ export interface AdminPageShellBackLink {
 }
 
 interface AdminPageShellProps {
-  active: AdminNavKey
   title: string
   badge?: string
   description?: ReactNode
@@ -39,7 +37,6 @@ interface AdminPageShellProps {
 }
 
 export function AdminPageShell({
-  active,
   title,
   badge,
   description,
@@ -50,8 +47,6 @@ export function AdminPageShell({
 }: AdminPageShellProps) {
   return (
     <div className={contentClassName}>
-      <AdminNav active={active} />
-
       <div className="flex items-start justify-between mb-6 gap-4">
         <div className="min-w-0">
           {badge && <span className="pill">{badge}</span>}

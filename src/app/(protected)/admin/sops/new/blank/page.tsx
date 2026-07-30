@@ -29,7 +29,6 @@ export default async function NewBlankSopPage() {
 
   return (
     <AdminPageShell
-      active="sops"
       title="New SOP"
       description="Start a SOP from scratch — pick the sections you want, then build them in the editor."
     >

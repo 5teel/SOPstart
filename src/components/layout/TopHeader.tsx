@@ -134,11 +134,14 @@ const BASE_LINKS: NavLink[] = [
   { label: 'Sign-off', href: '/activity' },
 ]
 
-// Admin links in the primary header, right of Sign-off. Visibility gate
+// Admin links in the primary header, right of Sign-off (sketch 004 variant A:
+// AdminNav is gone — the header is the ONLY admin nav tier). Visibility gate
 // mirrors the server-side admin gate (['admin','safety_manager']) — every
 // admin page keeps its own server guard; hiding links is not access control.
 const ADMIN_LINKS: NavLink[] = [
+  { label: 'Manage SOPs', href: '/admin/sops' },
   { label: 'Create New SOP', href: '/admin/sops/new' },
+  { label: 'Content', href: '/admin/blocks' },
   { label: 'Team', href: '/admin/team' },
   { label: 'Settings', href: '/admin/settings' },
 ]
@@ -153,8 +156,16 @@ function isAdminRole(role: Role): boolean {
   return role === 'admin' || role === 'safety_manager'
 }
 
-function isActive(pathname: string, href: string): boolean {
-  return pathname === href || pathname.startsWith(href + '/')
+// Longest-prefix match so nested admin hrefs don't double-highlight
+// (/admin/sops/new must light "Create New SOP", not also "Manage SOPs").
+function activeHref(pathname: string, links: NavLink[]): string | null {
+  let best: string | null = null
+  for (const { href } of links) {
+    if ((pathname === href || pathname.startsWith(href + '/')) && (!best || href.length > best.length)) {
+      best = href
+    }
+  }
+  return best
 }
 
 export interface TopHeaderProps {
@@ -224,7 +235,7 @@ export function TopHeader({ role, userEmail }: TopHeaderProps) {
           className="hidden md:flex flex-1 items-center gap-1 ml-4"
         >
           {links.map((link) => {
-            const active = isActive(pathname, link.href)
+            const active = link.href === activeHref(pathname, links)
             return (
               <Link
                 key={link.href}
@@ -346,7 +357,7 @@ export function TopHeader({ role, userEmail }: TopHeaderProps) {
             </div>
             <nav aria-label="Primary mobile" className="flex flex-col p-2 gap-1">
               {links.map((link) => {
-                const active = isActive(pathname, link.href)
+                const active = link.href === activeHref(pathname, links)
                 return (
                   <Link
                     key={link.href}
