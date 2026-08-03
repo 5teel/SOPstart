@@ -268,6 +268,11 @@ export function UploadDropzone() {
               : { ...f, status: 'error' as FileStatus, error: result.error || 'Upload failed' }
             : f
         ))
+        // The success panel renders on `uploadedSopIds.length > 0`; both
+        // document branches below feed it, and the video branch didn't —
+        // so a video-only upload finished at 100% with no confirmation and
+        // no link to the draft.
+        if (result.ok) setUploadedSopIds(prev => [...prev, sessionResult.sopId])
         continue
       }
 
