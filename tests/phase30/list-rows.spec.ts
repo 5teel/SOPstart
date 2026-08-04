@@ -80,15 +80,46 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
     expect(shell).toMatch(/aria-expanded=\{open\}/)
   })
 
-  test('row is one line: title + status chip + one flag chip + owner, click → builder', () => {
-    const src = read(ADMIN_SOPS_PAGE)
-    // Whole row is the builder link (WIRING: interpolated sopId).
-    expect(src).toMatch(/href=\{`\/admin\/sops\/builder\/\$\{sop\.id\}`\}/)
-    // Title · status chip · ONE flag chip · owner.
-    expect(src).toContain('<StatusBadge status={sop.status as SopStatus} />')
-    expect(src).toContain('FLAG_LABEL[flag]')
-    expect(src).toContain('ownerLabelById[sop.owner_user_id]')
-    // ONE flag chip: worst-first pick from the governance queue flags.
-    expect(src).toContain('FLAG_PRIORITY.find((f) => r.flags.includes(f))')
+  test('row is one line: title + status chip + one flag chip, and reaches the builder', () => {
+    const page = read(ADMIN_SOPS_PAGE)
+    const browser = read(path.join(ROOT, 'src', 'components', 'admin', 'SopMillerBrowser.tsx'))
+
+    // 2026-08-04 (sketch 005 variant C): the row moved out of the page into
+    // SopMillerBrowser, because selecting a SOP must be client state — a
+    // search-param push would fire an RSC request per click (CLAUDE.md
+    // [2026-05-13]). UX-06's invariant is unchanged: ONE line, ONE flag chip,
+    // and the row reaches the builder. Assert it where it now lives, plus
+    // that the page still WIRES it — a guard that only greps the old file
+    // goes stale-green on the next relocation (CLAUDE.md [2026-07-13]).
+    expect(page).toContain('<SopMillerBrowser')
+    expect(page).toContain('sops={millerSops}')
+
+    // Whole row reaches the builder (WIRING: interpolated sop id).
+    expect(browser).toMatch(/href=\{`\/admin\/sops\/builder\/\$\{sop\.id\}`\}/)
+    expect(browser).toContain('<StatusBadge status={sop.status as SopStatus} />')
+    expect(browser).toContain('sop.flagLabel')
+
+    // ONE flag chip: worst-first pick, still resolved server-side.
+    expect(page).toContain('FLAG_PRIORITY.find((f) => r.flags.includes(f))')
+    expect(page).toContain('flagLabel: flag ? FLAG_LABEL[flag] : null')
+    // Owner is still resolved for the detail pane, and still suppressed when
+    // the flag chip already says "No owner".
+    expect(page).toContain('ownerLabelById[sop.owner_user_id]')
+    expect(page).toContain("flag === 'unowned' ? null : shortOwner(owner)")
+  })
+
+  test('selecting a SOP is client state, not a URL push (hot-path latency)', () => {
+    const browser = read(path.join(ROOT, 'src', 'components', 'admin', 'SopMillerBrowser.tsx'))
+    expect(browser).toContain("'use client'")
+    expect(browser).toContain('useState')
+    expect(browser).toContain('setSelectedId(sop.id)')
+    // A router push here would cost an RSC round-trip through the service
+    // worker on every row click — the exact regression [2026-05-13] records.
+    expect(browser).not.toContain('router.push')
+    expect(browser).not.toContain('useRouter')
+    // The detail pane must render from data the list already carries; a fetch
+    // here would reintroduce the per-click round-trip by another route.
+    expect(browser).not.toContain('createClient')
+    expect(browser).not.toContain('fetch(')
   })
 })

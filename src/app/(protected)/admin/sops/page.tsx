@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getSessionContext } from '@/lib/auth/session-context'
-import { StatusBadge } from '@/components/admin/StatusBadge'
+
 import { getTeamMembersWithEmails } from '@/actions/auth'
 import { listGovernanceQueue, type GovernanceRow } from '@/actions/governance'
 import type { GovernanceFlag } from '@/lib/governance/classify'
@@ -13,6 +13,7 @@ import { WiringPatchBayShell } from '@/components/admin/wiring/WiringPatchBayShe
 import type { WiringCollection, WiringNewSop, WiringSop } from '@/components/admin/wiring/WiringPatchBay'
 import type { SopStatus } from '@/types/sop'
 import { categoryLabel } from '@/lib/sop-categories'
+import { SopMillerBrowser, type MillerSop } from '@/components/admin/SopMillerBrowser'
 
 export const metadata: Metadata = {
   title: 'Manage SOPs',
@@ -277,6 +278,21 @@ export default async function SopsLibraryPage({
     if (name) (deptsBySop[r.sop_id] ??= []).push(name)
   }
 
+  // Department counts for the scope column. sop_departments is org-scoped by
+  // RLS and unfiltered here, so it counts the whole library regardless of what
+  // the main query is currently showing — a scope count that moved with the
+  // scope would be useless for choosing the next one.
+  const deptCounts: Record<string, number> = {}
+  const sopIdsWithDept = new Set<string>()
+  for (const r of ((sopDeptsResult?.data ?? []) as Array<{ sop_id: string; department_id: string }>)) {
+    if (!deptNameById[r.department_id]) continue
+    deptCounts[r.department_id] = (deptCounts[r.department_id] ?? 0) + 1
+    sopIdsWithDept.add(r.sop_id)
+  }
+  const scopeDepartments = Object.entries(deptCounts)
+    .map(([id, count]) => ({ id, name: deptNameById[id], count }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+
   const allStatuses = ((statusCountsResult?.data ?? []) as Array<{ status: string }>).map((r) => r.status)
   const railCounts = {
     all: allStatuses.length,
@@ -291,7 +307,7 @@ export default async function SopsLibraryPage({
   let orgTree: Exclude<Awaited<ReturnType<typeof listOrgTree>>, { error: string }> | null = null
   let grantsList: GrantRow[] = []
   let collections: WiringCollection[] = []
-  let sopsByCollection: Record<string, WiringSop[]> = {}
+  const sopsByCollection: Record<string, WiringSop[]> = {}
   let newSop: WiringNewSop | null = null
   const deptMembers: Record<string, string[]> = {}
   if (isAccessView) {
@@ -344,71 +360,70 @@ export default async function SopsLibraryPage({
     }
   }
 
+  // Sketch 005 variant C — Miller columns. The scope column replaces the tab
+  // rail: an item here is a scope, not a tab, and its count describes the whole
+  // library rather than the current view. Scope changes are Links (the URL
+  // carries scope, and changing it SHOULD refetch); selecting a SOP is client
+  // state inside SopMillerBrowser, because that is the hot path.
+  const scopeActive = !isAttentionView && !isAccessView
+  const scopeLabel = ownerOnly
+    ? 'Owned by me'
+    : departmentFilter
+      ? (deptNameById[departmentFilter] ?? 'Department')
+      : collectionFilter
+        ? 'Collection'
+        : (STATUS_TABS.find((t) => t.value === activeStatus)?.label ?? 'All')
+
+  // Everything the list and detail panes need, resolved here so clicking a row
+  // costs nothing — the detail column reads from this, it does not fetch.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const millerSops: MillerSop[] = ((sops ?? []) as any[]).map((sop: any) => {
+    const flag = rowFlag[sop.id]
+    const owner = sop.owner_user_id ? ownerLabelById[sop.owner_user_id] : null
+    const inFlight = sop.status === 'uploading' || sop.status === 'parsing'
+    return {
+      id: sop.id,
+      title: sop.title ?? null,
+      displayTitle: sop.title ?? stripExtension(sop.source_file_name),
+      untitled: !sop.title,
+      status: sop.status,
+      categoryLabel: categoryLabel(sop.category_slug ?? null),
+      departments: deptsBySop[sop.id] ?? [],
+      allDepartments: Boolean(sop.all_departments),
+      // The `unowned` flag already says "No owner" — don't say it twice.
+      ownerLabel: flag === 'unowned' ? null : shortOwner(owner),
+      age: relativeDay(sop.updated_at ?? sop.created_at),
+      updatedAt: sop.updated_at ?? sop.created_at ?? null,
+      flagLabel: flag ? FLAG_LABEL[flag] : null,
+      flagStyle: flag ? FLAG_STYLE[flag] : null,
+      stuck: inFlight && Date.now() - new Date(sop.created_at).getTime() > STUCK_AFTER_MS,
+      confidence: typeof sop.overall_confidence === 'number' ? sop.overall_confidence : null,
+    }
+  })
+
+  const scopeItems = STATUS_TABS
+    .filter((t) => t.value !== 'failed' || railCounts.failed > 0)
+    .map((t) => ({
+      key: t.value,
+      label: t.label,
+      count: railCounts[t.value as keyof typeof railCounts],
+      href: t.value === 'all' ? '/admin/sops' : `/admin/sops?status=${t.value}`,
+      on: scopeActive && !ownerOnly && !departmentFilter && activeStatus === t.value,
+      tone: t.value === 'failed' ? 'bad' : 'plain',
+    }))
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10">
-        {/* Sketch 004 variant A — ONE rail. No page header (the app header
-            already says Manage SOPs and carries Create New SOP), no section
-            nav, no chip row: this tab rail is the page's only control tier. */}
-        <div className="flex gap-1 border-b border-[var(--ink-100)] mb-6 overflow-x-auto items-center">
-          {STATUS_TABS.map(tab => {
-            const isActive = !isAttentionView && !isAccessView && !ownerOnly && activeStatus === tab.value
-            // Only surface "Still working" when something actually is.
-            if (tab.value === 'failed' && railCounts.failed === 0) return null
-            return (
-              <Link
-                key={tab.value}
-                href={tab.value === 'all' ? '/admin/sops' : `/admin/sops?status=${tab.value}`}
-                className="tab"
-                data-active={isActive ? 'true' : undefined}
-              >
-                {tab.label}
-                <span className="mono text-[11px] text-[var(--ink-400)] ml-1">
-                  {railCounts[tab.value as keyof typeof railCounts]}
-                </span>
-              </Link>
-            )
-          })}
+        {/* The two full-width sub-surfaces lost the tab rail that used to carry
+            them, so each gets an explicit way back to the library. */}
+        {(isAccessView || isAttentionView) && (
           <Link
-            href="/admin/sops?view=attention"
-            className="tab"
-            data-active={isAttentionView ? 'true' : undefined}
+            href="/admin/sops"
+            className="mono mb-4 inline-block text-[11px] uppercase tracking-wider text-[var(--ink-500)] hover:text-[var(--ink-900)]"
           >
-            Needs attention
-            {flaggedRows.length > 0 && (
-              <span className="mono text-[11px] text-red-600 font-bold ml-1">{flaggedRows.length}</span>
-            )}
+            ← Back to the SOP library
           </Link>
-          <Link
-            href="/admin/sops?view=access"
-            className="tab"
-            data-active={isAccessView ? 'true' : undefined}
-          >
-            Access
-          </Link>
-          <div className="flex-1" />
-          {/* Rare filters — native details menu, no client JS. */}
-          <details className="relative flex-shrink-0">
-            <summary className="tab cursor-pointer list-none select-none text-[var(--ink-400)]"
-              data-active={ownerOnly || activeStatus === 'failed' ? 'true' : undefined}
-            >
-              {ownerOnly ? 'Owned by me' : activeStatus === 'failed' ? 'Parse issues' : 'Filter'} ▾
-            </summary>
-            <div className="absolute right-0 top-full mt-1 w-44 rounded-md border border-[var(--ink-200)] bg-white shadow-lg z-30 py-1">
-              <Link href="/admin/sops?owner=me" className="block px-3 py-2 text-sm text-[var(--ink-900)] hover:bg-[var(--paper-2)]">
-                Owned by me
-              </Link>
-              <Link href="/admin/sops?status=failed" className="block px-3 py-2 text-sm text-[var(--ink-900)] hover:bg-[var(--paper-2)]">
-                Parse issues
-                {railCounts.failed > 0 && <span className="mono text-[11px] text-[var(--ink-400)] ml-1">{railCounts.failed}</span>}
-              </Link>
-              {(ownerOnly || activeStatus === 'failed') && (
-                <Link href="/admin/sops" className="block px-3 py-2 text-sm text-[var(--ink-500)] hover:bg-[var(--paper-2)] border-t border-[var(--ink-100)]">
-                  Clear filter
-                </Link>
-              )}
-            </div>
-          </details>
-        </div>
+        )}
 
         {isAccessView ? (
           <>
@@ -466,7 +481,7 @@ export default async function SopsLibraryPage({
           <>
         {/* SC-4 viz-as-library-filter: server-filtered result banner, with a
             count and a way back to the unfiltered list. */}
-        {filterIds !== null && (
+        {filterIds !== null && !departmentFilter && (
           <div className="flex items-center justify-between mb-4 px-4 py-3 rounded-xl border border-[var(--accent-step)]/40 bg-[var(--accent-step)]/10">
             <span className="mono text-[11px] uppercase tracking-wider text-[var(--ink-700)]">
               Open in library ({(sops ?? []).length})
@@ -477,125 +492,144 @@ export default async function SopsLibraryPage({
           </div>
         )}
 
-        {/* Draft triage strip — surfaced on the All tab so review work is never invisible */}
-        {activeStatus === 'all' && (sops ?? []).some((s: { status: string }) => s.status === 'draft') && (
-          <Link
-            href="/admin/sops?status=draft"
-            className="flex items-center justify-between mb-4 px-4 py-3 rounded-xl border border-amber-300 bg-amber-50 hover:bg-amber-100 transition-colors"
-          >
-            <span className="text-sm font-medium text-amber-800">
-              {(sops ?? []).filter((s: { status: string }) => s.status === 'draft').length} draft
-              {(sops ?? []).filter((s: { status: string }) => s.status === 'draft').length === 1 ? '' : 's'} waiting for review
-            </span>
-            <span className="mono text-[11px] uppercase tracking-wider text-amber-700">Review worst-first →</span>
+        {/* Sketch 005 variant C — three altitudes across, not stacked.
+            LEFT (server): scope. MIDDLE + RIGHT (client): list and detail.
+            The draft-triage strip is gone: "Drafts 23" in the scope column is
+            the same information doing navigational work, and the banner was a
+            second copy of it. */}
+        {/* Below lg the scope column becomes a horizontal strip — three
+            columns do not fit on a phone, and a hidden scope is worse than a
+            scrolling one. Outside the row flex so it stacks above it. */}
+        <div className="mb-4 flex gap-1 overflow-x-auto border-b border-[var(--ink-100)] pb-1 lg:hidden">
+          {scopeItems.map((item) => (
+            <Link
+              key={item.key}
+              href={item.href}
+              className="tab flex-shrink-0"
+              data-active={item.on ? 'true' : undefined}
+            >
+              {item.label}
+              <span className="mono ml-1 text-[11px] text-[var(--ink-400)]">{item.count}</span>
+            </Link>
+          ))}
+          <Link href="/admin/sops?view=attention" className="tab flex-shrink-0">
+            Needs attention
+            {flaggedRows.length > 0 && (
+              <span className="mono ml-1 text-[11px] font-bold text-red-600">{flaggedRows.length}</span>
+            )}
           </Link>
-        )}
+          <Link href="/admin/sops?view=access" className="tab flex-shrink-0">Access</Link>
+        </div>
 
-        {/* SOP list — UX-06 one-line rows: title · status chip · one flag chip
-            · owner. Click opens the builder; the per-SOP actions live in the
-            builder's labelled action menu (30-07, decision #2). */}
-        {!sops || sops.length === 0 ? (
-          <div className="blueprint-frame text-center py-12">
-            <p className="mono text-[11px] text-[var(--ink-500)] uppercase tracking-wider mb-2">
-              EMPTY
-            </p>
-            <p className="text-lg font-semibold text-[var(--ink-900)] mb-1">No SOPs yet</p>
-            <p className="text-sm text-[var(--ink-500)]">
-              Use Create New SOP in the header — upload a doc, talk it through, describe it, or start blank.
-            </p>
-          </div>
-        ) : (
-          <ul className="space-y-1">
-            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            {sops.map((sop: any) => {
-              const flag = rowFlag[sop.id]
-              // The `unowned` flag chip already reads "No owner" — rendering
-              // the owner column's fallback too printed it twice on the row.
-              const owner = sop.owner_user_id ? ownerLabelById[sop.owner_user_id] : null
-              const showOwner = owner && flag !== 'unowned'
-              const category = categoryLabel(sop.category_slug ?? null)
-              const untitled = !sop.title
-              const depts = deptsBySop[sop.id] ?? []
-              const audience = sop.all_departments
-                ? 'Everyone'
-                : depts.length === 0
-                  ? null
-                  : depts.length === 1
-                    ? depts[0]
-                    : `${depts[0]} +${depts.length - 1}`
-              const inFlight = sop.status === 'uploading' || sop.status === 'parsing'
-              const stuck =
-                inFlight && Date.now() - new Date(sop.created_at).getTime() > STUCK_AFTER_MS
-              return (
-                <li key={sop.id}>
+        <div className="flex gap-5">
+          {/* ── Scope column ────────────────────────────────────── */}
+          <nav
+            aria-label="Scope"
+            data-testid="miller-scope"
+            className="hidden w-[150px] flex-shrink-0 lg:block"
+          >
+            <p className="mono mb-1.5 text-[10px] uppercase tracking-wider text-[var(--ink-400)]">Library</p>
+            <ul className="mb-4">
+              {scopeItems.map((item) => (
+                <li key={item.key}>
                   <Link
-                    href={`/admin/sops/builder/${sop.id}`}
-                    className="blueprint-frame row-compact flex items-center gap-2.5 hover:shadow-[0_0_0_1px_var(--ink-900)] transition-shadow"
+                    href={item.href}
+                    data-active={item.on ? 'true' : undefined}
+                    className={`flex items-center gap-2 rounded px-2 py-1.5 text-[13px] ${
+                      item.on
+                        ? 'bg-[var(--ink-900)] font-semibold text-white'
+                        : 'text-[var(--ink-700)] hover:bg-[var(--paper-2)]'
+                    }`}
                   >
-                    <p
-                      className={`min-w-0 flex-1 truncate text-sm font-semibold ${
-                        untitled ? 'italic text-[var(--ink-500)]' : 'text-[var(--ink-900)]'
+                    <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                    <span
+                      className={`mono text-[11px] ${
+                        item.on
+                          ? 'text-white/70'
+                          : item.tone === 'bad'
+                            ? 'text-red-600'
+                            : 'text-[var(--ink-400)]'
                       }`}
-                      title={sop.title ?? sop.source_file_name ?? undefined}
                     >
-                      {sop.title ?? stripExtension(sop.source_file_name)}
-                    </p>
-
-                    {/* Category — DAT-01's whole point is that a SOP has one,
-                        and until now the list SELECTed it and dropped it. */}
-                    {category ? (
-                      <span className="mono hidden flex-shrink-0 rounded bg-[var(--paper-2)] px-1.5 py-0.5 text-[11px] text-[var(--ink-500)] sm:inline">
-                        {category}
-                      </span>
-                    ) : (
-                      <span className="mono hidden flex-shrink-0 px-1.5 text-[11px] text-[var(--ink-300)] sm:inline">
-                        No category
-                      </span>
-                    )}
-
-                    {/* Who it's for. Only shown when set — an empty chip is
-                        worse than none, and 16 of 30 have no department. */}
-                    {audience && (
-                      <span
-                        className="mono hidden w-32 flex-shrink-0 truncate rounded bg-[var(--paper-2)] px-1.5 py-0.5 text-[11px] text-[var(--ink-500)] md:inline-block"
-                        title={sop.all_departments ? 'Everyone in the organisation' : depts.join(', ')}
-                      >
-                        {audience}
-                      </span>
-                    )}
-
-                    {stuck && (
-                      <span
-                        className="mono flex-shrink-0 rounded bg-red-500/20 px-1.5 py-0.5 text-[11px] text-red-600"
-                        title={`Stuck in "${sop.status}" since ${new Date(sop.created_at).toLocaleString()} — the pipeline never finished. Open it to retry or delete it.`}
-                      >
-                        Stuck
-                      </span>
-                    )}
-                    {flag && (
-                      <span className={`mono text-[11px] px-1.5 py-0.5 rounded flex-shrink-0 ${FLAG_STYLE[flag]}`}>
-                        {FLAG_LABEL[flag]}
-                      </span>
-                    )}
-                    <StatusBadge status={sop.status as SopStatus} />
-
-                    {showOwner && (
-                      <span
-                        className="mono hidden w-28 flex-shrink-0 truncate text-right text-[11px] text-[var(--ink-500)] lg:inline-block"
-                        title={owner}
-                      >
-                        {shortOwner(owner)}
-                      </span>
-                    )}
-                    <span className="mono w-16 flex-shrink-0 text-right text-[11px] text-[var(--ink-300)]">
-                      {relativeDay(sop.updated_at ?? sop.created_at)}
+                      {item.count}
                     </span>
                   </Link>
                 </li>
-              )
-            })}
-          </ul>
-        )}
+              ))}
+            </ul>
+
+            {scopeDepartments.length > 0 && (
+              <>
+                <p className="mono mb-1.5 text-[10px] uppercase tracking-wider text-[var(--ink-400)]">
+                  By department
+                </p>
+                <ul className="mb-4">
+                  {scopeDepartments.map((d) => {
+                    const on = departmentFilter === d.id
+                    return (
+                      <li key={d.id}>
+                        <Link
+                          href={`/admin/sops?departments=${d.id}`}
+                          data-active={on ? 'true' : undefined}
+                          className={`flex items-center gap-2 rounded px-2 py-1.5 text-[13px] ${
+                            on
+                              ? 'bg-[var(--ink-900)] font-semibold text-white'
+                              : 'text-[var(--ink-700)] hover:bg-[var(--paper-2)]'
+                          }`}
+                        >
+                          <span className="min-w-0 flex-1 truncate" title={d.name}>{d.name}</span>
+                          <span className={`mono text-[11px] ${on ? 'text-white/70' : 'text-[var(--ink-400)]'}`}>
+                            {d.count}
+                          </span>
+                        </Link>
+                      </li>
+                    )
+                  })}
+                  {/* Not a filter — a finding. Over half the library has no
+                      department, which means nobody can be assigned it. */}
+                  {railCounts.all - sopIdsWithDept.size > 0 && (
+                    <li className="flex items-center gap-2 px-2 py-1.5 text-[13px] text-[var(--ink-400)]">
+                      <span className="min-w-0 flex-1 truncate">No department</span>
+                      <span className="mono text-[11px]">{railCounts.all - sopIdsWithDept.size}</span>
+                    </li>
+                  )}
+                </ul>
+              </>
+            )}
+
+            <div className="border-t border-[var(--ink-100)] pt-2">
+              <Link
+                href="/admin/sops?view=attention"
+                className="flex items-center gap-2 rounded px-2 py-1.5 text-[13px] text-[var(--ink-700)] hover:bg-[var(--paper-2)]"
+              >
+                <span className="min-w-0 flex-1 truncate">Needs attention</span>
+                {flaggedRows.length > 0 && (
+                  <span className="mono text-[11px] font-bold text-red-600">{flaggedRows.length}</span>
+                )}
+              </Link>
+              <Link
+                href="/admin/sops?view=access"
+                className="block rounded px-2 py-1.5 text-[13px] text-[var(--ink-700)] hover:bg-[var(--paper-2)]"
+              >
+                Access map
+              </Link>
+              <Link
+                href={ownerOnly ? '/admin/sops' : '/admin/sops?owner=me'}
+                data-active={ownerOnly ? 'true' : undefined}
+                className={`block rounded px-2 py-1.5 text-[13px] ${
+                  ownerOnly
+                    ? 'bg-[var(--ink-900)] font-semibold text-white'
+                    : 'text-[var(--ink-700)] hover:bg-[var(--paper-2)]'
+                }`}
+              >
+                {ownerOnly ? 'Owned by me ✕' : 'Owned by me'}
+              </Link>
+            </div>
+          </nav>
+
+          {/* ── List + detail ───────────────────────────────────── */}
+          <SopMillerBrowser scopeLabel={scopeLabel} sops={millerSops} />
+        </div>
           </>
         )}
     </div>

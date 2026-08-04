@@ -95,16 +95,23 @@ test.describe('UX-03 — governance folds into /admin/sops', () => {
     ).toBe(false)
   })
 
-  test('Parse issues lives in the rail filter menu; the folded view owns "Needs attention" (decision #4, sketch 004)', () => {
+  test('in-flight SOPs and the attention view are both reachable from the scope column (sketch 005 variant C)', () => {
     const src = read(ADMIN_SOPS_PAGE)
-    // 2026-07-30: failed-status moved from a top-level tab into the rail's
-    // details Filter menu — still reachable, still named Parse issues.
-    expect(src).toContain('Parse issues')
-    expect(src).toContain('href="/admin/sops?status=failed"')
-    expect(src).not.toContain("{ label: 'Needs attention', value: 'failed' }")
-    // The folded view's tab carries the "Needs attention" name.
+    // 2026-08-04: the tab rail became a scope column (Miller columns). The
+    // invariant UX-03 actually protects is REACHABILITY, not which control
+    // shape carries it — so assert the destinations, not the rail.
+    //
+    // 'failed' status is now a first-class scope ("Still working") rather than
+    // a Filter-menu entry, rendered only when the count is non-zero.
+    expect(src).toContain("{ label: 'Still working', value: 'failed' }")
+    expect(src).toMatch(/status=\$\{t\.value\}|status=failed/)
+    // The governance queue keeps its own view and its own entry.
     expect(src).toContain('Needs attention')
     expect(src).toContain('href="/admin/sops?view=attention"')
+    // …and the access map did not get lost in the rework.
+    expect(src).toContain('href="/admin/sops?view=access"')
+    // Both full-width sub-surfaces must offer a way back now the rail is gone.
+    expect(src).toContain('Back to the SOP library')
   })
 })
 
