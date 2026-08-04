@@ -23,7 +23,24 @@ import { createClient } from '@/lib/supabase/client'
 import { selfAddSop, selfRemoveSop, requestRemoveAssignment, getUserSopAssignments } from '@/actions/assignments'
 import { refresherDueDate, isRefresherDue as computeRefresherDue, isRefresherOverdue as computeRefresherOverdue } from '@/lib/competency/refresher'
 import { categoryLabel } from '@/lib/sop-categories'
-import { SopWorkerBrowser, type WorkerSop } from '@/components/sop/SopWorkerBrowser'
+import dynamic from 'next/dynamic'
+import type { WorkerSop } from '@/components/sop/SopWorkerBrowser'
+
+/**
+ * SB-LINE-06: /sops/[sopId]'s chunk set transitively includes /sops/page's own
+ * route chunk, so ANY weight added to this page counts against the worker
+ * detail route's bundle gate — measured, not assumed (the gate's chunk list
+ * names `app/(protected)/sops/page-*.js` at 28.7 KB). A static import of the
+ * browser put it in that chunk and blew the ±2 KB tolerance by 4 KB.
+ *
+ * next/dynamic gives it its own chunk instead, which is the same treatment
+ * DesktopWalkthrough and WalkthroughVoiceModal already get — and which the
+ * gate's own isolation check exists to verify.
+ */
+const SopWorkerBrowser = dynamic(
+  () => import('@/components/sop/SopWorkerBrowser').then((m) => m.SopWorkerBrowser),
+  { ssr: false }
+)
 import type { Department } from '@/types/sop'
 
 function getRelativeTime(isoString: string): string {
