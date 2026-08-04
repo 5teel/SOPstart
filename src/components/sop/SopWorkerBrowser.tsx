@@ -23,6 +23,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { AlertTriangle, Clock, RefreshCw } from 'lucide-react'
+import { SopLibraryCard } from '@/components/sop/SopLibraryCard'
+import type { CachedSop } from '@/lib/offline/db'
 
 export type WorkerSop = {
   id: string
@@ -38,6 +40,8 @@ export type WorkerSop = {
   /** Self-added vs assigned by a manager — decides which removal path applies. */
   isSelfAssigned: boolean
   removalRequested: boolean
+  /** The cached row itself, for the mobile card renderer. */
+  raw: CachedSop
 }
 
 function formatDay(iso: string | null): string | null {
@@ -129,15 +133,21 @@ export function SopWorkerBrowser({
                   {body}
                 </button>
 
-                {/* Below lg there is no detail column — the row opens the SOP,
-                    which is the pre-Miller behaviour and the right one on a
-                    phone, where reading is the whole point. */}
-                <Link
-                  href={`/sops/${sop.id}`}
-                  className="flex min-h-14 w-full items-center gap-2.5 rounded-xl border border-[var(--ink-100)] bg-white px-4 py-3 lg:hidden"
-                >
-                  {body}
-                </Link>
+                {/* Below lg there is no detail column, so the compact row would
+                    hide everything the pane was going to show. Keep the full
+                    SopLibraryCard on phones — it already carries the cached,
+                    updated and refresher badges, and a glove-sized tap target.
+                    The Miller row is a DESKTOP affordance; the phone keeps the
+                    card it always had. */}
+                <div className="lg:hidden">
+                  <SopLibraryCard
+                    sop={sop.raw}
+                    isCached
+                    hasNewerVersion={sop.hasNewerVersion}
+                    isRefresherDue={sop.isRefresherDue}
+                    isRefresherOverdue={sop.isRefresherOverdue}
+                  />
+                </div>
               </li>
             )
           })}

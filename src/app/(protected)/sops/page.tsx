@@ -419,6 +419,7 @@ function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeDeptLabel,
       hasNewerVersion: hasNewerVersion(sop),
       isSelfAssigned: info?.isSelfAssigned ?? false,
       removalRequested: requestedIds.has(sop.id),
+      raw: sop,
     }
   })
 
