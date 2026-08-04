@@ -107,8 +107,16 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
     const supabase = createClient()
     lastUpdateRef.current = Date.now()
 
+    // Clearing the interval on unmount does NOT cancel a request already in
+    // flight. Without this flag, a poll fired just before you navigate away
+    // resolves a second later on a dead component and still runs its
+    // completion branch — which on the AI-draft surfaces is a router.push into
+    // the builder. Symptom: you click Manage SOPs and get thrown into the last
+    // SOP you were drafting, with no input from you.
+    let cancelled = false
+
     function startPolling() {
-      if (pollingRef.current) return
+      if (cancelled || pollingRef.current) return
       pollingRef.current = setInterval(() => {
         if (pipelineId) {
           fetchPipelineSnapshot()
@@ -126,6 +134,7 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
         .order('created_at', { ascending: false })
         .limit(1)
         .maybeSingle() as { data: { status: string; error_message: string | null; current_stage: string | null; file_type: string; input_type: string | null } | null }
+      if (cancelled) return
       if (data) {
         setStatus(data.status as ParseJobStatusType)
         if (data.error_message) setErrorMessage(data.error_message)
@@ -143,8 +152,9 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
     async function fetchPipelineSnapshot() {
       try {
         const res = await fetch(`/api/sops/pipeline/${pipelineId}/snapshot`)
-        if (!res.ok) return
+        if (cancelled || !res.ok) return
         const next = (await res.json()) as Snapshot
+        if (cancelled) return
         setSnapshot(next)
         onSnapshot?.(next)
         lastUpdateRef.current = Date.now()
@@ -191,6 +201,7 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
           'postgres_changes',
           { event: 'UPDATE', schema: 'public', table: 'parse_jobs', filter: `sop_id=eq.${sopId}` },
           (payload) => {
+            if (cancelled) return
             lastUpdateRef.current = Date.now()
             if (pollingRef.current) { clearInterval(pollingRef.current); pollingRef.current = null }
             setStatus(payload.new.status as ParseJobStatusType)
@@ -228,6 +239,7 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
     }, REALTIME_STALE_MS)
 
     return () => {
+      cancelled = true
       clearTimeout(startPollingTimeout)
       clearInterval(staleWatchdog)
       if (pollingRef.current) {
