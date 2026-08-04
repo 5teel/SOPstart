@@ -12,6 +12,7 @@ import { ensureSopCollections, listGrants, type GrantRow } from '@/actions/grant
 import { WiringPatchBayShell } from '@/components/admin/wiring/WiringPatchBayShell'
 import type { WiringCollection, WiringNewSop, WiringSop } from '@/components/admin/wiring/WiringPatchBay'
 import type { SopStatus } from '@/types/sop'
+import { categoryLabel } from '@/lib/sop-categories'
 
 export const metadata: Metadata = {
   title: 'Manage SOPs',
@@ -38,6 +39,41 @@ const FLAG_STYLE: Record<GovernanceFlag, string> = {
   unowned: 'bg-[var(--paper-2)] text-[var(--ink-500)]',
   stale_role: 'bg-[var(--paper-2)] text-[var(--ink-500)]',
   awaiting_approval: 'bg-[var(--accent-signoff)]/20 text-[var(--accent-signoff)]',
+}
+
+/**
+ * A SOP created by upload has no title of its own, so the row falls back to the
+ * source filename — which printed "Plenum chamber change procedure.pdf" and
+ * "test-sop-page.webp" as if they were titles. Dropping the extension stops the
+ * list reading like a file browser. The row also italicises these, because an
+ * untitled SOP is a thing to fix, not a naming style.
+ */
+function stripExtension(name: string | null | undefined): string {
+  if (!name) return 'Untitled SOP'
+  return name.replace(/\.[a-z0-9]{2,5}$/i, '') || name
+}
+
+/** `simonscott86@gmail.com` is 21 characters of noise on every row. */
+function shortOwner(label: string | null): string {
+  if (!label) return ''
+  return label.includes('@') ? label.split('@')[0] : label
+}
+
+/**
+ * Compact relative age. The list had no date at all, so there was nothing to
+ * scan by and no way to tell a SOP touched this morning from one abandoned in
+ * April. Rendered server-side only, so no hydration concern.
+ */
+function relativeDay(iso: string | null | undefined): string {
+  if (!iso) return ''
+  const then = new Date(iso).getTime()
+  if (Number.isNaN(then)) return ''
+  const days = Math.floor((Date.now() - then) / 86_400_000)
+  if (days <= 0) return 'today'
+  if (days === 1) return '1d'
+  if (days < 30) return `${days}d`
+  if (days < 365) return `${Math.floor(days / 30)}mo`
+  return `${Math.floor(days / 365)}y`
 }
 
 const FLAG_LABEL: Record<GovernanceFlag, string> = {
@@ -430,27 +466,60 @@ export default async function SopsLibraryPage({
             </p>
           </div>
         ) : (
-          <ul className="space-y-2">
+          <ul className="space-y-1">
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
             {sops.map((sop: any) => {
               const flag = rowFlag[sop.id]
+              // The `unowned` flag chip already reads "No owner" — rendering
+              // the owner column's fallback too printed it twice on the row.
+              const owner = sop.owner_user_id ? ownerLabelById[sop.owner_user_id] : null
+              const showOwner = owner && flag !== 'unowned'
+              const category = categoryLabel(sop.category_slug ?? null)
+              const untitled = !sop.title
               return (
                 <li key={sop.id}>
                   <Link
                     href={`/admin/sops/builder/${sop.id}`}
-                    className="blueprint-frame flex items-center gap-3 hover:shadow-[0_0_0_1px_var(--ink-900)] transition-shadow"
+                    className="blueprint-frame row-compact flex items-center gap-2.5 hover:shadow-[0_0_0_1px_var(--ink-900)] transition-shadow"
                   >
-                    <p className="flex-1 min-w-0 text-base font-semibold text-[var(--ink-900)] truncate">
-                      {sop.title ?? sop.source_file_name}
+                    <p
+                      className={`min-w-0 flex-1 truncate text-sm font-semibold ${
+                        untitled ? 'italic text-[var(--ink-500)]' : 'text-[var(--ink-900)]'
+                      }`}
+                      title={sop.title ?? sop.source_file_name ?? undefined}
+                    >
+                      {sop.title ?? stripExtension(sop.source_file_name)}
                     </p>
-                    <StatusBadge status={sop.status as SopStatus} />
+
+                    {/* Category — DAT-01's whole point is that a SOP has one,
+                        and until now the list SELECTed it and dropped it. */}
+                    {category ? (
+                      <span className="mono hidden flex-shrink-0 rounded bg-[var(--paper-2)] px-1.5 py-0.5 text-[11px] text-[var(--ink-500)] sm:inline">
+                        {category}
+                      </span>
+                    ) : (
+                      <span className="mono hidden flex-shrink-0 px-1.5 text-[11px] text-[var(--ink-300)] sm:inline">
+                        No category
+                      </span>
+                    )}
+
                     {flag && (
                       <span className={`mono text-[11px] px-1.5 py-0.5 rounded flex-shrink-0 ${FLAG_STYLE[flag]}`}>
                         {FLAG_LABEL[flag]}
                       </span>
                     )}
-                    <span className="mono text-[11px] text-[var(--ink-500)] flex-shrink-0">
-                      {sop.owner_user_id ? (ownerLabelById[sop.owner_user_id] ?? 'No owner') : 'No owner'}
+                    <StatusBadge status={sop.status as SopStatus} />
+
+                    {showOwner && (
+                      <span
+                        className="mono hidden w-28 flex-shrink-0 truncate text-right text-[11px] text-[var(--ink-500)] lg:inline-block"
+                        title={owner}
+                      >
+                        {shortOwner(owner)}
+                      </span>
+                    )}
+                    <span className="mono w-16 flex-shrink-0 text-right text-[11px] text-[var(--ink-300)]">
+                      {relativeDay(sop.updated_at ?? sop.created_at)}
                     </span>
                   </Link>
                 </li>

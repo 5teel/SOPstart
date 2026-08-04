@@ -200,6 +200,22 @@ body[data-theme="paper"] .blueprint-frame::before {
   top: -1px; left: -1px;
   border-right: none; border-bottom: none;
 }
+
+/* Row variant: the frame is a CARD (20px padding + corner ticks). A library
+   list of 30 SOPs is not 30 cards — at card padding each row costs ~73px for
+   one line of text, and 60 corner ticks pull the eye to the frames rather than
+   the titles. Compact rows drop both. Declared here, not as a Tailwind
+   utility, because `body[data-theme="paper"] .blueprint-frame` outranks a
+   single utility class. */
+body[data-theme="paper"] .blueprint-frame.row-compact {
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  border-color: var(--ink-100);
+}
+body[data-theme="paper"] .blueprint-frame.row-compact::before,
+body[data-theme="paper"] .blueprint-frame.row-compact::after {
+  content: none;
+}
 body[data-theme="paper"] .blueprint-frame::after {
   bottom: -1px; right: -1px;
   border-left: none; border-top: none;

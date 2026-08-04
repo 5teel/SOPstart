@@ -42,15 +42,33 @@ function walk(dir: string, out: string[] = []): string[] {
 }
 
 test.describe('UX-04 — one create entry', () => {
-  test('method picker exists with all 4 options and Upload listed first', () => {
+  // 2026-08-04: the picker went from 4 tiles to 3. "Talk it through"
+  // (?mode=voice) and "Describe it" both pointed at /admin/sops/new/ai — the
+  // same surface advertised twice. They are one "Draft it with AI" tile now,
+  // and the type-vs-talk fork moved onto that page as a must-answer modal
+  // (AiDraftFork). UX-04's actual invariant is unchanged: one create entry,
+  // Upload first, every on-ramp reachable.
+  test('method picker exists with all 3 options and Upload listed first', () => {
     const src = read(METHOD_PICKER)
     expect(src).toContain('/admin/sops/upload')
     expect(src).toContain('/admin/sops/new/ai')
-    expect(src).toContain('mode=voice')
     expect(src).toContain('/admin/sops/new/blank')
-    // Upload must appear BEFORE the other destinations in source order.
-    expect(src.indexOf('/admin/sops/upload')).toBeLessThan(src.indexOf('/admin/sops/new/ai'))
-    expect(src.indexOf('/admin/sops/upload')).toBeLessThan(src.indexOf('/admin/sops/new/blank'))
+    // The voice path is no longer a tile — it is reachable through the fork on
+    // /admin/sops/new/ai, which must still honour the ?mode= deep link.
+    // Targets the href list, not the whole file: the comment above METHODS
+    // explains the merge and names the old query string, which a bare
+    // substring check would read as a surviving tile.
+    expect(src).not.toMatch(/href:\s*'[^']*mode=voice/)
+    const fork = read(path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'new', 'ai', 'AiDraftFork.tsx'))
+    expect(fork).toContain("param === 'voice'")
+    expect(fork).toContain("param === 'type'")
+    // Upload must appear BEFORE the other destinations in TILE order. Scoped
+    // to the METHODS array: the explanatory comment above it names every
+    // route, so whole-file indexOf compares prose positions, not tiles.
+    const methods = src.slice(src.indexOf('const METHODS'), src.indexOf('export default'))
+    expect(methods.indexOf('/admin/sops/upload')).toBeGreaterThan(-1)
+    expect(methods.indexOf('/admin/sops/upload')).toBeLessThan(methods.indexOf('/admin/sops/new/ai'))
+    expect(methods.indexOf('/admin/sops/upload')).toBeLessThan(methods.indexOf('/admin/sops/new/blank'))
     // Admin guard present (T-30-05-01). Section nav lives in the app header
     // (sketch 004 — AdminNav deleted 2026-07-30).
     expect(src).toContain("['admin', 'safety_manager']")
