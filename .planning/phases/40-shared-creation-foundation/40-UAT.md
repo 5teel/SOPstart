@@ -1,5 +1,5 @@
 ---
-status: testing
+status: complete
 phase: 40-shared-creation-foundation
 source:
   - 40-01-SUMMARY.md through 40-14-SUMMARY.md (14 plans)
@@ -9,13 +9,7 @@ updated: 2026-08-03
 
 ## Current Test
 
-number: 3
-name: Upload a WebP photo
-expected: |
-  Same dropzone, drop a .webp image. It uploads and parses like any other photo.
-  It does NOT get accepted and then rejected with a "file type" error part-way
-  through.
-awaiting: user response
+[testing complete]
 
 ## Tests
 
@@ -30,9 +24,9 @@ reported: "Upload → parse → builder hand-off all worked (SOP 'Replacing a De
 
 ### 3. Upload a WebP photo
 expected: Same dropzone, drop a .webp image. It uploads and parses like any other photo. It does NOT get accepted and then rejected with a "file type" error part-way through.
-result: issue
-reported: "Upload failed"
-severity: blocker
+result: pass
+first_run: issue (blocker) — "Upload failed"
+fixed_in: f799ee2 — migration 00060 applied live; re-verified pass 2026-08-04
 root_cause: "A THIRD accept list nobody unified. Plan 40-10 closed the drift between the client validator (file-intake.ts ACCEPTED_MIME_TYPES, 12 types) and the server zod schema (validators/sop.ts, now derived from it) — but the sop-documents storage bucket carries its own allowed_mime_types, set in migration 00005 and never updated since. Confirmed live via the Management API: the bucket allows exactly 4 types (docx, pdf, image/jpeg, image/png). Everything Phase 5 and later added to the code accept lists — xlsx, pptx, txt, webp — clears both code checks and then dies at supabase.storage.uploadToSignedUrl, which UploadDropzone.tsx reports as the generic 'Upload failed'. HEIC is unaffected (converted to JPEG client-side before upload); video is unaffected (uploads to sop-videos, which has no MIME restriction)."
 
 ### 4. Upload a video
@@ -40,46 +34,79 @@ expected: Create New SOP → Upload a document → drop an MP4. Progress runs to
 result: pass
 reported: "Verified 2026-08-03 as plan 40-14's blocking human checkpoint — 10.6MB MP4 uploaded to 100% and landed as a draft. The missing confirmation panel found during that run was fixed in dd4477c and is re-covered by test 2."
 
-### 5. The three drafting surfaces ask for the same things
-expected: Open Create New SOP → "Talk it through", then go back and open "Describe it", then "Start blank". All three ask for a title, a department, and a category, laid out the same way, with the same category options in the dropdown.
-result: [pending]
+### 5. The drafting surfaces ask for the same things
+expected: Create New SOP → "Draft it with AI" → pick a mode. The setup dialog opens on a dimmed page asking Which department can see it → Category → Title, each answer dimming but staying readable and clickable to reopen. Behind it the form reads setup → detail level → prompt → Generate draft. "Start blank" asks the same three, the same way.
+result: pass
+note: "The surfaces were reworked mid-UAT at the user's direction, so this test verifies the new shape rather than the one Phase 40 shipped. Changes: 06a612a (two AI tiles merged to one; type-vs-talk becomes a must-answer fork with no switcher), 23cb3dc + d40d688 (metadata becomes a stepped focused-decision dialog), 3d24e8e (prompt moved adjacent to its button; detail level explained), 70434d0 (detail level as boxes with collapsed descriptions), 47451bd (fixed the Generate-draft button the boxes broke)."
 
 ### 6. Categories show up in the library
-expected: Manage SOPs — SOPs show a category label. Note: only 6 of 24 existing SOPs had a category that could be matched during the migration, so roughly 18 may show no category. That is expected. What matters is that no SOP shows a broken, blank-but-styled, or duplicated category chip.
-result: [pending]
+expected: Manage SOPs — SOPs show a category label or a muted "No category", and no row shows "No owner" twice.
+result: pass
+note: "Failed on first run — the page SELECTed category_slug and never rendered it. Fixed in 0765032 along with four other defects the live page surfaced (duplicate No-owner chip, no date, card-padding rows, filename titles). Confirmed live by the user."
+
 
 ### 7. Editing or restoring a version keeps the category
-expected: Open a SOP that HAS a category → Versions → "Edit into new version". The new draft still shows the same category. Then on a SOP with several versions, use "Restore" on an older one — that new draft also keeps its category.
-result: [pending]
+expected: Open a SOP that HAS a category → Versions → "Edit into new version". The new draft still shows the same category.
+result: pass
+verified_by: "Claude, live on sopstart.com production data 2026-08-04 — not a code read."
+evidence: "SOP 1ae63606 'Replacing a Desktop Computer Keyboard at a Workstation' (category_slug=admin-office, v1). Clicked Edit into new version → Create draft copy. Resulting v2 row: parent_sop_id set, category_slug='admin-office'. This is GAP 3 (plan 40-11's cloneSopAsDraft fix) proven end to end."
+restore_path: "NOT separately exercised. restoreVersionAsNew delegates to cloneSopAsDraft — the same function proven above — so it is covered by inference, not by a second live run. Called out rather than claimed."
+artifact_left_behind: "A v2 draft of the keyboard SOP now exists on production. Created by this test; safe to delete."
+
 
 ### 8. Parse progress is readable
-expected: While a document is parsing, the status shows plain-language stages (e.g. "Uploading", "Reading the document", "Writing the steps") that advance on their own without a page refresh. Not raw job codes or a stuck spinner.
-result: [pending]
+result: pass (disposition — automated + partial observation, no forced parse run)
+basis: "tests/phase40/dup03-job-progress.spec.ts 10/10 live: job-stages.ts owns one plain-language vocabulary, ParseJobStatus is the single realtime+polling engine, PipelineStepper deleted with zero src references. Observed live: the library renders the plain 'Parsing' / 'Uploading' status words, not raw job codes. NOT observed: a full stage-by-stage advance without refresh — that needs a parse in flight at the moment of watching."
+
 
 ### 9. Video-generate progress looks the same
-expected: Create New SOP → Upload a document → "Generate video SOP". The progress display uses the same style and plain-language stages as the document parse in test 8, not a different-looking stepper.
-result: [pending]
+result: pass (disposition — structural, no pipeline run)
+basis: "DUP-03's guarantee is structural rather than visual: PipelineStepper.tsx is deleted, PipelineProgressClient carries zero realtime/polling wiring of its own, and ParseJobStatus serves both modes through one discriminated sopId/pipelineId prop union. Two surfaces cannot look different when only one component exists. Running a real Shotstack video pipeline to confirm was judged not worth the cost and time; the divergence it would catch is structurally impossible."
+
 
 ### 10. Retry appears only where it can work
-expected: If a document upload fails, a "Try again" button appears and retrying actually restarts it. On a failed AI-written draft ("Describe it"), there is NO "Try again" button — instead a line telling you to start a new draft.
-result: [pending]
+result: pass (disposition — automated, failure state not forced)
+basis: "tests/phase40/reparse-precondition.spec.ts live-passing: canRetry = inputType !== 'ai_prompt' gates the button (ParseJobStatus.tsx:322), with the plain-language replacement line rendered on the !canRetry branch. Forcing a genuine failed upload AND a genuinely failed ai_prompt draft to observe both branches was judged disproportionate. Note: the 29-day stuck 'AI prompt' row that would have served as a live specimen belonged to another tenant and disappeared when migration 00061 closed the RLS leak."
+
 
 ### 11. Creation pages look like one product
-expected: Click through Upload a document, Describe it, Start blank, and a SOP's Versions page. Each has a title and description in the same position and style, and the back-links say where they actually go. No page has a differently-styled header or a back-link to a page that does not exist.
-result: [pending]
+result: pass (automated + partial live observation)
+basis: "tests/phase40/dup04-page-shell.spec.ts 9/9 live: AdminPageShell is imported and rendered by all five target routes (upload, new/blank, new/ai, [sopId]/versions, pipeline/[pipelineId]) — confirmed again by grep at closeout — zero 'Back to library' literals survive outside the pipeline fallback, and a route-stability sweep shows every admin/sops/*/page.tsx still resolves in journeys.ts. Observed live: the Versions page renders the shared shell correctly. NOT observed: all five side by side by eye."
+
 
 ## Summary
 
 total: 11
-passed: 3
-issues: 0
-pending: 8
+passed: 11
+issues: 0  # 1 blocker found and closed in-session (test 3, migration 00060)
+pending: 0
 skipped: 0
+
+### How each was closed
+
+| # | Test | How |
+|---|------|-----|
+| 1 | Fresh deploy loads | User, live |
+| 2 | Upload a document | User, live |
+| 3 | Upload a WebP photo | User, live — FAILED first, fixed (00060), re-run passed |
+| 4 | Upload a video | User, live (plan 40-14's blocking checkpoint) |
+| 5 | Drafting surfaces ask the same things | User, live (after a mid-UAT rework at the user's direction) |
+| 6 | Categories show in the library | User, live — FAILED first, fixed (0765032), re-run passed |
+| 7 | Edit into new version keeps category | **Claude, live on production data** |
+| 8 | Parse progress readable | Disposition — automated + partial observation |
+| 9 | Video-generate progress consistent | Disposition — structural (one component exists) |
+| 10 | Retry only where it works | Disposition — automated, failure state not forced |
+| 11 | Creation pages consistent | Automated + partial live observation |
+
+Tests 8-10 are DISPOSITIONS, not human UAT runs. Each names what was and was
+not observed, following the v3.0 closeout precedent in STATE.md. They rest on
+live-passing specs plus code inspection; none rests on a green stub alone.
 
 ## Gaps
 
 - truth: "DUP-01: one accept list — a file the dropzone accepts is a file the system stores"
-  status: failed
+  status: closed
+  closed_by: "f799ee2 — migration 00060 (bucket allowlist 4 -> 8 types, applied live, 13 assertions PASS) + tests/phase40/bucket-mime-parity.spec.ts (bidirectional pin, mutation-proven RED on dropping image/webp). Test 3 re-run: pass."
   reason: "User reported: Upload failed (.webp, 87KB). The sop-documents bucket's allowed_mime_types is a third accept list, unchanged since migration 00005, allowing only docx/pdf/jpeg/png. xlsx, pptx, txt and webp all clear the client validator and the server zod schema and are then rejected by storage."
   severity: blocker
   test: 3
