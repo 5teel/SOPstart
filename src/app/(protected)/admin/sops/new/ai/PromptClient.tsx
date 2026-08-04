@@ -62,14 +62,16 @@ export function PromptClient({ departments }: Props) {
     handleSubmit,
     formState: { errors },
     watch,
+    setValue,
   } = useForm<AiPromptFormInput, undefined, AiPromptInput>({
     resolver: zodResolver(aiPromptSchema),
     defaultValues: { promptText: '', detailLevel: 3 },
   })
 
-  // Coerced on read as well as on write: a radio hands back a STRING, and a
-  // string here silently breaks two things at once — the selected-box highlight
-  // (=== against a number is never true) and zod's z.number() on submit.
+  // Held as a real number via setValue, never routed through a radio's string
+  // value. `register` + a radio hands zod a string (valueAsNumber only applies
+  // to type="number"), which fails `z.number()` and makes handleSubmit bail
+  // before onSubmit — a Generate-draft button that does nothing at all.
   const detailLevel = Number(watch('detailLevel') ?? 3)
 
   const onSubmit: SubmitHandler<AiPromptInput> = async (values) => {
@@ -119,7 +121,20 @@ export function PromptClient({ departments }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+    <form
+      onSubmit={handleSubmit(onSubmit, (formErrors) => {
+        // Without this, ANY field failing validation makes Generate draft look
+        // simply dead: handleSubmit swallows the submit, and a field with no
+        // error UI of its own (detailLevel) leaves nothing on screen at all.
+        // Never let a blocked submit be silent.
+        const first = Object.values(formErrors)[0]
+        setServerError(
+          (first?.message as string | undefined) ??
+            'Something on this form is not valid yet — check the fields above.'
+        )
+      })}
+      className="space-y-5"
+    >
       {/* Setup first — who it's for, what it's called, how deep to go. Then the
           prompt, sitting directly above the button that acts on it. */}
 
@@ -127,19 +142,24 @@ export function PromptClient({ departments }: Props) {
           Title is not offered by RHF here — meta.title flows straight into the POST body. */}
       <SopMetadataFields value={meta} onChange={setMeta} departments={departments} idPrefix="ai-prompt" />
 
-      {/* Real radios, not buttons: a radiogroup gives arrow-key selection and
-          screen-reader semantics for free. The descriptions sit behind a native
-          <details> — no JS, keyboard-operable, collapsed until asked for. */}
+      {/* Buttons calling setValue with a real number — NOT registered radios.
+          A radio's value is a string, and RHF has no working number coercion
+          for one, so the form held "2" where zod wanted 2. ARIA radio roles
+          give the group its semantics without the string round-trip. */}
       <fieldset>
         <legend className="block text-sm font-medium text-[var(--ink-700)] mb-1">
           How much detail should the draft have?
         </legend>
-        <div className="grid grid-cols-5 gap-1.5">
+        <div role="radiogroup" aria-label="Detail level" className="grid grid-cols-5 gap-1.5">
           {LEVELS.map((level) => {
             const selected = detailLevel === level
             return (
-              <label
+              <button
                 key={level}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                onClick={() => setValue('detailLevel', level, { shouldValidate: true })}
                 data-testid={`detail-level-${level}`}
                 data-selected={selected ? 'true' : undefined}
                 className={`cursor-pointer rounded border px-2 py-2 text-center transition-colors ${
@@ -148,16 +168,6 @@ export function PromptClient({ departments }: Props) {
                     : 'border-[var(--ink-100)] hover:border-[var(--ink-300)]'
                 }`}
               >
-                <input
-                  type="radio"
-                  value={level}
-                  checked={selected}
-                  // setValueAs, NOT valueAsNumber — the latter only applies to
-                  // <input type="number">, so a radio would store "2" and fail
-                  // aiPromptSchema's z.number() on submit.
-                  {...register('detailLevel', { setValueAs: (v) => Number(v) })}
-                  className="sr-only"
-                />
                 <span className="mono block text-[10px] text-[var(--ink-500)]">{level}</span>
                 <span
                   className={`block text-[11px] leading-tight ${
@@ -166,7 +176,7 @@ export function PromptClient({ departments }: Props) {
                 >
                   {DETAIL_LEVELS[level].name}
                 </span>
-              </label>
+              </button>
             )
           })}
         </div>
