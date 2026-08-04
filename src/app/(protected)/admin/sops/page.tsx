@@ -21,11 +21,26 @@ export const metadata: Metadata = {
 // Sketch 004 variant A — ONE rail: All · Drafts · Published · Needs attention
 // · Access, with the rare filters (Parse issues · Owned by me) folded behind
 // a native <details> menu. The rail is the page's only control tier.
+// The tab counts must add up to All. They did not: a SOP mid-pipeline is
+// neither a draft nor published, so `uploading`/`parsing` rows were reachable
+// only through the FILTER dropdown and All read 30 while Drafts + Published
+// read 28. Two rows were effectively invisible — including one that had been
+// stuck in `parsing` for 29 days. `still_working` is rendered only when the
+// count is non-zero, so a healthy org sees three tabs as before.
 const STATUS_TABS: { label: string; value: string }[] = [
   { label: 'All', value: 'all' },
   { label: 'Drafts', value: 'draft' },
   { label: 'Published', value: 'published' },
+  { label: 'Still working', value: 'failed' },
 ]
+
+/**
+ * A SOP that has been `uploading` or `parsing` for longer than this is not
+ * working, it is wedged — the pipeline's own worst case is ~2 minutes for
+ * video. Surfacing it as a flag is what makes the zombie rows actionable
+ * rather than merely present.
+ */
+const STUCK_AFTER_MS = 60 * 60 * 1000
 
 // UX-06 one-line rows: ONE flag chip per row, worst-first. Styling mirrors
 // GovernanceQueueRow's FLAG_STYLE/FLAG_LABEL (that file is 'use client', so
@@ -211,6 +226,8 @@ export default async function SopsLibraryPage({
     newSopResult,
     memberDeptsResult,
     statusCountsResult,
+    sopDeptsResult,
+    deptNamesResult,
   ] = await Promise.all([
     isAccessView ? Promise.resolve({ data: null }) : query,
     listGovernanceQueue(),
@@ -236,9 +253,29 @@ export default async function SopsLibraryPage({
     // Rail counts (sketch 004): one cheap org-scoped status read, independent
     // of whatever filter the main query applies.
     supabase.from('sops').select('id, status'),
+    // Department per row. 14 of 30 SOPs carry a department and NONE of it was
+    // visible here — "who is this for" is the first question an admin asks of
+    // a library, and the answer was only reachable by opening each SOP. Two
+    // small org-scoped reads (RLS-scoped, no filter needed), run alongside
+    // everything else rather than as a waterfall ([2026-07-13]).
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('sop_departments').select('sop_id, department_id'),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('departments').select('id, name'),
   ])
   const govRows: GovernanceRow[] = 'success' in govResult && govResult.success ? govResult.rows : []
   const flaggedRows = govRows.filter((r) => r.flags.length > 0)
+
+  // Department names per SOP, for the row chip.
+  const deptNameById: Record<string, string> = {}
+  for (const d of ((deptNamesResult?.data ?? []) as Array<{ id: string; name: string }>)) {
+    deptNameById[d.id] = d.name
+  }
+  const deptsBySop: Record<string, string[]> = {}
+  for (const r of ((sopDeptsResult?.data ?? []) as Array<{ sop_id: string; department_id: string }>)) {
+    const name = deptNameById[r.department_id]
+    if (name) (deptsBySop[r.sop_id] ??= []).push(name)
+  }
 
   const allStatuses = ((statusCountsResult?.data ?? []) as Array<{ status: string }>).map((r) => r.status)
   const railCounts = {
@@ -315,6 +352,8 @@ export default async function SopsLibraryPage({
         <div className="flex gap-1 border-b border-[var(--ink-100)] mb-6 overflow-x-auto items-center">
           {STATUS_TABS.map(tab => {
             const isActive = !isAttentionView && !isAccessView && !ownerOnly && activeStatus === tab.value
+            // Only surface "Still working" when something actually is.
+            if (tab.value === 'failed' && railCounts.failed === 0) return null
             return (
               <Link
                 key={tab.value}
@@ -476,6 +515,17 @@ export default async function SopsLibraryPage({
               const showOwner = owner && flag !== 'unowned'
               const category = categoryLabel(sop.category_slug ?? null)
               const untitled = !sop.title
+              const depts = deptsBySop[sop.id] ?? []
+              const audience = sop.all_departments
+                ? 'Everyone'
+                : depts.length === 0
+                  ? null
+                  : depts.length === 1
+                    ? depts[0]
+                    : `${depts[0]} +${depts.length - 1}`
+              const inFlight = sop.status === 'uploading' || sop.status === 'parsing'
+              const stuck =
+                inFlight && Date.now() - new Date(sop.created_at).getTime() > STUCK_AFTER_MS
               return (
                 <li key={sop.id}>
                   <Link
@@ -503,6 +553,25 @@ export default async function SopsLibraryPage({
                       </span>
                     )}
 
+                    {/* Who it's for. Only shown when set — an empty chip is
+                        worse than none, and 16 of 30 have no department. */}
+                    {audience && (
+                      <span
+                        className="mono hidden w-32 flex-shrink-0 truncate rounded bg-[var(--paper-2)] px-1.5 py-0.5 text-[11px] text-[var(--ink-500)] md:inline-block"
+                        title={sop.all_departments ? 'Everyone in the organisation' : depts.join(', ')}
+                      >
+                        {audience}
+                      </span>
+                    )}
+
+                    {stuck && (
+                      <span
+                        className="mono flex-shrink-0 rounded bg-red-500/20 px-1.5 py-0.5 text-[11px] text-red-600"
+                        title={`Stuck in "${sop.status}" since ${new Date(sop.created_at).toLocaleString()} — the pipeline never finished. Open it to retry or delete it.`}
+                      >
+                        Stuck
+                      </span>
+                    )}
                     {flag && (
                       <span className={`mono text-[11px] px-1.5 py-0.5 rounded flex-shrink-0 ${FLAG_STYLE[flag]}`}>
                         {FLAG_LABEL[flag]}
