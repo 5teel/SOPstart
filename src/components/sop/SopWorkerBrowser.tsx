@@ -211,7 +211,9 @@ export function SopWorkerBrowser({
 
               <div className="flex flex-col gap-1.5">
                 <Link
-                  href={`/sops/${selected.id}/walkthrough`}
+                  // Phase 30 deleted the /walkthrough route — Walk it is a tab
+                  // on the detail page now (tests/phase30/dead-weight.spec.ts).
+                  href={`/sops/${selected.id}?tab=walk`}
                   className="block min-h-11 rounded-lg bg-[var(--ink-900)] px-3 py-2.5 text-center text-sm font-semibold text-white"
                 >
                   Start walkthrough

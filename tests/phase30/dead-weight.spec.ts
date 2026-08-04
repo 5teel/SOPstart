@@ -70,7 +70,11 @@ test.describe('UX-08 — dead-weight sweep', () => {
     expect(src).not.toMatch(/\/\/ TODO.*useAssignedSops/)
     // The fix is WIRED: junction fetch feeds the filter predicate.
     expect(src).toContain("from('sop_departments')")
-    expect(src).toContain('sopDeptMap[sop.id]')
+    // Repointed 2026-08-04: the predicate moved into deptMatches(sopId) when
+    // the library tab merged into the Miller scopes. Assert the junction feeds
+    // it AND that the list actually applies it (wiring, not token presence).
+    expect(src).toMatch(/sopDeptMap\[sop(\.id|Id)\]/)
+    expect(src).toContain('deptMatches(s.id)')
     // UX-04: no worker-side Create SOP tab either.
     expect(src).not.toContain('Create SOP')
   })
@@ -120,5 +124,27 @@ test.describe('UX-08 — dead-weight sweep', () => {
       path.join(ROOT, 'src', 'lib', 'journeys', 'journeys.ts'), 'utf-8',
     )
     expect(journeys).not.toContain("'/sops/[sopId]/walkthrough'")
+  })
+
+  /**
+   * The route deletion above only proves the directory is gone — a link TO it
+   * still builds green and 404s at runtime (CLAUDE.md 2026-06-08: internal
+   * hrefs are not type-checked). SopWorkerBrowser resurrected exactly that
+   * href in the 2026-08 Miller-columns work and shipped it. Sweep src/.
+   */
+  test('no src file links to the deleted /walkthrough route', () => {
+    const offenders: string[] = []
+    const walk = (dir: string) => {
+      for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+        const p = path.join(dir, e.name)
+        if (e.isDirectory()) walk(p)
+        // Anchor on /sops/ so `@/stores/walkthrough` imports aren't offenders.
+        else if (/\.tsx?$/.test(e.name) && /\/sops\/[^'"`\n]*\/walkthrough/.test(fs.readFileSync(p, 'utf-8'))) {
+          offenders.push(path.relative(ROOT, p))
+        }
+      }
+    }
+    walk(path.join(ROOT, 'src'))
+    expect(offenders).toEqual([])
   })
 })
