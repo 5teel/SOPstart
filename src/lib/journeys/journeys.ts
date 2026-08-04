@@ -310,7 +310,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin uploads an existing Word/PDF/Excel/PowerPoint/photo and AI turns it into a structured, mobile-friendly procedure.',
     steps: [
       { id: 's', type: 'start', label: 'Has an existing SOP doc' },
-      { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: 'Header "Create New SOP" link (admin roles) lands here directly; also the "New SOP" button on /admin/sops. 4 tiles, Upload first: Upload a document · Talk it through · Describe it · Start blank.' },
+      { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: 'Header "Create New SOP" link (admin roles) lands here directly. 3 tiles, Upload first: Upload a document · Draft it with AI · Start blank. The type-vs-talk choice moved off this screen onto /admin/sops/new/ai.' },
       { id: 'up', type: 'screen', label: 'Upload', route: '/admin/sops/upload', detail: 'Drag in .docx/.pdf/.xlsx/.pptx/photo.' },
       { id: 'parse', type: 'action', label: 'AI parses the document', detail: 'Async pipeline (30–120s); extracts sections, steps, hazards.' },
       { id: 'status', type: 'decision', label: 'Parse result?', branches: [
@@ -345,8 +345,8 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin describes the procedure in plain words and AI drafts a first version.',
     steps: [
       { id: 's', type: 'start', label: 'No document — just knowledge' },
-      { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: '"Describe it" tile.' },
-      { id: 'ai', type: 'screen', label: 'AI draft', route: '/admin/sops/new/ai' },
+      { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: '"Draft it with AI" tile.' },
+      { id: 'ai', type: 'screen', label: 'AI draft', route: '/admin/sops/new/ai', detail: 'AiDraftFork opens a must-answer modal — Type a brief vs Talk it through. Choosing "Type a brief" lands here. No switcher afterwards: switching remounted the other client and discarded the draft.' },
       { id: 'prompt', type: 'action', label: 'Describe the procedure', detail: 'AI generates structured sections + steps.' },
       { id: 'builder', type: 'screen', label: 'Builder', route: '/admin/sops/builder/[sopId]' },
       { id: 'e', type: 'end', label: 'Draft ready' },
@@ -375,8 +375,12 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin describes the procedure out loud; an AI interviewer asks follow-up questions, builds a brief, then drafts through the same AI pipeline.',
     steps: [
       { id: 's', type: 'start', label: 'Easier to say than type' },
-      { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: '"Talk it through" tile deep-links ?mode=voice (honoured by AiDraftTabs).' },
-      { id: 'voice', type: 'screen', label: 'Voice draft conversation (Talk it through tab)', route: '/admin/sops/new/ai', detail: 'Mic → live transcription → AI follow-up questions (spoken + text). Brief accumulates as you talk.' },
+      { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: '"Draft it with AI" tile — the voice path no longer has its own tile.' },
+      { id: 'fork', type: 'decision', label: 'Type a brief or talk it through?', detail: 'AiDraftFork\'s must-answer modal on /admin/sops/new/ai. ?mode=voice / ?mode=type skip it for deep links. The answer is written back to the URL with replaceState so a refresh does not re-ask.', branches: [
+        { label: 'Talk it through', to: 'voice' },
+        { label: 'Type a brief', to: 'voice' },
+      ] },
+      { id: 'voice', type: 'screen', label: 'Voice draft conversation', route: '/admin/sops/new/ai', detail: 'Mic → live transcription → AI follow-up questions (spoken + text). Brief accumulates as you talk. No tab back to the typed surface — that discarded the conversation.' },
       { id: 'gen', type: 'action', label: 'Generate draft', detail: 'The accumulated brief feeds the same /api/sops/ai-prompt pipeline as the typed workflow.' },
       { id: 'builder', type: 'screen', label: 'Builder', route: '/admin/sops/builder/[sopId]' },
       { id: 'e', type: 'end', label: 'Draft ready' },

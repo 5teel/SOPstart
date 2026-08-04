@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { listDepartments } from '@/actions/departments'
 import { AdminPageShell } from '@/components/admin/AdminPageShell'
-import { AiDraftTabs } from './AiDraftTabs'
+import { AiDraftFork } from './AiDraftFork'
 
 export const metadata: Metadata = {
   title: 'Draft a SOP with AI — SOPstart',
@@ -31,7 +31,7 @@ export default async function NewAiSopPage() {
       title="Draft a SOP with AI"
       description="Type a brief or talk it through — either way you review the draft in the builder before publish."
     >
-      <AiDraftTabs departments={departments} />
+      <AiDraftFork departments={departments} />
     </AdminPageShell>
   )
 }

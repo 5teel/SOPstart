@@ -5,16 +5,23 @@ import { getSessionContext } from '@/lib/auth/session-context'
 
 export const metadata: Metadata = {
   title: 'New SOP — SOPstart',
-  description: 'Pick how to create your SOP: upload a document, talk it through, describe it, or start blank.',
+  description: 'Pick how to create your SOP: upload a document, draft it with AI, or start blank.',
 }
 
 /**
  * Phase 30 (UX-04) — the ONE create entry point.
  *
- * Method picker: 4 tiles, Upload FIRST (Visy interview — most orgs already
+ * Method picker: 3 tiles, Upload FIRST (Visy interview — most orgs already
  * have SOP documents; create-from-scratch is not the headline). The 3 intake
  * routes below remain the real destinations; every other create button in the
  * app collapses into this screen.
+ *
+ * "Talk it through" and "Describe it" used to be two tiles pointing at the same
+ * route (one with ?mode=voice). They are one tile now: the type-vs-talk fork is
+ * a decision about HOW to drive the same AI drafting surface, so it belongs on
+ * that surface, not here. /admin/sops/new/ai asks it once, up front, and does
+ * not offer a switcher afterwards — switching remounted the other client and
+ * discarded whatever had been drafted.
  */
 
 const METHODS: { eyebrow: string; title: string; description: string; href: string }[] = [
@@ -25,19 +32,13 @@ const METHODS: { eyebrow: string; title: string; description: string; href: stri
     href: '/admin/sops/upload',
   },
   {
-    eyebrow: '02 · Voice',
-    title: 'Talk it through',
-    description: 'Describe the procedure out loud — an AI interviewer asks follow-up questions and drafts it for you.',
-    href: '/admin/sops/new/ai?mode=voice',
-  },
-  {
-    eyebrow: '03 · AI draft',
-    title: 'Describe it',
-    description: 'Type a short brief and AI drafts a first version for you to review in the builder.',
+    eyebrow: '02 · AI draft',
+    title: 'Draft it with AI',
+    description: 'Type a short brief, or talk it through with an AI interviewer that asks follow-up questions. Either way you get a first version to review in the builder.',
     href: '/admin/sops/new/ai',
   },
   {
-    eyebrow: '04 · Manual',
+    eyebrow: '03 · Manual',
     title: 'Start blank',
     description: 'Build the procedure by hand with the guided wizard.',
     href: '/admin/sops/new/blank',
@@ -64,7 +65,7 @@ export default async function NewSopMethodPickerPage() {
       </div>
 
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {METHODS.map((m) => (
           <Link
             key={m.href}
