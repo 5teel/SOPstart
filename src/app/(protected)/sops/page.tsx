@@ -17,13 +17,30 @@ import {
 import { useAssignedSops } from '@/hooks/useAssignedSops'
 import { useSopSync } from '@/hooks/useSopSync'
 import { db } from '@/lib/offline/db'
-import { SopLibraryCard } from '@/components/sop/SopLibraryCard'
 import { SopSearchInput } from '@/components/sop/SopSearchInput'
 import { DepartmentBottomSheet, DepartmentSidebar } from '@/components/sop/CategoryBottomSheet'
 import { createClient } from '@/lib/supabase/client'
 import { selfAddSop, selfRemoveSop, requestRemoveAssignment, getUserSopAssignments } from '@/actions/assignments'
 import { refresherDueDate, isRefresherDue as computeRefresherDue, isRefresherOverdue as computeRefresherOverdue } from '@/lib/competency/refresher'
 import { categoryLabel } from '@/lib/sop-categories'
+import dynamic from 'next/dynamic'
+import type { WorkerSop } from '@/components/sop/SopWorkerBrowser'
+
+/**
+ * SB-LINE-06: /sops/[sopId]'s chunk set transitively includes /sops/page's own
+ * route chunk, so ANY weight added to this page counts against the worker
+ * detail route's bundle gate — measured, not assumed (the gate's chunk list
+ * names `app/(protected)/sops/page-*.js` at 28.7 KB). A static import of the
+ * browser put it in that chunk and blew the ±2 KB tolerance by 4 KB.
+ *
+ * next/dynamic gives it its own chunk instead, which is the same treatment
+ * DesktopWalkthrough and WalkthroughVoiceModal already get — and which the
+ * gate's own isolation check exists to verify.
+ */
+const SopWorkerBrowser = dynamic(
+  () => import('@/components/sop/SopWorkerBrowser').then((m) => m.SopWorkerBrowser),
+  { ssr: false }
+)
 import type { Department } from '@/types/sop'
 
 function getRelativeTime(isoString: string): string {
@@ -39,6 +56,28 @@ function getRelativeTime(isoString: string): string {
 
 type Section = 'your-sops' | 'library'
 
+/**
+ * Sketch 005 variant C on the worker side. The admin scopes are about the
+ * library's health (drafts, stuck, published); a worker's are about their own
+ * training clock — what is overdue, what changed under them, what they have
+ * never done. Same layout language, different questions.
+ */
+export type WorkerScope = 'all' | 'refresher' | 'updated' | 'not-done'
+
+const WORKER_SCOPES: { key: WorkerScope; label: string }[] = [
+  { key: 'all', label: 'All yours' },
+  { key: 'refresher', label: 'Refresher due' },
+  { key: 'updated', label: 'Updated' },
+  { key: 'not-done', label: 'Never done' },
+]
+
+const SCOPE_LABEL: Record<WorkerScope, string> = {
+  all: 'All yours',
+  refresher: 'Refresher due',
+  updated: 'Updated since you read them',
+  'not-done': 'Never done',
+}
+
 export default function SopsPage() {
   const [activeSection, setActiveSection] = useState<Section>('your-sops')
   const [searchOpen, setSearchOpen] = useState(false)
@@ -49,6 +88,7 @@ export default function SopsPage() {
   const [selectedDeptIds, setSelectedDeptIds] = useState<string[]>([])
   const [allDepartments, setAllDepartments] = useState(false)
   const [deptSheetOpen, setDeptSheetOpen] = useState(false)
+  const [workerScope, setWorkerScope] = useState<WorkerScope>('all')
 
   const { syncing } = useSopSync()
 
@@ -166,14 +206,36 @@ export default function SopsPage() {
       {/* Desktop layout: sidebar + content, on the shared 5xl rail */}
       <div className="flex flex-1 max-w-5xl mx-auto w-full">
         {activeSection === 'your-sops' && (
-          <div className="hidden lg:block">
+          <nav aria-label="Scope" data-testid="worker-miller-scope" className="hidden w-[150px] flex-shrink-0 px-2 py-6 lg:block">
+            <p className="mono mb-1.5 text-[10px] uppercase tracking-wider text-[var(--ink-400)]">Your SOPs</p>
+            <ul className="mb-4">
+              {WORKER_SCOPES.map((sc) => (
+                <li key={sc.key}>
+                  <button
+                    type="button"
+                    onClick={() => setWorkerScope(sc.key)}
+                    data-active={workerScope === sc.key ? 'true' : undefined}
+                    className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-[13px] ${
+                      workerScope === sc.key
+                        ? 'bg-[var(--ink-900)] font-semibold text-white'
+                        : 'text-[var(--ink-700)] hover:bg-[var(--paper-2)]'
+                    }`}
+                  >
+                    <span className="min-w-0 flex-1 truncate">{sc.label}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+            {/* The department filter keeps its own component — it already owns
+                the selection model and the mobile bottom-sheet twin. */}
+            <p className="mono mb-1.5 text-[10px] uppercase tracking-wider text-[var(--ink-400)]">By department</p>
             <DepartmentSidebar
               departments={departments}
               selectedIds={selectedDeptIds}
               allDepartments={allDepartments}
               onSelect={handleDeptSelect}
             />
-          </div>
+          </nav>
         )}
 
         <div className="flex-1 px-4 py-6 min-w-0">
@@ -184,6 +246,9 @@ export default function SopsPage() {
               lastSyncLabel={lastSyncLabel}
               activeDeptLabel={activeDeptLabel}
               onOpenDeptSheet={() => setDeptSheetOpen(true)}
+              scope={workerScope}
+              onScopeChange={setWorkerScope}
+              scopeLabel={SCOPE_LABEL[workerScope]}
             />
           )}
           {activeSection === 'library' && <LibrarySection />}
@@ -223,9 +288,13 @@ interface YourSopsSectionProps {
   lastSyncLabel: string
   activeDeptLabel: string
   onOpenDeptSheet: () => void
+  /** Sketch 005 variant C — which worker scope the left column has selected. */
+  scope: WorkerScope
+  onScopeChange: (s: WorkerScope) => void
+  scopeLabel: string
 }
 
-function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeDeptLabel, onOpenDeptSheet }: YourSopsSectionProps) {
+function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeDeptLabel, onOpenDeptSheet, scope, onScopeChange, scopeLabel }: YourSopsSectionProps) {
   const queryClient = useQueryClient()
   const [pending, startTransition] = useTransition()
   const [requestedIds, setRequestedIds] = useState<Set<string>>(new Set())
@@ -351,20 +420,70 @@ function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeDeptLabel,
     })
   }
 
+  // Sketch 005 variant C: a worker row carries ONE signal and the training
+  // clock moves to the detail pane. Everything is derived here — the browser
+  // renders what it is handed and owns no data logic.
+  const workerSops: WorkerSop[] = sops.map((sop) => {
+    const refresher = refresherState(sop)
+    const info = getAssignmentInfo(sop.id)
+    return {
+      id: sop.id,
+      title: sop.title ?? 'Untitled SOP',
+      categoryLabel: categoryLabel((sop as { category_slug?: string | null }).category_slug ?? null),
+      lastCompletedAt: lastCompletionByRoot[rootOf(sop.id)] ?? null,
+      isRefresherDue: refresher.isRefresherDue,
+      isRefresherOverdue: refresher.isRefresherOverdue,
+      hasNewerVersion: hasNewerVersion(sop),
+      isSelfAssigned: info?.isSelfAssigned ?? false,
+      removalRequested: requestedIds.has(sop.id),
+      raw: sop,
+    }
+  })
+
+  const scoped = workerSops.filter((s) => {
+    if (scope === 'refresher') return s.isRefresherDue || s.isRefresherOverdue
+    if (scope === 'updated') return s.hasNewerVersion
+    if (scope === 'not-done') return s.lastCompletedAt === null
+    return true
+  })
+
+  const counts: Record<WorkerScope, number> = {
+    all: workerSops.length,
+    refresher: workerSops.filter((s) => s.isRefresherDue || s.isRefresherOverdue).length,
+    updated: workerSops.filter((s) => s.hasNewerVersion).length,
+    'not-done': workerSops.filter((s) => s.lastCompletedAt === null).length,
+  }
+
   return (
     <>
       <h1 className="text-2xl font-bold text-[var(--ink-900)] mb-1">Your SOPs</h1>
       <p className="text-sm text-[var(--ink-500)] mb-4">
-        {isLoading ? 'Loading...' : `${sops.length} procedure${sops.length !== 1 ? 's' : ''}`}
+        {isLoading ? 'Loading...' : `${workerSops.length} procedure${workerSops.length !== 1 ? 's' : ''}`}
         {' · '}{lastSyncLabel}
       </p>
 
-      {/* Department filter pill — mobile */}
-      <div className="lg:hidden mb-4">
+      {/* Scope strip — below lg the left column has nowhere to go, so the
+          same scopes ride here rather than disappearing. */}
+      <div className="lg:hidden mb-4 flex gap-2 overflow-x-auto pb-1">
+        {WORKER_SCOPES.map((sc) => (
+          <button
+            key={sc.key}
+            type="button"
+            onClick={() => onScopeChange(sc.key)}
+            className={`flex-shrink-0 min-h-11 rounded-xl border px-3 text-sm font-medium ${
+              scope === sc.key
+                ? 'border-[var(--ink-900)] bg-[var(--ink-900)] text-white'
+                : 'border-[var(--ink-100)] bg-white text-[var(--ink-700)]'
+            }`}
+          >
+            {sc.label}
+            <span className="mono ml-1 text-[11px] opacity-70">{counts[sc.key]}</span>
+          </button>
+        ))}
         <button
           type="button"
           onClick={onOpenDeptSheet}
-          className="inline-flex items-center gap-2 px-4 h-[44px] bg-white border border-[var(--ink-100)] rounded-xl text-sm font-medium text-[var(--ink-900)] hover:bg-[var(--paper-2)] transition-colors"
+          className="flex-shrink-0 inline-flex items-center gap-2 px-4 min-h-11 bg-white border border-[var(--ink-100)] rounded-xl text-sm font-medium text-[var(--ink-900)]"
         >
           <span>{activeDeptLabel}</span>
           <ChevronDown size={16} className="text-[var(--ink-500)]" />
@@ -377,7 +496,7 @@ function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeDeptLabel,
             <div key={i} className="h-[88px] bg-[var(--paper-2)] rounded-xl animate-pulse" />
           ))}
         </div>
-      ) : sops.length === 0 ? (
+      ) : workerSops.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-4 py-24 px-8 text-center">
           <ClipboardList size={48} className="text-[var(--ink-300)]" />
           <div>
@@ -388,44 +507,12 @@ function YourSopsSection({ sops = [], isLoading, lastSyncLabel, activeDeptLabel,
           </div>
         </div>
       ) : (
-        <div className="flex flex-col gap-3">
-          {sops.map((sop) => {
-            const info = getAssignmentInfo(sop.id)
-            const isSelf = info?.isSelfAssigned ?? false
-            const alreadyRequested = requestedIds.has(sop.id)
-            const refresher = refresherState(sop)
-            return (
-              <div key={sop.id} className="flex items-stretch gap-2">
-                <div className="flex-1 min-w-0">
-                  <SopLibraryCard
-                    sop={sop}
-                    isCached={true}
-                    hasNewerVersion={hasNewerVersion(sop)}
-                    isRefresherDue={refresher.isRefresherDue}
-                    isRefresherOverdue={refresher.isRefresherOverdue}
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleRemove(sop.id)}
-                  disabled={pending || alreadyRequested}
-                  title={isSelf ? 'Remove from Your SOPs' : alreadyRequested ? 'Request sent' : 'Request removal'}
-                  aria-label={isSelf ? 'Remove from Your SOPs' : 'Request removal from manager'}
-                  className={[
-                    'flex items-center justify-center w-10 rounded-xl transition-colors flex-shrink-0 border',
-                    alreadyRequested
-                      ? 'bg-[var(--paper-2)] border-[var(--ink-100)] text-[var(--ink-300)] cursor-default'
-                      : isSelf
-                        ? 'bg-white border-[var(--ink-100)] hover:bg-red-50 hover:border-red-300 text-[var(--ink-500)] hover:text-red-500'
-                        : 'bg-white border-[var(--ink-100)] hover:bg-orange-50 hover:border-orange-300 text-[var(--ink-500)] hover:text-orange-500',
-                  ].join(' ')}
-                >
-                  {pending ? <Loader2 size={16} className="animate-spin" /> : <Minus size={16} />}
-                </button>
-              </div>
-            )
-          })}
-        </div>
+        <SopWorkerBrowser
+          sops={scoped}
+          scopeLabel={scopeLabel}
+          onRemove={handleRemove}
+          removePending={pending}
+        />
       )}
     </>
   )
