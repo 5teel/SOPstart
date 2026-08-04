@@ -67,7 +67,10 @@ export function PromptClient({ departments }: Props) {
     defaultValues: { promptText: '', detailLevel: 3 },
   })
 
-  const detailLevel = watch('detailLevel') ?? 3
+  // Coerced on read as well as on write: a radio hands back a STRING, and a
+  // string here silently breaks two things at once — the selected-box highlight
+  // (=== against a number is never true) and zod's z.number() on submit.
+  const detailLevel = Number(watch('detailLevel') ?? 3)
 
   const onSubmit: SubmitHandler<AiPromptInput> = async (values) => {
     setSubmitting(true)
@@ -148,7 +151,11 @@ export function PromptClient({ departments }: Props) {
                 <input
                   type="radio"
                   value={level}
-                  {...register('detailLevel', { valueAsNumber: true })}
+                  checked={selected}
+                  // setValueAs, NOT valueAsNumber — the latter only applies to
+                  // <input type="number">, so a radio would store "2" and fail
+                  // aiPromptSchema's z.number() on submit.
+                  {...register('detailLevel', { setValueAs: (v) => Number(v) })}
                   className="sr-only"
                 />
                 <span className="mono block text-[10px] text-[var(--ink-500)]">{level}</span>
