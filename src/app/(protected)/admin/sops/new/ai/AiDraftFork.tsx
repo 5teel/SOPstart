@@ -137,11 +137,10 @@ export function AiDraftFork({ departments }: { departments: Department[] }) {
   }
 
   return mode === 'type' ? (
+    // The "describe the procedure…" line lives on the prompt field itself in
+    // PromptClient, not up here — it describes that one input, and the setup
+    // fields now sit above it.
     <div className="blueprint-frame">
-      <p className="mb-5 text-sm text-[var(--ink-500)]">
-        Describe the procedure in a sentence or two — AI drafts structured sections, steps,
-        hazards and PPE for you to review in the builder.
-      </p>
       <PromptClient departments={departments} />
     </div>
   ) : (

@@ -16,6 +16,24 @@ import type { SopMetadataValue } from '@/components/admin/SopMetadataFields'
 // SubmitHandler<AiPromptInput> aligns with onSubmit(values: AiPromptInput).
 type AiPromptFormInput = z.input<typeof aiPromptSchema>
 
+/**
+ * Plain-language summary of each detail level. The authoritative versions are
+ * the DETAIL_LEVEL_HINTS prompt blocks in src/lib/parsers/sop-parser.ts — these
+ * are the one-line UI paraphrases of them. They are duplicated deliberately:
+ * sop-parser.ts is a server module and importing it here would drag the parser
+ * into the client bundle. If a hint changes materially, change its line here.
+ *
+ * A bare 1-5 slider asked the admin to guess what "2" meant while the system
+ * held a precise description of it — this is that description, surfaced.
+ */
+const DETAIL_LEVELS: Record<number, { name: string; blurb: string }> = {
+  1: { name: 'Minimal', blurb: 'A short checklist. One line per step, and only genuinely dangerous hazards.' },
+  2: { name: 'Brief', blurb: 'Concise. Key hazards and PPE, one or two sentences per step, minor tips skipped.' },
+  3: { name: 'Standard', blurb: 'All hazards, PPE and steps with clear descriptions, plus the tools needed.' },
+  4: { name: 'Detailed', blurb: 'Explains why each step matters. Tips, time estimates, full hazard mitigations, quality checks.' },
+  5: { name: 'Maximum', blurb: 'Sub-steps, hazard severity ratings, emergency procedures, regulatory references, sign-off requirements.' },
+}
+
 type Props = {
   /** Phase 25: departments for the department multi-select field (localOnly create mode). */
   departments: Department[]
@@ -97,10 +115,42 @@ export function PromptClient({ departments }: Props) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      {/* Setup first — who it's for, what it's called, how deep to go. Then the
+          prompt, sitting directly above the button that acts on it. */}
+
+      {/* Phase 40 DUP-02: shared title + departments + category picker.
+          Title is not offered by RHF here — meta.title flows straight into the POST body. */}
+      <SopMetadataFields value={meta} onChange={setMeta} departments={departments} idPrefix="ai-prompt" />
+
+      <div>
+        <label htmlFor="detailLevel" className="block text-sm font-medium text-[var(--ink-700)] mb-1">
+          How much detail should the draft have?
+        </label>
+        <input
+          id="detailLevel"
+          type="range"
+          min={1}
+          max={5}
+          step={1}
+          {...register('detailLevel', { valueAsNumber: true })}
+          className="w-full accent-[var(--ink-900)]"
+          aria-describedby="detailLevel-blurb"
+        />
+        <p id="detailLevel-blurb" className="mt-1 text-sm text-[var(--ink-500)]">
+          <b className="text-[var(--ink-900)]">{DETAIL_LEVELS[detailLevel]?.name ?? 'Standard'}</b>
+          {' — '}
+          {DETAIL_LEVELS[detailLevel]?.blurb ?? DETAIL_LEVELS[3].blurb}
+        </p>
+      </div>
+
       <div>
         <label htmlFor="promptText" className="block text-sm font-medium text-[var(--ink-700)] mb-1">
           Your prompt
         </label>
+        <p className="mb-2 text-sm text-[var(--ink-500)]">
+          Describe the procedure in a sentence or two — AI drafts structured sections, steps,
+          hazards and PPE for you to review in the builder.
+        </p>
         <textarea
           id="promptText"
           {...register('promptText')}
@@ -111,25 +161,6 @@ export function PromptClient({ departments }: Props) {
         {errors.promptText && (
           <p className="mt-1 text-sm text-red-400">{errors.promptText.message}</p>
         )}
-      </div>
-
-      {/* Phase 40 DUP-02: shared title + departments + category picker.
-          Title is not offered by RHF here — meta.title flows straight into the POST body. */}
-      <SopMetadataFields value={meta} onChange={setMeta} departments={departments} idPrefix="ai-prompt" />
-
-      <div>
-        <label htmlFor="detailLevel" className="block text-sm font-medium text-[var(--ink-700)] mb-1">
-          Detail level <span className="text-[var(--ink-500)]">(1 = minimal, 5 = maximum) — currently {detailLevel}</span>
-        </label>
-        <input
-          id="detailLevel"
-          type="range"
-          min={1}
-          max={5}
-          step={1}
-          {...register('detailLevel', { valueAsNumber: true })}
-          className="w-full accent-[var(--ink-900)]"
-        />
       </div>
 
       {serverError && (
