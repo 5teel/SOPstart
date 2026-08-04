@@ -34,6 +34,8 @@ const DETAIL_LEVELS: Record<number, { name: string; blurb: string }> = {
   5: { name: 'Maximum', blurb: 'Sub-steps, hazard severity ratings, emergency procedures, regulatory references, sign-off requirements.' },
 }
 
+const LEVELS = [1, 2, 3, 4, 5] as const
+
 type Props = {
   /** Phase 25: departments for the department multi-select field (localOnly create mode). */
   departments: Department[]
@@ -122,26 +124,70 @@ export function PromptClient({ departments }: Props) {
           Title is not offered by RHF here — meta.title flows straight into the POST body. */}
       <SopMetadataFields value={meta} onChange={setMeta} departments={departments} idPrefix="ai-prompt" />
 
-      <div>
-        <label htmlFor="detailLevel" className="block text-sm font-medium text-[var(--ink-700)] mb-1">
+      {/* Real radios, not buttons: a radiogroup gives arrow-key selection and
+          screen-reader semantics for free. The descriptions sit behind a native
+          <details> — no JS, keyboard-operable, collapsed until asked for. */}
+      <fieldset>
+        <legend className="block text-sm font-medium text-[var(--ink-700)] mb-1">
           How much detail should the draft have?
-        </label>
-        <input
-          id="detailLevel"
-          type="range"
-          min={1}
-          max={5}
-          step={1}
-          {...register('detailLevel', { valueAsNumber: true })}
-          className="w-full accent-[var(--ink-900)]"
-          aria-describedby="detailLevel-blurb"
-        />
-        <p id="detailLevel-blurb" className="mt-1 text-sm text-[var(--ink-500)]">
-          <b className="text-[var(--ink-900)]">{DETAIL_LEVELS[detailLevel]?.name ?? 'Standard'}</b>
-          {' — '}
-          {DETAIL_LEVELS[detailLevel]?.blurb ?? DETAIL_LEVELS[3].blurb}
-        </p>
-      </div>
+        </legend>
+        <div className="grid grid-cols-5 gap-1.5">
+          {LEVELS.map((level) => {
+            const selected = detailLevel === level
+            return (
+              <label
+                key={level}
+                data-testid={`detail-level-${level}`}
+                data-selected={selected ? 'true' : undefined}
+                className={`cursor-pointer rounded border px-2 py-2 text-center transition-colors ${
+                  selected
+                    ? 'border-[var(--ink-900)] bg-[var(--paper-2)]'
+                    : 'border-[var(--ink-100)] hover:border-[var(--ink-300)]'
+                }`}
+              >
+                <input
+                  type="radio"
+                  value={level}
+                  {...register('detailLevel', { valueAsNumber: true })}
+                  className="sr-only"
+                />
+                <span className="mono block text-[10px] text-[var(--ink-500)]">{level}</span>
+                <span
+                  className={`block text-[11px] leading-tight ${
+                    selected ? 'font-semibold text-[var(--ink-900)]' : 'text-[var(--ink-700)]'
+                  }`}
+                >
+                  {DETAIL_LEVELS[level].name}
+                </span>
+              </label>
+            )
+          })}
+        </div>
+
+        <details className="mt-2">
+          <summary className="cursor-pointer text-sm text-[var(--ink-500)] hover:text-[var(--ink-900)]">
+            What these mean
+          </summary>
+          <dl className="mt-2 flex flex-col gap-1.5">
+            {LEVELS.map((level) => (
+              <div key={level} className="flex gap-2 text-sm">
+                <dt
+                  className={`w-20 shrink-0 ${
+                    detailLevel === level
+                      ? 'font-semibold text-[var(--ink-900)]'
+                      : 'text-[var(--ink-500)]'
+                  }`}
+                >
+                  {DETAIL_LEVELS[level].name}
+                </dt>
+                <dd className="min-w-0 flex-1 text-[var(--ink-500)]">
+                  {DETAIL_LEVELS[level].blurb}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </details>
+      </fieldset>
 
       <div>
         <label htmlFor="promptText" className="block text-sm font-medium text-[var(--ink-700)] mb-1">
