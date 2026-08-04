@@ -165,14 +165,19 @@ export default async function SopsLibraryPage({
     // to FIX the gap, so it has to be selectable — the detail pane assigns a
     // department inline, and a row leaves this scope the moment you do.
     const [{ data: allRows }, { data: taggedRows }] = await Promise.all([
-      supabase.from('sops').select('id'),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (supabase as any).from('sops').select('id, all_departments'),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (supabase as any).from('sop_departments').select('sop_id'),
     ])
     const tagged = new Set(((taggedRows ?? []) as Array<{ sop_id: string }>).map((r) => r.sop_id))
-    filterIds = ((allRows ?? []) as Array<{ id: string }>)
+    // all_departments = true is an AUDIENCE, and it produces no junction rows —
+    // so "has no sop_departments rows" is NOT the same as "nobody can be
+    // assigned this". Without the second clause a SOP you just set to Everyone
+    // stays in this list forever and the fix looks like it did nothing.
+    filterIds = ((allRows ?? []) as Array<{ id: string; all_departments: boolean | null }>)
+      .filter((r) => !tagged.has(r.id) && !r.all_departments)
       .map((r) => r.id)
-      .filter((id) => !tagged.has(id))
   } else if (departmentFilter) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data } = await (supabase as any).from('sop_departments').select('sop_id').eq('department_id', departmentFilter)
@@ -266,7 +271,8 @@ export default async function SopsLibraryPage({
       : Promise.resolve({ data: null }),
     // Rail counts (sketch 004): one cheap org-scoped status read, independent
     // of whatever filter the main query applies.
-    supabase.from('sops').select('id, status'),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('sops').select('id, status, all_departments'),
     // Department per row. 14 of 30 SOPs carry a department and NONE of it was
     // visible here — "who is this for" is the first question an admin asks of
     // a library, and the answer was only reachable by opening each SOP. Two
@@ -315,7 +321,20 @@ export default async function SopsLibraryPage({
     .map(([id, count]) => ({ id, name: deptNameById[id], count }))
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
 
-  const allStatuses = ((statusCountsResult?.data ?? []) as Array<{ status: string }>).map((r) => r.status)
+  // "No department" means NO AUDIENCE AT ALL — nobody can be assigned this.
+  // all_departments = true is an audience and writes no junction rows, so a
+  // SOP set to Everyone must not be counted here (or it never leaves the
+  // scope after you fix it, and the fix looks broken).
+  const statusRows = (statusCountsResult?.data ?? []) as Array<{
+    id: string
+    status: string
+    all_departments: boolean | null
+  }>
+  const noAudienceCount = statusRows.filter(
+    (r) => !sopIdsWithDept.has(r.id) && !r.all_departments
+  ).length
+
+  const allStatuses = statusRows.map((r) => r.status)
   const railCounts = {
     all: allStatuses.length,
     draft: allStatuses.filter((s) => s === 'draft').length,
@@ -615,7 +634,7 @@ export default async function SopsLibraryPage({
                       department, so nobody can be assigned it — and this is
                       where you go to fix that, since the detail pane assigns
                       one inline. A row leaves this scope as soon as you do. */}
-                  {railCounts.all - sopIdsWithDept.size > 0 && (
+                  {noAudienceCount > 0 && (
                     <li>
                       <Link
                         href="/admin/sops?departments=none"
@@ -632,7 +651,7 @@ export default async function SopsLibraryPage({
                             departmentFilter === 'none' ? 'text-white/70' : 'text-[var(--ink-400)]'
                           }`}
                         >
-                          {railCounts.all - sopIdsWithDept.size}
+                          {noAudienceCount}
                         </span>
                       </Link>
                     </li>

@@ -175,4 +175,17 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
     expect(page).toContain('href="/admin/sops?departments=none"')
     expect(page).toContain("departmentFilter === 'none'")
   })
+
+  test('"No department" means no AUDIENCE — all_departments does not count as unassigned', () => {
+    const page = read(ADMIN_SOPS_PAGE)
+    // all_departments = true is an audience and writes NO sop_departments rows,
+    // so "has no junction rows" is not the same as "nobody can be assigned
+    // this". Without this, setting a SOP to Everyone left it sitting in the
+    // "No department" scope and the fix looked like it had done nothing.
+    expect(page).toMatch(/!tagged\.has\(r\.id\)\s*&&\s*!r\.all_departments/)
+    expect(page).toMatch(/!sopIdsWithDept\.has\(r\.id\)\s*&&\s*!r\.all_departments/)
+    // Both the filter and the count must read all_departments to do that.
+    expect(page).toContain("select('id, all_departments')")
+    expect(page).toContain("select('id, status, all_departments')")
+  })
 })
