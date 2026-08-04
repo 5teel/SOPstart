@@ -38,7 +38,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Pencil } from 'lucide-react'
 import type { Department } from '@/types/sop'
 import { SOP_CATEGORIES } from '@/lib/sop-categories'
-import { SopMetadataDialog, type MetadataStep } from '@/components/admin/SopMetadataDialog'
+import { SopMetadataDialog, STEP_LABEL, type MetadataStep } from '@/components/admin/SopMetadataDialog'
 
 export type SopMetadataValue = {
   title: string
@@ -128,15 +128,16 @@ export function SopMetadataFields({
     setOpen(true)
   }
 
-  const rows: { step: MetadataStep; label: string; text: string; testid: string }[] = []
+  // Labels come from STEP_LABEL, not a second list — one name per field.
+  const rows: { step: MetadataStep; text: string; testid: string }[] = []
   if (steps.includes('departments')) {
-    rows.push({ step: 'departments', label: 'Who can see it', text: audience, testid: 'summary-departments' })
+    rows.push({ step: 'departments', text: audience, testid: 'summary-departments' })
   }
   if (steps.includes('category')) {
-    rows.push({ step: 'category', label: 'Kind', text: categoryLabel, testid: 'summary-category' })
+    rows.push({ step: 'category', text: categoryLabel, testid: 'summary-category' })
   }
   if (steps.includes('title')) {
-    rows.push({ step: 'title', label: 'Title', text: value.title.trim() || 'Not set yet', testid: 'summary-title' })
+    rows.push({ step: 'title', text: value.title.trim() || 'Not set yet', testid: 'summary-title' })
   }
 
   return (
@@ -153,8 +154,8 @@ export function SopMetadataFields({
               i > 0 ? 'border-t border-[var(--ink-100)]' : ''
             }`}
           >
-            <span className="w-32 shrink-0 text-xs uppercase tracking-wider text-[var(--ink-500)]">
-              {r.label}
+            <span className="w-44 shrink-0 text-xs uppercase tracking-wider text-[var(--ink-500)]">
+              {STEP_LABEL[r.step]}
             </span>
             <span
               className={`min-w-0 flex-1 truncate text-sm ${

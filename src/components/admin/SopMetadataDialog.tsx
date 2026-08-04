@@ -33,10 +33,15 @@ export type MetadataStep = 'departments' | 'category' | 'title'
 
 const SORTED_CATEGORIES = [...SOP_CATEGORIES].sort((a, b) => a.sort - b.sort)
 
-const STEP_LABEL: Record<MetadataStep, string> = {
-  departments: 'Who can see it',
-  category: 'What kind of SOP',
-  title: 'What it is called',
+/**
+ * The one label per step — imported by SopMetadataFields for its on-page
+ * summary so a field can never end up with two different names depending on
+ * whether you are looking at the dialog or the row it leaves behind.
+ */
+export const STEP_LABEL: Record<MetadataStep, string> = {
+  departments: 'Which department can see it',
+  category: 'Category',
+  title: 'Title',
 }
 
 type Props = {
