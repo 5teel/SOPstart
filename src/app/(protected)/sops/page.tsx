@@ -12,7 +12,7 @@ import { useSopSync } from '@/hooks/useSopSync'
 import { db } from '@/lib/offline/db'
 import type { CachedSop } from '@/lib/offline/db'
 import { SopSearchInput } from '@/components/sop/SopSearchInput'
-import { DepartmentBottomSheet, DepartmentSidebar } from '@/components/sop/CategoryBottomSheet'
+import { DepartmentBottomSheet } from '@/components/sop/CategoryBottomSheet'
 import { createClient } from '@/lib/supabase/client'
 import { selfAddSop, selfRemoveSop, requestRemoveAssignment, getUserSopAssignments } from '@/actions/assignments'
 import { refresherDueDate, isRefresherDue as computeRefresherDue, isRefresherOverdue as computeRefresherOverdue } from '@/lib/competency/refresher'
@@ -177,8 +177,8 @@ export default function SopsPage() {
         </div>
       </nav>
 
-      {/* Desktop layout: scope column + content, on the shared 5xl rail */}
-      <div className="flex flex-1 max-w-5xl mx-auto w-full">
+      {/* Desktop layout: the Miller frame, on the shared 5xl rail */}
+      <div className="max-w-5xl mx-auto w-full px-4 py-5">
         <SopsSection
           assignedSops={assignedSops}
           isLoading={assignedLoading}
@@ -463,89 +463,108 @@ function SopsSection({
 
   const loading = isLoading || libraryLoading
 
+  const summary = loading
+    ? 'Loading...'
+    : [
+        `${counts.all} yours`,
+        counts.refresher > 0 && `${counts.refresher} refresher due`,
+        `${counts.library} in the library`,
+        lastSyncLabel,
+      ].filter(Boolean).join(' · ')
+
   return (
     <>
-      <nav aria-label="Scope" data-testid="worker-miller-scope" className="hidden w-[150px] flex-shrink-0 px-2 py-6 lg:block">
-        {(['yours', 'library'] as const).map((group) => (
-          <div key={group} className="mb-4">
-            <p className="mono mb-1.5 text-[10px] uppercase tracking-wider text-[var(--ink-400)]">
-              {group === 'yours' ? 'Your SOPs' : 'Library'}
-            </p>
-            <ul>
-              {WORKER_SCOPES.filter((sc) => sc.group === group).map((sc) => (
-                <li key={sc.key}>
-                  <button
-                    type="button"
-                    onClick={() => onScopeChange(sc.key)}
-                    data-active={scope === sc.key ? 'true' : undefined}
-                    className={`flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-[13px] ${
-                      scope === sc.key
-                        ? 'bg-[var(--ink-900)] font-semibold text-white'
-                        : 'text-[var(--ink-700)] hover:bg-[var(--paper-2)]'
-                    }`}
-                  >
-                    <span className="min-w-0 flex-1 truncate">{sc.label}</span>
-                    <span className="mono flex-shrink-0 text-[11px] opacity-60">{counts[sc.key]}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-        {/* The department filter keeps its own component — it already owns
-            the selection model and the mobile bottom-sheet twin. */}
-        <p className="mono mb-1.5 text-[10px] uppercase tracking-wider text-[var(--ink-400)]">By department</p>
-        <DepartmentSidebar
-          departments={departments}
-          selectedIds={selectedDeptIds}
-          allDepartments={allDepartments}
-          onSelect={onDeptSelect}
-        />
-      </nav>
+      <p className="mb-3 text-[13px] text-[var(--ink-500)]">{summary}</p>
 
-      <div className="flex-1 px-4 py-6 min-w-0">
-        <h1 className="text-2xl font-bold text-[var(--ink-900)] mb-1">{SCOPE_LABEL[scope]}</h1>
-        <p className="text-sm text-[var(--ink-500)] mb-4">
-          {loading ? 'Loading...' : `${scoped.length} procedure${scoped.length !== 1 ? 's' : ''}`}
-          {' · '}{lastSyncLabel}
-        </p>
-
-        {/* Scope strip — below lg the left column has nowhere to go, so the
-            same scopes ride here rather than disappearing. */}
-        <div className="lg:hidden mb-4 flex gap-2 overflow-x-auto pb-1">
-          {WORKER_SCOPES.map((sc) => (
-            <button
-              key={sc.key}
-              type="button"
-              onClick={() => onScopeChange(sc.key)}
-              className={`flex-shrink-0 min-h-11 rounded-xl border px-3 text-sm font-medium ${
-                scope === sc.key
-                  ? 'border-[var(--ink-900)] bg-[var(--ink-900)] text-white'
-                  : 'border-[var(--ink-100)] bg-white text-[var(--ink-700)]'
-              }`}
-            >
-              {sc.label}
-              <span className="mono ml-1 text-[11px] opacity-70">{counts[sc.key]}</span>
-            </button>
-          ))}
+      {/* Scope strip — below lg the left column has nowhere to go, so the
+          same scopes ride here rather than disappearing. */}
+      <div className="lg:hidden mb-4 flex gap-2 overflow-x-auto pb-1">
+        {WORKER_SCOPES.map((sc) => (
           <button
+            key={sc.key}
             type="button"
-            onClick={onOpenDeptSheet}
-            className="flex-shrink-0 inline-flex items-center gap-2 px-4 min-h-11 bg-white border border-[var(--ink-100)] rounded-xl text-sm font-medium text-[var(--ink-900)]"
+            onClick={() => onScopeChange(sc.key)}
+            className={`flex-shrink-0 min-h-11 rounded-xl border px-3 text-sm font-medium ${
+              scope === sc.key
+                ? 'border-[var(--ink-900)] bg-[var(--ink-900)] text-white'
+                : 'border-[var(--ink-100)] bg-white text-[var(--ink-700)]'
+            }`}
           >
-            <span>{activeDeptLabel}</span>
-            <ChevronDown size={16} className="text-[var(--ink-500)]" />
+            {sc.label}
+            <span className="mono ml-1 text-[11px] opacity-70">{counts[sc.key]}</span>
           </button>
-        </div>
+        ))}
+        <button
+          type="button"
+          onClick={onOpenDeptSheet}
+          className="flex-shrink-0 inline-flex items-center gap-2 px-4 min-h-11 bg-white border border-[var(--ink-100)] rounded-xl text-sm font-medium text-[var(--ink-900)]"
+        >
+          <span>{activeDeptLabel}</span>
+          <ChevronDown size={16} className="text-[var(--ink-500)]" />
+        </button>
+      </div>
+
+      {/* Sketch 005 variant C's frame: one bordered surface, three columns,
+          hairline dividers. Below lg it collapses to the plain card list — the
+          grid, the frame and the two side columns are all lg-only. */}
+      <div className="lg:grid lg:min-h-[420px] lg:grid-cols-[168px_1fr_248px] lg:overflow-hidden lg:rounded-lg lg:border lg:border-[var(--ink-300)] lg:bg-[var(--paper-1)]">
+        <nav
+          aria-label="Scope"
+          data-testid="worker-miller-scope"
+          className="hidden overflow-y-auto border-r border-[var(--ink-200)] lg:block"
+        >
+          {(['yours', 'library'] as const).map((group) => (
+            <div key={group}>
+              <MillerColumnHeader>{group === 'yours' ? 'Your SOPs' : 'Library'}</MillerColumnHeader>
+              {WORKER_SCOPES.filter((sc) => sc.group === group).map((sc) => (
+                <MillerItem
+                  key={sc.key}
+                  selected={scope === sc.key}
+                  onClick={() => onScopeChange(sc.key)}
+                  count={counts[sc.key]}
+                  data-active={scope === sc.key ? 'true' : undefined}
+                >
+                  {sc.label}
+                </MillerItem>
+              ))}
+            </div>
+          ))}
+
+          {/* Departments are rows in this column, not a nested sidebar — the
+              DepartmentSidebar component is a 240px h-screen aside and was
+              being squeezed into a 150px column. The bottom sheet is still the
+              mobile twin; only this desktop rendering changed. */}
+          <MillerColumnHeader>By department</MillerColumnHeader>
+          <MillerItem selected={allDepartments} onClick={() => onDeptSelect([], !allDepartments)}>
+            All departments
+          </MillerItem>
+          {departments.map((dept) => (
+            <MillerItem
+              key={dept.id}
+              selected={selectedDeptIds.includes(dept.id)}
+              onClick={() =>
+                onDeptSelect(
+                  selectedDeptIds.includes(dept.id)
+                    ? selectedDeptIds.filter((id) => id !== dept.id)
+                    : [...selectedDeptIds, dept.id],
+                  false,
+                )
+              }
+              dot={dept.colour ?? undefined}
+            >
+              {dept.name}
+            </MillerItem>
+          ))}
+        </nav>
 
         {loading ? (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2 p-3 lg:col-span-2">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-[88px] bg-[var(--paper-2)] rounded-xl animate-pulse" />
+              <div key={i} className="h-[68px] animate-pulse rounded-lg bg-[var(--paper-2)] lg:h-9 lg:rounded" />
             ))}
           </div>
         ) : workerSops.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-4 py-24 px-8 text-center">
+          <div className="flex flex-col items-center justify-center gap-4 px-8 py-24 text-center lg:col-span-2">
             <ClipboardList size={48} className="text-[var(--ink-300)]" />
             <div>
               <p className="text-xl font-semibold text-[var(--ink-900)]">No SOPs yet</p>
@@ -565,5 +584,61 @@ function SopsSection({
         )}
       </div>
     </>
+  )
+}
+
+/* ─── Miller column primitives (sketch 005 variant C) ────────────────────── */
+
+/** Sticky column header: mono, 10px, uppercase, on the recessed paper tone. */
+function MillerColumnHeader({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="mono sticky top-0 z-10 border-b border-[var(--ink-200)] bg-[var(--paper-2)] px-3 py-2 text-[10px] uppercase tracking-[0.08em] text-[var(--ink-500)]">
+      {children}
+    </h2>
+  )
+}
+
+/**
+ * A flush row in a Miller column: hairline-separated, never a floating card.
+ * Selection is a solid ink fill, which is what lets three columns of these read
+ * as one surface instead of three stacks of chips.
+ */
+function MillerItem({
+  children,
+  selected,
+  onClick,
+  count,
+  dot,
+  ...rest
+}: {
+  children: React.ReactNode
+  selected: boolean
+  onClick: () => void
+  count?: number
+  dot?: string
+} & React.ComponentProps<'button'>) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex w-full items-center gap-2 border-b border-[var(--ink-100)] px-3 py-2 text-left text-[12.5px] transition-colors ${
+        selected ? 'bg-[var(--ink-900)] font-semibold text-white' : 'text-[var(--ink-700)] hover:bg-[var(--paper-2)]'
+      }`}
+      {...rest}
+    >
+      {dot && (
+        <span
+          aria-hidden="true"
+          className="h-2 w-2 flex-shrink-0 rounded-full"
+          style={{ background: dot }}
+        />
+      )}
+      <span className="min-w-0 flex-1 truncate">{children}</span>
+      {count !== undefined && (
+        <span className={`mono flex-shrink-0 text-[10.5px] ${selected ? 'text-white/70' : 'text-[var(--ink-400)]'}`}>
+          {count}
+        </span>
+      )}
+    </button>
   )
 }
