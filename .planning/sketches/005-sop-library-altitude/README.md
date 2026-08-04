@@ -2,7 +2,7 @@
 sketch: 005
 name: sop-library-altitude
 question: "How does /admin/sops funnel an admin from a high-level decision down to one SOP, instead of presenting every SOP and every attribute at one altitude?"
-winner: null
+winner: "C"
 tags: [admin, information-architecture, library, progressive-disclosure]
 ---
 
@@ -44,7 +44,7 @@ open .planning/sketches/005-sop-library-altitude/index.html
 
 - **A: Triage board** — the page opens on three decision decks (23 to review · 9 problems · 5 live). Choosing one yields a focused worklist where each row carries the single action that clears it. "Browse all 30" is a deliberate second step.
 - **B: Drill-down** — pick a department, then a state, then a SOP. A breadcrumb is the only control; your position in the hierarchy *is* the filter state. The 16 department-less SOPs get a dashed tile so the gap is visible work.
-- **C: Miller columns** — scope | list | detail, three altitudes side by side. Nothing navigates away, so comparing two SOPs is two clicks rather than two page loads.
+- **C: Miller columns** ★ WINNER — shipped 2026-08-04 — scope | list | detail, three altitudes side by side. Nothing navigates away, so comparing two SOPs is two clicks rather than two page loads.
 - **D: Quiet list** — least disruptive. Same list shape, but a row shows title + one status dot and reveals the rest on hover; five tabs collapse into one "Group by" control.
 - **— Shipped** — today's page, included as the baseline to beat.
 
@@ -62,3 +62,44 @@ open .planning/sketches/005-sop-library-altitude/index.html
 
 - Does the triage framing hold when the library is healthy (0 problems, 2 drafts)? A's decks may read as an empty stage.
 - If drafts stay dominant long-term, is "Manage SOPs" the wrong name for what is mostly a review queue?
+
+## Outcome — shipped 2026-08-04
+
+Variant C won and is live on `/admin/sops`.
+
+**What shipped as sketched:** three columns (scope · list · detail), the scope
+column replacing the tab rail, department counts alongside status counts, and
+the detail pane rendering from data the list already carries.
+
+**What changed during implementation:**
+
+- **"No department" became a real scope.** The sketch made it a non-clickable
+  finding, on the reasoning that filtering to it would let you tidy the symptom.
+  That reasoning only held while nothing could be fixed in place — once the
+  detail pane assigns a department inline, filtering to those 17 IS the fix, so
+  it links to `?departments=none`.
+- **The detail pane edits, it does not only display.** Category is a select
+  backed by a new `setSopCategory` action; department is `DepartmentPicker` in
+  `sop` mode with `localOnly` OFF, so writes land through `assignSopDepartments`
+  (D-11's grant-backed path). Both `router.refresh()` after a write, so the
+  scope counts and row chips stay honest — a SOP assigned a department leaves
+  the "No department" scope immediately.
+- **"Needs me" did NOT become a scope.** The existing attention view was kept
+  instead: folding it into the list column would have cost the `OwnerPicker` and
+  approve actions that live in `GovernanceQueueRow`.
+- **Step counts were dropped from the detail pane.** They need a per-SOP
+  aggregate query, and the whole point of client-side selection is that clicking
+  costs nothing.
+
+**The load-bearing split:** scope is server state (URL, Links — changing scope
+SHOULD refetch); selection is client state (`useState` — a search-param push
+would fire an RSC request through the service worker on every row click,
+CLAUDE.md [2026-05-13]). A phase30 guard asserts the selection handler touches
+no router, and that the browser holds no `fetch`/`createClient`.
+
+**What the live data revealed that the sketch could not:** the department split
+is `General 11 · Engineering 2 · Forming 2 · No department 17`. "General"
+holding 11 of 13 assigned SOPs means the field is being used as a default rather
+than a classification, so the by-department scope is currently near-useless as a
+filter. That is a data-shape problem, not a layout one — but it means the
+drill-down's value is unproven until departments are actually used.

@@ -113,13 +113,66 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
     expect(browser).toContain("'use client'")
     expect(browser).toContain('useState')
     expect(browser).toContain('setSelectedId(sop.id)')
-    // A router push here would cost an RSC round-trip through the service
-    // worker on every row click — the exact regression [2026-05-13] records.
+    // A router PUSH would cost an RSC round-trip through the service worker on
+    // every row click — the exact regression [2026-05-13] records. refresh()
+    // is allowed and necessary, but only AFTER a write: the scope counts and
+    // row chips are server-rendered, so assigning a department has to re-run
+    // the page or the row stays in a scope it no longer belongs to.
     expect(browser).not.toContain('router.push')
-    expect(browser).not.toContain('useRouter')
+    expect(browser).toContain('router.refresh()')
+
+    // The selection handler itself must not refresh. Slice from the onClick to
+    // the end of that JSX attribute and assert it does nothing but set state.
+    const onSelect = browser.slice(
+      browser.indexOf('onClick={() => setSelectedId'),
+      browser.indexOf('data-testid="miller-row"')
+    )
+    expect(onSelect, 'selecting a SOP must not navigate or refresh').not.toContain('router')
+
     // The detail pane must render from data the list already carries; a fetch
-    // here would reintroduce the per-click round-trip by another route.
+    // or a supabase client here would reintroduce the per-click round-trip by
+    // another route.
     expect(browser).not.toContain('createClient')
     expect(browser).not.toContain('fetch(')
+  })
+
+  test('the detail pane fixes what it surfaces: category and department are editable in place', () => {
+    const browser = read(path.join(ROOT, 'src', 'components', 'admin', 'SopMillerBrowser.tsx'))
+    const actions = read(path.join(ROOT, 'src', 'actions', 'sops.ts'))
+
+    // Noticing a missing category in the detail pane and having to open the
+    // builder to set it is the trip the Miller layout exists to remove.
+    expect(browser).toContain('setSopCategory(sop.id, next)')
+    expect(browser).toContain('data-testid="miller-category-select"')
+
+    // Departments go through DepartmentPicker in sop mode WITHOUT localOnly, so
+    // the write lands via assignSopDepartments — the grant-backed path (D-11),
+    // never a direct sop_departments insert.
+    const picker = browser.slice(
+      browser.indexOf('<DepartmentPicker'),
+      browser.indexOf('/>', browser.indexOf('<DepartmentPicker'))
+    )
+    expect(picker, 'DepartmentPicker must be mounted').toContain('mode="sop"')
+    expect(picker).toContain('sopId={sop.id}')
+    // Scoped to the JSX element, not the file: the comment above it explains
+    // why localOnly is OFF, and a whole-file check would read that as the prop.
+    expect(picker, 'localOnly would make the picker report but never write').not.toContain('localOnly')
+    expect(browser).not.toContain("from('sop_departments')")
+
+    // The category action self-enforces org scope from the SESSION, never from
+    // the fetched row, and filters the write on it too (CLAUDE.md [2026-07-28]).
+    const body = actions.slice(actions.indexOf('export async function setSopCategory'))
+    expect(body).toContain('requireAdminContext()')
+    expect(body).toContain('sopRow.organisation_id !== ctx.organisationId')
+    expect(body).toContain(".eq('organisation_id', ctx.organisationId)")
+    expect(body).toContain('isValidCategorySlug(categorySlug)')
+  })
+
+  test('"No department" is a reachable scope, not a dead label', () => {
+    const page = read(ADMIN_SOPS_PAGE)
+    // It counts the SOPs nobody can be assigned, so it must be somewhere you
+    // can GO — the detail pane is what makes going there useful.
+    expect(page).toContain('href="/admin/sops?departments=none"')
+    expect(page).toContain("departmentFilter === 'none'")
   })
 })

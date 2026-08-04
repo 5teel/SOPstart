@@ -18,7 +18,7 @@ Paper/ink engineering-drawing system (established in the blueprint-redesign expl
 | 002 | permission-wiring | How do SOP-access connections read at a glance across 1:N, N:1, N:M? | A (Patch Bay default · Matrix + Illuminate alt views) | permissions, library-access |
 | 003 | wiring-at-scale | Does the Patch Bay survive ~15 depts × ~20 collections, and what keeps it legible? | D (hybrid: groups + focus + library-filter + wire-up mode) | permissions, scale |
 | 004 | admin-sop-hub-hierarchy | How do the four stacked /admin/sops control tiers collapse into one comprehensible hierarchy? | A (one rail, no page header, grouped attention queue) | admin, information-architecture, governance |
-| 005 | sop-library-altitude | How does /admin/sops funnel from a high-level decision down to one SOP, instead of showing every SOP and attribute at one altitude? | _pending_ | admin, information-architecture, library, progressive-disclosure |
+| 005 | sop-library-altitude | How does /admin/sops funnel from a high-level decision down to one SOP, instead of showing every SOP and attribute at one altitude? | C (Miller columns — scope · list · editable detail) | admin, information-architecture, library, progressive-disclosure |
 
 ## Decisions
 

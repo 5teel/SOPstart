@@ -16,10 +16,16 @@
  * still work on a phone rather than merely not crash on one.
  */
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { StatusBadge } from '@/components/admin/StatusBadge'
-import type { SopStatus } from '@/types/sop'
+import { DepartmentPicker } from '@/components/admin/departments/DepartmentPicker'
+import { setSopCategory } from '@/actions/sops'
+import { SOP_CATEGORIES } from '@/lib/sop-categories'
+import type { SopStatus, Department } from '@/types/sop'
+
+const SORTED_CATEGORIES = [...SOP_CATEGORIES].sort((a, b) => a.sort - b.sort)
 
 /** Everything the list and detail panes need, resolved server-side. */
 export type MillerSop = {
@@ -30,7 +36,9 @@ export type MillerSop = {
   untitled: boolean
   status: string
   categoryLabel: string | null
+  categorySlug: string | null
   departments: string[]
+  departmentIds: string[]
   allDepartments: boolean
   ownerLabel: string | null
   age: string
@@ -44,9 +52,12 @@ export type MillerSop = {
 export function SopMillerBrowser({
   sops,
   scopeLabel,
+  departments,
 }: {
   sops: MillerSop[]
   scopeLabel: string
+  /** Pre-fetched by the page — the detail pane never fetches. */
+  departments: Department[]
 }) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const selected = sops.find((s) => s.id === selectedId) ?? null
@@ -128,18 +139,14 @@ export function SopMillerBrowser({
                 </p>
               )}
 
+              {/* The two fields that are most often missing are editable HERE.
+                  The detail pane is where you notice the gap, so bouncing to
+                  the builder to change one field is the trip this layout
+                  exists to remove. Everything else stays read-only. */}
+              <CategoryField key={`cat-${selected.id}`} sop={selected} />
+              <DepartmentField key={`dept-${selected.id}`} sop={selected} departments={departments} />
+
               <dl className="mb-3">
-                <Field label="Category" value={selected.categoryLabel} />
-                <Field
-                  label="Department"
-                  value={
-                    selected.allDepartments
-                      ? 'Everyone'
-                      : selected.departments.length > 0
-                        ? selected.departments.join(', ')
-                        : null
-                  }
-                />
                 <Field label="Owner" value={selected.ownerLabel} />
                 <Field label="Updated" value={selected.age === 'today' ? 'today' : `${selected.age} ago`} />
                 {selected.confidence !== null && (
@@ -195,6 +202,93 @@ function RowBody({ sop }: { sop: MillerSop }) {
         {sop.age}
       </span>
     </>
+  )
+}
+
+/**
+ * Category, editable in place.
+ *
+ * `router.refresh()` after the write, NOT before: the scope counts and the
+ * row's own chips are server-rendered, so a save has to re-run the page to
+ * stay honest — assigning a department while filtered to "No department"
+ * should drop the row out of the list. This is the ONLY navigation in this
+ * component; selecting a SOP must never trigger one (CLAUDE.md [2026-05-13]).
+ */
+function CategoryField({ sop }: { sop: MillerSop }) {
+  const router = useRouter()
+  const [saving, startSaving] = useTransition()
+  const [error, setError] = useState<string | null>(null)
+  const [value, setValue] = useState(sop.categorySlug ?? '')
+
+  return (
+    <div className="mb-2 border-b border-dotted border-[var(--ink-200)] pb-2">
+      <label className="mb-1 block text-[11px] text-[var(--ink-500)]" htmlFor={`cat-${sop.id}`}>
+        Category
+      </label>
+      <select
+        id={`cat-${sop.id}`}
+        data-testid="miller-category-select"
+        value={value}
+        disabled={saving}
+        onChange={(e) => {
+          const next = e.target.value || null
+          setValue(e.target.value)
+          setError(null)
+          startSaving(async () => {
+            const res = await setSopCategory(sop.id, next)
+            if ('error' in res) {
+              setError(res.error)
+              setValue(sop.categorySlug ?? '')
+              return
+            }
+            router.refresh()
+          })
+        }}
+        className="w-full rounded border border-[var(--ink-300)] bg-white px-2 py-1 text-xs text-[var(--ink-900)] disabled:opacity-60"
+      >
+        <option value="">— Not set —</option>
+        {SORTED_CATEGORIES.map((c) => (
+          <option key={c.slug} value={c.slug}>{c.label}</option>
+        ))}
+      </select>
+      {error && <p className="mt-1 text-[11px] text-red-600">{error}</p>}
+    </div>
+  )
+}
+
+/**
+ * Department, editable in place. DepartmentPicker in `sop` mode with a real
+ * sopId and localOnly OFF writes through assignSopDepartments itself — the
+ * grant-backed path (D-11), never a direct sop_departments insert.
+ */
+function DepartmentField({
+  sop,
+  departments,
+}: {
+  sop: MillerSop
+  departments: Department[]
+}) {
+  const router = useRouter()
+
+  if (departments.length === 0) return null
+
+  return (
+    <div className="mb-3 border-b border-dotted border-[var(--ink-200)] pb-2">
+      <p className="mb-1 text-[11px] text-[var(--ink-500)]">Department</p>
+      {sop.departments.length === 0 && !sop.allDepartments && (
+        <p className="mb-1 text-[11px] text-[var(--ink-300)]">
+          Not set — nobody can be assigned this.
+        </p>
+      )}
+      <DepartmentPicker
+        mode="sop"
+        sopId={sop.id}
+        departments={departments}
+        selectedIds={sop.departmentIds}
+        allDepartments={sop.allDepartments}
+        onChange={() => router.refresh()}
+      />
+    </div>
   )
 }
 

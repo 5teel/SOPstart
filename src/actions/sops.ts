@@ -650,3 +650,55 @@ export async function createSopFromWizard(
 
   return { sopId: sop.id }
 }
+
+/**
+ * Set (or clear) a SOP's category from the library's detail pane.
+ *
+ * Sketch 005 variant C: the Miller detail pane is where an admin NOTICES a
+ * missing category, so it is where it should be fixable — bouncing to the
+ * builder to change one field is the thing the layout exists to avoid.
+ *
+ * Uses the service-role client because `sops` writes elsewhere in this file do
+ * (the session client hits RLS on the admin write paths), and therefore
+ * self-enforces org scope: the org comes from the SESSION, never from the
+ * fetched row, and the update is filtered on it as well as on the id
+ * (CLAUDE.md [2026-07-28] — a predicate fed the fetched row's own
+ * organisation_id proves nothing, since the row is whatever the supplied id
+ * points at).
+ */
+export async function setSopCategory(
+  sopId: string,
+  categorySlug: string | null
+): Promise<{ success: true } | { error: string }> {
+  if (!sopId) return { error: 'sopId required' }
+  if (categorySlug !== null && !isValidCategorySlug(categorySlug)) {
+    return { error: 'Unknown category' }
+  }
+
+  const ctx = await requireAdminContext()
+  if ('error' in ctx) return { error: ctx.error }
+  if (!ctx.organisationId) return { error: 'No organisation' }
+
+  const admin = createAdminClient()
+  const { data: sopRow } = await admin
+    .from('sops')
+    .select('id, organisation_id')
+    .eq('id', sopId)
+    .maybeSingle()
+  if (!sopRow) return { error: 'SOP not found' }
+  if (sopRow.organisation_id !== ctx.organisationId) {
+    return { error: 'SOP belongs to another organisation' }
+  }
+
+  const { error } = await admin
+    .from('sops')
+    .update({ category_slug: categorySlug })
+    .eq('id', sopId)
+    .eq('organisation_id', ctx.organisationId)
+
+  if (error) {
+    console.error('[setSopCategory] update error', error)
+    return { error: 'Could not save the category. Please try again.' }
+  }
+  return { success: true }
+}

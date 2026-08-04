@@ -11,7 +11,7 @@ import { listOrgTree } from '@/actions/org-model'
 import { ensureSopCollections, listGrants, type GrantRow } from '@/actions/grants'
 import { WiringPatchBayShell } from '@/components/admin/wiring/WiringPatchBayShell'
 import type { WiringCollection, WiringNewSop, WiringSop } from '@/components/admin/wiring/WiringPatchBay'
-import type { SopStatus } from '@/types/sop'
+import type { SopStatus, Department } from '@/types/sop'
 import { categoryLabel } from '@/lib/sop-categories'
 import { SopMillerBrowser, type MillerSop } from '@/components/admin/SopMillerBrowser'
 
@@ -160,7 +160,20 @@ export default async function SopsLibraryPage({
   // auto-generated database.types.ts — `(supabase as any)` cast matches the
   // established pattern (departments.ts, org-model.ts, governance.ts).
   let filterIds: string[] | null = null
-  if (departmentFilter) {
+  if (departmentFilter === 'none') {
+    // The 17 SOPs nobody can be assigned. This is the scope you go to in order
+    // to FIX the gap, so it has to be selectable — the detail pane assigns a
+    // department inline, and a row leaves this scope the moment you do.
+    const [{ data: allRows }, { data: taggedRows }] = await Promise.all([
+      supabase.from('sops').select('id'),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (supabase as any).from('sop_departments').select('sop_id'),
+    ])
+    const tagged = new Set(((taggedRows ?? []) as Array<{ sop_id: string }>).map((r) => r.sop_id))
+    filterIds = ((allRows ?? []) as Array<{ id: string }>)
+      .map((r) => r.id)
+      .filter((id) => !tagged.has(id))
+  } else if (departmentFilter) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data } = await (supabase as any).from('sop_departments').select('sop_id').eq('department_id', departmentFilter)
     filterIds = ((data ?? []) as Array<{ sop_id: string }>).map((r) => r.sop_id)
@@ -273,10 +286,19 @@ export default async function SopsLibraryPage({
     deptNameById[d.id] = d.name
   }
   const deptsBySop: Record<string, string[]> = {}
+  const deptIdsBySop: Record<string, string[]> = {}
   for (const r of ((sopDeptsResult?.data ?? []) as Array<{ sop_id: string; department_id: string }>)) {
     const name = deptNameById[r.department_id]
-    if (name) (deptsBySop[r.sop_id] ??= []).push(name)
+    if (!name) continue
+    ;(deptsBySop[r.sop_id] ??= []).push(name)
+    ;(deptIdsBySop[r.sop_id] ??= []).push(r.department_id)
   }
+
+  // The picker in the detail pane needs the full department list, not just the
+  // ones already in use — you assign a department that ISN'T set yet.
+  const allDepartments = ((deptNamesResult?.data ?? []) as Array<{ id: string; name: string }>)
+    .map((d) => ({ ...d }) as unknown as Department)
+    .sort((a, b) => a.name.localeCompare(b.name))
 
   // Department counts for the scope column. sop_departments is org-scoped by
   // RLS and unfiltered here, so it counts the whole library regardless of what
@@ -368,7 +390,9 @@ export default async function SopsLibraryPage({
   const scopeActive = !isAttentionView && !isAccessView
   const scopeLabel = ownerOnly
     ? 'Owned by me'
-    : departmentFilter
+    : departmentFilter === 'none'
+      ? 'No department'
+      : departmentFilter
       ? (deptNameById[departmentFilter] ?? 'Department')
       : collectionFilter
         ? 'Collection'
@@ -388,7 +412,9 @@ export default async function SopsLibraryPage({
       untitled: !sop.title,
       status: sop.status,
       categoryLabel: categoryLabel(sop.category_slug ?? null),
+      categorySlug: sop.category_slug ?? null,
       departments: deptsBySop[sop.id] ?? [],
+      departmentIds: deptIdsBySop[sop.id] ?? [],
       allDepartments: Boolean(sop.all_departments),
       // The `unowned` flag already says "No owner" — don't say it twice.
       ownerLabel: flag === 'unowned' ? null : shortOwner(owner),
@@ -585,12 +611,30 @@ export default async function SopsLibraryPage({
                       </li>
                     )
                   })}
-                  {/* Not a filter — a finding. Over half the library has no
-                      department, which means nobody can be assigned it. */}
+                  {/* Both a finding AND a scope: over half the library has no
+                      department, so nobody can be assigned it — and this is
+                      where you go to fix that, since the detail pane assigns
+                      one inline. A row leaves this scope as soon as you do. */}
                   {railCounts.all - sopIdsWithDept.size > 0 && (
-                    <li className="flex items-center gap-2 px-2 py-1.5 text-[13px] text-[var(--ink-400)]">
-                      <span className="min-w-0 flex-1 truncate">No department</span>
-                      <span className="mono text-[11px]">{railCounts.all - sopIdsWithDept.size}</span>
+                    <li>
+                      <Link
+                        href="/admin/sops?departments=none"
+                        data-active={departmentFilter === 'none' ? 'true' : undefined}
+                        className={`flex items-center gap-2 rounded px-2 py-1.5 text-[13px] ${
+                          departmentFilter === 'none'
+                            ? 'bg-[var(--ink-900)] font-semibold text-white'
+                            : 'text-[var(--ink-500)] hover:bg-[var(--paper-2)]'
+                        }`}
+                      >
+                        <span className="min-w-0 flex-1 truncate">No department</span>
+                        <span
+                          className={`mono text-[11px] ${
+                            departmentFilter === 'none' ? 'text-white/70' : 'text-[var(--ink-400)]'
+                          }`}
+                        >
+                          {railCounts.all - sopIdsWithDept.size}
+                        </span>
+                      </Link>
                     </li>
                   )}
                 </ul>
@@ -628,7 +672,7 @@ export default async function SopsLibraryPage({
           </nav>
 
           {/* ── List + detail ───────────────────────────────────── */}
-          <SopMillerBrowser scopeLabel={scopeLabel} sops={millerSops} />
+          <SopMillerBrowser scopeLabel={scopeLabel} sops={millerSops} departments={allDepartments} />
         </div>
           </>
         )}

@@ -191,7 +191,12 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
 // be classified against CATEGORY_EXEMPT above (or shown to already carry
 // category_slug) -- update this constant deliberately, never to silence a
 // failing run.
-const EXPECTED_SOPS_WRITE_SITE_COUNT = 45
+// 2026-08-04: 45 -> 46. The new site is setSopCategory in src/actions/sops.ts,
+// which backs the inline category editor in the Miller detail pane (sketch 005
+// variant C). It WRITES category_slug — that is its entire purpose — so it
+// needs no exemption; the count moved only because a sops write path was
+// genuinely added, which is exactly what this tripwire exists to surface.
+const EXPECTED_SOPS_WRITE_SITE_COUNT = 46
 
 // Extracts the substring between a `(` at `openIdx` and its matching `)`,
 // tracking paren depth so nested calls/objects don't truncate the payload.
