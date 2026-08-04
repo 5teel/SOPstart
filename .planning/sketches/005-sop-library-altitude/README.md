@@ -98,8 +98,22 @@ CLAUDE.md [2026-05-13]). A phase30 guard asserts the selection handler touches
 no router, and that the browser holds no `fetch`/`createClient`.
 
 **What the live data revealed that the sketch could not:** the department split
-is `General 11 · Engineering 2 · Forming 2 · No department 17`. "General"
-holding 11 of 13 assigned SOPs means the field is being used as a default rather
-than a classification, so the by-department scope is currently near-useless as a
-filter. That is a data-shape problem, not a layout one — but it means the
-drill-down's value is unproven until departments are actually used.
+is `General 11 · Engineering 4 · Forming 3`, with 2 SOPs set to Everyone and 5
+carrying no audience at all, over 23 SOPs. "General" holding 11 of 18 assigned
+SOPs means the field is being used as a default rather than a classification, so
+the by-department scope is weaker as a filter than the sketch assumed. That is a
+data-shape problem, not a layout one — but it means the drill-down's value stays
+partly unproven until departments are used deliberately.
+
+> **Correction (same day).** The numbers first recorded here — 30 SOPs,
+> `No department 17` — were wrong, and wrong in an instructive way: the library
+> was showing SOPs from four organisations because of a cross-tenant RLS read
+> hole on `public.sops` (closed in migration 00061). Seven of the 30 belonged to
+> other tenants. **Every "live data shape" figure in this README's opening
+> section was inflated by that leak** and should be read as ~23 SOPs in one org,
+> not 30 across four. The design conclusions are unaffected — drafts still
+> dominate, departments are still under-used — but the exact counts are not.
+>
+> Worth keeping as a methodology note: the leak surfaced only because an inline
+> WRITE was added to this surface and its org guard fired. A read-only design
+> exploration would have measured the wrong library and never known.
