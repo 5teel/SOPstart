@@ -1,8 +1,9 @@
 ---
 phase: 40-shared-creation-foundation
 verified: 2026-07-29T08:23:58Z
-status: gaps_found
-score: 3/5 must-haves verified
+status: gaps_closed
+score: 3/5 at first verification; all 3 gaps closed and evidenced below (2026-08-04)
+original_status: gaps_found
 overrides_applied: 0
 gaps:
   - truth: "DUP-01: One file-intake component owns accepted MIME types... and the accept lists no longer disagree"
@@ -150,3 +151,42 @@ CR-02 (unauthenticated destructive parse/transcribe/restructure routes) and CR-0
 
 _Verified: 2026-07-29T08:23:58Z_
 _Verifier: Claude (gsd-verifier)_
+
+
+---
+
+## Gap closure — 2026-08-04
+
+The original verdict above is preserved as written. All three gaps it raised are
+now closed, each with its own evidence. This is a closure record, not a
+re-verification run by the verifier agent.
+
+| Gap | Closed by | Evidence |
+|-----|-----------|----------|
+| **1 — DUP-01** `image/webp` accepted client-side, rejected server-side | Plan 40-10 | `uploadFileSchema` now derives from `ACCEPTED_MIME_TYPES`, so the two lists cannot diverge. **Then failed again at UAT test 3** for a different reason — a THIRD list, the `sop-documents` bucket's own `allowed_mime_types`, unchanged since migration 00005 and allowing only 4 types. Closed by migration 00060 (applied live) + `bucket-mime-parity.spec.ts`, mutation-proven. `.xlsx`, `.pptx` and `.txt` had been dead the same way since Phase 5. |
+| **2 — DUP-01/security** `SUPABASE_SERVICE_ROLE_KEY` returned to the browser | Plan 40-14 | All three sites closed (two predated the phase). Sweep spec pins the key to `src/lib/supabase/admin.ts` alone. Migration 00059 scoped the `sop-videos` bucket, which the change made load-bearing. Verified live by the user at 40-14's blocking checkpoint. |
+| **3 — DAT-01** `cloneSopAsDraft` dropped `category_slug` | Plan 40-11 | Closed by a data-keyed write census (45 sites, 28 justified exemptions) that fails on any future `sops` write dropping the column. **Verified live on production 2026-08-04**: SOP `1ae63606` cloned to v2 carrying `category_slug=admin-office` (UAT test 7). |
+
+### Found during closeout, beyond the phase's own scope
+
+The UAT surfaced defects the phase never introduced but which its surfaces
+exposed — recorded here because a future reader of this report should know the
+library was not in the state this phase's SUMMARYs imply:
+
+- **Cross-tenant read hole on `public.sops`** — four SELECT policies, one org
+  predicate; Postgres ORs permissive policies, so 15 of 30 SOPs were readable by
+  every tenant. Closed in migration 00061 + a permanent lint guard. **All the
+  "live data" figures in this phase's artifacts were measured through that leak**
+  and count four organisations' SOPs as one org's.
+- **Cross-tenant write hole on `organisation_members`** — a `WITH CHECK` that
+  replaced an org-scoped `USING` with a role-only rule. Closed in 00062.
+- Tab counts that did not reconcile, two SOPs invisible to every tab (one wedged
+  in `parsing` for 29 days), and a category column that was fetched and never
+  rendered.
+
+### Remaining formal gate
+
+`/gsd-secure-phase 40` has NOT been run — no `40-SECURITY.md` exists, and
+`workflow.security_enforcement` is `true`. The session's RLS audit closed two
+real holes and left a general guard, but that is not the same artifact as a
+threat-model verification against `PLAN.md`, and should not be treated as one.

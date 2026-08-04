@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v8.0
 milestone_name: — Authoring Convergence
 status: executing
-stopped_at: Phase 40 plans complete — awaiting re-verification
-last_updated: "2026-08-03"
-last_activity: 2026-08-03 -- Phase 40 plan 40-14 checkpoint approved
+stopped_at: Phase 40 CLOSED (UAT 11/11, all gaps closed) — Phase 41 not yet started
+last_updated: "2026-08-04"
+last_activity: 2026-08-04 -- Phase 40 closed out; two cross-tenant RLS holes found and fixed
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 14
   completed_plans: 14
-  percent: 0
+  percent: 25
 ---
 
 # Project State
@@ -25,12 +25,14 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 40 (shared-creation-foundation) — EXECUTING
-Plan: 1 of 14
-Status: Executing Phase 40
+Phase: 40 (shared-creation-foundation) — COMPLETE (2026-08-04)
+Next: Phase 41 (one-sop-surface) — not started
+Status: Phase 40 closed. UAT 11/11 (1 blocker found + fixed in session). All
+three 40-VERIFICATION gaps closed. Outstanding formal gate: /gsd-secure-phase 40
+has not run (no 40-SECURITY.md, security_enforcement=true).
 Last activity: 2026-07-29 -- Phase 40 execution started
 
-Progress: 0/4 phases · [░░░░░░░░░░] 0%
+Progress: 1/4 phases · [██░░░░░░░░] 25%
 
 ### v8.0 roadmap (created 2026-07-28 · re-derived 2026-07-28 after the SUR scope correction)
 
@@ -598,9 +600,46 @@ None yet.
 - Phase 8: TTS mispronounces industrial terminology and NZ place names — build per-org pronunciation dictionary with SSML phoneme tags; mandatory admin audio preview before publish
 - ~~Phase 26.5 PRE-DEPLOY GATE~~ **CLOSED 2026-07-12** — VOYAGE_API_KEY + CRON_SECRET now set on Railway (Simon confirmed). Synthesis sweep route + publish-hook embedding path are live-capable. Verify next deploy: `/api/agent-layer/synthesis-sweep` runs (not 503) and `last_synthesis_status='ok'` on publish.
 
+### Phase 40 closeout — what it turned up beyond its own scope
+
+The Phase 40 UAT ran on 2026-08-03/04 and surfaced five defects the phase never
+introduced. Two are tenant-isolation holes and are the most important artifacts
+of the whole phase:
+
+- **00061 — cross-tenant READ on `public.sops`.** Four SELECT policies, only one
+  carrying an org predicate. Postgres ORs permissive policies, so the scoped one
+  was decorative: 15 of 30 SOPs were readable by every authenticated user of
+  every tenant, and the admin library was rendering 7 foreign-org SOPs. Second
+  occurrence of this class (`sop_observations`, Phase 34).
+- **00062 — cross-tenant WRITE on `organisation_members`.** An org-scoped
+  `USING` paired with a `WITH CHECK` naming only the role. A specified check
+  REPLACES the USING fallback, so an admin could rewrite a member's
+  `organisation_id` into another tenant.
+- **00060 — four advertised upload formats were dead** (`.webp`, `.xlsx`,
+  `.pptx`, `.txt`) at a third accept list nobody had unified: the storage
+  bucket's own `allowed_mime_types`, untouched since 00005.
+
+Both RLS classes now have a permanent, mutation-proven guard
+(`tests/lint/rls-org-scope.spec.ts`) covering every table carrying
+`organisation_id`, not just the two that failed.
+
+**Consequence for planning:** every "live data shape" figure recorded in Phase
+40's artifacts and in sketch 005 was measured through the read leak and counts
+four organisations' SOPs as one. Real single-org shape is ~23 SOPs, not 30.
+
+**Deliberately not done:** seven junction/lookup tables keep `using(true)`
+SELECT policies per the 00030/00031 recursion-avoidance decision. They expose
+UUID pairs and two org-agnostic lookup tables — structure, no content. Narrowing
+them means reintroducing 42P17 risk via SECURITY DEFINER helpers; worth a
+deliberate decision, not a side-effect.
+
 ## Session Continuity
 
-Last session: 2026-08-03
-Stopped at: Phase 40 plan 40-14 complete — human checkpoint approved on sopstart.com, SUMMARY written. All 14 plans done; all three 40-VERIFICATION.md gaps closed in code (GAP 1 by 40-10, GAP 2 by 40-14, GAP 3 by 40-11). Phase 40 awaits re-verification.
+Last session: 2026-08-04
+Stopped at: Phase 40 CLOSED. UAT complete 11/11. Manage SOPs rebuilt onto sketch
+005 variant C (Miller columns: scope | list | editable detail) with inline
+category + department assignment. Next: apply the same Miller layout to the
+WORKER library at /sops for design consistency (user's request, 2026-08-04) —
+note SB-LINE-06's bundle gate applies to that route.
 Resume file:
-.planning/phases/40-shared-creation-foundation/40-VERIFICATION.md
+.planning/sketches/005-sop-library-altitude/README.md
