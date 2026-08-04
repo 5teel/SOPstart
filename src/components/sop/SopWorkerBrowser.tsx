@@ -37,6 +37,8 @@ export type WorkerSop = {
   isRefresherDue: boolean
   isRefresherOverdue: boolean
   hasNewerVersion: boolean
+  /** In the worker's own list, vs a library row they have not taken on. */
+  isAssigned: boolean
   /** Self-added vs assigned by a manager — decides which removal path applies. */
   isSelfAssigned: boolean
   removalRequested: boolean
@@ -53,6 +55,7 @@ function formatDay(iso: string | null): string | null {
 
 /** The one signal that most deserves the worker's attention, worst first. */
 function topSignal(sop: WorkerSop): { label: string; tone: 'bad' | 'warn' | 'info' } | null {
+  if (!sop.isAssigned) return { label: 'Not yours', tone: 'info' }
   if (sop.isRefresherOverdue) return { label: 'Refresher overdue', tone: 'bad' }
   if (sop.hasNewerVersion) return { label: 'Updated since you read it', tone: 'warn' }
   if (sop.isRefresherDue) return { label: 'Refresher due', tone: 'warn' }
@@ -70,12 +73,14 @@ export function SopWorkerBrowser({
   sops,
   scopeLabel,
   onRemove,
-  removePending,
+  onAdd,
+  actionPending,
 }: {
   sops: WorkerSop[]
   scopeLabel: string
   onRemove: (sopId: string) => void
-  removePending: boolean
+  onAdd: (sopId: string) => void
+  actionPending: boolean
 }) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const selected = sops.find((s) => s.id === selectedId) ?? null
@@ -142,7 +147,8 @@ export function SopWorkerBrowser({
                 <div className="lg:hidden">
                   <SopLibraryCard
                     sop={sop.raw}
-                    isCached
+                    isCached={sop.isAssigned}
+                    isAssigned={sop.isAssigned}
                     hasNewerVersion={sop.hasNewerVersion}
                     isRefresherDue={sop.isRefresherDue}
                     isRefresherOverdue={sop.isRefresherOverdue}
@@ -198,7 +204,7 @@ export function SopWorkerBrowser({
                 <div className="flex gap-2 py-1">
                   <dt className="w-[74px] flex-shrink-0 text-[11px] text-[var(--ink-500)]">Added by</dt>
                   <dd className="text-[var(--ink-900)]">
-                    {selected.isSelfAssigned ? 'You' : 'Your manager'}
+                    {!selected.isAssigned ? '—' : selected.isSelfAssigned ? 'You' : 'Your manager'}
                   </dd>
                 </div>
               </dl>
@@ -216,21 +222,33 @@ export function SopWorkerBrowser({
                 >
                   Read it
                 </Link>
-                {/* Removal moved off every row and into the pane — one button
-                    for the SOP you are actually looking at, instead of 20
-                    destructive-ish controls down the side of the list. */}
-                <button
-                  type="button"
-                  onClick={() => onRemove(selected.id)}
-                  disabled={removePending || selected.removalRequested}
-                  className="min-h-11 rounded-lg px-3 py-2 text-xs text-[var(--ink-500)] hover:text-red-600 disabled:cursor-default disabled:text-[var(--ink-300)]"
-                >
-                  {selected.removalRequested
-                    ? 'Removal requested'
-                    : selected.isSelfAssigned
-                      ? 'Remove from your SOPs'
-                      : 'Ask to be taken off this'}
-                </button>
+                {/* Add/remove moved off every row and into the pane — one
+                    button for the SOP you are actually looking at, instead of
+                    a column of +/− controls down the side of the list. This is
+                    what replaced the old "SOP Library" tab's per-row buttons. */}
+                {selected.isAssigned ? (
+                  <button
+                    type="button"
+                    onClick={() => onRemove(selected.id)}
+                    disabled={actionPending || selected.removalRequested}
+                    className="min-h-11 rounded-lg px-3 py-2 text-xs text-[var(--ink-500)] hover:text-red-600 disabled:cursor-default disabled:text-[var(--ink-300)]"
+                  >
+                    {selected.removalRequested
+                      ? 'Removal requested'
+                      : selected.isSelfAssigned
+                        ? 'Remove from your SOPs'
+                        : 'Ask to be taken off this'}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => onAdd(selected.id)}
+                    disabled={actionPending}
+                    className="min-h-11 rounded-lg border border-[var(--ink-900)] px-3 py-2 text-xs font-semibold text-[var(--ink-900)] hover:bg-[var(--paper)] disabled:cursor-default disabled:border-[var(--ink-300)] disabled:text-[var(--ink-300)]"
+                  >
+                    Add to your SOPs
+                  </button>
+                )}
               </div>
             </>
           )}

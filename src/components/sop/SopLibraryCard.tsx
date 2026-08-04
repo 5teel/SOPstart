@@ -27,6 +27,9 @@ interface SopLibraryCardProps {
   /** Phase 36 REF-01 / D-08: true when the due date has actually passed —
    * escalates the chip label from "Refresher due" to "Refresher overdue". */
   isRefresherOverdue?: boolean
+  /** False for a library row the worker has not added — the "Assigned" badge
+   *  would be a lie on those. */
+  isAssigned?: boolean
 }
 
 export function SopLibraryCard({
@@ -35,6 +38,7 @@ export function SopLibraryCard({
   hasNewerVersion = false,
   isRefresherDue = false,
   isRefresherOverdue = false,
+  isAssigned = true,
 }: SopLibraryCardProps) {
   const meta = [categoryLabel(sop.category_slug ?? null), sop.department].filter(Boolean).join(' · ')
 
@@ -68,9 +72,11 @@ export function SopLibraryCard({
           <p className="mono text-xs text-[var(--ink-500)]">{sop.sop_number}</p>
         )}
         <div className="flex items-center gap-2 mt-2 flex-wrap">
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--accent-signoff)]/10 text-[var(--accent-signoff)] text-xs font-semibold rounded">
-            Assigned
-          </span>
+          {isAssigned && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--accent-signoff)]/10 text-[var(--accent-signoff)] text-xs font-semibold rounded">
+              Assigned
+            </span>
+          )}
           {/* AFL-VER-04 / D-08: "Updated" badge — derives from hasNewerVersion prop
               (comparison of sop.published_at vs worker's last submitted_at, computed in
               the parent page). D-09: badge is informational only, no onClick re-walk. */}
