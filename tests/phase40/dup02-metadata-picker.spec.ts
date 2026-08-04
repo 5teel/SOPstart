@@ -29,6 +29,7 @@ const PROMPT_CLIENT = path.join(SRC_DIR, 'app', '(protected)', 'admin', 'sops', 
 const WIZARD_CLIENT = path.join(SRC_DIR, 'app', '(protected)', 'admin', 'sops', 'new', 'blank', 'WizardClient.tsx')
 const VOICE_DRAFT_CLIENT = path.join(SRC_DIR, 'app', '(protected)', 'admin', 'sops', 'new', 'ai', 'VoiceDraftClient.tsx')
 const SOP_METADATA_FIELDS = path.join(SRC_DIR, 'components', 'admin', 'SopMetadataFields.tsx')
+const SOP_METADATA_DIALOG = path.join(SRC_DIR, 'components', 'admin', 'SopMetadataDialog.tsx')
 const UPLOAD_PAGE = path.join(SRC_DIR, 'app', '(protected)', 'admin', 'sops', 'upload', 'page.tsx')
 const AI_PROMPT_ROUTE = path.join(SRC_DIR, 'app', 'api', 'sops', 'ai-prompt', 'route.ts')
 const SOPS_ACTIONS = path.join(SRC_DIR, 'actions', 'sops.ts')
@@ -46,12 +47,46 @@ test.describe('DUP-02 -- one shared metadata picker', () => {
     }
   })
 
-  test('SopMetadataFields renders DepartmentPicker with localOnly and sources categories from @/lib/sop-categories', () => {
-    const src = read(SOP_METADATA_FIELDS)
+  // The picker + category vocabulary moved from SopMetadataFields into
+  // SopMetadataDialog when metadata capture became a stepped modal. Assert the
+  // behaviour WHERE IT LIVES *and* that the caller still wires it — a guard
+  // that only greps the old file goes stale-green on the next relocation
+  // (CLAUDE.md [2026-07-13]).
+  test('SopMetadataDialog renders DepartmentPicker with localOnly and sources categories from @/lib/sop-categories', () => {
+    const src = read(SOP_METADATA_DIALOG)
     expect(src).toContain('<DepartmentPicker')
     expect(src).toContain('localOnly')
     expect(src).toContain("from '@/lib/sop-categories'")
     expect(src).not.toContain(".from('sops').select('category')")
+  })
+
+  test('SopMetadataFields still owns the contract and mounts the dialog', () => {
+    const src = read(SOP_METADATA_FIELDS)
+    // The shared value type stays here — three call sites import it from here.
+    expect(src).toContain('export type SopMetadataValue')
+    // Wiring, not mere import presence: the dialog is actually rendered, and is
+    // handed the value/onChange pair the parent owns.
+    expect(src).toContain('<SopMetadataDialog')
+    expect(src).toContain('value={value}')
+    expect(src).toContain('onChange={onChange}')
+    // Whatever the surface hides is dropped from the dialog's step run, so a
+    // hidden field can never be asked for.
+    expect(src).toContain('showDepartments && departments.length > 0')
+    expect(src).not.toContain(".from('sops').select('category')")
+  })
+
+  test('metadata capture is one decision at a time, with answered steps revisitable (D-10)', () => {
+    const src = read(SOP_METADATA_DIALOG)
+    // Department -> Category -> Title: low-effort picks first.
+    const order = ['departments', 'category', 'title']
+    const positions = order.map((s) => src.indexOf(`STEP_LABEL`) >= 0 ? src.indexOf(`${s}:`) : -1)
+    expect(positions.every((p) => p > 0), 'all three steps declared in STEP_LABEL').toBe(true)
+    expect(positions[0]).toBeLessThan(positions[1])
+    expect(positions[1]).toBeLessThan(positions[2])
+    // An answered step stays on screen and can be re-opened.
+    expect(src).toContain('onClick={() => setActive(step)}')
+    // Nothing in a dialog rendered inside a parent <form> may submit it.
+    expect(src).not.toMatch(/<button(?![^>]*type="button")[^>]*>/)
   })
 
   test('admin/sops/upload/page.tsx does NOT import SopMetadataFields (D-12 -- upload is Phase 42 scope)', () => {

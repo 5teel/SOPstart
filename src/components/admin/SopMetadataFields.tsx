@@ -9,29 +9,36 @@
  * query (an anti-pattern per DAT-01 — deleted here), and VoiceDraftClient had
  * no category UI at all. See 40-PATTERNS.md for the full comparison.
  *
+ * These three fields are no longer inline inputs. They are collected up front
+ * by SopMetadataDialog — one decision at a time on a recessed screen — and
+ * this component is what remains on the page afterwards: a compact, quiet
+ * summary of the answers with one way back in. The dialog opens by itself the
+ * first time, when nothing has been set yet, because these are decisions the
+ * surface cannot proceed sensibly without.
+ *
+ * The props contract is UNCHANGED from the inline version, which is the point:
+ * all three call sites picked up the new interaction without an edit. That is
+ * the DUP-02 consolidation paying for itself.
+ *
  * D-10: this is ONE composite component rendering all fields with uniform
  * layout — not a field kit of three independently-composable parts. The
  * `showTitle`/`showCategory`/`showDepartments` props are escape hatches for a
  * surface that genuinely lacks a field, not a per-surface theming API. Hiding
  * a field is a deviation from the norm and must be justified in a comment at
- * the call site.
+ * the call site. A hidden field is also dropped from the dialog's step run.
  *
  * D-11: `localOnly` on `DepartmentPicker` is mandatory and non-negotiable.
  * This component NEVER calls a server action and NEVER writes
  * `sop_departments` directly — it only reports the selection via `onChange`.
  * The parent owns `value` and commits the real write (`assignSopDepartments`)
  * on final submit, exactly as all three pre-existing copies already did.
- *
- * Uncontrolled RHF `register()` is deliberately NOT used for the title field:
- * two of the three call sites (PromptClient, VoiceDraftClient) don't use
- * react-hook-form for this field at all, so this component is driven purely
- * by controlled `value`/`onChange` props.
  */
 
+import { useEffect, useMemo, useState } from 'react'
+import { Pencil } from 'lucide-react'
 import type { Department } from '@/types/sop'
-import { DepartmentPicker } from '@/components/admin/departments/DepartmentPicker'
-import { DChip } from '@/components/admin/departments/DChip'
 import { SOP_CATEGORIES } from '@/lib/sop-categories'
+import { SopMetadataDialog, type MetadataStep } from '@/components/admin/SopMetadataDialog'
 
 export type SopMetadataValue = {
   title: string
@@ -79,82 +86,103 @@ export function SopMetadataFields({
   disabled,
   idPrefix = 'sop-meta',
 }: Props) {
+  // A field the surface has hidden is not a step the user gets asked about.
+  const steps = useMemo<MetadataStep[]>(() => {
+    const s: MetadataStep[] = []
+    if (showDepartments && departments.length > 0) s.push('departments')
+    if (showCategory) s.push('category')
+    if (showTitle) s.push('title')
+    return s
+  }, [showDepartments, showCategory, showTitle, departments.length])
+
+  // Auto-open once, only when there is genuinely nothing to show yet. Editing
+  // an existing draft (title already present) does not get ambushed by a modal.
+  const [open, setOpen] = useState(false)
+  const [autoOpened, setAutoOpened] = useState(false)
+  const [reopenAt, setReopenAt] = useState<MetadataStep | undefined>(undefined)
+
+  useEffect(() => {
+    if (autoOpened || disabled || steps.length === 0) return
+    const untouched =
+      value.title.trim() === '' &&
+      value.categorySlug === null &&
+      value.departmentIds.length === 0 &&
+      !value.allDepartments
+    setAutoOpened(true)
+    if (untouched) setOpen(true)
+  }, [autoOpened, disabled, steps.length, value])
+
+  const categoryLabel = value.categorySlug
+    ? SORTED_CATEGORIES.find((c) => c.slug === value.categorySlug)?.label ?? value.categorySlug
+    : 'No category'
+
+  const audience = value.allDepartments || value.departmentIds.length === 0
+    ? 'Everyone in the organisation'
+    : (value.departmentIds
+        .map((id) => departments.find((d) => d.id === id)?.name)
+        .filter(Boolean) as string[]).join(', ')
+
+  const openAt = (step: MetadataStep) => {
+    if (disabled) return
+    setReopenAt(step)
+    setOpen(true)
+  }
+
+  const rows: { step: MetadataStep; label: string; text: string; testid: string }[] = []
+  if (steps.includes('departments')) {
+    rows.push({ step: 'departments', label: 'Who can see it', text: audience, testid: 'summary-departments' })
+  }
+  if (steps.includes('category')) {
+    rows.push({ step: 'category', label: 'Kind', text: categoryLabel, testid: 'summary-category' })
+  }
+  if (steps.includes('title')) {
+    rows.push({ step: 'title', label: 'Title', text: value.title.trim() || 'Not set yet', testid: 'summary-title' })
+  }
+
   return (
-    <div className="flex flex-col gap-4" data-testid="sop-metadata-fields">
-      {showTitle && (
-        <label className="flex flex-col gap-1">
-          <span className="text-sm text-[var(--ink-500)]">Title *</span>
-          <input
-            id={`${idPrefix}-title`}
-            value={value.title}
-            onChange={(e) => onChange({ ...value, title: e.target.value })}
+    <div className="flex flex-col gap-2" data-testid="sop-metadata-fields">
+      <div className="rounded border border-[var(--ink-100)] bg-[var(--paper-2)]">
+        {rows.map((r, i) => (
+          <button
+            key={r.step}
+            type="button"
             disabled={disabled}
-            className="rounded border border-[var(--ink-300)] bg-[var(--paper)] px-3 py-2 text-[var(--ink-900)]"
-            placeholder="e.g. Forklift pre-start checklist"
-            data-testid="sop-metadata-title-input"
-          />
-          {titleError && <span className="text-xs text-red-400">{titleError}</span>}
-        </label>
-      )}
-
-      {/* Departments — localOnly (D-11): parent owns the selection, the write
-          happens on final submit through assignSopDepartments. This component
-          must never call a server action and must never write sop_departments
-          directly. */}
-      {showDepartments && departments.length > 0 && (
-        <div className="flex flex-col gap-1" data-testid="sop-metadata-dept-field">
-          <span className="text-sm font-semibold" style={{ color: 'var(--ink-900)' }}>
-            Department <span className="font-normal text-[var(--ink-500)]">(optional)</span>
-          </span>
-          {(value.departmentIds.length > 0 || value.allDepartments) && (
-            <div className="flex flex-wrap gap-1 mb-1">
-              {value.allDepartments ? (
-                <DChip variant="all-departments" />
-              ) : (
-                value.departmentIds.map((id) => {
-                  const dept = departments.find((d) => d.id === id)
-                  return dept ? <DChip key={id} variant="department" department={dept} /> : null
-                })
-              )}
-            </div>
-          )}
-          <DepartmentPicker
-            mode="sop"
-            sopId="__new__"
-            localOnly
-            departments={departments}
-            selectedIds={value.departmentIds}
-            allDepartments={value.allDepartments}
-            onChange={(ids, all) => onChange({ ...value, departmentIds: ids, allDepartments: all })}
-          />
-          <span className="text-xs" style={{ color: 'var(--ink-500)' }}>
-            Leave empty to make visible to all members, or select departments to restrict visibility.
-          </span>
-        </div>
-      )}
-
-      {/* Category — fixed SOP_CATEGORIES vocabulary (DAT-01). The live
-          `DISTINCT sops.category` query PromptClient used to populate this
-          dropdown queried a column DAT-01 retires and must not survive. */}
-      {showCategory && (
-        <label className="flex flex-col gap-1">
-          <span className="text-sm text-[var(--ink-500)]">Category (optional)</span>
-          <select
-            id={`${idPrefix}-category`}
-            value={value.categorySlug ?? ''}
-            onChange={(e) => onChange({ ...value, categorySlug: e.target.value || null })}
-            disabled={disabled}
-            className="w-full bg-white border border-[var(--ink-100)] rounded-lg p-2 text-[var(--ink-900)]"
-            data-testid="sop-metadata-category-select"
+            onClick={() => openAt(r.step)}
+            data-testid={`sop-metadata-${r.testid}`}
+            className={`flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-white disabled:cursor-not-allowed disabled:opacity-60 ${
+              i > 0 ? 'border-t border-[var(--ink-100)]' : ''
+            }`}
           >
-            <option value="">— None —</option>
-            {SORTED_CATEGORIES.map((c) => (
-              <option key={c.slug} value={c.slug}>
-                {c.label}
-              </option>
-            ))}
-          </select>
-        </label>
+            <span className="w-32 shrink-0 text-xs uppercase tracking-wider text-[var(--ink-500)]">
+              {r.label}
+            </span>
+            <span
+              className={`min-w-0 flex-1 truncate text-sm ${
+                r.text === 'Not set yet' ? 'text-[var(--ink-300)]' : 'text-[var(--ink-900)]'
+              }`}
+            >
+              {r.text}
+            </span>
+            <Pencil size={13} className="shrink-0 text-[var(--ink-500)]" aria-hidden="true" />
+          </button>
+        ))}
+      </div>
+
+      {titleError && <span className="text-xs text-red-400">{titleError}</span>}
+
+      {open && (
+        <SopMetadataDialog
+          value={value}
+          onChange={onChange}
+          onClose={() => {
+            setOpen(false)
+            setReopenAt(undefined)
+          }}
+          departments={departments}
+          steps={steps}
+          initialStep={reopenAt}
+          idPrefix={idPrefix}
+        />
       )}
     </div>
   )
