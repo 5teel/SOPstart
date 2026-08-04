@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sketch 005 — SOP library altitude</title>
+<link rel="stylesheet" href="../themes/default.css">
+<style>
+  /* ── sketch chrome (matches 004) ───────────────────────────── */
+  .variant-nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--ink-900); color: #fff;
+    display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+    padding: 8px 16px; font-family: var(--mono); font-size: 12px;
+  }
+  .variant-nav .vlabel { color: var(--ink-400); margin-right: 8px; }
+  .variant-nav button {
+    background: transparent; color: var(--ink-300); border: 1px solid transparent;
+    font: inherit; padding: 4px 10px; border-radius: 4px; cursor: pointer;
+  }
+  .variant-nav button.active { background: #fff; color: var(--ink-900); font-weight: 700; }
+  .variant { display: none; }
+  .variant.active { display: block; }
+  .variant-title {
+    max-width: 1024px; margin: 0 auto; padding: 14px 16px 0;
+    font-family: var(--mono); font-size: 11px; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--ink-500);
+  }
+  .variant-title b { color: var(--ink-900); }
+  .variant-title p { font-family: var(--sans); text-transform: none; letter-spacing: 0; font-size: 13px; color: var(--ink-600); margin: 6px 0 0; max-width: 680px; }
+
+  /* ── shared app chrome mock ────────────────────────────────── */
+  .app { border: 1px solid var(--ink-300); border-radius: 10px; overflow: hidden; background: var(--paper); max-width: 1024px; margin: 16px auto 48px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .topbar { border-bottom: 1px solid var(--ink-200); background: var(--paper-1); }
+  .topbar-in { display: flex; align-items: center; gap: 12px; height: 52px; padding: 0 20px; }
+  .brand { display: flex; align-items: center; gap: 8px; font-family: var(--mono); font-weight: 700; font-size: 14px; }
+  .dot { width: 20px; height: 20px; border-radius: 5px; background: var(--ink-900); color:#fff; display:grid; place-items:center; font-size:11px; }
+  .topnav { display: flex; gap: 2px; margin-left: 12px; flex: 1; }
+  .topnav a { text-decoration: none; color: var(--ink-500); font-size: 12px; font-weight: 500; padding: 6px 9px; border-radius: 6px; }
+  .topnav a.on { color: var(--ink-900); background: var(--paper-2); font-weight: 600; }
+  .avatar { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--ink-300); display: grid; place-items: center; font-size: 10px; font-family: var(--mono); }
+  .page { padding: 22px 20px 32px; }
+
+  h2.ph { font-size: 17px; margin: 0 0 2px; letter-spacing: -.01em; }
+  .sub { font-size: 13px; color: var(--ink-500); margin: 0 0 18px; }
+
+  .row { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid var(--ink-100); border-radius: 6px; background: var(--paper-1); margin-bottom: 4px; cursor: pointer; }
+  .row:hover { box-shadow: 0 0 0 1px var(--ink-900); }
+  .row .t { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .row .t.untitled { font-style: italic; font-weight: 500; color: var(--ink-500); }
+  .chip { font-family: var(--mono); font-size: 10.5px; padding: 2px 6px; border-radius: 4px; background: var(--paper-2); color: var(--ink-500); white-space: nowrap; }
+  .chip.warn { background: rgba(217,119,6,.16); color: #b45309; }
+  .chip.bad  { background: rgba(185,28,28,.14); color: var(--accent-hazard); }
+  .chip.ok   { background: rgba(22,163,74,.14); color: var(--accent-ok); }
+  .chip.ghost { background: transparent; color: var(--ink-300); }
+  .age { font-family: var(--mono); font-size: 10.5px; color: var(--ink-300); width: 34px; text-align: right; }
+
+  .btn { font: inherit; font-size: 12px; border: 1px solid var(--ink-300); background: var(--paper-1); border-radius: 6px; padding: 5px 11px; cursor: pointer; color: var(--ink-700); }
+  .btn:hover { border-color: var(--ink-900); color: var(--ink-900); }
+  .btn.primary { background: var(--ink-900); color: #fff; border-color: var(--ink-900); font-weight: 600; }
+  .btn.sm { padding: 3px 8px; font-size: 11px; }
+
+  .muted { color: var(--ink-500); }
+  .mono-s { font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-500); }
+
+  /* ── A: triage board ───────────────────────────────────────── */
+  .decks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .deck { border: 1px solid var(--ink-300); border-radius: 8px; padding: 14px; background: var(--paper-1); cursor: pointer; text-align: left; font: inherit; }
+  .deck:hover { box-shadow: 0 0 0 1px var(--ink-900); }
+  .deck.on { border-color: var(--ink-900); box-shadow: 0 0 0 1px var(--ink-900); background: var(--paper-2); }
+  .deck .n { font-family: var(--mono); font-size: 30px; font-weight: 700; line-height: 1; }
+  .deck .n.bad { color: var(--accent-hazard); }
+  .deck .n.warn { color: #b45309; }
+  .deck .lb { font-size: 13px; font-weight: 600; margin-top: 6px; }
+  .deck .hint { font-size: 11.5px; color: var(--ink-500); margin-top: 2px; line-height: 1.35; }
+  .worklist-head { display: flex; align-items: center; gap: 10px; margin: 0 0 10px; }
+  .worklist-head .ttl { font-size: 13px; font-weight: 700; }
+  .rule { flex: 1; height: 1px; background: var(--ink-200); }
+
+  /* ── B: drill-down ─────────────────────────────────────────── */
+  .crumb { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 11px; color: var(--ink-500); margin-bottom: 14px; }
+  .crumb a { color: var(--ink-900); text-decoration: none; border-bottom: 1px solid var(--ink-300); cursor: pointer; }
+  .tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .tile { border: 1px solid var(--ink-300); border-radius: 8px; padding: 13px; background: var(--paper-1); cursor: pointer; text-align: left; font: inherit; }
+  .tile:hover { box-shadow: 0 0 0 1px var(--ink-900); }
+  .tile .nm { font-size: 13px; font-weight: 600; }
+  .tile .ct { font-family: var(--mono); font-size: 19px; font-weight: 700; margin-top: 4px; }
+  .tile .br { display: flex; gap: 3px; margin-top: 8px; height: 4px; border-radius: 2px; overflow: hidden; background: var(--ink-200); }
+  .tile .br i { display: block; height: 100%; }
+  .tile .meta { font-size: 11px; color: var(--ink-500); margin-top: 6px; }
+
+  /* ── C: miller columns ─────────────────────────────────────── */
+  .miller { display: grid; grid-template-columns: 150px 1fr 250px; border: 1px solid var(--ink-300); border-radius: 8px; overflow: hidden; min-height: 400px; background: var(--paper-1); }
+  .mcol { border-right: 1px solid var(--ink-200); overflow: auto; }
+  .mcol:last-child { border-right: none; background: var(--paper-2); }
+  .mcol h4 { margin: 0; padding: 8px 11px; font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-500); border-bottom: 1px solid var(--ink-200); background: var(--paper-2); position: sticky; top: 0; }
+  .mitem { padding: 7px 11px; font-size: 12.5px; cursor: pointer; display: flex; align-items: center; gap: 7px; border-bottom: 1px solid var(--ink-100); }
+  .mitem:hover { background: var(--paper-2); }
+  .mitem.on { background: var(--ink-900); color: #fff; }
+  .mitem.on .chip { background: rgba(255,255,255,.18); color: #fff; }
+  .mitem .c { margin-left: auto; font-family: var(--mono); font-size: 10.5px; color: var(--ink-400); }
+  .mitem.on .c { color: rgba(255,255,255,.7); }
+  .preview { padding: 14px; }
+  .preview .pt { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+  .kv { display: flex; gap: 8px; font-size: 12px; padding: 4px 0; border-bottom: 1px dotted var(--ink-200); }
+  .kv b { width: 76px; flex-shrink: 0; font-weight: 500; color: var(--ink-500); font-size: 11px; }
+
+  /* ── D: quiet list ─────────────────────────────────────────── */
+  .qbar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .seg { display: inline-flex; border: 1px solid var(--ink-300); border-radius: 6px; overflow: hidden; }
+  .seg button { font: inherit; font-size: 11.5px; padding: 4px 10px; background: var(--paper-1); border: none; border-right: 1px solid var(--ink-200); cursor: pointer; color: var(--ink-600); }
+  .seg button:last-child { border-right: none; }
+  .seg button.on { background: var(--ink-900); color: #fff; font-weight: 600; }
+  .search { flex: 1; border: 1px solid var(--ink-300); border-radius: 6px; padding: 5px 10px; font: inherit; font-size: 12.5px; background: var(--paper-1); }
+  .grp { margin: 16px 0 6px; display: flex; align-items: center; gap: 9px; }
+  .grp .gl { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-500); }
+  .qrow { display: flex; align-items: center; gap: 10px; padding: 7px 4px; border-bottom: 1px solid var(--ink-100); cursor: pointer; }
+  .qrow:hover { background: var(--paper-2); }
+  .qrow .t { flex: 1; min-width: 0; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .qrow .t.untitled { font-style: italic; color: var(--ink-500); }
+  .qrow .detail { display: none; }
+  .qrow:hover .detail { display: flex; gap: 6px; }
+  .qrow .sig { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .sig.d { background: var(--ink-300); }
+  .sig.p { background: var(--accent-ok); }
+  .sig.x { background: var(--accent-hazard); }
+
+  .note { max-width: 1024px; margin: 0 auto 40px; padding: 0 16px; font-size: 12.5px; color: var(--ink-600); }
+  .note b { color: var(--ink-900); }
+  .note ul { margin: 6px 0 0; padding-left: 18px; }
+  .note li { margin: 3px 0; }
+</style>
+</head>
+<body>
+
+<nav class="variant-nav">
+  <span class="vlabel">SKETCH 005 · SOP LIBRARY ALTITUDE</span>
+  <button class="active" onclick="showVariant('a', this)">A: Triage board</button>
+  <button onclick="showVariant('b', this)">B: Drill-down</button>
+  <button onclick="showVariant('c', this)">C: Miller columns</button>
+  <button onclick="showVariant('d', this)">D: Quiet list</button>
+  <button onclick="showVariant('now', this)">— Shipped (for comparison)</button>
+</nav>
+
+<!-- ══════════════════════════════ A ══════════════════════════ -->
+<section id="variant-a" class="variant active">
+  <div class="variant-title">
+    <b>Variant A — Triage board.</b> The page opens on a decision, not an inventory.
+    <p>Three decks answer “what needs me?” before any SOP is listed. Choosing one
+       yields a focused worklist of only those SOPs, each with the single action
+       that clears it. The full library is a deliberate second step, not the default.</p>
+  </div>
+  <div class="app">
+    <div class="topbar"><div class="topbar-in">
+      <span class="brand"><span class="dot">S</span>SOPstart</span>
+      <span class="topnav"><a>SOPs</a><a>Sign-off</a><a class="on">Manage SOPs</a><a>Create New SOP</a><a>Content</a><a>Team</a></span>
+      <span class="avatar">SI</span>
+    </div></div>
+    <div class="page">
+      <h2 class="ph">What needs you today?</h2>
+      <p class="sub">30 SOPs in the library. Three things are waiting.</p>
+
+      <div class="decks">
+        <button class="deck on" onclick="pickDeck(this,'review')">
+          <div class="n warn">23</div>
+          <div class="lb">Drafts to review</div>
+          <div class="hint">Parsed and waiting for a human to check them before workers see them.</div>
+        </button>
+        <button class="deck" onclick="pickDeck(this,'problem')">
+          <div class="n bad">9</div>
+          <div class="lb">Problems to fix</div>
+          <div class="hint">7 flagged for owner or review date · 2 stuck mid-pipeline.</div>
+        </button>
+        <button class="deck" onclick="pickDeck(this,'live')">
+          <div class="n">5</div>
+          <div class="lb">Live for workers</div>
+          <div class="hint">Published and in use. Nothing needed unless a review falls due.</div>
+        </button>
+      </div>
+
+      <div class="worklist-head">
+        <span class="ttl" id="wl-title">Drafts to review — worst parse first</span>
+        <span class="rule"></span>
+        <button class="btn sm">Browse all 30 →</button>
+      </div>
+
+      <div id="wl-review">
+        <div class="row"><span class="t">Deflector Setup and Replacement for Proper Gob Loading — Glass Forming Machine</span><span class="chip warn">62% parse</span><button class="btn sm primary">Review</button></div>
+        <div class="row"><span class="t untitled">EN-FOR-03-001 Forming Machine Swabbing</span><span class="chip warn">No title</span><button class="btn sm primary">Review</button></div>
+        <div class="row"><span class="t">Alkaline Cleaning Tank Operation — Machine Shop</span><span class="chip warn">71% parse</span><button class="btn sm primary">Review</button></div>
+        <div class="row"><span class="t">Changing Plenum Chamber — IS Machine Forming Section</span><span class="chip">Engineering</span><button class="btn sm primary">Review</button></div>
+        <div class="row"><span class="t">Forming Area Mandatory Minimum Safety Requirements</span><span class="chip">Manufacturing</span><button class="btn sm primary">Review</button></div>
+        <div class="row"><span class="t">Emergency Tyre Change on a Motorway</span><span class="chip">Forklift &amp; Vehicles</span><button class="btn sm primary">Review</button></div>
+        <p class="sub" style="margin:10px 0 0">…17 more. <a href="#" style="color:var(--ink-900)">Show all 23</a></p>
+      </div>
+
+      <div id="wl-problem" style="display:none">
+        <div class="row"><span class="t untitled">test-sop-page</span><span class="chip bad">Stuck 15h</span><button class="btn sm">Delete</button><button class="btn sm primary">Retry</button></div>
+        <div class="row"><span class="t untitled">AI prompt</span><span class="chip bad">Stuck 29d</span><button class="btn sm">Delete</button><button class="btn sm primary">Retry</button></div>
+        <div class="row"><span class="t">Org B SOP</span><span class="chip warn">No owner</span><button class="btn sm primary">Assign owner</button></div>
+        <div class="row"><span class="t">Changing the Blank Side Hanger</span><span class="chip warn">No owner</span><button class="btn sm primary">Assign owner</button></div>
+        <div class="row"><span class="t">Manually Swabbing a Forming Machine</span><span class="chip warn">No owner</span><button class="btn sm primary">Assign owner</button></div>
+      </div>
+
+      <div id="wl-live" style="display:none">
+        <div class="row"><span class="t">Setting Up and Operating the Hot Melt Gluer</span><span class="chip ok">Live</span><span class="chip">Engineering</span><span class="age">27d</span></div>
+        <div class="row"><span class="t">Replacing a Desktop Computer Keyboard at a Workstation</span><span class="chip ok">Live</span><span class="chip">Admin &amp; Office</span><span class="age">27d</span></div>
+        <div class="row"><span class="t">Test SOP Scratch</span><span class="chip ok">Live</span><span class="chip">Environmental</span><span class="age">today</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="note">
+    <b>The bet:</b> an admin arrives with a job, not a browsing impulse. Counts are the
+    navigation, and each worklist row carries the one action that clears it, so the page
+    is a queue that drains rather than a table that accumulates.
+    <ul><li><b>Watch:</b> does “Browse all 30” feel buried when you genuinely just want to look something up?</li></ul>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ B ══════════════════════════ -->
+<section id="variant-b" class="variant">
+  <div class="variant-title">
+    <b>Variant B — Drill-down by facet.</b> Pick a scope before you see any SOP.
+    <p>Departments first (the question an admin actually asks: “what does Forming have?”),
+       then status within it, then the SOP. A breadcrumb is the only control — your position
+       in the hierarchy IS the filter state.</p>
+  </div>
+  <div class="app">
+    <div class="topbar"><div class="topbar-in">
+      <span class="brand"><span class="dot">S</span>SOPstart</span>
+      <span class="topnav"><a>SOPs</a><a>Sign-off</a><a class="on">Manage SOPs</a><a>Create New SOP</a><a>Content</a><a>Team</a></span>
+      <span class="avatar">SI</span>
+    </div></div>
+    <div class="page">
+      <div class="crumb" id="b-crumb"><a onclick="bLevel(0)">All SOPs</a><span>30</span></div>
+
+      <div id="b-l0">
+        <h2 class="ph">Which part of the business?</h2>
+        <p class="sub">Every SOP belongs to a department, or to nobody yet.</p>
+        <div class="tiles">
+          <button class="tile" onclick="bLevel(1,'Engineering')">
+            <div class="nm">Engineering</div><div class="ct">9</div>
+            <div class="br"><i style="flex:7;background:var(--ink-400)"></i><i style="flex:2;background:var(--accent-ok)"></i></div>
+            <div class="meta">7 drafts · 2 live</div>
+          </button>
+          <button class="tile" onclick="bLevel(1,'Manufacturing')">
+            <div class="nm">Manufacturing</div><div class="ct">5</div>
+            <div class="br"><i style="flex:4;background:var(--ink-400)"></i><i style="flex:1;background:var(--accent-ok)"></i></div>
+            <div class="meta">4 drafts · 1 live</div>
+          </button>
+          <button class="tile" onclick="bLevel(1,'Forming')">
+            <div class="nm">Forming</div><div class="ct">3</div>
+            <div class="br"><i style="flex:3;background:var(--ink-400)"></i></div>
+            <div class="meta">3 drafts</div>
+          </button>
+          <button class="tile" onclick="bLevel(1,'Machine Shop')">
+            <div class="nm">Machine Shop</div><div class="ct">2</div>
+            <div class="br"><i style="flex:2;background:var(--ink-400)"></i></div>
+            <div class="meta">2 drafts</div>
+          </button>
+          <button class="tile" onclick="bLevel(1,'No department')" style="border-style:dashed">
+            <div class="nm muted">No department yet</div><div class="ct">16</div>
+            <div class="br"><i style="flex:14;background:var(--ink-300)"></i><i style="flex:2;background:var(--accent-ok)"></i></div>
+            <div class="meta">Nobody can be assigned these</div>
+          </button>
+          <button class="tile" onclick="bLevel(1,'Problems')" style="border-color:var(--accent-hazard)">
+            <div class="nm" style="color:var(--accent-hazard)">Needs attention</div><div class="ct" style="color:var(--accent-hazard)">9</div>
+            <div class="br"><i style="flex:9;background:var(--accent-hazard)"></i></div>
+            <div class="meta">Cuts across departments</div>
+          </button>
+        </div>
+      </div>
+
+      <div id="b-l1" style="display:none">
+        <h2 class="ph" id="b-l1-title">Engineering — 9 SOPs</h2>
+        <p class="sub">Pick a state, or scroll the lot.</p>
+        <div class="tiles" style="grid-template-columns:repeat(4,1fr);margin-bottom:18px">
+          <button class="tile" onclick="bLevel(2)"><div class="nm">Drafts</div><div class="ct">7</div></button>
+          <button class="tile" onclick="bLevel(2)"><div class="nm">Live</div><div class="ct">2</div></button>
+          <button class="tile" onclick="bLevel(2)"><div class="nm">Flagged</div><div class="ct" style="color:var(--accent-hazard)">3</div></button>
+          <button class="tile" onclick="bLevel(2)"><div class="nm muted">Everything</div><div class="ct">9</div></button>
+        </div>
+        <div class="row"><span class="t">Changing Plenum Chamber — IS Machine Forming Section</span><span class="chip">Draft</span><span class="age">28d</span></div>
+        <div class="row"><span class="t">Setting Up and Operating the Hot Melt Gluer</span><span class="chip ok">Live</span><span class="age">27d</span></div>
+        <div class="row"><span class="t">adaxx</span><span class="chip">Draft</span><span class="age">today</span></div>
+        <div class="row"><span class="t">Test SOP Scratch</span><span class="chip ok">Live</span><span class="age">today</span></div>
+      </div>
+
+      <div id="b-l2" style="display:none">
+        <h2 class="ph">Engineering · Drafts — 7 SOPs</h2>
+        <p class="sub">Lowest altitude. Every row is one SOP.</p>
+        <div class="row"><span class="t">Changing Plenum Chamber — IS Machine Forming Section</span><span class="chip warn">62% parse</span><span class="age">28d</span></div>
+        <div class="row"><span class="t">adaxx</span><span class="chip">Forklift &amp; Vehicles</span><span class="age">today</span></div>
+        <div class="row"><span class="t untitled">EN-FOR-02-003 Adjacent Section Stoppage</span><span class="chip warn">No title</span><span class="age">28d</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="note">
+    <b>The bet:</b> the library's natural hierarchy is organisational, not chronological.
+    16 of 30 having no department is itself the finding — the dashed tile makes the gap
+    a visible piece of work rather than an invisible default.
+    <ul><li><b>Watch:</b> three clicks to reach a known SOP. Does the breadcrumb carry enough to avoid feeling lost?</li></ul>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ C ══════════════════════════ -->
+<section id="variant-c" class="variant">
+  <div class="variant-title">
+    <b>Variant C — Miller columns.</b> All three altitudes on screen at once, left to right.
+    <p>Scope narrows in the left column, the list responds in the middle, the detail
+       previews on the right. Nothing navigates away, so comparing two SOPs is two clicks
+       rather than two page loads.</p>
+  </div>
+  <div class="app">
+    <div class="topbar"><div class="topbar-in">
+      <span class="brand"><span class="dot">S</span>SOPstart</span>
+      <span class="topnav"><a>SOPs</a><a>Sign-off</a><a class="on">Manage SOPs</a><a>Create New SOP</a><a>Content</a><a>Team</a></span>
+      <span class="avatar">SI</span>
+    </div></div>
+    <div class="page">
+      <h2 class="ph">Manage SOPs</h2>
+      <p class="sub">30 in the library · 23 drafts · 5 live · 2 stuck</p>
+      <div class="miller">
+        <div class="mcol">
+          <h4>Scope</h4>
+          <div class="mitem on" onclick="mPick(this)">Needs me <span class="c">9</span></div>
+          <div class="mitem" onclick="mPick(this)">Drafts <span class="c">23</span></div>
+          <div class="mitem" onclick="mPick(this)">Live <span class="c">5</span></div>
+          <div class="mitem" onclick="mPick(this)">Stuck <span class="c">2</span></div>
+          <h4 style="margin-top:0">By department</h4>
+          <div class="mitem" onclick="mPick(this)">Engineering <span class="c">9</span></div>
+          <div class="mitem" onclick="mPick(this)">Manufacturing <span class="c">5</span></div>
+          <div class="mitem" onclick="mPick(this)">Forming <span class="c">3</span></div>
+          <div class="mitem" onclick="mPick(this)">Machine Shop <span class="c">2</span></div>
+          <div class="mitem" onclick="mPick(this)">None <span class="c">16</span></div>
+        </div>
+        <div class="mcol">
+          <h4>Needs me — 9</h4>
+          <div class="mitem" onclick="mSel(this)"><span class="chip bad">Stuck</span> test-sop-page</div>
+          <div class="mitem" onclick="mSel(this)"><span class="chip bad">Stuck</span> AI prompt</div>
+          <div class="mitem on" onclick="mSel(this)"><span class="chip warn">No owner</span> Org B SOP</div>
+          <div class="mitem" onclick="mSel(this)"><span class="chip warn">No owner</span> Changing the Blank Side Hanger</div>
+          <div class="mitem" onclick="mSel(this)"><span class="chip warn">No owner</span> Manually Swabbing a Forming Machine</div>
+          <div class="mitem" onclick="mSel(this)"><span class="chip warn">Due soon</span> Forming Area Mandatory Minimum Safety…</div>
+          <div class="mitem" onclick="mSel(this)"><span class="chip warn">Due soon</span> Emergency Tyre Change on a Motorway</div>
+        </div>
+        <div class="mcol">
+          <h4>Detail</h4>
+          <div class="preview">
+            <div class="pt">Org B SOP</div>
+            <div class="mono-s" style="margin-bottom:10px">DRAFT · v1</div>
+            <div class="kv"><b>Problem</b><span style="color:var(--accent-hazard)">No owner assigned</span></div>
+            <div class="kv"><b>Department</b><span class="muted">Not set</span></div>
+            <div class="kv"><b>Category</b><span class="muted">Not set</span></div>
+            <div class="kv"><b>Updated</b><span>7 days ago</span></div>
+            <div class="kv"><b>Steps</b><span>12 · 0 verified</span></div>
+            <div style="display:flex;gap:6px;margin-top:14px">
+              <button class="btn primary sm">Assign owner</button>
+              <button class="btn sm">Open builder</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="note">
+    <b>The bet:</b> altitude becomes spatial rather than temporal — you never “go down a
+    level”, you look further right. Triage without losing your place in the list.
+    <ul><li><b>Watch:</b> 250px of preview on a max-w-5xl rail. Does the middle column get too narrow for real titles?</li></ul>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ D ══════════════════════════ -->
+<section id="variant-d" class="variant">
+  <div class="variant-title">
+    <b>Variant D — Quiet list.</b> Keep the list; strip the row to one signal and reveal the rest on hover.
+    <p>The least disruptive path: same shape as today, but a row carries a title, a status
+       dot and nothing else until you point at it. Tabs and the filter menu collapse into
+       one “Group by” control, so grouping does the work the five tabs were doing.</p>
+  </div>
+  <div class="app">
+    <div class="topbar"><div class="topbar-in">
+      <span class="brand"><span class="dot">S</span>SOPstart</span>
+      <span class="topnav"><a>SOPs</a><a>Sign-off</a><a class="on">Manage SOPs</a><a>Create New SOP</a><a>Content</a><a>Team</a></span>
+      <span class="avatar">SI</span>
+    </div></div>
+    <div class="page">
+      <div class="qbar">
+        <input class="search" placeholder="Search 30 SOPs…">
+        <span class="mono-s">Group by</span>
+        <span class="seg">
+          <button class="on">State</button><button>Department</button><button>Category</button><button>None</button>
+        </span>
+      </div>
+
+      <div class="grp"><span class="gl" style="color:var(--accent-hazard)">Needs attention · 9</span><span class="rule"></span></div>
+      <div class="qrow"><span class="sig x"></span><span class="t untitled">test-sop-page</span><span class="detail"><span class="chip bad">Stuck 15h</span><button class="btn sm">Retry</button></span><span class="age">today</span></div>
+      <div class="qrow"><span class="sig x"></span><span class="t untitled">AI prompt</span><span class="detail"><span class="chip bad">Stuck 29d</span><button class="btn sm">Retry</button></span><span class="age">28d</span></div>
+      <div class="qrow"><span class="sig x"></span><span class="t">Org B SOP</span><span class="detail"><span class="chip warn">No owner</span><button class="btn sm">Assign</button></span><span class="age">7d</span></div>
+
+      <div class="grp"><span class="gl">Drafts · 23</span><span class="rule"></span></div>
+      <div class="qrow"><span class="sig d"></span><span class="t">Deflector Setup and Replacement for Proper Gob Loading</span><span class="detail"><span class="chip">Engineering</span><span class="chip warn">62%</span></span><span class="age">28d</span></div>
+      <div class="qrow"><span class="sig d"></span><span class="t">Changing Plenum Chamber — IS Machine Forming Section</span><span class="detail"><span class="chip">Engineering</span></span><span class="age">28d</span></div>
+      <div class="qrow"><span class="sig d"></span><span class="t">Alkaline Cleaning Tank Operation — Machine Shop</span><span class="detail"><span class="chip">Machine Shop</span></span><span class="age">28d</span></div>
+      <div class="qrow"><span class="sig d"></span><span class="t untitled">EN-FOR-02-003 Adjacent Section Stoppage</span><span class="detail"><span class="chip warn">No title</span></span><span class="age">28d</span></div>
+      <div class="qrow"><span class="sig d"></span><span class="t">Forming Area Mandatory Minimum Safety Requirements</span><span class="detail"><span class="chip">Manufacturing</span></span><span class="age">28d</span></div>
+      <div class="qrow"><span class="sig d"></span><span class="t">adaxx</span><span class="detail"><span class="chip">Forklift &amp; Vehicles</span></span><span class="age">today</span></div>
+
+      <div class="grp"><span class="gl">Live for workers · 5</span><span class="rule"></span></div>
+      <div class="qrow"><span class="sig p"></span><span class="t">Setting Up and Operating the Hot Melt Gluer</span><span class="detail"><span class="chip">Engineering</span></span><span class="age">27d</span></div>
+      <div class="qrow"><span class="sig p"></span><span class="t">Replacing a Desktop Computer Keyboard at a Workstation</span><span class="detail"><span class="chip">Admin &amp; Office</span></span><span class="age">27d</span></div>
+      <div class="qrow"><span class="sig p"></span><span class="t">Test SOP Scratch</span><span class="detail"><span class="chip">Environmental</span></span><span class="age">today</span></div>
+    </div>
+  </div>
+  <div class="note">
+    <b>The bet:</b> the information was never the problem — its <i>simultaneity</i> was.
+    Hover is the altitude control, and grouping replaces five tabs with one verb.
+    <ul><li><b>Watch:</b> hover-to-reveal has no touch equivalent. Fine for a desk-bound admin, dead on a tablet.</li></ul>
+  </div>
+</section>
+
+<!-- ═════════════════════════ SHIPPED ═════════════════════════ -->
+<section id="variant-now" class="variant">
+  <div class="variant-title">
+    <b>Shipped today — for comparison.</b> One rail, every SOP, every attribute, one altitude.
+    <p>Six competing elements per row and five tabs above them. This is the baseline the
+       four variants are trying to beat.</p>
+  </div>
+  <div class="app">
+    <div class="topbar"><div class="topbar-in">
+      <span class="brand"><span class="dot">S</span>SOPstart</span>
+      <span class="topnav"><a>SOPs</a><a>Sign-off</a><a class="on">Manage SOPs</a><a>Create New SOP</a><a>Content</a><a>Team</a></span>
+      <span class="avatar">SI</span>
+    </div></div>
+    <div class="page">
+      <div style="display:flex;gap:14px;border-bottom:1px solid var(--ink-200);padding-bottom:8px;margin-bottom:16px;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em">
+        <span style="font-weight:700;border-bottom:2px solid var(--ink-900);padding-bottom:8px;margin-bottom:-9px">All <span class="muted">30</span></span>
+        <span class="muted">Drafts 23</span><span class="muted">Published 5</span><span class="muted">Still working 2</span>
+        <span class="muted">Needs attention <b style="color:var(--accent-hazard)">7</b></span><span class="muted">Access</span>
+        <span style="margin-left:auto" class="muted">Filter ▾</span>
+      </div>
+      <div style="border:1px solid var(--brand-yellow);background:rgba(251,191,36,.09);border-radius:6px;padding:9px 12px;margin-bottom:12px;display:flex;font-size:12.5px">
+        <span>23 drafts waiting for review</span><span style="margin-left:auto" class="mono-s">Review worst-first →</span>
+      </div>
+      <div class="row"><span class="t">adaxx</span><span class="chip">Forklift &amp; Vehicles</span><span class="chip">Engineering</span><span class="chip">Draft</span><span class="chip ghost">simonscott86</span><span class="age">today</span></div>
+      <div class="row"><span class="t">Test SOP Scratch</span><span class="chip">Environmental</span><span class="chip">Engineering</span><span class="chip">Draft</span><span class="chip ghost">simonscott86</span><span class="age">today</span></div>
+      <div class="row"><span class="t untitled">test-sop-page</span><span class="chip ghost">No category</span><span class="chip">Draft</span><span class="chip ghost">simonscott86</span><span class="age">today</span></div>
+      <div class="row"><span class="t untitled">test-sop-page</span><span class="chip ghost">No category</span><span class="chip bad">Stuck</span><span class="chip">Uploading</span><span class="chip ghost">simonscott86</span><span class="age">today</span></div>
+      <div class="row"><span class="t untitled">test-sop-video</span><span class="chip ghost">No category</span><span class="chip">Draft</span><span class="chip ghost">simonscott86</span><span class="age">today</span></div>
+      <div class="row"><span class="t">Setting Up and Operating the Hot Melt Gluer</span><span class="chip">Manufacturing</span><span class="chip">Draft</span><span class="chip ghost">simonscott86</span><span class="age">today</span></div>
+      <div class="row"><span class="t">Org B SOP</span><span class="chip ghost">No category</span><span class="chip warn">No owner</span><span class="chip">Draft</span><span class="age">7d</span></div>
+      <div class="row"><span class="t">Changing the Blank Side Hanger</span><span class="chip">Manufacturing</span><span class="chip warn">No owner</span><span class="chip">Draft</span><span class="age">26d</span></div>
+    </div>
+  </div>
+</section>
+
+<script>
+function showVariant(id, btn) {
+  document.querySelectorAll('.variant').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.variant-nav button').forEach(t => t.classList.remove('active'));
+  document.getElementById('variant-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+function pickDeck(btn, which) {
+  document.querySelectorAll('#variant-a .deck').forEach(d => d.classList.remove('on'));
+  btn.classList.add('on');
+  ['review','problem','live'].forEach(k => document.getElementById('wl-' + k).style.display = 'none');
+  document.getElementById('wl-' + which).style.display = 'block';
+  document.getElementById('wl-title').textContent = {
+    review: 'Drafts to review — worst parse first',
+    problem: 'Problems to fix — most urgent first',
+    live: 'Live for workers — nothing needed',
+  }[which];
+}
+function bLevel(n, name) {
+  [0,1,2].forEach(i => document.getElementById('b-l' + i).style.display = 'none');
+  document.getElementById('b-l' + n).style.display = 'block';
+  const crumb = document.getElementById('b-crumb');
+  if (n === 0) crumb.innerHTML = '<a onclick="bLevel(0)">All SOPs</a><span>30</span>';
+  if (n === 1) {
+    document.getElementById('b-l1-title').textContent = name + ' — 9 SOPs';
+    crumb.innerHTML = '<a onclick="bLevel(0)">All SOPs</a><span>›</span><a>' + name + '</a><span>9</span>';
+  }
+  if (n === 2) crumb.innerHTML = '<a onclick="bLevel(0)">All SOPs</a><span>›</span><a onclick="bLevel(1,\'Engineering\')">Engineering</a><span>›</span><a>Drafts</a><span>7</span>';
+}
+function mPick(el) {
+  el.parentElement.querySelectorAll('.mitem').forEach(i => i.classList.remove('on'));
+  el.classList.add('on');
+}
+function mSel(el) {
+  el.parentElement.querySelectorAll('.mitem').forEach(i => i.classList.remove('on'));
+  el.classList.add('on');
+}
+</script>
+</body>
+</html>
