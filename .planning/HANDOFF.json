@@ -1,0 +1,146 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-08-08T03:21:07.720Z",
+  "phase": "v9.0-scoping",
+  "phase_name": "v9.0 Hot End Pilot — milestone scoping (pre-roadmap)",
+  "phase_dir": ".planning",
+  "plan": null,
+  "task": 3,
+  "total_tasks": 5,
+  "status": "paused",
+  "context": "deliberation",
+  "completed_tasks": [
+    {
+      "id": 1,
+      "name": "Ship /sops simplification — merge Your SOPs + SOP Library into one Miller surface",
+      "status": "done",
+      "commit": "cbce023"
+    },
+    {
+      "id": 2,
+      "name": "Fix dead /walkthrough href (404 on primary CTA) + add reference-sweep guard",
+      "status": "done",
+      "commit": "09c1b7b"
+    },
+    {
+      "id": 3,
+      "name": "Rebuild /sops desktop as sketch 005 variant C Miller frame; fix DepartmentSidebar mis-sizing",
+      "status": "done",
+      "commit": "82fec78"
+    },
+    {
+      "id": 4,
+      "name": "Derive v9.0 phase list (44-50) from the 2026-08-04 Joe + Simon UAT session",
+      "status": "done",
+      "commit": null
+    },
+    {
+      "id": 5,
+      "name": "Publish decision artifact (D1-D5) for Simon to evaluate",
+      "status": "done",
+      "commit": null
+    },
+    {
+      "id": 6,
+      "name": "Walk Simon through decisions D1-D5",
+      "status": "in_progress",
+      "progress": "D1 = C (split 44a/44b) LOCKED. D2 = B (44a + 46 parallel with Phase 41) LOCKED. D3 asked, awaiting answer. D4, D5 not yet asked."
+    }
+  ],
+  "remaining_tasks": [
+    {
+      "id": 7,
+      "name": "Get D3 answer (standard start/end steps: copied vs linked)",
+      "status": "not_started"
+    },
+    {
+      "id": 8,
+      "name": "Get D4 answer (who can remove worker feedback) — likely defers to Joe's spec",
+      "status": "not_started"
+    },
+    {
+      "id": 9,
+      "name": "Get D5 answer (edit-history audience)",
+      "status": "not_started"
+    },
+    {
+      "id": 10,
+      "name": "Update the published decision artifact to mark D1-D5 settled",
+      "status": "not_started"
+    },
+    {
+      "id": 11,
+      "name": "Write phases 44a, 44b, 45-50 into ROADMAP.md as v9.0 with requirement IDs",
+      "status": "not_started"
+    }
+  ],
+  "blockers": [
+    {
+      "description": "Joe's hot end role hierarchy (Grade Two Operator -> Grade One Operator -> Wear Maker) with ~12 SOPs per role. This data IS the first content of the 44a obligation record.",
+      "type": "external",
+      "workaround": "None. 44a and 44b cannot be planned in detail without it. Joe committed to end of week (w/c 2026-08-04)."
+    },
+    {
+      "description": "Joe's worker-feedback spec (how it works, what is displayed, to whom) blocks Phase 48.",
+      "type": "external",
+      "workaround": "D4 can be pre-decided by Simon and put to Joe as a proposal rather than a question."
+    },
+    {
+      "description": "Joe's colour-coded generics + generic start/end steps block Phase 49; his annotated proofread blocks Phase 50.",
+      "type": "external",
+      "workaround": "Phase 50 is gated on v8.0 Phase 42 anyway, so Joe's notes are not the critical path there."
+    },
+    {
+      "description": "Phase 48 needs outbound email, which does not exist anywhere in this codebase. Provider, sending domain on sopstart.com, and bounce handling are part of that phase.",
+      "type": "technical",
+      "workaround": "None — scope it into 48 rather than discovering it mid-phase."
+    }
+  ],
+  "human_actions_pending": [
+    {
+      "action": "Confirm the library discrepancy Joe and Simon saw is explained by migrations 00061 + 00062",
+      "context": "Both landed 2026-08-04, the same day as the UAT session. 00061 closed a cross-tenant SELECT hole on public.sops (15 of 30 rows readable by every tenant); 00062 closed an org-rewrite hole on organisation_members. If the discrepancy is NOT explained by those, it is a live bug and the entire v9.0 permission model is being designed on an unverified base.",
+      "blocking": true
+    },
+    {
+      "action": "Set Joe up as an admin so both accounts can toggle admin/worker views",
+      "context": "Action item from the UAT session. Data task, not a phase. Also the manual stand-in for Phase 45 (view-as-role) until that ships.",
+      "blocking": false
+    },
+    {
+      "action": "Answer D3, D4, D5",
+      "context": "D3 was asked and is awaiting a reply. See .continue-here.md for the full option sets.",
+      "blocking": true
+    }
+  ],
+  "decisions": [
+    {
+      "decision": "Role-ladder inheritance applies to VISIBILITY only, never to training obligation",
+      "rationale": "Training obligation is set and defined by higher-level managers (model TBD in Joe's update). Simon, 2026-08-05.",
+      "phase": "44"
+    },
+    {
+      "decision": "Self-adding a SOP is a bookmark, never an obligation",
+      "rationale": "Follows from obligation being manager-set. sop_assignments already carries assigned_by, so the filter is cheap. Simon, 2026-08-05.",
+      "phase": "44a"
+    },
+    {
+      "decision": "D1 = C — split Phase 44 into 44a (obligation gets its own record) then 44b (role ladder)",
+      "rationale": "The training matrix currently derives requiredSopIds from sop_departments + sop_access_people (competency.ts:332-343) — i.e. from ACCESS. The role ladder widens exactly those tables, so shipping the ladder first would mark all inherited SOPs as required and fill every Wear Maker's overdue list. 44a repoints the matrix onto a manager-set record; 44b is then provably safe. Backfill obligation = today's access so no existing org's matrix moves. Simon, 2026-08-06.",
+      "phase": "44"
+    },
+    {
+      "decision": "D2 = B — run 44a and 46 alongside v8.0 Phase 41 rather than waiting for 41-43 to close",
+      "rationale": "44a and 46 are schema/documentation work touching no routes, so they cannot collide with Phase 41's surface merge. Anything touching surfaces (45 view-as) still waits for 41. Means Joe's Friday data goes straight to work. Simon, 2026-08-06.",
+      "phase": "v9.0"
+    },
+    {
+      "decision": "Worker /sops is one surface — the SOP Library tab became two Miller scopes (Everything, Not added yet)",
+      "rationale": "Two tabs over the same rows forced a worker to know which page a procedure lived on before looking for it. The Miller first column already answers 'which slice'. Shipped cbce023 + 82fec78.",
+      "phase": "shipped"
+    }
+  ],
+  "uncommitted_files": [],
+  "next_action": "Ask Simon for the D3 answer (standard start/end steps: copied vs linked — recommendation is B, linked). Then D4 and D5, then write v9.0 into ROADMAP.md.",
+  "context_notes": "This session shipped three /sops commits (all pushed, Railway deployed, visually verified on sopstart.com at 1440px) and then pivoted to scoping v9.0 from the 2026-08-04 Joe + Simon UAT session. No code work is in flight — the pause is mid-conversation on a decision sequence. The single most important artifact of the session is the finding in competency.ts:332-343: the training matrix equates 'has access' with 'is required', which nothing in the roadmap had accounted for and which reshapes Phase 44. Published decision artifact: https://claude.ai/code/artifact/6de44250-2870-4e43-9790-7710fd37d912"
+}
