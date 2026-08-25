@@ -51,27 +51,32 @@
     {
       "id": 7,
       "name": "Get D3 answer (standard start/end steps: copied vs linked)",
-      "status": "not_started"
+      "status": "done",
+      "resolution": "2026-08-25: B, generalised — Standard Steps library, any number of org-defined steps linked by reference per SOP"
     },
     {
       "id": 8,
       "name": "Get D4 answer (who can remove worker feedback) — likely defers to Joe's spec",
-      "status": "not_started"
+      "status": "done",
+      "resolution": "2026-08-25: C — sign-off manager + admin, removals logged"
     },
     {
       "id": 9,
       "name": "Get D5 answer (edit-history audience)",
-      "status": "not_started"
+      "status": "done",
+      "resolution": "2026-08-25: B — everyone with SOP access, read-only"
     },
     {
       "id": 10,
       "name": "Update the published decision artifact to mark D1-D5 settled",
-      "status": "not_started"
+      "status": "done",
+      "resolution": "2026-08-25: republished at same URL, all five cards marked settled"
     },
     {
       "id": 11,
       "name": "Write phases 44a, 44b, 45-50 into ROADMAP.md as v9.0 with requirement IDs",
-      "status": "not_started"
+      "status": "done",
+      "resolution": "2026-08-25: v9.0 in ROADMAP.md (8 phases) + REQUIREMENTS.md (OBL/LAD/VAS/CAP/LOG/FBK/STD/PAR, 21/21 mapped); dev plan at .planning/v9.0-DEV-PLAN.md"
     }
   ],
   "blockers": [

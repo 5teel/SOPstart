@@ -611,6 +611,146 @@ The phase must **decide and state a rendering model in its first plan, before an
 
 ---
 
+## v9.0 — Hot End Pilot (scoped 2026-08-25)
+
+**PILOT milestone.** Ship the hot end department (Grade Two Operator → Grade One Operator → Wear Maker) as the first real role-based permission deployment, then roll out horizontally. Scoped from the Joe + Simon working session (2026-08-04); decisions D1–D5 all settled 2026-08-25 (artifact `6de44250`). Dev plan: `.planning/v9.0-DEV-PLAN.md`. **8 phases, 21 requirements, 21/21 mapped.**
+
+**The structural finding that shaped the milestone:** there is no record anywhere meaning "a manager decided this person must do this SOP." The training matrix infers obligation from the access tables (`src/actions/competency.ts:332-343`, `sop_departments` ∪ `sop_access_people`) — and the role ladder widens exactly those tables. Shipping the ladder first would mark every inherited SOP required and flood every Wear Maker's overdue list on day one. Hence **D1 = C: Phase 44 split into 44a (obligation gets its own record, matrix repointed) → 44b (ladder). Never re-merge them.**
+
+**Locked decisions:** inheritance is visibility-only, never obligation · self-add = bookmark, never obligation · separate SOPs for operators vs engineers · sign-off authority carries edit rights · every block edit logged (user + timestamp) · feedback tab → email to sign-off manager → read-only to all with access · D3: Standard Steps library, linked by reference not copied (any number of org-defined steps; each SOP links its subset; edit once, propagates; explicit override path) · D4: feedback removable only by sign-off manager + admin, removals logged · D5: edit history read-only to everyone with SOP access · AI voice drafting deprioritised · keep it simple — removal beats addition.
+
+**Sequencing (D2 = B):** 46 and 47's logging layer start immediately, and 44a starts the moment Joe's role lists arrive — all in parallel with v8.0 Phase 41 (they touch no routes, so no collision with the surface merge). Anything touching surfaces waits: 45 and 47's history view need Phase 41; 50 needs Phase 42. v8.0 keeps priority on surface work.
+
+**External blockers (Joe, committed end of week w/c 2026-08-04, outstanding as of 2026-08-25):** per-role SOP lists (~12/role, roles as headers) → 44a/44b · colour-coded generics + generic start/end steps → 49 · worker-feedback spec → 48 (D4 goes to him as a settled proposal) · annotated proofread with reasons → 50.
+
+**Pre-flight check (blocking):** confirm the library discrepancy Joe and Simon saw on 2026-08-04 is explained by migrations 00061/00062 (cross-tenant RLS holes fixed the same day). If not, it is a live bug and the permission model is built on sand.
+
+- [ ] **Phase 44a: Obligation Record** - "Must do" becomes its own manager-set record; the training matrix reads it instead of access; backfill = today's access so no matrix moves
+- [ ] **Phase 44b: Role Ladder** - Roles inherit visibility up the ladder (`inherits_from_role_id`), provably without touching obligation
+- [ ] **Phase 45: View As Role** - Admins view any surface as a chosen role, read-only, through the real access path
+- [ ] **Phase 46: Capability Matrix** - One written role × capability matrix; sign-off authority carries edit rights
+- [ ] **Phase 47: Edit Log** - Every block edit logged with user + timestamp, read-only visible to everyone with SOP access
+- [ ] **Phase 48: Worker Feedback** - Feedback tab → email to sign-off manager → read-only to all with access; moderated removals, logged; includes outbound email infra
+- [ ] **Phase 49: Standard Steps Library** - Org-defined reusable steps (start/end, hazards, PPE) linked by reference into any SOP; edit once, propagates; explicit overrides
+- [ ] **Phase 50: Parse Relevance** - Parse output drops content irrelevant to the target role, evaluated against Joe's annotated rules
+
+### Phase 44a: Obligation Record
+
+**Goal**: Training obligation exists as its own manager-set record, populated initially from Joe's per-role SOP lists; the training matrix reads it exclusively; nothing about today's matrices changes until a manager changes it.
+
+**Depends on**: Joe's per-role SOP lists (external). Runs parallel to v8.0 Phase 41 — no route work.
+**Requirements**: OBL-01, OBL-02, OBL-03, OBL-04
+**Success Criteria** (what must be TRUE):
+
+  1. A manager can set and unset "this person/role must do this SOP" as a first-class record, org-scoped under RLS
+  2. `requiredSopIds` derives only from the obligation record — a source-contract test fails if `sop_departments`/`sop_access_people` re-enter the derivation (`src/lib/competency/matrix.ts` header contract updated in the same change)
+  3. Live backfill proven: every worker's required-SOP set is byte-identical before and after the migration
+  4. A test pins that self-added SOPs (`sop_assignments` self-add flag) never appear in the obligation-derived matrix
+
+**Plans**: TBD
+
+### Phase 44b: Role Ladder
+
+**Goal**: Roles within a department form an inheritance ladder; a higher rung sees every lower rung's SOPs; the hot end hierarchy is configured as the pilot.
+
+**Depends on**: Phase 44a (obligation decoupled first — blocking constraint), Joe's hierarchy (external)
+**Requirements**: LAD-01, LAD-02, LAD-03
+**Success Criteria** (what must be TRUE):
+
+  1. `roles` carries `inherits_from_role_id` (migration; `sort` untouched — it is display order) and the hot end ladder Grade Two → Grade One → Wear Maker is configured
+  2. A Wear Maker sees all three rungs' SOPs in the library scope; a Grade Two sees only their own; RLS-level, not UI filtering
+  3. The training matrix of every hot end worker is unchanged by turning the ladder on (obligation untouched — the 44a decoupling proven end-to-end)
+  4. Worker `/sops` needs no new UI — "All yours" = obligation set, "Everything / Not added yet" = inherited-visible set (already the right shape)
+
+**Plans**: TBD
+
+### Phase 45: View As Role
+
+**Goal**: An admin can see exactly what any role sees — read-only, resolved through the real access path — replacing the manual two-account toggle Joe and Simon use today.
+
+**Depends on**: v8.0 Phase 41 (the merged SOP surface is the thing being viewed-as), Phase 44b (the ladder is what makes view-as worth having)
+**Requirements**: VAS-01
+**Success Criteria** (what must be TRUE):
+
+  1. An admin picks a role (or a person) and every SOP surface renders what that role's session would see, via the real RLS/permission path — not a client-side approximation
+  2. View-as is read-only: no write action fires while impersonating
+  3. Exiting view-as is one obvious action; the app never gets stuck impersonating
+
+**Plans**: TBD
+
+### Phase 46: Capability Matrix
+
+**Goal**: One written role × capability matrix is the single reference for who can see and do what, and sign-off authority carries edit rights in code, not just in the document.
+
+**Depends on**: Nothing — starts immediately, parallel with v8.0 Phase 41 (no route work)
+**Requirements**: CAP-01, CAP-02
+**Success Criteria** (what must be TRUE):
+
+  1. The matrix document exists in-repo, covers every role × every capability surfaced in the app, and is referenced from CLAUDE.md/planning docs as the authority
+  2. A user with sign-off authority on a SOP can edit that SOP; one without cannot — enforced server-side, with positive and negative probes per role (per the 2026-07-20 RLS-probe learning)
+
+**Plans**: TBD
+
+### Phase 47: Edit Log
+
+**Goal**: Every SOP block edit is logged with user identity and timestamp, and the trail is readable, read-only, by everyone with access to the SOP.
+
+**Depends on**: Logging layer — nothing (append-only table + write-path hook, no route work). History view — v8.0 Phase 41 (surfaces settle first).
+**Requirements**: LOG-01, LOG-02
+**Success Criteria** (what must be TRUE):
+
+  1. Any block create/update/delete through any write path (builder autosave included) produces an append-only log row: who, when, which block, what kind of change — no write path is missed (key the sweep on the DATA, per the 2026-07-29 learning: every `.insert(`/`.update(` on the block tables)
+  2. The log is append-only under RLS (no UPDATE/DELETE policies — the `sop_completions` pattern)
+  3. A worker with SOP access can read the history (tab/panel on the SOP surface); a user without access cannot; nobody can edit it
+
+**Plans**: TBD
+
+### Phase 48: Worker Feedback
+
+**Goal**: Workers submit feedback from a tab at the bottom of the SOP; it emails the sign-off manager, is visible read-only to everyone with access, and is removable only by the sign-off manager or an admin with the removal logged.
+
+**Depends on**: Joe's feedback spec (external — D4 goes to him as a settled proposal). Includes standing up outbound email (provider, sending domain on sopstart.com, bounce handling) — scoped in, not discovered mid-phase.
+**Requirements**: FBK-01, FBK-02, FBK-03, FBK-04, FBK-05
+**Success Criteria** (what must be TRUE):
+
+  1. A worker can submit feedback from the SOP's feedback tab; it appears read-only to every user with access to that SOP
+  2. The sign-off manager receives an email per submission, from a sopstart.com sending domain, with bounces handled — and the email path failing never loses the feedback row
+  3. Only the sign-off manager or an admin can remove feedback; every removal writes a log row naming who removed what and when
+  4. RLS: feedback readable org-scoped by SOP access, writable by any worker with access, removable per rule 3 — probed positive and negative per role
+
+**Plans**: TBD
+
+### Phase 49: Standard Steps Library
+
+**Goal**: Admins curate any number of Standard Steps (start/end sequences, hazards, PPE) in the shared library, and SOPs link the subset that applies by reference — edit the source once and every linked SOP updates, with explicit local overrides.
+
+**Depends on**: Joe's colour-coded generics + generic start/end steps (external). Builds on the existing block library + `sop_section_blocks` junction — by-reference semantics, not a new entity.
+**Requirements**: STD-01, STD-02, STD-03
+**Success Criteria** (what must be TRUE):
+
+  1. An admin creates/edits Standard Steps in the library; inserting one into a SOP creates a reference, not a copy
+  2. Editing a library Standard Step changes it in every linked SOP; a source sweep proves no per-SOP copies exist for linked steps
+  3. A SOP can override a linked step locally; the override is visibly marked as diverged from the library source
+  4. The propagation-vs-re-verification question for published SOPs (deferred sub-question of D3) is decided at phase planning and enforced at the publish gate accordingly
+
+**Plans**: TBD
+
+### Phase 50: Parse Relevance
+
+**Goal**: The parse pipeline drops content irrelevant to the target role, driven by Joe's annotated proofread — his reasons become evaluable rules, making this an AI phase with a reference dataset rather than prompt-fiddling.
+
+**Depends on**: v8.0 Phase 42 (one creation flow — parse quality work lands on the converged pipeline), Joe's annotated proofread (external)
+**Requirements**: PAR-01
+**Success Criteria** (what must be TRUE):
+
+  1. Joe's annotations are distilled into a written rule set + reference dataset (input doc → expected kept/dropped content)
+  2. Parsing a hot end source document produces output that matches the reference dataset's kept/dropped judgements within an agreed threshold
+  3. Dropped content is recorded (provenance), not silently destroyed — an admin can see what the parse excluded and why
+
+**Plans**: TBD
+
+---
+
 ## v4.0 — Safety-Critical Parsing + Voice + AI Foundation (started 2026-05-24 · ✅ shipped 2026-07-02)
 
 Bundles the 8 v4.0 NOW features from `.planning/PRODUCT-ROADMAP.md` v0.3. Planned 21 → 22 → 23; grew in-flight with 21.5/21.6 (builder UX) and 24/25 (flow graph + departments). All phases executed and code-reviewed; residual = human UAT (21.6/22/23/25) carried per the v3.0 field-verification precedent. Archive via `/gsd-complete-milestone`.

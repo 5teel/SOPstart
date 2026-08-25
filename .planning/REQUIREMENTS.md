@@ -820,3 +820,81 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 ---
 *v8.0 requirements added: 2026-07-28 · roadmap created 2026-07-28 (Phases 40-42, 15 reqs) · **re-derived 2026-07-28 after the SUR scope correction (Phases 40-43, 21/21 mapped, 0 unmapped)***
+
+## v9.0 Requirements — Hot End Pilot
+
+**Defined:** 2026-08-25 · Source: Joe + Simon working session (2026-08-04), v9.0 scoping pass (2026-08-05..08), decisions D1–D5 settled 2026-08-25. Dev plan: `.planning/v9.0-DEV-PLAN.md`. Decision artifact: `6de44250`.
+
+**Milestone character:** PILOT. Ship the hot end department (Grade Two Operator → Grade One Operator → Wear Maker) as the first real role-based permission deployment, then roll out horizontally. Everything content-side is downstream of Joe's data drops.
+
+**Standing constraint (blocking):** *Obligation is not access.* `src/actions/competency.ts:332-343` derives required SOPs from the access tables (`sop_departments` ∪ `sop_access_people`). Any requirement that widens visibility inflates every worker's training matrix unless OBL lands first. 44a before 44b, never re-merged.
+
+### Obligation Record (OBL) — Phase 44a
+
+- [ ] **OBL-01**: "This person must do this SOP" is its own manager-set record, distinct from any access/visibility table
+- [ ] **OBL-02**: The training matrix derives required SOPs exclusively from the obligation record — never from `sop_departments` / `sop_access_people`
+- [ ] **OBL-03**: Backfill sets obligation = today's access, so no existing org's matrix moves on day one
+- [ ] **OBL-04**: A worker self-adding a SOP creates a bookmark, never an obligation — pinned by a test (currently true only by accident)
+
+### Role Ladder (LAD) — Phase 44b
+
+- [ ] **LAD-01**: Roles within a department form a ladder (`inherits_from_role_id` on the Phase 32 `roles` table — not overloading `sort`, which is display order)
+- [ ] **LAD-02**: SOPs visible to a lower rung are visible to every higher rung (Grade Two → Grade One → Wear Maker, cumulative)
+- [ ] **LAD-03**: Ladder inheritance confers visibility only — it never creates training obligation (provable via OBL-02)
+
+### View As Role (VAS) — Phase 45
+
+- [ ] **VAS-01**: An admin can view any surface as a chosen role, read-only, resolved through the real access path — not a simulated filter
+
+### Capability Matrix (CAP) — Phase 46
+
+- [ ] **CAP-01**: One written role × capability matrix exists as the single reference for who can see/do what
+- [ ] **CAP-02**: Sign-off authority on a SOP carries edit permission on that SOP
+
+### Edit Log (LOG) — Phase 47
+
+- [ ] **LOG-01**: Every SOP block edit is logged with user identity and timestamp
+- [ ] **LOG-02**: The edit history is visible read-only to everyone with access to that SOP (D5)
+
+### Worker Feedback (FBK) — Phase 48
+
+- [ ] **FBK-01**: A feedback tab at the bottom of every SOP lets workers submit feedback
+- [ ] **FBK-02**: Feedback is emailed to the manager with sign-off authority on that SOP
+- [ ] **FBK-03**: Feedback is visible read-only to everyone with access to that SOP
+- [ ] **FBK-04**: Feedback is removable only by the sign-off manager or an admin, with every removal logged (D4)
+- [ ] **FBK-05**: Outbound email infrastructure exists — provider, sending domain on sopstart.com, bounce handling (none exists in the codebase today)
+
+### Standard Steps Library (STD) — Phase 49
+
+- [ ] **STD-01**: Admins can create any number of Standard Steps (start/end sequences, hazards, PPE) in the shared library
+- [ ] **STD-02**: A SOP links the subset of Standard Steps that applies, by reference — editing the library source updates every linked SOP (D3)
+- [ ] **STD-03**: A SOP can explicitly override a linked Standard Step locally, and the override is visible as such
+- *Open sub-question (resolve at phase planning): does a linked-step edit silently update published SOPs, or drop them to needs-re-verification? Interacts with the per-block verify checklist and publish gate.*
+
+### Parse Relevance (PAR) — Phase 50
+
+- [ ] **PAR-01**: The parse pipeline drops content irrelevant to the target role, driven by Joe's annotated proofread (irrelevant items *with reasons* — an evaluable AI phase, not prompt-fiddling)
+
+### v9.0 Out of Scope
+
+- **AI voice drafting improvements** — stays available, explicitly deprioritised in the session
+- **Other departments** (cold end Trainee MSO → MSO, engineering) — horizontal rollout after the hot end pilot proves the model
+- **Anything adding complexity without a session mandate** — "keep the application as simple as possible" is a locked decision; removal beats addition
+
+### v9.0 Traceability
+
+| REQ-ID | Phase | Status |
+|--------|-------|--------|
+| OBL-01..04 (4) | Phase 44a | Pending |
+| LAD-01..03 (3) | Phase 44b | Pending |
+| VAS-01 (1) | Phase 45 | Pending |
+| CAP-01..02 (2) | Phase 46 | Pending |
+| LOG-01..02 (2) | Phase 47 | Pending |
+| FBK-01..05 (5) | Phase 48 | Pending |
+| STD-01..03 (3) | Phase 49 | Pending |
+| PAR-01 (1) | Phase 50 | Pending |
+
+**v9.0 Coverage:** 21 requirements, 21 mapped, 0 unmapped.
+
+---
+*v9.0 requirements added: 2026-08-25*
