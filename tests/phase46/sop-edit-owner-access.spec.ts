@@ -157,6 +157,52 @@ async function createEphemeralStep(admin: SupabaseClient, sectionId: string): Pr
   return data as { id: string }
 }
 
+async function createEphemeralBlock(
+  admin: SupabaseClient,
+  orgId: string
+): Promise<{ blockId: string; versionId: string; snapshot: object }> {
+  const snapshot = { kind: 'text', text: 'Phase46 junction probe block' }
+  const { data: block, error: bErr } = await admin
+    .from('blocks')
+    .insert({ organisation_id: orgId, kind_slug: 'text', name: `Phase46 probe block ${Date.now()}` })
+    .select('id')
+    .single()
+  if (bErr || !block) throw new Error(`createEphemeralBlock blocks insert failed: ${bErr?.message}`)
+  const { data: version, error: vErr } = await admin
+    .from('block_versions')
+    .insert({ block_id: block.id, version_number: 1, content: snapshot })
+    .select('id')
+    .single()
+  if (vErr || !version) throw new Error(`createEphemeralBlock block_versions insert failed: ${vErr?.message}`)
+  const { error: uErr } = await admin.from('blocks').update({ current_version_id: version.id }).eq('id', block.id)
+  if (uErr) throw new Error(`createEphemeralBlock current_version_id update failed: ${uErr.message}`)
+  return { blockId: block.id as string, versionId: version.id as string, snapshot }
+}
+
+async function createEphemeralJunction(
+  admin: SupabaseClient,
+  sectionId: string,
+  blockId: string,
+  versionId: string,
+  snapshot: object,
+  sortOrder: number
+): Promise<{ id: string }> {
+  const { data, error } = await admin
+    .from('sop_section_blocks')
+    .insert({
+      sop_section_id: sectionId,
+      block_id: blockId,
+      pinned_version_id: versionId,
+      pin_mode: 'pinned',
+      snapshot_content: snapshot,
+      sort_order: sortOrder,
+    })
+    .select('id')
+    .single()
+  if (error || !data) throw new Error(`createEphemeralJunction failed: ${error?.message}`)
+  return data as { id: string }
+}
+
 test.afterAll(async () => {
   if (!LIVE_ENV_READY) return
   const admin = serviceClient()
@@ -309,5 +355,166 @@ test.describe('CAP-02 -- owner-edit runtime probes (real ephemeral org, real RLS
 
     const { data: persisted } = await admin.from('sops').select('status').eq('id', sop.id).single()
     expect(persisted?.status).not.toBe('published')
+  })
+
+  // -------------------------------------------------------------------------
+  // Phase 46 CR-02/WR-02 -- sop_section_blocks (block junction) probes.
+  // Migration 00064 extended ssb_admin_manage_own_org with the owner arm;
+  // without these probes the guard-approved-but-RLS-denied state shipped
+  // invisible (delete + reorder failed as SILENT zero-row success).
+  // -------------------------------------------------------------------------
+
+  // added by the CR-02 review fix after migration 00064 is applied
+  test('JUNCTION POSITIVE -- the owner (role worker) can insert, update pin_mode, and delete a sop_section_blocks row on their own SOP', async () => {
+    test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
+    const admin = serviceClient()
+    const orgId = await createEphemeralOrg(admin, 'Phase46 Junction Owner Org')
+    const { userId: ownerId, email: ownerEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    const sop = await createEphemeralSop(admin, orgId, ownerId, ownerId)
+    const section = await createEphemeralSection(admin, sop.id)
+    const { blockId, versionId, snapshot } = await createEphemeralBlock(admin, orgId)
+
+    const accessToken = await mintAccessToken(admin, ownerEmail)
+    const asOwner = asUserClient(accessToken)
+
+    // INSERT (the addBlockToSection path)
+    const { data: inserted, error: insErr } = await asOwner
+      .from('sop_section_blocks')
+      .insert({
+        sop_section_id: section.id,
+        block_id: blockId,
+        pinned_version_id: versionId,
+        pin_mode: 'pinned',
+        snapshot_content: snapshot,
+        sort_order: 1,
+      })
+      .select('id')
+      .single()
+    expect(insErr).toBeNull()
+    expect(inserted?.id).toBeTruthy()
+
+    // UPDATE (the setPinMode path) -- re-read via service client, never trust the response
+    await asOwner.from('sop_section_blocks').update({ pin_mode: 'follow_latest' }).eq('id', inserted!.id)
+    const { data: afterUpdate } = await admin.from('sop_section_blocks').select('pin_mode').eq('id', inserted!.id).single()
+    expect(afterUpdate?.pin_mode).toBe('follow_latest')
+
+    // DELETE (the removeBlockFromSection path -- the silent-false-success case)
+    await asOwner.from('sop_section_blocks').delete().eq('id', inserted!.id)
+    const { data: afterDelete } = await admin.from('sop_section_blocks').select('id').eq('id', inserted!.id).maybeSingle()
+    expect(afterDelete).toBeNull()
+  })
+
+  // added by the CR-02 review fix after migration 00064 is applied
+  test('JUNCTION POSITIVE -- the owner can reorder junctions via the reorder_sop_section_blocks RPC (NOT SECURITY DEFINER -- runs under the extended policy)', async () => {
+    test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
+    const admin = serviceClient()
+    const orgId = await createEphemeralOrg(admin, 'Phase46 Junction Reorder Org')
+    const { userId: ownerId, email: ownerEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    const sop = await createEphemeralSop(admin, orgId, ownerId, ownerId)
+    const section = await createEphemeralSection(admin, sop.id)
+    const { blockId, versionId, snapshot } = await createEphemeralBlock(admin, orgId)
+    const j1 = await createEphemeralJunction(admin, section.id, blockId, versionId, snapshot, 1)
+    const j2 = await createEphemeralJunction(admin, section.id, blockId, versionId, snapshot, 2)
+
+    const accessToken = await mintAccessToken(admin, ownerEmail)
+    const asOwner = asUserClient(accessToken)
+
+    const { error: rpcErr } = await asOwner.rpc('reorder_sop_section_blocks', {
+      p_sop_section_id: section.id,
+      p_ordered_junction_ids: [j2.id, j1.id],
+    })
+    expect(rpcErr).toBeNull()
+
+    const { data: rows } = await admin
+      .from('sop_section_blocks')
+      .select('id, sort_order')
+      .in('id', [j1.id, j2.id])
+    const byId = new Map((rows ?? []).map((r: { id: string; sort_order: number }) => [r.id, r.sort_order]))
+    expect(byId.get(j2.id)).toBe(1)
+    expect(byId.get(j1.id)).toBe(2)
+
+    // Explicit junction cleanup: blocks FK is ON DELETE RESTRICT, so the org
+    // cascade in afterAll must not race a surviving junction row.
+    await admin.from('sop_section_blocks').delete().in('id', [j1.id, j2.id])
+  })
+
+  // added by the CR-02 review fix after migration 00064 is applied
+  test('JUNCTION NEGATIVE -- a same-org worker who is NOT the owner cannot update or delete a junction (silent zero-row deny, verified by re-read)', async () => {
+    test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
+    const admin = serviceClient()
+    const orgId = await createEphemeralOrg(admin, 'Phase46 Junction Non-Owner Org')
+    const { userId: ownerId } = await createEphemeralMember(admin, orgId, 'worker')
+    const { email: otherEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    const sop = await createEphemeralSop(admin, orgId, ownerId, ownerId)
+    const section = await createEphemeralSection(admin, sop.id)
+    const { blockId, versionId, snapshot } = await createEphemeralBlock(admin, orgId)
+    const junction = await createEphemeralJunction(admin, section.id, blockId, versionId, snapshot, 1)
+
+    const accessToken = await mintAccessToken(admin, otherEmail)
+    const asOther = asUserClient(accessToken)
+
+    await asOther.from('sop_section_blocks').update({ pin_mode: 'follow_latest' }).eq('id', junction.id)
+    await asOther.from('sop_section_blocks').delete().eq('id', junction.id)
+
+    const { data: persisted } = await admin
+      .from('sop_section_blocks')
+      .select('id, pin_mode')
+      .eq('id', junction.id)
+      .maybeSingle()
+    expect(persisted).not.toBeNull()
+    expect(persisted?.pin_mode).toBe('pinned')
+
+    await admin.from('sop_section_blocks').delete().eq('id', junction.id)
+  })
+
+  // -------------------------------------------------------------------------
+  // Phase 46 WR-02 -- sop_images probes (admins_can_manage_images was
+  // recreated by 00063 but had zero probes).
+  // -------------------------------------------------------------------------
+
+  // added by the CR-02/WR-02 review fix
+  test('IMAGES POSITIVE -- the owner (role worker) can insert a sop_images row on their own SOP', async () => {
+    test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
+    const admin = serviceClient()
+    const orgId = await createEphemeralOrg(admin, 'Phase46 Images Owner Org')
+    const { userId: ownerId, email: ownerEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    const sop = await createEphemeralSop(admin, orgId, ownerId, ownerId)
+
+    const accessToken = await mintAccessToken(admin, ownerEmail)
+    const asOwner = asUserClient(accessToken)
+
+    const { data: inserted, error } = await asOwner
+      .from('sop_images')
+      .insert({ sop_id: sop.id, storage_path: 'phase46-probe/owner.jpg', content_type: 'image/jpeg' })
+      .select('id')
+      .single()
+    expect(error).toBeNull()
+
+    const { data: persisted } = await admin.from('sop_images').select('id').eq('id', inserted!.id).maybeSingle()
+    expect(persisted).not.toBeNull()
+  })
+
+  // added by the CR-02/WR-02 review fix
+  test('IMAGES NEGATIVE -- a same-org worker who is NOT the owner cannot insert a sop_images row (verified by service re-read)', async () => {
+    test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
+    const admin = serviceClient()
+    const orgId = await createEphemeralOrg(admin, 'Phase46 Images Non-Owner Org')
+    const { userId: ownerId } = await createEphemeralMember(admin, orgId, 'worker')
+    const { email: otherEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    const sop = await createEphemeralSop(admin, orgId, ownerId, ownerId)
+
+    const accessToken = await mintAccessToken(admin, otherEmail)
+    const asOther = asUserClient(accessToken)
+
+    await asOther
+      .from('sop_images')
+      .insert({ sop_id: sop.id, storage_path: 'phase46-probe/non-owner.jpg', content_type: 'image/jpeg' })
+
+    const { data: rows } = await admin
+      .from('sop_images')
+      .select('id')
+      .eq('sop_id', sop.id)
+      .eq('storage_path', 'phase46-probe/non-owner.jpg')
+    expect(rows ?? []).toHaveLength(0)
   })
 })

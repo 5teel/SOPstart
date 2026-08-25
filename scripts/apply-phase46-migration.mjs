@@ -35,6 +35,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
 const MIGRATION_FILES = [
   path.join(ROOT, 'supabase/migrations/00063_sop_content_owner_edit.sql'),
+  // Phase 46 CR-02 corrective: owner arm on sop_section_blocks (block
+  // junctions) that 00063 missed. Appended per the 2026-07-28 applier rule
+  // -- re-running this script must apply BOTH, in this order.
+  path.join(ROOT, 'supabase/migrations/00064_ssb_owner_edit.sql'),
 ]
 
 // ---------------------------------------------------------------------------
@@ -126,7 +130,7 @@ try {
       const migrationSql = readFileSync(file, 'utf8')
       await managementSql(migrationSql)
     }
-    console.log('Management API raw-SQL apply: SUCCESS (00063)')
+    console.log('Management API raw-SQL apply: SUCCESS (all MIGRATION_FILES, in order)')
     pushSucceeded = true
     pushPath = 'management-api-fallback'
   } catch (fallbackErr) {
@@ -190,13 +194,21 @@ async function assertSql(label, sql, checkFn) {
 }
 
 const REQUIRED_SUBSTRINGS = ['current_organisation_id', 'current_user_role', 'owner_user_id', 'auth.uid()']
+// withCheck semantics per policy:
+//   'null'        -- the policy writes NO WITH CHECK, so Postgres reuses USING
+//                    as the check (the three 00063 policies).
+//   'equals-qual' -- the policy DOES write a WITH CHECK (00019 did), so 00064
+//                    must restate the FULL predicate: the deparsed with_check
+//                    must be byte-identical to the deparsed qual (CLAUDE.md
+//                    2026-08-04: a partial WITH CHECK replaces USING).
 const POLICIES = [
-  { table: 'sop_sections', name: 'admins_can_manage_sections' },
-  { table: 'sop_steps', name: 'admins_can_manage_steps' },
-  { table: 'sop_images', name: 'admins_can_manage_images' },
+  { table: 'sop_sections', name: 'admins_can_manage_sections', withCheck: 'null' },
+  { table: 'sop_steps', name: 'admins_can_manage_steps', withCheck: 'null' },
+  { table: 'sop_images', name: 'admins_can_manage_images', withCheck: 'null' },
+  { table: 'sop_section_blocks', name: 'ssb_admin_manage_own_org', withCheck: 'equals-qual' },
 ]
 
-for (const { table, name } of POLICIES) {
+for (const { table, name, withCheck } of POLICIES) {
   await assertSql(
     `${table}.${name} qual contains current_organisation_id, current_user_role, owner_user_id, auth.uid()`,
     `SELECT policyname, qual, with_check FROM pg_policies WHERE schemaname='public' AND tablename='${table}' AND policyname='${name}'`,
@@ -211,17 +223,31 @@ for (const { table, name } of POLICIES) {
     }
   )
 
-  await assertSql(
-    `${table}.${name} with_check IS NULL (USING reused as the check -- no partial WITH CHECK narrowing)`,
-    `SELECT with_check FROM pg_policies WHERE schemaname='public' AND tablename='${table}' AND policyname='${name}'`,
-    (rows) => {
-      const row = rows?.[0]
-      return {
-        ok: !!row && (row.with_check === null || row.with_check === undefined),
-        detail: row ? `with_check=${row.with_check}` : 'policy not found',
+  if (withCheck === 'null') {
+    await assertSql(
+      `${table}.${name} with_check IS NULL (USING reused as the check -- no partial WITH CHECK narrowing)`,
+      `SELECT with_check FROM pg_policies WHERE schemaname='public' AND tablename='${table}' AND policyname='${name}'`,
+      (rows) => {
+        const row = rows?.[0]
+        return {
+          ok: !!row && (row.with_check === null || row.with_check === undefined),
+          detail: row ? `with_check=${row.with_check}` : 'policy not found',
+        }
       }
-    }
-  )
+    )
+  } else {
+    await assertSql(
+      `${table}.${name} with_check is IDENTICAL to qual (full predicate restated -- no 00062-class narrowing)`,
+      `SELECT qual, with_check FROM pg_policies WHERE schemaname='public' AND tablename='${table}' AND policyname='${name}'`,
+      (rows) => {
+        const row = rows?.[0]
+        return {
+          ok: !!row && typeof row.with_check === 'string' && row.with_check === row.qual,
+          detail: row ? `with_check===qual: ${row.with_check === row.qual}` : 'policy not found',
+        }
+      }
+    )
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -245,9 +271,10 @@ console.log('[4/4] Summary')
 if (allPassed) {
   console.log('=== ALL POST-APPLY ASSERTIONS PASSED ===')
   console.log('')
-  console.log('Migration 00063 is live on the DB: all three content policies carry the')
-  console.log('owner-OR-role arm inside their org-scoped USING, none carry a WITH CHECK,')
-  console.log('and PostgREST has been told to reload its schema cache.')
+  console.log('Migrations 00063+00064 are live on the DB: all four content policies')
+  console.log('(sections, steps, images, block junctions) carry the owner-OR-role arm')
+  console.log('inside their org-scoped USING; the junction policy restates the full')
+  console.log('predicate in WITH CHECK; PostgREST has been told to reload its cache.')
   process.exit(0)
 } else {
   console.error('=== ONE OR MORE ASSERTIONS FAILED ===')
