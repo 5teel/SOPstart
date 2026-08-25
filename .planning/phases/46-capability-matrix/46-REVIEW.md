@@ -21,6 +21,18 @@ findings:
   info: 3
   total: 9
 status: issues_found
+fix_status: criticals_and_warnings_fixed
+fixed_at: 2026-08-25
+fix_commits:
+  - "589d03f CR-01 remove wire-reachable serviceRole bypass"
+  - "a35baad CR-01 follow-up: directive-position spec assertions"
+  - "23fd6d2 CR-01 follow-up: repoint scp-parse-pipeline stale contract"
+  - "ecbff27 CR-02 migration 00064 ssb owner arm + junction/images probes"
+  - "600cfb3 WR-01 structural nesting assertions"
+  - "22c2506 WR-01 follow-up: accept ::app_role deparse cast"
+  - "cf6a45d WR-02 sop_steps non-owner negative probe"
+  - "1f63946 WR-03 PATCH step containment + per-step errors + Zod"
+  - "549a759 WR-04 zero-affected-rows = error (migration 00065)"
 ---
 
 # Phase 46: Code Review Report
@@ -39,6 +51,8 @@ T4 fails twice. First, the `serviceRole` flag on `addBlockToSection` is a client
 ## Critical Issues
 
 ### CR-01: `serviceRole: true` in `addBlockToSection` input is a network-reachable, unauthenticated, cross-tenant write bypass
+
+**Status: FIXED** (`589d03f`, follow-ups `a35baad`/`23fd6d2`) — insert body extracted to `src/lib/builder/section-blocks-core.ts` (plain module, no endpoint ID); parser now calls `addBlockToSectionAsService`; `serviceRole` removed from the Zod schema; the action always runs `requireSopEditAccess`. Wiring spec, parser contract test, and scp-parse-pipeline all repointed.
 
 **File:** `src/actions/sop-section-blocks.ts:86` (schema), `:104-109` (branch)
 **Issue:** `sop-section-blocks.ts` is a `'use server'` module, so every export is a POST-reachable RPC endpoint. `AddBlockToSectionInput` accepts `serviceRole: z.boolean().optional()` from the wire, and the `data.serviceRole` branch does **no auth at all** — no session check, no org check — before switching to `createAdminClient()` (service-role, RLS bypass) and inserting into any `sop_section_blocks` row named by client-supplied UUIDs. `addBlockToSection` is imported by client components (`WizardClient.tsx:9`, `ReuseTier.tsx:5`), so its action ID is present in the shipped client bundle; any anonymous caller who replays it with `{ serviceRole: true, sopSectionId: <victim uuid>, blockId: <uuid> }` writes into another tenant's SOP. This is the recurring 2026-06-15/07-28 service-role class on a new surface (server-action parameter instead of RPC parameter). It predates Phase 46, but the phase's threat model (T4) explicitly targets the service-role paths in this file, and the new wiring spec (`sop-edit-guard-wiring.spec.ts:123-132`) now pins the bypass-before-guard ordering as a contract, cementing the hole.
@@ -60,6 +74,8 @@ await addBlockToSectionCore(createAdminClient(), { ...item, serviceRole: true /*
 Then repoint the wiring spec's trust-boundary test (it currently asserts `data.serviceRole` precedes the guard inside the action body) and `parser-creates-junctions.test.ts:114` in the same commit (CLAUDE.md 2026-07-13 repoint rule).
 
 ### CR-02: Migration 00063 never extended `sop_section_blocks` RLS — owner block-junction edits are guard-approved but RLS-denied, two of them as silent false success
+
+**Status: FIXED** (`ecbff27`) — migration 00064 recreates `ssb_admin_manage_own_org` with the owner arm nested inside the org-scope AND, restating the FULL predicate in both USING and WITH CHECK; applied live via the applier (all assertions PASS, `with_check === qual` confirmed). Live probes added: owner junction insert/update/delete + RPC reorder positive, same-org non-owner negative, all green against the live DB. `sop_images` was already covered by 00063 (confirmed — no other table missed). The reorder RPC needed no access change (NOT SECURITY DEFINER — the extended policy gates it).
 
 **File:** `supabase/migrations/00063_sop_content_owner_edit.sql` (missing table) / `src/actions/sop-section-blocks.ts:111, 215, 244, 310`
 **Issue:** `guards.ts` A2 defines CAP-02 edit scope as "sections, steps, images, layout_data, **block junctions**", and Plan 46-03 swapped `addBlockToSection`, `removeBlockFromSection`, `setPinMode`, `reorderSectionBlocks` onto `requireSopEditAccess` — all four writing with the **session** client. But 00063 only recreated policies on `sop_sections`, `sop_steps`, `sop_images`. The junction table's only write policy is `ssb_admin_manage_own_org` (00019:273-288), admin/safety_manager-only in both USING and WITH CHECK, and `reorder_sop_section_blocks` is deliberately NOT SECURITY DEFINER (00024:7). For a worker-owner the guard says yes and then:
@@ -90,11 +106,15 @@ Append the new file to `MIGRATION_FILES` in `apply-phase46-migration.mjs` (2026-
 
 ### WR-01: Applier post-apply assertions are substring checks that would print PASS on the exact T1 hole they exist to catch
 
+**Status: FIXED** (`600cfb3`, follow-up `22c2506`) — the qual assertion now whitespace-normalizes the deparsed expression and requires the org predicate to be AND-conjoined with the `(role OR owner)` group via a structural regex; a `(org AND role) OR owner` top-level-OR regression cannot match. Live deparse casts role literals to `::app_role` (not `::text`) — regex accepts both. Verified PASS on all four policies live.
+
 **File:** `scripts/apply-phase46-migration.mjs:192-212`
 **Issue:** The qual assertion only checks that all four tokens (`current_organisation_id`, `current_user_role`, `owner_user_id`, `auth.uid()`) appear somewhere in the deparsed USING. A regressed policy shaped `(org AND role) OR (owner_user_id = auth.uid())` — the top-level-OR cross-tenant hole 00061 fixed — contains all four substrings and passes green. The script's own header cites 2026-07-28 ("an assertion must pin EVERY security-relevant clause"), but token presence does not pin the conjunction structure.
 **Fix:** Assert the nesting, not the tokens. Normalize whitespace on `qual` and require the org predicate to be AND-conjoined with the role/owner OR-group inside the EXISTS, e.g. `expect(normalized).toMatch(/organisation_id = current_organisation_id\(\)\) AND \(\(current_user_role\(\).*OR \(.*owner_user_id = auth\.uid\(\)/)` — or pin the entire normalized qual string per policy.
 
 ### WR-02: Live-probe spec skips one of the three recreated policies entirely (`sop_images`) and all junction-table writes
+
+**Status: FIXED** (`ecbff27` + `cf6a45d`) — added: `sop_images` owner-positive + same-org non-owner-negative, `sop_steps` non-owner-negative, and the full junction probe set (owner insert/update/delete/reorder positive, non-owner negative). All green against live RLS.
 
 **File:** `tests/phase46/sop-edit-owner-access.spec.ts`
 **Issue:** The header claims enumeration of "role x own/other x same-org/cross-org" per the 2026-07-20 rule, but `admins_can_manage_images` — recreated by 00063 — has zero probes (no positive owner write, no negative), `sop_steps` has only the positive half, and `sop_section_blocks` (which the guard layer now advertises to owners) has none — which is why CR-02 shipped invisible. One probe set per policy per branch is the stated bar; two of the surfaces changed by this phase don't meet it.
@@ -102,17 +122,23 @@ Append the new file to `MIGRATION_FILES` in `apply-phase46-migration.mjs` (2026-
 
 ### WR-03: PATCH route updates `sop_steps` by raw client-supplied `step.id` with no containment to the authorized section, and ignores per-step errors
 
+**Status: FIXED** (`1f63946`) — every step update carries `.eq('section_id', sectionId)`; each update's error AND zero-affected-rows result is surfaced (400 with `stepErrors`); body Zod-validated with malformed-JSON → 400. `step.id` is `min(1)` not `.uuid()` because SectionEditor's `addStep` sends `new-*` placeholder ids — placeholders are skipped (preserving the route's existing no-step-creation behaviour) rather than failing the whole save.
+
 **File:** `src/app/api/sops/[sopId]/sections/[sectionId]/route.ts:58-66`
 **Issue:** The guard authorizes edit on `sopId`, but the steps loop runs `.update(...).eq('id', step.id)` with no `.eq('section_id', ...)` / no membership check — `step.id` can name a step in a *different* SOP (RLS bounds it to org + admin-or-owned, but the route's own authorization claim is per-SOP, so the guard gives false assurance). The loop also discards every update's error and the route returns `{ success: true }` regardless; a partially-failed or fully-RLS-denied batch reports success. Body is additionally unvalidated (no Zod, contrary to project convention) — `step.text` could be any JSON type.
 **Fix:** Fetch the section's step ids first and filter (`.in('id', ownIds)` or `.eq('section_id', sectionId)` per update... note `sop_steps.section_id` is the FK — add `.eq('section_id', sectionId)` to each update), check each `error`, and validate `body` with a Zod schema (`content: z.string().optional(), approved: z.boolean().optional(), steps: z.array({id: uuid, text: string}).optional()`).
 
 ### WR-04: Write actions report success on zero-affected-rows — RLS denials and stale ids are indistinguishable from real deletes/reorders
 
+**Status: FIXED** (`549a759`) — `removeBlockFromSection` chains `.select('id')` and errors on empty; migration 00065 makes `reorder_sop_section_blocks` RETURN integer via `GET DIAGNOSTICS row_count` (still NOT SECURITY DEFINER) and the action errors when `affected < orderedJunctionIds.length`. Applied live; applier pins returns-integer / row-count / not-security-definer / authenticated-execute.
+
 **File:** `src/actions/sop-section-blocks.ts:219-228` (removeBlockFromSection), `:314-323` (reorderSectionBlocks)
 **Issue:** The owner-access spec's own header documents that "an RLS-denied UPDATE through PostgREST does not error — it silently affects zero rows," but the action layer doesn't apply the same discipline: `removeBlockFromSection` and `reorderSectionBlocks` return `{ success: true }` whether or not any row changed. Even after CR-02's migration lands, a stale `junctionId` or a future policy regression produces a lying success (CR-02 shows this is live today for owners).
 **Fix:** For the delete, chain `.select('id')` and error when the returned array is empty. For the RPC, have `reorder_sop_section_blocks` return the affected row count (`GET DIAGNOSTICS n = ROW_COUNT; return n`) and error when it is less than `array_length(p_ordered_junction_ids, 1)`.
 
 ## Info
+
+_IN-01..IN-04: SKIPPED by the review-fix pass (fix scope was Critical + Warning only)._
 
 ### IN-01: Stale comments contradicting shipped state
 
