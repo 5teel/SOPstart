@@ -262,6 +262,27 @@ test.describe('CAP-02 -- owner-edit runtime probes (real ephemeral org, real RLS
     expect(persisted?.text).toBe('Owner-edited step text')
   })
 
+  // added by the WR-02 review fix -- sop_steps previously had only the
+  // positive half (2026-07-20: one probe per policy branch is not coverage)
+  test('NEGATIVE -- a same-org worker who is NOT the owner cannot update sop_steps.text (silent zero-row deny, verified by re-read)', async () => {
+    test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
+    const admin = serviceClient()
+    const orgId = await createEphemeralOrg(admin, 'Phase46 Steps Non-Owner Org')
+    const { userId: ownerId } = await createEphemeralMember(admin, orgId, 'worker')
+    const { email: otherEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    const sop = await createEphemeralSop(admin, orgId, ownerId, ownerId)
+    const section = await createEphemeralSection(admin, sop.id)
+    const step = await createEphemeralStep(admin, section.id)
+
+    const accessToken = await mintAccessToken(admin, otherEmail)
+    const asOther = asUserClient(accessToken)
+
+    await asOther.from('sop_steps').update({ text: 'Should not persist' }).eq('id', step.id)
+
+    const { data: persisted } = await admin.from('sop_steps').select('text').eq('id', step.id).single()
+    expect(persisted?.text).not.toBe('Should not persist')
+  })
+
   // activated by plan 46-03 after migration 00063 is applied
   test('NEGATIVE -- a second worker in the same org who is NOT the owner cannot update sop_sections.title', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
