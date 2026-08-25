@@ -193,7 +193,18 @@ async function assertSql(label, sql, checkFn) {
   }
 }
 
+// WR-01: token-presence checks alone would print PASS on the exact T1 hole
+// this script exists to catch -- a regressed `(org AND role) OR owner` shape
+// (the top-level-OR cross-tenant hole 00061 fixed) contains all four tokens.
+// So we assert the NESTING: after whitespace-normalizing the deparsed qual,
+// the org predicate must be AND-conjoined with the (role OR owner) group --
+// i.e. `...organisation_id = current_organisation_id()) AND ((current_user_role()
+// = ANY (...)) OR (<alias>.owner_user_id = auth.uid()))`. A top-level-OR
+// regression deparse cannot match this shape.
+const NESTED_OWNER_ARM =
+  /organisation_id = current_organisation_id\(\)\) AND \(\(current_user_role\(\) = ANY \(ARRAY\['admin'::text,\s*'safety_manager'::text\]\)\) OR \(\w+\.owner_user_id = auth\.uid\(\)\)\)/
 const REQUIRED_SUBSTRINGS = ['current_organisation_id', 'current_user_role', 'owner_user_id', 'auth.uid()']
+const normalizeQual = (q) => (q ?? '').replace(/\s+/g, ' ')
 // withCheck semantics per policy:
 //   'null'        -- the policy writes NO WITH CHECK, so Postgres reuses USING
 //                    as the check (the three 00063 policies).
@@ -210,15 +221,18 @@ const POLICIES = [
 
 for (const { table, name, withCheck } of POLICIES) {
   await assertSql(
-    `${table}.${name} qual contains current_organisation_id, current_user_role, owner_user_id, auth.uid()`,
+    `${table}.${name} qual: owner arm is NESTED under the org-scope AND (structural, not token presence)`,
     `SELECT policyname, qual, with_check FROM pg_policies WHERE schemaname='public' AND tablename='${table}' AND policyname='${name}'`,
     (rows) => {
       const row = rows?.[0]
-      const qual = row?.qual ?? ''
+      const qual = normalizeQual(row?.qual)
       const missing = REQUIRED_SUBSTRINGS.filter((s) => !qual.includes(s))
+      const nested = NESTED_OWNER_ARM.test(qual)
       return {
-        ok: !!row && missing.length === 0,
-        detail: row ? `qual=${qual}` : 'policy not found',
+        ok: !!row && missing.length === 0 && nested,
+        detail: row
+          ? `nested-owner-arm=${nested} missing-tokens=[${missing.join(',')}] qual=${qual}`
+          : 'policy not found',
       }
     }
   )
