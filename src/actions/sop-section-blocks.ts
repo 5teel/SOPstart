@@ -128,13 +128,20 @@ export async function removeBlockFromSection(
   const { supabase } = ctx
 
   // RLS-scoped delete; the source block in the library is unaffected.
-  const { error } = await supabase
+  // WR-04: an RLS-denied delete does not error -- it silently affects zero
+  // rows. Chain .select('id') and treat an empty result as failure, never
+  // a lying { success: true }.
+  const { data: deleted, error } = await supabase
     .from('sop_section_blocks')
     .delete()
     .eq('id', junctionId)
+    .select('id')
   if (error) {
     console.error('[removeBlockFromSection] delete error', error)
     return { error: error.message }
+  }
+  if (!deleted || deleted.length === 0) {
+    return { error: 'Delete affected no rows — the block was already removed or you do not have edit access.' }
   }
   return { success: true }
 }
@@ -222,14 +229,25 @@ export async function reorderSectionBlocks(
   if ('error' in ctx) return { error: ctx.error }
   const { supabase } = ctx
 
+  // WR-04: the RPC (migration 00065) returns the affected row count -- it
+  // runs as the caller (NOT SECURITY DEFINER), so an RLS deny or stale id
+  // updates zero rows without erroring. Anything short of the full list is
+  // a failure, never a lying { success: true }.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any).rpc('reorder_sop_section_blocks', {
+  const { data: affected, error } = await (supabase as any).rpc('reorder_sop_section_blocks', {
     p_sop_section_id: parsed.data.sopSectionId,
     p_ordered_junction_ids: parsed.data.orderedJunctionIds,
   })
   if (error) {
     console.error('[reorderSectionBlocks] rpc error', error)
     return { error: `Reorder failed: ${error.message}` }
+  }
+  const expected = parsed.data.orderedJunctionIds.length
+  if (typeof affected !== 'number' || affected < expected) {
+    console.error('[reorderSectionBlocks] partial/zero reorder', { affected, expected })
+    return {
+      error: `Reorder affected ${typeof affected === 'number' ? affected : 0} of ${expected} rows — stale ids or no edit access; order unchanged or partially applied.`,
+    }
   }
   return { success: true }
 }

@@ -39,6 +39,9 @@ const MIGRATION_FILES = [
   // junctions) that 00063 missed. Appended per the 2026-07-28 applier rule
   // -- re-running this script must apply BOTH, in this order.
   path.join(ROOT, 'supabase/migrations/00064_ssb_owner_edit.sql'),
+  // Phase 46 WR-04: reorder_sop_section_blocks now RETURNS integer (affected
+  // row count) so zero-row reorders are detectable. Must apply AFTER 00064.
+  path.join(ROOT, 'supabase/migrations/00065_reorder_ssb_rpc_rowcount.sql'),
 ]
 
 // ---------------------------------------------------------------------------
@@ -263,6 +266,32 @@ for (const { table, name, withCheck } of POLICIES) {
     )
   }
 }
+
+// WR-04 (00065): pin every security-relevant clause of the reorder RPC --
+// returns integer, counts rows via GET DIAGNOSTICS, is NOT SECURITY DEFINER
+// (must run as caller so ssb_admin_manage_own_org gates it), and stays
+// executable by authenticated.
+await assertSql(
+  'reorder_sop_section_blocks: returns integer, GET DIAGNOSTICS row count, NOT SECURITY DEFINER, authenticated may execute',
+  `SELECT pg_get_functiondef(p.oid) AS def,
+          p.prosecdef AS secdef,
+          has_function_privilege('authenticated', p.oid, 'execute') AS auth_exec
+     FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public' AND p.proname = 'reorder_sop_section_blocks'`,
+  (rows) => {
+    const row = rows?.[0]
+    if (!row) return { ok: false, detail: 'function not found' }
+    const def = row.def ?? ''
+    const returnsInt = /RETURNS integer/i.test(def)
+    const countsRows = /GET DIAGNOSTICS/i.test(def) && /ROW_COUNT/i.test(def)
+    const notSecDef = row.secdef === false
+    const authExec = row.auth_exec === true
+    return {
+      ok: returnsInt && countsRows && notSecDef && authExec,
+      detail: `returnsInt=${returnsInt} countsRows=${countsRows} notSecurityDefiner=${notSecDef} authenticatedExecute=${authExec}`,
+    }
+  }
+)
 
 // ---------------------------------------------------------------------------
 // Step 3: NOTIFY pgrst to flush the PostgREST schema cache.
