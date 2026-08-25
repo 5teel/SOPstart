@@ -133,7 +133,13 @@ test.describe('CAP-02 -- requireSopEditAccess call-site wiring (source-contract)
     // The service path is a plain module (not 'use server' — no endpoint ID)
     // and performs no auth-flag branching.
     const core = read(path.join(ROOT, 'src', 'lib', 'builder', 'section-blocks-core.ts'))
-    expect(core, 'core module must not be a server-action module').not.toContain("'use server'")
+    // A 'use server' DIRECTIVE must be the module's first statement -- check
+    // that position, not token absence (the core's comments legitimately
+    // mention the literal when explaining why it is NOT a server module).
+    expect(
+      /^\s*['"]use server['"]/.test(core),
+      'core module must not open with a use server directive'
+    ).toBe(false)
     expect(core).toContain('export async function addBlockToSectionAsService')
     // The parser imports the core entry point, not the guarded action.
     const parser = read(path.join(ROOT, 'src', 'lib', 'parsers', 'parsed-sop-to-layout-data.ts'))

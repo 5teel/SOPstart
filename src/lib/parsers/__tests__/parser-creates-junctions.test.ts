@@ -120,8 +120,10 @@ test.describe('Plan 21-05 — parser materializes junctions', () => {
     expect(src).not.toContain('serviceRole: z.boolean()')
     expect(src).not.toContain('data.serviceRole')
     // The service path (parser) lives in the plain core module instead.
+    // Directive-position check, not token absence -- the core's comments
+    // legitimately mention the 'use server' literal.
     const core = read('src/lib/builder/section-blocks-core.ts')
-    expect(core).not.toContain("'use server'")
+    expect(/^\s*['"]use server['"]/.test(core)).toBe(false)
     expect(core).toContain('export async function addBlockToSectionAsService')
     expect(core).toContain('block_provenance: blockProvenance ?? null')
   })
