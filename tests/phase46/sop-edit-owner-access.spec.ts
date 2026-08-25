@@ -1,25 +1,28 @@
 /**
- * CAP-02 -- live RLS probe set: owner-edit, non-owner-denied, admin-regression,
- * cross-org-denied, and publish-still-denied against real Supabase RLS.
+ * CAP-02 -- live RLS probe set for the A1-RESOLVED model (Simon, 2026-08-25):
+ * sign-off authority = approval-chain approvers (Phase 29 approval_chains),
+ * NOT sops.owner_user_id. Probes: approver-edit (userId step and role step),
+ * owner-now-denied (the key flip probe), non-approver-denied, no-chain-denied,
+ * admin-regression, cross-org-denied, and publish-still-denied against real
+ * Supabase RLS (migration 00066 is_sop_sign_off_approver()).
  *
  * Mirrors tests/phase34/observation-read-role-scope.spec.ts verbatim (env
  * loader, ephemeral-org fixtures, teardown, mint-token pattern) -- no shared
  * test-utils module exists for this pattern in this codebase.
  *
  * Per CLAUDE.md 2026-07-20 (one probe per policy is not coverage) and
- * 2026-08-04 (permissive policies OR-combine -- the owner arm must live
+ * 2026-08-04 (permissive policies OR-combine -- the approver arm must live
  * INSIDE the org-scope AND, never as a sibling policy), this spec enumerates
- * role x own/other x same-org/cross-org x allowed/denied, not a single probe.
+ * role x approver/non-approver x same-org/cross-org x allowed/denied, not a
+ * single probe.
  *
  * CRITICAL assertion shape: an RLS-denied UPDATE through PostgREST does not
  * error -- it silently affects zero rows. Every probe therefore re-reads the
  * target row with the SERVICE client after the attempted write and compares
  * the persisted value, never trusting the update response alone.
  *
- * Activated by Plan 46-03: migration 00063 (which extends the RLS policies
- * with the owner-OR-role predicate) is live. Probes 3-7 (the negative half)
- * must ALSO stay red-if-broken going forward -- they are the negative half
- * of the 2026-07-20 rule, not a one-time proof.
+ * The negative half must stay red-if-broken going forward -- it is the
+ * negative half of the 2026-07-20 rule, not a one-time proof.
  *
  * Registration: playwright.config.ts `phase46` project
  *   testDir: '.', testMatch: /tests\/phase46\/.*\.(spec|test)\.ts$/
@@ -58,6 +61,10 @@ const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 const ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 const LIVE_ENV_READY = !!(SUPABASE_URL && SERVICE_KEY && ANON_KEY)
 
+// Every probe SOP is created in this category; the chain fixture writes the
+// approval_chains row for the same slug (values from src/lib/sop-categories.ts).
+const PROBE_CATEGORY = 'safety'
+
 function serviceClient(): SupabaseClient {
   return createClient(SUPABASE_URL!, SERVICE_KEY!, { auth: { autoRefreshToken: false, persistSession: false } })
 }
@@ -93,13 +100,30 @@ async function createEphemeralMember(
   orgId: string,
   role: 'worker' | 'supervisor' | 'admin'
 ): Promise<{ userId: string; email: string }> {
-  const email = `p46-owner-${role}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example-phase46-test.invalid`
+  const email = `p46-appr-${role}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example-phase46-test.invalid`
   const { data: userResp, error } = await admin.auth.admin.createUser({ email, email_confirm: true })
   if (error || !userResp?.user) throw new Error(`createUser failed: ${error?.message}`)
   cleanupUserIds.push(userResp.user.id)
   const { error: memErr } = await admin.from('organisation_members').insert({ organisation_id: orgId, user_id: userResp.user.id, role })
   if (memErr) throw new Error(`organisation_members insert failed: ${memErr.message}`)
   return { userId: userResp.user.id, email }
+}
+
+/**
+ * A1 fixture: writes the approval_chains row for (orgId, PROBE_CATEGORY).
+ * Steps use the real ChainStep shape ({ userId | role, label }) that
+ * stepMatchesCaller and is_sop_sign_off_approver() both read. Cleaned up by
+ * the org cascade (approval_chains.organisation_id ON DELETE CASCADE, 00045).
+ */
+async function setEphemeralChain(
+  admin: SupabaseClient,
+  orgId: string,
+  steps: Array<{ userId?: string; role?: string; label: string }>
+): Promise<void> {
+  const { error } = await admin
+    .from('approval_chains')
+    .insert({ organisation_id: orgId, category: PROBE_CATEGORY, steps })
+  if (error) throw new Error(`setEphemeralChain failed: ${error.message}`)
 }
 
 async function createEphemeralSop(
@@ -112,12 +136,13 @@ async function createEphemeralSop(
     .from('sops')
     .insert({
       organisation_id: orgId,
-      title: 'Phase46 owner-edit probe SOP',
+      title: 'Phase46 approver-edit probe SOP',
       status: 'draft',
       version: 1,
       uploaded_by: uploaderId,
       owner_user_id: ownerUserId,
-      source_file_path: 'phase46-owner/probe.docx',
+      category_slug: PROBE_CATEGORY,
+      source_file_path: 'phase46-approver/probe.docx',
       source_file_type: 'docx',
       source_file_name: 'probe.docx',
     })
@@ -133,7 +158,7 @@ async function createEphemeralSection(admin: SupabaseClient, sopId: string): Pro
     .insert({
       sop_id: sopId,
       section_type: 'procedure',
-      title: 'Phase46 owner-edit probe section',
+      title: 'Phase46 approver-edit probe section',
       sort_order: 10,
       approved: false,
     })
@@ -149,7 +174,7 @@ async function createEphemeralStep(admin: SupabaseClient, sectionId: string): Pr
     .insert({
       section_id: sectionId,
       step_number: 1,
-      text: 'Phase46 owner-edit probe step',
+      text: 'Phase46 approver-edit probe step',
     })
     .select('id')
     .single()
@@ -215,61 +240,104 @@ test.afterAll(async () => {
 })
 
 // ---------------------------------------------------------------------------
-// Live-Supabase probes -- activated by Plan 46-03 against live migration 00063.
-// Probes 3-7 (negative/regression/isolation/containment) must stay red if
+// Live-Supabase probes -- against live migration 00066 (A1 resolution).
+// The negative/regression/isolation/containment probes must stay red if
 // CAP-02 regresses -- they are not a one-time proof, per CLAUDE.md 2026-07-20.
 // ---------------------------------------------------------------------------
 
-test.describe('CAP-02 -- owner-edit runtime probes (real ephemeral org, real RLS)', () => {
+test.describe('CAP-02 -- approver-edit runtime probes (real ephemeral org, real RLS, A1 = chain approvers)', () => {
   test.skip(!LIVE_ENV_READY, 'requires NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY / NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY in .env.local')
 
-  // activated by plan 46-03 after migration 00063 is applied
-  test('POSITIVE -- a worker who is the SOP owner can update sop_sections.title on their own SOP', async () => {
+  test('POSITIVE -- a plain worker named by userId in the category chain can update sop_sections.title', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
     const admin = serviceClient()
-    const orgId = await createEphemeralOrg(admin, 'Phase46 Owner Org')
-    const { userId: ownerId, email: ownerEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    const orgId = await createEphemeralOrg(admin, 'Phase46 Approver Org')
+    const { userId: ownerId } = await createEphemeralMember(admin, orgId, 'worker')
+    const { userId: approverId, email: approverEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    await setEphemeralChain(admin, orgId, [{ userId: approverId, label: 'Named approver' }])
     const sop = await createEphemeralSop(admin, orgId, ownerId, ownerId)
     const section = await createEphemeralSection(admin, sop.id)
 
-    const accessToken = await mintAccessToken(admin, ownerEmail)
-    const asOwner = asUserClient(accessToken)
+    const accessToken = await mintAccessToken(admin, approverEmail)
+    const asApprover = asUserClient(accessToken)
 
-    const { error } = await asOwner.from('sop_sections').update({ title: 'Owner-edited title' }).eq('id', section.id)
+    const { error } = await asApprover.from('sop_sections').update({ title: 'Approver-edited title' }).eq('id', section.id)
     expect(error).toBeNull()
 
     const { data: persisted } = await admin.from('sop_sections').select('title').eq('id', section.id).single()
-    expect(persisted?.title).toBe('Owner-edited title')
+    expect(persisted?.title).toBe('Approver-edited title')
   })
 
-  // activated by plan 46-03 after migration 00063 is applied
-  test('POSITIVE -- the same owner can update sop_steps.text on a step under their SOP (admins_can_manage_steps extended, not just sections)', async () => {
+  test('POSITIVE -- the same userId-step approver can update sop_steps.text (admins_can_manage_steps carries the approver arm, not just sections)', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
     const admin = serviceClient()
-    const orgId = await createEphemeralOrg(admin, 'Phase46 Owner Steps Org')
-    const { userId: ownerId, email: ownerEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    const orgId = await createEphemeralOrg(admin, 'Phase46 Approver Steps Org')
+    const { userId: ownerId } = await createEphemeralMember(admin, orgId, 'worker')
+    const { userId: approverId, email: approverEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    await setEphemeralChain(admin, orgId, [{ userId: approverId, label: 'Named approver' }])
     const sop = await createEphemeralSop(admin, orgId, ownerId, ownerId)
     const section = await createEphemeralSection(admin, sop.id)
     const step = await createEphemeralStep(admin, section.id)
 
-    const accessToken = await mintAccessToken(admin, ownerEmail)
-    const asOwner = asUserClient(accessToken)
+    const accessToken = await mintAccessToken(admin, approverEmail)
+    const asApprover = asUserClient(accessToken)
 
-    const { error } = await asOwner.from('sop_steps').update({ text: 'Owner-edited step text' }).eq('id', step.id)
+    const { error } = await asApprover.from('sop_steps').update({ text: 'Approver-edited step text' }).eq('id', step.id)
     expect(error).toBeNull()
 
     const { data: persisted } = await admin.from('sop_steps').select('text').eq('id', step.id).single()
-    expect(persisted?.text).toBe('Owner-edited step text')
+    expect(persisted?.text).toBe('Approver-edited step text')
   })
 
-  // added by the WR-02 review fix -- sop_steps previously had only the
-  // positive half (2026-07-20: one probe per policy branch is not coverage)
-  test('NEGATIVE -- a same-org worker who is NOT the owner cannot update sop_steps.text (silent zero-row deny, verified by re-read)', async () => {
+  test('POSITIVE -- a supervisor matched by a { role: supervisor } chain step can update sop_sections.title (role-step arm, not just userId)', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
     const admin = serviceClient()
-    const orgId = await createEphemeralOrg(admin, 'Phase46 Steps Non-Owner Org')
+    const orgId = await createEphemeralOrg(admin, 'Phase46 Role-Step Org')
     const { userId: ownerId } = await createEphemeralMember(admin, orgId, 'worker')
+    const { email: supEmail } = await createEphemeralMember(admin, orgId, 'supervisor')
+    await setEphemeralChain(admin, orgId, [{ role: 'supervisor', label: 'Any supervisor' }])
+    const sop = await createEphemeralSop(admin, orgId, ownerId, ownerId)
+    const section = await createEphemeralSection(admin, sop.id)
+
+    const accessToken = await mintAccessToken(admin, supEmail)
+    const asSup = asUserClient(accessToken)
+
+    const { error } = await asSup.from('sop_sections').update({ title: 'Supervisor-approver-edited title' }).eq('id', section.id)
+    expect(error).toBeNull()
+
+    const { data: persisted } = await admin.from('sop_sections').select('title').eq('id', section.id).single()
+    expect(persisted?.title).toBe('Supervisor-approver-edited title')
+  })
+
+  // The key A1 flip probe: ownership no longer carries edit rights.
+  test('NEGATIVE (A1 flip) -- the SOP owner (worker) who is NOT in the chain cannot update sop_sections.title (silent zero-row deny, verified by re-read)', async () => {
+    test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
+    const admin = serviceClient()
+    const orgId = await createEphemeralOrg(admin, 'Phase46 Owner-Denied Org')
+    const { userId: ownerId, email: ownerEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    const { userId: approverId } = await createEphemeralMember(admin, orgId, 'worker')
+    // The chain exists but names someone else -- the owner as such gains nothing.
+    await setEphemeralChain(admin, orgId, [{ userId: approverId, label: 'Named approver (not the owner)' }])
+    const sop = await createEphemeralSop(admin, orgId, ownerId, ownerId)
+    const section = await createEphemeralSection(admin, sop.id)
+
+    const accessToken = await mintAccessToken(admin, ownerEmail)
+    const asOwner = asUserClient(accessToken)
+
+    await asOwner.from('sop_sections').update({ title: 'Should not persist' }).eq('id', section.id)
+
+    const { data: persisted } = await admin.from('sop_sections').select('title').eq('id', section.id).single()
+    expect(persisted?.title).not.toBe('Should not persist')
+  })
+
+  test('NEGATIVE -- a same-org worker in no chain step cannot update sop_steps.text (silent zero-row deny, verified by re-read)', async () => {
+    test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
+    const admin = serviceClient()
+    const orgId = await createEphemeralOrg(admin, 'Phase46 Non-Approver Org')
+    const { userId: ownerId } = await createEphemeralMember(admin, orgId, 'worker')
+    const { userId: approverId } = await createEphemeralMember(admin, orgId, 'worker')
     const { email: otherEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    await setEphemeralChain(admin, orgId, [{ userId: approverId, label: 'Named approver' }])
     const sop = await createEphemeralSop(admin, orgId, ownerId, ownerId)
     const section = await createEphemeralSection(admin, sop.id)
     const step = await createEphemeralStep(admin, section.id)
@@ -283,46 +351,27 @@ test.describe('CAP-02 -- owner-edit runtime probes (real ephemeral org, real RLS
     expect(persisted?.text).not.toBe('Should not persist')
   })
 
-  // activated by plan 46-03 after migration 00063 is applied
-  test('NEGATIVE -- a second worker in the same org who is NOT the owner cannot update sop_sections.title', async () => {
+  // Accepted consequence of A1 (Simon, 2026-08-25): no chain for the category
+  // means zero people with sign-off-derived edit rights.
+  test('NO-CHAIN -- with no approval_chains row for the category, the owner-worker (the former positive) is denied', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
     const admin = serviceClient()
-    const orgId = await createEphemeralOrg(admin, 'Phase46 Non-Owner Worker Org')
-    const { userId: ownerId } = await createEphemeralMember(admin, orgId, 'worker')
-    const { email: otherWorkerEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    const orgId = await createEphemeralOrg(admin, 'Phase46 No-Chain Org')
+    const { userId: ownerId, email: ownerEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    // Deliberately NO setEphemeralChain call.
     const sop = await createEphemeralSop(admin, orgId, ownerId, ownerId)
     const section = await createEphemeralSection(admin, sop.id)
 
-    const accessToken = await mintAccessToken(admin, otherWorkerEmail)
-    const asOtherWorker = asUserClient(accessToken)
+    const accessToken = await mintAccessToken(admin, ownerEmail)
+    const asOwner = asUserClient(accessToken)
 
-    await asOtherWorker.from('sop_sections').update({ title: 'Should not persist' }).eq('id', section.id)
+    await asOwner.from('sop_sections').update({ title: 'Should not persist' }).eq('id', section.id)
 
     const { data: persisted } = await admin.from('sop_sections').select('title').eq('id', section.id).single()
     expect(persisted?.title).not.toBe('Should not persist')
   })
 
-  // activated by plan 46-03 after migration 00063 is applied
-  test('NEGATIVE -- a supervisor in the same org who is not the owner cannot update sop_sections.title (sign-off != edit)', async () => {
-    test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
-    const admin = serviceClient()
-    const orgId = await createEphemeralOrg(admin, 'Phase46 Supervisor Non-Owner Org')
-    const { userId: ownerId } = await createEphemeralMember(admin, orgId, 'worker')
-    const { email: supEmail } = await createEphemeralMember(admin, orgId, 'supervisor')
-    const sop = await createEphemeralSop(admin, orgId, ownerId, ownerId)
-    const section = await createEphemeralSection(admin, sop.id)
-
-    const accessToken = await mintAccessToken(admin, supEmail)
-    const asSup = asUserClient(accessToken)
-
-    await asSup.from('sop_sections').update({ title: 'Should not persist' }).eq('id', section.id)
-
-    const { data: persisted } = await admin.from('sop_sections').select('title').eq('id', section.id).single()
-    expect(persisted?.title).not.toBe('Should not persist')
-  })
-
-  // activated by plan 46-03 after migration 00063 is applied
-  test('REGRESSION -- an admin in the same org who is not the owner CAN still update sop_sections.title (universal admin edit unchanged)', async () => {
+  test('REGRESSION -- an admin in the same org who is in no chain step CAN still update sop_sections.title (universal admin edit unchanged)', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
     const admin = serviceClient()
     const orgId = await createEphemeralOrg(admin, 'Phase46 Admin Regression Org')
@@ -341,65 +390,69 @@ test.describe('CAP-02 -- owner-edit runtime probes (real ephemeral org, real RLS
     expect(persisted?.title).toBe('Admin-edited title')
   })
 
-  // activated by plan 46-03 after migration 00063 is applied
-  test('CROSS-ORG ISOLATION -- the owner of org A cannot update a section of org B\'s SOP (owner arm lives inside the org-scope AND, never as a sibling policy)', async () => {
+  test('CROSS-ORG ISOLATION -- a worker of org A named in ORG B\'s chain still cannot update org B\'s section (org conjunct binds to the SESSION org, never the chain row)', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
     const admin = serviceClient()
-    const orgAId = await createEphemeralOrg(admin, 'Phase46 Cross-Org Owner A')
-    const orgBId = await createEphemeralOrg(admin, 'Phase46 Cross-Org Org B')
-    const { userId: ownerAId, email: ownerAEmail } = await createEphemeralMember(admin, orgAId, 'worker')
+    const orgAId = await createEphemeralOrg(admin, 'Phase46 Cross-Org A')
+    const orgBId = await createEphemeralOrg(admin, 'Phase46 Cross-Org B')
+    const { userId: userAId, email: userAEmail } = await createEphemeralMember(admin, orgAId, 'worker')
     const { userId: ownerBId } = await createEphemeralMember(admin, orgBId, 'worker')
+    // The sharpest probe of the org conjunct: org B's chain NAMES user A.
+    // The helper must still deny -- user A's session org is A, the SOP's is B.
+    await setEphemeralChain(admin, orgBId, [{ userId: userAId, label: 'Foreign-org user named in chain' }])
     const sopB = await createEphemeralSop(admin, orgBId, ownerBId, ownerBId)
     const sectionB = await createEphemeralSection(admin, sopB.id)
 
-    const accessToken = await mintAccessToken(admin, ownerAEmail)
-    const asOwnerA = asUserClient(accessToken)
+    const accessToken = await mintAccessToken(admin, userAEmail)
+    const asUserA = asUserClient(accessToken)
 
-    await asOwnerA.from('sop_sections').update({ title: 'Should not persist cross-org' }).eq('id', sectionB.id)
+    await asUserA.from('sop_sections').update({ title: 'Should not persist cross-org' }).eq('id', sectionB.id)
 
     const { data: persisted } = await admin.from('sop_sections').select('title').eq('id', sectionB.id).single()
     expect(persisted?.title).not.toBe('Should not persist cross-org')
   })
 
-  // activated by plan 46-03 after migration 00063 is applied
-  test('SCOPE CONTAINMENT -- the owner (role worker) cannot publish their own SOP; CAP-02 grants content edit only, not publish', async () => {
+  test('SCOPE CONTAINMENT -- a userId-step approver (role worker) cannot publish the SOP; CAP-02 grants content edit only, not publish', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
     const admin = serviceClient()
     const orgId = await createEphemeralOrg(admin, 'Phase46 Scope Containment Org')
-    const { userId: ownerId, email: ownerEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    const { userId: ownerId } = await createEphemeralMember(admin, orgId, 'worker')
+    const { userId: approverId, email: approverEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    await setEphemeralChain(admin, orgId, [{ userId: approverId, label: 'Named approver' }])
     const sop = await createEphemeralSop(admin, orgId, ownerId, ownerId)
 
-    const accessToken = await mintAccessToken(admin, ownerEmail)
-    const asOwner = asUserClient(accessToken)
+    const accessToken = await mintAccessToken(admin, approverEmail)
+    const asApprover = asUserClient(accessToken)
 
-    await asOwner.from('sops').update({ status: 'published' }).eq('id', sop.id)
+    await asApprover.from('sops').update({ status: 'published' }).eq('id', sop.id)
 
     const { data: persisted } = await admin.from('sops').select('status').eq('id', sop.id).single()
     expect(persisted?.status).not.toBe('published')
   })
 
   // -------------------------------------------------------------------------
-  // Phase 46 CR-02/WR-02 -- sop_section_blocks (block junction) probes.
-  // Migration 00064 extended ssb_admin_manage_own_org with the owner arm;
-  // without these probes the guard-approved-but-RLS-denied state shipped
-  // invisible (delete + reorder failed as SILENT zero-row success).
+  // sop_section_blocks (block junction) probes -- ssb_admin_manage_own_org
+  // carries the approver arm in BOTH USING and WITH CHECK (00066); without
+  // these probes the guard-approved-but-RLS-denied state ships invisible
+  // (delete + reorder fail as SILENT zero-row success).
   // -------------------------------------------------------------------------
 
-  // added by the CR-02 review fix after migration 00064 is applied
-  test('JUNCTION POSITIVE -- the owner (role worker) can insert, update pin_mode, and delete a sop_section_blocks row on their own SOP', async () => {
+  test('JUNCTION POSITIVE -- a userId-step approver (role worker) can insert, update pin_mode, and delete a sop_section_blocks row', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
     const admin = serviceClient()
-    const orgId = await createEphemeralOrg(admin, 'Phase46 Junction Owner Org')
-    const { userId: ownerId, email: ownerEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    const orgId = await createEphemeralOrg(admin, 'Phase46 Junction Approver Org')
+    const { userId: ownerId } = await createEphemeralMember(admin, orgId, 'worker')
+    const { userId: approverId, email: approverEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    await setEphemeralChain(admin, orgId, [{ userId: approverId, label: 'Named approver' }])
     const sop = await createEphemeralSop(admin, orgId, ownerId, ownerId)
     const section = await createEphemeralSection(admin, sop.id)
     const { blockId, versionId, snapshot } = await createEphemeralBlock(admin, orgId)
 
-    const accessToken = await mintAccessToken(admin, ownerEmail)
-    const asOwner = asUserClient(accessToken)
+    const accessToken = await mintAccessToken(admin, approverEmail)
+    const asApprover = asUserClient(accessToken)
 
     // INSERT (the addBlockToSection path)
-    const { data: inserted, error: insErr } = await asOwner
+    const { data: inserted, error: insErr } = await asApprover
       .from('sop_section_blocks')
       .insert({
         sop_section_id: section.id,
@@ -415,32 +468,33 @@ test.describe('CAP-02 -- owner-edit runtime probes (real ephemeral org, real RLS
     expect(inserted?.id).toBeTruthy()
 
     // UPDATE (the setPinMode path) -- re-read via service client, never trust the response
-    await asOwner.from('sop_section_blocks').update({ pin_mode: 'follow_latest' }).eq('id', inserted!.id)
+    await asApprover.from('sop_section_blocks').update({ pin_mode: 'follow_latest' }).eq('id', inserted!.id)
     const { data: afterUpdate } = await admin.from('sop_section_blocks').select('pin_mode').eq('id', inserted!.id).single()
     expect(afterUpdate?.pin_mode).toBe('follow_latest')
 
     // DELETE (the removeBlockFromSection path -- the silent-false-success case)
-    await asOwner.from('sop_section_blocks').delete().eq('id', inserted!.id)
+    await asApprover.from('sop_section_blocks').delete().eq('id', inserted!.id)
     const { data: afterDelete } = await admin.from('sop_section_blocks').select('id').eq('id', inserted!.id).maybeSingle()
     expect(afterDelete).toBeNull()
   })
 
-  // added by the CR-02 review fix after migration 00064 is applied
-  test('JUNCTION POSITIVE -- the owner can reorder junctions via the reorder_sop_section_blocks RPC (NOT SECURITY DEFINER -- runs under the extended policy)', async () => {
+  test('JUNCTION POSITIVE -- the approver can reorder junctions via the reorder_sop_section_blocks RPC (NOT SECURITY DEFINER -- runs under the extended policy)', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
     const admin = serviceClient()
     const orgId = await createEphemeralOrg(admin, 'Phase46 Junction Reorder Org')
-    const { userId: ownerId, email: ownerEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    const { userId: ownerId } = await createEphemeralMember(admin, orgId, 'worker')
+    const { userId: approverId, email: approverEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    await setEphemeralChain(admin, orgId, [{ userId: approverId, label: 'Named approver' }])
     const sop = await createEphemeralSop(admin, orgId, ownerId, ownerId)
     const section = await createEphemeralSection(admin, sop.id)
     const { blockId, versionId, snapshot } = await createEphemeralBlock(admin, orgId)
     const j1 = await createEphemeralJunction(admin, section.id, blockId, versionId, snapshot, 1)
     const j2 = await createEphemeralJunction(admin, section.id, blockId, versionId, snapshot, 2)
 
-    const accessToken = await mintAccessToken(admin, ownerEmail)
-    const asOwner = asUserClient(accessToken)
+    const accessToken = await mintAccessToken(admin, approverEmail)
+    const asApprover = asUserClient(accessToken)
 
-    const { error: rpcErr } = await asOwner.rpc('reorder_sop_section_blocks', {
+    const { error: rpcErr } = await asApprover.rpc('reorder_sop_section_blocks', {
       p_sop_section_id: section.id,
       p_ordered_junction_ids: [j2.id, j1.id],
     })
@@ -459,13 +513,14 @@ test.describe('CAP-02 -- owner-edit runtime probes (real ephemeral org, real RLS
     await admin.from('sop_section_blocks').delete().in('id', [j1.id, j2.id])
   })
 
-  // added by the CR-02 review fix after migration 00064 is applied
-  test('JUNCTION NEGATIVE -- a same-org worker who is NOT the owner cannot update or delete a junction (silent zero-row deny, verified by re-read)', async () => {
+  test('JUNCTION NEGATIVE -- a same-org worker in no chain step cannot update or delete a junction (silent zero-row deny, verified by re-read)', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
     const admin = serviceClient()
-    const orgId = await createEphemeralOrg(admin, 'Phase46 Junction Non-Owner Org')
+    const orgId = await createEphemeralOrg(admin, 'Phase46 Junction Non-Approver Org')
     const { userId: ownerId } = await createEphemeralMember(admin, orgId, 'worker')
+    const { userId: approverId } = await createEphemeralMember(admin, orgId, 'worker')
     const { email: otherEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    await setEphemeralChain(admin, orgId, [{ userId: approverId, label: 'Named approver' }])
     const sop = await createEphemeralSop(admin, orgId, ownerId, ownerId)
     const section = await createEphemeralSection(admin, sop.id)
     const { blockId, versionId, snapshot } = await createEphemeralBlock(admin, orgId)
@@ -489,24 +544,24 @@ test.describe('CAP-02 -- owner-edit runtime probes (real ephemeral org, real RLS
   })
 
   // -------------------------------------------------------------------------
-  // Phase 46 WR-02 -- sop_images probes (admins_can_manage_images was
-  // recreated by 00063 but had zero probes).
+  // sop_images probes (admins_can_manage_images carries the approver arm).
   // -------------------------------------------------------------------------
 
-  // added by the CR-02/WR-02 review fix
-  test('IMAGES POSITIVE -- the owner (role worker) can insert a sop_images row on their own SOP', async () => {
+  test('IMAGES POSITIVE -- a userId-step approver (role worker) can insert a sop_images row', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
     const admin = serviceClient()
-    const orgId = await createEphemeralOrg(admin, 'Phase46 Images Owner Org')
-    const { userId: ownerId, email: ownerEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    const orgId = await createEphemeralOrg(admin, 'Phase46 Images Approver Org')
+    const { userId: ownerId } = await createEphemeralMember(admin, orgId, 'worker')
+    const { userId: approverId, email: approverEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    await setEphemeralChain(admin, orgId, [{ userId: approverId, label: 'Named approver' }])
     const sop = await createEphemeralSop(admin, orgId, ownerId, ownerId)
 
-    const accessToken = await mintAccessToken(admin, ownerEmail)
-    const asOwner = asUserClient(accessToken)
+    const accessToken = await mintAccessToken(admin, approverEmail)
+    const asApprover = asUserClient(accessToken)
 
-    const { data: inserted, error } = await asOwner
+    const { data: inserted, error } = await asApprover
       .from('sop_images')
-      .insert({ sop_id: sop.id, storage_path: 'phase46-probe/owner.jpg', content_type: 'image/jpeg' })
+      .insert({ sop_id: sop.id, storage_path: 'phase46-probe/approver.jpg', content_type: 'image/jpeg' })
       .select('id')
       .single()
     expect(error).toBeNull()
@@ -515,13 +570,14 @@ test.describe('CAP-02 -- owner-edit runtime probes (real ephemeral org, real RLS
     expect(persisted).not.toBeNull()
   })
 
-  // added by the CR-02/WR-02 review fix
-  test('IMAGES NEGATIVE -- a same-org worker who is NOT the owner cannot insert a sop_images row (verified by service re-read)', async () => {
+  test('IMAGES NEGATIVE -- a same-org worker in no chain step cannot insert a sop_images row (verified by service re-read)', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
     const admin = serviceClient()
-    const orgId = await createEphemeralOrg(admin, 'Phase46 Images Non-Owner Org')
+    const orgId = await createEphemeralOrg(admin, 'Phase46 Images Non-Approver Org')
     const { userId: ownerId } = await createEphemeralMember(admin, orgId, 'worker')
+    const { userId: approverId } = await createEphemeralMember(admin, orgId, 'worker')
     const { email: otherEmail } = await createEphemeralMember(admin, orgId, 'worker')
+    await setEphemeralChain(admin, orgId, [{ userId: approverId, label: 'Named approver' }])
     const sop = await createEphemeralSop(admin, orgId, ownerId, ownerId)
 
     const accessToken = await mintAccessToken(admin, otherEmail)
@@ -529,13 +585,13 @@ test.describe('CAP-02 -- owner-edit runtime probes (real ephemeral org, real RLS
 
     await asOther
       .from('sop_images')
-      .insert({ sop_id: sop.id, storage_path: 'phase46-probe/non-owner.jpg', content_type: 'image/jpeg' })
+      .insert({ sop_id: sop.id, storage_path: 'phase46-probe/non-approver.jpg', content_type: 'image/jpeg' })
 
     const { data: rows } = await admin
       .from('sop_images')
       .select('id')
       .eq('sop_id', sop.id)
-      .eq('storage_path', 'phase46-probe/non-owner.jpg')
+      .eq('storage_path', 'phase46-probe/non-approver.jpg')
     expect(rows ?? []).toHaveLength(0)
   })
 })
