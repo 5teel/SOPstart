@@ -133,12 +133,16 @@ test.describe('SCP-PARSE — Phase 20 contract integration (Phase 21)', () => {
     const action = read('src/actions/sop-section-blocks.ts')
     // getPublishGateStatus returns ready=false when total>0 AND unverified>0.
     expect(action).toContain('ready: totalNum > 0 && unverifiedNum === 0')
-    // Plan 21-05 wires the materializer through addBlockToSection — accepts
-    // blockProvenance + serviceRole signature additions.
+    // Plan 21-05 wired the materializer through addBlockToSection's
+    // serviceRole flag; Phase 46 CR-01 removed that wire-reachable bypass —
+    // the parser now goes through the non-'use server' core entry point,
+    // and the action keeps blockProvenance only.
     expect(action).toContain('blockProvenance: BlockProvenanceSchema.optional()')
-    expect(action).toContain('serviceRole: z.boolean().optional()')
+    expect(action).not.toContain('serviceRole: z.boolean()')
+    const core = read('src/lib/builder/section-blocks-core.ts')
+    expect(core).toContain('export async function addBlockToSectionAsService')
     // The junction insert forwards block_provenance into the column.
-    expect(action).toContain('block_provenance: data.blockProvenance ?? null')
+    expect(core).toContain('block_provenance: blockProvenance ?? null')
   })
 
   test('SCP-PARSE-07: library picker filters parsed_inline by default (T-21-05-01)', () => {
