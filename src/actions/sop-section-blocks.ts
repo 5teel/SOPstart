@@ -23,10 +23,8 @@
 
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminContext, requireSopEditAccess } from '@/lib/auth/guards'
-import { BlockContentSchema } from '@/lib/validators/blocks'
-import type { BlockContent } from '@/lib/validators/blocks'
+import { insertSectionBlockJunction } from '@/lib/builder/section-blocks-core'
 import { BlockProvenanceSchema } from '@/lib/validators/sop'
 import type {
   SopSectionBlock,
@@ -76,14 +74,11 @@ const AddBlockToSectionInput = z.object({
    * Phase 13 callers (wizard, picker) omit it — the column remains NULL.
    */
   blockProvenance: BlockProvenanceSchema.optional(),
-  /**
-   * Phase 21 Plan 21-05 — service-role override for parser invocation.
-   * When true, the action uses the admin (service-role) supabase client
-   * and skips the requireAdmin() gate. The caller is responsible for
-   * ensuring the block + section both belong to the same org as the SOP.
-   * NEVER set from user-facing routes.
-   */
-  serviceRole: z.boolean().optional(),
+  // Phase 46 CR-01: the old `serviceRole: boolean` wire flag is GONE. It let
+  // any network caller skip auth entirely (every 'use server' export is a
+  // POST-reachable endpoint). The parser's service-role path now lives in
+  // src/lib/builder/section-blocks-core.ts (addBlockToSectionAsService),
+  // which is not a server action and has no wire-reachable endpoint ID.
 })
 
 // ---------------------------------------------------------------------------
@@ -99,108 +94,24 @@ export async function addBlockToSection(
   }
   const data = parsed.data
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let supabase: any
-  if (data.serviceRole) {
-    // Plan 21-05 — parser invocation. Skip requireAdmin (no session in the
-    // parse-job worker); use the service-role client. Caller (parser) owns
-    // the org-scope check by passing block+section ids that both belong
-    // to the SOP being parsed.
-    supabase = createAdminClient()
-  } else {
-    const ctx = await requireSopEditAccess({ sectionId: data.sopSectionId })
-    if ('error' in ctx) return { error: ctx.error }
-    supabase = ctx.supabase
-  }
+  // Phase 46 CR-01: the guard ALWAYS runs — there is no wire-reachable
+  // bypass. The parser's session-less path is addBlockToSectionAsService
+  // in src/lib/builder/section-blocks-core.ts (not a server action).
+  const ctx = await requireSopEditAccess({ sectionId: data.sopSectionId })
+  if ('error' in ctx) return { error: ctx.error }
 
   // Fetch the block + current version. RLS-scoped: returns null on cross-org or missing.
   // T-13-03-01: prevents adding cross-org or unauthorised blocks via guessed UUID.
-  // In serviceRole mode getBlock uses the regular client (no session) and will
-  // return null because RLS blocks anon — so we fetch via admin client below.
-  let block: { id: string; kind_slug: string }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let currentVersion: { id: string; content: any }
-  if (data.serviceRole) {
-    const { data: blockRow, error: bErr } = await supabase
-      .from('blocks')
-      .select('id, kind_slug, current_version_id')
-      .eq('id', data.blockId)
-      .maybeSingle()
-    if (bErr || !blockRow) return { error: bErr?.message ?? 'Block not found' }
-    const versionId = (blockRow as { current_version_id: string | null }).current_version_id
-    if (!versionId) return { error: 'Block has no current version' }
-    const { data: versionRow, error: vErr } = await supabase
-      .from('block_versions')
-      .select('id, content')
-      .eq('id', versionId)
-      .maybeSingle()
-    if (vErr || !versionRow) return { error: vErr?.message ?? 'Block version not found' }
-    block = blockRow as { id: string; kind_slug: string }
-    currentVersion = versionRow as { id: string; content: unknown }
-  } else {
-    const fetched = await getBlock(data.blockId)
-    if (!fetched) return { error: 'Block not found or not accessible' }
-    block = fetched.block
-    currentVersion = fetched.currentVersion
-  }
+  const fetched = await getBlock(data.blockId)
+  if (!fetched) return { error: 'Block not found or not accessible' }
 
-  // Defence-in-depth: validate the snapshot content via Zod even though
-  // createBlock already validated when it was written. T-13-03-02 mitigation
-  // (someone could theoretically have inserted via service_role outside the
-  // action layer with malformed content).
-  let snapshotContent: BlockContent
-  try {
-    snapshotContent = BlockContentSchema.parse(currentVersion.content) as BlockContent
-  } catch {
-    return { error: 'Block content failed validation; cannot snapshot' }
-  }
-
-  // Verify the block's kind_slug matches the BlockContent discriminator (sanity check).
-  if (snapshotContent.kind !== block.kind_slug) {
-    // Soft check: BlockContentSchema.kind is the discriminator; block.kind_slug
-    // is the indexed FK. They should always agree. If not, refuse to snapshot.
-    return { error: 'Block kind/content mismatch' }
-  }
-
-  // Compute next sort_order = (current max for this section) + 1
-  const { data: maxRow, error: maxErr } = await supabase
-    .from('sop_section_blocks')
-    .select('sort_order')
-    .eq('sop_section_id', data.sopSectionId)
-    .order('sort_order', { ascending: false })
-    .limit(1)
-    .maybeSingle()
-  if (maxErr) {
-    console.error('[addBlockToSection] sort_order lookup error', maxErr)
-    return { error: maxErr.message }
-  }
-  const nextSort = (maxRow?.sort_order ?? 0) + 1
-
-  // Insert junction row.
-  const { data: junctionRow, error: insErr } = await supabase
-    .from('sop_section_blocks')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .insert({
-      sop_section_id: data.sopSectionId,
-      block_id: block.id,
-      pinned_version_id: currentVersion.id,
-      pin_mode: data.pinMode,
-      snapshot_content: snapshotContent as unknown as object,
-      sort_order: nextSort,
-      update_available: false,
-      // Plan 21-05 — parser-supplied provenance (Phase 13 callers omit).
-      block_provenance: data.blockProvenance ?? null,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any)
-    .select('*')
-    .single()
-
-  if (insErr || !junctionRow) {
-    console.error('[addBlockToSection] insert error', insErr)
-    return { error: insErr?.message ?? 'Failed to add block to section' }
-  }
-
-  return { junction: junctionRow as unknown as SopSectionBlock }
+  return insertSectionBlockJunction(ctx.supabase, {
+    sopSectionId: data.sopSectionId,
+    block: fetched.block,
+    currentVersion: fetched.currentVersion,
+    pinMode: data.pinMode,
+    blockProvenance: data.blockProvenance ?? null,
+  })
 }
 
 // ---------------------------------------------------------------------------

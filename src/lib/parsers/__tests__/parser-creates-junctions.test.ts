@@ -30,7 +30,9 @@ test.describe('Plan 21-05 — parser materializes junctions', () => {
     expect(conv).toContain('export async function materializeJunctionsForLayout')
     expect(conv).toContain("category: 'parsed_inline'")
     expect(conv).toContain("scope: 'org'")
-    expect(conv).toContain("serviceRole:")
+    // Phase 46 CR-01: junction adds go through the non-'use server' core
+    // entry point, never a wire-level serviceRole flag on the action.
+    expect(conv).toContain('addBlockToSectionAsService')
     // Each item's junctionId stamped on the Puck props in place.
     expect(conv).toContain('item.props.junctionId = addRes.junction.id')
     // Throws on partial failure (T-21-05-02).
@@ -111,11 +113,17 @@ test.describe('Plan 21-05 — parser materializes junctions', () => {
     ).toThrow(/invalid content/)
   })
 
-  test('addBlockToSection signature accepts blockProvenance + serviceRole', () => {
+  test('addBlockToSection accepts blockProvenance; serviceRole wire flag removed (Phase 46 CR-01)', () => {
     const src = read('src/actions/sop-section-blocks.ts')
     expect(src).toContain('blockProvenance: BlockProvenanceSchema.optional()')
-    expect(src).toContain('serviceRole: z.boolean().optional()')
-    expect(src).toContain('block_provenance: data.blockProvenance ?? null')
+    // The wire-reachable auth bypass is gone from the action module.
+    expect(src).not.toContain('serviceRole: z.boolean()')
+    expect(src).not.toContain('data.serviceRole')
+    // The service path (parser) lives in the plain core module instead.
+    const core = read('src/lib/builder/section-blocks-core.ts')
+    expect(core).not.toContain("'use server'")
+    expect(core).toContain('export async function addBlockToSectionAsService')
+    expect(core).toContain('block_provenance: blockProvenance ?? null')
   })
 
   test('createBlock signature accepts serviceRole({organisationId, createdByUserId}) + category', () => {

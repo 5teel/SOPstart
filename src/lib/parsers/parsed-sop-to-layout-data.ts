@@ -36,7 +36,11 @@ import {
   type BlockContent,
 } from '@/lib/validators/blocks'
 import { createBlock } from '@/actions/blocks'
-import { addBlockToSection } from '@/actions/sop-section-blocks'
+// Phase 46 CR-01: the parser must NOT call the addBlockToSection server
+// action with a wire-level serviceRole flag (that flag was a network-
+// reachable auth bypass and has been removed). The session-less service
+// path is the non-'use server' core entry point below.
+import { addBlockToSectionAsService } from '@/lib/builder/section-blocks-core'
 
 // Minimal subset of Puck's layout_data shape. We avoid importing Puck's
 // internal types so this module stays usable from server contexts.
@@ -804,12 +808,11 @@ export async function materializeJunctionsForLayout(
     const provFromItem = item.props.block_provenance as
       | { region: SourceProvenanceRegion; parser_run_id: string; parser_version: string }
       | undefined
-    const addRes = await addBlockToSection({
+    const addRes = await addBlockToSectionAsService({
       sopSectionId: sectionId,
       blockId: createRes.block.id,
       pinMode: 'pinned',
       blockProvenance: provFromItem,
-      serviceRole: true,
     })
     if ('error' in addRes) {
       throw new Error(

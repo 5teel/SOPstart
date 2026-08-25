@@ -116,18 +116,27 @@ test.describe('CAP-02 -- requireSopEditAccess call-site wiring (source-contract)
     expect(body).toContain('createAdminClient(')
   })
 
-  // --- Trust-boundary containment: the parser's service-role bypass is a
-  // different trust boundary and must not be gated by the new user guard
-  // (RESEARCH Pitfall 3). ---
-  // activated by plan 46-03
-  test('addBlockToSection checks the serviceRole parser bypass BEFORE the requireSopEditAccess user path', () => {
+  // --- Trust-boundary containment (repointed by the CR-01 fix): the parser's
+  // service-role path is a different trust boundary, but it must NOT be a
+  // wire-reachable flag on the server action (that was a network-reachable
+  // auth bypass — every 'use server' export is a POST endpoint). It lives in
+  // a plain core module with no action endpoint ID, and the exported server
+  // action ALWAYS runs the guard. ---
+  test('addBlockToSection has NO wire-reachable serviceRole bypass — guard always runs; the parser path lives in the non-server core module', () => {
     const src = read(BLOCKS)
-    expect(src).toContain('data.serviceRole')
+    // The wire flag is gone from the action module entirely.
+    expect(src, 'sop-section-blocks.ts must not carry a serviceRole wire flag').not.toContain('serviceRole: z')
+    expect(src).not.toContain('data.serviceRole')
+    // The guard runs unconditionally inside the action body.
     const body = fnBody(src, 'addBlockToSection')
-    const serviceRoleIdx = body.indexOf('data.serviceRole')
-    const guardIdx = body.indexOf('requireSopEditAccess(')
-    expect(serviceRoleIdx, 'data.serviceRole check must be present in addBlockToSection').toBeGreaterThan(-1)
-    expect(guardIdx, 'requireSopEditAccess( must be present in addBlockToSection').toBeGreaterThan(-1)
-    expect(serviceRoleIdx).toBeLessThan(guardIdx)
+    expect(body).toContain('requireSopEditAccess(')
+    // The service path is a plain module (not 'use server' — no endpoint ID)
+    // and performs no auth-flag branching.
+    const core = read(path.join(ROOT, 'src', 'lib', 'builder', 'section-blocks-core.ts'))
+    expect(core, 'core module must not be a server-action module').not.toContain("'use server'")
+    expect(core).toContain('export async function addBlockToSectionAsService')
+    // The parser imports the core entry point, not the guarded action.
+    const parser = read(path.join(ROOT, 'src', 'lib', 'parsers', 'parsed-sop-to-layout-data.ts'))
+    expect(parser).toContain('addBlockToSectionAsService')
   })
 })
