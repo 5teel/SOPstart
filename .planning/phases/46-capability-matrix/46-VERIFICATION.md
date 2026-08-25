@@ -128,3 +128,21 @@ The single gap (CAPABILITY-MATRIX.md drift re: migration 00064) was closed by th
 - `npx playwright test tests/phase46/capability-matrix-doc.spec.ts --project=phase46` re-run: 9/9 passed
 
 Status flipped gaps_found → passed accordingly. All 8 must-haves now verified.
+
+
+## A1 Resolution (2026-08-25)
+
+Simon resolved CAP-02 assumption A1: **sign-off authority = approval-chain approvers** (Phase 29 `approval_chains`/`sop_approvals`), NOT `sops.owner_user_id`. The predicate was flipped everywhere it lived, in the same session. Accepted consequence (chosen knowingly): a SOP whose category has no configured chain has zero people with sign-off-derived edit rights — only admin/safety_manager can edit it.
+
+**Changes and commits:**
+
+| Item | Commit |
+|---|---|
+| `requireSopEditAccess` grants via `approval_chains` step match (`stepMatchesCaller`, keyed on session org + `sops.category_slug`); wiring spec repointed same commit | `62247bb` |
+| Migration `00066_sign_off_approver_edit.sql` — `is_sop_sign_off_approver()` (SECURITY DEFINER, self-scoping via `auth.uid()`/`current_organisation_id()`/`current_user_role()`) replaces the owner arm in all four content policies (nested inside the org AND; junction policy restates full predicate in USING + WITH CHECK); applier appends 00066 + repoints structural assertions + pins every helper security clause | `89ebb3b` |
+| Live probes re-fixtured to the approver model (userId-step + role-step positives, owner-now-denied flip probe, non-approver/no-chain denies, admin regression, publish containment, cross-org probe sharpened: org B's chain naming an org-A user still denies) | `7a7f8c3` |
+| `CAPABILITY-MATRIX.md` — column renamed to "Chain approver (any role)", A1 RESOLVED mapping with zero-approver consequence, Enforced-at names `is_sop_sign_off_approver()` + 00066; doc gate repointed same commit | `93b7494` |
+
+**Live applier run:** `node scripts/apply-phase46-migration.mjs` — 00066 applied via `supabase db push`; ALL post-apply assertions PASSED (4× nested-approver-arm structural quals with owner arm confirmed GONE, 3× `with_check IS NULL`, 1× `with_check === qual`, reorder RPC clauses, and the new `is_sop_sign_off_approver` pin: securityDefiner / search_path=public / org conjunct / both step arms / category join / authenticated-yes+anon-no execute — all true).
+
+**Gates:** `npx playwright test --project=phase46` 31/31 passed (14 live RLS probes); `npx tsc --noEmit` clean; `npm run build` clean (bundle checks OK); `tests/lint/rls-org-scope.spec.ts` + `tests/lint/sops-select-policies-org-scoped.spec.ts` 5/5 passed.
