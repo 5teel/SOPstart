@@ -16,11 +16,10 @@
  * target row with the SERVICE client after the attempted write and compares
  * the persisted value, never trusting the update response alone.
  *
- * All tests here are `test.fixme` -- migration 00063 (which extends the RLS
- * policies with the owner-OR-role predicate) does not exist until Plan
- * 46-03. Probes 3-7 (the negative half) must ALSO stay red-if-broken after
- * CAP-02 ships -- they are the negative half of the 2026-07-20 rule, not a
- * one-time proof. Plan 46-03's final task removes the fixme markers.
+ * Activated by Plan 46-03: migration 00063 (which extends the RLS policies
+ * with the owner-OR-role predicate) is live. Probes 3-7 (the negative half)
+ * must ALSO stay red-if-broken going forward -- they are the negative half
+ * of the 2026-07-20 rule, not a one-time proof.
  *
  * Registration: playwright.config.ts `phase46` project
  *   testDir: '.', testMatch: /tests\/phase46\/.*\.(spec|test)\.ts$/
@@ -170,7 +169,7 @@ test.afterAll(async () => {
 })
 
 // ---------------------------------------------------------------------------
-// Live-Supabase probes -- all test.fixme pending migration 00063 (Plan 46-03).
+// Live-Supabase probes -- activated by Plan 46-03 against live migration 00063.
 // Probes 3-7 (negative/regression/isolation/containment) must stay red if
 // CAP-02 regresses -- they are not a one-time proof, per CLAUDE.md 2026-07-20.
 // ---------------------------------------------------------------------------
@@ -179,7 +178,7 @@ test.describe('CAP-02 -- owner-edit runtime probes (real ephemeral org, real RLS
   test.skip(!LIVE_ENV_READY, 'requires NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY / NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY in .env.local')
 
   // activated by plan 46-03 after migration 00063 is applied
-  test.fixme('POSITIVE -- a worker who is the SOP owner can update sop_sections.title on their own SOP', async () => {
+  test('POSITIVE -- a worker who is the SOP owner can update sop_sections.title on their own SOP', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
     const admin = serviceClient()
     const orgId = await createEphemeralOrg(admin, 'Phase46 Owner Org')
@@ -198,7 +197,7 @@ test.describe('CAP-02 -- owner-edit runtime probes (real ephemeral org, real RLS
   })
 
   // activated by plan 46-03 after migration 00063 is applied
-  test.fixme('POSITIVE -- the same owner can update sop_steps.text on a step under their SOP (admins_can_manage_steps extended, not just sections)', async () => {
+  test('POSITIVE -- the same owner can update sop_steps.text on a step under their SOP (admins_can_manage_steps extended, not just sections)', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
     const admin = serviceClient()
     const orgId = await createEphemeralOrg(admin, 'Phase46 Owner Steps Org')
@@ -218,7 +217,7 @@ test.describe('CAP-02 -- owner-edit runtime probes (real ephemeral org, real RLS
   })
 
   // activated by plan 46-03 after migration 00063 is applied
-  test.fixme('NEGATIVE -- a second worker in the same org who is NOT the owner cannot update sop_sections.title', async () => {
+  test('NEGATIVE -- a second worker in the same org who is NOT the owner cannot update sop_sections.title', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
     const admin = serviceClient()
     const orgId = await createEphemeralOrg(admin, 'Phase46 Non-Owner Worker Org')
@@ -237,7 +236,7 @@ test.describe('CAP-02 -- owner-edit runtime probes (real ephemeral org, real RLS
   })
 
   // activated by plan 46-03 after migration 00063 is applied
-  test.fixme('NEGATIVE -- a supervisor in the same org who is not the owner cannot update sop_sections.title (sign-off != edit)', async () => {
+  test('NEGATIVE -- a supervisor in the same org who is not the owner cannot update sop_sections.title (sign-off != edit)', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
     const admin = serviceClient()
     const orgId = await createEphemeralOrg(admin, 'Phase46 Supervisor Non-Owner Org')
@@ -256,7 +255,7 @@ test.describe('CAP-02 -- owner-edit runtime probes (real ephemeral org, real RLS
   })
 
   // activated by plan 46-03 after migration 00063 is applied
-  test.fixme('REGRESSION -- an admin in the same org who is not the owner CAN still update sop_sections.title (universal admin edit unchanged)', async () => {
+  test('REGRESSION -- an admin in the same org who is not the owner CAN still update sop_sections.title (universal admin edit unchanged)', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
     const admin = serviceClient()
     const orgId = await createEphemeralOrg(admin, 'Phase46 Admin Regression Org')
@@ -276,7 +275,7 @@ test.describe('CAP-02 -- owner-edit runtime probes (real ephemeral org, real RLS
   })
 
   // activated by plan 46-03 after migration 00063 is applied
-  test.fixme('CROSS-ORG ISOLATION -- the owner of org A cannot update a section of org B\'s SOP (owner arm lives inside the org-scope AND, never as a sibling policy)', async () => {
+  test('CROSS-ORG ISOLATION -- the owner of org A cannot update a section of org B\'s SOP (owner arm lives inside the org-scope AND, never as a sibling policy)', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
     const admin = serviceClient()
     const orgAId = await createEphemeralOrg(admin, 'Phase46 Cross-Org Owner A')
@@ -296,7 +295,7 @@ test.describe('CAP-02 -- owner-edit runtime probes (real ephemeral org, real RLS
   })
 
   // activated by plan 46-03 after migration 00063 is applied
-  test.fixme('SCOPE CONTAINMENT -- the owner (role worker) cannot publish their own SOP; CAP-02 grants content edit only, not publish', async () => {
+  test('SCOPE CONTAINMENT -- the owner (role worker) cannot publish their own SOP; CAP-02 grants content edit only, not publish', async () => {
     test.skip(!LIVE_ENV_READY, 'requires .env.local live Supabase credentials')
     const admin = serviceClient()
     const orgId = await createEphemeralOrg(admin, 'Phase46 Scope Containment Org')
