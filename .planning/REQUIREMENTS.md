@@ -849,7 +849,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 ### Capability Matrix (CAP) — Phase 46
 
 - [x] **CAP-01**: One written role × capability matrix exists as the single reference for who can see/do what
-- [ ] **CAP-02**: Sign-off authority on a SOP carries edit permission on that SOP
+- [x] **CAP-02**: Sign-off authority on a SOP carries edit permission on that SOP
 
 ### Edit Log (LOG) — Phase 47
 

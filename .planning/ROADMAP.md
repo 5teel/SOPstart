@@ -629,7 +629,7 @@ The phase must **decide and state a rendering model in its first plan, before an
 - [ ] **Phase 44a: Obligation Record** - "Must do" becomes its own manager-set record; the training matrix reads it instead of access; backfill = today's access so no matrix moves
 - [ ] **Phase 44b: Role Ladder** - Roles inherit visibility up the ladder (`inherits_from_role_id`), provably without touching obligation
 - [ ] **Phase 45: View As Role** - Admins view any surface as a chosen role, read-only, through the real access path
-- [ ] **Phase 46: Capability Matrix** - One written role × capability matrix; sign-off authority carries edit rights
+- [x] **Phase 46: Capability Matrix** - One written role × capability matrix; sign-off authority carries edit rights (completed 2026-08-25)
 - [ ] **Phase 47: Edit Log** - Every block edit logged with user + timestamp, read-only visible to everyone with SOP access
 - [ ] **Phase 48: Worker Feedback** - Feedback tab → email to sign-off manager → read-only to all with access; moderated removals, logged; includes outbound email infra
 - [ ] **Phase 49: Standard Steps Library** - Org-defined reusable steps (start/end, hazards, PPE) linked by reference into any SOP; edit once, propagates; explicit overrides
@@ -690,7 +690,7 @@ The phase must **decide and state a rendering model in its first plan, before an
   1. The matrix document exists in-repo, covers every role × every capability surfaced in the app, and is referenced from CLAUDE.md/planning docs as the authority
   2. A user with sign-off authority on a SOP can edit that SOP; one without cannot — enforced server-side, with positive and negative probes per role (per the 2026-07-20 RLS-probe learning)
 
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 **Wave 1**
 
@@ -699,7 +699,7 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [x] 46-02-PLAN.md — CAP-01: `.planning/codebase/CAPABILITY-MATRIX.md` + CLAUDE.md authority pointer (wave 2)
-- [ ] 46-03-PLAN.md — CAP-02: `requireSopEditAccess` guard, 9 content-write call sites, RLS migration 00063 + [BLOCKING] live apply (wave 2)
+- [x] 46-03-PLAN.md — CAP-02: `requireSopEditAccess` guard, 9 content-write call sites, RLS migration 00063 + [BLOCKING] live apply (wave 2)
 
 ### Phase 47: Edit Log
 

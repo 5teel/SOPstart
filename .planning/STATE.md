@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v8.0
 milestone_name: — Authoring Convergence
-status: executing
-stopped_at: Completed 46-02-PLAN.md
-last_updated: "2026-08-25T10:03:29.898Z"
+status: verifying
+stopped_at: Completed 46-03-PLAN.md
+last_updated: "2026-08-25T10:16:24.499Z"
 last_activity: 2026-08-25 -- Phase 46 execution started
 progress:
   total_phases: 4
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 Phase: 46 (Capability Matrix) — EXECUTING
 Plan: 3 of 3
 Next: Phase 41 (one-sop-surface) — not started
-Status: Ready to execute
+Status: Phase complete — ready for verification
 three 40-VERIFICATION gaps closed. Outstanding formal gate: /gsd-secure-phase 40
 has not run (no 40-SECURITY.md, security_enforcement=true).
 Last activity: 2026-08-25 -- Phase 46 execution started
@@ -246,6 +246,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 37 P06 | 55min | 3 tasks | 6 files |
 | Phase 46 P01 | 25min | 3 tasks | 4 files |
 | Phase 46-capability-matrix P02 | 35min | 2 tasks | 3 files |
+| Phase 46-capability-matrix P03 | 38min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -497,6 +498,9 @@ Recent decisions affecting current work:
 - [Phase 37]: Migration 00057 fix-forward (37-06) -- 00056 had silently dropped the 00053 cross-org RLS guard on sop_observations_insert_recorder; restored both conjuncts after the full-suite gate caught it live
 - [Phase ?]: requireSopEditAccess wiring gate uses a slice-and-throw fnBody helper so a renamed/removed target function turns the spec RED instead of silently passing
 - [Phase 46-capability-matrix]: Sign-off authority pinned to sops.owner_user_id (Phase 28 single accountable owner) for CAP-02 -- flagged as open assumption A1 for Simon to confirm before 46-03
+- [Phase ?]: [Phase 46-03]: requireSopEditAccess returns the session supabase client (not admin client) for downstream writes -- RLS stays defence-in-depth
+- [Phase ?]: [Phase 46-03]: migration 00063 writes zero WITH CHECK -- USING is reused as the check to avoid the 00062 WITH-CHECK-replaces-USING narrowing class
+- [Phase ?]: [Phase 46-03]: verifyBlock/unverifyBlock/acceptBlockUpdate/declineBlockUpdate stay on requireAdmin() -- CAP-02 is content-edit only, not publish/verify authority
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -642,8 +646,8 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-08-25T10:03:29.890Z
-Stopped at: Completed 46-02-PLAN.md
+Last session: 2026-08-25T10:16:24.488Z
+Stopped at: Completed 46-03-PLAN.md
 005 variant C (Miller columns: scope | list | editable detail) with inline
 category + department assignment. Next: apply the same Miller layout to the
 WORKER library at /sops for design consistency (user's request, 2026-08-04) —
