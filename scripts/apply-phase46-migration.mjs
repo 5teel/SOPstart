@@ -42,6 +42,12 @@ const MIGRATION_FILES = [
   // Phase 46 WR-04: reorder_sop_section_blocks now RETURNS integer (affected
   // row count) so zero-row reorders are detectable. Must apply AFTER 00064.
   path.join(ROOT, 'supabase/migrations/00065_reorder_ssb_rpc_rowcount.sql'),
+  // A1 RESOLVED (Simon, 2026-08-25): sign-off authority = approval-chain
+  // approvers, not sops.owner_user_id. 00066 CORRECTS 00063/00064 (recreates
+  // all four content policies with is_sop_sign_off_approver replacing the
+  // owner arm) -- per the 2026-07-28 applier rule it MUST be listed here,
+  // after them, or a re-run would re-ship the retired owner arm.
+  path.join(ROOT, 'supabase/migrations/00066_sign_off_approver_edit.sql'),
 ]
 
 // ---------------------------------------------------------------------------
@@ -103,11 +109,11 @@ async function managementSql(sql) {
 // Step 1: Apply migration via `npx supabase db push`, falling back to the
 // Management API raw-SQL endpoint if `db push` lacks a DB password.
 // ---------------------------------------------------------------------------
-console.log('=== Phase 46 Migration Applier (00063 sop_content_owner_edit) ===')
+console.log('=== Phase 46 Migration Applier (00063..00066 CAP-02 content-edit policies) ===')
 console.log('Target:', SUPABASE_URL)
 console.log('Project ref:', PROJECT_REF)
 console.log('')
-console.log('[1/4] Applying migration 00063 via supabase db push ...')
+console.log('[1/4] Applying migrations (through 00066) via supabase db push ...')
 console.log('      (Only unapplied migrations are run -- idempotent)')
 console.log('')
 
@@ -141,8 +147,8 @@ try {
     console.error('')
     console.error('FALLBACK -- apply the migration manually:')
     console.error('')
-    console.error('Option A: Supabase SQL Editor (paste the file body):')
-    console.error('  supabase/migrations/00063_sop_content_owner_edit.sql')
+    console.error('Option A: Supabase SQL Editor (paste each MIGRATION_FILES body, in order):')
+    console.error('  supabase/migrations/00063 -> 00064 -> 00065 -> 00066')
     console.error(`  URL: https://supabase.com/dashboard/project/${PROJECT_REF}/sql`)
     console.error('')
     console.error('Option B: psql:')
@@ -197,19 +203,23 @@ async function assertSql(label, sql, checkFn) {
 }
 
 // WR-01: token-presence checks alone would print PASS on the exact T1 hole
-// this script exists to catch -- a regressed `(org AND role) OR owner` shape
-// (the top-level-OR cross-tenant hole 00061 fixed) contains all four tokens.
-// So we assert the NESTING: after whitespace-normalizing the deparsed qual,
-// the org predicate must be AND-conjoined with the (role OR owner) group --
-// i.e. `...organisation_id = current_organisation_id()) AND ((current_user_role()
-// = ANY (...)) OR (<alias>.owner_user_id = auth.uid()))`. A top-level-OR
-// regression deparse cannot match this shape.
+// this script exists to catch -- a regressed `(org AND role) OR approver`
+// shape (the top-level-OR cross-tenant hole 00061 fixed) contains all the
+// tokens. So we assert the NESTING: after whitespace-normalizing the
+// deparsed qual, the org predicate must be AND-conjoined with the
+// (role OR approver) group -- i.e. `...organisation_id =
+// current_organisation_id()) AND ((current_user_role() = ANY (...)) OR
+// is_sop_sign_off_approver(<sop id expr>))`. A top-level-OR regression
+// deparse cannot match this shape.
+// A1 RESOLVED (2026-08-25): the arm is is_sop_sign_off_approver(), not
+// owner_user_id = auth.uid() -- an owner_user_id token reappearing in any
+// of these quals is itself a regression (asserted below).
 // (the live deparse casts the role literals to ::app_role -- the enum the
 // column actually is -- not ::text; accept either so a type re-declare
 // doesn't false-fail)
-const NESTED_OWNER_ARM =
-  /organisation_id = current_organisation_id\(\)\) AND \(\(current_user_role\(\) = ANY \(ARRAY\['admin'::(?:text|app_role),\s*'safety_manager'::(?:text|app_role)\]\)\) OR \(\w+\.owner_user_id = auth\.uid\(\)\)\)/
-const REQUIRED_SUBSTRINGS = ['current_organisation_id', 'current_user_role', 'owner_user_id', 'auth.uid()']
+const NESTED_APPROVER_ARM =
+  /organisation_id = current_organisation_id\(\)\) AND \(\(current_user_role\(\) = ANY \(ARRAY\['admin'::(?:text|app_role),\s*'safety_manager'::(?:text|app_role)\]\)\) OR is_sop_sign_off_approver\([\w.]+\)\)/
+const REQUIRED_SUBSTRINGS = ['current_organisation_id', 'current_user_role', 'is_sop_sign_off_approver']
 const normalizeQual = (q) => (q ?? '').replace(/\s+/g, ' ')
 // withCheck semantics per policy:
 //   'null'        -- the policy writes NO WITH CHECK, so Postgres reuses USING
@@ -227,17 +237,18 @@ const POLICIES = [
 
 for (const { table, name, withCheck } of POLICIES) {
   await assertSql(
-    `${table}.${name} qual: owner arm is NESTED under the org-scope AND (structural, not token presence)`,
+    `${table}.${name} qual: approver arm is NESTED under the org-scope AND (structural, not token presence); owner arm is GONE`,
     `SELECT policyname, qual, with_check FROM pg_policies WHERE schemaname='public' AND tablename='${table}' AND policyname='${name}'`,
     (rows) => {
       const row = rows?.[0]
       const qual = normalizeQual(row?.qual)
       const missing = REQUIRED_SUBSTRINGS.filter((s) => !qual.includes(s))
-      const nested = NESTED_OWNER_ARM.test(qual)
+      const nested = NESTED_APPROVER_ARM.test(qual)
+      const ownerArmGone = !qual.includes('owner_user_id')
       return {
-        ok: !!row && missing.length === 0 && nested,
+        ok: !!row && missing.length === 0 && nested && ownerArmGone,
         detail: row
-          ? `nested-owner-arm=${nested} missing-tokens=[${missing.join(',')}] qual=${qual}`
+          ? `nested-approver-arm=${nested} owner-arm-gone=${ownerArmGone} missing-tokens=[${missing.join(',')}] qual=${qual}`
           : 'policy not found',
       }
     }
@@ -296,6 +307,41 @@ await assertSql(
   }
 )
 
+// A1 (00066): pin EVERY security-relevant clause of the helper the four
+// policies now delegate to (CLAUDE.md 2026-07-28: an assertion that pins
+// fewer clauses certifies whatever happens to be live) -- SECURITY DEFINER,
+// search_path pinned, the org conjunct sourced from current_organisation_id()
+// (never the fetched row alone), both step-match arms (userId vs auth.uid(),
+// role vs current_user_role()), the category join, and the execute grants
+// (authenticated yes -- identity derives from auth.uid() internally, the
+// 00030 precedent -- anon no).
+await assertSql(
+  'is_sop_sign_off_approver: SECURITY DEFINER, search_path=public, org conjunct, both step arms, category join, authenticated-yes/anon-no execute',
+  `SELECT pg_get_functiondef(p.oid) AS def,
+          p.prosecdef AS secdef,
+          has_function_privilege('authenticated', p.oid, 'execute') AS auth_exec,
+          has_function_privilege('anon', p.oid, 'execute') AS anon_exec
+     FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public' AND p.proname = 'is_sop_sign_off_approver'`,
+  (rows) => {
+    const row = rows?.[0]
+    if (!row) return { ok: false, detail: 'function not found' }
+    const def = (row.def ?? '').replace(/\s+/g, ' ')
+    const secDef = row.secdef === true
+    const searchPath = /SET search_path TO '?public'?/i.test(def)
+    const orgConjunct = def.includes('s.organisation_id = public.current_organisation_id()')
+    const userIdArm = def.includes("step->>'userId' = auth.uid()::text") || def.includes("(step ->> 'userId'::text) = (auth.uid())::text")
+    const roleArm = def.includes("step->>'role' = public.current_user_role()::text") || def.includes("(step ->> 'role'::text) = (public.current_user_role())::text")
+    const categoryJoin = def.includes('ac.category = s.category_slug')
+    const authExec = row.auth_exec === true
+    const anonDenied = row.anon_exec === false
+    return {
+      ok: secDef && searchPath && orgConjunct && userIdArm && roleArm && categoryJoin && authExec && anonDenied,
+      detail: `securityDefiner=${secDef} searchPathPublic=${searchPath} orgConjunct=${orgConjunct} userIdArm=${userIdArm} roleArm=${roleArm} categoryJoin=${categoryJoin} authenticatedExecute=${authExec} anonDenied=${anonDenied}`,
+    }
+  }
+)
+
 // ---------------------------------------------------------------------------
 // Step 3: NOTIFY pgrst to flush the PostgREST schema cache.
 // ---------------------------------------------------------------------------
@@ -317,10 +363,11 @@ console.log('[4/4] Summary')
 if (allPassed) {
   console.log('=== ALL POST-APPLY ASSERTIONS PASSED ===')
   console.log('')
-  console.log('Migrations 00063+00064 are live on the DB: all four content policies')
-  console.log('(sections, steps, images, block junctions) carry the owner-OR-role arm')
-  console.log('inside their org-scoped USING; the junction policy restates the full')
-  console.log('predicate in WITH CHECK; PostgREST has been told to reload its cache.')
+  console.log('Migrations 00063..00066 are live on the DB: all four content policies')
+  console.log('(sections, steps, images, block junctions) carry the approver-OR-role')
+  console.log('arm (is_sop_sign_off_approver, A1 resolved 2026-08-25) inside their')
+  console.log('org-scoped USING; the junction policy restates the full predicate in')
+  console.log('WITH CHECK; PostgREST has been told to reload its cache.')
   process.exit(0)
 } else {
   console.error('=== ONE OR MORE ASSERTIONS FAILED ===')
