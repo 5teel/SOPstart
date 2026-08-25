@@ -204,8 +204,11 @@ async function assertSql(label, sql, checkFn) {
 // i.e. `...organisation_id = current_organisation_id()) AND ((current_user_role()
 // = ANY (...)) OR (<alias>.owner_user_id = auth.uid()))`. A top-level-OR
 // regression deparse cannot match this shape.
+// (the live deparse casts the role literals to ::app_role -- the enum the
+// column actually is -- not ::text; accept either so a type re-declare
+// doesn't false-fail)
 const NESTED_OWNER_ARM =
-  /organisation_id = current_organisation_id\(\)\) AND \(\(current_user_role\(\) = ANY \(ARRAY\['admin'::text,\s*'safety_manager'::text\]\)\) OR \(\w+\.owner_user_id = auth\.uid\(\)\)\)/
+  /organisation_id = current_organisation_id\(\)\) AND \(\(current_user_role\(\) = ANY \(ARRAY\['admin'::(?:text|app_role),\s*'safety_manager'::(?:text|app_role)\]\)\) OR \(\w+\.owner_user_id = auth\.uid\(\)\)\)/
 const REQUIRED_SUBSTRINGS = ['current_organisation_id', 'current_user_role', 'owner_user_id', 'auth.uid()']
 const normalizeQual = (q) => (q ?? '').replace(/\s+/g, ' ')
 // withCheck semantics per policy:
