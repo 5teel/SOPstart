@@ -690,7 +690,7 @@ The phase must **decide and state a rendering model in its first plan, before an
   1. The matrix document exists in-repo, covers every role × every capability surfaced in the app, and is referenced from CLAUDE.md/planning docs as the authority
   2. A user with sign-off authority on a SOP can edit that SOP; one without cannot — enforced server-side, with positive and negative probes per role (per the 2026-07-20 RLS-probe learning)
 
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 Plans:
 **Wave 1**
 
@@ -698,7 +698,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 46-02-PLAN.md — CAP-01: `.planning/codebase/CAPABILITY-MATRIX.md` + CLAUDE.md authority pointer (wave 2)
+- [x] 46-02-PLAN.md — CAP-01: `.planning/codebase/CAPABILITY-MATRIX.md` + CLAUDE.md authority pointer (wave 2)
 - [ ] 46-03-PLAN.md — CAP-02: `requireSopEditAccess` guard, 9 content-write call sites, RLS migration 00063 + [BLOCKING] live apply (wave 2)
 
 ### Phase 47: Edit Log

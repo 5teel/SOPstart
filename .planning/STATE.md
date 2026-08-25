@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v8.0
 milestone_name: — Authoring Convergence
 status: executing
-stopped_at: Phase 40 CLOSED. UAT complete 11/11. Manage SOPs rebuilt onto sketch
-last_updated: "2026-08-25T09:55:11.801Z"
+stopped_at: Completed 46-02-PLAN.md
+last_updated: "2026-08-25T10:03:29.898Z"
 last_activity: 2026-08-25 -- Phase 46 execution started
 progress:
   total_phases: 4
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 46 (Capability Matrix) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Next: Phase 41 (one-sop-surface) — not started
 Status: Ready to execute
 three 40-VERIFICATION gaps closed. Outstanding formal gate: /gsd-secure-phase 40
@@ -245,6 +245,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 37 P05 | 25min | 3 tasks | 5 files |
 | Phase 37 P06 | 55min | 3 tasks | 6 files |
 | Phase 46 P01 | 25min | 3 tasks | 4 files |
+| Phase 46-capability-matrix P02 | 35min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -495,6 +496,7 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 37-05]: AssessmentRequestsPanel mounted on /admin/team only, reusing the existing RecordObservationModal (worker+presetSopId) and markNotificationRead — closes 37-RESEARCH Pitfall 1 (no inbox surface for D-08 requests)
 - [Phase 37]: Migration 00057 fix-forward (37-06) -- 00056 had silently dropped the 00053 cross-org RLS guard on sop_observations_insert_recorder; restored both conjuncts after the full-suite gate caught it live
 - [Phase ?]: requireSopEditAccess wiring gate uses a slice-and-throw fnBody helper so a renamed/removed target function turns the spec RED instead of silently passing
+- [Phase 46-capability-matrix]: Sign-off authority pinned to sops.owner_user_id (Phase 28 single accountable owner) for CAP-02 -- flagged as open assumption A1 for Simon to confirm before 46-03
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -640,8 +642,8 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-08-25T09:54:16.339Z
-Stopped at: Phase 40 CLOSED. UAT complete 11/11. Manage SOPs rebuilt onto sketch
+Last session: 2026-08-25T10:03:29.890Z
+Stopped at: Completed 46-02-PLAN.md
 005 variant C (Miller columns: scope | list | editable detail) with inline
 category + department assignment. Next: apply the same Miller layout to the
 WORKER library at /sops for design consistency (user's request, 2026-08-04) —
