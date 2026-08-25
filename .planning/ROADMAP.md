@@ -523,7 +523,8 @@ Executes 40 → 41 → 42 → 43, strictly sequential.
   5. A SOP created via the AI route and a SOP created via the wizard appear together under the same category filter; every pre-existing row carrying the retired column is backfilled, no code path writes the retired column, and a live query against prod proves zero rows left behind
 
 **Plans:** 13/14 plans executed
-Plans:
+
+Plans:
 **Wave 1**
 
 - [x] 40-01-PLAN.md — Nyquist harness: register the `phase40` Playwright project + seven wave-0 specs (one live spine-freeze guard)
@@ -689,7 +690,12 @@ The phase must **decide and state a rendering model in its first plan, before an
   1. The matrix document exists in-repo, covers every role × every capability surfaced in the app, and is referenced from CLAUDE.md/planning docs as the authority
   2. A user with sign-off authority on a SOP can edit that SOP; one without cannot — enforced server-side, with positive and negative probes per role (per the 2026-07-20 RLS-probe learning)
 
-**Plans**: TBD
+**Plans:** 3 plans (2 waves)
+
+Plans:
+- [ ] 46-01-PLAN.md — Wave 0 harness: phase46 Playwright project + CAP-01 doc gate + CAP-02 guard-wiring gate + live RLS probe set (wave 1)
+- [ ] 46-02-PLAN.md — CAP-01: `.planning/codebase/CAPABILITY-MATRIX.md` + CLAUDE.md authority pointer (wave 2)
+- [ ] 46-03-PLAN.md — CAP-02: `requireSopEditAccess` guard, 9 content-write call sites, RLS migration 00063 + [BLOCKING] live apply (wave 2)
 
 ### Phase 47: Edit Log
 
