@@ -690,11 +690,11 @@ The phase must **decide and state a rendering model in its first plan, before an
   1. The matrix document exists in-repo, covers every role × every capability surfaced in the app, and is referenced from CLAUDE.md/planning docs as the authority
   2. A user with sign-off authority on a SOP can edit that SOP; one without cannot — enforced server-side, with positive and negative probes per role (per the 2026-07-20 RLS-probe learning)
 
-**Plans:** 3 plans (2 waves)
+**Plans:** 1/3 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 46-01-PLAN.md — Wave 0 harness: phase46 Playwright project + CAP-01 doc gate + CAP-02 guard-wiring gate + live RLS probe set (wave 1)
+- [x] 46-01-PLAN.md — Wave 0 harness: phase46 Playwright project + CAP-01 doc gate + CAP-02 guard-wiring gate + live RLS probe set (wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
