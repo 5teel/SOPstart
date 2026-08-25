@@ -528,5 +528,26 @@ export default defineConfig({
       testMatch: /tests\/phase40\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 46 -- Capability Matrix
+      // Nyquist harness (Wave 0 / Plan 46-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase46/**) so every later plan in
+      // the phase drops specs into tests/phase46/ with NO further config edit --
+      // single registration point for the whole phase (mirrors phase26/28/29/30/32/33/34/35/36/37/40).
+      //
+      // Verify registration: `npx playwright test --list --project=phase46`
+      // (should list all 3 tests/phase46/*.spec.ts files -- zero discovered = FAIL)
+      //
+      // Wave-0 stub files:
+      //   capability-matrix-doc (CAP-01, fixme, activates 46-02) --
+      //   sop-edit-guard-wiring (CAP-02, fixme, activates 46-03) --
+      //   sop-edit-owner-access (CAP-02 live probes, fixme, activates 46-03)
+      name: 'phase46',
+      testDir: '.',
+      testMatch: /tests\/phase46\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
