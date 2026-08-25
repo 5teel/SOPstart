@@ -24,7 +24,7 @@
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { requireAdminContext } from '@/lib/auth/guards'
+import { requireAdminContext, requireSopEditAccess } from '@/lib/auth/guards'
 import { BlockContentSchema } from '@/lib/validators/blocks'
 import type { BlockContent } from '@/lib/validators/blocks'
 import { BlockProvenanceSchema } from '@/lib/validators/sop'
@@ -40,6 +40,15 @@ import { getBlock } from '@/actions/blocks'
 // Helpers
 // ---------------------------------------------------------------------------
 
+// CAP-02 scope boundary: verifyBlock/unverifyBlock/acceptBlockUpdate/
+// declineBlockUpdate stay on requireAdmin() (= requireAdminContext()) —
+// verify-blocks is the pre-publish gate (publish authority, not edit
+// authority) and acceptBlockUpdate additionally flips sops.status
+// published->draft, an UPDATE that admins_can_update_sops restricts to
+// admins. Do NOT "finish the sweep" by swapping these to
+// requireSopEditAccess — that would let a SOP owner unverify/re-verify
+// blocks and flip publish state, which this phase deliberately does not
+// grant (RESEARCH Pitfall 4 / plan 46-03 acceptance criteria).
 async function requireAdmin() {
   return requireAdminContext()
 }
@@ -99,7 +108,7 @@ export async function addBlockToSection(
     // to the SOP being parsed.
     supabase = createAdminClient()
   } else {
-    const ctx = await requireAdmin()
+    const ctx = await requireSopEditAccess({ sectionId: data.sopSectionId })
     if ('error' in ctx) return { error: ctx.error }
     supabase = ctx.supabase
   }
@@ -203,7 +212,7 @@ export async function removeBlockFromSection(
 ): Promise<{ success: true } | { error: string }> {
   if (!junctionId) return { error: 'junctionId required' }
 
-  const ctx = await requireAdmin()
+  const ctx = await requireSopEditAccess({ junctionId })
   if ('error' in ctx) return { error: ctx.error }
   const { supabase } = ctx
 
@@ -232,7 +241,7 @@ export async function setPinMode(
     return { error: 'Invalid pin mode' }
   }
 
-  const ctx = await requireAdmin()
+  const ctx = await requireSopEditAccess({ junctionId })
   if ('error' in ctx) return { error: ctx.error }
   const { supabase } = ctx
 
@@ -298,7 +307,7 @@ export async function reorderSectionBlocks(
     return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
   }
 
-  const ctx = await requireAdmin()
+  const ctx = await requireSopEditAccess({ sectionId: parsed.data.sopSectionId })
   if ('error' in ctx) return { error: ctx.error }
   const { supabase } = ctx
 

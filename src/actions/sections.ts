@@ -3,8 +3,7 @@
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { getSessionContext } from '@/lib/auth/session-context'
-import { requireAdminContext } from '@/lib/auth/guards'
+import { requireSopEditAccess } from '@/lib/auth/guards'
 import type { SectionKind, SopSection } from '@/types/sop'
 
 /**
@@ -39,6 +38,9 @@ export async function createSection(
   input: CreateSectionInputType
 ): Promise<SopSection> {
   const parsed = CreateSectionInput.parse(input)
+
+  const ctx = await requireSopEditAccess({ sopId: parsed.sopId })
+  if ('error' in ctx) throw new Error(ctx.error)
   const supabase = await createClient()
 
   // Fetch the kind (RLS-scoped) to get its slug for section_type and to
@@ -113,7 +115,7 @@ export async function reorderSections(
     return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
   }
 
-  const ctx = await requireAdminContext()
+  const ctx = await requireSopEditAccess({ sopId: parsed.data.sopId })
   if ('error' in ctx) return ctx
   const { supabase } = ctx
 
@@ -152,7 +154,7 @@ export async function updateSectionLayout(
     return { error: 'Layout exceeds 128 KB; reduce block count or content' }
   }
 
-  const ctx = await requireAdminContext()
+  const ctx = await requireSopEditAccess({ sectionId: parsed.data.sectionId })
   if ('error' in ctx) return ctx
   const { supabase } = ctx
 
@@ -205,36 +207,12 @@ export async function updateSectionTitle(
     return { error: 'Section title must be a non-empty string.' }
   }
 
-  const { userId, role, organisationId } = await getSessionContext()
-  if (!userId) return { error: 'Not authenticated' }
-  if (!organisationId) return { error: 'No organisation found' }
-
-  if (!role || !['admin', 'safety_manager'].includes(role)) {
-    return { error: 'Admin access required to update section title.' }
-  }
+  const ctx = await requireSopEditAccess({ sectionId })
+  if ('error' in ctx) return ctx
 
   // Use admin client to handle published/superseded SOPs (RESEARCH Pitfall 5).
-  // Self-enforce org-scoping via the parent SOP's organisation_id FK check.
+  // requireSopEditAccess already self-enforced org-scope + edit authorization.
   const admin = createAdminClient()
-
-  // Verify the section belongs to an SOP in this organisation (org-scope self-enforcement).
-  const { data: section } = await admin
-    .from('sop_sections')
-    .select('id, sop_id')
-    .eq('id', sectionId)
-    .single()
-
-  if (!section) return { error: 'Section not found.' }
-
-  // Verify the parent SOP belongs to this organisation (CLAUDE.md 2026-06-15 pattern).
-  const { data: sop } = await admin
-    .from('sops')
-    .select('id')
-    .eq('id', section.sop_id)
-    .eq('organisation_id', organisationId)
-    .single()
-
-  if (!sop) return { error: 'Section not in your organisation.' }
 
   const { error: updateError } = await admin
     .from('sop_sections')

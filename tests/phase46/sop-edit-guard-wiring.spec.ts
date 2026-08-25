@@ -58,13 +58,13 @@ function fnBody(source: string, exportedName: string): string {
 
 test.describe('CAP-02 -- requireSopEditAccess call-site wiring (source-contract)', () => {
   // activated by plan 46-03
-  test.fixme('fnBody throws when the export anchor is absent (renamed/removed function turns this spec RED)', () => {
+  test('fnBody throws when the export anchor is absent (renamed/removed function turns this spec RED)', () => {
     expect(() => fnBody('export async function otherThing() {}', 'missingFn')).toThrow('fnBody: anchor')
   })
 
   // --- Positive wiring: sections.ts (4 call sites) ---
   // activated by plan 46-03
-  test.fixme('sections.ts: createSection, reorderSections, updateSectionLayout, updateSectionTitle all call requireSopEditAccess(', () => {
+  test('sections.ts: createSection, reorderSections, updateSectionLayout, updateSectionTitle all call requireSopEditAccess(', () => {
     const src = read(SECTIONS)
     for (const fn of ['createSection', 'reorderSections', 'updateSectionLayout', 'updateSectionTitle']) {
       expect(fnBody(src, fn), `${fn} should call requireSopEditAccess(`).toContain('requireSopEditAccess(')
@@ -73,7 +73,7 @@ test.describe('CAP-02 -- requireSopEditAccess call-site wiring (source-contract)
 
   // --- Positive wiring: sop-section-blocks.ts (4 call sites) ---
   // activated by plan 46-03
-  test.fixme('sop-section-blocks.ts: addBlockToSection, removeBlockFromSection, setPinMode, reorderSectionBlocks all call requireSopEditAccess(', () => {
+  test('sop-section-blocks.ts: addBlockToSection, removeBlockFromSection, setPinMode, reorderSectionBlocks all call requireSopEditAccess(', () => {
     const src = read(BLOCKS)
     for (const fn of ['addBlockToSection', 'removeBlockFromSection', 'setPinMode', 'reorderSectionBlocks']) {
       expect(fnBody(src, fn), `${fn} should call requireSopEditAccess(`).toContain('requireSopEditAccess(')
@@ -82,14 +82,14 @@ test.describe('CAP-02 -- requireSopEditAccess call-site wiring (source-contract)
 
   // --- Positive wiring: legacy PATCH route (1 call site) ---
   // activated by plan 46-03
-  test.fixme('the legacy sections/[sectionId] PATCH route calls requireSopEditAccess( before any write', () => {
+  test('the legacy sections/[sectionId] PATCH route calls requireSopEditAccess( before any write', () => {
     const src = read(ROUTE)
     expect(fnBody(src, 'PATCH')).toContain('requireSopEditAccess(')
   })
 
   // --- Negative / scope-containment: CAP-02 must not leak past "edit" ---
   // activated by plan 46-03 -- RESEARCH Pitfall 4
-  test.fixme('verifyBlock, unverifyBlock, acceptBlockUpdate, declineBlockUpdate stay admin-only -- no requireSopEditAccess leak', () => {
+  test('verifyBlock, unverifyBlock, acceptBlockUpdate, declineBlockUpdate stay admin-only -- no requireSopEditAccess leak', () => {
     const src = read(BLOCKS)
     for (const fn of ['verifyBlock', 'unverifyBlock', 'acceptBlockUpdate', 'declineBlockUpdate']) {
       const body = fnBody(src, fn)
@@ -100,7 +100,7 @@ test.describe('CAP-02 -- requireSopEditAccess call-site wiring (source-contract)
 
   // --- Guard-shape assertions on guards.ts ---
   // activated by plan 46-03
-  test.fixme('guards.ts exports requireSopEditAccess and retains requireAdminContext unchanged', () => {
+  test('guards.ts exports requireSopEditAccess and retains requireAdminContext unchanged', () => {
     const src = read(GUARDS)
     expect(src).toContain('export async function requireSopEditAccess')
     expect(src).toContain('export async function requireAdminContext')
@@ -108,7 +108,7 @@ test.describe('CAP-02 -- requireSopEditAccess call-site wiring (source-contract)
 
   // activated by plan 46-03 -- CLAUDE.md 2026-06-15/26/07-28: org-scope
   // sourced from the session, never trusted from the fetched row.
-  test.fixme('requireSopEditAccess self-enforces org-scope via an admin-client fetch filtered on organisationId', () => {
+  test('requireSopEditAccess self-enforces org-scope via an admin-client fetch filtered on organisationId', () => {
     const src = read(GUARDS)
     const body = fnBody(src, 'requireSopEditAccess')
     expect(body).toContain(".eq('organisation_id', organisationId)")
@@ -120,7 +120,7 @@ test.describe('CAP-02 -- requireSopEditAccess call-site wiring (source-contract)
   // different trust boundary and must not be gated by the new user guard
   // (RESEARCH Pitfall 3). ---
   // activated by plan 46-03
-  test.fixme('addBlockToSection checks the serviceRole parser bypass BEFORE the requireSopEditAccess user path', () => {
+  test('addBlockToSection checks the serviceRole parser bypass BEFORE the requireSopEditAccess user path', () => {
     const src = read(BLOCKS)
     expect(src).toContain('data.serviceRole')
     const body = fnBody(src, 'addBlockToSection')

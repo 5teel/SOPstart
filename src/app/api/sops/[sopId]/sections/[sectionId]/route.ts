@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { requireSopEditAccess } from '@/lib/auth/guards'
 
 // PATCH /api/sops/[sopId]/sections/[sectionId]
 // Body: { content?: string, approved?: boolean, steps?: { id: string, text: string }[] }
@@ -8,6 +9,12 @@ export async function PATCH(
   { params }: { params: Promise<{ sopId: string; sectionId: string }> }
 ) {
   const { sopId, sectionId } = await params
+
+  const ctx = await requireSopEditAccess({ sopId })
+  if ('error' in ctx) {
+    return NextResponse.json({ error: ctx.error }, { status: 403 })
+  }
+
   const body = await request.json()
   const supabase = await createClient()
 
