@@ -10,10 +10,10 @@
  * obligation as one thing. CLAUDE.md's Pathways Map convention is the
  * precedent for referencing a living doc from CLAUDE.md itself.
  *
- * All tests here are `test.fixme` -- the doc does not exist until Plan
- * 46-02 writes it. Plan 46-02's final task removes the fixme markers.
- * Do NOT use `test.skip` -- a skip reads as green and hides the gap
- * (CLAUDE.md 2026-05-25: test.fixme for stubs, listed not silently passed).
+ * Activated by Plan 46-02 Task 2 -- CAPABILITY-MATRIX.md and the CLAUDE.md
+ * pointer now exist, so these assertions run for real (previously deferred
+ * markers, per CLAUDE.md 2026-05-25: deferred assertions stay listed, never
+ * silently passed).
  *
  * Registration: playwright.config.ts `phase46` project
  *   testDir: '.', testMatch: /tests\/phase46\/.*\.(spec|test)\.ts$/
@@ -35,12 +35,12 @@ function read(p: string): string {
 
 test.describe('CAP-01 -- capability matrix document (source-contract)', () => {
   // activated by plan 46-02
-  test.fixme('CAPABILITY-MATRIX.md exists at .planning/codebase/', () => {
+  test('CAPABILITY-MATRIX.md exists at .planning/codebase/', () => {
     expect(fs.existsSync(MATRIX_PATH)).toBe(true)
   })
 
   // activated by plan 46-02
-  test.fixme('contains each org role token: worker, supervisor, admin, safety_manager', () => {
+  test('contains each org role token: worker, supervisor, admin, safety_manager', () => {
     const doc = read(MATRIX_PATH)
     expect(doc).toContain('worker')
     expect(doc).toContain('supervisor')
@@ -49,13 +49,13 @@ test.describe('CAP-01 -- capability matrix document (source-contract)', () => {
   })
 
   // activated by plan 46-02
-  test.fixme('contains platform_admin as the orthogonal Potenco footnote axis', () => {
+  test('contains platform_admin as the orthogonal Potenco footnote axis', () => {
     const doc = read(MATRIX_PATH)
     expect(doc).toContain('platform_admin')
   })
 
   // activated by plan 46-02
-  test.fixme('contains all three legend markers as literal strings', () => {
+  test('contains all three legend markers as literal strings', () => {
     const doc = read(MATRIX_PATH)
     expect(doc).toContain('shipped-and-enforced')
     expect(doc).toContain('shipped-but-unenforced')
@@ -63,7 +63,7 @@ test.describe('CAP-01 -- capability matrix document (source-contract)', () => {
   })
 
   // activated by plan 46-02 -- D1: obligation != access, must be two channels
-  test.fixme('contains both D1 channel headings: Access channel and Obligation channel', () => {
+  test('contains both D1 channel headings: Access channel and Obligation channel', () => {
     const doc = read(MATRIX_PATH)
     expect(doc).toContain('Access channel')
     expect(doc).toContain('Obligation channel')
@@ -71,7 +71,7 @@ test.describe('CAP-01 -- capability matrix document (source-contract)', () => {
 
   // activated by plan 46-02 -- one expect() per label so a failure names the
   // missing row, not just "some rows missing" (CLAUDE.md 2026-06-05 class).
-  test.fixme('contains every required capability row label', () => {
+  test('contains every required capability row label', () => {
     const doc = read(MATRIX_PATH)
     expect(doc).toContain('Read SOP')
     expect(doc).toContain('Walk SOP')
@@ -98,7 +98,7 @@ test.describe('CAP-01 -- capability matrix document (source-contract)', () => {
   })
 
   // activated by plan 46-02
-  test.fixme('contains the CAP-02 ownership overlay tokens: sign-off authority, owner_user_id', () => {
+  test('contains the CAP-02 ownership overlay tokens: sign-off authority, owner_user_id', () => {
     const doc = read(MATRIX_PATH)
     expect(doc).toContain('sign-off authority')
     expect(doc).toContain('owner_user_id')
@@ -106,7 +106,7 @@ test.describe('CAP-01 -- capability matrix document (source-contract)', () => {
 
   // activated by plan 46-02 -- deferred capabilities documented as planned,
   // not silently omitted (Phases 44a/44b/45/47/48).
-  test.fixme('contains forward-reference phase markers for deferred/planned capabilities', () => {
+  test('contains forward-reference phase markers for deferred/planned capabilities', () => {
     const doc = read(MATRIX_PATH)
     expect(doc).toContain('Phase 44a')
     expect(doc).toContain('Phase 44b')
@@ -116,7 +116,7 @@ test.describe('CAP-01 -- capability matrix document (source-contract)', () => {
   })
 
   // activated by plan 46-02 -- mirrors the Pathways Map CLAUDE.md pointer convention
-  test.fixme('CLAUDE.md references the matrix doc path', () => {
+  test('CLAUDE.md references the matrix doc path', () => {
     const claude = read(CLAUDE_PATH)
     expect(claude).toContain('.planning/codebase/CAPABILITY-MATRIX.md')
   })

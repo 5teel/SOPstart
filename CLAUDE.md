@@ -99,6 +99,15 @@ npm run test:e2e     # E2E tests only
 - **Sketch findings for SOPstart** (design tokens, layout primitives, screen inventory, new block types, voice/immersive walkthrough patterns, org-model views, permission-wiring views, **authoring & creation flow**) → `Skill("sketch-findings-SOPstart")` — load before building any worker-facing UI, adding new SOP block types, building org-chart / roles / library-permission surfaces, or touching the **SOP creation / conversion / authoring path** (new-SOP wizard, upload-parse review, builder canvas, block inserter, read/walk/edit surface — see `references/authoring-flow.md`, which is a not-yet-shipped design contract).
 - **Customer interviews** (`.planning/research/customer-interviews/`) — primary-source field research from real SOP users. Consult before spec/discuss/plan on any new phase, before locking contentious UX decisions (mobile vs desktop, identity model, approval chains), and when triaging backlog ideas. Latest: 2026-05-05 Visy Packaging (~100 AU/NZ industrial sites, glass + cans + cardboard) — surfaces desktop-first reading, SOP-ownership governance gap, voice Q&A unlock, training-record / Success Factors integration.
 
+## Capability Matrix
+
+`.planning/codebase/CAPABILITY-MATRIX.md` is the single authority on who can see and do what — every org role x every capability the app surfaces, access channel only (RLS + server-action guards). Obligation (is a role required to complete a SOP) is a separate channel, tracked by the Phase 44a obligation record, and must never be inferred from an access cell in that matrix.
+
+Maintenance trigger (mirrors the Pathways Map convention below):
+1. Any change to an RLS policy, a `require*` guard in `src/lib/auth/guards.ts`, or a role check in `src/actions/*` updates the matrix in the same commit.
+2. `/gsd-plan-phase` adds the matrix edit as an explicit task when a phase changes a capability gate.
+3. `/gsd-code-review` and `/gsd-verify-work` confirm the matrix matches the gates the phase touched.
+
 ## Pathways Map Maintenance (`journeys.ts`) — GSD triggers
 
 `src/lib/journeys/journeys.ts` is the **single source of truth** for the `/pathways` UX-flow map: the page renders entirely from it, and the "All screens" panel is read live from the route tree and **flags any screen no pathway covers**. It only stays accurate if it's updated alongside the flows it describes. The GSD framework will NOT do this automatically — Claude MUST keep it current at these points (mirrors the `## Learnings` GSD-trigger model):
