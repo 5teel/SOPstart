@@ -97,11 +97,17 @@ test.describe('CAP-01 -- capability matrix document (source-contract)', () => {
     expect(doc).toContain('Own profile')
   })
 
-  // activated by plan 46-02
-  test('contains the CAP-02 ownership overlay tokens: sign-off authority, owner_user_id', () => {
+  // Repointed by the A1 resolution (Simon, 2026-08-25): sign-off authority =
+  // approval-chain approvers, not sops.owner_user_id. The doc must carry the
+  // resolved mapping and the RLS helper it is enforced by.
+  test('contains the CAP-02 approver overlay tokens: sign-off authority, A1 RESOLVED, is_sop_sign_off_approver, chain approver column', () => {
     const doc = read(MATRIX_PATH)
     expect(doc).toContain('sign-off authority')
-    expect(doc).toContain('owner_user_id')
+    expect(doc).toContain('A1 RESOLVED')
+    expect(doc).toContain('is_sop_sign_off_approver')
+    expect(doc).toContain('Chain approver (any role)')
+    // The retired owner-mapping column must not resurface.
+    expect(doc).not.toContain('SOP owner (any role)')
   })
 
   // activated by plan 46-02 -- deferred capabilities documented as planned,
