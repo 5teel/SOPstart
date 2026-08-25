@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v8.0
 milestone_name: — Authoring Convergence
-status: executing
-stopped_at: Phase 40 CLOSED (UAT 11/11, all gaps closed) — Phase 41 not yet started
-last_updated: "2026-08-04"
-last_activity: 2026-08-04 -- Phase 40 closed out; two cross-tenant RLS holes found and fixed
+status: Phase 40 closed. UAT 11/11 (1 blocker found + fixed in session). All
+stopped_at: Phase 40 CLOSED. UAT complete 11/11. Manage SOPs rebuilt onto sketch
+last_updated: "2026-08-25T09:46:50.253Z"
+last_activity: 2026-07-29 -- Phase 40 execution started
 progress:
   total_phases: 4
   completed_phases: 1
@@ -611,10 +611,12 @@ of the whole phase:
   was decorative: 15 of 30 SOPs were readable by every authenticated user of
   every tenant, and the admin library was rendering 7 foreign-org SOPs. Second
   occurrence of this class (`sop_observations`, Phase 34).
+
 - **00062 — cross-tenant WRITE on `organisation_members`.** An org-scoped
   `USING` paired with a `WITH CHECK` naming only the role. A specified check
   REPLACES the USING fallback, so an admin could rewrite a member's
   `organisation_id` into another tenant.
+
 - **00060 — four advertised upload formats were dead** (`.webp`, `.xlsx`,
   `.pptx`, `.txt`) at a third accept list nobody had unified: the storage
   bucket's own `allowed_mime_types`, untouched since 00005.

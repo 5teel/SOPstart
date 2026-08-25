@@ -294,7 +294,7 @@ Derived from the full route tree (`src/app/(protected)/**/page.tsx`) and `src/ac
 | A1 | "Sign-off authority on a SOP" = `sops.owner_user_id`, not approval-chain approvers or completion sign-off | Sign-off Authority: Schema Mapping | If wrong, the enforcement predicate changes from a single-owner check to a chain/approver-membership check — a different (larger) query, and the matrix's "sign-off authority" column changes from one-owner-per-SOP to category-scoped/multi-approver. Cheap to fix if caught at plan-check; expensive if caught after CAP-02 ships and Simon expected chain-approver semantics. |
 | A2 | CAP-02 scope = content-edit paths only (sections/steps/images/layout/blocks), excluding publish/delete/version-supersede/owner-reassignment | SOP Edit Path Inventory § Scope decision | If Simon intends "edit" to include publish or version actions, those call sites (governance.ts, versioning.ts's admin-gated writes) need the same guard swap — a larger diff than currently scoped. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Does a SOP owner need to see/use the builder's admin-only UI chrome (governance queue links, publish button, etc.), or just gain the write capability with the existing worker-facing SOP detail page?**
    - What we know: The builder route (`/admin/sops/builder/[sopId]`) is itself gated by admin-route conventions (not verified in this pass — CAP-02's CONTEXT says "no route work, no new UI surfaces").

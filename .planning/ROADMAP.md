@@ -691,9 +691,13 @@ The phase must **decide and state a rendering model in its first plan, before an
   2. A user with sign-off authority on a SOP can edit that SOP; one without cannot — enforced server-side, with positive and negative probes per role (per the 2026-07-20 RLS-probe learning)
 
 **Plans:** 3 plans (2 waves)
-
 Plans:
+**Wave 1**
+
 - [ ] 46-01-PLAN.md — Wave 0 harness: phase46 Playwright project + CAP-01 doc gate + CAP-02 guard-wiring gate + live RLS probe set (wave 1)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 46-02-PLAN.md — CAP-01: `.planning/codebase/CAPABILITY-MATRIX.md` + CLAUDE.md authority pointer (wave 2)
 - [ ] 46-03-PLAN.md — CAP-02: `requireSopEditAccess` guard, 9 content-write call sites, RLS migration 00063 + [BLOCKING] live apply (wave 2)
 
