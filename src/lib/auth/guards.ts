@@ -1,6 +1,8 @@
 import { getSessionContext } from './session-context'
 import type { SessionContext } from './session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { stepMatchesCaller, type ChainStep } from '@/lib/governance/approvals'
+import type { AppRole } from '@/types/auth'
 
 export interface AdminContext {
   supabase: SessionContext['supabase']
@@ -29,12 +31,18 @@ export async function requireAdminContext(): Promise<AdminContext | { error: str
 // ---------------------------------------------------------------------------
 // CAP-02 — requireSopEditAccess: object-level (per-SOP) edit authorization.
 //
-// Stated assumption (A1): "sign-off authority" = sops.owner_user_id (Phase 28's
-// single accountable owner) — not approval-chain approvers (Phase 29), not
-// completion sign-off. Stated assumption (A2): "edit" = SOP content (sections,
-// steps, images, layout_data, block junctions) only. Publish, verify-blocks,
-// delete, version-supersede/clone and owner-reassignment stay on
-// requireAdminContext() — this guard must never be swapped in there.
+// A1 RESOLVED (Simon, 2026-08-25): "sign-off authority" = approval-chain
+// approvers (Phase 29 approval_chains/sop_approvals) — NOT sops.owner_user_id.
+// A caller gains edit rights when any step of the approval chain configured
+// for (their org, the SOP's category_slug) matches them via stepMatchesCaller
+// (userId equality OR role equality). Accepted consequence: a SOP whose
+// category has NO configured chain (or an empty steps array) has zero people
+// with sign-off-derived edit rights — only admin/safety_manager can edit it;
+// the SOP owner as such gains nothing. Assumption (A2) unchanged: "edit" =
+// SOP content (sections, steps, images, layout_data, block junctions) only.
+// Publish, verify-blocks, delete, version-supersede/clone and
+// owner-reassignment stay on requireAdminContext() — this guard must never
+// be swapped in there.
 //
 // The org filter in step 3 below is the SESSION organisationId, applied as
 // .eq('organisation_id', organisationId) on the admin-client fetch — never a
@@ -57,7 +65,7 @@ export interface SopEditContext {
   role: string
   organisationId: string
   sopId: string
-  viaOwnership: boolean
+  viaApproverStep: boolean
 }
 
 export async function requireSopEditAccess(
@@ -104,17 +112,35 @@ export async function requireSopEditAccess(
   // client bypasses RLS, so this call is the only org gate on these paths.
   const { data: sop } = await admin
     .from('sops')
-    .select('id, owner_user_id')
+    .select('id, category_slug')
     .eq('id', sopId)
     .eq('organisation_id', organisationId)
     .maybeSingle()
   if (!sop) return { error: 'SOP not found in your organisation.' }
 
   if (role === 'admin' || role === 'safety_manager') {
-    return { supabase, user: { id: userId }, role, organisationId, sopId, viaOwnership: false }
+    return { supabase, user: { id: userId }, role, organisationId, sopId, viaApproverStep: false }
   }
-  if ((sop as { owner_user_id: string | null }).owner_user_id === userId) {
-    return { supabase, user: { id: userId }, role: role ?? '', organisationId, sopId, viaOwnership: true }
+
+  // A1: chain lookup mirrors the canonical publish-route lookup —
+  // approval_chains keyed on (SESSION organisationId, sops.category_slug).
+  // approval_chains is not in database.types.ts — (as any) cast matches the
+  // publish route precedent. No chain row / empty steps ⇒ deny (accepted
+  // consequence of A1).
+  const categorySlug = (sop as { category_slug: string | null }).category_slug
+  if (categorySlug) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: chainRow } = await (admin as any)
+      .from('approval_chains')
+      .select('steps')
+      .eq('organisation_id', organisationId)
+      .eq('category', categorySlug)
+      .maybeSingle()
+    const steps = (chainRow?.steps ?? []) as ChainStep[]
+    const caller = { userId, role: (role ?? '') as AppRole }
+    if (Array.isArray(steps) && steps.some((s) => stepMatchesCaller(s, caller))) {
+      return { supabase, user: { id: userId }, role: role ?? '', organisationId, sopId, viaApproverStep: true }
+    }
   }
-  return { error: "Edit access required — you must be an admin, safety manager, or this SOP's owner." }
+  return { error: "Edit access required — you must be an admin, safety manager, or a sign-off approver in this SOP's category approval chain." }
 }

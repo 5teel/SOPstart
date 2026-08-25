@@ -108,12 +108,21 @@ test.describe('CAP-02 -- requireSopEditAccess call-site wiring (source-contract)
 
   // activated by plan 46-03 -- CLAUDE.md 2026-06-15/26/07-28: org-scope
   // sourced from the session, never trusted from the fetched row.
-  test('requireSopEditAccess self-enforces org-scope via an admin-client fetch filtered on organisationId', () => {
+  // Repointed by the A1 resolution (Simon, 2026-08-25): sign-off authority =
+  // approval-chain approvers, not sops.owner_user_id -- the guard body must
+  // key the chain lookup on the SOP's category_slug and match steps via the
+  // shared stepMatchesCaller helper (no forked matching logic).
+  test('requireSopEditAccess self-enforces org-scope and grants via approval-chain step match (A1: approvers, not owner)', () => {
     const src = read(GUARDS)
     const body = fnBody(src, 'requireSopEditAccess')
     expect(body).toContain(".eq('organisation_id', organisationId)")
-    expect(body).toContain('owner_user_id')
     expect(body).toContain('createAdminClient(')
+    expect(body).toContain('category_slug')
+    expect(body).toContain("from('approval_chains')")
+    expect(body).toContain('stepMatchesCaller(')
+    // The owner arm is GONE -- an owner_user_id read reappearing in this
+    // guard body means the A1 flip regressed.
+    expect(body).not.toContain('owner_user_id')
   })
 
   // --- Trust-boundary containment (repointed by the CR-01 fix): the parser's
