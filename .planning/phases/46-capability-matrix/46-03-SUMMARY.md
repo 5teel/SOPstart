@@ -113,3 +113,14 @@ None - no external service configuration required. `.env.local` already carried 
 ---
 *Phase: 46-capability-matrix*
 *Completed: 2026-08-25*
+
+## Self-Check: PASSED
+
+- FOUND: src/lib/auth/guards.ts
+- FOUND: supabase/migrations/00063_sop_content_owner_edit.sql
+- FOUND: scripts/apply-phase46-migration.mjs
+- FOUND: .planning/phases/46-capability-matrix/46-03-SUMMARY.md
+- FOUND: 510912e (feat(46-03): add requireSopEditAccess object-level edit guard)
+- FOUND: a3347c0 (feat(46-03): route content-write paths through requireSopEditAccess)
+- FOUND: 611b677 (feat(46-03): live migration 00063 owner-OR-role RLS + activate CAP-02 probes)
+- FOUND: 2bea3f4 (docs(46-03): add plan summary)
