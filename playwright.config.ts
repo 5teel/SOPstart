@@ -529,6 +529,29 @@ export default defineConfig({
       use: { browserName: 'chromium' },
     },
     {
+      // Phase 41 -- One SOP Surface
+      // Nyquist harness (Wave 0 / Plan 41-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase41/**) so every later plan in
+      // the phase drops specs into tests/phase41/ with NO further config edit --
+      // single registration point for the whole phase (mirrors phase26/28/29/30/32/33/34/35/36/37/40/46).
+      //
+      // Verify registration: `npx playwright test --list --project=phase41`
+      // (should list all 5 tests/phase41/*.spec.ts files -- zero discovered = FAIL)
+      //
+      // Wave-0 stub files:
+      //   bundle-gate (SUR-05, LIVE from this plan) --
+      //   merged-surface (SUR-01/SUR-02/SUR-06, fixme, activates 41-05) --
+      //   nav-and-shim (SUR-03/SUR-04 + redirect shim, fixme, activates 41-06) --
+      //   reference-sweep (SUR-03/SUR-04 sweep, fixme, activates 41-07) --
+      //   spec-repoint-inventory (legacy spec repoint guard, fixme, activates 41-08)
+      name: 'phase41',
+      testDir: '.',
+      testMatch: /tests\/phase41\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
+    {
       // Phase 46 -- Capability Matrix
       // Nyquist harness (Wave 0 / Plan 46-01).
       //
