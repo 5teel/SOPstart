@@ -575,7 +575,19 @@ The phase must **decide and state a rendering model in its first plan, before an
   4. From the merged list, an admin reaches a SOP's builder by one route chain — there is no second chain to the same builder, and no third chain is introduced by the merge
   5. The `SB-LINE-06` CI bundle check is green: mobile First Load JS for the worker SOP list is within 2 KB of its baseline, and a worker-session bundle contains none of the governance-queue, org-tree, or wiring-patch-bay code (dynamically imported, in the manner `WalkthroughSwitcher` already uses for `DesktopWalkthrough`). A regression here fails the phase
 
-**Plans**: TBD
+**Plans**: 9 plans in 7 waves (0-6)
+
+Plans:
+- [ ] 41-01-PLAN.md — Wave 0: two-route SB-LINE-06 gate + `/sops/page` baseline captured pre-merge, `phase41` project + SUR-01..06 stubs, admin-lens static-import guard
+- [ ] 41-02-PLAN.md — Wave 1: plain helper/flag-display modules + `listAdminSopRows` server action extracted from the admin page (rendering model: client shell, code-split lenses)
+- [ ] 41-03-PLAN.md — Wave 1: `listAdminAccessData` action + `AdminAccessLens` wrapping the wiring patch bay
+- [ ] 41-04-PLAN.md — Wave 2: `AdminStatusLens` + `AdminAttentionLens`
+- [ ] 41-05-PLAN.md — Wave 3: the merged `/sops` surface — Admin scope group, three `dynamic({ ssr:false })` lenses, deep-link resolution, `replaceState` scope state, capability matrix
+- [ ] 41-06-PLAN.md — Wave 4: `/admin/sops` redirect shim, one SOPs nav entry, `roleHome('admin')`, `journeys.ts`, Phase 30 guard repoints
+- [ ] 41-07-PLAN.md — Wave 5: internal href sweep, roles map, UAT hub, live count-pinned reference sweep
+- [ ] 41-08-PLAN.md — Wave 5: repoint the nine legacy source-contract specs to the code's new homes; full suite green
+- [ ] 41-09-PLAN.md — Wave 6: recorded SUR-05 bundle proof + blocking human verification on sopstart.com
+
 **UI hint**: yes
 
 ### Phase 42: One Creation Flow
@@ -1572,7 +1584,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | 38. Guidance-Notes Adoptions | 0/0 | Deferred → backlog 999.4 + 999.5 | 2026-07-28 |
 | 39. AI-Prioritized Maintenance Schedule | 0/0 | Deferred → backlog 999.6 | 2026-07-28 |
 | **40. Shared Creation Foundation (v8.0)** | 0/0 | Not started |  |
-| **41. One Creation Flow (v8.0)** | 0/0 | Not started |  |
+| **41. One SOP Surface (v8.0)** | 0/9 | Planned 2026-09-13 |  |
 | **42. Dead-Surface Removal & Route Truth (v8.0)** | 0/0 | Not started |  |
 
 ## Backlog
