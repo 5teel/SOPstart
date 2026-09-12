@@ -1,13 +1,15 @@
 {
-  "capturedAt": "2026-07-29T07:47:04.330Z",
-  "note": "First Load JS baseline for the mobile worker route (/sops/[sopId]). Postbuild check-bundle-size enforces ≤ +2KB delta. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts.",
+  "capturedAt": "2026-09-12T23:49:45.614Z",
+  "note": "First Load JS baseline for the SB-LINE-06 gated routes. Postbuild check-bundle-size enforces ≤ +2KB delta per route. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts.",
   "previousBaseline": {
-    "value": 1056,
-    "capturedAt": "2026-07-12T15:32:42.606Z",
-    "note": "First Load JS baseline for the mobile worker route (/sops/[sopId]). Postbuild check-bundle-size enforces ≤ +2KB delta. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts."
+    "/sops/[sopId]/page": {
+      "value": 1059,
+      "capturedAt": "2026-07-29T07:47:04.330Z",
+      "note": "First Load JS baseline for the mobile worker route (/sops/[sopId]). Postbuild check-bundle-size enforces ≤ +2KB delta. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts."
+    }
   },
   "routes": {
-    "/sops/[sopId]/page": 1059
-  },
-  "chunkCount": 19
+    "/sops/[sopId]/page": 1048,
+    "/sops/page": 940
+  }
 }
