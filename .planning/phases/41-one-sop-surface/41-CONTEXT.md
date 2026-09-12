@@ -23,7 +23,7 @@ One route lists SOPs for every role. What a person sees and can do on it is deci
 - D-03: **Rendering model must be decided and stated in the first plan before any surface work** (ROADMAP hard requirement). Prior: `/sops` is a client component (`useAssignedSops`, `useSopSync`, Dexie offline, self-add/remove, refresher dates, search — 644 lines) and `/admin/sops` is a server component (`listGovernanceQueue`, `listOrgTree`, `listGrants`, `WiringPatchBayShell` — 700 lines). Either "server shell hosting lazily-loaded client lenses" or "client list with code-split admin lenses" is acceptable. Whichever is chosen, every worker behaviour is preserved verbatim and the admin lens code never enters a worker-session bundle.
 
 ### Navigation
-- D-04: `TopHeader` keeps exactly one "SOPs" entry (`/sops`). `AdminNav` drops its "Manage SOPs" item; Governance/Content/Team/Settings survive; the governance link deep-links `/sops?view=attention`. "Create New SOP" stays where it is (Phase 42 moves it).
+- D-04: `TopHeader` keeps exactly one "SOPs" entry (`/sops`). The `ADMIN_LINKS` array in `TopHeader.tsx` drops its "Manage SOPs" item (`AdminNav.tsx` was deleted 2026-07-30 — there is no separate admin nav component); Create/Content/Team/Settings survive; the governance link deep-links `/sops?view=attention`. "Create New SOP" stays where it is (Phase 42 moves it).
 - D-05: The word "Library" survives only as a *filter/scope label* ("Your SOPs" vs "Everything"), never a nav label or a destination.
 
 ### Builder route chain
@@ -59,7 +59,7 @@ One route lists SOPs for every role. What a person sees and can do on it is deci
 - `src/app/(protected)/sops/page.tsx` — worker list (client)
 - `src/components/sop/SopWorkerBrowser.tsx` — Miller browser shipped 2026-08
 - `src/app/(protected)/admin/sops/page.tsx` — admin list (server) with `?view=attention|access`
-- `src/components/layout/TopHeader.tsx`, `src/components/admin/AdminNav.tsx` — nav entries
+- `src/components/layout/TopHeader.tsx` (`ADMIN_LINKS`, asserted by `tests/phase30/admin-nav.spec.ts`) — nav entries
 
 ### Gates and maps
 - `scripts/check-bundle-size.ts`, `.bundle-baseline.json` — SB-LINE-06 gate
