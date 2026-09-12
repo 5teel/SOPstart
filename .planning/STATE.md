@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v8.0
 milestone_name: — Authoring Convergence
-status: verifying
-stopped_at: Completed 46-03-PLAN.md
-last_updated: "2026-08-25T10:51:46.667Z"
-last_activity: 2026-08-25
+status: ready_to_plan
+stopped_at: Session resumed 2026-09-12 — Phase 46 verified PASS; next is Phase 41 or 47 planning
+last_updated: "2026-09-12T00:00:00.000Z"
+last_activity: 2026-09-12
 progress:
   total_phases: 4
   completed_phases: 1
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 46
-Plan: Not started
-Next: Phase 41 (one-sop-surface) — not started
-Status: Phase complete — ready for verification
+Phase: 46 (complete, verified PASS 2026-08-25)
+Plan: —
+Next: Phase 41 (one-sop-surface) or Phase 47 (edit-log) — neither has CONTEXT.md; 44a still blocked on Joe's per-role SOP lists
+Status: Between phases — ready to discuss/plan the next one
 three 40-VERIFICATION gaps closed. Outstanding formal gate: /gsd-secure-phase 40
 has not run (no 40-SECURITY.md, security_enforcement=true).
 Last activity: 2026-08-25
@@ -647,8 +647,8 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-08-25T10:16:24.488Z
-Stopped at: Completed 46-03-PLAN.md
+Last session: 2026-09-12
+Stopped at: Session resumed; Phase 46 closed (verified PASS). Awaiting choice: plan Phase 41 (v8.0 critical path) or Phase 47 (v9.0, unblocked)
 005 variant C (Miller columns: scope | list | editable detail) with inline
 category + department assignment. Next: apply the same Miller layout to the
 WORKER library at /sops for design consistency (user's request, 2026-08-04) —
