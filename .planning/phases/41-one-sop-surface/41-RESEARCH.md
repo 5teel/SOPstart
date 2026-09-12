@@ -244,17 +244,19 @@ function findSymbolInBuildOutput(symbol: string): { found: boolean; locations: s
 
 All other claims in this document are `[VERIFIED: codebase read]` — file:line citations are given throughout, not `[ASSUMED]` in the training-data sense, since this phase is a pure internal refactor with no external API/library surface to misremember.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Does `admin/sops/page.tsx`'s inline SOP-list query (lines 162-343) need to become ONE new server action or TWO (one for the plain list, one for the access-view's collections/grants assembly)?**
    - What we know: the plain-library query and the access-view data assembly are already read as independent branches gated by `isAccessView` in the same `Promise.all`.
    - What's unclear: whether splitting them into two actions vs one parameterized action is cleaner for the lens components' `useQuery` boundaries.
    - Recommendation: split into two — `listAdminSopRows(params)` for the plain/drafts/published scopes, and reuse the existing `listOrgTree`/`listGrants`/collections logic (already separable) for the access lens. This mirrors how the current page already treats them as independent data needs.
+   - **RESOLVED (2026-09-13, planning):** two actions — `listAdminSopRows` (plan 41-02) and `listAdminAccessData` (plan 41-03).
 
 2. **Should the redirect shim for `/admin/sops` be a page-level `redirect()` (server component) or a `next.config.js` redirect entry?**
    - What we know: Phase 30's `/admin/governance` shim is a page-level `redirect()` (per `journeys.ts:568`: "Redirect shim → /admin/sops?view=attention"). Query-string preservation with `next.config.js` redirects requires wildcard/`:path*` syntax and is less flexible for remapping `?view=X` to a different scope param shape if the merged page's scope query-param names differ from today's.
    - What's unclear: whether the merged `/sops` page will keep the exact same param names (`view`, `departments`, `collection`, `sop`) or rename them as part of the scope-group design.
    - Recommendation: use a page-level `redirect()` in `admin/sops/page.tsx` (replacing its current body entirely) that reads `searchParams` and constructs the equivalent `/sops?...` URL — this keeps remapping logic in TypeScript rather than regex-based `next.config.js` rewrites, and matches the existing shim precedent.
+   - **RESOLVED (2026-09-13, planning):** page-level `redirect()` preserving the query string via `URLSearchParams`, matching the Phase 30 `/admin/governance` shim — plan 41-06.
 
 ## Environment Availability
 

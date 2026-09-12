@@ -576,17 +576,37 @@ The phase must **decide and state a rendering model in its first plan, before an
   5. The `SB-LINE-06` CI bundle check is green: mobile First Load JS for the worker SOP list is within 2 KB of its baseline, and a worker-session bundle contains none of the governance-queue, org-tree, or wiring-patch-bay code (dynamically imported, in the manner `WalkthroughSwitcher` already uses for `DesktopWalkthrough`). A regression here fails the phase
 
 **Plans**: 9 plans in 7 waves (0-6)
-
 Plans:
+**Wave 1**
+
 - [ ] 41-01-PLAN.md — Wave 0: two-route SB-LINE-06 gate + `/sops/page` baseline captured pre-merge, `phase41` project + SUR-01..06 stubs, admin-lens static-import guard
 - [ ] 41-02-PLAN.md — Wave 1: plain helper/flag-display modules + `listAdminSopRows` server action extracted from the admin page (rendering model: client shell, code-split lenses)
 - [ ] 41-03-PLAN.md — Wave 1: `listAdminAccessData` action + `AdminAccessLens` wrapping the wiring patch bay
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 41-04-PLAN.md — Wave 2: `AdminStatusLens` + `AdminAttentionLens`
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 41-05-PLAN.md — Wave 3: the merged `/sops` surface — Admin scope group, three `dynamic({ ssr:false })` lenses, deep-link resolution, `replaceState` scope state, capability matrix
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 41-06-PLAN.md — Wave 4: `/admin/sops` redirect shim, one SOPs nav entry, `roleHome('admin')`, `journeys.ts`, Phase 30 guard repoints
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
 - [ ] 41-07-PLAN.md — Wave 5: internal href sweep, roles map, UAT hub, live count-pinned reference sweep
 - [ ] 41-08-PLAN.md — Wave 5: repoint the nine legacy source-contract specs to the code's new homes; full suite green
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
 - [ ] 41-09-PLAN.md — Wave 6: recorded SUR-05 bundle proof + blocking human verification on sopstart.com
+
+**Cross-cutting constraints:**
+
+- The full Playwright suite is green
 
 **UI hint**: yes
 
