@@ -579,7 +579,7 @@ The phase must **decide and state a rendering model in its first plan, before an
 Plans:
 **Wave 1**
 
-- [ ] 41-01-PLAN.md — Wave 0: two-route SB-LINE-06 gate + `/sops/page` baseline captured pre-merge, `phase41` project + SUR-01..06 stubs, admin-lens static-import guard
+- [x] 41-01-PLAN.md — Wave 0: two-route SB-LINE-06 gate + `/sops/page` baseline captured pre-merge, `phase41` project + SUR-01..06 stubs, admin-lens static-import guard
 - [ ] 41-02-PLAN.md — Wave 1: plain helper/flag-display modules + `listAdminSopRows` server action extracted from the admin page (rendering model: client shell, code-split lenses)
 - [ ] 41-03-PLAN.md — Wave 1: `listAdminAccessData` action + `AdminAccessLens` wrapping the wiring patch bay
 
@@ -722,7 +722,7 @@ Plans:
   1. The matrix document exists in-repo, covers every role × every capability surfaced in the app, and is referenced from CLAUDE.md/planning docs as the authority
   2. A user with sign-off authority on a SOP can edit that SOP; one without cannot — enforced server-side, with positive and negative probes per role (per the 2026-07-20 RLS-probe learning)
 
-**Plans:** 3/3 plans complete
+**Plans:** 1/9 plans executed
 Plans:
 **Wave 1**
 

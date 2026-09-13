@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v8.0
 milestone_name: — Authoring Convergence
-status: Between phases — ready to discuss/plan the next one
-stopped_at: "Session resumed; Phase 46 closed (verified PASS). Awaiting choice: plan Phase 41 (v8.0 critical path) or Phase 47 (v9.0, unblocked)"
-last_updated: "2026-09-12T15:10:32.959Z"
-last_activity: 2026-09-12 -- Phase 41 planning complete
+status: executing
+stopped_at: Completed 41-01-PLAN.md
+last_updated: "2026-09-12T23:59:39.984Z"
+last_activity: 2026-09-12 -- Phase 41 execution started
 progress:
   total_phases: 4
   completed_phases: 1
-  total_plans: 14
-  completed_plans: 14
+  total_plans: 23
+  completed_plans: 15
   percent: 25
 ---
 
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 46 — Capability Matrix
+**Current focus:** Phase 41 — One SOP Surface
 
 ## Current Position
 
-Phase: 46 (complete, verified PASS 2026-08-25)
-Plan: —
+Phase: 41 (One SOP Surface) — EXECUTING
+Plan: 2 of 9
 Next: Phase 41 (one-sop-surface) or Phase 47 (edit-log) — neither has CONTEXT.md; 44a still blocked on Joe's per-role SOP lists
-Status: Between phases — ready to discuss/plan the next one
+Status: Ready to execute
 three 40-VERIFICATION gaps closed. Outstanding formal gate: /gsd-secure-phase 40
 has not run (no 40-SECURITY.md, security_enforcement=true).
-Last activity: 2026-09-12 -- Phase 41 planning complete
+Last activity: 2026-09-12 -- Phase 41 execution started
 
 Progress: 1/4 phases · [██░░░░░░░░] 25%
 
@@ -248,6 +248,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 46 P01 | 25min | 3 tasks | 4 files |
 | Phase 46-capability-matrix P02 | 35min | 2 tasks | 3 files |
 | Phase 46-capability-matrix P03 | 38min | 3 tasks | 8 files |
+| Phase 41 P01 | 55min | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -502,6 +503,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 46-03]: requireSopEditAccess returns the session supabase client (not admin client) for downstream writes -- RLS stays defence-in-depth
 - [Phase ?]: [Phase 46-03]: migration 00063 writes zero WITH CHECK -- USING is reused as the check to avoid the 00062 WITH-CHECK-replaces-USING narrowing class
 - [Phase ?]: [Phase 46-03]: verifyBlock/unverifyBlock/acceptBlockUpdate/declineBlockUpdate stay on requireAdmin() -- CAP-02 is content-edit only, not publish/verify authority
+- [Phase ?]: Rendering model (D-03) locked: /sops stays client-side; admin views become next/dynamic({ ssr: false }) lenses gated by useIsAdmin().
+- [Phase ?]: Re-baselined /sops/[sopId]/page bundle gate at its true current value (1048 KB, down from stale 1059 KB) - the gate only fails on growth, so an 11 KB decrease across phases 16-40 went unrecorded.
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -647,8 +650,8 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-09-12
-Stopped at: Session resumed; Phase 46 closed (verified PASS). Awaiting choice: plan Phase 41 (v8.0 critical path) or Phase 47 (v9.0, unblocked)
+Last session: 2026-09-12T23:59:39.976Z
+Stopped at: Completed 41-01-PLAN.md
 005 variant C (Miller columns: scope | list | editable detail) with inline
 category + department assignment. Next: apply the same Miller layout to the
 WORKER library at /sops for design consistency (user's request, 2026-08-04) —

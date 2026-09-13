@@ -127,3 +127,7 @@ None - no external service configuration required.
 ---
 *Phase: 41-one-sop-surface*
 *Completed: 2026-09-13*
+
+## Self-Check: PASSED
+
+All 10 created/modified files confirmed present on disk; all 4 commit hashes (`c92bc6f`, `3a5a0ed`, `4c84565`, `6a8a1f7`) confirmed in `git log --oneline --all`.
