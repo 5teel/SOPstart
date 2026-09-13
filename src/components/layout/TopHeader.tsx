@@ -138,8 +138,12 @@ const BASE_LINKS: NavLink[] = [
 // AdminNav is gone — the header is the ONLY admin nav tier). Visibility gate
 // mirrors the server-side admin gate (['admin','safety_manager']) — every
 // admin page keeps its own server guard; hiding links is not access control.
+//
+// Phase 41 (SUR-03): the SOPs list is now one shared route (/sops, in
+// BASE_LINKS) for every role — "Manage SOPs" is gone and must not come
+// back. "Governance" deep-links the admin lens on that same surface.
 const ADMIN_LINKS: NavLink[] = [
-  { label: 'Manage SOPs', href: '/admin/sops' },
+  { label: 'Governance', href: '/sops?view=attention' },
   { label: 'Create New SOP', href: '/admin/sops/new' },
   { label: 'Content', href: '/admin/blocks' },
   { label: 'Team', href: '/admin/team' },
