@@ -593,7 +593,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 41-06-PLAN.md — Wave 4: `/admin/sops` redirect shim, one SOPs nav entry, `roleHome('admin')`, `journeys.ts`, Phase 30 guard repoints
+- [x] 41-06-PLAN.md — Wave 4: `/admin/sops` redirect shim, one SOPs nav entry, `roleHome('admin')`, `journeys.ts`, Phase 30 guard repoints
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
@@ -1604,7 +1604,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | 38. Guidance-Notes Adoptions | 0/0 | Deferred → backlog 999.4 + 999.5 | 2026-07-28 |
 | 39. AI-Prioritized Maintenance Schedule | 0/0 | Deferred → backlog 999.6 | 2026-07-28 |
 | **40. Shared Creation Foundation (v8.0)** | 0/0 | Not started |  |
-| **41. One SOP Surface (v8.0)** | 0/9 | Planned 2026-09-13 |  |
+| **41. One SOP Surface (v8.0)** | 6/9 | Executing |  |
 | **42. Dead-Surface Removal & Route Truth (v8.0)** | 0/0 | Not started |  |
 
 ## Backlog
