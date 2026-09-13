@@ -734,8 +734,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 The two surfaces are genuinely different in content (worker: assigned SOPs, offline sync, refresher dates; admin: status, governance queue, org tree, access grants) but that difference is *permissions and columns on the same list*, not two products. Merging is affordable because `/sops` already carries the lens pattern (`type Section = 'your-sops' | 'library'`, `sops/page.tsx:40`) — admin views become additional lenses on an existing toggle, matching the "multi-view over one shared model, no view has private state" decision locked for the org model and permission wiring.
 
-- [ ] **SUR-01**: One route lists SOPs for every role — what a person sees and can do is determined by their permissions, not by which URL they visited
-- [ ] **SUR-02**: Admin capabilities (draft/published status, governance queue, access/wiring) are lenses on that one surface, not separate destinations
+- [x] **SUR-01**: One route lists SOPs for every role — what a person sees and can do is determined by their permissions, not by which URL they visited
+- [x] **SUR-02**: Admin capabilities (draft/published status, governance queue, access/wiring) are lenses on that one surface, not separate destinations
 - [ ] **SUR-03**: One top-level "SOPs" entry across all roles — no second identically-labelled door, and no role sees two nav paths to the same list
 - [ ] **SUR-04**: One path from a SOP to editing it — an admin does not have two separate route chains reaching the same builder
 - [x] **SUR-05**: The mobile worker bundle is unaffected — admin lenses are code-split, and the existing `SB-LINE-06` CI bundle gate stays green (this is the one hard constraint on the merge; it dictates technique, not outcome)
@@ -784,8 +784,8 @@ The two surfaces are genuinely different in content (worker: assigned SOPs, offl
 | DUP-03 | Phase 40 | Pending |
 | DUP-04 | Phase 40 | Pending |
 | DAT-01 | Phase 40 | Pending |
-| SUR-01 | Phase 41 | Pending |
-| SUR-02 | Phase 41 | Pending |
+| SUR-01 | Phase 41 | Complete |
+| SUR-02 | Phase 41 | Complete |
 | SUR-03 | Phase 41 | Pending |
 | SUR-04 | Phase 41 | Pending |
 | SUR-05 | Phase 41 | Complete |

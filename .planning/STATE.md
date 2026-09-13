@@ -4,13 +4,13 @@ milestone: v8.0
 milestone_name: — Authoring Convergence
 status: executing
 stopped_at: Completed 41-01-PLAN.md
-last_updated: "2026-09-12T23:59:39.984Z"
+last_updated: "2026-09-13T00:08:44.519Z"
 last_activity: 2026-09-12 -- Phase 41 execution started
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 23
-  completed_plans: 15
+  completed_plans: 16
   percent: 25
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 41 (One SOP Surface) — EXECUTING
-Plan: 2 of 9
+Plan: 3 of 9
 Next: Phase 41 (one-sop-surface) or Phase 47 (edit-log) — neither has CONTEXT.md; 44a still blocked on Joe's per-role SOP lists
 Status: Ready to execute
 three 40-VERIFICATION gaps closed. Outstanding formal gate: /gsd-secure-phase 40
@@ -249,6 +249,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 46-capability-matrix P02 | 35min | 2 tasks | 3 files |
 | Phase 46-capability-matrix P03 | 38min | 3 tasks | 8 files |
 | Phase 41 P01 | 55min | 3 tasks | 10 files |
+| Phase 41 P02 | 45min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -505,6 +506,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 46-03]: verifyBlock/unverifyBlock/acceptBlockUpdate/declineBlockUpdate stay on requireAdmin() -- CAP-02 is content-edit only, not publish/verify authority
 - [Phase ?]: Rendering model (D-03) locked: /sops stays client-side; admin views become next/dynamic({ ssr: false }) lenses gated by useIsAdmin().
 - [Phase ?]: Re-baselined /sops/[sopId]/page bundle gate at its true current value (1048 KB, down from stale 1059 KB) - the gate only fails on growth, so an 11 KB decrease across phases 16-40 went unrecorded.
+- [Phase 41]: AdminSopListResult field list frozen for 41-04's status lens: sops, departments, railCounts, scopeDepartments, noAudienceCount, flaggedCount, scopeLabel, filtered
+- [Phase 41]: listAdminSopRows drops scopeItems/href — merged surface switches scope via history.replaceState, not <Link> navigation
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -650,7 +653,7 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-09-12T23:59:39.976Z
+Last session: 2026-09-13T00:08:10.436Z
 Stopped at: Completed 41-01-PLAN.md
 005 variant C (Miller columns: scope | list | editable detail) with inline
 category + department assignment. Next: apply the same Miller layout to the
