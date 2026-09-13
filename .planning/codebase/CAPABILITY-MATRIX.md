@@ -1,6 +1,6 @@
 # Capability Matrix
 
-**Last updated:** 2026-08-25
+**Last updated:** 2026-09-13
 
 This document is the single reference for who can see and do what in SafeStart. When a capability gate changes (an RLS policy, a `require*` guard, or a role check), this file changes in the **same commit**. If this file disagrees with the code, the code is the bug or the file is stale — treat any drift as a finding, not a footnote.
 
@@ -43,10 +43,11 @@ To answer "is a worker *required* to do X?": this document does not answer that 
 | Publish SOP | — | — | ✅ | ✅ | — | `assertPublishGates()` via `requireAdmin()` in `src/lib/governance/publish-core.ts` — a chain approver does not gain publish rights (approving a step ≠ executing the publish) |
 | Delete SOP | — | — | ✅ | ✅ | — | `requireAdminContext()` — a chain approver does not gain delete rights |
 | Version history | — | — | ✅ | ✅ | — | `cloneSopAsDraft`/`restoreVersionAsNew`/`uploadNewVersion` in `src/actions/versioning.ts`, manual role check + service-role self-enforced org-scope — a chain approver does not gain version-supersede rights |
-| Governance queue | — | — | ✅ | ✅ | — | `listGovernanceQueue` + owner/cadence/review actions in `src/actions/governance.ts`, `requireAdminContext()` |
+| Governance queue | — | — | ✅ | ✅ | — | `listGovernanceQueue` + owner/cadence/review actions in `src/actions/governance.ts`, `requireAdminContext()`. Phase 41: the queue is now a code-split `AdminAttentionLens` on the shared `/sops` route (`?view=attention`) — the former `/admin/sops` page-level `redirect('/dashboard')` for non-admins is gone, so `listGovernanceQueue`'s own `requireAdminContext()` is the sole access gate |
+| SOP list — admin lenses (drafts / published / needs attention / access) | — | — | ✅ | ✅ | — | `listAdminSopRows` (`src/actions/admin-sop-list.ts`) and `listAdminAccessData` (`src/actions/admin-access-view.ts`), both open with `requireAdminContext()`. These feed the `AdminStatusLens`/`AdminAttentionLens`/`AdminAccessLens` lenses on the shared `/sops` route (Phase 41 SUR-01/02) — `useIsAdmin()` on that route only decides which lens MOUNTS (a UX convenience); it is not and must never be read as the access gate |
 | Approval chains | — | ✅ (as named chain-step approver only) | ✅ | ✅ | — | `setApprovalChain` admin/safety_manager-only (`approvals.ts`); `approveStep`/`requestChanges` open to whichever member is named in that chain step, which may include a supervisor |
 | Manage team | — | — | ✅ | ⚠ (partial) | — | `/admin/team` routes, `requireAdminContext()` — safety_manager has partial access per 2026-07-05 learning (verify current scope before relying on this cell) |
-| Manage departments | — | — | ✅ | ✅ | — | `org-model.ts`/`departments.ts`/`grants.ts`, `requireAdminContext()` |
+| Manage departments | — | — | ✅ | ✅ | — | `org-model.ts`/`departments.ts`/`grants.ts`, `requireAdminContext()`. Phase 41: the wiring/access surface (`listOrgTree`/`listGrants`/`ensureSopCollections`) is now reached through the code-split `AdminAccessLens` on `/sops?view=access` rather than the former `/admin/sops` page — same guards, no page-level gate in front of them any more |
 | Manage blocks library | — | — | ✅ | ✅ | — | `/admin/blocks`, `requireAdminContext()`; global block curation additionally gated by `platform_admin` (`platform-admin-guard.ts`) |
 | AI settings | — | — | ✅ | — | — | `/admin/ai-settings`, admin-only role check |
 | Training matrix | — | — | ✅ | ✅ (read) | — | `/admin/team` matrix mode + `competency.ts`; supervisor gains a narrow write via Record observation above, not matrix admin |
@@ -55,6 +56,8 @@ To answer "is a worker *required* to do X?": this document does not answer that 
 | Own profile | ✅ | ✅ | ✅ | ✅ | — | `/profile`, self-scoped to the caller's own observations/completions/competency — every role reads only their own row |
 
 Where a row's `Enforced at` column names RLS only (no app guard), or app guard only (RLS is `using(true)` or otherwise not the real gate), that asymmetry is deliberate context, not an oversight — see Findings below for the two cases where it became a real gap.
+
+**Phase 41 note — the route is no longer an access boundary for SOP-list surfaces.** Before this phase, `/admin/sops`'s page-level `redirect('/dashboard')` was a real (if redundant) second gate in front of every admin SOP-list capability. That page is retired to a redirect shim and its content — status/drafts/published, the governance queue, and the org/access wiring map — now live as code-split lenses (`AdminStatusLens`/`AdminAttentionLens`/`AdminAccessLens`) on the same `/sops` route every role reaches. `useIsAdmin()` there decides which lens MOUNTS in the browser; it does not and cannot decide what a caller may READ or WRITE. A reviewer checking any of the three rows above must confirm the capability is reachable by calling the named server action directly (or reading that it self-guards with `requireAdminContext()`), never by observing that the route is reachable — "the route renders" and "the capability is granted" are now fully decoupled.
 
 ## Sign-off authority and edit rights (CAP-02)
 
