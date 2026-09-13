@@ -4,13 +4,13 @@ milestone: v8.0
 milestone_name: — Authoring Convergence
 status: executing
 stopped_at: Completed 41-03-PLAN.md
-last_updated: "2026-09-13T00:19:50.338Z"
+last_updated: "2026-09-13T00:30:46.148Z"
 last_activity: 2026-09-12 -- Phase 41 execution started
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 23
-  completed_plans: 17
+  completed_plans: 18
   percent: 25
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 41 (One SOP Surface) — EXECUTING
-Plan: 4 of 9
+Plan: 5 of 9
 Next: Phase 41 (one-sop-surface) or Phase 47 (edit-log) — neither has CONTEXT.md; 44a still blocked on Joe's per-role SOP lists
 Status: Ready to execute
 three 40-VERIFICATION gaps closed. Outstanding formal gate: /gsd-secure-phase 40
@@ -251,6 +251,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 41 P01 | 55min | 3 tasks | 10 files |
 | Phase 41 P02 | 45min | 3 tasks | 5 files |
 | Phase 41 P03 | 40min | 3 tasks | 3 files |
+| Phase 41 P04 | 35min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -510,6 +511,8 @@ Recent decisions affecting current work:
 - [Phase 41]: AdminSopListResult field list frozen for 41-04's status lens: sops, departments, railCounts, scopeDepartments, noAudienceCount, flaggedCount, scopeLabel, filtered
 - [Phase 41]: listAdminSopRows drops scopeItems/href — merged surface switches scope via history.replaceState, not <Link> navigation
 - [Phase 41]: AdminAccessData field list frozen: { tree, collections, sopsByCollection, grants, newSop, deptMembers } — exactly WiringPatchBayShell's props — Gives 41-05 a stable contract to wire the access lens against, mirroring the 41-02 pattern
+- [Phase 41]: AdminStatusLens banner shows only for a ?collection= deep link (data.filtered && !departments), matching the original page's departmentFilter exclusion exactly
+- [Phase 41]: AdminAttentionLens re-derives grouping from raw listGovernanceQueue rows rather than having the action pre-group, keeping the action's return shape reusable
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -655,7 +658,7 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-09-13T00:19:50.330Z
+Last session: 2026-09-13T00:30:09.914Z
 Stopped at: Completed 41-03-PLAN.md
 005 variant C (Miller columns: scope | list | editable detail) with inline
 category + department assignment. Next: apply the same Miller layout to the

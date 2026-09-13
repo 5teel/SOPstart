@@ -737,7 +737,7 @@ The two surfaces are genuinely different in content (worker: assigned SOPs, offl
 - [x] **SUR-01**: One route lists SOPs for every role — what a person sees and can do is determined by their permissions, not by which URL they visited
 - [x] **SUR-02**: Admin capabilities (draft/published status, governance queue, access/wiring) are lenses on that one surface, not separate destinations
 - [ ] **SUR-03**: One top-level "SOPs" entry across all roles — no second identically-labelled door, and no role sees two nav paths to the same list
-- [ ] **SUR-04**: One path from a SOP to editing it — an admin does not have two separate route chains reaching the same builder
+- [x] **SUR-04**: One path from a SOP to editing it — an admin does not have two separate route chains reaching the same builder
 - [x] **SUR-05**: The mobile worker bundle is unaffected — admin lenses are code-split, and the existing `SB-LINE-06` CI bundle gate stays green (this is the one hard constraint on the merge; it dictates technique, not outcome)
 - [ ] **SUR-06**: "Library" no longer names a destination; it survives only where it names a *filter* ("Your SOPs" vs all published), consistent with the plain-language standard applied in Phase 30/33
 
@@ -787,7 +787,7 @@ The two surfaces are genuinely different in content (worker: assigned SOPs, offl
 | SUR-01 | Phase 41 | Complete |
 | SUR-02 | Phase 41 | Complete |
 | SUR-03 | Phase 41 | Pending |
-| SUR-04 | Phase 41 | Pending |
+| SUR-04 | Phase 41 | Complete |
 | SUR-05 | Phase 41 | Complete |
 | SUR-06 | Phase 41 | Pending |
 | CRE-01 | Phase 42 | Pending |
