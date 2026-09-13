@@ -739,7 +739,7 @@ The two surfaces are genuinely different in content (worker: assigned SOPs, offl
 - [ ] **SUR-03**: One top-level "SOPs" entry across all roles — no second identically-labelled door, and no role sees two nav paths to the same list
 - [x] **SUR-04**: One path from a SOP to editing it — an admin does not have two separate route chains reaching the same builder
 - [x] **SUR-05**: The mobile worker bundle is unaffected — admin lenses are code-split, and the existing `SB-LINE-06` CI bundle gate stays green (this is the one hard constraint on the merge; it dictates technique, not outcome)
-- [ ] **SUR-06**: "Library" no longer names a destination; it survives only where it names a *filter* ("Your SOPs" vs all published), consistent with the plain-language standard applied in Phase 30/33
+- [x] **SUR-06**: "Library" no longer names a destination; it survives only where it names a *filter* ("Your SOPs" vs all published), consistent with the plain-language standard applied in Phase 30/33
 
 **Supersedes:** `UX-02` (Phase 30, "one shared AdminNav … one door to admin") is superseded in part — its goal was one *consistent* admin menu, which this achieves more directly by removing the second SOP destination entirely. The AdminNav component may still exist for Governance/Blocks/Team/Settings; what goes is its duplicate "SOPs" entry.
 
@@ -789,7 +789,7 @@ The two surfaces are genuinely different in content (worker: assigned SOPs, offl
 | SUR-03 | Phase 41 | Pending |
 | SUR-04 | Phase 41 | Complete |
 | SUR-05 | Phase 41 | Complete |
-| SUR-06 | Phase 41 | Pending |
+| SUR-06 | Phase 41 | Complete |
 | CRE-01 | Phase 42 | Pending |
 | CRE-02 | Phase 42 | Pending |
 | CRE-03 | Phase 42 | Pending |

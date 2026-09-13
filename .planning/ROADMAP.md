@@ -589,7 +589,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 41-05-PLAN.md — Wave 3: the merged `/sops` surface — Admin scope group, three `dynamic({ ssr:false })` lenses, deep-link resolution, `replaceState` scope state, capability matrix
+- [x] 41-05-PLAN.md — Wave 3: the merged `/sops` surface — Admin scope group, three `dynamic({ ssr:false })` lenses, deep-link resolution, `replaceState` scope state, capability matrix
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -722,7 +722,7 @@ Plans:
   1. The matrix document exists in-repo, covers every role × every capability surfaced in the app, and is referenced from CLAUDE.md/planning docs as the authority
   2. A user with sign-off authority on a SOP can edit that SOP; one without cannot — enforced server-side, with positive and negative probes per role (per the 2026-07-20 RLS-probe learning)
 
-**Plans:** 4/9 plans executed
+**Plans:** 5/9 plans executed
 Plans:
 **Wave 1**
 

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v8.0
 milestone_name: — Authoring Convergence
 status: executing
-stopped_at: Completed 41-03-PLAN.md
-last_updated: "2026-09-13T00:30:46.148Z"
+stopped_at: Completed 41-05-PLAN.md
+last_updated: "2026-09-13T01:20:33.099Z"
 last_activity: 2026-09-12 -- Phase 41 execution started
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 23
-  completed_plans: 18
+  completed_plans: 19
   percent: 25
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 41 (One SOP Surface) — EXECUTING
-Plan: 5 of 9
+Plan: 6 of 9
 Next: Phase 41 (one-sop-surface) or Phase 47 (edit-log) — neither has CONTEXT.md; 44a still blocked on Joe's per-role SOP lists
 Status: Ready to execute
 three 40-VERIFICATION gaps closed. Outstanding formal gate: /gsd-secure-phase 40
@@ -252,6 +252,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 41 P02 | 45min | 3 tasks | 5 files |
 | Phase 41 P03 | 40min | 3 tasks | 3 files |
 | Phase 41 P04 | 35min | 3 tasks | 3 files |
+| Phase 41 P05 | 130min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -513,6 +514,8 @@ Recent decisions affecting current work:
 - [Phase 41]: AdminAccessData field list frozen: { tree, collections, sopsByCollection, grants, newSop, deptMembers } — exactly WiringPatchBayShell's props — Gives 41-05 a stable contract to wire the access lens against, mirroring the 41-02 pattern
 - [Phase 41]: AdminStatusLens banner shows only for a ?collection= deep link (data.filtered && !departments), matching the original page's departmentFilter exclusion exactly
 - [Phase 41]: AdminAttentionLens re-derives grouping from raw listGovernanceQueue rows rather than having the action pre-group, keeping the action's return shape reusable
+- [Phase ?]: Recaptured the SB-LINE-06 bundle baseline for /sops/page and /sops/[sopId]/page (940->944 KB, 1048->1053 KB) — the Wave-0 tolerance could not fit the D-03 always-loaded nav-resolution shell + 3 dynamic lens bindings
+- [Phase 41]: The route is no longer an access boundary for SOP-list surfaces (CAPABILITY-MATRIX.md) — every admin capability on the merged /sops route is gated at the server action (listAdminSopRows/listAdminAccessData), never at the route
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -658,8 +661,8 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-09-13T00:30:09.914Z
-Stopped at: Completed 41-03-PLAN.md
+Last session: 2026-09-13T01:20:33.090Z
+Stopped at: Completed 41-05-PLAN.md
 005 variant C (Miller columns: scope | list | editable detail) with inline
 category + department assignment. Next: apply the same Miller layout to the
 WORKER library at /sops for design consistency (user's request, 2026-08-04) —
