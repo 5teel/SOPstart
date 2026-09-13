@@ -114,12 +114,21 @@ test.describe('SOP Builder authoring entry points (SB-AUTH)', () => {
     // the builder). What still holds: the library selects source_type, links
     // to the ONE create entry (/admin/sops/new), and the canonical publish
     // gate remains the POST /api/sops/[sopId]/publish route.
-    const libraryPage = await fs.readFile(
-      'src/app/(protected)/admin/sops/page.tsx',
+    //
+    // Repointed AGAIN 2026-09-13 (Phase 41, SUR-01/02/04): admin/sops/page.tsx
+    // is now a redirect shim — the library's SOP_SELECT column list (which
+    // carries source_type) moved to listAdminSopRows (admin-sop-list.ts), and
+    // the one create entry moved onto TopHeader's ADMIN_LINKS.
+    const listAction = await fs.readFile(
+      'src/actions/admin-sop-list.ts',
       'utf8'
     )
-    expect(libraryPage).toContain('source_type')
-    expect(libraryPage).toContain('/admin/sops/new')
+    expect(listAction).toContain('source_type')
+    const topHeader = await fs.readFile(
+      'src/components/layout/TopHeader.tsx',
+      'utf8'
+    )
+    expect(topHeader).toContain("{ label: 'Create New SOP', href: '/admin/sops/new' }")
 
     // 3. Existing publish route file exists at the canonical location.
     const publishRoute = await fs

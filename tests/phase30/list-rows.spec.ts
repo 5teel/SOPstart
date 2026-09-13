@@ -25,9 +25,6 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const ROOT = process.cwd()
-const ADMIN_SOPS_PAGE = path.join(
-  ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'page.tsx',
-)
 const STAGE_SHELL = path.join(
   ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'BuilderStageShell.tsx',
 )

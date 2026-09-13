@@ -23,6 +23,12 @@
  * present as a string. The true browser-render scenario is kept as a
  * documented `test.fixme` runtime smoke.
  *
+ * Repointed in 41-08 (Phase 41, SUR-01/02/04): the server assembly moved from
+ * admin/sops/page.tsx (now a redirect shim) to `listAdminAccessData`
+ * (src/actions/admin-access-view.ts); the ?sop= deep-link entry point (URL ->
+ * pinnedSopId) moved to AdminSopSurface.tsx's `resolveAdminScope`/render.
+ * Every WiringPatchBay.tsx test below is unchanged (that file did not move).
+ *
  * Registration: playwright.config.ts `phase33` project
  *   testDir: '.', testMatch: /tests\/phase33\/.*\.(spec|test)\.ts$/
  * Verify: `npx playwright test --list --project=phase33`
@@ -33,20 +39,29 @@ import path from 'node:path'
 
 const ROOT = process.cwd()
 const BAY = path.join(ROOT, 'src', 'components', 'admin', 'wiring', 'WiringPatchBay.tsx')
-const PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'page.tsx')
+const ADMIN_ACCESS_VIEW = path.join(ROOT, 'src', 'actions', 'admin-access-view.ts')
+const ADMIN_SURFACE = path.join(ROOT, 'src', 'components', 'sop', 'AdminSopSurface.tsx')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
 }
 
-test.describe('SC-2 — server page: sopsByCollection assembly', () => {
-  test('page.tsx fetches id/title/status per collection via ONE .in(collection_id, ids) join read on sop_collections->sops, inside the existing dependent read (no new serial await)', () => {
-    const page = read(PAGE)
-    expect(page).toContain(
+test.describe('SC-2 — server assembly: sopsByCollection + ?sop= deep-link entry point', () => {
+  test('listAdminAccessData fetches id/title/status per collection via ONE .in(collection_id, ids) join read on sop_collections->sops (SC-2, 33-08)', () => {
+    const src = read(ADMIN_ACCESS_VIEW)
+    expect(src).toContain(
       "await (supabase as any).from('sop_collections').select('collection_id, sops(id, title, status)').in('collection_id', collIds)",
     )
-    expect(page).toContain('let sopsByCollection: Record<string, WiringSop[]> = {}')
-    expect(page).toContain('<WiringPatchBayShell tree={orgTree} collections={collections} sopsByCollection={sopsByCollection}')
+    expect(src).toContain('const sopsByCollection: Record<string, WiringSop[]> = {}')
+    expect(src).toContain('return { tree, collections, sopsByCollection, grants, newSop, deptMembers }')
+  })
+
+  test('AdminSopSurface resolves ?sop= into pinnedSopId under the access scope (deep-link entry point survives the merge)', () => {
+    const src = read(ADMIN_SURFACE)
+    // resolveAdminScope carries ?sop= into nav.sop for the access branch only.
+    expect(src).toContain("return { scope: 'admin-access', ownerOnly: false, sop: params.get('sop') ?? undefined }")
+    // ...and AdminAccessLens receives it as pinnedSopId.
+    expect(src).toContain('<AdminAccessLens pinnedSopId={nav.sop} onBack={backToWorkerAll} />')
   })
 })
 

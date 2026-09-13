@@ -18,6 +18,12 @@
  *   - ✓ Done writes grants via `src/actions/grants.ts` `createGrant` (D-12,
  *     permission CREATION — the surface's most important job).
  *
+ * Repointed in 41-08 (Phase 41, SUR-01/02/04): the CR-02 ensure-before-read
+ * runtime path moved from admin/sops/page.tsx (now a redirect shim) to
+ * listAdminAccessData (src/actions/admin-access-view.ts). The ORDERING
+ * character of the assertion is preserved (ensureSopCollections still runs
+ * before the collections read), not degraded to mere presence.
+ *
  * Registration: playwright.config.ts `phase32` project
  *   testDir: '.', testMatch: /tests\/phase32\/.*\.(spec|test)\.ts$/
  * Verify: `npx playwright test --list --project=phase32`
@@ -28,7 +34,7 @@ import path from 'node:path'
 
 const ROOT = process.cwd()
 const BAY = path.join(ROOT, 'src', 'components', 'admin', 'wiring', 'WiringPatchBay.tsx')
-const PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'page.tsx')
+const ADMIN_ACCESS_VIEW = path.join(ROOT, 'src', 'actions', 'admin-access-view.ts')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
@@ -110,10 +116,15 @@ test.describe('SC-5 — ✓ Done writes grants via createGrant', () => {
     expect(src).toContain('{saveError && (')
   })
 
-  test('the page resolves the pinned SOP\'s collections server-side via ensureSopCollections (CR-02 runtime path)', () => {
-    const page = read(PAGE)
-    expect(page).toContain('ensureSopCollections(params.sop)')
-    expect(page).toContain('collectionIds: ensuredCollectionIds')
+  test('listAdminAccessData resolves the pinned SOP\'s collections server-side via ensureSopCollections, BEFORE the collections read (CR-02 runtime path)', () => {
+    const src = read(ADMIN_ACCESS_VIEW)
+    expect(src).toContain('ensureSopCollections(params.sop)')
+    expect(src).toContain('collectionIds: ensuredCollectionIds')
+    const ensureIdx = src.indexOf('ensureSopCollections(params.sop)')
+    const collectionsReadIdx = src.indexOf("from('collections')")
+    expect(ensureIdx).toBeGreaterThan(-1)
+    expect(collectionsReadIdx).toBeGreaterThan(-1)
+    expect(ensureIdx).toBeLessThan(collectionsReadIdx)
   })
 
   test('Done is wired to the SelectionStrip onDone prop and clears pending state on completion', () => {
