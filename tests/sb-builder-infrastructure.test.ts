@@ -11,7 +11,7 @@ test.describe('Builder infrastructure and safety gates (SB-INFRA)', () => {
     expect(page).toContain('getSessionContext')
     expect(page).toContain("redirect('/login')")
     expect(page).toContain("redirect('/dashboard')")
-    expect(page).toContain("redirect('/admin/sops')")
+    expect(page).toContain("redirect('/sops')")
     expect(page).toContain('BuilderStageShell')
 
     const shell = await fs.readFile('src/app/(protected)/admin/sops/builder/[sopId]/BuilderStageShell.tsx', 'utf8')
