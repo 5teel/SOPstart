@@ -4,13 +4,13 @@ milestone: v8.0
 milestone_name: — Authoring Convergence
 status: executing
 stopped_at: Completed 41-07-PLAN.md
-last_updated: "2026-09-13T03:01:29.539Z"
+last_updated: "2026-09-13T03:43:22.852Z"
 last_activity: "2026-09-13 -- Phase 41 Plan 06 executed: /admin/sops is now a redirect"
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 23
-  completed_plans: 21
+  completed_plans: 22
   percent: 25
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 41 (One SOP Surface) — EXECUTING
-Plan: 8 of 9
+Plan: 9 of 9
 Next: 41-07 (reference sweep) — repoint remaining internal /admin/sops links straight to /sops
 Status: Ready to execute
 three 40-VERIFICATION gaps closed. Outstanding formal gate: /gsd-secure-phase 40
@@ -257,6 +257,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 41 P05 | 130min | 3 tasks | 4 files |
 | Phase 41 P06 | 55min | 3 tasks | 10 files |
 | Phase 41 P07 | 38min | 3 tasks | 16 files |
+| Phase 41 P08 | 38min | 3 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -527,6 +528,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Repointed 6 additional in-app /admin/sops sites the plan's Task 1 file list omitted, using the plan's own acceptance grep as the ground truth
 - [Phase ?]: roles.ts ACCESS_MATRIX Manage SOPs row replaced with an annotated SOP list — admin lenses row on the same /sops route (deliberate duplicate documented); Block library renamed to Content to match TopHeader's rename
 - [Phase ?]: Reference-sweep guard flipped live: comment-stripped, count-pinned, mutation-proven in 3 directions (stray ref re-added, sub-route deleted, Library label added)
+- [Phase ?]: 41-08: Rule 1 fix — AdminSopSurface.tsx's department scope column + No-department link were computed but never rendered after the 41-05 bundle-budget extraction; restored, bundle-neutral.
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -672,7 +674,7 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-09-13T03:01:29.519Z
+Last session: 2026-09-13T03:43:16.474Z
 Stopped at: Completed 41-07-PLAN.md
 /admin/sops is now a redirect shim to /sops; TopHeader/roleHome/journeys.ts
 repointed; Phase 30/41 nav guards updated. Next: 41-07 (reference sweep —
