@@ -24,30 +24,11 @@ import { DepartmentPicker } from '@/components/admin/departments/DepartmentPicke
 import { setSopCategory } from '@/actions/sops'
 import { SOP_CATEGORIES } from '@/lib/sop-categories'
 import type { SopStatus, Department } from '@/types/sop'
+import type { MillerSop } from '@/lib/sop-list/admin-rows'
+
+export type { MillerSop }
 
 const SORTED_CATEGORIES = [...SOP_CATEGORIES].sort((a, b) => a.sort - b.sort)
-
-/** Everything the list and detail panes need, resolved server-side. */
-export type MillerSop = {
-  id: string
-  title: string | null
-  /** Filename fallback, already stripped of its extension. */
-  displayTitle: string
-  untitled: boolean
-  status: string
-  categoryLabel: string | null
-  categorySlug: string | null
-  departments: string[]
-  departmentIds: string[]
-  allDepartments: boolean
-  ownerLabel: string | null
-  age: string
-  updatedAt: string | null
-  flagLabel: string | null
-  flagStyle: string | null
-  stuck: boolean
-  confidence: number | null
-}
 
 export function SopMillerBrowser({
   sops,
