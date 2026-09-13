@@ -55,7 +55,7 @@ export default async function PipelineProgressPage({ params }: PageProps) {
   } | null
 
   if (!pipelineRun || pipelineRun.organisation_id !== organisationId) {
-    redirect('/admin/sops')
+    redirect('/sops')
   }
 
   // Find the sop referencing this pipeline run

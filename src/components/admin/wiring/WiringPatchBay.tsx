@@ -622,12 +622,12 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, sops
   }, [focus, collectionById, sopById, grants, visibleRawEdges])
 
   // 32-09 SC-4 (viz-as-library-filter): a focused department or collection is
-  // a valid /admin/sops server-side filter target — org/area/person focus
-  // has no equivalent library query param, so no link renders for those.
+  // a valid /sops server-side filter target — org/area/person focus
+  // has no equivalent list-scope query param, so no link renders for those.
   const openInLibraryHref = useMemo(() => {
     if (connecting || !focus) return undefined
-    if (deptById.has(focus)) return `/admin/sops?departments=${focus}`
-    if (collectionById.has(focus)) return `/admin/sops?collection=${focus}`
+    if (deptById.has(focus)) return `/sops?departments=${focus}`
+    if (collectionById.has(focus)) return `/sops?collection=${focus}`
     return undefined
   }, [connecting, focus, deptById, collectionById])
 

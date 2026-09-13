@@ -53,7 +53,7 @@ export function SelectionStrip({
           <b>{peopleCount}</b> {peopleCount === 1 ? 'person' : 'people'} can see this.
           {openInLibraryHref && (
             <Link href={openInLibraryHref} className="mono open-in-library">
-              Open in library →
+              Open in the SOP list →
             </Link>
           )}
         </span>

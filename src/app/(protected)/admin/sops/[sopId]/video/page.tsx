@@ -40,7 +40,7 @@ export default async function VideoGeneratePage({
   // attacker-controlled sopId route param — an admin/safety_manager of ANY
   // organisation could otherwise read another org's SOP + video jobs.
   if (!sop || !organisationId || sop.organisation_id !== organisationId || sop.status !== 'published') {
-    redirect('/admin/sops')
+    redirect('/sops')
   }
 
   // Fetch all non-archived versions, newest first

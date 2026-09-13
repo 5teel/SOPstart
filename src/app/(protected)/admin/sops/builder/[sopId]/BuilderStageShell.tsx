@@ -145,7 +145,7 @@ function ToolsMenu({
               <>
                 <div className="my-1 h-px bg-[var(--ink-100)]" />
                 <div role="menuitem">
-                  <DeleteSopButton sopId={sopId} redirectTo="/admin/sops" showLabel />
+                  <DeleteSopButton sopId={sopId} redirectTo="/sops" showLabel />
                 </div>
               </>
             )}
@@ -390,7 +390,7 @@ export function BuilderStageShell({
         >
           {/* Back zone */}
           <Link
-            href="/admin/sops"
+            href="/sops"
             data-testid="wayfinder-back"
             className="flex flex-shrink-0 items-center gap-2 px-[18px] border-r border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] no-underline transition-colors"
           >
@@ -490,7 +490,7 @@ export function BuilderStageShell({
               onRequestChanges={handleRequestChanges}
               approvalActionPending={approvalActionPending}
               approvalError={approvalError}
-              wireUpHref={initialSop.status === 'published' ? `/admin/sops?view=access&sop=${sopId}` : undefined}
+              wireUpHref={initialSop.status === 'published' ? `/sops?view=access&sop=${sopId}` : undefined}
             />
           )}
         </main>

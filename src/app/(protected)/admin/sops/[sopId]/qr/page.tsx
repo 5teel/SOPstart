@@ -86,7 +86,7 @@ export default async function SopQrPage({ params }: { params: Promise<{ sopId: s
 
       <div className="no-print mt-6 flex items-center justify-center gap-3">
         <PrintButton />
-        <Link href="/admin/sops" className="evidence-btn text-sm">
+        <Link href="/sops" className="evidence-btn text-sm">
           Back to SOPs
         </Link>
       </div>

@@ -43,7 +43,7 @@ export default async function BuilderPage({
     .single()
 
   if (sopError || !sop) {
-    redirect('/admin/sops')
+    redirect('/sops')
   }
 
   await signLayoutDataImages(supabase, sop as unknown as { sop_sections?: Array<{ layout_data?: unknown }> })
