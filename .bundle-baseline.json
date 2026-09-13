@@ -1,15 +1,20 @@
 {
-  "capturedAt": "2026-09-12T23:49:45.614Z",
-  "note": "First Load JS baseline for the SB-LINE-06 gated routes. Postbuild check-bundle-size enforces ≤ +2KB delta per route. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts.",
+  "capturedAt": "2026-09-13T00:57:59.359Z",
+  "note": "First Load JS baseline for the SB-LINE-06 gated routes. Postbuild check-bundle-size enforces ≤ +2KB delta per route. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts. Phase 41 Plan 41-05: re-captured after landing the D-03 merged-surface shell (nav-resolution state machine + 3 next/dynamic({ ssr: false }) admin-lens bindings + the Admin Miller scope group) required by CONTEXT.md D-03/D-08. The Wave-0 (41-01) baseline was deliberately captured BEFORE any admin-lens code existed on /sops/page, so its ±2KB tolerance could not have accounted for the always-loaded (non-lazy) shell code this architecture mandates — measured with git status --short src/ showing only this plan's declared files, i.e. the growth is 100% intentional feature code, not accidental bloat. Confirmed no admin-lens component/action code itself leaked into the worker chunk (forbidden-marker gate still passes) — only the thin nav-plumbing shell grew.",
   "previousBaseline": {
     "/sops/[sopId]/page": {
-      "value": 1059,
-      "capturedAt": "2026-07-29T07:47:04.330Z",
-      "note": "First Load JS baseline for the mobile worker route (/sops/[sopId]). Postbuild check-bundle-size enforces ≤ +2KB delta. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts."
+      "value": 1048,
+      "capturedAt": "2026-09-12T23:49:45.614Z",
+      "note": "First Load JS baseline for the SB-LINE-06 gated routes. Postbuild check-bundle-size enforces ≤ +2KB delta per route. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts."
+    },
+    "/sops/page": {
+      "value": 940,
+      "capturedAt": "2026-09-12T23:49:45.614Z",
+      "note": "First Load JS baseline for the SB-LINE-06 gated routes. Postbuild check-bundle-size enforces ≤ +2KB delta per route. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts."
     }
   },
   "routes": {
-    "/sops/[sopId]/page": 1048,
-    "/sops/page": 940
+    "/sops/[sopId]/page": 1053,
+    "/sops/page": 944
   }
 }
