@@ -241,6 +241,39 @@ export function AdminSopSurface({ nav, onNavChange, children }: AdminSopSurfaceP
       >
         Owned by me
       </MillerItem>
+
+      {/* By-department scope rows + "No department" (the reachable scope for
+          SOPs nobody can be assigned — the fix is inline in the detail pane,
+          so a row leaves this scope the moment you fix it). Rule 1 fix
+          (CLAUDE.md 2026-07-13 "hook fetched the data then threw it away"):
+          listAdminSopRows has always computed scopeDepartments/noAudienceCount
+          into `counts` via onResult below, but the 41-05 bundle-budget
+          extraction into this file dropped the render of it — restored here,
+          verbatim from admin/sops/page.tsx's original scope column. */}
+      {counts && counts.scopeDepartments.length > 0 && (
+        <>
+          <MillerColumnHeader>By department</MillerColumnHeader>
+          {counts.scopeDepartments.map((d) => (
+            <MillerItem
+              key={d.id}
+              selected={scope === 'admin-all' && nav.departments === d.id}
+              onClick={() => applyScope('admin-all', { departments: d.id })}
+              count={d.count}
+            >
+              {d.name}
+            </MillerItem>
+          ))}
+          {counts.noAudienceCount > 0 && (
+            <MillerItem
+              selected={scope === 'admin-all' && nav.departments === 'none'}
+              onClick={() => applyScope('admin-all', { departments: 'none' })}
+              count={counts.noAudienceCount}
+            >
+              No department
+            </MillerItem>
+          )}
+        </>
+      )}
     </>
   )
 

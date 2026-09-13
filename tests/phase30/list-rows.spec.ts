@@ -12,7 +12,13 @@
  *   - WIRING assertions required, not token presence (CLAUDE.md 2026-06-05):
  *     the menu entries' href/onClick must reference the real destinations.
  *
- * This file starts as test.fixme — the UX-06 plan flips it live.
+ * Repointed in 41-08 (Phase 41, SUR-01/02/04): the admin library rows moved
+ * off admin/sops/page.tsx (now a redirect shim) onto listAdminSopRows
+ * (src/actions/admin-sop-list.ts) for data and AdminStatusLens.tsx for
+ * rendering; the department scope column + "No department" link moved onto
+ * AdminSopSurface.tsx (restored there in this same commit — see the Rule 1
+ * fix note below, the 41-05 bundle-budget extraction computed the data but
+ * dropped its render).
  */
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
@@ -25,6 +31,11 @@ const ADMIN_SOPS_PAGE = path.join(
 const STAGE_SHELL = path.join(
   ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'BuilderStageShell.tsx',
 )
+const ADMIN_STATUS_LENS = path.join(
+  ROOT, 'src', 'components', 'sop', 'lenses', 'AdminStatusLens.tsx',
+)
+const ADMIN_SOP_LIST = path.join(ROOT, 'src', 'actions', 'admin-sop-list.ts')
+const ADMIN_SURFACE = path.join(ROOT, 'src', 'components', 'sop', 'AdminSopSurface.tsx')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
@@ -32,7 +43,7 @@ function read(p: string): string {
 
 test.describe('UX-06 — one-line admin rows + builder action menu', () => {
   test('admin rows contain no SopDepartmentEditor / LibraryReviewCell / icon-only actions', () => {
-    const src = read(ADMIN_SOPS_PAGE)
+    const src = read(ADMIN_STATUS_LENS)
     expect(src).not.toContain('SopDepartmentEditor')
     expect(src).not.toContain('LibraryReviewCell')
     expect(src).not.toContain('VideoJobIndicator')
@@ -81,18 +92,16 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
   })
 
   test('row is one line: title + status chip + one flag chip, and reaches the builder', () => {
-    const page = read(ADMIN_SOPS_PAGE)
+    // Repointed 2026-09-13 (Phase 41): admin/sops/page.tsx is now a redirect
+    // shim — the row moved to AdminStatusLens.tsx (which still WIRES
+    // SopMillerBrowser, same relocation-proofing rationale as before, CLAUDE.md
+    // [2026-07-13]) and the row-mapping logic moved to listAdminSopRows.
+    const lens = read(ADMIN_STATUS_LENS)
+    const listAction = read(ADMIN_SOP_LIST)
     const browser = read(path.join(ROOT, 'src', 'components', 'admin', 'SopMillerBrowser.tsx'))
 
-    // 2026-08-04 (sketch 005 variant C): the row moved out of the page into
-    // SopMillerBrowser, because selecting a SOP must be client state — a
-    // search-param push would fire an RSC request per click (CLAUDE.md
-    // [2026-05-13]). UX-06's invariant is unchanged: ONE line, ONE flag chip,
-    // and the row reaches the builder. Assert it where it now lives, plus
-    // that the page still WIRES it — a guard that only greps the old file
-    // goes stale-green on the next relocation (CLAUDE.md [2026-07-13]).
-    expect(page).toContain('<SopMillerBrowser')
-    expect(page).toContain('sops={millerSops}')
+    expect(lens).toContain('<SopMillerBrowser')
+    expect(lens).toContain('sops={data.sops}')
 
     // Whole row reaches the builder (WIRING: interpolated sop id).
     expect(browser).toMatch(/href=\{`\/admin\/sops\/builder\/\$\{sop\.id\}`\}/)
@@ -100,12 +109,12 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
     expect(browser).toContain('sop.flagLabel')
 
     // ONE flag chip: worst-first pick, still resolved server-side.
-    expect(page).toContain('FLAG_PRIORITY.find((f) => r.flags.includes(f))')
-    expect(page).toContain('flagLabel: flag ? FLAG_LABEL[flag] : null')
+    expect(listAction).toContain('FLAG_PRIORITY.find((f) => r.flags.includes(f))')
+    expect(listAction).toContain('flagLabel: flag ? FLAG_LABEL[flag] : null')
     // Owner is still resolved for the detail pane, and still suppressed when
     // the flag chip already says "No owner".
-    expect(page).toContain('ownerLabelById[sop.owner_user_id]')
-    expect(page).toContain("flag === 'unowned' ? null : shortOwner(owner)")
+    expect(listAction).toContain('ownerLabelById[sop.owner_user_id]')
+    expect(listAction).toContain("flag === 'unowned' ? null : shortOwner(owner)")
   })
 
   test('selecting a SOP is client state, not a URL push (hot-path latency)', () => {
@@ -169,23 +178,30 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
   })
 
   test('"No department" is a reachable scope, not a dead label', () => {
-    const page = read(ADMIN_SOPS_PAGE)
-    // It counts the SOPs nobody can be assigned, so it must be somewhere you
-    // can GO — the detail pane is what makes going there useful.
-    expect(page).toContain('href="/admin/sops?departments=none"')
-    expect(page).toContain("departmentFilter === 'none'")
+    // Repointed 2026-09-13 (Phase 41): the scope row is now a client-state
+    // MillerItem in AdminSopSurface.tsx (history.replaceState, not a <Link>
+    // href — CLAUDE.md [2026-05-13]), fed by listAdminSopRows' noAudienceCount.
+    // The 41-05 bundle-budget extraction computed this data via `counts` but
+    // dropped its render entirely — restored in this same commit (Rule 1:
+    // "hook fetched the data then threw it away", CLAUDE.md [2026-07-13]).
+    const surface = read(ADMIN_SURFACE)
+    expect(surface).toContain("applyScope('admin-all', { departments: 'none' })")
+    expect(surface).toContain("nav.departments === 'none'")
+    expect(surface).toContain('counts.noAudienceCount')
+    const listAction = read(ADMIN_SOP_LIST)
+    expect(listAction).toContain('noAudienceCount')
   })
 
   test('"No department" means no AUDIENCE — all_departments does not count as unassigned', () => {
-    const page = read(ADMIN_SOPS_PAGE)
+    const listAction = read(ADMIN_SOP_LIST)
     // all_departments = true is an audience and writes NO sop_departments rows,
     // so "has no junction rows" is not the same as "nobody can be assigned
     // this". Without this, setting a SOP to Everyone left it sitting in the
     // "No department" scope and the fix looked like it had done nothing.
-    expect(page).toMatch(/!tagged\.has\(r\.id\)\s*&&\s*!r\.all_departments/)
-    expect(page).toMatch(/!sopIdsWithDept\.has\(r\.id\)\s*&&\s*!r\.all_departments/)
+    expect(listAction).toMatch(/!tagged\.has\(r\.id\)\s*&&\s*!r\.all_departments/)
+    expect(listAction).toMatch(/!sopIdsWithDept\.has\(r\.id\)\s*&&\s*!r\.all_departments/)
     // Both the filter and the count must read all_departments to do that.
-    expect(page).toContain("select('id, all_departments')")
-    expect(page).toContain("select('id, status, all_departments')")
+    expect(listAction).toContain("select('id, all_departments')")
+    expect(listAction).toContain("select('id, status, all_departments')")
   })
 })

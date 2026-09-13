@@ -11,13 +11,19 @@
  *     (+?mode=voice), /admin/sops/new/blank.
  *   - Worker /sops "Create SOP" tab removal is 30-06 scope (shares
  *     sops/page.tsx) — that test stays fixme here until 30-06 flips it.
+ *
+ * Repointed in 41-08 (Phase 41): `ADMIN_SOPS_PAGE` renamed to
+ * `ADMIN_SOPS_SHIM` — admin/sops/page.tsx is now a thin redirect shim to
+ * /sops (41-06), so the constant's old name would lie about what the file
+ * does. The "no duplicate create entry" check now also asserts the merged
+ * surface (/sops) carries no create entry, not just the (now-empty) shim.
  */
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
 import path from 'node:path'
 
 const ROOT = process.cwd()
-const ADMIN_SOPS_PAGE = path.join(
+const ADMIN_SOPS_SHIM = path.join(
   ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'page.tsx',
 )
 const METHOD_PICKER = path.join(
@@ -76,19 +82,26 @@ test.describe('UX-04 — one create entry', () => {
   })
 
   test('/admin/sops has no duplicate create entry (the header Create New SOP link is the one entry)', () => {
-    const src = read(ADMIN_SOPS_PAGE)
-    // 2026-07-30: the page-level New SOP button moved to the app header
-    // (TopHeader ADMIN_LINKS "Create New SOP" → /admin/sops/new). The page
-    // itself must not re-add a second create entry.
-    const pickerLinks = src.match(/href="\/admin\/sops\/new"/g) ?? []
+    // Repointed 2026-09-13 (Phase 41): admin/sops/page.tsx is now a redirect
+    // shim (renders nothing, so the shim half of this check is trivially
+    // true) — the merged surface is /sops (WORKER_SOPS_PAGE), which must
+    // ALSO carry no create entry until Phase 42 (D-01/D-05, 41-CONTEXT.md).
+    const shimSrc = read(ADMIN_SOPS_SHIM)
+    const mergedSrc = read(WORKER_SOPS_PAGE)
+    const pickerLinks: string[] = [
+      ...(shimSrc.match(/href="\/admin\/sops\/new"/g) ?? []),
+      ...(mergedSrc.match(/href="\/admin\/sops\/new"/g) ?? []),
+    ]
     expect(pickerLinks).toHaveLength(0)
     const header = read(path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx'))
     expect(header).toContain("{ label: 'Create New SOP', href: '/admin/sops/new' }")
-    expect(src).not.toContain('href="/admin/sops/upload"')
-    expect(src).not.toContain('href="/admin/sops/new/ai"')
-    expect(src).not.toContain('href="/admin/sops/new/blank"')
-    expect(src).not.toContain('mode=voice')
-    expect(src).not.toContain('Voice Draft')
+    for (const src of [shimSrc, mergedSrc]) {
+      expect(src).not.toContain('href="/admin/sops/upload"')
+      expect(src).not.toContain('href="/admin/sops/new/ai"')
+      expect(src).not.toContain('href="/admin/sops/new/blank"')
+      expect(src).not.toContain('mode=voice')
+      expect(src).not.toContain('Voice Draft')
+    }
   })
 
   test('no stray intake hrefs anywhere in src outside the picker (worker tab = 30-06)', () => {
