@@ -143,6 +143,14 @@ function isAdminStatusScope(scope: SopScope): scope is keyof typeof ADMIN_STATUS
   return scope in ADMIN_STATUS
 }
 
+/** Scope-column count for one ADMIN_SCOPES entry — undefined while counts are unknown. */
+function adminScopeCount(key: AdminScope, counts: AdminSopListResult | null): number | undefined {
+  if (!counts) return undefined
+  if (key === 'admin-attention') return counts.flaggedCount
+  if (key === 'admin-access') return undefined
+  return counts.railCounts[ADMIN_STATUS[key]]
+}
+
 interface SopNav {
   scope: SopScope
   ownerOnly: boolean
@@ -372,13 +380,18 @@ export default function SopsPage() {
             lastSyncLabel={lastSyncLabel}
             activeDeptLabel={activeDeptLabel}
             onOpenDeptSheet={() => setDeptSheetOpen(true)}
-            scope={nav.scope as WorkerScope}
-            onScopeChange={(s: WorkerScope) => applyScope(s)}
+            scope={nav.scope}
+            onScopeChange={applyScope}
             deptMatches={deptMatches}
             departments={departments}
             selectedDeptIds={selectedDeptIds}
             allDepartments={allDepartments}
             onDeptSelect={handleDeptSelect}
+            isAdmin={isAdmin}
+            adminCounts={adminCounts}
+            onAdminResult={setAdminCounts}
+            nav={nav}
+            onApplyScope={applyScope}
           />
         )}
       </div>
@@ -413,13 +426,21 @@ interface SopsSectionProps {
   lastSyncLabel: string
   activeDeptLabel: string
   onOpenDeptSheet: () => void
-  scope: WorkerScope
-  onScopeChange: (s: WorkerScope) => void
+  scope: SopScope
+  onScopeChange: (s: SopScope) => void
   deptMatches: (sopId: string) => boolean
   departments: Department[]
   selectedDeptIds: string[]
   allDepartments: boolean
   onDeptSelect: (ids: string[], all: boolean) => void
+  isAdmin: boolean
+  adminCounts: AdminSopListResult | null
+  onAdminResult: (r: AdminSopListResult) => void
+  nav: SopNav
+  onApplyScope: (
+    next: SopScope,
+    patch?: { ownerOnly?: boolean; departments?: string; collection?: string }
+  ) => void
 }
 
 interface LibrarySop {
@@ -444,6 +465,11 @@ function SopsSection({
   selectedDeptIds,
   allDepartments,
   onDeptSelect,
+  isAdmin,
+  adminCounts,
+  onAdminResult,
+  nav,
+  onApplyScope,
 }: SopsSectionProps) {
   const queryClient = useQueryClient()
   const [pending, startTransition] = useTransition()
@@ -644,7 +670,7 @@ function SopsSection({
     return true
   }
 
-  const scoped = workerSops.filter((s) => inScope(s, scope))
+  const scoped = workerSops.filter((s) => inScope(s, scope as WorkerScope))
   const counts = Object.fromEntries(
     WORKER_SCOPES.map((sc) => [sc.key, workerSops.filter((s) => inScope(s, sc.key)).length])
   ) as Record<WorkerScope, number>
@@ -660,9 +686,15 @@ function SopsSection({
         lastSyncLabel,
       ].filter(Boolean).join(' · ')
 
+  const visibleAdminScopes = ADMIN_SCOPES.filter(
+    (sc) => sc.key !== 'admin-failed' || !adminCounts || adminCounts.railCounts.failed > 0
+  )
+
   return (
     <>
-      <p className="mb-3 text-[13px] text-[var(--ink-500)]">{summary}</p>
+      {!isAdminStatusScope(scope) && (
+        <p className="mb-3 text-[13px] text-[var(--ink-500)]">{summary}</p>
+      )}
 
       {/* Scope strip — below lg the left column has nowhere to go, so the
           same scopes ride here rather than disappearing. */}
@@ -680,6 +712,21 @@ function SopsSection({
           >
             {sc.label}
             <span className="mono ml-1 text-[11px] opacity-70">{counts[sc.key]}</span>
+          </button>
+        ))}
+        {isAdmin && visibleAdminScopes.map((sc) => (
+          <button
+            key={sc.key}
+            type="button"
+            onClick={() => onApplyScope(sc.key)}
+            className={`flex-shrink-0 min-h-11 rounded-xl border px-3 text-sm font-medium ${
+              nav.scope === sc.key
+                ? 'border-[var(--ink-900)] bg-[var(--ink-900)] text-white'
+                : 'border-[var(--ink-100)] bg-white text-[var(--ink-700)]'
+            }`}
+          >
+            {sc.label}
+            <span className="mono ml-1 text-[11px] opacity-70">{adminScopeCount(sc.key, adminCounts) ?? ''}</span>
           </button>
         ))}
         <button
@@ -743,9 +790,42 @@ function SopsSection({
               {dept.name}
             </MillerItem>
           ))}
+
+          {/* Phase 41 SUR-01/02: admin lenses are additional rows in this same
+              column, entitled roles only — never a second tab strip (D-02). */}
+          {isAdmin && (
+            <>
+              <MillerColumnHeader>Admin</MillerColumnHeader>
+              {visibleAdminScopes.map((sc) => (
+                <MillerItem
+                  key={sc.key}
+                  selected={nav.scope === sc.key}
+                  onClick={() => onApplyScope(sc.key)}
+                  count={adminScopeCount(sc.key, adminCounts)}
+                >
+                  {sc.label}
+                </MillerItem>
+              ))}
+              <MillerItem
+                selected={nav.ownerOnly}
+                onClick={() => onApplyScope('admin-all', { ownerOnly: !nav.ownerOnly })}
+              >
+                Owned by me
+              </MillerItem>
+            </>
+          )}
         </nav>
 
-        {loading ? (
+        {isAdminStatusScope(scope) ? (
+          <AdminStatusLens
+            status={ADMIN_STATUS[scope]}
+            ownerOnly={nav.ownerOnly}
+            departments={nav.departments}
+            collection={nav.collection}
+            onResult={onAdminResult}
+            onClearFilter={() => onApplyScope('admin-all')}
+          />
+        ) : loading ? (
           <div className="flex flex-col gap-2 p-3 lg:col-span-2">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="h-[68px] animate-pulse rounded-lg bg-[var(--paper-2)] lg:h-9 lg:rounded" />
@@ -764,7 +844,7 @@ function SopsSection({
         ) : (
           <SopWorkerBrowser
             sops={scoped}
-            scopeLabel={SCOPE_LABEL[scope]}
+            scopeLabel={SCOPE_LABEL[scope as WorkerScope]}
             onRemove={handleRemove}
             onAdd={handleAdd}
             actionPending={pending}
