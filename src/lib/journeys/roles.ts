@@ -97,7 +97,7 @@ export const ROLES: RoleDef[] = [
     kind: 'org',
     colour: '#b45309',
     who: 'The org’s administrator — the first sign-up becomes admin.',
-    landsOn: { label: 'SOP library (admin)', route: '/admin/sops' },
+    landsOn: { label: 'SOP list', route: '/sops' },
     can: [
       'Create / upload / AI-parse SOPs and run them to publish',
       'Manage the block library (department tagging)',
@@ -174,10 +174,15 @@ export interface AccessRow {
 }
 
 export const ACCESS_MATRIX: AccessRow[] = [
+  // NOTE: '/sops' appears twice below on purpose — one merged surface, two
+  // access levels. The worker-facing row is the base read/walk experience
+  // everyone gets; the admin-lenses row is the same URL gaining extra
+  // scopes (Drafts, Published, Needs attention, Access) once useIsAdmin()
+  // resolves true. Do not collapse these into one row.
   { surface: 'My SOPs (read / walk)', route: '/sops',             access: { worker: true,  supervisor: true,  safety_manager: true, admin: true } },
   { surface: 'Activity (review sign-off)', route: '/activity',    access: { worker: 'own', supervisor: true,  safety_manager: true, admin: true } },
-  { surface: 'Manage SOPs',          route: '/admin/sops',        access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
-  { surface: 'Block library',        route: '/admin/blocks',      access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
+  { surface: 'SOP list — admin lenses', route: '/sops?view=attention', access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
+  { surface: 'Content',              route: '/admin/blocks',      access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
   { surface: 'Team & roles',         route: '/admin/team',        access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
   { surface: 'Departments',          route: '/admin/departments', access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
 ]

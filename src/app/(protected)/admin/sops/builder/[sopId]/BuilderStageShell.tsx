@@ -397,7 +397,7 @@ export function BuilderStageShell({
             <span className="text-[15px]" aria-hidden="true">←</span>
             <span className="flex flex-col leading-tight">
               <span className="text-[9px] uppercase tracking-wider text-[var(--ink-300)]">Back to</span>
-              <span className="text-[12px]">SOP library</span>
+              <span className="text-[12px]">SOP list</span>
             </span>
           </Link>
 
