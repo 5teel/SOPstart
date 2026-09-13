@@ -4,8 +4,9 @@ import { getSessionContext } from '@/lib/auth/session-context'
 /**
  * Phase 30 (UX-03, orchestrator decision #1) — redirect shim.
  *
- * The governance queue folded into /admin/sops as the "Needs attention" view.
- * This route survives only so legacy deep-links + bookmarks (GQ-04
+ * The governance queue folded into /sops as the "Needs attention" view
+ * (Phase 41 merged the admin lens onto the worker route). This route
+ * survives only so legacy deep-links + bookmarks (GQ-04
  * /admin/governance?filter=X) keep working: it maps the legacy ?filter= param
  * onto the folded view's filter param. The approval-chain editor relocated to
  * /admin/settings. The admin guard stays IN FRONT of the redirect so an
@@ -29,5 +30,5 @@ export default async function GovernancePage({
   const params = await searchParams
   const filter = params.filter
 
-  redirect(filter ? `/admin/sops?view=attention&filter=${filter}` : '/admin/sops?view=attention')
+  redirect(filter ? `/sops?view=attention&filter=${filter}` : '/sops?view=attention')
 }

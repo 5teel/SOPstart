@@ -7,9 +7,9 @@
  * Two contracts:
  *
  *   1. `SopMillerBrowser`, `GovernanceQueueRow`, `WiringPatchBayShell` may
- *      only be statically imported from one of ALLOWED_FILES. The fourth,
- *      TEMPORARY entry (`admin/sops/page.tsx`) is removed by 41-06 when
- *      that page becomes a redirect shim — see the comment on that entry.
+ *      only be statically imported from one of ALLOWED_FILES. As of 41-06,
+ *      `admin/sops/page.tsx` is a redirect shim that imports none of these,
+ *      so the allowlist is tightened to the three lens files only.
  *
  *   2. `src/app/(protected)/sops/page.tsx` (the merged worker/admin
  *      surface) must not import any of the three lens components, nor
@@ -32,8 +32,6 @@ const ALLOWED_FILES = [
   path.join('src', 'components', 'sop', 'lenses', 'AdminStatusLens.tsx'),
   path.join('src', 'components', 'sop', 'lenses', 'AdminAttentionLens.tsx'),
   path.join('src', 'components', 'sop', 'lenses', 'AdminAccessLens.tsx'),
-  // TEMPORARY: removed by 41-06 when this page becomes a redirect shim.
-  path.join('src', 'app', '(protected)', 'admin', 'sops', 'page.tsx'),
 ].map((p) => p.replace(/\\/g, '/'))
 
 const SOPS_PAGE = path.join(REPO_ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx')
