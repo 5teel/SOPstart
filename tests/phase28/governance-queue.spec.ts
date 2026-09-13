@@ -3,10 +3,21 @@
  * the queue folded into /admin/sops as the "Needs attention" view
  * (?view=attention) and /admin/governance became a redirect shim.
  *
+ * Repointed AGAIN in 41-08 (SUR-01/02/04): /admin/sops itself is now a thin
+ * guard-first redirect shim to /sops (see 41-06). The queue read + rendering
+ * moved to AdminAttentionLens.tsx (a next/dynamic({ssr:false}) lens fetched
+ * by AdminSopSurface.tsx), and the real admin/safety_manager gate on the DATA
+ * is listGovernanceQueue -> requireAdmin() in src/actions/governance.ts — the
+ * shim's own redirect('/dashboard') is a second, shallower guard in front of
+ * that, kept here so both layers stay pinned (CLAUDE.md 2026-07-13: a guard
+ * pointing at an emptied file is a guard that stopped guarding).
+ *
  * Verifies (source-contract, no live DB required):
- *   GQ-01: the folded /admin/sops view calls listGovernanceQueue, guards the
- *     admin/safety_manager role, and the filter chips link all 5 filter
- *     values (including stale_role — GQ-03) onto ?view=attention.
+ *   GQ-01: AdminAttentionLens calls listGovernanceQueue; the real data gate
+ *     (requireAdmin() in governance.ts) guards admin/safety_manager; the
+ *     shim (admin/sops/page.tsx) keeps its own front-door redirect; and
+ *     AdminSopSurface.tsx resolves ?view=attention to the admin-attention
+ *     scope.
  *   GQ-02: GovernanceQueueRow WIRES a real confirmSopCurrent( call — not a
  *     bare prop-name reference (CLAUDE.md 2026-06-05 dead-feature learning) —
  *     and renders exactly one primary action per row via if/else-if branching
@@ -14,7 +25,7 @@
  *   OWN-02: OwnerPicker calls setSopOwner( and reuses getOrgMembers (not a
  *     hand-rolled second member query).
  *   GQ-04: /admin/governance is a guard-first redirect shim that maps legacy
- *     ?filter=X deep-links onto the folded view's filter param.
+ *     ?filter=X deep-links onto the merged view's filter param (now on /sops).
  *   Pathways coverage: journeys.ts still maps route: '/admin/governance'
  *     (the shim) AND the folded view.
  *
@@ -30,6 +41,9 @@ import path from 'node:path'
 const ROOT = process.cwd()
 const SHIM = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'governance', 'page.tsx')
 const FOLDED_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'page.tsx')
+const ATTENTION_LENS = path.join(ROOT, 'src', 'components', 'sop', 'lenses', 'AdminAttentionLens.tsx')
+const GOVERNANCE_ACTIONS = path.join(ROOT, 'src', 'actions', 'governance.ts')
+const ADMIN_SURFACE = path.join(ROOT, 'src', 'components', 'sop', 'AdminSopSurface.tsx')
 const ROW = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceQueueRow.tsx')
 const CHIPS = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceFilterChips.tsx')
 const OWNER_PICKER = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'OwnerPicker.tsx')
@@ -40,30 +54,41 @@ function read(p: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// admin/sops/page.tsx (folded view) — GQ-01
+// Needs-attention lens on /sops — GQ-01 (repointed 2026-09-13, Phase 41)
 // ---------------------------------------------------------------------------
 
-test.describe('folded governance view on /admin/sops — queue read + role guard', () => {
-  const src = read(FOLDED_PAGE)
-
-  test('calls listGovernanceQueue', () => {
-    expect(src).toContain('listGovernanceQueue(')
+test.describe('needs-attention lens on /sops — queue read + role guard', () => {
+  test('AdminAttentionLens calls listGovernanceQueue', () => {
+    const src = read(ATTENTION_LENS)
+    expect(src).toContain("import { listGovernanceQueue")
+    expect(src).toContain('queryFn: listGovernanceQueue')
   })
 
-  test('guards admin/safety_manager role and redirects otherwise', () => {
+  test('the shim keeps a front-door redirect for non-admins', () => {
     // 2026-07-13: member.role → role (shared getSessionContext auth refactor)
+    const src = read(FOLDED_PAGE)
     expect(src).toContain("['admin', 'safety_manager'].includes(role)")
     expect(src).toContain("redirect('/dashboard')")
   })
 
-  test('serves the attention view behind ?view=attention', () => {
-    expect(src).toContain("params.view === 'attention'")
+  test('the real data gate — listGovernanceQueue -> requireAdmin() — also enforces admin/safety_manager', () => {
+    const src = read(GOVERNANCE_ACTIONS)
+    expect(src).toContain('export async function requireAdmin')
+    expect(src).toContain("['admin', 'safety_manager'].includes(role)")
+    expect(src).toContain('export async function listGovernanceQueue')
   })
 
-  test('renders the queue rows grouped by worst flag (chips deleted, sketch 004)', () => {
+  test('AdminSopSurface resolves ?view=attention to the admin-attention scope', () => {
+    const src = read(ADMIN_SURFACE)
+    expect(src).toContain("view === 'attention'")
+    expect(src).toContain("scope: 'admin-attention'")
+  })
+
+  test('AdminAttentionLens renders the queue rows grouped by worst flag (chips deleted, sketch 004)', () => {
+    const src = read(ATTENTION_LENS)
+    expect(src).toContain('FLAG_PRIORITY.find(')
     expect(src).toContain('<GovernanceQueueRow')
     expect(src).not.toContain('<GovernanceFilterChips')
-    expect(src).toContain('attentionGroups.map')
   })
 })
 
@@ -80,10 +105,13 @@ test.describe('governance page — redirect shim mapping legacy ?filter=', () =>
     expect(src).toContain("redirect('/dashboard')")
   })
 
-  test('redirects to the folded view, mapping legacy ?filter=X', () => {
+  test('redirects to the merged view on /sops, mapping legacy ?filter=X', () => {
+    // Rule 1 (CLAUDE.md 2026-07-13): 41-06 retargeted this shim's destination
+    // from /admin/sops?view=attention to /sops?view=attention when /admin/sops
+    // itself became a shim — this assertion was stale against that change.
     expect(src).toContain('params.filter')
     expect(src).toContain('view=attention&filter=${filter}')
-    expect(src).toContain("'/admin/sops?view=attention'")
+    expect(src).toContain("'/sops?view=attention'")
   })
 
   test('no longer renders any governance surface itself', () => {

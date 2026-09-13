@@ -6,15 +6,23 @@
  * /admin/sops header chips, and Confirm current lives on GovernanceQueueRow
  * in the folded needs-attention view.
  *
+ * Repointed AGAIN in 41-08 (SUR-01/02/04): the admin library rows moved to
+ * `listAdminSopRows` (src/actions/admin-sop-list.ts), the "Owned by me"
+ * toggle + header/count chips moved to AdminSopSurface.tsx (a scope row in
+ * the Miller column, no more <Link> href — CLAUDE.md 2026-05-13 URL-state
+ * rule), and the attention-view grouping lives in AdminAttentionLens.tsx +
+ * flag-display.ts. admin/sops/page.tsx is now a thin redirect shim and no
+ * longer carries any of this behaviour (see 41-06-SUMMARY.md).
+ *
  * Verifies (source-contract, no live DB required):
- *   OWN-04/D28-08: admin/sops/page.tsx handles ?owner=me with a REAL
+ *   OWN-04/D28-08: listAdminSopRows handles ?owner=me with a REAL
  *     .eq('owner_user_id', ...) filter (not just a bare "owner" string).
  *   REV-02/REV-04: the overdue signal derives from the org-scoped governance
  *     queue (classifyGovernanceRow's review_due_at < now), rendered as the
  *     row flag chip; Confirm current stays a real wired call on
  *     GovernanceQueueRow (the merged surface).
- *   GQ-04/D28-09: the /admin/sops header chips count from
- *     listGovernanceQueue and deep-link the flags to the folded view.
+ *   GQ-04/D28-09: listAdminSopRows counts from listGovernanceQueue and
+ *     AdminAttentionLens/AdminSopSurface deep-link the flags to the merged view.
  *   REV-03/D28-07: ReadTab (Phase 30 merged Overview+Tools+Hazards) contains
  *     the "Current as of" caption and contains NO review_due_at
  *     conditional/gate anywhere (hard rule).
@@ -32,7 +40,10 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const ROOT = process.cwd()
-const LIBRARY_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'page.tsx')
+const ADMIN_SOP_LIST = path.join(ROOT, 'src', 'actions', 'admin-sop-list.ts')
+const ADMIN_SURFACE = path.join(ROOT, 'src', 'components', 'sop', 'AdminSopSurface.tsx')
+const ATTENTION_LENS = path.join(ROOT, 'src', 'components', 'sop', 'lenses', 'AdminAttentionLens.tsx')
+const FLAG_DISPLAY = path.join(ROOT, 'src', 'lib', 'governance', 'flag-display.ts')
 const QUEUE_ROW = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceQueueRow.tsx')
 const CLASSIFY = path.join(ROOT, 'src', 'lib', 'governance', 'classify.ts')
 const READ_TAB = path.join(ROOT, 'src', 'components', 'sop', 'tabs', 'ReadTab.tsx')
@@ -47,28 +58,33 @@ function read(p: string): string {
 const GATE_PATTERN = /review_due_at\s*[<>]|owner_user_id\s*[=!]==?\s*null|if\s*\([^)]*(review_due_at|owner_user_id)/
 
 // ---------------------------------------------------------------------------
-// admin/sops/page.tsx — OWN-04/D28-08
+// listAdminSopRows / AdminSopSurface — OWN-04/D28-08 (repointed 2026-09-13)
 // ---------------------------------------------------------------------------
 
 test.describe('admin library — owner=me filter + owner/flag columns', () => {
-  const src = read(LIBRARY_PAGE)
-
-  test('handles ?owner=me with a real .eq owner_user_id filter', () => {
+  test('listAdminSopRows handles ?owner=me with a real .eq owner_user_id filter', () => {
+    const src = read(ADMIN_SOP_LIST)
     expect(src).toContain("params.owner === 'me'")
-    // 2026-07-13: user.id → userId (shared getSessionContext auth refactor)
-    expect(src).toContain("query.eq('owner_user_id', userId)")
+    expect(src).toContain("query.eq('owner_user_id', user.id)")
   })
 
-  test('selects owner_user_id and review_due_at columns', () => {
+  test('listAdminSopRows selects owner_user_id and review_due_at columns', () => {
+    const src = read(ADMIN_SOP_LIST)
     expect(src).toContain('owner_user_id')
     expect(src).toContain('review_due_at')
   })
 
-  test('renders an Owned by me chip linking to ?owner=me', () => {
-    expect(src).toContain('/admin/sops?owner=me')
+  test('AdminSopSurface renders an Owned by me toggle that writes ?owner=me via history state (no <Link> href)', () => {
+    // CLAUDE.md 2026-05-13: scope/filter changes are history.replaceState, not
+    // router.push/<Link> — navToUrl composes the URL, applyScope drives state.
+    const src = read(ADMIN_SURFACE)
+    expect(src).toContain('Owned by me')
+    expect(src).toContain("applyScope('admin-all', { ownerOnly: !nav.ownerOnly })")
+    expect(src).toContain("if (nav.ownerOnly) qp.set('owner', 'me')")
   })
 
   test('renders the owner label on each one-line row (UX-06)', () => {
+    const src = read(ADMIN_SOP_LIST)
     expect(src).toContain('ownerLabelById[sop.owner_user_id]')
   })
 })
@@ -90,32 +106,39 @@ test.describe('merged surface — wired confirm-current + queue-derived overdue 
     expect(src).toContain("flags.push('overdue')")
   })
 
-  test('library rows render the queue-derived flag chip', () => {
-    const src = read(LIBRARY_PAGE)
+  test('listAdminSopRows renders the queue-derived flag chip (rowFlag -> flagLabel on MillerSop)', () => {
+    const src = read(ADMIN_SOP_LIST)
     expect(src).toContain('FLAG_LABEL[flag]')
     expect(src).toContain('rowFlag[sop.id]')
   })
 })
 
 // ---------------------------------------------------------------------------
-// Header chips — GQ-04/D28-09 (was GovernanceWidget, deleted in 30-08)
+// Header/scope chips — GQ-04/D28-09 (was GovernanceWidget, deleted in 30-08;
+// repointed 2026-09-13 off the emptied admin/sops/page.tsx)
 // ---------------------------------------------------------------------------
 
-test.describe('/admin/sops header chips — counts + deep links', () => {
-  const src = read(LIBRARY_PAGE)
-
-  test('counts from listGovernanceQueue', () => {
+test.describe('admin scope counts — counts from listGovernanceQueue + deep links', () => {
+  test('listAdminSopRows counts from listGovernanceQueue', () => {
+    const src = read(ADMIN_SOP_LIST)
     expect(src).toContain("from '@/actions/governance'")
     expect(src).toContain('listGovernanceQueue()')
+  })
+
+  test('AdminSopSurface resolves ?view=attention as its own scope, deep-linked via navToUrl', () => {
+    const src = read(ADMIN_SURFACE)
+    expect(src).toContain("qp.set('view', 'attention')")
+    expect(src).toContain("scope: 'admin-attention'")
   })
 
   test('attention view groups every flag (header chips deleted, sketch 004)', () => {
     // 2026-07-30: per-flag chip deep-links replaced by the grouped queue —
     // every flag renders as its own always-visible section.
-    expect(src).toContain('/admin/sops?view=attention')
-    expect(src).toContain('attentionGroups.map')
+    const lensSrc = read(ATTENTION_LENS)
+    expect(lensSrc).toContain('attentionGroups.map')
+    const flagSrc = read(FLAG_DISPLAY)
     for (const flag of ['overdue', 'due_soon', 'unowned', 'stale_role', 'awaiting_approval']) {
-      expect(src).toContain(`${flag}:`)
+      expect(flagSrc).toContain(`${flag}:`)
     }
   })
 })
