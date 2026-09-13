@@ -105,6 +105,12 @@ test.describe('T-41-02 — admin lens components cannot leak into the worker imp
       '@/actions/governance',
       '@/actions/org-model',
       '@/actions/grants',
+      // Bundle-regression fix (deviation from 41-05): the three lens
+      // wrappers relocated to AdminSopSurface.tsx — page.tsx must not
+      // reference any of them directly any more either.
+      'AdminStatusLens',
+      'AdminAttentionLens',
+      'AdminAccessLens',
     ]
     const present = forbidden.filter((token) => src.includes(token))
     expect(present, `Forbidden admin imports found in sops/page.tsx: ${present.join(', ')}`).toEqual([])

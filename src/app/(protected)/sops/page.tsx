@@ -1,7 +1,6 @@
 'use client'
-import { useEffect, useState, useTransition } from 'react'
+import { useState, useTransition } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useSearchParams } from 'next/navigation'
 import {
   Search,
   ClipboardList,
@@ -19,9 +18,12 @@ import { selfAddSop, selfRemoveSop, requestRemoveAssignment, getUserSopAssignmen
 import { refresherDueDate, isRefresherDue as computeRefresherDue, isRefresherOverdue as computeRefresherOverdue } from '@/lib/competency/refresher'
 import { categoryLabel } from '@/lib/sop-categories'
 import { useIsAdmin } from '@/components/providers/RoleProvider'
-import type { AdminSopListResult } from '@/lib/sop-list/admin-rows'
 import dynamic from 'next/dynamic'
 import type { WorkerSop } from '@/components/sop/SopWorkerBrowser'
+import { MillerColumnHeader, MillerItem } from '@/components/sop/MillerPrimitives'
+import type { AdminRenderProps } from '@/components/sop/AdminSopSurface'
+import type { WorkerScope, SopNav } from '@/components/sop/sops-nav-types'
+import type { Department } from '@/types/sop'
 
 /**
  * SB-LINE-06: /sops/[sopId]'s chunk set transitively includes /sops/page's own
@@ -34,32 +36,33 @@ import type { WorkerSop } from '@/components/sop/SopWorkerBrowser'
  * DesktopWalkthrough and WalkthroughVoiceModal already get — and which the
  * gate's own isolation check exists to verify.
  *
- * Phase 41: the three admin lenses below get the identical treatment for the
- * identical reason — this file is now the SOLE permitted reference site for
- * them, and transitively for every admin-only list/queue/wiring component
- * and server action they wrap. A static import of any admin-only surface
- * anywhere in this file's top-level import graph is a bundle regression
- * blocked by tests/lint/no-static-admin-lens-import.spec.ts (deliberately not
- * naming those symbols here — the guard does a raw substring scan of this
- * file, so a comment mentioning them by name would itself trip it).
+ * Phase 41 bundle-regression fix: the admin scope model, deep-link
+ * resolution and Miller-row rendering that 41-05 originally added directly
+ * to this file are now behind their OWN dynamic boundary — the entire admin
+ * surface lives in one lazily-loaded module (AdminSopSurface, which in turn
+ * dynamic-imports the three lenses). A static import of that module, or of
+ * any admin-only list/queue/wiring component/action anywhere in this file's
+ * top-level import graph, is a bundle regression blocked by
+ * tests/lint/no-static-admin-lens-import.spec.ts (deliberately not naming
+ * those symbols here — the guard does a raw substring scan of this file, so
+ * a comment mentioning them by name would itself trip it).
  */
 const SopWorkerBrowser = dynamic(
   () => import('@/components/sop/SopWorkerBrowser').then((m) => m.SopWorkerBrowser),
   { ssr: false }
 )
-const AdminStatusLens = dynamic(
-  () => import('@/components/sop/lenses/AdminStatusLens').then((m) => m.AdminStatusLens),
+const AdminSopSurface = dynamic(
+  () => import('@/components/sop/AdminSopSurface').then((m) => m.AdminSopSurface),
   { ssr: false }
 )
-const AdminAttentionLens = dynamic(
-  () => import('@/components/sop/lenses/AdminAttentionLens').then((m) => m.AdminAttentionLens),
-  { ssr: false }
-)
-const AdminAccessLens = dynamic(
-  () => import('@/components/sop/lenses/AdminAccessLens').then((m) => m.AdminAccessLens),
-  { ssr: false }
-)
-import type { Department } from '@/types/sop'
+
+const EMPTY_ADMIN: AdminRenderProps = {
+  desktopRows: null,
+  mobileRows: null,
+  inFrameElement: null,
+  takeoverElement: null,
+  hideWorkerSummary: false,
+}
 
 function getRelativeTime(isoString: string): string {
   const diff = Date.now() - new Date(isoString).getTime()
@@ -83,7 +86,7 @@ function getRelativeTime(isoString: string): string {
  * look for it. They are scopes of the same list instead: the Miller's first
  * column already answers "which slice", so the tab bar was a duplicate of it.
  */
-export type WorkerScope = 'all' | 'refresher' | 'updated' | 'not-done' | 'library' | 'not-added'
+export type { WorkerScope }
 
 const WORKER_SCOPES: { key: WorkerScope; label: string; group: 'yours' | 'library' }[] = [
   { key: 'all', label: 'All yours', group: 'yours' },
@@ -103,132 +106,8 @@ const SCOPE_LABEL: Record<WorkerScope, string> = {
   'not-added': 'Not added yet',
 }
 
-/**
- * Phase 41 SUR-01/02: the admin lenses are additional SCOPES in the same
- * first Miller column, gated on useIsAdmin() — not a second tab strip, not a
- * separate route (D-02). "Still working" mirrors the stuck-pipeline
- * STATUS_TABS entry from the old /admin/sops page; it is hidden from the
- * rail when its count is zero, same as there.
- */
-export type AdminScope =
-  | 'admin-all'
-  | 'admin-draft'
-  | 'admin-published'
-  | 'admin-failed'
-  | 'admin-attention'
-  | 'admin-access'
-
-export type SopScope = WorkerScope | AdminScope
-
-const ADMIN_SCOPES: { key: AdminScope; label: string }[] = [
-  { key: 'admin-all', label: 'All SOPs' },
-  { key: 'admin-draft', label: 'Drafts' },
-  { key: 'admin-published', label: 'Published' },
-  { key: 'admin-failed', label: 'Still working' },
-  { key: 'admin-attention', label: 'Needs attention' },
-  { key: 'admin-access', label: 'Access' },
-]
-
-// Single map doubles as the isAdminStatusScope() membership test (`in`) and
-// the scope->status lookup navToUrl() needs — one literal object instead of
-// a separate array + Record (SB-LINE-06 byte budget: every object-literal
-// key/string here ships verbatim to the /sops/page chunk, unminified).
-const ADMIN_STATUS: Record<'admin-all' | 'admin-draft' | 'admin-published' | 'admin-failed', 'all' | 'draft' | 'published' | 'failed'> = {
-  'admin-all': 'all',
-  'admin-draft': 'draft',
-  'admin-published': 'published',
-  'admin-failed': 'failed',
-}
-function isAdminStatusScope(scope: SopScope): scope is keyof typeof ADMIN_STATUS {
-  return scope in ADMIN_STATUS
-}
-
-/** Scope-column count for one ADMIN_SCOPES entry — undefined while counts are unknown. */
-function adminScopeCount(key: AdminScope, counts: AdminSopListResult | null): number | undefined {
-  if (!counts) return undefined
-  if (key === 'admin-attention') return counts.flaggedCount
-  if (key === 'admin-access') return undefined
-  return counts.railCounts[ADMIN_STATUS[key]]
-}
-
-interface SopNav {
-  scope: SopScope
-  ownerOnly: boolean
-  departments?: string
-  collection?: string
-  sop?: string
-}
-
-/**
- * Resolves every legacy /admin/sops deep link onto a scope on this page,
- * mirroring the precedence in admin/sops/page.tsx:137-154. A non-admin never
- * sees an admin scope or an admin param, regardless of what a bookmarked URL
- * carries (T-41-05) — every admin param is dropped in the very first branch.
- */
-function resolveInitialScope(params: URLSearchParams, isAdmin: boolean): SopNav {
-  if (!isAdmin) return { scope: 'all', ownerOnly: false }
-
-  const view = params.get('view')
-  if (view === 'attention') return { scope: 'admin-attention', ownerOnly: false }
-  if (view === 'access') {
-    // SC-4 (RESEARCH Pitfall 5): departments/collection are inert under the
-    // access lens — dropped here entirely, not merely ignored downstream.
-    return { scope: 'admin-access', ownerOnly: false, sop: params.get('sop') ?? undefined }
-  }
-
-  const status = params.get('status')
-  if (status === 'draft' || status === 'published' || status === 'failed') {
-    return { scope: (`admin-${status}`) as AdminScope, ownerOnly: false }
-  }
-
-  if (params.get('owner') === 'me') return { scope: 'admin-all', ownerOnly: true }
-
-  const departments = params.get('departments')
-  const collection = params.get('collection')
-  if (departments || collection) {
-    return {
-      scope: 'admin-all',
-      ownerOnly: false,
-      departments: departments ?? undefined,
-      collection: collection ?? undefined,
-    }
-  }
-
-  return { scope: 'admin-all', ownerOnly: false }
-}
-
-/** Builds the /sops URL for a given nav state — the inverse of resolveInitialScope. */
-function navToUrl(nav: SopNav): string {
-  const qp = new URLSearchParams()
-  if (nav.scope === 'admin-attention') {
-    qp.set('view', 'attention')
-  } else if (nav.scope === 'admin-access') {
-    qp.set('view', 'access')
-    if (nav.sop) qp.set('sop', nav.sop)
-  } else if (isAdminStatusScope(nav.scope)) {
-    const status = ADMIN_STATUS[nav.scope]
-    if (status !== 'all') qp.set('status', status)
-    if (nav.ownerOnly) qp.set('owner', 'me')
-    if (nav.departments) qp.set('departments', nav.departments)
-    if (nav.collection) qp.set('collection', nav.collection)
-  }
-  const qs = qp.toString()
-  return qs ? `/sops?${qs}` : '/sops'
-}
-
-function navsEqual(a: SopNav, b: SopNav): boolean {
-  return (
-    a.scope === b.scope &&
-    a.ownerOnly === b.ownerOnly &&
-    a.departments === b.departments &&
-    a.collection === b.collection &&
-    a.sop === b.sop
-  )
-}
-
 export default function SopsPage() {
   const isAdmin = useIsAdmin()
-  const searchParams = useSearchParams()
 
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -239,45 +118,23 @@ export default function SopsPage() {
   const [allDepartments, setAllDepartments] = useState(false)
   const [deptSheetOpen, setDeptSheetOpen] = useState(false)
 
-  // Phase 41 SUR-01/02: nav folds the worker scope AND the admin scope (+ its
-  // filters) into one piece of state. Seeded once from the URL the client's
-  // own SSR pass already saw — RoleProvider's role and this page's
-  // searchParams are both server-resolved, so this is hydration-safe without
-  // ever reading window.location (CLAUDE.md 2026-06-08 hydration class).
-  const [nav, setNav] = useState<SopNav>(() =>
-    resolveInitialScope(new URLSearchParams(searchParams.toString()), isAdmin)
-  )
-  // Fed by AdminStatusLens's onResult (41-05 Task 2) so the scope column
-  // keeps showing counts after switching away to a worker scope, even though
-  // the lens itself unmounts.
-  const [adminCounts, setAdminCounts] = useState<AdminSopListResult | null>(null)
+  // Phase 41 SUR-01/02, bundle-regression fix: nav starts at the worker
+  // default, or 'admin-all' for admins (matching today's admin landing
+  // experience — they land on the library, not their own assigned list) —
+  // computed synchronously since isAdmin is already resolved server-side
+  // (CLAUDE.md 2026-06-08 hydration class). A specific admin deep link
+  // (?status=, ?view=, ?owner=me, ?departments=, ?collection=, ?sop=) is
+  // resolved by AdminSopSurface once its chunk loads and corrected via
+  // onNavChange — that resolution logic is admin-only and must not ship in
+  // the always-loaded worker bundle (SB-LINE-06 / D-08 / ROADMAP SC-5).
+  const [nav, setNav] = useState<SopNav>(() => ({
+    scope: isAdmin ? 'admin-all' : 'all',
+    ownerOnly: false,
+  }))
 
-  // Re-resolve when the query string changes from OUTSIDE this component
-  // (back/forward, a deep link arriving while already mounted) — never from
-  // our own history.replaceState writes below, since useSearchParams() only
-  // observes next/navigation's own push/replace, not raw window.history
-  // (CLAUDE.md 2026-05-13) — so this effect cannot loop against applyScope.
-  useEffect(() => {
-    const resolved = resolveInitialScope(new URLSearchParams(searchParams.toString()), isAdmin)
-    setNav((prev) => (navsEqual(prev, resolved) ? prev : resolved))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams.toString(), isAdmin])
-
-  function applyScope(
-    next: SopScope,
-    patch?: { ownerOnly?: boolean; departments?: string; collection?: string }
-  ) {
-    const nextNav: SopNav = {
-      scope: next,
-      ownerOnly: patch?.ownerOnly ?? false,
-      departments: patch?.departments,
-      collection: patch?.collection,
-      // Leaving the access scope drops the pinned ?sop= — it only means
-      // anything inside that lens.
-      sop: next === 'admin-access' ? nav.sop : undefined,
-    }
-    setNav(nextNav)
-    window.history.replaceState(null, '', navToUrl(nextNav))
+  function applyWorkerScope(next: WorkerScope) {
+    setNav({ scope: next, ownerOnly: false })
+    window.history.replaceState(null, '', '/sops')
   }
 
   const { syncing } = useSopSync()
@@ -369,10 +226,28 @@ export default function SopsPage() {
 
       {/* Desktop layout: the Miller frame, on the shared 5xl rail */}
       <div className="max-w-5xl mx-auto w-full px-4 py-5">
-        {nav.scope === 'admin-attention' ? (
-          <AdminAttentionLens onBack={() => applyScope('all')} />
-        ) : nav.scope === 'admin-access' ? (
-          <AdminAccessLens pinnedSopId={nav.sop} onBack={() => applyScope('all')} />
+        {isAdmin ? (
+          <AdminSopSurface nav={nav} onNavChange={setNav}>
+            {(admin) =>
+              admin.takeoverElement ?? (
+                <SopsSection
+                  assignedSops={assignedSops}
+                  isLoading={assignedLoading}
+                  lastSyncLabel={lastSyncLabel}
+                  activeDeptLabel={activeDeptLabel}
+                  onOpenDeptSheet={() => setDeptSheetOpen(true)}
+                  scope={nav.scope as WorkerScope}
+                  onScopeChange={applyWorkerScope}
+                  deptMatches={deptMatches}
+                  departments={departments}
+                  selectedDeptIds={selectedDeptIds}
+                  allDepartments={allDepartments}
+                  onDeptSelect={handleDeptSelect}
+                  admin={admin}
+                />
+              )
+            }
+          </AdminSopSurface>
         ) : (
           <SopsSection
             assignedSops={assignedSops}
@@ -380,18 +255,14 @@ export default function SopsPage() {
             lastSyncLabel={lastSyncLabel}
             activeDeptLabel={activeDeptLabel}
             onOpenDeptSheet={() => setDeptSheetOpen(true)}
-            scope={nav.scope}
-            onScopeChange={applyScope}
+            scope={nav.scope as WorkerScope}
+            onScopeChange={applyWorkerScope}
             deptMatches={deptMatches}
             departments={departments}
             selectedDeptIds={selectedDeptIds}
             allDepartments={allDepartments}
             onDeptSelect={handleDeptSelect}
-            isAdmin={isAdmin}
-            adminCounts={adminCounts}
-            onAdminResult={setAdminCounts}
-            nav={nav}
-            onApplyScope={applyScope}
+            admin={EMPTY_ADMIN}
           />
         )}
       </div>
@@ -426,21 +297,14 @@ interface SopsSectionProps {
   lastSyncLabel: string
   activeDeptLabel: string
   onOpenDeptSheet: () => void
-  scope: SopScope
-  onScopeChange: (s: SopScope) => void
+  scope: WorkerScope
+  onScopeChange: (s: WorkerScope) => void
   deptMatches: (sopId: string) => boolean
   departments: Department[]
   selectedDeptIds: string[]
   allDepartments: boolean
   onDeptSelect: (ids: string[], all: boolean) => void
-  isAdmin: boolean
-  adminCounts: AdminSopListResult | null
-  onAdminResult: (r: AdminSopListResult) => void
-  nav: SopNav
-  onApplyScope: (
-    next: SopScope,
-    patch?: { ownerOnly?: boolean; departments?: string; collection?: string }
-  ) => void
+  admin: AdminRenderProps
 }
 
 interface LibrarySop {
@@ -465,11 +329,7 @@ function SopsSection({
   selectedDeptIds,
   allDepartments,
   onDeptSelect,
-  isAdmin,
-  adminCounts,
-  onAdminResult,
-  nav,
-  onApplyScope,
+  admin,
 }: SopsSectionProps) {
   const queryClient = useQueryClient()
   const [pending, startTransition] = useTransition()
@@ -670,7 +530,7 @@ function SopsSection({
     return true
   }
 
-  const scoped = workerSops.filter((s) => inScope(s, scope as WorkerScope))
+  const scoped = workerSops.filter((s) => inScope(s, scope))
   const counts = Object.fromEntries(
     WORKER_SCOPES.map((sc) => [sc.key, workerSops.filter((s) => inScope(s, sc.key)).length])
   ) as Record<WorkerScope, number>
@@ -686,13 +546,9 @@ function SopsSection({
         lastSyncLabel,
       ].filter(Boolean).join(' · ')
 
-  const visibleAdminScopes = ADMIN_SCOPES.filter(
-    (sc) => sc.key !== 'admin-failed' || !adminCounts || adminCounts.railCounts.failed > 0
-  )
-
   return (
     <>
-      {!isAdminStatusScope(scope) && (
+      {!admin.hideWorkerSummary && (
         <p className="mb-3 text-[13px] text-[var(--ink-500)]">{summary}</p>
       )}
 
@@ -714,21 +570,7 @@ function SopsSection({
             <span className="mono ml-1 text-[11px] opacity-70">{counts[sc.key]}</span>
           </button>
         ))}
-        {isAdmin && visibleAdminScopes.map((sc) => (
-          <button
-            key={sc.key}
-            type="button"
-            onClick={() => onApplyScope(sc.key)}
-            className={`flex-shrink-0 min-h-11 rounded-xl border px-3 text-sm font-medium ${
-              nav.scope === sc.key
-                ? 'border-[var(--ink-900)] bg-[var(--ink-900)] text-white'
-                : 'border-[var(--ink-100)] bg-white text-[var(--ink-700)]'
-            }`}
-          >
-            {sc.label}
-            <span className="mono ml-1 text-[11px] opacity-70">{adminScopeCount(sc.key, adminCounts) ?? ''}</span>
-          </button>
-        ))}
+        {admin.mobileRows}
         <button
           type="button"
           onClick={onOpenDeptSheet}
@@ -792,39 +634,15 @@ function SopsSection({
           ))}
 
           {/* Phase 41 SUR-01/02: admin lenses are additional rows in this same
-              column, entitled roles only — never a second tab strip (D-02). */}
-          {isAdmin && (
-            <>
-              <MillerColumnHeader>Admin</MillerColumnHeader>
-              {visibleAdminScopes.map((sc) => (
-                <MillerItem
-                  key={sc.key}
-                  selected={nav.scope === sc.key}
-                  onClick={() => onApplyScope(sc.key)}
-                  count={adminScopeCount(sc.key, adminCounts)}
-                >
-                  {sc.label}
-                </MillerItem>
-              ))}
-              <MillerItem
-                selected={nav.ownerOnly}
-                onClick={() => onApplyScope('admin-all', { ownerOnly: !nav.ownerOnly })}
-              >
-                Owned by me
-              </MillerItem>
-            </>
-          )}
+              column, entitled roles only (D-02) — rendered by the lazy
+              AdminSopSurface module via the `admin` slot prop so this file
+              never needs to know the admin scope shape (bundle-regression
+              fix; see AdminSopSurface.tsx). */}
+          {admin.desktopRows}
         </nav>
 
-        {isAdminStatusScope(scope) ? (
-          <AdminStatusLens
-            status={ADMIN_STATUS[scope]}
-            ownerOnly={nav.ownerOnly}
-            departments={nav.departments}
-            collection={nav.collection}
-            onResult={onAdminResult}
-            onClearFilter={() => onApplyScope('admin-all')}
-          />
+        {admin.inFrameElement ? (
+          admin.inFrameElement
         ) : loading ? (
           <div className="flex flex-col gap-2 p-3 lg:col-span-2">
             {[...Array(4)].map((_, i) => (
@@ -844,7 +662,7 @@ function SopsSection({
         ) : (
           <SopWorkerBrowser
             sops={scoped}
-            scopeLabel={SCOPE_LABEL[scope as WorkerScope]}
+            scopeLabel={SCOPE_LABEL[scope]}
             onRemove={handleRemove}
             onAdd={handleAdd}
             actionPending={pending}
@@ -852,61 +670,5 @@ function SopsSection({
         )}
       </div>
     </>
-  )
-}
-
-/* ─── Miller column primitives (sketch 005 variant C) ────────────────────── */
-
-/** Sticky column header: mono, 10px, uppercase, on the recessed paper tone. */
-function MillerColumnHeader({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="mono sticky top-0 z-10 border-b border-[var(--ink-200)] bg-[var(--paper-2)] px-3 py-2 text-[10px] uppercase tracking-[0.08em] text-[var(--ink-500)]">
-      {children}
-    </h2>
-  )
-}
-
-/**
- * A flush row in a Miller column: hairline-separated, never a floating card.
- * Selection is a solid ink fill, which is what lets three columns of these read
- * as one surface instead of three stacks of chips.
- */
-function MillerItem({
-  children,
-  selected,
-  onClick,
-  count,
-  dot,
-  ...rest
-}: {
-  children: React.ReactNode
-  selected: boolean
-  onClick: () => void
-  count?: number
-  dot?: string
-} & React.ComponentProps<'button'>) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex w-full items-center gap-2 border-b border-[var(--ink-100)] px-3 py-2 text-left text-[12.5px] transition-colors ${
-        selected ? 'bg-[var(--ink-900)] font-semibold text-white' : 'text-[var(--ink-700)] hover:bg-[var(--paper-2)]'
-      }`}
-      {...rest}
-    >
-      {dot && (
-        <span
-          aria-hidden="true"
-          className="h-2 w-2 flex-shrink-0 rounded-full"
-          style={{ background: dot }}
-        />
-      )}
-      <span className="min-w-0 flex-1 truncate">{children}</span>
-      {count !== undefined && (
-        <span className={`mono flex-shrink-0 text-[10.5px] ${selected ? 'text-white/70' : 'text-[var(--ink-400)]'}`}>
-          {count}
-        </span>
-      )}
-    </button>
   )
 }
