@@ -597,7 +597,7 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 41-07-PLAN.md — Wave 5: internal href sweep, roles map, UAT hub, live count-pinned reference sweep
+- [x] 41-07-PLAN.md — Wave 5: internal href sweep, roles map, UAT hub, live count-pinned reference sweep
 - [ ] 41-08-PLAN.md — Wave 5: repoint the nine legacy source-contract specs to the code's new homes; full suite green
 
 **Wave 6** *(blocked on Wave 5 completion)*
@@ -722,7 +722,7 @@ Plans:
   1. The matrix document exists in-repo, covers every role × every capability surfaced in the app, and is referenced from CLAUDE.md/planning docs as the authority
   2. A user with sign-off authority on a SOP can edit that SOP; one without cannot — enforced server-side, with positive and negative probes per role (per the 2026-07-20 RLS-probe learning)
 
-**Plans:** 5/9 plans executed
+**Plans:** 7/9 plans executed
 Plans:
 **Wave 1**
 

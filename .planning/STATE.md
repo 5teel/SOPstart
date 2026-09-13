@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v8.0
 milestone_name: — Authoring Convergence
 status: executing
-stopped_at: Completed 41-06-PLAN.md
-last_updated: "2026-09-13T02:20:00.000Z"
-last_activity: 2026-09-13 -- Phase 41 Plan 06 executed (redirect shim, nav, role-home)
+stopped_at: Completed 41-07-PLAN.md
+last_updated: "2026-09-13T03:01:29.539Z"
+last_activity: "2026-09-13 -- Phase 41 Plan 06 executed: /admin/sops is now a redirect"
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 23
-  completed_plans: 20
+  completed_plans: 21
   percent: 25
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 41 (One SOP Surface) — EXECUTING
-Plan: 7 of 9
+Plan: 8 of 9
 Next: 41-07 (reference sweep) — repoint remaining internal /admin/sops links straight to /sops
 Status: Ready to execute
 three 40-VERIFICATION gaps closed. Outstanding formal gate: /gsd-secure-phase 40
@@ -256,6 +256,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 41 P04 | 35min | 3 tasks | 3 files |
 | Phase 41 P05 | 130min | 3 tasks | 4 files |
 | Phase 41 P06 | 55min | 3 tasks | 10 files |
+| Phase 41 P07 | 38min | 3 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -523,6 +524,9 @@ Recent decisions affecting current work:
 - [Phase 41-06]: /admin/sops is now a guard-first redirect() shim to /sops (seven pass-through params via URLSearchParams over a fixed path); /admin/governance retargets to /sops?view=attention (one hop instead of two); TopHeader ADMIN_LINKS drops "Manage SOPs" for "Governance" (/sops?view=attention); roleHome('admin') = /sops
 - [Phase 41-06]: governance-fold.spec.ts's scope-column reachability assertion targets AdminSopSurface.tsx's applyScope()/ADMIN_SCOPES (client state machine), not hrefs — 41-05's bundle-fix restructure replaced anchor-based scope links with history.replaceState clicks before this plan ran
 - [Phase 41-06]: 8 legacy specs (tests/phase28/*, phase29/queue-approve-action, phase30/list-rows, phase32/*, phase33/sop-drilldown, sb-auth-builder) are red by design — they read the deleted admin/sops/page.tsx content; 41-08 repoints them
+- [Phase ?]: Repointed 6 additional in-app /admin/sops sites the plan's Task 1 file list omitted, using the plan's own acceptance grep as the ground truth
+- [Phase ?]: roles.ts ACCESS_MATRIX Manage SOPs row replaced with an annotated SOP list — admin lenses row on the same /sops route (deliberate duplicate documented); Block library renamed to Content to match TopHeader's rename
+- [Phase ?]: Reference-sweep guard flipped live: comment-stripped, count-pinned, mutation-proven in 3 directions (stray ref re-added, sub-route deleted, Library label added)
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -668,8 +672,8 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-09-13T02:20:00.000Z
-Stopped at: Completed 41-06-PLAN.md
+Last session: 2026-09-13T03:01:29.519Z
+Stopped at: Completed 41-07-PLAN.md
 /admin/sops is now a redirect shim to /sops; TopHeader/roleHome/journeys.ts
 repointed; Phase 30/41 nav guards updated. Next: 41-07 (reference sweep —
 repoint remaining internal /admin/sops links straight to /sops) then 41-08
