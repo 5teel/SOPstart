@@ -5,7 +5,8 @@
  *   - `roleHome(role)` lives in src/lib/auth/role-home.ts (NEVER exported from
  *     src/actions/* — 'use server' sync-export trap, CLAUDE.md 2026-06-27):
  *       worker → /sops · supervisor → /activity · safety_manager → /activity ·
- *       admin → /admin/sops · absent/unknown role → /pending (safe default A1).
+ *       admin → /sops (Phase 41 SUR-01 — one shared SOP route) · absent/unknown
+ *       role → /pending (safe default A1).
  *   - middleware.ts + actions/auth.ts redirect through roleHome (JWT claim
  *     `user_role` via shared parseJwtPayload — never raw atob, 2026-06-26).
  *   - /dashboard survives ONLY as a redirect shim (role → home); the
@@ -29,7 +30,7 @@ function read(p: string): string {
 }
 
 test.describe('UX-01 — one home per role', () => {
-  test('roleHome maps worker→/sops, supervisor/safety_manager→/activity, admin→/admin/sops, unknown→/pending', () => {
+  test('roleHome maps worker→/sops, supervisor/safety_manager→/activity, admin→/sops, unknown→/pending', () => {
     const src = read(ROLE_HOME)
     // all 5 cases of the mapping present in the ONE decision function
     expect(src).toContain("case 'worker'")
@@ -38,7 +39,7 @@ test.describe('UX-01 — one home per role', () => {
     expect(src).toContain("case 'admin'")
     expect(src).toContain("'/sops'")
     expect(src).toContain("'/activity'")
-    expect(src).toContain("'/admin/sops'")
+    expect(src).not.toContain("'/admin/sops'")
     expect(src).toContain("'/pending'")
     // NOT a 'use server' file (sync export would break next build)
     expect(src).not.toContain("'use server'")

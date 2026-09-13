@@ -30,12 +30,19 @@ const SETTINGS_PAGE = path.join(
 const TOP_HEADER = path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx')
 
 // 30-08: admin/governance became a redirect shim (no UI, no nav) — it keeps
-// its guard but no longer mounts AdminNav.
+// its guard but no longer mounts AdminNav. 41-06: admin/sops became a
+// redirect shim too, same shape — ADMIN_PAGES[0] is now that shim.
 const ADMIN_PAGES = ['sops', 'blocks', 'team', 'departments'].map(
   (dir) => path.join(ROOT, 'src', 'app', '(protected)', 'admin', dir, 'page.tsx'),
 )
 const GOVERNANCE_SHIM = path.join(
   ROOT, 'src', 'app', '(protected)', 'admin', 'governance', 'page.tsx',
+)
+const SOPS_PAGE = path.join(
+  ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx',
+)
+const ADMIN_SOP_SURFACE = path.join(
+  ROOT, 'src', 'components', 'sop', 'AdminSopSurface.tsx',
 )
 
 function read(p: string): string {
@@ -49,11 +56,14 @@ test.describe('UX-02 — one shared admin nav', () => {
   test('AdminNav component is deleted; header carries the admin links', () => {
     expect(fs.existsSync(ADMIN_NAV)).toBe(false)
     const header = read(TOP_HEADER)
-    for (const item of ['Manage SOPs', 'Create New SOP', 'Content', 'Team', 'Settings']) {
+    for (const item of ['Governance', 'Create New SOP', 'Content', 'Team', 'Settings']) {
       expect(header).toContain(item)
     }
+    // SUR-03: "Manage SOPs" must never come back as a second SOPs nav entry
+    // (comments referencing the old name for context are fine).
+    expect(header).not.toContain("label: 'Manage SOPs'")
     for (const href of [
-      "'/admin/sops'",
+      "'/sops?view=attention'",
       "'/admin/sops/new'",
       "'/admin/blocks'",
       "'/admin/team'",
@@ -61,9 +71,11 @@ test.describe('UX-02 — one shared admin nav', () => {
     ]) {
       expect(header).toContain(href)
     }
-    // The attention view stays reachable from the /admin/sops rail.
-    const sopsPage = read(ADMIN_PAGES[0])
-    expect(sopsPage).toContain('/admin/sops?view=attention')
+    // The attention view stays reachable — resolved on the merged /sops
+    // surface (41-06: /admin/sops is now a redirect shim, not a destination).
+    const surface = read(ADMIN_SOP_SURFACE)
+    expect(surface).toContain("view === 'attention'")
+    expect(surface).toContain("scope: 'admin-attention'")
   })
 
   test('no admin page mounts AdminNav or an inline "Admin sections" sub-nav; guards survive', () => {
@@ -79,6 +91,9 @@ test.describe('UX-02 — one shared admin nav', () => {
     expect(shim).toContain("['admin', 'safety_manager']")
     expect(shim).not.toContain('aria-label="Admin sections"')
     expect(shim).not.toContain('<AdminNav')
+    // The /admin/sops shim (41-06) renders no UI either.
+    const adminSopsShim = read(ADMIN_PAGES[0])
+    expect(adminSopsShim).not.toContain('<div')
   })
 
   test('/admin/settings exists, keeps the admin guard, and homes AI Settings + Departments + agent layer', () => {

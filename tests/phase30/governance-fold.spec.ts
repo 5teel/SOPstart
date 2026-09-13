@@ -1,16 +1,18 @@
 /**
- * UX-03 — One governance surface (flipped live in 30-08).
+ * UX-03 — One governance surface (flipped live in 30-08; repointed in 41-06
+ * when /admin/sops became a redirect shim and the fold moved onto /sops).
  *
  * Contract (30-RESEARCH § Test Map + orchestrator decisions #1/#4):
- *   - Governance folds into /admin/sops?view=attention ("Needs attention"
- *     view) rendering the EXISTING GovernanceQueueRow + GovernanceFilterChips
- *     (moved VERBATIM — reuse, not rewrite, preserves the HARD constraint).
+ *   - Governance folds into /sops?view=attention ("Needs attention" scope)
+ *     rendering the EXISTING GovernanceQueueRow (moved VERBATIM — reuse,
+ *     not rewrite, preserves the HARD constraint). As of 41-05/41-06 this
+ *     lives in AdminAttentionLens.tsx, mounted from AdminSopSurface.tsx.
  *   - /admin/governance is a redirect() shim mapping legacy ?filter=X
- *     deep-links onto the new view's filter param (GQ-04 preserved), with the
- *     admin guard IN FRONT of the redirect.
+ *     deep-links onto /sops?view=attention's filter param (GQ-04
+ *     preserved), with the admin guard IN FRONT of the redirect.
  *   - APR-03/APR-04 preserved: approveStep( wired in GovernanceQueueRow AND
  *     builder PublishStage; awaiting-approval count + deep-link live on
- *     /admin/sops header chips (server-rendered — Pitfall 10).
+ *     the attention lens (server-rendered — Pitfall 10).
  *   - GovernanceWidget + LibraryReviewCell removed as separate surfaces.
  *   - The old STATUS_TABS "Needs attention" (value=failed) renamed to
  *     "Parse issues" (decision #4 — no naming collision).
@@ -23,11 +25,17 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const ROOT = process.cwd()
-const ADMIN_SOPS_PAGE = path.join(
-  ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'page.tsx',
+const ADMIN_SOP_SURFACE = path.join(
+  ROOT, 'src', 'components', 'sop', 'AdminSopSurface.tsx',
+)
+const ATTENTION_LENS = path.join(
+  ROOT, 'src', 'components', 'sop', 'lenses', 'AdminAttentionLens.tsx',
 )
 const QUEUE_ROW = path.join(
   ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceQueueRow.tsx',
+)
+const FLAG_DISPLAY = path.join(
+  ROOT, 'src', 'lib', 'governance', 'flag-display.ts',
 )
 const PUBLISH_STAGE = path.join(
   ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'PublishStage.tsx',
@@ -41,22 +49,24 @@ function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
 }
 
-test.describe('UX-03 — governance folds into /admin/sops', () => {
-  test('/admin/sops renders the needs-attention view (QueueRow + FilterChips) behind ?view=attention', () => {
-    const src = read(ADMIN_SOPS_PAGE)
-    expect(src).toContain("params.view === 'attention'")
-    expect(src).toContain('<GovernanceQueueRow')
-    // 2026-07-30 (sketch 004): the chip row is gone — the attention view is
-    // a grouped worst-first queue instead (every flag always visible).
-    expect(src).not.toContain('<GovernanceFilterChips')
-    expect(src).toContain('attentionGroups.map')
-    expect(src).toContain('listGovernanceQueue')
+test.describe('UX-03 — governance folds into /sops', () => {
+  test('/sops renders the needs-attention view (QueueRow, grouped worst-first) behind ?view=attention', () => {
+    // Deep-link resolution: view=attention -> admin-attention scope.
+    const surface = read(ADMIN_SOP_SURFACE)
+    expect(surface).toContain("view === 'attention'")
+    expect(surface).toContain("scope: 'admin-attention'")
+    expect(surface).toContain('<AdminAttentionLens')
+    // The lens itself renders the grouped queue, unmodified GovernanceQueueRow.
+    const lens = read(ATTENTION_LENS)
+    expect(lens).toContain('<GovernanceQueueRow')
+    expect(lens).toContain('attentionGroups.map')
+    expect(lens).toContain('listGovernanceQueue')
   })
 
   test('/admin/governance is a redirect shim mapping legacy ?filter= deep-links, guard first', () => {
     const src = read(GOVERNANCE_SHIM)
     expect(src).toContain('redirect(')
-    expect(src).toContain('view=attention')
+    expect(src).toContain('/sops?view=attention')
     expect(src).toContain('view=attention&filter=${filter}')
     // Guard stays in front of the redirect (T-30-08-03).
     // 2026-07-13: member.role → role (shared getSessionContext auth refactor)
@@ -76,11 +86,15 @@ test.describe('UX-03 — governance folds into /admin/sops', () => {
     expect(read(PUBLISH_STAGE)).toContain('approveStep')
   })
 
-  test('awaiting-approval survives as an always-visible attention group (header chips deleted, sketch 004)', () => {
-    const src = read(ADMIN_SOPS_PAGE)
-    expect(src).toContain("'overdue', 'due_soon', 'awaiting_approval', 'unowned', 'stale_role'")
-    expect(src).toContain("awaiting_approval: 'Awaiting approval'")
-    expect(src).toContain('attentionGroups.map')
+  test('awaiting-approval survives as an always-visible attention group', () => {
+    // Priority ordering lives in the shared flag-display.ts (41-04); the
+    // lens imports it rather than redefining it.
+    expect(read(FLAG_DISPLAY)).toContain(
+      "'overdue', 'due_soon', 'awaiting_approval', 'unowned', 'stale_role'",
+    )
+    const lens = read(ATTENTION_LENS)
+    expect(lens).toContain('FLAG_PRIORITY')
+    expect(lens).toContain('attentionGroups.map')
   })
 
   test('GovernanceWidget and LibraryReviewCell no longer exist as separate surfaces', () => {
@@ -96,22 +110,16 @@ test.describe('UX-03 — governance folds into /admin/sops', () => {
   })
 
   test('in-flight SOPs and the attention view are both reachable from the scope column (sketch 005 variant C)', () => {
-    const src = read(ADMIN_SOPS_PAGE)
-    // 2026-08-04: the tab rail became a scope column (Miller columns). The
-    // invariant UX-03 actually protects is REACHABILITY, not which control
-    // shape carries it — so assert the destinations, not the rail.
-    //
-    // 'failed' status is now a first-class scope ("Still working") rather than
-    // a Filter-menu entry, rendered only when the count is non-zero.
-    expect(src).toContain("{ label: 'Still working', value: 'failed' }")
-    expect(src).toMatch(/status=\$\{t\.value\}|status=failed/)
-    // The governance queue keeps its own view and its own entry.
-    expect(src).toContain('Needs attention')
-    expect(src).toContain('href="/admin/sops?view=attention"')
-    // …and the access map did not get lost in the rework.
-    expect(src).toContain('href="/admin/sops?view=access"')
-    // Both full-width sub-surfaces must offer a way back now the rail is gone.
-    expect(src).toContain('Back to the SOP library')
+    // Phase 41: the tab rail / Miller scope column moved into
+    // AdminSopSurface.tsx as ADMIN_SCOPES, each an in-frame applyScope()
+    // click (history.replaceState), not a navigable href.
+    const surface = read(ADMIN_SOP_SURFACE)
+    expect(surface).toContain("{ key: 'admin-failed', label: 'Still working' }")
+    expect(surface).toContain("{ key: 'admin-attention', label: 'Needs attention' }")
+    expect(surface).toContain("{ key: 'admin-access', label: 'Access' }")
+    expect(surface).toContain("applyScope(sc.key)")
+    // Both full-width takeover lenses offer a way back to the worker scope.
+    expect(surface).toContain('Back to your SOPs')
   })
 })
 
