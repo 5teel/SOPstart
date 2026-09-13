@@ -86,7 +86,7 @@ export const ROLES: RoleDef[] = [
     landsOn: { label: 'Activity', route: '/activity' },
     can: [
       'Everything a Supervisor can do',
-      'Full admin authoring: create / upload / parse SOPs, manage the block library',
+      'Full admin authoring: create / upload / parse SOPs, manage the content library',
       'Manage team & roles, manage departments + owners, assign SOPs',
     ],
     cannot: ['Cross-org / platform curation (that is the Potenco platform admin)'],
@@ -100,7 +100,7 @@ export const ROLES: RoleDef[] = [
     landsOn: { label: 'SOP list', route: '/sops' },
     can: [
       'Create / upload / AI-parse SOPs and run them to publish',
-      'Manage the block library (department tagging)',
+      'Manage the content library (department tagging)',
       'Manage team, roles & invites; manage departments + owners',
       'Assign SOPs by role / department',
     ],
@@ -115,7 +115,7 @@ export const ROLES: RoleDef[] = [
     who: 'Potenco super-admin operating across organisations (not an org member role).',
     can: [
       'Cross-org operations gated by the is_platform_admin() RLS check',
-      'Historically curated the shared global block library',
+      'Historically curated the shared global content library',
     ],
     cannot: [
       'Most cross-org curation surfaces were retired in Phase 25 (single-org + departments model)',
@@ -128,9 +128,9 @@ export const ROLES: RoleDef[] = [
     label: 'Department',
     kind: 'overlay',
     colour: '#0891b2',
-    who: 'An org unit (Forming, Quality, Maintenance…) that organises SOPs, blocks & people.',
+    who: 'An org unit (Forming, Quality, Maintenance…) that organises SOPs, content & people.',
     gates: 'Worker SOP visibility (RLS, additive-OR with assignment + sub-trade). Organises the library & team.',
-    can: ['A SOP / block / member can belong to many departments, or be org-wide ("All departments")'],
+    can: ['A SOP / content item / member can belong to many departments, or be org-wide ("All departments")'],
   },
   {
     key: 'department_owner',

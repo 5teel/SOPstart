@@ -135,7 +135,7 @@ export function InserterMenu({
           </button>
         )}
         <span className="font-mono text-[11px] font-semibold uppercase tracking-wider">
-          {page === 'all' ? 'All block types' : 'Add a block'}
+          {page === 'all' ? 'All content types' : 'Add content'}
         </span>
       </div>
 
@@ -146,7 +146,7 @@ export function InserterMenu({
           data-inserter-search
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={page === 'all' ? 'Filter blocks…' : 'Type to filter…'}
+          placeholder={page === 'all' ? 'Filter content…' : 'Type to filter…'}
           className="w-full rounded border border-[var(--ink-300,#d4d4d8)] px-2 py-1 text-[13px] outline-none focus:border-[var(--accent-step,#3b82f6)]"
         />
       </div>

@@ -39,7 +39,7 @@ const SECTIONS = [
     eyebrow: 'ORGANISATION',
     title: 'Departments',
     description:
-      'Define departments once — SOPs, blocks and people all reference them.',
+      'Define departments once — SOPs, content and people all reference them.',
   },
   {
     href: '/admin/agent',

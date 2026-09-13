@@ -407,12 +407,12 @@ export const JOURNEYS: Journey[] = [
     group: 'Refine & publish',
     persona: 'SOP Admin',
     title: 'Review, verify & publish in the builder',
-    summary: 'The core editing flow: shape the content, check it against the source with AI help, verify every safety block, then publish. Create-from-scratch, AI-convert and edit-draft all converge on this one bespoke builder surface (Phase 26 D-01: Puck removed — inline block editing, no separate field popovers).',
+    summary: 'The core editing flow: shape the content, check it against the source with AI help, verify every safety step, then publish. Create-from-scratch, AI-convert and edit-draft all converge on this one bespoke builder surface (Phase 26 D-01: Puck removed — inline content editing, no separate field popovers).',
     steps: [
       { id: 's', type: 'start', label: 'Have a draft' },
-      { id: 'build', type: 'screen', label: 'Build stage', route: '/admin/sops/builder/[sopId]', detail: 'Bespoke editor: step-centric rail; the admin edits the SAME block components the worker reads, in place (edit==worker parity, R2). Add/edit/reorder/duplicate blocks inline; every field reachable (P14, 0 unreachable). Image blocks open a Konva annotation layer (arrows/boxes/text, palm-reject) that bakes to a flat PNG on publish. A light Wayfinder header (Phase 33 SC-6) tops every stage: back-to-library / you\'re-editing / next-stage zones, with a single "Tools for this SOP" menu (assign, versions, video, QR, flow diagram, delete draft).' },
-      { id: 'review', type: 'action', label: 'Review stage', detail: 'Source viewer side-by-side; AI reviewer flags omissions/anchoring; per-block verify checklist. The Wayfinder header\'s forward chip states the lock reason inline ("Locked — N steps below still need checking").' },
-      { id: 'verify', type: 'decision', label: 'Every block verified?', branches: [
+      { id: 'build', type: 'screen', label: 'Build stage', route: '/admin/sops/builder/[sopId]', detail: 'Bespoke editor: step-centric rail; the admin edits the SAME content components the worker reads, in place (edit==worker parity, R2). Add/edit/reorder/duplicate steps inline; every field reachable (P14, 0 unreachable). Image content opens a Konva annotation layer (arrows/boxes/text, palm-reject) that bakes to a flat PNG on publish. A light Wayfinder header (Phase 33 SC-6) tops every stage: back-to-library / you\'re-editing / next-stage zones, with a single "Tools for this SOP" menu (assign, versions, video, QR, flow diagram, delete draft).' },
+      { id: 'review', type: 'action', label: 'Review stage', detail: 'Source viewer side-by-side; AI reviewer flags omissions/anchoring; per-step verify checklist. The Wayfinder header\'s forward chip states the lock reason inline ("Locked — N steps below still need checking").' },
+      { id: 'verify', type: 'decision', label: 'Every step verified?', branches: [
         { label: 'Yes', to: 'pubstage' },
         { label: 'No — gate blocks publish', to: 'review' },
       ] },
@@ -493,10 +493,10 @@ export const JOURNEYS: Journey[] = [
     group: 'Refine & publish',
     persona: 'SOP Admin',
     title: 'Inspect the machine layer & review proposals',
-    summary: 'An admin peeks behind the human-facing SOP at what the AI agent has synthesised — a read-only per-SOP/per-block metadata panel in the builder — then reviews and decides on the evidence-backed proposals it has raised across the whole org.',
+    summary: 'An admin peeks behind the human-facing SOP at what the AI agent has synthesised — a read-only per-SOP/per-step metadata panel in the builder — then reviews and decides on the evidence-backed proposals it has raised across the whole org.',
     steps: [
       { id: 's', type: 'start', label: 'Curious what the agent has synthesised' },
-      { id: 'build', type: 'screen', label: 'Builder', route: '/admin/sops/builder/[sopId]', detail: 'Toggle "⚇ Agent layer" reveals a read-only purple panel: summary, tags, entities, embedding status, links, plus per-block metadata rows keyed by junction id.' },
+      { id: 'build', type: 'screen', label: 'Builder', route: '/admin/sops/builder/[sopId]', detail: 'Toggle "⚇ Agent layer" reveals a read-only purple panel: summary, tags, entities, embedding status, links, plus per-step metadata rows keyed by junction id.' },
       { id: 'toggle', type: 'action', label: 'Toggle ⚇ Agent layer', detail: 'Strictly read-only — nothing here is hand-editable, it regenerates on publish (D-10).' },
       { id: 'dash', type: 'screen', label: 'Org agent dashboard', route: '/admin/agent', detail: 'Evidence-backed proposals queue (primary) + recent memory/metadata-refresh activity feed (secondary). No cross-SOP graph viz this phase (D-11/D-13).' },
       { id: 'decide', type: 'decision', label: 'Act on a proposal?', branches: [
@@ -512,13 +512,13 @@ export const JOURNEYS: Journey[] = [
     id: 'reusable-blocks',
     group: 'Library & team',
     persona: 'SOP Admin',
-    title: 'Manage reusable blocks',
-    summary: 'Admins keep a library of reusable safety blocks; when a block changes, SOPs using it flag the update for review.',
+    title: 'Manage reusable content',
+    summary: 'Admins keep a library of reusable safety content; when an item changes, SOPs using it flag the update for review.',
     steps: [
       { id: 's', type: 'start', label: 'Standardise a hazard / PPE / step' },
       { id: 'blocks', type: 'screen', label: 'Content Library', route: '/admin/blocks' },
-      { id: 'edit', type: 'screen', label: 'Edit a block', route: '/admin/blocks/[blockId]' },
-      { id: 'update', type: 'action', label: 'Block updated', detail: 'SOPs using it show an “update available” badge.' },
+      { id: 'edit', type: 'screen', label: 'Edit content', route: '/admin/blocks/[blockId]' },
+      { id: 'update', type: 'action', label: 'Content updated', detail: 'SOPs using it show an “update available” badge.' },
       { id: 'review', type: 'decision', label: 'Per SOP', branches: [
         { label: 'Accept update', to: 'e' },
         { label: 'Decline (keep snapshot)', to: 'e' },
@@ -586,7 +586,7 @@ export const JOURNEYS: Journey[] = [
     group: 'Library & team',
     persona: 'SOP Admin',
     title: 'Manage departments',
-    summary: 'An admin creates departments, assigns owners, and uses them to organise SOPs, blocks, and team members.',
+    summary: 'An admin creates departments, assigns owners, and uses them to organise SOPs, content, and team members.',
     steps: [
       { id: 's', type: 'start', label: 'Need to organise by department' },
       { id: 'depts', type: 'screen', label: 'Departments', route: '/admin/departments' },

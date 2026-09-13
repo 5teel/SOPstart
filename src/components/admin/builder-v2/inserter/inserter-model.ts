@@ -33,7 +33,7 @@ export const SMART: Partial<Record<BlockType, { type: BlockType; why: string }>>
   StepBlock: { type: 'MeasurementBlock', why: 'capture a value' },
 }
 
-/** TIER 2 — the full catalog, grouped (the "More block types" page). */
+/** TIER 2 — the full catalog, grouped (the "More content types" page). */
 export const GROUPS: [string, BlockType[]][] = [
   ['Actions & flow', ['StepBlock', 'StepWithPhotosBlock', 'DecisionBlock']],
   ['Safety', ['HazardCardBlock', 'PPECardBlock', 'EscalateBlock', 'ZoneBlock']],
@@ -72,8 +72,8 @@ export function homeRows(
   for (const t of LANE[ctx] ?? LANE.steps) {
     rows.push({ kind: 'insert', type: t, label: humanizeBlockType(t) })
   }
-  rows.push({ kind: 'nav', page: 'all', label: 'More block types' })
-  if (opts.hasReuse) rows.push({ kind: 'nav', page: 'reuse', label: 'Reuse a block or snippet' })
+  rows.push({ kind: 'nav', page: 'all', label: 'More content types' })
+  if (opts.hasReuse) rows.push({ kind: 'nav', page: 'reuse', label: 'Reuse content or a snippet' })
   if (opts.hasAI) rows.push({ kind: 'nav', page: 'ai', label: 'Describe with AI' })
   return rows
 }

@@ -178,7 +178,7 @@ function seedRoot(layoutData: unknown): Record<string, unknown> {
 }
 
 /**
- * A ＋ insert affordance. `big` = the section-end "Add step or block" bar; the
+ * A ＋ insert affordance. `big` = the section-end "Add step or content" bar; the
  * hairline variant sits between blocks and reveals a dashed pill on hover
  * (UI-SPEC `.adddiv` / `.addbig`). When active, anchors the InserterMenu below.
  */
@@ -200,7 +200,7 @@ function InsertDivider({
           type="button"
           data-add-divider
           data-add-big
-          aria-label="Add step or block"
+          aria-label="Add step or content"
           onClick={onOpen}
           className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-[var(--ink-300,#d4d4d8)] py-3 font-mono text-[12px] uppercase tracking-wider text-[var(--ink-500,#71717a)] hover:border-[var(--accent-step,#3b82f6)] hover:text-[var(--accent-step,#3b82f6)]"
         >
@@ -210,7 +210,7 @@ function InsertDivider({
         <button
           type="button"
           data-add-divider
-          aria-label="Insert block"
+          aria-label="Insert content"
           onClick={onOpen}
           className="group relative -my-1 flex w-full items-center justify-center py-1"
         >

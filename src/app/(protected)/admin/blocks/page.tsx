@@ -193,8 +193,8 @@ export default async function BlocksLibraryPage({
         }}
       >
         {activeDept
-          ? `${activeDept.name} blocks, plus org-wide blocks. A block tagged to several departments shows up under each.`
-          : 'Every block in the organisation. Org-wide blocks appear under all departments.'}
+          ? `${activeDept.name} content, plus org-wide content. An item tagged to several departments shows up under each.`
+          : 'All content in the organisation. Org-wide content appears under all departments.'}
       </p>
 
       {/* Kind filter */}

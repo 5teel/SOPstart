@@ -10,7 +10,7 @@
  *     `deriveStepTree` (pure read of layout_data.content[]; no mutation)
  *   - Renders TreeStepRow + nested TreeBlockRow children; "Before first step"
  *     header for pre-step blocks when the section HAS steps (D-01/D-02)
- *   - "＋ Add step or block" placeholder at each section end (opens AddMenu via
+ *   - "＋ Add step or content" placeholder at each section end (opens AddMenu via
  *     onOpenAddMenu; the actual Puck insert is dispatched by BuilderClient's
  *     `puck` override — the rail renders OUTSIDE <Puck> and must not use Puck hooks)
  *   - E6 display override: HeadingBlock with text starting "Unanchored figures"
@@ -421,7 +421,7 @@ export function BuilderTreeRail({
                       type="button"
                       data-testid="add-control"
                       aria-haspopup="menu"
-                      aria-label={`Add step or block to ${s.title}`}
+                      aria-label={`Add step or content to ${s.title}`}
                       onClick={() => {
                         if (s.id !== activeSectionId) onSelect(s.id)
                         onOpenAddMenu?.()

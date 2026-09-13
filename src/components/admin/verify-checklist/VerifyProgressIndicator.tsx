@@ -37,8 +37,8 @@ export function VerifyProgressIndicator({
   const remaining = Math.max(0, totalCount - verifiedCount)
   const pct = totalCount > 0 ? Math.round((verifiedCount / totalCount) * 100) : 0
   const tooltip = isReady
-    ? 'All blocks verified — ready to publish'
-    : `${remaining} block${remaining === 1 ? '' : 's'} remaining to verify`
+    ? 'All steps verified — ready to publish'
+    : `${remaining} step${remaining === 1 ? '' : 's'} remaining to verify`
 
   return (
     <div

@@ -7,7 +7,7 @@ import { getBlock, listBlockCategories } from '@/actions/blocks'
 import { BlockEditorClient } from './BlockEditorClient'
 
 export const metadata: Metadata = {
-  title: 'Edit Block',
+  title: 'Edit Content',
 }
 
 export default async function BlockEditorPage({

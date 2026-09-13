@@ -88,7 +88,7 @@ function StepInApp({ block }: { block: ChecklistBlock }): React.JSX.Element {
           margin: 0,
         }}
       >
-        {block.preview || 'No preview available for this block.'}
+        {block.preview || 'No preview available for this step.'}
       </p>
     )
   }

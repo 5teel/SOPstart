@@ -237,7 +237,7 @@ export function BlockEditShell({
   const bodyInner = Block ? (
     <BlockAny {...stripMeta(item.props)} />
   ) : (
-    <div className="text-sm text-[var(--ink-500,#71717a)]">Unsupported block: {item.type}</div>
+    <div className="text-sm text-[var(--ink-500,#71717a)]">Unsupported content: {item.type}</div>
   )
   const body = <div className="p-4">{bodyInner}</div>
 
@@ -297,7 +297,7 @@ export function BlockEditShell({
               data-verify-chip
               data-verified={verified ? 'true' : 'false'}
               aria-pressed={verified}
-              aria-label={verified ? 'Verified — tap to unverify' : 'Tap to verify this block'}
+              aria-label={verified ? 'Verified — tap to unverify' : 'Tap to verify this step'}
               onClick={onToggleVerify}
               className={
                 verified
@@ -336,7 +336,7 @@ export function BlockEditShell({
           <button
             type="button"
             data-edit-block-tool
-            aria-label={editing ? 'Done editing block' : 'Edit block'}
+            aria-label={editing ? 'Done editing step' : 'Edit step'}
             aria-pressed={editing}
             onClick={onToggleEdit}
             className={
@@ -350,7 +350,7 @@ export function BlockEditShell({
         )}
         <button
           type="button"
-          aria-label="Duplicate block"
+          aria-label="Duplicate step"
           onClick={onDuplicate}
           className="grid h-6 w-6 place-items-center rounded border border-[var(--ink-300,#d4d4d8)]"
         >
@@ -358,7 +358,7 @@ export function BlockEditShell({
         </button>
         <button
           type="button"
-          aria-label="Delete block"
+          aria-label="Delete step"
           onClick={onDelete}
           className="grid h-6 w-6 place-items-center rounded border border-[var(--ink-300,#d4d4d8)] hover:text-[var(--accent-hazard,#ef4444)]"
         >

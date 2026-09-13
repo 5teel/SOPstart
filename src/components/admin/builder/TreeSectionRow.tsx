@@ -119,7 +119,7 @@ export function TreeSectionRow({
         </span>
         {verifiedSummary && verifiedSummary.total > 0 && (
           <span
-            aria-label={`${verifiedSummary.done} of ${verifiedSummary.total} blocks verified`}
+            aria-label={`${verifiedSummary.done} of ${verifiedSummary.total} steps verified`}
             style={{
               flexShrink: 0,
               marginLeft: '6px',
