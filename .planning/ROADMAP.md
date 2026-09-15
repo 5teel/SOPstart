@@ -504,7 +504,7 @@ Executes 40 → 41 → 42 → 43, strictly sequential.
 **Sequencing rationale — SUR before CRE.** The creation entry point ("New SOP") lives *on* the list surface (`admin/sops/page.tsx:308-313`). Converging the creation flow first would anchor the new entry, and its role gating, to a surface about to be merged — building it twice, and rewriting route-gated visibility into permission-gated visibility on the second pass. Merging the surface first gives the creation flow a stable home and a single, settled SOP→builder route chain for CRE-03 to land in. The counter-argument (SUR is the largest single piece, so front-loading it front-loads risk) is accepted but answered: the risk in SUR is a *rendering-model decision*, not scope, and every later phase inherits that decision — discovering it in Phase 43, after CRE has already built on a client-only or server-only assumption, is the worse failure. DUP still precedes both, unchanged from the first pass: converging four flows onto one is a rewiring job once they already share a dropzone, a picker, a progress component, and a shell. DED-04 still lands last: route truth can only be certified after every phase has stopped changing routes.
 
 - [x] **Phase 40: Shared Creation Foundation** - One file-intake component, one metadata picker, one progress component, one page shell — and one category column with one vocabulary, backfilled (completed 2026-07-29)
-- [ ] **Phase 41: One SOP Surface** - One route lists SOPs for every role, admin views become code-split lenses on it, one top-level "SOPs" entry, one path to the builder — with the worker bundle gate green
+- [x] **Phase 41: One SOP Surface** - One route lists SOPs for every role, admin views become code-split lenses on it, one top-level "SOPs" entry, one path to the builder — with the worker bundle gate green (completed 2026-09-15)
 - [ ] **Phase 42: One Creation Flow** - Every on-ramp reachable from one entry on that surface, collecting the same metadata, landing in the builder — which now renders parse state honestly
 - [ ] **Phase 43: Dead-Surface Removal & Route Truth** - No CTA to a route that does not exist, no coming-soon controls, no orphaned shims or dead state, docs and `journeys.ts` matching the real route tree
 
@@ -602,7 +602,7 @@ Plans:
 
 **Wave 6** *(blocked on Wave 5 completion)*
 
-- [ ] 41-09-PLAN.md — Wave 6: recorded SUR-05 bundle proof + blocking human verification on sopstart.com
+- [x] 41-09-PLAN.md — Wave 6: recorded SUR-05 bundle proof + blocking human verification on sopstart.com
 
 **Cross-cutting constraints:**
 
@@ -722,7 +722,7 @@ Plans:
   1. The matrix document exists in-repo, covers every role × every capability surfaced in the app, and is referenced from CLAUDE.md/planning docs as the authority
   2. A user with sign-off authority on a SOP can edit that SOP; one without cannot — enforced server-side, with positive and negative probes per role (per the 2026-07-20 RLS-probe learning)
 
-**Plans:** 8/9 plans executed
+**Plans:** 9/9 plans complete
 Plans:
 **Wave 1**
 
