@@ -32,17 +32,31 @@ import type { AdminSopListResult } from '@/lib/sop-list/admin-rows'
 import type { SopScope, SopNav, WorkerScope } from './sops-nav-types'
 import { MillerColumnHeader, MillerItem } from './MillerPrimitives'
 
+/** Shown while a lens chunk is in flight (~400 ms on prod) — without it the
+ *  takeover lenses replace the Miller frame with nothing until they arrive
+ *  (blank flash caught by the 2026-09-15 deployed-site eval). Same bars the
+ *  lenses themselves show while their data loads, so the swap is seamless. */
+function LensSkeleton() {
+  return (
+    <div className="flex flex-col gap-2 p-3 lg:col-span-2">
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="h-[68px] animate-pulse rounded-lg bg-[var(--paper-2)] lg:h-9 lg:rounded" />
+      ))}
+    </div>
+  )
+}
+
 const AdminStatusLens = dynamic(
   () => import('./lenses/AdminStatusLens').then((m) => m.AdminStatusLens),
-  { ssr: false }
+  { ssr: false, loading: LensSkeleton }
 )
 const AdminAttentionLens = dynamic(
   () => import('./lenses/AdminAttentionLens').then((m) => m.AdminAttentionLens),
-  { ssr: false }
+  { ssr: false, loading: LensSkeleton }
 )
 const AdminAccessLens = dynamic(
   () => import('./lenses/AdminAccessLens').then((m) => m.AdminAccessLens),
-  { ssr: false }
+  { ssr: false, loading: LensSkeleton }
 )
 
 export type AdminScope =

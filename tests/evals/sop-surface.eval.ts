@@ -99,6 +99,8 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
       await scopeColumn(page).getByText('Access', { exact: true }).click()
       await expect(backLink(page)).toBeVisible(SLOW)
       await expect(scopeColumn(page)).toBeHidden() // full width, frame replaced
+      await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 45_000 }) // data settled (~3 s on prod)
+      await expect(page.getByText(/Whole site/i)).toBeVisible()
       await shot(page, 'admin-access')
       await backLink(page).click()
       await expect(scopeColumn(page)).toBeVisible(SLOW)
@@ -118,7 +120,7 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
       await page.waitForTimeout(500)
       await page.keyboard.press('Escape')
       await scopeColumn(page).getByText('Everything', { exact: true }).click()
-      await expect(rows(page).first().or(page.locator('a[href^="/sops/"]').first())).toBeVisible(SLOW)
+      await expect(page.getByTestId('worker-miller-row').first()).toBeVisible(SLOW)
     })
 
     test('D — one SOPs door: single nav entry, legacy admin URLs redirect onto /sops, Governance deep-links the attention lens', async ({ page, context }) => {
@@ -145,7 +147,7 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
     test('E — pathways map reports zero unmapped screens', async ({ page, context }) => {
       await signInAs(context, 'admin')
       await page.goto('/pathways')
-      await page.getByText('All screens', { exact: true }).first().click()
+      await page.getByRole('button', { name: /All screens/ }).click()
       await expect(page.getByText(/^0 not mapped yet$/)).toBeVisible(SLOW)
     })
   })
