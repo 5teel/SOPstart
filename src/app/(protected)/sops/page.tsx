@@ -611,6 +611,11 @@ function SopsSection({
               DepartmentSidebar component is a 240px h-screen aside and was
               being squeezed into a 150px column. The bottom sheet is still the
               mobile twin; only this desktop rendering changed. */}
+          {/* Worker department filter — hidden while an admin status scope is
+              active, because AdminSopSurface renders its own counted
+              "By department" group for that list (two identical headers
+              otherwise, seen on the 2026-09-15 deployed-site eval). */}
+          {!admin.hideWorkerSummary && (<>
           <MillerColumnHeader>By department</MillerColumnHeader>
           <MillerItem selected={allDepartments} onClick={() => onDeptSelect([], !allDepartments)}>
             All departments
@@ -632,6 +637,7 @@ function SopsSection({
               {dept.name}
             </MillerItem>
           ))}
+          </>)}
 
           {/* Phase 41 SUR-01/02: admin lenses are additional rows in this same
               column, entitled roles only (D-02) — rendered by the lazy

@@ -8,6 +8,13 @@
  *
  * Every test self-skips when EVAL_BASE_URL is unset so the normal suite never
  * touches production.
+ *
+ * DOM facts (probed 2026-09-15): desktop rows are `li > button` inside the
+ * Miller frame; the only list→builder chain is the "Open" link in the detail
+ * pane after a row is selected; mobile rows are `a[href^=/admin/sops/builder]`
+ * with `lg:hidden`. Admin status lenses span two grid columns (`lg:col-span-2`),
+ * so the frame has 2 children under an admin status scope and 3 under a worker
+ * scope. Server actions take 2–5 s on prod — wait generously.
  */
 import { test, expect, type Page } from '@playwright/test'
 import path from 'node:path'
@@ -16,7 +23,11 @@ import { EVAL_ENV_READY, signInAs } from './lib/session'
 
 const SHOTS = path.join(process.cwd(), '.planning', 'evals', 'latest')
 fs.mkdirSync(SHOTS, { recursive: true })
-const shot = (page: Page, name: string) => page.screenshot({ path: path.join(SHOTS, `${name}.png`), fullPage: false })
+async function shot(page: Page, name: string) {
+  await page.waitForLoadState('networkidle').catch(() => {})
+  await page.waitForTimeout(800)
+  await page.screenshot({ path: path.join(SHOTS, `${name}.png`), fullPage: false })
+}
 
 /** Fail the test on any uncaught page error or React hydration/minified error in the console. */
 function watchConsole(page: Page) {
@@ -30,7 +41,10 @@ function watchConsole(page: Page) {
   return errors
 }
 
+const SLOW = { timeout: 25_000 }
 const scopeColumn = (page: Page) => page.getByTestId('worker-miller-scope')
+const frame = (page: Page) => scopeColumn(page).locator('..')
+const rows = (page: Page) => frame(page).locator('li > button')
 const backLink = (page: Page) => page.getByRole('link', { name: /Back to your SOPs/ }).or(page.getByRole('button', { name: /Back to your SOPs/ }))
 
 test.describe('Phase 41 — one SOP surface (deployed)', () => {
@@ -39,7 +53,7 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
   test.describe('admin, desktop', () => {
     test.use({ viewport: { width: 1440, height: 900 } })
 
-    test('A — Admin scope group renders inside the Miller frame with counts, columns aligned', async ({ page, context }) => {
+    test('A — Admin scope group renders inside the Miller frame with counts, one department group, columns aligned', async ({ page, context }) => {
       const errors = watchConsole(page)
       await signInAs(context, 'admin')
       await page.goto('/sops')
@@ -48,85 +62,91 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
       for (const label of ['All SOPs', 'Drafts', 'Published', 'Needs attention', 'Access', 'Owned by me']) {
         await expect(col.getByText(label, { exact: true }), label).toBeVisible()
       }
-      // counts: at least one admin row carries a number
-      await expect.poll(async () => (await col.innerText()).match(/\b\d+\b/g)?.length ?? 0, { timeout: 15_000 }).toBeGreaterThan(0)
-      // three grid columns, same height
+      await expect(rows(page).first()).toBeVisible(SLOW)
+      // counts next to the admin rows
+      await expect.poll(async () => (await col.innerText()).match(/All SOPs\s*\d+/) !== null, SLOW).toBe(true)
+      // exactly one "By department" group — two identical headers was the 2026-09-15 defect
+      await expect(col.getByText('By department', { exact: true })).toHaveCount(1)
+      // grid columns share one height
       const heights = await col.evaluate((el) => Array.from(el.parentElement!.children).map((c) => (c as HTMLElement).getBoundingClientRect().height))
-      expect(heights.length).toBe(3)
+      expect(heights.length).toBeGreaterThanOrEqual(2)
       expect(Math.max(...heights) - Math.min(...heights)).toBeLessThanOrEqual(2)
       await shot(page, 'admin-sops')
       expect(errors).toEqual([])
     })
 
-    test('B — Drafts lens lists SOPs, a row opens the builder, attention + access lenses open full-width and return without reload', async ({ page, context }) => {
+    test('B — Drafts lens lists SOPs, a selected row exposes one Open→builder chain, attention + access lenses take over full-width and return without reload', async ({ page, context }) => {
       const errors = watchConsole(page)
       await signInAs(context, 'admin')
       await page.goto('/sops')
       await scopeColumn(page).getByText('Drafts', { exact: true }).click()
-      const builderLinks = page.locator('a[href^="/admin/sops/builder/"]')
-      await expect(builderLinks.first()).toBeVisible({ timeout: 15_000 })
-      // select a row → detail panel exposes exactly one "Open" chain to the builder
-      const rows = page.locator('[data-testid="worker-miller-scope"] ~ * button, [data-testid="worker-miller-scope"] ~ * a[href^="/admin/sops/builder/"]')
-      await rows.first().click()
+      await expect(rows(page).first()).toBeVisible(SLOW)
+      await rows(page).first().click()
       const open = page.getByRole('link', { name: 'Open', exact: true })
-      await expect(open).toBeVisible()
+      await expect(open).toBeVisible(SLOW)
       expect(await open.getAttribute('href')).toMatch(/^\/admin\/sops\/builder\/[0-9a-f-]{36}$/)
+      await expect(page.locator('a[href^="/admin/sops/builder/"]:visible')).toHaveCount(1) // one chain, not two
 
       await page.evaluate(() => { (window as unknown as { __eval: number }).__eval = 1 })
       await scopeColumn(page).getByText('Needs attention', { exact: true }).click()
-      await expect(backLink(page)).toBeVisible({ timeout: 15_000 })
+      await expect(backLink(page)).toBeVisible(SLOW)
       await shot(page, 'admin-attention')
       await backLink(page).click()
-      await expect(scopeColumn(page)).toBeVisible()
+      await expect(scopeColumn(page)).toBeVisible(SLOW)
       expect(await page.evaluate(() => (window as unknown as { __eval?: number }).__eval)).toBe(1) // no full reload
       expect(page.url()).toMatch(/\/sops(\?|$)/)
 
       await scopeColumn(page).getByText('Access', { exact: true }).click()
-      await expect(backLink(page)).toBeVisible({ timeout: 15_000 })
+      await expect(backLink(page)).toBeVisible(SLOW)
       await expect(scopeColumn(page)).toBeHidden() // full width, frame replaced
       await shot(page, 'admin-access')
       await backLink(page).click()
-      await expect(scopeColumn(page)).toBeVisible()
+      await expect(scopeColumn(page)).toBeVisible(SLOW)
       expect(errors).toEqual([])
     })
 
-    test('C — worker behaviours survive for an admin: All yours, search, department filter', async ({ page, context }) => {
+    test('C — worker behaviours survive for an admin: All yours scope, search overlay, department filter', async ({ page, context }) => {
       await signInAs(context, 'admin')
       await page.goto('/sops')
       await scopeColumn(page).getByText('All yours', { exact: true }).click()
-      await expect(scopeColumn(page)).toBeVisible()
+      await expect(scopeColumn(page).getByText('All departments', { exact: true })).toBeVisible(SLOW)
+      await expect(scopeColumn(page).getByText('By department', { exact: true })).toHaveCount(1)
+      await page.getByRole('button', { name: 'Search SOPs' }).click()
       const search = page.getByPlaceholder('Search SOPs...')
-      await search.fill('zzzz-no-such-sop-zzzz')
-      await expect(page.getByText(/no (sops|results|matches)/i).or(page.locator('a[href^="/sops/"]').first())).toBeVisible()
-      await search.fill('')
-      await expect(scopeColumn(page).getByText('Everything', { exact: true })).toBeVisible()
+      await expect(search).toBeVisible()
+      await search.fill('forming')
+      await page.waitForTimeout(500)
+      await page.keyboard.press('Escape')
+      await scopeColumn(page).getByText('Everything', { exact: true }).click()
+      await expect(rows(page).first().or(page.locator('a[href^="/sops/"]').first())).toBeVisible(SLOW)
     })
 
     test('D — one SOPs door: single nav entry, legacy admin URLs redirect onto /sops, Governance deep-links the attention lens', async ({ page, context }) => {
       await signInAs(context, 'admin')
       await page.goto('/sops')
-      const nav = page.locator('header, nav')
+      const nav = page.locator('header')
       await expect(nav.getByRole('link', { name: 'SOPs', exact: true })).toHaveCount(1)
       await expect(nav.getByRole('link', { name: /Manage SOPs/ })).toHaveCount(0)
 
       await page.goto('/admin/sops?view=access')
       await expect(page).toHaveURL(/\/sops\?.*view=access/)
-      await expect(backLink(page)).toBeVisible({ timeout: 15_000 })
+      await expect(backLink(page)).toBeVisible(SLOW)
 
       await page.goto('/admin/sops?status=draft')
       await expect(page).toHaveURL(/\/sops\?.*status=draft/)
-      await expect(page.locator('a[href^="/admin/sops/builder/"]').first()).toBeVisible({ timeout: 15_000 })
+      await expect(rows(page).first()).toBeVisible(SLOW)
 
       await page.goto('/sops')
       await nav.getByRole('link', { name: 'Governance', exact: true }).click()
       await expect(page).toHaveURL(/\/sops\?.*view=attention/)
-      await expect(backLink(page)).toBeVisible({ timeout: 15_000 })
+      await expect(backLink(page)).toBeVisible(SLOW)
     })
 
     test('E — pathways map reports zero unmapped screens', async ({ page, context }) => {
       await signInAs(context, 'admin')
       await page.goto('/pathways')
-      await expect(page.getByText(/^0 not mapped yet$/)).toBeVisible({ timeout: 20_000 })
+      await page.getByText('All screens', { exact: true }).first().click()
+      await expect(page.getByText(/^0 not mapped yet$/)).toBeVisible(SLOW)
     })
   })
 

@@ -250,7 +250,7 @@ export function AdminSopSurface({ nav, onNavChange, children }: AdminSopSurfaceP
           into `counts` via onResult below, but the 41-05 bundle-budget
           extraction into this file dropped the render of it — restored here,
           verbatim from admin/sops/page.tsx's original scope column. */}
-      {counts && counts.scopeDepartments.length > 0 && (
+      {isAdminStatusScope(scope) && counts && counts.scopeDepartments.length > 0 && (
         <>
           <MillerColumnHeader>By department</MillerColumnHeader>
           {counts.scopeDepartments.map((d) => (
