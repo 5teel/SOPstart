@@ -4,8 +4,8 @@ milestone: v8.0
 milestone_name: — Authoring Convergence
 status: executing
 stopped_at: Completed 41-07-PLAN.md
-last_updated: "2026-09-15T11:25:49.582Z"
-last_activity: "2026-09-13 -- Phase 41 Plan 06 executed: /admin/sops is now a redirect"
+last_updated: "2026-09-15T11:47:55.723Z"
+last_activity: 2026-09-15
 progress:
   total_phases: 4
   completed_phases: 2
@@ -25,13 +25,13 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 41 (One SOP Surface) — EXECUTING
-Plan: 9 of 9
+Phase: 42
+Plan: Not started
 Next: 41-07 (reference sweep) — repoint remaining internal /admin/sops links straight to /sops
 Status: Ready to execute
 three 40-VERIFICATION gaps closed. Outstanding formal gate: /gsd-secure-phase 40
 has not run (no 40-SECURITY.md, security_enforcement=true).
-Last activity: 2026-09-13 -- Phase 41 Plan 06 executed: /admin/sops is now a redirect
+Last activity: 2026-09-15
 shim to /sops, TopHeader/roleHome repointed, journeys.ts + Phase 30/41 guards updated.
 8 named legacy specs left red for 41-08 (see 41-06-SUMMARY.md).
 
@@ -144,6 +144,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | 36 | 10 | - | - |
 | 37 | 8 | - | - |
 | 46 | 3 | - | - |
+| 41 | 9 | - | - |
 
 **v2.0 By Phase:**
 
