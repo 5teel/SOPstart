@@ -119,6 +119,19 @@ Maintenance trigger (mirrors the Pathways Map convention below):
 
 **Rule of thumb: a new route or changed flow is not "done" until `journeys.ts` reflects it** (and `src/lib/uat/tests.ts` is updated when the change is worth team review). This rule is mirrored in `.planning/codebase/CONVENTIONS.md` so GSD planning/execution agents pick it up from project intel.
 
+## Deployed-site evals (replaces human-verify checkpoints)
+
+Simon does not run manual click-path UAT. Every phase that touches a user-facing surface ships an eval in `tests/evals/<area>.eval.ts` (Playwright project `evals`), and the orchestrator runs it after pushing:
+
+```bash
+npm run eval -- --phase <N>     # waits for Railway to serve HEAD (/api/version), runs against https://sopstart.com
+```
+
+- Fixture accounts: `eval-admin@sopstart.com` (admin) and `eval-worker@sopstart.com` (worker) in the SOPstart org — `node scripts/eval-fixtures.mjs` provisions them idempotently; sessions are minted via `tests/evals/lib/session.ts` (admin magic link → verifyOtp → `sb-<ref>-auth-token` cookie), never by typing a password.
+- Output: `.planning/evals/latest/EVAL-REPORT.md` + screenshots; `--phase N` also writes `<N>-EVAL.md` into the phase directory. Claude READS the screenshots (CSS-token and sizing bugs are invisible to assertions — 2026-07-14) before declaring a pass.
+- Evals self-skip without `EVAL_BASE_URL`, so `npm run test` never hits production.
+- GSD hooks: `/gsd-plan-phase` adds "extend/author the eval" as a task on any UI phase and replaces `autonomous: false` human-verify tasks with an eval run; `/gsd-verify-work` and the verifier treat `<N>-EVAL.md` as the UAT artefact. Escalate to Simon only with a specific failing screenshot.
+
 ## Learnings
 
 _Log mistakes, errors, and patterns discovered during development sessions here._
