@@ -131,7 +131,7 @@ export function SopWorkerBrowser({
         {sops.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-1.5 px-6 py-16 text-center">
             <p className="text-sm font-semibold text-[var(--ink-900)]">Nothing in {scopeLabel}</p>
-            <p className="text-xs text-[var(--ink-500)]">Pick another view on the left.</p>
+            <p className="text-xs text-[var(--ink-500)]">Pick another view.</p>
           </div>
         ) : (
           <ul className="flex flex-col gap-2 lg:gap-0">

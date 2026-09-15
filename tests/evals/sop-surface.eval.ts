@@ -100,7 +100,7 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
       await expect(backLink(page)).toBeVisible(SLOW)
       await expect(scopeColumn(page)).toBeHidden() // full width, frame replaced
       await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 45_000 }) // data settled (~3 s on prod)
-      await expect(page.getByText(/Whole site/i)).toBeVisible()
+      await expect(page.getByRole('heading', { name: /Whole site/i })).toBeVisible()
       await shot(page, 'admin-access')
       await backLink(page).click()
       await expect(scopeColumn(page)).toBeVisible(SLOW)
