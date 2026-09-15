@@ -16,7 +16,8 @@
     "test": "npx playwright test",
     "test:integration": "npx playwright test --project=integration",
     "test:e2e": "npx playwright test --project=e2e",
-    "postinstall": "node scripts/copy-ffmpeg.js"
+    "postinstall": "node scripts/copy-ffmpeg.js",
+    "eval": "node scripts/run-evals.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.82.0",

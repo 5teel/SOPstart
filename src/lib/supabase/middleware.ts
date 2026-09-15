@@ -38,7 +38,10 @@ export async function updateSession(request: NextRequest) {
   // Shotstack completion webhook: no session cookies by design. The handler
   // enforces its own SHOTSTACK_CALLBACK_SECRET query-param auth (fails 401).
   const isShotstackCallback = path === '/api/sops/generate-video/callback'
-  const isPublicRoute = path === '/' || isAuthRoute || isSchemaIntrospection || isCronRoute || isShotstackCallback
+  // Build identity for the deployed-site eval runner (scripts/run-evals.mjs):
+  // returns only the git SHA Railway injected at build time. No tenant data.
+  const isVersionRoute = path === '/api/version'
+  const isPublicRoute = path === '/' || isAuthRoute || isSchemaIntrospection || isCronRoute || isShotstackCallback || isVersionRoute
 
   if (!isPublicRoute && !claims) {
     return NextResponse.redirect(new URL('/login', request.url))

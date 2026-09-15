@@ -54,7 +54,7 @@ export default defineConfig({
     {
       name: 'phase15-stubs',
       testMatch:
-        /(desktop-walkthrough-layout|sequential-ack|voice-qa-happy-path|voice-grounding-scope|sub-trade-rls-backward-compat|sub-trade-assignment|no-static-desktop-import|no-static-admin-lens-import|no-bulk-verify-ui|no-undefined-css-tokens|sops-select-policies-org-scoped|rls-org-scope|use-viewport|walkthrough-store-ack)\.spec\.ts$/,
+        /(desktop-walkthrough-layout|sequential-ack|voice-qa-happy-path|voice-grounding-scope|sub-trade-rls-backward-compat|sub-trade-assignment|no-static-desktop-import|no-static-admin-lens-import|version-route-public|no-bulk-verify-ui|no-undefined-css-tokens|sops-select-policies-org-scoped|rls-org-scope|use-viewport|walkthrough-store-ack)\.spec\.ts$/,
       use: { browserName: 'chromium' },
     },
     {
@@ -550,6 +550,17 @@ export default defineConfig({
       testDir: '.',
       testMatch: /tests\/phase41\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
+    },
+    {
+      // Deployed-site evals: run ONLY via `npm run eval` (scripts/run-evals.mjs sets
+      // EVAL_BASE_URL); every spec self-skips without it, so `npm run test` never
+      // touches production.
+      name: 'evals',
+      testDir: '.',
+      testMatch: /tests\/evals\/.*\.eval\.ts$/,
+      timeout: 90_000,
+      retries: 1,
+      use: { browserName: 'chromium', baseURL: process.env.EVAL_BASE_URL || 'http://localhost:3000', screenshot: 'only-on-failure' },
     },
     {
       // Phase 46 -- Capability Matrix
