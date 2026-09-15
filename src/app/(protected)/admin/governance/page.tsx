@@ -28,7 +28,8 @@ export default async function GovernancePage({
   }
 
   const params = await searchParams
-  const filter = params.filter
+  const qp = new URLSearchParams({ view: 'attention' })
+  if (params.filter) qp.set('filter', params.filter) // encoded, never interpolated raw (41-REVIEW WR-01)
 
-  redirect(filter ? `/sops?view=attention&filter=${filter}` : '/sops?view=attention')
+  redirect(`/sops?${qp.toString()}`)
 }

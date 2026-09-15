@@ -77,7 +77,9 @@ export async function listAdminAccessData(params: { sop?: string }): Promise<Adm
   if ('error' in treeResult) return { error: treeResult.error }
   const tree: OrgTree = treeResult
 
-  const grants: GrantRow[] = 'error' in grantsResult ? [] : grantsResult.grants
+  // A grants read failure must not render as "no access wired" (41-REVIEW WR-03).
+  if ('error' in grantsResult) return { error: grantsResult.error }
+  const grants: GrantRow[] = grantsResult.grants
 
   const deptMembers: Record<string, string[]> = {}
   for (const r of ((memberDeptsResult?.data ?? []) as Array<{ member_id: string; department_id: string }>)) {

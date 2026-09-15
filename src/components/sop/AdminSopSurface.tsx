@@ -145,16 +145,6 @@ function navToUrl(nav: SopNav): string {
   return qs ? `/sops?${qs}` : '/sops'
 }
 
-function navsEqual(a: SopNav, b: SopNav): boolean {
-  return (
-    a.scope === b.scope &&
-    a.ownerOnly === b.ownerOnly &&
-    a.departments === b.departments &&
-    a.collection === b.collection &&
-    a.sop === b.sop
-  )
-}
-
 export interface AdminRenderProps {
   desktopRows: ReactNode
   mobileRows: ReactNode
@@ -162,14 +152,8 @@ export interface AdminRenderProps {
   takeoverElement: ReactNode | null
   hideWorkerSummary: boolean
 }
-
-export const EMPTY_ADMIN: AdminRenderProps = {
-  desktopRows: null,
-  mobileRows: null,
-  inFrameElement: null,
-  takeoverElement: null,
-  hideWorkerSummary: false,
-}
+// The non-admin `EMPTY_ADMIN` value lives in sops/page.tsx (the only consumer) —
+// keeping it out of this lazy module means the worker bundle never imports it.
 
 interface AdminSopSurfaceProps {
   nav: SopNav

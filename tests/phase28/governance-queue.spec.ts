@@ -110,7 +110,8 @@ test.describe('governance page — redirect shim mapping legacy ?filter=', () =>
     // from /admin/sops?view=attention to /sops?view=attention when /admin/sops
     // itself became a shim — this assertion was stale against that change.
     expect(src).toContain('params.filter')
-    expect(src).toContain('view=attention&filter=${filter}')
+    expect(src).toContain("qp.set('filter', params.filter)") // 41-REVIEW WR-01: encoded via URLSearchParams, never interpolated
+    expect(src).toContain("view: 'attention'")
     expect(src).toContain("'/sops?view=attention'")
   })
 

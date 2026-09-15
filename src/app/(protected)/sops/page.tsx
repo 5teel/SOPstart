@@ -571,14 +571,18 @@ function SopsSection({
           </button>
         ))}
         {admin.mobileRows}
-        <button
-          type="button"
-          onClick={onOpenDeptSheet}
-          className="flex-shrink-0 inline-flex items-center gap-2 px-4 min-h-11 bg-white border border-[var(--ink-100)] rounded-xl text-sm font-medium text-[var(--ink-900)]"
-        >
-          <span>{activeDeptLabel}</span>
-          <ChevronDown size={16} className="text-[var(--ink-500)]" />
-        </button>
+        {/* Worker department sheet is a dead control under an admin status lens
+            (that list filters by its own scope rows) — same gate as the desktop column. */}
+        {!admin.hideWorkerSummary && (
+          <button
+            type="button"
+            onClick={onOpenDeptSheet}
+            className="flex-shrink-0 inline-flex items-center gap-2 px-4 min-h-11 bg-white border border-[var(--ink-100)] rounded-xl text-sm font-medium text-[var(--ink-900)]"
+          >
+            <span>{activeDeptLabel}</span>
+            <ChevronDown size={16} className="text-[var(--ink-500)]" />
+          </button>
+        )}
       </div>
 
       {/* Sketch 005 variant C's frame: one bordered surface, three columns,

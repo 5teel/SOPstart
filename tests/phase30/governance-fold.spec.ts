@@ -67,7 +67,8 @@ test.describe('UX-03 — governance folds into /sops', () => {
     const src = read(GOVERNANCE_SHIM)
     expect(src).toContain('redirect(')
     expect(src).toContain('/sops?view=attention')
-    expect(src).toContain('view=attention&filter=${filter}')
+    expect(src).toContain("qp.set('filter', params.filter)") // 41-REVIEW WR-01: encoded via URLSearchParams, never interpolated
+    expect(src).toContain("view: 'attention'")
     // Guard stays in front of the redirect (T-30-08-03).
     // 2026-07-13: member.role → role (shared getSessionContext auth refactor)
     expect(src).toContain("['admin', 'safety_manager'].includes(role)")

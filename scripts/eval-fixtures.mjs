@@ -9,6 +9,9 @@ export const EVAL_USERS = { admin: 'eval-admin@sopstart.com', worker: 'eval-work
 const { data: list } = await sb.auth.admin.listUsers({ perPage: 500 })
 for (const [role, email] of Object.entries(EVAL_USERS)) {
   let user = list.users.find(u => u.email === email)
+  // CR-01 (41-REVIEW): never touch a real account that happens to own this email —
+  // only an account this script created (eval_fixture metadata) may be (re)granted a role.
+  if (user && user.user_metadata?.eval_fixture !== true) throw new Error(`${email} exists but is not an eval fixture — refusing to change its membership`)
   if (!user) { const { data, error } = await sb.auth.admin.createUser({ email, email_confirm: true, user_metadata: { eval_fixture: true } }); if (error) throw error; user = data.user; console.log('created', email) }
   const { error } = await sb.from('organisation_members').upsert({ organisation_id: EVAL_ORG_ID, user_id: user.id, role }, { onConflict: 'organisation_id,user_id' })
   if (error) throw error
