@@ -39,7 +39,7 @@ findings:
   warning: 4
   info: 2
   total: 7
-status: issues_found
+status: resolved
 ---
 
 # Phase 41: Code Review Report
@@ -161,3 +161,17 @@ redirect(`/sops?${qp.toString()}`)
 _Reviewed: 2026-09-15_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
+
+---
+
+## Resolution (2026-09-15, commit `181f291`)
+
+| Finding | Outcome |
+|---------|---------|
+| CR-01 fixture script escalation | Fixed — refuses any existing account without `eval_fixture` metadata |
+| WR-01 governance shim raw interpolation | Fixed — `URLSearchParams`; phase28/phase30 pins repointed in the same commit |
+| WR-02 dead mobile department control under admin lens | Fixed — gated on `hideWorkerSummary` like the desktop column |
+| WR-03 swallowed `listGrants()` error | Fixed — returns `{ error }` |
+| WR-04 duplicate `EMPTY_ADMIN` | Fixed — export removed from the lazy module; `page.tsx` copy is the only one |
+| IN-01 dead `navsEqual` | Fixed — deleted |
+| IN-02 legacy `filter=` forwarded by both shims | Accepted — pre-existing no-op, harmless; Phase 43 route-truth sweep owns it |
