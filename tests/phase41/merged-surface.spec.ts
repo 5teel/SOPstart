@@ -109,7 +109,9 @@ test.describe('SUR-02 — admin lenses are code-split, deep-linkable, and use cl
     const code = stripComments(read(ADMIN_SURFACE))
     const dynamicCalls = code.match(/dynamic\(/g) ?? []
     expect(dynamicCalls.length).toBe(3)
-    const ssrFalseCount = (code.match(/\{\s*ssr:\s*false\s*\}/g) ?? []).length
+    // `{ ssr: false, loading: LensSkeleton }` since the 2026-09-15 blank-flash fix —
+    // the option object may carry a loading fallback but ssr must stay false.
+    const ssrFalseCount = (code.match(/\{\s*ssr:\s*false\b[^}]*\}/g) ?? []).length
     expect(ssrFalseCount).toBe(3)
   })
 
