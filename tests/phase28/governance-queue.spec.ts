@@ -112,7 +112,7 @@ test.describe('governance page — redirect shim mapping legacy ?filter=', () =>
     expect(src).toContain('params.filter')
     expect(src).toContain("qp.set('filter', params.filter)") // 41-REVIEW WR-01: encoded via URLSearchParams, never interpolated
     expect(src).toContain("view: 'attention'")
-    expect(src).toContain("'/sops?view=attention'")
+    expect(src).toContain('redirect(`/sops?${qp.toString()}`)') // 41-REVIEW WR-01: destination built from URLSearchParams seeded with view=attention
   })
 
   test('no longer renders any governance surface itself', () => {

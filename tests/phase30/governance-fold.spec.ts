@@ -66,7 +66,7 @@ test.describe('UX-03 — governance folds into /sops', () => {
   test('/admin/governance is a redirect shim mapping legacy ?filter= deep-links, guard first', () => {
     const src = read(GOVERNANCE_SHIM)
     expect(src).toContain('redirect(')
-    expect(src).toContain('/sops?view=attention')
+    expect(src).toContain('redirect(`/sops?${qp.toString()}`)') // 41-REVIEW WR-01: URLSearchParams seeded with view=attention
     expect(src).toContain("qp.set('filter', params.filter)") // 41-REVIEW WR-01: encoded via URLSearchParams, never interpolated
     expect(src).toContain("view: 'attention'")
     // Guard stays in front of the redirect (T-30-08-03).
