@@ -82,7 +82,7 @@ const TONE_TEXT: Record<'bad' | 'warn' | 'info', string> = {
 /** Mirrors the scope column's header so the three columns share one baseline. */
 function ColumnHeader({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="mono sticky top-0 z-10 hidden border-b border-[var(--ink-200)] bg-[var(--paper-2)] px-3 py-2 text-[10px] uppercase tracking-[0.08em] text-[var(--ink-500)] lg:block">
+    <h2 className="mono sticky top-0 z-10 hidden border-b border-[var(--ink-200)] bg-[var(--paper-2)] px-3 py-2 text-[11px] uppercase tracking-[0.08em] text-[var(--ink-500)] lg:block">
       {children}
     </h2>
   )
@@ -113,6 +113,7 @@ export function SopWorkerBrowser({
 }) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const selected = sops.find((s) => s.id === selectedId) ?? null
+  const allUnassigned = sops.length > 0 && sops.every((s) => !s.isAssigned)
 
   const selectedSignal = selected ? topSignal(selected) : null
 
@@ -136,7 +137,9 @@ export function SopWorkerBrowser({
         ) : (
           <ul className="flex flex-col gap-2 lg:gap-0">
             {sops.map((sop) => {
-              const signal = topSignal(sop)
+              // A chip every row carries says nothing — drop 'Not yours' when the whole list is not yours (2026-09-15 readability review).
+              const rawSignal = topSignal(sop)
+              const signal = rawSignal?.label === 'Not yours' && allUnassigned ? null : rawSignal
               const isSelected = sop.id === selectedId
               return (
                 <li key={sop.id}>
@@ -161,7 +164,7 @@ export function SopWorkerBrowser({
                     </span>
                     {signal && (
                       <span
-                        className={`mono flex-shrink-0 rounded px-1.5 py-0.5 text-[10.5px] ${
+                        className={`mono flex-shrink-0 rounded px-1.5 py-0.5 text-[11px] ${
                           isSelected ? TONE_SELECTED : TONE[signal.tone]
                         }`}
                       >
@@ -206,7 +209,7 @@ export function SopWorkerBrowser({
               <p className="text-sm font-bold leading-snug text-[var(--ink-900)]">
                 {selected.title}
               </p>
-              <p className="mono mb-2.5 mt-1 text-[10px] uppercase tracking-[0.06em] text-[var(--ink-500)]">
+              <p className="mono mb-2.5 mt-1 text-[11px] uppercase tracking-[0.06em] text-[var(--ink-500)]">
                 {selected.categoryLabel ?? 'No category'}
               </p>
 

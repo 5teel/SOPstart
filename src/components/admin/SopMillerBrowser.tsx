@@ -34,11 +34,14 @@ export function SopMillerBrowser({
   sops,
   scopeLabel,
   departments,
+  hideStatus,
 }: {
   sops: MillerSop[]
   scopeLabel: string
   /** Pre-fetched by the page — the detail pane never fetches. */
   departments: Department[]
+  /** The scope's own status: rows don't repeat it as a chip (2026-09-15 readability review). */
+  hideStatus?: string
 }) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const selected = sops.find((s) => s.id === selectedId) ?? null
@@ -59,7 +62,7 @@ export function SopMillerBrowser({
       <div className="min-w-0 flex-1">
         <div className="mono mb-2 flex items-center gap-2 text-[11px] uppercase tracking-wider text-[var(--ink-500)]">
           <span>{scopeLabel}</span>
-          <span className="text-[var(--ink-300)]">{sops.length}</span>
+          <span className="text-[var(--ink-500)]">{sops.length}</span>
           <span className="h-px flex-1 bg-[var(--ink-100)]" />
         </div>
 
@@ -80,7 +83,7 @@ export function SopMillerBrowser({
                       : 'border-[var(--ink-100)] bg-white hover:border-[var(--ink-300)]'
                   }`}
                 >
-                  <RowBody sop={sop} />
+                  <RowBody sop={sop} hideStatus={hideStatus} />
                 </button>
 
                 {/* Below lg there is no detail column, so the row is the link. */}
@@ -88,7 +91,7 @@ export function SopMillerBrowser({
                   href={`/admin/sops/builder/${sop.id}`}
                   className="flex w-full items-center gap-2.5 rounded border border-[var(--ink-100)] bg-white px-3 py-2 lg:hidden"
                 >
-                  <RowBody sop={sop} />
+                  <RowBody sop={sop} hideStatus={hideStatus} />
                 </Link>
               </li>
             )
@@ -157,14 +160,15 @@ export function SopMillerBrowser({
   )
 }
 
-function RowBody({ sop }: { sop: MillerSop }) {
+/** `hideStatus`: the scope's own status — a chip that repeats the scope on every row is noise (2026-09-15 readability review). */
+function RowBody({ sop, hideStatus }: { sop: MillerSop; hideStatus?: string }) {
   return (
     <>
       <span
         className={`min-w-0 flex-1 truncate text-sm font-semibold ${
-          sop.untitled ? 'italic text-[var(--ink-500)]' : 'text-[var(--ink-900)]'
+          sop.untitled ? 'italic text-[var(--ink-700)]' : 'text-[var(--ink-900)]'
         }`}
-        title={sop.displayTitle}
+        title={sop.untitled ? `Untitled — showing the file name: ${sop.displayTitle}` : sop.displayTitle}
       >
         {sop.displayTitle}
       </span>
@@ -178,8 +182,8 @@ function RowBody({ sop }: { sop: MillerSop }) {
           {sop.flagLabel}
         </span>
       )}
-      <StatusBadge status={sop.status as SopStatus} />
-      <span className="mono w-10 flex-shrink-0 text-right text-[11px] text-[var(--ink-300)]">
+      {sop.status !== hideStatus && <StatusBadge status={sop.status as SopStatus} />}
+      <span className="mono w-10 flex-shrink-0 text-right text-[12px] text-[var(--ink-500)]">
         {sop.age}
       </span>
     </>
@@ -257,7 +261,7 @@ function DepartmentField({
     <div className="mb-3 border-b border-dotted border-[var(--ink-200)] pb-2">
       <p className="mb-1 text-[11px] text-[var(--ink-500)]">Department</p>
       {sop.departments.length === 0 && !sop.allDepartments && (
-        <p className="mb-1 text-[11px] text-[var(--ink-300)]">
+        <p className="mb-1 rounded border border-amber-200 bg-amber-50 px-2 py-1 text-[12px] text-amber-800">
           Not set — nobody can be assigned this.
         </p>
       )}

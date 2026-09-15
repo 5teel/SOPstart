@@ -102,7 +102,7 @@ export function AdminStatusLens({
         </div>
       )}
 
-      <SopMillerBrowser sops={data.sops} scopeLabel={data.scopeLabel} departments={data.departments} />
+      <SopMillerBrowser sops={data.sops} scopeLabel={data.scopeLabel} departments={data.departments} hideStatus={status === 'all' || status === 'failed' ? undefined : status} />
     </div>
   )
 }

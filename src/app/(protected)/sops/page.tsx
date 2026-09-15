@@ -186,7 +186,7 @@ export default function SopsPage() {
   })
   const lastSyncLabel = lastSyncMeta?.value
     ? `Synced ${getRelativeTime(lastSyncMeta.value)}`
-    : syncing ? 'Syncing...' : 'Not yet synced'
+    : syncing ? 'Syncing...' : 'Not saved for offline yet'
 
   const activeDeptLabel = allDepartments
     ? '◇ All departments'
