@@ -219,7 +219,8 @@ export function SopWorkerBrowser({
                   <div className="lg:hidden">
                     <SopLibraryCard
                       sop={sop.raw}
-                      isAssigned={sop.isAssigned}
+                      // Same rule as the desktop row: 'Not yours' on every card says nothing.
+                      isAssigned={sop.isAssigned || allUnassigned}
                       hasNewerVersion={sop.hasNewerVersion}
                       isRefresherDue={sop.isRefresherDue}
                       isRefresherOverdue={sop.isRefresherOverdue}

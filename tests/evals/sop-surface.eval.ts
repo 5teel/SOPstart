@@ -72,7 +72,7 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
       // ...and the detail pane is never blank: the first row is pre-selected, Open is live
       await expect(page.getByRole('link', { name: 'Open', exact: true })).toBeVisible(SLOW)
       // toolbar: New SOP CTA + inline search box
-      await expect(page.getByRole('link', { name: /New SOP/ })).toHaveAttribute('href', '/admin/sops/new')
+      await expect(page.getByRole('link', { name: 'New SOP', exact: true })).toHaveAttribute('href', '/admin/sops/new')
       await expect(page.getByRole('searchbox', { name: 'Search SOPs' })).toBeVisible()
       // grid columns share one height
       const heights = await col.evaluate((el) => Array.from(el.parentElement!.children).map((c) => (c as HTMLElement).getBoundingClientRect().height))
@@ -97,6 +97,8 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
       await page.evaluate(() => { (window as unknown as { __eval: number }).__eval = 1 })
       await scopeColumn(page).getByText('Needs attention', { exact: true }).click()
       await expect(backLink(page)).toBeVisible(SLOW)
+      await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 45_000 }) // queue settled
+      await expect(page.getByRole('searchbox', { name: 'Search SOPs' })).toHaveCount(0) // toolbar search hidden on a takeover
       await shot(page, 'admin-attention')
       await backLink(page).click()
       await expect(scopeColumn(page)).toBeVisible(SLOW)
@@ -176,8 +178,10 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
       await expect(scopeColumn(page)).toBeVisible()
       await expect(scopeColumn(page).getByText('Admin', { exact: true })).toHaveCount(0)
       await expect(scopeColumn(page).getByText('Needs attention', { exact: true })).toHaveCount(0)
-      // zero-count scopes are not listed — no column of zeros
-      await expect(scopeColumn(page).getByText(/^0$/)).toHaveCount(0)
+      // zero-count sub-scopes are not listed — no column of zeros (the fixture worker has nothing assigned)
+      for (const label of ['Refresher due', 'Updated', 'Never done', 'Not added yet']) {
+        await expect(scopeColumn(page).getByText(label, { exact: true }), label).toHaveCount(0)
+      }
       // no dead end: either the worker has rows, or the empty state hands them the library
       const door = page.getByRole('button', { name: /Browse the library/ })
       await expect(door.or(page.getByTestId('worker-miller-row').first())).toBeVisible(SLOW)

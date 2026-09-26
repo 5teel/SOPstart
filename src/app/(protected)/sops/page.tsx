@@ -205,6 +205,10 @@ export default function SopsPage() {
       ? true
       : (sopDeptMap[sopId] ?? []).some((id) => selectedDeptIds.includes(id))
 
+  // The attention and access lenses replace the whole frame with their own
+  // surfaces (and their own search); the toolbar box would filter nothing there.
+  const takeover = nav.scope === 'admin-attention' || nav.scope === 'admin-access'
+
   const sectionProps = {
     assignedSops,
     isLoading: assignedLoading,
@@ -238,6 +242,7 @@ export default function SopsPage() {
               New SOP
             </Link>
           )}
+          {!takeover && (
           <label className={`relative flex min-h-[44px] w-full items-center sm:min-h-[36px] sm:w-72 ${isAdmin ? 'sm:order-none' : 'sm:ml-auto'} order-last`}>
             <Search size={16} className="pointer-events-none absolute left-3 text-[var(--ink-500)]" aria-hidden="true" />
             <input
@@ -264,6 +269,7 @@ export default function SopsPage() {
               </button>
             )}
           </label>
+          )}
         </div>
       </nav>
 
