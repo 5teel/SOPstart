@@ -75,7 +75,13 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
       await expect(page.getByRole('link', { name: 'New SOP', exact: true })).toHaveAttribute('href', '/admin/sops/new')
       await expect(page.getByRole('searchbox', { name: 'Search SOPs' })).toBeVisible()
       // grid columns share one height
-      const heights = await col.evaluate((el) => Array.from(el.parentElement!.children).map((c) => (c as HTMLElement).getBoundingClientRect().height))
+      // Both browsers render as `display: contents`, so the grid items are the
+      // wrappers' children — a contents box itself measures 0 tall.
+      const heights = await col.evaluate((el) =>
+        Array.from(el.parentElement!.children)
+          .flatMap((c) => (getComputedStyle(c).display === 'contents' ? Array.from(c.children) : [c]))
+          .map((c) => (c as HTMLElement).getBoundingClientRect().height)
+      )
       expect(heights.length).toBeGreaterThanOrEqual(2)
       expect(Math.max(...heights) - Math.min(...heights)).toBeLessThanOrEqual(2)
       await shot(page, 'admin-sops')
