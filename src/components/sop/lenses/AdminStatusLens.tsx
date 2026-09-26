@@ -20,6 +20,10 @@
  * counts (`railCounts`, `scopeDepartments`, `noAudienceCount`, `flaggedCount`)
  * from this same single fetch instead of issuing a second one. It is invoked
  * from an effect keyed on the query data, never during render.
+ *
+ * The browser renders as `contents`, so its list + detail columns become
+ * direct children of the page's Miller frame — same flush surface as the
+ * worker list, not a card floating inside it.
  */
 
 import { useEffect } from 'react'
@@ -33,6 +37,8 @@ export interface AdminStatusLensProps {
   ownerOnly: boolean
   departments?: string
   collection?: string
+  /** Live search term from the toolbar; narrows rows client-side. */
+  filter?: string
   onResult?: (r: AdminSopListResult) => void
   onClearFilter: () => void
 }
@@ -42,6 +48,7 @@ export function AdminStatusLens({
   ownerOnly,
   departments,
   collection,
+  filter = '',
   onResult,
   onClearFilter,
 }: AdminStatusLensProps) {
@@ -75,34 +82,31 @@ export function AdminStatusLens({
 
   if ('error' in data) {
     return (
-      <div className="blueprint-frame py-12 text-center lg:col-span-2">
+      <div className="py-12 text-center lg:col-span-2">
         <p className="mono mb-2 text-[11px] uppercase tracking-wider text-red-600">ERROR</p>
         <p className="text-sm text-[var(--ink-500)]">{data.error}</p>
       </div>
     )
   }
 
-  return (
-    <div className="lg:col-span-2">
-      {/* SC-4 viz-as-library-filter: server-filtered result banner, with a
-          count and a way back to the unfiltered list. Only shown for a
-          collection deep link — a department scope carries its own label. */}
-      {data.filtered && !departments && (
-        <div className="mb-4 flex items-center justify-between rounded-xl border border-[var(--accent-step)]/40 bg-[var(--accent-step)]/10 px-4 py-3">
-          <span className="mono text-[11px] uppercase tracking-wider text-[var(--ink-700)]">
-            Open in library ({data.sops.length})
-          </span>
-          <button
-            type="button"
-            onClick={onClearFilter}
-            className="mono text-[11px] uppercase tracking-wider text-[var(--ink-500)] underline"
-          >
-            Clear filter
-          </button>
-        </div>
-      )}
+  const q = filter.trim().toLowerCase()
+  const sops = q
+    ? data.sops.filter((s) =>
+        [s.displayTitle, s.categoryLabel, s.ownerLabel, ...s.departments].some((v) => v?.toLowerCase().includes(q))
+      )
+    : data.sops
 
-      <SopMillerBrowser sops={data.sops} scopeLabel={data.scopeLabel} departments={data.departments} hideStatus={status === 'all' || status === 'failed' ? undefined : status} />
-    </div>
+  return (
+    <SopMillerBrowser
+      sops={sops}
+      scopeLabel={data.scopeLabel}
+      departments={data.departments}
+      hideStatus={status === 'all' || status === 'failed' ? undefined : status}
+      query={q}
+      // SC-4 viz-as-library-filter: a collection deep link is server-filtered;
+      // the list header says so and offers the way back to the unfiltered
+      // list. A department scope carries its own label, so no banner there.
+      onClearFilter={data.filtered && !departments ? onClearFilter : undefined}
+    />
   )
 }

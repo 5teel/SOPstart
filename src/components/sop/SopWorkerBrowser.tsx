@@ -22,7 +22,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { AlertTriangle, Clock, RefreshCw } from 'lucide-react'
+import { AlertTriangle, BookOpen, Clock, Play, RefreshCw } from 'lucide-react'
 import { SopLibraryCard } from '@/components/sop/SopLibraryCard'
 import type { CachedSop } from '@/lib/offline/db'
 
@@ -54,13 +54,18 @@ function formatDay(iso: string | null): string | null {
 }
 
 /** The one signal that most deserves the worker's attention, worst first. */
-function topSignal(sop: WorkerSop): { label: string; tone: 'bad' | 'warn' | 'info' } | null {
+export function topSignal(sop: WorkerSop): { label: string; tone: 'bad' | 'warn' | 'info' } | null {
   if (!sop.isAssigned) return { label: 'Not yours', tone: 'info' }
   if (sop.isRefresherOverdue) return { label: 'Refresher overdue', tone: 'bad' }
   if (sop.hasNewerVersion) return { label: 'Updated since you read it', tone: 'warn' }
   if (sop.isRefresherDue) return { label: 'Refresher due', tone: 'warn' }
   if (!sop.lastCompletedAt) return { label: 'Not done yet', tone: 'info' }
   return null
+}
+
+/** Second line of a row: number · category · department, whichever exist. */
+export function rowMeta(sop: WorkerSop): string {
+  return [sop.raw.sop_number, sop.categoryLabel, sop.raw.department].filter(Boolean).join(' · ')
 }
 
 const TONE: Record<'bad' | 'warn' | 'info', string> = {
@@ -91,7 +96,7 @@ function ColumnHeader({ children }: { children: React.ReactNode }) {
 /** Sketch 005 `.kv`: 76px label, dotted rule, value right of it. */
 function Kv({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex gap-2 border-b border-dotted border-[var(--ink-200)] py-1 text-xs">
+    <div className="flex gap-2 border-b border-dotted border-[var(--ink-200)] py-1.5 text-xs">
       <dt className="w-[76px] flex-shrink-0 text-[11px] text-[var(--ink-500)]">{label}</dt>
       <dd className="min-w-0 flex-1">{children}</dd>
     </div>
@@ -101,18 +106,26 @@ function Kv({ label, children }: { label: string; children: React.ReactNode }) {
 export function SopWorkerBrowser({
   sops,
   scopeLabel,
+  query = '',
+  emptyAction,
   onRemove,
   onAdd,
   actionPending,
 }: {
   sops: WorkerSop[]
   scopeLabel: string
+  /** The live search term, for the empty message only — filtering is the page's job. */
+  query?: string
+  /** A way out of an empty scope (e.g. "Browse the library") — a dead end otherwise. */
+  emptyAction?: { label: string; onClick: () => void }
   onRemove: (sopId: string) => void
   onAdd: (sopId: string) => void
   actionPending: boolean
 }) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const selected = sops.find((s) => s.id === selectedId) ?? null
+  // The detail pane is never empty: the first row is selected until you pick
+  // another, so the page answers "what should I do next" without a click.
+  const selected = sops.find((s) => s.id === selectedId) ?? sops[0] ?? null
   const allUnassigned = sops.length > 0 && sops.every((s) => !s.isAssigned)
 
   const selectedSignal = selected ? topSignal(selected) : null
@@ -131,8 +144,23 @@ export function SopWorkerBrowser({
 
         {sops.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-1.5 px-6 py-16 text-center">
-            <p className="text-sm font-semibold text-[var(--ink-900)]">Nothing in {scopeLabel}</p>
-            <p className="text-xs text-[var(--ink-500)]">Pick another view.</p>
+            <p className="text-sm font-semibold text-[var(--ink-900)]">
+              {query ? `Nothing matches “${query}”` : `Nothing in ${scopeLabel}`}
+            </p>
+            {emptyAction ? (
+              <button
+                type="button"
+                onClick={emptyAction.onClick}
+                className="mt-2 inline-flex min-h-[44px] items-center gap-2 rounded-md bg-[var(--ink-900)] px-4 text-sm font-semibold text-white hover:opacity-90"
+              >
+                <BookOpen size={16} aria-hidden="true" />
+                {emptyAction.label}
+              </button>
+            ) : (
+              <p className="text-xs text-[var(--ink-500)]">
+                {query ? 'Try a shorter word, or the SOP number.' : 'Pick another view.'}
+              </p>
+            )}
           </div>
         ) : (
           <ul className="flex flex-col gap-2 lg:gap-0">
@@ -140,27 +168,36 @@ export function SopWorkerBrowser({
               // A chip every row carries says nothing — drop 'Not yours' when the whole list is not yours (2026-09-15 readability review).
               const rawSignal = topSignal(sop)
               const signal = rawSignal?.label === 'Not yours' && allUnassigned ? null : rawSignal
-              const isSelected = sop.id === selectedId
+              const isSelected = sop.id === selected?.id
+              const meta = rowMeta(sop)
               return (
                 <li key={sop.id}>
                   {/* Desktop: a flush Miller row — hairline separator, no
-                      per-row border, ink fill when selected. */}
+                      per-row border, ink fill when selected. Two lines: the
+                      title, then number · category · department to scan by. */}
                   <button
                     type="button"
                     onClick={() => setSelectedId(sop.id)}
                     data-testid="worker-miller-row"
                     data-selected={isSelected ? 'true' : undefined}
-                    className={`hidden w-full items-center gap-2.5 border-b border-[var(--ink-100)] px-3 py-2 text-left transition-colors lg:flex ${
+                    className={`hidden w-full items-center gap-3 border-b border-[var(--ink-100)] px-3 py-2 text-left transition-colors lg:flex ${
                       isSelected ? 'bg-[var(--ink-900)]' : 'hover:bg-[var(--paper-2)]'
                     }`}
                   >
-                    <span
-                      className={`min-w-0 flex-1 truncate text-[12.5px] font-medium ${
-                        isSelected ? 'text-white' : 'text-[var(--ink-900)]'
-                      }`}
-                      title={sop.title}
-                    >
-                      {sop.title}
+                    <span className="min-w-0 flex-1">
+                      <span
+                        className={`block truncate text-[13px] font-semibold ${
+                          isSelected ? 'text-white' : 'text-[var(--ink-900)]'
+                        }`}
+                        title={sop.title}
+                      >
+                        {sop.title}
+                      </span>
+                      {meta && (
+                        <span className={`mono block truncate text-[11px] ${isSelected ? 'text-white/70' : 'text-[var(--ink-500)]'}`}>
+                          {meta}
+                        </span>
+                      )}
                     </span>
                     {signal && (
                       <span
@@ -182,11 +219,11 @@ export function SopWorkerBrowser({
                   <div className="lg:hidden">
                     <SopLibraryCard
                       sop={sop.raw}
-                      isCached={sop.isAssigned}
                       isAssigned={sop.isAssigned}
                       hasNewerVersion={sop.hasNewerVersion}
                       isRefresherDue={sop.isRefresherDue}
                       isRefresherOverdue={sop.isRefresherOverdue}
+                      neverDone={sop.isAssigned && !sop.lastCompletedAt}
                     />
                   </div>
                 </li>
@@ -199,24 +236,46 @@ export function SopWorkerBrowser({
       {/* ── Right: detail ────────────────────────────────────────── */}
       <aside className="hidden overflow-y-auto bg-[var(--paper-2)] lg:block">
         <ColumnHeader>Detail</ColumnHeader>
-        <div className="p-3.5">
+        <div className="p-4">
           {!selected ? (
             <p className="py-10 text-center text-xs text-[var(--ink-500)]">
               Pick a procedure to see when you last did it.
             </p>
           ) : (
             <>
-              <p className="text-sm font-bold leading-snug text-[var(--ink-900)]">
+              <p className="text-[15px] font-bold leading-snug text-[var(--ink-900)]">
                 {selected.title}
               </p>
-              <p className="mono mb-2.5 mt-1 text-[11px] uppercase tracking-[0.06em] text-[var(--ink-500)]">
-                {selected.categoryLabel ?? 'No category'}
+              <p className="mono mb-3 mt-1 text-[11px] uppercase tracking-[0.06em] text-[var(--ink-500)]">
+                {rowMeta(selected) || 'No category'}
               </p>
+
+              {/* Short labels, side by side — they mirror the detail page's own
+                  Read / Walk it tabs, which is where both links land. The
+                  actions sit ABOVE the facts: this pane exists to start the job. */}
+              <div className="mb-4 flex gap-2">
+                <Link
+                  // Phase 30 deleted the /walkthrough route — Walk it is a tab
+                  // on the detail page now (tests/phase30/dead-weight.spec.ts).
+                  href={`/sops/${selected.id}?tab=walk`}
+                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-md bg-[var(--ink-900)] px-3 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+                >
+                  <Play size={14} aria-hidden="true" />
+                  Walk it
+                </Link>
+                <Link
+                  href={`/sops/${selected.id}`}
+                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-md border border-[var(--ink-300)] bg-[var(--paper-1)] px-3 py-2.5 text-sm text-[var(--ink-700)] hover:border-[var(--ink-900)] hover:text-[var(--ink-900)]"
+                >
+                  <BookOpen size={14} aria-hidden="true" />
+                  Read
+                </Link>
+              </div>
 
               {/* Sketch 005 states the problem as a keyed row in its own
                   colour. Three stacked tinted banners said the same thing in
                   three times the space, and two of them could show at once. */}
-              <dl className="mb-3.5">
+              <dl className="mb-3">
                 {selectedSignal && selectedSignal.tone !== 'info' && (
                   <Kv label="Attention">
                     <span className={`flex items-center gap-1.5 font-medium ${TONE_TEXT[selectedSignal.tone]}`}>
@@ -243,25 +302,6 @@ export function SopWorkerBrowser({
                 </Kv>
               </dl>
 
-              {/* Short labels, side by side — they mirror the detail page's own
-                  Read / Walk it tabs, which is where both links land. */}
-              <div className="flex gap-1.5">
-                <Link
-                  // Phase 30 deleted the /walkthrough route — Walk it is a tab
-                  // on the detail page now (tests/phase30/dead-weight.spec.ts).
-                  href={`/sops/${selected.id}?tab=walk`}
-                  className="flex-1 rounded-md bg-[var(--ink-900)] px-3 py-2 text-center text-xs font-semibold text-white hover:opacity-90"
-                >
-                  Walk it
-                </Link>
-                <Link
-                  href={`/sops/${selected.id}`}
-                  className="flex-1 rounded-md border border-[var(--ink-300)] bg-[var(--paper-1)] px-3 py-2 text-center text-xs text-[var(--ink-700)] hover:border-[var(--ink-900)] hover:text-[var(--ink-900)]"
-                >
-                  Read
-                </Link>
-              </div>
-
               {/* Add/remove moved off every row and into the pane — one
                   button for the SOP you are actually looking at, instead of
                   a column of +/− controls down the side of the list. This is
@@ -284,7 +324,7 @@ export function SopWorkerBrowser({
                   type="button"
                   onClick={() => onAdd(selected.id)}
                   disabled={actionPending}
-                  className="mt-2 w-full rounded-md border border-[var(--ink-900)] px-3 py-1.5 text-[11px] font-semibold text-[var(--ink-900)] hover:bg-[var(--paper-1)] disabled:cursor-default disabled:border-[var(--ink-300)] disabled:text-[var(--ink-300)]"
+                  className="mt-2 w-full rounded-md border border-[var(--ink-900)] px-3 py-2 text-xs font-semibold text-[var(--ink-900)] hover:bg-[var(--paper-1)] disabled:cursor-default disabled:border-[var(--ink-300)] disabled:text-[var(--ink-300)]"
                 >
                   + Add to your SOPs
                 </button>

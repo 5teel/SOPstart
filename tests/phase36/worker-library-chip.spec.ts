@@ -19,6 +19,8 @@ import path from 'node:path'
 const ROOT = process.cwd()
 const SOP_LIBRARY_CARD = path.join(ROOT, 'src', 'components', 'sop', 'SopLibraryCard.tsx')
 const WORKER_SOP_LIBRARY = path.join(ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx')
+// The card element itself renders from the page's lazy list chunk, not page.tsx.
+const WORKER_BROWSER = path.join(ROOT, 'src', 'components', 'sop', 'SopWorkerBrowser.tsx')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
@@ -45,7 +47,7 @@ test.describe('REF-01 / D-08 -- worker library page wires the chip from real dat
   })
 
   test('the <SopLibraryCard element passes both refresher fields, not merely somewhere in the file', () => {
-    const match = pageSrc.match(/<SopLibraryCard[\s\S]*?\/>/)
+    const match = read(WORKER_BROWSER).match(/<SopLibraryCard[\s\S]*?\/>/)
     expect(match).not.toBeNull()
     const element = match ? match[0] : ''
     expect(element).toContain('isRefresherDue')

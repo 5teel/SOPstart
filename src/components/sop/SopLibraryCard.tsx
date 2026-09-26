@@ -1,12 +1,11 @@
 'use client'
 import Link from 'next/link'
-import { FileText, ChevronRight } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import type { CachedSop } from '@/lib/offline/db'
 import { categoryLabel } from '@/lib/sop-categories'
 
 interface SopLibraryCardProps {
   sop: CachedSop
-  isCached: boolean
   /**
    * AFL-VER-04 / D-08: true when a newer published version exists than the
    * worker's last completion for this SOP lineage.
@@ -27,88 +26,75 @@ interface SopLibraryCardProps {
   /** Phase 36 REF-01 / D-08: true when the due date has actually passed —
    * escalates the chip label from "Refresher due" to "Refresher overdue". */
   isRefresherOverdue?: boolean
-  /** False for a library row the worker has not added — the "Assigned" badge
-   *  would be a lie on those. */
+  /** False for a library row the worker has not added — those say so, the
+   *  rest say nothing (a badge on every card is noise). */
   isAssigned?: boolean
+  /** Assigned but never walked — the phone's twin of the desktop row signal. */
+  neverDone?: boolean
 }
 
+/**
+ * The phone row. One tap target, two lines of text, at most one chip — the
+ * desktop Miller row's twin, sized for a glove.
+ */
 export function SopLibraryCard({
   sop,
-  isCached,
   hasNewerVersion = false,
   isRefresherDue = false,
   isRefresherOverdue = false,
   isAssigned = true,
+  neverDone = false,
 }: SopLibraryCardProps) {
-  const meta = [categoryLabel(sop.category_slug ?? null), sop.department].filter(Boolean).join(' · ')
+  const meta = [sop.sop_number, categoryLabel(sop.category_slug ?? null), sop.department].filter(Boolean).join(' · ')
 
   return (
     <Link
       href={`/sops/${sop.id}`}
-      className="flex items-start gap-4 p-4 bg-white border border-[var(--ink-100)] rounded-xl hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] active:bg-[var(--paper-2)] transition-colors cursor-pointer min-h-[88px]"
+      className="flex min-h-[64px] items-center gap-3 rounded-lg border border-[var(--ink-100)] bg-white px-4 py-3 transition-colors hover:border-[var(--ink-300)] hover:bg-[var(--paper-2)] active:bg-[var(--paper-2)]"
     >
-      {/* Left column — icon + cache dot */}
-      <div className="flex flex-col items-center gap-2 flex-shrink-0 pt-0.5">
-        <FileText size={28} className="text-[var(--ink-500)]" />
-        {isCached ? (
-          <span
-            className="w-2.5 h-2.5 rounded-full bg-[var(--accent-signoff)]"
-            title="Available offline"
-          />
-        ) : (
-          <span className="w-2.5 h-2.5 rounded-full bg-[var(--ink-300)]" />
-        )}
-      </div>
-
-      {/* Middle column — title, meta, badges */}
-      <div className="flex-1 min-w-0">
-        <p className="text-base font-semibold text-[var(--ink-900)] leading-snug line-clamp-2">
+      <div className="min-w-0 flex-1">
+        <p className="line-clamp-2 text-[15px] font-semibold leading-snug text-[var(--ink-900)]">
           {sop.title ?? 'Untitled SOP'}
         </p>
-        {meta && (
-          <p className="text-xs text-[var(--ink-500)] mt-0.5">{meta}</p>
-        )}
-        {sop.sop_number && (
-          <p className="mono text-xs text-[var(--ink-500)]">{sop.sop_number}</p>
-        )}
-        <div className="flex items-center gap-2 mt-2 flex-wrap">
-          {isAssigned && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--accent-signoff)]/10 text-[var(--accent-signoff)] text-xs font-semibold rounded">
-              Assigned
-            </span>
-          )}
+        {meta && <p className="mono mt-0.5 truncate text-[11px] text-[var(--ink-500)]">{meta}</p>}
+        <div className="mt-1.5 flex flex-wrap items-center gap-1.5 empty:hidden">
           {/* AFL-VER-04 / D-08: "Updated" badge — derives from hasNewerVersion prop
               (comparison of sop.published_at vs worker's last submitted_at, computed in
               the parent page). D-09: badge is informational only, no onClick re-walk. */}
           {hasNewerVersion && (
             <span
               data-updated-badge="true"
-              className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--accent-signoff)]/15 text-[var(--accent-signoff)] text-xs font-semibold rounded border border-[var(--accent-signoff)]/30"
+              className="mono rounded bg-amber-600/[0.16] px-1.5 py-0.5 text-[11px] text-amber-700"
               title="This SOP has been updated since you last completed it"
             >
-              Updated
+              Updated since you read it
             </span>
           )}
           {/* Phase 36 REF-01 / D-08: informational refresher-due badge — a
               sibling of the "Updated" badge, same informational-only
-              precedent (D-09). Amber/decision-toned, never red — this is a
-              coaching nudge, not a hazard warning. */}
+              precedent (D-09). Amber when due, hazard-red once overdue —
+              still a nudge, never a gate. */}
           {isRefresherDue && (
             <span
               data-refresher-due-badge="true"
-              className="inline-flex items-center gap-1 px-2 py-0.5 bg-[var(--accent-decision)]/10 text-[var(--accent-decision)] text-xs font-semibold rounded"
+              className={`mono rounded px-1.5 py-0.5 text-[11px] ${
+                isRefresherOverdue
+                  ? 'bg-red-500/[0.14] text-[var(--accent-hazard)]'
+                  : 'bg-amber-600/[0.16] text-amber-700'
+              }`}
               title="Time for a refresher walkthrough of this SOP"
             >
               {isRefresherOverdue ? 'Refresher overdue' : 'Refresher due'}
             </span>
           )}
+          {!hasNewerVersion && !isRefresherDue && (neverDone || !isAssigned) && (
+            <span className="mono rounded bg-[var(--paper-2)] px-1.5 py-0.5 text-[11px] text-[var(--ink-500)]">
+              {isAssigned ? 'Not done yet' : 'Not yours'}
+            </span>
+          )}
         </div>
       </div>
-
-      {/* Right column — chevron */}
-      <div className="flex-shrink-0 flex flex-col items-end justify-between self-stretch">
-        <ChevronRight size={18} className="text-[var(--ink-300)]" />
-      </div>
+      <ChevronRight size={18} className="flex-shrink-0 text-[var(--ink-300)]" />
     </Link>
   )
 }

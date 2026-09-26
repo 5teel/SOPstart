@@ -67,6 +67,13 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
       await expect.poll(async () => (await col.innerText()).match(/All SOPs\s*\d+/) !== null, SLOW).toBe(true)
       // exactly one "By department" group — two identical headers was the 2026-09-15 defect
       await expect(col.getByText('By department', { exact: true })).toHaveCount(1)
+      // 2026-09-26 redesign: Admin group sits FIRST in the column (admins land there)
+      expect((await col.innerText()).indexOf('ADMIN')).toBeLessThan((await col.innerText()).indexOf('YOUR SOPS'))
+      // ...and the detail pane is never blank: the first row is pre-selected, Open is live
+      await expect(page.getByRole('link', { name: 'Open', exact: true })).toBeVisible(SLOW)
+      // toolbar: New SOP CTA + inline search box
+      await expect(page.getByRole('link', { name: /New SOP/ })).toHaveAttribute('href', '/admin/sops/new')
+      await expect(page.getByRole('searchbox', { name: 'Search SOPs' })).toBeVisible()
       // grid columns share one height
       const heights = await col.evaluate((el) => Array.from(el.parentElement!.children).map((c) => (c as HTMLElement).getBoundingClientRect().height))
       expect(heights.length).toBeGreaterThanOrEqual(2)
@@ -113,14 +120,22 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
       await scopeColumn(page).getByText('All yours', { exact: true }).click()
       await expect(scopeColumn(page).getByText('All departments', { exact: true })).toBeVisible(SLOW)
       await expect(scopeColumn(page).getByText('By department', { exact: true })).toHaveCount(1)
-      await page.getByRole('button', { name: 'Search SOPs' }).click()
-      const search = page.getByPlaceholder('Search SOPs...')
-      await expect(search).toBeVisible()
-      await search.fill('forming')
-      await page.waitForTimeout(500)
-      await page.keyboard.press('Escape')
       await scopeColumn(page).getByText('Everything', { exact: true }).click()
       await expect(page.getByTestId('worker-miller-row').first()).toBeVisible(SLOW)
+      // 2026-09-26 redesign: search is an inline box that narrows the list you are on — no overlay
+      const search = page.getByRole('searchbox', { name: 'Search SOPs' })
+      const before = await page.getByTestId('worker-miller-row').count()
+      await search.fill('zzzz-no-such-sop')
+      await expect(page.getByText(/Nothing matches/)).toBeVisible()
+      await page.getByRole('button', { name: 'Clear search' }).click()
+      await expect(page.getByTestId('worker-miller-row')).toHaveCount(before)
+      // ...and it narrows the ADMIN list too
+      await scopeColumn(page).getByText('All SOPs', { exact: true }).click()
+      await expect(rows(page).first()).toBeVisible(SLOW)
+      await search.fill('forming')
+      await expect.poll(async () => (await rows(page).allInnerTexts()).every((t) => /forming/i.test(t)), SLOW).toBe(true)
+      await shot(page, 'admin-search')
+      await search.fill('')
     })
 
     test('D — one SOPs door: single nav entry, legacy admin URLs redirect onto /sops, Governance deep-links the attention lens', async ({ page, context }) => {
@@ -161,7 +176,18 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
       await expect(scopeColumn(page)).toBeVisible()
       await expect(scopeColumn(page).getByText('Admin', { exact: true })).toHaveCount(0)
       await expect(scopeColumn(page).getByText('Needs attention', { exact: true })).toHaveCount(0)
+      // zero-count scopes are not listed — no column of zeros
+      await expect(scopeColumn(page).getByText(/^0$/)).toHaveCount(0)
+      // no dead end: either the worker has rows, or the empty state hands them the library
+      const door = page.getByRole('button', { name: /Browse the library/ })
+      await expect(door.or(page.getByTestId('worker-miller-row').first())).toBeVisible(SLOW)
       await shot(page, 'worker-sops')
+      if (await door.isVisible()) {
+        await door.click()
+        await expect(page.getByTestId('worker-miller-row').first()).toBeVisible(SLOW)
+        await expect(page.getByRole('link', { name: /Walk it/ })).toBeVisible() // detail pre-selected
+        await shot(page, 'worker-library')
+      }
       await page.goto('/admin/sops?view=attention')
       await expect(page).not.toHaveURL(/view=attention/)
       expect(errors).toEqual([])
@@ -173,7 +199,14 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
       await page.goto('/sops')
       await expect(page.getByText('Admin', { exact: true })).toHaveCount(0)
       await expect(page.getByText('Needs attention', { exact: true })).toHaveCount(0)
+      await expect(page.getByRole('searchbox', { name: 'Search SOPs' })).toBeVisible()
       await shot(page, 'worker-mobile')
+      const door = page.getByRole('button', { name: /Browse the library/ })
+      if (await door.isVisible()) {
+        await door.click()
+        await expect(page.locator('a[href^="/sops/"]').first()).toBeVisible(SLOW)
+        await shot(page, 'worker-mobile-library')
+      }
     })
   })
 })

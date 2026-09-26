@@ -146,7 +146,11 @@ function navToUrl(nav: SopNav): string {
 }
 
 export interface AdminRenderProps {
+  /** The Admin scope group — the page renders it first, admins land there. */
   desktopRows: ReactNode
+  /** The admin list's own counted "By department" group; the page slots it
+   *  where the worker's department group normally sits (always last). */
+  desktopDeptRows: ReactNode
   mobileRows: ReactNode
   inFrameElement: ReactNode | null
   takeoverElement: ReactNode | null
@@ -158,6 +162,8 @@ export interface AdminRenderProps {
 interface AdminSopSurfaceProps {
   nav: SopNav
   onNavChange: (nav: SopNav) => void
+  /** The toolbar's live search term — narrows the status lens list client-side. */
+  filter?: string
   children: (admin: AdminRenderProps) => ReactNode
 }
 
@@ -168,7 +174,7 @@ interface AdminSopSurfaceProps {
  * and `SopsPage`'s own `nav` state (`onNavChange` is only ever called from an
  * effect or an event handler, never during render).
  */
-export function AdminSopSurface({ nav, onNavChange, children }: AdminSopSurfaceProps) {
+export function AdminSopSurface({ nav, onNavChange, filter = '', children }: AdminSopSurfaceProps) {
   const searchParams = useSearchParams()
   const [counts, setCounts] = useState<AdminSopListResult | null>(null)
 
@@ -239,15 +245,20 @@ export function AdminSopSurface({ nav, onNavChange, children }: AdminSopSurfaceP
       >
         Owned by me
       </MillerItem>
+    </>
+  )
 
-      {/* By-department scope rows + "No department" (the reachable scope for
-          SOPs nobody can be assigned — the fix is inline in the detail pane,
-          so a row leaves this scope the moment you fix it). Rule 1 fix
-          (CLAUDE.md 2026-07-13 "hook fetched the data then threw it away"):
-          listAdminSopRows has always computed scopeDepartments/noAudienceCount
-          into `counts` via onResult below, but the 41-05 bundle-budget
-          extraction into this file dropped the render of it — restored here,
-          verbatim from admin/sops/page.tsx's original scope column. */}
+  // By-department scope rows + "No department" (the reachable scope for
+  // SOPs nobody can be assigned — the fix is inline in the detail pane,
+  // so a row leaves this scope the moment you fix it). Rule 1 fix
+  // (CLAUDE.md 2026-07-13 "hook fetched the data then threw it away"):
+  // listAdminSopRows has always computed scopeDepartments/noAudienceCount
+  // into `counts` via onResult below, but the 41-05 bundle-budget
+  // extraction into this file dropped the render of it — restored here,
+  // verbatim from admin/sops/page.tsx's original scope column. Handed to the
+  // page separately so it can sit LAST in the column, under the worker groups.
+  const desktopDeptRows = (
+    <>
       {isAdminStatusScope(scope) && counts && counts.scopeDepartments.length > 0 && (
         <>
           <MillerColumnHeader>By department</MillerColumnHeader>
@@ -301,6 +312,7 @@ export function AdminSopSurface({ nav, onNavChange, children }: AdminSopSurfaceP
       ownerOnly={nav.ownerOnly}
       departments={nav.departments}
       collection={nav.collection}
+      filter={filter}
       onResult={setCounts}
       onClearFilter={() => applyScope('admin-all')}
     />
@@ -317,6 +329,7 @@ export function AdminSopSurface({ nav, onNavChange, children }: AdminSopSurfaceP
     <>
       {children({
         desktopRows,
+        desktopDeptRows,
         mobileRows,
         inFrameElement,
         takeoverElement,

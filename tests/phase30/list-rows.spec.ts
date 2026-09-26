@@ -98,7 +98,10 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
     const browser = read(path.join(ROOT, 'src', 'components', 'admin', 'SopMillerBrowser.tsx'))
 
     expect(lens).toContain('<SopMillerBrowser')
-    expect(lens).toContain('sops={data.sops}')
+    // The toolbar search narrows client-side: the lens hands the browser a
+    // filtered slice of data.sops, never a second fetch (2026-09-26 redesign).
+    expect(lens).toContain('sops={sops}')
+    expect(lens).toContain('data.sops.filter(')
 
     // Whole row reaches the builder (WIRING: interpolated sop id).
     expect(browser).toMatch(/href=\{`\/admin\/sops\/builder\/\$\{sop\.id\}`\}/)

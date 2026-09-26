@@ -62,15 +62,18 @@ test.describe('AdminStatusLens — client wrapper', () => {
     expect(code).toContain('SopMillerBrowser')
   })
 
-  test('contains the "Open in library" filtered banner', () => {
+  test('passes the collection-filter escape hatch to the browser, which renders it in the list header', () => {
+    // The banner became a "Clear filter" control in the list column header
+    // (2026-09-26 redesign) — the lens decides WHEN it shows, the browser draws it.
     const code = stripComments(read(STATUS_LENS))
-    expect(code).toContain('Open in library')
+    expect(code).toMatch(/onClearFilter=\{data\.filtered && !departments \? onClearFilter : undefined\}/)
+    expect(stripComments(read(MILLER_BROWSER))).toContain('Clear filter')
   })
 
   test('onClearFilter is a button handler, not a link — no href=, no <Link, no router.push', () => {
     const code = stripComments(read(STATUS_LENS))
     expect(code).toContain('onClearFilter')
-    expect(code).toMatch(/onClick=\{onClearFilter\}/)
+    expect(stripComments(read(MILLER_BROWSER))).toMatch(/onClick=\{onClearFilter\}/)
     expect(code).not.toContain('href=')
     expect(code).not.toContain('<Link')
     expect(code).not.toContain('router.push')

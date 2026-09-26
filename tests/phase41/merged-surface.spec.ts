@@ -83,7 +83,6 @@ test.describe('SUR-01 — merged /sops surface gates admin scope on useIsAdmin()
     for (const token of [
       'useAssignedSops',
       'useSopSync',
-      'SopSearchInput',
       'DepartmentBottomSheet',
       'selfAddSop',
       'selfRemoveSop',
@@ -166,7 +165,10 @@ test.describe('SUR-02 — admin lenses are code-split, deep-linkable, and use cl
     const src = read(SOPS_PAGE)
     expect(src).toContain('history.replaceState')
     expect(src).not.toContain('router.push')
-    expect(src).not.toContain("next/link")
+    // The toolbar's admin "New SOP" CTA is the ONE Link on the page (2026-09-26
+    // redesign); a scope change is never one — the scope column is all buttons.
+    expect((stripComments(src).match(/<Link/g) ?? []).length).toBe(1)
+    expect(stripComments(src)).toMatch(/<Link\s+href="\/admin\/sops\/new"/)
     const adminSrc = read(ADMIN_SURFACE)
     expect(adminSrc).toContain('history.replaceState')
     expect(adminSrc).not.toContain('router.push')

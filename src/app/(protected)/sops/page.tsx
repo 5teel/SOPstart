@@ -1,17 +1,12 @@
 'use client'
 import { useState, useTransition } from 'react'
+import Link from 'next/link'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-  Search,
-  ClipboardList,
-  ChevronDown,
-  RefreshCw,
-} from 'lucide-react'
+import { Search, ClipboardList, ChevronDown, Plus, X } from 'lucide-react'
 import { useAssignedSops } from '@/hooks/useAssignedSops'
 import { useSopSync } from '@/hooks/useSopSync'
 import { db } from '@/lib/offline/db'
 import type { CachedSop } from '@/lib/offline/db'
-import { SopSearchInput } from '@/components/sop/SopSearchInput'
 import { DepartmentBottomSheet } from '@/components/sop/CategoryBottomSheet'
 import { createClient } from '@/lib/supabase/client'
 import { selfAddSop, selfRemoveSop, requestRemoveAssignment, getUserSopAssignments } from '@/actions/assignments'
@@ -58,6 +53,7 @@ const AdminSopSurface = dynamic(
 
 const EMPTY_ADMIN: AdminRenderProps = {
   desktopRows: null,
+  desktopDeptRows: null,
   mobileRows: null,
   inFrameElement: null,
   takeoverElement: null,
@@ -85,16 +81,19 @@ function getRelativeTime(isoString: string): string {
  * worker to decide which of two pages a procedure lived on before they could
  * look for it. They are scopes of the same list instead: the Miller's first
  * column already answers "which slice", so the tab bar was a duplicate of it.
+ *
+ * `always: false` scopes are only listed while they have something in them —
+ * a column of zeros is noise, and on a fresh account it was most of the column.
  */
 export type { WorkerScope }
 
-const WORKER_SCOPES: { key: WorkerScope; label: string; group: 'yours' | 'library' }[] = [
-  { key: 'all', label: 'All yours', group: 'yours' },
-  { key: 'refresher', label: 'Refresher due', group: 'yours' },
-  { key: 'updated', label: 'Updated', group: 'yours' },
-  { key: 'not-done', label: 'Never done', group: 'yours' },
-  { key: 'library', label: 'Everything', group: 'library' },
-  { key: 'not-added', label: 'Not added yet', group: 'library' },
+const WORKER_SCOPES: { key: WorkerScope; label: string; group: 'yours' | 'library'; always: boolean }[] = [
+  { key: 'all', label: 'All yours', group: 'yours', always: true },
+  { key: 'refresher', label: 'Refresher due', group: 'yours', always: false },
+  { key: 'updated', label: 'Updated', group: 'yours', always: false },
+  { key: 'not-done', label: 'Never done', group: 'yours', always: false },
+  { key: 'library', label: 'Everything', group: 'library', always: true },
+  { key: 'not-added', label: 'Not added yet', group: 'library', always: false },
 ]
 
 const SCOPE_LABEL: Record<WorkerScope, string> = {
@@ -109,8 +108,9 @@ const SCOPE_LABEL: Record<WorkerScope, string> = {
 export default function SopsPage() {
   const isAdmin = useIsAdmin()
 
-  const [searchOpen, setSearchOpen] = useState(false)
-  const [searchTerm, setSearchTerm] = useState('')
+  // One inline search box filters whichever list is showing — no overlay, no
+  // second results surface. Searching is narrowing the list you are looking at.
+  const [query, setQuery] = useState('')
   // Phase 25: department-based filter replacing the old category filter.
   // selectedDeptIds / allDepartments are view filters only — actual visibility is
   // gated by sops_visible_by_department RLS (Plan 01, T-25-10 mitigated).
@@ -140,7 +140,6 @@ export default function SopsPage() {
   const { syncing } = useSopSync()
 
   const { data: assignedSops = [], isLoading: assignedLoading } = useAssignedSops()
-  const { data: searchResults = [] } = useAssignedSops({ search: searchTerm || undefined })
 
   // Fetch departments from Supabase for the filter panel.
   const { data: departments = [] } = useQuery<Department[]>({
@@ -184,9 +183,11 @@ export default function SopsPage() {
     queryFn: async () => db.syncMeta.get('lastSync'),
     networkMode: 'offlineFirst',
   })
-  const lastSyncLabel = lastSyncMeta?.value
-    ? `Synced ${getRelativeTime(lastSyncMeta.value)}`
-    : syncing ? 'Syncing...' : 'Not saved for offline yet'
+  const lastSyncLabel = syncing
+    ? 'Syncing…'
+    : lastSyncMeta?.value
+      ? `Offline copy · ${getRelativeTime(lastSyncMeta.value)}`
+      : 'Not saved for offline yet'
 
   const activeDeptLabel = allDepartments
     ? '◇ All departments'
@@ -204,66 +205,76 @@ export default function SopsPage() {
       ? true
       : (sopDeptMap[sopId] ?? []).some((id) => selectedDeptIds.includes(id))
 
+  const sectionProps = {
+    assignedSops,
+    isLoading: assignedLoading,
+    query,
+    activeDeptLabel,
+    onOpenDeptSheet: () => setDeptSheetOpen(true),
+    scope: nav.scope as WorkerScope,
+    onScopeChange: applyWorkerScope,
+    deptMatches,
+    departments,
+    selectedDeptIds,
+    allDepartments,
+    onDeptSelect: handleDeptSelect,
+  }
+
   return (
     <div className="flex flex-col flex-1 bg-[var(--paper)]">
+      {/* Toolbar: title · search · offline state · (admin) new SOP. One row on
+          desktop; the search box drops to its own full-width row on a phone so
+          it stays a glove-sized target. */}
       <nav className="sticky top-0 z-20 bg-[var(--paper)] border-b border-[var(--ink-100)]">
-        <div className="max-w-5xl mx-auto px-4 flex items-center gap-2 py-2">
+        <div className="max-w-5xl mx-auto px-4 py-2 flex flex-wrap items-center gap-x-4 gap-y-2">
           <h1 className="text-base font-semibold text-[var(--ink-900)]">SOPs</h1>
-          <button
-            type="button"
-            onClick={() => { setSearchTerm(''); setSearchOpen(true) }}
-            aria-label="Search SOPs"
-            className="ml-auto min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-[var(--paper-2)] transition-colors"
-          >
-            {syncing ? (
-              <RefreshCw size={20} className="text-[var(--accent-measure)] animate-spin" />
-            ) : (
-              <Search size={20} className="text-[var(--ink-500)] hover:text-[var(--ink-900)]" />
+          <span className="mono hidden text-[11px] text-[var(--ink-500)] sm:inline">{lastSyncLabel}</span>
+          {isAdmin && (
+            <Link
+              href="/admin/sops/new"
+              className="ml-auto inline-flex min-h-[40px] items-center gap-1.5 rounded-md bg-[var(--ink-900)] px-3 text-sm font-semibold text-white hover:opacity-90"
+            >
+              <Plus size={16} aria-hidden="true" />
+              New SOP
+            </Link>
+          )}
+          <label className={`relative flex min-h-[44px] w-full items-center sm:min-h-[36px] sm:w-72 ${isAdmin ? 'sm:order-none' : 'sm:ml-auto'} order-last`}>
+            <Search size={16} className="pointer-events-none absolute left-3 text-[var(--ink-500)]" aria-hidden="true" />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search SOPs…"
+              aria-label="Search SOPs"
+              enterKeyHint="search"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              className="h-full w-full rounded-md border border-[var(--ink-300)] bg-white pl-9 pr-9 text-sm text-[var(--ink-900)] placeholder:text-[var(--ink-500)] focus:border-[var(--ink-900)] focus:outline-none [&::-webkit-search-cancel-button]:hidden"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                aria-label="Clear search"
+                className="absolute right-1 flex h-8 w-8 items-center justify-center rounded text-[var(--ink-500)] hover:text-[var(--ink-900)]"
+              >
+                <X size={14} />
+              </button>
             )}
-          </button>
+          </label>
         </div>
       </nav>
 
       {/* Desktop layout: the Miller frame, on the shared 5xl rail */}
-      <div className="max-w-5xl mx-auto w-full px-4 py-5">
+      <div className="max-w-5xl mx-auto w-full px-4 py-4">
         {isAdmin ? (
-          <AdminSopSurface nav={nav} onNavChange={setNav}>
-            {(admin) =>
-              admin.takeoverElement ?? (
-                <SopsSection
-                  assignedSops={assignedSops}
-                  isLoading={assignedLoading}
-                  lastSyncLabel={lastSyncLabel}
-                  activeDeptLabel={activeDeptLabel}
-                  onOpenDeptSheet={() => setDeptSheetOpen(true)}
-                  scope={nav.scope as WorkerScope}
-                  onScopeChange={applyWorkerScope}
-                  deptMatches={deptMatches}
-                  departments={departments}
-                  selectedDeptIds={selectedDeptIds}
-                  allDepartments={allDepartments}
-                  onDeptSelect={handleDeptSelect}
-                  admin={admin}
-                />
-              )
-            }
+          <AdminSopSurface nav={nav} onNavChange={setNav} filter={query}>
+            {(admin) => admin.takeoverElement ?? <SopsSection {...sectionProps} admin={admin} />}
           </AdminSopSurface>
         ) : (
-          <SopsSection
-            assignedSops={assignedSops}
-            isLoading={assignedLoading}
-            lastSyncLabel={lastSyncLabel}
-            activeDeptLabel={activeDeptLabel}
-            onOpenDeptSheet={() => setDeptSheetOpen(true)}
-            scope={nav.scope as WorkerScope}
-            onScopeChange={applyWorkerScope}
-            deptMatches={deptMatches}
-            departments={departments}
-            selectedDeptIds={selectedDeptIds}
-            allDepartments={allDepartments}
-            onDeptSelect={handleDeptSelect}
-            admin={EMPTY_ADMIN}
-          />
+          <SopsSection {...sectionProps} admin={EMPTY_ADMIN} />
         )}
       </div>
 
@@ -275,16 +286,6 @@ export default function SopsPage() {
         open={deptSheetOpen}
         onClose={() => setDeptSheetOpen(false)}
       />
-
-      {/* Search overlay */}
-      {searchOpen && (
-        <SopSearchInput
-          searchTerm={searchTerm}
-          onSearch={setSearchTerm}
-          onClose={() => { setSearchOpen(false); setSearchTerm('') }}
-          results={searchResults}
-        />
-      )}
     </div>
   )
 }
@@ -294,7 +295,7 @@ export default function SopsPage() {
 interface SopsSectionProps {
   assignedSops: ReturnType<typeof useAssignedSops>['data']
   isLoading: boolean
-  lastSyncLabel: string
+  query: string
   activeDeptLabel: string
   onOpenDeptSheet: () => void
   scope: WorkerScope
@@ -319,7 +320,7 @@ interface LibrarySop {
 function SopsSection({
   assignedSops = [],
   isLoading,
-  lastSyncLabel,
+  query,
   activeDeptLabel,
   onOpenDeptSheet,
   scope,
@@ -530,32 +531,55 @@ function SopsSection({
     return true
   }
 
-  const scoped = workerSops.filter((s) => inScope(s, scope))
+  const q = query.trim().toLowerCase()
+  const matchesQuery = (s: WorkerSop) =>
+    !q ||
+    [s.title, s.raw.sop_number, s.categoryLabel, s.raw.department]
+      .some((v) => v?.toLowerCase().includes(q))
+
+  const scoped = workerSops.filter((s) => inScope(s, scope) && matchesQuery(s))
   const counts = Object.fromEntries(
     WORKER_SCOPES.map((sc) => [sc.key, workerSops.filter((s) => inScope(s, sc.key)).length])
   ) as Record<WorkerScope, number>
+  const visibleScopes = WORKER_SCOPES.filter((sc) => sc.always || counts[sc.key] > 0 || scope === sc.key)
 
   const loading = isLoading || libraryLoading
 
-  const summary = loading
-    ? 'Loading...'
-    : [
-        `${counts.all} yours`,
-        counts.refresher > 0 && `${counts.refresher} refresher due`,
-        `${counts.library} in the library`,
-        lastSyncLabel,
-      ].filter(Boolean).join(' · ')
+  // A worker with nothing assigned used to land on "Nothing in All yours" — a
+  // dead end one click from the whole library. Hand them the door.
+  const emptyAction =
+    !q && scope === 'all' && counts.library > 0
+      ? { label: `Browse the library (${counts.library})`, onClick: () => onScopeChange('library') }
+      : undefined
+
+  const workerScopeColumn = (
+    <>
+      {(['yours', 'library'] as const).map((group) => (
+        <div key={group}>
+          <MillerColumnHeader>{group === 'yours' ? 'Your SOPs' : 'Library'}</MillerColumnHeader>
+          {visibleScopes.filter((sc) => sc.group === group).map((sc) => (
+            <MillerItem
+              key={sc.key}
+              selected={scope === sc.key}
+              onClick={() => onScopeChange(sc.key)}
+              count={counts[sc.key]}
+              data-active={scope === sc.key ? 'true' : undefined}
+            >
+              {sc.label}
+            </MillerItem>
+          ))}
+        </div>
+      ))}
+    </>
+  )
 
   return (
     <>
-      {!admin.hideWorkerSummary && (
-        <p className="mb-3 text-[13px] text-[var(--ink-500)]">{summary}</p>
-      )}
-
       {/* Scope strip — below lg the left column has nowhere to go, so the
           same scopes ride here rather than disappearing. */}
       <div className="lg:hidden mb-4 flex gap-2 overflow-x-auto pb-1">
-        {WORKER_SCOPES.map((sc) => (
+        {admin.mobileRows}
+        {visibleScopes.map((sc) => (
           <button
             key={sc.key}
             type="button"
@@ -570,7 +594,6 @@ function SopsSection({
             <span className="mono ml-1 text-[11px] opacity-70">{counts[sc.key]}</span>
           </button>
         ))}
-        {admin.mobileRows}
         {/* Worker department sheet is a dead control under an admin status lens
             (that list filters by its own scope rows) — same gate as the desktop column. */}
         {!admin.hideWorkerSummary && (
@@ -587,29 +610,23 @@ function SopsSection({
 
       {/* Sketch 005 variant C's frame: one bordered surface, three columns,
           hairline dividers. Below lg it collapses to the plain card list — the
-          grid, the frame and the two side columns are all lg-only. */}
-      <div className="lg:grid lg:min-h-[420px] lg:grid-cols-[168px_1fr_248px] lg:overflow-hidden lg:rounded-lg lg:border lg:border-[var(--ink-300)] lg:bg-[var(--paper-1)]">
+          grid, the frame and the two side columns are all lg-only. The frame
+          is pinned to the viewport so each column scrolls on its own and the
+          scope column + detail pane never leave the screen. */}
+      <div className="lg:grid lg:h-[calc(100vh-140px)] lg:min-h-[420px] lg:grid-cols-[176px_1fr_264px] lg:grid-rows-[minmax(0,1fr)] lg:overflow-hidden lg:rounded-lg lg:border lg:border-[var(--ink-300)] lg:bg-[var(--paper-1)]">
         <nav
           aria-label="Scope"
           data-testid="worker-miller-scope"
           className="hidden overflow-y-auto border-r border-[var(--ink-200)] lg:block"
         >
-          {(['yours', 'library'] as const).map((group) => (
-            <div key={group}>
-              <MillerColumnHeader>{group === 'yours' ? 'Your SOPs' : 'Library'}</MillerColumnHeader>
-              {WORKER_SCOPES.filter((sc) => sc.group === group).map((sc) => (
-                <MillerItem
-                  key={sc.key}
-                  selected={scope === sc.key}
-                  onClick={() => onScopeChange(sc.key)}
-                  count={counts[sc.key]}
-                  data-active={scope === sc.key ? 'true' : undefined}
-                >
-                  {sc.label}
-                </MillerItem>
-              ))}
-            </div>
-          ))}
+          {/* Phase 41 SUR-01/02: admin lenses are rows in this same column,
+              entitled roles only (D-02) — rendered by the lazy AdminSopSurface
+              module via the `admin` slot prop so this file never needs to know
+              the admin scope shape (bundle-regression fix; see
+              AdminSopSurface.tsx). Admins land on their group, so it goes
+              first; the department group always sits last. */}
+          {admin.desktopRows}
+          {workerScopeColumn}
 
           {/* Departments are rows in this column, not a nested sidebar — the
               DepartmentSidebar component is a 240px h-screen aside and was
@@ -619,7 +636,7 @@ function SopsSection({
               active, because AdminSopSurface renders its own counted
               "By department" group for that list (two identical headers
               otherwise, seen on the 2026-09-15 deployed-site eval). */}
-          {!admin.hideWorkerSummary && (<>
+          {admin.hideWorkerSummary ? admin.desktopDeptRows : (<>
           <MillerColumnHeader>By department</MillerColumnHeader>
           <MillerItem selected={allDepartments} onClick={() => onDeptSelect([], !allDepartments)}>
             All departments
@@ -642,13 +659,6 @@ function SopsSection({
             </MillerItem>
           ))}
           </>)}
-
-          {/* Phase 41 SUR-01/02: admin lenses are additional rows in this same
-              column, entitled roles only (D-02) — rendered by the lazy
-              AdminSopSurface module via the `admin` slot prop so this file
-              never needs to know the admin scope shape (bundle-regression
-              fix; see AdminSopSurface.tsx). */}
-          {admin.desktopRows}
         </nav>
 
         {admin.inFrameElement ? (
@@ -673,6 +683,8 @@ function SopsSection({
           <SopWorkerBrowser
             sops={scoped}
             scopeLabel={SCOPE_LABEL[scope]}
+            query={q}
+            emptyAction={emptyAction}
             onRemove={handleRemove}
             onAdd={handleAdd}
             actionPending={pending}
