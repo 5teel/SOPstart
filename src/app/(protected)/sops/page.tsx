@@ -15,7 +15,7 @@ import { categoryLabel } from '@/lib/sop-categories'
 import { useIsAdmin } from '@/components/providers/RoleProvider'
 import dynamic from 'next/dynamic'
 import type { WorkerSop } from '@/components/sop/SopWorkerBrowser'
-import { MillerColumnHeader, MillerItem } from '@/components/sop/MillerPrimitives'
+import { MillerColumnHeader, MillerGroupLabel, MillerItem } from '@/components/sop/MillerPrimitives'
 import type { AdminRenderProps } from '@/components/sop/AdminSopSurface'
 import type { WorkerScope, SopNav } from '@/components/sop/sops-nav-types'
 import type { Department } from '@/types/sop'
@@ -562,7 +562,7 @@ function SopsSection({
     <>
       {(['yours', 'library'] as const).map((group) => (
         <div key={group}>
-          <MillerColumnHeader>{group === 'yours' ? 'Your SOPs' : 'Library'}</MillerColumnHeader>
+          <MillerGroupLabel>{group === 'yours' ? 'Your SOPs' : 'Library'}</MillerGroupLabel>
           {visibleScopes.filter((sc) => sc.group === group).map((sc) => (
             <MillerItem
               key={sc.key}
@@ -625,6 +625,9 @@ function SopsSection({
           data-testid="worker-miller-scope"
           className="hidden overflow-y-auto border-r border-[var(--ink-200)] lg:block"
         >
+          {/* The frame's top row reads as one chain — Show → <scope> → Selected.
+              The groups below are sub-labels, never a second header. */}
+          <MillerColumnHeader>Show</MillerColumnHeader>
           {/* Phase 41 SUR-01/02: admin lenses are rows in this same column,
               entitled roles only (D-02) — rendered by the lazy AdminSopSurface
               module via the `admin` slot prop so this file never needs to know
@@ -643,7 +646,7 @@ function SopsSection({
               "By department" group for that list (two identical headers
               otherwise, seen on the 2026-09-15 deployed-site eval). */}
           {admin.hideWorkerSummary ? admin.desktopDeptRows : (<>
-          <MillerColumnHeader>By department</MillerColumnHeader>
+          <MillerGroupLabel>By department</MillerGroupLabel>
           <MillerItem selected={allDepartments} onClick={() => onDeptSelect([], !allDepartments)}>
             All departments
           </MillerItem>

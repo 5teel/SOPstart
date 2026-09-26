@@ -236,7 +236,7 @@ export function SopWorkerBrowser({
 
       {/* ── Right: detail ────────────────────────────────────────── */}
       <aside className="hidden overflow-y-auto bg-[var(--paper-2)] lg:block">
-        <ColumnHeader>Detail</ColumnHeader>
+        <ColumnHeader>Selected</ColumnHeader>
         <div className="p-4">
           {!selected ? (
             <p className="py-10 text-center text-xs text-[var(--ink-500)]">

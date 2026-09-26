@@ -21,6 +21,20 @@ export function MillerColumnHeader({ children }: { children: ReactNode }) {
 }
 
 /**
+ * A group label INSIDE a column (Admin / Your SOPs / Library / By department).
+ * Deliberately smaller and not sticky, so it never reads as the column's own
+ * header — the top row of the frame is the one place that names what each
+ * column IS (Show → <scope> → Selected), and group labels must sit below it.
+ */
+export function MillerGroupLabel({ children }: { children: ReactNode }) {
+  return (
+    <p className="mono mt-3 px-3 pb-1 text-[10px] uppercase tracking-[0.1em] text-[var(--ink-500)] first:mt-1">
+      {children}
+    </p>
+  )
+}
+
+/**
  * A flush row in a Miller column: hairline-separated, never a floating card.
  * Selection is a solid ink fill, which is what lets three columns of these read
  * as one surface instead of three stacks of chips.

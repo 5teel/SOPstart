@@ -202,7 +202,7 @@ test.describe('SUR-06 — "Library" survives only as a scope/filter label', () =
 
   test('SUR-06: the admin scope-column header reads "Admin", not "Library" (now rendered by AdminSopSurface.tsx)', () => {
     const src = read(ADMIN_SURFACE)
-    expect(src).toContain('MillerColumnHeader>Admin<')
+    expect(src).toContain('MillerGroupLabel>Admin<')
     expect(src).not.toContain("'Library'")
   })
 })

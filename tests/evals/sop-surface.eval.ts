@@ -67,6 +67,11 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
       await expect.poll(async () => (await col.innerText()).match(/All SOPs\s*\d+/) !== null, SLOW).toBe(true)
       // exactly one "By department" group — two identical headers was the 2026-09-15 defect
       await expect(col.getByText('By department', { exact: true })).toHaveCount(1)
+      // the frame's top row reads as one chain: Show → <scope> → Selected
+      const heads = frame(page).locator('h2')
+      await expect(heads.nth(0)).toHaveText('Show')
+      await expect(heads.nth(1)).toContainText(/All SOPs|All/)
+      await expect(heads.nth(2)).toHaveText('Selected')
       // 2026-09-26 redesign: Admin group sits FIRST in the column (admins land there)
       expect((await col.innerText()).indexOf('ADMIN')).toBeLessThan((await col.innerText()).indexOf('YOUR SOPS'))
       // ...and the detail pane is never blank: the first row is pre-selected, Open is live

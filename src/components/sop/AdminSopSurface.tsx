@@ -30,7 +30,7 @@ import { useSearchParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import type { AdminSopListResult } from '@/lib/sop-list/admin-rows'
 import type { SopScope, SopNav, WorkerScope } from './sops-nav-types'
-import { MillerColumnHeader, MillerItem } from './MillerPrimitives'
+import { MillerGroupLabel, MillerItem } from './MillerPrimitives'
 
 /** Shown while a lens chunk is in flight (~400 ms on prod) — without it the
  *  takeover lenses replace the Miller frame with nothing until they arrive
@@ -228,7 +228,7 @@ export function AdminSopSurface({ nav, onNavChange, filter = '', children }: Adm
 
   const desktopRows = (
     <>
-      <MillerColumnHeader>Admin</MillerColumnHeader>
+      <MillerGroupLabel>Admin</MillerGroupLabel>
       {visibleAdminScopes.map((sc) => (
         <MillerItem
           key={sc.key}
@@ -261,7 +261,7 @@ export function AdminSopSurface({ nav, onNavChange, filter = '', children }: Adm
     <>
       {isAdminStatusScope(scope) && counts && counts.scopeDepartments.length > 0 && (
         <>
-          <MillerColumnHeader>By department</MillerColumnHeader>
+          <MillerGroupLabel>By department</MillerGroupLabel>
           {counts.scopeDepartments.map((d) => (
             <MillerItem
               key={d.id}

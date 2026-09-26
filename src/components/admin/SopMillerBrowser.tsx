@@ -135,7 +135,7 @@ export function SopMillerBrowser({
 
       {/* ── Right column: detail ────────────────────────────────── */}
       <aside className="hidden overflow-y-auto bg-[var(--paper-2)] lg:block">
-        <ColumnHeader>Detail</ColumnHeader>
+        <ColumnHeader>Selected</ColumnHeader>
         <div className="p-4">
           {!selected ? (
             <p className="py-8 text-center text-sm text-[var(--ink-500)]">
