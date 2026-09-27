@@ -98,7 +98,7 @@ function SopDetailInner() {
             <Link href="/sops" className="text-sm text-[var(--ink-500)] hover:text-[var(--ink-900)] flex-shrink-0">
               ← SOPs
             </Link>
-            <h1 className="text-base font-semibold truncate">{sop.title ?? 'Untitled SOP'}</h1>
+            <p className="text-base font-semibold truncate">{sop.title ?? 'Untitled SOP'}</p>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             {isAdmin && (
