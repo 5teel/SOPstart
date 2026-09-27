@@ -1,8 +1,7 @@
 'use client'
 import { useState, useTransition } from 'react'
-import Link from 'next/link'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Search, ClipboardList, ChevronDown, Plus, X } from 'lucide-react'
+import { Search, ClipboardList, ChevronDown, X } from 'lucide-react'
 import { useAssignedSops } from '@/hooks/useAssignedSops'
 import { useSopSync } from '@/hooks/useSopSync'
 import { db } from '@/lib/offline/db'
@@ -226,24 +225,16 @@ export default function SopsPage() {
 
   return (
     <div className="flex flex-col flex-1 bg-[var(--paper)]">
-      {/* Toolbar: title · search · offline state · (admin) new SOP. One row on
-          desktop; the search box drops to its own full-width row on a phone so
-          it stays a glove-sized target. */}
+      {/* Toolbar: title · offline state · search. One row on desktop; the
+          search box drops to its own full-width row on a phone so it stays a
+          glove-sized target. Creating a SOP stays in the header (UX-04: one
+          create entry). */}
       <nav className="sticky top-0 z-20 bg-[var(--paper)] border-b border-[var(--ink-100)]">
         <div className="max-w-5xl mx-auto px-4 py-2 flex flex-wrap items-center gap-x-4 gap-y-2">
           <h1 className="text-base font-semibold text-[var(--ink-900)]">SOPs</h1>
           <span className="mono hidden text-[11px] text-[var(--ink-500)] sm:inline">{lastSyncLabel}</span>
-          {isAdmin && (
-            <Link
-              href="/admin/sops/new"
-              className="ml-auto inline-flex min-h-[40px] items-center gap-1.5 rounded-md bg-[var(--ink-900)] px-3 text-sm font-semibold text-white hover:opacity-90"
-            >
-              <Plus size={16} aria-hidden="true" />
-              New SOP
-            </Link>
-          )}
           {!takeover && (
-          <label className={`relative flex min-h-[44px] w-full items-center sm:min-h-[36px] sm:w-72 ${isAdmin ? 'sm:order-none' : 'sm:ml-auto'} order-last`}>
+          <label className="relative order-last flex min-h-[44px] w-full items-center sm:ml-auto sm:min-h-[36px] sm:w-72">
             <Search size={16} className="pointer-events-none absolute left-3 text-[var(--ink-500)]" aria-hidden="true" />
             <input
               type="search"

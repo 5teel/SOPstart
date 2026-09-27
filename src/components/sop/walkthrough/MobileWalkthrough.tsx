@@ -3,6 +3,7 @@ import { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'r
 import { useRouter, useSearchParams } from 'next/navigation'
 import { CheckCircle2, ClipboardCheck, Camera } from 'lucide-react'
 import type { SopWithSections, SopSection } from '@/types/sop'
+import { isEmergencySection, isHazardSection, isPpeSection } from '@/lib/sop/sections'
 import { ImmersiveStepCard } from '@/components/sop/walkthrough/ImmersiveStepCard'
 import { ViewModeToggle } from '@/components/sop/walkthrough/ViewModeToggle'
 import { useWalkthroughModeStore } from '@/stores/walkthroughMode'
@@ -178,12 +179,15 @@ export const MobileWalkthrough = React.forwardRef<
   const currentStepPhotos = currentStep ? photosForStep(currentStep.id) : []
   const photoGateMet = !currentStep?.photo_required || currentStepPhotos.length > 0
 
+  // Same matchers the Read page uses — a "Safety Requirements" section used
+  // to satisfy Read and MISS this lookup, so the gate opened empty.
   const sections = sop.sop_sections
-  const hazardsSection = sections.find((s) => s.section_type.includes('hazard')) as SopSection | undefined
-  const ppeSection = sections.find((s) =>
-    s.section_type.includes('ppe') || s.section_type.includes('protective')
-  ) as SopSection | undefined
-  const emergencySection = sections.find((s) => s.section_type.includes('emergency')) as SopSection | undefined
+  const hazardsSection = sections.find(isHazardSection) as SopSection | undefined
+  const ppeSection = sections.find(isPpeSection) as SopSection | undefined
+  const emergencySection = sections.find(isEmergencySection) as SopSection | undefined
+  // Nothing to review → nothing to gate on. The Read page can also
+  // acknowledge inline, so this screen is the fallback, not the front door.
+  const needsGate = !!(hazardsSection?.content || ppeSection?.content || emergencySection?.content)
 
   const handleStepChange = useCallback(
     (stepId: string) => {
@@ -402,7 +406,7 @@ export const MobileWalkthrough = React.forwardRef<
   return (
     <div className="responsive-walkthrough-root pb-[144px]" data-walkthrough="mobile">
       {/* Safety acknowledgement gate */}
-      {!acknowledged && (
+      {!acknowledged && needsGate && (
         <SafetyAcknowledgement
           sopId={sopId}
           hazardsSection={hazardsSection}
@@ -515,8 +519,8 @@ export const MobileWalkthrough = React.forwardRef<
         />
       </div>
 
-      {/* Sticky action bar — shown after safety acknowledgement */}
-      {acknowledged && (
+      {/* Sticky action bar — shown after safety acknowledgement (or at once when there is nothing to acknowledge) */}
+      {(acknowledged || !needsGate) && (
         <div className="fixed bottom-0 left-0 right-0 z-30 bg-[var(--paper)] border-t border-[var(--ink-100)] px-4 pt-3 pb-[calc(12px+env(safe-area-inset-bottom,0px))]">
           {submitError && (
             <p className="text-xs text-[var(--accent-escalate)] text-center mb-2">{submitError}</p>

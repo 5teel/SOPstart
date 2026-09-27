@@ -76,8 +76,8 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
       expect((await col.innerText()).indexOf('ADMIN')).toBeLessThan((await col.innerText()).indexOf('YOUR SOPS'))
       // ...and the detail pane is never blank: the first row is pre-selected, Open is live
       await expect(page.getByRole('link', { name: 'Open', exact: true })).toBeVisible(SLOW)
-      // toolbar: New SOP CTA + inline search box
-      await expect(page.getByRole('link', { name: 'New SOP', exact: true })).toHaveAttribute('href', '/admin/sops/new')
+      // toolbar: inline search box only (creating a SOP stays in the header — UX-04 one create entry)
+      await expect(page.locator('nav').getByRole('link', { name: 'New SOP', exact: true })).toHaveCount(0)
       await expect(page.getByRole('searchbox', { name: 'Search SOPs' })).toBeVisible()
       // grid columns share one height
       // Both browsers render as `display: contents`, so the grid items are the

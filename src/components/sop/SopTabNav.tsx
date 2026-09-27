@@ -37,7 +37,9 @@ export function useActiveTab(): SopTabId {
   return resolveTab(search.get('tab'))
 }
 
-export function SopTabNav({ className = '' }: { className?: string }) {
+/** `hideFlow`: a linear procedure's flow graph is the step list rotated —
+ *  workers do not get the tab; admins (and authored graphs) still do. */
+export function SopTabNav({ className = '', hideFlow = false }: { className?: string; hideFlow?: boolean }) {
   const router = useRouter()
   const search = useSearchParams()
   const active = resolveTab(search.get('tab'))
@@ -52,7 +54,7 @@ export function SopTabNav({ className = '' }: { className?: string }) {
   return (
     <TabNav
       ariaLabel="SOP sections"
-      tabs={TAB_DEFS}
+      tabs={hideFlow ? TAB_DEFS.filter((t) => t.id !== 'flow') : TAB_DEFS}
       activeId={active}
       onChange={handleChange}
       className={className}

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { CheckCircle2, ClipboardCheck, AlertTriangle, Zap, Lightbulb, Wrench, Clock } from 'lucide-react'
 import type { SopWithSections, SopSection } from '@/types/sop'
+import { isEmergencySection, isHazardSection, isPpeSection } from '@/lib/sop/sections'
 import { useWalkthroughStore } from '@/stores/walkthrough'
 import { ReadAloudButton, stepSpeechText } from '@/components/sop/voice/ReadAloudButton'
 import { useCompletionStore } from '@/stores/completionStore'
@@ -95,12 +96,15 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep?.id, highestAckIdx])
 
+  // Same matchers the Read page uses — a "Safety Requirements" section used
+  // to satisfy Read and MISS this lookup, so the gate opened empty.
   const sections = sop.sop_sections
-  const hazardsSection = sections.find((s) => s.section_type.includes('hazard')) as SopSection | undefined
-  const ppeSection = sections.find((s) =>
-    s.section_type.includes('ppe') || s.section_type.includes('protective')
-  ) as SopSection | undefined
-  const emergencySection = sections.find((s) => s.section_type.includes('emergency')) as SopSection | undefined
+  const hazardsSection = sections.find(isHazardSection) as SopSection | undefined
+  const ppeSection = sections.find(isPpeSection) as SopSection | undefined
+  const emergencySection = sections.find(isEmergencySection) as SopSection | undefined
+  // Nothing to review → nothing to gate on. The Read page can also
+  // acknowledge inline, so this screen is the fallback, not the front door.
+  const needsGate = !!(hazardsSection?.content || ppeSection?.content || emergencySection?.content)
 
   const handleStepChange = useCallback(
     (stepId: string) => {
@@ -235,7 +239,7 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
   return (
     <div className="responsive-walkthrough-root" data-walkthrough="desktop">
       {/* Safety acknowledgement gate */}
-      {!acknowledged && (
+      {!acknowledged && needsGate && (
         <SafetyAcknowledgement
           sopId={sopId}
           hazardsSection={hazardsSection}
@@ -245,7 +249,7 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
         />
       )}
 
-      {acknowledged && (
+      {(acknowledged || !needsGate) && (
         <PageShell width="lg" paddingX="px-8" paddingY="py-12" animateKey={`wt-${sopId}`}>
           {/*
             Phase 15 polish: walkthrough laid out with a CSS grid of named

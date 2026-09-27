@@ -1,13 +1,14 @@
 'use client'
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import { useSopDetail } from '@/hooks/useSopDetail'
 import { useIsAdmin } from '@/components/providers/RoleProvider'
 import { SopTabNav, useActiveTab } from '@/components/sop/SopTabNav'
 import { WorkerPreviewToggle, WorkerPreviewClamp } from '@/components/sop/WorkerPreviewToggle'
 import { ReadTab, FlowTab } from '@/components/sop/tabs'
 import { WalkthroughSwitcher } from '@/components/sop/walkthrough/WalkthroughSwitcher'
+import { procedureSections, scopeSopToJob } from '@/lib/sop/sections'
 
 function SopDetailInner() {
   const params = useParams<{ sopId: string }>()
@@ -15,6 +16,30 @@ function SopDetailInner() {
   const { data: sop, isLoading, isError } = useSopDetail(sopId)
   const active = useActiveTab()
   const isAdmin = useIsAdmin()
+  const search = useSearchParams()
+
+  // Which job inside the SOP. A document like OTG Probe Maintenance holds four
+  // independent procedures; the worker was sent to do ONE. The choice rides in
+  // ?job= (so Read → Walk it keeps it, and a link can point at a job) but is
+  // driven from local state and synced with replaceState — a router.push on a
+  // search-param change costs an RSC fetch through the service worker
+  // (CLAUDE.md 2026-05-13).
+  // Back/forward or a router-driven ?job= change re-seeds the choice — derived
+  // during render (React's "adjust state on prop change" pattern), not in an
+  // effect, so there is no extra render and no set-state-in-effect.
+  const urlJob = search.get('job')
+  const [jobId, setJobId] = useState<string | null>(urlJob)
+  const [seenUrlJob, setSeenUrlJob] = useState<string | null>(urlJob)
+  if (urlJob !== seenUrlJob) {
+    setSeenUrlJob(urlJob)
+    if (urlJob) setJobId(urlJob)
+  }
+  function handleJobChange(id: string) {
+    setJobId(id)
+    const params = new URLSearchParams(window.location.search)
+    params.set('job', id)
+    window.history.replaceState(window.history.state, '', `${window.location.pathname}?${params}`)
+  }
 
   if (isLoading) {
     return (
@@ -57,6 +82,14 @@ function SopDetailInner() {
     )
   }
 
+  const jobs = procedureSections(sop)
+  const job = jobs.find((s) => s.id === jobId) ?? jobs[0] ?? null
+  // Walk it walks the chosen job only — "Step 1 of 6", not "Step 1 of 40".
+  const walkSop = job && jobs.length > 1 ? scopeSopToJob(sop, job.id) : sop
+  // A linear procedure's flow graph is the step list rotated; workers get it
+  // only when someone authored a real graph. Admins always can.
+  const hideFlow = !isAdmin && !sop.flow_graph
+
   return (
     <div className="min-h-screen bg-[var(--paper)] text-[var(--ink-900)]">
       <header className="sticky top-0 z-10 bg-[var(--paper)]/95 backdrop-blur border-b border-[var(--ink-100)]">
@@ -77,19 +110,20 @@ function SopDetailInner() {
                 Edit in builder
               </Link>
             )}
-            <WorkerPreviewToggle />
+            {/* Admin preview tool — not worker chrome. */}
+            {isAdmin && <WorkerPreviewToggle />}
           </div>
         </div>
         <div className="max-w-5xl mx-auto px-4">
-          <SopTabNav />
+          <SopTabNav hideFlow={hideFlow} />
         </div>
       </header>
 
       <main>
         <WorkerPreviewClamp>
-          {active === 'read' && <ReadTab sop={sop} />}
-          {active === 'walk' && <WalkthroughSwitcher sop={sop} />}
-          {active === 'flow' && <FlowTab sop={sop} />}
+          {active === 'read' && <ReadTab sop={sop} jobId={job?.id ?? null} onJobChange={handleJobChange} />}
+          {active === 'walk' && <WalkthroughSwitcher sop={walkSop} />}
+          {active === 'flow' && !hideFlow && <FlowTab sop={sop} />}
         </WorkerPreviewClamp>
       </main>
 

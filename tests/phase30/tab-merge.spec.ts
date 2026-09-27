@@ -56,8 +56,19 @@ test.describe('UX-05 — worker tab merge (6 → 3)', () => {
     // After the merge only the merged Read tab defines/uses isPpeSection.
     expect(fs.existsSync(path.join(TABS_DIR, 'ToolsTab.tsx'))).toBe(false)
     expect(fs.existsSync(path.join(TABS_DIR, 'HazardsTab.tsx'))).toBe(false)
+    // 2026-09-27: the matcher moved to src/lib/sop/sections.ts so the Read page
+    // and BOTH walkthroughs share one definition (the walkthrough's private copy
+    // missed "Safety Requirements" and opened an empty gate).
     const readTab = read(path.join(TABS_DIR, 'ReadTab.tsx'))
-    expect(readTab.match(/function isPpeSection/g)?.length).toBe(1)
+    expect(readTab).toMatch(/import \{[^}]*isPpeSection[^}]*\} from '@\/lib\/sop\/sections'/)
+    expect(readTab).not.toMatch(/function isPpeSection|const isPpeSection/)
+    const shared = read(path.join(ROOT, 'src', 'lib', 'sop', 'sections.ts'))
+    expect(shared.match(/export const isPpeSection\s*=/g)?.length).toBe(1)
+    for (const w of ['DesktopWalkthrough.tsx', 'MobileWalkthrough.tsx']) {
+      const src = read(path.join(ROOT, 'src', 'components', 'sop', 'walkthrough', w))
+      expect(src, w).toMatch(/import \{[^}]*isPpeSection[^}]*\} from '@\/lib\/sop\/sections'/)
+      expect(src, w).not.toContain("section_type.includes('ppe')")
+    }
   })
 
   test('Read tab keeps the "Current as of" caption (phase28 contract)', () => {
