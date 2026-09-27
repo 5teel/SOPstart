@@ -206,7 +206,7 @@ export default function SopsPage() {
 
   // The attention and access lenses replace the whole frame with their own
   // surfaces (and their own search); the toolbar box would filter nothing there.
-  const takeover = nav.scope === 'admin-attention' || nav.scope === 'admin-access'
+  const takeover = nav.scope === 'admin-access'
 
   const sectionProps = {
     assignedSops,

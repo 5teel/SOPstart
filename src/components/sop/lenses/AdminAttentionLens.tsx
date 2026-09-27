@@ -8,13 +8,12 @@
  * `flag-display.ts`; `tests/phase30/list-rows.spec.ts` is the sync contract
  * for its private FLAG maps.
  *
- * Like `AdminAccessLens`, this lens renders FULL WIDTH replacing the Miller
- * frame — that is exactly what `admin/sops/page.tsx` does today for
- * `?view=attention`, so the wide grouped queue keeps its width.
- *
- * Exiting the lens is a callback (`onBack`), never a navigation — a scope
- * change on the merged client page must not trigger an RSC fetch through the
- * service worker (CLAUDE.md 2026-05-13).
+ * Renders INSIDE the Miller frame, spanning the list + detail columns, so the
+ * scope column stays put — "Needs attention" is a filter row like Drafts, not
+ * a separate page (2026-09-27: the full-width takeover made the CLEAR panel
+ * swallow the whole surface and hid the column the admin had just clicked).
+ * Leaving it is any other scope row; there is no navigation here (CLAUDE.md
+ * 2026-05-13).
  */
 
 import { useQuery } from '@tanstack/react-query'
@@ -24,53 +23,41 @@ import { GovernanceQueueRow } from '@/components/admin/governance/GovernanceQueu
 import { FLAG_PRIORITY, FLAG_STYLE, FLAG_LABEL, FLAG_DESC } from '@/lib/governance/flag-display'
 
 export interface AdminAttentionLensProps {
-  onBack: () => void
+  /** Live search term from the toolbar; narrows rows client-side. */
+  filter?: string
 }
 
-export function AdminAttentionLens({ onBack }: AdminAttentionLensProps) {
+export function AdminAttentionLens({ filter = '' }: AdminAttentionLensProps) {
   const { data, isLoading } = useQuery({
     queryKey: ['governance-queue'],
     queryFn: listGovernanceQueue,
     staleTime: 1000 * 60,
   })
 
-  const backLink = (
-    <button
-      type="button"
-      onClick={onBack}
-      className="mono mb-4 inline-block text-meta uppercase tracking-wider text-[var(--ink-500)] hover:text-[var(--ink-900)]"
-    >
-      ← Back to your SOPs
-    </button>
-  )
-
   if (isLoading || !data) {
     return (
-      <div>
-        {backLink}
-        <div className="flex flex-col gap-2 p-3">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-tap-row animate-pulse rounded-lg bg-[var(--paper-2)] lg:h-9 lg:rounded" />
-          ))}
-        </div>
+      <div className="flex flex-col gap-2 p-3 lg:col-span-2">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-tap-row animate-pulse rounded-lg bg-[var(--paper-2)] lg:h-9 lg:rounded" />
+        ))}
       </div>
     )
   }
 
   if ('error' in data) {
     return (
-      <div>
-        {backLink}
-        <div className="blueprint-frame py-12 text-center">
-          <p className="mono mb-2 text-meta uppercase tracking-wider text-accent-escalate">ERROR</p>
-          <p className="text-sm text-[var(--ink-500)]">{data.error}</p>
-        </div>
+      <div className="py-12 text-center lg:col-span-2">
+        <p className="mono mb-2 text-meta uppercase tracking-wider text-accent-escalate">ERROR</p>
+        <p className="text-sm text-[var(--ink-500)]">{data.error}</p>
       </div>
     )
   }
 
+  const q = filter.trim().toLowerCase()
   const govRows: GovernanceRow[] = data.rows
-  const flaggedRows = govRows.filter((r) => r.flags.length > 0)
+  const flaggedRows = govRows.filter(
+    (r) => r.flags.length > 0 && (!q || [r.title, r.ownerLabel, r.category_slug].some((v) => v?.toLowerCase().includes(q)))
+  )
 
   // UX-06: ONE flag chip per library row, worst flag first.
   const rowFlag: Record<string, GovernanceFlag | undefined> = {}
@@ -85,11 +72,9 @@ export function AdminAttentionLens({ onBack }: AdminAttentionLensProps) {
     .filter((g) => g.rows.length > 0)
 
   return (
-    <div>
-      {backLink}
-
+    <div className="overflow-y-auto p-4 lg:col-span-2">
       {attentionGroups.length === 0 && (
-        <div className="blueprint-frame py-12 text-center">
+        <div className="py-12 text-center">
           <p className="mono mb-2 text-meta uppercase tracking-wider text-[var(--ink-500)]">CLEAR</p>
           <p className="mb-1 text-lg font-semibold text-[var(--ink-900)]">Nothing needs attention</p>
           <p className="text-sm text-[var(--ink-500)]">Every SOP is owned, current, and correctly assigned.</p>

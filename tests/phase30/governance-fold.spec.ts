@@ -119,8 +119,10 @@ test.describe('UX-03 — governance folds into /sops', () => {
     expect(surface).toContain("{ key: 'admin-attention', label: 'Needs attention' }")
     expect(surface).toContain("{ key: 'admin-access', label: 'Access' }")
     expect(surface).toContain("applyScope(sc.key)")
-    // Both full-width takeover lenses offer a way back to the worker scope.
-    expect(surface).toContain('Back to your SOPs')
+    // Attention is an in-frame lens (the scope column is its exit); only the
+    // access takeover carries a way back.
+    expect(surface).toContain('<AdminAttentionLens filter={filter} />')
+    expect(surface).toContain('<AdminAccessLens pinnedSopId={nav.sop} onBack={backToWorkerAll} />')
   })
 })
 

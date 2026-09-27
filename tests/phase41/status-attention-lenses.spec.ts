@@ -137,9 +137,10 @@ test.describe('AdminAttentionLens — client wrapper', () => {
     expect(code).toContain('Every SOP is owned, current, and correctly assigned.')
   })
 
-  test('exit is a callback (onBack) — no router.push, no <Link, no href=', () => {
+  test('renders in-frame (lg:col-span-2, no back link) — no router.push, no <Link, no href=', () => {
     const code = stripComments(read(ATTENTION_LENS))
-    expect(code).toContain('onBack')
+    expect(code).toContain('lg:col-span-2')
+    expect(code).not.toContain('onBack')
     expect(code).not.toContain('router.push')
     expect(code).not.toContain('<Link')
     expect(code).not.toContain('href=')

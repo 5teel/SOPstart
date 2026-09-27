@@ -310,7 +310,9 @@ export function AdminSopSurface({ nav, onNavChange, filter = '', children }: Adm
     </>
   )
 
-  const inFrameElement = isAdminStatusScope(scope) ? (
+  const inFrameElement = scope === 'admin-attention' ? (
+    <AdminAttentionLens filter={filter} />
+  ) : isAdminStatusScope(scope) ? (
     <AdminStatusLens
       status={ADMIN_STATUS[scope]}
       ownerOnly={nav.ownerOnly}
@@ -323,9 +325,7 @@ export function AdminSopSurface({ nav, onNavChange, filter = '', children }: Adm
   ) : null
 
   const takeoverElement =
-    scope === 'admin-attention' ? (
-      <AdminAttentionLens onBack={backToWorkerAll} />
-    ) : scope === 'admin-access' ? (
+    scope === 'admin-access' ? (
       <AdminAccessLens pinnedSopId={nav.sop} onBack={backToWorkerAll} />
     ) : null
 
@@ -337,7 +337,7 @@ export function AdminSopSurface({ nav, onNavChange, filter = '', children }: Adm
         mobileRows,
         inFrameElement,
         takeoverElement,
-        hideWorkerSummary: isAdminStatusScope(scope),
+        hideWorkerSummary: isAdminStatusScope(scope) || scope === 'admin-attention',
       })}
     </>
   )

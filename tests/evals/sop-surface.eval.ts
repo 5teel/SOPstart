@@ -93,7 +93,7 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
       expect(errors).toEqual([])
     })
 
-    test('B — Drafts lens lists SOPs, Open goes to the worker view and Edit is the one builder chain, attention + access lenses take over full-width and return without reload', async ({ page, context }) => {
+    test('B — Drafts lens lists SOPs, Open goes to the worker view and Edit is the one builder chain, attention stays in-frame, access takes over full-width and returns without reload', async ({ page, context }) => {
       const errors = watchConsole(page)
       await signInAs(context, 'admin')
       await page.goto('/sops')
@@ -109,12 +109,17 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
 
       await page.evaluate(() => { (window as unknown as { __eval: number }).__eval = 1 })
       await scopeColumn(page).getByText('Needs attention', { exact: true }).click()
-      await expect(backLink(page)).toBeVisible(SLOW)
       await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 45_000 }) // queue settled
-      await expect(page.getByRole('searchbox', { name: 'Search SOPs' })).toHaveCount(0) // toolbar search hidden on a takeover
+      // 2026-09-27: attention is a filter row, not a takeover — the scope column
+      // stays, exactly one row is lit, the search box stays, no back link.
+      await expect(scopeColumn(page)).toBeVisible()
+      await expect(scopeColumn(page).locator('[aria-current="true"]')).toHaveCount(1)
+      await expect(page.getByRole('searchbox', { name: 'Search SOPs' })).toBeVisible()
+      await expect(backLink(page)).toHaveCount(0)
+      await expect(page.getByText(/Nothing needs attention|·\s*\d+/).first()).toBeVisible(SLOW)
       await shot(page, 'admin-attention')
-      await backLink(page).click()
-      await expect(scopeColumn(page)).toBeVisible(SLOW)
+      await scopeColumn(page).getByText('All SOPs', { exact: true }).click()
+      await expect(rows(page).first()).toBeVisible(SLOW)
       expect(await page.evaluate(() => (window as unknown as { __eval?: number }).__eval)).toBe(1) // no full reload
       expect(page.url()).toMatch(/\/sops(\?|$)/)
 

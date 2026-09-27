@@ -57,6 +57,7 @@ export function MillerItem({
     <button
       type="button"
       onClick={onClick}
+      aria-current={selected || undefined}
       className={`flex w-full items-center gap-2 border-b border-[var(--ink-100)] px-3 py-2 text-left text-ui transition-colors ${
         selected ? 'bg-[var(--ink-900)] font-semibold text-white' : 'text-[var(--ink-700)] hover:bg-[var(--paper-2)]'
       }`}
