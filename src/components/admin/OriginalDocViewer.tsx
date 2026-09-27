@@ -37,7 +37,7 @@ export default function OriginalDocViewer({
       </p>
 
       {sourceFileType === 'pdf' && presignedUrl ? (
-        <div className="relative flex-1 overflow-hidden rounded-lg border border-[var(--ink-100)] bg-[var(--paper)] min-h-[400px]">
+        <div className="relative flex-1 overflow-hidden rounded-lg border border-[var(--ink-100)] bg-[var(--paper)] min-h-100">
           <iframe
             src={presignedUrl}
             className="w-full h-full border-0 rounded-lg bg-[var(--paper)]"
@@ -45,16 +45,16 @@ export default function OriginalDocViewer({
           />
         </div>
       ) : sourceFileType === 'image' && presignedUrl ? (
-        <div className="flex flex-col gap-3 overflow-y-auto p-4 bg-[var(--paper)] rounded-lg border border-[var(--ink-100)] flex-1 min-h-[400px]">
+        <div className="flex flex-col gap-3 overflow-y-auto p-4 bg-[var(--paper)] rounded-lg border border-[var(--ink-100)] flex-1 min-h-100">
           <img
             src={presignedUrl}
             alt={sourceFileName}
-            className="rounded-md shadow-sm max-w-full border border-[var(--ink-100)]"
+            className="rounded-lg shadow-sm max-w-full border border-[var(--ink-100)]"
           />
         </div>
       ) : (
         // .docx or no presigned URL
-        <div className="flex flex-col items-center justify-center gap-3 p-8 bg-[var(--paper)] rounded-lg border border-[var(--ink-100)] flex-1 min-h-[200px] text-center">
+        <div className="flex flex-col items-center justify-center gap-3 p-8 bg-[var(--paper)] rounded-lg border border-[var(--ink-100)] flex-1 min-h-50 text-center">
           <FileText size={40} className="text-[var(--ink-500)]" />
           <p className="text-sm text-[var(--ink-500)]">
             Word document — preview not available

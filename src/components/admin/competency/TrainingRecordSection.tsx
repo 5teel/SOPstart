@@ -91,13 +91,13 @@ export function TrainingRecordSection({ personId, focusSopId }: TrainingRecordSe
   return (
     <section>
       <div className="flex items-center justify-between mb-1.5">
-        <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--ink-500)]">
+        <div className="text-micro font-semibold uppercase tracking-wider text-[var(--ink-500)]">
           Training record
         </div>
         <button
           type="button"
           onClick={() => void handleExport()}
-          className="px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wide bg-[var(--ink-900)] text-white"
+          className="px-2.5 py-1 rounded text-micro font-bold uppercase tracking-wide bg-[var(--ink-900)] text-white"
         >
           {exporting ? 'Exporting…' : 'Export CSV'}
         </button>
@@ -163,7 +163,7 @@ export function TrainingRecordSection({ personId, focusSopId }: TrainingRecordSe
 
       {!loading && record && record.otherCompletedSops.length > 0 && (
         <div className="mt-4">
-          <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--ink-500)] mb-1.5">
+          <div className="text-micro font-semibold uppercase tracking-wider text-[var(--ink-500)] mb-1.5">
             Other completed SOPs
           </div>
           <div className="flex flex-col gap-2">

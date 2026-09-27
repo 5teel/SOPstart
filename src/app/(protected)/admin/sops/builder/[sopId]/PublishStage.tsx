@@ -94,10 +94,10 @@ export function PublishStage({
   return (
     <div
       data-testid="publish-stage"
-      className="mx-auto flex w-full max-w-[640px] flex-col gap-4 px-6 py-12"
+      className="mx-auto flex w-full max-w-160 flex-col gap-4 px-6 py-12"
     >
       {/* 1. Stage heading */}
-      <h1 className="m-0 text-[17px] leading-tight font-bold text-[var(--ink-900)]">
+      <h1 className="m-0 text-lg leading-tight font-bold text-[var(--ink-900)]">
         Publish this SOP
       </h1>
 
@@ -108,7 +108,7 @@ export function PublishStage({
 
       {/* 3. Progress summary — only when hasSourceDoc */}
       {hasSourceDoc && (
-        <div className="mono flex items-center gap-2 text-[12px] font-medium uppercase tracking-[0.08em] text-[var(--accent-signoff)]">
+        <div className="mono flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-[var(--accent-signoff)]">
           <span aria-hidden className="text-sm">&#10003;</span>
           <span>{verifiedCount} steps verified</span>
         </div>
@@ -134,7 +134,7 @@ export function PublishStage({
           data-testid="publish-blocked-reason"
           className="rounded border border-[var(--accent-decision)]/40 bg-[var(--accent-decision)]/10 px-4 py-2"
         >
-          <span className="mono text-[10px] font-medium text-[var(--accent-decision)]">
+          <span className="mono text-micro font-medium text-[var(--accent-decision)]">
             {remaining} of {totalCount} steps left to verify before you can publish
           </span>
         </div>
@@ -177,7 +177,7 @@ export function PublishStage({
           role="alert"
           data-testid="publish-error-banner"
           onClick={onDismissError}
-          className="cursor-pointer rounded border-t border-[var(--accent-escalate)]/30 bg-[var(--accent-escalate)]/10 px-3 py-2 text-[13px] text-[var(--accent-escalate)]"
+          className="cursor-pointer rounded border-t border-[var(--accent-escalate)]/30 bg-[var(--accent-escalate)]/10 px-3 py-2 text-ui text-[var(--accent-escalate)]"
         >
           {publishError} (click to dismiss)
         </div>
@@ -188,7 +188,7 @@ export function PublishStage({
         <button
           type="button"
           onClick={onBackToReview}
-          className="mono self-start cursor-pointer border-none bg-transparent p-0 text-[12px] text-[var(--ink-500)] underline"
+          className="mono self-start cursor-pointer border-none bg-transparent p-0 text-xs text-[var(--ink-500)] underline"
         >
           &#8592; Back to Check
         </button>

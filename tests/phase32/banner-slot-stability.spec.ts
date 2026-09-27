@@ -29,9 +29,9 @@ function read(p: string): string {
 }
 
 test.describe('SC-6 — SelectionStrip source contract', () => {
-  test('renders exactly one unconditional h-[48px] overflow-hidden slot — no conditional slot-div mount', () => {
+  test('renders exactly one unconditional h-12 overflow-hidden slot — no conditional slot-div mount', () => {
     const src = read(STRIP)
-    expect(src).toContain("h-[48px] overflow-hidden")
+    expect(src).toContain("h-12 overflow-hidden")
     // The outer slot div itself must never be behind a ternary that can render null/undefined —
     // only ONE `<div` with data-state exists, and it is unconditional (not `{state === 'x' ? <div ... : null}`).
     const divCount = (src.match(/<div data-state=/g) ?? []).length
@@ -59,7 +59,7 @@ test.describe('SC-6 — SelectionStrip source contract', () => {
 
   test('state class swaps on the SAME slot element (data-state + state-name class, not a remount)', () => {
     const src = read(STRIP)
-    expect(src).toContain('className={`strip-slot h-[48px] overflow-hidden ${state}`}')
+    expect(src).toContain('className={`strip-slot h-12 overflow-hidden ${state}`}')
   })
 })
 

@@ -50,13 +50,13 @@ export function SopLibraryCard({
   return (
     <Link
       href={`/sops/${sop.id}`}
-      className="flex min-h-[64px] items-center gap-3 rounded-lg border border-[var(--ink-100)] bg-white px-4 py-3 transition-colors hover:border-[var(--ink-300)] hover:bg-[var(--paper-2)] active:bg-[var(--paper-2)]"
+      className="flex min-h-tap-glove items-center gap-3 rounded-lg border border-[var(--ink-100)] bg-white px-4 py-3 transition-colors hover:border-[var(--ink-300)] hover:bg-[var(--paper-2)] active:bg-[var(--paper-2)]"
     >
       <div className="min-w-0 flex-1">
-        <p className="line-clamp-2 text-[15px] font-semibold leading-snug text-[var(--ink-900)]">
+        <p className="line-clamp-2 text-reading font-semibold leading-snug text-[var(--ink-900)]">
           {sop.title ?? 'Untitled SOP'}
         </p>
-        {meta && <p className="mono mt-0.5 truncate text-[11px] text-[var(--ink-500)]">{meta}</p>}
+        {meta && <p className="mono mt-0.5 truncate text-meta text-[var(--ink-500)]">{meta}</p>}
         <div className="mt-1.5 flex flex-wrap items-center gap-1.5 empty:hidden">
           {/* AFL-VER-04 / D-08: "Updated" badge — derives from hasNewerVersion prop
               (comparison of sop.published_at vs worker's last submitted_at, computed in
@@ -64,7 +64,7 @@ export function SopLibraryCard({
           {hasNewerVersion && (
             <span
               data-updated-badge="true"
-              className="mono rounded bg-accent-decision/16 px-1.5 py-0.5 text-[11px] text-accent-decision"
+              className="mono rounded bg-accent-decision/16 px-1.5 py-0.5 text-meta text-accent-decision"
               title="This SOP has been updated since you last completed it"
             >
               Updated since you read it
@@ -77,7 +77,7 @@ export function SopLibraryCard({
           {isRefresherDue && (
             <span
               data-refresher-due-badge="true"
-              className={`mono rounded px-1.5 py-0.5 text-[11px] ${
+              className={`mono rounded px-1.5 py-0.5 text-meta ${
                 isRefresherOverdue
                   ? 'bg-accent-escalate/14 text-[var(--accent-hazard)]'
                   : 'bg-accent-decision/16 text-accent-decision'
@@ -88,7 +88,7 @@ export function SopLibraryCard({
             </span>
           )}
           {!hasNewerVersion && !isRefresherDue && (neverDone || !isAssigned) && (
-            <span className="mono rounded bg-[var(--paper-2)] px-1.5 py-0.5 text-[11px] text-[var(--ink-500)]">
+            <span className="mono rounded bg-[var(--paper-2)] px-1.5 py-0.5 text-meta text-[var(--ink-500)]">
               {isAssigned ? 'Not done yet' : 'Not yours'}
             </span>
           )}

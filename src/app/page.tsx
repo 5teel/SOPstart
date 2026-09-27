@@ -9,13 +9,13 @@ export default function Home() {
       <div className="flex gap-4">
         <Link
           href="/login"
-          className="bg-[var(--ink-900)] text-white font-semibold px-6 py-3 rounded-lg min-h-[var(--min-tap-target)] flex items-center hover:opacity-90 transition-opacity"
+          className="bg-[var(--ink-900)] text-white font-semibold px-6 py-3 rounded-lg min-h-tap-row flex items-center hover:opacity-90 transition-opacity"
         >
           Log In
         </Link>
         <Link
           href="/sign-up"
-          className="bg-white text-[var(--ink-900)] font-semibold px-6 py-3 rounded-lg min-h-[var(--min-tap-target)] flex items-center border border-[var(--ink-100)] hover:border-[var(--ink-900)] transition-colors"
+          className="bg-white text-[var(--ink-900)] font-semibold px-6 py-3 rounded-lg min-h-tap-row flex items-center border border-[var(--ink-100)] hover:border-[var(--ink-900)] transition-colors"
         >
           Sign Up
         </Link>

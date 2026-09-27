@@ -64,7 +64,7 @@ export function SopTable({ markdown }: SopTableProps) {
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-[var(--ink-100)] my-3">
+    <div className="overflow-x-auto rounded-lg border border-[var(--ink-100)] my-3">
       <table className="w-full text-sm border-collapse" role="table">
         <thead className="bg-[var(--paper-2)] sticky top-0 z-10">
           <tr>
@@ -88,7 +88,7 @@ export function SopTable({ markdown }: SopTableProps) {
               {row.map((cell, cellIdx) => (
                 <td
                   key={cellIdx}
-                  className="px-3 py-2 text-base text-[var(--ink-900)] leading-snug min-h-[44px]"
+                  className="px-3 py-2 text-base text-[var(--ink-900)] leading-snug min-h-tap"
                   style={{ textAlign: table.alignments[cellIdx] ?? 'left' }}
                 >
                   {cell}

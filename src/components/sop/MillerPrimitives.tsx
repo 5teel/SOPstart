@@ -14,7 +14,7 @@ import type { ReactNode, ComponentProps } from 'react'
 /** Sticky column header: mono, 11px, uppercase, on the recessed paper tone (readability floor, 2026-09-15 review). */
 export function MillerColumnHeader({ children }: { children: ReactNode }) {
   return (
-    <h2 className="mono sticky top-0 z-10 border-b border-[var(--ink-200)] bg-[var(--paper-2)] px-3 py-2 text-[11px] uppercase tracking-[0.08em] text-[var(--ink-500)]">
+    <h2 className="mono sticky top-0 z-10 border-b border-[var(--ink-200)] bg-[var(--paper-2)] px-3 py-2 text-meta uppercase tracking-widest text-[var(--ink-500)]">
       {children}
     </h2>
   )
@@ -28,7 +28,7 @@ export function MillerColumnHeader({ children }: { children: ReactNode }) {
  */
 export function MillerGroupLabel({ children }: { children: ReactNode }) {
   return (
-    <p className="mono mt-3 px-3 pb-1 text-[10px] uppercase tracking-[0.1em] text-[var(--ink-500)] first:mt-1">
+    <p className="mono mt-3 px-3 pb-1 text-micro uppercase tracking-widest text-[var(--ink-500)] first:mt-1">
       {children}
     </p>
   )
@@ -57,7 +57,7 @@ export function MillerItem({
     <button
       type="button"
       onClick={onClick}
-      className={`flex w-full items-center gap-2 border-b border-[var(--ink-100)] px-3 py-2 text-left text-[12.5px] transition-colors ${
+      className={`flex w-full items-center gap-2 border-b border-[var(--ink-100)] px-3 py-2 text-left text-ui transition-colors ${
         selected ? 'bg-[var(--ink-900)] font-semibold text-white' : 'text-[var(--ink-700)] hover:bg-[var(--paper-2)]'
       }`}
       {...rest}
@@ -71,7 +71,7 @@ export function MillerItem({
       )}
       <span className="min-w-0 flex-1 truncate">{children}</span>
       {count !== undefined && (
-        <span className={`mono flex-shrink-0 text-[12px] ${selected ? 'text-white/80' : 'text-[var(--ink-500)]'}`}>
+        <span className={`mono flex-shrink-0 text-xs ${selected ? 'text-white/80' : 'text-[var(--ink-500)]'}`}>
           {count}
         </span>
       )}

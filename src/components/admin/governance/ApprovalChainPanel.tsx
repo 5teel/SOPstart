@@ -51,7 +51,7 @@ export function ApprovalChainPanel({
       className="blueprint-frame space-y-3 p-4"
       style={{ borderColor: 'var(--accent-signoff)' }}
     >
-      <span className="mono text-[11px] uppercase tracking-wider text-[var(--accent-signoff)]">
+      <span className="mono text-meta uppercase tracking-wider text-[var(--accent-signoff)]">
         Awaiting approval
       </span>
 
@@ -61,7 +61,7 @@ export function ApprovalChainPanel({
           return (
             <li key={i} className="flex items-center gap-2 text-sm">
               <span
-                className="mono text-[10px] uppercase"
+                className="mono text-micro uppercase"
                 style={{
                   color:
                     state === 'approved'
@@ -88,7 +88,7 @@ export function ApprovalChainPanel({
             data-testid="approve-button"
             disabled={pending}
             onClick={() => onApprove(comment.trim() || undefined)}
-            className="evidence-btn !min-h-[36px] text-sm"
+            className="evidence-btn !min-h-9 text-sm"
           >
             {pending ? 'Working…' : 'Approve'}
           </button>
@@ -107,7 +107,7 @@ export function ApprovalChainPanel({
             data-testid="request-changes-button"
             disabled={pending || comment.trim().length === 0}
             onClick={() => onRequestChanges(comment.trim())}
-            className="evidence-btn !min-h-[36px] text-sm disabled:opacity-40"
+            className="evidence-btn !min-h-9 text-sm disabled:opacity-40"
           >
             Request changes
           </button>

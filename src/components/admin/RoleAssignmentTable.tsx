@@ -164,7 +164,7 @@ export default function RoleAssignmentTable({
   return (
     <div className="space-y-6">
       {/* Org invite code */}
-      <div className="rounded-xl bg-white border border-[var(--ink-100)] p-4">
+      <div className="rounded-lg bg-white border border-[var(--ink-100)] p-4">
         <p className="text-sm text-[var(--ink-500)] mb-2 font-medium">Organisation Invite Code</p>
         <div className="flex items-center gap-2 flex-wrap">
           <span className="font-mono text-lg font-bold text-[var(--ink-900)] tracking-widest">
@@ -192,7 +192,7 @@ export default function RoleAssignmentTable({
       </div>
 
       {/* Invite by email */}
-      <div className="rounded-xl bg-white border border-[var(--ink-100)] p-4">
+      <div className="rounded-lg bg-white border border-[var(--ink-100)] p-4">
         <p className="text-sm text-[var(--ink-500)] mb-2 font-medium">Invite by Email</p>
         <div className="flex gap-2">
           <input
@@ -205,7 +205,7 @@ export default function RoleAssignmentTable({
           <button
             onClick={handleInvite}
             disabled={inviteLoading || !inviteEmail.trim()}
-            className="h-[44px] px-4 bg-[var(--ink-900)] hover:bg-[var(--accent-voice)] disabled:opacity-60 text-white font-bold rounded-lg text-sm transition-colors whitespace-nowrap"
+            className="h-tap px-4 bg-[var(--ink-900)] hover:bg-[var(--accent-voice)] disabled:opacity-60 text-white font-bold rounded-lg text-sm transition-colors whitespace-nowrap"
           >
             {inviteLoading ? 'Sending...' : 'Send'}
           </button>
@@ -218,7 +218,7 @@ export default function RoleAssignmentTable({
       </div>
 
       {/* Add existing member with role */}
-      <div className="rounded-xl bg-white border border-[var(--ink-100)] p-4">
+      <div className="rounded-lg bg-white border border-[var(--ink-100)] p-4">
         <p className="text-sm text-[var(--ink-500)] mb-2 font-medium">Add Existing Member to Role</p>
         <p className="text-xs text-[var(--ink-300)] mb-3">Add someone who already has a SOPstart account to your organisation with a specific role.</p>
         <div className="flex gap-2 flex-wrap">
@@ -227,7 +227,7 @@ export default function RoleAssignmentTable({
             value={addEmail}
             onChange={e => setAddEmail(e.target.value)}
             placeholder="user@example.co.nz"
-            className="flex-1 min-w-[180px] px-4 py-3 rounded-lg bg-[var(--paper)] border border-[var(--ink-100)] text-[var(--ink-900)] placeholder-[var(--ink-500)] focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)] text-sm"
+            className="flex-1 min-w-45 px-4 py-3 rounded-lg bg-[var(--paper)] border border-[var(--ink-100)] text-[var(--ink-900)] placeholder-[var(--ink-500)] focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)] text-sm"
           />
           <select
             value={addRole}
@@ -241,7 +241,7 @@ export default function RoleAssignmentTable({
           <button
             onClick={handleAddMember}
             disabled={addLoading || !addEmail.trim()}
-            className="h-[44px] px-4 bg-[var(--ink-900)] hover:bg-[var(--accent-voice)] disabled:opacity-60 text-white font-bold rounded-lg text-sm transition-colors whitespace-nowrap"
+            className="h-tap px-4 bg-[var(--ink-900)] hover:bg-[var(--accent-voice)] disabled:opacity-60 text-white font-bold rounded-lg text-sm transition-colors whitespace-nowrap"
           >
             {addLoading ? 'Adding...' : 'Add'}
           </button>
@@ -255,7 +255,7 @@ export default function RoleAssignmentTable({
 
       {/* Confirmation bar */}
       {confirmAction && (
-        <div className="rounded-xl bg-[var(--accent-voice)]/10 border border-[var(--accent-voice)]/30 p-4 flex items-center gap-3 flex-wrap">
+        <div className="rounded-lg bg-[var(--accent-voice)]/10 border border-[var(--accent-voice)]/30 p-4 flex items-center gap-3 flex-wrap">
           <AlertTriangle size={18} className="text-[var(--accent-voice)] flex-shrink-0" />
           <span className="text-sm text-[var(--ink-900)] flex-1">
             {confirmAction.type === 'remove'
@@ -284,7 +284,7 @@ export default function RoleAssignmentTable({
       )}
 
       {/* Members list with department filter + column */}
-      <div className="rounded-xl bg-white border border-[var(--ink-100)] overflow-hidden">
+      <div className="rounded-lg bg-white border border-[var(--ink-100)] overflow-hidden">
         <div className="px-4 py-3 border-b border-[var(--ink-100)]">
           <h3 className="font-semibold text-[var(--ink-900)]">Team Members ({members.length})</h3>
           <p className="text-xs text-[var(--ink-500)] mt-1">
@@ -296,7 +296,7 @@ export default function RoleAssignmentTable({
         {departments.length > 0 && (
           <div className="px-4 py-3 border-b border-[var(--ink-100)] flex items-center gap-2 flex-wrap">
             <span
-              className="text-[9px] uppercase tracking-[0.10em] flex-shrink-0"
+              className="text-micro uppercase tracking-widest flex-shrink-0"
               style={{ color: 'var(--ink-500)', marginRight: '4px' }}
             >
               Department
@@ -305,7 +305,7 @@ export default function RoleAssignmentTable({
             <button
               type="button"
               onClick={() => setActiveDeptFilter(null)}
-              className="inline-flex items-center gap-2 rounded-md text-xs font-medium transition-colors"
+              className="inline-flex items-center gap-2 rounded-lg text-xs font-medium transition-colors"
               style={{
                 padding: '8px 13px',
                 minHeight: '44px',
@@ -317,7 +317,7 @@ export default function RoleAssignmentTable({
             >
               All
               <span
-                className="text-[10px] font-bold rounded-full px-[7px] py-px"
+                className="text-micro font-bold rounded-full px-2 py-px"
                 style={{
                   background: activeDeptFilter === null ? 'var(--steel-700, #3f3f46)' : 'var(--paper-2)',
                   color: activeDeptFilter === null ? 'var(--paper-1)' : 'var(--ink-700)',
@@ -332,7 +332,7 @@ export default function RoleAssignmentTable({
                 key={dept.id}
                 type="button"
                 onClick={() => setActiveDeptFilter(activeDeptFilter === dept.id ? null : dept.id)}
-                className="inline-flex items-center gap-2 rounded-md text-xs font-medium transition-colors"
+                className="inline-flex items-center gap-2 rounded-lg text-xs font-medium transition-colors"
                 style={{
                   padding: '8px 13px',
                   minHeight: '44px',
@@ -347,7 +347,7 @@ export default function RoleAssignmentTable({
                     display: 'inline-block',
                     width: '8px',
                     height: '8px',
-                    borderRadius: '2px',
+                    borderRadius: 'var(--radius-sm)',
                     background: dept.colour,
                     flexShrink: 0,
                   }}
@@ -355,7 +355,7 @@ export default function RoleAssignmentTable({
                 />
                 {dept.name}
                 <span
-                  className="text-[10px] font-bold rounded-full px-[7px] py-px"
+                  className="text-micro font-bold rounded-full px-2 py-px"
                   style={{
                     background: activeDeptFilter === dept.id ? 'var(--steel-700, #3f3f46)' : 'var(--paper-2)',
                     color: activeDeptFilter === dept.id ? 'var(--paper-1)' : 'var(--ink-700)',
@@ -371,7 +371,7 @@ export default function RoleAssignmentTable({
         {/* Context line */}
         {departments.length > 0 && (
           <div className="px-4 py-2 border-b border-[var(--ink-100)]">
-            <p className="text-[11px]" style={{ color: 'var(--ink-500)', lineHeight: 1.5 }}>
+            <p className="text-meta" style={{ color: 'var(--ink-500)', lineHeight: 1.5 }}>
               {activeDeptFilter
                 ? `People assigned to ${deptMap.get(activeDeptFilter)?.name ?? ''}.`
                 : 'Everyone in the organisation. A member in several departments appears under each.'}
@@ -384,17 +384,17 @@ export default function RoleAssignmentTable({
           className="hidden md:flex items-center px-4 py-2 border-b border-[var(--ink-100)] gap-3"
           style={{ minHeight: '36px' }}
         >
-          <div className="flex-1 text-[9px] uppercase tracking-[0.08em]" style={{ color: 'var(--ink-500)' }}>
+          <div className="flex-1 text-micro uppercase tracking-widest" style={{ color: 'var(--ink-500)' }}>
             Member
           </div>
           <div
-            className="text-[9px] uppercase tracking-[0.08em]"
+            className="text-micro uppercase tracking-widest"
             style={{ width: 130, flexShrink: 0, color: 'var(--ink-500)' }}
           >
             Role
           </div>
           <div
-            className="text-[9px] uppercase tracking-[0.08em]"
+            className="text-micro uppercase tracking-widest"
             style={{ width: 230, flexShrink: 0, color: 'var(--ink-500)' }}
           >
             Departments
@@ -421,7 +421,7 @@ export default function RoleAssignmentTable({
               return (
                 <div
                   key={member.id}
-                  className="flex flex-col md:flex-row md:items-center gap-3 px-4 py-3 min-h-[60px]"
+                  className="flex flex-col md:flex-row md:items-center gap-3 px-4 py-3 min-h-tap-glove"
                 >
                   {/* Identity + owner badge(s) */}
                   <div className="flex-1 min-w-0">
@@ -430,7 +430,7 @@ export default function RoleAssignmentTable({
                         {member.email ?? member.user_id.slice(0, 8) + '...'}
                       </p>
                       {isCurrentUser && (
-                        <span className="text-[10px] text-[var(--ink-900)] font-semibold bg-[var(--ink-900)]/10 px-1.5 py-0.5 rounded flex-shrink-0">
+                        <span className="text-micro text-[var(--ink-900)] font-semibold bg-[var(--ink-900)]/10 px-1.5 py-0.5 rounded flex-shrink-0">
                           You
                         </span>
                       )}
@@ -438,12 +438,12 @@ export default function RoleAssignmentTable({
                       {ownedDepts.map(d => (
                         <span
                           key={d.id}
-                          className="text-[8px] font-bold uppercase tracking-[0.05em] inline-flex items-center gap-0.5 px-1 py-px rounded border flex-shrink-0"
+                          className="text-micro font-bold uppercase tracking-wider inline-flex items-center gap-0.5 px-1 py-px rounded border flex-shrink-0"
                           style={{
                             color: 'var(--accent-decision)',
                             background: 'rgba(251,191,36,0.16)',
                             border: '1px solid var(--accent-signoff)',
-                            borderRadius: '3px',
+                            borderRadius: 'var(--radius-sm)',
                           }}
                         >
                           ★ Owns {d.name}
@@ -481,7 +481,7 @@ export default function RoleAssignmentTable({
                   >
                     {memberDeptIds.length === 0 && openPickerMemberId !== member.id && (
                       <span
-                        className="text-[10px]"
+                        className="text-micro"
                         style={{ color: 'var(--ink-500)', fontStyle: 'italic' }}
                       >
                         No department
@@ -534,7 +534,7 @@ export default function RoleAssignmentTable({
                         <button
                           type="button"
                           onClick={() => setOpenPickerMemberId(null)}
-                          className="mt-2 text-[11px] font-semibold rounded-md px-3 py-1"
+                          className="mt-2 text-meta font-semibold rounded-lg px-3 py-1"
                           style={{
                             background: 'var(--ink-900)',
                             color: 'var(--paper-1)',

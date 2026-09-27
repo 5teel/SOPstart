@@ -102,7 +102,7 @@ export default function VideoReviewPanel({
       </p>
 
       {/* Video player */}
-      <div className="bg-[var(--paper)] rounded-lg overflow-hidden border border-[var(--ink-100)] max-h-[280px]">
+      <div className="bg-[var(--paper)] rounded-lg overflow-hidden border border-[var(--ink-100)] max-h-70">
         {youtubeVideoId ? (
           <iframe
             id="youtube-player"
@@ -123,7 +123,7 @@ export default function VideoReviewPanel({
             onTimeUpdate={handleTimeUpdate}
           />
         ) : (
-          <div className="flex items-center justify-center h-[180px] text-[var(--ink-500)] text-sm">
+          <div className="flex items-center justify-center h-45 text-[var(--ink-500)] text-sm">
             No video available.
           </div>
         )}
@@ -156,13 +156,13 @@ export default function VideoReviewPanel({
               role="listitem"
               aria-pressed={activeSegmentIndex === i}
               onClick={() => handleSegmentClick(i)}
-              className={`flex items-start gap-3 px-3 py-2 rounded-lg cursor-pointer min-h-[44px] ${
+              className={`flex items-start gap-3 px-3 py-2 rounded-lg cursor-pointer min-h-tap ${
                 activeSegmentIndex === i
                   ? 'bg-white border-l-2 border-[var(--ink-900)]'
                   : 'hover:bg-white'
               }`}
             >
-              <span className="text-xs text-[var(--ink-500)] font-semibold tabular-nums w-[48px] shrink-0 pt-1">
+              <span className="text-xs text-[var(--ink-500)] font-semibold tabular-nums w-12 shrink-0 pt-1">
                 {formatTimestamp(seg.start)}
               </span>
               <span className="text-sm text-[var(--ink-900)] leading-relaxed flex-1">

@@ -105,7 +105,7 @@ function SortableRow({
       ref={setNodeRef}
       style={style}
       data-array-row
-      className="flex items-start gap-2 rounded-md border border-[var(--ink-300,#d4d4d8)] bg-[var(--paper,#fafafa)] px-2 py-1.5"
+      className="flex items-start gap-2 rounded-lg border border-[var(--ink-300,#d4d4d8)] bg-[var(--paper,#fafafa)] px-2 py-1.5"
     >
       <button
         type="button"
@@ -124,7 +124,7 @@ function SortableRow({
             aria-label={itemLabel ?? 'Item'}
             defaultValue={typeof row.data === 'string' ? row.data : ''}
             onChange={(e) => onEditString(e.target.value)}
-            className="w-full rounded border border-[var(--ink-300,#d4d4d8)] px-2 py-1 text-[13px] outline-none focus:shadow-[0_0_0_2px_rgba(59,130,246,0.22)]"
+            className="w-full rounded border border-[var(--ink-300,#d4d4d8)] px-2 py-1 text-ui outline-none focus:shadow-[0_0_0_2px_rgba(59,130,246,0.22)]"
           />
         ) : (
           (rowFields ?? []).map((rf) =>
@@ -135,12 +135,12 @@ function SortableRow({
                 aria-label={rf.label}
                 defaultValue={obj[rf.key] == null ? '' : String(obj[rf.key])}
                 onChange={(e) => onEditField(rf.key, e.target.value)}
-                className="w-full rounded border border-[var(--ink-300,#d4d4d8)] px-2 py-1 text-[13px] outline-none focus:shadow-[0_0_0_2px_rgba(59,130,246,0.22)]"
+                className="w-full rounded border border-[var(--ink-300,#d4d4d8)] px-2 py-1 text-ui outline-none focus:shadow-[0_0_0_2px_rgba(59,130,246,0.22)]"
               />
             ) : (
               <label
                 key={rf.key}
-                className="flex items-center gap-2 font-mono text-[11px] text-[var(--ink-500,#71717a)]"
+                className="flex items-center gap-2 font-mono text-meta text-[var(--ink-500,#71717a)]"
               >
                 <input
                   type="checkbox"
@@ -265,7 +265,7 @@ export function ArrayFieldEditor({
         type="button"
         data-array-add
         onClick={addRow}
-        className="inline-flex items-center gap-1 self-start rounded border border-dashed border-[var(--ink-300,#d4d4d8)] px-2 py-1 font-mono text-[11px] text-[var(--ink-500,#71717a)] hover:border-[var(--accent-step,#3b82f6)] hover:text-[var(--accent-step,#3b82f6)]"
+        className="inline-flex items-center gap-1 self-start rounded border border-dashed border-[var(--ink-300,#d4d4d8)] px-2 py-1 font-mono text-meta text-[var(--ink-500,#71717a)] hover:border-[var(--accent-step,#3b82f6)] hover:text-[var(--accent-step,#3b82f6)]"
       >
         <Plus size={12} /> add {itemLabel ?? 'row'}
       </button>

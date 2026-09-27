@@ -48,7 +48,7 @@ export function AccessAnswerPanel({ data }: { data: AccessAnswerPanelData }) {
 
   return (
     <div className="mt-3 rounded border border-[var(--ink-100)] bg-[var(--paper-1)] px-4 py-3">
-      <div className="mono text-[11px] font-medium uppercase tracking-wide text-[var(--ink-500)]">{heading}</div>
+      <div className="mono text-meta font-medium uppercase tracking-wide text-[var(--ink-500)]">{heading}</div>
 
       {data.kind === 'empty' && (
         <p className="m-0 mt-2 text-sm leading-normal text-[var(--ink-500)]">
@@ -59,7 +59,7 @@ export function AccessAnswerPanel({ data }: { data: AccessAnswerPanelData }) {
 
       {data.kind === 'sop' && (
         <>
-          <h3 className="m-0 mt-2 text-[15px] font-bold text-[var(--ink-900)]">{data.title}</h3>
+          <h3 className="m-0 mt-2 text-reading font-bold text-[var(--ink-900)]">{data.title}</h3>
           {data.collectionName && (
             <p className="m-0 text-xs text-[var(--ink-500)]">In the {data.collectionName} collection</p>
           )}
@@ -92,7 +92,7 @@ export function AccessAnswerPanel({ data }: { data: AccessAnswerPanelData }) {
 
       {data.kind === 'collection' && (
         <>
-          <h3 className="m-0 mt-2 text-[15px] font-bold text-[var(--ink-900)]">{data.title}</h3>
+          <h3 className="m-0 mt-2 text-reading font-bold text-[var(--ink-900)]">{data.title}</h3>
           <p className="m-0 text-xs text-[var(--ink-500)]">
             Changing this changes who sees every SOP inside — except SOPs with people chosen by name
           </p>
@@ -111,7 +111,7 @@ export function AccessAnswerPanel({ data }: { data: AccessAnswerPanelData }) {
 
       {data.kind === 'unit' && (
         <>
-          <h3 className="m-0 mt-2 text-[15px] font-bold text-[var(--ink-900)]">{data.title}</h3>
+          <h3 className="m-0 mt-2 text-reading font-bold text-[var(--ink-900)]">{data.title}</h3>
           {data.collections.length === 0 && data.sops.length === 0 ? (
             <p className="m-0 mt-2 text-sm text-[var(--ink-500)]">
               Nothing yet — choose a collection or SOP, then select this person or team to let them see it.

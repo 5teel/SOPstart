@@ -201,7 +201,7 @@ export default function AssignSopPage() {
 
   if (isPageLoading) {
     return (
-      <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10 flex items-center justify-center min-h-[200px]">
+      <div className="max-w-5xl mx-auto px-4 py-8 lg:px-8 lg:py-10 flex items-center justify-center min-h-50">
         <p className="text-[var(--ink-500)] text-sm">Loading...</p>
       </div>
     )
@@ -296,7 +296,7 @@ export default function AssignSopPage() {
 
         {members.length === 0 ? (
           /* Empty state */
-          <div className="flex flex-col items-center justify-center py-12 text-center bg-white rounded-xl border border-[var(--ink-100)]">
+          <div className="flex flex-col items-center justify-center py-12 text-center bg-white rounded-lg border border-[var(--ink-100)]">
             <Users size={32} className="text-[var(--ink-500)] mb-3" />
             <p className="text-base font-semibold text-[var(--ink-900)] mb-1">No workers yet</p>
             <p className="text-sm text-[var(--ink-500)]">
@@ -311,7 +311,7 @@ export default function AssignSopPage() {
               placeholder="Search workers..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full h-[56px] px-4 bg-white border border-[var(--ink-100)] rounded-xl text-[var(--ink-900)] placeholder:text-[var(--ink-500)] text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)]/50 focus:border-[var(--ink-900)]/50"
+              className="w-full h-14 px-4 bg-white border border-[var(--ink-100)] rounded-lg text-[var(--ink-900)] placeholder:text-[var(--ink-500)] text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)]/50 focus:border-[var(--ink-900)]/50"
             />
 
             {filteredMembers.length === 0 ? (

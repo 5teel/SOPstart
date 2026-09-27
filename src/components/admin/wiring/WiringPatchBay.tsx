@@ -881,7 +881,7 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, sops
   if (lens !== 'wiring') {
     return (
       <div className="p-6">
-        <div className="mono text-[11px] uppercase tracking-wide text-[var(--ink-500)] mb-3">
+        <div className="mono text-meta uppercase tracking-wide text-[var(--ink-500)] mb-3">
           {lens === 'matrix' ? '▦ Matrix' : '◉ Illuminate'} — coming soon, ⌇ Wiring is the shipping default
         </div>
         <ViewToggle options={LENS_OPTIONS} value={lens} onChange={(v) => setLens(v as LensView)} />
@@ -914,7 +914,7 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, sops
       />
 
       {saveError && (
-        <div role="alert" className="mono text-[11px] uppercase tracking-wide text-accent-escalate mt-1">
+        <div role="alert" className="mono text-meta uppercase tracking-wide text-accent-escalate mt-1">
           That didn&apos;t save — {saveError} Nothing changed yet; your choices are still here, try again.
         </div>
       )}

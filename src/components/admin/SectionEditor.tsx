@@ -223,7 +223,7 @@ export default function SectionEditor({
                   key={img.id}
                   src={img.storage_path}
                   alt={img.alt_text ?? 'SOP figure'}
-                  className="rounded-md max-w-full object-contain max-h-48 my-2 border border-[var(--ink-100)]"
+                  className="rounded-lg max-w-full object-contain max-h-48 my-2 border border-[var(--ink-100)]"
                 />
               ))}
             </div>
@@ -243,7 +243,7 @@ export default function SectionEditor({
                     ref={idx === 0 ? firstTextareaRef : undefined}
                     value={step.text}
                     onChange={(e) => updateStepText(idx, e.target.value)}
-                    className="flex-1 bg-[var(--paper)] border border-[var(--ink-900)]/50 rounded-lg text-base text-[var(--ink-900)] leading-relaxed p-3 resize-y focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)]/50 min-h-[72px]"
+                    className="flex-1 bg-[var(--paper)] border border-[var(--ink-900)]/50 rounded-lg text-base text-[var(--ink-900)] leading-relaxed p-3 resize-y focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)]/50 min-h-tap-row"
                   />
                   <button
                     type="button"
@@ -269,7 +269,7 @@ export default function SectionEditor({
                 ref={firstTextareaRef}
                 value={editContent}
                 onChange={(e) => setEditContent(e.target.value)}
-                className="w-full bg-[var(--paper)] border border-[var(--ink-900)]/50 rounded-lg text-base text-[var(--ink-900)] leading-relaxed p-3 resize-y focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)]/50 min-h-[120px]"
+                className="w-full bg-[var(--paper)] border border-[var(--ink-900)]/50 rounded-lg text-base text-[var(--ink-900)] leading-relaxed p-3 resize-y focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)]/50 min-h-30"
               />
               {containsMarkdownTable(editContent) && (
                 <p className="text-xs text-[var(--ink-500)] mt-1">
@@ -302,7 +302,7 @@ export default function SectionEditor({
               <button
                 type="button"
                 onClick={enterEdit}
-                className="h-[72px] px-5 bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--paper-2)] text-sm"
+                className="h-tap-row px-5 bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--paper-2)] text-sm"
               >
                 Edit section
               </button>
@@ -310,7 +310,7 @@ export default function SectionEditor({
                 type="button"
                 onClick={approveSection}
                 disabled={approving}
-                className="h-[72px] px-5 bg-[var(--ink-900)] text-white font-bold rounded-lg hover:bg-[var(--ink-700)] text-sm disabled:opacity-60"
+                className="h-tap-row px-5 bg-[var(--ink-900)] text-white font-bold rounded-lg hover:bg-[var(--ink-700)] text-sm disabled:opacity-60"
               >
                 {approving ? 'Approving…' : 'Approve section'}
               </button>
@@ -322,14 +322,14 @@ export default function SectionEditor({
               type="button"
               onClick={saveChanges}
               disabled={saving}
-              className="h-[72px] px-5 bg-[var(--ink-900)] text-white font-bold rounded-lg hover:bg-[var(--ink-700)] text-sm disabled:opacity-60"
+              className="h-tap-row px-5 bg-[var(--ink-900)] text-white font-bold rounded-lg hover:bg-[var(--ink-700)] text-sm disabled:opacity-60"
             >
               {saving ? 'Saving…' : 'Save changes'}
             </button>
             <button
               type="button"
               onClick={cancelEdit}
-              className="h-[72px] px-5 bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--paper-2)] text-sm"
+              className="h-tap-row px-5 bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--paper-2)] text-sm"
             >
               Cancel
             </button>

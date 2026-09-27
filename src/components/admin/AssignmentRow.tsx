@@ -54,7 +54,7 @@ export function AssignmentRow({
   }
 
   return (
-    <div className="flex items-center gap-4 px-4 py-3 bg-white rounded-xl border border-[var(--ink-100)] min-h-[56px]">
+    <div className="flex items-center gap-4 px-4 py-3 bg-white rounded-lg border border-[var(--ink-100)] min-h-14">
       {/* Left icon */}
       {type === 'role' ? (
         <Users size={20} className="text-[var(--ink-500)] flex-shrink-0" />
@@ -81,21 +81,21 @@ export function AssignmentRow({
             <button
               type="button"
               onClick={handleConfirmRemove}
-              className="h-[36px] px-3 text-accent-escalate font-semibold text-sm rounded-lg border border-accent-escalate/40 hover:bg-accent-escalate/10 transition-colors"
+              className="h-9 px-3 text-accent-escalate font-semibold text-sm rounded-lg border border-accent-escalate/40 hover:bg-accent-escalate/10 transition-colors"
             >
               Remove
             </button>
             <button
               type="button"
               onClick={handleCancelRemove}
-              className="h-[36px] px-3 text-[var(--ink-500)] font-semibold text-sm rounded-lg border border-[var(--ink-300)] hover:bg-[var(--paper-2)] transition-colors"
+              className="h-9 px-3 text-[var(--ink-500)] font-semibold text-sm rounded-lg border border-[var(--ink-300)] hover:bg-[var(--paper-2)] transition-colors"
             >
               Cancel
             </button>
           </div>
         ) : isLoading ? (
           /* Loading state */
-          <div className="h-[44px] px-4 flex items-center justify-center opacity-70 pointer-events-none">
+          <div className="h-tap px-4 flex items-center justify-center opacity-70 pointer-events-none">
             <Loader2 size={18} className="animate-spin text-[var(--ink-500)]" />
           </div>
         ) : isAssigned ? (
@@ -106,7 +106,7 @@ export function AssignmentRow({
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
             className={[
-              'h-[44px] px-4 font-semibold text-sm rounded-lg border transition-colors flex items-center gap-1.5',
+              'h-tap px-4 font-semibold text-sm rounded-lg border transition-colors flex items-center gap-1.5',
               hovered
                 ? 'bg-accent-escalate/10 text-accent-escalate border-accent-escalate/40 hover:bg-accent-escalate/20'
                 : 'bg-accent-signoff/20 text-accent-signoff border-accent-signoff/40',
@@ -127,7 +127,7 @@ export function AssignmentRow({
           <button
             type="button"
             onClick={onAssign}
-            className="h-[44px] px-4 bg-[var(--ink-900)] text-white font-semibold text-sm rounded-lg hover:bg-[var(--ink-700)] transition-colors"
+            className="h-tap px-4 bg-[var(--ink-900)] text-white font-semibold text-sm rounded-lg hover:bg-[var(--ink-700)] transition-colors"
           >
             + Assign
           </button>

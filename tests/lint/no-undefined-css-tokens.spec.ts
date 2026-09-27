@@ -38,9 +38,14 @@ function walk(dir: string, out: string[] = []): string[] {
 test('every var(--token) used without a fallback is defined in a stylesheet', () => {
   const files = walk(SRC_DIR)
 
-  // 1. Collect every custom property DEFINED anywhere in src (any selector).
+  // 1. Collect every custom property DEFINED anywhere in src (any selector),
+  //    plus Tailwind's own theme variables (--text-sm, --radius-lg,
+  //    --tracking-widest …), which Tailwind v4 emits on :root at build time
+  //    and which inline styles reference since the 2026-09-28 token sweep.
   const defined = new Set<string>()
-  for (const file of files) {
+  const tailwindTheme = path.join(REPO_ROOT, 'node_modules', 'tailwindcss', 'theme.css')
+  for (const file of [...files, tailwindTheme]) {
+    if (!fs.existsSync(file)) continue
     const src = fs.readFileSync(file, 'utf-8')
     for (const m of src.matchAll(/(--[a-zA-Z0-9-]+)\s*:/g)) {
       defined.add(m[1])

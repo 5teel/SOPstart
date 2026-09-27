@@ -81,12 +81,12 @@ export function NavGroupHeader({
           display: 'inline-flex',
           alignItems: 'center',
           fontFamily: 'JetBrains Mono, monospace',
-          fontSize: '9px',
+          fontSize: 'var(--text-micro)',
           fontWeight: 700,
           textTransform: 'uppercase',
-          letterSpacing: '0.08em',
+          letterSpacing: 'var(--tracking-widest)',
           color: accent,
-          borderRadius: '2px',
+          borderRadius: 'var(--radius-sm)',
           padding: '2px 6px',
           background: 'color-mix(in srgb, currentColor 10%, transparent)',
         }}
@@ -96,7 +96,7 @@ export function NavGroupHeader({
       <span
         style={{
           fontFamily: 'JetBrains Mono, monospace',
-          fontSize: '9px',
+          fontSize: 'var(--text-micro)',
           fontWeight: 500,
           color: 'var(--ink-500)',
         }}
@@ -175,7 +175,7 @@ export function NavRow({ block, index, active, onSelect }: NavRowProps): React.J
         alignItems: 'flex-start',
         gap: '7px',
         padding: '6px 8px',
-        borderRadius: '3px',
+        borderRadius: 'var(--radius-sm)',
         cursor: 'pointer',
         border: active
           ? '1px solid var(--accent-step)'
@@ -201,7 +201,7 @@ export function NavRow({ block, index, active, onSelect }: NavRowProps): React.J
           border: verified ? 'none' : '1.5px solid var(--ink-300)',
           background: verified ? 'var(--accent-ok)' : 'transparent',
           color: 'var(--paper-1)',
-          fontSize: '10px',
+          fontSize: 'var(--text-micro)',
           lineHeight: 1,
           fontWeight: 700,
         }}
@@ -216,7 +216,7 @@ export function NavRow({ block, index, active, onSelect }: NavRowProps): React.J
           width: '18px',
           textAlign: 'right',
           fontFamily: 'JetBrains Mono, monospace',
-          fontSize: '10px',
+          fontSize: 'var(--text-micro)',
           fontWeight: 600,
           color: 'var(--ink-500)',
           lineHeight: 1.5,
@@ -237,7 +237,7 @@ export function NavRow({ block, index, active, onSelect }: NavRowProps): React.J
           WebkitBoxOrient: 'vertical',
           overflow: 'hidden',
           fontFamily: 'Inter, sans-serif',
-          fontSize: '13px',
+          fontSize: 'var(--text-ui)',
           lineHeight: 1.35,
           fontWeight: active ? 600 : 400,
           color: verified ? 'var(--ink-500)' : 'var(--ink-900)',
@@ -263,7 +263,7 @@ export function NavRow({ block, index, active, onSelect }: NavRowProps): React.J
             borderRadius: '50%',
             background: 'var(--accent-hazard)',
             color: 'var(--paper-1)',
-            fontSize: '10px',
+            fontSize: 'var(--text-micro)',
             fontWeight: 700,
             padding: '0 2px',
           }}

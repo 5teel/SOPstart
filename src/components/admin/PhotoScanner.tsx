@@ -354,7 +354,7 @@ export function PhotoScanner({ open, onClose, onSubmit }: PhotoScannerProps) {
               ref={closeButtonRef}
               type="button"
               onClick={handleClose}
-              className="h-[44px] w-[44px] flex items-center justify-center text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors rounded-lg"
+              className="h-tap w-tap flex items-center justify-center text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors rounded-lg"
               aria-label="Close scanner"
             >
               <X className="w-5 h-5" />
@@ -362,7 +362,7 @@ export function PhotoScanner({ open, onClose, onSubmit }: PhotoScannerProps) {
           </div>
 
           {/* Viewfinder / Preview area */}
-          <div className="flex-1 bg-black flex items-center justify-center min-h-[200px] overflow-hidden">
+          <div className="flex-1 bg-black flex items-center justify-center min-h-50 overflow-hidden">
             {currentThumbnail ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -387,7 +387,7 @@ export function PhotoScanner({ open, onClose, onSubmit }: PhotoScannerProps) {
           <ImageQualityOverlay state={qualityState} message={qualityMessage || undefined} />
 
           {/* Thumbnail strip */}
-          <div className="flex gap-2 overflow-x-auto px-4 py-3 border-b border-[var(--ink-100)] min-h-[88px] items-center">
+          <div className="flex gap-2 overflow-x-auto px-4 py-3 border-b border-[var(--ink-100)] min-h-22 items-center">
             {pages.map((page, index) => (
               <div
                 key={page.id}
@@ -400,7 +400,7 @@ export function PhotoScanner({ open, onClose, onSubmit }: PhotoScannerProps) {
                 role="img"
                 aria-label={`Page ${index + 1}${page.detectedPageNumber ? ` (detected: page ${page.detectedPageNumber})` : ''}`}
                 className={[
-                  'relative shrink-0 w-[56px] h-[72px] rounded-lg overflow-hidden cursor-grab active:cursor-grabbing focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)]',
+                  'relative shrink-0 w-14 h-tap-row rounded-lg overflow-hidden cursor-grab active:cursor-grabbing focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)]',
                   dragIndex === index ? 'opacity-60 scale-95' : '',
                   focusedIndex === index ? 'ring-2 ring-[var(--ink-900)]' : 'border border-[var(--ink-100)]',
                 ].join(' ')}
@@ -418,7 +418,7 @@ export function PhotoScanner({ open, onClose, onSubmit }: PhotoScannerProps) {
                   className="w-full h-full object-cover"
                 />
                 {/* Page number badge */}
-                <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[9px] text-center leading-4">
+                <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-micro text-center leading-4">
                   {index + 1}
                 </div>
                 {/* Delete button */}
@@ -437,7 +437,7 @@ export function PhotoScanner({ open, onClose, onSubmit }: PhotoScannerProps) {
             <button
               type="button"
               onClick={() => cameraInputRef.current?.click()}
-              className="shrink-0 w-[56px] h-[72px] rounded-lg border border-dashed border-[var(--ink-100)] flex items-center justify-center text-[var(--ink-300)] hover:text-[var(--ink-500)] hover:border-[var(--ink-500)] transition-colors"
+              className="shrink-0 w-14 h-tap-row rounded-lg border border-dashed border-[var(--ink-100)] flex items-center justify-center text-[var(--ink-300)] hover:text-[var(--ink-500)] hover:border-[var(--ink-500)] transition-colors"
               aria-label="Capture another page"
             >
               <Plus className="w-5 h-5" />
@@ -457,7 +457,7 @@ export function PhotoScanner({ open, onClose, onSubmit }: PhotoScannerProps) {
                 <button
                   type="button"
                   onClick={handleRetake}
-                  className="flex-1 h-[72px] bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-xl hover:bg-[var(--ink-300)] active:bg-[var(--ink-500)] transition-colors"
+                  className="flex-1 h-tap-row bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--ink-300)] active:bg-[var(--ink-500)] transition-colors"
                 >
                   Retake photo
                 </button>
@@ -465,7 +465,7 @@ export function PhotoScanner({ open, onClose, onSubmit }: PhotoScannerProps) {
                 <button
                   type="button"
                   onClick={handleAddPage}
-                  className="flex-1 h-[72px] bg-[var(--ink-900)] text-white font-semibold rounded-xl hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
+                  className="flex-1 h-tap-row bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
                 >
                   Add page
                 </button>
@@ -476,7 +476,7 @@ export function PhotoScanner({ open, onClose, onSubmit }: PhotoScannerProps) {
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  className="flex-1 h-[72px] bg-[var(--ink-900)] text-white font-semibold rounded-xl hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
+                  className="flex-1 h-tap-row bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
                 >
                   Done -- submit {pageCount} {pageCount === 1 ? 'page' : 'pages'}
                 </button>
@@ -487,7 +487,7 @@ export function PhotoScanner({ open, onClose, onSubmit }: PhotoScannerProps) {
                 <button
                   type="button"
                   onClick={() => cameraInputRef.current?.click()}
-                  className="flex-1 h-[72px] bg-[var(--ink-900)] text-white font-semibold rounded-xl hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
+                  className="flex-1 h-tap-row bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
                 >
                   Capture first page
                 </button>
@@ -518,14 +518,14 @@ export function PhotoScanner({ open, onClose, onSubmit }: PhotoScannerProps) {
               <button
                 type="button"
                 onClick={() => setShowDiscardConfirm(false)}
-                className="flex-1 h-[72px] bg-[var(--paper-2)] text-[var(--ink-500)] font-semibold rounded-xl hover:bg-[var(--ink-300)] transition-colors"
+                className="flex-1 h-tap-row bg-[var(--paper-2)] text-[var(--ink-500)] font-semibold rounded-lg hover:bg-[var(--ink-300)] transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleDiscard}
-                className="flex-1 h-[72px] bg-[var(--paper-2)] text-accent-escalate font-semibold rounded-xl hover:bg-[var(--ink-300)] transition-colors"
+                className="flex-1 h-tap-row bg-[var(--paper-2)] text-accent-escalate font-semibold rounded-lg hover:bg-[var(--ink-300)] transition-colors"
               >
                 Discard
               </button>

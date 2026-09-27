@@ -20,18 +20,18 @@ export type BlockPickerPreviewProps = {
 export function BlockPickerPreview({ block, content }: BlockPickerPreviewProps) {
   if (!block || !content) {
     return (
-      <div className="bg-white border border-[var(--ink-100)] rounded-md p-6 h-full flex items-center justify-center">
+      <div className="bg-white border border-[var(--ink-100)] rounded-lg p-6 h-full flex items-center justify-center">
         <p className="text-sm text-[var(--ink-500)]">Select an item to preview</p>
       </div>
     )
   }
 
   return (
-    <div className="bg-white border border-[var(--ink-100)] rounded-md p-4 h-full overflow-y-auto">
+    <div className="bg-white border border-[var(--ink-100)] rounded-lg p-4 h-full overflow-y-auto">
       <div className="text-xs uppercase tracking-wider text-[var(--ink-500)] mb-2">
         Preview
       </div>
-      <div className="text-[11px] text-[var(--ink-500)] mb-3">
+      <div className="text-meta text-[var(--ink-500)] mb-3">
         Workers see this exact content.
       </div>
       <div>
@@ -71,7 +71,7 @@ function renderForKind(kindSlug: string, content: BlockContent) {
       )
     case 'emergency':
       return (
-        <div className="bg-accent-escalate/10 border border-accent-escalate/30 rounded-xl p-4">
+        <div className="bg-accent-escalate/10 border border-accent-escalate/30 rounded-lg p-4">
           <div className="text-sm font-bold uppercase tracking-widest text-accent-escalate mb-2">
             Emergency
           </div>
@@ -87,7 +87,7 @@ function renderForKind(kindSlug: string, content: BlockContent) {
       )
     case 'measurement':
       return (
-        <div className="bg-[var(--paper)] border border-[var(--ink-100)] rounded-xl p-4">
+        <div className="bg-[var(--paper)] border border-[var(--ink-100)] rounded-lg p-4">
           <div className="text-xs uppercase tracking-wider text-[var(--ink-500)] mb-1">
             Measurement
           </div>
@@ -104,7 +104,7 @@ function renderForKind(kindSlug: string, content: BlockContent) {
     // promoting a parsed_inline block manually).
     case 'text':
       return (
-        <div className="bg-white border border-[var(--ink-100)] rounded-xl p-4">
+        <div className="bg-white border border-[var(--ink-100)] rounded-lg p-4">
           <div className="text-xs uppercase tracking-wider text-[var(--ink-500)] mb-1">
             Text
           </div>
@@ -116,7 +116,7 @@ function renderForKind(kindSlug: string, content: BlockContent) {
       )
     case 'heading':
       return (
-        <div className="bg-white border border-[var(--ink-100)] rounded-xl p-4">
+        <div className="bg-white border border-[var(--ink-100)] rounded-lg p-4">
           <div className="text-xs uppercase tracking-wider text-[var(--ink-500)] mb-1">
             Heading ({content.level})
           </div>
@@ -129,7 +129,7 @@ function renderForKind(kindSlug: string, content: BlockContent) {
       )
     case 'photo':
       return (
-        <div className="bg-white border border-[var(--ink-100)] rounded-xl p-3">
+        <div className="bg-white border border-[var(--ink-100)] rounded-lg p-3">
           <div className="text-xs uppercase tracking-wider text-[var(--ink-500)] mb-2">
             Photo
           </div>
@@ -150,7 +150,7 @@ function renderForKind(kindSlug: string, content: BlockContent) {
       )
     case 'callout':
       return (
-        <div className="bg-[var(--accent-decision)]/10 border border-[var(--accent-decision)]/30 rounded-xl p-4">
+        <div className="bg-[var(--accent-decision)]/10 border border-[var(--accent-decision)]/30 rounded-lg p-4">
           <div className="text-xs uppercase tracking-widest text-[var(--accent-decision)] mb-1">
             {content.title}
           </div>
@@ -159,7 +159,7 @@ function renderForKind(kindSlug: string, content: BlockContent) {
       )
     case 'model':
       return (
-        <div className="bg-white border border-dashed border-[var(--ink-300)] rounded-xl p-4">
+        <div className="bg-white border border-dashed border-[var(--ink-300)] rounded-lg p-4">
           <div className="text-xs uppercase tracking-wider text-[var(--ink-500)] mb-2">
             3D Model
           </div>
@@ -175,7 +175,7 @@ function renderForKind(kindSlug: string, content: BlockContent) {
       )
     case 'step_with_photos':
       return (
-        <div className="bg-white border border-[var(--ink-100)] rounded-xl p-4">
+        <div className="bg-white border border-[var(--ink-100)] rounded-lg p-4">
           <div className="text-xs uppercase tracking-wider text-[var(--ink-500)] mb-1">
             Step {content.number} with photos ({content.photos.length})
           </div>
@@ -187,7 +187,7 @@ function renderForKind(kindSlug: string, content: BlockContent) {
       )
     case 'photo_grid':
       return (
-        <div className="bg-white border border-[var(--ink-100)] rounded-xl p-4">
+        <div className="bg-white border border-[var(--ink-100)] rounded-lg p-4">
           <div className="text-xs uppercase tracking-wider text-[var(--ink-500)] mb-1">
             Photo Grid ({content.columns} cols)
           </div>

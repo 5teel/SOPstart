@@ -56,7 +56,7 @@ export function VoiceNoteBlock({
 
   return (
     <section
-      className="mb-4 border rounded-xl p-5"
+      className="mb-4 border rounded-lg p-5"
       style={{
         borderColor: 'var(--accent-voice)',
         background: 'color-mix(in srgb, var(--accent-voice) 6%, white)',
@@ -67,7 +67,7 @@ export function VoiceNoteBlock({
     >
       <div className="flex items-center gap-2 mb-2">
         <span
-          className="text-[11px] font-mono uppercase tracking-wider"
+          className="text-meta font-mono uppercase tracking-wider"
           style={{ color: 'var(--accent-voice)' }}
         >
           Voice note

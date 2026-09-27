@@ -28,7 +28,7 @@ export default async function LoginPage({
       <LoginForm />
 
       {/* Prominent join card below the form */}
-      <div className="mt-6 rounded-xl border border-[var(--ink-100)] bg-white p-4 text-center">
+      <div className="mt-6 rounded-lg border border-[var(--ink-100)] bg-white p-4 text-center">
         <p className="text-sm font-semibold text-[var(--ink-900)] mb-1">
           Been given an invite code?
         </p>
@@ -37,7 +37,7 @@ export default async function LoginPage({
         </p>
         <Link
           href="/join"
-          className="inline-flex items-center justify-center h-[44px] px-6 bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold text-sm rounded-lg hover:bg-[var(--ink-300)] transition-colors border border-[var(--ink-900)]/30"
+          className="inline-flex items-center justify-center h-tap px-6 bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold text-sm rounded-lg hover:bg-[var(--ink-300)] transition-colors border border-[var(--ink-900)]/30"
         >
           Join with invite code
         </Link>

@@ -28,7 +28,7 @@ function HazardContent({ section, isEmergency }: { section: SectionWithChildren;
   const lines = parseContentLines(section.content)
 
   return (
-    <div className="bg-accent-escalate/10 border border-accent-escalate/30 rounded-xl p-5 mb-4">
+    <div className="bg-accent-escalate/10 border border-accent-escalate/30 rounded-lg p-5 mb-4">
       <div className="flex items-center gap-2 mb-3">
         <Icon size={18} className="text-accent-escalate flex-shrink-0" />
         <span className="text-sm font-bold uppercase tracking-widest text-accent-escalate">
@@ -55,7 +55,7 @@ function PpeContent({ section }: { section: SectionWithChildren }) {
   const items = parseContentLines(section.content)
 
   return (
-    <div className="bg-accent-step/10 border border-accent-step/30 rounded-xl p-5 mb-4">
+    <div className="bg-accent-step/10 border border-accent-step/30 rounded-lg p-5 mb-4">
       <div className="flex items-center gap-2 mb-3">
         <ShieldCheck size={18} className="text-accent-step flex-shrink-0" />
         <span className="text-sm font-bold uppercase tracking-widest text-accent-step">
@@ -90,9 +90,9 @@ function StepsContent({ section }: { section: SectionWithChildren }) {
         return (
           <div
             key={step.id}
-            className="flex items-start gap-4 p-4 bg-white rounded-xl border border-[var(--ink-100)]"
+            className="flex items-start gap-4 p-4 bg-white rounded-lg border border-[var(--ink-100)]"
           >
-            <span className="text-[13px] font-bold text-[var(--ink-500)] w-6 flex-shrink-0 pt-0.5 tabular-nums">
+            <span className="text-ui font-bold text-[var(--ink-500)] w-6 flex-shrink-0 pt-0.5 tabular-nums">
               {step.step_number}
             </span>
             <div className="flex-1 min-w-0">
@@ -118,7 +118,7 @@ function DefaultContent({ section }: { section: SectionWithChildren }) {
   const hasTable = containsMarkdownTable(section.content)
 
   return (
-    <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5 mb-4">
+    <div className="bg-white border border-[var(--ink-100)] rounded-lg p-5 mb-4">
       {section.content && (
         hasTable
           ? <SopTable markdown={section.content} />
@@ -159,7 +159,7 @@ function LegacyRenderer({ section }: SectionContentProps) {
       return (
         <>
           {section.content && (
-            <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5 mb-4">
+            <div className="bg-white border border-[var(--ink-100)] rounded-lg p-5 mb-4">
               <p className="text-base text-[var(--ink-900)] leading-relaxed whitespace-pre-wrap">{section.content}</p>
             </div>
           )}

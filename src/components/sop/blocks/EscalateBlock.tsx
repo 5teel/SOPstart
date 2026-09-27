@@ -62,7 +62,7 @@ export function EscalateBlock({
 
   return (
     <section
-      className="mb-4 border-2 rounded-xl p-5"
+      className="mb-4 border-2 rounded-lg p-5"
       style={{
         borderColor: 'var(--accent-escalate)',
         background: 'color-mix(in srgb, var(--accent-escalate) 8%, white)',
@@ -72,7 +72,7 @@ export function EscalateBlock({
     >
       <div className="flex items-center gap-2 mb-2">
         <span
-          className="text-[11px] font-mono uppercase tracking-wider"
+          className="text-meta font-mono uppercase tracking-wider"
           style={{ color: 'var(--accent-escalate)' }}
         >
           Escalate · {escalationMode}

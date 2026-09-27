@@ -67,7 +67,7 @@ test.describe('SB-LINE-02 — Sequential acknowledgement gate (Wave 2 contract t
   test('Next button has min-h-[60px] (glove-friendly tap target)', () => {
     const src = readMobile()
     // Tailwind arbitrary value class — needs literal match.
-    expect(src).toContain('min-h-[60px]')
+    expect(src).toContain('min-h-tap-glove') // 60px glove CTA — --spacing-tap-glove (2026-09-28 token sweep)
   })
 
   test('Forward-jump guard uses router.replace + strict > check (D-20, Pitfall 4)', () => {

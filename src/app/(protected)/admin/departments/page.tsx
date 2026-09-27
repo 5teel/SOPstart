@@ -58,7 +58,7 @@ export default async function DepartmentsPage() {
       {/* Sub-heading (above the grid's own header row) */}
       <p
         style={{
-          fontSize: '12px',
+          fontSize: 'var(--text-xs)',
           color: 'var(--ink-500)',
           maxWidth: '620px',
           lineHeight: 1.5,

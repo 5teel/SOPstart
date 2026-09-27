@@ -86,8 +86,8 @@ export function SopSectionTabs({ sections, activeId, onTabChange, hasVideo, vide
             type="button"
             onClick={() => onTabChange(section.id)}
             className={[
-              'flex-shrink-0 flex flex-col items-center justify-end px-4 h-[52px] gap-1 relative whitespace-nowrap',
-              'text-[13px] font-semibold transition-colors',
+              'flex-shrink-0 flex flex-col items-center justify-end px-4 h-13 gap-1 relative whitespace-nowrap',
+              'text-ui font-semibold transition-colors',
               isActive ? `${colors.active} border-b-2 ${colors.border}` : 'text-[var(--ink-500)] hover:text-[var(--ink-900)]',
             ].join(' ')}
           >
@@ -103,8 +103,8 @@ export function SopSectionTabs({ sections, activeId, onTabChange, hasVideo, vide
           type="button"
           onClick={() => onTabChange('video')}
           className={[
-            'flex-shrink-0 flex flex-col items-center justify-end px-4 h-[52px] gap-1 relative whitespace-nowrap',
-            'text-[13px] font-semibold transition-colors',
+            'flex-shrink-0 flex flex-col items-center justify-end px-4 h-13 gap-1 relative whitespace-nowrap',
+            'text-ui font-semibold transition-colors',
             isVideoActive
               ? 'text-[var(--ink-900)] border-b-2 border-[var(--ink-900)]'
               : 'text-[var(--ink-500)] hover:text-[var(--ink-900)]',

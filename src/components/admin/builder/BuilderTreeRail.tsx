@@ -266,7 +266,7 @@ export function BuilderTreeRail({
     <nav
       aria-label="SOP builder — sections and steps"
       data-testid="builder-tree-rail"
-      className="w-[240px] lg:w-[280px] shrink-0 border-r border-[var(--ink-100)] overflow-y-auto bg-[var(--paper)]"
+      className="w-60 lg:w-70 shrink-0 border-r border-[var(--ink-100)] overflow-y-auto bg-[var(--paper)]"
       style={{ display: 'flex', flexDirection: 'column' }}
     >
       {/* Reorder error strip */}
@@ -274,7 +274,7 @@ export function BuilderTreeRail({
         <div
           role="alert"
           className="px-4 py-2 text-xs border-b border-accent-escalate/30 bg-accent-escalate/10"
-          style={{ color: 'var(--accent-hazard)', fontFamily: 'JetBrains Mono, monospace', fontSize: '11px' }}
+          style={{ color: 'var(--accent-hazard)', fontFamily: 'JetBrains Mono, monospace', fontSize: 'var(--text-meta)' }}
         >
           {`Couldn't save order — try again`}
         </div>
@@ -285,10 +285,10 @@ export function BuilderTreeRail({
         style={{
           padding: '12px 12px 4px',
           fontFamily: 'JetBrains Mono, monospace',
-          fontSize: '10px',
+          fontSize: 'var(--text-micro)',
           fontWeight: 600,
           textTransform: 'uppercase',
-          letterSpacing: '0.08em',
+          letterSpacing: 'var(--tracking-widest)',
           color: 'var(--ink-500)',
           lineHeight: 1.3,
         }}
@@ -332,7 +332,7 @@ export function BuilderTreeRail({
                       style={{
                         padding: '8px 12px 8px 24px',
                         fontFamily: 'JetBrains Mono, monospace',
-                        fontSize: '11px',
+                        fontSize: 'var(--text-meta)',
                         color: 'var(--ink-500)',
                         lineHeight: 1.4,
                       }}
@@ -347,10 +347,10 @@ export function BuilderTreeRail({
                           style={{
                             padding: '4px 8px 2px 24px',
                             fontFamily: 'JetBrains Mono, monospace',
-                            fontSize: '10px',
+                            fontSize: 'var(--text-micro)',
                             fontWeight: 500,
                             textTransform: 'uppercase',
-                            letterSpacing: '0.06em',
+                            letterSpacing: 'var(--tracking-wider)',
                             color: 'var(--ink-500)',
                           }}
                         >
@@ -435,10 +435,10 @@ export function BuilderTreeRail({
                         gap: '4px',
                         background: 'none',
                         border: '1px dashed var(--ink-300)',
-                        borderRadius: '2px',
+                        borderRadius: 'var(--radius-sm)',
                         cursor: 'pointer',
                         fontFamily: 'JetBrains Mono, monospace',
-                        fontSize: '11px',
+                        fontSize: 'var(--text-meta)',
                         fontWeight: 400,
                         color: 'var(--ink-500)',
                       }}
@@ -455,7 +455,7 @@ export function BuilderTreeRail({
                   <span
                     style={{
                       fontFamily: 'JetBrains Mono, monospace',
-                      fontSize: '10px',
+                      fontSize: 'var(--text-micro)',
                       color: 'var(--ink-400)',
                     }}
                   >

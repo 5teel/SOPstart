@@ -133,7 +133,7 @@ export function VideoTabPanel({
                 aria-label={`${rate}x playback speed`}
                 aria-pressed={isActive}
                 className={[
-                  'px-3 h-[36px] rounded-lg text-sm font-semibold transition-colors',
+                  'px-3 h-9 rounded-lg text-sm font-semibold transition-colors',
                   isActive
                     ? 'bg-[var(--ink-900)] text-white'
                     : 'bg-[var(--paper-2)] text-[var(--ink-900)] hover:bg-[var(--paper-2)]',
@@ -153,7 +153,7 @@ export function VideoTabPanel({
             Chapters
           </p>
           <div
-            className="bg-white rounded-xl overflow-hidden divide-y divide-[var(--ink-100)]"
+            className="bg-white rounded-lg overflow-hidden divide-y divide-[var(--ink-100)]"
             role="list"
           >
             {chapters.map((chapter) => {
@@ -167,11 +167,11 @@ export function VideoTabPanel({
                     aria-label={`${chapter.title} - jump to ${timeLabel}`}
                     aria-current={isActive ? 'true' : undefined}
                     className={[
-                      'flex items-center gap-3 px-4 py-3 w-full min-h-[44px] hover:bg-[var(--paper-2)] transition-colors text-left',
+                      'flex items-center gap-3 px-4 py-3 w-full min-h-tap hover:bg-[var(--paper-2)] transition-colors text-left',
                       isActive ? 'border-l-2 border-[var(--ink-900)] bg-white' : '',
                     ].join(' ')}
                   >
-                    <span className="text-xs text-[var(--ink-500)] font-semibold tabular-nums w-[40px] shrink-0">
+                    <span className="text-xs text-[var(--ink-500)] font-semibold tabular-nums w-10 shrink-0">
                       {timeLabel}
                     </span>
                     <span className="text-sm text-[var(--ink-900)] font-semibold flex-1 leading-snug">

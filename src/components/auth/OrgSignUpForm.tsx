@@ -113,7 +113,7 @@ export default function OrgSignUpForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full min-h-[var(--min-tap-target)] bg-[var(--ink-900)] hover:bg-[var(--accent-voice)] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-lg text-base transition-colors"
+        className="w-full min-h-tap-row bg-[var(--ink-900)] hover:bg-[var(--accent-voice)] disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold rounded-lg text-base transition-colors"
       >
         {isSubmitting ? 'Creating your organisation...' : 'Register Organisation'}
       </button>

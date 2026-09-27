@@ -60,7 +60,7 @@ export function CompletionHistoryCard({
 }: CompletionHistoryCardProps) {
   return (
     <Link href={`/activity/${id}`}>
-      <div className="flex items-start gap-4 p-4 bg-white border border-[var(--ink-100)] rounded-xl hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] transition-colors cursor-pointer min-h-[88px]">
+      <div className="flex items-start gap-4 p-4 bg-white border border-[var(--ink-100)] rounded-lg hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] transition-colors cursor-pointer min-h-22">
         <StatusIcon status={status} />
 
         <div className="flex-1 min-w-0">

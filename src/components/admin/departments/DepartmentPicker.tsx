@@ -6,7 +6,7 @@
  * Near-verbatim mirror of SubTradePicker.tsx with three deltas (per PATTERNS):
  *  1. `departments` prop passed in (pre-fetched by server component — no internal fetch)
  *  2. `selectedIds` prop passed in (no internal state fetch)
- *  3. Colour swatch per pill (7px×7px, rounded-sm, dept.colour)
+ *  3. Colour swatch per pill (7px×7px, rounded, dept.colour)
  *
  * Mode 'member': toggle calls assignMemberDepartments; no all-departments option.
  *   - Shows inline "Set owner / ★ Owner" affordance per assigned dept (D-03)
@@ -243,7 +243,7 @@ export function DepartmentPicker(props: Props) {
               {/* Colour swatch — key delta from SubTradePicker (PATTERNS §delta 3) */}
               <span
                 style={{ background: dept.colour }}
-                className="w-1.5 h-1.5 rounded-sm flex-shrink-0"
+                className="w-1.5 h-1.5 rounded flex-shrink-0"
                 aria-hidden
               />
               {isOn && <Check className="h-3 w-3" aria-hidden="true" />}
@@ -256,7 +256,7 @@ export function DepartmentPicker(props: Props) {
                 type="button"
                 onClick={() => !isOwner && handleSetOwner(dept.id)}
                 disabled={pending || isOwner}
-                className={`text-[8px] font-bold uppercase tracking-[0.05em] px-1 py-px rounded border transition-colors ${
+                className={`text-micro font-bold uppercase tracking-wider px-1 py-px rounded border transition-colors ${
                   isOwner
                     ? 'cursor-default'
                     : 'cursor-pointer hover:opacity-80'

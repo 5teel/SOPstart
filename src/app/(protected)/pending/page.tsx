@@ -12,7 +12,7 @@ export default function PendingPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 lg:py-10">
       <div className="blueprint-frame max-w-md">
-        <p className="mono text-[11px] text-[var(--ink-500)] uppercase tracking-wider mb-1">
+        <p className="mono text-meta text-[var(--ink-500)] uppercase tracking-wider mb-1">
           ACCOUNT PENDING
         </p>
         <p className="text-sm text-[var(--ink-700)]">

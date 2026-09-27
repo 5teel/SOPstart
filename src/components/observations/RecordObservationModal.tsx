@@ -199,7 +199,7 @@ export function RecordObservationModal({
       aria-label="Record observation"
       className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
     >
-      <div className="bg-[var(--paper)] rounded-xl max-w-lg w-full shadow-xl overflow-hidden">
+      <div className="bg-[var(--paper)] rounded-lg max-w-lg w-full shadow-xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-3.5 border-b border-[var(--ink-100)]">
           <span className="text-xs font-bold uppercase tracking-wider text-[var(--ink-900)]">
             Record observation
@@ -218,7 +218,7 @@ export function RecordObservationModal({
         <div className="p-5 flex flex-col gap-4 max-h-[75vh] overflow-y-auto">
           {/* Worker (locked / pre-filled) */}
           <div>
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--ink-500)] mb-1.5">
+            <div className="text-micro font-semibold uppercase tracking-wider text-[var(--ink-500)] mb-1.5">
               Worker
             </div>
             <div className="flex items-center gap-2 w-full px-3 py-2.5 border border-[var(--ink-900)] rounded text-sm text-[var(--ink-900)]">
@@ -226,13 +226,13 @@ export function RecordObservationModal({
                 👤 {worker.name}
                 {worker.roleLabel ? ` — ${worker.roleLabel}` : ''}
               </span>
-              <span className="ml-auto text-[9px] text-[var(--ink-500)]">PRE-FILLED</span>
+              <span className="ml-auto text-micro text-[var(--ink-500)]">PRE-FILLED</span>
             </div>
           </div>
 
           {/* SOP picker — worker's required SOPs listed first (D-06) */}
           <div>
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--ink-500)] mb-1.5">
+            <div className="text-micro font-semibold uppercase tracking-wider text-[var(--ink-500)] mb-1.5">
               SOP observed
             </div>
             {selectedSop ? (
@@ -273,7 +273,7 @@ export function RecordObservationModal({
                     >
                       {s.title ?? 'Untitled SOP'}
                       {s.assigned && (
-                        <span className="ml-2 text-[9px] text-[var(--ink-500)] uppercase">
+                        <span className="ml-2 text-micro text-[var(--ink-500)] uppercase">
                           Required
                         </span>
                       )}
@@ -289,7 +289,7 @@ export function RecordObservationModal({
 
           {/* Verdict */}
           <div>
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--ink-500)] mb-1.5">
+            <div className="text-micro font-semibold uppercase tracking-wider text-[var(--ink-500)] mb-1.5">
               Verdict
             </div>
             <VerdictButtons
@@ -342,7 +342,7 @@ export function RecordObservationModal({
                     maxLength={500}
                     disabled={busy}
                     placeholder="Reason for override (min. 10 characters)…"
-                    className="w-full min-h-[64px] px-3 py-2 border border-[var(--ink-300)] rounded text-sm text-[var(--ink-900)] bg-[var(--paper-1)] outline-none focus:border-[var(--ink-900)] resize-none"
+                    className="w-full min-h-tap-glove px-3 py-2 border border-[var(--ink-300)] rounded text-sm text-[var(--ink-900)] bg-[var(--paper-1)] outline-none focus:border-[var(--ink-900)] resize-none"
                   />
                 </div>
               )}
@@ -351,7 +351,7 @@ export function RecordObservationModal({
 
           {/* Note */}
           <div>
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--ink-500)] mb-1.5">
+            <div className="text-micro font-semibold uppercase tracking-wider text-[var(--ink-500)] mb-1.5">
               Note (optional)
             </div>
             <textarea
@@ -360,7 +360,7 @@ export function RecordObservationModal({
               maxLength={2000}
               disabled={busy}
               placeholder='e.g. "Correct lock order, verified zero energy without prompting."'
-              className="w-full min-h-[72px] px-3 py-2.5 border border-dashed border-[var(--ink-300)] rounded text-sm text-[var(--ink-900)] bg-[var(--paper-1)] outline-none focus:border-[var(--ink-900)] resize-none"
+              className="w-full min-h-tap-row px-3 py-2.5 border border-dashed border-[var(--ink-300)] rounded text-sm text-[var(--ink-900)] bg-[var(--paper-1)] outline-none focus:border-[var(--ink-900)] resize-none"
             />
           </div>
 

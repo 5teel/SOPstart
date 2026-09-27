@@ -271,7 +271,7 @@ export function WizardClient({ categories, departments }: WizardClientProps) {
   }
 
   return (
-    <div className="rounded-xl border border-[var(--ink-100)] bg-white p-6" data-testid="wizard-client">
+    <div className="rounded-lg border border-[var(--ink-100)] bg-white p-6" data-testid="wizard-client">
       {/* Step indicator */}
       <div className="mb-6 flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-[var(--ink-500)]">
         <span className={step === 1 ? 'text-[var(--ink-900)]' : ''}>1 Title</span>
@@ -412,7 +412,7 @@ export function WizardClient({ categories, departments }: WizardClientProps) {
                           {picks.map((p) => (
                             <span
                               key={p.blockId}
-                              className="inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] rounded bg-accent-decision/10 text-accent-decision border border-accent-decision/30"
+                              className="inline-flex items-center gap-1.5 px-2 py-0.5 text-meta rounded bg-accent-decision/10 text-accent-decision border border-accent-decision/30"
                             >
                               <span className="uppercase tracking-wider">
                                 {p.pinMode === 'pinned' ? 'Pinned' : 'Follow'}

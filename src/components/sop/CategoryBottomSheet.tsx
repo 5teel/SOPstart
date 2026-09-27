@@ -48,7 +48,7 @@ function DepartmentRow({
       type="button"
       onClick={onToggle}
       className={[
-        'flex items-center justify-between px-4 rounded-xl transition-colors cursor-pointer w-full text-left',
+        'flex items-center justify-between px-4 rounded-lg transition-colors cursor-pointer w-full text-left',
         height,
         isSelected
           ? 'bg-[var(--ink-900)]/15 border border-[var(--ink-900)]/30'
@@ -64,7 +64,7 @@ function DepartmentRow({
             display: 'inline-block',
             width: '10px',
             height: '10px',
-            borderRadius: '3px',
+            borderRadius: 'var(--radius-sm)',
             background: dept.colour,
             flexShrink: 0,
           }}
@@ -90,7 +90,7 @@ function AllDepartmentsRow({
       type="button"
       onClick={onToggle}
       className={[
-        'flex items-center justify-between px-4 rounded-xl transition-colors cursor-pointer w-full text-left',
+        'flex items-center justify-between px-4 rounded-lg transition-colors cursor-pointer w-full text-left',
         height,
         isSelected
           ? 'border border-[var(--accent-mcu)]/40'
@@ -179,7 +179,7 @@ export function DepartmentBottomSheet({
             <AllDepartmentsRow
               isSelected={draftAll}
               onToggle={toggleAll}
-              height="h-[56px]"
+              height="h-14"
             />
             {departments.map((dept) => (
               <DepartmentRow
@@ -187,7 +187,7 @@ export function DepartmentBottomSheet({
                 dept={dept}
                 isSelected={draftIds.includes(dept.id)}
                 onToggle={() => toggleDept(dept.id)}
-                height="h-[56px]"
+                height="h-14"
               />
             ))}
           </div>
@@ -197,7 +197,7 @@ export function DepartmentBottomSheet({
             <button
               type="button"
               onClick={handleDone}
-              className="text-sm font-semibold text-white rounded-lg px-5 h-[44px] transition-colors hover:opacity-80"
+              className="text-sm font-semibold text-white rounded-lg px-5 h-tap transition-colors hover:opacity-80"
               style={{ background: 'var(--ink-900)' }}
             >
               Done
@@ -232,7 +232,7 @@ export function DepartmentSidebar({
   }
 
   return (
-    <aside className="w-[240px] flex-shrink-0 sticky top-0 h-screen overflow-y-auto py-6 px-3 border-r border-[var(--ink-100)] bg-[var(--paper)]">
+    <aside className="w-60 flex-shrink-0 sticky top-0 h-screen overflow-y-auto py-6 px-3 border-r border-[var(--ink-100)] bg-[var(--paper)]">
       <p className="text-xs font-semibold text-[var(--ink-500)] uppercase tracking-widest px-3 mb-3">
         Departments
       </p>
@@ -240,7 +240,7 @@ export function DepartmentSidebar({
         <AllDepartmentsRow
           isSelected={allDepartments}
           onToggle={toggleAll}
-          height="h-[44px]"
+          height="h-tap"
         />
         {departments.map((dept) => (
           <DepartmentRow
@@ -248,7 +248,7 @@ export function DepartmentSidebar({
             dept={dept}
             isSelected={selectedIds.includes(dept.id)}
             onToggle={() => toggleDept(dept.id)}
-            height="h-[44px]"
+            height="h-tap"
           />
         ))}
       </div>

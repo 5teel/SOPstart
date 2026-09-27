@@ -63,11 +63,11 @@ export function BlockChecklistRow({
             : 'border-[var(--ink-400)] bg-transparent',
         ].join(' ')}
       >
-        {verified ? <span className="text-[10px] leading-none">&#10003;</span> : null}
+        {verified ? <span className="text-micro leading-none">&#10003;</span> : null}
       </span>
 
       {/* Humanized type label — SPEC R4: no raw block.type symbol rendered */}
-      <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--ink-500)] min-w-[3.5rem]">
+      <span className="text-micro font-mono uppercase tracking-wider text-[var(--ink-500)] min-w-[3.5rem]">
         {humanizeBlockType(block.type)}
       </span>
 
@@ -79,7 +79,7 @@ export function BlockChecklistRow({
         <span
           data-testid="flag-badge"
           className={[
-            'inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full text-[10px] font-bold',
+            'inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full text-micro font-bold',
             verified
               ? 'bg-[var(--ink-200)] text-[var(--ink-500)]'
               : 'bg-accent-escalate text-white',
@@ -100,10 +100,10 @@ export function BlockChecklistRow({
             e.stopPropagation()
             onApprove()
           }}
-          className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono rounded border border-accent-signoff/50 bg-accent-signoff/10 text-accent-signoff hover:bg-accent-signoff/10 disabled:opacity-40 whitespace-nowrap"
+          className="flex items-center gap-1 px-2 py-0.5 text-micro font-mono rounded border border-accent-signoff/50 bg-accent-signoff/10 text-accent-signoff hover:bg-accent-signoff/10 disabled:opacity-40 whitespace-nowrap"
         >
           Verify step
-          <kbd className="text-[9px] opacity-50 font-mono border border-[var(--ink-300)] rounded px-0.5 leading-none">A</kbd>
+          <kbd className="text-micro opacity-50 font-mono border border-[var(--ink-300)] rounded px-0.5 leading-none">A</kbd>
         </button>
         <button
           type="button"
@@ -113,10 +113,10 @@ export function BlockChecklistRow({
             e.stopPropagation()
             onDecline()
           }}
-          className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono rounded border border-[var(--accent-voice)]/50 text-[var(--accent-voice)] hover:bg-accent-voice/10 whitespace-nowrap"
+          className="flex items-center gap-1 px-2 py-0.5 text-micro font-mono rounded border border-[var(--accent-voice)]/50 text-[var(--accent-voice)] hover:bg-accent-voice/10 whitespace-nowrap"
         >
           Send back to edit
-          <kbd className="text-[9px] opacity-50 font-mono border border-[var(--ink-300)] rounded px-0.5 leading-none">D</kbd>
+          <kbd className="text-micro opacity-50 font-mono border border-[var(--ink-300)] rounded px-0.5 leading-none">D</kbd>
         </button>
       </div>
     </div>

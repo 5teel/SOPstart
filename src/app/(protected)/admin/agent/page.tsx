@@ -40,7 +40,7 @@ export default async function AgentDashboardPage() {
     >
       <h1
         style={{
-          fontSize: '22px',
+          fontSize: 'var(--text-2xl)',
           fontWeight: 700,
           color: 'var(--ink-900)',
           margin: '0 0 6px',
@@ -51,7 +51,7 @@ export default async function AgentDashboardPage() {
       </h1>
       <p
         style={{
-          fontSize: '12px',
+          fontSize: 'var(--text-xs)',
           color: 'var(--ink-500)',
           maxWidth: '620px',
           lineHeight: 1.5,

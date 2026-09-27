@@ -93,7 +93,7 @@ export function AiDraftFork({ departments }: { departments: Department[] }) {
         data-testid="ai-draft-fork"
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
       >
-        <div className="w-full max-w-2xl rounded-md border border-[var(--ink-300)] bg-[var(--paper-1,#fff)] p-6 shadow-lg">
+        <div className="w-full max-w-2xl rounded-lg border border-[var(--ink-300)] bg-[var(--paper-1,#fff)] p-6 shadow-lg">
           <h2
             id="ai-fork-heading"
             className="mono text-lg font-semibold text-[var(--ink-900)]"

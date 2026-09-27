@@ -71,12 +71,12 @@ export function GovernanceQueueRow({ row }: { row: GovernanceRow }) {
               non-slug string gets looked up against SOP_CATEGORIES and
               silently returns null. */}
           {row.category_slug && <span className="text-xs text-[var(--ink-500)]">{row.category_slug}</span>}
-          <span className="mono text-[11px] text-[var(--ink-500)]">Owner: {row.ownerLabel}</span>
-          <span className="mono text-[11px] text-[var(--ink-500)]">Due: {formatDate(row.reviewDueAt)}</span>
+          <span className="mono text-meta text-[var(--ink-500)]">Owner: {row.ownerLabel}</span>
+          <span className="mono text-meta text-[var(--ink-500)]">Due: {formatDate(row.reviewDueAt)}</span>
           {row.flags.map((flag) => (
             <span
               key={flag}
-              className={`mono text-[11px] px-1.5 py-0.5 rounded ${FLAG_STYLE[flag]}`}
+              className={`mono text-meta px-1.5 py-0.5 rounded ${FLAG_STYLE[flag]}`}
             >
               {FLAG_LABEL[flag]}
             </span>
@@ -91,14 +91,14 @@ export function GovernanceQueueRow({ row }: { row: GovernanceRow }) {
             type="button"
             onClick={handleApprove}
             disabled={isPending}
-            className="evidence-btn !min-h-[36px] text-sm"
+            className="evidence-btn !min-h-9 text-sm"
           >
             {isPending ? 'Approving…' : 'Approve'}
           </button>
         ) : row.flags.includes('unowned') ? (
           <OwnerPicker sopId={row.id} ownerUserId={row.ownerUserId} ownerLabel={row.ownerLabel} />
         ) : row.flags.includes('stale_role') ? (
-          <Link href={`/admin/sops/${row.id}/assign`} className="evidence-btn !min-h-[36px] text-sm">
+          <Link href={`/admin/sops/${row.id}/assign`} className="evidence-btn !min-h-9 text-sm">
             Fix assignment
           </Link>
         ) : (
@@ -106,7 +106,7 @@ export function GovernanceQueueRow({ row }: { row: GovernanceRow }) {
             type="button"
             onClick={handleConfirmCurrent}
             disabled={isPending}
-            className="evidence-btn !min-h-[36px] text-sm"
+            className="evidence-btn !min-h-9 text-sm"
           >
             {isPending ? 'Confirming…' : 'Confirm current'}
           </button>

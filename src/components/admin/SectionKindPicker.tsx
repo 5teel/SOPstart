@@ -115,7 +115,7 @@ export function SectionKindPicker({ onSubmit, onCancel }: SectionKindPickerProps
                   onClick={() => handleSelect(k.id)}
                   className={[
                     'flex items-center gap-2 px-3 py-2 rounded-lg border text-left',
-                    'min-h-[72px] transition-colors',
+                    'min-h-tap-row transition-colors',
                     isSelected
                       ? 'border-[var(--ink-900)] bg-[var(--ink-900)]/10 text-[var(--ink-900)]'
                       : 'border-[var(--ink-100)] bg-white text-[var(--ink-900)] hover:bg-[var(--paper-2)]',
@@ -149,7 +149,7 @@ export function SectionKindPicker({ onSubmit, onCancel }: SectionKindPickerProps
                       type="button"
                       onClick={() => handleSelect(k.id)}
                       className={[
-                        'flex items-center gap-2 px-3 py-2 rounded-lg border text-left min-h-[72px]',
+                        'flex items-center gap-2 px-3 py-2 rounded-lg border text-left min-h-tap-row',
                         isSelected
                           ? 'border-[var(--ink-900)] bg-[var(--ink-900)]/10 text-[var(--ink-900)]'
                           : 'border-[var(--ink-100)] bg-white text-[var(--ink-900)] hover:bg-[var(--paper-2)]',
@@ -188,14 +188,14 @@ export function SectionKindPicker({ onSubmit, onCancel }: SectionKindPickerProps
           type="button"
           onClick={handleSubmit}
           disabled={!selectedKindId || !title.trim() || submitting || loading}
-          className="h-[72px] px-5 bg-[var(--ink-900)] text-white font-bold rounded-lg hover:bg-[var(--ink-700)] text-sm disabled:opacity-60"
+          className="h-tap-row px-5 bg-[var(--ink-900)] text-white font-bold rounded-lg hover:bg-[var(--ink-700)] text-sm disabled:opacity-60"
         >
           {submitting ? 'Adding…' : 'Add section'}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="h-[72px] px-5 bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--paper-2)] text-sm"
+          className="h-tap-row px-5 bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--paper-2)] text-sm"
         >
           Cancel
         </button>

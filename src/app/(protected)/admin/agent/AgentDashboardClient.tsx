@@ -80,13 +80,13 @@ export function AgentDashboardClient({
         <p
           role="alert"
           style={{
-            fontSize: '13px',
+            fontSize: 'var(--text-ui)',
             color: 'var(--accent-hazard)',
             marginBottom: '16px',
             padding: '10px 14px',
             background: 'rgba(239,68,68,0.06)',
             border: '1px solid var(--accent-hazard)',
-            borderRadius: '6px',
+            borderRadius: 'var(--radius-lg)',
           }}
         >
           {fetchError || actionError}

@@ -9,7 +9,7 @@ export default function NotFound() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="blueprint-frame max-w-md text-center">
-        <p className="mono text-[11px] text-[var(--ink-500)] uppercase tracking-wider mb-2">
+        <p className="mono text-meta text-[var(--ink-500)] uppercase tracking-wider mb-2">
           PAGE NOT FOUND
         </p>
         <p className="text-sm text-[var(--ink-700)] mb-4">

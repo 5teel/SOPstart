@@ -70,7 +70,7 @@ export default function AiModelSelect({
           setInternal(e.target.value)
           onChange?.(e.target.value)
         }}
-        className="h-[48px] w-full bg-white border border-[var(--ink-100)] rounded-xl text-sm text-[var(--ink-900)] px-3 focus:outline-none focus:ring-2 focus:ring-[var(--ink-300)] disabled:opacity-50"
+        className="h-12 w-full bg-white border border-[var(--ink-100)] rounded-lg text-sm text-[var(--ink-900)] px-3 focus:outline-none focus:ring-2 focus:ring-[var(--ink-300)] disabled:opacity-50"
       >
         {options.map((o) => (
           <option key={o.id} value={o.id}>
@@ -80,7 +80,7 @@ export default function AiModelSelect({
         ))}
       </select>
       {showNotes && (
-        <p className="mt-1 text-[11px] text-[var(--ink-400)]">
+        <p className="mt-1 text-meta text-[var(--ink-400)]">
           {options.find((o) => o.id === selected)?.provider ?? AI_MODELS[useCase].provider}
           {selected === aiModel(useCase) ? ' · default' : ''}
         </p>

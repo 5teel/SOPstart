@@ -30,7 +30,7 @@ export function ModelBlock({
   if (!enabled) {
     return (
       <section
-        className="mb-4 border border-dashed rounded-xl p-6 text-center"
+        className="mb-4 border border-dashed rounded-lg p-6 text-center"
         style={{
           borderColor: 'var(--ink-300, #d1d5db)',
           background: 'var(--paper-2, #f9fafb)',
@@ -39,7 +39,7 @@ export function ModelBlock({
         data-layout-placeholder="true"
       >
         <p
-          className="text-[11px] font-mono uppercase tracking-wider"
+          className="text-meta font-mono uppercase tracking-wider"
           style={{ color: 'var(--ink-500, #6b7280)' }}
         >
           3D model — disabled
@@ -82,11 +82,11 @@ export function ModelBlock({
   // Phase 12.6 will replace this branch with the three.js viewer.
   return (
     <section
-      className="mb-4 border rounded-xl p-6"
+      className="mb-4 border rounded-lg p-6"
       data-block="model"
     >
       <p
-        className="text-[11px] font-mono uppercase tracking-wider"
+        className="text-meta font-mono uppercase tracking-wider"
         style={{ color: 'var(--ink-500, #6b7280)' }}
       >
         3D viewer — Phase 12.6 pending

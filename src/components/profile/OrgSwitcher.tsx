@@ -73,7 +73,7 @@ export function OrgSwitcher() {
               onClick={() => handleSwitch(m.organisationId)}
               disabled={switching || isActive}
               className={[
-                'w-full flex items-center gap-3 rounded-xl px-4 py-3 text-left transition-all border',
+                'w-full flex items-center gap-3 rounded-lg px-4 py-3 text-left transition-all border',
                 isActive
                   ? 'bg-[var(--ink-900)]/5 border-[var(--ink-900)]/20'
                   : 'bg-white border-[var(--ink-100)] hover:border-[var(--ink-300)] hover:bg-[var(--paper-2)]',

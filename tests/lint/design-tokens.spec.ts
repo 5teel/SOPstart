@@ -85,6 +85,56 @@ test.describe('design tokens — one source of truth', () => {
     expect(layout).not.toContain('blueprint-theme.css')
   })
 
+  // ── Spacing / radius / type (2026-09-28, second sweep) ────────────────
+  const PX_UTIL = /(?<![\w\-\[])(?:[a-z0-9-]+:)*(?:(?:min-|max-)?(?:w|h|size)|p[xytblr]?|m[xytblr]?|gap(?:-[xy])?|space-[xy]|text|rounded(?:-[a-z]+)?|tracking)-\[[0-9.]+px\](?![\w\-])/g
+  const BAD_RADIUS = /(?<![\w\-\[])(?:[a-z0-9-]+:)*rounded-(?:xs|sm|md|xl|3xl|4xl)(?:-(?:t|b|l|r|tl|tr|bl|br|s|e|ss|se|es|ee))?(?![\w\-])/g
+  const TRACKING_ARB = /(?<![\w\-\[])(?:[a-z0-9-]+:)*tracking-\[[^\]]+\]/g
+  const INLINE_TYPE = /(?:fontSize|letterSpacing):\s*(?:'[0-9.]+(?:px|em)?'|"[0-9.]+(?:px|em)?"|[0-9.]+)(?=[,\s}])/g
+  const INLINE_RADIUS = /borderRadius:\s*(?:'[0-9.]+px'|"[0-9.]+px"|[1-9][0-9.]*)(?=[,\s}])/g
+  const INLINE_ALLOW = ['src/components/admin/source-viewer/', 'src/components/sop/flow/FlowGraphCanvas.tsx', 'src/components/sop/blocks/ModelBlock.tsx', 'src/components/admin/builder-v2/visual/annotation-tools.ts' /* Konva text, rasterised */]
+
+  test('no pixel-valued spacing, type, radius or tracking utilities — use the scale or a named token', () => {
+    const files: string[] = []
+    walk(SRC, files)
+    const hits: string[] = []
+    for (const f of files) {
+      const src = fs.readFileSync(f, 'utf-8')
+      for (const m of src.matchAll(PX_UTIL)) hits.push(`${rel(f)}: ${m[0]}`)
+      for (const m of src.matchAll(TRACKING_ARB)) hits.push(`${rel(f)}: ${m[0]}`)
+    }
+    expect(hits, hits.slice(0, 20).join('\n')).toEqual([])
+  })
+
+  test('radius vocabulary is rounded / rounded-lg / rounded-2xl / rounded-full', () => {
+    const files: string[] = []
+    walk(SRC, files)
+    const hits: string[] = []
+    for (const f of files) for (const m of fs.readFileSync(f, 'utf-8').matchAll(BAD_RADIUS)) hits.push(`${rel(f)}: ${m[0]}`)
+    expect(hits, hits.slice(0, 20).join('\n')).toEqual([])
+  })
+
+  test('inline styles use the type and radius tokens, not pixel literals', () => {
+    const files: string[] = []
+    walk(path.join(SRC, 'components'), files)
+    walk(path.join(SRC, 'app'), files)
+    const hits: string[] = []
+    for (const f of files) {
+      const r = rel(f)
+      if (INLINE_ALLOW.some((a) => r.startsWith(a))) continue
+      const src = fs.readFileSync(f, 'utf-8')
+      for (const m of src.matchAll(INLINE_TYPE)) hits.push(`${r}: ${m[0]}`)
+      for (const m of src.matchAll(INLINE_RADIUS)) hits.push(`${r}: ${m[0]}`)
+    }
+    expect(hits, hits.slice(0, 20).join('\n')).toEqual([])
+  })
+
+  test('the type and tap-target tokens are declared', () => {
+    const theme = fs.readFileSync(path.join(SRC, 'styles', 'blueprint-theme.css'), 'utf-8')
+    for (const t of ['--text-micro', '--text-meta', '--text-ui', '--text-reading', '--spacing-tap', '--spacing-tap-glove', '--spacing-tap-row']) {
+      expect(theme, t).toMatch(new RegExp(`\\n\\s*${t}:\\s*[0-9]+px`))
+    }
+  })
+
   test('every token utility a component may use is declared in the @theme block', () => {
     const theme = fs.readFileSync(path.join(SRC, 'styles', 'blueprint-theme.css'), 'utf-8')
     for (const t of ['accent-step', 'accent-ok', 'accent-hazard', 'accent-mcu', 'ai', 'brand-yellow', 'steel-900', 'steel-700', 'ink-200', 'ink-400', 'ink-600', 'paper-1']) {

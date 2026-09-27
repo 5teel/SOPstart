@@ -77,14 +77,14 @@ export function ImmersiveStepCard({ sop, onStepChange, completedSteps, stepPhoto
       data-immersive="true"
     >
       <header className="px-4 py-3 border-b border-[var(--ink-100)] flex items-center justify-between">
-        <div className="mono text-[11px] uppercase tracking-wider text-[var(--ink-500)] truncate">
+        <div className="mono text-meta uppercase tracking-wider text-[var(--ink-500)] truncate">
           {sectionTitle} · Step {currentIdx + 1}/{steps.length}
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {done && (
             <div className="flex items-center gap-1 text-accent-signoff">
               <CheckCircle2 size={14} />
-              <span className="mono text-[11px] uppercase tracking-wider">Done</span>
+              <span className="mono text-meta uppercase tracking-wider">Done</span>
             </div>
           )}
           <ReadAloudButton text={stepSpeechText(current)} />
@@ -106,7 +106,7 @@ export function ImmersiveStepCard({ sop, onStepChange, completedSteps, stepPhoto
         )}
         {current.required_tools && current.required_tools.length > 0 && (
           <div className="mt-3">
-            <span className="mono text-[11px] uppercase tracking-wider text-[var(--ink-500)]">
+            <span className="mono text-meta uppercase tracking-wider text-[var(--ink-500)]">
               Tools required:
             </span>
             <ul className="mt-1 space-y-1">
@@ -134,7 +134,7 @@ export function ImmersiveStepCard({ sop, onStepChange, completedSteps, stepPhoto
           ) : (
             <div className="flex items-center gap-2 text-[var(--ink-400)]">
               <Icon className="h-8 w-8" aria-hidden="true" />
-              <span className="mono text-[11px] uppercase tracking-wider">{sectionType}</span>
+              <span className="mono text-meta uppercase tracking-wider">{sectionType}</span>
             </div>
           )}
         </div>
@@ -142,7 +142,7 @@ export function ImmersiveStepCard({ sop, onStepChange, completedSteps, stepPhoto
         {/* Evidence capture grid — shown when step requires a photo and isn't complete */}
         {current.photo_required && !done && (
           <div className="mt-5 pt-4 border-t border-[var(--ink-100)]">
-            <span className="mono text-[11px] uppercase tracking-wider text-[var(--ink-500)]">
+            <span className="mono text-meta uppercase tracking-wider text-[var(--ink-500)]">
               Evidence Required
             </span>
             <div className="mt-2 flex flex-wrap items-center gap-2">

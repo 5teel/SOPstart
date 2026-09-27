@@ -131,7 +131,7 @@ export function UatTestModal({ test, existingRow, onClose, onSaved }: Props) {
             {/* Spotlight + improvement */}
             {(test.spotlight || test.comparison) && (
               <div className="rounded-lg border border-[var(--accent-step,#2563eb)]/30 bg-[var(--accent-step,#2563eb)]/[0.06] p-3">
-                <p className="flex items-center gap-1.5 text-[13px] font-semibold text-[var(--ink-900)]">
+                <p className="flex items-center gap-1.5 text-ui font-semibold text-[var(--ink-900)]">
                   <Sparkles className="h-4 w-4 text-[var(--accent-step,#2563eb)]" />
                   What&apos;s new{test.spotlight ? <> — {test.spotlight}</> : null}
                 </p>
@@ -145,7 +145,7 @@ export function UatTestModal({ test, existingRow, onClose, onSaved }: Props) {
             {hasComparison && test.comparison && (
               <div>
                 <BeforeAfter before={test.comparison.before} after={test.comparison.after} />
-                <div className="flex justify-between mt-1.5 text-[11px] text-[var(--ink-500)]">
+                <div className="flex justify-between mt-1.5 text-meta text-[var(--ink-500)]">
                   <span>{test.comparison.before.caption ?? 'Before'}</span>
                   <span>{test.comparison.after.caption ?? 'After'}</span>
                 </div>
@@ -155,7 +155,7 @@ export function UatTestModal({ test, existingRow, onClose, onSaved }: Props) {
             {/* Direction options (tap to pick) */}
             {!hasComparison && hasDirections && test.directions && (
               <div>
-                <p className="text-[13px] font-semibold text-[var(--ink-900)] mb-2">Which do you prefer? — tap one</p>
+                <p className="text-ui font-semibold text-[var(--ink-900)] mb-2">Which do you prefer? — tap one</p>
                 <div className="grid sm:grid-cols-2 gap-3">
                   {test.directions.map((dir) => {
                     const active = draft.preferredDirection === dir.id
@@ -163,7 +163,7 @@ export function UatTestModal({ test, existingRow, onClose, onSaved }: Props) {
                       <button
                         key={dir.id}
                         onClick={() => patch({ preferredDirection: active ? null : dir.id })}
-                        className="text-left rounded-xl border-2 p-3 transition-all"
+                        className="text-left rounded-lg border-2 p-3 transition-all"
                         style={{
                           borderColor: active ? 'var(--ink-900)' : 'var(--ink-100)',
                           background: active ? 'var(--paper-2)' : 'white',
@@ -173,11 +173,11 @@ export function UatTestModal({ test, existingRow, onClose, onSaved }: Props) {
                         <div className="flex items-center justify-between gap-2 mb-2">
                           <span className="text-sm font-semibold text-[var(--ink-900)]">{dir.label}</span>
                           {active ? (
-                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold bg-[var(--ink-900)] text-white rounded-full px-2 py-0.5">
+                            <span className="inline-flex items-center gap-1 text-meta font-semibold bg-[var(--ink-900)] text-white rounded-full px-2 py-0.5">
                               <Check className="h-3 w-3" /> Your pick
                             </span>
                           ) : (
-                            <span className="text-[11px] text-[var(--ink-500)]">Tap to pick</span>
+                            <span className="text-meta text-[var(--ink-500)]">Tap to pick</span>
                           )}
                         </div>
                         {dir.screenshot && (
@@ -195,7 +195,7 @@ export function UatTestModal({ test, existingRow, onClose, onSaved }: Props) {
             {/* Take a look (steps + open) */}
             {((test.tryIt && test.tryIt.length > 0) || (test.links && test.links.length > 0)) && (
               <div className="rounded-lg bg-white border border-[var(--ink-100)] p-3">
-                <p className="text-[13px] font-semibold text-[var(--ink-900)] mb-2">👀  See it for real</p>
+                <p className="text-ui font-semibold text-[var(--ink-900)] mb-2">👀  See it for real</p>
                 {test.tryIt && test.tryIt.length > 0 && (
                   <ol className="list-decimal list-inside text-sm text-[var(--ink-700)] space-y-1 mb-3">
                     {test.tryIt.map((s, i) => <li key={i}>{s}</li>)}
@@ -209,7 +209,7 @@ export function UatTestModal({ test, existingRow, onClose, onSaved }: Props) {
                         href={l.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="evidence-btn !min-h-[38px] text-sm inline-flex items-center gap-1.5"
+                        className="evidence-btn !min-h-9.5 text-sm inline-flex items-center gap-1.5"
                       >
                         {l.label}
                         <ExternalLink className="h-3.5 w-3.5" />
@@ -223,7 +223,7 @@ export function UatTestModal({ test, existingRow, onClose, onSaved }: Props) {
             {test.background && (
               <details className="text-xs text-[var(--ink-500)]">
                 <summary className="cursor-pointer select-none">Why we&apos;re asking</summary>
-                <p className="mono text-[11px] mt-1.5 leading-relaxed">{test.background}</p>
+                <p className="mono text-meta mt-1.5 leading-relaxed">{test.background}</p>
               </details>
             )}
           </div>
@@ -231,7 +231,7 @@ export function UatTestModal({ test, existingRow, onClose, onSaved }: Props) {
           {/* ---------- RIGHT: evaluate ---------- */}
           <div className="p-5 space-y-5 bg-white">
             <div>
-              <p className="text-[13px] font-semibold text-[var(--ink-900)] mb-2">A few quick questions</p>
+              <p className="text-ui font-semibold text-[var(--ink-900)] mb-2">A few quick questions</p>
               <ul className="space-y-2">
                 {test.questions.map((q) => (
                   <li key={q.id} className="rounded-lg bg-[var(--paper)] px-3 py-2">
@@ -243,7 +243,7 @@ export function UatTestModal({ test, existingRow, onClose, onSaved }: Props) {
                           <button
                             key={a.v}
                             onClick={() => setAnswer(q.id, a.v)}
-                            className="px-3 h-8 rounded-md text-xs font-semibold border transition-colors"
+                            className="px-3 h-8 rounded-lg text-xs font-semibold border transition-colors"
                             style={{
                               borderColor: active ? a.on : 'var(--ink-300)',
                               background: active ? a.on : 'white',
@@ -261,7 +261,7 @@ export function UatTestModal({ test, existingRow, onClose, onSaved }: Props) {
             </div>
 
             <div>
-              <p className="text-[13px] font-semibold text-[var(--ink-900)] mb-2">Overall, how does it feel?</p>
+              <p className="text-ui font-semibold text-[var(--ink-900)] mb-2">Overall, how does it feel?</p>
               <div className="flex flex-col gap-2">
                 {VERDICTS.map((v) => {
                   const active = draft.verdict === v.id
@@ -284,7 +284,7 @@ export function UatTestModal({ test, existingRow, onClose, onSaved }: Props) {
             </div>
 
             <div>
-              <p className="text-[13px] font-semibold text-[var(--ink-900)] mb-2">Anything else? (optional)</p>
+              <p className="text-ui font-semibold text-[var(--ink-900)] mb-2">Anything else? (optional)</p>
               <textarea
                 value={draft.notes}
                 onChange={(e) => patch({ notes: e.target.value })}
@@ -308,13 +308,13 @@ export function UatTestModal({ test, existingRow, onClose, onSaved }: Props) {
             <span className="text-xs text-[var(--ink-500)]">You can change your answers any time.</span>
           )}
           <div className="flex items-center gap-2">
-            <button onClick={onClose} className="evidence-btn !min-h-[40px] text-sm">
+            <button onClick={onClose} className="evidence-btn !min-h-10 text-sm">
               Close
             </button>
             <button
               onClick={save}
               disabled={saveState === 'saving'}
-              className="evidence-btn !min-h-[40px] text-sm !bg-[var(--ink-900)] !text-white !border-[var(--ink-900)] hover:!bg-[var(--ink-700)] disabled:opacity-50 inline-flex items-center gap-2 px-5"
+              className="evidence-btn !min-h-10 text-sm !bg-[var(--ink-900)] !text-white !border-[var(--ink-900)] hover:!bg-[var(--ink-700)] disabled:opacity-50 inline-flex items-center gap-2 px-5"
             >
               {saveState === 'saving' && <Loader2 className="h-4 w-4 animate-spin" />}
               {existingRow ? 'Update feedback' : 'Save feedback'}

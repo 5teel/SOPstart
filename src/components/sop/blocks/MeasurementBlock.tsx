@@ -76,7 +76,7 @@ export function MeasurementBlock({
 
   return (
     <section
-      className="mb-4 border rounded-xl p-5"
+      className="mb-4 border rounded-lg p-5"
       style={{
         borderColor: 'var(--accent-measure)',
         background: 'color-mix(in srgb, var(--accent-measure) 8%, white)',
@@ -86,7 +86,7 @@ export function MeasurementBlock({
       <div className="flex items-center justify-between gap-3">
         <div className="flex flex-col min-w-0">
           <span
-            className="text-[11px] font-mono uppercase tracking-wider"
+            className="text-meta font-mono uppercase tracking-wider"
             style={{ color: 'var(--accent-measure)' }}
           >
             Measurement

@@ -25,10 +25,10 @@ export function EscalationFormModal({
       data-escalation-modal="true"
       className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
     >
-      <div className="bg-white rounded-xl max-w-md w-full p-5 shadow-xl">
+      <div className="bg-white rounded-lg max-w-md w-full p-5 shadow-xl">
         <h3 className="text-base font-semibold mb-3">Escalation report</h3>
         <textarea
-          className="w-full border border-[var(--ink-300,#d4d4d8)] rounded p-2 min-h-[120px] text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[var(--accent-escalate)]"
+          className="w-full border border-[var(--ink-300,#d4d4d8)] rounded p-2 min-h-30 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[var(--accent-escalate)]"
           placeholder="Describe the issue…"
           value={reason}
           onChange={(e) => setReason(e.target.value)}

@@ -143,7 +143,7 @@ export function SopMetadataDialog({
         aria-modal="true"
         aria-labelledby={`${idPrefix}-dialog-heading`}
         data-testid="sop-metadata-dialog"
-        className="w-full max-w-lg rounded-md border border-[var(--ink-300)] bg-white p-6 shadow-lg"
+        className="w-full max-w-lg rounded-lg border border-[var(--ink-300)] bg-white p-6 shadow-lg"
       >
         <h2
           id={`${idPrefix}-dialog-heading`}

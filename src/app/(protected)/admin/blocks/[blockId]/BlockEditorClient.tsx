@@ -111,7 +111,7 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full bg-white border border-[var(--ink-100)] rounded-md px-3 py-2 text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
+            className="w-full bg-white border border-[var(--ink-100)] rounded-lg px-3 py-2 text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
           />
         </div>
 
@@ -157,7 +157,7 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
                   .filter((s) => s.length > 0)
               )
             }
-            className="w-full bg-white border border-[var(--ink-100)] rounded-md px-3 py-2 text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
+            className="w-full bg-white border border-[var(--ink-100)] rounded-lg px-3 py-2 text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
           />
         </div>
 
@@ -170,7 +170,7 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
             rows={12}
             value={contentJson}
             onChange={(e) => setContentJson(e.target.value)}
-            className="w-full bg-[var(--paper-2)] border border-[var(--ink-100)] rounded-md px-3 py-2 font-mono text-xs text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
+            className="w-full bg-[var(--paper-2)] border border-[var(--ink-100)] rounded-lg px-3 py-2 font-mono text-xs text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
           />
         </div>
 
@@ -183,18 +183,18 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
             type="text"
             value={changeNote}
             onChange={(e) => setChangeNote(e.target.value)}
-            className="w-full bg-white border border-[var(--ink-100)] rounded-md px-3 py-2 text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
+            className="w-full bg-white border border-[var(--ink-100)] rounded-lg px-3 py-2 text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
             placeholder="Why are you saving this version?"
           />
         </div>
 
         {error && (
-          <div className="text-sm text-accent-escalate bg-accent-escalate/10 border border-accent-escalate/40 rounded-md p-3">
+          <div className="text-sm text-accent-escalate bg-accent-escalate/10 border border-accent-escalate/40 rounded-lg p-3">
             {error}
           </div>
         )}
         {savedMsg && (
-          <div className="text-sm text-accent-signoff bg-accent-signoff/10 border border-accent-signoff/40 rounded-md p-3">
+          <div className="text-sm text-accent-signoff bg-accent-signoff/10 border border-accent-signoff/40 rounded-lg p-3">
             {savedMsg}
           </div>
         )}
@@ -204,7 +204,7 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
             type="button"
             onClick={handleSave}
             disabled={isPending}
-            className="bg-[var(--ink-900)] text-white font-semibold px-4 h-[44px] rounded-lg hover:bg-[var(--ink-700)] transition-colors text-sm inline-flex items-center gap-2 disabled:opacity-50"
+            className="bg-[var(--ink-900)] text-white font-semibold px-4 h-tap rounded-lg hover:bg-[var(--ink-700)] transition-colors text-sm inline-flex items-center gap-2 disabled:opacity-50"
           >
             <Save className="h-4 w-4" />
             Save changes
@@ -213,7 +213,7 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
             type="button"
             onClick={handleArchive}
             disabled={isPending}
-            className="bg-white border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-accent-escalate hover:bg-accent-escalate/10 font-semibold px-4 h-[44px] rounded-lg transition-colors text-sm disabled:opacity-50"
+            className="bg-white border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-accent-escalate hover:bg-accent-escalate/10 font-semibold px-4 h-tap rounded-lg transition-colors text-sm disabled:opacity-50"
           >
             Archive block
           </button>
@@ -233,7 +233,7 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
               {allVersions.map((v) => (
                 <li
                   key={v.id}
-                  className="text-xs bg-white border border-[var(--ink-100)] rounded-md p-2 text-[var(--ink-500)]"
+                  className="text-xs bg-white border border-[var(--ink-100)] rounded-lg p-2 text-[var(--ink-500)]"
                 >
                   <span className="font-semibold text-[var(--ink-900)]">v{v.version_number}</span>
                   {v.change_note && <span className="ml-2">— {v.change_note}</span>}
@@ -277,7 +277,7 @@ function BlockPreview({ content }: { content: BlockContent | null }) {
     case 'hazard':
       return (
         <div>
-          <div className="text-[10px] uppercase tracking-wider text-accent-escalate mb-1">{content.severity}</div>
+          <div className="text-micro uppercase tracking-wider text-accent-escalate mb-1">{content.severity}</div>
           <div className="text-[var(--ink-900)]">{content.text}</div>
         </div>
       )

@@ -85,7 +85,7 @@ export function MediaGrid({ item, onCommitField }: MediaGridProps) {
             key={i}
             data-media-item
             data-medium={it.medium}
-            className="group/media relative flex flex-col overflow-hidden rounded-md border border-[var(--ink-300,#d4d4d8)] bg-[var(--paper-2,#f4f4f5)]"
+            className="group/media relative flex flex-col overflow-hidden rounded-lg border border-[var(--ink-300,#d4d4d8)] bg-[var(--paper-2,#f4f4f5)]"
           >
             <div className="relative aspect-video w-full bg-[var(--ink-100,#f4f4f5)]">
               {it.src && it.medium === 'video' ? (
@@ -95,14 +95,14 @@ export function MediaGrid({ item, onCommitField }: MediaGridProps) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={it.src} alt={it.alt} className="h-full w-full object-cover" />
               ) : (
-                <div className="grid h-full w-full place-items-center font-mono text-[9px] uppercase text-[var(--ink-500,#71717a)]">
+                <div className="grid h-full w-full place-items-center font-mono text-micro uppercase text-[var(--ink-500,#71717a)]">
                   empty
                 </div>
               )}
               {/* Medium tag pill — visual:{medium}, colour-coded per UI-SPEC. */}
               <span
                 data-medium-tag
-                className="absolute left-1 top-1 rounded px-1 py-0.5 font-mono text-[8px] font-semibold uppercase tracking-wider text-white"
+                className="absolute left-1 top-1 rounded px-1 py-0.5 font-mono text-micro font-semibold uppercase tracking-wider text-white"
                 style={{ backgroundColor: MEDIUM_ACCENT[it.medium] }}
               >
                 {mediumTag(it.medium)}
@@ -111,7 +111,7 @@ export function MediaGrid({ item, onCommitField }: MediaGridProps) {
                 type="button"
                 aria-label={`Remove ${it.medium} item ${i + 1}`}
                 onClick={() => removeItem(i)}
-                className="absolute right-1 top-1 hidden rounded bg-[var(--ink-900,#09090b)]/70 px-1 font-mono text-[9px] text-white group-hover/media:block"
+                className="absolute right-1 top-1 hidden rounded bg-[var(--ink-900,#09090b)]/70 px-1 font-mono text-micro text-white group-hover/media:block"
               >
                 ×
               </button>
@@ -122,7 +122,7 @@ export function MediaGrid({ item, onCommitField }: MediaGridProps) {
                   data-annotate-diagram
                   aria-label={`Annotate diagram item ${i + 1}`}
                   onClick={() => setAnnotatingIndex(i)}
-                  className="absolute bottom-1 right-1 hidden items-center gap-1 rounded bg-[var(--ink-900,#09090b)]/75 px-1.5 py-0.5 font-mono text-[9px] text-white group-hover/media:inline-flex"
+                  className="absolute bottom-1 right-1 hidden items-center gap-1 rounded bg-[var(--ink-900,#09090b)]/75 px-1.5 py-0.5 font-mono text-micro text-white group-hover/media:inline-flex"
                 >
                   <PenLine size={10} /> annotate
                 </button>
@@ -134,7 +134,7 @@ export function MediaGrid({ item, onCommitField }: MediaGridProps) {
               placeholder="Caption"
               defaultValue={it.caption ?? ''}
               onBlur={(e) => updateCaption(i, e.target.value)}
-              className="border-t border-[var(--ink-300,#d4d4d8)] bg-transparent px-1.5 py-1 text-[11px] outline-none focus:shadow-[0_0_0_2px_rgba(59,130,246,0.22)]"
+              className="border-t border-[var(--ink-300,#d4d4d8)] bg-transparent px-1.5 py-1 text-meta outline-none focus:shadow-[0_0_0_2px_rgba(59,130,246,0.22)]"
             />
           </div>
         ))}
@@ -147,7 +147,7 @@ export function MediaGrid({ item, onCommitField }: MediaGridProps) {
           data-add-media
           aria-label="Add media"
           onClick={() => addMedium('photo')}
-          className="inline-flex items-center gap-1 rounded border border-dashed border-[var(--ink-300,#d4d4d8)] px-2 py-0.5 font-mono text-[10px] text-[var(--ink-500,#71717a)] hover:border-[var(--accent-step,#3b82f6)] hover:text-[var(--accent-step,#3b82f6)]"
+          className="inline-flex items-center gap-1 rounded border border-dashed border-[var(--ink-300,#d4d4d8)] px-2 py-0.5 font-mono text-micro text-[var(--ink-500,#71717a)] hover:border-[var(--accent-step,#3b82f6)] hover:text-[var(--accent-step,#3b82f6)]"
         >
           <ImagePlus size={11} /> add media
         </button>
@@ -162,7 +162,7 @@ export function MediaGrid({ item, onCommitField }: MediaGridProps) {
             aria-expanded={picking}
             aria-label="Add media"
             onClick={() => setPicking((o) => !o)}
-            className="inline-flex items-center gap-1 rounded border border-dashed border-[var(--ink-300,#d4d4d8)] px-2 py-0.5 font-mono text-[10px] text-[var(--ink-500,#71717a)] hover:border-[var(--accent-step,#3b82f6)] hover:text-[var(--accent-step,#3b82f6)]"
+            className="inline-flex items-center gap-1 rounded border border-dashed border-[var(--ink-300,#d4d4d8)] px-2 py-0.5 font-mono text-micro text-[var(--ink-500,#71717a)] hover:border-[var(--accent-step,#3b82f6)] hover:text-[var(--accent-step,#3b82f6)]"
           >
             <ImagePlus size={11} /> add media
           </button>
@@ -170,7 +170,7 @@ export function MediaGrid({ item, onCommitField }: MediaGridProps) {
             <div
               role="menu"
               data-medium-picker
-              className="absolute left-0 z-30 mt-1 flex gap-1 rounded-[10px] border-[1.5px] border-[var(--ink-900,#09090b)] bg-[var(--paper,#fafafa)] p-1 shadow-[0_18px_50px_rgba(0,0,0,0.24)]"
+              className="absolute left-0 z-30 mt-1 flex gap-1 rounded-lg border-[1.5px] border-[var(--ink-900,#09090b)] bg-[var(--paper,#fafafa)] p-1 shadow-[0_18px_50px_rgba(0,0,0,0.24)]"
             >
               {MEDIUM_PICKER.map(({ medium, label, Icon }) => (
                 <button
@@ -179,7 +179,7 @@ export function MediaGrid({ item, onCommitField }: MediaGridProps) {
                   role="menuitem"
                   data-add-medium={medium}
                   onClick={() => addMedium(medium)}
-                  className="inline-flex items-center gap-1 rounded px-2 py-1 font-mono text-[10px] text-[var(--ink-900,#09090b)] hover:bg-[var(--paper-2,#f4f4f5)]"
+                  className="inline-flex items-center gap-1 rounded px-2 py-1 font-mono text-micro text-[var(--ink-900,#09090b)] hover:bg-[var(--paper-2,#f4f4f5)]"
                   style={{ color: MEDIUM_ACCENT[medium] }}
                 >
                   <Icon size={12} /> {label}

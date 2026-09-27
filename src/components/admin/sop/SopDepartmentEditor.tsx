@@ -43,7 +43,7 @@ export function SopDepartmentEditor({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex items-center gap-1.5 text-[11px] text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors"
+        className="inline-flex items-center gap-1.5 text-meta text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors"
         aria-expanded={open}
       >
         <Tags className="h-3.5 w-3.5" />

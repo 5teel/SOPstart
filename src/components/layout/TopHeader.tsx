@@ -215,7 +215,7 @@ export function TopHeader({ role, userEmail }: TopHeaderProps) {
         <button
           type="button"
           onClick={() => setDrawerOpen(true)}
-          className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-md text-[var(--ink-700)] hover:bg-[var(--paper-2)] focus-visible:outline-2 focus-visible:outline-[var(--ink-900)] focus-visible:outline-offset-2"
+          className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg text-[var(--ink-700)] hover:bg-[var(--paper-2)] focus-visible:outline-2 focus-visible:outline-[var(--ink-900)] focus-visible:outline-offset-2"
           aria-label="Open navigation"
           aria-expanded={drawerOpen}
           aria-controls="top-header-drawer"
@@ -225,7 +225,7 @@ export function TopHeader({ role, userEmail }: TopHeaderProps) {
 
         <Link
           href={roleHome(role)}
-          className="flex items-center gap-2 text-[var(--ink-900)] focus-visible:outline-2 focus-visible:outline-[var(--ink-900)] focus-visible:outline-offset-2 rounded-sm"
+          className="flex items-center gap-2 text-[var(--ink-900)] focus-visible:outline-2 focus-visible:outline-[var(--ink-900)] focus-visible:outline-offset-2 rounded"
           aria-label={`${PRODUCT_NAME} — home`}
         >
           <BrandMark className="h-7 w-7" />
@@ -279,11 +279,11 @@ export function TopHeader({ role, userEmail }: TopHeaderProps) {
             {menuOpen && (
               <div
                 role="menu"
-                className="absolute right-0 top-full mt-2 w-56 rounded-md border border-[var(--ink-200)] bg-white shadow-lg z-50"
+                className="absolute right-0 top-full mt-2 w-56 rounded-lg border border-[var(--ink-200)] bg-white shadow-lg z-50"
               >
                 {userEmail && (
                   <div className="px-3 py-2 border-b border-[var(--ink-100)]">
-                    <p className="mono text-[10px] uppercase tracking-wider text-[var(--ink-500)]">
+                    <p className="mono text-micro uppercase tracking-wider text-[var(--ink-500)]">
                       Signed in as
                     </p>
                     <p className="text-sm text-[var(--ink-900)] truncate" title={userEmail}>
@@ -353,7 +353,7 @@ export function TopHeader({ role, userEmail }: TopHeaderProps) {
               <button
                 type="button"
                 onClick={() => setDrawerOpen(false)}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-md text-[var(--ink-700)] hover:bg-[var(--paper-2)] focus-visible:outline-2 focus-visible:outline-[var(--ink-900)] focus-visible:outline-offset-2"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-[var(--ink-700)] hover:bg-[var(--paper-2)] focus-visible:outline-2 focus-visible:outline-[var(--ink-900)] focus-visible:outline-offset-2"
                 aria-label="Close navigation"
               >
                 <CloseIcon className="h-5 w-5" />
@@ -368,8 +368,8 @@ export function TopHeader({ role, userEmail }: TopHeaderProps) {
                     href={link.href}
                     onClick={() => setDrawerOpen(false)}
                     className={[
-                      'flex items-center px-3 py-3 rounded-md text-sm font-medium',
-                      'min-h-[var(--min-tap-target)]',
+                      'flex items-center px-3 py-3 rounded-lg text-sm font-medium',
+                      'min-h-tap-row',
                       active
                         ? 'bg-[var(--paper-2)] text-[var(--ink-900)]'
                         : 'text-[var(--ink-700)] hover:bg-[var(--paper-2)] hover:text-[var(--ink-900)]',

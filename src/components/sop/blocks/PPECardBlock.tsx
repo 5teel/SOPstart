@@ -9,7 +9,7 @@ export type PPECardBlockProps = z.infer<typeof PPECardBlockPropsSchema>
 
 export function PPECardBlock({ title, items }: PPECardBlockProps) {
   return (
-    <div className="bg-accent-step/10 border border-accent-step/30 rounded-xl p-5 mb-4">
+    <div className="bg-accent-step/10 border border-accent-step/30 rounded-lg p-5 mb-4">
       <div className="flex items-center gap-2 mb-3">
         <ShieldCheck size={18} className="text-accent-step flex-shrink-0" />
         <span className="text-sm font-bold uppercase tracking-widest text-accent-step">

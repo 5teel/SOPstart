@@ -64,7 +64,7 @@ export default function VideoGeneratePanel({ sop, versions, archivedVersions, au
   return (
     <div>
       {/* Sticky header */}
-      <div className="sticky top-0 z-20 bg-[var(--paper)] border-b border-[var(--ink-100)] px-4 flex items-center gap-3 h-[56px]">
+      <div className="sticky top-0 z-20 bg-[var(--paper)] border-b border-[var(--ink-100)] px-4 flex items-center gap-3 h-14">
         <Link
           href={`/admin/sops/builder/${sop.id}`}
           className="text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors"
@@ -99,7 +99,7 @@ export default function VideoGeneratePanel({ sop, versions, archivedVersions, au
 
           {/* Narrated slideshow card */}
           <label
-            className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
+            className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
               selectedFormat === 'narrated_slideshow'
                 ? 'border-[var(--ink-900)] bg-white'
                 : 'border-[var(--ink-100)] bg-white hover:border-[var(--ink-300)]'
@@ -135,7 +135,7 @@ export default function VideoGeneratePanel({ sop, versions, archivedVersions, au
 
           {/* Screen recording card */}
           <label
-            className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-colors ${
+            className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
               selectedFormat === 'screen_recording'
                 ? 'border-[var(--ink-900)] bg-white'
                 : 'border-[var(--ink-100)] bg-white hover:border-[var(--ink-300)]'
@@ -174,7 +174,7 @@ export default function VideoGeneratePanel({ sop, versions, archivedVersions, au
         <button
           onClick={handleGenerate}
           disabled={!selectedFormat || generating || hasActiveGeneration(selectedFormat)}
-          className="mt-6 h-[72px] w-full bg-[var(--accent-voice)] text-white font-semibold text-lg rounded-xl hover:bg-accent-voice active:bg-accent-voice transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-6 h-tap-row w-full bg-[var(--accent-voice)] text-white font-semibold text-lg rounded-lg hover:bg-accent-voice active:bg-accent-voice transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {generating ? 'Starting...' : 'Generate new version'}
         </button>

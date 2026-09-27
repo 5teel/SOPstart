@@ -79,13 +79,13 @@ export function FlagBadge({ flag, onClick }: FlagBadgeProps): React.JSX.Element 
       title={`${flag.severity.toUpperCase()} · ${plainTitle} · ${flag.source_location_hint ?? ''}`}
     >
       <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-      <span className="font-mono text-[10px] uppercase tracking-wider opacity-80">
+      <span className="font-mono text-micro uppercase tracking-wider opacity-80">
         {flag.severity}
       </span>
       <span className="shrink-0 font-semibold">{plainTitle}</span>
       <span className="flex-1 truncate opacity-90">{flag.description}</span>
       {flag.source_location_hint && (
-        <span className="font-mono text-[10px] shrink-0 opacity-70">
+        <span className="font-mono text-micro shrink-0 opacity-70">
           {flag.source_location_hint}
         </span>
       )}

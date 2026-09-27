@@ -49,7 +49,7 @@ export function ReuseTier({ open, sopSectionId, categoryTag, onClose }: ReuseTie
       aria-pressed={scope === value}
       onClick={() => setScope(value)}
       className={[
-        'px-3 py-1 font-mono text-[11px] uppercase tracking-wider transition-colors',
+        'px-3 py-1 font-mono text-meta uppercase tracking-wider transition-colors',
         scope === value
           ? 'bg-[var(--ink-900,#18181b)] text-white'
           : 'bg-[var(--paper,#fff)] text-[var(--ink-500,#71717a)] hover:text-[var(--ink-900,#18181b)]',

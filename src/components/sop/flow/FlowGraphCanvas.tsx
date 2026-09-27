@@ -213,20 +213,20 @@ export function FlowGraphCanvas({ graph, authored = false }: { graph: FlowGraph;
     <div className="h-full flex flex-col">
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-[var(--ink-100)] bg-[var(--paper)]">
         <div className="flex items-center gap-2">
-          <span className="mono text-[10px] tracking-widest text-[var(--ink-500)]">PROCEDURE FLOW</span>
+          <span className="mono text-micro tracking-widest text-[var(--ink-500)]">PROCEDURE FLOW</span>
           <span className="pill">{graph.nodes.length} NODES</span>
           <span className="pill">{branchCount} {branchCount === 1 ? 'BRANCH' : 'BRANCHES'}</span>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => void exportPng()}
-            className="evidence-btn !min-h-[30px] text-[11px]"
+            className="evidence-btn !min-h-7.5 text-meta"
           >
             Export PNG
           </button>
           <button
             onClick={fitToView}
-            className="evidence-btn !min-h-[30px] text-[11px]"
+            className="evidence-btn !min-h-7.5 text-meta"
           >
             Fit
           </button>

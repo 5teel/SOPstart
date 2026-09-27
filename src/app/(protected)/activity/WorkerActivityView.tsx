@@ -33,7 +33,7 @@ export function WorkerActivityView() {
           </div>
           <Link
             href="/sops"
-            className="mt-2 px-6 h-[48px] flex items-center rounded-xl bg-[var(--ink-900)] text-[var(--paper)] font-semibold text-sm hover:opacity-80 transition-opacity"
+            className="mt-2 px-6 h-12 flex items-center rounded-lg bg-[var(--ink-900)] text-[var(--paper)] font-semibold text-sm hover:opacity-80 transition-opacity"
           >
             Browse SOPs
           </Link>

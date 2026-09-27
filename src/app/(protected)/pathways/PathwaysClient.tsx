@@ -75,7 +75,7 @@ export function PathwaysClient({ journeys, routes }: Props) {
   return (
     <div className="grid lg:grid-cols-[260px_1fr] gap-6 items-start">
       {/* ---------------- Index (navigable) ---------------- */}
-      <nav className="lg:sticky lg:top-4 rounded-xl border border-[var(--ink-100)] bg-white overflow-hidden">
+      <nav className="lg:sticky lg:top-4 rounded-lg border border-[var(--ink-100)] bg-white overflow-hidden">
         <button
           onClick={() => select('all-screens')}
           className="w-full flex items-center gap-2 px-3 py-2.5 text-sm font-semibold border-b border-[var(--ink-100)] transition-colors"
@@ -85,7 +85,7 @@ export function PathwaysClient({ journeys, routes }: Props) {
           }}
         >
           <LayoutGrid className="h-4 w-4" /> All screens
-          <span className="ml-auto text-[11px] font-normal opacity-70">{routes.length} live</span>
+          <span className="ml-auto text-meta font-normal opacity-70">{routes.length} live</span>
         </button>
         <button
           onClick={() => select('roles')}
@@ -96,12 +96,12 @@ export function PathwaysClient({ journeys, routes }: Props) {
           }}
         >
           <Users className="h-4 w-4" /> Roles &amp; access
-          <span className="ml-auto text-[11px] font-normal opacity-70">{ROLES.length}</span>
+          <span className="ml-auto text-meta font-normal opacity-70">{ROLES.length}</span>
         </button>
         <div className="max-h-[70vh] overflow-y-auto py-1">
           {grouped.map((g) => (
             <div key={g.group} className="py-1">
-              <p className="mono text-[10px] uppercase tracking-wider text-[var(--ink-500)] px-3 pt-2 pb-1">{g.group}</p>
+              <p className="mono text-micro uppercase tracking-wider text-[var(--ink-500)] px-3 pt-2 pb-1">{g.group}</p>
               {g.items.map((j) => {
                 const active = selected === j.id
                 return (
@@ -157,18 +157,18 @@ function JourneyView({ journey }: { journey: Journey }) {
 
   return (
     <div>
-      <div className="rounded-xl border border-[var(--ink-100)] bg-white p-5 mb-5">
+      <div className="rounded-lg border border-[var(--ink-100)] bg-white p-5 mb-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
               <span className="pill">{journey.group}</span>
-              <span className="text-[11px] font-semibold text-[var(--ink-500)]">· {journey.persona}</span>
+              <span className="text-meta font-semibold text-[var(--ink-500)]">· {journey.persona}</span>
             </div>
             <h2 className="text-xl font-semibold text-[var(--ink-900)] leading-snug">{journey.title}</h2>
           </div>
           <button
             onClick={copyLink}
-            className="flex-shrink-0 evidence-btn !min-h-[34px] text-xs inline-flex items-center gap-1.5"
+            className="flex-shrink-0 evidence-btn !min-h-8.5 text-xs inline-flex items-center gap-1.5"
             title="Copy a link straight to this pathway"
           >
             {copied ? <Check className="h-3.5 w-3.5" /> : <Link2 className="h-3.5 w-3.5" />}
@@ -178,7 +178,7 @@ function JourneyView({ journey }: { journey: Journey }) {
         <p className="text-sm text-[var(--ink-700)] mt-2 leading-relaxed">{journey.summary}</p>
       </div>
 
-      <ol className="rounded-xl border border-[var(--ink-100)] bg-white p-5">
+      <ol className="rounded-lg border border-[var(--ink-100)] bg-white p-5">
         {journey.steps.map((step, i) => (
           <StepRow
             key={step.id}
@@ -230,13 +230,13 @@ function StepRow({
       {/* content */}
       <div className={last ? 'flex-1 pb-1' : 'flex-1 pb-5'}>
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-[15px] font-semibold text-[var(--ink-900)]">{step.label}</span>
+          <span className="text-reading font-semibold text-[var(--ink-900)]">{step.label}</span>
           {step.route && (
             <a
               href={step.route.includes('[') ? undefined : step.route}
               target={step.route.includes('[') ? undefined : '_blank'}
               rel="noopener noreferrer"
-              className="mono text-[11px] inline-flex items-center gap-1 rounded px-1.5 py-0.5 border"
+              className="mono text-meta inline-flex items-center gap-1 rounded px-1.5 py-0.5 border"
               style={{
                 color: 'var(--accent-step,#2563eb)',
                 borderColor: 'color-mix(in srgb, var(--accent-step,#2563eb) 30%, transparent)',
@@ -250,13 +250,13 @@ function StepRow({
             </a>
           )}
         </div>
-        {step.detail && <p className="text-[13px] text-[var(--ink-500)] mt-0.5 leading-snug">{step.detail}</p>}
+        {step.detail && <p className="text-ui text-[var(--ink-500)] mt-0.5 leading-snug">{step.detail}</p>}
         {step.branches && step.branches.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-2">
             {step.branches.map((b, i) => (
               <span
                 key={i}
-                className="inline-flex items-center gap-1 text-[11px] rounded-md px-2 py-1 border border-[var(--ink-100)] bg-[var(--paper)] text-[var(--ink-700)]"
+                className="inline-flex items-center gap-1 text-meta rounded-lg px-2 py-1 border border-[var(--ink-100)] bg-[var(--paper)] text-[var(--ink-700)]"
               >
                 <span className="font-semibold">{b.label}</span>
                 <span className="text-[var(--ink-300)]">→</span>
@@ -303,7 +303,7 @@ function ScreenInventory({
 
   return (
     <div>
-      <div className="rounded-xl border border-[var(--ink-100)] bg-white p-5 mb-5">
+      <div className="rounded-lg border border-[var(--ink-100)] bg-white p-5 mb-5">
         <h2 className="text-xl font-semibold text-[var(--ink-900)]">All screens</h2>
         <p className="text-sm text-[var(--ink-700)] mt-2 leading-relaxed">
           Read live from the app’s route tree. New screens appear here automatically; any screen not yet covered by a
@@ -319,13 +319,13 @@ function ScreenInventory({
         )}
       </div>
 
-      <ul className="rounded-xl border border-[var(--ink-100)] bg-white divide-y divide-[var(--ink-100)] overflow-hidden">
+      <ul className="rounded-lg border border-[var(--ink-100)] bg-white divide-y divide-[var(--ink-100)] overflow-hidden">
         {routes.map((r) => {
           const js = byRoute.get(r.route) ?? []
           return (
             <li key={r.route} className="flex items-center gap-3 px-4 py-2.5 flex-wrap">
-              <span className="mono text-[12px] text-[var(--ink-900)] flex-1 min-w-[200px]">{r.route}</span>
-              <span className="text-[10px] mono uppercase tracking-wider text-[var(--ink-500)] border border-[var(--ink-100)] rounded px-1.5 py-0.5">
+              <span className="mono text-xs text-[var(--ink-900)] flex-1 min-w-50">{r.route}</span>
+              <span className="text-micro mono uppercase tracking-wider text-[var(--ink-500)] border border-[var(--ink-100)] rounded px-1.5 py-0.5">
                 {AREA_LABEL[r.area]}
               </span>
               {js.length > 0 ? (
@@ -334,14 +334,14 @@ function ScreenInventory({
                     <button
                       key={j.id}
                       onClick={() => onOpenJourney(j.id)}
-                      className="text-[11px] rounded-md px-2 py-0.5 border border-[var(--ink-100)] bg-[var(--paper)] text-[var(--ink-700)] hover:border-[var(--ink-900)] transition-colors"
+                      className="text-meta rounded-lg px-2 py-0.5 border border-[var(--ink-100)] bg-[var(--paper)] text-[var(--ink-700)] hover:border-[var(--ink-900)] transition-colors"
                     >
                       {j.title}
                     </button>
                   ))}
                 </span>
               ) : (
-                <span className="text-[11px] font-semibold text-accent-decision bg-accent-decision/10 border border-accent-decision/30 rounded-md px-2 py-0.5">
+                <span className="text-meta font-semibold text-accent-decision bg-accent-decision/10 border border-accent-decision/30 rounded-lg px-2 py-0.5">
                   Not mapped yet
                 </span>
               )}
@@ -359,13 +359,13 @@ function ScreenInventory({
 
 function RoleCard({ role }: { role: RoleDef }) {
   return (
-    <div className="rounded-xl border border-[var(--ink-100)] bg-white overflow-hidden">
+    <div className="rounded-lg border border-[var(--ink-100)] bg-white overflow-hidden">
       <div className="h-1.5 w-full" style={{ background: role.colour }} />
       <div className="p-4">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="h-2.5 w-2.5 rounded-full flex-shrink-0" style={{ background: role.colour }} />
-          <span className="text-[15px] font-semibold text-[var(--ink-900)]">{role.label}</span>
-          <span className="mono text-[10px] text-[var(--ink-500)] border border-[var(--ink-100)] rounded px-1.5 py-0.5">
+          <span className="text-reading font-semibold text-[var(--ink-900)]">{role.label}</span>
+          <span className="mono text-micro text-[var(--ink-500)] border border-[var(--ink-100)] rounded px-1.5 py-0.5">
             {role.key}
           </span>
           {role.landsOn && (
@@ -373,7 +373,7 @@ function RoleCard({ role }: { role: RoleDef }) {
               href={role.landsOn.route}
               target="_blank"
               rel="noopener noreferrer"
-              className="ml-auto mono text-[11px] inline-flex items-center gap-1 rounded px-1.5 py-0.5 border"
+              className="ml-auto mono text-meta inline-flex items-center gap-1 rounded px-1.5 py-0.5 border"
               style={{
                 color: 'var(--accent-step,#2563eb)',
                 borderColor: 'color-mix(in srgb, var(--accent-step,#2563eb) 30%, transparent)',
@@ -385,10 +385,10 @@ function RoleCard({ role }: { role: RoleDef }) {
             </a>
           )}
         </div>
-        <p className="text-[13px] text-[var(--ink-700)] mt-1.5 leading-snug">{role.who}</p>
+        <p className="text-ui text-[var(--ink-700)] mt-1.5 leading-snug">{role.who}</p>
 
         {role.gates && (
-          <p className="text-[12px] mt-2 leading-snug rounded-md px-2 py-1.5 border border-[var(--ink-100)] bg-[var(--paper)]">
+          <p className="text-xs mt-2 leading-snug rounded-lg px-2 py-1.5 border border-[var(--ink-100)] bg-[var(--paper)]">
             <span className="font-semibold text-[var(--ink-900)]">Gates: </span>
             <span className="text-[var(--ink-700)]">{role.gates}</span>
           </p>
@@ -396,13 +396,13 @@ function RoleCard({ role }: { role: RoleDef }) {
 
         <ul className="mt-2.5 space-y-1">
           {role.can.map((c, i) => (
-            <li key={i} className="flex items-start gap-1.5 text-[13px] text-[var(--ink-700)]">
+            <li key={i} className="flex items-start gap-1.5 text-ui text-[var(--ink-700)]">
               <Check className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-accent-signoff" />
               <span>{c}</span>
             </li>
           ))}
           {role.cannot?.map((c, i) => (
-            <li key={i} className="flex items-start gap-1.5 text-[13px] text-[var(--ink-500)]">
+            <li key={i} className="flex items-start gap-1.5 text-ui text-[var(--ink-500)]">
               <Minus className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-[var(--ink-300)]" />
               <span>{c}</span>
             </li>
@@ -419,20 +419,20 @@ function RolesView() {
     v === true ? (
       <Check className="h-4 w-4 text-accent-signoff mx-auto" />
     ) : v === 'own' ? (
-      <span className="text-[10px] mono text-[var(--ink-500)]">own</span>
+      <span className="text-micro mono text-[var(--ink-500)]">own</span>
     ) : (
       <Minus className="h-4 w-4 text-[var(--ink-300)] mx-auto" />
     )
 
   return (
     <div>
-      <div className="rounded-xl border border-[var(--ink-100)] bg-white p-5 mb-5">
+      <div className="rounded-lg border border-[var(--ink-100)] bg-white p-5 mb-5">
         <h2 className="text-xl font-semibold text-[var(--ink-900)]">Roles &amp; access</h2>
         <p className="text-sm text-[var(--ink-700)] mt-2 leading-relaxed">
           Who can do what. <span className="font-semibold">Organisation roles</span> escalate from Pending to Admin and set
           where you land after login. <span className="font-semibold">Overlays</span> (department, owner, sub-trade) are
           <em> not</em> roles — they gate visibility and accountability, never permissions. The admin gate in code is{' '}
-          <span className="mono text-[12px]">[&apos;admin&apos;, &apos;safety_manager&apos;]</span>.
+          <span className="mono text-xs">[&apos;admin&apos;, &apos;safety_manager&apos;]</span>.
         </p>
       </div>
 
@@ -441,7 +441,7 @@ function RolesView() {
         if (items.length === 0) return null
         return (
           <div key={kind} className="mb-6">
-            <p className="mono text-[10px] uppercase tracking-wider text-[var(--ink-500)] px-1 mb-2">
+            <p className="mono text-micro uppercase tracking-wider text-[var(--ink-500)] px-1 mb-2">
               {ROLE_KIND_LABEL[kind]}
             </p>
             <div className="grid sm:grid-cols-2 gap-3">
@@ -455,11 +455,11 @@ function RolesView() {
 
       {/* Access matrix */}
       <div className="mb-2">
-        <p className="mono text-[10px] uppercase tracking-wider text-[var(--ink-500)] px-1 mb-2">
+        <p className="mono text-micro uppercase tracking-wider text-[var(--ink-500)] px-1 mb-2">
           Access matrix — organisation roles × surface
         </p>
-        <div className="rounded-xl border border-[var(--ink-100)] bg-white overflow-hidden overflow-x-auto">
-          <table className="w-full text-[13px] border-collapse">
+        <div className="rounded-lg border border-[var(--ink-100)] bg-white overflow-hidden overflow-x-auto">
+          <table className="w-full text-ui border-collapse">
             <thead>
               <tr className="border-b border-[var(--ink-100)] bg-[var(--paper-2)]">
                 <th className="text-left font-semibold text-[var(--ink-900)] px-3 py-2">Surface</th>
@@ -475,7 +475,7 @@ function RolesView() {
                 <tr key={row.route} className="border-b border-[var(--ink-100)] last:border-0">
                   <td className="px-3 py-2">
                     <span className="text-[var(--ink-900)]">{row.surface}</span>
-                    <span className="mono text-[11px] text-[var(--ink-500)] ml-2">{row.route}</span>
+                    <span className="mono text-meta text-[var(--ink-500)] ml-2">{row.route}</span>
                   </td>
                   {ACCESS_ROLE_ORDER.map((rk) => (
                     <td key={rk} className="px-2 py-2 text-center">
@@ -487,7 +487,7 @@ function RolesView() {
             </tbody>
           </table>
         </div>
-        <p className="text-[11px] text-[var(--ink-500)] mt-2 px-1">
+        <p className="text-meta text-[var(--ink-500)] mt-2 px-1">
           <Check className="inline h-3 w-3 text-accent-signoff" /> full access ·{' '}
           <span className="mono">own</span> own records only ·{' '}
           <Minus className="inline h-3 w-3 text-[var(--ink-300)]" /> no access

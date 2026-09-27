@@ -65,7 +65,7 @@ export function OwnerPicker({
       <button
         type="button"
         onClick={handleOpen}
-        className="evidence-btn !min-h-[36px] text-sm inline-flex items-center gap-1.5"
+        className="evidence-btn !min-h-9 text-sm inline-flex items-center gap-1.5"
       >
         <User className="h-3.5 w-3.5" />
         {ownerUserId ? 'Reassign' : 'Assign owner'}
@@ -73,7 +73,7 @@ export function OwnerPicker({
 
       {open && (
         <div className="absolute right-0 z-10 mt-1 w-64 blueprint-frame bg-[var(--paper-1)] shadow-lg p-2">
-          <p className="mono text-[11px] uppercase tracking-wider text-[var(--ink-500)] mb-2">
+          <p className="mono text-meta uppercase tracking-wider text-[var(--ink-500)] mb-2">
             Current: {ownerLabel}
           </p>
           {loading && <p className="text-xs text-[var(--ink-500)]">Loading members…</p>}

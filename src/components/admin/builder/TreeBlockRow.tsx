@@ -170,7 +170,7 @@ export function TreeBlockRow({ item, onSelect, displayLabel, verified }: TreeBlo
         paddingBottom: '4px',
         minHeight: '28px',
         cursor: 'pointer',
-        borderRadius: '3px',
+        borderRadius: 'var(--radius-sm)',
       }}
       className="hover:bg-[var(--paper-2)]"
     >
@@ -184,12 +184,12 @@ export function TreeBlockRow({ item, onSelect, displayLabel, verified }: TreeBlo
           justifyContent: 'center',
           width: '60px',
           minWidth: '60px',
-          fontSize: '10px',
+          fontSize: 'var(--text-micro)',
           fontWeight: 600,
           fontFamily: 'JetBrains Mono, monospace',
           textTransform: 'uppercase',
-          letterSpacing: '0.08em',
-          borderRadius: '2px',
+          letterSpacing: 'var(--tracking-widest)',
+          borderRadius: 'var(--radius-sm)',
           padding: '2px 4px',
           overflow: 'hidden',
           textOverflow: 'ellipsis',
@@ -208,7 +208,7 @@ export function TreeBlockRow({ item, onSelect, displayLabel, verified }: TreeBlo
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
-          fontSize: '12px',
+          fontSize: 'var(--text-xs)',
           fontWeight: 400,
           fontFamily: 'JetBrains Mono, monospace',
           color: 'var(--ink-500)',

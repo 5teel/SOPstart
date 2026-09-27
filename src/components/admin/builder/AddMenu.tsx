@@ -115,7 +115,7 @@ export function AddMenu({ onInsert, onClose, onOpenLibrary }: AddMenuProps) {
       style={{
         background: 'var(--paper)',
         border: '1px solid var(--ink-300)',
-        borderRadius: '4px',
+        borderRadius: 'var(--radius-sm)',
         boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
         maxHeight: '320px',
         overflowY: 'auto',
@@ -139,12 +139,12 @@ export function AddMenu({ onInsert, onClose, onOpenLibrary }: AddMenuProps) {
           <div
             style={{
               padding: '4px 8px',
-              fontSize: '10px',
+              fontSize: 'var(--text-micro)',
               fontFamily: 'JetBrains Mono, monospace',
               fontWeight: 600,
               textTransform: 'uppercase',
               color: 'var(--ink-400)',
-              letterSpacing: '0.08em',
+              letterSpacing: 'var(--tracking-widest)',
             }}
           >
             {group.label}
@@ -184,12 +184,12 @@ export function AddMenu({ onInsert, onClose, onOpenLibrary }: AddMenuProps) {
                     justifyContent: 'center',
                     width: '60px',
                     minWidth: '60px',
-                    fontSize: '10px',
+                    fontSize: 'var(--text-micro)',
                     fontWeight: 600,
                     fontFamily: 'JetBrains Mono, monospace',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    borderRadius: '2px',
+                    letterSpacing: 'var(--tracking-widest)',
+                    borderRadius: 'var(--radius-sm)',
                     padding: '2px 4px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -203,7 +203,7 @@ export function AddMenu({ onInsert, onClose, onOpenLibrary }: AddMenuProps) {
                 {/* Label — resolved through humanizeBlockType, never raw PascalCase */}
                 <span
                   style={{
-                    fontSize: '12px',
+                    fontSize: 'var(--text-xs)',
                     fontFamily: 'JetBrains Mono, monospace',
                     fontWeight: 400,
                     color: 'var(--ink-700)',
@@ -254,7 +254,7 @@ export function AddMenu({ onInsert, onClose, onOpenLibrary }: AddMenuProps) {
         <Library size={14} style={{ color: 'var(--ink-500)', flexShrink: 0 }} />
         <span
           style={{
-            fontSize: '12px',
+            fontSize: 'var(--text-xs)',
             fontFamily: 'JetBrains Mono, monospace',
             fontWeight: 400,
             fontStyle: 'italic',

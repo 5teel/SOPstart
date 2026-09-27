@@ -47,10 +47,10 @@ export function BuilderFlowButton({ sop }: { sop: SopWithSections }) {
         type="button"
         role="menuitem"
         onClick={() => setOpen(true)}
-        className="flex w-full flex-col items-start gap-0.5 rounded-xs px-3 py-2 text-left hover:bg-[var(--paper-2)] transition-colors"
+        className="flex w-full flex-col items-start gap-0.5 rounded px-3 py-2 text-left hover:bg-[var(--paper-2)] transition-colors"
       >
-        <span className="text-[12.5px] text-[var(--ink-900)]">See the flow diagram</span>
-        <span className="text-[10.5px] text-[var(--ink-500)]">a map of how the steps connect — view only</span>
+        <span className="text-ui text-[var(--ink-900)]">See the flow diagram</span>
+        <span className="text-micro text-[var(--ink-500)]">a map of how the steps connect — view only</span>
       </button>
 
       {open &&

@@ -45,12 +45,12 @@ function SopDetailInner() {
     return (
       <div className="min-h-screen bg-[var(--paper)]">
         {/* Skeleton header */}
-        <div className="sticky top-0 z-10 bg-[var(--paper)]/95 border-b border-[var(--ink-100)] px-4 flex items-center gap-3 h-[56px]">
+        <div className="sticky top-0 z-10 bg-[var(--paper)]/95 border-b border-[var(--ink-100)] px-4 flex items-center gap-3 h-14">
           <div className="w-16 h-4 rounded bg-[var(--ink-100)] animate-pulse" />
-          <div className="flex-1 h-4 rounded bg-[var(--ink-100)] animate-pulse max-w-[200px]" />
+          <div className="flex-1 h-4 rounded bg-[var(--ink-100)] animate-pulse max-w-50" />
         </div>
         {/* Skeleton tab bar */}
-        <div className="h-[48px] bg-[var(--paper)] border-b border-[var(--ink-100)] flex items-center px-4 gap-4">
+        <div className="h-12 bg-[var(--paper)] border-b border-[var(--ink-100)] flex items-center px-4 gap-4">
           {[...Array(3)].map((_, i) => (
             <div key={i} className="w-16 h-3 rounded bg-[var(--ink-100)] animate-pulse" />
           ))}
@@ -74,7 +74,7 @@ function SopDetailInner() {
         </p>
         <Link
           href="/sops"
-          className="mt-2 inline-flex items-center gap-2 px-4 h-[44px] border border-[var(--ink-300)] rounded-lg text-sm font-medium text-[var(--ink-700)] hover:border-[var(--ink-900)] transition-colors"
+          className="mt-2 inline-flex items-center gap-2 px-4 h-tap border border-[var(--ink-300)] rounded-lg text-sm font-medium text-[var(--ink-700)] hover:border-[var(--ink-900)] transition-colors"
         >
           ← SOPs
         </Link>

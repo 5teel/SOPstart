@@ -111,7 +111,7 @@ export function BlockUpdateReviewModal({
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="w-full max-w-3xl max-h-[85vh] overflow-y-auto bg-white border border-[var(--ink-100)] rounded-xl shadow-xl">
+      <div className="w-full max-w-3xl max-h-[85vh] overflow-y-auto bg-white border border-[var(--ink-100)] rounded-lg shadow-xl">
         {/* Header */}
         <div className="flex items-start justify-between px-5 py-4 border-b border-[var(--ink-100)]">
           <div>
@@ -139,14 +139,14 @@ export function BlockUpdateReviewModal({
         {/* Body */}
         <div className="px-5 py-4 space-y-4">
           {!latest && (
-            <div className="text-sm text-accent-decision bg-accent-decision/10 border border-accent-decision/40 rounded-md p-3">
+            <div className="text-sm text-accent-decision bg-accent-decision/10 border border-accent-decision/40 rounded-lg p-3">
               No latest version is available to compare against. The badge will
               clear once you reload.
             </div>
           )}
 
           {diff?.kindChanged && (
-            <div className="flex items-start gap-2 text-sm text-accent-decision bg-accent-decision/10 border border-accent-decision/40 rounded-md p-3">
+            <div className="flex items-start gap-2 text-sm text-accent-decision bg-accent-decision/10 border border-accent-decision/40 rounded-lg p-3">
               <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
               <div>
                 <strong>Item kind changed.</strong> Accepting will replace it
@@ -158,10 +158,10 @@ export function BlockUpdateReviewModal({
 
           {diff && (
             <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="text-[10px] uppercase tracking-wider text-[var(--ink-500)] px-2">
+              <div className="text-micro uppercase tracking-wider text-[var(--ink-500)] px-2">
                 Current (in this SOP)
               </div>
-              <div className="text-[10px] uppercase tracking-wider text-[var(--ink-500)] px-2">
+              <div className="text-micro uppercase tracking-wider text-[var(--ink-500)] px-2">
                 New (latest version)
               </div>
 
@@ -172,16 +172,16 @@ export function BlockUpdateReviewModal({
                   : 'bg-[var(--paper)] border border-[var(--ink-100)]'
                 return (
                   <div key={f.key} className="contents">
-                    <div className={`${cellClass} rounded-md p-2`}>
-                      <div className="text-[10px] uppercase tracking-wider text-[var(--ink-500)] mb-1">
+                    <div className={`${cellClass} rounded-lg p-2`}>
+                      <div className="text-micro uppercase tracking-wider text-[var(--ink-500)] mb-1">
                         {f.key}
                       </div>
                       <pre className="whitespace-pre-wrap break-words font-mono text-xs text-[var(--ink-900)]">
                         {f.oldValue || <span className="text-[var(--ink-500)]">(empty)</span>}
                       </pre>
                     </div>
-                    <div className={`${cellClass} rounded-md p-2`}>
-                      <div className="text-[10px] uppercase tracking-wider text-[var(--ink-500)] mb-1">
+                    <div className={`${cellClass} rounded-lg p-2`}>
+                      <div className="text-micro uppercase tracking-wider text-[var(--ink-500)] mb-1">
                         {f.key}
                       </div>
                       <pre className="whitespace-pre-wrap break-words font-mono text-xs text-[var(--ink-900)]">
@@ -206,18 +206,18 @@ export function BlockUpdateReviewModal({
               rows={2}
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="w-full bg-[var(--paper)] border border-[var(--ink-100)] rounded-md px-3 py-2 text-sm text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
+              className="w-full bg-[var(--paper)] border border-[var(--ink-100)] rounded-lg px-3 py-2 text-sm text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
               placeholder="Why are you accepting / declining?"
             />
           </div>
 
           {error && (
-            <div className="text-sm text-accent-escalate bg-accent-escalate/10 border border-accent-escalate/40 rounded-md p-3">
+            <div className="text-sm text-accent-escalate bg-accent-escalate/10 border border-accent-escalate/40 rounded-lg p-3">
               {error}
             </div>
           )}
           {toast && (
-            <div className="text-sm text-accent-signoff bg-accent-signoff/10 border border-accent-signoff/40 rounded-md p-3">
+            <div className="text-sm text-accent-signoff bg-accent-signoff/10 border border-accent-signoff/40 rounded-lg p-3">
               {toast}
             </div>
           )}
@@ -229,7 +229,7 @@ export function BlockUpdateReviewModal({
             type="button"
             onClick={handleDecline}
             disabled={isPending || !latest}
-            className="bg-white border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] hover:bg-[var(--paper-2)] font-semibold px-4 h-[40px] rounded-lg transition-colors text-sm disabled:opacity-50"
+            className="bg-white border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] hover:bg-[var(--paper-2)] font-semibold px-4 h-10 rounded-lg transition-colors text-sm disabled:opacity-50"
           >
             Decline (keep current)
           </button>
@@ -237,7 +237,7 @@ export function BlockUpdateReviewModal({
             type="button"
             onClick={handleAccept}
             disabled={isPending || !latest}
-            className="bg-[var(--ink-900)] text-white font-semibold px-4 h-[40px] rounded-lg hover:bg-[var(--ink-700)] transition-colors text-sm disabled:opacity-50"
+            className="bg-[var(--ink-900)] text-white font-semibold px-4 h-10 rounded-lg hover:bg-[var(--ink-700)] transition-colors text-sm disabled:opacity-50"
           >
             Accept update
           </button>

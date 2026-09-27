@@ -24,7 +24,7 @@ export type PhotoGridBlockProps = z.infer<typeof PhotoGridBlockPropsSchema>
 export function PhotoGridBlock({ items, columns }: PhotoGridBlockProps) {
   if (!items || items.length === 0) {
     return (
-      <div className="bg-white border border-dashed border-[var(--ink-300)] rounded-xl p-6 text-center text-[var(--ink-500)] text-sm mb-4">
+      <div className="bg-white border border-dashed border-[var(--ink-300)] rounded-lg p-6 text-center text-[var(--ink-500)] text-sm mb-4">
         No photos
       </div>
     )
@@ -42,7 +42,7 @@ export function PhotoGridBlock({ items, columns }: PhotoGridBlockProps) {
           {it.src ? (
             <SopImageInline src={it.src} alt={it.alt || `Photo ${i + 1}`} />
           ) : (
-            <div className="bg-white border border-dashed border-[var(--ink-300)] rounded-xl p-6 text-center text-[var(--ink-500)] text-xs">
+            <div className="bg-white border border-dashed border-[var(--ink-300)] rounded-lg p-6 text-center text-[var(--ink-500)] text-xs">
               Missing
             </div>
           )}

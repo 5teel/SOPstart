@@ -228,7 +228,7 @@ export function CompletionDetailClient({
   return (
     <>
       {/* Sticky header */}
-      <div className="sticky top-0 z-20 bg-[var(--paper)] border-b border-[var(--ink-100)] px-4 flex items-center gap-3 h-[56px]">
+      <div className="sticky top-0 z-20 bg-[var(--paper)] border-b border-[var(--ink-100)] px-4 flex items-center gap-3 h-14">
         <Link
           href="/activity"
           className="flex items-center gap-1.5 text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors"
@@ -241,7 +241,7 @@ export function CompletionDetailClient({
       </div>
 
       {/* Page content */}
-      <div className={`px-4 py-6 max-w-5xl mx-auto ${showSignOffBar ? 'pb-[100px]' : ''}`}>
+      <div className={`px-4 py-6 max-w-5xl mx-auto ${showSignOffBar ? 'pb-25' : ''}`}>
 
         {/* Summary banner */}
         <div className="blueprint-frame p-5 mb-6">
@@ -291,13 +291,13 @@ export function CompletionDetailClient({
         </div>
 
         {actionError && (
-          <div className="mb-4 p-3 rounded-xl bg-[var(--accent-escalate)]/8 border border-[var(--accent-escalate)]/20">
+          <div className="mb-4 p-3 rounded-lg bg-[var(--accent-escalate)]/8 border border-[var(--accent-escalate)]/20">
             <p className="text-sm text-[var(--accent-escalate)]">{actionError}</p>
           </div>
         )}
 
         {/* Step-by-step detail */}
-        <div className="bg-white border border-[var(--ink-100)] rounded-xl px-4">
+        <div className="bg-white border border-[var(--ink-100)] rounded-lg px-4">
           {steps.length === 0 ? (
             <p className="py-8 text-center text-sm text-[var(--ink-500)]">
               Step details not available (SOP may have been updated).
@@ -328,7 +328,7 @@ export function CompletionDetailClient({
             {/* Phase 37 D-08: blocked-supervisor teaching state — the reject
                 control below is UNAFFECTED by this and stays fully enabled. */}
             {blockedFromApproving && !canOverride && (
-              <div className="p-3 rounded-xl bg-[var(--paper-2)] border border-[var(--ink-100)]">
+              <div className="p-3 rounded-lg bg-[var(--paper-2)] border border-[var(--ink-100)]">
                 <p className="text-sm text-[var(--ink-900)] mb-2">{NOT_ASSESSOR_COPY}</p>
                 {requestSent ? (
                   <p className="text-sm text-[var(--accent-signoff)] font-medium">
@@ -351,7 +351,7 @@ export function CompletionDetailClient({
                 type="button"
                 onClick={handleApproveClick}
                 disabled={isApproving || isRejecting || (blockedFromApproving && !canOverride)}
-                className={`flex-1 h-[72px] rounded-xl font-bold text-base bg-[var(--accent-signoff)] text-white flex items-center justify-center gap-2 transition-opacity ${
+                className={`flex-1 h-tap-row rounded-lg font-bold text-base bg-[var(--accent-signoff)] text-white flex items-center justify-center gap-2 transition-opacity ${
                   isApproving || isRejecting || (blockedFromApproving && !canOverride) ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
                 }`}
               >
@@ -362,7 +362,7 @@ export function CompletionDetailClient({
                 type="button"
                 onClick={() => setRejectSheetOpen(true)}
                 disabled={isApproving || isRejecting}
-                className={`flex-1 h-[72px] rounded-xl font-bold text-base bg-white border-2 border-[var(--accent-escalate)] text-[var(--accent-escalate)] flex items-center justify-center gap-2 transition-opacity ${
+                className={`flex-1 h-tap-row rounded-lg font-bold text-base bg-white border-2 border-[var(--accent-escalate)] text-[var(--accent-escalate)] flex items-center justify-center gap-2 transition-opacity ${
                   isApproving || isRejecting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[var(--accent-escalate)]/5'
                 }`}
               >
@@ -410,7 +410,7 @@ export function CompletionDetailClient({
             <div className="flex flex-col gap-1">
               <textarea
                 id="override-reason"
-                className="w-full bg-[var(--paper-2)] border border-[var(--ink-100)] rounded-xl text-base text-[var(--ink-900)] p-3 resize-none min-h-[120px] focus:outline-none focus:ring-2 focus:ring-[var(--accent-signoff)]/30 placeholder:text-[var(--ink-300)]"
+                className="w-full bg-[var(--paper-2)] border border-[var(--ink-100)] rounded-lg text-base text-[var(--ink-900)] p-3 resize-none min-h-30 focus:outline-none focus:ring-2 focus:ring-[var(--accent-signoff)]/30 placeholder:text-[var(--ink-300)]"
                 placeholder="e.g. I've directly verified this worker's competence on this task."
                 value={overrideReason}
                 onChange={(e) => setOverrideReason(e.target.value.slice(0, 500))}
@@ -424,7 +424,7 @@ export function CompletionDetailClient({
               type="button"
               onClick={() => void handleApprove(overrideReason.trim())}
               disabled={overrideReason.trim().length < 10 || isApproving}
-              className={`w-full h-[72px] rounded-xl font-bold text-lg bg-[var(--accent-signoff)] text-white flex items-center justify-center gap-2 transition-opacity ${
+              className={`w-full h-tap-row rounded-lg font-bold text-lg bg-[var(--accent-signoff)] text-white flex items-center justify-center gap-2 transition-opacity ${
                 overrideReason.trim().length < 10 || isApproving ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
               }`}
             >

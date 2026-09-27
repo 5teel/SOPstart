@@ -77,7 +77,7 @@ export default async function BlocksLibraryPage({
         <h1 className="text-2xl font-bold text-[var(--ink-900)]">Content Library</h1>
         <Link
           href="/admin/blocks/new"
-          className="bg-[var(--ink-900)] text-white font-semibold px-4 h-[44px] rounded-lg hover:bg-[var(--ink-700)] transition-colors text-sm inline-flex items-center gap-2"
+          className="bg-[var(--ink-900)] text-white font-semibold px-4 h-tap rounded-lg hover:bg-[var(--ink-700)] transition-colors text-sm inline-flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
           New block
@@ -95,9 +95,9 @@ export default async function BlocksLibraryPage({
             <span
               className="mr-1"
               style={{
-                fontSize: '9px',
+                fontSize: 'var(--text-micro)',
                 textTransform: 'uppercase',
-                letterSpacing: '0.10em',
+                letterSpacing: 'var(--tracking-widest)',
                 color: 'var(--ink-500)',
               }}
             >
@@ -106,10 +106,10 @@ export default async function BlocksLibraryPage({
             {/* All button */}
             <Link
               href={kind ? `/admin/blocks?kind=${kind}` : '/admin/blocks'}
-              className="inline-flex items-center gap-2 rounded-[6px] transition-colors"
+              className="inline-flex items-center gap-2 rounded-lg transition-colors"
               style={{
                 padding: '8px 13px',
-                fontSize: '12px',
+                fontSize: 'var(--text-xs)',
                 fontWeight: 500,
                 minHeight: '44px',
                 border: !dept
@@ -121,9 +121,9 @@ export default async function BlocksLibraryPage({
             >
               All
               <span
-                className="rounded-[10px] tabular-nums"
+                className="rounded-lg tabular-nums"
                 style={{
-                  fontSize: '10px',
+                  fontSize: 'var(--text-micro)',
                   fontWeight: 700,
                   padding: '1px 7px',
                   background: !dept ? 'var(--steel-700, #374151)' : 'var(--paper-2)',
@@ -140,10 +140,10 @@ export default async function BlocksLibraryPage({
                 <Link
                   key={d.id}
                   href={`/admin/blocks?dept=${d.id}${kind ? `&kind=${kind}` : ''}`}
-                  className="inline-flex items-center gap-2 rounded-[6px] transition-colors"
+                  className="inline-flex items-center gap-2 rounded-lg transition-colors"
                   style={{
                     padding: '8px 13px',
-                    fontSize: '12px',
+                    fontSize: 'var(--text-xs)',
                     fontWeight: 500,
                     minHeight: '44px',
                     border: isActive
@@ -158,16 +158,16 @@ export default async function BlocksLibraryPage({
                     style={{
                       width: '8px',
                       height: '8px',
-                      borderRadius: '2px',
+                      borderRadius: 'var(--radius-sm)',
                       background: d.colour,
                       flexShrink: 0,
                     }}
                   />
                   {d.name}
                   <span
-                    className="rounded-[10px] tabular-nums"
+                    className="rounded-lg tabular-nums"
                     style={{
-                      fontSize: '10px',
+                      fontSize: 'var(--text-micro)',
                       fontWeight: 700,
                       padding: '1px 7px',
                       background: isActive ? 'var(--steel-700, #374151)' : 'var(--paper-2)',
@@ -187,7 +187,7 @@ export default async function BlocksLibraryPage({
       <p
         className="mb-4"
         style={{
-          fontSize: '11px',
+          fontSize: 'var(--text-meta)',
           color: 'var(--ink-500)',
           lineHeight: 1.5,
         }}
@@ -212,7 +212,7 @@ export default async function BlocksLibraryPage({
                 key={k.value}
                 href={href}
                 className={[
-                  'px-2.5 h-7 text-xs rounded-md inline-flex items-center transition-colors',
+                  'px-2.5 h-7 text-xs rounded-lg inline-flex items-center transition-colors',
                   isActive
                     ? 'bg-[var(--ink-900)]/20 text-[var(--ink-900)] border border-[var(--ink-900)]/40'
                     : 'bg-white text-[var(--ink-500)] border border-[var(--ink-100)] hover:text-[var(--ink-900)]',

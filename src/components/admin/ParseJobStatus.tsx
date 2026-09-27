@@ -380,7 +380,7 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
                 {label}
               </span>
               {i < activeStageSet.length - 1 && (
-                <div className={`h-px flex-1 min-w-[8px] ${
+                <div className={`h-px flex-1 min-w-2 ${
                   isCompleted ? 'bg-[var(--ink-900)]' : 'bg-[var(--ink-100)]'
                 }`} />
               )}

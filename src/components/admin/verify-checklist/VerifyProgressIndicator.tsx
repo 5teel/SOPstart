@@ -52,7 +52,7 @@ export function VerifyProgressIndicator({
         >
           {verifiedCount} / {totalCount} verified
         </span>
-        <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--ink-500)]">
+        <span className="font-mono text-micro uppercase tracking-wider text-[var(--ink-500)]">
           {pct}%
         </span>
       </div>

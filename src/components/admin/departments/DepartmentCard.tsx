@@ -46,7 +46,7 @@ export function DepartmentCard({ department, owner, onEdit, onArchive }: Departm
     <div
       style={{
         border: '1.5px solid var(--ink-300)',
-        borderRadius: '8px',
+        borderRadius: 'var(--radius-lg)',
         background: 'var(--paper)',
         display: 'flex',
         overflow: 'hidden',
@@ -82,13 +82,13 @@ export function DepartmentCard({ department, owner, onEdit, onArchive }: Departm
               style={{
                 width: '26px',
                 height: '26px',
-                borderRadius: '6px',
+                borderRadius: 'var(--radius-lg)',
                 background: department.colour,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 flexShrink: 0,
-                fontSize: '13px',
+                fontSize: 'var(--text-ui)',
                 color: '#fff',
                 fontWeight: 700,
               }}
@@ -99,7 +99,7 @@ export function DepartmentCard({ department, owner, onEdit, onArchive }: Departm
             <div style={{ minWidth: 0 }}>
               <h3
                 style={{
-                  fontSize: '15px',
+                  fontSize: 'var(--text-reading)',
                   fontWeight: 700,
                   color: 'var(--ink-900)',
                   margin: 0,
@@ -113,9 +113,9 @@ export function DepartmentCard({ department, owner, onEdit, onArchive }: Departm
               </h3>
               <p
                 style={{
-                  fontSize: '10px',
+                  fontSize: 'var(--text-micro)',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
+                  letterSpacing: 'var(--tracking-wider)',
                   color: 'var(--ink-500)',
                   marginTop: '2px',
                   margin: '2px 0 0',
@@ -131,9 +131,9 @@ export function DepartmentCard({ department, owner, onEdit, onArchive }: Departm
           {isArchived ? (
             <span
               style={{
-                fontSize: '9px',
+                fontSize: 'var(--text-micro)',
                 textTransform: 'uppercase',
-                letterSpacing: '0.08em',
+                letterSpacing: 'var(--tracking-widest)',
                 color: 'var(--ink-500)',
                 fontWeight: 600,
                 flexShrink: 0,
@@ -155,7 +155,7 @@ export function DepartmentCard({ department, owner, onEdit, onArchive }: Departm
                 }}
                 style={{
                   color: 'var(--ink-500)',
-                  fontSize: '16px',
+                  fontSize: 'var(--text-base)',
                   background: 'none',
                   border: 'none',
                   padding: '2px 6px',
@@ -179,7 +179,7 @@ export function DepartmentCard({ department, owner, onEdit, onArchive }: Departm
                   top: '100%',
                   background: 'var(--paper)',
                   border: '1px solid var(--ink-300)',
-                  borderRadius: '6px',
+                  borderRadius: 'var(--radius-lg)',
                   boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
                   zIndex: 20,
                   minWidth: '120px',
@@ -198,7 +198,7 @@ export function DepartmentCard({ department, owner, onEdit, onArchive }: Departm
                     width: '100%',
                     textAlign: 'left',
                     padding: '10px 14px',
-                    fontSize: '13px',
+                    fontSize: 'var(--text-ui)',
                     color: 'var(--ink-900)',
                     background: 'none',
                     border: 'none',
@@ -220,7 +220,7 @@ export function DepartmentCard({ department, owner, onEdit, onArchive }: Departm
                     width: '100%',
                     textAlign: 'left',
                     padding: '10px 14px',
-                    fontSize: '13px',
+                    fontSize: 'var(--text-ui)',
                     color: 'var(--accent-hazard)',
                     background: 'none',
                     border: 'none',
@@ -244,7 +244,7 @@ export function DepartmentCard({ department, owner, onEdit, onArchive }: Departm
             border: department.owner_user_id
               ? '1px solid var(--ink-100)'
               : '1px dashed var(--accent-hazard)',
-            borderRadius: '6px',
+            borderRadius: 'var(--radius-lg)',
             display: 'flex',
             alignItems: 'center',
             gap: '9px',
@@ -261,7 +261,7 @@ export function DepartmentCard({ department, owner, onEdit, onArchive }: Departm
                   borderRadius: '50%',
                   background: 'var(--ink-900)',
                   color: '#fff',
-                  fontSize: '10px',
+                  fontSize: 'var(--text-micro)',
                   fontWeight: 600,
                   display: 'flex',
                   alignItems: 'center',
@@ -274,9 +274,9 @@ export function DepartmentCard({ department, owner, onEdit, onArchive }: Departm
               <div style={{ minWidth: 0 }}>
                 <p
                   style={{
-                    fontSize: '9px',
+                    fontSize: 'var(--text-micro)',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
+                    letterSpacing: 'var(--tracking-widest)',
                     color: 'var(--ink-500)',
                     margin: 0,
                     lineHeight: 1.4,
@@ -286,7 +286,7 @@ export function DepartmentCard({ department, owner, onEdit, onArchive }: Departm
                 </p>
                 <p
                   style={{
-                    fontSize: '12px',
+                    fontSize: 'var(--text-xs)',
                     fontWeight: 600,
                     color: 'var(--ink-900)',
                     margin: 0,
@@ -311,7 +311,7 @@ export function DepartmentCard({ department, owner, onEdit, onArchive }: Departm
                   borderRadius: '50%',
                   background: 'rgba(239,68,68,0.10)',
                   color: 'var(--accent-hazard)',
-                  fontSize: '12px',
+                  fontSize: 'var(--text-xs)',
                   fontWeight: 700,
                   display: 'flex',
                   alignItems: 'center',
@@ -324,9 +324,9 @@ export function DepartmentCard({ department, owner, onEdit, onArchive }: Departm
               <div style={{ minWidth: 0 }}>
                 <p
                   style={{
-                    fontSize: '9px',
+                    fontSize: 'var(--text-micro)',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
+                    letterSpacing: 'var(--tracking-widest)',
                     color: 'var(--ink-500)',
                     margin: 0,
                     lineHeight: 1.4,
@@ -336,7 +336,7 @@ export function DepartmentCard({ department, owner, onEdit, onArchive }: Departm
                 </p>
                 <p
                   style={{
-                    fontSize: '12px',
+                    fontSize: 'var(--text-xs)',
                     fontWeight: 600,
                     color: 'var(--accent-hazard)',
                     margin: 0,
@@ -356,7 +356,7 @@ export function DepartmentCard({ department, owner, onEdit, onArchive }: Departm
             display: 'flex',
             marginTop: '14px',
             border: '1px solid var(--ink-100)',
-            borderRadius: '6px',
+            borderRadius: 'var(--radius-lg)',
             overflow: 'hidden',
           }}
         >
@@ -376,7 +376,7 @@ export function DepartmentCard({ department, owner, onEdit, onArchive }: Departm
             >
               <p
                 style={{
-                  fontSize: '17px',
+                  fontSize: 'var(--text-lg)',
                   fontWeight: 700,
                   color: 'var(--ink-900)',
                   margin: 0,
@@ -387,9 +387,9 @@ export function DepartmentCard({ department, owner, onEdit, onArchive }: Departm
               </p>
               <p
                 style={{
-                  fontSize: '9px',
+                  fontSize: 'var(--text-micro)',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
+                  letterSpacing: 'var(--tracking-wider)',
                   color: 'var(--ink-500)',
                   marginTop: '2px',
                   margin: '2px 0 0',

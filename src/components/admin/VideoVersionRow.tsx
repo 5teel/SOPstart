@@ -196,7 +196,7 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
 
         {/* Error message for failed versions */}
         {version.status === 'failed' && version.error_message && (
-          <span className="text-xs text-accent-escalate truncate max-w-[300px] shrink" title={version.error_message}>
+          <span className="text-xs text-accent-escalate truncate max-w-75 shrink" title={version.error_message}>
             {version.error_message}
           </span>
         )}
@@ -212,7 +212,7 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
             onKeyDown={handleLabelKeyDown}
             maxLength={60}
             placeholder="E.g. Final cut, Training version..."
-            className="bg-[var(--paper)] border border-[var(--ink-300)] rounded px-2 py-1 text-sm text-[var(--ink-900)] w-full max-w-[240px]"
+            className="bg-[var(--paper)] border border-[var(--ink-300)] rounded px-2 py-1 text-sm text-[var(--ink-900)] w-full max-w-60"
           />
         ) : (
           <button
@@ -361,14 +361,14 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
             <button
               onClick={handleConfirm}
               disabled={pending}
-              className={`flex-1 h-[44px] ${confirmButtonCls[confirmAction]} font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50`}
+              className={`flex-1 h-tap ${confirmButtonCls[confirmAction]} font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50`}
             >
               {pending ? 'Working...' : confirmLabel[confirmAction]}
             </button>
             <button
               onClick={() => setConfirmAction(null)}
               disabled={pending}
-              className="flex-1 h-[44px] bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--paper-2)] transition-colors disabled:opacity-50"
+              className="flex-1 h-tap bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--paper-2)] transition-colors disabled:opacity-50"
             >
               {cancelLabel[confirmAction]}
             </button>

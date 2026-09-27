@@ -87,7 +87,7 @@ const TONE_TEXT: Record<'bad' | 'warn' | 'info', string> = {
 /** Mirrors the scope column's header so the three columns share one baseline. */
 function ColumnHeader({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="mono sticky top-0 z-10 hidden border-b border-[var(--ink-200)] bg-[var(--paper-2)] px-3 py-2 text-[11px] uppercase tracking-[0.08em] text-[var(--ink-500)] lg:block">
+    <h2 className="mono sticky top-0 z-10 hidden border-b border-[var(--ink-200)] bg-[var(--paper-2)] px-3 py-2 text-meta uppercase tracking-widest text-[var(--ink-500)] lg:block">
       {children}
     </h2>
   )
@@ -97,7 +97,7 @@ function ColumnHeader({ children }: { children: React.ReactNode }) {
 function Kv({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex gap-2 border-b border-dotted border-[var(--ink-200)] py-1.5 text-xs">
-      <dt className="w-[76px] flex-shrink-0 text-[11px] text-[var(--ink-500)]">{label}</dt>
+      <dt className="w-19 flex-shrink-0 text-meta text-[var(--ink-500)]">{label}</dt>
       <dd className="min-w-0 flex-1">{children}</dd>
     </div>
   )
@@ -151,7 +151,7 @@ export function SopWorkerBrowser({
               <button
                 type="button"
                 onClick={emptyAction.onClick}
-                className="mt-2 inline-flex min-h-[44px] items-center gap-2 rounded-md bg-[var(--ink-900)] px-4 text-sm font-semibold text-white hover:opacity-90"
+                className="mt-2 inline-flex min-h-tap items-center gap-2 rounded-lg bg-[var(--ink-900)] px-4 text-sm font-semibold text-white hover:opacity-90"
               >
                 <BookOpen size={16} aria-hidden="true" />
                 {emptyAction.label}
@@ -186,7 +186,7 @@ export function SopWorkerBrowser({
                   >
                     <span className="min-w-0 flex-1">
                       <span
-                        className={`block truncate text-[13px] font-semibold ${
+                        className={`block truncate text-ui font-semibold ${
                           isSelected ? 'text-white' : 'text-[var(--ink-900)]'
                         }`}
                         title={sop.title}
@@ -194,14 +194,14 @@ export function SopWorkerBrowser({
                         {sop.title}
                       </span>
                       {meta && (
-                        <span className={`mono block truncate text-[11px] ${isSelected ? 'text-white/70' : 'text-[var(--ink-500)]'}`}>
+                        <span className={`mono block truncate text-meta ${isSelected ? 'text-white/70' : 'text-[var(--ink-500)]'}`}>
                           {meta}
                         </span>
                       )}
                     </span>
                     {signal && (
                       <span
-                        className={`mono flex-shrink-0 rounded px-1.5 py-0.5 text-[11px] ${
+                        className={`mono flex-shrink-0 rounded px-1.5 py-0.5 text-meta ${
                           isSelected ? TONE_SELECTED : TONE[signal.tone]
                         }`}
                       >
@@ -244,10 +244,10 @@ export function SopWorkerBrowser({
             </p>
           ) : (
             <>
-              <p className="text-[15px] font-bold leading-snug text-[var(--ink-900)]">
+              <p className="text-reading font-bold leading-snug text-[var(--ink-900)]">
                 {selected.title}
               </p>
-              <p className="mono mb-3 mt-1 text-[11px] uppercase tracking-[0.06em] text-[var(--ink-500)]">
+              <p className="mono mb-3 mt-1 text-meta uppercase tracking-wider text-[var(--ink-500)]">
                 {rowMeta(selected) || 'No category'}
               </p>
 
@@ -259,14 +259,14 @@ export function SopWorkerBrowser({
                   // Phase 30 deleted the /walkthrough route — Walk it is a tab
                   // on the detail page now (tests/phase30/dead-weight.spec.ts).
                   href={`/sops/${selected.id}?tab=walk`}
-                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-md bg-[var(--ink-900)] px-3 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--ink-900)] px-3 py-2.5 text-sm font-semibold text-white hover:opacity-90"
                 >
                   <Play size={14} aria-hidden="true" />
                   Walk it
                 </Link>
                 <Link
                   href={`/sops/${selected.id}`}
-                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-md border border-[var(--ink-300)] bg-[var(--paper-1)] px-3 py-2.5 text-sm text-[var(--ink-700)] hover:border-[var(--ink-900)] hover:text-[var(--ink-900)]"
+                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-[var(--ink-300)] bg-[var(--paper-1)] px-3 py-2.5 text-sm text-[var(--ink-700)] hover:border-[var(--ink-900)] hover:text-[var(--ink-900)]"
                 >
                   <BookOpen size={14} aria-hidden="true" />
                   Read
@@ -312,7 +312,7 @@ export function SopWorkerBrowser({
                   type="button"
                   onClick={() => onRemove(selected.id)}
                   disabled={actionPending || selected.removalRequested}
-                  className="mt-2 w-full rounded-md px-3 py-1.5 text-[11px] text-[var(--ink-500)] hover:text-[var(--accent-hazard)] disabled:cursor-default disabled:text-[var(--ink-300)]"
+                  className="mt-2 w-full rounded-lg px-3 py-1.5 text-meta text-[var(--ink-500)] hover:text-[var(--accent-hazard)] disabled:cursor-default disabled:text-[var(--ink-300)]"
                 >
                   {selected.removalRequested
                     ? 'Removal requested'
@@ -325,7 +325,7 @@ export function SopWorkerBrowser({
                   type="button"
                   onClick={() => onAdd(selected.id)}
                   disabled={actionPending}
-                  className="mt-2 w-full rounded-md border border-[var(--ink-900)] px-3 py-2 text-xs font-semibold text-[var(--ink-900)] hover:bg-[var(--paper-1)] disabled:cursor-default disabled:border-[var(--ink-300)] disabled:text-[var(--ink-300)]"
+                  className="mt-2 w-full rounded-lg border border-[var(--ink-900)] px-3 py-2 text-xs font-semibold text-[var(--ink-900)] hover:bg-[var(--paper-1)] disabled:cursor-default disabled:border-[var(--ink-300)] disabled:text-[var(--ink-300)]"
                 >
                   + Add to your SOPs
                 </button>

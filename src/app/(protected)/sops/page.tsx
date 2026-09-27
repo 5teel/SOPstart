@@ -232,9 +232,9 @@ export default function SopsPage() {
       <nav className="sticky top-0 z-20 bg-[var(--paper)] border-b border-[var(--ink-100)]">
         <div className="max-w-5xl mx-auto px-4 py-2 flex flex-wrap items-center gap-x-4 gap-y-2">
           <h1 className="text-base font-semibold text-[var(--ink-900)]">SOPs</h1>
-          <span className="mono hidden text-[11px] text-[var(--ink-500)] sm:inline">{lastSyncLabel}</span>
+          <span className="mono hidden text-meta text-[var(--ink-500)] sm:inline">{lastSyncLabel}</span>
           {!takeover && (
-          <label className="relative order-last flex min-h-[44px] w-full items-center sm:ml-auto sm:min-h-[36px] sm:w-72">
+          <label className="relative order-last flex min-h-tap w-full items-center sm:ml-auto sm:min-h-9 sm:w-72">
             <Search size={16} className="pointer-events-none absolute left-3 text-[var(--ink-500)]" aria-hidden="true" />
             <input
               type="search"
@@ -247,7 +247,7 @@ export default function SopsPage() {
               autoCorrect="off"
               autoCapitalize="off"
               spellCheck={false}
-              className="h-full w-full rounded-md border border-[var(--ink-300)] bg-white pl-9 pr-9 text-sm text-[var(--ink-900)] placeholder:text-[var(--ink-500)] focus:border-[var(--ink-900)] focus:outline-none [&::-webkit-search-cancel-button]:hidden"
+              className="h-full w-full rounded-lg border border-[var(--ink-300)] bg-white pl-9 pr-9 text-sm text-[var(--ink-900)] placeholder:text-[var(--ink-500)] focus:border-[var(--ink-900)] focus:outline-none [&::-webkit-search-cancel-button]:hidden"
             />
             {query && (
               <button
@@ -581,14 +581,14 @@ function SopsSection({
             key={sc.key}
             type="button"
             onClick={() => onScopeChange(sc.key)}
-            className={`flex-shrink-0 min-h-11 rounded-xl border px-3 text-sm font-medium ${
+            className={`flex-shrink-0 min-h-11 rounded-lg border px-3 text-sm font-medium ${
               scope === sc.key
                 ? 'border-[var(--ink-900)] bg-[var(--ink-900)] text-white'
                 : 'border-[var(--ink-100)] bg-white text-[var(--ink-700)]'
             }`}
           >
             {sc.label}
-            <span className="mono ml-1 text-[11px] opacity-70">{counts[sc.key]}</span>
+            <span className="mono ml-1 text-meta opacity-70">{counts[sc.key]}</span>
           </button>
         ))}
         {/* Worker department sheet is a dead control under an admin status lens
@@ -597,7 +597,7 @@ function SopsSection({
           <button
             type="button"
             onClick={onOpenDeptSheet}
-            className="flex-shrink-0 inline-flex items-center gap-2 px-4 min-h-11 bg-white border border-[var(--ink-100)] rounded-xl text-sm font-medium text-[var(--ink-900)]"
+            className="flex-shrink-0 inline-flex items-center gap-2 px-4 min-h-11 bg-white border border-[var(--ink-100)] rounded-lg text-sm font-medium text-[var(--ink-900)]"
           >
             <span>{activeDeptLabel}</span>
             <ChevronDown size={16} className="text-[var(--ink-500)]" />
@@ -610,7 +610,7 @@ function SopsSection({
           grid, the frame and the two side columns are all lg-only. The frame
           is pinned to the viewport so each column scrolls on its own and the
           scope column + detail pane never leave the screen. */}
-      <div className="lg:grid lg:h-[calc(100vh-140px)] lg:min-h-[420px] lg:grid-cols-[176px_1fr_264px] lg:grid-rows-[minmax(0,1fr)] lg:overflow-hidden lg:rounded-lg lg:border lg:border-[var(--ink-300)] lg:bg-[var(--paper-1)]">
+      <div className="lg:grid lg:h-[calc(100vh-140px)] lg:min-h-105 lg:grid-cols-[176px_1fr_264px] lg:grid-rows-[minmax(0,1fr)] lg:overflow-hidden lg:rounded-lg lg:border lg:border-[var(--ink-300)] lg:bg-[var(--paper-1)]">
         <nav
           aria-label="Scope"
           data-testid="worker-miller-scope"
@@ -666,7 +666,7 @@ function SopsSection({
         ) : loading ? (
           <div className="flex flex-col gap-2 p-3 lg:col-span-2">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-[68px] animate-pulse rounded-lg bg-[var(--paper-2)] lg:h-9 lg:rounded" />
+              <div key={i} className="h-tap-row animate-pulse rounded-lg bg-[var(--paper-2)] lg:h-9 lg:rounded" />
             ))}
           </div>
         ) : workerSops.length === 0 ? (

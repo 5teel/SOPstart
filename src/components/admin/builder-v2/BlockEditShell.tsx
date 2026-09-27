@@ -111,7 +111,7 @@ function FieldControl({
 }) {
   const raw = item.props[spec.field]
   const label = (
-    <span className="min-w-[5rem] font-mono text-[9px] uppercase tracking-wider text-[var(--ink-500,#71717a)]">
+    <span className="min-w-[5rem] font-mono text-micro uppercase tracking-wider text-[var(--ink-500,#71717a)]">
       {spec.field}
     </span>
   )
@@ -124,7 +124,7 @@ function FieldControl({
           autoFocus={false}
           initialValue={raw == null ? '' : String(raw)}
           ariaLabel={`Edit ${spec.field}`}
-          className="prose block flex-1 whitespace-pre-wrap rounded border border-[var(--ink-300,#d4d4d8)] px-2 py-1 text-[13px] outline-none focus:shadow-[0_0_0_2px_rgba(59,130,246,0.22)]"
+          className="prose block flex-1 whitespace-pre-wrap rounded border border-[var(--ink-300,#d4d4d8)] px-2 py-1 text-ui outline-none focus:shadow-[0_0_0_2px_rgba(59,130,246,0.22)]"
           onCommit={(value) => {
             if (value !== raw) onCommitField(spec.field, value)
           }}
@@ -171,7 +171,7 @@ function FieldControl({
           data-open-field-panel
           aria-label={`Edit ${spec.field} in field panel`}
           onClick={onOpenPanel}
-          className="inline-flex items-center gap-1 rounded border border-[var(--ink-300,#d4d4d8)] px-2 py-0.5 font-mono text-[10px] text-[var(--ink-500,#71717a)] hover:border-[var(--accent-step,#3b82f6)] hover:text-[var(--accent-step,#3b82f6)]"
+          className="inline-flex items-center gap-1 rounded border border-[var(--ink-300,#d4d4d8)] px-2 py-0.5 font-mono text-micro text-[var(--ink-500,#71717a)] hover:border-[var(--accent-step,#3b82f6)] hover:text-[var(--accent-step,#3b82f6)]"
         >
           <SlidersHorizontal size={11} /> edit
         </button>
@@ -272,7 +272,7 @@ export function BlockEditShell({
             <span
               data-reference-images-chip
               aria-label="Reference images"
-              className="inline-flex items-center rounded border border-dashed border-[var(--ink-300,#d4d4d8)] px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-[var(--ink-500,#71717a)]"
+              className="inline-flex items-center rounded border border-dashed border-[var(--ink-300,#d4d4d8)] px-2 py-0.5 font-mono text-micro font-semibold uppercase tracking-wider text-[var(--ink-500,#71717a)]"
             >
               Reference images
             </span>
@@ -284,7 +284,7 @@ export function BlockEditShell({
               aria-label={`${flagsCount} AI ${flagsCount === 1 ? 'flag' : 'flags'} — tap to review`}
               aria-expanded={flagsOpen}
               onClick={onToggleFlags}
-              className="inline-flex items-center gap-1 rounded border border-[var(--accent-ai,#8b5cf6)] bg-[color-mix(in_srgb,var(--accent-ai,#8b5cf6)_12%,transparent)] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-[var(--accent-ai,#8b5cf6)]"
+              className="inline-flex items-center gap-1 rounded border border-[var(--accent-ai,#8b5cf6)] bg-[color-mix(in_srgb,var(--accent-ai,#8b5cf6)_12%,transparent)] px-1.5 py-0.5 font-mono text-micro font-semibold text-[var(--accent-ai,#8b5cf6)]"
             >
               ⚑ {flagsCount}
             </button>
@@ -301,8 +301,8 @@ export function BlockEditShell({
               onClick={onToggleVerify}
               className={
                 verified
-                  ? 'inline-flex items-center gap-1 rounded border border-[var(--accent-ok,#10b981)] bg-[color-mix(in_srgb,var(--accent-ok,#10b981)_12%,transparent)] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-[var(--accent-ok,#10b981)]'
-                  : 'inline-flex items-center gap-1 rounded border border-[var(--ink-300,#d4d4d8)] px-1.5 py-0.5 font-mono text-[10px] font-semibold text-[var(--ink-500,#71717a)] hover:border-[var(--accent-ok,#10b981)] hover:text-[var(--accent-ok,#10b981)]'
+                  ? 'inline-flex items-center gap-1 rounded border border-[var(--accent-ok,#10b981)] bg-[color-mix(in_srgb,var(--accent-ok,#10b981)_12%,transparent)] px-1.5 py-0.5 font-mono text-micro font-semibold text-[var(--accent-ok,#10b981)]'
+                  : 'inline-flex items-center gap-1 rounded border border-[var(--ink-300,#d4d4d8)] px-1.5 py-0.5 font-mono text-micro font-semibold text-[var(--ink-500,#71717a)] hover:border-[var(--accent-ok,#10b981)] hover:text-[var(--accent-ok,#10b981)]'
               }
             >
               {verified ? '✓ verified' : '✦ tap to verify'}
@@ -329,7 +329,7 @@ export function BlockEditShell({
           editing ? 'opacity-100' : 'opacity-0'
         }`}
       >
-        <span className="px-1 font-mono text-[9px] uppercase tracking-wider text-[var(--ink-500,#71717a)]">
+        <span className="px-1 font-mono text-micro uppercase tracking-wider text-[var(--ink-500,#71717a)]">
           {humanizeBlockType(item.type)}
         </span>
         {specs.length > 0 && onToggleEdit && (
@@ -341,8 +341,8 @@ export function BlockEditShell({
             onClick={onToggleEdit}
             className={
               editing
-                ? 'grid h-6 place-items-center rounded border px-2 font-mono text-[10px] font-semibold border-[var(--accent-step,#3b82f6)] text-[var(--accent-step,#3b82f6)]'
-                : 'grid h-6 place-items-center rounded border px-2 font-mono text-[10px] font-semibold border-[var(--ink-300,#d4d4d8)] text-[var(--ink-500,#71717a)] hover:border-[var(--accent-step,#3b82f6)] hover:text-[var(--accent-step,#3b82f6)]'
+                ? 'grid h-6 place-items-center rounded border px-2 font-mono text-micro font-semibold border-[var(--accent-step,#3b82f6)] text-[var(--accent-step,#3b82f6)]'
+                : 'grid h-6 place-items-center rounded border px-2 font-mono text-micro font-semibold border-[var(--ink-300,#d4d4d8)] text-[var(--ink-500,#71717a)] hover:border-[var(--accent-step,#3b82f6)] hover:text-[var(--accent-step,#3b82f6)]'
             }
           >
             {editing ? 'Done' : 'Edit'}

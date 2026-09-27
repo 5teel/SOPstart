@@ -87,13 +87,13 @@ export function BuilderStageStepper({
       <div
         data-testid="wayfinder-forward-chip"
         data-chip-state="pending-approval"
-        className="flex flex-col items-start gap-0.5 rounded-sm border-[1.5px] px-3.5 py-1.5 text-left"
+        className="flex flex-col items-start gap-0.5 rounded border-[1.5px] px-3.5 py-1.5 text-left"
         style={{ borderColor: 'var(--accent-decision)', background: 'rgba(180,83,9,0.08)' }}
       >
-        <span className="text-[11.5px] font-semibold" style={{ color: 'var(--accent-decision)' }}>
+        <span className="text-meta font-semibold" style={{ color: 'var(--accent-decision)' }}>
           Waiting for approval
         </span>
-        <span className="text-[10px]" style={{ color: 'var(--accent-decision)' }}>
+        <span className="text-micro" style={{ color: 'var(--accent-decision)' }}>
           {approverLabel ? `Next: ${approverLabel}` : 'An approver needs to review this'}
         </span>
       </div>
@@ -118,22 +118,22 @@ export function BuilderStageStepper({
       disabled={locked}
       aria-disabled={locked}
       aria-label={`Go to ${forwardChip.label} stage`}
-      className={`flex flex-col items-start gap-0.5 rounded-sm border-[1.5px] px-3.5 py-1.5 text-left transition-colors ${
+      className={`flex flex-col items-start gap-0.5 rounded border-[1.5px] px-3.5 py-1.5 text-left transition-colors ${
         ready ? 'border-[var(--accent-ok)]' : 'border-[var(--ink-300)] bg-[var(--paper-2)]'
       } ${locked ? 'cursor-default' : 'cursor-pointer'}`}
       style={ready ? { background: 'rgba(16,185,129,.08)' } : undefined}
     >
       <span
-        className="flex items-center gap-1.5 text-[11.5px]"
+        className="flex items-center gap-1.5 text-meta"
         style={{ color: ready ? 'var(--accent-ok)' : locked ? 'var(--ink-700)' : 'var(--ink-900)' }}
       >
-        <span className="text-[9px] uppercase tracking-wider text-[var(--ink-500)]">Next →</span>
+        <span className="text-micro uppercase tracking-wider text-[var(--ink-500)]">Next →</span>
         <span className={ready ? 'font-semibold' : ''}>{forwardChip.label}</span>
         {locked && <span aria-hidden="true">🔒</span>}
       </span>
       <span
         data-testid="wayfinder-lock-reason"
-        className="text-[10px]"
+        className="text-micro"
         style={{ color: ready ? 'var(--accent-ok)' : 'var(--ink-500)' }}
       >
         {locked

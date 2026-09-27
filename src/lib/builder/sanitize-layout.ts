@@ -37,7 +37,7 @@ export function UnsupportedBlockPlaceholder({ type }: { type?: string }): ReactE
     {
       'data-layout-placeholder': 'unsupported-block',
       className:
-        'bg-white border border-dashed border-[var(--ink-500)] rounded-xl p-4 text-[var(--ink-500)] text-sm mb-4',
+        'bg-white border border-dashed border-[var(--ink-500)] rounded-lg p-4 text-[var(--ink-500)] text-sm mb-4',
     },
     `This item isn't supported in your app version - update required${type ? ` (${type})` : ''}.`
   )

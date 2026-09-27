@@ -58,16 +58,16 @@ export function BeforeAfter({ before, after }: Props) {
         </div>
 
         {/* corner labels */}
-        <span className="absolute top-2 left-2 text-[10px] font-bold uppercase tracking-wider text-white bg-[var(--ink-900)]/85 rounded px-1.5 py-0.5">
+        <span className="absolute top-2 left-2 text-micro font-bold uppercase tracking-wider text-white bg-[var(--ink-900)]/85 rounded px-1.5 py-0.5">
           Before
         </span>
-        <span className="absolute top-2 right-2 text-[10px] font-bold uppercase tracking-wider text-white bg-[var(--accent-step,#2563eb)] rounded px-1.5 py-0.5">
+        <span className="absolute top-2 right-2 text-micro font-bold uppercase tracking-wider text-white bg-[var(--accent-step,#2563eb)] rounded px-1.5 py-0.5">
           After
         </span>
 
         {/* divider + handle */}
         <div className="absolute inset-y-0 pointer-events-none" style={{ left: `${pos}%` }}>
-          <div className="absolute inset-y-0 -translate-x-1/2 w-[2px] bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.15)]" />
+          <div className="absolute inset-y-0 -translate-x-1/2 w-0.5 bg-white shadow-[0_0_0_1px_rgba(0,0,0,0.15)]" />
           <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-white border border-[var(--ink-200,#d4d4d8)] shadow-md flex items-center justify-center text-[var(--ink-700)]">
             <MoveHorizontal className="h-4 w-4" />
           </div>

@@ -50,6 +50,36 @@
   --color-steel-700: var(--steel-700);
 }
 
+/* Type, tap targets — the non-colour tokens (2026-09-28 sweep). Tailwind
+ * turns each into a utility: text-meta, min-h-tap, h-tap-row … and emits the
+ * variable for inline styles (fontSize: 'var(--text-meta)').
+ *
+ * Type: Tailwind's own xs/sm/base/lg/xl/2xl stay in use; these four fill the
+ * gaps the app kept writing by hand (122× text-[11px], 86× text-[10px] …).
+ *   micro   10px — pill labels, counters, the tiniest mono captions
+ *   meta    11px — mono captions, column headers, row metadata
+ *   ui      13px — dense list rows and controls (between xs and sm)
+ *   reading 15px — worker-facing body text on phones (between sm and base)
+ * Tap targets (D-19 glove rule): tap 44px standard control, tap-glove 60px
+ * primary CTA, tap-row 72px step/list row.
+ * Radii are Tailwind's scale; the vocabulary is FOUR — rounded (chips, pills,
+ * small controls), rounded-lg (inputs, buttons, cards), rounded-2xl (sheets,
+ * modals), rounded-full (circles). xs/sm/md/xl/3xl and px values are banned
+ * by tests/lint/design-tokens.spec.ts. */
+@theme {
+  --text-micro: 10px;
+  --text-micro--line-height: 1.2;
+  --text-meta: 11px;
+  --text-meta--line-height: 1.35;
+  --text-ui: 13px;
+  --text-ui--line-height: 1.4;
+  --text-reading: 15px;
+  --text-reading--line-height: 1.55;
+  --spacing-tap: 44px;
+  --spacing-tap-glove: 60px;
+  --spacing-tap-row: 72px;
+}
+
 :root {
   /* Neutral paper + ink (Tailwind zinc-aligned) */
   --paper:     #fafafa;

@@ -181,7 +181,7 @@ export default function VideoGenerationStatus({
               </span>
               {i < VIDEO_GEN_STAGES.length - 1 && (
                 <div
-                  className={`h-px flex-1 min-w-[8px] ${
+                  className={`h-px flex-1 min-w-2 ${
                     status === 'ready' ? 'bg-[var(--ink-900)]' :
                     isCompleted ? 'bg-[var(--ink-900)]' :
                     'bg-[var(--ink-100)]'

@@ -68,7 +68,7 @@ export function RejectReasonSheet({
         <div className="flex flex-col gap-1">
           <textarea
             id="reject-reason"
-            className="w-full bg-[var(--paper-2)] border border-[var(--ink-100)] rounded-xl text-base text-[var(--ink-900)] p-3 resize-none min-h-[120px] focus:outline-none focus:ring-2 focus:ring-[var(--accent-escalate)]/30 placeholder:text-[var(--ink-300)]"
+            className="w-full bg-[var(--paper-2)] border border-[var(--ink-100)] rounded-lg text-base text-[var(--ink-900)] p-3 resize-none min-h-30 focus:outline-none focus:ring-2 focus:ring-[var(--accent-escalate)]/30 placeholder:text-[var(--ink-300)]"
             placeholder="e.g. PPE photo shows gloves were not worn. Redo step 3 with correct PPE."
             value={reason}
             onChange={(e) => setReason(e.target.value.slice(0, MAX_LENGTH))}
@@ -83,7 +83,7 @@ export function RejectReasonSheet({
           type="button"
           onClick={handleConfirm}
           disabled={!isValid || isSubmitting}
-          className={`w-full h-[72px] rounded-xl font-bold text-lg bg-[var(--accent-escalate)] text-white flex items-center justify-center gap-2 transition-opacity ${
+          className={`w-full h-tap-row rounded-lg font-bold text-lg bg-[var(--accent-escalate)] text-white flex items-center justify-center gap-2 transition-opacity ${
             !isValid || isSubmitting ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'
           }`}
         >

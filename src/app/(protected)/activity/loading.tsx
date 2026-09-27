@@ -8,7 +8,7 @@ export default function ActivityLoading() {
       <div className="w-32 h-6 rounded bg-[var(--ink-100)] animate-pulse mb-6" />
       <div className="flex flex-col gap-3">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-[72px] bg-[var(--paper-2)] rounded-xl animate-pulse" />
+          <div key={i} className="h-tap-row bg-[var(--paper-2)] rounded-lg animate-pulse" />
         ))}
       </div>
     </div>

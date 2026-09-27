@@ -417,7 +417,7 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
               type="button"
               onClick={handleDiscardConfirm}
               aria-label="Discard recording and close"
-              className="flex-1 h-[72px] bg-white border border-accent-escalate/50 text-accent-escalate rounded-lg font-semibold text-sm hover:bg-[var(--paper-2)] transition-colors"
+              className="flex-1 h-tap-row bg-white border border-accent-escalate/50 text-accent-escalate rounded-lg font-semibold text-sm hover:bg-[var(--paper-2)] transition-colors"
             >
               Discard recording
             </button>
@@ -425,7 +425,7 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
               type="button"
               onClick={handleKeepRecording}
               aria-label="Keep recording and continue"
-              className="flex-1 h-[72px] bg-[var(--paper-2)] text-[var(--ink-900)] rounded-lg font-semibold text-sm hover:bg-[var(--paper-2)] transition-colors"
+              className="flex-1 h-tap-row bg-[var(--paper-2)] text-[var(--ink-900)] rounded-lg font-semibold text-sm hover:bg-[var(--paper-2)] transition-colors"
             >
               Keep recording
             </button>
@@ -481,7 +481,7 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
               setRecorderState('requesting-permission')
               startCamera(facingMode)
             }}
-            className="h-[72px] px-8 bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--paper-2)] transition-colors"
+            className="h-tap-row px-8 bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--paper-2)] transition-colors"
           >
             Try again
           </button>
@@ -497,7 +497,7 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
           onClick={handleSwitchCamera}
           disabled={isRecording}
           aria-label={switchCameraLabel}
-          className={`md:hidden w-[72px] h-[72px] rounded-full bg-[var(--paper-2)] flex items-center justify-center text-[var(--ink-900)] hover:bg-[var(--paper-2)] active:bg-[var(--ink-500)] transition-colors ${
+          className={`md:hidden w-tap-row h-tap-row rounded-full bg-[var(--paper-2)] flex items-center justify-center text-[var(--ink-900)] hover:bg-[var(--paper-2)] active:bg-[var(--ink-500)] transition-colors ${
             isRecording ? 'opacity-50 cursor-not-allowed' : ''
           }`}
         >
@@ -528,9 +528,9 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
         )}
 
         {/* Right spacer (desktop) — keeps record button centered */}
-        <div className="hidden md:block w-[72px]" aria-hidden="true" />
+        <div className="hidden md:block w-tap-row" aria-hidden="true" />
         {/* Mobile spacer when not showing switch button — keeps centered */}
-        <div className="md:hidden w-[72px]" aria-hidden="true" />
+        <div className="md:hidden w-tap-row" aria-hidden="true" />
       </>
     )
   }

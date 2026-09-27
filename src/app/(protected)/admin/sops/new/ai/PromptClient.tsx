@@ -168,9 +168,9 @@ export function PromptClient({ departments }: Props) {
                     : 'border-[var(--ink-100)] hover:border-[var(--ink-300)]'
                 }`}
               >
-                <span className="mono block text-[10px] text-[var(--ink-500)]">{level}</span>
+                <span className="mono block text-micro text-[var(--ink-500)]">{level}</span>
                 <span
-                  className={`block text-[11px] leading-tight ${
+                  className={`block text-meta leading-tight ${
                     selected ? 'font-semibold text-[var(--ink-900)]' : 'text-[var(--ink-700)]'
                   }`}
                 >

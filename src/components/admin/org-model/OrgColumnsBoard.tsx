@@ -89,7 +89,7 @@ export function OrgColumnsBoard({ tree, orgId, inviteCode, departments, onChange
           <div key={dept.id} className="flex flex-col gap-2" style={{ flex: '0 0 250px' }}>
             <div className="node" style={{ position: 'static' }}>
               <div className="kicker mono">DEPARTMENT</div>
-              <div className="flex items-center gap-1.5 text-[13px] font-medium text-[var(--ink-900)]">
+              <div className="flex items-center gap-1.5 text-ui font-medium text-[var(--ink-900)]">
                 <span className="inline-block w-2 h-2 rounded-full" style={{ background: dept.colour }} />
                 {dept.name}
               </div>
@@ -101,7 +101,7 @@ export function OrgColumnsBoard({ tree, orgId, inviteCode, departments, onChange
                   <div className="kicker mono">ROLE</div>
                   <span className="pill">{role.filledCount}/{role.budgetedCount}</span>
                 </div>
-                <div className="text-[13px] font-medium text-[var(--ink-900)] mb-1.5">{role.name}</div>
+                <div className="text-ui font-medium text-[var(--ink-900)] mb-1.5">{role.name}</div>
                 <div className="flex flex-wrap gap-1 mb-1.5">
                   {role.people.map((person, i) => {
                     const clickable = !person.isVacancy && Boolean(person.id)
@@ -157,7 +157,7 @@ export function OrgColumnsBoard({ tree, orgId, inviteCode, departments, onChange
 
       {/* Old member roster absorbed here — org-privilege role / invite / department-picker
           editing stays reachable via this sub-panel, never deleted (plan Task 1). */}
-      <details className="rounded-xl bg-white border border-[var(--ink-100)]">
+      <details className="rounded-lg bg-white border border-[var(--ink-100)]">
         <summary className="px-4 py-3 cursor-pointer text-sm font-semibold text-[var(--ink-900)]">
           Manage members, invites &amp; org roles
         </summary>

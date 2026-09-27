@@ -422,7 +422,7 @@ export function UploadDropzone() {
             placeholder="Paste YouTube URL..."
             value={youtubeUrl}
             onChange={(e) => { setYoutubeUrl(e.target.value); setYoutubeError(null) }}
-            className="w-full bg-white border border-[var(--ink-100)] rounded-lg px-4 h-[52px] text-sm text-[var(--ink-900)] placeholder:text-[var(--ink-500)] focus:border-[var(--ink-900)] focus:outline-none"
+            className="w-full bg-white border border-[var(--ink-100)] rounded-lg px-4 h-13 text-sm text-[var(--ink-900)] placeholder:text-[var(--ink-500)] focus:border-[var(--ink-900)] focus:outline-none"
           />
           {youtubeError && (
             <p role="alert" className="text-xs text-accent-escalate">{youtubeError}</p>
@@ -443,7 +443,7 @@ export function UploadDropzone() {
           <button
             onClick={handleYoutubeSubmit}
             disabled={!youtubeUrl || !termsChecked || youtubeFetching}
-            className="h-[72px] w-full rounded-lg bg-[var(--ink-900)] text-white text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[var(--ink-700)] transition-colors"
+            className="h-tap-row w-full rounded-lg bg-[var(--ink-900)] text-white text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[var(--ink-700)] transition-colors"
           >
             {youtubeFetching ? 'Fetching captions...' : 'Transcribe from YouTube'}
           </button>
@@ -460,7 +460,7 @@ export function UploadDropzone() {
               <button
                 type="button"
                 onClick={() => setRecorderOpen(true)}
-                className="h-[72px] w-full bg-white border border-[var(--ink-100)] border-dashed rounded-xl text-[var(--ink-900)] font-semibold text-base flex items-center justify-center gap-3 hover:bg-[var(--paper-2)] transition-colors"
+                className="h-tap-row w-full bg-white border border-[var(--ink-100)] border-dashed rounded-lg text-[var(--ink-900)] font-semibold text-base flex items-center justify-center gap-3 hover:bg-[var(--paper-2)] transition-colors"
               >
                 <Video className="w-6 h-6" />
                 Start recording
@@ -473,7 +473,7 @@ export function UploadDropzone() {
             /* iOS / unsupported device fallback (D-04, D-05) */
             <div
               role="status"
-              className="flex flex-col items-center text-center p-6 bg-[var(--accent-voice)]/20 border border-[var(--accent-voice)]/50 rounded-xl"
+              className="flex flex-col items-center text-center p-6 bg-[var(--accent-voice)]/20 border border-[var(--accent-voice)]/50 rounded-lg"
             >
               <Smartphone className="w-8 h-8 text-[var(--accent-voice)] mx-auto mb-3" />
               <p className="text-sm font-semibold text-[var(--accent-voice)] text-center">
@@ -486,7 +486,7 @@ export function UploadDropzone() {
                 type="button"
                 aria-label="Choose a video file from your device"
                 onClick={() => videoInputRef.current?.click()}
-                className="h-[72px] w-full bg-[var(--ink-900)] text-white font-semibold text-lg rounded-lg hover:bg-[var(--ink-700)] transition-colors mt-4"
+                className="h-tap-row w-full bg-[var(--ink-900)] text-white font-semibold text-lg rounded-lg hover:bg-[var(--ink-700)] transition-colors mt-4"
               >
                 Choose video file
               </button>
@@ -502,8 +502,8 @@ export function UploadDropzone() {
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             className={[
-              'border-2 border-dashed rounded-xl transition-colors',
-              hasFiles ? 'min-h-[120px]' : 'min-h-[200px]',
+              'border-2 border-dashed rounded-lg transition-colors',
+              hasFiles ? 'min-h-30' : 'min-h-50',
               'flex flex-col items-center justify-center gap-4 p-8 text-center',
               dragOver
                 ? 'border-[var(--ink-900)] bg-[var(--ink-900)]/10'
@@ -532,7 +532,7 @@ export function UploadDropzone() {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="bg-[var(--ink-900)] text-white font-semibold px-6 h-[72px] rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
+                className="bg-[var(--ink-900)] text-white font-semibold px-6 h-tap-row rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
               >
                 Browse files
               </button>
@@ -541,7 +541,7 @@ export function UploadDropzone() {
               <button
                 type="button"
                 onClick={() => cameraInputRef.current?.click()}
-                className="bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold px-6 h-[72px] rounded-lg hover:bg-[var(--ink-300)] active:bg-[var(--ink-500)] transition-colors"
+                className="bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold px-6 h-tap-row rounded-lg hover:bg-[var(--ink-300)] active:bg-[var(--ink-500)] transition-colors"
               >
                 Take a photo
               </button>
@@ -550,7 +550,7 @@ export function UploadDropzone() {
               <button
                 type="button"
                 onClick={() => setScannerOpen(true)}
-                className="bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold px-6 h-[72px] rounded-lg hover:bg-[var(--ink-300)] active:bg-[var(--ink-500)] transition-colors flex items-center gap-2"
+                className="bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold px-6 h-tap-row rounded-lg hover:bg-[var(--ink-300)] active:bg-[var(--ink-500)] transition-colors flex items-center gap-2"
               >
                 <ScanLine className="w-5 h-5" />
                 Scan document
@@ -560,7 +560,7 @@ export function UploadDropzone() {
               <button
                 type="button"
                 onClick={() => videoInputRef.current?.click()}
-                className="bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold px-6 h-[72px] rounded-lg hover:bg-[var(--ink-300)] active:bg-[var(--ink-500)] transition-colors flex items-center gap-2"
+                className="bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold px-6 h-tap-row rounded-lg hover:bg-[var(--ink-300)] active:bg-[var(--ink-500)] transition-colors flex items-center gap-2"
               >
                 <Video size={20} />
                 Browse video
@@ -570,7 +570,7 @@ export function UploadDropzone() {
               <button
                 type="button"
                 onClick={() => setPipelineModalOpen(true)}
-                className="bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold px-6 h-[72px] rounded-lg hover:bg-[var(--ink-300)] active:bg-[var(--ink-500)] transition-colors flex items-center gap-2"
+                className="bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold px-6 h-tap-row rounded-lg hover:bg-[var(--ink-300)] active:bg-[var(--ink-500)] transition-colors flex items-center gap-2"
               >
                 <Film size={20} />
                 Generate video SOP
@@ -609,7 +609,7 @@ export function UploadDropzone() {
               {queue.map(item => (
                 <li
                   key={item.id}
-                  className="flex items-center gap-3 p-3 bg-white rounded-lg min-h-[72px] border border-[var(--ink-100)]"
+                  className="flex items-center gap-3 p-3 bg-white rounded-lg min-h-tap-row border border-[var(--ink-100)]"
                 >
                   <FileIcon mimeType={item.file.type} />
 
@@ -654,7 +654,7 @@ export function UploadDropzone() {
               type="button"
               onClick={handleUpload}
               disabled={uploading || hasErrors}
-              className="w-full h-[72px] bg-[var(--ink-900)] text-white font-bold text-lg rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-tap-row bg-[var(--ink-900)] text-white font-bold text-lg rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {uploading
                 ? 'Uploading...'
@@ -675,7 +675,7 @@ export function UploadDropzone() {
                   <button
                     type="button"
                     onClick={() => router.push(`/admin/sops/builder/${uploadedSopIds[0]}`)}
-                    className="flex-1 min-h-[44px] px-4 bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
+                    className="flex-1 min-h-tap px-4 bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
                   >
                     Review parsed SOP
                   </button>
@@ -683,7 +683,7 @@ export function UploadDropzone() {
                   <button
                     type="button"
                     onClick={() => router.push('/sops?status=draft')}
-                    className="flex-1 min-h-[44px] px-4 bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
+                    className="flex-1 min-h-tap px-4 bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors"
                   >
                     Review drafts
                   </button>
@@ -695,7 +695,7 @@ export function UploadDropzone() {
                     setQueue([])
                     setUploadedSopIds([])
                   }}
-                  className="min-h-[44px] px-4 bg-[var(--paper-2)] text-[var(--ink-900)] rounded-lg hover:bg-[var(--ink-300)] transition-colors"
+                  className="min-h-tap px-4 bg-[var(--paper-2)] text-[var(--ink-900)] rounded-lg hover:bg-[var(--ink-300)] transition-colors"
                 >
                   Upload more
                 </button>

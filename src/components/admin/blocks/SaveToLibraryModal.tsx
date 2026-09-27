@@ -98,7 +98,7 @@ export function SaveToLibraryModal({
       onClick={onClose}
     >
       <div
-        className="bg-white border border-[var(--ink-100)] rounded-xl w-full max-w-md p-6 shadow-2xl"
+        className="bg-white border border-[var(--ink-100)] rounded-lg w-full max-w-md p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
@@ -124,7 +124,7 @@ export function SaveToLibraryModal({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Crush hazard â€” section forming"
-            className="w-full bg-[var(--paper)] border border-[var(--ink-100)] rounded-md px-3 py-2 text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
+            className="w-full bg-[var(--paper)] border border-[var(--ink-100)] rounded-lg px-3 py-2 text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
           />
         </div>
 
@@ -166,14 +166,14 @@ export function SaveToLibraryModal({
             value={freeTextTagsRaw}
             onChange={(e) => setFreeTextTagsRaw(e.target.value)}
             placeholder="e.g. forming, swab, gob"
-            className="w-full bg-[var(--paper)] border border-[var(--ink-100)] rounded-md px-3 py-2 text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
+            className="w-full bg-[var(--paper)] border border-[var(--ink-100)] rounded-lg px-3 py-2 text-[var(--ink-900)] focus:border-[var(--ink-900)] focus:outline-none"
           />
         </div>
 
         {/* Phase 25: Scope field removed — all blocks are org-owned (global model retired). */}
 
         {error && (
-          <div className="text-sm text-accent-escalate bg-accent-escalate/10 border border-accent-escalate/40 rounded-md p-3 mb-4">
+          <div className="text-sm text-accent-escalate bg-accent-escalate/10 border border-accent-escalate/40 rounded-lg p-3 mb-4">
             {error}
           </div>
         )}
@@ -183,7 +183,7 @@ export function SaveToLibraryModal({
             type="button"
             onClick={onClose}
             disabled={isPending}
-            className="bg-[var(--paper)] border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] font-semibold px-4 h-[40px] rounded-lg transition-colors text-sm disabled:opacity-50"
+            className="bg-[var(--paper)] border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] font-semibold px-4 h-10 rounded-lg transition-colors text-sm disabled:opacity-50"
           >
             Cancel
           </button>
@@ -191,7 +191,7 @@ export function SaveToLibraryModal({
             type="button"
             onClick={handleSave}
             disabled={isPending}
-            className="bg-[var(--ink-900)] text-white font-semibold px-4 h-[40px] rounded-lg hover:bg-[var(--ink-700)] transition-colors text-sm disabled:opacity-50"
+            className="bg-[var(--ink-900)] text-white font-semibold px-4 h-10 rounded-lg hover:bg-[var(--ink-700)] transition-colors text-sm disabled:opacity-50"
           >
             Save to library
           </button>

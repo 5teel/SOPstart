@@ -114,8 +114,8 @@ test.describe('SC-5 — AccessAnswerPanel answers "Who can see this?" / "What ca
 test.describe('SC-5 — SelectionStrip 48px structural pins survive the copy sweep', () => {
   test('h-[48px] slot structure is untouched', () => {
     const src = read(STRIP)
-    expect(src).toContain('h-[48px] overflow-hidden')
-    expect(src).toContain('className={`strip-slot h-[48px] overflow-hidden ${state}`}')
+    expect(src).toContain('h-12 overflow-hidden')
+    expect(src).toContain('className={`strip-slot h-12 overflow-hidden ${state}`}')
     expect(src).toContain('onClick={onDone}')
     const divCount = (src.match(/<div data-state=/g) ?? []).length
     expect(divCount).toBe(1)

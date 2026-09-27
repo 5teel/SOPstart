@@ -11,7 +11,7 @@ export type PhotoBlockProps = z.infer<typeof PhotoBlockPropsSchema>
 export function PhotoBlock({ src, alt, caption }: PhotoBlockProps) {
   if (!src) {
     return (
-      <div className="bg-white border border-dashed border-[var(--ink-300)] rounded-xl p-8 text-center text-[var(--ink-500)] text-sm mb-4">
+      <div className="bg-white border border-dashed border-[var(--ink-300)] rounded-lg p-8 text-center text-[var(--ink-500)] text-sm mb-4">
         Photo missing
       </div>
     )

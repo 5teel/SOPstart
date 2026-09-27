@@ -38,7 +38,7 @@ function formatNzDate(iso: string | null | undefined): string | null {
 
 function Heading({ children, tone }: { children: React.ReactNode; tone?: string }) {
   return (
-    <h2 className="mono text-[11px] uppercase tracking-[0.1em]" style={{ color: tone ?? 'var(--ink-500)' }}>
+    <h2 className="mono text-meta uppercase tracking-widest" style={{ color: tone ?? 'var(--ink-500)' }}>
       {children}
     </h2>
   )
@@ -103,12 +103,12 @@ export function ReadTab({
           <div className="mt-2 flex flex-wrap items-center gap-2">
             {sop.sop_number && <span className="pill">{sop.sop_number}</span>}
             <span className="pill">v{sop.version}</span>
-            {meta && <span className="mono text-[11px] uppercase tracking-wider text-[var(--ink-500)]">{meta}</span>}
+            {meta && <span className="mono text-meta uppercase tracking-wider text-[var(--ink-500)]">{meta}</span>}
           </div>
           {scope?.content && (
-            <p className="mt-4 text-[15px] leading-relaxed text-[var(--ink-700)] whitespace-pre-line">{scope.content}</p>
+            <p className="mt-4 text-reading leading-relaxed text-[var(--ink-700)] whitespace-pre-line">{scope.content}</p>
           )}
-          <p className="mono mt-3 text-[11px] text-[var(--ink-500)]">
+          <p className="mono mt-3 text-meta text-[var(--ink-500)]">
             Current as of {formatNzDate(sop.last_reviewed_at ?? sop.published_at) ?? '—'}
             {sop.author ? ` · Author ${sop.author}` : ''}
           </p>
@@ -129,14 +129,14 @@ export function ReadTab({
                     aria-checked={active}
                     data-testid="job-chip"
                     onClick={() => onJobChange?.(s.id)}
-                    className={`min-h-[44px] rounded-md border px-3 text-left text-sm font-medium transition-colors ${
+                    className={`min-h-tap rounded-lg border px-3 text-left text-sm font-medium transition-colors ${
                       active
                         ? 'border-[var(--ink-900)] bg-[var(--ink-900)] text-white'
                         : 'border-[var(--ink-300)] bg-white text-[var(--ink-700)] hover:border-[var(--ink-900)]'
                     }`}
                   >
                     {s.title}
-                    <span className={`mono ml-2 text-[11px] ${active ? 'text-white/70' : 'text-[var(--ink-500)]'}`}>
+                    <span className={`mono ml-2 text-meta ${active ? 'text-white/70' : 'text-[var(--ink-500)]'}`}>
                       {s.sop_steps.length} steps
                     </span>
                   </button>
@@ -165,7 +165,7 @@ export function ReadTab({
                   type="button"
                   data-testid="safety-acknowledge"
                   onClick={() => acknowledgeSafety(sop.id)}
-                  className="inline-flex min-h-[44px] items-center gap-2 rounded-md border border-[var(--ink-900)] px-4 text-sm font-semibold text-[var(--ink-900)] hover:bg-[var(--paper-2)]"
+                  className="inline-flex min-h-tap items-center gap-2 rounded-lg border border-[var(--ink-900)] px-4 text-sm font-semibold text-[var(--ink-900)] hover:bg-[var(--paper-2)]"
                 >
                   <ShieldCheck size={16} aria-hidden="true" /> I&apos;ve read the safety requirements
                 </button>
@@ -216,13 +216,13 @@ export function ReadTab({
                 <Heading>The steps</Heading>
                 <p className="mt-1 text-lg font-semibold text-[var(--ink-900)]">
                   {job.title}
-                  <span className="mono ml-2 text-[11px] font-normal text-[var(--ink-500)]">{job.sop_steps.length} steps</span>
+                  <span className="mono ml-2 text-meta font-normal text-[var(--ink-500)]">{job.sop_steps.length} steps</span>
                 </p>
               </div>
               <Link
                 href={walkHref}
                 data-testid="walk-it"
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-md bg-[var(--ink-900)] px-4 text-sm font-semibold text-white hover:opacity-90"
+                className="inline-flex min-h-tap items-center gap-2 rounded-lg bg-[var(--ink-900)] px-4 text-sm font-semibold text-white hover:opacity-90"
               >
                 <Play size={14} aria-hidden="true" /> Walk it step by step
               </Link>
@@ -235,14 +235,14 @@ export function ReadTab({
                   <li key={step.id} className="flex gap-4 px-4 py-4">
                     <span className="mono w-7 flex-shrink-0 pt-0.5 text-right text-sm tabular-nums text-[var(--ink-500)]">{idx + 1}</span>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[15px] leading-relaxed text-[var(--ink-900)]">{step.text}</p>
+                      <p className="text-reading leading-relaxed text-[var(--ink-900)]">{step.text}</p>
                       {step.warning && (
-                        <p className="mt-2 flex items-start gap-2 rounded-md border border-[var(--accent-escalate)]/30 bg-[var(--accent-escalate)]/10 px-3 py-2 text-sm text-[var(--accent-escalate)]">
+                        <p className="mt-2 flex items-start gap-2 rounded-lg border border-[var(--accent-escalate)]/30 bg-[var(--accent-escalate)]/10 px-3 py-2 text-sm text-[var(--accent-escalate)]">
                           <AlertTriangle size={14} className="mt-0.5 flex-shrink-0" aria-hidden="true" />{step.warning}
                         </p>
                       )}
                       {step.caution && (
-                        <p className="mt-2 flex items-start gap-2 rounded-md border border-[var(--accent-decision)]/30 bg-[var(--accent-decision)]/10 px-3 py-2 text-sm text-[var(--accent-decision)]">
+                        <p className="mt-2 flex items-start gap-2 rounded-lg border border-[var(--accent-decision)]/30 bg-[var(--accent-decision)]/10 px-3 py-2 text-sm text-[var(--accent-decision)]">
                           <Zap size={14} className="mt-0.5 flex-shrink-0" aria-hidden="true" />{step.caution}
                         </p>
                       )}
@@ -252,13 +252,13 @@ export function ReadTab({
                         </p>
                       )}
                       {step.photo_required && (
-                        <p className="mono mt-2 flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-[var(--accent-decision)]">
+                        <p className="mono mt-2 flex items-center gap-1.5 text-meta uppercase tracking-wider text-[var(--accent-decision)]">
                           <Camera size={12} aria-hidden="true" /> Photo required
                         </p>
                       )}
                       {images.map((img) => (
                         // eslint-disable-next-line @next/next/no-img-element
-                        <img key={img.id} src={img.storage_path} alt={img.alt_text ?? ''} className="mt-3 max-h-64 rounded-md border border-[var(--ink-100)]" />
+                        <img key={img.id} src={img.storage_path} alt={img.alt_text ?? ''} className="mt-3 max-h-64 rounded-lg border border-[var(--ink-100)]" />
                       ))}
                     </div>
                   </li>
@@ -273,7 +273,7 @@ export function ReadTab({
         {/* Reference material — there if you need it, out of the way if not */}
         {references.length > 0 && (
           <details className="rounded-lg border border-[var(--ink-100)] bg-white">
-            <summary className="mono cursor-pointer px-4 py-3 text-[11px] uppercase tracking-[0.1em] text-[var(--ink-500)]">
+            <summary className="mono cursor-pointer px-4 py-3 text-meta uppercase tracking-widest text-[var(--ink-500)]">
               Reference ({references.length})
             </summary>
             <div className="divide-y divide-[var(--ink-100)] border-t border-[var(--ink-100)]">

@@ -6,9 +6,6 @@
  * it was plain CSS — the utilities silently generated nothing (2026-09-28). */
 @import "../styles/blueprint-theme.css";
 
-@theme {
-  --min-tap-target: 72px;
-}
 
 /* ─────────────────────────────────────────────────────────────
    Page + step transition animations

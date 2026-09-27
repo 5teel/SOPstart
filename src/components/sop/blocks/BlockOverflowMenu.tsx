@@ -95,7 +95,7 @@ export function BlockOverflowMenu({
         }}
         aria-label="Item actions"
         data-testid="block-overflow-trigger"
-        className="p-1.5 rounded-md bg-[var(--paper)]/80 border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] hover:bg-white backdrop-blur-sm shadow"
+        className="p-1.5 rounded-lg bg-[var(--paper)]/80 border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] hover:bg-white backdrop-blur-sm shadow"
       >
         <MoreVertical className="h-4 w-4" />
       </button>
@@ -104,7 +104,7 @@ export function BlockOverflowMenu({
         <div
           role="menu"
           data-testid="block-overflow-menu"
-          className="absolute top-full right-0 mt-1 w-44 bg-white border border-[var(--ink-100)] rounded-md shadow-xl z-30 py-1"
+          className="absolute top-full right-0 mt-1 w-44 bg-white border border-[var(--ink-100)] rounded-lg shadow-xl z-30 py-1"
         >
           <button
             type="button"

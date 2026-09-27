@@ -107,7 +107,7 @@ export default async function AdminSettingsPage() {
             href={section.href}
             className="blueprint-frame block transition-shadow hover:shadow-[0_0_0_1px_var(--ink-900)] focus-visible:outline-2 focus-visible:outline-[var(--ink-900)] focus-visible:outline-offset-2"
           >
-            <p className="mono text-[10px] text-[var(--ink-500)] uppercase tracking-[0.08em] mb-2">
+            <p className="mono text-micro text-[var(--ink-500)] uppercase tracking-widest mb-2">
               {section.eyebrow}
             </p>
             <h3 className="text-base font-semibold text-[var(--ink-900)] mb-1">

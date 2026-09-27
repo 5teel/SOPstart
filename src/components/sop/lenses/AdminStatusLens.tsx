@@ -74,7 +74,7 @@ export function AdminStatusLens({
     return (
       <div className="flex flex-col gap-2 p-3 lg:col-span-2">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-[68px] animate-pulse rounded-lg bg-[var(--paper-2)] lg:h-9 lg:rounded" />
+          <div key={i} className="h-tap-row animate-pulse rounded-lg bg-[var(--paper-2)] lg:h-9 lg:rounded" />
         ))}
       </div>
     )
@@ -83,7 +83,7 @@ export function AdminStatusLens({
   if ('error' in data) {
     return (
       <div className="py-12 text-center lg:col-span-2">
-        <p className="mono mb-2 text-[11px] uppercase tracking-wider text-accent-escalate">ERROR</p>
+        <p className="mono mb-2 text-meta uppercase tracking-wider text-accent-escalate">ERROR</p>
         <p className="text-sm text-[var(--ink-500)]">{data.error}</p>
       </div>
     )

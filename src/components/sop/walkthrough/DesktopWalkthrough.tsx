@@ -207,14 +207,14 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
                 router.push(`?${params.toString()}`, { scroll: false })
               }
             }}
-            className="min-h-[60px] px-10 rounded-xl bg-[var(--ink-900)] text-[var(--paper)] text-xl font-bold hover:opacity-90 transition-opacity"
+            className="min-h-tap-glove px-10 rounded-lg bg-[var(--ink-900)] text-[var(--paper)] text-xl font-bold hover:opacity-90 transition-opacity"
           >
             Re-read steps
           </button>
           <button
             type="button"
             onClick={() => { setSubmitted(false); walkthroughStore.resetWalkthrough(sopId) }}
-            className="min-h-[60px] px-10 rounded-xl border border-[var(--ink-300)] text-lg font-medium text-[var(--ink-700)] hover:border-[var(--ink-900)] transition-colors"
+            className="min-h-tap-glove px-10 rounded-lg border border-[var(--ink-300)] text-lg font-medium text-[var(--ink-700)] hover:border-[var(--ink-900)] transition-colors"
           >
             Start another walkthrough
           </button>
@@ -369,7 +369,7 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
               <div className="flex items-center gap-4">
                 <div
                   data-testid="walkthrough-already-submitted"
-                  className="min-h-[60px] px-6 rounded-xl border border-[var(--ink-200)] bg-[var(--ink-50)] flex items-center gap-3 text-lg font-semibold text-[var(--ink-700)]"
+                  className="min-h-tap-glove px-6 rounded-lg border border-[var(--ink-200)] bg-[var(--ink-50)] flex items-center gap-3 text-lg font-semibold text-[var(--ink-700)]"
                 >
                   <CheckCircle2 className="h-6 w-6 text-accent-signoff" />
                   Already submitted — re-reading
@@ -378,7 +378,7 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
                   type="button"
                   disabled={!nextStep}
                   onClick={() => nextStep && void handleStepChange(nextStep.id)}
-                  className="min-h-[60px] px-8 rounded-xl bg-[var(--ink-900)] text-[var(--paper)] text-xl font-bold flex items-center gap-3 hover:opacity-90 transition-opacity disabled:opacity-30 disabled:pointer-events-none"
+                  className="min-h-tap-glove px-8 rounded-lg bg-[var(--ink-900)] text-[var(--paper)] text-xl font-bold flex items-center gap-3 hover:opacity-90 transition-opacity disabled:opacity-30 disabled:pointer-events-none"
                   data-testid="review-next"
                 >
                   Next
@@ -390,7 +390,7 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
                 type="button"
                 onClick={handleSubmit}
                 disabled={submitLoading}
-                className="min-h-[60px] px-10 rounded-xl bg-[var(--accent-decision)] text-white text-xl font-bold flex items-center gap-3 hover:opacity-90 transition-opacity disabled:opacity-50"
+                className="min-h-tap-glove px-10 rounded-lg bg-[var(--accent-decision)] text-white text-xl font-bold flex items-center gap-3 hover:opacity-90 transition-opacity disabled:opacity-50"
                 data-testid="ack-next"
               >
                 <ClipboardCheck className="h-6 w-6" />
@@ -400,7 +400,7 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
               <button
                 type="button"
                 onClick={handleAcknowledgeNext}
-                className="min-h-[60px] px-10 rounded-xl bg-[var(--ink-900)] text-[var(--paper)] text-xl font-bold flex items-center gap-3 hover:opacity-90 transition-transform duration-100 active:scale-[0.97]"
+                className="min-h-tap-glove px-10 rounded-lg bg-[var(--ink-900)] text-[var(--paper)] text-xl font-bold flex items-center gap-3 hover:opacity-90 transition-transform duration-100 active:scale-[0.97]"
                 data-testid="ack-next"
               >
                 I&apos;ve done this — Next

@@ -20,7 +20,7 @@ function MediaItem({ item, index }: { item: VisualItem; index: number }) {
         src={item.src}
         controls
         preload="metadata"
-        className="mt-3 w-full rounded-xl border border-[var(--ink-300)] max-h-[240px] bg-black"
+        className="mt-3 w-full rounded-lg border border-[var(--ink-300)] max-h-60 bg-black"
       />
     )
   }
@@ -32,7 +32,7 @@ function MediaItem({ item, index }: { item: VisualItem; index: number }) {
     return <SopImageInline src={displaySrc} alt={item.alt || `Visual ${index + 1}`} />
   }
   return (
-    <div className="bg-white border border-dashed border-[var(--ink-300)] rounded-xl p-6 text-center text-[var(--ink-500)] text-xs">
+    <div className="bg-white border border-dashed border-[var(--ink-300)] rounded-lg p-6 text-center text-[var(--ink-500)] text-xs">
       Missing
     </div>
   )
@@ -41,7 +41,7 @@ function MediaItem({ item, index }: { item: VisualItem; index: number }) {
 export function VisualBlock({ items }: VisualBlockProps) {
   if (!items || items.length === 0) {
     return (
-      <div className="bg-white border border-dashed border-[var(--ink-300)] rounded-xl p-6 text-center text-[var(--ink-500)] text-sm mb-4">
+      <div className="bg-white border border-dashed border-[var(--ink-300)] rounded-lg p-6 text-center text-[var(--ink-500)] text-sm mb-4">
         No media
       </div>
     )

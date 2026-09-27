@@ -28,7 +28,7 @@ export function SafetyAcknowledgement({
 
   return (
     <div className="fixed inset-0 z-40 bg-[var(--paper)] flex flex-col overflow-y-auto">
-      <div className="flex flex-col gap-6 px-4 py-8 pb-[120px] max-w-2xl mx-auto w-full">
+      <div className="flex flex-col gap-6 px-4 py-8 pb-30 max-w-2xl mx-auto w-full">
 
         {/* Header */}
         <div className="flex flex-col gap-2">
@@ -41,7 +41,7 @@ export function SafetyAcknowledgement({
 
         {/* Hazards card */}
         {hazardsSection && (
-          <div className="bg-accent-escalate/10 border border-accent-escalate/40 rounded-xl p-5">
+          <div className="bg-accent-escalate/10 border border-accent-escalate/40 rounded-lg p-5">
             <div className="flex items-center gap-2">
               <AlertTriangle size={18} className="text-accent-escalate" />
               <span className="text-xs font-bold uppercase tracking-widest text-accent-escalate">
@@ -66,7 +66,7 @@ export function SafetyAcknowledgement({
 
         {/* PPE card */}
         {ppeSection && (
-          <div className="bg-accent-step/10 border border-accent-step/40 rounded-xl p-5">
+          <div className="bg-accent-step/10 border border-accent-step/40 rounded-lg p-5">
             <div className="flex items-center gap-2">
               <ShieldCheck size={18} className="text-accent-step" />
               <span className="text-xs font-bold uppercase tracking-widest text-accent-step">
@@ -93,11 +93,11 @@ export function SafetyAcknowledgement({
 
         {/* Emergency card (collapsible) */}
         {emergencySection && (
-          <div className="bg-accent-escalate/10 border border-accent-escalate/40 rounded-xl overflow-hidden">
+          <div className="bg-accent-escalate/10 border border-accent-escalate/40 rounded-lg overflow-hidden">
             <button
               type="button"
               onClick={() => setEmergencyExpanded((v) => !v)}
-              className="flex items-center justify-between p-4 min-h-[56px] w-full text-left"
+              className="flex items-center justify-between p-4 min-h-14 w-full text-left"
             >
               <div className="flex items-center gap-2">
                 <Siren size={18} className="text-accent-escalate" />
@@ -124,7 +124,7 @@ export function SafetyAcknowledgement({
         <button
           type="button"
           onClick={onAcknowledge}
-          className="w-full h-[80px] bg-[var(--accent-voice)] text-white font-bold text-lg rounded-xl hover:bg-accent-voice active:bg-accent-voice transition-colors flex items-center justify-center gap-2"
+          className="w-full h-20 bg-[var(--accent-voice)] text-white font-bold text-lg rounded-lg hover:bg-accent-voice active:bg-accent-voice transition-colors flex items-center justify-center gap-2"
         >
           <ShieldCheck size={22} />
           Understood — Start Procedure

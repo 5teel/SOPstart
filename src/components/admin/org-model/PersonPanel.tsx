@@ -103,7 +103,7 @@ export function PersonPanel({ person, focusSopId, onClose }: PersonPanelProps) {
 
           {/* Observation history */}
           <section>
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--ink-500)] mb-1.5">
+            <div className="text-micro font-semibold uppercase tracking-wider text-[var(--ink-500)] mb-1.5">
               Observation history
             </div>
             <div className="rounded border border-[var(--ink-100)] divide-y divide-[var(--ink-100)]">

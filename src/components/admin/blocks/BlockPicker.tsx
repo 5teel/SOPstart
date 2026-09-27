@@ -167,7 +167,7 @@ export function BlockPicker({
       onClick={onClose}
     >
       <div
-        className="bg-white border border-[var(--ink-100)] rounded-xl w-full max-w-5xl max-h-[85vh] flex flex-col shadow-2xl"
+        className="bg-white border border-[var(--ink-100)] rounded-lg w-full max-w-5xl max-h-[85vh] flex flex-col shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -333,7 +333,7 @@ export function BlockPicker({
         {/* Footer â€” pin/follow toggle + actions */}
         <div className="px-6 py-4 border-t border-[var(--ink-100)] flex items-center justify-between gap-4">
           <fieldset className="flex flex-col gap-1">
-            <legend className="text-[11px] uppercase tracking-wider text-[var(--ink-500)] mb-1">
+            <legend className="text-meta uppercase tracking-wider text-[var(--ink-500)] mb-1">
               When the library source changes
             </legend>
             <div className="flex items-center gap-4">
@@ -348,7 +348,7 @@ export function BlockPicker({
                 />
                 <span className="text-sm text-[var(--ink-700)]">
                   Pinned
-                  <span className="block text-[11px] text-[var(--ink-500)]">
+                  <span className="block text-meta text-[var(--ink-500)]">
                     Lock to the current version forever.
                   </span>
                 </span>
@@ -364,7 +364,7 @@ export function BlockPicker({
                 />
                 <span className="text-sm text-[var(--ink-700)]">
                   Follow latest
-                  <span className="block text-[11px] text-[var(--ink-500)]">
+                  <span className="block text-meta text-[var(--ink-500)]">
                     Show an &lsquo;update available&rsquo; badge when source changes.
                   </span>
                 </span>
@@ -377,7 +377,7 @@ export function BlockPicker({
               type="button"
               onClick={onClose}
               disabled={submitting}
-              className="bg-[var(--paper)] border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] font-semibold px-4 h-[40px] rounded-lg text-sm disabled:opacity-50"
+              className="bg-[var(--paper)] border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] font-semibold px-4 h-10 rounded-lg text-sm disabled:opacity-50"
             >
               Cancel
             </button>
@@ -385,7 +385,7 @@ export function BlockPicker({
               type="button"
               onClick={handleAdd}
               disabled={!selectedBlockEntry || !selectedContent || submitting}
-              className="bg-[var(--ink-900)] text-white font-semibold px-4 h-[40px] rounded-lg hover:bg-[var(--ink-700)] text-sm disabled:opacity-50"
+              className="bg-[var(--ink-900)] text-white font-semibold px-4 h-10 rounded-lg hover:bg-[var(--ink-700)] text-sm disabled:opacity-50"
               data-testid="block-picker-add"
             >
               {submitting ? 'Addingâ€¦' : 'Add to section'}

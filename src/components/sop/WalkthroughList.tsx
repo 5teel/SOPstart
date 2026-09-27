@@ -63,7 +63,7 @@ export function WalkthroughList({
         <button
           type="button"
           onClick={() => setSafetyExpanded((v) => !v)}
-          className="flex items-center gap-3 px-4 py-3 bg-[var(--accent-voice)]/10 border border-[var(--accent-voice)]/30 rounded-xl w-full text-left cursor-pointer"
+          className="flex items-center gap-3 px-4 py-3 bg-[var(--accent-voice)]/10 border border-[var(--accent-voice)]/30 rounded-lg w-full text-left cursor-pointer"
         >
           <ShieldAlert size={18} className="text-[var(--accent-voice)] flex-shrink-0" />
           <div className="flex-1 min-w-0">
@@ -79,7 +79,7 @@ export function WalkthroughList({
         {safetyExpanded && (
           <div className="mt-3 flex flex-col gap-4">
             {hazardsSection?.content && (
-              <div className="bg-accent-escalate/10 border border-accent-escalate/40 rounded-xl p-4">
+              <div className="bg-accent-escalate/10 border border-accent-escalate/40 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <AlertTriangle size={16} className="text-accent-escalate" />
                   <span className="text-xs font-bold uppercase tracking-widest text-accent-escalate">
@@ -97,7 +97,7 @@ export function WalkthroughList({
               </div>
             )}
             {ppeSection?.content && (
-              <div className="bg-accent-step/10 border border-accent-step/40 rounded-xl p-4">
+              <div className="bg-accent-step/10 border border-accent-step/40 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <ShieldCheck size={16} className="text-accent-step" />
                   <span className="text-xs font-bold uppercase tracking-widest text-accent-step">

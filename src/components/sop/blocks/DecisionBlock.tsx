@@ -18,7 +18,7 @@ export type DecisionBlockProps = z.infer<typeof DecisionBlockPropsSchema>
 export function DecisionBlock({ question, options }: DecisionBlockProps) {
   return (
     <section
-      className="mb-4 border rounded-xl p-5"
+      className="mb-4 border rounded-lg p-5"
       style={{
         borderColor: 'var(--accent-decision)',
         background: 'color-mix(in srgb, var(--accent-decision) 8%, white)',
@@ -27,7 +27,7 @@ export function DecisionBlock({ question, options }: DecisionBlockProps) {
     >
       <div className="flex items-center gap-2 mb-2">
         <span
-          className="text-[11px] font-mono uppercase tracking-wider"
+          className="text-meta font-mono uppercase tracking-wider"
           style={{ color: 'var(--accent-decision)' }}
         >
           Decision

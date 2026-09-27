@@ -43,7 +43,7 @@ test.describe('SB-LINE-01 — Desktop walkthrough layout (Wave 2 contract)', () 
 
   test('DesktopWalkthrough primary Next button is min-h-[60px] (D-19)', () => {
     const src = read(DESKTOP)
-    expect(src).toContain('min-h-[60px]')
+    expect(src).toContain('min-h-tap-glove') // 60px glove CTA — --spacing-tap-glove (2026-09-28 token sweep)
   })
 
   test('DesktopWalkthrough secondary text (warnings/cautions/tips/tools) uses ≥18px (text-lg)', () => {

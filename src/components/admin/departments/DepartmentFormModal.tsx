@@ -154,7 +154,7 @@ export function DepartmentFormModal({
       <div
         style={{
           background: 'var(--paper)',
-          borderRadius: '12px',
+          borderRadius: 'var(--radius-lg)',
           padding: '24px',
           maxWidth: '480px',
           width: '100%',
@@ -167,7 +167,7 @@ export function DepartmentFormModal({
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
           <h2
             id="dept-form-modal-title"
-            style={{ fontSize: '15px', fontWeight: 700, color: 'var(--ink-900)', margin: 0 }}
+            style={{ fontSize: 'var(--text-reading)', fontWeight: 700, color: 'var(--ink-900)', margin: 0 }}
           >
             {isEdit ? 'Edit department' : 'New department'}
           </h2>
@@ -197,7 +197,7 @@ export function DepartmentFormModal({
           <div style={{ marginBottom: '16px' }}>
             <label
               htmlFor="dept-name"
-              style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--ink-900)', marginBottom: '6px' }}
+              style={{ display: 'block', fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--ink-900)', marginBottom: '6px' }}
             >
               Name <span style={{ color: 'var(--accent-hazard)' }}>*</span>
             </label>
@@ -211,9 +211,9 @@ export function DepartmentFormModal({
               style={{
                 width: '100%',
                 padding: '10px 12px',
-                fontSize: '13px',
+                fontSize: 'var(--text-ui)',
                 border: '1px solid var(--ink-300)',
-                borderRadius: '6px',
+                borderRadius: 'var(--radius-lg)',
                 background: 'var(--paper)',
                 color: 'var(--ink-900)',
                 outline: 'none',
@@ -226,10 +226,10 @@ export function DepartmentFormModal({
           <div style={{ marginBottom: '16px' }}>
             <label
               htmlFor="dept-code"
-              style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--ink-900)', marginBottom: '6px' }}
+              style={{ display: 'block', fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--ink-900)', marginBottom: '6px' }}
             >
               Code <span style={{ color: 'var(--accent-hazard)' }}>*</span>
-              <span style={{ fontWeight: 400, color: 'var(--ink-500)', marginLeft: '6px', fontSize: '11px' }}>
+              <span style={{ fontWeight: 400, color: 'var(--ink-500)', marginLeft: '6px', fontSize: 'var(--text-meta)' }}>
                 (max 6 chars, auto-uppercased)
               </span>
             </label>
@@ -244,12 +244,12 @@ export function DepartmentFormModal({
               style={{
                 width: '100%',
                 padding: '10px 12px',
-                fontSize: '13px',
+                fontSize: 'var(--text-ui)',
                 fontFamily: 'var(--font-mono, monospace)',
                 textTransform: 'uppercase',
-                letterSpacing: '0.06em',
+                letterSpacing: 'var(--tracking-wider)',
                 border: '1px solid var(--ink-300)',
-                borderRadius: '6px',
+                borderRadius: 'var(--radius-lg)',
                 background: 'var(--paper)',
                 color: 'var(--ink-900)',
                 outline: 'none',
@@ -261,7 +261,7 @@ export function DepartmentFormModal({
           {/* Colour — fixed 8-swatch radio picker (V5, T-25-08) */}
           <div style={{ marginBottom: '16px' }}>
             <p
-              style={{ fontSize: '12px', fontWeight: 600, color: 'var(--ink-900)', marginBottom: '8px' }}
+              style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--ink-900)', marginBottom: '8px' }}
             >
               Colour <span style={{ color: 'var(--accent-hazard)' }}>*</span>
             </p>
@@ -278,7 +278,7 @@ export function DepartmentFormModal({
                         position: 'relative',
                         width: '32px',
                         height: '32px',
-                        borderRadius: '6px',
+                        borderRadius: 'var(--radius-lg)',
                         background: c.hex,
                         cursor: 'pointer',
                         display: 'flex',
@@ -303,7 +303,7 @@ export function DepartmentFormModal({
                           aria-hidden="true"
                           style={{
                             color: '#fff',
-                            fontSize: '14px',
+                            fontSize: 'var(--text-sm)',
                             fontWeight: 700,
                             lineHeight: 1,
                           }}
@@ -322,10 +322,10 @@ export function DepartmentFormModal({
           <div style={{ marginBottom: '16px' }}>
             <label
               htmlFor="dept-icon"
-              style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--ink-900)', marginBottom: '6px' }}
+              style={{ display: 'block', fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--ink-900)', marginBottom: '6px' }}
             >
               Icon
-              <span style={{ fontWeight: 400, color: 'var(--ink-500)', marginLeft: '6px', fontSize: '11px' }}>
+              <span style={{ fontWeight: 400, color: 'var(--ink-500)', marginLeft: '6px', fontSize: 'var(--text-meta)' }}>
                 (optional — emoji or single char)
               </span>
             </label>
@@ -340,10 +340,10 @@ export function DepartmentFormModal({
                 style={{
                   width: '80px',
                   padding: '10px 12px',
-                  fontSize: '18px',
+                  fontSize: 'var(--text-lg)',
                   textAlign: 'center',
                   border: '1px solid var(--ink-300)',
-                  borderRadius: '6px',
+                  borderRadius: 'var(--radius-lg)',
                   background: 'var(--paper)',
                   color: 'var(--ink-900)',
                   outline: 'none',
@@ -355,12 +355,12 @@ export function DepartmentFormModal({
                 style={{
                   width: '32px',
                   height: '32px',
-                  borderRadius: '6px',
+                  borderRadius: 'var(--radius-lg)',
                   background: colour,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '14px',
+                  fontSize: 'var(--text-sm)',
                   color: '#fff',
                   fontWeight: 700,
                 }}
@@ -374,10 +374,10 @@ export function DepartmentFormModal({
           <div style={{ marginBottom: '20px' }}>
             <label
               htmlFor="dept-owner-search"
-              style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--ink-900)', marginBottom: '6px' }}
+              style={{ display: 'block', fontSize: 'var(--text-xs)', fontWeight: 600, color: 'var(--ink-900)', marginBottom: '6px' }}
             >
               Owner
-              <span style={{ fontWeight: 400, color: 'var(--ink-500)', marginLeft: '6px', fontSize: '11px' }}>
+              <span style={{ fontWeight: 400, color: 'var(--ink-500)', marginLeft: '6px', fontSize: 'var(--text-meta)' }}>
                 (optional — accountability label, no extra permissions)
               </span>
             </label>
@@ -392,7 +392,7 @@ export function DepartmentFormModal({
                   style={{
                     width: '100%',
                     padding: '10px 12px',
-                    fontSize: '13px',
+                    fontSize: 'var(--text-ui)',
                     border: '1px solid var(--ink-300)',
                     borderRadius: '6px 6px 0 0',
                     background: 'var(--paper)',
@@ -420,7 +420,7 @@ export function DepartmentFormModal({
                       width: '100%',
                       textAlign: 'left',
                       padding: '9px 12px',
-                      fontSize: '12px',
+                      fontSize: 'var(--text-xs)',
                       color: ownerMemberId === '' ? 'var(--ink-900)' : 'var(--ink-500)',
                       background: ownerMemberId === '' ? 'var(--paper-2)' : 'none',
                       border: 'none',
@@ -443,7 +443,7 @@ export function DepartmentFormModal({
                         width: '100%',
                         textAlign: 'left',
                         padding: '9px 12px',
-                        fontSize: '12px',
+                        fontSize: 'var(--text-xs)',
                         color: 'var(--ink-900)',
                         background: ownerMemberId === m.id ? 'var(--paper-2)' : 'none',
                         border: 'none',
@@ -457,14 +457,14 @@ export function DepartmentFormModal({
                     </button>
                   ))}
                   {filteredMembers.length === 0 && ownerSearch && (
-                    <p style={{ padding: '9px 12px', fontSize: '12px', color: 'var(--ink-500)', fontStyle: 'italic', margin: 0 }}>
+                    <p style={{ padding: '9px 12px', fontSize: 'var(--text-xs)', color: 'var(--ink-500)', fontStyle: 'italic', margin: 0 }}>
                       No members match
                     </p>
                   )}
                 </div>
               </>
             ) : (
-              <p style={{ fontSize: '12px', color: 'var(--ink-500)', fontStyle: 'italic', margin: 0 }}>
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--ink-500)', fontStyle: 'italic', margin: 0 }}>
                 No org members available.
               </p>
             )}
@@ -474,7 +474,7 @@ export function DepartmentFormModal({
           {error && (
             <p
               role="alert"
-              style={{ fontSize: '12px', color: 'var(--accent-hazard)', marginBottom: '12px', margin: '0 0 12px' }}
+              style={{ fontSize: 'var(--text-xs)', color: 'var(--accent-hazard)', marginBottom: '12px', margin: '0 0 12px' }}
             >
               {error}
             </p>
@@ -488,12 +488,12 @@ export function DepartmentFormModal({
               disabled={isPending}
               style={{
                 padding: '10px 18px',
-                fontSize: '13px',
+                fontSize: 'var(--text-ui)',
                 fontWeight: 600,
                 color: 'var(--ink-700)',
                 background: 'var(--paper-2)',
                 border: '1px solid var(--ink-300)',
-                borderRadius: '6px',
+                borderRadius: 'var(--radius-lg)',
                 cursor: 'pointer',
                 minHeight: '44px',
               }}
@@ -505,12 +505,12 @@ export function DepartmentFormModal({
               disabled={isPending}
               style={{
                 padding: '10px 18px',
-                fontSize: '13px',
+                fontSize: 'var(--text-ui)',
                 fontWeight: 600,
                 color: '#fff',
                 background: isPending ? 'var(--ink-500)' : 'var(--ink-900)',
                 border: 'none',
-                borderRadius: '6px',
+                borderRadius: 'var(--radius-lg)',
                 cursor: isPending ? 'not-allowed' : 'pointer',
                 minHeight: '44px',
                 display: 'flex',

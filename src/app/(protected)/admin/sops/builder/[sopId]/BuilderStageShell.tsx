@@ -105,7 +105,7 @@ function ToolsMenu({
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label="Tools for this SOP"
-        className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-xs border border-[var(--ink-300)] bg-white px-3 text-[11px] text-[var(--ink-700)] hover:border-[var(--ink-900)] transition-colors"
+        className="inline-flex h-8 cursor-pointer items-center gap-1.5 rounded border border-[var(--ink-300)] bg-white px-3 text-meta text-[var(--ink-700)] hover:border-[var(--ink-900)] transition-colors"
       >
         Tools for this SOP
         <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
@@ -125,7 +125,7 @@ function ToolsMenu({
             role="menu"
             aria-label="Tools for this SOP"
             data-testid="tools-menu"
-            className="absolute left-0 top-full z-50 mt-1.5 min-w-[300px] rounded-md border border-[var(--ink-300)] bg-white py-1 shadow-lg"
+            className="absolute left-0 top-full z-50 mt-1.5 min-w-75 rounded-lg border border-[var(--ink-300)] bg-white py-1 shadow-lg"
           >
             {items.map((item) => (
               <Link
@@ -134,8 +134,8 @@ function ToolsMenu({
                 href={item.href}
                 className="flex flex-col gap-0.5 px-3 py-2 hover:bg-[var(--paper-2)] transition-colors"
               >
-                <span className="text-[12.5px] text-[var(--ink-900)]">{item.label}</span>
-                <span className="text-[10.5px] text-[var(--ink-500)]">{item.hint}</span>
+                <span className="text-ui text-[var(--ink-900)]">{item.label}</span>
+                <span className="text-micro text-[var(--ink-500)]">{item.hint}</span>
               </Link>
             ))}
             <div className="my-1 h-px bg-[var(--ink-100)]" />
@@ -392,43 +392,43 @@ export function BuilderStageShell({
           <Link
             href="/sops"
             data-testid="wayfinder-back"
-            className="flex flex-shrink-0 items-center gap-2 px-[18px] border-r border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] no-underline transition-colors"
+            className="flex flex-shrink-0 items-center gap-2 px-4.5 border-r border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] no-underline transition-colors"
           >
-            <span className="text-[15px]" aria-hidden="true">←</span>
+            <span className="text-reading" aria-hidden="true">←</span>
             <span className="flex flex-col leading-tight">
-              <span className="text-[9px] uppercase tracking-wider text-[var(--ink-300)]">Back to</span>
-              <span className="text-[12px]">SOP list</span>
+              <span className="text-micro uppercase tracking-wider text-[var(--ink-300)]">Back to</span>
+              <span className="text-xs">SOP list</span>
             </span>
           </Link>
 
           {/* Here zone */}
           <div
             data-testid="wayfinder-here"
-            className="flex min-w-0 flex-1 items-center gap-[11px] px-[18px] border-r border-[var(--ink-100)]"
+            className="flex min-w-0 flex-1 items-center gap-3 px-4.5 border-r border-[var(--ink-100)]"
           >
             <span
-              className="flex-shrink-0 text-[9px] uppercase leading-tight tracking-wider text-accent-decision"
+              className="flex-shrink-0 text-micro uppercase leading-tight tracking-wider text-accent-decision"
               style={{ borderLeft: '3px solid var(--brand-yellow, #fbbf24)', paddingLeft: 9 }}
             >
               You&rsquo;re<br />{HERE_VERB[activeStage]}
             </span>
             {sopTitle && (
               <span
-                className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-[13.5px] font-semibold text-[var(--ink-900)]"
+                className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-ui font-semibold text-[var(--ink-900)]"
                 title={sopTitle}
               >
                 {sopTitle}
               </span>
             )}
             {sopVersion !== undefined && (
-              <span className="flex-shrink-0 rounded-xs border border-[var(--ink-300)] px-1.5 py-0.5 text-[9px] text-[var(--ink-500)]">
+              <span className="flex-shrink-0 rounded border border-[var(--ink-300)] px-1.5 py-0.5 text-micro text-[var(--ink-500)]">
                 v{sopVersion}
               </span>
             )}
           </div>
 
           {/* Forward zone — single next-stage chip, lock reason inline */}
-          <div data-testid="wayfinder-forward" className="flex flex-shrink-0 items-center px-[14px]">
+          <div data-testid="wayfinder-forward" className="flex flex-shrink-0 items-center px-3.5">
             <BuilderStageStepper
               activeStage={activeStage}
               hasSourceDoc={hasSourceDoc}
@@ -443,11 +443,11 @@ export function BuilderStageShell({
         </header>
 
         {/* ── Tools row (--paper-2) ─────────────────────────────────── */}
-        <div className="flex h-9 flex-shrink-0 items-center gap-2 border-b border-[var(--ink-100)] bg-[var(--paper-2)] px-[18px]">
+        <div className="flex h-9 flex-shrink-0 items-center gap-2 border-b border-[var(--ink-100)] bg-[var(--paper-2)] px-4.5">
           <ToolsMenu sopId={sopId} isDraft={initialSop.status === 'draft'} sop={initialSop} />
           <span className="flex-1" />
           {showVerifyGate && (
-            <span className="text-[10.5px] text-[var(--ink-500)]">
+            <span className="text-micro text-[var(--ink-500)]">
               <b className="text-[var(--ink-900)]">{effectiveVerifiedCount} of {effectiveTotalCount}</b> steps checked
             </span>
           )}

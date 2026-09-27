@@ -17,7 +17,7 @@ export type InspectBlockProps = z.infer<typeof InspectBlockPropsSchema>
 export function InspectBlock({ title, items }: InspectBlockProps) {
   return (
     <section
-      className="mb-4 border rounded-xl p-5"
+      className="mb-4 border rounded-lg p-5"
       style={{
         borderColor: 'var(--accent-inspect)',
         background: 'color-mix(in srgb, var(--accent-inspect) 6%, white)',
@@ -26,7 +26,7 @@ export function InspectBlock({ title, items }: InspectBlockProps) {
     >
       <div className="flex items-center gap-2 mb-2">
         <span
-          className="text-[11px] font-mono uppercase tracking-wider"
+          className="text-meta font-mono uppercase tracking-wider"
           style={{ color: 'var(--accent-inspect)' }}
         >
           Inspection

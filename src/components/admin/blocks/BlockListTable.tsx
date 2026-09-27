@@ -53,23 +53,23 @@ function BlockDeptPopover({
   return (
     <div
       ref={ref}
-      className="absolute right-0 top-8 z-20 w-[230px] rounded-lg shadow-lg"
+      className="absolute right-0 top-8 z-20 w-57.5 rounded-lg shadow-lg"
       style={{
         background: 'var(--paper)',
         border: '1.5px solid var(--ink-900)',
-        borderRadius: '8px',
+        borderRadius: 'var(--radius-lg)',
         boxShadow: '0 12px 32px rgba(0,0,0,0.16)',
         overflow: 'hidden',
       }}
     >
       {/* Header */}
       <div
-        className="px-3 pb-2 pt-[10px]"
+        className="px-3 pb-2 pt-2.5"
         style={{
-          fontSize: '9px',
+          fontSize: 'var(--text-micro)',
           fontWeight: 600,
           textTransform: 'uppercase',
-          letterSpacing: '0.08em',
+          letterSpacing: 'var(--tracking-widest)',
           color: 'var(--ink-500)',
           borderBottom: '1px solid var(--ink-100)',
         }}
@@ -97,7 +97,7 @@ function BlockDeptPopover({
         <button
           type="button"
           onClick={onClose}
-          className="text-[11px] font-semibold text-white rounded-[5px] px-3 py-[7px] transition-colors hover:opacity-80"
+          className="text-meta font-semibold text-white rounded-lg px-3 py-2 transition-colors hover:opacity-80"
           style={{ background: 'var(--ink-900)', border: 'none' }}
         >
           Done
@@ -205,7 +205,7 @@ export function BlockListTable({ blocks, departments }: Props) {
                     <button
                       type="button"
                       onClick={() => setOpenPickerId(openPickerId === b.id ? null : b.id)}
-                      className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs text-[var(--ink-500)] border border-transparent hover:text-[var(--ink-900)] hover:border-[var(--ink-300)] transition-colors"
+                      className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs text-[var(--ink-500)] border border-transparent hover:text-[var(--ink-900)] hover:border-[var(--ink-300)] transition-colors"
                     >
                       Departments ▾
                     </button>
@@ -221,7 +221,7 @@ export function BlockListTable({ blocks, departments }: Props) {
                         type="button"
                         onClick={() => handleArchive(b.id)}
                         disabled={isPending}
-                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs text-[var(--ink-500)] hover:text-accent-escalate hover:bg-accent-escalate/10 transition-colors disabled:opacity-50"
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs text-[var(--ink-500)] hover:text-accent-escalate hover:bg-accent-escalate/10 transition-colors disabled:opacity-50"
                         aria-label={`Archive ${b.name}`}
                       >
                         <Archive className="h-3.5 w-3.5" />

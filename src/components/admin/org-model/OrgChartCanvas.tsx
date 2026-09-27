@@ -151,7 +151,7 @@ export function OrgChartCanvas({ tree, orgName = 'Organisation', onChange, onSel
               style={{ left: rootPos.x, top: rootPos.y, width: rootPos.width, minHeight: rootPos.height }}
             >
               <div className="kicker mono">ORGANISATION</div>
-              <div className="text-[13px] font-semibold text-[var(--ink-900)]">{orgName}</div>
+              <div className="text-ui font-semibold text-[var(--ink-900)]">{orgName}</div>
             </div>
           )}
 
@@ -167,7 +167,7 @@ export function OrgChartCanvas({ tree, orgName = 'Organisation', onChange, onSel
                 style={{ left: pos.x, top: pos.y, width: pos.width, minHeight: pos.height }}
               >
                 <div className="kicker mono">AREA</div>
-                <div className="flex items-center gap-1.5 text-[13px] font-medium text-[var(--ink-900)]">
+                <div className="flex items-center gap-1.5 text-ui font-medium text-[var(--ink-900)]">
                   <span className="inline-block w-2 h-2 rounded-full" style={{ background: area.colour }} />
                   {area.name}
                 </div>
@@ -187,7 +187,7 @@ export function OrgChartCanvas({ tree, orgName = 'Organisation', onChange, onSel
                 style={{ left: pos.x, top: pos.y, width: pos.width, minHeight: pos.height }}
               >
                 <div className="kicker mono">DEPARTMENT</div>
-                <div className="flex items-center gap-1.5 text-[13px] font-medium text-[var(--ink-900)]">
+                <div className="flex items-center gap-1.5 text-ui font-medium text-[var(--ink-900)]">
                   <span className="inline-block w-2 h-2 rounded-full" style={{ background: dept.colour }} />
                   {dept.name}
                 </div>
@@ -229,7 +229,7 @@ export function OrgChartCanvas({ tree, orgName = 'Organisation', onChange, onSel
                         <div className="kicker mono">ROLE</div>
                         <span className="pill">{role.filledCount}/{role.budgetedCount}</span>
                       </div>
-                      <div className="text-[13px] font-medium text-[var(--ink-900)] mb-1.5">{role.name}</div>
+                      <div className="text-ui font-medium text-[var(--ink-900)] mb-1.5">{role.name}</div>
                       <div className="flex flex-wrap gap-1">
                         {role.people.map((person, i) => {
                           const clickable = !person.isVacancy && Boolean(person.id)

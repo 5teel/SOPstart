@@ -304,7 +304,7 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
                     <th key={colItem.id} className="text-left px-3 py-2 font-semibold text-[var(--ink-900)] whitespace-nowrap">
                       {colItem.label}
                       {rollup && tally && (
-                        <div className="text-[10px] font-normal text-[var(--ink-500)] mt-0.5">
+                        <div className="text-micro font-normal text-[var(--ink-500)] mt-0.5">
                           {tally.count}/{rollup.total} {tally.label}
                           {rollup.needsSupportCount > 0 && (
                             <span className="text-[var(--accent-decision)]"> · {rollup.needsSupportCount} needs support</span>
@@ -331,7 +331,7 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
                     <td className="px-3 py-2 font-medium text-[var(--ink-900)] sticky left-0 bg-[var(--paper)] whitespace-nowrap">
                       {rowItem.label}
                       {rollup && tally && (
-                        <div className="text-[10px] font-normal text-[var(--ink-500)] mt-0.5">
+                        <div className="text-micro font-normal text-[var(--ink-500)] mt-0.5">
                           {tally.count}/{rollup.total} {tally.label}
                           {rollup.needsSupportCount > 0 && (
                             <span className="text-[var(--accent-decision)]"> · {rollup.needsSupportCount} needs support</span>
@@ -382,7 +382,7 @@ export function TrainingMatrixView({ departments, onSelectCell }: TrainingMatrix
       )}
 
       {isCompact && (
-        <div className="flex flex-wrap gap-3 text-[10px] text-[var(--ink-500)]">
+        <div className="flex flex-wrap gap-3 text-micro text-[var(--ink-500)]">
           {COMPACT_LEGEND.map((item) => (
             <span key={item.label} className="inline-flex items-center gap-1.5">
               <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: `var(${item.accentVar})` }} />

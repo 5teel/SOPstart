@@ -43,7 +43,7 @@ const SORTED_CATEGORIES = [...SOP_CATEGORIES].sort((a, b) => a.sort - b.sort)
 /** Mirrors the scope column's header so the three columns share one baseline. */
 function ColumnHeader({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="mono sticky top-0 z-10 hidden items-center gap-2 border-b border-[var(--ink-200)] bg-[var(--paper-2)] px-3 py-2 text-[11px] uppercase tracking-[0.08em] text-[var(--ink-500)] lg:flex">
+    <h2 className="mono sticky top-0 z-10 hidden items-center gap-2 border-b border-[var(--ink-200)] bg-[var(--paper-2)] px-3 py-2 text-meta uppercase tracking-widest text-[var(--ink-500)] lg:flex">
       {children}
     </h2>
   )
@@ -127,7 +127,7 @@ export function SopMillerBrowser({
                   {/* Below lg there is no detail column, so the row is the link — to the SOP, not the editor. */}
                   <Link
                     href={`/sops/${sop.id}`}
-                    className="flex min-h-[64px] w-full items-center gap-3 rounded-lg border border-[var(--ink-100)] bg-white px-4 py-3 lg:hidden"
+                    className="flex min-h-tap-glove w-full items-center gap-3 rounded-lg border border-[var(--ink-100)] bg-white px-4 py-3 lg:hidden"
                   >
                     <RowBody sop={sop} hideStatus={hideStatus} selected={false} />
                   </Link>
@@ -149,7 +149,7 @@ export function SopMillerBrowser({
           ) : (
             <>
               <p
-                className={`text-[15px] font-bold leading-snug ${
+                className={`text-reading font-bold leading-snug ${
                   selected.untitled ? 'italic text-[var(--ink-700)]' : 'text-[var(--ink-900)]'
                 }`}
               >
@@ -158,7 +158,7 @@ export function SopMillerBrowser({
               <div className="mb-3 mt-1.5 flex flex-wrap items-center gap-1.5">
                 <StatusBadge status={selected.status as SopStatus} />
                 {selected.flagLabel && (
-                  <span className={`mono inline-block rounded px-1.5 py-0.5 text-[11px] ${selected.flagStyle ?? ''}`}>
+                  <span className={`mono inline-block rounded px-1.5 py-0.5 text-meta ${selected.flagStyle ?? ''}`}>
                     {selected.flagLabel}
                   </span>
                 )}
@@ -169,14 +169,14 @@ export function SopMillerBrowser({
               <div className="mb-1.5 flex gap-2">
                 <Link
                   href={`/sops/${selected.id}`}
-                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-md bg-[var(--ink-900)] px-3 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--ink-900)] px-3 py-2.5 text-sm font-semibold text-white hover:opacity-90"
                 >
                   <BookOpen size={14} aria-hidden="true" />
                   Open
                 </Link>
                 <Link
                   href={`/admin/sops/builder/${selected.id}`}
-                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-md border border-[var(--ink-300)] bg-[var(--paper-1)] px-3 py-2.5 text-sm text-[var(--ink-700)] hover:border-[var(--ink-900)] hover:text-[var(--ink-900)]"
+                  className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-[var(--ink-300)] bg-[var(--paper-1)] px-3 py-2.5 text-sm text-[var(--ink-700)] hover:border-[var(--ink-900)] hover:text-[var(--ink-900)]"
                 >
                   <PencilLine size={14} aria-hidden="true" />
                   Edit
@@ -184,7 +184,7 @@ export function SopMillerBrowser({
               </div>
               <Link
                 href={`/admin/sops/${selected.id}/versions`}
-                className="mb-4 block text-center text-[11px] text-[var(--ink-500)] underline-offset-2 hover:text-[var(--ink-900)] hover:underline"
+                className="mb-4 block text-center text-meta text-[var(--ink-500)] underline-offset-2 hover:text-[var(--ink-900)] hover:underline"
               >
                 Version history
               </Link>
@@ -218,7 +218,7 @@ function RowBody({ sop, hideStatus, selected }: { sop: MillerSop; hideStatus?: s
     <>
       <span className="min-w-0 flex-1">
         <span
-          className={`block truncate text-[13px] font-semibold ${
+          className={`block truncate text-ui font-semibold ${
             sop.untitled ? 'italic' : ''
           } ${selected ? 'text-white' : sop.untitled ? 'text-[var(--ink-700)]' : 'text-[var(--ink-900)]'}`}
           title={sop.untitled ? `Untitled — showing the file name: ${sop.displayTitle}` : sop.displayTitle}
@@ -226,18 +226,18 @@ function RowBody({ sop, hideStatus, selected }: { sop: MillerSop; hideStatus?: s
           {sop.displayTitle}
         </span>
         {meta && (
-          <span className={`mono block truncate text-[11px] ${selected ? 'text-white/70' : 'text-[var(--ink-500)]'}`}>
+          <span className={`mono block truncate text-meta ${selected ? 'text-white/70' : 'text-[var(--ink-500)]'}`}>
             {meta}
           </span>
         )}
       </span>
       {sop.stuck && (
-        <span className={`mono flex-shrink-0 rounded px-1.5 py-0.5 text-[11px] ${selected ? 'bg-white/20 text-white' : 'bg-accent-escalate/20 text-accent-escalate'}`}>
+        <span className={`mono flex-shrink-0 rounded px-1.5 py-0.5 text-meta ${selected ? 'bg-white/20 text-white' : 'bg-accent-escalate/20 text-accent-escalate'}`}>
           Stuck
         </span>
       )}
       {sop.flagLabel && !sop.stuck && (
-        <span className={`mono flex-shrink-0 rounded px-1.5 py-0.5 text-[11px] ${selected ? 'bg-white/20 text-white' : sop.flagStyle ?? ''}`}>
+        <span className={`mono flex-shrink-0 rounded px-1.5 py-0.5 text-meta ${selected ? 'bg-white/20 text-white' : sop.flagStyle ?? ''}`}>
           {sop.flagLabel}
         </span>
       )}
@@ -246,7 +246,7 @@ function RowBody({ sop, hideStatus, selected }: { sop: MillerSop; hideStatus?: s
           <StatusBadge status={sop.status as SopStatus} />
         </span>
       )}
-      <span className={`mono w-9 flex-shrink-0 text-right text-[11px] ${selected ? 'text-white/70' : 'text-[var(--ink-500)]'}`}>
+      <span className={`mono w-9 flex-shrink-0 text-right text-meta ${selected ? 'text-white/70' : 'text-[var(--ink-500)]'}`}>
         {sop.age}
       </span>
     </>
@@ -270,7 +270,7 @@ function CategoryField({ sop }: { sop: MillerSop }) {
 
   return (
     <div className="mb-2 border-b border-dotted border-[var(--ink-200)] pb-2">
-      <label className="mb-1 block text-[11px] text-[var(--ink-500)]" htmlFor={`cat-${sop.id}`}>
+      <label className="mb-1 block text-meta text-[var(--ink-500)]" htmlFor={`cat-${sop.id}`}>
         Category
       </label>
       <select
@@ -299,7 +299,7 @@ function CategoryField({ sop }: { sop: MillerSop }) {
           <option key={c.slug} value={c.slug}>{c.label}</option>
         ))}
       </select>
-      {error && <p className="mt-1 text-[11px] text-accent-escalate">{error}</p>}
+      {error && <p className="mt-1 text-meta text-accent-escalate">{error}</p>}
     </div>
   )
 }
@@ -322,9 +322,9 @@ function DepartmentField({
 
   return (
     <div className="mb-3 border-b border-dotted border-[var(--ink-200)] pb-2">
-      <p className="mb-1 text-[11px] text-[var(--ink-500)]">Department</p>
+      <p className="mb-1 text-meta text-[var(--ink-500)]">Department</p>
       {sop.departments.length === 0 && !sop.allDepartments && (
-        <p className="mb-1 rounded border border-accent-decision/30 bg-accent-decision/10 px-2 py-1 text-[12px] text-accent-decision">
+        <p className="mb-1 rounded border border-accent-decision/30 bg-accent-decision/10 px-2 py-1 text-xs text-accent-decision">
           Not set — nobody can be assigned this.
         </p>
       )}
@@ -345,7 +345,7 @@ function DepartmentField({
 function Field({ label, value }: { label: string; value: string | null }) {
   return (
     <div className="flex gap-2 border-b border-dotted border-[var(--ink-200)] py-1.5 text-xs last:border-b-0">
-      <dt className="w-[68px] flex-shrink-0 text-[11px] text-[var(--ink-500)]">{label}</dt>
+      <dt className="w-tap-row flex-shrink-0 text-meta text-[var(--ink-500)]">{label}</dt>
       <dd className={`min-w-0 flex-1 ${value ? 'text-[var(--ink-900)]' : 'text-[var(--ink-300)]'}`}>
         {value ?? 'Not set'}
       </dd>

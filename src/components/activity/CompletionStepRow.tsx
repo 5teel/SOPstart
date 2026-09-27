@@ -77,7 +77,7 @@ export function CompletionStepRow({
               key={photo.id}
               type="button"
               onClick={() => openPhoto(index)}
-              className="w-[80px] h-[80px] rounded-lg overflow-hidden border border-[var(--ink-100)] hover:border-[var(--ink-300)] cursor-pointer flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)]/20"
+              className="w-20 h-20 rounded-lg overflow-hidden border border-[var(--ink-100)] hover:border-[var(--ink-300)] cursor-pointer flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)]/20"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img

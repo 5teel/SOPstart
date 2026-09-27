@@ -202,7 +202,7 @@ function InsertDivider({
           data-add-big
           aria-label="Add step or content"
           onClick={onOpen}
-          className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-[var(--ink-300,#d4d4d8)] py-3 font-mono text-[12px] uppercase tracking-wider text-[var(--ink-500,#71717a)] hover:border-[var(--accent-step,#3b82f6)] hover:text-[var(--accent-step,#3b82f6)]"
+          className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-[var(--ink-300,#d4d4d8)] py-3 font-mono text-xs uppercase tracking-wider text-[var(--ink-500,#71717a)] hover:border-[var(--accent-step,#3b82f6)] hover:text-[var(--accent-step,#3b82f6)]"
         >
           ＋ Add step or block
         </button>
@@ -217,7 +217,7 @@ function InsertDivider({
           <span className="pointer-events-none absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-[var(--ink-100,#e4e4e7)] opacity-0 group-hover:opacity-100" />
           <span
             className={[
-              'relative rounded-full border border-dashed border-[var(--ink-300,#d4d4d8)] bg-[var(--paper,#fff)] px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-[var(--ink-500,#71717a)] transition-opacity',
+              'relative rounded-full border border-dashed border-[var(--ink-300,#d4d4d8)] bg-[var(--paper,#fff)] px-2 py-0.5 font-mono text-micro uppercase tracking-wider text-[var(--ink-500,#71717a)] transition-opacity',
               active
                 ? 'opacity-100 border-[var(--accent-step,#3b82f6)] text-[var(--accent-step,#3b82f6)]'
                 : 'opacity-0 group-hover:opacity-100 group-hover:border-[var(--accent-step,#3b82f6)] group-hover:text-[var(--accent-step,#3b82f6)]',
@@ -435,14 +435,14 @@ export function EditableDocument({
   return (
     <div
       data-editable-document
-      className="mx-auto max-w-[680px] space-y-1 px-6 py-8"
+      className="mx-auto max-w-170 space-y-1 px-6 py-8"
       style={{ backgroundSize: '20px 20px' }}
     >
       {/* Section header — confirms which section the tree-rail click navigated
           to (the canvas shows one section at a time). */}
       {section.title && (
         <div className="mb-4 border-b border-[var(--ink-100,#e4e4e7)] pb-2">
-          <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--ink-400,#a1a1aa)]">
+          <span className="font-mono text-micro uppercase tracking-wider text-[var(--ink-400,#a1a1aa)]">
             Section
           </span>
           <h2 className="text-lg font-semibold text-[var(--ink-900,#09090b)]">{section.title}</h2>

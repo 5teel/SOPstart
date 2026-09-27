@@ -45,7 +45,7 @@ export function ObservationLabelsCard({ initial }: ObservationLabelsCardProps) {
       </p>
       <div className="flex flex-col gap-3">
         <label className="block">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--ink-500)] mb-1.5 block">
+          <span className="text-micro font-semibold uppercase tracking-wider text-[var(--ink-500)] mb-1.5 block">
             &ldquo;Performed to SOP&rdquo; label
           </span>
           <input
@@ -58,7 +58,7 @@ export function ObservationLabelsCard({ initial }: ObservationLabelsCardProps) {
           />
         </label>
         <label className="block">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--ink-500)] mb-1.5 block">
+          <span className="text-micro font-semibold uppercase tracking-wider text-[var(--ink-500)] mb-1.5 block">
             &ldquo;Needs support&rdquo; label
           </span>
           <input

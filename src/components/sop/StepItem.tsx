@@ -49,7 +49,7 @@ export function StepItem({
       className={[
         'flex items-start gap-4 px-4 py-5',
         'border-l-4 transition-all duration-150',
-        'min-h-[72px] cursor-pointer',
+        'min-h-tap-row cursor-pointer',
         borderByStatus[status],
       ].join(' ')}
     >
@@ -58,7 +58,7 @@ export function StepItem({
         {status === 'completed' ? (
           <CheckCircle2 size={20} className="text-accent-signoff" />
         ) : (
-          <span className="text-[13px] font-bold tabular-nums text-[var(--ink-500)]">
+          <span className="text-ui font-bold tabular-nums text-[var(--ink-500)]">
             {step.step_number}
           </span>
         )}
@@ -106,7 +106,7 @@ export function StepItem({
       </div>
 
       {/* Right: tap target */}
-      <div className="flex-shrink-0 min-w-[44px] min-h-[72px] flex items-center justify-center">
+      <div className="flex-shrink-0 min-w-tap min-h-tap-row flex items-center justify-center">
         {status === 'completed' ? (
           <CheckCircle2 size={28} className="text-accent-signoff" />
         ) : (

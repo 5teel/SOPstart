@@ -45,7 +45,7 @@ export function BlockPickerRow({
       data-match-reason={matchReason}
       aria-current={selected ? 'true' : undefined}
       className={[
-        'w-full text-left px-3 py-2 border rounded-md transition-colors',
+        'w-full text-left px-3 py-2 border rounded-lg transition-colors',
         selected
           ? 'bg-[var(--paper-2)] border-l-4 border-l-[var(--ink-900)] border-[var(--ink-300)]'
           : 'bg-[var(--paper)] border-[var(--ink-100)] hover:bg-white',
@@ -56,7 +56,7 @@ export function BlockPickerRow({
           {block.name}
         </span>
         {isGlobal && (
-          <span className="text-[10px] uppercase tracking-wider text-accent-decision bg-accent-decision/10 border border-accent-decision/30 px-1.5 py-0.5 rounded">
+          <span className="text-micro uppercase tracking-wider text-accent-decision bg-accent-decision/10 border border-accent-decision/30 px-1.5 py-0.5 rounded">
             global
           </span>
         )}
@@ -65,16 +65,16 @@ export function BlockPickerRow({
         {tags.slice(0, 3).map((slug) => (
           <span
             key={slug}
-            className="text-[10px] px-1.5 py-0.5 rounded bg-white text-[var(--ink-500)] border border-[var(--ink-100)]"
+            className="text-micro px-1.5 py-0.5 rounded bg-white text-[var(--ink-500)] border border-[var(--ink-100)]"
           >
             {categoryDisplayMap?.[slug] ?? slug}
           </span>
         ))}
         {tags.length > 3 && (
-          <span className="text-[10px] text-[var(--ink-500)]">+{tags.length - 3}</span>
+          <span className="text-micro text-[var(--ink-500)]">+{tags.length - 3}</span>
         )}
       </div>
-      <div className="flex items-center gap-3 text-[11px] text-[var(--ink-500)]">
+      <div className="flex items-center gap-3 text-meta text-[var(--ink-500)]">
         {updatedLabel && <span>Updated {updatedLabel}</span>}
         {usageCount > 0 && <span>used in {usageCount} SOPs</span>}
       </div>

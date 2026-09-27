@@ -48,7 +48,7 @@ export interface MobileWalkthroughHandle {
  *
  * 1. The primary CTA now reads "I've done this — Next" and wires
  *    `markStepAcknowledged(sopId, currentStepId)` on click (D-19). The
- *    button is min-h-[60px] (glove-friendly tap target).
+ *    button is min-h-tap-glove (glove-friendly tap target).
  * 2. A forward-jump guard effect calls `router.replace(?step=…)` when a
  *    deep-link bypasses the highest-acked step (D-20, Pitfall 4 — strict
  *    `>` check + `router.replace` to avoid infinite loops).
@@ -384,14 +384,14 @@ export const MobileWalkthrough = React.forwardRef<
                 router.push(`?${params.toString()}`, { scroll: false })
               }
             }}
-            className="px-6 py-3 rounded-xl bg-[var(--ink-900)] text-[var(--paper)] font-semibold hover:opacity-90 transition-opacity"
+            className="px-6 py-3 rounded-lg bg-[var(--ink-900)] text-[var(--paper)] font-semibold hover:opacity-90 transition-opacity"
           >
             Re-read steps
           </button>
           <button
             type="button"
             onClick={() => { setSubmitted(false); walkthroughStore.resetWalkthrough(sopId) }}
-            className="px-6 py-3 rounded-xl border border-[var(--ink-300)] text-sm font-medium text-[var(--ink-700)] hover:border-[var(--ink-900)] transition-colors"
+            className="px-6 py-3 rounded-lg border border-[var(--ink-300)] text-sm font-medium text-[var(--ink-700)] hover:border-[var(--ink-900)] transition-colors"
           >
             Start another walkthrough
           </button>
@@ -404,7 +404,7 @@ export const MobileWalkthrough = React.forwardRef<
 
   // ── Main layout ────────────────────────────────────────────────
   return (
-    <div className="responsive-walkthrough-root pb-[144px]" data-walkthrough="mobile">
+    <div className="responsive-walkthrough-root pb-36" data-walkthrough="mobile">
       {/* Safety acknowledgement gate */}
       {!acknowledged && needsGate && (
         <SafetyAcknowledgement
@@ -426,20 +426,20 @@ export const MobileWalkthrough = React.forwardRef<
             />
           </div>
           <div className="flex items-center justify-between">
-            <span className="mono text-[11px] uppercase tracking-wider text-[var(--ink-500)]">
+            <span className="mono text-meta uppercase tracking-wider text-[var(--ink-500)]">
               {allDone ? `All ${totalSteps} steps done` : `Step ${completedCount + 1} of ${totalSteps}`}
             </span>
             <div className="flex items-center gap-2">
               {queueCount > 0 && (
                 <span
-                  className="mono text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-[var(--accent-decision)]/15 text-[var(--accent-decision)] flex items-center gap-1"
+                  className="mono text-micro uppercase tracking-wider px-1.5 py-0.5 rounded bg-[var(--accent-decision)]/15 text-[var(--accent-decision)] flex items-center gap-1"
                   title={`${queueCount} photo${queueCount === 1 ? '' : 's'} waiting to upload`}
                 >
                   <Camera size={10} />
                   {queueCount} queued
                 </span>
               )}
-              <span className="mono text-[11px] text-[var(--ink-400)]">{pct}%</span>
+              <span className="mono text-meta text-[var(--ink-400)]">{pct}%</span>
             </div>
           </div>
         </div>
@@ -471,7 +471,7 @@ export const MobileWalkthrough = React.forwardRef<
                 <li key={step.id} className={`blueprint-frame ${done ? 'opacity-60' : ''}`}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
-                      <span className="mono text-[11px] uppercase tracking-wider text-[var(--ink-500)]">
+                      <span className="mono text-meta uppercase tracking-wider text-[var(--ink-500)]">
                         Step {idx + 1}
                       </span>
                       <p className="text-sm mt-1">{step.text}</p>
@@ -530,7 +530,7 @@ export const MobileWalkthrough = React.forwardRef<
           {isSubmittedSop ? (
             <div
               data-testid="walkthrough-already-submitted"
-              className="w-full min-h-[60px] h-[64px] rounded-xl border border-[var(--ink-200)] bg-[var(--ink-50)] flex flex-col items-center justify-center gap-0.5 text-[var(--ink-700)]"
+              className="w-full min-h-tap-glove h-tap-glove rounded-lg border border-[var(--ink-200)] bg-[var(--ink-50)] flex flex-col items-center justify-center gap-0.5 text-[var(--ink-700)]"
             >
               <div className="flex items-center gap-2 font-semibold">
                 <CheckCircle2 size={20} className="text-accent-signoff" />
@@ -544,7 +544,7 @@ export const MobileWalkthrough = React.forwardRef<
               onClick={handleSubmit}
               disabled={submitLoading}
               className={[
-                'w-full min-h-[60px] h-[64px] rounded-xl font-bold text-base transition-all flex flex-col items-center justify-center gap-0.5',
+                'w-full min-h-tap-glove h-tap-glove rounded-lg font-bold text-base transition-all flex flex-col items-center justify-center gap-0.5',
                 submitLoading
                   ? 'bg-[var(--accent-decision)]/40 text-white/60 cursor-not-allowed'
                   : 'bg-[var(--accent-decision)] text-white hover:opacity-90',
@@ -557,7 +557,7 @@ export const MobileWalkthrough = React.forwardRef<
               <span className="text-xs font-normal opacity-75">Records your sign-off with a timestamp</span>
             </button>
           ) : currentDone ? (
-            <div className="flex items-center justify-center gap-2 h-[64px] text-sm text-[var(--ink-500)]">
+            <div className="flex items-center justify-center gap-2 h-tap-glove text-sm text-[var(--ink-500)]">
               <CheckCircle2 size={16} className="text-accent-signoff" />
               Step {currentIdx + 1} done — go to next
             </div>
@@ -571,7 +571,7 @@ export const MobileWalkthrough = React.forwardRef<
                 </div>
               )}
               {/* Phase 15 D-19: explicit "I've done this — Next" gate.
-                  min-h-[60px] for glove-friendly tap target.
+                  min-h-tap-glove for glove-friendly tap target.
                   active:scale-[0.97] gives instant tap feedback while the
                   optimistic store updates + navigation kick in (no awaits
                   block the click handler — see handleMarkComplete). */}
@@ -581,7 +581,7 @@ export const MobileWalkthrough = React.forwardRef<
                 onClick={() => currentStep && handleMarkComplete(currentStep.id)}
                 disabled={!photoGateMet}
                 className={[
-                  'w-full min-h-[60px] h-[64px] rounded-xl font-bold text-base flex items-center justify-center gap-2',
+                  'w-full min-h-tap-glove h-tap-glove rounded-lg font-bold text-base flex items-center justify-center gap-2',
                   'transition-transform duration-100 active:scale-[0.97]',
                   !photoGateMet
                     ? 'bg-[var(--ink-200)] text-[var(--ink-400)] cursor-not-allowed active:scale-100'
@@ -594,7 +594,7 @@ export const MobileWalkthrough = React.forwardRef<
           )}
 
           {/* Prev / Next nav */}
-          <div className="flex items-center justify-between h-[44px] mt-1">
+          <div className="flex items-center justify-between h-tap mt-1">
             <button
               type="button"
               disabled={!prevStep}

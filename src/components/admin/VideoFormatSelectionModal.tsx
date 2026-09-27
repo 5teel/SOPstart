@@ -161,7 +161,7 @@ export function VideoFormatSelectionModal({ open, onClose }: Props) {
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="w-full min-h-[72px] border-2 border-dashed border-[var(--ink-100)] rounded-xl p-4 flex items-center gap-3 text-left hover:bg-white transition-colors mb-4"
+          className="w-full min-h-tap-row border-2 border-dashed border-[var(--ink-100)] rounded-lg p-4 flex items-center gap-3 text-left hover:bg-white transition-colors mb-4"
         >
           <Upload className="w-5 h-5 text-[var(--ink-500)] shrink-0" />
           <div className="min-w-0 flex-1">
@@ -197,7 +197,7 @@ export function VideoFormatSelectionModal({ open, onClose }: Props) {
             return (
               <label
                 key={f.id}
-                className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer ${
+                className={`flex items-start gap-4 p-4 rounded-lg border-2 cursor-pointer ${
                   selected ? 'border-[var(--ink-900)]' : 'border-[var(--ink-100)]'
                 }`}
               >
@@ -242,7 +242,7 @@ export function VideoFormatSelectionModal({ open, onClose }: Props) {
           type="button"
           onClick={handleConfirm}
           disabled={!canSubmit}
-          className="h-[72px] w-full bg-[var(--ink-900)] text-white font-semibold text-xl rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[var(--ink-700)] transition-colors flex items-center justify-center gap-2"
+          className="h-tap-row w-full bg-[var(--ink-900)] text-white font-semibold text-xl rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[var(--ink-700)] transition-colors flex items-center justify-center gap-2"
         >
           {submitting ? (
             <>
@@ -258,7 +258,7 @@ export function VideoFormatSelectionModal({ open, onClose }: Props) {
           type="button"
           onClick={handleDismiss}
           disabled={submitting}
-          className="w-full min-h-[44px] mt-3 bg-[var(--paper-2)] text-[var(--ink-900)] rounded-lg hover:bg-[var(--paper-2)] transition-colors disabled:opacity-50"
+          className="w-full min-h-tap mt-3 bg-[var(--paper-2)] text-[var(--ink-900)] rounded-lg hover:bg-[var(--paper-2)] transition-colors disabled:opacity-50"
         >
           Discard
         </button>

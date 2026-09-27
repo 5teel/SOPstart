@@ -49,7 +49,7 @@ export function AssessmentRequestsPanel() {
           <span className="text-xs font-bold uppercase tracking-wider text-[var(--ink-900)]">
             Assessment requests
           </span>
-          <span className="text-[10px] font-bold text-[var(--ink-500)] bg-[var(--paper-2)] rounded-full px-2 py-0.5">
+          <span className="text-micro font-bold text-[var(--ink-500)] bg-[var(--paper-2)] rounded-full px-2 py-0.5">
             {requests.length}
           </span>
         </div>

@@ -34,11 +34,11 @@ export function DChip({ variant, department, showOwnerStar, onClick }: DChipProp
   if (variant === 'all-departments') {
     return (
       <span
-        className="inline-flex items-center gap-1 px-[7px] py-[2px] rounded text-[10px] font-semibold"
+        className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-micro font-semibold"
         style={{
           color: 'var(--accent-mcu)',
           border: '1px solid var(--accent-mcu)',
-          borderRadius: '3px',
+          borderRadius: 'var(--radius-sm)',
           background: 'rgba(6,182,212,0.06)',
         }}
       >
@@ -58,11 +58,11 @@ export function DChip({ variant, department, showOwnerStar, onClick }: DChipProp
           minWidth: '44px',
           minHeight: '44px',
           padding: '2px 7px',
-          fontSize: '10px',
+          fontSize: 'var(--text-micro)',
           fontWeight: 600,
           color: 'var(--accent-step)',
           border: '1px dashed var(--accent-step)',
-          borderRadius: '3px',
+          borderRadius: 'var(--radius-sm)',
           background: 'rgba(59,130,246,0.04)',
         }}
       >
@@ -79,11 +79,11 @@ export function DChip({ variant, department, showOwnerStar, onClick }: DChipProp
       className="inline-flex items-center gap-1"
       style={{
         padding: '2px 7px',
-        fontSize: '10px',
+        fontSize: 'var(--text-micro)',
         fontWeight: 600,
         color: 'var(--ink-700)',
         border: '1px solid var(--ink-300)',
-        borderRadius: '3px',
+        borderRadius: 'var(--radius-sm)',
         background: 'var(--paper-2)',
       }}
     >
@@ -94,7 +94,7 @@ export function DChip({ variant, department, showOwnerStar, onClick }: DChipProp
           display: 'inline-block',
           width: '7px',
           height: '7px',
-          borderRadius: '2px',
+          borderRadius: 'var(--radius-sm)',
           flexShrink: 0,
           background: department.colour,
         }}

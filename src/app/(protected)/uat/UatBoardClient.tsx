@@ -52,7 +52,7 @@ export function UatBoardClient({ tests, feedback, currentUserId }: Props) {
   return (
     <div>
       {/* How this works */}
-      <div className="rounded-xl border border-[var(--ink-100)] bg-white p-4 mb-6">
+      <div className="rounded-lg border border-[var(--ink-100)] bg-white p-4 mb-6">
         <p className="text-sm font-semibold text-[var(--ink-900)] mb-2">How this works</p>
         <ol className="grid sm:grid-cols-3 gap-3 text-sm text-[var(--ink-700)]">
           <Howto n={1} text="Pick a card to open it." />
@@ -91,7 +91,7 @@ export function UatBoardClient({ tests, feedback, currentUserId }: Props) {
             <li key={t.id}>
               <button
                 onClick={() => setOpenId(t.id)}
-                className="group w-full text-left rounded-xl border border-[var(--ink-100)] bg-white overflow-hidden hover:border-[var(--ink-900)] hover:shadow-sm transition-all flex flex-col h-full"
+                className="group w-full text-left rounded-lg border border-[var(--ink-100)] bg-white overflow-hidden hover:border-[var(--ink-900)] hover:shadow-sm transition-all flex flex-col h-full"
               >
                 {/* thumbnail */}
                 <div className="relative bg-[var(--paper)] border-b border-[var(--ink-100)] h-40 flex items-center justify-center overflow-hidden">
@@ -101,11 +101,11 @@ export function UatBoardClient({ tests, feedback, currentUserId }: Props) {
                   ) : (
                     <Eye className="h-8 w-8 text-[var(--ink-300)]" />
                   )}
-                  <span className="absolute top-2 left-2 inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--ink-700)] bg-white/90 rounded-full px-2 py-0.5 border border-[var(--ink-100)]">
+                  <span className="absolute top-2 left-2 inline-flex items-center gap-1 text-meta font-semibold text-[var(--ink-700)] bg-white/90 rounded-full px-2 py-0.5 border border-[var(--ink-100)]">
                     {k.icon} {k.label}
                   </span>
                   {done && (
-                    <span className="absolute top-2 right-2 inline-flex items-center gap-1 text-[11px] font-semibold text-white bg-accent-signoff rounded-full px-2 py-0.5">
+                    <span className="absolute top-2 right-2 inline-flex items-center gap-1 text-meta font-semibold text-white bg-accent-signoff rounded-full px-2 py-0.5">
                       <Check className="h-3 w-3" /> Done
                     </span>
                   )}
@@ -129,7 +129,7 @@ export function UatBoardClient({ tests, feedback, currentUserId }: Props) {
       </ul>
 
       {visible.length === 0 && (
-        <div className="rounded-xl border border-[var(--ink-100)] bg-white text-center py-10 text-sm text-[var(--ink-500)]">
+        <div className="rounded-lg border border-[var(--ink-100)] bg-white text-center py-10 text-sm text-[var(--ink-500)]">
           Nothing to review here right now.
         </div>
       )}
@@ -149,7 +149,7 @@ export function UatBoardClient({ tests, feedback, currentUserId }: Props) {
 function Howto({ n, text }: { n: number; text: string }) {
   return (
     <li className="flex items-start gap-2.5">
-      <span className="flex-shrink-0 mono text-[11px] font-bold text-white bg-[var(--ink-900)] rounded-full h-5 w-5 flex items-center justify-center">
+      <span className="flex-shrink-0 mono text-meta font-bold text-white bg-[var(--ink-900)] rounded-full h-5 w-5 flex items-center justify-center">
         {n}
       </span>
       <span>{text}</span>

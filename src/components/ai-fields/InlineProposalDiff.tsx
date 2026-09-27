@@ -169,7 +169,7 @@ export function InlineProposalDiff({ proposal, onResolved }: InlineProposalDiffP
   return (
     <div
       data-inline-proposal-diff
-      className="rounded-xl border border-[var(--ink-100)] bg-[var(--paper)] overflow-hidden shadow-sm"
+      className="rounded-lg border border-[var(--ink-100)] bg-[var(--paper)] overflow-hidden shadow-sm"
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-[var(--ink-100)] bg-[var(--paper-2)]">
@@ -195,18 +195,18 @@ export function InlineProposalDiff({ proposal, onResolved }: InlineProposalDiffP
               const changed = field.oldValue !== field.newValue
               return (
                 <div key={field.key} className="space-y-1">
-                  <div className="text-[10px] uppercase tracking-wider text-[var(--ink-500)] font-medium">
+                  <div className="text-micro uppercase tracking-wider text-[var(--ink-500)] font-medium">
                     {field.key}
                   </div>
                   <div className="grid grid-cols-2 gap-2">
-                    <div className={`rounded-md px-3 py-2 text-sm font-mono border ${
+                    <div className={`rounded-lg px-3 py-2 text-sm font-mono border ${
                       changed
                         ? 'border-[var(--ink-100)] bg-[var(--paper-2)] text-[var(--ink-500)] line-through'
                         : 'border-[var(--ink-100)] bg-[var(--paper-2)] text-[var(--ink-500)]'
                     }`}>
                       {field.oldValue || <span className="italic opacity-50">(empty)</span>}
                     </div>
-                    <div className={`rounded-md px-3 py-2 text-sm font-mono border ${
+                    <div className={`rounded-lg px-3 py-2 text-sm font-mono border ${
                       changed
                         ? 'border-accent-signoff/40 bg-accent-signoff/10 text-[var(--ink-900)]'
                         : 'border-[var(--ink-100)] bg-[var(--paper-2)] text-[var(--ink-500)]'
@@ -222,18 +222,18 @@ export function InlineProposalDiff({ proposal, onResolved }: InlineProposalDiffP
           // ── Scalar diff (plain old → new) ──
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <div className="text-[10px] uppercase tracking-wider text-[var(--ink-500)] mb-1">
+              <div className="text-micro uppercase tracking-wider text-[var(--ink-500)] mb-1">
                 Current
               </div>
-              <div className="rounded-md px-3 py-2 text-sm font-mono border border-[var(--ink-100)] bg-[var(--paper-2)] text-[var(--ink-500)] line-through">
+              <div className="rounded-lg px-3 py-2 text-sm font-mono border border-[var(--ink-100)] bg-[var(--paper-2)] text-[var(--ink-500)] line-through">
                 {toDisplayString(proposal.current_value)}
               </div>
             </div>
             <div>
-              <div className="text-[10px] uppercase tracking-wider text-[var(--ink-500)] mb-1">
+              <div className="text-micro uppercase tracking-wider text-[var(--ink-500)] mb-1">
                 Proposed
               </div>
-              <div className="rounded-md px-3 py-2 text-sm font-mono border border-accent-signoff/40 bg-accent-signoff/10 text-[var(--ink-900)]">
+              <div className="rounded-lg px-3 py-2 text-sm font-mono border border-accent-signoff/40 bg-accent-signoff/10 text-[var(--ink-900)]">
                 {toDisplayString(proposal.proposed_value)}
               </div>
             </div>

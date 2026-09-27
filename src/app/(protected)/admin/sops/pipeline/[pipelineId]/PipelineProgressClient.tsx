@@ -72,14 +72,14 @@ export function PipelineProgressClient(props: Props) {
 
         <div className="mt-6 space-y-4">
           {!errorAt && plainKey === 'upload' && (
-            <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5 flex items-center gap-3">
+            <div className="bg-white border border-[var(--ink-100)] rounded-lg p-5 flex items-center gap-3">
               <Loader2 className="w-5 h-5 text-accent-step animate-spin" />
               <p className="text-sm text-[var(--ink-900)]">Uploading your file...</p>
             </div>
           )}
 
           {!errorAt && plainKey === 'read' && (
-            <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5">
+            <div className="bg-white border border-[var(--ink-100)] rounded-lg p-5">
               <div className="flex items-center gap-3">
                 <Loader2 className="w-5 h-5 text-accent-step animate-spin" />
                 <p className="text-sm font-semibold text-[var(--ink-900)]">
@@ -93,7 +93,7 @@ export function PipelineProgressClient(props: Props) {
           )}
 
           {!errorAt && plainKey === 'check' && sopId && (
-            <div className="bg-[var(--accent-voice)]/20 border border-[var(--accent-voice)]/50 rounded-xl p-5">
+            <div className="bg-[var(--accent-voice)]/20 border border-[var(--accent-voice)]/50 rounded-lg p-5">
               <div className="flex items-start gap-3 mb-3">
                 <ClipboardCheck className="w-6 h-6 text-[var(--accent-voice)] shrink-0" />
                 <div>
@@ -108,7 +108,7 @@ export function PipelineProgressClient(props: Props) {
               </div>
               <Link
                 href={`/admin/sops/builder/${sopId}`}
-                className="h-[72px] w-full bg-[var(--ink-900)] text-white font-semibold text-xl rounded-lg flex items-center justify-center hover:bg-[var(--ink-700)] transition-colors"
+                className="h-tap-row w-full bg-[var(--ink-900)] text-white font-semibold text-xl rounded-lg flex items-center justify-center hover:bg-[var(--ink-700)] transition-colors"
               >
                 Review SOP now →
               </Link>
@@ -116,7 +116,7 @@ export function PipelineProgressClient(props: Props) {
           )}
 
           {!errorAt && plainKey === 'render' && snapshot.videoJob && (
-            <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5">
+            <div className="bg-white border border-[var(--ink-100)] rounded-lg p-5">
               <div className="flex items-center gap-3 mb-2">
                 <Loader2 className="w-5 h-5 text-accent-step animate-spin" />
                 <p className="text-sm font-semibold text-[var(--ink-900)]">
@@ -131,14 +131,14 @@ export function PipelineProgressClient(props: Props) {
           )}
 
           {!errorAt && plainKey === 'render' && !snapshot.videoJob && (
-            <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5 flex items-center gap-3">
+            <div className="bg-white border border-[var(--ink-100)] rounded-lg p-5 flex items-center gap-3">
               <Loader2 className="w-5 h-5 text-accent-step animate-spin" />
               <p className="text-sm text-[var(--ink-900)]">Queuing video generation…</p>
             </div>
           )}
 
           {!errorAt && plainKey === 'ready' && sopId && (
-            <div className="bg-accent-signoff/20 border border-accent-signoff/40 rounded-xl px-5 py-5">
+            <div className="bg-accent-signoff/20 border border-accent-signoff/40 rounded-lg px-5 py-5">
               <div className="flex items-start gap-3 mb-3">
                 <CheckCircle className="w-6 h-6 text-accent-signoff shrink-0" />
                 <div>
@@ -153,7 +153,7 @@ export function PipelineProgressClient(props: Props) {
               </div>
               <Link
                 href={`/admin/sops/${sopId}/video`}
-                className="h-[72px] w-full bg-[var(--ink-900)] text-white font-semibold text-xl rounded-lg flex items-center justify-center hover:bg-[var(--ink-700)] transition-colors"
+                className="h-tap-row w-full bg-[var(--ink-900)] text-white font-semibold text-xl rounded-lg flex items-center justify-center hover:bg-[var(--ink-700)] transition-colors"
               >
                 Preview and publish video →
               </Link>
@@ -162,7 +162,7 @@ export function PipelineProgressClient(props: Props) {
 
           {errorAt === 'render' && sopId && (
             <div
-              className="bg-white border border-[var(--ink-100)] rounded-xl p-5"
+              className="bg-white border border-[var(--ink-100)] rounded-lg p-5"
               role="alert"
             >
               <div className="flex items-start gap-3 mb-3">
@@ -179,7 +179,7 @@ export function PipelineProgressClient(props: Props) {
               </div>
               <Link
                 href={`/admin/sops/${sopId}/video`}
-                className="h-[72px] w-full bg-[var(--ink-900)] text-white font-semibold text-xl rounded-lg flex items-center justify-center hover:bg-[var(--ink-700)] transition-colors"
+                className="h-tap-row w-full bg-[var(--ink-900)] text-white font-semibold text-xl rounded-lg flex items-center justify-center hover:bg-[var(--ink-700)] transition-colors"
               >
                 Go to video panel
               </Link>
@@ -188,7 +188,7 @@ export function PipelineProgressClient(props: Props) {
 
           {errorAt === 'read' && sopId && (
             <div
-              className="bg-white border border-[var(--ink-100)] rounded-xl p-5"
+              className="bg-white border border-[var(--ink-100)] rounded-lg p-5"
               role="alert"
             >
               <div className="flex items-start gap-3">

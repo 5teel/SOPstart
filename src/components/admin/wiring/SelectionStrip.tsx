@@ -41,7 +41,7 @@ export function SelectionStrip({
   openInLibraryHref,
 }: SelectionStripProps) {
   return (
-    <div data-state={state} className={`strip-slot h-[48px] overflow-hidden ${state}`}>
+    <div data-state={state} className={`strip-slot h-12 overflow-hidden ${state}`}>
       {state === 'idle' && (
         <span className="mono idle-copy">
           Click a team, role or person to see what they can see · click a collection or SOP to choose who sees it

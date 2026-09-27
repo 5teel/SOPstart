@@ -82,7 +82,7 @@ function StepInApp({ block }: { block: ChecklistBlock }): React.JSX.Element {
       <p
         style={{
           fontFamily: 'Inter, sans-serif',
-          fontSize: '14px',
+          fontSize: 'var(--text-sm)',
           lineHeight: 1.55,
           color: 'var(--ink-700)',
           margin: 0,
@@ -141,7 +141,7 @@ function ReviewCard({
         border: active
           ? '1.5px solid var(--accent-step)'
           : '1px solid var(--ink-300)',
-        borderRadius: '4px',
+        borderRadius: 'var(--radius-sm)',
         background: 'var(--paper-1)',
         overflow: 'hidden',
         marginBottom: '12px',
@@ -169,7 +169,7 @@ function ReviewCard({
           style={{
             margin: '0 12px 12px',
             border: '1px solid var(--ink-300)',
-            borderRadius: '4px',
+            borderRadius: 'var(--radius-sm)',
             overflow: 'hidden',
           }}
         >
@@ -197,7 +197,7 @@ function ReviewCard({
               <span
                 style={{
                   fontFamily: 'JetBrains Mono, monospace',
-                  fontSize: '12px',
+                  fontSize: 'var(--text-xs)',
                   fontWeight: 600,
                   color: 'var(--ink-900)',
                 }}
@@ -232,10 +232,10 @@ function ReviewCard({
           style={{
             flexShrink: 0,
             fontFamily: 'JetBrains Mono, monospace',
-            fontSize: '10px',
+            fontSize: 'var(--text-micro)',
             fontWeight: 500,
             color: 'var(--ink-500)',
-            letterSpacing: '0.06em',
+            letterSpacing: 'var(--tracking-wider)',
           }}
         >
           {index + 1}/{total}
@@ -249,7 +249,7 @@ function ReviewCard({
                 alignItems: 'center',
                 gap: '6px',
                 fontFamily: 'JetBrains Mono, monospace',
-                fontSize: '12px',
+                fontSize: 'var(--text-xs)',
                 fontWeight: 600,
                 color: 'var(--accent-ok)',
               }}
@@ -266,12 +266,12 @@ function ReviewCard({
                 marginLeft: 'auto',
                 padding: '6px 12px',
                 border: '1px solid var(--ink-300)',
-                borderRadius: '2px',
+                borderRadius: 'var(--radius-sm)',
                 background: 'transparent',
                 color: 'var(--ink-700)',
                 cursor: 'pointer',
                 fontFamily: 'JetBrains Mono, monospace',
-                fontSize: '12px',
+                fontSize: 'var(--text-xs)',
                 fontWeight: 600,
               }}
             >
@@ -290,12 +290,12 @@ function ReviewCard({
               style={{
                 padding: '6px 14px',
                 border: 'none',
-                borderRadius: '2px',
+                borderRadius: 'var(--radius-sm)',
                 background: 'var(--accent-ok)',
                 color: 'var(--paper-1)',
                 cursor: 'pointer',
                 fontFamily: 'JetBrains Mono, monospace',
-                fontSize: '12px',
+                fontSize: 'var(--text-xs)',
                 fontWeight: 600,
               }}
             >
@@ -310,12 +310,12 @@ function ReviewCard({
               style={{
                 padding: '6px 12px',
                 border: '1px solid var(--accent-measure)',
-                borderRadius: '2px',
+                borderRadius: 'var(--radius-sm)',
                 background: 'transparent',
                 color: 'var(--accent-voice)',
                 cursor: 'pointer',
                 fontFamily: 'JetBrains Mono, monospace',
-                fontSize: '12px',
+                fontSize: 'var(--text-xs)',
                 fontWeight: 600,
               }}
             >
@@ -495,7 +495,7 @@ export function ReviewStation({
           flex: 1,
           color: 'var(--ink-500)',
           fontFamily: 'JetBrains Mono, monospace',
-          fontSize: '12px',
+          fontSize: 'var(--text-xs)',
         }}
       >
         Loading checklist…
@@ -524,7 +524,7 @@ export function ReviewStation({
         <p
           style={{
             fontFamily: 'Inter, sans-serif',
-            fontSize: '17px',
+            fontSize: 'var(--text-lg)',
             fontWeight: 600,
             color: 'var(--ink-900)',
             margin: 0,
@@ -535,7 +535,7 @@ export function ReviewStation({
         <p
           style={{
             fontFamily: 'Inter, sans-serif',
-            fontSize: '14px',
+            fontSize: 'var(--text-sm)',
             color: 'var(--ink-500)',
             margin: 0,
           }}
@@ -632,11 +632,11 @@ export function ReviewStation({
             <p
               style={{
                 fontFamily: 'JetBrains Mono, monospace',
-                fontSize: '12px',
+                fontSize: 'var(--text-xs)',
                 fontWeight: 600,
                 color: 'var(--ink-900)',
                 textTransform: 'uppercase',
-                letterSpacing: '0.08em',
+                letterSpacing: 'var(--tracking-widest)',
                 margin: 0,
               }}
             >
@@ -645,7 +645,7 @@ export function ReviewStation({
             <p
               style={{
                 fontFamily: 'JetBrains Mono, monospace',
-                fontSize: '10px',
+                fontSize: 'var(--text-micro)',
                 fontWeight: 500,
                 color: 'var(--ink-500)',
                 margin: '2px 0 0',
@@ -722,11 +722,11 @@ export function ReviewStation({
               <p
                 style={{
                   fontFamily: 'JetBrains Mono, monospace',
-                  fontSize: '12px',
+                  fontSize: 'var(--text-xs)',
                   fontWeight: 600,
                   color: 'var(--ink-900)',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
+                  letterSpacing: 'var(--tracking-widest)',
                   margin: 0,
                 }}
               >
@@ -735,7 +735,7 @@ export function ReviewStation({
               <p
                 style={{
                   fontFamily: 'JetBrains Mono, monospace',
-                  fontSize: '10px',
+                  fontSize: 'var(--text-micro)',
                   fontWeight: 500,
                   color: 'var(--ink-500)',
                   margin: '2px 0 0',
@@ -757,12 +757,12 @@ export function ReviewStation({
                 gap: '4px',
                 padding: '4px 8px',
                 border: '1px solid var(--ink-300)',
-                borderRadius: '2px',
+                borderRadius: 'var(--radius-sm)',
                 background: drawerOpen ? 'var(--tint-step-bg)' : 'var(--paper-1)',
                 color: drawerOpen ? 'var(--accent-step)' : 'var(--ink-700)',
                 cursor: 'pointer',
                 fontFamily: 'JetBrains Mono, monospace',
-                fontSize: '10px',
+                fontSize: 'var(--text-micro)',
                 fontWeight: 500,
               }}
             >
@@ -827,11 +827,11 @@ export function ReviewStation({
             <p
               style={{
                 fontFamily: 'JetBrains Mono, monospace',
-                fontSize: '12px',
+                fontSize: 'var(--text-xs)',
                 fontWeight: 600,
                 color: 'var(--ink-900)',
                 textTransform: 'uppercase',
-                letterSpacing: '0.08em',
+                letterSpacing: 'var(--tracking-widest)',
                 margin: 0,
               }}
             >
@@ -840,7 +840,7 @@ export function ReviewStation({
             <p
               style={{
                 fontFamily: 'JetBrains Mono, monospace',
-                fontSize: '10px',
+                fontSize: 'var(--text-micro)',
                 fontWeight: 500,
                 color: 'var(--ink-500)',
                 margin: '2px 0 0',
@@ -880,7 +880,7 @@ export function ReviewStation({
             data-testid="verify-progress"
             style={{
               fontFamily: 'JetBrains Mono, monospace',
-              fontSize: '12px',
+              fontSize: 'var(--text-xs)',
               fontWeight: 600,
               color: remaining === 0 ? 'var(--accent-ok)' : 'var(--ink-900)',
               whiteSpace: 'nowrap',
@@ -901,7 +901,7 @@ export function ReviewStation({
               alignItems: 'center',
               gap: '4px',
               fontFamily: 'JetBrains Mono, monospace',
-              fontSize: '10px',
+              fontSize: 'var(--text-micro)',
               fontWeight: 500,
               color: 'var(--ink-500)',
               whiteSpace: 'nowrap',
@@ -911,10 +911,10 @@ export function ReviewStation({
             <kbd
               style={{
                 border: '1px solid var(--ink-300)',
-                borderRadius: '2px',
+                borderRadius: 'var(--radius-sm)',
                 padding: '4px',
                 background: 'var(--paper-1)',
-                fontSize: '10px',
+                fontSize: 'var(--text-micro)',
               }}
             >
               {CHECKLIST_KEYBINDS.approve}
@@ -923,10 +923,10 @@ export function ReviewStation({
             <kbd
               style={{
                 border: '1px solid var(--ink-300)',
-                borderRadius: '2px',
+                borderRadius: 'var(--radius-sm)',
                 padding: '4px',
                 background: 'var(--paper-1)',
-                fontSize: '10px',
+                fontSize: 'var(--text-micro)',
               }}
             >
               {CHECKLIST_KEYBINDS.decline}
@@ -935,10 +935,10 @@ export function ReviewStation({
             <kbd
               style={{
                 border: '1px solid var(--ink-300)',
-                borderRadius: '2px',
+                borderRadius: 'var(--radius-sm)',
                 padding: '4px',
                 background: 'var(--paper-1)',
-                fontSize: '10px',
+                fontSize: 'var(--text-micro)',
               }}
             >
               {CHECKLIST_KEYBINDS.next}
@@ -947,10 +947,10 @@ export function ReviewStation({
             <kbd
               style={{
                 border: '1px solid var(--ink-300)',
-                borderRadius: '2px',
+                borderRadius: 'var(--radius-sm)',
                 padding: '4px',
                 background: 'var(--paper-1)',
-                fontSize: '10px',
+                fontSize: 'var(--text-micro)',
               }}
             >
               {CHECKLIST_KEYBINDS.prev}

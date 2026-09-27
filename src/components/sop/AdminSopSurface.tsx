@@ -40,7 +40,7 @@ function LensSkeleton() {
   return (
     <div className="flex flex-col gap-2 p-3 lg:col-span-2">
       {[...Array(4)].map((_, i) => (
-        <div key={i} className="h-[68px] animate-pulse rounded-lg bg-[var(--paper-2)] lg:h-9 lg:rounded" />
+        <div key={i} className="h-tap-row animate-pulse rounded-lg bg-[var(--paper-2)] lg:h-9 lg:rounded" />
       ))}
     </div>
   )
@@ -293,14 +293,14 @@ export function AdminSopSurface({ nav, onNavChange, filter = '', children }: Adm
           key={sc.key}
           type="button"
           onClick={() => applyScope(sc.key)}
-          className={`flex-shrink-0 min-h-11 rounded-xl border px-3 text-sm font-medium ${
+          className={`flex-shrink-0 min-h-11 rounded-lg border px-3 text-sm font-medium ${
             scope === sc.key
               ? 'border-[var(--ink-900)] bg-[var(--ink-900)] text-white'
               : 'border-[var(--ink-100)] bg-white text-[var(--ink-700)]'
           }`}
         >
           {sc.label}
-          <span className="mono ml-1 text-[11px] opacity-70">{scopeCount(sc.key) ?? ''}</span>
+          <span className="mono ml-1 text-meta opacity-70">{scopeCount(sc.key) ?? ''}</span>
         </button>
       ))}
     </>

@@ -9,7 +9,7 @@ export type CalloutBlockProps = z.infer<typeof CalloutBlockPropsSchema>
 
 export function CalloutBlock({ title, body }: CalloutBlockProps) {
   return (
-    <div className="bg-[var(--accent-decision)]/10 border border-[var(--accent-decision)]/30 rounded-xl p-4 mb-4">
+    <div className="bg-[var(--accent-decision)]/10 border border-[var(--accent-decision)]/30 rounded-lg p-4 mb-4">
       <div className="flex items-center gap-2 mb-2">
         <Info size={16} className="text-[var(--accent-decision)] flex-shrink-0" />
         <span className="text-sm font-bold uppercase tracking-widest text-[var(--accent-decision)]">

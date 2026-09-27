@@ -93,7 +93,7 @@ export function SupervisorActivityView({ role: _role }: SupervisorActivityViewPr
           </button>
           {pickerOpen && (
             <div className="absolute right-0 top-full mt-1 w-56 max-h-56 overflow-y-auto bg-[var(--paper)] border border-[var(--ink-300)] rounded shadow-xl z-20">
-              <p className="px-3 py-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--ink-500)] border-b border-[var(--ink-100)]">
+              <p className="px-3 py-2 text-micro font-semibold uppercase tracking-wider text-[var(--ink-500)] border-b border-[var(--ink-100)]">
                 Select worker
               </p>
               {workerOptions.map((w) => (
@@ -122,7 +122,7 @@ export function SupervisorActivityView({ role: _role }: SupervisorActivityViewPr
 
       <div className="lg:flex lg:gap-8">
         {/* Sidebar filter (desktop) */}
-        <div className="hidden lg:block w-[220px] flex-shrink-0">
+        <div className="hidden lg:block w-55 flex-shrink-0">
           <p className="mono text-xs font-semibold text-[var(--ink-500)] uppercase tracking-wide mb-3">
             Filter
           </p>

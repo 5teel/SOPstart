@@ -19,7 +19,7 @@ export function NotificationBadge() {
   return (
     <span
       aria-label={`${unreadCount} unread notification${unreadCount === 1 ? '' : 's'}`}
-      className="ml-1.5 inline-flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-accent-escalate px-1 align-middle text-[10px] font-bold leading-none tracking-normal text-white"
+      className="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-accent-escalate px-1 align-middle text-micro font-bold leading-none tracking-normal text-white"
     >
       {displayCount}
     </span>

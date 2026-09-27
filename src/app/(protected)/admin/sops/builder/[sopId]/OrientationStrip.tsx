@@ -65,10 +65,10 @@ export function OrientationStrip({
           justifyContent: 'center',
           background: 'var(--accent-step)', // --accent-step
           color: 'var(--paper-1)',
-          fontSize: 10,
+          fontSize: 'var(--text-micro)',
           fontWeight: 600,
           lineHeight: 1.3,
-          borderRadius: 2,
+          borderRadius: 'var(--radius-sm)',
           padding: '2px 6px',
           whiteSpace: 'nowrap',
           flexShrink: 0,
@@ -85,7 +85,7 @@ export function OrientationStrip({
           flex: 1,
           margin: 0,
           fontFamily: "'Inter', system-ui, sans-serif",
-          fontSize: 12,
+          fontSize: 'var(--text-xs)',
           fontWeight: 400,
           lineHeight: 1.3,
           color: 'var(--ink-600)', // --ink-700 (UI-SPEC value)
@@ -108,7 +108,7 @@ export function OrientationStrip({
         <span
           style={{
             fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-            fontSize: 12,
+            fontSize: 'var(--text-xs)',
             fontWeight: 400,
             lineHeight: 1.3,
             color: 'var(--ink-500)', // --ink-500
@@ -124,7 +124,7 @@ export function OrientationStrip({
             width: 120,
             height: 4,
             background: 'var(--ink-100)', // --ink-200
-            borderRadius: 3,
+            borderRadius: 'var(--radius-sm)',
             overflow: 'hidden',
             flexShrink: 0,
           }}
@@ -139,7 +139,7 @@ export function OrientationStrip({
               width: fillPercent,
               height: '100%',
               background: 'var(--accent-step)', // --accent-step
-              borderRadius: 3,
+              borderRadius: 'var(--radius-sm)',
               transition: 'width 200ms ease',
             }}
           />

@@ -82,10 +82,10 @@ export function BuilderFlowEditButton({ sop, sopId }: BuilderFlowEditButtonProps
         type="button"
         role="menuitem"
         onClick={() => { setDirty(false); setOpen(true) }}
-        className="flex w-full flex-col items-start gap-0.5 rounded-xs px-3 py-2 text-left hover:bg-[var(--paper-2)] transition-colors"
+        className="flex w-full flex-col items-start gap-0.5 rounded px-3 py-2 text-left hover:bg-[var(--paper-2)] transition-colors"
       >
-        <span className="text-[12.5px] text-[var(--ink-900)]">Edit the flow diagram</span>
-        <span className="text-[10.5px] text-[var(--ink-500)]">drag the boxes around, then save the layout</span>
+        <span className="text-ui text-[var(--ink-900)]">Edit the flow diagram</span>
+        <span className="text-micro text-[var(--ink-500)]">drag the boxes around, then save the layout</span>
       </button>
 
       {open &&

@@ -28,9 +28,9 @@ export function ActivityFilter({
   desktop = false,
 }: ActivityFilterProps) {
   const activeBase =
-    'h-[40px] px-4 rounded-xl text-sm font-semibold bg-[var(--ink-900)] text-[var(--paper)] cursor-pointer'
+    'h-10 px-4 rounded-lg text-sm font-semibold bg-[var(--ink-900)] text-[var(--paper)] cursor-pointer'
   const inactiveBase =
-    'h-[40px] px-4 rounded-xl text-sm font-medium bg-white border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] hover:border-[var(--ink-300)] transition-colors cursor-pointer'
+    'h-10 px-4 rounded-lg text-sm font-medium bg-white border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)] hover:border-[var(--ink-300)] transition-colors cursor-pointer'
 
   const pillRow = desktop ? 'flex flex-col gap-2' : 'flex flex-row gap-2 flex-wrap'
 
@@ -62,7 +62,7 @@ export function ActivityFilter({
 
       {filter.type === 'by_sop' && sopOptions.length > 0 && (
         <select
-          className="h-[48px] w-full bg-white border border-[var(--ink-100)] rounded-xl text-sm text-[var(--ink-900)] px-3 focus:outline-none focus:ring-2 focus:ring-[var(--ink-300)]"
+          className="h-12 w-full bg-white border border-[var(--ink-100)] rounded-lg text-sm text-[var(--ink-900)] px-3 focus:outline-none focus:ring-2 focus:ring-[var(--ink-300)]"
           value={'value' in filter ? filter.value : ''}
           onChange={(e) => onChange({ type: 'by_sop', value: e.target.value })}
         >
@@ -76,7 +76,7 @@ export function ActivityFilter({
 
       {filter.type === 'by_worker' && workerOptions.length > 0 && (
         <select
-          className="h-[48px] w-full bg-white border border-[var(--ink-100)] rounded-xl text-sm text-[var(--ink-900)] px-3 focus:outline-none focus:ring-2 focus:ring-[var(--ink-300)]"
+          className="h-12 w-full bg-white border border-[var(--ink-100)] rounded-lg text-sm text-[var(--ink-900)] px-3 focus:outline-none focus:ring-2 focus:ring-[var(--ink-300)]"
           value={'value' in filter ? filter.value : ''}
           onChange={(e) => onChange({ type: 'by_worker', value: e.target.value })}
         >

@@ -46,7 +46,7 @@ export function EnumChip({ value, options, onSelect, accent, ariaLabel }: EnumCh
         data-enum-chip
         aria-label={ariaLabel}
         onClick={handleClick}
-        className="inline-flex items-center rounded-full border px-2 py-0.5 font-mono text-[11px] font-medium"
+        className="inline-flex items-center rounded-full border px-2 py-0.5 font-mono text-meta font-medium"
         style={{ borderColor: color, color }}
       >
         {label}
@@ -55,7 +55,7 @@ export function EnumChip({ value, options, onSelect, accent, ariaLabel }: EnumCh
         <span
           role="menu"
           data-enum-menu
-          className="absolute left-0 top-full z-20 mt-1 min-w-[8rem] rounded-md border border-[var(--ink-900,#09090b)] bg-[var(--paper,#fafafa)] py-1 shadow-[0_18px_50px_rgba(0,0,0,0.24)]"
+          className="absolute left-0 top-full z-20 mt-1 min-w-[8rem] rounded-lg border border-[var(--ink-900,#09090b)] bg-[var(--paper,#fafafa)] py-1 shadow-[0_18px_50px_rgba(0,0,0,0.24)]"
         >
           {options.map((o) => (
             <button
@@ -66,7 +66,7 @@ export function EnumChip({ value, options, onSelect, accent, ariaLabel }: EnumCh
                 onSelect(o.value)
                 setOpen(false)
               }}
-              className="block w-full px-3 py-1 text-left font-mono text-[11px] hover:bg-[var(--paper-2,#f4f4f5)]"
+              className="block w-full px-3 py-1 text-left font-mono text-meta hover:bg-[var(--paper-2,#f4f4f5)]"
             >
               {o.label}
             </button>

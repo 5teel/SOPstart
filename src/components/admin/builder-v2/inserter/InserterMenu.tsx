@@ -119,7 +119,7 @@ export function InserterMenu({
       data-inserter-menu
       role="menu"
       onKeyDown={onKeyDown}
-      className="w-[320px] overflow-hidden rounded-[10px] border-[1.5px] border-[var(--ink-900,#18181b)] bg-[var(--paper,#fff)] text-[var(--ink-900,#18181b)] shadow-[0_12px_32px_rgba(0,0,0,0.18)]"
+      className="w-80 overflow-hidden rounded-lg border-[1.5px] border-[var(--ink-900,#18181b)] bg-[var(--paper,#fff)] text-[var(--ink-900,#18181b)] shadow-[0_12px_32px_rgba(0,0,0,0.18)]"
     >
       {/* Header — ‹ back appears on the ALL page. */}
       <div className="flex items-center gap-2 border-b border-[var(--ink-100,#e4e4e7)] px-2.5 py-2">
@@ -134,7 +134,7 @@ export function InserterMenu({
             <ChevronLeft size={16} />
           </button>
         )}
-        <span className="font-mono text-[11px] font-semibold uppercase tracking-wider">
+        <span className="font-mono text-meta font-semibold uppercase tracking-wider">
           {page === 'all' ? 'All content types' : 'Add content'}
         </span>
       </div>
@@ -147,21 +147,21 @@ export function InserterMenu({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={page === 'all' ? 'Filter content…' : 'Type to filter…'}
-          className="w-full rounded border border-[var(--ink-300,#d4d4d8)] px-2 py-1 text-[13px] outline-none focus:border-[var(--accent-step,#3b82f6)]"
+          className="w-full rounded border border-[var(--ink-300,#d4d4d8)] px-2 py-1 text-ui outline-none focus:border-[var(--accent-step,#3b82f6)]"
         />
       </div>
 
       {/* Rows. */}
-      <div data-inserter-list className="max-h-[360px] overflow-y-auto py-1">
+      <div data-inserter-list className="max-h-90 overflow-y-auto py-1">
         {rows.length === 0 && (
-          <div className="px-3 py-4 text-center text-[12px] text-[var(--ink-500,#71717a)]">
+          <div className="px-3 py-4 text-center text-xs text-[var(--ink-500,#71717a)]">
             No matching blocks
           </div>
         )}
         {rows.map((row, i) => (
           <div key={row.kind === 'insert' ? `ins-${row.type}-${i}` : `nav-${row.page}`}>
             {page === 'home' && i === firstLaneIdx && (
-              <div className="px-3 pb-1 pt-1.5 font-mono text-[9px] uppercase tracking-wider text-[var(--ink-500,#71717a)]">
+              <div className="px-3 pb-1 pt-1.5 font-mono text-micro uppercase tracking-wider text-[var(--ink-500,#71717a)]">
                 Fits here
               </div>
             )}
@@ -182,9 +182,9 @@ export function InserterMenu({
                 row.kind === 'nav' && row.page === 'ai' ? 'text-[var(--ai,#7c3aed)]' : '',
               ].join(' ')}
             >
-              <span className="flex-1 truncate text-[13px]">{row.label}</span>
+              <span className="flex-1 truncate text-ui">{row.label}</span>
               {row.kind === 'insert' && row.smart && (
-                <span className="shrink-0 font-mono text-[10px] text-[var(--ink-500,#71717a)]">
+                <span className="shrink-0 font-mono text-micro text-[var(--ink-500,#71717a)]">
                   {row.why ? `${row.why} · ` : ''}↵ or Tab
                 </span>
               )}
@@ -197,7 +197,7 @@ export function InserterMenu({
       </div>
 
       {/* Keyboard hint. */}
-      <div className="border-t border-[var(--ink-100,#e4e4e7)] px-3 py-1.5 font-mono text-[9px] uppercase tracking-wider text-[var(--ink-500,#71717a)]">
+      <div className="border-t border-[var(--ink-100,#e4e4e7)] px-3 py-1.5 font-mono text-micro uppercase tracking-wider text-[var(--ink-500,#71717a)]">
         ↑↓ move · ↵ insert · esc close
       </div>
     </div>

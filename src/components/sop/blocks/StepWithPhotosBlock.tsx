@@ -41,9 +41,9 @@ export function StepWithPhotosBlock({ number, text, photos, layout }: StepWithPh
   if (layout === 'right' && photosValid.length === 1) {
     const p = photosValid[0]
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(240px,360px)] gap-4 items-start p-4 bg-white rounded-xl border border-[var(--ink-100)] mb-3">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(240px,360px)] gap-4 items-start p-4 bg-white rounded-lg border border-[var(--ink-100)] mb-3">
         <div className="flex items-start gap-4 min-w-0">
-          <span className="text-[13px] font-bold text-[var(--ink-500)] w-6 flex-shrink-0 pt-0.5 tabular-nums">
+          <span className="text-ui font-bold text-[var(--ink-500)] w-6 flex-shrink-0 pt-0.5 tabular-nums">
             {number}
           </span>
           <div className="flex-1 min-w-0">
@@ -75,9 +75,9 @@ export function StepWithPhotosBlock({ number, text, photos, layout }: StepWithPh
         : 'grid-cols-1 sm:grid-cols-2'
 
   return (
-    <div className="p-4 bg-white rounded-xl border border-[var(--ink-100)] mb-3">
+    <div className="p-4 bg-white rounded-lg border border-[var(--ink-100)] mb-3">
       <div className="flex items-start gap-4 min-w-0 mb-3">
-        <span className="text-[13px] font-bold text-[var(--ink-500)] w-6 flex-shrink-0 pt-0.5 tabular-nums">
+        <span className="text-ui font-bold text-[var(--ink-500)] w-6 flex-shrink-0 pt-0.5 tabular-nums">
           {number}
         </span>
         <div className="flex-1 min-w-0">

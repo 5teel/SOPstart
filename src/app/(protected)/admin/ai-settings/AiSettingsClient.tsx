@@ -59,14 +59,14 @@ export function AiSettingsClient({
         </p>
         <div className="mt-3 space-y-4">
           {configurable.map((s) => (
-            <div key={s.key} className="bg-white border border-[var(--ink-100)] rounded-xl p-4">
+            <div key={s.key} className="bg-white border border-[var(--ink-100)] rounded-lg p-4">
               <AiModelSelect
                 useCase={s.key}
                 value={settings[s.key] ?? s.resolvedDefault}
                 onChange={(id) => save(s.key, id, id === s.resolvedDefault)}
                 disabled={pending}
               />
-              <div className="mt-2 flex items-center gap-2 text-[11px]">
+              <div className="mt-2 flex items-center gap-2 text-meta">
                 <span className="text-[var(--ink-400)]">{s.description}</span>
                 {settings[s.key] && settings[s.key] !== s.resolvedDefault && (
                   <span className="text-accent-decision font-medium shrink-0">org override</span>
@@ -89,7 +89,7 @@ export function AiSettingsClient({
         <div className="mt-3 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-[11px] uppercase tracking-wide text-[var(--ink-400)]">
+              <tr className="text-left text-meta uppercase tracking-wide text-[var(--ink-400)]">
                 <th className="py-2 pr-3 font-medium">Use case</th>
                 <th className="py-2 pr-3 font-medium">Model</th>
                 <th className="py-2 pr-3 font-medium">Provider</th>

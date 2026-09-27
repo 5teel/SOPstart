@@ -386,7 +386,7 @@ export function WalkthroughVoiceModal({
         aria-modal="true"
         aria-labelledby="walkthrough-voice-title"
         data-testid="voice-modal"
-        className="bg-[var(--paper)] border border-[var(--ink-100)] rounded-xl shadow-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto"
+        className="bg-[var(--paper)] border border-[var(--ink-100)] rounded-lg shadow-xl max-w-2xl w-full max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <header className="flex items-center justify-between px-6 py-4 border-b border-[var(--ink-100)]">
@@ -483,7 +483,7 @@ export function WalkthroughVoiceModal({
 
           {/* Manual text input — always-visible tap fallback (D-04) */}
           <label className="block">
-            <span className="mono text-[11px] uppercase tracking-wider text-[var(--ink-500)]">
+            <span className="mono text-meta uppercase tracking-wider text-[var(--ink-500)]">
               Your question
             </span>
             <textarea
@@ -570,7 +570,7 @@ function AnswerCard({
               type="button"
               onClick={() => onCitationClick(part.label)}
               data-testid="citation-chip"
-              className="inline-flex items-center px-2 py-0.5 mx-1 rounded-md bg-[var(--accent-decision)]/15 text-[var(--accent-decision)] text-sm font-medium hover:bg-[var(--accent-decision)]/25 transition-colors"
+              className="inline-flex items-center px-2 py-0.5 mx-1 rounded-lg bg-[var(--accent-decision)]/15 text-[var(--accent-decision)] text-sm font-medium hover:bg-[var(--accent-decision)]/25 transition-colors"
             >
               {part.label}
             </button>

@@ -289,7 +289,7 @@ export function VideoPreviewPanel({
           type="button"
           onClick={onRetake}
           disabled={isUploading}
-          className="flex-1 h-[72px] bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold text-lg rounded-lg hover:bg-[var(--paper-2)] active:bg-[var(--ink-500)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 h-tap-row bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold text-lg rounded-lg hover:bg-[var(--paper-2)] active:bg-[var(--ink-500)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Retake
         </button>
@@ -298,7 +298,7 @@ export function VideoPreviewPanel({
           onClick={handleSubmit}
           disabled={isUploading}
           aria-busy={isUploading}
-          className="flex-[2] h-[72px] bg-[var(--ink-900)] text-white font-semibold text-lg rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="flex-[2] h-tap-row bg-[var(--ink-900)] text-white font-semibold text-lg rounded-lg hover:bg-[var(--ink-700)] active:bg-[var(--ink-700)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {isUploading ? (
             <>

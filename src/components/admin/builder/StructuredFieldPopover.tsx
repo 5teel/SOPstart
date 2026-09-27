@@ -108,7 +108,7 @@ export function StructuredFieldPopover({
         overflowY: 'auto',
         background: 'var(--paper)',
         border: '1.5px solid var(--ink-300)',
-        borderRadius: '4px',
+        borderRadius: 'var(--radius-sm)',
         boxShadow: '0 4px 16px rgba(0,0,0,0.10)',
         zIndex: 50,
       }}
@@ -125,12 +125,12 @@ export function StructuredFieldPopover({
       >
         <span
           style={{
-            fontSize: '11px',
+            fontSize: 'var(--text-meta)',
             fontFamily: 'JetBrains Mono, monospace',
             fontWeight: 600,
             textTransform: 'uppercase',
             color: 'var(--ink-500)',
-            letterSpacing: '0.06em',
+            letterSpacing: 'var(--tracking-wider)',
           }}
         >
           {humanizeBlockType(blockType)}
@@ -144,7 +144,7 @@ export function StructuredFieldPopover({
             border: 'none',
             cursor: 'pointer',
             color: 'var(--ink-500)',
-            fontSize: '16px',
+            fontSize: 'var(--text-base)',
             lineHeight: 1,
             padding: '0 2px',
             display: 'flex',

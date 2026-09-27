@@ -18,7 +18,7 @@ export function ZoneBlock({ label, zoneType, notes }: ZoneBlockProps) {
   const color = ZONE_COLORS[zoneType]
   return (
     <section
-      className="mb-4 border rounded-xl p-4"
+      className="mb-4 border rounded-lg p-4"
       style={{
         borderColor: color,
         background: `color-mix(in srgb, ${color} 8%, white)`,
@@ -28,7 +28,7 @@ export function ZoneBlock({ label, zoneType, notes }: ZoneBlockProps) {
     >
       <div className="flex items-center gap-2 mb-1">
         <span
-          className="text-[11px] font-mono uppercase tracking-wider"
+          className="text-meta font-mono uppercase tracking-wider"
           style={{ color }}
         >
           {zoneType} zone

@@ -39,7 +39,7 @@ export function AdminAccessLens({ pinnedSopId, onBack }: AdminAccessLensProps) {
     <button
       type="button"
       onClick={onBack}
-      className="mono mb-4 inline-block text-[11px] uppercase tracking-wider text-[var(--ink-500)] hover:text-[var(--ink-900)]"
+      className="mono mb-4 inline-block text-meta uppercase tracking-wider text-[var(--ink-500)] hover:text-[var(--ink-900)]"
     >
       ← Back to your SOPs
     </button>
@@ -51,7 +51,7 @@ export function AdminAccessLens({ pinnedSopId, onBack }: AdminAccessLensProps) {
         {backLink}
         <div className="flex flex-col gap-2 p-3">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-[68px] animate-pulse rounded-lg bg-[var(--paper-2)] lg:h-9 lg:rounded" />
+            <div key={i} className="h-tap-row animate-pulse rounded-lg bg-[var(--paper-2)] lg:h-9 lg:rounded" />
           ))}
         </div>
       </div>
@@ -63,7 +63,7 @@ export function AdminAccessLens({ pinnedSopId, onBack }: AdminAccessLensProps) {
       <div>
         {backLink}
         <div className="blueprint-frame text-center py-12">
-          <p className="mono text-[11px] text-accent-escalate uppercase tracking-wider mb-2">ERROR</p>
+          <p className="mono text-meta text-accent-escalate uppercase tracking-wider mb-2">ERROR</p>
           <p className="text-sm text-[var(--ink-500)]">{data.error}</p>
         </div>
       </div>

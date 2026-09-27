@@ -196,10 +196,10 @@ export function FlowGraphEditor({ initialGraph, sopId, onSaved, onDirtyChange }:
   )
 
   return (
-    <div className="flex border border-[#d4d4d8] rounded-xl overflow-hidden bg-white" style={{ height: 520 }}>
+    <div className="flex border border-[#d4d4d8] rounded-lg overflow-hidden bg-white" style={{ height: 520 }}>
       {/* Left palette */}
       <div className="w-40 flex-shrink-0 border-r border-[#e4e4e7] bg-[#f4f4f5] flex flex-col gap-1 p-2 overflow-y-auto">
-        <p className="text-[10px] font-mono uppercase tracking-wider text-[#71717a] px-1 mb-1">Node types</p>
+        <p className="text-micro font-mono uppercase tracking-wider text-[#71717a] px-1 mb-1">Node types</p>
         {NODE_TYPES.map((type) => (
           <button
             key={type}
@@ -429,7 +429,7 @@ export function FlowGraphEditor({ initialGraph, sopId, onSaved, onDirtyChange }:
                       )
                     )
                   }
-                  className="border border-[#d4d4d8] rounded px-2 py-1 bg-white text-[#09090b] font-mono text-[10px] focus:outline-none focus:border-[#09090b]"
+                  className="border border-[#d4d4d8] rounded px-2 py-1 bg-white text-[#09090b] font-mono text-micro focus:outline-none focus:border-[#09090b]"
                 />
               </label>
             </div>

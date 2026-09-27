@@ -23,7 +23,7 @@ const FlowGraphCanvas = dynamic(
     ssr: false,
     loading: () => (
       <div className="h-full flex items-center justify-center bg-grid" style={{ minHeight: 360 }}>
-        <span className="mono text-[10px] tracking-widest text-[var(--ink-500)]">LOADING FLOW…</span>
+        <span className="mono text-micro tracking-widest text-[var(--ink-500)]">LOADING FLOW…</span>
       </div>
     ),
   }
@@ -92,7 +92,7 @@ function StepCard({
         onClick={onToggle}
         aria-expanded={isOpen}
         aria-controls={`flow-step-detail-${entry.node.id}`}
-        className="w-full text-left bg-[var(--paper)] border rounded-xl px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[var(--ink-50)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--ink-900)]"
+        className="w-full text-left bg-[var(--paper)] border rounded-lg px-4 py-3 flex items-center gap-3 transition-colors hover:bg-[var(--ink-50)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--ink-900)]"
         style={{
           borderColor: isOpen ? colors.accent : 'var(--ink-100)',
           borderLeftWidth: 4,
@@ -102,7 +102,7 @@ function StepCard({
         data-flow-open={isOpen ? 'true' : 'false'}
       >
         <span
-          className="mono text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded flex-shrink-0"
+          className="mono text-micro uppercase tracking-wider px-1.5 py-0.5 rounded flex-shrink-0"
           style={{ color: colors.accent, backgroundColor: `color-mix(in srgb, ${colors.bg} 12%, transparent)` }}
         >
           {colors.label}
@@ -110,7 +110,7 @@ function StepCard({
         {/* Non-step nodes (decision/escalate/…) have no step match — hide the
             counter rather than printing a wrong "0/N" (24-REVIEW.md WR-06). */}
         {entry.stepNumber > 0 && (
-          <span className="mono text-[11px] text-[var(--ink-500)] flex-shrink-0">
+          <span className="mono text-meta text-[var(--ink-500)] flex-shrink-0">
             {entry.stepNumber}/{entry.totalSteps}
           </span>
         )}

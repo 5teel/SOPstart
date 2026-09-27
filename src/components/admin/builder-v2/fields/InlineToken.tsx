@@ -41,7 +41,7 @@ export function InlineToken({ value, onCommit, className, ariaLabel }: InlineTok
       suppressContentEditableWarning
       className={
         className ??
-        'font-mono text-[12px] underline decoration-dashed underline-offset-4 outline-none focus:decoration-solid'
+        'font-mono text-xs underline decoration-dashed underline-offset-4 outline-none focus:decoration-solid'
       }
       onBlur={() => onCommit(ref.current?.textContent ?? '')}
       onKeyDown={(e) => {

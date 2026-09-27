@@ -31,7 +31,7 @@ export function PhotoThumbnail({ photo, onRemove }: PhotoThumbnailProps) {
   const dotColor = photo.uploaded ? 'bg-accent-signoff' : 'bg-[var(--accent-voice)]'
 
   return (
-    <div className="relative w-[72px] h-[72px] flex-shrink-0">
+    <div className="relative w-tap-row h-tap-row flex-shrink-0">
       {objectUrl ? (
         <img
           src={objectUrl}

@@ -122,7 +122,7 @@ export function DepartmentGrid({ departments, orgMembers = [] }: DepartmentGridP
       >
         <h1
           style={{
-            fontSize: '22px',
+            fontSize: 'var(--text-2xl)',
             fontWeight: 700,
             color: 'var(--ink-900)',
             margin: 0,
@@ -139,12 +139,12 @@ export function DepartmentGrid({ departments, orgMembers = [] }: DepartmentGridP
             alignItems: 'center',
             gap: '6px',
             padding: '10px 16px',
-            fontSize: '13px',
+            fontSize: 'var(--text-ui)',
             fontWeight: 600,
             color: '#fff',
             background: 'var(--ink-900)',
             border: 'none',
-            borderRadius: '6px',
+            borderRadius: 'var(--radius-lg)',
             cursor: 'pointer',
             minHeight: '44px',
             flexShrink: 0,
@@ -160,13 +160,13 @@ export function DepartmentGrid({ departments, orgMembers = [] }: DepartmentGridP
         <p
           role="alert"
           style={{
-            fontSize: '13px',
+            fontSize: 'var(--text-ui)',
             color: 'var(--accent-hazard)',
             marginBottom: '12px',
             padding: '10px 14px',
             background: 'rgba(239,68,68,0.06)',
             border: '1px solid var(--accent-hazard)',
-            borderRadius: '6px',
+            borderRadius: 'var(--radius-lg)',
           }}
         >
           {archiveError}
@@ -184,7 +184,7 @@ export function DepartmentGrid({ departments, orgMembers = [] }: DepartmentGridP
         >
           <p
             style={{
-              fontSize: '15px',
+              fontSize: 'var(--text-reading)',
               fontWeight: 700,
               color: 'var(--ink-900)',
               marginBottom: '8px',
@@ -192,10 +192,10 @@ export function DepartmentGrid({ departments, orgMembers = [] }: DepartmentGridP
           >
             No departments yet
           </p>
-          <p style={{ fontSize: '13px', maxWidth: '420px', margin: '0 auto 24px' }}>
+          <p style={{ fontSize: 'var(--text-ui)', maxWidth: '420px', margin: '0 auto 24px' }}>
             Create your first department to start organising SOPs, blocks, and team members.
           </p>
-          <p style={{ fontSize: '12px', maxWidth: '380px', margin: '0 auto', fontStyle: 'italic' }}>
+          <p style={{ fontSize: 'var(--text-xs)', maxWidth: '380px', margin: '0 auto', fontStyle: 'italic' }}>
             Each department has a named owner accountable for its procedures.
           </p>
         </div>
@@ -232,7 +232,7 @@ export function DepartmentGrid({ departments, orgMembers = [] }: DepartmentGridP
             aria-label="Create new department"
             style={{
               border: '1.5px dashed var(--ink-300)',
-              borderRadius: '8px',
+              borderRadius: 'var(--radius-lg)',
               minHeight: '200px',
               display: 'flex',
               flexDirection: 'column',
@@ -258,12 +258,12 @@ export function DepartmentGrid({ departments, orgMembers = [] }: DepartmentGridP
               el.style.background = 'rgba(0,0,0,0.01)'
             }}
           >
-            <span style={{ fontSize: '26px', lineHeight: 1 }}>＋</span>
+            <span style={{ fontSize: 'var(--text-3xl)', lineHeight: 1 }}>＋</span>
             <span
               style={{
-                fontSize: '12px',
+                fontSize: 'var(--text-xs)',
                 textTransform: 'uppercase',
-                letterSpacing: '0.06em',
+                letterSpacing: 'var(--tracking-wider)',
                 fontWeight: 600,
               }}
             >
@@ -280,7 +280,7 @@ export function DepartmentGrid({ departments, orgMembers = [] }: DepartmentGridP
             type="button"
             onClick={() => setShowArchived((v) => !v)}
             style={{
-              fontSize: '11px',
+              fontSize: 'var(--text-meta)',
               color: 'var(--ink-500)',
               background: 'none',
               border: 'none',

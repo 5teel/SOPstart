@@ -102,7 +102,7 @@ function SortableStepRow({
       </button>
 
       <div className="flex flex-1 flex-wrap items-center gap-2">
-        <span className="mono text-[11px] text-[var(--ink-500)]">Step {index + 1}</span>
+        <span className="mono text-meta text-[var(--ink-500)]">Step {index + 1}</span>
 
         <select
           aria-label="Approver type"
@@ -257,7 +257,7 @@ export function ApprovalChainEditor({
   return (
     <div className="blueprint-frame p-4 space-y-3">
       <div className="flex items-center gap-2">
-        <span className="mono text-[11px] uppercase tracking-wider text-[var(--ink-500)]">Category</span>
+        <span className="mono text-meta uppercase tracking-wider text-[var(--ink-500)]">Category</span>
         <select
           aria-label="Chain category"
           value={category}
@@ -293,7 +293,7 @@ export function ApprovalChainEditor({
           type="button"
           onClick={addStep}
           disabled={steps.length >= 4}
-          className="evidence-btn !min-h-[32px] text-sm inline-flex items-center gap-1 disabled:opacity-40"
+          className="evidence-btn !min-h-8 text-sm inline-flex items-center gap-1 disabled:opacity-40"
         >
           <Plus className="h-3.5 w-3.5" /> Add step
         </button>
@@ -302,7 +302,7 @@ export function ApprovalChainEditor({
           type="button"
           onClick={handleSave}
           disabled={isPending}
-          className="evidence-btn !min-h-[36px] text-sm"
+          className="evidence-btn !min-h-9 text-sm"
         >
           {isPending ? 'Saving…' : 'Save chain'}
         </button>

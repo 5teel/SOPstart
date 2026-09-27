@@ -63,7 +63,7 @@ export function CompletionSummaryCard({
   return (
     <Link href={`/activity/${id}`}>
       <div
-        className={`flex items-start gap-4 p-4 bg-white border border-[var(--ink-100)] rounded-xl hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] transition-colors cursor-pointer min-h-[100px] ${
+        className={`flex items-start gap-4 p-4 bg-white border border-[var(--ink-100)] rounded-lg hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] transition-colors cursor-pointer min-h-25 ${
           isPending ? 'border-l-4 border-l-[var(--accent-decision)]' : ''
         }`}
       >
@@ -101,7 +101,7 @@ export function CompletionSummaryCard({
               e.preventDefault()
               onObserve({ workerId, workerName, sopId, sopTitle, completionId: id })
             }}
-            className="flex-shrink-0 self-center px-2.5 py-1.5 rounded border text-[10px] font-bold uppercase tracking-wide"
+            className="flex-shrink-0 self-center px-2.5 py-1.5 rounded border text-micro font-bold uppercase tracking-wide"
             style={{ borderColor: 'var(--accent-ok)', color: 'var(--accent-ok)' }}
           >
             👁 I observed this

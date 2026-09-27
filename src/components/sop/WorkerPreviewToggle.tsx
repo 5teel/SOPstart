@@ -15,7 +15,7 @@ export function WorkerPreviewToggle({ className = '' }: { className?: string }) 
         type="button"
         aria-pressed={viewport === 'desktop'}
         onClick={() => setViewport('desktop')}
-        className="px-3 py-1 text-[11px] mono uppercase tracking-wider"
+        className="px-3 py-1 text-meta mono uppercase tracking-wider"
         style={{
           background: viewport === 'desktop' ? 'var(--ink-900)' : 'transparent',
           color: viewport === 'desktop' ? 'var(--paper)' : 'var(--ink-700)',
@@ -27,7 +27,7 @@ export function WorkerPreviewToggle({ className = '' }: { className?: string }) 
         type="button"
         aria-pressed={viewport === 'mobile'}
         onClick={() => setViewport('mobile')}
-        className="px-3 py-1 text-[11px] mono uppercase tracking-wider border-l border-[var(--ink-300)]"
+        className="px-3 py-1 text-meta mono uppercase tracking-wider border-l border-[var(--ink-300)]"
         style={{
           background: viewport === 'mobile' ? 'var(--ink-900)' : 'transparent',
           color: viewport === 'mobile' ? 'var(--paper)' : 'var(--ink-700)',

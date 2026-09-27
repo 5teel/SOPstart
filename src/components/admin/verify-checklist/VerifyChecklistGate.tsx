@@ -109,7 +109,7 @@ export function VerifyChecklistGate({
       <aside
         data-testid="verify-checklist-gate"
         data-state="loading"
-        className="w-[320px] min-w-[320px] border-l border-[var(--ink-200)] bg-[var(--ink-50)] flex items-center justify-center text-sm text-[var(--ink-500)]"
+        className="w-80 min-w-80 border-l border-[var(--ink-200)] bg-[var(--ink-50)] flex items-center justify-center text-sm text-[var(--ink-500)]"
         style={{ height: '100%' }}
       >
         Loading checklist…
@@ -122,7 +122,7 @@ export function VerifyChecklistGate({
       <aside
         data-testid="verify-checklist-gate"
         data-state="empty"
-        className="w-[320px] min-w-[320px] border-l border-[var(--ink-200)] bg-[var(--ink-50)] flex items-center justify-center text-sm text-[var(--ink-500)] px-4 text-center"
+        className="w-80 min-w-80 border-l border-[var(--ink-200)] bg-[var(--ink-50)] flex items-center justify-center text-sm text-[var(--ink-500)] px-4 text-center"
         style={{ height: '100%' }}
       >
         No blocks to verify in this SOP yet.
@@ -136,7 +136,7 @@ export function VerifyChecklistGate({
       data-state={checklist.isReady ? 'ready' : 'pending'}
       data-verified-count={checklist.verifiedCount}
       data-total-count={checklist.totalCount}
-      className="w-[320px] min-w-[320px] max-w-[40vw] border-l border-[var(--ink-200)] bg-[var(--ink-50)] flex flex-col"
+      className="w-80 min-w-80 max-w-[40vw] border-l border-[var(--ink-200)] bg-[var(--ink-50)] flex flex-col"
       style={{ height: '100%' }}
     >
       <VerifyProgressIndicator
@@ -176,7 +176,7 @@ export function VerifyChecklistGate({
 
       <footer
         data-testid="verify-checklist-keyhelp"
-        className="px-3 py-2 border-t border-[var(--ink-200)] text-[10px] font-mono uppercase tracking-wider text-[var(--ink-500)] flex flex-wrap gap-x-3 gap-y-1"
+        className="px-3 py-2 border-t border-[var(--ink-200)] text-micro font-mono uppercase tracking-wider text-[var(--ink-500)] flex flex-wrap gap-x-3 gap-y-1"
       >
         <span>
           <kbd>{CHECKLIST_KEYBINDS.next}</kbd> next

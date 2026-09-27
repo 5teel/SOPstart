@@ -129,17 +129,17 @@ export function FieldPanel({ item, onCommitField, onClose }: FieldPanelProps) {
       data-field-panel
       role="dialog"
       aria-label="Edit fields"
-      className="absolute right-1 top-8 z-30 w-[300px] rounded-[10px] border-[1.5px] border-[var(--ink-900,#09090b)] bg-[var(--paper,#fafafa)] shadow-[0_18px_50px_rgba(0,0,0,0.24)]"
+      className="absolute right-1 top-8 z-30 w-75 rounded-lg border-[1.5px] border-[var(--ink-900,#09090b)] bg-[var(--paper,#fafafa)] shadow-[0_18px_50px_rgba(0,0,0,0.24)]"
     >
       <div className="flex items-center justify-between border-b border-[var(--ink-300,#d4d4d8)] px-3 py-2">
-        <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--ink-500,#71717a)]">
+        <span className="font-mono text-micro uppercase tracking-wider text-[var(--ink-500,#71717a)]">
           Edit fields
         </span>
         <button
           type="button"
           aria-label="Close field panel"
           onClick={onClose}
-          className="font-mono text-[11px] text-[var(--ink-500,#71717a)] hover:text-[var(--ink-900,#09090b)]"
+          className="font-mono text-meta text-[var(--ink-500,#71717a)] hover:text-[var(--ink-900,#09090b)]"
         >
           esc
         </button>
@@ -151,7 +151,7 @@ export function FieldPanel({ item, onCommitField, onClose }: FieldPanelProps) {
           const valid = isFieldValueValid(item.props, type, f.field, candidate[f.field])
           return (
             <div key={f.field} className="space-y-1.5">
-              <span className="block font-mono text-[9px] uppercase tracking-wider text-[var(--ink-500,#71717a)]">
+              <span className="block font-mono text-micro uppercase tracking-wider text-[var(--ink-500,#71717a)]">
                 {shape && 'label' in shape ? shape.label : f.field}
               </span>
 
@@ -162,7 +162,7 @@ export function FieldPanel({ item, onCommitField, onClose }: FieldPanelProps) {
                   placeholder={shape.placeholder}
                   defaultValue={item.props[f.field] == null ? '' : String(item.props[f.field])}
                   onChange={(e) => apply(f.field, e.target.value)}
-                  className="w-full rounded border border-[var(--ink-300,#d4d4d8)] px-2 py-1 text-[13px] outline-none focus:shadow-[0_0_0_2px_rgba(59,130,246,0.22)]"
+                  className="w-full rounded border border-[var(--ink-300,#d4d4d8)] px-2 py-1 text-ui outline-none focus:shadow-[0_0_0_2px_rgba(59,130,246,0.22)]"
                 />
               )}
 
@@ -198,7 +198,7 @@ export function FieldPanel({ item, onCommitField, onClose }: FieldPanelProps) {
               {!valid && (
                 <span
                   data-field-invalid
-                  className="block font-mono text-[10px] text-[var(--accent-hazard,#ef4444)]"
+                  className="block font-mono text-micro text-[var(--accent-hazard,#ef4444)]"
                 >
                   Invalid — keeping the last valid value.
                 </span>

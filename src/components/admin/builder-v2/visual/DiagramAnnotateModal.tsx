@@ -86,7 +86,7 @@ export function DiagramAnnotateModal({ item, onClose, onSaved }: DiagramAnnotate
       onClick={onClose}
     >
       <div
-        className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-xl bg-steel-900 shadow-2xl"
+        className="flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-lg bg-steel-900 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <header className="flex items-center justify-between border-b border-steel-700 px-4 py-2">

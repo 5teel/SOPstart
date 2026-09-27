@@ -172,7 +172,7 @@ export function VoiceDraftClient({ departments }: { departments: Department[] })
     <div className="mt-6 space-y-5">
       {/* Conversation */}
       <div
-        className="bg-white border border-[var(--ink-100)] rounded-xl p-4 space-y-3 max-h-[45vh] overflow-y-auto"
+        className="bg-white border border-[var(--ink-100)] rounded-lg p-4 space-y-3 max-h-[45vh] overflow-y-auto"
         data-testid="voice-draft-conversation"
       >
         {messages.map((m, i) => (
@@ -224,18 +224,18 @@ export function VoiceDraftClient({ departments }: { departments: Department[] })
               }}
               placeholder={listening ? 'Listening… tap ■ to send' : 'Or type a reply'}
               disabled={listening || thinking || generating}
-              className="flex-1 h-[44px] bg-white border border-[var(--ink-100)] rounded-xl text-sm px-3 text-[var(--ink-900)] focus:outline-none focus:ring-2 focus:ring-[var(--ink-300)] disabled:opacity-50"
+              className="flex-1 h-tap bg-white border border-[var(--ink-100)] rounded-lg text-sm px-3 text-[var(--ink-900)] focus:outline-none focus:ring-2 focus:ring-[var(--ink-300)] disabled:opacity-50"
             />
             <button
               type="button"
               onClick={() => void sendTyped()}
               disabled={!typed.trim() || listening || thinking || generating}
-              className="h-[44px] px-4 rounded-xl border border-[var(--ink-100)] text-sm text-[var(--ink-700)] hover:bg-[var(--ink-050,#f5f5f4)] disabled:opacity-50"
+              className="h-tap px-4 rounded-lg border border-[var(--ink-100)] text-sm text-[var(--ink-700)] hover:bg-[var(--ink-050,#f5f5f4)] disabled:opacity-50"
             >
               Send
             </button>
           </div>
-          <label className="mt-1 flex items-center gap-1 text-[11px] text-[var(--ink-500)]">
+          <label className="mt-1 flex items-center gap-1 text-meta text-[var(--ink-500)]">
             <input type="checkbox" checked={muted} onChange={(e) => setMuted(e.target.checked)} />
             Mute spoken replies
           </label>
@@ -250,7 +250,7 @@ export function VoiceDraftClient({ departments }: { departments: Department[] })
 
       {/* Brief-so-far */}
       {brief && (
-        <div className="bg-[var(--ink-050,#f5f5f4)] border border-[var(--ink-100)] rounded-xl p-4" data-testid="voice-draft-brief">
+        <div className="bg-[var(--ink-050,#f5f5f4)] border border-[var(--ink-100)] rounded-lg p-4" data-testid="voice-draft-brief">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--ink-500)]">
               Brief so far

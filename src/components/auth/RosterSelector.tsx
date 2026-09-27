@@ -119,7 +119,7 @@ export default function RosterSelector({ orgCode }: RosterSelectorProps) {
 
   if (error) {
     return (
-      <div className="rounded-xl border border-[var(--accent-escalate)]/30 bg-[var(--accent-escalate)]/8 p-6 text-center">
+      <div className="rounded-lg border border-[var(--accent-escalate)]/30 bg-[var(--accent-escalate)]/8 p-6 text-center">
         <AlertCircle size={24} className="text-[var(--accent-escalate)] mx-auto mb-3" />
         <p className="text-sm text-[var(--accent-escalate)] font-medium mb-1">Roster unavailable</p>
         <p className="text-xs text-[var(--ink-500)]">{error}</p>
@@ -129,7 +129,7 @@ export default function RosterSelector({ orgCode }: RosterSelectorProps) {
 
   if (members.length === 0) {
     return (
-      <div className="rounded-xl border border-[var(--ink-100)] bg-[var(--paper-2)] p-6 text-center">
+      <div className="rounded-lg border border-[var(--ink-100)] bg-[var(--paper-2)] p-6 text-center">
         <User size={24} className="text-[var(--ink-400)] mx-auto mb-3" />
         <p className="text-sm text-[var(--ink-500)]">No workers found for this organisation.</p>
         <p className="text-xs text-[var(--ink-400)] mt-1">Ask your admin to add team members.</p>
@@ -141,7 +141,7 @@ export default function RosterSelector({ orgCode }: RosterSelectorProps) {
   if (selectedId && selectedName) {
     return (
       <div className="space-y-4">
-        <div className="rounded-xl border border-[var(--accent-signoff)]/40 bg-[var(--accent-signoff)]/8 p-5 flex items-center gap-4">
+        <div className="rounded-lg border border-[var(--accent-signoff)]/40 bg-[var(--accent-signoff)]/8 p-5 flex items-center gap-4">
           <CheckCircle size={28} className="text-[var(--accent-signoff)] flex-shrink-0" />
           <div>
             <p className="text-sm text-[var(--ink-500)] mb-0.5">Selected worker</p>
@@ -152,7 +152,7 @@ export default function RosterSelector({ orgCode }: RosterSelectorProps) {
         <button
           type="button"
           onClick={handleContinue}
-          className="w-full h-[64px] rounded-xl bg-[var(--ink-900)] text-white font-bold text-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
+          className="w-full h-tap-glove rounded-lg bg-[var(--ink-900)] text-white font-bold text-lg flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
         >
           Continue as {selectedName.split(' ')[0]}
         </button>
@@ -160,7 +160,7 @@ export default function RosterSelector({ orgCode }: RosterSelectorProps) {
         <button
           type="button"
           onClick={handleClear}
-          className="w-full h-[48px] rounded-xl border border-[var(--ink-200)] text-[var(--ink-500)] text-sm font-medium hover:bg-[var(--paper-2)] transition-colors"
+          className="w-full h-12 rounded-lg border border-[var(--ink-200)] text-[var(--ink-500)] text-sm font-medium hover:bg-[var(--paper-2)] transition-colors"
         >
           Not you? Select a different name
         </button>
@@ -176,7 +176,7 @@ export default function RosterSelector({ orgCode }: RosterSelectorProps) {
           key={member.user_id}
           type="button"
           onClick={() => handleSelect(member)}
-          className="w-full h-[64px] rounded-xl border border-[var(--ink-100)] bg-[var(--paper)] hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] active:scale-[0.98] transition-all flex items-center gap-4 px-5 text-left"
+          className="w-full h-tap-glove rounded-lg border border-[var(--ink-100)] bg-[var(--paper)] hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] active:scale-[0.98] transition-all flex items-center gap-4 px-5 text-left"
         >
           <div className="w-9 h-9 rounded-full bg-[var(--paper-2)] border border-[var(--ink-100)] flex items-center justify-center flex-shrink-0">
             <span className="text-sm font-bold text-[var(--ink-700)]">

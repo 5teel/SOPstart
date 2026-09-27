@@ -219,7 +219,7 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
               {overwriteToast}
             </span>
           )}
-          <span className="rounded border border-[var(--ink-300)] px-2 py-0.5 font-mono text-[11px] uppercase tracking-wider text-[var(--ink-500)]">
+          <span className="rounded border border-[var(--ink-300)] px-2 py-0.5 font-mono text-meta uppercase tracking-wider text-[var(--ink-500)]">
             {savePillLabel}
           </span>
           {/* 32-uat: tools cluster — matches the shell top bar's bordered
@@ -230,7 +230,7 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
           >
             <span
               aria-hidden="true"
-              className="font-mono text-[9px] uppercase tracking-widest text-[var(--ink-500)]"
+              className="font-mono text-micro uppercase tracking-widest text-[var(--ink-500)]"
             >
               Tools
             </span>
@@ -239,7 +239,7 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
               type="button"
               onClick={() => setAgentview((v) => !v)}
               aria-pressed={agentview}
-              className="rounded border border-[var(--ink-300)] px-2 py-0.5 font-mono text-[11px] uppercase tracking-wider text-[var(--ink-500)] data-[on=true]:border-[var(--ai)] data-[on=true]:text-[var(--ai)]"
+              className="rounded border border-[var(--ink-300)] px-2 py-0.5 font-mono text-meta uppercase tracking-wider text-[var(--ink-500)] data-[on=true]:border-[var(--ai)] data-[on=true]:text-[var(--ai)]"
               data-on={agentview}
               data-testid="agentview-toggle"
             >

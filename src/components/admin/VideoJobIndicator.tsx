@@ -104,11 +104,11 @@ export function VideoJobIndicator({ sopId }: { sopId: string }) {
     return (
       <Link
         href={`/admin/sops/${sopId}/video`}
-        className="flex flex-col items-center justify-center w-[72px] min-h-[72px] rounded-lg bg-accent-step/15 border border-accent-step/30 text-accent-step hover:bg-accent-step/25 transition-colors flex-shrink-0"
+        className="flex flex-col items-center justify-center w-tap-row min-h-tap-row rounded-lg bg-accent-step/15 border border-accent-step/30 text-accent-step hover:bg-accent-step/25 transition-colors flex-shrink-0"
         title="Video generation in progress — tap to view"
       >
         <Loader2 size={20} className="animate-spin" />
-        <span className="text-[10px] font-semibold mt-1">{state.label}</span>
+        <span className="text-micro font-semibold mt-1">{state.label}</span>
       </Link>
     )
   }
@@ -117,11 +117,11 @@ export function VideoJobIndicator({ sopId }: { sopId: string }) {
     return (
       <Link
         href={`/admin/sops/${sopId}/video`}
-        className="flex flex-col items-center justify-center w-[72px] min-h-[72px] rounded-lg bg-accent-escalate/15 border border-accent-escalate/30 text-accent-escalate hover:bg-accent-escalate/25 transition-colors flex-shrink-0"
+        className="flex flex-col items-center justify-center w-tap-row min-h-tap-row rounded-lg bg-accent-escalate/15 border border-accent-escalate/30 text-accent-escalate hover:bg-accent-escalate/25 transition-colors flex-shrink-0"
         title="Video generation failed — tap to manage"
       >
         <AlertTriangle size={20} />
-        <span className="text-[10px] font-semibold mt-1">Failed</span>
+        <span className="text-micro font-semibold mt-1">Failed</span>
       </Link>
     )
   }
@@ -130,11 +130,11 @@ export function VideoJobIndicator({ sopId }: { sopId: string }) {
     return (
       <Link
         href={`/admin/sops/${sopId}/video`}
-        className="flex flex-col items-center justify-center w-[72px] min-h-[72px] rounded-lg bg-[var(--paper-2)]/50 border border-[var(--ink-300)] text-[var(--ink-500)] hover:bg-[var(--paper-2)] transition-colors flex-shrink-0"
+        className="flex flex-col items-center justify-center w-tap-row min-h-tap-row rounded-lg bg-[var(--paper-2)]/50 border border-[var(--ink-300)] text-[var(--ink-500)] hover:bg-[var(--paper-2)] transition-colors flex-shrink-0"
         title="Video ready but not published — tap to manage"
       >
         <Video size={20} />
-        <span className="text-[10px] font-semibold mt-1">Draft</span>
+        <span className="text-micro font-semibold mt-1">Draft</span>
       </Link>
     )
   }
@@ -144,11 +144,11 @@ export function VideoJobIndicator({ sopId }: { sopId: string }) {
   return (
     <Link
       href={`/admin/sops/${sopId}/video?play=${playJobId}`}
-      className="flex flex-col items-center justify-center w-[72px] min-h-[72px] rounded-lg bg-accent-signoff/15 border border-accent-signoff/30 text-accent-signoff hover:bg-accent-signoff/25 transition-colors flex-shrink-0"
+      className="flex flex-col items-center justify-center w-tap-row min-h-tap-row rounded-lg bg-accent-signoff/15 border border-accent-signoff/30 text-accent-signoff hover:bg-accent-signoff/25 transition-colors flex-shrink-0"
       title="Video ready — tap to play"
     >
       <Play size={24} fill="currentColor" />
-      <span className="text-[10px] font-semibold mt-1">Play</span>
+      <span className="text-micro font-semibold mt-1">Play</span>
     </Link>
   )
 }

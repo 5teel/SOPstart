@@ -67,20 +67,20 @@ export default async function SopQrPage({ params }: { params: Promise<{ sopId: s
       </div>
 
       {/* The sticker */}
-      <div className="mx-auto w-[340px] border-2 border-[var(--ink-900)] rounded-xl bg-white p-5 text-center">
+      <div className="mx-auto w-85 border-2 border-[var(--ink-900)] rounded-lg bg-white p-5 text-center">
         <div
-          className="mx-auto w-[260px] h-[260px] [&>svg]:w-full [&>svg]:h-full"
+          className="mx-auto w-65 h-65 [&>svg]:w-full [&>svg]:h-full"
           // qrcode's SVG output is generated server-side from our own data — safe to inline.
           dangerouslySetInnerHTML={{ __html: qrSvg }}
         />
-        <p className="mono text-[11px] uppercase tracking-wider text-[var(--ink-500)] mt-3">
+        <p className="mono text-meta uppercase tracking-wider text-[var(--ink-500)] mt-3">
           Scan for procedure
         </p>
         <p className="text-base font-semibold text-[var(--ink-900)] mt-1 leading-snug">
           {sop.title ?? 'Standard Operating Procedure'}
         </p>
         {sop.sop_number && (
-          <p className="mono text-[11px] text-[var(--ink-500)] mt-1">{sop.sop_number}</p>
+          <p className="mono text-meta text-[var(--ink-500)] mt-1">{sop.sop_number}</p>
         )}
       </div>
 

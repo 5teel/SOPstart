@@ -369,7 +369,7 @@ export default function SopVersionHistoryPage() {
           type="button"
           onClick={() => { setShowUploadConfirm(true); setShowCloneConfirm(false) }}
           disabled={uploading || cloning}
-          className="flex items-center gap-2 h-[56px] px-5 bg-[var(--paper-2)] border border-[var(--ink-200)] text-[var(--ink-900)] font-semibold rounded-xl hover:bg-white hover:border-[var(--ink-400)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+          className="flex items-center gap-2 h-14 px-5 bg-[var(--paper-2)] border border-[var(--ink-200)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-white hover:border-[var(--ink-400)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
         >
           <UploadIcon className="h-4 w-4" />
           {uploading
@@ -384,7 +384,7 @@ export default function SopVersionHistoryPage() {
           type="button"
           onClick={() => { setShowCloneConfirm(true); setShowUploadConfirm(false) }}
           disabled={uploading || cloning || !currentSop}
-          className="flex items-center gap-2 h-[56px] px-5 bg-[var(--ink-900)] text-white font-semibold rounded-xl hover:bg-[var(--ink-700)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+          className="flex items-center gap-2 h-14 px-5 bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
         >
           <CopyIcon className="h-4 w-4" />
           {cloning ? 'Creating draft...' : 'Edit into new version'}
@@ -395,7 +395,7 @@ export default function SopVersionHistoryPage() {
             cycle (D28 cadence). Disabled ONLY while a save is in flight —
             never based on competency/refresher-due/version-currency state. */}
         {currentSop && (
-          <div className="flex items-center gap-2 h-[56px] px-4 bg-white border border-[var(--ink-200)] rounded-xl">
+          <div className="flex items-center gap-2 h-14 px-4 bg-white border border-[var(--ink-200)] rounded-lg">
             <label htmlFor="refresher-interval-months" className="text-xs text-[var(--ink-500)] leading-tight">
               Refresher (months)
             </label>
@@ -446,7 +446,7 @@ export default function SopVersionHistoryPage() {
 
       {/* Upload confirmation card (existing pattern) */}
       {showUploadConfirm && (
-        <div className="mb-4 bg-[var(--accent-voice)]/10 border border-[var(--accent-voice)]/30 rounded-xl px-4 py-4">
+        <div className="mb-4 bg-[var(--accent-voice)]/10 border border-[var(--accent-voice)]/30 rounded-lg px-4 py-4">
           <div className="flex items-start gap-3">
             <AlertTriangleIcon className="h-5 w-5 text-[var(--accent-voice)] flex-shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
@@ -481,7 +481,7 @@ export default function SopVersionHistoryPage() {
 
       {/* Clone confirmation card — same pattern as upload confirm */}
       {showCloneConfirm && currentSop && (
-        <div className="mb-4 bg-[var(--accent-signoff)]/10 border border-[var(--accent-signoff)]/30 rounded-xl px-4 py-4">
+        <div className="mb-4 bg-[var(--accent-signoff)]/10 border border-[var(--accent-signoff)]/30 rounded-lg px-4 py-4">
           <div className="flex items-start gap-3">
             <CopyIcon className="h-5 w-5 text-[var(--accent-signoff)] flex-shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
@@ -549,7 +549,7 @@ export default function SopVersionHistoryPage() {
             return (
               <div key={ver.id} className="border-t border-[var(--ink-100)]">
                 <div
-                  className="grid grid-cols-[80px_1fr_1fr_200px] gap-4 px-4 items-center min-h-[56px] text-sm text-[var(--ink-900)]"
+                  className="grid grid-cols-[80px_1fr_1fr_200px] gap-4 px-4 items-center min-h-14 text-sm text-[var(--ink-900)]"
                 >
                   {/* Version number */}
                   <span className="text-sm font-mono font-semibold">v{ver.version}</span>
@@ -610,7 +610,7 @@ export default function SopVersionHistoryPage() {
 
                 {/* Inline restore confirmation — D-06, mirrors showUploadConfirm pattern */}
                 {showRestoreConfirm && !isCurrent && (
-                  <div className="mx-4 mb-3 bg-[var(--paper-2)] border border-[var(--ink-100)] rounded-xl px-4 py-3">
+                  <div className="mx-4 mb-3 bg-[var(--paper-2)] border border-[var(--ink-100)] rounded-lg px-4 py-3">
                     <p className="text-sm text-[var(--ink-900)] leading-relaxed mb-2">
                       This copies v{ver.version} content into a <strong>new draft</strong>.
                       The old version is not reactivated — history stays append-only.

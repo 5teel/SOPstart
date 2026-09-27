@@ -64,7 +64,7 @@ export function VerdictButtons({
             <span>
               {icon} {labels[verdict]}
             </span>
-            <small className="text-[10px] font-normal normal-case tracking-normal text-[var(--ink-500)]">
+            <small className="text-micro font-normal normal-case tracking-normal text-[var(--ink-500)]">
               {subtitle}
             </small>
           </button>

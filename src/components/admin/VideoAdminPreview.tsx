@@ -100,7 +100,7 @@ export default function VideoAdminPreview({
               <button
                 onClick={handleConfirm}
                 disabled={pending}
-                className="flex-1 h-[44px] bg-[var(--accent-voice)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-accent-voice transition-colors disabled:opacity-50"
+                className="flex-1 h-tap bg-[var(--accent-voice)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-accent-voice transition-colors disabled:opacity-50"
               >
                 {pending ? 'Generating...' : 'Yes, generate new version'}
               </button>
@@ -109,7 +109,7 @@ export default function VideoAdminPreview({
               <button
                 onClick={handleConfirm}
                 disabled={pending}
-                className="flex-1 h-[44px] bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] transition-colors disabled:opacity-50"
+                className="flex-1 h-tap bg-[var(--ink-900)] text-white font-semibold rounded-lg hover:bg-[var(--ink-700)] transition-colors disabled:opacity-50"
               >
                 {pending ? 'Publishing...' : 'Yes, publish'}
               </button>
@@ -118,7 +118,7 @@ export default function VideoAdminPreview({
               <button
                 onClick={handleConfirm}
                 disabled={pending}
-                className="flex-1 h-[44px] bg-[var(--ink-300)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--ink-500)] transition-colors disabled:opacity-50"
+                className="flex-1 h-tap bg-[var(--ink-300)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--ink-500)] transition-colors disabled:opacity-50"
               >
                 {pending ? 'Unpublishing...' : 'Yes, unpublish'}
               </button>
@@ -127,7 +127,7 @@ export default function VideoAdminPreview({
               <button
                 onClick={handleConfirm}
                 disabled={pending}
-                className="flex-1 h-[44px] bg-accent-escalate text-[var(--ink-900)] font-semibold rounded-lg hover:bg-accent-escalate transition-colors disabled:opacity-50"
+                className="flex-1 h-tap bg-accent-escalate text-[var(--ink-900)] font-semibold rounded-lg hover:bg-accent-escalate transition-colors disabled:opacity-50"
               >
                 {pending ? 'Deleting...' : 'Yes, delete'}
               </button>
@@ -135,7 +135,7 @@ export default function VideoAdminPreview({
             <button
               onClick={handleCancel}
               disabled={pending}
-              className="flex-1 h-[44px] bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--paper-2)] transition-colors disabled:opacity-50"
+              className="flex-1 h-tap bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-[var(--paper-2)] transition-colors disabled:opacity-50"
             >
               {confirmAction === 'regenerate' ? 'Not now' :
                confirmAction === 'publish' ? 'Not yet' :
@@ -151,21 +151,21 @@ export default function VideoAdminPreview({
         <div className="flex gap-3 mt-4">
           <button
             onClick={() => openConfirm('regenerate')}
-            className="flex-1 h-[72px] bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold text-lg rounded-lg hover:bg-[var(--paper-2)] transition-colors"
+            className="flex-1 h-tap-row bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold text-lg rounded-lg hover:bg-[var(--paper-2)] transition-colors"
           >
             Generate new version
           </button>
           {isPublished ? (
             <button
               onClick={() => openConfirm('unpublish')}
-              className="flex-[2] h-[72px] bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold text-lg rounded-lg hover:bg-[var(--paper-2)] transition-colors"
+              className="flex-[2] h-tap-row bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold text-lg rounded-lg hover:bg-[var(--paper-2)] transition-colors"
             >
               Unpublish
             </button>
           ) : (
             <button
               onClick={() => openConfirm('publish')}
-              className="flex-[2] h-[72px] bg-[var(--ink-900)] text-white font-semibold text-lg rounded-lg hover:bg-[var(--ink-700)] transition-colors"
+              className="flex-[2] h-tap-row bg-[var(--ink-900)] text-white font-semibold text-lg rounded-lg hover:bg-[var(--ink-700)] transition-colors"
             >
               Publish video
             </button>
