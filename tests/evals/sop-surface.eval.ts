@@ -176,7 +176,8 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
       await page.goto('/sops')
       await nav.getByRole('link', { name: 'Governance', exact: true }).click()
       await expect(page).toHaveURL(/\/sops\?.*view=attention/)
-      await expect(backLink(page)).toBeVisible(SLOW)
+      // in-frame lens: the column stays and "Needs attention" is the lit row
+      await expect(scopeColumn(page).locator('[aria-current="true"]')).toHaveText(/Needs attention/, SLOW)
     })
 
     test('E — pathways map reports zero unmapped screens', async ({ page, context }) => {
