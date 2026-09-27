@@ -226,13 +226,17 @@ export function AdminSopSurface({ nav, onNavChange, filter = '', children }: Adm
     return counts.railCounts[ADMIN_STATUS[key as keyof typeof ADMIN_STATUS]]
   }
 
+  // One row lit at a time: "Owned by me" and the department rows narrow
+  // the admin-all scope, so while either is active the "All SOPs" row is
+  // NOT the selection — otherwise the column reads as a multi-select.
+  const narrowed = nav.ownerOnly || !!nav.departments
   const desktopRows = (
     <>
       <MillerGroupLabel>Admin</MillerGroupLabel>
       {visibleAdminScopes.map((sc) => (
         <MillerItem
           key={sc.key}
-          selected={scope === sc.key}
+          selected={scope === sc.key && !(sc.key === 'admin-all' && narrowed)}
           onClick={() => applyScope(sc.key)}
           count={scopeCount(sc.key)}
         >
