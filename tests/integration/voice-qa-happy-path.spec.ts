@@ -108,7 +108,7 @@ test.describe('SB-LINE-03 — Voice Q&A happy path (Wave 2 shell contract)', () 
   test('Verifier flag renders yellow badge (D-18) with amber tokens', () => {
     const src = read(MODAL)
     expect(src).toContain('verifier_flags')
-    expect(src).toMatch(/amber-/) // amber-50 / amber-500 / amber-600 / amber-900
+    expect(src).toMatch(/accent-decision/) // the amber role token (raw amber-* classes are banned by tests/lint/design-tokens.spec.ts)
     expect(src).toContain('data-testid="verifier-flag"')
     // role=alert per ARIA spec for assertive notification
     expect(src).toMatch(/role=["']alert["']/)

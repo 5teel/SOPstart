@@ -25,6 +25,29 @@
   --color-accent-inspect: var(--accent-inspect);
   --color-accent-zone: var(--accent-zone);
   --color-accent-voice: var(--accent-voice);
+  /* 2026-09-28 token sweep — every colour a component may use is a utility
+   * here (`text-accent-step`, `bg-accent-escalate/10`, `border-ink-200`).
+   * Raw Tailwind palette classes (text-red-400 …) are banned by
+   * tests/lint/design-tokens.spec.ts; most were dark-theme leftovers that
+   * read low-contrast on paper. */
+  --color-accent-step: var(--accent-step);
+  --color-accent-ok: var(--accent-ok);
+  --color-accent-hazard: var(--accent-hazard);
+  --color-accent-mcu: var(--accent-mcu);
+  --color-ai: var(--ai);
+  --color-brand-yellow: var(--brand-yellow);
+  --color-ink-600: var(--ink-600);
+  --color-ink-400: var(--ink-400);
+  --color-ink-200: var(--ink-200);
+  --color-paper-1: var(--paper-1);
+  /* Dark chrome — the annotation toolbar and diagram modal sit on steel.
+   * `bg-steel-900` / `bg-brand-yellow` were used by three builder-v2 visual
+   * components but defined NOWHERE (no tailwind config, no @theme), so those
+   * utilities emitted no CSS at all — same class as the undefined
+   * --accent-ok bug (CLAUDE.md 2026-07-14). */
+  --color-steel-900: var(--steel-900);
+  --color-steel-800: var(--steel-800);
+  --color-steel-700: var(--steel-700);
 }
 
 :root {
@@ -69,6 +92,36 @@
 
   /* Phase 26.5 — the human-invisible AGENT metadata layer (D-09) */
   --ai: #8b5cf6; /* violet — agentview toggle, agent panel, per-block ameta rows */
+  --accent-ai: var(--ai); /* alias — BlockEditShell referenced this spelling with a fallback */
+  --ink-050: var(--ink-50); /* alias — VoiceDraftClient referenced this spelling with a fallback */
+
+  /* Brand + dark chrome. Referenced (with fallbacks) by the builder stage
+   * shell and the annotation tools since Phase 12 but never defined here. */
+  --brand-yellow: #fbbf24;
+  --steel-900: #0a0a0b;
+  --steel-800: #141416;
+  --steel-700: #1f1f22;
+
+  /* Tints — the pastel fill + hairline pair a pill or callout uses for each
+   * accent. Derived from the accent, so a palette change flows through.
+   * These replace ~90 hard-coded Tailwind-50/-300 hex values that four
+   * builder components each carried their own copy of. */
+  --tint-escalate-bg:     color-mix(in srgb, var(--accent-escalate) 8%, white);
+  --tint-escalate-border: color-mix(in srgb, var(--accent-escalate) 45%, white);
+  --tint-step-bg:         color-mix(in srgb, var(--accent-step) 8%, white);
+  --tint-step-border:     color-mix(in srgb, var(--accent-step) 45%, white);
+  --tint-signoff-bg:      color-mix(in srgb, var(--accent-signoff) 8%, white);
+  --tint-signoff-border:  color-mix(in srgb, var(--accent-signoff) 45%, white);
+  --tint-decision-bg:     color-mix(in srgb, var(--accent-decision) 8%, white);
+  --tint-decision-border: color-mix(in srgb, var(--accent-decision) 45%, white);
+  --tint-voice-bg:        color-mix(in srgb, var(--accent-voice) 8%, white);
+  --tint-voice-border:    color-mix(in srgb, var(--accent-voice) 45%, white);
+  --tint-zone-bg:         color-mix(in srgb, var(--accent-zone) 8%, white);
+  --tint-zone-border:     color-mix(in srgb, var(--accent-zone) 45%, white);
+  --tint-measure-bg:      color-mix(in srgb, var(--accent-measure) 8%, white);
+  --tint-measure-border:  color-mix(in srgb, var(--accent-measure) 45%, white);
+  --tint-ai-bg:           color-mix(in srgb, var(--ai) 8%, white);
+  --tint-ai-border:       color-mix(in srgb, var(--ai) 45%, white);
 }
 
 /* ---------- SCOPED ONLY UNDER body[data-theme="paper"] ---------- */

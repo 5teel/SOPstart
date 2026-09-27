@@ -7,7 +7,7 @@
  * Layout: [check-state | type label | preview text | flag badge | actions]
  *   - Verified: green check + faded text
  *   - Unverified: empty circle + normal text
- *   - Active: 2px yellow ring (`ring-2 ring-yellow-400`) matches Spike 004
+ *   - Active: 2px yellow ring (`ring-2 ring-brand-yellow`) matches Spike 004
  *     focus-ring affordance — admin's eye lands here.
  *   - Flag badge: red number when `flags_count > 0 && !verified`; faded
  *     when `verified` (so the eye-flow stops at unaddressed-flag rows).
@@ -49,7 +49,7 @@ export function BlockChecklistRow({
       className={[
         'flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer rounded',
         'border border-transparent',
-        active ? 'ring-2 ring-yellow-400' : '',
+        active ? 'ring-2 ring-brand-yellow' : '',
         verified ? 'text-[var(--ink-500)]' : 'text-[var(--ink-700)]',
         'hover:bg-[var(--ink-100)]',
       ].join(' ')}
@@ -59,7 +59,7 @@ export function BlockChecklistRow({
         className={[
           'inline-flex items-center justify-center w-4 h-4 rounded-full border',
           verified
-            ? 'border-green-500 bg-green-500 text-white'
+            ? 'border-accent-signoff bg-accent-signoff text-white'
             : 'border-[var(--ink-400)] bg-transparent',
         ].join(' ')}
       >
@@ -82,7 +82,7 @@ export function BlockChecklistRow({
             'inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1 rounded-full text-[10px] font-bold',
             verified
               ? 'bg-[var(--ink-200)] text-[var(--ink-500)]'
-              : 'bg-red-500 text-white',
+              : 'bg-accent-escalate text-white',
           ].join(' ')}
           title={`${block.flags_count} AI reviewer flag(s)`}
         >
@@ -100,7 +100,7 @@ export function BlockChecklistRow({
             e.stopPropagation()
             onApprove()
           }}
-          className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono rounded border border-green-500/50 bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-40 whitespace-nowrap"
+          className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono rounded border border-accent-signoff/50 bg-accent-signoff/10 text-accent-signoff hover:bg-accent-signoff/10 disabled:opacity-40 whitespace-nowrap"
         >
           Verify step
           <kbd className="text-[9px] opacity-50 font-mono border border-[var(--ink-300)] rounded px-0.5 leading-none">A</kbd>
@@ -113,7 +113,7 @@ export function BlockChecklistRow({
             e.stopPropagation()
             onDecline()
           }}
-          className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono rounded border border-[#f97316]/50 text-[#c2410c] hover:bg-orange-50 whitespace-nowrap"
+          className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono rounded border border-[var(--accent-voice)]/50 text-[var(--accent-voice)] hover:bg-accent-voice/10 whitespace-nowrap"
         >
           Send back to edit
           <kbd className="text-[9px] opacity-50 font-mono border border-[var(--ink-300)] rounded px-0.5 leading-none">D</kbd>

@@ -42,10 +42,10 @@ const ICON_MAP: Record<string, React.ElementType> = {
 // Tailwind color classes keyed by section_kinds.color_family. Static strings
 // so Tailwind's JIT picks them up at build time.
 const COLOR_CLASSES: Record<string, { active: string; border: string }> = {
-  'red-400':      { active: 'text-red-400',              border: 'border-red-400' },
-  'blue-400':     { active: 'text-blue-400',             border: 'border-blue-400' },
+  'red-400':      { active: 'text-accent-escalate',              border: 'border-accent-escalate' },
+  'blue-400':     { active: 'text-accent-step',             border: 'border-accent-step' },
   'brand-yellow': { active: 'text-[var(--ink-900)]',     border: 'border-[var(--ink-900)]' },
-  'green-400':    { active: 'text-green-400',            border: 'border-green-400' },
+  'green-400':    { active: 'text-accent-signoff',            border: 'border-accent-signoff' },
   'steel-100':    { active: 'text-[var(--ink-900)]',     border: 'border-[var(--ink-900)]' },
 }
 

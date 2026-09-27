@@ -190,11 +190,11 @@ export function BlockListTable({ blocks, departments }: Props) {
                 <td className="px-4 py-3 text-[var(--ink-500)]">{formatDate(b.updated_at)}</td>
                 <td className="px-4 py-3">
                   {isArchived ? (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-red-950/40 border border-red-700/40 text-red-300">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-accent-escalate/10 border border-accent-escalate/40 text-accent-escalate">
                       Archived
                     </span>
                   ) : (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-green-950/40 border border-green-700/40 text-green-300">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-accent-signoff/10 border border-accent-signoff/40 text-accent-signoff">
                       Active
                     </span>
                   )}
@@ -221,7 +221,7 @@ export function BlockListTable({ blocks, departments }: Props) {
                         type="button"
                         onClick={() => handleArchive(b.id)}
                         disabled={isPending}
-                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs text-[var(--ink-500)] hover:text-red-300 hover:bg-red-950/30 transition-colors disabled:opacity-50"
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs text-[var(--ink-500)] hover:text-accent-escalate hover:bg-accent-escalate/10 transition-colors disabled:opacity-50"
                         aria-label={`Archive ${b.name}`}
                       >
                         <Archive className="h-3.5 w-3.5" />

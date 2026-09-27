@@ -14,7 +14,7 @@
  *   - Scalar fields: plain old → new display
  *
  * Design tokens (paper/ink palette from sketch-findings):
- *   - Accept button: green accent (text-green-400, bg-green-950/40, border-green-700/40)
+ *   - Accept button: green accent (text-accent-signoff, bg-accent-signoff/10, border-accent-signoff/40)
  *   - Reject button: ink-neutral (text-[var(--ink-500)])
  *   - Old value: struck-through, text-[var(--ink-500)] (neutral/dim)
  *   - New value: highlighted, text-[var(--ink-900)] (prominent)
@@ -136,7 +136,7 @@ export function InlineProposalDiff({ proposal, onResolved }: InlineProposalDiffP
     return (
       <div
         data-inline-proposal-diff
-        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-green-950/30 border border-green-700/40 text-green-400 text-sm"
+        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent-signoff/10 border border-accent-signoff/40 text-accent-signoff text-sm"
       >
         <CheckCircle className="h-4 w-4 shrink-0" />
         <span>Change applied.</span>
@@ -208,7 +208,7 @@ export function InlineProposalDiff({ proposal, onResolved }: InlineProposalDiffP
                     </div>
                     <div className={`rounded-md px-3 py-2 text-sm font-mono border ${
                       changed
-                        ? 'border-green-700/40 bg-green-950/20 text-[var(--ink-900)]'
+                        ? 'border-accent-signoff/40 bg-accent-signoff/10 text-[var(--ink-900)]'
                         : 'border-[var(--ink-100)] bg-[var(--paper-2)] text-[var(--ink-500)]'
                     }`}>
                       {field.newValue || <span className="italic opacity-50">(empty)</span>}
@@ -233,7 +233,7 @@ export function InlineProposalDiff({ proposal, onResolved }: InlineProposalDiffP
               <div className="text-[10px] uppercase tracking-wider text-[var(--ink-500)] mb-1">
                 Proposed
               </div>
-              <div className="rounded-md px-3 py-2 text-sm font-mono border border-green-700/40 bg-green-950/20 text-[var(--ink-900)]">
+              <div className="rounded-md px-3 py-2 text-sm font-mono border border-accent-signoff/40 bg-accent-signoff/10 text-[var(--ink-900)]">
                 {toDisplayString(proposal.proposed_value)}
               </div>
             </div>
@@ -244,7 +244,7 @@ export function InlineProposalDiff({ proposal, onResolved }: InlineProposalDiffP
       {/* Error */}
       {error && (
         <div className="px-4 pb-3">
-          <p className="text-xs text-red-400">{error}</p>
+          <p className="text-xs text-accent-escalate">{error}</p>
         </div>
       )}
 
@@ -266,7 +266,7 @@ export function InlineProposalDiff({ proposal, onResolved }: InlineProposalDiffP
           type="button"
           onClick={handleAccept}
           disabled={isPending}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-green-400 bg-green-950/40 hover:bg-green-950/60 border border-green-700/40 transition-colors disabled:opacity-40"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-accent-signoff bg-accent-signoff/10 hover:bg-accent-signoff/10 border border-accent-signoff/40 transition-colors disabled:opacity-40"
         >
           <CheckCircle className="h-3.5 w-3.5" />
           Accept

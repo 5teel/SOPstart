@@ -77,7 +77,7 @@ export function OwnerPicker({
             Current: {ownerLabel}
           </p>
           {loading && <p className="text-xs text-[var(--ink-500)]">Loading members…</p>}
-          {error && <p className="text-xs text-red-600 mb-2">{error}</p>}
+          {error && <p className="text-xs text-accent-escalate mb-2">{error}</p>}
           <ul className="max-h-56 overflow-y-auto space-y-0.5">
             <li>
               <button

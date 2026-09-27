@@ -21,7 +21,7 @@ export function ImageQualityOverlay({ state, message }: ImageQualityOverlayProps
     pass: {
       icon: <CheckCircle className="w-4 h-4" />,
       text: 'Looking good',
-      color: 'text-green-400',
+      color: 'text-accent-signoff',
     },
     warn: {
       icon: <AlertTriangle className="w-4 h-4" />,

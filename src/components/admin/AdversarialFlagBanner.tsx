@@ -68,7 +68,7 @@ export default function AdversarialFlagBanner({ flags, onUnresolvedCountChange }
               <span className="font-semibold">
                 {flag.section_title}{flag.step_number ? ` (step ${flag.step_number})` : ''}
                 {flag.severity === 'critical' && (
-                  <span className="ml-1 text-red-400">[critical]</span>
+                  <span className="ml-1 text-accent-escalate">[critical]</span>
                 )}
               </span>
               {' — '}{flag.description}
@@ -85,7 +85,7 @@ export default function AdversarialFlagBanner({ flags, onUnresolvedCountChange }
               onClick={() => handleResolveFlag(i)}
               className={`text-xs px-2 py-1 rounded ${
                 resolvedFlags.has(i)
-                  ? 'bg-green-500/20 text-green-400'
+                  ? 'bg-accent-signoff/20 text-accent-signoff'
                   : 'bg-[var(--paper-2)] text-[var(--ink-500)] hover:text-[var(--ink-900)]'
               }`}
             >

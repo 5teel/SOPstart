@@ -142,7 +142,7 @@ function ReviewCard({
           ? '1.5px solid var(--accent-step)'
           : '1px solid var(--ink-300)',
         borderRadius: '4px',
-        background: '#fff',
+        background: 'var(--paper-1)',
         overflow: 'hidden',
         marginBottom: '12px',
         // The active card is what zone 3 is showing the source for — make that
@@ -292,7 +292,7 @@ function ReviewCard({
                 border: 'none',
                 borderRadius: '2px',
                 background: 'var(--accent-ok)',
-                color: '#fff',
+                color: 'var(--paper-1)',
                 cursor: 'pointer',
                 fontFamily: 'JetBrains Mono, monospace',
                 fontSize: '12px',
@@ -312,7 +312,7 @@ function ReviewCard({
                 border: '1px solid var(--accent-measure)',
                 borderRadius: '2px',
                 background: 'transparent',
-                color: '#c2410c',
+                color: 'var(--accent-voice)',
                 cursor: 'pointer',
                 fontFamily: 'JetBrains Mono, monospace',
                 fontSize: '12px',
@@ -758,7 +758,7 @@ export function ReviewStation({
                 padding: '4px 8px',
                 border: '1px solid var(--ink-300)',
                 borderRadius: '2px',
-                background: drawerOpen ? '#eff4ff' : '#fff',
+                background: drawerOpen ? 'var(--tint-step-bg)' : 'var(--paper-1)',
                 color: drawerOpen ? 'var(--accent-step)' : 'var(--ink-700)',
                 cursor: 'pointer',
                 fontFamily: 'JetBrains Mono, monospace',
@@ -913,7 +913,7 @@ export function ReviewStation({
                 border: '1px solid var(--ink-300)',
                 borderRadius: '2px',
                 padding: '4px',
-                background: '#fff',
+                background: 'var(--paper-1)',
                 fontSize: '10px',
               }}
             >
@@ -925,7 +925,7 @@ export function ReviewStation({
                 border: '1px solid var(--ink-300)',
                 borderRadius: '2px',
                 padding: '4px',
-                background: '#fff',
+                background: 'var(--paper-1)',
                 fontSize: '10px',
               }}
             >
@@ -937,7 +937,7 @@ export function ReviewStation({
                 border: '1px solid var(--ink-300)',
                 borderRadius: '2px',
                 padding: '4px',
-                background: '#fff',
+                background: 'var(--paper-1)',
                 fontSize: '10px',
               }}
             >
@@ -949,7 +949,7 @@ export function ReviewStation({
                 border: '1px solid var(--ink-300)',
                 borderRadius: '2px',
                 padding: '4px',
-                background: '#fff',
+                background: 'var(--paper-1)',
                 fontSize: '10px',
               }}
             >

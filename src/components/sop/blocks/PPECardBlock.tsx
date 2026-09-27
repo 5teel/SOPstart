@@ -9,10 +9,10 @@ export type PPECardBlockProps = z.infer<typeof PPECardBlockPropsSchema>
 
 export function PPECardBlock({ title, items }: PPECardBlockProps) {
   return (
-    <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-5 mb-4">
+    <div className="bg-accent-step/10 border border-accent-step/30 rounded-xl p-5 mb-4">
       <div className="flex items-center gap-2 mb-3">
-        <ShieldCheck size={18} className="text-blue-400 flex-shrink-0" />
-        <span className="text-sm font-bold uppercase tracking-widest text-blue-400">
+        <ShieldCheck size={18} className="text-accent-step flex-shrink-0" />
+        <span className="text-sm font-bold uppercase tracking-widest text-accent-step">
           {title}
         </span>
       </div>
@@ -20,7 +20,7 @@ export function PPECardBlock({ title, items }: PPECardBlockProps) {
         {items.map((item, i) => (
           <span
             key={i}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/15 text-blue-300 text-sm font-medium rounded-lg border border-blue-500/30 m-1"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent-step/15 text-accent-step text-sm font-medium rounded-lg border border-accent-step/30 m-1"
           >
             {item}
           </span>

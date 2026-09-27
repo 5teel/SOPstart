@@ -27,8 +27,8 @@ export function PhotoThumbnail({ photo, onRemove }: PhotoThumbnailProps) {
     }
   }, [photo.blob])
 
-  const borderColor = photo.uploaded ? 'border-green-500/40' : 'border-[var(--accent-voice)]'
-  const dotColor = photo.uploaded ? 'bg-green-500' : 'bg-[var(--accent-voice)]'
+  const borderColor = photo.uploaded ? 'border-accent-signoff/40' : 'border-[var(--accent-voice)]'
+  const dotColor = photo.uploaded ? 'bg-accent-signoff' : 'bg-[var(--accent-voice)]'
 
   return (
     <div className="relative w-[72px] h-[72px] flex-shrink-0">

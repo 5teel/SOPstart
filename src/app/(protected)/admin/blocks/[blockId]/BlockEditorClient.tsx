@@ -189,12 +189,12 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
         </div>
 
         {error && (
-          <div className="text-sm text-red-400 bg-red-950/30 border border-red-700/40 rounded-md p-3">
+          <div className="text-sm text-accent-escalate bg-accent-escalate/10 border border-accent-escalate/40 rounded-md p-3">
             {error}
           </div>
         )}
         {savedMsg && (
-          <div className="text-sm text-green-400 bg-green-950/30 border border-green-700/40 rounded-md p-3">
+          <div className="text-sm text-accent-signoff bg-accent-signoff/10 border border-accent-signoff/40 rounded-md p-3">
             {savedMsg}
           </div>
         )}
@@ -213,7 +213,7 @@ export function BlockEditorClient({ block, currentVersion, allVersions, categori
             type="button"
             onClick={handleArchive}
             disabled={isPending}
-            className="bg-white border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-red-300 hover:bg-red-950/30 font-semibold px-4 h-[44px] rounded-lg transition-colors text-sm disabled:opacity-50"
+            className="bg-white border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-accent-escalate hover:bg-accent-escalate/10 font-semibold px-4 h-[44px] rounded-lg transition-colors text-sm disabled:opacity-50"
           >
             Archive block
           </button>
@@ -277,7 +277,7 @@ function BlockPreview({ content }: { content: BlockContent | null }) {
     case 'hazard':
       return (
         <div>
-          <div className="text-[10px] uppercase tracking-wider text-red-300 mb-1">{content.severity}</div>
+          <div className="text-[10px] uppercase tracking-wider text-accent-escalate mb-1">{content.severity}</div>
           <div className="text-[var(--ink-900)]">{content.text}</div>
         </div>
       )
@@ -294,10 +294,10 @@ function BlockPreview({ content }: { content: BlockContent | null }) {
         <div>
           <div className="text-[var(--ink-900)]">{content.text}</div>
           {content.warning && (
-            <div className="mt-2 text-xs text-red-300 italic">Warning: {content.warning}</div>
+            <div className="mt-2 text-xs text-accent-escalate italic">Warning: {content.warning}</div>
           )}
           {content.tip && (
-            <div className="mt-1 text-xs text-blue-300 italic">Tip: {content.tip}</div>
+            <div className="mt-1 text-xs text-accent-step italic">Tip: {content.tip}</div>
           )}
         </div>
       )

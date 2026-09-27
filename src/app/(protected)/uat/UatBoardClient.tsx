@@ -105,7 +105,7 @@ export function UatBoardClient({ tests, feedback, currentUserId }: Props) {
                     {k.icon} {k.label}
                   </span>
                   {done && (
-                    <span className="absolute top-2 right-2 inline-flex items-center gap-1 text-[11px] font-semibold text-white bg-green-600 rounded-full px-2 py-0.5">
+                    <span className="absolute top-2 right-2 inline-flex items-center gap-1 text-[11px] font-semibold text-white bg-accent-signoff rounded-full px-2 py-0.5">
                       <Check className="h-3 w-3" /> Done
                     </span>
                   )}

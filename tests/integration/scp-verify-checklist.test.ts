@@ -130,7 +130,7 @@ test.describe('SCP-VERIFY — per-block verify checklist + publish gate (Phase 2
 
     // The focus ring (yellow) per Spike 004 eye-flow.
     const row = read('src/components/admin/verify-checklist/BlockChecklistRow.tsx')
-    expect(row).toContain('ring-2 ring-yellow-400')
+    expect(row).toContain('ring-2 ring-brand-yellow')
 
     // Auto-scroll active row into view.
     const gate = read('src/components/admin/verify-checklist/VerifyChecklistGate.tsx')

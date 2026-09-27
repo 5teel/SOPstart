@@ -15,10 +15,10 @@ export function HazardCardBlock({ title, body, severity }: HazardCardBlockProps)
     .map((l) => l.replace(/^[-•*]\s*/, '').trim())
     .filter(Boolean)
   return (
-    <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-5 mb-4">
+    <div className="bg-accent-escalate/10 border border-accent-escalate/30 rounded-xl p-5 mb-4">
       <div className="flex items-center gap-2 mb-3">
-        <Icon size={18} className="text-red-400 flex-shrink-0" />
-        <span className="text-sm font-bold uppercase tracking-widest text-red-400">
+        <Icon size={18} className="text-accent-escalate flex-shrink-0" />
+        <span className="text-sm font-bold uppercase tracking-widest text-accent-escalate">
           {title}
         </span>
       </div>
@@ -29,7 +29,7 @@ export function HazardCardBlock({ title, body, severity }: HazardCardBlockProps)
               key={i}
               className="flex items-start gap-3 text-base text-[var(--ink-900)] leading-relaxed"
             >
-              <span className="text-red-400 mt-1.5 flex-shrink-0">•</span>
+              <span className="text-accent-escalate mt-1.5 flex-shrink-0">•</span>
               <span>{line}</span>
             </li>
           ))}

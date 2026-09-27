@@ -367,7 +367,7 @@ export const MobileWalkthrough = React.forwardRef<
         className="flex flex-col items-center justify-center min-h-[60vh] px-6 gap-6 text-center"
         data-walkthrough="mobile"
       >
-        <CheckCircle2 size={64} className="text-green-500" />
+        <CheckCircle2 size={64} className="text-accent-signoff" />
         <div>
           <p className="text-2xl font-bold text-[var(--ink-900)] mb-2">Completion submitted</p>
           <p className="text-sm text-[var(--ink-500)]">Your supervisor has been notified.</p>
@@ -481,7 +481,7 @@ export const MobileWalkthrough = React.forwardRef<
                         </p>
                       )}
                     </div>
-                    {done && <CheckCircle2 size={18} className="text-green-500 flex-shrink-0 mt-1" />}
+                    {done && <CheckCircle2 size={18} className="text-accent-signoff flex-shrink-0 mt-1" />}
                   </div>
                   {!done && (
                     <div className="flex gap-2 mt-2">
@@ -533,7 +533,7 @@ export const MobileWalkthrough = React.forwardRef<
               className="w-full min-h-[60px] h-[64px] rounded-xl border border-[var(--ink-200)] bg-[var(--ink-50)] flex flex-col items-center justify-center gap-0.5 text-[var(--ink-700)]"
             >
               <div className="flex items-center gap-2 font-semibold">
-                <CheckCircle2 size={20} className="text-green-500" />
+                <CheckCircle2 size={20} className="text-accent-signoff" />
                 Already submitted — re-reading
               </div>
               <span className="text-xs font-normal opacity-75">Use Prev / Next to browse any step</span>
@@ -558,7 +558,7 @@ export const MobileWalkthrough = React.forwardRef<
             </button>
           ) : currentDone ? (
             <div className="flex items-center justify-center gap-2 h-[64px] text-sm text-[var(--ink-500)]">
-              <CheckCircle2 size={16} className="text-green-500" />
+              <CheckCircle2 size={16} className="text-accent-signoff" />
               Step {currentIdx + 1} done — go to next
             </div>
           ) : (

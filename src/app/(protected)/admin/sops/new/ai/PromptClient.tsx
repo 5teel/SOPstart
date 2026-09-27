@@ -222,12 +222,12 @@ export function PromptClient({ departments }: Props) {
           className="w-full bg-white border border-[var(--ink-100)] rounded-lg p-3 text-[var(--ink-900)] placeholder-[var(--ink-500)] focus:border-[var(--ink-900)] focus:outline-none"
         />
         {errors.promptText && (
-          <p className="mt-1 text-sm text-red-400">{errors.promptText.message}</p>
+          <p className="mt-1 text-sm text-accent-escalate">{errors.promptText.message}</p>
         )}
       </div>
 
       {serverError && (
-        <div className="bg-red-900/30 border border-red-800 rounded-lg p-3 text-sm text-red-200">
+        <div className="bg-accent-escalate/10 border border-accent-escalate rounded-lg p-3 text-sm text-accent-escalate">
           {serverError}
         </div>
       )}

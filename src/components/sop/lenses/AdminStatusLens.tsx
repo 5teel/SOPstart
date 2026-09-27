@@ -83,7 +83,7 @@ export function AdminStatusLens({
   if ('error' in data) {
     return (
       <div className="py-12 text-center lg:col-span-2">
-        <p className="mono mb-2 text-[11px] uppercase tracking-wider text-red-600">ERROR</p>
+        <p className="mono mb-2 text-[11px] uppercase tracking-wider text-accent-escalate">ERROR</p>
         <p className="text-sm text-[var(--ink-500)]">{data.error}</p>
       </div>
     )

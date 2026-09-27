@@ -168,9 +168,9 @@ export default function VideoGenerationStatus({
             <React.Fragment key={stage.key}>
               <span
                 className={`text-xs whitespace-nowrap px-1 ${
-                  status === 'ready' ? 'text-green-400' :
-                  status === 'failed' ? 'text-red-400' :
-                  isCompleted ? 'text-green-400' :
+                  status === 'ready' ? 'text-accent-signoff' :
+                  status === 'failed' ? 'text-accent-escalate' :
+                  isCompleted ? 'text-accent-signoff' :
                   isActive ? 'text-[var(--ink-900)] font-semibold' :
                   isPending ? 'text-[var(--ink-300)]' :
                   'text-[var(--ink-300)]'
@@ -196,7 +196,7 @@ export default function VideoGenerationStatus({
       {/* Status content */}
       {status === 'ready' ? (
         <div className="flex items-center gap-3">
-          <CheckCircle className="text-green-400 flex-shrink-0" size={20} />
+          <CheckCircle className="text-accent-signoff flex-shrink-0" size={20} />
           <p className="text-sm font-semibold text-[var(--ink-900)]">Video ready to preview and publish</p>
         </div>
       ) : status === 'failed' ? (
@@ -206,7 +206,7 @@ export default function VideoGenerationStatus({
         </div>
       ) : (
         <div className="flex items-center gap-3">
-          <Loader2 className="text-blue-400 animate-spin flex-shrink-0" size={20} />
+          <Loader2 className="text-accent-step animate-spin flex-shrink-0" size={20} />
           <p className="text-sm font-semibold text-[var(--ink-900)]">
             {stageCopy[currentStage ?? status] ?? 'Generating video...'}
           </p>

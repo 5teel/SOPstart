@@ -69,8 +69,8 @@ export function rowMeta(sop: WorkerSop): string {
 }
 
 const TONE: Record<'bad' | 'warn' | 'info', string> = {
-  bad: 'bg-red-500/[0.14] text-[var(--accent-hazard)]',
-  warn: 'bg-amber-600/[0.16] text-amber-700',
+  bad: 'bg-accent-escalate/14 text-[var(--accent-hazard)]',
+  warn: 'bg-accent-decision/16 text-accent-decision',
   info: 'bg-[var(--paper-2)] text-[var(--ink-500)]',
 }
 
@@ -80,7 +80,7 @@ const TONE_SELECTED = 'bg-white/20 text-white'
 /** The detail pane states the signal in its own colour rather than in a box. */
 const TONE_TEXT: Record<'bad' | 'warn' | 'info', string> = {
   bad: 'text-[var(--accent-hazard)]',
-  warn: 'text-amber-700',
+  warn: 'text-accent-decision',
   info: 'text-[var(--ink-500)]',
 }
 

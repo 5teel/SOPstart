@@ -120,13 +120,13 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
   // Status badge
   let statusBadge: { cls: string; text: string }
   if (isActive) {
-    statusBadge = { cls: 'bg-blue-500/20 text-blue-400 animate-pulse', text: 'Generating' }
+    statusBadge = { cls: 'bg-accent-step/20 text-accent-step animate-pulse', text: 'Generating' }
   } else if (version.status === 'ready' && version.published) {
-    statusBadge = { cls: 'bg-green-500/20 text-green-400', text: 'Published' }
+    statusBadge = { cls: 'bg-accent-signoff/20 text-accent-signoff', text: 'Published' }
   } else if (version.status === 'ready') {
     statusBadge = { cls: 'bg-[var(--paper-2)] text-[var(--ink-500)]', text: 'Ready' }
   } else {
-    statusBadge = { cls: 'bg-red-500/20 text-red-400', text: 'Failed' }
+    statusBadge = { cls: 'bg-accent-escalate/20 text-accent-escalate', text: 'Failed' }
   }
 
   // Created date
@@ -147,7 +147,7 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
   const confirmButtonCls: Record<NonNullable<ConfirmAction>, string> = {
     publish: 'bg-[var(--ink-900)] text-white',
     archive: 'bg-[var(--ink-300)] text-[var(--ink-900)]',
-    delete: 'bg-red-600 text-[var(--ink-900)]',
+    delete: 'bg-accent-escalate text-[var(--ink-900)]',
   }
   const confirmLabel: Record<NonNullable<ConfirmAction>, string> = {
     publish: 'Yes, publish',
@@ -172,7 +172,7 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
         {canPlay ? (
           <button
             onClick={() => setShowPlayer(!showPlayer)}
-            className="flex items-center gap-1 text-xs font-semibold shrink-0 text-green-400 hover:text-green-300 transition-colors"
+            className="flex items-center gap-1 text-xs font-semibold shrink-0 text-accent-signoff hover:text-accent-signoff transition-colors"
             title={showPlayer ? 'Hide preview' : 'Play preview'}
           >
             {showPlayer ? <ChevronUp size={14} /> : <Play size={14} fill="currentColor" />}
@@ -196,7 +196,7 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
 
         {/* Error message for failed versions */}
         {version.status === 'failed' && version.error_message && (
-          <span className="text-xs text-red-400 truncate max-w-[300px] shrink" title={version.error_message}>
+          <span className="text-xs text-accent-escalate truncate max-w-[300px] shrink" title={version.error_message}>
             {version.error_message}
           </span>
         )}
@@ -306,7 +306,7 @@ export default function VideoVersionRow({ version, sopId, isArchived, onMutate, 
               {/* Permanent delete icon */}
               <button
                 onClick={() => handleOpenConfirm('delete')}
-                className="w-8 h-8 flex items-center justify-center text-[var(--ink-500)] hover:text-red-400 transition-colors"
+                className="w-8 h-8 flex items-center justify-center text-[var(--ink-500)] hover:text-accent-escalate transition-colors"
                 title="Permanently delete"
                 disabled={pending}
               >

@@ -139,20 +139,20 @@ function getDisplayLabel(item: PuckItem): string {
 function getPillStyle(pillVariant: string): React.CSSProperties {
   switch (pillVariant) {
     case 'kind-haz':
-      return { background: '#fef2f2', color: 'var(--accent-hazard)', border: '1px solid #fca5a5' }
+      return { background: 'var(--tint-escalate-bg)', color: 'var(--accent-hazard)', border: '1px solid var(--tint-escalate-border)' }
     case 'kind-meas':
-      return { background: '#fff5ed', color: 'var(--accent-measure)', border: '1px solid #fdba74' }
+      return { background: 'var(--tint-voice-bg)', color: 'var(--accent-measure)', border: '1px solid var(--tint-voice-border)' }
     case 'kind-ins':
-      return { background: '#ecfdff', color: 'var(--accent-mcu)', border: '1px solid #67e8f9' }
+      return { background: 'var(--tint-zone-bg)', color: 'var(--accent-mcu)', border: '1px solid var(--tint-zone-border)' }
     case 'kind-dec':
-      return { background: '#fdf2f8', color: 'var(--accent-decision)', border: '1px solid #f9a8d4' }
+      return { background: 'var(--tint-decision-bg)', color: 'var(--accent-decision)', border: '1px solid var(--tint-decision-border)' }
     case 'kind-esc':
-      return { background: '#fef2f2', color: 'var(--accent-hazard)', border: '1px solid #fca5a5' }
+      return { background: 'var(--tint-escalate-bg)', color: 'var(--accent-hazard)', border: '1px solid var(--tint-escalate-border)' }
     case 'kind-sign':
-      return { background: '#fffbeb', color: '#b45309', border: '1px solid #fcd34d' }
+      return { background: 'var(--tint-decision-bg)', color: 'var(--accent-decision)', border: '1px solid var(--tint-decision-border)' }
     case 'kind-step':
     default:
-      return { background: '#eff4ff', color: 'var(--accent-step)', border: '1px solid #93c5fd' }
+      return { background: 'var(--tint-step-bg)', color: 'var(--accent-step)', border: '1px solid var(--tint-step-border)' }
   }
 }
 
@@ -273,7 +273,7 @@ export function BuilderTreeRail({
       {reorderError && (
         <div
           role="alert"
-          className="px-4 py-2 text-xs border-b border-red-500/30 bg-red-500/10"
+          className="px-4 py-2 text-xs border-b border-accent-escalate/30 bg-accent-escalate/10"
           style={{ color: 'var(--accent-hazard)', fontFamily: 'JetBrains Mono, monospace', fontSize: '11px' }}
         >
           {`Couldn't save order — try again`}

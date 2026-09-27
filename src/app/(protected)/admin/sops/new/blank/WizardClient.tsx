@@ -286,7 +286,7 @@ export function WizardClient({ categories, departments }: WizardClientProps) {
       {error && (
         <div
           role="alert"
-          className="mb-4 rounded border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400"
+          className="mb-4 rounded border border-accent-escalate/30 bg-accent-escalate/10 p-3 text-sm text-accent-escalate"
         >
           {error}
         </div>
@@ -412,7 +412,7 @@ export function WizardClient({ categories, departments }: WizardClientProps) {
                           {picks.map((p) => (
                             <span
                               key={p.blockId}
-                              className="inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] rounded bg-amber-500/10 text-amber-300 border border-amber-500/30"
+                              className="inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] rounded bg-accent-decision/10 text-accent-decision border border-accent-decision/30"
                             >
                               <span className="uppercase tracking-wider">
                                 {p.pinMode === 'pinned' ? 'Pinned' : 'Follow'}
@@ -421,7 +421,7 @@ export function WizardClient({ categories, departments }: WizardClientProps) {
                               <button
                                 type="button"
                                 onClick={() => handleRemovePicked(k.slug, p.blockId)}
-                                className="text-[var(--ink-500)] hover:text-red-400 ml-1"
+                                className="text-[var(--ink-500)] hover:text-accent-escalate ml-1"
                                 aria-label={`Remove ${p.preview.name}`}
                               >
                                 ×

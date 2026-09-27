@@ -232,7 +232,7 @@ function RowBody({ sop, hideStatus, selected }: { sop: MillerSop; hideStatus?: s
         )}
       </span>
       {sop.stuck && (
-        <span className={`mono flex-shrink-0 rounded px-1.5 py-0.5 text-[11px] ${selected ? 'bg-white/20 text-white' : 'bg-red-500/20 text-red-600'}`}>
+        <span className={`mono flex-shrink-0 rounded px-1.5 py-0.5 text-[11px] ${selected ? 'bg-white/20 text-white' : 'bg-accent-escalate/20 text-accent-escalate'}`}>
           Stuck
         </span>
       )}
@@ -299,7 +299,7 @@ function CategoryField({ sop }: { sop: MillerSop }) {
           <option key={c.slug} value={c.slug}>{c.label}</option>
         ))}
       </select>
-      {error && <p className="mt-1 text-[11px] text-red-600">{error}</p>}
+      {error && <p className="mt-1 text-[11px] text-accent-escalate">{error}</p>}
     </div>
   )
 }
@@ -324,7 +324,7 @@ function DepartmentField({
     <div className="mb-3 border-b border-dotted border-[var(--ink-200)] pb-2">
       <p className="mb-1 text-[11px] text-[var(--ink-500)]">Department</p>
       {sop.departments.length === 0 && !sop.allDepartments && (
-        <p className="mb-1 rounded border border-amber-200 bg-amber-50 px-2 py-1 text-[12px] text-amber-800">
+        <p className="mb-1 rounded border border-accent-decision/30 bg-accent-decision/10 px-2 py-1 text-[12px] text-accent-decision">
           Not set — nobody can be assigned this.
         </p>
       )}

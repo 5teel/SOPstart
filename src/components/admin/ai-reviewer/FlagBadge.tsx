@@ -64,8 +64,8 @@ export function FlagBadge({ flag, onClick }: FlagBadgeProps): React.JSX.Element 
   const Icon = kindIcon(flag.kind)
   const isCritical = flag.severity === 'critical'
   const colourClasses = isCritical
-    ? 'border-red-500/40 bg-red-500/10 text-red-300'
-    : 'border-amber-500/40 bg-amber-500/10 text-amber-300'
+    ? 'border-accent-escalate/40 bg-accent-escalate/10 text-accent-escalate'
+    : 'border-accent-decision/40 bg-accent-decision/10 text-accent-decision'
   const plainTitle = KIND_LABEL[flag.kind] ?? flag.kind
 
   return (

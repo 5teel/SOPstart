@@ -441,7 +441,7 @@ export default function SopVersionHistoryPage() {
       )}
 
       {breakdownError && (
-        <p className="mb-4 text-sm text-red-400">{breakdownError}</p>
+        <p className="mb-4 text-sm text-accent-escalate">{breakdownError}</p>
       )}
 
       {/* Upload confirmation card (existing pattern) */}
@@ -511,7 +511,7 @@ export default function SopVersionHistoryPage() {
       )}
 
       {error && (
-        <p className="mb-4 text-sm text-red-400">{error}</p>
+        <p className="mb-4 text-sm text-accent-escalate">{error}</p>
       )}
 
       {/* Version history table */}

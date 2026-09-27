@@ -139,14 +139,14 @@ export function BlockUpdateReviewModal({
         {/* Body */}
         <div className="px-5 py-4 space-y-4">
           {!latest && (
-            <div className="text-sm text-amber-300 bg-amber-950/30 border border-amber-700/40 rounded-md p-3">
+            <div className="text-sm text-accent-decision bg-accent-decision/10 border border-accent-decision/40 rounded-md p-3">
               No latest version is available to compare against. The badge will
               clear once you reload.
             </div>
           )}
 
           {diff?.kindChanged && (
-            <div className="flex items-start gap-2 text-sm text-amber-200 bg-amber-950/30 border border-amber-700/40 rounded-md p-3">
+            <div className="flex items-start gap-2 text-sm text-accent-decision bg-accent-decision/10 border border-accent-decision/40 rounded-md p-3">
               <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" />
               <div>
                 <strong>Item kind changed.</strong> Accepting will replace it
@@ -168,7 +168,7 @@ export function BlockUpdateReviewModal({
               {diff.fields.map((f) => {
                 const fieldChanged = f.oldValue !== f.newValue
                 const cellClass = fieldChanged
-                  ? 'bg-amber-900/30 border border-amber-600/50'
+                  ? 'bg-accent-decision/10 border border-accent-decision/50'
                   : 'bg-[var(--paper)] border border-[var(--ink-100)]'
                 return (
                   <div key={f.key} className="contents">
@@ -212,12 +212,12 @@ export function BlockUpdateReviewModal({
           </div>
 
           {error && (
-            <div className="text-sm text-red-400 bg-red-950/30 border border-red-700/40 rounded-md p-3">
+            <div className="text-sm text-accent-escalate bg-accent-escalate/10 border border-accent-escalate/40 rounded-md p-3">
               {error}
             </div>
           )}
           {toast && (
-            <div className="text-sm text-green-400 bg-green-950/30 border border-green-700/40 rounded-md p-3">
+            <div className="text-sm text-accent-signoff bg-accent-signoff/10 border border-accent-signoff/40 rounded-md p-3">
               {toast}
             </div>
           )}

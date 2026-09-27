@@ -174,12 +174,12 @@ export default function VideoGeneratePanel({ sop, versions, archivedVersions, au
         <button
           onClick={handleGenerate}
           disabled={!selectedFormat || generating || hasActiveGeneration(selectedFormat)}
-          className="mt-6 h-[72px] w-full bg-[var(--accent-voice)] text-white font-semibold text-lg rounded-xl hover:bg-orange-500 active:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-6 h-[72px] w-full bg-[var(--accent-voice)] text-white font-semibold text-lg rounded-xl hover:bg-accent-voice active:bg-accent-voice transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {generating ? 'Starting...' : 'Generate new version'}
         </button>
 
-        {error && <p className="text-sm text-red-400 mt-2">{error}</p>}
+        {error && <p className="text-sm text-accent-escalate mt-2">{error}</p>}
 
         {/* Version list */}
         <div className="mt-8 border-t border-[var(--ink-100)] pt-6">

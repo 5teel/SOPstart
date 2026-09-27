@@ -117,13 +117,16 @@ test.describe('SC-6 — Wayfinder builder header', () => {
   test('only declared CSS tokens referenced (no undefined bare var(--x))', () => {
     const shellSrc = read(SHELL)
     const stepperSrc = read(STEPPER)
+    // Every bare var(--x) reference in these two files must be a token
+    // DECLARED in src/styles/blueprint-theme.css — read from the file, not a
+    // hand-kept list (2026-09-28 token sweep: the list went stale the moment
+    // a new token was used).
+    const theme = fs.readFileSync(path.join(ROOT, 'src', 'styles', 'blueprint-theme.css'), 'utf-8')
+    const declared = new Set([...theme.matchAll(/^\s*(--[a-zA-Z0-9-]+)\s*:/gm)].map((m) => m[1]))
+    expect(declared.size).toBeGreaterThan(20)
     for (const src of [shellSrc, stepperSrc]) {
       for (const m of src.matchAll(/var\(\s*(--[a-zA-Z0-9-]+)\s*\)/g)) {
-        // Every bare var(--x) reference in these two files must be one of
-        // the tokens declared in src/styles/blueprint-theme.css.
-        expect(
-          ['--ink-100', '--ink-300', '--ink-500', '--ink-700', '--ink-900', '--paper-2', '--accent-ok'],
-        ).toContain(m[1])
+        expect(declared.has(m[1]), `${m[1]} is not declared in blueprint-theme.css`).toBe(true)
       }
     }
   })

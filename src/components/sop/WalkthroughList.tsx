@@ -79,17 +79,17 @@ export function WalkthroughList({
         {safetyExpanded && (
           <div className="mt-3 flex flex-col gap-4">
             {hazardsSection?.content && (
-              <div className="bg-red-500/10 border border-red-500/40 rounded-xl p-4">
+              <div className="bg-accent-escalate/10 border border-accent-escalate/40 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <AlertTriangle size={16} className="text-red-400" />
-                  <span className="text-xs font-bold uppercase tracking-widest text-red-400">
+                  <AlertTriangle size={16} className="text-accent-escalate" />
+                  <span className="text-xs font-bold uppercase tracking-widest text-accent-escalate">
                     Hazards
                   </span>
                 </div>
                 <ul className="list-none space-y-2">
                   {parseListItems(hazardsSection.content).map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-sm text-[var(--ink-900)]">
-                      <span className="text-red-400">•</span>
+                      <span className="text-accent-escalate">•</span>
                       <span>{item}</span>
                     </li>
                   ))}
@@ -97,10 +97,10 @@ export function WalkthroughList({
               </div>
             )}
             {ppeSection?.content && (
-              <div className="bg-blue-500/10 border border-blue-500/40 rounded-xl p-4">
+              <div className="bg-accent-step/10 border border-accent-step/40 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <ShieldCheck size={16} className="text-blue-400" />
-                  <span className="text-xs font-bold uppercase tracking-widest text-blue-400">
+                  <ShieldCheck size={16} className="text-accent-step" />
+                  <span className="text-xs font-bold uppercase tracking-widest text-accent-step">
                     PPE Required
                   </span>
                 </div>
@@ -108,7 +108,7 @@ export function WalkthroughList({
                   {parseListItems(ppeSection.content).map((item, i) => (
                     <span
                       key={i}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/15 text-blue-300 text-sm font-medium rounded-lg border border-blue-500/30"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent-step/15 text-accent-step text-sm font-medium rounded-lg border border-accent-step/30"
                     >
                       {item}
                     </span>

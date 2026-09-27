@@ -158,17 +158,17 @@ function DiffFieldRow({
   return (
     <div className={[
       'grid grid-cols-2 gap-0 text-xs border-b border-[var(--ink-100)] last:border-b-0',
-      changed ? 'bg-amber-50' : '',
+      changed ? 'bg-accent-decision/10' : '',
     ].join(' ')}>
       <div className="px-3 py-2 border-r border-[var(--ink-100)]">
         <span className="text-[var(--ink-400)] font-mono text-[10px] uppercase tracking-wider block mb-0.5">{fieldKey}</span>
-        <span className={['font-mono text-xs whitespace-pre-wrap break-words', changed ? 'text-red-700' : 'text-[var(--ink-700)]'].join(' ')}>
+        <span className={['font-mono text-xs whitespace-pre-wrap break-words', changed ? 'text-accent-escalate' : 'text-[var(--ink-700)]'].join(' ')}>
           {oldValue || <span className="text-[var(--ink-300)] italic">empty</span>}
         </span>
       </div>
       <div className="px-3 py-2">
         <span className="text-[var(--ink-400)] font-mono text-[10px] uppercase tracking-wider block mb-0.5">{fieldKey}</span>
-        <span className={['font-mono text-xs whitespace-pre-wrap break-words', changed ? 'text-green-700' : 'text-[var(--ink-700)]'].join(' ')}>
+        <span className={['font-mono text-xs whitespace-pre-wrap break-words', changed ? 'text-accent-signoff' : 'text-[var(--ink-700)]'].join(' ')}>
           {newValue || <span className="text-[var(--ink-300)] italic">empty</span>}
         </span>
       </div>
@@ -245,8 +245,8 @@ export default function SopVersionDiffPage() {
           <p className="text-sm text-[var(--ink-500)]">Loading versions...</p>
         </div>
       ) : error ? (
-        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-4">
-          <p className="text-sm text-red-700">{error}</p>
+        <div className="bg-accent-escalate/10 border border-accent-escalate/30 rounded-xl px-4 py-4">
+          <p className="text-sm text-accent-escalate">{error}</p>
         </div>
       ) : sopA && sopB ? (
         <>
@@ -278,7 +278,7 @@ export default function SopVersionDiffPage() {
           {/* Summary */}
           <div className="mb-4 flex items-center gap-2">
             {hasAnyChange ? (
-              <span className="inline-flex items-center px-3 py-1 bg-amber-100 text-amber-800 text-xs font-semibold rounded-full">
+              <span className="inline-flex items-center px-3 py-1 bg-accent-decision/10 text-accent-decision text-xs font-semibold rounded-full">
                 Changes detected
               </span>
             ) : (
@@ -304,14 +304,14 @@ export default function SopVersionDiffPage() {
                   key={idx}
                   className={[
                     'bg-white border rounded-xl overflow-hidden',
-                    hasChanges ? 'border-amber-200' : 'border-[var(--ink-100)]',
+                    hasChanges ? 'border-accent-decision/30' : 'border-[var(--ink-100)]',
                   ].join(' ')}
                 >
                   {/* Section header */}
                   <div className="flex items-center gap-2 px-4 py-3 bg-[var(--paper)]/60 border-b border-[var(--ink-100)]">
                     <span className="text-sm font-semibold text-[var(--ink-900)]">{sd.sectionTitle}</span>
                     {hasChanges && (
-                      <span className="inline-flex items-center px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[10px] font-semibold rounded uppercase tracking-wide">
+                      <span className="inline-flex items-center px-1.5 py-0.5 bg-accent-decision/10 text-accent-decision text-[10px] font-semibold rounded uppercase tracking-wide">
                         Changed
                       </span>
                     )}

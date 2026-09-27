@@ -50,8 +50,8 @@ export function OrientationStrip({
         alignItems: 'center',
         gap: 8,
         padding: '8px 16px',
-        background: '#ffffff',
-        borderBottom: '1px solid #d4d4d8', // --ink-300
+        background: 'var(--paper-1)',
+        borderBottom: '1px solid var(--ink-300)', // --ink-300
         width: '100%',
         boxSizing: 'border-box',
         flexShrink: 0,
@@ -63,8 +63,8 @@ export function OrientationStrip({
           display: 'inline-flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#3b82f6', // --accent-step
-          color: '#ffffff',
+          background: 'var(--accent-step)', // --accent-step
+          color: 'var(--paper-1)',
           fontSize: 10,
           fontWeight: 600,
           lineHeight: 1.3,
@@ -88,7 +88,7 @@ export function OrientationStrip({
           fontSize: 12,
           fontWeight: 400,
           lineHeight: 1.3,
-          color: '#3f3f46', // --ink-700 (UI-SPEC value)
+          color: 'var(--ink-600)', // --ink-700 (UI-SPEC value)
           minWidth: 0,
         }}
       >
@@ -111,7 +111,7 @@ export function OrientationStrip({
             fontSize: 12,
             fontWeight: 400,
             lineHeight: 1.3,
-            color: '#71717a', // --ink-500
+            color: 'var(--ink-500)', // --ink-500
             whiteSpace: 'nowrap',
           }}
         >
@@ -123,7 +123,7 @@ export function OrientationStrip({
           style={{
             width: 120,
             height: 4,
-            background: '#e5e5e5', // --ink-200
+            background: 'var(--ink-100)', // --ink-200
             borderRadius: 3,
             overflow: 'hidden',
             flexShrink: 0,
@@ -138,7 +138,7 @@ export function OrientationStrip({
             style={{
               width: fillPercent,
               height: '100%',
-              background: '#3b82f6', // --accent-step
+              background: 'var(--accent-step)', // --accent-step
               borderRadius: 3,
               transition: 'width 200ms ease',
             }}

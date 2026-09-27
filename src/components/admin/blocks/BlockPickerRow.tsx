@@ -56,7 +56,7 @@ export function BlockPickerRow({
           {block.name}
         </span>
         {isGlobal && (
-          <span className="text-[10px] uppercase tracking-wider text-amber-300 bg-amber-500/10 border border-amber-500/30 px-1.5 py-0.5 rounded">
+          <span className="text-[10px] uppercase tracking-wider text-accent-decision bg-accent-decision/10 border border-accent-decision/30 px-1.5 py-0.5 rounded">
             global
           </span>
         )}

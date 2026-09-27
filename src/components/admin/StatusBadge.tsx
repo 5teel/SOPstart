@@ -8,18 +8,18 @@ interface StatusBadgeProps {
 const variantMap: Record<string, string> = {
   // SOP statuses
   uploading: 'bg-[var(--paper-2)] text-[var(--ink-500)]',
-  parsing: 'bg-blue-500/20 text-blue-400 animate-pulse',
+  parsing: 'bg-accent-step/20 text-accent-step animate-pulse',
   draft: 'bg-[var(--ink-900)]/20 text-[var(--ink-900)]',
-  published: 'bg-green-500/20 text-green-400',
+  published: 'bg-accent-signoff/20 text-accent-signoff',
   // ParseJob statuses
   queued: 'bg-[var(--paper-2)] text-[var(--ink-500)]',
-  processing: 'bg-blue-500/20 text-blue-400 animate-pulse',
-  completed: 'bg-green-500/20 text-green-400',
-  failed: 'bg-red-500/20 text-red-400',
+  processing: 'bg-accent-step/20 text-accent-step animate-pulse',
+  completed: 'bg-accent-signoff/20 text-accent-signoff',
+  failed: 'bg-accent-escalate/20 text-accent-escalate',
   // Completion statuses
   pending_sign_off: 'bg-[var(--ink-900)]/20 text-[var(--ink-900)]',
-  signed_off: 'bg-green-500/20 text-green-400',
-  rejected: 'bg-red-500/20 text-red-400',
+  signed_off: 'bg-accent-signoff/20 text-accent-signoff',
+  rejected: 'bg-accent-escalate/20 text-accent-escalate',
 }
 
 const labelMap: Record<string, string> = {

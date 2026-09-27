@@ -30,9 +30,9 @@ export function GhostRow({ ghost, registerRef, onEnter, onLeave, onClick }: Ghos
       onClick={() => onClick(ghost.afterIndex)}
       onMouseEnter={() => onEnter(ghost.afterIndex)}
       onMouseLeave={() => onLeave(ghost.afterIndex)}
-      className="my-[2px] flex cursor-pointer items-center gap-[9px] rounded-md border border-dashed border-[#8b5cf6] bg-[rgba(139,92,246,0.06)] px-3 py-[9px] text-[11px] text-[#8b5cf6] opacity-30 transition-opacity duration-150 hover:bg-[rgba(139,92,246,0.12)] hover:opacity-100"
+      className="my-[2px] flex cursor-pointer items-center gap-[9px] rounded-md border border-dashed border-[var(--ai)] bg-[rgba(139,92,246,0.06)] px-3 py-[9px] text-[11px] text-[var(--ai)] opacity-30 transition-opacity duration-150 hover:bg-[rgba(139,92,246,0.12)] hover:opacity-100"
     >
-      <span className="rounded-[3px] bg-[#8b5cf6] px-[6px] py-[2px] font-mono text-[9px] uppercase tracking-wider text-white">
+      <span className="rounded-[3px] bg-[var(--ai)] px-[6px] py-[2px] font-mono text-[9px] uppercase tracking-wider text-white">
         Tab
       </span>
       <span>

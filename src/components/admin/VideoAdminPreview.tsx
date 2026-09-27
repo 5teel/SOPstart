@@ -100,7 +100,7 @@ export default function VideoAdminPreview({
               <button
                 onClick={handleConfirm}
                 disabled={pending}
-                className="flex-1 h-[44px] bg-[var(--accent-voice)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-orange-500 transition-colors disabled:opacity-50"
+                className="flex-1 h-[44px] bg-[var(--accent-voice)] text-[var(--ink-900)] font-semibold rounded-lg hover:bg-accent-voice transition-colors disabled:opacity-50"
               >
                 {pending ? 'Generating...' : 'Yes, generate new version'}
               </button>
@@ -127,7 +127,7 @@ export default function VideoAdminPreview({
               <button
                 onClick={handleConfirm}
                 disabled={pending}
-                className="flex-1 h-[44px] bg-red-600 text-[var(--ink-900)] font-semibold rounded-lg hover:bg-red-500 transition-colors disabled:opacity-50"
+                className="flex-1 h-[44px] bg-accent-escalate text-[var(--ink-900)] font-semibold rounded-lg hover:bg-accent-escalate transition-colors disabled:opacity-50"
               >
                 {pending ? 'Deleting...' : 'Yes, delete'}
               </button>

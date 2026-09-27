@@ -26,11 +26,11 @@ interface Props {
 }
 
 const TYPE_META: Record<StepType, { icon: React.ReactNode; ring: string; bg: string; label: string }> = {
-  start: { icon: <Play className="h-3.5 w-3.5" />, ring: '#16a34a', bg: '#16a34a', label: 'Start' },
-  screen: { icon: <Monitor className="h-3.5 w-3.5" />, ring: '#2563eb', bg: '#2563eb', label: 'Screen' },
-  action: { icon: <Zap className="h-3.5 w-3.5" />, ring: '#78756e', bg: '#78756e', label: 'Action' },
-  decision: { icon: <GitBranch className="h-3.5 w-3.5" />, ring: '#b45309', bg: '#b45309', label: 'Decision' },
-  end: { icon: <Flag className="h-3.5 w-3.5" />, ring: '#1c1b19', bg: '#1c1b19', label: 'End' },
+  start: { icon: <Play className="h-3.5 w-3.5" />, ring: 'var(--accent-signoff)', bg: 'var(--accent-signoff)', label: 'Start' },
+  screen: { icon: <Monitor className="h-3.5 w-3.5" />, ring: 'var(--accent-measure)', bg: 'var(--accent-measure)', label: 'Screen' },
+  action: { icon: <Zap className="h-3.5 w-3.5" />, ring: 'var(--ink-500)', bg: 'var(--ink-500)', label: 'Action' },
+  decision: { icon: <GitBranch className="h-3.5 w-3.5" />, ring: 'var(--accent-decision)', bg: 'var(--accent-decision)', label: 'Decision' },
+  end: { icon: <Flag className="h-3.5 w-3.5" />, ring: 'var(--ink-900)', bg: 'var(--ink-900)', label: 'End' },
 }
 
 export function PathwaysClient({ journeys, routes }: Props) {
@@ -311,8 +311,8 @@ function ScreenInventory({
         </p>
         <div className="flex gap-4 mt-3 text-sm">
           <span className="text-[var(--ink-900)] font-semibold">{routes.length} screens</span>
-          <span className="text-green-700">{mapped} in a pathway</span>
-          <span className={gaps > 0 ? 'text-amber-700 font-semibold' : 'text-[var(--ink-500)]'}>{gaps} not mapped yet</span>
+          <span className="text-accent-signoff">{mapped} in a pathway</span>
+          <span className={gaps > 0 ? 'text-accent-decision font-semibold' : 'text-[var(--ink-500)]'}>{gaps} not mapped yet</span>
         </div>
         {routes.length === 0 && (
           <p className="text-xs text-[var(--ink-500)] mt-2">(Route tree not readable in this environment — showing pathways only.)</p>
@@ -341,7 +341,7 @@ function ScreenInventory({
                   ))}
                 </span>
               ) : (
-                <span className="text-[11px] font-semibold text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-2 py-0.5">
+                <span className="text-[11px] font-semibold text-accent-decision bg-accent-decision/10 border border-accent-decision/30 rounded-md px-2 py-0.5">
                   Not mapped yet
                 </span>
               )}
@@ -397,7 +397,7 @@ function RoleCard({ role }: { role: RoleDef }) {
         <ul className="mt-2.5 space-y-1">
           {role.can.map((c, i) => (
             <li key={i} className="flex items-start gap-1.5 text-[13px] text-[var(--ink-700)]">
-              <Check className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-green-700" />
+              <Check className="h-3.5 w-3.5 mt-0.5 flex-shrink-0 text-accent-signoff" />
               <span>{c}</span>
             </li>
           ))}
@@ -417,7 +417,7 @@ function RolesView() {
   const kinds: RoleKind[] = ['org', 'platform', 'overlay']
   const accessCell = (v: boolean | 'own') =>
     v === true ? (
-      <Check className="h-4 w-4 text-green-700 mx-auto" />
+      <Check className="h-4 w-4 text-accent-signoff mx-auto" />
     ) : v === 'own' ? (
       <span className="text-[10px] mono text-[var(--ink-500)]">own</span>
     ) : (
@@ -488,7 +488,7 @@ function RolesView() {
           </table>
         </div>
         <p className="text-[11px] text-[var(--ink-500)] mt-2 px-1">
-          <Check className="inline h-3 w-3 text-green-700" /> full access ·{' '}
+          <Check className="inline h-3 w-3 text-accent-signoff" /> full access ·{' '}
           <span className="mono">own</span> own records only ·{' '}
           <Minus className="inline h-3 w-3 text-[var(--ink-300)]" /> no access
         </p>

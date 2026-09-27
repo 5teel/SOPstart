@@ -62,7 +62,7 @@ export function SectionListSidebar({
       className="w-64 shrink-0 border-r border-[var(--ink-100)] overflow-y-auto"
     >
       {error && (
-        <div className="px-4 py-2 text-xs text-red-400 border-b border-red-500/30 bg-red-500/10">
+        <div className="px-4 py-2 text-xs text-accent-escalate border-b border-accent-escalate/30 bg-accent-escalate/10">
           {error}
         </div>
       )}

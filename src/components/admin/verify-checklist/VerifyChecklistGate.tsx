@@ -151,7 +151,7 @@ export function VerifyChecklistGate({
           role="alert"
           data-testid="verify-checklist-error"
           onClick={checklist.clearError}
-          className="m-2 px-2 py-1 rounded border border-red-500/30 bg-red-500/10 text-red-700 text-xs cursor-pointer"
+          className="m-2 px-2 py-1 rounded border border-accent-escalate/30 bg-accent-escalate/10 text-accent-escalate text-xs cursor-pointer"
         >
           {checklist.error} (click to dismiss)
         </div>

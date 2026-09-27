@@ -58,12 +58,12 @@ function renderForKind(kindSlug: string, content: BlockContent) {
         <div>
           <StepBlock number={1} text={content.text} />
           {content.warning && (
-            <div className="mt-2 text-xs text-red-300 bg-red-500/10 border border-red-500/30 rounded p-2">
+            <div className="mt-2 text-xs text-accent-escalate bg-accent-escalate/10 border border-accent-escalate/30 rounded p-2">
               Warning: {content.warning}
             </div>
           )}
           {content.tip && (
-            <div className="mt-2 text-xs text-amber-200 bg-amber-500/10 border border-amber-500/30 rounded p-2">
+            <div className="mt-2 text-xs text-accent-decision bg-accent-decision/10 border border-accent-decision/30 rounded p-2">
               Tip: {content.tip}
             </div>
           )}
@@ -71,8 +71,8 @@ function renderForKind(kindSlug: string, content: BlockContent) {
       )
     case 'emergency':
       return (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
-          <div className="text-sm font-bold uppercase tracking-widest text-red-400 mb-2">
+        <div className="bg-accent-escalate/10 border border-accent-escalate/30 rounded-xl p-4">
+          <div className="text-sm font-bold uppercase tracking-widest text-accent-escalate mb-2">
             Emergency
           </div>
           <p className="text-base text-[var(--ink-900)] leading-relaxed">{content.text}</p>

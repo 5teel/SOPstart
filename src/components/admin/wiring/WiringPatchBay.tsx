@@ -914,7 +914,7 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, sops
       />
 
       {saveError && (
-        <div role="alert" className="mono text-[11px] uppercase tracking-wide text-red-600 mt-1">
+        <div role="alert" className="mono text-[11px] uppercase tracking-wide text-accent-escalate mt-1">
           That didn&apos;t save — {saveError} Nothing changed yet; your choices are still here, try again.
         </div>
       )}

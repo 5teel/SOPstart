@@ -276,7 +276,7 @@ export function DepartmentPicker(props: Props) {
       })}
 
       {error && (
-        <span className="text-xs text-red-600 ml-2" role="alert">
+        <span className="text-xs text-accent-escalate ml-2" role="alert">
           {error}
         </span>
       )}

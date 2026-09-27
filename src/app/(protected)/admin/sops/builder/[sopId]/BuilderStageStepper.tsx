@@ -88,12 +88,12 @@ export function BuilderStageStepper({
         data-testid="wayfinder-forward-chip"
         data-chip-state="pending-approval"
         className="flex flex-col items-start gap-0.5 rounded-sm border-[1.5px] px-3.5 py-1.5 text-left"
-        style={{ borderColor: '#b45309', background: 'rgba(180,83,9,0.08)' }}
+        style={{ borderColor: 'var(--accent-decision)', background: 'rgba(180,83,9,0.08)' }}
       >
-        <span className="text-[11.5px] font-semibold" style={{ color: '#b45309' }}>
+        <span className="text-[11.5px] font-semibold" style={{ color: 'var(--accent-decision)' }}>
           Waiting for approval
         </span>
-        <span className="text-[10px]" style={{ color: '#b45309' }}>
+        <span className="text-[10px]" style={{ color: 'var(--accent-decision)' }}>
           {approverLabel ? `Next: ${approverLabel}` : 'An approver needs to review this'}
         </span>
       </div>

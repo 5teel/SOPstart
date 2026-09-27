@@ -75,7 +75,8 @@ SafeStart is a multi-tenant SaaS progressive web app that helps blue-collar trad
 
 ## Conventions
 
-- Dark theme by default (`bg-steel-900`, `text-brand-yellow` palette)
+- **Design tokens: `src/styles/blueprint-theme.css` is the one place colours are defined.** Components use them as Tailwind utilities (`text-accent-escalate`, `bg-accent-signoff/10`, `border-ink-200`) or as `var(--token)`; pastel pill/callout fills use the derived `--tint-*-bg/-border` pair. Raw Tailwind palette classes (`text-red-400`) and bare hex in component code are banned by `tests/lint/design-tokens.spec.ts` (canvas/data files allowlisted there). Need a new colour? Add the token + its `--color-*` line in the `@theme inline` block, never a literal at the call site.
+- Paper theme app-wide (`body[data-theme="paper"]`): paper/ink neutrals, one semantic accent per role (step, measure, decision, escalate, signoff, inspect, zone, voice, ai); steel-900 + brand-yellow survive only as dark chrome in the annotation tools
 - PWA-first: large tap targets (glove-friendly), mobile-optimized
 - Supabase RLS for all data access; `admin.ts` client for elevated operations only
 - Server actions in `src/actions/` for mutations; API routes for complex operations (parsing, file handling)

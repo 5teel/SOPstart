@@ -64,7 +64,7 @@ export function VerifyProgressIndicator({
           data-testid="verify-progress-bar"
           className={[
             'h-full transition-all',
-            isReady ? 'bg-green-500' : 'bg-yellow-500',
+            isReady ? 'bg-accent-signoff' : 'bg-brand-yellow',
           ].join(' ')}
           style={{ width: `${pct}%` }}
         />
@@ -78,7 +78,7 @@ export function VerifyProgressIndicator({
         className={[
           'px-3 py-1.5 text-sm font-bold rounded',
           isReady
-            ? 'bg-yellow-400 text-black hover:bg-yellow-300 cursor-pointer'
+            ? 'bg-brand-yellow/30 text-black hover:bg-brand-yellow/30 cursor-pointer'
             : 'bg-[var(--ink-300)] text-[var(--ink-700)] cursor-not-allowed',
         ].join(' ')}
       >

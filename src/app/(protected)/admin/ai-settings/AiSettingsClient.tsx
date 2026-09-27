@@ -69,10 +69,10 @@ export function AiSettingsClient({
               <div className="mt-2 flex items-center gap-2 text-[11px]">
                 <span className="text-[var(--ink-400)]">{s.description}</span>
                 {settings[s.key] && settings[s.key] !== s.resolvedDefault && (
-                  <span className="text-amber-600 font-medium shrink-0">org override</span>
+                  <span className="text-accent-decision font-medium shrink-0">org override</span>
                 )}
-                {saveState[s.key] === 'saved' && <span className="text-green-600 shrink-0">✓ saved</span>}
-                {saveState[s.key] === 'error' && <span className="text-red-500 shrink-0">save failed</span>}
+                {saveState[s.key] === 'saved' && <span className="text-accent-signoff shrink-0">✓ saved</span>}
+                {saveState[s.key] === 'error' && <span className="text-accent-escalate shrink-0">save failed</span>}
               </div>
             </div>
           ))}
@@ -104,7 +104,7 @@ export function AiSettingsClient({
                   <td className="py-2 pr-3 text-[var(--ink-700)]">
                     {s.provider}
                     {!s.providerKeyConfigured && (
-                      <span className="ml-1 text-red-500 text-xs" title="Provider API key missing in this deployment">
+                      <span className="ml-1 text-accent-escalate text-xs" title="Provider API key missing in this deployment">
                         ⚠ no key
                       </span>
                     )}

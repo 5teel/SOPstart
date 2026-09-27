@@ -104,7 +104,7 @@ export function VideoJobIndicator({ sopId }: { sopId: string }) {
     return (
       <Link
         href={`/admin/sops/${sopId}/video`}
-        className="flex flex-col items-center justify-center w-[72px] min-h-[72px] rounded-lg bg-blue-500/15 border border-blue-500/30 text-blue-400 hover:bg-blue-500/25 transition-colors flex-shrink-0"
+        className="flex flex-col items-center justify-center w-[72px] min-h-[72px] rounded-lg bg-accent-step/15 border border-accent-step/30 text-accent-step hover:bg-accent-step/25 transition-colors flex-shrink-0"
         title="Video generation in progress — tap to view"
       >
         <Loader2 size={20} className="animate-spin" />
@@ -117,7 +117,7 @@ export function VideoJobIndicator({ sopId }: { sopId: string }) {
     return (
       <Link
         href={`/admin/sops/${sopId}/video`}
-        className="flex flex-col items-center justify-center w-[72px] min-h-[72px] rounded-lg bg-red-500/15 border border-red-500/30 text-red-400 hover:bg-red-500/25 transition-colors flex-shrink-0"
+        className="flex flex-col items-center justify-center w-[72px] min-h-[72px] rounded-lg bg-accent-escalate/15 border border-accent-escalate/30 text-accent-escalate hover:bg-accent-escalate/25 transition-colors flex-shrink-0"
         title="Video generation failed — tap to manage"
       >
         <AlertTriangle size={20} />
@@ -144,7 +144,7 @@ export function VideoJobIndicator({ sopId }: { sopId: string }) {
   return (
     <Link
       href={`/admin/sops/${sopId}/video?play=${playJobId}`}
-      className="flex flex-col items-center justify-center w-[72px] min-h-[72px] rounded-lg bg-green-500/15 border border-green-500/30 text-green-400 hover:bg-green-500/25 transition-colors flex-shrink-0"
+      className="flex flex-col items-center justify-center w-[72px] min-h-[72px] rounded-lg bg-accent-signoff/15 border border-accent-signoff/30 text-accent-signoff hover:bg-accent-signoff/25 transition-colors flex-shrink-0"
       title="Video ready — tap to play"
     >
       <Play size={24} fill="currentColor" />

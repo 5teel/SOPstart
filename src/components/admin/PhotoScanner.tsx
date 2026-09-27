@@ -404,7 +404,7 @@ export function PhotoScanner({ open, onClose, onSubmit }: PhotoScannerProps) {
                   dragIndex === index ? 'opacity-60 scale-95' : '',
                   focusedIndex === index ? 'ring-2 ring-[var(--ink-900)]' : 'border border-[var(--ink-100)]',
                 ].join(' ')}
-                style={{ border: focusedIndex === index ? undefined : '1px solid #374151' }}
+                style={{ border: focusedIndex === index ? undefined : '1px solid var(--ink-600)' }}
               >
                 {/* Grip handle */}
                 <div className="absolute left-0 top-0 bottom-0 flex items-center px-0.5 text-[var(--ink-300)] z-10">
@@ -425,7 +425,7 @@ export function PhotoScanner({ open, onClose, onSubmit }: PhotoScannerProps) {
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); handleDeletePage(page.id) }}
-                  className="absolute top-0.5 right-0.5 w-6 h-6 flex items-center justify-center bg-black/70 rounded-full text-white hover:bg-red-500/80 transition-colors z-20"
+                  className="absolute top-0.5 right-0.5 w-6 h-6 flex items-center justify-center bg-black/70 rounded-full text-white hover:bg-accent-escalate/80 transition-colors z-20"
                   aria-label={`Remove page ${index + 1}`}
                 >
                   <X className="w-3 h-3" />
@@ -525,7 +525,7 @@ export function PhotoScanner({ open, onClose, onSubmit }: PhotoScannerProps) {
               <button
                 type="button"
                 onClick={handleDiscard}
-                className="flex-1 h-[72px] bg-[var(--paper-2)] text-red-400 font-semibold rounded-xl hover:bg-[var(--ink-300)] transition-colors"
+                className="flex-1 h-[72px] bg-[var(--paper-2)] text-accent-escalate font-semibold rounded-xl hover:bg-[var(--ink-300)] transition-colors"
               >
                 Discard
               </button>

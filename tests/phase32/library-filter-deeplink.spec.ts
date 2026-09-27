@@ -44,10 +44,14 @@ test.describe('SC-4 — library filter deep-link', () => {
     expect(src).toContain("query = query.in('id', filterIds.length > 0 ? filterIds : [NO_MATCH_ID])")
   })
 
-  test('AdminStatusLens renders the Open in library (N) filtered-count header', () => {
+  test('a collection deep link gets a filtered-count header with a way back (Clear filter)', () => {
+    // 2026-09-27: the banner became a "Clear filter" control in the list column
+    // header — the lens decides WHEN it shows, SopMillerBrowser draws it.
     const src = fs.readFileSync(ADMIN_STATUS_LENS, 'utf-8')
-    expect(src).toContain('Open in library (')
-    expect(src).toContain('Clear filter')
+    expect(src).toMatch(/onClearFilter=\{data\.filtered && !departments \? onClearFilter : undefined\}/)
+    const browser = fs.readFileSync(path.join(process.cwd(), 'src/components/admin/SopMillerBrowser.tsx'), 'utf-8')
+    expect(browser).toContain('Clear filter')
+    expect(browser).toMatch(/onClick=\{onClearFilter\}/)
   })
 
   test('AdminSopSurface resolves ?view=access BEFORE any departments/collection check, dropping them entirely (isAccessView precedence)', () => {

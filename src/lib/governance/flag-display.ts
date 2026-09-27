@@ -20,8 +20,8 @@ import type { GovernanceFlag } from '@/lib/governance/classify'
 export const FLAG_PRIORITY: GovernanceFlag[] = ['overdue', 'due_soon', 'awaiting_approval', 'unowned', 'stale_role']
 
 export const FLAG_STYLE: Record<GovernanceFlag, string> = {
-  overdue: 'bg-red-500/20 text-red-600',
-  due_soon: 'bg-amber-500/20 text-amber-700',
+  overdue: 'bg-accent-escalate/20 text-accent-escalate',
+  due_soon: 'bg-accent-decision/20 text-accent-decision',
   unowned: 'bg-[var(--paper-2)] text-[var(--ink-500)]',
   stale_role: 'bg-[var(--paper-2)] text-[var(--ink-500)]',
   awaiting_approval: 'bg-[var(--accent-signoff)]/20 text-[var(--accent-signoff)]',

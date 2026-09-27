@@ -82,7 +82,7 @@ export function ImmersiveStepCard({ sop, onStepChange, completedSteps, stepPhoto
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {done && (
-            <div className="flex items-center gap-1 text-green-600">
+            <div className="flex items-center gap-1 text-accent-signoff">
               <CheckCircle2 size={14} />
               <span className="mono text-[11px] uppercase tracking-wider">Done</span>
             </div>
@@ -164,7 +164,7 @@ export function ImmersiveStepCard({ sop, onStepChange, completedSteps, stepPhoto
                   className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-[var(--ink-50)] border border-[var(--ink-100)] text-xs text-[var(--ink-600)]"
                 >
                   {photo.uploaded ? (
-                    <CheckCircle2 size={12} className="text-green-500 flex-shrink-0" />
+                    <CheckCircle2 size={12} className="text-accent-signoff flex-shrink-0" />
                   ) : (
                     <div className="w-3 h-3 rounded-full border-2 border-[var(--accent-decision)] border-t-transparent animate-spin flex-shrink-0" />
                   )}

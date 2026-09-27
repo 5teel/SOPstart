@@ -21,7 +21,7 @@ interface StepItemProps {
 
 const borderByStatus: Record<StepStatus, string> = {
   active: 'border-[var(--ink-900)] bg-white/60',
-  completed: 'border-green-500/40 bg-green-500/5',
+  completed: 'border-accent-signoff/40 bg-accent-signoff/5',
   upcoming: 'border-transparent opacity-80',
 }
 
@@ -56,7 +56,7 @@ export function StepItem({
       {/* Left: step number or check */}
       <div className="flex-shrink-0 w-8 pt-0.5">
         {status === 'completed' ? (
-          <CheckCircle2 size={20} className="text-green-400" />
+          <CheckCircle2 size={20} className="text-accent-signoff" />
         ) : (
           <span className="text-[13px] font-bold tabular-nums text-[var(--ink-500)]">
             {step.step_number}
@@ -108,7 +108,7 @@ export function StepItem({
       {/* Right: tap target */}
       <div className="flex-shrink-0 min-w-[44px] min-h-[72px] flex items-center justify-center">
         {status === 'completed' ? (
-          <CheckCircle2 size={28} className="text-green-400" />
+          <CheckCircle2 size={28} className="text-accent-signoff" />
         ) : (
           <Circle size={28} className="text-[var(--ink-300)] hover:text-[var(--ink-900)]" />
         )}

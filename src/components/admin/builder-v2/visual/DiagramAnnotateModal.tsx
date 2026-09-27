@@ -92,7 +92,7 @@ export function DiagramAnnotateModal({ item, onClose, onSaved }: DiagramAnnotate
         <header className="flex items-center justify-between border-b border-steel-700 px-4 py-2">
           <h2 className="text-sm font-semibold text-brand-yellow">Annotate diagram</h2>
           <div className="flex items-center gap-2">
-            {error && <span className="text-xs text-red-400">{error}</span>}
+            {error && <span className="text-xs text-accent-escalate">{error}</span>}
             <button
               type="button"
               onClick={saveAndBake}

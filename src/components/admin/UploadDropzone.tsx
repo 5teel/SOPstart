@@ -46,24 +46,24 @@ function formatFileSize(bytes: number): string {
 
 function FileIcon({ mimeType }: { mimeType: string }) {
   if (mimeType === 'video/mp4' || mimeType === 'video/quicktime') {
-    return <Video size={20} className="text-purple-400 shrink-0" />
+    return <Video size={20} className="text-ai shrink-0" />
   }
   if (mimeType === 'application/pdf') {
-    return <FileText className="w-5 h-5 text-red-400 shrink-0" />
+    return <FileText className="w-5 h-5 text-accent-escalate shrink-0" />
   }
   if (mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-    return <FileText className="w-5 h-5 text-blue-400 shrink-0" />
+    return <FileText className="w-5 h-5 text-accent-step shrink-0" />
   }
   if (mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
-    return <TableProperties className="w-5 h-5 text-blue-400 shrink-0" />
+    return <TableProperties className="w-5 h-5 text-accent-step shrink-0" />
   }
   if (mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation') {
-    return <ScanLine className="w-5 h-5 text-orange-400 shrink-0" />
+    return <ScanLine className="w-5 h-5 text-accent-voice shrink-0" />
   }
   if (mimeType === 'text/plain') {
     return <FileType2 className="w-5 h-5 text-[var(--ink-500)] shrink-0" />
   }
-  return <ImageIcon className="w-5 h-5 text-green-400 shrink-0" />
+  return <ImageIcon className="w-5 h-5 text-accent-signoff shrink-0" />
 }
 
 export function UploadDropzone() {
@@ -425,7 +425,7 @@ export function UploadDropzone() {
             className="w-full bg-white border border-[var(--ink-100)] rounded-lg px-4 h-[52px] text-sm text-[var(--ink-900)] placeholder:text-[var(--ink-500)] focus:border-[var(--ink-900)] focus:outline-none"
           />
           {youtubeError && (
-            <p role="alert" className="text-xs text-red-400">{youtubeError}</p>
+            <p role="alert" className="text-xs text-accent-escalate">{youtubeError}</p>
           )}
 
           <label className="flex items-start gap-3 text-sm text-[var(--ink-500)] py-3 cursor-pointer">
@@ -617,7 +617,7 @@ export function UploadDropzone() {
                     <p className="text-sm font-medium text-[var(--ink-900)] truncate">{item.file.name}</p>
                     <p className="text-xs text-[var(--ink-500)]">{formatFileSize(item.file.size)}</p>
                     {item.error && (
-                      <p className="text-xs text-red-400 mt-0.5">{item.error}</p>
+                      <p className="text-xs text-accent-escalate mt-0.5">{item.error}</p>
                     )}
                   </div>
 
@@ -626,7 +626,7 @@ export function UploadDropzone() {
                     <button
                       type="button"
                       onClick={() => removeFile(item.id)}
-                      className="shrink-0 text-[var(--ink-500)] hover:text-red-400 transition-colors p-1"
+                      className="shrink-0 text-[var(--ink-500)] hover:text-accent-escalate transition-colors p-1"
                       aria-label="Remove file"
                     >
                       <X className="w-4 h-4" />
@@ -635,13 +635,13 @@ export function UploadDropzone() {
                   {item.status === 'uploading' && (item.useTus || item.isVideo) && item.tusProgress !== undefined ? (
                     <TusUploadProgress percentage={item.tusProgress} />
                   ) : item.status === 'uploading' ? (
-                    <Loader2 className="w-5 h-5 text-blue-400 animate-spin shrink-0" />
+                    <Loader2 className="w-5 h-5 text-accent-step animate-spin shrink-0" />
                   ) : null}
                   {item.status === 'uploaded' && (
-                    <CheckCircle className="w-5 h-5 text-green-400 shrink-0" />
+                    <CheckCircle className="w-5 h-5 text-accent-signoff shrink-0" />
                   )}
                   {item.status === 'error' && (
-                    <X className="w-5 h-5 text-red-400 shrink-0" />
+                    <X className="w-5 h-5 text-accent-escalate shrink-0" />
                   )}
                 </li>
               ))}
@@ -664,8 +664,8 @@ export function UploadDropzone() {
 
           {/* Success banner */}
           {success && uploadedSopIds.length > 0 && (
-            <div className="mt-4 bg-green-500/20 border border-green-500/40 rounded-lg px-4 py-4">
-              <p className="text-green-400 text-sm mb-3">
+            <div className="mt-4 bg-accent-signoff/20 border border-accent-signoff/40 rounded-lg px-4 py-4">
+              <p className="text-accent-signoff text-sm mb-3">
                 {uploadedSopIds.length === 1
                   ? 'File uploaded — AI parsing is running now.'
                   : `${uploadedSopIds.length} files uploaded — AI parsing continues in the background. You can leave this page; drafts appear in the library as they finish.`}

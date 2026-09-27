@@ -52,46 +52,46 @@ function getPillStyle(pillVariant: string): React.CSSProperties {
   switch (pillVariant) {
     case 'kind-haz':
       return {
-        background: '#fef2f2',
+        background: 'var(--tint-escalate-bg)',
         color: 'var(--accent-hazard)',
-        border: '1px solid #fca5a5',
+        border: '1px solid var(--tint-escalate-border)',
       }
     case 'kind-meas':
       return {
-        background: '#fff5ed',
+        background: 'var(--tint-voice-bg)',
         color: 'var(--accent-measure)',
-        border: '1px solid #fdba74',
+        border: '1px solid var(--tint-voice-border)',
       }
     case 'kind-ins':
       return {
-        background: '#ecfdff',
+        background: 'var(--tint-zone-bg)',
         color: 'var(--accent-mcu)',
-        border: '1px solid #67e8f9',
+        border: '1px solid var(--tint-zone-border)',
       }
     case 'kind-dec':
       return {
-        background: '#fdf2f8',
+        background: 'var(--tint-decision-bg)',
         color: 'var(--accent-decision)',
-        border: '1px solid #f9a8d4',
+        border: '1px solid var(--tint-decision-border)',
       }
     case 'kind-esc':
       return {
-        background: '#fef2f2',
+        background: 'var(--tint-escalate-bg)',
         color: 'var(--accent-hazard)',
-        border: '1px solid #fca5a5',
+        border: '1px solid var(--tint-escalate-border)',
       }
     case 'kind-sign':
       return {
-        background: '#fffbeb',
-        color: '#b45309',
-        border: '1px solid #fcd34d',
+        background: 'var(--tint-decision-bg)',
+        color: 'var(--accent-decision)',
+        border: '1px solid var(--tint-decision-border)',
       }
     case 'kind-step':
     default:
       return {
-        background: '#eff4ff',
+        background: 'var(--tint-step-bg)',
         color: 'var(--accent-step)',
-        border: '1px solid #93c5fd',
+        border: '1px solid var(--tint-step-border)',
       }
   }
 }
@@ -148,7 +148,7 @@ export function TreeStepRow({
         borderRadius: '3px',
         cursor: 'pointer',
         border: isActive ? '1px solid var(--accent-step)' : '1px solid transparent',
-        background: isActive ? '#eff4ff' : 'transparent',
+        background: isActive ? 'var(--tint-step-bg)' : 'transparent',
         transition: 'background 0.1s ease',
       }}
       className="hover:bg-[var(--paper-2)]"

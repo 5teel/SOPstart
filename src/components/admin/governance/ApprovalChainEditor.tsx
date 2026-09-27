@@ -153,7 +153,7 @@ function SortableStepRow({
         aria-label="Remove step"
         disabled={!canRemove}
         onClick={onRemove}
-        className="mt-1 text-[var(--ink-500)] enabled:hover:text-red-600 disabled:opacity-30"
+        className="mt-1 text-[var(--ink-500)] enabled:hover:text-accent-escalate disabled:opacity-30"
       >
         <Trash2 size={14} />
       </button>
@@ -307,8 +307,8 @@ export function ApprovalChainEditor({
           {isPending ? 'Saving…' : 'Save chain'}
         </button>
 
-        {saved && !error && <span className="text-xs text-green-600">Saved</span>}
-        {error && <p className="text-xs text-red-600">{error}</p>}
+        {saved && !error && <span className="text-xs text-accent-signoff">Saved</span>}
+        {error && <p className="text-xs text-accent-escalate">{error}</p>}
       </div>
     </div>
   )

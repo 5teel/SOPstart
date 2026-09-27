@@ -130,7 +130,7 @@ export function BlockOverflowMenu({
               type="button"
               role="menuitem"
               onClick={handleDeleteClick}
-              className="w-full text-left px-3 py-1.5 text-sm text-red-300 hover:bg-red-500/10"
+              className="w-full text-left px-3 py-1.5 text-sm text-accent-escalate hover:bg-accent-escalate/10"
             >
               Delete
             </button>

@@ -73,7 +73,7 @@ export function PipelineProgressClient(props: Props) {
         <div className="mt-6 space-y-4">
           {!errorAt && plainKey === 'upload' && (
             <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5 flex items-center gap-3">
-              <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
+              <Loader2 className="w-5 h-5 text-accent-step animate-spin" />
               <p className="text-sm text-[var(--ink-900)]">Uploading your file...</p>
             </div>
           )}
@@ -81,7 +81,7 @@ export function PipelineProgressClient(props: Props) {
           {!errorAt && plainKey === 'read' && (
             <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5">
               <div className="flex items-center gap-3">
-                <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
+                <Loader2 className="w-5 h-5 text-accent-step animate-spin" />
                 <p className="text-sm font-semibold text-[var(--ink-900)]">
                   Crunching your SOP…
                 </p>
@@ -118,7 +118,7 @@ export function PipelineProgressClient(props: Props) {
           {!errorAt && plainKey === 'render' && snapshot.videoJob && (
             <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5">
               <div className="flex items-center gap-3 mb-2">
-                <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
+                <Loader2 className="w-5 h-5 text-accent-step animate-spin" />
                 <p className="text-sm font-semibold text-[var(--ink-900)]">
                   Generating video
                 </p>
@@ -132,15 +132,15 @@ export function PipelineProgressClient(props: Props) {
 
           {!errorAt && plainKey === 'render' && !snapshot.videoJob && (
             <div className="bg-white border border-[var(--ink-100)] rounded-xl p-5 flex items-center gap-3">
-              <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
+              <Loader2 className="w-5 h-5 text-accent-step animate-spin" />
               <p className="text-sm text-[var(--ink-900)]">Queuing video generation…</p>
             </div>
           )}
 
           {!errorAt && plainKey === 'ready' && sopId && (
-            <div className="bg-green-500/20 border border-green-500/40 rounded-xl px-5 py-5">
+            <div className="bg-accent-signoff/20 border border-accent-signoff/40 rounded-xl px-5 py-5">
               <div className="flex items-start gap-3 mb-3">
-                <CheckCircle className="w-6 h-6 text-green-400 shrink-0" />
+                <CheckCircle className="w-6 h-6 text-accent-signoff shrink-0" />
                 <div>
                   <p className="text-sm font-semibold text-[var(--ink-900)]">
                     Video SOP ready

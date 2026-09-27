@@ -208,7 +208,7 @@ export function VoiceDraftClient({ departments }: { departments: Department[] })
           className={
             'shrink-0 h-16 w-16 rounded-full font-semibold text-white transition-colors disabled:opacity-50 ' +
             (listening
-              ? 'bg-red-600 hover:bg-red-500 animate-pulse'
+              ? 'bg-accent-escalate hover:bg-accent-escalate animate-pulse'
               : 'bg-[var(--ink-900)] hover:bg-[var(--ink-700)]')
           }
         >
@@ -243,7 +243,7 @@ export function VoiceDraftClient({ departments }: { departments: Department[] })
       </div>
 
       {!voiceSupported && (
-        <p className="text-xs text-amber-600">
+        <p className="text-xs text-accent-decision">
           Voice capture isn&apos;t supported in this browser — you can still type your answers.
         </p>
       )}
@@ -255,7 +255,7 @@ export function VoiceDraftClient({ departments }: { departments: Department[] })
             <h3 className="text-xs font-semibold uppercase tracking-wide text-[var(--ink-500)]">
               Brief so far
             </h3>
-            {ready && <span className="text-xs font-medium text-green-600">ready to draft</span>}
+            {ready && <span className="text-xs font-medium text-accent-signoff">ready to draft</span>}
           </div>
           <p className="mt-2 text-sm text-[var(--ink-700)] whitespace-pre-wrap">{brief}</p>
         </div>
@@ -268,7 +268,7 @@ export function VoiceDraftClient({ departments }: { departments: Department[] })
       )}
 
       {error && (
-        <div className="bg-red-900/30 border border-red-800 rounded-lg p-3 text-sm text-red-200">{error}</div>
+        <div className="bg-accent-escalate/10 border border-accent-escalate rounded-lg p-3 text-sm text-accent-escalate">{error}</div>
       )}
 
       <button

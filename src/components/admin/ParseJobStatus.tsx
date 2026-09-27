@@ -369,7 +369,7 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
             <React.Fragment key={key}>
               <span
                 className={`text-xs whitespace-nowrap px-1 ${
-                  isCompleted ? 'text-green-400' :
+                  isCompleted ? 'text-accent-signoff' :
                   isActive ? 'text-[var(--ink-900)] font-semibold' :
                   isPending ? 'text-[var(--ink-300)]' :
                   'text-[var(--ink-300)]'
@@ -410,7 +410,7 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
       <>
         {isOcr && <OcrBanner />}
         <div className="bg-white border border-[var(--ink-100)] rounded-lg p-4 flex items-start gap-3">
-          <CheckCircle className="text-green-400 flex-shrink-0 mt-0.5" size={20} />
+          <CheckCircle className="text-accent-signoff flex-shrink-0 mt-0.5" size={20} />
           <div className="flex-1">
             <p className="text-sm font-semibold text-[var(--ink-900)]">
               {completionCopy}
@@ -487,7 +487,7 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
                 <button
                   onClick={handleDelete}
                   disabled={deleting}
-                  className="text-red-400 text-sm font-medium hover:text-red-300"
+                  className="text-accent-escalate text-sm font-medium hover:text-accent-escalate"
                 >
                   {deleting ? 'Deleting...' : 'Delete'}
                 </button>
@@ -524,7 +524,7 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
             <button
               onClick={handleDelete}
               disabled={deleting}
-              className="text-red-400 text-sm hover:text-red-300 font-medium"
+              className="text-accent-escalate text-sm hover:text-accent-escalate font-medium"
             >
               {deleting ? 'Deleting…' : 'Delete'}
             </button>
@@ -543,7 +543,7 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
           {currentStage === 'verifying' ? (
             <Loader2 size={20} className="text-[var(--accent-voice)] animate-spin flex-shrink-0 mt-0.5" />
           ) : (
-            <Loader2 size={20} className="text-blue-400 animate-spin flex-shrink-0 mt-0.5" />
+            <Loader2 size={20} className="text-accent-step animate-spin flex-shrink-0 mt-0.5" />
           )}
           <div>
             <p className="text-sm font-semibold text-[var(--ink-900)]">
@@ -565,7 +565,7 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
       <div className="bg-white border border-[var(--ink-100)] rounded-lg p-4">
         <StageStepper />
         <div className="flex items-start gap-3">
-          <Loader2 size={20} className="text-blue-400 animate-spin flex-shrink-0 mt-0.5" />
+          <Loader2 size={20} className="text-accent-step animate-spin flex-shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-semibold text-[var(--ink-900)]">{plainLabel(currentStage)}</p>
           </div>
@@ -578,7 +578,7 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
   return (
     <div className="bg-white border border-[var(--ink-100)] rounded-lg p-4 flex items-start gap-3">
       <div
-        className="flex-shrink-0 mt-0.5 animate-spin border-2 border-blue-500/30 border-t-blue-400 rounded-full w-5 h-5"
+        className="flex-shrink-0 mt-0.5 animate-spin border-2 border-accent-step/30 border-t-blue-400 rounded-full w-5 h-5"
         aria-hidden="true"
       />
       <div>

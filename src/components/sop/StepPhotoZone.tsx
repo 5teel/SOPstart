@@ -102,7 +102,7 @@ export function StepPhotoZone({
           <button
             type="button"
             onClick={handleCameraClick}
-            className="flex items-center gap-1.5 h-[72px] px-4 bg-[var(--accent-voice)] text-white text-sm font-bold rounded-lg hover:bg-orange-600 transition-colors flex-shrink-0"
+            className="flex items-center gap-1.5 h-[72px] px-4 bg-[var(--accent-voice)] text-white text-sm font-bold rounded-lg hover:bg-accent-voice transition-colors flex-shrink-0"
           >
             <Camera size={16} />
             Take photo

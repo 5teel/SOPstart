@@ -376,7 +376,7 @@ export function BuilderStageShell({
           flexDirection: 'column',
           height: '100vh',
           minHeight: 0,
-          background: '#fafafa',
+          background: 'var(--paper)',
         }}
       >
         {/* ── Wayfinder bar (Phase 33, 33-04, SC-6) ────────────────────
@@ -407,7 +407,7 @@ export function BuilderStageShell({
             className="flex min-w-0 flex-1 items-center gap-[11px] px-[18px] border-r border-[var(--ink-100)]"
           >
             <span
-              className="flex-shrink-0 text-[9px] uppercase leading-tight tracking-wider text-amber-700"
+              className="flex-shrink-0 text-[9px] uppercase leading-tight tracking-wider text-accent-decision"
               style={{ borderLeft: '3px solid var(--brand-yellow, #fbbf24)', paddingLeft: 9 }}
             >
               You&rsquo;re<br />{HERE_VERB[activeStage]}

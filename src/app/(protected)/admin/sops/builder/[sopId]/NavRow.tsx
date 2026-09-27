@@ -21,7 +21,7 @@
  *
  * Row states:
  *   - Default:  border 1px transparent; hover → background --paper-2
- *   - Active:   border 1px solid --accent-step; background #eff4ff
+ *   - Active:   border 1px solid --accent-step; background var(--tint-step-bg)
  *   - Verified: check dot filled --accent-ok + white ✓; text color --ink-500
  *
  * Flag badge appears only when flags_count > 0 && !verified.
@@ -180,7 +180,7 @@ export function NavRow({ block, index, active, onSelect }: NavRowProps): React.J
         border: active
           ? '1px solid var(--accent-step)'
           : '1px solid transparent',
-        background: active ? '#eff4ff' : 'transparent',
+        background: active ? 'var(--tint-step-bg)' : 'transparent',
         transition: 'background 0.1s ease',
       }}
       className="hover:bg-[var(--paper-2)]"
@@ -200,7 +200,7 @@ export function NavRow({ block, index, active, onSelect }: NavRowProps): React.J
           borderRadius: '50%',
           border: verified ? 'none' : '1.5px solid var(--ink-300)',
           background: verified ? 'var(--accent-ok)' : 'transparent',
-          color: '#fff',
+          color: 'var(--paper-1)',
           fontSize: '10px',
           lineHeight: 1,
           fontWeight: 700,
@@ -262,7 +262,7 @@ export function NavRow({ block, index, active, onSelect }: NavRowProps): React.J
             height: '16px',
             borderRadius: '50%',
             background: 'var(--accent-hazard)',
-            color: '#fff',
+            color: 'var(--paper-1)',
             fontSize: '10px',
             fontWeight: 700,
             padding: '0 2px',

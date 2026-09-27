@@ -43,7 +43,7 @@ export function RerunReviewerButton({
           role="alert"
           data-testid="reviewer-rerun-error"
           data-kind={rerunError.kind}
-          className="cursor-pointer px-2 py-1 rounded border border-amber-500/30 bg-amber-500/10 text-amber-300 text-xs font-mono uppercase tracking-wider"
+          className="cursor-pointer px-2 py-1 rounded border border-accent-decision/30 bg-accent-decision/10 text-accent-decision text-xs font-mono uppercase tracking-wider"
           onClick={clearRerunError}
         >
           {rerunError.message} (click to dismiss)

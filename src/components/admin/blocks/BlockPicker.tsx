@@ -233,7 +233,7 @@ export function BlockPicker({
               <div className="text-sm text-[var(--ink-500)]">Loading libraryâ€¦</div>
             )}
             {error && (
-              <div className="text-sm text-red-400 bg-red-950/30 border border-red-700/40 rounded p-3">
+              <div className="text-sm text-accent-escalate bg-accent-escalate/10 border border-accent-escalate/40 rounded p-3">
                 {error}
               </div>
             )}
@@ -278,7 +278,7 @@ export function BlockPicker({
                 )}
 
                 {noCategoryMatches && (
-                  <div className="bg-amber-900/30 text-amber-200 p-3 rounded border border-amber-500/40 text-xs">
+                  <div className="bg-accent-decision/10 text-accent-decision p-3 rounded border border-accent-decision/40 text-xs">
                     Nothing tagged for {sopCategoryLabel ?? sopCategory}. Showing all {kindSlug} items.
                   </div>
                 )}

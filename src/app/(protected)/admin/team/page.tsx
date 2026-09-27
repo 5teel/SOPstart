@@ -55,7 +55,7 @@ export default async function AdminTeamPage() {
       <AssessmentRequestsPanel />
 
       {'error' in tree ? (
-        <p className="text-sm text-red-500">Could not load the org model: {tree.error}</p>
+        <p className="text-sm text-accent-escalate">Could not load the org model: {tree.error}</p>
       ) : (
         <TeamViewShell
           tree={tree}

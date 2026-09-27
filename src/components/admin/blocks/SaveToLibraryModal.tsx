@@ -173,7 +173,7 @@ export function SaveToLibraryModal({
         {/* Phase 25: Scope field removed — all blocks are org-owned (global model retired). */}
 
         {error && (
-          <div className="text-sm text-red-400 bg-red-950/30 border border-red-700/40 rounded-md p-3 mb-4">
+          <div className="text-sm text-accent-escalate bg-accent-escalate/10 border border-accent-escalate/40 rounded-md p-3 mb-4">
             {error}
           </div>
         )}

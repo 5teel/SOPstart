@@ -135,7 +135,7 @@ export default function SectionEditor({
     <div
       className={[
         'bg-white rounded-lg border-l-4 mb-4 overflow-hidden transition-colors',
-        approved ? 'border-green-500' : 'border-[var(--ink-100)]',
+        approved ? 'border-accent-signoff' : 'border-[var(--ink-100)]',
       ].join(' ')}
     >
       {/* Card header — clickable when approved to toggle collapse */}
@@ -171,10 +171,10 @@ export default function SectionEditor({
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
           {savedFlash && (
-            <span className="text-xs text-green-400 font-medium">Saved ✓</span>
+            <span className="text-xs text-accent-signoff font-medium">Saved ✓</span>
           )}
           {approved && (
-            <CheckCircle2 className="text-green-400" size={18} />
+            <CheckCircle2 className="text-accent-signoff" size={18} />
           )}
         </div>
       </button>
@@ -248,7 +248,7 @@ export default function SectionEditor({
                   <button
                     type="button"
                     onClick={() => removeStep(idx)}
-                    className="text-[var(--ink-500)] hover:text-red-400 mt-3 text-lg leading-none"
+                    className="text-[var(--ink-500)] hover:text-accent-escalate mt-3 text-lg leading-none"
                     aria-label="Remove step"
                   >
                     ✕
@@ -286,7 +286,7 @@ export default function SectionEditor({
         {mode === 'read' ? (
           approved ? (
             <>
-              <span className="text-green-400 text-sm font-semibold flex items-center gap-1">
+              <span className="text-accent-signoff text-sm font-semibold flex items-center gap-1">
                 <CheckCircle2 size={16} /> Approved ✓
               </span>
               <button

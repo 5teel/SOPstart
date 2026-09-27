@@ -100,7 +100,7 @@ export function SectionKindPicker({ onSubmit, onCancel }: SectionKindPickerProps
       </p>
 
       {loading && <p className="text-sm text-[var(--ink-500)]">Loading kinds…</p>}
-      {error && <p className="text-sm text-red-400">{error}</p>}
+      {error && <p className="text-sm text-accent-escalate">{error}</p>}
 
       {!loading && (
         <>

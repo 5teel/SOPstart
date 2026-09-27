@@ -81,7 +81,7 @@ export function AssignmentRow({
             <button
               type="button"
               onClick={handleConfirmRemove}
-              className="h-[36px] px-3 text-red-400 font-semibold text-sm rounded-lg border border-red-500/40 hover:bg-red-500/10 transition-colors"
+              className="h-[36px] px-3 text-accent-escalate font-semibold text-sm rounded-lg border border-accent-escalate/40 hover:bg-accent-escalate/10 transition-colors"
             >
               Remove
             </button>
@@ -108,8 +108,8 @@ export function AssignmentRow({
             className={[
               'h-[44px] px-4 font-semibold text-sm rounded-lg border transition-colors flex items-center gap-1.5',
               hovered
-                ? 'bg-red-500/10 text-red-400 border-red-500/40 hover:bg-red-500/20'
-                : 'bg-green-500/20 text-green-400 border-green-500/40',
+                ? 'bg-accent-escalate/10 text-accent-escalate border-accent-escalate/40 hover:bg-accent-escalate/20'
+                : 'bg-accent-signoff/20 text-accent-signoff border-accent-signoff/40',
             ].join(' ')}
             aria-label={hovered ? 'Remove assignment' : 'Already assigned'}
           >

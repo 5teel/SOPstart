@@ -581,11 +581,11 @@ function AnswerCard({
       {flagged && (
         <div
           role="alert"
-          className="flex items-start gap-2 mt-2 p-3 rounded-lg bg-amber-50 border-l-4 border-amber-500"
+          className="flex items-start gap-2 mt-2 p-3 rounded-lg bg-accent-decision/10 border-l-4 border-accent-decision"
           data-testid="verifier-flag"
         >
-          <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" aria-hidden="true" />
-          <div className="text-sm text-amber-900">
+          <AlertTriangle className="h-5 w-5 text-accent-decision flex-shrink-0 mt-0.5" aria-hidden="true" />
+          <div className="text-sm text-accent-decision">
             <p className="font-semibold">Verification flag — please re-check the SOP</p>
             <ul className="mt-1 space-y-0.5">
               {entry.r.verifier_flags.map((f: VerificationFlag, i: number) => (
@@ -596,7 +596,7 @@ function AnswerCard({
               type="button"
               onClick={() => onGoToSop(targetSection)}
               data-testid="verifier-flag-goto"
-              className="mt-2 inline-flex items-center gap-1 font-medium text-amber-900 underline underline-offset-2 hover:text-amber-700"
+              className="mt-2 inline-flex items-center gap-1 font-medium text-accent-decision underline underline-offset-2 hover:text-accent-decision"
             >
               {targetSection ? `Open “${targetSection}” in the SOP` : 'Open the SOP'}
               <span aria-hidden="true">→</span>

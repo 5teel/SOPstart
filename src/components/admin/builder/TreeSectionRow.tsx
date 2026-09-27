@@ -128,9 +128,9 @@ export function TreeSectionRow({
               fontWeight: 600,
               padding: '1px 5px',
               borderRadius: '999px',
-              background: verifiedSummary.done === verifiedSummary.total ? '#ecfdf5' : '#fffbeb',
-              color: verifiedSummary.done === verifiedSummary.total ? '#059669' : '#b45309',
-              border: verifiedSummary.done === verifiedSummary.total ? '1px solid #6ee7b7' : '1px solid #fcd34d',
+              background: verifiedSummary.done === verifiedSummary.total ? 'var(--tint-signoff-bg)' : 'var(--tint-decision-bg)',
+              color: verifiedSummary.done === verifiedSummary.total ? 'var(--accent-ok)' : 'var(--accent-decision)',
+              border: verifiedSummary.done === verifiedSummary.total ? '1px solid var(--tint-signoff-border)' : '1px solid var(--tint-decision-border)',
             }}
           >
             {verifiedSummary.done === verifiedSummary.total ? 'OK ' : ''}{verifiedSummary.done}/{verifiedSummary.total}

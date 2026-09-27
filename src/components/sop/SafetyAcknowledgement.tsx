@@ -41,19 +41,19 @@ export function SafetyAcknowledgement({
 
         {/* Hazards card */}
         {hazardsSection && (
-          <div className="bg-red-500/10 border border-red-500/40 rounded-xl p-5">
+          <div className="bg-accent-escalate/10 border border-accent-escalate/40 rounded-xl p-5">
             <div className="flex items-center gap-2">
-              <AlertTriangle size={18} className="text-red-400" />
-              <span className="text-xs font-bold uppercase tracking-widest text-red-400">
+              <AlertTriangle size={18} className="text-accent-escalate" />
+              <span className="text-xs font-bold uppercase tracking-widest text-accent-escalate">
                 Hazards
               </span>
             </div>
-            <div className="border-t border-red-500/20 my-3" />
+            <div className="border-t border-accent-escalate/20 my-3" />
             {hazardsSection.content ? (
               <ul className="list-none space-y-2">
                 {parseListItems(hazardsSection.content).map((item, i) => (
                   <li key={i} className="flex items-start gap-2 text-base text-[var(--ink-900)] leading-relaxed">
-                    <span className="text-red-400 mt-0.5">•</span>
+                    <span className="text-accent-escalate mt-0.5">•</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -66,20 +66,20 @@ export function SafetyAcknowledgement({
 
         {/* PPE card */}
         {ppeSection && (
-          <div className="bg-blue-500/10 border border-blue-500/40 rounded-xl p-5">
+          <div className="bg-accent-step/10 border border-accent-step/40 rounded-xl p-5">
             <div className="flex items-center gap-2">
-              <ShieldCheck size={18} className="text-blue-400" />
-              <span className="text-xs font-bold uppercase tracking-widest text-blue-400">
+              <ShieldCheck size={18} className="text-accent-step" />
+              <span className="text-xs font-bold uppercase tracking-widest text-accent-step">
                 PPE Required
               </span>
             </div>
-            <div className="border-t border-blue-500/20 my-3" />
+            <div className="border-t border-accent-step/20 my-3" />
             {ppeSection.content ? (
               <div className="flex flex-wrap gap-2">
                 {parseListItems(ppeSection.content).map((item, i) => (
                   <span
                     key={i}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/15 text-blue-300 text-sm font-medium rounded-lg border border-blue-500/30"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent-step/15 text-accent-step text-sm font-medium rounded-lg border border-accent-step/30"
                   >
                     {item}
                   </span>
@@ -93,15 +93,15 @@ export function SafetyAcknowledgement({
 
         {/* Emergency card (collapsible) */}
         {emergencySection && (
-          <div className="bg-red-500/10 border border-red-500/40 rounded-xl overflow-hidden">
+          <div className="bg-accent-escalate/10 border border-accent-escalate/40 rounded-xl overflow-hidden">
             <button
               type="button"
               onClick={() => setEmergencyExpanded((v) => !v)}
               className="flex items-center justify-between p-4 min-h-[56px] w-full text-left"
             >
               <div className="flex items-center gap-2">
-                <Siren size={18} className="text-red-400" />
-                <span className="text-xs font-bold uppercase tracking-widest text-red-400">
+                <Siren size={18} className="text-accent-escalate" />
+                <span className="text-xs font-bold uppercase tracking-widest text-accent-escalate">
                   Emergency Procedures
                 </span>
               </div>
@@ -124,7 +124,7 @@ export function SafetyAcknowledgement({
         <button
           type="button"
           onClick={onAcknowledge}
-          className="w-full h-[80px] bg-[var(--accent-voice)] text-white font-bold text-lg rounded-xl hover:bg-orange-500 active:bg-orange-700 transition-colors flex items-center justify-center gap-2"
+          className="w-full h-[80px] bg-[var(--accent-voice)] text-white font-bold text-lg rounded-xl hover:bg-accent-voice active:bg-accent-voice transition-colors flex items-center justify-center gap-2"
         >
           <ShieldCheck size={22} />
           Understood — Start Procedure

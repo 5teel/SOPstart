@@ -116,7 +116,7 @@ export default async function BlocksLibraryPage({
                   ? '1.5px solid var(--ink-900)'
                   : '1.5px solid var(--ink-300)',
                 background: !dept ? 'var(--ink-900)' : 'var(--paper)',
-                color: !dept ? '#fff' : 'var(--ink-500)',
+                color: !dept ? 'var(--paper-1)' : 'var(--ink-500)',
               }}
             >
               All
@@ -127,7 +127,7 @@ export default async function BlocksLibraryPage({
                   fontWeight: 700,
                   padding: '1px 7px',
                   background: !dept ? 'var(--steel-700, #374151)' : 'var(--paper-2)',
-                  color: !dept ? '#fff' : 'var(--ink-700)',
+                  color: !dept ? 'var(--paper-1)' : 'var(--ink-700)',
                 }}
               >
                 {augmentedBlocks.length}
@@ -150,7 +150,7 @@ export default async function BlocksLibraryPage({
                       ? '1.5px solid var(--ink-900)'
                       : '1.5px solid var(--ink-300)',
                     background: isActive ? 'var(--ink-900)' : 'var(--paper)',
-                    color: isActive ? '#fff' : 'var(--ink-500)',
+                    color: isActive ? 'var(--paper-1)' : 'var(--ink-500)',
                   }}
                 >
                   {/* Colour swatch */}
@@ -171,7 +171,7 @@ export default async function BlocksLibraryPage({
                       fontWeight: 700,
                       padding: '1px 7px',
                       background: isActive ? 'var(--steel-700, #374151)' : 'var(--paper-2)',
-                      color: isActive ? '#fff' : 'var(--ink-700)',
+                      color: isActive ? 'var(--paper-1)' : 'var(--ink-700)',
                     }}
                   >
                     {d.block_count}

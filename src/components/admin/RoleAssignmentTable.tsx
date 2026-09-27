@@ -211,7 +211,7 @@ export default function RoleAssignmentTable({
           </button>
         </div>
         {inviteFeedback && (
-          <p className={`mt-2 text-sm ${inviteFeedback.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+          <p className={`mt-2 text-sm ${inviteFeedback.type === 'success' ? 'text-accent-signoff' : 'text-accent-escalate'}`}>
             {inviteFeedback.message}
           </p>
         )}
@@ -247,7 +247,7 @@ export default function RoleAssignmentTable({
           </button>
         </div>
         {addFeedback && (
-          <p className={`mt-2 text-sm ${addFeedback.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+          <p className={`mt-2 text-sm ${addFeedback.type === 'success' ? 'text-accent-signoff' : 'text-accent-escalate'}`}>
             {addFeedback.message}
           </p>
         )}
@@ -312,7 +312,7 @@ export default function RoleAssignmentTable({
                 border: '1.5px solid',
                 borderColor: activeDeptFilter === null ? 'var(--ink-900)' : 'var(--ink-300)',
                 background: activeDeptFilter === null ? 'var(--ink-900)' : 'var(--paper)',
-                color: activeDeptFilter === null ? '#fff' : 'var(--ink-500)',
+                color: activeDeptFilter === null ? 'var(--paper-1)' : 'var(--ink-500)',
               }}
             >
               All
@@ -320,7 +320,7 @@ export default function RoleAssignmentTable({
                 className="text-[10px] font-bold rounded-full px-[7px] py-px"
                 style={{
                   background: activeDeptFilter === null ? 'var(--steel-700, #3f3f46)' : 'var(--paper-2)',
-                  color: activeDeptFilter === null ? '#fff' : 'var(--ink-700)',
+                  color: activeDeptFilter === null ? 'var(--paper-1)' : 'var(--ink-700)',
                 }}
               >
                 {members.length}
@@ -339,7 +339,7 @@ export default function RoleAssignmentTable({
                   border: '1.5px solid',
                   borderColor: activeDeptFilter === dept.id ? 'var(--ink-900)' : 'var(--ink-300)',
                   background: activeDeptFilter === dept.id ? 'var(--ink-900)' : 'var(--paper)',
-                  color: activeDeptFilter === dept.id ? '#fff' : 'var(--ink-500)',
+                  color: activeDeptFilter === dept.id ? 'var(--paper-1)' : 'var(--ink-500)',
                 }}
               >
                 <span
@@ -358,7 +358,7 @@ export default function RoleAssignmentTable({
                   className="text-[10px] font-bold rounded-full px-[7px] py-px"
                   style={{
                     background: activeDeptFilter === dept.id ? 'var(--steel-700, #3f3f46)' : 'var(--paper-2)',
-                    color: activeDeptFilter === dept.id ? '#fff' : 'var(--ink-700)',
+                    color: activeDeptFilter === dept.id ? 'var(--paper-1)' : 'var(--ink-700)',
                   }}
                 >
                   {deptMemberCount[dept.id] ?? 0}
@@ -440,7 +440,7 @@ export default function RoleAssignmentTable({
                           key={d.id}
                           className="text-[8px] font-bold uppercase tracking-[0.05em] inline-flex items-center gap-0.5 px-1 py-px rounded border flex-shrink-0"
                           style={{
-                            color: '#a16207',
+                            color: 'var(--accent-decision)',
                             background: 'rgba(251,191,36,0.16)',
                             border: '1px solid var(--accent-signoff)',
                             borderRadius: '3px',
@@ -451,7 +451,7 @@ export default function RoleAssignmentTable({
                       ))}
                     </div>
                     {feedback?.id === member.id && (
-                      <p className={`text-xs mt-0.5 ${feedback.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+                      <p className={`text-xs mt-0.5 ${feedback.type === 'success' ? 'text-accent-signoff' : 'text-accent-escalate'}`}>
                         {feedback.message}
                       </p>
                     )}
@@ -537,7 +537,7 @@ export default function RoleAssignmentTable({
                           className="mt-2 text-[11px] font-semibold rounded-md px-3 py-1"
                           style={{
                             background: 'var(--ink-900)',
-                            color: '#fff',
+                            color: 'var(--paper-1)',
                             border: 'none',
                           }}
                         >
@@ -551,7 +551,7 @@ export default function RoleAssignmentTable({
                   {!isCurrentUser ? (
                     <button
                       onClick={() => setConfirmAction({ type: 'remove', memberId: member.id })}
-                      className="h-9 w-9 flex items-center justify-center rounded-lg bg-[var(--paper-2)] border border-[var(--ink-300)] text-[var(--ink-500)] hover:text-red-400 hover:border-red-500/30 transition-colors flex-shrink-0"
+                      className="h-9 w-9 flex items-center justify-center rounded-lg bg-[var(--paper-2)] border border-[var(--ink-300)] text-[var(--ink-500)] hover:text-accent-escalate hover:border-accent-escalate/30 transition-colors flex-shrink-0"
                       title="Remove from organisation"
                       aria-label={`Remove ${member.email ?? 'member'}`}
                     >

@@ -63,7 +63,7 @@ export function AdminAccessLens({ pinnedSopId, onBack }: AdminAccessLensProps) {
       <div>
         {backLink}
         <div className="blueprint-frame text-center py-12">
-          <p className="mono text-[11px] text-red-600 uppercase tracking-wider mb-2">ERROR</p>
+          <p className="mono text-[11px] text-accent-escalate uppercase tracking-wider mb-2">ERROR</p>
           <p className="text-sm text-[var(--ink-500)]">{data.error}</p>
         </div>
       </div>

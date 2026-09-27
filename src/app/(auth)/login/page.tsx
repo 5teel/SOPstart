@@ -17,7 +17,7 @@ export default async function LoginPage({
   return (
     <div>
       {justRegistered && (
-        <div className="rounded-lg bg-green-900/40 border border-green-700 px-4 py-3 text-sm text-green-300 mb-6 text-center">
+        <div className="rounded-lg bg-accent-signoff/10 border border-accent-signoff px-4 py-3 text-sm text-accent-signoff mb-6 text-center">
           Account created successfully. Log in to get started.
         </div>
       )}

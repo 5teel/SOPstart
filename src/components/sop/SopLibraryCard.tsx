@@ -64,7 +64,7 @@ export function SopLibraryCard({
           {hasNewerVersion && (
             <span
               data-updated-badge="true"
-              className="mono rounded bg-amber-600/[0.16] px-1.5 py-0.5 text-[11px] text-amber-700"
+              className="mono rounded bg-accent-decision/16 px-1.5 py-0.5 text-[11px] text-accent-decision"
               title="This SOP has been updated since you last completed it"
             >
               Updated since you read it
@@ -79,8 +79,8 @@ export function SopLibraryCard({
               data-refresher-due-badge="true"
               className={`mono rounded px-1.5 py-0.5 text-[11px] ${
                 isRefresherOverdue
-                  ? 'bg-red-500/[0.14] text-[var(--accent-hazard)]'
-                  : 'bg-amber-600/[0.16] text-amber-700'
+                  ? 'bg-accent-escalate/14 text-[var(--accent-hazard)]'
+                  : 'bg-accent-decision/16 text-accent-decision'
               }`}
               title="Time for a refresher walkthrough of this SOP"
             >

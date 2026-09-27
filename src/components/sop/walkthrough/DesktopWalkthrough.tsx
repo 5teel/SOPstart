@@ -190,7 +190,7 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
         className="flex flex-col items-center justify-center min-h-[60vh] px-6 gap-8 text-center"
         data-walkthrough="desktop"
       >
-        <CheckCircle2 size={96} className="text-green-500" />
+        <CheckCircle2 size={96} className="text-accent-signoff" />
         <div>
           <p className="text-4xl font-bold text-[var(--ink-900)] mb-3">Completion submitted</p>
           <p className="text-xl text-[var(--ink-500)]">Your supervisor has been notified.</p>
@@ -371,7 +371,7 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
                   data-testid="walkthrough-already-submitted"
                   className="min-h-[60px] px-6 rounded-xl border border-[var(--ink-200)] bg-[var(--ink-50)] flex items-center gap-3 text-lg font-semibold text-[var(--ink-700)]"
                 >
-                  <CheckCircle2 className="h-6 w-6 text-green-500" />
+                  <CheckCircle2 className="h-6 w-6 text-accent-signoff" />
                   Already submitted — re-reading
                 </div>
                 <button

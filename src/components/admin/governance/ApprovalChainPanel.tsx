@@ -65,7 +65,7 @@ export function ApprovalChainPanel({
                 style={{
                   color:
                     state === 'approved'
-                      ? '#10b981'
+                      ? 'var(--accent-ok)'
                       : state === 'current'
                         ? 'var(--accent-signoff)'
                         : 'var(--ink-500)',
@@ -79,7 +79,7 @@ export function ApprovalChainPanel({
         })}
       </ol>
 
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-accent-escalate">{error}</p>}
 
       {canAct && (
         <div className="flex flex-wrap items-center gap-2">

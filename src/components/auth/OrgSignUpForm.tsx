@@ -49,7 +49,7 @@ export default function OrgSignUpForm() {
           className="w-full px-4 py-3 rounded-lg bg-white border border-[var(--ink-100)] text-[var(--ink-900)] placeholder-[var(--ink-500)] focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)] focus:border-transparent text-base"
         />
         {errors.organisationName && (
-          <p className="mt-1 text-sm text-red-400">{errors.organisationName.message}</p>
+          <p className="mt-1 text-sm text-accent-escalate">{errors.organisationName.message}</p>
         )}
       </div>
 
@@ -66,7 +66,7 @@ export default function OrgSignUpForm() {
           className="w-full px-4 py-3 rounded-lg bg-white border border-[var(--ink-100)] text-[var(--ink-900)] placeholder-[var(--ink-500)] focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)] focus:border-transparent text-base"
         />
         {errors.email && (
-          <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+          <p className="mt-1 text-sm text-accent-escalate">{errors.email.message}</p>
         )}
       </div>
 
@@ -83,7 +83,7 @@ export default function OrgSignUpForm() {
           className="w-full px-4 py-3 rounded-lg bg-white border border-[var(--ink-100)] text-[var(--ink-900)] placeholder-[var(--ink-500)] focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)] focus:border-transparent text-base"
         />
         {errors.password && (
-          <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
+          <p className="mt-1 text-sm text-accent-escalate">{errors.password.message}</p>
         )}
       </div>
 
@@ -100,12 +100,12 @@ export default function OrgSignUpForm() {
           className="w-full px-4 py-3 rounded-lg bg-white border border-[var(--ink-100)] text-[var(--ink-900)] placeholder-[var(--ink-500)] focus:outline-none focus:ring-2 focus:ring-[var(--ink-900)] focus:border-transparent text-base"
         />
         {errors.confirmPassword && (
-          <p className="mt-1 text-sm text-red-400">{errors.confirmPassword.message}</p>
+          <p className="mt-1 text-sm text-accent-escalate">{errors.confirmPassword.message}</p>
         )}
       </div>
 
       {serverError && (
-        <div className="rounded-lg bg-red-900/40 border border-red-700 px-4 py-3 text-sm text-red-300">
+        <div className="rounded-lg bg-accent-escalate/10 border border-accent-escalate px-4 py-3 text-sm text-accent-escalate">
           {serverError}
         </div>
       )}

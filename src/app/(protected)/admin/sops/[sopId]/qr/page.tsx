@@ -58,7 +58,7 @@ export default async function SopQrPage({ params }: { params: Promise<{ sopId: s
             Print and stick this on the machine or work area. Scanning opens the procedure
             directly on the worker&apos;s phone.
             {sop.status !== 'published' && (
-              <span className="block mt-1 text-amber-600 font-medium">
+              <span className="block mt-1 text-accent-decision font-medium">
                 ⚠ This SOP isn&apos;t published yet — workers will not see it until it is.
               </span>
             )}

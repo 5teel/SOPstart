@@ -377,7 +377,7 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
     if (recorderState === 'requesting-permission') {
       return (
         <div className="absolute inset-0 flex items-center justify-center">
-          <Loader2 className="w-10 h-10 text-blue-400 animate-spin" />
+          <Loader2 className="w-10 h-10 text-accent-step animate-spin" />
         </div>
       )
     }
@@ -394,7 +394,7 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
     if (recorderState === 'error') {
       return (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 px-8 text-center">
-          <AlertTriangle className="w-10 h-10 text-red-400" />
+          <AlertTriangle className="w-10 h-10 text-accent-escalate" />
           <p className="text-sm text-[var(--accent-voice)] leading-relaxed">{errorMessage}</p>
         </div>
       )
@@ -417,7 +417,7 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
               type="button"
               onClick={handleDiscardConfirm}
               aria-label="Discard recording and close"
-              className="flex-1 h-[72px] bg-white border border-red-500/50 text-red-400 rounded-lg font-semibold text-sm hover:bg-[var(--paper-2)] transition-colors"
+              className="flex-1 h-[72px] bg-white border border-accent-escalate/50 text-accent-escalate rounded-lg font-semibold text-sm hover:bg-[var(--paper-2)] transition-colors"
             >
               Discard recording
             </button>
@@ -444,7 +444,7 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
             </>
           ) : (
             <div className="flex items-center gap-2">
-              <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
+              <Loader2 className="w-5 h-5 text-accent-step animate-spin" />
               <p className="text-sm text-[var(--ink-900)]">Stopping...</p>
             </div>
           )}
@@ -521,7 +521,7 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
             onClick={handleStopRecording}
             aria-label="Stop recording"
             aria-pressed={true}
-            className="w-20 h-20 rounded-full border-4 border-red-500 bg-red-500 flex items-center justify-center ring-4 ring-red-500/30"
+            className="w-20 h-20 rounded-full border-4 border-accent-escalate bg-accent-escalate flex items-center justify-center ring-4 ring-accent-escalate/30"
           >
             <Square className="w-8 h-8 fill-white text-white" />
           </button>
@@ -582,15 +582,15 @@ export function VideoRecorder({ open, onClose, onSubmitComplete }: VideoRecorder
             className="absolute top-4 left-4 flex items-center gap-2"
             aria-live="polite"
           >
-            <span className="w-3 h-3 rounded-full bg-red-500 animate-pulse" aria-hidden="true" />
+            <span className="w-3 h-3 rounded-full bg-accent-escalate animate-pulse" aria-hidden="true" />
             <span className="text-xs font-semibold text-[var(--ink-900)] tabular-nums">REC</span>
             <span
-              className={`text-xs font-semibold tabular-nums ${isWarning ? 'text-red-400' : 'text-[var(--ink-500)]'}`}
+              className={`text-xs font-semibold tabular-nums ${isWarning ? 'text-accent-escalate' : 'text-[var(--ink-500)]'}`}
               aria-label={`Recording duration: ${formatTime(elapsedSeconds)}`}
             >
               {formatTime(elapsedSeconds)}
               {isWarning && (
-                <span className="ml-1 text-red-400">
+                <span className="ml-1 text-accent-escalate">
                   ({formatTime(remainingSeconds)} left)
                 </span>
               )}

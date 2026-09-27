@@ -8,14 +8,14 @@ import { BeforeAfter } from './BeforeAfter'
 import type { UatTest, UatFeedbackRow, CriterionResponse, OverallVerdict } from '@/lib/uat/tests'
 
 const ANSWERS: { v: CriterionResponse; label: string; on: string }[] = [
-  { v: 'pass', label: 'Yes', on: '#16a34a' },
-  { v: 'fail', label: 'No', on: '#dc2626' },
-  { v: 'na', label: 'Not sure', on: '#78756e' },
+  { v: 'pass', label: 'Yes', on: 'var(--accent-signoff)' },
+  { v: 'fail', label: 'No', on: 'var(--accent-escalate)' },
+  { v: 'na', label: 'Not sure', on: 'var(--ink-500)' },
 ]
 const VERDICTS: { id: OverallVerdict; label: string; color: string }[] = [
-  { id: 'approve', label: '👍  Looks good', color: '#16a34a' },
-  { id: 'needs_work', label: '🤔  Could be better', color: '#b45309' },
-  { id: 'reject', label: '👎  Not working', color: '#dc2626' },
+  { id: 'approve', label: '👍  Looks good', color: 'var(--accent-signoff)' },
+  { id: 'needs_work', label: '🤔  Could be better', color: 'var(--accent-decision)' },
+  { id: 'reject', label: '👎  Not working', color: 'var(--accent-escalate)' },
 ]
 
 interface Draft {
@@ -299,11 +299,11 @@ export function UatTestModal({ test, existingRow, onClose, onSaved }: Props) {
         {/* Footer */}
         <footer className="flex items-center justify-between gap-3 px-5 py-3 border-t border-[var(--ink-100)] bg-white">
           {saveState === 'saved' ? (
-            <span className="text-sm text-green-700 font-medium inline-flex items-center gap-1">
+            <span className="text-sm text-accent-signoff font-medium inline-flex items-center gap-1">
               <Check className="h-4 w-4" /> Thanks — your feedback is saved
             </span>
           ) : saveState === 'error' ? (
-            <span className="text-sm text-red-500">Couldn&apos;t save — please try again.</span>
+            <span className="text-sm text-accent-escalate">Couldn&apos;t save — please try again.</span>
           ) : (
             <span className="text-xs text-[var(--ink-500)]">You can change your answers any time.</span>
           )}

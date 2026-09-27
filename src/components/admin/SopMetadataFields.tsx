@@ -169,7 +169,7 @@ export function SopMetadataFields({
         ))}
       </div>
 
-      {titleError && <span className="text-xs text-red-400">{titleError}</span>}
+      {titleError && <span className="text-xs text-accent-escalate">{titleError}</span>}
 
       {open && (
         <SopMetadataDialog

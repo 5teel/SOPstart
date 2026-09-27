@@ -205,7 +205,7 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
           {layoutErrorToast && (
             <div
               role="alert"
-              className="cursor-pointer rounded border border-red-500/30 bg-red-500/10 px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-red-300"
+              className="cursor-pointer rounded border border-accent-escalate/30 bg-accent-escalate/10 px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-accent-escalate"
               onClick={() => setLayoutErrorToast(null)}
             >
               {layoutErrorToast} (click to dismiss)
@@ -214,7 +214,7 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
           {overwriteToast && (
             <span
               role="status"
-              className="rounded border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-amber-300"
+              className="rounded border border-accent-decision/30 bg-accent-decision/10 px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-accent-decision"
             >
               {overwriteToast}
             </span>
@@ -266,7 +266,7 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
               {proposalActionError && (
                 <p
                   role="alert"
-                  className="mb-2 rounded border border-red-500/30 bg-red-500/10 px-3 py-1.5 font-mono text-xs text-red-400"
+                  className="mb-2 rounded border border-accent-escalate/30 bg-accent-escalate/10 px-3 py-1.5 font-mono text-xs text-accent-escalate"
                 >
                   Proposal action failed: {proposalActionError}
                 </p>
@@ -274,7 +274,7 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
               {agentError ? (
                 <p
                   role="alert"
-                  className="mb-2 rounded border border-red-500/30 bg-red-500/10 px-3 py-1.5 font-mono text-xs text-red-400"
+                  className="mb-2 rounded border border-accent-escalate/30 bg-accent-escalate/10 px-3 py-1.5 font-mono text-xs text-accent-escalate"
                   data-testid="agent-layer-error"
                 >
                   Agent layer unavailable: {agentError}

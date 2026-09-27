@@ -37,7 +37,7 @@ export function DeleteSopButton({
             })
           }}
           disabled={pending}
-          className="flex items-center justify-center w-10 h-10 rounded-lg bg-red-900/40 border border-red-500/40 text-red-400 hover:bg-red-900/60 transition-colors"
+          className="flex items-center justify-center w-10 h-10 rounded-lg bg-accent-escalate/10 border border-accent-escalate/40 text-accent-escalate hover:bg-accent-escalate/10 transition-colors"
           title="Confirm delete"
           aria-label="Confirm delete"
         >
@@ -75,7 +75,7 @@ export function DeleteSopButton({
     <button
       type="button"
       onClick={() => setConfirming(true)}
-      className="flex items-center justify-center w-10 h-10 rounded-lg bg-white border border-[var(--ink-100)] hover:bg-red-900/30 hover:border-red-500/40 transition-colors text-[var(--ink-500)] hover:text-red-400 flex-shrink-0"
+      className="flex items-center justify-center w-10 h-10 rounded-lg bg-white border border-[var(--ink-100)] hover:bg-accent-escalate/10 hover:border-accent-escalate/40 transition-colors text-[var(--ink-500)] hover:text-accent-escalate flex-shrink-0"
       title="Delete SOP"
       aria-label="Delete SOP"
     >
