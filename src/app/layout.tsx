@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { PRODUCT_NAME, PRODUCT_DESCRIPTION } from '@/lib/constants'
 import './globals.css'
-import '../styles/blueprint-theme.css'
 
 export const metadata: Metadata = {
   title: PRODUCT_NAME,

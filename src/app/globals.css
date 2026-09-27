@@ -1,4 +1,10 @@
 @import "tailwindcss";
+/* The token file MUST come in through this Tailwind entry, not as a separate
+ * stylesheet import from layout.tsx: its `@theme inline` block is what turns
+ * every token into a utility (text-accent-escalate, bg-ink-100/50 …), and
+ * Tailwind only reads @theme from CSS it processes. Imported from the layout
+ * it was plain CSS — the utilities silently generated nothing (2026-09-28). */
+@import "../styles/blueprint-theme.css";
 
 @theme {
   --min-tap-target: 72px;

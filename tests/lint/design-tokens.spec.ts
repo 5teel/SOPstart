@@ -74,6 +74,17 @@ test.describe('design tokens — one source of truth', () => {
     expect(hits, hits.slice(0, 20).join('\n')).toEqual([])
   })
 
+  test('the theme file reaches Tailwind through the globals.css entry, never as a plain stylesheet import', () => {
+    // Tailwind only reads `@theme` from CSS it processes. Imported from
+    // layout.tsx as a separate stylesheet, the block was plain CSS and every
+    // token utility (text-accent-escalate …) silently generated NOTHING —
+    // shipped to production for ~40 minutes on 2026-09-28.
+    const globals = fs.readFileSync(path.join(SRC, 'app', 'globals.css'), 'utf-8')
+    expect(globals).toMatch(/@import "tailwindcss";[\s\S]*@import "\.\.\/styles\/blueprint-theme\.css";/)
+    const layout = fs.readFileSync(path.join(SRC, 'app', 'layout.tsx'), 'utf-8')
+    expect(layout).not.toContain('blueprint-theme.css')
+  })
+
   test('every token utility a component may use is declared in the @theme block', () => {
     const theme = fs.readFileSync(path.join(SRC, 'styles', 'blueprint-theme.css'), 'utf-8')
     for (const t of ['accent-step', 'accent-ok', 'accent-hazard', 'accent-mcu', 'ai', 'brand-yellow', 'steel-900', 'steel-700', 'ink-200', 'ink-400', 'ink-600', 'paper-1']) {
