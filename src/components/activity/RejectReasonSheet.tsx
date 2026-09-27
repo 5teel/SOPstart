@@ -74,8 +74,8 @@ export function RejectReasonSheet({
             onChange={(e) => setReason(e.target.value.slice(0, MAX_LENGTH))}
             disabled={isSubmitting}
           />
-          <span className="mono text-xs text-[var(--ink-500)] text-right tabular-nums">
-            {reason.length}/{MAX_LENGTH}
+          <span className="mono text-xs text-right tabular-nums" style={{ color: isValid ? 'var(--ink-500)' : 'var(--accent-escalate)' }}>
+            {isValid ? `${reason.length}/${MAX_LENGTH}` : `At least 10 characters · ${reason.length}/${MAX_LENGTH}`}
           </span>
         </div>
 

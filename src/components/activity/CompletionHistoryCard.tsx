@@ -17,6 +17,8 @@ interface CompletionHistoryCardProps {
 function formatNZDateTime(isoString: string): string {
   const date = new Date(isoString)
   return date.toLocaleDateString('en-NZ', {
+    // Fixed zone: the server (UTC) and the browser (NZ) must render the SAME text or React throws #418 on hydration.
+    timeZone: 'Pacific/Auckland',
     day: '2-digit',
     month: 'short',
     year: 'numeric',

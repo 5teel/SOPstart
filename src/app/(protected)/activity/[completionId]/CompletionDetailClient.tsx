@@ -70,6 +70,8 @@ function mapSignOffError(error: string): string {
 function formatNZDateTime(isoString: string): string {
   const date = new Date(isoString)
   return date.toLocaleDateString('en-NZ', {
+    // Fixed zone: the server (UTC) and the browser (NZ) must render the SAME text or React throws #418 on hydration.
+    timeZone: 'Pacific/Auckland',
     day: '2-digit', month: 'short', year: 'numeric',
     hour: '2-digit', minute: '2-digit', hour12: false,
   }).replace(',', ' ·')
@@ -414,7 +416,9 @@ export function CompletionDetailClient({
                 onChange={(e) => setOverrideReason(e.target.value.slice(0, 500))}
                 disabled={isApproving}
               />
-              <span className="mono text-xs text-[var(--ink-500)] text-right tabular-nums">{overrideReason.length}/500</span>
+              <span className="mono text-xs text-right tabular-nums" style={{ color: overrideReason.trim().length >= 10 ? 'var(--ink-500)' : 'var(--accent-escalate)' }}>
+                {overrideReason.trim().length >= 10 ? `${overrideReason.length}/500` : `At least 10 characters · ${overrideReason.length}/500`}
+              </span>
             </div>
             <button
               type="button"

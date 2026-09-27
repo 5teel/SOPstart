@@ -137,9 +137,12 @@ export default async function CompletionDetailPage({ params }: CompletionDetailP
     sop_steps: { id: string; step_number: number; text: string }[] | null
   }
 
+  // Section order, then step order within the section; numbered sequentially.
+  // step_number restarts at 1 in every section, so a global sort by it
+  // interleaved the procedures and printed "1" four times in a row.
   const allSteps = ((sections ?? []) as unknown as RawSection[])
-    .flatMap((sec) => sec.sop_steps ?? [])
-    .sort((a, b) => a.step_number - b.step_number)
+    .flatMap((sec) => [...(sec.sop_steps ?? [])].sort((a, b) => a.step_number - b.step_number))
+    .map((s, i) => ({ ...s, step_number: i + 1 }))
 
   const signOffs = data.completion_sign_offs ?? []
   const signOff = signOffs.length > 0 ? signOffs[0] : null

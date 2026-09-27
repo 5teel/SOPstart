@@ -28,6 +28,8 @@ export interface CompletionStepRowProps {
 function formatTime(ms: number): string {
   const date = new Date(ms)
   return date.toLocaleTimeString('en-NZ', {
+    // Fixed zone: the server (UTC) and the browser (NZ) must render the SAME text or React throws #418 on hydration.
+    timeZone: 'Pacific/Auckland',
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
