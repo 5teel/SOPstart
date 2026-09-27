@@ -103,8 +103,11 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
     expect(lens).toContain('sops={sops}')
     expect(lens).toContain('data.sops.filter(')
 
-    // Whole row reaches the builder (WIRING: interpolated sop id).
-    expect(browser).toMatch(/href=\{`\/admin\/sops\/builder\/\$\{sop\.id\}`\}/)
+    // Rows open the SOP as a worker sees it; the detail pane's Edit is the one
+    // list→builder chain (WIRING: interpolated sop id) — 2026-09-27, /sops is a
+    // portal to USE a SOP, not an editor launcher.
+    expect(browser).toMatch(/href=\{`\/sops\/\$\{sop\.id\}`\}/)
+    expect(browser).toMatch(/href=\{`\/admin\/sops\/builder\/\$\{selected\.id\}`\}/)
     expect(browser).toContain('<StatusBadge status={sop.status as SopStatus} />')
     expect(browser).toContain('sop.flagLabel')
 

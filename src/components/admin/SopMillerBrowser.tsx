@@ -10,10 +10,15 @@
  * in client state here, and the detail pane renders from data the list already
  * carries. No query runs when you click a row.
  *
+ * /sops is a portal to USE a SOP — an admin opening one from here wants the
+ * SOP as a worker sees it (read / walk it), not the editor. So the primary
+ * action everywhere is the worker view; the builder is the "Edit" side door in
+ * the detail pane, the single list→builder chain (SUR-04).
+ *
  * Below `lg` there is no room for three columns: the detail pane is dropped and
- * a row becomes a direct link to the builder, which is the pre-Miller
- * behaviour. Admin work is desktop-first (Visy interview), but the page must
- * still work on a phone rather than merely not crash on one.
+ * a row becomes a direct link to the worker view. Admin work is desktop-first
+ * (Visy interview), but the page must still work on a phone rather than merely
+ * not crash on one.
  *
  * Renders as `contents` so the two columns are direct grid children of the
  * page's Miller frame — one flush surface, the same rows and headers the
@@ -23,7 +28,7 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { GitBranch, PencilLine } from 'lucide-react'
+import { BookOpen, PencilLine } from 'lucide-react'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { DepartmentPicker } from '@/components/admin/departments/DepartmentPicker'
 import { setSopCategory } from '@/actions/sops'
@@ -119,9 +124,9 @@ export function SopMillerBrowser({
                     <RowBody sop={sop} hideStatus={hideStatus} selected={isSelected} />
                   </button>
 
-                  {/* Below lg there is no detail column, so the row is the link. */}
+                  {/* Below lg there is no detail column, so the row is the link — to the SOP, not the editor. */}
                   <Link
-                    href={`/admin/sops/builder/${sop.id}`}
+                    href={`/sops/${sop.id}`}
                     className="flex min-h-[64px] w-full items-center gap-3 rounded-lg border border-[var(--ink-100)] bg-white px-4 py-3 lg:hidden"
                   >
                     <RowBody sop={sop} hideStatus={hideStatus} selected={false} />
@@ -159,24 +164,30 @@ export function SopMillerBrowser({
                 )}
               </div>
 
-              {/* The primary action sits above the facts: this pane exists to
-                  get you into the builder. */}
-              <div className="mb-4 flex gap-2">
+              {/* The primary action sits above the facts and opens the SOP as
+                  a worker sees it. Edit is the one list→builder chain (SUR-04). */}
+              <div className="mb-1.5 flex gap-2">
                 <Link
-                  href={`/admin/sops/builder/${selected.id}`}
+                  href={`/sops/${selected.id}`}
                   className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-md bg-[var(--ink-900)] px-3 py-2.5 text-sm font-semibold text-white hover:opacity-90"
                 >
-                  <PencilLine size={14} aria-hidden="true" />
+                  <BookOpen size={14} aria-hidden="true" />
                   Open
                 </Link>
                 <Link
-                  href={`/admin/sops/${selected.id}/versions`}
+                  href={`/admin/sops/builder/${selected.id}`}
                   className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-md border border-[var(--ink-300)] bg-[var(--paper-1)] px-3 py-2.5 text-sm text-[var(--ink-700)] hover:border-[var(--ink-900)] hover:text-[var(--ink-900)]"
                 >
-                  <GitBranch size={14} aria-hidden="true" />
-                  Versions
+                  <PencilLine size={14} aria-hidden="true" />
+                  Edit
                 </Link>
               </div>
+              <Link
+                href={`/admin/sops/${selected.id}/versions`}
+                className="mb-4 block text-center text-[11px] text-[var(--ink-500)] underline-offset-2 hover:text-[var(--ink-900)] hover:underline"
+              >
+                Version history
+              </Link>
 
               {/* The two fields that are most often missing are editable HERE.
                   The detail pane is where you notice the gap, so bouncing to

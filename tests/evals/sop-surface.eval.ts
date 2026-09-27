@@ -10,8 +10,8 @@
  * touches production.
  *
  * DOM facts (probed 2026-09-15): desktop rows are `li > button` inside the
- * Miller frame; the only list→builder chain is the "Open" link in the detail
- * pane after a row is selected; mobile rows are `a[href^=/admin/sops/builder]`
+ * Miller frame; "Open" in the detail pane goes to the worker view (/sops/<id>)
+ * and "Edit" is the only list→builder chain; mobile rows are `a[href^=/sops/]`
  * with `lg:hidden`. Admin status lenses span two grid columns (`lg:col-span-2`),
  * so the frame has 2 children under an admin status scope and 3 under a worker
  * scope. Server actions take 2–5 s on prod — wait generously.
@@ -93,7 +93,7 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
       expect(errors).toEqual([])
     })
 
-    test('B — Drafts lens lists SOPs, a selected row exposes one Open→builder chain, attention + access lenses take over full-width and return without reload', async ({ page, context }) => {
+    test('B — Drafts lens lists SOPs, Open goes to the worker view and Edit is the one builder chain, attention + access lenses take over full-width and return without reload', async ({ page, context }) => {
       const errors = watchConsole(page)
       await signInAs(context, 'admin')
       await page.goto('/sops')
@@ -102,7 +102,9 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
       await rows(page).first().click()
       const open = page.getByRole('link', { name: 'Open', exact: true })
       await expect(open).toBeVisible(SLOW)
-      expect(await open.getAttribute('href')).toMatch(/^\/admin\/sops\/builder\/[0-9a-f-]{36}$/)
+      expect(await open.getAttribute('href')).toMatch(/^\/sops\/[0-9a-f-]{36}$/) // the SOP itself, not the editor
+      const edit = page.getByRole('link', { name: 'Edit', exact: true })
+      expect(await edit.getAttribute('href')).toMatch(/^\/admin\/sops\/builder\/[0-9a-f-]{36}$/)
       await expect(page.locator('a[href^="/admin/sops/builder/"]:visible')).toHaveCount(1) // one chain, not two
 
       await page.evaluate(() => { (window as unknown as { __eval: number }).__eval = 1 })
