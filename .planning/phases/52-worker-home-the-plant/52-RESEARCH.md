@@ -318,7 +318,7 @@ useEffect(() => {
 | A2 | `plantRelState`'s "never" tone (amber, matching sketch's `.badge.never` = red-ish `--accent-hazard`) should be a NEW export alongside `topSignal` in `SopWorkerBrowser.tsx`, not a modification of `topSignal` itself | Pattern 2 | Medium — if the planner instead extends `topSignal`'s own return shape, existing SopWorkerBrowser row rendering (which relies on `topSignal`'s current 3-tone `bad`/`warn`/`info` set) must be re-verified to not regress today's badge appearance for `library`/`not-added` rows. Adding a sibling function is lower-risk. |
 | A3 | The fixture-account fix (Pitfall 2/3) belongs in `scripts/eval-fixtures.mjs` as part of THIS phase's Wave 0 or eval-authoring plan, not a prerequisite fixed elsewhere first | Pitfall 2/3 | Low — confirmed by reading the actual fixture script; this is a factual gap, not a guess, but the RIGHT PLACE to fix it (which plan/wave) is a planning decision. |
 
-## Open Questions
+## Open Questions (RESOLVED 2026-09-28 — Q1: mic opens WalkthroughVoiceModal via next/dynamic inside the plant module; Q2: new file src/actions/site-worker.ts)
 
 1. **Does the ask-bar mic open the voice modal directly, or navigate to the Now-card SOP's walkthrough page first?**
    - What we know: `WalkthroughVoiceModal` requires `sopId` and is currently mounted ONLY inside `WalkthroughSwitcher` (i.e., only reachable once already on `/sops/[sopId]`). There is no SOP-agnostic or list-level voice entry anywhere in the codebase (`src/lib/voice/*`, `src/components/sop/voice/*` both confirmed SOP-scoped).
