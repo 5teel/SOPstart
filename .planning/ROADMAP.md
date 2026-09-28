@@ -1656,7 +1656,7 @@ Plans:
 Plans:
 
 - [x] 54-01-PLAN.md — Wave 1: phase54 project + stubs + deletion-sweep scaffold; admin-health.ts (machineHealth, adminSopBadge, machinePanelSops, deriveChecks, tableStatus — TDD); listAdminSopRows check inputs; listSiteHealthForOrg; matrix row
-- [ ] 54-02-PLAN.md — Wave 2: inbox.ts deriveInbox (TDD); /governance server page + GovernanceInbox + GovernanceQueueRow as inbox row (gating verbatim); header, /admin/governance + /admin/sops?view=attention shims, journeys/roles/matrix
+- [x] 54-02-PLAN.md — Wave 2: inbox.ts deriveInbox (TDD); /governance server page + GovernanceInbox + GovernanceQueueRow as inbox row (gating verbatim); header, /admin/governance + /admin/sops?view=attention shims, journeys/roles/matrix
 - [ ] 54-03-PLAN.md — Wave 3: PlantStage health paint + AdminMachinePanel + AdminFloorHealth (dynamic stage, no-site card) beside the inbox
 - [ ] 54-04-PLAN.md — Wave 3: AdminLibraryTable + resolveLibraryNav; WorkerSimpleList (per-row add/remove) + BuilderCategoryButton; /sops swap (no Miller frame), table marker group, page specs repointed, build gate
 - [ ] 54-05-PLAN.md — Wave 4: delete the 7 Miller/lens files + repoint every spec; live deletion sweep + per-symbol lint guard; journeys/roles/uat/matrix
@@ -1737,7 +1737,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 
 **Goal:** Scheduled task or cron that marks video_generation_jobs stuck in queued/analyzing/generating_audio/rendering for >30 minutes as 'failed' with a timeout error. Could also notify admin. Triggered by finding a hours-old rendering job during Phase 10 verification.
 **Requirements:** TBD
-**Plans:** 1/6 plans executed
+**Plans:** 2/6 plans executed
 
 Plans:
 
