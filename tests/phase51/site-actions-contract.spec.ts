@@ -20,6 +20,8 @@ function read(rel: string): string {
 }
 
 const SITE_ACTIONS_PATH = 'src/actions/site.ts'
+const GENERATE_ROUTE_PATH = 'src/app/api/admin/site/generate/route.ts'
+const EMPTY_STATE_PATH = 'src/components/admin/site/SiteEmptyState.tsx'
 
 const EXPECTED_EXPORTS = [
   'listSiteForOrg',
@@ -120,15 +122,80 @@ test.describe('actions', () => {
 })
 
 test.describe('generate route + empty state', () => {
-  // activated by plan 51-03 Task 2
-  test.fixme('POST /api/admin/site/generate returns 503 (not a broken 200) when GEMINI_API_KEY is unset', () => {})
+  test('POST /api/admin/site/generate returns 503 (not a broken 200) when GEMINI_API_KEY is unset', () => {
+    const src = read(GENERATE_ROUTE_PATH)
+    expect(src).toContain('export async function POST')
+    expect(src).toContain('export const maxDuration')
 
-  // activated by plan 51-03 Task 2
-  test.fixme('the Generate control only renders when canGenerate (key present) is true; Upload always renders', () => {})
+    const guardIndex = src.indexOf('requireAdminContext()')
+    const keyIndex = src.indexOf('GEMINI_API_KEY')
+    const fetchIndex = src.indexOf('fetch(')
+    expect(guardIndex).toBeGreaterThan(-1)
+    expect(keyIndex).toBeGreaterThan(-1)
+    expect(fetchIndex).toBeGreaterThan(-1)
+    expect(guardIndex, 'requireAdminContext() must run before the env read').toBeLessThan(keyIndex)
+    expect(keyIndex, 'the key must be checked before the paid fetch').toBeLessThan(fetchIndex)
 
-  // activated by plan 51-03 Task 2
-  test.fixme('GEMINI_API_KEY is never included in any response body sent to the client', () => {})
+    expect(src).toContain('status: 503')
+    expect(src).toContain('status: 409')
+    expect(src).toContain('x-goog-api-key')
+    expect(src).toContain('generateSceneSchema')
+    expect(src).toContain('AbortSignal.timeout(')
+    expect(src).toContain('upsertSiteLayout(')
+    expect(src.includes('?key=')).toBe(false)
+  })
 
-  // activated by plan 51-03 Task 2
-  test.fixme('generateSceneSchema rejects a description under 20 chars and over 1200 chars before any fetch call', () => {})
+  test('the Generate control only renders when canGenerate (key present) is true; Upload always renders', () => {
+    const src = read(EMPTY_STATE_PATH)
+    expect(src.trimStart().startsWith("'use client'")).toBe(true)
+
+    const gateIndex = src.indexOf('canGenerate &&')
+    const genButtonIndex = src.indexOf('site-generate-button')
+    const genDescIndex = src.indexOf('site-generate-description')
+    expect(gateIndex).toBeGreaterThan(-1)
+    expect(genButtonIndex).toBeGreaterThan(-1)
+    expect(genDescIndex).toBeGreaterThan(-1)
+    expect(gateIndex, 'the canGenerate gate must precede the generate controls').toBeLessThan(genButtonIndex)
+    expect(gateIndex, 'the canGenerate gate must precede the generate controls').toBeLessThan(genDescIndex)
+
+    expect(src).toContain('accept="image/jpeg,image/png"')
+    expect(src).toContain('createSceneUploadUrl(')
+    expect(src).toContain('uploadToSignedUrl(')
+    expect(src).toContain('upsertSiteLayout(')
+    expect(src).toContain('router.refresh()')
+    expect(src).toContain('/api/admin/site/generate')
+  })
+
+  test('GEMINI_API_KEY is never included in any response body sent to the client', () => {
+    const src = read(GENERATE_ROUTE_PATH)
+    // No NextResponse.json( call's argument text may reference process.env —
+    // scan each call's balanced-paren argument text.
+    const callRegex = /NextResponse\.json\(/g
+    let m: RegExpExecArray | null
+    while ((m = callRegex.exec(src))) {
+      let depth = 1
+      let i = m.index + m[0].length
+      const start = i
+      while (i < src.length && depth > 0) {
+        if (src[i] === '(') depth++
+        else if (src[i] === ')') depth--
+        i++
+      }
+      const argText = src.slice(start, i - 1)
+      expect(argText.includes('process.env'), `NextResponse.json call at ${m.index} references process.env`).toBe(false)
+    }
+  })
+
+  test('generateSceneSchema rejects a description under 20 chars and over 1200 chars before any fetch call', () => {
+    const validatorSrc = read('src/lib/validators/site.ts')
+    expect(validatorSrc).toContain('min(20)')
+    expect(validatorSrc).toContain('max(1200)')
+
+    const routeSrc = read(GENERATE_ROUTE_PATH)
+    const parseIndex = routeSrc.indexOf('generateSceneSchema')
+    const fetchIndex = routeSrc.indexOf('fetch(')
+    expect(parseIndex).toBeGreaterThan(-1)
+    expect(fetchIndex).toBeGreaterThan(-1)
+    expect(parseIndex, 'schema validation must run before the paid fetch call').toBeLessThan(fetchIndex)
+  })
 })
