@@ -38,7 +38,7 @@ The **data and the admin editor** for the plant-floor model, nothing the worker 
 - D-11: Empty state when the org has no layout: two large choices — **Generate from a description** (textarea + Generate) and **Upload an image**. After either, the editor opens on the scene.
 
 ### SOP ↔ machine linking
-- D-12: The builder's SOP-level metadata panel gets a **Machines** multi-select (org-scoped, grouped by department, searchable); writes `sop_machines` through the same server action the editor uses. Find the actual panel by grepping the builder for where category/department are edited (`assignSopDepartments` call site) — do not guess the file (CLAUDE.md rule 1).
+- D-12: The builder gets a **Machines** multi-select (org-scoped, grouped by department, searchable) that writes `sop_machines` through the same server action the editor uses. **Research correction (2026-09-28):** there is no SOP-level metadata panel — `SopDepartmentEditor.tsx` has zero call sites. The picker is a new row in `BuilderStageShell.tsx`'s `ToolsMenu`, opened as a portaled modal exactly like `BuilderFlowButton.tsx`.
 - D-13: Deleting a machine cascades `sop_machines`; deleting a SOP cascades `sop_machines` (FK `on delete cascade`); a department delete sets `department_id` null (never deletes machines).
 
 ### Testing & verification
