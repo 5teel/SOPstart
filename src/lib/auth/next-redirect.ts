@@ -6,7 +6,6 @@
  * server-action file breaks next build (CLAUDE.md 2026-06-27).
  */
 const MAX_LEN = 512
-// eslint-disable-next-line no-control-regex
 const CONTROL_CHAR = /[\u0000-\u001f\u007f]/
 
 export function safeNextPath(next: string | null | undefined): string | null {

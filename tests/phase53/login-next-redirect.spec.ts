@@ -10,7 +10,24 @@
  * Static @/ imports only -- CLAUDE.md 2026-06-24.
  */
 import { test, expect } from '@playwright/test'
+import fs from 'node:fs'
+import path from 'node:path'
 import { safeNextPath } from '@/lib/auth/next-redirect'
+
+const ROOT = path.resolve(__dirname, '..', '..')
+function read(p: string): string {
+  return fs.readFileSync(path.join(ROOT, p), 'utf-8')
+}
+// Mirrors tests/phase41/merged-surface.spec.ts: strip comments before
+// asserting, so a comment can never satisfy or trip an assertion
+// (CLAUDE.md 2026-09-28).
+function stripComments(src: string): string {
+  return src
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .split('\n')
+    .map((line) => line.replace(/\/\/.*$/, ''))
+    .join('\n')
+}
 
 test.describe('safeNextPath', () => {
   test('accepts a plain relative path, with query and/or hash', () => {
@@ -48,5 +65,38 @@ test.describe('safeNextPath', () => {
 })
 
 test.describe('login ?next= wiring', () => {
-  test.fixme('login ?next= wiring source-contract tests land in 53-01 Task 3', async () => {})
+  test('middleware imports safeNextPath from the shared guard', () => {
+    const src = stripComments(read('src/lib/supabase/middleware.ts'))
+    expect(src).toContain("from '@/lib/auth/next-redirect'")
+  })
+
+  test('the unauthenticated redirect sets ?next= and skips /api/* paths', () => {
+    const src = stripComments(read('src/lib/supabase/middleware.ts'))
+    expect(src).toContain("searchParams.set('next'")
+    expect(src).toContain("startsWith('/api/')")
+  })
+
+  test('the signed-in auth-route branch prefers a validated next over roleHome', () => {
+    const src = stripComments(read('src/lib/supabase/middleware.ts'))
+    const idx = src.indexOf("safeNextPath(request.nextUrl.searchParams.get('next'))")
+    expect(idx).toBeGreaterThan(-1)
+    expect(src.indexOf('roleHome(role)')).toBeGreaterThan(idx)
+  })
+
+  test('the login page type accepts next and passes it to LoginForm', () => {
+    const src = stripComments(read('src/app/(auth)/login/page.tsx'))
+    expect(src).toContain('next?: string')
+    expect(src).toMatch(/<LoginForm next=\{next\}/)
+  })
+
+  test('LoginForm calls loginWithEmail with data and next', () => {
+    const src = stripComments(read('src/components/auth/LoginForm.tsx'))
+    expect(src).toContain('loginWithEmail(data, next)')
+  })
+
+  test('auth.ts redirects via safeNextPath(next) ?? roleHome(...) and never defines its own safeNextPath', () => {
+    const src = stripComments(read('src/actions/auth.ts'))
+    expect(src).toMatch(/redirect\(safeNextPath\(next\) \?\? roleHome\(/)
+    expect(src).not.toContain('function safeNextPath')
+  })
 })

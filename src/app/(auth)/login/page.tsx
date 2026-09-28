@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import LoginForm from '@/components/auth/LoginForm'
 import Link from 'next/link'
+import { safeNextPath } from '@/lib/auth/next-redirect'
 
 export const metadata: Metadata = {
   title: 'Log In',
@@ -9,10 +10,11 @@ export const metadata: Metadata = {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ registered?: string }>
+  searchParams: Promise<{ registered?: string; next?: string }>
 }) {
   const params = await searchParams
   const justRegistered = params.registered === '1'
+  const next = safeNextPath(params.next) ?? undefined
 
   return (
     <div>
@@ -25,7 +27,7 @@ export default async function LoginPage({
       <h2 className="text-xl font-semibold text-[var(--ink-900)] mb-6 text-center">
         Log in to your account
       </h2>
-      <LoginForm />
+      <LoginForm next={next} />
 
       {/* Prominent join card below the form */}
       <div className="mt-6 rounded-lg border border-[var(--ink-100)] bg-white p-4 text-center">

@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { loginSchema, type LoginInput } from '@/lib/validators/auth'
 import { loginWithEmail } from '@/actions/auth'
 
-export default function LoginForm() {
+export default function LoginForm({ next }: { next?: string }) {
   const [serverError, setServerError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -23,7 +23,7 @@ export default function LoginForm() {
     setIsSubmitting(true)
     setServerError(null)
     try {
-      const result = await loginWithEmail(data)
+      const result = await loginWithEmail(data, next)
       if (result?.error) {
         setServerError(result.error)
       }

@@ -6,6 +6,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { parseJwtPayload } from '@/lib/supabase/jwt'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { roleHome } from '@/lib/auth/role-home'
+import { safeNextPath } from '@/lib/auth/next-redirect'
 import type { TablesInsert, TablesUpdate } from '@/types/database.types'
 import type { AppRole } from '@/types/auth'
 import {
@@ -93,10 +94,13 @@ export async function signUpOrganisation(formData: {
 // ─────────────────────────────────────────────
 // loginWithEmail — AUTH-02, AUTH-03
 // ─────────────────────────────────────────────
-export async function loginWithEmail(formData: {
-  email: string
-  password: string
-}) {
+export async function loginWithEmail(
+  formData: {
+    email: string
+    password: string
+  },
+  next?: string
+) {
   const result = loginSchema.safeParse(formData)
   if (!result.success) {
     return { error: result.error.issues[0]?.message ?? 'Invalid input' }
@@ -111,9 +115,12 @@ export async function loginWithEmail(formData: {
     return { error: 'Invalid email or password' }
   }
 
-  // UX-01: land the user directly on their role home (JWT claim, Base64URL-safe parse)
+  // UX-01: land the user directly on their role home (JWT claim, Base64URL-safe parse).
+  // Phase 53 PHN-02: prefer a validated ?next= (e.g. a scanned /m/<code> plate)
+  // over the role home when present -- re-validated here (defence in depth,
+  // T-53-03) since `next` arrives from the client form call.
   const claims = data.session ? parseJwtPayload(data.session.access_token) : {}
-  redirect(roleHome(claims['user_role'] as string | undefined))
+  redirect(safeNextPath(next) ?? roleHome(claims['user_role'] as string | undefined))
 }
 
 // ─────────────────────────────────────────────

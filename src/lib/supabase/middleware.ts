@@ -1,6 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextRequest, NextResponse } from 'next/server'
 import { roleHome } from '@/lib/auth/role-home'
+import { safeNextPath } from '@/lib/auth/next-redirect'
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request })
@@ -44,14 +45,26 @@ export async function updateSession(request: NextRequest) {
   const isPublicRoute = path === '/' || isAuthRoute || isSchemaIntrospection || isCronRoute || isShotstackCallback || isVersionRoute
 
   if (!isPublicRoute && !claims) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    // Phase 53 PHN-02: preserve the requested path (e.g. a scanned /m/<code>
+    // plate) through the login round trip, so a logged-out worker lands back
+    // on it after signing in. An API caller has no use for a login page
+    // return, so /api/* paths never get a ?next=.
+    const loginUrl = new URL('/login', request.url)
+    if (!path.startsWith('/api/')) {
+      const next = safeNextPath(path + request.nextUrl.search)
+      if (next) loginUrl.searchParams.set('next', next)
+    }
+    return NextResponse.redirect(loginUrl)
   }
 
   if (isAuthRoute && claims) {
     // UX-01: land each role directly on its home. Role comes from the JWT
     // claim (no DB call in middleware); absent claim → /pending safe default.
+    // Phase 53 PHN-02: an already-signed-in visit to /login?next=<safe path>
+    // (e.g. from a scanned plate) goes straight there instead of the role home.
     const role = (claims as Record<string, unknown>)['user_role'] as string | undefined
-    return NextResponse.redirect(new URL(roleHome(role), request.url))
+    const next = safeNextPath(request.nextUrl.searchParams.get('next'))
+    return NextResponse.redirect(new URL(next ?? roleHome(role), request.url))
   }
 
   return response
