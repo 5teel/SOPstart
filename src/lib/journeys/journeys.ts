@@ -68,7 +68,7 @@ export const JOURNEYS: Journey[] = [
       ] },
       { id: 'worker-home', type: 'screen', label: 'SOPs — plant home on desktop when the site has a map', route: '/sops' },
       { id: 'super-home', type: 'screen', label: 'Sign-off', route: '/activity' },
-      { id: 'admin-home', type: 'screen', label: 'SOP surface (Admin scope group)', route: '/sops' },
+      { id: 'admin-home', type: 'screen', label: 'SOP library (table)', route: '/sops' },
       { id: 'pending-home', type: 'screen', label: 'Account pending', route: '/pending', detail: 'Holding screen until an admin assigns a role.' },
       { id: 'e', type: 'end', label: 'Signed in' },
     ],
@@ -144,7 +144,7 @@ export const JOURNEYS: Journey[] = [
         { label: 'On a phone, and the site has a map', to: 'phone' },
         { label: 'No map drawn yet', to: 'lib' },
       ] },
-      { id: 'plant', type: 'screen', label: 'Plant home — the site map', route: '/sops', detail: 'The site drawing with every machine clickable (Phase 52). An amber pin on a machine counts that worker\'s procedures there that are due, never done, or updated — worked out live from the worker\'s own list, never stored (D-05/D-06). The "Next for you" card shows the single next procedure with Walk it and Show me. Department chips move the view to that department\'s machines. The ask bar lights up matching machines as the worker types, and its mic opens the same voice Q&A as the walkthrough. Admins still see today\'s SOP list here (Phase 54 repaints their view).' },
+      { id: 'plant', type: 'screen', label: 'Plant home — the site map', route: '/sops', detail: 'The site drawing with every machine clickable (Phase 52). An amber pin on a machine counts that worker\'s procedures there that are due, never done, or updated — worked out live from the worker\'s own list, never stored (D-05/D-06). The "Next for you" card shows the single next procedure with Walk it and Show me. Department chips move the view to that department\'s machines. The ask bar lights up matching machines as the worker types, and its mic opens the same voice Q&A as the walkthrough. Admins see the library table here instead; their floor is on Governance (Phase 54).' },
       { id: 'pick', type: 'decision', label: 'How do they get there?', branches: [
         { label: 'Click a machine', to: 'panel' },
         { label: 'Now card → Walk it', to: 'walk' },
@@ -166,7 +166,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'scan', type: 'action', label: 'Point the camera at the plate — or type the code printed on it', detail: 'A plate from another site is refused; a blocked camera goes straight to typing.', branches: [
         { label: 'Decoded / typed', to: 'machine' },
       ] },
-      { id: 'lib', type: 'screen', label: 'SOP library', route: '/sops', detail: 'Browse, search, filter by trade. "Updated since last completion" badge (AFL-VER-04) marks any SOP published after the worker\'s last completion. Phase 36 (REF-01): a "Refresher due"/"Refresher overdue" chip appears alongside it once the SOP\'s refresher interval has elapsed since the worker\'s last completion — informational only, never blocks opening the card.' },
+      { id: 'lib', type: 'screen', label: 'SOP library', route: '/sops', detail: 'The stacked worker list (WorkerSimpleList, no map drawn or below 1024px): scope chips (All yours, Refresher due, Updated, Never done, Everything, Not added yet), a department filter, and search. "Updated since last completion" badge (AFL-VER-04) marks any SOP published after the worker\'s last completion. Phase 36 (REF-01): a "Refresher due"/"Refresher overdue" chip appears alongside it once the SOP\'s refresher interval has elapsed since the worker\'s last completion — informational only, never blocks opening the card. Add / Remove sits on each row (D-10).' },
       { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]', detail: 'Read is the SOP as one document (2026-09-27): Orient → Prepare → Do. A SOP holding several procedures shows a "Which job are you doing?" chooser (?job=); Prepare lists tools and parts for that job and lets the worker acknowledge the safety requirements inline; Do lists the job\'s steps in full with a "Walk it step by step" button. Walk it walks the chosen job only (Step 1 of 6, not 1 of 40) and skips the "Before you start" screen when already acknowledged or when there is nothing to acknowledge. Workers see Read + Walk it; the Flow tab and the Desktop/Mobile preview toggle are admin-only (Flow also shows to workers when a real branching graph was authored). Legacy ?tab= params still map onto the tabs. Admins/safety managers see an "Edit in builder" link here.' },
       { id: 'go', type: 'decision', label: 'Ready to start?', branches: [
         { label: 'Yes — walk it', to: 'walk' },
@@ -310,11 +310,11 @@ export const JOURNEYS: Journey[] = [
     group: 'Create an SOP',
     persona: 'SOP Admin',
     title: 'Switch into admin tools',
-    summary: 'An admin signs in and lands directly on the merged SOP surface (UX-01 one home per role), with an Admin scope group of lenses alongside the worker scopes. Admin surfaces live in the primary header for admin roles — Governance · Create New SOP · Team · Site · Settings sit right of Sign-off (2026-07-30, supersedes the UX-02 account-menu door).',
+    summary: 'An admin signs in and lands directly on the SOP library table (UX-01 one home per role) — SOP · Machine · Status · Owner · Checks · Review, with Where / Status / Owner / Checks chips to narrow it. Admin surfaces live in the primary header for admin roles — Governance · Create New SOP · Team · Site · Settings sit right of Sign-off (2026-07-30, supersedes the UX-02 account-menu door).',
     steps: [
       { id: 's', type: 'start', label: 'Signed in as admin / safety manager' },
-      { id: 'home', type: 'screen', label: 'Admin home — SOP surface', route: '/sops', detail: 'roleHome(admin) lands here via the brand mark. The primary header adds Governance (/governance) · Create New SOP (/admin/sops/new) · Team · Site · Settings for admin roles; worker surfaces (SOPs · Sign-off) stay one tap away.' },
-      { id: 'menu', type: 'decision', label: 'Open another admin surface? (app header: Governance · Create New SOP · Content · Team · Site · Settings; Access is a lens within the Admin scope group on the SOP surface)', branches: [
+      { id: 'home', type: 'screen', label: 'Admin home — SOP library table', route: '/sops', detail: 'roleHome(admin) lands here via the brand mark, on the SOP library table (SOP · Machine · Status · Owner · Checks · Review, chips for Where / Status / Owner / Checks, Edit opens the builder). The primary header adds Governance (/governance) · Create New SOP (/admin/sops/new) · Team · Site · Settings for admin roles; worker surfaces (SOPs · Sign-off) stay one tap away.' },
+      { id: 'menu', type: 'decision', label: 'Open another admin surface? (app header: Governance · Create New SOP · Content · Team · Site · Settings; the Access map is a button on the library table, /sops?view=access)', branches: [
         { label: 'SOPs', to: 'sops' },
         { label: 'Governance inbox', to: 'gov' },
         { label: 'Content', to: 'blocks' },
@@ -324,7 +324,7 @@ export const JOURNEYS: Journey[] = [
         { label: 'Stay on worker path', to: 'e' },
       ] },
       { id: 'gov', type: 'screen', label: 'Governance inbox', route: '/governance', detail: 'One-action rows — no owner, review overdue, awaiting approval, stuck converting, machines with no procedures — counted chips and an All clear empty state (Phase 54, D-01/D-02).' },
-      { id: 'sops', type: 'screen', label: 'SOP surface (Admin scope group)', route: '/sops', detail: 'An "Access" scope deep-links /sops?view=access — the D-hybrid wiring surface (D-09), a lens on this same surface.' },
+      { id: 'sops', type: 'screen', label: 'SOP library (table)', route: '/sops', detail: 'SOP · Machine · Status · Owner · Checks · Review, five check circles per row, Where / Status / Owner / Checks chips to narrow it, Edit opens the builder. The Access map button deep-links /sops?view=access — the D-hybrid wiring surface (D-09), a lens takeover on this same table.' },
       { id: 'blocks', type: 'screen', label: 'Content Library', route: '/admin/blocks' },
       { id: 'team', type: 'screen', label: 'Team & org model', route: '/admin/team', detail: 'Org model surface (D-08) — Node Chart default, ▤ Columns toggle absorbs member management.' },
       { id: 'site', type: 'screen', label: 'Site map', route: '/admin/site', detail: 'The plant-floor scene and its machines (Phase 51) — draw/name/tag machines, link SOPs to them.' },
@@ -477,7 +477,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin assigns a published procedure to roles, trades or specific sub-trades; workers get notified.',
     steps: [
       { id: 's', type: 'start', label: 'SOP published' },
-      { id: 'lib', type: 'screen', label: 'SOP surface (Admin scope group)', route: '/sops' },
+      { id: 'lib', type: 'screen', label: 'SOP library (table)', route: '/sops' },
       { id: 'assign', type: 'screen', label: 'Assign', route: '/admin/sops/[sopId]/assign', detail: 'By role / trade / sub-trade.' },
       { id: 'notify', type: 'action', label: 'Workers notified', detail: 'Appears in their library + dashboard.' },
       { id: 'e', type: 'end', label: 'Assigned' },
@@ -599,6 +599,16 @@ export const JOURNEYS: Journey[] = [
       { id: 'legacy', type: 'screen', label: 'Legacy governance URL (optional)', route: '/admin/governance', detail: 'Redirect shim → /governance — legacy ?filter=X bookmarks land on the whole inbox (GQ-04); the inbox has no flag-filter param.' },
       { id: 'legacy-admin-sops', type: 'screen', label: 'Legacy /admin/sops URL (optional)', route: '/admin/sops', detail: 'Redirect shim → /sops, preserving ?status=/?owner=/?filter=/?departments=/?collection=/?sop= so old bookmarks keep working (SUR-01); a bare Governance view param redirects to /governance instead (Phase 54).' },
       { id: 'queue', type: 'screen', label: 'Governance inbox', route: '/governance', detail: 'One-action rows — no owner, review overdue, awaiting the caller\'s approval, stuck converting, machines with no procedures. Counted chips: All · No owner · Overdue · Approve · Stuck · Machines. One action per row: Assign owner · Approve · Confirm current · Fix assignment · Retry · Add. An empty inbox shows the All clear state. Computed on read — no jobs, no materialized state (D28-05).' },
+      { id: 'view', type: 'decision', label: 'Work the queue, or check the floor?', branches: [
+        { label: 'Work a row', to: 'action' },
+        { label: 'Check the floor', to: 'floor' },
+      ] },
+      { id: 'floor', type: 'screen', label: 'Floor health', route: '/governance', detail: 'The site drawing beside the inbox: a red ! where a procedure has no owner, an amber ↻ where a review is overdue, a green dot when a machine is all clear. A "Draw your site" card shows instead when the org has no site yet.', branches: [
+        { label: 'Click a machine with a mark', to: 'panel' },
+      ] },
+      { id: 'panel', type: 'screen', label: 'Machine panel (admin)', route: '/governance', detail: 'Slides in: each procedure linked to the machine with its NO OWNER / REVIEW DUE / DRAFT / OK badge, owner and review date, an Open link (worker view) and an Edit link (builder). "Add one" shows when the machine has no procedures yet.', branches: [
+        { label: 'Open or edit a procedure', to: 'e' },
+      ] },
       { id: 'action', type: 'decision', label: 'What does the row need?', branches: [
         { label: 'Approve (awaiting approval)', to: 'approve' },
         { label: 'Confirm current (overdue/due soon)', to: 'confirm' },
@@ -645,7 +655,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'draw', type: 'action', label: 'Draw machine', detail: 'Click each corner, click the first to finish; name it, pick its department.' },
       { id: 'link', type: 'action', label: 'Show SOPs on a machine', detail: 'Link or unlink SOPs from the machine panel.' },
       { id: 'plate', type: 'screen', label: 'Print a machine plate', route: '/admin/site/plate/[machineId]', detail: 'From a selected machine, choose Print plate. The plate shows a QR code, the machine name, its department and a short code in large letters. Print it at A6 and fix it to the machine — scanning it opens that machine\'s page (Phase 53).' },
-      { id: 'builder', type: 'screen', label: 'Builder → Tools for this SOP → Pick machines for this SOP', route: '/admin/sops/builder/[sopId]', detail: 'The same links, edited from the SOP side.' },
+      { id: 'builder', type: 'screen', label: 'Builder → Tools for this SOP → Pick machines for this SOP', route: '/admin/sops/builder/[sopId]', detail: 'The same links, edited from the SOP side. The same Tools menu also carries "Change category" (BuilderCategoryButton, D-09) — the category fix that used to live in the retired list detail pane.' },
       { id: 'e', type: 'end', label: 'Site mapped' },
     ],
   },

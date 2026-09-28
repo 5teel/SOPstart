@@ -931,7 +931,7 @@ export const UAT_TESTS: UatTest[] = [
     dateAdded: '2026-09-13',
     category: 'Procedure builder',
     title: 'Does the SOPs page show everything admins need in one place?',
-    status: 'active',
+    status: 'archived',
     summary:
       'Admins used to have two separate SOP pages — one for browsing, one for managing. They are now one page: open SOPs and the extra admin views appear as extra tabs down the side.',
     tryIt: [
@@ -947,7 +947,54 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'no-lost-place', text: 'Did switching scopes and coming back feel like one page, not a jump to somewhere else?' },
     ],
     background:
-      'The separate admin SOP page merged into the worker SOP surface as permission-gated scopes on the same route; the old admin-only URL now redirects to the merged page so any bookmarks still work.',
+      'Archived 2026-09-29 (Phase 54): the page this test describes (tabbed scopes down the left side of /sops) no longer exists — the queue moved to its own route, /governance, and the admin table replaced the scope column. See governance-inbox and library-table below.',
+  },
+  {
+    id: 'governance-inbox',
+    dateAdded: '2026-09-29',
+    category: 'Admin home',
+    title: 'Does Governance show you what needs doing?',
+    status: 'active',
+    summary:
+      'Admins now have a Governance page: a list of things that need attention, with a picture of the site next to it.',
+    tryIt: [
+      'Open Governance.',
+      'Look at the list and the numbers on the filters above it.',
+      'Give one procedure an owner.',
+      'Look at the picture of the site beside the list.',
+      'Click a machine with a red mark on it.',
+    ],
+    links: [{ label: 'Governance', href: '/governance' }],
+    questions: [
+      { id: 'row-clear', text: 'Was it clear what each row wanted you to do?' },
+      { id: 'row-disappears', text: 'Did the row disappear once you had done it?' },
+      { id: 'site-marks-make-sense', text: 'Did the red and orange marks on the site picture make sense?' },
+    ],
+    background:
+      'Phase 54 (D-01/D-02) — /governance server-renders listGovernanceQueue + listAdminSopRows + listSiteHealthForOrg, derived into InboxItem[] by deriveInbox() and rendered by GovernanceInbox.tsx; the floor is AdminFloorHealth reading the same site data.',
+  },
+  {
+    id: 'library-table',
+    dateAdded: '2026-09-29',
+    category: 'Admin home',
+    title: 'Can you see at a glance which procedures need work?',
+    status: 'active',
+    summary:
+      'The admin SOPs page is now a table with a row of five circles per procedure — a quick health check without opening anything.',
+    tryIt: [
+      'Open SOPs as an admin.',
+      'Read the row of five circles next to a procedure.',
+      'Use the Status and Owner filters above the table.',
+      'Click Edit on one procedure.',
+    ],
+    links: [{ label: 'SOPs', href: '/sops' }],
+    questions: [
+      { id: 'circles-make-sense', text: 'Do the five circles make sense without an explanation?' },
+      { id: 'filters-find-expected', text: 'Do the Status and Owner filters find what you expect?' },
+      { id: 'edit-right-place', text: 'Does Edit take you to the right place?' },
+    ],
+    background:
+      'Phase 54 (D-07/D-08) — AdminLibraryTable.tsx, fed by listAdminSopRows; the five checks (owner/review/approved/assigned/converted) come from deriveChecks() in src/lib/sop/admin-health.ts, never re-derived in the component.',
   },
   {
     id: 'plant-home-worker',

@@ -174,11 +174,11 @@ export interface AccessRow {
 }
 
 export const ACCESS_MATRIX: AccessRow[] = [
-  // NOTE: '/sops' appears twice below on purpose — one merged surface, two
-  // access levels. The worker-facing row is the base read/walk experience
-  // everyone gets; the admin-lenses row is the same URL gaining extra
-  // scopes (Drafts, Published, Needs attention, Access) once useIsAdmin()
-  // resolves true. Do not collapse these into one row.
+  // NOTE: '/sops' appears once below — one merged surface, one row. Admins
+  // get the library table there (SOP · Machine · Status · Owner · Checks ·
+  // Review, an Access map button) once useIsAdmin() resolves true; everyone
+  // else gets the same worker read/walk list. Governance is its own route
+  // and its own row below — it never lived on /sops.
   { surface: 'My SOPs (read / walk)', route: '/sops',             access: { worker: true,  supervisor: true,  safety_manager: true, admin: true } },
   { surface: 'Activity (review sign-off)', route: '/activity',    access: { worker: 'own', supervisor: true,  safety_manager: true, admin: true } },
   { surface: 'Governance inbox', route: '/governance', access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
