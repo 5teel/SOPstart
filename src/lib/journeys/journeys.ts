@@ -66,7 +66,7 @@ export const JOURNEYS: Journey[] = [
         { label: 'Admin', to: 'admin-home' },
         { label: 'No role yet', to: 'pending-home' },
       ] },
-      { id: 'worker-home', type: 'screen', label: 'SOP library', route: '/sops' },
+      { id: 'worker-home', type: 'screen', label: 'SOPs — plant home on desktop when the site has a map', route: '/sops' },
       { id: 'super-home', type: 'screen', label: 'Sign-off', route: '/activity' },
       { id: 'admin-home', type: 'screen', label: 'SOP surface (Admin scope group)', route: '/sops' },
       { id: 'pending-home', type: 'screen', label: 'Account pending', route: '/pending', detail: 'Holding screen until an admin assigns a role.' },
@@ -138,6 +138,19 @@ export const JOURNEYS: Journey[] = [
     summary: 'A worker finds the right SOP and opens it to read before starting work.',
     steps: [
       { id: 's', type: 'start', label: 'Needs to do a task' },
+      { id: 'where', type: 'decision', label: 'On a desktop, and the site has a map?', branches: [
+        { label: 'Yes', to: 'plant' },
+        { label: 'No — phone, or no map drawn yet', to: 'lib' },
+      ] },
+      { id: 'plant', type: 'screen', label: 'Plant home — the site map', route: '/sops', detail: 'The site drawing with every machine clickable (Phase 52). An amber pin on a machine counts that worker\'s procedures there that are due, never done, or updated — worked out live from the worker\'s own list, never stored (D-05/D-06). The "Next for you" card shows the single next procedure with Walk it and Show me. Department chips move the view to that department\'s machines. The ask bar lights up matching machines as the worker types, and its mic opens the same voice Q&A as the walkthrough. Admins still see today\'s SOP list here (Phase 54 repaints their view).' },
+      { id: 'pick', type: 'decision', label: 'How do they get there?', branches: [
+        { label: 'Click a machine', to: 'panel' },
+        { label: 'Now card → Walk it', to: 'walk' },
+      ] },
+      { id: 'panel', type: 'screen', label: 'Machine panel', route: '/sops', detail: 'Slides in from the right: the machine\'s photo (or "no photo yet"), its department named in that department\'s colour, then its procedures to-do first with the shared badge, a Walk › link and a plain Read link.', branches: [
+        { label: 'Walk ›', to: 'walk' },
+        { label: 'Read', to: 'detail' },
+      ] },
       { id: 'lib', type: 'screen', label: 'SOP library', route: '/sops', detail: 'Browse, search, filter by trade. "Updated since last completion" badge (AFL-VER-04) marks any SOP published after the worker\'s last completion. Phase 36 (REF-01): a "Refresher due"/"Refresher overdue" chip appears alongside it once the SOP\'s refresher interval has elapsed since the worker\'s last completion — informational only, never blocks opening the card.' },
       { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]', detail: 'Read is the SOP as one document (2026-09-27): Orient → Prepare → Do. A SOP holding several procedures shows a "Which job are you doing?" chooser (?job=); Prepare lists tools and parts for that job and lets the worker acknowledge the safety requirements inline; Do lists the job\'s steps in full with a "Walk it step by step" button. Walk it walks the chosen job only (Step 1 of 6, not 1 of 40) and skips the "Before you start" screen when already acknowledged or when there is nothing to acknowledge. Workers see Read + Walk it; the Flow tab and the Desktop/Mobile preview toggle are admin-only (Flow also shows to workers when a real branching graph was authored). Legacy ?tab= params still map onto the tabs. Admins/safety managers see an "Edit in builder" link here.' },
       { id: 'go', type: 'decision', label: 'Ready to start?', branches: [

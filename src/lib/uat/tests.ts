@@ -950,6 +950,29 @@ export const UAT_TESTS: UatTest[] = [
       'The separate admin SOP page merged into the worker SOP surface as permission-gated scopes on the same route; the old admin-only URL now redirects to the merged page so any bookmarks still work.',
   },
   {
+    id: 'plant-home-worker',
+    dateAdded: '2026-09-29',
+    category: 'Worker home',
+    title: 'Can a worker find their next job from the site map?',
+    status: 'active',
+    summary:
+      'On a computer, a worker\'s SOPs page now shows a picture of the site instead of a list. We want to know if it\'s obvious how to find a job from it.',
+    tryIt: [
+      'Sign in as a worker on a computer (not a phone).',
+      'Look at the drawing of the site.',
+      'Click a machine that has an orange number on it.',
+      'Open a job from the list that slides in.',
+    ],
+    links: [{ label: 'Open SOPs', href: '/sops' }],
+    questions: [
+      { id: 'pin-numbers-make-sense', text: 'Did the orange numbers on the machines make sense?' },
+      { id: 'click-shows-right-jobs', text: 'Did clicking a machine show you the right jobs for it?' },
+      { id: 'now-card-right-job', text: 'Did the "Next for you" card show the job you\'d actually do first?' },
+    ],
+    background:
+      'HOM-01..06 (Phase 52) — a desktop, non-admin worker whose org has a drawn site (>=1 machine) sees PlantHome instead of the Miller frame; pins/Now card/ask bar all derive from worker-signal.ts, never stored. Admins and phone widths are unaffected this phase (Phase 53/54).',
+  },
+  {
     id: 'example-direction-template',
     dateAdded: '2026-06-09',
     category: 'Examples',
