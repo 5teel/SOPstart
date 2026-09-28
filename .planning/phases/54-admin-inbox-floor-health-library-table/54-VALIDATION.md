@@ -9,7 +9,7 @@ created: 2026-09-29
 
 # Phase 54 — Validation Strategy
 
-> Per-phase validation contract for feedback sampling during execution.
+> Per-phase validation contract for feedback sampling during execution. Task IDs match the PLAN.md files (updated with the plans, 2026-09-29).
 
 ---
 
@@ -20,7 +20,7 @@ created: 2026-09-29
 | **Framework** | Playwright (`@playwright/test`) — source-contract + unit specs under `tests/phase54/`, deployed evals under `tests/evals/` |
 | **Config file** | `playwright.config.ts` |
 | **Quick run command** | `npx playwright test --project=phase54 && npx tsc --noEmit` |
-| **Full suite command** | `npm run test && npm run build` (full suite ONCE per gate — OTP budget) |
+| **Full suite command** | `npm run test && npm run build` (full suite ONCE, in 54-06 — OTP budget) |
 | **Estimated runtime** | ~25 s quick · ~4 min full |
 
 ---
@@ -28,8 +28,8 @@ created: 2026-09-29
 ## Sampling Rate
 
 - **After every task commit:** `npx playwright test --project=phase54 && npx tsc --noEmit`
-- **After every plan wave:** `npm run build` (bundle gate + marker self-validation) + non-live projects touched by the wave (phase28/29/30/33/41 after any repoint)
-- **Before `/gsd-verify-work`:** full suite once + `npm run eval -- --phase 54` (governance + rewritten sop-surface), screenshots read by the orchestrator
+- **After every plan wave:** `npm run build` (bundle gate + marker self-validation) + the non-live projects the wave touched (phase28/29/30/41/52 and the named phase32/33/36/37 page readers)
+- **Before `/gsd-verify-work`:** full suite once + `npm run eval -- --phase 54` (governance + rewritten sop-surface + plant-home), screenshots read
 - **Max feedback latency:** 30 s
 
 ---
@@ -38,17 +38,22 @@ created: 2026-09-29
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 54-W0 | 01 | 0 | all | — | — | project registration | `npx playwright test --list --project=phase54` | ❌ W0 | ⬜ pending |
-| 54-01-01 | 01 | 1 | ADM-02 | — | `machineHealth()` pure: no-owner › overdue › ok; unit-tested | unit | `npx playwright test --project=phase54 tests/phase54/admin-health.spec.ts` | ❌ W0 | ⬜ pending |
-| 54-01-02 | 01 | 1 | ADM-03 | — | checks derivation pure: owner · reviewed ≤12 mo · approved · assigned · converted | unit | `npx playwright test --project=phase54 tests/phase54/library-table-checks.spec.ts` | ❌ W0 | ⬜ pending |
-| 54-01-03 | 01 | 1 | ADM-01/02 | T-54-01 | admin site-health action: `requireAdminContext`, org-scoped, returns per-SOP owner/review/status per machine + machines with no SOPs | source-contract + live probe (once) | `npx playwright test --project=phase54 tests/phase54/site-health-action.spec.ts` | ❌ W0 | ⬜ pending |
-| 54-02-01 | 02 | 2 | ADM-01 | T-54-02 | `/governance` page admin-gated; inbox rows derived from existing queue/parse/site data; ONE action per row; counted chips; all-clear state | source-contract (wiring) | `npx playwright test --project=phase54 tests/phase54/governance-inbox.spec.ts` | ❌ W0 | ⬜ pending |
-| 54-02-02 | 02 | 2 | ADM-01 | T-54-02 | approve/owner actions reuse `approveStep` gating + `OwnerPicker` verbatim (no reimplementation) | source-contract | `npx playwright test --project=phase54 tests/phase54/inbox-reuses-governance-gating.spec.ts` | ❌ W0 | ⬜ pending |
-| 54-03-01 | 03 | 2 | ADM-02 | — | floor beside inbox in admin repaint; pin → admin machine panel (owner · rev, Open/Edit); no-site card | source-contract (wiring) | `npx playwright test --project=phase54 tests/phase54/admin-machine-panel.spec.ts` | ❌ W0 | ⬜ pending |
-| 54-04-01 | 04 | 3 | ADM-03 | — | admin `/sops` table: columns, checks row, chips; deep links `?departments=` `?collection=` `?status=` `?owner=me` resolve; `?view=access` still opens the lens; one list→builder chain | source-contract (wiring) | `npx playwright test --project=phase54 tests/phase54/library-table.spec.ts --project=phase41 tests/phase41/merged-surface.spec.ts --project=phase33 tests/phase33/sop-drilldown.spec.ts` | ❌ W0 / ✅ | ⬜ pending |
-| 54-05-01 | 05 | 4 | ADM-03/04 | T-54-03 | deletions: 6 files + dead `sops-nav-types.ts` gone; markers in `check-bundle-size.ts` rewritten in the SAME commit; every spec that grepped them repointed/deleted; sweep fails on any import/href/`view=attention` outside permitted shims | source-contract sweep + build | `npx playwright test --project=phase54 tests/phase54/deletion-sweep.spec.ts && npm run build` | ❌ W0 | ⬜ pending |
-| 54-05-02 | 05 | 4 | ADM-04 | — | header Governance → `/governance`; `/admin/governance` + `/sops?view=attention` shims redirect; `journeys.ts` 0 not-mapped; capability matrix; `uat/tests.ts` | source-contract + pathways spec | `npx playwright test --project=phase30 tests/phase30/governance-fold.spec.ts` | ✅ (edit) | ⬜ pending |
-| 54-06-01 | 06 | 5 | ADM-01..04 | — | deployed evals: rewritten `sop-surface.eval.ts` + new `governance.eval.ts` (owner reset in beforeAll → red pin on EVAL Press → Assign owner clears; EVAL Oven → Machines row) | deployed eval | `npm run eval -- --phase 54` | ❌ W0 / ✅ rewrite | ⬜ pending |
+| 54-01-01 | 01 | 1 | all | — | `phase54` project registered; stubs + deletion-sweep fixme scaffold | registration | `npx playwright test --list --project=phase54` | ❌ W0 | ⬜ pending |
+| 54-01-02 | 01 | 1 | ADM-02/03 | — | `admin-health.ts` pure: `machineHealth` (no owner › overdue › ok), `adminSopBadge`, `machinePanelSops`, `deriveChecks` (owner · reviewed ≤12 mo · approved · assigned · converted), `tableStatus` — reads governance flags only | unit | `npx playwright test --project=phase54 tests/phase54/admin-health.spec.ts tests/phase54/library-table-checks.spec.ts` | ❌ W0 | ⬜ pending |
+| 54-01-03 | 01 | 1 | ADM-01/02/03 | T-54-01 | `listSiteHealthForOrg` guard-first, no service role; `listAdminSopRows` new reads session-org filtered; capability-matrix row | source-contract (runtime cross-org probe in 54-06 eval) | `npx playwright test --project=phase54 tests/phase54/site-health-action.spec.ts` | ❌ W0 | ⬜ pending |
+| 54-02-01 | 02 | 2 | ADM-01 | — | `deriveInbox` pure: owner/overdue/approve-me/stuck/machines rows, severities, counts, empty = all clear | unit | `npx playwright test --project=phase54 tests/phase54/governance-inbox.spec.ts -g deriveInbox` | ❌ W0 | ⬜ pending |
+| 54-02-02 | 02 | 2 | ADM-01 | T-54-02 | `/governance` server page admin-gated; inbox actions only via `GovernanceQueueRow`'s untouched branches (`approveStep` / `OwnerPicker` / Confirm current) | source-contract | `npx playwright test --project=phase54 tests/phase54/governance-inbox.spec.ts tests/phase54/inbox-reuses-governance-gating.spec.ts` | ❌ W0 | ⬜ pending |
+| 54-02-03 | 02 | 2 | ADM-04 | T-54-03a | header → `/governance`; `/admin/governance` + `/admin/sops?view=attention` redirect; journeys maps `/governance`; roles + matrix | source-contract + pathways walk | `npx playwright test --project=phase28 --project=phase30 --project=phase41` | ✅ (repoint) | ⬜ pending |
+| 54-03-01 | 03 | 3 | ADM-02 | T-54-04b | `PlantStage` paints caller-supplied health; `AdminMachinePanel` shows owner · review, Open/Edit, Add one; worker panel untouched | source-contract | `npx playwright test --project=phase54 tests/phase54/admin-machine-panel.spec.ts && npx playwright test --project=phase52` | ❌ W0 | ⬜ pending |
+| 54-03-02 | 03 | 3 | ADM-02 | T-54-01 | `AdminFloorHealth` beside the inbox (dynamic PlantStage), pin → panel, no-site card | source-contract + build | `npx playwright test --project=phase54 && npm run build` | ❌ W0 | ⬜ pending |
+| 54-04-01 | 04 | 3 | ADM-03 | T-54-03b | `AdminLibraryTable`: columns, checks, chips, one builder chain; `resolveLibraryNav` (`?departments=` `?collection=` `?status=` `?owner=me`, `?view=access`, `?view=attention` → /governance) | unit + source-contract | `npx playwright test --project=phase54 tests/phase54/library-table.spec.ts` | ❌ W0 | ⬜ pending |
+| 54-04-02 | 04 | 3 | ADM-03 | T-54-08 | `WorkerSimpleList` (scope chips, dept sheet, per-row Add/Remove); `BuilderCategoryButton` via `setSopCategory` | source-contract | `npx playwright test --project=phase54 tests/phase54/library-table.spec.ts -g "surviving affordances"` | ❌ W0 | ⬜ pending |
+| 54-04-03 | 04 | 3 | ADM-03 | T-54-04 | `/sops` swap (no Miller frame); table marker group on both routes; recursive self-validation corpus; page specs repointed; ±2 KB, baseline untouched | source-contract + build | `npm run build && npx playwright test --project=phase41 --project=phase52 --project=phase54` | ✅ (repoint) | ⬜ pending |
+| 54-05-01 | 05 | 4 | ADM-03 | T-54-02 | 7 files deleted; every spec that read them repointed / `status-attention-lenses` deleted — same commit | source-contract | `npx tsc --noEmit && npx playwright test --project=phase28 --project=phase29 --project=phase30 --project=phase41 --project=phase52 --project=phase54` | ✅ (repoint) | ⬜ pending |
+| 54-05-02 | 05 | 4 | ADM-03/04 | T-54-03 | live deletion sweep (src + non-eval tests); per-symbol lint allow-list; dead `topSignal` cleared; build green | source-contract sweep + build | `npx playwright test --project=phase54 tests/phase54/deletion-sweep.spec.ts && npm run build` | ❌ W0 | ⬜ pending |
+| 54-05-03 | 05 | 4 | ADM-04 | — | journeys (inbox, floor, panel, table) 0 not mapped; roles; uat; capability matrix | source-contract + pathways walk | `npx playwright test --project=phase30 tests/phase30/governance-fold.spec.ts tests/phase30/dead-weight.spec.ts` | ✅ (edit) | ⬜ pending |
+| 54-06-01 | 06 | 5 | ADM-01..04 | T-54-10 | governance eval (owner reset + read-back in beforeAll → red pin on EVAL Press → panel → Assign owner clears; EVAL Oven → Machines row; no real-org title); sop-surface rewritten; plant-home repointed; sweep covers evals | eval authoring + sweep | `npx playwright test --project=phase54 tests/phase54/deletion-sweep.spec.ts && npx playwright test --project=evals --list` | ❌ W0 / ✅ rewrite | ⬜ pending |
+| 54-06-02 | 06 | 5 | ADM-01..04 | T-54-11 | full suite once, build, push, deployed eval, every screenshot read, sign-off | deployed eval | `npm run eval -- --phase 54` | ✅ | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -56,11 +61,11 @@ created: 2026-09-29
 
 ## Wave 0 Requirements
 
-- [ ] `playwright.config.ts` — `phase54` project (`testMatch: /tests\/phase54\/.*\.(spec|test)\.ts$/`), verified with `--list`
-- [ ] `tests/phase54/` stubs for every spec above; `deletion-sweep.spec.ts` scaffolded early as `test.fixme` in the `tests/phase41/reference-sweep.spec.ts` shape (exact-route regex, `PERMITTED_FILES`, comment stripping)
-- [ ] `src/lib/sop/admin-health.ts` (test-first) and the checks derivation module
-- [ ] `tests/evals/governance.eval.ts` skeleton; `tests/evals/sop-surface.eval.ts` rewrite planned against the new surfaces
-- [ ] Deletion inventory from 54-RESEARCH.md copied into the last plan as its checklist (importers + ~15 specs)
+- [ ] `playwright.config.ts` — `phase54` project (`testMatch: /tests\/phase54\/.*\.(spec|test)\.ts$/`), verified with `--list` (54-01-01)
+- [ ] `tests/phase54/` stubs for every spec above; `deletion-sweep.spec.ts` scaffolded as `test.fixme` in its final shape (54-01-01)
+- [ ] `src/lib/sop/admin-health.ts` test-first (54-01-02)
+- [ ] `tests/evals/governance.eval.ts` authored and `sop-surface.eval.ts` rewritten in 54-06-01 (evals run only post-deploy, so they are written once, complete, rather than as a Wave-0 skeleton)
+- [ ] Deletion inventory copied into 54-05 as its checklist (files + importers + specs)
 
 ---
 
@@ -68,7 +73,7 @@ created: 2026-09-29
 
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
-| None | — | All phase behaviours have automated verification (pathways coverage runs as a spec) | — |
+| None | — | All phase behaviours have automated verification (pathways coverage runs as a spec; visuals are read from eval screenshots) | — |
 
 ---
 

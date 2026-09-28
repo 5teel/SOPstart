@@ -1651,7 +1651,17 @@ Plans:
   3. Admin `/sops` is a table (SOP · Machine · Status · Owner · Checks · Review) with Where/Status/Owner/Checks chips; `AdminSopSurface.tsx`, the three lens files, `MillerPrimitives.tsx` and `SopWorkerBrowser.tsx` are deleted and a repo sweep fails on any import or href of them
   4. Header "Governance" points at `/governance`; `journeys.ts` maps every new route with 0 not-mapped on `/pathways`; `.planning/codebase/CAPABILITY-MATRIX.md` has the new surfaces; `tests/evals/sop-surface.eval.ts` is rewritten for the new surfaces and passes on the deployed site
 
-**Plans**: TBD
+**Plans**: 6 plans
+
+Plans:
+
+- [ ] 54-01-PLAN.md — Wave 1: phase54 project + stubs + deletion-sweep scaffold; admin-health.ts (machineHealth, adminSopBadge, machinePanelSops, deriveChecks, tableStatus — TDD); listAdminSopRows check inputs; listSiteHealthForOrg; matrix row
+- [ ] 54-02-PLAN.md — Wave 2: inbox.ts deriveInbox (TDD); /governance server page + GovernanceInbox + GovernanceQueueRow as inbox row (gating verbatim); header, /admin/governance + /admin/sops?view=attention shims, journeys/roles/matrix
+- [ ] 54-03-PLAN.md — Wave 3: PlantStage health paint + AdminMachinePanel + AdminFloorHealth (dynamic stage, no-site card) beside the inbox
+- [ ] 54-04-PLAN.md — Wave 3: AdminLibraryTable + resolveLibraryNav; WorkerSimpleList (per-row add/remove) + BuilderCategoryButton; /sops swap (no Miller frame), table marker group, page specs repointed, build gate
+- [ ] 54-05-PLAN.md — Wave 4: delete the 7 Miller/lens files + repoint every spec; live deletion sweep + per-symbol lint guard; journeys/roles/uat/matrix
+- [ ] 54-06-PLAN.md — Wave 5: governance.eval.ts (owner reset → red pin → panel → Assign owner clears), rewritten sop-surface.eval.ts, full suite once, push, deployed eval, screenshots read, sign-off
+
 **UI hint**: yes
 
 ## Progress
