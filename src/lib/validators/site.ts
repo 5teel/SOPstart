@@ -104,3 +104,28 @@ export interface SiteData {
   sops: SiteSopOption[]
   canGenerate: boolean
 }
+
+// -- Worker-readable subset (Phase 52, D-03) ---------------------------------
+// Plain, serialisable fields only -- no sprite_path/scene_path (those are
+// signed into URLs before this crosses the server/client boundary).
+export interface WorkerSiteLayout {
+  id: string
+  sceneUrl: string
+  sceneWidth: number
+  sceneHeight: number
+}
+
+export interface WorkerSiteMachine {
+  id: string
+  name: string
+  department_id: string | null
+  polygon: Point[]
+  spriteUrl: string | null
+}
+
+export interface WorkerSiteData {
+  layout: WorkerSiteLayout | null
+  machines: WorkerSiteMachine[]
+  links: SopMachineLink[]
+  departments: SiteDepartment[]
+}
