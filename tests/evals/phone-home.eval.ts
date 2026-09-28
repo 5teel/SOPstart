@@ -167,13 +167,19 @@ test.describe('Phase 53 — phone home (deployed)', () => {
   })
 
   test('a worker in another org gets a 404 for the EVAL Press code', async ({ page, context }) => {
+    // The app's not-found.tsx boundary (Phase 30) is a friendly, navigable
+    // page rather than a bare browser 404 -- Next.js serves it with a 200
+    // status for this fully-dynamic route, so the assertion is on CONTENT
+    // (no machine data ever renders), not the HTTP status code.
     await signInAs(context, 'worker')
-    const res = await page.goto(`/m/${pressCode}`)
-    expect(res?.status()).toBe(404)
+    await page.goto(`/m/${pressCode}`)
+    await expect(page.getByText('PAGE NOT FOUND')).toBeVisible()
     await expect(page.getByTestId('machine-view')).toHaveCount(0)
+    await expect(page.getByText('EVAL Press')).toHaveCount(0)
 
-    const res2 = await page.goto('/m/nope')
-    expect(res2?.status()).toBe(404)
+    await page.goto('/m/nope')
+    await expect(page.getByText('PAGE NOT FOUND')).toBeVisible()
+    await expect(page.getByTestId('machine-view')).toHaveCount(0)
   })
 
   test('eval-site admin: the plate page renders at A6 with the QR, name, department and code; print hides the controls; the site editor links to it; a worker cannot open the plate', async ({
