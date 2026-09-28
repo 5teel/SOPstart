@@ -2,7 +2,7 @@
 sketch: 007
 name: plant-floor-navigation
 question: "What if the plant itself is the navigation — no library, no scope column — and every persona reaches a procedure by standing above their site and pointing at a machine?"
-winner: null
+winner: "plant"
 tags: [navigation, spatial, isometric, worker, kiosk, phone, admin, governance, generated-assets]
 ---
 
@@ -50,7 +50,7 @@ the pins on the Plant and Shared-terminal tabs.
 ## Tabs
 
 - **Plant · desktop** — the worker home. Now card bottom-left (the one procedure due at your station, Walk it), ask/voice bar top, department chips fly the camera. Amber pins = something due for you on that machine. Click → zoom + right panel with the machine's sprite and its procedures. Admin repaints: red pin = a procedure with no owner, amber = review overdue, Now card becomes library health.
-- **Shared terminal** — the Visy reality: a desktop beside the line, many operators per shift. Full-bleed floor, no header, no login. "Who are you?" avatar strip, PIN dots only for sign-off, 64px targets.
+- **Shared terminal** — DROPPED (Simon, 2026-09-28: "forget the shared terminal"). Kept in the file for the record. Was: the Visy reality: a desktop beside the line, many operators per shift. Full-bleed floor, no header, no login. "Who are you?" avatar strip, PIN dots only for sign-off, 64px targets.
 - **Phone** — the floor is a thumbnail here, not the navigation. Home = ask bar + Now card + floor thumbnail + "Scan a machine plate". Middle = camera on the QR plate riveted to IS Machine 1. Right = that machine's list, glove-sized.
 - **Admin inbox** — the admin home is the work, not the list: Linear-style inbox (no owner · overdue · approve · stuck · nothing-at-all-for-this-machine), each row one action, goal is zero. Beside it the floor lit by health. Below, the library as a plain table with a pull-request-style checks row per SOP (owner · reviewed · approved · assigned · converted).
 
