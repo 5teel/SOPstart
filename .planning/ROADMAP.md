@@ -1659,7 +1659,7 @@ Plans:
 - [x] 54-02-PLAN.md — Wave 2: inbox.ts deriveInbox (TDD); /governance server page + GovernanceInbox + GovernanceQueueRow as inbox row (gating verbatim); header, /admin/governance + /admin/sops?view=attention shims, journeys/roles/matrix
 - [x] 54-03-PLAN.md — Wave 3: PlantStage health paint + AdminMachinePanel + AdminFloorHealth (dynamic stage, no-site card) beside the inbox
 - [x] 54-04-PLAN.md — Wave 3: AdminLibraryTable + resolveLibraryNav; WorkerSimpleList (per-row add/remove) + BuilderCategoryButton; /sops swap (no Miller frame), table marker group, page specs repointed, build gate
-- [ ] 54-05-PLAN.md — Wave 4: delete the 7 Miller/lens files + repoint every spec; live deletion sweep + per-symbol lint guard; journeys/roles/uat/matrix
+- [x] 54-05-PLAN.md — Wave 4: delete the 7 Miller/lens files + repoint every spec; live deletion sweep + per-symbol lint guard; journeys/roles/uat/matrix
 - [ ] 54-06-PLAN.md — Wave 5: governance.eval.ts (owner reset → red pin → panel → Assign owner clears), rewritten sop-surface.eval.ts, full suite once, push, deployed eval, screenshots read, sign-off
 
 **UI hint**: yes
@@ -1737,7 +1737,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 
 **Goal:** Scheduled task or cron that marks video_generation_jobs stuck in queued/analyzing/generating_audio/rendering for >30 minutes as 'failed' with a timeout error. Could also notify admin. Triggered by finding a hours-old rendering job during Phase 10 verification.
 **Requirements:** TBD
-**Plans:** 4/6 plans executed
+**Plans:** 5/6 plans executed
 
 Plans:
 
