@@ -1553,7 +1553,7 @@ Plans:
 Executes 51 → 52 → 53 ∥ 54 → (v8.0 Phase 43).
 
 - [x] **Phase 51: Site Model & Machine Editor** - `site_layouts` / `site_machines` / `sop_machines` under RLS; admin generates or uploads a scene, draws polygon hotspots (Konva), links SOPs to machines (completed 2026-09-28)
-- [ ] **Phase 52: Worker Home — The Plant** - `/sops` worker desktop = pan/zoom scene, derived pins, Now card, machine panel, ask bar; scope column and Miller frame gone for workers; bundle gate green
+- [x] **Phase 52: Worker Home — The Plant** - `/sops` worker desktop = pan/zoom scene, derived pins, Now card, machine panel, ask bar; scope column and Miller frame gone for workers; bundle gate green (completed 2026-09-28)
 - [ ] **Phase 53: Phone — Scan or Ask** - Phone home (ask · Now · thumbnail · Scan), printable QR plates, `/m/<code>`, in-app camera scan
 - [ ] **Phase 54: Admin — Inbox, Floor Health, Library Table** - `/governance` inbox + health-lit floor; admin `/sops` = checks-row table; `AdminSopSurface` lenses, Miller frame and scope column deleted; header, journeys, evals, matrix updated
 
@@ -1608,7 +1608,7 @@ Plans:
 - [x] 52-02-PLAN.md — Wave 2: scene.ts camera maths (flyToView, fitBoxView, zoneColour — TDD), PlantStage (img + SVG, pan, zoom-to-cursor, fly-to, labels, pins), MachinePanel (worker variant)
 - [x] 52-03-PLAN.md — Wave 2: NowCard (Walk it / Show me / Then:), PlantAskBar (live filter + mic → existing WalkthroughVoiceModal via next/dynamic), voice import guard
 - [x] 52-04-PLAN.md — Wave 3: PlantHome composition, /sops render seam (useViewport + site query + dynamic slot), plant marker group, journeys.ts + uat/tests.ts, build gate
-- [ ] 52-05-PLAN.md — Wave 4: deployed eval (eval-site worker + no-site fallback), serial eval run, full suite once, push, eval, screenshots read, validation sign-off
+- [x] 52-05-PLAN.md — Wave 4: deployed eval (eval-site worker + no-site fallback), serial eval run, full suite once, push, eval, screenshots read, validation sign-off
 
 **UI hint**: yes
 
@@ -1717,7 +1717,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 
 **Goal:** Scheduled task or cron that marks video_generation_jobs stuck in queued/analyzing/generating_audio/rendering for >30 minutes as 'failed' with a timeout error. Could also notify admin. Triggered by finding a hours-old rendering job during Phase 10 verification.
 **Requirements:** TBD
-**Plans:** 4/5 plans executed
+**Plans:** 5/5 plans complete
 
 Plans:
 
