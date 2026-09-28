@@ -34,7 +34,10 @@ if (!flag('--no-wait')) {
 }
 
 const jsonOut = path.join(OUT, 'results.json')
-const res = spawnSync('npx', ['playwright', 'test', '--project=evals', '--reporter=list,json'], {
+// --workers=1: site-editor.eval.ts's beforeAll deletes the eval-site org's
+// layout/machines before every run; the plant-home eval reads that same org
+// concurrently would race it (52-05, T-52-05-B) -- serial removes the race.
+const res = spawnSync('npx', ['playwright', 'test', '--project=evals', '--workers=1', '--reporter=list,json'], {
   stdio: ['inherit', 'inherit', 'inherit'], shell: true,
   env: { ...process.env, EVAL_BASE_URL: BASE, PLAYWRIGHT_JSON_OUTPUT_NAME: jsonOut },
 })
