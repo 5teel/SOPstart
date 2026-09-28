@@ -1,6 +1,6 @@
 ---
 name: sketch-findings-SOPstart
-description: Validated design decisions, tokens, CSS patterns, new block types, and interaction flows from the SOPstart sketch explorations — blueprint redesign, org model + library permissions, and the SOP authoring/creation flow (new-SOP wizard, inline builder canvas, block inserter, AI ghosts, read/walk/edit modes). Auto-loads when building UI for SafeStart / sopstart.com.
+description: Validated design decisions, tokens, CSS patterns, new block types, and interaction flows from the SOPstart sketch explorations — blueprint redesign, org model + library permissions, and the SOP authoring/creation flow (new-SOP wizard, inline builder canvas, block inserter, AI ghosts, read/walk/edit modes). and the plant-floor navigation model (isometric site as the worker home, QR phone, admin inbox). Auto-loads when building UI for SafeStart / sopstart.com.
 ---
 
 <context>
@@ -33,6 +33,16 @@ single inline builder where the canvas IS the worker document; Read/Walk/Edit
 become three modes of one URL. **This area is NOT shipped** — it is the design
 contract for the SOP creation/conversion milestone (see
 `references/authoring-flow.md` for the not-shipped caveat).
+
+**Fourth wrap-up 2026-09-28** — plant-floor navigation
+(`.planning/sketches/007-plant-floor-navigation`, winner "Plant"; 006 superseded;
+shared-terminal dropped): the worker home is an isometric drawing of the site with
+tappable machines, amber pins for what is due, one Now card and an ask/voice bar; the
+phone scans the machine's QR plate; the admin home is an inbox with the same floor lit
+by library health, and the library is a plain table with a checks row. **NOT shipped**
+— it is the design contract that replaces the Phase 41 `/sops` scope column (see
+`references/plant-floor-navigation.md`). First sketch to use generated image assets
+(Nano Banana 2).
 </context>
 
 <design_direction>
@@ -71,6 +81,7 @@ contract for the SOP creation/conversion milestone (see
 | Interaction patterns | references/interaction-patterns.md | Voice state machine, cmdk, preview toggle, mobile immersive walkthrough |
 | Org model views | references/org-model-views.md | Node Chart default + Column Builder alt view; roles layer between depts and people; vacancies as dashed first-class chips |
 | Permission wiring views | references/permission-wiring-views.md | Patch Bay default + Matrix/Illuminate alt views; direct/inherited/personal access vocabulary; trace-on-click. At scale (15×20): the D hybrid — groups + focus + viz-as-library-filter + wire-up mode with live blast-radius; fixed-height banner slot so the graph never moves |
+| Plant floor navigation ⚠ **not shipped** | references/plant-floor-navigation.md | The site is the map: isometric scene + hotspot polygons as the worker home, pins derived from due/health, Now card, ask bar, QR phone, admin inbox + checks-row table; Miller/scope column retired; kiosk dropped |
 | Authoring & creation flow ⚠ **not shipped** | references/authoring-flow.md | Five on-ramps → one wizard → one inline builder; canvas IS the worker document (no palette/inspector); 4-tier context-aware inserter + self-expiring AI ghosts; Read/Walk/Edit as three modes of one URL; visible agent-metadata layer |
 
 ## Theme
@@ -92,6 +103,7 @@ Original sketch HTML preserved at `sources/blueprint-sketch.html` (2015 lines, a
 - `references/interaction-patterns.md` if building voice input, cmdk, or the mobile immersive walkthrough
 - `references/org-model-views.md` if building the org-chart / departments / roles / team surfaces
 - `references/permission-wiring-views.md` if building SOP-library access assignment, department↔SOP visibility, or any permissions UI
+- `references/plant-floor-navigation.md` if building **the worker home, the `/sops` surface, the admin governance/inbox surface, anything with a site/machine model, or the phone QR entry** — read its NOT-SHIPPED caveat and the "What to avoid" list (no Miller/scope column for workers, no kiosk) first.
 - `references/authoring-flow.md` if building **anything in the SOP creation / conversion / authoring path** — the new-SOP wizard, upload/parse review, the inline builder canvas, block insertion, AI suggestions in the editor, or the read/walk/edit surface. Read its "NOT SHIPPED" caveat first: it is a design contract, not a description of current code.
 - `sources/blueprint-sketch.html` directly only if a reference doc points to a line range and you need the exact HTML/CSS
 - `sources/authoring-flow/*.html` for the exact builder/wizard/mode-switch markup and JS (picker tiers, ghost lifecycle, mode state machine)
@@ -124,6 +136,12 @@ Original sketch HTML preserved at `sources/blueprint-sketch.html` (2015 lines, a
 - `sketches/departments`, `sketches/team-departments`, `sketches/unified-block-library` — Phase 25
 - `sketches/access-hierarchy` (winner A, Access map), `sketches/builder-header-orientation` (winner A, Wayfinder bar) — Phase 33; both have READMEs with full trade-off tables and decisions, kept in place as historical record
 - `sketches/supervisor-observations` — Phase 34
+
+### Wrapped 2026-09-28
+
+- `007-plant-floor-navigation` (winner Plant) → references/plant-floor-navigation.md; source in `sources/007-plant-floor-navigation/`; generated assets stay in `.planning/sketches/007-plant-floor-navigation/assets/`
+- `006-sop-navigation-model` — processed, **superseded by 007** (kept in `.planning/sketches/` as the record of why the column reshape wasn't enough)
+- `004-admin-sop-hub-hierarchy`, `005-sop-library-altitude` — processed, deliberately excluded (shipped as Phase 41 / the 2026-08-04 Miller page; code is source of truth — and 007 now retires that surface)
 
 ## Related planning docs
 

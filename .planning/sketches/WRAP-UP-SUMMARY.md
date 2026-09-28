@@ -230,3 +230,38 @@ milestone**, and `references/authoring-flow.md` carries an explicit NOT-SHIPPED
 caveat plus a carried list of open questions (wizard default selection conflict,
 wizard length, agent-layer scope, section colour derivation, approval-chain
 placement, `--ai` accessibility pass) to resolve at spec time.
+
+
+---
+
+# Session 4 — 2026-09-28 — Plant floor navigation
+
+**Sketches processed:** 4 (007 included · 006 superseded · 004, 005 excluded as shipped)
+**Design areas:** Plant floor navigation
+**Skill output:** `./.claude/skills/sketch-findings-SOPstart/references/plant-floor-navigation.md`
+
+## Included
+| # | Name | Winner | Design Area |
+|---|------|--------|-------------|
+| 007 | plant-floor-navigation | Plant (scene as worker home + phone QR + admin inbox; shared terminal dropped) | Plant floor navigation |
+
+## Excluded
+| # | Name | Reason |
+|---|------|--------|
+| 006 | sop-navigation-model | Superseded by 007 the same day — kept the Miller frame; Simon asked for the frame questioned, not the column |
+| 004 | admin-sop-hub-hierarchy | Shipped (Phase 41); code is source of truth; retired by 007 |
+| 005 | sop-library-altitude | Shipped (2026-08-04 Miller page); code is source of truth; retired by 007 |
+
+## Design Direction
+The site is the map. Workers reach a procedure by pointing at the machine on an isometric
+drawing of their plant (desktop) or scanning its QR plate (phone), never by browsing a
+library. Admins get an inbox and the same floor lit by library health. First sketch built
+on generated image assets (Nano Banana 2, five first-shot generations).
+
+## Key Decisions
+- Worker home = scene + Now card + ask bar; pins are derived (due / never / updated), never stored.
+- Admin home = inbox of one-action rows; floor repaints red (no owner) / amber (review overdue).
+- Library survives only as a machine panel list and an admin table with a checks row.
+- Phone demotes the scene to a thumbnail; camera + ask are the navigation.
+- Kiosk / shared terminal dropped (Simon, 2026-09-28).
+- New data: `site_layouts`, `site_machines` (polygons in scene px), `sop_machines`.

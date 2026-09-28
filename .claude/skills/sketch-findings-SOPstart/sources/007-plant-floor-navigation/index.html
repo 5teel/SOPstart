@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sketch 007 — Plant floor navigation</title>
+<link rel="stylesheet" href="../themes/default.css">
+<style>
+  .variant-nav { position: sticky; top: 0; z-index: 100; background: var(--ink-900); color: #fff; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; padding: 8px 16px; font-family: var(--mono); font-size: 12px; }
+  .variant-nav .vlabel { color: var(--ink-400); margin-right: 8px; }
+  .variant-nav button { background: transparent; color: var(--ink-300); border: 1px solid transparent; font: inherit; padding: 4px 10px; border-radius: 4px; cursor: pointer; }
+  .variant-nav button.active { background: #fff; color: var(--ink-900); font-weight: 700; }
+  .variant-nav .spacer { flex: 1; }
+  .variant-nav .role { display: flex; gap: 2px; border: 1px solid rgba(255,255,255,.25); border-radius: 4px; padding: 2px; }
+  .variant-nav .role button.active { background: var(--brand-yellow); color: var(--ink-900); }
+  .variant { display: none; }
+  .variant.active { display: block; }
+  .variant-title { max-width: 1100px; margin: 0 auto; padding: 12px 16px 0; font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-500); }
+  .variant-title b { color: var(--ink-900); }
+  .variant-title p { font-family: var(--sans); text-transform: none; letter-spacing: 0; font-size: 13px; color: var(--ink-600); margin: 6px 0 0; max-width: 760px; }
+  body { padding-top: 0; overflow-x: hidden; }
+
+  /* ── the plant scene ─────────────────────────────────────── */
+  .stage { position: relative; height: 720px; margin: 12px auto 40px; max-width: 1100px; border: 1px solid var(--ink-300); border-radius: 12px; overflow: hidden; background: #f5f5f4; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .stage.kiosk { max-width: none; border-radius: 0; height: 780px; margin: 0; border: 0; }
+  .world { position: absolute; left: 0; top: 0; width: 2000px; height: 1116px; transform-origin: 0 0; will-change: transform; cursor: grab; }
+  .world.drag { cursor: grabbing; }
+  .world img { position: absolute; inset: 0; width: 2000px; height: 1116px; user-select: none; -webkit-user-drag: none; pointer-events: none; }
+  .world svg { position: absolute; inset: 0; width: 2000px; height: 1116px; pointer-events: none; overflow: visible; }
+  .world svg polygon { pointer-events: auto; fill: rgba(9,9,11,0); stroke: transparent; stroke-width: 2; cursor: pointer; transition: fill .15s, stroke .15s; }
+  .world svg polygon:hover, .world svg polygon.hover { fill: rgba(59,130,246,.14); stroke: var(--accent-step); }
+  .world svg polygon.on { fill: rgba(9,9,11,.10); stroke: var(--ink-900); stroke-width: 3; }
+  .world svg polygon.due { fill: rgba(217,119,6,.10); stroke: rgba(217,119,6,.55); stroke-dasharray: 6 4; }
+  .world svg polygon.bad { fill: rgba(185,28,28,.10); stroke: rgba(185,28,28,.6); stroke-dasharray: 6 4; }
+  .world svg polygon.zone-Forming.zoned { fill: rgba(234,88,12,.12); } .world svg polygon.zone-General.zoned { fill: rgba(37,99,235,.12); } .world svg polygon.zone-Engineering.zoned { fill: rgba(124,58,237,.12); }
+  .tag { position: absolute; transform: translate(-50%, -100%); pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .tag .lbl { font-family: var(--mono); font-size: 12px; font-weight: 700; background: rgba(255,255,255,.92); border: 1px solid var(--ink-300); border-radius: 4px; padding: 2px 8px; color: var(--ink-900); white-space: nowrap; box-shadow: 0 1px 2px rgba(0,0,0,.08); opacity: 0; transition: opacity .15s; }
+  .tag.show .lbl, .world:hover .tag.pin .lbl { opacity: 1; }
+  .tag .pip { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-family: var(--mono); font-size: 12px; font-weight: 800; color: #fff; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.25); animation: bob 1.6s ease-in-out infinite; }
+  .tag .pip.due { background: #d97706; } .tag .pip.bad { background: #b91c1c; } .tag .pip.ok { background: var(--accent-ok); width: 10px; height: 10px; animation: none; border-width: 1.5px; }
+  .tag .stem { width: 2px; height: 14px; background: var(--ink-900); opacity: .6; }
+  @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-4px) } }
+
+  /* chrome floating over the scene */
+  .hud { position: absolute; z-index: 5; }
+  .hud.top { left: 16px; right: 16px; top: 14px; display: flex; gap: 10px; align-items: flex-start; pointer-events: none; }
+  .hud.top > * { pointer-events: auto; }
+  .ask { flex: 1; max-width: 560px; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,.96); border: 1px solid var(--ink-300); border-radius: 12px; padding: 0 12px; height: 48px; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+  .ask input { flex: 1; border: 0; outline: 0; background: transparent; font: inherit; font-size: 15px; }
+  .ask .mic { width: 34px; height: 34px; border-radius: 50%; background: var(--ink-900); color: #fff; display: grid; place-items: center; font-size: 15px; cursor: pointer; }
+  .kiosk .ask { max-width: none; height: 64px; }
+  .kiosk .ask input { font-size: 20px; }
+  .kiosk .ask .mic { width: 48px; height: 48px; font-size: 20px; }
+  .zones { display: flex; gap: 6px; background: rgba(255,255,255,.96); border: 1px solid var(--ink-300); border-radius: 12px; padding: 6px; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+  .zones button { font: inherit; font-size: 12px; font-weight: 600; border: 0; background: transparent; padding: 6px 10px; border-radius: 8px; cursor: pointer; color: var(--ink-600); display: flex; align-items: center; gap: 6px; }
+  .zones button i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+  .zones button.on { background: var(--ink-900); color: #fff; }
+  .zones .brand { font-family: var(--mono); font-weight: 700; font-size: 13px; padding: 6px 8px 6px 4px; color: var(--ink-900); display: flex; align-items: center; gap: 6px; }
+  .dot { width: 20px; height: 20px; border-radius: 5px; background: var(--ink-900); color:#fff; display:grid; place-items:center; font-size:11px; font-family: var(--mono); font-weight: 700; }
+
+  .now { position: absolute; left: 16px; bottom: 16px; z-index: 5; width: 330px; background: rgba(255,255,255,.97); border: 1px solid var(--ink-900); border-radius: 12px; padding: 14px; box-shadow: 0 6px 24px rgba(0,0,0,.14); }
+  .now .k { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-500); display: flex; justify-content: space-between; }
+  .now h3 { margin: 6px 0 2px; font-size: 16px; line-height: 1.25; }
+  .now .m { font-family: var(--mono); font-size: 11px; color: var(--ink-500); margin-bottom: 10px; }
+  .now .cta { display: flex; gap: 6px; }
+  .btn { font: inherit; font-size: 13px; border: 1px solid var(--ink-300); background: var(--paper-1); border-radius: 8px; padding: 8px 12px; cursor: pointer; color: var(--ink-700); }
+  .btn.primary { background: var(--ink-900); color: #fff; border-color: var(--ink-900); font-weight: 700; }
+  .btn.big { min-height: 48px; font-size: 15px; flex: 1; }
+  .kiosk .btn.big { min-height: 64px; font-size: 20px; }
+  .kiosk .now { bottom: 84px; width: 380px; }
+  .kiosk .hint { display: none; }
+  .now .more { margin-top: 10px; border-top: 1px solid var(--ink-100); padding-top: 8px; font-size: 12px; color: var(--ink-600); }
+  .now .more span { display: block; padding: 2px 0; }
+  .badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; white-space: nowrap; }
+  .badge.due { background: rgba(217,119,6,.16); color: #b45309; } .badge.new { background: rgba(37,99,235,.14); color: var(--accent-measure); } .badge.never { background: rgba(185,28,28,.12); color: var(--accent-hazard); } .badge.done { color: var(--ink-400); border: 1px solid var(--ink-200); }
+  .badge.noowner { background: rgba(185,28,28,.12); color: var(--accent-hazard); } .badge.stale { background: rgba(217,119,6,.16); color: #b45309; } .badge.ok { background: rgba(22,163,74,.14); color: var(--accent-ok); } .badge.draft { background: var(--paper-2); color: var(--ink-500); }
+
+  .hint { position: absolute; right: 16px; bottom: 16px; z-index: 5; font-family: var(--mono); font-size: 10.5px; color: var(--ink-500); background: rgba(255,255,255,.9); border-radius: 6px; padding: 4px 8px; }
+
+  /* machine panel */
+  .panel { position: absolute; top: 0; right: 0; bottom: 0; width: 380px; z-index: 6; background: var(--paper-1); border-left: 1px solid var(--ink-300); box-shadow: -8px 0 30px rgba(0,0,0,.12); transform: translateX(105%); transition: transform .25s ease; display: flex; flex-direction: column; }
+  .panel.open { transform: none; }
+  .kiosk .panel { width: 480px; }
+  .panel .pic { height: 200px; background: #f7f7f6; border-bottom: 1px solid var(--ink-200); display: grid; place-items: center; overflow: hidden; position: relative; }
+  .panel .pic img { width: 100%; height: 100%; object-fit: cover; }
+  .panel .pic .nopic { font-family: var(--mono); font-size: 11px; color: var(--ink-400); }
+  .panel .close { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--ink-300); background: #fff; cursor: pointer; font-size: 16px; }
+  .panel .body { padding: 14px 16px; overflow-y: auto; flex: 1; }
+  .panel .k { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-500); }
+  .panel h2 { margin: 2px 0 10px; font-size: 20px; line-height: 1.2; }
+  .kiosk .panel h2 { font-size: 26px; }
+  .panel .sop { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; font: inherit; border: 1px solid var(--ink-200); background: var(--paper-1); border-radius: 10px; padding: 10px 12px; margin-bottom: 6px; cursor: pointer; min-height: 52px; }
+  .kiosk .panel .sop { min-height: 68px; padding: 14px; }
+  .panel .sop:hover { border-color: var(--ink-900); }
+  .panel .sop .t { flex: 1; min-width: 0; font-size: 14px; font-weight: 600; line-height: 1.3; }
+  .kiosk .panel .sop .t { font-size: 17px; }
+  .panel .sop .go { font-family: var(--mono); font-size: 11px; color: var(--ink-500); }
+  .panel .empty { padding: 20px; border: 1px dashed var(--ink-300); border-radius: 10px; color: var(--ink-500); font-size: 13px; text-align: center; }
+  .panel .adm { display: none; margin-top: 12px; border-top: 1px solid var(--ink-100); padding-top: 10px; font-size: 12.5px; }
+  .is-admin .panel .adm { display: block; }
+  .panel .adm .row { display: flex; justify-content: space-between; padding: 4px 0; }
+  .panel .ask2 { margin-top: 12px; padding: 10px; border: 1px dashed var(--ink-300); border-radius: 10px; font-size: 13px; color: var(--ink-700); }
+  .panel .ask2 b { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-500); margin-bottom: 2px; }
+  .is-admin .panel .ask2 { display: none; }
+
+  /* kiosk identity strip */
+  .who { position: absolute; left: 0; right: 0; bottom: 0; z-index: 7; background: rgba(9,9,11,.92); color: #fff; padding: 10px 16px; display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px; }
+  .who .av { width: 44px; height: 44px; border-radius: 50%; background: #fff; color: var(--ink-900); display: grid; place-items: center; font-weight: 700; font-size: 13px; cursor: pointer; border: 2px solid transparent; }
+  .who .av.on { border-color: var(--brand-yellow); }
+  .who .lbl { color: var(--ink-400); margin-right: 6px; }
+  .who .pin { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+  .who .pin i { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #fff; display: inline-block; }
+  .who .pin i.f { background: #fff; }
+
+  /* phone */
+  .phones { display: flex; gap: 20px; justify-content: center; max-width: 1100px; margin: 16px auto 48px; flex-wrap: wrap; }
+  .phone { width: 320px; height: 660px; flex: 0 0 auto; border: 10px solid var(--ink-900); border-radius: 34px; background: var(--paper); overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 8px 30px rgba(0,0,0,.18); position: relative; }
+  .phone .cap { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-500); text-align: center; padding: 8px 0 0; }
+  .phone .pad { padding: 12px; }
+  .phone .now { position: static; width: auto; margin: 0 12px 10px; }
+  .phone .ask { flex: 0 0 auto; margin: 10px 12px; }
+  .phone .cam { flex: 1; margin: 0 12px 12px; border-radius: 16px; background: #1a1a1a; position: relative; overflow: hidden; display: grid; place-items: center; }
+  .phone .cam img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .55; filter: saturate(.6); }
+  .phone .cam .plate { position: relative; background: #e8e8e6; border: 3px solid #333; border-radius: 6px; padding: 8px; display: flex; gap: 8px; align-items: center; box-shadow: 0 8px 20px rgba(0,0,0,.5); }
+  .phone .cam .qr { width: 64px; height: 64px; background: repeating-conic-gradient(#111 0 25%, #fff 0 50%) 0 0/16px 16px; border: 3px solid #fff; }
+  .phone .cam .plate .pt { font-family: var(--mono); font-size: 10px; font-weight: 700; color: #111; line-height: 1.3; }
+  .phone .cam .frame { position: absolute; width: 200px; height: 200px; border: 2px solid var(--brand-yellow); border-radius: 12px; box-shadow: 0 0 0 999px rgba(0,0,0,.35); }
+  .phone .cam .found { position: absolute; bottom: 12px; left: 12px; right: 12px; background: #fff; border-radius: 10px; padding: 10px 12px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .phone .cam .found .badge { margin-left: auto; }
+  .phone .sop { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; font: inherit; border: 1px solid var(--ink-200); background: var(--paper-1); border-radius: 12px; padding: 12px; margin: 0 12px 8px; width: calc(100% - 24px); min-height: 60px; }
+  .phone .sop .t { flex: 1; font-size: 15px; font-weight: 600; line-height: 1.3; }
+  .phone .mini { height: 150px; margin: 0 12px 10px; border-radius: 12px; overflow: hidden; border: 1px solid var(--ink-200); background: #f5f5f4; position: relative; }
+  .phone .mini img { width: 100%; height: 100%; object-fit: cover; }
+  .phone .mini .k { position: absolute; left: 8px; top: 8px; font-family: var(--mono); font-size: 10px; background: #fff; border-radius: 4px; padding: 2px 6px; }
+
+  /* admin */
+  .adminwrap { max-width: 1100px; margin: 12px auto 40px; display: grid; grid-template-columns: 1fr 420px; gap: 16px; }
+  .inbox { border: 1px solid var(--ink-300); border-radius: 12px; background: var(--paper-1); overflow: hidden; }
+  .inbox .h { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--ink-200); }
+  .inbox .h h2 { margin: 0; font-size: 16px; }
+  .inbox .h .n { font-family: var(--mono); font-size: 11px; color: var(--ink-500); }
+  .inbox .h .f { margin-left: auto; display: flex; gap: 4px; }
+  .inbox .h .f button { font: inherit; font-size: 11.5px; border: 1px solid var(--ink-200); background: transparent; border-radius: 999px; padding: 3px 10px; cursor: pointer; color: var(--ink-600); }
+  .inbox .h .f button.on { background: var(--ink-900); color: #fff; border-color: var(--ink-900); }
+  .inbox .it { display: grid; grid-template-columns: 22px 1fr auto auto; gap: 10px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--ink-100); cursor: pointer; }
+  .inbox .it:hover { background: var(--paper-2); }
+  .inbox .it .ic { width: 10px; height: 10px; border-radius: 50%; }
+  .inbox .it .ic.bad { background: #b91c1c; } .inbox .it .ic.warn { background: #d97706; } .inbox .it .ic.info { background: var(--accent-measure); } .inbox .it .ic.grey { background: var(--ink-300); }
+  .inbox .it .t { font-size: 13px; font-weight: 600; }
+  .inbox .it .t small { display: block; font-weight: 400; color: var(--ink-500); font-size: 12px; }
+  .inbox .it .w { font-family: var(--mono); font-size: 10.5px; color: var(--ink-500); }
+  .inbox .it .a { font: inherit; font-size: 12px; border: 1px solid var(--ink-900); background: var(--ink-900); color: #fff; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-weight: 600; }
+  .inbox .zero { padding: 40px; text-align: center; color: var(--ink-500); }
+  .floor { border: 1px solid var(--ink-300); border-radius: 12px; overflow: hidden; background: #f5f5f4; position: relative; height: 300px; }
+  .floor .k { position: absolute; left: 10px; top: 10px; z-index: 2; font-family: var(--mono); font-size: 10.5px; background: #fff; border-radius: 4px; padding: 2px 8px; letter-spacing: .06em; text-transform: uppercase; }
+  .floor .world { transform: scale(.21); }
+  .side .card { border: 1px solid var(--ink-200); border-radius: 12px; background: var(--paper-1); padding: 12px; margin-top: 12px; }
+  .side .card h4 { margin: 0 0 8px; font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-500); }
+  .side .card .r { display: flex; justify-content: space-between; font-size: 12.5px; padding: 5px 0; border-bottom: 1px solid var(--ink-100); }
+  .table { max-width: 1100px; margin: 0 auto 48px; border: 1px solid var(--ink-300); border-radius: 12px; background: var(--paper-1); overflow: hidden; }
+  .table .h { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--ink-200); }
+  .table .h h2 { margin: 0; font-size: 16px; }
+  .table .h .chips { margin-left: auto; display: flex; gap: 4px; }
+  .table .h .chips button { font: inherit; font-size: 11.5px; border: 1px solid var(--ink-200); background: transparent; border-radius: 999px; padding: 3px 10px; cursor: pointer; color: var(--ink-600); }
+  .table table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .table th { text-align: left; font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-500); padding: 8px 12px; border-bottom: 1px solid var(--ink-200); font-weight: 600; }
+  .table td { padding: 9px 12px; border-bottom: 1px solid var(--ink-100); vertical-align: middle; }
+  .table td.t { font-weight: 600; }
+  .table td .checks { display: flex; gap: 4px; }
+  .table .ck { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: 10px; font-weight: 800; color: #fff; }
+  .table .ck.ok { background: var(--accent-ok); } .table .ck.bad { background: #b91c1c; } .table .ck.warn { background: #d97706; } .table .ck.off { background: var(--ink-200); color: var(--ink-500); }
+  .table td.mach { font-family: var(--mono); font-size: 11px; color: var(--ink-500); }
+  .note { max-width: 1100px; margin: 0 auto 30px; padding: 0 16px; font-size: 12.5px; color: var(--ink-600); }
+</style>
+</head>
+<body>
+
+<nav class="variant-nav">
+  <span class="vlabel">SKETCH 007 · PLANT FLOOR NAVIGATION</span>
+  <button data-v="plant" class="active">★ Plant · desktop</button>
+  <button data-v="kiosk">Shared terminal (dropped)</button>
+  <button data-v="phone">Phone</button>
+  <button data-v="admin">Admin inbox</button>
+  <span class="spacer"></span>
+  <span class="vlabel">VIEW AS</span>
+  <span class="role"><button data-role="worker" class="active">Worker</button><button data-role="admin">Admin</button></span>
+</nav>
+
+<!-- ══════════════ PLANT (desktop worker home) ══════════════ -->
+<section class="variant active" id="v-plant">
+  <div class="variant-title"><b>The plant is the navigation.</b>
+    <p>No library, no scope column. You open SOPstart and you are standing above your site. Machines that have something due for you carry a pin. Click any machine to zoom to it and see its procedures. Drag to pan, scroll to zoom, or just ask the bar at the top. Switch <b>View as</b> to Admin: the same floor, but the pins now show library health — red where a procedure has no owner, amber where review is overdue.</p>
+  </div>
+  <div class="stage" data-stage="plant"></div>
+</section>
+
+<!-- ══════════════ KIOSK ══════════════ -->
+<section class="variant" id="v-kiosk">
+  <div class="variant-title"><b>Shared terminal beside the line — DROPPED 2026-09-28 (Simon: "forget the shared terminal").</b>
+    <p>The Visy reality: a desktop next to the machine used by every operator on shift. Full-bleed floor, no header, no login. Tap your face to say who you are, tap the machine, tap the procedure. A four-digit PIN only when you sign something off. Everything is 64px tall because the operator has gloves on.</p>
+  </div>
+  <div class="stage kiosk" data-stage="kiosk"></div>
+</section>
+
+<!-- ══════════════ PHONE ══════════════ -->
+<section class="variant" id="v-phone">
+  <div class="variant-title"><b>Phone: scan the plate, or ask.</b>
+    <p>Left: the home is the Now card plus the ask bar plus a thumbnail of the floor. Middle: point the camera at the QR plate riveted to the machine and its procedures appear. Right: the machine's list, glove-sized, badges carried over. The floor scene is a thumbnail here, not the navigation — thumbs and cameras beat pan-and-zoom on a 6-inch screen.</p>
+  </div>
+  <div class="phones">
+    <div class="phone">
+      <div class="cap">Home</div>
+      <div class="ask" style="height:48px"><span>⌕</span><input placeholder="Ask or search… 'blank side hanger'"><span class="mic">🎤</span></div>
+      <div class="now">
+        <div class="k"><span>Next for you</span><span class="badge due">Due</span></div>
+        <h3>Changing the Blank Side Hanger</h3>
+        <div class="m">IS Machine 1 · Forming · ~20 min</div>
+        <div class="cta"><button class="btn primary big">Walk it</button><button class="btn big">Read</button></div>
+        <div class="more"><span>Then: Automated Sample Challenge Recording · <b>due</b></span><span>Then: Changing Plenum Chamber · <b>never done</b></span></div>
+      </div>
+      <div class="mini"><img src="assets/plant.jpg" alt=""><span class="k">Your site · tap to open</span></div>
+      <button class="btn" style="margin:0 12px">📷 Scan a machine plate</button>
+    </div>
+    <div class="phone">
+      <div class="cap">Scanning</div>
+      <div class="cam">
+        <img src="assets/is-machine.jpg" alt="">
+        <div class="frame"></div>
+        <div class="plate"><div class="qr"></div><div class="pt">IS MACHINE 1<br>FORMING · LINE A<br>SOPSTART / M-0031</div></div>
+        <div class="found">✓ IS Machine 1 <span class="badge due">1 due</span></div>
+      </div>
+    </div>
+    <div class="phone">
+      <div class="cap">IS Machine 1</div>
+      <div class="pad"><span class="k" style="font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-500)">Forming · Line A</span><h2 style="margin:2px 0 6px;font-size:22px">IS Machine 1</h2></div>
+      <div class="mini" style="height:120px"><img src="assets/is-machine.jpg" alt=""></div>
+      <button class="sop"><span class="t">Changing the Blank Side Hanger</span><span class="badge due">Due</span></button>
+      <button class="sop"><span class="t">Deflector Setup and Replacement for Proper Gob Loading</span><span class="badge never">Never</span></button>
+      <button class="sop"><span class="t">Working Safely in the Forming Area</span><span class="badge new">Updated</span></button>
+      <button class="sop"><span class="t">Manually Swabbing a Forming Machine</span><span class="badge done">Done</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ ADMIN ══════════════ -->
+<section class="variant" id="v-admin">
+  <div class="variant-title"><b>Admin: an inbox, and the floor lit by health.</b>
+    <p>The admin's home is not a list of SOPs, it is the work: a Linear-style inbox where every row is one thing to do and the goal is zero. Beside it, the same plant floor with red and amber pins where the library is sick, so "the machine shop has no owner for anything" is visible as a place, not a filter. Below, the library as a plain table with a checks row per SOP, GitHub-pull-request style.</p>
+  </div>
+  <div class="adminwrap">
+    <div class="inbox">
+      <div class="h"><h2>Inbox</h2><span class="n">12 open</span>
+        <div class="f"><button class="on">All</button><button>No owner 7</button><button>Overdue 3</button><button>Approve 1</button><button>Stuck 1</button></div></div>
+      <div data-inbox></div>
+    </div>
+    <div class="side">
+      <div class="floor"><span class="k">Floor health</span><div class="world" data-floor></div></div>
+      <div class="card"><h4>SOPs you look after</h4><div class="r"><span>OTG Probe Maintenance</span><span class="badge ok">OK</span></div><div class="r"><span>Automated Sample Challenge Recording</span><span class="badge ok">OK</span></div><div class="r"><span>Alkaline Cleaning Tank Operation</span><span class="badge stale">Review due</span></div></div>
+      <div class="card"><h4>Coming up</h4><div class="r"><span>Oct</span><span>2 reviews due</span></div><div class="r"><span>Nov</span><span>1 review due</span></div></div>
+    </div>
+  </div>
+  <div class="table">
+    <div class="h"><h2>Library</h2><span style="font-family:var(--mono);font-size:11px;color:var(--ink-500)">33 SOPs</span>
+      <div class="chips"><button>Where ▾</button><button>Status ▾</button><button>Owner ▾</button><button>Checks ▾</button></div></div>
+    <table><thead><tr><th>SOP</th><th>Machine</th><th>Status</th><th>Owner</th><th>Checks</th><th>Review</th></tr></thead><tbody data-table></tbody></table>
+  </div>
+  <div class="note">Checks, left to right: has an owner · reviewed within 12 months · approved · assigned to someone · converted cleanly. Same idiom as pull-request checks: green means nothing to do.</div>
+</section>
+
+<script>
+/* ── machines: hotspots on the 2000×1116 scene, department, and their SOPs ── */
+const M = [
+  { id:'furnace', name:'Furnace & forehearth', dept:'Forming', poly:[[170,420],[350,360],[430,470],[300,610],[170,560]], sops:['forming-safety','forming-safety-2'] },
+  { id:'panel', name:'Electrical panel', dept:'Forming', poly:[[368,285],[438,282],[440,398],[370,402]], sops:[] },
+  { id:'is1', name:'IS Machine 1', dept:'Forming', pic:'assets/is-machine.jpg', poly:[[398,585],[540,520],[720,650],[905,845],[875,905],[650,860],[398,705]], sops:['hanger','deflector','forming-safety','swab'] },
+  { id:'is2', name:'IS Machine 2', dept:'Forming', pic:'assets/is-machine.jpg', poly:[[528,485],[690,428],[1050,745],[1010,822],[890,770],[760,660]], sops:['plenum','swab','forming-safety'] },
+  { id:'lehr', name:'Annealing lehr', dept:'Forming', pic:'assets/lehr.jpg', poly:[[588,290],[705,228],[1002,428],[962,502],[860,470],[598,345]], sops:['otg'] },
+  { id:'insp1', name:'Inspection line 1', dept:'General', poly:[[1005,495],[1140,428],[1262,560],[1150,645],[1005,575]], sops:['sample','iri'] },
+  { id:'insp2', name:'Inspection line 2 & palletiser', dept:'General', poly:[[1195,432],[1292,398],[1408,522],[1330,598],[1215,545]], sops:['sample'] },
+  { id:'pallets', name:'Pallet staging', dept:'General', poly:[[1215,560],[1500,560],[1500,800],[1215,800]], sops:[] },
+  { id:'tank', name:'Alkaline cleaning tank', dept:'Engineering', pic:'assets/cleaning-tank.jpg', poly:[[1308,195],[1455,150],[1502,232],[1380,332],[1308,300]], sops:['tank','tank2'] },
+  { id:'lathe', name:'Lathe', dept:'Engineering', poly:[[1515,215],[1642,190],[1665,300],[1560,342],[1500,300]], sops:[] },
+  { id:'bench', name:'Workbench', dept:'Engineering', poly:[[1660,245],[1805,268],[1795,385],[1680,385]], sops:[] },
+  { id:'gluer', name:'Hot-melt gluer', dept:'Engineering', pic:'assets/gluer.jpg', poly:[[1430,345],[1560,330],[1585,455],[1450,470]], sops:['gluer'] },
+  { id:'rack', name:'Racking', dept:'Engineering', poly:[[1625,560],[1905,655],[1905,800],[1705,800],[1625,700]], sops:[] },
+  { id:'forklift', name:'Forklift', dept:'Engineering', poly:[[1588,690],[1765,690],[1765,865],[1588,865]], sops:['tyre'] },
+  { id:'office', name:'Office terminal', dept:'General', poly:[[1440,800],[1622,800],[1622,962],[1440,962]], sops:['keyboard'] },
+];
+const S = {
+  hanger:{ t:'Changing the Blank Side Hanger', rel:'due', owner:null, rev:'Jan 2021', status:'published', mins:20 },
+  deflector:{ t:'Deflector Setup and Replacement for Proper Gob Loading', rel:'never', owner:null, rev:'—', status:'draft', mins:30 },
+  swab:{ t:'Manually Swabbing a Forming Machine', rel:'done', owner:'B. Tane', rev:'Aug 2026', status:'published', mins:5 },
+  plenum:{ t:'Changing Plenum Chamber — IS Machine Forming Section', rel:'never', owner:null, rev:'Mar 2026', status:'published', mins:45 },
+  'forming-safety':{ t:'Working Safely in the Forming Area — Mandatory Safety Requirements', rel:'new', owner:'H&S', rev:'3 days ago', status:'published', mins:10 },
+  'forming-safety-2':{ t:'Forming Area Mandatory Minimum Safety Requirements and Procedures', rel:null, owner:null, rev:'—', status:'draft', mins:10 },
+  otg:{ t:'OTG Probe Maintenance', rel:'done', owner:'E. Vans', rev:'Sep 2026', status:'published', mins:15 },
+  sample:{ t:'Automated Sample Challenge Recording', rel:'due', owner:'E. Vans', rev:'Sep 2026', status:'published', mins:10 },
+  iri:{ t:'IRI CSV File Configuration', rel:null, owner:null, rev:'—', status:'draft', mins:5 },
+  tank:{ t:'Alkaline Cleaning Tank Operation — Machine Shop (Tergo Alkalox)', rel:null, owner:'E. Vans', rev:'review due', status:'published', mins:25 },
+  tank2:{ t:'Alkaline Cleaning Tank – Machine Shop', rel:null, owner:null, rev:'—', status:'draft', mins:25 },
+  gluer:{ t:'Setting Up and Operating the Hot Melt Gluer', rel:'never', owner:null, rev:'Jul 2026', status:'published', mins:25 },
+  tyre:{ t:'Emergency Tyre Change on a Motorway', rel:null, owner:null, rev:'—', status:'draft', mins:20 },
+  keyboard:{ t:'Replacing a Desktop Computer Keyboard at a Workstation', rel:null, owner:null, rev:'—', status:'draft', mins:5 },
+};
+const REL = { due:'Due', new:'Updated', never:'Never done', done:'Done' };
+const ZONE = { Forming:'#ea580c', General:'#2563eb', Engineering:'#7c3aed' };
+let role = 'worker';
+
+const visible = id => role==='admin' || S[id].status==='published';
+function health(m) { // admin pin
+  const ids = m.sops.filter(id => S[id].status!=='uploading');
+  if (ids.some(id => !S[id].owner)) return 'bad';
+  if (ids.some(id => /2021|review due/.test(S[id].rev))) return 'due';
+  return ids.length ? 'ok' : null;
+}
+function todo(m) { return m.sops.filter(visible).filter(id => ['due','never','new'].includes(S[id].rel)).length; }
+
+function centroid(p) { const n=p.length; return [p.reduce((a,c)=>a+c[0],0)/n, p.reduce((a,c)=>a+c[1],0)/n]; }
+function topOf(p) { return Math.min(...p.map(c=>c[1])); }
+
+function buildStage(el, kiosk) {
+  el.innerHTML = `
+    <div class="world" data-world>
+      <img src="assets/plant.jpg" alt="Plant floor">
+      <svg viewBox="0 0 2000 1116">${M.map(m=>`<polygon data-m="${m.id}" class="zone-${m.dept}" points="${m.poly.map(c=>c.join(',')).join(' ')}"/>`).join('')}</svg>
+      ${M.map(m=>{ const [cx]=centroid(m.poly); return `<div class="tag" data-tag="${m.id}" style="left:${cx}px;top:${topOf(m.poly)-6}px"><span class="lbl">${m.name}</span><span data-pip></span><span class="stem"></span></div>`; }).join('')}
+    </div>
+    <div class="hud top">
+      <div class="zones"><span class="brand"><span class="dot">S</span>${kiosk?'Line A terminal':'SOPstart'}</span>
+        <button data-zone="" class="on">Whole site</button>
+        ${Object.keys(ZONE).map(z=>`<button data-zone="${z}"><i style="background:${ZONE[z]}"></i>${z}</button>`).join('')}
+      </div>
+      <label class="ask"><span>⌕</span><input placeholder="${kiosk?'Ask: “how do I change the blank side hanger?”':'Ask or search… try “hanger”'}" data-ask><span class="mic">🎤</span></label>
+    </div>
+    <div class="now" data-now></div>
+    <div class="hint">drag to pan · scroll to zoom · click a machine</div>
+    <aside class="panel" data-panel></aside>
+    ${kiosk?`<div class="who"><span class="lbl">WHO ARE YOU?</span><span class="av on">RT</span><span class="av">MK</span><span class="av">AJ</span><span class="av">SP</span><span class="av">+</span><span class="pin">PIN on sign-off <i class="f"></i><i class="f"></i><i></i><i></i></span></div>`:''}
+  `;
+  const world = el.querySelector('[data-world]');
+  let W = el.clientWidth, H = el.clientHeight;
+  const view = { s: 0.5, x: 0, y: 0 };
+  // a stage built while its tab is hidden measures 0×0 — re-measure on every fit
+  const fit = () => { W = el.clientWidth; H = el.clientHeight; if (!W) return; view.s = Math.min(W/2000, (H-(kiosk?70:0))/1116) * 1.02; view.x = (W - 2000*view.s)/2; view.y = ((H-(kiosk?70:0)) - 1116*view.s)/2 - 10; apply(); };
+  const apply = () => { world.style.transform = `translate(${view.x}px,${view.y}px) scale(${view.s})`; };
+  fit();
+  // pan
+  let drag=null;
+  world.addEventListener('pointerdown', e => { if (e.target.tagName==='polygon') return; drag={x:e.clientX,y:e.clientY,vx:view.x,vy:view.y}; world.classList.add('drag'); world.setPointerCapture(e.pointerId); });
+  world.addEventListener('pointermove', e => { if(!drag) return; view.x = drag.vx + (e.clientX-drag.x); view.y = drag.vy + (e.clientY-drag.y); apply(); });
+  world.addEventListener('pointerup', () => { drag=null; world.classList.remove('drag'); });
+  // zoom to cursor
+  el.addEventListener('wheel', e => { e.preventDefault(); const r = el.getBoundingClientRect(); const mx=e.clientX-r.left, my=e.clientY-r.top; const f = e.deltaY<0 ? 1.12 : 1/1.12; const ns = Math.min(2.4, Math.max(0.35, view.s*f)); view.x = mx - (mx-view.x)*(ns/view.s); view.y = my - (my-view.y)*(ns/view.s); view.s = ns; apply(); }, { passive:false });
+  const zoomTo = (m) => { const [cx,cy]=centroid(m.poly); const ns = kiosk?1.3:1.5; const targetX = (W-380)/2; view.s = ns; view.x = targetX - cx*ns; view.y = (H/2) - cy*ns; world.style.transition='transform .35s ease'; apply(); setTimeout(()=>world.style.transition='',380); };
+
+  // pins + labels
+  const paint = () => {
+    el.classList.toggle('is-admin', role==='admin');
+    M.forEach(m => {
+      const poly = el.querySelector(`polygon[data-m="${m.id}"]`), tag = el.querySelector(`[data-tag="${m.id}"]`), pip = tag.querySelector('[data-pip]');
+      poly.classList.remove('due','bad');
+      if (role==='worker') { const n = todo(m); pip.className = n ? 'pip due' : ''; pip.textContent = n||''; tag.classList.toggle('pin', !!n); if (n) poly.classList.add('due'); }
+      else { const h = health(m); pip.className = h ? `pip ${h}` : ''; pip.textContent = h==='ok' ? '' : (h==='bad' ? '!' : '↻'); tag.classList.toggle('pin', h==='bad'||h==='due'); if (h==='bad') poly.classList.add('bad'); else if (h==='due') poly.classList.add('due'); }
+    });
+    renderNow();
+  };
+  const renderNow = () => {
+    const now = el.querySelector('[data-now]');
+    if (role==='admin') { now.innerHTML = `<div class="k"><span>Library health</span><span class="badge noowner">7 no owner</span></div><h3>3 machines have procedures nobody owns</h3><div class="m">Machine shop · IS Machine 1 · Forklift</div><div class="cta"><button class="btn primary big">Open inbox · 12</button></div>`; return; }
+    now.innerHTML = `<div class="k"><span>Next for you</span><span class="badge due">Due</span></div><h3>Changing the Blank Side Hanger</h3><div class="m">IS Machine 1 · Forming · ~20 min · last done 11 months ago</div><div class="cta"><button class="btn primary big">Walk it</button><button class="btn big" data-goto="is1">Show me</button></div><div class="more"><span>Then: Automated Sample Challenge Recording · <b>due</b> · Inspection 1</span><span>Then: Changing Plenum Chamber · <b>never done</b> · IS Machine 2</span></div>`;
+    now.querySelector('[data-goto]').onclick = () => open(M.find(m=>m.id==='is1'));
+  };
+  const open = (m) => {
+    el.querySelectorAll('polygon').forEach(p=>p.classList.toggle('on', p.dataset.m===m.id));
+    el.querySelectorAll('.tag').forEach(t=>t.classList.toggle('show', t.dataset.tag===m.id));
+    const panel = el.querySelector('[data-panel]');
+    const ids = m.sops.filter(visible);
+    const order = [...ids].sort((a,b)=>(['due','never','new'].includes(S[a].rel)?0:1)-(['due','never','new'].includes(S[b].rel)?0:1));
+    panel.innerHTML = `
+      <div class="pic">${m.pic?`<img src="${m.pic}" alt="">`:`<span class="nopic">no photo yet</span>`}<button class="close" data-close>×</button></div>
+      <div class="body">
+        <span class="k" style="color:${ZONE[m.dept]}">${m.dept}</span>
+        <h2>${m.name}</h2>
+        ${order.length ? order.map(id => `<button class="sop"><span class="t">${S[id].t}</span>${role==='worker' ? (S[id].rel?`<span class="badge ${S[id].rel}">${REL[S[id].rel]}</span>`:'') : (!S[id].owner?'<span class="badge noowner">No owner</span>':(S[id].status==='draft'?'<span class="badge draft">Draft</span>':'<span class="badge ok">OK</span>'))}<span class="go">${role==='worker'?'Walk ›':'Open ›'}</span></button>`).join('') : `<div class="empty">No procedures for this machine yet.${role==='admin'?'<br><br><button class="btn primary">Add one</button>':''}</div>`}
+        <div class="adm">${ids.map(id=>`<div class="row"><span>${S[id].t.slice(0,34)}…</span><span style="font-family:var(--mono);font-size:10.5px;color:var(--ink-500)">owner ${S[id].owner||'<b style=\"color:#b91c1c\">none</b>'} · rev ${S[id].rev}</span></div>`).join('')}</div>
+        <div class="ask2"><b>Ask about ${m.name}</b>🎤 “Which spanner for the hanger bolt?”</div>
+      </div>`;
+    panel.classList.add('open');
+    panel.querySelector('[data-close]').onclick = () => { panel.classList.remove('open'); el.querySelectorAll('polygon').forEach(p=>p.classList.remove('on')); el.querySelectorAll('.tag').forEach(t=>t.classList.remove('show')); fit(); };
+    zoomTo(m);
+  };
+  el.querySelectorAll('polygon').forEach(p => {
+    p.onclick = () => open(M.find(m=>m.id===p.dataset.m));
+    p.onmouseenter = () => el.querySelector(`[data-tag="${p.dataset.m}"]`).classList.add('show');
+    p.onmouseleave = () => el.querySelector(`[data-tag="${p.dataset.m}"]`).classList.remove('show');
+  });
+  el.querySelectorAll('[data-zone]').forEach(b => b.onclick = () => {
+    el.querySelectorAll('[data-zone]').forEach(x=>x.classList.toggle('on', x===b));
+    el.querySelectorAll('polygon').forEach(p => p.classList.toggle('zoned', !!b.dataset.zone && p.classList.contains('zone-'+b.dataset.zone)));
+    if (!b.dataset.zone) { fit(); return; }
+    const pts = M.filter(m=>m.dept===b.dataset.zone).flatMap(m=>m.poly);
+    const xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]); const bw=Math.max(...xs)-Math.min(...xs), bh=Math.max(...ys)-Math.min(...ys);
+    view.s = Math.min((W-80)/bw, (H-120)/bh, 1.6); view.x = W/2 - (Math.min(...xs)+bw/2)*view.s; view.y = H/2 - (Math.min(...ys)+bh/2)*view.s; world.style.transition='transform .35s ease'; apply(); setTimeout(()=>world.style.transition='',380);
+  });
+  el.querySelector('[data-ask]').oninput = e => {
+    const q = e.target.value.trim().toLowerCase(); if (!q) { el.querySelectorAll('.tag').forEach(t=>t.classList.remove('show')); return; }
+    M.forEach(m => { const hit = m.name.toLowerCase().includes(q) || m.sops.some(id=>S[id].t.toLowerCase().includes(q)); el.querySelector(`[data-tag="${m.id}"]`).classList.toggle('show', hit); el.querySelector(`polygon[data-m="${m.id}"]`).classList.toggle('hover', hit); });
+  };
+  el._paint = paint; el._fit = fit; paint();
+}
+buildStage(document.querySelector('[data-stage="plant"]'), false);
+buildStage(document.querySelector('[data-stage="kiosk"]'), true);
+
+/* admin: mini floor with health pins */
+(function(){
+  const w = document.querySelector('[data-floor]');
+  w.innerHTML = `<img src="assets/plant.jpg" alt=""><svg viewBox="0 0 2000 1116">${M.map(m=>{const h=health(m); return `<polygon class="${h==='bad'?'bad':h==='due'?'due':''}" points="${m.poly.map(c=>c.join(',')).join(' ')}"/>`}).join('')}</svg>` +
+    M.filter(m=>['bad','due'].includes(health(m))).map(m=>{const [cx]=centroid(m.poly); return `<div class="tag pin" style="left:${cx}px;top:${topOf(m.poly)-6}px;transform:translate(-50%,-100%) scale(3.5)"><span class="pip ${health(m)}">${health(m)==='bad'?'!':'↻'}</span><span class="stem"></span></div>`}).join('');
+  const inbox = [
+    { ic:'bad', t:'Changing the Blank Side Hanger', s:'IS Machine 1 · live to workers · no owner', w:'2 mo', a:'Assign owner' },
+    { ic:'bad', t:'Changing Plenum Chamber', s:'IS Machine 2 · live to workers · no owner', w:'2 mo', a:'Assign owner' },
+    { ic:'bad', t:'Setting Up and Operating the Hot Melt Gluer', s:'Hot-melt gluer · live · no owner', w:'6 wk', a:'Assign owner' },
+    { ic:'warn', t:'Changing the Blank Side Hanger', s:'Last reviewed Jan 2021', w:'5 yr', a:'Review' },
+    { ic:'warn', t:'Alkaline Cleaning Tank Operation', s:'Review was due 12 Sep · yours', w:'16 d', a:'Review' },
+    { ic:'info', t:'Working Safely in the Forming Area', s:'Approval step 2 of 3 · you are next', w:'3 d', a:'Approve' },
+    { ic:'bad', t:'(untitled upload)', s:'Stopped while converting · 29 days', w:'29 d', a:'Retry' },
+    { ic:'bad', t:'Deflector Setup and Replacement', s:'IS Machine 1 · draft · no owner', w:'3 mo', a:'Assign owner' },
+    { ic:'grey', t:'Emergency Tyre Change on a Motorway', s:'Forklift · draft · no owner · is this ours?', w:'4 mo', a:'Finish' },
+    { ic:'grey', t:'Racking, Lathe, Workbench', s:'3 machines with no procedures at all', w:'—', a:'Add' },
+  ];
+  document.querySelector('[data-inbox]').innerHTML = inbox.map(i=>`<div class="it"><span class="ic ${i.ic}"></span><span class="t">${i.t}<small>${i.s}</small></span><span class="w">${i.w}</span><button class="a">${i.a}</button></div>`).join('');
+  const mOf = id => M.find(m=>m.sops.includes(id))?.name || '—';
+  const ck = (ok, warn) => `<span class="ck ${ok?'ok':(warn?'warn':'bad')}">${ok?'✓':(warn?'!':'×')}</span>`;
+  document.querySelector('[data-table]').innerHTML = Object.entries(S).map(([id,s])=>`<tr><td class="t">${s.t}</td><td class="mach">${mOf(id)}</td><td>${s.status==='published'?'<span class="badge ok">Live</span>':'<span class="badge draft">Draft</span>'}</td><td>${s.owner||'<span class="badge noowner">none</span>'}</td><td><span class="checks">${ck(!!s.owner)}${ck(!/2021|—|due/.test(s.rev), /due/.test(s.rev))}${ck(s.status==='published', s.status==='draft')}${ck(true)}${ck(true)}</span></td><td class="mach">${s.rev}</td></tr>`).join('');
+})();
+
+/* chrome */
+document.querySelectorAll('.variant-nav button[data-v]').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.variant-nav button[data-v]').forEach(x => x.classList.toggle('active', x===b));
+  document.querySelectorAll('.variant').forEach(v => v.classList.toggle('active', v.id==='v-'+b.dataset.v));
+  document.querySelectorAll('.variant.active [data-stage]').forEach(s => s._fit());
+});
+window.addEventListener('resize', () => document.querySelectorAll('.variant.active [data-stage]').forEach(s => s._fit()));
+document.querySelectorAll('.variant-nav button[data-role]').forEach(b => b.onclick = () => {
+  role = b.dataset.role;
+  document.querySelectorAll('.variant-nav button[data-role]').forEach(x => x.classList.toggle('active', x===b));
+  document.querySelectorAll('[data-stage]').forEach(s => s._paint());
+});
+</script>
+</body>
+</html>
