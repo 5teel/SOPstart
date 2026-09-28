@@ -21,8 +21,9 @@ import { useTtsPlayback } from './useTtsPlayback'
  *   - TTS read-back: answers read aloud via useTtsPlayback.speak()
  *   - TTS step-entry: currentStepText changes trigger speak() for VDW-LIT-03
  *
- * Bundle isolation: this component is ONLY imported via `next/dynamic`
- * from WalkthroughSwitcher.tsx. The Wave 0 lint guard enforces this.
+ * Bundle isolation: this component is ONLY imported via `next/dynamic`,
+ * from WalkthroughSwitcher.tsx or (Phase 52, D-13) the plant home's
+ * PlantAskBar.tsx. The Wave 0 lint guard enforces this for both sites.
  *
  * a11y (D-15):
  * - `role="dialog" aria-modal="true"`; titled by `walkthrough-voice-title`

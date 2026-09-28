@@ -1,11 +1,16 @@
 /**
  * Phase 15 / Wave 0 — Static-import leak guard (Pitfall 5, guards SB-LINE-06).
+ * Phase 52 (D-13) added a second sanctioned dynamic reference site for
+ * WalkthroughVoiceModal — see below.
  *
  * Ensures that DesktopWalkthrough and WalkthroughVoiceModal are NEVER
- * statically imported. The ONLY allowed reference site is
- * `src/components/sop/walkthrough/WalkthroughSwitcher.tsx`, and only via
- * `next/dynamic`. Any other import path would pull the desktop / voice
- * code into the mobile worker bundle and bust SB-LINE-06 bundle isolation.
+ * statically imported. DesktopWalkthrough's ONLY allowed reference site is
+ * `src/components/sop/walkthrough/WalkthroughSwitcher.tsx`; WalkthroughVoiceModal's
+ * allowed reference sites are that same file AND
+ * `src/components/sop/plant/PlantAskBar.tsx` (the plant home's ask-bar mic,
+ * D-13) — both only via `next/dynamic`. Any other import path would pull the
+ * desktop / voice code into the mobile worker bundle and bust SB-LINE-06
+ * bundle isolation.
  *
  * Runs LIVE (no `test.fixme`). At Phase-14-head the components don't exist
  * yet, so the regex finds zero matches and the test passes vacuously.
@@ -28,6 +33,10 @@ const ALLOWED_FILE = path.join(
   'walkthrough',
   'WalkthroughSwitcher.tsx'
 )
+const ALLOWED_VOICE_FILES = [
+  ALLOWED_FILE,
+  path.join('src', 'components', 'sop', 'plant', 'PlantAskBar.tsx'),
+]
 
 type Hit = { file: string; line: number; text: string; usesDynamic: boolean }
 
@@ -99,11 +108,11 @@ test('SB-LINE-06: no static import of DesktopWalkthrough outside WalkthroughSwit
   expect(violations).toEqual([])
 })
 
-test('SB-LINE-06: no static import of WalkthroughVoiceModal outside WalkthroughSwitcher.tsx', () => {
+test('SB-LINE-06: no static import of WalkthroughVoiceModal outside WalkthroughSwitcher.tsx or plant/PlantAskBar.tsx', () => {
   const hits = findImports('WalkthroughVoiceModal')
+  const allowedPaths = ALLOWED_VOICE_FILES.map((f) => f.replace(/\\/g, '/'))
   const violations = hits.filter((h) => {
-    const allowedPath = ALLOWED_FILE.replace(/\\/g, '/')
-    if (h.file !== allowedPath) return true
+    if (!allowedPaths.includes(h.file)) return true
     return !h.usesDynamic
   })
   if (violations.length > 0) {
