@@ -31,6 +31,8 @@ const EXPECTED_EXPORTS = [
   'deleteSiteMachine',
   'setSopMachines',
   'listSopMachines',
+  // Phase 54 (D-04): admin floor-health read, composed on top of listSiteForOrg.
+  'listSiteHealthForOrg',
 ]
 
 /** Splits the file into per-export bodies at each `export async function` boundary. */
