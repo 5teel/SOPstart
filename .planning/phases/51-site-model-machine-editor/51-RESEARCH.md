@@ -435,7 +435,7 @@ No prior version of this feature exists to supersede; this section is not applic
 
 **If this table is empty:** N/A — see rows above. Everything else in this research (schema, RLS, Konva, storage, builder panel finding) is VERIFIED or CITED against files read directly in this session.
 
-## Open Questions
+## Open Questions (RESOLVED — Q1: SiteEditor lives in src/components/admin/site/; Q2: plain input + SCENE_MIME_TYPES/SCENE_MAX_BYTES per 51-03 discretion)
 
 1. **Where exactly should `SiteEditor.tsx` live once the Konva allow-list is widened?**
    - What we know: it must be inside whatever directory `konva-worker-isolation.spec.ts` allows.
