@@ -12,12 +12,15 @@ import { selfAddSop, selfRemoveSop, requestRemoveAssignment, getUserSopAssignmen
 import { refresherDueDate, isRefresherDue as computeRefresherDue, isRefresherOverdue as computeRefresherOverdue } from '@/lib/competency/refresher'
 import { categoryLabel } from '@/lib/sop-categories'
 import { useIsAdmin } from '@/components/providers/RoleProvider'
+import { useViewport } from '@/hooks/useViewport'
 import dynamic from 'next/dynamic'
 import type { WorkerSop } from '@/components/sop/SopWorkerBrowser'
 import { MillerColumnHeader, MillerGroupLabel, MillerItem } from '@/components/sop/MillerPrimitives'
 import type { AdminRenderProps } from '@/components/sop/AdminSopSurface'
 import type { WorkerScope, SopNav } from '@/components/sop/sops-nav-types'
 import type { Department } from '@/types/sop'
+import { listSiteForWorker } from '@/actions/site-worker'
+import type { WorkerSiteData } from '@/lib/validators/site'
 
 /**
  * SB-LINE-06: /sops/[sopId]'s chunk set transitively includes /sops/page's own
@@ -40,6 +43,11 @@ import type { Department } from '@/types/sop'
  * tests/lint/no-static-admin-lens-import.spec.ts (deliberately not naming
  * those symbols here — the guard does a raw substring scan of this file, so
  * a comment mentioning them by name would itself trip it).
+ *
+ * Phase 52 (D-01): the worker desktop home (PlantHome) gets the same
+ * treatment for the same reason — it is its own lazy module so this file
+ * only ever holds the render gate and the slot, never the plant's own
+ * state, markup or camera logic.
  */
 const SopWorkerBrowser = dynamic(
   () => import('@/components/sop/SopWorkerBrowser').then((m) => m.SopWorkerBrowser),
@@ -47,6 +55,10 @@ const SopWorkerBrowser = dynamic(
 )
 const AdminSopSurface = dynamic(
   () => import('@/components/sop/AdminSopSurface').then((m) => m.AdminSopSurface),
+  { ssr: false }
+)
+const PlantHome = dynamic(
+  () => import('@/components/sop/plant/PlantHome').then((m) => m.PlantHome),
   { ssr: false }
 )
 
@@ -106,6 +118,26 @@ const SCOPE_LABEL: Record<WorkerScope, string> = {
 
 export default function SopsPage() {
   const isAdmin = useIsAdmin()
+
+  // Phase 52 (D-01): the plant replaces the Miller frame for a non-admin
+  // session at >=1024px once the org has a drawn site with >=1 machine.
+  // Loading/undefined/error/no-layout/zero-machines all resolve plantSite
+  // to null -- the fallback list renders first and the plant only swaps in
+  // once a site is known (D-04). No persister: the signed URLs stay in
+  // memory for the session only (T-52-02); staleTime is well under the
+  // scene URL's 1hr TTL.
+  const viewport = useViewport()
+  const wantsPlant = !isAdmin && viewport === 'desktop'
+  const { data: siteResult } = useQuery({
+    queryKey: ['site-worker'],
+    queryFn: () => listSiteForWorker(),
+    enabled: wantsPlant,
+    staleTime: 30 * 60 * 1000,
+  })
+  const plantSite: WorkerSiteData | null =
+    wantsPlant && siteResult && !('error' in siteResult) && siteResult.layout && siteResult.machines.length > 0
+      ? siteResult
+      : null
 
   // One inline search box filters whichever list is showing — no overlay, no
   // second results surface. Searching is narrowing the list you are looking at.
@@ -233,7 +265,7 @@ export default function SopsPage() {
         <div className="max-w-5xl mx-auto px-4 py-2 flex flex-wrap items-center gap-x-4 gap-y-2">
           <h1 className="text-base font-semibold text-[var(--ink-900)]">SOPs</h1>
           <span className="mono hidden text-meta text-[var(--ink-500)] sm:inline">{lastSyncLabel}</span>
-          {!takeover && (
+          {!takeover && !plantSite && (
           <label className="relative order-last flex min-h-tap w-full items-center sm:ml-auto sm:min-h-9 sm:w-72">
             <Search size={16} className="pointer-events-none absolute left-3 text-[var(--ink-500)]" aria-hidden="true" />
             <input
@@ -271,7 +303,7 @@ export default function SopsPage() {
             {(admin) => admin.takeoverElement ?? <SopsSection {...sectionProps} admin={admin} />}
           </AdminSopSurface>
         ) : (
-          <SopsSection {...sectionProps} admin={EMPTY_ADMIN} />
+          <SopsSection {...sectionProps} admin={EMPTY_ADMIN} plant={plantSite} onQueryChange={setQuery} />
         )}
       </div>
 
@@ -303,6 +335,9 @@ interface SopsSectionProps {
   allDepartments: boolean
   onDeptSelect: (ids: string[], all: boolean) => void
   admin: AdminRenderProps
+  /** Phase 52 (D-01): worker-only. Present only for a desktop worker whose org has a drawn site. */
+  plant?: WorkerSiteData | null
+  onQueryChange?: (q: string) => void
 }
 
 interface LibrarySop {
@@ -328,6 +363,8 @@ function SopsSection({
   allDepartments,
   onDeptSelect,
   admin,
+  plant,
+  onQueryChange,
 }: SopsSectionProps) {
   const queryClient = useQueryClient()
   const [pending, startTransition] = useTransition()
@@ -541,6 +578,11 @@ function SopsSection({
   const visibleScopes = WORKER_SCOPES.filter((sc) => sc.always || counts[sc.key] > 0 || scope === sc.key)
 
   const loading = isLoading || libraryLoading
+
+  // D-01: the plant replaces the Miller frame and receives the exact list
+  // the frame would have shown -- refresher state, lineage-rooted
+  // completion clock, version currency, department filter all included.
+  if (plant && onQueryChange) return <PlantHome site={plant} sops={workerSops} loading={loading} query={query} onQueryChange={onQueryChange} />
 
   // A worker with nothing assigned used to land on "Nothing in All yours" — a
   // dead end one click from the whole library. Hand them the door.
