@@ -309,7 +309,7 @@ row.flags.includes('awaiting_approval') && row.isCallerNextApprover
 
 **If this table is empty:** N/A — see above.
 
-## Open Questions
+## Open Questions (RESOLVED 2026-09-29 — Q1: Retry links to the builder's parse state, no inline extraction; Q2: /governance is NOT bundle-gated; Q3: the governance eval resets the fixture SOP's owner to null in beforeAll and asserts it, never assumes)
 
 1. **Does the new inbox's "Retry" action link to the builder, or trigger retry inline?**
    - What we know: `ParseJobStatus.tsx` (rendered inside the builder page) already has working retry logic gated on `inputType !== 'ai_prompt'`.
