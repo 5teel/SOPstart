@@ -24,43 +24,18 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { AlertTriangle, BookOpen, Clock, Play, RefreshCw } from 'lucide-react'
 import { SopLibraryCard } from '@/components/sop/SopLibraryCard'
-import type { CachedSop } from '@/lib/offline/db'
+import { topSignal, type WorkerSop } from '@/lib/sop/worker-signal'
 
-export type WorkerSop = {
-  id: string
-  title: string
-  /** Resolved in the page — this component must not pull the category module
-   *  into the worker bundle (SB-LINE-06). */
-  categoryLabel: string | null
-  /** Worker's most recent completion for this SOP's lineage, ISO. */
-  lastCompletedAt: string | null
-  isRefresherDue: boolean
-  isRefresherOverdue: boolean
-  hasNewerVersion: boolean
-  /** In the worker's own list, vs a library row they have not taken on. */
-  isAssigned: boolean
-  /** Self-added vs assigned by a manager — decides which removal path applies. */
-  isSelfAssigned: boolean
-  removalRequested: boolean
-  /** The cached row itself, for the mobile card renderer. */
-  raw: CachedSop
-}
+// Re-exported so existing `import type { WorkerSop } from '@/components/sop/SopWorkerBrowser'`
+// call sites (e.g. sops/page.tsx) keep resolving — the type itself now lives
+// in the one classifier module (CLAUDE.md 2026-09-27).
+export type { WorkerSop } from '@/lib/sop/worker-signal'
 
 function formatDay(iso: string | null): string | null {
   if (!iso) return null
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return null
   return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
-}
-
-/** The one signal that most deserves the worker's attention, worst first. */
-export function topSignal(sop: WorkerSop): { label: string; tone: 'bad' | 'warn' | 'info' } | null {
-  if (!sop.isAssigned) return { label: 'Not yours', tone: 'info' }
-  if (sop.isRefresherOverdue) return { label: 'Refresher overdue', tone: 'bad' }
-  if (sop.hasNewerVersion) return { label: 'Updated since you read it', tone: 'warn' }
-  if (sop.isRefresherDue) return { label: 'Refresher due', tone: 'warn' }
-  if (!sop.lastCompletedAt) return { label: 'Not done yet', tone: 'info' }
-  return null
 }
 
 /** Second line of a row: number · category · department, whichever exist. */

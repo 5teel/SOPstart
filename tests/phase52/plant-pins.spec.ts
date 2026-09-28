@@ -117,7 +117,7 @@ test.describe('compareToDoFirst', () => {
     const due = sop('4', 'Whiskey', { lastCompletedAt: '2026-01-01T00:00:00Z', isRefresherDue: true })
     const unassigned = sop('5', 'Victor', { isAssigned: false })
     const items = [done, news, never, due, unassigned]
-    const rank = (s: WorkerSop): PlantRel => plantRelState(s)
+    const rank = (s: WorkerSop): PlantRel | null => plantRelState(s)
     const sorted = [...items].sort((a, b) => compareToDoFirst(a, b))
     expect(sorted.map(rank)).toEqual(['due', 'never', 'new', 'done', null])
   })
