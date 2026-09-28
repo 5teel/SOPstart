@@ -927,9 +927,9 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 ### Phone (PHN) — Phase 53
 
-- [ ] **PHN-01**: On a phone the home is the ask bar, the Now card, a floor thumbnail and a Scan button — the scene is never the phone navigation
-- [ ] **PHN-02**: Every machine has a printable QR plate resolving `/m/<code>` to that machine's SOP list for the signed-in worker
-- [ ] **PHN-03**: An in-app camera scan (getUserMedia + QR decode) lands on `/m/<code>` without a full page reload
+- [x] **PHN-01**: On a phone the home is the ask bar, the Now card, a floor thumbnail and a Scan button — the scene is never the phone navigation
+- [x] **PHN-02**: Every machine has a printable QR plate resolving `/m/<code>` to that machine's SOP list for the signed-in worker
+- [x] **PHN-03**: An in-app camera scan (getUserMedia + QR decode) lands on `/m/<code>` without a full page reload
 
 ### Admin (ADM) — Phase 54
 
@@ -951,7 +951,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 |--------|-------|--------|
 | SIT-01..04 (4) | Phase 51 | Complete (2026-09-28) |
 | HOM-01..06 (6) | Phase 52 | Complete (2026-09-29) |
-| PHN-01..03 (3) | Phase 53 | Pending |
+| PHN-01..03 (3) | Phase 53 | Complete (2026-09-29) |
 | ADM-01..04 (4) | Phase 54 | Pending |
 
 **v10.0 Coverage:** 17 requirements, 17 mapped, 0 unmapped.
