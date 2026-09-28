@@ -121,3 +121,78 @@ export type AdminSopListResult = {
   scopeLabel: string
   filtered: boolean
 }
+
+// ---------------------------------------------------------------------------
+// Phase 54 (D-07/D-08) — pure deep-link resolver for AdminLibraryTable. No
+// I/O, no React — importable from the component and from a source-contract
+// unit test alike.
+// ---------------------------------------------------------------------------
+
+/** Admin library table state. `checks` is chip-only (client state); every
+ *  other field is URL-backed — see `libraryNavToUrl`. */
+export interface LibraryNav {
+  view: 'table' | 'access'
+  status: 'all' | 'LIVE' | 'DRAFT' | 'STUCK'
+  /** 'all' | 'me' | 'none' | a member's user id. Only 'me' is URL-backed
+   *  (?owner=me) — 'none' and a specific id are chip-only selections. */
+  owner: string
+  departments?: string
+  collection?: string
+  checks: 'all' | 'red' | 'amber'
+  sop?: string
+}
+
+export const DEFAULT_LIBRARY_NAV: LibraryNav = {
+  view: 'table',
+  status: 'all',
+  owner: 'all',
+  checks: 'all',
+}
+
+/**
+ * Resolves the /sops URL onto the library table's nav state. `view=attention`
+ * is the legacy deep link — that lens now lives at /governance (D-01), so
+ * this returns the sentinel string 'governance' rather than a LibraryNav for
+ * the caller to router.replace() on. `view=access` returns BEFORE
+ * departments/collection are read (SC-4 — they are inert under the Access
+ * lens, dropped entirely rather than merely ignored downstream).
+ */
+export function resolveLibraryNav(params: URLSearchParams): LibraryNav | 'governance' {
+  if (params.get('view') === 'attention') return 'governance'
+
+  if (params.get('view') === 'access') {
+    return { ...DEFAULT_LIBRARY_NAV, view: 'access', sop: params.get('sop') ?? undefined }
+  }
+
+  const status = params.get('status')
+  const mappedStatus: LibraryNav['status'] =
+    status === 'draft' ? 'DRAFT' : status === 'published' ? 'LIVE' : status === 'failed' ? 'STUCK' : 'all'
+
+  return {
+    view: 'table',
+    status: mappedStatus,
+    owner: params.get('owner') === 'me' ? 'me' : 'all',
+    departments: params.get('departments') ?? undefined,
+    collection: params.get('collection') ?? undefined,
+    checks: 'all',
+  }
+}
+
+/** Builds the /sops URL for a given library nav state — only the URL-backed
+ *  fields (view=access[&sop], status, owner=me, departments, collection). */
+export function libraryNavToUrl(nav: LibraryNav): string {
+  const qp = new URLSearchParams()
+  if (nav.view === 'access') {
+    qp.set('view', 'access')
+    if (nav.sop) qp.set('sop', nav.sop)
+  } else {
+    if (nav.status !== 'all') {
+      qp.set('status', nav.status === 'DRAFT' ? 'draft' : nav.status === 'LIVE' ? 'published' : 'failed')
+    }
+    if (nav.owner === 'me') qp.set('owner', 'me')
+    if (nav.departments) qp.set('departments', nav.departments)
+    if (nav.collection) qp.set('collection', nav.collection)
+  }
+  const qs = qp.toString()
+  return qs ? `/sops?${qs}` : '/sops'
+}
