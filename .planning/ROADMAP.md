@@ -1629,8 +1629,8 @@ Plans:
 
 Plans:
 
-- [ ] 53-01-PLAN.md — Wave 1: phase53 harness + stubs, jsqr pinned after a registry check, eval skeleton, qr-decode.ts + next-redirect.ts (TDD), login ?next= through middleware → /login → LoginForm → loginWithEmail
-- [ ] 53-02-PLAN.md — Wave 1: useWorkerSops hook — the one worker-list derivation lifted out of /sops (guards repointed, build gate)
+- [x] 53-01-PLAN.md — Wave 1: phase53 harness + stubs, jsqr pinned after a registry check, eval skeleton, qr-decode.ts + next-redirect.ts (TDD), login ?next= through middleware → /login → LoginForm → loginWithEmail
+- [x] 53-02-PLAN.md — Wave 1: useWorkerSops hook — the one worker-list derivation lifted out of /sops (guards repointed, build gate)
 - [ ] 53-03-PLAN.md — Wave 2: /m/[code] (org-scoped lookup, MachineView, inline MachinePanel, live cross-org probe) + A6 plate page + Print plate in SiteWorkspace + journeys routes + capability matrix
 - [ ] 53-04-PLAN.md — Wave 2: NowCard (optional Show me → Read, inline), machine codes to the client, MachineListSheet, PhoneHome, /sops phone seam, phone-home marker group, build gate
 - [ ] 53-05-PLAN.md — Wave 3: ScanSheet (back camera, BarcodeDetector → jsqr, our-origin check, typed code), Scan button, scan-sheet marker group, journeys phone flow, build gate
@@ -1737,7 +1737,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 
 **Goal:** Scheduled task or cron that marks video_generation_jobs stuck in queued/analyzing/generating_audio/rendering for >30 minutes as 'failed' with a timeout error. Could also notify admin. Triggered by finding a hours-old rendering job during Phase 10 verification.
 **Requirements:** TBD
-**Plans:** 5/5 plans complete
+**Plans:** 2/6 plans executed
 
 Plans:
 
