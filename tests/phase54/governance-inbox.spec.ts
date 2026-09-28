@@ -1,23 +1,242 @@
 /**
- * Phase 54 / Plan 54-02 -- ADM-01 `/governance` inbox contracts (severity
- * ordering, row derivation from listGovernanceQueue + parse_jobs + machines
- * without procedures, filter chips, "All clear" empty state).
+ * Phase 54 / Plan 54-02 -- ADM-01 `/governance` inbox contracts.
  *
- * Wave-0 stub -- activates in 54-02. See 54-VALIDATION.md for the full
- * contract list this file will cover.
+ * `deriveInbox` describe: pure unit tests over the row derivation (severity
+ * ordering, chip assignment, All-clear empty state).
+ * `page + component wiring` describe: source-contract fixme placeholders for
+ * the server page + GovernanceInbox client component, activated in Task 2.
  *
  * Registration: playwright.config.ts `phase54` project
  *   testDir: '.', testMatch: /tests\/phase54\/.*\.(spec|test)\.ts$/
  * Verify: `npx playwright test --list --project=phase54`
  */
-import { test } from '@playwright/test'
+import { test, expect } from '@playwright/test'
+import { deriveInbox, inboxCounts, chipMatches, INBOX_CHIPS, type InboxItem } from '@/lib/governance/inbox'
+import type { GovernanceRow } from '@/actions/governance'
+import type { MillerSop } from '@/lib/sop-list/admin-rows'
+import type { SopMachineLink } from '@/lib/validators/site'
 
-test.describe('governance inbox (54-02)', () => {
-  test.fixme('unowned row -> red dot, Assign owner action', () => {})
-  test.fixme('overdue row -> amber dot, Review action -> builder', () => {})
-  test.fixme('awaiting-approval row -> blue dot, Approve action reuses approveStep gating', () => {})
-  test.fixme('stuck/failed parse row -> grey dot, Retry action -> builder parse-state panel', () => {})
-  test.fixme('machine with no procedures row -> Add action, machine preselected', () => {})
-  test.fixme('filter chips: All / No owner / Overdue / Approve / Stuck / Machines counts match rows', () => {})
-  test.fixme('empty inbox renders the "All clear" state, not an apology copy', () => {})
+function govRow(id: string, overrides: Partial<GovernanceRow> = {}): GovernanceRow {
+  return {
+    id,
+    title: `SOP ${id}`,
+    category_slug: null,
+    status: 'draft',
+    ownerUserId: null,
+    ownerLabel: 'No owner',
+    reviewDueAt: null,
+    flags: [],
+    isCallerNextApprover: false,
+    ...overrides,
+  }
+}
+
+function libRow(id: string, overrides: Partial<MillerSop> = {}): MillerSop {
+  return {
+    id,
+    title: `SOP ${id}`,
+    displayTitle: `SOP ${id}`,
+    untitled: false,
+    status: 'draft',
+    categoryLabel: null,
+    categorySlug: null,
+    departments: [],
+    departmentIds: [],
+    allDepartments: false,
+    ownerLabel: null,
+    age: '3d',
+    updatedAt: null,
+    flagLabel: null,
+    flagStyle: null,
+    stuck: false,
+    confidence: null,
+    ownerUserId: null,
+    flags: [],
+    lastReviewedAt: null,
+    chainRequired: false,
+    hasPersonGrant: false,
+    parseFailed: false,
+    machines: [],
+    ...overrides,
+  }
+}
+
+test.describe('deriveInbox', () => {
+  test('unowned row -> chips [owner], severity bad, gov set, action null', () => {
+    const items = deriveInbox({ governance: [govRow('a', { flags: ['unowned'] })], library: [], machines: [], links: [] })
+    expect(items).toHaveLength(1)
+    expect(items[0].chips).toEqual(['owner'])
+    expect(items[0].severity).toBe('bad')
+    expect(items[0].gov).not.toBeNull()
+    expect(items[0].action).toBeNull()
+  })
+
+  test('overdue only -> chips [overdue], severity warn', () => {
+    const items = deriveInbox({ governance: [govRow('a', { flags: ['overdue'] })], library: [], machines: [], links: [] })
+    expect(items[0].chips).toEqual(['overdue'])
+    expect(items[0].severity).toBe('warn')
+  })
+
+  test('awaiting_approval + isCallerNextApprover true -> chips [approve], severity info', () => {
+    const items = deriveInbox({
+      governance: [govRow('a', { flags: ['awaiting_approval'], isCallerNextApprover: true })],
+      library: [],
+      machines: [],
+      links: [],
+    })
+    expect(items[0].chips).toEqual(['approve'])
+    expect(items[0].severity).toBe('info')
+  })
+
+  test('awaiting_approval + isCallerNextApprover false, nothing else -> excluded', () => {
+    const items = deriveInbox({
+      governance: [govRow('a', { flags: ['awaiting_approval'], isCallerNextApprover: false })],
+      library: [],
+      machines: [],
+      links: [],
+    })
+    expect(items).toHaveLength(0)
+  })
+
+  test('due_soon only -> excluded', () => {
+    const items = deriveInbox({ governance: [govRow('a', { flags: ['due_soon'] })], library: [], machines: [], links: [] })
+    expect(items).toHaveLength(0)
+  })
+
+  test('stale_role only -> included, chips [], severity grey', () => {
+    const items = deriveInbox({ governance: [govRow('a', { flags: ['stale_role'] })], library: [], machines: [], links: [] })
+    expect(items).toHaveLength(1)
+    expect(items[0].chips).toEqual([])
+    expect(items[0].severity).toBe('grey')
+  })
+
+  test('unowned + overdue -> ONE item, chips [owner, overdue], severity bad', () => {
+    const items = deriveInbox({
+      governance: [govRow('a', { flags: ['unowned', 'overdue'] })],
+      library: [],
+      machines: [],
+      links: [],
+    })
+    expect(items).toHaveLength(1)
+    expect(items[0].chips).toEqual(['owner', 'overdue'])
+    expect(items[0].severity).toBe('bad')
+  })
+
+  test('library row stuck -> kind stuck, chips [stuck], severity bad, meta + Retry action', () => {
+    const items = deriveInbox({ governance: [], library: [libRow('s1', { stuck: true })], machines: [], links: [] })
+    expect(items).toHaveLength(1)
+    expect(items[0].kind).toBe('stuck')
+    expect(items[0].chips).toEqual(['stuck'])
+    expect(items[0].severity).toBe('bad')
+    expect(items[0].meta).toContain('stopped while converting')
+    expect(items[0].action).toEqual({ label: 'Retry', href: '/admin/sops/builder/s1' })
+  })
+
+  test('library row parseFailed -> meta contains conversion failed, same action shape', () => {
+    const items = deriveInbox({ governance: [], library: [libRow('s1', { parseFailed: true })], machines: [], links: [] })
+    expect(items[0].meta).toContain('conversion failed')
+    expect(items[0].action).toEqual({ label: 'Retry', href: '/admin/sops/builder/s1' })
+  })
+
+  test('machine with no links -> kind machines, chips [machines], severity grey, Add action', () => {
+    const items = deriveInbox({
+      governance: [],
+      library: [],
+      machines: [{ id: 'm1', name: 'Press 1' }],
+      links: [],
+    })
+    expect(items).toHaveLength(1)
+    expect(items[0].kind).toBe('machines')
+    expect(items[0].chips).toEqual(['machines'])
+    expect(items[0].severity).toBe('grey')
+    expect(items[0].meta).toBe('no procedures yet')
+    expect(items[0].action).toEqual({ label: 'Add', href: '/admin/sops/new' })
+  })
+
+  test('machine with a link -> no item', () => {
+    const items = deriveInbox({
+      governance: [],
+      library: [],
+      machines: [{ id: 'm1', name: 'Press 1' }],
+      links: [{ sop_id: 's1', machine_id: 'm1' }],
+    })
+    expect(items).toHaveLength(0)
+  })
+
+  test('governance meta = machine names then status word; title falls back displayTitle -> row title -> Untitled SOP; age from library', () => {
+    const withLibrary = deriveInbox({
+      governance: [govRow('a', { flags: ['unowned'], status: 'published' })],
+      library: [libRow('a', { displayTitle: 'Oven Cleaning', machines: ['Oven 1', 'Oven 2'], age: '5d' })],
+      machines: [],
+      links: [],
+    })
+    expect(withLibrary[0].title).toBe('Oven Cleaning')
+    expect(withLibrary[0].meta).toBe('Oven 1 · Oven 2 · live')
+    expect(withLibrary[0].age).toBe('5d')
+
+    const withoutLibrary = deriveInbox({
+      governance: [govRow('b', { flags: ['unowned'], title: 'Fallback Title' })],
+      library: [],
+      machines: [],
+      links: [],
+    })
+    expect(withoutLibrary[0].title).toBe('Fallback Title')
+
+    const untitled = deriveInbox({
+      governance: [govRow('c', { flags: ['unowned'], title: null })],
+      library: [],
+      machines: [],
+      links: [],
+    })
+    expect(untitled[0].title).toBe('Untitled SOP')
+  })
+
+  test('items ordered bad -> warn -> info -> grey, stable within a severity', () => {
+    const items = deriveInbox({
+      governance: [
+        govRow('warn1', { flags: ['overdue'] }),
+        govRow('bad1', { flags: ['unowned'] }),
+        govRow('grey1', { flags: ['stale_role'] }),
+        govRow('info1', { flags: ['awaiting_approval'], isCallerNextApprover: true }),
+        govRow('bad2', { flags: ['unowned'] }),
+      ],
+      library: [],
+      machines: [],
+      links: [],
+    })
+    expect(items.map((i) => i.key)).toEqual(['gov-bad1', 'gov-bad2', 'gov-warn1', 'gov-info1', 'gov-grey1'])
+  })
+
+  test('inboxCounts: all = items.length, each chip counts; chipMatches(all) always true', () => {
+    const items = deriveInbox({
+      governance: [govRow('a', { flags: ['unowned'] }), govRow('b', { flags: ['overdue'] })],
+      library: [],
+      machines: [],
+      links: [],
+    })
+    const counts = inboxCounts(items)
+    expect(counts.all).toBe(2)
+    expect(counts.owner).toBe(1)
+    expect(counts.overdue).toBe(1)
+    expect(counts.approve).toBe(0)
+    for (const item of items) expect(chipMatches(item, 'all')).toBe(true)
+  })
+
+  test('empty inputs -> [] (the All clear state)', () => {
+    const items = deriveInbox({ governance: [], library: [], machines: [], links: [] })
+    expect(items).toEqual([])
+  })
+
+  test('INBOX_CHIPS carries all six chip keys in order', () => {
+    expect(INBOX_CHIPS.map((c) => c.key)).toEqual(['all', 'owner', 'overdue', 'approve', 'stuck', 'machines'])
+  })
+})
+
+test.describe('page + component wiring (54-02 Task 2)', () => {
+  test.fixme('governance/page.tsx: no use client, requireAdminContext before data reads, redirect on error', () => {})
+  test.fixme('governance/page.tsx: one Promise.all(listGovernanceQueue, listAdminSopRows, listSiteHealthForOrg), deriveInbox called server-side', () => {})
+  test.fixme('governance/page.tsx: renders <GovernanceInbox items=', () => {})
+  test.fixme('GovernanceInbox.tsx: use client, testids gov-inbox/gov-chip/gov-clear/gov-row/gov-action, uses INBOX_CHIPS/inboxCounts/chipMatches', () => {})
+  test.fixme('GovernanceInbox.tsx: no useQuery, router.push, or createClient', () => {})
+  test.fixme('GovernanceInbox.tsx: carries the three CLEAR strings verbatim', () => {})
 })
