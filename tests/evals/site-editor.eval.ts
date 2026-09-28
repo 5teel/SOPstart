@@ -25,7 +25,12 @@ const REAL_SOPSTART_ORG_ID = 'bd2c2b88-b26e-46ca-a6b4-a89161a98aea'
 const SHOTS = path.join(process.cwd(), '.planning', 'evals', 'latest')
 fs.mkdirSync(SHOTS, { recursive: true })
 async function shot(page: Page, name: string) {
-  await page.waitForLoadState('networkidle').catch(() => {})
+  // Explicit bounded timeout (unlike sop-surface's copy of this helper):
+  // waitForLoadState has no default timeout of its own — it would otherwise
+  // block for the whole remaining test budget if the page never reaches
+  // network-idle (observed live on /admin/site — a long-lived connection
+  // keeps at least one request open), starving every later step.
+  await page.waitForLoadState('networkidle', { timeout: 5_000 }).catch(() => {})
   await page.waitForTimeout(800)
   await page.screenshot({ path: path.join(SHOTS, `${name}.png`), fullPage: false })
 }
@@ -43,6 +48,10 @@ function watchConsole(page: Page) {
 }
 
 const SLOW = { timeout: 25_000 }
+// Creating a machine (close-polygon -> upsertSiteMachine) observed taking well
+// over 25s on production for the first call in a session — give it the same
+// generous budget as the upload-processing wait, rather than the standard SLOW.
+const CREATE_SLOW = { timeout: 60_000 }
 
 type Transform = { boxX: number; boxY: number; scale: number; x: number; y: number }
 
@@ -63,6 +72,25 @@ function toScreen(t: Transform, [sx, sy]: [number, number]) {
 
 function closeTo(actual: number, expected: number, tol = 4) {
   return Math.abs(actual - expected) <= tol
+}
+
+/**
+ * Click each scene-pixel corner in sequence (closing the polygon by
+ * re-clicking the first corner). A move + a short settle delay between
+ * clicks is required — firing page.mouse.click() back-to-back with no gap
+ * let the browser coalesce/drop clicks against the Konva stage, so only the
+ * first vertex was ever recorded (observed live on /admin/site).
+ */
+async function drawPolygon(page: Page, t: Transform, corners: [number, number][]) {
+  for (const corner of [...corners, corners[0]]) {
+    const p = toScreen(t, corner)
+    await page.mouse.move(p.x, p.y)
+    await page.waitForTimeout(150)
+    await page.mouse.down()
+    await page.waitForTimeout(100)
+    await page.mouse.up()
+    await page.waitForTimeout(300)
+  }
 }
 
 test.describe('Phase 51 — site editor (deployed)', () => {
@@ -126,7 +154,10 @@ test.describe('Phase 51 — site editor (deployed)', () => {
     page,
     context,
   }) => {
-    test.setTimeout(300_000)
+    // Generous: several save-triggering actions (machine create x2,
+    // rename/department, vertex drag, builder link, unlink/relink) each
+    // occasionally take tens of seconds server-side on production.
+    test.setTimeout(600_000)
     await page.setViewportSize({ width: 1440, height: 900 })
     const errors = watchConsole(page)
     await signInAs(context, 'siteAdmin')
@@ -169,14 +200,11 @@ test.describe('Phase 51 — site editor (deployed)', () => {
     ]
     await page.getByTestId('site-draw-machine').click()
     let t = await readTransform(page)
-    for (const corner of [...firstCorners, firstCorners[0]]) {
-      const p = toScreen(t, corner)
-      await page.mouse.click(p.x, p.y)
-    }
-    await expect(page.getByTestId('site-machine-row')).toHaveCount(1, SLOW)
+    await drawPolygon(page, t, firstCorners)
+    await expect(page.getByTestId('site-machine-row')).toHaveCount(1, CREATE_SLOW)
     await page.getByTestId('site-machine-name').fill('EVAL Press')
     await page.getByTestId('site-machine-department').selectOption({ label: 'Forming' })
-    await expect(page.getByTestId('site-save-status')).toHaveText('Saved ✓', SLOW)
+    await expect(page.getByTestId('site-save-status')).toHaveText('Saved ✓', CREATE_SLOW)
 
     // 4. Zoom toward the canvas centre, then pan an empty area (away from the
     // machine just drawn), then draw the second machine using the NEW transform.
@@ -207,13 +235,10 @@ test.describe('Phase 51 — site editor (deployed)', () => {
     ]
     await page.getByTestId('site-draw-machine').click()
     t = await readTransform(page)
-    for (const corner of [...secondCorners, secondCorners[0]]) {
-      const p = toScreen(t, corner)
-      await page.mouse.click(p.x, p.y)
-    }
-    await expect(page.getByTestId('site-machine-row')).toHaveCount(2, SLOW)
+    await drawPolygon(page, t, secondCorners)
+    await expect(page.getByTestId('site-machine-row')).toHaveCount(2, CREATE_SLOW)
     await page.getByTestId('site-machine-name').fill('EVAL Oven')
-    await expect(page.getByTestId('site-save-status')).toHaveText('Saved ✓', SLOW)
+    await expect(page.getByTestId('site-save-status')).toHaveText('Saved ✓', CREATE_SLOW)
 
     // 5. Move a corner of EVAL Press: drag (520,200) -> (560,180).
     await page.getByTestId('site-machine-row').filter({ hasText: 'EVAL Press' }).click()
@@ -224,7 +249,7 @@ test.describe('Phase 51 — site editor (deployed)', () => {
     await page.mouse.down()
     await page.mouse.move(to.x, to.y, { steps: 8 })
     await page.mouse.up()
-    await expect(page.getByTestId('site-save-status')).toHaveText('Saved ✓', SLOW)
+    await expect(page.getByTestId('site-save-status')).toHaveText('Saved ✓', CREATE_SLOW)
 
     // 6. Link the fixture SOP from the builder Tools menu (D-12 — the same
     // setSopMachines() action the editor panel uses).
@@ -234,7 +259,7 @@ test.describe('Phase 51 — site editor (deployed)', () => {
     const picker = page.getByTestId('machines-picker')
     await expect(picker).toBeVisible(SLOW)
     await picker.getByRole('checkbox', { name: 'EVAL Press' }).check()
-    await expect(picker.getByText('Saved ✓')).toBeVisible(SLOW)
+    await expect(picker.getByText('Saved ✓')).toBeVisible(CREATE_SLOW)
     await shot(page, 'builder-machines')
     await page.keyboard.press('Escape')
     await expect(picker).toBeHidden()
@@ -250,7 +275,11 @@ test.describe('Phase 51 — site editor (deployed)', () => {
     await expect(ovenRow).toBeVisible()
     await expect(pressRow).toContainText('Forming')
     await expect(pressRow).toContainText('1 SOP')
-    await pressRow.getByTestId('site-machine-sops-toggle').click()
+    // site-machine-sops-toggle is a SIBLING of the row button in the same
+    // card div, not a descendant of it — go up to the card before searching,
+    // or the locator never resolves and .click() waits out the whole test
+    // budget (found live: both attempts hung here for the full timeout).
+    await pressRow.locator('..').getByTestId('site-machine-sops-toggle').click()
     await expect(page.getByText(EVAL_SITE_SOP_TITLE)).toBeVisible(SLOW)
     await shot(page, 'site-editor')
 
@@ -307,7 +336,7 @@ test.describe('Phase 51 — site editor (deployed)', () => {
 
     // 9. Editor write paths: unlink, re-link, delete (with Delete key).
     await page.getByRole('button', { name: 'Unlink' }).click()
-    await expect(page.getByTestId('site-save-status')).toHaveText('Saved ✓', SLOW)
+    await expect(page.getByTestId('site-save-status')).toHaveText('Saved ✓', CREATE_SLOW)
     {
       const { data: links } = await db.from('sop_machines').select('sop_id').eq('organisation_id', siteOrgId)
       expect(links).toHaveLength(0)
@@ -315,7 +344,7 @@ test.describe('Phase 51 — site editor (deployed)', () => {
 
     await page.getByTestId('site-link-sop-input').fill(EVAL_SITE_SOP_TITLE)
     await page.getByRole('button', { name: EVAL_SITE_SOP_TITLE, exact: true }).click()
-    await expect(page.getByTestId('site-save-status')).toHaveText('Saved ✓', SLOW)
+    await expect(page.getByTestId('site-save-status')).toHaveText('Saved ✓', CREATE_SLOW)
     {
       const { data: links } = await db.from('sop_machines').select('sop_id').eq('organisation_id', siteOrgId)
       expect(links).toHaveLength(1)
@@ -323,7 +352,7 @@ test.describe('Phase 51 — site editor (deployed)', () => {
 
     await page.getByTestId('site-machine-row').filter({ hasText: 'EVAL Oven' }).click()
     await page.keyboard.press('Delete')
-    await expect(page.getByTestId('site-machine-row')).toHaveCount(1, SLOW)
+    await expect(page.getByTestId('site-machine-row')).toHaveCount(1, CREATE_SLOW)
     {
       const { data: machines } = await db.from('site_machines').select('id').eq('organisation_id', siteOrgId)
       expect(machines).toHaveLength(1)
