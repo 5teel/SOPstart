@@ -8,6 +8,11 @@
  * the admin variant Phase 54 adds. Ordering comes from the caller
  * (worker-signal's machineSops/narrowForAsk) -- this component renders
  * what it is handed, it never re-sorts.
+ *
+ * Two placements share this one component (Phase 53 D-04): the desktop
+ * plant overlay (`inline` omitted, slides in over the scene, has a close
+ * control) and the /m/[code] in-page card (`inline` passed, sits in normal
+ * page flow with no close control -- there is nothing to close back to).
  */
 import Link from 'next/link'
 import { X } from 'lucide-react'
@@ -17,6 +22,9 @@ import { RelBadge } from '@/components/sop/plant/RelBadge'
 // w-95 below is 95 * 4px = 380px -- kept in step with scene.ts's
 // PLANT_PANEL_WIDTH by the source-contract spec, which imports the
 // constant and asserts the arithmetic relationship.
+const OVERLAY_CLASS_BASE =
+  'absolute inset-y-0 right-0 z-20 flex w-95 flex-col border-l border-[var(--ink-300)] bg-[var(--paper-1)] shadow-xl transition-transform duration-250 motion-reduce:transition-none'
+const INLINE_CLASS = 'flex flex-col overflow-hidden rounded-lg border border-[var(--ink-300)] bg-[var(--paper-1)]'
 
 export function MachinePanel({
   open,
@@ -24,12 +32,14 @@ export function MachinePanel({
   department,
   sops,
   onClose,
+  inline,
 }: {
   open: boolean
   machine: { id: string; name: string; spriteUrl: string | null } | null
   department: { name: string; colour: string } | null
   sops: WorkerSop[]
-  onClose(): void
+  onClose?(): void
+  inline?: boolean
 }) {
   return (
     <aside
@@ -37,7 +47,7 @@ export function MachinePanel({
       data-open={open ? 'true' : 'false'}
       aria-label={machine?.name ?? 'Machine'}
       inert={!open}
-      className={`absolute inset-y-0 right-0 z-20 flex w-95 flex-col border-l border-[var(--ink-300)] bg-[var(--paper-1)] shadow-xl transition-transform duration-250 motion-reduce:transition-none ${open ? 'translate-x-0' : 'translate-x-full'}`}
+      className={inline ? INLINE_CLASS : `${OVERLAY_CLASS_BASE} ${open ? 'translate-x-0' : 'translate-x-full'}`}
     >
       {machine && (
         <>
@@ -53,15 +63,17 @@ export function MachinePanel({
             ) : (
               <span className="mono text-meta text-[var(--ink-400)]">no photo yet</span>
             )}
-            <button
-              type="button"
-              data-testid="plant-panel-close"
-              aria-label="Close"
-              onClick={onClose}
-              className="absolute right-2.5 top-2.5 grid h-8 w-8 place-items-center rounded-full border border-[var(--ink-300)] bg-white"
-            >
-              <X size={16} />
-            </button>
+            {onClose && (
+              <button
+                type="button"
+                data-testid="plant-panel-close"
+                aria-label="Close"
+                onClick={onClose}
+                className="absolute right-2.5 top-2.5 grid h-8 w-8 place-items-center rounded-full border border-[var(--ink-300)] bg-white"
+              >
+                <X size={16} />
+              </button>
+            )}
           </div>
 
           <div className="flex-1 overflow-y-auto px-4 py-3.5">

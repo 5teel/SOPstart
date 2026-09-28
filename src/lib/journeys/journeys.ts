@@ -138,9 +138,10 @@ export const JOURNEYS: Journey[] = [
     summary: 'A worker finds the right SOP and opens it to read before starting work.',
     steps: [
       { id: 's', type: 'start', label: 'Needs to do a task' },
-      { id: 'where', type: 'decision', label: 'On a desktop, and the site has a map?', branches: [
-        { label: 'Yes', to: 'plant' },
-        { label: 'No — phone, or no map drawn yet', to: 'lib' },
+      { id: 'where', type: 'decision', label: 'How do they start?', branches: [
+        { label: 'On a desktop, and the site has a map', to: 'plant' },
+        { label: 'Scanned the QR plate on a machine', to: 'machine' },
+        { label: 'Phone, or no map drawn yet', to: 'lib' },
       ] },
       { id: 'plant', type: 'screen', label: 'Plant home — the site map', route: '/sops', detail: 'The site drawing with every machine clickable (Phase 52). An amber pin on a machine counts that worker\'s procedures there that are due, never done, or updated — worked out live from the worker\'s own list, never stored (D-05/D-06). The "Next for you" card shows the single next procedure with Walk it and Show me. Department chips move the view to that department\'s machines. The ask bar lights up matching machines as the worker types, and its mic opens the same voice Q&A as the walkthrough. Admins still see today\'s SOP list here (Phase 54 repaints their view).' },
       { id: 'pick', type: 'decision', label: 'How do they get there?', branches: [
@@ -148,6 +149,10 @@ export const JOURNEYS: Journey[] = [
         { label: 'Now card → Walk it', to: 'walk' },
       ] },
       { id: 'panel', type: 'screen', label: 'Machine panel', route: '/sops', detail: 'Slides in from the right: the machine\'s photo (or "no photo yet"), its department named in that department\'s colour, then its procedures to-do first with the shared badge, a Walk › link and a plain Read link.', branches: [
+        { label: 'Walk ›', to: 'walk' },
+        { label: 'Read', to: 'detail' },
+      ] },
+      { id: 'machine', type: 'screen', label: 'Machine page', route: '/m/[code]', detail: 'Opened by scanning the plate stuck on the machine. Shows the department, the machine, its photo or "no photo yet", and its procedures with the things to do first, each with a Walk › link and a plain Read link. A code from another site shows "not found" — nothing tells the two apart. Signed-out people sign in and land straight back here (Phase 53).', branches: [
         { label: 'Walk ›', to: 'walk' },
         { label: 'Read', to: 'detail' },
       ] },
