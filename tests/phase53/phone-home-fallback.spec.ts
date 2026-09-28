@@ -75,22 +75,25 @@ test.describe('phone seam wiring', () => {
     expect(hits.length).toBeGreaterThanOrEqual(2)
   })
 
-  test('both SopsSection call sites pass phone={phoneSite}', () => {
+  test('the one SopsSection call site passes phone={phoneSite} (Phase 54: admins now take a separate AdminLibraryTable branch, so there is exactly one SopsSection call site)', () => {
     const src = read(SOPS_PAGE_PATH)
     const hits = src.match(/phone=\{phoneSite\}/g) ?? []
-    expect(hits.length).toBe(2)
+    expect(hits.length).toBe(1)
   })
 
   test('the toolbar search box is hidden while either the plant or the phone home is rendering', () => {
     expect(read(SOPS_PAGE_PATH)).toContain('!takeover && !plantSite && !phoneSite')
   })
 
-  test('the final return still contains the lg:hidden scope strip and <SopWorkerBrowser (additive, D-02 negative case)', () => {
+  test('the final return renders <WorkerSimpleList (which carries the scope strip) below the PhoneHome slot (Phase 54, additive)', () => {
     const src = stripComments(read(SOPS_PAGE_PATH))
     const sectionStart = src.indexOf('function SopsSection(')
     const sectionSrc = src.slice(sectionStart)
-    expect(sectionSrc).toContain('lg:hidden mb-4 flex gap-2')
-    expect(sectionSrc).toContain('<SopWorkerBrowser')
+    const phoneSlotIdx = sectionSrc.indexOf('phone && onQueryChange && (')
+    const listIdx = sectionSrc.indexOf('<WorkerSimpleList')
+    expect(phoneSlotIdx).toBeGreaterThan(-1)
+    expect(listIdx).toBeGreaterThan(-1)
+    expect(listIdx).toBeGreaterThan(phoneSlotIdx)
   })
 
   test('no early return keyed on phone -- the phone home is additive, never a replacement branch', () => {

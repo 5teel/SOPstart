@@ -77,6 +77,13 @@ const GATED_ROUTES: GatedRoute[] = [
       { label: 'plant home (52 D-01)', markers: ['No procedures for this machine yet.'] },
       { label: 'phone home (53 D-01)', markers: ['Show the machines on your site'] },
       { label: 'scan sheet (53 D-09)', markers: ["That's not a SOPstart plate"] },
+      // Phase 54: /sops/[sopId]/page's chunk set includes /sops/page's own
+      // route chunk (SB-LINE-06 comment above), so the library table's
+      // markers are forbidden here too.
+      {
+        label: 'library table (AdminLibraryTable.tsx)',
+        markers: ['Reviewed within 12 months', 'No SOPs match these filters.'],
+      },
     ],
   },
   {
@@ -87,11 +94,11 @@ const GATED_ROUTES: GatedRoute[] = [
     pageBundlePath: path.join(NEXT_DIR, 'server', 'app', '(protected)', 'sops', 'page.js'),
     forbiddenMarkers: [
       {
-        label: 'status lens (SopMillerBrowser.tsx)',
-        markers: ['Pick another scope on the left.', 'Pick a SOP to see its detail here.'],
+        label: 'library table (AdminLibraryTable.tsx)',
+        markers: ['Reviewed within 12 months', 'No SOPs match these filters.'],
       },
       {
-        label: 'governance/attention lens (GovernanceQueueRow.tsx)',
+        label: 'governance inbox row (GovernanceQueueRow.tsx)',
         markers: ['Owner role gone'],
       },
       {
@@ -316,16 +323,26 @@ console.log(
 function collectSelfValidationCorpus(): string {
   const bodies: string[] = []
 
-  const staticChunksDir = path.join(NEXT_DIR, 'static', 'chunks')
-  if (fs.existsSync(staticChunksDir)) {
-    for (const entry of fs.readdirSync(staticChunksDir)) {
-      const full = path.join(staticChunksDir, entry)
-      const stat = fs.statSync(full)
-      if (!stat.isFile() || !entry.endsWith('.js')) continue
-      if (stat.size > 2 * 1024 * 1024) continue
-      bodies.push(fs.readFileSync(full, 'utf-8'))
+  function walkDir(dir: string, maxBytes: number) {
+    if (!fs.existsSync(dir)) return
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name)
+      if (entry.isDirectory()) {
+        walkDir(full, maxBytes)
+      } else if (entry.isFile() && entry.name.endsWith('.js')) {
+        const stat = fs.statSync(full)
+        if (stat.size > maxBytes) continue
+        bodies.push(fs.readFileSync(full, 'utf-8'))
+      }
     }
   }
+
+  // Phase 54: walked RECURSIVELY (not a flat readdir) so route-level chunks
+  // — e.g. /governance's, which now carries GovernanceQueueRow's
+  // 'Owner role gone' literal now that the old admin-attention lens is gone
+  // from /sops — still count as "somewhere in the build". A flat scan would
+  // miss any chunk Next.js nests under a route subdirectory.
+  walkDir(path.join(NEXT_DIR, 'static', 'chunks'), 2 * 1024 * 1024)
 
   for (const entry of GATED_ROUTES) {
     if (fs.existsSync(entry.pageBundlePath)) {
@@ -333,21 +350,8 @@ function collectSelfValidationCorpus(): string {
     }
   }
 
-  const adminSopsDir = path.join(NEXT_DIR, 'server', 'app', '(protected)', 'admin', 'sops')
-  function walkDir(dir: string) {
-    if (!fs.existsSync(dir)) return
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, entry.name)
-      if (entry.isDirectory()) {
-        walkDir(full)
-      } else if (entry.isFile() && entry.name.endsWith('.js')) {
-        const stat = fs.statSync(full)
-        if (stat.size > 4 * 1024 * 1024) continue
-        bodies.push(fs.readFileSync(full, 'utf-8'))
-      }
-    }
-  }
-  walkDir(adminSopsDir)
+  walkDir(path.join(NEXT_DIR, 'server', 'app', '(protected)', 'admin', 'sops'), 4 * 1024 * 1024)
+  walkDir(path.join(NEXT_DIR, 'server', 'app', '(protected)', 'governance'), 4 * 1024 * 1024)
 
   return bodies.join('\n')
 }

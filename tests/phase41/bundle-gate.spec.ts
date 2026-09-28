@@ -48,11 +48,15 @@ test.describe('SB-LINE-06 — two-route bundle gate', () => {
     expect(baseline.routes['/sops/page']).toBeGreaterThan(0)
   })
 
-  test('/sops/page entry declares at least one forbidden marker per admin lens', () => {
+  test('/sops/page entry declares at least one forbidden marker per admin surface', () => {
     const src = read('scripts/check-bundle-size.ts')
-    // One literal per lens, verified against the lens source at plan time
-    // (SopMillerBrowser.tsx, GovernanceQueueRow.tsx, WiringPatchBay.tsx).
-    expect(src).toContain('Pick another scope on the left.')
+    // One literal per surface, verified against source at plan time
+    // (AdminLibraryTable.tsx, GovernanceQueueRow.tsx, WiringPatchBay.tsx).
+    // Phase 54: the old status-lens marker ('Pick another scope on the
+    // left.') left the file with SopMillerBrowser/AdminStatusLens — the
+    // library table replaces it.
+    expect(src).not.toContain('Pick another scope on the left.')
+    expect(src).toContain('Reviewed within 12 months')
     expect(src).toContain('Owner role gone')
     expect(src).toContain('follows collection')
   })

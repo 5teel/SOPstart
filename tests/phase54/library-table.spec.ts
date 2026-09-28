@@ -20,6 +20,7 @@ import {
 
 const ROOT = path.resolve(__dirname, '..', '..')
 const TABLE_PATH = path.join(ROOT, 'src', 'components', 'admin', 'AdminLibraryTable.tsx')
+const SOPS_PAGE_PATH = path.join(ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx')
 const WORKER_LIST_PATH = path.join(ROOT, 'src', 'components', 'sop', 'WorkerSimpleList.tsx')
 const WORKER_SIGNAL_PATH = path.join(ROOT, 'src', 'lib', 'sop', 'worker-signal.ts')
 const CATEGORY_BUTTON_PATH = path.join(
@@ -206,5 +207,32 @@ test.describe('surviving affordances', () => {
 
   test('BuilderStageShell renders <BuilderCategoryButton sopId={sopId}', () => {
     expect(read(STAGE_SHELL_PATH)).toContain('<BuilderCategoryButton sopId={sopId}')
+  })
+})
+
+test.describe('page seam (54-04 Task 3): /sops swaps onto the table and the simple list', () => {
+  test('page.tsx dynamic-binds WorkerSimpleList and AdminLibraryTable, both ssr: false', () => {
+    const code = stripComments(read(SOPS_PAGE_PATH))
+    expect(code).toMatch(/dynamic\(\s*\(\)\s*=>\s*import\('@\/components\/sop\/WorkerSimpleList'\)/)
+    expect(code).toMatch(/dynamic\(\s*\(\)\s*=>\s*import\('@\/components\/admin\/AdminLibraryTable'\)/)
+    const ssrFalseCount = (code.match(/\{\s*ssr:\s*false\b[^}]*\}/g) ?? []).length
+    expect(ssrFalseCount).toBeGreaterThanOrEqual(2)
+  })
+
+  test('AdminLibraryTable receives onTakeoverChange={setTakeover}', () => {
+    expect(read(SOPS_PAGE_PATH)).toContain('onTakeoverChange={setTakeover}')
+  })
+
+  test('<WorkerSimpleList receives onAdd={handleAdd} and onRemove={handleRemove}', () => {
+    const code = stripComments(read(SOPS_PAGE_PATH))
+    const idx = code.indexOf('<WorkerSimpleList')
+    expect(idx).toBeGreaterThan(-1)
+    const block = code.slice(idx, idx + 700)
+    expect(block).toContain('onAdd={handleAdd}')
+    expect(block).toContain('onRemove={handleRemove}')
+  })
+
+  test('page.tsx contains no lg:grid-cols-[176px (the retired Miller frame)', () => {
+    expect(read(SOPS_PAGE_PATH)).not.toContain('lg:grid-cols-[176px')
   })
 })

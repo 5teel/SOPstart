@@ -1,22 +1,18 @@
 /**
  * Phase 41 Plan 05 — LIVE source-contract spec for the merged `/sops` surface
- * (src/app/(protected)/sops/page.tsx) plus its lazy admin module
- * (src/components/sop/AdminSopSurface.tsx).
+ * (src/app/(protected)/sops/page.tsx).
  *
- * Bundle-regression fix (deviation from 41-05): 41-05 originally put the
- * admin scope model, deep-link resolution and Miller-row JSX directly in
- * page.tsx, which cost the always-loaded worker bundle +4/+5KB past the
- * SC-5/D-08 ±2KB gate. That code now lives in AdminSopSurface.tsx, loaded
- * from page.tsx via ONE `dynamic({ ssr: false })` call gated on
- * `useIsAdmin()`. Assertions below are repointed to their new home; the
- * SUR-01/02/06 + deep-link CONTRACTS this spec proves are unchanged, only
- * which file each lives in.
+ * Phase 54 rewrite: the admin scope model, deep-link resolution and Miller-
+ * row JSX that used to live in AdminSopSurface.tsx are gone — replaced by
+ * AdminLibraryTable.tsx (its own next/dynamic({ ssr: false }) module, gated
+ * on isAdmin && viewport === 'desktop') and WorkerSimpleList.tsx (the
+ * worker/below-1024 admin fallback, no Miller frame). The SUR-01/02/06 +
+ * deep-link CONTRACTS this spec proves are unchanged in spirit; the
+ * assertions below are repointed to their new home (CLAUDE.md 2026-07-13 —
+ * repoint stale guards in the same commit as the refactor).
  *
- * Assertions run against COMMENT-STRIPPED source so an explanatory comment
- * that merely quotes a token (e.g. this file's own SB-LINE-06 note, which is
- * deliberately worded to avoid naming forbidden symbols — see
- * tests/lint/no-static-admin-lens-import.spec.ts) cannot satisfy a check
- * about the actual code. Normalises \r\n to \n per CLAUDE.md 2026-07-18.
+ * Assertions run against COMMENT-STRIPPED source. Normalises \r\n to \n per
+ * CLAUDE.md 2026-07-18.
  *
  * Registration: playwright.config.ts `phase41` project
  *   testDir: '.', testMatch: /tests\/phase41\/.*\.(spec|test)\.ts$/
@@ -29,7 +25,9 @@ import path from 'node:path'
 
 const ROOT = process.cwd()
 const SOPS_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx')
-const ADMIN_SURFACE = path.join(ROOT, 'src', 'components', 'sop', 'AdminSopSurface.tsx')
+const LIBRARY_TABLE = path.join(ROOT, 'src', 'components', 'admin', 'AdminLibraryTable.tsx')
+const ADMIN_ROWS = path.join(ROOT, 'src', 'lib', 'sop-list', 'admin-rows.ts')
+const ADMIN_SOPS_SHIM = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'page.tsx')
 // Phase 53-02: the worker per-SOP list derivation lives here now.
 const WORKER_SOPS_HOOK = path.join(ROOT, 'src', 'hooks', 'useWorkerSops.ts')
 
@@ -63,36 +61,24 @@ function stripComments(src: string): string {
     .join('\n')
 }
 
-const LENS_MODULES = [
-  './lenses/AdminStatusLens',
-  './lenses/AdminAttentionLens',
-  './lenses/AdminAccessLens',
-]
-
-test.describe('SUR-01 — merged /sops surface gates admin scope on useIsAdmin()', () => {
-  test('SUR-01: admin scope group is gated on useIsAdmin() from RoleProvider', () => {
+test.describe('SUR-01 — merged /sops surface gates the admin table on useIsAdmin() && desktop viewport', () => {
+  test('SUR-01: admin table is gated on useIsAdmin() from RoleProvider', () => {
     const src = read(SOPS_PAGE)
     expect(src).toContain('useIsAdmin')
     expect(src).toContain("@/components/providers/RoleProvider")
   })
 
-  test('SUR-01: the admin module is mounted only inside an isAdmin conditional', () => {
+  test('SUR-01: AdminLibraryTable is mounted only inside an isAdmin && viewport === "desktop" conditional', () => {
     const code = stripComments(read(SOPS_PAGE))
-    // Mutation-proof: removing the `isAdmin ? (` gate immediately before the
-    // element (e.g. always rendering it, or gating on something else) fails
+    // Mutation-proof: removing the gate immediately before the element fails
     // this regex even though `isAdmin` still appears elsewhere in the file.
-    expect(code).toMatch(/isAdmin\s*\?\s*\(\s*<AdminSopSurface/)
+    expect(code).toMatch(/isAdmin\s*&&\s*viewport\s*===\s*'desktop'\s*\?\s*\(\s*<AdminLibraryTable/)
   })
 
-  test('SUR-01: AdminSopSurface is loaded only via dynamic(), never a static value import', () => {
+  test('SUR-01: AdminLibraryTable is loaded only via dynamic(), never a static value import', () => {
     const code = stripComments(read(SOPS_PAGE))
-    expect(code).toContain("import('@/components/sop/AdminSopSurface')")
-    // `import type { X } from '.../AdminSopSurface'` is fine (erased, 0
-    // bytes); a static VALUE import of the component itself is the
-    // regression this guards — it would pull the whole admin module (and
-    // therefore the lenses it dynamic-imports) back into the always-loaded
-    // worker chunk.
-    const staticValueImport = /import\s+(?!type\b)\{[^}]*AdminSopSurface[^}]*\}\s+from\s+['"]@\/components\/sop\/AdminSopSurface['"]/
+    expect(code).toContain("import('@/components/admin/AdminLibraryTable')")
+    const staticValueImport = /import\s+(?!type\b)\{[^}]*AdminLibraryTable[^}]*\}\s+from\s+['"]@\/components\/admin\/AdminLibraryTable['"]/
     expect(staticValueImport.test(code)).toBe(false)
   })
 
@@ -122,11 +108,6 @@ test.describe('SUR-01 — merged /sops surface gates admin scope on useIsAdmin()
     expect(owners).toEqual(['src/hooks/useWorkerSops.ts'])
     expect(read(WORKER_SOPS_HOOK)).toContain(".eq('worker_id'")
     const pageCode = stripComments(read(SOPS_PAGE))
-    // The three queries that moved wholesale into the hook. 'user-sop-assignments'
-    // is excluded here: page.tsx legitimately still references that key in its
-    // two queryClient.invalidateQueries({ queryKey: ['user-sop-assignments'] })
-    // calls (handleRemove/handleAdd) -- the useQuery DEFINITION itself moved
-    // (proved by 'getUserSopAssignments' being absent from page.tsx, asserted above).
     for (const key of ["queryKey: ['worker-last-completions']", "queryKey: ['sop-refresher-intervals']", "queryKey: ['library-sops']"]) {
       expect(pageCode).not.toContain(key)
     }
@@ -134,124 +115,103 @@ test.describe('SUR-01 — merged /sops surface gates admin scope on useIsAdmin()
   })
 })
 
-test.describe('SUR-02 — admin lenses are code-split, deep-linkable, and use client-side scope state', () => {
-  test('SUR-02: page.tsx has exactly 4 next/dynamic({ ssr: false }) bindings (worker browser + the admin module + the Phase 52 plant home + the Phase 53 phone home)', () => {
+test.describe('SUR-02 — the admin table is code-split, deep-linkable, and uses client-side nav state', () => {
+  test('SUR-02: page.tsx has exactly 4 next/dynamic({ ssr: false }) bindings (WorkerSimpleList + AdminLibraryTable + PlantHome + PhoneHome)', () => {
     const code = stripComments(read(SOPS_PAGE))
     const dynamicCalls = code.match(/dynamic\(/g) ?? []
     expect(dynamicCalls.length).toBe(4)
-    const ssrFalseCount = (code.match(/\{\s*ssr:\s*false\s*\}/g) ?? []).length
+    const ssrFalseCount = (code.match(/\{\s*ssr:\s*false\b[^}]*\}/g) ?? []).length
     expect(ssrFalseCount).toBe(4)
   })
 
-  test('SUR-02: AdminSopSurface.tsx has exactly 3 next/dynamic({ ssr: false }) bindings (the three lenses)', () => {
-    const code = stripComments(read(ADMIN_SURFACE))
-    const dynamicCalls = code.match(/dynamic\(/g) ?? []
-    expect(dynamicCalls.length).toBe(3)
-    // `{ ssr: false, loading: LensSkeleton }` since the 2026-09-15 blank-flash fix —
-    // the option object may carry a loading fallback but ssr must stay false.
-    const ssrFalseCount = (code.match(/\{\s*ssr:\s*false\b[^}]*\}/g) ?? []).length
-    expect(ssrFalseCount).toBe(3)
-  })
-
-  test('SUR-02: page.tsx does not reference any admin lens module at all (moved to AdminSopSurface.tsx)', () => {
+  test('SUR-02: every dynamic( import target in page.tsx is in the allowed set', () => {
     const code = stripComments(read(SOPS_PAGE))
-    for (const mod of ['AdminStatusLens', 'AdminAttentionLens', 'AdminAccessLens']) {
-      expect(code).not.toContain(mod)
+    const targets = [...code.matchAll(/import\('([^']+)'\)/g)].map((m) => m[1])
+    const allowed = new Set([
+      '@/components/sop/WorkerSimpleList',
+      '@/components/admin/AdminLibraryTable',
+      '@/components/sop/plant/PlantHome',
+      '@/components/sop/plant/PhoneHome',
+    ])
+    for (const t of targets) {
+      expect(allowed.has(t), `unexpected dynamic import target: ${t}`).toBe(true)
     }
+    expect(targets.length).toBeGreaterThanOrEqual(3)
   })
 
-  test('SUR-02: each admin lens module is imported ONLY inside a dynamic( import(...) call in AdminSopSurface.tsx — no static import', () => {
-    const code = stripComments(read(ADMIN_SURFACE))
-    for (const mod of LENS_MODULES) {
-      const staticImport = new RegExp(`import\\s+[^(][^;]*from\\s+['"]${mod.replace(/[/.]/g, '\\$&')}['"]`)
-      expect(staticImport.test(code)).toBe(false)
-      expect(code).toContain(`import('${mod}')`)
-    }
+  test('SUR-02: page.tsx has no @/components/sop/lenses/ import (the retired admin lenses)', () => {
+    const code = stripComments(read(SOPS_PAGE))
+    expect(code).not.toContain('@/components/sop/lenses/')
   })
 
-  test('SUR-02 / deep-link: AdminSopSurface resolves view, status, owner, departments, collection, sop from useSearchParams', () => {
-    const src = read(ADMIN_SURFACE)
-    expect(src).toContain('useSearchParams')
+  test('SUR-02 / deep-link: resolveLibraryNav resolves view, status, owner, departments, collection, sop', () => {
+    const src = read(ADMIN_ROWS)
+    expect(src).toContain('export function resolveLibraryNav')
     for (const param of ['view', 'status', 'owner', 'departments', 'collection', 'sop']) {
       expect(src).toContain(`'${param}'`)
     }
   })
 
-  test("SUR-02 / deep-link: view=access resolution drops departments/collection (SC-4, RESEARCH Pitfall 5)", () => {
-    const code = stripComments(read(ADMIN_SURFACE))
-    const accessBranch = code.slice(
-      code.indexOf("view === 'access'"),
-      code.indexOf("const status = params.get('status')")
-    )
+  test("SUR-02 / deep-link: view=access resolution returns before departments/collection are read (SC-4)", () => {
+    const code = stripComments(read(ADMIN_ROWS))
+    const fnStart = code.indexOf('export function resolveLibraryNav')
+    const fnBody = code.slice(fnStart, code.indexOf('export function libraryNavToUrl'))
+    const accessIdx = fnBody.indexOf("=== 'access'")
+    const statusIdx = fnBody.indexOf("params.get('status')")
+    expect(accessIdx).toBeGreaterThan(-1)
+    expect(statusIdx).toBeGreaterThan(accessIdx)
+    const accessBranch = fnBody.slice(accessIdx, statusIdx)
     expect(accessBranch).not.toContain('departments')
     expect(accessBranch).not.toContain('collection')
-    expect(accessBranch).toContain("scope: 'admin-access'")
+    expect(accessBranch).toContain("view: 'access'")
   })
 
-  test('SUR-02 / deep-link: a non-admin session never mounts AdminSopSurface, so no admin param is ever resolved for it', () => {
-    // Structural guarantee replacing the old runtime `if (!isAdmin)` branch:
-    // resolveAdminScope has no isAdmin parameter at all — the module is only
-    // ever fetched (see the isAdmin-gate test above) for an admin session,
-    // which is a stronger guarantee than a branch inside always-shipped code.
-    const code = stripComments(read(ADMIN_SURFACE))
-    const fnStart = code.indexOf('function resolveAdminScope(')
-    expect(fnStart).toBeGreaterThan(-1)
-    const fnSignatureLine = code.slice(fnStart, code.indexOf('{', fnStart))
-    expect(fnSignatureLine).not.toContain('isAdmin')
+  test("SUR-02 / deep-link: view=attention resolves to the 'governance' sentinel", () => {
+    const src = read(ADMIN_ROWS)
+    expect(src).toContain("if (params.get('view') === 'attention') return 'governance'")
   })
 
-  test('SUR-02 / hot path: scope changes use history.replaceState, never router.push or <Link>', () => {
+  test('SUR-02 / hot path: page.tsx uses history.replaceState, never router.push or <Link> for scope changes', () => {
     const src = read(SOPS_PAGE)
     expect(src).toContain('history.replaceState')
     expect(src).not.toContain('router.push')
     expect(src).not.toContain("next/link")
-    const adminSrc = read(ADMIN_SURFACE)
-    expect(adminSrc).toContain('history.replaceState')
-    expect(adminSrc).not.toContain('router.push')
-    expect(adminSrc).not.toContain('next/link')
   })
 
-  test('SUR-02: no window.location read anywhere in either file (hydration-safe seed, CLAUDE.md 2026-06-08)', () => {
+  test('SUR-02: no window.location read anywhere in page.tsx (hydration-safe seed, CLAUDE.md 2026-06-08)', () => {
     expect(stripComments(read(SOPS_PAGE))).not.toContain('window.location')
-    expect(stripComments(read(ADMIN_SURFACE))).not.toContain('window.location')
   })
 })
 
-test.describe('SUR-01/02 — the admin-status branch renders before the worker empty state', () => {
-  test('an admin with zero assigned SOPs sees the library, not "No SOPs yet" (positional guard)', () => {
+test.describe('SUR-01/02 — the admin table renders before the worker empty state', () => {
+  test('an admin at desktop width never reaches the worker <SopsSection> branch', () => {
     const code = stripComments(read(SOPS_PAGE))
-    const adminBranchIndex = code.indexOf('admin.inFrameElement ?')
-    const emptyStateIndex = code.indexOf('No SOPs yet')
+    const adminBranchIndex = code.indexOf("isAdmin && viewport === 'desktop' ?")
+    const sectionIndex = code.indexOf('<SopsSection')
     expect(adminBranchIndex).toBeGreaterThan(-1)
-    expect(emptyStateIndex).toBeGreaterThan(-1)
-    expect(adminBranchIndex).toBeLessThan(emptyStateIndex)
+    expect(sectionIndex).toBeGreaterThan(-1)
+    expect(adminBranchIndex).toBeLessThan(sectionIndex)
   })
 })
 
 test.describe('SUR-06 — "Library" survives only as a scope/filter label', () => {
-  test('SUR-06: the string literal \'Library\' appears exactly once in page.tsx — the worker scope-group header, never a nav label or destination', () => {
+  test('SUR-06: the string literal \'Library\' does not appear in page.tsx at all (no admin scope column left to header)', () => {
     const src = read(SOPS_PAGE)
     const hits = src.match(/'Library'/g) ?? []
-    expect(hits.length).toBe(1)
-    expect(src).toContain("group === 'yours' ? 'Your SOPs' : 'Library'")
-  })
-
-  test('SUR-06: the admin scope-column header reads "Admin", not "Library" (now rendered by AdminSopSurface.tsx)', () => {
-    const src = read(ADMIN_SURFACE)
-    expect(src).toContain('MillerGroupLabel>Admin<')
-    expect(src).not.toContain("'Library'")
+    expect(hits.length).toBe(0)
   })
 })
 
-test.describe('redirect shim — legacy /admin/sops deep links all resolve on /sops', () => {
-  test('view=attention, view=access, status=draft|published|failed, owner=me, and bare departments/collection all map to an admin scope', () => {
-    const code = stripComments(read(ADMIN_SURFACE))
-    expect(code).toContain("view === 'attention'")
-    expect(code).toContain("scope: 'admin-attention'")
-    expect(code).toContain("view === 'access'")
-    expect(code).toContain("scope: 'admin-access'")
-    expect(code).toContain("status === 'draft' || status === 'published' || status === 'failed'")
-    expect(code).toContain("params.get('owner') === 'me'")
-    expect(code).toContain("scope: 'admin-all', ownerOnly: true")
+test.describe('redirect shim — legacy /admin/sops deep links all resolve on /sops or /governance', () => {
+  test('the shim passes every legacy param through and sends view=attention to /governance after the role guard', () => {
+    const code = stripComments(read(ADMIN_SOPS_SHIM))
+    const guardIdx = code.indexOf("redirect('/dashboard')")
+    const attentionIdx = code.indexOf("params.view === 'attention'")
+    expect(guardIdx).toBeGreaterThan(-1)
+    expect(attentionIdx).toBeGreaterThan(guardIdx)
+    expect(code.slice(attentionIdx, attentionIdx + 80)).toContain("redirect('/governance')")
+    for (const param of ['view', 'status', 'owner', 'filter', 'departments', 'collection', 'sop']) {
+      expect(code).toContain(`params.${param}`)
+    }
   })
 })

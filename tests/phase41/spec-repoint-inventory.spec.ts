@@ -29,6 +29,10 @@
  *   - tests/phase54/deletion-sweep.spec.ts — PERMITTED_ATTENTION_FILES names
  *     the shim as one of the two files still allowed to spell
  *     `=== 'attention'` once the Phase 41 lenses are deleted (54-05).
+ *   - tests/phase41/merged-surface.spec.ts — ADMIN_SOPS_SHIM constant reads
+ *     the shim source to assert it still passes every legacy param through
+ *     and sends `view=attention` to `/governance` after the role guard
+ *     (54-04 rewrite of this spec for the library-table surface).
  */
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
@@ -45,6 +49,7 @@ const ALLOWLIST = [
   path.join('tests', 'phase30', 'create-entry.spec.ts'),
   path.join('tests', 'phase41', 'reference-sweep.spec.ts'),
   path.join('tests', 'phase54', 'deletion-sweep.spec.ts'),
+  path.join('tests', 'phase41', 'merged-surface.spec.ts'),
 ]
 
 // Strips full-line comments (//, /*, */, and JSDoc * continuation lines) so

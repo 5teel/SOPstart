@@ -310,7 +310,7 @@ export function AdminLibraryTable({ filter, onTakeoverChange }: AdminLibraryTabl
                           data-check={key}
                           data-state={checks[key]}
                           title={CHECK_TITLE[key]}
-                          className={`grid h-4.5 w-4.5 place-items-center rounded-full text-micro font-extrabold text-white ${CHECK_STYLE[checks[key]]}`}
+                          className={`grid h-4 w-4 place-items-center rounded-full text-micro font-extrabold text-white ${CHECK_STYLE[checks[key]]}`}
                         >
                           {CHECK_GLYPH[checks[key]]}
                           <span className="sr-only">{CHECK_TITLE[key]}</span>

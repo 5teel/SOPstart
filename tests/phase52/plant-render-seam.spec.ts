@@ -98,8 +98,8 @@ test.describe('render seam', () => {
     expect(read(PAGE_PATH)).toContain('!takeover && !plantSite')
   })
 
-  test('the admin branch (isAdmin ? <AdminSopSurface> ...) is untouched by this change', () => {
-    expect(read(PAGE_PATH)).toMatch(/isAdmin\s*\?\s*\(\s*<AdminSopSurface/)
+  test('the admin branch renders the library table (Phase 54: isAdmin && viewport === "desktop" ? <AdminLibraryTable ...)', () => {
+    expect(read(PAGE_PATH)).toMatch(/isAdmin\s*&&\s*viewport\s*===\s*'desktop'\s*\?\s*\(\s*<AdminLibraryTable/)
   })
 
   test('the PlantHome slot renders after every hook in SopsSection (hook-order safety)', () => {

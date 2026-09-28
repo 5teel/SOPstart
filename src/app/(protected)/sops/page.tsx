@@ -1,7 +1,7 @@
 'use client'
 import { useState, useTransition } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Search, ClipboardList, ChevronDown, X } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { useAssignedSops } from '@/hooks/useAssignedSops'
 import { useSopSync } from '@/hooks/useSopSync'
 import { useWorkerSops } from '@/hooks/useWorkerSops'
@@ -12,10 +12,7 @@ import { selfAddSop, selfRemoveSop, requestRemoveAssignment } from '@/actions/as
 import { useIsAdmin } from '@/components/providers/RoleProvider'
 import { useViewport } from '@/hooks/useViewport'
 import dynamic from 'next/dynamic'
-import type { WorkerSop } from '@/components/sop/SopWorkerBrowser'
-import { MillerColumnHeader, MillerGroupLabel, MillerItem } from '@/components/sop/MillerPrimitives'
-import type { AdminRenderProps } from '@/components/sop/AdminSopSurface'
-import type { WorkerScope, SopNav } from '@/components/sop/sops-nav-types'
+import type { WorkerSop, WorkerScope } from '@/lib/sop/worker-signal'
 import type { Department } from '@/types/sop'
 import { listSiteForWorker } from '@/actions/site-worker'
 import type { WorkerSiteData } from '@/lib/validators/site'
@@ -23,42 +20,31 @@ import type { WorkerSiteData } from '@/lib/validators/site'
 /**
  * SB-LINE-06: /sops/[sopId]'s chunk set transitively includes /sops/page's own
  * route chunk, so ANY weight added to this page counts against the worker
- * detail route's bundle gate — measured, not assumed (the gate's chunk list
- * names `app/(protected)/sops/page-*.js` at 28.7 KB). A static import of the
- * browser put it in that chunk and blew the ±2 KB tolerance by 4 KB.
+ * detail route's bundle gate — measured, not assumed.
  *
- * next/dynamic gives it its own chunk instead, which is the same treatment
- * DesktopWalkthrough and WalkthroughVoiceModal already get — and which the
- * gate's own isolation check exists to verify.
+ * Phase 54: the admin scope model, the three admin lenses and the Miller
+ * frame are gone from this file entirely. An admin session mounts its own
+ * table through ONE `next/dynamic({ ssr: false })` call gated on
+ * `isAdmin && viewport === 'desktop'`; below that width an admin is a
+ * worker (D-07) and takes the same path everyone else does. This file now
+ * holds only the render gates and the slots each surface mounts into —
+ * never the admin table's, the plant's, the phone home's, or the worker
+ * list's own state, markup or camera logic.
  *
- * Phase 41 bundle-regression fix: the admin scope model, deep-link
- * resolution and Miller-row rendering that 41-05 originally added directly
- * to this file are now behind their OWN dynamic boundary — the entire admin
- * surface lives in one lazily-loaded module (AdminSopSurface, which in turn
- * dynamic-imports the three lenses). A static import of that module, or of
- * any admin-only list/queue/wiring component/action anywhere in this file's
- * top-level import graph, is a bundle regression blocked by
- * tests/lint/no-static-admin-lens-import.spec.ts (deliberately not naming
- * those symbols here — the guard does a raw substring scan of this file, so
- * a comment mentioning them by name would itself trip it).
+ * Phase 52 (D-01): the worker desktop home (PlantHome) is its own lazy
+ * module for the same reason.
  *
- * Phase 52 (D-01): the worker desktop home (PlantHome) gets the same
- * treatment for the same reason — it is its own lazy module so this file
- * only ever holds the render gate and the slot, never the plant's own
- * state, markup or camera logic.
- *
- * Phase 53 (D-01): the phone home (PhoneHome) is a fourth lazy module for
- * the same reason — a phone-width worker (or an admin on a phone) gets a
- * different render seam below the same shared site query, and none of its
- * markup belongs in this file's always-loaded chunk either.
+ * Phase 53 (D-01): the phone home (PhoneHome) is a fourth lazy module — a
+ * phone-width worker (or an admin on a phone) gets a different render seam
+ * below the same shared site query.
  */
-const SopWorkerBrowser = dynamic(
-  () => import('@/components/sop/SopWorkerBrowser').then((m) => m.SopWorkerBrowser),
+const WorkerSimpleList = dynamic(
+  () => import('@/components/sop/WorkerSimpleList').then((m) => m.WorkerSimpleList),
   { ssr: false }
 )
-const AdminSopSurface = dynamic(
-  () => import('@/components/sop/AdminSopSurface').then((m) => m.AdminSopSurface),
-  { ssr: false }
+const AdminLibraryTable = dynamic(
+  () => import('@/components/admin/AdminLibraryTable').then((m) => m.AdminLibraryTable),
+  { ssr: false, loading: () => <div className="h-9 animate-pulse rounded bg-[var(--paper-2)]" /> }
 )
 const PlantHome = dynamic(
   () => import('@/components/sop/plant/PlantHome').then((m) => m.PlantHome),
@@ -68,15 +54,6 @@ const PhoneHome = dynamic(
   () => import('@/components/sop/plant/PhoneHome').then((m) => m.PhoneHome),
   { ssr: false }
 )
-
-const EMPTY_ADMIN: AdminRenderProps = {
-  desktopRows: null,
-  desktopDeptRows: null,
-  mobileRows: null,
-  inFrameElement: null,
-  takeoverElement: null,
-  hideWorkerSummary: false,
-}
 
 function getRelativeTime(isoString: string): string {
   const diff = Date.now() - new Date(isoString).getTime()
@@ -90,21 +67,16 @@ function getRelativeTime(isoString: string): string {
 }
 
 /**
- * Sketch 005 variant C on the worker side. The admin scopes are about the
- * library's health (drafts, stuck, published); a worker's are about their own
- * training clock — what is overdue, what changed under them, what they have
- * never done.
+ * A worker's scopes are about their own training clock — what is overdue,
+ * what changed under them, what they have never done.
  *
  * `library` / `not-added` used to be a second top-level TAB, which forced the
  * worker to decide which of two pages a procedure lived on before they could
- * look for it. They are scopes of the same list instead: the Miller's first
- * column already answers "which slice", so the tab bar was a duplicate of it.
+ * look for it. They are scopes of the same list instead.
  *
  * `always: false` scopes are only listed while they have something in them —
  * a column of zeros is noise, and on a fresh account it was most of the column.
  */
-export type { WorkerScope }
-
 const WORKER_SCOPES: { key: WorkerScope; label: string; group: 'yours' | 'library'; always: boolean }[] = [
   { key: 'all', label: 'All yours', group: 'yours', always: true },
   { key: 'refresher', label: 'Refresher due', group: 'yours', always: false },
@@ -126,7 +98,7 @@ const SCOPE_LABEL: Record<WorkerScope, string> = {
 export default function SopsPage() {
   const isAdmin = useIsAdmin()
 
-  // Phase 52 (D-01): the plant replaces the Miller frame for a non-admin
+  // Phase 52 (D-01): the plant replaces the worker list for a non-admin
   // session at >=1024px once the org has a drawn site with >=1 machine.
   // Loading/undefined/error/no-layout/zero-machines all resolve plantSite
   // to null -- the fallback list renders first and the plant only swaps in
@@ -163,22 +135,15 @@ export default function SopsPage() {
   const [allDepartments, setAllDepartments] = useState(false)
   const [deptSheetOpen, setDeptSheetOpen] = useState(false)
 
-  // Phase 41 SUR-01/02, bundle-regression fix: nav starts at the worker
-  // default, or 'admin-all' for admins (matching today's admin landing
-  // experience — they land on the library, not their own assigned list) —
-  // computed synchronously since isAdmin is already resolved server-side
-  // (CLAUDE.md 2026-06-08 hydration class). A specific admin deep link
-  // (?status=, ?view=, ?owner=me, ?departments=, ?collection=, ?sop=) is
-  // resolved by AdminSopSurface once its chunk loads and corrected via
-  // onNavChange — that resolution logic is admin-only and must not ship in
-  // the always-loaded worker bundle (SB-LINE-06 / D-08 / ROADMAP SC-5).
-  const [nav, setNav] = useState<SopNav>(() => ({
-    scope: isAdmin ? 'admin-all' : 'all',
-    ownerOnly: false,
-  }))
+  // Phase 54: the worker scope and the admin table's takeover state
+  // (reported by AdminLibraryTable when the Access lens opens) each live
+  // here as their own plain state — no shared nav object, no admin deep-link
+  // resolution in this file at all (that lives inside AdminLibraryTable.tsx).
+  const [scope, setScope] = useState<WorkerScope>('all')
+  const [takeover, setTakeover] = useState(false)
 
   function applyWorkerScope(next: WorkerScope) {
-    setNav({ scope: next, ownerOnly: false })
+    setScope(next)
     window.history.replaceState(null, '', '/sops')
   }
 
@@ -250,23 +215,15 @@ export default function SopsPage() {
       ? true
       : (sopDeptMap[sopId] ?? []).some((id) => selectedDeptIds.includes(id))
 
-  // The attention and access lenses replace the whole frame with their own
-  // surfaces (and their own search); the toolbar box would filter nothing there.
-  const takeover = nav.scope === 'admin-access'
-
   const sectionProps = {
     assignedSops,
     isLoading: assignedLoading,
     query,
     activeDeptLabel,
     onOpenDeptSheet: () => setDeptSheetOpen(true),
-    scope: nav.scope as WorkerScope,
+    scope,
     onScopeChange: applyWorkerScope,
     deptMatches,
-    departments,
-    selectedDeptIds,
-    allDepartments,
-    onDeptSelect: handleDeptSelect,
   }
 
   return (
@@ -310,16 +267,11 @@ export default function SopsPage() {
         </div>
       </nav>
 
-      {/* Desktop layout: the Miller frame, on the shared 5xl rail */}
       <div className="max-w-5xl mx-auto w-full px-4 py-4">
-        {isAdmin ? (
-          <AdminSopSurface nav={nav} onNavChange={setNav} filter={query}>
-            {(admin) => admin.takeoverElement ?? (
-              <SopsSection {...sectionProps} admin={admin} phone={phoneSite} onQueryChange={setQuery} />
-            )}
-          </AdminSopSurface>
+        {isAdmin && viewport === 'desktop' ? (
+          <AdminLibraryTable filter={query} onTakeoverChange={setTakeover} />
         ) : (
-          <SopsSection {...sectionProps} admin={EMPTY_ADMIN} plant={plantSite} phone={phoneSite} onQueryChange={setQuery} />
+          <SopsSection {...sectionProps} plant={plantSite} phone={phoneSite} onQueryChange={setQuery} />
         )}
       </div>
 
@@ -346,11 +298,6 @@ interface SopsSectionProps {
   scope: WorkerScope
   onScopeChange: (s: WorkerScope) => void
   deptMatches: (sopId: string) => boolean
-  departments: Department[]
-  selectedDeptIds: string[]
-  allDepartments: boolean
-  onDeptSelect: (ids: string[], all: boolean) => void
-  admin: AdminRenderProps
   /** Phase 52 (D-01): worker-only. Present only for a desktop worker whose org has a drawn site. */
   plant?: WorkerSiteData | null
   /** Phase 53 (D-01): set below 1024px when the org has a site (admin sessions included -- an admin on a phone is a worker). */
@@ -367,11 +314,6 @@ function SopsSection({
   scope,
   onScopeChange,
   deptMatches,
-  departments,
-  selectedDeptIds,
-  allDepartments,
-  onDeptSelect,
-  admin,
   plant,
   phone,
   onQueryChange,
@@ -438,9 +380,9 @@ function SopsSection({
 
   const loading = isLoading || libraryLoading
 
-  // D-01: the plant replaces the Miller frame and receives the exact list
-  // the frame would have shown -- refresher state, lineage-rooted
-  // completion clock, version currency, department filter all included.
+  // D-01: the plant replaces the worker list and receives the exact list the
+  // list would have shown -- refresher state, lineage-rooted completion
+  // clock, version currency, department filter all included.
   if (plant && onQueryChange) return <PlantHome site={plant} sops={workerSops} loading={loading} query={query} onQueryChange={onQueryChange} />
 
   // A worker with nothing assigned used to land on "Nothing in All yours" — a
@@ -450,152 +392,28 @@ function SopsSection({
       ? { label: `Browse the library (${counts.library})`, onClick: () => onScopeChange('library') }
       : undefined
 
-  const workerScopeColumn = (
-    <>
-      {(['yours', 'library'] as const).map((group) => (
-        <div key={group}>
-          <MillerGroupLabel>{group === 'yours' ? 'Your SOPs' : 'Library'}</MillerGroupLabel>
-          {visibleScopes.filter((sc) => sc.group === group).map((sc) => (
-            <MillerItem
-              key={sc.key}
-              selected={scope === sc.key}
-              onClick={() => onScopeChange(sc.key)}
-              count={counts[sc.key]}
-              data-active={scope === sc.key ? 'true' : undefined}
-            >
-              {sc.label}
-            </MillerItem>
-          ))}
-        </div>
-      ))}
-    </>
-  )
-
   return (
     <>
       {phone && onQueryChange && (
         <PhoneHome site={phone} sops={workerSops} loading={loading} query={query} onQueryChange={onQueryChange} />
       )}
 
-      {/* Scope strip — below lg the left column has nowhere to go, so the
-          same scopes ride here rather than disappearing. */}
-      <div className="lg:hidden mb-4 flex gap-2 overflow-x-auto pb-1">
-        {admin.mobileRows}
-        {visibleScopes.map((sc) => (
-          <button
-            key={sc.key}
-            type="button"
-            onClick={() => onScopeChange(sc.key)}
-            className={`flex-shrink-0 min-h-11 rounded-lg border px-3 text-sm font-medium ${
-              scope === sc.key
-                ? 'border-[var(--ink-900)] bg-[var(--ink-900)] text-white'
-                : 'border-[var(--ink-100)] bg-white text-[var(--ink-700)]'
-            }`}
-          >
-            {sc.label}
-            <span className="mono ml-1 text-meta opacity-70">{counts[sc.key]}</span>
-          </button>
-        ))}
-        {/* Worker department sheet is a dead control under an admin status lens
-            (that list filters by its own scope rows) — same gate as the desktop column. */}
-        {!admin.hideWorkerSummary && (
-          <button
-            type="button"
-            onClick={onOpenDeptSheet}
-            className="flex-shrink-0 inline-flex items-center gap-2 px-4 min-h-11 bg-white border border-[var(--ink-100)] rounded-lg text-sm font-medium text-[var(--ink-900)]"
-          >
-            <span>{activeDeptLabel}</span>
-            <ChevronDown size={16} className="text-[var(--ink-500)]" />
-          </button>
-        )}
-      </div>
-
-      {/* Sketch 005 variant C's frame: one bordered surface, three columns,
-          hairline dividers. Below lg it collapses to the plain card list — the
-          grid, the frame and the two side columns are all lg-only. The frame
-          is pinned to the viewport so each column scrolls on its own and the
-          scope column + detail pane never leave the screen. */}
-      <div className="lg:grid lg:h-[calc(100vh-140px)] lg:min-h-105 lg:grid-cols-[176px_1fr_264px] lg:grid-rows-[minmax(0,1fr)] lg:overflow-hidden lg:rounded-lg lg:border lg:border-[var(--ink-300)] lg:bg-[var(--paper-1)]">
-        <nav
-          aria-label="Scope"
-          data-testid="worker-miller-scope"
-          className="hidden overflow-y-auto border-r border-[var(--ink-200)] lg:block"
-        >
-          {/* The frame's top row reads as one chain — Show → <scope> → Selected.
-              The groups below are sub-labels, never a second header. */}
-          <MillerColumnHeader>Show</MillerColumnHeader>
-          {/* Phase 41 SUR-01/02: admin lenses are rows in this same column,
-              entitled roles only (D-02) — rendered by the lazy AdminSopSurface
-              module via the `admin` slot prop so this file never needs to know
-              the admin scope shape (bundle-regression fix; see
-              AdminSopSurface.tsx). Admins land on their group, so it goes
-              first; the department group always sits last. */}
-          {admin.desktopRows}
-          {workerScopeColumn}
-
-          {/* Departments are rows in this column, not a nested sidebar — the
-              DepartmentSidebar component is a 240px h-screen aside and was
-              being squeezed into a 150px column. The bottom sheet is still the
-              mobile twin; only this desktop rendering changed. */}
-          {/* Worker department filter — hidden while an admin status scope is
-              active, because AdminSopSurface renders its own counted
-              "By department" group for that list (two identical headers
-              otherwise, seen on the 2026-09-15 deployed-site eval). */}
-          {admin.hideWorkerSummary ? admin.desktopDeptRows : (<>
-          <MillerGroupLabel>By department</MillerGroupLabel>
-          <MillerItem selected={allDepartments} onClick={() => onDeptSelect([], !allDepartments)}>
-            All departments
-          </MillerItem>
-          {departments.map((dept) => (
-            <MillerItem
-              key={dept.id}
-              selected={selectedDeptIds.includes(dept.id)}
-              onClick={() =>
-                onDeptSelect(
-                  selectedDeptIds.includes(dept.id)
-                    ? selectedDeptIds.filter((id) => id !== dept.id)
-                    : [...selectedDeptIds, dept.id],
-                  false,
-                )
-              }
-              dot={dept.colour ?? undefined}
-            >
-              {dept.name}
-            </MillerItem>
-          ))}
-          </>)}
-        </nav>
-
-        {admin.inFrameElement ? (
-          admin.inFrameElement
-        ) : loading ? (
-          <div className="flex flex-col gap-2 p-3 lg:col-span-2">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-tap-row animate-pulse rounded-lg bg-[var(--paper-2)] lg:h-9 lg:rounded" />
-            ))}
-          </div>
-        ) : workerSops.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-4 px-8 py-24 text-center lg:col-span-2">
-            <ClipboardList size={48} className="text-[var(--ink-300)]" />
-            <div>
-              <p className="text-xl font-semibold text-[var(--ink-900)]">No SOPs yet</p>
-              <p className="text-sm text-[var(--ink-500)] max-w-xs mx-auto mt-2">
-                Your admin hasn&apos;t published any SOPs yet.
-              </p>
-            </div>
-          </div>
-        ) : (
-          <SopWorkerBrowser
-            sops={scoped}
-            scopeLabel={SCOPE_LABEL[scope]}
-            query={q}
-            emptyAction={emptyAction}
-            onRemove={handleRemove}
-            onAdd={handleAdd}
-            actionPending={pending}
-          />
-        )}
-      </div>
+      <WorkerSimpleList
+        sops={scoped}
+        scopes={visibleScopes.map((sc) => ({ key: sc.key, label: sc.label, count: counts[sc.key] }))}
+        scope={scope}
+        onScopeChange={onScopeChange}
+        scopeLabel={SCOPE_LABEL[scope]}
+        activeDeptLabel={activeDeptLabel}
+        onOpenDeptSheet={onOpenDeptSheet}
+        query={q}
+        emptyAction={emptyAction}
+        loading={loading}
+        noSops={workerSops.length === 0}
+        onAdd={handleAdd}
+        onRemove={handleRemove}
+        actionPending={pending}
+      />
     </>
   )
 }
