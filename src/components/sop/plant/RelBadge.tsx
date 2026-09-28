@@ -2,8 +2,8 @@
  * The shared DUE / UPDATED / NEVER DONE / DONE badge (D-11) — the machine
  * panel and the Now card both use this, so the four-state vocabulary from
  * `src/lib/sop/worker-signal.ts` never gets a second rendering. No hooks, no
- * directive — a plain leaf, tokens only (2026-07-14: never a bare hex or
- * undefined var(--x)).
+ * directive — a plain leaf, tokens only (2026-07-14: never a bare hex or an
+ * undefined custom property).
  */
 import { PLANT_REL_LABEL, type PlantRel } from '@/lib/sop/worker-signal'
 
