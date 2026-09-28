@@ -53,6 +53,8 @@ const WORKER_SOP_LIBRARY = path.join(ROOT, 'src', 'app', '(protected)', 'sops', 
 const STATE_PILL = path.join(ROOT, 'src', 'components', 'admin', 'competency', 'StatePill.tsx')
 const TRAINING_RECORD_SECTION = path.join(ROOT, 'src', 'components', 'admin', 'competency', 'TrainingRecordSection.tsx')
 const TRAINING_MATRIX_VIEW = path.join(ROOT, 'src', 'components', 'admin', 'competency', 'TrainingMatrixView.tsx')
+// Phase 53-02: the refresher derivation moved out of page.tsx into this hook.
+const WORKER_SOPS_HOOK = path.join(ROOT, 'src', 'hooks', 'useWorkerSops.ts')
 
 const TARGETS: Array<{ label: string; file: string }> = [
   { label: 'ReadTab.tsx (worker SOP read surface)', file: READ_TAB },
@@ -63,6 +65,7 @@ const TARGETS: Array<{ label: string; file: string }> = [
   { label: 'StatePill.tsx (shared chip renderer)', file: STATE_PILL },
   { label: 'TrainingRecordSection.tsx (per-worker record panel)', file: TRAINING_RECORD_SECTION },
   { label: 'TrainingMatrixView.tsx (supervisor matrix surface)', file: TRAINING_MATRIX_VIEW },
+  { label: 'useWorkerSops.ts (worker list derivation)', file: WORKER_SOPS_HOOK },
 ]
 
 function read(p: string): string {

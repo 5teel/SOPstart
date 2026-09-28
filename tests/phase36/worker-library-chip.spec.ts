@@ -21,6 +21,9 @@ const SOP_LIBRARY_CARD = path.join(ROOT, 'src', 'components', 'sop', 'SopLibrary
 const WORKER_SOP_LIBRARY = path.join(ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx')
 // The card element itself renders from the page's lazy list chunk, not page.tsx.
 const WORKER_BROWSER = path.join(ROOT, 'src', 'components', 'sop', 'SopWorkerBrowser.tsx')
+// Phase 53-02: the refresher derivation (and its refresherDueDate import)
+// moved out of page.tsx into this hook.
+const WORKER_SOPS_HOOK = path.join(ROOT, 'src', 'hooks', 'useWorkerSops.ts')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
@@ -42,8 +45,8 @@ test.describe('REF-01 / D-08 -- SopLibraryCard refresher-due chip', () => {
 test.describe('REF-01 / D-08 -- worker library page wires the chip from real data', () => {
   const pageSrc = read(WORKER_SOP_LIBRARY)
 
-  test('imports refresherDueDate from @/lib/competency/refresher', () => {
-    expect(pageSrc).toMatch(/import\s*\{[^}]*refresherDueDate[^}]*\}\s*from\s*['"]@\/lib\/competency\/refresher['"]/)
+  test('imports refresherDueDate from @/lib/competency/refresher (Phase 53-02: via the useWorkerSops hook)', () => {
+    expect(read(WORKER_SOPS_HOOK)).toMatch(/import\s*\{[^}]*refresherDueDate[^}]*\}\s*from\s*['"]@\/lib\/competency\/refresher['"]/)
   })
 
   test('the <SopLibraryCard element passes both refresher fields, not merely somewhere in the file', () => {
@@ -54,7 +57,7 @@ test.describe('REF-01 / D-08 -- worker library page wires the chip from real dat
     expect(element).toContain('isRefresherOverdue')
   })
 
-  test('neither file contains a gating branch on the new fields', () => {
+  test('neither file (nor the hook that now derives the fields) contains a gating branch', () => {
     const GATE_FIELDS = 'isRefresherOverdue|isRefresherDue|refresher_interval_months'
     // Same corrected shape as tests/phase36/no-refresher-gate.spec.ts
     // GATE_PATTERN (WR-06): the old `[<>!]` class missed equality gates
@@ -72,5 +75,6 @@ test.describe('REF-01 / D-08 -- worker library page wires the chip from real dat
     expect('isRefresherDue?: boolean').not.toMatch(GATE_PATTERN)
     expect(read(SOP_LIBRARY_CARD)).not.toMatch(GATE_PATTERN)
     expect(pageSrc).not.toMatch(GATE_PATTERN)
+    expect(read(WORKER_SOPS_HOOK)).not.toMatch(GATE_PATTERN)
   })
 })

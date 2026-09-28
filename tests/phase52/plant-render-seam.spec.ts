@@ -103,7 +103,9 @@ test.describe('render seam', () => {
     const sectionSrc = src.slice(sectionStart)
     const slotIdx = sectionSrc.indexOf('if (plant && onQueryChange) return <PlantHome')
     expect(slotIdx).toBeGreaterThan(-1)
-    const lastQueryIdx = sectionSrc.lastIndexOf('useQuery(', slotIdx)
+    // Phase 53-02: the worker-list queries moved into useWorkerSops(); the
+    // hook call is now the last data-fetching statement before the slot.
+    const lastQueryIdx = sectionSrc.lastIndexOf('useWorkerSops(', slotIdx)
     expect(lastQueryIdx).toBeGreaterThan(-1)
     expect(slotIdx).toBeGreaterThan(lastQueryIdx)
   })

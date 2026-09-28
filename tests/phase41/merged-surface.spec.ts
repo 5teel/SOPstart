@@ -30,9 +30,27 @@ import path from 'node:path'
 const ROOT = process.cwd()
 const SOPS_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx')
 const ADMIN_SURFACE = path.join(ROOT, 'src', 'components', 'sop', 'AdminSopSurface.tsx')
+// Phase 53-02: the worker per-SOP list derivation lives here now.
+const WORKER_SOPS_HOOK = path.join(ROOT, 'src', 'hooks', 'useWorkerSops.ts')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8').replace(/\r\n/g, '\n')
+}
+
+/** Recursively lists .ts/.tsx files under a src-relative dir, path separators normalised to '/'. */
+function walk(dir: string, out: string[] = []): string[] {
+  const full = path.join(ROOT, dir)
+  if (!fs.existsSync(full)) return out
+  for (const entry of fs.readdirSync(full, { withFileTypes: true })) {
+    const rel = path.join(dir, entry.name).replace(/\\/g, '/')
+    if (entry.isDirectory()) {
+      if (entry.name === 'node_modules' || entry.name === '.next') continue
+      walk(rel, out)
+    } else if (entry.isFile() && (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx'))) {
+      out.push(rel)
+    }
+  }
+  return out
 }
 
 /** Strips // line comments and block comments so a comment quoting a token
@@ -87,11 +105,32 @@ test.describe('SUR-01 — merged /sops surface gates admin scope on useIsAdmin()
       'selfAddSop',
       'selfRemoveSop',
       'requestRemoveAssignment',
-      'getUserSopAssignments',
-      'refresherDueDate',
+      'useWorkerSops(',
     ]) {
       expect(src).toContain(token)
     }
+    // Phase 53-02: getUserSopAssignments and refresherDueDate moved into
+    // src/hooks/useWorkerSops.ts -- asserted below, not here.
+    const hookSrc = read(WORKER_SOPS_HOOK)
+    expect(hookSrc).toContain('getUserSopAssignments')
+    expect(hookSrc).toContain('refresherDueDate')
+  })
+
+  test('SUR-01: the worker list is derived in exactly one place', () => {
+    const files = walk('src')
+    const owners = files.filter((f) => stripComments(read(path.join(ROOT, f))).includes("queryKey: ['worker-last-completions']"))
+    expect(owners).toEqual(['src/hooks/useWorkerSops.ts'])
+    expect(read(WORKER_SOPS_HOOK)).toContain(".eq('worker_id'")
+    const pageCode = stripComments(read(SOPS_PAGE))
+    // The three queries that moved wholesale into the hook. 'user-sop-assignments'
+    // is excluded here: page.tsx legitimately still references that key in its
+    // two queryClient.invalidateQueries({ queryKey: ['user-sop-assignments'] })
+    // calls (handleRemove/handleAdd) -- the useQuery DEFINITION itself moved
+    // (proved by 'getUserSopAssignments' being absent from page.tsx, asserted above).
+    for (const key of ["queryKey: ['worker-last-completions']", "queryKey: ['sop-refresher-intervals']", "queryKey: ['library-sops']"]) {
+      expect(pageCode).not.toContain(key)
+    }
+    expect(pageCode).not.toContain('getUserSopAssignments')
   })
 })
 
