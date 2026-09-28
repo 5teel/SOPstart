@@ -60,7 +60,14 @@ test.describe('Phase 52 — worker plant home (deployed)', () => {
     await expect
       .poll(async () => stage.locator('img').evaluate((img: HTMLImageElement) => img.naturalWidth), SLOW)
       .toBeGreaterThan(0)
-    await expect(page.getByTestId('plant-machine')).toHaveCount(1, { timeout: SLOW.timeout })
+    // >=1, not ===1: 54-06's governance.eval.ts permanently added a second
+    // machine ("EVAL Oven") to this same eval-site org/layout so it can prove
+    // the "machines with no procedures" inbox row -- this eval only needs to
+    // know the scene painted at least the one it cares about (EVAL Press,
+    // asserted by name below).
+    await expect
+      .poll(async () => page.getByTestId('plant-machine').count(), { timeout: SLOW.timeout })
+      .toBeGreaterThanOrEqual(1)
 
     // 2. No scope column, no worker list search box -- the plant replaces
     // both. { exact: true } is required: Playwright's default name match is

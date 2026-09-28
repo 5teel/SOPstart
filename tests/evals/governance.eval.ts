@@ -203,7 +203,10 @@ test.describe('Phase 54 -- admin governance inbox + floor health (deployed)', ()
     const fixtureRow = fixtureGovRow(page)
     await expect(fixtureRow).toBeVisible(SLOW)
     await fixtureRow.getByRole('button', { name: /Assign owner/ }).click()
-    await page.getByRole('button', { name: /eval-site-admin@sopstart\.com/ }).click()
+    // OwnerPicker's memberLabel() falls back to `${role} (${userId.slice(0,8)})`
+    // when the member has no email/full_name on the returned row (observed on
+    // the deployed eval-site org) -- pick by role label, not by email text.
+    await fixtureRow.getByRole('button', { name: /^admin \(/ }).click()
 
     await expect(async () => {
       await expect(fixtureGovRow(page).getByRole('button', { name: /Assign owner/ })).toHaveCount(0)

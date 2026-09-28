@@ -94,13 +94,19 @@ test.describe('Phase 54 — admin library table + worker fallback (deployed)', (
 
       await page.goto('/sops?status=draft')
       await expect(table(page)).toBeVisible(SLOW)
-      await expect(page.getByTestId('lib-chip-status')).toHaveValue('DRAFT')
+      await expect(page.getByTestId('lib-chip-status')).toHaveValue('DRAFT', SLOW)
       const statuses = await page.getByTestId('lib-status').evaluateAll((els) => els.map((e) => e.getAttribute('data-status')))
       expect(statuses.every((s) => s === 'DRAFT')).toBe(true)
 
+      // eval-admin may legitimately own zero SOPs on prod (real data, not a
+      // fixture) -- the deep link is proven by the resolved chip value once
+      // the dynamic chunk + query have settled, and the surface itself is
+      // either the table or its own empty state, never a blank page. Wait
+      // for that settled state FIRST (the chip <select> doesn't exist during
+      // the loading skeleton), then read the chip.
       await page.goto('/sops?owner=me')
-      await expect(table(page)).toBeVisible(SLOW)
-      await expect(page.getByTestId('lib-chip-owner')).toHaveValue('me')
+      await expect(table(page).or(page.getByText('No SOPs match these filters.'))).toBeVisible(SLOW)
+      await expect(page.getByTestId('lib-chip-owner')).toHaveValue('me', SLOW)
 
       await page.goto('/sops')
       await expect(table(page)).toBeVisible(SLOW)
