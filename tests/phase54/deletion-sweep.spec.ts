@@ -59,9 +59,9 @@ const PERMITTED_ATTENTION_FILES = [
 ]
 const EXPECTED_ATTENTION_COUNT = 2
 
-// 54-06 rewrites tests/evals/sop-surface.eval.ts for the new surfaces; until
-// then it still documents/exercises the old routes and is exempt here.
-const TESTS_EXCLUDED_DIRS = [path.join('tests', 'evals')]
+// 54-06 rewrote every eval that named the retired surface (governance.eval.ts,
+// sop-surface.eval.ts, plant-home.eval.ts) -- the scan now covers tests/evals too.
+const TESTS_EXCLUDED_DIRS = [] as string[]
 
 function read(relPath: string): string {
   return fs.readFileSync(path.join(ROOT, relPath), 'utf-8').replace(/\r\n/g, '\n')

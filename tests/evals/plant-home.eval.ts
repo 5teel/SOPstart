@@ -66,7 +66,7 @@ test.describe('Phase 52 — worker plant home (deployed)', () => {
     // both. { exact: true } is required: Playwright's default name match is
     // a case-insensitive substring, and "Ask or search SOPs" (PlantAskBar)
     // contains "search SOPs" -- a loose match here would count the ask bar.
-    await expect(page.getByTestId('worker-miller-scope')).toHaveCount(0)
+    await expect(page.getByTestId('worker-list')).toHaveCount(0)
     await expect(page.getByRole('searchbox', { name: 'Search SOPs', exact: true })).toHaveCount(0)
 
     // 3. A pin on EVAL Press.
@@ -156,7 +156,7 @@ test.describe('Phase 52 — worker plant home (deployed)', () => {
 
     await signInAs(context, 'worker')
     await page.goto('/sops')
-    await expect(page.getByTestId('worker-miller-scope')).toBeVisible(SLOW)
+    await expect(page.getByTestId('worker-list')).toBeVisible(SLOW)
     await expect(page.getByTestId('plant-stage')).toHaveCount(0)
     await expect(page.getByRole('searchbox', { name: 'Search SOPs', exact: true })).toBeVisible()
     await shot(page, 'plant-home-fallback')

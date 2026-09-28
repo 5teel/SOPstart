@@ -1,20 +1,16 @@
 /**
- * Deployed-site eval — Phase 41 "One SOP Surface".
+ * Deployed-site eval — Phase 54 "Admin — Inbox, Floor Health, Library Table".
  *
- * Replaces the 19-question human click-path. Runs against EVAL_BASE_URL
- * (normally https://sopstart.com via `npm run eval`) as the two eval fixture
- * accounts, asserts the surface at DOM level, and saves screenshots for the
- * visual items into .planning/evals/latest/ for the orchestrator to inspect.
+ * Replaces the Phase 41 Miller/scope-column eval: admin `/sops` is now a
+ * plain checks table (AdminLibraryTable), the attention lens moved to its
+ * own route (/governance), and the worker desktop/mobile fallback is
+ * WorkerSimpleList (no Miller frame anywhere — D-09/D-10). Runs against
+ * EVAL_BASE_URL (normally https://sopstart.com via `npm run eval`) as the
+ * two real-org eval fixture accounts, asserts the surface at DOM level, and
+ * saves screenshots for the visual items into .planning/evals/latest/.
  *
- * Every test self-skips when EVAL_BASE_URL is unset so the normal suite never
- * touches production.
- *
- * DOM facts (probed 2026-09-15): desktop rows are `li > button` inside the
- * Miller frame; "Open" in the detail pane goes to the worker view (/sops/<id>)
- * and "Edit" is the only list→builder chain; mobile rows are `a[href^=/sops/]`
- * with `lg:hidden`. Admin status lenses span two grid columns (`lg:col-span-2`),
- * so the frame has 2 children under an admin status scope and 3 under a worker
- * scope. Server actions take 2–5 s on prod — wait generously.
+ * Every test self-skips when EVAL_BASE_URL is unset so the normal suite
+ * never touches production.
  */
 import { test, expect, type Page } from '@playwright/test'
 import path from 'node:path'
@@ -42,142 +38,119 @@ function watchConsole(page: Page) {
 }
 
 const SLOW = { timeout: 25_000 }
-const scopeColumn = (page: Page) => page.getByTestId('worker-miller-scope')
-const frame = (page: Page) => scopeColumn(page).locator('..')
-const rows = (page: Page) => frame(page).locator('li > button')
-const backLink = (page: Page) => page.getByRole('link', { name: /Back to your SOPs/ }).or(page.getByRole('button', { name: /Back to your SOPs/ }))
+const table = (page: Page) => page.getByTestId('library-table')
+const rows = (page: Page) => page.getByTestId('lib-row')
 
-test.describe('Phase 41 — one SOP surface (deployed)', () => {
+test.describe('Phase 54 — admin library table + worker fallback (deployed)', () => {
   test.skip(!EVAL_ENV_READY, 'set EVAL_BASE_URL (+ Supabase keys in .env.local) — run via `npm run eval`')
 
   test.describe('admin, desktop', () => {
     test.use({ viewport: { width: 1440, height: 900 } })
 
-    test('A — Admin scope group renders inside the Miller frame with counts, one department group, columns aligned', async ({ page, context }) => {
+    test('A — library table: checks row, one builder chain per row, header/search', async ({ page, context }) => {
       const errors = watchConsole(page)
       await signInAs(context, 'admin')
       await page.goto('/sops')
-      const col = scopeColumn(page)
-      await expect(col.getByText('Admin', { exact: true })).toBeVisible()
-      for (const label of ['All SOPs', 'Drafts', 'Published', 'Needs attention', 'Access', 'Owned by me']) {
-        await expect(col.getByText(label, { exact: true }), label).toBeVisible()
-      }
+      await expect(table(page)).toBeVisible(SLOW)
       await expect(rows(page).first()).toBeVisible(SLOW)
-      // counts next to the admin rows
-      await expect.poll(async () => (await col.innerText()).match(/All SOPs\s*\d+/) !== null, SLOW).toBe(true)
-      // exactly one "By department" group — two identical headers was the 2026-09-15 defect
-      await expect(col.getByText('By department', { exact: true })).toHaveCount(1)
-      // the frame's top row reads as one chain: Show → <scope> → Selected
-      const heads = frame(page).locator('h2')
-      await expect(heads.nth(0)).toHaveText('Show')
-      await expect(heads.nth(1)).toContainText(/All SOPs|All/)
-      await expect(heads.nth(2)).toHaveText('Selected')
-      // 2026-09-26 redesign: Admin group sits FIRST in the column (admins land there)
-      expect((await col.innerText()).indexOf('ADMIN')).toBeLessThan((await col.innerText()).indexOf('YOUR SOPS'))
-      // ...and the detail pane is never blank: the first row is pre-selected, Open is live
-      await expect(page.getByRole('link', { name: 'Open', exact: true })).toBeVisible(SLOW)
-      // toolbar: inline search box only (creating a SOP stays in the header — UX-04 one create entry)
-      await expect(page.locator('nav').getByRole('link', { name: 'New SOP', exact: true })).toHaveCount(0)
+
+      const firstChecks = rows(page).first().getByTestId('lib-check')
+      await expect(firstChecks).toHaveCount(5)
+      const states = await firstChecks.evaluateAll((els) => els.map((e) => e.getAttribute('data-state')))
+      expect(states.every((s) => s === 'ok' || s === 'warn' || s === 'bad')).toBe(true)
+
+      // Never spell a deleted testid here — the deletion sweep scans evals
+      // too. Assert the retired scope-column text is gone instead.
+      await expect(page.getByText('Needs attention', { exact: true })).toHaveCount(0)
+      await expect(page.getByText('Show', { exact: true })).toHaveCount(0)
+
       await expect(page.getByRole('searchbox', { name: 'Search SOPs' })).toBeVisible()
-      // grid columns share one height
-      // Both browsers render as `display: contents`, so the grid items are the
-      // wrappers' children — a contents box itself measures 0 tall.
-      const heights = await col.evaluate((el) =>
-        Array.from(el.parentElement!.children)
-          .flatMap((c) => (getComputedStyle(c).display === 'contents' ? Array.from(c.children) : [c]))
-          .map((c) => (c as HTMLElement).getBoundingClientRect().height)
-      )
-      expect(heights.length).toBeGreaterThanOrEqual(2)
-      expect(Math.max(...heights) - Math.min(...heights)).toBeLessThanOrEqual(2)
-      await shot(page, 'admin-sops')
+
+      const firstTitleLink = rows(page).first().locator('a[href^="/sops/"]').first()
+      expect(await firstTitleLink.getAttribute('href')).toMatch(/^\/sops\/[0-9a-f-]{36}$/)
+      const firstEdit = rows(page).first().getByTestId('lib-edit')
+      expect(await firstEdit.getAttribute('href')).toMatch(/^\/admin\/sops\/builder\/[0-9a-f-]{36}$/)
+
+      const rowCount = await rows(page).count()
+      await expect(page.locator('a[href^="/admin/sops/builder/"]')).toHaveCount(rowCount) // one chain per row
+
+      await expect(page.locator('header').getByRole('link', { name: 'SOPs', exact: true })).toHaveCount(1)
+      await shot(page, 'admin-library')
       expect(errors).toEqual([])
     })
 
-    test('B — Drafts lens lists SOPs, Open goes to the worker view and Edit is the one builder chain, attention stays in-frame, access takes over full-width and returns without reload', async ({ page, context }) => {
-      const errors = watchConsole(page)
+    test('B — chips narrow the table and resolve deep links', async ({ page, context }) => {
       await signInAs(context, 'admin')
       await page.goto('/sops')
-      await scopeColumn(page).getByText('Drafts', { exact: true }).click()
-      await expect(rows(page).first()).toBeVisible(SLOW)
-      await rows(page).first().click()
-      const open = page.getByRole('link', { name: 'Open', exact: true })
-      await expect(open).toBeVisible(SLOW)
-      expect(await open.getAttribute('href')).toMatch(/^\/sops\/[0-9a-f-]{36}$/) // the SOP itself, not the editor
-      const edit = page.getByRole('link', { name: 'Edit', exact: true })
-      expect(await edit.getAttribute('href')).toMatch(/^\/admin\/sops\/builder\/[0-9a-f-]{36}$/)
-      await expect(page.locator('a[href^="/admin/sops/builder/"]:visible')).toHaveCount(1) // one chain, not two
+      await expect(table(page)).toBeVisible(SLOW)
 
-      await page.evaluate(() => { (window as unknown as { __eval: number }).__eval = 1 })
-      await scopeColumn(page).getByText('Needs attention', { exact: true }).click()
-      await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 45_000 }) // queue settled
-      // 2026-09-27: attention is a filter row, not a takeover — the scope column
-      // stays, exactly one row is lit, the search box stays, no back link.
-      await expect(scopeColumn(page)).toBeVisible()
-      await expect(scopeColumn(page).locator('[aria-current="true"]')).toHaveCount(1)
-      await expect(page.getByRole('searchbox', { name: 'Search SOPs' })).toBeVisible()
-      await expect(backLink(page)).toHaveCount(0)
-      await expect(page.getByText(/Nothing needs attention|·\s*\d+/).first()).toBeVisible(SLOW)
-      await shot(page, 'admin-attention')
-      await scopeColumn(page).getByText('All SOPs', { exact: true }).click()
-      await expect(rows(page).first()).toBeVisible(SLOW)
-      expect(await page.evaluate(() => (window as unknown as { __eval?: number }).__eval)).toBe(1) // no full reload
-      expect(page.url()).toMatch(/\/sops(\?|$)/)
+      await page.getByTestId('lib-chip-status').selectOption('DRAFT')
+      await expect
+        .poll(async () => {
+          const statuses = await page.getByTestId('lib-status').evaluateAll((els) => els.map((e) => e.getAttribute('data-status')))
+          return statuses.length > 0 && statuses.every((s) => s === 'DRAFT')
+        }, SLOW)
+        .toBe(true)
 
-      await scopeColumn(page).getByText('Access', { exact: true }).click()
-      await expect(backLink(page)).toBeVisible(SLOW)
-      await expect(scopeColumn(page)).toBeHidden() // full width, frame replaced
-      await expect(page.locator('.animate-pulse')).toHaveCount(0, { timeout: 45_000 }) // data settled (~3 s on prod)
-      await expect(page.getByRole('heading', { name: /Whole site/i })).toBeVisible()
-      await shot(page, 'admin-access')
-      await backLink(page).click()
-      await expect(scopeColumn(page)).toBeVisible(SLOW)
-      expect(errors).toEqual([])
-    })
+      await page.goto('/sops?status=draft')
+      await expect(table(page)).toBeVisible(SLOW)
+      await expect(page.getByTestId('lib-chip-status')).toHaveValue('DRAFT')
+      const statuses = await page.getByTestId('lib-status').evaluateAll((els) => els.map((e) => e.getAttribute('data-status')))
+      expect(statuses.every((s) => s === 'DRAFT')).toBe(true)
 
-    test('C — worker behaviours survive for an admin: All yours scope, search overlay, department filter', async ({ page, context }) => {
-      await signInAs(context, 'admin')
+      await page.goto('/sops?owner=me')
+      await expect(table(page)).toBeVisible(SLOW)
+      await expect(page.getByTestId('lib-chip-owner')).toHaveValue('me')
+
       await page.goto('/sops')
-      await scopeColumn(page).getByText('All yours', { exact: true }).click()
-      await expect(scopeColumn(page).getByText('All departments', { exact: true })).toBeVisible(SLOW)
-      await expect(scopeColumn(page).getByText('By department', { exact: true })).toHaveCount(1)
-      await scopeColumn(page).getByText('Everything', { exact: true }).click()
-      await expect(page.getByTestId('worker-miller-row').first()).toBeVisible(SLOW)
-      // 2026-09-26 redesign: search is an inline box that narrows the list you are on — no overlay
+      await expect(table(page)).toBeVisible(SLOW)
       const search = page.getByRole('searchbox', { name: 'Search SOPs' })
-      const before = await page.getByTestId('worker-miller-row').count()
       await search.fill('zzzz-no-such-sop')
-      await expect(page.getByText(/Nothing matches/)).toBeVisible()
-      await page.getByRole('button', { name: 'Clear search' }).click()
-      await expect(page.getByTestId('worker-miller-row')).toHaveCount(before)
-      // ...and it narrows the ADMIN list too
-      await scopeColumn(page).getByText('All SOPs', { exact: true }).click()
-      await expect(rows(page).first()).toBeVisible(SLOW)
-      await search.fill('forming')
-      await expect.poll(async () => (await rows(page).allInnerTexts()).every((t) => /forming/i.test(t)), SLOW).toBe(true)
-      await shot(page, 'admin-search')
+      await expect(page.getByText('No SOPs match these filters.')).toBeVisible(SLOW)
+      await shot(page, 'admin-library-filtered')
       await search.fill('')
     })
 
-    test('D — one SOPs door: single nav entry, legacy admin URLs redirect onto /sops, Governance deep-links the attention lens', async ({ page, context }) => {
+    test('C — Access lens opens full-width and returns without a reload', async ({ page, context }) => {
       await signInAs(context, 'admin')
       await page.goto('/sops')
-      const nav = page.locator('header')
-      await expect(nav.getByRole('link', { name: 'SOPs', exact: true })).toHaveCount(1)
-      await expect(nav.getByRole('link', { name: /Manage SOPs/ })).toHaveCount(0)
+      await expect(table(page)).toBeVisible(SLOW)
 
-      await page.goto('/admin/sops?view=access')
-      await expect(page).toHaveURL(/\/sops\?.*view=access/)
-      await expect(backLink(page)).toBeVisible(SLOW)
+      await page.evaluate(() => { (window as unknown as { __eval: number }).__eval = 1 })
+      await page.getByTestId('lib-access').click()
+      const back = page.getByRole('button', { name: /Back to your SOPs/ })
+      await expect(back).toBeVisible(SLOW)
+      await expect(page.getByRole('heading', { name: /Whole site/i })).toBeVisible(SLOW)
+      await expect(table(page)).toBeHidden()
+      await shot(page, 'admin-access')
+
+      await back.click()
+      await expect(table(page)).toBeVisible(SLOW)
+      expect(await page.evaluate(() => (window as unknown as { __eval?: number }).__eval)).toBe(1) // no full reload
+
+      await page.goto('/sops?view=access')
+      await expect(page.getByRole('button', { name: /Back to your SOPs/ })).toBeVisible(SLOW)
+    })
+
+    test('D — legacy governance URLs land on /governance; legacy status URL keeps resolving onto the table', async ({ page, context }) => {
+      await signInAs(context, 'admin')
+
+      await page.goto('/admin/sops?view=attention')
+      await expect(page).toHaveURL(/\/governance$/)
+      await expect(page.getByTestId('gov-inbox')).toBeVisible(SLOW)
+
+      await page.goto('/sops?view=attention')
+      await expect(page).toHaveURL(/\/governance$/)
+      await expect(page.getByTestId('gov-inbox')).toBeVisible(SLOW)
+      await shot(page, 'admin-governance')
+
+      await page.goto('/admin/governance')
+      await expect(page).toHaveURL(/\/governance$/)
+      await expect(page.getByTestId('gov-inbox')).toBeVisible(SLOW)
 
       await page.goto('/admin/sops?status=draft')
       await expect(page).toHaveURL(/\/sops\?.*status=draft/)
-      await expect(rows(page).first()).toBeVisible(SLOW)
-
-      await page.goto('/sops')
-      await nav.getByRole('link', { name: 'Governance', exact: true }).click()
-      await expect(page).toHaveURL(/\/sops\?.*view=attention/)
-      // in-frame lens: the column stays and "Needs attention" is the lit row
-      await expect(scopeColumn(page).locator('[aria-current="true"]')).toHaveText(/Needs attention/, SLOW)
+      await expect(table(page)).toBeVisible(SLOW)
     })
 
     test('E — pathways map reports zero unmapped screens', async ({ page, context }) => {
@@ -189,47 +162,54 @@ test.describe('Phase 41 — one SOP surface (deployed)', () => {
   })
 
   test.describe('worker', () => {
-    test('F1 — desktop: no Admin group, legacy admin URL bounces away from admin params', async ({ page, context }) => {
+    test('F1 — desktop: no library table, no Governance link, worker list or plant', async ({ page, context }) => {
       await page.setViewportSize({ width: 1440, height: 900 })
       const errors = watchConsole(page)
       await signInAs(context, 'worker')
       await page.goto('/sops')
-      await expect(scopeColumn(page)).toBeVisible()
-      await expect(scopeColumn(page).getByText('Admin', { exact: true })).toHaveCount(0)
-      await expect(scopeColumn(page).getByText('Needs attention', { exact: true })).toHaveCount(0)
-      // zero-count sub-scopes are not listed — no column of zeros (the fixture worker has nothing assigned)
-      for (const label of ['Refresher due', 'Updated', 'Never done', 'Not added yet']) {
-        await expect(scopeColumn(page).getByText(label, { exact: true }), label).toHaveCount(0)
-      }
-      // no dead end: either the worker has rows, or the empty state hands them the library
+      await expect(table(page)).toHaveCount(0)
+      await expect(page.locator('header').getByRole('link', { name: 'Governance', exact: true })).toHaveCount(0)
+
+      const list = page.getByTestId('worker-list')
       const door = page.getByRole('button', { name: /Browse the library/ })
-      await expect(door.or(page.getByTestId('worker-miller-row').first())).toBeVisible(SLOW)
+      await expect(list.or(door)).toBeVisible(SLOW)
       await shot(page, 'worker-sops')
       if (await door.isVisible()) {
         await door.click()
-        await expect(page.getByTestId('worker-miller-row').first()).toBeVisible(SLOW)
-        await expect(page.getByRole('link', { name: /Walk it/ })).toBeVisible() // detail pre-selected
-        await shot(page, 'worker-library')
+        await expect(list).toBeVisible(SLOW)
       }
+      const row = page.getByTestId('worker-list-row').first()
+      if (await row.isVisible().catch(() => false)) {
+        await expect(
+          row
+            .getByRole('button', { name: /Add to your SOPs/ })
+            .or(row.getByRole('button', { name: /Remove from your SOPs/ }))
+            .or(row.getByRole('button', { name: /Ask to be taken off this/ }))
+        ).toBeVisible()
+      }
+
       await page.goto('/admin/sops?view=attention')
-      await expect(page).not.toHaveURL(/view=attention/)
+      await expect(page).not.toHaveURL(/\/governance$/)
       expect(errors).toEqual([])
     })
 
-    test('F2 — mobile: stacked worker list, no admin scopes', async ({ page, context }) => {
+    test('F2 — mobile: no library table, no Governance link', async ({ page, context }) => {
       await page.setViewportSize({ width: 390, height: 844 })
       await signInAs(context, 'worker')
       await page.goto('/sops')
-      await expect(page.getByText('Admin', { exact: true })).toHaveCount(0)
-      await expect(page.getByText('Needs attention', { exact: true })).toHaveCount(0)
-      await expect(page.getByRole('searchbox', { name: 'Search SOPs' })).toBeVisible()
+      await expect(table(page)).toHaveCount(0)
+      await expect(page.getByRole('link', { name: 'Governance', exact: true })).toHaveCount(0)
       await shot(page, 'worker-mobile')
-      const door = page.getByRole('button', { name: /Browse the library/ })
-      if (await door.isVisible()) {
-        await door.click()
-        await expect(page.locator('a[href^="/sops/"]').first()).toBeVisible(SLOW)
-        await shot(page, 'worker-mobile-library')
-      }
+    })
+
+    test('F3 — admin on a phone renders no library table (an admin on a phone is a worker, D-07)', async ({ page, context }) => {
+      await page.setViewportSize({ width: 390, height: 844 })
+      await signInAs(context, 'admin')
+      await page.goto('/sops')
+      await expect(table(page)).toHaveCount(0)
+      const list = page.getByTestId('worker-list').or(page.getByTestId('phone-home'))
+      await expect(list).toBeVisible(SLOW)
+      await shot(page, 'admin-mobile')
     })
   })
 })
