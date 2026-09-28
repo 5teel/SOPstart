@@ -973,6 +973,29 @@ export const UAT_TESTS: UatTest[] = [
       'HOM-01..06 (Phase 52) — a desktop, non-admin worker whose org has a drawn site (>=1 machine) sees PlantHome instead of the Miller frame; pins/Now card/ask bar all derive from worker-signal.ts, never stored. Admins and phone widths are unaffected this phase (Phase 53/54).',
   },
   {
+    id: 'phone-home-worker',
+    dateAdded: '2026-09-29',
+    category: 'Worker home',
+    title: 'Can a worker get to a machine\'s jobs from their phone?',
+    status: 'active',
+    summary:
+      'On a phone, the SOPs page now starts with a search box, the next job, a picture of the site and a Scan button.',
+    tryIt: [
+      'Sign in as a worker on your phone.',
+      'Look at the top of the SOPs page.',
+      'Tap the picture of the site and pick a machine.',
+      'Go back and tap Scan a machine plate — point it at a printed plate, or type the code under it.',
+    ],
+    links: [{ label: 'Open SOPs', href: '/sops' }],
+    questions: [
+      { id: 'clear-first-step', text: 'Was it clear what to do first?' },
+      { id: 'right-jobs', text: 'Did picking a machine show the right jobs?' },
+      { id: 'scan-right-machine', text: 'Did scanning (or typing the code) take you to the right machine?' },
+    ],
+    background:
+      'PHN-01..03 (Phase 53) — below 1024px a worker (or an admin on a phone) whose org has a drawn site sees the phone home: ask bar, Now card, floor thumbnail → department-grouped machine sheet, and an in-app QR scanner with a typed-code fallback, all resolving to /m/<code>.',
+  },
+  {
     id: 'example-direction-template',
     dateAdded: '2026-06-09',
     category: 'Examples',
