@@ -1576,9 +1576,9 @@ Executes 51 → 52 → 53 ∥ 54 → (v8.0 Phase 43).
 Plans:
 
 - [x] 51-01-PLAN.md — Wave-0 scaffold: phase51 project + stubs, Konva allow-list, eval skeleton + fixture PNG, site model contract (TDD)
-- [ ] 51-02-PLAN.md — Migration 00067 (3 tables, RLS, site-scenes bucket) + [BLOCKING] live push + RLS/FK/storage probes + capability matrix
-- [ ] 51-03-PLAN.md — src/actions/site.ts (7 actions), Gemini generate route, SiteEmptyState, env example
-- [ ] 51-04-PLAN.md — Konva SiteEditor (natural-size scene, pan/zoom/fit, draw/select/vertex drag) + dynamic loader
+- [x] 51-02-PLAN.md — Migration 00067 (3 tables, RLS, site-scenes bucket) + [BLOCKING] live push + RLS/FK/storage probes + capability matrix
+- [x] 51-03-PLAN.md — src/actions/site.ts (7 actions), Gemini generate route, SiteEmptyState, env example
+- [x] 51-04-PLAN.md — Konva SiteEditor (natural-size scene, pan/zoom/fit, draw/select/vertex drag) + dynamic loader
 - [ ] 51-05-PLAN.md — /admin/site page + SiteWorkspace panel (rename, department, delete, SOP links) + header Site link + journeys
 - [ ] 51-06-PLAN.md — Builder Tools menu "Pick machines for this SOP" modal
 - [ ] 51-07-PLAN.md — Deployed eval (isolated eval-site org), full gates, push, run eval, read screenshots
@@ -1708,7 +1708,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 
 **Goal:** Scheduled task or cron that marks video_generation_jobs stuck in queued/analyzing/generating_audio/rendering for >30 minutes as 'failed' with a timeout error. Could also notify admin. Triggered by finding a hours-old rendering job during Phase 10 verification.
 **Requirements:** TBD
-**Plans:** 1/7 plans executed
+**Plans:** 4/7 plans executed
 
 Plans:
 

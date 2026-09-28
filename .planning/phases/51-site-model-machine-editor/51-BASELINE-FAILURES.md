@@ -41,3 +41,9 @@ Do not fix or interpret these — they pre-date this phase.
   auth rate limit hit during this specific run (transient infra, not a code
   regression). A re-run may show a different pass/fail split on these four.
 - `evals` project tests self-skip (no `EVAL_BASE_URL`) and are not counted above.
+
+## Wave 2 post-merge gate (2026-09-28, HEAD b485141)
+
+- `npx tsc --noEmit` clean · `npm run build` clean · bundle gate ✓ (/sops/[sopId] −3 KB, /sops −3 KB, Konva isolation ✓)
+- Full suite: non-live failures = the same 16 baseline stubs (phase11-stubs ×10, phase12.5-stubs ×5, phase25-integration ×1). Every additional failure was a live-Supabase probe (phase33/34/35/36/37/46/51) failing with `verifyOtp failed: Request rate limit reached` — Supabase Auth's OTP verification cap, exhausted by three consecutive full-suite runs. `tests/phase51/site-model-rls-runtime.spec.ts` passed 19/19 in isolation during 51-02 before the cap was hit.
+- Rule for 51-07: run the full suite ONCE, then re-run only the live-probe projects after the rate window resets; do not treat rate-limit failures as regressions, and do not loop the suite.
