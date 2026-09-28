@@ -10,12 +10,20 @@
  * no zoom and no camera here (D-03); tapping it opens MachineListSheet.
  */
 import { useMemo, useState } from 'react'
+import dynamic from 'next/dynamic'
+import { ScanLine } from 'lucide-react'
 import { NowCard } from '@/components/sop/plant/NowCard'
 import { PlantAskBar } from '@/components/sop/plant/PlantAskBar'
 import { MachineListSheet } from '@/components/sop/plant/MachineListSheet'
 import { derivePlantPins, pickNowQueue, type WorkerSop } from '@/lib/sop/worker-signal'
 import { zoneColour } from '@/lib/site/scene'
 import type { WorkerSiteData } from '@/lib/validators/site'
+
+// The scanner and its decoder never enter this page's base bundle (D-09) --
+// this is the only place ScanSheet is referenced, and it is loaded lazily.
+const ScanSheet = dynamic(() => import('@/components/sop/plant/ScanSheet').then((m) => m.ScanSheet), {
+  ssr: false,
+})
 
 export function PhoneHome({
   site,
@@ -31,6 +39,7 @@ export function PhoneHome({
   onQueryChange(q: string): void
 }) {
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [scanOpen, setScanOpen] = useState(false)
 
   const { pins, nowItems, colourByDept } = useMemo(() => {
     const sopsById = new Map(sops.map((s) => [s.id, s]))
@@ -63,6 +72,16 @@ export function PhoneHome({
         </span>
       </button>
 
+      <button
+        type="button"
+        data-testid="phone-scan"
+        onClick={() => setScanOpen(true)}
+        className="flex min-h-tap-glove w-full items-center justify-center gap-2 rounded-lg bg-[var(--ink-900)] text-base font-semibold text-white"
+      >
+        <ScanLine className="h-5 w-5" aria-hidden="true" />
+        Scan a machine plate
+      </button>
+
       <h2 className="mono mt-1 text-meta uppercase tracking-widest text-[var(--ink-500)]">Everything else</h2>
 
       <MachineListSheet
@@ -73,6 +92,8 @@ export function PhoneHome({
         colourByDept={colourByDept}
         pins={pins}
       />
+
+      {scanOpen && <ScanSheet onClose={() => setScanOpen(false)} />}
     </section>
   )
 }

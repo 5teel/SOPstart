@@ -19,6 +19,8 @@ import QRCode from 'qrcode'
 import { extractMachineCode } from '@/lib/site/qr-decode'
 
 const ROOT = path.resolve(__dirname, '..', '..')
+const SCAN_SHEET_PATH = path.join(ROOT, 'src', 'components', 'sop', 'plant', 'ScanSheet.tsx')
+const PHONE_HOME_PATH = path.join(ROOT, 'src', 'components', 'sop', 'plant', 'PhoneHome.tsx')
 
 function read(rel: string): string {
   return fs.readFileSync(path.join(ROOT, rel), 'utf-8').replace(/\r\n/g, '\n')
@@ -213,12 +215,47 @@ test.describe('ScanSheet', () => {
   })
 })
 
-// PhoneHome wiring (Scan button, dynamic-only loading, bundle marker) --
-// activates 53-05 Task 2.
 test.describe('PhoneHome — scan sheet wiring', () => {
-  test.fixme('activates 53-05 Task 2: ScanSheet is referenced only via next/dynamic with ssr: false', () => {})
-  test.fixme('activates 53-05 Task 2: phone-scan button opens the sheet; ScanSheet is mounted only while open', () => {})
-  test.fixme('activates 53-05 Task 2: JSX order is phone-thumb, then phone-scan, then "Everything else"', () => {})
-  test.fixme('activates 53-05 Task 2: no other file in src references ScanSheet, and neither ScanSheet nor jsqr appear in /sops/page.tsx', () => {})
-  test.fixme('activates 53-05 Task 2: scripts/check-bundle-size.ts carries the scan sheet marker group on both gated routes', () => {})
+  const raw = read('src/components/sop/plant/PhoneHome.tsx')
+  const code = stripComments(raw)
+
+  test('ScanSheet is referenced only via next/dynamic with ssr: false', () => {
+    expect(code).toMatch(
+      /dynamic\(\(\) => import\('@\/components\/sop\/plant\/ScanSheet'\)\.then\(\(m\) => m\.ScanSheet\),\s*\{\s*ssr:\s*false,?\s*\}\)/
+    )
+  })
+
+  test('phone-scan button opens the sheet; ScanSheet is mounted only while open and closes back through the same setter', () => {
+    expect(code).toMatch(/data-testid="phone-scan"[\s\S]{0,300}onClick=\{?\(\) => setScanOpen\(true\)\}?/)
+    expect(code).toMatch(/scanOpen && <ScanSheet onClose=\{\(\) => setScanOpen\(false\)\}/)
+  })
+
+  test('JSX order is phone-thumb, then phone-scan, then "Everything else"', () => {
+    const thumbIdx = code.indexOf('data-testid="phone-thumb"')
+    const scanIdx = code.indexOf('data-testid="phone-scan"')
+    const elseIdx = code.indexOf('Everything else')
+    expect(thumbIdx).toBeGreaterThan(-1)
+    expect(scanIdx).toBeGreaterThan(thumbIdx)
+    expect(elseIdx).toBeGreaterThan(scanIdx)
+  })
+
+  test('no other file in src references ScanSheet, and neither ScanSheet nor jsqr appear in /sops/page.tsx', () => {
+    const hits: string[] = []
+    for (const f of listFiles('src')) {
+      if (path.resolve(f) === path.resolve(PHONE_HOME_PATH)) continue
+      if (path.resolve(f) === path.resolve(SCAN_SHEET_PATH)) continue
+      const text = read(f)
+      if (text.includes('ScanSheet')) hits.push(f)
+    }
+    expect(hits).toEqual([])
+    const sopsPage = read('src/app/(protected)/sops/page.tsx')
+    expect(sopsPage).not.toContain('ScanSheet')
+    expect(sopsPage).not.toContain('jsqr')
+  })
+
+  test('scripts/check-bundle-size.ts carries the scan sheet marker group on both gated routes', () => {
+    const gate = read('scripts/check-bundle-size.ts')
+    const hits = gate.match(/scan sheet \(53 D-09\)/g) ?? []
+    expect(hits.length).toBe(2)
+  })
 })

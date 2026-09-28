@@ -141,7 +141,8 @@ export const JOURNEYS: Journey[] = [
       { id: 'where', type: 'decision', label: 'How do they start?', branches: [
         { label: 'On a desktop, and the site has a map', to: 'plant' },
         { label: 'Scanned the QR plate on a machine', to: 'machine' },
-        { label: 'Phone, or no map drawn yet', to: 'lib' },
+        { label: 'On a phone, and the site has a map', to: 'phone' },
+        { label: 'No map drawn yet', to: 'lib' },
       ] },
       { id: 'plant', type: 'screen', label: 'Plant home — the site map', route: '/sops', detail: 'The site drawing with every machine clickable (Phase 52). An amber pin on a machine counts that worker\'s procedures there that are due, never done, or updated — worked out live from the worker\'s own list, never stored (D-05/D-06). The "Next for you" card shows the single next procedure with Walk it and Show me. Department chips move the view to that department\'s machines. The ask bar lights up matching machines as the worker types, and its mic opens the same voice Q&A as the walkthrough. Admins still see today\'s SOP list here (Phase 54 repaints their view).' },
       { id: 'pick', type: 'decision', label: 'How do they get there?', branches: [
@@ -155,6 +156,15 @@ export const JOURNEYS: Journey[] = [
       { id: 'machine', type: 'screen', label: 'Machine page', route: '/m/[code]', detail: 'Opened by scanning the plate stuck on the machine. Shows the department, the machine, its photo or "no photo yet", and its procedures with the things to do first, each with a Walk › link and a plain Read link. A code from another site shows "not found" — nothing tells the two apart. Signed-out people sign in and land straight back here (Phase 53).', branches: [
         { label: 'Walk ›', to: 'walk' },
         { label: 'Read', to: 'detail' },
+      ] },
+      { id: 'phone', type: 'screen', label: 'Phone home', route: '/sops', detail: 'Below 1024px, a worker (or an admin on a phone -- an admin on a phone is a worker) whose org has a drawn site sees: the ask bar with a microphone, the Next for you card with Walk it and Read, a picture of the floor, a Scan a machine plate button, then everything else (Phase 53).' },
+      { id: 'phone-pick', type: 'decision', label: 'How do they get there?', branches: [
+        { label: 'Scan a machine plate', to: 'scan' },
+        { label: 'Tap the floor picture, pick a machine', to: 'machine' },
+        { label: 'Next for you → Walk it', to: 'walk' },
+      ] },
+      { id: 'scan', type: 'action', label: 'Point the camera at the plate — or type the code printed on it', detail: 'A plate from another site is refused; a blocked camera goes straight to typing.', branches: [
+        { label: 'Decoded / typed', to: 'machine' },
       ] },
       { id: 'lib', type: 'screen', label: 'SOP library', route: '/sops', detail: 'Browse, search, filter by trade. "Updated since last completion" badge (AFL-VER-04) marks any SOP published after the worker\'s last completion. Phase 36 (REF-01): a "Refresher due"/"Refresher overdue" chip appears alongside it once the SOP\'s refresher interval has elapsed since the worker\'s last completion — informational only, never blocks opening the card.' },
       { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]', detail: 'Read is the SOP as one document (2026-09-27): Orient → Prepare → Do. A SOP holding several procedures shows a "Which job are you doing?" chooser (?job=); Prepare lists tools and parts for that job and lets the worker acknowledge the safety requirements inline; Do lists the job\'s steps in full with a "Walk it step by step" button. Walk it walks the chosen job only (Step 1 of 6, not 1 of 40) and skips the "Before you start" screen when already acknowledged or when there is nothing to acknowledge. Workers see Read + Walk it; the Flow tab and the Desktop/Mobile preview toggle are admin-only (Flow also shows to workers when a real branching graph was authored). Legacy ?tab= params still map onto the tabs. Admins/safety managers see an "Edit in builder" link here.' },
