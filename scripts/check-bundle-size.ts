@@ -95,6 +95,8 @@ const GATED_ROUTES: GatedRoute[] = [
         label: 'access lens (WiringPatchBay.tsx)',
         markers: ['Search org or collections…', 'follows collection'],
       },
+      { label: 'konva (52 D-02)', markers: ['react-konva', 'konva'] },
+      { label: 'voice modal (52 D-13)', markers: ['Please acknowledge the safety hazards first'] },
     ],
   },
 ]

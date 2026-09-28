@@ -608,5 +608,31 @@ export default defineConfig({
       testMatch: /tests\/phase51\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 52 -- Worker Home: The Plant
+      // Nyquist harness (Wave 0 / Plan 52-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase52/**) so every later plan in
+      // the phase drops specs into tests/phase52/ with NO further config edit --
+      // single registration point for the whole phase (mirrors phase51/41/etc).
+      //
+      // Verify registration: `npx playwright test --list --project=phase52`
+      // (should list all 8 tests/phase52/*.spec.ts files -- zero discovered = FAIL)
+      //
+      // Files registered here:
+      //   plant-pins (HOM-02, LIVE from 52-01) --
+      //   plant-pins-no-storage (HOM-02, LIVE from 52-01) --
+      //   site-worker-action (HOM-02/HOM-06, LIVE from 52-01) --
+      //   plant-stage (HOM-01, fixme, activates 52-02) --
+      //   plant-panel (HOM-04, fixme, activates 52-02) --
+      //   plant-now-card (HOM-03, fixme, activates 52-03) --
+      //   plant-ask-bar (HOM-05, fixme, activates 52-03) --
+      //   plant-render-seam (HOM-01..06, fixme, activates 52-04)
+      name: 'phase52',
+      testDir: '.',
+      testMatch: /tests\/phase52\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })

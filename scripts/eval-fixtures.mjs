@@ -14,6 +14,12 @@ export const EVAL_SITE_ORG_NAME = 'SOPstart Eval Site'
 export const EVAL_SITE_ADMIN_EMAIL = 'eval-site-admin@sopstart.com'
 export const EVAL_SITE_SOP_TITLE = 'Eval site fixture SOP'
 export const EVAL_SITE_DEPARTMENT = 'Forming'
+// Phase 52 (52-01): a worker fixture in the SAME eval-site org, plus a
+// PUBLISHED (not draft) SOP assigned to it -- the plant home only pins
+// published SOPs (worker Dexie sync filters status === 'published'), unlike
+// the Phase 51 draft fixture above which only needed to exist for linking.
+export const EVAL_SITE_WORKER_EMAIL = 'eval-site-worker@sopstart.com'
+export const EVAL_PLANT_SOP_TITLE = 'Eval plant fixture SOP'
 
 const { data: list } = await sb.auth.admin.listUsers({ perPage: 500 })
 for (const [role, email] of Object.entries(EVAL_USERS)) {
@@ -95,4 +101,84 @@ if (!sop) {
   console.log('created fixture SOP', EVAL_SITE_SOP_TITLE, sop.id)
 }
 
-console.log(`SOPstart Eval Site → org=${siteOrg.id} admin=${siteAdmin.id} department=${dept.id} sop=${sop.id}`)
+// --- Phase 52 (52-01): eval-site worker + a PUBLISHED assigned fixture SOP ---
+let siteWorker = list.users.find(u => u.email === EVAL_SITE_WORKER_EMAIL)
+if (siteWorker && siteWorker.user_metadata?.eval_fixture !== true) throw new Error(`${EVAL_SITE_WORKER_EMAIL} exists but is not an eval fixture — refusing to change its membership`)
+if (!siteWorker) {
+  const { data, error } = await sb.auth.admin.createUser({ email: EVAL_SITE_WORKER_EMAIL, email_confirm: true, user_metadata: { eval_fixture: true } })
+  if (error) throw error
+  siteWorker = data.user
+  console.log('created', EVAL_SITE_WORKER_EMAIL)
+}
+{
+  const { error } = await sb.from('organisation_members').upsert({ organisation_id: siteOrg.id, user_id: siteWorker.id, role: 'worker' }, { onConflict: 'organisation_id,user_id' })
+  if (error) throw error
+  console.log(`${EVAL_SITE_WORKER_EMAIL} → worker of ${EVAL_SITE_ORG_NAME} (${siteWorker.id})`)
+}
+
+let plantSop
+{
+  const { data, error } = await sb.from('sops').select('id, status').eq('organisation_id', siteOrg.id).eq('title', EVAL_PLANT_SOP_TITLE).maybeSingle()
+  if (error) throw error
+  plantSop = data
+}
+if (!plantSop) {
+  const { data, error } = await sb
+    .from('sops')
+    .insert({
+      organisation_id: siteOrg.id,
+      title: EVAL_PLANT_SOP_TITLE,
+      source_file_name: EVAL_PLANT_SOP_TITLE,
+      source_file_type: 'docx',
+      source_file_path: '',
+      uploaded_by: siteAdmin.id,
+      status: 'published',
+      published_at: new Date().toISOString(),
+      version: 1,
+      source_type: 'blank',
+    })
+    .select('id, status')
+    .single()
+  if (error) throw error
+  plantSop = data
+  console.log('created fixture SOP', EVAL_PLANT_SOP_TITLE, plantSop.id)
+} else if (plantSop.status !== 'published') {
+  const { error } = await sb.from('sops').update({ status: 'published', published_at: new Date().toISOString() }).eq('id', plantSop.id)
+  if (error) throw error
+  console.log('published fixture SOP', EVAL_PLANT_SOP_TITLE, plantSop.id)
+}
+
+let plantSection
+{
+  const { data, error } = await sb.from('sop_sections').select('id').eq('sop_id', plantSop.id).limit(1).maybeSingle()
+  if (error) throw error
+  plantSection = data
+}
+if (!plantSection) {
+  const { data, error } = await sb
+    .from('sop_sections')
+    .insert({ sop_id: plantSop.id, section_type: 'procedure', title: 'Procedure', sort_order: 0, approved: true })
+    .select('id')
+    .single()
+  if (error) throw error
+  plantSection = data
+  console.log('created fixture section', plantSection.id)
+
+  const { error: stepErr } = await sb
+    .from('sop_steps')
+    .insert({ section_id: plantSection.id, step_number: 1, text: 'Check the press guard is closed before starting.', time_estimate_minutes: 5 })
+  if (stepErr) throw stepErr
+}
+
+{
+  const { error } = await sb
+    .from('sop_assignments')
+    .upsert(
+      { organisation_id: siteOrg.id, sop_id: plantSop.id, assignment_type: 'individual', user_id: siteWorker.id, assigned_by: siteAdmin.id },
+      { onConflict: 'sop_id,assignment_type,user_id' }
+    )
+  if (error) throw error
+  console.log(`assigned ${EVAL_PLANT_SOP_TITLE} → ${EVAL_SITE_WORKER_EMAIL}`)
+}
+
+console.log(`SOPstart Eval Site → org=${siteOrg.id} admin=${siteAdmin.id} department=${dept.id} sop=${sop.id} worker=${siteWorker.id} plantSop=${plantSop.id}`)

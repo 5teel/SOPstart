@@ -26,11 +26,16 @@ export const EVAL_USERS = {
   admin: 'eval-admin@sopstart.com',
   worker: 'eval-worker@sopstart.com',
   siteAdmin: 'eval-site-admin@sopstart.com',
+  // Phase 52: worker member of the eval-site org (never the real SOPstart
+  // org), so a plant-home eval can see a pin without risking Simon's data.
+  siteWorker: 'eval-site-worker@sopstart.com',
 } as const
 export type EvalRole = keyof typeof EVAL_USERS
 export const EVAL_SITE_ORG_NAME = 'SOPstart Eval Site'
 export const EVAL_SITE_SOP_TITLE = 'Eval site fixture SOP'
 export const EVAL_SITE_DEPARTMENT = 'Forming'
+export const EVAL_PLANT_SOP_TITLE = 'Eval plant fixture SOP'
+export const EVAL_PLANT_MACHINE = 'EVAL Press'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
