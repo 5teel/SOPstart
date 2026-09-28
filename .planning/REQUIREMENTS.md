@@ -918,12 +918,12 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 ### Worker Home (HOM) — Phase 52
 
-- [ ] **HOM-01**: `/sops` for a worker on desktop renders the site scene with pan, zoom-to-cursor, department fly-to and tappable machines — no scope column, no Miller frame
-- [ ] **HOM-02**: Each machine carries a derived pin: the count of that machine's SOPs due / never done / updated for the viewer; pins are computed, never stored
-- [ ] **HOM-03**: A Now card shows the single next procedure (due first), with Walk it and Show me (fly the camera to the machine and open its panel)
-- [ ] **HOM-04**: Clicking a machine flies to it and opens a panel listing its SOPs to-do first with the shared badge vocabulary; Walk it opens the existing SOP page
-- [ ] **HOM-05**: The ask bar highlights machines and SOPs as the worker types and is the entry point for the existing voice Q&A
-- [ ] **HOM-06**: The worker route's First Load JS stays within the SB-LINE-06 budget — the scene renderer is a dynamic import and the scene image is lazy
+- [x] **HOM-01**: `/sops` for a worker on desktop renders the site scene with pan, zoom-to-cursor, department fly-to and tappable machines — no scope column, no Miller frame
+- [x] **HOM-02**: Each machine carries a derived pin: the count of that machine's SOPs due / never done / updated for the viewer; pins are computed, never stored
+- [x] **HOM-03**: A Now card shows the single next procedure (due first), with Walk it and Show me (fly the camera to the machine and open its panel)
+- [x] **HOM-04**: Clicking a machine flies to it and opens a panel listing its SOPs to-do first with the shared badge vocabulary; Walk it opens the existing SOP page
+- [x] **HOM-05**: The ask bar highlights machines and SOPs as the worker types and is the entry point for the existing voice Q&A
+- [x] **HOM-06**: The worker route's First Load JS stays within the SB-LINE-06 budget — the scene renderer is a dynamic import and the scene image is lazy
 
 ### Phone (PHN) — Phase 53
 
@@ -950,7 +950,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
 | SIT-01..04 (4) | Phase 51 | Complete (2026-09-28) |
-| HOM-01..06 (6) | Phase 52 | Pending |
+| HOM-01..06 (6) | Phase 52 | Complete (2026-09-29) |
 | PHN-01..03 (3) | Phase 53 | Pending |
 | ADM-01..04 (4) | Phase 54 | Pending |
 
