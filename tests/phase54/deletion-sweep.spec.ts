@@ -1,7 +1,7 @@
 /**
  * Phase 54 / Plan 54-05 -- ADM-04 / D-09 deletion sweep, final shape.
  *
- * Written in Wave 0 (54-01) as a `test.fixme` scaffold so its shape is
+ * Written in Wave 0 (54-01) as a fixme-gated scaffold so its shape is
  * pinned before the deletion wave runs; every test flips live in 54-05
  * (CLAUDE.md 2026-08-04: "a deletion guard must assert the absence of
  * REFERENCES, not just the absence of the file").
@@ -101,13 +101,13 @@ function findMatches(relPath: string, re: RegExp): string[] {
 }
 
 test.describe('D-09 deletion sweep -- Miller/scope-column admin surface is fully removed (54-05)', () => {
-  test.fixme('the seven deleted files are gone; the Access lens survives', () => {
+  test('the seven deleted files are gone; the Access lens survives', () => {
     const missing = DELETED_FILES.filter((f) => !fs.existsSync(path.join(ROOT, f)))
     expect(missing, `Still present (should be deleted): ${missing.join(', ')}`).toEqual(DELETED_FILES)
     expect(fs.existsSync(path.join(ROOT, SURVIVOR)), `${SURVIVOR} must survive`).toBe(true)
   })
 
-  test.fixme('no comment-stripped src/ file references a deleted symbol/module', () => {
+  test('no comment-stripped src/ file references a deleted symbol/module', () => {
     const offenders: string[] = []
     for (const file of walkTsFiles(path.join(ROOT, 'src'))) {
       offenders.push(...findMatches(path.relative(ROOT, file), DEAD_NAMES))
@@ -115,7 +115,7 @@ test.describe('D-09 deletion sweep -- Miller/scope-column admin surface is fully
     expect(offenders, `Dead-name references:\n${offenders.join('\n')}`).toEqual([])
   })
 
-  test.fixme('no comment-stripped src/ file references the old attention deep link or scope-id params; the attention comparison survives only in its two permitted homes', () => {
+  test('no comment-stripped src/ file references the old attention deep link or scope-id params; the attention comparison survives only in its two permitted homes', () => {
     const paramOffenders: string[] = []
     let attentionTotal = 0
     const attentionBreakdown: string[] = []
@@ -135,7 +135,7 @@ test.describe('D-09 deletion sweep -- Miller/scope-column admin surface is fully
     expect(attentionTotal, `Attention-compare breakdown:\n${attentionBreakdown.join('\n')}`).toBe(EXPECTED_ATTENTION_COUNT)
   })
 
-  test.fixme('no comment-stripped tests/**/*.ts(x) file outside the exclusions references a deleted symbol/module', () => {
+  test('no comment-stripped tests/**/*.ts(x) file outside the exclusions references a deleted symbol/module', () => {
     const offenders: string[] = []
     for (const file of walkTsFiles(path.join(ROOT, 'tests'))) {
       const rel = path.relative(ROOT, file)
@@ -146,7 +146,7 @@ test.describe('D-09 deletion sweep -- Miller/scope-column admin surface is fully
     expect(offenders, `Dead-name references in tests/:\n${offenders.join('\n')}`).toEqual([])
   })
 
-  test.fixme('scripts/check-bundle-size.ts forbidden markers repointed to surviving admin modules', () => {
+  test('scripts/check-bundle-size.ts forbidden markers repointed to surviving admin modules', () => {
     const src = read(path.join('scripts', 'check-bundle-size.ts'))
     expect(src).not.toContain('SopMillerBrowser')
     expect(src).not.toContain('Pick another scope on the left.')

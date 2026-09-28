@@ -1,12 +1,13 @@
 /**
  * The ONE place a worker's SOP state is classified (CLAUDE.md 2026-09-27: "a
  * classification lives in ONE plain module imported by every surface that
- * asks the question" — a second copy is a future disagreement). `topSignal`
- * (the worker list row/detail badge) and `plantRelState` (the plant home's
- * pins, panel and Now card, D-06) live side by side here so they can never
- * drift apart. Pins and the Now card are DERIVED from this module, never
- * stored (D-05) — no Supabase, no Dexie, no browser storage, no Date.now()
- * in this file (tests/phase52/plant-pins-no-storage.spec.ts pins this).
+ * asks the question" — a second copy is a future disagreement). `plantRelState`
+ * (the plant home's pins, panel and Now card, D-06) is the sole classifier
+ * now that the Phase 41 worker list/detail badge it used to share this file
+ * with (`topSignal`, retired in 54-05 alongside SopWorkerBrowser) is gone.
+ * Pins and the Now card are DERIVED from this module, never stored (D-05) —
+ * no Supabase, no Dexie, no browser storage, no Date.now() in this file
+ * (tests/phase52/plant-pins-no-storage.spec.ts pins this).
  *
  * Plain module, no directive -- importable from both client and server code.
  * Only `import type` for the shapes owned elsewhere (CachedSop, SopMachineLink).
@@ -36,16 +37,6 @@ export type WorkerSop = {
   removalRequested: boolean
   /** The cached row itself, for the mobile card renderer. */
   raw: CachedSop
-}
-
-/** The one signal that most deserves the worker's attention, worst first. */
-export function topSignal(sop: WorkerSop): { label: string; tone: 'bad' | 'warn' | 'info' } | null {
-  if (!sop.isAssigned) return { label: 'Not yours', tone: 'info' }
-  if (sop.isRefresherOverdue) return { label: 'Refresher overdue', tone: 'bad' }
-  if (sop.hasNewerVersion) return { label: 'Updated since you read it', tone: 'warn' }
-  if (sop.isRefresherDue) return { label: 'Refresher due', tone: 'warn' }
-  if (!sop.lastCompletedAt) return { label: 'Not done yet', tone: 'info' }
-  return null
 }
 
 // ---------------------------------------------------------------------------

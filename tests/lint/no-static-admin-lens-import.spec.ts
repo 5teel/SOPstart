@@ -6,18 +6,18 @@
  *
  * Two contracts:
  *
- *   1. `SopMillerBrowser`, `GovernanceQueueRow`, `WiringPatchBayShell` may
- *      only be statically imported from one of ALLOWED_FILES. As of 41-06,
- *      `admin/sops/page.tsx` is a redirect shim that imports none of these,
- *      so the allowlist is tightened to the three lens files only.
+ *   1. Per-symbol allow-list (converted 54-05 from a shared file list, now
+ *      that the three Phase 41 lens files are deleted): `GovernanceQueueRow`,
+ *      `WiringPatchBayShell`, `AdminFloorHealth` may each only be statically
+ *      imported from their own named file below. `AdminLibraryTable` has an
+ *      empty allow-list — it is only ever reached via `next/dynamic`
+ *      (`src/app/(protected)/sops/page.tsx`), so ANY static import is a
+ *      violation.
  *
  *   2. `src/app/(protected)/sops/page.tsx` (the merged worker/admin
- *      surface) must not import any of the three lens components, nor
+ *      surface) must not import any admin table/lens component, nor
  *      `DepartmentPicker`, nor `setSopCategory`, nor anything from
  *      `@/actions/governance`, `@/actions/org-model`, `@/actions/grants`.
- *      This contract is LIVE and passes today — none of these are
- *      imported there yet — so it guards every intervening wave rather
- *      than waiting for 41-05 to add the lens wiring.
  *
  * Runs LIVE (no test.fixme).
  */
@@ -28,15 +28,15 @@ import path from 'node:path'
 const REPO_ROOT = path.resolve(__dirname, '..', '..')
 const SRC_DIR = path.join(REPO_ROOT, 'src')
 
-const ALLOWED_FILES = [
-  path.join('src', 'components', 'sop', 'lenses', 'AdminStatusLens.tsx'),
-  path.join('src', 'components', 'sop', 'lenses', 'AdminAttentionLens.tsx'),
-  path.join('src', 'components', 'sop', 'lenses', 'AdminAccessLens.tsx'),
-  // Phase 54 (54-02): GovernanceInbox is the new sole importer for the
-  // /governance route; 54-05 converts this list to a per-symbol map when
-  // the three lens files above are deleted.
-  path.join('src', 'components', 'admin', 'governance', 'GovernanceInbox.tsx'),
-].map((p) => p.replace(/\\/g, '/'))
+// Per-symbol allow-list: the ONLY file(s) allowed to statically import each
+// symbol. An empty array means the symbol must never be statically imported
+// anywhere — only via next/dynamic.
+const ALLOWED_IMPORTERS: Record<string, string[]> = {
+  GovernanceQueueRow: [path.join('src', 'components', 'admin', 'governance', 'GovernanceInbox.tsx')],
+  WiringPatchBayShell: [path.join('src', 'components', 'sop', 'lenses', 'AdminAccessLens.tsx')],
+  AdminFloorHealth: [path.join('src', 'app', '(protected)', 'governance', 'page.tsx')],
+  AdminLibraryTable: [],
+}
 
 const SOPS_PAGE = path.join(REPO_ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx')
 
@@ -79,13 +79,12 @@ function findImports(symbol: string): Hit[] {
   return hits
 }
 
-const LENS_SYMBOLS = ['SopMillerBrowser', 'GovernanceQueueRow', 'WiringPatchBayShell']
-
 test.describe('T-41-02 — admin lens components cannot leak into the worker import graph', () => {
-  for (const symbol of LENS_SYMBOLS) {
+  for (const [symbol, allowedFiles] of Object.entries(ALLOWED_IMPORTERS)) {
+    const allowed = allowedFiles.map((p) => p.replace(/\\/g, '/'))
     test(`${symbol} is only statically imported from an allowed file`, () => {
       const hits = findImports(symbol)
-      const violations = hits.filter((h) => !ALLOWED_FILES.includes(h.file))
+      const violations = hits.filter((h) => !allowed.includes(h.file))
       if (violations.length > 0) {
         console.error(
           `${symbol} import-leak violations:\n` +
@@ -96,10 +95,9 @@ test.describe('T-41-02 — admin lens components cannot leak into the worker imp
     })
   }
 
-  test('src/app/(protected)/sops/page.tsx does not import any admin lens code (live guard, no fixme)', () => {
+  test('src/app/(protected)/sops/page.tsx does not import any admin lens/table code (live guard, no fixme)', () => {
     const src = fs.readFileSync(SOPS_PAGE, 'utf-8')
     const forbidden = [
-      'SopMillerBrowser',
       'GovernanceQueueRow',
       'WiringPatchBayShell',
       'DepartmentPicker',
@@ -107,11 +105,12 @@ test.describe('T-41-02 — admin lens components cannot leak into the worker imp
       '@/actions/governance',
       '@/actions/org-model',
       '@/actions/grants',
-      // Bundle-regression fix (deviation from 41-05): the three lens
-      // wrappers relocated to AdminSopSurface.tsx — page.tsx must not
-      // reference any of them directly any more either.
-      'AdminStatusLens',
-      'AdminAttentionLens',
+      // Phase 54: page.tsx mounts AdminLibraryTable only via next/dynamic
+      // (SC-4/T-54-04) — it must never import the data layer behind it, nor
+      // the Access lens, directly.
+      'listAdminSopRows',
+      '@/actions/admin-sop-list',
+      '@/lib/sop/admin-health',
       'AdminAccessLens',
     ]
     const present = forbidden.filter((token) => src.includes(token))

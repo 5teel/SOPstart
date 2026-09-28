@@ -13,7 +13,6 @@
 import { test, expect } from '@playwright/test'
 import {
   plantRelState,
-  topSignal,
   PLANT_REL_LABEL,
   compareToDoFirst,
   derivePlantPins,
@@ -78,32 +77,9 @@ test.describe('plantRelState', () => {
   })
 })
 
-test.describe('topSignal (moved, unchanged behaviour)', () => {
-  test('unassigned -> Not yours / info', () => {
-    expect(topSignal(sop('a', 'A', { isAssigned: false }))).toEqual({ label: 'Not yours', tone: 'info' })
-  })
-  test('isRefresherOverdue -> Refresher overdue / bad', () => {
-    expect(topSignal(sop('a', 'A', { isRefresherOverdue: true }))).toEqual({
-      label: 'Refresher overdue',
-      tone: 'bad',
-    })
-  })
-  test('hasNewerVersion -> Updated since you read it / warn', () => {
-    expect(topSignal(sop('a', 'A', { hasNewerVersion: true }))).toEqual({
-      label: 'Updated since you read it',
-      tone: 'warn',
-    })
-  })
-  test('isRefresherDue -> Refresher due / warn', () => {
-    expect(topSignal(sop('a', 'A', { isRefresherDue: true }))).toEqual({ label: 'Refresher due', tone: 'warn' })
-  })
-  test('no lastCompletedAt -> Not done yet / info', () => {
-    expect(topSignal(sop('a', 'A', { lastCompletedAt: null }))).toEqual({ label: 'Not done yet', tone: 'info' })
-  })
-  test('assigned + completed + no other signal -> null', () => {
-    expect(topSignal(sop('a', 'A', { lastCompletedAt: '2026-01-01T00:00:00Z' }))).toBeNull()
-  })
-})
+// topSignal (the Phase 41 worker list/detail badge helper) was retired in
+// 54-05 alongside SopWorkerBrowser, its only consumer — plantRelState is now
+// the sole classifier this module exports (CLAUDE.md 2026-09-27).
 
 test('PLANT_REL_LABEL deep-equals the sketch vocabulary', () => {
   expect(PLANT_REL_LABEL).toEqual({ due: 'Due', new: 'Updated', never: 'Never done', done: 'Done' })
