@@ -147,6 +147,7 @@ const ADMIN_LINKS: NavLink[] = [
   { label: 'Create New SOP', href: '/admin/sops/new' },
   { label: 'Content', href: '/admin/blocks' },
   { label: 'Team', href: '/admin/team' },
+  { label: 'Site', href: '/admin/site' },
   { label: 'Settings', href: '/admin/settings' },
 ]
 
