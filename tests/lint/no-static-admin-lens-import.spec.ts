@@ -32,6 +32,10 @@ const ALLOWED_FILES = [
   path.join('src', 'components', 'sop', 'lenses', 'AdminStatusLens.tsx'),
   path.join('src', 'components', 'sop', 'lenses', 'AdminAttentionLens.tsx'),
   path.join('src', 'components', 'sop', 'lenses', 'AdminAccessLens.tsx'),
+  // Phase 54 (54-02): GovernanceInbox is the new sole importer for the
+  // /governance route; 54-05 converts this list to a per-symbol map when
+  // the three lens files above are deleted.
+  path.join('src', 'components', 'admin', 'governance', 'GovernanceInbox.tsx'),
 ].map((p) => p.replace(/\\/g, '/'))
 
 const SOPS_PAGE = path.join(REPO_ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx')

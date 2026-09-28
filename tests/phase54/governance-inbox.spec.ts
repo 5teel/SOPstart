@@ -11,10 +11,17 @@
  * Verify: `npx playwright test --list --project=phase54`
  */
 import { test, expect } from '@playwright/test'
+import fs from 'node:fs'
+import path from 'node:path'
 import { deriveInbox, inboxCounts, chipMatches, INBOX_CHIPS, type InboxItem } from '@/lib/governance/inbox'
 import type { GovernanceRow } from '@/actions/governance'
 import type { MillerSop } from '@/lib/sop-list/admin-rows'
 import type { SopMachineLink } from '@/lib/validators/site'
+
+const ROOT = path.resolve(__dirname, '..', '..')
+const GOV_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'governance', 'page.tsx')
+const GOV_INBOX_COMPONENT = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceInbox.tsx')
+const read = (p: string) => fs.readFileSync(p, 'utf-8')
 
 function govRow(id: string, overrides: Partial<GovernanceRow> = {}): GovernanceRow {
   return {
@@ -233,10 +240,60 @@ test.describe('deriveInbox', () => {
 })
 
 test.describe('page + component wiring (54-02 Task 2)', () => {
-  test.fixme('governance/page.tsx: no use client, requireAdminContext before data reads, redirect on error', () => {})
-  test.fixme('governance/page.tsx: one Promise.all(listGovernanceQueue, listAdminSopRows, listSiteHealthForOrg), deriveInbox called server-side', () => {})
-  test.fixme('governance/page.tsx: renders <GovernanceInbox items=', () => {})
-  test.fixme('GovernanceInbox.tsx: use client, testids gov-inbox/gov-chip/gov-clear/gov-row/gov-action, uses INBOX_CHIPS/inboxCounts/chipMatches', () => {})
-  test.fixme('GovernanceInbox.tsx: no useQuery, router.push, or createClient', () => {})
-  test.fixme('GovernanceInbox.tsx: carries the three CLEAR strings verbatim', () => {})
+  const PAGE = GOV_PAGE
+  const INBOX = GOV_INBOX_COMPONENT
+
+  test('governance/page.tsx: no use client, requireAdminContext before data reads, redirect on error', () => {
+    const src = read(PAGE)
+    expect(src).not.toContain("'use client'")
+    const ctxIdx = src.indexOf('requireAdminContext(')
+    expect(ctxIdx).toBeGreaterThan(-1)
+    for (const call of ['listGovernanceQueue(', 'listAdminSopRows(', 'listSiteHealthForOrg(']) {
+      const idx = src.indexOf(call)
+      expect(idx).toBeGreaterThan(-1)
+      expect(ctxIdx).toBeLessThan(idx)
+    }
+    expect(src).toContain('redirect(')
+  })
+
+  test('governance/page.tsx: one Promise.all(listGovernanceQueue, listAdminSopRows, listSiteHealthForOrg), deriveInbox called server-side', () => {
+    const src = read(PAGE)
+    expect(src.match(/Promise\.all\(/g)).toHaveLength(1)
+    const allMatch = src.match(/Promise\.all\(\[([\s\S]*?)\]\)/)
+    expect(allMatch).not.toBeNull()
+    expect(allMatch![1]).toContain('listGovernanceQueue()')
+    expect(allMatch![1]).toContain('listAdminSopRows(')
+    expect(allMatch![1]).toContain('listSiteHealthForOrg()')
+    expect(src).toContain('deriveInbox(')
+  })
+
+  test('governance/page.tsx: renders <GovernanceInbox items=', () => {
+    const src = read(PAGE)
+    expect(src).toContain('<GovernanceInbox items={items}')
+  })
+
+  test('GovernanceInbox.tsx: use client, testids gov-inbox/gov-chip/gov-clear/gov-row/gov-action, uses INBOX_CHIPS/inboxCounts/chipMatches', () => {
+    const src = read(INBOX)
+    expect(src).toContain("'use client'")
+    for (const testid of ['gov-inbox', 'gov-chip', 'gov-clear', 'gov-row', 'gov-action']) {
+      expect(src).toContain(`data-testid="${testid}"`)
+    }
+    expect(src).toContain('INBOX_CHIPS')
+    expect(src).toContain('inboxCounts(')
+    expect(src).toContain('chipMatches(')
+  })
+
+  test('GovernanceInbox.tsx: no useQuery, router.push, or createClient', () => {
+    const src = read(INBOX)
+    for (const forbidden of ['useQuery', 'router.push', 'createClient']) {
+      expect(src).not.toContain(forbidden)
+    }
+  })
+
+  test('GovernanceInbox.tsx: carries the three CLEAR strings verbatim', () => {
+    const src = read(INBOX)
+    expect(src).toContain('CLEAR')
+    expect(src).toContain('Nothing needs attention')
+    expect(src).toContain('Every SOP is owned, current, and correctly assigned.')
+  })
 })
