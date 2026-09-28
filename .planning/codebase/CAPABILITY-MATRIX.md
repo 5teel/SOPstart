@@ -1,6 +1,6 @@
 # Capability Matrix
 
-**Last updated:** 2026-09-13
+**Last updated:** 2026-09-28
 
 This document is the single reference for who can see and do what in SafeStart. When a capability gate changes (an RLS policy, a `require*` guard, or a role check), this file changes in the **same commit**. If this file disagrees with the code, the code is the bug or the file is stale — treat any drift as a finding, not a footnote.
 
@@ -54,6 +54,10 @@ To answer "is a worker *required* to do X?": this document does not answer that 
 | Assessor governance | — | — | ✅ (override) | — | — | `isSignedOffAssessor` flag on the member row + admin override path (Phase 37); assessor status itself is a per-member flag, not a role |
 | Export training records | — | — | ✅ | ✅ | — | Training CSV export, `competency.ts`, admin/safety_manager |
 | Own profile | ✅ | ✅ | ✅ | ✅ | — | `/profile`, self-scoped to the caller's own observations/completions/competency — every role reads only their own row |
+| View site map (scene, machines, SOP links) | ✅ | ✅ | ✅ | ✅ | — | RLS `org_members_can_view_site_layouts`/`_machines`/`_sop_machines` + `org_members_can_read_site_scenes` (migration `00067_site_model.sql`); no worker-facing surface exists until Phase 52 — this row documents the data-access gate, not a shipped UI |
+| Edit site map (scene, machines) | — | — | ✅ | ✅ | — | RLS `admins_can_write_site_layouts`/`_machines` + `admins_can_upload_site_scenes` (00067) backstopping `requireAdminContext()` in `src/actions/site.ts` and `POST /api/admin/site/generate` (Phase 51 plan 51-03) |
+| Link SOPs to machines | — | — | ✅ | ✅ | — | RLS `admins_can_write_sop_machines` (00067) backstopping `setSopMachines()` in `src/actions/site.ts` — `requireAdminContext()`, both the SOP id and every machine id filtered to the session org before write (Phase 51 plan 51-03) |
+| Generate site scene (paid AI) | — | — | ✅ | ✅ | — | `POST /api/admin/site/generate` — `requireAdminContext()`, `GEMINI_API_KEY` gate, refuses when the org's layout already has a scene (Phase 51 plan 51-03) |
 
 Where a row's `Enforced at` column names RLS only (no app guard), or app guard only (RLS is `using(true)` or otherwise not the real gate), that asymmetry is deliberate context, not an oversight — see Findings below for the two cases where it became a real gap.
 
