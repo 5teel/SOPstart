@@ -20,6 +20,14 @@ import {
 
 const ROOT = path.resolve(__dirname, '..', '..')
 const TABLE_PATH = path.join(ROOT, 'src', 'components', 'admin', 'AdminLibraryTable.tsx')
+const WORKER_LIST_PATH = path.join(ROOT, 'src', 'components', 'sop', 'WorkerSimpleList.tsx')
+const WORKER_SIGNAL_PATH = path.join(ROOT, 'src', 'lib', 'sop', 'worker-signal.ts')
+const CATEGORY_BUTTON_PATH = path.join(
+  ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'BuilderCategoryButton.tsx'
+)
+const STAGE_SHELL_PATH = path.join(
+  ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'BuilderStageShell.tsx'
+)
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8').replace(/\r\n/g, '\n')
@@ -161,5 +169,42 @@ test.describe('AdminLibraryTable wiring', () => {
     const code = stripComments(read(TABLE_PATH))
     expect(code).not.toContain('window.location')
     expect(code).not.toContain('createClient')
+  })
+})
+
+test.describe('surviving affordances', () => {
+  test('WorkerSimpleList passes hasNewerVersion/isRefresherDue/isRefresherOverdue to SopLibraryCard', () => {
+    const code = read(WORKER_LIST_PATH)
+    expect(code).toContain('hasNewerVersion={sop.hasNewerVersion}')
+    expect(code).toContain('isRefresherDue={sop.isRefresherDue}')
+    expect(code).toContain('isRefresherOverdue={sop.isRefresherOverdue}')
+  })
+
+  test('WorkerSimpleList wires onAdd/onRemove to the real callbacks', () => {
+    const code = read(WORKER_LIST_PATH)
+    expect(code).toContain('onClick={() => onAdd(sop.id)}')
+    expect(code).toContain('onClick={() => onRemove(sop.id)}')
+  })
+
+  test('WorkerSimpleList carries worker-list / worker-list-row testids and no builder/walkthrough link', () => {
+    const code = read(WORKER_LIST_PATH)
+    expect(code).toContain('data-testid="worker-list"')
+    expect(code).toContain('data-testid="worker-list-row"')
+    expect(code).not.toContain('/admin/sops/builder')
+    expect(code).not.toContain('/walkthrough')
+  })
+
+  test('worker-signal.ts exports WorkerScope', () => {
+    expect(read(WORKER_SIGNAL_PATH)).toContain('export type WorkerScope')
+  })
+
+  test('BuilderCategoryButton calls setSopCategory(sopId, next) and imports SOP_CATEGORIES', () => {
+    const code = read(CATEGORY_BUTTON_PATH)
+    expect(code).toContain('setSopCategory(sopId, next)')
+    expect(code).toContain('SOP_CATEGORIES')
+  })
+
+  test('BuilderStageShell renders <BuilderCategoryButton sopId={sopId}', () => {
+    expect(read(STAGE_SHELL_PATH)).toContain('<BuilderCategoryButton sopId={sopId}')
   })
 })

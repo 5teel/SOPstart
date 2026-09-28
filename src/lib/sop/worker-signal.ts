@@ -14,6 +14,10 @@
 import type { CachedSop } from '@/lib/offline/db'
 import type { SopMachineLink } from '@/lib/validators/site'
 
+/** Phase 54 (D-10): moved here from `src/components/sop/sops-nav-types.ts`,
+ *  which 54-05 deletes — a plain type export, no I/O, no new imports. */
+export type WorkerScope = 'all' | 'refresher' | 'updated' | 'not-done' | 'library' | 'not-added'
+
 export type WorkerSop = {
   id: string
   title: string

@@ -41,6 +41,7 @@ import { BuilderStageStepper } from './BuilderStageStepper'
 import { BuilderFlowButton } from './BuilderFlowButton'
 import { BuilderFlowEditButton } from './BuilderFlowEditButton'
 import { BuilderMachinesButton } from './BuilderMachinesButton'
+import { BuilderCategoryButton } from './BuilderCategoryButton'
 import type { BuilderStage } from './BuilderStageStepper'
 import { OrientationStrip } from './OrientationStrip'
 import { ReviewStation } from './ReviewStation'
@@ -143,6 +144,7 @@ function ToolsMenu({
             <BuilderFlowButton sop={sop} />
             <BuilderFlowEditButton sop={sop} sopId={sopId} />
             <BuilderMachinesButton sopId={sopId} />
+            <BuilderCategoryButton sopId={sopId} categorySlug={sop.category_slug ?? null} />
             {isDraft && (
               <>
                 <div className="my-1 h-px bg-[var(--ink-100)]" />
