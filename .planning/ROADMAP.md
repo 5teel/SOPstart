@@ -1604,7 +1604,7 @@ Plans:
 
 Plans:
 
-- [ ] 52-01-PLAN.md — Wave 1: phase52 project + stubs, Konva deny + /sops Konva/voice marker groups, eval-site worker + published assigned fixture SOP, worker-signal.ts (plantRelState, derivePlantPins, pickNowQueue, askMatches — TDD), listSiteForWorker, RelBadge, capability matrix
+- [x] 52-01-PLAN.md — Wave 1: phase52 project + stubs, Konva deny + /sops Konva/voice marker groups, eval-site worker + published assigned fixture SOP, worker-signal.ts (plantRelState, derivePlantPins, pickNowQueue, askMatches — TDD), listSiteForWorker, RelBadge, capability matrix
 - [ ] 52-02-PLAN.md — Wave 2: scene.ts camera maths (flyToView, fitBoxView, zoneColour — TDD), PlantStage (img + SVG, pan, zoom-to-cursor, fly-to, labels, pins), MachinePanel (worker variant)
 - [ ] 52-03-PLAN.md — Wave 2: NowCard (Walk it / Show me / Then:), PlantAskBar (live filter + mic → existing WalkthroughVoiceModal via next/dynamic), voice import guard
 - [ ] 52-04-PLAN.md — Wave 3: PlantHome composition, /sops render seam (useViewport + site query + dynamic slot), plant marker group, journeys.ts + uat/tests.ts, build gate
@@ -1717,7 +1717,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 
 **Goal:** Scheduled task or cron that marks video_generation_jobs stuck in queued/analyzing/generating_audio/rendering for >30 minutes as 'failed' with a timeout error. Could also notify admin. Triggered by finding a hours-old rendering job during Phase 10 verification.
 **Requirements:** TBD
-**Plans:** 7/7 plans complete
+**Plans:** 1/5 plans executed
 
 Plans:
 
