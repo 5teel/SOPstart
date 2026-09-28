@@ -20,8 +20,11 @@ Paper/ink engineering-drawing system (established in the blueprint-redesign expl
 | 004 | admin-sop-hub-hierarchy | How do the four stacked /admin/sops control tiers collapse into one comprehensible hierarchy? | A (one rail, no page header, grouped attention queue) | admin, information-architecture, governance |
 | 005 | sop-library-altitude | How does /admin/sops funnel from a high-level decision down to one SOP, instead of showing every SOP and attribute at one altitude? | C (Miller columns — scope · list · editable detail) | admin, information-architecture, library, progressive-disclosure |
 | 006 | sop-navigation-model | How does /sops answer "which procedure do I need?" for a worker AND stay useful to an admin, without a scope column that mixes role, obligation, catalogue and facet? | _pending_ | navigation, information-architecture, library, governance, worker, admin, phone |
+| 007 | plant-floor-navigation | What if the plant itself is the navigation — an isometric site with tappable machines, pins for what is due (worker) or what is sick (admin) — and the library is never the home? | _pending_ | navigation, spatial, isometric, worker, kiosk, phone, admin, generated-assets |
 
 ## Decisions
+
+- **2026-09-28 — Sketch 006 kept the Miller frame; Simon asked for the frame questioned, not the column.** 007 restarts from floor-product idioms (SwipeGuide / Poka / Tulip: scan the machine, today feed, station terminal) instead of desk-catalogue idioms (Finder / Linear). First use of generated image assets in a sketch (Nano Banana 2, 5 first-shot generations, `007/assets/`). Decision pending between 006 and 007.
 
 - **2026-09-28 — The 005 scope column outgrew its meaning.** Four groups (Admin / Your SOPs / Library / By department) rendered as one row style read as sub-menus; two same-day bugs (double-lit rows, attention lens replacing the frame) were symptoms. Sketch 006 restarts from the two user questions (worker: which procedure do I need; admin: is the library healthy) and proposes `/sops` as one library (place tree or search-first) + `/governance` as its own page. Decision pending.
 
