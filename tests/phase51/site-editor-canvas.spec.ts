@@ -126,8 +126,14 @@ test.describe('drawing', () => {
     expect(src).toContain('/ view.s')
   })
 
-  // deferred to plan 51-05: delete lives in SiteWorkspace (51-04 objective —
-  // SceneEditorProps has no onDelete callback; deleting a machine is a
-  // server-action-backed action the workspace owns, not the canvas)
-  test.fixme('Delete key and a delete button both remove the selected machine', () => {})
+  // Resolved in 51-05: SceneEditorProps (frozen 51-01) has no onDelete
+  // callback by design — delete is a server-action-backed workspace concern,
+  // not a canvas concern. Coverage lives in
+  // tests/phase51/site-workspace-wiring.spec.ts's "workspace" describe
+  // ("Draw / Delete / rename / department-select / link / unlink handlers
+  // are wired..."), which asserts the Delete button's onClick, the
+  // window keydown listener (Delete/Backspace, ignored while typing), and
+  // deleteSiteMachine( wiring in SiteWorkspace.tsx. Left fixme here — SiteEditor
+  // itself never gains an onDelete path.
+  test.fixme('Delete key and a delete button both remove the selected machine — see site-workspace-wiring.spec.ts', () => {})
 })
