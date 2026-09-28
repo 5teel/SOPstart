@@ -1571,7 +1571,17 @@ Executes 51 → 52 → 53 ∥ 54 → (v8.0 Phase 43).
   4. A SOP's builder metadata panel offers a machine picker (multi-select, org-scoped); the machine editor's panel lists the SOPs linked to each machine; both write `sop_machines`
   5. Deployed eval covers: generate-or-upload → draw two polygons → link a SOP → reload shows all three
 
-**Plans**: TBD
+**Plans**: 7 plans
+
+Plans:
+- [ ] 51-01-PLAN.md — Wave-0 scaffold: phase51 project + stubs, Konva allow-list, eval skeleton + fixture PNG, site model contract (TDD)
+- [ ] 51-02-PLAN.md — Migration 00067 (3 tables, RLS, site-scenes bucket) + [BLOCKING] live push + RLS/FK/storage probes + capability matrix
+- [ ] 51-03-PLAN.md — src/actions/site.ts (7 actions), Gemini generate route, SiteEmptyState, env example
+- [ ] 51-04-PLAN.md — Konva SiteEditor (natural-size scene, pan/zoom/fit, draw/select/vertex drag) + dynamic loader
+- [ ] 51-05-PLAN.md — /admin/site page + SiteWorkspace panel (rename, department, delete, SOP links) + header Site link + journeys
+- [ ] 51-06-PLAN.md — Builder Tools menu "Pick machines for this SOP" modal
+- [ ] 51-07-PLAN.md — Deployed eval (isolated eval-site org), full gates, push, run eval, read screenshots
+
 **UI hint**: yes
 
 ### Phase 52: Worker Home — The Plant
