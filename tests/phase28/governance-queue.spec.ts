@@ -4,20 +4,23 @@
  * (?view=attention) and /admin/governance became a redirect shim.
  *
  * Repointed AGAIN in 41-08 (SUR-01/02/04): /admin/sops itself is now a thin
- * guard-first redirect shim to /sops (see 41-06). The queue read + rendering
- * moved to AdminAttentionLens.tsx (a next/dynamic({ssr:false}) lens fetched
- * by AdminSopSurface.tsx), and the real admin/safety_manager gate on the DATA
- * is listGovernanceQueue -> requireAdmin() in src/actions/governance.ts — the
- * shim's own redirect('/dashboard') is a second, shallower guard in front of
- * that, kept here so both layers stay pinned (CLAUDE.md 2026-07-13: a guard
- * pointing at an emptied file is a guard that stopped guarding).
+ * guard-first redirect shim to /sops (see 41-06).
+ *
+ * Repointed a third time in 54-05 (D-01/D-02): the governance queue moved off
+ * /sops?view=attention onto its own route, /governance, rendered by
+ * GovernanceInbox.tsx and derived by src/lib/governance/inbox.ts. The real
+ * admin/safety_manager gate on the DATA is listGovernanceQueue ->
+ * requireAdmin() in src/actions/governance.ts — the page's own
+ * redirect('/dashboard') is a second, shallower guard in front of that, kept
+ * here so both layers stay pinned (CLAUDE.md 2026-07-13: a guard pointing at
+ * an emptied file is a guard that stopped guarding).
  *
  * Verifies (source-contract, no live DB required):
- *   GQ-01: AdminAttentionLens calls listGovernanceQueue; the real data gate
- *     (requireAdmin() in governance.ts) guards admin/safety_manager; the
- *     shim (admin/sops/page.tsx) keeps its own front-door redirect; and
- *     AdminSopSurface.tsx resolves ?view=attention to the admin-attention
- *     scope.
+ *   GQ-01: the /governance page calls listGovernanceQueue() server-side
+ *     after requireAdminContext(); GovernanceInbox renders <GovernanceQueueRow
+ *     and not <GovernanceFilterChips; and the /sops redirect shim maps legacy
+ *     ?view=attention onto /governance (resolveLibraryNav returns the
+ *     'governance' sentinel, asserted in tests/phase30/admin-nav.spec.ts).
  *   GQ-02: GovernanceQueueRow WIRES a real confirmSopCurrent( call — not a
  *     bare prop-name reference (CLAUDE.md 2026-06-05 dead-feature learning) —
  *     and renders exactly one primary action per row via if/else-if branching
@@ -41,9 +44,9 @@ import path from 'node:path'
 const ROOT = process.cwd()
 const SHIM = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'governance', 'page.tsx')
 const FOLDED_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'page.tsx')
-const ATTENTION_LENS = path.join(ROOT, 'src', 'components', 'sop', 'lenses', 'AdminAttentionLens.tsx')
+const GOV_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'governance', 'page.tsx')
+const GOV_INBOX = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceInbox.tsx')
 const GOVERNANCE_ACTIONS = path.join(ROOT, 'src', 'actions', 'governance.ts')
-const ADMIN_SURFACE = path.join(ROOT, 'src', 'components', 'sop', 'AdminSopSurface.tsx')
 const ROW = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceQueueRow.tsx')
 const CHIPS = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceFilterChips.tsx')
 const OWNER_PICKER = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'OwnerPicker.tsx')
@@ -54,17 +57,20 @@ function read(p: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Needs-attention lens on /sops — GQ-01 (repointed 2026-09-13, Phase 41)
+// Governance inbox on /governance — GQ-01 (repointed 2026-09-29, Phase 54)
 // ---------------------------------------------------------------------------
 
-test.describe('needs-attention lens on /sops — queue read + role guard', () => {
-  test('AdminAttentionLens calls listGovernanceQueue', () => {
-    const src = read(ATTENTION_LENS)
-    expect(src).toContain("import { listGovernanceQueue")
-    expect(src).toContain('queryFn: listGovernanceQueue')
+test.describe('governance inbox — queue read + role guard', () => {
+  test('the /governance page calls listGovernanceQueue() server-side, guarded by requireAdminContext()', () => {
+    const src = read(GOV_PAGE)
+    expect(src).toContain("import { requireAdminContext } from '@/lib/auth/guards'")
+    expect(src).toContain("import { listGovernanceQueue } from '@/actions/governance'")
+    expect(src).toContain('const ctx = await requireAdminContext()')
+    expect(src).toContain("if ('error' in ctx) redirect('/dashboard')")
+    expect(src).toContain('listGovernanceQueue()')
   })
 
-  test('the shim keeps a front-door redirect for non-admins', () => {
+  test('the /admin/sops shim keeps a front-door redirect for non-admins', () => {
     // 2026-07-13: member.role → role (shared getSessionContext auth refactor)
     const src = read(FOLDED_PAGE)
     expect(src).toContain("['admin', 'safety_manager'].includes(role)")
@@ -78,15 +84,9 @@ test.describe('needs-attention lens on /sops — queue read + role guard', () =>
     expect(src).toContain('export async function listGovernanceQueue')
   })
 
-  test('AdminSopSurface resolves ?view=attention to the admin-attention scope', () => {
-    const src = read(ADMIN_SURFACE)
-    expect(src).toContain("view === 'attention'")
-    expect(src).toContain("scope: 'admin-attention'")
-  })
-
-  test('AdminAttentionLens renders the queue rows grouped by worst flag (chips deleted, sketch 004)', () => {
-    const src = read(ATTENTION_LENS)
-    expect(src).toContain('FLAG_PRIORITY.find(')
+  test('GovernanceInbox renders governance rows via GovernanceQueueRow, not GovernanceFilterChips', () => {
+    const src = read(GOV_INBOX)
+    expect(src).toContain("import { GovernanceQueueRow } from './GovernanceQueueRow'")
     expect(src).toContain('<GovernanceQueueRow')
     expect(src).not.toContain('<GovernanceFilterChips')
   })

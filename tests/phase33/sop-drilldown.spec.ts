@@ -25,9 +25,13 @@
  *
  * Repointed in 41-08 (Phase 41, SUR-01/02/04): the server assembly moved from
  * admin/sops/page.tsx (now a redirect shim) to `listAdminAccessData`
- * (src/actions/admin-access-view.ts); the ?sop= deep-link entry point (URL ->
- * pinnedSopId) moved to AdminSopSurface.tsx's `resolveAdminScope`/render.
- * Every WiringPatchBay.tsx test below is unchanged (that file did not move).
+ * (src/actions/admin-access-view.ts).
+ *
+ * Repointed a second time in 54-05 (Phase 54, D-07/D-08): the Miller frame
+ * and its lenses are gone. The ?sop= deep-link entry point (URL -> pinnedSopId)
+ * is now the pure `resolveLibraryNav` in src/lib/sop-list/admin-rows.ts,
+ * consumed by AdminLibraryTable.tsx. Every WiringPatchBay.tsx test below is
+ * unchanged (that file did not move).
  *
  * Registration: playwright.config.ts `phase33` project
  *   testDir: '.', testMatch: /tests\/phase33\/.*\.(spec|test)\.ts$/
@@ -40,7 +44,8 @@ import path from 'node:path'
 const ROOT = process.cwd()
 const BAY = path.join(ROOT, 'src', 'components', 'admin', 'wiring', 'WiringPatchBay.tsx')
 const ADMIN_ACCESS_VIEW = path.join(ROOT, 'src', 'actions', 'admin-access-view.ts')
-const ADMIN_SURFACE = path.join(ROOT, 'src', 'components', 'sop', 'AdminSopSurface.tsx')
+const ADMIN_ROWS = path.join(ROOT, 'src', 'lib', 'sop-list', 'admin-rows.ts')
+const LIBRARY_TABLE = path.join(ROOT, 'src', 'components', 'admin', 'AdminLibraryTable.tsx')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
@@ -56,12 +61,13 @@ test.describe('SC-2 — server assembly: sopsByCollection + ?sop= deep-link entr
     expect(src).toContain('return { tree, collections, sopsByCollection, grants, newSop, deptMembers }')
   })
 
-  test('AdminSopSurface resolves ?sop= into pinnedSopId under the access scope (deep-link entry point survives the merge)', () => {
-    const src = read(ADMIN_SURFACE)
-    // resolveAdminScope carries ?sop= into nav.sop for the access branch only.
-    expect(src).toContain("return { scope: 'admin-access', ownerOnly: false, sop: params.get('sop') ?? undefined }")
+  test('resolveLibraryNav resolves ?sop= into pinnedSopId under the access view (deep-link entry point survives the merge)', () => {
+    const rowsSrc = read(ADMIN_ROWS)
+    // resolveLibraryNav carries ?sop= into nav.sop for the access branch only.
+    expect(rowsSrc).toContain("return { ...DEFAULT_LIBRARY_NAV, view: 'access', sop: params.get('sop') ?? undefined }")
     // ...and AdminAccessLens receives it as pinnedSopId.
-    expect(src).toContain('<AdminAccessLens pinnedSopId={nav.sop} onBack={backToWorkerAll} />')
+    const tableSrc = read(LIBRARY_TABLE)
+    expect(tableSrc).toContain('<AdminAccessLens pinnedSopId={nav.sop} onBack={() => applyNav(DEFAULT_LIBRARY_NAV)} />')
   })
 })
 

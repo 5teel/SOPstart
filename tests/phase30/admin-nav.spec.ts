@@ -41,8 +41,8 @@ const GOVERNANCE_SHIM = path.join(
 const SOPS_PAGE = path.join(
   ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx',
 )
-const ADMIN_SOP_SURFACE = path.join(
-  ROOT, 'src', 'components', 'sop', 'AdminSopSurface.tsx',
+const ADMIN_ROWS = path.join(
+  ROOT, 'src', 'lib', 'sop-list', 'admin-rows.ts',
 )
 
 function read(p: string): string {
@@ -71,11 +71,10 @@ test.describe('UX-02 — one shared admin nav', () => {
     ]) {
       expect(header).toContain(href)
     }
-    // The attention view stays reachable — resolved on the merged /sops
-    // surface (41-06: /admin/sops is now a redirect shim, not a destination).
-    const surface = read(ADMIN_SOP_SURFACE)
-    expect(surface).toContain("view === 'attention'")
-    expect(surface).toContain("scope: 'admin-attention'")
+    // The attention view stays reachable — resolveLibraryNav maps the legacy
+    // ?view=attention deep link onto the governance route (Phase 54, D-01).
+    const rows = read(ADMIN_ROWS)
+    expect(rows).toContain("if (params.get('view') === 'attention') return 'governance'")
   })
 
   test('no admin page mounts AdminNav or an inline "Admin sections" sub-nav; guards survive', () => {

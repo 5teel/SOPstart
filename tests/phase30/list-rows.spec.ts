@@ -16,9 +16,15 @@
  * off admin/sops/page.tsx (now a redirect shim) onto listAdminSopRows
  * (src/actions/admin-sop-list.ts) for data and AdminStatusLens.tsx for
  * rendering; the department scope column + "No department" link moved onto
- * AdminSopSurface.tsx (restored there in this same commit — see the Rule 1
- * fix note below, the 41-05 bundle-budget extraction computed the data but
- * dropped its render).
+ * AdminSopSurface.tsx.
+ *
+ * Repointed a second time in 54-05 (Phase 54, D-07/D-08): the Miller frame
+ * and its lenses are gone. The admin `/sops` route now mounts
+ * AdminLibraryTable.tsx: one row per SOP (SOP · Machine · Status · Owner ·
+ * Checks · Review), the row title links directly to /sops/[sopId] (the
+ * worker view), and a separate Edit link goes to the builder — there is no
+ * detail pane. The category fix (previously the SopMillerBrowser detail
+ * pane) now lives in the builder Tools menu's BuilderCategoryButton.tsx.
  */
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
@@ -28,11 +34,14 @@ const ROOT = process.cwd()
 const STAGE_SHELL = path.join(
   ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'BuilderStageShell.tsx',
 )
-const ADMIN_STATUS_LENS = path.join(
-  ROOT, 'src', 'components', 'sop', 'lenses', 'AdminStatusLens.tsx',
+const LIBRARY_TABLE = path.join(
+  ROOT, 'src', 'components', 'admin', 'AdminLibraryTable.tsx',
+)
+const CATEGORY_BUTTON = path.join(
+  ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'BuilderCategoryButton.tsx',
 )
 const ADMIN_SOP_LIST = path.join(ROOT, 'src', 'actions', 'admin-sop-list.ts')
-const ADMIN_SURFACE = path.join(ROOT, 'src', 'components', 'sop', 'AdminSopSurface.tsx')
+const SOPS_ACTIONS = path.join(ROOT, 'src', 'actions', 'sops.ts')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8')
@@ -40,14 +49,11 @@ function read(p: string): string {
 
 test.describe('UX-06 — one-line admin rows + builder action menu', () => {
   test('admin rows contain no SopDepartmentEditor / LibraryReviewCell / icon-only actions', () => {
-    const src = read(ADMIN_STATUS_LENS)
+    const src = read(LIBRARY_TABLE)
     expect(src).not.toContain('SopDepartmentEditor')
     expect(src).not.toContain('LibraryReviewCell')
     expect(src).not.toContain('VideoJobIndicator')
-    // No icon-only action Links survive in the row region.
-    expect(src).not.toContain('!min-w-[40px]')
     expect(src).not.toContain('DeleteSopButton')
-    expect(src).not.toContain('lucide-react')
   })
 
   test('builder shell owns a labelled action menu wired to the 5 destinations', () => {
@@ -88,109 +94,77 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
     expect(shell).toMatch(/aria-expanded=\{open\}/)
   })
 
-  test('row is one line: title + status chip + one flag chip, and reaches the builder', () => {
-    // Repointed 2026-09-13 (Phase 41): admin/sops/page.tsx is now a redirect
-    // shim — the row moved to AdminStatusLens.tsx (which still WIRES
-    // SopMillerBrowser, same relocation-proofing rationale as before, CLAUDE.md
-    // [2026-07-13]) and the row-mapping logic moved to listAdminSopRows.
-    const lens = read(ADMIN_STATUS_LENS)
+  test('row is one line: title, status, owner, checks and review — and reaches the builder via a separate Edit link', () => {
+    // Repointed 2026-09-29 (Phase 54): the row moved to AdminLibraryTable.tsx,
+    // fed by listAdminSopRows.
+    const table = read(LIBRARY_TABLE)
     const listAction = read(ADMIN_SOP_LIST)
-    const browser = read(path.join(ROOT, 'src', 'components', 'admin', 'SopMillerBrowser.tsx'))
 
-    expect(lens).toContain('<SopMillerBrowser')
-    // The toolbar search narrows client-side: the lens hands the browser a
-    // filtered slice of data.sops, never a second fetch (2026-09-26 redesign).
-    expect(lens).toContain('sops={sops}')
-    expect(lens).toContain('data.sops.filter(')
+    // The row title opens the SOP as a worker sees it; Edit is the one
+    // list→builder chain (WIRING: interpolated sop id).
+    expect(table).toMatch(/href=\{`\/sops\/\$\{sop\.id\}`\}/)
+    expect(table).toMatch(/href=\{`\/admin\/sops\/builder\/\$\{sop\.id\}`\}/)
+    expect(table).toContain('data-testid="lib-status"')
+    expect(table).toContain('tableStatus(')
+    expect(table).toContain('data-testid="lib-check"')
 
-    // Rows open the SOP as a worker sees it; the detail pane's Edit is the one
-    // list→builder chain (WIRING: interpolated sop id) — 2026-09-27, /sops is a
-    // portal to USE a SOP, not an editor launcher.
-    expect(browser).toMatch(/href=\{`\/sops\/\$\{sop\.id\}`\}/)
-    expect(browser).toMatch(/href=\{`\/admin\/sops\/builder\/\$\{selected\.id\}`\}/)
-    expect(browser).toContain('<StatusBadge status={sop.status as SopStatus} />')
-    expect(browser).toContain('sop.flagLabel')
-
-    // ONE flag chip: worst-first pick, still resolved server-side.
     expect(listAction).toContain('FLAG_PRIORITY.find((f) => r.flags.includes(f))')
     expect(listAction).toContain('flagLabel: flag ? FLAG_LABEL[flag] : null')
-    // Owner is still resolved for the detail pane, and still suppressed when
-    // the flag chip already says "No owner".
     expect(listAction).toContain('ownerLabelById[sop.owner_user_id]')
     expect(listAction).toContain("flag === 'unowned' ? null : shortOwner(owner)")
   })
 
-  test('selecting a SOP is client state, not a URL push (hot-path latency)', () => {
-    const browser = read(path.join(ROOT, 'src', 'components', 'admin', 'SopMillerBrowser.tsx'))
-    expect(browser).toContain("'use client'")
-    expect(browser).toContain('useState')
-    expect(browser).toContain('setSelectedId(sop.id)')
+  test('chip changes are client state, not a URL push (hot-path latency)', () => {
+    const table = read(LIBRARY_TABLE)
+    expect(table).toContain("'use client'")
+    expect(table).toContain('useState')
+    expect(table).toContain('window.history.replaceState(null')
     // A router PUSH would cost an RSC round-trip through the service worker on
-    // every row click — the exact regression [2026-05-13] records. refresh()
-    // is allowed and necessary, but only AFTER a write: the scope counts and
-    // row chips are server-rendered, so assigning a department has to re-run
-    // the page or the row stays in a scope it no longer belongs to.
-    expect(browser).not.toContain('router.push')
-    expect(browser).toContain('router.refresh()')
+    // every filter change — the exact regression [2026-05-13] records.
+    expect(table).not.toContain('router.push(')
 
-    // The selection handler itself must not refresh. Slice from the onClick to
-    // the end of that JSX attribute and assert it does nothing but set state.
-    const onSelect = browser.slice(
-      browser.indexOf('onClick={() => setSelectedId'),
-      browser.indexOf('data-testid="miller-row"')
-    )
-    expect(onSelect, 'selecting a SOP must not navigate or refresh').not.toContain('router')
-
-    // The detail pane must render from data the list already carries; a fetch
-    // or a supabase client here would reintroduce the per-click round-trip by
-    // another route.
-    expect(browser).not.toContain('createClient')
-    expect(browser).not.toContain('fetch(')
+    // The table must render from the data the query already carries; a
+    // fetch or a supabase client in the row-render path would reintroduce a
+    // per-click round-trip by another route.
+    expect(table).not.toContain('createClient')
+    // `fetch(` used only by the dynamic() lazy-import of AdminAccessLens's
+    // module is fine — the row render path itself never calls fetch.
+    const rowsRegion = table.slice(table.indexOf('rows.map('))
+    expect(rowsRegion).not.toContain('fetch(')
   })
 
-  test('the detail pane fixes what it surfaces: category and department are editable in place', () => {
-    const browser = read(path.join(ROOT, 'src', 'components', 'admin', 'SopMillerBrowser.tsx'))
-    const actions = read(path.join(ROOT, 'src', 'actions', 'sops.ts'))
+  test('the category fix lives in the builder Tools menu; departments are granted through the Access map', () => {
+    // Noticing a missing category used to mean opening the retired detail
+    // pane; it now lives beside "Pick machines for this SOP" in the builder
+    // Tools menu (D-09) so it never gets stranded by the table replacing the
+    // Miller frame.
+    const categoryButton = read(CATEGORY_BUTTON)
+    expect(categoryButton).toContain('setSopCategory(sopId, next)')
+    expect(categoryButton).toContain('data-testid="builder-category-select"')
 
-    // Noticing a missing category in the detail pane and having to open the
-    // builder to set it is the trip the Miller layout exists to remove.
-    expect(browser).toContain('setSopCategory(sop.id, next)')
-    expect(browser).toContain('data-testid="miller-category-select"')
+    // Department assignment happens through the Access map (D-11), never a
+    // direct sop_departments insert from the row.
+    const table = read(LIBRARY_TABLE)
+    expect(table).not.toContain("from('sop_departments')")
 
-    // Departments go through DepartmentPicker in sop mode WITHOUT localOnly, so
-    // the write lands via assignSopDepartments — the grant-backed path (D-11),
-    // never a direct sop_departments insert.
-    const picker = browser.slice(
-      browser.indexOf('<DepartmentPicker'),
-      browser.indexOf('/>', browser.indexOf('<DepartmentPicker'))
-    )
-    expect(picker, 'DepartmentPicker must be mounted').toContain('mode="sop"')
-    expect(picker).toContain('sopId={sop.id}')
-    // Scoped to the JSX element, not the file: the comment above it explains
-    // why localOnly is OFF, and a whole-file check would read that as the prop.
-    expect(picker, 'localOnly would make the picker report but never write').not.toContain('localOnly')
-    expect(browser).not.toContain("from('sop_departments')")
-
-    // The category action self-enforces org scope from the SESSION, never from
-    // the fetched row, and filters the write on it too (CLAUDE.md [2026-07-28]).
-    const body = actions.slice(actions.indexOf('export async function setSopCategory'))
-    expect(body).toContain('requireAdminContext()')
-    expect(body).toContain('sopRow.organisation_id !== ctx.organisationId')
-    expect(body).toContain(".eq('organisation_id', ctx.organisationId)")
-    expect(body).toContain('isValidCategorySlug(categorySlug)')
+    // The category action self-enforces org scope from the SESSION, never
+    // from the fetched row, and filters the write on it too (CLAUDE.md
+    // [2026-07-28]).
+    const body = read(SOPS_ACTIONS)
+    const fn = body.slice(body.indexOf('export async function setSopCategory'))
+    expect(fn).toContain('requireAdminContext()')
+    expect(fn).toContain('sopRow.organisation_id !== ctx.organisationId')
+    expect(fn).toContain(".eq('organisation_id', ctx.organisationId)")
+    expect(fn).toContain('isValidCategorySlug(categorySlug)')
   })
 
   test('"No department" is a reachable scope, not a dead label', () => {
-    // Repointed 2026-09-13 (Phase 41): the scope row is now a client-state
-    // MillerItem in AdminSopSurface.tsx (history.replaceState, not a <Link>
-    // href — CLAUDE.md [2026-05-13]), fed by listAdminSopRows' noAudienceCount.
-    // The 41-05 bundle-budget extraction computed this data via `counts` but
-    // dropped its render entirely — restored in this same commit (Rule 1:
-    // "hook fetched the data then threw it away", CLAUDE.md [2026-07-13]).
-    const surface = read(ADMIN_SURFACE)
-    expect(surface).toContain("applyScope('admin-all', { departments: 'none' })")
-    expect(surface).toContain("nav.departments === 'none'")
-    expect(surface).toContain('counts.noAudienceCount')
+    // Repointed 2026-09-29 (Phase 54): the Where chip on AdminLibraryTable
+    // offers a "No department (N)" option once listAdminSopRows reports
+    // noAudienceCount > 0.
+    const table = read(LIBRARY_TABLE)
+    expect(table).toContain("data.noAudienceCount > 0 && <option value=\"none\">No department ({data.noAudienceCount})</option>")
+    expect(table).toContain("nav.owner === 'none' && !sop.flags.includes('unowned')")
     const listAction = read(ADMIN_SOP_LIST)
     expect(listAction).toContain('noAudienceCount')
   })

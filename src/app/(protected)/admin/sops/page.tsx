@@ -4,9 +4,9 @@ import { getSessionContext } from '@/lib/auth/session-context'
 /**
  * Phase 41 (SUR-01, orchestrator decision D-01) — redirect shim.
  *
- * `/admin/sops` folded into the merged SOP surface at `/sops` (see
- * AdminSopSurface.tsx for the Admin scope group of lenses). This route
- * survives only so legacy deep-links + bookmarks keep working: it maps the
+ * `/admin/sops` folded into the merged SOP surface at `/sops` (see the
+ * admin library table component there). This route survives only so legacy
+ * deep-links + bookmarks keep working: it maps the
  * seven legacy query params onto the merged surface's own scopes. The admin
  * guard stays IN FRONT of the destination redirect so an unauthenticated or
  * unauthorised hit never learns the destination shape (T-41-03b).

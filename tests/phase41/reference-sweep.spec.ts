@@ -126,8 +126,8 @@ test.describe('SUR-03/SUR-04/SUR-06 reference sweep — /admin/sops list route i
     const sopDetail = read(path.join('src', 'app', '(protected)', 'sops', '[sopId]', 'page.tsx'))
     expect(sopDetail).toContain('/admin/sops/builder/')
 
-    const sopMillerBrowser = read(path.join('src', 'components', 'admin', 'SopMillerBrowser.tsx'))
-    expect(sopMillerBrowser).toContain('/admin/sops/builder/')
+    const libraryTable = read(path.join('src', 'components', 'admin', 'AdminLibraryTable.tsx'))
+    expect(libraryTable).toContain('/admin/sops/builder/')
 
     const topHeader = read(path.join('src', 'components', 'layout', 'TopHeader.tsx'))
     expect(topHeader).toContain('/admin/sops/new')

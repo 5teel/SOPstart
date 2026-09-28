@@ -9,14 +9,13 @@ import path from 'node:path'
  * deep-link now live on the /admin/sops header chips (APR-03/APR-04 hard
  * constraint); QueueRow + FilterChips survive the fold verbatim.
  *
- * Repointed in 41-08 (Phase 41, SUR-01/02/04): the attention view's grouped
- * queue rendering moved off admin/sops/page.tsx (now a redirect shim) onto
- * AdminAttentionLens.tsx, a next/dynamic({ssr:false}) lens fed by
- * listGovernanceQueue. The approveStep/isCallerNextApprover/handleApprove
- * assertions below read GovernanceQueueRow.tsx, which did NOT move — that
- * file is deliberately double-guarded: this spec AND
- * tests/phase41/status-attention-lenses.spec.ts (41-04) both pin it, so the
- * approval-gate contract had two live guards throughout the Phase 41 move.
+ * Repointed a second time in 54-05 (Phase 54, D-01/D-02): the grouped queue
+ * rendering moved off /sops?view=attention onto its own route, /governance,
+ * rendered by GovernanceInbox.tsx and derived by src/lib/governance/inbox.ts.
+ * The approveStep/isCallerNextApprover/handleApprove assertions below read
+ * GovernanceQueueRow.tsx, which did NOT move — that file is deliberately
+ * double-guarded: this spec AND tests/phase54/inbox-reuses-governance-gating.spec.ts
+ * both pin it, so the approval-gate contract stays under two live guards.
  *
  * Verifies:
  *   - GovernanceQueueRow's Approve branch condition is
@@ -24,8 +23,8 @@ import path from 'node:path'
  *     unowned/stale_role branches, and its onClick calls approveStep(row.id)
  *     wired inside a useTransition (not a bare/empty handler — CLAUDE.md
  *     2026-06-05 dead-feature learning).
- *   - GovernanceFilterChips CHIPS includes awaiting_approval.
- *   - AdminAttentionLens/flag-display.ts carry the awaiting_approval group +
+ *   - GovernanceFilterChips no longer exists.
+ *   - INBOX_CHIPS/flag-display.ts carry the awaiting_approval group +
  *     plain-language blurb.
  *
  * Registration: playwright.config.ts `phase29` project
@@ -35,7 +34,7 @@ import path from 'node:path'
 const ROOT = process.cwd()
 const QUEUE_ROW = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceQueueRow.tsx')
 const FILTER_CHIPS = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceFilterChips.tsx')
-const ATTENTION_LENS = path.join(ROOT, 'src', 'components', 'sop', 'lenses', 'AdminAttentionLens.tsx')
+const INBOX = path.join(ROOT, 'src', 'lib', 'governance', 'inbox.ts')
 const FLAG_DISPLAY = path.join(ROOT, 'src', 'lib', 'governance', 'flag-display.ts')
 
 function read(p: string): string {
@@ -74,22 +73,21 @@ test.describe('GovernanceQueueRow — awaiting_approval priority Approve branch'
   })
 })
 
-// 2026-07-30 (sketch 004): GovernanceFilterChips deleted — the attention
-// view is a grouped worst-first queue, so awaiting_approval is ALWAYS
-// visible as its own group instead of behind a chip/filter.
-test.describe('AdminAttentionLens — awaiting_approval surfaced (chips deleted)', () => {
-  test('GovernanceFilterChips is gone from AdminAttentionLens.tsx and from disk', () => {
-    const src = read(ATTENTION_LENS)
-    expect(src).not.toContain('GovernanceFilterChips')
+// 2026-07-30 (sketch 004) / 2026-09-29 (Phase 54): GovernanceFilterChips
+// deleted — the governance inbox is a derived, chip-filterable queue, so
+// awaiting_approval is always represented as its own Approve chip.
+test.describe('Governance inbox — awaiting_approval surfaced (chips deleted)', () => {
+  test('GovernanceFilterChips is gone from disk', () => {
     expect(fs.existsSync(FILTER_CHIPS)).toBe(false)
   })
 
-  test('awaiting_approval is a grouped section with a plain-language blurb', () => {
+  test('awaiting_approval is its own inbox chip with a plain-language blurb', () => {
+    const inboxSrc = read(INBOX)
+    expect(inboxSrc).toContain("{ key: 'approve', label: 'Approve' }")
+    expect(inboxSrc).toContain("row.flags.includes('awaiting_approval') && row.isCallerNextApprover")
     const flagSrc = read(FLAG_DISPLAY)
     expect(flagSrc).toContain("FLAG_PRIORITY: GovernanceFlag[] = ['overdue', 'due_soon', 'awaiting_approval', 'unowned', 'stale_role']")
     expect(flagSrc).toContain("awaiting_approval: 'Awaiting approval'")
     expect(flagSrc).toContain("awaiting_approval: 'waiting on an approval step'")
-    const lensSrc = read(ATTENTION_LENS)
-    expect(lensSrc).toContain('attentionGroups.map')
   })
 })

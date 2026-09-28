@@ -72,14 +72,13 @@ test('(d) worker-signal.ts has no I/O -- no supabase, no db.ts value import, no 
   expect(src.includes('create(')).toBe(false)
 })
 
-test('(e) one classifier: worker-signal.ts owns both topSignal and plantRelState; SopWorkerBrowser imports, does not redefine', () => {
+test('(e) one classifier: worker-signal.ts owns plantRelState (and topSignal while it has a consumer); no other src/ file redefines either', () => {
   const workerSignalSrc = read('src/lib/sop/worker-signal.ts')
-  expect(workerSignalSrc).toContain('export function topSignal')
   expect(workerSignalSrc).toContain('export function plantRelState')
 
-  const browserSrc = read('src/components/sop/SopWorkerBrowser.tsx')
-  expect(browserSrc).toContain("from '@/lib/sop/worker-signal'")
-  expect(browserSrc.includes('function topSignal')).toBe(false)
+  const files = listFiles('src').filter((f) => f.split(path.sep).join('/') !== 'src/lib/sop/worker-signal.ts')
+  const violations = files.filter((f) => /function\s+(topSignal|plantRelState)\b/.test(read(f)))
+  expect(violations).toEqual([])
 })
 
 test('(f) the plant directory renders what worker-signal classifies -- it never classifies or stores', () => {

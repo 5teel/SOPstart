@@ -15,20 +15,23 @@
  * documented below as a fixme runtime smoke with the same prerequisites list.
  *
  * Repointed in 41-08 (Phase 41, SUR-01/02/04): the deep-link surface moved
- * from admin/sops/page.tsx (now a redirect shim) to /sops. Server-side id
- * resolution + the `.in('id', …)` filter moved to `listAdminSopRows`
- * (src/actions/admin-sop-list.ts); the "Open in library (N)" header moved
- * to AdminStatusLens.tsx; the departments/collection-are-inert-under-access
- * precedence moved to AdminSopSurface.tsx's `resolveAdminScope`; and the
- * WiringPatchBay/SelectionStrip hrefs were repointed to `/sops?...` in 41-07.
+ * from admin/sops/page.tsx (now a redirect shim) to /sops.
+ *
+ * Repointed a second time in 54-05 (Phase 54, D-07/D-08): the Miller frame
+ * and its lenses are gone. `listAdminSopRows` still owns the id resolution +
+ * `.in('id', …)` filter; the filtered-count header is now AdminLibraryTable's
+ * "In a collection ×" chip (`lib-chip-collection`); the departments/
+ * collection-are-inert-under-access precedence moved to the pure
+ * `resolveLibraryNav` in src/lib/sop-list/admin-rows.ts; and the
+ * WiringPatchBay/SelectionStrip hrefs are unchanged from 41-07.
  */
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
 import path from 'node:path'
 
 const ADMIN_SOP_LIST = path.join(process.cwd(), 'src/actions/admin-sop-list.ts')
-const ADMIN_STATUS_LENS = path.join(process.cwd(), 'src/components/sop/lenses/AdminStatusLens.tsx')
-const ADMIN_SURFACE = path.join(process.cwd(), 'src/components/sop/AdminSopSurface.tsx')
+const LIBRARY_TABLE = path.join(process.cwd(), 'src/components/admin/AdminLibraryTable.tsx')
+const ADMIN_ROWS = path.join(process.cwd(), 'src/lib/sop-list/admin-rows.ts')
 const WIRING_PATCH_BAY_PATH = path.join(process.cwd(), 'src/components/admin/wiring/WiringPatchBay.tsx')
 const SELECTION_STRIP_PATH = path.join(process.cwd(), 'src/components/admin/wiring/SelectionStrip.tsx')
 
@@ -45,28 +48,27 @@ test.describe('SC-4 — library filter deep-link', () => {
   })
 
   test('a collection deep link gets a filtered-count header with a way back (Clear filter)', () => {
-    // 2026-09-27: the banner became a "Clear filter" control in the list column
-    // header — the lens decides WHEN it shows, SopMillerBrowser draws it.
-    const src = fs.readFileSync(ADMIN_STATUS_LENS, 'utf-8')
-    expect(src).toMatch(/onClearFilter=\{data\.filtered && !departments \? onClearFilter : undefined\}/)
-    const browser = fs.readFileSync(path.join(process.cwd(), 'src/components/admin/SopMillerBrowser.tsx'), 'utf-8')
-    expect(browser).toContain('Clear filter')
-    expect(browser).toMatch(/onClick=\{onClearFilter\}/)
+    // 2026-09-29: the filtered-count control is AdminLibraryTable's own
+    // "In a collection ×" chip, shown only while nav.collection is set.
+    const src = fs.readFileSync(LIBRARY_TABLE, 'utf-8')
+    expect(src).toContain('data-testid="lib-chip-collection"')
+    expect(src).toContain('{nav.collection && (')
+    expect(src).toContain("onClick={() => applyNav({ ...nav, collection: undefined })}")
   })
 
-  test('AdminSopSurface resolves ?view=access BEFORE any departments/collection check, dropping them entirely (isAccessView precedence)', () => {
-    const src = fs.readFileSync(ADMIN_SURFACE, 'utf-8')
-    const accessIdx = src.indexOf("if (view === 'access') {")
-    const deptCollIdx = src.indexOf('if (departments || collection) {')
+  test('resolveLibraryNav resolves ?view=access BEFORE any departments/collection check, dropping them entirely', () => {
+    const src = fs.readFileSync(ADMIN_ROWS, 'utf-8')
+    const accessIdx = src.indexOf("if (params.get('view') === 'access') {")
+    const statusIdx = src.indexOf("const status = params.get('status')")
     expect(accessIdx).toBeGreaterThan(-1)
-    expect(deptCollIdx).toBeGreaterThan(-1)
-    expect(accessIdx).toBeLessThan(deptCollIdx)
+    expect(statusIdx).toBeGreaterThan(-1)
+    expect(accessIdx).toBeLessThan(statusIdx)
 
     // The access branch's own return statement carries no departments/collection
-    // key — asserted on the actual code line, not the explanatory comment above
-    // it (which legitimately names both fields in prose).
+    // key — asserted on the actual code line, not the explanatory comment
+    // above it (which legitimately names both fields in prose).
     const accessReturnLine = src.split('\n').find(
-      (l) => l.includes("scope: 'admin-access'") && l.includes('return')
+      (l) => l.includes("view: 'access'") && l.includes('return')
     )
     expect(accessReturnLine).toBeDefined()
     expect(accessReturnLine).not.toContain('departments')
@@ -102,9 +104,11 @@ test.describe('SC-4 — library filter deep-link', () => {
        * 1. Navigate to /sops?view=access.
        * 2. Click a department jack; confirm the SelectionStrip shows an
        *    "Open in library →" link and its href is /sops?departments=<id>.
-       * 3. Follow the link; confirm the library list only shows that
-       *    department's SOPs and the header reads "Open in library (N)".
-       * 4. Repeat for a collection jack → ?collection=<id>.
+       * 3. Follow the link; confirm the library table only shows that
+       *    department's SOPs and the "In a collection ×" chip is gone
+       *    (departments filters don't use that chip; only collection does).
+       * 4. Repeat for a collection jack → ?collection=<id>, confirming the
+       *    "In a collection ×" chip appears and clears the filter on click.
        */
       void page
       expect(true).toBe(true)

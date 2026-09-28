@@ -7,12 +7,17 @@
  * in the folded needs-attention view.
  *
  * Repointed AGAIN in 41-08 (SUR-01/02/04): the admin library rows moved to
- * `listAdminSopRows` (src/actions/admin-sop-list.ts), the "Owned by me"
- * toggle + header/count chips moved to AdminSopSurface.tsx (a scope row in
- * the Miller column, no more <Link> href — CLAUDE.md 2026-05-13 URL-state
- * rule), and the attention-view grouping lives in AdminAttentionLens.tsx +
- * flag-display.ts. admin/sops/page.tsx is now a thin redirect shim and no
- * longer carries any of this behaviour (see 41-06-SUMMARY.md).
+ * `listAdminSopRows` (src/actions/admin-sop-list.ts).
+ *
+ * Repointed a third time in 54-05 (D-07/D-08): the Miller frame and its
+ * lenses are gone — the admin `/sops` route now mounts AdminLibraryTable.tsx,
+ * whose nav state (owner=me, status, departments, collection, ?view=access)
+ * is resolved by the pure `resolveLibraryNav` in src/lib/sop-list/admin-rows.ts
+ * and applied via `window.history.replaceState` (CLAUDE.md 2026-05-13
+ * URL-state rule), never a <Link> href. The governance queue moved to its own
+ * route, /governance, rendered by GovernanceInbox.tsx and derived by
+ * src/lib/governance/inbox.ts. admin/sops/page.tsx is now a thin redirect
+ * shim and no longer carries any of this behaviour.
  *
  * Verifies (source-contract, no live DB required):
  *   OWN-04/D28-08: listAdminSopRows handles ?owner=me with a REAL
@@ -21,8 +26,9 @@
  *     queue (classifyGovernanceRow's review_due_at < now), rendered as the
  *     row flag chip; Confirm current stays a real wired call on
  *     GovernanceQueueRow (the merged surface).
- *   GQ-04/D28-09: listAdminSopRows counts from listGovernanceQueue and
- *     AdminAttentionLens/AdminSopSurface deep-link the flags to the merged view.
+ *   GQ-04/D28-09: listAdminSopRows counts from listGovernanceQueue, and the
+ *     table's resolveLibraryNav sentinel + the governance inbox's chips
+ *     deep-link the flags.
  *   REV-03/D28-07: ReadTab (Phase 30 merged Overview+Tools+Hazards) contains
  *     the "Current as of" caption and contains NO review_due_at
  *     conditional/gate anywhere (hard rule).
@@ -41,8 +47,9 @@ import path from 'node:path'
 
 const ROOT = process.cwd()
 const ADMIN_SOP_LIST = path.join(ROOT, 'src', 'actions', 'admin-sop-list.ts')
-const ADMIN_SURFACE = path.join(ROOT, 'src', 'components', 'sop', 'AdminSopSurface.tsx')
-const ATTENTION_LENS = path.join(ROOT, 'src', 'components', 'sop', 'lenses', 'AdminAttentionLens.tsx')
+const ADMIN_ROWS = path.join(ROOT, 'src', 'lib', 'sop-list', 'admin-rows.ts')
+const LIBRARY_TABLE = path.join(ROOT, 'src', 'components', 'admin', 'AdminLibraryTable.tsx')
+const INBOX = path.join(ROOT, 'src', 'lib', 'governance', 'inbox.ts')
 const FLAG_DISPLAY = path.join(ROOT, 'src', 'lib', 'governance', 'flag-display.ts')
 const QUEUE_ROW = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceQueueRow.tsx')
 const CLASSIFY = path.join(ROOT, 'src', 'lib', 'governance', 'classify.ts')
@@ -58,7 +65,7 @@ function read(p: string): string {
 const GATE_PATTERN = /review_due_at\s*[<>]|owner_user_id\s*[=!]==?\s*null|if\s*\([^)]*(review_due_at|owner_user_id)/
 
 // ---------------------------------------------------------------------------
-// listAdminSopRows / AdminSopSurface — OWN-04/D28-08 (repointed 2026-09-13)
+// listAdminSopRows / AdminLibraryTable — OWN-04/D28-08 (repointed 2026-09-29)
 // ---------------------------------------------------------------------------
 
 test.describe('admin library — owner=me filter + owner/flag columns', () => {
@@ -74,13 +81,14 @@ test.describe('admin library — owner=me filter + owner/flag columns', () => {
     expect(src).toContain('review_due_at')
   })
 
-  test('AdminSopSurface renders an Owned by me toggle that writes ?owner=me via history state (no <Link> href)', () => {
+  test('AdminLibraryTable renders an owner filter that writes ?owner=me via history state (no <Link> href)', () => {
     // CLAUDE.md 2026-05-13: scope/filter changes are history.replaceState, not
-    // router.push/<Link> — navToUrl composes the URL, applyScope drives state.
-    const src = read(ADMIN_SURFACE)
-    expect(src).toContain('Owned by me')
-    expect(src).toContain("applyScope('admin-all', { ownerOnly: !nav.ownerOnly })")
-    expect(src).toContain("if (nav.ownerOnly) qp.set('owner', 'me')")
+    // router.push/<Link> — libraryNavToUrl composes the URL, applyNav drives state.
+    const src = read(LIBRARY_TABLE)
+    expect(src).toContain('applyNav(')
+    expect(src).toContain('window.history.replaceState(null, \'\', libraryNavToUrl(next))')
+    const rowsSrc = read(ADMIN_ROWS)
+    expect(rowsSrc).toContain("if (nav.owner === 'me') qp.set('owner', 'me')")
   })
 
   test('renders the owner label on each one-line row (UX-06)', () => {
@@ -115,7 +123,7 @@ test.describe('merged surface — wired confirm-current + queue-derived overdue 
 
 // ---------------------------------------------------------------------------
 // Header/scope chips — GQ-04/D28-09 (was GovernanceWidget, deleted in 30-08;
-// repointed 2026-09-13 off the emptied admin/sops/page.tsx)
+// repointed 2026-09-29 onto AdminLibraryTable.tsx + the governance inbox)
 // ---------------------------------------------------------------------------
 
 test.describe('admin scope counts — counts from listGovernanceQueue + deep links', () => {
@@ -125,17 +133,22 @@ test.describe('admin scope counts — counts from listGovernanceQueue + deep lin
     expect(src).toContain('listGovernanceQueue()')
   })
 
-  test('AdminSopSurface resolves ?view=attention as its own scope, deep-linked via navToUrl', () => {
-    const src = read(ADMIN_SURFACE)
-    expect(src).toContain("qp.set('view', 'attention')")
-    expect(src).toContain("scope: 'admin-attention'")
+  test('resolveLibraryNav resolves ?view=attention to the governance sentinel, and the table redirects there', () => {
+    const rowsSrc = read(ADMIN_ROWS)
+    expect(rowsSrc).toContain("if (params.get('view') === 'attention') return 'governance'")
+    const tableSrc = read(LIBRARY_TABLE)
+    expect(tableSrc).toContain("if (resolved === 'governance')")
+    expect(tableSrc).toContain("router.replace('/governance')")
   })
 
-  test('attention view groups every flag (header chips deleted, sketch 004)', () => {
-    // 2026-07-30: per-flag chip deep-links replaced by the grouped queue —
-    // every flag renders as its own always-visible section.
-    const lensSrc = read(ATTENTION_LENS)
-    expect(lensSrc).toContain('attentionGroups.map')
+  test('the governance inbox groups by chip; every flag from classify.ts is still represented', () => {
+    // 2026-07-30/2026-09-29: per-flag filter chips replaced by the derived
+    // inbox — INBOX_CHIPS covers the actionable subset (owner/overdue/approve),
+    // and flag-display.ts still names every GovernanceFlag for GovernanceQueueRow.
+    const inboxSrc = read(INBOX)
+    expect(inboxSrc).toContain("{ key: 'owner', label: 'No owner' }")
+    expect(inboxSrc).toContain("{ key: 'overdue', label: 'Overdue' }")
+    expect(inboxSrc).toContain("{ key: 'approve', label: 'Approve' }")
     const flagSrc = read(FLAG_DISPLAY)
     for (const flag of ['overdue', 'due_soon', 'unowned', 'stale_role', 'awaiting_approval']) {
       expect(flagSrc).toContain(`${flag}:`)
