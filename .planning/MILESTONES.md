@@ -162,3 +162,22 @@ North star (locked): ease of use and maintenance first — governance never bloc
 
 - Access grants (Phases 32–33) encode who is REQUIRED to know what — the left-hand side of a training/competency matrix.
 - Completions + immutable sign-off chains (Phase 23/D-17) are the evidence half. v7.0 joins the two.
+
+## v10.0 — Plant Floor Navigation
+
+**Started:** 2026-09-28 · **Shipped:** 2026-09-29
+
+Decided from sketch 007 ("the site is the map") after Simon rejected the Miller-column reshape (006) as too close to what existed. Kiosk / shared-terminal mode dropped by Simon the same day.
+
+- **Phase 51 (7/7):** `site_layouts` / `site_machines` / `sop_machines` under org-scoped RLS; scene upload or Gemini generation; Konva polygon editor at `/admin/site`; SOP↔machine linking from the editor and the builder Tools menu.
+- **Phase 52 (5/5):** worker desktop `/sops` = the plant scene with derived pins, Now card, machine panel, ask bar; one shared worker-signal classifier; bundle gate held at −2 KB. Deployed eval caught a real bug (persisted empty assigned-SOP cache) fixed at the root.
+- **Phase 53 (6/6):** phone home (ask · Now · floor thumbnail · Scan), `/m/<code>` machine pages, printable A6 QR plates, in-app scan with `BarcodeDetector` → `jsqr` fallback and a typed-code path; login `?next=` carried through. A webpack chunk-scatter regression (+8 KB on the gate) was pinned with an enforced cacheGroup, baseline untouched.
+- **Phase 54 (6/6):** `/governance` inbox with one action per row, floor health repaint + admin machine panel, admin library table with a five-check row; the Phase 41 scope column, Miller frame, `AdminSopSurface` and its lenses deleted with a reference sweep; 26/26 deployed evals.
+
+**Manual items outstanding:** real-camera QR decode on a physical phone (headless Chromium cannot); Gemini scene generation once `GEMINI_API_KEY` is on Railway.
+
+### Carried forward
+- v8.0 Phase 43 (route truth) now runs against the post-54 route tree.
+- `scripts/check-bundle-size.ts` blind spot (URL-encoded `[sopId]` page chunk uncounted) — documented in `.planning/phases/53-phone-scan-or-ask/deferred-items.md`; closing it needs a signed-off baseline change.
+- Access wiring → Team; review-due calendar; multi-site picker; sprite generation per machine.
+

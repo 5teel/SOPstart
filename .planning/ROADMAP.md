@@ -1540,7 +1540,7 @@ Plans:
 4. Per-block verify checklist — single sign-off pass, or split by section (hazards verified by safety_manager, steps verified by supervisor)?
 5. Where does AI-reviewer cost get capped — re-run limit per SOP per day? Token budget per parse?
 
-## v10.0 — Plant Floor Navigation (scoped 2026-09-28)
+## v10.0 — Plant Floor Navigation (scoped 2026-09-28 · ✅ shipped 2026-09-29 — all four phases live on sopstart.com, each verified with a deployed eval)
 
 **REPLACEMENT milestone.** The site is the map. Sketch 007 (winner "Plant", decided 2026-09-28) replaces the `/sops` scope column Phase 41 merged — a desk-catalogue idiom (Finder / Linear) applied to operators who never wanted a catalogue. Floor products (SwipeGuide, Poka, Tulip, Dozuki) reach a procedure by scanning the machine, by a "today" feed, or by a station app. v10.0 builds that: an isometric drawing of the plant as the worker home with tappable machines and derived pins, a Now card, an ask/voice bar; QR plates on the phone; an admin inbox with the same floor lit by library health and the library demoted to a table with a checks row. Design contract: `.claude/skills/sketch-findings-SOPstart/references/plant-floor-navigation.md`. Kiosk / shared terminal **dropped**.
 

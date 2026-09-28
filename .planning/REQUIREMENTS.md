@@ -933,10 +933,10 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 ### Admin (ADM) — Phase 54
 
-- [ ] **ADM-01**: `/governance` is its own route: an inbox of one-action rows (no owner · review overdue · awaiting your approval · stuck converting · machines with no procedures) with counted filter chips; an empty inbox is the goal state
-- [ ] **ADM-02**: The site scene sits beside the inbox repainted by health — red where a SOP has no owner, amber where review is overdue — and a pin opens the machine panel with owner and revision per SOP
-- [ ] **ADM-03**: Admin `/sops` is the library as a plain table with a per-SOP checks row (owner · reviewed within 12 months · approved · assigned · converted) and Where / Status / Owner / Checks chips; the Miller frame, the scope column and the `AdminSopSurface` lenses are deleted, not hidden
-- [ ] **ADM-04**: Header links, `journeys.ts`, the deployed evals and the CAPABILITY-MATRIX reflect the new surfaces; a repo sweep proves no href targets a retired lens or query parameter
+- [x] **ADM-01**: `/governance` is its own route: an inbox of one-action rows (no owner · review overdue · awaiting your approval · stuck converting · machines with no procedures) with counted filter chips; an empty inbox is the goal state
+- [x] **ADM-02**: The site scene sits beside the inbox repainted by health — red where a SOP has no owner, amber where review is overdue — and a pin opens the machine panel with owner and revision per SOP
+- [x] **ADM-03**: Admin `/sops` is the library as a plain table with a per-SOP checks row (owner · reviewed within 12 months · approved · assigned · converted) and Where / Status / Owner / Checks chips; the Miller frame, the scope column and the `AdminSopSurface` lenses are deleted, not hidden
+- [x] **ADM-04**: Header links, `journeys.ts`, the deployed evals and the CAPABILITY-MATRIX reflect the new surfaces; a repo sweep proves no href targets a retired lens or query parameter
 
 ### v10.0 Out of Scope
 
@@ -952,9 +952,9 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 | SIT-01..04 (4) | Phase 51 | Complete (2026-09-28) |
 | HOM-01..06 (6) | Phase 52 | Complete (2026-09-29) |
 | PHN-01..03 (3) | Phase 53 | Complete (2026-09-29) |
-| ADM-01..04 (4) | Phase 54 | Pending |
+| ADM-01..04 (4) | Phase 54 | Complete (2026-09-29) |
 
-**v10.0 Coverage:** 17 requirements, 17 mapped, 0 unmapped.
+**v10.0 Coverage:** 17 requirements, 17 mapped, 0 unmapped — **17/17 complete 2026-09-29**.
 
 ---
 *v10.0 requirements added: 2026-09-28*
