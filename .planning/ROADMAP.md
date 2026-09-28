@@ -1633,7 +1633,7 @@ Plans:
 - [x] 53-02-PLAN.md — Wave 1: useWorkerSops hook — the one worker-list derivation lifted out of /sops (guards repointed, build gate)
 - [x] 53-03-PLAN.md — Wave 2: /m/[code] (org-scoped lookup, MachineView, inline MachinePanel, live cross-org probe) + A6 plate page + Print plate in SiteWorkspace + journeys routes + capability matrix
 - [x] 53-04-PLAN.md — Wave 2: NowCard (optional Show me → Read, inline), machine codes to the client, MachineListSheet, PhoneHome, /sops phone seam, phone-home marker group, build gate
-- [ ] 53-05-PLAN.md — Wave 3: ScanSheet (back camera, BarcodeDetector → jsqr, our-origin check, typed code), Scan button, scan-sheet marker group, journeys phone flow, build gate
+- [x] 53-05-PLAN.md — Wave 3: ScanSheet (back camera, BarcodeDetector → jsqr, our-origin check, typed code), Scan button, scan-sheet marker group, journeys phone flow, build gate
 - [ ] 53-06-PLAN.md — Wave 4: live phone-home eval at 390×844 (+ shared fixture helper), /uat item, full suite once, push, eval, screenshots read, validation sign-off
 
 **UI hint**: yes
@@ -1737,7 +1737,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 
 **Goal:** Scheduled task or cron that marks video_generation_jobs stuck in queued/analyzing/generating_audio/rendering for >30 minutes as 'failed' with a timeout error. Could also notify admin. Triggered by finding a hours-old rendering job during Phase 10 verification.
 **Requirements:** TBD
-**Plans:** 4/6 plans executed
+**Plans:** 5/6 plans executed
 
 Plans:
 
