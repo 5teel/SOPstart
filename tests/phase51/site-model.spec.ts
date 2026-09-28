@@ -65,7 +65,7 @@ test.describe('polygonSchema', () => {
 
 test.describe('upsertSiteMachineSchema', () => {
   const base = {
-    siteLayoutId: '00000000-0000-0000-0000-000000000001',
+    siteLayoutId: '11111111-1111-4111-8111-111111111111',
     departmentId: null,
     polygon: [[0, 0], [10, 0], [10, 10]],
   }
@@ -96,7 +96,7 @@ test.describe('scenePath / upsertSiteLayoutSchema', () => {
 
   test("upsertSiteLayoutSchema rejects ext 'gif'", () => {
     const result = upsertSiteLayoutSchema.safeParse({
-      id: '00000000-0000-0000-0000-000000000001',
+      id: '11111111-1111-4111-8111-111111111111',
       ext: 'gif',
     })
     expect(result.success).toBe(false)
