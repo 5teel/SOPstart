@@ -634,5 +634,32 @@ export default defineConfig({
       testMatch: /tests\/phase52\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 53 -- Phone: Scan or Ask
+      // Nyquist harness (Wave 0 / Plan 53-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase53/**) so every later plan in
+      // the phase drops specs into tests/phase53/ with NO further config edit --
+      // single registration point for the whole phase (mirrors phase51/52/etc).
+      //
+      // Verify registration: `npx playwright test --list --project=phase53`
+      // (should list all 9 tests/phase53/*.spec.ts files -- zero discovered = FAIL)
+      //
+      // Files registered here:
+      //   qr-decode (PHN-03, LIVE from 53-01) --
+      //   login-next-redirect (PHN-02, LIVE from 53-01) --
+      //   m-code-page (PHN-02, fixme, activates 53-03) --
+      //   m-code-org-scope (PHN-02, fixme, activates 53-03) --
+      //   plate-page (PHN-02, fixme, activates 53-03) --
+      //   phone-home (PHN-01, fixme, activates 53-04) --
+      //   machine-list-sheet (PHN-01, fixme, activates 53-04) --
+      //   phone-home-fallback (PHN-01, fixme, activates 53-04) --
+      //   scan-sheet (PHN-03, fixme, activates 53-05)
+      name: 'phase53',
+      testDir: '.',
+      testMatch: /tests\/phase53\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
