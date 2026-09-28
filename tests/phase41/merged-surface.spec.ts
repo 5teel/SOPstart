@@ -135,12 +135,12 @@ test.describe('SUR-01 — merged /sops surface gates admin scope on useIsAdmin()
 })
 
 test.describe('SUR-02 — admin lenses are code-split, deep-linkable, and use client-side scope state', () => {
-  test('SUR-02: page.tsx has exactly 3 next/dynamic({ ssr: false }) bindings (worker browser + the admin module + the Phase 52 plant home)', () => {
+  test('SUR-02: page.tsx has exactly 4 next/dynamic({ ssr: false }) bindings (worker browser + the admin module + the Phase 52 plant home + the Phase 53 phone home)', () => {
     const code = stripComments(read(SOPS_PAGE))
     const dynamicCalls = code.match(/dynamic\(/g) ?? []
-    expect(dynamicCalls.length).toBe(3)
+    expect(dynamicCalls.length).toBe(4)
     const ssrFalseCount = (code.match(/\{\s*ssr:\s*false\s*\}/g) ?? []).length
-    expect(ssrFalseCount).toBe(3)
+    expect(ssrFalseCount).toBe(4)
   })
 
   test('SUR-02: AdminSopSurface.tsx has exactly 3 next/dynamic({ ssr: false }) bindings (the three lenses)', () => {

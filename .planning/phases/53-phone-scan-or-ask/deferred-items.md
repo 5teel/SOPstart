@@ -1,0 +1,27 @@
+# Deferred Items — Phase 53
+
+## SB-LINE-06 bundle gate: `/sops/[sopId]/page` fails +8 KB, pre-existing from Plan 53-03 (not introduced by 53-04)
+
+**Found during:** Plan 53-04, Task 3 (`npm run build` / `check-bundle-size.ts`).
+
+**Symptom:** `check-bundle-size: /sops/[sopId]/page = 1056 KB (baseline 1048 KB, Δ +8 KB, tolerance ±2 KB)`. `npm run build`'s `postbuild` step (`check-bundle-size.ts`) exits 1. Compilation and `tsc` both succeed cleanly — only the bundle-delta gate fails, on the FIRST route in `GATED_ROUTES` (`/sops/[sopId]/page`), before it ever reaches `/sops/page`'s own delta check or the marker self-validation step for either route.
+
+**Root cause (proven by git bisection, not assumed):**
+
+1. Built at `375a642` (Plan 53-02 tip, last point the bundle gate was actually run): **PASS** — `/sops/[sopId]/page` Δ-1 KB, `/sops/page` Δ-2 KB. Matches 53-02-SUMMARY.md's recorded numbers exactly.
+2. Built at `e4e5c19` (Plan 53-03, Task 1 — `/m/[code]` route + `MachinePanel.tsx` gaining an optional `inline`/`onClose?` prop pair so `MachineView.tsx` can reuse it inline): **FAIL** — `/sops/[sopId]/page` Δ+8 KB, identical to the failure seen at `837f4d5` (53-03's final commit) and identical to the failure with all of 53-04's own work applied on top.
+3. Built at `837f4d5` (Plan 53-03 tip, before any 53-04 work): **FAIL**, same +8 KB.
+4. Built with only 53-04's `page.tsx` changes re-applied on top of (3): **FAIL**, same +8 KB — confirming 53-04's own contribution to `/sops/page`'s chunk is `15278 - 14960 = 318 bytes` (~0.3 KB), far under tolerance on its own.
+
+**Mechanism:** `MachinePanel.tsx` used to be reachable from exactly one entry point (`PlantHome`, itself only reachable via `/sops/page`'s lazy `dynamic()` boundary). Plan 53-03 added a second consumer, `MachineView.tsx`, statically imported from the new `/m/[code]` route. With two independent entry points now importing the same module, webpack's automatic `splitChunks` commons-extraction reorganises the shared-module graph: a single 98 KB numbered chunk (`5501-*.js`) that existed at 53-02 tip is gone at 53-03 tip, replaced by four smaller numbered chunks (`2780`, `4528`, `7978`, `9605`) totalling ~117 KB, and `/sops/page`'s own chunk shrinks from ~24.5 KB to ~15 KB as content moves out into the new shared chunks. Net effect on `/sops/[sopId]/page`'s counted total: +8 KB. This is generic webpack chunk-graph churn from adding a new route that shares a component with an existing lazy module — **not** a bundle-isolation leak: every forbidden-marker check (pdfjs, mammoth, konva, admin lenses, plant/phone home markers) still passes cleanly; no forbidden string appears in any of the newly-shuffled chunks.
+
+**Why it wasn't caught in 53-03:** 53-03-SUMMARY.md's verification output has no `npm run build` / bundle-gate line — only `tsc --noEmit`, `eslint`, and `npm run lint` were run. The regression landed silently.
+
+**Why 53-04 doesn't fix it:** the root cause lives entirely in files outside this plan's `files_modified` scope (`MachinePanel.tsx`, `MachineView.tsx`, `/m/[code]/page.tsx` — all Plan 53-03 artifacts). Restructuring the shared-module boundary (e.g. giving `MachinePanel` its own explicit webpack `cacheGroup`, or duplicating a slimmer worker-only variant instead of sharing one component across the two entry points) is a cross-plan architectural change, not a same-task auto-fix under Rules 1-3, and CLAUDE.md's 2026-09-13 learning explicitly prohibits treating `.bundle-baseline.json` as a tuning knob to paper over it. The baseline was **not** recaptured.
+
+**Recommendation for a follow-up plan (54 or a dedicated remediation plan):**
+- Give `MachinePanel.tsx` (or the worker-signal + zoneColour + RelBadge cluster it pulls in) an explicit `next.config.ts` webpack `splitChunks.cacheGroups` entry so its shared-chunk shape is deterministic rather than left to automatic heuristics, OR
+- Accept the new baseline deliberately: re-run `capture-bundle-baseline.ts` with a signed-off justification paragraph (per the 2026-09-13 precedent) once a human has confirmed the +8 KB is inert chunk-graph reshuffling, not a functional regression, OR
+- Extract a worker-only `MachineViewPanel` that does not share `MachinePanel.tsx` with the desktop plant, trading a small amount of duplication for two independent, single-consumer chunk graphs.
+
+**Status:** left unfixed, documented here per the SCOPE BOUNDARY rule (pre-existing failure in unrelated files, out of scope for 53-04). `npm run build`'s postbuild gate currently exits 1 on `main`. This blocks a fully green `npm run build` for any future plan until addressed.

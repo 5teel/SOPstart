@@ -75,6 +75,7 @@ const GATED_ROUTES: GatedRoute[] = [
       { label: 'mammoth (D-21-09)', markers: ['mammoth', 'convertToHtml'] },
       { label: 'konva (26-05 D-03)', markers: ['react-konva', 'konva'] },
       { label: 'plant home (52 D-01)', markers: ['No procedures for this machine yet.'] },
+      { label: 'phone home (53 D-01)', markers: ['Show the machines on your site'] },
     ],
   },
   {
@@ -99,6 +100,7 @@ const GATED_ROUTES: GatedRoute[] = [
       { label: 'konva (52 D-02)', markers: ['react-konva', 'konva'] },
       { label: 'voice modal (52 D-13)', markers: ['Please acknowledge the safety hazards first'] },
       { label: 'plant home (52 D-01)', markers: ['No procedures for this machine yet.'] },
+      { label: 'phone home (53 D-01)', markers: ['Show the machines on your site'] },
     ],
   },
 ]
