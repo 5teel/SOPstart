@@ -661,5 +661,31 @@ export default defineConfig({
       testMatch: /tests\/phase53\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 54 -- Admin: Inbox, Floor Health, Library Table
+      // Nyquist harness (Wave 0 / Plan 54-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase54/**) so every later plan in
+      // the phase drops specs into tests/phase54/ with NO further config edit --
+      // single registration point for the whole phase (mirrors phase51/52/53).
+      //
+      // Verify registration: `npx playwright test --list --project=phase54`
+      // (should list all 8 tests/phase54/*.spec.ts files -- zero discovered = FAIL)
+      //
+      // Files registered here:
+      //   admin-health (ADM-02/ADM-03, LIVE from 54-01) --
+      //   library-table-checks (ADM-03, LIVE from 54-01) --
+      //   site-health-action (ADM-02, LIVE from 54-01) --
+      //   governance-inbox (ADM-01, fixme, activates 54-02) --
+      //   inbox-reuses-governance-gating (ADM-01, fixme, activates 54-02) --
+      //   admin-machine-panel (ADM-02, fixme, activates 54-03) --
+      //   library-table (ADM-03, fixme, activates 54-04) --
+      //   deletion-sweep (ADM-04, fixme scaffold from 54-01, activates 54-05)
+      name: 'phase54',
+      testDir: '.',
+      testMatch: /tests\/phase54\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
