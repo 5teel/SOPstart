@@ -1600,7 +1600,16 @@ Plans:
   5. Typing in the ask bar highlights matching machines and SOPs live; the mic routes into the existing voice Q&A entry
   6. `npm run build` bundle check shows the worker `/sops` route within the SB-LINE-06 budget against the untouched baseline (the renderer is `next/dynamic`, the image `loading="lazy"`); deployed eval screenshots at 1440px read by the orchestrator
 
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+
+- [ ] 52-01-PLAN.md — Wave 1: phase52 project + stubs, Konva deny + /sops Konva/voice marker groups, eval-site worker + published assigned fixture SOP, worker-signal.ts (plantRelState, derivePlantPins, pickNowQueue, askMatches — TDD), listSiteForWorker, RelBadge, capability matrix
+- [ ] 52-02-PLAN.md — Wave 2: scene.ts camera maths (flyToView, fitBoxView, zoneColour — TDD), PlantStage (img + SVG, pan, zoom-to-cursor, fly-to, labels, pins), MachinePanel (worker variant)
+- [ ] 52-03-PLAN.md — Wave 2: NowCard (Walk it / Show me / Then:), PlantAskBar (live filter + mic → existing WalkthroughVoiceModal via next/dynamic), voice import guard
+- [ ] 52-04-PLAN.md — Wave 3: PlantHome composition, /sops render seam (useViewport + site query + dynamic slot), plant marker group, journeys.ts + uat/tests.ts, build gate
+- [ ] 52-05-PLAN.md — Wave 4: deployed eval (eval-site worker + no-site fallback), serial eval run, full suite once, push, eval, screenshots read, validation sign-off
+
 **UI hint**: yes
 
 ### Phase 53: Phone — Scan or Ask
