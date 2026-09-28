@@ -58,6 +58,7 @@ To answer "is a worker *required* to do X?": this document does not answer that 
 | Edit site map (scene, machines) | — | — | ✅ | ✅ | — | RLS `admins_can_write_site_layouts`/`_machines` + `admins_can_upload_site_scenes` (00067) backstopping `requireAdminContext()` in `src/actions/site.ts` and `POST /api/admin/site/generate` (Phase 51 plan 51-03) |
 | Link SOPs to machines | — | — | ✅ | ✅ | — | RLS `admins_can_write_sop_machines` (00067) backstopping `setSopMachines()` in `src/actions/site.ts` — `requireAdminContext()`, both the SOP id and every machine id filtered to the session org before write (Phase 51 plan 51-03) |
 | Generate site scene (paid AI) | — | — | ✅ | ✅ | — | `POST /api/admin/site/generate` — `requireAdminContext()`, `GEMINI_API_KEY` gate, refuses when the org's layout already has a scene (Phase 51 plan 51-03) |
+| Print a machine plate (QR) | — | — | ✅ | ✅ | — | `requireAdminContext()` in `src/app/(protected)/admin/site/plate/[machineId]/page.tsx` before any read, plus the session-org filter on the machine lookup (foreign id → 404) (Phase 53) |
 
 Where a row's `Enforced at` column names RLS only (no app guard), or app guard only (RLS is `using(true)` or otherwise not the real gate), that asymmetry is deliberate context, not an oversight — see Findings below for the two cases where it became a real gap.
 

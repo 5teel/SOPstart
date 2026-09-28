@@ -633,6 +633,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'editor', type: 'screen', label: 'Site map editor', route: '/admin/site', detail: 'Scene at full size, drag to pan, scroll to zoom.' },
       { id: 'draw', type: 'action', label: 'Draw machine', detail: 'Click each corner, click the first to finish; name it, pick its department.' },
       { id: 'link', type: 'action', label: 'Show SOPs on a machine', detail: 'Link or unlink SOPs from the machine panel.' },
+      { id: 'plate', type: 'screen', label: 'Print a machine plate', route: '/admin/site/plate/[machineId]', detail: 'From a selected machine, choose Print plate. The plate shows a QR code, the machine name, its department and a short code in large letters. Print it at A6 and fix it to the machine — scanning it opens that machine\'s page (Phase 53).' },
       { id: 'builder', type: 'screen', label: 'Builder → Tools for this SOP → Pick machines for this SOP', route: '/admin/sops/builder/[sopId]', detail: 'The same links, edited from the SOP side.' },
       { id: 'e', type: 'end', label: 'Site mapped' },
     ],
