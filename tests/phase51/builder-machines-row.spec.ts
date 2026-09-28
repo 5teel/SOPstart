@@ -1,30 +1,97 @@
 /**
  * Phase 51 -- SIT-04. Source-contract assertions for the builder's
- * "Manage machines" ToolsMenu row + SopMachinePicker modal.
+ * "Pick machines for this SOP" ToolsMenu row + BuilderMachinesButton modal.
  *
- * Wave-0 stub. Activated by Plan 51-06.
+ * Activated by Plan 51-06.
  *
  * Registration: playwright.config.ts `phase51` project
  *   testDir: '.', testMatch: /tests\/phase51\/.*\.(spec|test)\.ts$/
  * Verify: `npx playwright test --list --project=phase51`
  */
-import { test } from '@playwright/test'
+import { test, expect } from '@playwright/test'
+import fs from 'node:fs'
+import path from 'node:path'
+
+const ROOT = path.resolve(__dirname, '..', '..')
+
+function read(rel: string): string {
+  return fs.readFileSync(path.join(ROOT, rel), 'utf-8').replace(/\r\n/g, '\n')
+}
+
+const BUTTON_PATH = "src/app/(protected)/admin/sops/builder/[sopId]/BuilderMachinesButton.tsx"
+const SHELL_PATH = "src/app/(protected)/admin/sops/builder/[sopId]/BuilderStageShell.tsx"
+
+/** Returns the [start, end) character span of a top-level `function <name>(` body. */
+function functionSpan(src: string, name: string): [number, number] {
+  const marker = new RegExp(`function ${name}\\(`)
+  const m = marker.exec(src)
+  if (!m) throw new Error(`${name} not found in source`)
+  const start = m.index
+  let i = src.indexOf('{', m.index)
+  let depth = 1
+  i++
+  while (i < src.length && depth > 0) {
+    if (src[i] === '{') depth++
+    else if (src[i] === '}') depth--
+    i++
+  }
+  return [start, i]
+}
 
 test.describe('modal', () => {
-  // activated by plan 51-06
-  test.fixme('SopMachinePicker lists org-scoped machines grouped by department, with search', () => {})
+  test('SopMachinePicker lists org-scoped machines grouped by department, with search', () => {
+    const src = read(BUTTON_PATH)
+    expect(src.startsWith("'use client'")).toBe(true)
+    expect(src).toContain('listSopMachines(')
+    expect(src).toContain('data-testid="machines-picker"')
+    expect(src).toContain('aria-label="Find a machine"')
+    expect(src).toContain('href="/admin/site"')
+    expect(src).toContain('Pick machines for this SOP')
+  })
 
-  // activated by plan 51-06
-  test.fixme('toggling a machine in the picker writes through setSopMachines(sopId, ids), not a bespoke insert', () => {})
+  test('toggling a machine in the picker writes through setSopMachines(sopId, ids), not a bespoke insert', () => {
+    const src = read(BUTTON_PATH)
+    expect(src).toContain('setSopMachines({ sopId, machineIds: next })')
+  })
 
-  // activated by plan 51-06
-  test.fixme('modal follows the BuilderFlowButton portaled-modal pattern (createPortal to document.body, Escape closes)', () => {})
+  test('the checkbox handler is wired to the shared setSopMachines() call, not just present in the file', () => {
+    const src = read(BUTTON_PATH)
+    const [start, end] = functionSpan(src, 'toggleMachine')
+    const body = src.slice(start, end)
+    expect(body).toContain('setSopMachines(')
+    expect(src).toContain('onChange={() => void toggleMachine(machine.id)}')
+  })
+
+  test('modal follows the BuilderFlowButton portaled-modal pattern (createPortal to document.body, Escape closes)', () => {
+    const src = read(BUTTON_PATH)
+    expect(src).toContain('createPortal(')
+    expect(src).toContain('document.body')
+    expect(src).toContain('role="menuitem"')
+    expect(src).toContain("'Escape'")
+  })
+
+  test('never imports the admin/service-role client', () => {
+    const src = read(BUTTON_PATH)
+    expect(src).not.toContain('createAdminClient')
+  })
 })
 
 test.describe('tools menu', () => {
-  // activated by plan 51-06
-  test.fixme('BuilderStageShell ToolsMenu renders a "Manage machines" row alongside the flow-diagram row', () => {})
+  test('BuilderStageShell ToolsMenu renders a "Pick machines" row alongside the flow-diagram row', () => {
+    const src = read(SHELL_PATH)
+    expect(src).toContain("import { BuilderMachinesButton } from './BuilderMachinesButton'")
+    expect(src).toContain('<BuilderMachinesButton sopId={sopId} />')
+  })
 
-  // activated by plan 51-06
-  test.fixme('the row opens SopMachinePicker, not a route navigation', () => {})
+  test('the row opens BuilderMachinesButton, not a route navigation, and sits after BuilderFlowEditButton, before DeleteSopButton', () => {
+    const src = read(SHELL_PATH)
+    // JSX usages (not the import lines) — each of these tags is used exactly
+    // once as JSX in the whole file, inside ToolsMenu.
+    const editIdx = src.indexOf('<BuilderFlowEditButton')
+    const machinesIdx = src.indexOf('<BuilderMachinesButton sopId={sopId} />')
+    const deleteIdx = src.indexOf('<DeleteSopButton')
+    expect(editIdx).toBeGreaterThan(-1)
+    expect(machinesIdx).toBeGreaterThan(editIdx)
+    expect(deleteIdx).toBeGreaterThan(machinesIdx)
+  })
 })
