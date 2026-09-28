@@ -14,6 +14,28 @@ const nextConfig: NextConfig = {
   // reached via dynamic({ ssr:false }) from admin builder-v2 — never the worker tier.
   serverExternalPackages: ['officeparser', 'file-type', 'sharp', '@anthropic-ai/sdk', 'ffmpeg-static', 'canvas'],
   /**
+   * One shared chunk for Next's next/dynamic runtime (fix(53), SB-LINE-06).
+   * Left to the default heuristics it rode along in whichever vendors chunk
+   * happened to share its route set; when /m/[code] joined the offline-db
+   * vendors chunk, the runtime fell under minSize as a shared group and was
+   * copied into a per-route vendors chunk on every next/dynamic route
+   * (/sops, /sops/[sopId], builder, activity, api/schema). Pinning it here
+   * keeps one copy no matter which routes are added later.
+   */
+  webpack(config, { isServer }) {
+    const split = config.optimization?.splitChunks
+    if (!isServer && split && split.cacheGroups) {
+      split.cacheGroups.nextDynamic = {
+        test: /[\\/]node_modules[\\/]next[\\/]dist[\\/](?:esm[\\/])?(?:shared[\\/]lib[\\/](?:app-dynamic|lazy-dynamic[\\/])|api[\\/]app-dynamic)/,
+        name: 'next-dynamic',
+        chunks: 'all',
+        priority: 20,
+        enforce: true,
+      }
+    }
+    return config
+  },
+  /**
    * Phase 21 D-21-12 — Legacy `/admin/sops/[sopId]/review` route is retired
    * and replaced by the full Phase 12 builder + Phase 21 source viewer at
    * `/admin/sops/builder/[sopId]`. Server-side 308 keeps bookmarks alive
