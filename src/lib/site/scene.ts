@@ -155,6 +155,86 @@ export function extractGeminiImage(json: unknown): { mimeType: string; data: str
   return null
 }
 
+// -- Worker plant camera (Phase 52, D-07/D-12) -------------------------------
+// Ported from .planning/sketches/007-plant-floor-navigation/index.html
+// (buildStage's zoomTo, lines 343-354, and the department-chip fit, 405-412).
+
+/** Wheel zoom clamp (sketch: Math.min(2.4, Math.max(0.35, ...))). */
+export const ZOOM_MIN = 0.35
+export const ZOOM_MAX = 2.4
+/** The machine panel's width in px -- fly-to targets clear of it. */
+export const PLANT_PANEL_WIDTH = 380
+/** Fly-to scale on machine click (sketch zoomTo: worker ns = 1.5). */
+export const FLY_SCALE = 1.5
+/** Department chip fit's scale cap (sketch: Math.min(..., 1.6)). */
+export const ZONE_FIT_MAX = 1.6
+/** Camera transition duration in ms (sketch: transform .35s, rounded). */
+export const CAMERA_MS = 350
+
+/** Fly the camera so `point` (scene px) lands centred, offset left of the
+ *  panel: targetX = (W - PLANT_PANEL_WIDTH) / 2 (D-07). */
+export function flyToView(
+  W: number,
+  H: number,
+  point: Point,
+  scale: number = FLY_SCALE,
+  panelWidth: number = PLANT_PANEL_WIDTH
+): View | null {
+  if (!W || !H) return null
+  const s = scale
+  const x = (W - panelWidth) / 2 - point[0] * s
+  const y = H / 2 - point[1] * s
+  return { x, y, s }
+}
+
+/** Fit the camera to the bounding box of one or more polygons (department
+ *  chip fit), capped at ZONE_FIT_MAX so a tiny department never over-zooms. */
+export function fitBoxView(
+  W: number,
+  H: number,
+  polygons: ReadonlyArray<ReadonlyArray<Point>>
+): View | null {
+  if (!W || !H) return null
+  const points = polygons.flat()
+  if (points.length === 0) return null
+  const xs = points.map((p) => p[0])
+  const ys = points.map((p) => p[1])
+  const minX = Math.min(...xs)
+  const maxX = Math.max(...xs)
+  const minY = Math.min(...ys)
+  const maxY = Math.max(...ys)
+  const bw = maxX - minX || 1
+  const bh = maxY - minY || 1
+  const s = Math.min((W - 80) / bw, (H - 120) / bh, ZONE_FIT_MAX)
+  const x = W / 2 - (minX + bw / 2) * s
+  const y = H / 2 - (minY + bh / 2) * s
+  return { x, y, s }
+}
+
+// -- Zone colours (D-12) ------------------------------------------------------
+// A department's own `colour` unless it is the 00035 column default, in which
+// case the contract triple by name, then the next theme accent by index.
+// Plain lib code so component code carries no hex (design-token lint).
+const DEFAULT_DEPARTMENT_COLOUR = '#3b82f6'
+const ZONE_NAME_COLOUR: Record<string, string> = {
+  forming: 'var(--accent-voice)',
+  general: 'var(--accent-measure)',
+  engineering: 'var(--accent-inspect)',
+}
+const ZONE_EXTRA_COLOURS = [
+  'var(--accent-zone)',
+  'var(--accent-signoff)',
+  'var(--accent-decision)',
+  'var(--accent-escalate)',
+]
+
+export function zoneColour(dept: { name: string; colour: string | null }, index: number): string {
+  if (dept.colour && dept.colour !== DEFAULT_DEPARTMENT_COLOUR) return dept.colour
+  const known = ZONE_NAME_COLOUR[dept.name.trim().toLowerCase()]
+  if (known) return known
+  return ZONE_EXTRA_COLOURS[index % ZONE_EXTRA_COLOURS.length]
+}
+
 // -- Editor prop contract (consumed by 51-04/51-05; lives here so
 // SiteWorkspace never imports from SiteEditor, which the Konva gate forbids) --
 export interface SceneEditorMachine {
