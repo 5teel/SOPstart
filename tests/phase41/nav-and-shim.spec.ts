@@ -29,9 +29,10 @@ test.describe('SUR-03 — one top-level "SOPs" entry', () => {
     expect(sopsMatches.length).toBe(1)
   })
 
-  test('SUR-03: a governance entry deep-links /sops?view=attention', () => {
+  test('SUR-03/Phase 54: the Governance entry points at /governance', () => {
     const header = read(TOP_HEADER)
-    expect(header).toContain("'/sops?view=attention'")
+    expect(header).toContain("label: 'Governance', href: '/governance'")
+    expect(header).not.toContain("'/sops?view=attention'")
   })
 })
 

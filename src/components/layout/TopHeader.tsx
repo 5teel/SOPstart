@@ -141,9 +141,9 @@ const BASE_LINKS: NavLink[] = [
 //
 // Phase 41 (SUR-03): the SOPs list is now one shared route (/sops, in
 // BASE_LINKS) for every role — "Manage SOPs" is gone and must not come
-// back. "Governance" deep-links the admin lens on that same surface.
+// back. Governance is its own route, /governance (Phase 54).
 const ADMIN_LINKS: NavLink[] = [
-  { label: 'Governance', href: '/sops?view=attention' },
+  { label: 'Governance', href: '/governance' },
   { label: 'Create New SOP', href: '/admin/sops/new' },
   { label: 'Content', href: '/admin/blocks' },
   { label: 'Team', href: '/admin/team' },

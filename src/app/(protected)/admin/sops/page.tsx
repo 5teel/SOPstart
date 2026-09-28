@@ -32,6 +32,10 @@ export default async function AdminSopsShimPage({
   }
 
   const params = await searchParams
+  // Phase 54 (D-01): the governance queue moved off /sops?view=attention
+  // onto its own route, /governance — repoint this one legacy param before
+  // the rest fall through to the merged surface unchanged.
+  if (params.view === 'attention') redirect('/governance')
   const qp = new URLSearchParams()
   if (params.view) qp.set('view', params.view)
   if (params.status) qp.set('status', params.status)

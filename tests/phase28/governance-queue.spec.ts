@@ -105,14 +105,17 @@ test.describe('governance page — redirect shim mapping legacy ?filter=', () =>
     expect(src).toContain("redirect('/dashboard')")
   })
 
-  test('redirects to the merged view on /sops, mapping legacy ?filter=X', () => {
-    // Rule 1 (CLAUDE.md 2026-07-13): 41-06 retargeted this shim's destination
-    // from /admin/sops?view=attention to /sops?view=attention when /admin/sops
-    // itself became a shim — this assertion was stale against that change.
-    expect(src).toContain('params.filter')
-    expect(src).toContain("qp.set('filter', params.filter)") // 41-REVIEW WR-01: encoded via URLSearchParams, never interpolated
-    expect(src).toContain("view: 'attention'")
-    expect(src).toContain('redirect(`/sops?${qp.toString()}`)') // 41-REVIEW WR-01: destination built from URLSearchParams seeded with view=attention
+  test('redirects to the governance inbox — a bookmark lands on the whole inbox, no filter param survives', () => {
+    // Rule 1 (CLAUDE.md 2026-07-13): Phase 54 (D-01) retargeted this shim's
+    // destination to /governance, a real route, not a ?view= deep link —
+    // the inbox has no flag-filter param, so legacy ?filter=X is dropped.
+    const guardIdx = src.indexOf("['admin', 'safety_manager'].includes(role)")
+    const redirectIdx = src.indexOf("redirect('/governance')")
+    expect(guardIdx).toBeGreaterThan(-1)
+    expect(redirectIdx).toBeGreaterThan(-1)
+    expect(guardIdx).toBeLessThan(redirectIdx)
+    expect(src).not.toContain("qp.set('filter'")
+    expect(src).not.toContain("view: 'attention'")
   })
 
   test('no longer renders any governance surface itself', () => {
@@ -182,14 +185,14 @@ test.describe('OwnerPicker — reuses getOrgMembers, wires setSopOwner', () => {
 // journeys.ts — pathways coverage
 // ---------------------------------------------------------------------------
 
-test.describe('journeys.ts — shim + folded view mapped (pathways coverage)', () => {
+test.describe('journeys.ts — shim + governance inbox mapped (pathways coverage)', () => {
   const src = read(JOURNEYS)
 
   test('contains a step with route: /admin/governance (the shim stays mapped)', () => {
     expect(src).toContain("route: '/admin/governance'")
   })
 
-  test('maps the folded needs-attention view', () => {
-    expect(src).toContain('view=attention')
+  test('maps the governance inbox route', () => {
+    expect(src).toContain("route: '/governance'")
   })
 })

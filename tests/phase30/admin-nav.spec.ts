@@ -63,7 +63,7 @@ test.describe('UX-02 — one shared admin nav', () => {
     // (comments referencing the old name for context are fine).
     expect(header).not.toContain("label: 'Manage SOPs'")
     for (const href of [
-      "'/sops?view=attention'",
+      "'/governance'",
       "'/admin/sops/new'",
       "'/admin/blocks'",
       "'/admin/team'",

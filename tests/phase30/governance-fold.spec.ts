@@ -63,15 +63,14 @@ test.describe('UX-03 — governance folds into /sops', () => {
     expect(lens).toContain('listGovernanceQueue')
   })
 
-  test('/admin/governance is a redirect shim mapping legacy ?filter= deep-links, guard first', () => {
+  test('/admin/governance is a redirect shim to /governance, guard first (Phase 54, D-01)', () => {
     const src = read(GOVERNANCE_SHIM)
-    expect(src).toContain('redirect(')
-    expect(src).toContain('redirect(`/sops?${qp.toString()}`)') // 41-REVIEW WR-01: URLSearchParams seeded with view=attention
-    expect(src).toContain("qp.set('filter', params.filter)") // 41-REVIEW WR-01: encoded via URLSearchParams, never interpolated
-    expect(src).toContain("view: 'attention'")
+    const guardIdx = src.indexOf("['admin', 'safety_manager'].includes(role)")
+    const redirectIdx = src.indexOf("redirect('/governance')")
+    expect(guardIdx).toBeGreaterThan(-1)
+    expect(redirectIdx).toBeGreaterThan(-1)
     // Guard stays in front of the redirect (T-30-08-03).
-    // 2026-07-13: member.role → role (shared getSessionContext auth refactor)
-    expect(src).toContain("['admin', 'safety_manager'].includes(role)")
+    expect(guardIdx).toBeLessThan(redirectIdx)
     // No governance surface renders here anymore.
     expect(src).not.toContain('GovernanceQueueRow')
     expect(src).not.toContain('ApprovalChainEditor')
