@@ -36,6 +36,9 @@ export interface PlantStageMachine {
   selected: boolean
   zoned: boolean
   zoneColour: string
+  /** Admin repaint only (Phase 54, D-04) -- caller-classified (admin-health.ts);
+   *  the stage only paints it, it never reads governance data itself. */
+  health?: 'bad' | 'due' | 'ok'
 }
 
 export interface PlantStageHandle {
@@ -68,6 +71,22 @@ function polygonPaint(m: PlantStageMachine, hovered: boolean): React.CSSProperti
     return {
       fill: `color-mix(in srgb, ${m.zoneColour} 12%, transparent)`,
       stroke: 'transparent',
+    }
+  }
+  if (m.health === 'bad') {
+    return {
+      fill: 'color-mix(in srgb, var(--accent-escalate) 10%, transparent)',
+      stroke: 'color-mix(in srgb, var(--accent-escalate) 55%, transparent)',
+      strokeWidth: 2,
+      strokeDasharray: '6 4',
+    }
+  }
+  if (m.health === 'due') {
+    return {
+      fill: 'color-mix(in srgb, var(--accent-decision) 10%, transparent)',
+      stroke: 'color-mix(in srgb, var(--accent-decision) 55%, transparent)',
+      strokeWidth: 2,
+      strokeDasharray: '6 4',
     }
   }
   if (m.pin > 0) {
@@ -261,12 +280,21 @@ export function PlantStage({
               data-machine-id={m.id}
               data-machine-name={m.name}
               data-pin={m.pin}
+              data-health={m.health ?? ''}
               data-highlighted={m.highlighted}
               data-selected={m.selected}
               points={m.polygon.map((p) => p.join(',')).join(' ')}
               role="button"
               tabIndex={0}
-              aria-label={m.pin > 0 ? `${m.name}, ${m.pin} to do` : m.name}
+              aria-label={
+                m.health === 'bad'
+                  ? `${m.name}, a procedure here has nobody responsible`
+                  : m.health === 'due'
+                    ? `${m.name}, a review is due here`
+                    : m.pin > 0
+                      ? `${m.name}, ${m.pin} to do`
+                      : m.name
+              }
               className="pointer-events-auto cursor-pointer"
               style={polygonPaint(m, hoverId === m.id)}
               onClick={() => onMachineClick(m.id)}
@@ -285,7 +313,12 @@ export function PlantStage({
           const [cx] = centroid(m.polygon)
           const top = Math.min(...m.polygon.map((p) => p[1]))
           const hovered = hoverId === m.id
-          const labelVisible = hovered || m.highlighted || m.selected || (m.pin > 0 && worldHover)
+          const labelVisible =
+            hovered ||
+            m.highlighted ||
+            m.selected ||
+            (m.pin > 0 && worldHover) ||
+            ((m.health === 'bad' || m.health === 'due') && worldHover)
           const invScale = view ? 1 / view.s : 1
           return (
             <div
@@ -304,13 +337,29 @@ export function PlantStage({
               >
                 {m.name}
               </span>
-              {m.pin > 0 && (
+              {m.health ? (
                 <span
-                  data-testid="plant-pin"
-                  className="plant-pin-bob mono grid h-6.5 w-6.5 place-items-center rounded-full border-2 border-white bg-accent-decision text-xs font-extrabold text-white shadow"
+                  data-testid="plant-health-pin"
+                  data-health={m.health}
+                  className={
+                    m.health === 'bad'
+                      ? 'mono grid h-6.5 w-6.5 place-items-center rounded-full border-2 border-white bg-accent-escalate text-xs font-extrabold text-white shadow'
+                      : m.health === 'due'
+                        ? 'mono grid h-6.5 w-6.5 place-items-center rounded-full border-2 border-white bg-accent-decision text-xs font-extrabold text-white shadow'
+                        : 'h-2.5 w-2.5 rounded-full border border-white bg-accent-ok shadow'
+                  }
                 >
-                  {m.pin}
+                  {m.health === 'bad' ? '!' : m.health === 'due' ? '↻' : ''}
                 </span>
+              ) : (
+                m.pin > 0 && (
+                  <span
+                    data-testid="plant-pin"
+                    className="plant-pin-bob mono grid h-6.5 w-6.5 place-items-center rounded-full border-2 border-white bg-accent-decision text-xs font-extrabold text-white shadow"
+                  >
+                    {m.pin}
+                  </span>
+                )
               )}
               <span className="h-3.5 w-0.5 bg-[var(--ink-900)] opacity-60" />
             </div>
