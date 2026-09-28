@@ -583,5 +583,30 @@ export default defineConfig({
       testMatch: /tests\/phase46\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 51 -- Site Model & Machine Editor
+      // Nyquist harness (Wave 0 / Plan 51-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase51/**) so every later plan in
+      // the phase drops specs into tests/phase51/ with NO further config edit --
+      // single registration point for the whole phase (mirrors phase26/28/29/30/32/33/34/35/36/37/40/41/46).
+      //
+      // Verify registration: `npx playwright test --list --project=phase51`
+      // (should list all 7 tests/phase51/*.spec.ts files -- zero discovered = FAIL)
+      //
+      // Wave-0 stub files:
+      //   site-model (SIT-01..04, LIVE from this plan -- TDD contract module) --
+      //   site-migration-shape (SIT-01, fixme, activates 51-02) --
+      //   site-model-rls-runtime (SIT-01, fixme, activates 51-02) --
+      //   site-actions-contract (SIT-03/SIT-04, fixme, activates 51-03) --
+      //   site-editor-canvas (SIT-02/SIT-03, fixme, activates 51-04) --
+      //   site-workspace-wiring (SIT-02/SIT-03/SIT-04, fixme, activates 51-05) --
+      //   builder-machines-row (SIT-04, fixme, activates 51-06)
+      name: 'phase51',
+      testDir: '.',
+      testMatch: /tests\/phase51\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
