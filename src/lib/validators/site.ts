@@ -121,6 +121,7 @@ export interface WorkerSiteMachine {
   department_id: string | null
   polygon: Point[]
   spriteUrl: string | null
+  code: string
 }
 
 export interface WorkerSiteData {

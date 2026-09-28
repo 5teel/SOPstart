@@ -55,7 +55,7 @@ export async function listSiteForWorker(): Promise<WorkerSiteData | { error: str
   // 3. This layout's machines.
   const { data: machineRows, error: machineErr } = await db
     .from('site_machines')
-    .select('id, name, department_id, polygon, sprite_path')
+    .select('id, name, department_id, polygon, sprite_path, code')
     .eq('site_layout_id', layout.id)
     .eq('organisation_id', orgId)
     .order('sort', { ascending: true })
@@ -70,6 +70,7 @@ export async function listSiteForWorker(): Promise<WorkerSiteData | { error: str
     department_id: string | null
     polygon: WorkerSiteMachine['polygon']
     sprite_path: string | null
+    code: string
   }>
 
   if (machineData.length === 0) {
@@ -89,7 +90,7 @@ export async function listSiteForWorker(): Promise<WorkerSiteData | { error: str
         const { data: signedSprite } = await db.storage.from(SCENE_BUCKET).createSignedUrl(m.sprite_path, SCENE_SIGNED_TTL_SEC)
         spriteUrl = signedSprite?.signedUrl ?? null
       }
-      return { id: m.id, name: m.name, department_id: m.department_id, polygon: m.polygon, spriteUrl }
+      return { id: m.id, name: m.name, department_id: m.department_id, polygon: m.polygon, spriteUrl, code: m.code }
     })
   )
   const machineIds = machines.map((m) => m.id)

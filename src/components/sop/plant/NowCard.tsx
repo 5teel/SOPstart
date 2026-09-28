@@ -26,7 +26,15 @@ async function sopMinutes(sopId: string): Promise<number> {
   return Math.round(total)
 }
 
-export function NowCard({ items, onShowMe }: { items: NowItem[]; onShowMe(machineId: string): void }) {
+export function NowCard({
+  items,
+  onShowMe,
+  inline,
+}: {
+  items: NowItem[]
+  onShowMe?: (machineId: string) => void
+  inline?: boolean
+}) {
   const now = items[0] ?? null
   const nowId = now?.sop.id
 
@@ -46,7 +54,11 @@ export function NowCard({ items, onShowMe }: { items: NowItem[]; onShowMe(machin
       data-testid="plant-now-card"
       aria-label="Next for you"
       data-empty={now ? undefined : 'true'}
-      className="absolute bottom-4 left-4 z-10 w-82.5 rounded-lg border border-[var(--ink-900)] bg-white/97 p-3.5 shadow-xl"
+      className={
+        inline
+          ? 'w-full rounded-lg border border-[var(--ink-900)] bg-white p-3.5'
+          : 'absolute bottom-4 left-4 z-10 w-82.5 rounded-lg border border-[var(--ink-900)] bg-white/97 p-3.5 shadow-xl'
+      }
     >
       {!now ? (
         <p className="text-ui text-[var(--ink-700)]">Nothing due — browse your machines.</p>
@@ -72,15 +84,25 @@ export function NowCard({ items, onShowMe }: { items: NowItem[]; onShowMe(machin
             >
               Walk it
             </Link>
-            {now.machine && (
-              <button
-                type="button"
-                data-testid="plant-now-show"
-                onClick={() => onShowMe(now.machine!.id)}
+            {onShowMe ? (
+              now.machine && (
+                <button
+                  type="button"
+                  data-testid="plant-now-show"
+                  onClick={() => onShowMe(now.machine!.id)}
+                  className="flex min-h-tap items-center justify-center rounded-lg border border-[var(--ink-300)] bg-white px-4 text-sm font-semibold text-[var(--ink-900)]"
+                >
+                  Show me
+                </button>
+              )
+            ) : (
+              <Link
+                href={`/sops/${now.sop.id}`}
+                data-testid="plant-now-read"
                 className="flex min-h-tap items-center justify-center rounded-lg border border-[var(--ink-300)] bg-white px-4 text-sm font-semibold text-[var(--ink-900)]"
               >
-                Show me
-              </button>
+                Read
+              </Link>
             )}
           </div>
           {items.length > 1 && (
