@@ -16,6 +16,8 @@ const ROOT = path.resolve(__dirname, '..', '..')
 const PLANT_STAGE_PATH = 'src/components/sop/plant/PlantStage.tsx'
 const MACHINE_PANEL_PATH = 'src/components/sop/plant/MachinePanel.tsx'
 const ADMIN_PANEL_PATH = 'src/components/admin/governance/AdminMachinePanel.tsx'
+const FLOOR_HEALTH_PATH = 'src/components/admin/governance/AdminFloorHealth.tsx'
+const GOV_PAGE_PATH = 'src/app/(protected)/governance/page.tsx'
 
 function read(rel: string): string {
   return fs.readFileSync(path.join(ROOT, rel), 'utf-8').replace(/\r\n/g, '\n')
@@ -75,5 +77,49 @@ test.describe('worker MachinePanel stays governance-free', () => {
     expect(src).not.toMatch(/\bowner\b/i)
     expect(src).not.toContain('NO OWNER')
     expect(src).not.toContain('REVIEW DUE')
+  })
+})
+
+test.describe('AdminFloorHealth (54-03 Task 2)', () => {
+  test('loads PlantStage only through next/dynamic ssr:false -- no static import', () => {
+    const src = read(FLOOR_HEALTH_PATH)
+    expect(src).toMatch(/dynamic\(\s*\(\)\s*=>\s*import\('@\/components\/sop\/plant\/PlantStage'\)/)
+    expect(src).toContain('ssr: false')
+    expect(src).not.toMatch(/^import .* from '@\/components\/sop\/plant/m)
+  })
+
+  test('derives pins and panel rows from admin-health.ts, never re-classifies', () => {
+    const src = read(FLOOR_HEALTH_PATH)
+    expect(src).toContain('machineHealth(')
+    expect(src).toContain('machinePanelSops(')
+  })
+
+  test('wires onMachineClick and onClose to the selection state, not just names them', () => {
+    const src = read(FLOOR_HEALTH_PATH)
+    expect(src).toContain('onMachineClick={setSelectedId}')
+    expect(src).toContain('onClose={() => setSelectedId(null)}')
+  })
+
+  test('no-site card links /admin/site', () => {
+    const src = read(FLOOR_HEALTH_PATH)
+    expect(src).toContain('floor-no-site')
+    expect(src).toContain('/admin/site')
+  })
+
+  test('error state renders the returned error string', () => {
+    const src = read(FLOOR_HEALTH_PATH)
+    expect(src).toContain('floor-error')
+    expect(src).toContain('floor.error')
+  })
+})
+
+test.describe('/governance renders the floor column (54-03 Task 2)', () => {
+  test('renders AdminFloorHealth after GovernanceInbox inside the grid, server component', () => {
+    const src = read(GOV_PAGE_PATH)
+    const inboxIdx = src.indexOf('<GovernanceInbox')
+    const floorIdx = src.indexOf('<AdminFloorHealth floor={floor} governance={gov.rows}')
+    expect(inboxIdx).toBeGreaterThan(-1)
+    expect(floorIdx).toBeGreaterThan(inboxIdx)
+    expect(src).not.toContain("'use client'")
   })
 })

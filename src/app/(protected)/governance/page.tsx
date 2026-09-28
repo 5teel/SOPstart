@@ -5,6 +5,7 @@ import { listAdminSopRows } from '@/actions/admin-sop-list'
 import { listSiteHealthForOrg } from '@/actions/site'
 import { deriveInbox } from '@/lib/governance/inbox'
 import { GovernanceInbox } from '@/components/admin/governance/GovernanceInbox'
+import { AdminFloorHealth } from '@/components/admin/governance/AdminFloorHealth'
 
 /**
  * Phase 54 (D-01/D-02): /governance is the admin's home for the work — a
@@ -50,7 +51,12 @@ export default async function GovernancePage() {
   return (
     <div className="max-w-6xl mx-auto w-full px-4 py-4">
       <h1 className="text-base font-semibold text-[var(--ink-900)] mb-4">Governance</h1>
-      <GovernanceInbox items={items} />
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_420px] lg:items-start">
+        <GovernanceInbox items={items} />
+        <aside>
+          <AdminFloorHealth floor={floor} governance={gov.rows} />
+        </aside>
+      </div>
     </div>
   )
 }
