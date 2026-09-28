@@ -1552,7 +1552,7 @@ Plans:
 
 Executes 51 → 52 → 53 ∥ 54 → (v8.0 Phase 43).
 
-- [ ] **Phase 51: Site Model & Machine Editor** - `site_layouts` / `site_machines` / `sop_machines` under RLS; admin generates or uploads a scene, draws polygon hotspots (Konva), links SOPs to machines
+- [x] **Phase 51: Site Model & Machine Editor** - `site_layouts` / `site_machines` / `sop_machines` under RLS; admin generates or uploads a scene, draws polygon hotspots (Konva), links SOPs to machines (completed 2026-09-28)
 - [ ] **Phase 52: Worker Home — The Plant** - `/sops` worker desktop = pan/zoom scene, derived pins, Now card, machine panel, ask bar; scope column and Miller frame gone for workers; bundle gate green
 - [ ] **Phase 53: Phone — Scan or Ask** - Phone home (ask · Now · thumbnail · Scan), printable QR plates, `/m/<code>`, in-app camera scan
 - [ ] **Phase 54: Admin — Inbox, Floor Health, Library Table** - `/governance` inbox + health-lit floor; admin `/sops` = checks-row table; `AdminSopSurface` lenses, Miller frame and scope column deleted; header, journeys, evals, matrix updated
@@ -1581,7 +1581,7 @@ Plans:
 - [x] 51-04-PLAN.md — Konva SiteEditor (natural-size scene, pan/zoom/fit, draw/select/vertex drag) + dynamic loader
 - [x] 51-05-PLAN.md — /admin/site page + SiteWorkspace panel (rename, department, delete, SOP links) + header Site link + journeys
 - [x] 51-06-PLAN.md — Builder Tools menu "Pick machines for this SOP" modal
-- [ ] 51-07-PLAN.md — Deployed eval (isolated eval-site org), full gates, push, run eval, read screenshots
+- [x] 51-07-PLAN.md — Deployed eval (isolated eval-site org), full gates, push, run eval, read screenshots
 
 **UI hint**: yes
 
@@ -1708,7 +1708,7 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 
 **Goal:** Scheduled task or cron that marks video_generation_jobs stuck in queued/analyzing/generating_audio/rendering for >30 minutes as 'failed' with a timeout error. Could also notify admin. Triggered by finding a hours-old rendering job during Phase 10 verification.
 **Requirements:** TBD
-**Plans:** 6/7 plans executed
+**Plans:** 7/7 plans complete
 
 Plans:
 
