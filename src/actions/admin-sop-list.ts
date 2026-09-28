@@ -36,7 +36,7 @@ import {
 } from '@/lib/sop-list/admin-rows'
 import { FLAG_PRIORITY, FLAG_LABEL, FLAG_STYLE } from '@/lib/governance/flag-display'
 
-const SOP_SELECT = 'id, title, sop_number, category_slug, status, source_file_name, source_type, created_at, updated_at, published_at, all_departments, overall_confidence, parse_notes, owner_user_id, review_due_at'
+const SOP_SELECT = 'id, title, sop_number, category_slug, status, source_file_name, source_type, created_at, updated_at, published_at, all_departments, overall_confidence, parse_notes, owner_user_id, review_due_at, last_reviewed_at'
 
 export async function listAdminSopRows(params: {
   status?: string
@@ -46,7 +46,8 @@ export async function listAdminSopRows(params: {
 }): Promise<AdminSopListResult | { error: string }> {
   const ctx = await requireAdminContext()
   if ('error' in ctx) return { error: ctx.error }
-  const { supabase, user } = ctx
+  const { supabase, user, organisationId } = ctx
+  if (!organisationId) return { error: 'No organisation' }
 
   const activeStatus = params.status ?? 'all'
   const ownerOnly = params.owner === 'me'
@@ -124,6 +125,11 @@ export async function listAdminSopRows(params: {
     statusCountsResult,
     sopDeptsResult,
     deptNamesResult,
+    approvalChainsResult,
+    sopAccessPeopleResult,
+    parseJobsResult,
+    sopMachinesResult,
+    siteMachinesResult,
   ] = await Promise.all([
     query,
     listGovernanceQueue(),
@@ -138,10 +144,67 @@ export async function listAdminSopRows(params: {
     (supabase as any).from('sop_departments').select('sop_id, department_id'),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (supabase as any).from('departments').select('id, name'),
+    // Phase 54 (D-07) check inputs, all org-scoped and run alongside the rest.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('approval_chains').select('category, steps').eq('organisation_id', organisationId),
+    // sop_access_people has no organisation_id column — the same-org admin
+    // arm of its SELECT policy (migration 00048) is the org scope here.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('sop_access_people').select('sop_id'),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any)
+      .from('parse_jobs')
+      .select('sop_id, status, created_at')
+      .eq('organisation_id', organisationId)
+      .order('created_at', { ascending: false }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('sop_machines').select('sop_id, machine_id').eq('organisation_id', organisationId),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any).from('site_machines').select('id, name').eq('organisation_id', organisationId),
   ])
+
+  if (approvalChainsResult?.error) console.error('[listAdminSopRows] approval_chains read', approvalChainsResult.error)
+  if (sopAccessPeopleResult?.error) console.error('[listAdminSopRows] sop_access_people read', sopAccessPeopleResult.error)
+  if (parseJobsResult?.error) console.error('[listAdminSopRows] parse_jobs read', parseJobsResult.error)
+  if (sopMachinesResult?.error) console.error('[listAdminSopRows] sop_machines read', sopMachinesResult.error)
+  if (siteMachinesResult?.error) console.error('[listAdminSopRows] site_machines read', siteMachinesResult.error)
+
+  // chainCategories: categories whose approval_chains row has at least one step.
+  const chainCategories = new Set(
+    ((approvalChainsResult?.data ?? []) as Array<{ category: string; steps: unknown[] | null }>)
+      .filter((c) => Array.isArray(c.steps) && c.steps.length > 0)
+      .map((c) => c.category)
+  )
+
+  const personGrantSops = new Set(
+    ((sopAccessPeopleResult?.data ?? []) as Array<{ sop_id: string }>).map((r) => r.sop_id)
+  )
+
+  // Latest parse status per SOP — first row per sop_id in the descending read.
+  const latestParseStatusBySop: Record<string, string> = {}
+  for (const r of (parseJobsResult?.data ?? []) as Array<{ sop_id: string; status: string; created_at: string }>) {
+    if (!(r.sop_id in latestParseStatusBySop)) latestParseStatusBySop[r.sop_id] = r.status
+  }
+
+  const siteMachineNameById: Record<string, string> = {}
+  for (const m of (siteMachinesResult?.data ?? []) as Array<{ id: string; name: string }>) {
+    siteMachineNameById[m.id] = m.name
+  }
+  const machineNamesBySop: Record<string, string[]> = {}
+  for (const r of (sopMachinesResult?.data ?? []) as Array<{ sop_id: string; machine_id: string }>) {
+    const name = siteMachineNameById[r.machine_id]
+    if (!name) continue
+    ;(machineNamesBySop[r.sop_id] ??= []).push(name)
+  }
+  for (const sopId of Object.keys(machineNamesBySop)) machineNamesBySop[sopId].sort()
 
   const govRows: GovernanceRow[] = 'success' in govResult && govResult.success ? govResult.rows : []
   const flaggedRows = govRows.filter((r) => r.flags.length > 0)
+
+  // Flags for EVERY sop (not just the flagged subset) — admin-health needs a
+  // per-SOP flags array to derive owner/review checks even for a clean SOP.
+  const flagsBySop: Record<string, GovernanceFlag[]> = {}
+  for (const r of govRows) flagsBySop[r.id] = r.flags
 
   // Department names per SOP, for the row chip.
   const deptNameById: Record<string, string> = {}
@@ -249,6 +312,14 @@ export async function listAdminSopRows(params: {
       flagStyle: flag ? FLAG_STYLE[flag] : null,
       stuck: inFlight && Date.now() - new Date(sop.created_at).getTime() > STUCK_AFTER_MS,
       confidence: typeof sop.overall_confidence === 'number' ? sop.overall_confidence : null,
+      // Phase 54 (D-07) check inputs.
+      ownerUserId: sop.owner_user_id ?? null,
+      flags: flagsBySop[sop.id] ?? [],
+      lastReviewedAt: sop.last_reviewed_at ?? null,
+      chainRequired: chainCategories.has(sop.category_slug ?? ''),
+      hasPersonGrant: personGrantSops.has(sop.id),
+      parseFailed: latestParseStatusBySop[sop.id] === 'failed',
+      machines: machineNamesBySop[sop.id] ?? [],
     }
   })
 

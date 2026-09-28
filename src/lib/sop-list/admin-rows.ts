@@ -8,6 +8,7 @@
 // live outside `src/actions/`.
 
 import type { Department } from '@/types/sop'
+import type { GovernanceFlag } from '@/lib/governance/classify'
 
 // Sketch 004 variant A — ONE rail: All · Drafts · Published · Needs attention
 // · Access, with the rare filters (Parse issues · Owned by me) folded behind
@@ -95,6 +96,16 @@ export type MillerSop = {
   flagStyle: string | null
   stuck: boolean
   confidence: number | null
+  // Phase 54 (D-07): check inputs — every new field is org-scoped by the
+  // reads that build it in listAdminSopRows. Structural superset of
+  // admin-health's CheckInput so this type satisfies it without importing it.
+  ownerUserId: string | null
+  flags: GovernanceFlag[]
+  lastReviewedAt: string | null
+  chainRequired: boolean
+  hasPersonGrant: boolean
+  parseFailed: boolean
+  machines: string[]
 }
 
 export type AdminScopeDepartment = { id: string; name: string; count: number }

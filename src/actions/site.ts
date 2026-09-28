@@ -11,6 +11,10 @@
  *  - deleteSiteMachine()    — delete a machine (sop_machines cascades, D-13)
  *  - setSopMachines()       — replace-semantics SOP<->machine linking, insert-before-prune (D-12)
  *  - listSopMachines()      — machines + departments + this SOP's linked ids, for the builder panel
+ *  - listSiteHealthForOrg() — Phase 54 (D-04): worker-shaped floor read (signed
+ *                             sprites, unfiltered links — drafts included) for the
+ *                             admin health repaint; reshapes listSiteForOrg, never
+ *                             a second admin-health classifier (CLAUDE.md 2026-09-27)
  *
  * All functions return a discriminated union `{ ... } | { error }` — never throw.
  * requireAdminContext() runs first in every export; the session client carries the
@@ -39,6 +43,8 @@ import type {
   SopMachineLink,
   SiteDepartment,
   SiteSopOption,
+  AdminSiteFloor,
+  WorkerSiteMachine,
 } from '@/lib/validators/site'
 import { scenePath, polygonWithinScene, newMachineCode, SCENE_BUCKET, SCENE_SIGNED_TTL_SEC } from '@/lib/site/scene'
 
@@ -520,5 +526,49 @@ export async function listSopMachines(
     machines: (machineRows ?? []) as SiteMachine[],
     departments: (deptRows ?? []) as SiteDepartment[],
     linkedIds: ((linkRows ?? []) as Array<{ machine_id: string }>).map((r) => r.machine_id),
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 8. listSiteHealthForOrg — Phase 54 (D-04): admin floor read for the health
+//    repaint. Reshapes listSiteForOrg's admin-scoped read into the worker
+//    render shape (signed sprites); links are NOT narrowed to published SOPs
+//    (library health covers drafts too, unlike listSiteForWorker).
+// ---------------------------------------------------------------------------
+
+export async function listSiteHealthForOrg(): Promise<AdminSiteFloor | { error: string }> {
+  const ctx = await requireAdminContext()
+  if ('error' in ctx) return { error: ctx.error }
+  if (!ctx.organisationId) return { error: 'No organisation' }
+
+  const site = await listSiteForOrg()
+  if ('error' in site) return site
+
+  if (!site.layout || !site.layout.scene_path || !site.layout.scene_width || !site.layout.scene_height) {
+    return { layout: null, machines: [], links: site.links, departments: site.departments }
+  }
+
+  const db = ctx.supabase as unknown as SupabaseClient
+  const machines: WorkerSiteMachine[] = await Promise.all(
+    site.machines.map(async (m) => {
+      let spriteUrl: string | null = null
+      if (m.sprite_path) {
+        const { data: signedSprite } = await db.storage.from(SCENE_BUCKET).createSignedUrl(m.sprite_path, SCENE_SIGNED_TTL_SEC)
+        spriteUrl = signedSprite?.signedUrl ?? null
+      }
+      return { id: m.id, name: m.name, department_id: m.department_id, polygon: m.polygon, spriteUrl, code: m.code }
+    })
+  )
+
+  return {
+    layout: {
+      id: site.layout.id,
+      sceneUrl: site.layout.sceneUrl,
+      sceneWidth: site.layout.scene_width,
+      sceneHeight: site.layout.scene_height,
+    },
+    machines,
+    links: site.links,
+    departments: site.departments,
   }
 }

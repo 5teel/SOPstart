@@ -130,3 +130,8 @@ export interface WorkerSiteData {
   links: SopMachineLink[]
   departments: SiteDepartment[]
 }
+
+// -- Admin floor read (Phase 54, D-04) ---------------------------------------
+// Same render shape as the worker floor — but `links` are NOT narrowed to
+// published SOPs (library health covers drafts too).
+export type AdminSiteFloor = WorkerSiteData

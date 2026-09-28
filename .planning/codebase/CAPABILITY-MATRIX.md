@@ -1,6 +1,6 @@
 # Capability Matrix
 
-**Last updated:** 2026-09-28
+**Last updated:** 2026-09-29
 
 This document is the single reference for who can see and do what in SafeStart. When a capability gate changes (an RLS policy, a `require*` guard, or a role check), this file changes in the **same commit**. If this file disagrees with the code, the code is the bug or the file is stale — treat any drift as a finding, not a footnote.
 
@@ -59,6 +59,7 @@ To answer "is a worker *required* to do X?": this document does not answer that 
 | Link SOPs to machines | — | — | ✅ | ✅ | — | RLS `admins_can_write_sop_machines` (00067) backstopping `setSopMachines()` in `src/actions/site.ts` — `requireAdminContext()`, both the SOP id and every machine id filtered to the session org before write (Phase 51 plan 51-03) |
 | Generate site scene (paid AI) | — | — | ✅ | ✅ | — | `POST /api/admin/site/generate` — `requireAdminContext()`, `GEMINI_API_KEY` gate, refuses when the org's layout already has a scene (Phase 51 plan 51-03) |
 | Print a machine plate (QR) | — | — | ✅ | ✅ | — | `requireAdminContext()` in `src/app/(protected)/admin/site/plate/[machineId]/page.tsx` before any read, plus the session-org filter on the machine lookup (foreign id → 404) (Phase 53) |
+| Library health data (floor + library checks) | — | — | ✅ | ✅ | — | Enforced at `listSiteHealthForOrg()` (`src/actions/site.ts`) and `listAdminSopRows()` (`src/actions/admin-sop-list.ts`): `requireAdminContext()` first, every new read filtered to the SESSION organisation, `sop_access_people` scoped by RLS 00048's same-org admin arm, no service-role client (Phase 54 plan 54-01) |
 
 Where a row's `Enforced at` column names RLS only (no app guard), or app guard only (RLS is `using(true)` or otherwise not the real gate), that asymmetry is deliberate context, not an oversight — see Findings below for the two cases where it became a real gap.
 

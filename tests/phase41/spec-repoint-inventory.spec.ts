@@ -26,6 +26,9 @@
  *   - tests/phase41/reference-sweep.spec.ts — PERMITTED_FILES set names the
  *     shim as one of exactly two files allowed to reference `/admin/sops`
  *     as a literal route string (41-07).
+ *   - tests/phase54/deletion-sweep.spec.ts — PERMITTED_ATTENTION_FILES names
+ *     the shim as one of the two files still allowed to spell
+ *     `=== 'attention'` once the Phase 41 lenses are deleted (54-05).
  */
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
@@ -41,6 +44,7 @@ const ALLOWLIST = [
   path.join('tests', 'phase28', 'governance-queue.spec.ts'),
   path.join('tests', 'phase30', 'create-entry.spec.ts'),
   path.join('tests', 'phase41', 'reference-sweep.spec.ts'),
+  path.join('tests', 'phase54', 'deletion-sweep.spec.ts'),
 ]
 
 // Strips full-line comments (//, /*, */, and JSDoc * continuation lines) so
