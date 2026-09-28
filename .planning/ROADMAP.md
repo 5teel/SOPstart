@@ -1625,7 +1625,17 @@ Plans:
   3. Scan opens the camera in-app, decodes the QR, and client-routes to `/m/<code>`; denied camera permission falls back to a code entry field
   4. Deployed eval at 390×844 covers home → thumbnail list → `/m/<code>` → Walk it
 
-**Plans**: TBD
+**Plans**: 6 plans
+
+Plans:
+
+- [ ] 53-01-PLAN.md — Wave 1: phase53 harness + stubs, jsqr pinned after a registry check, eval skeleton, qr-decode.ts + next-redirect.ts (TDD), login ?next= through middleware → /login → LoginForm → loginWithEmail
+- [ ] 53-02-PLAN.md — Wave 1: useWorkerSops hook — the one worker-list derivation lifted out of /sops (guards repointed, build gate)
+- [ ] 53-03-PLAN.md — Wave 2: /m/[code] (org-scoped lookup, MachineView, inline MachinePanel, live cross-org probe) + A6 plate page + Print plate in SiteWorkspace + journeys routes + capability matrix
+- [ ] 53-04-PLAN.md — Wave 2: NowCard (optional Show me → Read, inline), machine codes to the client, MachineListSheet, PhoneHome, /sops phone seam, phone-home marker group, build gate
+- [ ] 53-05-PLAN.md — Wave 3: ScanSheet (back camera, BarcodeDetector → jsqr, our-origin check, typed code), Scan button, scan-sheet marker group, journeys phone flow, build gate
+- [ ] 53-06-PLAN.md — Wave 4: live phone-home eval at 390×844 (+ shared fixture helper), /uat item, full suite once, push, eval, screenshots read, validation sign-off
+
 **UI hint**: yes
 
 ### Phase 54: Admin — Inbox, Floor Health, Library Table
