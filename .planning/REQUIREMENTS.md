@@ -911,10 +911,10 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 ### Site Model (SIT) — Phase 51
 
-- [ ] **SIT-01**: An organisation has one or more site layouts, each a scene image plus machines (name, department, polygon in scene-pixel space, optional sprite, short QR code), org-scoped under RLS with admin-only writes
-- [ ] **SIT-02**: An admin can create a site scene by generating it server-side from a short description (Gemini image model, same style prompt the sketch validated) or by uploading an image; the asset lives in Supabase Storage
-- [ ] **SIT-03**: An admin draws, moves and deletes machine hotspots as polygons over the scene (Konva), names them and assigns a department, without leaving the page
-- [ ] **SIT-04**: A SOP links to zero or more machines (N:M) as first-class metadata, editable from the builder's SOP-level panel and from the machine editor
+- [x] **SIT-01**: An organisation has one or more site layouts, each a scene image plus machines (name, department, polygon in scene-pixel space, optional sprite, short QR code), org-scoped under RLS with admin-only writes
+- [x] **SIT-02**: An admin can create a site scene by generating it server-side from a short description (Gemini image model, same style prompt the sketch validated) or by uploading an image; the asset lives in Supabase Storage
+- [x] **SIT-03**: An admin draws, moves and deletes machine hotspots as polygons over the scene (Konva), names them and assigns a department, without leaving the page
+- [x] **SIT-04**: A SOP links to zero or more machines (N:M) as first-class metadata, editable from the builder's SOP-level panel and from the machine editor
 
 ### Worker Home (HOM) — Phase 52
 
@@ -949,7 +949,7 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| SIT-01..04 (4) | Phase 51 | Pending |
+| SIT-01..04 (4) | Phase 51 | Complete (2026-09-28) |
 | HOM-01..06 (6) | Phase 52 | Pending |
 | PHN-01..03 (3) | Phase 53 | Pending |
 | ADM-01..04 (4) | Phase 54 | Pending |
