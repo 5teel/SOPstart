@@ -19,8 +19,18 @@ for (const l of fs.existsSync('.env.local') ? fs.readFileSync('.env.local', 'utf
 }
 
 export const EVAL_BASE_URL = process.env.EVAL_BASE_URL ?? ''
-export const EVAL_USERS = { admin: 'eval-admin@sopstart.com', worker: 'eval-worker@sopstart.com' } as const
+// siteAdmin (Phase 51 / 51-07): admin of its OWN org "SOPstart Eval Site" —
+// the site-editor eval resets the org's site before every run, which would
+// delete Simon's real site map if it ran in the shared SOPstart eval org.
+export const EVAL_USERS = {
+  admin: 'eval-admin@sopstart.com',
+  worker: 'eval-worker@sopstart.com',
+  siteAdmin: 'eval-site-admin@sopstart.com',
+} as const
 export type EvalRole = keyof typeof EVAL_USERS
+export const EVAL_SITE_ORG_NAME = 'SOPstart Eval Site'
+export const EVAL_SITE_SOP_TITLE = 'Eval site fixture SOP'
+export const EVAL_SITE_DEPARTMENT = 'Forming'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!
