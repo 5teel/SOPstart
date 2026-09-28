@@ -898,3 +898,63 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 ---
 *v9.0 requirements added: 2026-08-25*
+
+---
+
+## v10.0 Requirements — Plant Floor Navigation
+
+**Defined:** 2026-09-28 · Source: sketch 007 (winner "Plant"), Simon's decision the same day ("Go ahead with 007. Forget the shared terminal."). Design contract: `.claude/skills/sketch-findings-SOPstart/references/plant-floor-navigation.md`.
+
+**Milestone character:** REPLACEMENT. The site is the map. Workers reach a procedure by pointing at the machine on an isometric drawing of their plant (desktop) or scanning its QR plate (phone) — never by browsing. Admins get an inbox and the same floor lit by library health. Retires the Phase 41 `/sops` scope column (Admin / Your SOPs / Library / By department), the Miller frame and the three `AdminSopSurface` lenses. Kiosk / shared-terminal mode is **out** (dropped 2026-09-28).
+
+**Standing constraints:** `SB-LINE-06` worker bundle gate stays a phase-failing condition (the scene renderer and every admin surface are code-split). Obligation is not access (v9.0) — pins derive from the same assignments × completions × cadence query `useAssignedSops` already computes, never from a new store.
+
+### Site Model (SIT) — Phase 51
+
+- [ ] **SIT-01**: An organisation has one or more site layouts, each a scene image plus machines (name, department, polygon in scene-pixel space, optional sprite, short QR code), org-scoped under RLS with admin-only writes
+- [ ] **SIT-02**: An admin can create a site scene by generating it server-side from a short description (Gemini image model, same style prompt the sketch validated) or by uploading an image; the asset lives in Supabase Storage
+- [ ] **SIT-03**: An admin draws, moves and deletes machine hotspots as polygons over the scene (Konva), names them and assigns a department, without leaving the page
+- [ ] **SIT-04**: A SOP links to zero or more machines (N:M) as first-class metadata, editable from the builder's SOP-level panel and from the machine editor
+
+### Worker Home (HOM) — Phase 52
+
+- [ ] **HOM-01**: `/sops` for a worker on desktop renders the site scene with pan, zoom-to-cursor, department fly-to and tappable machines — no scope column, no Miller frame
+- [ ] **HOM-02**: Each machine carries a derived pin: the count of that machine's SOPs due / never done / updated for the viewer; pins are computed, never stored
+- [ ] **HOM-03**: A Now card shows the single next procedure (due first), with Walk it and Show me (fly the camera to the machine and open its panel)
+- [ ] **HOM-04**: Clicking a machine flies to it and opens a panel listing its SOPs to-do first with the shared badge vocabulary; Walk it opens the existing SOP page
+- [ ] **HOM-05**: The ask bar highlights machines and SOPs as the worker types and is the entry point for the existing voice Q&A
+- [ ] **HOM-06**: The worker route's First Load JS stays within the SB-LINE-06 budget — the scene renderer is a dynamic import and the scene image is lazy
+
+### Phone (PHN) — Phase 53
+
+- [ ] **PHN-01**: On a phone the home is the ask bar, the Now card, a floor thumbnail and a Scan button — the scene is never the phone navigation
+- [ ] **PHN-02**: Every machine has a printable QR plate resolving `/m/<code>` to that machine's SOP list for the signed-in worker
+- [ ] **PHN-03**: An in-app camera scan (getUserMedia + QR decode) lands on `/m/<code>` without a full page reload
+
+### Admin (ADM) — Phase 54
+
+- [ ] **ADM-01**: `/governance` is its own route: an inbox of one-action rows (no owner · review overdue · awaiting your approval · stuck converting · machines with no procedures) with counted filter chips; an empty inbox is the goal state
+- [ ] **ADM-02**: The site scene sits beside the inbox repainted by health — red where a SOP has no owner, amber where review is overdue — and a pin opens the machine panel with owner and revision per SOP
+- [ ] **ADM-03**: Admin `/sops` is the library as a plain table with a per-SOP checks row (owner · reviewed within 12 months · approved · assigned · converted) and Where / Status / Owner / Checks chips; the Miller frame, the scope column and the `AdminSopSurface` lenses are deleted, not hidden
+- [ ] **ADM-04**: Header links, `journeys.ts`, the deployed evals and the CAPABILITY-MATRIX reflect the new surfaces; a repo sweep proves no href targets a retired lens or query parameter
+
+### v10.0 Out of Scope
+
+- **Shared terminal / kiosk mode** — dropped by Simon 2026-09-28
+- **Three.js / true 3D orbit** — the scene is a raster with polygon hotspots; revisit only if sites need editable 3D
+- **Multi-site picker UI** — the model allows many layouts per org; the picker ships when a second real site exists
+- **Sprite generation per machine on demand** — nice-to-have inside SIT-02's generator; not a requirement
+
+### v10.0 Traceability
+
+| REQ-ID | Phase | Status |
+|--------|-------|--------|
+| SIT-01..04 (4) | Phase 51 | Pending |
+| HOM-01..06 (6) | Phase 52 | Pending |
+| PHN-01..03 (3) | Phase 53 | Pending |
+| ADM-01..04 (4) | Phase 54 | Pending |
+
+**v10.0 Coverage:** 17 requirements, 17 mapped, 0 unmapped.
+
+---
+*v10.0 requirements added: 2026-09-28*

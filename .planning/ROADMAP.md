@@ -1540,10 +1540,94 @@ Plans:
 4. Per-block verify checklist — single sign-off pass, or split by section (hazards verified by safety_manager, steps verified by supervisor)?
 5. Where does AI-reviewer cost get capped — re-run limit per SOP per day? Token budget per parse?
 
+## v10.0 — Plant Floor Navigation (scoped 2026-09-28)
+
+**REPLACEMENT milestone.** The site is the map. Sketch 007 (winner "Plant", decided 2026-09-28) replaces the `/sops` scope column Phase 41 merged — a desk-catalogue idiom (Finder / Linear) applied to operators who never wanted a catalogue. Floor products (SwipeGuide, Poka, Tulip, Dozuki) reach a procedure by scanning the machine, by a "today" feed, or by a station app. v10.0 builds that: an isometric drawing of the plant as the worker home with tappable machines and derived pins, a Now card, an ask/voice bar; QR plates on the phone; an admin inbox with the same floor lit by library health and the library demoted to a table with a checks row. Design contract: `.claude/skills/sketch-findings-SOPstart/references/plant-floor-navigation.md`. Kiosk / shared terminal **dropped**.
+
+**Relationship to v8.0 / v9.0:** Phase 42 (one creation flow) is unaffected — "Create New SOP" lives in the header. Phase 43 (route truth) runs **after** Phase 54, since 54 retires routes. v9.0 phases touch no surfaces and run in parallel. Numbering starts at **51** (44a–50 belong to v9.0).
+
+**Hard constraints carried:** `SB-LINE-06` worker bundle gate (scene renderer dynamic-imported, image lazy); obligation ≠ access (pins derive from the existing `useAssignedSops` query); every new tenant table org-scoped with `WITH CHECK` restating `USING` (2026-08-04 learning); evals, not click-paths.
+
+**Assets:** scene + sprites generated with the Gemini image model (`nano-banana-2` MCP locally; server-side for SIT-02). Style prompt validated in sketch 007 (`.planning/sketches/007-plant-floor-navigation/README.md`). Backgrounds are opaque `#fafafa` — design around it.
+
+Executes 51 → 52 → 53 ∥ 54 → (v8.0 Phase 43).
+
+- [ ] **Phase 51: Site Model & Machine Editor** - `site_layouts` / `site_machines` / `sop_machines` under RLS; admin generates or uploads a scene, draws polygon hotspots (Konva), links SOPs to machines
+- [ ] **Phase 52: Worker Home — The Plant** - `/sops` worker desktop = pan/zoom scene, derived pins, Now card, machine panel, ask bar; scope column and Miller frame gone for workers; bundle gate green
+- [ ] **Phase 53: Phone — Scan or Ask** - Phone home (ask · Now · thumbnail · Scan), printable QR plates, `/m/<code>`, in-app camera scan
+- [ ] **Phase 54: Admin — Inbox, Floor Health, Library Table** - `/governance` inbox + health-lit floor; admin `/sops` = checks-row table; `AdminSopSurface` lenses, Miller frame and scope column deleted; header, journeys, evals, matrix updated
+
+### Phase 51: Site Model & Machine Editor
+
+**Goal**: An organisation can describe its site once — a scene image and the machines on it — and every SOP can say which machine it belongs to. This is the data every later phase draws pins on.
+
+**Depends on**: Nothing in-flight. Konva is installed (Phase 26 annotation). Gemini key needed on Railway for generation (upload path works without it).
+**Requirements**: SIT-01, SIT-02, SIT-03, SIT-04
+**Success Criteria** (what must be TRUE):
+
+  1. Tables `site_layouts`, `site_machines`, `sop_machines` exist with org-scoped RLS, admin-only writes, and a `WITH CHECK` that restates every `USING` predicate — pinned by `tests/lint/rls-org-scope.spec.ts` passing unchanged
+  2. An admin at `/admin/site` can generate a scene from a one-paragraph description (server-side Gemini call, validated style prompt, stored in Supabase Storage) **or** upload a JPG/PNG, and sees it rendered at natural size with pan/zoom
+  3. On that scene the admin can draw a polygon, name it, pick its department, move a vertex, delete it — all persisted, polygons stored in scene-pixel space
+  4. A SOP's builder metadata panel offers a machine picker (multi-select, org-scoped); the machine editor's panel lists the SOPs linked to each machine; both write `sop_machines`
+  5. Deployed eval covers: generate-or-upload → draw two polygons → link a SOP → reload shows all three
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 52: Worker Home — The Plant
+
+**Goal**: A worker on a desktop opens SOPs and is standing above their site. What they owe is a pin on a machine and one Now card; a procedure is one click on the machine it belongs to.
+
+**Depends on**: Phase 51 (scene + machines + sop_machines)
+**Requirements**: HOM-01, HOM-02, HOM-03, HOM-04, HOM-05, HOM-06
+**Success Criteria** (what must be TRUE):
+
+  1. `/sops` for a worker at ≥1024px renders the org's scene with drag-pan, wheel zoom-to-cursor, department chips that fly the camera, and hoverable machine labels; the scope column and Miller frame do not render for workers
+  2. Pins are derived from the existing assignment/completion/cadence data: a machine shows an amber count equal to its SOPs that are due, never done, or updated for that worker; a source-contract test pins that no new table or store backs the count
+  3. The Now card shows the due-first next procedure with Walk it (opens the SOP page) and Show me (flies to the machine and opens its panel); orgs with no scene yet see the existing list as the fallback, never a blank
+  4. Clicking a machine flies to it (target offset so the 380px panel never covers it) and opens the panel: sprite or "no photo yet", department in zone colour, SOPs to-do first with the shared badge set, Walk it per row
+  5. Typing in the ask bar highlights matching machines and SOPs live; the mic routes into the existing voice Q&A entry
+  6. `npm run build` bundle check shows the worker `/sops` route within the SB-LINE-06 budget against the untouched baseline (the renderer is `next/dynamic`, the image `loading="lazy"`); deployed eval screenshots at 1440px read by the orchestrator
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 53: Phone — Scan or Ask
+
+**Goal**: On the floor with a phone, a worker never navigates: they scan the plate on the machine or ask.
+
+**Depends on**: Phase 51 (machine codes), Phase 52 (Now card + panel components reused)
+**Requirements**: PHN-01, PHN-02, PHN-03
+**Success Criteria** (what must be TRUE):
+
+  1. `/sops` below 1024px renders ask bar, Now card, a floor thumbnail (tap → the machine list grouped by department, no pan/zoom) and a Scan button; no scene renderer enters the phone bundle
+  2. Every machine has a short code; `/m/<code>` renders that machine's SOP list for the signed-in worker with the shared badges, and the admin machine editor offers a printable A6 plate (QR + machine name + department)
+  3. Scan opens the camera in-app, decodes the QR, and client-routes to `/m/<code>`; denied camera permission falls back to a code entry field
+  4. Deployed eval at 390×844 covers home → thumbnail list → `/m/<code>` → Walk it
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 54: Admin — Inbox, Floor Health, Library Table
+
+**Goal**: The admin's home is the work, not the list. An inbox that drains, the same floor lit red and amber where the library is sick, and the library as a plain table with a checks row. Everything the Phase 41 scope column and lenses did is either here or deleted.
+
+**Depends on**: Phase 52 (scene renderer, panel), Phase 51 (machines)
+**Requirements**: ADM-01, ADM-02, ADM-03, ADM-04
+**Success Criteria** (what must be TRUE):
+
+  1. `/governance` is a real route (no `?view=` deep link): an inbox listing no-owner, review-overdue, awaiting-your-approval, stuck-converting and machines-with-no-procedures rows, each with the one action that clears it, counted filter chips, and an "all clear" state
+  2. The scene renders beside the inbox in admin repaint — red pin where any SOP on the machine has no owner, amber where any is review-overdue, green dot otherwise — and a pin opens the panel with owner + revision per SOP and Open/Edit
+  3. Admin `/sops` is a table (SOP · Machine · Status · Owner · Checks · Review) with Where/Status/Owner/Checks chips; `AdminSopSurface.tsx`, the three lens files, `MillerPrimitives.tsx` and `SopWorkerBrowser.tsx` are deleted and a repo sweep fails on any import or href of them
+  4. Header "Governance" points at `/governance`; `journeys.ts` maps every new route with 0 not-mapped on `/pathways`; `.planning/codebase/CAPABILITY-MATRIX.md` has the new surfaces; `tests/evals/sop-surface.eval.ts` is rewritten for the new surfaces and passes on the deployed site
+
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 21.6 → 22 → 23 → 24 → 25** (v4.0) → **26 → 26.5** (v5.0) → **27** (v5.0 close) → **28 → 29 → 30** (v6.0) → **34 → 35 → 36 → 37** (v7.0; 38/39 deferred to backlog) → **40 → 41 → 42** (v8.0)
+Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 21.6 → 22 → 23 → 24 → 25** (v4.0) → **26 → 26.5** (v5.0) → **27** (v5.0 close) → **28 → 29 → 30** (v6.0) → **34 → 35 → 36 → 37** (v7.0; 38/39 deferred to backlog) → **40 → 41 → 42** (v8.0) → **51 → 52 → 53 ∥ 54** (v10.0) → 43 (v8.0 route truth, after 54)
 
 **v3.0 closeout 2026-05-23.** Phases 16, 17, 18 deferred to v4.0 backlog. Phase 19 deleted (no remaining dependencies). Phase 20 partial — DOCX-to-builder slice shipped on master; remaining safety-critical verification scope carried to v4.0 Phase 21.
 
