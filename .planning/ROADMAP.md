@@ -640,7 +640,15 @@ Plans:
   3. Orphaned redirect shims (`/admin/governance`, plus whatever Phase 41 leaves behind) and dead state in the creation and list surfaces (set-never-called setters, computed-never-rendered memos) are gone, and a clean `npm run build` plus lint passes with no unused-symbol carve-outs
   4. `/pathways` → "All screens" shows **0 not-mapped** for every route this milestone added, removed, renamed, or merged, and `.planning/codebase/ARCHITECTURE.md` no longer references routes deleted in earlier phases (e.g. `/admin/sops/[sopId]/review`, removed in Phase 21.5)
 
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+
+- [ ] 43-01-PLAN.md — Wave 1: dead-link lint guard (live, red-first on the stale journeys Publish route + ARCHITECTURE review line, reserved-segment rule staged); journeys/ARCHITECTURE/matrix doc fixes; phase43 spec scaffolds + project; dead-surface.eval.ts
+- [ ] 43-02-PLAN.md — Wave 2: createBlock wire-reachable trust override removed (createBlockAsService core, T-43-01); /admin/blocks/new create form over createBlock(), shared BLOCK_KINDS, journeys step
+- [ ] 43-03-PLAN.md — Wave 2: Scan document drives PhotoScanner; WiringPatchBay Matrix/Illuminate toggle removed; sopCategoryOptions + selectedForCompare dead state removed
+- [ ] 43-04-PLAN.md — Wave 3: /admin/governance + /admin/sops shim pages deleted, next.config.ts redirects, journeys legacy steps + matrix note, ten legacy specs repointed
+- [ ] 43-05-PLAN.md — Wave 4: tsc, full suite once, build + baseline untouched, lint pins, push, npm run eval -- --phase 43, screenshots read, sign-off
 
 ---
 
