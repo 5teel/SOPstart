@@ -21,7 +21,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { listAdminSopRows } from '@/actions/admin-sop-list'
 import {
@@ -81,7 +81,6 @@ export interface AdminLibraryTableProps {
 }
 
 export function AdminLibraryTable({ filter, onTakeoverChange }: AdminLibraryTableProps) {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const [nav, setNav] = useState<LibraryNav>(DEFAULT_LIBRARY_NAV)
 
@@ -91,10 +90,9 @@ export function AdminLibraryTable({ filter, onTakeoverChange }: AdminLibraryTabl
   // observes next/navigation's own push/replace, CLAUDE.md 2026-05-13).
   useEffect(() => {
     const resolved = resolveLibraryNav(new URLSearchParams(searchParams.toString()))
-    if (resolved === 'governance') {
-      router.replace('/governance')
-      return
-    }
+    // ?view=attention is redirected to /governance by the session proxy before
+    // this page renders — never navigate from a mount effect here (2026-09-29).
+    if (resolved === 'governance') return
     setNav(resolved)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams.toString()])

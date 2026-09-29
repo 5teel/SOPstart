@@ -57,6 +57,17 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
+  // Legacy `/sops?view=attention` is /governance now (Phase 54). Server-side
+  // on purpose: a client router.replace fired on mount raced the page's own
+  // mount-time server actions, and Next 16.2.1's action queue orphans a server
+  // action dispatched while a navigation has discarded another — the router
+  // then waits on it forever (fixed upstream in 16.3). CLAUDE.md 2026-09-29.
+  if (path === '/sops' && request.nextUrl.searchParams.get('view') === 'attention') {
+    const redirect = NextResponse.redirect(new URL('/governance', request.url))
+    response.cookies.getAll().forEach((c) => redirect.cookies.set(c))
+    return redirect
+  }
+
   if (isAuthRoute && claims) {
     // UX-01: land each role directly on its home. Role comes from the JWT
     // claim (no DB call in middleware); absent claim → /pending safe default.

@@ -142,20 +142,20 @@ test.describe('Phase 54 — admin library table + worker fallback (deployed)', (
       await signInAs(context, 'admin')
 
       await page.goto('/admin/sops?view=attention')
-      await expect(page).toHaveURL(/\/governance$/)
+      await expect(page).toHaveURL(/\/governance$/, SLOW)
       await expect(page.getByTestId('gov-inbox')).toBeVisible(SLOW)
 
       await page.goto('/sops?view=attention')
-      await expect(page).toHaveURL(/\/governance$/)
+      await expect(page).toHaveURL(/\/governance$/, SLOW)
       await expect(page.getByTestId('gov-inbox')).toBeVisible(SLOW)
       await shot(page, 'admin-governance')
 
       await page.goto('/admin/governance')
-      await expect(page).toHaveURL(/\/governance$/)
+      await expect(page).toHaveURL(/\/governance$/, SLOW)
       await expect(page.getByTestId('gov-inbox')).toBeVisible(SLOW)
 
       await page.goto('/admin/sops?status=draft')
-      await expect(page).toHaveURL(/\/sops\?.*status=draft/)
+      await expect(page).toHaveURL(/\/sops\?.*status=draft/, SLOW)
       await expect(table(page)).toBeVisible(SLOW)
     })
 

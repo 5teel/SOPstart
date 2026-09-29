@@ -56,8 +56,10 @@ const ATTENTION_COMPARE = /===\s*'attention'/g
 const PERMITTED_ATTENTION_FILES = [
   path.join('src', 'app', '(protected)', 'admin', 'sops', 'page.tsx'),
   path.join('src', 'lib', 'sop-list', 'admin-rows.ts'),
+  // 2026-09-29: the /sops?view=attention -> /governance redirect is server-side.
+  path.join('src', 'lib', 'supabase', 'middleware.ts'),
 ]
-const EXPECTED_ATTENTION_COUNT = 2
+const EXPECTED_ATTENTION_COUNT = 3
 
 // 54-06 rewrote every eval that named the retired surface (governance.eval.ts,
 // sop-surface.eval.ts, plant-home.eval.ts) -- the scan now covers tests/evals too.

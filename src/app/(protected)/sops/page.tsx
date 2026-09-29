@@ -1,6 +1,5 @@
 'use client'
-import { useEffect, useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useTransition } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Search, X } from 'lucide-react'
 import { useAssignedSops } from '@/hooks/useAssignedSops'
@@ -107,16 +106,8 @@ export default function SopsPage() {
   // memory for the session only (T-52-02); staleTime is well under the
   // scene URL's 1hr TTL.
   const viewport = useViewport()
-  // Legacy `/sops?view=attention` is /governance now (Phase 54). Decide it
-  // here, before any role/viewport slot mounts: the admin table used to own
-  // this redirect, but once the org has a site the mobile-seeded first paint
-  // starts the phone-home chunk and the table's later replace never lands
-  // (caught by the deployed eval the day the real org got its site map).
-  // Reading window inside an effect is hydration-safe (2026-06-08).
-  const router = useRouter()
-  useEffect(() => {
-    if (new URLSearchParams(window.location.search).get('view') === 'attention') router.replace('/governance')
-  }, [router])
+  // Legacy `/sops?view=attention` never reaches this page: the session proxy
+  // redirects it to /governance (src/lib/supabase/middleware.ts).
 
   const wantsPlant = !isAdmin && viewport === 'desktop'
   // Phase 53 (D-01): an admin on a phone is a worker (contract) -- the phone

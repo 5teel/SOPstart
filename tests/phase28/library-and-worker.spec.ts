@@ -133,12 +133,19 @@ test.describe('admin scope counts — counts from listGovernanceQueue + deep lin
     expect(src).toContain('listGovernanceQueue()')
   })
 
-  test('resolveLibraryNav resolves ?view=attention to the governance sentinel, and the table redirects there', () => {
+  test('resolveLibraryNav resolves ?view=attention to the governance sentinel; the session proxy owns the redirect', () => {
     const rowsSrc = read(ADMIN_ROWS)
     expect(rowsSrc).toContain("if (params.get('view') === 'attention') return 'governance'")
     const tableSrc = read(LIBRARY_TABLE)
-    expect(tableSrc).toContain("if (resolved === 'governance')")
-    expect(tableSrc).toContain("router.replace('/governance')")
+    expect(tableSrc).toContain("if (resolved === 'governance') return")
+    // 2026-09-29: a mount-effect router.replace raced the page's mount-time
+    // server actions (Next 16.2.1 action queue) and never landed — the one
+    // redirect is server-side, and no client copy may come back.
+    expect(tableSrc).not.toContain("router.replace('/governance')")
+    expect(read(path.join(ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx'))).not.toContain("'/governance'")
+    const proxySrc = read(path.join(ROOT, 'src', 'lib', 'supabase', 'middleware.ts'))
+    expect(proxySrc).toContain("path === '/sops' && request.nextUrl.searchParams.get('view') === 'attention'")
+    expect(proxySrc).toContain("NextResponse.redirect(new URL('/governance', request.url))")
   })
 
   test('the governance inbox groups by chip; every flag from classify.ts is still represented', () => {

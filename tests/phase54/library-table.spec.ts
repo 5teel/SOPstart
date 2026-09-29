@@ -118,9 +118,10 @@ test.describe('AdminLibraryTable wiring', () => {
     expect(stripComments(read(TABLE_PATH))).toContain('pinnedSopId={nav.sop}')
   })
 
-  test("router.replace('/governance') present, router.push absent", () => {
+  test('no router navigation at all -- ?view=attention is redirected by the session proxy (2026-09-29)', () => {
     const code = stripComments(read(TABLE_PATH))
-    expect(code).toContain("router.replace('/governance')")
+    expect(code).toContain("if (resolved === 'governance') return")
+    expect(code).not.toContain('router.replace')
     expect(code).not.toContain('router.push')
   })
 
