@@ -1,6 +1,6 @@
-# Deployed-site eval — 2026-09-28T19:18:28.383Z
+# Deployed-site eval — 2026-09-29T06:14:48.628Z
 
-Target: https://sopstart.com · commit 76fa362 · 26 passed / 0 failed / 0 skipped
+Target: https://sopstart.com · commit 5049f29 · 24 passed / 0 failed / 2 skipped
 
 | | Test | Failure |
 |---|------|---------|
@@ -14,9 +14,9 @@ Target: https://sopstart.com · commit 76fa362 · 26 passed / 0 failed / 0 skipp
 | ✅ | Phase 53 — phone home (deployed) › logged out, /m/<code> goes to /login?next=…, and a signed-in visit to that login URL lands on the machine |  |
 | ✅ | Phase 53 — phone home (deployed) › a worker in another org gets a 404 for the EVAL Press code |  |
 | ✅ | Phase 53 — phone home (deployed) › eval-site admin: the plate page renders at A6 with the QR, name, department and code; print hides the controls; the site editor links to it; a worker cannot open the plate |  |
-| ✅ | Phase 53 — phone home (deployed) › a worker whose org has no site still sees today's phone list |  |
+| ⏭ | Phase 53 — phone home (deployed) › a worker whose org has no site still sees today's phone list |  |
 | ✅ | Phase 52 — worker plant home (deployed) › eval-site worker at 1440 sees the scene, a pin on EVAL Press, the Now card, the panel, a chip fit, the ask highlight and the voice dialog — no scope column, no console errors |  |
-| ✅ | Phase 52 — worker plant home (deployed) › a worker whose org has no site still sees the list |  |
+| ⏭ | Phase 52 — worker plant home (deployed) › a worker whose org has no site still sees the list |  |
 | ✅ | Phase 51 — site editor (deployed) › admin uploads a scene, draws two machines (one after zoom+pan), names them, tags a department, moves a corner, links a SOP from the builder, and reloads |  |
 | ✅ | Phase 51 — site editor (deployed) › a worker is sent away from /admin/site |  |
 | ✅ | SOP page — one document, one job (deployed) › worker, desktop: Orient → Prepare → Do, one job at a time, no admin chrome |  |
@@ -31,4 +31,4 @@ Target: https://sopstart.com · commit 76fa362 · 26 passed / 0 failed / 0 skipp
 | ✅ | worker › F2 — mobile: no library table, no Governance link |  |
 | ✅ | worker › F3 — admin on a phone renders no library table (an admin on a phone is a worker, D-07) |  |
 
-Screenshots (inspect these — CSS/sizing bugs are invisible to assertions): `.planning\evals\latest\admin-access.png`, `.planning\evals\latest\admin-governance.png`, `.planning\evals\latest\admin-library-filtered.png`, `.planning\evals\latest\admin-library.png`, `.planning\evals\latest\admin-mobile.png`, `.planning\evals\latest\builder-machines.png`, `.planning\evals\latest\governance-after-assign.png`, `.planning\evals\latest\governance-inbox.png`, `.planning\evals\latest\governance-panel.png`, `.planning\evals\latest\phone-home-fallback.png`, `.planning\evals\latest\phone-home.png`, `.planning\evals\latest\phone-machine-sheet.png`, `.planning\evals\latest\phone-machine.png`, `.planning\evals\latest\phone-plate-print.png`, `.planning\evals\latest\phone-plate.png`, `.planning\evals\latest\phone-scan-fallback.png`, `.planning\evals\latest\plant-home-ask.png`, `.planning\evals\latest\plant-home-fallback.png`, `.planning\evals\latest\plant-home-panel.png`, `.planning\evals\latest\plant-home-voice.png`, `.planning\evals\latest\plant-home-zone.png`, `.planning\evals\latest\plant-home.png`, `.planning\evals\latest\site-editor.png`, `.planning\evals\latest\site-empty.png`, `.planning\evals\latest\sop-read-desktop.png`, `.planning\evals\latest\sop-read-mobile.png`, `.planning\evals\latest\sop-walk-desktop.png`, `.planning\evals\latest\sop-walk-mobile.png`, `.planning\evals\latest\worker-mobile.png`, `.planning\evals\latest\worker-sops.png`
+Screenshots (inspect these — CSS/sizing bugs are invisible to assertions): `.planning\evals\latest\admin-access.png`, `.planning\evals\latest\admin-governance.png`, `.planning\evals\latest\admin-library-filtered.png`, `.planning\evals\latest\admin-library.png`, `.planning\evals\latest\admin-mobile.png`, `.planning\evals\latest\builder-machines.png`, `.planning\evals\latest\governance-after-assign.png`, `.planning\evals\latest\governance-inbox.png`, `.planning\evals\latest\governance-panel.png`, `.planning\evals\latest\phone-home.png`, `.planning\evals\latest\phone-machine-sheet.png`, `.planning\evals\latest\phone-machine.png`, `.planning\evals\latest\phone-plate-print.png`, `.planning\evals\latest\phone-plate.png`, `.planning\evals\latest\phone-scan-fallback.png`, `.planning\evals\latest\plant-home-ask.png`, `.planning\evals\latest\plant-home-panel.png`, `.planning\evals\latest\plant-home-voice.png`, `.planning\evals\latest\plant-home-zone.png`, `.planning\evals\latest\plant-home.png`, `.planning\evals\latest\site-editor.png`, `.planning\evals\latest\site-empty.png`, `.planning\evals\latest\sop-read-desktop.png`, `.planning\evals\latest\sop-read-mobile.png`, `.planning\evals\latest\sop-walk-desktop.png`, `.planning\evals\latest\sop-walk-mobile.png`, `.planning\evals\latest\worker-mobile.png`, `.planning\evals\latest\worker-sops.png`
