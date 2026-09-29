@@ -641,13 +641,22 @@ Plans:
   4. `/pathways` → "All screens" shows **0 not-mapped** for every route this milestone added, removed, renamed, or merged, and `.planning/codebase/ARCHITECTURE.md` no longer references routes deleted in earlier phases (e.g. `/admin/sops/[sopId]/review`, removed in Phase 21.5)
 
 **Plans**: 5 plans
-
 Plans:
+**Wave 1**
 
 - [ ] 43-01-PLAN.md — Wave 1: dead-link lint guard (live, red-first on the stale journeys Publish route + ARCHITECTURE review line, reserved-segment rule staged); journeys/ARCHITECTURE/matrix doc fixes; phase43 spec scaffolds + project; dead-surface.eval.ts
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 43-02-PLAN.md — Wave 2: createBlock wire-reachable trust override removed (createBlockAsService core, T-43-01); /admin/blocks/new create form over createBlock(), shared BLOCK_KINDS, journeys step
 - [ ] 43-03-PLAN.md — Wave 2: Scan document drives PhotoScanner; WiringPatchBay Matrix/Illuminate toggle removed; sopCategoryOptions + selectedForCompare dead state removed
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 43-04-PLAN.md — Wave 3: /admin/governance + /admin/sops shim pages deleted, next.config.ts redirects, journeys legacy steps + matrix note, ten legacy specs repointed
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 43-05-PLAN.md — Wave 4: tsc, full suite once, build + baseline untouched, lint pins, push, npm run eval -- --phase 43, screenshots read, sign-off
 
 ---
