@@ -1,0 +1,39 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-09-29T06:48:53.545Z",
+  "phase": "54",
+  "phase_name": "admin-inbox-floor-health-library-table",
+  "phase_dir": ".planning/phases/54-admin-inbox-floor-health-library-table",
+  "plan": 6,
+  "task": 2,
+  "total_tasks": 2,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": 51, "name": "Phase 51 Site Model & Machine Editor — 7/7 plans, verified, live", "status": "done", "commit": "ebde37c"},
+    {"id": 52, "name": "Phase 52 Worker Home — The Plant — 5/5 plans, verified, live", "status": "done", "commit": "7eca1e2"},
+    {"id": 53, "name": "Phase 53 Phone — Scan or Ask — 6/6 plans, verified, live", "status": "done", "commit": "820c426"},
+    {"id": 54, "name": "Phase 54 Admin — Inbox, Floor Health, Library Table — 6/6 plans, verified, live", "status": "done", "commit": "afe0ddf"},
+    {"id": 55, "name": "Real SOPstart org site seeded (scene, 13 machines Forming/Engineering, 4 sprites, 26 SOP links)", "status": "done", "commit": "ad20a7b"},
+    {"id": 56, "name": "Legacy /sops?view=attention redirect moved to the session proxy (Next 16.2.1 action-queue defect)", "status": "done", "commit": "5049f29"}
+  ],
+  "remaining_tasks": [
+    {"id": 1, "name": "v8.0 Phase 43 Dead-Surface Removal & Route Truth — now runs against the post-54 route tree", "status": "not_started"},
+    {"id": 2, "name": "Upgrade next + eslint-config-next to 16.3.6 (fixes the action-queue navigation defect app-wide); own phase, watch the bundle gate", "status": "not_started"},
+    {"id": 3, "name": "check-bundle-size.ts blind spot: URL-encoded [sopId] page chunk uncounted — needs a signed-off baseline change", "status": "not_started"},
+    {"id": 4, "name": "Backlog: Access wiring → Team; review-due calendar; multi-site picker; per-machine sprite generation", "status": "not_started"}
+  ],
+  "blockers": [],
+  "human_actions_pending": [
+    {"action": "Scan a printed machine plate with a real phone (Site → machine → Print plate)", "context": "Headless Chromium has no camera; only the typed-code fallback is eval-covered", "blocking": false},
+    {"action": "Add GEMINI_API_KEY to Railway", "context": "Enables Generate on /admin/site; Upload works without it", "blocking": false},
+    {"action": "Decide the .planning/phases/41-one-sop-surface/41-EVAL.md uncommitted edit (pre-existing before this session)", "context": "Left untouched all session; commit or discard", "blocking": false}
+  ],
+  "decisions": [
+    {"decision": "Sketch 007 (the site is the map) over 006 (Miller reshape); shared-terminal/kiosk dropped", "rationale": "Simon: 006 too close to what existed; 'forget the shared terminal'", "phase": "v10.0"},
+    {"decision": "Executors ran sequentially on the main tree, never in worktrees", "rationale": "Worktrees branch from the session-start commit (CLAUDE.md 2026-06-02) and every phase had cross-wave dependencies", "phase": "51-54"},
+    {"decision": "Legacy ?view=attention redirect lives in src/lib/supabase/middleware.ts, no client copy", "rationale": "A mount-effect router.replace is orphaned by Next 16.2.1's server-action queue when another action is in flight", "phase": "54"}
+  ],
+  "uncommitted_files": [".planning/phases/41-one-sop-surface/41-EVAL.md (pre-existing, not from this session)"],
+  "next_action": "Nothing in flight. Pick the next phase: /gsd-plan-phase 43 (route truth) or a small Next 16.3.6 upgrade phase.",
+  "context_notes": "v10.0 Plant Floor Navigation shipped end-to-end 2026-09-28..29: sketch → 4 phases → deployed evals (12/12, 14/14, 20/20, 26/26) → real org seeded. All learnings are in CLAUDE.md (2026-09-28 ×3, 2026-09-29 ×5). MILESTONES.md carries the carry-forward list."
+}
