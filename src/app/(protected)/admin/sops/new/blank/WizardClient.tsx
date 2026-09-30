@@ -1,8 +1,8 @@
 'use client'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { z } from 'zod'
-import type { SectionKind, BlockCategory, Department } from '@/types/sop'
+import type { SectionKind, Department } from '@/types/sop'
 import type { BlockContent } from '@/lib/validators/blocks'
 import { listSectionKinds } from '@/actions/sections'
 import { createSopFromWizard } from '@/actions/sops'
@@ -49,13 +49,11 @@ type PickedBlock = {
 }
 
 interface WizardClientProps {
-  /** Phase 13 D-Tax-03: controlled vocab for SOP-level category select + library picker. */
-  categories: BlockCategory[]
   /** Phase 25: departments for the department multi-select field (localOnly create mode). */
   departments: Department[]
 }
 
-export function WizardClient({ categories, departments }: WizardClientProps) {
+export function WizardClient({ departments }: WizardClientProps) {
   const router = useRouter()
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1)
   const [titleValues, setTitleValues] = useState<TitleStepValues | null>(null)
@@ -85,19 +83,6 @@ export function WizardClient({ categories, departments }: WizardClientProps) {
   } | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  // SOP-level categories — pulled from the same controlled vocab as block_categories.
-  // Filter to hazard / area / procedure groups (PPE is a sub-tag, not a SOP-level category).
-  const sopCategoryOptions = useMemo(
-    () =>
-      categories.filter(
-        (c) =>
-          c.category_group === 'hazard' ||
-          c.category_group === 'area' ||
-          c.category_group === 'procedure'
-      ),
-    [categories]
-  )
 
   // Fetch section_kinds lazily when the admin reaches step 2. listSectionKinds
   // already RLS-scopes the result to globals + own-org — no extra filtering

@@ -59,7 +59,6 @@ import { resolveEffectiveAccess } from '@/lib/org-model/resolve-access'
 import { createGrant } from '@/actions/grants'
 import { SelectionStrip } from './SelectionStrip'
 import { AccessAnswerPanel, type AccessAnswerPanelData } from './AccessAnswerPanel'
-import { ViewToggle } from '@/components/admin/org-model/ViewToggle'
 
 export interface WiringCollection {
   id: string
@@ -105,13 +104,6 @@ interface WiringPatchBayProps {
   onWireUpComplete?: () => void
 }
 
-type LensView = 'wiring' | 'matrix' | 'illuminate'
-const LENS_OPTIONS = [
-  { value: 'wiring', label: '⌇ Wiring' },
-  { value: 'matrix', label: '▦ Matrix' },
-  { value: 'illuminate', label: '◉ Illuminate' },
-]
-
 interface PendingGrant {
   subjectType: SubjectType
   subjectId: string | null
@@ -133,7 +125,6 @@ function deptPeopleIds(dept: OrgTreeDepartment): string[] {
 }
 
 export function WiringPatchBay({ tree, orgName = 'Whole site', collections, sopsByCollection = {}, grants, newSop, deptMembers, onWireUpComplete }: WiringPatchBayProps) {
-  const [lens, setLens] = useState<LensView>('wiring')
   const [expandedAreas, setExpandedAreas] = useState<Set<string>>(new Set())
   const [expandedDepts, setExpandedDepts] = useState<Set<string>>(new Set())
   const [expandedRoles, setExpandedRoles] = useState<Set<string>>(new Set())
@@ -878,17 +869,6 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, sops
     )
   }
 
-  if (lens !== 'wiring') {
-    return (
-      <div className="p-6">
-        <div className="mono text-meta uppercase tracking-wide text-[var(--ink-500)] mb-3">
-          {lens === 'matrix' ? '▦ Matrix' : '◉ Illuminate'} — coming soon, ⌇ Wiring is the shipping default
-        </div>
-        <ViewToggle options={LENS_OPTIONS} value={lens} onChange={(v) => setLens(v as LensView)} />
-      </div>
-    )
-  }
-
   return (
     <div className="p-4">
       <div className="flex items-center justify-between gap-3 mb-3">
@@ -900,7 +880,6 @@ export function WiringPatchBay({ tree, orgName = 'Whole site', collections, sops
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <ViewToggle options={LENS_OPTIONS} value={lens} onChange={(v) => setLens(v as LensView)} />
       </div>
 
       <SelectionStrip

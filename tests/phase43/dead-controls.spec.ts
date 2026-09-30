@@ -73,7 +73,7 @@ test.describe('Dead controls: scan-document, wiring lens, dead state (D-02/D-04/
     }
   )
 
-  test.fixme('no comment-stripped src/ file ships a coming-soon placeholder (D-04, D-05)', () => {
+  test('no comment-stripped src/ file ships a coming-soon placeholder (D-04, D-05)', () => {
     const offenders: string[] = []
     for (const file of walkTsFiles(path.join(ROOT, 'src'))) {
       const rel = path.relative(ROOT, file)
@@ -83,14 +83,14 @@ test.describe('Dead controls: scan-document, wiring lens, dead state (D-02/D-04/
     expect(offenders, offenders.join('\n')).toEqual([])
   })
 
-  test.fixme('WiringPatchBay renders the Wiring view only — no lens toggle (D-05)', () => {
+  test('WiringPatchBay renders the Wiring view only — no lens toggle (D-05)', () => {
     const stripped = stripComments(read('src/components/admin/wiring/WiringPatchBay.tsx'))
     for (const forbidden of ['LENS_OPTIONS', 'LensView', 'setLens', "'matrix'", "'illuminate'", '<ViewToggle']) {
       expect(stripped, `must not contain ${forbidden}`).not.toContain(forbidden)
     }
   })
 
-  test.fixme('dead state removed from the creation and version surfaces (D-02)', () => {
+  test('dead state removed from the creation and version surfaces (D-02)', () => {
     const wizardSrc = read('src/app/(protected)/admin/sops/new/blank/WizardClient.tsx')
     expect(wizardSrc).not.toContain('sopCategoryOptions')
 

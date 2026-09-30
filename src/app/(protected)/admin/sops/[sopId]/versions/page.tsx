@@ -133,9 +133,6 @@ export default function SopVersionHistoryPage() {
   const [restoringVersionId, setRestoringVersionId] = useState<string | null>(null)
   const [showRestoreConfirmFor, setShowRestoreConfirmFor] = useState<string | null>(null)
 
-  // Compare: track which version to compare against current
-  const [selectedForCompare, setSelectedForCompare] = useState<string | null>(null)
-
   const loadVersions = useCallback(async () => {
     setLoading(true)
     const result = await getVersionHistory(sopId)

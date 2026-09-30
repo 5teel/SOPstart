@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { getSessionContext } from '@/lib/auth/session-context'
-import { listBlockCategories } from '@/actions/blocks'
 import { listDepartments } from '@/actions/departments'
 import { AdminPageShell } from '@/components/admin/AdminPageShell'
 import { WizardClient } from './WizardClient'
@@ -19,20 +18,15 @@ export default async function NewBlankSopPage() {
     redirect('/dashboard')
   }
 
-  // Phase 13 D-Tax-03: SOP-level category vocab + block library categories
-  // for the wizard's "Pick from library" picker (passed as a prop to keep
-  // env-vars / service-role keys out of the client bundle).
-  const [categories, departments] = await Promise.all([
-    listBlockCategories(),
-    listDepartments(),
-  ])
+  // Phase 25: departments for the wizard's department multi-select field.
+  const departments = await listDepartments()
 
   return (
     <AdminPageShell
       title="New SOP"
       description="Start a SOP from scratch — pick the sections you want, then build them in the editor."
     >
-      <WizardClient categories={categories} departments={departments} />
+      <WizardClient departments={departments} />
     </AdminPageShell>
   )
 }
