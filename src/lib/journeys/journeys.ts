@@ -448,7 +448,7 @@ export const JOURNEYS: Journey[] = [
         { label: 'No — gate blocks publish', to: 'review' },
       ] },
       { id: 'pubstage', type: 'action', label: 'Publish stage', detail: 'Single publish trigger; gated on full verification.' },
-      { id: 'publish', type: 'action', label: 'Publish', route: '/admin/sops/[sopId]/publish', detail: 'SOP goes live for assigned workers. A "Choose who sees it →" CTA appears once published (D-12a).' },
+      { id: 'publish', type: 'action', label: 'Publish', route: '/api/sops/[sopId]/publish', detail: 'SOP goes live for assigned workers. A "Choose who sees it →" CTA appears once published (D-12a).' },
       { id: 'e', type: 'end', label: 'Published' },
     ],
   },

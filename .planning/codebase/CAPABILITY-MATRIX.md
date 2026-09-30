@@ -48,7 +48,7 @@ To answer "is a worker *required* to do X?": this document does not answer that 
 | Approval chains | — | ✅ (as named chain-step approver only) | ✅ | ✅ | — | `setApprovalChain` admin/safety_manager-only (`approvals.ts`); `approveStep`/`requestChanges` open to whichever member is named in that chain step, which may include a supervisor |
 | Manage team | — | — | ✅ | ⚠ (partial) | — | `/admin/team` routes, `requireAdminContext()` — safety_manager has partial access per 2026-07-05 learning (verify current scope before relying on this cell) |
 | Manage departments | — | — | ✅ | ✅ | — | `org-model.ts`/`departments.ts`/`grants.ts`, `requireAdminContext()`. Phase 41: the wiring/access surface (`listOrgTree`/`listGrants`/`ensureSopCollections`) is now reached through the code-split `AdminAccessLens` on `/sops?view=access` rather than the former `/admin/sops` page — same guards, no page-level gate in front of them any more |
-| Manage blocks library | — | — | ✅ | ✅ | — | `/admin/blocks`, `requireAdminContext()`; global block curation additionally gated by `platform_admin` (`platform-admin-guard.ts`) |
+| Manage blocks library | — | — | ✅ | ✅ | — | `/admin/blocks`, `requireAdminContext()`; global block curation retired in Phase 25 (plan 25-05) |
 | AI settings | — | — | ✅ | — | — | `/admin/ai-settings`, admin-only role check |
 | Training matrix | — | — | ✅ | ✅ (read) | — | `/admin/team` matrix mode + `competency.ts`; supervisor gains a narrow write via Record observation above, not matrix admin |
 | Assessor governance | — | — | ✅ (override) | — | — | `isSignedOffAssessor` flag on the member row + admin override path (Phase 37); assessor status itself is a per-member flag, not a role |
@@ -88,7 +88,7 @@ Locked decision: a user with **sign-off authority** on a SOP also has **edit rig
 
 ## Roles that are not rows
 
-- **`platform_admin`** — Potenco-level super-admin (`platform_admins` table, renamed from `summit_admins` in migration 00026), orthogonal to every org role above. Gates `/admin/global-blocks` (global block library curation) only. Per `CLAUDE.md` § Ownership, this is a Potenco concept and is never conflated with Summit Insights.
+- **`platform_admin`** — Potenco-level super-admin (`platform_admins` table, renamed from `summit_admins` in migration 00026), orthogonal to every org role above. Gates no page today — the global block curation pages were deleted in Phase 25 (plan 25-05); `is_platform_admin()` survives because RLS policies still call it (e.g. `ai_review_results`, migration 00032). Per `CLAUDE.md` § Ownership, this is a Potenco concept and is never conflated with Summit Insights.
 - **Dept-scoped job role** (Phase 32 `roles` table, e.g. "Grade Two Operator") — an org-chart / headcount entity today, not a capability gate anywhere in code. Becomes a visibility axis in **Phase 44b**; do not treat it as a fifth matrix row until that phase ships it as one.
 
 ## Planned capabilities

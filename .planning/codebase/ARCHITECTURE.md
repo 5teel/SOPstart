@@ -149,7 +149,7 @@ SafeStart is a multi-tenant Next.js 16 App Router SaaS PWA that implements a thr
    - Calls `parsedSopToPerSectionLayoutData` to generate layout JSON (Puck blocks)
    - Inserts `SopSection` rows, `SopStep` rows, and optional `SopImage` rows
    - Updates parse job (status: `completed`)
-6. **Review** → Admin views at `/admin/sops/[sopId]/review`, edits sections/steps via builder
+6. **Review** → Admin reviews and edits in the builder at `/admin/sops/builder/[sopId]` (source viewer, AI reviewer, per-block verify checklist)
 7. **Publish** → `publishSop` server action updates status to `published`
 8. **Assignment** → Admin assigns to roles/trades at `/admin/sops/[sopId]/assign`
 
@@ -212,7 +212,7 @@ SafeStart is a multi-tenant Next.js 16 App Router SaaS PWA that implements a thr
 **Protected Entry:**
 - Location: `src/app/(protected)/layout.tsx`
 - Triggers: `updateSession` middleware redirects authenticated users here
-- Responsibilities: Role-based navigation (workers → `/sops`, supervisors → `/activity`, admins → `/dashboard`)
+- Responsibilities: Role-based home via `roleHome()` in `src/lib/auth/role-home.ts` — workers → `/sops`, supervisors and safety managers → `/activity`, admins → `/sops`, no role → `/pending`
 
 **Middleware (Session Gate):**
 - Location: `src/lib/supabase/middleware.ts`
