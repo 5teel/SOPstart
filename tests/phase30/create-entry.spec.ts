@@ -12,20 +12,16 @@
  *   - Worker /sops "Create SOP" tab removal is 30-06 scope (shares
  *     sops/page.tsx) — that test stays fixme here until 30-06 flips it.
  *
- * Repointed in 41-08 (Phase 41): `ADMIN_SOPS_PAGE` renamed to
- * `ADMIN_SOPS_SHIM` — admin/sops/page.tsx is now a thin redirect shim to
- * /sops (41-06), so the constant's old name would lie about what the file
- * does. The "no duplicate create entry" check now also asserts the merged
- * surface (/sops) carries no create entry, not just the (now-empty) shim.
+ * Repointed in 43-04 (Phase 43, D-01): admin/sops/page.tsx is deleted — the
+ * legacy URL is now a next.config.ts redirect with no page of its own to
+ * read. The "no duplicate create entry" check now asserts only the merged
+ * surface (/sops).
  */
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
 import path from 'node:path'
 
 const ROOT = process.cwd()
-const ADMIN_SOPS_SHIM = path.join(
-  ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'page.tsx',
-)
 const METHOD_PICKER = path.join(
   ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'new', 'page.tsx',
 )
@@ -81,21 +77,18 @@ test.describe('UX-04 — one create entry', () => {
     expect(src).not.toContain('<AdminNav')
   })
 
-  test('/admin/sops has no duplicate create entry (the header Create New SOP link is the one entry)', () => {
-    // Repointed 2026-09-13 (Phase 41): admin/sops/page.tsx is now a redirect
-    // shim (renders nothing, so the shim half of this check is trivially
-    // true) — the merged surface is /sops (WORKER_SOPS_PAGE), which must
-    // ALSO carry no create entry until Phase 42 (D-01/D-05, 41-CONTEXT.md).
-    const shimSrc = read(ADMIN_SOPS_SHIM)
+  test('/sops has no duplicate create entry (the header Create New SOP link is the one entry)', () => {
+    // Repointed 2026-09-30 (Phase 43, D-01): admin/sops/page.tsx is deleted
+    // (the legacy URL is now a next.config.ts redirect, no page to read) —
+    // the merged surface (/sops) is the only remaining place to check.
     const mergedSrc = read(WORKER_SOPS_PAGE)
     const pickerLinks: string[] = [
-      ...(shimSrc.match(/href="\/admin\/sops\/new"/g) ?? []),
       ...(mergedSrc.match(/href="\/admin\/sops\/new"/g) ?? []),
     ]
     expect(pickerLinks).toHaveLength(0)
     const header = read(path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx'))
     expect(header).toContain("{ label: 'Create New SOP', href: '/admin/sops/new' }")
-    for (const src of [shimSrc, mergedSrc]) {
+    for (const src of [mergedSrc]) {
       expect(src).not.toContain('href="/admin/sops/upload"')
       expect(src).not.toContain('href="/admin/sops/new/ai"')
       expect(src).not.toContain('href="/admin/sops/new/blank"')

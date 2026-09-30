@@ -27,10 +27,11 @@
  *     on flags.
  *   OWN-02: OwnerPicker calls setSopOwner( and reuses getOrgMembers (not a
  *     hand-rolled second member query).
- *   GQ-04: /admin/governance is a guard-first redirect shim that maps legacy
- *     ?filter=X deep-links onto the merged view's filter param (now on /sops).
- *   Pathways coverage: journeys.ts still maps route: '/admin/governance'
- *     (the shim) AND the folded view.
+ *   GQ-04: legacy /admin/governance is now a next.config.ts redirect (Phase
+ *     43, D-01) straight to /governance — the inbox has no flag-filter param,
+ *     so a legacy ?filter=X bookmark lands on the whole inbox.
+ *   Pathways coverage: journeys.ts maps route: '/governance' and no longer
+ *     maps the deleted /admin/governance page.
  *
  * Registration: playwright.config.ts `phase28` project
  *   testDir: '.', testMatch: /tests\/phase28\/.*\.(spec|test)\.ts$/
@@ -42,8 +43,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 
 const ROOT = process.cwd()
-const SHIM = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'governance', 'page.tsx')
-const FOLDED_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'page.tsx')
+const NEXT_CONFIG = path.join(ROOT, 'next.config.ts')
 const GOV_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'governance', 'page.tsx')
 const GOV_INBOX = path.join(ROOT, 'src', 'components', 'admin', 'governance', 'GovernanceInbox.tsx')
 const GOVERNANCE_ACTIONS = path.join(ROOT, 'src', 'actions', 'governance.ts')
@@ -70,11 +70,10 @@ test.describe('governance inbox — queue read + role guard', () => {
     expect(src).toContain('listGovernanceQueue()')
   })
 
-  test('the /admin/sops shim keeps a front-door redirect for non-admins', () => {
-    // 2026-07-13: member.role → role (shared getSessionContext auth refactor)
-    const src = read(FOLDED_PAGE)
-    expect(src).toContain("['admin', 'safety_manager'].includes(role)")
-    expect(src).toContain("redirect('/dashboard')")
+  test('legacy /admin/sops is a next.config.ts redirect to /sops (Phase 43 D-01)', () => {
+    const src = read(NEXT_CONFIG)
+    expect(src).toContain("source: '/admin/sops',")
+    expect(src).toContain("destination: '/sops',")
   })
 
   test('the real data gate — listGovernanceQueue -> requireAdmin() — also enforces admin/safety_manager', () => {
@@ -93,35 +92,14 @@ test.describe('governance inbox — queue read + role guard', () => {
 })
 
 // ---------------------------------------------------------------------------
-// admin/governance/page.tsx — redirect shim (GQ-04 deep-links preserved)
+// legacy /admin/governance — next.config.ts redirect (Phase 43 D-01)
 // ---------------------------------------------------------------------------
 
-test.describe('governance page — redirect shim mapping legacy ?filter=', () => {
-  const src = read(SHIM)
-
-  test('keeps the admin guard IN FRONT of the redirect', () => {
-    // 2026-07-13: member.role → role (shared getSessionContext auth refactor)
-    expect(src).toContain("['admin', 'safety_manager'].includes(role)")
-    expect(src).toContain("redirect('/dashboard')")
-  })
-
-  test('redirects to the governance inbox — a bookmark lands on the whole inbox, no filter param survives', () => {
-    // Rule 1 (CLAUDE.md 2026-07-13): Phase 54 (D-01) retargeted this shim's
-    // destination to /governance, a real route, not a ?view= deep link —
-    // the inbox has no flag-filter param, so legacy ?filter=X is dropped.
-    const guardIdx = src.indexOf("['admin', 'safety_manager'].includes(role)")
-    const redirectIdx = src.indexOf("redirect('/governance')")
-    expect(guardIdx).toBeGreaterThan(-1)
-    expect(redirectIdx).toBeGreaterThan(-1)
-    expect(guardIdx).toBeLessThan(redirectIdx)
-    expect(src).not.toContain("qp.set('filter'")
-    expect(src).not.toContain("view: 'attention'")
-  })
-
-  test('no longer renders any governance surface itself', () => {
-    expect(src).not.toContain('GovernanceQueueRow')
-    expect(src).not.toContain('GovernanceFilterChips')
-    expect(src).not.toContain('ApprovalChainEditor')
+test.describe('legacy /admin/governance — next.config.ts redirect (Phase 43 D-01)', () => {
+  test('redirects to /governance, which guards itself (asserted in the first describe above)', () => {
+    const src = read(NEXT_CONFIG)
+    expect(src).toContain("source: '/admin/governance',")
+    expect(src).toContain("destination: '/governance',")
   })
 })
 
@@ -185,11 +163,11 @@ test.describe('OwnerPicker — reuses getOrgMembers, wires setSopOwner', () => {
 // journeys.ts — pathways coverage
 // ---------------------------------------------------------------------------
 
-test.describe('journeys.ts — shim + governance inbox mapped (pathways coverage)', () => {
+test.describe('journeys.ts — governance inbox mapped, deleted shim is not (pathways coverage)', () => {
   const src = read(JOURNEYS)
 
-  test('contains a step with route: /admin/governance (the shim stays mapped)', () => {
-    expect(src).toContain("route: '/admin/governance'")
+  test('maps no step to the deleted /admin/governance page', () => {
+    expect(src).not.toContain("route: '/admin/governance'")
   })
 
   test('maps the governance inbox route', () => {

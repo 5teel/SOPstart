@@ -47,9 +47,7 @@ const FLAG_DISPLAY = path.join(
 const PUBLISH_STAGE = path.join(
   ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'builder', '[sopId]', 'PublishStage.tsx',
 )
-const GOVERNANCE_SHIM = path.join(
-  ROOT, 'src', 'app', '(protected)', 'admin', 'governance', 'page.tsx',
-)
+const NEXT_CONFIG = path.join(ROOT, 'next.config.ts')
 const JOURNEYS = path.join(ROOT, 'src', 'lib', 'journeys', 'journeys.ts')
 
 function read(p: string): string {
@@ -67,17 +65,16 @@ test.describe('UX-03 — governance lives at /governance', () => {
     expect(inbox).toContain("from '@/lib/governance/inbox'")
   })
 
-  test('/admin/governance is a redirect shim to /governance, guard first (Phase 54, D-01)', () => {
-    const src = read(GOVERNANCE_SHIM)
-    const guardIdx = src.indexOf("['admin', 'safety_manager'].includes(role)")
-    const redirectIdx = src.indexOf("redirect('/governance')")
-    expect(guardIdx).toBeGreaterThan(-1)
-    expect(redirectIdx).toBeGreaterThan(-1)
-    // Guard stays in front of the redirect (T-30-08-03).
-    expect(guardIdx).toBeLessThan(redirectIdx)
-    // No governance surface renders here anymore.
-    expect(src).not.toContain('GovernanceQueueRow')
-    expect(src).not.toContain('ApprovalChainEditor')
+  test('/admin/governance is a next.config.ts redirect and /governance guards itself (Phase 43 D-01)', () => {
+    const config = read(NEXT_CONFIG)
+    expect(config).toContain("source: '/admin/governance',")
+    expect(config).toContain("destination: '/governance',")
+    const page = read(GOV_PAGE)
+    expect(page).toContain('requireAdminContext()')
+    expect(page).toContain("redirect('/dashboard')")
+    // No unrelated governance surface renders here.
+    expect(page).not.toContain('ApprovalChainEditor')
+    expect(page).not.toContain('GovernanceQueueRow')
   })
 
   test('approveStep stays wired in GovernanceQueueRow AND PublishStage (APR-03/04 hard constraint)', () => {
