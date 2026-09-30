@@ -216,7 +216,7 @@ test.describe('no dead internal hrefs — route truth (D-07)', () => {
 
   // activates 43-02 (D-03): flips to `test(` once /admin/blocks/new (and any
   // sibling reserved-segment route) has its own static segment.
-  test.fixme(
+  test(
     'a reserved segment (new, create, add, edit) resolves to a static route segment, never only through a dynamic one',
     () => {
       const offenders = collectAllSrcTargets()

@@ -21,6 +21,8 @@
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
 import path from 'node:path'
+import { BLOCK_KINDS, seedBlockContent } from '@/lib/blocks/block-kinds'
+import { BlockContentSchema } from '@/lib/validators/blocks'
 
 const ROOT = process.cwd()
 
@@ -81,7 +83,7 @@ test.describe('New block creation form (D-03, activates 43-02)', () => {
     }
   )
 
-  test.fixme('/admin/blocks/new is a static route guarded like its siblings (D-03)', () => {
+  test('/admin/blocks/new is a static route guarded like its siblings (D-03)', () => {
     const relPath = 'src/app/(protected)/admin/blocks/new/page.tsx'
     expect(exists(relPath)).toBe(true)
     const src = read(relPath)
@@ -98,7 +100,7 @@ test.describe('New block creation form (D-03, activates 43-02)', () => {
     expect(guardIdx).toBeLessThan(formIdx)
   })
 
-  test.fixme(
+  test(
     'NewBlockForm submits only through createBlock() and opens the created item (D-03, T-43-01)',
     () => {
       const relPath = 'src/app/(protected)/admin/blocks/new/NewBlockForm.tsx'
@@ -116,7 +118,7 @@ test.describe('New block creation form (D-03, activates 43-02)', () => {
     }
   )
 
-  test.fixme('the Content Library filter and the create form share one kind list (D-03)', () => {
+  test('the Content Library filter and the create form share one kind list (D-03)', () => {
     const listSrc = read('src/app/(protected)/admin/blocks/page.tsx')
     expect(listSrc).toContain("from '@/lib/blocks/block-kinds'")
     expect(listSrc).toContain('BLOCK_KINDS')
@@ -126,8 +128,21 @@ test.describe('New block creation form (D-03, activates 43-02)', () => {
     expect(formSrc).toContain('BLOCK_KINDS')
   })
 
-  test.fixme('journeys maps /admin/blocks/new (D-03)', () => {
+  test('journeys maps /admin/blocks/new (D-03)', () => {
     const src = read('src/lib/journeys/journeys.ts')
     expect(src).toContain("route: '/admin/blocks/new'")
+  })
+
+  test('seedBlockContent emits schema-valid content whose kind equals its slug (D-03)', () => {
+    expect(BLOCK_KINDS.map((k) => k.value)).toEqual(['hazard', 'ppe', 'step', 'emergency', 'custom'])
+
+    for (const { value } of BLOCK_KINDS) {
+      const content = seedBlockContent(value, '  Hot glass  ')
+      expect(content.kind).toBe(value)
+      expect(() => BlockContentSchema.parse(content)).not.toThrow()
+    }
+
+    const ppe = seedBlockContent('ppe', 'Gloves\n\n Glasses \n')
+    expect((ppe as { items: string[] }).items).toEqual(['Gloves', 'Glasses'])
   })
 })

@@ -6,6 +6,7 @@ import { getSessionContext } from '@/lib/auth/session-context'
 import { listBlocks } from '@/actions/blocks'
 import { listDepartments } from '@/actions/departments'
 import { BlockListTable } from '@/components/admin/blocks/BlockListTable'
+import { BLOCK_KINDS } from '@/lib/blocks/block-kinds'
 
 export const metadata: Metadata = {
   title: 'Content Library',
@@ -13,11 +14,7 @@ export const metadata: Metadata = {
 
 const KIND_FILTERS = [
   { label: 'All', value: 'all' },
-  { label: 'Hazard', value: 'hazard' },
-  { label: 'PPE', value: 'ppe' },
-  { label: 'Step', value: 'step' },
-  { label: 'Emergency', value: 'emergency' },
-  { label: 'Custom', value: 'custom' },
+  ...BLOCK_KINDS.map(({ label, value }) => ({ label, value })),
 ]
 
 export default async function BlocksLibraryPage({

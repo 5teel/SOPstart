@@ -548,6 +548,7 @@ export const JOURNEYS: Journey[] = [
     steps: [
       { id: 's', type: 'start', label: 'Standardise a hazard / PPE / step' },
       { id: 'blocks', type: 'screen', label: 'Content Library', route: '/admin/blocks' },
+      { id: 'new', type: 'screen', label: 'New content', route: '/admin/blocks/new', detail: 'Name, kind, text, categories and tags; Create saves through createBlock() and opens the item in the editor (Phase 43, D-03).' },
       { id: 'edit', type: 'screen', label: 'Edit content', route: '/admin/blocks/[blockId]' },
       { id: 'update', type: 'action', label: 'Content updated', detail: 'SOPs using it show an “update available” badge.' },
       { id: 'review', type: 'decision', label: 'Per SOP', branches: [
