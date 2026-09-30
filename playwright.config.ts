@@ -687,5 +687,27 @@ export default defineConfig({
       testMatch: /tests\/phase54\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 43 -- Dead-Surface Removal & Route Truth
+      // Nyquist harness (Wave 0 / Plan 43-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase43/**) so every later plan in
+      // the phase drops specs into tests/phase43/ with NO further config edit --
+      // single registration point for the whole phase (mirrors phase51/52/53/54).
+      //
+      // Verify registration: `npx playwright test --list --project=phase43`
+      //
+      // Files registered here:
+      //   new-block (D-03, fixme scaffold from 43-01, activates 43-02) --
+      //   dead-controls (D-02/D-04/D-05, fixme scaffold from 43-01 plus one
+      //     LIVE carve-out pin, activates 43-03) --
+      //   route-truth (D-01/D-06, fixme scaffold from 43-01 plus one LIVE
+      //     doc-truth pin, activates 43-04)
+      name: 'phase43',
+      testDir: '.',
+      testMatch: /tests\/phase43\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
