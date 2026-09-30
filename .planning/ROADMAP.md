@@ -506,7 +506,7 @@ Executes 40 → 41 → 42 → 43, strictly sequential.
 - [x] **Phase 40: Shared Creation Foundation** - One file-intake component, one metadata picker, one progress component, one page shell — and one category column with one vocabulary, backfilled (completed 2026-07-29)
 - [x] **Phase 41: One SOP Surface** - One route lists SOPs for every role, admin views become code-split lenses on it, one top-level "SOPs" entry, one path to the builder — with the worker bundle gate green (completed 2026-09-15)
 - [ ] **Phase 42: One Creation Flow** - Every on-ramp reachable from one entry on that surface, collecting the same metadata, landing in the builder — which now renders parse state honestly
-- [ ] **Phase 43: Dead-Surface Removal & Route Truth** - No CTA to a route that does not exist, no coming-soon controls, no orphaned shims or dead state, docs and `journeys.ts` matching the real route tree
+- [x] **Phase 43: Dead-Surface Removal & Route Truth** - No CTA to a route that does not exist, no coming-soon controls, no orphaned shims or dead state, docs and `journeys.ts` matching the real route tree (completed 2026-09-30)
 
 ### Phase 40: Shared Creation Foundation
 
@@ -657,7 +657,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 43-05-PLAN.md — Wave 4: tsc, full suite once, build + baseline untouched, lint pins, push, npm run eval -- --phase 43, screenshots read, sign-off
+- [x] 43-05-PLAN.md — Wave 4: tsc, full suite once, build + baseline untouched, lint pins, push, npm run eval -- --phase 43, screenshots read, sign-off
 
 ---
 
@@ -739,7 +739,7 @@ Plans:
   1. The matrix document exists in-repo, covers every role × every capability surfaced in the app, and is referenced from CLAUDE.md/planning docs as the authority
   2. A user with sign-off authority on a SOP can edit that SOP; one without cannot — enforced server-side, with positive and negative probes per role (per the 2026-07-20 RLS-probe learning)
 
-**Plans:** 4/5 plans executed
+**Plans:** 5/5 plans complete
 Plans:
 **Wave 1**
 
