@@ -41,6 +41,18 @@ const nextConfig: NextConfig = {
    * `/admin/sops/builder/[sopId]`. Server-side 308 keeps bookmarks alive
    * AND preserves any `?from=pipeline&pipelineId=...` search params (Next
    * 308 redirects forward the query string by default).
+   *
+   * Phase 43 (D-01) — the two page-level legacy shims (`/admin/governance`,
+   * `/admin/sops`) are deleted; these two entries take over bookmark
+   * compatibility. Next forwards the query string on a redirect, so old
+   * status / owner / filter / departments / collection / sop bookmarks
+   * arrive at the target intact, and the legacy attention view is carried
+   * the rest of the way to the governance inbox by the middleware (it
+   * matches `/sops?view=attention` after this hop). Each destination runs
+   * its own guard, so no access control is lost by removing the shims'
+   * page-level checks. Not permanent, so browsers never cache a legacy
+   * mapping. Destinations are fixed strings, never built from request
+   * input (T-43-02).
    */
   async redirects() {
     return [
@@ -48,6 +60,16 @@ const nextConfig: NextConfig = {
         source: '/admin/sops/:sopId/review',
         destination: '/admin/sops/builder/:sopId',
         permanent: true,
+      },
+      {
+        source: '/admin/governance',
+        destination: '/governance',
+        permanent: false,
+      },
+      {
+        source: '/admin/sops',
+        destination: '/sops',
+        permanent: false,
       },
     ]
   },

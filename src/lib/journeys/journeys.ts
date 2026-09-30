@@ -238,7 +238,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'A supervisor checks a worker’s completed procedure and signs it off, creating a second immutable record.',
     steps: [
       { id: 's', type: 'start', label: 'Completion submitted' },
-      { id: 'activity', type: 'screen', label: 'Sign-off records', route: '/activity', detail: 'All completions for the org. Admins see the same sign-off queue (no longer redirected to /admin/sops).' },
+      { id: 'activity', type: 'screen', label: 'Sign-off records', route: '/activity', detail: 'All completions for the org. Admins see the same sign-off queue.' },
       { id: 'one', type: 'screen', label: 'Completion detail', route: '/activity/[completionId]', detail: 'Steps, photos, measurements, who/when.' },
       { id: 'ok', type: 'decision', label: 'Done correctly?', branches: [
         { label: 'Yes — sign off', to: 'sign' },
@@ -597,8 +597,6 @@ export const JOURNEYS: Journey[] = [
     summary: 'An admin opens Governance and works an inbox of one-action rows — no owner, review overdue, waiting on their approval, stuck converting, machines with no procedures — until it reads All clear.',
     steps: [
       { id: 's', type: 'start', label: 'SOPs are drifting out of date, ownerless, or awaiting approval' },
-      { id: 'legacy', type: 'screen', label: 'Legacy governance URL (optional)', route: '/admin/governance', detail: 'Redirect shim → /governance — legacy ?filter=X bookmarks land on the whole inbox (GQ-04); the inbox has no flag-filter param.' },
-      { id: 'legacy-admin-sops', type: 'screen', label: 'Legacy /admin/sops URL (optional)', route: '/admin/sops', detail: 'Redirect shim → /sops, preserving ?status=/?owner=/?filter=/?departments=/?collection=/?sop= so old bookmarks keep working (SUR-01); a bare Governance view param redirects to /governance instead (Phase 54).' },
       { id: 'queue', type: 'screen', label: 'Governance inbox', route: '/governance', detail: 'One-action rows — no owner, review overdue, awaiting the caller\'s approval, stuck converting, machines with no procedures. Counted chips: All · No owner · Overdue · Approve · Stuck · Machines. One action per row: Assign owner · Approve · Confirm current · Fix assignment · Retry · Add. An empty inbox shows the All clear state. Computed on read — no jobs, no materialized state (D28-05).' },
       { id: 'view', type: 'decision', label: 'Work the queue, or check the floor?', branches: [
         { label: 'Work a row', to: 'action' },

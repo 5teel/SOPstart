@@ -66,13 +66,13 @@ function shimPagePath(segs: string[]): string {
 }
 
 test.describe('Route truth: legacy shims retired to config redirects (D-01, activates 43-04)', () => {
-  test.fixme('the two page-level redirect shims are deleted (D-01)', () => {
+  test('the two page-level redirect shims are deleted (D-01)', () => {
     for (const segs of SHIM_SEGMENTS) {
       expect(fs.existsSync(shimPagePath(segs)), `${segs.join('/')} shim page must be deleted`).toBe(false)
     }
   })
 
-  test.fixme('nothing in comment-stripped src/ names the /admin/governance URL (D-01)', () => {
+  test('nothing in comment-stripped src/ names the /admin/governance URL (D-01)', () => {
     const offenders: string[] = []
     const re = /\/admin\/governance(?![\w/-])/
     for (const file of walkTsFiles(path.join(ROOT, 'src'))) {
@@ -83,7 +83,7 @@ test.describe('Route truth: legacy shims retired to config redirects (D-01, acti
     expect(offenders, offenders.join('\n')).toEqual([])
   })
 
-  test.fixme(
+  test(
     'next.config.ts redirects both legacy URLs to static same-origin paths and keeps the review redirect (D-01, T-43-02)',
     () => {
       const src = read('next.config.ts')
@@ -109,7 +109,7 @@ test.describe('Route truth: legacy shims retired to config redirects (D-01, acti
     }
   )
 
-  test.fixme('journeys maps no deleted page (D-01)', () => {
+  test('journeys maps no deleted page (D-01)', () => {
     const src = read('src/lib/journeys/journeys.ts')
     expect(src).not.toContain("route: '/admin/governance'")
     expect(src).not.toContain("route: '/admin/sops'")
