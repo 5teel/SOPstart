@@ -4,8 +4,8 @@ milestone: v8.0
 milestone_name: — Authoring Convergence
 status: verifying
 stopped_at: Completed 43-05-PLAN.md (Phase 43 certified, ready for verification)
-last_updated: "2026-09-30T12:49:22.955Z"
-last_activity: 2026-09-30 -- Phase 43 execution started
+last_updated: "2026-09-30T13:00:09.703Z"
+last_activity: 2026-09-30
 progress:
   total_phases: 4
   completed_phases: 3
@@ -25,13 +25,13 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 43 (dead-surface-removal-route-truth) — EXECUTING
-Plan: 5 of 5
+Phase: 43
+Plan: Not started
 Next: 41-07 (reference sweep) — repoint remaining internal /admin/sops links straight to /sops
 Status: Phase complete — ready for verification
 three 40-VERIFICATION gaps closed. Outstanding formal gate: /gsd-secure-phase 40
 has not run (no 40-SECURITY.md, security_enforcement=true).
-Last activity: 2026-09-30 -- Phase 43 execution started
+Last activity: 2026-09-30
 shim to /sops, TopHeader/roleHome repointed, journeys.ts + Phase 30/41 guards updated.
 8 named legacy specs left red for 41-08 (see 41-06-SUMMARY.md).
 
@@ -145,6 +145,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | 37 | 8 | - | - |
 | 46 | 3 | - | - |
 | 41 | 9 | - | - |
+| 43 | 5 | - | - |
 
 **v2.0 By Phase:**
 
