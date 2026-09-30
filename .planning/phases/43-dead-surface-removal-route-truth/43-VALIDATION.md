@@ -1,8 +1,8 @@
 ---
 phase: 43
 slug: dead-surface-removal-route-truth
-status: draft
-nyquist_compliant: false
+status: complete
+nyquist_compliant: true
 wave_0_complete: true
 created: 2026-09-30
 ---
@@ -41,13 +41,27 @@ Deployed eval: `npm run eval -- --phase 43` after push (waits for Railway to ser
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
 | 43-W0 | 01 | 0 | DED-01 | — | N/A | lint (source-contract, mutation-proven) | `npx playwright test --project=phase15-stubs -g "no-dead-internal-hrefs"` | ✅ `tests/lint/no-dead-internal-hrefs.spec.ts` | ✅ green (4/4) |
-| 43-blocks-new | 02 | 1 | DED-01 | T-43-01 | new-block form submits only through `createBlock()` (existing auth + Zod); wire-reachable serviceRole override removed | eval + source-contract | `npm run eval -- --phase 43`; `tests/phase43/new-block.spec.ts` | ✅ live (6/6 green) | ✅ source-contract green; ⬜ eval pending (Task 2) |
-| 43-scanner | 03 | 1 | DED-02 | — | N/A | eval + source-contract (`UploadDropzone.tsx` imports + renders `PhotoScanner`; no "coming soon" literal) | `npm run eval -- --phase 43`; `tests/phase43/dead-controls.spec.ts` | ✅ live (5/5 green) | ✅ source-contract green; ⬜ eval pending (Task 2) |
-| 43-wiring-lens | 03 | 1 | DED-02 | — | N/A | source-contract (`LENS_OPTIONS` has no matrix/illuminate entries) | `tests/phase43/dead-controls.spec.ts` | ✅ live | ✅ source-contract green; ⬜ eval pending (Task 2) |
+| 43-blocks-new | 02 | 1 | DED-01 | T-43-01 | new-block form submits only through `createBlock()` (existing auth + Zod); wire-reachable serviceRole override removed | eval + source-contract | `npm run eval -- --phase 43`; `tests/phase43/new-block.spec.ts` | ✅ live (6/6 green) | ✅ green — eval test A passed deployed (after migration 00068 fix, see 43-EVAL.md) |
+| 43-scanner | 03 | 1 | DED-02 | — | N/A | eval + source-contract (`UploadDropzone.tsx` imports + renders `PhotoScanner`; no "coming soon" literal) | `npm run eval -- --phase 43`; `tests/phase43/dead-controls.spec.ts` | ✅ live (5/5 green) | ✅ green — eval test B passed deployed |
+| 43-wiring-lens | 03 | 1 | DED-02 | — | N/A | source-contract (`LENS_OPTIONS` has no matrix/illuminate entries) | `tests/phase43/dead-controls.spec.ts` | ✅ live | ✅ green — eval test C passed deployed |
 | 43-dead-state | 03 | 1 | DED-03 | — | N/A | source-contract (identifiers absent) + `npx eslint <files>` zero `no-unused-vars` | `tests/phase43/dead-controls.spec.ts` | ✅ live | ✅ green |
-| 43-shims | 04 | 1 | DED-03 | T-43-02 | `next.config.ts` redirects only to same-origin paths | source-contract (shim page files absent; `next.config.ts` has the two entries; `reference-sweep` + `deletion-sweep` updated) + eval (legacy URLs land) | `tests/phase41/reference-sweep.spec.ts`, `tests/phase54/deletion-sweep.spec.ts`, `tests/phase43/route-truth.spec.ts`, `npm run eval -- --phase 43` | ✅ live (5/5 green) | ✅ source-contract green; ⬜ eval pending (Task 2) |
+| 43-shims | 04 | 1 | DED-03 | T-43-02 | `next.config.ts` redirects only to same-origin paths | source-contract (shim page files absent; `next.config.ts` has the two entries; `reference-sweep` + `deletion-sweep` updated) + eval (legacy URLs land) | `tests/phase41/reference-sweep.spec.ts`, `tests/phase54/deletion-sweep.spec.ts`, `tests/phase43/route-truth.spec.ts`, `npm run eval -- --phase 43` | ✅ live (5/5 green) | ✅ green — eval tests D1/D2 passed deployed |
 | 43-docs | 01 | 0 | DED-04 | — | N/A | source-contract (stale strings absent from ARCHITECTURE.md; `journeys.ts` publish route is `/api/sops/[sopId]/publish`) | `tests/phase43/route-truth.spec.ts` | ✅ (live pin) | ✅ green |
-| 43-pathways | 05 | 2 | DED-04 | — | N/A | eval (existing) | `tests/evals/sop-surface.eval.ts` test E "pathways map reports zero unmapped screens" | ✅ | ⬜ eval pending (Task 2) |
+| 43-pathways | 05 | 2 | DED-04 | — | N/A | eval (existing) | `tests/evals/sop-surface.eval.ts` test E "pathways map reports zero unmapped screens" | ✅ | ✅ green — 0 not-mapped, deployed |
+
+### Task 2 result (2026-09-30)
+
+`npm run eval -- --phase 43` first run (commit `2e4a373`): 28/29 passed, test A
+failed on a genuine production RLS gap (`public.blocks` had zero SELECT
+policies since migration 00037 — see `43-EVAL.md` for the full root cause).
+Fixed with migration `00068_blocks_read_own_org.sql`, applied live and
+verified via direct SQL + a minted session before committing/pushing.
+Second run (commit `1ae05cd`): 29/29 passed, 0 failed, 2 unrelated self-skips
+(no-site fixture arms, phase 52/53). All 7 required screenshots
+(`new-block-form`, `new-block-created`, `scan-document`, `access-wiring-only`,
+`admin-library`, `admin-governance`, `worker-sops`) read and judged — no
+CSS-token/sizing defects. `git log origin/master..HEAD` is empty after the
+final push.
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -79,11 +93,11 @@ Deployed eval: `npm run eval -- --phase 43` after push (waits for Railway to ser
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 60s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 60s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** signed off 2026-09-30 (deployed eval)
