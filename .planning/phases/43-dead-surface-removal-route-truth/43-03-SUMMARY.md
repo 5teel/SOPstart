@@ -128,3 +128,7 @@ No routes were added, removed, or renamed by this plan (only the existing `/admi
 ---
 *Phase: 43-dead-surface-removal-route-truth*
 *Completed: 2026-09-30*
+
+## Self-Check: PASSED
+
+All 7 created/modified files verified present on disk; all 3 commit hashes (`87c8e04`, `649c79f`, `32eb567`) verified in `git log`.
