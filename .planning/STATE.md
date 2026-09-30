@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v8.0
 milestone_name: — Authoring Convergence
 status: executing
-stopped_at: Completed 43-01-PLAN.md
-last_updated: "2026-09-30T11:47:26.320Z"
+stopped_at: Completed 43-02-PLAN.md
+last_updated: "2026-09-30T11:59:23.651Z"
 last_activity: 2026-09-30 -- Phase 43 execution started
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 28
-  completed_plans: 24
+  completed_plans: 25
   percent: 50
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 43 (dead-surface-removal-route-truth) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Next: 41-07 (reference sweep) — repoint remaining internal /admin/sops links straight to /sops
 Status: Ready to execute
 three 40-VERIFICATION gaps closed. Outstanding formal gate: /gsd-secure-phase 40
@@ -260,6 +260,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 41 P07 | 38min | 3 tasks | 16 files |
 | Phase 41 P08 | 38min | 3 tasks | 12 files |
 | Phase 43 P01 | 45min | 3 tasks | 10 files |
+| Phase 43-dead-surface-removal-route-truth P02 | 55min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -534,6 +535,8 @@ Recent decisions affecting current work:
 - [Phase 43]: Dead-href guard scans comment-stripped src/ per-line for 11 named href/route/redirect prefixes rather than a full AST parse -- matches the existing stripComments+regex idiom used by every other lint guard in this codebase
 - [Phase 43]: The /admin/blocks/new reserved-segment runtime-404 bug class is explicitly NOT caught by the main dead-href sweep -- pinned as its own fixme test, activates in 43-02 once the route gets a static segment
 - [Phase 43]: route-truth.spec.ts builds the two legacy shim page paths from segment arrays via path.join(...) instead of a literal path string, so the spec itself never trips the live tests/phase41/spec-repoint-inventory.spec.ts literal-fragment scan
+- [Phase 43-02]: Did not reuse SectionKindPicker for the new-block form; created a shared BLOCK_KINDS vocabulary instead since the picker's kinds/return type don't match a block's kind_slug
+- [Phase 43-02]: NewBlockForm sends scope: 'org' only, no scope control, matching SaveToLibraryModal post-Phase-25 (global scope retired)
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -679,8 +682,8 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-09-30T11:47:26.309Z
-Stopped at: Completed 43-01-PLAN.md
+Last session: 2026-09-30T11:59:23.643Z
+Stopped at: Completed 43-02-PLAN.md
 /admin/sops is now a redirect shim to /sops; TopHeader/roleHome/journeys.ts
 repointed; Phase 30/41 nav guards updated. Next: 41-07 (reference sweep —
 repoint remaining internal /admin/sops links straight to /sops) then 41-08
