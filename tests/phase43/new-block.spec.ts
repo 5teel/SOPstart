@@ -50,7 +50,7 @@ function sliceBetweenFunctions(src: string, fromName: string, toName: string): s
 }
 
 test.describe('New block creation form (D-03, activates 43-02)', () => {
-  test.fixme(
+  test(
     'createBlock takes no wire-level trust override; the parser writes through createBlockAsService (D-03, T-43-01)',
     () => {
       const actionsSrc = read('src/actions/blocks.ts')

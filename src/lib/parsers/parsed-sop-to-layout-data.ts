@@ -35,11 +35,12 @@ import {
   BlockContentSchema,
   type BlockContent,
 } from '@/lib/validators/blocks'
-import { createBlock } from '@/actions/blocks'
-// Phase 46 CR-01: the parser must NOT call the addBlockToSection server
-// action with a wire-level serviceRole flag (that flag was a network-
-// reachable auth bypass and has been removed). The session-less service
-// path is the non-'use server' core entry point below.
+// Phase 46 CR-01 / Phase 43 T-43-01: the parser must NOT call createBlock
+// or addBlockToSection server actions with a wire-level trust override
+// (that flag was a network-reachable auth bypass and has been removed on
+// both). The session-less service paths are the non-'use server' core
+// entry points below.
+import { createBlockAsService } from '@/lib/blocks/create-block-core'
 import { addBlockToSectionAsService } from '@/lib/builder/section-blocks-core'
 
 // Minimal subset of Puck's layout_data shape. We avoid importing Puck's
@@ -784,20 +785,19 @@ export async function materializeJunctionsForLayout(
       )
     }
 
-    // 1. createBlock — org-scoped, category='parsed_inline'.
-    const createRes = await createBlock({
-      kindSlug: content.kind,
-      name: deriveBlockName(item.type, content),
-      categoryTags: [],
-      freeTextTags: [],
-      content,
-      scope: 'org',
-      category: 'parsed_inline',
-      serviceRole: {
-        organisationId,
-        createdByUserId,
+    // 1. createBlockAsService — org-scoped, category='parsed_inline'.
+    const createRes = await createBlockAsService(
+      {
+        kindSlug: content.kind,
+        name: deriveBlockName(item.type, content),
+        categoryTags: [],
+        freeTextTags: [],
+        content,
+        scope: 'org',
+        category: 'parsed_inline',
       },
-    })
+      { organisationId, createdByUserId }
+    )
     if ('error' in createRes) {
       throw new Error(
         `[materializeJunctionsForLayout] createBlock failed at item ${i} (${item.type}): ${createRes.error}`,

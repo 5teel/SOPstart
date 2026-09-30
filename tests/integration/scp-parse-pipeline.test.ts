@@ -154,8 +154,11 @@ test.describe('SCP-PARSE — Phase 20 contract integration (Phase 21)', () => {
     // The actual exclusion clause (PostgREST `category.neq.parsed_inline`
     // wrapped in an OR so NULL rows still pass).
     expect(blocksAction).toContain("category.is.null,category.neq.parsed_inline")
-    // createBlock honours the `category` field + service-role parser path.
-    expect(blocksAction).toContain('category: z.string().max(60).nullable().optional()')
-    expect(blocksAction).toContain('serviceRole: z')
+    // createBlock honours the `category` field; the parser's session-less
+    // path is createBlockAsService in the core module (Phase 43 T-43-01) —
+    // there is no wire-level service-role override left in the action.
+    const core = read('src/lib/blocks/create-block-core.ts')
+    expect(core).toContain('category: z.string().max(60).nullable().optional()')
+    expect(blocksAction).not.toContain('serviceRole')
   })
 })

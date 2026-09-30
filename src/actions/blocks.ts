@@ -13,14 +13,21 @@
  *
  * All content writes call BlockContentSchema.parse() before the insert.
  * RLS handles cross-org isolation.
+ *
+ * Phase 43 T-43-01: createBlock's insert body moved to
+ * src/lib/blocks/create-block-core.ts (insertBlockWithVersion). createBlock
+ * here ALWAYS runs requireAdmin() first and takes organisationId only from
+ * the session — there is no wire-level override. The parser's session-less
+ * write path is createBlockAsService in that plain module, which has no
+ * server-action endpoint.
  */
 
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminContext } from '@/lib/auth/guards'
 import { BlockContentSchema } from '@/lib/validators/blocks'
 import type { BlockContent } from '@/lib/validators/blocks'
+import { CreateBlockInput, insertBlockWithVersion } from '@/lib/blocks/create-block-core'
 import type {
   Block,
   BlockVersion,
@@ -38,37 +45,6 @@ async function requireAdmin() {
 // ---------------------------------------------------------------------------
 // Input schemas
 // ---------------------------------------------------------------------------
-
-const CreateBlockInput = z.object({
-  kindSlug: z.string().min(1),
-  name: z.string().min(1).max(200),
-  categoryTags: z.array(z.string()).max(20).default([]),
-  freeTextTags: z.array(z.string()).max(20).default([]),
-  content: z.unknown(), // validated below via BlockContentSchema
-  changeNote: z.string().max(500).optional(),
-  // Phase 25: 'global' scope removed — all blocks are org-owned.
-  scope: z.enum(['org']).default('org'),
-  /**
-   * Phase 21 Plan 21-05 — written to blocks.category. The picker filters
-   * `category != 'parsed_inline'` by default so per-item library blocks
-   * created during parsing don't bloat the picker UX (T-21-05-01).
-   * Other callers (Phase 13 wizard, picker promotion) leave this null.
-   */
-  category: z.string().max(60).nullable().optional(),
-  /**
-   * Phase 21 Plan 21-05 — service-role / parser invocation override.
-   * When set, the action skips the auth-session-based requireAdmin() path
-   * and uses the admin (service-role) supabase client with the explicit
-   * organisationId. NEVER call from a user-facing context — parser is the
-   * sole consumer because parse-jobs run server-side with no auth session.
-   */
-  serviceRole: z
-    .object({
-      organisationId: z.string().uuid(),
-      createdByUserId: z.string().uuid().nullable(),
-    })
-    .optional(),
-})
 
 const UpdateBlockInput = z.object({
   blockId: z.string().uuid(),
@@ -119,93 +95,18 @@ export type ListBlocksOptions = {
 export async function createBlock(
   input: z.input<typeof CreateBlockInput>
 ): Promise<{ block: Block; version: BlockVersion } | { error: string }> {
-  const parsed = CreateBlockInput.safeParse(input)
-  if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
-  }
-  const data = parsed.data
+  // The guard always runs — there is no wire-level override. The parser's
+  // session-less write path is createBlockAsService in
+  // src/lib/blocks/create-block-core.ts, which is not a server action.
+  const ctx = await requireAdmin()
+  if ('error' in ctx) return { error: ctx.error }
+  if (!ctx.organisationId) return { error: 'No organisation' }
 
-  // Validate the content payload BEFORE any DB writes (T-13-01-03 mitigation).
-  let content: BlockContent
-  try {
-    content = BlockContentSchema.parse(data.content) as BlockContent
-  } catch {
-    return { error: 'Invalid block content' }
-  }
-
-  // Auth gates
-  let organisationId: string | null = null
-  let createdByUserId: string | null = null
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let writer: any
-  if (data.serviceRole) {
-    // Plan 21-05 — parser invocation. Bypass requireAdmin (no session in the
-    // parse-job worker context). Always scoped to the caller-supplied org.
-    writer = createAdminClient()
-    organisationId = data.serviceRole.organisationId
-    createdByUserId = data.serviceRole.createdByUserId
-  } else {
-    const ctx = await requireAdmin()
-    if ('error' in ctx) return { error: ctx.error }
-    if (!ctx.organisationId) return { error: 'No organisation' }
-    writer = ctx.supabase
-    organisationId = ctx.organisationId
-    createdByUserId = ctx.user.id
-  }
-
-  // Insert blocks row
-  const { data: blockRow, error: blockErr } = await writer
-    .from('blocks')
-    .insert({
-      organisation_id: organisationId,
-      kind_slug: data.kindSlug,
-      name: data.name,
-      category_tags: data.categoryTags,
-      free_text_tags: data.freeTextTags,
-      created_by: createdByUserId,
-      // Plan 21-05 — only set when supplied (Phase 13 callers leave null).
-      ...(data.category ? { category: data.category } : {}),
-    })
-    .select('*')
-    .single()
-  if (blockErr || !blockRow) {
-    console.error('[createBlock] block insert error', blockErr)
-    return { error: blockErr?.message ?? 'Failed to create block' }
-  }
-
-  // Insert block_versions v1
-  const { data: versionRow, error: versionErr } = await writer
-    .from('block_versions')
-    .insert({
-      block_id: blockRow.id,
-      version_number: 1,
-      content: content as unknown as object,
-      change_note: data.changeNote ?? null,
-      created_by: createdByUserId,
-    })
-    .select('*')
-    .single()
-  if (versionErr || !versionRow) {
-    console.error('[createBlock] version insert error — rolling back block', versionErr)
-    // Rollback the block row so we don't leave an orphan with no current_version_id.
-    await writer.from('blocks').delete().eq('id', blockRow.id)
-    return { error: versionErr?.message ?? 'Failed to create block version' }
-  }
-
-  // Set blocks.current_version_id
-  const { error: updErr } = await writer
-    .from('blocks')
-    .update({ current_version_id: versionRow.id })
-    .eq('id', blockRow.id)
-  if (updErr) {
-    console.error('[createBlock] current_version_id update error', updErr)
-    return { error: updErr.message }
-  }
-
-  return {
-    block: { ...(blockRow as unknown as Block), current_version_id: versionRow.id },
-    version: versionRow as unknown as BlockVersion,
-  }
+  return insertBlockWithVersion(
+    ctx.supabase,
+    { organisationId: ctx.organisationId, createdByUserId: ctx.user.id },
+    input
+  )
 }
 
 // ---------------------------------------------------------------------------

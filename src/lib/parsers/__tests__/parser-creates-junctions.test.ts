@@ -128,17 +128,22 @@ test.describe('Plan 21-05 — parser materializes junctions', () => {
     expect(core).toContain('block_provenance: blockProvenance ?? null')
   })
 
-  test('createBlock signature accepts serviceRole({organisationId, createdByUserId}) + category', () => {
+  test('createBlock has no wire-level trust override; the parser writes through createBlockAsService (Phase 43 T-43-01)', () => {
     const src = read('src/actions/blocks.ts')
-    expect(src).toContain('category: z.string().max(60).nullable().optional()')
-    expect(src).toContain('serviceRole: z')
-    expect(src).toContain('organisationId: z.string().uuid()')
+    expect(src).not.toContain('serviceRole')
+    expect(src).not.toContain('createAdminClient')
+
+    const core = read('src/lib/blocks/create-block-core.ts')
+    expect(/^\s*['"]use server['"]/.test(core)).toBe(false)
+    expect(core).toContain('export async function createBlockAsService')
+    expect(core).toContain('category: z.string().max(60).nullable().optional()')
     // Phase 25 (A5/A6) retired the 'global' scope entirely — scope is now
-    // z.enum(['org']) only, which makes the old serviceRole+scope=global
-    // combination structurally impossible (zod rejects any non-'org' value
-    // before the check could ever run). Assert the enum is locked down
-    // instead of the now-dead runtime guard string.
-    expect(src).toContain("scope: z.enum(['org']).default('org')")
+    // z.enum(['org']) only.
+    expect(core).toContain("scope: z.enum(['org']).default('org')")
+
+    const parser = read('src/lib/parsers/parsed-sop-to-layout-data.ts')
+    expect(parser).toContain('createBlockAsService(')
+    expect(parser).not.toContain("from '@/actions/blocks'")
   })
 
   test('migration 00033 seeds 7 new section_kinds', () => {
