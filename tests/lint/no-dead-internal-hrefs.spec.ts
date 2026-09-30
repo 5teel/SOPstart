@@ -256,8 +256,7 @@ test.describe('no dead internal hrefs — route truth (D-07)', () => {
     for (const docPath of ['.planning/codebase/ARCHITECTURE.md', '.planning/codebase/STRUCTURE.md']) {
       const src = read(docPath)
       const re = /`(\/[a-z~[][^`]*)`/g
-      let m: RegExpExecArray | null
-      while ((m = re.exec(src))) docRouteCount++
+      docRouteCount += [...src.matchAll(re)].length
     }
     expect(docRouteCount).toBeGreaterThanOrEqual(8)
   })
