@@ -50,7 +50,7 @@ function walkTsFiles(dir: string, out: string[] = []): string[] {
 }
 
 test.describe('Dead controls: scan-document, wiring lens, dead state (D-02/D-04/D-05, activates 43-03)', () => {
-  test.fixme(
+  test(
     'UploadDropzone mounts the shipped PhotoScanner and queues scanned pages through validateAndAddFiles (D-04)',
     () => {
       const src = read('src/components/admin/UploadDropzone.tsx')

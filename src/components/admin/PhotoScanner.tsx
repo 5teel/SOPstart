@@ -43,7 +43,6 @@ export function PhotoScanner({ open, onClose, onSubmit }: PhotoScannerProps) {
   const cameraInputRef = useRef<HTMLInputElement>(null)
   const modalRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
-  const scanButtonRef = useRef<HTMLButtonElement | null>(null)
   const sessionRestoredRef = useRef(false)
 
   // ---------------------------------------------------------------------------
@@ -78,7 +77,12 @@ export function PhotoScanner({ open, onClose, onSubmit }: PhotoScannerProps) {
     getIdbKeyval().then(async ({ set }) => {
       try {
         // Don't store thumbnailUrl (object URLs don't survive) — store blob + metadata
-        const toStore: Omit<ScannedPage, 'thumbnailUrl'>[] = pages.map(({ thumbnailUrl: _url, ...rest }) => rest)
+        const toStore: Omit<ScannedPage, 'thumbnailUrl'>[] = pages.map((p) => ({
+          id: p.id,
+          blob: p.blob,
+          quality: p.quality,
+          detectedPageNumber: p.detectedPageNumber,
+        }))
         await set(SESSION_KEY, toStore)
       } catch {
         // Best-effort — ignore persistence errors

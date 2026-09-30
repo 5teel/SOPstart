@@ -24,6 +24,7 @@ import { startVideoSopUpload } from '@/lib/upload/start-video-sop-upload'
 import { TusUploadProgress } from './TusUploadProgress'
 import { VideoRecorder } from './VideoRecorder'
 import { VideoFormatSelectionModal } from './VideoFormatSelectionModal'
+import { PhotoScanner } from './PhotoScanner'
 
 type FileStatus = 'queued' | 'uploading' | 'uploaded' | 'error'
 
@@ -703,14 +704,17 @@ export function UploadDropzone() {
             </div>
           )}
 
-          {/* Scan document placeholder modal */}
+          {/* Scan document: mounted only while open so each scan starts clean;
+              scanned pages queue exactly like picked photos, one upload per page. */}
           {scannerOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-              <div className="bg-[var(--paper)] rounded-2xl p-8 max-w-lg text-center">
-                <p className="text-[var(--ink-900)]">Scanner coming soon</p>
-                <button onClick={() => setScannerOpen(false)} className="mt-4 px-4 py-2 bg-[var(--paper-2)] text-[var(--ink-900)] rounded-lg">Close</button>
-              </div>
-            </div>
+            <PhotoScanner
+              open
+              onClose={() => setScannerOpen(false)}
+              onSubmit={(files) => {
+                setScannerOpen(false)
+                validateAndAddFiles(files)
+              }}
+            />
           )}
         </>
       )}
