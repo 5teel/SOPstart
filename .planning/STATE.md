@@ -4,13 +4,13 @@ milestone: v8.0
 milestone_name: — Authoring Convergence
 status: executing
 stopped_at: Completed 43-03-PLAN.md
-last_updated: "2026-09-30T12:07:20.115Z"
+last_updated: "2026-09-30T12:18:40.553Z"
 last_activity: 2026-09-30 -- Phase 43 execution started
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 28
-  completed_plans: 26
+  completed_plans: 27
   percent: 50
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 ## Current Position
 
 Phase: 43 (dead-surface-removal-route-truth) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Next: 41-07 (reference sweep) — repoint remaining internal /admin/sops links straight to /sops
 Status: Ready to execute
 three 40-VERIFICATION gaps closed. Outstanding formal gate: /gsd-secure-phase 40
@@ -262,6 +262,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 43 P01 | 45min | 3 tasks | 10 files |
 | Phase 43-dead-surface-removal-route-truth P02 | 55min | 2 tasks | 13 files |
 | Phase 43 P03 | 35min | 2 tasks | 7 files |
+| Phase 43-dead-surface-removal-route-truth P04 | 50min | 3 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -540,6 +541,7 @@ Recent decisions affecting current work:
 - [Phase 43-02]: NewBlockForm sends scope: 'org' only, no scope control, matching SaveToLibraryModal post-Phase-25 (global scope retired)
 - [Phase ?]: 43-03: PhotoScanner's two pre-existing lint warnings fixed in the same commit that wires it in (D-02)
 - [Phase ?]: 43-03: versions/page.tsx's two pre-existing react-hooks/set-state-in-effect errors left untouched — out of scope per D-02
+- [Phase 43-dead-surface-removal-route-truth]: Deleted /admin/governance and /admin/sops page-level shims per 43-CONTEXT D-01; bookmark compatibility moved to two static next.config.ts redirects (non-permanent, fixed destinations)
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -685,7 +687,7 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-09-30T12:07:20.107Z
+Last session: 2026-09-30T12:18:40.546Z
 Stopped at: Completed 43-03-PLAN.md
 /admin/sops is now a redirect shim to /sops; TopHeader/roleHome/journeys.ts
 repointed; Phase 30/41 nav guards updated. Next: 41-07 (reference sweep —

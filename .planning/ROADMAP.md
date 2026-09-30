@@ -653,7 +653,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 43-04-PLAN.md — Wave 3: /admin/governance + /admin/sops shim pages deleted, next.config.ts redirects, journeys legacy steps + matrix note, ten legacy specs repointed
+- [x] 43-04-PLAN.md — Wave 3: /admin/governance + /admin/sops shim pages deleted, next.config.ts redirects, journeys legacy steps + matrix note, ten legacy specs repointed
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -739,7 +739,7 @@ Plans:
   1. The matrix document exists in-repo, covers every role × every capability surfaced in the app, and is referenced from CLAUDE.md/planning docs as the authority
   2. A user with sign-off authority on a SOP can edit that SOP; one without cannot — enforced server-side, with positive and negative probes per role (per the 2026-07-20 RLS-probe learning)
 
-**Plans:** 3/5 plans executed
+**Plans:** 4/5 plans executed
 Plans:
 **Wave 1**
 
