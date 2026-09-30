@@ -761,10 +761,10 @@ The two surfaces are genuinely different in content (worker: assigned SOPs, offl
 
 ### Dead-Surface Removal (DED)
 
-- [ ] **DED-01**: No CTA in the admin UI points at a route that does not exist
-- [ ] **DED-02**: No non-functional affordance ships as an enabled control — a feature is either implemented or its control is removed
-- [ ] **DED-03**: Orphaned redirect shims and dead state (set-never-called variables, computed-never-rendered memos) in the creation surfaces are removed
-- [ ] **DED-04**: `journeys.ts`, `.planning/codebase/ARCHITECTURE.md`, and any other route documentation match the real route tree after convergence; `/pathways` shows 0 not-mapped for changed routes
+- [x] **DED-01**: No CTA in the admin UI points at a route that does not exist
+- [x] **DED-02**: No non-functional affordance ships as an enabled control — a feature is either implemented or its control is removed
+- [x] **DED-03**: Orphaned redirect shims and dead state (set-never-called variables, computed-never-rendered memos) in the creation surfaces are removed
+- [x] **DED-04**: `journeys.ts`, `.planning/codebase/ARCHITECTURE.md`, and any other route documentation match the real route tree after convergence; `/pathways` shows 0 not-mapped for changed routes
 
 ### v8.0 Out of Scope
 
@@ -796,10 +796,10 @@ The two surfaces are genuinely different in content (worker: assigned SOPs, offl
 | CRE-04 | Phase 42 | Pending |
 | PRG-01 | Phase 42 | Pending |
 | PRG-02 | Phase 42 | Pending |
-| DED-01 | Phase 43 | Pending |
-| DED-02 | Phase 43 | Pending |
-| DED-03 | Phase 43 | Pending |
-| DED-04 | Phase 43 | Pending |
+| DED-01 | Phase 43 | Complete |
+| DED-02 | Phase 43 | Complete |
+| DED-03 | Phase 43 | Complete |
+| DED-04 | Phase 43 | Complete |
 
 **v8.0 Coverage:** 21 requirements (SUR ×6, CRE ×4, DUP ×4, DAT ×1, PRG ×2, DED ×4).
 

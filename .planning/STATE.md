@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v8.0
 milestone_name: — Authoring Convergence
 status: executing
-stopped_at: context exhaustion at 75% (2026-09-29)
-last_updated: "2026-09-29T22:04:39.892Z"
-last_activity: 2026-09-28 -- Phase 54 execution started
+stopped_at: Completed 43-01-PLAN.md
+last_updated: "2026-09-30T11:47:26.320Z"
+last_activity: 2026-09-30 -- Phase 43 execution started
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 23
-  completed_plans: 23
+  total_plans: 28
+  completed_plans: 24
   percent: 50
 ---
 
@@ -21,17 +21,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 54 — admin-inbox-floor-health-library-table
+**Current focus:** Phase 43 — dead-surface-removal-route-truth
 
 ## Current Position
 
-Phase: 54 (admin-inbox-floor-health-library-table) — EXECUTING
-Plan: 1 of 6
+Phase: 43 (dead-surface-removal-route-truth) — EXECUTING
+Plan: 2 of 5
 Next: 41-07 (reference sweep) — repoint remaining internal /admin/sops links straight to /sops
 Status: Ready to execute
 three 40-VERIFICATION gaps closed. Outstanding formal gate: /gsd-secure-phase 40
 has not run (no 40-SECURITY.md, security_enforcement=true).
-Last activity: 2026-09-28 -- Phase 54 execution started
+Last activity: 2026-09-30 -- Phase 43 execution started
 shim to /sops, TopHeader/roleHome repointed, journeys.ts + Phase 30/41 guards updated.
 8 named legacy specs left red for 41-08 (see 41-06-SUMMARY.md).
 
@@ -259,6 +259,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 41 P06 | 55min | 3 tasks | 10 files |
 | Phase 41 P07 | 38min | 3 tasks | 16 files |
 | Phase 41 P08 | 38min | 3 tasks | 12 files |
+| Phase 43 P01 | 45min | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -530,6 +531,9 @@ Recent decisions affecting current work:
 - [Phase ?]: roles.ts ACCESS_MATRIX Manage SOPs row replaced with an annotated SOP list — admin lenses row on the same /sops route (deliberate duplicate documented); Block library renamed to Content to match TopHeader's rename
 - [Phase ?]: Reference-sweep guard flipped live: comment-stripped, count-pinned, mutation-proven in 3 directions (stray ref re-added, sub-route deleted, Library label added)
 - [Phase ?]: 41-08: Rule 1 fix — AdminSopSurface.tsx's department scope column + No-department link were computed but never rendered after the 41-05 bundle-budget extraction; restored, bundle-neutral.
+- [Phase 43]: Dead-href guard scans comment-stripped src/ per-line for 11 named href/route/redirect prefixes rather than a full AST parse -- matches the existing stripComments+regex idiom used by every other lint guard in this codebase
+- [Phase 43]: The /admin/blocks/new reserved-segment runtime-404 bug class is explicitly NOT caught by the main dead-href sweep -- pinned as its own fixme test, activates in 43-02 once the route gets a static segment
+- [Phase 43]: route-truth.spec.ts builds the two legacy shim page paths from segment arrays via path.join(...) instead of a literal path string, so the spec itself never trips the live tests/phase41/spec-repoint-inventory.spec.ts literal-fragment scan
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -675,8 +679,8 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-09-29T05:49:17.437Z
-Stopped at: context exhaustion at 75% (2026-09-29)
+Last session: 2026-09-30T11:47:26.309Z
+Stopped at: Completed 43-01-PLAN.md
 /admin/sops is now a redirect shim to /sops; TopHeader/roleHome/journeys.ts
 repointed; Phase 30/41 nav guards updated. Next: 41-07 (reference sweep —
 repoint remaining internal /admin/sops links straight to /sops) then 41-08

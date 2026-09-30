@@ -644,7 +644,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 43-01-PLAN.md — Wave 1: dead-link lint guard (live, red-first on the stale journeys Publish route + ARCHITECTURE review line, reserved-segment rule staged); journeys/ARCHITECTURE/matrix doc fixes; phase43 spec scaffolds + project; dead-surface.eval.ts
+- [x] 43-01-PLAN.md — Wave 1: dead-link lint guard (live, red-first on the stale journeys Publish route + ARCHITECTURE review line, reserved-segment rule staged); journeys/ARCHITECTURE/matrix doc fixes; phase43 spec scaffolds + project; dead-surface.eval.ts
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -739,7 +739,7 @@ Plans:
   1. The matrix document exists in-repo, covers every role × every capability surfaced in the app, and is referenced from CLAUDE.md/planning docs as the authority
   2. A user with sign-off authority on a SOP can edit that SOP; one without cannot — enforced server-side, with positive and negative probes per role (per the 2026-07-20 RLS-probe learning)
 
-**Plans:** 9/9 plans complete
+**Plans:** 1/5 plans executed
 Plans:
 **Wave 1**
 
