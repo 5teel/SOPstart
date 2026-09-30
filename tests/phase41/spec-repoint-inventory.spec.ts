@@ -13,26 +13,12 @@
  * reference (a `path.join(...)` call building the shim's path, or the
  * shim path used as a literal string in code) counts as a hit.
  *
- * Allowlist — every file below legitimately still reads the shim itself
- * (admin/sops/page.tsx is a REAL file, not deleted; it now just redirects):
- *   - tests/phase41/nav-and-shim.spec.ts — asserts the shim's guard-first
- *     redirect + query-param remap (SUR-01/03, 41-06).
- *   - tests/phase30/admin-nav.spec.ts — asserts the shim carries no UI.
- *   - tests/phase28/governance-queue.spec.ts — FOLDED_PAGE constant asserts
- *     the shim's own front-door admin/safety_manager guard survives,
- *     alongside the real data-layer gate in governance.ts (41-08 Task 1).
- *   - tests/phase30/create-entry.spec.ts — ADMIN_SOPS_SHIM constant asserts
- *     the shim carries no duplicate create entry (41-08 Task 2).
- *   - tests/phase41/reference-sweep.spec.ts — PERMITTED_FILES set names the
- *     shim as one of exactly two files allowed to reference `/admin/sops`
- *     as a literal route string (41-07).
- *   - tests/phase54/deletion-sweep.spec.ts — PERMITTED_ATTENTION_FILES names
- *     the shim as one of the two files still allowed to spell
- *     `=== 'attention'` once the Phase 41 lenses are deleted (54-05).
- *   - tests/phase41/merged-surface.spec.ts — ADMIN_SOPS_SHIM constant reads
- *     the shim source to assert it still passes every legacy param through
- *     and sends `view=attention` to `/governance` after the role guard
- *     (54-04 rewrite of this spec for the library-table surface).
+ * Allowlist — empty as of 43-04 (Phase 43, D-01): admin/sops/page.tsx is
+ * DELETED, not a live redirect shim any more (the legacy URL moved to a
+ * static next.config.ts redirect), so no spec may legitimately read its
+ * path as code. tests/phase43/route-truth.spec.ts proves the file's
+ * absence directly, using segment arrays rather than a literal path
+ * fragment (so it never trips this sweep either).
  */
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
@@ -42,15 +28,7 @@ const ROOT = process.cwd()
 const TESTS_DIR = path.join(ROOT, 'tests')
 const SELF = path.join('tests', 'phase41', 'spec-repoint-inventory.spec.ts')
 const SHIM_PATH_FRAGMENT = "app', '(protected)', 'admin', 'sops', 'page.tsx"
-const ALLOWLIST = [
-  path.join('tests', 'phase41', 'nav-and-shim.spec.ts'),
-  path.join('tests', 'phase30', 'admin-nav.spec.ts'),
-  path.join('tests', 'phase28', 'governance-queue.spec.ts'),
-  path.join('tests', 'phase30', 'create-entry.spec.ts'),
-  path.join('tests', 'phase41', 'reference-sweep.spec.ts'),
-  path.join('tests', 'phase54', 'deletion-sweep.spec.ts'),
-  path.join('tests', 'phase41', 'merged-surface.spec.ts'),
-]
+const ALLOWLIST: string[] = []
 
 // Strips full-line comments (//, /*, */, and JSDoc * continuation lines) so
 // a file's own explanatory prose about where an assertion moved FROM cannot

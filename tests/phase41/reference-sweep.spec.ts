@@ -1,6 +1,9 @@
 /**
  * Phase 41 / Plan 41-07 — SUR-03/SUR-04/SUR-06 `/admin/sops` reference sweep.
- * Flipped live from the 41-01 Wave-0 stub.
+ * Flipped live from the 41-01 Wave-0 stub. Repointed in 43-04 (Phase 43,
+ * D-01): the page-level shim is deleted, so nothing in src/ is permitted to
+ * reference `/admin/sops` as a list route any more — the legacy URL lives
+ * only as a next.config.ts redirect.
  *
  * Pattern: tests/phase30/dead-weight.spec.ts — pair a deletion/rewrite with
  * a src/-wide reference sweep, per CLAUDE.md 2026-08-04 ("a deletion guard
@@ -26,21 +29,7 @@ const ROOT = process.cwd()
 // comma, space, or `)` after it counts as a hit (end of the route literal).
 const EXACT_ADMIN_SOPS_REF = /\/admin\/sops(?![\w/[-])/g
 
-// The only two files allowed to still reference the list route: the redirect
-// shim itself (never references its own destination as a literal, so this
-// is expected to contribute 0 hits) and journeys.ts's shim-documenting step
-// (contributes the legacy-URL id + label + route + detail matches).
-const PERMITTED_FILES = new Set([
-  path.join('src', 'app', '(protected)', 'admin', 'sops', 'page.tsx'),
-  path.join('src', 'lib', 'journeys', 'journeys.ts'),
-])
-
-// Pinned so a NEW /admin/sops reference added to a permitted file later must
-// be a deliberate, reviewed decision, not silent drift. Counted per LINE
-// (journeys.ts:213 the activity-redirect detail string, journeys.ts:569 the
-// shim-documenting step — which itself carries two occurrences on one line,
-// counted once here since hits are tallied per matching line).
-const EXPECTED_PERMITTED_COUNT = 2
+const NEXT_CONFIG = 'next.config.ts'
 
 // `label:`/`route:`/`href:` key whose string value contains the word
 // "Library" — a nav/route label naming a destination. Free prose in
@@ -96,27 +85,21 @@ function findAdminSopsHits(absPath: string): string[] {
 }
 
 test.describe('SUR-03/SUR-04/SUR-06 reference sweep — /admin/sops list route is fully repointed', () => {
-  test('no src/ file outside the shim + journeys.ts references /admin/sops as a list route', () => {
+  test('no src/ file references /admin/sops as a list route (Phase 43 D-01: the shim page is deleted)', () => {
     const files = walkTsFiles(path.join(ROOT, 'src'))
     const offenders: string[] = []
     for (const file of files) {
       const rel = path.relative(ROOT, file)
-      if (PERMITTED_FILES.has(rel)) continue
       const hits = findAdminSopsHits(file)
       for (const hit of hits) offenders.push(`${rel}:${hit}`)
     }
     expect(offenders, `Unexpected /admin/sops list-route references:\n${offenders.join('\n')}`).toEqual([])
   })
 
-  test('the permitted files carry exactly the pinned number of /admin/sops references', () => {
-    let total = 0
-    const breakdown: string[] = []
-    for (const rel of PERMITTED_FILES) {
-      const hits = findAdminSopsHits(path.join(ROOT, rel))
-      total += hits.length
-      if (hits.length > 0) breakdown.push(`${rel}: ${hits.length} (${hits.join(' | ')})`)
-    }
-    expect(total, `Permitted-reference breakdown:\n${breakdown.join('\n')}`).toBe(EXPECTED_PERMITTED_COUNT)
+  test('the legacy /admin/sops URL lives only in next.config.ts, as a redirect to /sops', () => {
+    const config = read(NEXT_CONFIG)
+    expect(config).toContain("source: '/admin/sops',")
+    expect(config).toContain("destination: '/sops',")
   })
 
   test('the four live /admin/sops sub-routes survived the sweep', () => {

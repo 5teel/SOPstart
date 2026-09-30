@@ -1,6 +1,8 @@
 /**
- * Phase 41 / Plan 41-06 — SUR-03 / SUR-04 + the `/admin/sops` redirect shim.
- * Flipped live (was a Wave-0 stub in 41-01).
+ * Phase 41 / Plan 41-06 — SUR-03 / SUR-04 + the legacy `/admin/sops` URL.
+ * Flipped live (was a Wave-0 stub in 41-01). Repointed in 43-04 (Phase 43,
+ * D-01): the page-level shim is deleted; the legacy URL is now a static
+ * next.config.ts redirect.
  *
  * Source-contract idiom, not browser automation — normalises \r\n to \n
  * per CLAUDE.md 2026-07-18.
@@ -11,7 +13,7 @@ import path from 'node:path'
 
 const ROOT = process.cwd()
 const TOP_HEADER = path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx')
-const ADMIN_SOPS_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'page.tsx')
+const NEXT_CONFIG = path.join(ROOT, 'next.config.ts')
 const LIBRARY_TABLE = path.join(ROOT, 'src', 'components', 'admin', 'AdminLibraryTable.tsx')
 const WORKER_LIST = path.join(ROOT, 'src', 'components', 'sop', 'WorkerSimpleList.tsx')
 const SOP_DETAIL_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'sops', '[sopId]', 'page.tsx')
@@ -36,37 +38,18 @@ test.describe('SUR-03 — one top-level "SOPs" entry', () => {
   })
 })
 
-test.describe('redirect shim — /admin/sops preserves deep links to /sops', () => {
-  test('redirect shim: guard stays in front of redirect(), destination is /sops, query built via URLSearchParams', () => {
-    const shim = read(ADMIN_SOPS_PAGE)
-    expect(shim).toContain("['admin', 'safety_manager']")
-    expect(shim).toContain('redirect(')
-    expect(shim).toContain('URLSearchParams')
-    // Positional: the role guard must precede the destination redirect.
-    const guardIdx = shim.indexOf("['admin', 'safety_manager']")
-    const destinationIdx = shim.indexOf("redirect(qs ? `/sops?")
-    expect(guardIdx).toBeGreaterThan(-1)
-    expect(destinationIdx).toBeGreaterThan(-1)
-    expect(guardIdx).toBeLessThan(destinationIdx)
-    // The destination path is a string constant, never a template hole
-    // filled from `params` (open-redirect hygiene, T-41-03).
-    expect(shim).not.toMatch(/redirect\(`\/sops\$\{params/)
-    for (const param of ['view', 'status', 'owner', 'filter', 'departments', 'collection', 'sop']) {
-      expect(shim).toContain(param)
-    }
-  })
-
-  test('redirect shim: no longer imports the admin table/lens components/actions directly', () => {
-    const shim = read(ADMIN_SOPS_PAGE)
-    for (const token of [
-      'AdminLibraryTable',
-      'WiringPatchBayShell',
-      'GovernanceQueueRow',
-      'listGovernanceQueue',
-      'listOrgTree',
-      'listGrants',
-    ]) {
-      expect(shim).not.toContain(token)
+test.describe('legacy /admin/sops — static next.config.ts redirect (Phase 43 D-01)', () => {
+  test('redirects to /sops as a fixed same-origin destination (open-redirect hygiene, T-41-03/T-43-02)', () => {
+    const config = read(NEXT_CONFIG)
+    expect(config).toContain("source: '/admin/sops',")
+    expect(config).toContain("destination: '/sops',")
+    const destinations = [...config.matchAll(/destination:\s*'([^']*)'/g)].map((m) => m[1])
+    expect(destinations.length).toBeGreaterThan(0)
+    for (const d of destinations) {
+      expect(d.startsWith('/')).toBe(true)
+      expect(d.startsWith('//')).toBe(false)
+      expect(d).not.toContain('http')
+      expect(d).not.toContain('${')
     }
   })
 })

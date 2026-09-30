@@ -25,9 +25,9 @@ import path from 'node:path'
 
 const ROOT = process.cwd()
 const SOPS_PAGE = path.join(ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx')
-const LIBRARY_TABLE = path.join(ROOT, 'src', 'components', 'admin', 'AdminLibraryTable.tsx')
 const ADMIN_ROWS = path.join(ROOT, 'src', 'lib', 'sop-list', 'admin-rows.ts')
-const ADMIN_SOPS_SHIM = path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'page.tsx')
+const NEXT_CONFIG = path.join(ROOT, 'next.config.ts')
+const MIDDLEWARE = path.join(ROOT, 'src', 'lib', 'supabase', 'middleware.ts')
 // Phase 53-02: the worker per-SOP list derivation lives here now.
 const WORKER_SOPS_HOOK = path.join(ROOT, 'src', 'hooks', 'useWorkerSops.ts')
 
@@ -202,16 +202,15 @@ test.describe('SUR-06 — "Library" survives only as a scope/filter label', () =
   })
 })
 
-test.describe('redirect shim — legacy /admin/sops deep links all resolve on /sops or /governance', () => {
-  test('the shim passes every legacy param through and sends view=attention to /governance after the role guard', () => {
-    const code = stripComments(read(ADMIN_SOPS_SHIM))
-    const guardIdx = code.indexOf("redirect('/dashboard')")
-    const attentionIdx = code.indexOf("params.view === 'attention'")
-    expect(guardIdx).toBeGreaterThan(-1)
-    expect(attentionIdx).toBeGreaterThan(guardIdx)
-    expect(code.slice(attentionIdx, attentionIdx + 80)).toContain("redirect('/governance')")
-    for (const param of ['view', 'status', 'owner', 'filter', 'departments', 'collection', 'sop']) {
-      expect(code).toContain(`params.${param}`)
-    }
+test.describe('legacy /admin/sops deep links — next.config.ts redirect + middleware (Phase 43 D-01)', () => {
+  test('the legacy URL is a static next.config.ts redirect to /sops, and the middleware forwards ?view=attention on to /governance', () => {
+    const config = stripComments(read(NEXT_CONFIG))
+    expect(config).toContain("source: '/admin/sops',")
+    expect(config).toContain("destination: '/sops',")
+    const middleware = stripComments(read(MIDDLEWARE))
+    expect(middleware).toContain(
+      "path === '/sops' && request.nextUrl.searchParams.get('view') === 'attention'",
+    )
+    expect(middleware).toContain("new URL('/governance', request.url)")
   })
 })

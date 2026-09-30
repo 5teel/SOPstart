@@ -50,16 +50,18 @@ const DEAD_NAMES =
 // so `admin-access-view` (the survivor) is never a false positive.
 const DEAD_PARAMS = /view=attention|['"]admin-(all|draft|published|failed|attention|access)['"]/g
 
-// The `status === 'attention'` legacy comparison. Only the redirect shim and
-// the admin-rows scope-label fallback are permitted to still spell it.
+// The `status === 'attention'` legacy comparison. Only the admin-rows
+// scope-label fallback and the middleware's server-side legacy redirect may
+// still spell it (Phase 43 D-01: the page-level shim that used to be the
+// third permitted home is deleted; the legacy URL is now a next.config.ts
+// redirect with no comparison of its own to make).
 const ATTENTION_COMPARE = /===\s*'attention'/g
 const PERMITTED_ATTENTION_FILES = [
-  path.join('src', 'app', '(protected)', 'admin', 'sops', 'page.tsx'),
   path.join('src', 'lib', 'sop-list', 'admin-rows.ts'),
   // 2026-09-29: the /sops?view=attention -> /governance redirect is server-side.
   path.join('src', 'lib', 'supabase', 'middleware.ts'),
 ]
-const EXPECTED_ATTENTION_COUNT = 3
+const EXPECTED_ATTENTION_COUNT = 2
 
 // 54-06 rewrote every eval that named the retired surface (governance.eval.ts,
 // sop-surface.eval.ts, plant-home.eval.ts) -- the scan now covers tests/evals too.
