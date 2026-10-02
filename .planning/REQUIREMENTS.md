@@ -958,3 +958,138 @@ Re-derived by the roadmapper 2026-07-28 after the SUR scope correction (the firs
 
 ---
 *v10.0 requirements added: 2026-09-28*
+
+---
+
+## v11.0 Requirements — One-Screen MVP
+
+**Defined:** 2026-10-03 · Source: Simon's MVP simplification (2026-10-02) and sketch 008 (winner A + focus rule, 2026-10-03). Design contract: `.claude/skills/sketch-findings-SOPstart/references/one-screen-site.md` — it governs, and carries a supersession table for every older reference. Scoped without a question round: Simon answered the keep/drop list item by item on 2026-10-02 and asked for the milestone to be set up unsupervised.
+
+**Milestone character:** SIMPLIFICATION. Cut the app to a minimal product on one screen, re-found the data on eight plain types (decisions · objectives · requests · notifications · SOP · steps · standards · users), and delete every feature that did not make the cut. Supersedes v8.0 Phase 42 (CRE-01..04, PRG-01..02 → carried by WRK-01..03) and the unstarted v9.0 phases (OBL → RQS-03, LOG → DEC-01, FBK → RQS-01, STD → SOP-02; LAD, VAS, PAR → backlog).
+
+**Standing constraints:**
+- Words on screen are plain: "section" and "step", never "block". No internal IDs in UI copy.
+- Every phase that touches a screen ships a deployed eval (`tests/evals/`, `npm run eval -- --phase N`) and the screenshots are read before a pass is declared.
+- `src/lib/journeys/journeys.ts` and `.planning/codebase/CAPABILITY-MATRIX.md` change in the same commit as the route or the gate they describe.
+- Removal is deletion: a dropped feature loses its routes, components, API endpoints, dependencies and scheduled jobs. **No database table or customer row is dropped in this milestone.**
+- Row-level security stays on for every table, including new ones (org-scoped `USING` and matching `WITH CHECK`; `tests/lint/rls-org-scope.spec.ts` stays green).
+- The publish gate (`assertPublishGates()`) and "tick each step yourself" are never weakened; no bulk-verify control.
+- Metric units and Celsius in any AI-written content.
+
+### One Screen (SHL)
+
+- [ ] **SHL-01**: After signing in, every user lands on one screen made of three panes — a list on the left, the isometric site in the middle, a detail panel on the right — and there is no header navigation anywhere in the app
+- [ ] **SHL-02**: A user can select any room or machine either by clicking its shape on the site or by clicking its row in the list; both highlight the shape, move the camera to it and fill the detail panel identically
+- [ ] **SHL-03**: With nothing selected, the detail panel shows the site overview: objectives, the user's notifications and open requests
+- [ ] **SHL-04**: A user can type in the list's search box and see matching rooms and machines filtered in the list and highlighted on the site; the search matches machine names and the titles of the SOPs on them
+- [ ] **SHL-05**: The list shows one "next for you" card: for a worker, the single next SOP due with Walk it and Show me; for an admin or supervisor, how many things are waiting in the Office with a button that opens it
+- [ ] **SHL-06**: When the detail panel shows a table (decision ledger, people and roles, access, training matrix) it widens, and the site stays visible and re-centres on the selected place
+- [ ] **SHL-07**: Every place and every tab inside a room has its own address, so a link or a browser refresh returns to the same place, and every address from the old app (SOP list, governance, activity, profile, team, site, settings, content, builder, upload) redirects to the matching place on the one screen
+
+### Places on the Site (PLC)
+
+- [ ] **PLC-01**: The site always shows four fixed rooms — Office, Smoko room, Workshop, Noticeboard — signposted by name at every zoom level, alongside the machines; an admin can position each room's shape in the site editor
+- [ ] **PLC-02**: Selecting a machine shows its SOPs with a status badge each; a worker can walk any published one, and an admin can walk it, edit it, or start a new SOP for that machine
+- [ ] **PLC-03**: Selecting the Noticeboard shows the SOPs that belong to the whole site rather than to a machine, with the same badges and actions as a machine
+- [ ] **PLC-04**: Machines and rooms carry pins: a worker sees how many SOPs are due for them at each place; an admin sees where a SOP has no owner or an overdue review, and a count on the Office and Workshop of what is waiting there
+- [ ] **PLC-05**: An admin can switch the site into edit mode from the map and add, rename, reshape or remove machines and departments there; departments exist only as zones on the drawing and there is no separate departments screen
+
+### Focus on the SOP (FOC)
+
+- [ ] **FOC-01**: Opening a SOP to walk it removes the list and the site from the screen; what remains is a slim top bar, the SOP's sections and steps down the left, and the current step in one centred column
+- [ ] **FOC-02**: Opening a SOP to edit it removes the list and the site in the same way; the steps are shown grouped under their sections in one centred column, and SOP-level details (version, machine, objective, standards) sit quietly in the left rail
+- [ ] **FOC-03**: While a SOP is open, nothing else from the site is on screen — no map, no list, no inbox count, no notifications — and Back or Esc returns to the one screen with the place the user came from still selected
+- [ ] **FOC-04**: A worker walks a SOP one step at a time: hazard and PPE steps must be acknowledged before going on, a step can ask for a photo, and finishing the last step records the completion and sends it for sign-off
+
+### The SOP Itself (SOP)
+
+- [ ] **SOP-01**: A SOP is sections and steps; hazard, PPE, step and check are kinds of step, and every existing SOP is converted so that none of its hazard or PPE content is lost
+- [ ] **SOP-02**: An admin can put a standard — a plain label such as "LOTO" — on a whole SOP, a section or a single step, and manage the list of standards in the Workshop; content that was linked from the old reusable library stays in the SOPs that used it
+- [ ] **SOP-03**: Every SOP belongs either to one or more machines or to the whole site, and its department comes from its machine rather than being picked separately
+- [ ] **SOP-04**: An admin can publish a new version of a SOP; workers always get the latest published version and earlier versions are kept on record
+
+### Workshop — Writing and Editing (WRK)
+
+- [ ] **WRK-01**: An admin can start a new SOP from the Workshop in exactly four ways, each shown once: upload a document, describe it to AI, record a video, start blank
+- [ ] **WRK-02**: Every way of starting asks for a title and where the SOP lives (a machine or the whole site) before anything is created, and then opens the same editor
+- [ ] **WRK-03**: A SOP that is still being read from a document or a video opens in the editor showing what is happening and roughly how long it takes, never an empty page, and moving into the editor never reloads the whole app
+- [ ] **WRK-04**: The editor shows what the AI check found; the admin must tick every step as checked and clear every AI finding before Publish becomes available
+- [ ] **WRK-05**: The Workshop lists SOPs in progress with their state in plain words (being read, AI found things, steps left to check, waiting for approval) and opens any of them in the editor
+- [ ] **WRK-06**: An admin can choose which AI model reads documents and which checks drafts from the Workshop
+- [ ] **WRK-07**: A worker who enters the Workshop can ask for a change to a SOP, or for a new one, and that becomes a request in the Office
+
+### Office — Governance (OFF)
+
+- [ ] **OFF-01**: The Office opens on an inbox in which every row is one thing to do with one button that clears it — assign an owner, mark reviewed, sign off, approve — and an empty inbox is shown as the goal
+- [ ] **OFF-02**: A supervisor can sign off or reject a worker's completion, with its photos, straight from the inbox
+- [ ] **OFF-03**: A person named in an approval chain can approve or send back a SOP waiting for them from the inbox
+- [ ] **OFF-04**: Every SOP has an owner and a review date, visible wherever the SOP is listed for an admin, and the owner can mark it reviewed
+- [ ] **OFF-05**: An admin can invite people, set each person's role (Worker, Supervisor, SOP Admin, Safety Manager) and see their department from the Office
+- [ ] **OFF-06**: An admin can open the existing access wiring screen from the Office, unchanged, to decide who sees which SOPs
+
+### Decision Ledger (DEC)
+
+- [ ] **DEC-01**: Every approval, rejection, sign-off, assignment, publish, change of owner, recorded observation and cleared AI finding is written as one decision: who, when, what was decided and what it was about
+- [ ] **DEC-02**: An admin can read the ledger in the Office, newest first, and narrow it by kind of decision
+- [ ] **DEC-03**: No one, in any role, can change or delete a decision once it is written, and that is enforced by the database rather than by the screen
+- [ ] **DEC-04**: A decision made by an AI agent is recorded with the agent named as who made it
+
+### Requests (RQS)
+
+- [ ] **RQS-01**: Any user can raise a request — change a SOP, write a new SOP, observe me doing a job — and see the state of the requests they have raised
+- [ ] **RQS-02**: An admin or supervisor can accept or decline a request in the Office; the answer is written to the decision ledger and the person who asked is told
+- [ ] **RQS-03**: A supervisor or admin can ask that a role or a named person does a SOP; once accepted it shows as due for those people on their machines and in their "next for you" card
+- [ ] **RQS-04**: An AI agent can raise a request (for example, a machine that has no SOPs) and it appears in the Office marked as coming from an agent
+
+### Notifications (NTF)
+
+- [ ] **NTF-01**: A user sees their notifications in the site overview, with a count on the bell in the list, and a notification opens the place it is about
+- [ ] **NTF-02**: A user is notified when they are next to approve a SOP, when a SOP they own is due for review, when a completion is waiting for their sign-off, when a request they raised is answered, and when a SOP they do has a new version
+
+### Objectives (OBJ)
+
+- [ ] **OBJ-01**: An admin can set an objective — a short statement of intent — on the site, a department, a machine, a SOP or a person, and change or remove it
+- [ ] **OBJ-02**: An objective is shown as quiet metadata on the detail panel of the thing it applies to, saying who set it
+- [ ] **OBJ-03**: An AI agent can read every objective and can set one through the existing AI field interface; an objective set by an agent is marked as such until a person confirms it
+
+### Smoko Room — Training (SMK)
+
+- [ ] **SMK-01**: A supervisor or admin can see a training matrix of people against SOPs showing, for each pair, not started, read, done, or seen doing it right
+- [ ] **SMK-02**: A supervisor can record that they watched a person do a SOP and whether it was done right or the person needs support; it is one simple record and it is written to the decision ledger
+- [ ] **SMK-03**: Any user can see their own training record and what has been recorded about them in the Smoko room
+
+### One Organisation (ORG)
+
+- [ ] **ORG-01**: The app serves one organisation: there is no way to sign up and create another, no organisation switch, and people join only by invitation
+
+### Removal (CUT)
+
+- [ ] **CUT-01**: None of the dropped worker features can be reached or is shipped: offline use, voice of any kind, phone scan and QR machine plates, shared-device login
+- [ ] **CUT-02**: None of the dropped authoring features can be reached or is shipped: video generation, flow diagram, image annotation, the YouTube and photo-scan ways of starting, the reusable-content library pages, version compare and restore
+- [ ] **CUT-03**: None of the dropped governance and training features can be reached or is shipped: refresher cadence, CSV export, the departments screen, org-chart views
+- [ ] **CUT-04**: The code, routes, API endpoints, packages and scheduled jobs that existed only for dropped features are deleted, the app builds and lints clean without them, and a guard fails the build if a dropped route or package comes back
+- [ ] **CUT-05**: The pathways map and the feedback (UAT) page are rebuilt to describe the one-screen app and show no screen that no longer exists
+
+### v11.0 Out of Scope
+
+| Item | Why |
+|------|-----|
+| A phone layout | Dropped with phone/QR on 2026-10-02. The focus screen would translate; the three panes would not. Revisit after the build — flagged for Simon's confirmation. |
+| Regenerating the site artwork with the rooms drawn in | Needs image-generation credit (out on 2026-10-03). PLC-01 ships with an admin-placed shape and a signpost per room on the existing scene. |
+| Dropping database tables or migrating away data of removed features | Irreversible; no benefit to the MVP. Rows stay, code goes. |
+| A read-only SOP view separate from Walk | Not in the sketch; an admin previews by walking. Raise if missed. |
+| Objectives with targets, dates or automated tracking | OBJ is free-text metadata in the MVP. |
+| Template on-ramp, multi-site, role ladder, view-as-role, parse-relevance tuning | New capability or superseded v9.0 scope; backlog. |
+| Next.js 16.3 upgrade, `check-bundle-size.ts` blind spot, `/gsd-secure-phase 40` | Carried debt; not part of the simplification. |
+
+### v11.0 Traceability
+
+*Filled by the roadmap.*
+
+| REQ-ID | Phase | Status |
+|--------|-------|--------|
+
+**v11.0 Coverage:** 55 requirements — SHL 7 · PLC 5 · FOC 4 · SOP 4 · WRK 7 · OFF 6 · DEC 4 · RQS 4 · NTF 2 · OBJ 3 · SMK 3 · ORG 1 · CUT 5.
+
+---
+*v11.0 requirements added: 2026-10-03*
