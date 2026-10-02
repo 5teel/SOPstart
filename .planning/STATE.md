@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v8.0
-milestone_name: — Authoring Convergence
-status: verifying
-stopped_at: Completed 43-05-PLAN.md (Phase 43 certified, ready for verification)
-last_updated: "2026-09-30T13:00:09.703Z"
-last_activity: 2026-09-30
+milestone: v11.0
+milestone_name: One-Screen MVP
+status: planning
+last_updated: "2026-10-02T14:38:29.337Z"
+last_activity: 2026-10-02
 progress:
-  total_phases: 4
-  completed_phases: 3
-  total_plans: 28
-  completed_plans: 28
-  percent: 75
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -25,17 +24,10 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 
 ## Current Position
 
-Phase: 43
-Plan: Not started
-Next: 41-07 (reference sweep) — repoint remaining internal /admin/sops links straight to /sops
-Status: Phase complete — ready for verification
-three 40-VERIFICATION gaps closed. Outstanding formal gate: /gsd-secure-phase 40
-has not run (no 40-SECURITY.md, security_enforcement=true).
-Last activity: 2026-09-30
-shim to /sops, TopHeader/roleHome repointed, journeys.ts + Phase 30/41 guards updated.
-8 named legacy specs left red for 41-08 (see 41-06-SUMMARY.md).
-
-Progress: 1/4 phases · [██░░░░░░░░] 25%
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-10-02 — Milestone v11.0 started
 
 ### v8.0 roadmap (created 2026-07-28 · re-derived 2026-07-28 after the SUR scope correction)
 
@@ -690,11 +682,10 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-09-30T12:49:22.947Z
-Stopped at: Completed 43-05-PLAN.md (Phase 43 certified, ready for verification)
-/admin/sops is now a redirect shim to /sops; TopHeader/roleHome/journeys.ts
-repointed; Phase 30/41 nav guards updated. Next: 41-07 (reference sweep —
-repoint remaining internal /admin/sops links straight to /sops) then 41-08
-(repoint the 8 named legacy specs listed in 41-06-SUMMARY.md).
+Last session: 2026-10-02
+Stopped at: Session resumed. Phase 43 complete, verified and pushed (HEAD 765c995).
+Nothing in flight. Next: Phase 42 (One Creation Flow) — discuss/plan. Phase 43
+ran ahead of 42, so 42 must keep the Phase 43 route-truth guards green when it
+orphans /admin/sops/upload, /admin/sops/new/ai and /admin/sops/new/blank.
 Resume file:
-None
+None (.planning/.continue-here.md is a stale 2026-09-29 v10.0 closeout note)

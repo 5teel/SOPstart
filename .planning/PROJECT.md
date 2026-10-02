@@ -2,11 +2,15 @@
 
 ## What This Is
 
-A multi-tenant SaaS progressive web app that helps blue-collar tradespeople and inspectors follow Standard Operating Procedures on-site. Organizations upload their existing SOP documents (Word/PDF), AI parses them into structured, mobile-friendly procedures, and workers walk through them step-by-step on their phones — with photo capture, completion tracking, and supervisor sign-off.
+A web app that helps people on a factory floor follow Standard Operating Procedures. The whole app is **one screen**: an isometric drawing of the site with a list beside it and a detail panel. Each machine carries its SOPs; the Office is governance, the Smoko room is training, the Workshop is where SOPs are written and edited, and the Noticeboard holds site-wide SOPs. Admins turn existing documents (Word/PDF), a typed description or a recorded video into a structured SOP of sections and steps; workers walk it step by step with photo capture; supervisors sign off. Built for one organisation (Visy) first.
+
+*(Until 2026-10-02 this was a multi-tenant, phone-first, offline-capable PWA with many separate surfaces. Simon cut it to an MVP on that date — see Current Milestone v11.0.)*
 
 ## Core Value
 
-Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
+A worker can find the SOP for the machine in front of them and follow it step by step with nothing else on the screen — and the business can see, in one ledger, who decided and did what.
+
+*(Reworded 2026-10-03 for the MVP simplification. Previous wording: "Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline." Phone and offline were dropped by Simon on 2026-10-02; flagged for his confirmation.)*
 
 ## Requirements
 
@@ -82,13 +86,24 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 
 <!-- Current scope. Building toward these. -->
 
-#### v8.0 — Authoring Convergence (defined 2026-07-28)
-- One SOP surface: one route lists SOPs for every role, admin views are code-split lenses on it, one top-level "SOPs" entry, one path to the builder (SUR-01..06) — *added 2026-07-28 in a scope correction*
-- One creation flow: every on-ramp (upload, video, AI-describe, AI-voice, blank) funnels through one entry and lands in the builder (CRE-01..04)
-- Deduplication: one file-intake component, one department/metadata picker, one progress component, one page shell (DUP-01..04)
-- Data convergence: SOP category resolves to a single column + single vocabulary, existing rows backfilled (DAT-01)
-- Progress honesty: builder renders parsing state; consistent client-side navigation (PRG-01..02)
-- Dead-surface removal: no CTA to a non-existent route, no non-functional affordances, dead shims/vars gone, docs match real routes (DED-01..04)
+#### v11.0 — One-Screen MVP (defined 2026-10-03)
+- One screen: list · isometric site · detail panel; no header navigation; every place has a URL (SHL-01..07)
+- Places: Office, Smoko room, Workshop, Noticeboard and machines are the only destinations; departments and machines are part of the site drawing (PLC-01..05)
+- Focus: opening a SOP to walk or edit removes the map and the list (FOC-01..04)
+- SOP model: sections and steps; hazard and PPE are kinds of step; standards are labels; a SOP belongs to a machine or the site (SOP-01..04)
+- Workshop: four ways to start, one editor, honest progress, tick-each-step before publish (WRK-01..07)
+- Office: inbox, sign-off, approvals, people and roles, access wiring, owners and review dates (OFF-01..06)
+- Decision ledger: every approve / reject / sign-off / assign / publish is one append-only row (DEC-01..04)
+- Requests, notifications, objectives as first-class data (RQS-01..04, NTF-01..02, OBJ-01..03)
+- Smoko room: training matrix, simple observations, my record (SMK-01..03)
+- Single organisation (ORG-01) and removal of every dropped feature (CUT-01..05)
+
+#### v8.0 — Authoring Convergence (closed 2026-10-03)
+- Shipped: Phases 40, 41, 43 (DUP-01..04, DAT-01, SUR-01..06, DED-01..04).
+- **Phase 42 One Creation Flow (CRE-01..04, PRG-01..02) superseded by v11.0** — its intent (one entry, same details on every path, lands in the editor, honest progress, client-side navigation) is carried by WRK-01..03 against the new shell.
+
+#### v9.0 — Hot End Pilot (superseded 2026-10-03, never started beyond Phase 46)
+- Phase 46 Capability Matrix shipped. The rest is absorbed or dropped by v11.0: obligation record → requests/assignments (RQS-03); edit log → decision ledger (DEC-01); worker feedback → requests (RQS-01); standard steps library → standards labels (SOP-02); role ladder, view-as-role and parse relevance → backlog.
 
 #### Deferred to backlog (2026-07-28)
 - 999.4 AI-reviewer completeness rubric + risk triage (RUB-01..03, TRI-01) — blocked on conversion-pipeline maturity
@@ -118,7 +133,49 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 - Integration with external HR/ERP systems
 - Video content within SOPs
 
-## Current Milestone: v8.0 Authoring Convergence
+**Dropped in the 2026-10-02 MVP simplification (Simon) — removed from the product, not hidden:**
+- Offline use (service worker, local SOP cache, photo queue, sync)
+- Voice: Q&A, read-aloud, voice-driven walkthrough, voice drafting
+- Phone experience and QR machine plates (MVP is desktop; revisit after the build)
+- Video generation from a SOP
+- Flow diagram and image annotation
+- Refresher cadence, CSV export of training records, version compare/restore
+- YouTube and photo-scan on-ramps; the template on-ramp
+- The reusable-content library as its own surface (replaced by standards labels)
+- The departments screen and org-chart views (departments live on the site drawing)
+- Shared-device (roster) login
+- Multiple organisations, organisation sign-up, multi-site
+
+## Current Milestone: v11.0 One-Screen MVP
+
+**Started:** 2026-10-03
+**Goal:** Cut the app down to a minimal product that fits on one screen — the isometric site with a list and a detail panel — re-found its data on eight plain types, and remove every feature that did not make the cut.
+
+**NORTH STAR (carried, locked by Simon 2026-07-12):** User ease of use and maintenance FIRST. Simplicity now outranks feature coverage: when a kept feature and simplicity conflict, simplicity wins.
+
+**Why now (Simon, 2026-10-02):** "I want to simplify the app more — cut the features down to a minimal viable product and drop features in favour of simplicity … 1x super simple navigable screen." The product had grown to ~35 screens, nine header entries and seven ways to start a SOP. The plant-floor map (v10.0) proved the site is a better index than any menu, so it becomes the whole app.
+
+**Target features:**
+- **One screen** — list (search, next-for-you, rooms, departments ▸ machines) · isometric site · detail panel that widens for tables. No header navigation.
+- **Rooms as destinations** — Office (governance), Smoko room (training), Workshop (write and edit SOPs), Noticeboard (site-wide SOPs), machines (their SOPs). The list is the same places as text.
+- **Focus rule** — opening a SOP to walk it or edit it removes the map and the list; the SOP, its sections and its steps are the only thing on screen.
+- **Eight data types** — decisions (one append-only ledger), objectives (metadata people and agents can set and read), requests, notifications, SOP, steps, standards (labels at SOP / section / step level), users (with roles under governance).
+- **Simpler SOP** — sections and steps; hazard and PPE are kinds of step.
+- **Workshop** — four ways to start (document · describe to AI · record a video · blank), one editor, AI check and tick-each-step before publish, versions.
+- **Office** — inbox (owners, review dates, sign-offs, approvals), requests, decision ledger, people and roles, the current access wiring.
+- **Smoko room** — training matrix, simple observations, my record.
+- **Single organisation** — Visy. No sign-up-creates-an-org, no tenant switching.
+- **Removal** — every dropped feature deleted (see Out of Scope); pathways map and UAT page rebuilt afterwards.
+
+**Design contract:** `.claude/skills/sketch-findings-SOPstart/references/one-screen-site.md` (sketch 008, winner A + focus rule, wrapped 2026-10-03). It governs and carries a supersession table for every older reference.
+
+**Key anti-goals:** no new capability beyond what the sketch shows; no phone layout; no template on-ramp; no dropping of database tables or customer data in this milestone (dropped features lose their code and UI, their rows stay); no bulk-verify shortcut around tick-each-step.
+
+**Build-on (do not rebuild):** the v10.0 site model and scene renderer (`site_layouts` / `site_machines` / `sop_machines`, pins, machine panel, Konva polygon editor); the parse → AI-review → verify → publish spine and `assertPublishGates()`; the Phase 26 inline editor and its component registry; the access-grant model and wiring patch bay (kept as is); the completion + sign-off chain; the competency classifier behind the training matrix; `getSessionContext()` / `requireAdminContext()` auth idiom; the deployed-eval harness.
+
+**Open questions carried into planning:** phone (dropped — confirm the MVP is desktop-only); room artwork (placeholders until the site scene is regenerated with rooms in it); whether workers may enter the Workshop; whether a read-only SOP view exists besides Walk; one physical decisions table vs a ledger over existing tables; whether objectives carry a target and date.
+
+## Previous Milestone: v8.0 Authoring Convergence (closed 2026-10-03 — Phases 40, 41, 43 shipped; Phase 42 superseded by v11.0)
 
 **Started:** 2026-07-28
 **Goal:** Collapse the SOP creation path from five divergent on-ramps into one consistent flow — removing duplicated components, dead routes, and inconsistent metadata collection — so every way of making a SOP behaves the same way and lands in the same place. This is a **consolidation milestone**: tighten what exists, delete what duplicates, simplify the workflow. It is explicitly NOT a greenfield rebuild of the builder.
@@ -144,7 +201,7 @@ Workers can reliably follow any SOP on their phone, step-by-step, with the right
 
 **Build-on (do not rebuild):** the Phase 26 bespoke inline builder and its `BLOCK_COMPONENTS` registry (already shared between worker read path and admin edit path), the frozen `layout_data` / `sop_section_blocks` / `block_provenance` contract, the parse→AI-review→verify→publish spine.
 
-## Next Milestone (planned): v9.0 Conversion Quality
+## Superseded plan: v9.0 (was "Conversion Quality", later "Hot End Pilot") — replaced by v11.0 on 2026-10-03
 
 Sequenced by Simon 2026-07-28: **v8.0 authoring UX first, then v9.0 conversion quality.** v9.0 addresses whether the parse produces something worth editing — the actual pre-alpha concern. It is also the unblocking dependency for backlog 999.4 (AI-reviewer completeness rubric), which was deferred because a rubric tuned against pre-alpha parse output would need retuning.
 
@@ -165,12 +222,15 @@ Sequenced by Simon 2026-07-28: **v8.0 authoring UX first, then v9.0 conversion q
 
 ## Constraints
 
-- **Platform**: Progressive Web App — must work across Android and iOS browsers, installable to home screen
-- **Offline**: Must function with intermittent connectivity — cached SOPs accessible offline, sync when back online
-- **Accessibility**: Workers may have limited tech literacy — UI must be extremely simple and glove-friendly (large tap targets)
-- **Multi-tenant**: Each organization's SOPs and data must be fully isolated
-- **AI Parsing**: Must handle varied document formats and structures; confidence scoring to flag sections that need admin review
-- **Tech stack**: To be determined by research phase
+- **Platform**: Desktop web first (v11.0). The one-screen layout targets a desktop or line-side terminal browser; a phone layout is out of scope for the MVP.
+- **Online only**: No offline mode in the MVP.
+- **Accessibility**: Workers may have limited tech literacy — UI must be extremely simple, plain-worded, with large targets. One thing on screen at a time when following a SOP.
+- **Single organisation**: Built for Visy. Row-level security stays on (defence in depth) but there is one organisation and no sign-up path that creates another.
+- **AI Parsing**: Must handle varied document formats and structures; AI flags and tick-each-step stand between a parse and a published SOP.
+- **Tech stack**: Next.js 16 (App Router) · React 19 · Supabase (Postgres, Auth, Storage, RLS) · Tailwind 4 · TanStack Query · Konva (site editor). Deployed on Railway from `master`.
+- **Removal is deletion**: a dropped feature loses its routes, components, API endpoints, dependencies and scheduled jobs. Its database rows stay untouched this milestone.
+
+*(Pre-2026-10-02 constraints — PWA installable on iOS/Android, offline with sync, multi-tenant isolation as a product feature — are retired with the features they served.)*
 
 ## Key Decisions
 
@@ -190,7 +250,15 @@ Sequenced by Simon 2026-07-28: **v8.0 authoring UX first, then v9.0 conversion q
 | Training records = CSV export only (v6.0) | HRIS/Success Factors API integration stays out of scope; CSV covers the audit/training-evidence need without integration surface | — Locked 2026-07-12 |
 | Foundation before more governance layers (v8.0) | Governance shipped well across v6.0/v7.0, but every layer sits on content whose creation path is fragmented and whose parse quality is pre-alpha. Phases 38/39 deferred rather than built on unstable ground | — Locked 2026-07-28 |
 | v8.0 is consolidation, not rebuild | The ask is tightening current design, removing duplicative routes, simplifying workflows — not a greenfield builder. New capabilities (template on-ramp) are deferred even where sketched | — Locked 2026-07-28 |
-| Authoring UX before conversion quality | Two-milestone sequence: v8.0 converges the creation flow, v9.0 makes the parse output trustworthy. Ordering chosen by Simon | — Locked 2026-07-28 |
+| Authoring UX before conversion quality | Two-milestone sequence: v8.0 converges the creation flow, v9.0 makes the parse output trustworthy. Ordering chosen by Simon | ✗ Superseded 2026-10-03 by the MVP simplification |
+| MVP simplification: one screen, features dropped for simplicity (v11.0) | ~35 screens and nine header entries had outgrown the people using them; the site map already indexes everything | — Locked by Simon 2026-10-02 |
+| The site is the only navigation; rooms are destinations (v11.0) | Office = governance, Smoko room = training, Workshop = authoring, Noticeboard = site-wide SOPs, machines = their SOPs. A list beside the map is the same places as text, never a second menu | — Locked 2026-10-02 (sketch 008) |
+| An open SOP owns the screen (v11.0) | "The SOP and its contents are never shared with other elements of the site that could be distracting" — walking or editing removes the map and the list | — Locked by Simon 2026-10-03 |
+| Eight data types underpin the app (v11.0) | decisions · objectives · requests · notifications · SOP · steps · standards · users. Decisions are one append-only ledger; objectives are metadata people and agents both set and read; standards are labels, not a library | — Locked by Simon 2026-10-02 |
+| A SOP is sections and steps; hazard and PPE are kinds of step (v11.0) | Removes the fixed hazard/PPE section types and the block vocabulary from what admins and workers see | — Locked by Simon 2026-10-02 |
+| Single organisation — Visy (v11.0) | "We are building for one organisation only." Multi-tenancy as a product feature is retired; RLS stays as defence in depth | ✗ Supersedes "Multi-tenant SaaS from the start" · Locked 2026-10-02 |
+| Offline, voice, phone/QR dropped (v11.0) | Dropped in favour of simplicity. Reverses the original core value's "on their phone … even offline" | ✗ Supersedes "PWA over native apps" as a product commitment · Locked 2026-10-02 — phone flagged for confirmation |
+| Keep the current access wiring (v11.0) | The one governance surface kept exactly as built, opened from the Office | — Locked by Simon 2026-10-02 |
 
 ## Evolution
 
@@ -210,4 +278,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-09-30 — **Phase 43 (Dead-Surface Removal & Route Truth) complete, verified 8/8, deployed eval 29/29; last phase of v8.0 executed — milestone ready for `/gsd-complete-milestone`** (code review: 0 critical / 5 warnings, see 43-REVIEW.md). Prior: 2026-07-28 — **Milestone v8.0 (Authoring Convergence) started**; v7.0 closed at Phase 37 with 4/4 phases and 32/32 plans, Phases 38/39 deferred to backlog 999.4/999.5/999.6 (creation pipeline pre-alpha). v9.0 (Conversion Quality) sequenced next. Prior: Phase 37 (assessor governance, ASR-01) complete, re-verified 14/14 after gap closure (37-07/37-08 closed CR-01/CR-02 + WR-01..WR-05; post-closure review's 2 new warnings fixed same day). Phase 36 (refresher cadence + version-currency) complete, verified 4/4; code review 1 Critical + 7 Warnings all fixed pre-verification (CMP-03/TRN-03/REF-01/REF-02 validated). Phase 35 (competency classifier + training matrix) complete 2026-07-26, UAT 8/8. Prior: Phase 34 (supervisor observations) complete, re-verified 5/5 after gap closure. Milestone v7.0 (Competency & Training Layer) started 2026-07-19; v6.0 quick-closed same day (Phase 31 rolled forward into v7.0). Prior: v5.0 shipped 2026-07-05; ad-hoc AI-layer work 2026-07-06→09 formalized by Phase 27 (2026-07-12); self-healing video render webhook shipped 2026-07-12. Source of truth `.planning/PRODUCT-ROADMAP.md` v0.3 + Visy interview findings (2026-05-05).*
+*Last updated: 2026-10-03 — **Milestone v11.0 (One-Screen MVP) started** after Simon's 2026-10-02 MVP simplification; v8.0 closed with Phase 42 superseded, v9.0 superseded. What This Is, Core Value, Constraints and Out of Scope rewritten for the one-screen, single-organisation, desktop-first product. Prior: 2026-09-30 — **Phase 43 (Dead-Surface Removal & Route Truth) complete, verified 8/8, deployed eval 29/29; last phase of v8.0 executed — milestone ready for `/gsd-complete-milestone`** (code review: 0 critical / 5 warnings, see 43-REVIEW.md). Prior: 2026-07-28 — **Milestone v8.0 (Authoring Convergence) started**; v7.0 closed at Phase 37 with 4/4 phases and 32/32 plans, Phases 38/39 deferred to backlog 999.4/999.5/999.6 (creation pipeline pre-alpha). v9.0 (Conversion Quality) sequenced next. Prior: Phase 37 (assessor governance, ASR-01) complete, re-verified 14/14 after gap closure (37-07/37-08 closed CR-01/CR-02 + WR-01..WR-05; post-closure review's 2 new warnings fixed same day). Phase 36 (refresher cadence + version-currency) complete, verified 4/4; code review 1 Critical + 7 Warnings all fixed pre-verification (CMP-03/TRN-03/REF-01/REF-02 validated). Phase 35 (competency classifier + training matrix) complete 2026-07-26, UAT 8/8. Prior: Phase 34 (supervisor observations) complete, re-verified 5/5 after gap closure. Milestone v7.0 (Competency & Training Layer) started 2026-07-19; v6.0 quick-closed same day (Phase 31 rolled forward into v7.0). Prior: v5.0 shipped 2026-07-05; ad-hoc AI-layer work 2026-07-06→09 formalized by Phase 27 (2026-07-12); self-healing video render webhook shipped 2026-07-12. Source of truth `.planning/PRODUCT-ROADMAP.md` v0.3 + Visy interview findings (2026-05-05).*
