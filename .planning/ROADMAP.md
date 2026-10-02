@@ -505,7 +505,7 @@ Executes 40 → 41 → 42 → 43, strictly sequential.
 
 - [x] **Phase 40: Shared Creation Foundation** - One file-intake component, one metadata picker, one progress component, one page shell — and one category column with one vocabulary, backfilled (completed 2026-07-29)
 - [x] **Phase 41: One SOP Surface** - One route lists SOPs for every role, admin views become code-split lenses on it, one top-level "SOPs" entry, one path to the builder — with the worker bundle gate green (completed 2026-09-15)
-- [ ] **Phase 42: One Creation Flow** - Every on-ramp reachable from one entry on that surface, collecting the same metadata, landing in the builder — which now renders parse state honestly
+- [⤳] **Phase 42: One Creation Flow** — **SUPERSEDED by v11.0 (2026-10-03)**; intent carried by WRK-01..03. Every on-ramp reachable from one entry on that surface, collecting the same metadata, landing in the builder — which now renders parse state honestly
 - [x] **Phase 43: Dead-Surface Removal & Route Truth** - No CTA to a route that does not exist, no coming-soon controls, no orphaned shims or dead state, docs and `journeys.ts` matching the real route tree (completed 2026-09-30)
 
 ### Phase 40: Shared Creation Foundation
@@ -675,14 +675,14 @@ Plans:
 
 **Pre-flight check (blocking):** confirm the library discrepancy Joe and Simon saw on 2026-08-04 is explained by migrations 00061/00062 (cross-tenant RLS holes fixed the same day). If not, it is a live bug and the permission model is built on sand.
 
-- [ ] **Phase 44a: Obligation Record** - "Must do" becomes its own manager-set record; the training matrix reads it instead of access; backfill = today's access so no matrix moves
-- [ ] **Phase 44b: Role Ladder** - Roles inherit visibility up the ladder (`inherits_from_role_id`), provably without touching obligation
-- [ ] **Phase 45: View As Role** - Admins view any surface as a chosen role, read-only, through the real access path
+- [⤳] **Phase 44a: Obligation Record** — **SUPERSEDED by v11.0 (2026-10-03)**; carried by requests/assignments (RQS-03). "Must do" becomes its own manager-set record; the training matrix reads it instead of access; backfill = today's access so no matrix moves
+- [⤳] **Phase 44b: Role Ladder** — **SUPERSEDED by v11.0 (2026-10-03)**; → backlog. Roles inherit visibility up the ladder (`inherits_from_role_id`), provably without touching obligation
+- [⤳] **Phase 45: View As Role** — **SUPERSEDED by v11.0 (2026-10-03)**; → backlog. Admins view any surface as a chosen role, read-only, through the real access path
 - [x] **Phase 46: Capability Matrix** - One written role × capability matrix; sign-off authority carries edit rights (completed 2026-08-25)
-- [ ] **Phase 47: Edit Log** - Every block edit logged with user + timestamp, read-only visible to everyone with SOP access
-- [ ] **Phase 48: Worker Feedback** - Feedback tab → email to sign-off manager → read-only to all with access; moderated removals, logged; includes outbound email infra
-- [ ] **Phase 49: Standard Steps Library** - Org-defined reusable steps (start/end, hazards, PPE) linked by reference into any SOP; edit once, propagates; explicit overrides
-- [ ] **Phase 50: Parse Relevance** - Parse output drops content irrelevant to the target role, evaluated against Joe's annotated rules
+- [⤳] **Phase 47: Edit Log** — **SUPERSEDED by v11.0 (2026-10-03)**; carried by the decision ledger (DEC-01). Every block edit logged with user + timestamp, read-only visible to everyone with SOP access
+- [⤳] **Phase 48: Worker Feedback** — **SUPERSEDED by v11.0 (2026-10-03)**; carried by requests (RQS-01). Feedback tab → email to sign-off manager → read-only to all with access; moderated removals, logged; includes outbound email infra
+- [⤳] **Phase 49: Standard Steps Library** — **SUPERSEDED by v11.0 (2026-10-03)**; carried by standards labels (SOP-02). Org-defined reusable steps (start/end, hazards, PPE) linked by reference into any SOP; edit once, propagates; explicit overrides
+- [⤳] **Phase 50: Parse Relevance** — **SUPERSEDED by v11.0 (2026-10-03)**; → backlog. Parse output drops content irrelevant to the target role, evaluated against Joe's annotated rules
 
 ### Phase 44a: Obligation Record
 
@@ -1681,10 +1681,182 @@ Plans:
 
 **UI hint**: yes
 
+## v11.0 — One-Screen MVP (scoped 2026-10-03)
+
+**SIMPLIFICATION milestone.** On 2026-10-02 Simon cut the app to an MVP: one screen (a list, the isometric site and a detail panel), four rooms (Office, Smoko room, Workshop, Noticeboard) and the machines as the only destinations, an open SOP taking the whole screen, the data re-founded on eight plain types (decisions · objectives · requests · notifications · SOP · steps · standards · users), one organisation, and a long list of features deleted. Most of this milestone is re-homing and deleting shipped code — the v10.0 site and scene renderer, the governance inbox, the training matrix, the Phase 26 editor and the parse → AI-review → verify → publish spine all stay and move into rooms — with a small amount of genuinely new work: the decision ledger, requests, objectives, standards labels, hazard and PPE as kinds of step (a data conversion of every existing SOP), the shell with its rooms, and the focus rule. Design contract: `.claude/skills/sketch-findings-SOPstart/references/one-screen-site.md` — it governs and carries a supersession table for every older reference. **Supersedes** v8.0 Phase 42 (One Creation Flow — intent carried by WRK-01..03) and the unstarted v9.0 phases 44a, 44b, 45, 47, 48, 49, 50 (Phase 46 shipped and stays). 55 requirements: `.planning/REQUIREMENTS.md` § v11.0.
+
+**Standing constraints (every v11.0 phase):**
+
+- Words on screen are plain: "section" and "step", never "block". No internal IDs in UI copy.
+- Every phase that touches a screen ships a deployed eval (`tests/evals/`, `npm run eval -- --phase N`) and the screenshots are read before a pass is declared.
+- `src/lib/journeys/journeys.ts` and `.planning/codebase/CAPABILITY-MATRIX.md` change in the same commit as the route or the gate they describe.
+- Removal is deletion: a dropped feature loses its routes, components, API endpoints, packages and scheduled jobs. **No database table or customer row is dropped in this milestone.**
+- Row-level security stays on for every table, including new ones (org-scoped `USING` and matching `WITH CHECK`; `tests/lint/rls-org-scope.spec.ts` stays green).
+- The publish gate (`assertPublishGates()`) and "tick each step yourself" are never weakened; no bulk-verify control.
+- Metric units and Celsius in any AI-written content.
+
+**Sequencing rationale.**
+
+1. **Cut first (55).** The offline cache (Dexie, service worker, photo queue) sits under the worker data path that the pins and the "next for you" card read, and voice, video generation, the flow diagram and annotation each add content types the SOP conversion would otherwise have to carry. Cutting first makes every later phase smaller.
+2. **SOP shape and ledger before any screen (56).** SOP-01 converts every existing SOP and is the riskiest change in the milestone; both the walk screen and the editor depend on it. The decision write path lands here so every later phase that decides something writes through one writer instead of retrofitting.
+3. **Shell and places (57)** — the frame every later phase mounts into.
+4. **Focus screen (58)** — walking and editing need the converted SOP and a place to return to.
+5. **Office (59), then requests, notifications and objectives (60)** — requests are answered in an Office tab, and a worker asking for a change from the Workshop (WRK-07) needs requests to exist, so both land before the Workshop. They are two phases only to keep each reviewable.
+6. **Workshop and Smoko room (61)** — the two remaining rooms; both consume the editor, the ledger and requests.
+7. **Certification last (62)** — "every old address redirects", "no dropped route or package can come back" and the rebuilt pathways map and feedback page can only be certified once every room exists and every old page is retired. Each earlier phase still deletes the old page it replaces in the same phase and adds what it deleted to one dropped list (routes, packages, jobs) that Phase 62 turns into the guard.
+
+**Bridges.** Until a room's own phase lands, its detail panel summarises it and opens the existing page behind a plain "Back to the site" link; the phase that re-homes the room deletes that page, so no bridge survives Phase 62.
+
+**Placement notes (where this departs from the scoping order).** SHL-03 (the site overview of objectives, notifications and requests) sits in Phase 60 and SHL-06 (the detail panel widening for tables) in Phase 59: the shell phase has neither those three data types nor any table to widen, so claiming them in Phase 57 would mean verifying an empty overview and a mechanism with no consumer. SHL-07 is certified in Phase 62, but each place gets its address as it is built (Back from the focus screen needs one from Phase 57). SOP-02 delivers the standards model and its list manager in Phase 56; Phase 61 mounts that manager in the Workshop.
+
+Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequential.
+
+- [ ] **Phase 55: Cut the Dropped Features & One Organisation** - Offline, voice, phone/QR, shared-device login, video generation, flow diagram, annotation, YouTube and photo-scan on-ramps, library pages and version compare/restore deleted; sign-up no longer creates an organisation; the worker path keeps working online
+- [ ] **Phase 56: A Simpler SOP & the Decision Ledger** - Every SOP converted to sections and steps (hazard and PPE as kinds of step), standards as labels, machine-or-site placement; one append-only decision ledger written by every existing approve / sign-off / assign / publish path
+- [ ] **Phase 57: The One Screen & Its Places** - List · isometric site · detail panel as the landing screen, four signposted rooms, search, "next for you" card, pins, site edit mode; no header navigation
+- [ ] **Phase 58: The SOP Focus Screen — Walk & Edit** - Opening a SOP removes the map and the list; walk one step at a time to a sign-off, or edit with the AI check and tick-each-step before publish; new versions
+- [ ] **Phase 59: The Office** - Inbox that drains, sign-off and approvals, decision ledger, people and roles, the existing access wiring — one room, with the detail panel widening for tables
+- [ ] **Phase 60: Requests, Notifications & Objectives** - People and agents raise requests the Office answers; notifications with a bell; objectives as quiet metadata; the site overview fills in
+- [ ] **Phase 61: The Workshop & the Smoko Room** - Four ways to start a SOP, in-progress list, AI model choice, worker change requests; training matrix, simple observations, my record
+- [ ] **Phase 62: Removal Certified, Addresses & Maps** - Every old address redirects, every place has an address, a guard fails the build if a dropped route or package returns, pathways map and feedback page rebuilt
+
+### Phase 55: Cut the Dropped Features & One Organisation
+
+**Goal**: The app stops carrying what did not make the MVP and serves one organisation. Offline use, voice of any kind, phone scan and QR plates, shared-device login, video generation, the flow diagram, image annotation, the YouTube and photo-scan ways of starting, the reusable-content library pages and version compare/restore are deleted — routes, components, API endpoints, packages and scheduled jobs; their database rows stay. Sign-up stops creating organisations and people join by invitation. The worker path (pins, next-SOP card, walk, photo, completion) keeps working, now reading and writing straight to the server instead of through the local cache. First because the offline cache sits under the data the pins and the "next for you" card read, and voice, video, flow and annotation are extra content types the Phase 56 conversion would otherwise carry. Starts the dropped list (every deleted route, package and job) that Phase 62 turns into a build guard. The bundle-size script asserts the voice modal chunk exists and gates growth; it is updated here to match the owner's decision to drop voice and phone (baseline moves down only, recorded as a decision, never re-captured to hide growth).
+
+**Depends on**: Nothing in-flight (v8.0 and v10.0 are shipped; this builds on them as they stand)
+**Requirements**: CUT-01, CUT-02, ORG-01
+**Success Criteria** (what must be TRUE):
+
+  1. A worker signs in on the deployed site, sees their pins and next-SOP card, walks a SOP, takes a photo on a step that asks for one and finishes it — with no install prompt, no offline banner and no "saved for later" photo queue — and the finished SOP shows up waiting for sign-off
+  2. No dropped worker feature can be reached: no microphone or read-aloud on any step, no scan button, no machine QR address or printable plate, no shared-device login, and no way to use the app offline
+  3. No dropped authoring feature can be reached: an admin sees no video, flow-diagram or annotation tools on a SOP, the new-SOP entry offers neither YouTube nor photo scan, the reusable-content library pages are gone, and an earlier version can no longer be compared or restored (publishing a new version still works)
+  4. The sign-up page no longer creates an organisation, there is nowhere to switch organisation, and someone with no invitation is told to ask their admin
+  5. Every existing SOP, completion record and photo is still there and opens exactly as before — nothing in the database was dropped
+
+**Plans**: TBD
+
+### Phase 56: A Simpler SOP & the Decision Ledger
+
+**Goal**: A SOP becomes sections and steps, with hazard, PPE, step and check as kinds of step, and every existing SOP is converted without losing any hazard or PPE content. A standard (a plain label such as "LOTO") can sit on a SOP, a section or a step, with one list to manage them (a standalone panel opened from the admin SOP page now; Phase 61 mounts it in the Workshop). Every SOP belongs to a machine or to the whole site, and its department comes from its machine. Alongside, the decision ledger exists — one append-only table the database itself protects — and every action that already makes a decision writes to it. The riskiest change in the milestone, and both the walk screen and the editor depend on it, so it comes before them. The old SOP page and the builder must keep working over converted SOPs until Phase 58 replaces them; the plan states how (the expected shape: original rows kept, the conversion safe to re-run at the Phase 58 cutover so edits made in the old builder in between are not lost).
+
+**Depends on**: Phase 55 (fewer content types to convert; no offline cache holding the old shape)
+**Requirements**: SOP-01, SOP-02, SOP-03, DEC-01, DEC-03, DEC-04
+**Success Criteria** (what must be TRUE):
+
+  1. Every existing SOP on the deployed site still shows every hazard and PPE item it had before, now as a hazard or PPE step inside its section; a before-and-after count per SOP shows nothing lost
+  2. An admin can put a standard such as "LOTO" on a whole SOP, a section or a single step, add, rename and remove standards from one list, and see the label wherever that SOP is shown; SOPs that used content from the old reusable library still show it
+  3. Every SOP says whether it lives on one or more machines or on the whole site, and shows the department of its machine; SOPs that had no machine are site-wide until an admin places them
+  4. Approving, rejecting, signing off, assigning, publishing, changing an owner, recording an observation and clearing an AI finding each write one decision naming who, when, what and what it was about; a decision made by an AI agent names the agent
+  5. Nobody — worker, supervisor or admin — can change or delete a decision once it is written; the database refuses the attempt even when the screen is bypassed
+
+**Plans**: TBD
+
+### Phase 57: The One Screen & Its Places
+
+**Goal**: After signing in, everyone lands on one screen — a list on the left, the isometric site in the middle, a detail panel on the right — and there is no header navigation anywhere. Four fixed rooms (Office, Smoko room, Workshop, Noticeboard) stand on the site beside the machines, signposted by name at every zoom, and any place can be chosen from the map or from the list with identical results. Machines carry their SOPs with a status badge each, the Noticeboard carries the site-wide SOPs, pins show what is due (worker) or what has no owner or an overdue review (admin), search finds machines and the SOPs on them, and a "next for you" card leads the list. Admins edit the site (machines, departments, room positions) from the map; departments exist only as zones on the drawing and the departments screen is deleted. Builds on the v10.0 scene renderer, pins and machine panel rather than rebuilding them. Retires the worker plant home, the admin library table, the dashboard and the header navigation; rooms not yet re-homed use the bridge described above.
+
+**Depends on**: Phase 56 (SOP kinds, machine-or-site placement); Phase 55 (offline, phone home and QR gone from the surface being replaced)
+**Requirements**: SHL-01, SHL-02, SHL-04, SHL-05, PLC-01, PLC-02, PLC-03, PLC-04, PLC-05
+**Success Criteria** (what must be TRUE):
+
+  1. After signing in, a user lands on one screen with a list, the site and a detail panel; there is no header navigation on it or on any page it opens
+  2. Clicking a room or machine on the site, or its row in the list, does the same thing: the shape highlights, the camera moves to it and the detail panel fills; Esc returns to the full site view
+  3. Office, Smoko room, Workshop and Noticeboard are signposted by name at every zoom; selecting a machine lists its SOPs with a status badge each — a worker can walk any published one, an admin can also edit it or start a new SOP for that machine — and selecting the Noticeboard does the same for the site-wide SOPs
+  4. A worker sees how many SOPs are due at each place and a "next for you" card with Walk it and Show me; an admin sees where a SOP has no owner or an overdue review, a count on the Office and the Workshop, and a card saying how many things wait in the Office with a button that opens it; typing in the search box filters the list and lights the matching shapes (machine names and the titles of the SOPs on them)
+  5. An admin can switch the site into edit mode from the map to add, rename, reshape or remove machines and departments and to drag each room's shape to a new place; there is no departments screen
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 58: The SOP Focus Screen — Walk & Edit
+
+**Goal**: Opening a SOP gives it the whole screen. To walk it: a slim top bar, its sections and steps down the left, the current step alone in one centred column — hazard and PPE steps acknowledged before going on, a photo where a step asks for one, and the last step recording the completion and sending it for sign-off. To edit it: the same frame with steps grouped under their sections, the AI check at the top, a tick on every step, and Publish only after every step is ticked and every AI finding cleared. Nothing else from the site is on screen, and Back or Esc returns to the one screen with the place still selected. A SOP still being read from a document or a video opens in the editor showing what is happening, never an empty page. Re-homes the Phase 26 inline editor and the walkthrough over the Phase 56 model; the publish gate and tick-each-step carry over untouched. Deletes the tabbed SOP page, the old walkthrough screens, the admin builder routes and builder-only chrome in this phase, and repoints every link to them.
+
+**Depends on**: Phase 57 (the places that open a SOP and that Back returns to); Phase 56 (the SOP shape)
+**Requirements**: FOC-01, FOC-02, FOC-03, FOC-04, WRK-03, WRK-04, SOP-04
+**Success Criteria** (what must be TRUE):
+
+  1. A worker opens a SOP from a machine and the map and list disappear: a slim top bar with Back and the SOP's title, its sections and steps down the left, and the current step alone in one centred column; no map, list, inbox count or notification is anywhere on screen
+  2. Walking: hazard and PPE steps must be acknowledged before the worker can go on, a step that asks for a photo takes one, and finishing the last step records the completion and puts it in line for sign-off
+  3. An admin opens the same SOP to edit: steps sit under their sections in one centred column, version, machine and standards sit quietly in the left rail, the AI check's findings are at the top, and Publish stays unavailable until every step is ticked as checked and every finding is cleared — there is no tick-all control
+  4. A SOP still being read from a document or a video opens in the editor saying what is happening and roughly how long it will take, never as an empty page, and getting there does not reload the whole app
+  5. Publishing a new version means workers always get the latest published one while earlier versions stay on record; Back or Esc from any open SOP returns to the one screen with the place the user came from still selected
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 59: The Office
+
+**Goal**: The Office room becomes the one home of governance. Its inbox lists every thing to do — assign an owner, mark reviewed, sign off or reject a completion (with its photos), approve or send back a SOP in a chain — each with one button, and an empty inbox is the goal. Beside it: the decision ledger read newest first; people and roles (invite, set Worker / Supervisor / SOP Admin / Safety Manager, see department); and the current access wiring screen, opened unchanged. Tables widen the detail panel while the site stays visible and re-centres on the Office. Every SOP carries an owner and a review date wherever an admin sees it listed. Re-homes the Phase 54 inbox, the Phase 28/29 owner, review and approval machinery, the team page, supervisor review of completions and the Phase 32/33 wiring screen; deletes the governance page, the team pages, the org-chart views and supervisor review pages in this phase (the worker's own record moves in Phase 61).
+
+**Depends on**: Phase 57 (the Office room and the shell); Phase 56 (the ledger being read)
+**Requirements**: OFF-01, OFF-02, OFF-03, OFF-04, OFF-05, OFF-06, DEC-02, SHL-06
+**Success Criteria** (what must be TRUE):
+
+  1. Selecting the Office opens an inbox where every row is one thing with one button; clearing a row removes it, and an empty inbox says so as the goal
+  2. A supervisor sees a worker's finished SOP with its photos in the inbox and signs it off or rejects it there; a person named in an approval chain sees the SOP waiting for them and approves it or sends it back
+  3. Every SOP an admin sees listed shows its owner and review date, and the owner can mark it reviewed
+  4. The decisions tab lists the ledger newest first and can be narrowed by kind of decision; opening it, people and roles, or access widens the detail panel while the site stays visible and re-centres on the Office
+  5. An admin invites a person, sets their role, sees their department, and opens the existing access wiring screen, unchanged, to decide who sees which SOPs
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 60: Requests, Notifications & Objectives
+
+**Goal**: Three more of the eight data types, and the site overview they feed. Anyone can raise a request (change a SOP, write a new SOP, observe me doing a job); a supervisor or admin accepts or declines it in the Office, the answer is written to the ledger and the asker is told; a supervisor can also ask a role or a person to do a SOP, which once accepted shows as due. An AI agent can raise requests, and can read and set objectives through the existing AI field interface; what it raises or sets is marked as coming from an agent. Notifications are in-app only: a bell with a count in the list, each item opening the place it is about. Objectives are short free-text statements on the site, a department, a machine, a SOP or a person, shown as quiet metadata saying who set them. With nothing selected, the detail panel becomes the site overview of objectives, notifications and open requests. Lands before the Workshop so a worker's ask for a change has somewhere to go. Deletes the old assign-a-SOP screens as assignments become requests.
+
+**Depends on**: Phase 59 (the Requests tab lives in the Office; accept and decline write through the ledger); Phase 56 (decision writer)
+**Requirements**: RQS-01, RQS-02, RQS-03, RQS-04, NTF-01, NTF-02, OBJ-01, OBJ-02, OBJ-03, SHL-03
+**Success Criteria** (what must be TRUE):
+
+  1. With nothing selected the detail panel shows the site overview: the objectives, the user's notifications and the user's open requests
+  2. Any user raises a request (change a SOP, write a new SOP, observe me) and sees the state of every request they raised; a supervisor or admin accepts or declines it in the Office, the answer appears in the decision ledger, and the person who asked is told
+  3. A supervisor or admin asks a role or a named person to do a SOP; once accepted it shows as due for those people on their machines and in their "next for you" card
+  4. The bell in the list shows a count, and a person is notified when they are next to approve a SOP, when a SOP they own is due for review, when a completion waits for their sign-off, when a request they raised is answered and when a SOP they do has a new version; opening a notification goes to the place it is about
+  5. An admin sets, changes and removes an objective on the site, a department, a machine, a SOP or a person, and it shows as quiet metadata saying who set it; an AI agent's request appears in the Office marked as from an agent, and an objective an agent set stays marked until a person confirms it
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 61: The Workshop & the Smoko Room
+
+**Goal**: The Workshop is where SOPs are written and edited: an admin starts a new SOP in exactly four ways — upload a document, describe it to AI, record a video, start blank — each shown once, each asking for a title and where the SOP lives (a machine or the whole site) before anything is created, and each opening the same focus editor. The Workshop lists SOPs in progress with their state in plain words, lets an admin choose which AI model reads documents and which checks drafts, hosts the standards list from Phase 56, and lets a worker ask for a change or a new SOP (a request in the Office). The Smoko room is training: the matrix of people against SOPs, one simple observation record written to the ledger, and each person's own record. Deletes the old new-SOP wizard, upload and AI-draft routes, the admin SOP list and AI settings page, the training, refresher-cadence, CSV-export and observation pages, and the worker's activity and profile pages, as each is replaced.
+
+**Depends on**: Phase 58 (the focus editor every path lands in); Phase 60 (requests, for a worker's change request and "observe me"); Phase 59 (the wide detail panel the matrix uses)
+**Requirements**: WRK-01, WRK-02, WRK-05, WRK-06, WRK-07, SMK-01, SMK-02, SMK-03
+**Success Criteria** (what must be TRUE):
+
+  1. Selecting the Workshop as an admin offers exactly four ways to start a SOP — upload a document, describe it to AI, record a video, start blank — each shown once; each asks for a title and a machine or the whole site before anything is created and then opens the same editor; "Write a SOP for this machine" arrives with the machine filled in
+  2. The Workshop lists SOPs in progress with their state in plain words — being read, AI found things, steps left to check, waiting for approval — and opens any of them in the editor; an admin can pick which AI model reads documents and which checks drafts, and manage the list of standards there
+  3. A worker who enters the Workshop can ask for a change to a SOP or for a new one, and it shows up as a request in the Office
+  4. In the Smoko room a supervisor or admin sees a matrix of people against SOPs (not started, read, done, seen doing it right) in a widened panel, and can record that they watched someone do a SOP — done right or needs support — as one simple record that also appears in the decision ledger
+  5. Any user sees their own training record and what has been recorded about them in the Smoko room
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 62: Removal Certified, Addresses & Maps
+
+**Goal**: Everything the milestone promised is proven true. Every address from the old app redirects to the matching place on the one screen, and every place and every tab inside a room has its own address, so a link or a refresh returns to the same place. The dropped governance and training features — refresher cadence, CSV export, the departments screen, org-chart views — are confirmed gone (each was deleted in the phase that replaced it; this phase sweeps for leftovers). The code, routes, API endpoints, packages and scheduled jobs that existed only for dropped features are gone, the app builds and lints clean without them, and a guard fails the build if a dropped route or package comes back (built from the dropped list Phases 55–61 kept). The pathways map and the feedback (UAT) page are rebuilt for the one-screen app. Last because it can only be certified once every room exists and every old page is retired.
+
+**Depends on**: Phase 61 (every room built, every old page retired)
+**Requirements**: CUT-03, CUT-04, CUT-05, SHL-07
+**Success Criteria** (what must be TRUE):
+
+  1. Opening each old address — the SOP list, governance, activity, profile, team, site admin, settings, content library, builder and upload — lands on the matching place on the one screen, never on a not-found page
+  2. Copying the address of any place, or of any tab inside a room, into a fresh browser — or refreshing — returns to the same place and tab
+  3. There is no refresher cadence, CSV export, departments screen or org-chart view anywhere in the app; the app builds and lints clean without the dropped code, and putting a dropped route or package back fails the build
+  4. The pathways map describes the one-screen app with no screen flagged as not mapped and no screen that no longer exists, and the feedback page lists only checks that describe the one-screen app
+
+**Plans**: TBD
+**UI hint**: yes
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 21.6 → 22 → 23 → 24 → 25** (v4.0) → **26 → 26.5** (v5.0) → **27** (v5.0 close) → **28 → 29 → 30** (v6.0) → **34 → 35 → 36 → 37** (v7.0; 38/39 deferred to backlog) → **40 → 41 → 42** (v8.0) → **51 → 52 → 53 ∥ 54** (v10.0) → 43 (v8.0 route truth, after 54)
+Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 21.6 → 22 → 23 → 24 → 25** (v4.0) → **26 → 26.5** (v5.0) → **27** (v5.0 close) → **28 → 29 → 30** (v6.0) → **34 → 35 → 36 → 37** (v7.0; 38/39 deferred to backlog) → **40 → 41 → 42** (v8.0) → **51 → 52 → 53 ∥ 54** (v10.0) → 43 (v8.0 route truth, after 54) → **55 → 56 → 57 → 58 → 59 → 60 → 61 → 62** (v11.0; supersedes v8.0 Phase 42 and the unstarted v9.0 phases)
 
 **v3.0 closeout 2026-05-23.** Phases 16, 17, 18 deferred to v4.0 backlog. Phase 19 deleted (no remaining dependencies). Phase 20 partial — DOCX-to-builder slice shipped on master; remaining safety-critical verification scope carried to v4.0 Phase 21.
 
@@ -1697,6 +1869,8 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 **v7.0 kicked off 2026-07-19 · roadmap created 2026-07-19 (6 phases).** Phase 34 (supervisor observations) → Phase 35 (competency classifier + training matrix + records) → Phase 36 (refresher cadence + version-currency) → Phase 37 (assessor governance) → Phase 38 (guidance-notes adoptions — parallel-safe with 35-37) → Phase 39 (AI-prioritized maintenance schedule). Absorbs v6.0's unshipped Phase 31 and promotes backlog 999.4-999.7. North star carried: competency tracking never gates worker access.
 
 **v8.0 kicked off 2026-07-28 · roadmap created 2026-07-28 (3 phases, coarse granularity).** Phase 40 (shared creation foundation — one intake / picker / progress / shell component, one category column + backfill) → Phase 41 (one creation flow — every on-ramp from one entry, same metadata, lands in the builder, honest parse state) → Phase 42 (dead-surface removal + route truth). Strictly sequential. CONSOLIDATION milestone: every requirement removes, merges, or unifies something that already exists — no new authoring capabilities. Numbering starts at 40; 38/39 are burned. Implements design contract D-A1 ("one flow, not four").
+
+**v11.0 kicked off 2026-10-03 · roadmap created 2026-10-03 (8 phases, coarse granularity).** Phase 55 (cut the dropped features, go single-organisation) → Phase 56 (simpler SOP + decision ledger) → Phase 57 (the one screen and its places) → Phase 58 (SOP focus screen: walk and edit) → Phase 59 (the Office) → Phase 60 (requests, notifications, objectives) → Phase 61 (Workshop and Smoko room) → Phase 62 (removal certification, route truth, rebuilt maps). Strictly sequential. SIMPLIFICATION milestone: mostly re-homing and deleting shipped code; genuinely new are the decision ledger, requests, objectives, standards labels, hazard/PPE as step kinds (a data conversion of every existing SOP), the shell and the focus rule. Supersedes v8.0 Phase 42 and the unstarted v9.0 phases 44a/44b/45/47/48/49/50 (Phase 46 stays complete). Numbering continues at 55 (44a–50 stay v9.0's and are not reused). 55/55 requirements mapped. Design contract: `.claude/skills/sketch-findings-SOPstart/references/one-screen-site.md`.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -1744,9 +1918,18 @@ Phases execute in numeric order: 1 → … → 15 → 20 → **21 → 21.5 → 2
 | 37. Assessor Governance | 8/8 | Complete    | 2026-07-28 |
 | 38. Guidance-Notes Adoptions | 0/0 | Deferred → backlog 999.4 + 999.5 | 2026-07-28 |
 | 39. AI-Prioritized Maintenance Schedule | 0/0 | Deferred → backlog 999.6 | 2026-07-28 |
-| **40. Shared Creation Foundation (v8.0)** | 0/0 | Not started |  |
-| **41. One SOP Surface (v8.0)** | 6/9 | Executing |  |
-| **42. Dead-Surface Removal & Route Truth (v8.0)** | 0/0 | Not started |  |
+| **40. Shared Creation Foundation (v8.0)** | 14/14 | Complete | 2026-07-29 |
+| **41. One SOP Surface (v8.0)** | 9/9 | Complete | 2026-09-15 |
+| **42. One Creation Flow (v8.0)** | — | Superseded → v11.0 | 2026-10-03 |
+| **43. Dead-Surface Removal & Route Truth (v8.0)** | 5/5 | Complete | 2026-09-30 |
+| **55. Cut the Dropped Features & One Organisation (v11.0)** | 0/0 | Not started |  |
+| **56. A Simpler SOP & the Decision Ledger (v11.0)** | 0/0 | Not started |  |
+| **57. The One Screen & Its Places (v11.0)** | 0/0 | Not started |  |
+| **58. The SOP Focus Screen — Walk & Edit (v11.0)** | 0/0 | Not started |  |
+| **59. The Office (v11.0)** | 0/0 | Not started |  |
+| **60. Requests, Notifications & Objectives (v11.0)** | 0/0 | Not started |  |
+| **61. The Workshop & the Smoko Room (v11.0)** | 0/0 | Not started |  |
+| **62. Removal Certified, Addresses & Maps (v11.0)** | 0/0 | Not started |  |
 
 ## Backlog
 

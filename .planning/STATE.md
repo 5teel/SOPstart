@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: One-Screen MVP
 status: planning
-last_updated: "2026-10-02T14:38:29.337Z"
+last_updated: "2026-10-03T00:00:00.000Z"
 last_activity: 2026-10-02
 progress:
-  total_phases: 0
+  total_phases: 8
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -17,17 +17,40 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-13)
+See: .planning/PROJECT.md (updated 2026-10-03)
 
-**Core value:** Workers can reliably follow any SOP on their phone, step-by-step, with the right safety information always visible — even offline.
-**Current focus:** Phase 43 — dead-surface-removal-route-truth
+**Core value:** A worker can find the SOP for the machine in front of them and follow it step by step with nothing else on the screen — and the business can see, in one ledger, who decided and did what.
+**Current focus:** Phase 55 — Cut the Dropped Features & One Organisation (not started)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 55 (1 of 8 in v11.0)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-10-02 — Milestone v11.0 started
+Status: Roadmap created — ready to discuss/plan Phase 55
+Last activity: 2026-10-03 — v11.0 roadmap created
+
+### v11.0 roadmap (created 2026-10-03)
+
+Eight phases, coarse granularity, strictly sequential (55 → 62). SIMPLIFICATION milestone — mostly re-homing and deleting shipped code; the genuinely new work is the decision ledger, requests, objectives, standards labels, hazard and PPE as kinds of step (a data conversion of every existing SOP), the shell with its rooms, and the focus rule. Numbering continues at **55** (44a–50 belong to the superseded v9.0 and are not reused). Supersedes v8.0 Phase 42 and the unstarted v9.0 phases 44a/44b/45/47/48/49/50.
+
+| Phase | Goal (one line) | Requirements |
+|-------|-----------------|--------------|
+| 55. Cut the Dropped Features & One Organisation | Delete offline, voice, phone/QR, shared-device login, video generation, flow diagram, annotation, YouTube/photo-scan, library pages, version compare/restore; one organisation, invitation only; worker path keeps working online | CUT-01, CUT-02, ORG-01 (3) |
+| 56. A Simpler SOP & the Decision Ledger | Every SOP converted to sections and steps (hazard/PPE as step kinds), standards as labels, machine-or-site placement; one append-only decision ledger written by every existing decision path | SOP-01..03, DEC-01, DEC-03, DEC-04 (6) |
+| 57. The One Screen & Its Places | List · isometric site · detail panel as the landing screen; four signposted rooms; search, next-for-you card, pins; site edit mode; no header navigation | SHL-01, SHL-02, SHL-04, SHL-05, PLC-01..05 (9) |
+| 58. The SOP Focus Screen — Walk & Edit | An open SOP owns the screen: walk one step at a time to a sign-off, or edit with AI check and tick-each-step before publish; new versions; parse-in-progress state | FOC-01..04, WRK-03, WRK-04, SOP-04 (7) |
+| 59. The Office | Inbox that drains, sign-off and approvals, decision ledger, people and roles, the existing access wiring; detail panel widens for tables | OFF-01..06, DEC-02, SHL-06 (8) |
+| 60. Requests, Notifications & Objectives | Requests people and agents raise and the Office answers; notifications with a bell; objectives as quiet metadata; the site overview fills in | RQS-01..04, NTF-01, NTF-02, OBJ-01..03, SHL-03 (10) |
+| 61. The Workshop & the Smoko Room | Four ways to start a SOP, in-progress list, AI model choice, worker change requests; training matrix, simple observations, my record | WRK-01, WRK-02, WRK-05..07, SMK-01..03 (8) |
+| 62. Removal Certified, Addresses & Maps | Every old address redirects, every place has an address, build guard against dropped routes and packages, pathways map and feedback page rebuilt | CUT-03..05, SHL-07 (4) |
+
+**Coverage:** 55/55 mapped, 0 unmapped, 0 duplicated (3 + 6 + 9 + 7 + 8 + 10 + 8 + 4).
+
+**Sequencing:** Cut first (55) — the offline cache sits under the worker data path the pins and Now card read, and voice/video/flow/annotation multiply the content the SOP conversion would carry. SOP shape + ledger next (56) — SOP-01 converts every existing SOP, the riskiest change in the milestone, and both the walk screen and the editor depend on it. Then the shell (57), the focus screen (58), the Office (59) and requests/notifications/objectives (60) — requests before the Workshop because WRK-07 needs them — then Workshop + Smoko room (61). Certification last (62): "every old address redirects", "no dropped route or package can come back" and the rebuilt pathways map can only be certified once every room exists. Each earlier phase deletes the page it replaces, and rooms not yet re-homed open the existing page behind a "Back to the site" link until their phase lands.
+
+**Departures from the scoping order:** SHL-03 (site overview) is in Phase 60 and SHL-06 (wide panel) in Phase 59 — the shell phase has neither the data nor a table to show. SHL-07 is certified in Phase 62 but each place gets its address as it is built.
+
+**Standing constraints for every v11.0 phase:** plain words ("section" and "step", never "block"; no internal IDs in UI copy) · a deployed eval per screen-touching phase with screenshots read · `journeys.ts` and `CAPABILITY-MATRIX.md` change in the same commit as the route or gate they describe · removal is deletion, but no database table or customer row is dropped · RLS on for every table, new ones included (`rls-org-scope.spec.ts` stays green) · `assertPublishGates()` and tick-each-step never weakened, no bulk-verify · metric units and Celsius in AI-written content · Phase 43's dead-href lint and route-truth guards stay green as routes are deleted (repoint, never suppress).
 
 ### v8.0 roadmap (created 2026-07-28 · re-derived 2026-07-28 after the SUR scope correction)
 
@@ -682,10 +705,6 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-10-02
-Stopped at: Session resumed. Phase 43 complete, verified and pushed (HEAD 765c995).
-Nothing in flight. Next: Phase 42 (One Creation Flow) — discuss/plan. Phase 43
-ran ahead of 42, so 42 must keep the Phase 43 route-truth guards green when it
-orphans /admin/sops/upload, /admin/sops/new/ai and /admin/sops/new/blank.
-Resume file:
-None (.planning/.continue-here.md is a stale 2026-09-29 v10.0 closeout note)
+Last session: 2026-10-03
+Stopped at: v11.0 roadmap created; next /gsd-discuss-phase 55
+Resume file: None
