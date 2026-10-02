@@ -1,6 +1,6 @@
 ---
 name: sketch-findings-SOPstart
-description: Validated design decisions, tokens, CSS patterns, new block types, and interaction flows from the SOPstart sketch explorations — blueprint redesign, org model + library permissions, and the SOP authoring/creation flow (new-SOP wizard, inline builder canvas, block inserter, AI ghosts, read/walk/edit modes). and the plant-floor navigation model (isometric site as the worker home, QR phone, admin inbox). Auto-loads when building UI for SafeStart / sopstart.com.
+description: Validated design decisions, tokens, CSS patterns, new block types, and interaction flows from the SOPstart sketch explorations — blueprint redesign, org model + library permissions, and the SOP authoring/creation flow (new-SOP wizard, inline builder canvas, block inserter, AI ghosts, read/walk/edit modes). and the plant-floor navigation model (isometric site as the worker home, QR phone, admin inbox), and the 2026-10 one-screen MVP shell (list · isometric site · detail; Office/Smoko room/Workshop/Noticeboard as rooms; an open SOP takes the whole screen; eight-type data model) which SUPERSEDES parts of the earlier references. Auto-loads when building UI for SafeStart / sopstart.com.
 ---
 
 <context>
@@ -43,6 +43,18 @@ by library health, and the library is a plain table with a checks row. **NOT shi
 — it is the design contract that replaces the Phase 41 `/sops` scope column (see
 `references/plant-floor-navigation.md`). First sketch to use generated image assets
 (Nano Banana 2).
+
+**Fifth wrap-up 2026-10-03 — the MVP simplification** (`.planning/sketches/008-one-screen-site`,
+winner A + focus rule). Simon cut the app to an MVP on 2026-10-02: ONE screen (list ·
+isometric site · detail), no header navigation, governance / training / authoring as rooms
+on the site (Office / Smoko room / Workshop), a Noticeboard for site-wide SOPs, machines
+carrying their SOPs. Opening a SOP removes the map and the list — the SOP owns the screen.
+The data model is re-founded on eight types (decisions · objectives · requests ·
+notifications · SOP · steps · standards · users). A long list of features is dropped
+(offline, voice, phone/QR, video generation, flow diagram, annotation, refresher cadence,
+reuse library, org chart, multi-org). **NOT shipped. `references/one-screen-site.md` is the
+governing contract and overrides older references where they conflict** — it carries the
+supersession table.
 </context>
 
 <design_direction>
@@ -74,6 +86,7 @@ by library health, and the library is a plain table with a checks row. **NOT shi
 
 | Area | Reference | Key decision |
 |------|-----------|--------------|
+| **One-screen site — MVP shell** ⚠ **not shipped · governs** | references/one-screen-site.md | Three panes (list 256 · site · detail 400, wide for tables); Office/Smoko room/Workshop/Noticeboard/machines are the only destinations; **an open SOP takes the whole screen** (map + list removed); eight-type data model; kept/dropped feature list; supersession table for every older reference |
 | Design tokens | references/design-tokens.md | Paper/ink palette + JetBrains Mono + 20px grid-paper bg; 6 semantic accent colors |
 | Layout primitives | references/layout-primitives.md | Pills, tabs, grid-paper bg, card frames, evidence buttons, measurement box, decision buttons |
 | Screen inventory | references/screen-inventory.md | 8 tabs: overview, tools, hazards, flow, model, walkthrough (desktop + mobile), cmdk, voice |
@@ -96,6 +109,7 @@ Original sketch HTML preserved at `sources/blueprint-sketch.html` (2015 lines, a
 <routing>
 ## When reading this skill, also read
 
+- `references/one-screen-site.md` **FIRST, always** — the 2026-10 MVP simplification. It says which parts of every reference below still apply and which are dropped. Do not build from an older reference without checking its row in that file's "What this supersedes" table.
 - `references/design-tokens.md` if implementing palette, typography, or globals
 - `references/layout-primitives.md` if building reusable components (pills, tabs, cards)
 - `references/screen-inventory.md` if implementing a specific tab / screen
@@ -143,6 +157,10 @@ Original sketch HTML preserved at `sources/blueprint-sketch.html` (2015 lines, a
 - `006-sop-navigation-model` — processed, **superseded by 007** (kept in `.planning/sketches/` as the record of why the column reshape wasn't enough)
 - `004-admin-sop-hub-hierarchy`, `005-sop-library-altitude` — processed, deliberately excluded (shipped as Phase 41 / the 2026-08-04 Miller page; code is source of truth — and 007 now retires that surface)
 
+### Wrapped 2026-10-03
+
+- `008-one-screen-site` (winner A, three panes + focus rule) → references/one-screen-site.md; source in `sources/008-one-screen-site/` (reuses the 007 scene assets; smoko room / workshop / noticeboard are SVG placeholders)
+
 ## Related planning docs
 
 - `.planning/sketches/WRAP-UP-FINDINGS.md` — the raw analysis doc that seeded this skill
@@ -150,5 +168,5 @@ Original sketch HTML preserved at `sources/blueprint-sketch.html` (2015 lines, a
 
 ## Wrap-up
 
-2026-04-24 (blueprint redesign) · 2026-07-18 (org model + permissions) · 2026-07-28 (authoring & creation flow)
+2026-04-24 (blueprint redesign) · 2026-07-18 (org model + permissions) · 2026-07-28 (authoring & creation flow) · 2026-09-28 (plant-floor navigation) · 2026-10-03 (one-screen MVP shell)
 </metadata>

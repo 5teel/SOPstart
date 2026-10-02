@@ -265,3 +265,40 @@ on generated image assets (Nano Banana 2, five first-shot generations).
 - Phone demotes the scene to a thumbnail; camera + ask are the navigation.
 - Kiosk / shared terminal dropped (Simon, 2026-09-28).
 - New data: `site_layouts`, `site_machines` (polygons in scene px), `sop_machines`.
+
+---
+
+# Sketch Wrap-Up Summary — Session 5
+
+**Date:** 2026-10-03
+**Sketches processed:** 1 (008 included)
+**Design areas:** One-screen site (MVP shell)
+**Skill output:** `./.claude/skills/sketch-findings-SOPstart/references/one-screen-site.md`
+
+## Included
+| # | Name | Winner | Design Area |
+|---|------|--------|-------------|
+| 008 | one-screen-site | A (three panes) + focus rule: an open SOP takes the whole screen | One-screen site (MVP shell) |
+
+## Excluded
+None. Variants B (sheets over the map) and C (step inside) stay in the sketch file as rejected alternatives.
+
+## Design Direction
+The MVP simplification (Simon, 2026-10-02). The app is one screen: a list, the isometric
+site, a detail panel. No header navigation. Governance, training and authoring are rooms on
+the site (Office, Smoko room, Workshop); site-wide SOPs live on a Noticeboard; machines carry
+their SOPs. Curated without a question round: Simon asked for the wrap-up and the new
+milestone to run unsupervised.
+
+## Key Decisions
+- Three panes: list 256 · site · detail 400; detail widens to ~58% for tables; the map never leaves.
+- Focus rule: opening a SOP (walk or edit) removes the map and the list; the screen is the SOP's sections and steps and nothing else from the site.
+- A SOP is sections and steps; hazard and PPE are kinds of step.
+- Standards are labels at SOP / section / step level; the reusable-content library retires.
+- Decisions are one append-only ledger (approvals, sign-offs, assignments, publishes, observations).
+- Objectives are metadata beside any type, settable and readable by people and agents.
+- Requests cover change-a-SOP, assign, observe-me, new-SOP; people and agents raise them.
+- Departments and machines are part of the site drawing; people and roles live in the Office; access keeps the current wiring screen.
+- Single organisation (Visy).
+- Dropped: offline, voice, phone/QR, video generation, flow diagram, image annotation, refresher cadence, CSV export, version compare/restore, YouTube and photo-scan on-ramps, org chart, shared-device login.
+- The skill's older references are annotated with what still applies; `one-screen-site.md` governs.

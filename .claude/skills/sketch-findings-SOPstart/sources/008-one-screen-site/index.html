@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sketch 008 — One screen: the site is the app</title>
+<link rel="stylesheet" href="../themes/default.css">
+<style>
+  html, body { height: 100%; } body { overflow: hidden; }
+  #variant-nav .spacer { flex: 1; }
+  #variant-nav .vl { color: rgba(255,255,255,.5); font-size: 10px; letter-spacing: .08em; }
+  #variant-nav .role { display: flex; gap: 2px; border: 1px solid rgba(255,255,255,.25); border-radius: 3px; padding: 2px; }
+  #variant-nav .role button { font: inherit; font-size: 11px; font-weight: 600; background: transparent; color: rgba(255,255,255,.7); border: 0; padding: 3px 10px; border-radius: 2px; cursor: pointer; }
+  #variant-nav .role button.active { background: #fff; color: var(--ink-900); }
+  button { transition: background .15s, border-color .15s, color .15s, opacity .15s; }
+
+  /* ── shell: three layouts over one DOM ───────────────────── */
+  .app { position: relative; height: calc(100vh - 46px); overflow: hidden; background: #f5f5f4; margin: 0 auto; }
+  .nav, .info { background: var(--paper-1); display: flex; flex-direction: column; min-height: 0; min-width: 0; overflow: hidden; }
+  .stage { position: relative; overflow: hidden; min-width: 0; background: #f5f5f4; }
+  .scrim { position: absolute; inset: 0; background: rgba(9,9,11,.38); backdrop-filter: blur(2px); opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 5; }
+
+  /* A — three panes, everything docked */
+  .app[data-v=a] { display: grid; grid-template-columns: 256px 1fr 400px; }
+  .app[data-v=a].wide { grid-template-columns: 256px 1fr minmax(560px, 58%); }
+  .app[data-v=a] .nav { border-right: 1px solid var(--ink-300); }
+  .app[data-v=a] .info { border-left: 1px solid var(--ink-300); }
+  /* A · focus: an open SOP owns the whole screen — no map, no list, nothing else from the site */
+  .app[data-v=a].focus { grid-template-columns: 1fr; }
+  .app[data-v=a].focus .nav, .app[data-v=a].focus .stage, .app[data-v=a].focus .data { display: none; }
+  .app[data-v=a].focus .info { border-left: 0; }
+  .app[data-v=a].focus .ih { padding: 12px 24px; } .app[data-v=a].focus .crumb { font-size: 13px; }
+  .app[data-v=a].focus .workgrid { grid-template-columns: 300px minmax(0, 1fr); }
+  .app[data-v=a].focus .wl { font-size: 14px; padding: 22px 14px; } .app[data-v=a].focus .wl .st { padding: 8px 10px; }
+  .app[data-v=a].focus .wc { padding: 36px 40px; display: flex; flex-direction: column; align-items: center; }
+  .app[data-v=a].focus .wc > * { width: 100%; max-width: 820px; }
+  .app[data-v=a].focus .card { padding: 28px; } .app[data-v=a].focus .card h3 { font-size: 28px; margin: 12px 0; } .app[data-v=a].focus .card p { font-size: 18px; }
+  .app[data-v=a].focus .btn.big { min-height: 60px; font-size: 17px; padding: 0 28px; }
+  .app[data-v=a].focus .bs { padding: 14px 16px; } .app[data-v=a].focus .bs .t { font-size: 16px; }
+  .app[data-v=a].focus .pubbar { padding: 12px 24px; }
+
+  /* B — the map is the whole screen; panels float, rooms open as sheets */
+  .app[data-v=b] .stage { position: absolute; inset: 0; }
+  .app[data-v=b] .nav { position: absolute; left: 12px; top: 12px; bottom: 12px; width: 272px; border: 1px solid var(--ink-300); border-radius: 12px; box-shadow: 0 6px 24px rgba(0,0,0,.14); z-index: 6; }
+  .app[data-v=b] .info { position: absolute; right: 12px; top: 12px; bottom: 12px; width: 380px; border: 1px solid var(--ink-300); border-radius: 12px; box-shadow: 0 6px 24px rgba(0,0,0,.16); z-index: 7; transform: translateX(115%); transition: transform .25s ease; }
+  .app[data-v=b].sel .info { transform: none; }
+  .app[data-v=b].wide .info { left: 300px; right: 16px; width: auto; top: 40px; bottom: 0; border-radius: 14px 14px 0 0; border-bottom: 0; }
+  .app[data-v=b].wide .scrim { opacity: 1; pointer-events: auto; }
+  .app[data-v=b] .maptools { left: 300px; }
+
+  /* C — step inside: the place becomes the screen, the map shrinks into the sidebar */
+  .app[data-v=c] { display: grid; grid-template-columns: 288px 1fr; }
+  .app[data-v=c] .nav { border-right: 1px solid var(--ink-300); }
+  .app[data-v=c] .info { display: none; }
+  .app[data-v=c].sel .stage { display: none; }
+  .app[data-v=c].sel .info { display: flex; }
+  .app[data-v=c].sel .ib, .app[data-v=c].sel .workgrid { max-width: 1100px; width: 100%; margin: 0 auto; }
+  .app[data-v=c].editing { grid-template-columns: 288px 1fr 380px; }
+  .app[data-v=c].editing .stage { display: block; }
+  .app[data-v=c].editing .info { border-left: 1px solid var(--ink-300); }
+
+  /* ── map ─────────────────────────────────────────────────── */
+  .world { position: absolute; left: 0; top: 0; width: 2000px; height: 1116px; transform-origin: 0 0; will-change: transform; cursor: grab; }
+  .world.drag { cursor: grabbing; }
+  .world img, .cw img, .mw img { position: absolute; inset: 0; width: 2000px; height: 1116px; user-select: none; -webkit-user-drag: none; pointer-events: none; }
+  .world svg, .cw svg, .mw svg { position: absolute; inset: 0; width: 2000px; height: 1116px; overflow: visible; }
+  .art { pointer-events: none; }
+  .hs { fill: rgba(9,9,11,0); stroke: transparent; stroke-width: 2; cursor: pointer; transition: fill .15s, stroke .15s; }
+  .hs.room { stroke: rgba(9,9,11,.4); stroke-dasharray: 2 5; }
+  .hs:hover, .hs.hover { fill: rgba(59,130,246,.14); stroke: var(--accent-step); stroke-dasharray: none; }
+  .hs.due { fill: rgba(217,119,6,.10); stroke: rgba(217,119,6,.55); stroke-dasharray: 6 4; }
+  .hs.bad { fill: rgba(185,28,28,.10); stroke: rgba(185,28,28,.6); stroke-dasharray: 6 4; }
+  .hs.on { fill: rgba(9,9,11,.10); stroke: var(--ink-900); stroke-width: 3; stroke-dasharray: none; }
+  .hs.zoned.zone-Forming { fill: rgba(234,88,12,.16); } .hs.zoned.zone-General { fill: rgba(37,99,235,.16); } .hs.zoned.zone-Engineering { fill: rgba(124,58,237,.16); }
+  .verts { display: none; pointer-events: none; } .verts circle { fill: #fff; stroke: var(--ink-900); stroke-width: 2; }
+  .stage.editing .verts { display: block; }
+  .stage.editing .hs { stroke: var(--ink-900); stroke-dasharray: 6 4; fill: rgba(9,9,11,.04); }
+  .tag { position: absolute; transform: translate(-50%, -100%) scale(var(--inv, 1)); transform-origin: 50% 100%; pointer-events: none; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .tag .lbl { font-family: var(--mono); font-size: 12px; font-weight: 700; background: rgba(255,255,255,.94); border: 1px solid var(--ink-300); border-radius: 4px; padding: 2px 8px; white-space: nowrap; box-shadow: 0 1px 2px rgba(0,0,0,.08); opacity: 0; transition: opacity .15s; }
+  .tag.hov .lbl, .tag.show .lbl, .world:hover .tag.pin .lbl { opacity: 1; }
+  .tag .sign { font-family: var(--mono); font-size: 13px; background: var(--ink-900); color: #fff; border-radius: 5px; padding: 4px 10px; white-space: nowrap; box-shadow: 0 2px 8px rgba(0,0,0,.25); display: flex; align-items: center; gap: 7px; }
+  .tag .sign b { text-transform: uppercase; letter-spacing: .06em; } .tag .sign em { font-style: normal; color: var(--ink-300); font-size: 11px; }
+  .tag .sign i { font-style: normal; background: var(--brand-yellow); color: var(--ink-900); border-radius: 999px; padding: 0 6px; font-size: 11px; font-weight: 800; } .tag .sign i:empty { display: none; }
+  .tag .pip { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-family: var(--mono); font-size: 12px; font-weight: 800; color: #fff; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.25); animation: bob 1.6s ease-in-out infinite; }
+  .tag .pip.due { background: #d97706; } .tag .pip.bad { background: #b91c1c; } .tag .pip.ok { background: var(--accent-ok); width: 10px; height: 10px; animation: none; border-width: 1.5px; }
+  .tag .stem { width: 2px; height: 14px; background: var(--ink-900); opacity: .6; }
+  @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-4px) } }
+  .maptools { position: absolute; left: 12px; bottom: 12px; z-index: 4; display: flex; gap: 6px; align-items: center; }
+  .hint { font-family: var(--mono); font-size: 10.5px; color: var(--ink-500); background: rgba(255,255,255,.9); border-radius: 6px; padding: 5px 8px; }
+  .editbar { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); z-index: 4; background: var(--brand-yellow); color: var(--ink-900); font-family: var(--mono); font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; display: none; }
+  .stage.editing .editbar { display: block; }
+
+  /* ── shared bits ─────────────────────────────────────────── */
+  .btn { font: inherit; font-size: 13px; border: 1px solid var(--ink-300); background: var(--paper-1); border-radius: 8px; padding: 7px 12px; cursor: pointer; color: var(--ink-700); white-space: nowrap; }
+  .btn:hover { border-color: var(--ink-900); }
+  .btn.primary { background: var(--ink-900); color: #fff; border-color: var(--ink-900); font-weight: 700; }
+  .btn.sm { font-size: 12px; padding: 4px 9px; border-radius: 6px; }
+  .btn.big { min-height: 48px; font-size: 15px; padding: 0 20px; }
+  .btn[disabled] { opacity: .4; cursor: not-allowed; }
+  .badge { font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; white-space: nowrap; }
+  .badge.due, .badge.stale { background: rgba(217,119,6,.16); color: #b45309; } .badge.new { background: rgba(37,99,235,.14); color: var(--accent-measure); }
+  .badge.never, .badge.noowner { background: rgba(185,28,28,.12); color: var(--accent-hazard); } .badge.done { color: var(--ink-400); border: 1px solid var(--ink-200); }
+  .badge.ok { background: rgba(22,163,74,.14); color: var(--accent-ok); } .badge.draft { background: var(--paper-2); color: var(--ink-500); }
+  .k { font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-500); }
+  .tg { font-family: var(--mono); font-size: 10px; color: var(--accent-inspect); background: rgba(124,58,237,.08); border-radius: 3px; padding: 1px 5px; margin-right: 4px; white-space: nowrap; }
+  .obj { display: flex; gap: 8px; align-items: flex-start; font-size: 12.5px; border: 1px dashed var(--ink-300); border-radius: 8px; padding: 7px 10px; margin-bottom: 6px; }
+  .obj b { font-family: var(--mono); font-size: 10px; letter-spacing: .06em; color: var(--accent-zone); white-space: nowrap; padding-top: 2px; } .obj small { display: block; color: var(--ink-500); font-size: 11px; }
+
+  /* ── nav sidebar ─────────────────────────────────────────── */
+  .brand { display: flex; align-items: center; gap: 9px; padding: 12px; flex: 0 0 auto; }
+  .brand .dot { width: 26px; height: 26px; border-radius: 6px; background: var(--ink-900); color: #fff; display: grid; place-items: center; font-family: var(--mono); font-weight: 700; }
+  .brand b { font-family: var(--mono); font-size: 13px; display: block; line-height: 1.15; } .brand small { color: var(--ink-500); font-size: 11px; }
+  .bell { margin-left: auto; position: relative; border: 1px solid var(--ink-200); background: var(--paper-1); border-radius: 8px; width: 34px; height: 34px; cursor: pointer; font-size: 14px; }
+  .bell i { position: absolute; right: -5px; top: -5px; background: #b91c1c; color: #fff; border-radius: 999px; font: 700 10px var(--mono); padding: 1px 5px; font-style: normal; }
+  .mini { margin: 0 12px 10px; border: 1px solid var(--ink-300); border-radius: 8px; overflow: hidden; height: 147px; position: relative; flex: 0 0 auto; background: #f5f5f4; }
+  .mw { position: absolute; left: 0; top: 0; width: 2000px; height: 1116px; transform: scale(.131); transform-origin: 0 0; }
+  .mw .hs.on { fill: rgba(251,191,36,.55); stroke-width: 10; }
+  .mini button { position: absolute; left: 6px; top: 6px; font: 700 10.5px var(--mono); border: 1px solid var(--ink-900); background: #fff; border-radius: 5px; padding: 3px 7px; cursor: pointer; }
+  .ask { margin: 0 12px 10px; display: flex; align-items: center; gap: 8px; border: 1px solid var(--ink-300); border-radius: 8px; padding: 0 10px; height: 38px; flex: 0 0 auto; }
+  .ask input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; }
+  .now { margin: 0 12px 8px; border: 1px solid var(--ink-900); border-radius: 10px; padding: 10px; flex: 0 0 auto; }
+  .now .k { display: flex; justify-content: space-between; } .now h3 { margin: 5px 0 2px; font-size: 14px; line-height: 1.25; } .now .m { font-family: var(--mono); font-size: 10.5px; color: var(--ink-500); margin-bottom: 8px; } .now .cta { display: flex; gap: 6px; }
+  .tree { flex: 1; overflow-y: auto; padding: 0 6px 8px; }
+  .grp { font-family: var(--mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-500); padding: 10px 8px 4px; }
+  .row { display: flex; align-items: center; gap: 8px; width: 100%; border: 0; background: transparent; font: inherit; text-align: left; padding: 6px 8px; border-radius: 6px; cursor: pointer; color: var(--ink-700); }
+  .row:hover { background: var(--paper-2); } .row.on { background: var(--ink-900); color: #fff; }
+  .row .ic { width: 18px; text-align: center; flex: 0 0 auto; } .row em { font-style: normal; color: var(--ink-500); font-size: 11.5px; } .row.on em { color: var(--ink-300); }
+  .row.dept { font-weight: 600; } .row.dept i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; margin: 0 5px 0 4px; }
+  .row.mach { padding-left: 34px; font-size: 13px; }
+  .row .n { margin-left: auto; font: 700 10px var(--mono); border-radius: 999px; padding: 1px 6px; background: rgba(217,119,6,.16); color: #b45309; }
+  .row .n.bad { background: rgba(185,28,28,.12); color: var(--accent-hazard); } .row .n.dk { background: var(--brand-yellow); color: var(--ink-900); }
+  .foot { border-top: 1px solid var(--ink-200); padding: 8px 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; flex: 0 0 auto; }
+  .av { width: 28px; height: 28px; border-radius: 50%; background: var(--paper-2); border: 1px solid var(--ink-300); display: grid; place-items: center; font: 700 10.5px var(--mono); flex: 0 0 auto; }
+  .foot small { display: block; color: var(--ink-500); font-size: 10.5px; }
+
+  /* ── info / work panel ───────────────────────────────────── */
+  .ih { display: flex; align-items: center; gap: 8px; padding: 9px 14px; border-bottom: 1px solid var(--ink-200); flex: 0 0 auto; min-height: 44px; }
+  .crumb { font-family: var(--mono); font-size: 11px; color: var(--ink-500); } .crumb b { color: var(--ink-900); }
+  .x { margin-left: auto; width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--ink-300); background: #fff; cursor: pointer; font-size: 15px; line-height: 1; }
+  .crop { height: 118px; position: relative; overflow: hidden; background: #f5f5f4; border-bottom: 1px solid var(--ink-200); flex: 0 0 auto; }
+  .crop .cw { position: absolute; left: 50%; top: 50%; width: 2000px; height: 1116px; transform-origin: 0 0; }
+  .crop > img { width: 100%; height: 100%; object-fit: cover; }
+  .ttl { padding: 12px 16px 0; flex: 0 0 auto; } .ttl h2 { margin: 2px 0 8px; font-size: 20px; line-height: 1.2; }
+  .tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--ink-200); padding: 0 10px; flex: 0 0 auto; overflow-x: auto; }
+  .tabs button { font: inherit; font-size: 12.5px; font-weight: 600; border: 0; background: transparent; padding: 9px 9px; cursor: pointer; color: var(--ink-500); border-bottom: 2px solid transparent; white-space: nowrap; }
+  .tabs button:hover { color: var(--ink-900); } .tabs button.on { color: var(--ink-900); border-bottom-color: var(--ink-900); }
+  .ib { flex: 1; overflow-y: auto; padding: 14px 16px; min-height: 0; }
+  .ib h4 { margin: 16px 0 6px; font: 600 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-500); } .ib h4:first-child { margin-top: 0; }
+  .ib p.tip { font-size: 12.5px; color: var(--ink-500); }
+  .data { font-family: var(--mono); font-size: 10px; color: var(--ink-400); padding: 7px 16px; border-top: 1px solid var(--ink-100); flex: 0 0 auto; }
+  .li { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--ink-100); }
+  .li .t { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; line-height: 1.3; } .li .t small { display: block; font-weight: 400; color: var(--ink-500); font-size: 12px; margin-top: 1px; }
+  .li .w { font-family: var(--mono); font-size: 10.5px; color: var(--ink-500); white-space: nowrap; }
+  .li .ic { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; } .ic.bad { background: #b91c1c; } .ic.warn { background: #d97706; } .ic.info { background: var(--accent-measure); } .ic.grey { background: var(--ink-300); } .ic.ok { background: var(--accent-ok); }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 4px; } .stats div { border: 1px solid var(--ink-200); border-radius: 8px; padding: 8px; font-size: 11px; color: var(--ink-500); } .stats b { display: block; font: 700 18px var(--mono); color: var(--ink-900); }
+  .zero { padding: 28px; text-align: center; color: var(--ink-500); border: 1px dashed var(--ink-300); border-radius: 10px; font-size: 13px; }
+  .chips { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; } .chips span { font-size: 11.5px; border: 1px solid var(--ink-200); border-radius: 999px; padding: 2px 10px; color: var(--ink-600); } .chips span.on { background: var(--ink-900); color: #fff; border-color: var(--ink-900); }
+  table.t { width: 100%; border-collapse: collapse; font-size: 12.5px; } table.t th { text-align: left; font: 600 10px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--ink-500); padding: 6px 8px; border-bottom: 1px solid var(--ink-200); } table.t td { padding: 7px 8px; border-bottom: 1px solid var(--ink-100); vertical-align: top; }
+  table.t td.m { font-family: var(--mono); font-size: 11px; color: var(--ink-500); white-space: nowrap; }
+  .pl { display: inline-block; width: 22px; height: 22px; border-radius: 5px; font: 800 10px var(--mono); line-height: 22px; text-align: center; color: #fff; } .pl.d { background: var(--accent-ok); } .pl.o { background: var(--accent-inspect); } .pl.r { background: var(--ink-300); color: var(--ink-700); } .pl.n { background: transparent; border: 1px dashed var(--ink-300); color: var(--ink-400); }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; } .tile { text-align: left; font: inherit; border: 1px solid var(--ink-300); background: var(--paper-1); border-radius: 10px; padding: 12px; cursor: pointer; } .tile:hover { border-color: var(--ink-900); } .tile.on { border-color: var(--ink-900); box-shadow: inset 0 0 0 1px var(--ink-900); background: var(--paper-2); }
+  .tile b { display: block; font-size: 14px; } .tile small { color: var(--ink-500); font-size: 12px; } .tile .e { font: 600 10px var(--mono); letter-spacing: .08em; color: var(--ink-500); }
+  .f { display: block; margin-top: 10px; font-size: 12px; font-weight: 600; color: var(--ink-700); } .f input, .f select { display: block; width: 100%; margin-top: 4px; font: inherit; font-weight: 400; border: 1px solid var(--ink-300); border-radius: 8px; padding: 8px 10px; background: #fff; } .f .err { color: var(--accent-hazard); font-weight: 400; }
+  .wire { border: 1px solid var(--ink-200); border-radius: 10px; background-image: linear-gradient(var(--ink-200) 1px, transparent 1px), linear-gradient(90deg, var(--ink-200) 1px, transparent 1px); background-size: 20px 20px; }
+
+  /* walkthrough + builder */
+  .workgrid { flex: 1; min-height: 0; display: grid; grid-template-columns: 210px 1fr; }
+  .wl { border-right: 1px solid var(--ink-200); overflow-y: auto; padding: 10px 8px; font-size: 12.5px; }
+  .wl .s { font: 600 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-500); padding: 8px 6px 3px; }
+  .wl .st { display: flex; gap: 7px; padding: 5px 6px; border-radius: 6px; color: var(--ink-600); line-height: 1.3; } .wl .st.cur { background: var(--ink-900); color: #fff; } .wl .st.dn { color: var(--ink-400); }
+  .wc { overflow-y: auto; padding: 18px 20px; }
+  .card { border: 1px solid var(--ink-300); border-left: 4px solid var(--accent-step); border-radius: 10px; padding: 16px; background: #fff; }
+  .card.hazard { border-left-color: var(--accent-hazard); background: rgba(185,28,28,.03); } .card.ppe { border-left-color: var(--accent-decision); } .card.check { border-left-color: var(--accent-measure); }
+  .card h3 { margin: 6px 0; font-size: 19px; line-height: 1.3; } .card p { margin: 0 0 10px; font-size: 15px; color: var(--ink-700); }
+  .ty { font: 700 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; color: #fff; background: var(--accent-step); } .ty.hazard { background: var(--accent-hazard); } .ty.ppe { background: var(--accent-decision); } .ty.check { background: var(--accent-measure); }
+  .bar { height: 4px; background: var(--ink-200); border-radius: 2px; margin-bottom: 14px; } .bar i { display: block; height: 100%; background: var(--ink-900); border-radius: 2px; transition: width .2s; }
+  .bs { display: flex; align-items: flex-start; gap: 10px; border: 1px solid var(--ink-200); border-radius: 8px; padding: 9px 10px; margin-bottom: 6px; background: #fff; } .bs .t { flex: 1; min-width: 0; font-size: 13.5px; } .bs .t div { margin-top: 4px; }
+  .vf { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--ink-300); background: #fff; cursor: pointer; font-size: 13px; flex: 0 0 auto; } .vf.on { background: var(--accent-ok); border-color: var(--accent-ok); color: #fff; }
+  .flag { border: 1px solid rgba(124,58,237,.4); background: rgba(124,58,237,.06); border-radius: 8px; padding: 9px 10px; font-size: 12.5px; margin-bottom: 10px; display: flex; gap: 8px; align-items: center; }
+  .pubbar { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-top: 1px solid var(--ink-200); flex: 0 0 auto; font-size: 12.5px; }
+
+  #toast { position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 20px); background: var(--ink-900); color: #fff; font-size: 13px; padding: 9px 16px; border-radius: 8px; opacity: 0; transition: all .2s; z-index: 9999; pointer-events: none; }
+  #toast.on { opacity: 1; transform: translate(-50%, 0); }
+  #sketch-tools { position: fixed; bottom: 12px; right: 12px; z-index: 9999; font: 12px system-ui; background: rgba(0,0,0,.7); color: #fff; padding: 6px 10px; border-radius: 8px; opacity: .35; transition: opacity .2s; display: flex; gap: 6px; align-items: center; }
+  #sketch-tools:hover { opacity: 1; } #sketch-tools button { font: inherit; background: transparent; color: #fff; border: 1px solid rgba(255,255,255,.4); border-radius: 4px; padding: 2px 7px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div id="variant-nav">
+  <span class="sketch-title">008 · One screen</span>
+  <button class="variant-tab active" data-v="a">A: Three panes ★ Selected</button>
+  <button class="variant-tab" data-v="b">B: Map + sheets</button>
+  <button class="variant-tab" data-v="c">C: Step inside</button>
+  <span class="spacer"></span>
+  <span class="vl">VIEW AS</span>
+  <span class="role"><button data-role="admin" class="active">Admin</button><button data-role="worker">Worker</button></span>
+</div>
+
+<div class="app" id="app" data-v="a">
+  <aside class="nav" id="nav"></aside>
+  <main class="stage" id="stage">
+    <div class="world" id="world"></div>
+    <div class="editbar">EDITING THE SITE — drag a corner to reshape, click a shape to rename it</div>
+    <div class="maptools"><button class="btn sm" data-act="fit">Whole site</button><button class="btn sm" data-act="edit" id="editbtn">Edit site</button><span class="hint">drag to pan · scroll to zoom · click a room or machine</span></div>
+  </main>
+  <div class="scrim" id="scrim" data-act="close"></div>
+  <section class="info" id="info"></section>
+</div>
+<div id="toast"></div>
+<div id="sketch-tools">width <button data-w="">full</button><button data-w="1280px">1280</button><button data-w="1024px">1024</button></div>
+
+<script>
+const ASSET = '../007-plant-floor-navigation/assets/';
+const ZONE = { Forming:'#ea580c', General:'#2563eb', Engineering:'#7c3aed' };
+
+/* ── vector rooms drawn onto the empty corner of the 007 scene ── */
+const E1=[.866,.5], E2=[.866,-.5];
+const P=(o,u,v,z=0)=>[o[0]+u*E1[0]+v*E2[0], o[1]+u*E1[1]+v*E2[1]-z];
+const pts=a=>a.map(p=>(+p[0]).toFixed(1)+','+(+p[1]).toFixed(1)).join(' ');
+const pg=(a,f)=>`<polygon points="${pts(a)}" fill="${f}" stroke="#57534e" stroke-width="1.1" stroke-linejoin="round"/>`;
+const ln=(a,b)=>`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="rgba(0,0,0,.07)"/>`;
+const box=(o,u,v,w,d,h,c,z=0)=>({ k:(u+w/2)-(v+d/2)+z*.01, s:
+  pg([P(o,u,v,z),P(o,u+w,v,z),P(o,u+w,v,z+h),P(o,u,v,z+h)],c[1]) +
+  pg([P(o,u+w,v,z),P(o,u+w,v+d,z),P(o,u+w,v+d,z+h),P(o,u+w,v,z+h)],c[2]) +
+  pg([P(o,u,v,z+h),P(o,u+w,v,z+h),P(o,u+w,v+d,z+h),P(o,u,v+d,z+h)],c[0]) });
+function roomArt(o,a,b,H,wall,items){
+  let s=pg([P(o,0,0),P(o,0,a),P(o,b,a),P(o,b,0)],'#cfcdc9');
+  for(let i=40;i<b;i+=40) s+=ln(P(o,i,0),P(o,i,a)); for(let j=40;j<a;j+=40) s+=ln(P(o,0,j),P(o,b,j));
+  s+=pg([P(o,0,0),P(o,0,a),P(o,0,a,H),P(o,0,0,H)],'#a8a19a')+pg([P(o,0,a),P(o,b,a),P(o,b,a,H),P(o,0,a,H)],'#ddd8d1')+wall;
+  s+=items.sort((x,y)=>x.k-y.k).map(i=>i.s).join('');
+  s+=pg([P(o,0,0),P(o,b,0),P(o,b,0,14),P(o,0,0,14)],'#e7e3dd');
+  s+=pg([P(o,b,0),P(o,b,a*.3),P(o,b,a*.3,14),P(o,b,0,14)],'#bdb6ae')+pg([P(o,b,a*.62),P(o,b,a),P(o,b,a,14),P(o,b,a*.62,14)],'#bdb6ae');
+  return s;
+}
+const foot=(o,a,b,H)=>[P(o,0,0),P(o,0,0,H),P(o,0,a,H),P(o,b,a,H),P(o,b,a),P(o,b,0)];
+const W=['#f5f5f4','#d6d3d1','#a8a29e'], WD=['#d9a066','#a16207','#854d0e'], ST=['#a1a1aa','#71717a','#52525b'], BL=['#93c5fd','#60a5fa','#3b82f6'];
+const SM=[20,850], WS=[254,985], NB=[1120,745];
+const ART =
+  roomArt(SM,190,230,70,
+    pg([P(SM,70,190,26),P(SM,160,190,26),P(SM,160,190,58),P(SM,70,190,58)],'#fff')+pg([P(SM,0,60,30),P(SM,0,130,30),P(SM,0,130,58),P(SM,0,60,58)],'#bfdbfe'),
+    [box(SM,8,150,30,32,62,W), box(SM,48,160,120,24,26,['#e7e5e4','#d6d3d1','#a8a29e']), box(SM,70,166,10,10,12,ST,26), box(SM,112,163,26,16,14,['#e4e4e7','#a1a1aa','#71717a'],26),
+     box(SM,124,70,16,14,18,ST), box(SM,90,50,84,54,6,WD,18), box(SM,100,30,16,16,14,BL), box(SM,150,30,16,16,14,BL), box(SM,100,110,16,16,14,BL), box(SM,150,110,16,16,14,BL), box(SM,192,152,24,24,48,BL)]) +
+  roomArt(WS,190,230,70,
+    pg([P(WS,30,190,24),P(WS,150,190,24),P(WS,150,190,60),P(WS,30,190,60)],'#d6b98c')+[45,70,95,120].map(u=>`<line x1="${P(WS,u,190,52)[0]}" y1="${P(WS,u,190,52)[1]}" x2="${P(WS,u,190,34)[0]}" y2="${P(WS,u,190,34)[1]}" stroke="#44403c" stroke-width="3" stroke-linecap="round"/>`).join(''),
+    [box(WS,8,20,30,120,26,WD), box(WS,14,70,12,14,10,ST,26), box(WS,120,78,30,20,26,ST), box(WS,90,60,90,56,4,['#dbeafe','#93c5fd','#60a5fa'],26),
+     box(WS,170,158,46,24,58,['#e7e5e4','#a8a29e','#78716c']), box(WS,122,24,16,16,16,['#fbbf24','#d97706','#b45309'])]) +
+  // noticeboard on the hall floor
+  `<line x1="${P(NB,5,0)[0]}" y1="${P(NB,5,0)[1]}" x2="${P(NB,5,0,18)[0]}" y2="${P(NB,5,0,18)[1]}" stroke="#44403c" stroke-width="4"/><line x1="${P(NB,55,0)[0]}" y1="${P(NB,55,0)[1]}" x2="${P(NB,55,0,18)[0]}" y2="${P(NB,55,0,18)[1]}" stroke="#44403c" stroke-width="4"/>` +
+  pg([P(NB,0,0,16),P(NB,60,0,16),P(NB,60,0,64),P(NB,0,0,64)],'#15803d')+pg([P(NB,5,0,21),P(NB,55,0,21),P(NB,55,0,59),P(NB,5,0,59)],'#e7c9a0')+
+  pg([P(NB,10,0,34),P(NB,26,0,34),P(NB,26,0,54),P(NB,10,0,54)],'#fff')+pg([P(NB,32,0,28),P(NB,50,0,28),P(NB,50,0,48),P(NB,32,0,48)],'#fef3c7');
+
+/* ── places ── */
+const ROOMS = {
+  office:  { name:'Office', sub:'governance', ic:'▣', poly:[[1432,778],[1640,778],[1640,965],[1432,965]] },
+  smoko:   { name:'Smoko room', sub:'training', ic:'☕', poly:foot(SM,190,230,70) },
+  workshop:{ name:'Workshop', sub:'write & edit SOPs', ic:'✎', poly:foot(WS,190,230,70) },
+  board:   { name:'Noticeboard', sub:'site-wide SOPs', ic:'▤', poly:[[1108,676],[1186,676],[1186,792],[1108,792]], sops:['evac','manual','forming-safety'] },
+};
+const M = [
+  { id:'furnace', name:'Furnace & forehearth', dept:'Forming', poly:[[170,420],[350,360],[430,470],[300,610],[170,560]], sops:['forming-safety'] },
+  { id:'panel', name:'Electrical panel', dept:'Forming', poly:[[368,285],[438,282],[440,398],[370,402]], sops:[] },
+  { id:'is1', name:'IS Machine 1', dept:'Forming', pic:'is-machine.jpg', poly:[[398,585],[540,520],[720,650],[905,845],[875,905],[650,860],[398,705]], sops:['hanger','deflector','forming-safety','swab'] },
+  { id:'is2', name:'IS Machine 2', dept:'Forming', pic:'is-machine.jpg', poly:[[528,485],[690,428],[1050,745],[1010,822],[890,770],[760,660]], sops:['plenum','swab','forming-safety'] },
+  { id:'lehr', name:'Annealing lehr', dept:'Forming', pic:'lehr.jpg', poly:[[588,290],[705,228],[1002,428],[962,502],[860,470],[598,345]], sops:['otg'] },
+  { id:'insp1', name:'Inspection line 1', dept:'General', poly:[[1005,495],[1140,428],[1262,560],[1150,645],[1005,575]], sops:['sample','iri'] },
+  { id:'insp2', name:'Inspection line 2 & palletiser', dept:'General', poly:[[1195,432],[1292,398],[1408,522],[1330,598],[1215,545]], sops:['sample'] },
+  { id:'pallets', name:'Pallet staging', dept:'General', poly:[[1225,600],[1490,600],[1490,760],[1225,760]], sops:[] },
+  { id:'tank', name:'Alkaline cleaning tank', dept:'Engineering', pic:'cleaning-tank.jpg', poly:[[1308,195],[1455,150],[1502,232],[1380,332],[1308,300]], sops:['tank','tank2'] },
+  { id:'lathe', name:'Lathe', dept:'Engineering', poly:[[1515,215],[1642,190],[1665,300],[1560,342],[1500,300]], sops:[] },
+  { id:'bench', name:'Workbench', dept:'Engineering', poly:[[1660,245],[1805,268],[1795,385],[1680,385]], sops:[] },
+  { id:'gluer', name:'Hot-melt gluer', dept:'Engineering', pic:'gluer.jpg', poly:[[1430,345],[1560,330],[1585,455],[1450,470]], sops:['gluer'] },
+  { id:'rack', name:'Racking', dept:'Engineering', poly:[[1625,560],[1905,655],[1905,800],[1705,800],[1625,700]], sops:[] },
+  { id:'forklift', name:'Forklift', dept:'Engineering', poly:[[1588,690],[1765,690],[1765,865],[1588,865]], sops:['tyre'] },
+];
+const S = {
+  hanger:{ t:'Changing the Blank Side Hanger', rel:'due', owner:null, rev:'Jan 2021', live:true, tags:['LOTO','hot-work'] },
+  deflector:{ t:'Deflector Setup and Replacement for Proper Gob Loading', rel:'never', owner:null, rev:'—', live:false, tags:['hot-work'] },
+  swab:{ t:'Manually Swabbing a Forming Machine', rel:'done', owner:'B. Tane', rev:'Aug 2026', live:true, tags:['hot-work'] },
+  plenum:{ t:'Changing Plenum Chamber — IS Machine Forming Section', rel:'never', owner:null, rev:'Mar 2026', live:true, tags:['LOTO'] },
+  'forming-safety':{ t:'Working Safely in the Forming Area', rel:'new', owner:'J. Moana', rev:'3 days ago', live:true, tags:['PPE-forming'] },
+  otg:{ t:'OTG Probe Maintenance', rel:'done', owner:'E. Vans', rev:'Sep 2026', live:true, tags:[] },
+  sample:{ t:'Automated Sample Challenge Recording', rel:'due', owner:'E. Vans', rev:'Sep 2026', live:true, tags:[] },
+  iri:{ t:'IRI CSV File Configuration', rel:null, owner:null, rev:'—', live:false, tags:[] },
+  tank:{ t:'Alkaline Cleaning Tank Operation (Tergo Alkalox)', rel:null, owner:'E. Vans', rev:'review due', live:true, tags:['chemicals'] },
+  tank2:{ t:'Alkaline Cleaning Tank — Machine Shop', rel:null, owner:null, rev:'—', live:false, tags:['chemicals'] },
+  gluer:{ t:'Setting Up and Operating the Hot Melt Gluer', rel:'never', owner:null, rev:'Jul 2026', live:true, tags:['hot-work'] },
+  tyre:{ t:'Emergency Tyre Change', rel:null, owner:null, rev:'—', live:false, tags:[] },
+  evac:{ t:'Emergency Evacuation — Main Plant', rel:'done', owner:'J. Moana', rev:'Jun 2026', live:true, tags:['emergency'] },
+  manual:{ t:'Manual Handling Basics', rel:'never', owner:'J. Moana', rev:'Feb 2026', live:true, tags:[] },
+};
+const REL = { due:'Due', new:'Updated', never:'Never done', done:'Done' };
+const STEPS = [
+  { sec:'Before you start', ty:'hazard', t:'Hot surfaces — blank moulds run at 450 °C', d:'Burn risk to hands and forearms. Read and acknowledge before you go on.', tags:['hot-work'] },
+  { sec:'Before you start', ty:'ppe', t:'Put on heat-resistant gloves, face shield and long sleeves', d:'', tags:['PPE-forming'] },
+  { sec:'Steps', ty:'action', t:'Isolate the section and lock it out', d:'Press section stop, then put your personal lock on the isolator.', tags:['LOTO'] },
+  { sec:'Steps', ty:'action', t:'Remove the worn blank side hanger', d:'Undo the two M12 bolts with the 19 mm spanner. Support the hanger as it comes free.', tags:[], photo:true },
+  { sec:'Steps', ty:'check', t:'Fit the new hanger and torque to 85 N·m', d:'Take a photo of the torque wrench reading.', tags:[], photo:true },
+  { sec:'Finish', ty:'action', t:'Remove your lock and restart the section', d:'', tags:['LOTO'] },
+];
+const TYN = { hazard:'Hazard', ppe:'PPE', action:'Step', check:'Check' };
+const PEOPLE = [['R. Tane','Worker','Forming'],['M. Kaho','Worker','Forming'],['A. Jensen','Worker','General'],['S. Patel','Supervisor','Forming'],['B. Tane','Supervisor','General'],['E. Vans','SOP Admin','Engineering'],['J. Moana','Safety Manager','Site']];
+const OBJ = [
+  { t:'Zero hand injuries on the forming line', by:'J. Moana', on:'Forming' },
+  { t:'Every live SOP has an owner by 31 Oct', by:'E. Vans', on:'Site' },
+  { t:'Hanger change in under 20 minutes', by:'agent · suggested', on:'IS Machine 1' },
+];
+let INBOX = [
+  { ic:'bad', t:'Changing the Blank Side Hanger', s:'IS Machine 1 · live · nobody owns it', w:'2 mo', a:'Assign owner' },
+  { ic:'bad', t:'Changing Plenum Chamber', s:'IS Machine 2 · live · nobody owns it', w:'2 mo', a:'Assign owner' },
+  { ic:'info', t:'Sign off: Manually Swabbing a Forming Machine', s:'Done by R. Tane today 09:14 · 2 photos', w:'1 h', a:'Sign off' },
+  { ic:'info', t:'Working Safely in the Forming Area · v4', s:'Approval step 2 of 3 · you are next', w:'3 d', a:'Approve' },
+  { ic:'warn', t:'Alkaline Cleaning Tank Operation', s:'Review was due 12 Sep · yours', w:'16 d', a:'Mark reviewed' },
+  { ic:'warn', t:'Changing the Blank Side Hanger', s:'Last reviewed Jan 2021', w:'5 yr', a:'Mark reviewed' },
+  { ic:'grey', t:'Lathe, Workbench, Racking', s:'3 machines with no SOPs at all', w:'—', a:'Dismiss' },
+];
+let REQS = [
+  { who:'R. Tane', kind:'Change a SOP', t:'Step 5 torque looks wrong (85 vs 58 N·m on the wrench chart)', about:'Changing the Blank Side Hanger', w:'2 d' },
+  { who:'S. Patel', kind:'Assign', t:'All Engineering operators must do the gluer SOP', about:'Hot Melt Gluer', w:'4 d' },
+  { who:'M. Kaho', kind:'Observe me', t:'Ready to be observed on swabbing', about:'Manually Swabbing a Forming Machine', w:'1 d' },
+  { who:'agent', kind:'New SOP', t:'The lathe has no procedures. Draft one from the maker manual?', about:'Lathe', w:'6 d' },
+];
+let DEC = [
+  { w:'02 Oct 14:12', who:'E. Vans', what:'Approved (step 1 of 3)', about:'Working Safely in the Forming Area · v4' },
+  { w:'02 Oct 09:40', who:'agent · checker', what:'Flagged a torque mismatch', about:'Changing the Blank Side Hanger · step 5' },
+  { w:'01 Oct 16:03', who:'B. Tane', what:'Signed off a completion', about:'OTG Probe Maintenance · A. Jensen' },
+  { w:'30 Sep 11:20', who:'J. Moana', what:'Published v3', about:'Emergency Evacuation — Main Plant' },
+  { w:'29 Sep 08:55', who:'S. Patel', what:'Rejected a completion (photo missing)', about:'Manually Swabbing · M. Kaho' },
+  { w:'28 Sep 13:30', who:'E. Vans', what:'Took ownership', about:'Automated Sample Challenge Recording' },
+];
+let OBS = [['S. Patel','R. Tane','Manually Swabbing a Forming Machine','Did it right','28 Sep'],['B. Tane','A. Jensen','OTG Probe Maintenance','Did it right','22 Sep'],['S. Patel','M. Kaho','Changing the Blank Side Hanger','Needs support','15 Sep']];
+const NOTIF = [['info','You are next to approve “Working Safely in the Forming Area”','3 d'],['warn','Your SOP “Alkaline Cleaning Tank Operation” is due for review','16 d'],['ok','R. Tane finished “Manually Swabbing a Forming Machine”','1 h']];
+const DRAFTS = [['deflector','Check each step · 7 of 18 ticked'],['iri','AI check found 2 things to look at'],['tank2','Reading your document… 60%'],['tyre','Waiting for approval · step 1 of 2']];
+const TAGS = [['LOTO',6],['hot-work',5],['PPE-forming',4],['chemicals',2],['emergency',1],['AS/NZS 4024',3]];
+const TABS = {
+  office:{ admin:[['inbox','Inbox'],['requests','Requests'],['decisions','Decisions'],['people','People & roles'],['access','Access']], worker:[['requests','My requests'],['mine','My sign-offs']] },
+  smoko:{ admin:[['matrix','Training matrix'],['obs','Observations'],['me','My record']], worker:[['me','My record'],['obs','Observations of me']] },
+  workshop:{ admin:[['new','New SOP'],['drafts','Drafts'],['standards','Standards'],['ai','AI']], worker:[['ask','Ask for a change']] },
+  board:{ admin:[['sops','Site-wide SOPs']], worker:[['sops','Site-wide SOPs']] },
+};
+const WIDE = { office:['decisions','people','access'], smoko:['matrix'], workshop:[], board:[] };
+const DATA = { inbox:'decisions · requests · notifications · sop', requests:'requests · users', decisions:'decisions · users · sop', people:'users (+ roles)', access:'users (+ roles) · sop', mine:'decisions · sop', matrix:'users · sop · decisions', obs:'decisions · users · sop', me:'users · sop', new:'sop · steps · standards', drafts:'sop · steps', standards:'standards', ai:'objectives (agent-readable)', ask:'requests', sops:'sop · steps' };
+
+const st = { v:'a', role:'admin', sel:null, work:null, edit:false, q:'', tab:{}, ramp:null, where:'', ver:new Set([0,1]), flag:true, pub:false, xt:{}, err:false };
+const $ = s => document.querySelector(s);
+const app=$('#app'), nav=$('#nav'), stage=$('#stage'), info=$('#info'), world=$('#world');
+const admin = () => st.role==='admin';
+const me = () => admin() ? ['EV','E. Vans','SOP Admin'] : ['RT','R. Tane','Worker · Forming'];
+const visible = id => admin() || S[id].live;
+const todo = sops => sops.filter(visible).filter(id => ['due','never','new'].includes(S[id].rel)).length;
+function health(m){ const ids=m.sops; if(ids.some(id=>!S[id].owner)) return 'bad'; if(ids.some(id=>/2021|review due/.test(S[id].rev))) return 'due'; return ids.length?'ok':null; }
+const centroid = p => [p.reduce((a,c)=>a+c[0],0)/p.length, p.reduce((a,c)=>a+c[1],0)/p.length];
+const bbox = p => { const xs=p.map(c=>c[0]), ys=p.map(c=>c[1]); return [Math.min(...xs),Math.min(...ys),Math.max(...xs),Math.max(...ys)]; };
+const place = s => s && (s.k==='m' ? M.find(m=>m.id===s.id) : ROOMS[s.id]);
+const curTab = id => { const l=TABS[id][st.role]; return l.some(t=>t[0]===st.tab[id]) ? st.tab[id] : l[0][0]; };
+function toast(t){ const el=$('#toast'); el.textContent=t; el.classList.add('on'); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove('on'),2200); }
+function log(what, about){ DEC.unshift({ w:'just now', who:me()[1], what, about }); }
+
+/* ── map ── */
+const HS = [...M.map(m=>({ go:'m:'+m.id, poly:m.poly, cls:'zone-'+m.dept })), ...Object.entries(ROOMS).map(([id,r])=>({ go:'r:'+id, poly:r.poly, cls:'room' }))];
+const hsSVG = cls => HS.map(h=>`<polygon class="hs ${h.cls} ${cls(h.go)}" data-go="${h.go}" points="${pts(h.poly)}"/>`).join('');
+world.innerHTML = `<img src="${ASSET}plant.jpg" alt="" draggable="false"><svg viewBox="0 0 2000 1116"><g class="art">${ART}</g>${hsSVG(()=>'')}<g class="verts">${HS.flatMap(h=>h.poly.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="5"/>`)).join('')}</g></svg>` +
+  M.map(m=>`<div class="tag" data-tag="m:${m.id}" style="left:${centroid(m.poly)[0]}px;top:${bbox(m.poly)[1]-6}px"><span class="lbl">${m.name}</span><span data-pip></span><span class="stem"></span></div>`).join('') +
+  Object.entries(ROOMS).map(([id,r])=>`<div class="tag" data-tag="r:${id}" style="left:${centroid(r.poly)[0]}px;top:${bbox(r.poly)[1]-4}px"><span class="sign"><b>${r.name}</b><em>${r.sub}</em><i data-cnt></i></span><span class="stem"></span></div>`).join('');
+const view = { s:.5, x:0, y:0 };
+const pads = () => st.v==='b' ? [296, st.sel && !app.classList.contains('wide') ? 404 : 0] : [0,0];
+const apply = anim => { if(anim){ world.style.transition='transform .35s ease'; setTimeout(()=>world.style.transition='',380); } world.style.transform=`translate(${view.x}px,${view.y}px) scale(${view.s})`; world.style.setProperty('--inv', Math.min(2.4, 1/view.s)); };
+function frame(b, anim, max){ const Wd=stage.clientWidth, H=stage.clientHeight; if(!Wd||!H) return; const [pl,pr]=pads(), aw=Math.max(200,Wd-pl-pr), bw=b[2]-b[0], bh=b[3]-b[1];
+  view.s=Math.min(aw/bw, H/bh, max); view.x=pl+aw/2-(b[0]+bw/2)*view.s; view.y=H/2-(b[1]+bh/2)*view.s; apply(anim); }
+const fit = anim => frame([-20,-10,2020,1126], anim, 3);
+function flyTo(poly, anim, max=1.5){ const b=bbox(poly), mx=(b[2]-b[0])*.9, my=(b[3]-b[1])*.9; frame([b[0]-mx,b[1]-my,b[2]+mx,b[3]+my], anim, max); }
+function recenter(anim){ const p=place(st.sel); if(p && st.v!=='c') flyTo(p.poly, anim); else fit(anim); }
+let drag=null;
+world.addEventListener('pointerdown', e=>{ if(e.target.classList.contains('hs')) return; drag={x:e.clientX,y:e.clientY,vx:view.x,vy:view.y}; world.classList.add('drag'); world.setPointerCapture(e.pointerId); });
+world.addEventListener('pointermove', e=>{ if(!drag) return; view.x=drag.vx+(e.clientX-drag.x); view.y=drag.vy+(e.clientY-drag.y); apply(); });
+world.addEventListener('pointerup', ()=>{ drag=null; world.classList.remove('drag'); });
+stage.addEventListener('wheel', e=>{ e.preventDefault(); const r=stage.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top, f=e.deltaY<0?1.12:1/1.12, ns=Math.min(2.6,Math.max(.3,view.s*f)); view.x=mx-(mx-view.x)*(ns/view.s); view.y=my-(my-view.y)*(ns/view.s); view.s=ns; apply(); }, { passive:false });
+world.addEventListener('mouseover', e=>{ const g=e.target.dataset && e.target.dataset.go; if(g) world.querySelector(`[data-tag="${g}"]`).classList.add('hov'); });
+world.addEventListener('mouseout', e=>{ const g=e.target.dataset && e.target.dataset.go; if(g) world.querySelector(`[data-tag="${g}"]`).classList.remove('hov'); });
+new ResizeObserver(()=>recenter(false)).observe(stage);
+
+function paint(){
+  stage.classList.toggle('editing', st.edit);
+  const cur = st.sel ? st.sel.k+':'+st.sel.id : '';
+  world.querySelectorAll('.hs').forEach(p=>{ p.classList.toggle('on', p.dataset.go===cur); p.classList.remove('due','bad'); });
+  M.forEach(m=>{ const poly=world.querySelector(`.hs[data-go="m:${m.id}"]`), tag=world.querySelector(`[data-tag="m:${m.id}"]`), pip=tag.querySelector('[data-pip]');
+    tag.classList.toggle('show', cur==='m:'+m.id);
+    if(!admin()){ const n=todo(m.sops); pip.className=n?'pip due':''; pip.textContent=n||''; tag.classList.toggle('pin',!!n); if(n) poly.classList.add('due'); }
+    else { const h=health(m); pip.className=h?'pip '+h:''; pip.textContent=h==='ok'?'':(h==='bad'?'!':'↻'); tag.classList.toggle('pin',h==='bad'||h==='due'); if(h==='bad'||h==='due') poly.classList.add(h); } });
+  const cnt = { office: admin()?INBOX.length+REQS.length:'', smoko:'', workshop: admin()?DRAFTS.length:'', board: admin()?'':(todo(ROOMS.board.sops)||'') };
+  Object.keys(ROOMS).forEach(id=>world.querySelector(`[data-tag="r:${id}"] [data-cnt]`).textContent=cnt[id]);
+  $('#editbtn').style.display = admin() ? '' : 'none'; $('#editbtn').classList.toggle('primary', st.edit); $('#editbtn').textContent = st.edit ? 'Done editing' : 'Edit site';
+}
+
+/* ── nav sidebar ── */
+function renderNav(){
+  const u=me(), cur = st.sel ? st.sel.k+':'+st.sel.id : '';
+  const row=(go,ic,name,sub,n,cls='')=>`<button class="row ${cls} ${cur===go?'on':''}" data-go="${go}" data-s="${(name+' '+sub).toLowerCase()}"><span class="ic">${ic}</span>${name}${sub&&!cls?` <em>${sub}</em>`:''}${n?`<span class="n ${n[1]||''}">${n[0]}</span>`:''}</button>`;
+  const rn = { office: admin()?[INBOX.length+REQS.length,'dk']:null, workshop: admin()?[DRAFTS.length,'dk']:null, board: !admin()&&todo(ROOMS.board.sops)?[todo(ROOMS.board.sops)]:null };
+  nav.innerHTML = `
+    <div class="brand"><span class="dot">S</span><div><b>SOPstart</b><small>Visy · Main plant</small></div><button class="bell" data-act="notif" title="Notifications">🔔<i>${NOTIF.length}</i></button></div>
+    ${st.v==='c' && st.sel && !st.edit ? `<div class="mini"><div class="mw"><img src="${ASSET}plant.jpg" alt=""><svg viewBox="0 0 2000 1116"><g class="art">${ART}</g>${hsSVG(g=>g===cur?'on':'')}</svg></div><button data-act="home">‹ Whole site</button></div>` : ''}
+    <label class="ask"><span>⌕</span><input id="q" placeholder="Search or ask… try “hanger”" value="${st.q}"></label>
+    ${admin()
+      ? `<div class="now"><div class="k"><span>Needs you</span><span class="badge noowner">${INBOX.length}</span></div><h3>${INBOX.length ? INBOX.length+' things waiting in the Office' : 'Nothing waiting. Inbox is clear.'}</h3><div class="m">owners · reviews · sign-offs · approvals</div><div class="cta"><button class="btn sm primary" data-go="r:office">Open the Office</button></div></div>`
+      : `<div class="now"><div class="k"><span>Next for you</span><span class="badge due">Due</span></div><h3>Changing the Blank Side Hanger</h3><div class="m">IS Machine 1 · ~20 min · last done 11 months ago</div><div class="cta"><button class="btn sm primary" data-act="walk" data-id="hanger" data-m="is1">Walk it</button><button class="btn sm" data-go="m:is1">Show me</button></div></div>`}
+    <div class="tree" id="tree">
+      <div class="grp">Rooms</div>
+      ${Object.entries(ROOMS).map(([id,r])=>row('r:'+id, r.ic, r.name, r.sub, rn[id])).join('')}
+      <div class="grp">Departments & machines</div>
+      ${Object.keys(ZONE).map(z=>`<button class="row dept" data-zone="${z}" data-s="${z.toLowerCase()}"><span class="ic">▾</span><i style="background:${ZONE[z]}"></i>${z}</button>` +
+        M.filter(m=>m.dept===z).map(m=>{ const n = admin() ? (health(m)==='bad'?['!','bad']:health(m)==='due'?['↻']:null) : (todo(m.sops)?[todo(m.sops)]:null);
+          return row('m:'+m.id, '', m.name, m.sops.map(id=>S[id].t).join(' '), n, 'mach'); }).join('')).join('')}
+    </div>
+    <div class="foot"><span class="av">${u[0]}</span><div><b>${u[1]}</b><small>${u[2]}</small></div></div>`;
+  if(st.q) filter(st.q);
+}
+function filter(q){
+  q=q.trim().toLowerCase(); st.q=q;
+  nav.querySelectorAll('#tree .row').forEach(r=>r.hidden = !!q && !r.dataset.s.includes(q));
+  world.querySelectorAll('.hs').forEach(p=>{ const r=nav.querySelector(`.row[data-go="${p.dataset.go}"]`), hit=!!q && r && r.dataset.s.includes(q); p.classList.toggle('hover',hit); world.querySelector(`[data-tag="${p.dataset.go}"]`).classList.toggle('hov',hit); });
+}
+
+/* ── info panel ── */
+const head = (crumb, back) => `<header class="ih">${back?`<button class="btn sm" data-act="close">‹ ${back}</button>`:''}<span class="crumb">Site${crumb?` › <b>${crumb}</b>`:''}</span>${(st.sel||st.edit)&&!back?'<button class="x" data-act="close" title="Close">×</button>':''}</header>`;
+const dataFoot = t => `<div class="data">data: ${t}</div>`;
+const tagsHTML = a => a.map(t=>`<span class="tg">#${t}</span>`).join('');
+const objHTML = on => OBJ.filter(o=>on.includes(o.on)).map(o=>`<div class="obj"><b>◎ OBJECTIVE</b><span>${o.t}<small>set by ${o.by} · applies to ${o.on}</small></span></div>`).join('');
+function cropHTML(p){ if(p.pic) return `<div class="crop"><img src="${ASSET}${p.pic}" alt=""></div>`; const b=bbox(p.poly), s=Math.min(1.3,Math.max(.55,300/(b[2]-b[0]))), c=[(b[0]+b[2])/2,(b[1]+b[3])/2];
+  return `<div class="crop"><div class="cw" style="transform:translate(${-c[0]*s}px,${-c[1]*s}px) scale(${s})"><img src="${ASSET}plant.jpg" alt=""><svg viewBox="0 0 2000 1116"><g class="art">${ART}</g></svg></div></div>`; }
+function sopRow(id){ const s=S[id]; const b = admin() ? (!s.owner?'<span class="badge noowner">No owner</span>':!s.live?'<span class="badge draft">Draft</span>':/due|2021/.test(s.rev)?'<span class="badge stale">Review due</span>':'<span class="badge ok">OK</span>') : (s.rel?`<span class="badge ${s.rel}">${REL[s.rel]}</span>`:'');
+  return `<div class="li"><span class="t">${s.t}<small>${tagsHTML(s.tags)}${admin()?`owner ${s.owner||'none'} · reviewed ${s.rev}`:''}</small></span>${b}<button class="btn sm ${admin()?'':'primary'}" data-act="walk" data-id="${id}">Walk</button>${admin()?`<button class="btn sm" data-act="build" data-id="${id}">Edit</button>`:''}</div>`; }
+
+function overviewHTML(){ return head('') + `<div class="ttl"><span class="k">Visy · one site</span><h2>Main plant</h2></div><div class="ib">
+  <div class="stats"><div><b>${M.length}</b>machines</div><div><b>3</b>departments</div><div><b>${Object.keys(S).length}</b>SOPs</div><div><b>${INBOX.length}</b>waiting</div></div>
+  <h4>Objectives</h4>${objHTML(['Site','Forming','IS Machine 1'])}
+  <h4>Notifications</h4>${NOTIF.map(n=>`<div class="li"><span class="ic ${n[0]}"></span><span class="t" style="font-weight:400">${n[1]}</span><span class="w">${n[2]}</span></div>`).join('')}
+  <h4>Open requests</h4>${REQS.slice(0,2).map(r=>`<div class="li"><span class="t">${r.t}<small>${r.who} · ${r.kind}</small></span><span class="w">${r.w}</span></div>`).join('')}
+  <p class="tip">Click any room or machine on the map, or pick it from the list on the left. Both do the same thing.</p></div>` + dataFoot('objectives · notifications · requests'); }
+
+function machineHTML(m){ const ids=m.sops.filter(visible).sort((a,b)=>(['due','never','new'].includes(S[a].rel)?0:1)-(['due','never','new'].includes(S[b].rel)?0:1));
+  return head(m.name) + cropHTML(m) + `<div class="ttl"><span class="k" style="color:${ZONE[m.dept]}">${m.dept}</span><h2>${m.name}</h2></div><div class="ib">
+  ${objHTML([m.name, m.dept])}
+  <h4>SOPs on this machine</h4>${ids.length ? ids.map(sopRow).join('') : `<div class="zero">No SOPs for this machine yet.</div>`}
+  ${admin()?`<p style="margin-top:12px"><button class="btn" data-act="newhere" data-id="${m.id}">＋ Write a SOP for this machine</button></p>`:''}</div>` + dataFoot('sop · steps · standards · objectives'); }
+
+function tabHTML(id, tab){
+  switch(tab){
+  case 'inbox': return INBOX.length ? `<div class="chips"><span class="on">All ${INBOX.length}</span><span>No owner</span><span>Sign-off</span><span>Approve</span><span>Review due</span></div>` + INBOX.map((i,n)=>`<div class="li"><span class="ic ${i.ic}"></span><span class="t">${i.t}<small>${i.s}</small></span><span class="w">${i.w}</span><button class="btn sm primary" data-act="inbox" data-id="${n}">${i.a}</button></div>`).join('') + `<p class="tip">One action clears each row. Every action is written to the decision ledger.</p>` : `<div class="zero">Inbox is clear. That is the goal.</div>`;
+  case 'requests': { const l = admin()?REQS:REQS.filter(r=>r.who===me()[1]); return (admin()?'':`<p><button class="btn primary" data-act="raise">＋ Raise a request</button></p>`) + (l.length ? l.map(r=>`<div class="li"><span class="t">${r.t}<small>${r.who} · ${r.kind} · ${r.about}</small></span><span class="w">${r.w}</span>${admin()?`<button class="btn sm primary" data-act="req" data-id="${REQS.indexOf(r)}" data-val="Accepted">Accept</button><button class="btn sm" data-act="req" data-id="${REQS.indexOf(r)}" data-val="Declined">Decline</button>`:'<span class="badge draft">Open</span>'}</div>`).join('') : `<div class="zero">No open requests.</div>`) + `<p class="tip">A request is anything one person asks another to do: change a SOP, assign a SOP, observe me, write a new SOP. People and agents can both raise them.</p>`; }
+  case 'decisions': return `<div class="chips"><span class="on">All</span><span>Approvals</span><span>Sign-offs</span><span>Ownership</span><span>Agent</span></div><table class="t"><thead><tr><th>When</th><th>Who</th><th>Decision</th><th>About</th></tr></thead><tbody>${DEC.map(d=>`<tr><td class="m">${d.w}</td><td>${d.who}</td><td><b>${d.what}</b></td><td>${d.about}</td></tr>`).join('')}</tbody></table><p class="tip">The ledger only ever grows. Approve, reject, sign off, assign, publish: each one adds a row with who and when. Nothing here is edited or deleted.</p>`;
+  case 'people': return `<p><button class="btn primary" data-act="toast" data-val="Invite sent">＋ Invite someone</button></p><table class="t"><thead><tr><th>Person</th><th>Role</th><th>Department</th></tr></thead><tbody>${PEOPLE.map(p=>`<tr><td><b>${p[0]}</b></td><td><span class="badge draft">${p[1]}</span></td><td>${p[2]}</td></tr>`).join('')}</tbody></table><h4>Roles</h4><div class="chips"><span>Worker</span><span>Supervisor</span><span>SOP Admin</span><span>Safety Manager</span></div><p class="tip">Roles decide who can sign off, write SOPs and approve. They live here, in the Office.</p>`;
+  case 'access': return `<p class="tip">Who sees which SOPs. The wiring screen you have today, kept as it is, opened from here.</p><svg class="wire" viewBox="0 0 520 200" style="width:100%;max-width:640px">${['Forming','General','Engineering'].map((d,i)=>`<rect x="14" y="${22+i*58}" width="130" height="34" rx="4" fill="#fff" stroke="#09090b"/><text x="26" y="${44+i*58}" font-size="12" font-family="monospace">${d}</text>`).join('')}${['Forming line SOPs','Cold end SOPs','Machine shop SOPs','Site-wide SOPs'].map((d,i)=>`<rect x="350" y="${12+i*46}" width="156" height="32" rx="4" fill="#fff" stroke="#09090b"/><text x="360" y="${33+i*46}" font-size="11" font-family="monospace">${d}</text>`).join('')}<path d="M144 39 C240 39 260 28 350 28 M144 97 C240 97 260 74 350 74 M144 155 C240 155 260 120 350 120 M144 39 C250 39 250 166 350 166 M144 97 C250 97 250 166 350 166 M144 155 C250 155 250 166 350 166" fill="none" stroke="#3b82f6" stroke-width="2"/></svg><p><button class="btn" data-act="toast" data-val="Opens the wiring screen">Open wiring</button></p>`;
+  case 'mine': return [['Manually Swabbing a Forming Machine','Waiting for S. Patel','draft'],['OTG Probe Maintenance','Signed off by B. Tane · 22 Sep','ok']].map(r=>`<div class="li"><span class="t">${r[0]}<small>${r[1]}</small></span><span class="badge ${r[2]}">${r[2]==='ok'?'Signed off':'Waiting'}</span></div>`).join('');
+  case 'matrix': { const cols=['hanger','swab','plenum','forming-safety','otg','evac'], v=['d','o','r','n']; const lab={d:'✓',o:'★',r:'·',n:''};
+    return `<table class="t"><thead><tr><th>Person</th>${cols.map(c=>`<th title="${S[c].t}">${S[c].t.split(' ').slice(0,2).join(' ')}</th>`).join('')}</tr></thead><tbody>${PEOPLE.slice(0,5).map((p,i)=>`<tr><td><b>${p[0]}</b><br><span style="color:var(--ink-500);font-size:11px">${p[1]}</span></td>${cols.map((c,j)=>{ const x=v[(i*3+j*5+i*j)%4]; return `<td><span class="pl ${x}">${lab[x]}</span></td>`; }).join('')}</tr>`).join('')}</tbody></table><p class="tip"><span class="pl d">✓</span> done &nbsp; <span class="pl o">★</span> observed doing it right &nbsp; <span class="pl r">·</span> read only &nbsp; <span class="pl n"></span> not started</p>`; }
+  case 'obs': { const l = admin()?OBS:OBS.filter(o=>o[1]===me()[1]); return (admin()?`<p><button class="btn primary" data-act="obsadd">＋ Record an observation</button></p>`:'') + l.map(o=>`<div class="li"><span class="t">${o[1]} — ${o[2]}<small>watched by ${o[0]} · ${o[4]}</small></span><span class="badge ${o[3]==='Did it right'?'ok':'stale'}">${o[3]}</span></div>`).join('') + `<p class="tip">One simple record: a supervisor watched someone do the job and said whether it was done right.</p>`; }
+  case 'me': return Object.keys(S).filter(id=>S[id].live&&S[id].rel).map(id=>`<div class="li"><span class="t">${S[id].t}</span><span class="badge ${S[id].rel}">${REL[S[id].rel]}</span></div>`).join('');
+  case 'new': { const R=[['doc','01','Upload a document','Word, PDF or photo. AI turns it into steps.'],['ai','02','Describe it to AI','Type what the job is. Get a first draft.'],['video','03','Record a video','Film the job. AI writes it up.'],['blank','04','Start blank','Write it yourself.']];
+    return `<h4>1 · How do you want to start?</h4><div class="tiles">${R.map(r=>`<button class="tile ${st.ramp===r[0]?'on':''}" data-act="ramp" data-id="${r[0]}"><span class="e">${r[1]}</span><b>${r[2]}</b><small>${r[3]}</small></button>`).join('')}</div>
+    ${st.ramp?`<h4>2 · What is it, and where does it live?</h4><label class="f">Title ${st.err?'<span class="err">— give it a name first</span>':''}<input id="ttl" placeholder="e.g. Changing the Neck Ring"></label><label class="f">Where<select id="where">${M.map(m=>`<option value="${m.id}" ${st.where===m.id?'selected':''}>${m.name} · ${m.dept}</option>`).join('')}<option value="">Site-wide (goes on the noticeboard)</option></select></label><p style="margin-top:14px"><button class="btn primary big" data-act="create">Create and open</button></p><p class="tip">The department comes from the machine. Every way of starting lands in the same editor.</p>`:''}`; }
+  case 'drafts': return DRAFTS.map(d=>`<div class="li"><span class="t">${S[d[0]].t}<small>${d[1]}</small></span><button class="btn sm" data-act="build" data-id="${d[0]}">Open</button></div>`).join('');
+  case 'standards': return `<p class="tip">A standard is just a label. Put it on a whole SOP, a section, or a single step. There is no separate library to manage.</p>${TAGS.map(t=>`<div class="li"><span class="t"><span class="tg">#${t[0]}</span></span><span class="w">on ${t[1]} SOPs</span></div>`).join('')}<p><button class="btn" data-act="toast" data-val="New standard added">＋ New standard</button></p>`;
+  case 'ai': return `<label class="f">Model that reads documents<select><option>Claude Sonnet</option><option>Claude Haiku (faster)</option></select></label><label class="f">Model that checks drafts<select><option>Claude Haiku</option><option>Claude Sonnet (more careful)</option></select></label><h4>What agents can read and set</h4>${objHTML(['Site','Forming','IS Machine 1'])}<p class="tip">Objectives sit beside SOPs, machines and people. People and agents can both read them and set them.</p>`;
+  case 'ask': return `<p>SOPs are written here by your SOP admins. Seen something wrong, or a job with no SOP?</p><p><button class="btn primary big" data-act="raise">Ask for a change</button></p>`;
+  case 'sops': return ROOMS.board.sops.filter(visible).map(sopRow).join('') + `<p class="tip">SOPs that belong to the whole site, not one machine.</p>`;
+  } return '';
+}
+function roomHTML(id){ const r=ROOMS[id], tabs=TABS[id][st.role], tab=curTab(id);
+  return head(r.name) + (st.v==='c'?'':cropHTML(r)) + `<div class="ttl"><span class="k">${r.sub}</span><h2>${r.name}</h2></div>` +
+    (tabs.length>1?`<div class="tabs">${tabs.map(t=>`<button class="${t[0]===tab?'on':''}" data-tab="${t[0]}">${t[1]}</button>`).join('')}</div>`:'') +
+    `<div class="ib">${tabHTML(id,tab)}</div>` + dataFoot(DATA[tab]); }
+
+function walkHTML(){ const w=st.work, s=S[w.id], n=STEPS.length, back = place(st.sel) ? place(st.sel).name : 'Site';
+  let secs='', last=''; STEPS.forEach((x,i)=>{ if(x.sec!==last){ secs+=`<div class="s">${x.sec}</div>`; last=x.sec; } secs+=`<div class="st ${i===w.i?'cur':i<w.i?'dn':''}"><span>${i<w.i?'✓':i+1}</span><span>${x.t}</span></div>`; });
+  let main;
+  if(w.i>=n) main=`<div class="card" style="border-left-color:var(--accent-ok)"><span class="ty" style="background:var(--accent-ok)">Finished</span><h3>Recorded. Sent to S. Patel for sign-off.</h3><p>${me()[1]} · today · ${Object.keys(w.ph).length} photo${Object.keys(w.ph).length===1?'':'s'} attached. This record cannot be changed.</p><button class="btn primary big" data-act="close">Back to ${back}</button></div>`;
+  else { const x=STEPS[w.i]; main=`<div class="bar"><i style="width:${w.i/n*100}%"></i></div><div class="card ${x.ty}"><span class="ty ${x.ty}">${TYN[x.ty]}</span> <span class="k">step ${w.i+1} of ${n} · ${x.sec}</span><h3>${x.t}</h3>${x.d?`<p>${x.d}</p>`:''}<div style="margin-bottom:12px">${tagsHTML(x.tags)}</div>
+    ${x.photo?`<p><button class="btn" data-act="photo">${w.ph[w.i]?'✓ 1 photo attached':'📷 Add a photo'}</button></p>`:''}
+    <button class="btn primary big" data-act="next">${x.ty==='hazard'?'I understand — continue':x.ty==='ppe'?'I’m wearing it — continue':w.i===n-1?'Done — finish':'Done — next'}</button></div>`; }
+  return head(s.t, back) + `<div class="workgrid"><div class="wl">${secs}</div><div class="wc">${main}</div></div>` + dataFoot('sop · steps · standards → decisions (completion + sign-off)'); }
+
+function buildHTML(){ const w=st.work, s=S[w.id], back = place(st.sel) ? place(st.sel).name : 'Site', n=STEPS.length, ok = st.ver.size===n && !st.flag;
+  let rows='', last=''; STEPS.forEach((x,i)=>{ if(x.sec!==last){ rows+=`<h4>${x.sec}</h4>`; last=x.sec; } rows+=`<div class="bs"><span class="ty ${x.ty}">${TYN[x.ty]}</span><span class="t" contenteditable="true">${x.t}<div contenteditable="false">${tagsHTML([...x.tags, ...(st.xt[i]||[])])}<button class="btn sm" data-act="tag" data-id="${i}">＋ standard</button></div></span><button class="vf ${st.ver.has(i)?'on':''}" data-act="verify" data-id="${i}" title="Tick when you have checked this step">✓</button></div>`; });
+  return head(s.t, back) + `<div class="workgrid"><div class="wl"><div class="s">Sections</div>${[...new Set(STEPS.map(x=>x.sec))].map((x,i)=>`<div class="st ${i===1?'cur':''}"><span>${i+1}</span><span>${x}</span></div>`).join('')}<div class="s">This SOP</div><div class="st"><span>v</span><span>${s.live?'v3 live · editing v4':'first draft'}</span></div><div class="st"><span>⌂</span><span>${(M.find(m=>m.sops.includes(w.id))||{name:'Site-wide'}).name}</span></div><div class="st"><span>◎</span><span>Objective: hanger change in under 20 minutes</span></div><div style="padding:8px 6px">${tagsHTML(s.tags)}</div></div>
+    <div class="wc">${st.flag?`<div class="flag"><b style="color:var(--accent-inspect)">✦ AI check</b><span style="flex:1">Step 5 says 85 N·m. Your uploaded document says 58 N·m.</span><button class="btn sm" data-act="fixflag">I’ve checked it</button></div>`:''}${rows}<p class="tip">Click any step to change the words. A SOP is sections and steps; hazards and PPE are just kinds of step.</p></div></div>
+    <div class="pubbar"><span>Checked <b>${st.ver.size} of ${n}</b> steps${st.flag?' · 1 AI flag open':''}</span><span style="flex:1"></span>${st.pub?'<span class="badge ok">Sent for approval</span>':`<button class="btn primary" data-act="publish" ${ok?'':'disabled'}>Publish</button>`}</div>` + dataFoot('sop · steps · standards · objectives → decisions (approval)'); }
+
+function editHTML(){ return head('Site design') + `<div class="ttl"><span class="k">map editor</span><h2>Site design</h2></div><div class="ib">
+  <h4>Departments</h4>${Object.keys(ZONE).map(z=>`<div class="li"><span class="ic" style="background:${ZONE[z]};border-radius:2px"></span><span class="t">${z}<small>${M.filter(m=>m.dept===z).length} machines</small></span><button class="btn sm" data-zone="${z}">Show</button></div>`).join('')}<p><button class="btn sm" data-act="toast" data-val="Draw the department’s area on the map">＋ Add a department</button></p>
+  <h4>Machines</h4>${M.slice(0,6).map(m=>`<div class="li"><span class="t">${m.name}</span><span class="w">${m.dept}</span></div>`).join('')}<p class="tip">…and ${M.length-6} more.</p><p><button class="btn sm" data-act="toast" data-val="Click the map to draw the machine’s outline">＋ Add a machine</button></p>
+  <h4>Rooms every site has</h4>${Object.values(ROOMS).map(r=>`<div class="li"><span class="t">${r.name}<small>${r.sub}</small></span><span class="w">fixed</span></div>`).join('')}
+  <p class="tip">Departments and machines are part of the drawing. There is no separate departments screen.</p></div>` + dataFoot('site · departments · machines'); }
+
+function renderInfo(){
+  const s=st.sel;
+  info.innerHTML = st.work ? (st.work.k==='walk'?walkHTML():buildHTML()) : st.edit ? editHTML() : !s ? overviewHTML() : s.k==='m' ? machineHTML(place(s)) : roomHTML(s.id);
+}
+function render(anim=true){
+  const s=st.sel, room = s && s.k==='r';
+  app.dataset.v = st.v;
+  app.classList.toggle('sel', !!(s || st.work || st.edit));
+  app.classList.toggle('editing', st.edit);
+  app.classList.toggle('focus', !!st.work);
+  app.classList.toggle('wide', !!st.work || (room && !st.edit && (st.v==='b' || WIDE[s.id].includes(curTab(s.id)))));
+  renderNav(); renderInfo(); paint();
+  requestAnimationFrame(()=>recenter(anim));
+}
+function go(k,id){ const p = k==='m' ? M.find(m=>m.id===id) : ROOMS[id]; const set=()=>{ st.sel={k,id}; st.work=null; st.edit=false; st.err=false; render(); };
+  if(st.v==='c' && !st.sel && !st.edit){ flyTo(p.poly, true, 2.4); setTimeout(set, 360); } else set(); }
+
+/* ── events ── */
+document.addEventListener('input', e=>{ if(e.target.id==='q') filter(e.target.value); });
+document.addEventListener('click', e=>{
+  const t = e.target.closest('[data-go],[data-tab],[data-act],[data-zone],[data-v],[data-role],[data-w]'); if(!t) return;
+  const d=t.dataset;
+  if(d.v){ st.v=d.v; document.querySelectorAll('.variant-tab').forEach(b=>b.classList.toggle('active',b===t)); return render(false); }
+  if(d.role){ st.role=d.role; document.querySelectorAll('[data-role]').forEach(b=>b.classList.toggle('active',b===t)); st.work=null; st.edit=false; return render(false); }
+  if(d.w!==undefined && t.closest('#sketch-tools')){ app.style.maxWidth=d.w; return; }
+  if(d.go){ const [k,id]=d.go.split(':'); if(st.edit){ st.edit=false; } return go(k,id); }
+  if(d.tab){ st.tab[st.sel.id]=d.tab; return render(); }
+  if(d.zone){ const pts=M.filter(m=>m.dept===d.zone).flatMap(m=>m.poly); world.querySelectorAll('.hs').forEach(p=>p.classList.toggle('zoned',p.classList.contains('zone-'+d.zone)));
+    const fly=()=>frame((b=>[b[0]-60,b[1]-60,b[2]+60,b[3]+60])(bbox(pts)), true, 1.6);
+    if(st.v==='c' && st.sel && !st.edit){ st.sel=null; st.work=null; render(false); setTimeout(fly,60); } else fly(); return; }
+  switch(d.act){
+    case 'close': if(st.work) st.work=null; else { st.sel=null; st.edit=false; } world.querySelectorAll('.zoned').forEach(p=>p.classList.remove('zoned')); return render();
+    case 'home': st.sel=null; st.work=null; return render();
+    case 'fit': world.querySelectorAll('.zoned').forEach(p=>p.classList.remove('zoned')); return fit(true);
+    case 'edit': st.edit=!st.edit; st.sel=null; st.work=null; return render();
+    case 'notif': st.sel=null; st.work=null; st.edit=false; render(); return toast(st.v==='a' ? 'Notifications are on the site overview' : NOTIF.length+' notifications — shown on the site overview in variant A');
+    case 'walk': if(d.m) st.sel={k:'m',id:d.m}; st.work={ k:'walk', id:d.id, i:0, ph:{} }; return render();
+    case 'photo': st.work.ph[st.work.i]=!st.work.ph[st.work.i]; if(!st.work.ph[st.work.i]) delete st.work.ph[st.work.i]; return renderInfo();
+    case 'next': st.work.i++; if(st.work.i>=STEPS.length){ INBOX.unshift({ ic:'info', t:'Sign off: '+S[st.work.id].t, s:'Done by '+me()[1]+' just now', w:'now', a:'Sign off' }); renderNav(); paint(); } return renderInfo();
+    case 'build': st.work={ k:'build', id:d.id }; return render();
+    case 'verify': { const i=+d.id; st.ver.has(i)?st.ver.delete(i):st.ver.add(i); return renderInfo(); }
+    case 'fixflag': st.flag=false; log('Cleared an AI flag', S[st.work.id].t+' · step 5'); toast('Logged in the decision ledger'); return renderInfo();
+    case 'tag': (st.xt[d.id]=st.xt[d.id]||[]).push('LOTO'); return renderInfo();
+    case 'publish': st.pub=true; log('Asked to publish', S[st.work.id].t); toast('Sent for approval · logged in the decision ledger'); return renderInfo();
+    case 'inbox': { const i=INBOX.splice(+d.id,1)[0]; log(i.a, i.t); toast(i.a+' · logged in the decision ledger'); return render(false); }
+    case 'req': { const r=REQS.splice(+d.id,1)[0]; log(d.val+' a request', r.t); toast(d.val+' · logged in the decision ledger'); return render(false); }
+    case 'raise': REQS.unshift({ who:me()[1], kind:'Change a SOP', t:'Step 3 should mention the second isolator', about:'Changing the Blank Side Hanger', w:'now' }); toast('Request sent to the Office'); st.sel={k:'r',id:'office'}; st.tab.office='requests'; return render();
+    case 'obsadd': OBS.unshift([me()[1],'R. Tane','Changing the Blank Side Hanger','Did it right','today']); log('Recorded an observation', 'R. Tane · Changing the Blank Side Hanger'); toast('Observation recorded'); return renderInfo();
+    case 'ramp': st.ramp=d.id; st.err=false; return renderInfo();
+    case 'newhere': st.where=d.id; st.ramp=null; st.tab.workshop='new'; return go('r','workshop');
+    case 'create': { const ttl=$('#ttl').value.trim(); if(!ttl){ st.err=true; return renderInfo(); } const where=$('#where').value; S.fresh={ t:ttl, rel:null, owner:me()[1], rev:'—', live:false, tags:[] }; const m=M.find(x=>x.id===where); if(m && !m.sops.includes('fresh')) m.sops.push('fresh');
+      st.ver=new Set(); st.flag=st.ramp!=='blank'; st.pub=false; st.err=false; toast(st.ramp==='doc'?'Reading your document…':st.ramp==='video'?'Writing it up from your video…':st.ramp==='ai'?'Drafting…':'Blank SOP created'); st.work={ k:'build', id:'fresh' }; return render(); }
+    case 'toast': return toast(d.val);
+  }
+});
+window.addEventListener('keydown', e=>{ if(e.key==='Escape' && (st.sel||st.work||st.edit) && document.activeElement.tagName!=='INPUT'){ if(st.work) st.work=null; else { st.sel=null; st.edit=false; } render(); } });
+render(false);
+</script>
+</body>
+</html>

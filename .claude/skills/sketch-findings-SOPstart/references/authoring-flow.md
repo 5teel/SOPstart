@@ -1,5 +1,7 @@
 # Authoring & Creation Flow
 
+> **2026-10-03: partly superseded by `one-screen-site.md` (MVP simplification).** Still valid: D-A1 (every on-ramp lands in one editor), D-A8 (verify each imported step by hand). Changed: four on-ramps (document · AI typed · record video · blank — no template, no YouTube); the reuse library becomes standards labels; read/walk/edit modes are replaced by the focus rule (an open SOP owns the screen); ghosts and the agent twin are not in the MVP. Read that file first.
+
 How a SOP gets *made* — the on-ramp wizard, the inline builder, and the one-URL
 read/walk/edit surface. Synthesized from three sketches (2026-07-14), wrapped
 2026-07-28.

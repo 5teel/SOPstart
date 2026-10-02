@@ -1,5 +1,7 @@
 # Plant Floor Navigation — the site is the map
 
+> **2026-10-03: partly superseded by `one-screen-site.md` (MVP simplification).** Still valid: scene renderer, hotspot polygons, pins, badges, machine panel, zone colours. Dropped: the phone/QR surface, voice in the ask bar, the admin inbox as its own page, the library table as a destination. Read that file first.
+
 **Status: NOT SHIPPED. Design contract, decided 2026-09-28 (sketch 007, winner "Plant").**
 Supersedes sketch 006 (Miller-column reshape) and, once built, replaces the `/sops`
 scope column that Phase 41 merged (Admin / Your SOPs / Library / By department).
