@@ -1737,7 +1737,8 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 **Decision (D-07, 2026-10-03):** bundle baseline moved down by hand after the cut — /sops/[sopId]/page 1048 → 817 KB, /sops/page 940 → 817 KB; capture script not run.
 
 **Plans:** 14/14 plans complete
-Plans:
+
+Plans:
 **Wave 1**
 
 - [x] 55-01-PLAN.md — Wave 0: dropped-features.json, phase55 sweep/contract specs + project, walk eval fixture + cleanup + skeleton, failure + bundle baselines
@@ -1808,7 +1809,35 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
   4. Approving, rejecting, signing off, assigning, publishing, changing an owner, recording an observation and clearing an AI finding each write one decision naming who, when, what and what it was about; a decision made by an AI agent names the agent
   5. Nobody — worker, supervisor or admin — can change or delete a decision once it is written; the database refuses the attempt even when the screen is bypassed
 
-**Plans**: TBD
+**Plans:** 10 plans
+Plans:
+**Wave 1**
+
+- [ ] 56-01-PLAN.md — Wave 0: phase56 project, data-keyed decision-writer list + sweep, publish-gate hash pin, convert fixture SOP, eval skeleton
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 56-02-PLAN.md — Pure converter (18 types, D-02/D-03 ordering, hard gate, re-run diff) + read-only production dry run and report
+- [ ] 56-03-PLAN.md — Migrations 00069 (placement + trigger, sop_focus_steps, conversion runs, standards) and 00070 (append-only decisions ledger, revokes, seven-source backfill) + types + matrix
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 56-04-PLAN.md — [BLOCKING] apply both migrations live; immutability probe; live RLS / trigger / cascade spec
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 56-05-PLAN.md — recordDecision() writer + approvals, publish, governance, completions hooks
+- [ ] 56-06-PLAN.md — Standards actions + Standards panel in the builder Tools menu + journey
+- [ ] 56-07-PLAN.md — Converter --apply: live proof in a throwaway org, then every production SOP (after the dry-run report is read)
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 56-08-PLAN.md — Assignment, observation, verify / AI-finding and agent-named AI write hooks; reconcile script; sweep fully live
+- [ ] 56-09-PLAN.md — Placement + derived department + SOP/section standards on the SOP page, Read and walk; Whole site in the machines picker
+
+**Wave 6** *(blocked on Wave 5 completion)*
+
+- [ ] 56-10-PLAN.md — Deployed eval for all five success criteria, full suite once, screenshots read, validation signed off
 
 ### Phase 57: The One Screen & Its Places
 
