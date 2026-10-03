@@ -6,7 +6,7 @@
  * draft, voice draft, blank wizard). Consolidates three near-identical
  * copies that had drifted: only WizardClient collected a title, PromptClient
  * had a free-text category `<select>` fed by a live `DISTINCT sops.category`
- * query (an anti-pattern per DAT-01 — deleted here), and VoiceDraftClient had
+ * query (an anti-pattern per DAT-01 — deleted here), and the voice draft client had
  * no category UI at all. See 40-PATTERNS.md for the full comparison.
  *
  * These three fields are no longer inline inputs. They are collected up front

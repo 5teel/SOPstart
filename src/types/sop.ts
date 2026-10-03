@@ -414,17 +414,6 @@ export interface SopsSubTrade {
  */
 export type AckTraceEntry = { stepId: string; timestamp: number }
 
-/**
- * Phase 15 voice Q&A response shape. Returned by POST /api/voice/query.
- * `citations` are section/step IDs the answer cites.
- * `verifier_flags` are adversarial-verifier ungrounded-claim flags (D-06, D-18).
- */
-export interface VoiceQueryResponse {
-  answer: string
-  citations: string[]
-  verifier_flags: VerificationFlag[]
-}
-
 // ---------------------------------------------------------------
 // Phase 25: Department as a First-Class Entity
 // Matches supabase/migrations/00035_departments_schema.sql.

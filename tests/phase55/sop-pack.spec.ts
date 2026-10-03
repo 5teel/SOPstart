@@ -6,7 +6,7 @@
  * headers with [type=...] tag, JSON.stringify of block snapshot content).
  */
 import { test, expect } from '@playwright/test'
-import { packSopForPrompt } from '@/lib/voice/sop-pack'
+import { packSopForPrompt } from '@/lib/agent-layer/sop-pack'
 import type { SopWithSections } from '@/types/sop'
 
 function makeSop(overrides: Partial<SopWithSections> = {}): SopWithSections {

@@ -23,7 +23,7 @@ export interface AiModelOption {
 
 // Cross-provider LLM candidates — the llm adapter (./llm.ts) routes by model
 // ID shape, so any option here works wherever llmToolCall/llmText is the call
-// path (the parse pipeline + voice-draft). GLM 5.2 was validated for SOP work
+// path (the parse pipeline). GLM 5.2 was validated for SOP work
 // by the .autoresearch R&D loop (2026-07-06).
 const CROSS_PROVIDER_LLM_OPTIONS: readonly AiModelOption[] = [
   { id: 'z-ai/glm-5.2', label: 'GLM 5.2', note: 'via OpenRouter · very cheap', provider: 'openrouter' },
@@ -53,10 +53,7 @@ export const AI_MODEL_OPTIONS: Record<AiModelKey, readonly AiModelOption[]> = {
   'parse-simple': [...ANTHROPIC_LLM_OPTIONS, ...CROSS_PROVIDER_LLM_OPTIONS],
   'parse-complex': [...ANTHROPIC_LLM_OPTIONS, ...CROSS_PROVIDER_LLM_OPTIONS],
   'draft-verify': ANTHROPIC_LLM_OPTIONS,
-  'voice-qa': ANTHROPIC_LLM_OPTIONS,
-  'sop-ask': ANTHROPIC_LLM_OPTIONS,
   synthesis: ANTHROPIC_LLM_OPTIONS,
-  'voice-draft': ANTHROPIC_LLM_OPTIONS,
   'vision-image-describe': [
     { id: 'gpt-4o-2024-08-06', label: 'GPT-4o', note: 'current default' },
     { id: 'gpt-4o-mini', label: 'GPT-4o mini', note: 'cheaper · lower detail' },
@@ -66,8 +63,6 @@ export const AI_MODEL_OPTIONS: Record<AiModelKey, readonly AiModelOption[]> = {
     { id: 'voyage-3', label: 'Voyage 3', note: 'previous generation' },
   ],
   'stt-batch': DEEPGRAM_STT_OPTIONS,
-  'stt-stream': DEEPGRAM_STT_OPTIONS,
-  'tts-voice': OPENAI_TTS_OPTIONS,
   'tts-video': OPENAI_TTS_OPTIONS,
   'ocr-fallback': [{ id: 'eng', label: 'Tesseract (English)', note: 'runs locally · free' }],
 }
@@ -78,15 +73,10 @@ export const AI_MODEL_LABELS: Record<AiModelKey, string> = {
   'parse-simple': 'Parse model (simple docs)',
   'parse-complex': 'Parse model (complex docs)',
   'draft-verify': 'Draft verification model',
-  'voice-qa': 'Voice Q&A model',
-  'sop-ask': 'SOP ask model',
   synthesis: 'Synthesis model',
-  'voice-draft': 'Voice draft interviewer model',
   'vision-image-describe': 'Image description model',
   embed: 'Embedding model',
   'stt-batch': 'Transcription model',
-  'stt-stream': 'Live speech model',
-  'tts-voice': 'Narration voice model',
   'tts-video': 'Video narration model',
   'ocr-fallback': 'OCR engine',
 }

@@ -1,19 +1,16 @@
 import type { SopWithSections } from '@/types/sop'
 
 /**
- * Phase 15 — Shared SOP serializer used by BOTH the answer call (voice-qa.ts)
- * AND the verifier call (verify-sop.ts mode: 'voice_qa').
+ * Phase 15 — SOP serializer for the agent-layer synthesis prompt (moved from
+ * lib/voice in Phase 55 when voice Q&A was cut).
  *
  * ⚠️  LOAD-BEARING CONSTANT — DO NOT MODIFY WITHOUT UNDERSTANDING PROMPT CACHE.
  *
  * Pitfall 3 (cache key drift): byte-identical output → same Anthropic prompt-cache hit.
  * Any whitespace / field-order / formatting change here invalidates the cache and
- * costs 10x per question. Both the answer call's cache_control breakpoint AND the
- * verifier call's cache_control breakpoint reference THIS function's output. If
- * two callers serialise the SOP differently above the breakpoint, the verifier
- * call becomes a cache miss → cost regression.
+ * costs 10x per question. 
  *
- * Unit-tested for byte-identical output across calls in voice-qa-cache.test.ts.
+ * Unit-tested for byte-identical output in tests/phase55/sop-pack.spec.ts.
  */
 export function packSopForPrompt(sop: SopWithSections): string {
   const lines = [`SOP TITLE: ${sop.title}`, `SOP VERSION: ${sop.version}`, '']

@@ -123,7 +123,7 @@
   /* Phase 26.5 — the human-invisible AGENT metadata layer (D-09) */
   --ai: #8b5cf6; /* violet — agentview toggle, agent panel, per-block ameta rows */
   --accent-ai: var(--ai); /* alias — BlockEditShell referenced this spelling with a fallback */
-  --ink-050: var(--ink-50); /* alias — VoiceDraftClient referenced this spelling with a fallback */
+  --ink-050: var(--ink-50); /* alias for the --ink-050 spelling */
 
   /* Brand + dark chrome. Referenced (with fallbacks) by the builder stage
    * shell and the annotation tools since Phase 12 but never defined here. */

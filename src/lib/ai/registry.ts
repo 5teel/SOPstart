@@ -8,7 +8,7 @@
  * 2026-06-02 model-rot learning).
  *
  * This module is deliberately LEAN — it is imported by client bundles
- * (deepgram-stream, voice-queue), and the /sops/[sopId] page has a bundle-size
+ * and the /sops/[sopId] page has a bundle-size
  * gate. Selector metadata (candidate model lists, labels) lives in
  * ./model-options.ts and is pulled in only by screens that render
  * <AiModelSelect> (src/components/ai/AiModelSelect.tsx).
@@ -31,7 +31,7 @@
  * ## Notes
  * - `envVar` overrides only apply server-side. In client bundles process.env
  *   is shimmed, so `aiModel()` returns the default — fine for the client
- *   callers (deepgram-stream, voice-queue), which treat the ID as a constant.
+ *   callers (none today), which treat the ID as a constant.
  * - Anthropic model IDs: prefer dateless aliases (`claude-haiku-4-5`) for new
  *   entries; existing dated pins are kept to avoid behavior drift.
  */
@@ -105,35 +105,12 @@ export const AI_MODELS = {
     envVar: 'ANTHROPIC_VERIFY_MODEL',
     description: 'Draft SOP verification + AI reviewer jobs (parsers/verify-sop.ts, ai-reviewer/orchestrator.ts)',
   },
-  'voice-qa': {
-    capability: 'llm',
-    provider: 'anthropic',
-    defaultId: 'claude-haiku-4-5-20251001',
-    envVar: 'VOICE_QA_MODEL',
-    description:
-      'Worker voice Q&A answer AND verifier calls (voice/voice-qa.ts, parsers/verify-sop.ts). ' +
-      'One key on purpose: D-08 requires both calls on the same model ID so the verifier reuses the answer call’s prompt-cache write.',
-  },
-  'sop-ask': {
-    capability: 'llm',
-    provider: 'anthropic',
-    defaultId: 'claude-haiku-4-5-20251001',
-    envVar: 'SOP_ASK_MODEL',
-    description: 'SOP question-answering endpoint (api/sops/[sopId]/ask)',
-  },
   synthesis: {
     capability: 'llm',
     provider: 'anthropic',
     defaultId: 'claude-haiku-4-5-20251001',
     envVar: 'SYNTHESIS_MODEL',
     description: 'Agent-metadata synthesis: tags, entities, assessment (agent-layer/synthesis.ts)',
-  },
-  'voice-draft': {
-    capability: 'llm',
-    provider: 'anthropic',
-    defaultId: 'claude-haiku-4-5-20251001',
-    envVar: 'VOICE_DRAFT_MODEL',
-    description: 'Conversational voice SOP-drafting interviewer (api/sops/voice-draft)',
   },
 
   // ---- Vision (OpenAI) -------------------------------------------------
@@ -162,22 +139,8 @@ export const AI_MODELS = {
     envVar: 'STT_BATCH_MODEL',
     description: 'Batch video/audio transcription (parsers/transcribe-audio.ts)',
   },
-  'stt-stream': {
-    capability: 'stt',
-    provider: 'deepgram',
-    defaultId: 'nova-3',
-    envVar: 'STT_STREAM_MODEL',
-    description: 'Live voice walkthrough streaming STT — client-side WS, env override has no effect in browser (voice/deepgram-stream.ts, offline/voice-queue.ts)',
-  },
 
   // ---- TTS (OpenAI) ------------------------------------------------------
-  'tts-voice': {
-    capability: 'tts',
-    provider: 'openai',
-    defaultId: 'gpt-4o-mini-tts',
-    envVar: 'TTS_MODEL',
-    description: 'Walkthrough voice narration (api/voice/tts, voice/tts-constants.ts)',
-  },
   'tts-video': {
     capability: 'tts',
     provider: 'openai',
