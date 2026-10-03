@@ -1,6 +1,6 @@
 /**
  * Phase 40 -- DUP-02 (D-09..D-12): one shared metadata picker.
- * PromptClient.tsx, WizardClient.tsx, and VoiceDraftClient.tsx used to each
+ * PromptClient.tsx, WizardClient.tsx (and the since-removed voice draft client) used to each
  * render their own <DepartmentPicker directly. Plan 40-08 extracted
  * SopMetadataFields.tsx (title + department + category picker, localOnly)
  * and rewired all three on-ramps onto it, sourcing category options from
@@ -27,7 +27,6 @@ const SRC_DIR = path.join(ROOT, 'src')
 
 const PROMPT_CLIENT = path.join(SRC_DIR, 'app', '(protected)', 'admin', 'sops', 'new', 'ai', 'PromptClient.tsx')
 const WIZARD_CLIENT = path.join(SRC_DIR, 'app', '(protected)', 'admin', 'sops', 'new', 'blank', 'WizardClient.tsx')
-const VOICE_DRAFT_CLIENT = path.join(SRC_DIR, 'app', '(protected)', 'admin', 'sops', 'new', 'ai', 'VoiceDraftClient.tsx')
 const SOP_METADATA_FIELDS = path.join(SRC_DIR, 'components', 'admin', 'SopMetadataFields.tsx')
 const SOP_METADATA_DIALOG = path.join(SRC_DIR, 'components', 'admin', 'SopMetadataDialog.tsx')
 const UPLOAD_PAGE = path.join(SRC_DIR, 'app', '(protected)', 'admin', 'sops', 'upload', 'page.tsx')
@@ -39,8 +38,8 @@ function read(p: string): string {
 }
 
 test.describe('DUP-02 -- one shared metadata picker', () => {
-  test('PromptClient, WizardClient, VoiceDraftClient import SopMetadataFields and render no local <DepartmentPicker', () => {
-    for (const file of [PROMPT_CLIENT, WIZARD_CLIENT, VOICE_DRAFT_CLIENT]) {
+  test('PromptClient, WizardClient import SopMetadataFields and render no local <DepartmentPicker', () => {
+    for (const file of [PROMPT_CLIENT, WIZARD_CLIENT]) {
       const src = read(file)
       expect(src).toContain("import { SopMetadataFields } from '@/components/admin/SopMetadataFields'")
       expect(src).not.toContain('<DepartmentPicker')

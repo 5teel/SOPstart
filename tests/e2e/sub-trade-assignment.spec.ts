@@ -45,7 +45,7 @@ function read(p: string): string {
  * Strip block comments (`/* ... *\/`) and line comments (`// ...`) so
  * source-contract assertions can check the substantive code body without
  * matching anti-patterns mentioned in docstrings. Same approach used by
- * tests/integration/voice-qa-happy-path.spec.ts (Phase 15-02 Deviation 4).
+ * the former voice Q&A happy-path spec (Phase 15-02 Deviation 4; removed in Phase 55).
  */
 function stripComments(src: string): string {
   return src

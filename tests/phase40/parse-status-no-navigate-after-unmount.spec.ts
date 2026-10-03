@@ -9,7 +9,7 @@ import path from 'node:path'
  * ParseJobStatus polls parse_jobs on an interval. Clearing that interval on
  * unmount does NOT cancel a request already in flight, so a poll fired just
  * before navigation resolved on a dead component and still ran its completion
- * branch — `onCompleted()`, which PromptClient and VoiceDraftClient both bind
+ * branch — `onCompleted()`, which PromptClient binds
  * to router.push('/admin/sops/builder/…'). The user had left the page; the
  * app dragged them back.
  *

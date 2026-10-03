@@ -5,10 +5,10 @@
  *   - Exactly ONE "New SOP" button (on /admin/sops) → method-picker screen
  *     /admin/sops/new with 4 options, Upload a document FIRST
  *     (per Visy interview — create-from-scratch is not the headline):
- *     Upload a document · Talk it through (?mode=voice) · Describe it ·
+ *     Upload a document · Describe it ·
  *     Start blank.
  *   - Destinations remain: /admin/sops/upload, /admin/sops/new/ai
- *     (+?mode=voice), /admin/sops/new/blank.
+ *     /admin/sops/new/blank.
  *   - Worker /sops "Create SOP" tab removal is 30-06 scope (shares
  *     sops/page.tsx) — that test stays fixme here until 30-06 flips it.
  *
@@ -55,15 +55,16 @@ test.describe('UX-04 — one create entry', () => {
     expect(src).toContain('/admin/sops/upload')
     expect(src).toContain('/admin/sops/new/ai')
     expect(src).toContain('/admin/sops/new/blank')
-    // The voice path is no longer a tile — it is reachable through the fork on
-    // /admin/sops/new/ai, which must still honour the ?mode= deep link.
+    // Voice drafting was cut (Phase 55): /admin/sops/new/ai opens straight onto
+    // the typed brief, with no type-vs-talk fork.
     // Targets the href list, not the whole file: the comment above METHODS
     // explains the merge and names the old query string, which a bare
     // substring check would read as a surviving tile.
     expect(src).not.toMatch(/href:\s*'[^']*mode=voice/)
     const fork = read(path.join(ROOT, 'src', 'app', '(protected)', 'admin', 'sops', 'new', 'ai', 'AiDraftFork.tsx'))
-    expect(fork).toContain("param === 'voice'")
-    expect(fork).toContain("param === 'type'")
+    expect(fork).toContain('PromptClient')
+    expect(fork).not.toContain('Talk it through')
+    expect(fork).not.toContain('ai-draft-fork')
     // Upload must appear BEFORE the other destinations in TILE order. Scoped
     // to the METHODS array: the explanatory comment above it names every
     // route, so whole-file indexOf compares prose positions, not tiles.

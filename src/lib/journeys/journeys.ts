@@ -376,7 +376,7 @@ export const JOURNEYS: Journey[] = [
     steps: [
       { id: 's', type: 'start', label: 'No document — just knowledge' },
       { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: '"Draft it with AI" tile.' },
-      { id: 'ai', type: 'screen', label: 'AI draft', route: '/admin/sops/new/ai', detail: 'AiDraftFork opens a must-answer modal — Type a brief vs Talk it through. Choosing "Type a brief" lands here. No switcher afterwards: switching remounted the other client and discarded the draft.' },
+      { id: 'ai', type: 'screen', label: 'AI draft', route: '/admin/sops/new/ai', detail: 'Type a brief; the AI drafts the SOP and opens it in the builder.' },
       { id: 'prompt', type: 'action', label: 'Describe the procedure', detail: 'AI generates structured sections + steps.' },
       { id: 'builder', type: 'screen', label: 'Builder', route: '/admin/sops/builder/[sopId]' },
       { id: 'e', type: 'end', label: 'Draft ready' },
@@ -395,25 +395,6 @@ export const JOURNEYS: Journey[] = [
       { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]' },
       { id: 'walk', type: 'screen', label: 'Walkthrough (Walk it tab)', route: '/sops/[sopId]', detail: 'Walk it tab (?tab=walk).' },
       { id: 'e', type: 'end', label: 'Right SOP, zero searching' },
-    ],
-  },
-  {
-    id: 'create-with-voice',
-    group: 'Create an SOP',
-    persona: 'SOP Admin',
-    title: 'Talk through a SOP (voice draft)',
-    summary: 'An admin describes the procedure out loud; an AI interviewer asks follow-up questions, builds a brief, then drafts through the same AI pipeline.',
-    steps: [
-      { id: 's', type: 'start', label: 'Easier to say than type' },
-      { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: '"Draft it with AI" tile — the voice path no longer has its own tile.' },
-      { id: 'fork', type: 'decision', label: 'Type a brief or talk it through?', detail: 'AiDraftFork\'s must-answer modal on /admin/sops/new/ai. ?mode=voice / ?mode=type skip it for deep links. The answer is written back to the URL with replaceState so a refresh does not re-ask.', branches: [
-        { label: 'Talk it through', to: 'voice' },
-        { label: 'Type a brief', to: 'voice' },
-      ] },
-      { id: 'voice', type: 'screen', label: 'Voice draft conversation', route: '/admin/sops/new/ai', detail: 'Mic → live transcription → AI follow-up questions (spoken + text). Brief accumulates as you talk. No tab back to the typed surface — that discarded the conversation.' },
-      { id: 'gen', type: 'action', label: 'Generate draft', detail: 'The accumulated brief feeds the same /api/sops/ai-prompt pipeline as the typed workflow.' },
-      { id: 'builder', type: 'screen', label: 'Builder', route: '/admin/sops/builder/[sopId]' },
-      { id: 'e', type: 'end', label: 'Draft ready' },
     ],
   },
   {

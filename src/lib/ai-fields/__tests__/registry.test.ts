@@ -6,8 +6,7 @@
  * This ensures Playwright's TS compiler resolves @/ path aliases via static imports.
  *
  * CLAUDE.md 2026-04-24: dynamic import('@/...') fails in Playwright Node runner
- * outside a testDir-scoped project. Use STATIC @/ imports here (mirrors intent-classifier.test.ts
- * pattern in src/lib/voice/__tests__/ under phase15-unit).
+ * outside a testDir-scoped project. Use STATIC @/ imports here (testDir-scoped project).
  *
  * NEVER use `await import('@/lib/ai-fields/registry')` here — it will fail at runtime
  * in the Playwright Node runner with "SyntaxError: Unexpected token 'export'".

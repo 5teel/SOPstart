@@ -20,7 +20,7 @@ test('D-06: signals.ts reads all four signal sources', () => {
   const src = read(SIGNALS_PATH)
   expect(src).toContain('sop_completions')
   expect(src).toMatch(/ai_review|reviewer/)
-  expect(src).toMatch(/voice_qa|voice-qa/)
+  expect(src).toContain('sop_voice_qa_log')
   expect(src).toContain('sop_section_blocks')
 })
 

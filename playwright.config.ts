@@ -54,13 +54,8 @@ export default defineConfig({
     {
       name: 'phase15-stubs',
       testMatch:
-        /(desktop-walkthrough-layout|sequential-ack|voice-qa-happy-path|voice-grounding-scope|sub-trade-rls-backward-compat|sub-trade-assignment|no-static-desktop-import|no-static-admin-lens-import|version-route-public|no-bulk-verify-ui|no-undefined-css-tokens|design-tokens|sops-select-policies-org-scoped|rls-org-scope|use-viewport|walkthrough-store-ack|no-dead-internal-hrefs)\.spec\.ts$/,
+        /(desktop-walkthrough-layout|sequential-ack|sub-trade-rls-backward-compat|sub-trade-assignment|no-static-desktop-import|no-static-admin-lens-import|version-route-public|no-bulk-verify-ui|no-undefined-css-tokens|design-tokens|sops-select-policies-org-scoped|rls-org-scope|use-viewport|walkthrough-store-ack|no-dead-internal-hrefs)\.spec\.ts$/,
       use: { browserName: 'chromium' },
-    },
-    {
-      name: 'phase15-unit',
-      testDir: './src/lib/voice/__tests__',
-      testMatch: /.*\.test\.ts$/,
     },
     {
       name: 'phase21-stubs',
@@ -174,12 +169,7 @@ export default defineConfig({
       // (should list all 6 tests/phase22/*.spec.ts files — zero discovered = FAIL)
       //
       // Files registered here:
-      //   tests/phase22/intent-classifier.spec.ts  — VDW-VOICE-03 unit test (Plan 02)
-      //   tests/phase22/tts-route.spec.ts           — VDW-LIT-03 TTS route auth gate (Plan 02)
-      //   tests/phase22/stt-keyterms.spec.ts        — VDW-VOICE-01 Deepgram keyterms (Plan 02)
       //   tests/phase22/visual-layer.spec.ts        — VDW-LIT-01/02 icon+image layer (Plan 04)
-      //   tests/phase22/voice-modal.spec.ts         — VDW-VOICE-02/03 STT+TTS+intent wiring (Plan 03)
-      //   tests/phase22/voice-safety-gate.spec.ts   — D-02 onVoiceNext→handleMarkComplete chain (Plan 03)
       name: 'phase22-stubs',
       testDir: '.',
       testMatch: /tests\/phase22\/.*\.(spec|test)\.ts$/,
@@ -211,7 +201,7 @@ export default defineConfig({
       // CLAUDE.md 2026-04-24: dynamic import('@/...') fails in Playwright Node runner
       // outside a testDir-scoped project — use STATIC @/ imports here.
       // testDir: './src/lib/ai-fields/__tests__' so Playwright's TS compiler resolves
-      // @/ path aliases (mirrors phase15-unit pattern for voice/__tests__).
+      // @/ path aliases (testDir-scoped project).
       //
       // Verify: `npx playwright test --list --project=phase23-unit`
       name: 'phase23-unit',
@@ -346,7 +336,7 @@ export default defineConfig({
       //
       // Wave-0 stub files (9, per 26.5-RESEARCH.md § Validation Architecture):
       //   schema-contract, synthesis-pipeline, proposal-evidence, signal-readers,
-      //   voice-qa-persistence, synthesis-sweep-auth, backfill-coverage,
+      //   synthesis-sweep-auth, backfill-coverage,
       //   agent-panel-readonly, agent-dashboard
       name: 'phase26.5',
       testDir: '.',
