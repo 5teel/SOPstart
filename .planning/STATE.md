@@ -4,13 +4,13 @@ milestone: v11.0
 milestone_name: — One-Screen MVP
 status: executing
 stopped_at: v11.0 roadmap created; next /gsd-discuss-phase 55
-last_updated: "2026-10-03T10:39:26.165Z"
+last_updated: "2026-10-03T10:44:44.052Z"
 last_activity: 2026-10-03 -- Phase 55 execution started
 progress:
   total_phases: 14
   completed_phases: 0
   total_plans: 14
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 55 (cut-the-dropped-features-one-organisation) — EXECUTING
-Plan: 4 of 14
+Plan: 5 of 14
 Status: Ready to execute
 Last activity: 2026-10-03 -- Phase 55 execution started
 
@@ -284,6 +284,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 55 P01 | 40min | 3 tasks | 12 files |
 | Phase 55 P02 | 35min | 3 tasks | 19 files |
 | Phase 55 P03 | 1h | 3 tasks | 14 files |
+| Phase 55 P04 | 35min | 3 tasks | 25 files |
 
 ## Accumulated Context
 
@@ -567,6 +568,7 @@ Recent decisions affecting current work:
 - [Phase 55-01]: Dropped list is JSON data read by a per-feature fixme-gated sweep; walk eval fixture SOP is unassigned and machine-less
 - [Phase 55]: [55-02] Builder autosave flushes pending edit on unmount/pagehide/visibilitychange; overwrite-toast effect has no cleanup
 - [Phase 55]: 55-03: photo upload memory-only via useStepPhotos; submitCompletion rejects photo paths outside session org completion folder; phone ImmersiveStepCard follows currentStepId
+- [Phase 55]: [55-04] VoiceNoteBlock stays registered and renders its prompt as static text; MeasurementBlock schema keeps voiceEnabled
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -712,6 +714,6 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-10-03T10:39:22.989Z
+Last session: 2026-10-03T10:44:40.432Z
 Stopped at: v11.0 roadmap created; next /gsd-discuss-phase 55
 Resume file: None
