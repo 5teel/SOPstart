@@ -113,12 +113,12 @@ test.describe('Plan 21-05 — parser materializes junctions', () => {
     ).toThrow(/invalid content/)
   })
 
-  test('addBlockToSection accepts blockProvenance; serviceRole wire flag removed (Phase 46 CR-01)', () => {
+  test('junction insert carries blockProvenance; no wire-level trust flag (Phase 46 CR-01, Phase 55)', () => {
+    // Phase 55: the junction-insert server action went with the content library;
+    // what remains in the action module must not reintroduce a trust override.
     const src = read('src/actions/sop-section-blocks.ts')
-    expect(src).toContain('blockProvenance: BlockProvenanceSchema.optional()')
-    // The wire-reachable auth bypass is gone from the action module.
-    expect(src).not.toContain('serviceRole: z.boolean()')
-    expect(src).not.toContain('data.serviceRole')
+    expect(src).not.toContain('serviceRole')
+    expect(src).not.toContain('createAdminClient')
     // The service path (parser) lives in the plain core module instead.
     // Directive-position check, not token absence -- the core's comments
     // legitimately mention the 'use server' literal.
@@ -128,11 +128,7 @@ test.describe('Plan 21-05 — parser materializes junctions', () => {
     expect(core).toContain('block_provenance: blockProvenance ?? null')
   })
 
-  test('createBlock has no wire-level trust override; the parser writes through createBlockAsService (Phase 43 T-43-01)', () => {
-    const src = read('src/actions/blocks.ts')
-    expect(src).not.toContain('serviceRole')
-    expect(src).not.toContain('createAdminClient')
-
+  test('the parser writes blocks through createBlockAsService, a plain module (Phase 43 T-43-01)', () => {
     const core = read('src/lib/blocks/create-block-core.ts')
     expect(/^\s*['"]use server['"]/.test(core)).toBe(false)
     expect(core).toContain('export async function createBlockAsService')
@@ -143,7 +139,7 @@ test.describe('Plan 21-05 — parser materializes junctions', () => {
 
     const parser = read('src/lib/parsers/parsed-sop-to-layout-data.ts')
     expect(parser).toContain('createBlockAsService(')
-    expect(parser).not.toContain("from '@/actions/blocks'")
+    expect(parser).not.toMatch(/from '@[/]actions[/][a-z-]*block/)
   })
 
   test('migration 00033 seeds 7 new section_kinds', () => {

@@ -29,7 +29,6 @@
  * Sources:
  *   - 23-04-PLAN.md Task 3
  *   - 23-CONTEXT.md D-03 (inline diff at the field, no central queue)
- *   - src/components/admin/blocks/BlockUpdateReviewModal.tsx (diff card pattern)
  *   - src/lib/builder/diff-block-content.ts (D-07 diff utility)
  *   - CLAUDE.md 2026-06-05 (wire the handler, not just render the affordance)
  */

@@ -3,13 +3,8 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { z } from 'zod'
 import type { SectionKind, Department } from '@/types/sop'
-import type { BlockContent } from '@/lib/validators/blocks'
 import { listSectionKinds } from '@/actions/sections'
 import { createSopFromWizard } from '@/actions/sops'
-import { addBlockToSection } from '@/actions/sop-section-blocks'
-import { updateSectionLayout } from '@/actions/sections'
-import { BlockPicker } from '@/components/admin/blocks/BlockPicker'
-import { blockContentToPuckProps, blockKindToPuckType } from '@/lib/builder/puck-to-block-content'
 import { SopMetadataFields } from '@/components/admin/SopMetadataFields'
 import type { SopMetadataValue } from '@/components/admin/SopMetadataFields'
 
@@ -18,35 +13,11 @@ import type { SopMetadataValue } from '@/components/admin/SopMetadataFields'
 // inside the builder via AddSectionButton if needed.
 const CANONICAL_WIZARD_SLUGS = ['hazards', 'ppe', 'steps', 'emergency', 'signoff'] as const
 
-// Phase 13: section kinds that surface a "Pick from library" affordance at
-// wizard step 2. Must match BlockContentSchema discriminator kinds.
-const LIBRARY_SUPPORTED_SLUG_TO_KIND: Record<string, BlockContent['kind'] | null> = {
-  hazards: 'hazard',
-  ppe: 'ppe',
-  steps: 'step',
-  emergency: 'emergency',
-  signoff: null, // signoff blocks live inline; no library picker yet
-  // Plan 21-05 — parser-emitted slugs (seeded in migration 00033).
-  text: 'text',
-  heading: 'heading',
-  photo: 'photo',
-  callout: 'callout',
-  model: 'model',
-  step_with_photos: 'step_with_photos',
-  photo_grid: 'photo_grid',
-}
-
 const TitleStepSchema = z.object({
   title: z.string().min(1, 'Title is required').max(200),
   sopNumber: z.string().max(60).optional(),
 })
 type TitleStepValues = z.infer<typeof TitleStepSchema>
-
-type PickedBlock = {
-  blockId: string
-  pinMode: 'pinned' | 'follow_latest'
-  preview: { name: string; content: BlockContent }
-}
 
 interface WizardClientProps {
   /** Phase 25: departments for the department multi-select field (localOnly create mode). */
@@ -72,15 +43,6 @@ export function WizardClient({ departments }: WizardClientProps) {
   const [kinds, setKinds] = useState<SectionKind[]>([])
   const [kindsLoading, setKindsLoading] = useState(true)
   const [selectedKindIds, setSelectedKindIds] = useState<string[]>([])
-  // Phase 13: blocks picked from the library, grouped by kind_slug.
-  const [pickedBlocksByKind, setPickedBlocksByKind] = useState<
-    Record<string, PickedBlock[]>
-  >({})
-  // Currently-open picker target — null when picker is closed.
-  const [pickerTarget, setPickerTarget] = useState<{
-    sectionKindSlug: string
-    libraryKindSlug: BlockContent['kind']
-  } | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -110,10 +72,6 @@ export function WizardClient({ departments }: WizardClientProps) {
     }
   }, [step])
 
-  function totalPickedCount(): number {
-    return Object.values(pickedBlocksByKind).reduce((sum, arr) => sum + arr.length, 0)
-  }
-
   async function handleSubmitFinal() {
     if (!titleValues || selectedKindIds.length === 0) return
     setSubmitting(true)
@@ -135,124 +93,7 @@ export function WizardClient({ departments }: WizardClientProps) {
       return
     }
 
-    // Phase 13: post-create, attach picked library blocks via addBlockToSection.
-    // Best-effort — failures here are non-blocking (admin can manually add in builder).
-    if (totalPickedCount() > 0) {
-      try {
-        await attachPickedBlocks(result.sopId)
-      } catch (e: unknown) {
-        // Non-blocking — surface a console warning but proceed to builder.
-        console.warn('[wizard] attachPickedBlocks partial failure', e)
-      }
-    }
-
     router.push(`/admin/sops/builder/${result.sopId}`)
-  }
-
-  /**
-   * Post-creation, fetch the new SOP's sections (created by createSopFromWizard
-   * with empty layout_data), and for each kind with picked blocks:
-   *   1. addBlockToSection per pick — captures snapshot_content
-   *   2. build a Puck item for each pick with props.junctionId stamped
-   *   3. updateSectionLayout to commit the new layout_data
-   */
-  async function attachPickedBlocks(sopId: string): Promise<void> {
-    const supabaseModule = await import('@/lib/supabase/client')
-    const supabase = supabaseModule.createClient()
-    const { data: sectionsRaw, error: secErr } = await supabase
-      .from('sop_sections')
-      .select('id, section_type, layout_data, layout_version')
-      .eq('sop_id', sopId)
-    if (secErr || !sectionsRaw) {
-      console.warn('[wizard] could not load sections for picked-block attachment', secErr)
-      return
-    }
-
-    type SectionRow = {
-      id: string
-      section_type: string
-      layout_data: unknown
-      layout_version: number | null
-    }
-    const sections = sectionsRaw as unknown as SectionRow[]
-
-    for (const [sectionKindSlug, picks] of Object.entries(pickedBlocksByKind)) {
-      if (picks.length === 0) continue
-      const section = sections.find(
-        (s) => s.section_type === sectionKindSlug
-      )
-      if (!section) continue
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const layoutData: any = section.layout_data ?? { content: [], root: { props: {} } }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const newContent: any[] = Array.isArray(layoutData.content)
-        ? [...layoutData.content]
-        : []
-
-      for (const pick of picks) {
-        const result = await addBlockToSection({
-          sopSectionId: section.id,
-          blockId: pick.blockId,
-          pinMode: pick.pinMode,
-        })
-        if ('error' in result) {
-          console.warn('[wizard] addBlockToSection failed', pick.blockId, result.error)
-          continue
-        }
-        const junctionId = result.junction.id
-        const puckType = blockKindToPuckType(pick.preview.content.kind)
-        if (!puckType) continue
-        const props = blockContentToPuckProps(pick.preview.content)
-        const itemId = `${puckType.toLowerCase()}-${junctionId.slice(0, 8)}`
-        newContent.push({
-          type: puckType,
-          props: {
-            id: itemId,
-            junctionId,
-            ...props,
-          },
-        })
-      }
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const newLayout: any = {
-        ...layoutData,
-        content: newContent,
-      }
-      const upd = await updateSectionLayout({
-        sectionId: section.id,
-        layoutData: newLayout,
-        layoutVersion: ((section.layout_version as number | null) ?? 0) + 1,
-        clientUpdatedAt: Date.now(),
-      })
-      if ('error' in upd) {
-        console.warn('[wizard] updateSectionLayout failed', section.id, upd.error)
-      }
-    }
-  }
-
-  function handlePickerAdd(input: {
-    blockId: string
-    pinMode: 'pinned' | 'follow_latest'
-    preview: { name: string; content: BlockContent }
-  }) {
-    if (!pickerTarget) return
-    const slug = pickerTarget.sectionKindSlug
-    setPickedBlocksByKind((prev) => ({
-      ...prev,
-      [slug]: [...(prev[slug] ?? []), input],
-    }))
-    setPickerTarget(null)
-  }
-
-  function handleRemovePicked(sectionKindSlug: string, blockId: string) {
-    setPickedBlocksByKind((prev) => ({
-      ...prev,
-      [sectionKindSlug]: (prev[sectionKindSlug] ?? []).filter(
-        (p) => p.blockId !== blockId
-      ),
-    }))
   }
 
   return (
@@ -332,9 +173,7 @@ export function WizardClient({ departments }: WizardClientProps) {
       {step === 2 && (
         <div className="flex flex-col gap-4">
           <p className="text-sm text-[var(--ink-500)]">
-            Pick the sections you want to include. You can add more later. For
-            hazards, PPE, and step sections you can also pick reusable blocks
-            from the library.
+            Pick the sections you want to include. You can add more later.
           </p>
           {kindsLoading ? (
             <div className="text-[var(--ink-500)] text-sm">Loading sections…</div>
@@ -342,8 +181,6 @@ export function WizardClient({ departments }: WizardClientProps) {
             <ul className="flex flex-col gap-2">
               {kinds.map((k) => {
                 const checked = selectedKindIds.includes(k.id)
-                const libraryKind = LIBRARY_SUPPORTED_SLUG_TO_KIND[k.slug] ?? null
-                const picks = pickedBlocksByKind[k.slug] ?? []
                 return (
                   <li key={k.id}>
                     <div
@@ -360,14 +197,6 @@ export function WizardClient({ departments }: WizardClientProps) {
                                 ? [...prev, k.id]
                                 : prev.filter((id) => id !== k.id)
                             )
-                            // If unchecking, clear any picks for this kind.
-                            if (!e.target.checked && picks.length > 0) {
-                              setPickedBlocksByKind((prev) => {
-                                const next = { ...prev }
-                                delete next[k.slug]
-                                return next
-                              })
-                            }
                           }}
                         />
                         <div className="flex-1">
@@ -375,46 +204,7 @@ export function WizardClient({ departments }: WizardClientProps) {
                             {k.display_name}
                           </div>
                         </div>
-                        {checked && libraryKind && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault()
-                              setPickerTarget({
-                                sectionKindSlug: k.slug,
-                                libraryKindSlug: libraryKind,
-                              })
-                            }}
-                            className="text-xs px-2 py-1 rounded bg-[var(--paper)] border border-[var(--ink-100)] text-[var(--ink-500)] hover:text-[var(--ink-900)]"
-                            data-testid={`wizard-pick-from-library-${k.slug}`}
-                          >
-                            + Pick from library
-                          </button>
-                        )}
                       </label>
-                      {checked && picks.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 pl-7">
-                          {picks.map((p) => (
-                            <span
-                              key={p.blockId}
-                              className="inline-flex items-center gap-1.5 px-2 py-0.5 text-meta rounded bg-accent-decision/10 text-accent-decision border border-accent-decision/30"
-                            >
-                              <span className="uppercase tracking-wider">
-                                {p.pinMode === 'pinned' ? 'Pinned' : 'Follow'}
-                              </span>
-                              <span className="text-[var(--ink-700)]">{p.preview.name}</span>
-                              <button
-                                type="button"
-                                onClick={() => handleRemovePicked(k.slug, p.blockId)}
-                                className="text-[var(--ink-500)] hover:text-accent-escalate ml-1"
-                                aria-label={`Remove ${p.preview.name}`}
-                              >
-                                ×
-                              </button>
-                            </span>
-                          ))}
-                        </div>
-                      )}
                     </div>
                   </li>
                 )
@@ -481,15 +271,9 @@ export function WizardClient({ departments }: WizardClientProps) {
                   {selectedKindIds.map((id) => {
                     const k = kinds.find((x) => x.id === id)
                     if (!k) return null
-                    const picks = pickedBlocksByKind[k.slug] ?? []
                     return (
                       <li key={id}>
                         {k.display_name}
-                        {picks.length > 0 && (
-                          <span className="text-xs text-[var(--ink-500)] ml-1">
-                            ({picks.length} from library)
-                          </span>
-                        )}
                       </li>
                     )
                   })}
@@ -523,20 +307,6 @@ export function WizardClient({ departments }: WizardClientProps) {
         <div className="text-[var(--ink-500)] text-sm" data-testid="wizard-submitting">
           Creating your SOP…
         </div>
-      )}
-
-      {/* Phase 13: BlockPicker overlay — driven by pickerTarget state */}
-      {pickerTarget && (
-        <BlockPicker
-          open={true}
-          onClose={() => setPickerTarget(null)}
-          kindSlug={pickerTarget.libraryKindSlug}
-          // Phase 40: the old SOP-level-category state that fed this prop was
-          // already permanently null (dead state) — pass null explicitly
-          // rather than reintroducing that dead state.
-          sopCategory={null}
-          onAdd={handlePickerAdd}
-        />
       )}
     </div>
   )

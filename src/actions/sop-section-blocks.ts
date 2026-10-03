@@ -1,193 +1,33 @@
 'use server'
 
 /**
- * Phase 13 plan 03 — sop_section_blocks junction CRUD.
+ * sop_section_blocks junction — what remains after the content library was
+ * removed (Phase 55).
  *
- * SB-BLOCK-04: snapshot_content frozen on add. Workers read from junction.snapshot_content
- * only — never join block_versions at read time. SOPs render the snapshot forever even
- * when the source block is later edited, archived, or deleted.
+ * The junction rows themselves stay: they carry snapshot_content (frozen
+ * when the parser creates a block, SB-BLOCK-04), block_provenance and the
+ * per-block verify state that the publish gate reads. The parser writes them
+ * through src/lib/builder/section-blocks-core.ts (not a server action).
  *
- * SB-BLOCK-05: pin_mode toggle (pinned default). Switching modes does not modify
- * snapshot_content; the follow-latest update path lives in plan 13-04.
- *
- * Junction reorder uses reorder_sop_section_blocks RPC (migration 00023.5) — atomic
- * multi-row UPDATE via single plpgsql call (no Promise.all of UPDATEs).
- *
- * Puck-item linkage contract: addBlockToSection RETURNS the new junction id; the
- * caller (BlockPicker / wizard submit) is responsible for stamping
- * `props.junctionId = junction.id` onto the matching Puck item in the section's
- * layout_data. This keeps layout_data writes localised to existing
- * updateSectionLayout flow and lets 13-04's UpdateAvailableBadge map junctions
- * → rendered Puck items.
+ * This module only reads a section's junction rows (builder editor), and
+ * owns the pre-publish verify chip + gate status.
  */
 
-import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
-import { requireAdminContext, requireSopEditAccess } from '@/lib/auth/guards'
-import { insertSectionBlockJunction } from '@/lib/builder/section-blocks-core'
-import { BlockProvenanceSchema } from '@/lib/validators/sop'
-import type {
-  SopSectionBlock,
-  SopSectionBlockWithUpdate,
-  BlockVersion,
-  PinMode,
-} from '@/types/sop'
-import { getBlock } from '@/actions/blocks'
+import { requireAdminContext } from '@/lib/auth/guards'
+import type { SopSectionBlock } from '@/types/sop'
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-// CAP-02 scope boundary: verifyBlock/unverifyBlock/acceptBlockUpdate/
-// declineBlockUpdate stay on requireAdmin() (= requireAdminContext()) —
-// verify-blocks is the pre-publish gate (publish authority, not edit
-// authority) and acceptBlockUpdate additionally flips sops.status
-// published->draft, an UPDATE that admins_can_update_sops restricts to
-// admins. Do NOT "finish the sweep" by swapping these to
-// requireSopEditAccess — that would let a SOP owner unverify/re-verify
-// blocks and flip publish state, which this phase deliberately does not
-// grant (RESEARCH Pitfall 4 / plan 46-03 acceptance criteria).
+// CAP-02 scope boundary: verifyBlock/unverifyBlock stay on requireAdmin()
+// (= requireAdminContext()) — verify-blocks is the pre-publish gate (publish
+// authority, not edit authority). Do NOT swap these to requireSopEditAccess —
+// that would let a SOP owner unverify/re-verify blocks, which the phase 46
+// capability work deliberately does not grant.
 async function requireAdmin() {
   return requireAdminContext()
 }
 
 // ---------------------------------------------------------------------------
-// Input schemas
-// ---------------------------------------------------------------------------
-
-const AddBlockToSectionInput = z.object({
-  sopSectionId: z.string().uuid(),
-  blockId: z.string().uuid(),
-  pinMode: z.enum(['pinned', 'follow_latest']).default('pinned'),
-  /**
-   * Optional Puck item id (from layout_data.content[].props.id) — purely
-   * informational; addBlockToSection itself does NOT mutate layout_data,
-   * the caller stamps `props.junctionId` onto the matching item using the
-   * returned junction id. See file-level JSDoc for the contract.
-   */
-  puckItemId: z.string().optional(),
-  /**
-   * Phase 21 Plan 21-05 — optional block_provenance stamp written to the
-   * junction row's block_provenance JSONB column. Populated by the parser
-   * pipeline so the verify checklist + reviewer-flags panel can map a
-   * block back to its source region (PDF bbox / DOCX paragraph anchor / etc.).
-   * Phase 13 callers (wizard, picker) omit it — the column remains NULL.
-   */
-  blockProvenance: BlockProvenanceSchema.optional(),
-  // Phase 46 CR-01: the old `serviceRole: boolean` wire flag is GONE. It let
-  // any network caller skip auth entirely (every 'use server' export is a
-  // POST-reachable endpoint). The parser's service-role path now lives in
-  // src/lib/builder/section-blocks-core.ts (addBlockToSectionAsService),
-  // which is not a server action and has no wire-reachable endpoint ID.
-})
-
-// ---------------------------------------------------------------------------
-// 1. addBlockToSection — snapshot-on-add (SB-BLOCK-04)
-// ---------------------------------------------------------------------------
-
-export async function addBlockToSection(
-  input: z.input<typeof AddBlockToSectionInput>
-): Promise<{ junction: SopSectionBlock } | { error: string }> {
-  const parsed = AddBlockToSectionInput.safeParse(input)
-  if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
-  }
-  const data = parsed.data
-
-  // Phase 46 CR-01: the guard ALWAYS runs — there is no wire-reachable
-  // bypass. The parser's session-less path is addBlockToSectionAsService
-  // in src/lib/builder/section-blocks-core.ts (not a server action).
-  const ctx = await requireSopEditAccess({ sectionId: data.sopSectionId })
-  if ('error' in ctx) return { error: ctx.error }
-
-  // Fetch the block + current version. RLS-scoped: returns null on cross-org or missing.
-  // T-13-03-01: prevents adding cross-org or unauthorised blocks via guessed UUID.
-  const fetched = await getBlock(data.blockId)
-  if (!fetched) return { error: 'Block not found or not accessible' }
-
-  return insertSectionBlockJunction(ctx.supabase, {
-    sopSectionId: data.sopSectionId,
-    block: fetched.block,
-    currentVersion: fetched.currentVersion,
-    pinMode: data.pinMode,
-    blockProvenance: data.blockProvenance ?? null,
-  })
-}
-
-// ---------------------------------------------------------------------------
-// 2. removeBlockFromSection
-// ---------------------------------------------------------------------------
-
-export async function removeBlockFromSection(
-  junctionId: string
-): Promise<{ success: true } | { error: string }> {
-  if (!junctionId) return { error: 'junctionId required' }
-
-  const ctx = await requireSopEditAccess({ junctionId })
-  if ('error' in ctx) return { error: ctx.error }
-  const { supabase } = ctx
-
-  // RLS-scoped delete; the source block in the library is unaffected.
-  // WR-04: an RLS-denied delete does not error -- it silently affects zero
-  // rows. Chain .select('id') and treat an empty result as failure, never
-  // a lying { success: true }.
-  const { data: deleted, error } = await supabase
-    .from('sop_section_blocks')
-    .delete()
-    .eq('id', junctionId)
-    .select('id')
-  if (error) {
-    console.error('[removeBlockFromSection] delete error', error)
-    return { error: error.message }
-  }
-  if (!deleted || deleted.length === 0) {
-    return { error: 'Delete affected no rows — the block was already removed or you do not have edit access.' }
-  }
-  return { success: true }
-}
-
-// ---------------------------------------------------------------------------
-// 3. setPinMode — SB-BLOCK-05 toggle
-// ---------------------------------------------------------------------------
-
-export async function setPinMode(
-  junctionId: string,
-  mode: PinMode
-): Promise<{ junction: SopSectionBlock } | { error: string }> {
-  if (!junctionId) return { error: 'junctionId required' }
-  if (mode !== 'pinned' && mode !== 'follow_latest') {
-    return { error: 'Invalid pin mode' }
-  }
-
-  const ctx = await requireSopEditAccess({ junctionId })
-  if ('error' in ctx) return { error: ctx.error }
-  const { supabase } = ctx
-
-  // Update only pin_mode + clear update_available. snapshot_content and
-  // pinned_version_id remain untouched — the follow-latest update path
-  // lives in plan 13-04.
-  const { data, error } = await supabase
-    .from('sop_section_blocks')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    .update({
-      pin_mode: mode,
-      update_available: false,
-      updated_at: new Date().toISOString(),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any)
-    .eq('id', junctionId)
-    .select('*')
-    .single()
-
-  if (error || !data) {
-    console.error('[setPinMode] update error', error)
-    return { error: error?.message ?? 'Failed to update pin mode' }
-  }
-  return { junction: data as unknown as SopSectionBlock }
-}
-
-// ---------------------------------------------------------------------------
-// 4. listSectionBlocks
+// 1. listSectionBlocks — RLS-scoped read of a section's junction rows
 // ---------------------------------------------------------------------------
 
 export async function listSectionBlocks(
@@ -209,172 +49,7 @@ export async function listSectionBlocks(
 }
 
 // ---------------------------------------------------------------------------
-// 5. reorderSectionBlocks — atomic via reorder_sop_section_blocks RPC
-// ---------------------------------------------------------------------------
-
-const ReorderSectionBlocksInput = z.object({
-  sopSectionId: z.string().uuid(),
-  orderedJunctionIds: z.array(z.string().uuid()).min(1),
-})
-
-export async function reorderSectionBlocks(
-  input: z.input<typeof ReorderSectionBlocksInput>
-): Promise<{ success: true } | { error: string }> {
-  const parsed = ReorderSectionBlocksInput.safeParse(input)
-  if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
-  }
-
-  const ctx = await requireSopEditAccess({ sectionId: parsed.data.sopSectionId })
-  if ('error' in ctx) return { error: ctx.error }
-  const { supabase } = ctx
-
-  // WR-04: the RPC (migration 00065) returns the affected row count -- it
-  // runs as the caller (NOT SECURITY DEFINER), so an RLS deny or stale id
-  // updates zero rows without erroring. Anything short of the full list is
-  // a failure, never a lying { success: true }.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: affected, error } = await (supabase as any).rpc('reorder_sop_section_blocks', {
-    p_sop_section_id: parsed.data.sopSectionId,
-    p_ordered_junction_ids: parsed.data.orderedJunctionIds,
-  })
-  if (error) {
-    console.error('[reorderSectionBlocks] rpc error', error)
-    return { error: `Reorder failed: ${error.message}` }
-  }
-  const expected = parsed.data.orderedJunctionIds.length
-  if (typeof affected !== 'number' || affected < expected) {
-    console.error('[reorderSectionBlocks] partial/zero reorder', { affected, expected })
-    return {
-      error: `Reorder affected ${typeof affected === 'number' ? affected : 0} of ${expected} rows — stale ids or no edit access; order unchanged or partially applied.`,
-    }
-  }
-  return { success: true }
-}
-
-// ---------------------------------------------------------------------------
-// 6. acceptBlockUpdate — Phase 13 plan 13-04
-// Routes through migration 00025's accept_block_update RPC, then flips
-// the parent SOP from published → draft so workers don't see the new
-// content until admin re-publishes (SB-BLOCK-06 publish gate integration).
-// ---------------------------------------------------------------------------
-
-const AcceptBlockUpdateInput = z.object({
-  sopSectionBlockId: z.string().uuid(),
-  newVersionId: z.string().uuid(),
-  note: z.string().max(500).optional(),
-})
-
-export async function acceptBlockUpdate(
-  input: z.input<typeof AcceptBlockUpdateInput>
-): Promise<{ success: true; sopReturnedToDraft: boolean } | { error: string }> {
-  const parsed = AcceptBlockUpdateInput.safeParse(input)
-  if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
-  }
-  const data = parsed.data
-
-  const ctx = await requireAdmin()
-  if ('error' in ctx) return { error: ctx.error }
-  const { supabase } = ctx
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error: rpcErr } = await (supabase as any).rpc('accept_block_update', {
-    p_sop_section_block_id: data.sopSectionBlockId,
-    p_new_version_id: data.newVersionId,
-    p_note: data.note ?? null,
-  })
-  if (rpcErr) {
-    console.error('[acceptBlockUpdate] rpc error', rpcErr)
-    return { error: `Accept failed: ${rpcErr.message}` }
-  }
-
-  // Publish-gate integration: walk the junction → section → SOP, and if the
-  // SOP is currently 'published', flip it to 'draft' so workers don't see
-  // the new content until admin re-publishes.
-  let sopReturnedToDraft = false
-  try {
-    const { data: junctionRow, error: jErr } = await supabase
-      .from('sop_section_blocks')
-      .select('sop_section_id')
-      .eq('id', data.sopSectionBlockId)
-      .maybeSingle()
-    if (!jErr && junctionRow) {
-      const sopSectionId = (junctionRow as { sop_section_id: string }).sop_section_id
-      const { data: sectionRow, error: sErr } = await supabase
-        .from('sop_sections')
-        .select('sop_id')
-        .eq('id', sopSectionId)
-        .maybeSingle()
-      if (!sErr && sectionRow) {
-        const sopId = (sectionRow as { sop_id: string }).sop_id
-        const { data: updated, error: uErr } = await supabase
-          .from('sops')
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .update({ status: 'draft' } as any)
-          .eq('id', sopId)
-          .eq('status', 'published')
-          .select('id')
-        if (!uErr && Array.isArray(updated) && updated.length > 0) {
-          sopReturnedToDraft = true
-        }
-      }
-    }
-  } catch (e) {
-    // Non-fatal: the snapshot was already updated by the RPC, the publish-gate
-    // flip is a follow-up. Surface a console warning but report success.
-    console.warn('[acceptBlockUpdate] publish-gate flip failed (non-fatal)', e)
-  }
-
-  return { success: true, sopReturnedToDraft }
-}
-
-// ---------------------------------------------------------------------------
-// 7. declineBlockUpdate — Phase 13 plan 13-04
-// Wraps decline_block_update RPC. No SOP status change.
-// ---------------------------------------------------------------------------
-
-const DeclineBlockUpdateInput = z.object({
-  sopSectionBlockId: z.string().uuid(),
-  newVersionId: z.string().uuid(),
-  note: z.string().max(500).optional(),
-})
-
-export async function declineBlockUpdate(
-  input: z.input<typeof DeclineBlockUpdateInput>
-): Promise<{ success: true } | { error: string }> {
-  const parsed = DeclineBlockUpdateInput.safeParse(input)
-  if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? 'Invalid input' }
-  }
-  const data = parsed.data
-
-  const ctx = await requireAdmin()
-  if ('error' in ctx) return { error: ctx.error }
-  const { supabase } = ctx
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any).rpc('decline_block_update', {
-    p_sop_section_block_id: data.sopSectionBlockId,
-    p_new_version_id: data.newVersionId,
-    p_note: data.note ?? null,
-  })
-  if (error) {
-    console.error('[declineBlockUpdate] rpc error', error)
-    return { error: `Decline failed: ${error.message}` }
-  }
-  return { success: true }
-}
-
-// ---------------------------------------------------------------------------
-// 8. listSectionBlocksWithUpdates — Phase 13 plan 13-04
-// Returns junction rows for a section, hydrated with `latestVersion` for any
-// row whose update_available=true so the builder can render UpdateAvailableBadge
-// + BlockUpdateReviewModal without an extra round-trip per row.
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// 9. verifyBlock / unverifyBlock — Phase 21 plan 21-01 (SCP-VERIFY-01/03)
+// 2. verifyBlock / unverifyBlock — Phase 21 plan 21-01 (SCP-VERIFY-01/03)
 //
 // Pre-publish per-block verify checklist (Spike 004). Each block in a draft
 // SOP must carry a verified_by_admin_id before the publish button unlocks
@@ -436,7 +111,7 @@ export async function unverifyBlock(
 }
 
 // ---------------------------------------------------------------------------
-// 10. getPublishGateStatus — Phase 21 plan 21-04 (SCP-VERIFY-02)
+// 3. getPublishGateStatus — Phase 21 plan 21-04 (SCP-VERIFY-02)
 //
 // Reads the verify gate state for a SOP — used by the builder UI to render
 // "X / N verified" + enable/disable the Publish button before the user
@@ -510,79 +185,4 @@ export async function getPublishGateStatus(
     total: totalNum,
     bypassed: false,
   }
-}
-
-// ---------------------------------------------------------------------------
-// 11. listSectionBlocksWithUpdates — Phase 13 plan 13-04
-// ---------------------------------------------------------------------------
-
-export async function listSectionBlocksWithUpdates(
-  sopSectionId: string
-): Promise<SopSectionBlockWithUpdate[]> {
-  if (!sopSectionId) return []
-  const supabase = await createClient()
-
-  const { data, error } = await supabase
-    .from('sop_section_blocks')
-    .select('*')
-    .eq('sop_section_id', sopSectionId)
-    .order('sort_order', { ascending: true })
-
-  if (error) {
-    console.error('[listSectionBlocksWithUpdates] junction list error', error)
-    return []
-  }
-  const rows = (data ?? []) as unknown as SopSectionBlock[]
-  if (rows.length === 0) return []
-
-  // Collect block_ids that need a head-version lookup (only those with
-  // update_available=true — others render fine without latestVersion).
-  const blocksNeedingLatest = Array.from(
-    new Set(rows.filter((r) => r.update_available).map((r) => r.block_id))
-  )
-
-  if (blocksNeedingLatest.length === 0) {
-    return rows.map((r) => ({ ...r, latestVersion: null }))
-  }
-
-  // Fetch the head version for each block_id. blocks.current_version_id points
-  // at the latest row in block_versions.
-  const { data: blocksRows, error: bErr } = await supabase
-    .from('blocks')
-    .select('id, current_version_id')
-    .in('id', blocksNeedingLatest)
-  if (bErr || !blocksRows) {
-    console.warn('[listSectionBlocksWithUpdates] blocks lookup error', bErr)
-    return rows.map((r) => ({ ...r, latestVersion: null }))
-  }
-
-  const blockIdToCurrentVersionId = new Map<string, string | null>()
-  for (const b of blocksRows as Array<{ id: string; current_version_id: string | null }>) {
-    blockIdToCurrentVersionId.set(b.id, b.current_version_id ?? null)
-  }
-  const versionIds = Array.from(blockIdToCurrentVersionId.values()).filter(
-    (v): v is string => typeof v === 'string'
-  )
-
-  let versionsById = new Map<string, BlockVersion>()
-  if (versionIds.length > 0) {
-    const { data: versions, error: vErr } = await supabase
-      .from('block_versions')
-      .select('*')
-      .in('id', versionIds)
-    if (vErr || !versions) {
-      console.warn('[listSectionBlocksWithUpdates] versions lookup error', vErr)
-    } else {
-      versionsById = new Map(
-        (versions as unknown as BlockVersion[]).map((v) => [v.id, v])
-      )
-    }
-  }
-
-  return rows.map((r) => {
-    if (!r.update_available) return { ...r, latestVersion: null }
-    const versionId = blockIdToCurrentVersionId.get(r.block_id) ?? null
-    const latest = versionId ? versionsById.get(versionId) ?? null : null
-    return { ...r, latestVersion: latest }
-  })
 }

@@ -19,8 +19,6 @@ export const metadata: Metadata = {
  * The "＋ New department" header CTA is rendered inside DepartmentGrid (client component)
  * so it can wire directly to the create modal's open state without a server/client boundary
  * prop-drilling issue.
- *
- * Analog: src/app/(protected)/admin/blocks/page.tsx (auth pattern copied exactly).
  */
 export default async function DepartmentsPage() {
   const { userId, role } = await getSessionContext()

@@ -2,7 +2,6 @@
 // D-21-09 isolation: admin-only; never imported by worker routes.
 
 import { useEffect } from 'react'
-import { Library } from 'lucide-react'
 import { humanizeBlockType, BLOCK_TYPE_LABELS } from '@/lib/builder/block-type-labels'
 
 // ---------------------------------------------------------------------------
@@ -13,7 +12,7 @@ import { humanizeBlockType, BLOCK_TYPE_LABELS } from '@/lib/builder/block-type-l
 // must be used inside <Puck>"). Instead it requests an insert through the
 // onInsert callback, which BuilderClient routes to a dispatch captured by the
 // `puck` override that lives inside the Puck context (RESEARCH Pitfall 2 —
-// root:default-zone). Preserves Phase 13 library picker via onOpenLibrary (D-03).
+// root:default-zone).
 // All visible labels resolve through humanizeBlockType — no raw PascalCase.
 // ---------------------------------------------------------------------------
 
@@ -22,8 +21,6 @@ interface AddMenuProps {
   onInsert: (componentType: string) => void
   /** Called after a block is inserted or the user dismisses. */
   onClose: () => void
-  /** Opens the Phase 13 block picker (addBlockToSection path). D-03 preservation. */
-  onOpenLibrary: () => void
 }
 
 // ---------------------------------------------------------------------------
@@ -91,7 +88,7 @@ const BLOCK_GROUPS: { label: string; types: string[] }[] = [
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
-export function AddMenu({ onInsert, onClose, onOpenLibrary }: AddMenuProps) {
+export function AddMenu({ onInsert, onClose }: AddMenuProps) {
   // Insert a new block by asking BuilderClient (which holds the Puck dispatch
   // captured inside the `puck` override). AddMenu lives outside <Puck>.
   function insertBlock(componentType: string) {
@@ -219,51 +216,6 @@ export function AddMenu({ onInsert, onClose, onOpenLibrary }: AddMenuProps) {
           })}
         </div>
       ))}
-
-      {/* Divider before "From library…" */}
-      <div
-        style={{
-          height: '1px',
-          background: 'var(--ink-300)',
-          margin: '2px 0',
-        }}
-      />
-
-      {/* "From library…" entry — delegates to Phase 13 block picker (D-03) */}
-      <button
-        type="button"
-        role="menuitem"
-        onClick={() => {
-          onOpenLibrary()
-          onClose()
-        }}
-        className="hover:bg-[var(--paper-2)]"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '4px 8px',
-          width: '100%',
-          height: '32px',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          textAlign: 'left',
-        }}
-      >
-        <Library size={14} style={{ color: 'var(--ink-500)', flexShrink: 0 }} />
-        <span
-          style={{
-            fontSize: 'var(--text-xs)',
-            fontFamily: 'JetBrains Mono, monospace',
-            fontWeight: 400,
-            fontStyle: 'italic',
-            color: 'var(--ink-500)',
-          }}
-        >
-          From library…
-        </span>
-      </button>
     </div>
   )
 }

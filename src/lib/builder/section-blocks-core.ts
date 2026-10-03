@@ -2,12 +2,13 @@
  * sop_section_blocks junction insert core — plain module, deliberately NOT
  * 'use server'.
  *
- * Phase 46 CR-01: the old addBlockToSection server action accepted a
+ * Phase 46 CR-01: the old junction-insert server action accepted a
  * `serviceRole: true` flag FROM THE WIRE and skipped all auth when it was
  * set — a network-reachable, unauthenticated, cross-tenant write bypass
  * (every export of a 'use server' module is a POST-reachable RPC endpoint,
- * and the action's ID ships in the client bundle via WizardClient/ReuseTier
- * imports). The trust flag must never arrive over the wire.
+ * and the action's ID shipped in the client bundle via client-component
+ * imports). The trust flag must never arrive over the wire. (Phase 55 removed
+ * that action along with the content library.)
  *
  * Split:
  *   - insertSectionBlockJunction(supabase, input) — the shared insert body

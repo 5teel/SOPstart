@@ -36,7 +36,7 @@ import {
   type BlockContent,
 } from '@/lib/validators/blocks'
 // Phase 46 CR-01 / Phase 43 T-43-01: the parser must NOT call createBlock
-// or addBlockToSection server actions with a wire-level trust override
+// or a junction-insert server action with a wire-level trust override
 // (that flag was a network-reachable auth bypass and has been removed on
 // both). The session-less service paths are the non-'use server' core
 // entry points below.
@@ -804,7 +804,7 @@ export async function materializeJunctionsForLayout(
       )
     }
 
-    // 2. addBlockToSection — pinned mode, forward block_provenance if present.
+    // 2. junction insert — pinned mode, forward block_provenance if present.
     const provFromItem = item.props.block_provenance as
       | { region: SourceProvenanceRegion; parser_run_id: string; parser_version: string }
       | undefined
