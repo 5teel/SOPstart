@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v11.0
 milestone_name: — One-Screen MVP
 status: executing
-stopped_at: Completed 56-02-PLAN.md
-last_updated: "2026-10-03T23:27:37.243Z"
+stopped_at: Completed 56-04-PLAN.md
+last_updated: "2026-10-03T23:36:58.154Z"
 last_activity: 2026-10-03 -- Phase 56 execution started
 progress:
   total_phases: 14
   completed_phases: 1
   total_plans: 24
-  completed_plans: 17
+  completed_plans: 18
   percent: 7
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 56 (a-simpler-sop-the-decision-ledger) — EXECUTING
-Plan: 4 of 10
+Plan: 5 of 10
 Status: Ready to execute
 Last activity: 2026-10-03 -- Phase 56 execution started
 
@@ -292,6 +292,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 56 P01 | 25min | 2 tasks | 8 files |
 | Phase 56 P02 | 40min | 2 tasks | 4 files |
 | Phase 56 P03 | 30min | 2 tasks | 5 files |
+| Phase 56 P04 | 25min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -584,6 +585,7 @@ Recent decisions affecting current work:
 - [Phase 56]: 56-02: unreadable hazard/PPE cards and unknown block types fail the per-SOP gate; empty non-safety blocks are dropped and counted
 - [Phase 56]: Phase 56-03: decisions has no authenticated INSERT policy; only the service-role writer inserts (no PostgREST forgery)
 - [Phase 56]: Phase 56-03: standard_attachments uses one FK column per level (sop, section, focus step) so deletes cascade and no label is orphaned
+- [Phase 56]: 56-04: 00069/00070 applied live via Management API fallback; migration history table not updated (stops at 00067); repair 00068-00070 before any bare supabase db push
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -729,6 +731,6 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-10-03T23:27:31.164Z
-Stopped at: Completed 56-02-PLAN.md
+Last session: 2026-10-03T23:36:58.142Z
+Stopped at: Completed 56-04-PLAN.md
 Resume file: .planning/phases/56-a-simpler-sop-the-decision-ledger/56-CONTEXT.md

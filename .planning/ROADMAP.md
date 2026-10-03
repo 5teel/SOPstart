@@ -1809,7 +1809,7 @@ Plans:
   4. Approving, rejecting, signing off, assigning, publishing, changing an owner, recording an observation and clearing an AI finding each write one decision naming who, when, what and what it was about; a decision made by an AI agent names the agent
   5. Nobody — worker, supervisor or admin — can change or delete a decision once it is written; the database refuses the attempt even when the screen is bypassed
 
-**Plans:** 3/10 plans executed
+**Plans:** 4/10 plans executed
 Plans:
 **Wave 1**
 
@@ -1822,7 +1822,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 56-04-PLAN.md — [BLOCKING] apply both migrations live; immutability probe; live RLS / trigger / cascade spec
+- [x] 56-04-PLAN.md — [BLOCKING] apply both migrations live; immutability probe; live RLS / trigger / cascade spec
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
