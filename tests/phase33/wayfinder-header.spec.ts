@@ -92,11 +92,9 @@ test.describe('SC-6 — Wayfinder builder header', () => {
     expect(src).toContain('Tools for this SOP')
     // No old standalone action-menu component survives.
     expect(src).not.toContain('SopActionsMenu')
-    // The 4 link items with locked labels.
+    // The link items with locked labels.
     expect(src).toContain('Assign this SOP to workers')
     expect(src).toContain('See earlier versions')
-    expect(src).toContain('Make a training video')
-    expect(src).toContain('Print a QR code')
     // Both flow-modal triggers render inside the popover.
     expect(src).toContain('<BuilderFlowButton sop={sop} />')
     expect(src).toContain('<BuilderFlowEditButton sop={sop} sopId={sopId} />')

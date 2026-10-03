@@ -25,16 +25,9 @@ const SHELL_TARGETS = [
   path.join(ADMIN_SOPS_DIR, 'new', 'blank', 'page.tsx'),
   path.join(ADMIN_SOPS_DIR, 'new', 'ai', 'page.tsx'),
   path.join(ADMIN_SOPS_DIR, '[sopId]', 'versions', 'page.tsx'),
-  path.join(ADMIN_SOPS_DIR, 'pipeline', '[pipelineId]', 'PipelineProgressClient.tsx'),
 ]
 
 const ADMIN_PAGE_SHELL = path.join(SRC_DIR, 'components', 'admin', 'AdminPageShell.tsx')
-
-// The pipeline page's `backLink` fallback (no sopId resolved yet) legitimately
-// carries the literal "Back to library" as a prop VALUE passed into
-// AdminPageShell -- it is not a second hand-rolled header. This is the one
-// carve-out the plan's acceptance criteria names explicitly.
-const PIPELINE_CLIENT = path.join(ADMIN_SOPS_DIR, 'pipeline', '[pipelineId]', 'PipelineProgressClient.tsx')
 
 function read(p: string): string {
   return fs.readFileSync(p, 'utf-8').replace(/\r\n/g, '\n')
@@ -77,18 +70,18 @@ test.describe('DUP-04 -- one shared admin page shell', () => {
     }
   })
 
-  test('none of the five creation-flow files renders <AdminNav directly', () => {
+  test('none of the creation-flow files renders <AdminNav directly', () => {
     for (const file of SHELL_TARGETS) {
       const src = read(file)
       expect(src).not.toContain('<AdminNav')
     }
   })
 
-  test('zero occurrences of the literal "Back to library" outside the pipeline fallback', () => {
+  test('zero occurrences of the literal "Back to library" outside the shell', () => {
     const files: string[] = []
     walk(ADMIN_SOPS_DIR, files)
     const hits = files
-      .filter((f) => f !== ADMIN_PAGE_SHELL && f !== PIPELINE_CLIENT)
+      .filter((f) => f !== ADMIN_PAGE_SHELL)
       .filter((f) => read(f).includes('Back to library'))
     expect(hits).toEqual([])
   })
@@ -99,22 +92,15 @@ test.describe('DUP-04 -- one shared admin page shell', () => {
     expect(src).toMatch(/backHref\?:|backLink\?:/)
   })
 
-  test('versions/page.tsx and PipelineProgressClient.tsx preserve the per-SOP back link', () => {
+  test('versions/page.tsx preserves the per-SOP back link', () => {
     const versionsSrc = read(path.join(ADMIN_SOPS_DIR, '[sopId]', 'versions', 'page.tsx'))
-    const pipelineSrc = read(PIPELINE_CLIENT)
     expect(versionsSrc).toContain('/admin/sops/builder/')
-    expect(pipelineSrc).toContain('/admin/sops/builder/')
   })
 
   test('upload/page.tsx uses the shared INTAKE_HINT, not the stale hardcoded format list', () => {
     const src = read(path.join(ADMIN_SOPS_DIR, 'upload', 'page.tsx'))
     expect(src).toContain('INTAKE_HINT')
     expect(src).not.toContain('Word (.docx), PDF, and photos')
-  })
-
-  test('PipelineProgressClient.tsx no longer renders its own <header', () => {
-    const src = read(PIPELINE_CLIENT)
-    expect(src).not.toMatch(/<header/)
   })
 
   test('route stability: every admin/sops page.tsx route resolves in journeys.ts', () => {

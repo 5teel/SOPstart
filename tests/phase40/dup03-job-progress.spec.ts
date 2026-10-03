@@ -22,16 +22,6 @@ const ROOT = process.cwd()
 const SRC_DIR = path.join(ROOT, 'src')
 
 const PIPELINE_STEPPER = path.join(SRC_DIR, 'components', 'admin', 'PipelineStepper.tsx')
-const PIPELINE_PROGRESS_CLIENT = path.join(
-  SRC_DIR,
-  'app',
-  '(protected)',
-  'admin',
-  'sops',
-  'pipeline',
-  '[pipelineId]',
-  'PipelineProgressClient.tsx',
-)
 const PARSE_JOB_STATUS = path.join(SRC_DIR, 'components', 'admin', 'ParseJobStatus.tsx')
 const JOB_STAGES = path.join(SRC_DIR, 'lib', 'admin', 'job-stages.ts')
 
@@ -64,14 +54,6 @@ test.describe('DUP-03 -- one shared job-progress component', () => {
     expect(fs.existsSync(PIPELINE_STEPPER)).toBe(false)
   })
 
-  test('PipelineProgressClient contains zero realtime/polling wiring of its own', () => {
-    const src = stripComments(read(PIPELINE_PROGRESS_CLIENT))
-    for (const token of ['postgres_changes', 'setInterval', 'REALTIME_GRACE_MS', 'REALTIME_STALE_MS', 'POLL_INTERVAL_MS']) {
-      expect(src).not.toContain(token)
-    }
-    expect(src).toContain('<ParseJobStatus')
-  })
-
   test('exactly one file under src/ contains both REALTIME_GRACE_MS and REALTIME_STALE_MS, and it is ParseJobStatus.tsx', () => {
     const files: string[] = []
     walk(SRC_DIR, files)
@@ -82,16 +64,14 @@ test.describe('DUP-03 -- one shared job-progress component', () => {
     expect(owners).toEqual([PARSE_JOB_STATUS])
   })
 
-  test('job-stages.ts exports STAGE_SETS with a video_generation key and a plain-language map', () => {
+  test('job-stages.ts exports STAGE_SETS and a plain-language map', () => {
     const src = read(JOB_STAGES)
     expect(src).toContain('export const STAGE_SETS')
-    expect(src).toContain('video_generation')
     for (const label of [
       'Uploading',
       'Reading your document',
       'Building the draft',
       'Checking',
-      'Making the video',
       'Ready',
     ]) {
       expect(src).toContain(label)
@@ -112,10 +92,11 @@ test.describe('DUP-03 -- one shared job-progress component', () => {
     }
   })
 
-  test('ParseJobStatus subscribes to all four pipeline tables in pipeline mode', () => {
+  test('ParseJobStatus subscribes to parse_jobs only (generation pipeline gone)', () => {
     const src = stripComments(read(PARSE_JOB_STATUS))
+    expect(src).toContain("table: 'parse_jobs'")
     for (const literal of ['sop_pipeline_runs', 'video_generation_jobs', 'pipeline_run_id=eq.']) {
-      expect(src).toContain(literal)
+      expect(src).not.toContain(literal)
     }
   })
 

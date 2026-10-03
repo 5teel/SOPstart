@@ -77,10 +77,9 @@ test('every onCompleted call is preceded by a cancelled check', () => {
   }
 })
 
-test('the async pipeline snapshot path is guarded after its awaits too', () => {
+test('the async parse-job poll and the realtime handler are both guarded', () => {
   const src = read()
-  // Two awaits (fetch, then .json()) — both need a guard after them before any
+  // The poll's await and the realtime callback each need a guard before any
   // setState/callback runs.
-  expect(src).toContain('if (cancelled || !res.ok) return')
-  expect(src.match(/if \(cancelled\) return/g)?.length ?? 0).toBeGreaterThanOrEqual(3)
+  expect(src.match(/if \(cancelled\) return/g)?.length ?? 0).toBeGreaterThanOrEqual(2)
 })

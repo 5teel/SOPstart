@@ -54,6 +54,6 @@ test.describe('chain gate — publish route divert into pending_approval', () =>
   test('no-chain branch still calls performPublish( — byte-identical path preserved', () => {
     const noChainIdx = routeSrc.lastIndexOf('performPublish(')
     expect(noChainIdx).toBeGreaterThan(-1)
-    expect(routeSrc).toContain('pipelineAutoQueued: result.pipelineAutoQueued')
+    expect(routeSrc).toContain('NextResponse.json({ success: true })')
   })
 })

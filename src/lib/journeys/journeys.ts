@@ -325,7 +325,6 @@ export const JOURNEYS: Journey[] = [
       { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: 'Video lives behind "Upload a document".' },
       { id: 'up', type: 'screen', label: 'Upload / record', route: '/admin/sops/upload' },
       { id: 'trans', type: 'action', label: 'Transcribe audio', detail: 'Domain vocabulary prompt; numbers + chemicals flagged for confirmation.' },
-      { id: 'pipe', type: 'screen', label: 'Pipeline progress', route: '/admin/sops/pipeline/[pipelineId]' },
       { id: 'builder', type: 'screen', label: 'Builder', route: '/admin/sops/builder/[sopId]' },
       { id: 'e', type: 'end', label: 'Draft ready' },
     ],
@@ -432,19 +431,6 @@ export const JOURNEYS: Journey[] = [
       { id: 'builder', type: 'screen', label: 'Builder (edit draft)', route: '/admin/sops/builder/[sopId]' },
       { id: 'republish', type: 'action', label: 'Republish', detail: 'Supersedes the prior version; workers notified. Updated badge appears on worker SOP card (D-08).' },
       { id: 'e', type: 'end', label: 'New version live' },
-    ],
-  },
-  {
-    id: 'generate-video',
-    group: 'Refine & publish',
-    persona: 'SOP Admin',
-    title: 'Generate a video',
-    summary: 'An admin turns a published procedure into a narrated video.',
-    steps: [
-      { id: 's', type: 'start', label: 'Want a video version' },
-      { id: 'video', type: 'screen', label: 'Generate video', route: '/admin/sops/[sopId]/video', detail: 'Pick a format.' },
-      { id: 'pipe', type: 'action', label: 'Render pipeline', detail: 'Narrated slideshow / screen recording.' },
-      { id: 'e', type: 'end', label: 'Video ready' },
     ],
   },
   {

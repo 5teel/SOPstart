@@ -5,7 +5,7 @@
  *   - Admin /admin/sops row = Title · status chip · ONE flag chip · owner;
  *     whole row click → builder. Nothing else.
  *   - SopDepartmentEditor + LibraryReviewCell leave the row.
- *   - The icon-only actions (edit/assign/versions/video) move into a
+ *   - The icon-only actions (edit/assign/versions) move into a
  *     LABELLED action menu in the BuilderStageShell top bar (reachable from
  *     every stage). Delete action survives for drafts in the same menu.
  *   - Fixes usability-lab F-09 (icon-only actions, WCAG).
@@ -52,7 +52,6 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
     const src = read(LIBRARY_TABLE)
     expect(src).not.toContain('SopDepartmentEditor')
     expect(src).not.toContain('LibraryReviewCell')
-    expect(src).not.toContain('VideoJobIndicator')
     expect(src).not.toContain('DeleteSopButton')
   })
 
@@ -62,7 +61,6 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
     // sopId into the real destination routes — not just route-name tokens.
     expect(shell).toMatch(/\/admin\/sops\/\$\{sopId\}\/assign/)
     expect(shell).toMatch(/\/admin\/sops\/\$\{sopId\}\/versions/)
-    expect(shell).toMatch(/\/admin\/sops\/\$\{sopId\}\/video/)
     // Delete for drafts survives in the menu (wired, not just named):
     // DeleteSopButton receives the sopId and the menu gates it on draft status.
     expect(shell).toMatch(/<DeleteSopButton\s+sopId=\{sopId\}/)
@@ -79,7 +77,6 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
     // 2026-07-13 stale-guard class).
     expect(shell).toContain('Assign this SOP to workers')
     expect(shell).toContain('See earlier versions')
-    expect(shell).toContain('Make a training video')
     // The old Phase 30 labels no longer appear.
     expect(shell).not.toContain('Assign to team')
     expect(shell).not.toContain('Version history')

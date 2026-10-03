@@ -166,12 +166,11 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
   { file: 'src/actions/grants.ts', keys: 'all_departments,all_departments_pre_override', reason: 'Grant-system all-departments override bookkeeping; not a category-bearing write.' },
   { file: 'src/actions/sop-section-blocks.ts', keys: 'status', reason: 'Resets SOP status to draft after a block edit invalidates verification; not a category-bearing write.' },
   { file: 'src/actions/sops.ts', keys: 'organisation_id,source_file_name,source_file_path,source_file_type,status', reason: 'createUploadSession -- pre-parse shell insert; /api/sops/parse’s post-parse UPDATE sets category_slug once the document is classified.' },
-  { file: 'src/actions/sops.ts', keys: 'source_file_path', reason: 'Finalises the uploaded file path after a presigned PUT/TUS upload; not a category-bearing write (4 call sites across the upload-session creators).' },
+  { file: 'src/actions/sops.ts', keys: 'source_file_path', reason: 'Finalises the uploaded file path after a presigned PUT/TUS upload; not a category-bearing write (2 call sites across the upload-session creators).' },
   { file: 'src/actions/sops.ts', keys: 'status', reason: 'Status-only transition; not a category-bearing write.' },
   { file: 'src/actions/sops.ts', keys: 'is_ocr,organisation_id,source_file_name,source_file_path,source_file_type,status,title,uploaded_by,version', reason: 'createVideoUploadSession -- pre-parse shell insert; the transcribe route’s post-parse UPDATE sets category_slug once the transcript is classified.' },
   { file: 'src/actions/sops.ts', keys: 'overall_confidence,parse_notes,status,title,updated_at', reason: 'reparseSop/restructureSop reset status to re-trigger parsing; category_slug is left untouched so the existing value survives unchanged.' },
   { file: 'src/actions/sops.ts', keys: 'title,updated_at', reason: 'Title-only rename; not a category-bearing write.' },
-  { file: 'src/actions/sops.ts', keys: 'organisation_id,pipeline_run_id,source_file_name,source_file_path,source_file_type,status,uploaded_by', reason: 'createVideoSopPipelineSession -- pre-parse shell insert; the pipeline’s post-parse UPDATE sets category_slug once classified.' },
   { file: 'src/actions/versioning.ts', keys: 'source_file_path', reason: 'Finalises the new-version/clone file path after upload; category was already carried into the insert above (2 call sites: uploadNewVersion, cloneSopAsDraft).' },
   { file: 'src/actions/versioning.ts', keys: 'superseded_by', reason: 'Marks the OLD SOP as superseded when a new version/clone publishes; the new row already carries its own category via its own insert (2 call sites).' },
   { file: 'src/actions/versioning.ts', keys: 'status', reason: 'Flips the sentinel status uploading -> draft once cloneSopAsDraft’s copy completes; category was already carried into the insert.' },
@@ -196,7 +195,9 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
 // genuinely added, which is exactly what this tripwire exists to surface.
 // 2026-10-03: 46 -> 44. Phase 55-07 deleted the YouTube route (its shell insert and
 // post-parse update were the two sites); no remaining path lost category_slug.
-const EXPECTED_SOPS_WRITE_SITE_COUNT = 44
+// 2026-10-03: 44 -> 41. Phase 55-08 deleted the video-generation session creator (its
+// shell insert and two file-path updates); no remaining path lost category_slug.
+const EXPECTED_SOPS_WRITE_SITE_COUNT = 41
 
 // Extracts the substring between a `(` at `openIdx` and its matching `)`,
 // tracking paren depth so nested calls/objects don't truncate the payload.

@@ -3,7 +3,7 @@
  *
  * The bespoke canvas re-implements the per-block verify chip, but the server
  * route `POST /api/sops/[sopId]/publish` remains the authoritative gate. This
- * spec exercises the REAL route handler (Supabase + auto-queue mocked) and
+ * spec exercises the REAL route handler (Supabase mocked) and
  * asserts: one unverified block → 400 `unverified_blocks` {count}; all verified
  * → 200 success. Proof runs in `scripts/verify-gate-check.tsx`. Behavioural, NOT
  * a source grep (extends the Wave-4 publish-gate contract with a real invocation).

@@ -3,7 +3,7 @@
  *
  * The bespoke canvas re-implements the per-block verify UI, but the AUTHORITATIVE
  * gate is the UNCHANGED server route `POST /api/sops/[sopId]/publish`. This harness
- * invokes the REAL route handler (createClient + auto-queue mocked) and proves the
+ * invokes the REAL route handler (createClient mocked) and proves the
  * two behaviours the UI depends on (CLAUDE.md 2026-06-05 — not a source grep):
  *   - one block unverified → 400 { error: 'unverified_blocks', count }
  *   - all blocks verified   → 200 { success: true }

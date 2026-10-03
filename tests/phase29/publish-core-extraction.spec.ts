@@ -34,10 +34,6 @@ test.describe('performPublish shared — publish-core extraction', () => {
     expect(coreSrc).toContain('triggerAgentSynthesis(')
   })
 
-  test('publish-core.ts calls enqueueVideoGenerationForPipeline', () => {
-    expect(coreSrc).toContain('enqueueVideoGenerationForPipeline(')
-  })
-
   test('exports both performPublish and assertPublishGates', () => {
     expect(coreSrc).toContain('export async function performPublish(')
     expect(coreSrc).toContain('export async function assertPublishGates(')

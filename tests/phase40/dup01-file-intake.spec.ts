@@ -28,7 +28,6 @@ const ROOT = process.cwd()
 const SRC_DIR = path.join(ROOT, 'src')
 
 const UPLOAD_DROPZONE = path.join(SRC_DIR, 'components', 'admin', 'UploadDropzone.tsx')
-const VIDEO_FORMAT_MODAL = path.join(SRC_DIR, 'components', 'admin', 'VideoFormatSelectionModal.tsx')
 const VERSIONS_PAGE = path.join(
   SRC_DIR,
   'app',
@@ -83,9 +82,9 @@ test.describe('DUP-01 -- one shared file-intake module', () => {
   })
 
   test(
-    'UploadDropzone, VideoFormatSelectionModal, and versions page import from @/lib/upload/file-intake and declare no local accept-list',
+    'UploadDropzone and versions page import from @/lib/upload/file-intake and declare no local accept-list',
     () => {
-      for (const file of [UPLOAD_DROPZONE, VIDEO_FORMAT_MODAL, VERSIONS_PAGE]) {
+      for (const file of [UPLOAD_DROPZONE, VERSIONS_PAGE]) {
         const src = stripComments(read(file))
         expect(src).toContain("from '@/lib/upload/file-intake'")
         expect(src).not.toContain('ACCEPTED_MIME_TYPES =')
@@ -99,8 +98,8 @@ test.describe('DUP-01 -- one shared file-intake module', () => {
   // 40-02 slice of the test above: the two surfaces this plan owns. Kept
   // alongside (not replacing) the all-three-surface fixme, which stays fixme
   // until 40-07 repoints the versions page too.
-  test('UploadDropzone and VideoFormatSelectionModal import from @/lib/upload/file-intake and declare no local accept-list', () => {
-    for (const file of [UPLOAD_DROPZONE, VIDEO_FORMAT_MODAL]) {
+  test('UploadDropzone imports from @/lib/upload/file-intake and declare no local accept-list', () => {
+    for (const file of [UPLOAD_DROPZONE]) {
       const src = stripComments(read(file))
       expect(src).toContain("from '@/lib/upload/file-intake'")
       expect(src).not.toContain('ACCEPTED_MIME_TYPES =')
@@ -122,8 +121,8 @@ test.describe('DUP-01 -- one shared file-intake module', () => {
     expect(hits).toEqual([])
   })
 
-  test('the new-version page and video-generate modal route video sources through startVideoSopUpload, not the document parser (D-06 honesty rule)', () => {
-    for (const file of [VERSIONS_PAGE, VIDEO_FORMAT_MODAL]) {
+  test('the new-version page routes video sources through startVideoSopUpload, not the document parser (D-06 honesty rule)', () => {
+    for (const file of [VERSIONS_PAGE]) {
       const src = stripComments(read(file))
       expect(src).toContain('startVideoSopUpload(')
     }
