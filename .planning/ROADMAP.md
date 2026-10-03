@@ -1734,7 +1734,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
   4. The sign-up page no longer creates an organisation, there is nowhere to switch organisation, and someone with no invitation is told to ask their admin
   5. Every existing SOP, completion record and photo is still there and opens exactly as before — nothing in the database was dropped
 
-**Plans:** 11/14 plans executed
+**Plans:** 12/14 plans executed
 Plans:
 **Wave 1**
 
@@ -1782,7 +1782,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 
 **Wave 12** *(blocked on Wave 11 completion)*
 
-- [ ] 55-12-PLAN.md — One organisation: static invitation-only /sign-up, no org creation/switch, Supabase public signup disabled (D-06)
+- [x] 55-12-PLAN.md — One organisation: static invitation-only /sign-up, no org creation/switch, Supabase public signup disabled (D-06)
 
 **Wave 13** *(blocked on Wave 12 completion)*
 
