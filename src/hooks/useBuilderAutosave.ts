@@ -11,6 +11,8 @@ import { CURRENT_LAYOUT_VERSION } from '@/lib/builder/supported-versions'
 type Data = { content: unknown[]; root: Record<string, unknown>; zones?: Record<string, unknown> }
 
 const DEBOUNCE_MS = 750 // CONTEXT D-06
+const RETRY_MS = 5_000
+const MAX_RETRIES = 3
 
 /** What BuilderClient reads for the SAVED pill and the "Updated by another admin" toast. */
 export const useBuilderSaveStatus = create<{
@@ -27,9 +29,11 @@ export const useBuilderSaveStatus = create<{
   clearOverwritten: () => set({ overwrittenSectionIds: [] }),
 }))
 
-async function saveLayout(sectionId: string, data: Data) {
+/** Resolves true when the server took the edit (or deliberately dropped it as server_newer). */
+async function saveLayout(sectionId: string, data: Data): Promise<boolean> {
   const status = useBuilderSaveStatus
   status.setState((s) => ({ pending: s.pending + 1 }))
+  let ok = true
   try {
     const result = await updateSectionLayout({
       sectionId,
@@ -42,16 +46,36 @@ async function saveLayout(sectionId: string, data: Data) {
       if (result.error === 'server_newer') {
         status.setState((s) => ({ overwrittenSectionIds: [...s.overwrittenSectionIds, sectionId] }))
       } else {
+        ok = false
         status.setState({ error: result.error })
       }
     } else {
       status.setState({ lastSavedAt: Date.now(), error: null })
     }
   } catch (err) {
+    ok = false
     status.setState({ error: err instanceof Error ? err.message : String(err) })
   } finally {
     status.setState((s) => ({ pending: s.pending - 1 }))
   }
+  return ok
+}
+
+/**
+ * A failed save is re-sent a few times so a transient error (or closing the tab
+ * right after one) does not lose the edit. A newer edit supersedes the retry:
+ * it carries the latest data and runs its own save.
+ */
+async function saveWithRetry(
+  sectionId: string,
+  data: Data,
+  isLatest: () => boolean,
+  retriesLeft = MAX_RETRIES
+) {
+  if ((await saveLayout(sectionId, data)) || retriesLeft <= 0) return
+  setTimeout(() => {
+    if (isLatest()) void saveWithRetry(sectionId, data, isLatest, retriesLeft - 1)
+  }, RETRY_MS)
 }
 
 /**
@@ -68,7 +92,8 @@ export function useBuilderAutosave(sectionId: string, sopId: string) {
     if (!timerRef.current || !dataRef.current) return
     clearTimeout(timerRef.current)
     timerRef.current = null
-    void saveLayout(sectionId, dataRef.current)
+    const data = dataRef.current
+    void saveWithRetry(sectionId, data, () => dataRef.current === data)
   }, [sectionId])
 
   useEffect(() => {
@@ -91,7 +116,7 @@ export function useBuilderAutosave(sectionId: string, sopId: string) {
       if (timerRef.current) clearTimeout(timerRef.current)
       timerRef.current = setTimeout(() => {
         timerRef.current = null
-        void saveLayout(sectionId, data)
+        void saveWithRetry(sectionId, data, () => dataRef.current === data)
       }, DEBOUNCE_MS)
     },
     [sectionId, sopId]

@@ -60,6 +60,13 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
   const overwrittenSectionIds = useBuilderSaveStatus((s) => s.overwrittenSectionIds)
   const clearOverwritten = useBuilderSaveStatus((s) => s.clearOverwritten)
 
+  // The save-status store is module-level: drop the previous SOP's error, saved
+  // time and overwrite notices when a different SOP opens. `pending` is left
+  // alone because in-flight saves from the old SOP still decrement it.
+  useEffect(() => {
+    useBuilderSaveStatus.setState({ lastSavedAt: null, error: null, overwrittenSectionIds: [] })
+  }, [sopId])
+
   // 1 s tick so the "SAVED Ns AGO" label counts up.
   const [savedTick, setSavedTick] = useState(0)
   useEffect(() => {
@@ -69,6 +76,8 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
 
   // D-07: surface a quiet toast when a cross-admin overwrite is reported.
   const [overwriteToast, setOverwriteToast] = useState<string | null>(null)
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  useEffect(() => () => { if (toastTimer.current) clearTimeout(toastTimer.current) }, [])
   useEffect(() => {
     if (!overwrittenSectionIds.length) return
     const overwrittenTitles = overwrittenSectionIds.map(
@@ -76,8 +85,10 @@ export function BuilderClient({ sopId, initialSop }: BuilderClientProps) {
     )
     setOverwriteToast(`Updated by another admin - ${overwrittenTitles.join(', ')}`)
     clearOverwritten()
-    // No cleanup: clearOverwritten() re-runs this effect, and a cleanup would cancel the hide timer.
-    setTimeout(() => setOverwriteToast(null), 4000)
+    // No cleanup here: clearOverwritten() re-runs this effect, and a cleanup would cancel the hide
+    // timer. The handle lives in a ref (reset on each overwrite, cleared on unmount) instead.
+    if (toastTimer.current) clearTimeout(toastTimer.current)
+    toastTimer.current = setTimeout(() => setOverwriteToast(null), 4000)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [overwrittenSectionIds])
 

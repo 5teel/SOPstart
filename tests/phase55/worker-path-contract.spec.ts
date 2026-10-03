@@ -205,4 +205,13 @@ test.describe('review fixes (55-review)', () => {
     // the duplicate-key retry path must still reach the photo insert, not return early
     expect(body).not.toMatch(/23505'\)\s*\{\s*return/)
   })
+
+  test('WR-03: a failed autosave is retried and the save-status store resets per SOP', () => {
+    const hook = code('src/hooks/useBuilderAutosave.ts')
+    expect(hook).toContain('saveWithRetry(')
+    expect(hook).not.toMatch(/void saveLayout\(/)
+    const client = code('src/app/(protected)/admin/sops/builder/[sopId]/BuilderClient.tsx')
+    expect(client).toMatch(/useBuilderSaveStatus\.setState\(\{[^}]*error: null/)
+    expect(client).toContain('[sopId]')
+  })
 })
