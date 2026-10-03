@@ -1734,7 +1734,23 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
   4. The sign-up page no longer creates an organisation, there is nowhere to switch organisation, and someone with no invitation is told to ask their admin
   5. Every existing SOP, completion record and photo is still there and opens exactly as before — nothing in the database was dropped
 
-**Plans**: TBD
+**Plans:** 14 plans (strictly sequential, main tree — every plan edits a shared map)
+
+Plans:
+- [ ] 55-01-PLAN.md — Wave 0: dropped-features.json, phase55 sweep/contract specs + project, walk eval fixture + cleanup + skeleton, failure + bundle baselines
+- [ ] 55-02-PLAN.md — Rewire reads: worker list/detail/Now card from the server; builder autosave straight to updateSectionLayout
+- [ ] 55-03-PLAN.md — Rewire writes: direct photo upload + in-memory completion; getPhotoUploadUrl org from session; deployed walk eval green before any deletion
+- [ ] 55-04-PLAN.md — Delete worker voice (walkthrough bridge, read-aloud, ask-bar mic, voice capture); bundle gate voice assertion removed (D-07)
+- [ ] 55-05-PLAN.md — Delete voice drafting, voice/ask endpoints, lib/voice, voice AI model keys; move sop-pack
+- [ ] 55-06-PLAN.md — Delete phone/QR (machine pages, plates, scanner, phone home) and shared-device login; phone/scan marker groups removed
+- [ ] 55-07-PLAN.md — Delete YouTube and photo-scan on-ramps (and the Generate video SOP entry) from UploadDropzone
+- [ ] 55-08-PLAN.md — Delete video generation (Shotstack pipeline, routes, components, auto-queue, middleware exemption, tts-video)
+- [ ] 55-09-PLAN.md — Delete offline layer + install prompt; retire Serwist with a committed self-unregistering sw.js
+- [ ] 55-10-PLAN.md — Delete flow diagram, image annotation, version compare/restore (keep Edit into new version, D-01)
+- [ ] 55-11-PLAN.md — Delete the reusable-content library pages, Reuse tier, wizard picker and library actions (keep block data + parser plumbing)
+- [ ] 55-12-PLAN.md — One organisation: static invitation-only /sign-up, no org creation/switch, Supabase public signup disabled (D-06)
+- [ ] 55-13-PLAN.md — Uninstall 8 packages, dropped list fully live, docs refreshed, bundle baseline moved down by hand (D-07), full suite once
+- [ ] 55-14-PLAN.md — Finish and run the deployed eval (npm run eval -- --phase 55), read screenshots, sign off validation
 
 ### Phase 56: A Simpler SOP & the Decision Ledger
 
