@@ -9,7 +9,7 @@
  */
 import { useState, useEffect, useCallback } from 'react'
 import { db, type QueuedPhoto } from '@/lib/offline/db'
-import { compressPhoto } from '@/lib/offline/photo-compress'
+import { compressPhoto } from '@/lib/photo/compress'
 
 interface UsePhotoQueueResult {
   photos: QueuedPhoto[]

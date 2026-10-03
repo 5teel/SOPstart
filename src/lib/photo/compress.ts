@@ -1,5 +1,5 @@
 /**
- * photo-compress.ts
+ * compress.ts
  *
  * Canvas API-based image compression targeting ~200KB output.
  * Uses a binary-search over JPEG quality to hit the target byte size.

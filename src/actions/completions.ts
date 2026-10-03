@@ -1,6 +1,7 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { Json } from '@/types/database.types'
@@ -50,6 +51,13 @@ export async function submitCompletion(
       return { success: false, error: 'Roster user not in this organisation.' }
     }
     resolvedRosterWorkerId = rosterWorkerId
+  }
+
+  // Photo paths must sit in this org's folder for this completion (the folder
+  // getPhotoUploadUrl signs); a client-supplied path never reaches another tenant's files.
+  const photoPrefix = `${organisationId}/completions/${localId}/`
+  if (photoStoragePaths.some((p) => !p.storagePath.startsWith(photoPrefix))) {
+    return { success: false, error: 'Invalid photo path.' }
   }
 
   // Insert into sop_completions — client UUID as PK for idempotent retry
@@ -262,26 +270,32 @@ export async function signOffCompletion(
 // getPhotoUploadUrl
 //
 // Generates a presigned upload URL for a completion photo.
-// Path: {orgId}/completions/{completionLocalId}/{localId}.jpg
+// Path: {session org}/completions/{completionLocalId}/{localId}.jpg
+// The org comes from the session only, and both ids must be UUIDs so a
+// crafted id cannot add path segments or point at another org's folder.
 // Uses admin client to bypass RLS for storage bucket access.
 // ---------------------------------------------------------------
 export async function getPhotoUploadUrl(input: {
   localId: string
   contentType: string
-  orgId: string
   completionLocalId: string
 }): Promise<{ url: string; path: string } | { error: string }> {
+  const parsed = z
+    .object({
+      localId: z.string().uuid(),
+      contentType: z.string(),
+      completionLocalId: z.string().uuid(),
+    })
+    .safeParse(input)
+  if (!parsed.success) return { error: 'Invalid upload request.' }
+
   const { userId, organisationId } = await getSessionContext()
   if (!userId) return { error: 'Not authenticated' }
-
-  // Derive orgId from the session context if caller passed empty string
-  // (offline client pattern)
-  const orgId = input.orgId || organisationId || ''
-  if (!orgId) return { error: 'No organisation found' }
+  if (!organisationId) return { error: 'No organisation found' }
 
   // Determine file extension from content type
-  const ext = input.contentType === 'image/png' ? 'png' : 'jpg'
-  const path = `${orgId}/completions/${input.completionLocalId}/${input.localId}.${ext}`
+  const ext = parsed.data.contentType === 'image/png' ? 'png' : 'jpg'
+  const path = `${organisationId}/completions/${parsed.data.completionLocalId}/${parsed.data.localId}.${ext}`
 
   const admin = createAdminClient()
   const { data, error } = await admin.storage

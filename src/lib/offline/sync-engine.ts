@@ -176,9 +176,6 @@ export async function flushPhotoQueue(
         const urlResult = await getPhotoUploadUrl({
           localId: photo.localId,
           contentType: photo.contentType,
-          // orgId is extracted by server action from JWT — pass a placeholder here;
-          // the actual orgId extraction happens server-side
-          orgId: '',
           completionLocalId: photo.completionLocalId,
         })
 

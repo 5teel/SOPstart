@@ -1,6 +1,6 @@
 # Capability Matrix
 
-**Last updated:** 2026-09-29
+**Last updated:** 2026-10-03
 
 This document is the single reference for who can see and do what in SafeStart. When a capability gate changes (an RLS policy, a `require*` guard, or a role check), this file changes in the **same commit**. If this file disagrees with the code, the code is the bug or the file is stale — treat any drift as a finding, not a footnote.
 
@@ -34,7 +34,7 @@ To answer "is a worker *required* to do X?": this document does not answer that 
 | Read SOP | ✅ | ✅ | ✅ | ✅ | ✅ | RLS `sops` SELECT policies, org-scoped (`org_members_can_view_sops` + department/sub-trade tag arms, migration 00061) |
 | Walk SOP | ✅ | ✅ | ✅ | ✅ | ✅ | Same RLS as Read SOP — walkthrough is a read-only client mode over the same rows |
 | Self-add SOP | ✅ | ✅ | ✅ | ✅ | — | `assignments.ts` worker-context self-assign functions, session client + org-scoped RLS on `sop_assignments`. UI is the per-row Add/Remove buttons on `WorkerSimpleList.tsx` (Phase 54 D-10) — the retired desktop detail pane's only home for this action |
-| Record completion | ✅ | ✅ | ✅ | ✅ | — | `sop_completions` INSERT RLS (append-only — no UPDATE/DELETE, D-15) |
+| Record completion | ✅ | ✅ | ✅ | ✅ | — | `sop_completions` INSERT RLS (append-only — no UPDATE/DELETE, D-15); walk photos upload through `getPhotoUploadUrl()` in `src/actions/completions.ts`, which builds the storage path from the session organisation only and accepts UUID ids only (Phase 55) |
 | Sign off completion | — | ✅ | ✅ | ✅ | — | `signOffCompletion()` in `src/actions/completions.ts`, role check `role in ('supervisor','safety_manager','admin')` + org-scoped write (fixed cross-org hole, 2026-06-26 CR-02) |
 | Record observation | — | ✅ | ✅ | ✅ | — | `recordObservation()` in `src/actions/observations.ts`, supervisor/assessor-gated + org-scoped RLS (`sop_observations`, fixed 2026-07-20 org-scope hole) |
 | Create SOP | — | — | ✅ | ✅ | — | `requireAdminContext()` in `src/lib/auth/guards.ts` at every creation on-ramp (upload/AI-prompt/AI-voice/wizard/video) |
