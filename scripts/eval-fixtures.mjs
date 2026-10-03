@@ -20,6 +20,9 @@ export const EVAL_SITE_DEPARTMENT = 'Forming'
 // the Phase 51 draft fixture above which only needed to exist for linking.
 export const EVAL_SITE_WORKER_EMAIL = 'eval-site-worker@sopstart.com'
 export const EVAL_PLANT_SOP_TITLE = 'Eval plant fixture SOP'
+// Phase 55 (55-01): a published, UNASSIGNED, machine-less SOP whose step 2 asks for a
+// photo -- the walk eval completes it, so it must never be the plant fixture SOP.
+export const EVAL_WALK_SOP_TITLE = 'Eval walk fixture SOP'
 
 const { data: list } = await sb.auth.admin.listUsers({ perPage: 500 })
 for (const [role, email] of Object.entries(EVAL_USERS)) {
@@ -181,4 +184,70 @@ if (!plantSection) {
   console.log(`assigned ${EVAL_PLANT_SOP_TITLE} → ${EVAL_SITE_WORKER_EMAIL}`)
 }
 
-console.log(`SOPstart Eval Site → org=${siteOrg.id} admin=${siteAdmin.id} department=${dept.id} sop=${sop.id} worker=${siteWorker.id} plantSop=${plantSop.id}`)
+// --- Phase 55 (55-01): dedicated walk fixture ---
+// Published, assigned to NOBODY and linked to NO machine: an assigned, never-done SOP
+// would join the plant-home Now card and pins (CLAUDE.md 2026-09-29 shared-fixture
+// learning). Step 2 asks for a photo so the walk eval can take one.
+let walkSop
+{
+  const { data, error } = await sb.from('sops').select('id, status').eq('organisation_id', siteOrg.id).eq('title', EVAL_WALK_SOP_TITLE).maybeSingle()
+  if (error) throw error
+  walkSop = data
+}
+if (!walkSop) {
+  const { data, error } = await sb
+    .from('sops')
+    .insert({
+      organisation_id: siteOrg.id,
+      title: EVAL_WALK_SOP_TITLE,
+      source_file_name: EVAL_WALK_SOP_TITLE,
+      source_file_type: 'docx',
+      source_file_path: '',
+      uploaded_by: siteAdmin.id,
+      status: 'published',
+      published_at: new Date().toISOString(),
+      version: 1,
+      source_type: 'blank',
+    })
+    .select('id, status')
+    .single()
+  if (error) throw error
+  walkSop = data
+  console.log('created fixture SOP', EVAL_WALK_SOP_TITLE, walkSop.id)
+} else if (walkSop.status !== 'published') {
+  const { error } = await sb.from('sops').update({ status: 'published', published_at: new Date().toISOString() }).eq('id', walkSop.id)
+  if (error) throw error
+  console.log('published fixture SOP', EVAL_WALK_SOP_TITLE, walkSop.id)
+}
+
+let walkSection
+{
+  const { data, error } = await sb.from('sop_sections').select('id').eq('sop_id', walkSop.id).order('sort_order').limit(1).maybeSingle()
+  if (error) throw error
+  walkSection = data
+}
+if (!walkSection) {
+  const { data, error } = await sb
+    .from('sop_sections')
+    .insert({ sop_id: walkSop.id, section_type: 'procedure', title: 'Procedure', sort_order: 0, approved: true })
+    .select('id')
+    .single()
+  if (error) throw error
+  walkSection = data
+  console.log('created walk fixture section', walkSection.id)
+}
+
+for (const step of [
+  { step_number: 1, text: 'Check the guard is closed.', photo_required: false },
+  { step_number: 2, text: 'Photograph the closed guard.', photo_required: true },
+]) {
+  const { data: existing, error } = await sb.from('sop_steps').select('id').eq('section_id', walkSection.id).eq('step_number', step.step_number).maybeSingle()
+  if (error) throw error
+  const { error: writeErr } = existing
+    ? await sb.from('sop_steps').update({ text: step.text, photo_required: step.photo_required }).eq('id', existing.id)
+    : await sb.from('sop_steps').insert({ section_id: walkSection.id, ...step, time_estimate_minutes: 1 })
+  if (writeErr) throw writeErr
+}
+console.log(`walk fixture ${EVAL_WALK_SOP_TITLE} → ${walkSop.id}`)
+
+console.log(`SOPstart Eval Site → org=${siteOrg.id} admin=${siteAdmin.id} department=${dept.id} sop=${sop.id} worker=${siteWorker.id} plantSop=${plantSop.id} walkSop=${walkSop.id}`)
