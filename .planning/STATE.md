@@ -4,13 +4,13 @@ milestone: v11.0
 milestone_name: — One-Screen MVP
 status: executing
 stopped_at: v11.0 roadmap created; next /gsd-discuss-phase 55
-last_updated: "2026-10-03T10:59:31.805Z"
+last_updated: "2026-10-03T11:07:30.831Z"
 last_activity: 2026-10-03 -- Phase 55 execution started
 progress:
   total_phases: 14
   completed_phases: 0
   total_plans: 14
-  completed_plans: 7
+  completed_plans: 8
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 55 (cut-the-dropped-features-one-organisation) — EXECUTING
-Plan: 8 of 14
+Plan: 9 of 14
 Status: Ready to execute
 Last activity: 2026-10-03 -- Phase 55 execution started
 
@@ -569,6 +569,7 @@ Recent decisions affecting current work:
 - [Phase 55]: [55-02] Builder autosave flushes pending edit on unmount/pagehide/visibilitychange; overwrite-toast effect has no cleanup
 - [Phase 55]: 55-03: photo upload memory-only via useStepPhotos; submitCompletion rejects photo paths outside session org completion folder; phone ImmersiveStepCard follows currentStepId
 - [Phase 55]: [55-04] VoiceNoteBlock stays registered and renders its prompt as static text; MeasurementBlock schema keeps voiceEnabled
+- [Phase 55]: [55-08] Video generation deleted; publish result is { success: true }; Shotstack exemption removed; record-a-video on-ramp kept (D-05)
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -714,6 +715,6 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-10-03T10:59:31.794Z
+Last session: 2026-10-03T11:07:25.695Z
 Stopped at: v11.0 roadmap created; next /gsd-discuss-phase 55
 Resume file: None
