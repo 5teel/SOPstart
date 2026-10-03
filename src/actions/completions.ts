@@ -18,7 +18,7 @@ import { isSignedOffAssessor } from '@/lib/competency/assessor'
 // Inserts a completion record into sop_completions using the
 // client-generated UUID as the primary key (idempotency key).
 // submitted_at is deliberately OMITTED — uses DB DEFAULT now() (COMP-01).
-// On conflict (23505 duplicate key): returns success (idempotent retry).
+// On conflict (23505 duplicate key): idempotent retry -- missing photo rows are added, then success.
 // ---------------------------------------------------------------
 export async function submitCompletion(
   rawInput: unknown
@@ -35,10 +35,12 @@ export async function submitCompletion(
   const admin = createAdminClient()
   const { localId, sopId, sopVersion, contentHash, stepData, photoStoragePaths, stepAckTrace } = parsed.data
 
-  // Photo paths must sit in this org's folder for this completion (the folder
-  // getPhotoUploadUrl signs); a client-supplied path never reaches another tenant's files.
+  // Photo paths must be exactly what getPhotoUploadUrl signs for this org and
+  // completion: no extra segments, no `..`, a UUID file name and a known extension.
   const photoPrefix = `${organisationId}/completions/${localId}/`
-  if (photoStoragePaths.some((p) => !p.storagePath.startsWith(photoPrefix))) {
+  const validPhotoPath = (p: { localId: string; storagePath: string }) =>
+    p.storagePath === `${photoPrefix}${p.localId}.jpg` || p.storagePath === `${photoPrefix}${p.localId}.png`
+  if (!photoStoragePaths.every(validPhotoPath)) {
     return { success: false, error: 'Invalid photo path.' }
   }
 
@@ -63,32 +65,53 @@ export async function submitCompletion(
       step_ack_trace: (stepAckTrace ?? []) as unknown as Json,
     })
 
-  if (insertError) {
-    // 23505 = unique_violation (duplicate key) — completion already submitted, treat as success
-    if (insertError.code === '23505') {
-      return { success: true, completionId: localId }
-    }
+  // 23505 = unique_violation: the completion row was already written by an
+  // earlier attempt. Fall through so a retry can still add the photo rows that
+  // attempt failed to save.
+  const isRetry = insertError?.code === '23505'
+  if (insertError && !isRetry) {
     console.error('submitCompletion insert error:', insertError)
     return { success: false, error: 'Failed to submit completion.' }
   }
 
   // Insert completion_photos records for each uploaded photo
   if (photoStoragePaths.length > 0) {
-    const photoRows = photoStoragePaths.map((p) => ({
-      organisation_id: organisationId,
-      completion_id: localId,
-      step_id: p.stepId,
-      storage_path: p.storagePath,
-      content_type: p.contentType,
-    }))
+    let toInsert = photoStoragePaths
+    if (isRetry) {
+      // Only the worker who wrote the completion may attach photos to it, and
+      // rows an earlier attempt did save are not duplicated.
+      const { data: existing } = await admin
+        .from('sop_completions')
+        .select('worker_id, organisation_id')
+        .eq('id', localId)
+        .single()
+      if (!existing || existing.worker_id !== userId || existing.organisation_id !== organisationId) {
+        return { success: false, error: 'Failed to submit completion.' }
+      }
+      const { data: saved } = await admin
+        .from('completion_photos')
+        .select('storage_path')
+        .eq('completion_id', localId)
+        .eq('organisation_id', organisationId)
+      const have = new Set((saved ?? []).map((r) => r.storage_path))
+      toInsert = photoStoragePaths.filter((p) => !have.has(p.storagePath))
+    }
 
-    const { error: photoError } = await admin
-      .from('completion_photos')
-      .insert(photoRows)
-
-    if (photoError) {
-      console.error('submitCompletion photo insert error:', photoError)
-      // Non-fatal: completion record is already inserted; photos can be retried
+    if (toInsert.length > 0) {
+      const { error: photoError } = await admin.from('completion_photos').insert(
+        toInsert.map((p) => ({
+          organisation_id: organisationId,
+          completion_id: localId,
+          step_id: p.stepId,
+          storage_path: p.storagePath,
+          content_type: p.contentType,
+        }))
+      )
+      if (photoError) {
+        // The client keeps the walk open and resubmits; the retry saves the missing rows.
+        console.error('submitCompletion photo insert error:', photoError)
+        return { success: false, error: 'Photos could not be saved. Please try again.' }
+      }
     }
   }
 

@@ -195,4 +195,14 @@ test.describe('review fixes (55-review)', () => {
       'rosterUserId'
     )
   })
+
+  test('WR-01/WR-02: photo paths are exact-matched and a failed photo insert is not reported as success', () => {
+    const body = actionBody('submitCompletion')
+    expect(body).not.toContain('startsWith')
+    expect(body).toContain('`${photoPrefix}${p.localId}.jpg`')
+    expect(body).toContain("insertError?.code === '23505'")
+    expect(body).toContain("'Photos could not be saved. Please try again.'")
+    // the duplicate-key retry path must still reach the photo insert, not return early
+    expect(body).not.toMatch(/23505'\)\s*\{\s*return/)
+  })
 })
