@@ -5,7 +5,6 @@ import { CheckCircle2, ClipboardCheck, AlertTriangle, Zap, Lightbulb, Wrench, Cl
 import type { SopWithSections, SopSection } from '@/types/sop'
 import { isEmergencySection, isHazardSection, isPpeSection } from '@/lib/sop/sections'
 import { useWalkthroughStore } from '@/stores/walkthrough'
-import { ReadAloudButton, stepSpeechText } from '@/components/sop/voice/ReadAloudButton'
 import { useCompletionStore } from '@/stores/completionStore'
 import { PageShell } from '@/components/layout/PageShell'
 import { SafetyAcknowledgement } from '@/components/sop/SafetyAcknowledgement'
@@ -261,7 +260,6 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
                   Step {currentIdx + 1} of {totalSteps}
                   {currentSection?.title ? ` · ${currentSection.title}` : ''}
                 </span>
-                <ReadAloudButton text={stepSpeechText(currentStep)} />
               </div>
 
               <div data-region="title">

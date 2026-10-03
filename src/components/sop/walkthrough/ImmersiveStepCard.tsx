@@ -4,7 +4,6 @@ import { useSearchParams } from 'next/navigation'
 import { CheckCircle2, Camera, X, AlertTriangle, Shield, Siren, ListChecks, ClipboardCheck } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useWalkthroughStore } from '@/stores/walkthrough'
-import { ReadAloudButton, stepSpeechText } from '@/components/sop/voice/ReadAloudButton'
 import { SopImageInline } from '@/components/sop/SopImageInline'
 import type { SopWithSections } from '@/types/sop'
 import type { StepPhoto } from '@/hooks/useStepPhotos'
@@ -87,7 +86,6 @@ export function ImmersiveStepCard({ sop, onStepChange, completedSteps, stepPhoto
               <span className="mono text-meta uppercase tracking-wider">Done</span>
             </div>
           )}
-          <ReadAloudButton text={stepSpeechText(current)} />
         </div>
       </header>
 

@@ -20,7 +20,6 @@ import {
   machineSops,
   narrowForAsk,
   pickNowQueue,
-  plantRelState,
   type WorkerSop,
 } from '@/lib/sop/worker-signal'
 import { zoneColour } from '@/lib/site/scene'
@@ -71,23 +70,10 @@ export function PlantHome({
       ? narrowForAsk(query, selected.name, machineSops(selected.id, site.links, sopsById))
       : []
 
-    let voiceSopId: string | null
-    if (selected) {
-      const msops = machineSops(selected.id, site.links, sopsById)
-      const todo = msops.find((s) => {
-        const rel = plantRelState(s)
-        return rel === 'due' || rel === 'never' || rel === 'new'
-      })
-      voiceSopId = todo?.id ?? msops[0]?.id ?? null
-    } else {
-      voiceSopId = nowItems[0]?.sop.id ?? null
-    }
-
-    return { colourByDept, chipDepartments, stageMachines, nowItems, selected, selectedDept, panelSops, voiceSopId }
+    return { colourByDept, chipDepartments, stageMachines, nowItems, selected, selectedDept, panelSops }
   }, [site, sops, query, selectedId, zoneId])
 
-  const { colourByDept, chipDepartments, stageMachines, nowItems, selected, selectedDept, panelSops, voiceSopId } =
-    derived
+  const { colourByDept, chipDepartments, stageMachines, nowItems, selected, selectedDept, panelSops } = derived
 
   if (!site.layout) return null
   const layout = site.layout
@@ -157,7 +143,7 @@ export function PlantHome({
             </button>
           ))}
         </div>
-        <PlantAskBar value={query} onChange={onQueryChange} voiceSopId={voiceSopId} />
+        <PlantAskBar value={query} onChange={onQueryChange} />
       </div>
 
       {!loading && <NowCard items={nowItems} onShowMe={open} />}

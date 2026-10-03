@@ -55,7 +55,7 @@ export function PhoneHome({
 
   return (
     <section data-testid="phone-home" aria-label="Your site" className="mb-4 flex flex-col gap-3">
-      <PlantAskBar value={query} onChange={onQueryChange} voiceSopId={nowItems[0]?.sop.id ?? null} />
+      <PlantAskBar value={query} onChange={onQueryChange} />
 
       {!loading && <NowCard items={nowItems} inline />}
 
