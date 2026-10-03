@@ -1809,7 +1809,7 @@ Plans:
   4. Approving, rejecting, signing off, assigning, publishing, changing an owner, recording an observation and clearing an AI finding each write one decision naming who, when, what and what it was about; a decision made by an AI agent names the agent
   5. Nobody — worker, supervisor or admin — can change or delete a decision once it is written; the database refuses the attempt even when the screen is bypassed
 
-**Plans:** 6/10 plans executed
+**Plans:** 7/10 plans executed
 Plans:
 **Wave 1**
 
@@ -1828,7 +1828,7 @@ Plans:
 
 - [x] 56-05-PLAN.md — recordDecision() writer + approvals, publish, governance, completions hooks
 - [x] 56-06-PLAN.md — Standards actions + Standards panel in the builder Tools menu + journey
-- [ ] 56-07-PLAN.md — Converter --apply: live proof in a throwaway org, then every production SOP (after the dry-run report is read)
+- [x] 56-07-PLAN.md — Converter --apply: live proof in a throwaway org, then every production SOP (after the dry-run report is read)
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
