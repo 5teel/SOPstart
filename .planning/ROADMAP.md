@@ -1734,7 +1734,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
   4. The sign-up page no longer creates an organisation, there is nowhere to switch organisation, and someone with no invitation is told to ask their admin
   5. Every existing SOP, completion record and photo is still there and opens exactly as before — nothing in the database was dropped
 
-**Plans:** 10/14 plans executed
+**Plans:** 11/14 plans executed
 Plans:
 **Wave 1**
 
@@ -1778,7 +1778,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 
 **Wave 11** *(blocked on Wave 10 completion)*
 
-- [ ] 55-11-PLAN.md — Delete the reusable-content library pages, Reuse tier, wizard picker and library actions (keep block data + parser plumbing)
+- [x] 55-11-PLAN.md — Delete the reusable-content library pages, Reuse tier, wizard picker and library actions (keep block data + parser plumbing)
 
 **Wave 12** *(blocked on Wave 11 completion)*
 

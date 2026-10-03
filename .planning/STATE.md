@@ -4,13 +4,13 @@ milestone: v11.0
 milestone_name: — One-Screen MVP
 status: executing
 stopped_at: v11.0 roadmap created; next /gsd-discuss-phase 55
-last_updated: "2026-10-03T11:24:45.537Z"
+last_updated: "2026-10-03T11:35:38.751Z"
 last_activity: 2026-10-03 -- Phase 55 execution started
 progress:
   total_phases: 14
   completed_phases: 0
   total_plans: 14
-  completed_plans: 10
+  completed_plans: 11
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 55 (cut-the-dropped-features-one-organisation) — EXECUTING
-Plan: 11 of 14
+Plan: 12 of 14
 Status: Ready to execute
 Last activity: 2026-10-03 -- Phase 55 execution started
 
@@ -286,6 +286,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 55 P03 | 1h | 3 tasks | 14 files |
 | Phase 55 P04 | 35min | 3 tasks | 25 files |
 | Phase 55 P10 | 40min | 3 tasks | 60 files |
+| Phase 55 P11 | ~45min | 3 tasks | 60 files |
 
 ## Accumulated Context
 
@@ -572,6 +573,7 @@ Recent decisions affecting current work:
 - [Phase 55]: [55-04] VoiceNoteBlock stays registered and renders its prompt as static text; MeasurementBlock schema keeps voiceEnabled
 - [Phase 55]: [55-08] Video generation deleted; publish result is { success: true }; Shotstack exemption removed; record-a-video on-ramp kept (D-05)
 - [Phase 55]: 55-10: SOP_TABS is read/walk; ?tab=flow maps to read; Konva allow-list narrowed to admin/site; DAT-01 sops write census 41 to 40
+- [Phase 55]: [55-11] sop-section-blocks keeps read-only listSectionBlocks (builder junction map needs it); library actions deleted
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -717,6 +719,6 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-10-03T11:24:42.238Z
+Last session: 2026-10-03T11:35:35.603Z
 Stopped at: v11.0 roadmap created; next /gsd-discuss-phase 55
 Resume file: None
