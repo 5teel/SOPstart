@@ -465,7 +465,7 @@ export const UAT_TESTS: UatTest[] = [
     dateAdded: '2026-07-03',
     category: 'Phase 26 — SOP Builder Redesign',
     title: 'Does drawing on a diagram feel right on a real device?',
-    status: 'active',
+    status: 'archived',
     summary:
       'When editing a procedure you can now draw on a diagram — arrows, boxes, circles, numbered markers and freehand — and drag or resize what you drew. This one is about how it FEELS to draw on a touchscreen or with a stylus, which we can only judge on a real device. (Available once the annotate button is wired in a later step; verify after that ships.)',
     tryIt: [
@@ -486,7 +486,7 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'reopen', text: 'After closing and re-opening, did your annotations reload exactly?' },
     ],
     background:
-      'Phase 26-11 Task 3 residual (R5 / D-03 slice 2). The Konva annotation editor (AnnotationEditor.tsx + DiagramHotspotBlock.tsx, admin-only, dynamic-imported) plus its pure scene model (annotation-tools.ts) are built and machine-tested (14 phase26 specs green: primitives, undo/redo, non-destructive serialize, palm-reject, hotspot coordinate-stability; tsc clean; worker bundle Konva-free Δ0). The draw/transform/palm-reject FEEL is device-dependent and cannot be proven headless — carried as a deferred-residual per the v3.0 device-verification precedent. On-device verification is only possible once 26-13 wires the annotate→save→reopen launch point; run this item then, alongside the 26-13 persistence check.',
+      'Phase 26-11 Task 3 residual (R5 / D-03 slice 2). The Konva annotation editor (admin-only, dynamic-imported) plus its pure scene model (ARCHIVED 2026-10-03: the annotation editor was removed in Phase 55-10) are built and machine-tested (14 phase26 specs green: primitives, undo/redo, non-destructive serialize, palm-reject, hotspot coordinate-stability; tsc clean; worker bundle Konva-free Δ0). The draw/transform/palm-reject FEEL is device-dependent and cannot be proven headless — carried as a deferred-residual per the v3.0 device-verification precedent. On-device verification is only possible once 26-13 wires the annotate→save→reopen launch point; run this item then, alongside the 26-13 persistence check.',
   },
   {
     id: 'p26-edit-worker-parity',
@@ -519,7 +519,7 @@ export const UAT_TESTS: UatTest[] = [
     dateAdded: '2026-07-03',
     category: 'Phase 26 — SOP Builder Redesign',
     title: 'Do annotations you draw show up baked onto the worker\'s diagram?',
-    status: 'active',
+    status: 'archived',
     summary:
       'When you annotate a diagram in the builder (arrows/boxes/numbered markers) and publish, the worker should see those marks baked flat onto the image — no editing handles, exactly as drawn. This is the end-to-end annotate → publish → worker-read check on a real device.',
     tryIt: [
@@ -539,7 +539,7 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'reopen', text: 'When you re-opened the editor before publishing, did your marks reload exactly?' },
     ],
     background:
-      'R5 / D-03 — annotate→re-edit→bake pipeline end-to-end. The non-destructive Konva scene (annotation-tools.ts) serializes to layout_data; on publish it bakes to a flat PNG for the worker read path (Konva stays admin-only, worker bundle Konva-free Δ0). Machine-tested for scene serialize/reopen + palm-reject + bundle isolation; the on-device annotate→publish→worker-read visual confirmation is a human check (run alongside p26-annotation-editor-feel once 26-13 wires the launch point).',
+      'ARCHIVED 2026-10-03 (annotation editor removed in Phase 55-10; already-baked images still display). R5 / D-03 — annotate→re-edit→bake pipeline end-to-end. The non-destructive Konva scene serializes to layout_data; on publish it bakes to a flat PNG for the worker read path (Konva stays admin-only, worker bundle Konva-free Δ0). Machine-tested for scene serialize/reopen + palm-reject + bundle isolation; the on-device annotate→publish→worker-read visual confirmation is a human check (run alongside p26-annotation-editor-feel once 26-13 wires the launch point).',
   },
 
   {

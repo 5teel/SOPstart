@@ -1,15 +1,14 @@
 /**
- * Phase 23 — AFL-VER-01/02/03: Version supersede source-contract assertions.
+ * Phase 23 — AFL-VER-01: Version supersede source-contract assertions.
+ * (Compare/restore, AFL-VER-02/03, were retired in Phase 55-10.)
  *
  * D-05 (version lineage: parent_sop_id chains versions; new draft cloned not branched)
- * D-06 (append-only: superseded_by set only on publish; restoreVersionAsNew creates
+ * D-06 (append-only: superseded_by set only on publish; cloneSopAsDraft creates
  *        a new draft forward — never mutates old rows)
- * D-07 (diff reuses existing diffBlockContent — no new diff library)
  *
  * Tests turn GREEN when Plan 23-03 ships:
- *   src/actions/versioning.ts — cloneSopAsDraft + restoreVersionAsNew extensions
+ *   src/actions/versioning.ts — cloneSopAsDraft extension
  *   src/app/(protected)/admin/sops/[sopId]/versions/page.tsx — UI wiring
- *   src/app/(protected)/admin/sops/[sopId]/versions/diff/page.tsx — diff viewer
  *   src/lib/builder/diff-block-content.ts — existing utility (should already exist)
  *
  * Unbuilt files are guarded with fs.existsSync + test.skip so Wave-0 is green-when-absent
@@ -36,18 +35,6 @@ const VERSIONS_PAGE_PATH = path.join(
   'sops',
   '[sopId]',
   'versions',
-  'page.tsx',
-)
-const DIFF_PAGE_PATH = path.join(
-  REPO_ROOT,
-  'src',
-  'app',
-  '(protected)',
-  'admin',
-  'sops',
-  '[sopId]',
-  'versions',
-  'diff',
   'page.tsx',
 )
 const DIFF_UTIL_PATH = path.join(
@@ -102,8 +89,7 @@ test('AFL-VER-01: cloneSopAsDraft is CALLED in versions/page.tsx onClick handler
 })
 
 // ---------------------------------------------------------------------------
-// AFL-VER-02: versions/diff/page.tsx imports diffBlockContent from builder util
-// D-07: reuse existing diffBlockContent — no new diff library
+// AFL-VER-02: the diffBlockContent builder util stays (inline proposal diff reuses it)
 // ---------------------------------------------------------------------------
 
 test('AFL-VER-02: diff-block-content.ts utility exists (prerequisite reuse D-07)', () => {
@@ -114,83 +100,4 @@ test('AFL-VER-02: diff-block-content.ts utility exists (prerequisite reuse D-07)
     return
   }
   expect(fs.existsSync(DIFF_UTIL_PATH)).toBe(true)
-})
-
-test('AFL-VER-02: versions/diff/page.tsx exists', () => {
-  // AFL-VER-02: the diff viewer route is created in Plan 23-05.
-  if (!fs.existsSync(DIFF_PAGE_PATH)) {
-    test.skip(true, 'versions/diff/page.tsx not yet created (Plan 23-05 will create it)')
-    return
-  }
-  expect(fs.existsSync(DIFF_PAGE_PATH)).toBe(true)
-})
-
-test('AFL-VER-02: versions/diff/page.tsx imports diffBlockContent from @/lib/builder/diff-block-content', () => {
-  // D-07: the diff page must import the existing diffBlockContent utility —
-  // do NOT introduce a new diff library (Plan 23-03 pattern from PATTERNS.md).
-  if (!fs.existsSync(DIFF_PAGE_PATH)) {
-    test.skip(true, 'versions/diff/page.tsx not yet created (Plan 23-05 will create it)')
-    return
-  }
-  const src = fs.readFileSync(DIFF_PAGE_PATH, 'utf-8')
-  expect(src).toContain('diffBlockContent')
-  expect(src).toContain('@/lib/builder/diff-block-content')
-})
-
-// ---------------------------------------------------------------------------
-// AFL-VER-03: restoreVersionAsNew exported AND append-only (never mutates superseded_by on old rows)
-// D-06: restoreVersionAsNew creates a new forward draft; old rows are NEVER mutated
-// ---------------------------------------------------------------------------
-
-test('AFL-VER-03: versioning.ts exports restoreVersionAsNew', () => {
-  // AFL-VER-03: restoreVersionAsNew creates a new draft from any historical version —
-  // the "Restore this version" entry point. Ships in Plan 23-03.
-  if (!fs.existsSync(VERSIONING_PATH)) {
-    test.skip(true, 'versioning.ts not found')
-    return
-  }
-  const src = fs.readFileSync(VERSIONING_PATH, 'utf-8')
-  // Only assert once Plan 23-03 has shipped the function
-  if (!src.includes('restoreVersionAsNew')) {
-    test.skip(true, 'restoreVersionAsNew not yet implemented (Plan 23-03 will add it)')
-    return
-  }
-  expect(src).toContain('export async function restoreVersionAsNew')
-})
-
-test('AFL-VER-03: restoreVersionAsNew does NOT mutate superseded_by on old rows (append-only D-06)', () => {
-  // D-06 append-only invariant: restoreVersionAsNew must NEVER call
-  // .update({ superseded_by: ... }) on an existing row — it only creates new rows forward.
-  // This source-contract assertion detects any accidental mutation of old records.
-  if (!fs.existsSync(VERSIONING_PATH)) {
-    test.skip(true, 'versioning.ts not found')
-    return
-  }
-  const src = fs.readFileSync(VERSIONING_PATH, 'utf-8')
-  if (!src.includes('restoreVersionAsNew')) {
-    test.skip(true, 'restoreVersionAsNew not yet implemented (Plan 23-03 will add it)')
-    return
-  }
-
-  // Extract the restoreVersionAsNew function body using [\s\S] (CLAUDE.md 2026-06-02 — no /s flag)
-  const fnStartIndex = src.indexOf('async function restoreVersionAsNew')
-  if (fnStartIndex === -1) {
-    test.skip(true, 'restoreVersionAsNew body not parseable for append-only check')
-    return
-  }
-  // Extract from the function start to the next top-level `export async function`
-  const afterFn = src.slice(fnStartIndex)
-  const nextFnIndex = afterFn.indexOf('\nexport async function', 1)
-  const fnBody = nextFnIndex === -1 ? afterFn : afterFn.slice(0, nextFnIndex)
-
-  // The function body must NOT update superseded_by on an old/existing row
-  // (it may reference the field for reading, but not in an .update() call)
-  const hasMutation =
-    fnBody.includes('.update({ superseded_by') ||
-    fnBody.includes('.update({superseded_by') ||
-    fnBody.includes("update({ 'superseded_by'")
-  expect(
-    hasMutation,
-    'restoreVersionAsNew must NOT mutate superseded_by on old rows (D-06 append-only)',
-  ).toBe(false)
 })

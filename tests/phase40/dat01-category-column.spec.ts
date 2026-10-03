@@ -135,7 +135,7 @@ test.describe('DAT-01 -- one category column (sops.category_slug)', () => {
 // ------------------------------------------------------------------------
 // Plan 40-11 -- table-write census (CLAUDE.md [2026-07-29]: a sweep keyed on
 // a planner-enumerated feature list misses the sibling function nobody
-// listed -- cloneSopAsDraft/restoreVersionAsNew were exactly that miss).
+// listed -- cloneSopAsDraft and its former sibling restore were exactly that miss).
 //
 // This census is keyed on the DATA: every `.from('sops')....insert(|.update(
 // |.upsert(` under src/. A write whose payload contains `category_slug`
@@ -196,7 +196,9 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
 // post-parse update were the two sites); no remaining path lost category_slug.
 // 2026-10-03: 44 -> 41. Phase 55-08 deleted the video-generation session creator (its
 // shell insert and two file-path updates); no remaining path lost category_slug.
-const EXPECTED_SOPS_WRITE_SITE_COUNT = 41
+// 2026-10-03: 41 -> 40. Phase 55-10 deleted the flow-graph action (its single flow_graph
+// update); no remaining path lost category_slug, and cloneSopAsDraft still carries it.
+const EXPECTED_SOPS_WRITE_SITE_COUNT = 40
 
 // Extracts the substring between a `(` at `openIdx` and its matching `)`,
 // tracking paren depth so nested calls/objects don't truncate the payload.

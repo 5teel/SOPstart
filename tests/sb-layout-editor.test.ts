@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 import { execSync } from 'node:child_process'
 
 test.describe('Layout editor (SB-LAYOUT)', () => {
-  test('SB-LAYOUT-01 admin palette exposes exactly 7 block components (no DiagramHotspotBlock)', async () => {
+  test('SB-LAYOUT-01 admin palette exposes exactly 7 block components (no diagram hotspot block)', async () => {
     // Plan 02 delivers 7 shared block components registered in puckConfig.
     // DiagramHotspotBlock is deferred to Phase 16.
     //
@@ -43,7 +43,7 @@ test.describe('Layout editor (SB-LAYOUT)', () => {
     expect(blockDir).toContain('HazardCardBlock.tsx')
     expect(blockDir).toContain('PPECardBlock.tsx')
     expect(blockDir).toContain('index.ts')
-    expect(blockDir).not.toContain('DiagramHotspotBlock.tsx')
+    expect(blockDir).not.toContain('DiagramHotspot')
   })
 
   test('SB-LAYOUT-02 each block component is shared between admin editor and worker walkthrough (single component tree)', async () => {
@@ -169,7 +169,7 @@ test.describe('Layout editor (SB-LAYOUT)', () => {
   })
 
   test.fixme(
-    'SB-LAYOUT-05 admin can add a DiagramHotspotBlock, drop a machine diagram image, and place numbered hotspot callouts at freeform x/y positions',
+    'SB-LAYOUT-05 admin can add a diagram hotspot block, drop a machine diagram image, and place numbered hotspot callouts at freeform x/y positions',
     async ({ page: _page }) => {
       void _page
     }

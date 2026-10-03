@@ -1,11 +1,11 @@
 /**
- * Phase 23 Plan 03 — Unit tests for version clone/restore lineage logic.
+ * Phase 23 Plan 03 — Unit tests for version clone lineage logic.
  *
  * TDD RED: tests written before full implementation exists.
  *
  * Tests cover:
  *   1. computeNextVersionLineage — pure lineage helper (N→N+1, parent resolution)
- *   2. restoreVersionAsNew append-only source-contract — no superseded_by:null, no old-row reactivation
+ *   2. cloneSopAsDraft append-only source-contract — no superseded_by mutation, no old-row reactivation
  *
  * Static @/ imports used throughout (phase21.5-unit testDir resolves @/).
  * Dynamic import() is NOT used (CLAUDE.md 2026-06-24 learning).
@@ -52,43 +52,26 @@ test('lineage: newParentId is never the source id when source already has a pare
 })
 
 // ---------------------------------------------------------------------------
-// 2. restoreVersionAsNew — append-only source-contract assertions
-// D-06: restore never rewrites or reactivates old rows
+// 2. cloneSopAsDraft — append-only source-contract assertions
+// D-06: starting a new version never rewrites or reactivates old rows
 // ---------------------------------------------------------------------------
 
 const versioningPath = path.resolve(__dirname, '../../../actions/versioning.ts')
 
-test('append-only invariant: restoreVersionAsNew is exported from versioning.ts', () => {
+test('append-only invariant: cloneSopAsDraft is exported from versioning.ts', () => {
   const src = fs.readFileSync(versioningPath, 'utf-8')
-  expect(src).toContain('export async function restoreVersionAsNew')
+  expect(src).toContain('export async function cloneSopAsDraft')
 })
 
-test('append-only invariant: restoreVersionAsNew does NOT set superseded_by to null on any old row', () => {
+test('append-only invariant: cloneSopAsDraft never mutates superseded_by or reactivates the source', () => {
   const src = fs.readFileSync(versioningPath, 'utf-8')
-  // Find the restoreVersionAsNew function body
-  const fnStart = src.indexOf('export async function restoreVersionAsNew')
+  const fnStart = src.indexOf('export async function cloneSopAsDraft')
   expect(fnStart).toBeGreaterThan(-1)
-  const fnBody = src.slice(fnStart)
-  // Should not contain superseded_by: null anywhere in restoreVersionAsNew body
-  expect(fnBody).not.toContain("superseded_by: null")
-})
-
-test('append-only invariant: restoreVersionAsNew does NOT set status to published on an old id', () => {
-  const src = fs.readFileSync(versioningPath, 'utf-8')
-  const fnStart = src.indexOf('export async function restoreVersionAsNew')
-  expect(fnStart).toBeGreaterThan(-1)
-  const fnBody = src.slice(fnStart)
-  // Should not contain status: 'published' anywhere in restoreVersionAsNew body
+  const rest = src.slice(fnStart + 1)
+  const next = rest.indexOf('\nexport async function')
+  const fnBody = next === -1 ? rest : rest.slice(0, next)
+  expect(fnBody).not.toMatch(/update\(\{\s*superseded_by/)
   expect(fnBody).not.toContain("status: 'published'")
-})
-
-test('append-only invariant: restoreVersionAsNew delegates to cloneSopAsDraft (reuses deep-copy mechanism)', () => {
-  const src = fs.readFileSync(versioningPath, 'utf-8')
-  const fnStart = src.indexOf('export async function restoreVersionAsNew')
-  expect(fnStart).toBeGreaterThan(-1)
-  const fnBody = src.slice(fnStart)
-  // restoreVersionAsNew should call cloneSopAsDraft
-  expect(fnBody).toContain('cloneSopAsDraft')
 })
 
 test('append-only invariant: only static imports at file top-level (CLAUDE.md 2026-06-24)', () => {

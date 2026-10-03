@@ -11,7 +11,7 @@ import path from 'node:path'
  *     lineage in the same effect that loads getVersionHistory.
  *   - Approval rows are filtered per-version by `a.sopId === ver.id`.
  *   - The render block is read-only: no mutation action call (approveStep,
- *     requestChanges, cloneSopAsDraft, restoreVersionAsNew, uploadNewVersion)
+ *     requestChanges, cloneSopAsDraft, uploadNewVersion)
  *     appears inside the approval-rows render block.
  *
  * Registration: playwright.config.ts `phase29` project
@@ -62,7 +62,7 @@ test.describe('versions page — approval render block is read-only', () => {
     const blockMatch = src.match(/\{verApprovals\.length > 0 && \(([\s\S]*?)\)\}/)
     expect(blockMatch).not.toBeNull()
     const block = blockMatch![1]
-    for (const mutation of ['approveStep(', 'requestChanges(', 'cloneSopAsDraft(', 'restoreVersionAsNew(', 'uploadNewVersion(']) {
+    for (const mutation of ['approveStep(', 'requestChanges(', 'cloneSopAsDraft(', 'uploadNewVersion(']) {
       expect(block).not.toContain(mutation)
     }
   })
