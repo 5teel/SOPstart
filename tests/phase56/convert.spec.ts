@@ -99,7 +99,7 @@ test.describe('kinds', () => {
       ['CalloutBlock', { title: 'Note', body: 'n' }],
     ] as const) expect(read(type, props).steps[0].kind, type).toBe('step')
     expect(read('ModelBlock', { hotspots: [{ label: 'valve' }] }).steps[0].text).toBe('3D model: valve')
-    expect(read('PhotoBlock', { src: 'org/p.jpg' }).steps[0]).toMatchObject({ photoRequired: true, text: 'Take a photo', imagePaths: ['org/p.jpg'] })
+    expect(read('PhotoBlock', { src: 'org/p.jpg' }).steps[0]).toMatchObject({ photoRequired: true, text: 'Photo needed', imagePaths: ['org/p.jpg'] })
     expect(read('PhotoGridBlock', { items: [{ src: 'a', caption: 'One' }, { src: 'b', alt: 'Two' }] }).steps[0]).toMatchObject({
       photoRequired: true, text: 'One; Two', imagePaths: ['a', 'b'],
     })

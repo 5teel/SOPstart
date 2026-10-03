@@ -172,7 +172,7 @@ const READERS: Record<string, Reader> = {
 
   StepWithPhotosBlock: (p) => {
     const paths = arr(p.photos).map((x) => rawPath(rec(x).src)).filter((s): s is string => !!s)
-    return one('step', str(p.text) || captionsOf(arr(p.photos)).join('; ') || 'Take a photo', {
+    return one('step', str(p.text) || captionsOf(arr(p.photos)).join('; ') || 'Photo needed', {
       photoRequired: true,
       imagePaths: paths,
     })
@@ -253,7 +253,7 @@ const READERS: Record<string, Reader> = {
 
   PhotoBlock: (p) => {
     const path = rawPath(p.src)
-    return one('step', str(p.caption) || str(p.alt) || 'Take a photo', {
+    return one('step', str(p.caption) || str(p.alt) || 'Photo needed', {
       photoRequired: true,
       imagePaths: path ? [path] : [],
     })
@@ -275,7 +275,7 @@ const READERS: Record<string, Reader> = {
     // ponytail: a mixed block keeps its photo/diagram items; the dropped video count is reported
     // only for all-video blocks. Add a per-item count if mixed blocks ever show up in production.
     const paths = media.map((x) => rawPath(rec(x).bakedSrc) ?? rawPath(rec(x).src)).filter((s): s is string => !!s)
-    return one('step', captionsOf(media).join('; ') || 'Take a photo', { photoRequired: true, imagePaths: paths })
+    return one('step', captionsOf(media).join('; ') || 'Photo needed', { photoRequired: true, imagePaths: paths })
   },
 
   VoiceNoteBlock: () => ({ steps: [], dropped: 'voice' }),
