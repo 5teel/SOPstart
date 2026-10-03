@@ -344,7 +344,7 @@ export const JOURNEYS: Journey[] = [
     summary: 'The core editing flow: shape the content, check it against the source with AI help, verify every safety step, then publish. Create-from-scratch, AI-convert and edit-draft all converge on this one bespoke builder surface (Phase 26 D-01: Puck removed — inline content editing, no separate field popovers).',
     steps: [
       { id: 's', type: 'start', label: 'Have a draft' },
-      { id: 'build', type: 'screen', label: 'Build stage', route: '/admin/sops/builder/[sopId]', detail: 'Bespoke editor: step-centric rail; the admin edits the SAME content components the worker reads, in place (edit==worker parity, R2). Add/edit/reorder/duplicate steps inline; every field reachable (P14, 0 unreachable). Image content opens a Konva annotation layer (arrows/boxes/text, palm-reject) that bakes to a flat PNG on publish. A light Wayfinder header (Phase 33 SC-6) tops every stage: back-to-library / you\'re-editing / next-stage zones, with a single "Tools for this SOP" menu (assign, versions, video, QR, flow diagram, delete draft).' },
+      { id: 'build', type: 'screen', label: 'Build stage', route: '/admin/sops/builder/[sopId]', detail: 'Bespoke editor: step-centric rail; the admin edits the SAME content components the worker reads, in place (edit==worker parity, R2). Add/edit/reorder/duplicate steps inline; every field reachable (P14, 0 unreachable). Image content opens a Konva annotation layer (arrows/boxes/text, palm-reject) that bakes to a flat PNG on publish. A light Wayfinder header (Phase 33 SC-6) tops every stage: back-to-library / you\'re-editing / next-stage zones, with a single "Tools for this SOP" menu (assign, versions, pick machines, change category, standards, delete draft).' },
       { id: 'review', type: 'action', label: 'Review stage', detail: 'Source viewer side-by-side; AI reviewer flags omissions/anchoring; per-step verify checklist. The Wayfinder header\'s forward chip states the lock reason inline ("Locked — N steps below still need checking").' },
       { id: 'verify', type: 'decision', label: 'Every step verified?', branches: [
         { label: 'Yes', to: 'pubstage' },
@@ -353,6 +353,22 @@ export const JOURNEYS: Journey[] = [
       { id: 'pubstage', type: 'action', label: 'Publish stage', detail: 'Single publish trigger; gated on full verification.' },
       { id: 'publish', type: 'action', label: 'Publish', route: '/api/sops/[sopId]/publish', detail: 'SOP goes live for assigned workers. A "Choose who sees it →" CTA appears once published (D-12a).' },
       { id: 'e', type: 'end', label: 'Published' },
+    ],
+  },
+  {
+    id: 'label-with-standards',
+    group: 'Refine & publish',
+    persona: 'SOP Admin',
+    title: 'Label a SOP with a standard',
+    summary: 'An admin keeps one list of standards for the whole organisation (LOTO, Hot Work and so on) and puts any of them on a whole SOP, on a section, or on a single step.',
+    steps: [
+      { id: 's', type: 'start', label: 'Has a SOP' },
+      { id: 'builder', type: 'screen', label: 'Builder', route: '/admin/sops/builder/[sopId]' },
+      { id: 'tools', type: 'action', label: 'Tools for this SOP → Standards' },
+      { id: 'manage', type: 'action', label: 'Add, rename or remove a standard', detail: 'One list for the whole organisation, seeded with LOTO, Hot Work, Confined Space, Working at Height, Manual Handling and Electrical Isolation. Removing one takes it off everywhere, and the panel says how many places before it does.' },
+      { id: 'attach', type: 'action', label: 'Put a standard on the SOP, a section or a step' },
+      { id: 'sop', type: 'screen', label: 'SOP page', route: '/sops/[sopId]', detail: 'The label shows beside the SOP title and beside each labelled section, also on the walk. Step labels reach the walk in Phase 58.' },
+      { id: 'e', type: 'end', label: 'Labelled' },
     ],
   },
   {

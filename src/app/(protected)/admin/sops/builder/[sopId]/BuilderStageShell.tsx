@@ -39,6 +39,7 @@ import { DeleteSopButton } from '@/components/admin/DeleteSopButton'
 import { BuilderClient } from './BuilderClient'
 import { BuilderStageStepper } from './BuilderStageStepper'
 import { BuilderMachinesButton } from './BuilderMachinesButton'
+import { BuilderStandardsButton } from './BuilderStandardsButton'
 import { BuilderCategoryButton } from './BuilderCategoryButton'
 import type { BuilderStage } from './BuilderStageStepper'
 import { OrientationStrip } from './OrientationStrip'
@@ -137,6 +138,7 @@ function ToolsMenu({
             ))}
             <div className="my-1 h-px bg-[var(--ink-100)]" />
             <BuilderMachinesButton sopId={sopId} />
+            <BuilderStandardsButton sopId={sopId} />
             <BuilderCategoryButton sopId={sopId} categorySlug={sop.category_slug ?? null} />
             {isDraft && (
               <>

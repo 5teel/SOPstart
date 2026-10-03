@@ -1,6 +1,6 @@
 # Capability Matrix
 
-**Last updated:** 2026-10-04
+**Last updated:** 2026-10-04 (56-06)
 
 This document is the single reference for who can see and do what in SafeStart. When a capability gate changes (an RLS policy, a `require*` guard, or a role check), this file changes in the **same commit**. If this file disagrees with the code, the code is the bug or the file is stale — treat any drift as a finding, not a footnote.
 
@@ -60,7 +60,7 @@ To answer "is a worker *required* to do X?": this document does not answer that 
 | Generate site scene (paid AI) | — | — | ✅ | ✅ | — | `POST /api/admin/site/generate` — `requireAdminContext()`, `GEMINI_API_KEY` gate, refuses when the org's layout already has a scene (Phase 51 plan 51-03) |
 | Library health data (floor + library checks) | — | — | ✅ | ✅ | — | Enforced at `listSiteHealthForOrg()` (`src/actions/site.ts`) and `listAdminSopRows()` (`src/actions/admin-sop-list.ts`): `requireAdminContext()` first, every new read filtered to the SESSION organisation, `sop_access_people` scoped by RLS 00048's same-org admin arm, no service-role client (Phase 54 plan 54-01) |
 | View standards labels | ✅ | ✅ | ✅ | ✅ | — | RLS `org_members_can_view_standards` / `org_members_can_view_standard_attachments`, org-scoped (migration `00069_sop_kinds_placement_standards.sql`, Phase 56) |
-| Manage standards (add, rename, remove, attach) | — | — | ✅ | ✅ | — | RLS `admins_can_write_standards`, `admins_can_attach_standards` (the target SOP, section or generated step must belong to the caller's org) and `admins_can_detach_standards` (00069); server guard added in 56-06 |
+| Manage standards (add, rename, remove, attach) | — | — | ✅ | ✅ | — | RLS `admins_can_write_standards`, `admins_can_attach_standards` (the target SOP, section or generated step must belong to the caller's org) and `admins_can_detach_standards` (00069); server guard: `requireAdminContext()` first in every action, session-org filters, and the standard and target checked in the org before writing, in `src/actions/standards.ts` (56-06) |
 | Read generated SOP steps | ✅ | ✅ | ✅ | ✅ | ✅ | RLS `org_members_can_view_sop_focus_steps` (00069): org-scoped AND an `exists` on `sops` evaluated under the caller's own sops policies, so department visibility is inherited exactly as the old step table inherits it. Writes: service-role converter only, no write policy |
 | Read conversion reports | — | — | ✅ | ✅ | — | RLS `admins_can_view_sop_conversion_runs` (00069), org-scoped; no write policy (service-role converter only) |
 | Read decision ledger | — | — | ✅ | ✅ | — | RLS `admins_can_read_decisions` (00070, Phase 56), org-scoped, admin/safety_manager only; the Office view is Phase 59 |

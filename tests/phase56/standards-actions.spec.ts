@@ -65,3 +65,52 @@ test.describe('standards actions', () => {
     expect(before).toContain(".from('sop_sections')")
   })
 })
+
+const PANEL = 'src/app/(protected)/admin/sops/builder/[sopId]/BuilderStandardsButton.tsx'
+const SHELL = 'src/app/(protected)/admin/sops/builder/[sopId]/BuilderStageShell.tsx'
+
+test.describe('standards panel wiring', () => {
+  test('the Tools menu renders the panel button after the machines button', () => {
+    const shell = read(SHELL)
+    const machines = shell.indexOf('<BuilderMachinesButton')
+    const standards = shell.indexOf('<BuilderStandardsButton')
+    expect(machines).toBeGreaterThan(-1)
+    expect(standards).toBeGreaterThan(machines)
+  })
+
+  test('each action call sits in a named handler that an onClick references', () => {
+    const panel = read(PANEL)
+    const handlers: Array<[string, string]> = [
+      ['createStandard(', 'addStandard'],
+      ['renameStandard(', 'saveRename'],
+      ['removeStandard(', 'confirmRemove'],
+      ['setStandardAttachment(', 'toggleStandard'],
+    ]
+    for (const [call, handler] of handlers) {
+      const start = panel.indexOf(`async function ${handler}(`)
+      expect(start, handler).toBeGreaterThan(-1)
+      const body = panel.slice(start, panel.indexOf('\n  }\n', start))
+      expect(body, `${handler} calls the action`).toContain(call)
+      expect(panel, `${handler} wired to onClick`).toMatch(new RegExp(String.raw`onClick=\{[^}]*${handler}\(`))
+    }
+    expect(panel).toContain('data-testid="standards-panel"')
+  })
+
+  test('copy never says block', () => {
+    expect(read(PANEL)).not.toMatch(/block/i)
+  })
+
+  test('the pathways map has the standards journey', () => {
+    expect(read('src/lib/journeys/journeys.ts')).toContain("id: 'label-with-standards'")
+  })
+
+  test('no worker /sops file imports the admin panel', () => {
+    const walk = (d: string): string[] =>
+      fs.readdirSync(d, { withFileTypes: true }).flatMap((e) =>
+        e.isDirectory() ? walk(path.join(d, e.name)) : /\.tsx?$/.test(e.name) ? [path.join(d, e.name)] : []
+      )
+    for (const f of walk(path.join(root, 'src/app/(protected)/sops'))) {
+      expect(fs.readFileSync(f, 'utf8'), f).not.toContain('BuilderStandardsButton')
+    }
+  })
+})
