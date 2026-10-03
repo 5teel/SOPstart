@@ -113,7 +113,8 @@ export function MobileWalkthrough({ sop }: { sop: SopWithSections }) {
   }, [currentStep?.id, highestAckIdx])
 
   // Photos for this walk upload as soon as they are taken
-  const { photosForStep, uploadingCount, uploadedPhotos, addPhoto, removePhoto } = useStepPhotos()
+  const { photosForStep, uploadingCount, uploadedPhotos, addPhoto, removePhoto } =
+    useStepPhotos(activeCompletion?.localId)
   const currentStepPhotos = currentStep ? photosForStep(currentStep.id) : []
   const photoGateMet =
     !currentStep?.photo_required || currentStepPhotos.some((p) => p.status === 'uploaded')

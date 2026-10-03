@@ -106,6 +106,15 @@ test.describe('walk photos upload directly (55-03)', () => {
     expect(hook).toContain("method: 'PUT'")
   })
 
+  test('photos follow the active completion, so a second walk never submits the first walk photos', () => {
+    const hook = code('src/hooks/useStepPhotos.ts')
+    expect(hook).toContain('export function useStepPhotos(activeCompletionId')
+    expect(hook).toContain('p.completionId === activeCompletionId')
+    expect(code('src/components/sop/walkthrough/MobileWalkthrough.tsx')).toContain(
+      'useStepPhotos(activeCompletion?.localId)'
+    )
+  })
+
   test('MobileWalkthrough submits with uploaded photos and nothing is queued', () => {
     const src = code('src/components/sop/walkthrough/MobileWalkthrough.tsx')
     expect(src).toContain('useStepPhotos(')
