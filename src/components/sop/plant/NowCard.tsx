@@ -8,7 +8,7 @@
  */
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
-import { db } from '@/lib/offline/db'
+import { createClient } from '@/lib/supabase/client'
 import { PLANT_REL_LABEL, type NowItem } from '@/lib/sop/worker-signal'
 import { RelBadge } from '@/components/sop/plant/RelBadge'
 
@@ -20,9 +20,16 @@ function formatDay(iso: string | null): string | null {
 }
 
 async function sopMinutes(sopId: string): Promise<number> {
-  const sectionKeys = await db.sections.where('sop_id').equals(sopId).primaryKeys()
-  const steps = await db.steps.where('section_id').anyOf(sectionKeys as string[]).toArray()
-  const total = steps.reduce((sum, s) => sum + (s.time_estimate_minutes ?? 0), 0)
+  const { data } = (await createClient()
+    .from('sop_sections')
+    .select('sop_steps(time_estimate_minutes)')
+    .eq('sop_id', sopId)) as {
+    data: Array<{ sop_steps: Array<{ time_estimate_minutes: number | null }> | null }> | null
+  }
+  const total = (data ?? []).reduce(
+    (sum, sec) => sum + (sec.sop_steps ?? []).reduce((s, st) => s + (st.time_estimate_minutes ?? 0), 0),
+    0,
+  )
   return Math.round(total)
 }
 
@@ -42,7 +49,6 @@ export function NowCard({
     queryKey: ['sop-minutes', nowId],
     queryFn: () => sopMinutes(nowId as string),
     enabled: !!nowId,
-    networkMode: 'offlineFirst',
     staleTime: 1000 * 60 * 5,
   })
 

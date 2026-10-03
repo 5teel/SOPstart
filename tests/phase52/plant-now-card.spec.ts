@@ -43,9 +43,10 @@ test.describe('NowCard', () => {
     expect(SRC).not.toMatch(/\.put\(|\.add\(|\.delete\(/)
   })
 
-  test('the card reads cached step minutes offline-first', () => {
+  test('the card reads step minutes from Supabase', () => {
     expect(SRC).toMatch(/useQuery\(/)
-    expect(SRC).toContain("networkMode: 'offlineFirst'")
+    expect(SRC).toContain("from('sop_sections')")
+    expect(SRC).not.toContain('networkMode')
   })
 
   test('the card is 330px wide (w-82.5)', () => {
