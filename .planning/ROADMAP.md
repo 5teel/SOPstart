@@ -1734,7 +1734,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
   4. The sign-up page no longer creates an organisation, there is nowhere to switch organisation, and someone with no invitation is told to ask their admin
   5. Every existing SOP, completion record and photo is still there and opens exactly as before — nothing in the database was dropped
 
-**Plans:** 2/14 plans executed
+**Plans:** 3/14 plans executed
 Plans:
 **Wave 1**
 
@@ -1746,7 +1746,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 55-03-PLAN.md — Rewire writes: direct photo upload + in-memory completion; getPhotoUploadUrl org from session; deployed walk eval green before any deletion
+- [x] 55-03-PLAN.md — Rewire writes: direct photo upload + in-memory completion; getPhotoUploadUrl org from session; deployed walk eval green before any deletion
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
