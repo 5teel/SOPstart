@@ -1,6 +1,6 @@
 {
-  "capturedAt": "2026-09-12T23:49:45.614Z",
-  "note": "First Load JS baseline for the SB-LINE-06 gated routes. Postbuild check-bundle-size enforces ≤ +2KB delta per route. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts.",
+  "capturedAt": "2026-10-03T12:00:00.000Z",
+  "note": "Phase 55 D-07: moved DOWN by hand to the measured post-cut First Load JS (/sops/[sopId]/page 1048 -> 817 KB, /sops/page 940 -> 817 KB); never re-captured. Raising a value needs a signed-off decision recorded in ROADMAP.",
   "previousBaseline": {
     "/sops/[sopId]/page": {
       "value": 1059,
@@ -8,8 +8,22 @@
       "note": "First Load JS baseline for the mobile worker route (/sops/[sopId]). Postbuild check-bundle-size enforces ≤ +2KB delta. DO NOT edit by hand — regenerate via scripts/capture-bundle-baseline.ts after intentional baseline shifts."
     }
   },
+  "history": [
+    {
+      "route": "/sops/[sopId]/page",
+      "value": 1048,
+      "capturedAt": "2026-09-12T23:49:45.614Z",
+      "note": "pre-Phase 55 (measured 1045 KB on the unchanged tree)"
+    },
+    {
+      "route": "/sops/page",
+      "value": 940,
+      "capturedAt": "2026-09-12T23:49:45.614Z",
+      "note": "pre-Phase 55 (measured 936 KB on the unchanged tree)"
+    }
+  ],
   "routes": {
-    "/sops/[sopId]/page": 1048,
-    "/sops/page": 940
+    "/sops/[sopId]/page": 817,
+    "/sops/page": 817
   }
 }

@@ -1734,6 +1734,8 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
   4. The sign-up page no longer creates an organisation, there is nowhere to switch organisation, and someone with no invitation is told to ask their admin
   5. Every existing SOP, completion record and photo is still there and opens exactly as before — nothing in the database was dropped
 
+**Decision (D-07, 2026-10-03):** bundle baseline moved down by hand after the cut — /sops/[sopId]/page 1048 → 817 KB, /sops/page 940 → 817 KB; capture script not run.
+
 **Plans:** 12/14 plans executed
 Plans:
 **Wave 1**
