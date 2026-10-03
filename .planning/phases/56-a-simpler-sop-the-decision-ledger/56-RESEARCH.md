@@ -581,7 +581,17 @@ export async function recordDecision(input: {
 | A6 | Workers/supervisors should NOT be able to read the ledger | RLS | If Phase 59/60 expects supervisor read, add a role to the SELECT policy later (additive) |
 | A7 | Self-add/remove assignment and `requestAssessorReview` are not ledger decisions | Writers | If the user wants every assignment logged, add two more hooks |
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+All five were resolved at planning on 2026-10-04 by the "Amendments at planning" block in `56-CONTEXT.md`, which overrides the recommendations below where they differ:
+
+- Q1 → **RESOLVED by A-04**: `actor_kind='agent'` + DB CHECK requiring `actor_name`; `applyAiWrite` is the one live agent producer; eval proves both the named row and the CHECK refusal.
+- Q2 → **RESOLVED by A-01**: generated rows live in their OWN table (`sop_focus_steps`), not `sop_steps`; no reader filtering, no `no-unfiltered-step-reads` lint.
+- Q3 → **RESOLVED by A-05**: SOP + section labels on the old walk rail now; step labels in the panel and on the Phase 58 walk.
+- Q4 → **RESOLVED by A-06**: `image_paths text[]` lives on `sop_focus_steps` (NOT `sop_steps` — the recommendation below is superseded), each path verified against `sop_images.storage_path` for that SOP.
+- Q5 → **RESOLVED by A-07**: one small `sop_conversion_runs` table.
+
+Original questions kept for the record:
 
 1. **What is an "AI agent" in this codebase for DEC-04, and who produces an agent decision today?**
    - Known: agents authenticate as normal session users (`/api/ai-fields/write` uses `getSessionContext()`); `applyAiWrite`, `acceptProposal`, `rejectProposal` (`src/actions/ai-fields.ts`) are the only agent-adjacent write paths; the AI reviewer raises flags but never decides.

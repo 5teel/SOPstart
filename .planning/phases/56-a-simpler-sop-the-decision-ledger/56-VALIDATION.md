@@ -56,6 +56,7 @@ created: 2026-10-04
 | 56-03-02, 56-04-01, 56-10-01 | 03, 04, 10 | 2, 3, 6 | DEC-01 | T-56-17 | Backfill: per-source counts equal across 7 tables; ledger non-empty on deploy | migration assertion + applier + eval | `node scripts/apply-phase56-migration.mjs`; eval F | ❌ W0 | ⬜ pending |
 | 56-04-01, 56-04-02, 56-10-01 | 04, 10 | 3, 6 | DEC-03 | T-56-01 | UPDATE / DELETE on an EXISTING row refused as owner and service role (row unchanged); TRUNCATE refused; triggers `tgenabled='A'`; no UPDATE/DELETE/TRUNCATE grant to app roles; no authenticated INSERT | live probe + live spec + eval | `node scripts/probe-decisions-immutable.mjs`; schema-runtime ledger test; eval F | ❌ W0 | ⬜ pending |
 | 56-05-01, 56-04-02, 56-08-02, 56-10-01 | 05, 04, 08, 10 | 4, 3, 5, 6 | DEC-04 | T-56-03 | Unnamed agent refused by type, by `buildDecisionRow` and by DB CHECK; named agent row stored; `applyAiWrite` produces one | unit + live + eval | `… tests/phase56/decision-shape.spec.ts`; schema-runtime ledger test; eval E/F | ❌ W0 | ⬜ pending |
+| 56-08-03 | 08 | 5 | DEC-01, DEC-04 | T-56-12 | Every `DecisionKind` drives `buildDecisionRow` → service-key INSERT and lands (passes DB CHECKs); sample table typed `Record<DecisionKind, DecisionInput>`; unnamed/blank agent and actor-less person refused (23514) | live spec (`PHASE56_LIVE=1`, no sessions) | `PHASE56_LIVE=1 npx playwright test --project=phase56 decision-kinds-live` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
