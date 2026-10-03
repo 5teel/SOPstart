@@ -1,8 +1,8 @@
 ---
 phase: 55
 slug: cut-the-dropped-features-one-organisation
-status: draft
-nyquist_compliant: false
+status: approved
+nyquist_compliant: true
 wave_0_complete: true
 created: 2026-10-03
 ---
@@ -75,15 +75,8 @@ created: 2026-10-03
 | 55-13-01 | 13 | 13 | CUT-01, CUT-02 | T-55-SC, T-55-13-02 | dexie, idb-keyval, serwist, @serwist/next, query-persist-client-core, jsqr, qrcode, @types/qrcode uninstalled (zero importers); package sweep live and mutation-proven (jsqr re-added red); all 13 features live | sweep + build | `npx playwright test --project=phase55 && npm run build` | yes | green |
 | 55-13-02 | 13 | 13 | CUT-02 | - | env template and codebase docs describe the shipped app; doc routes exist | lint | `npx playwright test --project=phase15-stubs tests/lint/no-dead-internal-hrefs.spec.ts` | yes | green |
 | 55-13-03 | 13 | 13 | CUT-01 | T-55-13-01 | baseline moved down by hand 1048/940 to 817/817, build delta 0 on both routes, full suite run once and reconciled | build + suite | `npm run build` | yes | green |
-| (filled by planner per task) | | | CUT-01 | T-55-01 (stale SW serving old shell) | kill-switch `public/sw.js` committed; eval asserts no SW registered | source-contract + eval | `npx playwright test --project=phase55 tests/phase55/deletion-sweep.spec.ts` | ❌ W0 | ⬜ pending |
-| | | | CUT-01 | — | no `@/lib/offline` import in `src/`; walkthrough uses `getPhotoUploadUrl` + `submitCompletion` | source-contract | `npx playwright test --project=phase55 tests/phase55/worker-path-contract.spec.ts` | ❌ W0 | ⬜ pending |
-| | | | CUT-01 | — | worker walks + photo + submit online, no banner/queue | deployed eval | `npm run eval -- --phase 55` | ❌ W0 | ⬜ pending |
-| | | | CUT-02 | T-55-02 (orphaned Shotstack middleware exemption) | exemption removed with the route; dropped files/packages/refs absent; survivors present | source-contract | `npx playwright test --project=phase55 tests/phase55/deletion-sweep.spec.ts` | ❌ W0 | ⬜ pending |
-| | | | CUT-02 | — | admin sees no dropped affordances; dead addresses render not-found content | deployed eval | `npm run eval -- --phase 55` | ❌ W0 | ⬜ pending |
-| | | | ORG-01 | T-55-03 (direct Supabase signup with publishable key) | `signUpOrganisation`/`switchOrganisation`/`OrgSwitcher` absent; Supabase public signup disabled | source-contract | `npx playwright test --project=phase55 tests/phase55/org-single.spec.ts` | ❌ W0 | ⬜ pending |
-| | | | ORG-01 | — | signed-out `/sign-up` shows invitation text, no inputs | deployed eval | `npm run eval -- --phase 55` | ❌ W0 | ⬜ pending |
-| | | | all | — | build green incl. bundle gate (voice assertion + 3 marker groups removed, baseline moved down only) | build | `npm run build && npm run lint` | ✅ | ⬜ pending |
-| | | | all | T-55-04 (sibling action loses org guard when trimmed) | existing guards green after repoint | source-contract | `npx playwright test --project=phase15-stubs --project=phase41 --project=phase43 --project=phase46 --project=phase52 --project=phase54` | ✅ | ⬜ pending |
+| 55-14-01 | 14 | 14 | CUT-01, CUT-02, ORG-01 | T-55-01, T-55-14-01 | cut-features eval authored: pins/Now card with no install prompt, offline banner, mic or SW registration; signed-out /sw.js is the kill-switch; existing SOP and real-org completion open (read-only); admin tools gone; dead addresses render not-found; sign-up/login/profile | deployed eval | `npm run eval -- --phase 55` | yes | green |
+| 55-14-02 | 14 | 14 | all | T-55-14-02 | whole evals project green on sopstart.com (28 passed, 0 failed, 1 pre-existing skip); every Phase 55 screenshot read; 55-EVAL.md written | deployed eval | `npm run eval -- --phase 55` | yes | green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -107,7 +100,7 @@ created: 2026-10-03
 
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
-| Guard mutation proof | CUT-01/02 | A grep guard that finds nothing passes vacuously (CLAUDE.md 2026-05-25 / 2026-06-05) | Once per new guard: plant a violation (re-add one import/href), run the spec → red; remove → green. Record in SUMMARY.md |
+| Guard mutation proof | CUT-01/02 | A grep guard that finds nothing passes vacuously (CLAUDE.md 2026-05-25 / 2026-06-05) | Once per new guard: plant a violation (re-add one import/href), run the spec → red; remove → green. Record in SUMMARY.md | DONE: proofs recorded in the 55-04..55-13 SUMMARYs. |
 | External schedulers calling dropped routes | CUT-02 | Not derivable from repo | Executor checks Railway cron + Shotstack dashboard for callers of `/api/sops/*/video*`, `/api/voice/*`; records result in SUMMARY.md |
 | Photo capture on a photo-required step | CUT-01 | `DesktopWalkthrough` has no photo capture | Eval runs the walk at a phone viewport (mobile project) — automated, but note the viewport constraint |
 
@@ -115,11 +108,11 @@ created: 2026-10-03
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 60s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 60s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** approved 2026-10-03

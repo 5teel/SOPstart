@@ -1711,7 +1711,7 @@ Plans:
 
 Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequential.
 
-- [ ] **Phase 55: Cut the Dropped Features & One Organisation** - Offline, voice, phone/QR, shared-device login, video generation, flow diagram, annotation, YouTube and photo-scan on-ramps, library pages and version compare/restore deleted; sign-up no longer creates an organisation; the worker path keeps working online
+- [x] **Phase 55: Cut the Dropped Features & One Organisation** - Offline, voice, phone/QR, shared-device login, video generation, flow diagram, annotation, YouTube and photo-scan on-ramps, library pages and version compare/restore deleted; sign-up no longer creates an organisation; the worker path keeps working online (completed 2026-10-03)
 - [ ] **Phase 56: A Simpler SOP & the Decision Ledger** - Every SOP converted to sections and steps (hazard and PPE as kinds of step), standards as labels, machine-or-site placement; one append-only decision ledger written by every existing approve / sign-off / assign / publish path
 - [ ] **Phase 57: The One Screen & Its Places** - List · isometric site · detail panel as the landing screen, four signposted rooms, search, "next for you" card, pins, site edit mode; no header navigation
 - [ ] **Phase 58: The SOP Focus Screen — Walk & Edit** - Opening a SOP removes the map and the list; walk one step at a time to a sign-off, or edit with the AI check and tick-each-step before publish; new versions
@@ -1736,7 +1736,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 
 **Decision (D-07, 2026-10-03):** bundle baseline moved down by hand after the cut — /sops/[sopId]/page 1048 → 817 KB, /sops/page 940 → 817 KB; capture script not run.
 
-**Plans:** 13/14 plans executed
+**Plans:** 14/14 plans complete
 Plans:
 **Wave 1**
 
@@ -1792,7 +1792,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 
 **Wave 14** *(blocked on Wave 13 completion)*
 
-- [ ] 55-14-PLAN.md — Finish and run the deployed eval (npm run eval -- --phase 55), read screenshots, sign off validation
+- [x] 55-14-PLAN.md — Finish and run the deployed eval (npm run eval -- --phase 55), read screenshots, sign off validation
 
 ### Phase 56: A Simpler SOP & the Decision Ledger
 
