@@ -17,7 +17,7 @@ SafeStart is a multi-tenant SaaS progressive web app that helps blue-collar trad
 - **Styling**: Tailwind CSS 4 (PostCSS plugin)
 - **Database/Auth**: Supabase (Postgres, Auth, Storage, RLS policies)
 - **State**: Zustand (client stores), TanStack React Query (server state)
-- **Offline**: Serwist (service worker / PWA), Dexie (IndexedDB), idb-keyval
+- **Offline**: none since Phase 55 (2026-10-03) — the app is online-only; `public/sw.js` is a committed kill-switch that unregisters any previously-installed service worker. Do not reintroduce Serwist/Dexie/idb-keyval.
 - **AI Parsing**: OpenAI API (GPT) for document-to-structured-SOP conversion
 - **File Parsing**: mammoth (DOCX), unpdf (PDF), tesseract.js (OCR)
 - **Forms**: React Hook Form + Zod validation
@@ -37,7 +37,6 @@ SafeStart is a multi-tenant SaaS progressive web app that helps blue-collar trad
   - `admin/sops/` — SOP management, upload, `[sopId]/review`, `[sopId]/assign`, `[sopId]/versions`
   - `admin/team/` — Team/org member management
 - `api/sops/` — REST API routes (parse, publish, assignments, sections, download-url, parse-job)
-- `~offline/` — Offline fallback page
 
 ### Key Directories
 - `src/actions/` — Server actions (auth, sops, assignments, completions, versioning)
@@ -46,10 +45,9 @@ SafeStart is a multi-tenant SaaS progressive web app that helps blue-collar trad
 - `src/components/admin/` — Admin panel UI
 - `src/components/layout/` — Shared layout (nav, sidebar, etc.)
 - `src/components/providers/` — React context providers
-- `src/hooks/` — Custom hooks (useAssignedSops, useCompletions, useOnlineStatus, usePhotoQueue, useSopDetail, useSopSync, useNotifications)
-- `src/stores/` — Zustand stores (completionStore, network, walkthrough)
+- `src/hooks/` — Custom hooks (useWorkerSops, useSopDetail, useStepPhotos, useCompletions, useBuilderAutosave, useNotifications, useViewport)
+- `src/stores/` — Zustand stores (completionStore — in-memory, per-walk; walkthrough; walkthroughMode; preview)
 - `src/lib/parsers/` — File parsing pipeline (extract-docx, extract-pdf, gpt-parser, image-uploader, ocr-fallback)
-- `src/lib/offline/` — Offline infrastructure (db, photo-compress, query-persister, sync-engine)
 - `src/lib/supabase/` — Supabase client variants (client, server, admin, middleware)
 - `src/lib/validators/` — Zod schemas (auth, sop)
 - `src/types/` — TypeScript types (sop, auth, database.types)
@@ -67,11 +65,10 @@ SafeStart is a multi-tenant SaaS progressive web app that helps blue-collar trad
 - Roles: Worker, Supervisor, SOP Admin, Safety Manager
 - SOP assignment by role/trade
 
-### Offline Strategy
-- Service worker via Serwist for asset caching
-- Dexie (IndexedDB) for offline SOP data
-- Photo queue with compression for deferred upload
-- Sync engine for reconnection reconciliation
+### Worker Walk Path (online-only since Phase 55)
+- SOP list/detail read straight from Supabase via React Query (`useWorkerSops`, `useSopDetail`)
+- A walk's state lives in the in-memory `completionStore`; photos upload directly to Storage via a signed URL (`useStepPhotos` → `getPhotoUploadUrl`), tagged to the active completion id
+- `submitCompletion` validates every photo path against the exact `{org}/completions/{localId}/{photoId}.{jpg|png}` shape and is retry-safe (duplicate-key retries insert only missing photo rows)
 
 ## Conventions
 
@@ -93,7 +90,7 @@ npm run build        # Production build
 npm run lint         # ESLint
 npm run test         # All Playwright tests
 npm run test:integration  # Integration tests only
-npm run test:e2e     # E2E tests only
+npm run eval -- --phase <N>  # Deployed evals against sopstart.com (see below)
 ```
 
 ## Auto-load routing
@@ -137,6 +134,8 @@ npm run eval -- --phase <N>     # waits for Railway to serve HEAD (/api/version)
 ## Learnings
 
 _Log mistakes, errors, and patterns discovered during development sessions here._
+
+- **[2026-10-03] Replacing a persisted queue with in-memory state moves the "which record does this belong to" question into the component tree — and a hook that outlives the record silently leaks it into the next one** — Phase 55 (55-03) swapped the Dexie photo queue for `useStepPhotos`, a plain `useState` list living in `MobileWalkthrough`. The Dexie rows had carried a `completion_local_id` column; the in-memory list carried nothing, so after a worker submitted and tapped "Start another walkthrough", the new completion id was minted but the old walk's photo list was still in the hook — and the new `submitCompletion` path check (correctly) rejected the whole submit as "Invalid photo path." until reload. Every gate was green (tsc, build, 115 phase55 specs, the deployed walk eval — which only ever does ONE walk per session) and the code reviewer caught it by tracing the second-walk path. Same phase, same reviewer pass: `recordSignature` still accepted `rosterUserId` + `role` from the client (the shared-device flow 55-06 had deleted was the only reason it existed), so any org member could counter-sign as anyone — the parameter outlived its only legitimate caller. Rules: (1) when you delete a persistence layer, list every column/key the old rows carried and ask where each one now lives — an id that identified the OWNER of the data (completion, SOP, session) must be re-attached to the in-memory state or the state must reset when the owner changes (`useStepPhotos(activeCompletionId)`); (2) an eval that proves a flow once per session cannot catch cross-record leakage — add the second iteration (second walk, second SOP, second session) to the eval when the state is in-memory; (3) deleting a feature's UI is not deleting the feature — grep every server action for the parameters that feature alone supplied, and drop or re-derive them from the session in the same plan (the phase's 13 sweeps checked references to deleted FILES, not client-trusted parameters whose only legitimate caller was deleted). Fixed in `ec560bf` / `d6d0565` (55 review-fix).
 
 - **[2026-09-29] Never navigate from a mount effect while the page fires mount-time server actions — Next 16.2.1's action queue orphans the next server action and the router waits on it forever** — Admin `/sops?view=attention` froze on its mobile-seed first paint (URL never changed, viewport never flipped to desktop, no error anywhere) the day the real org got a site. Mechanism, proven with a local prod build + an injected React devtools hook: in one passive-effect flush `useWorkerSops` dispatched `getUserSopAssignments` (a server action), the page's effect called `router.replace('/governance')`, and the `['site-worker']` query dispatched `listSiteForWorker`. 16.2.1's `dispatchAction` NAVIGATE branch marks the in-flight action `discarded` but never repoints `actionQueue.last`, so the next server action is linked off the discarded node and NEVER runs; every dispatch also does `startTransition(setState(deferredPromise))`, so the router's state is that orphan's promise, which never resolves -> the navigation transition suspends forever. And because a permanently-pending non-idle lane starves idle work, `useViewport`'s `setVariant('desktop')` (it landed in IdleLane) never rendered either — which is why the page looked like a hydration failure. Upstream fixed it in 16.3 (`if (actionQueue.last === actionQueue.pending) actionQueue.last = newAction` + only advancing the queue from its head); patching just that line locally made the redirect land in ~1s. Rules: (1) legacy-URL redirects belong in the proxy (`src/lib/supabase/middleware.ts`) or a server component, never a client `useEffect` + `router.replace`; (2) 'the page is frozen on its first paint with zero console errors' = suspect a never-resolving router transition — count the server-action POSTs (`next-action` header) against the queries that should have fired; a missing POST is an orphaned action; (3) patching `node_modules` to test a framework fix needs `rm -rf .next/cache/webpack` first — webpack treats node_modules as immutable and silently reuses the cached module (and clear it again after restoring). Latent until Next >=16.3: a user tap that navigates while one server action is in flight, followed by another server action before the nav lands, can still orphan that action. Fixed in the commit after `1007c5c`.
 
