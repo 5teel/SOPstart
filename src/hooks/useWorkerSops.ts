@@ -2,8 +2,8 @@
 /**
  * The ONE place a worker's per-SOP list is built (CLAUDE.md 2026-09-27 -- a
  * classification/derivation living in two modules is a future disagreement).
- * `/sops` (SopsSection) and Phase 53's `/m/[code]` both call this hook so
- * they can never show a different badge for the same SOP. The classifier
+ * `/sops` (SopsSection) calls this hook so there is exactly one derivation
+ * of a worker's badges. The classifier
  * that turns a WorkerSop into a label (topSignal / plantRelState) stays in
  * src/lib/sop/worker-signal.ts -- this hook only gathers and joins the raw
  * data (assignment lookup, library rows, lineage-rooted last completion,
@@ -150,7 +150,7 @@ export function useWorkerSops(requestedIds?: ReadonlySet<string>) {
   // One list, two origins: what the worker has (their own assignments, joined
   // to the published library), then everything else that is published. No
   // department filter here -- that is view state owned by whichever caller
-  // (SopsSection today, /m/[code] in 53-03).
+  // (SopsSection).
   const assignedIds = new Set(assignments.map((a) => a.sop_id))
   const toRow = (sop: WorkerSopRow, isAssigned: boolean): WorkerSop => ({
     id: sop.id,

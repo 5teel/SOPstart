@@ -25,15 +25,11 @@ import type { WorkerSiteData } from '@/lib/validators/site'
  * `isAdmin && viewport === 'desktop'`; below that width an admin is a
  * worker (D-07) and takes the same path everyone else does. This file now
  * holds only the render gates and the slots each surface mounts into —
- * never the admin table's, the plant's, the phone home's, or the worker
+ * never the admin table's, the plant's, or the worker
  * list's own state, markup or camera logic.
  *
  * Phase 52 (D-01): the worker desktop home (PlantHome) is its own lazy
  * module for the same reason.
- *
- * Phase 53 (D-01): the phone home (PhoneHome) is a fourth lazy module — a
- * phone-width worker (or an admin on a phone) gets a different render seam
- * below the same shared site query.
  */
 const WorkerSimpleList = dynamic(
   () => import('@/components/sop/WorkerSimpleList').then((m) => m.WorkerSimpleList),
@@ -45,10 +41,6 @@ const AdminLibraryTable = dynamic(
 )
 const PlantHome = dynamic(
   () => import('@/components/sop/plant/PlantHome').then((m) => m.PlantHome),
-  { ssr: false }
-)
-const PhoneHome = dynamic(
-  () => import('@/components/sop/plant/PhoneHome').then((m) => m.PhoneHome),
   { ssr: false }
 )
 
@@ -96,23 +88,15 @@ export default function SopsPage() {
   // redirects it to /governance (src/lib/supabase/middleware.ts).
 
   const wantsPlant = !isAdmin && viewport === 'desktop'
-  // Phase 53 (D-01): an admin on a phone is a worker (contract) -- the phone
-  // home is not gated on isAdmin. useViewport() starts at 'mobile' on first
-  // paint (SSR-safe seed), so a desktop admin's first render briefly wants
-  // the phone too -- one unused site read before the real viewport resolves.
-  // ponytail: a "viewport resolved" flag on useViewport is the upgrade if
-  // that first-paint read ever matters.
-  const wantsPhone = viewport === 'mobile'
   const { data: siteResult } = useQuery({
     queryKey: ['site-worker'],
     queryFn: () => listSiteForWorker(),
-    enabled: wantsPlant || wantsPhone,
+    enabled: wantsPlant,
     staleTime: 30 * 60 * 1000,
   })
   const site: WorkerSiteData | null =
     siteResult && !('error' in siteResult) && siteResult.layout && siteResult.machines.length > 0 ? siteResult : null
   const plantSite: WorkerSiteData | null = wantsPlant ? site : null
-  const phoneSite: WorkerSiteData | null = wantsPhone ? site : null
 
   // One inline search box filters whichever list is showing — no overlay, no
   // second results surface. Searching is narrowing the list you are looking at.
@@ -207,7 +191,7 @@ export default function SopsPage() {
       <nav className="sticky top-0 z-20 bg-[var(--paper)] border-b border-[var(--ink-100)]">
         <div className="max-w-5xl mx-auto px-4 py-2 flex flex-wrap items-center gap-x-4 gap-y-2">
           <h1 className="text-base font-semibold text-[var(--ink-900)]">SOPs</h1>
-          {!takeover && !plantSite && !phoneSite && (
+          {!takeover && !plantSite && (
           <label className="relative order-last flex min-h-tap w-full items-center sm:ml-auto sm:min-h-9 sm:w-72">
             <Search size={16} className="pointer-events-none absolute left-3 text-[var(--ink-500)]" aria-hidden="true" />
             <input
@@ -242,7 +226,7 @@ export default function SopsPage() {
         {isAdmin && viewport === 'desktop' ? (
           <AdminLibraryTable filter={query} onTakeoverChange={setTakeover} />
         ) : (
-          <SopsSection {...sectionProps} plant={plantSite} phone={phoneSite} onQueryChange={setQuery} />
+          <SopsSection {...sectionProps} plant={plantSite} onQueryChange={setQuery} />
         )}
       </div>
 
@@ -269,8 +253,6 @@ interface SopsSectionProps {
   deptMatches: (sopId: string) => boolean
   /** Phase 52 (D-01): worker-only. Present only for a desktop worker whose org has a drawn site. */
   plant?: WorkerSiteData | null
-  /** Phase 53 (D-01): set below 1024px when the org has a site (admin sessions included -- an admin on a phone is a worker). */
-  phone?: WorkerSiteData | null
   onQueryChange?: (q: string) => void
 }
 
@@ -282,7 +264,6 @@ function SopsSection({
   onScopeChange,
   deptMatches,
   plant,
-  phone,
   onQueryChange,
 }: SopsSectionProps) {
   const queryClient = useQueryClient()
@@ -290,8 +271,8 @@ function SopsSection({
   const [requestedIds, setRequestedIds] = useState<Set<string>>(new Set())
 
   // The worker's per-SOP list is derived in exactly one place now --
-  // src/hooks/useWorkerSops.ts -- so this file and Phase 53's /m/[code] page
-  // can never disagree about a badge (CLAUDE.md 2026-09-27).
+  // src/hooks/useWorkerSops.ts -- so every surface agrees about a badge
+  // (CLAUDE.md 2026-09-27).
   const { workerSops: allWorkerSops, assignments, libraryLoading, assignmentsLoading } = useWorkerSops(requestedIds)
 
   function getAssignmentInfo(sopId: string) {
@@ -359,10 +340,6 @@ function SopsSection({
 
   return (
     <>
-      {phone && onQueryChange && (
-        <PhoneHome site={phone} sops={workerSops} loading={loading} query={query} onQueryChange={onQueryChange} />
-      )}
-
       <WorkerSimpleList
         sops={scoped}
         scopes={visibleScopes.map((sc) => ({ key: sc.key, label: sc.label, count: counts[sc.key] }))}

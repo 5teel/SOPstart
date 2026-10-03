@@ -11,7 +11,6 @@
  * data of its own beyond optimistic local copies of the server rows.
  */
 import { useCallback, useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
 import { SiteEditorLoader } from './SiteEditorLoader'
 import { deleteSiteMachine, setSopMachines, upsertSiteMachine } from '@/actions/site'
 import type { Point, SiteData, SiteDepartment, SiteMachine, SiteSopOption, SopMachineLink } from '@/lib/validators/site'
@@ -338,15 +337,6 @@ export function SiteWorkspace({ layout, machines: initialMachines, links: initia
                             </option>
                           ))}
                         </select>
-                        <Link
-                          href={`/admin/site/plate/${machine.id}`}
-                          data-testid="site-machine-print-plate"
-                          target="_blank"
-                          rel="noopener"
-                          className="min-h-tap inline-flex items-center justify-center rounded-lg border border-ink-300 px-4 text-ui text-ink-900"
-                        >
-                          Print plate
-                        </Link>
                       </div>
                     )}
 
