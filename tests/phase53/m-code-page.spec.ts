@@ -93,13 +93,9 @@ test.describe('/m/[code] page', () => {
 })
 
 test.describe('MachineView', () => {
-  test('gathers data via the shared hooks -- useSopSync, useAssignedSops, useWorkerSops -- never a second derivation', () => {
+  test('gathers data via the shared useWorkerSops hook -- never a second derivation', () => {
     const src = stripComments(read(MACHINE_VIEW_PATH))
     expect(src).toContain("from '@/hooks/useWorkerSops'")
-    expect(src).toContain("from '@/hooks/useAssignedSops'")
-    expect(src).toContain("from '@/hooks/useSopSync'")
-    expect(src).toContain('useSopSync(')
-    expect(src).toContain('useAssignedSops(')
     expect(src).toContain('useWorkerSops(')
   })
 

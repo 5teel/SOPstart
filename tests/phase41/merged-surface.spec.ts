@@ -85,8 +85,6 @@ test.describe('SUR-01 — merged /sops surface gates the admin table on useIsAdm
   test('SUR-01: worker data layer is untouched', () => {
     const src = read(SOPS_PAGE)
     for (const token of [
-      'useAssignedSops',
-      'useSopSync',
       'DepartmentBottomSheet',
       'selfAddSop',
       'selfRemoveSop',
@@ -100,6 +98,7 @@ test.describe('SUR-01 — merged /sops surface gates the admin table on useIsAdm
     const hookSrc = read(WORKER_SOPS_HOOK)
     expect(hookSrc).toContain('getUserSopAssignments')
     expect(hookSrc).toContain('refresherDueDate')
+    expect(hookSrc).toContain('library-sops')
   })
 
   test('SUR-01: the worker list is derived in exactly one place', () => {

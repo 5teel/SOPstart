@@ -18,20 +18,10 @@ import {
   isRefresherOverdue as computeRefresherOverdue,
 } from '@/lib/competency/refresher'
 import { categoryLabel } from '@/lib/sop-categories'
-import type { CachedSop } from '@/lib/offline/db'
-import type { WorkerSop } from '@/lib/sop/worker-signal'
+import type { WorkerSop, WorkerSopRow } from '@/lib/sop/worker-signal'
 
-interface LibrarySop {
-  id: string
-  title: string | null
-  sop_number: string | null
-  category_slug: string | null
-  department: string | null
-  published_at: string | null
-}
-
-export function useWorkerSops(assignedSops: CachedSop[] = [], requestedIds?: ReadonlySet<string>) {
-  const { data: assignments = [] } = useQuery({
+export function useWorkerSops(requestedIds?: ReadonlySet<string>) {
+  const { data: assignments = [], isLoading: assignmentsLoading } = useQuery({
     queryKey: ['user-sop-assignments'],
     queryFn: getUserSopAssignments,
     staleTime: 1000 * 60 * 5,
@@ -39,7 +29,7 @@ export function useWorkerSops(assignedSops: CachedSop[] = [], requestedIds?: Rea
 
   // The whole published library. Used to be a second tab; it is a scope now, so
   // it loads alongside the assigned list rather than behind a tab switch.
-  const { data: librarySops = [], isLoading: libraryLoading } = useQuery<LibrarySop[]>({
+  const { data: librarySops = [], isLoading: libraryLoading } = useQuery<WorkerSopRow[]>({
     queryKey: ['library-sops'],
     queryFn: async () => {
       const supabase = createClient()
@@ -47,7 +37,7 @@ export function useWorkerSops(assignedSops: CachedSop[] = [], requestedIds?: Rea
         .from('sops')
         .select('id, title, sop_number, category_slug, department, published_at')
         .eq('status', 'published')
-        .order('title', { ascending: true }) as { data: LibrarySop[] | null }
+        .order('title', { ascending: true }) as { data: WorkerSopRow[] | null }
       return data ?? []
     },
     staleTime: 1000 * 60 * 2,
@@ -157,43 +147,27 @@ export function useWorkerSops(assignedSops: CachedSop[] = [], requestedIds?: Rea
   // clock moves to the detail pane. Everything is derived here -- the browser
   // renders what it is handed and owns no data logic.
   //
-  // One list, two origins: what the worker has, then everything else that is
-  // published. Assigned rows win the id collision -- they carry the cached row
-  // the offline card needs. No department filter here -- that is view state
-  // owned by whichever caller (SopsSection today, /m/[code] in 53-03).
-  const assignedIds = new Set(assignedSops.map((s) => s.id))
+  // One list, two origins: what the worker has (their own assignments, joined
+  // to the published library), then everything else that is published. No
+  // department filter here -- that is view state owned by whichever caller
+  // (SopsSection today, /m/[code] in 53-03).
+  const assignedIds = new Set(assignments.map((a) => a.sop_id))
+  const toRow = (sop: WorkerSopRow, isAssigned: boolean): WorkerSop => ({
+    id: sop.id,
+    title: sop.title ?? 'Untitled SOP',
+    categoryLabel: categoryLabel(sop.category_slug),
+    lastCompletedAt: lastCompletionByRoot[rootOf(sop.id)] ?? null,
+    ...refresherState(sop.id),
+    hasNewerVersion: hasNewerVersion(sop.id, sop.published_at),
+    isAssigned,
+    isSelfAssigned: isAssigned ? (getAssignmentInfo(sop.id)?.isSelfAssigned ?? false) : false,
+    removalRequested: isAssigned ? (requestedIds?.has(sop.id) ?? false) : false,
+    raw: sop,
+  })
   const workerSops: WorkerSop[] = [
-    ...assignedSops.map((sop) => {
-      const info = getAssignmentInfo(sop.id)
-      return {
-        id: sop.id,
-        title: sop.title ?? 'Untitled SOP',
-        categoryLabel: categoryLabel((sop as { category_slug?: string | null }).category_slug ?? null),
-        lastCompletedAt: lastCompletionByRoot[rootOf(sop.id)] ?? null,
-        ...refresherState(sop.id),
-        hasNewerVersion: hasNewerVersion(sop.id, sop.published_at),
-        isAssigned: true,
-        isSelfAssigned: info?.isSelfAssigned ?? false,
-        removalRequested: requestedIds?.has(sop.id) ?? false,
-        raw: sop,
-      }
-    }),
-    ...librarySops
-      .filter((sop) => !assignedIds.has(sop.id))
-      .map((sop) => ({
-        id: sop.id,
-        title: sop.title ?? 'Untitled SOP',
-        categoryLabel: categoryLabel(sop.category_slug),
-        lastCompletedAt: lastCompletionByRoot[rootOf(sop.id)] ?? null,
-        ...refresherState(sop.id),
-        hasNewerVersion: hasNewerVersion(sop.id, sop.published_at),
-        isAssigned: false,
-        isSelfAssigned: false,
-        removalRequested: false,
-        // Only fields SopLibraryCard reads; the row is not in the offline cache.
-        raw: { ...sop, _cachedAt: 0 } as unknown as CachedSop,
-      })),
+    ...librarySops.filter((s) => assignedIds.has(s.id)).map((s) => toRow(s, true)),
+    ...librarySops.filter((s) => !assignedIds.has(s.id)).map((s) => toRow(s, false)),
   ]
 
-  return { workerSops, assignments, libraryLoading }
+  return { workerSops, assignments, libraryLoading, assignmentsLoading }
 }

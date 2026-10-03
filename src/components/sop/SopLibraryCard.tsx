@@ -1,11 +1,11 @@
 'use client'
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
-import type { CachedSop } from '@/lib/offline/db'
+import type { WorkerSopRow } from '@/lib/sop/worker-signal'
 import { categoryLabel } from '@/lib/sop-categories'
 
 interface SopLibraryCardProps {
-  sop: CachedSop
+  sop: WorkerSopRow
   /**
    * AFL-VER-04 / D-08: true when a newer published version exists than the
    * worker's last completion for this SOP lineage.

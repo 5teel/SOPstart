@@ -24,7 +24,7 @@ import {
   type PlantRel,
 } from '@/lib/sop/worker-signal'
 import type { SopMachineLink } from '@/lib/validators/site'
-import type { CachedSop } from '@/lib/offline/db'
+import type { WorkerSopRow } from '@/lib/sop/worker-signal'
 
 function sop(id: string, title: string, overrides: Partial<WorkerSop> = {}): WorkerSop {
   return {
@@ -38,7 +38,7 @@ function sop(id: string, title: string, overrides: Partial<WorkerSop> = {}): Wor
     isAssigned: true,
     isSelfAssigned: false,
     removalRequested: false,
-    raw: {} as CachedSop,
+    raw: {} as WorkerSopRow,
     ...overrides,
   }
 }

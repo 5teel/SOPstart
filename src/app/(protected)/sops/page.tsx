@@ -2,10 +2,7 @@
 import { useState, useTransition } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Search, X } from 'lucide-react'
-import { useAssignedSops } from '@/hooks/useAssignedSops'
-import { useSopSync } from '@/hooks/useSopSync'
 import { useWorkerSops } from '@/hooks/useWorkerSops'
-import { db } from '@/lib/offline/db'
 import { DepartmentBottomSheet } from '@/components/sop/CategoryBottomSheet'
 import { createClient } from '@/lib/supabase/client'
 import { selfAddSop, selfRemoveSop, requestRemoveAssignment } from '@/actions/assignments'
@@ -54,17 +51,6 @@ const PhoneHome = dynamic(
   () => import('@/components/sop/plant/PhoneHome').then((m) => m.PhoneHome),
   { ssr: false }
 )
-
-function getRelativeTime(isoString: string): string {
-  const diff = Date.now() - new Date(isoString).getTime()
-  const minutes = Math.floor(diff / 60_000)
-  if (minutes < 1) return 'just now'
-  if (minutes < 60) return `${minutes}m ago`
-  const hours = Math.floor(minutes / 60)
-  if (hours < 24) return `${hours}h ago`
-  const days = Math.floor(hours / 24)
-  return `${days}d ago`
-}
 
 /**
  * A worker's scopes are about their own training clock — what is overdue,
@@ -150,10 +136,6 @@ export default function SopsPage() {
     window.history.replaceState(null, '', '/sops')
   }
 
-  const { syncing } = useSopSync()
-
-  const { data: assignedSops = [], isLoading: assignedLoading } = useAssignedSops()
-
   // Fetch departments from Supabase for the filter panel.
   const { data: departments = [] } = useQuery<Department[]>({
     queryKey: ['departments'],
@@ -191,17 +173,6 @@ export default function SopsPage() {
     staleTime: 1000 * 60 * 5,
   })
 
-  const { data: lastSyncMeta } = useQuery({
-    queryKey: ['sync-meta-last-sync'],
-    queryFn: async () => db.syncMeta.get('lastSync'),
-    networkMode: 'offlineFirst',
-  })
-  const lastSyncLabel = syncing
-    ? 'Syncing…'
-    : lastSyncMeta?.value
-      ? `Offline copy · ${getRelativeTime(lastSyncMeta.value)}`
-      : 'Not saved for offline yet'
-
   const activeDeptLabel = allDepartments
     ? '◇ All departments'
     : selectedDeptIds.length > 0
@@ -219,8 +190,6 @@ export default function SopsPage() {
       : (sopDeptMap[sopId] ?? []).some((id) => selectedDeptIds.includes(id))
 
   const sectionProps = {
-    assignedSops,
-    isLoading: assignedLoading,
     query,
     activeDeptLabel,
     onOpenDeptSheet: () => setDeptSheetOpen(true),
@@ -231,14 +200,13 @@ export default function SopsPage() {
 
   return (
     <div className="flex flex-col flex-1 bg-[var(--paper)]">
-      {/* Toolbar: title · offline state · search. One row on desktop; the
+      {/* Toolbar: title · search. One row on desktop; the
           search box drops to its own full-width row on a phone so it stays a
           glove-sized target. Creating a SOP stays in the header (UX-04: one
           create entry). */}
       <nav className="sticky top-0 z-20 bg-[var(--paper)] border-b border-[var(--ink-100)]">
         <div className="max-w-5xl mx-auto px-4 py-2 flex flex-wrap items-center gap-x-4 gap-y-2">
           <h1 className="text-base font-semibold text-[var(--ink-900)]">SOPs</h1>
-          <span className="mono hidden text-meta text-[var(--ink-500)] sm:inline">{lastSyncLabel}</span>
           {!takeover && !plantSite && !phoneSite && (
           <label className="relative order-last flex min-h-tap w-full items-center sm:ml-auto sm:min-h-9 sm:w-72">
             <Search size={16} className="pointer-events-none absolute left-3 text-[var(--ink-500)]" aria-hidden="true" />
@@ -293,8 +261,6 @@ export default function SopsPage() {
 /* ─── The one list ───────────────────────────────────────────────────────── */
 
 interface SopsSectionProps {
-  assignedSops: ReturnType<typeof useAssignedSops>['data']
-  isLoading: boolean
   query: string
   activeDeptLabel: string
   onOpenDeptSheet: () => void
@@ -309,8 +275,6 @@ interface SopsSectionProps {
 }
 
 function SopsSection({
-  assignedSops = [],
-  isLoading,
   query,
   activeDeptLabel,
   onOpenDeptSheet,
@@ -328,7 +292,7 @@ function SopsSection({
   // The worker's per-SOP list is derived in exactly one place now --
   // src/hooks/useWorkerSops.ts -- so this file and Phase 53's /m/[code] page
   // can never disagree about a badge (CLAUDE.md 2026-09-27).
-  const { workerSops: allWorkerSops, assignments, libraryLoading } = useWorkerSops(assignedSops, requestedIds)
+  const { workerSops: allWorkerSops, assignments, libraryLoading, assignmentsLoading } = useWorkerSops(requestedIds)
 
   function getAssignmentInfo(sopId: string) {
     return assignments.find((a) => a.sop_id === sopId)
@@ -344,7 +308,6 @@ function SopsSection({
         setRequestedIds((prev) => new Set(prev).add(sopId))
       }
       queryClient.invalidateQueries({ queryKey: ['user-sop-assignments'] })
-      queryClient.invalidateQueries({ queryKey: ['assigned-sops'] })
     })
   }
 
@@ -352,7 +315,6 @@ function SopsSection({
     startTransition(async () => {
       await selfAddSop(sopId)
       queryClient.invalidateQueries({ queryKey: ['user-sop-assignments'] })
-      queryClient.invalidateQueries({ queryKey: ['assigned-sops'] })
     })
   }
 
@@ -381,7 +343,7 @@ function SopsSection({
   ) as Record<WorkerScope, number>
   const visibleScopes = WORKER_SCOPES.filter((sc) => sc.always || counts[sc.key] > 0 || scope === sc.key)
 
-  const loading = isLoading || libraryLoading
+  const loading = libraryLoading || assignmentsLoading
 
   // D-01: the plant replaces the worker list and receives the exact list the
   // list would have shown -- refresher state, lineage-rooted completion

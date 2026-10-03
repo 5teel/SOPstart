@@ -10,14 +10,23 @@
  * (tests/phase52/plant-pins-no-storage.spec.ts pins this).
  *
  * Plain module, no directive -- importable from both client and server code.
- * Only `import type` for the shapes owned elsewhere (CachedSop, SopMachineLink).
+ * Only `import type` for the shapes owned elsewhere (SopMachineLink).
  */
-import type { CachedSop } from '@/lib/offline/db'
 import type { SopMachineLink } from '@/lib/validators/site'
 
 /** Phase 54 (D-10): moved here from `src/components/sop/sops-nav-types.ts`,
  *  which 54-05 deletes — a plain type export, no I/O, no new imports. */
 export type WorkerScope = 'all' | 'refresher' | 'updated' | 'not-done' | 'library' | 'not-added'
+
+/** The published library row a worker card reads. */
+export type WorkerSopRow = {
+  id: string
+  title: string | null
+  sop_number: string | null
+  category_slug: string | null
+  department: string | null
+  published_at: string | null
+}
 
 export type WorkerSop = {
   id: string
@@ -35,8 +44,8 @@ export type WorkerSop = {
   /** Self-added vs assigned by a manager — decides which removal path applies. */
   isSelfAssigned: boolean
   removalRequested: boolean
-  /** The cached row itself, for the mobile card renderer. */
-  raw: CachedSop
+  /** The published library row, for the card renderer. */
+  raw: WorkerSopRow
 }
 
 // ---------------------------------------------------------------------------
