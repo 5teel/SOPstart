@@ -87,12 +87,12 @@ test.describe('SOP page — one document, one job (deployed)', () => {
     await shot(page, 'sop-walk-mobile')
   })
 
-  test('admin keeps the preview toggle and the Flow tab', async ({ page, context }) => {
+  test('admin keeps the preview toggle and has no Flow tab', async ({ page, context }) => {
     await page.setViewportSize({ width: 1440, height: 900 })
     await signInAs(context, 'admin')
     await page.goto(OTG)
     await expect(page.getByRole('group', { name: 'Preview viewport' })).toBeVisible(SLOW)
-    await expect(page.locator('header').getByText(/^Flow$/i)).toBeVisible()
+    await expect(page.locator('header').getByText(/^Flow$/i)).toHaveCount(0, SLOW)
     await expect(page.getByRole('link', { name: /Edit in builder/ })).toBeVisible()
   })
 })

@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 export interface BlueprintCanvasProps {
   children: ReactNode
   className?: string
-  /** When true, removes the max-width clamp (use for full-bleed Flow tab). */
+  /** When true, removes the max-width clamp (use for full-bleed views). */
   fullBleed?: boolean
 }
 

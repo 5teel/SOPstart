@@ -5,7 +5,7 @@
  * (depth 1), departments (depth 2, null-area depts attach directly to the
  * root — no synthetic area node), roles (depth 3). People render as chips
  * *inside* role nodes, not as separate layout nodes (RESEARCH Open Question 3
- * — a dedicated leveled tree, not FlowGraphCanvas's step-graph layering).
+ * — a dedicated leveled tree, not a step-graph layering).
  *
  * Algorithm: bottom-up "slot span" per node (leaf = one fixed-width slot,
  * parent = sum of its children's slots), then top-down placement centering

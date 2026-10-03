@@ -1,7 +1,6 @@
 /**
  * Phase 35 Plan 03 Task 4 — client-side Blob download helper (D-16).
- * Forks the FlowGraphCanvas PNG-export idiom verbatim (src/components/sop/
- * flow/FlowGraphCanvas.tsx) — one shared helper so the Blob dance isn't
+ * One shared helper so the Blob dance isn't
  * inlined twice across the matrix header export and the per-worker record
  * export. Plain client module, no server directive.
  */

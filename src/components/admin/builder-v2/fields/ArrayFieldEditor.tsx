@@ -30,8 +30,8 @@ import { CSS } from '@dnd-kit/utilities'
  *     (Decision `options[]{label,isEscalation}`, Inspect `items[]{label,requirePhoto}`)
  *
  * Row objects are edited by SPREAD-MERGE (`{ ...row, [key]: v }`) so unknown row
- * keys survive — e.g. a Decision option's `nextStepId` (set by the flow-graph
- * field) is preserved when its label is edited here (R7 lossless).
+ * keys survive — e.g. a Decision option's `nextStepId` (a legacy link written by
+ * an earlier editor) is preserved when its label is edited here (R7 lossless).
  *
  * Owns local `rows` state (seeded once) so a keystroke never snaps back when the
  * parent commit rejects an intermediate invalid state (e.g. an empty label); the

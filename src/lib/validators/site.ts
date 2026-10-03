@@ -2,7 +2,7 @@
  * Phase 51 -- site model validators (D-01, D-02, D-05, T-51-03, T-51-04).
  *
  * Plain module, no directive -- importable from both client and server code.
- * House style: `z.string().uuid()`, not `z.uuid()` (see src/lib/validators/flow-graph.ts).
+ * House style: `z.string().uuid()`, not `z.uuid()`.
  */
 import { z } from 'zod'
 

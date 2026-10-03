@@ -159,7 +159,6 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
   { file: 'src/actions/approvals.ts', keys: 'approval_state', reason: 'Approval-chain state stamp; not a category-bearing write.' },
   { file: 'src/actions/departments.ts', keys: 'organisation_id', reason: 'Repairs a SOP row’s organisation_id; not a category-bearing write.' },
   { file: 'src/actions/departments.ts', keys: 'all_departments', reason: 'Toggles the all-departments grant flag; not a category-bearing write.' },
-  { file: 'src/actions/flow-graph.ts', keys: 'flow_graph', reason: 'Persists the builder flow-graph JSON only; not a category-bearing write.' },
   { file: 'src/actions/governance.ts', keys: 'owner_user_id,updated_at', reason: 'SOP-owner reassignment; not a category-bearing write.' },
   { file: 'src/actions/governance.ts', keys: 'refresher_interval_months,updated_at', reason: 'Per-SOP refresher-interval override; category is set via a separate action, not this one.' },
   { file: 'src/actions/governance.ts', keys: 'last_reviewed_at,last_reviewed_by,review_due_at,updated_at', reason: 'Manual "confirm current" review-clock stamp; category_slug is read (not written) to resolve the cadence.' },

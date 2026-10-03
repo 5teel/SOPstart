@@ -50,13 +50,6 @@ export default defineConfig({
       testMatch: /.*\.test\.ts$/,
     },
     {
-      // Phase 24 — branch-aware flow derivation unit tests.
-      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
-      name: 'phase24-unit',
-      testDir: './src/lib/sop/__tests__',
-      testMatch: /flow-graph-derivation\.test\.ts$/,
-    },
-    {
       name: 'phase21-source-viewer',
       testDir: './src/lib/parsers/source-viewer/__tests__',
       testMatch: /.*\.test\.ts$/,
@@ -101,16 +94,6 @@ export default defineConfig({
       name: 'phase21.6-stubs',
       testDir: '.',
       testMatch: /(no-raw-block-types-in-build|builder-edit-stage)\.(test|spec)\.ts$/,
-    },
-    {
-      // Phase 24 — source-contract + lint guard stubs:
-      //   no-preview-pill.spec.ts   — PREVIEW string absent from flow components (test.fixme until Plans 02/03 remove it)
-      //   flow-graph-canvas.spec.ts — fitToView + exportPng wired; useViewport imported (test.fixme until Plans 02/03)
-      //   flow-graph-schema.spec.ts — schema accepts min(1) ids, stepId still uuid (live — passes now)
-      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
-      name: 'phase24-stubs',
-      testDir: '.',
-      testMatch: /(no-preview-pill|flow-graph-canvas|flow-graph-schema)\.(test|spec)\.ts$/,
     },
     {
       // Phase 25 — departments RLS + SOP visibility integration specs.

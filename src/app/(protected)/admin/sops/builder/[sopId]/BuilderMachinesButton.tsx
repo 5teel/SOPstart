@@ -13,8 +13,8 @@ import type { SiteDepartment, SiteMachine } from '@/lib/validators/site'
  * setSopMachines() action the /admin/site editor uses (D-12), so the two
  * surfaces can never drift.
  *
- * Shell copied from BuilderFlowButton.tsx: Escape closes, backdrop click
- * closes, createPortal to document.body.
+ * Portaled modal shell: Escape closes, backdrop click closes,
+ * createPortal to document.body.
  */
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error'

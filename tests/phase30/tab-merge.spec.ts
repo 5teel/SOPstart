@@ -2,9 +2,9 @@
  * UX-05 — Worker SOP detail 6 tabs → 3 (LIVE — flipped in 30-06).
  *
  * Contract (30-RESEARCH § Test Map + § Current Wiring 5):
- *   - SOP_TABS === ['read', 'walk', 'flow'] (SopTabNav.tsx).
+ *   - SOP_TABS === ['read', 'walk'] (SopTabNav.tsx).
  *   - Legacy ?tab= mapping inside SopTabNav — ALL 6 old values land:
- *     overview|tools|hazards|model → read, walkthrough → walk, flow → flow.
+ *     overview|tools|hazards|model|flow → read, walkthrough → walk.
  *     Old params accepted forever (bookmarks/shared links; printed QR codes
  *     encode bare /sops/{id} so QR risk is nil).
  *   - Merged Read tab renders PPE ONCE (single isPpeSection definition),
@@ -31,9 +31,9 @@ function read(p: string): string {
 }
 
 test.describe('UX-05 — worker tab merge (6 → 3)', () => {
-  test('SOP_TABS is exactly [read, walk, flow]', () => {
+  test('SOP_TABS is exactly [read, walk]', () => {
     const src = read(TAB_NAV)
-    expect(src).toMatch(/SOP_TABS\s*=\s*\[\s*'read',\s*'walk',\s*'flow',?\s*\]/)
+    expect(src).toMatch(/SOP_TABS\s*=\s*\[\s*'read',\s*'walk',?\s*\]/)
   })
 
   test('legacy tab params all map: overview/tools/hazards/model → read, walkthrough → walk', () => {
@@ -45,6 +45,7 @@ test.describe('UX-05 — worker tab merge (6 → 3)', () => {
     expect(src).toMatch(/hazards:\s*'read'/)
     expect(src).toMatch(/model:\s*'read'/)
     expect(src).toMatch(/walkthrough:\s*'walk'/)
+    expect(src).toMatch(/flow:\s*'read'/)
     expect(src).toContain('LEGACY_TAB_MAP')
   })
 

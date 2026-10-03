@@ -38,8 +38,6 @@ import { ChevronDown } from 'lucide-react'
 import { DeleteSopButton } from '@/components/admin/DeleteSopButton'
 import { BuilderClient } from './BuilderClient'
 import { BuilderStageStepper } from './BuilderStageStepper'
-import { BuilderFlowButton } from './BuilderFlowButton'
-import { BuilderFlowEditButton } from './BuilderFlowEditButton'
 import { BuilderMachinesButton } from './BuilderMachinesButton'
 import { BuilderCategoryButton } from './BuilderCategoryButton'
 import type { BuilderStage } from './BuilderStageStepper'
@@ -73,8 +71,7 @@ function deriveSourcePaneKind(rawType: string | null | undefined): SourcePaneKin
 // ONE self-describing tools menu — Phase 33 (33-04, SC-6 winner decision #2)
 //
 // Absorbs the old per-SOP actions menu (Assign / Versions /
-// Delete-draft — Phase 30 30-07 UX-06) PLUS BuilderFlowButton +
-// BuilderFlowEditButton, which render as menu rows below. Every item is a
+// Delete-draft — Phase 30 30-07 UX-06). Every item is a
 // plain-language verb phrase about THIS SOP with a one-line hint — labels
 // traced from the shipped code (sketches/builder-header-orientation
 // README § Decisions 2026-07-19).
@@ -139,8 +136,6 @@ function ToolsMenu({
               </Link>
             ))}
             <div className="my-1 h-px bg-[var(--ink-100)]" />
-            <BuilderFlowButton sop={sop} />
-            <BuilderFlowEditButton sop={sop} sopId={sopId} />
             <BuilderMachinesButton sopId={sopId} />
             <BuilderCategoryButton sopId={sopId} categorySlug={sop.category_slug ?? null} />
             {isDraft && (

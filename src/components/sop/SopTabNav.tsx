@@ -2,23 +2,23 @@
 import { useRouter, useSearchParams } from 'next/navigation'
 import { TabNav, type TabNavItem } from '@/components/ui/TabNav'
 
-export const SOP_TABS = ['read', 'walk', 'flow'] as const
+export const SOP_TABS = ['read', 'walk'] as const
 export type SopTabId = typeof SOP_TABS[number]
 
 const TAB_DEFS: TabNavItem[] = [
   { id: 'read', label: 'Read' },
   { id: 'walk', label: 'Walk it' },
-  { id: 'flow', label: 'Flow' },
 ]
 
 // UX-05: legacy ?tab= params from the pre-Phase-30 6-tab surface map onto the
-// 3 new tabs so old bookmarks / shared deep-links land forever.
-// overview | tools | hazards | model → read; walkthrough → walk.
+// 2 remaining tabs so old bookmarks / shared deep-links land forever.
+// overview | tools | hazards | model | flow → read; walkthrough → walk.
 const LEGACY_TAB_MAP: Record<string, SopTabId> = {
   overview: 'read',
   tools: 'read',
   hazards: 'read',
   model: 'read',
+  flow: 'read',
   walkthrough: 'walk',
 }
 
@@ -37,9 +37,7 @@ export function useActiveTab(): SopTabId {
   return resolveTab(search.get('tab'))
 }
 
-/** `hideFlow`: a linear procedure's flow graph is the step list rotated —
- *  workers do not get the tab; admins (and authored graphs) still do. */
-export function SopTabNav({ className = '', hideFlow = false }: { className?: string; hideFlow?: boolean }) {
+export function SopTabNav({ className = '' }: { className?: string }) {
   const router = useRouter()
   const search = useSearchParams()
   const active = resolveTab(search.get('tab'))
@@ -54,7 +52,7 @@ export function SopTabNav({ className = '', hideFlow = false }: { className?: st
   return (
     <TabNav
       ariaLabel="SOP sections"
-      tabs={hideFlow ? TAB_DEFS.filter((t) => t.id !== 'flow') : TAB_DEFS}
+      tabs={TAB_DEFS}
       activeId={active}
       onChange={handleChange}
       className={className}

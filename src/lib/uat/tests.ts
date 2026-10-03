@@ -627,11 +627,11 @@ export const UAT_TESTS: UatTest[] = [
     title: 'Is the new builder header clear about where you are and what unlocks next?',
     status: 'active',
     summary:
-      'The dark bar at the top of the SOP builder is now a light bar with three parts: a "Back to SOP list" link, a "You\'re editing" tag with the SOP title, and a button showing the next stage — which tells you in plain words if it\'s locked and why. All the other tools (assign, versions, flow diagram, delete) are now in one "Tools for this SOP" menu.',
+      'The dark bar at the top of the SOP builder is now a light bar with three parts: a "Back to SOP list" link, a "You\'re editing" tag with the SOP title, and a button showing the next stage — which tells you in plain words if it\'s locked and why. All the other tools (assign, versions, delete) are now in one "Tools for this SOP" menu.',
     tryIt: [
       'Open any draft SOP in the builder and look at the header — check you can tell where you are and what SOP you\'re editing at a glance.',
       'With some steps still unchecked, look at the button on the right — read the sentence under it out loud; is it clear what\'s stopping you from sending this to workers?',
-      'Click "Tools for this SOP ▾" and confirm every item (assign, versions, see/edit flow diagram, delete draft) is there with a plain-English label.',
+      'Click "Tools for this SOP ▾" and confirm every item (assign, versions, delete draft) is there with a plain-English label.',
       'Check every step, then look at the same button again — it should turn green and say you\'re ready to send it to workers.',
     ],
     links: [{ label: 'SOPs', href: '/sops' }],
@@ -642,7 +642,7 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'no-clutter', text: 'Did the header feel calmer than before, without losing anything you needed?' },
     ],
     background:
-      'SC-6 (33-04) — replaces the dark #0a0a0b header with a light paper/hairline "Wayfinder" bar (back/here/forward zones); the old SopActionsMenu + BuilderFlowButton + BuilderFlowEditButton + DeleteSopButton cluster collapses into one "Tools for this SOP ▾" menu. Winner of a 3-concept sketch review (sketches/builder-header-orientation), locked 2026-07-19. Screenshot check per CLAUDE.md 2026-07-14 (an undefined CSS token renders wrong but fails no automated gate) — this entry exists so a human actually looks at the rendered bar.',
+      'SC-6 (33-04) — replaces the dark #0a0a0b header with a light paper/hairline "Wayfinder" bar (back/here/forward zones); the old SopActionsMenu + per-tool buttons + DeleteSopButton cluster collapses into one "Tools for this SOP ▾" menu. Winner of a 3-concept sketch review (sketches/builder-header-orientation), locked 2026-07-19. Screenshot check per CLAUDE.md 2026-07-14 (an undefined CSS token renders wrong but fails no automated gate) — this entry exists so a human actually looks at the rendered bar.',
   },
 
   {

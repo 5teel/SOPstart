@@ -6,7 +6,7 @@ import { useSopDetail } from '@/hooks/useSopDetail'
 import { useIsAdmin } from '@/components/providers/RoleProvider'
 import { SopTabNav, useActiveTab } from '@/components/sop/SopTabNav'
 import { WorkerPreviewToggle, WorkerPreviewClamp } from '@/components/sop/WorkerPreviewToggle'
-import { ReadTab, FlowTab } from '@/components/sop/tabs'
+import { ReadTab } from '@/components/sop/tabs'
 import { WalkthroughSwitcher } from '@/components/sop/walkthrough/WalkthroughSwitcher'
 import { procedureSections, scopeSopToJob } from '@/lib/sop/sections'
 
@@ -86,9 +86,6 @@ function SopDetailInner() {
   const job = jobs.find((s) => s.id === jobId) ?? jobs[0] ?? null
   // Walk it walks the chosen job only — "Step 1 of 6", not "Step 1 of 40".
   const walkSop = job && jobs.length > 1 ? scopeSopToJob(sop, job.id) : sop
-  // A linear procedure's flow graph is the step list rotated; workers get it
-  // only when someone authored a real graph. Admins always can.
-  const hideFlow = !isAdmin && !sop.flow_graph
 
   return (
     <div className="min-h-screen bg-[var(--paper)] text-[var(--ink-900)]">
@@ -115,7 +112,7 @@ function SopDetailInner() {
           </div>
         </div>
         <div className="max-w-5xl mx-auto px-4">
-          <SopTabNav hideFlow={hideFlow} />
+          <SopTabNav />
         </div>
       </header>
 
@@ -123,7 +120,6 @@ function SopDetailInner() {
         <WorkerPreviewClamp>
           {active === 'read' && <ReadTab sop={sop} jobId={job?.id ?? null} onJobChange={handleJobChange} />}
           {active === 'walk' && <WalkthroughSwitcher sop={walkSop} />}
-          {active === 'flow' && !hideFlow && <FlowTab sop={sop} />}
         </WorkerPreviewClamp>
       </main>
 

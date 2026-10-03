@@ -27,7 +27,6 @@ const SRC = path.join(ROOT, 'src')
 const HEX_ALLOW = [
   'src/components/admin/departments/',
   'src/components/admin/source-viewer/',
-  'src/components/sop/flow/FlowGraphCanvas.tsx',
   'src/components/sop/blocks/ModelBlock.tsx',
   'src/components/admin/org-model/',
   'src/components/admin/builder-v2/visual/annotation-tools.ts', // Konva stroke colours baked into PNGs
@@ -90,7 +89,7 @@ test.describe('design tokens — one source of truth', () => {
   const TRACKING_ARB = /(?<![\w\-\[])(?:[a-z0-9-]+:)*tracking-\[[^\]]+\]/g
   const INLINE_TYPE = /(?:fontSize|letterSpacing):\s*(?:'[0-9.]+(?:px|em)?'|"[0-9.]+(?:px|em)?"|[0-9.]+)(?=[,\s}])/g
   const INLINE_RADIUS = /borderRadius:\s*(?:'[0-9.]+px'|"[0-9.]+px"|[1-9][0-9.]*)(?=[,\s}])/g
-  const INLINE_ALLOW = ['src/components/admin/source-viewer/', 'src/components/sop/flow/FlowGraphCanvas.tsx', 'src/components/sop/blocks/ModelBlock.tsx', 'src/components/admin/builder-v2/visual/annotation-tools.ts' /* Konva text, rasterised */]
+  const INLINE_ALLOW = ['src/components/admin/source-viewer/', 'src/components/sop/blocks/ModelBlock.tsx', 'src/components/admin/builder-v2/visual/annotation-tools.ts' /* Konva text, rasterised */]
 
   test('no pixel-valued spacing, type, radius or tracking utilities — use the scale or a named token', () => {
     const files: string[] = []

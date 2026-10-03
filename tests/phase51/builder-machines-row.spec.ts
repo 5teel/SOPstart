@@ -62,7 +62,7 @@ test.describe('modal', () => {
     expect(src).toContain('onChange={() => void toggleMachine(machine.id)}')
   })
 
-  test('modal follows the BuilderFlowButton portaled-modal pattern (createPortal to document.body, Escape closes)', () => {
+  test('modal follows the portaled-modal pattern (createPortal to document.body, Escape closes)', () => {
     const src = read(BUTTON_PATH)
     expect(src).toContain('createPortal(')
     expect(src).toContain('document.body')
@@ -77,17 +77,17 @@ test.describe('modal', () => {
 })
 
 test.describe('tools menu', () => {
-  test('BuilderStageShell ToolsMenu renders a "Pick machines" row alongside the flow-diagram row', () => {
+  test('BuilderStageShell ToolsMenu renders a "Pick machines" row inside the tools menu', () => {
     const src = read(SHELL_PATH)
     expect(src).toContain("import { BuilderMachinesButton } from './BuilderMachinesButton'")
     expect(src).toContain('<BuilderMachinesButton sopId={sopId} />')
   })
 
-  test('the row opens BuilderMachinesButton, not a route navigation, and sits after BuilderFlowEditButton, before DeleteSopButton', () => {
+  test('the row opens BuilderMachinesButton, not a route navigation, and sits after the tool links, before DeleteSopButton', () => {
     const src = read(SHELL_PATH)
     // JSX usages (not the import lines) — each of these tags is used exactly
     // once as JSX in the whole file, inside ToolsMenu.
-    const editIdx = src.indexOf('<BuilderFlowEditButton')
+    const editIdx = src.indexOf('items.map(')
     const machinesIdx = src.indexOf('<BuilderMachinesButton sopId={sopId} />')
     const deleteIdx = src.indexOf('<DeleteSopButton')
     expect(editIdx).toBeGreaterThan(-1)

@@ -5,7 +5,7 @@
  * output as absolutely-positioned `.node` divs on 20px grid paper, with one
  * SVG underlay drawing cubic-bezier parent -> child connectors. Anchor
  * points are measured with `getBoundingClientRect()` against the canvas
- * container (FlowGraphCanvas idiom) so connectors stay pixel-accurate to
+ * container so connectors stay pixel-accurate to
  * the actual rendered boxes, and are redrawn on resize / tree change.
  *
  * Vacancies render as first-class dashed `.person-chip.vacant` chips (never

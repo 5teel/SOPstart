@@ -48,7 +48,7 @@ test.describe('D-09/D-10/D-11 — org agent dashboard (/admin/agent)', () => {
     const pageSrc = fs.readFileSync(PAGE, 'utf-8')
     const clientSrc = fs.readFileSync(CLIENT, 'utf-8')
     for (const src of [pageSrc, clientSrc]) {
-      expect(src).not.toMatch(/react-konva|FlowGraphCanvas|Konva/i)
+      expect(src).not.toMatch(/react-konva|Konva/i)
       expect(src.toLowerCase()).not.toContain('<canvas')
     }
   })

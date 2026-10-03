@@ -95,9 +95,6 @@ test.describe('SC-6 — Wayfinder builder header', () => {
     // The link items with locked labels.
     expect(src).toContain('Assign this SOP to workers')
     expect(src).toContain('See earlier versions')
-    // Both flow-modal triggers render inside the popover.
-    expect(src).toContain('<BuilderFlowButton sop={sop} />')
-    expect(src).toContain('<BuilderFlowEditButton sop={sop} sopId={sopId} />')
     // DeleteSopButton shape intact (regex-pinned by tests/phase30/list-rows.spec.ts).
     expect(src).toMatch(/<DeleteSopButton\s+sopId=\{sopId\}/)
     expect(src).toMatch(/isDraft=\{initialSop\.status === 'draft'\}/)
