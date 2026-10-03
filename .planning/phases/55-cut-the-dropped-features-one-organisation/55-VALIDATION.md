@@ -1,0 +1,89 @@
+---
+phase: 55
+slug: cut-the-dropped-features-one-organisation
+status: draft
+nyquist_compliant: false
+wave_0_complete: false
+created: 2026-10-03
+---
+
+# Phase 55 — Validation Strategy
+
+> Per-phase validation contract for feedback sampling during execution.
+
+---
+
+## Test Infrastructure
+
+| Property | Value |
+|----------|-------|
+| **Framework** | Playwright `@playwright/test` ^1.58.2 (source-contract + unit + deployed evals) |
+| **Config file** | `playwright.config.ts` — Wave 0 adds project `phase55` (`testMatch: /tests\/phase55\/.*\.(spec\|test)\.ts$/`), verified with `--list` |
+| **Quick run command** | `npx tsc --noEmit && npx playwright test --project=phase55` |
+| **Full suite command** | `npm run build && npm run test` (ONCE per gate — live-probe OTP budget, CLAUDE.md 2026-09-28) |
+| **Deployed** | `npm run eval -- --phase 55` after push to master |
+| **Estimated runtime** | ~30 s quick · ~10 min full · ~5 min eval |
+
+---
+
+## Sampling Rate
+
+- **After every task commit:** Run `npx tsc --noEmit && npx playwright test --project=phase55`
+- **After every plan wave:** Run `npm run build` (bundle gate + marker self-validation + prebuild `contract-check`) plus the non-live projects the wave touched (RESEARCH.md Section 7)
+- **Before `/gsd-verify-work`:** Full suite ONCE (compare non-live failures to `55-BASELINE-FAILURES.md`; OTP rate-limit failures are environment), push, `npm run eval -- --phase 55`, read every screenshot — `55-EVAL.md` is the UAT artefact
+- **Max feedback latency:** ~30 seconds
+
+---
+
+## Per-Task Verification Map
+
+| Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
+|---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
+| (filled by planner per task) | | | CUT-01 | T-55-01 (stale SW serving old shell) | kill-switch `public/sw.js` committed; eval asserts no SW registered | source-contract + eval | `npx playwright test --project=phase55 tests/phase55/deletion-sweep.spec.ts` | ❌ W0 | ⬜ pending |
+| | | | CUT-01 | — | no `@/lib/offline` import in `src/`; walkthrough uses `getPhotoUploadUrl` + `submitCompletion` | source-contract | `npx playwright test --project=phase55 tests/phase55/worker-path-contract.spec.ts` | ❌ W0 | ⬜ pending |
+| | | | CUT-01 | — | worker walks + photo + submit online, no banner/queue | deployed eval | `npm run eval -- --phase 55` | ❌ W0 | ⬜ pending |
+| | | | CUT-02 | T-55-02 (orphaned Shotstack middleware exemption) | exemption removed with the route; dropped files/packages/refs absent; survivors present | source-contract | `npx playwright test --project=phase55 tests/phase55/deletion-sweep.spec.ts` | ❌ W0 | ⬜ pending |
+| | | | CUT-02 | — | admin sees no dropped affordances; dead addresses render not-found content | deployed eval | `npm run eval -- --phase 55` | ❌ W0 | ⬜ pending |
+| | | | ORG-01 | T-55-03 (direct Supabase signup with publishable key) | `signUpOrganisation`/`switchOrganisation`/`OrgSwitcher` absent; Supabase public signup disabled | source-contract | `npx playwright test --project=phase55 tests/phase55/org-single.spec.ts` | ❌ W0 | ⬜ pending |
+| | | | ORG-01 | — | signed-out `/sign-up` shows invitation text, no inputs | deployed eval | `npm run eval -- --phase 55` | ❌ W0 | ⬜ pending |
+| | | | all | — | build green incl. bundle gate (voice assertion + 3 marker groups removed, baseline moved down only) | build | `npm run build && npm run lint` | ✅ | ⬜ pending |
+| | | | all | T-55-04 (sibling action loses org guard when trimmed) | existing guards green after repoint | source-contract | `npx playwright test --project=phase15-stubs --project=phase41 --project=phase43 --project=phase46 --project=phase52 --project=phase54` | ✅ | ⬜ pending |
+
+*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+
+---
+
+## Wave 0 Requirements
+
+- [ ] `playwright.config.ts` — project `phase55` + `npx playwright test --list --project=phase55` shows the specs
+- [ ] `scripts/dropped-features.json` — initial full list (routes, packages, jobs, modules) from RESEARCH.md Section 1; the Phase 62 build-guard input
+- [ ] `tests/phase55/deletion-sweep.spec.ts` — reads the JSON; asserts absence of FILES and of REFERENCES (imports/hrefs/`router.push`/`journeys.ts` routes); positive survivor list; fixme-gated, flipped live per wave
+- [ ] `tests/phase55/worker-path-contract.spec.ts` — stubs for CUT-01 rewire
+- [ ] `tests/phase55/org-single.spec.ts` — stubs for ORG-01
+- [ ] `tests/evals/cut-features.eval.ts` skeleton + walk fixture in `scripts/eval-fixtures.mjs` (photo-required step) + completion cleanup helper in `tests/evals/lib/` so the shared plant fixture SOP is never left "done" (would flip `plant-home.eval`)
+- [ ] `55-BASELINE-FAILURES.md` — pre-phase full-suite failure baseline, recorded before the first deleting wave
+- [ ] Snapshot `.bundle-baseline.json` → `.bundle-baseline.old.json` (gitignored) for the move-down-only check
+- No framework install needed.
+
+---
+
+## Manual-Only Verifications
+
+| Behavior | Requirement | Why Manual | Test Instructions |
+|----------|-------------|------------|-------------------|
+| Guard mutation proof | CUT-01/02 | A grep guard that finds nothing passes vacuously (CLAUDE.md 2026-05-25 / 2026-06-05) | Once per new guard: plant a violation (re-add one import/href), run the spec → red; remove → green. Record in SUMMARY.md |
+| External schedulers calling dropped routes | CUT-02 | Not derivable from repo | Executor checks Railway cron + Shotstack dashboard for callers of `/api/sops/*/video*`, `/api/voice/*`; records result in SUMMARY.md |
+| Photo capture on a photo-required step | CUT-01 | `DesktopWalkthrough` has no photo capture | Eval runs the walk at a phone viewport (mobile project) — automated, but note the viewport constraint |
+
+---
+
+## Validation Sign-Off
+
+- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
+- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
+- [ ] Wave 0 covers all MISSING references
+- [ ] No watch-mode flags
+- [ ] Feedback latency < 60s
+- [ ] `nyquist_compliant: true` set in frontmatter
+
+**Approval:** pending
