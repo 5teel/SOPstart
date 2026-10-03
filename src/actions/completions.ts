@@ -298,7 +298,8 @@ export async function getPhotoUploadUrl(input: {
 // self-enforced org-scope (CLAUDE.md 2026-06-15, T-23-06-04).
 //
 // AFL-VER-05: worker self-sign at completion + supervisor counter-sign (D-09/D-10).
-// The roster_user_id must belong to the caller's org (cross-tenant guard, T-23-06-01).
+// The signer is always the signed-in session user -- never a client-supplied id --
+// and a supervisor counter-signature needs a supervisor-or-above session role.
 // ---------------------------------------------------------------
 export async function recordSignature(
   rawInput: unknown
@@ -308,10 +309,13 @@ export async function recordSignature(
     return { success: false, error: parsed.error.issues[0]?.message ?? 'Invalid input' }
   }
 
-  const { completionId, role, rosterUserId } = parsed.data
+  const { completionId, role } = parsed.data
 
-  const { userId, organisationId } = await getSessionContext()
+  const { userId, role: sessionRole, organisationId } = await getSessionContext()
   if (!userId) return { success: false, error: 'Not authenticated' }
+  if (role === 'supervisor' && (!sessionRole || !['supervisor', 'safety_manager', 'admin'].includes(sessionRole))) {
+    return { success: false, error: 'Only supervisors, safety managers and admins can counter-sign.' }
+  }
   if (!organisationId) return { success: false, error: 'No organisation found' }
 
   const admin = createAdminClient()
@@ -331,18 +335,6 @@ export async function recordSignature(
     return { success: false, error: 'Completion does not belong to your organisation.' }
   }
 
-  // Verify rosterUserId belongs to the same org (T-23-06-01 cross-tenant guard)
-  const { data: memberCheck } = await admin
-    .from('organisation_members')
-    .select('user_id')
-    .eq('user_id', rosterUserId)
-    .eq('organisation_id', organisationId)
-    .single()
-
-  if (!memberCheck) {
-    return { success: false, error: 'Roster user not in this organisation.' }
-  }
-
   // Insert signature row — service-role, append-only (no UPDATE/DELETE)
   // signed_at is DB DEFAULT now() (not client-supplied — authoritative server timestamp)
   const { error: insertError } = await admin
@@ -351,7 +343,7 @@ export async function recordSignature(
       organisation_id: organisationId,
       completion_id: completionId,
       role,
-      roster_user_id: rosterUserId,
+      roster_user_id: userId,
     })
 
   if (insertError) {

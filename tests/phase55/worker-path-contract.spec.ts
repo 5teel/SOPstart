@@ -175,3 +175,24 @@ test.describe('service worker retired (55-09)', () => {
     expect(offenders, offenders.join('\n')).toEqual([])
   })
 })
+
+test.describe('review fixes (55-review)', () => {
+  function actionBody(name: string): string {
+    const src = code('src/actions/completions.ts')
+    const start = src.indexOf(`export async function ${name}`)
+    expect(start).toBeGreaterThan(-1)
+    const next = src.indexOf('export async function', start + 10)
+    return src.slice(start, next === -1 ? undefined : next)
+  }
+
+  test('CR-02: recordSignature takes the signer from the session and gates counter-signing by role', () => {
+    const body = actionBody('recordSignature')
+    expect(body).not.toContain('rosterUserId')
+    expect(body).toContain('roster_user_id: userId')
+    expect(body).toMatch(/role === 'supervisor' && .*\['supervisor', 'safety_manager', 'admin'\]\.includes\(sessionRole\)/)
+    expect(code('src/lib/validators/completions.ts')).not.toContain('rosterUserId')
+    expect(code('src/app/(protected)/activity/[completionId]/CompletionDetailClient.tsx')).not.toContain(
+      'rosterUserId'
+    )
+  })
+})

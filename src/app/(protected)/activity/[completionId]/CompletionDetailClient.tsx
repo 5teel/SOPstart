@@ -143,7 +143,6 @@ export function CompletionDetailClient({
           recordSignature({
             completionId,
             role: 'supervisor',
-            rosterUserId: currentUserId,
           }).catch((err) => {
             console.warn('recordSignature (supervisor) failed — non-fatal:', err)
           })
