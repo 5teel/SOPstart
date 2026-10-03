@@ -1,0 +1,833 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/app/sw.ts"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/hooks/useSopSync.ts"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/hooks/usePhotoQueue.ts"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/hooks/useDraftLayoutSync.ts"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/hooks/useOnlineStatus.ts"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/hooks/useAssignedSops.ts"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/stores/network.ts"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/layout/InstallPrompt.tsx"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/layout/OnlineStatusBanner.tsx"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/sop/WalkthroughList.tsx"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/sop/StepItem.tsx"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/sop/StepPhotoZone.tsx"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/sop/PhotoThumbnail.tsx"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "route-page",
+      "path": "/~offline",
+      "dir": "src/app/~offline",
+      "ref": "~offline"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "dir",
+      "path": "src/lib/offline"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "symbol",
+      "pattern": "@/lib/offline|\\b(useSopSync|usePhotoQueue|useDraftLayoutSync|useOnlineStatus|useAssignedSops|useNetworkStore|InstallPrompt|OnlineStatusBanner|offlineFirst|restoreFromDexie|CachedSop|QueuedPhoto)\\b|\\bwithSerwist\\w*"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "package",
+      "name": "dexie"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "package",
+      "name": "idb-keyval"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "package",
+      "name": "serwist"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "package",
+      "name": "@serwist/next"
+    },
+    {
+      "feature": "offline",
+      "phase": 55,
+      "kind": "package",
+      "name": "@tanstack/query-persist-client-core"
+    },
+    {
+      "feature": "voice-capture",
+      "phase": 55,
+      "kind": "dir",
+      "path": "src/components/sop/voice"
+    },
+    {
+      "feature": "voice-capture",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/sop/VoiceCaptureControl.tsx"
+    },
+    {
+      "feature": "voice-capture",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/actions/voice-notes.ts"
+    },
+    {
+      "feature": "voice-capture",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/lib/offline/voice-queue.ts"
+    },
+    {
+      "feature": "voice-capture",
+      "phase": 55,
+      "kind": "symbol",
+      "pattern": "\\b(WalkthroughVoiceModal|WalkthroughVoiceButton|ReadAloudButton|stepSpeechText|useTtsPlayback|VoiceCaptureControl|saveVoiceNote|MobileWalkthroughHandle|onVoiceStateChange|voiceSopId|flushVoiceNoteQueue)\\b|plant-ask-mic"
+    },
+    {
+      "feature": "voice",
+      "phase": 55,
+      "kind": "dir",
+      "path": "src/lib/voice"
+    },
+    {
+      "feature": "voice",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/lib/validators/voice-query.ts"
+    },
+    {
+      "feature": "voice",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/lib/validators/voice-tts.ts"
+    },
+    {
+      "feature": "voice",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/hooks/useDeepgramWebSocket.ts"
+    },
+    {
+      "feature": "voice",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/app/(protected)/admin/sops/new/ai/VoiceDraftClient.tsx"
+    },
+    {
+      "feature": "voice",
+      "phase": 55,
+      "kind": "route-api",
+      "path": "/api/voice/query",
+      "dir": "src/app/api/voice/query",
+      "ref": "/api/voice/"
+    },
+    {
+      "feature": "voice",
+      "phase": 55,
+      "kind": "route-api",
+      "path": "/api/voice/token",
+      "dir": "src/app/api/voice/token",
+      "ref": "/api/voice/"
+    },
+    {
+      "feature": "voice",
+      "phase": 55,
+      "kind": "route-api",
+      "path": "/api/voice/tts",
+      "dir": "src/app/api/voice/tts",
+      "ref": "/api/voice/"
+    },
+    {
+      "feature": "voice",
+      "phase": 55,
+      "kind": "route-api",
+      "path": "/api/sops/voice-draft",
+      "dir": "src/app/api/sops/voice-draft",
+      "ref": "/api/sops/voice-draft"
+    },
+    {
+      "feature": "voice",
+      "phase": 55,
+      "kind": "route-api",
+      "path": "/api/sops/[sopId]/ask",
+      "dir": "src/app/api/sops/[sopId]/ask",
+      "ref": "\\}/ask[\"'\\x60]"
+    },
+    {
+      "feature": "voice",
+      "phase": 55,
+      "kind": "symbol",
+      "pattern": "@/lib/voice/|\\b(useDeepgramWebSocket|VoiceDraftClient|startVoiceStream|classifyIntent|VoiceQueryResponse|answerSopQuestion|VOICE_QA_VERIFY\\w*)\\b|\\bvoice_qa\\b"
+    },
+    {
+      "feature": "voice",
+      "phase": 55,
+      "kind": "ai-model-key",
+      "key": "voice-qa"
+    },
+    {
+      "feature": "voice",
+      "phase": 55,
+      "kind": "ai-model-key",
+      "key": "sop-ask"
+    },
+    {
+      "feature": "voice",
+      "phase": 55,
+      "kind": "ai-model-key",
+      "key": "voice-draft"
+    },
+    {
+      "feature": "voice",
+      "phase": 55,
+      "kind": "ai-model-key",
+      "key": "stt-stream"
+    },
+    {
+      "feature": "voice",
+      "phase": 55,
+      "kind": "ai-model-key",
+      "key": "tts-voice"
+    },
+    {
+      "feature": "phone-qr",
+      "phase": 55,
+      "kind": "route-page",
+      "path": "/m/[code]",
+      "dir": "src/app/(protected)/m",
+      "ref": "[\"'\\x60]/m/"
+    },
+    {
+      "feature": "phone-qr",
+      "phase": 55,
+      "kind": "route-page",
+      "path": "/admin/site/plate/[machineId]",
+      "dir": "src/app/(protected)/admin/site/plate",
+      "ref": "/site/plate"
+    },
+    {
+      "feature": "phone-qr",
+      "phase": 55,
+      "kind": "route-page",
+      "path": "/admin/sops/[sopId]/qr",
+      "dir": "src/app/(protected)/admin/sops/[sopId]/qr",
+      "ref": "\\}/qr[\"'\\x60]"
+    },
+    {
+      "feature": "phone-qr",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/sop/plant/PhoneHome.tsx"
+    },
+    {
+      "feature": "phone-qr",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/sop/plant/ScanSheet.tsx"
+    },
+    {
+      "feature": "phone-qr",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/sop/plant/MachineListSheet.tsx"
+    },
+    {
+      "feature": "phone-qr",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/sop/plant/MachineView.tsx"
+    },
+    {
+      "feature": "phone-qr",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/lib/site/qr-decode.ts"
+    },
+    {
+      "feature": "phone-qr",
+      "phase": 55,
+      "kind": "symbol",
+      "pattern": "\\b(PhoneHome|ScanSheet|MachineListSheet|MachineView)\\b|qr-decode|\\bjsQR\\b|[\"'\\x60](jsqr|qrcode)[\"'\\x60]|[\"'\\x60](site-machine-print-plate|phone-home)[\"'\\x60]"
+    },
+    {
+      "feature": "phone-qr",
+      "phase": 55,
+      "kind": "package",
+      "name": "jsqr"
+    },
+    {
+      "feature": "phone-qr",
+      "phase": 55,
+      "kind": "package",
+      "name": "qrcode"
+    },
+    {
+      "feature": "phone-qr",
+      "phase": 55,
+      "kind": "package",
+      "name": "@types/qrcode"
+    },
+    {
+      "feature": "shared-device",
+      "phase": 55,
+      "kind": "route-page",
+      "path": "/login/roster",
+      "dir": "src/app/(auth)/login/roster",
+      "ref": "/login/roster"
+    },
+    {
+      "feature": "shared-device",
+      "phase": 55,
+      "kind": "route-api",
+      "path": "/api/roster",
+      "dir": "src/app/api/roster",
+      "ref": "/api/roster"
+    },
+    {
+      "feature": "shared-device",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/auth/RosterSelector.tsx"
+    },
+    {
+      "feature": "shared-device",
+      "phase": 55,
+      "kind": "symbol",
+      "pattern": "\\b(RosterSelector|ROSTER_STORAGE_KEY|rosterWorkerId)\\b"
+    },
+    {
+      "feature": "youtube",
+      "phase": 55,
+      "kind": "route-api",
+      "path": "/api/sops/youtube",
+      "dir": "src/app/api/sops/youtube",
+      "ref": "/api/sops/youtube"
+    },
+    {
+      "feature": "youtube",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/lib/parsers/fetch-youtube-transcript.ts"
+    },
+    {
+      "feature": "youtube",
+      "phase": 55,
+      "kind": "symbol",
+      "pattern": "fetch-youtube-transcript|\\byoutubeUrl\\b|YouTube URL|Transcribe from YouTube"
+    },
+    {
+      "feature": "photo-scan",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/admin/PhotoScanner.tsx"
+    },
+    {
+      "feature": "photo-scan",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/admin/ImageQualityOverlay.tsx"
+    },
+    {
+      "feature": "photo-scan",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/lib/image/quality-checks.ts"
+    },
+    {
+      "feature": "photo-scan",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/lib/image/page-order-detect.ts"
+    },
+    {
+      "feature": "photo-scan",
+      "phase": 55,
+      "kind": "symbol",
+      "pattern": "\\b(PhotoScanner|ImageQualityOverlay)\\b|image/quality-checks|image/page-order-detect|Scan document|Take a photo"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "route-api",
+      "path": "/api/sops/generate-video",
+      "dir": "src/app/api/sops/generate-video",
+      "ref": "generate-video"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "route-api",
+      "path": "/api/sops/generate-video/callback",
+      "dir": "src/app/api/sops/generate-video/callback",
+      "ref": "generate-video"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "route-api",
+      "path": "/api/sops/generate-video/finalize",
+      "dir": "src/app/api/sops/generate-video/finalize",
+      "ref": "generate-video"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "route-api",
+      "path": "/api/sops/recover-renders",
+      "dir": "src/app/api/sops/recover-renders",
+      "ref": "recover-renders"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "route-api",
+      "path": "/api/videos/[jobId]/stream",
+      "dir": "src/app/api/videos",
+      "ref": "/api/videos/"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "route-api",
+      "path": "/api/sops/pipeline/[pipelineId]/snapshot",
+      "dir": "src/app/api/sops/pipeline",
+      "ref": "/api/sops/pipeline/"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "route-page",
+      "path": "/admin/sops/[sopId]/video",
+      "dir": "src/app/(protected)/admin/sops/[sopId]/video",
+      "ref": "\\}/video[\"'\\x60]"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "route-page",
+      "path": "/admin/sops/pipeline/[pipelineId]",
+      "dir": "src/app/(protected)/admin/sops/pipeline",
+      "ref": "/admin/sops/pipeline/"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "dir",
+      "path": "src/lib/video-gen"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/actions/video.ts"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/hooks/useVideoGeneration.ts"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/admin/VideoAdminPreview.tsx"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/admin/VideoFormatSelectionModal.tsx"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/admin/VideoGeneratePanel.tsx"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/admin/VideoGenerationStatus.tsx"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/admin/VideoJobIndicator.tsx"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/admin/VideoOutdatedBanner.tsx"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/admin/VideoVersionList.tsx"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/admin/VideoVersionRow.tsx"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/sop/VideoTabPanel.tsx"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "symbol",
+      "pattern": "@/lib/video-gen|@/actions/video[\"'\\x60]|\\b(VideoAdminPreview|VideoFormatSelectionModal|VideoGeneratePanel|VideoGenerationStatus|VideoJobIndicator|VideoOutdatedBanner|VideoVersionList|VideoVersionRow|VideoTabPanel|useVideoGeneration|enqueueVideoGenerationForPipeline|pipelineAutoQueued|isShotstackCallback|fetchPipelineSnapshot|derivePipelineStage)\\b|\\bcreateVideoSopPipelineSession\\w*|Generate video SOP|Make a training video"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "ai-model-key",
+      "key": "tts-video"
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "job",
+      "name": "Shotstack completion webhook",
+      "path": "/api/sops/generate-video/callback",
+      "env": [
+        "SHOTSTACK_API_KEY",
+        "SHOTSTACK_API_URL",
+        "SHOTSTACK_CALLBACK_SECRET"
+      ]
+    },
+    {
+      "feature": "video-generation",
+      "phase": 55,
+      "kind": "job",
+      "name": "Render recovery",
+      "path": "/api/sops/recover-renders",
+      "env": []
+    },
+    {
+      "feature": "flow-diagram",
+      "phase": 55,
+      "kind": "dir",
+      "path": "src/components/sop/flow"
+    },
+    {
+      "feature": "flow-diagram",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/sop/tabs/FlowTab.tsx"
+    },
+    {
+      "feature": "flow-diagram",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/lib/sop/flow-graph.ts"
+    },
+    {
+      "feature": "flow-diagram",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/lib/validators/flow-graph.ts"
+    },
+    {
+      "feature": "flow-diagram",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/actions/flow-graph.ts"
+    },
+    {
+      "feature": "flow-diagram",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/lib/builder/flow-graph-field.tsx"
+    },
+    {
+      "feature": "flow-diagram",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/app/(protected)/admin/sops/builder/[sopId]/BuilderFlowButton.tsx"
+    },
+    {
+      "feature": "flow-diagram",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/app/(protected)/admin/sops/builder/[sopId]/BuilderFlowEditButton.tsx"
+    },
+    {
+      "feature": "flow-diagram",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/lib/sop/__tests__/flow-graph-derivation.test.ts"
+    },
+    {
+      "feature": "flow-diagram",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/lib/validators/__tests__/flow-graph-schema.spec.ts"
+    },
+    {
+      "feature": "flow-diagram",
+      "phase": 55,
+      "kind": "symbol",
+      "pattern": "\\b(FlowGraphCanvas|FlowTab|BuilderFlowButton|BuilderFlowEditButton|hideFlow)\\b|/(lib/sop|lib/validators|actions)/flow-graph|flow-graph-field"
+    },
+    {
+      "feature": "annotation",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/admin/builder-v2/visual/AnnotationEditor.tsx"
+    },
+    {
+      "feature": "annotation",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/admin/builder-v2/visual/AnnotationEditorLoader.tsx"
+    },
+    {
+      "feature": "annotation",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/admin/builder-v2/visual/DiagramAnnotateModal.tsx"
+    },
+    {
+      "feature": "annotation",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/admin/builder-v2/visual/DiagramHotspotBlock.tsx"
+    },
+    {
+      "feature": "annotation",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/admin/builder-v2/visual/annotation-tools.ts"
+    },
+    {
+      "feature": "annotation",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/admin/builder-v2/visual/bake-on-publish.ts"
+    },
+    {
+      "feature": "annotation",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/actions/annotations.ts"
+    },
+    {
+      "feature": "annotation",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/lib/builder/baked-path.ts"
+    },
+    {
+      "feature": "annotation",
+      "phase": 55,
+      "kind": "symbol",
+      "pattern": "\\b(AnnotationEditor|AnnotationEditorLoader|DiagramAnnotateModal|DiagramHotspotBlock|annotatingIndex|applyAnnotation)\\b|annotation-tools|bake-on-publish|@/actions/annotations|builder/baked-path"
+    },
+    {
+      "feature": "version-compare",
+      "phase": 55,
+      "kind": "route-page",
+      "path": "/admin/sops/[sopId]/versions/diff",
+      "dir": "src/app/(protected)/admin/sops/[sopId]/versions/diff",
+      "ref": "versions/diff"
+    },
+    {
+      "feature": "version-compare",
+      "phase": 55,
+      "kind": "symbol",
+      "pattern": "\\b(restoreVersionAsNew|getSopVersionForDiff|SopVersionPayload|showRestoreConfirmFor|restoringVersionId)\\b"
+    },
+    {
+      "feature": "library",
+      "phase": 55,
+      "kind": "route-page",
+      "path": "/admin/blocks",
+      "dir": "src/app/(protected)/admin/blocks",
+      "ref": "/admin/blocks"
+    },
+    {
+      "feature": "library",
+      "phase": 55,
+      "kind": "route-page",
+      "path": "/admin/blocks/new",
+      "dir": "src/app/(protected)/admin/blocks/new",
+      "ref": "/admin/blocks"
+    },
+    {
+      "feature": "library",
+      "phase": 55,
+      "kind": "route-page",
+      "path": "/admin/blocks/[blockId]",
+      "dir": "src/app/(protected)/admin/blocks/[blockId]",
+      "ref": "/admin/blocks"
+    },
+    {
+      "feature": "library",
+      "phase": 55,
+      "kind": "dir",
+      "path": "src/components/admin/blocks"
+    },
+    {
+      "feature": "library",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/admin/builder-v2/inserter/ReuseTier.tsx"
+    },
+    {
+      "feature": "library",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/sop/blocks/BlockOverflowMenu.tsx"
+    },
+    {
+      "feature": "library",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/sop/blocks/PuckItemBadgeOverlay.tsx"
+    },
+    {
+      "feature": "library",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/lib/builder/match-blocks.ts"
+    },
+    {
+      "feature": "library",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/lib/builder/match-blocks.test.ts"
+    },
+    {
+      "feature": "library",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/lib/blocks/block-kinds.ts"
+    },
+    {
+      "feature": "library",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/actions/blocks.ts"
+    },
+    {
+      "feature": "library",
+      "phase": 55,
+      "kind": "symbol",
+      "pattern": "@/actions/blocks[\"'\\x60]|\\b(BlockPicker\\w*|ReuseTier|BlockOverflowMenu|SaveToLibraryModal|addBlockToSection(?! failed)|setPinMode|acceptBlockUpdate|declineBlockUpdate|listSectionBlocksWithUpdates|PuckItemBadgeOverlay|onOpenReuse)\\b|match-blocks|lib/blocks/block-kinds|Content Library"
+    },
+    {
+      "feature": "org-signup",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/auth/OrgSignUpForm.tsx"
+    },
+    {
+      "feature": "org-signup",
+      "phase": 55,
+      "kind": "file",
+      "path": "src/components/profile/OrgSwitcher.tsx"
+    },
+    {
+      "feature": "org-signup",
+      "phase": 55,
+      "kind": "symbol",
+      "pattern": "\\b(signUpOrganisation|switchOrganisation|getUserMemberships|UserMembership|orgSignUpSchema|OrgSignUpInput|OrgSignUpForm|OrgSwitcher)\\b|Register a new organisation|Register your organisation"
+    }
+  ],
+  "allow": [
+    {
+      "pattern": "accent-voice",
+      "reason": "colour token, not the voice feature"
+    },
+    {
+      "pattern": "VoiceNoteBlock",
+      "reason": "inert block type kept for contract-check and old layout_data until Phase 56 converts it"
+    }
+  ]
+}

@@ -247,8 +247,9 @@ test.describe('no dead internal hrefs — route truth (D-07)', () => {
 
   test('the sweep is not vacuous', () => {
     const allTargets = collectAllSrcTargets()
-    expect(allTargets.length).toBeGreaterThanOrEqual(250)
-    expect(PAGE_SHAPES.length).toBeGreaterThanOrEqual(60)
+    // Floors guard against a broken walker, not a route count; recalibrated for the Phase 55 cut.
+    expect(allTargets.length).toBeGreaterThanOrEqual(150)
+    expect(PAGE_SHAPES.length).toBeGreaterThanOrEqual(40)
     expect(PAGE_SHAPES.some((s) => s.join('/') === 'sops/[sopId]')).toBe(true)
     expect(PAGE_SHAPES.some((s) => s.join('/') === 'api/sops/[sopId]/publish')).toBe(true)
 

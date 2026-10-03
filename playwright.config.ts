@@ -709,5 +709,27 @@ export default defineConfig({
       testMatch: /tests\/phase43\/.*\.(spec|test)\.ts$/,
       use: { browserName: 'chromium' },
     },
+    {
+      // Phase 55 -- Cut the Dropped Features & One Organisation
+      // Nyquist harness (Wave 0 / Plan 55-01).
+      //
+      // CLAUDE.md 2026-05-25: a spec file not in any project regex NEVER runs.
+      // DELIBERATELY BROAD testMatch (tests/phase55/**) so every later plan in
+      // the phase drops specs into tests/phase55/ with NO further config edit --
+      // single registration point for the whole phase (mirrors phase51..54).
+      //
+      // Verify registration: `npx playwright test --list --project=phase55`
+      //
+      // Files registered here:
+      //   deletion-sweep (CUT-01/CUT-02; reads scripts/dropped-features.json;
+      //     survivors + not-vacuous LIVE from 55-01, each feature fixme until
+      //     the plan that deletes it flips it live)
+      //   worker-path-contract (CUT-01, fixme, flipped by 55-02/55-03/55-09)
+      //   org-single (ORG-01, D-06 + D-02 LIVE from 55-01, rest fixme until 55-12)
+      name: 'phase55',
+      testDir: '.',
+      testMatch: /tests\/phase55\/.*\.(spec|test)\.ts$/,
+      use: { browserName: 'chromium' },
+    },
   ],
 })
