@@ -1809,7 +1809,7 @@ Plans:
   4. Approving, rejecting, signing off, assigning, publishing, changing an owner, recording an observation and clearing an AI finding each write one decision naming who, when, what and what it was about; a decision made by an AI agent names the agent
   5. Nobody — worker, supervisor or admin — can change or delete a decision once it is written; the database refuses the attempt even when the screen is bypassed
 
-**Plans:** 2/10 plans executed
+**Plans:** 3/10 plans executed
 Plans:
 **Wave 1**
 
@@ -1818,7 +1818,7 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [x] 56-02-PLAN.md — Pure converter (18 types, D-02/D-03 ordering, hard gate, re-run diff) + read-only production dry run and report
-- [ ] 56-03-PLAN.md — Migrations 00069 (placement + trigger, sop_focus_steps, conversion runs, standards) and 00070 (append-only decisions ledger, revokes, seven-source backfill) + types + matrix
+- [x] 56-03-PLAN.md — Migrations 00069 (placement + trigger, sop_focus_steps, conversion runs, standards) and 00070 (append-only decisions ledger, revokes, seven-source backfill) + types + matrix
 
 **Wave 3** *(blocked on Wave 2 completion)*
 

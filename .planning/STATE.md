@@ -4,13 +4,13 @@ milestone: v11.0
 milestone_name: — One-Screen MVP
 status: executing
 stopped_at: Completed 56-02-PLAN.md
-last_updated: "2026-10-03T23:22:05.364Z"
+last_updated: "2026-10-03T23:27:37.243Z"
 last_activity: 2026-10-03 -- Phase 56 execution started
 progress:
   total_phases: 14
   completed_phases: 1
   total_plans: 24
-  completed_plans: 16
+  completed_plans: 17
   percent: 7
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 56 (a-simpler-sop-the-decision-ledger) — EXECUTING
-Plan: 3 of 10
+Plan: 4 of 10
 Status: Ready to execute
 Last activity: 2026-10-03 -- Phase 56 execution started
 
@@ -291,6 +291,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 55 P13 | 10min | 3 tasks | 12 files |
 | Phase 56 P01 | 25min | 2 tasks | 8 files |
 | Phase 56 P02 | 40min | 2 tasks | 4 files |
+| Phase 56 P03 | 30min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -581,6 +582,8 @@ Recent decisions affecting current work:
 - [Phase 55]: D-07: bundle baseline moved down by hand after the cut — /sops/[sopId]/page 1048 → 817 KB, /sops/page 940 → 817 KB; capture script not run — Phase 55 cut
 - [Phase 56]: 56-01: decision-writer sweep discovers writes by method-chain parsing; column tokens count only inside a function that writes the table
 - [Phase 56]: 56-02: unreadable hazard/PPE cards and unknown block types fail the per-SOP gate; empty non-safety blocks are dropped and counted
+- [Phase 56]: Phase 56-03: decisions has no authenticated INSERT policy; only the service-role writer inserts (no PostgREST forgery)
+- [Phase 56]: Phase 56-03: standard_attachments uses one FK column per level (sop, section, focus step) so deletes cascade and no label is orphaned
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -726,6 +729,6 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-10-03T23:22:05.352Z
+Last session: 2026-10-03T23:27:31.164Z
 Stopped at: Completed 56-02-PLAN.md
 Resume file: .planning/phases/56-a-simpler-sop-the-decision-ledger/56-CONTEXT.md
