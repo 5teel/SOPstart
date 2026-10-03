@@ -1177,6 +1177,8 @@ export type Database = {
           owner_user_id: string | null
           parent_sop_id: string | null
           parse_notes: string | null
+          // Plan 56-03: manually extended (type regen unavailable)
+          placement: 'machine' | 'site'
           pipeline_run_id: string | null
           published_at: string | null
           refresher_interval_months: number | null
@@ -1215,6 +1217,7 @@ export type Database = {
           owner_user_id?: string | null
           parent_sop_id?: string | null
           parse_notes?: string | null
+          placement?: 'machine' | 'site'
           pipeline_run_id?: string | null
           published_at?: string | null
           refresher_interval_months?: number | null
@@ -1253,6 +1256,7 @@ export type Database = {
           owner_user_id?: string | null
           parent_sop_id?: string | null
           parse_notes?: string | null
+          placement?: 'machine' | 'site'
           pipeline_run_id?: string | null
           published_at?: string | null
           refresher_interval_months?: number | null
@@ -1853,6 +1857,312 @@ export type Database = {
             columns: ["organisation_id"]
             isOneToOne: false
             referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      // Plan 56-03: manually extended (type regen unavailable)
+      decisions: {
+        Row: {
+          id: string
+          organisation_id: string
+          kind: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write'
+          actor_kind: 'person' | 'agent'
+          actor_id: string | null
+          actor_name: string | null
+          subject_kind: string
+          subject_id: string | null
+          sop_id: string | null
+          summary: string
+          details: Json
+          source: 'live' | 'backfill'
+          legacy_table: string | null
+          legacy_id: string | null
+          supersedes_decision_id: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          organisation_id: string
+          kind: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write'
+          actor_kind: 'person' | 'agent'
+          actor_id?: string | null
+          actor_name?: string | null
+          subject_kind: string
+          subject_id?: string | null
+          sop_id?: string | null
+          summary: string
+          details?: Json
+          source?: 'live' | 'backfill'
+          legacy_table?: string | null
+          legacy_id?: string | null
+          supersedes_decision_id?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          kind?: 'approve' | 'reject' | 'sign_off' | 'countersign' | 'assign' | 'unassign' | 'publish' | 'owner_change' | 'review' | 'observation' | 'verify' | 'verify_withdrawn' | 'ai_finding_cleared' | 'cadence_change' | 'ai_field_write'
+          actor_kind?: 'person' | 'agent'
+          actor_id?: string | null
+          actor_name?: string | null
+          subject_kind?: string
+          subject_id?: string | null
+          sop_id?: string | null
+          summary?: string
+          details?: Json
+          source?: 'live' | 'backfill'
+          legacy_table?: string | null
+          legacy_id?: string | null
+          supersedes_decision_id?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "decisions_supersedes_decision_id_fkey"
+            columns: ["supersedes_decision_id"]
+            isOneToOne: false
+            referencedRelation: "decisions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      // Plan 56-03: manually extended (type regen unavailable)
+      sop_focus_steps: {
+        Row: {
+          id: string
+          organisation_id: string
+          sop_id: string
+          section_id: string
+          kind: 'hazard' | 'ppe' | 'step' | 'check'
+          text: string
+          tip: string | null
+          photo_required: boolean
+          image_paths: string[]
+          required_tools: string[] | null
+          time_estimate_minutes: number | null
+          sort_order: number
+          source_key: string
+          run_id: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          organisation_id: string
+          sop_id: string
+          section_id: string
+          kind: 'hazard' | 'ppe' | 'step' | 'check'
+          text: string
+          tip?: string | null
+          photo_required?: boolean
+          image_paths?: string[]
+          required_tools?: string[] | null
+          time_estimate_minutes?: number | null
+          sort_order: number
+          source_key: string
+          run_id: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          sop_id?: string
+          section_id?: string
+          kind?: 'hazard' | 'ppe' | 'step' | 'check'
+          text?: string
+          tip?: string | null
+          photo_required?: boolean
+          image_paths?: string[]
+          required_tools?: string[] | null
+          time_estimate_minutes?: number | null
+          sort_order?: number
+          source_key?: string
+          run_id?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sop_focus_steps_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sop_focus_steps_sop_id_fkey"
+            columns: ["sop_id"]
+            isOneToOne: false
+            referencedRelation: "sops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sop_focus_steps_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "sop_sections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      // Plan 56-03: manually extended (type regen unavailable)
+      sop_conversion_runs: {
+        Row: {
+          id: string
+          run_id: string
+          organisation_id: string
+          sop_id: string
+          source: 'layout' | 'rows' | 'mixed' | 'empty'
+          layout_hash: string
+          converter_version: number
+          before: Json
+          after: Json
+          ok: boolean
+          failures: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          run_id: string
+          organisation_id: string
+          sop_id: string
+          source: 'layout' | 'rows' | 'mixed' | 'empty'
+          layout_hash: string
+          converter_version: number
+          before: Json
+          after: Json
+          ok: boolean
+          failures?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          run_id?: string
+          organisation_id?: string
+          sop_id?: string
+          source?: 'layout' | 'rows' | 'mixed' | 'empty'
+          layout_hash?: string
+          converter_version?: number
+          before?: Json
+          after?: Json
+          ok?: boolean
+          failures?: Json
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sop_conversion_runs_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sop_conversion_runs_sop_id_fkey"
+            columns: ["sop_id"]
+            isOneToOne: false
+            referencedRelation: "sops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      // Plan 56-03: manually extended (type regen unavailable)
+      standards: {
+        Row: {
+          id: string
+          organisation_id: string
+          name: string
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          organisation_id: string
+          name: string
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          name?: string
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "standards_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      // Plan 56-03: manually extended (type regen unavailable)
+      standard_attachments: {
+        Row: {
+          id: string
+          organisation_id: string
+          standard_id: string
+          sop_id: string | null
+          section_id: string | null
+          focus_step_id: string | null
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          organisation_id: string
+          standard_id: string
+          sop_id?: string | null
+          section_id?: string | null
+          focus_step_id?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          organisation_id?: string
+          standard_id?: string
+          sop_id?: string | null
+          section_id?: string | null
+          focus_step_id?: string | null
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "standard_attachments_organisation_id_fkey"
+            columns: ["organisation_id"]
+            isOneToOne: false
+            referencedRelation: "organisations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "standard_attachments_sop_id_fkey"
+            columns: ["sop_id"]
+            isOneToOne: false
+            referencedRelation: "sops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "standard_attachments_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "sop_sections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "standard_attachments_focus_step_id_fkey"
+            columns: ["focus_step_id"]
+            isOneToOne: false
+            referencedRelation: "sop_focus_steps"
             referencedColumns: ["id"]
           },
         ]
