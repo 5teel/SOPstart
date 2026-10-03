@@ -169,23 +169,24 @@ test.describe('Phase 55 — cut features (deployed)', () => {
     await expect(page.locator('main').getByRole('heading', { level: 1, name: /OTG Probe Maintenance/ })).toBeVisible(SLOW)
     await shot(page, 'cut-existing-sop')
 
-    // Read-only: newest real-org completion that has a photo.
-    const { data: photos } = await db.from('completion_photos').select('completion_id').limit(500)
+    // Read-only: newest real-org completion, preferring one that has a photo.
+    const { data: photos } = await db
+      .from('completion_photos')
+      .select('completion_id')
+      .eq('organisation_id', REAL_SOPSTART_ORG_ID)
+      .limit(500)
     const ids = [...new Set((photos ?? []).map((p) => p.completion_id as string))]
-    const { data: rows } = ids.length
-      ? await db
-          .from('sop_completions')
-          .select('id')
-          .eq('organisation_id', REAL_SOPSTART_ORG_ID)
-          .in('id', ids)
-          .order('submitted_at', { ascending: false })
-          .limit(1)
-      : { data: [] as { id: string }[] }
-    test.skip(!rows?.length, 'no real-org completion with a photo exists')
+    const q = db.from('sop_completions').select('id').eq('organisation_id', REAL_SOPSTART_ORG_ID)
+    const { data: rows } = await (ids.length ? q.in('id', ids) : q).order('submitted_at', { ascending: false }).limit(1)
+    test.skip(!rows?.length, 'no real-org completion exists')
     await page.goto(`/activity/${rows![0].id}`)
-    const img = page.locator('img[alt^="Step"]').first()
-    await expect(img).toBeVisible(SLOW)
-    await expect.poll(async () => img.evaluate((el: HTMLImageElement) => el.naturalWidth), SLOW).toBeGreaterThan(0)
+    await expect(page.locator('main').first()).toBeVisible(SLOW)
+    await expect(page.getByText(NOT_FOUND)).toHaveCount(0)
+    if (ids.length) {
+      const img = page.locator('img[alt^="Step"]').first()
+      await expect(img).toBeVisible(SLOW)
+      await expect.poll(async () => img.evaluate((el: HTMLImageElement) => el.naturalWidth), SLOW).toBeGreaterThan(0)
+    }
     await shot(page, 'cut-existing-completion')
     expect(errors, errors.join('\n')).toEqual([])
   })
