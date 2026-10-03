@@ -16,7 +16,7 @@
 
 **Environment:**
 - Node.js 20+ (pinned in `package.json` engines and `railway.json` nixpacksPlan)
-- Browser runtime - Web APIs, Service Workers via Serwist
+- Browser runtime - Web APIs (no service worker; `public/sw.js` is a self-unregistering kill-switch, served until Phase 62)
 
 **Package Manager:**
 - npm (v10+) - Lockfile: `package-lock.json` present
@@ -32,7 +32,6 @@
 **State & Data:**
 - TanStack React Query 5.95.2 - Server state management, caching, synchronization
 - Zustand 5.0.12 - Client state stores (completion, walkthrough, network, preview)
-- @tanstack/query-persist-client-core 5.95.2 - Persistent cache hydration
 
 **Styling:**
 - Tailwind CSS 4 (PostCSS plugin) - Utility-first CSS, dark theme default
@@ -41,14 +40,11 @@
 
 **Forms & Validation:**
 - React Hook Form 7.72.0 - Performant form state, minimal re-renders
-- Zod 4.3.6 - Schema validation (auth, sops, blocks, completions, voice queries)
+- Zod 4.3.6 - Schema validation (auth, sops, blocks, completions)
   - Validators in `src/lib/validators/` for all API input
   - Real-time and server-side validation gates
 
-**Build & Dev:**
-- @serwist/next 9.5.7 + serwist 9.5.7 - Service Worker (PWA, offline support, precaching)
-- @serwist/next/worker - Custom SW (`src/app/sw.ts`) with Serwist runtime caching
-- Serwist navigation preload disabled (custom offline fallback at `/~offline`)
+**Removed in Phase 55:** dexie, idb-keyval, serwist, @serwist/next, @tanstack/query-persist-client-core, jsqr, qrcode, @types/qrcode (offline cache, service worker, QR scan/plates). `public/sw.js` is a self-unregistering kill-switch served until Phase 62.
 
 **Testing:**
 - @playwright/test 1.58.2 - Integration & E2E tests
@@ -105,27 +101,19 @@
   - Creates SSR-aware clients: `src/lib/supabase/server.ts`, `src/lib/supabase/client.ts`
   - Session propagation via middleware cookie sync
 
-**Offline & Local Storage:**
-- dexie 4.3.0 - IndexedDB wrapper (offline SOP cache, photo queue, layout drafts, voice notes)
-  - Schema in `src/lib/offline/db.ts`
-  - Tables: sops, sections, steps, images, syncMeta, completions, photoQueue, draftLayouts, voiceNotesQueue, walkthroughProgress
-- idb-keyval 6.2.2 - Simple key-value IndexedDB layer (sync engine metadata)
-
 **UI Components & Icons:**
 - lucide-react 1.0.1 - Icon library
 - cmdk 1.1.1 - Command/combobox UI (for CmdK palette, navigation)
 - @puckeditor/core 0.21.2 - Visual layout editor (Phase 12 SOP builder blocks)
 
-**Speech & Voice:**
-- (Deepgram API integration via fetch) - Server-only WebSocket streaming transcription
+**Transcription:**
+- Deepgram (via fetch) - Server-only batch transcription of recorded video SOPs
   - API key: `DEEPGRAM_API_KEY` (not NEXT_PUBLIC)
-  - Token generation: `src/app/api/voice/token/route.ts`
-  - Used in `src/hooks/useDeepgramWebSocket.ts` for real-time transcription during voice capture
+  - Route: `src/app/api/sops/transcribe/route.ts`
 
 **Providers & Infrastructure:**
 - React Context Providers:
   - SWRConfig (from `@tanstack/react-query`)
-  - SerwistProvider (from `@serwist/next`)
   - ThemeProvider (from `next-themes`)
   - CmdKProvider (custom wrapper around cmdk)
 
@@ -142,21 +130,16 @@ Required for AI/Parsing:
 - `OPENAI_API_KEY` - GPT parsing, transcription
 - `ANTHROPIC_API_KEY` - Claude for AI verification
 
-Required for video generation:
-- `SHOTSTACK_API_KEY` - Video creation service
-- `SHOTSTACK_API_URL` - Sandbox (default) or production endpoint
-
-Required for voice transcription:
-- `DEEPGRAM_API_KEY` - Real-time speech-to-text (server-side only)
+Required for video SOP transcription:
+- `DEEPGRAM_API_KEY` - Batch speech-to-text (server-side only)
 
 Optional:
 - `NEXT_PUBLIC_MODEL_BLOCK_ENABLED` - 3D model viewer feature flag (default: false)
 
 **Build Configuration:**
 
-- `next.config.ts` - NextConfig with Serwist integration, external packages list, 308 redirect for legacy admin routes
+- `next.config.ts` - NextConfig with external packages list, 308 redirect for legacy admin routes
   - `serverExternalPackages` includes: officeparser, file-type, sharp, @anthropic-ai/sdk, ffmpeg-static
-  - Service worker disabled in dev mode
 - `tsconfig.json` - Strict TypeScript (noEmit, strict: true), path alias `@/*` → `src/*`
 - `postcss.config.mjs` - Tailwind CSS 4 PostCSS plugin only
 - `eslint.config.mjs` - Flat config using eslint-config-next
@@ -197,7 +180,7 @@ Optional:
 - Git (for Supabase migrations)
 - npm lockfile sync (checked in)
 - Port 4200 available (default dev port)
-- Supabase local emulation (via CLI) — optional for offline testing
+- Supabase local emulation (via CLI) — optional
 
 **Production:**
 - Deployment: Railway (auto-deploys from `master` branch)
@@ -205,8 +188,7 @@ Optional:
 - Supabase Cloud project (Postgres, Auth, Storage, RLS)
 - OpenAI API account (for SOP parsing)
 - Anthropic API account (for verification)
-- Shotstack account (for video generation)
-- Deepgram account (for voice transcription)
+- Deepgram account (for video SOP transcription)
 - FFmpeg runtime (included in Railway via nixPkgs or bundled as static)
 - Playwright chromium (for local test execution only; not deployed)
 

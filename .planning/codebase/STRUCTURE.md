@@ -11,7 +11,7 @@ src/
 │   ├── (auth)/                  # Public auth routes (unprotected)
 │   │   ├── layout.tsx           # Centered auth layout wrapper
 │   │   ├── login/               # Email/password form
-│   │   ├── sign-up/             # Registration form
+│   │   ├── sign-up/             # Static invitation-only notice
 │   │   ├── join/                # Join org with code
 │   │   └── invite/accept/       # Magic-link accept
 │   │
@@ -38,13 +38,7 @@ src/
 │   │   │   │   ├── [sopId]/     # SOP detail menu
 │   │   │   │   │   ├── assign/  # Assign to roles/trades
 │   │   │   │   │   ├── versions/ # Version history
-│   │   │   │   │   └── video/   # Video generation
 │   │   │   │   └── pipeline/[pipelineId]/ # Parsing job detail
-│   │   │   │
-│   │   │   ├── blocks/          # Reusable block library
-│   │   │   │   ├── page.tsx     # Block library browser
-│   │   │   │   ├── [blockId]/   # Edit block
-│   │   │   │   └── global-blocks/ # Platform super-admin blocks
 │   │   │   │
 │   │   │   └── team/            # Org member management
 │   │   │
@@ -55,11 +49,8 @@ src/
 │   │   └── sops/                # SOP-related endpoints
 │   │       ├── parse/           # Async document parsing (300s timeout)
 │   │       ├── pipeline/        # Parse job management
-│   │       ├── generate-video/  # Video generation from SOP
 │   │       ├── transcribe/      # Audio transcription
-│   │       ├── youtube/         # YouTube to SOP conversion
 │   │       ├── restructure/     # Restructure SOPs via AI
-│   │       ├── recover-renders/ # Recovery/repair endpoint
 │   │       ├── ai-prompt/       # AI prompt suggestions
 │   │       │
 │   │       └── [sopId]/         # SOP-specific endpoints
@@ -68,10 +59,7 @@ src/
 │   │           ├── assignments/ # Get assigned users
 │   │           ├── parse-job/   # Query parse job status
 │   │           ├── download-url/ # Presigned download URL
-│   │           ├── ask/         # Q&A on SOP content
 │   │           └── ai-reviewer/ # AI review suggestions
-│   │
-│   └── ~offline/                # Offline fallback (no JS)
 │
 ├── actions/                     # Server Actions (mutations)
 │   ├── sops.ts                  # SOP CRUD, upload, versioning
@@ -83,24 +71,18 @@ src/
 │   ├── auth.ts                  # Auth mutations (join, invite)
 │   ├── sub-trades.ts            # Trade/role assignments
 │   ├── versioning.ts            # SOP version management
-│   ├── video.ts                 # Video pipeline operations
-│   ├── voice-notes.ts           # Voice note operations
 │   ├── escalation.ts            # Escalation workflows
 │   ├── walkthrough-progress.ts  # Walkthrough state sync
-│   ├── flow-graph.ts            # SOP flow diagram operations
 │   └── introspection.ts         # Schema introspection
 │
 ├── components/                  # React UI components
 │   ├── layout/                  # App shell components
 │   │   ├── TopHeader.tsx        # Top nav, breadcrumbs
 │   │   ├── BottomTabBar.tsx     # Mobile bottom nav
-│   │   ├── OnlineStatusBanner.tsx # Offline indicator
-│   │   ├── InstallPrompt.tsx    # PWA install prompt
 │   │   └── RouteTransition.tsx  # Page transition animation
 │   │
 │   ├── auth/                    # Auth forms
 │   │   ├── LoginForm.tsx
-│   │   ├── SignUpForm.tsx
 │   │   └── JoinForm.tsx
 │   │
 │   ├── sop/                     # SOP display & walkthrough
@@ -112,7 +94,7 @@ src/
 │   │   │   ├── DecisionBlock.tsx
 │   │   │   ├── EscalateBlock.tsx
 │   │   │   ├── SignOffBlock.tsx
-│   │   │   ├── VoiceNoteBlock.tsx
+│   │   │   ├── VoiceNoteBlock.tsx   # Inert placeholder (voice capture removed in Phase 55)
 │   │   │   ├── StepWithPhotosBlock.tsx
 │   │   │   ├── PhotoGridBlock.tsx
 │   │   │   └── index.ts         # Barrel export
@@ -128,14 +110,8 @@ src/
 │   │   │   ├── OverviewTab.tsx  # Metadata, description
 │   │   │   ├── ToolsTab.tsx     # Tools list
 │   │   │   ├── HazardsTab.tsx   # Hazards, PPE, cautions
-│   │   │   ├── FlowTab.tsx      # Flow diagram
 │   │   │   ├── ModelTab.tsx     # 3D model viewer
 │   │   │   └── index.ts
-│   │   │
-│   │   ├── voice/               # Voice capture UI
-│   │   │   ├── WalkthroughVoiceButton.tsx # Floating mic button
-│   │   │   ├── WalkthroughVoiceModal.tsx  # Voice modal
-│   │   │   └── VoiceTranscriber.tsx      # Transcription UI
 │   │   │
 │   │   ├── SopTabNav.tsx        # Tab navigation (overview, tools, hazards...)
 │   │   ├── WorkerPreviewToggle.tsx # Read/walkthrough mode switch
@@ -145,7 +121,6 @@ src/
 │   │   ├── SectionContent.tsx  # Section layout
 │   │   ├── LayoutRenderer.tsx  # Puck layout renderer
 │   │   ├── SafetyAcknowledgement.tsx # Safety check modal
-│   │   ├── CommandPalette.tsx  # Cmd+K search
 │   │   └── CategoryBottomSheet.tsx # Category filter UI
 │   │
 │   ├── admin/                   # Admin-specific components
@@ -154,9 +129,6 @@ src/
 │   │   │   ├── SopBuilderHost.tsx # Puck editor wrapper
 │   │   │   ├── AssignmentPanel.tsx
 │   │   │   └── VersionHistory.tsx
-│   │   │
-│   │   ├── blocks/              # Block library UI
-│   │   │   └── BlockLibraryBrowser.tsx
 │   │   │
 │   │   ├── verify-checklist/    # Pre-publish verification
 │   │   │   └── PublishGate.tsx
@@ -184,23 +156,15 @@ src/
 │   └── profile/                 # User profile components
 │
 ├── hooks/                       # Custom React hooks
-│   ├── useSopDetail.ts          # Fetch single SOP (Dexie + Supabase)
+│   ├── useSopDetail.ts          # Fetch single SOP (Supabase)
 │   ├── useCompletions.ts        # Fetch supervisor completions
-│   ├── useAssignedSops.ts       # Fetch worker's assigned SOPs
-│   ├── useOnlineStatus.ts       # Network status listener
-│   ├── usePhotoQueue.ts         # Photo upload queue management
-│   ├── useSopSync.ts            # Trigger offline sync
 │   ├── useNotifications.ts      # Fetch user notifications
 │   ├── useViewport.ts           # Mobile vs desktop viewport detection
 │   ├── useBuilderAutosave.ts    # Builder draft autosave
-│   ├── useDraftLayoutSync.ts    # Sync draft layouts on reconnect
-│   ├── useVideoGeneration.ts    # Video gen job polling
-│   └── useDeepgramWebSocket.ts  # Voice transcription WebSocket
 │
 ├── stores/                      # Zustand client stores (ephemeral state)
 │   ├── walkthrough.ts           # Step completion, ack trace, locked steps
 │   ├── completionStore.ts       # Photo queue, submission state
-│   ├── network.ts               # Online/offline flag
 │   ├── preview.ts               # Worker preview mode toggle
 │   └── walkthroughMode.ts       # Tab state (read vs walkthrough)
 │
@@ -217,8 +181,6 @@ src/
 │   │   ├── completions.ts       # Completion submission schema
 │   │   ├── auth.ts              # Auth input schemas
 │   │   ├── sub-trades.ts        # Trade assignment schemas
-│   │   ├── flow-graph.ts        # Flow diagram schema
-│   │   └── voice-query.ts       # Voice Q&A schema
 │   │
 │   ├── parsers/                 # Document parsing pipeline
 │   │   ├── extract-docx.ts      # Word extraction (legacy)
@@ -235,7 +197,6 @@ src/
 │   │   ├── image-uploader.ts    # Bulk image upload to Storage
 │   │   ├── parse-pipeline.ts    # Job orchestration
 │   │   ├── transcribe-audio.ts  # Deepgram/Whisper transcription
-│   │   ├── fetch-youtube-transcript.ts # YouTube transcript fetch
 │   │   ├── structural-doc.ts    # Document structure models
 │   │   ├── structured-doc-to-prompt.ts # Doc → GPT prompt
 │   │   ├── verify-sop.ts        # Post-parse verification
@@ -251,14 +212,6 @@ src/
 │   │   │
 │   │   └── __tests__/           # Parser unit tests
 │   │
-│   ├── offline/                 # Offline-first infrastructure
-│   │   ├── db.ts                # Dexie schema (sops, sections, steps, images, etc.)
-│   │   ├── sync-engine.ts       # Sync assigned SOPs, detect transitions
-│   │   ├── photo-compress.ts    # HEIC→JPEG conversion
-│   │   ├── voice-queue.ts       # Voice note durability queue
-│   │   ├── query-persister.ts   # React Query localStorage persist
-│   │   └── draftLayouts-purge.ts # Cleanup stale drafts
-│   │
 │   ├── builder/                 # Puck builder integration
 │   │   ├── diff-block-content.ts # Block change detection
 │   │   ├── match-blocks.ts      # Block matching logic
@@ -269,25 +222,14 @@ src/
 │   │   └── bulk-edit.ts
 │   │
 │   ├── sop/                     # SOP utilities
-│   │   ├── flow-graph.ts        # Flow diagram generation
 │   │   └── versioning.ts        # Version comparison
 │   │
 │   ├── auth/                    # Auth utilities
 │   │   ├── jwt-parser.ts        # JWT claims extraction
 │   │   └── roles.ts             # Role checking helpers
 │   │
-│   ├── video-gen/               # Video generation (FFmpeg, etc.)
-│   │   ├── ffmpeg-client.ts
-│   │   └── ... (video utilities)
-│   │
-│   ├── voice/                   # Voice processing
-│   │   ├── sop-pack.ts          # SOP data for voice Q&A
-│   │   ├── voice-qa-cache.ts    # Voice Q&A caching
-│   │   └── verify-sop-voice-qa.ts # Voice Q&A verification
-│   │
-│   ├── image/                   # Image utilities
-│   │   ├── compress.ts          # Image compression
-│   │   └── metadata.ts          # EXIF extraction
+│   ├── photo/                   # Photo utilities
+│   │   └── compress.ts          # Browser-side photo compression
 │   │
 │   └── constants.ts             # App constants (PRODUCT_NAME, etc.)
 │
@@ -320,13 +262,13 @@ src/
 **`src/hooks/`:**
 - Purpose: Custom React hooks for data fetching and lifecycle management
 - Contains: Hooks that wrap React Query queries, Zustand store access, API calls
-- Key files: `useSopDetail`, `useCompletions`, `useOnlineStatus`
+- Key files: `useSopDetail`, `useCompletions`
 - Pattern: Hooks follow React Query conventions; return `{ data, isLoading, isError }`
 
 **`src/stores/`:**
 - Purpose: Ephemeral client-side state (Zustand)
-- Contains: One Zustand store per feature (walkthrough progress, network status, completion form)
-- Key files: `walkthrough.ts`, `completionStore.ts`, `network.ts`
+- Contains: One Zustand store per feature (walkthrough progress, completion form)
+- Key files: `walkthrough.ts`, `completionStore.ts`
 - Pattern: Export single `use<Feature>Store` hook; call from components with `const state = useStore()`
 
 **`src/lib/supabase/`:**
@@ -345,12 +287,6 @@ src/
 - Contains: Extractors (DOCX, PDF, images, video), GPT parser, image uploader, OCR fallback
 - Key files: `gpt-parser.ts` (main structured parsing), `parsed-sop-to-layout-data.ts` (schema transformation), `extract-docx-structural.ts` (structural extraction)
 - Pattern: Each extractor is a pure async function; pipeline orchestrated in `/api/sops/parse/route.ts`
-
-**`src/lib/offline/`:**
-- Purpose: Offline-first infrastructure (Dexie, sync, photo queue)
-- Contains: Dexie schema definition, sync engine, photo compression, voice queue
-- Key files: `db.ts` (schema + indices), `sync-engine.ts` (reconciliation), `voice-queue.ts` (durability)
-- Pattern: `db` is a Dexie singleton; hooks and stores call it directly
 
 **`src/types/`:**
 - Purpose: TypeScript type definitions
@@ -376,8 +312,7 @@ src/
 - `src/actions/sops.ts`: SOP creation, upload, versioning
 - `src/actions/completions.ts`: Submission, sign-off, photo handling
 - `src/app/api/sops/parse/route.ts`: Document parsing pipeline
-- `src/lib/offline/sync-engine.ts`: Offline reconciliation
-- `src/hooks/useSopDetail.ts`: SOP fetching (Dexie → Supabase)
+- `src/hooks/useSopDetail.ts`: SOP fetching (Supabase)
 - `src/stores/walkthrough.ts`: Walkthrough state (Zustand)
 
 **Testing:**
@@ -391,19 +326,19 @@ src/
 
 **Files:**
 - Components: PascalCase (e.g., `WalkthroughSwitcher.tsx`)
-- Utilities/hooks: camelCase (e.g., `useSopDetail.ts`, `sync-engine.ts`)
+- Utilities/hooks: camelCase (e.g., `useSopDetail.ts`)
 - Stores: camelCase + "Store" suffix (e.g., `walkthrough.ts` exports `useWalkthroughStore`)
 - Validators: Feature name (e.g., `sop.ts`, `blocks.ts`)
 - API routes: Descriptive path (e.g., `/api/sops/parse`, `/api/sops/[sopId]/publish`)
 
 **Directories:**
 - Feature folders: lowercase plural (e.g., `sops/`, `completions/`)
-- Component folders: Feature name, plural if collection (e.g., `blocks/`, `tabs/`, `voice/`)
-- Lib modules: Feature or pattern name (e.g., `supabase/`, `parsers/`, `offline/`)
+- Component folders: Feature name, plural if collection (e.g., `blocks/`, `tabs/`)
+- Lib modules: Feature or pattern name (e.g., `supabase/`, `parsers/`)
 
 **Functions & Variables:**
-- Functions: camelCase, verb-first for mutations (e.g., `createUploadSession`, `syncAssignedSops`)
-- Hooks: `use` prefix + feature (e.g., `useSopDetail`, `usePhotoQueue`)
+- Functions: camelCase, verb-first for mutations (e.g., `createUploadSession`)
+- Hooks: `use` prefix + feature (e.g., `useSopDetail`, `useCompletions`)
 - Stores: Feature name exports `use<Feature>Store` (e.g., `walkthrough.ts` → `useWalkthroughStore`)
 - Server actions: camelCase, exported as named exports (e.g., `export async function submitCompletion(...)`)
 - Types: PascalCase (e.g., `Sop`, `SopWithSections`, `ParsedSop`)
@@ -430,7 +365,7 @@ src/
 **API Routes (complex operations):**
 - Location: `src/app/api/sops/<operation>/route.ts`
 - Pattern: `POST` for mutations, `GET` for reads; use admin client for elevated operations
-- Example: Video generation at `src/app/api/sops/generate-video/route.ts`
+- Example: Parsing at `src/app/api/sops/parse/route.ts`
 
 **Database/Schema Changes:**
 - Migrations: `supabase/migrations/NNNNNN-<description>.sql` (numbered sequentially)
@@ -438,12 +373,6 @@ src/
 - Sync with local: `supabase db pull` after creating migration in console
 
 ## Special Directories
-
-**`src/app/~offline/`:**
-- Purpose: Offline fallback page (no JavaScript, static)
-- Generated: No
-- Committed: Yes
-- Content: HTML-only fallback for when service worker cache is empty and user is offline
 
 **`supabase/`:**
 - Purpose: Database migrations and auth config

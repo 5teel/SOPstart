@@ -5,13 +5,13 @@
 
 ## System Overview
 
-SafeStart is a multi-tenant Next.js 16 App Router SaaS PWA that implements a three-tier architecture: **Client (React Components)** → **Server Actions & API Routes** → **Supabase (Auth, RLS, Storage, Postgres)**. The system separates concerns into feature layers: authentication (route guards via middleware), SOP management (parsing → review → publishing), worker walkthrough execution (with offline Dexie caching), and supervisor sign-off workflows.
+SafeStart is a multi-tenant Next.js 16 App Router SaaS web app that implements a three-tier architecture: **Client (React Components)** → **Server Actions & API Routes** → **Supabase (Auth, RLS, Storage, Postgres)**. The system separates concerns into feature layers: authentication (route guards via middleware), SOP management (parsing → review → publishing), worker walkthrough execution, and supervisor sign-off workflows.
 
 ```text
 ┌────────────────────────────────────────────────────────────────────┐
 │                          Client Layer                               │
 │  React Components (Pages & Layouts)                                 │
-│  `src/app/(auth)/`, `src/app/(protected)/`, `src/app/~offline`     │
+│  `src/app/(auth)/`, `src/app/(protected)/`                            │
 └────────────────────┬──────────────────────────────────────────────┘
                      │
     ┌────────────────┼───────────────────────┐
@@ -21,7 +21,7 @@ SafeStart is a multi-tenant Next.js 16 App Router SaaS PWA that implements a thr
 │  Server       │ │  API Routes      │ │  Zustand Stores  │
 │  Actions      │ │ & Hooks          │ │  & React Query   │
 │ `src/actions` │ │ `src/app/api`    │ │ `src/stores`     │
-└───────┬───────┘ │ `src/hooks`      │ │ `src/lib/offline`│
+└───────┬───────┘ │ `src/hooks`      │ │                  │
         │         └────────┬─────────┘ └────────┬─────────┘
         │                  │                    │
         └──────────────────┼────────────────────┘
@@ -51,9 +51,8 @@ SafeStart is a multi-tenant Next.js 16 App Router SaaS PWA that implements a thr
 | **Server Actions** | Mutations: SOP creation, parsing, completions, versioning | `src/actions/*.ts` |
 | **API Routes** | Complex operations: document parsing, video gen, schema introspection | `src/app/api/sops/*.ts` |
 | **Components** | React UI: SOP display, walkthrough views, admin builders | `src/components/` |
-| **Hooks** | Client-side queries: `useSopDetail`, `useCompletions`, `useOnlineStatus` | `src/hooks/*.ts` |
+| **Hooks** | Client-side queries: `useSopDetail`, `useCompletions` | `src/hooks/*.ts` |
 | **Zustand Stores** | Ephemeral client state: walkthrough progress, completion photos | `src/stores/*.ts` |
-| **Offline DB** | Dexie IndexedDB cache for assigned SOPs, photo queue, voice notes | `src/lib/offline/db.ts` |
 | **Supabase Clients** | `client.ts` (anon), `server.ts` (session), `admin.ts` (service-role) | `src/lib/supabase/*.ts` |
 | **Validators** | Zod schemas for forms, API input, GPT structured outputs | `src/lib/validators/*.ts` |
 
@@ -64,8 +63,7 @@ SafeStart is a multi-tenant Next.js 16 App Router SaaS PWA that implements a thr
 **Key Characteristics:**
 - **Server-first**: Data mutations via Server Actions (`'use server'` functions), fetches via React Query or server-side layout reads
 - **RLS-enforced isolation**: Supabase Row-Level Security policies filter data by `organisation_id` and role; admin client bypasses RLS only where explicitly needed
-- **Offline-capable**: Assigned SOPs synced to Dexie; walkthroughs read from cache; completions queued and flushed on reconnect
-- **Streaming & PWA**: Serwist service worker caches assets; HTML shell cached for offline fallback at `src/app/~offline/page.tsx`
+- **Online-only**: Phase 55 removed the offline cache and service worker; `public/sw.js` is a self-unregistering kill-switch served until Phase 62
 
 ## Layers
 
@@ -84,9 +82,9 @@ SafeStart is a multi-tenant Next.js 16 App Router SaaS PWA that implements a thr
 - Used by: Form submissions, click handlers in client components
 
 **API Route Layer:**
-- Purpose: Complex operations requiring longer execution (parsing, video generation, file processing)
+- Purpose: Complex operations requiring longer execution (parsing, transcription, file processing)
 - Location: `src/app/api/sops/` and sub-routes
-- Contains: `parse/route.ts` (300s timeout), `generate-video/`, `pipeline/`, `transcribe/`, etc.
+- Contains: `parse/route.ts` (300s timeout), `pipeline/`, `transcribe/`, etc.
 - Depends on: File extraction libs, GPT API, Supabase storage
 - Used by: Background jobs, long-running tasks
 
@@ -99,24 +97,17 @@ SafeStart is a multi-tenant Next.js 16 App Router SaaS PWA that implements a thr
 
 **Data Query Layer:**
 - Purpose: Fetch data from Supabase or cache
-- Location: `src/hooks/`, `src/lib/offline/sync-engine.ts`
-- Contains: `useSopDetail`, `useCompletions`, `useAssignedSops`, sync engine
-- Depends on: React Query, Dexie, Supabase client
-- Used by: Components via `useQuery` or direct Dexie reads
+- Location: `src/hooks/`
+- Contains: `useSopDetail`, `useCompletions`
+- Depends on: React Query, Supabase client
+- Used by: Components via `useQuery`
 
 **Client State Layer:**
 - Purpose: Ephemeral UI state (form values, walkthrough progress, modal open/close)
 - Location: `src/stores/*.ts`
-- Contains: `walkthrough.ts` (step completion, ack trace), `completionStore.ts`, `network.ts`
+- Contains: `walkthrough.ts` (step completion, ack trace), `completionStore.ts`
 - Depends on: Zustand
 - Used by: Components, hooks
-
-**Offline Sync Layer:**
-- Purpose: Reconcile offline changes with server on reconnect
-- Location: `src/lib/offline/sync-engine.ts`, `voice-queue.ts`
-- Contains: `syncAssignedSops` (Dexie → Supabase), photo upload queue, voice note queue
-- Depends on: Dexie, Supabase client, server actions
-- Used by: Service worker, component lifecycle hooks
 
 ## Data Flow
 
@@ -124,18 +115,16 @@ SafeStart is a multi-tenant Next.js 16 App Router SaaS PWA that implements a thr
 
 1. **Navigation** → Worker browses SOPs at `/sops` (list) or `/sops/[sopId]` (detail)
 2. **Server-side Fetch** (`useSopDetail` hook, `src/hooks/useSopDetail.ts:10`)
-   - Try Dexie first (offline cache of assigned SOPs)
-   - Fallback: Fetch from Supabase with RLS (only SOPs visible to user's org/role)
+   - Fetch from Supabase with RLS (only SOPs visible to user's org/role)
 3. **React Query Caching** → Result stored in memory; stale time 5 min
 4. **Component Render** → `WalkthroughSwitcher` (`src/components/sop/walkthrough/WalkthroughSwitcher.tsx`) dispatches to `MobileWalkthrough` or `DesktopWalkthrough` based on viewport
 5. **Step Interaction** → Worker taps "I've done this" on each step
    - `walkthrough.ts` store marks step complete (memory state)
-   - Photo capture writes to local `QueuedPhoto` in Dexie (`src/lib/offline/db.ts:23-32`)
+   - Photo capture compresses in the browser and uploads to Supabase Storage
 6. **Submission** → Worker taps "Submit" button
    - Client generates `contentHash` (deterministic JSON hash of walkthrough state)
    - `submitCompletion` server action (`src/actions/completions.ts:20`) inserts into `sop_completions` table with idempotent UUID
-   - Photo queue flushed: `getPhotoUploadUrl` server action generates presigned URLs, uploads to Storage bucket `completion-photos`
-7. **Offline Behavior** → No network? Photos/completion queued locally via `syncEngine` reconnect handler
+   - Photos upload to Storage bucket `completion-photos` via presigned URLs
 
 ### Secondary Path: SOP Parsing & Publishing
 
@@ -168,17 +157,16 @@ SafeStart is a multi-tenant Next.js 16 App Router SaaS PWA that implements a thr
 - **Server-side**: Supabase Postgres (SSOT for all durable state)
 - **Client-side session**: React Query cache (`useSopDetail`, `useCompletions`) — 5-min stale time
 - **Ephemeral UI state**: Zustand stores (`walkthrough.ts`, `completionStore.ts`) — reset on navigation or logout
-- **Offline durability**: Dexie (`LocalCompletion`, `QueuedPhoto`, `DraftLayout`) — synced on reconnect via `syncEngine`
 
 ## Key Abstractions
 
 **SopWithSections:**
 - Purpose: Represents a complete SOP with nested sections and steps
-- Examples: Used by `useSopDetail` hook, `WalkthroughSwitcher` component, `syncAssignedSops` sync engine
+- Examples: Used by `useSopDetail` hook, `WalkthroughSwitcher` component
 - Pattern: PostgREST auto-joins via `select('*, sop_sections(*, sop_steps(...), sop_images(...))')` syntax; client code expects sorted arrays
 
 **BlockContent (discriminated union):**
-- Purpose: Validates and types SOP section content blocks (text, photo, callout, measurement, decision, escalate, voice-note, etc.)
+- Purpose: Validates and types SOP section content blocks (text, photo, callout, measurement, decision, escalate, etc.)
 - Examples: `TextBlock`, `PhotoBlock`, `MeasurementBlock` components in `src/components/sop/blocks/`
 - Pattern: Zod schema in `src/lib/validators/blocks.ts` defines allowed block types; Puck visual builder reads/writes this schema
 
@@ -186,16 +174,6 @@ SafeStart is a multi-tenant Next.js 16 App Router SaaS PWA that implements a thr
 - Purpose: Intermediate shape after GPT parsing; distinct from final `SopSection` database rows
 - Examples: Sections with confidence scores, steps with image indexes
 - Pattern: Zod schema validates GPT `zodResponseFormat`; transformer `parsedSopToPerSectionLayoutData` converts to layout blocks
-
-**LocalCompletion (offline durability):**
-- Purpose: Tracks in-progress walkthrough in Dexie with client-generated UUID (idempotency key)
-- Examples: Stores step completion times, content hash, ack trace
-- Pattern: UUID used as primary key to `sop_completions`; enables offline submission + idempotent retry
-
-**DraftLayout (builder autosave):**
-- Purpose: Caches per-section Puck layout data (opaque JSON) in Dexie during builder editing
-- Examples: `layout_data` field stores Puck editor state; `syncState` tracks dirty vs synced
-- Pattern: Monotonic `layout_version` pin; LWW (last-write-wins) merge on sync
 
 ## Entry Points
 
@@ -231,12 +209,12 @@ SafeStart is a multi-tenant Next.js 16 App Router SaaS PWA that implements a thr
 
 ## Architectural Constraints
 
-- **Threading:** Single-threaded event loop (Node.js + Next.js); no worker threads. Long tasks (parsing, video gen) run sequentially; Vercel's 300s timeout enforced for `/api/sops/parse`.
-- **Global state:** Zustand stores are per-component-instance (no global singleton); Dexie is a true singleton (IndexedDB per origin). Supabase client instances are created fresh per request (server actions) to avoid session cross-contamination.
+- **Threading:** Single-threaded event loop (Node.js + Next.js); no worker threads. Long tasks (parsing) run sequentially; Vercel's 300s timeout enforced for `/api/sops/parse`.
+- **Global state:** Zustand stores are per-component-instance (no global singleton); Supabase client instances are created fresh per request (server actions) to avoid session cross-contamination.
 - **Circular imports:** None detected; feature modules (`sop`, `admin`, `activity`) are independent; shared utilities in `lib/` do not import from `components/`.
 - **RLS recursion:** Avoided via Phase 13 learnings — cross-table RLS policies must not exist (e.g., junction table policies checked parent AND parent checked junction → infinite recursion). Use `SECURITY DEFINER` helpers or drop junction policies if rows are non-sensitive.
 - **Serialization boundary:** Server actions and API routes return plain JSON; no Date, class instances, or non-serializable types cross the boundary. Timestamps stored as ISO strings.
-- **Service worker interaction:** Serwist intercepts all requests; if an asset is stale but offline, it serves the cached version. Search-param-only URL changes via `router.push()` trigger RSC fetches (Phase 13 learning); use `useState` + `history.replaceState` for hot click paths.
+- **Hot click paths:** Search-param-only URL changes via `router.push()` trigger RSC fetches (Phase 13 learning); use `useState` + `history.replaceState` for hot click paths.
 
 ## Anti-Patterns
 
@@ -255,14 +233,6 @@ SafeStart is a multi-tenant Next.js 16 App Router SaaS PWA that implements a thr
 **Why it's wrong:** Defeats security isolation; requires service-role key on client (compromises key if client is bundled or inspected). RLS is bypassed silently.
 
 **Do this instead:** Put the protected operation in a Server Action or API route where the admin client is legitimately used. For example, `publishSop` must bypass RLS to update status; it's wrapped in `src/actions/sops.ts:150` and called via a button handler that triggers the server action.
-
-### Synchronous Await on Dexie Writes in Hot Paths
-
-**What happens:** A click handler awaits `db.sops.put(...)` before rendering the next step, blocking the UI for 100-500ms.
-
-**Why it's wrong:** Perceived lag; workers think the app is slow when Dexie latency is the bottleneck.
-
-**Do this instead:** Fire and forget if it's non-critical (e.g., caching a read). For completions, use Zustand in-memory store first, queue the Dexie write as a background side-effect, and let the submission happen async. Phase 15 learning: `router.push` on search-param changes is slower than `useState + history.replaceState` because it triggers RSC fetch.
 
 ### Unvalidated Zod Parse in API Routes
 
