@@ -4,11 +4,10 @@ import { useSearchParams } from 'next/navigation'
 import { CheckCircle2, Camera, X, AlertTriangle, Shield, Siren, ListChecks, ClipboardCheck } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { useWalkthroughStore } from '@/stores/walkthrough'
-import { removePhoto } from '@/hooks/usePhotoQueue'
 import { ReadAloudButton, stepSpeechText } from '@/components/sop/voice/ReadAloudButton'
 import { SopImageInline } from '@/components/sop/SopImageInline'
 import type { SopWithSections } from '@/types/sop'
-import type { QueuedPhoto } from '@/lib/offline/db'
+import type { StepPhoto } from '@/hooks/useStepPhotos'
 
 // Phase 22 VDW-LIT-01: block-type icon fallback map — never blank visual area (D-05, D-06)
 const SECTION_TYPE_ICONS: Record<string, LucideIcon> = {
@@ -24,8 +23,9 @@ interface Props {
   sop: SopWithSections
   onStepChange: (stepId: string) => void
   completedSteps?: Set<string>
-  stepPhotos: QueuedPhoto[]
+  stepPhotos: StepPhoto[]
   onCapturePhoto: (stepId: string, file: File) => Promise<void>
+  onRemovePhoto: (localId: string) => void
   /**
    * Optional override for the current step id. When the parent walkthrough
    * drives step state locally (perf fix — see MobileWalkthrough.tsx), it
@@ -35,7 +35,7 @@ interface Props {
   currentStepId?: string | null
 }
 
-export function ImmersiveStepCard({ sop, onStepChange, completedSteps, stepPhotos, onCapturePhoto, currentStepId }: Props) {
+export function ImmersiveStepCard({ sop, onStepChange, completedSteps, stepPhotos, onCapturePhoto, onRemovePhoto, currentStepId }: Props) {
   const search = useSearchParams()
   const lockedSteps = useWalkthroughStore((s) => s.lockedSteps)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -151,6 +151,7 @@ export function ImmersiveStepCard({ sop, onStepChange, completedSteps, stepPhoto
                 <span>Add photo</span>
                 <input
                   ref={fileInputRef}
+                  data-testid="step-photo-input"
                   type="file"
                   accept="image/*"
                   capture="environment"
@@ -161,18 +162,26 @@ export function ImmersiveStepCard({ sop, onStepChange, completedSteps, stepPhoto
               {stepPhotos.map((photo) => (
                 <div
                   key={photo.localId}
+                  data-testid="step-photo"
+                  data-status={photo.status}
                   className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-[var(--ink-50)] border border-[var(--ink-100)] text-xs text-[var(--ink-600)]"
                 >
-                  {photo.uploaded ? (
+                  {photo.status === 'uploaded' ? (
                     <CheckCircle2 size={12} className="text-accent-signoff flex-shrink-0" />
-                  ) : (
+                  ) : photo.status === 'uploading' ? (
                     <div className="w-3 h-3 rounded-full border-2 border-[var(--accent-decision)] border-t-transparent animate-spin flex-shrink-0" />
-                  )}
-                  <span>{photo.uploaded ? 'Uploaded' : 'Queued'}</span>
-                  {!photo.uploaded && (
+                  ) : null}
+                  <span>
+                    {photo.status === 'uploaded'
+                      ? 'Uploaded'
+                      : photo.status === 'uploading'
+                        ? 'Uploading…'
+                        : 'Upload failed — remove and try again'}
+                  </span>
+                  {photo.status !== 'uploaded' && (
                     <button
                       type="button"
-                      onClick={() => void removePhoto(photo.localId)}
+                      onClick={() => onRemovePhoto(photo.localId)}
                       className="ml-0.5 text-[var(--ink-400)] hover:text-[var(--accent-escalate)] transition-colors"
                       aria-label="Remove photo"
                     >

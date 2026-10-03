@@ -98,8 +98,6 @@ test.describe('builder autosave writes straight to the server (55-02)', () => {
 })
 
 test.describe('walk photos upload directly (55-03)', () => {
-  test.fixme(true, 'flips live in 55-03')
-
   test('compressPhoto lives in lib/photo and useStepPhotos does the two-call upload', () => {
     expect(code('src/lib/photo/compress.ts')).toMatch(/export (async )?function compressPhoto/)
     const hook = code('src/hooks/useStepPhotos.ts')
@@ -130,8 +128,6 @@ test.describe('walk photos upload directly (55-03)', () => {
 })
 
 test.describe('photo upload URL takes its organisation from the session (55-03)', () => {
-  test.fixme(true, 'flips live in 55-03')
-
   test('getPhotoUploadUrl has no caller-supplied org and validates ids as UUIDs', () => {
     const src = code('src/actions/completions.ts')
     const start = src.indexOf('export async function getPhotoUploadUrl')

@@ -191,7 +191,7 @@ export const JOURNEYS: Journey[] = [
         { label: 'Enter a measurement', to: 'meas' },
         { label: 'Make a yes/no decision', to: 'decide' },
       ] },
-      { id: 'photo', type: 'action', label: 'Capture photo', detail: 'Compressed + queued (works offline).' },
+      { id: 'photo', type: 'action', label: 'Capture photo', detail: "Compressed and uploaded straight away; the step can't be finished until the photo shows Uploaded." },
       { id: 'meas', type: 'action', label: 'Enter reading', detail: 'Flagged if out of range.' },
       { id: 'decide', type: 'action', label: 'Choose path', detail: 'May branch or escalate.' },
       { id: 'ask', type: 'action', label: '(Optional) Voice interaction — ask a question or say "next"/"done"', detail: 'Phase 22: voice-driven mode on the mobile immersive surface. Mic pill → push-to-talk → classifyIntent routes to: (a) voice "next"/"done" → handleMarkComplete (same D-02 safety-ack path as the tap button); (b) voice question → AI Q&A grounded in this SOP, answer read aloud via TTS; step text is read aloud on each advance (VDW-LIT-03). Always-on tap equivalents remain (D-04). No new route — voice is a mode layer on the SOP detail Walk it tab (?tab=walk).' },

@@ -11,10 +11,7 @@ import { useWalkthroughStore } from '@/stores/walkthrough'
 import { useCompletionStore } from '@/stores/completionStore'
 import { SafetyAcknowledgement } from '@/components/sop/SafetyAcknowledgement'
 import { submitCompletion } from '@/actions/completions'
-import { usePhotoQueue, addPhotoToQueue } from '@/hooks/usePhotoQueue'
-import { flushPhotoQueue } from '@/lib/offline/sync-engine'
-import { createClient } from '@/lib/supabase/client'
-import { db } from '@/lib/offline/db'
+import { useStepPhotos } from '@/hooks/useStepPhotos'
 import { upsertWalkthroughProgress } from '@/actions/walkthrough-progress'
 import React from 'react'
 
@@ -90,22 +87,6 @@ export const MobileWalkthrough = React.forwardRef<
   const [submitted, setSubmitted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
-  // Restore in-progress completion from Dexie on mount (D-02 resume)
-  useEffect(() => {
-    void completionStore.restoreFromDexie(sop.id)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sop.id])
-
-  // Flush photo queue on reconnect
-  useEffect(() => {
-    async function flush() {
-      const supabase = createClient()
-      await flushPhotoQueue(supabase)
-    }
-    window.addEventListener('online', flush)
-    return () => window.removeEventListener('online', flush)
-  }, [])
-
   const sopId = sop.id
   const acknowledged = walkthroughStore.isAcknowledged(sopId)
   const completedSteps = walkthroughStore.getCompletedSteps(sopId)
@@ -174,10 +155,11 @@ export const MobileWalkthrough = React.forwardRef<
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep?.id, highestAckIdx])
 
-  // Photo queue for the active completion
-  const { photosForStep, queueCount } = usePhotoQueue(activeCompletion?.localId ?? null)
+  // Photos for this walk upload as soon as they are taken
+  const { photosForStep, uploadingCount, uploadedPhotos, addPhoto, removePhoto } = useStepPhotos()
   const currentStepPhotos = currentStep ? photosForStep(currentStep.id) : []
-  const photoGateMet = !currentStep?.photo_required || currentStepPhotos.length > 0
+  const photoGateMet =
+    !currentStep?.photo_required || currentStepPhotos.some((p) => p.status === 'uploaded')
 
   // Same matchers the Read page uses — a "Safety Requirements" section used
   // to satisfy Read and MISS this lookup, so the gate opened empty.
@@ -207,38 +189,34 @@ export const MobileWalkthrough = React.forwardRef<
     [sop.id]
   )
 
-  // Auto-starts a completion if none is active, then queues the photo
+  // Auto-starts a completion if none is active, then uploads the photo
   const handleCapturePhoto = useCallback(
     async (stepId: string, file: File) => {
       let localId = activeCompletion?.localId
       if (!localId) {
-        await completionStore.startCompletion(sopId, sop.version)
+        completionStore.startCompletion(sopId, sop.version)
         localId = useCompletionStore.getState().getActiveCompletion(sopId)?.localId
       }
       if (!localId) return
-      await addPhotoToQueue({ completionLocalId: localId, stepId, file })
+      await addPhoto(localId, stepId, file)
     },
-    [activeCompletion?.localId, completionStore, sopId, sop.version]
+    [activeCompletion?.localId, completionStore, sopId, sop.version, addPhoto]
   )
 
   const handleMarkComplete = useCallback(
     (stepId: string) => {
       // PERF: do all in-memory updates + navigation synchronously so the
-      // UI reacts on the next frame. Persistence (Dexie writes via
-      // completionStore + walkthrough-progress server action) is fired in
-      // the background — the user does not block on IndexedDB.
+      // UI reacts on the next frame. The walkthrough-progress server action
+      // is fired in the background.
       walkthroughStore.markStepAcknowledged(sopId, stepId)
       walkthroughStore.markStepComplete(sopId, stepId)
       const idx = allSteps.findIndex((s) => s.id === stepId)
       const next = allSteps.slice(idx + 1).find((s) => !completedSteps.has(s.id))
       if (next) void handleStepChange(next.id)
-      // Fire-and-forget persistence. startCompletion is idempotent and the
-      // completionStore sets in-memory state synchronously, so the order
-      // here is safe even on the first click.
-      if (!activeCompletion) {
-        void completionStore.startCompletion(sopId, sop.version)
-      }
-      void completionStore.markStepCompleted(sopId, stepId)
+      // startCompletion is idempotent and sets state synchronously, so the
+      // order here is safe even on the first click.
+      completionStore.startCompletion(sopId, sop.version)
+      completionStore.markStepCompleted(sopId, stepId)
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [activeCompletion, completionStore, walkthroughStore, sopId, sop.version, allSteps, completedSteps]
@@ -291,13 +269,7 @@ export const MobileWalkthrough = React.forwardRef<
 
   async function handleSubmit() {
     if (!activeCompletion) return
-    if (queueCount > 0) {
-      const proceed = window.confirm(
-        `${queueCount} photo${queueCount === 1 ? '' : 's'} still uploading. ` +
-          'These will not be attached to your completion if you submit now. Submit anyway?'
-      )
-      if (!proceed) return
-    }
+    if (uploadingCount > 0) return
     setSubmitLoading(true)
     setSubmitError(null)
     try {
@@ -310,14 +282,6 @@ export const MobileWalkthrough = React.forwardRef<
         .map((b) => b.toString(16).padStart(2, '0'))
         .join('')
 
-      const uploadedPhotos = await db.photoQueue
-        .where('completionLocalId')
-        .equals(activeCompletion.localId)
-        .and((p) => p.uploaded && p.storagePath !== null)
-        .toArray()
-
-      await db.completions.update(activeCompletion.localId, { contentHash, status: 'submitted' })
-
       // Phase 15 D-21: pass step_ack_trace evidence to the server action
       const stepAckTrace = walkthroughStore.getAckTrace(sopId)
 
@@ -327,17 +291,12 @@ export const MobileWalkthrough = React.forwardRef<
         sopVersion: sop.version,
         contentHash,
         stepData: activeCompletion.stepCompletions,
-        photoStoragePaths: uploadedPhotos.map((p) => ({
-          localId: p.localId,
-          stepId: p.stepId,
-          storagePath: p.storagePath as string,
-          contentType: p.contentType,
-        })),
+        photoStoragePaths: uploadedPhotos,
         stepAckTrace,
       })
 
       if (result.success) {
-        await completionStore.clearCompletion(sopId)
+        completionStore.clearCompletion(sopId)
         // Phase 15 polish: do NOT reset walkthrough state on submit. We mark
         // the SOP as submitted so the worker can re-enter and re-read any
         // step freely (highest-acked is now the last step, so the forward
@@ -346,13 +305,9 @@ export const MobileWalkthrough = React.forwardRef<
         walkthroughStore.markWalkthroughSubmitted(sopId)
         setSubmitted(true)
       } else {
-        await db.completions.update(activeCompletion.localId, { status: 'in_progress' })
         setSubmitError(result.error)
       }
     } catch (err) {
-      if (activeCompletion) {
-        await db.completions.update(activeCompletion.localId, { status: 'in_progress' }).catch(() => {})
-      }
       setSubmitError(err instanceof Error ? err.message : 'Submission failed')
     } finally {
       setSubmitLoading(false)
@@ -430,15 +385,6 @@ export const MobileWalkthrough = React.forwardRef<
               {allDone ? `All ${totalSteps} steps done` : `Step ${completedCount + 1} of ${totalSteps}`}
             </span>
             <div className="flex items-center gap-2">
-              {queueCount > 0 && (
-                <span
-                  className="mono text-micro uppercase tracking-wider px-1.5 py-0.5 rounded bg-[var(--accent-decision)]/15 text-[var(--accent-decision)] flex items-center gap-1"
-                  title={`${queueCount} photo${queueCount === 1 ? '' : 's'} waiting to upload`}
-                >
-                  <Camera size={10} />
-                  {queueCount} queued
-                </span>
-              )}
               <span className="mono text-meta text-[var(--ink-400)]">{pct}%</span>
             </div>
           </div>
@@ -460,6 +406,7 @@ export const MobileWalkthrough = React.forwardRef<
             completedSteps={completedSteps}
             stepPhotos={currentStepPhotos}
             onCapturePhoto={handleCapturePhoto}
+            onRemovePhoto={removePhoto}
           />
         </div>
       ) : (
@@ -516,6 +463,7 @@ export const MobileWalkthrough = React.forwardRef<
           completedSteps={completedSteps}
           stepPhotos={currentStepPhotos}
           onCapturePhoto={handleCapturePhoto}
+          onRemovePhoto={removePhoto}
         />
       </div>
 
@@ -542,17 +490,17 @@ export const MobileWalkthrough = React.forwardRef<
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={submitLoading}
+              disabled={submitLoading || uploadingCount > 0}
               className={[
                 'w-full min-h-tap-glove h-tap-glove rounded-lg font-bold text-base transition-all flex flex-col items-center justify-center gap-0.5',
-                submitLoading
+                submitLoading || uploadingCount > 0
                   ? 'bg-[var(--accent-decision)]/40 text-white/60 cursor-not-allowed'
                   : 'bg-[var(--accent-decision)] text-white hover:opacity-90',
               ].join(' ')}
             >
               <div className="flex items-center gap-2">
                 <ClipboardCheck size={20} />
-                {submitLoading ? 'Submitting…' : 'Sign off & submit'}
+                {submitLoading ? 'Submitting…' : uploadingCount > 0 ? 'Photos uploading…' : 'Sign off & submit'}
               </div>
               <span className="text-xs font-normal opacity-75">Records your sign-off with a timestamp</span>
             </button>

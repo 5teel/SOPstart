@@ -11,7 +11,6 @@ import { PageShell } from '@/components/layout/PageShell'
 import { SafetyAcknowledgement } from '@/components/sop/SafetyAcknowledgement'
 import { submitCompletion } from '@/actions/completions'
 import { upsertWalkthroughProgress } from '@/actions/walkthrough-progress'
-import { db } from '@/lib/offline/db'
 
 /**
  * Phase 15 — DesktopWalkthrough (D-01..D-04).
@@ -36,11 +35,6 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
   const [submitLoading, setSubmitLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
-
-  useEffect(() => {
-    void completionStore.restoreFromDexie(sop.id)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sop.id])
 
   const sopId = sop.id
   const acknowledged = walkthroughStore.isAcknowledged(sopId)
@@ -122,10 +116,8 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
 
   const handleAcknowledgeNext = useCallback(() => {
     if (!currentStep) return
-    // PERF: sync in-memory updates + navigation first; Dexie writes
-    // happen in the background via fire-and-forget. The completionStore
-    // sets state synchronously so the order here is safe even on first
-    // click (no need to await startCompletion).
+    // PERF: sync in-memory updates + navigation first. The completionStore
+    // sets state synchronously so the order here is safe even on first click.
     walkthroughStore.markStepAcknowledged(sopId, currentStep.id)
     walkthroughStore.markStepComplete(sopId, currentStep.id)
     const next = allSteps.slice(currentIdx + 1).find((s) => !completedSteps.has(s.id))
@@ -151,8 +143,6 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
         .map((b) => b.toString(16).padStart(2, '0'))
         .join('')
 
-      await db.completions.update(activeCompletion.localId, { contentHash, status: 'submitted' })
-
       const stepAckTrace = walkthroughStore.getAckTrace(sopId)
       const result = await submitCompletion({
         localId: activeCompletion.localId,
@@ -165,14 +155,13 @@ export function DesktopWalkthrough({ sop }: { sop: SopWithSections }) {
       })
 
       if (result.success) {
-        await completionStore.clearCompletion(sopId)
+        completionStore.clearCompletion(sopId)
         // Phase 15 polish: preserve walkthrough state so the worker can
         // re-enter and re-read any step freely. resetWalkthrough is only
         // called from the explicit "Start another walkthrough" action.
         walkthroughStore.markWalkthroughSubmitted(sopId)
         setSubmitted(true)
       } else {
-        await db.completions.update(activeCompletion.localId, { status: 'in_progress' })
         setSubmitError(result.error)
       }
     } catch (err) {
