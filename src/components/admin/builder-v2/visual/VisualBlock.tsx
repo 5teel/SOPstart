@@ -7,9 +7,8 @@ import type { VisualBlockProps, VisualItem } from './media-adapter'
  * One block holding mixed media, each item medium-tagged
  * `visual:photo | visual:diagram | visual:video`. This is the SAME component the
  * worker reads and the admin edit-shell shows (R2) — plain `img` / `video`
- * display only. Annotation EDITING (Konva) is admin-only and code-split behind
- * `AnnotationEditorLoader` (26-11); it is NOT imported here, so pulling this
- * component into the worker `/sops/[sopId]` bundle stays Konva-free (R8).
+ * display only. Already-annotated diagrams keep showing their flat baked image
+ * (`bakedSrc`); there is no annotation editor any more, and no Konva import here.
  *
  * Hook-free ⇒ SSR-safe ⇒ render-parity harness renders it identically.
  */

@@ -2,11 +2,8 @@
 
 /**
  * Phase 23 Plan 23-05 — AFL-VER-01 / D-05/D-06: Versions page with
- * "Edit into new version" (cloneSopAsDraft), "Restore as new version"
- * (restoreVersionAsNew), and "Compare" (→ diff page) buttons.
- *
- * NOTE: journeys.ts must reflect the new version/diff/restore flows — the
- * actual journeys.ts edit is in Plan 23-07 (same-change rule from CLAUDE.md).
+ * "Edit into new version" (cloneSopAsDraft) and Upload new version. There is
+ * no compare or restore: an older version can only be read, not brought back.
  *
  * CLAUDE.md 2026-06-05: all onClick handlers are WIRED to the server actions
  * (no empty handler).
@@ -22,7 +19,6 @@ import {
   uploadNewVersion,
   notifyAssignedWorkers,
   cloneSopAsDraft,
-  restoreVersionAsNew,
   type VersionRecord,
 } from '@/actions/versioning'
 import { getApprovalHistory, type ApprovalHistoryRow } from '@/actions/approvals'
@@ -129,10 +125,6 @@ export default function SopVersionHistoryPage() {
   const [showCloneConfirm, setShowCloneConfirm] = useState(false)
   const [cloning, setCloning] = useState(false)
 
-  // Restore as new version state — D-06; tracks which version is being restored
-  const [restoringVersionId, setRestoringVersionId] = useState<string | null>(null)
-  const [showRestoreConfirmFor, setShowRestoreConfirmFor] = useState<string | null>(null)
-
   const loadVersions = useCallback(async () => {
     setLoading(true)
     const result = await getVersionHistory(sopId)
@@ -168,7 +160,7 @@ export default function SopVersionHistoryPage() {
 
   // WR-01: a cloned-but-unpublished draft also has superseded_by === null and
   // the highest version, so it must never win — the refresher control, clone
-  // source, title, and compare baseline all target the live PUBLISHED current
+  // source and title all target the live PUBLISHED current
   // (same predicate as the row-level "Current" badge below).
   const currentSop = versions.find(v => v.superseded_by === null && v.status === 'published') ?? versions[0]
   const sopTitle = currentSop?.title ?? currentSop?.source_file_name ?? 'SOP'
@@ -311,20 +303,6 @@ export default function SopVersionHistoryPage() {
     if (!result.success) {
       setError(result.error)
       setCloning(false)
-      return
-    }
-    router.push(`/admin/sops/builder/${result.newDraftId}`)
-  }
-
-  // --- Restore as new version handler — D-06 ---
-  // CLAUDE.md 2026-06-05: wired to the server action, no empty handler
-  async function handleRestore(versionId: string) {
-    setRestoringVersionId(versionId)
-    setShowRestoreConfirmFor(null)
-    const result = await restoreVersionAsNew(versionId)
-    if (!result.success) {
-      setError(result.error)
-      setRestoringVersionId(null)
       return
     }
     router.push(`/admin/sops/builder/${result.newDraftId}`)
@@ -526,15 +504,7 @@ export default function SopVersionHistoryPage() {
           {/* Data rows */}
           {versions.map((ver) => {
             const isCurrent = ver.superseded_by === null && ver.status === 'published'
-            const isRestoringThis = restoringVersionId === ver.id
-            const showRestoreConfirm = showRestoreConfirmFor === ver.id
             const verApprovals = approvals.filter((a) => a.sopId === ver.id)
-
-            // Compare: A = this version, B = current
-            const currentId = currentSop?.id
-            const compareUrl = currentId
-              ? `/admin/sops/${sopId}/versions/diff?a=${ver.id}&b=${currentId}`
-              : null
 
             return (
               <div key={ver.id} className="border-t border-[var(--ink-100)]">
@@ -570,59 +540,8 @@ export default function SopVersionHistoryPage() {
                         Review
                       </Link>
                     )}
-
-                    {/* Compare — links to diff page: A=this version, B=current */}
-                    {compareUrl && !isCurrent && (
-                      <Link
-                        href={compareUrl}
-                        className="text-[var(--ink-500)] hover:text-[var(--ink-900)] text-sm font-medium transition-colors"
-                        title="Compare with current version"
-                      >
-                        Compare
-                      </Link>
-                    )}
-
-                    {/* Restore as new version — D-06: per non-current version */}
-                    {!isCurrent && (
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setShowRestoreConfirmFor(showRestoreConfirm ? null : ver.id)
-                        }
-                        disabled={!!restoringVersionId}
-                        className="text-[var(--accent-signoff)] hover:text-[var(--ink-700)] text-sm font-medium transition-colors disabled:opacity-50"
-                      >
-                        {isRestoringThis ? 'Restoring...' : 'Restore'}
-                      </button>
-                    )}
                   </div>
                 </div>
-
-                {/* Inline restore confirmation — D-06, mirrors showUploadConfirm pattern */}
-                {showRestoreConfirm && !isCurrent && (
-                  <div className="mx-4 mb-3 bg-[var(--paper-2)] border border-[var(--ink-100)] rounded-lg px-4 py-3">
-                    <p className="text-sm text-[var(--ink-900)] leading-relaxed mb-2">
-                      This copies v{ver.version} content into a <strong>new draft</strong>.
-                      The old version is not reactivated — history stays append-only.
-                    </p>
-                    <div className="flex items-center gap-4">
-                      <button
-                        type="button"
-                        onClick={() => handleRestore(ver.id)}
-                        className="text-[var(--accent-signoff)] font-semibold text-sm hover:text-[var(--ink-700)] transition-colors"
-                      >
-                        Restore as new version
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowRestoreConfirmFor(null)}
-                        className="text-[var(--ink-500)] hover:text-[var(--ink-900)] text-sm transition-colors"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                )}
 
                 {/* Approval history — read-only, D29-06 (APR-05). Grouped under
                     this version; approver + step labels already resolved by

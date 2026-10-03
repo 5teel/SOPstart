@@ -16,7 +16,6 @@ import {
   type MediaFieldType,
   type VisualMedium,
 } from './media-adapter'
-import { DiagramAnnotateModal } from './DiagramAnnotateModal'
 
 /**
  * Phase 26 Plan 26-09 (R5, D-03) — Pattern E: the media grid + medium sub-picker.
@@ -29,8 +28,7 @@ import { DiagramAnnotateModal } from './DiagramAnnotateModal'
  * every commit routes the block's NATIVE field value to the caller's lossless,
  * Zod-validated `onCommitField` (junctionId / block_provenance survive, P4/R7).
  *
- * Konva-FREE: diagram annotation editing is admin-only and code-split behind
- * `AnnotationEditorLoader` (26-11); this control only tags/orders/captions items.
+ * Konva-FREE: this control only tags/orders/captions items.
  * SSR-safe (document/window untouched at init; menu state via useState).
  */
 const MEDIUM_PICKER: { medium: VisualMedium; label: string; Icon: typeof ImagePlus }[] = [
@@ -50,15 +48,9 @@ export function MediaGrid({ item, onCommitField }: MediaGridProps) {
   const field = mediaFieldKey(type)
   const items = toVisualItems(type, item.props)
   const [picking, setPicking] = useState(false)
-  // Which diagram item is open in the Konva annotate editor (26-13 launch point).
-  const [annotatingIndex, setAnnotatingIndex] = useState<number | null>(null)
 
   function commit(next: ReturnType<typeof toVisualItems>) {
     onCommitField(field, fromVisualItems(type, next))
-  }
-
-  function applyAnnotation(index: number, patch: { annotationId?: string; bakedSrc: string }) {
-    commit(items.map((it, i) => (i === index ? { ...it, ...patch } : it)))
   }
 
   function addMedium(medium: VisualMedium) {
@@ -115,18 +107,6 @@ export function MediaGrid({ item, onCommitField }: MediaGridProps) {
               >
                 ×
               </button>
-              {/* Diagram → open the Konva annotate editor (26-11 via 26-13 launch). */}
-              {it.medium === 'diagram' && (
-                <button
-                  type="button"
-                  data-annotate-diagram
-                  aria-label={`Annotate diagram item ${i + 1}`}
-                  onClick={() => setAnnotatingIndex(i)}
-                  className="absolute bottom-1 right-1 hidden items-center gap-1 rounded bg-[var(--ink-900,#09090b)]/75 px-1.5 py-0.5 font-mono text-micro text-white group-hover/media:inline-flex"
-                >
-                  <PenLine size={10} /> annotate
-                </button>
-              )}
             </div>
             <input
               type="text"
@@ -188,15 +168,6 @@ export function MediaGrid({ item, onCommitField }: MediaGridProps) {
             </div>
           )}
         </div>
-      )}
-
-      {/* The Konva annotate editor — dynamic/ssr:false, admin-only (never worker). */}
-      {annotatingIndex !== null && items[annotatingIndex] && (
-        <DiagramAnnotateModal
-          item={items[annotatingIndex]}
-          onClose={() => setAnnotatingIndex(null)}
-          onSaved={(patch) => applyAnnotation(annotatingIndex, patch)}
-        />
       )}
     </div>
   )
