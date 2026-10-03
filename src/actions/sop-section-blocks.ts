@@ -14,7 +14,9 @@
  */
 
 import { createClient } from '@/lib/supabase/server'
-import { requireAdminContext } from '@/lib/auth/guards'
+import { requireAdminContext, type AdminContext } from '@/lib/auth/guards'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { recordDecision } from '@/lib/decisions/record'
 import type { SopSectionBlock } from '@/types/sop'
 
 // CAP-02 scope boundary: verifyBlock/unverifyBlock stay on requireAdmin()
@@ -62,6 +64,47 @@ export async function listSectionBlocks(
 // check so workers can't poke the verify column even within their own org.
 // ---------------------------------------------------------------------------
 
+// Phase 56: the SOP for a ledger row is resolved here from the junction's own
+// section, with the caller's RLS-scoped client -- never from a client parameter.
+async function resolveSopId(
+  supabase: AdminContext['supabase'],
+  sopSectionId: string | null | undefined,
+): Promise<string | null> {
+  if (!sopSectionId) return null
+  const { data } = await supabase.from('sop_sections').select('sop_id').eq('id', sopSectionId).maybeSingle()
+  return (data?.sop_id as string | undefined) ?? null
+}
+
+// AI findings the latest review raised against this junction (flags carry the junction id).
+async function findingsFor(
+  sopId: string | null,
+  organisationId: string | null,
+  blockId: string,
+): Promise<Array<{ job: string; kind: string; severity: string; description: string }>> {
+  if (!sopId || !organisationId) return []
+  const { data } = await createAdminClient()
+    .from('parse_jobs')
+    .select('ai_review_results')
+    .eq('sop_id', sopId)
+    .eq('organisation_id', organisationId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+  const flags = (data?.ai_review_results as { flags?: unknown } | null)?.flags
+  if (!Array.isArray(flags)) return []
+  return flags
+    .filter((f) => f && typeof f === 'object' && (f as { block_id?: string }).block_id === blockId)
+    .map((f) => {
+      const x = f as Record<string, unknown>
+      return {
+        job: String(x.job ?? ''),
+        kind: String(x.kind ?? ''),
+        severity: String(x.severity ?? ''),
+        description: String(x.description ?? ''),
+      }
+    })
+}
+
 export async function verifyBlock(
   blockId: string
 ): Promise<{ ok: boolean; error?: string }> {
@@ -69,19 +112,35 @@ export async function verifyBlock(
 
   const ctx = await requireAdmin()
   if ('error' in ctx) return { ok: false, error: ctx.error }
-  const { supabase, user } = ctx
+  const { supabase, user, organisationId } = ctx
 
-  const { error } = await supabase
+  const { data: rows, error } = await supabase
     .from('sop_section_blocks')
     .update({
       verified_by_admin_id: user.id,
       verified_at: new Date().toISOString(),
     })
     .eq('id', blockId)
+    .select('id, sop_section_id')
 
   if (error) {
     console.error('[verifyBlock] update error', error)
     return { ok: false, error: error.message }
+  }
+  if (rows && rows.length > 0) {
+    const sopId = await resolveSopId(supabase, rows[0].sop_section_id)
+    const flags = await findingsFor(sopId, organisationId, blockId)
+    const n = flags.length
+    await recordDecision({
+      kind: n > 0 ? 'ai_finding_cleared' : 'verify',
+      subject: { kind: 'section_block', id: blockId },
+      sopId,
+      summary:
+        n > 0
+          ? `Checked a section and cleared ${n} AI finding${n === 1 ? '' : 's'}`
+          : 'Checked a section before publishing',
+      details: n > 0 ? { junction_id: blockId, flags } : { junction_id: blockId },
+    })
   }
   return { ok: true }
 }
@@ -95,17 +154,27 @@ export async function unverifyBlock(
   if ('error' in ctx) return { ok: false, error: ctx.error }
   const { supabase } = ctx
 
-  const { error } = await supabase
+  const { data: rows, error } = await supabase
     .from('sop_section_blocks')
     .update({
       verified_by_admin_id: null,
       verified_at: null,
     })
     .eq('id', blockId)
+    .select('id, sop_section_id')
 
   if (error) {
     console.error('[unverifyBlock] update error', error)
     return { ok: false, error: error.message }
+  }
+  if (rows && rows.length > 0) {
+    await recordDecision({
+      kind: 'verify_withdrawn',
+      subject: { kind: 'section_block', id: blockId },
+      sopId: await resolveSopId(supabase, rows[0].sop_section_id),
+      summary: 'Un-checked a section',
+      details: { junction_id: blockId },
+    })
   }
   return { ok: true }
 }

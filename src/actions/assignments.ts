@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { z } from 'zod'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { AppRole } from '@/types/auth'
+import { recordDecision } from '@/lib/decisions/record'
 
 // ─── Schemas ────────────────────────────────────────────────────────────────
 
@@ -66,6 +67,14 @@ export async function assignSopToRole(
     return { success: false, error: 'Failed to assign role. Please try again.' }
   }
 
+  await recordDecision({
+    kind: 'assign',
+    subject: { kind: 'assignment', id: data.id },
+    sopId,
+    summary: `Assigned the SOP to the ${parsed.data} role`,
+    details: { assignment_type: 'role', role: parsed.data },
+  })
+
   return { success: true, id: data.id }
 }
 
@@ -101,6 +110,14 @@ export async function assignSopToUser(
     return { success: false, error: 'Failed to assign worker. Please try again.' }
   }
 
+  await recordDecision({
+    kind: 'assign',
+    subject: { kind: 'assignment', id: data.id },
+    sopId,
+    summary: 'Assigned the SOP to a person',
+    details: { assignment_type: 'individual', user_id: userId },
+  })
+
   return { success: true, id: data.id }
 }
 
@@ -115,14 +132,32 @@ export async function removeAssignment(
   if ('error' in ctx) return { success: false, error: ctx.error }
   const { supabase } = ctx
 
-  const { error } = await supabase
+  // Read first (same RLS-scoped client) so the decision can name what was removed.
+  const { data: before } = await supabase
+    .from('sop_assignments')
+    .select('sop_id, assignment_type, role, user_id')
+    .eq('id', assignmentId)
+    .maybeSingle()
+
+  const { data: deleted, error } = await supabase
     .from('sop_assignments')
     .delete()
     .eq('id', assignmentId)
+    .select('id')
 
   if (error) {
     console.error('removeAssignment error:', error)
     return { success: false, error: 'Failed to remove assignment. Please try again.' }
+  }
+
+  if (deleted && deleted.length > 0) {
+    await recordDecision({
+      kind: 'unassign',
+      subject: { kind: 'assignment', id: assignmentId },
+      sopId: before?.sop_id ?? null,
+      summary: 'Removed an assignment',
+      details: { ...(before ?? {}) },
+    })
   }
 
   return { success: true }

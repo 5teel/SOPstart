@@ -41,6 +41,12 @@ const LIVE_WRITERS: string[] = [
   'src/actions/governance.ts#setReviewCadence',
   'src/actions/completions.ts#signOffCompletion',
   'src/actions/completions.ts#recordSignature',
+  'src/actions/assignments.ts#assignSopToRole',
+  'src/actions/assignments.ts#assignSopToUser',
+  'src/actions/assignments.ts#removeAssignment',
+  'src/actions/observations.ts#recordObservation',
+  'src/actions/sop-section-blocks.ts#verifyBlock',
+  'src/actions/sop-section-blocks.ts#unverifyBlock',
 ]
 // performPublish is hooked outside the gate body (56-05).
 const PUBLISH_GUARD_LIVE = true

@@ -19,6 +19,7 @@ import { getSessionContext } from '@/lib/auth/session-context'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { RecordObservationSchema, ObservationLabelsSchema } from '@/lib/validators/observations'
 import { isSignedOffAssessor } from '@/lib/competency/assessor'
+import { recordDecision } from '@/lib/decisions/record'
 
 const DEFAULT_LABELS = {
   performed_to_sop: 'Performed to SOP',
@@ -126,6 +127,24 @@ export async function recordObservation(
     console.error('recordObservation insert error:', error)
     return { success: false, error: 'Failed to record observation.' }
   }
+
+  await recordDecision({
+    kind: 'observation',
+    subject: { kind: 'worker', id: workerId },
+    sopId,
+    summary:
+      verdict === 'performed_to_sop'
+        ? 'Recorded an observation: performed to SOP'
+        : 'Recorded an observation: needs support',
+    details: {
+      verdict,
+      sop_version: sop.version,
+      completion_id: completionId ?? null,
+      note: note ?? null,
+      is_assessor_override: isOverride,
+      override_reason: overrideReasonToStamp,
+    },
+  })
   return { success: true as const }
 }
 
