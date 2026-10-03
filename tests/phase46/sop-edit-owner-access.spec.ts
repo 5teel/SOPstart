@@ -451,7 +451,7 @@ test.describe('CAP-02 -- approver-edit runtime probes (real ephemeral org, real 
     const accessToken = await mintAccessToken(admin, approverEmail)
     const asApprover = asUserClient(accessToken)
 
-    // INSERT (the addBlockToSection path)
+    // INSERT (the former junction-add path)
     const { data: inserted, error: insErr } = await asApprover
       .from('sop_section_blocks')
       .insert({
@@ -467,12 +467,12 @@ test.describe('CAP-02 -- approver-edit runtime probes (real ephemeral org, real 
     expect(insErr).toBeNull()
     expect(inserted?.id).toBeTruthy()
 
-    // UPDATE (the setPinMode path) -- re-read via service client, never trust the response
+    // UPDATE (the former pin-mode path) -- re-read via service client, never trust the response
     await asApprover.from('sop_section_blocks').update({ pin_mode: 'follow_latest' }).eq('id', inserted!.id)
     const { data: afterUpdate } = await admin.from('sop_section_blocks').select('pin_mode').eq('id', inserted!.id).single()
     expect(afterUpdate?.pin_mode).toBe('follow_latest')
 
-    // DELETE (the removeBlockFromSection path -- the silent-false-success case)
+    // DELETE (the former junction-remove path -- the silent-false-success case)
     await asApprover.from('sop_section_blocks').delete().eq('id', inserted!.id)
     const { data: afterDelete } = await admin.from('sop_section_blocks').select('id').eq('id', inserted!.id).maybeSingle()
     expect(afterDelete).toBeNull()

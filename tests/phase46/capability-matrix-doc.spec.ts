@@ -89,7 +89,7 @@ test.describe('CAP-01 -- capability matrix document (source-contract)', () => {
     expect(doc).toContain('Approval chains')
     expect(doc).toContain('Manage team')
     expect(doc).toContain('Manage departments')
-    expect(doc).toContain('Manage blocks library')
+    expect(doc).not.toContain('Manage blocks library')
     expect(doc).toContain('AI settings')
     expect(doc).toContain('Training matrix')
     expect(doc).toContain('Assessor governance')

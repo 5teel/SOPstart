@@ -21,8 +21,8 @@
  * A target containing a reserved word as its own path segment (the create/
  * edit-form collision class — a segment textually matches a `[param]`
  * dynamic route shape at the ROUTING layer but the destination page treats
- * that literal specially and can still runtime-404, e.g. `/admin/blocks/new`
- * resolving into `[blockId]`) is a DIFFERENT bug class this mechanical sweep
+ * that literal specially and can still runtime-404, e.g. a `/new` form route
+ * resolving into a sibling `[id]` route) is a DIFFERENT bug class this mechanical sweep
  * cannot catch by design — see the fixme test below, which activates once
  * 43-02 gives that reserved segment its own static route.
  *
@@ -214,8 +214,9 @@ test.describe('no dead internal hrefs — route truth (D-07)', () => {
     expect(offenders, offenders.join('\n')).toEqual([])
   })
 
-  // activates 43-02 (D-03): flips to `test(` once /admin/blocks/new (and any
-  // sibling reserved-segment route) has its own static segment.
+  // Generic guard: a create/edit-style segment must never be served only by a
+  // sibling dynamic route (no such target exists today, so it passes vacuously
+  // until one appears).
   test(
     'a reserved segment (new, create, add, edit) resolves to a static route segment, never only through a dynamic one',
     () => {

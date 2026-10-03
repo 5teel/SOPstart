@@ -111,7 +111,7 @@ test.describe('SCP-PARSE — Phase 20 contract integration (Phase 21)', () => {
     expect(conv).toContain('export async function materializeJunctionsForLayout')
     // category='parsed_inline' enforced inside the loop (T-21-05-01).
     expect(conv).toContain("category: 'parsed_inline'")
-    // junctionId stamped on the Puck item AFTER addBlockToSection resolves.
+    // junctionId stamped on the Puck item AFTER the junction insert resolves.
     expect(conv).toContain('item.props.junctionId = addRes.junction.id')
     // Throws on partial failure (T-21-05-02) — no orphan junctions.
     expect(conv).toMatch(/throw new Error\(\s*`\[materializeJunctionsForLayout\]/)
@@ -133,32 +133,22 @@ test.describe('SCP-PARSE — Phase 20 contract integration (Phase 21)', () => {
     const action = read('src/actions/sop-section-blocks.ts')
     // getPublishGateStatus returns ready=false when total>0 AND unverified>0.
     expect(action).toContain('ready: totalNum > 0 && unverifiedNum === 0')
-    // Plan 21-05 wired the materializer through addBlockToSection's
-    // serviceRole flag; Phase 46 CR-01 removed that wire-reachable bypass —
-    // the parser now goes through the non-'use server' core entry point,
-    // and the action keeps blockProvenance only.
-    expect(action).toContain('blockProvenance: BlockProvenanceSchema.optional()')
-    expect(action).not.toContain('serviceRole: z.boolean()')
+    // Phase 46 CR-01 removed the wire-reachable service-role bypass; the
+    // parser goes through the non-'use server' core entry point, and the
+    // action module carries no trust override at all (Phase 55).
+    expect(action).not.toContain('serviceRole')
     const core = read('src/lib/builder/section-blocks-core.ts')
     expect(core).toContain('export async function addBlockToSectionAsService')
     // The junction insert forwards block_provenance into the column.
     expect(core).toContain('block_provenance: blockProvenance ?? null')
   })
 
-  test('SCP-PARSE-07: library picker filters parsed_inline by default (T-21-05-01)', () => {
-    const blocksAction = read('src/actions/blocks.ts')
-    // ListBlocksOptions has the new flag.
-    expect(blocksAction).toContain('includeParsedInline?: boolean')
-    // Defaulted false in listBlocks().
-    expect(blocksAction).toContain('includeParsedInline: false')
-    // The actual exclusion clause (PostgREST `category.neq.parsed_inline`
-    // wrapped in an OR so NULL rows still pass).
-    expect(blocksAction).toContain("category.is.null,category.neq.parsed_inline")
-    // createBlock honours the `category` field; the parser's session-less
-    // path is createBlockAsService in the core module (Phase 43 T-43-01) —
-    // there is no wire-level service-role override left in the action.
+  test('SCP-PARSE-07: the parser creates parsed_inline blocks through the plain core module (T-21-05-01)', () => {
+    // Phase 55 removed the content library (and its listing action); the
+    // parser's session-less path is createBlockAsService in the core module
+    // (Phase 43 T-43-01) — there is no wire-level service-role override.
     const core = read('src/lib/blocks/create-block-core.ts')
     expect(core).toContain('category: z.string().max(60).nullable().optional()')
-    expect(blocksAction).not.toContain('serviceRole')
+    expect(core).toContain('export async function createBlockAsService')
   })
 })

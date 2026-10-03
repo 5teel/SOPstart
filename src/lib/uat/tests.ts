@@ -112,7 +112,7 @@ export const UAT_TESTS: UatTest[] = [
     title: 'Do the main menu names make sense?',
     status: 'active',
     summary:
-      'The old "Activity" tab is now called "Sign-off", and admins now see the sign-off queue when they tap it instead of being bounced to the SOP admin area. The admin "Blocks" tab is now "Content" and opens the "Content Library" — the reusable warnings, PPE and steps you drop into SOPs.',
+      'The old "Activity" tab is now called "Sign-off", and admins now see the sign-off queue when they tap it instead of being bounced to the SOP admin area.',
     tryIt: [
       'Sign in and look at the two tabs at the top: SOPs and Sign-off.',
       'Tap Sign-off — you should see completed procedures waiting for review, not an editing screen.',
@@ -124,7 +124,7 @@ export const UAT_TESTS: UatTest[] = [
       { id: 'lost', text: 'In your first five taps, did you ever land somewhere you did not expect?' },
     ],
     background:
-      'Nav clarity pass (2026-07-30): "Activity" renamed to "Sign-off" in TopHeader + BottomTabBar; /activity no longer redirects admins to the old admin SOP page (they see the supervisor sign-off queue); /admin/blocks de-jargoned — nav tab "Content", page "Content Library" (was "Blocks"/"Library", clashing with the worker-side "SOP Library" tab).',
+      'Nav clarity pass (2026-07-30): "Activity" renamed to "Sign-off" in TopHeader + BottomTabBar; /activity no longer redirects admins to the old admin SOP page (they see the supervisor sign-off queue).',
   },
 
   // ===================== Design choices (pick A or B) =====================

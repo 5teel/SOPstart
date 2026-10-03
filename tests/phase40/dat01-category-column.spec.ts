@@ -79,15 +79,10 @@ function hasBareCategoryOnSopsSelect(src: string): boolean {
 }
 
 test.describe('DAT-01 -- one category column (sops.category_slug)', () => {
-  // Still test.fixme: `BuilderClient.tsx`'s `initialSop.category_tag` feeds
-  // `sopCategory` into `match-blocks.ts`/`BlockPicker.tsx` -- the BLOCK
-  // LIBRARY's Phase 13 category-tag taxonomy (`area-forming`,
-  // `area-machine-repair`, ...), a DIFFERENT vocabulary from the new
-  // SOP_CATEGORIES slugs this plan introduces. Renaming that read to
-  // `category_slug` would silently break block soft-filtering (wrong
-  // vocabulary), not fix a bug -- out of scope for every 40-0x plan's
-  // files_modified list (confirmed: not owned by 40-06/07/08/09 either).
-  // Left as a documented gap; see 40-05-SUMMARY.md Known Stubs.
+  // Still test.fixme: this was blocked by the content library's own category
+  // taxonomy reading `category_tag` (a DIFFERENT vocabulary from the
+  // SOP_CATEGORIES slugs). Phase 55 deleted that reader; the fixme is left as
+  // a documented gap (see 40-05-SUMMARY.md Known Stubs) for a later cleanup.
   test.fixme('zero occurrences of category_tag as a sops column read/write anywhere under src/ (excludes blocks.category_tags)', () => {
     const files: string[] = []
     walk(SRC_DIR, files)
@@ -163,7 +158,6 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
   { file: 'src/actions/governance.ts', keys: 'refresher_interval_months,updated_at', reason: 'Per-SOP refresher-interval override; category is set via a separate action, not this one.' },
   { file: 'src/actions/governance.ts', keys: 'last_reviewed_at,last_reviewed_by,review_due_at,updated_at', reason: 'Manual "confirm current" review-clock stamp; category_slug is read (not written) to resolve the cadence.' },
   { file: 'src/actions/grants.ts', keys: 'all_departments,all_departments_pre_override', reason: 'Grant-system all-departments override bookkeeping; not a category-bearing write.' },
-  { file: 'src/actions/sop-section-blocks.ts', keys: 'status', reason: 'Resets SOP status to draft after a block edit invalidates verification; not a category-bearing write.' },
   { file: 'src/actions/sops.ts', keys: 'organisation_id,source_file_name,source_file_path,source_file_type,status', reason: 'createUploadSession -- pre-parse shell insert; /api/sops/parse’s post-parse UPDATE sets category_slug once the document is classified.' },
   { file: 'src/actions/sops.ts', keys: 'source_file_path', reason: 'Finalises the uploaded file path after a presigned PUT/TUS upload; not a category-bearing write (2 call sites across the upload-session creators).' },
   { file: 'src/actions/sops.ts', keys: 'status', reason: 'Status-only transition; not a category-bearing write.' },
@@ -198,7 +192,9 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
 // shell insert and two file-path updates); no remaining path lost category_slug.
 // 2026-10-03: 41 -> 40. Phase 55-10 deleted the flow-graph action (its single flow_graph
 // update); no remaining path lost category_slug, and cloneSopAsDraft still carries it.
-const EXPECTED_SOPS_WRITE_SITE_COUNT = 40
+// 2026-10-03: 40 -> 39. Phase 55-11 deleted the block-update accept action (its single
+// status reset to draft); no remaining path lost category_slug.
+const EXPECTED_SOPS_WRITE_SITE_COUNT = 39
 
 // Extracts the substring between a `(` at `openIdx` and its matching `)`,
 // tracking paren depth so nested calls/objects don't truncate the payload.

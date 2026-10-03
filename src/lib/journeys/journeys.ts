@@ -256,10 +256,9 @@ export const JOURNEYS: Journey[] = [
     steps: [
       { id: 's', type: 'start', label: 'Signed in as admin / safety manager' },
       { id: 'home', type: 'screen', label: 'Admin home — SOP library table', route: '/sops', detail: 'roleHome(admin) lands here via the brand mark, on the SOP library table (SOP · Machine · Status · Owner · Checks · Review, chips for Where / Status / Owner / Checks, Edit opens the builder). The primary header adds Governance (/governance) · Create New SOP (/admin/sops/new) · Team · Site · Settings for admin roles; worker surfaces (SOPs · Sign-off) stay one tap away.' },
-      { id: 'menu', type: 'decision', label: 'Open another admin surface? (app header: Governance · Create New SOP · Content · Team · Site · Settings; the Access map is a button on the library table, /sops?view=access)', branches: [
+      { id: 'menu', type: 'decision', label: 'Open another admin surface? (app header: Governance · Create New SOP · Team · Site · Settings; the Access map is a button on the library table, /sops?view=access)', branches: [
         { label: 'SOPs', to: 'sops' },
         { label: 'Governance inbox', to: 'gov' },
-        { label: 'Content', to: 'blocks' },
         { label: 'Team', to: 'team' },
         { label: 'Site', to: 'site' },
         { label: 'Settings', to: 'settings' },
@@ -267,7 +266,6 @@ export const JOURNEYS: Journey[] = [
       ] },
       { id: 'gov', type: 'screen', label: 'Governance inbox', route: '/governance', detail: 'One-action rows — no owner, review overdue, awaiting approval, stuck converting, machines with no procedures — counted chips and an All clear empty state (Phase 54, D-01/D-02).' },
       { id: 'sops', type: 'screen', label: 'SOP library (table)', route: '/sops', detail: 'SOP · Machine · Status · Owner · Checks · Review, five check circles per row, Where / Status / Owner / Checks chips to narrow it, Edit opens the builder. The Access map button deep-links /sops?view=access — the D-hybrid wiring surface (D-09), a lens takeover on this same table.' },
-      { id: 'blocks', type: 'screen', label: 'Content Library', route: '/admin/blocks' },
       { id: 'team', type: 'screen', label: 'Team & org model', route: '/admin/team', detail: 'Org model surface (D-08) — Node Chart default, ▤ Columns toggle absorbs member management.' },
       { id: 'site', type: 'screen', label: 'Site map', route: '/admin/site', detail: 'The plant-floor scene and its machines (Phase 51) — draw/name/tag machines, link SOPs to them.' },
       { id: 'settings', type: 'screen', label: 'Settings hub', route: '/admin/settings', detail: 'Groups AI Settings, Departments, the AI agent layer, and the approval-chain editor under one home.' },
@@ -429,25 +427,6 @@ export const JOURNEYS: Journey[] = [
   },
 
   // ============================ Library & team ============================
-  {
-    id: 'reusable-blocks',
-    group: 'Library & team',
-    persona: 'SOP Admin',
-    title: 'Manage reusable content',
-    summary: 'Admins keep a library of reusable safety content; when an item changes, SOPs using it flag the update for review.',
-    steps: [
-      { id: 's', type: 'start', label: 'Standardise a hazard / PPE / step' },
-      { id: 'blocks', type: 'screen', label: 'Content Library', route: '/admin/blocks' },
-      { id: 'new', type: 'screen', label: 'New content', route: '/admin/blocks/new', detail: 'Name, kind, text, categories and tags; Create saves through createBlock() and opens the item in the editor (Phase 43, D-03).' },
-      { id: 'edit', type: 'screen', label: 'Edit content', route: '/admin/blocks/[blockId]' },
-      { id: 'update', type: 'action', label: 'Content updated', detail: 'SOPs using it show an “update available” badge.' },
-      { id: 'review', type: 'decision', label: 'Per SOP', branches: [
-        { label: 'Accept update', to: 'e' },
-        { label: 'Decline (keep snapshot)', to: 'e' },
-      ] },
-      { id: 'e', type: 'end', label: 'Library consistent' },
-    ],
-  },
   {
     id: 'manage-team',
     group: 'Library & team',

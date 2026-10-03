@@ -182,7 +182,6 @@ export const ACCESS_MATRIX: AccessRow[] = [
   { surface: 'My SOPs (read / walk)', route: '/sops',             access: { worker: true,  supervisor: true,  safety_manager: true, admin: true } },
   { surface: 'Activity (review sign-off)', route: '/activity',    access: { worker: 'own', supervisor: true,  safety_manager: true, admin: true } },
   { surface: 'Governance inbox', route: '/governance', access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
-  { surface: 'Content',              route: '/admin/blocks',      access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
   { surface: 'Team & roles',         route: '/admin/team',        access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
   { surface: 'Departments',          route: '/admin/departments', access: { worker: false, supervisor: false, safety_manager: true, admin: true } },
 ]

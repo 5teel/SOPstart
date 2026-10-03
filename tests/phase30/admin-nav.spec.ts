@@ -7,7 +7,7 @@
  *   - Governance deep-links /admin/sops?view=attention (decision #1; the
  *     folded needs-attention view itself lands in 30-08).
  *   - Every admin page mounts AdminNav; the 5 copy-pasted inline sub-navs
- *     (admin/sops, admin/governance, admin/blocks, admin/team,
+ *     (admin/sops, admin/governance, admin/team,
  *     admin/departments — three different styling idioms) are deleted.
  *   - /admin/settings route exists and groups: AI Settings, Departments,
  *     and the /admin/agent link (the previous orphan). The approval-chain
@@ -32,7 +32,7 @@ const TOP_HEADER = path.join(ROOT, 'src', 'components', 'layout', 'TopHeader.tsx
 // Phase 43 (D-01): the /admin/governance and /admin/sops page-level shims
 // are deleted; both legacy URLs are now static next.config.ts redirects
 // with no page of their own to read here.
-const ADMIN_PAGES = ['blocks', 'team', 'departments'].map(
+const ADMIN_PAGES = ['team', 'departments'].map(
   (dir) => path.join(ROOT, 'src', 'app', '(protected)', 'admin', dir, 'page.tsx'),
 )
 const ADMIN_ROWS = path.join(
@@ -50,7 +50,7 @@ test.describe('UX-02 — one shared admin nav', () => {
   test('AdminNav component is deleted; header carries the admin links', () => {
     expect(fs.existsSync(ADMIN_NAV)).toBe(false)
     const header = read(TOP_HEADER)
-    for (const item of ['Governance', 'Create New SOP', 'Content', 'Team', 'Settings']) {
+    for (const item of ['Governance', 'Create New SOP', 'Team', 'Settings']) {
       expect(header).toContain(item)
     }
     // SUR-03: "Manage SOPs" must never come back as a second SOPs nav entry
@@ -59,7 +59,6 @@ test.describe('UX-02 — one shared admin nav', () => {
     for (const href of [
       "'/governance'",
       "'/admin/sops/new'",
-      "'/admin/blocks'",
       "'/admin/team'",
       "'/admin/settings'",
     ]) {

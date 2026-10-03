@@ -23,8 +23,8 @@
  *     The parser pipeline owns the org-scope invariant (it passes the
  *     organisation of the SOP it is parsing).
  *
- * The user-facing entry point stays in src/actions/blocks.ts and ALWAYS
- * runs requireAdmin() before delegating here.
+ * The user-facing server action was removed with the content library in
+ * Phase 55; any future one must run requireAdmin() before delegating here.
  */
 
 import { z } from 'zod'
