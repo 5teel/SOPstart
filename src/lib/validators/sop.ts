@@ -76,34 +76,6 @@ export const uploadVideoFileSchema = z.object({
   ),
 })
 
-export const youtubeUrlSchema = z.string().refine(
-  (url) => {
-    try {
-      const u = new URL(url)
-      return (
-        u.hostname === 'www.youtube.com' ||
-        u.hostname === 'youtube.com' ||
-        u.hostname === 'youtu.be' ||
-        u.hostname === 'm.youtube.com'
-      )
-    } catch {
-      return false
-    }
-  },
-  "That doesn't look like a YouTube URL. Check the link and try again."
-)
-
-export function extractYouTubeId(url: string): string | null {
-  try {
-    const u = new URL(url)
-    if (u.hostname === 'youtu.be') return u.pathname.slice(1)
-    if (u.pathname.startsWith('/shorts/')) return u.pathname.split('/')[2]
-    return u.searchParams.get('v')
-  } catch {
-    return null
-  }
-}
-
 export const uploadSessionSchema = z.object({
   files: z.array(uploadFileSchema).min(1, 'Select at least one file').max(20, 'Maximum 20 files per batch'),
 })

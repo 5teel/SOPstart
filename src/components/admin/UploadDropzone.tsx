@@ -14,7 +14,6 @@ import {
   FileType2,
   Video,
   Smartphone,
-  Film,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { createUploadSession, createVideoUploadSession } from '@/actions/sops'
@@ -23,8 +22,6 @@ import { ACCEPT_ATTR, INTAKE_HINT, validateIntakeFile } from '@/lib/upload/file-
 import { startVideoSopUpload } from '@/lib/upload/start-video-sop-upload'
 import { TusUploadProgress } from './TusUploadProgress'
 import { VideoRecorder } from './VideoRecorder'
-import { VideoFormatSelectionModal } from './VideoFormatSelectionModal'
-import { PhotoScanner } from './PhotoScanner'
 
 type FileStatus = 'queued' | 'uploading' | 'uploaded' | 'error'
 
@@ -75,18 +72,11 @@ export function UploadDropzone() {
   const [success, setSuccess] = useState(false)
   const [uploadedSopIds, setUploadedSopIds] = useState<string[]>([])
   const [toast, setToast] = useState<string | null>(null)
-  const [scannerOpen, setScannerOpen] = useState(false)
-  const [mode, setMode] = useState<'upload' | 'youtube' | 'record'>('upload')
-  const [youtubeUrl, setYoutubeUrl] = useState('')
-  const [termsChecked, setTermsChecked] = useState(false)
-  const [youtubeError, setYoutubeError] = useState<string | null>(null)
-  const [youtubeFetching, setYoutubeFetching] = useState(false)
+  const [mode, setMode] = useState<'upload' | 'record'>('upload')
   const [recorderOpen, setRecorderOpen] = useState(false)
   const [mediaRecorderSupported, setMediaRecorderSupported] = useState<boolean | null>(null)
-  const [pipelineModalOpen, setPipelineModalOpen] = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const cameraInputRef = useRef<HTMLInputElement>(null)
   const videoInputRef = useRef<HTMLInputElement>(null)
 
   // ---------------------------------------------------------------------------
@@ -159,64 +149,6 @@ export function UploadDropzone() {
   const removeFile = useCallback((id: string) => {
     setQueue(prev => prev.filter(f => f.id !== id))
   }, [])
-
-  async function handleYoutubeSubmit() {
-    setYoutubeError(null)
-
-    if (!youtubeUrl.trim()) {
-      setYoutubeError('Please enter a YouTube URL')
-      return
-    }
-    if (!termsChecked) {
-      setYoutubeError('Please confirm rights before proceeding.')
-      return
-    }
-
-    // Client-side URL validation
-    try {
-      const u = new URL(youtubeUrl)
-      const validHosts = ['www.youtube.com', 'youtube.com', 'youtu.be', 'm.youtube.com']
-      if (!validHosts.includes(u.hostname)) {
-        setYoutubeError('Only YouTube URLs are supported. Upload the video file directly, or paste a YouTube link.')
-        return
-      }
-    } catch {
-      setYoutubeError("That doesn't look like a YouTube URL. Check the link and try again.")
-      return
-    }
-
-    setYoutubeFetching(true)
-    try {
-      const res = await fetch('/api/sops/youtube', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          url: youtubeUrl,
-          termsAccepted: termsChecked,
-        }),
-      })
-      const data = await res.json()
-
-      if (data.noCaption) {
-        setYoutubeError(data.message)
-        return
-      }
-
-      if (data.error) {
-        setYoutubeError(data.error)
-        return
-      }
-
-      if (data.sopId) {
-        // Navigate to builder (review folded into builder — Phase 21.5)
-        window.location.href = `/admin/sops/builder/${data.sopId}`
-      }
-    } catch {
-      setYoutubeError('Network error — please try again.')
-    } finally {
-      setYoutubeFetching(false)
-    }
-  }
 
   const handleUpload = useCallback(async () => {
     const pendingFiles = queue.filter(f => f.status === 'queued')
@@ -391,18 +323,6 @@ export function UploadDropzone() {
         </button>
         <button
           role="tab"
-          aria-selected={mode === 'youtube'}
-          onClick={() => setMode('youtube')}
-          className={`pb-3 text-sm font-semibold cursor-pointer ${
-            mode === 'youtube'
-              ? 'text-[var(--ink-900)] border-b-2 border-[var(--ink-900)] -mb-px'
-              : 'text-[var(--ink-500)]'
-          }`}
-        >
-          YouTube URL
-        </button>
-        <button
-          role="tab"
           aria-selected={mode === 'record'}
           onClick={() => setMode('record')}
           className={`pb-3 text-sm font-semibold cursor-pointer ${
@@ -415,41 +335,7 @@ export function UploadDropzone() {
         </button>
       </div>
 
-      {mode === 'youtube' ? (
-        /* YouTube URL tab panel */
-        <div role="tabpanel" className="flex flex-col gap-3 py-4">
-          <input
-            type="url"
-            placeholder="Paste YouTube URL..."
-            value={youtubeUrl}
-            onChange={(e) => { setYoutubeUrl(e.target.value); setYoutubeError(null) }}
-            className="w-full bg-white border border-[var(--ink-100)] rounded-lg px-4 h-13 text-sm text-[var(--ink-900)] placeholder:text-[var(--ink-500)] focus:border-[var(--ink-900)] focus:outline-none"
-          />
-          {youtubeError && (
-            <p role="alert" className="text-xs text-accent-escalate">{youtubeError}</p>
-          )}
-
-          <label className="flex items-start gap-3 text-sm text-[var(--ink-500)] py-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={termsChecked}
-              onChange={(e) => setTermsChecked(e.target.checked)}
-              className="w-5 h-5 accent-[var(--ink-900)] mt-0.5"
-              required
-              aria-required="true"
-            />
-            I confirm I have rights to use this content for SOP creation.
-          </label>
-
-          <button
-            onClick={handleYoutubeSubmit}
-            disabled={!youtubeUrl || !termsChecked || youtubeFetching}
-            className="h-tap-row w-full rounded-lg bg-[var(--ink-900)] text-white text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[var(--ink-700)] transition-colors"
-          >
-            {youtubeFetching ? 'Fetching captions...' : 'Transcribe from YouTube'}
-          </button>
-        </div>
-      ) : mode === 'record' ? (
+      {mode === 'record' ? (
         /* Record video tab panel */
         <div role="tabpanel" className="py-4">
           {mediaRecorderSupported === null ? (
@@ -538,25 +424,6 @@ export function UploadDropzone() {
                 Browse files
               </button>
 
-              {/* Take a photo button */}
-              <button
-                type="button"
-                onClick={() => cameraInputRef.current?.click()}
-                className="bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold px-6 h-tap-row rounded-lg hover:bg-[var(--ink-300)] active:bg-[var(--ink-500)] transition-colors"
-              >
-                Take a photo
-              </button>
-
-              {/* Scan document button */}
-              <button
-                type="button"
-                onClick={() => setScannerOpen(true)}
-                className="bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold px-6 h-tap-row rounded-lg hover:bg-[var(--ink-300)] active:bg-[var(--ink-500)] transition-colors flex items-center gap-2"
-              >
-                <ScanLine className="w-5 h-5" />
-                Scan document
-              </button>
-
               {/* Browse video button */}
               <button
                 type="button"
@@ -567,15 +434,6 @@ export function UploadDropzone() {
                 Browse video
               </button>
 
-              {/* Generate video SOP button (Phase 9 pipeline entry) */}
-              <button
-                type="button"
-                onClick={() => setPipelineModalOpen(true)}
-                className="bg-[var(--paper-2)] text-[var(--ink-900)] font-semibold px-6 h-tap-row rounded-lg hover:bg-[var(--ink-300)] active:bg-[var(--ink-500)] transition-colors flex items-center gap-2"
-              >
-                <Film size={20} />
-                Generate video SOP
-              </button>
             </div>
 
             {/* Hidden file inputs */}
@@ -585,14 +443,6 @@ export function UploadDropzone() {
               className="hidden"
               accept={ACCEPT_ATTR}
               multiple
-              onChange={handleFileInput}
-            />
-            <input
-              ref={cameraInputRef}
-              type="file"
-              className="hidden"
-              accept="image/*"
-              capture="environment"
               onChange={handleFileInput}
             />
             <input
@@ -703,19 +553,6 @@ export function UploadDropzone() {
               </div>
             </div>
           )}
-
-          {/* Scan document: mounted only while open so each scan starts clean;
-              scanned pages queue exactly like picked photos, one upload per page. */}
-          {scannerOpen && (
-            <PhotoScanner
-              open
-              onClose={() => setScannerOpen(false)}
-              onSubmit={(files) => {
-                setScannerOpen(false)
-                validateAndAddFiles(files)
-              }}
-            />
-          )}
         </>
       )}
 
@@ -737,12 +574,6 @@ export function UploadDropzone() {
           }}
         />
       )}
-
-      {/* Video SOP pipeline entry modal (Phase 9) */}
-      <VideoFormatSelectionModal
-        open={pipelineModalOpen}
-        onClose={() => setPipelineModalOpen(false)}
-      />
     </div>
   )
 }
