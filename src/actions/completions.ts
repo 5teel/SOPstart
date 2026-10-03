@@ -11,6 +11,7 @@ import {
   RecordSignatureSchema as recordSignatureSchema,
 } from '@/lib/validators/completions'
 import { isSignedOffAssessor } from '@/lib/competency/assessor'
+import { recordDecision } from '@/lib/decisions/record'
 
 // ---------------------------------------------------------------
 // submitCompletion
@@ -233,6 +234,19 @@ export async function signOffCompletion(
     return { success: false, error: 'Failed to record sign-off.' }
   }
 
+  await recordDecision({
+    kind: decision === 'approved' ? 'sign_off' : 'reject',
+    subject: { kind: 'completion', id: completionId },
+    sopId: completion.sop_id,
+    summary: decision === 'approved' ? 'Signed off a completion' : 'Rejected a completion',
+    details: {
+      worker_id: completion.worker_id,
+      reason: reason ?? null,
+      is_assessor_override: isOverride,
+      override_reason: isOverride ? parsed.data.overrideReason : null,
+    },
+  })
+
   // UPDATE sop_completions.status via admin client (bypasses RLS — only status field)
   const newStatus = decision === 'approved' ? 'signed_off' : 'rejected'
   const { error: updateError } = await admin
@@ -373,6 +387,14 @@ export async function recordSignature(
     console.error('recordSignature insert error:', insertError)
     return { success: false, error: 'Failed to record signature.' }
   }
+
+  await recordDecision({
+    kind: role === 'supervisor' ? 'countersign' : 'sign_off',
+    subject: { kind: 'completion', id: completionId },
+    sopId: null, // not in scope here; the completion id in subject resolves it
+    summary: role === 'supervisor' ? 'Counter-signed a completion' : 'Signed their completion',
+    details: { role },
+  })
 
   return { success: true }
 }

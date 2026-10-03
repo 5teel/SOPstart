@@ -32,9 +32,18 @@ import path from 'node:path'
 const ROOT = process.cwd()
 
 // Each wiring plan (56-05, 56-08) appends the file#function keys it hooks.
-const LIVE_WRITERS: string[] = []
-// 56-05 flips this once performPublish is hooked outside the gate body.
-const PUBLISH_GUARD_LIVE = false
+const LIVE_WRITERS: string[] = [
+  'src/actions/approvals.ts#approveStep',
+  'src/actions/approvals.ts#requestChanges',
+  'src/lib/governance/publish-core.ts#performPublish',
+  'src/actions/governance.ts#setSopOwner',
+  'src/actions/governance.ts#confirmSopCurrent',
+  'src/actions/governance.ts#setReviewCadence',
+  'src/actions/completions.ts#signOffCompletion',
+  'src/actions/completions.ts#recordSignature',
+]
+// performPublish is hooked outside the gate body (56-05).
+const PUBLISH_GUARD_LIVE = true
 
 interface Entry { file: string; function: string; key: string; kind: string; plan: number; status: 'hook' }
 interface ExtraHook { file: string; function: string; anchor: string; kind: string; plan: number }

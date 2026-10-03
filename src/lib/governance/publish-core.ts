@@ -4,6 +4,7 @@ import { triggerAgentSynthesis } from '@/lib/agent-layer/synthesis'
 import { resolveCadenceMonths, computeReviewDueDate } from '@/lib/governance/cadences'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { ensureSopCollectionsForOrg } from '@/lib/org-model/sop-collections'
+import { recordDecision } from '@/lib/decisions/record'
 
 // ------------------------------------------------------------
 // Phase 29 D29-03/Pattern 4 — performPublish() is the SINGLE relocated
@@ -171,6 +172,17 @@ export async function performPublish(
   if (!publishedRows || publishedRows.length === 0) {
     return { success: false, error: 'SOP is not a draft', status: 409 }
   }
+
+  // Phase 56 DEC-01: one ledger row per publish. Here (not in the route or in
+  // approveStep) so the no-chain route and the final approval step both log it.
+  // Fail-soft and outside assertPublishGates, whose body is hash-pinned.
+  await recordDecision({
+    kind: 'publish',
+    subject: { kind: 'sop', id: sopId },
+    sopId,
+    summary: approvalState ? 'Published the SOP after its approval chain' : 'Published the SOP',
+    details: { approval_state: approvalState ?? null, replaces_sop_id: sopRow?.parent_sop_id ?? null },
+  })
 
   // Step 3b: Phase 28 D28-04 — review-clock reset on publish. Non-fatal: the
   //     publish above already succeeded and is never rolled back for this.

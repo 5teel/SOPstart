@@ -45,6 +45,7 @@ import { requireAdmin } from '@/actions/governance'
 import { getOrgMembers } from '@/actions/assignments'
 import { resolveNextStepIndex, stepMatchesCaller, type ChainStep } from '@/lib/governance/approvals'
 import { performPublish } from '@/lib/governance/publish-core'
+import { recordDecision } from '@/lib/decisions/record'
 import { approvalChainSchema } from '@/lib/validators/approvals'
 
 export interface ApprovalRow {
@@ -197,6 +198,17 @@ export async function approveStep(
   // as an idempotent no-op, not an error.
   if (insertErr && insertErr.code !== '23505') return { error: insertErr.message }
 
+  // Ledger row only for a fresh approval -- a 23505 duplicate click wrote nothing.
+  if (!insertErr) {
+    await recordDecision({
+      kind: 'approve',
+      subject: { kind: 'sop', id: sopId },
+      sopId,
+      summary: `Approved step ${nextIndex + 1} of the approval chain`,
+      details: { version: sop.version, step_index: nextIndex, comment: comment ?? null },
+    })
+  }
+
   if (nextIndex === steps.length - 1) {
     // Final step — auto-complete the publish via the SAME function the
     // no-chain route path calls (APR-04). Not a duplicated inline status flip.
@@ -261,6 +273,14 @@ export async function requestChanges(
     comment,
   })
   if (insertErr) return { error: insertErr.message }
+
+  await recordDecision({
+    kind: 'reject',
+    subject: { kind: 'sop', id: sopId },
+    sopId,
+    summary: 'Sent back for changes',
+    details: { version: sop.version, step_index: nextIndex, comment },
+  })
 
   // approval_snapshot is INTENTIONALLY left in place (Pattern 2/A3) so version
   // history can still resolve step labels after this reject cycle.

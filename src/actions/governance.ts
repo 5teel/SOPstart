@@ -43,6 +43,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getSessionContext } from '@/lib/auth/session-context'
+import { recordDecision } from '@/lib/decisions/record'
 import { resolveCadenceMonths, computeReviewDueDate } from '@/lib/governance/cadences'
 import { classifyGovernanceRow, type GovernanceFlag } from '@/lib/governance/classify'
 import { resolveNextStepIndex, stepMatchesCaller, type ChainStep } from '@/lib/governance/approvals'
@@ -157,6 +158,14 @@ export async function setSopOwner(
   if (!updated || updated.length === 0) {
     return { error: 'SOP not found' }
   }
+
+  await recordDecision({
+    kind: 'owner_change',
+    subject: { kind: 'sop', id: sopId },
+    sopId,
+    summary: userId === null ? 'Cleared the SOP owner' : 'Changed the SOP owner',
+    details: { owner_user_id: userId },
+  })
   return { success: true }
 }
 
@@ -264,6 +273,14 @@ export async function confirmSopCurrent(
     return { error: eventErr.message }
   }
 
+  await recordDecision({
+    kind: 'review',
+    subject: { kind: 'sop', id: sopId },
+    sopId,
+    summary: 'Confirmed the SOP is current',
+    details: { action: 'confirmed_current', review_due_at: reviewDue },
+  })
+
   return { success: true }
 }
 
@@ -307,6 +324,14 @@ export async function setReviewCadence(
     console.error('[setReviewCadence] upsert error', error)
     return { error: error.message }
   }
+
+  await recordDecision({
+    kind: 'cadence_change',
+    subject: { kind: 'category', id: null },
+    sopId: null,
+    summary: `Set the review cadence for ${categoryLabel(category)} to ${months} months`,
+    details: { category, months },
+  })
   return { success: true }
 }
 
