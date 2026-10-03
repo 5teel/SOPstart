@@ -11,14 +11,11 @@ import {
   STAGE_SETS,
   STAGE_TO_PLAIN,
   plainLabel,
-  derivePipelineStage,
   shouldStartPolling,
-  type Snapshot,
 } from '@/lib/admin/job-stages'
 
-// D-08: one realtime+polling engine for both the document/AI parse flow and
-// the video-generation pipeline (ported wholesale from PipelineProgressClient
-// -- the three-timer model is strictly more robust than a flat 5s-delay poll).
+// D-08: realtime + polling engine for the document/AI/video-to-SOP parse flow
+// (three-timer model: realtime grace, stale watchdog, 5s poll).
 const POLL_INTERVAL_MS = 5000
 const REALTIME_GRACE_MS = 5000
 const REALTIME_STALE_MS = 15000
@@ -32,41 +29,22 @@ interface ParseJobStatusBaseProps {
   onCompleted?: () => void
 }
 
-interface ParseJobStatusParseProps extends ParseJobStatusBaseProps {
+interface ParseJobStatusProps extends ParseJobStatusBaseProps {
   sopId: string
-  pipelineId?: undefined
   initialStatus?: ParseJobStatusType | null
   initialErrorMessage?: string | null
   initialStage?: string | null // current_stage from parse_jobs
   initialIsVideo?: boolean // whether this is a video SOP
-  initialSnapshot?: undefined
-  onSnapshot?: undefined
 }
-
-interface ParseJobStatusPipelineProps extends ParseJobStatusBaseProps {
-  sopId?: undefined
-  pipelineId: string
-  initialSnapshot?: Snapshot
-  onSnapshot?: (s: Snapshot) => void
-  initialStatus?: undefined
-  initialErrorMessage?: undefined
-  initialStage?: undefined
-  initialIsVideo?: undefined
-}
-
-type ParseJobStatusProps = ParseJobStatusParseProps | ParseJobStatusPipelineProps
 
 export default function ParseJobStatus(props: ParseJobStatusProps) {
   const {
     sopId,
-    pipelineId,
     initialStatus,
     initialErrorMessage,
     isOcr = false,
     initialStage,
     initialIsVideo,
-    initialSnapshot,
-    onSnapshot,
     onRetry,
     onDelete,
     onCompleted,
@@ -86,7 +64,6 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
   const [detailLevel, setDetailLevel] = useState(3)
   const [startTime] = useState<number>(Date.now())
   const [elapsed, setElapsed] = useState(0)
-  const [snapshot, setSnapshot] = useState<Snapshot | null>(initialSnapshot ?? null)
   // Loading state for "Review now →" click — router.refresh() runs in a
   // transition so we can show a spinner while the slow RSC fetch lands.
   const [reviewLoading, startReviewTransition] = useTransition()
@@ -117,13 +94,7 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
 
     function startPolling() {
       if (cancelled || pollingRef.current) return
-      pollingRef.current = setInterval(() => {
-        if (pipelineId) {
-          fetchPipelineSnapshot()
-        } else {
-          fetchParseJob()
-        }
-      }, POLL_INTERVAL_MS)
+      pollingRef.current = setInterval(fetchParseJob, POLL_INTERVAL_MS)
     }
 
     async function fetchParseJob() {
@@ -149,79 +120,32 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
       }
     }
 
-    async function fetchPipelineSnapshot() {
-      try {
-        const res = await fetch(`/api/sops/pipeline/${pipelineId}/snapshot`)
-        if (cancelled || !res.ok) return
-        const next = (await res.json()) as Snapshot
-        if (cancelled) return
-        setSnapshot(next)
-        onSnapshot?.(next)
-        lastUpdateRef.current = Date.now()
-      } catch {
-        // swallow network errors — polling will retry
-      }
-    }
-
-    let channel: ReturnType<typeof supabase.channel>
-
-    if (pipelineId) {
-      channel = supabase
-        .channel(`pipeline-${pipelineId}`)
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'sop_pipeline_runs', filter: `id=eq.${pipelineId}` },
-          () => { lastUpdateRef.current = Date.now(); fetchPipelineSnapshot() }
-        )
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'parse_jobs', filter: `pipeline_run_id=eq.${pipelineId}` },
-          () => { lastUpdateRef.current = Date.now(); fetchPipelineSnapshot() }
-        )
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'sops', filter: `pipeline_run_id=eq.${pipelineId}` },
-          () => { lastUpdateRef.current = Date.now(); fetchPipelineSnapshot() }
-        )
-        .on(
-          'postgres_changes',
-          { event: '*', schema: 'public', table: 'video_generation_jobs', filter: `pipeline_run_id=eq.${pipelineId}` },
-          () => { lastUpdateRef.current = Date.now(); fetchPipelineSnapshot() }
-        )
-        .subscribe((subStatus) => {
-          if (subStatus === 'CHANNEL_ERROR' || subStatus === 'TIMED_OUT' || subStatus === 'CLOSED') {
-            startPolling()
-          }
-        })
-      fetchPipelineSnapshot()
-    } else {
-      channel = supabase
-        .channel(`parse-job-${sopId}`)
-        .on(
-          'postgres_changes',
-          { event: 'UPDATE', schema: 'public', table: 'parse_jobs', filter: `sop_id=eq.${sopId}` },
-          (payload) => {
-            if (cancelled) return
-            lastUpdateRef.current = Date.now()
-            if (pollingRef.current) { clearInterval(pollingRef.current); pollingRef.current = null }
-            setStatus(payload.new.status as ParseJobStatusType)
-            if (payload.new.error_message) setErrorMessage(payload.new.error_message)
-            if (payload.new.current_stage) {
-              setCurrentStage(payload.new.current_stage as string)
-            }
-            if (payload.new.file_type === 'video') setIsVideoSop(true)
-            if (payload.new.input_type !== undefined) setInputType((payload.new.input_type as string | null) ?? null)
-            if (payload.new.status === 'completed' && onCompleted) onCompleted()
-          }
-        )
-        .subscribe((subStatus) => {
+    const channel = supabase
+      .channel(`parse-job-${sopId}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'parse_jobs', filter: `sop_id=eq.${sopId}` },
+        (payload) => {
+          if (cancelled) return
           lastUpdateRef.current = Date.now()
-          if (subStatus === 'CHANNEL_ERROR' || subStatus === 'TIMED_OUT' || subStatus === 'CLOSED') {
-            startPolling()
+          if (pollingRef.current) { clearInterval(pollingRef.current); pollingRef.current = null }
+          setStatus(payload.new.status as ParseJobStatusType)
+          if (payload.new.error_message) setErrorMessage(payload.new.error_message)
+          if (payload.new.current_stage) {
+            setCurrentStage(payload.new.current_stage as string)
           }
-        })
-      fetchParseJob()
-    }
+          if (payload.new.file_type === 'video') setIsVideoSop(true)
+          if (payload.new.input_type !== undefined) setInputType((payload.new.input_type as string | null) ?? null)
+          if (payload.new.status === 'completed' && onCompleted) onCompleted()
+        }
+      )
+      .subscribe((subStatus) => {
+        lastUpdateRef.current = Date.now()
+        if (subStatus === 'CHANNEL_ERROR' || subStatus === 'TIMED_OUT' || subStatus === 'CLOSED') {
+          startPolling()
+        }
+      })
+    fetchParseJob()
 
     // Polling grace period: if no realtime event fires within REALTIME_GRACE_MS, start polling.
     const startPollingTimeout = setTimeout(() => {
@@ -249,7 +173,7 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
       supabase.removeChannel(channel)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sopId, pipelineId])
+  }, [sopId])
 
   const handleReparse = async () => {
     setReParsing(true)
@@ -342,15 +266,12 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
     </div>
   )
 
-  // Generalised stage stepper (D-07/D-08): renders the plain-language labels
-  // for whichever active set applies — pipeline mode derives its current key
-  // from the snapshot, parse mode translates parse_jobs.current_stage.
+  // Stage stepper (D-07/D-08): plain-language labels for the active set,
+  // translating parse_jobs.current_stage.
   const StageStepper = () => {
-    const activeSetKey = pipelineId ? 'video_generation' : (inputType ?? (isVideoSop ? 'video_file' : 'upload'))
+    const activeSetKey = inputType ?? (isVideoSop ? 'video_file' : 'upload')
     const activeStageSet = STAGE_SETS[activeSetKey] ?? null
-    const currentPlainKey = pipelineId
-      ? (snapshot ? (derivePipelineStage(snapshot).errorAt ?? derivePipelineStage(snapshot).plainKey) : null)
-      : (currentStage ? STAGE_TO_PLAIN[currentStage] ?? null : null)
+    const currentPlainKey = currentStage ? STAGE_TO_PLAIN[currentStage] ?? null : null
 
     if (!activeStageSet || !currentPlainKey) {
       return null
@@ -389,13 +310,6 @@ export default function ParseJobStatus(props: ParseJobStatusProps) {
         })}
       </div>
     )
-  }
-
-  // Pipeline mode: this component is the realtime+polling engine and the
-  // stage stepper; the outcome CTAs (review link, ready link, error panels)
-  // are rendered by PipelineProgressClient off derivePipelineStage(snapshot).
-  if (pipelineId) {
-    return <StageStepper />
   }
 
   if (status === 'completed') {

@@ -82,35 +82,6 @@ export const uploadSessionSchema = z.object({
 
 export type UploadFileInput = z.infer<typeof uploadFileSchema>
 
-// Pipeline session validators (D-06)
-export const pipelineVideoFormatSchema = z.enum(['narrated_slideshow', 'screen_recording'])
-
-export const createVideoSopPipelineSessionSchema = z.object({
-  file: z.object({
-    name: z.string().min(1).max(255),
-    size: z.number().int().positive(),
-    type: z.string().min(1),
-  }),
-  format: pipelineVideoFormatSchema,
-})
-
-// Video generation validators
-export const generateVideoSchema = z.object({
-  sopId: z.string().uuid(),
-  format: z.enum(['narrated_slideshow', 'screen_recording']),
-})
-
-export const recordVideoViewSchema = z.object({
-  sopId: z.string().uuid(),
-  sopVersion: z.number().int().positive(),
-  videoJobId: z.string().uuid(),
-})
-
-export const updateVersionLabelSchema = z.object({
-  jobId: z.string().uuid(),
-  label: z.string().max(60).trim().nullable(),
-})
-
 /**
  * Phase 14: AI-prompt entry validator.
  * - D-06: min(20) blocks wasted-call prompts ("make me an SOP")

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { ArrowLeft, Users, History, Video } from 'lucide-react'
+import { ArrowLeft, Users, History } from 'lucide-react'
 import Link from 'next/link'
 import { AssignmentRow } from '@/components/admin/AssignmentRow'
 import { SubTradePicker } from '@/components/admin/SubTradePicker'
@@ -227,13 +227,6 @@ export default function AssignSopPage() {
             title="Version history"
           >
             <History size={16} />
-          </Link>
-          <Link
-            href={`/admin/sops/${sopId}/video`}
-            className="w-8 h-8 rounded-lg bg-white border border-[var(--ink-100)] hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors flex items-center justify-center"
-            title="Video versions"
-          >
-            <Video size={16} />
           </Link>
         </div>
 

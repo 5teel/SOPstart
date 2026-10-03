@@ -37,12 +37,6 @@ const ANTHROPIC_LLM_OPTIONS: readonly AiModelOption[] = [
   { id: 'claude-opus-4-8', label: 'Claude Opus 4.8', note: 'highest quality · $$$' },
 ]
 
-const OPENAI_TTS_OPTIONS: readonly AiModelOption[] = [
-  { id: 'gpt-4o-mini-tts', label: 'GPT-4o mini TTS', note: 'fast · cheap' },
-  { id: 'tts-1', label: 'TTS-1', note: 'low latency' },
-  { id: 'tts-1-hd', label: 'TTS-1 HD', note: 'highest audio quality' },
-]
-
 const DEEPGRAM_STT_OPTIONS: readonly AiModelOption[] = [
   { id: 'nova-2', label: 'Deepgram Nova 2', note: 'proven · cheaper' },
   { id: 'nova-3', label: 'Deepgram Nova 3', note: 'best accuracy · keyterms' },
@@ -63,7 +57,6 @@ export const AI_MODEL_OPTIONS: Record<AiModelKey, readonly AiModelOption[]> = {
     { id: 'voyage-3', label: 'Voyage 3', note: 'previous generation' },
   ],
   'stt-batch': DEEPGRAM_STT_OPTIONS,
-  'tts-video': OPENAI_TTS_OPTIONS,
   'ocr-fallback': [{ id: 'eng', label: 'Tesseract (English)', note: 'runs locally · free' }],
 }
 
@@ -77,7 +70,6 @@ export const AI_MODEL_LABELS: Record<AiModelKey, string> = {
   'vision-image-describe': 'Image description model',
   embed: 'Embedding model',
   'stt-batch': 'Transcription model',
-  'tts-video': 'Video narration model',
   'ocr-fallback': 'OCR engine',
 }
 

@@ -36,13 +36,10 @@ export async function updateSession(request: NextRequest) {
   // Cron-invoked route: no session cookies by design. The handler enforces its
   // own CRON_SECRET bearer auth (timing-safe, fails closed 401).
   const isCronRoute = path === '/api/agent-layer/synthesis-sweep'
-  // Shotstack completion webhook: no session cookies by design. The handler
-  // enforces its own SHOTSTACK_CALLBACK_SECRET query-param auth (fails 401).
-  const isShotstackCallback = path === '/api/sops/generate-video/callback'
   // Build identity for the deployed-site eval runner (scripts/run-evals.mjs):
   // returns only the git SHA Railway injected at build time. No tenant data.
   const isVersionRoute = path === '/api/version'
-  const isPublicRoute = path === '/' || isAuthRoute || isSchemaIntrospection || isCronRoute || isShotstackCallback || isVersionRoute
+  const isPublicRoute = path === '/' || isAuthRoute || isSchemaIntrospection || isCronRoute || isVersionRoute
 
   if (!isPublicRoute && !claims) {
     // Phase 53 PHN-02: preserve the requested path (e.g. a scanned /m/<code>

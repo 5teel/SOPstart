@@ -5,7 +5,7 @@ import { performPublish, assertPublishGates } from '@/lib/governance/publish-cor
 // POST /api/sops/[sopId]/publish — transition draft -> published
 //
 // Phase 29 Plan 01 — steps 2 through 5 (unapproved-sections gate,
-// verify-checklist gate, status flip, review-clock reset, video auto-queue,
+// verify-checklist gate, status flip, review-clock reset,
 // agent synthesis) were relocated VERBATIM into performPublish()
 // (src/lib/governance/publish-core.ts).
 //
@@ -27,7 +27,7 @@ export async function POST(
 ) {
   const { sopId } = await params
 
-  // 1. Resolve user + org for downstream auto-queue call
+  // 1. Resolve user + org
   const { supabase, userId, organisationId } = await getSessionContext()
   if (!userId) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
@@ -96,8 +96,5 @@ export async function POST(
     return NextResponse.json(body, { status: result.status })
   }
 
-  return NextResponse.json({
-    success: true,
-    pipelineAutoQueued: result.pipelineAutoQueued,
-  })
+  return NextResponse.json({ success: true })
 }

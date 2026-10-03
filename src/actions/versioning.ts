@@ -34,7 +34,7 @@ export async function uploadNewVersion(
 
   // Reject macro-enabled Office files before any row is created (T-40-07-01 —
   // this guard was previously absent from uploadNewVersion, mirroring
-  // createUploadSession / createVideoSopPipelineSession).
+  // createUploadSession).
   if (isBlockedMacroFile(file.name)) {
     return { success: false, error: `${file.name} is not supported — macro-enabled Office files are blocked for security. Save as .xlsx or .pptx and try again.` }
   }
@@ -61,7 +61,7 @@ export async function uploadNewVersion(
   const newVersion: number = oldSop.version + 1
 
   // Determine file type (T-40-07-03 — throws on unknown rather than silently
-  // defaulting to 'docx', matching createVideoSopPipelineSession's precedent).
+  // defaulting to 'docx', matching createUploadSession's precedent).
   let fileType: ReturnType<typeof getSourceFileType>
   try {
     fileType = getSourceFileType(file.type)

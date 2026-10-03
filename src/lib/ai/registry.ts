@@ -140,15 +140,6 @@ export const AI_MODELS = {
     description: 'Batch video/audio transcription (parsers/transcribe-audio.ts)',
   },
 
-  // ---- TTS (OpenAI) ------------------------------------------------------
-  'tts-video': {
-    capability: 'tts',
-    provider: 'openai',
-    defaultId: 'gpt-4o-mini-tts',
-    envVar: 'VIDEO_TTS_MODEL',
-    description: 'Generated training-video narration (video-gen/tts.ts)',
-  },
-
   // ---- OCR (local) -------------------------------------------------------
   'ocr-fallback': {
     capability: 'ocr',

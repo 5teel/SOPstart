@@ -15,7 +15,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Users, Video } from 'lucide-react'
+import { Users } from 'lucide-react'
 import { AdminPageShell } from '@/components/admin/AdminPageShell'
 import {
   getVersionHistory,
@@ -349,13 +349,6 @@ export default function SopVersionHistoryPage() {
           title="Assign SOP"
         >
           <Users size={16} />
-        </Link>
-        <Link
-          href={`/admin/sops/${sopId}/video`}
-          className="w-8 h-8 rounded-lg bg-white border border-[var(--ink-100)] hover:bg-[var(--paper-2)] hover:border-[var(--ink-300)] text-[var(--ink-500)] hover:text-[var(--ink-900)] transition-colors flex items-center justify-center flex-shrink-0"
-          title="Video versions"
-        >
-          <Video size={16} />
         </Link>
       </div>
 

@@ -72,7 +72,7 @@ function deriveSourcePaneKind(rawType: string | null | undefined): SourcePaneKin
 // ---------------------------------------------------------------------------
 // ONE self-describing tools menu — Phase 33 (33-04, SC-6 winner decision #2)
 //
-// Absorbs the old per-SOP actions menu (Assign / Versions / Video /
+// Absorbs the old per-SOP actions menu (Assign / Versions /
 // Delete-draft — Phase 30 30-07 UX-06) PLUS BuilderFlowButton +
 // BuilderFlowEditButton, which render as menu rows below. Every item is a
 // plain-language verb phrase about THIS SOP with a one-line hint — labels
@@ -94,7 +94,6 @@ function ToolsMenu({
   const items: { label: string; hint: string; href: string }[] = [
     { label: 'Assign this SOP to workers', hint: 'choose who must do it and by when', href: `/admin/sops/${sopId}/assign` },
     { label: 'See earlier versions', hint: 'what changed, and when', href: `/admin/sops/${sopId}/versions` },
-    { label: 'Make a training video', hint: 'turn these steps into a narrated video', href: `/admin/sops/${sopId}/video` },
   ]
 
   return (

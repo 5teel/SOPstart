@@ -100,9 +100,6 @@ Module._load = function (request: string, parent: unknown, isMain: boolean) {
       }),
     }
   }
-  if (request.includes('video-gen/auto-queue')) {
-    return { enqueueVideoGenerationForPipeline: async () => ({}) }
-  }
   return origLoad.apply(this, [request, parent, isMain])
 }
 

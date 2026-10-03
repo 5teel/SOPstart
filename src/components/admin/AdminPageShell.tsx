@@ -6,7 +6,7 @@ import Link from 'next/link'
  *
  * Consolidates the hand-rolled header + "Back to library" link duplicated
  * across /admin/sops/upload, /admin/sops/new/blank, /admin/sops/new/ai,
- * /admin/sops/[sopId]/versions and the pipeline progress page. The optional
+ * /admin/sops/[sopId]/versions. The optional
  * `backLink` slot preserves the per-SOP contextual link those last two pages
  * need (RESEARCH Pitfall 5). Admin section nav lives in the app header
  * (sketch 004 variant A) — this shell renders no nav of its own.
@@ -16,8 +16,7 @@ import Link from 'next/link'
  * mistaken for that boundary.
  *
  * No 'use client'/'use server' directive — composes into both server pages
- * (upload, new/blank, new/ai) and client pages (versions,
- * PipelineProgressClient) without forcing either.
+ * (upload, new/blank, new/ai) and client pages (versions) without forcing either.
  */
 
 export interface AdminPageShellBackLink {

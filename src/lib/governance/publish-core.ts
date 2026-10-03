@@ -1,6 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database.types'
-import { enqueueVideoGenerationForPipeline } from '@/lib/video-gen/auto-queue'
 import { triggerAgentSynthesis } from '@/lib/agent-layer/synthesis'
 import { resolveCadenceMonths, computeReviewDueDate } from '@/lib/governance/cadences'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -31,7 +30,7 @@ export type PublishGateResult =
   | { ok: false; error: string; status: number; count?: number }
 
 export type PerformPublishResult =
-  | { success: true; pipelineAutoQueued: boolean }
+  | { success: true }
   | { success: false; error: string; status: number; count?: number }
 
 /**
@@ -232,26 +231,10 @@ export async function performPublish(
     console.error(`[performPublish] ensureSopCollections threw for SOP ${sopId}:`, err)
   }
 
-  // Step 4: Auto-queue video generation if this SOP arrived via the pipeline
-  //     flow (PATH-03). Never blocks/rolls back the publish — failures
-  //     are logged and surfaced on the progress page.
-  const queueResult = await enqueueVideoGenerationForPipeline({
-    sopId,
-    organisationId,
-    createdBy: userId,
-  })
-
-  if (queueResult.error) {
-    console.error(`[performPublish] auto-queue failed for SOP ${sopId}:`, queueResult.error)
-  }
-
-  // Step 5: Phase 26.5 D-04 — fire-and-forget agent-metadata regeneration.
+  // Step 4: Phase 26.5 D-04 — fire-and-forget agent-metadata regeneration.
   //     Never awaited, never affects the response — a failed synthesis
-  //     never fails the publish (mirrors step 4's video auto-queue shape).
+  //     never fails the publish.
   triggerAgentSynthesis(sopId, organisationId)
 
-  return {
-    success: true,
-    pipelineAutoQueued: 'enqueued' in queueResult,
-  }
+  return { success: true }
 }
