@@ -6,18 +6,20 @@
  * `node scripts/eval-fixtures.mjs` (adds the "Eval walk fixture SOP" to the
  * isolated eval-site org -- never the real SOPstart org).
  *
- * Skeleton from 55-01: the walk tests are authored in 55-03, the rest in
- * 55-14. Every test self-skips without EVAL_BASE_URL so `npm run test`
- * never touches production. Dead addresses are asserted by RENDERED not-found
- * content, never response.status() (custom not-found serves 200).
+ * Every test self-skips without EVAL_BASE_URL so `npm run test` never touches
+ * production. Dead addresses are asserted by RENDERED not-found content, never
+ * the HTTP status code (the custom not-found serves 200). The real SOPstart org
+ * is only ever READ.
  */
 import { test, expect } from '@playwright/test'
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { EVAL_ENV_READY, EVAL_SITE_ORG_NAME, EVAL_WALK_SOP_TITLE, signInAs } from './lib/session'
-import { ensurePlantFixture, shot, watchConsole } from './lib/plant-fixture'
+import { ensurePlantFixture, REAL_SOPSTART_ORG_ID, shot, watchConsole } from './lib/plant-fixture'
 import { deleteEvalCompletions } from './lib/completion-cleanup'
 
 const SLOW = { timeout: 30_000 }
+const OTG = '/sops/125cf9f1-547e-4cc6-8baf-813d9236a691'
+const NOT_FOUND = 'This page has moved or no longer exists.'
 
 // 1x1 PNG: compressPhoto redraws it to a JPEG, so this exercises the real compress -> signed PUT path.
 const TINY_PNG = Buffer.from(
@@ -56,10 +58,38 @@ test.describe('Phase 55 — cut features (deployed)', () => {
     await deleteEvalCompletions(db, walkSopId)
   })
 
-  // 55-14
-  test.fixme('worker at 1440 sees pins and the next-SOP card — no install prompt, no offline banner, no microphone, no service worker', async () => {})
+  test('worker at 1440 sees pins and the next-SOP card — no install prompt, no offline banner, no microphone, no service worker', async ({
+    page,
+    context,
+    request,
+  }) => {
+    test.setTimeout(180_000)
+    await page.setViewportSize({ width: 1440, height: 900 })
+    const errors = watchConsole(page)
+    await signInAs(context, 'siteWorker')
+    await page.goto('/sops')
 
-  // 55-03
+    await expect(page.getByTestId('plant-stage')).toBeVisible(SLOW)
+    const press = page.locator('[data-testid="plant-machine"][data-machine-name="EVAL Press"]')
+    await expect(press).toHaveAttribute('data-pin', /^[1-9]\d*$/, { timeout: 45_000 })
+    await expect(page.getByTestId('plant-now-card')).toBeVisible(SLOW)
+    await expect(page.getByTestId('plant-ask-mic')).toHaveCount(0)
+    await expect(page.getByText(/Install SOPstart|Add to Home Screen|No internet/i)).toHaveCount(0)
+    await shot(page, 'cut-worker-plant')
+
+    const registrations = await page.evaluate(() =>
+      navigator.serviceWorker ? navigator.serviceWorker.getRegistrations().then((r) => r.length) : 0
+    )
+    expect(registrations).toBe(0)
+
+    // Signed out: /sw.js must be the self-unregistering kill-switch, not the login page.
+    const res = await request.get(`${process.env.EVAL_BASE_URL}/sw.js`)
+    const body = await res.text()
+    expect(body).toContain('unregister()')
+    expect(body).not.toContain('<html')
+    expect(errors, errors.join('\n')).toEqual([])
+  })
+
   test.describe.serial('walk with a photo, then it waits for sign-off', () => {
     test('worker on a phone walks the walk fixture, takes the photo it asks for and submits — nothing queued', async ({
       page,
@@ -130,12 +160,128 @@ test.describe('Phase 55 — cut features (deployed)', () => {
     })
   })
 
-  // 55-14
-  test.fixme('existing SOPs, completions and photos still open', async () => {})
+  test('existing SOPs, completions and photos still open', async ({ page, context }) => {
+    test.setTimeout(180_000)
+    await page.setViewportSize({ width: 1440, height: 900 })
+    const errors = watchConsole(page)
+    await signInAs(context, 'admin')
+    await page.goto(OTG)
+    await expect(page.locator('main').getByRole('heading', { level: 1, name: /OTG Probe Maintenance/ })).toBeVisible(SLOW)
+    await shot(page, 'cut-existing-sop')
 
-  // 55-14
-  test.fixme('admin sees none of the dropped authoring tools; dead addresses show the not-found page', async () => {})
+    // Read-only: newest real-org completion that has a photo.
+    const { data: photos } = await db.from('completion_photos').select('completion_id').limit(500)
+    const ids = [...new Set((photos ?? []).map((p) => p.completion_id as string))]
+    const { data: rows } = ids.length
+      ? await db
+          .from('sop_completions')
+          .select('id')
+          .eq('organisation_id', REAL_SOPSTART_ORG_ID)
+          .in('id', ids)
+          .order('submitted_at', { ascending: false })
+          .limit(1)
+      : { data: [] as { id: string }[] }
+    test.skip(!rows?.length, 'no real-org completion with a photo exists')
+    await page.goto(`/activity/${rows![0].id}`)
+    const img = page.locator('img[alt^="Step"]').first()
+    await expect(img).toBeVisible(SLOW)
+    await expect.poll(async () => img.evaluate((el: HTMLImageElement) => el.naturalWidth), SLOW).toBeGreaterThan(0)
+    await shot(page, 'cut-existing-completion')
+    expect(errors, errors.join('\n')).toEqual([])
+  })
 
-  // 55-14
-  test.fixme('sign-up says ask your admin; login has no register link; profile has no organisation switch', async () => {})
+  test('admin sees none of the dropped authoring tools; dead addresses show the not-found page', async ({
+    page,
+    context,
+  }) => {
+    test.setTimeout(240_000)
+    await page.setViewportSize({ width: 1440, height: 900 })
+    const errors = watchConsole(page)
+    await signInAs(context, 'siteAdmin')
+
+    // Builder tools menu
+    await page.goto(`/admin/sops/builder/${walkSopId}`)
+    const trigger = page.getByTestId('tools-menu-trigger')
+    await expect(trigger).toHaveCount(1, { timeout: 30_000 })
+    await trigger.click()
+    const menu = page.getByTestId('tools-menu')
+    await expect(menu).toBeVisible(SLOW)
+    await expect(menu.getByText(/training video|QR code|flow diagram/i)).toHaveCount(0)
+    await shot(page, 'cut-builder-tools')
+
+    // New-SOP entry
+    await page.goto('/admin/sops/upload')
+    await expect(page.getByText('Record video').first()).toBeVisible(SLOW)
+    await expect(page.getByText(/YouTube|Take a photo|Scan document|Generate video SOP/)).toHaveCount(0)
+    await shot(page, 'cut-upload')
+
+    await page.goto('/admin/sops/new/ai')
+    await expect(page.getByRole('heading').first()).toBeVisible(SLOW)
+    await expect(page.getByText('Talk it through')).toHaveCount(0)
+    await expect(page.getByRole('button', { name: /\bmic(rophone)?\b/i })).toHaveCount(0)
+    await shot(page, 'cut-new-ai')
+
+    // Versions page
+    await page.goto(`/admin/sops/${walkSopId}/versions`)
+    await expect(page.getByText('Edit into new version').first()).toBeVisible(SLOW)
+    await expect(page.getByRole('button', { name: /Compare|Restore/ })).toHaveCount(0)
+    await expect(page.getByRole('link', { name: /Compare|Restore/ })).toHaveCount(0)
+    await expect(page.getByRole('link', { name: 'Content', exact: true })).toHaveCount(0)
+    await shot(page, 'cut-versions')
+
+    // Dead addresses render the not-found page (HTTP 200 behind the custom boundary -- assert content).
+    for (const dead of [
+      '/admin/blocks',
+      '/m/ABC234',
+      '/login/roster',
+      '/~offline',
+      `/admin/sops/${walkSopId}/video`,
+      `/admin/sops/${walkSopId}/qr`,
+      `/admin/sops/${walkSopId}/versions/diff`,
+    ]) {
+      await page.goto(dead)
+      await expect(page.getByText(NOT_FOUND), dead).toBeVisible(SLOW)
+    }
+    await shot(page, 'cut-not-found')
+
+    // Dead APIs
+    const tok = await page.request.post('/api/voice/token')
+    expect(await tok.text()).not.toContain('access_token')
+    const roster = await page.request.get('/api/roster')
+    let parsed: unknown = null
+    try {
+      parsed = JSON.parse(await roster.text())
+    } catch {
+      /* not JSON -- fine */
+    }
+    expect(Array.isArray(parsed)).toBe(false)
+    expect(errors, errors.join('\n')).toEqual([])
+  })
+
+  test('sign-up says ask your admin; login has no register link; profile has no organisation switch', async ({
+    page,
+    context,
+  }) => {
+    test.setTimeout(120_000)
+    await page.setViewportSize({ width: 1280, height: 900 })
+    const errors = watchConsole(page)
+
+    await page.goto('/sign-up')
+    await expect(page.getByText('SOPstart is by invitation').first()).toBeVisible(SLOW)
+    await expect(page.getByText(/Ask your admin/)).toBeVisible()
+    await expect(page.locator('input')).toHaveCount(0)
+    await shot(page, 'cut-sign-up')
+
+    await page.goto('/login')
+    await expect(page.locator('input').first()).toBeVisible(SLOW)
+    await expect(page.getByText(/Register/i)).toHaveCount(0)
+    await shot(page, 'cut-login')
+
+    await signInAs(context, 'admin')
+    await page.goto('/profile')
+    await expect(page.locator('main').first()).toBeVisible(SLOW)
+    await expect(page.getByRole('heading', { name: 'Organisations' })).toHaveCount(0)
+    await shot(page, 'cut-profile')
+    expect(errors, errors.join('\n')).toEqual([])
+  })
 })
