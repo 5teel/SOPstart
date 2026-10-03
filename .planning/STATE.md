@@ -4,13 +4,13 @@ milestone: v11.0
 milestone_name: — One-Screen MVP
 status: executing
 stopped_at: Completed 56-05-PLAN.md
-last_updated: "2026-10-03T23:42:48.884Z"
+last_updated: "2026-10-03T23:49:14.201Z"
 last_activity: 2026-10-03 -- Phase 56 execution started
 progress:
   total_phases: 14
   completed_phases: 1
   total_plans: 24
-  completed_plans: 19
+  completed_plans: 20
   percent: 7
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-10-03)
 ## Current Position
 
 Phase: 56 (a-simpler-sop-the-decision-ledger) — EXECUTING
-Plan: 6 of 10
+Plan: 7 of 10
 Status: Ready to execute
 Last activity: 2026-10-03 -- Phase 56 execution started
 
@@ -294,6 +294,7 @@ Known debt: Phase 7 UAT run, Phase 9 live UAT (`human_needed`), LR-03 async erro
 | Phase 56 P03 | 30min | 2 tasks | 5 files |
 | Phase 56 P04 | 25min | 2 tasks | 4 files |
 | Phase 56 P05 | 20min | 2 tasks | 8 files |
+| Phase 56 P06 | 25min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -588,6 +589,7 @@ Recent decisions affecting current work:
 - [Phase 56]: Phase 56-03: standard_attachments uses one FK column per level (sop, section, focus step) so deletes cascade and no label is orphaned
 - [Phase 56]: 56-04: 00069/00070 applied live via Management API fallback; migration history table not updated (stops at 00067); repair 00068-00070 before any bare supabase db push
 - [Phase 56]: 56-05: publish decision written inside performPublish after the flip; assertPublishGates untouched, hash pin unchanged
+- [Phase 56]: 56-06: standards actions use the session client only; sections scoped through their SOP; no ledger write for label management
 
 ### v2.0 Decisions (pending — to be filled during planning)
 
@@ -733,6 +735,6 @@ deliberate decision, not a side-effect.
 
 ## Session Continuity
 
-Last session: 2026-10-03T23:42:48.873Z
+Last session: 2026-10-03T23:49:09.567Z
 Stopped at: Completed 56-05-PLAN.md
 Resume file: .planning/phases/56-a-simpler-sop-the-decision-ledger/56-CONTEXT.md
