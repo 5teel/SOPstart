@@ -57,8 +57,8 @@ import { GhostRow } from './ghosts/GhostRow'
  * Holds the active section's `content[]` in local state, renders each entry as
  * a `<BlockEditShell>` wrapping the SAME worker component, and on every content
  * change feeds `{ content, root }` into the UNCHANGED `useBuilderAutosave`
- * (P11 RE-WIRE — no new persistence path). The hook debounces to Dexie
- * `draftLayouts`; `useDraftLayoutSync` flushes to Supabase, exactly as before.
+ * (P11 RE-WIRE — no new persistence path). The hook debounces and saves
+ * straight to `updateSectionLayout`.
  *
  * Selection state stays LOCAL (`useState`) — no search-param/route writes on
  * the hot edit path (CLAUDE.md 2026-05-13). Hydration-clean: no navigator/

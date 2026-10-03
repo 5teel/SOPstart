@@ -146,7 +146,6 @@ export function useWorkerCompletions() {
         sign_off: extractFirstSignOff(row.completion_sign_offs),
       }))
     },
-    networkMode: 'offlineFirst',
     refetchOnWindowFocus: true,
   })
 }
@@ -208,7 +207,6 @@ export function useSupervisorCompletions(filter: FilterState) {
         sign_off: extractFirstSignOff(row.completion_sign_offs),
       }))
     },
-    networkMode: 'offlineFirst',
     refetchOnWindowFocus: true,
   })
 }
@@ -270,6 +268,5 @@ export function useCompletionDetail(completionId: string) {
       }
     },
     enabled: Boolean(completionId),
-    networkMode: 'offlineFirst',
   })
 }
