@@ -29,19 +29,33 @@ export function useWorkerSops(requestedIds?: ReadonlySet<string>) {
 
   // The whole published library. Used to be a second tab; it is a scope now, so
   // it loads alongside the assigned list rather than behind a tab switch.
-  const { data: librarySops = [], isLoading: libraryLoading } = useQuery<WorkerSopRow[]>({
+  const {
+    data: libraryData,
+    isLoading: libraryLoading,
+    isError: libraryFailed,
+    fetchStatus: libraryFetchStatus,
+    refetch: refetchLibrary,
+  } = useQuery<WorkerSopRow[]>({
     queryKey: ['library-sops'],
     queryFn: async () => {
       const supabase = createClient()
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('sops')
         .select('id, title, sop_number, category_slug, department, published_at')
         .eq('status', 'published')
-        .order('title', { ascending: true }) as { data: WorkerSopRow[] | null }
+        .order('title', { ascending: true }) as {
+          data: WorkerSopRow[] | null
+          error: { message: string } | null
+        }
+      // A failed read must not look like an empty library.
+      if (error) throw new Error(error.message)
       return data ?? []
     },
     staleTime: 1000 * 60 * 2,
   })
+  const librarySops = libraryData ?? []
+  // Nothing to show and no way to get it: the read failed, or it is paused offline.
+  const libraryError = libraryData === undefined && (libraryFailed || libraryFetchStatus === 'paused')
 
   // AFL-VER-04 / D-08: fetch the worker's most recent completion submitted_at per SOP.
   // Compares sops.published_at (on the cached SOP row) vs MAX(sop_completions.submitted_at).
@@ -169,5 +183,5 @@ export function useWorkerSops(requestedIds?: ReadonlySet<string>) {
     ...librarySops.filter((s) => !assignedIds.has(s.id)).map((s) => toRow(s, false)),
   ]
 
-  return { workerSops, assignments, libraryLoading, assignmentsLoading }
+  return { workerSops, assignments, libraryLoading, assignmentsLoading, libraryError, refetchLibrary }
 }

@@ -214,4 +214,13 @@ test.describe('review fixes (55-review)', () => {
     expect(client).toMatch(/useBuilderSaveStatus\.setState\(\{[^}]*error: null/)
     expect(client).toContain('[sopId]')
   })
+
+  test('WR-04: a failed library read throws and the /sops page renders an error state, not an empty list', () => {
+    const hook = code('src/hooks/useWorkerSops.ts')
+    expect(hook).toContain('if (error) throw new Error(error.message)')
+    expect(hook).toContain('libraryError')
+    const page = code('src/app/(protected)/sops/page.tsx')
+    expect(page).toContain('if (libraryError)')
+    expect(page).toContain('sops-load-error')
+  })
 })

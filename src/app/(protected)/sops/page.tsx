@@ -273,7 +273,14 @@ function SopsSection({
   // The worker's per-SOP list is derived in exactly one place now --
   // src/hooks/useWorkerSops.ts -- so every surface agrees about a badge
   // (CLAUDE.md 2026-09-27).
-  const { workerSops: allWorkerSops, assignments, libraryLoading, assignmentsLoading } = useWorkerSops(requestedIds)
+  const {
+    workerSops: allWorkerSops,
+    assignments,
+    libraryLoading,
+    assignmentsLoading,
+    libraryError,
+    refetchLibrary,
+  } = useWorkerSops(requestedIds)
 
   function getAssignmentInfo(sopId: string) {
     return assignments.find((a) => a.sop_id === sopId)
@@ -325,6 +332,24 @@ function SopsSection({
   const visibleScopes = WORKER_SCOPES.filter((sc) => sc.always || counts[sc.key] > 0 || scope === sc.key)
 
   const loading = libraryLoading || assignmentsLoading
+
+  // A failed read must not look like "no SOPs".
+  if (libraryError) {
+    return (
+      <div role="alert" data-testid="sops-load-error" className="flex flex-col items-start gap-3 p-4">
+        <p className="text-reading text-accent-escalate">
+          Could not load your SOPs. Check your connection and try again.
+        </p>
+        <button
+          type="button"
+          onClick={() => void refetchLibrary()}
+          className="min-h-tap rounded-lg border border-ink-200 px-4 text-ui font-medium text-ink-900"
+        >
+          Try again
+        </button>
+      </div>
+    )
+  }
 
   // D-01: the plant replaces the worker list and receives the exact list the
   // list would have shown -- refresher state, lineage-rooted completion
