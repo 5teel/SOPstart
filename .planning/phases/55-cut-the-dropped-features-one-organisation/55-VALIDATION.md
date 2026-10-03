@@ -3,7 +3,7 @@ phase: 55
 slug: cut-the-dropped-features-one-organisation
 status: draft
 nyquist_compliant: false
-wave_0_complete: false
+wave_0_complete: true
 created: 2026-10-03
 ---
 
@@ -39,6 +39,9 @@ created: 2026-10-03
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
+| 55-01-01 | 01 | 1 | CUT-01, CUT-02 | T-55-W0-03 (vacuous guard) | dropped list is data; sweep asserts absence of files AND references per feature; survivors live | source-contract | `npx playwright test --list --project=phase55 && npx playwright test --project=phase55 tests/phase55/deletion-sweep.spec.ts` | ✅ | ✅ green |
+| 55-01-02 | 01 | 1 | CUT-01, ORG-01 | T-55-W0-01, T-55-W0-02 | worker-path + org contracts; D-06 and D-02 live; walk fixture unassigned/machine-less; cleanup refuses real org | source-contract + fixture | `npx tsc --noEmit && npx playwright test --project=phase55 && npx playwright test --list --project=evals` | ✅ | ✅ green |
+| 55-01-03 | 01 | 1 | CUT-01, CUT-02 | — | before-numbers recorded: failure baseline + bundle 1045 / 936 KB; baseline file untouched | build + record | `test -f .bundle-baseline.old.json && git diff --quiet -- .bundle-baseline.json` | ✅ | ✅ green |
 | (filled by planner per task) | | | CUT-01 | T-55-01 (stale SW serving old shell) | kill-switch `public/sw.js` committed; eval asserts no SW registered | source-contract + eval | `npx playwright test --project=phase55 tests/phase55/deletion-sweep.spec.ts` | ❌ W0 | ⬜ pending |
 | | | | CUT-01 | — | no `@/lib/offline` import in `src/`; walkthrough uses `getPhotoUploadUrl` + `submitCompletion` | source-contract | `npx playwright test --project=phase55 tests/phase55/worker-path-contract.spec.ts` | ❌ W0 | ⬜ pending |
 | | | | CUT-01 | — | worker walks + photo + submit online, no banner/queue | deployed eval | `npm run eval -- --phase 55` | ❌ W0 | ⬜ pending |
@@ -55,14 +58,14 @@ created: 2026-10-03
 
 ## Wave 0 Requirements
 
-- [ ] `playwright.config.ts` — project `phase55` + `npx playwright test --list --project=phase55` shows the specs
-- [ ] `scripts/dropped-features.json` — initial full list (routes, packages, jobs, modules) from RESEARCH.md Section 1; the Phase 62 build-guard input
-- [ ] `tests/phase55/deletion-sweep.spec.ts` — reads the JSON; asserts absence of FILES and of REFERENCES (imports/hrefs/`router.push`/`journeys.ts` routes); positive survivor list; fixme-gated, flipped live per wave
-- [ ] `tests/phase55/worker-path-contract.spec.ts` — stubs for CUT-01 rewire
-- [ ] `tests/phase55/org-single.spec.ts` — stubs for ORG-01
-- [ ] `tests/evals/cut-features.eval.ts` skeleton + walk fixture in `scripts/eval-fixtures.mjs` (photo-required step) + completion cleanup helper in `tests/evals/lib/` so the shared plant fixture SOP is never left "done" (would flip `plant-home.eval`)
-- [ ] `55-BASELINE-FAILURES.md` — pre-phase full-suite failure baseline, recorded before the first deleting wave
-- [ ] Snapshot `.bundle-baseline.json` → `.bundle-baseline.old.json` (gitignored) for the move-down-only check
+- [x] `playwright.config.ts` — project `phase55` + `npx playwright test --list --project=phase55` shows the specs
+- [x] `scripts/dropped-features.json` — initial full list (routes, packages, jobs, modules) from RESEARCH.md Section 1; the Phase 62 build-guard input
+- [x] `tests/phase55/deletion-sweep.spec.ts` — reads the JSON; asserts absence of FILES and of REFERENCES (imports/hrefs/`router.push`/`journeys.ts` routes); positive survivor list; fixme-gated, flipped live per wave
+- [x] `tests/phase55/worker-path-contract.spec.ts` — stubs for CUT-01 rewire
+- [x] `tests/phase55/org-single.spec.ts` — stubs for ORG-01
+- [x] `tests/evals/cut-features.eval.ts` skeleton + walk fixture in `scripts/eval-fixtures.mjs` (photo-required step) + completion cleanup helper in `tests/evals/lib/` so the shared plant fixture SOP is never left "done" (would flip `plant-home.eval`)
+- [x] `55-BASELINE-FAILURES.md` — pre-phase full-suite failure baseline, recorded before the first deleting wave
+- [x] Snapshot `.bundle-baseline.json` → `.bundle-baseline.old.json` (gitignored) for the move-down-only check
 - No framework install needed.
 
 ---

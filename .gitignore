@@ -22,6 +22,9 @@
 # production
 /build
 
+# Phase 55 pre-phase bundle snapshot (move-down-only check; never re-capture)
+.bundle-baseline.old.json
+
 # misc
 .DS_Store
 *.pem
