@@ -234,7 +234,6 @@ test.describe('Phase 55 — cut features (deployed)', () => {
     for (const dead of [
       '/admin/blocks',
       '/m/ABC234',
-      '/login/roster',
       '/~offline',
       `/admin/sops/${walkSopId}/video`,
       `/admin/sops/${walkSopId}/qr`,
@@ -277,6 +276,10 @@ test.describe('Phase 55 — cut features (deployed)', () => {
     await expect(page.locator('input').first()).toBeVisible(SLOW)
     await expect(page.getByText(/Register/i)).toHaveCount(0)
     await shot(page, 'cut-login')
+
+    // Signed out (a signed-in visit to /login* is redirected home), the roster login is gone.
+    await page.goto('/login/roster')
+    await expect(page.getByText(NOT_FOUND)).toBeVisible(SLOW)
 
     await signInAs(context, 'admin')
     await page.goto('/profile')
