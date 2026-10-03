@@ -76,15 +76,13 @@ export const JOURNEYS: Journey[] = [
   {
     id: 'sign-up',
     group: 'Getting started',
-    persona: 'New organisation',
-    title: 'Sign up & create an organisation',
-    summary: 'A new admin creates an account and a fresh organisation.',
+    persona: 'Uninvited visitor',
+    title: 'Asked to sign up without an invitation',
+    summary: 'SOPstart is invitation-only; there is no self-service sign-up.',
     steps: [
-      { id: 's', type: 'start', label: 'New user' },
-      { id: 'signup', type: 'screen', label: 'Sign-up screen', route: '/sign-up' },
-      { id: 'create', type: 'action', label: 'Create account + organisation', detail: 'Becomes the org’s first admin.' },
-      { id: 'home', type: 'screen', label: 'Admin home — SOP surface', route: '/sops' },
-      { id: 'e', type: 'end', label: 'Org ready' },
+      { id: 's', type: 'start', label: 'Visitor with no invitation' },
+      { id: 'signup', type: 'screen', label: 'Sign-up screen', route: '/sign-up', detail: 'Says SOPstart is by invitation and to ask your admin; links to log in and to join with a code.' },
+      { id: 'e', type: 'end', label: 'Asks their admin' },
     ],
   },
   {

@@ -6,8 +6,7 @@
  * 34-PATTERNS.md § profile/page.tsx):
  *   - `src/app/(protected)/profile/page.tsx` renders an additive
  *     "Observations about you" section (e.g. an `ObservationsSection`
- *     component), following the `<OrgSwitcher />` additive-section
- *     precedent already in that file.
+ *     component), as an additive section below the Account section.
  *   - `src/actions/observations.ts` exports `listObservationsForWorker`
  *     — a self-scoped read (`observed_worker_id = auth.uid()`), never a
  *     query for a different worker's rows.

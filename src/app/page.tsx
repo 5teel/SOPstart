@@ -13,12 +13,6 @@ export default function Home() {
         >
           Log In
         </Link>
-        <Link
-          href="/sign-up"
-          className="bg-white text-[var(--ink-900)] font-semibold px-6 py-3 rounded-lg min-h-tap-row flex items-center border border-[var(--ink-100)] hover:border-[var(--ink-900)] transition-colors"
-        >
-          Sign Up
-        </Link>
       </div>
     </main>
   )

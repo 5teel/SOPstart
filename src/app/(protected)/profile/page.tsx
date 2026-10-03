@@ -1,7 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getSessionContext } from '@/lib/auth/session-context'
 import { LogoutButton } from '@/components/profile/LogoutButton'
-import { OrgSwitcher } from '@/components/profile/OrgSwitcher'
 import { ObservationsSection } from '@/components/profile/ObservationsSection'
 import { CompetencySection } from '@/components/profile/CompetencySection'
 
@@ -26,9 +25,6 @@ export default async function ProfilePage() {
           <span className="text-sm text-[var(--ink-900)]">{userEmail}</span>
         </div>
       </section>
-
-      {/* Org memberships + switcher */}
-      <OrgSwitcher />
 
       {/* Observations about you (OBS-02) */}
       <ObservationsSection />

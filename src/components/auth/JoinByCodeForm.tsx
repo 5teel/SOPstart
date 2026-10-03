@@ -72,12 +72,6 @@ export default function JoinByCodeForm() {
 
       <div className="text-center space-y-2 pt-2">
         <p className="text-[var(--ink-500)] text-sm">
-          Registering a new org instead?{' '}
-          <Link href="/sign-up" className="text-[var(--ink-900)] hover:text-[var(--accent-voice)] font-medium">
-            Sign up
-          </Link>
-        </p>
-        <p className="text-[var(--ink-500)] text-sm">
           Already have an account?{' '}
           <Link href="/login" className="text-[var(--ink-900)] hover:text-[var(--accent-voice)] font-medium">
             Log in

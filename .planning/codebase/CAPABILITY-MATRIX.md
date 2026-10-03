@@ -89,6 +89,8 @@ Locked decision: a user with **sign-off authority** on a SOP also has **edit rig
 - **`platform_admin`** — Potenco-level super-admin (`platform_admins` table, renamed from `summit_admins` in migration 00026), orthogonal to every org role above. Gates no page today — the global block curation pages were deleted in Phase 25 (plan 25-05); `is_platform_admin()` survives because RLS policies still call it (e.g. `ai_review_results`, migration 00032). Per `CLAUDE.md` § Ownership, this is a Potenco concept and is never conflated with Summit Insights.
 - **Dept-scoped job role** (Phase 32 `roles` table, e.g. "Grade Two Operator") — an org-chart / headcount entity today, not a capability gate anywhere in code. Becomes a visibility axis in **Phase 44b**; do not treat it as a fifth matrix row until that phase ships it as one.
 
+**One organisation (Phase 55, ORG-01):** there is no self-service organisation creation or switching; accounts are created only by an admin invite (`inviteWorker` -> `inviteUserByEmail`, `acceptInvite`) and Supabase public sign-up is disabled.
+
 ## Planned capabilities
 
 | Capability | Phase | Notes |

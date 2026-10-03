@@ -2,7 +2,7 @@ import { listObservationsForWorker, getObservationLabels } from '@/actions/obser
 import { ObservationRow } from '@/components/observations/ObservationRow'
 
 // OBS-02 — worker-facing "Observations about you" section, additive below
-// the Account section + OrgSwitcher on /profile (see ProfilePage). Fully
+// the Account section on /profile (see ProfilePage). Fully
 // read-only: no edit/delete/hide control exists (append-only, D-08).
 export async function ObservationsSection() {
   const [observations, labels] = await Promise.all([

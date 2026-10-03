@@ -6,8 +6,8 @@
  *         public sign-up at the auth provider cannot break a product path.
  *   D-02  the invitation channel exists (email invite, accept, join by code),
  *         so removing organisation creation leaves a way in.
- * FIXME until 55-12: organisation creation and switching are gone, and
- * /sign-up becomes a static "ask your admin" page.
+ * LIVE (55-12): organisation creation and switching are gone, and
+ * /sign-up is a static "ask your admin" page.
  */
 import { test, expect } from '@playwright/test'
 import fs from 'node:fs'
@@ -65,8 +65,6 @@ test.describe('ORG-01 preconditions (live)', () => {
 })
 
 test.describe('organisation creation and switching are gone (55-12)', () => {
-  test.fixme(true, 'flips live in 55-12')
-
   test('actions, schema and components are removed', () => {
     const auth = code('src/actions/auth.ts')
     for (const gone of ['signUpOrganisation', 'switchOrganisation', 'getUserMemberships', 'UserMembership']) {
@@ -82,8 +80,6 @@ test.describe('organisation creation and switching are gone (55-12)', () => {
 })
 
 test.describe('/sign-up says ask your admin (55-12)', () => {
-  test.fixme(true, 'flips live in 55-12')
-
   test('the page is static text with no form', () => {
     const src = code('src/app/(auth)/sign-up/page.tsx')
     expect(src).not.toContain("'use client'")
@@ -96,8 +92,6 @@ test.describe('/sign-up says ask your admin (55-12)', () => {
 })
 
 test.describe('no register links (55-12)', () => {
-  test.fixme(true, 'flips live in 55-12')
-
   test('login, landing and join point nobody at sign-up', () => {
     for (const f of ['src/components/auth/LoginForm.tsx', 'src/app/page.tsx', 'src/components/auth/JoinByCodeForm.tsx']) {
       const src = code(f)

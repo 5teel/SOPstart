@@ -86,10 +86,7 @@ export default function LoginForm({ next }: { next?: string }) {
 
       <div className="text-center space-y-2 pt-2">
         <p className="text-[var(--ink-500)] text-sm">
-          Need an account?{' '}
-          <Link href="/sign-up" className="text-[var(--ink-900)] hover:text-[var(--accent-voice)] font-medium">
-            Register a new organisation
-          </Link>
+          Need an account? Ask your admin for an invitation.
         </p>
         <p className="text-[var(--ink-500)] text-sm">
           Have an invite code?{' '}

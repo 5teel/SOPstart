@@ -96,7 +96,7 @@ export const ROLES: RoleDef[] = [
     label: 'Admin (SOP Admin)',
     kind: 'org',
     colour: '#b45309',
-    who: 'The org’s administrator — the first sign-up becomes admin.',
+    who: 'The organisation’s administrator — set up by Potenco and by invitation.',
     landsOn: { label: 'SOP list', route: '/sops' },
     can: [
       'Create / upload / AI-parse SOPs and run them to publish',

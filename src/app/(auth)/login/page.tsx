@@ -10,20 +10,13 @@ export const metadata: Metadata = {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ registered?: string; next?: string }>
+  searchParams: Promise<{ next?: string }>
 }) {
   const params = await searchParams
-  const justRegistered = params.registered === '1'
   const next = safeNextPath(params.next) ?? undefined
 
   return (
     <div>
-      {justRegistered && (
-        <div className="rounded-lg bg-accent-signoff/10 border border-accent-signoff px-4 py-3 text-sm text-accent-signoff mb-6 text-center">
-          Account created successfully. Log in to get started.
-        </div>
-      )}
-
       <h2 className="text-xl font-semibold text-[var(--ink-900)] mb-6 text-center">
         Log in to your account
       </h2>

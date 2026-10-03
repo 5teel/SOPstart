@@ -10,7 +10,6 @@ import { safeNextPath } from '@/lib/auth/next-redirect'
 import type { TablesInsert, TablesUpdate } from '@/types/database.types'
 import type { AppRole } from '@/types/auth'
 import {
-  orgSignUpSchema,
   loginSchema,
   inviteCodeSchema,
   inviteWorkerSchema,
@@ -26,69 +25,6 @@ export async function signOut() {
   const supabase = await createClient()
   await supabase.auth.signOut()
   redirect('/login')
-}
-
-// ─────────────────────────────────────────────
-// signUpOrganisation — AUTH-01, D-01, D-02, D-03
-// Creates the org and admin user using service_role
-// ─────────────────────────────────────────────
-export async function signUpOrganisation(formData: {
-  organisationName: string
-  email: string
-  password: string
-  confirmPassword: string
-}) {
-  const result = orgSignUpSchema.safeParse(formData)
-  if (!result.success) {
-    return { error: result.error.issues[0]?.message ?? 'Invalid input' }
-  }
-
-  const { organisationName, email, password } = result.data
-  const admin = createAdminClient()
-
-  // Create the organisation record
-  const { data: org, error: orgError } = await admin
-    .from('organisations')
-    .insert({ name: organisationName })
-    .select()
-    .single()
-
-  if (orgError || !org) {
-    console.error('org creation error:', orgError)
-    return { error: 'Failed to create organisation. Please try again.' }
-  }
-
-  // Create the user via service_role (auto-confirms email)
-  const { data: authData, error: authError } = await admin.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-  })
-
-  if (authError || !authData.user) {
-    console.error('auth create user error:', authError)
-    // Roll back org creation
-    await admin.from('organisations').delete().eq('id', org.id)
-    return { error: authError?.message ?? 'Failed to create account. Please try again.' }
-  }
-
-  // Insert admin into organisation_members
-  const adminMemberInsert: TablesInsert<'organisation_members'> = {
-    organisation_id: org.id,
-    user_id: authData.user.id,
-    role: 'admin',
-  }
-  const { error: memberError } = await admin.from('organisation_members').insert(adminMemberInsert)
-
-  if (memberError) {
-    console.error('member insert error:', memberError)
-    // Roll back
-    await admin.auth.admin.deleteUser(authData.user.id)
-    await admin.from('organisations').delete().eq('id', org.id)
-    return { error: 'Failed to set up your account. Please try again.' }
-  }
-
-  redirect('/login?registered=1')
 }
 
 // ─────────────────────────────────────────────
@@ -518,87 +454,6 @@ export async function updateMemberRoleSafe(formData: {
   }
 
   return { success: 'Role updated successfully' }
-}
-
-// ─────────────────────────────────────────────
-// switchOrganisation — set active org in user_metadata
-// ─────────────────────────────────────────────
-
-export async function switchOrganisation(organisationId: string) {
-  const { supabase, userId } = await getSessionContext()
-  if (!userId) return { error: 'Not authenticated' }
-
-  // Verify user is a member of this org
-  const admin = createAdminClient()
-  const { data: membership } = await admin
-    .from('organisation_members')
-    .select('id')
-    .eq('user_id', userId)
-    .eq('organisation_id', organisationId)
-    .maybeSingle()
-
-  if (!membership) return { error: 'You are not a member of this organisation' }
-
-  await supabase.auth.updateUser({
-    data: { active_org_id: organisationId },
-  })
-  await supabase.auth.refreshSession()
-
-  return { success: true }
-}
-
-// ─────────────────────────────────────────────
-// getUserMemberships — all orgs the user belongs to
-// ─────────────────────────────────────────────
-
-export interface UserMembership {
-  organisationId: string
-  orgName: string
-  role: AppRole
-  joinedAt: string | null
-}
-
-export async function getUserMemberships() {
-  // getClaims (local JWT verify) instead of getSessionContext: this function
-  // needs user_metadata.active_org_id, which the context doesn't expose.
-  const supabase = await createClient()
-  const { data: claimsData } = await supabase.auth.getClaims()
-  const claims = claimsData?.claims
-  if (!claims?.sub) return { memberships: [] as UserMembership[], activeOrgId: null as string | null }
-
-  const admin = createAdminClient()
-  const { data: members } = await admin
-    .from('organisation_members')
-    .select('organisation_id, role, created_at')
-    .eq('user_id', claims.sub)
-    .order('created_at', { ascending: true })
-
-  if (!members) return { memberships: [] as UserMembership[], activeOrgId: null as string | null }
-
-  const orgIds = members.map((m) => m.organisation_id)
-  const { data: orgs } = await admin
-    .from('organisations')
-    .select('id, name')
-    .in('id', orgIds)
-
-  const orgMap: Record<string, string> = {}
-  for (const o of orgs ?? []) {
-    orgMap[o.id] = o.name
-  }
-
-  const memberships: UserMembership[] = members.map((m) => ({
-    organisationId: m.organisation_id,
-    orgName: orgMap[m.organisation_id] ?? 'Unknown',
-    role: m.role as AppRole,
-    joinedAt: m.created_at,
-  }))
-
-  const activeOrgId =
-    (((claims as Record<string, unknown>)['user_metadata'] as Record<string, unknown> | undefined)?.[
-      'active_org_id'
-    ] as string | undefined) ?? memberships[0]?.organisationId ?? null
-
-  return { memberships, activeOrgId }
 }
 
 // ─────────────────────────────────────────────
