@@ -30,9 +30,9 @@ import {
 } from '@/lib/builder/content-ops'
 import { BLOCK_DEFAULTS, type BlockType } from '@/lib/builder/block-registry'
 import { useQueryClient } from '@tanstack/react-query'
-import type { SectionRenderFamily, SopSectionBlockWithUpdate } from '@/types/sop'
+import type { SectionRenderFamily, SopSectionBlock } from '@/types/sop'
 import {
-  listSectionBlocksWithUpdates,
+  listSectionBlocks,
   verifyBlock,
   unverifyBlock,
 } from '@/actions/sop-section-blocks'
@@ -47,7 +47,6 @@ import type { SourceProvenanceRegion } from '@/lib/parsers/source-viewer'
 import { BlockEditShell } from './BlockEditShell'
 import { commitFieldToContent } from './fields/field-commit'
 import { InserterMenu } from './inserter/InserterMenu'
-import { ReuseTier } from './inserter/ReuseTier'
 import { useSmartGhosts } from './ghosts/useSmartGhosts'
 import { GhostRow } from './ghosts/GhostRow'
 
@@ -76,8 +75,6 @@ interface EditableDocumentProps {
   sopId: string
   /** Section render-family — selects the inserter's "Fits here" LANE (R3). */
   renderFamily: SectionRenderFamily
-  /** The SOP's category tag — the Reuse tier's "this department" scope. */
-  sopCategory: string | null
 }
 
 interface SortableBlockProps {
@@ -90,12 +87,11 @@ interface SortableBlockProps {
   junctionId: string | null
   region: SourceProvenanceRegion | null
   /** P13 overlays (26-12) — junction row + reviewer-flag surfacing. */
-  junction: SopSectionBlockWithUpdate | null
+  junction: SopSectionBlock | null
   sopId: string
   flagsCount: number
   flagsOpen: boolean
   onToggleFlags: () => void
-  onReviewed: () => void
   /** Edit mode for this block — lifted so only ONE block edits at a time. */
   editing: boolean
   onToggleEdit: () => void
@@ -123,7 +119,6 @@ function SortableBlock({
   flagsCount,
   flagsOpen,
   onToggleFlags,
-  onReviewed,
   editing,
   onToggleEdit,
   verified,
@@ -154,7 +149,6 @@ function SortableBlock({
       flagsCount={flagsCount}
       flagsOpen={flagsOpen}
       onToggleFlags={onToggleFlags}
-      onReviewed={onReviewed}
       editing={editing}
       onToggleEdit={onToggleEdit}
       verified={verified}
@@ -236,21 +230,20 @@ export function EditableDocument({
   section,
   sopId,
   renderFamily,
-  sopCategory,
 }: EditableDocumentProps) {
   const [content, setContent] = useState<LayoutItem[]>(() => seedContent(section.layout_data))
   const root = useMemo(() => seedRoot(section.layout_data), [section.layout_data])
 
   // P12/P13/P8 (26-12): junction rows for the active section, keyed by junction
-  // id. Convert SOPs have rows (with block_provenance + verified state + the
-  // update-available flag); inline-authored SOPs have an empty map → no
+  // id. Convert SOPs have rows (with block_provenance + verified state);
+  // inline-authored SOPs have an empty map → no
   // selection-sync / overlays / verify chip (UI-SPEC: non-convert shows none).
-  const [junctionMap, setJunctionMap] = useState<Map<string, SopSectionBlockWithUpdate>>(
+  const [junctionMap, setJunctionMap] = useState<Map<string, SopSectionBlock>>(
     () => new Map()
   )
   const refreshJunctions = useCallback(async () => {
     try {
-      const rows = await listSectionBlocksWithUpdates(section.id)
+      const rows = await listSectionBlocks(section.id)
       setJunctionMap(new Map(rows.map((r) => [r.id, r])))
     } catch (e) {
       console.warn('[EditableDocument] junction fetch failed', e)
@@ -261,7 +254,7 @@ export function EditableDocument({
     let cancelled = false
     void (async () => {
       try {
-        const rows = await listSectionBlocksWithUpdates(section.id)
+        const rows = await listSectionBlocks(section.id)
         if (!cancelled) setJunctionMap(new Map(rows.map((r) => [r.id, r])))
       } catch (e) {
         if (!cancelled) setJunctionMap(new Map())
@@ -275,8 +268,8 @@ export function EditableDocument({
 
   // componentId (layout props.id) → junction row, matched via each item's
   // props.junctionId. Powers the P12 reverse binding + P13 overlays.
-  const componentIdToJunction = useMemo<Map<string, SopSectionBlockWithUpdate>>(() => {
-    const out = new Map<string, SopSectionBlockWithUpdate>()
+  const componentIdToJunction = useMemo<Map<string, SopSectionBlock>>(() => {
+    const out = new Map<string, SopSectionBlock>()
     if (junctionMap.size === 0) return out
     for (const item of content) {
       const componentId = item.props.id as string | undefined
@@ -348,15 +341,12 @@ export function EditableDocument({
     return unregister
   }, [registerBlockClickHandler, componentIdToJunction])
 
-  // R3 inserter: which ＋ divider is open (afterIndex; -1 = prepend), and whether
-  // the dept-scoped Reuse tier (BlockPicker) modal is showing.
+  // R3 inserter: which ＋ divider is open (afterIndex; -1 = prepend).
   const [inserterAt, setInserterAt] = useState<number | null>(null)
-  const [reuseOpen, setReuseOpen] = useState(false)
 
   // Close any open inserter when the section switches.
   useEffect(() => {
     setInserterAt(null)
-    setReuseOpen(false)
   }, [section.id])
 
   // P11: the SAME hook <Puck onChange> fed. Reads only { content, root }.
@@ -413,10 +403,6 @@ export function EditableDocument({
         setInserterAt(null)
       }}
       onClose={() => setInserterAt(null)}
-      onOpenReuse={() => {
-        setInserterAt(null)
-        setReuseOpen(true)
-      }}
     />
   )
 
@@ -500,7 +486,6 @@ export function EditableDocument({
                   onToggleFlags={() =>
                     setOpenFlagsFor((prev) => (prev === item.props.id ? null : item.props.id))
                   }
-                  onReviewed={refreshJunctions}
                   editing={editingBlockId === item.props.id}
                   onToggleEdit={() =>
                     setEditingBlockId((prev) => (prev === item.props.id ? null : item.props.id))
@@ -533,14 +518,6 @@ export function EditableDocument({
           </SortableContext>
         </DndContext>
       )}
-
-      {/* R3 TIER 3 — dept-scoped Reuse (existing Phase 13 BlockPicker path). */}
-      <ReuseTier
-        open={reuseOpen}
-        sopSectionId={section.id}
-        categoryTag={sopCategory}
-        onClose={() => setReuseOpen(false)}
-      />
     </div>
   )
 }

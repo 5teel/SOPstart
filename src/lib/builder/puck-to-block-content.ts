@@ -7,7 +7,7 @@
  * in src/lib/validators/blocks.ts) uses a discriminated union with `kind`.
  *
  * This module bridges the two so the three-dot "Save to library" overflow
- * menu can capture a block's authored state and pass it to SaveToLibraryModal.
+ * menu can capture a block's authored state.
  *
  * Returns `null` for non-savable Puck types (TextBlock / HeadingBlock / PhotoBlock
  * / CalloutBlock / ModelBlock / UnsupportedBlockPlaceholder) — the menu's

@@ -7,7 +7,7 @@
  *   1. context differs by section render-family ("Fits here" LANE),
  *   2. keyboard nav (↑↓ highlight, ↵ resolve) + type-to-filter,
  *   3. insert adds a block at the cursor with fresh default props,
- *   4. Reuse is department-scoped (scope → BlockPicker sopCategory).
+ *   4. the home page drills only to the full catalog (and AI when wired).
  *
  * Relative imports (the phase26 project has no `@/` alias — established pattern).
  */
@@ -19,7 +19,6 @@ import {
   allRows,
   filterRows,
   moveHighlight,
-  reuseSopCategory,
   type InserterRow,
 } from '../../src/components/admin/builder-v2/inserter/inserter-model'
 import { insertBlock, type LayoutItem } from '../../src/lib/builder/content-ops'
@@ -57,7 +56,7 @@ test.describe('inserter — context varies by section render-family', () => {
 
 test.describe('inserter — keyboard nav + type-to-filter', () => {
   test('↑↓ move the highlight (clamped) and ↵ resolves the highlighted row', () => {
-    const rows = homeRows('steps', null, { hasReuse: true })
+    const rows = homeRows('steps', null)
     // ↓ from 0 → 1, ↑ back to 0, ↑ at top clamps to 0.
     expect(moveHighlight(rows.length, 0, 1)).toBe(1)
     expect(moveHighlight(rows.length, 1, -1)).toBe(0)
@@ -107,7 +106,7 @@ test.describe('inserter — insert adds a block with fresh default props', () =>
 
 test.describe('inserter — humanised labels only (P16)', () => {
   test('every row label is the humanised block label, never raw PascalCase', () => {
-    const rows = [...homeRows('hazard', 'HazardCardBlock', { hasReuse: true, hasAI: true }), ...allRows()]
+    const rows = [...homeRows('hazard', 'HazardCardBlock', { hasAI: true }), ...allRows()]
     for (const row of rows) {
       // No raw internal type name leaks into a label.
       expect(row.label).not.toMatch(/Block$/)
@@ -119,18 +118,11 @@ test.describe('inserter — humanised labels only (P16)', () => {
   })
 })
 
-test.describe('inserter — Reuse tier is department-scoped', () => {
-  test('scope toggle maps to the BlockPicker sopCategory (dept → tag, all → null)', () => {
-    // "This department" narrows the Phase 13 picker to the SOP's category.
-    expect(reuseSopCategory('dept', 'area-forming')).toBe('area-forming')
-    // "All departments" broadens it (null = no category filter).
-    expect(reuseSopCategory('all', 'area-forming')).toBeNull()
-    // A SOP with no category stays null under either scope.
-    expect(reuseSopCategory('dept', null)).toBeNull()
-  })
-
-  test('the Reuse drill row appears only when the host wires it', () => {
-    expect(homeRows('steps', null, { hasReuse: true }).some((r) => r.kind === 'nav' && r.page === 'reuse')).toBe(true)
-    expect(homeRows('steps', null, { hasReuse: false }).some((r) => r.kind === 'nav' && r.page === 'reuse')).toBe(false)
+test.describe('inserter — drill rows', () => {
+  test('home drills only to More types, plus AI when the host wires it', () => {
+    const pages = (opts: { hasAI?: boolean }) =>
+      homeRows('steps', null, opts).flatMap((r) => (r.kind === 'nav' ? [r.page] : []))
+    expect(pages({})).toEqual(['all'])
+    expect(pages({ hasAI: true })).toEqual(['all', 'ai'])
   })
 })

@@ -16,9 +16,6 @@ import { GROUPS, homeRows, filterRows, moveHighlight, type InserterRow } from '.
  * drill, esc close (or ‹ back from ALL); typing narrows the list. Every label
  * comes from `humanizeBlockType` (never raw PascalCase — P16). Local state only,
  * no route writes on this hot path (CLAUDE.md 2026-05-13).
- *
- * Reuse is delegated OUT to the existing Phase 13 `BlockPicker` via `onOpenReuse`
- * (the picker is a full-screen modal, not a sub-page of this 320px popover).
  */
 interface InserterMenuProps {
   /** Section render-family — selects the "Fits here" LANE. */
@@ -28,8 +25,6 @@ interface InserterMenuProps {
   /** Insert the chosen block type at the cursor. */
   onInsert: (type: BlockType) => void
   onClose: () => void
-  /** Opens the dept-scoped Reuse tier (BlockPicker). Row hidden if omitted. */
-  onOpenReuse?: () => void
   /** Opens AI-drafting (26.x). Row hidden if omitted — no dead button. */
   onDescribeAI?: () => void
 }
@@ -39,7 +34,6 @@ export function InserterMenu({
   prevType,
   onInsert,
   onClose,
-  onOpenReuse,
   onDescribeAI,
 }: InserterMenuProps) {
   const [page, setPage] = useState<'home' | 'all'>('home')
@@ -51,12 +45,12 @@ export function InserterMenu({
   const rows = useMemo<InserterRow[]>(() => {
     const base =
       page === 'home'
-        ? homeRows(ctx, prevType, { hasReuse: !!onOpenReuse, hasAI: !!onDescribeAI })
+        ? homeRows(ctx, prevType, { hasAI: !!onDescribeAI })
         : GROUPS.flatMap(([, types]) =>
             types.map((t): InserterRow => ({ kind: 'insert', type: t, label: humanizeBlockType(t) }))
           )
     return filterRows(base, query)
-  }, [page, ctx, prevType, query, onOpenReuse, onDescribeAI])
+  }, [page, ctx, prevType, query, onDescribeAI])
 
   // Reset highlight when the visible list changes; focus the search each page.
   useEffect(() => {
@@ -82,10 +76,7 @@ export function InserterMenu({
       return
     }
     if (row.page === 'all') setPage('all')
-    else if (row.page === 'reuse') {
-      onOpenReuse?.()
-      onClose()
-    } else if (row.page === 'ai') {
+    else if (row.page === 'ai') {
       onDescribeAI?.()
       onClose()
     }

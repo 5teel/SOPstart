@@ -41,28 +41,18 @@ export const GROUPS: [string, BlockType[]][] = [
   ['Guidance & gates', ['TextBlock', 'HeadingBlock', 'CalloutBlock', 'SignOffBlock']],
 ]
 
-/** TIER 3 (reuse) is delegated to the existing Phase 13 `BlockPicker`; its
- *  dept-scope toggle maps to the picker's `sopCategory` soft-filter. */
-export type ReuseScope = 'dept' | 'all'
-
-/** dept → the SOP's category (boosts + narrows to this department);
- *  all → null (Phase 13 picker shows every department). */
-export function reuseSopCategory(scope: ReuseScope, categoryTag: string | null): string | null {
-  return scope === 'dept' ? categoryTag : null
-}
-
 /** A single navigable row: either inserts a block type, or drills to a page. */
 export type InserterRow =
   | { kind: 'insert'; type: BlockType; label: string; smart?: boolean; why?: string }
-  | { kind: 'nav'; page: 'all' | 'reuse' | 'ai'; label: string }
+  | { kind: 'nav'; page: 'all' | 'ai'; label: string }
 
 /** HOME page rows: smart row (if the preceding block predicts one) → "Fits here"
- *  LANE list → drill rows (More / Reuse / AI). Reuse/AI included only when the
+ *  LANE list → drill rows (More / AI). AI included only when the
  *  host wires a handler (no dead buttons). */
 export function homeRows(
   ctx: SectionRenderFamily,
   prevType: BlockType | null,
-  opts: { hasReuse?: boolean; hasAI?: boolean } = {}
+  opts: { hasAI?: boolean } = {}
 ): InserterRow[] {
   const rows: InserterRow[] = []
   const smart = prevType ? SMART[prevType] : undefined
@@ -73,7 +63,6 @@ export function homeRows(
     rows.push({ kind: 'insert', type: t, label: humanizeBlockType(t) })
   }
   rows.push({ kind: 'nav', page: 'all', label: 'More content types' })
-  if (opts.hasReuse) rows.push({ kind: 'nav', page: 'reuse', label: 'Reuse content or a snippet' })
   if (opts.hasAI) rows.push({ kind: 'nav', page: 'ai', label: 'Describe with AI' })
   return rows
 }

@@ -13,7 +13,7 @@
  *
  * `useSelectionSync` itself is UNCHANGED — only the caller moved off Puck.
  */
-import type { SopSectionBlockWithUpdate } from '@/types/sop'
+import type { SopSectionBlock } from '@/types/sop'
 import type { SourceProvenanceRegion } from '@/lib/parsers/source-viewer'
 
 type SetActiveProvenance = (
@@ -46,7 +46,7 @@ export function selectBlock(
  * the active section maps to that junction.
  */
 export function resolveComponentIdFromSource(
-  componentIdToJunction: Map<string, SopSectionBlockWithUpdate>,
+  componentIdToJunction: Map<string, SopSectionBlock>,
   idFromSource: string,
 ): string | null {
   for (const [componentId, junction] of componentIdToJunction.entries()) {
@@ -61,7 +61,7 @@ export function resolveComponentIdFromSource(
  * Inline-authored blocks (no junctionId / not in the map) → null.
  */
 export function resolveRegion(
-  junctionMap: Map<string, SopSectionBlockWithUpdate>,
+  junctionMap: Map<string, SopSectionBlock>,
   junctionId: string | null | undefined,
 ): SourceProvenanceRegion | null {
   if (!junctionId) return null

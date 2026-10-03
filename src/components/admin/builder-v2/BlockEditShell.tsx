@@ -9,8 +9,7 @@ import { useSelectionSync } from '@/components/admin/source-viewer/useSelectionS
 import { selectBlock } from './selection-bridge'
 import type { SourceProvenanceRegion } from '@/lib/parsers/source-viewer'
 import { ReviewerFlagsPanel } from '@/components/admin/ai-reviewer/ReviewerFlagsPanel'
-import { PuckItemBadgeOverlay } from '@/components/sop/blocks/PuckItemBadgeOverlay'
-import type { SopSectionBlockWithUpdate } from '@/types/sop'
+import type { SopSectionBlock } from '@/types/sop'
 import { FIELD_MAP, ACCENT_BY_TYPE, DEFAULT_ACCENT, type FieldSpec } from './fields/field-map'
 import { InlineText } from './InlineText'
 import { EnumChip } from './fields/EnumChip'
@@ -61,18 +60,15 @@ interface BlockEditShellProps {
   onSelect?: () => void
   /**
    * P13 AI-flag overlay + P9 orphan chip (26-12). The junction row carries the
-   * update-available flag (13-04 badge) and verify state; `sopId` + `flagsCount`
-   * drive the reviewer-flag badge/panel (reused `ReviewerFlagsPanel`,
-   * `PuckItemBadgeOverlay` AS-IS). `flagsOpen` is lifted to the host so only ONE
+   * verify state; `sopId` + `flagsCount` drive the reviewer-flag badge/panel
+   * (reused `ReviewerFlagsPanel` AS-IS). `flagsOpen` is lifted to the host so only ONE
    * panel is expanded at a time (UI-SPEC §Review Overlays).
    */
-  junction?: SopSectionBlockWithUpdate | null
+  junction?: SopSectionBlock | null
   sopId?: string
   flagsCount?: number
   flagsOpen?: boolean
   onToggleFlags?: () => void
-  /** Refresh junctions after the update-available badge Accept/Decline. */
-  onReviewed?: () => void
   /**
    * P8 per-block verify (26-12). Single-block verify only — NO bulk affordance
    * (R8 lint guard). Writes through the existing verify action (host-owned);
@@ -207,7 +203,6 @@ export function BlockEditShell({
   flagsCount = 0,
   flagsOpen = false,
   onToggleFlags,
-  onReviewed,
   verified = false,
   onToggleVerify,
   editing = false,
@@ -228,10 +223,6 @@ export function BlockEditShell({
   const isOrphanHeading =
     item.type === 'HeadingBlock' &&
     String((item.props as { text?: unknown }).text ?? '').startsWith('Unanchored figures')
-  // P13 update-available badge (13-04) is reused via PuckItemBadgeOverlay, keyed
-  // by componentId off a one-entry map built from this block's junction row.
-  const badgeMap: Map<string, SopSectionBlockWithUpdate> =
-    junction ? new Map([[item.props.id, junction]]) : new Map()
   const showReviewOverlay = selectable && (isOrphanHeading || flagsCount > 0 || !!junction)
 
   const bodyInner = Block ? (
@@ -382,23 +373,10 @@ export function BlockEditShell({
         <FieldPanel item={item} onCommitField={onCommitField} onClose={() => setPanelOpen(false)} />
       )}
 
-      {/* Body: the SAME worker component (R2) as the live preview. P13 wraps it
-          in the reused 13-04 PuckItemBadgeOverlay so a linked block with a newer
-          library version surfaces the "update ▸" badge (no-op when up to date).
-          Hidden while editing — the field editors below take its place, rather
+      {/* Body: the SAME worker component (R2) as the live preview. Hidden
+          while editing — the field editors below take its place, rather
           than restating its content underneath it. */}
-      {!editing &&
-        (selectable && junction ? (
-          <PuckItemBadgeOverlay
-            componentId={item.props.id}
-            componentIdToJunction={badgeMap}
-            onReviewed={onReviewed}
-          >
-            {body}
-          </PuckItemBadgeOverlay>
-        ) : (
-          body
-        ))}
+      {!editing && body}
 
       {/* P13 inline AI-flag panel (reused AS-IS; renders null when clean). One
           panel expanded at a time — `flagsOpen` is lifted to the canvas host. */}
