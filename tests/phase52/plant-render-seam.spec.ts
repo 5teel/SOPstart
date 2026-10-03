@@ -60,16 +60,10 @@ test.describe('render seam', () => {
   })
 
   test('no static import of @/components/sop/plant/ anywhere outside the plant directory', () => {
-    // Phase 53: /m/[code] is its own route with its own chunk set, separate
-    // from the /sops bundle this guard protects -- it statically imports
-    // MachineView (which lives in the plant directory) directly. The
-    // bundle-isolation proof for /sops stays intact (the plant-home marker
-    // in the bundle gate covers that route specifically).
-    const M_ROUTE_DIR = 'src/app/(protected)/m/'
     const staticImport = /^\s*import\s+[^;]*from\s+'@\/components\/sop\/plant\//m
     const files = walk('src')
     const violations = files
-      .filter((f) => !f.startsWith(PLANT_DIR) && !f.startsWith(M_ROUTE_DIR))
+      .filter((f) => !f.startsWith(PLANT_DIR))
       .filter((f) => staticImport.test(read(f)))
     expect(violations).toEqual([])
   })

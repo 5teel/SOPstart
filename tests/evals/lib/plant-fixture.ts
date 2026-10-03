@@ -1,8 +1,7 @@
 /**
  * Shared eval-site fixture helper (Phase 52/53) -- one copy of the
  * upsert-only "ensure the eval-site org has its scene, EVAL Press, and the
- * published fixture SOP link" logic, used by both plant-home.eval.ts (52-05)
- * and phone-home.eval.ts (53-06). Never deletes; hard-asserts the resolved
+ * published fixture SOP link" logic, used by the plant evals. Never deletes; hard-asserts the resolved
  * org id is never the real SOPstart org before any write (T-52-05-A / T-53-18).
  */
 import fs from 'node:fs'

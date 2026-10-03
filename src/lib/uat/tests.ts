@@ -389,7 +389,7 @@ export const UAT_TESTS: UatTest[] = [
     dateAdded: '2026-06-26',
     category: 'Phase 23 — AI Field Layer + Version Supersede',
     title: 'Can a worker sign in on a shared device by picking their name?',
-    status: 'active',
+    status: 'archived',
     summary:
       'Workers on a shared device sign in by tapping their name from a list — no password needed. We want to confirm the name-select screen works and the right SOPs appear after selecting a name.',
     tryIt: [
@@ -399,7 +399,6 @@ export const UAT_TESTS: UatTest[] = [
       'Complete a short SOP and confirm the completion is recorded against the selected worker name.',
       'Switch to a different worker name and confirm you only see that worker\'s assigned SOPs (not the first worker\'s private data).',
     ],
-    links: [{ label: 'Roster name-select', href: '/login/roster' }],
     questions: [
       { id: 'name-list', text: 'Was it easy to find and tap your name on the list?' },
       { id: 'right-sops', text: 'Did the correct SOPs appear after selecting a name?' },
@@ -628,11 +627,11 @@ export const UAT_TESTS: UatTest[] = [
     title: 'Is the new builder header clear about where you are and what unlocks next?',
     status: 'active',
     summary:
-      'The dark bar at the top of the SOP builder is now a light bar with three parts: a "Back to SOP list" link, a "You\'re editing" tag with the SOP title, and a button showing the next stage — which tells you in plain words if it\'s locked and why. All the other tools (assign, versions, video, QR code, flow diagram, delete) are now in one "Tools for this SOP" menu.',
+      'The dark bar at the top of the SOP builder is now a light bar with three parts: a "Back to SOP list" link, a "You\'re editing" tag with the SOP title, and a button showing the next stage — which tells you in plain words if it\'s locked and why. All the other tools (assign, versions, video, flow diagram, delete) are now in one "Tools for this SOP" menu.',
     tryIt: [
       'Open any draft SOP in the builder and look at the header — check you can tell where you are and what SOP you\'re editing at a glance.',
       'With some steps still unchecked, look at the button on the right — read the sentence under it out loud; is it clear what\'s stopping you from sending this to workers?',
-      'Click "Tools for this SOP ▾" and confirm every item (assign, versions, video, QR code, see/edit flow diagram, delete draft) is there with a plain-English label.',
+      'Click "Tools for this SOP ▾" and confirm every item (assign, versions, video, see/edit flow diagram, delete draft) is there with a plain-English label.',
       'Check every step, then look at the same button again — it should turn green and say you\'re ready to send it to workers.',
     ],
     links: [{ label: 'SOPs', href: '/sops' }],
@@ -1024,7 +1023,7 @@ export const UAT_TESTS: UatTest[] = [
     dateAdded: '2026-09-29',
     category: 'Worker home',
     title: 'Can a worker get to a machine\'s jobs from their phone?',
-    status: 'active',
+    status: 'archived',
     summary:
       'On a phone, the SOPs page now starts with a search box, the next job, a picture of the site and a Scan button.',
     tryIt: [
@@ -1033,7 +1032,6 @@ export const UAT_TESTS: UatTest[] = [
       'Tap the picture of the site and pick a machine.',
       'Go back and tap Scan a machine plate — point it at a printed plate, or type the code under it.',
     ],
-    links: [{ label: 'Open SOPs', href: '/sops' }],
     questions: [
       { id: 'clear-first-step', text: 'Was it clear what to do first?' },
       { id: 'right-jobs', text: 'Did picking a machine show the right jobs?' },

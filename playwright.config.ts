@@ -634,18 +634,11 @@ export default defineConfig({
       // single registration point for the whole phase (mirrors phase51/52/etc).
       //
       // Verify registration: `npx playwright test --list --project=phase53`
-      // (should list all 9 tests/phase53/*.spec.ts files -- zero discovered = FAIL)
+      // (should list tests/phase53/login-next-redirect.spec.ts -- zero discovered = FAIL)
       //
-      // Files registered here:
-      //   qr-decode (PHN-03, LIVE from 53-01) --
-      //   login-next-redirect (PHN-02, LIVE from 53-01) --
-      //   m-code-page (PHN-02, fixme, activates 53-03) --
-      //   m-code-org-scope (PHN-02, fixme, activates 53-03) --
-      //   plate-page (PHN-02, fixme, activates 53-03) --
-      //   phone-home (PHN-01, fixme, activates 53-04) --
-      //   machine-list-sheet (PHN-01, fixme, activates 53-04) --
-      //   phone-home-fallback (PHN-01, fixme, activates 53-04) --
-      //   scan-sheet (PHN-03, fixme, activates 53-05)
+      // Files registered here (Phase 55 removed the phone/QR surface; only
+      // the login round-trip stays):
+      //   login-next-redirect (PHN-02) --
       name: 'phase53',
       testDir: '.',
       testMatch: /tests\/phase53\/.*\.(spec|test)\.ts$/,

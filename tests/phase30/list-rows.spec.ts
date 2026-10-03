@@ -5,7 +5,7 @@
  *   - Admin /admin/sops row = Title · status chip · ONE flag chip · owner;
  *     whole row click → builder. Nothing else.
  *   - SopDepartmentEditor + LibraryReviewCell leave the row.
- *   - The 5 icon-only actions (edit/assign/versions/video/qr) move into a
+ *   - The icon-only actions (edit/assign/versions/video) move into a
  *     LABELLED action menu in the BuilderStageShell top bar (reachable from
  *     every stage). Delete action survives for drafts in the same menu.
  *   - Fixes usability-lab F-09 (icon-only actions, WCAG).
@@ -56,14 +56,13 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
     expect(src).not.toContain('DeleteSopButton')
   })
 
-  test('builder shell owns a labelled action menu wired to the 5 destinations', () => {
+  test('builder shell owns a labelled action menu wired to the 3 destinations', () => {
     const shell = read(STAGE_SHELL)
     // Href WIRING (CLAUDE.md 2026-06-05): the menu links interpolate the real
     // sopId into the real destination routes — not just route-name tokens.
     expect(shell).toMatch(/\/admin\/sops\/\$\{sopId\}\/assign/)
     expect(shell).toMatch(/\/admin\/sops\/\$\{sopId\}\/versions/)
     expect(shell).toMatch(/\/admin\/sops\/\$\{sopId\}\/video/)
-    expect(shell).toMatch(/\/admin\/sops\/\$\{sopId\}\/qr/)
     // Delete for drafts survives in the menu (wired, not just named):
     // DeleteSopButton receives the sopId and the menu gates it on draft status.
     expect(shell).toMatch(/<DeleteSopButton\s+sopId=\{sopId\}/)
@@ -81,12 +80,10 @@ test.describe('UX-06 — one-line admin rows + builder action menu', () => {
     expect(shell).toContain('Assign this SOP to workers')
     expect(shell).toContain('See earlier versions')
     expect(shell).toContain('Make a training video')
-    expect(shell).toContain('Print a QR code')
     // The old Phase 30 labels no longer appear.
     expect(shell).not.toContain('Assign to team')
     expect(shell).not.toContain('Version history')
     expect(shell).not.toContain('Generate video')
-    expect(shell).not.toContain('Print QR code')
     // The menu never uses the icon-only evidence-btn idiom from the old rows.
     expect(shell).not.toContain('evidence-btn')
     // Trigger is a labelled control ("Tools for this SOP" visible text + aria).

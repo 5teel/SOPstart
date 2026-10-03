@@ -115,12 +115,12 @@ test.describe('SUR-01 — merged /sops surface gates the admin table on useIsAdm
 })
 
 test.describe('SUR-02 — the admin table is code-split, deep-linkable, and uses client-side nav state', () => {
-  test('SUR-02: page.tsx has exactly 4 next/dynamic({ ssr: false }) bindings (WorkerSimpleList + AdminLibraryTable + PlantHome + PhoneHome)', () => {
+  test('SUR-02: page.tsx has exactly 3 next/dynamic({ ssr: false }) bindings (WorkerSimpleList + AdminLibraryTable + PlantHome)', () => {
     const code = stripComments(read(SOPS_PAGE))
     const dynamicCalls = code.match(/dynamic\(/g) ?? []
-    expect(dynamicCalls.length).toBe(4)
+    expect(dynamicCalls.length).toBe(3)
     const ssrFalseCount = (code.match(/\{\s*ssr:\s*false\b[^}]*\}/g) ?? []).length
-    expect(ssrFalseCount).toBe(4)
+    expect(ssrFalseCount).toBe(3)
   })
 
   test('SUR-02: every dynamic( import target in page.tsx is in the allowed set', () => {
@@ -130,7 +130,6 @@ test.describe('SUR-02 — the admin table is code-split, deep-linkable, and uses
       '@/components/sop/WorkerSimpleList',
       '@/components/admin/AdminLibraryTable',
       '@/components/sop/plant/PlantHome',
-      '@/components/sop/plant/PhoneHome',
     ])
     for (const t of targets) {
       expect(allowed.has(t), `unexpected dynamic import target: ${t}`).toBe(true)

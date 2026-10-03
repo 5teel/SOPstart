@@ -32,7 +32,7 @@ const TEST_SCAN_EXCLUDED_PREFIXES = [
 ]
 
 // Each deleting plan appends its feature key here when it flips the block live.
-const LIVE_FEATURES: string[] = ['voice-capture', 'voice']
+const LIVE_FEATURES: string[] = ['voice-capture', 'voice', 'phone-qr', 'shared-device']
 // 55-13 flips this once the eight packages are uninstalled.
 const PACKAGES_LIVE = false
 

@@ -29,7 +29,6 @@ const HEX_ALLOW = [
   'src/components/admin/source-viewer/',
   'src/components/sop/flow/FlowGraphCanvas.tsx',
   'src/components/sop/blocks/ModelBlock.tsx',
-  'src/app/(protected)/admin/sops/[sopId]/qr/',
   'src/components/admin/org-model/',
   'src/components/admin/builder-v2/visual/annotation-tools.ts', // Konva stroke colours baked into PNGs
   'src/app/manifest.ts', // PWA manifest theme/background colours must be literal

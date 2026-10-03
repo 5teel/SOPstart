@@ -74,28 +74,6 @@ export const JOURNEYS: Journey[] = [
     ],
   },
   {
-    id: 'roster-login',
-    group: 'Getting started',
-    persona: 'Worker (shared device)',
-    title: 'Roster name-select login (D-11)',
-    summary: 'A worker on a shared device selects their name from the org roster — no password required. This is a standard browser login page; the shared-device account session (role=worker) is established once by an admin. Completing the SOP is the legal signature (D-09).',
-    steps: [
-      { id: 's', type: 'start', label: 'Shared device (admin-authenticated shared-device account)' },
-      { id: 'roster', type: 'screen', label: 'Roster name-select', route: '/login/roster', detail: 'RosterSelector fetches org worker roster (/api/roster) and renders large glove-friendly tap-target name buttons. Admin/supervisor sessions are redirected to their role home (escalation guard T-23-06-02).' },
-      { id: 'select', type: 'action', label: 'Tap name from roster', detail: 'roster_worker_id stored in sessionStorage. Shared-device account (RLS key) session unchanged.' },
-      { id: 'sops', type: 'screen', label: 'SOP library', route: '/sops', detail: 'Worker browses SOPs. "Updated since last completion" badge appears on any SOP newer than their last completion (AFL-VER-04 / D-08).' },
-      { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]', detail: 'One document in the order the job needs it: Orient (title, scope, which job inside the SOP), Prepare (hazards/PPE acknowledged inline, tools and parts for that job), Do (the job\'s steps listed in full, "Walk it step by step" button).' },
-      { id: 'walk', type: 'screen', label: 'Step-by-step walkthrough (Walk it tab)', route: '/sops/[sopId]', detail: 'Worker steps through by tapping. Walk it tab on the SOP detail (?tab=walk; legacy ?tab=walkthrough still lands).' },
-      { id: 'complete', type: 'action', label: 'Complete + worker self-sign', detail: 'Completing the SOP IS the worker signature (D-09). recordSignature() binds roster_worker_id to the completion record for attribution.' },
-      { id: 'countersign', type: 'decision', label: 'Counter-sign required?', branches: [
-        { label: 'Yes — supervisor counter-signs', to: 'sup' },
-        { label: 'No', to: 'e' },
-      ] },
-      { id: 'sup', type: 'screen', label: 'Supervisor review + counter-sign', route: '/activity/[completionId]', detail: 'Supervisor selects their name from roster and counter-signs. Second immutable record (D-10).' },
-      { id: 'e', type: 'end', label: 'SOP completion signed and recorded' },
-    ],
-  },
-  {
     id: 'sign-up',
     group: 'Getting started',
     persona: 'New organisation',
@@ -140,9 +118,7 @@ export const JOURNEYS: Journey[] = [
       { id: 's', type: 'start', label: 'Needs to do a task' },
       { id: 'where', type: 'decision', label: 'How do they start?', branches: [
         { label: 'On a desktop, and the site has a map', to: 'plant' },
-        { label: 'Scanned the QR plate on a machine', to: 'machine' },
-        { label: 'On a phone, and the site has a map', to: 'phone' },
-        { label: 'No map drawn yet', to: 'lib' },
+        { label: 'On a phone, or no map drawn yet', to: 'lib' },
       ] },
       { id: 'plant', type: 'screen', label: 'Plant home — the site map', route: '/sops', detail: 'The site drawing with every machine clickable (Phase 52). An amber pin on a machine counts that worker\'s procedures there that are due, never done, or updated — worked out live from the worker\'s own list, never stored (D-05/D-06). The "Next for you" card shows the single next procedure with Walk it and Show me. Department chips move the view to that department\'s machines. The ask bar lights up matching machines as the worker types. Admins see the library table here instead; their floor is on Governance (Phase 54).' },
       { id: 'pick', type: 'decision', label: 'How do they get there?', branches: [
@@ -152,19 +128,6 @@ export const JOURNEYS: Journey[] = [
       { id: 'panel', type: 'screen', label: 'Machine panel', route: '/sops', detail: 'Slides in from the right: the machine\'s photo (or "no photo yet"), its department named in that department\'s colour, then its procedures to-do first with the shared badge, a Walk › link and a plain Read link.', branches: [
         { label: 'Walk ›', to: 'walk' },
         { label: 'Read', to: 'detail' },
-      ] },
-      { id: 'machine', type: 'screen', label: 'Machine page', route: '/m/[code]', detail: 'Opened by scanning the plate stuck on the machine. Shows the department, the machine, its photo or "no photo yet", and its procedures with the things to do first, each with a Walk › link and a plain Read link. A code from another site shows "not found" — nothing tells the two apart. Signed-out people sign in and land straight back here (Phase 53).', branches: [
-        { label: 'Walk ›', to: 'walk' },
-        { label: 'Read', to: 'detail' },
-      ] },
-      { id: 'phone', type: 'screen', label: 'Phone home', route: '/sops', detail: 'Below 1024px, a worker (or an admin on a phone -- an admin on a phone is a worker) whose org has a drawn site sees: the ask bar with a microphone, the Next for you card with Walk it and Read, a picture of the floor, a Scan a machine plate button, then everything else (Phase 53).' },
-      { id: 'phone-pick', type: 'decision', label: 'How do they get there?', branches: [
-        { label: 'Scan a machine plate', to: 'scan' },
-        { label: 'Tap the floor picture, pick a machine', to: 'machine' },
-        { label: 'Next for you → Walk it', to: 'walk' },
-      ] },
-      { id: 'scan', type: 'action', label: 'Point the camera at the plate — or type the code printed on it', detail: 'A plate from another site is refused; a blocked camera goes straight to typing.', branches: [
-        { label: 'Decoded / typed', to: 'machine' },
       ] },
       { id: 'lib', type: 'screen', label: 'SOP library', route: '/sops', detail: 'The stacked worker list (WorkerSimpleList, no map drawn or below 1024px): scope chips (All yours, Refresher due, Updated, Never done, Everything, Not added yet), a department filter, and search. "Updated since last completion" badge (AFL-VER-04) marks any SOP published after the worker\'s last completion. Phase 36 (REF-01): a "Refresher due"/"Refresher overdue" chip appears alongside it once the SOP\'s refresher interval has elapsed since the worker\'s last completion — informational only, never blocks opening the card. Add / Remove sits on each row (D-10).' },
       { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]', detail: 'Read is the SOP as one document (2026-09-27): Orient → Prepare → Do. A SOP holding several procedures shows a "Which job are you doing?" chooser (?job=); Prepare lists tools and parts for that job and lets the worker acknowledge the safety requirements inline; Do lists the job\'s steps in full with a "Walk it step by step" button. Walk it walks the chosen job only (Step 1 of 6, not 1 of 40) and skips the "Before you start" screen when already acknowledged or when there is nothing to acknowledge. Workers see Read + Walk it; the Flow tab and the Desktop/Mobile preview toggle are admin-only (Flow also shows to workers when a real branching graph was authored). Legacy ?tab= params still map onto the tabs. Admins/safety managers see an "Edit in builder" link here.' },
@@ -198,7 +161,7 @@ export const JOURNEYS: Journey[] = [
         { label: 'Yes', to: 'read' },
         { label: 'Last step done', to: 'complete' },
       ] },
-      { id: 'complete', type: 'action', label: 'Complete + worker self-sign', detail: 'Creates an append-only completion record. Completing IS the worker signature (D-09). recordSignature() binds roster_worker_id for attribution (AFL-VER-05).' },
+      { id: 'complete', type: 'action', label: 'Complete + worker self-sign', detail: 'Creates an append-only completion record. Completing IS the worker signature (D-09). The worker who is signed in is the one recorded (AFL-VER-05).' },
       { id: 'signoff', type: 'decision', label: 'Supervisor counter-sign required?', branches: [
         { label: 'Yes → supervisor counter-signs', to: 'sup' },
         { label: 'No', to: 'e' },
@@ -380,21 +343,6 @@ export const JOURNEYS: Journey[] = [
       { id: 'prompt', type: 'action', label: 'Describe the procedure', detail: 'AI generates structured sections + steps.' },
       { id: 'builder', type: 'screen', label: 'Builder', route: '/admin/sops/builder/[sopId]' },
       { id: 'e', type: 'end', label: 'Draft ready' },
-    ],
-  },
-  {
-    id: 'machine-qr',
-    group: 'Follow a SOP',
-    persona: 'Worker',
-    title: 'Scan the machine QR code',
-    summary: 'Admin prints a QR sticker for the machine; the worker at the machine scans it and lands directly on that procedure — no library browsing.',
-    steps: [
-      { id: 's', type: 'start', label: 'Admin: SOP is published' },
-      { id: 'qr', type: 'screen', label: 'Print QR sticker', route: '/admin/sops/[sopId]/qr', detail: 'Server-rendered QR encoding the worker deep link. Stick it on the machine/work area.' },
-      { id: 'scan', type: 'action', label: 'Worker scans sticker on the machine' },
-      { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]' },
-      { id: 'walk', type: 'screen', label: 'Walkthrough (Walk it tab)', route: '/sops/[sopId]', detail: 'Walk it tab (?tab=walk).' },
-      { id: 'e', type: 'end', label: 'Right SOP, zero searching' },
     ],
   },
   {
@@ -633,7 +581,6 @@ export const JOURNEYS: Journey[] = [
       { id: 'editor', type: 'screen', label: 'Site map editor', route: '/admin/site', detail: 'Scene at full size, drag to pan, scroll to zoom.' },
       { id: 'draw', type: 'action', label: 'Draw machine', detail: 'Click each corner, click the first to finish; name it, pick its department.' },
       { id: 'link', type: 'action', label: 'Show SOPs on a machine', detail: 'Link or unlink SOPs from the machine panel.' },
-      { id: 'plate', type: 'screen', label: 'Print a machine plate', route: '/admin/site/plate/[machineId]', detail: 'From a selected machine, choose Print plate. The plate shows a QR code, the machine name, its department and a short code in large letters. Print it at A6 and fix it to the machine — scanning it opens that machine\'s page (Phase 53).' },
       { id: 'builder', type: 'screen', label: 'Builder → Tools for this SOP → Pick machines for this SOP', route: '/admin/sops/builder/[sopId]', detail: 'The same links, edited from the SOP side. The same Tools menu also carries "Change category" (BuilderCategoryButton, D-09) — the category fix that used to live in the retired list detail pane.' },
       { id: 'e', type: 'end', label: 'Site mapped' },
     ],
