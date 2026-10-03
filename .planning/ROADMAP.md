@@ -1736,7 +1736,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 
 **Decision (D-07, 2026-10-03):** bundle baseline moved down by hand after the cut — /sops/[sopId]/page 1048 → 817 KB, /sops/page 940 → 817 KB; capture script not run.
 
-**Plans:** 12/14 plans executed
+**Plans:** 13/14 plans executed
 Plans:
 **Wave 1**
 
@@ -1788,7 +1788,7 @@ Executes 55 → 56 → 57 → 58 → 59 → 60 → 61 → 62, strictly sequentia
 
 **Wave 13** *(blocked on Wave 12 completion)*
 
-- [ ] 55-13-PLAN.md — Uninstall 8 packages, dropped list fully live, docs refreshed, bundle baseline moved down by hand (D-07), full suite once
+- [x] 55-13-PLAN.md — Uninstall 8 packages, dropped list fully live, docs refreshed, bundle baseline moved down by hand (D-07), full suite once
 
 **Wave 14** *(blocked on Wave 13 completion)*
 
