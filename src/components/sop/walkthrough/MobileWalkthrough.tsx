@@ -459,6 +459,7 @@ export const MobileWalkthrough = React.forwardRef<
       <div className="immersive-only-below-430">
         <ImmersiveStepCard
           sop={sop}
+          currentStepId={localStepId}
           onStepChange={handleStepChange}
           completedSteps={completedSteps}
           stepPhotos={currentStepPhotos}
