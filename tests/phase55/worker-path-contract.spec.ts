@@ -141,8 +141,6 @@ test.describe('photo upload URL takes its organisation from the session (55-03)'
 })
 
 test.describe('service worker retired (55-09)', () => {
-  test.fixme(true, 'flips live in 55-09')
-
   test('public/sw.js is a committed kill-switch', () => {
     const sw = read('public/sw.js')
     expect(sw).toContain('unregister()')

@@ -15,7 +15,6 @@
  *     names, never raw block ids.
  *   - Reversibility near publish (PublishStage.tsx): "You can unpublish or
  *     edit later".
- *   - Offline pill (OnlineStatusBanner.tsx) plain-languaged.
  *
  * This file starts as test.fixme — the UX-07 plan flips it live.
  */
@@ -82,13 +81,5 @@ test.describe('UX-07 — plain-language pass (labels only)', () => {
   test('publish surface states reversibility ("You can unpublish or edit later")', () => {
     const src = read(PUBLISH_STAGE)
     expect(src).toContain('You can unpublish or edit later')
-  })
-
-  test('offline pill is plain-languaged', () => {
-    const src = read(
-      path.join(ROOT, 'src', 'components', 'layout', 'OnlineStatusBanner.tsx'),
-    )
-    expect(src).not.toContain('Offline — changes saved locally')
-    expect(src).toContain('No internet — your work is saved on this device')
   })
 })

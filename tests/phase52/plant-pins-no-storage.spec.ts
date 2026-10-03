@@ -55,19 +55,9 @@ test('(b) no file under src/stores/ mentions pin or plant', () => {
   expect(violations).toEqual([])
 })
 
-test('(c) src/lib/offline/db.ts declares no pin/plant Dexie store', () => {
-  const src = read('src/lib/offline/db.ts')
-  const storeDeclLines = src.split(/\r?\n/).filter((l) => /^\s*\w+:\s*['"]/.test(l))
-  const violations = storeDeclLines.filter((l) => /pin|plant/i.test(l))
-  expect(violations).toEqual([])
-})
-
-test('(d) worker-signal.ts has no I/O -- no supabase, no db.ts value import, no localStorage, no create(', () => {
+test('(d) worker-signal.ts has no I/O -- no supabase, no localStorage, no create(', () => {
   const src = read('src/lib/sop/worker-signal.ts')
   expect(src.includes('supabase')).toBe(false)
-  // A TYPE-ONLY import is fine (`import type { ... } from ...`);
-  // a VALUE import of the Dexie db instance is the thing this guards against.
-  expect(/^import\s+(?!type\s)[^;]*from\s+'@\/lib\/offline\/db'/m.test(src)).toBe(false)
   expect(src.includes('localStorage')).toBe(false)
   expect(src.includes('create(')).toBe(false)
 })

@@ -48,7 +48,7 @@ test.describe('reorder — dnd-kit vertical sortable (keyboard + pointer)', () =
     const after = reorderBlocks(content, from, to)
 
     expect(after.map((i) => i.props.id)).toEqual(['c', 'a', 'b'])
-    // Lossless — the persisted (draftLayouts) order carries intact metadata.
+    // Lossless — the saved layout order carries intact metadata.
     for (const item of after) {
       expect(item.props.junctionId).toBe(`junc-${item.props.id}`)
       expect(item.props.block_provenance).toBeDefined()

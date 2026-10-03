@@ -14,17 +14,12 @@ export default defineConfig({
       testMatch: /rls-isolation|auth-flows/,
     },
     {
-      name: 'e2e',
-      testMatch: /offline-indicator/,
-      use: { browserName: 'chromium' },
-    },
-    {
       name: 'phase2-stubs',
       testMatch: /sop-upload|sop-parsing|sop-review/,
     },
     {
       name: 'phase3-stubs',
-      testMatch: /offline-sync|walkthrough|quick-ref|sop-library|sop-assignment|sop-versioning/,
+      testMatch: /walkthrough|quick-ref|sop-library|sop-assignment|sop-versioning/,
     },
     {
       name: 'phase6-stubs',

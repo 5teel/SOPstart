@@ -170,26 +170,6 @@ export const JOURNEYS: Journey[] = [
       { id: 'e', type: 'end', label: 'Job recorded' },
     ],
   },
-  {
-    id: 'offline-use',
-    group: 'Worker',
-    persona: 'Worker',
-    title: 'Work offline',
-    summary: 'A worker downloads a procedure ahead of time and follows it with no signal, syncing when back online.',
-    steps: [
-      { id: 's', type: 'start', label: 'Going somewhere with no signal' },
-      { id: 'detail', type: 'screen', label: 'Procedure detail', route: '/sops/[sopId]' },
-      { id: 'dl', type: 'action', label: 'Download for offline', detail: 'Cached in the browser (Dexie + service worker).' },
-      { id: 'offline', type: 'action', label: 'Open & follow offline', detail: 'Steps, photos, measurements all work.' },
-      { id: 'miss', type: 'decision', label: 'Open an uncached page?', branches: [
-        { label: 'Yes', to: 'fallback' },
-        { label: 'No', to: 'recon' },
-      ] },
-      { id: 'fallback', type: 'screen', label: 'Offline fallback', route: '/~offline' },
-      { id: 'recon', type: 'action', label: 'Back online → sync', detail: 'Queued photos + completions reconcile automatically.' },
-      { id: 'e', type: 'end', label: 'Everything saved' },
-    ],
-  },
 
   // ============================== Supervisor ==============================
   {

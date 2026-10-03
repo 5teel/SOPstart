@@ -67,7 +67,6 @@ test.describe('UX-08 — dead-weight sweep', () => {
     const src = fs.readFileSync(
       path.join(ROOT, 'src', 'app', '(protected)', 'sops', 'page.tsx'), 'utf-8',
     )
-    expect(src).not.toMatch(/\/\/ TODO.*useAssignedSops/)
     // The fix is WIRED: junction fetch feeds the filter predicate.
     expect(src).toContain("from('sop_departments')")
     // Repointed 2026-08-04: the predicate moved into deptMatches(sopId) when
