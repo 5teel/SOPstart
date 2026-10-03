@@ -1,18 +1,19 @@
 /**
- * SOP -> focus-step conversion runner (Phase 56-02): DRY RUN ONLY.
+ * SOP -> focus-step conversion runner (Phase 56-02 dry run, 56-07 apply).
  *
- * Reads every SOP (service role, read-only), converts it with src/lib/sop/convert.ts
- * and prints / writes the before-after report. There is deliberately no write path
- * in this file: `--apply` arrives in 56-07, after the schema exists and this
- * report has been read.
+ * Default is a read-only dry run. `--apply` (needs --sop, --org or --all) writes
+ * ONLY public.sop_focus_steps and public.sop_conversion_runs. This file never
+ * touches the old section or step tables: no insert, update or delete on them, so
+ * the old SOP page and builder keep reading exactly what they read before.
  *
  * Run: npx tsx scripts/convert-sops-to-steps.ts --all --report <path.md>
- *      flags: --org <uuid> --sop <uuid> --all --report <path> --apply (exits 2)
+ *      npx tsx scripts/convert-sops-to-steps.ts --apply --sop <uuid> | --org <uuid> | --all
  */
 import fs from 'node:fs'
 import { execSync } from 'node:child_process'
-import { CONVERTER_VERSION, convertSop } from '../src/lib/sop/convert'
-import type { SopConversion } from '../src/lib/sop/convert'
+import { randomUUID } from 'node:crypto'
+import { CONVERTER_VERSION, convertSop, planFocusStepWrites } from '../src/lib/sop/convert'
+import type { ExistingFocusStep, SopConversion } from '../src/lib/sop/convert'
 import type { Section } from '../src/lib/sop/sections'
 
 const args = process.argv.slice(2)
@@ -21,8 +22,9 @@ const flag = (n: string) => {
   return i >= 0 ? args[i + 1] : undefined
 }
 
-if (args.includes('--apply')) {
-  console.error('--apply arrives in 56-07 (needs the 56-03 schema and a read of the dry-run report). Nothing was touched.')
+const APPLY = args.includes('--apply')
+if (APPLY && !flag('--sop') && !flag('--org') && !args.includes('--all')) {
+  console.error('--apply needs an explicit scope: --sop <uuid>, --org <uuid> or --all. Nothing was touched.')
   process.exit(2)
 }
 
@@ -41,6 +43,7 @@ const CENSUS: Record<string, number> = {
 }
 
 const SECTION_SELECT = '*, section_kind:section_kinds!section_kind_id ( * ), sop_steps ( * ), sop_images ( * )'
+const chunk = <T,>(a: T[], n = 500): T[][] => Array.from({ length: Math.ceil(a.length / n) }, (_, i) => a.slice(i * n, (i + 1) * n))
 const cell = (s: string) => s.replace(/\|/g, '/').replace(/\s+/g, ' ').trim()
 
 async function main() {
@@ -72,6 +75,57 @@ async function main() {
     rows.push({ sop, c, imgTotal: c.before.images })
   }
 
+  // ---- apply: per SOP, gate first; upsert before delete so a failure leaves a superset, never a loss.
+  const action = new Map<string, 'converted' | 'unchanged' | 'failed'>()
+  if (APPLY) {
+    const runId = randomUUID()
+    for (const { sop, c } of rows) {
+      if (!sop.organisation_id) throw new Error(`SOP ${sop.id} has no organisation_id; refusing to write`)
+      const runRow = {
+        run_id: runId, organisation_id: sop.organisation_id, sop_id: sop.id, source: c.source,
+        layout_hash: c.hash, converter_version: CONVERTER_VERSION, before: c.before, after: c.after,
+      }
+      if (!c.gate.ok) {
+        const { error: e } = await sb.from('sop_conversion_runs').insert({ ...runRow, ok: false, failures: c.gate.failures })
+        if (e) throw e
+        action.set(sop.id, 'failed')
+        continue
+      }
+      const { data: last, error: le } = await sb.from('sop_conversion_runs').select('ok, layout_hash, converter_version')
+        .eq('sop_id', sop.id).order('created_at', { ascending: false }).limit(1)
+      if (le) throw le
+      if (last?.[0]?.ok && last[0].layout_hash === c.hash && last[0].converter_version === CONVERTER_VERSION) {
+        action.set(sop.id, 'unchanged')
+        continue
+      }
+      const { data: existing, error: ee } = await sb.from('sop_focus_steps').select('*').eq('sop_id', sop.id)
+      if (ee) throw ee
+      const plan = planFocusStepWrites(c.steps, (existing ?? []) as unknown as ExistingFocusStep[])
+      const now = new Date().toISOString()
+      for (const part of chunk(plan.upserts)) {
+        const { error: ue } = await sb.from('sop_focus_steps').upsert(
+          part.map((d) => ({
+            organisation_id: sop.organisation_id, sop_id: sop.id, section_id: d.sectionId, kind: d.kind, text: d.text,
+            tip: d.tip, photo_required: d.photoRequired, image_paths: d.imagePaths, required_tools: d.requiredTools,
+            time_estimate_minutes: d.timeEstimateMinutes, sort_order: d.sortOrder, source_key: d.sourceKey,
+            run_id: runId, updated_at: now,
+          })),
+          { onConflict: 'section_id,source_key' },
+        )
+        if (ue) throw ue
+      }
+      for (const part of chunk(plan.deleteIds)) {
+        const { error: de } = await sb.from('sop_focus_steps').delete().in('id', part).eq('sop_id', sop.id)
+        if (de) throw de
+      }
+      const { error: re } = await sb.from('sop_conversion_runs').insert({ ...runRow, ok: true, failures: [] })
+      if (re) throw re
+      action.set(sop.id, 'converted')
+    }
+    const n = (a: string) => [...action.values()].filter((v) => v === a).length
+    console.log(`apply: ${n('converted')} converted / ${n('unchanged')} unchanged / ${n('failed')} failed (run ${runId})`)
+  }
+
   const failing = rows.filter((r) => !r.c.gate.ok)
   const sum = (f: (r: (typeof rows)[number]) => number) => rows.reduce((a, r) => a + f(r), 0)
   const bySource = (s: string) => rows.filter((r) => r.c.source === s).length
@@ -98,14 +152,16 @@ async function main() {
     try { sha = execSync('git rev-parse --short HEAD').toString().trim() } catch { /* not a repo */ }
     const scope = only ? `sop ${only}` : org ? `org ${org}` : 'all SOPs'
     const out: string[] = [
-      '# Phase 56 - Conversion dry run',
+      APPLY ? '# Phase 56 - Conversion apply' : '# Phase 56 - Conversion dry run',
       '',
       `- Date: ${new Date().toISOString()}`,
       `- Commit: ${sha}`,
       `- Scope: ${scope}`,
       `- CONVERTER_VERSION: ${CONVERTER_VERSION}`,
       `- SOPs in scope at run time (\`select count(*) from sops\`): ${count}; rows below: ${rows.length}`,
-      '- Read-only: this run wrote nothing.',
+      APPLY
+        ? `- Applied: ${[...action.values()].filter((v) => v === 'converted').length} converted / ${[...action.values()].filter((v) => v === 'unchanged').length} unchanged / ${failing.length} failed`
+        : '- Read-only: this run wrote nothing.',
       '',
       '## Totals',
       '',
@@ -132,11 +188,11 @@ async function main() {
       '',
       '## Per SOP',
       '',
-      '| Id | Title | Status | Source | Hazard before->after | PPE cards->steps (items) | Step | Check | Photo | Images matched/total | Dropped v/vid/empty | Tips folded | Result |',
-      '|---|---|---|---|---|---|---|---|---|---|---|---|---|',
+      '| Id | Title | Status | Source | Hazard before->after | PPE cards->steps (items) | Step | Check | Photo | Images matched/total | Dropped v/vid/empty | Tips folded | Result |' + (APPLY ? ' Action |' : ''),
+      '|---|---|---|---|---|---|---|---|---|---|---|---|---|' + (APPLY ? '---|' : ''),
       ...rows.map((r) => {
         const b = r.c.before
-        return `| ${r.sop.id.slice(0, 8)} | ${cell(r.sop.title ?? '')} | ${r.sop.status} | ${r.c.source} | ${b.hazardSources}->${r.c.after.hazard} | ${b.ppeSources}->${r.c.after.ppe} (${ppeCount(r)}/${b.ppeItems.length}) | ${r.c.after.step} | ${r.c.after.check} | ${r.c.after.photoRequired} | ${b.imagesMatched}/${r.imgTotal} | ${b.voiceDropped}/${b.videoDropped}/${b.emptyDropped} | ${b.tipsFolded} | ${r.c.gate.ok ? 'ok' : cell(r.c.gate.failures.join(' '))} |`
+        return `| ${r.sop.id.slice(0, 8)} | ${cell(r.sop.title ?? '')} | ${r.sop.status} | ${r.c.source} | ${b.hazardSources}->${r.c.after.hazard} | ${b.ppeSources}->${r.c.after.ppe} (${ppeCount(r)}/${b.ppeItems.length}) | ${r.c.after.step} | ${r.c.after.check} | ${r.c.after.photoRequired} | ${b.imagesMatched}/${r.imgTotal} | ${b.voiceDropped}/${b.videoDropped}/${b.emptyDropped} | ${b.tipsFolded} | ${r.c.gate.ok ? 'ok' : cell(r.c.gate.failures.join(' '))} |${APPLY ? ` ${action.get(r.sop.id)} |` : ''}`
       }),
       '',
     ]
