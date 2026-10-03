@@ -87,9 +87,9 @@ The 14: sb-auth-builder (1), sb-layout-editor (6: 01, 02, D01-preview, 06, 13-un
 
 Nothing fetched or installed; uninstall only (T-55-SC). `npm run build` green after uninstall.
 
-## Stale project CLAUDE.md (flag for Simon, not edited)
+## Project CLAUDE.md
 
-`CLAUDE.md` still describes Dexie, Serwist, idb-keyval and tesseract in the Technology Stack; lists `~offline/`, the offline hooks (`useAssignedSops`, `usePhotoQueue`, `useSopSync`, `useOnlineStatus`), the `network` store and `src/lib/offline/` under Architecture; and has an "Offline Strategy" section. All now false. Update when logging this phase's Learnings. `.planning/codebase/CONCERNS.md` also still mentions Dexie/Serwist.
+Updated separately on 2026-10-03 (Technology Stack "Offline: none since Phase 55", offline hooks and `src/lib/offline/` removed from Architecture, "Worker Walk Path" replaces "Offline Strategy"). Nothing left for this plan to flag. `.planning/codebase/CONCERNS.md` still mentions Dexie/Serwist; not in this plan's file list, left for Phase 62's doc sweep.
 
 ## Push note
 
