@@ -28,7 +28,7 @@ export default defineConfig({
     },
     {
       name: 'phase6-stubs',
-      testMatch: /video-upload|youtube-url|youtube-no-captions|stage-progress|transcript-review|publish-gate|safety-warning/,
+      testMatch: /video-upload|stage-progress|transcript-review|publish-gate|safety-warning/,
     },
     {
       name: 'phase8-stubs',

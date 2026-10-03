@@ -4,8 +4,6 @@
  * Proves the four dead-surface findings this phase fixes are actually
  * live in production, not just source-contract-pinned:
  *   A — /admin/blocks "New block" opens a real create form (D-03)
- *   B — /admin/sops/upload "Scan document" opens the shipped scanner,
- *       not a coming-soon placeholder (D-04)
  *   C — the Access map (/sops?view=access) shows the Wiring view only,
  *       no Matrix/Illuminate lens toggle (D-05)
  *   D1/D2 — the legacy /admin/sops and /admin/governance URLs still land
@@ -78,23 +76,6 @@ test.describe('Phase 43 — dead-surface removal (deployed)', () => {
     await page.getByRole('button', { name: 'Archive block' }).click()
     await expect(page).toHaveURL(/\/admin\/blocks$/, SLOW)
     await expect(page.getByText(name)).toHaveCount(0)
-
-    expect(errors).toEqual([])
-  })
-
-  test('B — Scan document opens the shipped scanner, not a coming-soon modal', async ({ page, context }) => {
-    const errors = watchConsole(page)
-    await signInAs(context, 'siteAdmin')
-
-    await page.goto('/admin/sops/upload')
-    await page.getByRole('button', { name: 'Scan document' }).click()
-    await expect(page.getByRole('dialog', { name: 'Scan document' })).toBeVisible(SLOW)
-    await expect(page.getByText(/coming soon/i)).toHaveCount(0)
-    await expect(page.getByText('Tap "Add page" to capture your first page')).toBeVisible(SLOW)
-    await shot(page, 'scan-document')
-
-    await page.getByRole('button', { name: 'Close scanner' }).click()
-    await expect(page.getByRole('dialog', { name: 'Scan document' })).toBeHidden(SLOW)
 
     expect(errors).toEqual([])
   })

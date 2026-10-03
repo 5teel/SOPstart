@@ -150,7 +150,7 @@ export const JOURNEYS: Journey[] = [
       { id: 'read', type: 'action', label: 'Read & acknowledge the step', detail: 'Must acknowledge to advance (safety).' },
       { id: 'kind', type: 'decision', label: 'What does the step need?', branches: [
         { label: 'Just read it', to: 'next' },
-        { label: 'Take a photo', to: 'photo' },
+        { label: 'Add a photo', to: 'photo' },
         { label: 'Enter a measurement', to: 'meas' },
         { label: 'Make a yes/no decision', to: 'decide' },
       ] },
@@ -319,11 +319,11 @@ export const JOURNEYS: Journey[] = [
     group: 'Create an SOP',
     persona: 'SOP Admin',
     title: 'Create from a video or recording',
-    summary: 'An admin uploads a video, records one, or pastes a YouTube link; the audio is transcribed into a draft procedure.',
+    summary: 'An admin uploads a video or records one; the audio is transcribed into a draft procedure.',
     steps: [
       { id: 's', type: 'start', label: 'Has a video of the task' },
       { id: 'picker', type: 'screen', label: 'New SOP method picker', route: '/admin/sops/new', detail: 'Video lives behind "Upload a document".' },
-      { id: 'up', type: 'screen', label: 'Upload / record / YouTube', route: '/admin/sops/upload' },
+      { id: 'up', type: 'screen', label: 'Upload / record', route: '/admin/sops/upload' },
       { id: 'trans', type: 'action', label: 'Transcribe audio', detail: 'Domain vocabulary prompt; numbers + chemicals flagged for confirmation.' },
       { id: 'pipe', type: 'screen', label: 'Pipeline progress', route: '/admin/sops/pipeline/[pipelineId]' },
       { id: 'builder', type: 'screen', label: 'Builder', route: '/admin/sops/builder/[sopId]' },

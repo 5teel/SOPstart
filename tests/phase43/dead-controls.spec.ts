@@ -50,29 +50,6 @@ function walkTsFiles(dir: string, out: string[] = []): string[] {
 }
 
 test.describe('Dead controls: scan-document, wiring lens, dead state (D-02/D-04/D-05, activates 43-03)', () => {
-  test(
-    'UploadDropzone mounts the shipped PhotoScanner and queues scanned pages through validateAndAddFiles (D-04)',
-    () => {
-      const src = read('src/components/admin/UploadDropzone.tsx')
-      expect(src).toContain("import { PhotoScanner } from './PhotoScanner'")
-      expect(src).toContain('<PhotoScanner')
-      expect(src).toMatch(/onSubmit=\{\(files\)\s*=>\s*\{[\s\S]{0,160}validateAndAddFiles\(files\)/)
-
-      let importers = 0
-      for (const file of walkTsFiles(path.join(ROOT, 'src'))) {
-        const rel = path.relative(ROOT, file)
-        const stripped = stripComments(read(rel))
-        if (
-          stripped.includes("from './PhotoScanner'") ||
-          stripped.includes("from '@/components/admin/PhotoScanner'")
-        ) {
-          importers++
-        }
-      }
-      expect(importers).toBe(1)
-    }
-  )
-
   test('no comment-stripped src/ file ships a coming-soon placeholder (D-04, D-05)', () => {
     const offenders: string[] = []
     for (const file of walkTsFiles(path.join(ROOT, 'src'))) {

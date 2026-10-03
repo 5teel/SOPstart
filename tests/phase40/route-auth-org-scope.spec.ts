@@ -134,7 +134,6 @@ test.describe('40-12 -- session + org guard on sopId-keyed admin-client routes',
     // added here with a classification -- the tripwire this plan promises.
     const ADMIN_CLIENT_ROUTES: { file: string; auth: string }[] = [
       { file: 'ai-prompt/route.ts', auth: 'session+org' },
-      { file: 'youtube/route.ts', auth: 'session+org' },
       { file: 'generate-video/route.ts', auth: 'session+org' },
       { file: 'generate-video/callback/route.ts', auth: 'machine-secret' },
       { file: 'generate-video/finalize/route.ts', auth: 'machine-secret' },

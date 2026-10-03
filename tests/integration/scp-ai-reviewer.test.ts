@@ -140,7 +140,6 @@ test.describe('SCP-AI — AI reviewer five-jobs (Phase 21)', () => {
     for (const route of [
       'src/app/api/sops/parse/route.ts',
       'src/app/api/sops/restructure/route.ts',
-      'src/app/api/sops/youtube/route.ts',
       'src/app/api/sops/transcribe/route.ts',
     ]) {
       const body = readFile(route)

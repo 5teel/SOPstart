@@ -30,7 +30,6 @@ const SOP_CREATING_ROUTES = [
   path.join(SRC_DIR, 'app', 'api', 'sops', 'parse', 'route.ts'),
   path.join(SRC_DIR, 'app', 'api', 'sops', 'restructure', 'route.ts'),
   path.join(SRC_DIR, 'app', 'api', 'sops', 'transcribe', 'route.ts'),
-  path.join(SRC_DIR, 'app', 'api', 'sops', 'youtube', 'route.ts'),
   path.join(SRC_DIR, 'app', 'api', 'sops', 'ai-prompt', 'route.ts'),
 ]
 
@@ -181,7 +180,6 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
   { file: 'src/app/api/sops/restructure/route.ts', keys: 'parse_notes,status', reason: 'Restructure-failure early exit; category is only set on the success-path post-parse UPDATE.' },
   { file: 'src/app/api/sops/transcribe/route.ts', keys: 'status', reason: 'Status-only transition (recording/transcribing progress, 2 call sites); not a category-bearing write.' },
   { file: 'src/app/api/sops/transcribe/route.ts', keys: 'parse_notes,status', reason: 'Transcription-failure early exit; category is only set on the success-path post-parse UPDATE.' },
-  { file: 'src/app/api/sops/youtube/route.ts', keys: 'is_ocr,organisation_id,source_file_name,source_file_path,source_file_type,status,title,uploaded_by,version', reason: 'Pre-parse shell insert for a YouTube-sourced SOP; this file’s own post-parse UPDATE sets category_slug once the transcript is classified.' },
   { file: 'src/app/api/sops/[sopId]/publish/route.ts', keys: 'approval_snapshot,approval_state', reason: 'Approval-chain state stamp on publish; not a category-bearing write.' },
   { file: 'src/lib/governance/publish-core.ts', keys: '', reason: 'performPublish’s status/published_at/updated_at(+approval_state) transition, built as a typed variable payload rather than an inline object literal; not a category-bearing write.' },
   { file: 'src/lib/governance/publish-core.ts', keys: 'last_reviewed_at,review_due_at', reason: 'Review-clock reset on publish; category_slug is read (not written) to resolve the cadence.' },
@@ -196,7 +194,9 @@ const CATEGORY_EXEMPT: CategoryExemptEntry[] = [
 // variant C). It WRITES category_slug — that is its entire purpose — so it
 // needs no exemption; the count moved only because a sops write path was
 // genuinely added, which is exactly what this tripwire exists to surface.
-const EXPECTED_SOPS_WRITE_SITE_COUNT = 46
+// 2026-10-03: 46 -> 44. Phase 55-07 deleted the YouTube route (its shell insert and
+// post-parse update were the two sites); no remaining path lost category_slug.
+const EXPECTED_SOPS_WRITE_SITE_COUNT = 44
 
 // Extracts the substring between a `(` at `openIdx` and its matching `)`,
 // tracking paren depth so nested calls/objects don't truncate the payload.
